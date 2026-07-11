@@ -74,6 +74,31 @@ def test_package_deck_role_preserves_true_external_reference_placeholder() -> No
     assert builder.package_deck_role(proposal) == proposal["deck_role_json"]
 
 
+def test_hand_cycling_runtime_fields_and_execution_scenario_are_manifested() -> None:
+    proposal = {
+        "normalized_name": "barkhide mauler",
+        "card_name": "Barkhide Mauler",
+        "logical_rule_key": "battle_rule_v1:cycling_fixture",
+        "oracle_hash": "hash-cycling",
+        "effect_json": {
+            "effect": "creature",
+            "battle_model_scope": "xmage_hand_cycling_only_v1",
+            "has_cycling": True,
+            "cycling_cost": "{2}",
+            "cycling_status": "runtime_executor_v1",
+        },
+    }
+
+    expected = builder.expected_rule_from_proposal(proposal)
+    scenario = builder.execution_scenario_from_expected_rule(expected)
+
+    assert expected["required_effect_fields"]["cycling_cost"] == "{2}"
+    assert expected["required_effect_fields"]["cycling_status"] == "runtime_executor_v1"
+    assert scenario["type"] == "hand_cycling"
+    assert scenario["expected_cycling_cost"] == "{2}"
+    assert scenario["controller_mana"]["generic"] == 2
+
+
 def test_counter_unless_pays_dynamic_fields_and_execution_scenario_are_manifested() -> None:
     proposal = {
         "normalized_name": "spell stutter",

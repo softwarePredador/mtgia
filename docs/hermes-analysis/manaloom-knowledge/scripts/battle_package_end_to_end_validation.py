@@ -7866,6 +7866,67 @@ def run_gain_control_untap_haste_until_eot(
     }
 
 
+def run_hand_cycling(
+    battle,
+    scenario: dict[str, Any],
+    events: list[tuple[str, dict[str, Any]]],
+) -> dict[str, Any]:
+    card = battle.enrich_card(dict(scenario["card"]))
+    active = battle.Player(
+        str(scenario.get("player") or "Cycling Controller"),
+        None,
+        [
+            battle.enrich_card(dict(item))
+            for item in (scenario.get("controller_library") or [])
+            if isinstance(item, dict)
+        ],
+    )
+    opponent = battle.Player(str(scenario.get("opponent") or "Cycling Opponent"), None, [])
+    active.hand = [card]
+    add_manifest_mana(active, scenario.get("controller_mana") or {})
+    expected_cost = str(scenario.get("expected_cycling_cost") or "").strip()
+    activated = battle.activate_hand_cycling(
+        active,
+        [opponent],
+        [active, opponent],
+        turn=int(scenario.get("turn") or 7),
+        rng=random.Random(int(scenario.get("seed") or 6072)),
+        phase=str(scenario.get("phase") or "precombat_main"),
+        stack=battle.Stack(),
+    )
+    if activated != 1:
+        fail("battle_execution", f"{card['name']} cycling activated {activated}, expected 1")
+    if any(item.get("name") == card.get("name") for item in active.hand if isinstance(item, dict)):
+        fail("battle_execution", f"{card['name']} remained in hand after cycling")
+    if not any(item.get("name") == card.get("name") for item in active.graveyard if isinstance(item, dict)):
+        fail("battle_execution", f"{card['name']} did not move to graveyard after cycling")
+    cycling_event = next(
+        (
+            data
+            for event, data in reversed(events)
+            if event == "cycling_activated" and data.get("card") == card.get("name")
+        ),
+        None,
+    )
+    if cycling_event is None:
+        fail("battle_events", f"missing {card['name']} cycling_activated event")
+    if str(cycling_event.get("cycling_cost") or "") != expected_cost:
+        fail(
+            "battle_events",
+            f"{card['name']} cycling_cost={cycling_event.get('cycling_cost')!r}, expected {expected_cost!r}",
+        )
+    drawn = list(cycling_event.get("drawn") or [])
+    if drawn != ["E2E Fresh Cycling Draw"]:
+        fail("battle_events", f"{card['name']} drawn={drawn!r}, expected fresh cycling draw")
+    return {
+        "scenario": scenario.get("name"),
+        "card_name": card["name"],
+        "cycling_cost": expected_cost,
+        "drawn": drawn,
+        "graveyard_size": len(active.graveyard),
+    }
+
+
 def run_simple_activated_tap_target(
     battle,
     scenario: dict[str, Any],
@@ -13548,6 +13609,7 @@ SCENARIO_RUNNERS = {
     "board_wipe": run_board_wipe,
     "beginning_end_step_draw": run_beginning_end_step_draw,
     "combat_damage_draw": run_combat_damage_draw,
+    "hand_cycling": run_hand_cycling,
     "mass_return_to_hand": run_mass_return_to_hand,
     "conditional_land_play": run_conditional_land_play,
     "counter_unless_pays_response": run_counter_unless_pays_response,

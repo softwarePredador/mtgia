@@ -50,6 +50,60 @@ def metadata(
 
 
 class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
+    def test_cycling_only_creature_maps_to_runtime_hand_cycling_scope(self) -> None:
+        row = queue_row(
+            "xmage_signature::no_effect_class::CyclingAbility::"
+            "no_target_class::no_condition_class::no_signal",
+            effect_classes=[],
+            ability_kind="static",
+            ability_classes=["CyclingAbility"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Barkhide Mauler",
+                type_line="Creature - Beast",
+                oracle_text="Cycling {2} ({2}, Discard this card: Draw a card.)",
+            ),
+            source_text='this.addAbility(new CyclingAbility(new GenericManaCost(2)));',
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.CYCLING_ONLY_SCOPE)
+        self.assertEqual(effect["effect"], "creature")
+        self.assertEqual(effect["cycling_cost"], "{2}")
+        self.assertEqual(effect["cycling_status"], "runtime_executor_v1")
+        self.assertTrue(effect["has_cycling"])
+
+    def test_cycling_only_creature_preserves_static_keywords(self) -> None:
+        row = queue_row(
+            "xmage_signature::no_effect_class::CyclingAbility,FlyingAbility::"
+            "no_target_class::no_condition_class::no_signal",
+            effect_classes=[],
+            ability_kind="static",
+            ability_classes=["CyclingAbility", "FlyingAbility"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Keeneye Aven",
+                type_line="Creature - Bird Soldier",
+                oracle_text="Flying\nCycling {2} ({2}, Discard this card: Draw a card.)",
+            ),
+            source_text=(
+                "this.addAbility(FlyingAbility.getInstance());"
+                "this.addAbility(new CyclingAbility(new ManaCostsImpl<>(\"{2}\")));"
+            ),
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.CYCLING_ONLY_SCOPE)
+        self.assertEqual(effect["keywords"], ["flying"])
+        self.assertTrue(effect["flying"])
+        self.assertEqual(effect["cycling_cost"], "{2}")
+
     def test_put_target_creature_on_library_top_maps_battlefield_to_library_scope(self) -> None:
         row = queue_row(
             "xmage_signature::PutOnLibraryTargetEffect::no_ability_class::"

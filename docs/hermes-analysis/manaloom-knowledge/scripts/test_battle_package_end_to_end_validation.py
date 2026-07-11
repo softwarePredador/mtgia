@@ -98,6 +98,43 @@ def test_validate_runtime_lookup_derives_checks_from_expected_rules() -> None:
     assert results[0]["effect"] == "topdeck_play"
 
 
+def test_hand_cycling_runner_uses_battle_runtime_cycling_executor() -> None:
+    battle = validator.load_battle(validator.DEFAULT_BATTLE)
+    previous_get_card_effect = battle.get_card_effect
+    battle.get_card_effect = lambda card: {
+        "effect": "creature",
+        "battle_model_scope": "xmage_hand_cycling_only_v1",
+        "cycling_cost": "{2}",
+        "cycling_status": "runtime_executor_v1",
+        "_rule_logical_key": "battle_rule_v1:cycling-fixture",
+    }
+    events: list[tuple[str, dict]] = []
+    previous_handler = getattr(battle, "REPLAY_EVENT_HANDLER", None)
+    battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+    try:
+        result = validator.run_hand_cycling(
+            battle,
+            {
+                "name": "Barkhide Mauler cycles from hand",
+                "type": "hand_cycling",
+                "card": {"name": "Barkhide Mauler", "type_line": "Creature"},
+                "controller_mana": {"generic": 2},
+                "controller_library": [
+                    {"name": "E2E Fresh Cycling Draw", "type_line": "Instant", "effect": "draw_cards"}
+                ],
+                "expected_cycling_cost": "{2}",
+            },
+            events,
+        )
+    finally:
+        battle.get_card_effect = previous_get_card_effect
+        battle.REPLAY_EVENT_HANDLER = previous_handler
+
+    assert result["card_name"] == "Barkhide Mauler"
+    assert result["cycling_cost"] == "{2}"
+    assert result["drawn"] == ["E2E Fresh Cycling Draw"]
+
+
 def test_static_filtered_protection_runner_blocks_matching_source() -> None:
     battle = validator.load_battle(validator.DEFAULT_BATTLE)
     effect = {

@@ -4248,6 +4248,33 @@ def simple_activated_damage_execution_scenario_from_expected_rule(
     return scenario
 
 
+def hand_cycling_execution_scenario_from_expected_rule(
+    rule: dict[str, Any],
+) -> dict[str, Any] | None:
+    required = dict(rule.get("required_effect_fields") or {})
+    if required.get("battle_model_scope") != "xmage_hand_cycling_only_v1":
+        return None
+    cycling_cost = str(required.get("cycling_cost") or "").strip()
+    if not cycling_cost or required.get("cycling_status") != "runtime_executor_v1":
+        return None
+    return {
+        "name": f"{rule['card_name']} cycles from hand",
+        "type": "hand_cycling",
+        "card": {"name": rule["card_name"], "type_line": "Creature"},
+        "controller_mana": _manifest_mana_for_activation_cost(cycling_cost),
+        "controller_library": [
+            {
+                "name": "E2E Fresh Cycling Draw",
+                "type_line": "Instant",
+                "effect": "draw_cards",
+                "cmc": 1,
+            }
+        ],
+        "expected_cycling_cost": cycling_cost,
+        "logical_rule_key": rule["logical_rule_key"],
+    }
+
+
 def _hand_to_battlefield_manifest_cards(target_type: str) -> tuple[list[dict[str, Any]], str]:
     target = str(target_type or "creature_card").strip().lower()
     invalid_card = {
@@ -8909,6 +8936,7 @@ def execution_scenario_from_expected_rule(rule: dict[str, Any]) -> dict[str, Any
         or target_player_draw_execution_scenario_from_expected_rule(rule)
         or combat_damage_draw_execution_scenario_from_expected_rule(rule)
         or beginning_end_step_draw_execution_scenario_from_expected_rule(rule)
+        or hand_cycling_execution_scenario_from_expected_rule(rule)
         or simple_activated_damage_execution_scenario_from_expected_rule(rule)
         or simple_activated_tap_target_execution_scenario_from_expected_rule(rule)
         or simple_activated_untap_target_execution_scenario_from_expected_rule(rule)

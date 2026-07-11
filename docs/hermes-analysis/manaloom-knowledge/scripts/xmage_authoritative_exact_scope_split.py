@@ -271,6 +271,7 @@ DIES_TARGET_PLAYER_DISCARD_CREATURE_SCOPE = "xmage_creature_dies_target_player_d
 COMBAT_DAMAGE_DISCARD_CREATURE_SCOPE = "xmage_creature_combat_damage_target_player_discard_v1"
 PREVENT_ALL_COMBAT_DAMAGE_SPELL_SCOPE = "xmage_prevent_all_combat_damage_spell_v1"
 PREVENT_DAMAGE_FROM_CREATURES_SPELL_SCOPE = "xmage_prevent_damage_from_creatures_spell_v1"
+CYCLING_ONLY_SCOPE = "xmage_hand_cycling_only_v1"
 DRAW_DISCARD_SPELL_SCOPE = "xmage_fixed_draw_discard_spell_v1"
 DRAW_LOSE_LIFE_SPELL_SCOPE = "xmage_fixed_controller_draw_lose_life_spell_v1"
 TARGET_DRAW_LOSE_LIFE_SPELL_SCOPE = "xmage_fixed_target_player_draw_lose_life_spell_v1"
@@ -13830,6 +13831,52 @@ def oracle_text_after_leading_static_keywords(metadata: dict[str, Any]) -> str:
         skipping_keywords = False
         kept.append(line)
     return re.sub(r"\s+", " ", "\n".join(kept).strip()).lower()
+
+
+def cycling_only_from_oracle_and_source(
+    metadata: dict[str, Any],
+    source_text: str,
+    row: dict[str, Any],
+) -> dict[str, Any] | str:
+    abilities = ability_classes(row)
+    if "CyclingAbility" not in abilities:
+        return "cycling_only_missing_cycling_ability"
+    keyword_abilities = abilities - {"CyclingAbility"}
+    if keyword_abilities - set(STATIC_SELF_KEYWORD_ABILITY_CLASSES):
+        return "cycling_only_ability_class_not_supported"
+    if effect_classes(row):
+        return "cycling_only_effect_class_not_empty"
+    if not is_creature_metadata(metadata):
+        return "cycling_only_not_creature"
+
+    source_cost = parse_cycling_cost_from_source(source_text)
+    oracle_cost = auxiliary_cost_from_oracle(metadata, "cycling")
+    if not source_cost or not oracle_cost:
+        return "cycling_only_cost_not_supported"
+    if source_cost != oracle_cost:
+        return "cycling_only_source_oracle_cost_mismatch"
+
+    oracle_keywords = static_keywords_from_oracle(metadata) or set()
+    source_keywords = keywords_from_source_added_ability_classes(source_text, row)
+    expected_keywords = keywords_from_ability_classes(row)
+    if oracle_keywords != expected_keywords or source_keywords != expected_keywords:
+        return "cycling_only_static_keyword_mismatch"
+
+    remaining_text = oracle_text_after_leading_static_keywords(metadata)
+    cycling_clause = re.fullmatch(
+        r"cycling\s+"
+        + re.escape(oracle_cost).replace(r"\{", r"\{").replace(r"\}", r"\}")
+        + r"(?:\s*\([^)]*draw a card\.\))?\.?",
+        remaining_text,
+        re.I,
+    )
+    if not cycling_clause:
+        return "cycling_only_oracle_not_exact"
+    return {
+        "cycling_cost": oracle_cost,
+        "cycling_status": "runtime_executor_v1",
+        "keywords": ordered_keywords(expected_keywords),
+    }
 
 
 def static_keywords_before_flash_permission_from_oracle(metadata: dict[str, Any]) -> set[str] | None:
@@ -29894,6 +29941,13 @@ def split_row(
         PREVENT_ALL_COMBAT_DAMAGE_SPELL_UNIT,
         PREVENT_ALL_COMBAT_DAMAGE_CYCLING_SPELL_UNIT,
     }
+    cycling_only_unit = (
+        not effect_classes(row)
+        and "CyclingAbility" in ability_classes(row)
+        and (ability_classes(row) - {"CyclingAbility"}).issubset(
+            STATIC_SELF_KEYWORD_ABILITY_CLASSES
+        )
+    )
     keyword_draw_spell_unit = (
         unit == DRAW_UNIT
         and effect_classes(row) == {"DrawCardSourceControllerEffect", "GainAbilityTargetEffect"}
@@ -30070,12 +30124,39 @@ def split_row(
         and not counter_unless_pays_spell_unit
         and not counter_target_with_replacement_spell_unit
         and not battlefield_to_library_spell_unit
+        and not cycling_only_unit
     ):
         return None, "unsupported_adapter_work_unit"
     if not metadata:
         return None, "postgres_card_metadata_missing"
     if not str(metadata.get("oracle_text") or "").strip():
         return None, "oracle_text_missing"
+
+    if cycling_only_unit:
+        cycling_spec = cycling_only_from_oracle_and_source(metadata, source_text, row)
+        if isinstance(cycling_spec, str):
+            return None, cycling_spec
+        effect_json = {
+            "effect": "creature",
+            "battle_model_scope": CYCLING_ONLY_SCOPE,
+            "ability_kind": "hand_activated_and_static",
+            "has_cycling": True,
+            "cycling_cost": cycling_spec["cycling_cost"],
+            "cycling_status": cycling_spec["cycling_status"],
+            "xmage_ability_classes": sorted(ability_classes(row)),
+        }
+        keyword_list = list(cycling_spec.get("keywords") or [])
+        if keyword_list:
+            effect_json["keywords"] = keyword_list
+            effect_json["_keywords_are_self"] = True
+            for keyword in keyword_list:
+                effect_json[keyword] = True
+        return build_proposal(
+            row,
+            metadata,
+            effect_json,
+            family_id="xmage_creature_hand_cycling",
+        ), "selected_exact_scope"
 
     damage_spell_stack_cant_be_countered_unit = (
         unit == DAMAGE_UNIT
@@ -43979,6 +44060,13 @@ def build_exact_split_report(
             and not is_counter_target_with_replacement_spell_unit(row)
             and not is_battlefield_to_library_spell_unit(row)
             and not (
+                not effect_classes(row)
+                and "CyclingAbility" in ability_classes(row)
+                and (ability_classes(row) - {"CyclingAbility"}).issubset(
+                    STATIC_SELF_KEYWORD_ABILITY_CLASSES
+                )
+            )
+            and not (
                 str(row.get("adapter_work_unit") or "") == RECURSION_UNIT
                 and effect_classes(row) == {"PutOnLibraryTargetEffect"}
                 and not ability_classes(row)
@@ -44086,6 +44174,7 @@ def build_exact_split_report(
                 "xmage_signature BoostSourceEffect + AttacksTriggeredAbility rows with exact fixed self boost until EOT and Oracle/source agreement",
                 "grant_protection_from_chosen_color rows with pure GainAbilityTargetEffect one-shot spells, exact target-creature keyword until EOT, and no auxiliary ability classes",
                 "PreventAllDamageByAllPermanentsEffect one-shot spells with exact Oracle 'Prevent all combat damage that would be dealt this turn', exact XMage Duration.EndOfTurn onlyCombat=true source, and optional CyclingAbility as auxiliary resolution-neutral ability",
+                "no-effect CyclingAbility creature rows, optionally with static self keywords, where Oracle and XMage agree on a runtime cycling cost and no other text remains after leading static keywords",
                 "ramp_permanent::pain_talisman_color_pair_partial_v1 rows with ColorlessManaAbility plus two fixed colored mana abilities, DamageControllerEffect(N) on each colored mode, and exact Oracle color-pair pain mana text",
                 "ramp_permanent mana source rows with ConditionalAnyColorManaAbility, ConditionalColorlessManaAbility, or ConditionalColoredManaAbility, exact supported spell-category spend restriction, and runtime conditional_mana_modes payment evidence",
                 "ramp_permanent::xmage_creature_mana_source_variant_review_v1 rows with EntersBattlefieldTriggeredAbility + BasicManaEffect, exact unconditional fixed ETB mana Oracle/source agreement, and no auxiliary ability class",

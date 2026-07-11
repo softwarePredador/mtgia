@@ -1,0 +1,2123 @@
+{
+  "apply_gate": "Do not run apply SQL without explicit approval for the exact command.",
+  "backup_table": "manaloom_deploy_audit.pg790_hand_cycling_new_server_pg790_hand_20260711_215437",
+  "deploy_id": "pg790_hand_cycling_new_server",
+  "execution_scenarios": [
+    {
+      "card": {
+        "name": "Angel of the God-Pharaoh",
+        "type_line": "Creature"
+      },
+      "controller_library": [
+        {
+          "cmc": 1,
+          "effect": "draw_cards",
+          "name": "E2E Fresh Cycling Draw",
+          "type_line": "Instant"
+        }
+      ],
+      "controller_mana": {
+        "black": 0,
+        "blue": 0,
+        "generic": 2,
+        "green": 0,
+        "red": 0,
+        "white": 0
+      },
+      "expected_cycling_cost": "{2}",
+      "logical_rule_key": "battle_rule_v1:46fcac72d695558c30094bff406ae3bd",
+      "name": "Angel of the God-Pharaoh cycles from hand",
+      "type": "hand_cycling"
+    },
+    {
+      "card": {
+        "name": "Barkhide Mauler",
+        "type_line": "Creature"
+      },
+      "controller_library": [
+        {
+          "cmc": 1,
+          "effect": "draw_cards",
+          "name": "E2E Fresh Cycling Draw",
+          "type_line": "Instant"
+        }
+      ],
+      "controller_mana": {
+        "black": 0,
+        "blue": 0,
+        "generic": 2,
+        "green": 0,
+        "red": 0,
+        "white": 0
+      },
+      "expected_cycling_cost": "{2}",
+      "logical_rule_key": "battle_rule_v1:b5b581f43feab946cc4b69983d61603d",
+      "name": "Barkhide Mauler cycles from hand",
+      "type": "hand_cycling"
+    },
+    {
+      "card": {
+        "name": "Desert Cerodon",
+        "type_line": "Creature"
+      },
+      "controller_library": [
+        {
+          "cmc": 1,
+          "effect": "draw_cards",
+          "name": "E2E Fresh Cycling Draw",
+          "type_line": "Instant"
+        }
+      ],
+      "controller_mana": {
+        "black": 0,
+        "blue": 0,
+        "generic": 0,
+        "green": 0,
+        "red": 1,
+        "white": 0
+      },
+      "expected_cycling_cost": "{R}",
+      "logical_rule_key": "battle_rule_v1:e3dc358f4001ced01327a852fb416506",
+      "name": "Desert Cerodon cycles from hand",
+      "type": "hand_cycling"
+    },
+    {
+      "card": {
+        "name": "Granitic Titan",
+        "type_line": "Creature"
+      },
+      "controller_library": [
+        {
+          "cmc": 1,
+          "effect": "draw_cards",
+          "name": "E2E Fresh Cycling Draw",
+          "type_line": "Instant"
+        }
+      ],
+      "controller_mana": {
+        "black": 0,
+        "blue": 0,
+        "generic": 2,
+        "green": 0,
+        "red": 0,
+        "white": 0
+      },
+      "expected_cycling_cost": "{2}",
+      "logical_rule_key": "battle_rule_v1:8a4e782806614448bafe0aea117a4b5c",
+      "name": "Granitic Titan cycles from hand",
+      "type": "hand_cycling"
+    },
+    {
+      "card": {
+        "name": "Hundroog",
+        "type_line": "Creature"
+      },
+      "controller_library": [
+        {
+          "cmc": 1,
+          "effect": "draw_cards",
+          "name": "E2E Fresh Cycling Draw",
+          "type_line": "Instant"
+        }
+      ],
+      "controller_mana": {
+        "black": 0,
+        "blue": 0,
+        "generic": 3,
+        "green": 0,
+        "red": 0,
+        "white": 0
+      },
+      "expected_cycling_cost": "{3}",
+      "logical_rule_key": "battle_rule_v1:d8f08ac6ab5cc5003a3b34e835b01a21",
+      "name": "Hundroog cycles from hand",
+      "type": "hand_cycling"
+    },
+    {
+      "card": {
+        "name": "Imposing Vantasaur",
+        "type_line": "Creature"
+      },
+      "controller_library": [
+        {
+          "cmc": 1,
+          "effect": "draw_cards",
+          "name": "E2E Fresh Cycling Draw",
+          "type_line": "Instant"
+        }
+      ],
+      "controller_mana": {
+        "black": 0,
+        "blue": 0,
+        "generic": 1,
+        "green": 0,
+        "red": 0,
+        "white": 0
+      },
+      "expected_cycling_cost": "{1}",
+      "logical_rule_key": "battle_rule_v1:7d5cea5e55509cdb26a27d54635b7361",
+      "name": "Imposing Vantasaur cycles from hand",
+      "type": "hand_cycling"
+    },
+    {
+      "card": {
+        "name": "Jungle Weaver",
+        "type_line": "Creature"
+      },
+      "controller_library": [
+        {
+          "cmc": 1,
+          "effect": "draw_cards",
+          "name": "E2E Fresh Cycling Draw",
+          "type_line": "Instant"
+        }
+      ],
+      "controller_mana": {
+        "black": 0,
+        "blue": 0,
+        "generic": 2,
+        "green": 0,
+        "red": 0,
+        "white": 0
+      },
+      "expected_cycling_cost": "{2}",
+      "logical_rule_key": "battle_rule_v1:4febc2ee6f32d96b6b2676216ae72c1a",
+      "name": "Jungle Weaver cycles from hand",
+      "type": "hand_cycling"
+    },
+    {
+      "card": {
+        "name": "Keeneye Aven",
+        "type_line": "Creature"
+      },
+      "controller_library": [
+        {
+          "cmc": 1,
+          "effect": "draw_cards",
+          "name": "E2E Fresh Cycling Draw",
+          "type_line": "Instant"
+        }
+      ],
+      "controller_mana": {
+        "black": 0,
+        "blue": 0,
+        "generic": 2,
+        "green": 0,
+        "red": 0,
+        "white": 0
+      },
+      "expected_cycling_cost": "{2}",
+      "logical_rule_key": "battle_rule_v1:46fcac72d695558c30094bff406ae3bd",
+      "name": "Keeneye Aven cycles from hand",
+      "type": "hand_cycling"
+    },
+    {
+      "card": {
+        "name": "Lava Serpent",
+        "type_line": "Creature"
+      },
+      "controller_library": [
+        {
+          "cmc": 1,
+          "effect": "draw_cards",
+          "name": "E2E Fresh Cycling Draw",
+          "type_line": "Instant"
+        }
+      ],
+      "controller_mana": {
+        "black": 0,
+        "blue": 0,
+        "generic": 2,
+        "green": 0,
+        "red": 0,
+        "white": 0
+      },
+      "expected_cycling_cost": "{2}",
+      "logical_rule_key": "battle_rule_v1:f80ece1da9165211fc885145ccf39147",
+      "name": "Lava Serpent cycles from hand",
+      "type": "hand_cycling"
+    },
+    {
+      "card": {
+        "name": "Lurching Rotbeast",
+        "type_line": "Creature"
+      },
+      "controller_library": [
+        {
+          "cmc": 1,
+          "effect": "draw_cards",
+          "name": "E2E Fresh Cycling Draw",
+          "type_line": "Instant"
+        }
+      ],
+      "controller_mana": {
+        "black": 1,
+        "blue": 0,
+        "generic": 0,
+        "green": 0,
+        "red": 0,
+        "white": 0
+      },
+      "expected_cycling_cost": "{B}",
+      "logical_rule_key": "battle_rule_v1:da7ee5e391f4a09f36ccd472d5fe4d37",
+      "name": "Lurching Rotbeast cycles from hand",
+      "type": "hand_cycling"
+    },
+    {
+      "card": {
+        "name": "Macetail Hystrodon",
+        "type_line": "Creature"
+      },
+      "controller_library": [
+        {
+          "cmc": 1,
+          "effect": "draw_cards",
+          "name": "E2E Fresh Cycling Draw",
+          "type_line": "Instant"
+        }
+      ],
+      "controller_mana": {
+        "black": 0,
+        "blue": 0,
+        "generic": 3,
+        "green": 0,
+        "red": 0,
+        "white": 0
+      },
+      "expected_cycling_cost": "{3}",
+      "logical_rule_key": "battle_rule_v1:a90726d6ffed75c3cad0732807268fef",
+      "name": "Macetail Hystrodon cycles from hand",
+      "type": "hand_cycling"
+    },
+    {
+      "card": {
+        "name": "Moaning Wall",
+        "type_line": "Creature"
+      },
+      "controller_library": [
+        {
+          "cmc": 1,
+          "effect": "draw_cards",
+          "name": "E2E Fresh Cycling Draw",
+          "type_line": "Instant"
+        }
+      ],
+      "controller_mana": {
+        "black": 0,
+        "blue": 0,
+        "generic": 2,
+        "green": 0,
+        "red": 0,
+        "white": 0
+      },
+      "expected_cycling_cost": "{2}",
+      "logical_rule_key": "battle_rule_v1:79aa1f27a3f5ffec00ecfa7d1d28a7ea",
+      "name": "Moaning Wall cycles from hand",
+      "type": "hand_cycling"
+    },
+    {
+      "card": {
+        "name": "Pendrell Drake",
+        "type_line": "Creature"
+      },
+      "controller_library": [
+        {
+          "cmc": 1,
+          "effect": "draw_cards",
+          "name": "E2E Fresh Cycling Draw",
+          "type_line": "Instant"
+        }
+      ],
+      "controller_mana": {
+        "black": 0,
+        "blue": 0,
+        "generic": 2,
+        "green": 0,
+        "red": 0,
+        "white": 0
+      },
+      "expected_cycling_cost": "{2}",
+      "logical_rule_key": "battle_rule_v1:46fcac72d695558c30094bff406ae3bd",
+      "name": "Pendrell Drake cycles from hand",
+      "type": "hand_cycling"
+    },
+    {
+      "card": {
+        "name": "Primoc Escapee",
+        "type_line": "Creature"
+      },
+      "controller_library": [
+        {
+          "cmc": 1,
+          "effect": "draw_cards",
+          "name": "E2E Fresh Cycling Draw",
+          "type_line": "Instant"
+        }
+      ],
+      "controller_mana": {
+        "black": 0,
+        "blue": 0,
+        "generic": 2,
+        "green": 0,
+        "red": 0,
+        "white": 0
+      },
+      "expected_cycling_cost": "{2}",
+      "logical_rule_key": "battle_rule_v1:46fcac72d695558c30094bff406ae3bd",
+      "name": "Primoc Escapee cycles from hand",
+      "type": "hand_cycling"
+    },
+    {
+      "card": {
+        "name": "Rampaging Hippo",
+        "type_line": "Creature"
+      },
+      "controller_library": [
+        {
+          "cmc": 1,
+          "effect": "draw_cards",
+          "name": "E2E Fresh Cycling Draw",
+          "type_line": "Instant"
+        }
+      ],
+      "controller_mana": {
+        "black": 0,
+        "blue": 0,
+        "generic": 2,
+        "green": 0,
+        "red": 0,
+        "white": 0
+      },
+      "expected_cycling_cost": "{2}",
+      "logical_rule_key": "battle_rule_v1:824f7e2642eddc58b00c3bb9bf6fa6c2",
+      "name": "Rampaging Hippo cycles from hand",
+      "type": "hand_cycling"
+    },
+    {
+      "card": {
+        "name": "Ridge Rannet",
+        "type_line": "Creature"
+      },
+      "controller_library": [
+        {
+          "cmc": 1,
+          "effect": "draw_cards",
+          "name": "E2E Fresh Cycling Draw",
+          "type_line": "Instant"
+        }
+      ],
+      "controller_mana": {
+        "black": 0,
+        "blue": 0,
+        "generic": 2,
+        "green": 0,
+        "red": 0,
+        "white": 0
+      },
+      "expected_cycling_cost": "{2}",
+      "logical_rule_key": "battle_rule_v1:b5b581f43feab946cc4b69983d61603d",
+      "name": "Ridge Rannet cycles from hand",
+      "type": "hand_cycling"
+    },
+    {
+      "card": {
+        "name": "Sandbar Merfolk",
+        "type_line": "Creature"
+      },
+      "controller_library": [
+        {
+          "cmc": 1,
+          "effect": "draw_cards",
+          "name": "E2E Fresh Cycling Draw",
+          "type_line": "Instant"
+        }
+      ],
+      "controller_mana": {
+        "black": 0,
+        "blue": 0,
+        "generic": 2,
+        "green": 0,
+        "red": 0,
+        "white": 0
+      },
+      "expected_cycling_cost": "{2}",
+      "logical_rule_key": "battle_rule_v1:b5b581f43feab946cc4b69983d61603d",
+      "name": "Sandbar Merfolk cycles from hand",
+      "type": "hand_cycling"
+    },
+    {
+      "card": {
+        "name": "Sandbar Serpent",
+        "type_line": "Creature"
+      },
+      "controller_library": [
+        {
+          "cmc": 1,
+          "effect": "draw_cards",
+          "name": "E2E Fresh Cycling Draw",
+          "type_line": "Instant"
+        }
+      ],
+      "controller_mana": {
+        "black": 0,
+        "blue": 0,
+        "generic": 2,
+        "green": 0,
+        "red": 0,
+        "white": 0
+      },
+      "expected_cycling_cost": "{2}",
+      "logical_rule_key": "battle_rule_v1:b5b581f43feab946cc4b69983d61603d",
+      "name": "Sandbar Serpent cycles from hand",
+      "type": "hand_cycling"
+    },
+    {
+      "card": {
+        "name": "Shimmering Barrier",
+        "type_line": "Creature"
+      },
+      "controller_library": [
+        {
+          "cmc": 1,
+          "effect": "draw_cards",
+          "name": "E2E Fresh Cycling Draw",
+          "type_line": "Instant"
+        }
+      ],
+      "controller_mana": {
+        "black": 0,
+        "blue": 0,
+        "generic": 2,
+        "green": 0,
+        "red": 0,
+        "white": 0
+      },
+      "expected_cycling_cost": "{2}",
+      "logical_rule_key": "battle_rule_v1:3305d03b7aa66edd80bddea1808ccefd",
+      "name": "Shimmering Barrier cycles from hand",
+      "type": "hand_cycling"
+    },
+    {
+      "card": {
+        "name": "Shimmerscale Drake",
+        "type_line": "Creature"
+      },
+      "controller_library": [
+        {
+          "cmc": 1,
+          "effect": "draw_cards",
+          "name": "E2E Fresh Cycling Draw",
+          "type_line": "Instant"
+        }
+      ],
+      "controller_mana": {
+        "black": 0,
+        "blue": 0,
+        "generic": 2,
+        "green": 0,
+        "red": 0,
+        "white": 0
+      },
+      "expected_cycling_cost": "{2}",
+      "logical_rule_key": "battle_rule_v1:46fcac72d695558c30094bff406ae3bd",
+      "name": "Shimmerscale Drake cycles from hand",
+      "type": "hand_cycling"
+    },
+    {
+      "card": {
+        "name": "Striped Riverwinder",
+        "type_line": "Creature"
+      },
+      "controller_library": [
+        {
+          "cmc": 1,
+          "effect": "draw_cards",
+          "name": "E2E Fresh Cycling Draw",
+          "type_line": "Instant"
+        }
+      ],
+      "controller_mana": {
+        "black": 0,
+        "blue": 1,
+        "generic": 0,
+        "green": 0,
+        "red": 0,
+        "white": 0
+      },
+      "expected_cycling_cost": "{U}",
+      "logical_rule_key": "battle_rule_v1:b4c4c3ee6697ff1d41eb16d7ca56dcdc",
+      "name": "Striped Riverwinder cycles from hand",
+      "type": "hand_cycling"
+    },
+    {
+      "card": {
+        "name": "Wasteland Scorpion",
+        "type_line": "Creature"
+      },
+      "controller_library": [
+        {
+          "cmc": 1,
+          "effect": "draw_cards",
+          "name": "E2E Fresh Cycling Draw",
+          "type_line": "Instant"
+        }
+      ],
+      "controller_mana": {
+        "black": 0,
+        "blue": 0,
+        "generic": 2,
+        "green": 0,
+        "red": 0,
+        "white": 0
+      },
+      "expected_cycling_cost": "{2}",
+      "logical_rule_key": "battle_rule_v1:88d467e8bd4236bbb2fd4c37d08859b8",
+      "name": "Wasteland Scorpion cycles from hand",
+      "type": "hand_cycling"
+    },
+    {
+      "card": {
+        "name": "Winged Shepherd",
+        "type_line": "Creature"
+      },
+      "controller_library": [
+        {
+          "cmc": 1,
+          "effect": "draw_cards",
+          "name": "E2E Fresh Cycling Draw",
+          "type_line": "Instant"
+        }
+      ],
+      "controller_mana": {
+        "black": 0,
+        "blue": 0,
+        "generic": 0,
+        "green": 0,
+        "red": 0,
+        "white": 1
+      },
+      "expected_cycling_cost": "{W}",
+      "logical_rule_key": "battle_rule_v1:026bdd34c333542b488d5a86cc64df22",
+      "name": "Winged Shepherd cycles from hand",
+      "type": "hand_cycling"
+    },
+    {
+      "card": {
+        "name": "Yoked Plowbeast",
+        "type_line": "Creature"
+      },
+      "controller_library": [
+        {
+          "cmc": 1,
+          "effect": "draw_cards",
+          "name": "E2E Fresh Cycling Draw",
+          "type_line": "Instant"
+        }
+      ],
+      "controller_mana": {
+        "black": 0,
+        "blue": 0,
+        "generic": 2,
+        "green": 0,
+        "red": 0,
+        "white": 0
+      },
+      "expected_cycling_cost": "{2}",
+      "logical_rule_key": "battle_rule_v1:b5b581f43feab946cc4b69983d61603d",
+      "name": "Yoked Plowbeast cycles from hand",
+      "type": "hand_cycling"
+    }
+  ],
+  "expected_rules": [
+    {
+      "card_name": "Angel of the God-Pharaoh",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:46fcac72d695558c30094bff406ae3bd",
+      "min_rule_version": 2,
+      "normalized_name": "angel of the god-pharaoh",
+      "oracle_hash": "c5b73959186893611c1c85228761d4cb",
+      "required_effect_fields": {
+        "_keywords_are_self": true,
+        "ability_kind": "hand_activated_and_static",
+        "battle_model_scope": "xmage_hand_cycling_only_v1",
+        "cycling_cost": "{2}",
+        "cycling_status": "runtime_executor_v1",
+        "effect": "creature",
+        "keywords": [
+          "flying"
+        ],
+        "xmage_ability_classes": [
+          "CyclingAbility",
+          "FlyingAbility"
+        ]
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Barkhide Mauler",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:b5b581f43feab946cc4b69983d61603d",
+      "min_rule_version": 2,
+      "normalized_name": "barkhide mauler",
+      "oracle_hash": "6f027f2cb826ec05fa70db079824812b",
+      "required_effect_fields": {
+        "ability_kind": "hand_activated_and_static",
+        "battle_model_scope": "xmage_hand_cycling_only_v1",
+        "cycling_cost": "{2}",
+        "cycling_status": "runtime_executor_v1",
+        "effect": "creature",
+        "xmage_ability_classes": [
+          "CyclingAbility"
+        ]
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Desert Cerodon",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:e3dc358f4001ced01327a852fb416506",
+      "min_rule_version": 2,
+      "normalized_name": "desert cerodon",
+      "oracle_hash": "b29a8c2ec2e3640000ae62d46b28e80a",
+      "required_effect_fields": {
+        "ability_kind": "hand_activated_and_static",
+        "battle_model_scope": "xmage_hand_cycling_only_v1",
+        "cycling_cost": "{R}",
+        "cycling_status": "runtime_executor_v1",
+        "effect": "creature",
+        "xmage_ability_classes": [
+          "CyclingAbility"
+        ]
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Granitic Titan",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:8a4e782806614448bafe0aea117a4b5c",
+      "min_rule_version": 2,
+      "normalized_name": "granitic titan",
+      "oracle_hash": "e7daa3e9b6bf3af5b767b4a60b4a7c55",
+      "required_effect_fields": {
+        "_keywords_are_self": true,
+        "ability_kind": "hand_activated_and_static",
+        "battle_model_scope": "xmage_hand_cycling_only_v1",
+        "cycling_cost": "{2}",
+        "cycling_status": "runtime_executor_v1",
+        "effect": "creature",
+        "keywords": [
+          "menace"
+        ],
+        "xmage_ability_classes": [
+          "CyclingAbility",
+          "MenaceAbility"
+        ]
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Hundroog",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:d8f08ac6ab5cc5003a3b34e835b01a21",
+      "min_rule_version": 2,
+      "normalized_name": "hundroog",
+      "oracle_hash": "40585673ab3e35f044f6de1d649975b1",
+      "required_effect_fields": {
+        "ability_kind": "hand_activated_and_static",
+        "battle_model_scope": "xmage_hand_cycling_only_v1",
+        "cycling_cost": "{3}",
+        "cycling_status": "runtime_executor_v1",
+        "effect": "creature",
+        "xmage_ability_classes": [
+          "CyclingAbility"
+        ]
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Imposing Vantasaur",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:7d5cea5e55509cdb26a27d54635b7361",
+      "min_rule_version": 2,
+      "normalized_name": "imposing vantasaur",
+      "oracle_hash": "2c99d78617076aa2995f9a9741ab3bea",
+      "required_effect_fields": {
+        "_keywords_are_self": true,
+        "ability_kind": "hand_activated_and_static",
+        "battle_model_scope": "xmage_hand_cycling_only_v1",
+        "cycling_cost": "{1}",
+        "cycling_status": "runtime_executor_v1",
+        "effect": "creature",
+        "keywords": [
+          "vigilance"
+        ],
+        "xmage_ability_classes": [
+          "CyclingAbility",
+          "VigilanceAbility"
+        ]
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Jungle Weaver",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:4febc2ee6f32d96b6b2676216ae72c1a",
+      "min_rule_version": 2,
+      "normalized_name": "jungle weaver",
+      "oracle_hash": "953552b5e980df063d273cce30a1917b",
+      "required_effect_fields": {
+        "_keywords_are_self": true,
+        "ability_kind": "hand_activated_and_static",
+        "battle_model_scope": "xmage_hand_cycling_only_v1",
+        "cycling_cost": "{2}",
+        "cycling_status": "runtime_executor_v1",
+        "effect": "creature",
+        "keywords": [
+          "reach"
+        ],
+        "xmage_ability_classes": [
+          "CyclingAbility",
+          "ReachAbility"
+        ]
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Keeneye Aven",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:46fcac72d695558c30094bff406ae3bd",
+      "min_rule_version": 2,
+      "normalized_name": "keeneye aven",
+      "oracle_hash": "c5b73959186893611c1c85228761d4cb",
+      "required_effect_fields": {
+        "_keywords_are_self": true,
+        "ability_kind": "hand_activated_and_static",
+        "battle_model_scope": "xmage_hand_cycling_only_v1",
+        "cycling_cost": "{2}",
+        "cycling_status": "runtime_executor_v1",
+        "effect": "creature",
+        "keywords": [
+          "flying"
+        ],
+        "xmage_ability_classes": [
+          "CyclingAbility",
+          "FlyingAbility"
+        ]
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Lava Serpent",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:f80ece1da9165211fc885145ccf39147",
+      "min_rule_version": 2,
+      "normalized_name": "lava serpent",
+      "oracle_hash": "92197d4472b1150b84d0f2a3c9898216",
+      "required_effect_fields": {
+        "_keywords_are_self": true,
+        "ability_kind": "hand_activated_and_static",
+        "battle_model_scope": "xmage_hand_cycling_only_v1",
+        "cycling_cost": "{2}",
+        "cycling_status": "runtime_executor_v1",
+        "effect": "creature",
+        "keywords": [
+          "haste"
+        ],
+        "xmage_ability_classes": [
+          "CyclingAbility",
+          "HasteAbility"
+        ]
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Lurching Rotbeast",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:da7ee5e391f4a09f36ccd472d5fe4d37",
+      "min_rule_version": 2,
+      "normalized_name": "lurching rotbeast",
+      "oracle_hash": "5d8e73538917d379afa3cf776464609b",
+      "required_effect_fields": {
+        "ability_kind": "hand_activated_and_static",
+        "battle_model_scope": "xmage_hand_cycling_only_v1",
+        "cycling_cost": "{B}",
+        "cycling_status": "runtime_executor_v1",
+        "effect": "creature",
+        "xmage_ability_classes": [
+          "CyclingAbility"
+        ]
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Macetail Hystrodon",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:a90726d6ffed75c3cad0732807268fef",
+      "min_rule_version": 2,
+      "normalized_name": "macetail hystrodon",
+      "oracle_hash": "a1c75489f4aafb349adfdd7c19948b3e",
+      "required_effect_fields": {
+        "_keywords_are_self": true,
+        "ability_kind": "hand_activated_and_static",
+        "battle_model_scope": "xmage_hand_cycling_only_v1",
+        "cycling_cost": "{3}",
+        "cycling_status": "runtime_executor_v1",
+        "effect": "creature",
+        "keywords": [
+          "first_strike",
+          "haste"
+        ],
+        "xmage_ability_classes": [
+          "CyclingAbility",
+          "FirstStrikeAbility",
+          "HasteAbility"
+        ]
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Moaning Wall",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:79aa1f27a3f5ffec00ecfa7d1d28a7ea",
+      "min_rule_version": 2,
+      "normalized_name": "moaning wall",
+      "oracle_hash": "663722b5e4a7d78843ba4c8d2a42fa06",
+      "required_effect_fields": {
+        "_keywords_are_self": true,
+        "ability_kind": "hand_activated_and_static",
+        "battle_model_scope": "xmage_hand_cycling_only_v1",
+        "cycling_cost": "{2}",
+        "cycling_status": "runtime_executor_v1",
+        "effect": "creature",
+        "keywords": [
+          "defender"
+        ],
+        "xmage_ability_classes": [
+          "CyclingAbility",
+          "DefenderAbility"
+        ]
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Pendrell Drake",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:46fcac72d695558c30094bff406ae3bd",
+      "min_rule_version": 2,
+      "normalized_name": "pendrell drake",
+      "oracle_hash": "c5b73959186893611c1c85228761d4cb",
+      "required_effect_fields": {
+        "_keywords_are_self": true,
+        "ability_kind": "hand_activated_and_static",
+        "battle_model_scope": "xmage_hand_cycling_only_v1",
+        "cycling_cost": "{2}",
+        "cycling_status": "runtime_executor_v1",
+        "effect": "creature",
+        "keywords": [
+          "flying"
+        ],
+        "xmage_ability_classes": [
+          "CyclingAbility",
+          "FlyingAbility"
+        ]
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Primoc Escapee",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:46fcac72d695558c30094bff406ae3bd",
+      "min_rule_version": 2,
+      "normalized_name": "primoc escapee",
+      "oracle_hash": "c5b73959186893611c1c85228761d4cb",
+      "required_effect_fields": {
+        "_keywords_are_self": true,
+        "ability_kind": "hand_activated_and_static",
+        "battle_model_scope": "xmage_hand_cycling_only_v1",
+        "cycling_cost": "{2}",
+        "cycling_status": "runtime_executor_v1",
+        "effect": "creature",
+        "keywords": [
+          "flying"
+        ],
+        "xmage_ability_classes": [
+          "CyclingAbility",
+          "FlyingAbility"
+        ]
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Rampaging Hippo",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:824f7e2642eddc58b00c3bb9bf6fa6c2",
+      "min_rule_version": 2,
+      "normalized_name": "rampaging hippo",
+      "oracle_hash": "d664775428f86e83e8e00507111afbfa",
+      "required_effect_fields": {
+        "_keywords_are_self": true,
+        "ability_kind": "hand_activated_and_static",
+        "battle_model_scope": "xmage_hand_cycling_only_v1",
+        "cycling_cost": "{2}",
+        "cycling_status": "runtime_executor_v1",
+        "effect": "creature",
+        "keywords": [
+          "trample"
+        ],
+        "xmage_ability_classes": [
+          "CyclingAbility",
+          "TrampleAbility"
+        ]
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Ridge Rannet",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:b5b581f43feab946cc4b69983d61603d",
+      "min_rule_version": 2,
+      "normalized_name": "ridge rannet",
+      "oracle_hash": "6f027f2cb826ec05fa70db079824812b",
+      "required_effect_fields": {
+        "ability_kind": "hand_activated_and_static",
+        "battle_model_scope": "xmage_hand_cycling_only_v1",
+        "cycling_cost": "{2}",
+        "cycling_status": "runtime_executor_v1",
+        "effect": "creature",
+        "xmage_ability_classes": [
+          "CyclingAbility"
+        ]
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Sandbar Merfolk",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:b5b581f43feab946cc4b69983d61603d",
+      "min_rule_version": 2,
+      "normalized_name": "sandbar merfolk",
+      "oracle_hash": "6f027f2cb826ec05fa70db079824812b",
+      "required_effect_fields": {
+        "ability_kind": "hand_activated_and_static",
+        "battle_model_scope": "xmage_hand_cycling_only_v1",
+        "cycling_cost": "{2}",
+        "cycling_status": "runtime_executor_v1",
+        "effect": "creature",
+        "xmage_ability_classes": [
+          "CyclingAbility"
+        ]
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Sandbar Serpent",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:b5b581f43feab946cc4b69983d61603d",
+      "min_rule_version": 2,
+      "normalized_name": "sandbar serpent",
+      "oracle_hash": "6f027f2cb826ec05fa70db079824812b",
+      "required_effect_fields": {
+        "ability_kind": "hand_activated_and_static",
+        "battle_model_scope": "xmage_hand_cycling_only_v1",
+        "cycling_cost": "{2}",
+        "cycling_status": "runtime_executor_v1",
+        "effect": "creature",
+        "xmage_ability_classes": [
+          "CyclingAbility"
+        ]
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Shimmering Barrier",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:3305d03b7aa66edd80bddea1808ccefd",
+      "min_rule_version": 2,
+      "normalized_name": "shimmering barrier",
+      "oracle_hash": "e662a839bc03af5c02c35a1788f49299",
+      "required_effect_fields": {
+        "_keywords_are_self": true,
+        "ability_kind": "hand_activated_and_static",
+        "battle_model_scope": "xmage_hand_cycling_only_v1",
+        "cycling_cost": "{2}",
+        "cycling_status": "runtime_executor_v1",
+        "effect": "creature",
+        "keywords": [
+          "first_strike",
+          "defender"
+        ],
+        "xmage_ability_classes": [
+          "CyclingAbility",
+          "DefenderAbility",
+          "FirstStrikeAbility"
+        ]
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Shimmerscale Drake",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:46fcac72d695558c30094bff406ae3bd",
+      "min_rule_version": 2,
+      "normalized_name": "shimmerscale drake",
+      "oracle_hash": "c5b73959186893611c1c85228761d4cb",
+      "required_effect_fields": {
+        "_keywords_are_self": true,
+        "ability_kind": "hand_activated_and_static",
+        "battle_model_scope": "xmage_hand_cycling_only_v1",
+        "cycling_cost": "{2}",
+        "cycling_status": "runtime_executor_v1",
+        "effect": "creature",
+        "keywords": [
+          "flying"
+        ],
+        "xmage_ability_classes": [
+          "CyclingAbility",
+          "FlyingAbility"
+        ]
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Striped Riverwinder",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:b4c4c3ee6697ff1d41eb16d7ca56dcdc",
+      "min_rule_version": 2,
+      "normalized_name": "striped riverwinder",
+      "oracle_hash": "18899552ccf0c5479c0c27c234269bf4",
+      "required_effect_fields": {
+        "_keywords_are_self": true,
+        "ability_kind": "hand_activated_and_static",
+        "battle_model_scope": "xmage_hand_cycling_only_v1",
+        "cycling_cost": "{U}",
+        "cycling_status": "runtime_executor_v1",
+        "effect": "creature",
+        "keywords": [
+          "hexproof"
+        ],
+        "xmage_ability_classes": [
+          "CyclingAbility",
+          "HexproofAbility"
+        ]
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Wasteland Scorpion",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:88d467e8bd4236bbb2fd4c37d08859b8",
+      "min_rule_version": 2,
+      "normalized_name": "wasteland scorpion",
+      "oracle_hash": "96d7c8a19fb10365bde472530fe970ca",
+      "required_effect_fields": {
+        "_keywords_are_self": true,
+        "ability_kind": "hand_activated_and_static",
+        "battle_model_scope": "xmage_hand_cycling_only_v1",
+        "cycling_cost": "{2}",
+        "cycling_status": "runtime_executor_v1",
+        "effect": "creature",
+        "keywords": [
+          "deathtouch"
+        ],
+        "xmage_ability_classes": [
+          "CyclingAbility",
+          "DeathtouchAbility"
+        ]
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Winged Shepherd",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:026bdd34c333542b488d5a86cc64df22",
+      "min_rule_version": 2,
+      "normalized_name": "winged shepherd",
+      "oracle_hash": "e880be01d39b7d80cc3cc31e587bb46a",
+      "required_effect_fields": {
+        "_keywords_are_self": true,
+        "ability_kind": "hand_activated_and_static",
+        "battle_model_scope": "xmage_hand_cycling_only_v1",
+        "cycling_cost": "{W}",
+        "cycling_status": "runtime_executor_v1",
+        "effect": "creature",
+        "keywords": [
+          "flying",
+          "vigilance"
+        ],
+        "xmage_ability_classes": [
+          "CyclingAbility",
+          "FlyingAbility",
+          "VigilanceAbility"
+        ]
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Yoked Plowbeast",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:b5b581f43feab946cc4b69983d61603d",
+      "min_rule_version": 2,
+      "normalized_name": "yoked plowbeast",
+      "oracle_hash": "6f027f2cb826ec05fa70db079824812b",
+      "required_effect_fields": {
+        "ability_kind": "hand_activated_and_static",
+        "battle_model_scope": "xmage_hand_cycling_only_v1",
+        "cycling_cost": "{2}",
+        "cycling_status": "runtime_executor_v1",
+        "effect": "creature",
+        "xmage_ability_classes": [
+          "CyclingAbility"
+        ]
+      },
+      "review_status": "verified"
+    }
+  ],
+  "family_counts": {
+    "xmage_creature_hand_cycling": 24
+  },
+  "files": {
+    "apply": "docs/hermes-analysis/master_optimizer_reports/pg790_hand_cycling_new_server_package_apply.sql",
+    "manifest": "docs/hermes-analysis/master_optimizer_reports/pg790_hand_cycling_new_server_package_manifest.json",
+    "package": "docs/hermes-analysis/master_optimizer_reports/pg790_hand_cycling_new_server_package_package.md",
+    "postcheck": "docs/hermes-analysis/master_optimizer_reports/pg790_hand_cycling_new_server_package_postcheck.sql",
+    "precheck": "docs/hermes-analysis/master_optimizer_reports/pg790_hand_cycling_new_server_package_precheck.sql",
+    "rollback": "docs/hermes-analysis/master_optimizer_reports/pg790_hand_cycling_new_server_package_rollback.sql"
+  },
+  "generated_at": "2026-07-11T21:54:37+00:00",
+  "mutations_performed": [],
+  "runtime_checks": [
+    {
+      "card": {
+        "name": "Angel of the God-Pharaoh"
+      },
+      "card_name": "Angel of the God-Pharaoh",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:46fcac72d695558c30094bff406ae3bd",
+      "normalized_name": "angel of the god-pharaoh",
+      "required_effect_fields": {
+        "_keywords_are_self": true,
+        "ability_kind": "hand_activated_and_static",
+        "battle_model_scope": "xmage_hand_cycling_only_v1",
+        "cycling_cost": "{2}",
+        "cycling_status": "runtime_executor_v1",
+        "effect": "creature",
+        "keywords": [
+          "flying"
+        ],
+        "xmage_ability_classes": [
+          "CyclingAbility",
+          "FlyingAbility"
+        ]
+      }
+    },
+    {
+      "card": {
+        "name": "Barkhide Mauler"
+      },
+      "card_name": "Barkhide Mauler",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:b5b581f43feab946cc4b69983d61603d",
+      "normalized_name": "barkhide mauler",
+      "required_effect_fields": {
+        "ability_kind": "hand_activated_and_static",
+        "battle_model_scope": "xmage_hand_cycling_only_v1",
+        "cycling_cost": "{2}",
+        "cycling_status": "runtime_executor_v1",
+        "effect": "creature",
+        "xmage_ability_classes": [
+          "CyclingAbility"
+        ]
+      }
+    },
+    {
+      "card": {
+        "name": "Desert Cerodon"
+      },
+      "card_name": "Desert Cerodon",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:e3dc358f4001ced01327a852fb416506",
+      "normalized_name": "desert cerodon",
+      "required_effect_fields": {
+        "ability_kind": "hand_activated_and_static",
+        "battle_model_scope": "xmage_hand_cycling_only_v1",
+        "cycling_cost": "{R}",
+        "cycling_status": "runtime_executor_v1",
+        "effect": "creature",
+        "xmage_ability_classes": [
+          "CyclingAbility"
+        ]
+      }
+    },
+    {
+      "card": {
+        "name": "Granitic Titan"
+      },
+      "card_name": "Granitic Titan",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:8a4e782806614448bafe0aea117a4b5c",
+      "normalized_name": "granitic titan",
+      "required_effect_fields": {
+        "_keywords_are_self": true,
+        "ability_kind": "hand_activated_and_static",
+        "battle_model_scope": "xmage_hand_cycling_only_v1",
+        "cycling_cost": "{2}",
+        "cycling_status": "runtime_executor_v1",
+        "effect": "creature",
+        "keywords": [
+          "menace"
+        ],
+        "xmage_ability_classes": [
+          "CyclingAbility",
+          "MenaceAbility"
+        ]
+      }
+    },
+    {
+      "card": {
+        "name": "Hundroog"
+      },
+      "card_name": "Hundroog",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:d8f08ac6ab5cc5003a3b34e835b01a21",
+      "normalized_name": "hundroog",
+      "required_effect_fields": {
+        "ability_kind": "hand_activated_and_static",
+        "battle_model_scope": "xmage_hand_cycling_only_v1",
+        "cycling_cost": "{3}",
+        "cycling_status": "runtime_executor_v1",
+        "effect": "creature",
+        "xmage_ability_classes": [
+          "CyclingAbility"
+        ]
+      }
+    },
+    {
+      "card": {
+        "name": "Imposing Vantasaur"
+      },
+      "card_name": "Imposing Vantasaur",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:7d5cea5e55509cdb26a27d54635b7361",
+      "normalized_name": "imposing vantasaur",
+      "required_effect_fields": {
+        "_keywords_are_self": true,
+        "ability_kind": "hand_activated_and_static",
+        "battle_model_scope": "xmage_hand_cycling_only_v1",
+        "cycling_cost": "{1}",
+        "cycling_status": "runtime_executor_v1",
+        "effect": "creature",
+        "keywords": [
+          "vigilance"
+        ],
+        "xmage_ability_classes": [
+          "CyclingAbility",
+          "VigilanceAbility"
+        ]
+      }
+    },
+    {
+      "card": {
+        "name": "Jungle Weaver"
+      },
+      "card_name": "Jungle Weaver",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:4febc2ee6f32d96b6b2676216ae72c1a",
+      "normalized_name": "jungle weaver",
+      "required_effect_fields": {
+        "_keywords_are_self": true,
+        "ability_kind": "hand_activated_and_static",
+        "battle_model_scope": "xmage_hand_cycling_only_v1",
+        "cycling_cost": "{2}",
+        "cycling_status": "runtime_executor_v1",
+        "effect": "creature",
+        "keywords": [
+          "reach"
+        ],
+        "xmage_ability_classes": [
+          "CyclingAbility",
+          "ReachAbility"
+        ]
+      }
+    },
+    {
+      "card": {
+        "name": "Keeneye Aven"
+      },
+      "card_name": "Keeneye Aven",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:46fcac72d695558c30094bff406ae3bd",
+      "normalized_name": "keeneye aven",
+      "required_effect_fields": {
+        "_keywords_are_self": true,
+        "ability_kind": "hand_activated_and_static",
+        "battle_model_scope": "xmage_hand_cycling_only_v1",
+        "cycling_cost": "{2}",
+        "cycling_status": "runtime_executor_v1",
+        "effect": "creature",
+        "keywords": [
+          "flying"
+        ],
+        "xmage_ability_classes": [
+          "CyclingAbility",
+          "FlyingAbility"
+        ]
+      }
+    },
+    {
+      "card": {
+        "name": "Lava Serpent"
+      },
+      "card_name": "Lava Serpent",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:f80ece1da9165211fc885145ccf39147",
+      "normalized_name": "lava serpent",
+      "required_effect_fields": {
+        "_keywords_are_self": true,
+        "ability_kind": "hand_activated_and_static",
+        "battle_model_scope": "xmage_hand_cycling_only_v1",
+        "cycling_cost": "{2}",
+        "cycling_status": "runtime_executor_v1",
+        "effect": "creature",
+        "keywords": [
+          "haste"
+        ],
+        "xmage_ability_classes": [
+          "CyclingAbility",
+          "HasteAbility"
+        ]
+      }
+    },
+    {
+      "card": {
+        "name": "Lurching Rotbeast"
+      },
+      "card_name": "Lurching Rotbeast",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:da7ee5e391f4a09f36ccd472d5fe4d37",
+      "normalized_name": "lurching rotbeast",
+      "required_effect_fields": {
+        "ability_kind": "hand_activated_and_static",
+        "battle_model_scope": "xmage_hand_cycling_only_v1",
+        "cycling_cost": "{B}",
+        "cycling_status": "runtime_executor_v1",
+        "effect": "creature",
+        "xmage_ability_classes": [
+          "CyclingAbility"
+        ]
+      }
+    },
+    {
+      "card": {
+        "name": "Macetail Hystrodon"
+      },
+      "card_name": "Macetail Hystrodon",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:a90726d6ffed75c3cad0732807268fef",
+      "normalized_name": "macetail hystrodon",
+      "required_effect_fields": {
+        "_keywords_are_self": true,
+        "ability_kind": "hand_activated_and_static",
+        "battle_model_scope": "xmage_hand_cycling_only_v1",
+        "cycling_cost": "{3}",
+        "cycling_status": "runtime_executor_v1",
+        "effect": "creature",
+        "keywords": [
+          "first_strike",
+          "haste"
+        ],
+        "xmage_ability_classes": [
+          "CyclingAbility",
+          "FirstStrikeAbility",
+          "HasteAbility"
+        ]
+      }
+    },
+    {
+      "card": {
+        "name": "Moaning Wall"
+      },
+      "card_name": "Moaning Wall",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:79aa1f27a3f5ffec00ecfa7d1d28a7ea",
+      "normalized_name": "moaning wall",
+      "required_effect_fields": {
+        "_keywords_are_self": true,
+        "ability_kind": "hand_activated_and_static",
+        "battle_model_scope": "xmage_hand_cycling_only_v1",
+        "cycling_cost": "{2}",
+        "cycling_status": "runtime_executor_v1",
+        "effect": "creature",
+        "keywords": [
+          "defender"
+        ],
+        "xmage_ability_classes": [
+          "CyclingAbility",
+          "DefenderAbility"
+        ]
+      }
+    },
+    {
+      "card": {
+        "name": "Pendrell Drake"
+      },
+      "card_name": "Pendrell Drake",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:46fcac72d695558c30094bff406ae3bd",
+      "normalized_name": "pendrell drake",
+      "required_effect_fields": {
+        "_keywords_are_self": true,
+        "ability_kind": "hand_activated_and_static",
+        "battle_model_scope": "xmage_hand_cycling_only_v1",
+        "cycling_cost": "{2}",
+        "cycling_status": "runtime_executor_v1",
+        "effect": "creature",
+        "keywords": [
+          "flying"
+        ],
+        "xmage_ability_classes": [
+          "CyclingAbility",
+          "FlyingAbility"
+        ]
+      }
+    },
+    {
+      "card": {
+        "name": "Primoc Escapee"
+      },
+      "card_name": "Primoc Escapee",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:46fcac72d695558c30094bff406ae3bd",
+      "normalized_name": "primoc escapee",
+      "required_effect_fields": {
+        "_keywords_are_self": true,
+        "ability_kind": "hand_activated_and_static",
+        "battle_model_scope": "xmage_hand_cycling_only_v1",
+        "cycling_cost": "{2}",
+        "cycling_status": "runtime_executor_v1",
+        "effect": "creature",
+        "keywords": [
+          "flying"
+        ],
+        "xmage_ability_classes": [
+          "CyclingAbility",
+          "FlyingAbility"
+        ]
+      }
+    },
+    {
+      "card": {
+        "name": "Rampaging Hippo"
+      },
+      "card_name": "Rampaging Hippo",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:824f7e2642eddc58b00c3bb9bf6fa6c2",
+      "normalized_name": "rampaging hippo",
+      "required_effect_fields": {
+        "_keywords_are_self": true,
+        "ability_kind": "hand_activated_and_static",
+        "battle_model_scope": "xmage_hand_cycling_only_v1",
+        "cycling_cost": "{2}",
+        "cycling_status": "runtime_executor_v1",
+        "effect": "creature",
+        "keywords": [
+          "trample"
+        ],
+        "xmage_ability_classes": [
+          "CyclingAbility",
+          "TrampleAbility"
+        ]
+      }
+    },
+    {
+      "card": {
+        "name": "Ridge Rannet"
+      },
+      "card_name": "Ridge Rannet",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:b5b581f43feab946cc4b69983d61603d",
+      "normalized_name": "ridge rannet",
+      "required_effect_fields": {
+        "ability_kind": "hand_activated_and_static",
+        "battle_model_scope": "xmage_hand_cycling_only_v1",
+        "cycling_cost": "{2}",
+        "cycling_status": "runtime_executor_v1",
+        "effect": "creature",
+        "xmage_ability_classes": [
+          "CyclingAbility"
+        ]
+      }
+    },
+    {
+      "card": {
+        "name": "Sandbar Merfolk"
+      },
+      "card_name": "Sandbar Merfolk",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:b5b581f43feab946cc4b69983d61603d",
+      "normalized_name": "sandbar merfolk",
+      "required_effect_fields": {
+        "ability_kind": "hand_activated_and_static",
+        "battle_model_scope": "xmage_hand_cycling_only_v1",
+        "cycling_cost": "{2}",
+        "cycling_status": "runtime_executor_v1",
+        "effect": "creature",
+        "xmage_ability_classes": [
+          "CyclingAbility"
+        ]
+      }
+    },
+    {
+      "card": {
+        "name": "Sandbar Serpent"
+      },
+      "card_name": "Sandbar Serpent",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:b5b581f43feab946cc4b69983d61603d",
+      "normalized_name": "sandbar serpent",
+      "required_effect_fields": {
+        "ability_kind": "hand_activated_and_static",
+        "battle_model_scope": "xmage_hand_cycling_only_v1",
+        "cycling_cost": "{2}",
+        "cycling_status": "runtime_executor_v1",
+        "effect": "creature",
+        "xmage_ability_classes": [
+          "CyclingAbility"
+        ]
+      }
+    },
+    {
+      "card": {
+        "name": "Shimmering Barrier"
+      },
+      "card_name": "Shimmering Barrier",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:3305d03b7aa66edd80bddea1808ccefd",
+      "normalized_name": "shimmering barrier",
+      "required_effect_fields": {
+        "_keywords_are_self": true,
+        "ability_kind": "hand_activated_and_static",
+        "battle_model_scope": "xmage_hand_cycling_only_v1",
+        "cycling_cost": "{2}",
+        "cycling_status": "runtime_executor_v1",
+        "effect": "creature",
+        "keywords": [
+          "first_strike",
+          "defender"
+        ],
+        "xmage_ability_classes": [
+          "CyclingAbility",
+          "DefenderAbility",
+          "FirstStrikeAbility"
+        ]
+      }
+    },
+    {
+      "card": {
+        "name": "Shimmerscale Drake"
+      },
+      "card_name": "Shimmerscale Drake",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:46fcac72d695558c30094bff406ae3bd",
+      "normalized_name": "shimmerscale drake",
+      "required_effect_fields": {
+        "_keywords_are_self": true,
+        "ability_kind": "hand_activated_and_static",
+        "battle_model_scope": "xmage_hand_cycling_only_v1",
+        "cycling_cost": "{2}",
+        "cycling_status": "runtime_executor_v1",
+        "effect": "creature",
+        "keywords": [
+          "flying"
+        ],
+        "xmage_ability_classes": [
+          "CyclingAbility",
+          "FlyingAbility"
+        ]
+      }
+    },
+    {
+      "card": {
+        "name": "Striped Riverwinder"
+      },
+      "card_name": "Striped Riverwinder",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:b4c4c3ee6697ff1d41eb16d7ca56dcdc",
+      "normalized_name": "striped riverwinder",
+      "required_effect_fields": {
+        "_keywords_are_self": true,
+        "ability_kind": "hand_activated_and_static",
+        "battle_model_scope": "xmage_hand_cycling_only_v1",
+        "cycling_cost": "{U}",
+        "cycling_status": "runtime_executor_v1",
+        "effect": "creature",
+        "keywords": [
+          "hexproof"
+        ],
+        "xmage_ability_classes": [
+          "CyclingAbility",
+          "HexproofAbility"
+        ]
+      }
+    },
+    {
+      "card": {
+        "name": "Wasteland Scorpion"
+      },
+      "card_name": "Wasteland Scorpion",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:88d467e8bd4236bbb2fd4c37d08859b8",
+      "normalized_name": "wasteland scorpion",
+      "required_effect_fields": {
+        "_keywords_are_self": true,
+        "ability_kind": "hand_activated_and_static",
+        "battle_model_scope": "xmage_hand_cycling_only_v1",
+        "cycling_cost": "{2}",
+        "cycling_status": "runtime_executor_v1",
+        "effect": "creature",
+        "keywords": [
+          "deathtouch"
+        ],
+        "xmage_ability_classes": [
+          "CyclingAbility",
+          "DeathtouchAbility"
+        ]
+      }
+    },
+    {
+      "card": {
+        "name": "Winged Shepherd"
+      },
+      "card_name": "Winged Shepherd",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:026bdd34c333542b488d5a86cc64df22",
+      "normalized_name": "winged shepherd",
+      "required_effect_fields": {
+        "_keywords_are_self": true,
+        "ability_kind": "hand_activated_and_static",
+        "battle_model_scope": "xmage_hand_cycling_only_v1",
+        "cycling_cost": "{W}",
+        "cycling_status": "runtime_executor_v1",
+        "effect": "creature",
+        "keywords": [
+          "flying",
+          "vigilance"
+        ],
+        "xmage_ability_classes": [
+          "CyclingAbility",
+          "FlyingAbility",
+          "VigilanceAbility"
+        ]
+      }
+    },
+    {
+      "card": {
+        "name": "Yoked Plowbeast"
+      },
+      "card_name": "Yoked Plowbeast",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:b5b581f43feab946cc4b69983d61603d",
+      "normalized_name": "yoked plowbeast",
+      "required_effect_fields": {
+        "ability_kind": "hand_activated_and_static",
+        "battle_model_scope": "xmage_hand_cycling_only_v1",
+        "cycling_cost": "{2}",
+        "cycling_status": "runtime_executor_v1",
+        "effect": "creature",
+        "xmage_ability_classes": [
+          "CyclingAbility"
+        ]
+      }
+    }
+  ],
+  "selected_card_names": [
+    "Angel of the God-Pharaoh",
+    "Barkhide Mauler",
+    "Desert Cerodon",
+    "Granitic Titan",
+    "Hundroog",
+    "Imposing Vantasaur",
+    "Jungle Weaver",
+    "Keeneye Aven",
+    "Lava Serpent",
+    "Lurching Rotbeast",
+    "Macetail Hystrodon",
+    "Moaning Wall",
+    "Pendrell Drake",
+    "Primoc Escapee",
+    "Rampaging Hippo",
+    "Ridge Rannet",
+    "Sandbar Merfolk",
+    "Sandbar Serpent",
+    "Shimmering Barrier",
+    "Shimmerscale Drake",
+    "Striped Riverwinder",
+    "Wasteland Scorpion",
+    "Winged Shepherd",
+    "Yoked Plowbeast"
+  ],
+  "selected_count": 24,
+  "slug": "pg790_hand_cycling_new_server_package",
+  "snapshot_checks": [
+    {
+      "card_name": "Angel of the God-Pharaoh",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:46fcac72d695558c30094bff406ae3bd",
+      "min_rule_version": 2,
+      "normalized_name": "angel of the god-pharaoh",
+      "oracle_hash": "c5b73959186893611c1c85228761d4cb",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_hand_cycling_only_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Barkhide Mauler",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:b5b581f43feab946cc4b69983d61603d",
+      "min_rule_version": 2,
+      "normalized_name": "barkhide mauler",
+      "oracle_hash": "6f027f2cb826ec05fa70db079824812b",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_hand_cycling_only_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Desert Cerodon",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:e3dc358f4001ced01327a852fb416506",
+      "min_rule_version": 2,
+      "normalized_name": "desert cerodon",
+      "oracle_hash": "b29a8c2ec2e3640000ae62d46b28e80a",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_hand_cycling_only_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Granitic Titan",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:8a4e782806614448bafe0aea117a4b5c",
+      "min_rule_version": 2,
+      "normalized_name": "granitic titan",
+      "oracle_hash": "e7daa3e9b6bf3af5b767b4a60b4a7c55",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_hand_cycling_only_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Hundroog",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:d8f08ac6ab5cc5003a3b34e835b01a21",
+      "min_rule_version": 2,
+      "normalized_name": "hundroog",
+      "oracle_hash": "40585673ab3e35f044f6de1d649975b1",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_hand_cycling_only_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Imposing Vantasaur",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:7d5cea5e55509cdb26a27d54635b7361",
+      "min_rule_version": 2,
+      "normalized_name": "imposing vantasaur",
+      "oracle_hash": "2c99d78617076aa2995f9a9741ab3bea",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_hand_cycling_only_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Jungle Weaver",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:4febc2ee6f32d96b6b2676216ae72c1a",
+      "min_rule_version": 2,
+      "normalized_name": "jungle weaver",
+      "oracle_hash": "953552b5e980df063d273cce30a1917b",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_hand_cycling_only_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Keeneye Aven",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:46fcac72d695558c30094bff406ae3bd",
+      "min_rule_version": 2,
+      "normalized_name": "keeneye aven",
+      "oracle_hash": "c5b73959186893611c1c85228761d4cb",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_hand_cycling_only_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Lava Serpent",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:f80ece1da9165211fc885145ccf39147",
+      "min_rule_version": 2,
+      "normalized_name": "lava serpent",
+      "oracle_hash": "92197d4472b1150b84d0f2a3c9898216",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_hand_cycling_only_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Lurching Rotbeast",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:da7ee5e391f4a09f36ccd472d5fe4d37",
+      "min_rule_version": 2,
+      "normalized_name": "lurching rotbeast",
+      "oracle_hash": "5d8e73538917d379afa3cf776464609b",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_hand_cycling_only_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Macetail Hystrodon",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:a90726d6ffed75c3cad0732807268fef",
+      "min_rule_version": 2,
+      "normalized_name": "macetail hystrodon",
+      "oracle_hash": "a1c75489f4aafb349adfdd7c19948b3e",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_hand_cycling_only_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Moaning Wall",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:79aa1f27a3f5ffec00ecfa7d1d28a7ea",
+      "min_rule_version": 2,
+      "normalized_name": "moaning wall",
+      "oracle_hash": "663722b5e4a7d78843ba4c8d2a42fa06",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_hand_cycling_only_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Pendrell Drake",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:46fcac72d695558c30094bff406ae3bd",
+      "min_rule_version": 2,
+      "normalized_name": "pendrell drake",
+      "oracle_hash": "c5b73959186893611c1c85228761d4cb",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_hand_cycling_only_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Primoc Escapee",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:46fcac72d695558c30094bff406ae3bd",
+      "min_rule_version": 2,
+      "normalized_name": "primoc escapee",
+      "oracle_hash": "c5b73959186893611c1c85228761d4cb",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_hand_cycling_only_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Rampaging Hippo",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:824f7e2642eddc58b00c3bb9bf6fa6c2",
+      "min_rule_version": 2,
+      "normalized_name": "rampaging hippo",
+      "oracle_hash": "d664775428f86e83e8e00507111afbfa",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_hand_cycling_only_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Ridge Rannet",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:b5b581f43feab946cc4b69983d61603d",
+      "min_rule_version": 2,
+      "normalized_name": "ridge rannet",
+      "oracle_hash": "6f027f2cb826ec05fa70db079824812b",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_hand_cycling_only_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Sandbar Merfolk",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:b5b581f43feab946cc4b69983d61603d",
+      "min_rule_version": 2,
+      "normalized_name": "sandbar merfolk",
+      "oracle_hash": "6f027f2cb826ec05fa70db079824812b",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_hand_cycling_only_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Sandbar Serpent",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:b5b581f43feab946cc4b69983d61603d",
+      "min_rule_version": 2,
+      "normalized_name": "sandbar serpent",
+      "oracle_hash": "6f027f2cb826ec05fa70db079824812b",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_hand_cycling_only_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Shimmering Barrier",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:3305d03b7aa66edd80bddea1808ccefd",
+      "min_rule_version": 2,
+      "normalized_name": "shimmering barrier",
+      "oracle_hash": "e662a839bc03af5c02c35a1788f49299",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_hand_cycling_only_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Shimmerscale Drake",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:46fcac72d695558c30094bff406ae3bd",
+      "min_rule_version": 2,
+      "normalized_name": "shimmerscale drake",
+      "oracle_hash": "c5b73959186893611c1c85228761d4cb",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_hand_cycling_only_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Striped Riverwinder",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:b4c4c3ee6697ff1d41eb16d7ca56dcdc",
+      "min_rule_version": 2,
+      "normalized_name": "striped riverwinder",
+      "oracle_hash": "18899552ccf0c5479c0c27c234269bf4",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_hand_cycling_only_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Wasteland Scorpion",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:88d467e8bd4236bbb2fd4c37d08859b8",
+      "min_rule_version": 2,
+      "normalized_name": "wasteland scorpion",
+      "oracle_hash": "96d7c8a19fb10365bde472530fe970ca",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_hand_cycling_only_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Winged Shepherd",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:026bdd34c333542b488d5a86cc64df22",
+      "min_rule_version": 2,
+      "normalized_name": "winged shepherd",
+      "oracle_hash": "e880be01d39b7d80cc3cc31e587bb46a",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_hand_cycling_only_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Yoked Plowbeast",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:b5b581f43feab946cc4b69983d61603d",
+      "min_rule_version": 2,
+      "normalized_name": "yoked plowbeast",
+      "oracle_hash": "6f027f2cb826ec05fa70db079824812b",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_hand_cycling_only_v1"
+      },
+      "review_status": "verified"
+    }
+  ],
+  "status": "prepared_read_only_pending_apply_approval"
+}

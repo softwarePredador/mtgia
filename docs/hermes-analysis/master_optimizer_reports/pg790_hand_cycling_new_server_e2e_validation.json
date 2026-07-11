@@ -1,0 +1,1095 @@
+{
+  "battle_execution": {
+    "event_count": 24,
+    "results": [
+      {
+        "card_name": "Angel of the God-Pharaoh",
+        "cycling_cost": "{2}",
+        "drawn": [
+          "E2E Fresh Cycling Draw"
+        ],
+        "graveyard_size": 1,
+        "scenario": "Angel of the God-Pharaoh cycles from hand"
+      },
+      {
+        "card_name": "Barkhide Mauler",
+        "cycling_cost": "{2}",
+        "drawn": [
+          "E2E Fresh Cycling Draw"
+        ],
+        "graveyard_size": 1,
+        "scenario": "Barkhide Mauler cycles from hand"
+      },
+      {
+        "card_name": "Desert Cerodon",
+        "cycling_cost": "{R}",
+        "drawn": [
+          "E2E Fresh Cycling Draw"
+        ],
+        "graveyard_size": 1,
+        "scenario": "Desert Cerodon cycles from hand"
+      },
+      {
+        "card_name": "Granitic Titan",
+        "cycling_cost": "{2}",
+        "drawn": [
+          "E2E Fresh Cycling Draw"
+        ],
+        "graveyard_size": 1,
+        "scenario": "Granitic Titan cycles from hand"
+      },
+      {
+        "card_name": "Hundroog",
+        "cycling_cost": "{3}",
+        "drawn": [
+          "E2E Fresh Cycling Draw"
+        ],
+        "graveyard_size": 1,
+        "scenario": "Hundroog cycles from hand"
+      },
+      {
+        "card_name": "Imposing Vantasaur",
+        "cycling_cost": "{1}",
+        "drawn": [
+          "E2E Fresh Cycling Draw"
+        ],
+        "graveyard_size": 1,
+        "scenario": "Imposing Vantasaur cycles from hand"
+      },
+      {
+        "card_name": "Jungle Weaver",
+        "cycling_cost": "{2}",
+        "drawn": [
+          "E2E Fresh Cycling Draw"
+        ],
+        "graveyard_size": 1,
+        "scenario": "Jungle Weaver cycles from hand"
+      },
+      {
+        "card_name": "Keeneye Aven",
+        "cycling_cost": "{2}",
+        "drawn": [
+          "E2E Fresh Cycling Draw"
+        ],
+        "graveyard_size": 1,
+        "scenario": "Keeneye Aven cycles from hand"
+      },
+      {
+        "card_name": "Lava Serpent",
+        "cycling_cost": "{2}",
+        "drawn": [
+          "E2E Fresh Cycling Draw"
+        ],
+        "graveyard_size": 1,
+        "scenario": "Lava Serpent cycles from hand"
+      },
+      {
+        "card_name": "Lurching Rotbeast",
+        "cycling_cost": "{B}",
+        "drawn": [
+          "E2E Fresh Cycling Draw"
+        ],
+        "graveyard_size": 1,
+        "scenario": "Lurching Rotbeast cycles from hand"
+      },
+      {
+        "card_name": "Macetail Hystrodon",
+        "cycling_cost": "{3}",
+        "drawn": [
+          "E2E Fresh Cycling Draw"
+        ],
+        "graveyard_size": 1,
+        "scenario": "Macetail Hystrodon cycles from hand"
+      },
+      {
+        "card_name": "Moaning Wall",
+        "cycling_cost": "{2}",
+        "drawn": [
+          "E2E Fresh Cycling Draw"
+        ],
+        "graveyard_size": 1,
+        "scenario": "Moaning Wall cycles from hand"
+      },
+      {
+        "card_name": "Pendrell Drake",
+        "cycling_cost": "{2}",
+        "drawn": [
+          "E2E Fresh Cycling Draw"
+        ],
+        "graveyard_size": 1,
+        "scenario": "Pendrell Drake cycles from hand"
+      },
+      {
+        "card_name": "Primoc Escapee",
+        "cycling_cost": "{2}",
+        "drawn": [
+          "E2E Fresh Cycling Draw"
+        ],
+        "graveyard_size": 1,
+        "scenario": "Primoc Escapee cycles from hand"
+      },
+      {
+        "card_name": "Rampaging Hippo",
+        "cycling_cost": "{2}",
+        "drawn": [
+          "E2E Fresh Cycling Draw"
+        ],
+        "graveyard_size": 1,
+        "scenario": "Rampaging Hippo cycles from hand"
+      },
+      {
+        "card_name": "Ridge Rannet",
+        "cycling_cost": "{2}",
+        "drawn": [
+          "E2E Fresh Cycling Draw"
+        ],
+        "graveyard_size": 1,
+        "scenario": "Ridge Rannet cycles from hand"
+      },
+      {
+        "card_name": "Sandbar Merfolk",
+        "cycling_cost": "{2}",
+        "drawn": [
+          "E2E Fresh Cycling Draw"
+        ],
+        "graveyard_size": 1,
+        "scenario": "Sandbar Merfolk cycles from hand"
+      },
+      {
+        "card_name": "Sandbar Serpent",
+        "cycling_cost": "{2}",
+        "drawn": [
+          "E2E Fresh Cycling Draw"
+        ],
+        "graveyard_size": 1,
+        "scenario": "Sandbar Serpent cycles from hand"
+      },
+      {
+        "card_name": "Shimmering Barrier",
+        "cycling_cost": "{2}",
+        "drawn": [
+          "E2E Fresh Cycling Draw"
+        ],
+        "graveyard_size": 1,
+        "scenario": "Shimmering Barrier cycles from hand"
+      },
+      {
+        "card_name": "Shimmerscale Drake",
+        "cycling_cost": "{2}",
+        "drawn": [
+          "E2E Fresh Cycling Draw"
+        ],
+        "graveyard_size": 1,
+        "scenario": "Shimmerscale Drake cycles from hand"
+      },
+      {
+        "card_name": "Striped Riverwinder",
+        "cycling_cost": "{U}",
+        "drawn": [
+          "E2E Fresh Cycling Draw"
+        ],
+        "graveyard_size": 1,
+        "scenario": "Striped Riverwinder cycles from hand"
+      },
+      {
+        "card_name": "Wasteland Scorpion",
+        "cycling_cost": "{2}",
+        "drawn": [
+          "E2E Fresh Cycling Draw"
+        ],
+        "graveyard_size": 1,
+        "scenario": "Wasteland Scorpion cycles from hand"
+      },
+      {
+        "card_name": "Winged Shepherd",
+        "cycling_cost": "{W}",
+        "drawn": [
+          "E2E Fresh Cycling Draw"
+        ],
+        "graveyard_size": 1,
+        "scenario": "Winged Shepherd cycles from hand"
+      },
+      {
+        "card_name": "Yoked Plowbeast",
+        "cycling_cost": "{2}",
+        "drawn": [
+          "E2E Fresh Cycling Draw"
+        ],
+        "graveyard_size": 1,
+        "scenario": "Yoked Plowbeast cycles from hand"
+      }
+    ],
+    "scenario_count": 24
+  },
+  "battle_path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py",
+  "database_target": "127.0.0.1:15432/halder",
+  "generated_at_utc": "2026-07-11T21:56:11.430365+00:00",
+  "manifest": "docs/hermes-analysis/master_optimizer_reports/pg790_hand_cycling_new_server_package_manifest.json",
+  "package_id": "pg790_hand_cycling_new_server_package_manifest",
+  "snapshot": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/known_cards_canonical_snapshot.json",
+  "sqlite_db": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db",
+  "stages": [
+    {
+      "evidence": {
+        "validated_rows": 24
+      },
+      "name": "postgres_source_of_truth",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_hand_cycling_only_v1",
+          "card_name": "Angel of the God-Pharaoh",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:46fcac72d695558c30094bff406ae3bd",
+          "oracle_hash": "c5b73959186893611c1c85228761d4cb",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_hand_cycling_only_v1",
+          "card_name": "Barkhide Mauler",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:b5b581f43feab946cc4b69983d61603d",
+          "oracle_hash": "6f027f2cb826ec05fa70db079824812b",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_hand_cycling_only_v1",
+          "card_name": "Desert Cerodon",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:e3dc358f4001ced01327a852fb416506",
+          "oracle_hash": "b29a8c2ec2e3640000ae62d46b28e80a",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_hand_cycling_only_v1",
+          "card_name": "Granitic Titan",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:8a4e782806614448bafe0aea117a4b5c",
+          "oracle_hash": "e7daa3e9b6bf3af5b767b4a60b4a7c55",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_hand_cycling_only_v1",
+          "card_name": "Hundroog",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:d8f08ac6ab5cc5003a3b34e835b01a21",
+          "oracle_hash": "40585673ab3e35f044f6de1d649975b1",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_hand_cycling_only_v1",
+          "card_name": "Imposing Vantasaur",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:7d5cea5e55509cdb26a27d54635b7361",
+          "oracle_hash": "2c99d78617076aa2995f9a9741ab3bea",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_hand_cycling_only_v1",
+          "card_name": "Jungle Weaver",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:4febc2ee6f32d96b6b2676216ae72c1a",
+          "oracle_hash": "953552b5e980df063d273cce30a1917b",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_hand_cycling_only_v1",
+          "card_name": "Keeneye Aven",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:46fcac72d695558c30094bff406ae3bd",
+          "oracle_hash": "c5b73959186893611c1c85228761d4cb",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_hand_cycling_only_v1",
+          "card_name": "Lava Serpent",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:f80ece1da9165211fc885145ccf39147",
+          "oracle_hash": "92197d4472b1150b84d0f2a3c9898216",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_hand_cycling_only_v1",
+          "card_name": "Lurching Rotbeast",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:da7ee5e391f4a09f36ccd472d5fe4d37",
+          "oracle_hash": "5d8e73538917d379afa3cf776464609b",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_hand_cycling_only_v1",
+          "card_name": "Macetail Hystrodon",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:a90726d6ffed75c3cad0732807268fef",
+          "oracle_hash": "a1c75489f4aafb349adfdd7c19948b3e",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_hand_cycling_only_v1",
+          "card_name": "Moaning Wall",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:79aa1f27a3f5ffec00ecfa7d1d28a7ea",
+          "oracle_hash": "663722b5e4a7d78843ba4c8d2a42fa06",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_hand_cycling_only_v1",
+          "card_name": "Pendrell Drake",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:46fcac72d695558c30094bff406ae3bd",
+          "oracle_hash": "c5b73959186893611c1c85228761d4cb",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_hand_cycling_only_v1",
+          "card_name": "Primoc Escapee",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:46fcac72d695558c30094bff406ae3bd",
+          "oracle_hash": "c5b73959186893611c1c85228761d4cb",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_hand_cycling_only_v1",
+          "card_name": "Rampaging Hippo",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:824f7e2642eddc58b00c3bb9bf6fa6c2",
+          "oracle_hash": "d664775428f86e83e8e00507111afbfa",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_hand_cycling_only_v1",
+          "card_name": "Ridge Rannet",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:b5b581f43feab946cc4b69983d61603d",
+          "oracle_hash": "6f027f2cb826ec05fa70db079824812b",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_hand_cycling_only_v1",
+          "card_name": "Sandbar Merfolk",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:b5b581f43feab946cc4b69983d61603d",
+          "oracle_hash": "6f027f2cb826ec05fa70db079824812b",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_hand_cycling_only_v1",
+          "card_name": "Sandbar Serpent",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:b5b581f43feab946cc4b69983d61603d",
+          "oracle_hash": "6f027f2cb826ec05fa70db079824812b",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_hand_cycling_only_v1",
+          "card_name": "Shimmering Barrier",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:3305d03b7aa66edd80bddea1808ccefd",
+          "oracle_hash": "e662a839bc03af5c02c35a1788f49299",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_hand_cycling_only_v1",
+          "card_name": "Shimmerscale Drake",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:46fcac72d695558c30094bff406ae3bd",
+          "oracle_hash": "c5b73959186893611c1c85228761d4cb",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_hand_cycling_only_v1",
+          "card_name": "Striped Riverwinder",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:b4c4c3ee6697ff1d41eb16d7ca56dcdc",
+          "oracle_hash": "18899552ccf0c5479c0c27c234269bf4",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_hand_cycling_only_v1",
+          "card_name": "Wasteland Scorpion",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:88d467e8bd4236bbb2fd4c37d08859b8",
+          "oracle_hash": "96d7c8a19fb10365bde472530fe970ca",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_hand_cycling_only_v1",
+          "card_name": "Winged Shepherd",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:026bdd34c333542b488d5a86cc64df22",
+          "oracle_hash": "e880be01d39b7d80cc3cc31e587bb46a",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_hand_cycling_only_v1",
+          "card_name": "Yoked Plowbeast",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:b5b581f43feab946cc4b69983d61603d",
+          "oracle_hash": "6f027f2cb826ec05fa70db079824812b",
+          "review_status": "verified",
+          "rule_version": 2
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_rows": 24
+      },
+      "name": "sqlite_hermes_cache",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_hand_cycling_only_v1",
+          "card_name": "Angel of the God-Pharaoh",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:46fcac72d695558c30094bff406ae3bd",
+          "oracle_hash": "c5b73959186893611c1c85228761d4cb",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_hand_cycling_only_v1",
+          "card_name": "Barkhide Mauler",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:b5b581f43feab946cc4b69983d61603d",
+          "oracle_hash": "6f027f2cb826ec05fa70db079824812b",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_hand_cycling_only_v1",
+          "card_name": "Desert Cerodon",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:e3dc358f4001ced01327a852fb416506",
+          "oracle_hash": "b29a8c2ec2e3640000ae62d46b28e80a",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_hand_cycling_only_v1",
+          "card_name": "Granitic Titan",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:8a4e782806614448bafe0aea117a4b5c",
+          "oracle_hash": "e7daa3e9b6bf3af5b767b4a60b4a7c55",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_hand_cycling_only_v1",
+          "card_name": "Hundroog",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:d8f08ac6ab5cc5003a3b34e835b01a21",
+          "oracle_hash": "40585673ab3e35f044f6de1d649975b1",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_hand_cycling_only_v1",
+          "card_name": "Imposing Vantasaur",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:7d5cea5e55509cdb26a27d54635b7361",
+          "oracle_hash": "2c99d78617076aa2995f9a9741ab3bea",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_hand_cycling_only_v1",
+          "card_name": "Jungle Weaver",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:4febc2ee6f32d96b6b2676216ae72c1a",
+          "oracle_hash": "953552b5e980df063d273cce30a1917b",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_hand_cycling_only_v1",
+          "card_name": "Keeneye Aven",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:46fcac72d695558c30094bff406ae3bd",
+          "oracle_hash": "c5b73959186893611c1c85228761d4cb",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_hand_cycling_only_v1",
+          "card_name": "Lava Serpent",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:f80ece1da9165211fc885145ccf39147",
+          "oracle_hash": "92197d4472b1150b84d0f2a3c9898216",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_hand_cycling_only_v1",
+          "card_name": "Lurching Rotbeast",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:da7ee5e391f4a09f36ccd472d5fe4d37",
+          "oracle_hash": "5d8e73538917d379afa3cf776464609b",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_hand_cycling_only_v1",
+          "card_name": "Macetail Hystrodon",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:a90726d6ffed75c3cad0732807268fef",
+          "oracle_hash": "a1c75489f4aafb349adfdd7c19948b3e",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_hand_cycling_only_v1",
+          "card_name": "Moaning Wall",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:79aa1f27a3f5ffec00ecfa7d1d28a7ea",
+          "oracle_hash": "663722b5e4a7d78843ba4c8d2a42fa06",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_hand_cycling_only_v1",
+          "card_name": "Pendrell Drake",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:46fcac72d695558c30094bff406ae3bd",
+          "oracle_hash": "c5b73959186893611c1c85228761d4cb",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_hand_cycling_only_v1",
+          "card_name": "Primoc Escapee",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:46fcac72d695558c30094bff406ae3bd",
+          "oracle_hash": "c5b73959186893611c1c85228761d4cb",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_hand_cycling_only_v1",
+          "card_name": "Rampaging Hippo",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:824f7e2642eddc58b00c3bb9bf6fa6c2",
+          "oracle_hash": "d664775428f86e83e8e00507111afbfa",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_hand_cycling_only_v1",
+          "card_name": "Ridge Rannet",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:b5b581f43feab946cc4b69983d61603d",
+          "oracle_hash": "6f027f2cb826ec05fa70db079824812b",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_hand_cycling_only_v1",
+          "card_name": "Sandbar Merfolk",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:b5b581f43feab946cc4b69983d61603d",
+          "oracle_hash": "6f027f2cb826ec05fa70db079824812b",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_hand_cycling_only_v1",
+          "card_name": "Sandbar Serpent",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:b5b581f43feab946cc4b69983d61603d",
+          "oracle_hash": "6f027f2cb826ec05fa70db079824812b",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_hand_cycling_only_v1",
+          "card_name": "Shimmering Barrier",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:3305d03b7aa66edd80bddea1808ccefd",
+          "oracle_hash": "e662a839bc03af5c02c35a1788f49299",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_hand_cycling_only_v1",
+          "card_name": "Shimmerscale Drake",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:46fcac72d695558c30094bff406ae3bd",
+          "oracle_hash": "c5b73959186893611c1c85228761d4cb",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_hand_cycling_only_v1",
+          "card_name": "Striped Riverwinder",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:b4c4c3ee6697ff1d41eb16d7ca56dcdc",
+          "oracle_hash": "18899552ccf0c5479c0c27c234269bf4",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_hand_cycling_only_v1",
+          "card_name": "Wasteland Scorpion",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:88d467e8bd4236bbb2fd4c37d08859b8",
+          "oracle_hash": "96d7c8a19fb10365bde472530fe970ca",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_hand_cycling_only_v1",
+          "card_name": "Winged Shepherd",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:026bdd34c333542b488d5a86cc64df22",
+          "oracle_hash": "e880be01d39b7d80cc3cc31e587bb46a",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_hand_cycling_only_v1",
+          "card_name": "Yoked Plowbeast",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:b5b581f43feab946cc4b69983d61603d",
+          "oracle_hash": "6f027f2cb826ec05fa70db079824812b",
+          "review_status": "verified",
+          "rule_version": 2
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_cards": 24
+      },
+      "name": "canonical_snapshot_fallback",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_hand_cycling_only_v1",
+          "battle_rule_version": 2,
+          "card_name": "Angel of the God-Pharaoh",
+          "logical_rule_key": "battle_rule_v1:46fcac72d695558c30094bff406ae3bd"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_hand_cycling_only_v1",
+          "battle_rule_version": 2,
+          "card_name": "Barkhide Mauler",
+          "logical_rule_key": "battle_rule_v1:b5b581f43feab946cc4b69983d61603d"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_hand_cycling_only_v1",
+          "battle_rule_version": 2,
+          "card_name": "Desert Cerodon",
+          "logical_rule_key": "battle_rule_v1:e3dc358f4001ced01327a852fb416506"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_hand_cycling_only_v1",
+          "battle_rule_version": 2,
+          "card_name": "Granitic Titan",
+          "logical_rule_key": "battle_rule_v1:8a4e782806614448bafe0aea117a4b5c"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_hand_cycling_only_v1",
+          "battle_rule_version": 2,
+          "card_name": "Hundroog",
+          "logical_rule_key": "battle_rule_v1:d8f08ac6ab5cc5003a3b34e835b01a21"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_hand_cycling_only_v1",
+          "battle_rule_version": 2,
+          "card_name": "Imposing Vantasaur",
+          "logical_rule_key": "battle_rule_v1:7d5cea5e55509cdb26a27d54635b7361"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_hand_cycling_only_v1",
+          "battle_rule_version": 2,
+          "card_name": "Jungle Weaver",
+          "logical_rule_key": "battle_rule_v1:4febc2ee6f32d96b6b2676216ae72c1a"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_hand_cycling_only_v1",
+          "battle_rule_version": 2,
+          "card_name": "Keeneye Aven",
+          "logical_rule_key": "battle_rule_v1:46fcac72d695558c30094bff406ae3bd"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_hand_cycling_only_v1",
+          "battle_rule_version": 2,
+          "card_name": "Lava Serpent",
+          "logical_rule_key": "battle_rule_v1:f80ece1da9165211fc885145ccf39147"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_hand_cycling_only_v1",
+          "battle_rule_version": 2,
+          "card_name": "Lurching Rotbeast",
+          "logical_rule_key": "battle_rule_v1:da7ee5e391f4a09f36ccd472d5fe4d37"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_hand_cycling_only_v1",
+          "battle_rule_version": 2,
+          "card_name": "Macetail Hystrodon",
+          "logical_rule_key": "battle_rule_v1:a90726d6ffed75c3cad0732807268fef"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_hand_cycling_only_v1",
+          "battle_rule_version": 2,
+          "card_name": "Moaning Wall",
+          "logical_rule_key": "battle_rule_v1:79aa1f27a3f5ffec00ecfa7d1d28a7ea"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_hand_cycling_only_v1",
+          "battle_rule_version": 2,
+          "card_name": "Pendrell Drake",
+          "logical_rule_key": "battle_rule_v1:46fcac72d695558c30094bff406ae3bd"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_hand_cycling_only_v1",
+          "battle_rule_version": 2,
+          "card_name": "Primoc Escapee",
+          "logical_rule_key": "battle_rule_v1:46fcac72d695558c30094bff406ae3bd"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_hand_cycling_only_v1",
+          "battle_rule_version": 2,
+          "card_name": "Rampaging Hippo",
+          "logical_rule_key": "battle_rule_v1:824f7e2642eddc58b00c3bb9bf6fa6c2"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_hand_cycling_only_v1",
+          "battle_rule_version": 2,
+          "card_name": "Ridge Rannet",
+          "logical_rule_key": "battle_rule_v1:b5b581f43feab946cc4b69983d61603d"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_hand_cycling_only_v1",
+          "battle_rule_version": 2,
+          "card_name": "Sandbar Merfolk",
+          "logical_rule_key": "battle_rule_v1:b5b581f43feab946cc4b69983d61603d"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_hand_cycling_only_v1",
+          "battle_rule_version": 2,
+          "card_name": "Sandbar Serpent",
+          "logical_rule_key": "battle_rule_v1:b5b581f43feab946cc4b69983d61603d"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_hand_cycling_only_v1",
+          "battle_rule_version": 2,
+          "card_name": "Shimmering Barrier",
+          "logical_rule_key": "battle_rule_v1:3305d03b7aa66edd80bddea1808ccefd"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_hand_cycling_only_v1",
+          "battle_rule_version": 2,
+          "card_name": "Shimmerscale Drake",
+          "logical_rule_key": "battle_rule_v1:46fcac72d695558c30094bff406ae3bd"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_hand_cycling_only_v1",
+          "battle_rule_version": 2,
+          "card_name": "Striped Riverwinder",
+          "logical_rule_key": "battle_rule_v1:b4c4c3ee6697ff1d41eb16d7ca56dcdc"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_hand_cycling_only_v1",
+          "battle_rule_version": 2,
+          "card_name": "Wasteland Scorpion",
+          "logical_rule_key": "battle_rule_v1:88d467e8bd4236bbb2fd4c37d08859b8"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_hand_cycling_only_v1",
+          "battle_rule_version": 2,
+          "card_name": "Winged Shepherd",
+          "logical_rule_key": "battle_rule_v1:026bdd34c333542b488d5a86cc64df22"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_hand_cycling_only_v1",
+          "battle_rule_version": 2,
+          "card_name": "Yoked Plowbeast",
+          "logical_rule_key": "battle_rule_v1:b5b581f43feab946cc4b69983d61603d"
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_cards": 24
+      },
+      "name": "runtime_get_card_effect",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "card_name": "Angel of the God-Pharaoh",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:46fcac72d695558c30094bff406ae3bd"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Barkhide Mauler",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:b5b581f43feab946cc4b69983d61603d"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Desert Cerodon",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:e3dc358f4001ced01327a852fb416506"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Granitic Titan",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:8a4e782806614448bafe0aea117a4b5c"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Hundroog",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:d8f08ac6ab5cc5003a3b34e835b01a21"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Imposing Vantasaur",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:7d5cea5e55509cdb26a27d54635b7361"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Jungle Weaver",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:4febc2ee6f32d96b6b2676216ae72c1a"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Keeneye Aven",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:46fcac72d695558c30094bff406ae3bd"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Lava Serpent",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:f80ece1da9165211fc885145ccf39147"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Lurching Rotbeast",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:da7ee5e391f4a09f36ccd472d5fe4d37"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Macetail Hystrodon",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:a90726d6ffed75c3cad0732807268fef"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Moaning Wall",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:79aa1f27a3f5ffec00ecfa7d1d28a7ea"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Pendrell Drake",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:46fcac72d695558c30094bff406ae3bd"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Primoc Escapee",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:46fcac72d695558c30094bff406ae3bd"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Rampaging Hippo",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:824f7e2642eddc58b00c3bb9bf6fa6c2"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Ridge Rannet",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:b5b581f43feab946cc4b69983d61603d"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Sandbar Merfolk",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:b5b581f43feab946cc4b69983d61603d"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Sandbar Serpent",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:b5b581f43feab946cc4b69983d61603d"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Shimmering Barrier",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:3305d03b7aa66edd80bddea1808ccefd"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Shimmerscale Drake",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:46fcac72d695558c30094bff406ae3bd"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Striped Riverwinder",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:b4c4c3ee6697ff1d41eb16d7ca56dcdc"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Wasteland Scorpion",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:88d467e8bd4236bbb2fd4c37d08859b8"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Winged Shepherd",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:026bdd34c333542b488d5a86cc64df22"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Yoked Plowbeast",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:b5b581f43feab946cc4b69983d61603d"
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "events": 24,
+        "scenarios": 24
+      },
+      "name": "battle_execution",
+      "status": "pass"
+    }
+  ],
+  "status": "pass",
+  "title": "Battle Package End-to-End Validation"
+}
