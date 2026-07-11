@@ -8691,6 +8691,11 @@ def fixed_boost_keyword_untap_target_from_source(
 
 def gain_control_target_spec_from_phrase(phrase: str) -> dict[str, Any] | str:
     text = re.sub(r"\s+", " ", str(phrase or "").strip().lower())
+    if text == "permanent":
+        return {
+            "target": "permanent",
+            "target_constraints": {"card_types": ["permanent"]},
+        }
     if text in {"artifact or creature", "artifact or target creature"}:
         return {
             "target": "artifact_or_creature",
@@ -8738,6 +8743,24 @@ def gain_control_target_spec_from_phrase(phrase: str) -> dict[str, Any] | str:
     return "gain_control_untap_haste_target_phrase_not_supported"
 
 
+def gain_control_granted_keywords_from_phrase(phrase: str) -> list[str] | str:
+    normalized = re.sub(r"\s+", " ", str(phrase or "").strip().lower())
+    if " or " in normalized:
+        return "gain_control_untap_haste_oracle_keyword_choice_not_supported"
+    keyword_parts = [
+        part.strip()
+        for part in re.split(r",?\s+and\s+|,\s*", normalized)
+        if part.strip()
+    ]
+    keywords = [TARGET_GRANT_KEYWORD_ORACLE_WORDS.get(part) for part in keyword_parts]
+    if not keywords or any(keyword is None for keyword in keywords):
+        return "gain_control_untap_haste_oracle_keyword_not_supported"
+    keyword_set = {str(keyword) for keyword in keywords if keyword}
+    if "haste" not in keyword_set:
+        return "gain_control_untap_haste_oracle_haste_missing"
+    return ordered_keywords(keyword_set)
+
+
 def gain_control_untap_haste_from_source(source: str) -> dict[str, Any] | str:
     text = source or ""
     if "TemporaryInsanityPredicate" in text or "number of cards in your graveyard" in text:
@@ -8746,18 +8769,28 @@ def gain_control_untap_haste_from_source(source: str) -> dict[str, Any] | str:
         return "gain_control_untap_haste_source_control_not_single_eot"
     if len(re.findall(r"new\s+UntapTargetEffect\s*\(", text)) != 1:
         return "gain_control_untap_haste_source_untap_not_single"
-    haste_effects = re.findall(
-        r"new\s+GainAbilityTargetEffect\s*\(\s*HasteAbility\.getInstance\(\)\s*,\s*Duration\.EndOfTurn",
+    gain_ability_matches = re.findall(
+        r"new\s+GainAbilityTargetEffect\s*\(\s*(?:(\w+Ability)\.getInstance\s*\(\s*\)|new\s+(\w+Ability)\s*\([^)]*\))\s*,\s*Duration\.EndOfTurn",
         text,
         re.S,
     )
-    if len(haste_effects) != 1:
-        return "gain_control_untap_haste_source_haste_not_single_eot"
     all_gain_ability_effects = re.findall(r"new\s+GainAbilityTargetEffect\s*\(", text)
-    if len(all_gain_ability_effects) != 1:
-        return "gain_control_untap_haste_source_extra_granted_ability_not_supported"
+    if len(gain_ability_matches) != len(all_gain_ability_effects):
+        return "gain_control_untap_haste_source_keyword_not_supported"
+    ability_keyword_set = {
+        TARGET_GRANT_KEYWORD_ABILITY_CLASSES.get(ability_class)
+        for get_instance_class, new_class in gain_ability_matches
+        for ability_class in [get_instance_class or new_class]
+    }
+    if not ability_keyword_set or any(keyword is None for keyword in ability_keyword_set):
+        return "gain_control_untap_haste_source_keyword_not_supported"
+    if "haste" not in ability_keyword_set:
+        return "gain_control_untap_haste_source_haste_not_single_eot"
+    granted_keywords = ordered_keywords({str(keyword) for keyword in ability_keyword_set if keyword})
 
-    if re.search(r"new\s+TargetArtifactPermanent\s*\(", text):
+    if re.search(r"new\s+TargetPermanent\s*\(\s*\)", text):
+        phrase = "permanent"
+    elif re.search(r"new\s+TargetArtifactPermanent\s*\(", text):
         phrase = "artifact"
     elif "FILTER_PERMANENT_ARTIFACT_OR_CREATURE" in text:
         phrase = "artifact or creature"
@@ -8775,7 +8808,7 @@ def gain_control_untap_haste_from_source(source: str) -> dict[str, Any] | str:
     spec = gain_control_target_spec_from_phrase(phrase)
     if isinstance(spec, str):
         return spec
-    return spec
+    return {**spec, "granted_keywords_until_eot": granted_keywords}
 
 
 def graveyard_count_boost_target_from_oracle(metadata: dict[str, Any]) -> dict[str, Any] | str | None:
@@ -11130,21 +11163,27 @@ def fixed_boost_keyword_untap_target_from_oracle(metadata: dict[str, Any]) -> di
 
 
 def gain_control_untap_haste_from_oracle(metadata: dict[str, Any]) -> dict[str, Any] | str:
-    text = strip_parenthetical_reminders(oracle_text(metadata))
+    text = " ".join(oracle_effect_lines_without_neutral_auxiliary(metadata))
+    text = strip_parenthetical_reminders(text)
     text = re.sub(r"\s+", " ", text).strip().lower()
+    keyword_words = "|".join(
+        re.escape(word)
+        for word in sorted(TARGET_GRANT_KEYWORD_ORACLE_WORDS, key=len, reverse=True)
+    )
+    keyword_group = rf"(?:{keyword_words})(?:,? (?:and )?(?:{keyword_words}))*"
     patterns = [
         (
-            r"^gain control of target (?P<target>artifact or creature|artifact|nonlegendary creature|"
+            r"^gain control of target (?P<target>artifact or creature|artifact|permanent|nonlegendary creature|"
             r"creature with (?:mana value|converted mana cost) \d+ or less|"
             r"creature with power \d+ or less|creature) until end of turn\. "
-            r"untap (?:it|that creature|that artifact)\. "
-            r"(?:it|that creature|that artifact) gains haste until end of turn\.?$"
+            r"untap (?:it|that creature|that artifact|that permanent)\. "
+            rf"(?:it|that creature|that artifact|that permanent) gains (?P<keywords>{keyword_group}) until end of turn\.?$"
         ),
         (
-            r"^untap target (?P<target>artifact or creature|artifact|nonlegendary creature|"
+            r"^untap target (?P<target>artifact or creature|artifact|permanent|nonlegendary creature|"
             r"creature with (?:mana value|converted mana cost) \d+ or less|"
             r"creature with power \d+ or less|creature) and gain control of it until end of turn\. "
-            r"(?:it|that creature|that artifact) gains haste until end of turn\.?$"
+            rf"(?:it|that creature|that artifact|that permanent) gains (?P<keywords>{keyword_group}) until end of turn\.?$"
         ),
     ]
     for pattern in patterns:
@@ -11154,7 +11193,10 @@ def gain_control_untap_haste_from_oracle(metadata: dict[str, Any]) -> dict[str, 
         spec = gain_control_target_spec_from_phrase(match.group("target"))
         if isinstance(spec, str):
             return spec
-        return spec
+        granted_keywords = gain_control_granted_keywords_from_phrase(match.group("keywords"))
+        if isinstance(granted_keywords, str):
+            return granted_keywords
+        return {**spec, "granted_keywords_until_eot": granted_keywords}
     return "gain_control_untap_haste_oracle_not_exact"
 
 
@@ -39837,7 +39879,17 @@ def split_row(
                 family_id=family_id,
             ), "selected_exact_scope"
         if classes == {"GainAbilityTargetEffect", "GainControlTargetEffect", "UntapTargetEffect"}:
-            if ability_classes(row) != {"HasteAbility"}:
+            abilities = ability_classes(row)
+            granted_ability_classes = abilities.intersection(TARGET_GRANT_KEYWORD_ABILITY_CLASSES)
+            unsupported_abilities = (
+                abilities
+                - granted_ability_classes
+                - ALLOWED_AUXILIARY_RESOLUTION_ABILITY_CLASSES
+            )
+            if (
+                unsupported_abilities
+                or "HasteAbility" not in granted_ability_classes
+            ):
                 return None, "gain_control_untap_haste_ability_class_not_supported"
             source_spec = gain_control_untap_haste_from_source(source_text)
             if isinstance(source_spec, str):
@@ -39856,13 +39908,14 @@ def split_row(
                 "control_duration": "until_end_of_turn",
                 "duration": "until_end_of_turn",
                 "untap_target": True,
-                "granted_keywords_until_eot": ["haste"],
+                "granted_keywords_until_eot": oracle_spec["granted_keywords_until_eot"],
                 "xmage_effect_classes": [
                     "GainAbilityTargetEffect",
                     "GainControlTargetEffect",
                     "UntapTargetEffect",
                 ],
-                "xmage_ability_classes": ["HasteAbility"],
+                "xmage_ability_classes": sorted(granted_ability_classes),
+                "xmage_auxiliary_ability_classes": sorted(abilities - granted_ability_classes),
                 **flags,
             }
             return build_proposal(

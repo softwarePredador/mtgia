@@ -5854,9 +5854,16 @@ def resolve_gain_control_untap_haste_until_eot_spell(player, opponents, card, ef
     target["controller"] = player.name
     if effect_data.get("untap_target", True):
         target["tapped"] = False
-    keywords = sorted(_keyword_values(target) | {"haste"})
+    granted_keywords = {
+        str(keyword or "").strip().lower().replace(" ", "_")
+        for keyword in (effect_data.get("granted_keywords_until_eot") or ["haste"])
+        if str(keyword or "").strip()
+    }
+    if not granted_keywords:
+        granted_keywords = {"haste"}
+    keywords = sorted(_keyword_values(target) | granted_keywords)
     target["keywords"] = keywords
-    target["haste"] = True
+    target["haste"] = "haste" in granted_keywords
     target["summoning_sick"] = False
     if target not in player.battlefield:
         player.battlefield.append(target)
@@ -5872,7 +5879,8 @@ def resolve_gain_control_untap_haste_until_eot_spell(player, opponents, card, ef
         target_tapped_before=tapped_before,
         target_tapped_after=bool(target.get("tapped")),
         target_untapped=tapped_before and not bool(target.get("tapped")),
-        haste_granted=True,
+        haste_granted="haste" in granted_keywords,
+        granted_keywords_until_eot=sorted(granted_keywords),
         control_duration=effect_data.get("control_duration") or "until_end_of_turn",
         available_targets=len(candidates),
         target_count=1,

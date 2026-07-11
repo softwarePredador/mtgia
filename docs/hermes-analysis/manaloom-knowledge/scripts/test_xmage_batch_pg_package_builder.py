@@ -2667,6 +2667,34 @@ def test_manifest_builds_gain_control_untap_haste_execution_scenario() -> None:
     assert scenario["nonmatching_target"]["name"] == "E2E Illegal Temporary Control Target"
 
 
+def test_manifest_builds_gain_control_untap_haste_extra_keywords_permanent_scenario() -> None:
+    rule = {
+        "normalized_name": "word of seizing",
+        "card_name": "Word of Seizing",
+        "oracle_hash": "hash-word-of-seizing",
+        "logical_rule_key": "battle_rule_v1:hash-word-of-seizing",
+        "required_effect_fields": {
+            "effect": "gain_control_untap_haste_until_eot",
+            "battle_model_scope": "xmage_gain_control_untap_haste_until_eot_spell_v1",
+            "target": "permanent",
+            "target_controller": "opponents",
+            "target_constraints": {"card_types": ["permanent"]},
+            "control_duration": "until_end_of_turn",
+            "untap_target": True,
+            "granted_keywords_until_eot": ["trample", "haste"],
+        },
+    }
+
+    scenario = builder.gain_control_untap_haste_execution_scenario_from_expected_rule(rule)
+
+    assert scenario is not None
+    assert scenario["type"] == "gain_control_untap_haste_until_eot"
+    assert scenario["target"]["type_line"] == "Enchantment"
+    assert scenario["nonmatching_target"]["type_line"] == "Instant"
+    assert scenario["expected_target_constraints"] == {"card_types": ["permanent"]}
+    assert scenario["expected_granted_keywords"] == ["trample", "haste"]
+
+
 def test_manifest_builds_simple_activated_tap_target_execution_scenario() -> None:
     rule = {
         "normalized_name": "akroan jailer",

@@ -3191,6 +3191,51 @@ def test_gain_control_untap_haste_runner_returns_control_at_cleanup() -> None:
     assert result["control_returned"] is True
 
 
+def test_gain_control_untap_haste_runner_checks_extra_keywords() -> None:
+    battle = validator.load_battle(validator.DEFAULT_BATTLE)
+    events = []
+    previous_handler = battle.REPLAY_EVENT_HANDLER
+    previous_get_card_effect = battle.get_card_effect
+    battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+    battle.get_card_effect = lambda card: {
+        "effect": "gain_control_untap_haste_until_eot",
+        "battle_model_scope": "xmage_gain_control_untap_haste_until_eot_spell_v1",
+        "target": "creature",
+        "target_controller": "opponents",
+        "target_constraints": {"card_types": ["creature"]},
+        "control_duration": "until_end_of_turn",
+        "untap_target": True,
+        "granted_keywords_until_eot": ["trample", "haste"],
+        "_rule_logical_key": "battle_rule_v1:traitorous-blood",
+    }
+    try:
+        result = validator.run_gain_control_untap_haste_until_eot(
+            battle,
+            {
+                "name": "Traitorous Blood grants trample and haste",
+                "type": "gain_control_untap_haste_until_eot",
+                "card": {"name": "Traitorous Blood", "type_line": "Sorcery"},
+                "target": {
+                    "name": "E2E Legal Brute",
+                    "type_line": "Creature - Brute",
+                    "effect": "creature",
+                    "power": 4,
+                    "toughness": 4,
+                    "tapped": True,
+                },
+                "expected_granted_keywords": ["trample", "haste"],
+                "logical_rule_key": "battle_rule_v1:traitorous-blood",
+            },
+            events,
+        )
+    finally:
+        battle.REPLAY_EVENT_HANDLER = previous_handler
+        battle.get_card_effect = previous_get_card_effect
+
+    assert result["card_name"] == "Traitorous Blood"
+    assert result["control_returned"] is True
+
+
 def test_simple_activated_tap_target_runner_executes_noncreature_target() -> None:
     battle = validator.load_battle(validator.DEFAULT_BATTLE)
     events = []

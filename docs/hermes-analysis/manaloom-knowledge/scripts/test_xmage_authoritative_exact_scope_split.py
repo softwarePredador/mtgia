@@ -32678,7 +32678,7 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
                 self.assertEqual(reason, "selected_exact_scope")
                 self.assertEqual(proposal["effect_json"]["target_constraints"], expected_constraints)
 
-    def test_gain_control_untap_haste_blocks_extra_granted_ability(self) -> None:
+    def test_gain_control_untap_haste_maps_extra_granted_ability(self) -> None:
         proposal, reason = split.split_row(
             queue_row(
                 split.UNTAP_TARGET_UNIT,
@@ -32704,6 +32704,183 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
                 this.getSpellAbility().addEffect(new UntapTargetEffect().setText("Untap it"));
                 this.getSpellAbility().addEffect(new GainAbilityTargetEffect(
                     TrampleAbility.getInstance(), Duration.EndOfTurn));
+                this.getSpellAbility().addEffect(new GainAbilityTargetEffect(
+                    HasteAbility.getInstance(), Duration.EndOfTurn));
+            """,
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        self.assertEqual(proposal["effect_json"]["granted_keywords_until_eot"], ["trample", "haste"])
+        self.assertEqual(
+            proposal["effect_json"]["xmage_ability_classes"],
+            ["HasteAbility", "TrampleAbility"],
+        )
+
+    def test_gain_control_untap_haste_maps_new_keyword_ability_constructor(self) -> None:
+        proposal, reason = split.split_row(
+            queue_row(
+                split.UNTAP_TARGET_UNIT,
+                effect_classes=[
+                    "GainControlTargetEffect",
+                    "UntapTargetEffect",
+                    "GainAbilityTargetEffect",
+                ],
+                ability_classes=["HasteAbility", "MenaceAbility"],
+                xmage_signals=["targeting"],
+            ),
+            metadata(
+                name="Lose Calm",
+                type_line="Sorcery",
+                oracle_text=(
+                    "Gain control of target creature until end of turn. Untap that creature. "
+                    "It gains haste and menace until end of turn."
+                ),
+            ),
+            source_text="""
+                this.getSpellAbility().addTarget(new TargetCreaturePermanent());
+                this.getSpellAbility().addEffect(new GainControlTargetEffect(Duration.EndOfTurn));
+                this.getSpellAbility().addEffect(new UntapTargetEffect());
+                this.getSpellAbility().addEffect(new GainAbilityTargetEffect(
+                    HasteAbility.getInstance(), Duration.EndOfTurn, "It gains haste"));
+                this.getSpellAbility().addEffect(new GainAbilityTargetEffect(
+                    new MenaceAbility(), Duration.EndOfTurn));
+            """,
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        self.assertEqual(proposal["effect_json"]["granted_keywords_until_eot"], ["menace", "haste"])
+
+    def test_gain_control_untap_haste_maps_neutral_auxiliary_ability(self) -> None:
+        proposal, reason = split.split_row(
+            queue_row(
+                split.UNTAP_TARGET_UNIT,
+                effect_classes=[
+                    "GainControlTargetEffect",
+                    "UntapTargetEffect",
+                    "GainAbilityTargetEffect",
+                ],
+                ability_classes=["CyclingAbility", "HasteAbility"],
+                xmage_signals=["targeting"],
+            ),
+            metadata(
+                name="Limits of Solidarity",
+                type_line="Sorcery",
+                oracle_text=(
+                    "Gain control of target creature until end of turn. Untap that creature. "
+                    "It gains haste until end of turn.\nCycling {2}"
+                ),
+            ),
+            source_text="""
+                this.getSpellAbility().addTarget(new TargetCreaturePermanent());
+                this.getSpellAbility().addEffect(new GainControlTargetEffect(Duration.EndOfTurn));
+                this.getSpellAbility().addEffect(new UntapTargetEffect());
+                this.getSpellAbility().addEffect(new GainAbilityTargetEffect(
+                    HasteAbility.getInstance(), Duration.EndOfTurn));
+                this.addAbility(new CyclingAbility(new ManaCostsImpl<>("{2}")));
+            """,
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        self.assertEqual(proposal["effect_json"]["granted_keywords_until_eot"], ["haste"])
+        self.assertEqual(proposal["effect_json"]["xmage_auxiliary_ability_classes"], ["CyclingAbility"])
+
+    def test_gain_control_untap_haste_maps_permanent_target_with_split_second(self) -> None:
+        proposal, reason = split.split_row(
+            queue_row(
+                split.UNTAP_TARGET_UNIT,
+                effect_classes=[
+                    "GainControlTargetEffect",
+                    "UntapTargetEffect",
+                    "GainAbilityTargetEffect",
+                ],
+                ability_classes=["HasteAbility", "SplitSecondAbility"],
+                xmage_signals=["targeting"],
+            ),
+            metadata(
+                name="Word of Seizing",
+                type_line="Instant",
+                oracle_text=(
+                    "Split second\n"
+                    "Untap target permanent and gain control of it until end of turn. "
+                    "It gains haste until end of turn."
+                ),
+            ),
+            source_text="""
+                this.addAbility(new SplitSecondAbility());
+                this.getSpellAbility().addEffect(new UntapTargetEffect());
+                this.getSpellAbility().addEffect(new GainControlTargetEffect(Duration.EndOfTurn));
+                this.getSpellAbility().addEffect(new GainAbilityTargetEffect(
+                    HasteAbility.getInstance(), Duration.EndOfTurn));
+                this.getSpellAbility().addTarget(new TargetPermanent());
+            """,
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        self.assertEqual(proposal["effect_json"]["target"], "permanent")
+        self.assertEqual(proposal["effect_json"]["target_constraints"], {"card_types": ["permanent"]})
+        self.assertEqual(proposal["effect_json"]["xmage_auxiliary_ability_classes"], ["SplitSecondAbility"])
+
+    def test_gain_control_untap_haste_blocks_multi_resolution_abilities(self) -> None:
+        for name, ability_class in (
+            ("Harness by Force", "StriveAbility"),
+            ("Spreading Insurrection", "StormAbility"),
+        ):
+            with self.subTest(name=name):
+                proposal, reason = split.split_row(
+                    queue_row(
+                        split.UNTAP_TARGET_UNIT,
+                        effect_classes=[
+                            "GainControlTargetEffect",
+                            "UntapTargetEffect",
+                            "GainAbilityTargetEffect",
+                        ],
+                        ability_classes=["HasteAbility", ability_class],
+                        xmage_signals=["targeting"],
+                    ),
+                    metadata(
+                        name=name,
+                        type_line="Sorcery",
+                        oracle_text=(
+                            "Gain control of target creature until end of turn. Untap that creature. "
+                            "It gains haste until end of turn."
+                        ),
+                    ),
+                    source_text="""
+                        this.getSpellAbility().addTarget(new TargetCreaturePermanent());
+                        this.getSpellAbility().addEffect(new GainControlTargetEffect(Duration.EndOfTurn));
+                        this.getSpellAbility().addEffect(new UntapTargetEffect());
+                        this.getSpellAbility().addEffect(new GainAbilityTargetEffect(
+                            HasteAbility.getInstance(), Duration.EndOfTurn));
+                    """,
+                )
+
+                self.assertIsNone(proposal)
+                self.assertEqual(reason, "gain_control_untap_haste_ability_class_not_supported")
+
+    def test_gain_control_untap_haste_blocks_unsupported_granted_ability(self) -> None:
+        proposal, reason = split.split_row(
+            queue_row(
+                split.UNTAP_TARGET_UNIT,
+                effect_classes=[
+                    "GainControlTargetEffect",
+                    "UntapTargetEffect",
+                    "GainAbilityTargetEffect",
+                ],
+                ability_classes=["HasteAbility", "WardAbility"],
+                xmage_signals=["targeting"],
+            ),
+            metadata(
+                name="Unsupported Control",
+                type_line="Sorcery",
+                oracle_text=(
+                    "Gain control of target creature until end of turn. Untap it. "
+                    "It gains haste until end of turn."
+                ),
+            ),
+            source_text="""
+                this.getSpellAbility().addTarget(new TargetCreaturePermanent());
+                this.getSpellAbility().addEffect(new GainControlTargetEffect(Duration.EndOfTurn));
+                this.getSpellAbility().addEffect(new UntapTargetEffect());
                 this.getSpellAbility().addEffect(new GainAbilityTargetEffect(
                     HasteAbility.getInstance(), Duration.EndOfTurn));
             """,

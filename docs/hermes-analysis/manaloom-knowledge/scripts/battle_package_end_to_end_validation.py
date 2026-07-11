@@ -7017,8 +7017,20 @@ def run_gain_control_untap_haste_until_eot(
         fail("battle_execution", f"{card['name']} did not move target to active battlefield")
     if bool(target.get("tapped")):
         fail("battle_execution", f"{card['name']} left stolen target tapped")
-    if not battle.card_has_keyword(target, "haste"):
-        fail("battle_execution", f"{card['name']} did not grant haste")
+    expected_keywords = {
+        str(keyword or "").strip().lower().replace(" ", "_")
+        for keyword in (
+            scenario.get("expected_granted_keywords")
+            or effect.get("granted_keywords_until_eot")
+            or ["haste"]
+        )
+        if str(keyword or "").strip()
+    }
+    if not expected_keywords:
+        expected_keywords = {"haste"}
+    for keyword in expected_keywords:
+        if not battle.card_has_keyword(target, keyword):
+            fail("battle_execution", f"{card['name']} did not grant {keyword}")
     if target.get("controller") != active.name:
         fail("battle_execution", f"{card['name']} controller={target.get('controller')!r}")
     resolved_event = next(
@@ -7036,14 +7048,22 @@ def run_gain_control_untap_haste_until_eot(
         fail("battle_events", f"{card['name']} result={resolved_event.get('result')!r}")
     if resolved_event.get("target") != target.get("name"):
         fail("battle_events", f"{card['name']} event target={resolved_event.get('target')!r}")
+    event_keywords = {
+        str(keyword or "").strip().lower().replace(" ", "_")
+        for keyword in (resolved_event.get("granted_keywords_until_eot") or [])
+        if str(keyword or "").strip()
+    }
+    if not expected_keywords.issubset(event_keywords):
+        fail("battle_events", f"{card['name']} event granted_keywords={sorted(event_keywords)!r}")
 
     battle.clear_until_eot(active)
     if target in active.battlefield:
         fail("battle_execution", f"{card['name']} did not return target at cleanup")
     if target not in opponent.battlefield:
         fail("battle_execution", f"{card['name']} target missing from original battlefield after cleanup")
-    if battle.card_has_keyword(target, "haste"):
-        fail("battle_execution", f"{card['name']} haste persisted after cleanup")
+    for keyword in expected_keywords:
+        if battle.card_has_keyword(target, keyword):
+            fail("battle_execution", f"{card['name']} {keyword} persisted after cleanup")
     if target.get("controller") != opponent.name:
         fail("battle_execution", f"{card['name']} cleanup controller={target.get('controller')!r}")
     return {

@@ -25174,6 +25174,57 @@ class XMageExactScopeRuntimeTest(unittest.TestCase):
             )
         )
 
+    def test_gain_control_untap_extra_keywords_until_eot_cleanup(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        opponent = self.battle.Player("Opponent", None, [])
+        target = {
+            "name": "Opponent Brute",
+            "type_line": "Creature - Ogre",
+            "effect": "creature",
+            "power": 4,
+            "toughness": 4,
+            "controller": opponent.name,
+            "tapped": True,
+        }
+        opponent.battlefield = [target]
+        effect = {
+            "effect": "gain_control_untap_haste_until_eot",
+            "battle_model_scope": "xmage_gain_control_untap_haste_until_eot_spell_v1",
+            "target": "creature",
+            "target_constraints": {"card_types": ["creature"]},
+            "target_controller": "opponents",
+            "control_duration": "until_end_of_turn",
+            "untap_target": True,
+            "granted_keywords_until_eot": ["trample", "haste"],
+        }
+
+        self.battle.apply_effect_immediate(
+            active,
+            [opponent],
+            {"name": "Traitorous Blood", "type_line": "Sorcery"},
+            turn=7,
+            rng=random.Random(7),
+            effect_data_override=effect,
+        )
+
+        self.assertIn(target, active.battlefield)
+        self.assertTrue(self.battle.card_has_keyword(target, "haste"))
+        self.assertTrue(self.battle.card_has_keyword(target, "trample"))
+        self.assertTrue(
+            any(
+                event == "gain_control_untap_haste_until_eot_resolved"
+                and data.get("card") == "Traitorous Blood"
+                and data.get("granted_keywords_until_eot") == ["haste", "trample"]
+                for event, data in self.events
+            )
+        )
+
+        self.battle.clear_until_eot(active)
+
+        self.assertIn(target, opponent.battlefield)
+        self.assertFalse(self.battle.card_has_keyword(target, "haste"))
+        self.assertFalse(self.battle.card_has_keyword(target, "trample"))
+
     def test_composite_proliferate_draw_adds_existing_counters_and_draws(self) -> None:
         active = self.battle.Player("Active", None, [])
         opponent = self.battle.Player("Opponent", None, [])
