@@ -64548,13 +64548,42 @@ def resolve_life_total_change(player, opponents, card, effect_data, turn, rng):
     return changed
 
 
-def _draw_discard_spell_selected_discards(player, discard_count, *, random_discard=False, rng=None):
+def _discard_unless_candidate_matches(card, effect_data):
+    if not isinstance(card, dict):
+        return False
+    if effect_data.get("discard_unless_basic_land"):
+        return _is_basic_land_card(card)
+    card_types = [
+        str(value).lower()
+        for value in _as_list(effect_data.get("discard_unless_card_types"))
+        if value
+    ]
+    if card_types:
+        return _card_type_matches(card, card_types)
+    return False
+
+
+def _draw_discard_spell_selected_discards(player, discard_count, *, random_discard=False, rng=None, effect_data=None):
     discard_count = max(0, int(discard_count or 0))
     if discard_count <= 0:
         return []
     candidates = [card for card in getattr(player, "hand", []) or [] if isinstance(card, dict)]
     if not candidates:
         return []
+    effect_data = effect_data or {}
+    if effect_data.get("discard_unless_status") == "runtime_executor_v1":
+        filtered = [card for card in candidates if _discard_unless_candidate_matches(card, effect_data)]
+        if filtered:
+            filtered.sort(
+                key=lambda card: (
+                    int(card_mana_value(card) or 0),
+                    str(card.get("name") or ""),
+                )
+            )
+            selected = [filtered[0]]
+            if selected[0] in player.hand:
+                player.hand.remove(selected[0])
+            return selected
     if random_discard:
         chooser = rng or random
         selected = list(chooser.sample(candidates, min(discard_count, len(candidates))))
@@ -64571,6 +64600,17 @@ def _draw_discard_spell_selected_discards(player, discard_count, *, random_disca
         if discard_card in player.hand:
             player.hand.remove(discard_card)
     return selected
+
+
+def _draw_discard_spell_requested_discard_count(discarded_cards, discard_count, effect_data):
+    if effect_data.get("discard_unless_status") != "runtime_executor_v1":
+        return discard_count
+    paid_count = max(0, int(effect_data.get("discard_unless_count") or 1))
+    if paid_count <= 0 or len(discarded_cards) != paid_count:
+        return discard_count
+    if all(_discard_unless_candidate_matches(card, effect_data) for card in discarded_cards):
+        return paid_count
+    return discard_count
 
 
 def resolve_draw_discard_spell(
@@ -64620,6 +64660,7 @@ def resolve_draw_discard_spell(
             discard_count,
             random_discard=random_discard,
             rng=rng,
+            effect_data=effect_data,
         )
         if discarded_cards:
             discard_resolution = resolve_effect_discard_cards(
@@ -64639,6 +64680,11 @@ def resolve_draw_discard_spell(
         draw_step()
         discard_step()
 
+    requested_discard_count = _draw_discard_spell_requested_discard_count(
+        discarded_cards,
+        discard_count,
+        effect_data,
+    )
     emit_replay_event(
         "draw_discard_spell_resolved",
         player=player.name,
@@ -64647,7 +64693,7 @@ def resolve_draw_discard_spell(
         cards_drawn=len(drawn_cards),
         requested_draw_count=draw_count,
         cards_discarded=len(discarded_cards),
-        requested_discard_count=discard_count,
+        requested_discard_count=requested_discard_count,
         discard_random=random_discard,
         discarded_to_graveyard=[
             entry.get("name", "?")

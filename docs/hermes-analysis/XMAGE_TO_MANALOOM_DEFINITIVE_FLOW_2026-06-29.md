@@ -20226,6 +20226,68 @@ Evidence:
 - `docs/hermes-analysis/master_optimizer_reports/operational_surface_alignment_audit_20260709_post_pg694_shuffle_self_auxiliary_new_server_final.md`
 - `docs/hermes-analysis/master_optimizer_reports/legacy_contamination_audit_20260709_post_pg694_shuffle_self_auxiliary_new_server_final.md`
 
+## PG739 Draw Discard Unless Checkpoint - 2026-07-11
+
+PG739 extended the existing fixed draw/discard spell runtime scope for the
+XMage `DoIfCostPaid(... DiscardControllerEffect(2), DiscardCardCost(filter))`
+subpattern. The runtime now supports drawing three cards and discarding one
+matching card instead of two when the Oracle/XMage "unless you discard a
+<type> card" condition is satisfied.
+
+Promoted cards:
+
+- `Mystic Meditation`
+- `Thirst for Discovery`
+- `Thirst for Identity`
+- `Thirst for Knowledge`
+- `Thirst for Meaning`
+
+Validation evidence:
+
+- split report selected `5` exact-scope proposals and no broad review scope;
+- precheck found `5` Oracle-hash-matched targets;
+- apply deprecated `2` stale `Thirst for Knowledge` shadow rows and upserted
+  `5` verified executable rows;
+- postcheck confirmed `5/5` promoted verified/auto rows with matching
+  `oracle_hash`;
+- package E2E passed PostgreSQL, SQLite/Hermes, canonical snapshot,
+  `runtime_get_card_effect`, and `5` battle-execution scenarios;
+- battle evidence confirmed each promoted card drew `3` and discarded `1`
+  matching card through the discard-unless path.
+
+Final post-PG739 state:
+
+- global readiness:
+  `battle_and_oracle_ready=6388`, `battle_family_mapper_required=27488`,
+  `snapshot_has_verified_rule=6413`, `snapshot_has_any_rule=7584`;
+- authoritative queue:
+  `target_identity_count=24565`,
+  `xmage_authoritative_source_count=24252`,
+  `xmage_missing_source_exception_count=313`,
+  `xmage_authoritative_parser_gap_count=0`,
+  `xmage_authoritative_adapter_required_count=24252`,
+  `adapter_work_unit_count=11295`;
+- validation gates:
+  `server-target` quality gate passed, `xmage_strategy_consistency_audit`
+  passed `26/26`, `pg_hermes_sqlite_contract_audit` passed `51/51`,
+  `operational_surface_alignment_audit` passed, and
+  `legacy_contamination_audit` passed.
+
+Evidence:
+
+- `docs/hermes-analysis/PG739_DRAW_DISCARD_UNLESS_EVIDENCE_2026-07-11.md`
+- `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_exact_scope_split_20260711_pg739_draw_discard_unless_new_server_candidate.md`
+- `docs/hermes-analysis/master_optimizer_reports/pg739_draw_discard_unless_new_server_package_manifest.json`
+- `docs/hermes-analysis/master_optimizer_reports/pg739_draw_discard_unless_new_server_metadata_sync.json`
+- `docs/hermes-analysis/master_optimizer_reports/pg739_draw_discard_unless_new_server_battle_rule_sync_report.json`
+- `docs/hermes-analysis/master_optimizer_reports/pg739_draw_discard_unless_new_server_e2e.md`
+- `docs/hermes-analysis/master_optimizer_reports/global_card_oracle_battle_readiness_20260711_post_pg739_draw_discard_unless_new_server.md`
+- `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260711_post_pg739_draw_discard_unless_new_server_commander_legal.md`
+- `docs/hermes-analysis/master_optimizer_reports/xmage_strategy_consistency_audit_20260711_post_pg739_draw_discard_unless_new_server.md`
+- `docs/hermes-analysis/master_optimizer_reports/pg_hermes_sqlite_contract_audit_20260711_post_pg739_draw_discard_unless_new_server.md`
+- `docs/hermes-analysis/master_optimizer_reports/operational_surface_alignment_audit_20260711_post_pg739_draw_discard_unless_new_server.md`
+- `docs/hermes-analysis/master_optimizer_reports/legacy_contamination_audit_20260711_post_pg739_draw_discard_unless_new_server.md`
+
 ## Required Artifacts Per Cycle
 
 Every cycle must produce or refresh:

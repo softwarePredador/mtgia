@@ -2054,6 +2054,59 @@ def test_fixed_draw_discard_spell_runner_executes_random_discard() -> None:
     assert result["order"] == "draw_then_discard"
 
 
+def test_fixed_draw_discard_spell_runner_executes_discard_unless() -> None:
+    battle = validator.load_battle(validator.DEFAULT_BATTLE)
+    events = []
+    previous_handler = battle.REPLAY_EVENT_HANDLER
+    previous_get_card_effect = battle.get_card_effect
+    battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+    battle.get_card_effect = lambda card: {
+        "effect": "draw_cards",
+        "battle_model_scope": "xmage_fixed_draw_discard_spell_v1",
+        "count": 3,
+        "draw_count": 3,
+        "discard_count": 2,
+        "discard_random": False,
+        "discard_unless_status": "runtime_executor_v1",
+        "discard_unless_filter": "artifact_card",
+        "discard_unless_count": 1,
+        "discard_unless_card_types": ["artifact"],
+        "draw_discard_order": "draw_then_discard",
+        "draw_discard_spell": True,
+    }
+    try:
+        result = validator.run_fixed_draw_discard_spell(
+            battle,
+            {
+                "name": "Thirst for Knowledge draws then discards",
+                "type": "fixed_draw_discard_spell",
+                "card": {"name": "Thirst for Knowledge", "type_line": "Instant"},
+                "controller_library": [
+                    {"name": f"E2E Draw Discard Library Card {index + 1}", "type_line": "Sorcery", "effect": "draw_cards"}
+                    for index in range(3)
+                ],
+                "controller_hand": [
+                    {"name": "E2E Draw Discard Artifact Card", "type_line": "Artifact", "effect": "mana_rock"},
+                    {"name": "E2E Draw Discard Spare Card", "type_line": "Instant", "effect": "draw_cards"},
+                ],
+                "expected_draw_count": 3,
+                "expected_discard_count": 1,
+                "expected_discard_random": False,
+                "expected_draw_discard_order": "draw_then_discard",
+            },
+            events,
+        )
+    finally:
+        battle.REPLAY_EVENT_HANDLER = previous_handler
+        battle.get_card_effect = previous_get_card_effect
+
+    assert result["card_name"] == "Thirst for Knowledge"
+    assert result["cards_drawn"] == 3
+    assert result["cards_discarded"] == 1
+    assert result["discard_random"] is False
+    assert result["order"] == "draw_then_discard"
+
+
 def test_single_target_removal_runner_validates_controller_life_gain() -> None:
     battle = validator.load_battle(validator.DEFAULT_BATTLE)
     events = []

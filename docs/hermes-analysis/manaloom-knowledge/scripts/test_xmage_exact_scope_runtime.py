@@ -4421,6 +4421,121 @@ class XMageExactScopeRuntimeTest(unittest.TestCase):
             )
         )
 
+    def test_draw_discard_spell_uses_discard_unless_matching_card(self) -> None:
+        active = self.battle.Player(
+            "Active",
+            None,
+            [
+                {"name": "Fresh Card A", "type_line": "Sorcery", "cmc": 2},
+                {"name": "Fresh Card B", "type_line": "Instant", "cmc": 3},
+                {"name": "Fresh Card C", "type_line": "Creature", "cmc": 4},
+            ],
+        )
+        opponent = self.battle.Player("Opponent", None, [])
+        active.hand = [
+            {"name": "Spare Artifact", "type_line": "Artifact", "cmc": 1},
+            {"name": "Keep Spell", "type_line": "Sorcery", "cmc": 5},
+        ]
+        spell = {"name": "Fixture Thirst", "type_line": "Instant", "cmc": 3}
+        effect_data = {
+            "effect": "draw_cards",
+            "battle_model_scope": "xmage_fixed_draw_discard_spell_v1",
+            "draw_discard_spell": True,
+            "count": 3,
+            "draw_count": 3,
+            "discard_count": 2,
+            "draw_discard_order": "draw_then_discard",
+            "discard_unless_status": "runtime_executor_v1",
+            "discard_unless_filter": "artifact_card",
+            "discard_unless_count": 1,
+            "discard_unless_card_types": ["artifact"],
+        }
+
+        self.battle.apply_effect_immediate(
+            active,
+            [opponent],
+            spell,
+            turn=4,
+            rng=random.Random(4),
+            effect_data_override=effect_data,
+            phase="resolution",
+        )
+
+        self.assertEqual(len(active.hand), 4)
+        self.assertEqual(len(active.library), 0)
+        self.assertTrue(any(card.get("name") == "Spare Artifact" for card in active.graveyard))
+        self.assertFalse(any(card.get("name") == "Spare Artifact" for card in active.hand))
+        self.assertTrue(
+            any(
+                event == "draw_discard_spell_resolved"
+                and data.get("card") == "Fixture Thirst"
+                and data.get("cards_drawn") == 3
+                and data.get("cards_discarded") == 1
+                and data.get("requested_discard_count") == 1
+                for event, data in self.events
+            )
+        )
+
+    def test_draw_discard_spell_discard_unless_falls_back_to_default_count(self) -> None:
+        active = self.battle.Player(
+            "Active",
+            None,
+            [
+                {"name": "Fresh Card A", "type_line": "Sorcery", "cmc": 2},
+                {"name": "Fresh Card B", "type_line": "Instant", "cmc": 3},
+                {"name": "Fresh Card C", "type_line": "Creature", "cmc": 4},
+            ],
+        )
+        opponent = self.battle.Player("Opponent", None, [])
+        active.hand = [
+            {"name": "Low Value Spell", "type_line": "Sorcery", "cmc": 1},
+            {"name": "Medium Spell", "type_line": "Instant", "cmc": 2},
+        ]
+        spell = {"name": "Fixture Thirst Fallback", "type_line": "Instant", "cmc": 3}
+        effect_data = {
+            "effect": "draw_cards",
+            "battle_model_scope": "xmage_fixed_draw_discard_spell_v1",
+            "draw_discard_spell": True,
+            "count": 3,
+            "draw_count": 3,
+            "discard_count": 2,
+            "draw_discard_order": "draw_then_discard",
+            "discard_unless_status": "runtime_executor_v1",
+            "discard_unless_filter": "artifact_card",
+            "discard_unless_count": 1,
+            "discard_unless_card_types": ["artifact"],
+        }
+
+        self.battle.apply_effect_immediate(
+            active,
+            [opponent],
+            spell,
+            turn=4,
+            rng=random.Random(4),
+            effect_data_override=effect_data,
+            phase="resolution",
+        )
+
+        self.assertEqual(len(active.hand), 3)
+        self.assertEqual(len(active.library), 0)
+        discarded_names = {
+            card.get("name")
+            for card in active.graveyard
+            if card.get("name") != "Fixture Thirst Fallback"
+        }
+        self.assertEqual(len(discarded_names), 2)
+        self.assertTrue(any(name in discarded_names for name in ("Low Value Spell", "Medium Spell", "Fresh Card A")))
+        self.assertTrue(
+            any(
+                event == "draw_discard_spell_resolved"
+                and data.get("card") == "Fixture Thirst Fallback"
+                and data.get("cards_drawn") == 3
+                and data.get("cards_discarded") == 2
+                and data.get("requested_discard_count") == 2
+                for event, data in self.events
+            )
+        )
+
     def test_draw_discard_spell_discards_then_draws(self) -> None:
         active = self.battle.Player(
             "Active",

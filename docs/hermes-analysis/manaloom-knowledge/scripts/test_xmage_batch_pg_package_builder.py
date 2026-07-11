@@ -982,6 +982,40 @@ def test_manifest_builds_fixed_draw_discard_random_scenario() -> None:
     assert len(scenario["controller_hand"]) == 3
 
 
+def test_manifest_builds_fixed_draw_discard_unless_scenario() -> None:
+    rule = {
+        "normalized_name": "thirst for knowledge",
+        "card_name": "Thirst for Knowledge",
+        "oracle_hash": "hash-thirst-for-knowledge",
+        "logical_rule_key": "battle_rule_v1:hash-thirst-for-knowledge",
+        "required_effect_fields": {
+            "effect": "draw_cards",
+            "battle_model_scope": "xmage_fixed_draw_discard_spell_v1",
+            "count": 3,
+            "draw_count": 3,
+            "discard_count": 2,
+            "discard_random": False,
+            "discard_unless_status": "runtime_executor_v1",
+            "discard_unless_filter": "artifact_card",
+            "discard_unless_count": 1,
+            "discard_unless_card_types": ["artifact"],
+            "draw_discard_order": "draw_then_discard",
+            "instant": True,
+        },
+    }
+
+    scenario = builder.execution_scenario_from_expected_rule(rule)
+
+    assert scenario is not None
+    assert scenario["type"] == "fixed_draw_discard_spell"
+    assert scenario["expected_draw_count"] == 3
+    assert scenario["expected_discard_count"] == 1
+    assert scenario["expected_discard_random"] is False
+    assert scenario["expected_draw_discard_order"] == "draw_then_discard"
+    assert scenario["controller_hand"][0]["name"] == "E2E Draw Discard Artifact Card"
+    assert scenario["controller_hand"][0]["type_line"] == "Artifact"
+
+
 def test_manifest_expected_rule_preserves_damage_prevention_fields() -> None:
     proposal = {
         "normalized_name": "vine snare",

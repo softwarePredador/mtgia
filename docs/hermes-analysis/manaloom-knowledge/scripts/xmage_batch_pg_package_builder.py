@@ -131,6 +131,11 @@ E2E_REQUIRED_EFFECT_FIELDS = (
     "proliferate_count",
     "discard_count",
     "discard_random",
+    "discard_unless_status",
+    "discard_unless_filter",
+    "discard_unless_count",
+    "discard_unless_basic_land",
+    "discard_unless_card_types",
     "draw_discard_order",
     "put_land_from_hand",
     "put_land_tapped",
@@ -3642,6 +3647,31 @@ def fixed_draw_discard_spell_execution_scenario_from_expected_rule(
     expected_discard_count = int(required.get("discard_count") or 0)
     if expected_draw_count <= 0 or expected_discard_count <= 0:
         return None
+    controller_hand = [
+        {
+            "name": f"E2E Draw Discard Spare Card {index + 1}",
+            "type_line": "Instant" if index % 2 == 0 else "Sorcery",
+            "effect": "draw_cards",
+            "cmc": index + 1,
+        }
+        for index in range(expected_discard_count)
+    ]
+    if required.get("discard_unless_status") == "runtime_executor_v1":
+        expected_discard_count = int(required.get("discard_unless_count") or 1)
+        if required.get("discard_unless_basic_land"):
+            matching_card = {
+                "name": "E2E Draw Discard Basic Land",
+                "type_line": "Basic Land - Island",
+                "cmc": 0,
+            }
+        else:
+            card_type = str((required.get("discard_unless_card_types") or ["artifact"])[0])
+            matching_card = {
+                "name": f"E2E Draw Discard {card_type.title()} Card",
+                "type_line": card_type.title(),
+                "cmc": 1,
+            }
+        controller_hand = [matching_card] + controller_hand
     return {
         "name": f"{rule['card_name']} draws then discards",
         "type": "fixed_draw_discard_spell",
@@ -3658,15 +3688,7 @@ def fixed_draw_discard_spell_execution_scenario_from_expected_rule(
             }
             for index in range(expected_draw_count)
         ],
-        "controller_hand": [
-            {
-                "name": f"E2E Draw Discard Spare Card {index + 1}",
-                "type_line": "Instant" if index % 2 == 0 else "Sorcery",
-                "effect": "draw_cards",
-                "cmc": index + 1,
-            }
-            for index in range(expected_discard_count)
-        ],
+        "controller_hand": controller_hand,
         "expected_draw_count": expected_draw_count,
         "expected_discard_count": expected_discard_count,
         "expected_discard_random": bool(required.get("discard_random")),

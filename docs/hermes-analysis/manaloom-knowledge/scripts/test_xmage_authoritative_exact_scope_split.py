@@ -6253,6 +6253,72 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertEqual(effect["draw_discard_order"], "draw_then_discard")
         self.assertFalse(effect["discard_random"])
 
+    def test_fixed_draw_discard_spell_maps_discard_unless_type_cost(self) -> None:
+        fixtures = [
+            (
+                "Mystic Meditation",
+                "Draw three cards. Then discard two cards unless you discard a creature card.",
+                "StaticFilters.FILTER_CARD_CREATURE_A",
+                "creature_card",
+                ["creature"],
+                False,
+            ),
+            (
+                "Thirst for Discovery",
+                "Draw three cards. Then discard two cards unless you discard a basic land card.",
+                "StaticFilters.FILTER_CARD_BASIC_LAND_A",
+                "basic_land_card",
+                ["land"],
+                True,
+            ),
+            (
+                "Thirst for Knowledge",
+                "Draw three cards. Then discard two cards unless you discard an artifact card.",
+                "new FilterArtifactCard()",
+                "artifact_card",
+                ["artifact"],
+                False,
+            ),
+            (
+                "Thirst for Meaning",
+                "Draw three cards. Then discard two cards unless you discard an enchantment card.",
+                "new FilterEnchantmentCard()",
+                "enchantment_card",
+                ["enchantment"],
+                False,
+            ),
+        ]
+        for name, oracle, source_filter, expected_filter, expected_types, is_basic_land in fixtures:
+            with self.subTest(name=name):
+                row = queue_row(
+                    split.DRAW_UNIT,
+                    effect_classes=["DrawCardSourceControllerEffect", "DiscardControllerEffect"],
+                )
+                proposal, reason = split.split_row(
+                    row,
+                    metadata(name=name, oracle_text=oracle),
+                    source_text=(
+                        "this.getSpellAbility().addEffect(new DrawCardSourceControllerEffect(3));"
+                        "this.getSpellAbility().addEffect(new DoIfCostPaid("
+                        "null, new DiscardControllerEffect(2), "
+                        f"new DiscardCardCost({source_filter})));"
+                    ),
+                )
+
+                self.assertEqual(reason, "selected_exact_scope")
+                effect = proposal["effect_json"]
+                self.assertEqual(effect["battle_model_scope"], split.DRAW_DISCARD_SPELL_SCOPE)
+                self.assertTrue(effect["draw_discard_spell"])
+                self.assertEqual(effect["draw_count"], 3)
+                self.assertEqual(effect["discard_count"], 2)
+                self.assertEqual(effect["draw_discard_order"], "draw_then_discard")
+                self.assertFalse(effect["discard_random"])
+                self.assertEqual(effect["discard_unless_status"], "runtime_executor_v1")
+                self.assertEqual(effect["discard_unless_count"], 1)
+                self.assertEqual(effect["discard_unless_filter"], expected_filter)
+                self.assertEqual(effect["discard_unless_card_types"], expected_types)
+                self.assertEqual(bool(effect.get("discard_unless_basic_land")), is_basic_land)
+
     def test_fixed_controller_draw_lose_life_spell_maps(self) -> None:
         row = queue_row(
             split.DRAW_UNIT,

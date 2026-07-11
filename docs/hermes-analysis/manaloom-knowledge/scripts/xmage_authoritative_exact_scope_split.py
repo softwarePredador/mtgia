@@ -15218,11 +15218,67 @@ def activated_draw_discard_from_oracle(metadata: dict[str, Any]) -> dict[str, An
     return activation
 
 
+def draw_discard_unless_filter_fields(filter_text: str) -> dict[str, Any] | None:
+    normalized = str(filter_text or "").strip().lower().replace("-", " ")
+    if normalized == "basic land":
+        return {
+            "discard_unless_filter": "basic_land_card",
+            "discard_unless_basic_land": True,
+            "discard_unless_card_types": ["land"],
+        }
+    if normalized in {"artifact", "creature", "enchantment"}:
+        return {
+            "discard_unless_filter": f"{normalized}_card",
+            "discard_unless_card_types": [normalized],
+        }
+    return None
+
+
+def draw_discard_unless_filter_from_source(source: str) -> dict[str, Any] | str | None:
+    text = source or ""
+    if "DoIfCostPaid" not in text or "DiscardCardCost" not in text:
+        return None
+    matches: list[tuple[str, dict[str, Any]]] = []
+    marker_map = [
+        ("basic_land", ("FILTER_CARD_BASIC_LAND",), "basic land"),
+        ("artifact", ("FilterArtifactCard", "FILTER_CARD_ARTIFACT"), "artifact"),
+        ("creature", ("FILTER_CARD_CREATURE", "FilterCreatureCard"), "creature"),
+        ("enchantment", ("FilterEnchantmentCard", "FILTER_CARD_ENCHANTMENT"), "enchantment"),
+    ]
+    for key, markers, filter_text in marker_map:
+        if any(marker in text for marker in markers):
+            fields = draw_discard_unless_filter_fields(filter_text)
+            if fields:
+                matches.append((key, fields))
+    if len(matches) != 1:
+        return "draw_discard_spell_source_unless_filter_not_supported"
+    return matches[0][1]
+
+
 def fixed_draw_discard_spell_from_oracle(metadata: dict[str, Any]) -> dict[str, Any] | str:
     text = re.sub(r"\s+", " ", oracle_text(metadata)).strip().lower()
+    number_pattern = r"(?:a|one|two|three|four|five|\d+)"
+    draw_then_discard_unless = re.fullmatch(
+        rf"draw (?P<draw>{number_pattern}) cards?\. then discard (?P<discard>{number_pattern}) cards? unless you discard (?:a|an) (?P<filter>basic land|artifact|creature|enchantment) card\.?",
+        text,
+    )
+    if draw_then_discard_unless:
+        draw_count = number_word_to_int(draw_then_discard_unless.group("draw"))
+        discard_count = number_word_to_int(draw_then_discard_unless.group("discard"))
+        filter_fields = draw_discard_unless_filter_fields(draw_then_discard_unless.group("filter"))
+        if draw_count <= 0 or discard_count <= 0 or filter_fields is None:
+            return "draw_discard_spell_oracle_count_not_fixed"
+        return {
+            "draw_count": draw_count,
+            "discard_count": discard_count,
+            "draw_discard_order": "draw_then_discard",
+            "discard_random": False,
+            "discard_unless_status": "runtime_executor_v1",
+            "discard_unless_count": 1,
+            **filter_fields,
+        }
     if has_oracle_complexity(metadata):
         return "draw_discard_spell_oracle_not_simple"
-    number_pattern = r"(?:a|one|two|three|four|five|\d+)"
     draw_then_discard = re.fullmatch(
         rf"draw (?P<draw>{number_pattern}) cards?, then discard (?P<discard>{number_pattern}) cards?(?P<random> at random)?\.?",
         text,
@@ -19614,6 +19670,39 @@ def fixed_draw_discard_spell_from_source(source: str, classes: set[str]) -> dict
     text = source or ""
     if has_additional_cost(text):
         return "draw_discard_spell_source_additional_cost_not_supported"
+    if classes == {"DrawCardSourceControllerEffect", "DiscardControllerEffect"} and "DoIfCostPaid" in text:
+        filter_fields = draw_discard_unless_filter_from_source(text)
+        if isinstance(filter_fields, str):
+            return filter_fields
+        if filter_fields is None:
+            return "draw_discard_spell_source_unless_filter_not_supported"
+        draw_count = java_constructor_int_or_noarg_default(
+            text,
+            "DrawCardSourceControllerEffect",
+            noarg_default=1,
+        )
+        if draw_count is None or draw_count <= 0:
+            return "draw_discard_spell_source_count_not_fixed"
+        discard_detail = discard_controller_spell_count_from_source(text)
+        if isinstance(discard_detail, str):
+            return discard_detail
+        discard_count, random_discard = discard_detail
+        if random_discard:
+            return "draw_discard_spell_source_random_unless_not_supported"
+        draw_match = re.search(r"DrawCardSourceControllerEffect\s*\(", text)
+        discard_match = re.search(r"DiscardControllerEffect\s*\(", text)
+        if not draw_match or not discard_match or draw_match.start() > discard_match.start():
+            return "draw_discard_spell_source_not_simple"
+        return {
+            "draw_count": draw_count,
+            "discard_count": discard_count,
+            "draw_discard_order": "draw_then_discard",
+            "discard_random": False,
+            "discard_unless_status": "runtime_executor_v1",
+            "discard_unless_count": 1,
+            "xmage_effect_classes": ["DrawCardSourceControllerEffect", "DiscardControllerEffect"],
+            **filter_fields,
+        }
     unsupported_markers = {
         "ConditionalOneShotEffect",
         "DoIfCostPaid",
@@ -34581,6 +34670,11 @@ def split_row(
                 "discard_count",
                 "draw_discard_order",
                 "discard_random",
+                "discard_unless_status",
+                "discard_unless_filter",
+                "discard_unless_count",
+                "discard_unless_basic_land",
+                "discard_unless_card_types",
             )
             if any(
                 oracle_draw_discard.get(key) != source_draw_discard.get(key)
@@ -34599,6 +34693,15 @@ def split_row(
                 "xmage_effect_classes": list(source_draw_discard["xmage_effect_classes"]),
                 **flags,
             }
+            for optional_key in (
+                "discard_unless_status",
+                "discard_unless_filter",
+                "discard_unless_count",
+                "discard_unless_basic_land",
+                "discard_unless_card_types",
+            ):
+                if oracle_draw_discard.get(optional_key) not in (None, "", [], {}):
+                    effect_json[optional_key] = oracle_draw_discard[optional_key]
             return build_proposal(
                 row,
                 metadata,
