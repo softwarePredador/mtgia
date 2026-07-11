@@ -1384,6 +1384,19 @@ def run_damage_gain_life_spell(
         fail("battle_events", f"missing {card['name']} damage_resolved event")
     if int(damage_event.get("amount") or 0) != expected_damage:
         fail("battle_events", f"{card['name']} damage amount={damage_event.get('amount')}, expected {expected_damage}")
+    if "expected_dynamic_count" in scenario:
+        expected_dynamic_count = int(scenario.get("expected_dynamic_count") or 0)
+        actual_dynamic_count = int(
+            damage_event.get("battlefield_damage_count")
+            or damage_event.get("graveyard_damage_count")
+            or damage_event.get("hand_damage_count")
+            or 0
+        )
+        if actual_dynamic_count != expected_dynamic_count:
+            fail(
+                "battle_events",
+                f"{card['name']} dynamic count={actual_dynamic_count}, expected {expected_dynamic_count}",
+            )
     expected_condition = str(scenario.get("expected_conditional_damage_condition") or "").strip()
     if expected_condition:
         if damage_event.get("conditional_damage_condition") != expected_condition:

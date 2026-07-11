@@ -388,6 +388,73 @@ def test_fixed_damage_target_spell_runner_executes_damage_and_cant_be_countered(
     assert result["cant_be_countered"] is True
 
 
+def test_dynamic_composite_damage_target_spell_runner_counts_union_components() -> None:
+    battle = validator.load_battle(validator.DEFAULT_BATTLE)
+    events = []
+    previous_handler = battle.REPLAY_EVENT_HANDLER
+    previous_get_card_effect = battle.get_card_effect
+    battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+    battle.get_card_effect = lambda card: {
+        "effect": "direct_damage",
+        "battle_model_scope": "xmage_dynamic_count_damage_spell_v1",
+        "amount": 0,
+        "damage": 0,
+        "damage_amount_source": "composite_battlefield_permanent_count",
+        "damage_base_amount": 2,
+        "damage_per_count": 1,
+        "battlefield_count_composite_mode": "union",
+        "battlefield_count_components": [
+            {
+                "battlefield_count_scope": "controller_battlefield",
+                "battlefield_count_subtypes": ["mount"],
+            },
+            {
+                "battlefield_count_scope": "controller_battlefield",
+                "battlefield_count_subtypes": ["vehicle"],
+            },
+        ],
+        "target": "creature_or_planeswalker",
+        "target_constraints": {"card_types": ["creature", "planeswalker"]},
+    }
+    try:
+        result = validator.run_fixed_damage_target_spell(
+            battle,
+            {
+                "name": "Road Rage deals dynamic target damage",
+                "type": "fixed_damage_target_spell",
+                "card": {"name": "Road Rage", "type_line": "Instant"},
+                "controller_battlefield": [
+                    {"name": "E2E Mount", "type_line": "Creature - Mount", "subtypes": ["mount"]},
+                    {"name": "E2E Vehicle", "type_line": "Artifact - Vehicle", "subtypes": ["vehicle"]},
+                ],
+                "target": {
+                    "name": "E2E Dynamic Damage Legal Target",
+                    "type_line": "Creature",
+                    "effect": "creature",
+                    "power": 2,
+                    "toughness": 4,
+                },
+                "expected_damage": 4,
+                "expected_life_gain": 0,
+                "expected_dynamic_count": 2,
+                "expected_target_constraints": {"card_types": ["creature", "planeswalker"]},
+            },
+            events,
+        )
+    finally:
+        battle.REPLAY_EVENT_HANDLER = previous_handler
+        battle.get_card_effect = previous_get_card_effect
+
+    assert result["damage"] == 4
+    assert result["target"] == "E2E Dynamic Damage Legal Target"
+    assert any(
+        event == "damage_resolved"
+        and data.get("battlefield_count_composite_mode") == "union"
+        and data.get("battlefield_damage_count") == 2
+        for event, data in events
+    )
+
+
 def test_conditional_fixed_damage_target_spell_runner_executes_condition_met() -> None:
     battle = validator.load_battle(validator.DEFAULT_BATTLE)
     events = []

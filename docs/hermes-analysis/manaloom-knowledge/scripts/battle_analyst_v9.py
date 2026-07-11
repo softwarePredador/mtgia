@@ -57821,19 +57821,27 @@ def _battlefield_count_card_matches(card, effect_data):
     )
 
 
+def _battlefield_players_for_count_scope(player, opponents, scope):
+    normalized_scope = str(scope or "controller_battlefield").lower()
+    if normalized_scope == "controller_battlefield":
+        return [player], None
+    if normalized_scope == "all_battlefields":
+        return [player] + list(opponents or []), None
+    if normalized_scope == "opponents_battlefield":
+        return list(opponents or []), None
+    return [], {
+        "battlefield_count_scope": normalized_scope,
+        "battlefield_count_status": "unsupported_scope",
+    }
+
+
 def _battlefield_count_for_stat_modifier(player, opponents, effect_data):
     scope = str(effect_data.get("battlefield_count_scope") or "controller_battlefield").lower()
-    if scope == "controller_battlefield":
-        battlefield_players = [player]
-    elif scope == "all_battlefields":
-        battlefield_players = [player] + list(opponents or [])
-    elif scope == "opponents_battlefield":
-        battlefield_players = list(opponents or [])
-    else:
+    battlefield_players, scope_error = _battlefield_players_for_count_scope(player, opponents, scope)
+    if scope_error is not None:
         return None, {
             "stat_modifier_amount_source": "battlefield_permanent_count",
-            "battlefield_count_scope": scope,
-            "battlefield_count_status": "unsupported_scope",
+            **scope_error,
         }
     count = 0
     for participant in battlefield_players:
@@ -58054,6 +58062,65 @@ def _dynamic_damage_count_from_source(player, opponents, effect_data):
             "sacrificed_creature_power": count,
             "sacrificed_creature": effect_data.get("_last_sacrificed_name"),
         }
+    if amount_source == "composite_battlefield_permanent_count":
+        components = [
+            dict(component)
+            for component in _as_list(effect_data.get("battlefield_count_components"))
+            if isinstance(component, dict)
+        ]
+        if not components:
+            return None, {
+                "damage_amount_source": amount_source,
+                "battlefield_count_status": "missing_components",
+            }
+        mode = str(effect_data.get("battlefield_count_composite_mode") or "sum").strip().lower()
+        component_counts = []
+        if mode == "sum":
+            total = 0
+            for component in components:
+                scope = str(component.get("battlefield_count_scope") or "controller_battlefield").lower()
+                battlefield_players, scope_error = _battlefield_players_for_count_scope(player, opponents, scope)
+                if scope_error is not None:
+                    return None, {"damage_amount_source": amount_source, **scope_error}
+                component_count = 0
+                for participant in battlefield_players:
+                    for permanent in getattr(participant, "battlefield", []) or []:
+                        if _battlefield_count_card_matches(permanent, component):
+                            component_count += 1
+                component_counts.append(component_count)
+                total += component_count
+            return total, {
+                "damage_amount_source": amount_source,
+                "battlefield_count_composite_mode": mode,
+                "battlefield_damage_count": total,
+                "battlefield_count_component_counts": component_counts,
+            }
+        if mode == "union":
+            matched_ids = set()
+            for component in components:
+                scope = str(component.get("battlefield_count_scope") or "controller_battlefield").lower()
+                battlefield_players, scope_error = _battlefield_players_for_count_scope(player, opponents, scope)
+                if scope_error is not None:
+                    return None, {"damage_amount_source": amount_source, **scope_error}
+                component_count = 0
+                for participant in battlefield_players:
+                    for permanent in getattr(participant, "battlefield", []) or []:
+                        if _battlefield_count_card_matches(permanent, component):
+                            component_count += 1
+                            matched_ids.add(id(permanent))
+                component_counts.append(component_count)
+            total = len(matched_ids)
+            return total, {
+                "damage_amount_source": amount_source,
+                "battlefield_count_composite_mode": mode,
+                "battlefield_damage_count": total,
+                "battlefield_count_component_counts": component_counts,
+            }
+        return None, {
+            "damage_amount_source": amount_source,
+            "battlefield_count_composite_mode": mode,
+            "battlefield_count_status": "unsupported_composite_mode",
+        }
     if amount_source == "graveyard_card_count":
         scope = str(effect_data.get("graveyard_count_scope") or "controller_graveyard").lower()
         if scope == "controller_graveyard":
@@ -58185,6 +58252,7 @@ def dynamic_damage_amount(player, opponents, effect_data):
         "greatest_shared_creature_type_count",
         "controlled_permanents_mana_symbol_count",
         "sacrificed_creature_power",
+        "composite_battlefield_permanent_count",
     }:
         return None, {}
     count, replay_fields = _dynamic_damage_count_from_source(player, opponents, effect_data)

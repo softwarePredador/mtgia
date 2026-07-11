@@ -2642,6 +2642,49 @@ def test_manifest_builds_fixed_damage_target_spell_execution_scenario() -> None:
     assert scenario["nonmatching_target"]["colors"] == ["B"]
 
 
+def test_manifest_builds_dynamic_composite_damage_target_spell_execution_scenario() -> None:
+    proposal = {
+        "normalized_name": "road_rage",
+        "card_name": "Road Rage",
+        "oracle_hash": "hash-road-rage",
+        "logical_rule_key": "battle_rule_v1:hash-road-rage",
+        "effect_json": {
+            "effect": "direct_damage",
+            "battle_model_scope": "xmage_dynamic_count_damage_spell_v1",
+            "amount": 0,
+            "damage": 0,
+            "damage_amount_source": "composite_battlefield_permanent_count",
+            "damage_base_amount": 2,
+            "damage_per_count": 1,
+            "battlefield_count_composite_mode": "union",
+            "battlefield_count_components": [
+                {
+                    "battlefield_count_scope": "controller_battlefield",
+                    "battlefield_count_subtypes": ["mount"],
+                },
+                {
+                    "battlefield_count_scope": "controller_battlefield",
+                    "battlefield_count_subtypes": ["vehicle"],
+                },
+            ],
+            "target": "creature_or_planeswalker",
+            "target_constraints": {"card_types": ["creature", "planeswalker"]},
+        },
+    }
+
+    rule = builder.expected_rule_from_proposal(proposal)
+    scenario = builder.execution_scenario_from_expected_rule(rule)
+
+    assert rule["required_effect_fields"]["battlefield_count_composite_mode"] == "union"
+    assert len(rule["required_effect_fields"]["battlefield_count_components"]) == 2
+    assert scenario is not None
+    assert scenario["type"] == "fixed_damage_target_spell"
+    assert scenario["expected_damage"] == 4
+    assert scenario["expected_dynamic_count"] == 2
+    assert len(scenario["controller_battlefield"]) == 2
+    assert scenario["expected_target_constraints"] == {"card_types": ["creature", "planeswalker"]}
+
+
 def test_manifest_builds_conditional_fixed_damage_target_spell_execution_scenario() -> None:
     proposal = {
         "normalized_name": "galvanic blast",

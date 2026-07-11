@@ -15059,10 +15059,115 @@ def _dynamic_damage_target_from_phrase(phrase: str) -> str | None:
     return None
 
 
+def _normalize_count_noun(token: str) -> str:
+    normalized = str(token or "").strip().lower().replace("\u2019", "'")
+    normalized = re.sub(r"^(?:the\s+)?number\s+of\s+", "", normalized)
+    normalized = re.sub(r"\s+you\s+control$", "", normalized).strip()
+    normalized = normalized.removeprefix("controlled ").strip()
+    irregular = {
+        "creatures": "creature",
+        "foods": "food",
+        "mounts": "mount",
+        "vehicles": "vehicle",
+        "spacecraft": "spacecraft",
+        "equipment": "equipment",
+    }
+    if normalized in irregular:
+        return irregular[normalized]
+    if normalized.endswith("ies"):
+        return normalized[:-3] + "y"
+    if normalized.endswith("s") and not normalized.endswith("ss"):
+        return normalized[:-1]
+    return normalized
+
+
+def _normalized_battlefield_count_component(component: dict[str, Any]) -> dict[str, Any]:
+    normalized: dict[str, Any] = {}
+    for key in ("battlefield_count_scope", "battlefield_count_combat_state", "battlefield_count_tapped_state"):
+        value = component.get(key)
+        if value not in (None, "", []):
+            normalized[key] = str(value).strip().lower()
+    for key in (
+        "battlefield_count_card_types",
+        "battlefield_count_subtypes",
+        "battlefield_count_required_colors",
+        "battlefield_count_keywords",
+    ):
+        values = [
+            str(value).strip().lower().replace(" ", "_")
+            for value in as_list(component.get(key))
+            if str(value).strip()
+        ]
+        if values:
+            normalized[key] = sorted(values)
+    normalized.setdefault("battlefield_count_scope", "controller_battlefield")
+    return normalized
+
+
+def _normalized_battlefield_count_components(components: Any) -> list[dict[str, Any]]:
+    normalized: list[dict[str, Any]] = []
+    for component in as_list(components):
+        if not isinstance(component, dict):
+            continue
+        normalized.append(_normalized_battlefield_count_component(component))
+    return normalized
+
+
+def _controlled_battlefield_count_component_from_phrase(phrase: str) -> dict[str, Any] | None:
+    noun = _normalize_count_noun(phrase)
+    if not noun:
+        return None
+    fields = _controlled_battlefield_count_fields(noun)
+    if fields is None:
+        return None
+    return _normalized_battlefield_count_component(fields)
+
+
+def _composite_battlefield_count_fields_from_filter(filter_text: str) -> dict[str, Any] | None:
+    token = re.sub(r"\s+", " ", str(filter_text or "").strip().lower())
+    if not token:
+        return None
+    plus_parts = re.split(r"\s+plus\s+(?:the number of\s+)?", token)
+    if len(plus_parts) > 1:
+        components = [
+            _controlled_battlefield_count_component_from_phrase(part)
+            for part in plus_parts
+        ]
+        if not components or any(component is None for component in components):
+            return None
+        return {
+            "damage_amount_source": "composite_battlefield_permanent_count",
+            "battlefield_count_composite_mode": "sum",
+            "battlefield_count_components": components,
+        }
+    for separator, mode in ((" and/or ", "union"), (" and ", "union")):
+        if separator not in token or " you control" not in token:
+            continue
+        controlled_token = re.sub(r"\s+you\s+control$", "", token).strip()
+        parts = [part.strip() for part in controlled_token.split(separator) if part.strip()]
+        if len(parts) <= 1:
+            continue
+        components = [
+            _controlled_battlefield_count_component_from_phrase(f"{part} you control")
+            for part in parts
+        ]
+        if not components or any(component is None for component in components):
+            return None
+        return {
+            "damage_amount_source": "composite_battlefield_permanent_count",
+            "battlefield_count_composite_mode": mode,
+            "battlefield_count_components": components,
+        }
+    return None
+
+
 def _dynamic_damage_count_fields_from_filter(filter_text: str) -> dict[str, Any] | str | None:
     token = re.sub(r"\s+", " ", str(filter_text or "").strip().lower())
     if token == "caves you control plus the number of cave cards in your graveyard":
         return {"damage_amount_source": "caves_controlled_plus_cave_cards_in_graveyard"}
+    composite_fields = _composite_battlefield_count_fields_from_filter(token)
+    if composite_fields is not None:
+        return composite_fields
     if " plus " in token or " and/or " in token:
         return "dynamic_count_damage_oracle_composite_count_not_supported"
     if token == "basic land types among lands you control":
@@ -15197,12 +15302,213 @@ def dynamic_count_damage_from_oracle(metadata: dict[str, Any]) -> dict[str, Any]
     return None
 
 
+def _static_int_from_dynamic_expr(expr: str) -> int | None:
+    token = re.sub(r"\s+", "", str(expr or ""))
+    if token.isdigit():
+        return int(token)
+    match = re.fullmatch(r"StaticValue\.get\((\d+)\)", token)
+    if match:
+        return int(match.group(1))
+    return None
+
+
+def _source_components_from_filter_expr(source: str, filter_expr: str) -> list[dict[str, Any]] | None:
+    text = source or ""
+    token = re.sub(r"\s+", " ", str(filter_expr or "")).strip()
+    compact = re.sub(r"\s+", "", token)
+    components: list[dict[str, Any]] = []
+    if (
+        "CreaturesYouControlCount" in token
+        or "FILTER_CONTROLLED_CREATURES" in token
+        or "FILTER_CONTROLLED_CREATURE" in token
+        or "CardType.CREATURE.getPredicate()" in token
+    ):
+        components.append(
+            _normalized_battlefield_count_component(
+                {
+                    "battlefield_count_scope": "controller_battlefield",
+                    "battlefield_count_card_types": ["creature"],
+                }
+            )
+        )
+    if "FilterControlledArtifactPermanent" in token:
+        components.append(
+            _normalized_battlefield_count_component(
+                {
+                    "battlefield_count_scope": "controller_battlefield",
+                    "battlefield_count_card_types": ["artifact"],
+                }
+            )
+        )
+    if "FILTER_CONTROLLED_PERMANENT_EQUIPMENT" in token or "SubType.EQUIPMENT" in token:
+        components.append(
+            _normalized_battlefield_count_component(
+                {
+                    "battlefield_count_scope": "controller_battlefield",
+                    "battlefield_count_card_types": ["artifact"],
+                    "battlefield_count_subtypes": ["equipment"],
+                }
+            )
+        )
+    for subtype_match in re.finditer(r"SubType\.([A-Z_]+)(?:\)|\.getPredicate\(\))", token):
+        subtype = subtype_match.group(1).lower()
+        if subtype == "equipment":
+            continue
+        components.append(
+            _normalized_battlefield_count_component(
+                {
+                    "battlefield_count_scope": "controller_battlefield",
+                    "battlefield_count_subtypes": [subtype],
+                }
+            )
+        )
+    if (
+        re.fullmatch(r"[A-Za-z_][A-Za-z0-9_]*", token)
+        and "Predicates.or" in text
+        and re.search(rf"\b{re.escape(token)}\.add\s*\(\s*Predicates\.or\s*\(", text)
+    ):
+        predicate_block = text
+        if "CardType.CREATURE.getPredicate()" in predicate_block:
+            components.append(
+                _normalized_battlefield_count_component(
+                    {
+                        "battlefield_count_scope": "controller_battlefield",
+                        "battlefield_count_card_types": ["creature"],
+                    }
+                )
+            )
+        for subtype_match in re.finditer(r"SubType\.([A-Z_]+)\.getPredicate\(\)", predicate_block):
+            components.append(
+                _normalized_battlefield_count_component(
+                    {
+                        "battlefield_count_scope": "controller_battlefield",
+                        "battlefield_count_subtypes": [subtype_match.group(1).lower()],
+                    }
+                )
+            )
+    deduped: list[dict[str, Any]] = []
+    seen: set[str] = set()
+    for component in components:
+        key = json.dumps(component, sort_keys=True)
+        if key in seen:
+            continue
+        seen.add(key)
+        deduped.append(component)
+    return deduped or None
+
+
+def _source_count_spec_from_permanents_on_battlefield(
+    source: str,
+    expr: str,
+) -> dict[str, Any] | str | None:
+    args = extract_constructor_args(expr, "PermanentsOnBattlefieldCount")
+    if args is None:
+        return None
+    parts = split_top_level_args(args)
+    if not parts:
+        return "dynamic_count_damage_source_filter_not_supported"
+    base = 0
+    if len(parts) > 1:
+        maybe_base = _static_int_from_dynamic_expr(parts[1])
+        if maybe_base is not None:
+            base = maybe_base
+    components = _source_components_from_filter_expr(source, parts[0])
+    if not components:
+        return None
+    if len(components) == 1 and "Predicates.or" not in (source or ""):
+        component = dict(components[0])
+        return {
+            "damage_amount_source": "battlefield_permanent_count",
+            "damage_base_amount": base,
+            **component,
+        }
+    return {
+        "damage_amount_source": "composite_battlefield_permanent_count",
+        "damage_base_amount": base,
+        "battlefield_count_composite_mode": "union",
+        "battlefield_count_components": components,
+    }
+
+
+def _source_composite_count_spec_from_expr(source: str, expr: str) -> dict[str, Any] | str | None:
+    text = source or ""
+    token = re.sub(r"\s+", " ", str(expr or "")).strip()
+    additive_args = extract_constructor_args(token, "AdditiveDynamicValue")
+    if additive_args is None and token == "xValue":
+        additive_args = extract_constructor_args(text, "AdditiveDynamicValue")
+    if additive_args is not None:
+        base = 0
+        components: list[dict[str, Any]] = []
+        mode = "sum"
+        for part in split_top_level_args(additive_args):
+            static_value = _static_int_from_dynamic_expr(part)
+            if static_value is not None:
+                base += static_value
+                continue
+            nested = _source_count_spec_from_permanents_on_battlefield(text, part)
+            if nested is None:
+                if "CreaturesYouControlCount" in part:
+                    components.append(
+                        _normalized_battlefield_count_component(
+                            {
+                                "battlefield_count_scope": "controller_battlefield",
+                                "battlefield_count_card_types": ["creature"],
+                            }
+                        )
+                    )
+                    continue
+                return "dynamic_count_damage_composite_count_not_supported"
+            if isinstance(nested, str):
+                return nested
+            nested_base = int(nested.get("damage_base_amount") or 0)
+            base += nested_base
+            if nested.get("damage_amount_source") == "composite_battlefield_permanent_count":
+                components.extend(_normalized_battlefield_count_components(nested.get("battlefield_count_components")))
+                mode = str(nested.get("battlefield_count_composite_mode") or mode)
+            elif nested.get("damage_amount_source") == "battlefield_permanent_count":
+                component = {
+                    key: value
+                    for key, value in nested.items()
+                    if key.startswith("battlefield_count_") and key != "battlefield_count_composite_mode"
+                }
+                components.append(_normalized_battlefield_count_component(component))
+            else:
+                return "dynamic_count_damage_composite_count_not_supported"
+        if not components:
+            return "dynamic_count_damage_composite_count_not_supported"
+        if len(components) == 1:
+            return {
+                "damage_amount_source": "battlefield_permanent_count",
+                "damage_base_amount": base,
+                **components[0],
+            }
+        return {
+            "damage_amount_source": "composite_battlefield_permanent_count",
+            "damage_base_amount": base,
+            "battlefield_count_composite_mode": mode,
+            "battlefield_count_components": components,
+        }
+    pob_expr = token
+    if token == "xValue":
+        args = extract_constructor_args(text, "PermanentsOnBattlefieldCount")
+        if args is None:
+            return None
+        pob_expr = f"new PermanentsOnBattlefieldCount({args})"
+    pob_spec = _source_count_spec_from_permanents_on_battlefield(text, pob_expr)
+    if isinstance(pob_spec, dict) and pob_spec.get("damage_amount_source") == "composite_battlefield_permanent_count":
+        return pob_spec
+    return None
+
+
 def _dynamic_count_damage_source_spec_from_expr(source: str, expr: str) -> dict[str, Any] | str | None:
     text = source or ""
     token = re.sub(r"\s+", " ", str(expr or "")).strip()
     parts = split_top_level_args(token)
     if len(parts) > 1 and any(part.strip().startswith('"') for part in parts[1:]):
         token = parts[0].strip()
+    composite_spec = _source_composite_count_spec_from_expr(text, token)
+    if isinstance(composite_spec, str) or composite_spec is not None:
+        return composite_spec
     if "GetXValue" in token or "ManacostVariableValue" in token:
         return "dynamic_count_damage_x_cost_not_supported"
     if (
@@ -39415,8 +39721,15 @@ def split_row(
                 "battlefield_count_card_types",
                 "battlefield_count_subtypes",
                 "battlefield_count_combat_state",
+                "battlefield_count_composite_mode",
+                "battlefield_count_components",
             ):
-                if dynamic_damage.get(key) != source_dynamic_damage.get(key):
+                oracle_value = dynamic_damage.get(key)
+                source_value = source_dynamic_damage.get(key)
+                if key == "battlefield_count_components":
+                    oracle_value = _normalized_battlefield_count_components(oracle_value)
+                    source_value = _normalized_battlefield_count_components(source_value)
+                if oracle_value != source_value:
                     return None, f"dynamic_count_damage_source_oracle_{key}_mismatch"
             target = str(dynamic_damage["target"])
             if not source_matches_target_constraint(source_text, target):

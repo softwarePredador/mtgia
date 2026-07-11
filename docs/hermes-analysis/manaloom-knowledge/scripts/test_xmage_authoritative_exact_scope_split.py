@@ -2478,6 +2478,111 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
                 },
             },
             {
+                "name": "Hobbit's Sting",
+                "oracle": (
+                    "Hobbit's Sting deals X damage to target creature, where X is the number "
+                    "of creatures you control plus the number of Foods you control."
+                ),
+                "source": """
+                    private static final DynamicValue xValue = new AdditiveDynamicValue(
+                            CreaturesYouControlCount.PLURAL,
+                            new PermanentsOnBattlefieldCount(new FilterControlledPermanent(SubType.FOOD))
+                    );
+                    this.getSpellAbility().addEffect(new DamageTargetEffect(xValue));
+                    this.getSpellAbility().addTarget(new TargetCreaturePermanent());
+                """,
+                "target": "creature",
+                "constraints": {"card_types": ["creature"]},
+                "amount_source": "composite_battlefield_permanent_count",
+                "count_fields": {
+                    "battlefield_count_composite_mode": "sum",
+                    "battlefield_count_components": [
+                        {
+                            "battlefield_count_scope": "controller_battlefield",
+                            "battlefield_count_card_types": ["creature"],
+                        },
+                        {
+                            "battlefield_count_scope": "controller_battlefield",
+                            "battlefield_count_subtypes": ["food"],
+                        },
+                    ],
+                },
+            },
+            {
+                "name": "Road Rage",
+                "oracle": (
+                    "Road Rage deals X damage to target creature or planeswalker, where X is "
+                    "2 plus the number of Mounts and Vehicles you control."
+                ),
+                "source": """
+                    private static final FilterPermanent filter = new FilterControlledPermanent("Mounts and Vehicles you control");
+                    static {
+                        filter.add(Predicates.or(
+                                SubType.MOUNT.getPredicate(),
+                                SubType.VEHICLE.getPredicate()
+                        ));
+                    }
+                    private static final DynamicValue xValue = new AdditiveDynamicValue(
+                            new PermanentsOnBattlefieldCount(filter), StaticValue.get(2)
+                    );
+                    this.getSpellAbility().addEffect(new DamageTargetEffect(xValue));
+                    this.getSpellAbility().addTarget(new TargetCreatureOrPlaneswalker());
+                """,
+                "target": "creature_or_planeswalker",
+                "constraints": {"card_types": ["creature", "planeswalker"]},
+                "amount_source": "composite_battlefield_permanent_count",
+                "base": 2,
+                "count_fields": {
+                    "battlefield_count_composite_mode": "union",
+                    "battlefield_count_components": [
+                        {
+                            "battlefield_count_scope": "controller_battlefield",
+                            "battlefield_count_subtypes": ["mount"],
+                        },
+                        {
+                            "battlefield_count_scope": "controller_battlefield",
+                            "battlefield_count_subtypes": ["vehicle"],
+                        },
+                    ],
+                },
+            },
+            {
+                "name": "Focus Fire",
+                "oracle": (
+                    "Focus Fire deals X damage to target attacking or blocking creature, where X is "
+                    "2 plus the number of creatures and/or Spacecraft you control."
+                ),
+                "source": """
+                    private static final FilterPermanent filter = new FilterControlledPermanent();
+                    static {
+                        filter.add(Predicates.or(
+                                CardType.CREATURE.getPredicate(),
+                                SubType.SPACECRAFT.getPredicate()
+                        ));
+                    }
+                    private static final DynamicValue xValue = new PermanentsOnBattlefieldCount(filter, 2);
+                    this.getSpellAbility().addEffect(new DamageTargetEffect(xValue));
+                    this.getSpellAbility().addTarget(new TargetAttackingOrBlockingCreature());
+                """,
+                "target": "creature",
+                "constraints": {"card_types": ["creature"], "combat_state": "attacking_or_blocking"},
+                "amount_source": "composite_battlefield_permanent_count",
+                "base": 2,
+                "count_fields": {
+                    "battlefield_count_composite_mode": "union",
+                    "battlefield_count_components": [
+                        {
+                            "battlefield_count_scope": "controller_battlefield",
+                            "battlefield_count_card_types": ["creature"],
+                        },
+                        {
+                            "battlefield_count_scope": "controller_battlefield",
+                            "battlefield_count_subtypes": ["spacecraft"],
+                        },
+                    ],
+                },
+            },
+            {
                 "name": "Artillery Blast",
                 "oracle": (
                     "Domain — Artillery Blast deals X damage to target tapped creature, where X is "
@@ -2745,7 +2850,7 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertIsNone(proposal)
         self.assertEqual(reason, "x_damage_auxiliary_ability_not_supported")
 
-    def test_dynamic_count_damage_blocks_x_cost_and_composite_counts(self) -> None:
+    def test_dynamic_count_damage_promotes_supported_composite_counts(self) -> None:
         row = queue_row(split.DAMAGE_UNIT, effect_classes=["DamageTargetEffect"], xmage_signals=["targeting"])
 
         proposal, reason = split.split_row(
@@ -2768,8 +2873,24 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
             """,
         )
 
-        self.assertIsNone(proposal)
-        self.assertEqual(reason, "dynamic_count_damage_oracle_composite_count_not_supported")
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.DYNAMIC_COUNT_DAMAGE_SCOPE)
+        self.assertEqual(effect["damage_amount_source"], "composite_battlefield_permanent_count")
+        self.assertEqual(effect["battlefield_count_composite_mode"], "sum")
+        self.assertEqual(
+            effect["battlefield_count_components"],
+            [
+                {
+                    "battlefield_count_scope": "controller_battlefield",
+                    "battlefield_count_card_types": ["creature"],
+                },
+                {
+                    "battlefield_count_scope": "controller_battlefield",
+                    "battlefield_count_subtypes": ["food"],
+                },
+            ],
+        )
 
     def test_return_all_graveyard_enchantments_to_battlefield_spell_maps_to_runtime(self) -> None:
         row = queue_row(

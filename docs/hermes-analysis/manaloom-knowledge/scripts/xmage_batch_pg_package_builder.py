@@ -536,6 +536,8 @@ E2E_REQUIRED_EFFECT_FIELDS = (
     "battlefield_count_scope",
     "battlefield_count_card_types",
     "battlefield_count_subtypes",
+    "battlefield_count_composite_mode",
+    "battlefield_count_components",
     "battlefield_count_required_colors",
     "battlefield_count_excluded_card_types",
     "battlefield_count_excluded_subtypes",
@@ -5036,7 +5038,69 @@ def damage_each_opponent_and_their_permanents_execution_scenario_from_expected_r
     }
 
 
-def _dynamic_damage_gain_life_fixture(required: dict[str, Any]) -> tuple[int, dict[str, Any]] | None:
+def _count_fixture_permanent_for_component(component: dict[str, Any], index: int) -> dict[str, Any]:
+    card_types = [
+        str(value).strip().lower()
+        for value in component.get("battlefield_count_card_types") or []
+        if str(value).strip()
+    ]
+    subtypes = [
+        str(value).strip().lower()
+        for value in component.get("battlefield_count_subtypes") or []
+        if str(value).strip()
+    ]
+    primary_type = card_types[0] if card_types else ""
+    primary_subtype = subtypes[0] if subtypes else ""
+    if primary_type == "land" and primary_subtype:
+        type_line = f"Basic Land - {primary_subtype.title()}"
+    elif primary_type == "artifact" and primary_subtype:
+        type_line = f"Artifact - {primary_subtype.title()}"
+    elif primary_type == "creature" and primary_subtype:
+        type_line = f"Creature - {primary_subtype.title()}"
+    elif primary_type:
+        type_line = primary_type.title()
+    elif primary_subtype in {"food", "equipment", "vehicle", "spacecraft"}:
+        type_line = f"Artifact - {primary_subtype.title()}"
+    elif primary_subtype:
+        type_line = f"Creature - {primary_subtype.title()}"
+    else:
+        type_line = "Artifact"
+    return {
+        "name": f"E2E Composite Count Permanent {index}",
+        "type_line": type_line,
+        "subtypes": subtypes,
+        "effect": "creature" if "creature" in card_types or type_line.startswith("Creature") else "permanent",
+    }
+
+
+def _composite_dynamic_damage_fixture(required: dict[str, Any]) -> tuple[int, dict[str, Any]] | None:
+    components = [
+        dict(component)
+        for component in (required.get("battlefield_count_components") or [])
+        if isinstance(component, dict)
+    ]
+    if not components:
+        return None
+    mode = str(required.get("battlefield_count_composite_mode") or "sum").strip().lower()
+    battlefield = [
+        _count_fixture_permanent_for_component(component, index + 1)
+        for index, component in enumerate(components)
+    ]
+    if mode == "union":
+        count = len(battlefield)
+    elif mode == "sum":
+        count = len(components)
+    else:
+        return None
+    base = int(required.get("damage_base_amount") or 0)
+    per_count = int(required.get("damage_per_count") or required.get("damage_per_graveyard_count") or 1)
+    return base + (count * per_count), {
+        "controller_battlefield": battlefield,
+        "expected_dynamic_count": count,
+    }
+
+
+def _dynamic_damage_fixture(required: dict[str, Any]) -> tuple[int, dict[str, Any]] | None:
     amount_source = str(required.get("damage_amount_source") or "").strip().lower()
     if amount_source == "x_value":
         x_value = int(required.get("x_value") or 3)
@@ -5047,6 +5111,8 @@ def _dynamic_damage_gain_life_fixture(required: dict[str, Any]) -> tuple[int, di
                 "_cast_context": {"x_value": x_value},
             },
         }
+    if amount_source == "composite_battlefield_permanent_count":
+        return _composite_dynamic_damage_fixture(required)
     if amount_source != "battlefield_permanent_count":
         return None
     scope = str(required.get("battlefield_count_scope") or "controller_battlefield").strip().lower()
@@ -5085,6 +5151,10 @@ def _dynamic_damage_gain_life_fixture(required: dict[str, Any]) -> tuple[int, di
     base = int(required.get("damage_base_amount") or 0)
     per_count = int(required.get("damage_per_count") or required.get("damage_per_graveyard_count") or 1)
     return base + (count * per_count), {"controller_battlefield": battlefield}
+
+
+def _dynamic_damage_gain_life_fixture(required: dict[str, Any]) -> tuple[int, dict[str, Any]] | None:
+    return _dynamic_damage_fixture(required)
 
 
 def damage_gain_life_spell_execution_scenario_from_expected_rule(
@@ -5190,19 +5260,28 @@ def fixed_damage_target_spell_execution_scenario_from_expected_rule(
     if scope not in {
         "xmage_fixed_damage_target_spell_v1",
         "xmage_conditional_fixed_damage_target_spell_v1",
+        "xmage_dynamic_count_damage_spell_v1",
     }:
         return None
     is_conditional_damage = scope == "xmage_conditional_fixed_damage_target_spell_v1"
-    damage = int(
-        (
-            required.get("conditional_damage_amount")
-            if is_conditional_damage
-            else None
+    is_dynamic_damage = scope == "xmage_dynamic_count_damage_spell_v1"
+    dynamic_fixture: dict[str, Any] = {}
+    if is_dynamic_damage:
+        fixture = _dynamic_damage_fixture(required)
+        if fixture is None:
+            return None
+        damage, dynamic_fixture = fixture
+    else:
+        damage = int(
+            (
+                required.get("conditional_damage_amount")
+                if is_conditional_damage
+                else None
+            )
+            or required.get("amount")
+            or required.get("damage")
+            or 0
         )
-        or required.get("amount")
-        or required.get("damage")
-        or 0
-    )
     if damage <= 0:
         return None
     type_line = "Sorcery" if required.get("sorcery") is True else "Instant"
@@ -5235,6 +5314,7 @@ def fixed_damage_target_spell_execution_scenario_from_expected_rule(
         "expected_target_constraints": target_constraints,
         "controller_life": 10,
         "opponent_life": max(20, damage + 5),
+        **dynamic_fixture,
         **(
             {
                 "expect_shuffle_self": True,
