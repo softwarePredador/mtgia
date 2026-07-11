@@ -33904,6 +33904,80 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertEqual(effect["formidable_life_total_count_scope"], "each_player_creatures_controlled")
         self.assertNotIn("_runtime_partial", effect)
 
+    def test_mana_source_etb_draw_unblocked_control_transfer_maps_full_scope(self) -> None:
+        row = queue_row(
+            split.RAMP_ARTIFACT_UNIT,
+            effect_classes=[
+                "AddManaOfAnyColorEffect",
+                "DrawCardSourceControllerEffect",
+                "DrawCardTargetEffect",
+                "TargetPlayerGainControlSourceEffect",
+                "UntapSourceEffect",
+            ],
+            ability_kind="triggered",
+            ability_classes=[
+                "CovetedJewelTriggeredAbility",
+                "EntersBattlefieldTriggeredAbility",
+                "SimpleManaAbility",
+            ],
+            xmage_signals=["mana", "draw", "triggered_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Coveted Jewel",
+                type_line="Artifact",
+                mana_cost="{6}",
+                oracle_text=(
+                    "When Coveted Jewel enters, draw three cards.\n"
+                    "{T}: Add three mana of any one color.\n"
+                    "Whenever one or more creatures an opponent controls attack you and aren't blocked, "
+                    "that player draws three cards and gains control of Coveted Jewel. Untap it."
+                ),
+            ),
+            source_text="""
+                this.addAbility(new EntersBattlefieldTriggeredAbility(new DrawCardSourceControllerEffect(3)));
+                this.addAbility(new SimpleManaAbility(
+                    Zone.BATTLEFIELD, new AddManaOfAnyColorEffect(3), new TapSourceCost()));
+                this.addAbility(new CovetedJewelTriggeredAbility());
+                class CovetedJewelTriggeredAbility extends TriggeredAbilityImpl {
+                    @Override
+                    public boolean checkTrigger(GameEvent event, Game game) {
+                        if (event.getType() != GameEvent.EventType.DECLARE_BLOCKERS_STEP) {
+                            return false;
+                        }
+                        UUID currentController = getControllerId();
+                        for (UUID attacker : game.getCombat().getAttackers()) {
+                            Permanent attackingCreature = game.getPermanent(attacker);
+                            if (currentController.hasOpponent(attackingCreature.getControllerId(), game)
+                                    && getControllerId().equals(game.getCombat().getDefenderId(attacker))
+                                    && !attackingCreature.isBlocked(game)) {
+                                this.getEffects().clear();
+                                this.addEffect(new DrawCardTargetEffect(3));
+                                this.addEffect(new TargetPlayerGainControlSourceEffect());
+                                this.addEffect(new UntapSourceEffect());
+                                return true;
+                            }
+                        }
+                        return false;
+                    }
+                }
+            """,
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        self.assertTrue(proposal["safe_for_batch_pg_package"])
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.MANA_WITH_ETB_DRAW_UNBLOCKED_CONTROL_TRANSFER_SCOPE)
+        self.assertEqual(effect["mana_produced"], 3)
+        self.assertEqual(effect["produces"], "WUBRG")
+        self.assertEqual(effect["etb_draw_count"], 3)
+        self.assertTrue(effect["unblocked_attack_control_transfer"])
+        self.assertEqual(effect["unblocked_attack_draw_count"], 3)
+        self.assertTrue(effect["unblocked_attack_untap_on_transfer"])
+        self.assertEqual(effect["unblocked_attack_trigger_controller"], "opponent")
+        self.assertNotIn("_runtime_partial", effect)
+
 
 if __name__ == "__main__":
     unittest.main()

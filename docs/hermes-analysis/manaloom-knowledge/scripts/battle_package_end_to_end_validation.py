@@ -5756,6 +5756,200 @@ def run_restricted_mana_formidable_life_reset(
     }
 
 
+def run_mana_source_etb_draw_unblocked_control_transfer(
+    battle,
+    scenario: dict[str, Any],
+    events: list[tuple[str, dict[str, Any]]],
+) -> dict[str, Any]:
+    card = dict(scenario["card"])
+    effect = battle.get_card_effect(card)
+    if (
+        effect.get("battle_model_scope")
+        != "xmage_simple_mana_source_with_etb_draw_unblocked_attack_control_transfer_v1"
+        or not effect.get("unblocked_attack_control_transfer")
+    ):
+        fail(
+            "battle_execution",
+            f"{card['name']} control-transfer scope mismatch: "
+            f"{effect.get('battle_model_scope')!r}/{effect.get('unblocked_attack_control_transfer')!r}",
+        )
+    source = battle.enrich_card(
+        {
+            **card,
+            "type_line": scenario.get("type_line") or card.get("type_line") or "Artifact",
+            "summoning_sick": False,
+            "tapped": False,
+            **effect,
+            **dict(scenario.get("source_overrides") or {}),
+        }
+    )
+    defender = battle.Player(str(scenario.get("defender") or "Control Transfer Defender"), None, [])
+    attacker = battle.Player(str(scenario.get("attacker") or "Control Transfer Attacker"), None, [])
+    defender.library = [
+        dict(item)
+        for item in (scenario.get("defender_library") or [])
+        if isinstance(item, dict)
+    ]
+    attacker.library = [
+        dict(item)
+        for item in (scenario.get("attacker_library") or [])
+        if isinstance(item, dict)
+    ]
+    if hasattr(battle, "bind_table_context"):
+        battle.bind_table_context([defender, attacker])
+    defender.battlefield = [source]
+    source["controller"] = defender.name
+    turn = int(scenario.get("turn") or 5)
+    rng = random.Random(int(scenario.get("seed") or 1))
+
+    before_etb_events = len(events)
+    battle.resolve_generic_permanent_etb(
+        defender,
+        [attacker],
+        source,
+        effect,
+        turn,
+        rng,
+        all_players=[defender, attacker],
+        phase="e2e_enter_battlefield",
+    )
+    expected_etb_draw = int(scenario.get("expected_etb_draw_count") or 0)
+    if len(defender.hand) != expected_etb_draw:
+        fail(
+            "battle_execution",
+            f"{card['name']} ETB hand size={len(defender.hand)}, expected {expected_etb_draw}",
+        )
+    etb_event = next(
+        (
+            data
+            for replay_event, data in events[before_etb_events:]
+            if replay_event == "trigger_resolved"
+            and data.get("card") == card.get("name")
+            and data.get("effect") == "draw_cards"
+        ),
+        None,
+    )
+    if etb_event is None:
+        fail("battle_events", f"missing {card['name']} ETB draw event")
+    if int(etb_event.get("cards_drawn") or 0) != expected_etb_draw:
+        fail(
+            "battle_events",
+            f"{card['name']} ETB cards_drawn={etb_event.get('cards_drawn')}, "
+            f"expected {expected_etb_draw}",
+        )
+
+    before_mana_events = len(events)
+    defender.refresh_mana_sources(turn=turn)
+    expected_available = int(scenario.get("expected_available_mana_after_refresh") or 0)
+    if defender.available_mana() != expected_available:
+        fail(
+            "battle_execution",
+            f"{card['name']} available mana={defender.available_mana()}, expected {expected_available}",
+        )
+    expected_tapped = bool(scenario.get("expected_tapped_after_refresh"))
+    if bool(source.get("tapped")) != expected_tapped:
+        fail("battle_execution", f"{card['name']} tapped={source.get('tapped')!r}")
+    expected_conditional = int(scenario.get("expected_conditional_mana") or 0)
+    conditional_total = sum(
+        int(item.get("amount") or 0)
+        for item in getattr(defender, "conditional_mana_sources", []) or []
+        if isinstance(item, dict)
+    )
+    if conditional_total != expected_conditional:
+        fail(
+            "battle_execution",
+            f"{card['name']} conditional mana={conditional_total}, expected {expected_conditional}",
+        )
+    mana_event = next(
+        (
+            data
+            for replay_event, data in events[before_mana_events:]
+            if replay_event == "mana_refreshed" and data.get("player") == defender.name
+        ),
+        None,
+    )
+    if mana_event is None:
+        fail("battle_events", f"missing {card['name']} mana_refreshed event")
+    if int(mana_event.get("sources") or 0) != 1:
+        fail("battle_events", f"{card['name']} mana sources={mana_event.get('sources')}, expected 1")
+
+    attacking_creature = battle.enrich_card(
+        dict(
+            scenario.get("attacking_creature")
+            or {
+                "name": "E2E Unblocked Attacker",
+                "type_line": "Creature - Rogue",
+                "power": 2,
+                "toughness": 2,
+            }
+        )
+    )
+    attacking_creature["attacking"] = True
+    attacker.battlefield = [attacking_creature]
+    before_transfer_events = len(events)
+    resolved = battle.resolve_unblocked_attack_control_transfer_triggers(
+        attacker,
+        defender,
+        [(attacking_creature, [])],
+        [attacker, defender],
+        turn,
+        rng,
+        phase="declare_blockers",
+    )
+    if resolved != 1:
+        fail("battle_execution", f"{card['name']} transfer trigger count={resolved}, expected 1")
+    expected_attack_draw = int(scenario.get("expected_unblocked_attack_draw_count") or 0)
+    if len(attacker.hand) != expected_attack_draw:
+        fail(
+            "battle_execution",
+            f"{card['name']} attacker hand size={len(attacker.hand)}, expected {expected_attack_draw}",
+        )
+    if source in defender.battlefield:
+        fail("battle_execution", f"{card['name']} remained under old controller after transfer")
+    if source not in attacker.battlefield:
+        fail("battle_execution", f"{card['name']} was not moved to attacker battlefield")
+    if source.get("controller") != attacker.name:
+        fail(
+            "battle_execution",
+            f"{card['name']} new controller={source.get('controller')!r}, expected {attacker.name!r}",
+        )
+    if bool(scenario.get("expected_untapped_after_transfer", True)) and source.get("tapped"):
+        fail("battle_execution", f"{card['name']} did not untap after control transfer")
+    transfer_event = next(
+        (
+            data
+            for replay_event, data in events[before_transfer_events:]
+            if replay_event == "unblocked_attack_control_transfer_resolved"
+            and data.get("card") == card.get("name")
+        ),
+        None,
+    )
+    if transfer_event is None:
+        fail("battle_events", f"missing {card['name']} control transfer event")
+    if int(transfer_event.get("cards_drawn") or 0) != expected_attack_draw:
+        fail(
+            "battle_events",
+            f"{card['name']} transfer cards_drawn={transfer_event.get('cards_drawn')}, "
+            f"expected {expected_attack_draw}",
+        )
+    if transfer_event.get("new_controller") != attacker.name:
+        fail("battle_events", f"{card['name']} event new_controller={transfer_event.get('new_controller')!r}")
+    if bool(transfer_event.get("source_tapped_after")):
+        fail("battle_events", f"{card['name']} event source_tapped_after={transfer_event.get('source_tapped_after')!r}")
+
+    return {
+        "scenario": scenario.get("name"),
+        "card_name": card["name"],
+        "etb_cards_drawn": expected_etb_draw,
+        "available_mana": defender.available_mana(),
+        "conditional_mana": conditional_total,
+        "source_tapped_after_refresh": expected_tapped,
+        "transfer_cards_drawn": expected_attack_draw,
+        "new_controller": attacker.name,
+        "source_tapped_after_transfer": bool(source.get("tapped")),
+    }
+
+
 def run_mana_spent_cast_trigger(
     battle,
     scenario: dict[str, Any],
@@ -12747,6 +12941,7 @@ SCENARIO_RUNNERS = {
     "multi_target_removal": run_multi_target_removal,
     "simple_mana_source_refresh": run_simple_mana_source_refresh,
     "restricted_mana_formidable_life_reset": run_restricted_mana_formidable_life_reset,
+    "mana_source_etb_draw_unblocked_control_transfer": run_mana_source_etb_draw_unblocked_control_transfer,
     "mana_spent_cast_trigger": run_mana_spent_cast_trigger,
     "mana_activation_cast_trigger": run_mana_activation_cast_trigger,
     "sacrifice_mana_source_activation": run_sacrifice_mana_source_activation,

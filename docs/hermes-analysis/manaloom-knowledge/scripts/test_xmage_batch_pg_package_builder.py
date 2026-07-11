@@ -6968,3 +6968,47 @@ def test_restricted_mana_formidable_life_reset_manifest_builds_composite_scenari
     assert scenario["expected_formidable_threshold"] == 8
     assert scenario["expected_controller_life_after"] == 2
     assert scenario["expected_opponent_life_after"] == 2
+
+
+def test_mana_source_etb_draw_unblocked_control_transfer_manifest_builds_composite_scenario() -> None:
+    proposal = {
+        "normalized_name": "coveted jewel",
+        "card_name": "Coveted Jewel",
+        "oracle_hash": "hash-coveted-jewel",
+        "logical_rule_key": "battle_rule_v1:coveted-jewel",
+        "effect_json": {
+            "effect": "ramp_permanent",
+            "battle_model_scope": "xmage_simple_mana_source_with_etb_draw_unblocked_attack_control_transfer_v1",
+            "is_mana_source": True,
+            "mana_produced": 3,
+            "produces": "WUBRG",
+            "mana_activation_requires_tap": True,
+            "activation_requires_tap": True,
+            "source_type_line": "Artifact",
+            "source_mana_cost": "{6}",
+            "trigger": "enters_battlefield",
+            "trigger_effect": "draw_cards",
+            "etb_draw_count": 3,
+            "unblocked_attack_control_transfer": True,
+            "unblocked_attack_draw_count": 3,
+            "unblocked_attack_untap_on_transfer": True,
+            "unblocked_attack_trigger_controller": "opponent",
+        },
+    }
+
+    expected = builder.expected_rule_from_proposal(proposal)
+    required = expected["required_effect_fields"]
+
+    assert required["unblocked_attack_control_transfer"] is True
+    assert required["unblocked_attack_draw_count"] == 3
+    assert required["etb_draw_count"] == 3
+
+    scenario = builder.execution_scenario_from_expected_rule(expected)
+
+    assert scenario["type"] == "mana_source_etb_draw_unblocked_control_transfer"
+    assert scenario["expected_etb_draw_count"] == 3
+    assert scenario["expected_available_mana_after_refresh"] == 3
+    assert scenario["expected_conditional_mana"] == 3
+    assert scenario["expected_tapped_after_refresh"] is True
+    assert scenario["expected_unblocked_attack_draw_count"] == 3
+    assert scenario["expected_untapped_after_transfer"] is True

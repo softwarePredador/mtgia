@@ -7392,3 +7392,60 @@ def test_restricted_mana_formidable_life_reset_runner_preserves_source_and_resol
     assert result["controller_life_after"] == 2
     assert result["opponent_life_after"] == 2
     assert result["source_tapped_after_formidable"] is True
+
+
+def test_mana_source_etb_draw_unblocked_control_transfer_runner_resolves_full_cycle() -> None:
+    battle = validator.load_battle(validator.DEFAULT_BATTLE)
+    effect = {
+        "effect": "ramp_permanent",
+        "battle_model_scope": "xmage_simple_mana_source_with_etb_draw_unblocked_attack_control_transfer_v1",
+        "is_mana_source": True,
+        "mana_produced": 3,
+        "produces": "WUBRG",
+        "mana_activation_requires_tap": True,
+        "activation_requires_tap": True,
+        "source_type_line": "Artifact",
+        "source_mana_cost": "{6}",
+        "trigger": "enters_battlefield",
+        "trigger_effect": "draw_cards",
+        "etb_draw_count": 3,
+        "unblocked_attack_control_transfer": True,
+        "unblocked_attack_draw_count": 3,
+        "unblocked_attack_untap_on_transfer": True,
+        "unblocked_attack_trigger_controller": "opponent",
+        "_rule_logical_key": "battle_rule_v1:coveted-jewel",
+    }
+    proposal = {
+        "normalized_name": "coveted jewel",
+        "card_name": "Coveted Jewel",
+        "oracle_hash": "hash-coveted-jewel",
+        "logical_rule_key": "battle_rule_v1:coveted-jewel",
+        "effect_json": effect,
+    }
+    expected = package_builder.expected_rule_from_proposal(proposal)
+    scenario = package_builder.execution_scenario_from_expected_rule(expected)
+
+    events = []
+    previous_handler = battle.REPLAY_EVENT_HANDLER
+    previous_get_card_effect = battle.get_card_effect
+    battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+    battle.get_card_effect = lambda card: dict(effect)
+    try:
+        result = validator.run_mana_source_etb_draw_unblocked_control_transfer(
+            battle,
+            scenario,
+            events,
+        )
+    finally:
+        battle.REPLAY_EVENT_HANDLER = previous_handler
+        battle.get_card_effect = previous_get_card_effect
+
+    assert result["card_name"] == "Coveted Jewel"
+    assert result["etb_cards_drawn"] == 3
+    assert result["available_mana"] == 3
+    assert result["conditional_mana"] == 3
+    assert result["source_tapped_after_refresh"] is True
+    assert result["transfer_cards_drawn"] == 3
+    assert result["new_controller"] == "Control Transfer Attacker"
+    assert result["source_tapped_after_transfer"] is False
+    assert any(event == "unblocked_attack_control_transfer_resolved" for event, _ in events)

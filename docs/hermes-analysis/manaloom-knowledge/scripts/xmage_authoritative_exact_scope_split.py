@@ -354,6 +354,9 @@ PAIN_TALISMAN_SCOPE = "pain_talisman_color_pair_partial_v1"
 MANA_WITH_ACTIVATION_LIFE_GAIN_SCOPE = "xmage_simple_tap_mana_source_with_gain_life_v1"
 MANA_WITH_ACTIVATED_DRAW_SCOPE = "xmage_simple_tap_mana_source_with_activated_draw_v1"
 MANA_WITH_ETB_DRAW_SCOPE = "xmage_simple_mana_source_with_etb_draw_v1"
+MANA_WITH_ETB_DRAW_UNBLOCKED_CONTROL_TRANSFER_SCOPE = (
+    "xmage_simple_mana_source_with_etb_draw_unblocked_attack_control_transfer_v1"
+)
 MANA_WITH_ETB_RETURN_LANDS_SCOPE = "xmage_simple_mana_source_with_etb_return_lands_to_hand_v1"
 MANA_SPENT_CAST_TRIGGER_SCOPE = "xmage_simple_tap_mana_source_with_mana_spent_cast_trigger_v1"
 MANA_ACTIVATION_NEXT_CAST_X_TRIGGER_SCOPE = "xmage_simple_tap_mana_source_with_next_cast_x_trigger_v1"
@@ -26744,6 +26747,75 @@ def mana_source_x_spell_token_counter_trigger_source_blocker(
     return None
 
 
+def mana_source_etb_draw_unblocked_control_transfer_detail_from_oracle(
+    metadata: dict[str, Any],
+) -> dict[str, Any] | str | None:
+    text = (
+        re.sub(r"\s+", " ", oracle_text(metadata))
+        .replace("\u2019", "'")
+        .strip()
+        .lower()
+    )
+    if "whenever one or more creatures an opponent controls attack you and aren't blocked" not in text:
+        return None
+    match = re.search(
+        r"that player draws (?P<draw>a|one|two|three|four|five|\d+) cards? "
+        r"and gains control of [^.]+\. untap it\.?",
+        text,
+    )
+    if not match:
+        return "mana_source_unblocked_control_transfer_oracle_not_exact"
+    draw_count = number_word_to_int(match.group("draw"))
+    if draw_count <= 0:
+        return "mana_source_unblocked_control_transfer_oracle_draw_not_fixed"
+    return {
+        "unblocked_attack_control_transfer": True,
+        "unblocked_attack_draw_count": draw_count,
+        "unblocked_attack_untap_on_transfer": True,
+        "unblocked_attack_trigger_controller": "opponent",
+    }
+
+
+def mana_source_etb_draw_unblocked_control_transfer_source_blocker(
+    source_text: str,
+    mana_ability_classes: set[str],
+    effect_classes: set[str],
+    detail: dict[str, Any],
+) -> str | None:
+    text = source_text or ""
+    if "CovetedJewelTriggeredAbility" not in mana_ability_classes:
+        return "mana_source_unblocked_control_transfer_source_trigger_missing"
+    if "EntersBattlefieldTriggeredAbility" not in mana_ability_classes:
+        return "mana_source_unblocked_control_transfer_source_etb_missing"
+    if "SimpleManaAbility" not in mana_ability_classes:
+        return "mana_source_unblocked_control_transfer_source_mana_missing"
+    expected_effects = {
+        "AddManaOfAnyColorEffect",
+        "DrawCardSourceControllerEffect",
+        "DrawCardTargetEffect",
+        "TargetPlayerGainControlSourceEffect",
+        "UntapSourceEffect",
+    }
+    if effect_classes != expected_effects:
+        return "mana_source_unblocked_control_transfer_source_effects_not_exact"
+    required_markers = (
+        "GameEvent.EventType.DECLARE_BLOCKERS_STEP",
+        "game.getCombat().getAttackers()",
+        "currentController.hasOpponent",
+        "getControllerId().equals(game.getCombat().getDefenderId(attacker))",
+        "!attackingCreature.isBlocked(game)",
+        "new DrawCardTargetEffect(3)",
+        "new TargetPlayerGainControlSourceEffect()",
+        "new UntapSourceEffect()",
+    )
+    for marker in required_markers:
+        if marker not in text:
+            return "mana_source_unblocked_control_transfer_source_signature_mismatch"
+    if int(detail.get("unblocked_attack_draw_count") or 0) != 3:
+        return "mana_source_unblocked_control_transfer_source_draw_mismatch"
+    return None
+
+
 def simple_mana_source_from_oracle(metadata: dict[str, Any]) -> tuple[str, int] | None:
     detail = simple_mana_source_detail_from_oracle(metadata)
     if detail is None:
@@ -41295,6 +41367,14 @@ def split_row(
                 - {"EntersBattlefieldTriggeredAbility"}
             )
         )
+        mana_source_etb_draw_unblocked_control_transfer = (
+            "CovetedJewelTriggeredAbility" in mana_ability_classes
+            and "EntersBattlefieldTriggeredAbility" in mana_ability_classes
+            and "SimpleManaAbility" in mana_ability_classes
+            and "TargetPlayerGainControlSourceEffect" in classes
+            and "DrawCardTargetEffect" in classes
+            and "UntapSourceEffect" in classes
+        )
         if mana_source_with_activated_draw:
             mana_source_detail = simple_mana_source_detail_from_oracle(metadata)
             if mana_source_detail is None:
@@ -41384,6 +41464,80 @@ def split_row(
                 metadata,
                 effect_json,
                 family_id="xmage_simple_mana_source_with_activated_draw",
+            ), "selected_exact_scope"
+        if mana_source_etb_draw_unblocked_control_transfer:
+            mana_source_detail = simple_mana_source_detail_from_oracle(metadata)
+            if mana_source_detail is None:
+                return None, "mana_source_oracle_not_simple"
+            source_any_color_amount = java_any_color_mana_amount_from_source(source_text)
+            if source_any_color_amount != int(mana_source_detail.get("mana_produced") or 0):
+                return None, "mana_source_unblocked_control_transfer_source_mana_mismatch"
+            oracle_draw_count = etb_draw_count_from_oracle(metadata)
+            source_draw_count = java_constructor_int_or_noarg_default(
+                source_text,
+                "DrawCardSourceControllerEffect",
+                noarg_default=1,
+            )
+            if oracle_draw_count is None or oracle_draw_count <= 0:
+                return None, "mana_source_etb_draw_count_not_fixed"
+            if source_draw_count is None or source_draw_count <= 0:
+                return None, "mana_source_etb_draw_source_count_not_fixed"
+            if int(source_draw_count) != int(oracle_draw_count):
+                return None, "mana_source_etb_draw_source_oracle_mismatch"
+            control_transfer = mana_source_etb_draw_unblocked_control_transfer_detail_from_oracle(metadata)
+            if isinstance(control_transfer, str):
+                return None, control_transfer
+            if control_transfer is None:
+                return None, "mana_source_unblocked_control_transfer_oracle_missing"
+            source_blocker = mana_source_etb_draw_unblocked_control_transfer_source_blocker(
+                source_text,
+                mana_ability_classes,
+                classes,
+                control_transfer,
+            )
+            if source_blocker:
+                return None, source_blocker
+            type_line = str(metadata.get("type_line") or "").lower()
+            mana_requires_tap = bool(mana_source_detail.get("mana_activation_requires_tap", True))
+            effect_json = {
+                "effect": "ramp_permanent",
+                "battle_model_scope": MANA_WITH_ETB_DRAW_UNBLOCKED_CONTROL_TRANSFER_SCOPE,
+                "is_mana_source": True,
+                "mana_produced": int(mana_source_detail["mana_produced"]),
+                "produces": str(mana_source_detail["produces"]),
+                "activation_requires_tap": mana_requires_tap,
+                "mana_activation_requires_tap": mana_requires_tap,
+                "permanent_type": (
+                    "creature"
+                    if "creature" in type_line
+                    else "artifact"
+                    if "artifact" in type_line
+                    else "permanent"
+                ),
+                "ability_kind": "activated_mana_etb_and_unblocked_attack_trigger",
+                "trigger": "enters_battlefield",
+                "trigger_effect": "draw_cards",
+                "etb_draw_count": int(oracle_draw_count),
+                "unblocked_attack_control_transfer": True,
+                "unblocked_attack_draw_count": int(control_transfer["unblocked_attack_draw_count"]),
+                "unblocked_attack_untap_on_transfer": True,
+                "unblocked_attack_trigger_controller": "opponent",
+                "source_type_line": str(metadata.get("type_line") or ""),
+                "source_mana_cost": str(metadata.get("mana_cost") or ""),
+                "xmage_mana_ability_classes": ["SimpleManaAbility"],
+                "xmage_auxiliary_ability_classes": [
+                    "CovetedJewelTriggeredAbility",
+                    "EntersBattlefieldTriggeredAbility",
+                ],
+                "xmage_effect_classes": sorted(classes),
+                "xmage_ability_classes": sorted(mana_ability_classes),
+            }
+            add_mana_source_activation_detail_fields(effect_json, mana_source_detail)
+            return build_proposal(
+                row,
+                metadata,
+                effect_json,
+                family_id="xmage_simple_mana_source_with_etb_draw_unblocked_attack_control_transfer",
             ), "selected_exact_scope"
         if mana_source_with_etb_draw:
             mana_source_detail = simple_mana_source_detail_from_oracle(metadata)

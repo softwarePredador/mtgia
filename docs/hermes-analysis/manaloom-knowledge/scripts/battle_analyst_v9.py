@@ -32854,6 +32854,133 @@ def resolve_becomes_blocked_self_boost_triggers(
     return resolved
 
 
+def resolve_unblocked_attack_control_transfer_triggers(
+    attacker,
+    defender,
+    block_assignments,
+    all_players,
+    turn,
+    rng,
+    *,
+    phase="declare_blockers",
+    stack=None,
+):
+    unblocked_attackers = [
+        attacking_creature
+        for attacking_creature, blockers in list(block_assignments or [])
+        if is_battlefield_creature(attacking_creature)
+        and attacking_creature in getattr(attacker, "battlefield", [])
+        and not list(blockers or [])
+    ]
+    if not unblocked_attackers:
+        return 0
+    sources = [
+        permanent
+        for permanent in list(getattr(defender, "battlefield", []) or [])
+        if isinstance(permanent, dict)
+        and permanent.get("unblocked_attack_control_transfer")
+    ]
+    if not sources:
+        return 0
+    resolved = 0
+    for source in sources:
+        if source not in getattr(defender, "battlefield", []):
+            continue
+        draw_count = max(0, int(source.get("unblocked_attack_draw_count") or 0))
+        old_controller = source.get("controller") or getattr(defender, "name", None)
+        tapped_before = bool(source.get("tapped"))
+        hand_before = len(getattr(attacker, "hand", []) or [])
+        library_before = len(getattr(attacker, "library", []) or [])
+        drawn = attacker.draw(draw_count, rng) if draw_count > 0 else []
+        if all_players is not None and drawn:
+            process_player_draw_triggers(
+                attacker,
+                len(drawn),
+                turn,
+                phase,
+                all_players,
+                stack=stack,
+                turn_player=attacker,
+            )
+        defender.battlefield.remove(source)
+        source["controller"] = attacker.name
+        if source.get("unblocked_attack_untap_on_transfer", True):
+            source["tapped"] = False
+        attacker.battlefield.append(source)
+        fields = replay_rule_fields(source)
+        emit_decision_trace(
+            decision_type="unblocked_attack_control_transfer_trigger",
+            player=defender,
+            turn=turn,
+            phase=phase,
+            available_options=[
+                decision_card_option(
+                    source,
+                    action="resolve_unblocked_attack_control_transfer",
+                    effect="control_transfer_drawback",
+                    score=len(unblocked_attackers) * max(1, draw_count),
+                    target=attacker.name,
+                )
+            ],
+            chosen_option=decision_card_option(
+                source,
+                action="resolve_unblocked_attack_control_transfer",
+                effect="control_transfer_drawback",
+                target=attacker.name,
+            ),
+            rejected_options=[],
+            score_components={
+                "unblocked_attackers": [card.get("name", "?") for card in unblocked_attackers],
+                "draw_count": draw_count,
+                "old_controller": old_controller,
+                "new_controller": attacker.name,
+                "source_tapped_before": tapped_before,
+                "source_tapped_after": bool(source.get("tapped")),
+            },
+            rule_source=fields.get("rule_source", "battle_rule"),
+            rule_status=fields.get("rule_review_status", "verified"),
+            confidence="high",
+            expected_benefit_score=len(drawn) * 6,
+            actual_outcome="control_transferred_to_unblocked_attacker",
+            reason="opponent_unblocked_attack_trigger_transfers_source_and_draws",
+            heuristic_version=DECISION_STRATEGY_VERSION,
+            resource_delta={
+                "attacker_cards_drawn": len(drawn),
+                "defender_permanents": -1,
+                "attacker_permanents": 1,
+            },
+            risk_flags=["drawback_trigger", "permanent_control_transfer"],
+        )
+        emit_replay_event(
+            "unblocked_attack_control_transfer_resolved",
+            player=defender.name,
+            card=source.get("name", "?"),
+            trigger="unblocked_attack",
+            effect="draw_and_gain_control_source",
+            attacker=attacker.name,
+            defender=defender.name,
+            unblocked_attackers=[card.get("name", "?") for card in unblocked_attackers],
+            unblocked_attacker_count=len(unblocked_attackers),
+            cards_requested=draw_count,
+            cards_drawn=len(drawn),
+            drawn_cards=[card.get("name", "?") for card in drawn if isinstance(card, dict)],
+            attacker_hand_before=hand_before,
+            attacker_hand_after=len(getattr(attacker, "hand", []) or []),
+            attacker_library_before=library_before,
+            attacker_library_after=len(getattr(attacker, "library", []) or []),
+            original_controller=old_controller,
+            new_controller=attacker.name,
+            source_tapped_before=tapped_before,
+            source_tapped_after=bool(source.get("tapped")),
+            source_untapped=tapped_before and not bool(source.get("tapped")),
+            turn=turn,
+            phase=phase,
+            **fields,
+        )
+        resolved += 1
+    return resolved
+
+
 def attack_target_keyword_effect_for_permanent(permanent):
     if not isinstance(permanent, dict):
         return None
@@ -73283,6 +73410,17 @@ def combat_phase_v8(attacker, opponents, all_players, turn, rng, stack):
         (group_target, group_attackers, declare_blockers_step(group_target, group_attackers, turn, rng))
         for group_target, group_attackers in live_attack_groups
     ]
+    for group_target, _, group_assignments in grouped_block_assignments:
+        resolve_unblocked_attack_control_transfer_triggers(
+            attacker,
+            group_target,
+            group_assignments,
+            all_players,
+            turn,
+            rng,
+            phase="declare_blockers",
+            stack=stack,
+        )
     for _, _, group_assignments in grouped_block_assignments:
         resolve_becomes_blocked_self_boost_triggers(
             attacker,

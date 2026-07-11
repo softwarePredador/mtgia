@@ -551,6 +551,10 @@ E2E_REQUIRED_EFFECT_FIELDS = (
     "formidable_activation_requires_tap",
     "formidable_controlled_creatures_total_power_gte",
     "formidable_life_total_count_scope",
+    "unblocked_attack_control_transfer",
+    "unblocked_attack_draw_count",
+    "unblocked_attack_untap_on_transfer",
+    "unblocked_attack_trigger_controller",
     "source_type_line",
     "source_mana_cost",
     "life_for_colored_mana",
@@ -3658,6 +3662,56 @@ def restricted_mana_formidable_life_reset_execution_scenario_from_expected_rule(
         "expected_formidable_threshold": power_threshold,
         "expected_controller_life_after": 2,
         "expected_opponent_life_after": 2,
+        "logical_rule_key": rule["logical_rule_key"],
+    }
+
+
+def mana_source_etb_draw_unblocked_control_transfer_execution_scenario_from_expected_rule(
+    rule: dict[str, Any],
+) -> dict[str, Any] | None:
+    required = dict(rule.get("required_effect_fields") or {})
+    if (
+        required.get("battle_model_scope")
+        != "xmage_simple_mana_source_with_etb_draw_unblocked_attack_control_transfer_v1"
+    ):
+        return None
+    if required.get("effect") != "ramp_permanent" or not required.get("is_mana_source"):
+        return None
+    if not required.get("unblocked_attack_control_transfer"):
+        return None
+    return {
+        "name": f"{rule['card_name']} draws on ETB, taps for mana, then transfers to unblocked attacker",
+        "type": "mana_source_etb_draw_unblocked_control_transfer",
+        "card": {
+            "name": rule["card_name"],
+            "type_line": required.get("source_type_line") or "Artifact",
+            "mana_cost": required.get("source_mana_cost") or "{6}",
+        },
+        "type_line": required.get("source_type_line") or "Artifact",
+        "expected_etb_draw_count": int(required.get("etb_draw_count") or 3),
+        "expected_available_mana_after_refresh": int(required.get("mana_produced") or 3),
+        "expected_tapped_after_refresh": bool(required.get("mana_activation_requires_tap", True)),
+        "expected_conditional_mana": (
+            int(required.get("mana_produced") or 3)
+            if required.get("produced_mana_symbols") in (None, [], "")
+            else 0
+        ),
+        "expected_unblocked_attack_draw_count": int(required.get("unblocked_attack_draw_count") or 3),
+        "expected_untapped_after_transfer": bool(required.get("unblocked_attack_untap_on_transfer", True)),
+        "attacker_library": [
+            {"name": f"E2E Attacker Draw {index + 1}", "type_line": "Instant", "mana_cost": "{1}", "cmc": 1}
+            for index in range(int(required.get("unblocked_attack_draw_count") or 3))
+        ],
+        "defender_library": [
+            {"name": f"E2E Defender Draw {index + 1}", "type_line": "Instant", "mana_cost": "{1}", "cmc": 1}
+            for index in range(int(required.get("etb_draw_count") or 3))
+        ],
+        "attacking_creature": {
+            "name": "E2E Unblocked Attacker",
+            "type_line": "Creature - Rogue",
+            "power": 2,
+            "toughness": 2,
+        },
         "logical_rule_key": rule["logical_rule_key"],
     }
 
@@ -8052,6 +8106,7 @@ def execution_scenario_from_expected_rule(rule: dict[str, Any]) -> dict[str, Any
         or mana_spent_cast_trigger_execution_scenario_from_expected_rule(rule)
         or mana_activation_cast_trigger_execution_scenario_from_expected_rule(rule)
         or restricted_mana_formidable_life_reset_execution_scenario_from_expected_rule(rule)
+        or mana_source_etb_draw_unblocked_control_transfer_execution_scenario_from_expected_rule(rule)
         or simple_mana_source_execution_scenario_from_expected_rule(rule)
         or sacrifice_mana_source_execution_scenario_from_expected_rule(rule)
         or damage_each_opponent_spell_execution_scenario_from_expected_rule(rule)
