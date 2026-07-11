@@ -354,6 +354,45 @@ def test_counter_target_return_creature_additional_cost_execution_scenario_is_ma
     assert scenario["responder_battlefield"][0]["type_line"] == "Creature - Wizard"
 
 
+def test_counter_target_tap_artifact_or_pay_generic_execution_scenario_is_manifested() -> None:
+    proposal = {
+        "normalized_name": "disruption protocol",
+        "card_name": "Disruption Protocol",
+        "oracle_hash": "hash-disruption-protocol",
+        "logical_rule_key": "battle_rule_v1:disruption protocol",
+        "effect_json": {
+            "effect": "counter",
+            "battle_model_scope": "xmage_counter_target_spell_v1",
+            "target": "spell",
+            "target_constraints": {"zone": "stack", "stack_object": "spell"},
+            "additional_cost": "choose_tap_untapped_artifact_or_pay_generic",
+            "requires_one_additional_cost_option": True,
+            "additional_cost_options": [
+                {
+                    "cost": "tap_untapped_artifact",
+                    "requires_tap_untapped_artifact": True,
+                    "xmage_additional_cost_target": "untapped_artifact",
+                },
+                {
+                    "cost": "pay_generic",
+                    "requires_pay_generic": True,
+                    "pay_generic_amount": 1,
+                },
+            ],
+            "xmage_additional_cost_class": "OrCost",
+        },
+    }
+
+    expected = builder.expected_rule_from_proposal(proposal)
+    scenario = builder.execution_scenario_from_expected_rule(expected)
+
+    assert expected["required_effect_fields"]["requires_one_additional_cost_option"] is True
+    assert scenario["type"] == "counter_target_response"
+    assert scenario["expected_additional_cost"] == "tap_untapped_artifact"
+    assert scenario["expected_tapped_name"] == "E2E Tap Cost Artifact"
+    assert scenario["responder_battlefield"][0]["tapped"] is False
+
+
 def test_counter_target_excluded_spell_subtype_execution_scenario_uses_illegal_subtype_fixture() -> None:
     proposal = {
         "normalized_name": "faerie trickery",

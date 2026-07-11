@@ -9845,6 +9845,9 @@ SAFE_RUNTIME_SECONDARY_ANNOTATION_KEYS = {
     "requires_discard_land",
     "requires_pay_life",
     "pay_life_amount",
+    "requires_pay_generic",
+    "pay_generic_amount",
+    "requires_tap_untapped_artifact",
     "requires_sacrifice_creature",
     "requires_sacrifice_creature_count",
     "requires_sacrifice_creature_or_land",
@@ -12404,14 +12407,30 @@ class Player:
             castable_counters = []
             for card in counters:
                 effect = get_card_effect(card)
-                if not additional_card_costs_are_payable(self, card, effect):
-                    continue
                 target_x_value = counter_target_x_value_for_target(effect, target_card)
                 if target_x_value is not None:
-                    if self.can_pay(card_cost_for_player_state(self, card, x_value=target_x_value)):
+                    base_cost = card_cost_for_player_state(self, card, x_value=target_x_value)
+                    if (
+                        self.can_pay(base_cost)
+                        and additional_card_costs_are_payable_for_spell_cast(
+                            self,
+                            card,
+                            effect,
+                            base_cost=base_cost,
+                        )
+                    ):
                         castable_counters.append(card)
                     continue
-                if self.can_pay_card(card):
+                base_cost = card_cost_for_player_state(self, card)
+                if (
+                    self.can_pay(base_cost)
+                    and additional_card_costs_are_payable_for_spell_cast(
+                        self,
+                        card,
+                        effect,
+                        base_cost=base_cost,
+                    )
+                ):
                     castable_counters.append(card)
             counters = castable_counters
         if target_card is not None:
@@ -23494,6 +23513,23 @@ def choose_activation_sacrifice_target(player, source, target_type):
     return candidates[0] if candidates else None, candidates
 
 
+def choose_untapped_artifact_for_additional_cost(player, source):
+    candidates = [
+        permanent
+        for permanent in list(getattr(player, "battlefield", []) or [])
+        if permanent is not source
+        and is_artifact_permanent(permanent)
+        and not bool(permanent.get("tapped"))
+    ]
+    candidates.sort(
+        key=lambda permanent: (
+            activation_sacrifice_candidate_score(player, permanent),
+            str(permanent.get("name") or ""),
+        )
+    )
+    return candidates[0] if candidates else None, candidates
+
+
 def sacrifice_permanent_for_activation(player, permanent, turn):
     if permanent in getattr(player, "battlefield", []) or []:
         player.battlefield.remove(permanent)
@@ -24186,6 +24222,14 @@ def additional_card_costs_are_payable(player, card, effect_data, cost_context=No
         amount = int(effect_data.get("pay_life_amount") or 0)
         if amount <= 0 or int(getattr(player, "life", 0) or 0) < amount:
             return False
+    if effect_data.get("requires_pay_generic"):
+        amount = int(effect_data.get("pay_generic_amount") or 0)
+        if amount <= 0 or not player.can_pay({"generic": amount}):
+            return False
+    if effect_data.get("requires_tap_untapped_artifact"):
+        artifact, _options = choose_untapped_artifact_for_additional_cost(player, card)
+        if artifact is None:
+            return False
     if effect_data.get("requires_sacrifice_green_creature"):
         creature, _options, _reason = choose_creature_for_resource_cost(
             player,
@@ -24307,6 +24351,45 @@ def additional_card_costs_are_payable(player, card, effect_data, cost_context=No
     return True
 
 
+def additional_card_costs_are_payable_for_spell_cast(
+    player,
+    card,
+    effect_data,
+    *,
+    base_cost=None,
+    cost_context=None,
+):
+    cost_options = [
+        option
+        for option in effect_data.get("additional_cost_options") or []
+        if isinstance(option, dict)
+    ]
+    if cost_options:
+        return any(
+            additional_card_costs_are_payable_for_spell_cast(
+                player,
+                card,
+                additional_cost_option_effect_fields(option),
+                base_cost=base_cost,
+                cost_context=cost_context,
+            )
+            for option in cost_options
+        )
+    if effect_data.get("requires_pay_generic"):
+        amount = int(effect_data.get("pay_generic_amount") or 0)
+        if amount <= 0:
+            return False
+        if base_cost is None:
+            return player.can_pay({"generic": amount})
+        return player.can_pay(merge_mana_costs(copy.deepcopy(base_cost), {"generic": amount}))
+    return additional_card_costs_are_payable(
+        player,
+        card,
+        effect_data,
+        cost_context=cost_context,
+    )
+
+
 def additional_cost_option_effect_fields(option):
     cost = str((option or {}).get("cost") or "").strip()
     effect_data = {"additional_cost": cost}
@@ -24317,6 +24400,11 @@ def additional_cost_option_effect_fields(option):
     elif cost == "pay_life":
         effect_data["requires_pay_life"] = True
         effect_data["pay_life_amount"] = int((option or {}).get("pay_life_amount") or 0)
+    elif cost == "pay_generic":
+        effect_data["requires_pay_generic"] = True
+        effect_data["pay_generic_amount"] = int((option or {}).get("pay_generic_amount") or 0)
+    elif cost == "tap_untapped_artifact":
+        effect_data["requires_tap_untapped_artifact"] = True
     elif cost == "sacrifice_creature":
         effect_data["requires_sacrifice_creature"] = True
     elif cost == "sacrifice_two_creatures":
@@ -24404,6 +24492,8 @@ def pay_additional_card_costs(player, card, effect_data, *, turn=None, cost_cont
         not effect_data.get("requires_discard_card")
         and not effect_data.get("requires_discard_land")
         and not effect_data.get("requires_pay_life")
+        and not effect_data.get("requires_pay_generic")
+        and not effect_data.get("requires_tap_untapped_artifact")
         and not effect_data.get("requires_sacrifice_creature")
         and not effect_data.get("requires_sacrifice_creature_count")
         and not effect_data.get("requires_sacrifice_creature_or_land")
@@ -24460,6 +24550,55 @@ def pay_additional_card_costs(player, card, effect_data, *, turn=None, cost_cont
             destination=destination,
             selection_reason=planned_blight.get("selection_reason"),
             runtime_cost_model=planned_blight.get("runtime_cost_model"),
+            turn=turn,
+        )
+    if effect_data.get("requires_pay_generic"):
+        amount = int(effect_data.get("pay_generic_amount") or 0)
+        cost = {"generic": amount}
+        mana_before = player.mana_pool.snapshot()
+        if amount <= 0 or not player.can_pay(cost) or not player.spend_mana(cost):
+            emit_replay_event(
+                "additional_cost_failed",
+                player=player.name,
+                card=card.get("name", "?"),
+                cost="pay_generic",
+                pay_generic_amount=amount,
+                turn=turn,
+            )
+            return False
+        emit_replay_event(
+            "additional_cost_paid",
+            player=player.name,
+            card=card.get("name", "?"),
+            cost="pay_generic",
+            pay_generic_amount=amount,
+            mana_before=mana_before,
+            mana_after=player.mana_pool.snapshot(),
+            turn=turn,
+        )
+    if effect_data.get("requires_tap_untapped_artifact"):
+        artifact, artifact_options = choose_untapped_artifact_for_additional_cost(player, card)
+        if not artifact:
+            emit_replay_event(
+                "additional_cost_failed",
+                player=player.name,
+                card=card.get("name", "?"),
+                cost="tap_untapped_artifact",
+                turn=turn,
+            )
+            return False
+        artifact["tapped"] = True
+        emit_replay_event(
+            "additional_cost_paid",
+            player=player.name,
+            card=card.get("name", "?"),
+            cost="tap_untapped_artifact",
+            tapped=artifact.get("name", "?"),
+            artifact_options=[
+                option.get("name", "?")
+                for option in artifact_options[:8]
+                if isinstance(option, dict)
+            ],
             turn=turn,
         )
     if effect_data.get("requires_pay_life"):

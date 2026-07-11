@@ -116,6 +116,9 @@ E2E_REQUIRED_EFFECT_FIELDS = (
     "requires_discard_land",
     "requires_pay_life",
     "pay_life_amount",
+    "requires_pay_generic",
+    "pay_generic_amount",
+    "requires_tap_untapped_artifact",
     "requires_sacrifice_creature",
     "requires_sacrifice_creature_count",
     "requires_sacrifice_creature_or_land",
@@ -7640,7 +7643,26 @@ def counter_target_execution_scenario_from_expected_rule(
         "logical_rule_key": rule["logical_rule_key"],
     }
     selected_additional_cost = str(required.get("additional_cost") or "").strip()
-    if selected_additional_cost == "pay_life":
+    additional_cost_options = [
+        option
+        for option in required.get("additional_cost_options") or []
+        if isinstance(option, dict)
+    ]
+    if additional_cost_options and any(
+        str(option.get("cost") or "") == "tap_untapped_artifact"
+        for option in additional_cost_options
+    ):
+        artifact = {
+            "name": "E2E Tap Cost Artifact",
+            "type_line": "Artifact",
+            "effect": "mana_rock",
+            "cmc": 1,
+            "tapped": False,
+        }
+        scenario["responder_battlefield"] = [artifact]
+        scenario["expected_additional_cost"] = "tap_untapped_artifact"
+        scenario["expected_tapped_name"] = artifact["name"]
+    elif selected_additional_cost == "pay_life":
         pay_life_amount = int(required.get("pay_life_amount") or 0)
         if pay_life_amount > 0:
             scenario["responder_life"] = max(20, pay_life_amount + 5)

@@ -19073,6 +19073,63 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertEqual(effect["xmage_additional_cost_class"], "ReturnToHandChosenControlledPermanentCost")
         self.assertEqual(effect["xmage_additional_cost_target"], "creature")
 
+    def test_counter_target_spell_maps_tap_artifact_or_pay_generic_additional_cost(self) -> None:
+        row = queue_row(split.COUNTER_UNIT, effect_classes=["CounterTargetEffect"])
+        proposal, reason = split.split_row(
+            row,
+            metadata(oracle_text="As an additional cost to cast this spell, tap an untapped artifact you control or pay {1}. Counter target spell."),
+            source_text=(
+                "private static final FilterControlledPermanent filter = "
+                "new FilterControlledArtifactPermanent(\"untapped artifact you control\");"
+                "filter.add(TappedPredicate.UNTAPPED);"
+                "this.getSpellAbility().addCost(new OrCost("
+                "\"tap an untapped artifact you control or pay {1}\", "
+                "new TapTargetCost(new TargetControlledPermanent(filter)), "
+                "new GenericManaCost(1)));"
+                "this.getSpellAbility().addEffect(new CounterTargetEffect());"
+                "this.getSpellAbility().addTarget(new TargetSpell());"
+            ),
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["effect"], "counter")
+        self.assertEqual(effect["battle_model_scope"], split.COUNTER_SCOPE)
+        self.assertEqual(effect["additional_cost"], "choose_tap_untapped_artifact_or_pay_generic")
+        self.assertTrue(effect["requires_one_additional_cost_option"])
+        self.assertEqual(
+            effect["additional_cost_options"],
+            [
+                {
+                    "cost": "tap_untapped_artifact",
+                    "requires_tap_untapped_artifact": True,
+                    "xmage_additional_cost_target": "untapped_artifact",
+                },
+                {
+                    "cost": "pay_generic",
+                    "requires_pay_generic": True,
+                    "pay_generic_amount": 1,
+                },
+            ],
+        )
+        self.assertEqual(effect["xmage_additional_cost_class"], "OrCost")
+
+    def test_counter_target_spell_blocks_orcost_generic_when_xmage_and_oracle_disagree(self) -> None:
+        row = queue_row(split.COUNTER_UNIT, effect_classes=["CounterTargetEffect"])
+        proposal, reason = split.split_row(
+            row,
+            metadata(oracle_text="As an additional cost to cast this spell, blight 2 or pay {1}. Counter target spell."),
+            source_text=(
+                "this.getSpellAbility().addCost(new OrCost("
+                "\"blight 2 or pay {1}\", new BlightCost(2), new GenericManaCost(2)));"
+                "this.getSpellAbility().addEffect(new CounterTargetEffect());"
+                "this.getSpellAbility().addTarget(new TargetSpell());"
+            ),
+        )
+
+        self.assertIsNone(proposal)
+        self.assertEqual(reason, "counter_additional_cost_not_supported")
+
     def test_counter_target_spell_ignores_neutral_auxiliary_oracle_lines(self) -> None:
         row = queue_row(
             split.COUNTER_UNIT,

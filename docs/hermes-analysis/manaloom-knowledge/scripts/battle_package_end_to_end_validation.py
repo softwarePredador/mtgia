@@ -11008,6 +11008,23 @@ def run_counter_target_response(
                 for card in responder.hand
             ):
                 fail("battle_execution", f"{response_card['name']} did not return {expected_returned} to hand")
+        expected_tapped = str(scenario.get("expected_tapped_name") or "").strip()
+        if expected_tapped:
+            if additional_cost_event.get("tapped") != expected_tapped:
+                fail(
+                    "battle_events",
+                    f"{response_card['name']} tapped={additional_cost_event.get('tapped')!r}, expected {expected_tapped!r}",
+                )
+            tapped_permanent = next(
+                (
+                    permanent
+                    for permanent in responder.battlefield
+                    if isinstance(permanent, dict) and permanent.get("name") == expected_tapped
+                ),
+                None,
+            )
+            if not tapped_permanent or not tapped_permanent.get("tapped"):
+                fail("battle_execution", f"{response_card['name']} did not tap {expected_tapped}")
         expected_pay_life = int(scenario.get("expected_pay_life_amount") or 0)
         if expected_pay_life > 0 and int(additional_cost_event.get("pay_life_amount") or 0) != expected_pay_life:
             fail(

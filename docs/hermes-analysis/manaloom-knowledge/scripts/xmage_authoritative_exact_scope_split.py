@@ -21898,9 +21898,45 @@ def fixed_spell_additional_cost_fields_from_source(
         return None, unsupported_reason
     lowered_oracle = oracle_text(metadata).lower()
     if "OrCost" in text:
-        if "GenericManaCost" in text or "ManaCostsImpl" in text or "ForageCost" in text:
+        if "ManaCostsImpl" in text or "ForageCost" in text:
             return None, unsupported_reason
         options: list[dict[str, Any]] = []
+        generic_cost_match = re.search(r"GenericManaCost\s*\(\s*(\d+)\s*\)", text)
+        oracle_pay_generic_match = re.search(r"additional cost.*pay \{(\d+)\}", lowered_oracle)
+        if (
+            "TapTargetCost" in text
+            and "FilterControlledArtifactPermanent" in text
+            and "TappedPredicate.UNTAPPED" in text
+            and re.search(
+                r"additional cost.*tap an untapped artifact you control or pay \{\d+\}",
+                lowered_oracle,
+            )
+        ):
+            options.append(
+                {
+                    "cost": "tap_untapped_artifact",
+                    "requires_tap_untapped_artifact": True,
+                    "xmage_additional_cost_target": "untapped_artifact",
+                }
+            )
+        if generic_cost_match and oracle_pay_generic_match and any(
+            str(option.get("cost") or "") == "tap_untapped_artifact"
+            for option in options
+        ):
+            generic_amount = int(generic_cost_match.group(1))
+            oracle_amount = int(oracle_pay_generic_match.group(1))
+            if generic_amount == oracle_amount:
+                options.append(
+                    {
+                        "cost": "pay_generic",
+                        "requires_pay_generic": True,
+                        "pay_generic_amount": generic_amount,
+                    }
+                )
+            else:
+                return None, unsupported_reason
+        elif "GenericManaCost" in text:
+            return None, unsupported_reason
         if "DiscardCardCost" in text and re.search(r"additional cost.*discard a card", lowered_oracle):
             options.append({"cost": "discard_card", "requires_discard_card": True})
         pay_life_match = re.search(r"PayLifeCost\s*\(\s*(\d+)\s*\)", text)
@@ -21940,6 +21976,10 @@ def fixed_spell_additional_cost_fields_from_source(
             cost = str(option.get("cost") or "")
             if cost.startswith("sacrifice_"):
                 return cost_source_text.find("SacrificeTargetCost")
+            if cost == "tap_untapped_artifact":
+                return cost_source_text.find("TapTargetCost")
+            if cost == "pay_generic":
+                return cost_source_text.find("GenericManaCost")
             if cost == "discard_card":
                 return cost_source_text.find("DiscardCardCost")
             if cost == "pay_life":
