@@ -676,10 +676,17 @@ E2E_REQUIRED_EFFECT_FIELDS = (
     "spell_cast_token_required_colors",
     "spell_cast_token_requires_multicolored",
     "spell_cast_token_requires_historic",
+    "spell_cast_token_requires_x_mana_cost",
     "spell_cast_token_source_zone",
     "spell_cast_token_mana_value_min",
     "spell_cast_token_optional",
+    "spell_cast_token_count_source",
     "trigger_artifact_spell",
+    "token_enters_with_counter_type",
+    "token_enters_with_counters",
+    "token_enters_with_counters_source",
+    "token_enters_with_plus_one_counters_from_x",
+    "e2e_x_value",
     "flashback_cost",
     "flashback_status",
     "cycling_cost",
@@ -1936,6 +1943,19 @@ def expected_token_from_component(component: dict[str, Any]) -> dict[str, Any]:
         "produced_mana_symbols": component.get("token_produced_mana_symbols") or [],
         "artifact_only": bool(component.get("token_artifact_only")),
     }
+    entering_plus_one_counters = 0
+    if component.get("token_enters_with_counters_source") == "x_value":
+        entering_plus_one_counters = int(component.get("e2e_x_value") or 0)
+    elif component.get("token_enters_with_plus_one_counters_from_x"):
+        entering_plus_one_counters = int(component.get("e2e_x_value") or 0)
+    elif component.get("token_enters_with_counters") is not None:
+        entering_plus_one_counters = int(component.get("token_enters_with_counters") or 0)
+    if entering_plus_one_counters:
+        expected["plus_one_counters"] = entering_plus_one_counters
+        if expected.get("power") is not None:
+            expected["power"] = int(expected["power"]) + entering_plus_one_counters
+        if expected.get("toughness") is not None:
+            expected["toughness"] = int(expected["toughness"]) + entering_plus_one_counters
     if component.get("token_cant_block"):
         expected["cant_block"] = True
     return expected
@@ -2899,7 +2919,10 @@ def spell_cast_token_maker_execution_scenario_from_expected_rule(
     rule: dict[str, Any],
 ) -> dict[str, Any] | None:
     required = dict(rule.get("required_effect_fields") or {})
-    if required.get("battle_model_scope") != "xmage_spell_cast_create_creature_token_v1":
+    if required.get("battle_model_scope") not in {
+        "xmage_spell_cast_create_creature_token_v1",
+        "xmage_simple_tap_mana_source_with_x_spell_token_counter_trigger_v1",
+    }:
         return None
     expected_count = int(required.get("trigger_token_count") or required.get("token_count") or 1)
     if expected_count <= 0:
@@ -2972,8 +2995,27 @@ def spell_cast_token_maker_execution_scenario_from_expected_rule(
         nonmatching_spell["type_line"] = matching_spell["type_line"]
         nonmatching_spell["effect"] = matching_spell.get("effect")
         nonmatching_spell["cmc"] = max(0, mana_value_min - 1)
+    if required.get("spell_cast_token_requires_x_mana_cost"):
+        x_value = max(1, int(required.get("e2e_x_value") or 2))
+        matching_spell.update({
+            "name": f"E2E X Spell for {rule['card_name']}",
+            "type_line": "Sorcery",
+            "effect": "draw_cards",
+            "mana_cost": "{X}",
+            "x_value": x_value,
+            "cmc": x_value,
+        })
+        nonmatching_spell.update({
+            "name": f"E2E Non-X Spell for {rule['card_name']}",
+            "type_line": "Sorcery",
+            "effect": "draw_cards",
+            "mana_cost": "{2}",
+            "cmc": 2,
+        })
     source_effect = str(required.get("effect") or "permanent")
-    if source_effect == "creature":
+    if required.get("source_type_line"):
+        source_type_line = str(required.get("source_type_line"))
+    elif source_effect == "creature":
         source_type_line = "Creature - Wizard"
     elif source_effect == "artifact":
         source_type_line = "Artifact"
@@ -2994,6 +3036,7 @@ def spell_cast_token_maker_execution_scenario_from_expected_rule(
         "expected_trigger": trigger,
         "expected_token": expected_token_from_component(required),
         "expected_tokens_created": expected_count,
+        "expected_x_value": int(required.get("e2e_x_value") or 0),
         "logical_rule_key": rule["logical_rule_key"],
     }
 

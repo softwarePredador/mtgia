@@ -6382,6 +6382,50 @@ def test_spell_cast_token_maker_execution_scenario_uses_matching_and_nonmatching
     assert scenario["expected_token"]["artifact"] is True
 
 
+def test_mana_source_x_spell_token_counter_scenario_uses_x_spell_and_counters() -> None:
+    rule = {
+        "normalized_name": "zaxara the exemplary",
+        "card_name": "Zaxara, the Exemplary",
+        "logical_rule_key": "battle_rule_v1:zaxara",
+        "required_effect_fields": {
+            "effect": "ramp_permanent",
+            "battle_model_scope": "xmage_simple_tap_mana_source_with_x_spell_token_counter_trigger_v1",
+            "is_mana_source": True,
+            "mana_produced": 2,
+            "produces": "WUBRG",
+            "source_type_line": "Legendary Creature - Nightmare Hydra",
+            "trigger": "spell_cast",
+            "trigger_effect": "token_maker",
+            "spell_cast_token_maker": True,
+            "spell_cast_token_requires_x_mana_cost": True,
+            "trigger_token_count": 1,
+            "token_count": 1,
+            "token_name": "Hydra Token",
+            "token_power": 0,
+            "token_toughness": 0,
+            "token_subtype": "Hydra",
+            "token_colors": ["G"],
+            "token_enters_with_counter_type": "+1/+1",
+            "token_enters_with_counters_source": "x_value",
+            "token_enters_with_plus_one_counters_from_x": True,
+            "e2e_x_value": 3,
+        },
+    }
+
+    scenario = builder.execution_scenario_from_expected_rule(rule)
+
+    assert scenario["type"] == "spell_cast_token_maker"
+    assert scenario["card"]["type_line"] == "Legendary Creature - Nightmare Hydra"
+    assert scenario["matching_spell"]["mana_cost"] == "{X}"
+    assert scenario["matching_spell"]["x_value"] == 3
+    assert scenario["nonmatching_spell"]["mana_cost"] == "{2}"
+    assert scenario["expected_token"]["name"] == "Hydra Token"
+    assert scenario["expected_token"]["power"] == 3
+    assert scenario["expected_token"]["toughness"] == 3
+    assert scenario["expected_token"]["plus_one_counters"] == 3
+    assert scenario["expected_x_value"] == 3
+
+
 def test_creature_enters_draw_execution_scenario_uses_matching_entering_creature() -> None:
     rule = {
         "normalized_name": "elemental bond",

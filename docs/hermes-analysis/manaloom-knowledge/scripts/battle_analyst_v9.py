@@ -44612,6 +44612,33 @@ def token_count_for_effect(player, effect_data, default=5, opponents=None):
     return int(token_count)
 
 
+def token_enters_with_counter_count(effect_data, default=0):
+    if not isinstance(effect_data, dict):
+        return int(default or 0)
+    source = str(effect_data.get("token_enters_with_counters_source") or "").lower()
+    if source == "x_value" or effect_data.get("token_enters_with_plus_one_counters_from_x"):
+        return x_value_from_effect_context(effect_data, default=default)
+    return max(0, int(effect_data.get("token_enters_with_counters") or default or 0))
+
+
+def apply_token_entering_counters(token, effect_data):
+    if not isinstance(token, dict) or not isinstance(effect_data, dict):
+        return 0
+    counter_count = token_enters_with_counter_count(effect_data)
+    if counter_count <= 0:
+        return 0
+    counter_type = str(effect_data.get("token_enters_with_counter_type") or "+1/+1")
+    if counter_type == "+1/+1":
+        add_plus_one_counters(token, counter_count)
+    elif counter_type == "-1/-1":
+        add_minus_one_counters(token, counter_count)
+    else:
+        add_named_counters(token, counter_type, counter_count)
+    token["entered_with_counter_type"] = counter_type
+    token["entered_with_counters"] = counter_count
+    return counter_count
+
+
 def attack_each_opponent_tokens_runtime_enabled(effect_data):
     return runtime_executor_status_enabled(
         (effect_data or {}).get("attack_each_opponent_this_turn_status")
@@ -44686,6 +44713,7 @@ def create_creature_tokens_from_effect(
     token_colors = (effect_data or {}).get("token_colors") or []
     capped_token_count = min(max(0, token_count), 20)
     per_opponent = (effect_data or {}).get("token_count_per_opponent")
+    counters_added_total = 0
     if (
         count is None
         and per_opponent not in (None, "", False)
@@ -44741,12 +44769,13 @@ def create_creature_tokens_from_effect(
                         active_player=active_player,
                         all_players=all_players,
                     )
-                    _mark_token_must_attack_defender_until_eot(
-                        token,
-                        opponent,
-                        source_card_name,
-                        turn,
-                    )
+                counters_added_total += apply_token_entering_counters(token, effect_data)
+                _mark_token_must_attack_defender_until_eot(
+                    token,
+                    opponent,
+                    source_card_name,
+                    turn,
+                )
                 defender_tokens += 1
                 created += 1
             if defender_tokens:
@@ -44756,11 +44785,12 @@ def create_creature_tokens_from_effect(
                 })
         if isinstance(effect_data, dict):
             effect_data["_last_token_attack_assignments"] = assignments
+            effect_data["_last_token_entering_counters_added"] = counters_added_total
         return token_count
 
     for _ in range(capped_token_count):
         if token_artifact_only:
-            create_artifact_token(
+            token = create_artifact_token(
                 player,
                 name=token_name,
                 subtype=token_subtype,
@@ -44772,7 +44802,7 @@ def create_creature_tokens_from_effect(
                 all_players=all_players,
             )
         else:
-            create_creature_token(
+            token = create_creature_token(
                 player,
                 name=token_name,
                 power=token_power,
@@ -44799,6 +44829,9 @@ def create_creature_tokens_from_effect(
                 active_player=active_player,
                 all_players=all_players,
             )
+        counters_added_total += apply_token_entering_counters(token, effect_data)
+    if isinstance(effect_data, dict):
+        effect_data["_last_token_entering_counters_added"] = counters_added_total
     return token_count
 
 
@@ -60390,26 +60423,41 @@ def trigger_spell_cast_engines(
             ):
                 continue
             token_count = max(1, int(permanent.get("trigger_token_count") or permanent.get("token_count") or 1))
+            trigger_x_value = _cast_x_value_for_trigger(spell, permanent)
 
             def resolve_generic_spell_cast_token_maker_trigger(
                 permanent=permanent,
                 token_count=token_count,
+                trigger_x_value=trigger_x_value,
             ):
                 life_loss = int(permanent.get("controller_loses_life_on_trigger") or 0)
                 life_before = player.life
                 if life_loss > 0:
                     change_life(player, -life_loss)
-                created = create_creature_tokens_from_effect(
-                    player,
-                    permanent,
-                    count=token_count,
-                    opponents=opponents,
-                    turn=turn,
-                    source_event=f"{trigger_kind}_token_maker",
-                    stack=stack,
-                    active_player=active_player,
-                    all_players=all_players,
-                )
+                previous_cast_context = permanent.get("_cast_context") if isinstance(permanent, dict) else None
+                if isinstance(permanent, dict):
+                    permanent["_cast_context"] = {"x_value": trigger_x_value}
+                try:
+                    created = create_creature_tokens_from_effect(
+                        player,
+                        permanent,
+                        count=token_count,
+                        opponents=opponents,
+                        turn=turn,
+                        source_event=f"{trigger_kind}_token_maker",
+                        stack=stack,
+                        active_player=active_player,
+                        all_players=all_players,
+                    )
+                    token_entering_counters_added = int(
+                        permanent.get("_last_token_entering_counters_added") or 0
+                    )
+                finally:
+                    if isinstance(permanent, dict):
+                        if previous_cast_context is None:
+                            permanent.pop("_cast_context", None)
+                        else:
+                            permanent["_cast_context"] = previous_cast_context
                 emit_replay_event(
                     "trigger_resolved",
                     player=player.name,
@@ -60439,13 +60487,19 @@ def trigger_spell_cast_engines(
                     spell_cast_token_requires_historic=bool(
                         permanent.get("spell_cast_token_requires_historic")
                     ),
+                    spell_cast_token_requires_x_mana_cost=bool(
+                        permanent.get("spell_cast_token_requires_x_mana_cost")
+                    ),
                     spell_cast_token_mana_value_min=int(
                         permanent.get("spell_cast_token_mana_value_min") or 0
                     ),
+                    x_value=trigger_x_value,
                     controller_life_lost=max(0, life_before - player.life),
                     life_before=life_before,
                     life_after=player.life,
                     tokens_created=created,
+                    token_entering_counter_type=permanent.get("token_enters_with_counter_type"),
+                    token_entering_counters_added=token_entering_counters_added,
                     token_name=permanent.get("token_name") or permanent.get("spell_cast_token_name") or "Token",
                     token_power=permanent.get("token_power"),
                     token_toughness=permanent.get("token_toughness") or permanent.get("token_power"),
@@ -62500,6 +62554,8 @@ def spell_cast_token_filter_matches(permanent, controller, spell, *, source_zone
         return False
     required_zone = str(permanent.get("spell_cast_token_source_zone") or "").strip().lower()
     if required_zone and str(source_zone or "hand").strip().lower() != required_zone:
+        return False
+    if permanent.get("spell_cast_token_requires_x_mana_cost") and not _spell_has_x_in_mana_cost(spell):
         return False
     required_types = [
         str(value).strip().lower()

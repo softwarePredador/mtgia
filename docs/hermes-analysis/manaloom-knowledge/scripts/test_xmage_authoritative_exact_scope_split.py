@@ -33730,6 +33730,63 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
             ],
         )
 
+    def test_mana_source_x_spell_token_counter_trigger_maps_zaxara(self) -> None:
+        proposal, reason = split.split_row(
+            queue_row(
+                "ramp_permanent::xmage_creature_mana_source_variant_review_v1",
+                effect_classes=[
+                    "AddManaOfAnyColorEffect",
+                    "OneShotEffect",
+                    "ZaxaraTheExemplaryHydraTokenEffect",
+                ],
+                ability_kind="activated_mana",
+                ability_classes=[
+                    "DeathtouchAbility",
+                    "SimpleManaAbility",
+                    "ZaxaraTheExemplaryHydraTokenAbility",
+                ],
+            ),
+            metadata(
+                name="Zaxara, the Exemplary",
+                type_line="Legendary Creature - Nightmare Hydra",
+                mana_cost="{1}{B}{G}{U}",
+                oracle_text=(
+                    "Deathtouch\n"
+                    "{T}: Add two mana of any one color.\n"
+                    "Whenever you cast a spell with {X} in its mana cost, create a 0/0 green Hydra "
+                    "creature token, then put X +1/+1 counters on it."
+                ),
+            ),
+            source_text="""
+                this.addAbility(DeathtouchAbility.getInstance());
+                Ability ability = new SimpleManaAbility(Zone.BATTLEFIELD, new AddManaOfAnyColorEffect(2), new TapSourceCost());
+                this.addAbility(ability);
+                this.addAbility(new ZaxaraTheExemplaryHydraTokenAbility());
+                if (spell == null || !spell.getSpellAbility().getManaCostsToPay().containsX()) {
+                    return false;
+                }
+                class ZaxaraTheExemplaryHydraTokenEffect extends OneShotEffect {}
+                Token hydraToken = new ZaxaraTheExemplaryHydraToken();
+                permanent.addCounters(CounterType.P1P1.createInstance(xValue), source.getControllerId(), source, game);
+            """,
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        self.assertTrue(proposal["safe_for_batch_pg_package"])
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.MANA_WITH_X_SPELL_TOKEN_COUNTER_TRIGGER_SCOPE)
+        self.assertEqual(effect["mana_produced"], 2)
+        self.assertEqual(effect["produces"], "WUBRG")
+        self.assertNotIn("produced_mana_symbols", effect)
+        self.assertTrue(effect["spell_cast_token_requires_x_mana_cost"])
+        self.assertEqual(effect["token_name"], "Hydra Token")
+        self.assertEqual(effect["token_power"], 0)
+        self.assertEqual(effect["token_toughness"], 0)
+        self.assertEqual(effect["token_subtype"], "Hydra")
+        self.assertEqual(effect["token_colors"], ["G"])
+        self.assertEqual(effect["token_enters_with_counters_source"], "x_value")
+        self.assertEqual(effect["keywords"], ["deathtouch"])
+
     def test_mana_spent_dragon_etb_replacement_maps_to_exact_runtime_scope(self) -> None:
         proposal, reason = split.split_row(
             queue_row(

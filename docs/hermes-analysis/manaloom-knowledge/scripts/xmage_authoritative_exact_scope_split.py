@@ -354,6 +354,7 @@ MANA_WITH_ETB_DRAW_SCOPE = "xmage_simple_mana_source_with_etb_draw_v1"
 MANA_WITH_ETB_RETURN_LANDS_SCOPE = "xmage_simple_mana_source_with_etb_return_lands_to_hand_v1"
 MANA_SPENT_CAST_TRIGGER_SCOPE = "xmage_simple_tap_mana_source_with_mana_spent_cast_trigger_v1"
 MANA_ACTIVATION_NEXT_CAST_X_TRIGGER_SCOPE = "xmage_simple_tap_mana_source_with_next_cast_x_trigger_v1"
+MANA_WITH_X_SPELL_TOKEN_COUNTER_TRIGGER_SCOPE = "xmage_simple_tap_mana_source_with_x_spell_token_counter_trigger_v1"
 ETB_FIXED_MANA_CREATURE_SCOPE = "xmage_creature_etb_add_fixed_mana_v1"
 SELF_SACRIFICE_MANA_SOURCE_SCOPE = "xmage_self_sacrifice_mana_source_permanent_v1"
 TAP_AND_SELF_SACRIFICE_MANA_SOURCE_SCOPE = "xmage_tap_and_self_sacrifice_mana_source_permanent_v1"
@@ -26615,6 +26616,71 @@ def mana_activation_next_cast_x_trigger_source_blocker(source_text: str, detail:
     return None
 
 
+def mana_source_x_spell_token_counter_trigger_detail_from_oracle(
+    metadata: dict[str, Any],
+) -> dict[str, Any] | None:
+    lines = [strip_parenthetical_reminders(line) for line in normalized_oracle_lines(metadata)]
+    mana_lines = [line for line in lines if line.startswith("{t}: add ")]
+    trigger_lines = [
+        line
+        for line in lines
+        if line.startswith("whenever you cast a spell with {x} in its mana cost, ")
+    ]
+    if len(mana_lines) != 1 or len(trigger_lines) != 1:
+        return None
+    mana_match = re.fullmatch(r"\{t\}: add (?P<mana>.+?)\.?", mana_lines[0])
+    trigger_match = re.fullmatch(
+        r"whenever you cast a spell with \{x\} in its mana cost, "
+        r"create a 0/0 green hydra creature token, then put x \+1/\+1 counters on it\.?",
+        trigger_lines[0],
+    )
+    if not mana_match or not trigger_match:
+        return None
+    mana_detail = mana_detail_from_add_phrase(mana_match.group("mana"))
+    if mana_detail is None:
+        return None
+    return {
+        **mana_detail,
+        "mana_activation_requires_tap": True,
+        "trigger": "spell_cast",
+        "trigger_effect": "token_maker",
+        "spell_cast_token_maker": True,
+        "spell_cast_token_requires_x_mana_cost": True,
+        "spell_cast_token_count_source": "fixed",
+        "trigger_token_count": 1,
+        "token_count": 1,
+        "token_name": "Hydra Token",
+        "token_power": 0,
+        "token_toughness": 0,
+        "token_subtype": "Hydra",
+        "token_colors": ["G"],
+        "token_enters_with_counter_type": "+1/+1",
+        "token_enters_with_counters_source": "x_value",
+        "token_enters_with_plus_one_counters_from_x": True,
+        "e2e_x_value": 2,
+    }
+
+
+def mana_source_x_spell_token_counter_trigger_source_blocker(
+    source_text: str,
+    detail: dict[str, Any],
+) -> str | None:
+    text = source_text or ""
+    required_markers = [
+        "ZaxaraTheExemplaryHydraTokenAbility",
+        "ZaxaraTheExemplaryHydraTokenEffect",
+        "containsX()",
+        "ZaxaraTheExemplaryHydraToken",
+        "CounterType.P1P1.createInstance(xValue)",
+    ]
+    for marker in required_markers:
+        if marker not in text:
+            return "mana_source_x_spell_token_counter_source_mismatch"
+    if str(detail.get("produces") or "") != "WUBRG" or int(detail.get("mana_produced") or 0) != 2:
+        return "mana_source_x_spell_token_counter_oracle_mana_mismatch"
+    return None
+
+
 def simple_mana_source_from_oracle(metadata: dict[str, Any]) -> tuple[str, int] | None:
     detail = simple_mana_source_detail_from_oracle(metadata)
     if detail is None:
@@ -41688,6 +41754,80 @@ def split_row(
                 metadata,
                 effect_json,
                 family_id="xmage_mana_activation_next_cast_x_trigger_mana_source",
+            ), "selected_exact_scope"
+        x_spell_token_counter_detail = mana_source_x_spell_token_counter_trigger_detail_from_oracle(metadata)
+        if x_spell_token_counter_detail is not None:
+            source_blocker = simple_mana_source_source_blocker(
+                source_text,
+                mana_ability_classes,
+                x_spell_token_counter_detail,
+            )
+            if source_blocker:
+                return None, source_blocker
+            trigger_source_blocker = mana_source_x_spell_token_counter_trigger_source_blocker(
+                source_text,
+                x_spell_token_counter_detail,
+            )
+            if trigger_source_blocker:
+                return None, trigger_source_blocker
+            type_line = str(metadata.get("type_line") or "").lower()
+            permanent_type = (
+                "creature"
+                if "creature" in type_line
+                else "artifact"
+                if "artifact" in type_line
+                else "permanent"
+            )
+            mana_requires_tap = bool(x_spell_token_counter_detail.get("mana_activation_requires_tap", True))
+            effect_json = {
+                "effect": "ramp_permanent",
+                "battle_model_scope": MANA_WITH_X_SPELL_TOKEN_COUNTER_TRIGGER_SCOPE,
+                "is_mana_source": True,
+                "mana_produced": int(x_spell_token_counter_detail["mana_produced"]),
+                "produces": str(x_spell_token_counter_detail["produces"]),
+                "activation_requires_tap": mana_requires_tap,
+                "mana_activation_requires_tap": mana_requires_tap,
+                "permanent_type": permanent_type,
+                "ability_kind": "activated_mana",
+                "source_type_line": str(metadata.get("type_line") or ""),
+                "source_mana_cost": str(metadata.get("mana_cost") or ""),
+                "xmage_mana_ability_classes": sorted(
+                    mana_ability_classes & SAFE_MANA_ABILITY_CLASSES
+                ),
+                "xmage_auxiliary_ability_classes": sorted(auxiliary_abilities),
+                "xmage_effect_classes": sorted(classes),
+                "xmage_ability_classes": sorted(mana_ability_classes),
+                **{
+                    key: value
+                    for key, value in x_spell_token_counter_detail.items()
+                    if key
+                    not in {
+                        "mana_produced",
+                        "produces",
+                        "produced_mana_symbols",
+                        "mana_activation_requires_tap",
+                    }
+                },
+            }
+            if x_spell_token_counter_detail.get("produced_mana_symbols"):
+                effect_json["produced_mana_symbols"] = list(
+                    x_spell_token_counter_detail["produced_mana_symbols"]
+                )
+            static_keywords = sorted(
+                {
+                    STATIC_SELF_KEYWORD_ABILITY_CLASSES[ability]
+                    for ability in auxiliary_abilities
+                    if ability in STATIC_SELF_KEYWORD_ABILITY_CLASSES
+                }
+            )
+            if static_keywords:
+                effect_json["keywords"] = static_keywords
+            add_mana_source_activation_detail_fields(effect_json, x_spell_token_counter_detail)
+            return build_proposal(
+                row,
+                metadata,
+                effect_json,
+                family_id="xmage_simple_mana_source_with_x_spell_token_counter_trigger",
             ), "selected_exact_scope"
         if limited_choice_mana_supported:
             mana_source_detail = limited_times_mana_source_detail_from_oracle(metadata)

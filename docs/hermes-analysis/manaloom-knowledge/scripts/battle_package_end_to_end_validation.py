@@ -490,6 +490,8 @@ def token_matches_expected(battle, token: dict[str, Any], expected: dict[str, An
         return False, f"power={token.get('power')}"
     if expected.get("toughness") is not None and int(token.get("toughness") or 0) != int(expected["toughness"]):
         return False, f"toughness={token.get('toughness')}"
+    if expected.get("plus_one_counters") is not None and int(token.get("plus_one_counters") or 0) != int(expected["plus_one_counters"]):
+        return False, f"plus_one_counters={token.get('plus_one_counters')}"
     expected_subtype = expected.get("subtype")
     if expected_subtype and str(expected_subtype) not in str(token.get("type_line") or ""):
         return False, f"type_line={token.get('type_line')!r}"
@@ -2183,6 +2185,21 @@ def run_spell_cast_token_maker(
             "battle_events",
             f"{card['name']} trigger={event.get('trigger')!r}, expected {expected_trigger!r}",
         )
+    expected_x_value = scenario.get("expected_x_value")
+    if expected_x_value not in (None, "", 0) and int(event.get("x_value") or 0) != int(expected_x_value):
+        fail(
+            "battle_events",
+            f"{card['name']} x_value={event.get('x_value')!r}, expected {expected_x_value!r}",
+        )
+    expected_entering_counters = sum(
+        int(token.get("count") or 1) * int(token.get("plus_one_counters") or 0)
+        for token in expected_tokens
+    )
+    if expected_entering_counters and int(event.get("token_entering_counters_added") or 0) != expected_entering_counters:
+        fail(
+            "battle_events",
+            f"{card['name']} token_entering_counters_added={event.get('token_entering_counters_added')}, expected {expected_entering_counters}",
+        )
     return {
         "scenario": scenario.get("name"),
         "card_name": card["name"],
@@ -2190,6 +2207,8 @@ def run_spell_cast_token_maker(
         "trigger": event.get("trigger"),
         "trigger_spell": event.get("trigger_spell"),
         "token_names": sorted(token.get("name") for token in matches),
+        "token_plus_one_counters": sorted(int(token.get("plus_one_counters") or 0) for token in matches),
+        "x_value": int(event.get("x_value") or 0),
     }
 
 

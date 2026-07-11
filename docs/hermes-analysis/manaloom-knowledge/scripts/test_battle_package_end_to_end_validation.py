@@ -6853,6 +6853,92 @@ def test_spell_cast_token_maker_runner_blocks_nonmatching_and_resolves_matching_
     assert result["token_names"] == ["Soldier Token"]
 
 
+def test_spell_cast_token_maker_runner_applies_x_value_token_counters() -> None:
+    battle = validator.load_battle(validator.DEFAULT_BATTLE)
+    events = []
+    previous_handler = battle.REPLAY_EVENT_HANDLER
+    previous_get_card_effect = battle.get_card_effect
+    battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+    battle.get_card_effect = lambda card: {
+        "effect": "ramp_permanent",
+        "battle_model_scope": "xmage_simple_tap_mana_source_with_x_spell_token_counter_trigger_v1",
+        "is_mana_source": True,
+        "mana_produced": 2,
+        "produces": "WUBRG",
+        "trigger": "spell_cast",
+        "trigger_effect": "token_maker",
+        "spell_cast_token_maker": True,
+        "spell_cast_token_requires_x_mana_cost": True,
+        "trigger_token_count": 1,
+        "token_count": 1,
+        "token_name": "Hydra Token",
+        "token_power": 0,
+        "token_toughness": 0,
+        "token_subtype": "Hydra",
+        "token_colors": ["G"],
+        "token_enters_with_counter_type": "+1/+1",
+        "token_enters_with_counters_source": "x_value",
+        "token_enters_with_plus_one_counters_from_x": True,
+        "_rule_logical_key": "battle_rule_v1:zaxara",
+    }
+    try:
+        result = validator.run_spell_cast_token_maker(
+            battle,
+            {
+                "name": "Zaxara creates a countered Hydra when X spell is cast",
+                "type": "spell_cast_token_maker",
+                "card": {
+                    "name": "Zaxara, the Exemplary",
+                    "type_line": "Legendary Creature - Nightmare Hydra",
+                    "effect": "ramp_permanent",
+                },
+                "matching_spell": {
+                    "name": "X Sorcery",
+                    "type_line": "Sorcery",
+                    "mana_cost": "{X}",
+                    "x_value": 4,
+                    "cmc": 4,
+                },
+                "nonmatching_spell": {
+                    "name": "Fixed Sorcery",
+                    "type_line": "Sorcery",
+                    "mana_cost": "{2}",
+                    "cmc": 2,
+                },
+                "expected_trigger": "spell_cast",
+                "expected_tokens_created": 1,
+                "expected_x_value": 4,
+                "expected_token": {
+                    "name": "Hydra Token",
+                    "count": 1,
+                    "power": 4,
+                    "toughness": 4,
+                    "subtype": "Hydra",
+                    "colors": ["G"],
+                    "plus_one_counters": 4,
+                },
+                "logical_rule_key": "battle_rule_v1:zaxara",
+            },
+            events,
+        )
+    finally:
+        battle.REPLAY_EVENT_HANDLER = previous_handler
+        battle.get_card_effect = previous_get_card_effect
+
+    assert result["card_name"] == "Zaxara, the Exemplary"
+    assert result["tokens_created"] == 1
+    assert result["trigger_spell"] == "X Sorcery"
+    assert result["token_names"] == ["Hydra Token"]
+    assert result["token_plus_one_counters"] == [4]
+    assert result["x_value"] == 4
+    assert any(
+        event == "trigger_resolved"
+        and data.get("token_entering_counters_added") == 4
+        and data.get("x_value") == 4
+        for event, data in events
+    )
+
+
 def test_modal_damage_or_destroy_runner_executes_chosen_destroy_mode() -> None:
     battle = validator.load_battle(validator.DEFAULT_BATTLE)
     events = []
