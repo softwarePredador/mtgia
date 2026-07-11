@@ -16112,6 +16112,8 @@ def parse_mana_cost_text(cost_text: str) -> tuple[int, list[str]] | None:
         normalized = str(symbol or "").strip().upper()
         if normalized.isdigit():
             generic += int(normalized)
+        elif normalized == "S":
+            generic += 1
         elif normalized in {"W", "U", "B", "R", "G"}:
             colors.append(normalized)
         elif re.fullmatch(r"[WUBRG](?:/[WUBRG])+", normalized):
@@ -16456,7 +16458,7 @@ def activation_cost_from_oracle_prefix(
     mana_text = re.sub(r"\s*,?\s*\{t\}\s*,?\s*", "", text).strip()
     if mana_text in {"", ","}:
         mana_text = "{0}"
-    if not re.fullmatch(r"(?:\{[0-9wubrgp/]+\})+", mana_text):
+    if not re.fullmatch(r"(?:\{[0-9wubrgsp/]+\})+", mana_text):
         return "activated_self_boost_oracle_cost_not_supported"
     canonical = re.sub(
         r"\{([^}]+)\}",
@@ -16654,14 +16656,37 @@ def activated_life_gain_from_source(source: str) -> dict[str, Any] | str:
 
 
 def activated_self_boost_from_oracle(metadata: dict[str, Any]) -> dict[str, Any] | str:
-    text = re.sub(r"\s+", " ", oracle_text_after_leading_static_keywords(metadata)).strip().lower()
+    text = strip_parenthetical_reminders(oracle_text_after_leading_static_keywords(metadata))
+    text = re.sub(r"\s+", " ", text).strip().lower()
     if text.count(":") != 1:
         return "activated_self_boost_oracle_not_simple"
     cost_text, effect_text = [part.strip() for part in text.split(":", 1)]
     activation_limit_per_turn = None
-    if effect_text.endswith("activate only once each turn."):
-        activation_limit_per_turn = 1
-        effect_text = effect_text[: -len("activate only once each turn.")].strip()
+    limit_words = {
+        "once": 1,
+        "one": 1,
+        "twice": 2,
+        "two": 2,
+        "three": 3,
+        "four": 4,
+        "five": 5,
+        "six": 6,
+        "seven": 7,
+        "eight": 8,
+        "nine": 9,
+    }
+    limit_match = re.search(
+        r"\s+activate(?: this ability)? (?:(?:only (?P<only>once|one|\d+))|"
+        r"(?:no more than (?P<limit>once|one|twice|two|three|four|five|six|seven|eight|nine|\d+)"
+        r"(?: times?)?)) each turn\.?$",
+        effect_text,
+    )
+    if limit_match:
+        raw_limit = (limit_match.group("only") or limit_match.group("limit") or "").strip()
+        activation_limit_per_turn = int(raw_limit) if raw_limit.isdigit() else limit_words.get(raw_limit)
+        if not activation_limit_per_turn or activation_limit_per_turn <= 0:
+            return "activated_self_boost_oracle_activation_limit_not_supported"
+        effect_text = effect_text[: limit_match.start()].strip()
     elif "activate only" in effect_text or "activate no more than" in effect_text:
         return "activated_self_boost_oracle_activation_limit_not_supported"
     card_name = normalize_name(str(metadata.get("name") or ""))
@@ -16770,9 +16795,14 @@ def activated_self_boost_from_source(source: str) -> dict[str, Any] | str:
             return "activated_self_boost_source_activation_limit_not_supported"
         split_args = split_top_level_args(args)
         if len(split_args) >= 4:
-            if not re.fullmatch(r"1", split_args[3].strip()):
+            activation_limit_text = split_args[3].strip()
+            if not re.fullmatch(r"\d+", activation_limit_text):
                 return "activated_self_boost_source_activation_limit_not_supported"
-        activation_limit_per_turn = 1
+            activation_limit_per_turn = int(activation_limit_text)
+            if activation_limit_per_turn <= 0:
+                return "activated_self_boost_source_activation_limit_not_supported"
+        else:
+            activation_limit_per_turn = 1
     activation = activated_self_boost_cost_from_source(window)
     if isinstance(activation, str):
         return activation

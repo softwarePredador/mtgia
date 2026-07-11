@@ -2783,6 +2783,9 @@ def _manifest_mana_for_activation_cost(cost: str | None) -> dict[str, int]:
         if token.isdigit():
             mana["generic"] += int(token)
             continue
+        if token == "S":
+            mana["generic"] += 1
+            continue
         if "/" in token:
             token = token.split("/", 1)[0]
         color = {

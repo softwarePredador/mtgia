@@ -8055,18 +8055,6 @@ def run_simple_activated_self_boost(
             "battle_execution",
             f"{card['name']} source tapped={bool(source.get('tapped'))}, expected {expected_tapped_source}",
         )
-    if expected_limit:
-        add_manifest_mana(active, scenario.get("controller_mana") or {})
-        second_activation = battle.activate_generic_self_boost_permanent(
-            active,
-            [active],
-            source,
-            turn=turn,
-            rng=random.Random(int(scenario.get("seed") or 6073) + 1),
-            phase=str(scenario.get("phase") or "precombat_main"),
-        )
-        if second_activation:
-            fail("battle_execution", f"{card['name']} activated self boost exceeded per-turn limit")
     activation_event = next(
         (
             data
@@ -8117,6 +8105,35 @@ def run_simple_activated_self_boost(
     )
     if resolved_event is None:
         fail("battle_events", f"missing {card['name']} simple activated self boost resolved event")
+    extra_activations = 0
+    if expected_limit:
+        for activation_index in range(2, expected_limit + 1):
+            add_manifest_mana(active, scenario.get("controller_mana") or {})
+            allowed_activation = battle.activate_generic_self_boost_permanent(
+                active,
+                [active],
+                source,
+                turn=turn,
+                rng=random.Random(int(scenario.get("seed") or 6073) + activation_index),
+                phase=str(scenario.get("phase") or "precombat_main"),
+            )
+            if not allowed_activation:
+                fail(
+                    "battle_execution",
+                    f"{card['name']} activated self boost failed before per-turn limit {expected_limit}",
+                )
+            extra_activations += 1
+        add_manifest_mana(active, scenario.get("controller_mana") or {})
+        exceeded_activation = battle.activate_generic_self_boost_permanent(
+            active,
+            [active],
+            source,
+            turn=turn,
+            rng=random.Random(int(scenario.get("seed") or 6073) + expected_limit + 1),
+            phase=str(scenario.get("phase") or "precombat_main"),
+        )
+        if exceeded_activation:
+            fail("battle_execution", f"{card['name']} activated self boost exceeded per-turn limit")
     return {
         "scenario": scenario.get("name"),
         "card_name": card["name"],
@@ -8125,6 +8142,7 @@ def run_simple_activated_self_boost(
         "power_delta": expected_power_delta,
         "toughness_delta": expected_toughness_delta,
         "activation_limit_per_turn": expected_limit,
+        "extra_activations": extra_activations,
         "discarded_count": len(discarded),
         "life_paid": expected_life_paid,
     }

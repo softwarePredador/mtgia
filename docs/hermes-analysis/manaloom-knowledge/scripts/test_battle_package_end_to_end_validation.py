@@ -3627,6 +3627,72 @@ def test_simple_activated_self_boost_runner_executes_extra_costs() -> None:
     assert result["life_paid"] == 1
 
 
+def test_simple_activated_self_boost_runner_respects_limit_above_one() -> None:
+    battle = validator.load_battle(validator.DEFAULT_BATTLE)
+    events = []
+    previous_handler = battle.REPLAY_EVENT_HANDLER
+    previous_get_card_effect = battle.get_card_effect
+    battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+    battle.get_card_effect = lambda card: {
+        "effect": "creature",
+        "battle_model_scope": "xmage_permanent_simple_activated_self_boost_until_eot_v1",
+        "activated_effect": "self_stat_modifier_until_eot",
+        "activated_battle_model_scope": "xmage_permanent_simple_activated_self_boost_until_eot_v1",
+        "target": "self",
+        "target_controller": "self",
+        "target_constraints": {"source": "self", "card_types": ["creature"]},
+        "power_delta": 1,
+        "toughness_delta": 0,
+        "power_boost": 1,
+        "toughness_boost": 0,
+        "activation_cost_mana": "{B}",
+        "activation_cost_generic": 0,
+        "activation_cost_colors": ["B"],
+        "activation_requires_tap": False,
+        "activation_life_cost": 1,
+        "activation_limit_per_turn": 3,
+        "_rule_logical_key": "battle_rule_v1:sewer-rats",
+    }
+    try:
+        result = validator.run_simple_activated_self_boost(
+            battle,
+            {
+                "name": "Sewer Rats pumps itself three times",
+                "type": "simple_activated_self_boost",
+                "card": {
+                    "name": "Sewer Rats",
+                    "type_line": "Creature - Rat",
+                    "power": 1,
+                    "toughness": 1,
+                },
+                "controller_mana": {"black": 1},
+                "expected_power_delta": 1,
+                "expected_toughness_delta": 0,
+                "expected_life_paid": 1,
+                "expected_activation_limit_per_turn": 3,
+                "logical_rule_key": "battle_rule_v1:sewer-rats",
+            },
+            events,
+        )
+    finally:
+        battle.REPLAY_EVENT_HANDLER = previous_handler
+        battle.get_card_effect = previous_get_card_effect
+
+    assert result["card_name"] == "Sewer Rats"
+    assert result["source_power"] == 4
+    assert result["activation_limit_per_turn"] == 3
+    assert result["extra_activations"] == 2
+    activation_events = [
+        data
+        for event, data in events
+        if event == "activated_ability"
+        and data.get("card") == "Sewer Rats"
+        and data.get("activation_kind") == "simple_activated_self_boost"
+    ]
+    assert len(activation_events) == 3
+    assert all(data.get("activation_limit_per_turn") == 3 for data in activation_events)
+
+
 def test_simple_activated_regenerate_source_runner_consumes_shield_on_destroy() -> None:
     battle = validator.load_battle(validator.DEFAULT_BATTLE)
     events = []

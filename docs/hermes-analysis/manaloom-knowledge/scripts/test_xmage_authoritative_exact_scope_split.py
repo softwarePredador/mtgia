@@ -11756,7 +11756,7 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
                 self.assertEqual(effect["activation_cost_colors"], colors)
                 self.assertEqual(effect["activation_requires_tap"], requires_tap)
 
-    def test_permanent_activated_tap_target_blocks_snow_cost(self) -> None:
+    def test_permanent_activated_tap_target_maps_snow_cost(self) -> None:
         row = queue_row(
             split.TAP_TARGET_PERMANENT_UNIT,
             effect_classes=["TapTargetEffect"],
@@ -11782,8 +11782,14 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
             """,
         )
 
-        self.assertIsNone(proposal)
-        self.assertEqual(reason, "activated_tap_target_oracle_cost_not_supported")
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.PERMANENT_ACTIVATED_TAP_TARGET_SCOPE)
+        self.assertEqual(effect["activation_cost_mana"], "{S}")
+        self.assertEqual(effect["activation_cost_generic"], 1)
+        self.assertEqual(effect["activation_cost_colors"], [])
+        self.assertTrue(effect["activation_requires_tap"])
+        self.assertEqual(effect["target"], "artifact_or_creature")
 
     def test_permanent_activated_tap_target_blocks_variable_target_count(self) -> None:
         row = queue_row(
@@ -23838,7 +23844,42 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertEqual(effect["xmage_ability_class"], "LimitedTimesPerTurnActivatedAbility")
         self.assertEqual(effect["_activated_rule_effects"][0]["activation_limit_per_turn"], 1)
 
-    def test_limited_activated_self_boost_rejects_three_times_per_turn(self) -> None:
+    def test_limited_activated_self_boost_maps_snow_cost_with_reminder(self) -> None:
+        row = queue_row(
+            "xmage_signature::BoostSourceEffect::LimitedTimesPerTurnActivatedAbility::"
+            "no_target_class::no_condition_class::activated_ability",
+            effect_classes=["BoostSourceEffect"],
+            ability_kind="activated",
+            ability_classes=["LimitedTimesPerTurnActivatedAbility"],
+            xmage_signals=["activated_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Frostwalla",
+                type_line="Snow Creature - Lizard",
+                oracle_text=(
+                    "{S}: This creature gets +2/+2 until end of turn. "
+                    "Activate only once each turn. "
+                    "({S} can be paid with one mana from a snow source.)"
+                ),
+            ),
+            source_text=(
+                "this.addAbility(new LimitedTimesPerTurnActivatedAbility("
+                "Zone.BATTLEFIELD, new BoostSourceEffect(2, 2, Duration.EndOfTurn), "
+                'new ManaCostsImpl<>("{S}")));'
+            ),
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.SELF_BOOST_ACTIVATED_SCOPE)
+        self.assertEqual(effect["activation_cost_mana"], "{S}")
+        self.assertEqual(effect["activation_cost_generic"], 1)
+        self.assertEqual(effect["activation_cost_colors"], [])
+        self.assertEqual(effect["activation_limit_per_turn"], 1)
+
+    def test_limited_activated_self_boost_maps_three_times_per_turn(self) -> None:
         row = queue_row(
             "xmage_signature::BoostSourceEffect::LimitedTimesPerTurnActivatedAbility::"
             "no_target_class::no_condition_class::activated_ability",
@@ -23865,8 +23906,13 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
             ),
         )
 
-        self.assertIsNone(proposal)
-        self.assertEqual(reason, "activated_self_boost_oracle_activation_limit_not_supported")
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.SELF_BOOST_ACTIVATED_SCOPE)
+        self.assertEqual(effect["activation_limit_per_turn"], 3)
+        self.assertEqual(effect["activation_life_cost"], 1)
+        self.assertEqual(effect["activation_cost_mana"], "{B}")
+        self.assertEqual(effect["_activated_rule_effects"][0]["activation_limit_per_turn"], 3)
 
     def test_activated_self_keyword_maps_to_keyword_until_eot(self) -> None:
         row = queue_row(
@@ -24853,7 +24899,7 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertEqual(effect["activation_sacrifice_target"], "artifact")
         self.assertEqual(effect["_activated_rule_effects"][0]["activation_sacrifice_target"], "artifact")
 
-    def test_activated_target_keyword_blocks_snow_mana_cost_until_supported(self) -> None:
+    def test_activated_target_keyword_maps_snow_mana_cost(self) -> None:
         row = queue_row(
             split.BOOST_KEYWORD_UNIT,
             effect_classes=["GainAbilityTargetEffect"],
@@ -24878,8 +24924,15 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
             ),
         )
 
-        self.assertIsNone(proposal)
-        self.assertEqual(reason, "activated_target_keyword_oracle_cost_not_supported")
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.TARGET_KEYWORD_ACTIVATED_SCOPE)
+        self.assertEqual(effect["activation_cost_mana"], "{2}{S}")
+        self.assertEqual(effect["activation_cost_generic"], 3)
+        self.assertEqual(effect["activation_cost_colors"], [])
+        self.assertEqual(effect["target"], "creature")
+        self.assertEqual(effect["target_constraints"], {"card_types": ["creature"], "required_supertypes": ["snow"]})
+        self.assertEqual(effect["granted_keywords_until_eot"], ["first_strike"])
 
     def test_activated_target_keyword_allows_trailing_reminder_text(self) -> None:
         row = queue_row(
