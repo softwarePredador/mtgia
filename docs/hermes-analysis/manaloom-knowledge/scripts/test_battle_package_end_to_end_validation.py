@@ -258,6 +258,48 @@ def test_fixed_damage_target_spell_runner_pays_return_land_cost() -> None:
     assert result["additional_cost"] == "return_land_to_hand"
 
 
+def test_beginning_end_step_draw_runner_executes_conditioned_draw() -> None:
+    battle = validator.load_battle(validator.DEFAULT_BATTLE)
+    events = []
+    previous_handler = battle.REPLAY_EVENT_HANDLER
+    previous_get_card_effect = battle.get_card_effect
+    battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+    battle.get_card_effect = lambda card: {
+        "effect": "creature",
+        "battle_model_scope": "xmage_beginning_end_step_conditional_draw_v1",
+        "trigger": "each_end_step",
+        "trigger_effect": "draw_cards",
+        "end_step_draw_count": 1,
+        "end_step_draw_optional": False,
+        "end_step_draw_condition_status": "runtime_executor_v1",
+        "end_step_draw_condition": "controller_gained_life_gte",
+        "end_step_draw_condition_threshold": 3,
+        "_rule_logical_key": "battle_rule_v1:the-gaffer",
+    }
+    try:
+        result = validator.run_beginning_end_step_draw(
+            battle,
+            {
+                "name": "The Gaffer beginning end step conditional draw",
+                "type": "beginning_end_step_draw",
+                "card": {"name": "The Gaffer", "type_line": "Legendary Creature - Halfling Peasant"},
+                "controller_library": [{"name": "E2E Drawn Card", "type_line": "Instant"}],
+                "expected_trigger": "each_end_step",
+                "expected_draw_count": 1,
+                "expected_condition": "controller_gained_life_gte",
+                "expected_threshold": 3,
+            },
+            events,
+        )
+    finally:
+        battle.REPLAY_EVENT_HANDLER = previous_handler
+        battle.get_card_effect = previous_get_card_effect
+
+    assert result["card_name"] == "The Gaffer"
+    assert result["cards_drawn"] == 1
+    assert result["condition"] == "controller_gained_life_gte"
+
+
 def test_fixed_damage_target_spell_runner_pays_mixed_sacrifice_cost() -> None:
     battle = validator.load_battle(validator.DEFAULT_BATTLE)
     events = []

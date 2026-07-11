@@ -457,6 +457,9 @@ EQUIPMENT_STATIC_ATTACHMENT_SCOPE = "xmage_equipment_static_power_toughness_atta
 PERMANENT_ACTIVATED_DRAW_SCOPE = "xmage_permanent_simple_activated_draw_v1"
 PERMANENT_ACTIVATED_DRAW_DISCARD_SCOPE = "xmage_permanent_simple_activated_draw_discard_v1"
 SPELL_CAST_DRAW_ENGINE_SCOPE = "xmage_spell_cast_draw_engine_v1"
+BEGINNING_END_STEP_CONDITIONAL_DRAW_SCOPE = (
+    "xmage_beginning_end_step_conditional_draw_v1"
+)
 SPELL_CAST_ADD_COUNTERS_SOURCE_SCOPE = "xmage_spell_cast_add_counters_source_v1"
 SPELL_CAST_GAIN_LIFE_SCOPE = "xmage_spell_cast_gain_life_v1"
 SPELL_CAST_TOKEN_MAKER_SCOPE = "xmage_spell_cast_create_creature_token_v1"
@@ -11143,6 +11146,177 @@ def fixed_proliferate_draw_from_source(source: str) -> tuple[int, str] | None:
     return draw_count, order
 
 
+def beginning_end_step_draw_from_oracle(metadata: dict[str, Any]) -> dict[str, Any] | str:
+    text = strip_parenthetical_reminders(oracle_text(metadata))
+    text = text.replace("\u2014", "-")
+    text = re.sub(r"^\s*morbid\s*-\s*", "", text, flags=re.I).strip()
+    text = re.sub(r"\s+", " ", text).strip().lower()
+    if "for each" in text or "equal to" in text:
+        return "end_step_draw_dynamic_count_not_supported"
+    if "discard your hand" in text:
+        return "end_step_draw_discard_hand_cost_not_supported"
+    patterns: list[tuple[str, dict[str, Any]]] = [
+        (
+            r"^at the beginning of each end step, if a creature died this turn, "
+            r"you may draw a card\.?$",
+            {
+                "trigger": "each_end_step",
+                "end_step_draw_optional": True,
+                "end_step_draw_condition": "creature_died_this_turn",
+            },
+        ),
+        (
+            r"^at the beginning of your end step, if a creature died this turn, "
+            r"draw a card\.?$",
+            {
+                "trigger": "controller_end_step",
+                "end_step_draw_optional": False,
+                "end_step_draw_condition": "creature_died_this_turn",
+            },
+        ),
+        (
+            r"^at the beginning of your end step, if you didn't play a land this turn, "
+            r"you may draw a card\.?$",
+            {
+                "trigger": "controller_end_step",
+                "end_step_draw_optional": True,
+                "end_step_draw_condition": "controller_did_not_play_land_this_turn",
+            },
+        ),
+        (
+            r"^at the beginning of your end step, if creatures you control have total power "
+            r"(?P<threshold>\d+) or greater, draw a card\.?$",
+            {
+                "trigger": "controller_end_step",
+                "end_step_draw_optional": False,
+                "end_step_draw_condition": "controlled_creatures_total_power_gte",
+            },
+        ),
+        (
+            r"^at the beginning of each end step, if an opponent lost "
+            r"(?P<threshold>\d+) or more life this turn, you may draw a card\.?$",
+            {
+                "trigger": "each_end_step",
+                "end_step_draw_optional": True,
+                "end_step_draw_condition": "opponent_lost_life_gte",
+            },
+        ),
+        (
+            r"^at the beginning of each end step, if you gained "
+            r"(?P<threshold>\d+) or more life this turn, draw a card\.?$",
+            {
+                "trigger": "each_end_step",
+                "end_step_draw_optional": False,
+                "end_step_draw_condition": "controller_gained_life_gte",
+            },
+        ),
+        (
+            r"^at the beginning of your end step, if you control no untapped lands, "
+            r"draw a card\.?$",
+            {
+                "trigger": "controller_end_step",
+                "end_step_draw_optional": False,
+                "end_step_draw_condition": "controller_controls_no_untapped_lands",
+            },
+        ),
+    ]
+    for pattern, spec in patterns:
+        match = re.fullmatch(pattern, text)
+        if not match:
+            continue
+        result = {
+            "end_step_draw_count": 1,
+            **spec,
+        }
+        if match.groupdict().get("threshold"):
+            result["end_step_draw_condition_threshold"] = int(match.group("threshold"))
+        return result
+    return "end_step_draw_oracle_not_exact"
+
+
+def beginning_end_step_draw_from_source(source: str) -> dict[str, Any] | str:
+    text = source or ""
+    if "BeginningOfEndStepTriggeredAbility" not in text:
+        return "end_step_draw_source_not_beginning_end_step"
+    if "DoIfCostPaid" in text or "DiscardHandCost" in text:
+        return "end_step_draw_source_discard_cost_not_supported"
+    draw_counts = re.findall(
+        r"new\s+DrawCardSourceControllerEffect\s*\(\s*([^)]+?)\s*\)",
+        text,
+        re.S,
+    )
+    if len(draw_counts) != 1:
+        return "end_step_draw_source_draw_count_not_exact"
+    draw_expr = re.sub(r"\s+", " ", draw_counts[0]).strip()
+    if draw_expr != "1":
+        return "end_step_draw_source_dynamic_count_not_supported"
+
+    trigger = "each_end_step" if "TargetController.ANY" in text else "controller_end_step"
+    optional = bool(
+        re.search(
+            r"BeginningOfEndStepTriggeredAbility\s*\([^;]*DrawCardSourceControllerEffect\s*\(\s*1\s*\)\s*,\s*true",
+            text,
+            re.S,
+        )
+    )
+    condition = ""
+    threshold = None
+    if "MorbidCondition.instance" in text:
+        condition = "creature_died_this_turn"
+    elif "MercadianAtlasCondition.instance" in text or "PlayLandWatcher" in text:
+        condition = "controller_did_not_play_land_this_turn"
+    elif "FormidableCondition.instance" in text:
+        condition = "controlled_creatures_total_power_gte"
+        threshold = 8
+    elif "OpponentLostLifeCondition" in text:
+        match = re.search(r"OpponentLostLifeCondition\s*\(\s*ComparisonType\.OR_GREATER\s*,\s*(\d+)\s*\)", text)
+        if not match:
+            return "end_step_draw_source_condition_not_supported"
+        condition = "opponent_lost_life_gte"
+        threshold = int(match.group(1))
+    elif "YouGainedLifeCondition" in text:
+        match = re.search(r"YouGainedLifeCondition\s*\(\s*ComparisonType\.MORE_THAN\s*,\s*(\d+)\s*\)", text)
+        if not match:
+            return "end_step_draw_source_condition_not_supported"
+        condition = "controller_gained_life_gte"
+        threshold = int(match.group(1)) + 1
+    elif (
+        "PermanentsOnTheBattlefieldCondition" in text
+        and "FilterControlledLandPermanent" in text
+        and "TappedPredicate.UNTAPPED" in text
+        and "ComparisonType.EQUAL_TO, 0" in text
+    ):
+        condition = "controller_controls_no_untapped_lands"
+    else:
+        return "end_step_draw_source_condition_not_supported"
+
+    result = {
+        "trigger": trigger,
+        "end_step_draw_count": 1,
+        "end_step_draw_optional": optional,
+        "end_step_draw_condition": condition,
+    }
+    if threshold is not None:
+        result["end_step_draw_condition_threshold"] = threshold
+    return result
+
+
+def beginning_end_step_draw_specs_match(
+    source_spec: dict[str, Any],
+    oracle_spec: dict[str, Any],
+) -> bool:
+    for key in (
+        "trigger",
+        "end_step_draw_count",
+        "end_step_draw_optional",
+        "end_step_draw_condition",
+        "end_step_draw_condition_threshold",
+    ):
+        if source_spec.get(key) != oracle_spec.get(key):
+            return False
+    return True
+
+
 def fixed_boost_keyword_target_from_oracle(metadata: dict[str, Any]) -> tuple[int, int, list[str], str, int, int, bool] | None:
     text = strip_parenthetical_reminders(oracle_text(metadata))
     text = re.sub(r"\s+", " ", text).strip().lower()
@@ -11867,6 +12041,19 @@ def is_spell_cast_draw_engine_unit(row: dict[str, Any]) -> bool:
         effect_classes(row) == {"DrawCardSourceControllerEffect"}
         and ability_classes(row) == {"SpellCastControllerTriggeredAbility"}
         and set(row.get("xmage_signals") or []) == {"draw", "triggered_ability"}
+    )
+
+
+def is_beginning_end_step_conditional_draw_unit(row: dict[str, Any]) -> bool:
+    if str(row.get("adapter_work_unit") or "") != DRAW_ENGINE_UNIT:
+        return False
+    return (
+        effect_classes(row) == {"DrawCardSourceControllerEffect"}
+        and ability_classes(row) == {"BeginningOfEndStepTriggeredAbility"}
+        and set(row.get("xmage_signals") or []).issubset(
+            {"draw", "triggered_ability", "condition", "targeting"}
+        )
+        and {"draw", "triggered_ability"}.issubset(set(row.get("xmage_signals") or []))
     )
 
 
@@ -26835,6 +27022,7 @@ def split_row(
     )
     dies_damage_creature_unit = is_creature_dies_damage_unit(row)
     spell_cast_draw_engine_unit = is_spell_cast_draw_engine_unit(row)
+    beginning_end_step_draw_unit = is_beginning_end_step_conditional_draw_unit(row)
     spell_cast_add_counters_source_unit = is_spell_cast_add_counters_source_unit(row)
     spell_cast_gain_life_unit = is_spell_cast_gain_life_unit(row)
     spell_cast_token_maker_unit = is_spell_cast_token_maker_unit(row)
@@ -26999,6 +27187,7 @@ def split_row(
         and not combat_damage_target_player_discard_creature_unit
         and not dies_damage_creature_unit
         and not spell_cast_draw_engine_unit
+        and not beginning_end_step_draw_unit
         and not spell_cast_add_counters_source_unit
         and not spell_cast_gain_life_unit
         and not spell_cast_token_maker_unit
@@ -28085,6 +28274,46 @@ def split_row(
             metadata,
             effect_json,
             family_id="xmage_spell_cast_draw_engine",
+        ), "selected_exact_scope"
+
+    if beginning_end_step_draw_unit:
+        if not is_permanent_metadata(metadata) or is_spell(metadata):
+            return None, "end_step_draw_not_permanent"
+        oracle_spec = beginning_end_step_draw_from_oracle(metadata)
+        if isinstance(oracle_spec, str):
+            return None, oracle_spec
+        source_spec = beginning_end_step_draw_from_source(source_text)
+        if isinstance(source_spec, str):
+            return None, source_spec
+        if not beginning_end_step_draw_specs_match(source_spec, oracle_spec):
+            return None, "end_step_draw_source_oracle_mismatch"
+        type_line = str(metadata.get("type_line") or "").lower()
+        permanent_effect = (
+            "creature"
+            if "creature" in type_line
+            else "artifact"
+            if "artifact" in type_line
+            else "enchantment"
+            if "enchantment" in type_line
+            else "permanent"
+        )
+        effect_json = {
+            "effect": permanent_effect if permanent_effect == "creature" else "draw_engine",
+            "battle_model_scope": BEGINNING_END_STEP_CONDITIONAL_DRAW_SCOPE,
+            "ability_kind": "triggered",
+            "trigger_effect": "draw_cards",
+            "end_step_draw_condition_status": "runtime_executor_v1",
+            "xmage_effect_class": "DrawCardSourceControllerEffect",
+            "xmage_ability_class": "BeginningOfEndStepTriggeredAbility",
+            **oracle_spec,
+        }
+        if permanent_effect == "creature":
+            effect_json["is_creature_permanent"] = True
+        return build_proposal(
+            row,
+            metadata,
+            effect_json,
+            family_id="xmage_beginning_end_step_conditional_draw",
         ), "selected_exact_scope"
 
     if spell_cast_add_counters_source_unit:
@@ -39060,6 +39289,7 @@ def build_exact_split_report(
             and not is_creature_combat_damage_target_player_discard_unit(row)
             and not is_creature_dies_damage_unit(row)
             and not is_spell_cast_draw_engine_unit(row)
+            and not is_beginning_end_step_conditional_draw_unit(row)
             and not is_spell_cast_add_counters_source_unit(row)
             and not is_spell_cast_gain_life_unit(row)
             and not is_spell_cast_token_maker_unit(row)
@@ -39164,6 +39394,7 @@ def build_exact_split_report(
                 "DiscardTargetEffect rows with DiesSourceTriggeredAbility, exact fixed dies target-player/opponent discard Oracle/source agreement, and only static self keywords",
                 "DiscardTargetEffect rows with DealsCombatDamageToAPlayerTriggeredAbility, exact fixed damaged-player discard Oracle/source agreement, and only static self keywords",
                 "draw_engine::xmage_draw_card_variant_review_v1 rows with DrawCardSourceControllerEffect and SpellCastControllerTriggeredAbility, exact draw count, and supported spell filters",
+                "draw_engine::xmage_draw_card_variant_review_v1 rows with DrawCardSourceControllerEffect and BeginningOfEndStepTriggeredAbility, exact fixed draw-one Oracle/source agreement, and supported runtime conditions",
                 "draw_engine::xmage_draw_card_variant_review_v1 rows with DrawDiscardControllerEffect and SimpleActivatedAbility, exact draw-then-discard counts, and mana/tap/life/source self-sacrifice costs only",
                 "add_counters::source_add_counters_variant_v1 rows with AddCountersSourceEffect and SpellCastControllerTriggeredAbility, exact source self-counter count, supported spell filters, and only static self keywords",
                 "life_gain::xmage_life_gain_variant_review_v1 rows with GainLifeEffect and SpellCastControllerTriggeredAbility, exact controller life gain, and supported spell filters",

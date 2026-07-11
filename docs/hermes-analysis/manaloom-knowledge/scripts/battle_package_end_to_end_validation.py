@@ -10626,6 +10626,122 @@ def run_combat_damage_draw(
     }
 
 
+def run_beginning_end_step_draw(
+    battle,
+    scenario: dict[str, Any],
+    events: list[tuple[str, dict[str, Any]]],
+) -> dict[str, Any]:
+    card = dict(scenario["card"])
+    effect = dict(battle.get_card_effect(card))
+    if not effect or effect.get("effect") == "unknown" or not effect.get("battle_model_scope"):
+        effect = {}
+    source = battle.enrich_card(
+        {
+            **card,
+            "type_line": card.get("type_line") or "Enchantment",
+            "summoning_sick": False,
+            **effect,
+        }
+    )
+    active = battle.Player(str(scenario.get("player") or "End Step Draw Controller"), None, [])
+    opponent = battle.Player(str(scenario.get("opponent") or "End Step Draw Opponent"), None, [])
+    turn = int(scenario.get("turn") or 7410)
+    active.library = [
+        battle.enrich_card(dict(library_card))
+        for library_card in (scenario.get("controller_library") or [])
+        if isinstance(library_card, dict)
+    ]
+    active.battlefield.append(source)
+    expected_draw_count = int(scenario.get("expected_draw_count") or source.get("end_step_draw_count") or 1)
+    expected_trigger = str(scenario.get("expected_trigger") or source.get("trigger") or "controller_end_step")
+    expected_condition = str(scenario.get("expected_condition") or source.get("end_step_draw_condition") or "")
+    expected_threshold = int(scenario.get("expected_threshold") or source.get("end_step_draw_condition_threshold") or 0)
+
+    if expected_condition == "creature_died_this_turn":
+        active.record_creature_died(1, turn)
+    elif expected_condition == "controller_did_not_play_land_this_turn":
+        active.lands_played_this_turn = 0
+    elif expected_condition == "controlled_creatures_total_power_gte":
+        active.battlefield.append(
+            battle.enrich_card(
+                {
+                    "name": "E2E Formidable Creature",
+                    "type_line": "Creature - Beast",
+                    "effect": "creature",
+                    "power": expected_threshold or 8,
+                    "toughness": 8,
+                }
+            )
+        )
+    elif expected_condition == "opponent_lost_life_gte":
+        opponent.record_life_lost(expected_threshold or 3, turn)
+    elif expected_condition == "controller_gained_life_gte":
+        active.record_life_gained(expected_threshold or 3, turn)
+    elif expected_condition == "controller_controls_no_untapped_lands":
+        active.battlefield.append(
+            battle.enrich_card(
+                {
+                    "name": "E2E Tapped Land",
+                    "type_line": "Basic Land - Plains",
+                    "effect": "land",
+                    "tapped": True,
+                }
+            )
+        )
+    else:
+        fail("battle_execution", f"{card['name']} unsupported end step draw condition {expected_condition!r}")
+
+    starting_hand_count = len(active.hand)
+    starting_library_count = len(active.library)
+    before_events = len(events)
+
+    battle.process_end_step_phase_engines(
+        active,
+        [active, opponent],
+        turn,
+        random.Random(int(scenario.get("seed") or 7410)),
+    )
+
+    if len(active.library) != starting_library_count - expected_draw_count:
+        fail(
+            "battle_execution",
+            f"{card['name']} library={len(active.library)}, expected {starting_library_count - expected_draw_count}",
+        )
+    if len(active.hand) != starting_hand_count + expected_draw_count:
+        fail(
+            "battle_execution",
+            f"{card['name']} hand={len(active.hand)}, expected {starting_hand_count + expected_draw_count}",
+        )
+    event = next(
+        (
+            data
+            for event_name, data in events[before_events:]
+            if event_name == "phase_trigger_resolved"
+            and data.get("card") == card.get("name")
+            and data.get("effect") == "draw_cards"
+        ),
+        None,
+    )
+    if event is None:
+        fail("battle_events", f"missing {card['name']} phase_trigger_resolved event")
+    if event.get("trigger") != expected_trigger:
+        fail("battle_events", f"{card['name']} trigger={event.get('trigger')!r}, expected {expected_trigger!r}")
+    if event.get("end_step_draw_condition") != expected_condition:
+        fail(
+            "battle_events",
+            f"{card['name']} end_step_draw_condition={event.get('end_step_draw_condition')!r}",
+        )
+    if int(event.get("cards_drawn") or 0) != expected_draw_count:
+        fail("battle_events", f"{card['name']} cards_drawn={event.get('cards_drawn')}")
+    return {
+        "scenario": scenario.get("name"),
+        "card_name": card["name"],
+        "cards_drawn": expected_draw_count,
+        "trigger": expected_trigger,
+        "condition": expected_condition,
+    }
+
+
 def run_target_player_draw_spell(
     battle,
     scenario: dict[str, Any],
@@ -10916,6 +11032,7 @@ SCENARIO_RUNNERS = {
     "equipment_static_power_toughness_attachment": run_equipment_static_power_toughness_attachment,
     "becomes_blocked_self_boost": run_becomes_blocked_self_boost,
     "board_wipe": run_board_wipe,
+    "beginning_end_step_draw": run_beginning_end_step_draw,
     "combat_damage_draw": run_combat_damage_draw,
     "mass_return_to_hand": run_mass_return_to_hand,
     "conditional_land_play": run_conditional_land_play,

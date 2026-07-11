@@ -552,6 +552,11 @@ E2E_REQUIRED_EFFECT_FIELDS = (
     "trigger_entering_subtypes",
     "trigger_optional",
     "trigger_limit_each_turn",
+    "end_step_draw_count",
+    "end_step_draw_optional",
+    "end_step_draw_condition_status",
+    "end_step_draw_condition",
+    "end_step_draw_condition_threshold",
     "optional",
     "ability_kind",
     "activated_effect",
@@ -3862,6 +3867,51 @@ def combat_damage_draw_execution_scenario_from_expected_rule(
     }
 
 
+def beginning_end_step_draw_execution_scenario_from_expected_rule(
+    rule: dict[str, Any],
+) -> dict[str, Any] | None:
+    required = dict(rule.get("required_effect_fields") or {})
+    if required.get("battle_model_scope") != "xmage_beginning_end_step_conditional_draw_v1":
+        return None
+    draw_count = int(required.get("end_step_draw_count") or 0)
+    if draw_count <= 0:
+        return None
+    condition = str(required.get("end_step_draw_condition") or "").strip()
+    if not condition:
+        return None
+    permanent_type = str(required.get("effect") or "draw_engine")
+    type_line = {
+        "creature": "Creature - E2E Fixture",
+        "artifact": "Artifact",
+        "enchantment": "Enchantment",
+    }.get(permanent_type, "Enchantment")
+    return {
+        "name": f"{rule['card_name']} beginning end step conditional draw",
+        "type": "beginning_end_step_draw",
+        "card": {
+            "name": rule["card_name"],
+            "type_line": type_line,
+            "effect": permanent_type,
+            **required,
+        },
+        "controller_library": [
+            {
+                "name": f"E2E End Step Draw Card {index + 1}",
+                "type_line": "Instant",
+                "effect": "draw_cards",
+                "cmc": index + 1,
+            }
+            for index in range(draw_count)
+        ],
+        "trigger": str(required.get("trigger") or "controller_end_step"),
+        "expected_trigger": str(required.get("trigger") or "controller_end_step"),
+        "expected_draw_count": draw_count,
+        "expected_condition": condition,
+        "expected_threshold": int(required.get("end_step_draw_condition_threshold") or 0),
+        "logical_rule_key": rule["logical_rule_key"],
+    }
+
+
 def damage_each_opponent_spell_execution_scenario_from_expected_rule(
     rule: dict[str, Any],
 ) -> dict[str, Any] | None:
@@ -6951,6 +7001,7 @@ def execution_scenario_from_expected_rule(rule: dict[str, Any]) -> dict[str, Any
         or fixed_draw_discard_spell_execution_scenario_from_expected_rule(rule)
         or target_player_draw_execution_scenario_from_expected_rule(rule)
         or combat_damage_draw_execution_scenario_from_expected_rule(rule)
+        or beginning_end_step_draw_execution_scenario_from_expected_rule(rule)
         or simple_activated_damage_execution_scenario_from_expected_rule(rule)
         or simple_activated_tap_target_execution_scenario_from_expected_rule(rule)
         or simple_activated_untap_target_execution_scenario_from_expected_rule(rule)

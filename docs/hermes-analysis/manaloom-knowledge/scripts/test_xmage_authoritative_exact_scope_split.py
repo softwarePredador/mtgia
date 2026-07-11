@@ -50,6 +50,127 @@ def metadata(
 
 
 class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
+    def test_beginning_each_end_step_morbid_draw_maps_exact_scope(self) -> None:
+        row = queue_row(
+            split.DRAW_ENGINE_UNIT,
+            effect_classes=["DrawCardSourceControllerEffect"],
+            ability_kind="triggered",
+            ability_classes=["BeginningOfEndStepTriggeredAbility"],
+            xmage_signals=["draw", "triggered_ability", "condition"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Deathreap Ritual",
+                type_line="Enchantment",
+                oracle_text=(
+                    "Morbid - At the beginning of each end step, if a creature died this turn, "
+                    "you may draw a card."
+                ),
+            ),
+            source_text="""
+                this.addAbility(new BeginningOfEndStepTriggeredAbility(
+                    TargetController.ANY,
+                    new DrawCardSourceControllerEffect(1),
+                    true,
+                    MorbidCondition.instance));
+            """,
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.BEGINNING_END_STEP_CONDITIONAL_DRAW_SCOPE)
+        self.assertEqual(effect["trigger"], "each_end_step")
+        self.assertEqual(effect["end_step_draw_count"], 1)
+        self.assertTrue(effect["end_step_draw_optional"])
+        self.assertEqual(effect["end_step_draw_condition"], "creature_died_this_turn")
+
+    def test_beginning_controller_end_step_formidable_draw_maps_threshold(self) -> None:
+        row = queue_row(
+            split.DRAW_ENGINE_UNIT,
+            effect_classes=["DrawCardSourceControllerEffect"],
+            ability_kind="triggered",
+            ability_classes=["BeginningOfEndStepTriggeredAbility"],
+            xmage_signals=["draw", "triggered_ability", "condition"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Owlbear Shepherd",
+                type_line="Creature - Human Druid",
+                oracle_text=(
+                    "At the beginning of your end step, if creatures you control have total power "
+                    "8 or greater, draw a card."
+                ),
+            ),
+            source_text="""
+                this.addAbility(new BeginningOfEndStepTriggeredAbility(
+                    new DrawCardSourceControllerEffect(1)).withInterveningIf(FormidableCondition.instance));
+            """,
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["effect"], "creature")
+        self.assertEqual(effect["trigger"], "controller_end_step")
+        self.assertFalse(effect["end_step_draw_optional"])
+        self.assertEqual(effect["end_step_draw_condition"], "controlled_creatures_total_power_gte")
+        self.assertEqual(effect["end_step_draw_condition_threshold"], 8)
+
+    def test_beginning_end_step_dynamic_draw_count_stays_blocked(self) -> None:
+        row = queue_row(
+            split.DRAW_ENGINE_UNIT,
+            effect_classes=["DrawCardSourceControllerEffect"],
+            ability_kind="triggered",
+            ability_classes=["BeginningOfEndStepTriggeredAbility"],
+            xmage_signals=["draw", "triggered_ability", "condition"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="April O'Neil, Hacktivist",
+                type_line="Legendary Creature - Human",
+                oracle_text=(
+                    "At the beginning of your end step, draw a card for each artifact creature "
+                    "you control."
+                ),
+            ),
+            source_text="""
+                this.addAbility(new BeginningOfEndStepTriggeredAbility(
+                    new DrawCardSourceControllerEffect(new PermanentsOnBattlefieldCount(filter))));
+            """,
+        )
+
+        self.assertIsNone(proposal)
+        self.assertEqual(reason, "end_step_draw_dynamic_count_not_supported")
+
+    def test_beginning_end_step_discard_hand_cost_stays_blocked(self) -> None:
+        row = queue_row(
+            split.DRAW_ENGINE_UNIT,
+            effect_classes=["DrawCardSourceControllerEffect"],
+            ability_kind="triggered",
+            ability_classes=["BeginningOfEndStepTriggeredAbility"],
+            xmage_signals=["draw", "triggered_ability", "condition"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Vaultguard Trooper",
+                type_line="Creature - Rhino Soldier",
+                oracle_text=(
+                    "At the beginning of your end step, you may discard your hand. "
+                    "If you do, draw two cards."
+                ),
+            ),
+            source_text="""
+                this.addAbility(new BeginningOfEndStepTriggeredAbility(
+                    new DoIfCostPaid(new DrawCardSourceControllerEffect(2), new DiscardHandCost())));
+            """,
+        )
+
+        self.assertIsNone(proposal)
+        self.assertEqual(reason, "end_step_draw_discard_hand_cost_not_supported")
+
     def test_fixed_equipment_static_attachment_maps_exact_scope(self) -> None:
         row = queue_row(
             "xmage_signature::BoostEquippedEffect,GainAbilityAttachedEffect::"

@@ -584,11 +584,23 @@ def _record_life_lost_this_turn(player, life_before):
         player.record_life_lost(lost, CURRENT_REPLAY_TURN)
 
 
+def _record_life_gained_this_turn(player, life_before):
+    if player is None:
+        return
+    try:
+        gained = max(0, int(getattr(player, "life", life_before)) - int(life_before))
+    except Exception:
+        gained = 0
+    if gained > 0 and hasattr(player, "record_life_gained"):
+        player.record_life_gained(gained, CURRENT_REPLAY_TURN)
+
+
 def change_life(player, delta):
     life_before = getattr(player, "life", None)
     changed = _change_life(player, delta, emit_replay_event=emit_replay_event)
     if changed and life_before is not None:
         _record_life_lost_this_turn(player, life_before)
+        _record_life_gained_this_turn(player, life_before)
         refresh_life_total_threshold_statics_for_player(
             player,
             turn=CURRENT_REPLAY_TURN,
@@ -661,8 +673,11 @@ def gain_life(player, amount, cap=40):
             turn=CURRENT_REPLAY_TURN,
             **replay_rule_fields(replacement_source),
         )
+    life_before = getattr(player, "life", None)
     gained = _gain_life(player, final_amount, cap=cap, emit_replay_event=emit_replay_event)
     if gained:
+        if life_before is not None:
+            _record_life_gained_this_turn(player, life_before)
         refresh_life_total_threshold_statics_for_player(
             player,
             turn=CURRENT_REPLAY_TURN,
@@ -685,6 +700,10 @@ def clear_turn_scoped_permanent_flags(all_players):
         participant.lands_played_this_turn = 0
         participant.life_lost_this_turn = 0
         participant._life_lost_turn_marker = CURRENT_REPLAY_TURN
+        participant.life_gained_this_turn = 0
+        participant._life_gained_turn_marker = CURRENT_REPLAY_TURN
+        participant.creatures_died_this_turn = 0
+        participant._creatures_died_turn_marker = CURRENT_REPLAY_TURN
 
 
 class EngineMetrics:
@@ -11104,6 +11123,32 @@ class Player:
             self._life_lost_turn_marker = turn_marker
         return int(getattr(self, "life_lost_this_turn", 0) or 0)
 
+    def record_life_gained(self, amount, turn_marker=None):
+        if turn_marker is not None and getattr(self, "_life_gained_turn_marker", None) != turn_marker:
+            self.life_gained_this_turn = 0
+            self._life_gained_turn_marker = turn_marker
+        self.life_gained_this_turn += max(0, int(amount or 0))
+        return self.life_gained_this_turn
+
+    def life_gained_this_turn_count(self, turn_marker=None):
+        if turn_marker is not None and getattr(self, "_life_gained_turn_marker", None) != turn_marker:
+            self.life_gained_this_turn = 0
+            self._life_gained_turn_marker = turn_marker
+        return int(getattr(self, "life_gained_this_turn", 0) or 0)
+
+    def record_creature_died(self, amount=1, turn_marker=None):
+        if turn_marker is not None and getattr(self, "_creatures_died_turn_marker", None) != turn_marker:
+            self.creatures_died_this_turn = 0
+            self._creatures_died_turn_marker = turn_marker
+        self.creatures_died_this_turn += max(0, int(amount or 0))
+        return self.creatures_died_this_turn
+
+    def creatures_died_this_turn_count(self, turn_marker=None):
+        if turn_marker is not None and getattr(self, "_creatures_died_turn_marker", None) != turn_marker:
+            self.creatures_died_this_turn = 0
+            self._creatures_died_turn_marker = turn_marker
+        return int(getattr(self, "creatures_died_this_turn", 0) or 0)
+
     def _draw_replacement_source(self, phase=None):
         source = _first_static_replacement_permanent(
             self,
@@ -11226,6 +11271,10 @@ class Player:
         self._noncreature_spells_cast_turn_marker = None
         self.life_lost_this_turn = 0
         self._life_lost_turn_marker = None
+        self.life_gained_this_turn = 0
+        self._life_gained_turn_marker = None
+        self.creatures_died_this_turn = 0
+        self._creatures_died_turn_marker = None
         self.surge_to_victory_delayed_triggers = []
         self.failed_draw_from_empty_library = False
         self.turn_end_requested = False
@@ -22155,6 +22204,8 @@ def move_creature_from_battlefield(owner, creature, reason=None, source=None, al
     if isinstance(creature, dict) and destination != "none":
         if destination == "graveyard":
             creature["_put_into_graveyard_from_battlefield_turn"] = CURRENT_REPLAY_TURN
+            if hasattr(owner, "record_creature_died"):
+                owner.record_creature_died(1, CURRENT_REPLAY_TURN)
         emit_replay_event(
             "permanent_moved_from_battlefield",
             player=getattr(owner, "name", "?"),
@@ -22266,6 +22317,7 @@ def move_creature_from_battlefield(owner, creature, reason=None, source=None, al
 
 
 def move_permanent_from_battlefield(owner, permanent, reason=None, source=None, all_players=None):
+    was_creature = is_battlefield_creature(permanent)
     if is_battlefield_creature(permanent) and consume_regeneration_shield(
         owner,
         permanent,
@@ -22285,6 +22337,8 @@ def move_permanent_from_battlefield(owner, permanent, reason=None, source=None, 
     if isinstance(permanent, dict) and destination != "none":
         if destination == "graveyard":
             permanent["_put_into_graveyard_from_battlefield_turn"] = CURRENT_REPLAY_TURN
+            if was_creature and hasattr(owner, "record_creature_died"):
+                owner.record_creature_died(1, CURRENT_REPLAY_TURN)
         emit_replay_event(
             "permanent_moved_from_battlefield",
             player=getattr(owner, "name", "?"),
@@ -61499,12 +61553,167 @@ def process_postcombat_main_phase_engines(player, opponents, all_players, turn, 
     return triggers
 
 
+def end_step_draw_controlled_creature_total_power(controller):
+    total = 0
+    for permanent in getattr(controller, "battlefield", []) or []:
+        if isinstance(permanent, dict) and is_battlefield_creature(permanent):
+            total += card_power_value(permanent, default=0)
+    return total
+
+
+def end_step_draw_controller_untapped_lands(controller):
+    lands = []
+    for permanent in getattr(controller, "battlefield", []) or []:
+        if not isinstance(permanent, dict):
+            continue
+        type_line = str(permanent.get("type_line") or "").lower()
+        if "land" in type_line and not bool(permanent.get("tapped")):
+            lands.append(permanent)
+    return lands
+
+
+def end_step_draw_condition_satisfied(controller, active_player, all_players, permanent, turn):
+    condition = str(permanent.get("end_step_draw_condition") or "").strip()
+    threshold = int(permanent.get("end_step_draw_condition_threshold") or 0)
+    participants = [p for p in (all_players or []) if getattr(p, "is_alive", lambda: True)()]
+    opponents = _live_opponents_for(controller, participants)
+    if condition == "creature_died_this_turn":
+        count = sum(
+            participant.creatures_died_this_turn_count(turn)
+            if hasattr(participant, "creatures_died_this_turn_count")
+            else int(getattr(participant, "creatures_died_this_turn", 0) or 0)
+            for participant in participants
+        )
+        return count > 0, {"creatures_died_this_turn": count}
+    if condition == "controller_did_not_play_land_this_turn":
+        lands_played = int(getattr(controller, "lands_played_this_turn", 0) or 0)
+        return lands_played <= 0, {"lands_played_this_turn": lands_played}
+    if condition == "controlled_creatures_total_power_gte":
+        threshold = threshold or 8
+        total_power = end_step_draw_controlled_creature_total_power(controller)
+        return total_power >= threshold, {
+            "controlled_creatures_total_power": total_power,
+            "end_step_draw_condition_threshold": threshold,
+        }
+    if condition == "opponent_lost_life_gte":
+        threshold = threshold or 3
+        qualified = [
+            opponent.name
+            for opponent in opponents
+            if (
+                opponent.life_lost_this_turn_count(turn)
+                if hasattr(opponent, "life_lost_this_turn_count")
+                else int(getattr(opponent, "life_lost_this_turn", 0) or 0)
+            )
+            >= threshold
+        ]
+        return bool(qualified), {
+            "qualified_opponents": qualified,
+            "end_step_draw_condition_threshold": threshold,
+        }
+    if condition == "controller_gained_life_gte":
+        threshold = threshold or 3
+        gained = (
+            controller.life_gained_this_turn_count(turn)
+            if hasattr(controller, "life_gained_this_turn_count")
+            else int(getattr(controller, "life_gained_this_turn", 0) or 0)
+        )
+        return gained >= threshold, {
+            "controller_life_gained_this_turn": gained,
+            "end_step_draw_condition_threshold": threshold,
+        }
+    if condition == "controller_controls_no_untapped_lands":
+        lands = end_step_draw_controller_untapped_lands(controller)
+        return len(lands) == 0, {
+            "untapped_lands_controlled": [land.get("name", "?") for land in lands],
+        }
+    return False, {"unsupported_end_step_draw_condition": condition}
+
+
 def process_end_step_phase_engines(active_player, all_players, turn, rng, *, stack=None):
     participants = [p for p in (all_players or []) if getattr(p, "is_alive", lambda: True)()]
     for controller in participants:
         controller_opponents = _live_opponents_for(controller, participants)
         for permanent in list(getattr(controller, "battlefield", []) or []):
             if not isinstance(permanent, dict):
+                continue
+            if (
+                permanent.get("trigger_effect") == "draw_cards"
+                and permanent.get("end_step_draw_condition_status") == "runtime_executor_v1"
+                and permanent.get("trigger") in {"controller_end_step", "each_end_step"}
+            ):
+                trigger = str(permanent.get("trigger") or "controller_end_step")
+                if trigger == "controller_end_step" and controller is not active_player:
+                    continue
+                trigger_key = (
+                    "controller_end_step"
+                    if trigger == "controller_end_step"
+                    else "each_end_step"
+                )
+                last_turn_key = f"{trigger_key}_draw_last_trigger_turn"
+                last_player_key = f"{trigger_key}_draw_last_trigger_player"
+                if (
+                    permanent.get(last_turn_key) == turn
+                    and permanent.get(last_player_key) == active_player.name
+                ):
+                    continue
+                permanent[last_turn_key] = turn
+                permanent[last_player_key] = active_player.name
+                condition_met, condition_details = end_step_draw_condition_satisfied(
+                    controller,
+                    active_player,
+                    participants,
+                    permanent,
+                    turn,
+                )
+                if not condition_met:
+                    emit_replay_event(
+                        "trigger_skipped",
+                        player=controller.name,
+                        card=permanent.get("name", "?"),
+                        trigger=trigger,
+                        active_player=active_player.name,
+                        effect="draw_cards",
+                        reason="end_step_draw_condition_not_met",
+                        end_step_draw_condition=permanent.get("end_step_draw_condition"),
+                        turn=turn,
+                        phase="end_step",
+                        **condition_details,
+                        **replay_rule_fields(permanent),
+                    )
+                    continue
+                draw_count = max(0, int(permanent.get("end_step_draw_count") or 0))
+                if draw_count <= 0:
+                    continue
+                library_before = len(getattr(controller, "library", []) or [])
+                drawn = controller.draw(draw_count, rng, phase="end_step")
+                process_player_draw_triggers(
+                    controller,
+                    len(drawn),
+                    turn,
+                    "end_step",
+                    participants,
+                    stack=stack,
+                    turn_player=active_player,
+                )
+                emit_replay_event(
+                    "phase_trigger_resolved",
+                    player=controller.name,
+                    card=permanent.get("name", "?"),
+                    trigger=trigger,
+                    active_player=active_player.name,
+                    effect="draw_cards",
+                    cards_drawn=len(drawn),
+                    requested_draw_count=draw_count,
+                    library_before=library_before,
+                    library_after=len(getattr(controller, "library", []) or []),
+                    end_step_draw_optional=bool(permanent.get("end_step_draw_optional")),
+                    end_step_draw_condition=permanent.get("end_step_draw_condition"),
+                    turn=turn,
+                    phase="end_step",
+                    **condition_details,
+                    **replay_rule_fields(permanent),
+                )
                 continue
             if permanent.get("each_end_step_opponent_extra_draw_land_treasure"):
                 if (

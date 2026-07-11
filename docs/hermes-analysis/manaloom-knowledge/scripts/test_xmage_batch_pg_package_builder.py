@@ -1015,6 +1015,36 @@ def test_manifest_builds_fixed_draw_discard_random_scenario() -> None:
     assert len(scenario["controller_hand"]) == 3
 
 
+def test_manifest_builds_beginning_end_step_draw_execution_scenario() -> None:
+    rule = {
+        "normalized_name": "the gaffer",
+        "card_name": "The Gaffer",
+        "oracle_hash": "hash-the-gaffer",
+        "logical_rule_key": "battle_rule_v1:hash-the-gaffer",
+        "required_effect_fields": {
+            "effect": "creature",
+            "battle_model_scope": "xmage_beginning_end_step_conditional_draw_v1",
+            "trigger": "each_end_step",
+            "trigger_effect": "draw_cards",
+            "end_step_draw_count": 1,
+            "end_step_draw_optional": False,
+            "end_step_draw_condition_status": "runtime_executor_v1",
+            "end_step_draw_condition": "controller_gained_life_gte",
+            "end_step_draw_condition_threshold": 3,
+        },
+    }
+
+    scenario = builder.execution_scenario_from_expected_rule(rule)
+
+    assert scenario is not None
+    assert scenario["type"] == "beginning_end_step_draw"
+    assert scenario["expected_trigger"] == "each_end_step"
+    assert scenario["expected_draw_count"] == 1
+    assert scenario["expected_condition"] == "controller_gained_life_gte"
+    assert scenario["expected_threshold"] == 3
+    assert scenario["card"]["type_line"] == "Creature - E2E Fixture"
+
+
 def test_manifest_builds_fixed_draw_discard_unless_scenario() -> None:
     rule = {
         "normalized_name": "thirst for knowledge",

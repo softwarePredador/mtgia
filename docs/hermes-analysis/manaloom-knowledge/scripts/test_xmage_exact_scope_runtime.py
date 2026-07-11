@@ -88,6 +88,120 @@ class XMageExactScopeRuntimeTest(unittest.TestCase):
         self.assertEqual(active.mana_pool.total(), 0)
         self.assertFalse(any(event == "dies_mana_resolved" for event, _data in self.events))
 
+    def test_beginning_end_step_draw_resolves_when_life_gain_condition_met(self) -> None:
+        active = self.battle.Player("Active", None, [{"name": "Drawn End Step Card"}])
+        opponent = self.battle.Player("Opponent", None, [])
+        source = {
+            "name": "The Gaffer",
+            "type_line": "Legendary Creature - Halfling Peasant",
+            "effect": "creature",
+            "battle_model_scope": "xmage_beginning_end_step_conditional_draw_v1",
+            "trigger": "each_end_step",
+            "trigger_effect": "draw_cards",
+            "end_step_draw_count": 1,
+            "end_step_draw_optional": False,
+            "end_step_draw_condition_status": "runtime_executor_v1",
+            "end_step_draw_condition": "controller_gained_life_gte",
+            "end_step_draw_condition_threshold": 3,
+            "_rule_logical_key": "battle_rule_v1:fixture_gaffer",
+        }
+        active.battlefield = [source]
+        active.record_life_gained(3, 8)
+
+        self.battle.process_end_step_phase_engines(
+            active,
+            [active, opponent],
+            8,
+            random.Random(8),
+        )
+
+        self.assertEqual([card["name"] for card in active.hand], ["Drawn End Step Card"])
+        self.assertTrue(
+            any(
+                event == "phase_trigger_resolved"
+                and data.get("card") == "The Gaffer"
+                and data.get("trigger") == "each_end_step"
+                and data.get("effect") == "draw_cards"
+                and data.get("cards_drawn") == 1
+                and data.get("end_step_draw_condition") == "controller_gained_life_gte"
+                and data.get("rule_logical_key") == "battle_rule_v1:fixture_gaffer"
+                for event, data in self.events
+            )
+        )
+
+    def test_beginning_end_step_draw_skips_when_condition_not_met(self) -> None:
+        active = self.battle.Player("Active", None, [{"name": "Undrawn End Step Card"}])
+        opponent = self.battle.Player("Opponent", None, [])
+        source = {
+            "name": "Sygg, River Cutthroat",
+            "type_line": "Legendary Creature - Merfolk Rogue",
+            "effect": "creature",
+            "battle_model_scope": "xmage_beginning_end_step_conditional_draw_v1",
+            "trigger": "each_end_step",
+            "trigger_effect": "draw_cards",
+            "end_step_draw_count": 1,
+            "end_step_draw_optional": True,
+            "end_step_draw_condition_status": "runtime_executor_v1",
+            "end_step_draw_condition": "opponent_lost_life_gte",
+            "end_step_draw_condition_threshold": 3,
+        }
+        active.battlefield = [source]
+        opponent.record_life_lost(2, 9)
+
+        self.battle.process_end_step_phase_engines(
+            active,
+            [active, opponent],
+            9,
+            random.Random(9),
+        )
+
+        self.assertEqual(active.hand, [])
+        self.assertEqual([card["name"] for card in active.library], ["Undrawn End Step Card"])
+        self.assertTrue(
+            any(
+                event == "trigger_skipped"
+                and data.get("card") == "Sygg, River Cutthroat"
+                and data.get("reason") == "end_step_draw_condition_not_met"
+                and data.get("end_step_draw_condition") == "opponent_lost_life_gte"
+                for event, data in self.events
+            )
+        )
+
+    def test_beginning_end_step_morbid_draw_uses_creature_death_tracking(self) -> None:
+        active = self.battle.Player("Active", None, [{"name": "Morbid Draw"}])
+        opponent = self.battle.Player("Opponent", None, [])
+        source = {
+            "name": "Twinblade Assassins",
+            "type_line": "Creature - Elf Assassin",
+            "effect": "creature",
+            "battle_model_scope": "xmage_beginning_end_step_conditional_draw_v1",
+            "trigger": "controller_end_step",
+            "trigger_effect": "draw_cards",
+            "end_step_draw_count": 1,
+            "end_step_draw_optional": False,
+            "end_step_draw_condition_status": "runtime_executor_v1",
+            "end_step_draw_condition": "creature_died_this_turn",
+        }
+        doomed = {"name": "Doomed Fixture", "type_line": "Creature - Soldier", "effect": "creature"}
+        active.battlefield = [source, doomed]
+        self.battle.CURRENT_REPLAY_TURN = 10
+
+        self.battle.move_creature_from_battlefield(
+            active,
+            doomed,
+            reason="destroyed",
+            all_players=[active, opponent],
+        )
+        self.battle.process_end_step_phase_engines(
+            active,
+            [active, opponent],
+            10,
+            random.Random(10),
+        )
+
+        self.assertEqual([card["name"] for card in active.hand], ["Morbid Draw"])
+        self.assertEqual(active.creatures_died_this_turn_count(10), 1)
+
     def test_creature_etb_cast_from_hand_mana_adds_when_cast_from_hand(self) -> None:
         active = self.battle.Player("Active", None, [])
         permanent = {
