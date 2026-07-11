@@ -98,6 +98,87 @@ def test_validate_runtime_lookup_derives_checks_from_expected_rules() -> None:
     assert results[0]["effect"] == "topdeck_play"
 
 
+def test_static_filtered_protection_runner_blocks_matching_source() -> None:
+    battle = validator.load_battle(validator.DEFAULT_BATTLE)
+    effect = {
+        "effect": "creature",
+        "battle_model_scope": "xmage_static_self_protection_from_filtered_creature_v1",
+        "static_effect": "self_protection_from_filtered",
+        "protection_filter": "multicolored",
+        "protection_from_color_profile": "multicolored",
+        "_rule_logical_key": "battle_rule_v1:filtered-protection",
+    }
+    previous_get_card_effect = battle.get_card_effect
+    battle.get_card_effect = lambda card: dict(effect)
+    try:
+        result = validator.run_static_filtered_protection(
+            battle,
+            {
+                "name": "Enemy of the Guildpact static filtered protection blocks matching source",
+                "type": "static_filtered_protection",
+                "card": {"name": "Enemy of the Guildpact"},
+                "matching_source": {
+                    "name": "Fixture Multicolored Spell",
+                    "type_line": "Instant",
+                    "colors": ["R", "G"],
+                    "cmc": 2,
+                },
+                "nonmatching_source": {
+                    "name": "Fixture Red Spell",
+                    "type_line": "Instant",
+                    "colors": ["R"],
+                    "cmc": 1,
+                },
+            },
+            [],
+        )
+    finally:
+        battle.get_card_effect = previous_get_card_effect
+
+    assert result["card_name"] == "Enemy of the Guildpact"
+    assert result["protection_filter"] == "multicolored"
+
+
+def test_static_subtype_protection_runner_blocks_matching_source() -> None:
+    battle = validator.load_battle(validator.DEFAULT_BATTLE)
+    effect = {
+        "effect": "creature",
+        "battle_model_scope": "xmage_static_self_protection_from_subtypes_creature_v1",
+        "static_effect": "self_protection_from_subtypes",
+        "protection_from_subtypes": ["goblin"],
+        "_rule_logical_key": "battle_rule_v1:subtype-protection",
+    }
+    previous_get_card_effect = battle.get_card_effect
+    battle.get_card_effect = lambda card: dict(effect)
+    try:
+        result = validator.run_static_filtered_protection(
+            battle,
+            {
+                "name": "Warren-Scourge Elf static subtype protection blocks matching source",
+                "type": "static_subtype_protection",
+                "card": {"name": "Warren-Scourge Elf"},
+                "matching_source": {
+                    "name": "Fixture Goblin",
+                    "type_line": "Creature - Goblin",
+                    "colors": ["R"],
+                    "cmc": 2,
+                },
+                "nonmatching_source": {
+                    "name": "Fixture Elf",
+                    "type_line": "Creature - Elf",
+                    "colors": ["G"],
+                    "cmc": 2,
+                },
+            },
+            [],
+        )
+    finally:
+        battle.get_card_effect = previous_get_card_effect
+
+    assert result["card_name"] == "Warren-Scourge Elf"
+    assert result["protection_from_subtypes"] == ["goblin"]
+
+
 def test_equipment_static_attachment_runner_executes_boost_and_keywords() -> None:
     battle = validator.load_battle(validator.DEFAULT_BATTLE)
     events = []

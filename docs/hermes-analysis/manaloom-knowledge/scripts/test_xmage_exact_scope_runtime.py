@@ -20765,6 +20765,94 @@ class XMageExactScopeRuntimeTest(unittest.TestCase):
             )
         )
 
+    def test_static_filtered_protection_blocks_color_profiles_and_mana_value(self) -> None:
+        opponent = self.battle.Player("Opponent", None, [])
+        base_creature = {
+            "name": "Fixture Filtered Protection",
+            "type_line": "Creature - Spirit",
+            "controller": "Active",
+            "power": 2,
+            "toughness": 2,
+        }
+
+        multicolored = self.battle.enrich_card(
+            {
+                **base_creature,
+                "battle_model_scope": "xmage_static_self_protection_from_filtered_creature_v1",
+                "static_effect": "self_protection_from_filtered",
+                "protection_filter": "multicolored",
+                "protection_from_color_profile": "multicolored",
+            }
+        )
+        self.assertFalse(
+            self.battle.is_legal_target(
+                {"name": "Fixture Gruul Spell", "type_line": "Instant", "colors": ["R", "G"], "cmc": 2},
+                multicolored,
+                opponent,
+                target_type="creature",
+            )
+        )
+        self.assertTrue(
+            self.battle.is_legal_target(
+                {"name": "Fixture Red Spell", "type_line": "Instant", "colors": ["R"], "cmc": 1},
+                multicolored,
+                opponent,
+                target_type="creature",
+            )
+        )
+
+        monocolored = self.battle.enrich_card(
+            {
+                **base_creature,
+                "battle_model_scope": "xmage_static_self_protection_from_filtered_creature_v1",
+                "static_effect": "self_protection_from_filtered",
+                "protection_filter": "monocolored",
+                "protection_from_color_profile": "monocolored",
+            }
+        )
+        self.assertFalse(
+            self.battle.is_legal_target(
+                {"name": "Fixture Red Spell", "type_line": "Instant", "colors": ["R"], "cmc": 1},
+                monocolored,
+                opponent,
+                target_type="creature",
+            )
+        )
+        self.assertTrue(
+            self.battle.is_legal_target(
+                {"name": "Fixture Gruul Spell", "type_line": "Instant", "colors": ["R", "G"], "cmc": 2},
+                monocolored,
+                opponent,
+                target_type="creature",
+            )
+        )
+
+        mana_value = self.battle.enrich_card(
+            {
+                **base_creature,
+                "battle_model_scope": "xmage_static_self_protection_from_filtered_creature_v1",
+                "static_effect": "self_protection_from_filtered",
+                "protection_filter": "mana_value_gte",
+                "protection_from_mana_value_min": 3,
+            }
+        )
+        self.assertFalse(
+            self.battle.is_legal_target(
+                {"name": "Fixture Big Spell", "type_line": "Instant", "colors": ["B"], "cmc": 3},
+                mana_value,
+                opponent,
+                target_type="creature",
+            )
+        )
+        self.assertTrue(
+            self.battle.is_legal_target(
+                {"name": "Fixture Small Spell", "type_line": "Instant", "colors": ["B"], "cmc": 2},
+                mana_value,
+                opponent,
+                target_type="creature",
+            )
+        )
+
     def test_destroy_all_enchantments_board_wipe_resolves_by_type(self) -> None:
         active = self.battle.Player("Active", None, [])
         opponent = self.battle.Player("Opponent", None, [])

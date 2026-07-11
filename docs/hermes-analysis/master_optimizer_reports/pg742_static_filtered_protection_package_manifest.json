@@ -1,0 +1,380 @@
+{
+  "apply_gate": "Do not run apply SQL without explicit approval for the exact command.",
+  "backup_table": "manaloom_deploy_audit.pg742_static_filtered_protection_20260711_052106",
+  "deploy_id": "PG742",
+  "execution_scenarios": [
+    {
+      "card": {
+        "name": "Enemy of the Guildpact"
+      },
+      "logical_rule_key": "battle_rule_v1:2a8232286b6b473126a81d5f3696ffba",
+      "matching_source": {
+        "cmc": 2,
+        "colors": [
+          "R",
+          "G"
+        ],
+        "effect": "direct_damage",
+        "mana_cost": "{R}{G}",
+        "name": "E2E Matching Protection Source",
+        "type_line": "Instant"
+      },
+      "name": "Enemy of the Guildpact static filtered protection blocks matching source",
+      "nonmatching_source": {
+        "cmc": 1,
+        "colors": [
+          "R"
+        ],
+        "effect": "direct_damage",
+        "mana_cost": "{R}",
+        "name": "E2E Nonmatching Protection Source",
+        "type_line": "Instant"
+      },
+      "type": "static_filtered_protection"
+    },
+    {
+      "card": {
+        "name": "Guardian of the Guildpact"
+      },
+      "logical_rule_key": "battle_rule_v1:ba763549dc3ab9cc7a3df072b0d5f6cc",
+      "matching_source": {
+        "cmc": 1,
+        "colors": [
+          "R"
+        ],
+        "effect": "direct_damage",
+        "mana_cost": "{R}",
+        "name": "E2E Matching Protection Source",
+        "type_line": "Instant"
+      },
+      "name": "Guardian of the Guildpact static filtered protection blocks matching source",
+      "nonmatching_source": {
+        "cmc": 2,
+        "colors": [
+          "R",
+          "G"
+        ],
+        "effect": "direct_damage",
+        "mana_cost": "{R}{G}",
+        "name": "E2E Nonmatching Protection Source",
+        "type_line": "Instant"
+      },
+      "type": "static_filtered_protection"
+    },
+    {
+      "card": {
+        "name": "Mistmeadow Skulk"
+      },
+      "logical_rule_key": "battle_rule_v1:335843a14f97a88cee79ec82f82c4600",
+      "matching_source": {
+        "cmc": 3,
+        "colors": [
+          "B"
+        ],
+        "effect": "direct_damage",
+        "mana_cost": "{3}",
+        "name": "E2E Matching Protection Source",
+        "type_line": "Instant"
+      },
+      "name": "Mistmeadow Skulk static filtered protection blocks matching source",
+      "nonmatching_source": {
+        "cmc": 2,
+        "colors": [
+          "B"
+        ],
+        "effect": "direct_damage",
+        "mana_cost": "{2}",
+        "name": "E2E Nonmatching Protection Source",
+        "type_line": "Instant"
+      },
+      "type": "static_filtered_protection"
+    },
+    {
+      "card": {
+        "name": "Warren-Scourge Elf"
+      },
+      "logical_rule_key": "battle_rule_v1:d8530a0ec0e100d63494854d035f7a2e",
+      "matching_source": {
+        "cmc": 2,
+        "colors": [
+          "R"
+        ],
+        "effect": "creature",
+        "mana_cost": "{1}{R}",
+        "name": "E2E Matching Protection Source",
+        "type_line": "Creature - Goblin"
+      },
+      "name": "Warren-Scourge Elf static subtype protection blocks matching source",
+      "nonmatching_source": {
+        "cmc": 2,
+        "colors": [
+          "G"
+        ],
+        "effect": "creature",
+        "mana_cost": "{1}{G}",
+        "name": "E2E Nonmatching Protection Source",
+        "type_line": "Creature - Elf"
+      },
+      "type": "static_subtype_protection"
+    }
+  ],
+  "expected_rules": [
+    {
+      "card_name": "Enemy of the Guildpact",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:2a8232286b6b473126a81d5f3696ffba",
+      "min_rule_version": 2,
+      "normalized_name": "enemy of the guildpact",
+      "oracle_hash": "cd1d44d04de0397a22c65b802740a2d1",
+      "required_effect_fields": {
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_self_protection_from_filtered_creature_v1",
+        "effect": "creature",
+        "protection_filter": "multicolored",
+        "protection_from_color_profile": "multicolored",
+        "static_effect": "self_protection_from_filtered",
+        "target": "self",
+        "target_controller": "self",
+        "xmage_ability_class": "ProtectionAbility"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Guardian of the Guildpact",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:ba763549dc3ab9cc7a3df072b0d5f6cc",
+      "min_rule_version": 2,
+      "normalized_name": "guardian of the guildpact",
+      "oracle_hash": "6db300085ae20d24e50370ea523fd3ff",
+      "required_effect_fields": {
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_self_protection_from_filtered_creature_v1",
+        "effect": "creature",
+        "protection_filter": "monocolored",
+        "protection_from_color_profile": "monocolored",
+        "static_effect": "self_protection_from_filtered",
+        "target": "self",
+        "target_controller": "self",
+        "xmage_ability_class": "ProtectionAbility"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Mistmeadow Skulk",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:335843a14f97a88cee79ec82f82c4600",
+      "min_rule_version": 2,
+      "normalized_name": "mistmeadow skulk",
+      "oracle_hash": "68ade6cbc5d9e6fd742fffa9aa9de5eb",
+      "required_effect_fields": {
+        "_keywords_are_self": true,
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_self_protection_from_filtered_creature_v1",
+        "effect": "creature",
+        "keywords": [
+          "lifelink"
+        ],
+        "protection_filter": "mana_value_gte",
+        "protection_from_mana_value_min": 3,
+        "static_effect": "self_protection_from_filtered",
+        "target": "self",
+        "target_controller": "self",
+        "xmage_ability_class": "ProtectionAbility"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Warren-Scourge Elf",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:d8530a0ec0e100d63494854d035f7a2e",
+      "min_rule_version": 2,
+      "normalized_name": "warren-scourge elf",
+      "oracle_hash": "05409a998adab6569dded35c77248cde",
+      "required_effect_fields": {
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_self_protection_from_subtypes_creature_v1",
+        "effect": "creature",
+        "protection_from_subtypes": [
+          "goblin"
+        ],
+        "static_effect": "self_protection_from_subtypes",
+        "target": "self",
+        "target_controller": "self",
+        "xmage_ability_class": "ProtectionAbility"
+      },
+      "review_status": "verified"
+    }
+  ],
+  "family_counts": {
+    "xmage_static_self_protection_from_filtered_creature": 3,
+    "xmage_static_self_protection_from_subtypes_creature": 1
+  },
+  "files": {
+    "apply": "docs/hermes-analysis/master_optimizer_reports/pg742_static_filtered_protection_package_apply.sql",
+    "manifest": "docs/hermes-analysis/master_optimizer_reports/pg742_static_filtered_protection_package_manifest.json",
+    "package": "docs/hermes-analysis/master_optimizer_reports/pg742_static_filtered_protection_package_package.md",
+    "postcheck": "docs/hermes-analysis/master_optimizer_reports/pg742_static_filtered_protection_package_postcheck.sql",
+    "precheck": "docs/hermes-analysis/master_optimizer_reports/pg742_static_filtered_protection_package_precheck.sql",
+    "rollback": "docs/hermes-analysis/master_optimizer_reports/pg742_static_filtered_protection_package_rollback.sql"
+  },
+  "generated_at": "2026-07-11T05:23:24+00:00",
+  "mutations_performed": [],
+  "runtime_checks": [
+    {
+      "card": {
+        "name": "Enemy of the Guildpact"
+      },
+      "card_name": "Enemy of the Guildpact",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:2a8232286b6b473126a81d5f3696ffba",
+      "normalized_name": "enemy of the guildpact",
+      "required_effect_fields": {
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_self_protection_from_filtered_creature_v1",
+        "effect": "creature",
+        "protection_filter": "multicolored",
+        "protection_from_color_profile": "multicolored",
+        "static_effect": "self_protection_from_filtered",
+        "target": "self",
+        "target_controller": "self",
+        "xmage_ability_class": "ProtectionAbility"
+      }
+    },
+    {
+      "card": {
+        "name": "Guardian of the Guildpact"
+      },
+      "card_name": "Guardian of the Guildpact",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:ba763549dc3ab9cc7a3df072b0d5f6cc",
+      "normalized_name": "guardian of the guildpact",
+      "required_effect_fields": {
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_self_protection_from_filtered_creature_v1",
+        "effect": "creature",
+        "protection_filter": "monocolored",
+        "protection_from_color_profile": "monocolored",
+        "static_effect": "self_protection_from_filtered",
+        "target": "self",
+        "target_controller": "self",
+        "xmage_ability_class": "ProtectionAbility"
+      }
+    },
+    {
+      "card": {
+        "name": "Mistmeadow Skulk"
+      },
+      "card_name": "Mistmeadow Skulk",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:335843a14f97a88cee79ec82f82c4600",
+      "normalized_name": "mistmeadow skulk",
+      "required_effect_fields": {
+        "_keywords_are_self": true,
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_self_protection_from_filtered_creature_v1",
+        "effect": "creature",
+        "keywords": [
+          "lifelink"
+        ],
+        "protection_filter": "mana_value_gte",
+        "protection_from_mana_value_min": 3,
+        "static_effect": "self_protection_from_filtered",
+        "target": "self",
+        "target_controller": "self",
+        "xmage_ability_class": "ProtectionAbility"
+      }
+    },
+    {
+      "card": {
+        "name": "Warren-Scourge Elf"
+      },
+      "card_name": "Warren-Scourge Elf",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:d8530a0ec0e100d63494854d035f7a2e",
+      "normalized_name": "warren-scourge elf",
+      "required_effect_fields": {
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_self_protection_from_subtypes_creature_v1",
+        "effect": "creature",
+        "protection_from_subtypes": [
+          "goblin"
+        ],
+        "static_effect": "self_protection_from_subtypes",
+        "target": "self",
+        "target_controller": "self",
+        "xmage_ability_class": "ProtectionAbility"
+      }
+    }
+  ],
+  "selected_card_names": [
+    "Enemy of the Guildpact",
+    "Guardian of the Guildpact",
+    "Mistmeadow Skulk",
+    "Warren-Scourge Elf"
+  ],
+  "selected_count": 4,
+  "slug": "static_filtered_protection",
+  "snapshot_checks": [
+    {
+      "card_name": "Enemy of the Guildpact",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:2a8232286b6b473126a81d5f3696ffba",
+      "min_rule_version": 2,
+      "normalized_name": "enemy of the guildpact",
+      "oracle_hash": "cd1d44d04de0397a22c65b802740a2d1",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_static_self_protection_from_filtered_creature_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Guardian of the Guildpact",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:ba763549dc3ab9cc7a3df072b0d5f6cc",
+      "min_rule_version": 2,
+      "normalized_name": "guardian of the guildpact",
+      "oracle_hash": "6db300085ae20d24e50370ea523fd3ff",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_static_self_protection_from_filtered_creature_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Mistmeadow Skulk",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:335843a14f97a88cee79ec82f82c4600",
+      "min_rule_version": 2,
+      "normalized_name": "mistmeadow skulk",
+      "oracle_hash": "68ade6cbc5d9e6fd742fffa9aa9de5eb",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_static_self_protection_from_filtered_creature_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Warren-Scourge Elf",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:d8530a0ec0e100d63494854d035f7a2e",
+      "min_rule_version": 2,
+      "normalized_name": "warren-scourge elf",
+      "oracle_hash": "05409a998adab6569dded35c77248cde",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_static_self_protection_from_subtypes_creature_v1"
+      },
+      "review_status": "verified"
+    }
+  ],
+  "status": "prepared_read_only_pending_apply_approval"
+}

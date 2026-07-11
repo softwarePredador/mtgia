@@ -126,6 +126,53 @@ def test_counter_unless_pays_draw_execution_scenario_is_manifested() -> None:
     assert scenario["expected_cards_drawn"] == 1
 
 
+def test_static_filtered_protection_execution_scenario_is_manifested() -> None:
+    proposal = {
+        "normalized_name": "enemy of the guildpact",
+        "card_name": "Enemy of the Guildpact",
+        "oracle_hash": "hash-protection",
+        "logical_rule_key": "battle_rule_v1:filtered-protection",
+        "effect_json": {
+            "effect": "creature",
+            "battle_model_scope": "xmage_static_self_protection_from_filtered_creature_v1",
+            "static_effect": "self_protection_from_filtered",
+            "protection_filter": "multicolored",
+            "protection_from_color_profile": "multicolored",
+        },
+    }
+
+    expected = builder.expected_rule_from_proposal(proposal)
+    scenario = builder.execution_scenario_from_expected_rule(expected)
+
+    assert expected["required_effect_fields"]["protection_from_color_profile"] == "multicolored"
+    assert scenario["type"] == "static_filtered_protection"
+    assert scenario["matching_source"]["colors"] == ["R", "G"]
+    assert scenario["nonmatching_source"]["colors"] == ["R"]
+
+
+def test_static_subtype_protection_execution_scenario_is_manifested() -> None:
+    proposal = {
+        "normalized_name": "warren-scourge elf",
+        "card_name": "Warren-Scourge Elf",
+        "oracle_hash": "hash-protection-subtype",
+        "logical_rule_key": "battle_rule_v1:subtype-protection",
+        "effect_json": {
+            "effect": "creature",
+            "battle_model_scope": "xmage_static_self_protection_from_subtypes_creature_v1",
+            "static_effect": "self_protection_from_subtypes",
+            "protection_from_subtypes": ["goblin"],
+        },
+    }
+
+    expected = builder.expected_rule_from_proposal(proposal)
+    scenario = builder.execution_scenario_from_expected_rule(expected)
+
+    assert expected["required_effect_fields"]["protection_from_subtypes"] == ["goblin"]
+    assert scenario["type"] == "static_subtype_protection"
+    assert scenario["matching_source"]["type_line"] == "Creature - Goblin"
+    assert scenario["nonmatching_source"]["type_line"] == "Creature - Elf"
+
+
 def test_counter_unless_pays_draw_execution_scenario_uses_instant_fixture_for_instant_or_sorcery_target() -> None:
     proposal = {
         "normalized_name": "disrupt",

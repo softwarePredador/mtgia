@@ -13660,6 +13660,20 @@ def card_color_symbol_set(card):
     }
 
 
+def card_mana_value(card):
+    if not isinstance(card, dict):
+        return 0
+    for key in ("mana_value", "cmc", "converted_mana_cost"):
+        value = card.get(key)
+        if value in (None, ""):
+            continue
+        try:
+            return int(float(value))
+        except (TypeError, ValueError):
+            continue
+    return 0
+
+
 def target_constraint_source(source, effect_data):
     if not isinstance(effect_data, dict):
         return source
@@ -13720,6 +13734,24 @@ def is_legal_target(spell, target, controller, all_players=None, target_type=Non
         source_colors = set(protection_colors_for_source(spell))
     if any(c in protections for c in source_colors):
         return False
+    protection_profile = str(target.get("protection_from_color_profile") or "").strip().lower()
+    if protection_profile:
+        source_profile_colors = {
+            color
+            for color in protection_colors_for_source(spell)
+            if _normalize_color_symbol(color) != "colorless"
+        }
+        if protection_profile == "multicolored" and len(source_profile_colors) >= 2:
+            return False
+        if protection_profile == "monocolored" and len(source_profile_colors) == 1:
+            return False
+    protection_mana_value_min = target.get("protection_from_mana_value_min")
+    if protection_mana_value_min not in (None, ""):
+        try:
+            if card_mana_value(spell) >= int(protection_mana_value_min):
+                return False
+        except (TypeError, ValueError):
+            pass
     protected_card_types = {
         str(card_type or "").strip().lower()
         for card_type in _as_list(target.get("protection_from_card_types"))

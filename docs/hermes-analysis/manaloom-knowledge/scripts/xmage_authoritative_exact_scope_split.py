@@ -436,6 +436,9 @@ STATIC_PROTECTION_FROM_CARD_TYPES_CREATURE_SCOPE = (
 STATIC_PROTECTION_FROM_SUBTYPES_CREATURE_SCOPE = (
     "xmage_static_self_protection_from_subtypes_creature_v1"
 )
+STATIC_PROTECTION_FROM_FILTERED_CREATURE_SCOPE = (
+    "xmage_static_self_protection_from_filtered_creature_v1"
+)
 STATIC_CAST_AS_FLASH_PERMISSION_SCOPE = "xmage_static_cast_spells_as_flash_permission_v1"
 STATIC_CANT_BE_BLOCKED_CREATURE_SCOPE = "xmage_static_self_cant_be_blocked_creature_v1"
 STATIC_CANT_BLOCK_CREATURE_SCOPE = "xmage_static_self_cant_block_creature_v1"
@@ -894,6 +897,8 @@ PROTECTION_SUBTYPE_WORDS = {
     "dragon": "dragon",
     "elves": "elf",
     "elf": "elf",
+    "goblins": "goblin",
+    "goblin": "goblin",
     "kavu": "kavu",
     "spirits": "spirit",
     "spirit": "spirit",
@@ -12688,6 +12693,36 @@ def protection_from_subtypes_from_oracle(metadata: dict[str, Any]) -> list[str] 
     return ordered_protection_subtypes([PROTECTION_SUBTYPE_WORDS[part] for part in parts])
 
 
+def protection_from_filtered_from_oracle(metadata: dict[str, Any]) -> dict[str, Any] | None:
+    raw = str(metadata.get("oracle_text") or "").strip()
+    if not raw:
+        return None
+    text = re.sub(r"\([^)]*\)", "", raw)
+    text = re.sub(r"\s+", " ", text.replace("\n", ", ")).strip().rstrip(".").lower()
+    text = oracle_protection_clause(text) or text
+    match = re.fullmatch(r"protection from (.+)", text)
+    if not match:
+        return None
+    body = re.sub(r"\bfrom\s+", "", match.group(1)).strip()
+    if body in {"multicolored", "multicolor"}:
+        return {
+            "protection_filter": "multicolored",
+            "protection_from_color_profile": "multicolored",
+        }
+    if body in {"monocolored", "monocolor"}:
+        return {
+            "protection_filter": "monocolored",
+            "protection_from_color_profile": "monocolored",
+        }
+    mana_value_match = re.fullmatch(r"mana value (\d+) or greater", body)
+    if mana_value_match:
+        return {
+            "protection_filter": "mana_value_gte",
+            "protection_from_mana_value_min": int(mana_value_match.group(1)),
+        }
+    return None
+
+
 def oracle_protection_clause(text: str) -> str | None:
     parts = [
         part.strip()
@@ -12813,6 +12848,38 @@ def protection_from_subtypes_from_source(source: str) -> list[str] | str:
     if not subtypes:
         return "static_protection_source_not_subtype_exact"
     return ordered_protection_subtypes(subtypes)
+
+
+def protection_from_filtered_from_source(source: str) -> dict[str, Any] | str:
+    text = source or ""
+    if not re.search(r"\bProtectionAbility\b", text):
+        return "static_protection_source_missing_protection_ability"
+    ability_constructors = re.findall(
+        r"(?:ProtectionAbility\.from|new\s+ProtectionAbility)\s*\(",
+        text,
+    )
+    if len(ability_constructors) != 1:
+        return "static_protection_source_multiple_protection_abilities"
+    if "MulticoloredPredicate" in text:
+        return {
+            "protection_filter": "multicolored",
+            "protection_from_color_profile": "multicolored",
+        }
+    if "MonocoloredPredicate" in text:
+        return {
+            "protection_filter": "monocolored",
+            "protection_from_color_profile": "monocolored",
+        }
+    mana_value_match = re.search(
+        r"new\s+ManaValuePredicate\s*\(\s*ComparisonType\.MORE_THAN\s*,\s*(\d+)\s*\)",
+        text,
+    )
+    if mana_value_match:
+        return {
+            "protection_filter": "mana_value_gte",
+            "protection_from_mana_value_min": int(mana_value_match.group(1)) + 1,
+        }
+    return "static_protection_source_not_filtered_exact"
 
 
 def static_keywords_from_oracle(metadata: dict[str, Any]) -> set[str] | None:
@@ -31672,6 +31739,7 @@ def split_row(
         oracle_colors = protection_from_colors_from_oracle(metadata)
         oracle_card_types: list[str] | None = None
         oracle_subtypes: list[str] | None = None
+        oracle_filtered: dict[str, Any] | None = None
         if oracle_colors is not None:
             source_colors = protection_from_colors_from_source(source_text)
             if isinstance(source_colors, str):
@@ -31699,18 +31767,29 @@ def split_row(
                 }
             else:
                 oracle_subtypes = protection_from_subtypes_from_oracle(metadata)
-                if oracle_subtypes is None:
-                    return None, "static_protection_oracle_not_color_or_card_type_or_subtype_exact"
-                source_subtypes = protection_from_subtypes_from_source(source_text)
-                if isinstance(source_subtypes, str):
-                    return None, source_subtypes
-                if source_subtypes != oracle_subtypes:
-                    return None, "static_protection_source_oracle_mismatch"
-                protection_scope = STATIC_PROTECTION_FROM_SUBTYPES_CREATURE_SCOPE
-                static_effect = "self_protection_from_subtypes"
-                protection_fields = {
-                    "protection_from_subtypes": oracle_subtypes,
-                }
+                if oracle_subtypes is not None:
+                    source_subtypes = protection_from_subtypes_from_source(source_text)
+                    if isinstance(source_subtypes, str):
+                        return None, source_subtypes
+                    if source_subtypes != oracle_subtypes:
+                        return None, "static_protection_source_oracle_mismatch"
+                    protection_scope = STATIC_PROTECTION_FROM_SUBTYPES_CREATURE_SCOPE
+                    static_effect = "self_protection_from_subtypes"
+                    protection_fields = {
+                        "protection_from_subtypes": oracle_subtypes,
+                    }
+                else:
+                    oracle_filtered = protection_from_filtered_from_oracle(metadata)
+                    if oracle_filtered is None:
+                        return None, "static_protection_oracle_not_color_or_card_type_or_subtype_exact"
+                    source_filtered = protection_from_filtered_from_source(source_text)
+                    if isinstance(source_filtered, str):
+                        return None, source_filtered
+                    if source_filtered != oracle_filtered:
+                        return None, "static_protection_source_oracle_mismatch"
+                    protection_scope = STATIC_PROTECTION_FROM_FILTERED_CREATURE_SCOPE
+                    static_effect = "self_protection_from_filtered"
+                    protection_fields = dict(oracle_filtered)
         keywords = keywords_from_ability_classes(row)
         oracle_keywords = static_keywords_before_protection_from_oracle(metadata)
         if oracle_keywords is None:
@@ -31743,7 +31822,11 @@ def split_row(
                 else (
                     "xmage_static_self_protection_from_card_types_creature"
                     if oracle_card_types is not None
-                    else "xmage_static_self_protection_from_subtypes_creature"
+                    else (
+                        "xmage_static_self_protection_from_subtypes_creature"
+                        if oracle_subtypes is not None
+                        else "xmage_static_self_protection_from_filtered_creature"
+                    )
                 )
             ),
         ), "selected_exact_scope"
@@ -39375,7 +39458,7 @@ def build_exact_split_report(
             "supported_adapter_work_units": sorted(SUPPORTED_UNITS),
             "supported_dynamic_adapter_work_units": [
                 "no-effect/no-signal static self keyword creature rows without ProtectionAbility or WardAbility",
-                "no-effect/no-signal ProtectionAbility creature rows, optionally with static self keywords, with exact Oracle/XMage protection from color words only",
+                "no-effect/no-signal ProtectionAbility creature rows, optionally with static self keywords, with exact Oracle/XMage protection from colors, card types, subtypes, or supported filters",
                 "passive::static_cast_as_flash_permission_variant_review_v1 rows with CastAsThoughItHadFlashAllEffect, SimpleStaticAbility, only safe static keyword auxiliaries including FlashAbility, and exact Oracle/XMage timing-permission filters",
                 "no-effect/no-signal CantBeBlockedSourceAbility creature rows with exact Oracle/XMage self can't-be-blocked evasion",
                 "no-effect/no-signal basic landwalk creature rows with exact Oracle/XMage self landwalk evasion",

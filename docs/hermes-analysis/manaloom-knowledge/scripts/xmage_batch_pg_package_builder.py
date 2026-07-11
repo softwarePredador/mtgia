@@ -654,8 +654,13 @@ E2E_REQUIRED_EFFECT_FIELDS = (
     "xmage_unmodeled_effect_classes",
     "xmage_effect_classes",
     "static_effect",
+    "protection_from",
+    "protection_from_colors",
     "protection_from_card_types",
     "protection_from_subtypes",
+    "protection_filter",
+    "protection_from_color_profile",
+    "protection_from_mana_value_min",
     "cast_spells_as_flash",
     "cast_nonland_spells_as_flash",
     "flash_permission_filter",
@@ -1162,6 +1167,86 @@ def runtime_check_from_expected_rule(rule: dict[str, Any]) -> dict[str, Any]:
     if required.get("effect") is not None:
         check["effect"] = required["effect"]
     return check
+
+
+def static_filtered_protection_execution_scenario_from_expected_rule(
+    rule: dict[str, Any],
+) -> dict[str, Any] | None:
+    required = dict(rule.get("required_effect_fields") or {})
+    if required.get("battle_model_scope") != "xmage_static_self_protection_from_filtered_creature_v1":
+        return None
+    matching_source = {
+        "name": "E2E Matching Protection Source",
+        "type_line": "Instant",
+        "effect": "direct_damage",
+        "cmc": 2,
+        "colors": ["R"],
+        "mana_cost": "{R}",
+    }
+    nonmatching_source = {
+        "name": "E2E Nonmatching Protection Source",
+        "type_line": "Instant",
+        "effect": "direct_damage",
+        "cmc": 1,
+        "colors": [],
+        "mana_cost": "{1}",
+    }
+    color_profile = str(required.get("protection_from_color_profile") or "").strip().lower()
+    if color_profile == "multicolored":
+        matching_source.update({"colors": ["R", "G"], "mana_cost": "{R}{G}", "cmc": 2})
+        nonmatching_source.update({"colors": ["R"], "mana_cost": "{R}", "cmc": 1})
+    elif color_profile == "monocolored":
+        matching_source.update({"colors": ["R"], "mana_cost": "{R}", "cmc": 1})
+        nonmatching_source.update({"colors": ["R", "G"], "mana_cost": "{R}{G}", "cmc": 2})
+    elif required.get("protection_from_mana_value_min") not in (None, ""):
+        minimum = int(required["protection_from_mana_value_min"])
+        matching_source.update({"colors": ["B"], "mana_cost": f"{{{minimum}}}", "cmc": minimum})
+        nonmatching_source.update({"colors": ["B"], "mana_cost": f"{{{max(0, minimum - 1)}}}", "cmc": max(0, minimum - 1)})
+    else:
+        return None
+    return {
+        "name": f"{rule['card_name']} static filtered protection blocks matching source",
+        "type": "static_filtered_protection",
+        "card": {"name": rule["card_name"]},
+        "matching_source": matching_source,
+        "nonmatching_source": nonmatching_source,
+        "logical_rule_key": rule["logical_rule_key"],
+    }
+
+
+def static_subtype_protection_execution_scenario_from_expected_rule(
+    rule: dict[str, Any],
+) -> dict[str, Any] | None:
+    required = dict(rule.get("required_effect_fields") or {})
+    if required.get("battle_model_scope") != "xmage_static_self_protection_from_subtypes_creature_v1":
+        return None
+    subtypes = [str(value).strip().lower() for value in required.get("protection_from_subtypes") or [] if value]
+    if not subtypes:
+        return None
+    subtype = subtypes[0]
+    nonmatching_subtype = "elf" if subtype != "elf" else "goblin"
+    return {
+        "name": f"{rule['card_name']} static subtype protection blocks matching source",
+        "type": "static_subtype_protection",
+        "card": {"name": rule["card_name"]},
+        "matching_source": {
+            "name": "E2E Matching Protection Source",
+            "type_line": f"Creature - {subtype.title()}",
+            "effect": "creature",
+            "cmc": 2,
+            "colors": ["R"],
+            "mana_cost": "{1}{R}",
+        },
+        "nonmatching_source": {
+            "name": "E2E Nonmatching Protection Source",
+            "type_line": f"Creature - {nonmatching_subtype.title()}",
+            "effect": "creature",
+            "cmc": 2,
+            "colors": ["G"],
+            "mana_cost": "{1}{G}",
+        },
+        "logical_rule_key": rule["logical_rule_key"],
+    }
 
 
 def static_global_pt_execution_scenario_from_expected_rule(rule: dict[str, Any]) -> dict[str, Any] | None:
@@ -6965,6 +7050,8 @@ def execution_scenario_from_expected_rule(rule: dict[str, Any]) -> dict[str, Any
         damage_prevention_execution_scenario_from_expected_rule(rule)
         or counter_target_execution_scenario_from_expected_rule(rule)
         or counter_unless_pays_execution_scenario_from_expected_rule(rule)
+        or static_filtered_protection_execution_scenario_from_expected_rule(rule)
+        or static_subtype_protection_execution_scenario_from_expected_rule(rule)
         or static_cost_reduction_execution_scenario_from_expected_rule(rule)
         or static_cost_increase_execution_scenario_from_expected_rule(rule)
         or static_controlled_pt_execution_scenario_from_expected_rule(rule)

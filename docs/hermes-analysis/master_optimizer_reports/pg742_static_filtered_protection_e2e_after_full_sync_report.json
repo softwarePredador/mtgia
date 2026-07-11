@@ -1,0 +1,237 @@
+{
+  "battle_execution": {
+    "event_count": 0,
+    "results": [
+      {
+        "card_name": "Enemy of the Guildpact",
+        "matching_source": "E2E Matching Protection Source",
+        "nonmatching_source": "E2E Nonmatching Protection Source",
+        "protection_filter": "multicolored",
+        "protection_from_subtypes": null,
+        "scenario": "Enemy of the Guildpact static filtered protection blocks matching source",
+        "static_effect": "self_protection_from_filtered"
+      },
+      {
+        "card_name": "Guardian of the Guildpact",
+        "matching_source": "E2E Matching Protection Source",
+        "nonmatching_source": "E2E Nonmatching Protection Source",
+        "protection_filter": "monocolored",
+        "protection_from_subtypes": null,
+        "scenario": "Guardian of the Guildpact static filtered protection blocks matching source",
+        "static_effect": "self_protection_from_filtered"
+      },
+      {
+        "card_name": "Mistmeadow Skulk",
+        "matching_source": "E2E Matching Protection Source",
+        "nonmatching_source": "E2E Nonmatching Protection Source",
+        "protection_filter": "mana_value_gte",
+        "protection_from_subtypes": null,
+        "scenario": "Mistmeadow Skulk static filtered protection blocks matching source",
+        "static_effect": "self_protection_from_filtered"
+      },
+      {
+        "card_name": "Warren-Scourge Elf",
+        "matching_source": "E2E Matching Protection Source",
+        "nonmatching_source": "E2E Nonmatching Protection Source",
+        "protection_filter": null,
+        "protection_from_subtypes": [
+          "goblin"
+        ],
+        "scenario": "Warren-Scourge Elf static subtype protection blocks matching source",
+        "static_effect": "self_protection_from_subtypes"
+      }
+    ],
+    "scenario_count": 4
+  },
+  "battle_path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py",
+  "database_target": "127.0.0.1:15432/halder",
+  "generated_at_utc": "2026-07-11T05:31:27.546621+00:00",
+  "manifest": "docs/hermes-analysis/master_optimizer_reports/pg742_static_filtered_protection_package_manifest.json",
+  "package_id": "pg742_static_filtered_protection_package_manifest",
+  "snapshot": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/known_cards_canonical_snapshot.json",
+  "sqlite_db": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db",
+  "stages": [
+    {
+      "evidence": {
+        "validated_rows": 4
+      },
+      "name": "postgres_source_of_truth",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_protection_from_filtered_creature_v1",
+          "card_name": "Enemy of the Guildpact",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:2a8232286b6b473126a81d5f3696ffba",
+          "oracle_hash": "cd1d44d04de0397a22c65b802740a2d1",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_protection_from_filtered_creature_v1",
+          "card_name": "Guardian of the Guildpact",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:ba763549dc3ab9cc7a3df072b0d5f6cc",
+          "oracle_hash": "6db300085ae20d24e50370ea523fd3ff",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_protection_from_filtered_creature_v1",
+          "card_name": "Mistmeadow Skulk",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:335843a14f97a88cee79ec82f82c4600",
+          "oracle_hash": "68ade6cbc5d9e6fd742fffa9aa9de5eb",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_protection_from_subtypes_creature_v1",
+          "card_name": "Warren-Scourge Elf",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:d8530a0ec0e100d63494854d035f7a2e",
+          "oracle_hash": "05409a998adab6569dded35c77248cde",
+          "review_status": "verified",
+          "rule_version": 2
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_rows": 4
+      },
+      "name": "sqlite_hermes_cache",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_protection_from_filtered_creature_v1",
+          "card_name": "Enemy of the Guildpact",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:2a8232286b6b473126a81d5f3696ffba",
+          "oracle_hash": "cd1d44d04de0397a22c65b802740a2d1",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_protection_from_filtered_creature_v1",
+          "card_name": "Guardian of the Guildpact",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:ba763549dc3ab9cc7a3df072b0d5f6cc",
+          "oracle_hash": "6db300085ae20d24e50370ea523fd3ff",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_protection_from_filtered_creature_v1",
+          "card_name": "Mistmeadow Skulk",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:335843a14f97a88cee79ec82f82c4600",
+          "oracle_hash": "68ade6cbc5d9e6fd742fffa9aa9de5eb",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_protection_from_subtypes_creature_v1",
+          "card_name": "Warren-Scourge Elf",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:d8530a0ec0e100d63494854d035f7a2e",
+          "oracle_hash": "05409a998adab6569dded35c77248cde",
+          "review_status": "verified",
+          "rule_version": 2
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_cards": 4
+      },
+      "name": "canonical_snapshot_fallback",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_protection_from_filtered_creature_v1",
+          "battle_rule_version": 2,
+          "card_name": "Enemy of the Guildpact",
+          "logical_rule_key": "battle_rule_v1:2a8232286b6b473126a81d5f3696ffba"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_protection_from_filtered_creature_v1",
+          "battle_rule_version": 2,
+          "card_name": "Guardian of the Guildpact",
+          "logical_rule_key": "battle_rule_v1:ba763549dc3ab9cc7a3df072b0d5f6cc"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_protection_from_filtered_creature_v1",
+          "battle_rule_version": 2,
+          "card_name": "Mistmeadow Skulk",
+          "logical_rule_key": "battle_rule_v1:335843a14f97a88cee79ec82f82c4600"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_protection_from_subtypes_creature_v1",
+          "battle_rule_version": 2,
+          "card_name": "Warren-Scourge Elf",
+          "logical_rule_key": "battle_rule_v1:d8530a0ec0e100d63494854d035f7a2e"
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_cards": 4
+      },
+      "name": "runtime_get_card_effect",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "card_name": "Enemy of the Guildpact",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:2a8232286b6b473126a81d5f3696ffba"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Guardian of the Guildpact",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:ba763549dc3ab9cc7a3df072b0d5f6cc"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Mistmeadow Skulk",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:335843a14f97a88cee79ec82f82c4600"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Warren-Scourge Elf",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:d8530a0ec0e100d63494854d035f7a2e"
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "events": 0,
+        "scenarios": 4
+      },
+      "name": "battle_execution",
+      "status": "pass"
+    }
+  ],
+  "status": "pass",
+  "title": "Battle Package End-to-End Validation"
+}

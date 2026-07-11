@@ -10353,6 +10353,48 @@ def run_static_cost_reduction_spell_cost(
     }
 
 
+def run_static_filtered_protection(
+    battle,
+    scenario: dict[str, Any],
+    events: list[tuple[str, dict[str, Any]]],
+) -> dict[str, Any]:
+    card = dict(scenario["card"])
+    effect = battle.get_card_effect(card)
+    active = battle.Player(str(scenario.get("player") or "Protection Controller"), None, [])
+    opponent = battle.Player(str(scenario.get("opponent") or "Protection Opponent"), None, [])
+    battle.bind_table_context([active, opponent])
+    permanent = battle.enrich_card(
+        {
+            **card,
+            "type_line": scenario.get("source_type_line") or "Creature - Fixture",
+            "controller": active.name,
+            **effect,
+        }
+    )
+    active.battlefield = [permanent]
+    matching_source = battle.enrich_card(dict(scenario["matching_source"]))
+    nonmatching_source = battle.enrich_card(dict(scenario["nonmatching_source"]))
+    if battle.is_legal_target(matching_source, permanent, opponent, target_type="creature"):
+        fail(
+            "battle_execution",
+            f"{card['name']} allowed protected matching source {matching_source.get('name')}",
+        )
+    if not battle.is_legal_target(nonmatching_source, permanent, opponent, target_type="creature"):
+        fail(
+            "battle_execution",
+            f"{card['name']} blocked nonmatching source {nonmatching_source.get('name')}",
+        )
+    return {
+        "scenario": scenario.get("name"),
+        "card_name": card["name"],
+        "matching_source": matching_source.get("name"),
+        "nonmatching_source": nonmatching_source.get("name"),
+        "static_effect": effect.get("static_effect"),
+        "protection_filter": effect.get("protection_filter"),
+        "protection_from_subtypes": effect.get("protection_from_subtypes"),
+    }
+
+
 def _controller_for_damage_source(source: dict[str, Any], active, opponent):
     return active if source.get("_controller_role") == "self" else opponent
 
@@ -11114,6 +11156,8 @@ SCENARIO_RUNNERS = {
     "static_graveyard_threshold_source_boost": run_static_graveyard_threshold_source_boost,
     "static_cost_increase_spell_cost": run_static_cost_increase_spell_cost,
     "static_cost_reduction_spell_cost": run_static_cost_reduction_spell_cost,
+    "static_filtered_protection": run_static_filtered_protection,
+    "static_subtype_protection": run_static_filtered_protection,
     "static_count_power_toughness": run_static_count_power_toughness,
     "static_global_power_toughness_boost": run_static_global_power_toughness_boost,
     "target_creature_cant_block": run_target_creature_cant_block,

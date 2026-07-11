@@ -30021,12 +30021,107 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
             ),
             source_text="""
                 private static final FilterObject<?> filter = new FilterObject<>("multicolored");
+                static {
+                    filter.add(MulticoloredPredicate.instance);
+                }
                 this.addAbility(new ProtectionAbility(filter));
             """,
         )
 
-        self.assertIsNone(proposal)
-        self.assertEqual(reason, "static_protection_oracle_not_color_or_card_type_or_subtype_exact")
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.STATIC_PROTECTION_FROM_FILTERED_CREATURE_SCOPE)
+        self.assertEqual(effect["static_effect"], "self_protection_from_filtered")
+        self.assertEqual(effect["protection_filter"], "multicolored")
+        self.assertEqual(effect["protection_from_color_profile"], "multicolored")
+
+    def test_static_protection_creature_maps_monocolored_filter(self) -> None:
+        row = queue_row(
+            "xmage_signature::no_effect_class::ProtectionAbility::no_target_class::no_condition_class::no_signal",
+            effect_classes=[],
+            ability_kind="static",
+            ability_classes=["ProtectionAbility"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Guardian of the Guildpact",
+                type_line="Creature - Spirit",
+                oracle_text="Protection from monocolored",
+            ),
+            source_text="""
+                private static final FilterCard filter = new FilterCard("monocolored");
+                static {
+                    filter.add(MonocoloredPredicate.instance);
+                }
+                this.addAbility(new ProtectionAbility(filter));
+            """,
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.STATIC_PROTECTION_FROM_FILTERED_CREATURE_SCOPE)
+        self.assertEqual(effect["protection_filter"], "monocolored")
+        self.assertEqual(effect["protection_from_color_profile"], "monocolored")
+
+    def test_static_protection_creature_maps_mana_value_filter_and_keyword(self) -> None:
+        row = queue_row(
+            "xmage_signature::no_effect_class::LifelinkAbility,ProtectionAbility::no_target_class::no_condition_class::no_signal",
+            effect_classes=[],
+            ability_kind="static",
+            ability_classes=["LifelinkAbility", "ProtectionAbility"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Mistmeadow Skulk",
+                type_line="Creature - Kithkin Rogue",
+                oracle_text="Lifelink, protection from mana value 3 or greater",
+            ),
+            source_text="""
+                private static final FilterCard filter = new FilterCard("mana value 3 or greater");
+                static {
+                    filter.add(new ManaValuePredicate(ComparisonType.MORE_THAN, 2));
+                }
+                this.addAbility(LifelinkAbility.getInstance());
+                this.addAbility(new ProtectionAbility(filter));
+            """,
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.STATIC_PROTECTION_FROM_FILTERED_CREATURE_SCOPE)
+        self.assertEqual(effect["protection_filter"], "mana_value_gte")
+        self.assertEqual(effect["protection_from_mana_value_min"], 3)
+        self.assertEqual(effect["keywords"], ["lifelink"])
+
+    def test_static_protection_from_goblin_subtype_creature_maps(self) -> None:
+        row = queue_row(
+            "xmage_signature::no_effect_class::ProtectionAbility::no_target_class::no_condition_class::no_signal",
+            effect_classes=[],
+            ability_kind="static",
+            ability_classes=["ProtectionAbility"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Warren-Scourge Elf",
+                type_line="Creature - Elf Warrior",
+                oracle_text="Protection from Goblins",
+            ),
+            source_text="""
+                private static final FilterCard filter = new FilterCard("Goblins");
+                static {
+                    filter.add(SubType.GOBLIN.getPredicate());
+                }
+                this.addAbility(new ProtectionAbility(filter));
+            """,
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.STATIC_PROTECTION_FROM_SUBTYPES_CREATURE_SCOPE)
+        self.assertEqual(effect["protection_from_subtypes"], ["goblin"])
 
     def test_static_keyword_creature_requires_creature_type(self) -> None:
         row = queue_row(
