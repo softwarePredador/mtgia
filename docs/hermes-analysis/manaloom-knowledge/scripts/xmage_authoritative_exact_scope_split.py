@@ -27247,6 +27247,7 @@ def build_proposal(
     deck_role_json = deck_role_from_effect(effect_json)
     rule = {"effect_json": effect_json, "deck_role_json": deck_role_json}
     logical_key = logical_rule_key(rule)
+    is_runtime_partial = bool(effect_json.get("_runtime_partial"))
     return {
         "card_id": str(row.get("card_id") or ""),
         "card_name": card_name,
@@ -27254,9 +27255,17 @@ def build_proposal(
         "family_id": family_id,
         "effect": effect_json.get("effect"),
         "battle_model_scope": effect_json.get("battle_model_scope"),
-        "promotion_lane": "batch_metadata_candidate_requires_pg_precheck",
-        "proposal_status": "batch_pg_candidate_after_precheck",
-        "safe_for_batch_pg_package": True,
+        "promotion_lane": (
+            "runtime_partial_review_only"
+            if is_runtime_partial
+            else "batch_metadata_candidate_requires_pg_precheck"
+        ),
+        "proposal_status": (
+            "runtime_partial_requires_family_runtime"
+            if is_runtime_partial
+            else "batch_pg_candidate_after_precheck"
+        ),
+        "safe_for_batch_pg_package": not is_runtime_partial,
         "shadow_handling": "deprecate_nonmatching_rows",
         "oracle_hash": str(metadata.get("oracle_hash") or md5_text(str(metadata.get("oracle_text") or ""))),
         "oracle_hash_source": "postgres.cards.oracle_text_md5",
@@ -38687,6 +38696,36 @@ def split_row(
                     if ability in STATIC_SELF_KEYWORD_ABILITY_CLASSES
                 }
             )
+            restricted_mana_ability_classes = {
+                "ConditionalAnyColorManaAbility",
+                "ConditionalColorlessManaAbility",
+                "ConditionalColoredManaAbility",
+            }
+            auxiliary_ability_classes = sorted(
+                mana_ability_classes
+                - restricted_mana_ability_classes
+                - SAFE_MANA_AUXILIARY_ABILITY_CLASSES
+            )
+            modeled_restricted_mana_effect_classes = {
+                "AddManaInAnyCombinationEffect",
+                "AddManaOfAnyColorEffect",
+                "BasicManaEffect",
+                "ConditionalManaEffect",
+                "ManaEffect",
+            }
+            unmodeled_effect_classes = sorted(
+                cls for cls in classes if cls not in modeled_restricted_mana_effect_classes
+            )
+            if auxiliary_ability_classes or unmodeled_effect_classes:
+                effect_json["_runtime_partial"] = True
+                effect_json["_runtime_partial_reason"] = (
+                    "Only the XMage restricted mana ability is executable in this rule; "
+                    "listed auxiliary ability/effect classes remain unmodeled."
+                )
+                effect_json["modeled_ability_subset"] = "restricted_mana_source_only"
+                effect_json["xmage_auxiliary_ability_classes"] = auxiliary_ability_classes
+                effect_json["xmage_unmodeled_auxiliary_ability_classes"] = auxiliary_ability_classes
+                effect_json["xmage_unmodeled_effect_classes"] = unmodeled_effect_classes
             if static_keywords:
                 effect_json["keywords"] = static_keywords
                 effect_json["_keywords_are_self"] = True
@@ -39721,6 +39760,10 @@ def build_exact_split_report(
     family_counts = Counter(str(proposal.get("family_id") or "") for proposal in proposals)
     scope_counts = Counter(str(proposal.get("battle_model_scope") or "") for proposal in proposals)
     unit_counts = Counter(str(proposal.get("adapter_work_unit") or "") for proposal in proposals)
+    proposal_status_counts = Counter(str(proposal.get("proposal_status") or "") for proposal in proposals)
+    safe_for_batch_pg_package_count = sum(
+        1 for proposal in proposals if proposal.get("safe_for_batch_pg_package")
+    )
     return {
         "generated_at": utc_now(),
         "status": "ready",
@@ -39838,8 +39881,8 @@ def build_exact_split_report(
         "summary": {
             "considered_supported_work_unit_rows": considered,
             "proposal_count": len(proposals),
-            "safe_for_batch_pg_package_count": len(proposals),
-            "proposal_status_counts": {"batch_pg_candidate_after_precheck": len(proposals)},
+            "safe_for_batch_pg_package_count": safe_for_batch_pg_package_count,
+            "proposal_status_counts": dict(sorted(proposal_status_counts.items())),
             "family_counts": dict(sorted(family_counts.items())),
             "scope_counts": dict(sorted(scope_counts.items())),
             "adapter_work_unit_counts": dict(sorted(unit_counts.items())),

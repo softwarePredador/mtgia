@@ -518,6 +518,45 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
             {split.AURA_STATIC_PT_ATTACHMENT_SCOPE: 1},
         )
 
+    def test_exact_split_report_does_not_count_runtime_partial_as_safe(self) -> None:
+        row = queue_row(
+            split.RAMP_ARTIFACT_UNIT,
+            card_id="card-1",
+            effect_classes=["DrawDiscardControllerEffect"],
+            ability_kind="activated",
+            ability_classes=["AnyColorManaAbility", "SimpleActivatedAbility"],
+        )
+        row["card_name"] = "Network Terminal"
+        row["normalized_name"] = "network terminal"
+        report = split.build_exact_split_report(
+            {"status": "action_required", "method": {"scope": "test"}, "queue": [row]},
+            card_metadata_by_id={
+                "card-1": metadata(
+                    name="Network Terminal",
+                    type_line="Artifact",
+                    oracle_text=(
+                        "{T}: Add one mana of any color.\n"
+                        "{1}, {T}, Tap another untapped artifact you control: Draw a card, then discard a card."
+                    ),
+                )
+            },
+            source_reader=lambda _row: (
+                "this.addAbility(new AnyColorManaAbility());"
+                "Ability ability = new SimpleActivatedAbility("
+                "new DrawDiscardControllerEffect(1, 1), new GenericManaCost(1));"
+                "ability.addCost(new TapSourceCost());"
+                "ability.addCost(new TapTargetCost(new TargetControlledPermanent(filter)));"
+                "this.addAbility(ability);"
+            ),
+        )
+
+        self.assertEqual(report["summary"]["proposal_count"], 1)
+        self.assertEqual(report["summary"]["safe_for_batch_pg_package_count"], 0)
+        self.assertEqual(
+            report["summary"]["proposal_status_counts"],
+            {"runtime_partial_requires_family_runtime": 1},
+        )
+
     def test_static_cast_as_flash_permission_maps_artifact_filter(self) -> None:
         row = queue_row(
             split.FLASH_PERMISSION_UNIT,
@@ -16005,6 +16044,46 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertTrue(effect["mana_activation_requires_tap"])
         self.assertNotIn("produced_mana_symbols", effect)
 
+    def test_restricted_mana_source_with_auxiliary_ability_is_not_safe_for_package(self) -> None:
+        row = queue_row(
+            split.RAMP_CREATURE_UNIT,
+            effect_classes=["OneShotEffect", "ShamanOfForgottenWaysEffect"],
+            ability_kind="activated",
+            ability_classes=["ActivateIfConditionActivatedAbility", "ConditionalAnyColorManaAbility"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Shaman of Forgotten Ways",
+                type_line="Creature - Human Shaman",
+                oracle_text=(
+                    "{T}: Add two mana in any combination of colors. Spend this mana only to cast creature spells.\n"
+                    "Formidable - {9}{G}{G}, {T}: Each player's life total becomes the number of creatures they control. "
+                    "Activate only if creatures you control have total power 8 or greater."
+                ),
+            ),
+            source_text=(
+                "this.addAbility(new ConditionalAnyColorManaAbility(2, new ShamanOfForgottenWaysManaBuilder()));"
+                "Ability ability = new ActivateIfConditionActivatedAbility("
+                "new ShamanOfForgottenWaysEffect(), new ManaCostsImpl<>(\"{9}{G}{G}\"), "
+                "FormidableCondition.instance);"
+                "ability.addCost(new TapSourceCost());"
+                "this.addAbility(ability);"
+                "String rule = \"Spend this mana only to cast creature spells\";"
+            ),
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        self.assertEqual(proposal["family_id"], "xmage_restricted_spell_category_mana_source")
+        self.assertFalse(proposal["safe_for_batch_pg_package"])
+        self.assertEqual(proposal["proposal_status"], "runtime_partial_requires_family_runtime")
+        effect = proposal["effect_json"]
+        self.assertTrue(effect["_runtime_partial"])
+        self.assertEqual(effect["modeled_ability_subset"], "restricted_mana_source_only")
+        self.assertEqual(effect["mana_produced"], 2)
+        self.assertEqual(effect["xmage_unmodeled_auxiliary_ability_classes"], ["ActivateIfConditionActivatedAbility"])
+        self.assertEqual(effect["xmage_unmodeled_effect_classes"], ["OneShotEffect", "ShamanOfForgottenWaysEffect"])
+
     def test_any_color_mana_rock_alias_preserves_generic_activation_cost(self) -> None:
         row = queue_row(
             split.RAMP_ANY_COLOR_MANA_ROCK_UNIT,
@@ -16271,6 +16350,9 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         effect = proposal["effect_json"]
         self.assertEqual(effect["battle_model_scope"], split.MANA_SCOPE)
         self.assertEqual(proposal["family_id"], "xmage_simple_mana_source_with_unmodeled_auxiliary")
+        self.assertEqual(proposal["proposal_status"], "runtime_partial_requires_family_runtime")
+        self.assertEqual(proposal["promotion_lane"], "runtime_partial_review_only")
+        self.assertFalse(proposal["safe_for_batch_pg_package"])
         self.assertTrue(effect["_runtime_partial"])
         self.assertEqual(effect["produces"], "WUBRG")
         self.assertNotIn("activation_discard_count", effect)
