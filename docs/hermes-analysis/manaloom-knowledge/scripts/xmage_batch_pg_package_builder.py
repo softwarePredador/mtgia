@@ -4884,6 +4884,44 @@ def damage_gain_life_spell_execution_scenario_from_expected_rule(
     }
 
 
+def fixed_life_gain_draw_spell_execution_scenario_from_expected_rule(
+    rule: dict[str, Any],
+) -> dict[str, Any] | None:
+    required = dict(rule.get("required_effect_fields") or {})
+    if required.get("battle_model_scope") != "xmage_fixed_controller_gain_life_draw_card_spell_v1":
+        return None
+    if required.get("effect") != "composite_resolution":
+        return None
+    draw_count = int(required.get("draw_count") or required.get("count") or 0)
+    life_gain = int(required.get("life_gain_amount") or required.get("gain_life") or 0)
+    if draw_count <= 0 or life_gain <= 0:
+        return None
+    starting_life = 10
+    return {
+        "name": f"{rule['card_name']} draws cards and gains life",
+        "type": "fixed_life_gain_draw_spell",
+        "card": {
+            "name": rule["card_name"],
+            "type_line": "Instant" if required.get("instant") else "Sorcery",
+        },
+        "controller_life": starting_life,
+        "controller_library": [
+            {
+                "name": f"E2E Life Gain Draw Card {index + 1}",
+                "type_line": "Instant" if index % 2 == 0 else "Sorcery",
+                "effect": "draw_cards",
+                "cmc": index + 1,
+            }
+            for index in range(draw_count)
+        ],
+        "expected_draw_count": draw_count,
+        "expected_life_gain": life_gain,
+        "expected_life_after": starting_life + life_gain,
+        "expected_resolution_order": required.get("resolution_order") or "gain_then_draw",
+        "logical_rule_key": rule["logical_rule_key"],
+    }
+
+
 def fixed_damage_target_spell_execution_scenario_from_expected_rule(
     rule: dict[str, Any],
 ) -> dict[str, Any] | None:
@@ -8246,6 +8284,7 @@ def execution_scenario_from_expected_rule(rule: dict[str, Any]) -> dict[str, Any
         or damage_each_opponent_spell_execution_scenario_from_expected_rule(rule)
         or damage_each_opponent_and_their_permanents_execution_scenario_from_expected_rule(rule)
         or damage_gain_life_spell_execution_scenario_from_expected_rule(rule)
+        or fixed_life_gain_draw_spell_execution_scenario_from_expected_rule(rule)
         or fixed_damage_draw_spell_execution_scenario_from_expected_rule(rule)
         or fixed_damage_target_spell_execution_scenario_from_expected_rule(rule)
         or damage_target_create_treasure_execution_scenario_from_expected_rule(rule)

@@ -12571,6 +12571,110 @@ def run_fixed_draw_spell(
     }
 
 
+def run_fixed_life_gain_draw_spell(
+    battle,
+    scenario: dict[str, Any],
+    events: list[tuple[str, dict[str, Any]]],
+) -> dict[str, Any]:
+    card = dict(scenario["card"])
+    effect = dict(battle.get_card_effect(card))
+    if effect.get("effect") != "composite_resolution":
+        fail("battle_execution", f"{card['name']} effect={effect.get('effect')!r}")
+    if effect.get("battle_model_scope") != "xmage_fixed_controller_gain_life_draw_card_spell_v1":
+        fail("battle_execution", f"{card['name']} scope={effect.get('battle_model_scope')!r}")
+    active = battle.Player(str(scenario.get("player") or "Spell Controller"), None, [])
+    opponent = battle.Player(str(scenario.get("opponent") or "Opponent"), None, [])
+    active.life = int(scenario.get("controller_life") or 20)
+    active.library = [
+        battle.enrich_card(dict(library_card))
+        for library_card in (scenario.get("controller_library") or scenario.get("library") or [])
+        if isinstance(library_card, dict)
+    ]
+    starting_life = int(active.life)
+    starting_hand_count = len(active.hand)
+    starting_library_count = len(active.library)
+    expected_draw_count = int(scenario.get("expected_draw_count") or effect.get("draw_count") or effect.get("count") or 0)
+    expected_life_gain = int(scenario.get("expected_life_gain") or effect.get("life_gain_amount") or 0)
+    expected_life_after = int(scenario.get("expected_life_after") or (starting_life + expected_life_gain))
+    expected_resolution_order = str(
+        scenario.get("expected_resolution_order")
+        or effect.get("resolution_order")
+        or "gain_then_draw"
+    )
+    before_events = len(events)
+
+    battle.apply_effect_immediate(
+        active,
+        [opponent],
+        battle.enrich_card(card),
+        turn=int(scenario.get("turn") or 7720),
+        rng=random.Random(int(scenario.get("seed") or 7720)),
+        effect_data_override=effect,
+        phase=str(scenario.get("phase") or "precombat_main"),
+    )
+
+    if len(active.library) != starting_library_count - expected_draw_count:
+        fail(
+            "battle_execution",
+            f"{card['name']} library={len(active.library)}, expected {starting_library_count - expected_draw_count}",
+        )
+    if len(active.hand) != starting_hand_count + expected_draw_count:
+        fail(
+            "battle_execution",
+            f"{card['name']} hand={len(active.hand)}, expected {starting_hand_count + expected_draw_count}",
+        )
+    if int(active.life) != expected_life_after:
+        fail("battle_execution", f"{card['name']} life={active.life}, expected {expected_life_after}")
+
+    component_events = [
+        data
+        for event_name, data in events[before_events:]
+        if event_name == "composite_rule_component_resolved"
+        and data.get("card") == card.get("name")
+        and data.get("component_effect") in {"draw_cards", "life_total_change"}
+    ]
+    expected_order = (
+        ["draw_cards", "life_total_change"]
+        if expected_resolution_order == "draw_then_gain"
+        else ["life_total_change", "draw_cards"]
+    )
+    actual_order = [str(data.get("component_effect") or "") for data in component_events]
+    if actual_order != expected_order:
+        fail("battle_events", f"{card['name']} component order={actual_order}, expected {expected_order}")
+    draw_event = next(
+        (data for data in component_events if data.get("component_effect") == "draw_cards"),
+        None,
+    )
+    if draw_event is None or draw_event.get("outcome") != "cards_drawn":
+        fail("battle_events", f"missing {card['name']} composite draw_cards component event")
+    life_event = next(
+        (
+            data
+            for event_name, data in events[before_events:]
+            if event_name == "life_total_changed"
+            and data.get("card") == card.get("name")
+        ),
+        None,
+    )
+    if life_event is None:
+        fail("battle_events", f"missing {card['name']} life_total_changed event")
+    if int(life_event.get("requested_delta") or 0) != expected_life_gain:
+        fail("battle_events", f"{card['name']} requested_delta={life_event.get('requested_delta')}")
+    if int(life_event.get("life_before") or 0) != starting_life:
+        fail("battle_events", f"{card['name']} life_before={life_event.get('life_before')}")
+    if int(life_event.get("life_after") or 0) != expected_life_after:
+        fail("battle_events", f"{card['name']} life_after={life_event.get('life_after')}")
+    return {
+        "scenario": scenario.get("name"),
+        "card_name": card["name"],
+        "cards_drawn": expected_draw_count,
+        "life_before": starting_life,
+        "life_gained": expected_life_gain,
+        "life_after": expected_life_after,
+        "resolution_order": expected_resolution_order,
+    }
+
+
 def run_draw_lose_life_spell(
     battle,
     scenario: dict[str, Any],
@@ -12967,6 +13071,7 @@ SCENARIO_RUNNERS = {
     "damage_target_create_treasure": run_damage_target_create_treasure,
     "damage_prevention": run_damage_prevention,
     "fixed_draw_spell": run_fixed_draw_spell,
+    "fixed_life_gain_draw_spell": run_fixed_life_gain_draw_spell,
     "draw_lose_life_spell": run_draw_lose_life_spell,
     "graveyard_to_library_draw_spell": run_graveyard_to_library_draw_spell,
     "fixed_draw_discard_spell": run_fixed_draw_discard_spell,

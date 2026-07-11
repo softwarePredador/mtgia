@@ -23404,14 +23404,34 @@ def dynamic_life_gain_from_source(source: str) -> dict[str, Any] | str | None:
     }
 
 
-def fixed_life_gain_draw_from_oracle(metadata: dict[str, Any]) -> tuple[int, int] | None:
-    match = re.match(r"^you gain (\d+) life\. draw a card\.?$", oracle_text(metadata))
-    if not match:
-        return None
-    return int(match.group(1)), 1
+def fixed_life_gain_draw_from_oracle(metadata: dict[str, Any]) -> tuple[int, int, str] | None:
+    text = " ".join(oracle_effect_lines_without_neutral_auxiliary(metadata))
+    text = re.sub(r"\s+", " ", text).strip().rstrip(".")
+    number = r"(?:\d+|one|two|three|four|five|six|seven|eight|nine|ten)"
+    gain_then_draw = re.fullmatch(
+        rf"you gain (?P<gain>{number}) life\. draw (?P<draw>a|{number}) cards?",
+        text,
+    )
+    if gain_then_draw:
+        return (
+            word_or_int(gain_then_draw.group("gain")),
+            word_or_int(gain_then_draw.group("draw")),
+            "gain_then_draw",
+        )
+    draw_then_gain = re.fullmatch(
+        rf"you draw (?P<draw>a|{number}) cards? and gain (?P<gain>{number}) life",
+        text,
+    )
+    if draw_then_gain:
+        return (
+            word_or_int(draw_then_gain.group("gain")),
+            word_or_int(draw_then_gain.group("draw")),
+            "draw_then_gain",
+        )
+    return None
 
 
-def fixed_life_gain_draw_from_source(source_text: str) -> tuple[int, int] | None:
+def fixed_life_gain_draw_from_source(source_text: str) -> tuple[int, int, str] | None:
     text = str(source_text or "")
     gain_matches = list(re.finditer(r"new\s+GainLifeEffect\s*\(", text))
     if len(gain_matches) != 1:
@@ -23425,11 +23445,10 @@ def fixed_life_gain_draw_from_source(source_text: str) -> tuple[int, int] | None
         "DrawCardSourceControllerEffect",
         noarg_default=1,
     )
-    if life_gain is None or life_gain <= 0 or draw_count != 1:
+    if life_gain is None or life_gain <= 0 or draw_count is None or draw_count <= 0:
         return None
-    if gain_matches[0].start() > draw_matches[0].start():
-        return None
-    return life_gain, draw_count
+    order = "gain_then_draw" if gain_matches[0].start() < draw_matches[0].start() else "draw_then_gain"
+    return life_gain, draw_count, order
 
 
 def etb_life_gain_amount_from_oracle(metadata: dict[str, Any]) -> int | None:
@@ -38759,7 +38778,7 @@ def split_row(
         unsupported_abilities = ability_classes(row) - ALLOWED_AUXILIARY_RESOLUTION_ABILITY_CLASSES
         if unsupported_abilities:
             return None, "life_gain_draw_ability_class_not_simple"
-        if has_oracle_complexity(metadata):
+        if has_non_neutral_oracle_complexity(metadata):
             return None, "life_gain_draw_oracle_not_simple"
         oracle_pair = fixed_life_gain_draw_from_oracle(metadata)
         if oracle_pair is None:
@@ -38769,7 +38788,7 @@ def split_row(
             return None, "life_gain_draw_source_not_fixed"
         if source_pair != oracle_pair:
             return None, "life_gain_draw_source_oracle_mismatch"
-        life_gain, draw_count = oracle_pair
+        life_gain, draw_count, effect_order = oracle_pair
         life_component = {
             "effect": "life_total_change",
             "battle_model_scope": LIFE_SCOPE,
@@ -38785,14 +38804,25 @@ def split_row(
             "compose_on_resolution": True,
             "xmage_effect_class": "DrawCardSourceControllerEffect",
         }
+        components = (
+            [draw_component, life_component]
+            if effect_order == "draw_then_gain"
+            else [life_component, draw_component]
+        )
+        xmage_effect_classes = (
+            ["DrawCardSourceControllerEffect", "GainLifeEffect"]
+            if effect_order == "draw_then_gain"
+            else ["GainLifeEffect", "DrawCardSourceControllerEffect"]
+        )
         effect_json = {
             "effect": "composite_resolution",
             "battle_model_scope": LIFE_GAIN_DRAW_SCOPE,
             "life_gain_amount": life_gain,
             "draw_count": draw_count,
             "count": draw_count,
-            "_composite_rule_components": [life_component, draw_component],
-            "xmage_effect_classes": ["GainLifeEffect", "DrawCardSourceControllerEffect"],
+            "resolution_order": effect_order,
+            "_composite_rule_components": components,
+            "xmage_effect_classes": xmage_effect_classes,
             **flags,
         }
         return build_proposal(

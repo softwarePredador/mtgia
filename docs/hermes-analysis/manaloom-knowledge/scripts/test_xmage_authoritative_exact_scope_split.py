@@ -10850,12 +10850,46 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertEqual(effect["battle_model_scope"], split.LIFE_GAIN_DRAW_SCOPE)
         self.assertEqual(effect["life_gain_amount"], 3)
         self.assertEqual(effect["draw_count"], 1)
+        self.assertEqual(effect["resolution_order"], "gain_then_draw")
         self.assertEqual(
             [component["effect"] for component in effect["_composite_rule_components"]],
             ["life_total_change", "draw_cards"],
         )
 
-    def test_fixed_life_gain_draw_spell_blocks_dynamic_draw(self) -> None:
+    def test_fixed_draw_gain_life_spell_maps_to_composite_runtime_with_auxiliary_affinity(self) -> None:
+        row = queue_row(
+            split.LIFE_UNIT,
+            effect_classes=["DrawCardSourceControllerEffect", "GainLifeEffect"],
+            ability_classes=["SpellAbility", "AffinityForArtifactsAbility"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                oracle_text=(
+                    "Affinity for artifacts\n"
+                    "You draw three cards and gain 3 life."
+                ),
+            ),
+            source_text=(
+                "this.addAbility(new AffinityForArtifactsAbility());"
+                "this.getSpellAbility().addEffect(new DrawCardSourceControllerEffect(3, true));"
+                "this.getSpellAbility().addEffect(new GainLifeEffect(3).setText(\"and gain 3 life\"));"
+            ),
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["effect"], "composite_resolution")
+        self.assertEqual(effect["battle_model_scope"], split.LIFE_GAIN_DRAW_SCOPE)
+        self.assertEqual(effect["life_gain_amount"], 3)
+        self.assertEqual(effect["draw_count"], 3)
+        self.assertEqual(effect["resolution_order"], "draw_then_gain")
+        self.assertEqual(
+            [component["effect"] for component in effect["_composite_rule_components"]],
+            ["draw_cards", "life_total_change"],
+        )
+
+    def test_fixed_life_gain_draw_spell_blocks_source_oracle_draw_count_mismatch(self) -> None:
         row = queue_row(split.LIFE_UNIT, effect_classes=["GainLifeEffect", "DrawCardSourceControllerEffect"])
         proposal, reason = split.split_row(
             row,
@@ -10867,7 +10901,22 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         )
 
         self.assertIsNone(proposal)
-        self.assertEqual(reason, "life_gain_draw_source_not_fixed")
+        self.assertEqual(reason, "life_gain_draw_source_oracle_mismatch")
+
+    def test_fixed_life_gain_draw_spell_blocks_x_dynamic_pair(self) -> None:
+        row = queue_row(split.LIFE_UNIT, effect_classes=["GainLifeEffect", "DrawCardSourceControllerEffect"])
+        proposal, reason = split.split_row(
+            row,
+            metadata(oracle_text="You gain X life and draw X cards."),
+            source_text=(
+                "GetXValue manaX = GetXValue.instance;"
+                "this.getSpellAbility().addEffect(new GainLifeEffect(manaX));"
+                "this.getSpellAbility().addEffect(new DrawCardSourceControllerEffect(manaX).concatBy(\"and\"));"
+            ),
+        )
+
+        self.assertIsNone(proposal)
+        self.assertEqual(reason, "life_gain_draw_oracle_not_exact_fixed")
 
     def test_fixed_boost_draw_spell_maps_to_composite_runtime(self) -> None:
         row = queue_row(
