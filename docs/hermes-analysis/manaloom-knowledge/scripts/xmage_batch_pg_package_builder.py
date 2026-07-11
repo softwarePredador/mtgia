@@ -155,6 +155,8 @@ E2E_REQUIRED_EFFECT_FIELDS = (
     "target_count_max",
     "max_targets",
     "up_to_count",
+    "zone_move",
+    "from_zone",
     "damage_per_target",
     "damage_assignment_mode",
     "divided_damage",
@@ -6661,6 +6663,7 @@ def single_target_removal_execution_scenario_from_expected_rule(
         "xmage_destroy_target_and_source_controller_damage_spell_v1",
         "xmage_destroy_target_and_target_controller_damage_spell_v1",
         "xmage_return_target_to_hand_spell_v1",
+        "xmage_put_target_permanent_on_library_spell_v1",
     }:
         return None
     if required.get("effect") not in {"remove_creature", "remove_permanent"}:
@@ -6990,6 +6993,7 @@ def multi_target_removal_execution_scenario_from_expected_rule(
         "xmage_destroy_target_spell_v1",
         "xmage_destroy_target_and_source_controller_loses_life_spell_v1",
         "xmage_return_target_to_hand_spell_v1",
+        "xmage_put_target_permanent_on_library_spell_v1",
     }:
         return None
     if required.get("effect") not in {"remove_creature", "remove_permanent"}:

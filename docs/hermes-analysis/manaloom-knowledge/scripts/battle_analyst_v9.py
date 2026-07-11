@@ -15124,6 +15124,103 @@ def move_permanent_from_battlefield_to_hand(owner, permanent, *, reason=None, so
     return destination
 
 
+def move_permanent_from_battlefield_to_library(owner, permanent, *, destination, reason=None, source=None, turn=None):
+    if owner is None or not isinstance(permanent, dict):
+        return "none"
+    destination = str(destination or "library_top").lower()
+    if destination not in {"library_top", "library_bottom"}:
+        destination = "library_top"
+    permanent = battlefield_object_for_target(owner, permanent) or permanent
+    moved = _remove_battlefield_object(owner, permanent)
+    if moved is None:
+        return "none"
+    moved["_lki_snapshot"] = {
+        "name": moved.get("name", moved.get("card_name", "")),
+        "power": moved.get("power", 0),
+        "toughness": moved.get("toughness", 0),
+        "cmc": moved.get("cmc", 0),
+        "type_line": moved.get("type_line", ""),
+        "is_commander": moved.get("is_commander", False),
+        "owner": moved.get("owner", moved.get("controller", "")),
+    }
+    moved["_zone_id"] = moved.get("_zone_id", 0) + 1
+    moved["_last_zone"] = "battlefield"
+    final_destination = destination
+    if moved.get("is_commander"):
+        event = ReplacementRegistry.process_event(
+            ReplacementEvent(
+                "zone_change",
+                affected_player=owner,
+                card=moved,
+                from_zone="battlefield",
+                to_zone="library",
+                source=source,
+                reason=reason,
+            )
+        )
+        if event.to_zone == "command_zone":
+            final_destination = "command_zone"
+    if moved.get("tag") == "token" or "token" in str(moved.get("type_line") or "").lower():
+        final_destination = "vanished_token"
+    elif final_destination == "command_zone":
+        owner.command_zone.append(moved)
+    else:
+        _clear_battlefield_only_state(moved)
+        if final_destination == "library_bottom":
+            owner.library.append(moved)
+        else:
+            owner.library.insert(0, moved)
+            final_destination = "library_top"
+    emit_replay_event(
+        "permanent_moved_from_battlefield",
+        player=getattr(owner, "name", "?"),
+        card=moved.get("name", "?"),
+        permanent_type="permanent",
+        from_zone="battlefield",
+        to_zone=final_destination,
+        destination=final_destination,
+        reason=reason,
+        source=source.get("name", "?") if isinstance(source, dict) else source,
+        turn=turn if turn is not None else CURRENT_REPLAY_TURN,
+    )
+    emit_replay_event(
+        "permanent_put_on_library",
+        player=getattr(owner, "name", "?"),
+        card=moved.get("name", "?"),
+        destination=final_destination,
+        requested_destination=destination,
+        source=source.get("name", "?") if isinstance(source, dict) else source,
+        vanished_token=final_destination == "vanished_token",
+        turn=turn if turn is not None else CURRENT_REPLAY_TURN,
+    )
+    resolve_leave_battlefield_treasure_trigger(
+        owner,
+        moved,
+        destination=final_destination,
+        reason=reason,
+        source=source,
+    )
+    refresh_controlled_static_indestructible(
+        owner,
+        turn=turn if turn is not None else CURRENT_REPLAY_TURN,
+        phase="leave_battlefield",
+        emit_events=True,
+    )
+    refresh_controlled_static_power_toughness_bonuses(
+        owner,
+        turn=turn if turn is not None else CURRENT_REPLAY_TURN,
+        phase="leave_battlefield",
+        emit_events=True,
+    )
+    refresh_controlled_static_keywords(
+        owner,
+        turn=turn if turn is not None else CURRENT_REPLAY_TURN,
+        phase="leave_battlefield",
+        emit_events=True,
+    )
+    return final_destination
+
+
 def move_removed_permanent_to_destination(
     target_controller,
     target,
@@ -15153,6 +15250,15 @@ def move_removed_permanent_to_destination(
             turn,
             rng,
             all_players=all_players,
+        )
+    elif destination in {"library_top", "library_bottom"}:
+        destination = move_permanent_from_battlefield_to_library(
+            target_controller,
+            target,
+            destination=destination,
+            reason="put_on_library",
+            source=source_card,
+            turn=turn,
         )
     elif destination == "hand":
         move_permanent_from_battlefield_to_hand(

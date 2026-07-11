@@ -613,6 +613,99 @@ class XMageExactScopeRuntimeTest(unittest.TestCase):
         self.assertNotIn(troll, opponent.graveyard)
         self.assertFalse(any(event == "life_loss_on_destroy_resolved" for event, _data in self.events))
 
+    def test_put_target_permanent_on_library_top_moves_from_battlefield_without_shuffle(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        opponent = self.battle.Player(
+            "Opponent",
+            None,
+            [{"name": "Existing Top"}, {"name": "Existing Bottom"}],
+        )
+        target = {
+            "name": "Target Bear",
+            "type_line": "Creature - Bear",
+            "effect": "creature",
+            "power": 2,
+            "toughness": 2,
+        }
+        decoy = {"name": "Decoy Land", "type_line": "Land", "effect": "land"}
+        opponent.battlefield = [decoy, target]
+        effect = {
+            "effect": "remove_permanent",
+            "battle_model_scope": "xmage_put_target_permanent_on_library_spell_v1",
+            "zone_move": "battlefield_to_library",
+            "from_zone": "battlefield",
+            "target": "creature",
+            "target_constraints": {"card_types": ["creature"]},
+            "target_controller": "opponent",
+            "library_controller": "owner",
+            "destination": "library_top",
+            "target_count": 1,
+        }
+
+        self.battle.apply_effect_immediate(
+            active,
+            [opponent],
+            {"name": "Fixture Excommunicate", "type_line": "Sorcery"},
+            turn=11,
+            rng=random.Random(11),
+            effect_data_override=effect,
+        )
+
+        self.assertEqual([card["name"] for card in opponent.battlefield], ["Decoy Land"])
+        self.assertEqual([card["name"] for card in opponent.library[:3]], ["Target Bear", "Existing Top", "Existing Bottom"])
+        self.assertNotIn(target, opponent.graveyard)
+        self.assertTrue(
+            any(
+                event == "permanent_put_on_library"
+                and data.get("card") == "Target Bear"
+                and data.get("destination") == "library_top"
+                for event, data in self.events
+            )
+        )
+
+    def test_put_target_permanent_on_library_bottom_moves_from_battlefield_without_shuffle(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        opponent = self.battle.Player(
+            "Opponent",
+            None,
+            [{"name": "Existing Top"}, {"name": "Existing Bottom"}],
+        )
+        target = {"name": "Target Relic", "type_line": "Artifact", "effect": "artifact"}
+        opponent.battlefield = [target]
+        effect = {
+            "effect": "remove_permanent",
+            "battle_model_scope": "xmage_put_target_permanent_on_library_spell_v1",
+            "zone_move": "battlefield_to_library",
+            "from_zone": "battlefield",
+            "target": "artifact",
+            "target_constraints": {"card_types": ["artifact"]},
+            "target_controller": "opponent",
+            "library_controller": "owner",
+            "destination": "library_bottom",
+            "target_count": 1,
+        }
+
+        self.battle.apply_effect_immediate(
+            active,
+            [opponent],
+            {"name": "Fixture Natural Obsolescence", "type_line": "Instant"},
+            turn=11,
+            rng=random.Random(12),
+            effect_data_override=effect,
+        )
+
+        self.assertEqual(opponent.battlefield, [])
+        self.assertEqual([card["name"] for card in opponent.library], ["Existing Top", "Existing Bottom", "Target Relic"])
+        self.assertNotIn(target, opponent.graveyard)
+        self.assertTrue(
+            any(
+                event == "removal_resolved"
+                and data.get("card") == "Fixture Natural Obsolescence"
+                and data.get("destination") == "library_bottom"
+                for event, data in self.events
+            )
+        )
+
     def test_destroy_source_controller_life_loss_applies_once_after_single_removal(self) -> None:
         active = self.battle.Player("Active", None, [])
         opponent = self.battle.Player("Opponent", None, [])

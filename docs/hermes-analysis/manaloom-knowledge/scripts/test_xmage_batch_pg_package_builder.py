@@ -126,6 +126,38 @@ def test_counter_unless_pays_draw_execution_scenario_is_manifested() -> None:
     assert scenario["expected_cards_drawn"] == 1
 
 
+def test_battlefield_to_library_removal_execution_scenario_is_manifested() -> None:
+    proposal = {
+        "normalized_name": "excommunicate",
+        "card_name": "Excommunicate",
+        "oracle_hash": "hash-excommunicate",
+        "logical_rule_key": "battle_rule_v1:excommunicate",
+        "effect_json": {
+            "effect": "remove_permanent",
+            "battle_model_scope": "xmage_put_target_permanent_on_library_spell_v1",
+            "zone_move": "battlefield_to_library",
+            "from_zone": "battlefield",
+            "target": "creature",
+            "target_constraints": {"card_types": ["creature"]},
+            "target_controller": "opponent",
+            "library_controller": "owner",
+            "destination": "library_top",
+            "target_count": 1,
+            "target_count_min": 1,
+            "target_count_max": 1,
+        },
+    }
+
+    expected = builder.expected_rule_from_proposal(proposal)
+    scenario = builder.execution_scenario_from_expected_rule(expected)
+
+    assert expected["required_effect_fields"]["zone_move"] == "battlefield_to_library"
+    assert expected["required_effect_fields"]["from_zone"] == "battlefield"
+    assert scenario["type"] == "single_target_removal"
+    assert scenario["expected_destination"] == "library_top"
+    assert scenario["expected_target_constraints"] == {"card_types": ["creature"]}
+
+
 def test_graveyard_to_library_draw_execution_scenario_is_manifested() -> None:
     proposal = {
         "normalized_name": "footbottom feast",

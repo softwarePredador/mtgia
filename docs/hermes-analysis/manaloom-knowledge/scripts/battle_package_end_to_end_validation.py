@@ -3137,12 +3137,24 @@ def run_single_target_removal(
     target_name = str(target.get("name") or "")
     nonmatching_name = str(nonmatching.get("name") or "")
     destination = str(scenario.get("expected_destination") or "graveyard").lower()
-    destination_zone_name = "exile" if destination == "exile" else "hand" if destination == "hand" else "graveyard"
+    destination_zone_name = (
+        "exile"
+        if destination == "exile"
+        else "hand"
+        if destination == "hand"
+        else "library"
+        if destination in {"library_top", "library_bottom"}
+        else "graveyard"
+    )
     destination_zone = getattr(target_owner, destination_zone_name)
     moved_names = [str(item.get("name") or "") for item in destination_zone if isinstance(item, dict)]
     battlefield_names = [str(item.get("name") or "") for item in target_owner.battlefield if isinstance(item, dict)]
     if target_name not in moved_names:
         fail("battle_execution", f"{card['name']} did not move legal target {target_name} to {destination}")
+    if destination == "library_top" and (not moved_names or moved_names[0] != target_name):
+        fail("battle_execution", f"{card['name']} library_top={moved_names[:3]}, expected {target_name!r}")
+    if destination == "library_bottom" and (not moved_names or moved_names[-1] != target_name):
+        fail("battle_execution", f"{card['name']} library_bottom={moved_names[-3:]}, expected {target_name!r}")
     if nonmatching_name not in battlefield_names:
         fail("battle_execution", f"{card['name']} removed illegal target {nonmatching_name}")
 
@@ -3705,13 +3717,25 @@ def run_multi_target_removal(
     target_names = [str(target.get("name") or "") for target in targets]
     nonmatching_name = str(nonmatching.get("name") or "")
     destination = str(scenario.get("expected_destination") or "graveyard").lower()
-    destination_zone_name = "exile" if destination == "exile" else "hand" if destination == "hand" else "graveyard"
+    destination_zone_name = (
+        "exile"
+        if destination == "exile"
+        else "hand"
+        if destination == "hand"
+        else "library"
+        if destination in {"library_top", "library_bottom"}
+        else "graveyard"
+    )
     destination_zone = getattr(opponent, destination_zone_name)
     moved_names = [str(item.get("name") or "") for item in destination_zone if isinstance(item, dict)]
     battlefield_names = [str(item.get("name") or "") for item in opponent.battlefield if isinstance(item, dict)]
     missing = [name for name in target_names if name not in moved_names]
     if missing:
         fail("battle_execution", f"{card['name']} did not move legal targets {missing} to {destination}")
+    if destination == "library_top" and not moved_names[: len(target_names)]:
+        fail("battle_execution", f"{card['name']} library_top missing moved targets")
+    if destination == "library_bottom" and not moved_names[-len(target_names):]:
+        fail("battle_execution", f"{card['name']} library_bottom missing moved targets")
     if nonmatching_name not in battlefield_names:
         fail("battle_execution", f"{card['name']} removed illegal target {nonmatching_name}")
 

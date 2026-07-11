@@ -100,6 +100,7 @@ BOOST_TARGET_UNIT = (
     "xmage_signature::BoostTargetEffect::no_ability_class::TargetCreaturePermanent::"
     "no_condition_class::targeting"
 )
+PUT_ON_LIBRARY_TARGET_UNIT_PREFIX = "xmage_signature::PutOnLibraryTargetEffect::"
 UNTAP_TARGET_UNIT = "untap_target::xmage_targeted_untap_variant_review_v1"
 BOOST_SCRY_UNIT = (
     "xmage_signature::BoostTargetEffect,ScryEffect::no_ability_class::"
@@ -357,6 +358,7 @@ COUNTER_UNLESS_PAYS_DRAW_SCOPE = (
     "xmage_counter_target_spell_unless_controller_pays_generic_draw_card_v1"
 )
 BOUNCE_SCOPE = "xmage_return_target_to_hand_spell_v1"
+BATTLEFIELD_TO_LIBRARY_SCOPE = "xmage_put_target_permanent_on_library_spell_v1"
 MASS_RETURN_TO_HAND_SCOPE = "xmage_return_all_matching_permanents_to_hand_spell_v1"
 RECURSION_SCOPE = "xmage_return_target_graveyard_card_to_hand_spell_v1"
 RECURSION_MILL_RETURN_SCOPE = "xmage_mill_then_return_graveyard_card_to_hand_spell_v1"
@@ -6570,6 +6572,124 @@ def graveyard_to_library_from_oracle(metadata: dict[str, Any]) -> dict[str, Any]
     return None
 
 
+def battlefield_to_library_from_oracle(metadata: dict[str, Any]) -> dict[str, Any] | str | None:
+    text = oracle_text(metadata)
+    patterns: list[tuple[str, str, str]] = [
+        (r"^put target (?P<target>.+?) on top of (?:its|their) owner's library\.?$", "library_top", "single"),
+        (r"^put target (?P<target>.+?) on the bottom of (?:its|their) owner's library\.?$", "library_bottom", "single"),
+        (r"^put two target (?P<target>.+?) on top of their owners' libraries\.?$", "library_top", "two"),
+        (r"^put two target (?P<target>.+?) on the bottom of their owners' libraries\.?$", "library_bottom", "two"),
+    ]
+    for pattern, destination, count_mode in patterns:
+        match = re.match(pattern, text)
+        if not match:
+            continue
+        phrase = re.sub(r"\s+", " ", match.group("target").strip().lower())
+        phrase = phrase.removesuffix("s").strip() if count_mode == "two" else phrase
+        phrase_to_target = {
+            "artifact": "artifact",
+            "artifact or creature": "artifact_or_creature",
+            "artifact or enchantment": "artifact_or_enchantment",
+            "artifact, creature, or enchantment": "artifact_creature_or_enchantment",
+            "creature": "creature",
+            "creature or land": "creature_or_land",
+            "creature with flying": "flying_creature",
+            "creature with power 4 or greater": "creature_power_4_or_greater",
+            "enchantment": "enchantment",
+            "land": "land",
+            "nonland permanent": "nonland_permanent",
+            "permanent": "permanent",
+        }
+        target = phrase_to_target.get(phrase)
+        if target is None:
+            return "battlefield_to_library_oracle_target_not_supported"
+        return {
+            "target": target,
+            "count": 2 if count_mode == "two" else 1,
+            "destination": destination,
+            "target_controller": "opponent",
+            "library_controller": "owner",
+        }
+    return None
+
+
+def battlefield_to_library_from_source(source_text: str) -> dict[str, Any] | str:
+    text = str(source_text or "")
+    effect_matches = re.findall(
+        r"new\s+PutOnLibraryTargetEffect\s*\(\s*(true|false)\s*(?:,\s*\"[^\"]*\")?\s*\)",
+        text,
+    )
+    if len(effect_matches) != 1:
+        return "battlefield_to_library_source_not_single_effect"
+    destination = "library_top" if effect_matches[0] == "true" else "library_bottom"
+    if "EachTargetPointer" in text or ".setTargetPointer" in text:
+        return "battlefield_to_library_source_target_pointer_not_supported"
+
+    target_patterns: list[tuple[str, str]] = [
+        (r"TargetCreaturePermanent\s*\(", "creature"),
+        (r"TargetArtifactPermanent\s*\(", "artifact"),
+        (r"TargetEnchantmentPermanent\s*\(", "enchantment"),
+        (r"TargetLandPermanent\s*\(", "land"),
+        (r"TargetNonlandPermanent\s*\(", "nonland_permanent"),
+    ]
+    target: str | None = None
+    for pattern, value in target_patterns:
+        if re.search(pattern, text):
+            target = value
+            break
+    if target is None:
+        if "FILTER_PERMANENT_ARTIFACT_OR_CREATURE" in text:
+            target = "artifact_or_creature"
+        elif "FILTER_PERMANENT_ARTIFACT_OR_ENCHANTMENT" in text:
+            target = "artifact_or_enchantment"
+        elif "FILTER_PERMANENT_CREATURE_OR_LAND" in text:
+            target = "creature_or_land"
+        elif "FILTER_CREATURE_FLYING" in text:
+            target = "flying_creature"
+        elif (
+            "CardType.ARTIFACT.getPredicate()" in text
+            and "CardType.CREATURE.getPredicate()" in text
+            and "CardType.ENCHANTMENT.getPredicate()" in text
+        ):
+            target = "artifact_creature_or_enchantment"
+        elif "FilterCreaturePermanent" in text and "PowerPredicate(ComparisonType.MORE_THAN, 3)" in text:
+            target = "creature_power_4_or_greater"
+        elif "FilterCreaturePermanent" in text and "FlyingPredicate.instance" in text:
+            target = "flying_creature"
+        elif re.search(r"new\s+TargetPermanent\s*\(\s*\)", text):
+            target = "permanent"
+        elif "new TargetPermanent(filter)" in text and "FilterPermanent filter" in text:
+            if "creature with power 4 or greater" in text:
+                target = "creature_power_4_or_greater"
+            elif "flying creature" in text:
+                target = "flying_creature"
+            else:
+                return "battlefield_to_library_source_target_filter_not_supported"
+    if target is None:
+        return "battlefield_to_library_source_target_not_supported"
+
+    count = 1
+    for ctor in (
+        "TargetCreaturePermanent",
+        "TargetArtifactPermanent",
+        "TargetEnchantmentPermanent",
+        "TargetLandPermanent",
+        "TargetNonlandPermanent",
+        "TargetPermanent",
+    ):
+        count_match = re.search(rf"{ctor}\s*\(\s*(\d+)\s*\)", text)
+        if count_match:
+            count = int(count_match.group(1))
+            break
+    return {
+        "target": target,
+        "count": count,
+        "destination": destination,
+        "target_controller": "opponent",
+        "library_controller": "owner",
+    }
+
+
 def graveyard_to_library_draw_from_oracle(metadata: dict[str, Any]) -> dict[str, Any] | str:
     text = oracle_text(metadata)
     match = re.match(
@@ -6621,7 +6741,10 @@ def graveyard_shuffle_to_library_from_oracle(metadata: dict[str, Any]) -> dict[s
 
 def graveyard_to_library_from_source(source_text: str) -> dict[str, Any] | str:
     text = str(source_text or "")
-    effect_matches = re.findall(r"new\s+PutOnLibraryTargetEffect\s*\(\s*(true|false)\s*\)", text)
+    effect_matches = re.findall(
+        r"new\s+PutOnLibraryTargetEffect\s*\(\s*(true|false)\s*(?:,\s*\"[^\"]*\")?\s*\)",
+        text,
+    )
     if len(effect_matches) != 1:
         return "graveyard_to_library_source_not_single_effect"
     destination = "library_top" if effect_matches[0] == "true" else "library_bottom"
@@ -11875,6 +11998,17 @@ def is_permanent_activated_draw_discard_unit(row: dict[str, Any]) -> bool:
         effect_classes(row) == {"DrawDiscardControllerEffect"}
         and ability_classes(row) == {"SimpleActivatedAbility"}
         and "activated_ability" in set(row.get("xmage_signals") or [])
+    )
+
+
+def is_battlefield_to_library_spell_unit(row: dict[str, Any]) -> bool:
+    unit = str(row.get("adapter_work_unit") or "")
+    return (
+        unit.startswith(PUT_ON_LIBRARY_TARGET_UNIT_PREFIX)
+        and "::no_condition_class::" in unit
+        and effect_classes(row) == {"PutOnLibraryTargetEffect"}
+        and ability_classes(row).issubset(ALLOWED_AUXILIARY_RESOLUTION_ABILITY_CLASSES)
+        and "targeting" in set(row.get("xmage_signals") or [])
     )
 
 
@@ -27059,8 +27193,12 @@ def target_constraints_for(target: str) -> dict[str, Any]:
         return {"card_types": ["artifact", "enchantment", "land"]}
     if target == "artifact_or_creature":
         return {"card_types": ["artifact", "creature"]}
+    if target == "artifact_creature_or_enchantment":
+        return {"card_types": ["artifact", "creature", "enchantment"]}
     if target == "artifact_creature_or_land":
         return {"card_types": ["artifact", "creature", "land"]}
+    if target == "creature_or_land":
+        return {"card_types": ["creature", "land"]}
     if target == "creature_or_enchantment":
         return {"card_types": ["creature", "enchantment"]}
     if target == "creature_enchantment_or_planeswalker":
@@ -27649,6 +27787,7 @@ def split_row(
     counter_unless_pays_spell_unit = is_counter_unless_pays_spell_unit(row)
     counter_target_with_replacement_spell_unit = is_counter_target_with_replacement_spell_unit(row)
     target_keyword_spell_unit = is_target_keyword_spell_unit(row)
+    battlefield_to_library_spell_unit = is_battlefield_to_library_spell_unit(row)
     boost_keyword_spell_unit = is_boost_keyword_spell_unit(row)
     prevent_all_combat_damage_spell_unit = unit in {
         PREVENT_ALL_COMBAT_DAMAGE_SPELL_UNIT,
@@ -27787,6 +27926,7 @@ def split_row(
         and not dies_each_player_sacrifice_creature_unit
         and not counter_unless_pays_spell_unit
         and not counter_target_with_replacement_spell_unit
+        and not battlefield_to_library_spell_unit
     ):
         return None, "unsupported_adapter_work_unit"
     if not metadata:
@@ -27801,7 +27941,11 @@ def split_row(
     )
 
     if (
-        (unit in SPELL_UNITS or boost_keyword_spell_unit or target_keyword_spell_unit)
+        (
+            unit in SPELL_UNITS
+            or boost_keyword_spell_unit
+            or target_keyword_spell_unit
+        )
         and not etb_life_gain_creature_unit
         and not creature_enters_life_gain_unit
         and not creature_enters_draw_unit
@@ -37239,6 +37383,50 @@ def split_row(
         }
         return build_proposal(row, metadata, effect_json, family_id="xmage_return_target_to_hand_spell"), "selected_exact_scope"
 
+    if battlefield_to_library_spell_unit:
+        unsupported_abilities = ability_classes(row) - ALLOWED_AUXILIARY_RESOLUTION_ABILITY_CLASSES
+        if unsupported_abilities:
+            return None, "battlefield_to_library_ability_class_not_simple"
+        if has_oracle_complexity(metadata):
+            return None, "battlefield_to_library_oracle_not_simple"
+        oracle_target = battlefield_to_library_from_oracle(metadata)
+        if isinstance(oracle_target, str):
+            return None, oracle_target
+        if oracle_target is None:
+            return None, "battlefield_to_library_oracle_not_supported"
+        source_target = battlefield_to_library_from_source(source_text)
+        if isinstance(source_target, str):
+            return None, source_target
+        for key in ("target", "count", "destination", "target_controller", "library_controller"):
+            if source_target.get(key) != oracle_target.get(key):
+                return None, f"battlefield_to_library_source_oracle_{key}_mismatch"
+        target_type = str(oracle_target["target"])
+        count = int(oracle_target["count"])
+        target_constraints = target_constraints_for(target_type)
+        effect_json = {
+            "effect": "remove_permanent",
+            "battle_model_scope": BATTLEFIELD_TO_LIBRARY_SCOPE,
+            "zone_move": "battlefield_to_library",
+            "from_zone": "battlefield",
+            "target": restricted_target_base(target_type),
+            "target_constraints": target_constraints,
+            "target_controller": "opponent",
+            "library_controller": "owner",
+            "destination": str(oracle_target["destination"]),
+            "target_count": count,
+            "target_count_min": count,
+            "target_count_max": count,
+            "max_targets": count,
+            "xmage_effect_class": "PutOnLibraryTargetEffect",
+            **flags,
+        }
+        return build_proposal(
+            row,
+            metadata,
+            effect_json,
+            family_id="xmage_put_target_permanent_on_library_spell",
+        ), "selected_exact_scope"
+
     if unit == RECURSION_UNIT:
         if classes == {"BoostTargetEffect"}:
             unsupported_abilities = ability_classes(row) - ALLOWED_AUXILIARY_RESOLUTION_ABILITY_CLASSES
@@ -40142,6 +40330,7 @@ def build_exact_split_report(
             and not is_boost_keyword_spell_unit(row)
             and not is_counter_unless_pays_spell_unit(row)
             and not is_counter_target_with_replacement_spell_unit(row)
+            and not is_battlefield_to_library_spell_unit(row)
             and not (
                 str(row.get("adapter_work_unit") or "") == RECURSION_UNIT
                 and effect_classes(row) == {"PutOnLibraryTargetEffect"}

@@ -50,6 +50,122 @@ def metadata(
 
 
 class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
+    def test_put_target_creature_on_library_top_maps_battlefield_to_library_scope(self) -> None:
+        row = queue_row(
+            "xmage_signature::PutOnLibraryTargetEffect::no_ability_class::"
+            "TargetCreaturePermanent::no_condition_class::targeting",
+            effect_classes=["PutOnLibraryTargetEffect"],
+            xmage_signals=["targeting"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Excommunicate",
+                type_line="Sorcery",
+                oracle_text="Put target creature on top of its owner's library.",
+            ),
+            source_text="""
+                this.getSpellAbility().addTarget(new TargetCreaturePermanent());
+                this.getSpellAbility().addEffect(new PutOnLibraryTargetEffect(true));
+            """,
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["effect"], "remove_permanent")
+        self.assertEqual(effect["battle_model_scope"], split.BATTLEFIELD_TO_LIBRARY_SCOPE)
+        self.assertEqual(effect["zone_move"], "battlefield_to_library")
+        self.assertEqual(effect["destination"], "library_top")
+        self.assertEqual(effect["target"], "creature")
+        self.assertEqual(effect["target_constraints"], {"card_types": ["creature"]})
+        self.assertEqual(effect["target_count"], 1)
+        self.assertEqual(effect["library_controller"], "owner")
+
+    def test_put_target_artifact_on_library_bottom_maps_battlefield_to_library_scope(self) -> None:
+        row = queue_row(
+            "xmage_signature::PutOnLibraryTargetEffect::no_ability_class::"
+            "TargetArtifactPermanent::no_condition_class::targeting",
+            effect_classes=["PutOnLibraryTargetEffect"],
+            xmage_signals=["targeting"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Natural Obsolescence",
+                type_line="Instant",
+                oracle_text="Put target artifact on the bottom of its owner's library.",
+            ),
+            source_text="""
+                this.getSpellAbility().addEffect(new PutOnLibraryTargetEffect(false));
+                this.getSpellAbility().addTarget(new TargetArtifactPermanent());
+            """,
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.BATTLEFIELD_TO_LIBRARY_SCOPE)
+        self.assertEqual(effect["destination"], "library_bottom")
+        self.assertEqual(effect["target"], "artifact")
+        self.assertEqual(effect["target_constraints"], {"card_types": ["artifact"]})
+
+    def test_put_two_target_lands_on_library_top_maps_multi_target_scope(self) -> None:
+        row = queue_row(
+            "xmage_signature::PutOnLibraryTargetEffect::no_ability_class::"
+            "TargetLandPermanent::no_condition_class::targeting",
+            effect_classes=["PutOnLibraryTargetEffect"],
+            xmage_signals=["targeting"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Plow Under",
+                type_line="Sorcery",
+                oracle_text="Put two target lands on top of their owners' libraries.",
+            ),
+            source_text="""
+                this.getSpellAbility().addEffect(new PutOnLibraryTargetEffect(true));
+                this.getSpellAbility().addTarget(new TargetLandPermanent(2));
+            """,
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.BATTLEFIELD_TO_LIBRARY_SCOPE)
+        self.assertEqual(effect["destination"], "library_top")
+        self.assertEqual(effect["target"], "land")
+        self.assertEqual(effect["target_count"], 2)
+        self.assertEqual(effect["target_count_min"], 2)
+        self.assertEqual(effect["target_count_max"], 2)
+
+    def test_put_two_target_artifacts_accepts_custom_xmage_effect_text(self) -> None:
+        row = queue_row(
+            "xmage_signature::PutOnLibraryTargetEffect::no_ability_class::"
+            "TargetArtifactPermanent::no_condition_class::targeting",
+            effect_classes=["PutOnLibraryTargetEffect"],
+            xmage_signals=["targeting"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Rebuking Ceremony",
+                type_line="Sorcery",
+                oracle_text="Put two target artifacts on top of their owners' libraries.",
+            ),
+            source_text="""
+                getSpellAbility().addEffect(new PutOnLibraryTargetEffect(
+                    true,
+                    "put two target artifacts on top of their owners' libraries"));
+                getSpellAbility().addTarget(new TargetArtifactPermanent(2));
+            """,
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.BATTLEFIELD_TO_LIBRARY_SCOPE)
+        self.assertEqual(effect["target"], "artifact")
+        self.assertEqual(effect["destination"], "library_top")
+        self.assertEqual(effect["target_count"], 2)
+
     def test_beginning_each_end_step_morbid_draw_maps_exact_scope(self) -> None:
         row = queue_row(
             split.DRAW_ENGINE_UNIT,

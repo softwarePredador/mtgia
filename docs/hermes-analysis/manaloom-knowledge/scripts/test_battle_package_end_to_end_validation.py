@@ -561,6 +561,64 @@ def test_single_target_removal_runner_pays_or_discard_cost() -> None:
     assert result["additional_cost"] == "discard_card"
 
 
+def test_single_target_removal_runner_moves_target_to_library_top() -> None:
+    battle = validator.load_battle(validator.DEFAULT_BATTLE)
+    events = []
+    previous_handler = battle.REPLAY_EVENT_HANDLER
+    previous_get_card_effect = battle.get_card_effect
+    battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+    battle.get_card_effect = lambda card: {
+        "effect": "remove_permanent",
+        "battle_model_scope": "xmage_put_target_permanent_on_library_spell_v1",
+        "zone_move": "battlefield_to_library",
+        "from_zone": "battlefield",
+        "target": "creature",
+        "target_constraints": {"card_types": ["creature"]},
+        "target_controller": "opponent",
+        "library_controller": "owner",
+        "destination": "library_top",
+        "target_count": 1,
+    }
+    try:
+        result = validator.run_single_target_removal(
+            battle,
+            {
+                "name": "Excommunicate puts target creature on library top",
+                "type": "single_target_removal",
+                "card": {"name": "Excommunicate", "type_line": "Sorcery"},
+                "target": {
+                    "name": "E2E Legal Removal Target",
+                    "type_line": "Creature",
+                    "effect": "creature",
+                    "power": 2,
+                    "toughness": 2,
+                },
+                "nonmatching_target": {
+                    "name": "E2E Illegal Removal Target",
+                    "type_line": "Land",
+                    "effect": "land",
+                },
+                "expected_destination": "library_top",
+                "expected_effect": "remove_permanent",
+                "expected_target_constraints": {"card_types": ["creature"]},
+            },
+            events,
+        )
+    finally:
+        battle.REPLAY_EVENT_HANDLER = previous_handler
+        battle.get_card_effect = previous_get_card_effect
+
+    assert result["target"] == "E2E Legal Removal Target"
+    assert result["destination"] == "library_top"
+    assert result["moved_names"][0] == "E2E Legal Removal Target"
+    assert any(
+        event == "permanent_put_on_library"
+        and data.get("card") == "E2E Legal Removal Target"
+        and data.get("destination") == "library_top"
+        for event, data in events
+    )
+
+
 def test_single_target_removal_runner_pays_life_cost() -> None:
     battle = validator.load_battle(validator.DEFAULT_BATTLE)
     events = []
