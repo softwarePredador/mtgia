@@ -24198,6 +24198,12 @@ def simple_mana_source_detail_from_line(text: str) -> dict[str, Any] | None:
         )
         if generic_detail is not None:
             return generic_detail
+    generic_detail = simple_mana_source_detail_from_generic_line(
+        working_text,
+        activation_limit_per_turn=activation_limit_per_turn,
+    )
+    if generic_detail is not None:
+        return generic_detail
     if working_text == "{t}: add one mana of any color.":
         detail = {"produces": "WUBRG", "mana_produced": 1, "mana_activation_requires_tap": True}
         if activation_limit_per_turn:

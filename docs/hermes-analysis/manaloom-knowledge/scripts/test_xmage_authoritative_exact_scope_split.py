@@ -15976,6 +15976,35 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertTrue(effect["mana_activation_requires_tap"])
         self.assertEqual(effect["permanent_type"], "artifact")
 
+    def test_simple_mana_source_maps_multiple_any_one_color_mana(self) -> None:
+        row = queue_row(
+            split.RAMP_ARTIFACT_UNIT,
+            effect_classes=["AddManaOfAnyColorEffect"],
+            ability_kind="activated",
+            ability_classes=["SimpleManaAbility"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Gilded Lotus",
+                type_line="Artifact",
+                oracle_text="{T}: Add three mana of any one color.",
+            ),
+            source_text=(
+                "Ability ability = new SimpleManaAbility(Zone.BATTLEFIELD, "
+                "new AddManaOfAnyColorEffect(3), new TapSourceCost());"
+                "this.addAbility(ability);"
+            ),
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.MANA_SCOPE)
+        self.assertEqual(effect["produces"], "WUBRG")
+        self.assertEqual(effect["mana_produced"], 3)
+        self.assertTrue(effect["mana_activation_requires_tap"])
+        self.assertNotIn("produced_mana_symbols", effect)
+
     def test_any_color_mana_rock_alias_preserves_generic_activation_cost(self) -> None:
         row = queue_row(
             split.RAMP_ANY_COLOR_MANA_ROCK_UNIT,
