@@ -5243,6 +5243,38 @@ def fixed_damage_target_spell_execution_scenario_from_expected_rule(
         scenario["expected_additional_cost"] = "return_land_to_hand"
         scenario["expected_returned_name"] = "E2E Return Cost Land"
         scenario["expected_returned_land_name"] = "E2E Return Cost Land"
+    additional_cost_options = [
+        option
+        for option in required.get("additional_cost_options") or []
+        if isinstance(option, dict)
+    ]
+    selected_additional_cost = str(required.get("additional_cost") or "").strip()
+    selected_option = additional_cost_options[0] if additional_cost_options else {}
+    if selected_option:
+        selected_additional_cost = str(selected_option.get("cost") or "").strip()
+    if selected_additional_cost == "discard_card":
+        scenario["controller_hand"] = [
+            {
+                "name": "E2E Discard Cost Card",
+                "type_line": "Sorcery",
+                "effect": "draw_cards",
+            }
+        ]
+        scenario["expected_additional_cost"] = "discard_card"
+        scenario["expected_discarded_name"] = "E2E Discard Cost Card"
+    elif selected_additional_cost == "pay_generic":
+        pay_generic_amount = int(
+            selected_option.get("pay_generic_amount")
+            or required.get("pay_generic_amount")
+            or 0
+        )
+        if pay_generic_amount > 0:
+            scenario["controller_mana"] = {
+                **dict(scenario.get("controller_mana") or {}),
+                "generic": pay_generic_amount,
+            }
+            scenario["expected_additional_cost"] = "pay_generic"
+            scenario["expected_pay_generic_amount"] = pay_generic_amount
     for return_flag, cost_name, fixture in (
         (
             "requires_return_permanent_to_hand",
@@ -7648,6 +7680,12 @@ def counter_target_execution_scenario_from_expected_rule(
         for option in required.get("additional_cost_options") or []
         if isinstance(option, dict)
     ]
+    selected_option = additional_cost_options[0] if additional_cost_options else {}
+    if selected_option and not any(
+        str(option.get("cost") or "") == "tap_untapped_artifact"
+        for option in additional_cost_options
+    ):
+        selected_additional_cost = str(selected_option.get("cost") or "").strip()
     if additional_cost_options and any(
         str(option.get("cost") or "") == "tap_untapped_artifact"
         for option in additional_cost_options
@@ -7668,6 +7706,19 @@ def counter_target_execution_scenario_from_expected_rule(
             scenario["responder_life"] = max(20, pay_life_amount + 5)
             scenario["expected_additional_cost"] = "pay_life"
             scenario["expected_pay_life_amount"] = pay_life_amount
+    elif selected_additional_cost == "pay_generic":
+        pay_generic_amount = int(
+            selected_option.get("pay_generic_amount")
+            or required.get("pay_generic_amount")
+            or 0
+        )
+        if pay_generic_amount > 0:
+            scenario["responder_mana"] = {
+                **dict(scenario.get("responder_mana") or {}),
+                "generic": pay_generic_amount,
+            }
+            scenario["expected_additional_cost"] = "pay_generic"
+            scenario["expected_pay_generic_amount"] = pay_generic_amount
     elif selected_additional_cost == "return_land_to_hand":
         land = {
             "name": "E2E Return Cost Land",
@@ -7969,6 +8020,19 @@ def single_target_removal_execution_scenario_from_expected_rule(
             scenario["controller_life"] = max(20, pay_life_amount + 5)
             scenario["expected_additional_cost"] = "pay_life"
             scenario["expected_pay_life_amount"] = pay_life_amount
+    elif selected_additional_cost == "pay_generic":
+        pay_generic_amount = int(
+            selected_option.get("pay_generic_amount")
+            or required.get("pay_generic_amount")
+            or 0
+        )
+        if pay_generic_amount > 0:
+            scenario["controller_mana"] = {
+                **dict(scenario.get("controller_mana") or {}),
+                "generic": pay_generic_amount,
+            }
+            scenario["expected_additional_cost"] = "pay_generic"
+            scenario["expected_pay_generic_amount"] = pay_generic_amount
     elif selected_additional_cost in {
         "sacrifice_creature",
         "sacrifice_creature_or_enchantment",

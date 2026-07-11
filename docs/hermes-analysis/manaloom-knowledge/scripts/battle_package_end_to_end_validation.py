@@ -1256,6 +1256,7 @@ def run_damage_gain_life_spell(
     opponent = battle.Player(str(scenario.get("opponent") or "Opponent"), None, [])
     active.life = int(scenario.get("controller_life") or 10)
     opponent.life = int(scenario.get("opponent_life") or 20)
+    add_manifest_mana(active, scenario.get("controller_mana") or {})
     expected_damage = int(scenario.get("expected_damage") or 0)
     expected_life_gain = int(scenario.get("expected_life_gain") or 0)
     expected_treasure_count = int(scenario.get("expected_treasure_count") or 0)
@@ -1360,6 +1361,15 @@ def run_damage_gain_life_spell(
                 for permanent in active.battlefield
             ):
                 fail("battle_execution", f"{card['name']} left returned permanent {expected_returned} on battlefield")
+        expected_pay_generic = int(scenario.get("expected_pay_generic_amount") or 0)
+        if (
+            expected_pay_generic > 0
+            and int(additional_cost_event.get("pay_generic_amount") or 0) != expected_pay_generic
+        ):
+            fail(
+                "battle_events",
+                f"{card['name']} pay_generic_amount={additional_cost_event.get('pay_generic_amount')!r}",
+            )
 
     damage_event = next(
         (
@@ -3274,6 +3284,7 @@ def run_single_target_removal(
     expected_source_controller_damage = int(scenario.get("expected_source_controller_damage") or 0)
     expected_target_controller_damage = int(scenario.get("expected_target_controller_damage") or 0)
     active.life = controller_starting_life
+    add_manifest_mana(active, scenario.get("controller_mana") or {})
     for card_fixture in scenario.get("controller_hand") or []:
         if isinstance(card_fixture, dict):
             active.hand.append(dict(card_fixture))
@@ -3397,6 +3408,13 @@ def run_single_target_removal(
             fail(
                 "battle_events",
                 f"{card['name']} pay_life_amount={additional_cost_event.get('pay_life_amount')!r}",
+            )
+    expected_pay_generic_amount = int(scenario.get("expected_pay_generic_amount") or 0)
+    if expected_pay_generic_amount > 0 and additional_cost_event is not None:
+        if int(additional_cost_event.get("pay_generic_amount") or 0) != expected_pay_generic_amount:
+            fail(
+                "battle_events",
+                f"{card['name']} pay_generic_amount={additional_cost_event.get('pay_generic_amount')!r}",
             )
     expected_discarded_name = str(scenario.get("expected_discarded_name") or "").strip()
     if expected_discarded_name:
@@ -3553,6 +3571,8 @@ def run_single_target_removal(
         result["additional_cost"] = expected_additional_cost
     if expected_pay_life_amount > 0:
         result["pay_life_amount"] = expected_pay_life_amount
+    if expected_pay_generic_amount > 0:
+        result["pay_generic_amount"] = expected_pay_generic_amount
     return result
 
 
@@ -11030,6 +11050,15 @@ def run_counter_target_response(
             fail(
                 "battle_events",
                 f"{response_card['name']} pay_life_amount={additional_cost_event.get('pay_life_amount')!r}",
+            )
+        expected_pay_generic = int(scenario.get("expected_pay_generic_amount") or 0)
+        if (
+            expected_pay_generic > 0
+            and int(additional_cost_event.get("pay_generic_amount") or 0) != expected_pay_generic
+        ):
+            fail(
+                "battle_events",
+                f"{response_card['name']} pay_generic_amount={additional_cost_event.get('pay_generic_amount')!r}",
             )
 
     counter_event = next(

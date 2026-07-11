@@ -21834,7 +21834,10 @@ def activation_sacrifice_target_from_source(source: str, window: str) -> str | N
         and "CardType.PLANESWALKER.getPredicate()" in relevant
     ):
         return "creature_or_planeswalker"
-    if "FILTER_PERMANENT_ARTIFACT_OR_CREATURE" in relevant:
+    if (
+        "FILTER_PERMANENT_ARTIFACT_OR_CREATURE" in relevant
+        or "FILTER_CONTROLLED_PERMANENT_ARTIFACT_OR_CREATURE" in relevant
+    ):
         return "artifact_or_creature"
     if "FILTER_CONTROLLED_ANOTHER_CREATURE_OR_ARTIFACT" in relevant:
         return "artifact_or_creature"
@@ -21901,8 +21904,6 @@ def fixed_spell_additional_cost_fields_from_source(
         if "ManaCostsImpl" in text or "ForageCost" in text:
             return None, unsupported_reason
         options: list[dict[str, Any]] = []
-        generic_cost_match = re.search(r"GenericManaCost\s*\(\s*(\d+)\s*\)", text)
-        oracle_pay_generic_match = re.search(r"additional cost.*pay \{(\d+)\}", lowered_oracle)
         if (
             "TapTargetCost" in text
             and "FilterControlledArtifactPermanent" in text
@@ -21919,24 +21920,6 @@ def fixed_spell_additional_cost_fields_from_source(
                     "xmage_additional_cost_target": "untapped_artifact",
                 }
             )
-        if generic_cost_match and oracle_pay_generic_match and any(
-            str(option.get("cost") or "") == "tap_untapped_artifact"
-            for option in options
-        ):
-            generic_amount = int(generic_cost_match.group(1))
-            oracle_amount = int(oracle_pay_generic_match.group(1))
-            if generic_amount == oracle_amount:
-                options.append(
-                    {
-                        "cost": "pay_generic",
-                        "requires_pay_generic": True,
-                        "pay_generic_amount": generic_amount,
-                    }
-                )
-            else:
-                return None, unsupported_reason
-        elif "GenericManaCost" in text:
-            return None, unsupported_reason
         if "DiscardCardCost" in text and re.search(r"additional cost.*discard a card", lowered_oracle):
             options.append({"cost": "discard_card", "requires_discard_card": True})
         pay_life_match = re.search(r"PayLifeCost\s*\(\s*(\d+)\s*\)", text)
@@ -21969,6 +21952,24 @@ def fixed_spell_additional_cost_fields_from_source(
                         "xmage_additional_cost_target": sacrifice_target,
                     }
                 )
+        generic_cost_match = re.search(r"GenericManaCost\s*\(\s*(\d+)\s*\)", text)
+        oracle_pay_generic_match = re.search(r"additional cost.*pay \{(\d+)\}", lowered_oracle)
+        if generic_cost_match:
+            if not oracle_pay_generic_match:
+                return None, unsupported_reason
+            generic_amount = int(generic_cost_match.group(1))
+            oracle_amount = int(oracle_pay_generic_match.group(1))
+            if generic_amount != oracle_amount:
+                return None, unsupported_reason
+            if not any(str(option.get("cost") or "") != "pay_generic" for option in options):
+                return None, unsupported_reason
+            options.append(
+                {
+                    "cost": "pay_generic",
+                    "requires_pay_generic": True,
+                    "pay_generic_amount": generic_amount,
+                }
+            )
         cost_source_start = text.find(".addCost")
         cost_source_text = text[cost_source_start:] if cost_source_start >= 0 else text
 

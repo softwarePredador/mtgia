@@ -996,6 +996,54 @@ def test_single_target_removal_runner_pays_life_cost() -> None:
     assert result["pay_life_amount"] == 3
 
 
+def test_single_target_removal_runner_pays_generic_cost() -> None:
+    battle = validator.load_battle(validator.DEFAULT_BATTLE)
+    events = []
+    previous_handler = battle.REPLAY_EVENT_HANDLER
+    previous_get_card_effect = battle.get_card_effect
+    battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+    battle.get_card_effect = lambda card: {
+        "effect": "remove_creature",
+        "battle_model_scope": "xmage_destroy_target_spell_v1",
+        "target": "creature",
+        "target_constraints": {"card_types": ["creature"]},
+        "destination": "graveyard",
+        "additional_cost": "pay_generic",
+        "requires_pay_generic": True,
+        "pay_generic_amount": 4,
+    }
+    try:
+        result = validator.run_single_target_removal(
+            battle,
+            {
+                "name": "Annihilating Glare pays generic cost",
+                "type": "single_target_removal",
+                "card": {"name": "Annihilating Glare", "type_line": "Sorcery"},
+                "target": {
+                    "name": "E2E Legal Removal Target",
+                    "type_line": "Creature",
+                    "effect": "creature",
+                    "power": 2,
+                    "toughness": 2,
+                },
+                "controller_mana": {"generic": 4},
+                "expected_destination": "graveyard",
+                "expected_effect": "remove_creature",
+                "expected_target_constraints": {"card_types": ["creature"]},
+                "expected_additional_cost": "pay_generic",
+                "expected_pay_generic_amount": 4,
+            },
+            events,
+        )
+    finally:
+        battle.REPLAY_EVENT_HANDLER = previous_handler
+        battle.get_card_effect = previous_get_card_effect
+
+    assert result["target"] == "E2E Legal Removal Target"
+    assert result["additional_cost"] == "pay_generic"
+    assert result["pay_generic_amount"] == 4
+
+
 def test_fixed_damage_target_spell_runner_validates_shuffle_self() -> None:
     battle = validator.load_battle(validator.DEFAULT_BATTLE)
     events = []

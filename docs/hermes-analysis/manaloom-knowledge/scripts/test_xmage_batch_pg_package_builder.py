@@ -393,6 +393,71 @@ def test_counter_target_tap_artifact_or_pay_generic_execution_scenario_is_manife
     assert scenario["responder_battlefield"][0]["tapped"] is False
 
 
+def test_fixed_damage_or_discard_or_pay_generic_scenario_uses_first_discard_option() -> None:
+    proposal = {
+        "normalized_name": "lightning axe",
+        "card_name": "Lightning Axe",
+        "oracle_hash": "hash-lightning-axe",
+        "logical_rule_key": "battle_rule_v1:lightning-axe",
+        "effect_json": {
+            "effect": "direct_damage",
+            "battle_model_scope": "xmage_fixed_damage_target_spell_v1",
+            "amount": 5,
+            "damage": 5,
+            "target": "creature",
+            "target_constraints": {"card_types": ["creature"]},
+            "additional_cost": "choose_discard_card_or_pay_generic",
+            "requires_one_additional_cost_option": True,
+            "additional_cost_options": [
+                {"cost": "discard_card", "requires_discard_card": True},
+                {"cost": "pay_generic", "requires_pay_generic": True, "pay_generic_amount": 5},
+            ],
+        },
+    }
+
+    expected = builder.expected_rule_from_proposal(proposal)
+    scenario = builder.execution_scenario_from_expected_rule(expected)
+
+    assert scenario["type"] == "fixed_damage_target_spell"
+    assert scenario["expected_additional_cost"] == "discard_card"
+    assert scenario["expected_discarded_name"] == "E2E Discard Cost Card"
+    assert scenario["controller_hand"][0]["name"] == "E2E Discard Cost Card"
+
+
+def test_single_target_removal_or_pay_generic_or_sacrifice_scenario_pays_generic() -> None:
+    proposal = {
+        "normalized_name": "annihilating glare",
+        "card_name": "Annihilating Glare",
+        "oracle_hash": "hash-annihilating-glare",
+        "logical_rule_key": "battle_rule_v1:annihilating-glare",
+        "effect_json": {
+            "effect": "remove_creature",
+            "battle_model_scope": "xmage_destroy_target_spell_v1",
+            "target": "creature_or_planeswalker",
+            "target_constraints": {"scope": "creature_or_planeswalker"},
+            "destination": "graveyard",
+            "additional_cost": "choose_pay_generic_or_sacrifice_artifact_or_creature",
+            "requires_one_additional_cost_option": True,
+            "additional_cost_options": [
+                {"cost": "pay_generic", "requires_pay_generic": True, "pay_generic_amount": 4},
+                {
+                    "cost": "sacrifice_artifact_or_creature",
+                    "requires_sacrifice_artifact_or_creature": True,
+                    "xmage_additional_cost_target": "artifact_or_creature",
+                },
+            ],
+        },
+    }
+
+    expected = builder.expected_rule_from_proposal(proposal)
+    scenario = builder.execution_scenario_from_expected_rule(expected)
+
+    assert scenario["type"] == "single_target_removal"
+    assert scenario["expected_additional_cost"] == "pay_generic"
+    assert scenario["expected_pay_generic_amount"] == 4
+    assert scenario["controller_mana"] == {"generic": 4}
+
+
 def test_counter_target_excluded_spell_subtype_execution_scenario_uses_illegal_subtype_fixture() -> None:
     proposal = {
         "normalized_name": "faerie trickery",

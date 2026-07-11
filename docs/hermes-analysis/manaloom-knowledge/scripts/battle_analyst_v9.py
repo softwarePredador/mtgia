@@ -2388,6 +2388,14 @@ def runtime_cast_plan_for_card(player, card, effect_data, *, additional_generic=
     )
     if not player.can_pay(locked_cost):
         return None
+    if not additional_card_costs_are_payable_for_spell_cast(
+        player,
+        card,
+        effect_data,
+        base_cost=locked_cost,
+        cost_context=cost_context,
+    ):
+        return None
     modes = []
     if kicker_paid:
         modes.append(f"kicker:{effect_data.get('kicker_mana_cost')}")

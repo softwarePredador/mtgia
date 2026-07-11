@@ -16139,7 +16139,7 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
             ],
         )
 
-    def test_destroy_target_spell_keeps_generic_mana_or_additional_cost_blocked(self) -> None:
+    def test_destroy_target_spell_accepts_or_pay_generic_or_sacrifice_additional_cost(self) -> None:
         row = queue_row(split.DESTROY_UNIT, effect_classes=["DestroyTargetEffect"])
         proposal, reason = split.split_row(
             row,
@@ -16159,8 +16159,56 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
             ),
         )
 
-        self.assertIsNone(proposal)
-        self.assertEqual(reason, "destroy_additional_cost_not_supported")
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.DESTROY_SCOPE)
+        self.assertEqual(effect["additional_cost"], "choose_pay_generic_or_sacrifice_artifact_or_creature")
+        self.assertTrue(effect["requires_one_additional_cost_option"])
+        self.assertEqual(
+            effect["additional_cost_options"],
+            [
+                {"cost": "pay_generic", "requires_pay_generic": True, "pay_generic_amount": 4},
+                {
+                    "cost": "sacrifice_artifact_or_creature",
+                    "requires_sacrifice_artifact_or_creature": True,
+                    "xmage_additional_cost_target": "artifact_or_creature",
+                },
+            ],
+        )
+
+    def test_fixed_damage_spell_accepts_or_discard_or_pay_generic_additional_cost(self) -> None:
+        row = queue_row(split.DAMAGE_UNIT, effect_classes=["DamageTargetEffect"])
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Lightning Axe",
+                oracle_text=(
+                    "As an additional cost to cast this spell, discard a card or pay {5}. "
+                    "Lightning Axe deals 5 damage to target creature."
+                ),
+            ),
+            source_text=(
+                "this.getSpellAbility().addCost(new OrCost("
+                "\"discard a card or pay {5}\", "
+                "new DiscardCardCost(), "
+                "new GenericManaCost(5)));"
+                "this.getSpellAbility().addTarget(new TargetCreaturePermanent());"
+                "this.getSpellAbility().addEffect(new DamageTargetEffect(5));"
+            ),
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.DAMAGE_SCOPE)
+        self.assertEqual(effect["target"], "creature")
+        self.assertEqual(effect["additional_cost"], "choose_discard_card_or_pay_generic")
+        self.assertEqual(
+            effect["additional_cost_options"],
+            [
+                {"cost": "discard_card", "requires_discard_card": True},
+                {"cost": "pay_generic", "requires_pay_generic": True, "pay_generic_amount": 5},
+            ],
+        )
 
     def test_fixed_life_gain_spell_maps_to_life_total_change_runtime(self) -> None:
         row = queue_row(split.LIFE_UNIT, effect_classes=["GainLifeEffect"])
