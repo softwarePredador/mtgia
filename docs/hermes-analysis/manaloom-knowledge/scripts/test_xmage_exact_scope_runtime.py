@@ -6125,6 +6125,51 @@ class XMageExactScopeRuntimeTest(unittest.TestCase):
             )
         )
 
+    def test_dynamic_create_tokens_spell_counts_creatures_died_this_turn(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        opponent = self.battle.Player("Opponent", None, [])
+        active.record_creature_died(3, turn_marker=5)
+        effect = {
+            "effect": "token_maker",
+            "battle_model_scope": "xmage_dynamic_count_create_creature_tokens_spell_v1",
+            "ability_kind": "one_shot",
+            "token_count_source": "creatures_you_control_died_this_turn",
+            "token_name": "Beast Token",
+            "token_subtype": "Beast",
+            "token_power": 3,
+            "token_toughness": 3,
+            "token_colors": ["G"],
+            "_rule_logical_key": "battle_rule_v1:fixture_fresh_meat",
+        }
+
+        self.battle.apply_effect_immediate(
+            active,
+            [opponent],
+            {
+                "name": "Fresh Meat",
+                "type_line": "Instant",
+                "oracle_text": (
+                    "Create a 3/3 green Beast creature token for each creature put into your "
+                    "graveyard from the battlefield this turn."
+                ),
+            },
+            turn=5,
+            rng=random.Random(5),
+            effect_data_override=effect,
+        )
+
+        tokens = [card for card in active.battlefield if card.get("name") == "Beast Token"]
+        self.assertEqual(len(tokens), 3)
+        self.assertTrue(
+            any(
+                event == "tokens_created"
+                and data.get("card") == "Fresh Meat"
+                and data.get("tokens_created") == 3
+                and data.get("token_count_source") == "creatures_you_control_died_this_turn"
+                for event, data in self.events
+            )
+        )
+
     def test_x_create_creature_tokens_spell_cast_plan_uses_xx_cost(self) -> None:
         active = self.battle.Player("Active", None, [])
         active.mana_pool.add("white", 3)
@@ -6309,6 +6354,52 @@ class XMageExactScopeRuntimeTest(unittest.TestCase):
                 and data.get("card") == "Fixture Cartographer"
                 and data.get("token_count") == 1
                 and data.get("token_names") == ["Map Token"]
+                for event, data in self.events
+            )
+        )
+
+    def test_creature_etb_dynamic_create_tokens_uses_devotion(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        opponent = self.battle.Player("Opponent", None, [])
+        active.battlefield.extend(
+            [
+                {"name": "Fixture Paladin", "type_line": "Creature - Knight", "mana_cost": "{W}{W}"},
+                {"name": "Fixture Acolyte", "type_line": "Creature - Cleric", "mana_cost": "{1}{W}"},
+            ]
+        )
+        permanent = {"name": "Evangel of Heliod", "type_line": "Creature - Human Cleric", "mana_cost": "{4}{W}{W}"}
+        active.battlefield.append(permanent)
+        effect = {
+            "effect": "creature",
+            "battle_model_scope": "xmage_creature_etb_create_tokens_v1",
+            "ability_kind": "triggered",
+            "trigger": "enters_battlefield",
+            "etb_token_count_source": "devotion_to_white",
+            "etb_token_name": "Soldier Token",
+            "etb_token_subtype": "Soldier",
+            "etb_token_power": 1,
+            "etb_token_toughness": 1,
+            "etb_token_colors": ["W"],
+            "_rule_logical_key": "battle_rule_v1:fixture_evangel",
+        }
+
+        self.battle.resolve_generic_permanent_etb(
+            active,
+            [opponent],
+            permanent,
+            effect,
+            turn=3,
+            rng=random.Random(3),
+        )
+
+        tokens = [card for card in active.battlefield if card.get("name") == "Soldier Token"]
+        self.assertEqual(len(tokens), 5)
+        self.assertTrue(
+            any(
+                event == "etb_token_maker_resolved"
+                and data.get("card") == "Evangel of Heliod"
+                and data.get("token_count") == 5
+                and data.get("token_count_source") == "devotion_to_white"
                 for event, data in self.events
             )
         )
@@ -18549,6 +18640,49 @@ class XMageExactScopeRuntimeTest(unittest.TestCase):
                 and data.get("token_tapped") is True
                 and data.get("source") == "Fixture Removal"
                 and data.get("rule_logical_key") == "battle_rule_v1:fixture_dies_token"
+                for event, data in self.events
+            )
+        )
+
+    def test_creature_dies_dynamic_create_tokens_counts_graveyard_creatures_after_death(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        opponent = self.battle.Player("Opponent", None, [])
+        active.graveyard.append({"name": "Fixture Prior Creature", "type_line": "Creature - Spirit"})
+        permanent = {
+            "name": "Hallowed Spiritkeeper",
+            "type_line": "Creature - Avatar",
+            "battle_model_scope": "xmage_creature_dies_create_tokens_v1",
+            "dies_trigger_effect": "token_maker",
+            "dies_token_count_source": "controller_graveyard_creature_count",
+            "dies_token_name": "Spirit Token",
+            "dies_token_subtype": "Spirit",
+            "dies_token_power": 1,
+            "dies_token_toughness": 1,
+            "dies_token_colors": ["W"],
+            "dies_token_keywords": ["flying"],
+            "dies_token_flying": True,
+            "_rule_logical_key": "battle_rule_v1:fixture_hallowed_spiritkeeper",
+        }
+        active.battlefield.append(permanent)
+
+        destination = self.battle.move_creature_from_battlefield(
+            active,
+            permanent,
+            reason="test_destroy",
+            source={"name": "Fixture Removal"},
+            all_players=[active, opponent],
+        )
+
+        self.assertEqual(destination, "graveyard")
+        tokens = [card for card in active.battlefield if card.get("name") == "Spirit Token"]
+        self.assertEqual(len(tokens), 2)
+        self.assertTrue(all(token.get("flying") for token in tokens))
+        self.assertTrue(
+            any(
+                event == "dies_token_maker_resolved"
+                and data.get("card") == "Hallowed Spiritkeeper"
+                and data.get("token_count") == 2
+                and data.get("token_count_source") == "controller_graveyard_creature_count"
                 for event, data in self.events
             )
         )

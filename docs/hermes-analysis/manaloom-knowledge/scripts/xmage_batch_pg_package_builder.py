@@ -225,6 +225,11 @@ E2E_REQUIRED_EFFECT_FIELDS = (
     "etb_treasure_count",
     "etb_treasure_condition",
     "etb_token_count",
+    "etb_token_count_source",
+    "etb_token_count_per_x",
+    "etb_token_count_subtype",
+    "etb_token_count_card_name",
+    "etb_token_count_base",
     "token_count",
     "token_count_source",
     "token_count_per_x",
@@ -316,6 +321,11 @@ E2E_REQUIRED_EFFECT_FIELDS = (
     "etb_token_mana_source_contextual_only",
     "etb_token_mana_spend_restriction",
     "dies_token_count",
+    "dies_token_count_source",
+    "dies_token_count_per_x",
+    "dies_token_count_subtype",
+    "dies_token_count_card_name",
+    "dies_token_count_base",
     "dies_token_name",
     "dies_token_power",
     "dies_token_toughness",
@@ -1907,6 +1917,39 @@ def expected_token_from_component(component: dict[str, Any]) -> dict[str, Any]:
     return expected
 
 
+DYNAMIC_TOKEN_COUNT_SCENARIO_TARGET = 3
+
+
+def apply_dynamic_token_count_scenario_fields(
+    scenario: dict[str, Any],
+    expected_token: dict[str, Any],
+    source: str | None,
+    *,
+    source_prefix: str = "",
+    include_dying_permanent: bool = False,
+) -> None:
+    source_text = str(source or "").strip().lower()
+    if not source_text:
+        return
+    if source_prefix:
+        scenario[f"{source_prefix}_token_count_source"] = source_text
+    else:
+        scenario["token_count_source"] = source_text
+    expected_count = DYNAMIC_TOKEN_COUNT_SCENARIO_TARGET
+    expected_token["count"] = expected_count
+    if source_text == "controller_graveyard_creature_count":
+        if include_dying_permanent:
+            scenario["controller_graveyard_creature_count_before_death"] = max(0, expected_count - 1)
+        else:
+            scenario["controller_graveyard_creature_count"] = expected_count
+    elif source_text == "controller_graveyard_instant_sorcery_count":
+        scenario["controller_graveyard_instant_sorcery_count"] = expected_count
+    elif source_text == "creatures_you_control_died_this_turn":
+        scenario["creatures_you_control_died_this_turn_count"] = expected_count
+    elif source_text.startswith("devotion_to_"):
+        scenario["expected_dynamic_token_count"] = expected_count
+
+
 def creature_etb_create_tokens_execution_scenario_from_expected_rule(
     rule: dict[str, Any],
 ) -> dict[str, Any] | None:
@@ -1962,6 +2005,12 @@ def creature_etb_create_tokens_execution_scenario_from_expected_rule(
     }
     if required.get("etb_token_cant_block"):
         scenario["expected_token"]["cant_block"] = True
+    apply_dynamic_token_count_scenario_fields(
+        scenario,
+        scenario["expected_token"],
+        required.get("etb_token_count_source"),
+        source_prefix="etb",
+    )
     return scenario
 
 
@@ -2146,6 +2195,19 @@ def fixed_create_creature_tokens_execution_scenario_from_expected_rule(
         scenario["controller_graveyard_named_card"] = required.get("token_count_card_name") or rule["card_name"]
         scenario["controller_graveyard_named_card_count"] = graveyard_count
         scenario["expected_token"]["count"] = base_count + graveyard_count
+    elif str(required.get("token_count_source") or "").strip().lower() in {
+        "creatures_you_control_died_this_turn",
+        "devotion_to_white",
+        "devotion_to_blue",
+        "devotion_to_black",
+        "devotion_to_red",
+        "devotion_to_green",
+    }:
+        apply_dynamic_token_count_scenario_fields(
+            scenario,
+            scenario["expected_token"],
+            required.get("token_count_source"),
+        )
     return scenario
 
 
@@ -2954,6 +3016,13 @@ def creature_dies_create_tokens_execution_scenario_from_expected_rule(
     }
     if required.get("dies_token_cant_block"):
         scenario["expected_token"]["cant_block"] = True
+    apply_dynamic_token_count_scenario_fields(
+        scenario,
+        scenario["expected_token"],
+        required.get("dies_token_count_source"),
+        source_prefix="dies",
+        include_dying_permanent=True,
+    )
     return scenario
 
 

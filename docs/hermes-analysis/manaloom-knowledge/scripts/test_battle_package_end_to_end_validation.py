@@ -5428,6 +5428,153 @@ def test_fixed_create_tokens_runner_counts_dynamic_support_state() -> None:
         battle.get_card_effect = previous_get_card_effect
 
 
+def test_fixed_create_tokens_runner_counts_creatures_died_this_turn() -> None:
+    battle = validator.load_battle(validator.DEFAULT_BATTLE)
+    events = []
+    previous_handler = battle.REPLAY_EVENT_HANDLER
+    previous_get_card_effect = battle.get_card_effect
+    battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+    battle.get_card_effect = lambda card: {
+        "effect": "token_maker",
+        "battle_model_scope": "xmage_dynamic_count_create_creature_tokens_spell_v1",
+        "ability_kind": "one_shot",
+        "token_count_source": "creatures_you_control_died_this_turn",
+        "token_name": "Beast Token",
+        "token_power": 3,
+        "token_toughness": 3,
+        "token_subtype": "Beast",
+        "token_colors": ["G"],
+        "_rule_logical_key": "battle_rule_v1:fresh-meat",
+    }
+    try:
+        result = validator.run_fixed_create_creature_tokens(
+            battle,
+            {
+                "name": "Fresh Meat creates one Beast per creature that died",
+                "type": "fixed_create_creature_tokens",
+                "card": {"name": "Fresh Meat"},
+                "creatures_you_control_died_this_turn_count": 3,
+                "expected_token": {
+                    "name": "Beast Token",
+                    "count": 1,
+                    "power": 3,
+                    "toughness": 3,
+                    "subtype": "Beast",
+                    "colors": ["G"],
+                },
+                "logical_rule_key": "battle_rule_v1:fresh-meat",
+            },
+            events,
+        )
+    finally:
+        battle.REPLAY_EVENT_HANDLER = previous_handler
+        battle.get_card_effect = previous_get_card_effect
+
+    assert result["card_name"] == "Fresh Meat"
+    assert result["tokens_created"] == 3
+
+
+def test_creature_etb_create_tokens_runner_counts_devotion() -> None:
+    battle = validator.load_battle(validator.DEFAULT_BATTLE)
+    events = []
+    previous_handler = battle.REPLAY_EVENT_HANDLER
+    previous_get_card_effect = battle.get_card_effect
+    battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+    battle.get_card_effect = lambda card: {
+        "effect": "creature",
+        "battle_model_scope": "xmage_creature_etb_create_tokens_v1",
+        "ability_kind": "triggered",
+        "trigger": "enters_battlefield",
+        "etb_token_count_source": "devotion_to_white",
+        "etb_token_name": "Soldier Token",
+        "etb_token_power": 1,
+        "etb_token_toughness": 1,
+        "etb_token_subtype": "Soldier",
+        "etb_token_colors": ["W"],
+        "_rule_logical_key": "battle_rule_v1:evangel-of-heliod",
+    }
+    try:
+        result = validator.run_creature_etb_create_tokens(
+            battle,
+            {
+                "name": "Evangel of Heliod creates Soldier tokens equal to devotion",
+                "type": "creature_etb_create_tokens",
+                "card": {"name": "Evangel of Heliod", "type_line": "Creature"},
+                "expected_dynamic_token_count": 3,
+                "expected_token": {
+                    "name": "Soldier Token",
+                    "count": 1,
+                    "power": 1,
+                    "toughness": 1,
+                    "subtype": "Soldier",
+                    "colors": ["W"],
+                },
+                "logical_rule_key": "battle_rule_v1:evangel-of-heliod",
+            },
+            events,
+        )
+    finally:
+        battle.REPLAY_EVENT_HANDLER = previous_handler
+        battle.get_card_effect = previous_get_card_effect
+
+    assert result["card_name"] == "Evangel of Heliod"
+    assert result["tokens_created"] == 3
+
+
+def test_creature_dies_create_tokens_runner_counts_graveyard_with_dying_source() -> None:
+    battle = validator.load_battle(validator.DEFAULT_BATTLE)
+    events = []
+    previous_handler = battle.REPLAY_EVENT_HANDLER
+    previous_get_card_effect = battle.get_card_effect
+    battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+    battle.get_card_effect = lambda card: {
+        "effect": "creature",
+        "battle_model_scope": "xmage_creature_dies_create_tokens_v1",
+        "ability_kind": "triggered",
+        "trigger": "dies",
+        "keywords": ["vigilance"],
+        "vigilance": True,
+        "dies_trigger_effect": "token_maker",
+        "dies_token_count_source": "controller_graveyard_creature_count",
+        "dies_token_name": "Spirit Token",
+        "dies_token_power": 1,
+        "dies_token_toughness": 1,
+        "dies_token_subtype": "Spirit",
+        "dies_token_colors": ["W"],
+        "dies_token_keywords": ["flying"],
+        "dies_token_flying": True,
+        "_rule_logical_key": "battle_rule_v1:hallowed-spiritkeeper",
+    }
+    try:
+        result = validator.run_creature_dies_create_tokens(
+            battle,
+            {
+                "name": "Hallowed Spiritkeeper creates Spirits equal to graveyard creatures",
+                "type": "creature_dies_create_tokens",
+                "card": {"name": "Hallowed Spiritkeeper", "type_line": "Creature"},
+                "controller_graveyard_creature_count_before_death": 2,
+                "expected_token": {
+                    "name": "Spirit Token",
+                    "count": 1,
+                    "power": 1,
+                    "toughness": 1,
+                    "subtype": "Spirit",
+                    "colors": ["W"],
+                    "keywords": ["flying"],
+                },
+                "expected_keywords": ["vigilance"],
+                "logical_rule_key": "battle_rule_v1:hallowed-spiritkeeper",
+            },
+            events,
+        )
+    finally:
+        battle.REPLAY_EVENT_HANDLER = previous_handler
+        battle.get_card_effect = previous_get_card_effect
+
+    assert result["card_name"] == "Hallowed Spiritkeeper"
+    assert result["tokens_created"] == 3
+
+
 def test_simple_mana_source_refresh_runner_pays_activation_cost_from_support_source() -> None:
     battle = validator.load_battle(validator.DEFAULT_BATTLE)
     events = []

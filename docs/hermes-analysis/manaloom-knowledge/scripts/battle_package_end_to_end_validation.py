@@ -10,6 +10,7 @@ runtime lookup -> focused battle execution scenario.
 from __future__ import annotations
 
 import argparse
+import copy
 import importlib.util
 import json
 import os
@@ -548,6 +549,149 @@ def assert_expected_token_multiset(
     return matched
 
 
+DYNAMIC_TOKEN_COUNT_SCENARIO_TARGET = 3
+DEVOTION_TOKEN_COUNT_SOURCES = {
+    "devotion_to_white": "W",
+    "devotion_to_blue": "U",
+    "devotion_to_black": "B",
+    "devotion_to_red": "R",
+    "devotion_to_green": "G",
+}
+
+
+def token_count_effect_view(effect_data: dict[str, Any], *, prefix: str = "") -> dict[str, Any]:
+    view = dict(effect_data or {})
+    if not prefix:
+        return view
+    for key, value in list(effect_data.items()):
+        key_text = str(key)
+        prefix_text = f"{prefix}_token_"
+        if key_text.startswith(prefix_text):
+            view[f"token_{key_text[len(prefix_text):]}"] = value
+    return view
+
+
+def expected_tokens_for_scenario(
+    scenario: dict[str, Any],
+    *,
+    token_count: int | None = None,
+) -> list[dict[str, Any]]:
+    if scenario.get("expected_tokens"):
+        expected_tokens = copy.deepcopy(scenario.get("expected_tokens") or [])
+    else:
+        expected_tokens = [copy.deepcopy(dict(scenario.get("expected_token") or {}))]
+    if token_count is not None and len(expected_tokens) == 1:
+        expected_tokens[0]["count"] = max(0, int(token_count or 0))
+    return expected_tokens
+
+
+def expected_token_total(expected_tokens: list[dict[str, Any]], scenario: dict[str, Any]) -> int:
+    return int(
+        scenario.get("expected_total_tokens")
+        or scenario.get("expected_tokens_created")
+        or sum(int(token.get("count") or 0) for token in expected_tokens)
+    )
+
+
+def add_graveyard_creature_fixture(player, index: int) -> None:
+    player.graveyard.append(
+        {
+            "name": f"Graveyard Creature {index + 1}",
+            "type_line": "Creature - Scout",
+            "effect": "creature",
+        }
+    )
+
+
+def add_devotion_fixture(player, color_symbol: str, index: int) -> None:
+    subtype_by_symbol = {
+        "W": "Cleric",
+        "U": "Wizard",
+        "B": "Warlock",
+        "R": "Shaman",
+        "G": "Druid",
+    }
+    subtype = subtype_by_symbol.get(color_symbol, "Cleric")
+    player.battlefield.append(
+        {
+            "name": f"Devotion Support {color_symbol} {index + 1}",
+            "type_line": f"Creature - {subtype}",
+            "effect": "creature",
+            "mana_cost": f"{{{color_symbol}}}",
+            "power": 1,
+            "toughness": 1,
+            "subtypes": [subtype],
+        }
+    )
+
+
+def prepare_dynamic_token_count_state(
+    battle,
+    player,
+    opponents: list[Any],
+    effect_data: dict[str, Any],
+    scenario: dict[str, Any],
+    turn: int,
+    *,
+    prefix: str = "",
+    include_dying_permanent: bool = False,
+) -> int | None:
+    token_effect = token_count_effect_view(effect_data, prefix=prefix)
+    source = str(token_effect.get("token_count_source") or "").strip().lower()
+    if not source:
+        return None
+    target = int(
+        scenario.get("expected_dynamic_token_count")
+        or scenario.get(f"{prefix}_dynamic_token_count_target")
+        or DYNAMIC_TOKEN_COUNT_SCENARIO_TARGET
+    )
+    if source == "controller_graveyard_creature_count":
+        predeath_key = "controller_graveyard_creature_count_before_death"
+        if include_dying_permanent:
+            desired_before = scenario.get(predeath_key)
+            if desired_before is None:
+                desired_before = max(0, target - 1)
+        else:
+            desired_before = scenario.get("controller_graveyard_creature_count")
+            if desired_before is None:
+                desired_before = target
+        current = sum(
+            1
+            for card in getattr(player, "graveyard", []) or []
+            if isinstance(card, dict) and "creature" in str(card.get("type_line") or "").lower()
+        )
+        for index in range(max(0, int(desired_before or 0) - current)):
+            add_graveyard_creature_fixture(player, current + index)
+    elif source == "creatures_you_control_died_this_turn":
+        desired = int(scenario.get("creatures_you_control_died_this_turn_count") or target)
+        if include_dying_permanent:
+            desired = max(0, desired - 1)
+        if hasattr(player, "record_creature_died"):
+            player.record_creature_died(desired, turn_marker=turn)
+        else:
+            player.creatures_died_this_turn = desired
+    elif source in DEVOTION_TOKEN_COUNT_SOURCES:
+        color_symbol = DEVOTION_TOKEN_COUNT_SOURCES[source]
+        current = int(battle.devotion_to_color(player, color_symbol))
+        for index in range(max(0, target - current)):
+            add_devotion_fixture(player, color_symbol, current + index)
+    else:
+        return None
+
+    computed = int(
+        battle.token_count_for_effect(
+            player,
+            {**token_effect, "turn": turn},
+            opponents=opponents,
+        )
+    )
+    if include_dying_permanent and source == "controller_graveyard_creature_count":
+        computed += 1
+    if include_dying_permanent and source == "creatures_you_control_died_this_turn":
+        computed += 1
+    return max(0, computed)
+
+
 def run_fixed_create_creature_tokens(
     battle,
     scenario: dict[str, Any],
@@ -615,6 +759,15 @@ def run_fixed_create_creature_tokens(
     named_graveyard_card = str(scenario.get("controller_graveyard_named_card") or "").strip()
     for index in range(max(0, int(scenario.get("controller_graveyard_named_card_count") or 0))):
         active.graveyard.append({"name": named_graveyard_card or card["name"], "type_line": "Sorcery"})
+    effect_data = battle.get_card_effect(card)
+    dynamic_expected_count = prepare_dynamic_token_count_state(
+        battle,
+        active,
+        [opponent],
+        effect_data,
+        scenario,
+        int(scenario.get("turn") or 6),
+    )
     before_events = len(events)
     battle.apply_effect_immediate(
         active,
@@ -626,7 +779,11 @@ def run_fixed_create_creature_tokens(
 
     expected = dict(scenario.get("expected_token") or {})
     expected_name = str(expected.get("name") or "")
-    expected_count = int(expected.get("count") or 1)
+    expected_tokens = expected_tokens_for_scenario(
+        scenario,
+        token_count=dynamic_expected_count,
+    )
+    expected_count = int(expected_tokens[0].get("count") or expected.get("count") or 1)
     actual_tokens = [
         permanent
         for permanent in active.battlefield
@@ -1924,6 +2081,16 @@ def run_creature_etb_create_tokens(
         turn=int(scenario.get("turn") or 6),
     )
     active.battlefield.append(permanent)
+    turn = int(scenario.get("turn") or 6)
+    dynamic_expected_count = prepare_dynamic_token_count_state(
+        battle,
+        active,
+        [opponent],
+        effect_data,
+        scenario,
+        turn,
+        prefix="etb",
+    )
 
     expected_keywords = [str(value) for value in (scenario.get("expected_keywords") or [])]
     missing_keywords = [
@@ -1943,17 +2110,17 @@ def run_creature_etb_create_tokens(
         [opponent],
         permanent,
         effect_data,
-        int(scenario.get("turn") or 6),
+        turn,
         random.Random(int(scenario.get("seed") or 6067)),
         all_players=[active, opponent],
     )
 
     expected = dict(scenario.get("expected_token") or {})
-    expected_tokens = scenario.get("expected_tokens") or [expected]
-    expected_total = int(
-        scenario.get("expected_total_tokens")
-        or sum(int(token.get("count") or 0) for token in expected_tokens)
+    expected_tokens = expected_tokens_for_scenario(
+        scenario,
+        token_count=dynamic_expected_count,
     )
+    expected_total = expected_token_total(expected_tokens, scenario)
     actual_tokens = [
         item
         for item in active.battlefield
@@ -2461,6 +2628,16 @@ def run_creature_dies_create_tokens(
     effect_data = battle.get_card_effect(card)
     permanent = battle.enrich_card({**card, **effect_data})
     active.battlefield.append(permanent)
+    dynamic_expected_count = prepare_dynamic_token_count_state(
+        battle,
+        active,
+        [opponent],
+        effect_data,
+        scenario,
+        int(scenario.get("turn") or 6),
+        prefix="dies",
+        include_dying_permanent=True,
+    )
 
     expected_keywords = [str(value) for value in (scenario.get("expected_keywords") or [])]
     missing_keywords = [
@@ -2487,18 +2664,13 @@ def run_creature_dies_create_tokens(
     if permanent not in active.graveyard:
         fail("battle_execution", f"{card['name']} not moved to controller graveyard")
 
-    expected_tokens = scenario.get("expected_tokens")
     expected = dict(scenario.get("expected_token") or {})
-    if expected_tokens:
-        expected_total = int(
-            scenario.get("expected_total_tokens")
-            or sum(int(token.get("count") or 0) for token in expected_tokens)
-        )
-    else:
-        expected_tokens = [expected]
-        expected_total = int(expected.get("count") or 1)
+    expected_tokens = expected_tokens_for_scenario(
+        scenario,
+        token_count=dynamic_expected_count,
+    )
+    expected_total = expected_token_total(expected_tokens, scenario)
     expected_name = str(expected.get("name") or "")
-    expected_count = int(expected.get("count") or 1)
     actual_tokens = [
         item
         for item in active.battlefield

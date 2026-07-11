@@ -4238,6 +4238,95 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertEqual(effect["token_count_source"], "controller_graveyard_creature_count")
         self.assertEqual(effect["token_name"], "Spirit Token")
 
+    def test_dynamic_count_create_tokens_spell_accepts_singular_creature_filter_alias(self) -> None:
+        row = queue_row(
+            split.TOKEN_SPELL_FLASHBACK_UNIT,
+            effect_classes=["CreateTokenEffect"],
+            ability_classes=["FlashbackAbility"],
+            xmage_signals=["token"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Spider Spawning",
+                type_line="Sorcery",
+                oracle_text=(
+                    "Create a 1/2 green Spider creature token with reach for each creature card "
+                    "in your graveyard.\nFlashback {6}{B}"
+                ),
+            ),
+            source_text="""
+                this.getSpellAbility().addEffect(new CreateTokenEffect(
+                    new SpiderToken(), new CardsInControllerGraveyardCount(StaticFilters.FILTER_CARD_CREATURE)
+                ));
+                this.addAbility(new FlashbackAbility(this, new ManaCostsImpl<>("{6}{B}")));
+                class SpiderToken extends TokenImpl {
+                    public SpiderToken() {
+                        super("Spider Token", "1/2 green Spider creature token with reach");
+                        cardType.add(CardType.CREATURE);
+                        subtype.add(SubType.SPIDER);
+                        color.setGreen(true);
+                        power = new MageInt(1);
+                        toughness = new MageInt(2);
+                        this.addAbility(ReachAbility.getInstance());
+                    }
+                }
+            """,
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.DYNAMIC_COUNT_TOKEN_SPELL_SCOPE)
+        self.assertEqual(effect["token_count_source"], "controller_graveyard_creature_count")
+        self.assertEqual(effect["flashback_cost"], "{6}{B}")
+        self.assertEqual(effect["token_name"], "Spider Token")
+        self.assertIn("reach", effect["token_keywords"])
+
+    def test_dynamic_count_create_tokens_spell_maps_creatures_died_this_turn(self) -> None:
+        row = queue_row(split.TOKEN_SPELL_UNIT, effect_classes=["CreateTokenEffect"], xmage_signals=["token"])
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Fresh Meat",
+                type_line="Instant",
+                oracle_text=(
+                    "Create a 3/3 green Beast creature token for each creature put into your "
+                    "graveyard from the battlefield this turn."
+                ),
+            ),
+            source_text="""
+                this.getSpellAbility().addEffect(new CreateTokenEffect(new BeastToken(), new FreshMeatDynamicValue()));
+                class FreshMeatDynamicValue implements DynamicValue {
+                    public int calculate(Game game, Ability sourceAbility, Effect effect) {
+                        CreaturesDiedWatcher watcher = game.getState().getWatcher(CreaturesDiedWatcher.class);
+                        if (watcher != null) {
+                            return watcher.getAmountOfCreaturesDiedThisTurnByController(sourceAbility.getControllerId());
+                        }
+                        return 0;
+                    }
+                    public String getMessage() {
+                        return "creature put into your graveyard from the battlefield this turn";
+                    }
+                }
+                class BeastToken extends TokenImpl {
+                    public BeastToken() {
+                        super("Beast Token", "3/3 green Beast creature token");
+                        cardType.add(CardType.CREATURE);
+                        subtype.add(SubType.BEAST);
+                        color.setGreen(true);
+                        power = new MageInt(3);
+                        toughness = new MageInt(3);
+                    }
+                }
+            """,
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.DYNAMIC_COUNT_TOKEN_SPELL_SCOPE)
+        self.assertEqual(effect["token_count_source"], "creatures_you_control_died_this_turn")
+        self.assertEqual(effect["token_name"], "Beast Token")
+
     def test_x_create_creature_tokens_spell_blocks_land_tokens_until_runtime_supported(self) -> None:
         row = queue_row(split.TOKEN_SPELL_UNIT, effect_classes=["CreateTokenEffect"], xmage_signals=["token"])
         proposal, reason = split.split_row(
@@ -5339,6 +5428,51 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertEqual(effect["dies_token_name"], "Spirit Token")
         self.assertEqual(effect["dies_token_keywords"], ["flying"])
 
+    def test_creature_dies_dynamic_create_tokens_maps_graveyard_creature_count(self) -> None:
+        row = queue_row(
+            split.DIES_TOKEN_CREATURE_UNIT,
+            effect_classes=["CreateTokenEffect"],
+            ability_kind="triggered",
+            ability_classes=["DiesSourceTriggeredAbility"],
+            xmage_signals=["token", "triggered_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Hallowed Spiritkeeper",
+                type_line="Creature - Avatar",
+                oracle_text=(
+                    "When Hallowed Spiritkeeper dies, create X 1/1 white Spirit creature tokens "
+                    "with flying, where X is the number of creature cards in your graveyard."
+                ),
+            ),
+            source_text="""
+                Effect effect = new CreateTokenEffect(
+                    new SpiritWhiteToken(), new CardsInControllerGraveyardCount(StaticFilters.FILTER_CARD_CREATURES)
+                );
+                this.addAbility(new DiesSourceTriggeredAbility(effect));
+                class SpiritWhiteToken extends TokenImpl {
+                    public SpiritWhiteToken() {
+                        super("Spirit Token", "1/1 white Spirit creature token with flying");
+                        cardType.add(CardType.CREATURE);
+                        subtype.add(SubType.SPIRIT);
+                        color.setWhite(true);
+                        power = new MageInt(1);
+                        toughness = new MageInt(1);
+                        this.addAbility(FlyingAbility.getInstance());
+                    }
+                }
+            """,
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        self.assertEqual(proposal["family_id"], "xmage_creature_dies_dynamic_create_tokens")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.DIES_TOKEN_CREATURE_SCOPE)
+        self.assertEqual(effect["dies_token_count_source"], "controller_graveyard_creature_count")
+        self.assertEqual(effect["dies_token_name"], "Spirit Token")
+        self.assertIn("flying", effect["dies_token_keywords"])
+
     def test_dies_create_token_matches_scion_mana_ability_oracle_wording(self) -> None:
         row = queue_row(
             split.DIES_TOKEN_CREATURE_UNIT,
@@ -5470,6 +5604,49 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertEqual(effect["etb_token_name"], "Goblin Token")
         self.assertEqual(effect["etb_token_subtype"], "Goblin")
         self.assertEqual(effect["etb_token_colors"], ["R"])
+
+    def test_creature_etb_dynamic_create_tokens_maps_devotion(self) -> None:
+        row = queue_row(
+            split.ETB_TOKEN_CREATURE_UNIT,
+            effect_classes=["CreateTokenEffect"],
+            ability_kind="triggered",
+            ability_classes=["EntersBattlefieldTriggeredAbility"],
+            xmage_signals=["token", "triggered_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Evangel of Heliod",
+                type_line="Creature - Human Cleric",
+                oracle_text=(
+                    "When Evangel of Heliod enters the battlefield, create a number of 1/1 white "
+                    "Soldier creature tokens equal to your devotion to white."
+                ),
+            ),
+            source_text="""
+                this.addAbility(new EntersBattlefieldTriggeredAbility(
+                    new CreateTokenEffect(new SoldierToken(), DevotionCount.W)
+                        .setText("create a number of 1/1 white Soldier creature tokens equal to your devotion to white")
+                ));
+                class SoldierToken extends TokenImpl {
+                    public SoldierToken() {
+                        super("Soldier Token", "1/1 white Soldier creature token");
+                        cardType.add(CardType.CREATURE);
+                        subtype.add(SubType.SOLDIER);
+                        color.setWhite(true);
+                        power = new MageInt(1);
+                        toughness = new MageInt(1);
+                    }
+                }
+            """,
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        self.assertEqual(proposal["family_id"], "xmage_creature_etb_dynamic_create_tokens")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.ETB_TOKEN_CREATURE_SCOPE)
+        self.assertEqual(effect["etb_token_count_source"], "devotion_to_white")
+        self.assertEqual(effect["etb_token_name"], "Soldier Token")
 
     def test_creature_etb_create_tokens_resolves_token_variable_argument(self) -> None:
         row = queue_row(

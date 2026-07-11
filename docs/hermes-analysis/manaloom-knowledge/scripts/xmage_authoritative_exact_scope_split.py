@@ -1352,7 +1352,10 @@ def graveyard_count_token_count_from_expression(count_expression: str) -> dict[s
     filter_expression = parts[0].strip()
     if filter_expression == "StaticFilters.FILTER_CARD_INSTANT_AND_SORCERY":
         return {"token_count_source": "controller_graveyard_instant_sorcery_count"}
-    if filter_expression == "StaticFilters.FILTER_CARD_CREATURES":
+    if filter_expression in {
+        "StaticFilters.FILTER_CARD_CREATURE",
+        "StaticFilters.FILTER_CARD_CREATURES",
+    }:
         return {"token_count_source": "controller_graveyard_creature_count"}
     return None
 
@@ -1400,8 +1403,48 @@ def named_graveyard_plus_base_token_count_from_source(source: str, count_express
     }
 
 
+def custom_dynamic_token_count_from_source(source: str, count_expression: str) -> dict[str, Any] | None:
+    text = source or ""
+    expression = str(count_expression or "").strip()
+    devotion_sources = {
+        "DevotionCount.W": "devotion_to_white",
+        "DevotionCount.U": "devotion_to_blue",
+        "DevotionCount.B": "devotion_to_black",
+        "DevotionCount.R": "devotion_to_red",
+        "DevotionCount.G": "devotion_to_green",
+    }
+    if expression in devotion_sources:
+        return {"token_count_source": devotion_sources[expression]}
+    class_match = re.fullmatch(r"(?:new\s+)?(?P<class>\w+)(?:\.instance)?\s*\(\s*\)?", expression)
+    if not class_match:
+        class_match = re.fullmatch(r"(?P<class>\w+)\.instance", expression)
+    if not class_match:
+        return None
+    class_name = class_match.group("class")
+    class_block_match = re.search(
+        rf"(?:enum|class)\s+{re.escape(class_name)}\s+implements\s+DynamicValue\b(?P<body>.*?)(?:\n\}}\s*$|\n\}}\s*\n\s*(?:class|enum)\s+)",
+        text,
+        re.S,
+    )
+    class_block = class_block_match.group("body") if class_block_match else text
+    lowered_block = class_block.lower()
+    if "nontoken creature" in lowered_block:
+        return None
+    if (
+        "CreaturesDiedWatcher" in class_block
+        and "getAmountOfCreaturesDiedThisTurnByController" in class_block
+    ):
+        return {"token_count_source": "creatures_you_control_died_this_turn"}
+    if "creature put into your graveyard from the battlefield this turn" in lowered_block:
+        return {"token_count_source": "creatures_you_control_died_this_turn"}
+    return None
+
+
 def dynamic_token_count_from_source(source: str, count_expression: str) -> dict[str, Any] | None:
     expression = str(count_expression or "").strip()
+    custom = custom_dynamic_token_count_from_source(source, expression)
+    if custom is not None:
+        return custom
     if expression == "GetXValue.instance":
         return {"token_count_source": "x_value", "token_count_per_x": 1}
     if expression == "GreatestAmongPermanentsValue.POWER_CONTROLLED_CREATURES":
@@ -1420,6 +1463,39 @@ def dynamic_token_count_from_source(source: str, count_expression: str) -> dict[
     if "CardsInControllerGraveyardCount" in expression:
         return graveyard_count_token_count_from_expression(expression)
     return named_graveyard_plus_base_token_count_from_source(source, expression)
+
+
+DYNAMIC_TOKEN_COUNT_FIELD_KEYS = (
+    "token_count_source",
+    "token_count_per_x",
+    "token_count_subtype",
+    "token_count_card_name",
+    "token_count_base",
+)
+
+
+def dynamic_token_count_fields_from_parsed_effect(parsed_effect: dict[str, Any]) -> dict[str, Any]:
+    fields = {
+        key: parsed_effect[key]
+        for key in DYNAMIC_TOKEN_COUNT_FIELD_KEYS
+        if parsed_effect.get(key) is not None
+    }
+    if parsed_effect.get("token_tapped"):
+        fields["token_tapped"] = True
+    return fields
+
+
+def prefixed_dynamic_token_count_fields(
+    parsed_effect: dict[str, Any],
+    prefix: str,
+) -> dict[str, Any]:
+    fields: dict[str, Any] = {}
+    for key in DYNAMIC_TOKEN_COUNT_FIELD_KEYS:
+        if parsed_effect.get(key) is not None:
+            fields[f"{prefix}_{key}"] = parsed_effect[key]
+    if parsed_effect.get("token_tapped"):
+        fields[f"{prefix}_token_tapped"] = True
+    return fields
 
 
 def fixed_token_class_from_create_token_arg(source: str, token_arg: str) -> str | None:
@@ -2153,6 +2229,38 @@ def dies_create_token_oracle_blocker(
     if phrase not in expected:
         return "dies_token_oracle_not_simple"
     return None
+
+
+def dynamic_token_count_oracle_blocker(
+    metadata: dict[str, Any],
+    token_count_source: str,
+) -> str | None:
+    text = oracle_text(metadata).lower()
+    source = str(token_count_source or "").strip().lower()
+    expected_fragments = {
+        "controller_graveyard_creature_count": (
+            "for each creature card in your graveyard",
+            "where x is the number of creature cards in your graveyard",
+        ),
+        "controller_graveyard_instant_sorcery_count": (
+            "for each instant and sorcery card in your graveyard",
+            "where x is the number of instant and sorcery cards in your graveyard",
+        ),
+        "creatures_you_control_died_this_turn": (
+            "for each creature put into your graveyard from the battlefield this turn",
+        ),
+        "devotion_to_white": ("devotion to white",),
+        "devotion_to_blue": ("devotion to blue",),
+        "devotion_to_black": ("devotion to black",),
+        "devotion_to_red": ("devotion to red",),
+        "devotion_to_green": ("devotion to green",),
+    }
+    fragments = expected_fragments.get(source)
+    if fragments is None:
+        return None
+    if any(fragment in text for fragment in fragments):
+        return None
+    return "dynamic_token_oracle_count_source_mismatch"
 
 
 def activated_create_token_from_source(source: str) -> dict[str, Any] | str:
@@ -30644,6 +30752,12 @@ def split_row(
                 "controller_graveyard_creature_count",
                 "controller_graveyard_instant_sorcery_count",
                 "controller_hand_count",
+                "creatures_you_control_died_this_turn",
+                "devotion_to_black",
+                "devotion_to_blue",
+                "devotion_to_green",
+                "devotion_to_red",
+                "devotion_to_white",
                 "domain_basic_land_types",
                 "greatest_power_among_controlled_creatures",
                 "named_cards_in_controller_graveyard_plus_base",
@@ -30652,6 +30766,12 @@ def split_row(
                 family_id = "xmage_dynamic_count_create_creature_tokens_spell"
             else:
                 return None, "token_source_create_token_not_fixed"
+            oracle_blocker = dynamic_token_count_oracle_blocker(
+                metadata,
+                str(parsed_effect["token_count_source"]),
+            )
+            if oracle_blocker:
+                return None, oracle_blocker
         else:
             if isinstance(parsed_effect, dict):
                 token_class = str(parsed_effect["token_class"])
@@ -30822,11 +30942,20 @@ def split_row(
         parsed_effect = fixed_create_token_effect_from_source(source_text)
         if isinstance(parsed_effect, str):
             return None, parsed_effect
-        parsed_parts = fixed_literal_token_parts(parsed_effect)
-        if isinstance(parsed_parts, str):
-            return None, parsed_parts
-        token_class, token_count, parsed_token_fields = parsed_parts
+        dynamic_token_fields: dict[str, Any] = {}
+        if isinstance(parsed_effect, dict) and parsed_effect.get("token_count_source"):
+            token_class = str(parsed_effect["token_class"])
+            token_count = None
+            parsed_token_fields = dynamic_token_count_fields_from_parsed_effect(parsed_effect)
+            dynamic_token_fields = prefixed_dynamic_token_count_fields(parsed_effect, "etb")
+        else:
+            parsed_parts = fixed_literal_token_parts(parsed_effect)
+            if isinstance(parsed_parts, str):
+                return None, parsed_parts
+            token_class, token_count, parsed_token_fields = parsed_parts
         if token_class == "TreasureToken":
+            if token_count is None:
+                return None, "etb_treasure_dynamic_count_not_supported"
             oracle_treasure = creature_etb_treasure_count_and_condition_from_oracle(metadata)
             if isinstance(oracle_treasure, str):
                 return None, oracle_treasure
@@ -30865,13 +30994,21 @@ def split_row(
         )
         if token_reason:
             return None, token_reason
+        if dynamic_token_fields:
+            oracle_blocker = dynamic_token_count_oracle_blocker(
+                metadata,
+                str(parsed_effect["token_count_source"]),
+            )
+            if oracle_blocker:
+                return None, oracle_blocker
         token_data = {**parsed_token_fields, **token_data}
         effect_json = {
             "effect": "creature",
             "battle_model_scope": ETB_TOKEN_CREATURE_SCOPE,
             "ability_kind": "triggered",
             "trigger": "enters_battlefield",
-            "etb_token_count": token_count,
+            **({"etb_token_count": token_count} if token_count is not None else {}),
+            **dynamic_token_fields,
             "xmage_effect_class": "CreateTokenEffect",
             "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
             "xmage_token_class": token_data["xmage_token_class"],
@@ -30930,7 +31067,11 @@ def split_row(
             row,
             metadata,
             effect_json,
-            family_id="xmage_creature_etb_create_tokens",
+            family_id=(
+                "xmage_creature_etb_dynamic_create_tokens"
+                if dynamic_token_fields
+                else "xmage_creature_etb_create_tokens"
+            ),
         ), "selected_exact_scope"
 
     if dies_token_creature_unit:
@@ -30986,11 +31127,20 @@ def split_row(
         parsed_effect = fixed_create_token_effect_from_source(source_text)
         if isinstance(parsed_effect, str):
             return None, parsed_effect
-        parsed_parts = fixed_literal_token_parts(parsed_effect)
-        if isinstance(parsed_parts, str):
-            return None, parsed_parts
-        token_class, token_count, parsed_token_fields = parsed_parts
+        dynamic_token_fields: dict[str, Any] = {}
+        if isinstance(parsed_effect, dict) and parsed_effect.get("token_count_source"):
+            token_class = str(parsed_effect["token_class"])
+            token_count = None
+            parsed_token_fields = dynamic_token_count_fields_from_parsed_effect(parsed_effect)
+            dynamic_token_fields = prefixed_dynamic_token_count_fields(parsed_effect, "dies")
+        else:
+            parsed_parts = fixed_literal_token_parts(parsed_effect)
+            if isinstance(parsed_parts, str):
+                return None, parsed_parts
+            token_class, token_count, parsed_token_fields = parsed_parts
         if token_class == "TreasureToken":
+            if token_count is None:
+                return None, "dies_treasure_dynamic_count_not_supported"
             oracle_treasure_count = creature_dies_create_treasure_from_oracle(metadata)
             if isinstance(oracle_treasure_count, str):
                 return None, oracle_treasure_count
@@ -31030,9 +31180,17 @@ def split_row(
         if token_reason:
             return None, token_reason
         token_data = {**parsed_token_fields, **token_data}
-        oracle_blocker = dies_create_token_oracle_blocker(metadata, token_data, token_count)
-        if oracle_blocker:
-            return None, oracle_blocker
+        if dynamic_token_fields:
+            oracle_blocker = dynamic_token_count_oracle_blocker(
+                metadata,
+                str(parsed_effect["token_count_source"]),
+            )
+            if oracle_blocker:
+                return None, oracle_blocker
+        else:
+            oracle_blocker = dies_create_token_oracle_blocker(metadata, token_data, token_count)
+            if oracle_blocker:
+                return None, oracle_blocker
         keyword_list = ordered_keywords(keywords_from_ability_classes(row))
         effect_json = {
             "effect": "creature",
@@ -31040,7 +31198,8 @@ def split_row(
             "ability_kind": "triggered",
             "trigger": "dies",
             "dies_trigger_effect": "token_maker",
-            "dies_token_count": token_count,
+            **({"dies_token_count": token_count} if token_count is not None else {}),
+            **dynamic_token_fields,
             "xmage_effect_class": "CreateTokenEffect",
             "xmage_ability_class": "DiesSourceTriggeredAbility",
             "xmage_token_class": token_data["xmage_token_class"],
@@ -31099,7 +31258,11 @@ def split_row(
             row,
             metadata,
             effect_json,
-            family_id="xmage_creature_dies_create_tokens",
+            family_id=(
+                "xmage_creature_dies_dynamic_create_tokens"
+                if dynamic_token_fields
+                else "xmage_creature_dies_create_tokens"
+            ),
         ), "selected_exact_scope"
 
     if etb_add_counters_creature_unit:

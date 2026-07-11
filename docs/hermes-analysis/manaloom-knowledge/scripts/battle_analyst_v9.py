@@ -21102,9 +21102,15 @@ def resolve_generic_permanent_etb(
             phase=phase,
             **replay_rule_fields(effect_data),
         )
-    elif effect_data.get("etb_token_count"):
+    elif effect_data.get("etb_token_count") or effect_data.get("etb_token_count_source"):
         token_effect_data = dict(effect_data)
         etb_field_map = {
+            "etb_token_count": "token_count",
+            "etb_token_count_source": "token_count_source",
+            "etb_token_count_per_x": "token_count_per_x",
+            "etb_token_count_subtype": "token_count_subtype",
+            "etb_token_count_card_name": "token_count_card_name",
+            "etb_token_count_base": "token_count_base",
             "etb_token_name": "token_name",
             "etb_token_power": "token_power",
             "etb_token_toughness": "token_toughness",
@@ -21146,10 +21152,15 @@ def resolve_generic_permanent_etb(
         for etb_key, token_key in etb_field_map.items():
             if etb_key in effect_data:
                 token_effect_data[token_key] = effect_data[etb_key]
+        token_count = token_count_for_effect(
+            player,
+            {**token_effect_data, "turn": turn},
+            opponents=opponents,
+        )
         create_creature_tokens_from_effect(
             player,
             token_effect_data,
-            count=int(effect_data.get("etb_token_count") or 1),
+            count=token_count,
             opponents=opponents,
             turn=turn,
             source_event="etb_token_created",
@@ -21160,7 +21171,8 @@ def resolve_generic_permanent_etb(
             "etb_token_maker_resolved",
             player=player.name,
             card=permanent.get("name", "?"),
-            token_count=int(effect_data.get("etb_token_count") or 1),
+            token_count=token_count,
+            token_count_source=token_effect_data.get("token_count_source"),
             token_component_count=1,
             token_names=[effect_data.get("etb_token_name", "Token")],
             token_cant_block=bool(effect_data.get("etb_token_cant_block")),
@@ -22156,6 +22168,7 @@ def resolve_permanent_dies_token_maker(
     if (
         permanent.get("dies_trigger_effect") != "token_maker"
         and not permanent.get("dies_token_count")
+        and not permanent.get("dies_token_count_source")
         and not dies_token_components
     ):
         return 0
@@ -22191,11 +22204,13 @@ def resolve_permanent_dies_token_maker(
             **replay_rule_fields(permanent),
         )
         return created
-    token_count = max(0, int(permanent.get("dies_token_count") or permanent.get("token_count") or 0))
-    if token_count <= 0:
-        return 0
     effect_data = dict(permanent)
     dies_field_map = {
+        "dies_token_count_source": "token_count_source",
+        "dies_token_count_per_x": "token_count_per_x",
+        "dies_token_count_subtype": "token_count_subtype",
+        "dies_token_count_card_name": "token_count_card_name",
+        "dies_token_count_base": "token_count_base",
         "dies_token_name": "token_name",
         "dies_token_power": "token_power",
         "dies_token_toughness": "token_toughness",
@@ -22237,6 +22252,17 @@ def resolve_permanent_dies_token_maker(
     for dies_key, token_key in dies_field_map.items():
         if dies_key in permanent:
             effect_data[token_key] = permanent[dies_key]
+    token_count = (
+        token_count_for_effect(
+            owner,
+            {**effect_data, "turn": CURRENT_REPLAY_TURN},
+            opponents=resolved_opponents,
+        )
+        if effect_data.get("token_count_source")
+        else max(0, int(permanent.get("dies_token_count") or permanent.get("token_count") or 0))
+    )
+    if token_count <= 0:
+        return 0
     created = create_creature_tokens_from_effect(
         owner,
         effect_data,
@@ -22252,6 +22278,7 @@ def resolve_permanent_dies_token_maker(
         player=getattr(owner, "name", "?"),
         card=permanent.get("name", "?"),
         token_count=created,
+        token_count_source=effect_data.get("token_count_source"),
         token_name=effect_data.get("token_name", "Token"),
         token_power=effect_data.get("token_power"),
         token_toughness=effect_data.get("token_toughness"),
@@ -44000,6 +44027,20 @@ def token_count_for_effect(player, effect_data, default=5, opponents=None):
             for card in getattr(player, "graveyard", []) or []
             if isinstance(card, dict) and _card_type_matches(card, ["instant", "sorcery"])
         )
+    if isinstance(effect_data, dict) and token_count_source == "creatures_you_control_died_this_turn":
+        turn_marker = (effect_data or {}).get("turn") or CURRENT_REPLAY_TURN
+        if hasattr(player, "creatures_died_this_turn_count"):
+            return player.creatures_died_this_turn_count(turn_marker)
+        return int(getattr(player, "creatures_died_this_turn", 0) or 0)
+    if isinstance(effect_data, dict) and token_count_source.startswith("devotion_to_"):
+        color_symbols = {
+            "devotion_to_white": "W",
+            "devotion_to_blue": "U",
+            "devotion_to_black": "B",
+            "devotion_to_red": "R",
+            "devotion_to_green": "G",
+        }
+        return devotion_to_color(player, color_symbols.get(token_count_source))
     if isinstance(effect_data, dict) and token_count_source == "named_cards_in_controller_graveyard_plus_base":
         target_name = normalize_card_name(effect_data.get("token_count_card_name") or effect_data.get("card_name") or "")
         base = int(effect_data.get("token_count_base") or 0)
