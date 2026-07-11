@@ -344,6 +344,9 @@ DESTROY_COMPENSATION_TOKEN_SCOPE = "xmage_destroy_target_with_controller_creatur
 EXILE_COMPENSATION_TOKEN_SCOPE = "xmage_exile_target_with_controller_creature_token_compensation_spell_v1"
 MANA_SCOPE = "xmage_simple_tap_mana_source_permanent_v1"
 RESTRICTED_MANA_SCOPE = "xmage_simple_tap_restricted_mana_source_permanent_v1"
+RESTRICTED_MANA_WITH_FORMIDABLE_LIFE_RESET_SCOPE = (
+    "xmage_simple_tap_restricted_mana_source_with_formidable_life_total_reset_v1"
+)
 LAND_COLOR_DEPENDENT_MANA_SCOPE = "xmage_simple_tap_land_color_dependent_mana_source_permanent_v1"
 DYNAMIC_FIXED_COLOR_MANA_SCOPE = "xmage_fixed_color_dynamic_mana_source_permanent_v1"
 CONTROLLED_CREATURE_CONDITION_CONDITIONAL_MANA_SCOPE = "xmage_controlled_creature_condition_conditional_mana_source_permanent_v1"
@@ -25355,6 +25358,66 @@ def restricted_mana_source_detail_from_source(
     return detail
 
 
+def formidable_life_total_reset_detail_from_oracle(metadata: dict[str, Any]) -> dict[str, Any] | None:
+    lines = [
+        strip_parenthetical_reminders(
+            re.sub(r"\s+", " ", str(line or "").strip().lower())
+        ).strip()
+        for line in normalized_oracle_lines(metadata)
+    ]
+    candidates = [
+        line
+        for line in lines
+        if "each player's life total becomes the number of creatures they control" in line
+        and "activate only if creatures you control have total power 8 or greater" in line
+    ]
+    if len(candidates) != 1:
+        return None
+    line = candidates[0]
+    activation_match = re.search(r"formidable\s*[-\u2014]\s*(?P<cost>.+?):", line)
+    if not activation_match:
+        return None
+    activation_cost = activation_match.group("cost").replace(" ", "")
+    if "{t}" not in activation_cost.lower():
+        return None
+    activation_mana_cost = re.sub(r",?\{t\}", "", activation_cost, flags=re.I).replace(",", "").upper()
+    return {
+        "auxiliary_activated_effect": "each_player_life_total_becomes_creatures_controlled",
+        "formidable_life_total_reset": True,
+        "formidable_activation_mana_cost": activation_mana_cost,
+        "formidable_activation_requires_tap": True,
+        "formidable_controlled_creatures_total_power_gte": 8,
+        "formidable_life_total_count_scope": "each_player_creatures_controlled",
+    }
+
+
+def formidable_life_total_reset_detail_from_source(source_text: str) -> dict[str, Any] | str | None:
+    text = source_text or ""
+    if "ActivateIfConditionActivatedAbility" not in text:
+        return None
+    required_fragments = [
+        "FormidableCondition.instance",
+        "ShamanOfForgottenWaysEffect",
+        "FilterCreaturePermanent",
+        "player.setLife(numberCreatures",
+        "game.getBattlefield().getAllActivePermanents(filter, playerId, game).size()",
+    ]
+    for fragment in required_fragments:
+        if fragment not in text:
+            return "formidable_life_total_reset_source_not_supported"
+    cost_match = re.search(r"new\s+ManaCostsImpl<>\s*\(\s*\"([^\"]+)\"\s*\)", text)
+    if not cost_match:
+        return "formidable_life_total_reset_source_cost_not_supported"
+    return {
+        "auxiliary_activated_effect": "each_player_life_total_becomes_creatures_controlled",
+        "formidable_life_total_reset": True,
+        "formidable_activation_mana_cost": cost_match.group(1),
+        "formidable_activation_requires_tap": "new TapSourceCost()" in text,
+        "formidable_controlled_creatures_total_power_gte": 8,
+        "formidable_life_total_count_scope": "each_player_creatures_controlled",
+    }
+
+
 def land_color_dependent_mana_source_detail_from_oracle(
     metadata: dict[str, Any],
 ) -> dict[str, Any] | str | None:
@@ -40840,6 +40903,26 @@ def split_row(
                 "xmage_effect_classes": sorted(classes),
                 "xmage_ability_classes": sorted(mana_ability_classes),
             }
+            formidable_life_reset = formidable_life_total_reset_detail_from_oracle(metadata)
+            if formidable_life_reset is not None:
+                source_formidable_life_reset = formidable_life_total_reset_detail_from_source(source_text)
+                if isinstance(source_formidable_life_reset, str):
+                    return None, source_formidable_life_reset
+                if source_formidable_life_reset is None:
+                    return None, "formidable_life_total_reset_source_not_supported"
+                for key in (
+                    "auxiliary_activated_effect",
+                    "formidable_life_total_reset",
+                    "formidable_activation_mana_cost",
+                    "formidable_activation_requires_tap",
+                    "formidable_controlled_creatures_total_power_gte",
+                    "formidable_life_total_count_scope",
+                ):
+                    if source_formidable_life_reset.get(key) != formidable_life_reset.get(key):
+                        return None, f"formidable_life_total_reset_source_oracle_{key}_mismatch"
+                effect_json.update(formidable_life_reset)
+                effect_json["battle_model_scope"] = RESTRICTED_MANA_WITH_FORMIDABLE_LIFE_RESET_SCOPE
+                effect_json["ability_kind"] = "activated_mana_and_formidable_activated"
             if restricted_mana_source.get("produced_mana_symbols"):
                 effect_json["produced_mana_symbols"] = list(
                     restricted_mana_source["produced_mana_symbols"]
@@ -40856,6 +40939,8 @@ def split_row(
                 "ConditionalColorlessManaAbility",
                 "ConditionalColoredManaAbility",
             }
+            if formidable_life_reset is not None:
+                restricted_mana_ability_classes.add("ActivateIfConditionActivatedAbility")
             auxiliary_ability_classes = sorted(
                 mana_ability_classes
                 - restricted_mana_ability_classes
@@ -40868,6 +40953,13 @@ def split_row(
                 "ConditionalManaEffect",
                 "ManaEffect",
             }
+            if formidable_life_reset is not None:
+                modeled_restricted_mana_effect_classes.update(
+                    {
+                        "OneShotEffect",
+                        "ShamanOfForgottenWaysEffect",
+                    }
+                )
             unmodeled_effect_classes = sorted(
                 cls for cls in classes if cls not in modeled_restricted_mana_effect_classes
             )

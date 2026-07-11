@@ -545,6 +545,12 @@ E2E_REQUIRED_EFFECT_FIELDS = (
     "conditional_mana_controlled_creature_count_gte",
     "conditional_mana_produced_when_condition_met",
     "conditional_mana_same_color_choice",
+    "auxiliary_activated_effect",
+    "formidable_life_total_reset",
+    "formidable_activation_mana_cost",
+    "formidable_activation_requires_tap",
+    "formidable_controlled_creatures_total_power_gte",
+    "formidable_life_total_count_scope",
     "source_type_line",
     "source_mana_cost",
     "life_for_colored_mana",
@@ -3580,6 +3586,80 @@ def simple_mana_source_execution_scenario_from_expected_rule(rule: dict[str, Any
             land["name"] for land in returnable_lands
         ]
     return scenario
+
+
+def restricted_mana_formidable_life_reset_execution_scenario_from_expected_rule(
+    rule: dict[str, Any],
+) -> dict[str, Any] | None:
+    required = dict(rule.get("required_effect_fields") or {})
+    if (
+        required.get("battle_model_scope")
+        != "xmage_simple_tap_restricted_mana_source_with_formidable_life_total_reset_v1"
+    ):
+        return None
+    if required.get("effect") != "ramp_permanent" or not required.get("is_mana_source"):
+        return None
+    if not required.get("formidable_life_total_reset"):
+        return None
+    activation_cost = str(required.get("formidable_activation_mana_cost") or "")
+    controller_mana = _manifest_mana_for_activation_cost(activation_cost)
+    support_mana_sources = _manifest_support_sources_for_controller_mana(controller_mana)
+    power_threshold = max(1, int(required.get("formidable_controlled_creatures_total_power_gte") or 8))
+    source_power = 2
+    support_power = max(1, power_threshold - source_power)
+    return {
+        "name": f"{rule['card_name']} refreshes creature-only mana and resolves Formidable life reset",
+        "type": "restricted_mana_formidable_life_reset",
+        "card": {
+            "name": rule["card_name"],
+            "type_line": required.get("source_type_line") or "Creature - Human Shaman",
+            "mana_cost": required.get("source_mana_cost") or "{2}{G}",
+            "power": source_power,
+            "toughness": 3,
+        },
+        "type_line": required.get("source_type_line") or "Creature - Human Shaman",
+        "controller_mana": controller_mana,
+        "support_mana_sources": support_mana_sources,
+        "controller_battlefield": [
+            {
+                "name": "E2E Formidable Support Creature",
+                "type_line": "Creature - Beast",
+                "power": support_power,
+                "toughness": support_power,
+            }
+        ],
+        "opponent_battlefield": [
+            {"name": "E2E Opponent Creature 1", "type_line": "Creature", "power": 2, "toughness": 2},
+            {"name": "E2E Opponent Creature 2", "type_line": "Creature", "power": 1, "toughness": 1},
+        ],
+        "expected_available_mana_after_refresh": int(required.get("mana_produced") or 2),
+        "expected_tapped": True,
+        "expected_sources": 1,
+        "expected_conditional_mana": int(required.get("mana_produced") or 2),
+        "expected_conditional_restrictions": ["creature_spell"],
+        "expected_restricted_mana_payable_card": {
+            "name": "E2E Creature Spell",
+            "type_line": "Creature",
+            "mana_cost": "{1}",
+            "cmc": 1,
+        },
+        "expected_restricted_mana_blocked_card": {
+            "name": "E2E Noncreature Spell",
+            "type_line": "Sorcery",
+            "mana_cost": "{1}",
+            "cmc": 1,
+        },
+        "formidable_activation_mana_cost": activation_cost,
+        "expected_formidable_available_mana_after_refresh": sum(
+            int(value or 0) for value in controller_mana.values()
+        ),
+        "controller_starting_life": 20,
+        "opponent_starting_life": 40,
+        "expected_formidable_threshold": power_threshold,
+        "expected_controller_life_after": 2,
+        "expected_opponent_life_after": 2,
+        "logical_rule_key": rule["logical_rule_key"],
+    }
 
 
 def mana_spent_cast_trigger_execution_scenario_from_expected_rule(rule: dict[str, Any]) -> dict[str, Any] | None:
@@ -7971,6 +8051,7 @@ def execution_scenario_from_expected_rule(rule: dict[str, Any]) -> dict[str, Any
         or creature_dies_create_tokens_execution_scenario_from_expected_rule(rule)
         or mana_spent_cast_trigger_execution_scenario_from_expected_rule(rule)
         or mana_activation_cast_trigger_execution_scenario_from_expected_rule(rule)
+        or restricted_mana_formidable_life_reset_execution_scenario_from_expected_rule(rule)
         or simple_mana_source_execution_scenario_from_expected_rule(rule)
         or sacrifice_mana_source_execution_scenario_from_expected_rule(rule)
         or damage_each_opponent_spell_execution_scenario_from_expected_rule(rule)

@@ -5624,6 +5624,138 @@ def run_simple_mana_source_refresh(
     }
 
 
+def run_restricted_mana_formidable_life_reset(
+    battle,
+    scenario: dict[str, Any],
+    events: list[tuple[str, dict[str, Any]]],
+) -> dict[str, Any]:
+    mana_result = run_simple_mana_source_refresh(
+        battle,
+        {
+            **dict(scenario),
+            "type": "simple_mana_source_refresh",
+            "name": f"{scenario.get('name')} - restricted mana subcheck",
+            "controller_mana": {},
+            "support_mana_sources": [],
+            "expected_available_mana_after_refresh": int(scenario.get("expected_conditional_mana") or 2),
+            "expected_sources": 1,
+        },
+        events,
+    )
+
+    card = dict(scenario["card"])
+    effect = battle.get_card_effect(card)
+    if (
+        effect.get("battle_model_scope")
+        != "xmage_simple_tap_restricted_mana_source_with_formidable_life_total_reset_v1"
+        or not effect.get("formidable_life_total_reset")
+    ):
+        fail(
+            "battle_execution",
+            f"{card['name']} formidable scope/effect mismatch: "
+            f"{effect.get('battle_model_scope')!r}/{effect.get('formidable_life_total_reset')!r}",
+        )
+    source = battle.enrich_card(
+        {
+            **card,
+            "type_line": scenario.get("type_line") or card.get("type_line") or "Creature - Human Shaman",
+            "summoning_sick": False,
+            "tapped": False,
+            **effect,
+            **dict(scenario.get("source_overrides") or {}),
+        }
+    )
+    active = battle.Player(str(scenario.get("player") or "Formidable Controller"), None, [])
+    opponent = battle.Player(str(scenario.get("opponent") or "Formidable Opponent"), None, [])
+    active.life = int(scenario.get("controller_starting_life") or 20)
+    opponent.life = int(scenario.get("opponent_starting_life") or 40)
+    if hasattr(battle, "bind_table_context"):
+        battle.bind_table_context([active, opponent])
+    active._current_opponents = [opponent]
+    support_sources = [
+        battle.enrich_card(dict(support))
+        for support in scenario.get("support_mana_sources") or []
+        if isinstance(support, dict)
+    ]
+    active.battlefield = [
+        *[
+            dict(permanent)
+            for permanent in (scenario.get("controller_battlefield") or [])
+            if isinstance(permanent, dict)
+        ],
+        *support_sources,
+        source,
+    ]
+    opponent.battlefield = [
+        dict(permanent)
+        for permanent in (scenario.get("opponent_battlefield") or [])
+        if isinstance(permanent, dict)
+    ]
+
+    turn = int(scenario.get("turn") or 5)
+    before_events = len(events)
+    active.refresh_mana_sources(turn=turn)
+    if source.get("tapped"):
+        fail("battle_execution", f"{card['name']} was tapped by mana refresh instead of preserved for Formidable")
+    expected_formidable_mana = scenario.get("expected_formidable_available_mana_after_refresh")
+    if expected_formidable_mana is not None and active.available_mana() != int(expected_formidable_mana):
+        fail(
+            "battle_execution",
+            f"{card['name']} formidable mana={active.available_mana()}, "
+            f"expected {expected_formidable_mana}",
+        )
+    activated = battle.activate_formidable_life_total_resets(
+        active,
+        [opponent],
+        [active, opponent],
+        turn,
+        phase=str(scenario.get("phase") or "precombat_main"),
+    )
+    if activated != 1:
+        fail("battle_execution", f"{card['name']} formidable activation count={activated}, expected 1")
+    expected_controller_life = int(scenario.get("expected_controller_life_after") or 0)
+    expected_opponent_life = int(scenario.get("expected_opponent_life_after") or 0)
+    if active.life != expected_controller_life:
+        fail(
+            "battle_execution",
+            f"{card['name']} controller life={active.life}, expected {expected_controller_life}",
+        )
+    if opponent.life != expected_opponent_life:
+        fail(
+            "battle_execution",
+            f"{card['name']} opponent life={opponent.life}, expected {expected_opponent_life}",
+        )
+    if not source.get("tapped"):
+        fail("battle_execution", f"{card['name']} source not tapped after Formidable activation")
+    event = next(
+        (
+            data
+            for replay_event, data in events[before_events:]
+            if replay_event == "formidable_life_total_reset_resolved"
+            and data.get("card") == card.get("name")
+        ),
+        None,
+    )
+    if event is None:
+        fail("battle_events", f"missing {card['name']} formidable_life_total_reset_resolved event")
+    if int(event.get("required_power") or 0) != int(scenario.get("expected_formidable_threshold") or 8):
+        fail("battle_events", f"{card['name']} required_power={event.get('required_power')}")
+    life_after = dict(event.get("life_after") or {})
+    if int(life_after.get(active.name) or 0) != expected_controller_life:
+        fail("battle_events", f"{card['name']} controller event life_after={life_after}")
+    if int(life_after.get(opponent.name) or 0) != expected_opponent_life:
+        fail("battle_events", f"{card['name']} opponent event life_after={life_after}")
+    return {
+        "scenario": scenario.get("name"),
+        "card_name": card["name"],
+        "mana_subcheck": mana_result,
+        "formidable_required_power": event.get("required_power"),
+        "controller_life_after": active.life,
+        "opponent_life_after": opponent.life,
+        "source_tapped_after_formidable": bool(source.get("tapped")),
+    }
+
+
 def run_mana_spent_cast_trigger(
     battle,
     scenario: dict[str, Any],
@@ -12614,6 +12746,7 @@ SCENARIO_RUNNERS = {
     "single_target_removal_and_surveil": run_single_target_removal_and_surveil,
     "multi_target_removal": run_multi_target_removal,
     "simple_mana_source_refresh": run_simple_mana_source_refresh,
+    "restricted_mana_formidable_life_reset": run_restricted_mana_formidable_life_reset,
     "mana_spent_cast_trigger": run_mana_spent_cast_trigger,
     "mana_activation_cast_trigger": run_mana_activation_cast_trigger,
     "sacrifice_mana_source_activation": run_sacrifice_mana_source_activation,

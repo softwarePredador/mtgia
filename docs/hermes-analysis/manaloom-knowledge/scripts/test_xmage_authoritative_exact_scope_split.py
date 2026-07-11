@@ -33849,6 +33849,61 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         )
         self.assertNotIn("_runtime_partial", effect)
 
+    def test_restricted_mana_formidable_life_reset_maps_full_scope(self) -> None:
+        row = queue_row(
+            split.RAMP_CREATURE_UNIT,
+            effect_classes=["OneShotEffect", "ShamanOfForgottenWaysEffect"],
+            ability_kind="activated_mana",
+            ability_classes=["ActivateIfConditionActivatedAbility", "ConditionalAnyColorManaAbility"],
+            xmage_signals=["mana", "activated_ability", "condition"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Shaman of Forgotten Ways",
+                type_line="Creature - Human Shaman",
+                mana_cost="{2}{G}",
+                oracle_text=(
+                    "{T}: Add two mana in any combination of colors. Spend this mana only to cast "
+                    "creature spells.\n"
+                    "Formidable - {9}{G}{G}, {T}: Each player's life total becomes the number of "
+                    "creatures they control. Activate only if creatures you control have total power "
+                    "8 or greater."
+                ),
+            ),
+            source_text="""
+                this.addAbility(new ConditionalAnyColorManaAbility(2, new ShamanOfForgottenWaysManaBuilder()));
+                Ability ability = new ActivateIfConditionActivatedAbility(
+                        new ShamanOfForgottenWaysEffect(), new ManaCostsImpl<>("{9}{G}{G}"), FormidableCondition.instance
+                );
+                ability.addCost(new TapSourceCost());
+                class ShamanOfForgottenWaysManaBuilder extends ConditionalManaBuilder {
+                    public String getRule() {
+                        return "Spend this mana only to cast creature spells";
+                    }
+                }
+                class ShamanOfForgottenWaysEffect extends OneShotEffect {
+                    public boolean apply(Game game, Ability source) {
+                        FilterPermanent filter = new FilterCreaturePermanent();
+                        int numberCreatures = game.getBattlefield().getAllActivePermanents(filter, playerId, game).size();
+                        player.setLife(numberCreatures, game, source);
+                        return true;
+                    }
+                }
+            """,
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        self.assertTrue(proposal["safe_for_batch_pg_package"])
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.RESTRICTED_MANA_WITH_FORMIDABLE_LIFE_RESET_SCOPE)
+        self.assertEqual(effect["mana_produced"], 2)
+        self.assertEqual(effect["conditional_mana_modes"][0]["restriction"], "creature_spell")
+        self.assertEqual(effect["formidable_activation_mana_cost"], "{9}{G}{G}")
+        self.assertEqual(effect["formidable_controlled_creatures_total_power_gte"], 8)
+        self.assertEqual(effect["formidable_life_total_count_scope"], "each_player_creatures_controlled")
+        self.assertNotIn("_runtime_partial", effect)
+
 
 if __name__ == "__main__":
     unittest.main()

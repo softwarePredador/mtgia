@@ -11702,6 +11702,11 @@ class Player:
             for source in self.battlefield
             if player_mana_source_permanent(self, source)
             and not (isinstance(source, dict) and source.get("tapped"))
+            and not formidable_life_total_reset_should_preserve_source(
+                self,
+                getattr(self, "_current_opponents", []),
+                source,
+            )
             and not (
                 is_battlefield_creature(source)
                 and player_mana_source_permanent(self, source)
@@ -33550,6 +33555,227 @@ def activate_sacrifice_mana_artifacts(
         return 1
 
     return 0
+
+
+def controlled_creatures_total_power(player):
+    return sum(
+        max(0, combat_stat(permanent, "power", 0))
+        for permanent in getattr(player, "battlefield", []) or []
+        if is_battlefield_creature(permanent)
+    )
+
+
+def controlled_creature_count(player):
+    return sum(
+        1
+        for permanent in getattr(player, "battlefield", []) or []
+        if is_battlefield_creature(permanent)
+    )
+
+
+def formidable_life_total_reset_targets(player, opponents):
+    participants = [
+        participant
+        for participant in [player] + list(opponents or [])
+        if participant and participant.is_alive()
+    ]
+    return {participant.name: controlled_creature_count(participant) for participant in participants}
+
+
+def formidable_life_total_reset_is_beneficial(player, opponents, source):
+    if not isinstance(source, dict) or not source.get("formidable_life_total_reset"):
+        return False
+    threshold = int(source.get("formidable_controlled_creatures_total_power_gte") or 8)
+    if controlled_creatures_total_power(player) < threshold:
+        return False
+    targets = formidable_life_total_reset_targets(player, opponents)
+    if player.name not in targets:
+        return False
+    controller_loss = max(0, int(player.life or 0) - int(targets[player.name]))
+    opponent_loss = 0
+    severe_opponent_reset = False
+    for opponent in opponents or []:
+        if opponent is None or not opponent.is_alive() or opponent.name not in targets:
+            continue
+        target_life = int(targets[opponent.name])
+        opponent_loss += max(0, int(opponent.life or 0) - target_life)
+        severe_opponent_reset = severe_opponent_reset or target_life <= 5
+    if opponent_loss <= 0:
+        return False
+    return severe_opponent_reset or opponent_loss >= controller_loss + 8
+
+
+def formidable_life_total_reset_should_preserve_source(player, opponents, source):
+    if not isinstance(source, dict) or not source.get("formidable_life_total_reset"):
+        return False
+    if not source.get("is_mana_source") or source.get("tapped"):
+        return False
+    return formidable_life_total_reset_is_beneficial(player, opponents, source)
+
+
+def activate_formidable_life_total_resets(
+    player,
+    opponents,
+    all_players,
+    turn,
+    *,
+    phase="precombat_main",
+    force=False,
+):
+    if not player.is_alive():
+        return 0
+    activations = 0
+    for permanent in list(player.battlefield):
+        if not isinstance(permanent, dict) or not permanent.get("formidable_life_total_reset"):
+            continue
+        if permanent.get("utility_activation_used_this_turn"):
+            continue
+        if permanent.get("formidable_activation_requires_tap", True) and permanent.get("tapped"):
+            emit_replay_event(
+                "activated_ability_skipped",
+                player=player.name,
+                card=permanent.get("name", "?"),
+                reason="source_already_tapped",
+                activation_kind="formidable_life_total_reset",
+                phase=phase,
+                turn=turn,
+                **replay_rule_fields(permanent),
+            )
+            continue
+        if (
+            permanent.get("formidable_activation_requires_tap", True)
+            and is_battlefield_creature(permanent)
+            and permanent.get("summoning_sick")
+        ):
+            emit_replay_event(
+                "activated_ability_skipped",
+                player=player.name,
+                card=permanent.get("name", "?"),
+                reason="summoning_sick_source_cannot_pay_tap_activation",
+                activation_kind="formidable_life_total_reset",
+                phase=phase,
+                turn=turn,
+                **replay_rule_fields(permanent),
+            )
+            continue
+        threshold = int(permanent.get("formidable_controlled_creatures_total_power_gte") or 8)
+        total_power = controlled_creatures_total_power(player)
+        if total_power < threshold:
+            emit_replay_event(
+                "activated_ability_skipped",
+                player=player.name,
+                card=permanent.get("name", "?"),
+                reason="formidable_threshold_not_met",
+                controlled_creatures_total_power=total_power,
+                required_power=threshold,
+                activation_kind="formidable_life_total_reset",
+                phase=phase,
+                turn=turn,
+                **replay_rule_fields(permanent),
+            )
+            continue
+        if not force and not formidable_life_total_reset_is_beneficial(player, opponents, permanent):
+            emit_replay_event(
+                "activated_ability_skipped",
+                player=player.name,
+                card=permanent.get("name", "?"),
+                reason="strategic_guardrail",
+                strategic_guardrail_reason="formidable_life_total_reset_not_beneficial",
+                controlled_creatures_total_power=total_power,
+                activation_kind="formidable_life_total_reset",
+                phase=phase,
+                turn=turn,
+                **replay_rule_fields(permanent),
+            )
+            continue
+        activation_cost = str(permanent.get("formidable_activation_mana_cost") or "")
+        if activation_cost and not player.spend_mana(activation_cost):
+            emit_replay_event(
+                "activated_ability_skipped",
+                player=player.name,
+                card=permanent.get("name", "?"),
+                reason="failed_to_pay_activation_cost",
+                activation_cost=activation_cost,
+                activation_kind="formidable_life_total_reset",
+                phase=phase,
+                turn=turn,
+                **replay_rule_fields(permanent),
+            )
+            continue
+        if permanent.get("formidable_activation_requires_tap", True):
+            permanent["tapped"] = True
+
+        participants = [
+            participant
+            for participant in [player] + list(opponents or [])
+            if participant and participant.is_alive()
+        ]
+        life_before = {participant.name: participant.life for participant in participants}
+        target_life = {
+            participant.name: controlled_creature_count(participant)
+            for participant in participants
+        }
+        for participant in participants:
+            desired_life = int(target_life[participant.name])
+            change_life(participant, desired_life - int(participant.life or 0))
+        life_after = {participant.name: participant.life for participant in participants}
+        permanent["utility_activation_used_this_turn"] = True
+        opponent_life_loss = sum(
+            max(0, life_before.get(opponent.name, 0) - target_life.get(opponent.name, 0))
+            for opponent in opponents or []
+            if opponent is not None
+        )
+        emit_decision_trace(
+            decision_type="formidable_life_total_reset_activation",
+            player=player,
+            turn=turn,
+            phase=phase,
+            available_options=[
+                decision_card_option(
+                    permanent,
+                    action="activate_formidable_life_total_reset",
+                    effect="life_total_reset",
+                    score=opponent_life_loss,
+                )
+            ],
+            chosen_option=decision_card_option(
+                permanent,
+                action="activate_formidable_life_total_reset",
+                effect="life_total_reset",
+            ),
+            score_components={
+                "controlled_creatures_total_power": total_power,
+                "required_power": threshold,
+                "life_before": life_before,
+                "life_after": life_after,
+                "target_life": target_life,
+            },
+            rule_source="formidable_life_total_reset_v1",
+            rule_status=permanent.get("_rule_review_status", "active"),
+            confidence="medium",
+            expected_benefit_score=opponent_life_loss,
+            actual_outcome="life_total_reset_resolved",
+            reason="convert_formidable_board_presence_into_life_total_pressure",
+            strategic_principle="activate_global_life_reset_only_when_table_life_delta_is_material",
+            heuristic_version=DECISION_STRATEGY_VERSION,
+            resource_delta={"life_before": life_before, "life_after": life_after},
+        )
+        emit_replay_event(
+            "formidable_life_total_reset_resolved",
+            player=player.name,
+            card=permanent.get("name", "?"),
+            activation_cost=activation_cost,
+            controlled_creatures_total_power=total_power,
+            required_power=threshold,
+            life_before=life_before,
+            life_after=life_after,
+            target_life=target_life,
+            phase=phase,
+            turn=turn,
+            **replay_rule_fields(permanent),
+        )
+        activations += 1
+    return activations
 
 
 def self_sacrifice_mana_activation_source(permanent):
@@ -73378,6 +73604,13 @@ def play_turn_v8(player, opponents, all_players, turn, rng, stack):
         phase="precombat_main",
     )
     activate_self_sacrifice_mana_sources(
+        player,
+        opponents,
+        all_players,
+        turn,
+        phase="precombat_main",
+    )
+    activate_formidable_life_total_resets(
         player,
         opponents,
         all_players,

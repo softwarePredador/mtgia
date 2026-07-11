@@ -7330,3 +7330,65 @@ def test_simple_mana_source_runner_validates_controlled_creature_condition_condi
     assert result["card_name"] == "Ilysian Caryatid"
     assert result["available_mana"] == 2
     assert result["conditional_mana"] == 2
+
+
+def test_restricted_mana_formidable_life_reset_runner_preserves_source_and_resolves() -> None:
+    battle = validator.load_battle(validator.DEFAULT_BATTLE)
+    effect = {
+        "effect": "ramp_permanent",
+        "battle_model_scope": "xmage_simple_tap_restricted_mana_source_with_formidable_life_total_reset_v1",
+        "is_mana_source": True,
+        "mana_produced": 2,
+        "produces": "WUBRG",
+        "mana_activation_requires_tap": True,
+        "activation_requires_tap": True,
+        "conditional_mana_modes_status": "runtime_executor_v1",
+        "conditional_mana_modes": [
+            {
+                "color": symbol,
+                "restriction": "creature_spell",
+                "mode": "restricted_spell_mana",
+                "status": "runtime_executor_v1",
+            }
+            for symbol in "WUBRG"
+        ],
+        "source_type_line": "Creature - Human Shaman",
+        "source_mana_cost": "{2}{G}",
+        "auxiliary_activated_effect": "each_player_life_total_becomes_creatures_controlled",
+        "formidable_life_total_reset": True,
+        "formidable_activation_mana_cost": "{9}{G}{G}",
+        "formidable_activation_requires_tap": True,
+        "formidable_controlled_creatures_total_power_gte": 8,
+        "formidable_life_total_count_scope": "each_player_creatures_controlled",
+        "_rule_logical_key": "battle_rule_v1:shaman-of-forgotten-ways",
+    }
+    proposal = {
+        "normalized_name": "shaman of forgotten ways",
+        "card_name": "Shaman of Forgotten Ways",
+        "oracle_hash": "hash-shaman-of-forgotten-ways",
+        "logical_rule_key": "battle_rule_v1:shaman-of-forgotten-ways",
+        "effect_json": effect,
+    }
+    expected = package_builder.expected_rule_from_proposal(proposal)
+    scenario = package_builder.execution_scenario_from_expected_rule(expected)
+
+    events = []
+    previous_handler = battle.REPLAY_EVENT_HANDLER
+    previous_get_card_effect = battle.get_card_effect
+    battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+    battle.get_card_effect = lambda card: dict(effect)
+    try:
+        result = validator.run_restricted_mana_formidable_life_reset(
+            battle,
+            scenario,
+            events,
+        )
+    finally:
+        battle.REPLAY_EVENT_HANDLER = previous_handler
+        battle.get_card_effect = previous_get_card_effect
+
+    assert result["card_name"] == "Shaman of Forgotten Ways"
+    assert result["mana_subcheck"]["conditional_mana"] == 2
+    assert result["controller_life_after"] == 2
+    assert result["opponent_life_after"] == 2
+    assert result["source_tapped_after_formidable"] is True

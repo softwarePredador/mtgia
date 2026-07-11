@@ -6916,3 +6916,55 @@ def test_controlled_creature_condition_conditional_mana_source_manifest_builds_f
     assert scenario["expected_conditional_mana"] == 2
     assert scenario["controller_battlefield"][0]["power"] == 4
     assert scenario["type_line"] == "Creature - Plant"
+
+
+def test_restricted_mana_formidable_life_reset_manifest_builds_composite_scenario() -> None:
+    proposal = {
+        "normalized_name": "shaman of forgotten ways",
+        "card_name": "Shaman of Forgotten Ways",
+        "oracle_hash": "hash-shaman-of-forgotten-ways",
+        "logical_rule_key": "battle_rule_v1:shaman-of-forgotten-ways",
+        "effect_json": {
+            "effect": "ramp_permanent",
+            "battle_model_scope": "xmage_simple_tap_restricted_mana_source_with_formidable_life_total_reset_v1",
+            "is_mana_source": True,
+            "mana_produced": 2,
+            "produces": "WUBRG",
+            "mana_activation_requires_tap": True,
+            "activation_requires_tap": True,
+            "conditional_mana_modes_status": "runtime_executor_v1",
+            "conditional_mana_modes": [
+                {
+                    "color": symbol,
+                    "restriction": "creature_spell",
+                    "mode": "restricted_spell_mana",
+                    "status": "runtime_executor_v1",
+                }
+                for symbol in "WUBRG"
+            ],
+            "source_type_line": "Creature - Human Shaman",
+            "source_mana_cost": "{2}{G}",
+            "auxiliary_activated_effect": "each_player_life_total_becomes_creatures_controlled",
+            "formidable_life_total_reset": True,
+            "formidable_activation_mana_cost": "{9}{G}{G}",
+            "formidable_activation_requires_tap": True,
+            "formidable_controlled_creatures_total_power_gte": 8,
+            "formidable_life_total_count_scope": "each_player_creatures_controlled",
+        },
+    }
+
+    expected = builder.expected_rule_from_proposal(proposal)
+    required = expected["required_effect_fields"]
+
+    assert required["formidable_life_total_reset"] is True
+    assert required["formidable_activation_mana_cost"] == "{9}{G}{G}"
+    assert required["conditional_mana_modes"][0]["restriction"] == "creature_spell"
+
+    scenario = builder.execution_scenario_from_expected_rule(expected)
+
+    assert scenario["type"] == "restricted_mana_formidable_life_reset"
+    assert scenario["expected_conditional_mana"] == 2
+    assert scenario["formidable_activation_mana_cost"] == "{9}{G}{G}"
+    assert scenario["expected_formidable_threshold"] == 8
+    assert scenario["expected_controller_life_after"] == 2
+    assert scenario["expected_opponent_life_after"] == 2
