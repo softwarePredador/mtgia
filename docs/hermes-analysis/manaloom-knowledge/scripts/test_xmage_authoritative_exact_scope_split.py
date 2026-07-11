@@ -28184,6 +28184,118 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertIsNone(proposal)
         self.assertEqual(reason, "etb_bounce_self_without_exclude_source_not_supported")
 
+    def test_permanent_activated_bounce_maps_self_creature_with_exclude_source(self) -> None:
+        row = queue_row(
+            split.BOUNCE_UNIT,
+            effect_classes=["ReturnToHandTargetEffect"],
+            ability_kind="activated",
+            ability_classes=["SimpleActivatedAbility"],
+            xmage_signals=["targeting", "activated_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Aegis Automaton",
+                type_line="Artifact Creature - Construct",
+                oracle_text="{4}{W}: Return another target creature you control to its owner's hand.",
+            ),
+            source_text="""
+                Ability ability = new SimpleActivatedAbility(
+                    new ReturnToHandTargetEffect(),
+                    new ManaCostsImpl<>("{4}{W}"));
+                ability.addTarget(new TargetPermanent(StaticFilters.FILTER_ANOTHER_TARGET_CREATURE_YOU_CONTROL));
+                this.addAbility(ability);
+            """,
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.PERMANENT_ACTIVATED_BOUNCE_SCOPE)
+        self.assertEqual(effect["activated_effect"], "return_to_hand")
+        self.assertEqual(effect["activated_remove_effect"], "remove_creature")
+        self.assertEqual(effect["activated_remove_target"], "creature")
+        self.assertEqual(effect["target"], "creature")
+        self.assertEqual(effect["target_controller"], "self")
+        self.assertEqual(
+            effect["target_constraints"],
+            {"card_types": ["creature"], "controller_scope": "self", "exclude_source": True},
+        )
+        self.assertEqual(effect["destination"], "hand")
+        self.assertEqual(effect["activation_cost_mana"], "{4}{W}")
+        self.assertEqual(effect["activation_cost_generic"], 4)
+        self.assertEqual(effect["activation_cost_colors"], ["W"])
+        self.assertFalse(effect["activation_requires_tap"])
+        self.assertEqual(effect["_activated_rule_effects"][0]["battle_model_scope"], split.PERMANENT_ACTIVATED_BOUNCE_SCOPE)
+
+    def test_permanent_activated_bounce_maps_spellshaper_discard_cost(self) -> None:
+        row = queue_row(
+            split.BOUNCE_UNIT,
+            effect_classes=["ReturnToHandTargetEffect"],
+            ability_kind="activated",
+            ability_classes=["SimpleActivatedAbility"],
+            xmage_signals=["targeting", "activated_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Waterfront Bouncer",
+                type_line="Creature - Merfolk Spellshaper",
+                oracle_text="{U}, {T}, Discard a card: Return target creature to its owner's hand.",
+            ),
+            source_text="""
+                Ability ability = new SimpleActivatedAbility(
+                    new ReturnToHandTargetEffect(),
+                    new ColoredManaCost(ColoredManaSymbol.U));
+                ability.addCost(new TapSourceCost());
+                ability.addCost(new DiscardCardCost());
+                ability.addTarget(new TargetCreaturePermanent());
+                this.addAbility(ability);
+            """,
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.PERMANENT_ACTIVATED_BOUNCE_SCOPE)
+        self.assertEqual(effect["target_controller"], "any")
+        self.assertEqual(effect["target_constraints"], {"card_types": ["creature"]})
+        self.assertEqual(effect["activation_cost_mana"], "{U}")
+        self.assertTrue(effect["activation_requires_tap"])
+        self.assertEqual(effect["activation_discard_count"], 1)
+        self.assertEqual(effect["activation_discard_target"], "any_card")
+        self.assertTrue(effect["activation_requires_discard_card"])
+
+    def test_permanent_activated_bounce_maps_self_sacrifice_source(self) -> None:
+        row = queue_row(
+            split.BOUNCE_UNIT,
+            effect_classes=["ReturnToHandTargetEffect"],
+            ability_kind="activated",
+            ability_classes=["SimpleActivatedAbility"],
+            xmage_signals=["targeting", "activated_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Seal of Removal",
+                type_line="Enchantment",
+                oracle_text="Sacrifice Seal of Removal: Return target creature to its owner's hand.",
+            ),
+            source_text="""
+                Ability ability = new SimpleActivatedAbility(new ReturnToHandTargetEffect(), new ManaCostsImpl<>("{0}"));
+                ability.addCost(new SacrificeSourceCost());
+                ability.addTarget(new TargetCreaturePermanent());
+                this.addAbility(ability);
+            """,
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.PERMANENT_ACTIVATED_BOUNCE_SCOPE)
+        self.assertEqual(effect["effect"], "enchantment")
+        self.assertEqual(effect["target"], "creature")
+        self.assertTrue(effect["activation_requires_sacrifice"])
+        self.assertTrue(effect["activated_self_sacrifice_bounce"])
+        self.assertEqual(effect["destination"], "hand")
+
     def test_creature_etb_recursion_maps_to_triggered_creature_scope(self) -> None:
         row = queue_row(
             split.RECURSION_UNIT,

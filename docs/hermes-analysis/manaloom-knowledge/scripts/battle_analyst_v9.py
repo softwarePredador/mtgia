@@ -13817,6 +13817,10 @@ def is_legal_target(spell, target, controller, all_players=None, target_type=Non
     elif required_controller in {"opponent", "opponents"}:
         if target_controller_name == getattr(controller, "name", None):
             return False
+    if bool(constraints.get("requires_owner_and_controller")):
+        controller_name = getattr(controller, "name", None)
+        if target_controller_name != controller_name or target.get("owner") != controller_name:
+            return False
     if target.get("hexproof") and controller.name != target_controller_name:
         return False
     # Shroud: can't be targeted at all
@@ -13936,6 +13940,12 @@ def is_legal_target(spell, target, controller, all_players=None, target_type=Non
         or constraints.get("nontoken")
         or constraints.get("target_non_token")
     ) and is_token_permanent(target):
+        return False
+    if bool(
+        constraints.get("requires_counter")
+        or constraints.get("with_counter")
+        or constraints.get("target_has_counter")
+    ) and not permanent_has_any_counter(target):
         return False
     if bool(constraints.get("enchanted") or constraints.get("is_enchanted")):
         enchanted = bool(
@@ -17001,6 +17011,17 @@ def priority_round(active_player, all_players, stack, turn, rng, phase=None):
                 flush_triggers_in_apnap(active_player, all_players, stack)
                 return True
             if activate_best_generic_destroy_permanent(
+                active_player,
+                opponents,
+                all_players,
+                turn,
+                rng,
+                phase=phase,
+            ):
+                check_sbas_until_stable(all_players)
+                flush_triggers_in_apnap(active_player, all_players, stack)
+                return True
+            if activate_best_generic_bounce_permanent(
                 active_player,
                 opponents,
                 all_players,
@@ -50036,6 +50057,7 @@ def apply_direct_damage(player, opponents, card, effect_data, turn, rng, *, fini
 GENERIC_TAP_DAMAGE_ACTIVATED_SCOPE = "xmage_tap_fixed_damage_target_activated_ability_v1"
 SIMPLE_ACTIVATED_DAMAGE_SCOPE = "xmage_permanent_simple_activated_damage_v1"
 SIMPLE_ACTIVATED_DESTROY_SCOPE = "xmage_permanent_simple_activated_destroy_target_v1"
+SIMPLE_ACTIVATED_BOUNCE_SCOPE = "xmage_permanent_simple_activated_return_to_hand_v1"
 SIMPLE_ACTIVATED_TAP_TARGET_SCOPE = "xmage_permanent_simple_activated_tap_target_v1"
 SIMPLE_ACTIVATED_UNTAP_TARGET_SCOPE = "xmage_permanent_simple_activated_untap_target_v1"
 SIMPLE_ACTIVATED_TARGET_ADD_COUNTERS_SCOPE = (
@@ -50170,6 +50192,46 @@ def _activated_rule_effects_for_permanent(permanent):
         ):
             destroy_effect[key] = permanent.get(key)
         effects.append(destroy_effect)
+    if (
+        permanent.get("activated_effect") == "return_to_hand"
+        and permanent.get("activated_battle_model_scope") == SIMPLE_ACTIVATED_BOUNCE_SCOPE
+    ):
+        bounce_effect = {
+            "effect": permanent.get("activated_remove_effect") or "remove_permanent",
+            "battle_model_scope": permanent.get("activated_battle_model_scope"),
+            "ability_kind": "activated",
+            "activated_effect": "return_to_hand",
+            "activation_requires_tap": bool(permanent.get("activation_requires_tap")),
+            "activation_requires_sacrifice": bool(permanent.get("activation_requires_sacrifice")),
+            "activation_requires_sacrifice_target": bool(permanent.get("activation_requires_sacrifice_target")),
+            "activation_sacrifice_target": permanent.get("activation_sacrifice_target"),
+            "activation_sacrifice_cost": permanent.get("activation_sacrifice_cost"),
+            "activation_requires_tap_target": bool(permanent.get("activation_requires_tap_target")),
+            "activation_tap_cost": permanent.get("activation_tap_cost"),
+            "activation_discard_count": permanent.get("activation_discard_count"),
+            "activation_discard_target": permanent.get("activation_discard_target"),
+            "activation_requires_discard_card": permanent.get("activation_requires_discard_card"),
+            "activation_discard_random": permanent.get("activation_discard_random"),
+            "activation_cost_mana": permanent.get("activation_cost_mana"),
+            "activation_cost_generic": permanent.get("activation_cost_generic"),
+            "activation_cost_colors": permanent.get("activation_cost_colors"),
+            "target": permanent.get("target"),
+            "target_controller": permanent.get("target_controller"),
+            "target_constraints": permanent.get("target_constraints"),
+            "destination": permanent.get("destination") or "hand",
+            "activated_remove_target": permanent.get("activated_remove_target"),
+        }
+        for key in (
+            "_rule_source",
+            "_rule_review_status",
+            "_rule_execution_status",
+            "_rule_confidence",
+            "_rule_version",
+            "_rule_logical_key",
+            "_rule_oracle_hash",
+        ):
+            bounce_effect[key] = permanent.get(key)
+        effects.append(bounce_effect)
     if (
         permanent.get("activated_effect") == "tap_target"
         and permanent.get("activated_battle_model_scope") == SIMPLE_ACTIVATED_TAP_TARGET_SCOPE
@@ -52647,6 +52709,423 @@ def activate_best_generic_destroy_permanent(player, opponents, all_players, turn
         return False
     options.sort(key=lambda item: (item[0], item[1]), reverse=True)
     return activate_generic_destroy_permanent(
+        player,
+        opponents,
+        all_players,
+        options[0][2],
+        turn,
+        rng,
+        phase=phase,
+    )
+
+
+def activated_bounce_effect_for_permanent(permanent):
+    if not isinstance(permanent, dict):
+        return None
+    for effect_data in _activated_rule_effects_for_permanent(permanent):
+        if (
+            effect_data.get("battle_model_scope") == SIMPLE_ACTIVATED_BOUNCE_SCOPE
+            and effect_data.get("ability_kind") == "activated"
+            and str(effect_data.get("destination") or "").lower() == "hand"
+            and effect_data.get("effect") in TARGETED_REMOVAL_EFFECTS
+        ):
+            return effect_data
+    return None
+
+
+def _activated_target_players(player, opponents, effect_data):
+    target_controller = str((effect_data or {}).get("target_controller") or "").lower()
+    if target_controller in {"self", "you", "controller", "controlled"}:
+        return [player]
+    if target_controller in {"opponent", "opponents"}:
+        return [opponent for opponent in opponents or [] if opponent.is_alive()]
+    return [candidate for candidate in [player, *(opponents or [])] if candidate.is_alive()]
+
+
+def can_activate_generic_bounce_permanent(player, permanent, opponents, *, effect_data=None):
+    effect_data = effect_data or activated_bounce_effect_for_permanent(permanent)
+    if effect_data is None:
+        return False
+    if permanent not in getattr(player, "battlefield", []):
+        return False
+    if effect_data.get("activation_requires_tap") and permanent.get("tapped"):
+        return False
+    if (
+        effect_data.get("activation_requires_tap")
+        and is_battlefield_creature(permanent)
+        and permanent.get("summoning_sick")
+        and not has_haste(permanent)
+    ):
+        return False
+    activation_cost = effect_data.get("activation_cost_mana")
+    if not activation_cost:
+        activation_cost = _activation_cost_text(
+            int(effect_data.get("activation_cost_generic") or 0),
+            effect_data.get("activation_cost_colors") or [],
+        )
+    if not player.can_pay(activation_cost):
+        return False
+    activation_discard_count = int(effect_data.get("activation_discard_count") or 0)
+    activation_discard_target = effect_data.get("activation_discard_target") or "any_card"
+    if activation_discard_count:
+        discard_cards = _choose_activation_discard_cost_cards(
+            player,
+            activation_discard_count,
+            activation_discard_target,
+            random_discard=bool(effect_data.get("activation_discard_random")),
+        )
+        if len(discard_cards) != activation_discard_count:
+            return False
+    sacrifice_target_type = str(effect_data.get("activation_sacrifice_target") or "").strip()
+    if _activation_sacrifice_cost(effect_data):
+        sacrifice_candidates, _options = _choose_activation_sacrifice_cost_candidates(
+            player,
+            permanent,
+            effect_data,
+        )
+        if len(sacrifice_candidates) != _sacrifice_cost_count(effect_data):
+            return False
+    elif sacrifice_target_type:
+        sacrifice_target, _options = choose_activation_sacrifice_target(
+            player,
+            permanent,
+            sacrifice_target_type,
+        )
+        if sacrifice_target is None:
+            return False
+    if _activation_tap_cost(effect_data):
+        tap_candidates, _tap_options = _choose_activation_tap_cost_candidates(
+            player,
+            permanent,
+            effect_data,
+        )
+        if len(tap_candidates) != _tap_cost_count(effect_data):
+            return False
+    return any(
+        removal_target_candidates(target_player, effect_data, controller=player, source=permanent)
+        for target_player in _activated_target_players(player, opponents, effect_data)
+    )
+
+
+def _best_activated_bounce_target(player, permanent, opponents, effect_data):
+    preferred_options = []
+    fallback_options = []
+    for target_player in _activated_target_players(player, opponents, effect_data):
+        player_options = [
+            (target_priority(target), target_player, target)
+            for target in removal_target_candidates(target_player, effect_data, controller=player, source=permanent)
+        ]
+        if target_player is player:
+            non_source_options = [item for item in player_options if item[2] is not permanent]
+            if non_source_options:
+                player_options = non_source_options
+        for option in player_options:
+            bucket = fallback_options if target_player is player else preferred_options
+            bucket.append(option)
+    options = preferred_options or fallback_options
+    if not options:
+        return None, None, []
+    options.sort(
+        key=lambda item: (
+            item[0],
+            str(item[1].name),
+            str(item[2].get("name") or ""),
+        ),
+        reverse=True,
+    )
+    return options[0][1], options[0][2], options
+
+
+def activate_generic_bounce_permanent(player, opponents, all_players, permanent, turn, rng, *, phase=None):
+    effect_data = activated_bounce_effect_for_permanent(permanent)
+    if not can_activate_generic_bounce_permanent(
+        player,
+        permanent,
+        opponents,
+        effect_data=effect_data,
+    ):
+        return False
+    phase = phase or "precombat_main"
+    target_player, target, scored_options = _best_activated_bounce_target(
+        player,
+        permanent,
+        opponents,
+        effect_data,
+    )
+    if target is None or target_player is None:
+        return False
+    target_type = str(effect_data.get("target") or "").lower()
+    if not target_type:
+        target_type = "creature" if effect_data.get("effect") == "remove_creature" else "nonland_permanent"
+    sacrifice_target_type = str(effect_data.get("activation_sacrifice_target") or "").strip()
+    sacrificed_targets = []
+    sacrificed_target = None
+    sacrifice_options = []
+    tapped_cost_targets = []
+    tap_cost_options = []
+    tap_candidates = []
+    if _activation_tap_cost(effect_data):
+        tap_candidates, tap_cost_options = _choose_activation_tap_cost_candidates(
+            player,
+            permanent,
+            effect_data,
+        )
+        if len(tap_candidates) != _tap_cost_count(effect_data):
+            return False
+    if _activation_sacrifice_cost(effect_data):
+        sacrifice_candidates, sacrifice_options = _choose_activation_sacrifice_cost_candidates(
+            player,
+            permanent,
+            effect_data,
+        )
+        if len(sacrifice_candidates) != _sacrifice_cost_count(effect_data):
+            return False
+        sacrificed_targets = sacrifice_candidates
+        sacrificed_target = _first_sacrificed_cost_target(sacrificed_targets)
+    elif sacrifice_target_type:
+        sacrificed_target, sacrifice_options = choose_activation_sacrifice_target(
+            player,
+            permanent,
+            sacrifice_target_type,
+        )
+        if sacrificed_target is None:
+            return False
+    decision = targeting_decision(
+        permanent,
+        target,
+        player,
+        target_controller=target_player,
+        target_type=target_type,
+    )
+    activation_cost = effect_data.get("activation_cost_mana")
+    if not activation_cost:
+        activation_cost = _activation_cost_text(
+            int(effect_data.get("activation_cost_generic") or 0),
+            effect_data.get("activation_cost_colors") or [],
+        )
+    if not player.spend_mana(activation_cost):
+        return False
+    activation_discard_count = int(effect_data.get("activation_discard_count") or 0)
+    activation_discard_target = effect_data.get("activation_discard_target") or "any_card"
+    discard_cards = []
+    discard_resolution = {"to_top": [], "to_graveyard": [], "used_replacement": False}
+    if activation_discard_count:
+        discard_cards = _choose_activation_discard_cost_cards(
+            player,
+            activation_discard_count,
+            activation_discard_target,
+            random_discard=bool(effect_data.get("activation_discard_random")),
+            rng=rng,
+        )
+        if len(discard_cards) != activation_discard_count:
+            return False
+        removed_cards = _remove_exact_cards_from_hand(player, discard_cards)
+        if len(removed_cards) != activation_discard_count:
+            return False
+        discard_resolution = resolve_effect_discard_cards(
+            player,
+            removed_cards,
+            top_limit=0,
+            opponents=opponents,
+            turn=turn,
+            phase=phase,
+            rng=rng,
+        )
+    if effect_data.get("activation_requires_tap"):
+        permanent["tapped"] = True
+    if _activation_tap_cost(effect_data):
+        tapped_cost_targets = _tap_activation_cost_candidates(player, tap_candidates, turn)
+    sacrificed_source = False
+    if effect_data.get("activation_requires_sacrifice"):
+        if permanent in player.battlefield:
+            player.battlefield.remove(permanent)
+        player.graveyard.append(permanent)
+        player.record_permanent_sacrificed(permanent, turn)
+        sacrificed_source = True
+    if sacrificed_targets:
+        sacrificed_targets = _sacrifice_activation_cost_candidates(player, sacrificed_targets, turn)
+        sacrificed_target = _first_sacrificed_cost_target(sacrificed_targets)
+    elif sacrificed_target is not None:
+        sacrifice_permanent_for_activation(player, sacrificed_target, turn)
+        sacrificed_targets = [sacrificed_target]
+    if check_ward(target, permanent, player, rng):
+        emit_replay_event(
+            "removal_countered_by_ward",
+            player=player.name,
+            card=permanent.get("name", "?"),
+            target_player=target_player.name,
+            target=target.get("name", "?"),
+            turn=turn,
+            phase=phase,
+            **decision,
+            **replay_rule_fields(effect_data),
+        )
+        return True
+
+    activation_cost_generic = int(effect_data.get("activation_cost_generic") or 0)
+    activation_cost_colors = list(effect_data.get("activation_cost_colors") or [])
+    mana_paid = activation_cost_generic + len(activation_cost_colors)
+    available_options = [
+        decision_card_option(
+            candidate,
+            get_card_effect(candidate),
+            action="activate_return_to_hand",
+            score=sum(priority),
+            target_controller=controller.name,
+        )
+        for priority, controller, candidate in scored_options[:8]
+    ]
+    fields = replay_rule_fields(effect_data)
+    emit_decision_trace(
+        decision_type="activated_ability",
+        player=player,
+        turn=turn,
+        phase=phase,
+        available_options=available_options,
+        chosen_option=available_options[0] if available_options else decision_card_option(target, get_card_effect(target)),
+        rejected_options=available_options[1:],
+        score_components={
+            "activation_cost": activation_cost,
+            "target": target.get("name", "?"),
+            "target_type": target_type,
+            "target_controller": target_player.name,
+            "target_score": list(target_priority(target)),
+            "requires_tap": 1 if effect_data.get("activation_requires_tap") else 0,
+            "requires_sacrifice": 1 if sacrificed_source else 0,
+            "sacrifice_target": sacrifice_target_type or None,
+            "sacrificed_target": (sacrificed_target or {}).get("name"),
+            "sacrificed_targets": _sacrificed_cost_target_names(sacrificed_targets),
+            "sacrifice_cost": _sacrifice_cost_label(effect_data),
+            "tap_cost_targets": _tapped_cost_target_names(tapped_cost_targets),
+            "tap_cost": _tap_cost_label(effect_data),
+            "tap_cost_options": [
+                option.get("name", "?")
+                for option in (tap_cost_options or [])[:6]
+            ],
+            "sacrifice_options": [
+                option.get("name", "?")
+                for option in (sacrifice_options or [])[:6]
+            ],
+            "discarded": [card.get("name", "?") for card in discard_cards],
+            "discarded_count": activation_discard_count,
+            "discard_target": activation_discard_target if activation_discard_count else None,
+        },
+        rule_source=fields.get("rule_source", "battle_rule"),
+        rule_status=fields.get("rule_review_status", "verified"),
+        confidence="medium",
+        expected_benefit_score=max(10, sum(target_priority(target)) * 4),
+        actual_outcome="activated_bounce_used",
+        reason="use_activated_bounce_when_legal_target_available",
+        heuristic_version=DECISION_STRATEGY_VERSION,
+        resource_delta={
+            "mana": -mana_paid,
+            "tapped": (1 if effect_data.get("activation_requires_tap") else 0) + len(tapped_cost_targets),
+            "permanents": -(
+                (1 if sacrificed_source else 0)
+                + len(sacrificed_targets)
+            ),
+            "graveyard": len(discard_resolution.get("to_graveyard") or []),
+            "cards_discarded": activation_discard_count,
+            "permanents_returned_to_hand": 1,
+        },
+        risk_flags=[
+            flag
+            for flag, active in {
+                "tap_ability": bool(effect_data.get("activation_requires_tap")),
+                "sacrifice_source": sacrificed_source,
+                "sacrifice_target": bool(sacrificed_targets),
+                "tap_cost_target": bool(tapped_cost_targets),
+                "discard_cost": activation_discard_count > 0,
+                "activated_return_to_hand": True,
+            }.items()
+            if active
+        ],
+    )
+    emit_replay_event(
+        "activated_ability",
+        player=player.name,
+        card=permanent.get("name", "?"),
+        effect=effect_data.get("effect"),
+        activation_kind="simple_activated_bounce",
+        activation_cost=activation_cost,
+        tapped=bool(permanent.get("tapped")),
+        sacrificed_source=sacrificed_source,
+        sacrifice_target=sacrifice_target_type or None,
+        sacrificed_target=(sacrificed_target or {}).get("name"),
+        sacrificed_targets=_sacrificed_cost_target_names(sacrificed_targets),
+        tapped_cost_targets=_tapped_cost_target_names(tapped_cost_targets),
+        tap_cost_available_targets=len(tap_cost_options),
+        discarded=[card.get("name", "?") for card in discard_cards],
+        discarded_count=activation_discard_count,
+        discard_target=activation_discard_target if activation_discard_count else None,
+        discard_to_graveyard=[card.get("name", "?") for card in discard_resolution.get("to_graveyard") or []],
+        discard_to_library_top=[card.get("name", "?") for card in discard_resolution.get("to_top") or []],
+        discard_replacement_used=bool(discard_resolution.get("used_replacement")),
+        mana_paid=mana_paid,
+        target=target.get("name", "?"),
+        target_player=target_player.name,
+        target_type=target_type,
+        turn=turn,
+        phase=phase,
+        **fields,
+    )
+    emit_replay_event(
+        "removal_resolved",
+        player=player.name,
+        card=permanent.get("name", "?"),
+        target_player=target_player.name,
+        target=target.get("name", "?"),
+        target_effect=get_card_effect(target).get("effect", target.get("effect")),
+        target_power=target.get("power"),
+        target_toughness=target.get("toughness"),
+        target_is_creature=is_battlefield_creature(target),
+        target_type_line=target.get("type_line", ""),
+        available_targets=len(scored_options),
+        **target_selection_replay_fields(target, [item[2] for item in scored_options]),
+        destination=removal_destination(effect_data),
+        turn=turn,
+        phase=phase,
+        **decision,
+        **removal_annotation_replay_fields(effect_data),
+        **replay_rule_fields(effect_data),
+    )
+    move_removed_permanent_to_destination(
+        target_player,
+        target,
+        permanent,
+        effect_data,
+        turn,
+        rng,
+        all_players=all_players,
+    )
+    check_sbas_until_stable(all_players)
+    return True
+
+
+def activate_best_generic_bounce_permanent(player, opponents, all_players, turn, rng, *, phase=None):
+    options = []
+    for permanent in list(getattr(player, "battlefield", []) or []):
+        effect_data = activated_bounce_effect_for_permanent(permanent)
+        if not can_activate_generic_bounce_permanent(
+            player,
+            permanent,
+            opponents,
+            effect_data=effect_data,
+        ):
+            continue
+        target_player, target, _scored = _best_activated_bounce_target(
+            player,
+            permanent,
+            opponents,
+            effect_data,
+        )
+        if target is None or target_player is None:
+            continue
+        options.append((target_priority(target), str(permanent.get("name") or ""), permanent))
+    if not options:
+        return False
+    options.sort(key=lambda item: (item[0], item[1]), reverse=True)
+    return activate_generic_bounce_permanent(
         player,
         opponents,
         all_players,

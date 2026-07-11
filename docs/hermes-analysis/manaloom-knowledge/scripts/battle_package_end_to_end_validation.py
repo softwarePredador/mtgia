@@ -7517,6 +7517,227 @@ def run_simple_activated_destroy(
     }
 
 
+def run_simple_activated_bounce(
+    battle,
+    scenario: dict[str, Any],
+    events: list[tuple[str, dict[str, Any]]],
+) -> dict[str, Any]:
+    card = dict(scenario["card"])
+    effect = battle.get_card_effect(card)
+    permanent_type = str(effect.get("effect") or "permanent")
+    default_type_line = {
+        "creature": "Creature - Wizard",
+        "artifact": "Artifact",
+        "enchantment": "Enchantment",
+    }.get(permanent_type, "Artifact")
+    source = battle.enrich_card(
+        {
+            **card,
+            "type_line": default_type_line,
+            "summoning_sick": False,
+            **effect,
+            **dict(scenario.get("source_overrides") or {}),
+        }
+    )
+    active = battle.Player(str(scenario.get("player") or "Activated Controller"), None, [])
+    opponent = battle.Player(str(scenario.get("opponent") or "Activated Opponent"), None, [])
+    source["controller"] = active.name
+    source["owner"] = active.name
+    target = battle.enrich_card(dict(scenario.get("target") or {
+        "name": f"E2E Permanent Target for {card['name']}",
+        "type_line": "Artifact",
+        "effect": "artifact",
+        "cmc": 2,
+    }))
+    expected_target_controller = str(
+        scenario.get("expected_target_controller")
+        or scenario.get("target_controller")
+        or effect.get("target_controller")
+        or "opponent"
+    ).lower()
+    if expected_target_controller in {"self", "you", "controller", "controlled"}:
+        target_player = active
+    else:
+        target_player = opponent
+    target["controller"] = target_player.name
+    target["owner"] = target_player.name
+    active.battlefield = [source]
+    opponent.battlefield = []
+    if target_player is active:
+        active.battlefield.append(target)
+    else:
+        opponent.battlefield.append(target)
+    tap_cost_targets = [
+        battle.enrich_card(dict(item))
+        for item in (scenario.get("tap_cost_targets") or [])
+        if isinstance(item, dict)
+    ]
+    for item in tap_cost_targets:
+        item["controller"] = active.name
+        item["owner"] = active.name
+    if tap_cost_targets:
+        active.battlefield.extend(tap_cost_targets)
+    controller_hand = [
+        battle.enrich_card(dict(item))
+        for item in (scenario.get("controller_hand") or [])
+        if isinstance(item, dict)
+    ]
+    for item in controller_hand:
+        item["owner"] = active.name
+    active.hand = list(controller_hand)
+    sacrifice_targets = []
+    sacrifice_target = None
+    if isinstance(scenario.get("sacrifice_targets"), list):
+        for item in scenario.get("sacrifice_targets") or []:
+            if isinstance(item, dict):
+                sacrifice_targets.append(battle.enrich_card(dict(item)))
+    elif scenario.get("sacrifice_target"):
+        sacrifice_target = battle.enrich_card(dict(scenario["sacrifice_target"]))
+        sacrifice_targets.append(sacrifice_target)
+    for item in sacrifice_targets:
+        item["controller"] = active.name
+        item["owner"] = active.name
+    if sacrifice_targets:
+        sacrifice_target = sacrifice_targets[0]
+        active.battlefield.extend(sacrifice_targets)
+    add_manifest_mana(active, scenario.get("controller_mana") or {})
+    all_players = [active, opponent]
+    expected_destination = str(scenario.get("expected_destination") or "hand").lower()
+    expected_tapped_source = bool(scenario.get("expected_tapped_source", effect.get("activation_requires_tap", False)))
+    expected_sacrificed_source = bool(
+        scenario.get("expected_sacrificed_source", effect.get("activation_requires_sacrifice", False))
+    )
+
+    if not battle.can_activate_generic_bounce_permanent(active, source, [opponent]):
+        fail("battle_execution", f"{card['name']} simple activated bounce cannot activate")
+    activated = battle.activate_generic_bounce_permanent(
+        active,
+        [opponent],
+        all_players,
+        source,
+        turn=int(scenario.get("turn") or 7),
+        rng=random.Random(int(scenario.get("seed") or 6075)),
+        phase=str(scenario.get("phase") or "precombat_main"),
+    )
+    if not activated:
+        fail("battle_execution", f"{card['name']} simple activated bounce activation failed")
+    if target in target_player.battlefield:
+        fail("battle_execution", f"{card['name']} target remained on battlefield")
+    if expected_destination == "hand" and target not in target_player.hand:
+        token_ceased = (
+            bool(target.get("token") or target.get("is_token") or str(target.get("tag") or "").lower() == "token")
+            and any(
+                event == "token_ceased_to_exist"
+                and data.get("token") == target.get("name")
+                and str(data.get("zone") or "").lower() == "hand"
+                for event, data in events
+            )
+        )
+        if not token_ceased:
+            fail(
+                "battle_execution",
+                f"{card['name']} target not in expected hand: {target.get('name')}",
+            )
+    if bool(source.get("tapped")) != expected_tapped_source:
+        fail(
+            "battle_execution",
+            f"{card['name']} source tapped={bool(source.get('tapped'))}, expected {expected_tapped_source}",
+        )
+    if expected_sacrificed_source:
+        if source in active.battlefield or source not in active.graveyard:
+            fail("battle_execution", f"{card['name']} source sacrifice zone mismatch")
+    elif source not in active.battlefield:
+        fail("battle_execution", f"{card['name']} source left battlefield unexpectedly")
+    if bool(scenario.get("expect_target_sacrificed")):
+        expected_sacrifice_count = int(
+            scenario.get("expected_sacrifice_count") or len(sacrifice_targets) or 1
+        )
+        if len(sacrifice_targets) < expected_sacrifice_count:
+            fail("battle_execution", f"{card['name']} expected sacrifice target was not configured")
+        for sacrificed_target in sacrifice_targets[:expected_sacrifice_count]:
+            if sacrificed_target in active.battlefield or sacrificed_target not in active.graveyard:
+                fail("battle_execution", f"{card['name']} sacrifice target zone mismatch")
+    activation_event = next(
+        (
+            data
+            for event, data in reversed(events)
+            if event == "activated_ability"
+            and data.get("card") == card.get("name")
+            and data.get("activation_kind") == "simple_activated_bounce"
+        ),
+        None,
+    )
+    if activation_event is None:
+        fail("battle_events", f"missing {card['name']} simple activated bounce event")
+    if bool(activation_event.get("sacrificed_source")) != expected_sacrificed_source:
+        fail(
+            "battle_events",
+            f"{card['name']} sacrificed_source={activation_event.get('sacrificed_source')!r}, expected {expected_sacrificed_source}",
+        )
+    expected_tap_cost_count = int(scenario.get("expected_tap_cost_count") or len(tap_cost_targets) or 0)
+    if expected_tap_cost_count:
+        if len(tap_cost_targets) < expected_tap_cost_count:
+            fail("battle_execution", f"{card['name']} expected tap cost target was not configured")
+        for tapped_target in tap_cost_targets[:expected_tap_cost_count]:
+            if not bool(tapped_target.get("tapped")):
+                fail("battle_execution", f"{card['name']} tap cost target was not tapped")
+    expected_discard_count = int(
+        scenario.get("expected_discard_count", effect.get("activation_discard_count") or 0) or 0
+    )
+    if int(activation_event.get("discarded_count") or 0) != expected_discard_count:
+        fail(
+            "battle_events",
+            f"{card['name']} discarded_count={activation_event.get('discarded_count')!r}, expected {expected_discard_count}",
+        )
+    if expected_discard_count:
+        expected_discard_target = str(
+            scenario.get("expected_discard_target") or effect.get("activation_discard_target") or "any_card"
+        )
+        if str(activation_event.get("discard_target") or "") != expected_discard_target:
+            fail(
+                "battle_events",
+                f"{card['name']} discard_target={activation_event.get('discard_target')!r}, expected {expected_discard_target!r}",
+            )
+        graveyard_names = {item.get("name") for item in active.graveyard if isinstance(item, dict)}
+        discarded_names = set(activation_event.get("discarded") or [])
+        if len(discarded_names) != expected_discard_count or not discarded_names.issubset(graveyard_names):
+            fail(
+                "battle_execution",
+                f"{card['name']} discarded cards not found in graveyard: {sorted(discarded_names)}",
+            )
+    resolved_event = next(
+        (
+            data
+            for event, data in reversed(events)
+            if event == "removal_resolved"
+            and data.get("card") == card.get("name")
+            and data.get("target") == target.get("name")
+        ),
+        None,
+    )
+    if resolved_event is None:
+        fail("battle_events", f"missing {card['name']} removal resolved event")
+    if str(resolved_event.get("destination") or "").lower() != expected_destination:
+        fail(
+            "battle_events",
+            f"{card['name']} destination={resolved_event.get('destination')!r}, expected {expected_destination!r}",
+        )
+    return {
+        "scenario": scenario.get("name"),
+        "card_name": card["name"],
+        "target": target.get("name"),
+        "target_controller": target_player.name,
+        "destination": expected_destination,
+        "source_tapped": bool(source.get("tapped")),
+        "sacrificed_source": expected_sacrificed_source,
+        "discarded_count": expected_discard_count,
+        "target_in_hand": target in target_player.hand,
+        "target_sacrificed": bool(sacrifice_targets and all(item in active.graveyard for item in sacrifice_targets)),
+        "sacrificed_targets": [item.get("name") for item in sacrifice_targets if isinstance(item, dict)],
+        "tapped_cost_targets": [item.get("name") for item in tap_cost_targets if bool(item.get("tapped"))],
+    }
+
+
 def run_simple_activated_target_keyword(
     battle,
     scenario: dict[str, Any],
@@ -11591,6 +11812,7 @@ SCENARIO_RUNNERS = {
     "target_keyword_draw_spell": run_target_keyword_draw_spell,
     "simple_activated_add_counters_target": run_simple_activated_add_counters_target,
     "simple_activated_add_counters_self": run_simple_activated_add_counters_self,
+    "simple_activated_bounce": run_simple_activated_bounce,
     "simple_activated_destroy": run_simple_activated_destroy,
     "simple_activated_target_keyword": run_simple_activated_target_keyword,
     "simple_activated_self_boost": run_simple_activated_self_boost,

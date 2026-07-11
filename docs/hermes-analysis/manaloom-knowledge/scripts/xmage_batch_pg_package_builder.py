@@ -5060,6 +5060,80 @@ def simple_activated_destroy_execution_scenario_from_expected_rule(
     return scenario
 
 
+def simple_activated_bounce_execution_scenario_from_expected_rule(
+    rule: dict[str, Any],
+) -> dict[str, Any] | None:
+    required = dict(rule.get("required_effect_fields") or {})
+    if required.get("battle_model_scope") != "xmage_permanent_simple_activated_return_to_hand_v1":
+        return None
+    constraints = dict(required.get("target_constraints") or {})
+    fixture_constraints = dict(constraints)
+    if fixture_constraints.get("card_types_any") and not fixture_constraints.get("card_types"):
+        first_type = str((fixture_constraints.get("card_types_any") or ["artifact"])[0]).strip().lower()
+        fixture_constraints["card_types"] = [first_type]
+    target_controller = str(required.get("target_controller") or "any").lower()
+    scenario = {
+        "name": f"{rule['card_name']} activates return-to-hand ability",
+        "type": "simple_activated_bounce",
+        "card": {"name": rule["card_name"]},
+        "target": _target_fixture_from_constraints(
+            "E2E Legal Activated Bounce Target",
+            fixture_constraints,
+            matching=True,
+        ),
+        "target_controller": target_controller,
+        "controller_mana": _manifest_mana_for_required_activation(required),
+        "expected_tapped_source": bool(required.get("activation_requires_tap")),
+        "expected_sacrificed_source": bool(required.get("activation_requires_sacrifice")),
+        "expected_destination": str(required.get("destination") or "hand").lower(),
+        "expected_target": required.get("activated_remove_target") or required.get("target"),
+        "expected_target_constraints": constraints,
+        "expected_target_controller": target_controller,
+        "logical_rule_key": rule["logical_rule_key"],
+    }
+    if target_controller in {"self", "you", "controller", "controlled"}:
+        scenario["target_owner"] = "controller"
+    discard_count = max(0, int(required.get("activation_discard_count") or 0))
+    if discard_count:
+        scenario["controller_hand"] = [
+            {
+                "name": f"E2E Activated Bounce Discard {index + 1}",
+                "type_line": "Instant",
+                "effect": "draw_cards",
+                "cmc": 2,
+            }
+            for index in range(discard_count)
+        ]
+        scenario["expected_discard_count"] = discard_count
+        scenario["expected_discard_target"] = required.get("activation_discard_target") or "any_card"
+    sacrifice_targets = _manifest_sacrifice_cost_fixtures(
+        "E2E Activated Bounce Sacrifice Target",
+        required.get("activation_sacrifice_cost") if isinstance(required.get("activation_sacrifice_cost"), dict) else None,
+    )
+    sacrifice_target_type = str(required.get("activation_sacrifice_target") or "").strip().lower()
+    if sacrifice_targets:
+        scenario["sacrifice_targets"] = sacrifice_targets
+        scenario["sacrifice_target"] = sacrifice_targets[0]
+        scenario["expected_sacrifice_count"] = len(sacrifice_targets)
+        scenario["expect_target_sacrificed"] = True
+    elif required.get("activation_requires_sacrifice_target") or sacrifice_target_type:
+        sacrifice_card_type = "creature" if sacrifice_target_type == "creature" else "permanent"
+        scenario["sacrifice_target"] = _target_fixture_from_constraints(
+            "E2E Activated Bounce Sacrifice Target",
+            {"card_types": [sacrifice_card_type]},
+            matching=True,
+        )
+        scenario["expect_target_sacrificed"] = True
+    tap_cost_targets = _manifest_tap_cost_fixtures(
+        "E2E Activated Bounce Tap Cost Target",
+        required.get("activation_tap_cost") if isinstance(required.get("activation_tap_cost"), dict) else None,
+    )
+    if tap_cost_targets:
+        scenario["tap_cost_targets"] = tap_cost_targets
+        scenario["expected_tap_cost_count"] = len(tap_cost_targets)
+    return scenario
+
+
 def simple_activated_self_keyword_execution_scenario_from_expected_rule(
     rule: dict[str, Any],
 ) -> dict[str, Any] | None:
@@ -7398,6 +7472,7 @@ def execution_scenario_from_expected_rule(rule: dict[str, Any]) -> dict[str, Any
         or simple_activated_untap_target_execution_scenario_from_expected_rule(rule)
         or simple_activated_add_counters_target_execution_scenario_from_expected_rule(rule)
         or simple_activated_add_counters_self_execution_scenario_from_expected_rule(rule)
+        or simple_activated_bounce_execution_scenario_from_expected_rule(rule)
         or simple_activated_destroy_execution_scenario_from_expected_rule(rule)
         or simple_activated_self_boost_execution_scenario_from_expected_rule(rule)
         or simple_activated_self_keyword_execution_scenario_from_expected_rule(rule)

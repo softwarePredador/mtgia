@@ -293,6 +293,7 @@ CREATURE_TAP_DAMAGE_SCOPE = "xmage_creature_tap_fixed_damage_target_activated_v1
 TAP_DAMAGE_ACTIVATED_SCOPE = "xmage_tap_fixed_damage_target_activated_ability_v1"
 PERMANENT_ACTIVATED_DAMAGE_SCOPE = "xmage_permanent_simple_activated_damage_v1"
 PERMANENT_ACTIVATED_DESTROY_SCOPE = "xmage_permanent_simple_activated_destroy_target_v1"
+PERMANENT_ACTIVATED_BOUNCE_SCOPE = "xmage_permanent_simple_activated_return_to_hand_v1"
 PERMANENT_ACTIVATED_TAP_TARGET_SCOPE = "xmage_permanent_simple_activated_tap_target_v1"
 PERMANENT_ACTIVATED_UNTAP_TARGET_SCOPE = "xmage_permanent_simple_activated_untap_target_v1"
 TAP_TARGET_SPELL_SCOPE = "xmage_tap_target_spell_v1"
@@ -3879,6 +3880,7 @@ def bounce_target_from_oracle(metadata: dict[str, Any]) -> tuple[str, str, str] 
     target_controller = "any"
     controller_rewrites = [
         (r"\s+you control to ", "self"),
+        (r"\s+you don'?t control to ", "opponent"),
         (r"\s+an opponent controls to ", "opponent"),
         (r"\s+opponents control to ", "opponent"),
     ]
@@ -3917,6 +3919,18 @@ def bounce_target_from_oracle(metadata: dict[str, Any]) -> tuple[str, str, str] 
         (
             r"^return target nonland permanent to its owner's hand\.?$",
             ("remove_permanent", "nonland_permanent"),
+        ),
+        (
+            r"^return target white or black creature to its owner's hand\.?$",
+            ("remove_creature", "white_or_black_creature"),
+        ),
+        (
+            r"^return target nonsnow land to its owner's hand\.?$",
+            ("remove_permanent", "nonsnow_land"),
+        ),
+        (
+            r"^return target creature with a counter on it to its owner's hand\.?$",
+            ("remove_creature", "creature_with_counter"),
         ),
         (r"^return target permanent to its owner's hand\.?$", ("remove_permanent", "permanent")),
         (r"^return target creature to its owner's hand\.?$", ("remove_creature", "creature")),
@@ -12039,6 +12053,15 @@ def is_permanent_activated_destroy_unit(row: dict[str, Any]) -> bool:
     )
 
 
+def is_permanent_activated_bounce_unit(row: dict[str, Any]) -> bool:
+    return (
+        str(row.get("adapter_work_unit") or "") == BOUNCE_UNIT
+        and effect_classes(row) == {"ReturnToHandTargetEffect"}
+        and ability_classes(row) == {"SimpleActivatedAbility"}
+        and {"targeting", "activated_ability"}.issubset(set(row.get("xmage_signals") or []))
+    )
+
+
 def is_permanent_activated_tap_target_unit(row: dict[str, Any]) -> bool:
     unit = str(row.get("adapter_work_unit") or "")
     return (
@@ -19651,6 +19674,210 @@ def activated_destroy_from_source(source: str) -> dict[str, Any] | str:
     }
 
 
+def activated_bounce_from_oracle(metadata: dict[str, Any]) -> dict[str, Any] | None:
+    text = re.sub(r"\s+", " ", strip_parenthetical_reminders(oracle_text(metadata))).strip().lower()
+    if text.count(":") != 1:
+        return None
+    effect_text = text.rsplit(":", 1)[1].strip()
+    sentences = [sentence.strip() for sentence in re.split(r"(?<=\.)\s+", effect_text) if sentence.strip()]
+    if len(sentences) != 1:
+        return None
+    effect_text = sentences[0]
+    if re.search(r"\b(return|returns)\s+(?:up to\s+)?(?:x|two|three|four|\d+)\s+target", effect_text):
+        return None
+    exclude_source = False
+    if re.search(r"\breturn another target\b", effect_text):
+        effect_text = re.sub(r"\breturn another target\b", "return target", effect_text, count=1)
+        exclude_source = True
+    if re.search(r"\breturn other target\b", effect_text):
+        effect_text = re.sub(r"\breturn other target\b", "return target", effect_text, count=1)
+        exclude_source = True
+    if re.fullmatch(r"return target permanent you both own and control to your hand\.?", effect_text):
+        constraints = target_constraints_with_controller("permanent", "self")
+        constraints["requires_owner_and_controller"] = True
+        return {
+            "effect": "remove_permanent",
+            "target": "permanent",
+            "target_controller": "self",
+            "target_constraints": constraints,
+        }
+    effect_metadata = dict(metadata)
+    effect_metadata["oracle_text"] = effect_text
+    target = bounce_target_from_oracle(effect_metadata)
+    if target is None:
+        return None
+    effect, target_type, target_controller = target
+    constraints = target_constraints_with_controller(target_type, target_controller)
+    if exclude_source:
+        constraints["exclude_source"] = True
+    sacrifice_cost = activation_sacrifice_cost_from_oracle(text)
+    if isinstance(sacrifice_cost, str):
+        return None
+    tap_cost = activation_tap_cost_from_oracle(text)
+    if isinstance(tap_cost, str):
+        return None
+    discard_cost = activation_discard_cost_from_oracle(text)
+    return {
+        "effect": effect,
+        "target": target_type,
+        "target_controller": target_controller,
+        "target_constraints": constraints,
+        "exclude_source": exclude_source,
+        "activation_sacrifice_cost": sacrifice_cost,
+        "activation_tap_cost": tap_cost,
+        **(discard_cost or {}),
+    }
+
+
+def activated_bounce_target_from_source(text: str) -> dict[str, Any] | None:
+    if "TargetPointer" in text or ".setTargetPointer" in text or "EachTargetPointer" in text:
+        return None
+    search = text or ""
+    target_controller = "any"
+    if re.search(r"TargetController\.NOT_YOU|NOT_YOU|you don'?t control|opponent", search, re.I):
+        target_controller = "opponent"
+    elif re.search(r"TargetControlled|TargetController\.YOU|FILTER_CONTROLLED|YOU_CONTROL|you control", search, re.I):
+        target_controller = "self"
+    exclude_source = bool(
+        re.search(r"FILTER_ANOTHER|AnotherPredicate|another target|other target", search, re.I)
+    )
+    owner_and_controller = bool(re.search(r"both own and control|OwnPredicate", search, re.I))
+    target_patterns = [
+        ("white_or_black_creature", r"white or black creature|ObjectColor\.WHITE.*ObjectColor\.BLACK"),
+        ("creature_with_counter", r"creature with a counter|CounterPredicate|counter on it"),
+        ("nonsnow_land", r"nonsnow land|non-snow land|Predicates\.not\([^)]*Snow"),
+        ("nonland_permanent", r"FilterNonlandPermanent|FILTER_PERMANENT_NON_LAND|Predicates\.not\(CardType\.LAND"),
+        ("artifact_or_enchantment", r"FILTER_PERMANENT_ARTIFACT_OR_ENCHANTMENT"),
+        ("artifact_or_enchantment_or_land", r"artifact, enchantment, or land|ARTIFACT_OR_ENCHANTMENT_OR_LAND"),
+        ("creature_or_vehicle", r"creature or vehicle|SubType\.VEHICLE"),
+        ("creature_or_enchantment", r"creature or enchantment"),
+        ("creature_or_planeswalker", r"TargetCreatureOrPlaneswalker|creature or planeswalker"),
+        ("enchanted_permanent", r"enchanted permanent|EnchantedPredicate"),
+        ("artifact", r"TargetArtifactPermanent|FILTER_PERMANENT_ARTIFACT|FilterPermanent\s*\(\s*\"artifact\"\s*\)"),
+        ("enchantment", r"TargetEnchantmentPermanent|FILTER_PERMANENT_ENCHANTMENT"),
+        ("land", r"TargetLandPermanent|FilterControlledLandPermanent|FILTER_LANDS|FILTER_LAND"),
+        ("creature", r"TargetCreaturePermanent|TargetControlledCreaturePermanent|FILTER_.*CREATURE|FilterCreaturePermanent|creature"),
+        ("permanent", r"TargetPermanent|TargetControlledPermanent|FilterControlledPermanent|FilterPermanent"),
+    ]
+    matched = [target for target, pattern in target_patterns if re.search(pattern, search, re.S | re.I)]
+    matched = list(dict.fromkeys(matched))
+    if not matched:
+        return None
+    target = matched[0]
+    constraints = target_constraints_with_controller(target, target_controller)
+    if exclude_source:
+        constraints["exclude_source"] = True
+    if owner_and_controller:
+        target_controller = "self"
+        constraints["controller_scope"] = "self"
+        constraints["requires_owner_and_controller"] = True
+    return {
+        "target": target,
+        "target_controller": target_controller,
+        "target_constraints": constraints,
+        "exclude_source": exclude_source,
+    }
+
+
+def activated_bounce_from_source(source: str) -> dict[str, Any] | str:
+    text = source or ""
+    risky_cost_classes = {
+        "CompositeCost",
+        "ExileFrom",
+        "ExileFromGraveCost",
+        "ExileSourceFromGraveCost",
+        "MillCardsCost",
+        "OrCost",
+        "PayLifeCost",
+        "RemoveCounterCost",
+        "ReturnToHandChosenControlledPermanentCost",
+        "ReturnToHandSourceCost",
+        "RevealTargetFromHandCost",
+    }
+    if "Zone.GRAVEYARD" in text:
+        return "activated_bounce_source_not_battlefield"
+    if "TargetsCountAdjuster" in text or "TargetAdjuster" in text:
+        return "activated_bounce_source_target_not_supported"
+    present_risky = sorted(cost for cost in risky_cost_classes if cost in text)
+    if present_risky:
+        return "activated_bounce_source_cost_not_supported"
+    if len(re.findall(r"new\s+ReturnToHandTargetEffect\s*\(\s*\)", text, re.S)) != 1:
+        return "activated_bounce_source_not_simple_bounce_effect"
+    effect_index = text.find("ReturnToHandTargetEffect")
+    window = text[max(0, effect_index - 700) : effect_index + 2200]
+    if "SimpleActivatedAbility" not in window:
+        return "activated_bounce_source_not_simple_activated"
+    discard_cost = activation_discard_cost_from_source(window)
+    if isinstance(discard_cost, str):
+        return discard_cost.replace("activated_damage", "activated_bounce")
+    sacrifice_cost = None
+    sacrifice_target = None
+    if "SacrificeTargetCost" in window:
+        sacrifice_cost = activation_sacrifice_cost_from_source(text, window)
+        if isinstance(sacrifice_cost, str):
+            return sacrifice_cost.replace("activated_damage", "activated_bounce")
+        if sacrifice_cost is None:
+            return "activated_bounce_source_cost_not_supported"
+        sacrifice_target = activation_sacrifice_target_from_cost(sacrifice_cost)
+    tap_cost = activation_tap_cost_from_source(text, window)
+    if isinstance(tap_cost, str):
+        return tap_cost.replace("activation_tap", "activated_bounce")
+    target_text = source_effect_target_window(text, effect_index)
+    target = activated_bounce_target_from_source(target_text)
+    if target is None:
+        return "activated_bounce_source_target_not_supported"
+    cost_text = "{0}"
+    mana_match = re.search(r'ManaCostsImpl<[^>]*>\s*\(\s*"([^"]+)"\s*\)', window)
+    generic_match = re.search(r"GenericManaCost\s*\(\s*(\d+)\s*\)", window)
+    colored_match = re.search(r"ColoredManaCost\s*\(\s*ColoredManaSymbol\.([WUBRG])\s*\)", window)
+    cost_kinds = sum(1 for match in (mana_match, generic_match, colored_match) if match)
+    if cost_kinds > 1:
+        return "activated_bounce_source_mana_cost_not_supported"
+    if mana_match:
+        cost_text = canonical_mana_cost_text(mana_match.group(1))
+    elif generic_match:
+        cost_text = "{" + generic_match.group(1) + "}"
+    elif colored_match:
+        cost_text = "{" + colored_match.group(1) + "}"
+    parsed_cost = parse_mana_cost_text(cost_text)
+    if parsed_cost is None:
+        return "activated_bounce_source_mana_cost_not_supported"
+    activation_cost_generic, activation_cost_colors = parsed_cost
+    return {
+        **target,
+        "activation_cost_mana": cost_text,
+        "activation_cost_generic": activation_cost_generic,
+        "activation_cost_colors": activation_cost_colors,
+        "activation_requires_tap": "TapSourceCost" in window,
+        "activation_requires_sacrifice": "SacrificeSourceCost" in window,
+        **(
+            {
+                "activation_sacrifice_cost": sacrifice_cost,
+                "activation_requires_sacrifice_target": True,
+            }
+            if sacrifice_cost is not None
+            else {}
+        ),
+        **(
+            {
+                "activation_sacrifice_target": sacrifice_target,
+                "activation_requires_sacrifice_target": True,
+            }
+            if sacrifice_target is not None
+            else {}
+        ),
+        **(
+            {
+                "activation_tap_cost": tap_cost,
+                "activation_requires_tap_target": True,
+            }
+            if tap_cost is not None
+            else {}
+        ),
+        **(discard_cost or {}),
+    }
+
+
 def activated_tap_target_from_oracle(metadata: dict[str, Any]) -> dict[str, Any] | str:
     text = strip_parenthetical_reminders(oracle_text(metadata))
     text = re.sub(r"\s+", " ", text).strip().lower()
@@ -26959,6 +27186,8 @@ def target_constraints_for(target: str) -> dict[str, Any]:
         return {"card_types": ["creature"], "target_colors": ["G"]}
     if target == "white_or_blue_creature":
         return {"card_types": ["creature"], "target_colors": ["W", "U"]}
+    if target == "white_or_black_creature":
+        return {"card_types": ["creature"], "target_colors": ["W", "B"]}
     if target == "green_or_white_creature":
         return {"card_types": ["creature"], "target_colors": ["G", "W"]}
     if target == "artifact_creature":
@@ -26973,8 +27202,12 @@ def target_constraints_for(target: str) -> dict[str, Any]:
         return {"card_types": ["land"], "required_subtypes": ["gate"]}
     if target == "snow_land":
         return {"card_types": ["land"], "required_supertypes": ["snow"]}
+    if target == "nonsnow_land":
+        return {"card_types": ["land"], "exclude_supertypes": ["snow"]}
     if target == "snow_permanent":
         return {"card_types": ["permanent"], "required_supertypes": ["snow"]}
+    if target == "creature_with_counter":
+        return {"card_types": ["creature"], "requires_counter": True}
     if target == "creature_with_tap_ability":
         return {"card_types": ["creature"], "requires_activated_ability_with_tap_cost": True}
     if target == "nonartifact_creature":
@@ -27731,6 +27964,7 @@ def split_row(
     permanent_activated_draw_unit = is_permanent_activated_draw_unit(row)
     permanent_activated_damage_unit = is_permanent_activated_damage_unit(row)
     permanent_activated_destroy_unit = is_permanent_activated_destroy_unit(row)
+    permanent_activated_bounce_unit = is_permanent_activated_bounce_unit(row)
     permanent_activated_tap_target_unit = is_permanent_activated_tap_target_unit(row)
     permanent_activated_untap_target_unit = is_permanent_activated_untap_target_unit(row)
     tap_target_spell_unit = is_tap_target_spell_unit(row)
@@ -27889,6 +28123,7 @@ def split_row(
         and not permanent_activated_draw_unit
         and not permanent_activated_damage_unit
         and not permanent_activated_destroy_unit
+        and not permanent_activated_bounce_unit
         and not permanent_activated_untap_target_unit
         and not permanent_activated_life_gain_unit
         and not permanent_activated_self_boost_unit
@@ -28002,6 +28237,7 @@ def split_row(
         and not permanent_activated_draw_unit
         and not permanent_activated_damage_unit
         and not permanent_activated_destroy_unit
+        and not permanent_activated_bounce_unit
         and not permanent_activated_untap_target_unit
         and not permanent_activated_life_gain_unit
         and not permanent_activated_self_boost_unit
@@ -29365,6 +29601,150 @@ def split_row(
             metadata,
             effect_json,
             family_id="xmage_permanent_simple_activated_destroy_target",
+        ), "selected_exact_scope"
+
+    if permanent_activated_bounce_unit:
+        if not is_permanent_metadata(metadata) or is_spell(metadata):
+            return None, "activated_bounce_not_permanent"
+        oracle_bounce = activated_bounce_from_oracle(metadata)
+        if oracle_bounce is None:
+            return None, "activated_bounce_oracle_not_simple"
+        parsed_activation = activated_bounce_from_source(source_text)
+        if isinstance(parsed_activation, str):
+            return None, parsed_activation
+        oracle_effect = str(oracle_bounce["effect"])
+        oracle_target_type = str(oracle_bounce["target"])
+        if str(parsed_activation["target"]) != oracle_target_type:
+            return None, "activated_bounce_source_oracle_target_mismatch"
+        if str(parsed_activation.get("target_controller") or "any") != str(
+            oracle_bounce.get("target_controller") or "any"
+        ):
+            return None, "activated_bounce_source_oracle_target_controller_mismatch"
+        if bool(parsed_activation.get("exclude_source")) != bool(oracle_bounce.get("exclude_source")):
+            return None, "activated_bounce_source_oracle_target_constraints_mismatch"
+        oracle_sacrifice_cost = normalized_activation_sacrifice_cost(
+            oracle_bounce.get("activation_sacrifice_cost")
+        )
+        source_sacrifice_cost = normalized_activation_sacrifice_cost(
+            parsed_activation.get("activation_sacrifice_cost")
+        )
+        if source_sacrifice_cost != oracle_sacrifice_cost:
+            return None, "activated_bounce_source_oracle_sacrifice_cost_mismatch"
+        oracle_tap_cost = normalized_activation_tap_cost(
+            oracle_bounce.get("activation_tap_cost")
+        )
+        source_tap_cost = normalized_activation_tap_cost(
+            parsed_activation.get("activation_tap_cost")
+        )
+        if source_tap_cost != oracle_tap_cost:
+            return None, "activated_bounce_source_oracle_tap_cost_mismatch"
+        oracle_discard_count = int(oracle_bounce.get("activation_discard_count") or 0)
+        source_discard_count = int(parsed_activation.get("activation_discard_count") or 0)
+        if source_discard_count != oracle_discard_count:
+            return None, "activated_bounce_source_oracle_discard_cost_mismatch"
+        if str(parsed_activation.get("activation_discard_target") or "any_card") != str(
+            oracle_bounce.get("activation_discard_target") or "any_card"
+        ):
+            return None, "activated_bounce_source_oracle_discard_cost_mismatch"
+        if bool(parsed_activation.get("activation_discard_random")) != bool(
+            oracle_bounce.get("activation_discard_random")
+        ):
+            return None, "activated_bounce_source_oracle_discard_cost_mismatch"
+        type_line = str(metadata.get("type_line") or "").lower()
+        permanent_effect = (
+            "creature"
+            if "creature" in type_line
+            else "artifact"
+            if "artifact" in type_line
+            else "enchantment"
+            if "enchantment" in type_line
+            else "permanent"
+        )
+        target_base = restricted_target_base(oracle_target_type)
+        target_controller = str(oracle_bounce.get("target_controller") or "any")
+        target_constraints = dict(
+            parsed_activation.get("target_constraints")
+            or oracle_bounce.get("target_constraints")
+            or target_constraints_with_controller(oracle_target_type, target_controller)
+        )
+        activated_effect = {
+            "effect": oracle_effect,
+            "battle_model_scope": PERMANENT_ACTIVATED_BOUNCE_SCOPE,
+            "ability_kind": "activated",
+            "activated_effect": "return_to_hand",
+            "activated_remove_effect": oracle_effect,
+            "activated_remove_target": oracle_target_type,
+            "target": target_base,
+            "target_controller": target_controller,
+            "target_constraints": target_constraints,
+            "destination": "hand",
+            "xmage_effect_class": "ReturnToHandTargetEffect",
+            "xmage_ability_class": "SimpleActivatedAbility",
+            **{
+                key: parsed_activation[key]
+                for key in (
+                    "activation_cost_mana",
+                    "activation_cost_generic",
+                    "activation_cost_colors",
+                    "activation_requires_tap",
+                    "activation_requires_sacrifice",
+                    "activation_sacrifice_cost",
+                    "activation_sacrifice_target",
+                    "activation_requires_sacrifice_target",
+                    "activation_tap_cost",
+                    "activation_requires_tap_target",
+                    "activation_discard_count",
+                    "activation_discard_target",
+                    "activation_requires_discard_card",
+                    "activation_discard_random",
+                )
+                if key in parsed_activation
+            },
+        }
+        effect_json = {
+            "effect": permanent_effect,
+            "battle_model_scope": PERMANENT_ACTIVATED_BOUNCE_SCOPE,
+            "ability_kind": "static_and_activated",
+            "activated_effect": "return_to_hand",
+            "activated_battle_model_scope": PERMANENT_ACTIVATED_BOUNCE_SCOPE,
+            "activated_remove_effect": oracle_effect,
+            "activated_remove_target": oracle_target_type,
+            "target": target_base,
+            "target_controller": target_controller,
+            "target_constraints": target_constraints,
+            "destination": "hand",
+            "_activated_rule_effects": [activated_effect],
+            "xmage_effect_class": "ReturnToHandTargetEffect",
+            "xmage_ability_class": "SimpleActivatedAbility",
+            **{
+                key: parsed_activation[key]
+                for key in (
+                    "activation_cost_mana",
+                    "activation_cost_generic",
+                    "activation_cost_colors",
+                    "activation_requires_tap",
+                    "activation_requires_sacrifice",
+                    "activation_sacrifice_cost",
+                    "activation_sacrifice_target",
+                    "activation_requires_sacrifice_target",
+                    "activation_tap_cost",
+                    "activation_requires_tap_target",
+                    "activation_discard_count",
+                    "activation_discard_target",
+                    "activation_requires_discard_card",
+                    "activation_discard_random",
+                )
+                if key in parsed_activation
+            },
+        }
+        if parsed_activation.get("activation_requires_sacrifice"):
+            effect_json["activated_self_sacrifice_bounce"] = True
+            activated_effect["activated_self_sacrifice_bounce"] = True
+        return build_proposal(
+            row,
+            metadata,
+            effect_json,
+            family_id="xmage_permanent_simple_activated_return_to_hand",
         ), "selected_exact_scope"
 
     if permanent_activated_tap_target_unit:
@@ -40301,6 +40681,7 @@ def build_exact_split_report(
             and not is_permanent_activated_draw_unit(row)
             and not is_permanent_activated_damage_unit(row)
             and not is_permanent_activated_destroy_unit(row)
+            and not is_permanent_activated_bounce_unit(row)
             and not is_permanent_activated_life_gain_unit(row)
             and not is_permanent_activated_self_boost_unit(row)
             and not is_permanent_activated_target_boost_unit(row)

@@ -3923,6 +3923,98 @@ def test_simple_activated_destroy_runner_executes_discard_cost() -> None:
     )
 
 
+def test_simple_activated_bounce_runner_moves_self_target_to_hand_and_pays_discard_cost() -> None:
+    battle = validator.load_battle(validator.DEFAULT_BATTLE)
+    events = []
+    previous_handler = battle.REPLAY_EVENT_HANDLER
+    previous_get_card_effect = battle.get_card_effect
+    battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+    battle.get_card_effect = lambda card: {
+        "effect": "creature",
+        "battle_model_scope": "xmage_permanent_simple_activated_return_to_hand_v1",
+        "activated_effect": "return_to_hand",
+        "activated_battle_model_scope": "xmage_permanent_simple_activated_return_to_hand_v1",
+        "activated_remove_effect": "remove_creature",
+        "activated_remove_target": "creature",
+        "target": "creature",
+        "target_controller": "self",
+        "target_constraints": {
+            "card_types": ["creature"],
+            "controller_scope": "self",
+            "exclude_source": True,
+        },
+        "destination": "hand",
+        "activation_cost_mana": "{U}",
+        "activation_cost_generic": 0,
+        "activation_cost_colors": ["U"],
+        "activation_requires_tap": True,
+        "activation_requires_sacrifice": False,
+        "activation_discard_count": 1,
+        "activation_discard_target": "any_card",
+        "activation_requires_discard_card": True,
+        "_rule_logical_key": "battle_rule_v1:waterfront-bouncer",
+    }
+    try:
+        result = validator.run_simple_activated_bounce(
+            battle,
+            {
+                "name": "Waterfront Bouncer returns own creature with discard cost",
+                "type": "simple_activated_bounce",
+                "card": {"name": "Waterfront Bouncer"},
+                "target_controller": "self",
+                "target": {
+                    "name": "E2E Self Bounce Creature",
+                    "type_line": "Creature - Soldier",
+                    "effect": "creature",
+                    "power": 2,
+                    "toughness": 2,
+                },
+                "controller_hand": [
+                    {
+                        "name": "E2E Activated Bounce Discard 1",
+                        "type_line": "Instant",
+                        "effect": "draw_cards",
+                        "cmc": 2,
+                    }
+                ],
+                "controller_mana": {"blue": 1},
+                "expected_tapped_source": True,
+                "expected_destination": "hand",
+                "expected_target_controller": "self",
+                "expected_discard_count": 1,
+                "expected_discard_target": "any_card",
+                "logical_rule_key": "battle_rule_v1:waterfront-bouncer",
+            },
+            events,
+        )
+    finally:
+        battle.REPLAY_EVENT_HANDLER = previous_handler
+        battle.get_card_effect = previous_get_card_effect
+
+    assert result["card_name"] == "Waterfront Bouncer"
+    assert result["target"] == "E2E Self Bounce Creature"
+    assert result["target_in_hand"] is True
+    assert result["destination"] == "hand"
+    assert result["source_tapped"] is True
+    assert result["discarded_count"] == 1
+    assert any(
+        event == "activated_ability"
+        and data.get("card") == "Waterfront Bouncer"
+        and data.get("activation_kind") == "simple_activated_bounce"
+        and data.get("target") == "E2E Self Bounce Creature"
+        and data.get("discarded") == ["E2E Activated Bounce Discard 1"]
+        and data.get("mana_paid") == 1
+        for event, data in events
+    )
+    assert any(
+        event == "removal_resolved"
+        and data.get("card") == "Waterfront Bouncer"
+        and data.get("target") == "E2E Self Bounce Creature"
+        and data.get("destination") == "hand"
+        for event, data in events
+    )
+
+
 def test_simple_activated_self_keyword_runner_executes_keyword_effect() -> None:
     battle = validator.load_battle(validator.DEFAULT_BATTLE)
     events = []

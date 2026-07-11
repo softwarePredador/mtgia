@@ -2984,6 +2984,53 @@ def test_manifest_builds_simple_activated_destroy_discard_cost_scenario() -> Non
     assert scenario["target"]["colors"] == ["W"]
 
 
+def test_manifest_builds_simple_activated_bounce_self_discard_scenario() -> None:
+    rule = {
+        "normalized_name": "waterfront bouncer",
+        "card_name": "Waterfront Bouncer",
+        "oracle_hash": "hash-waterfront-bouncer",
+        "logical_rule_key": "battle_rule_v1:hash-waterfront-bouncer",
+        "required_effect_fields": {
+            "effect": "creature",
+            "battle_model_scope": "xmage_permanent_simple_activated_return_to_hand_v1",
+            "activated_effect": "return_to_hand",
+            "activated_battle_model_scope": "xmage_permanent_simple_activated_return_to_hand_v1",
+            "activated_remove_effect": "remove_creature",
+            "activated_remove_target": "creature",
+            "target": "creature",
+            "target_controller": "self",
+            "target_constraints": {
+                "card_types": ["creature"],
+                "controller_scope": "self",
+                "exclude_source": True,
+            },
+            "destination": "hand",
+            "activation_cost_mana": "{U}",
+            "activation_cost_generic": 0,
+            "activation_cost_colors": ["U"],
+            "activation_requires_tap": True,
+            "activation_discard_count": 1,
+            "activation_discard_target": "any_card",
+            "activation_requires_discard_card": True,
+        },
+    }
+
+    scenario = builder.simple_activated_bounce_execution_scenario_from_expected_rule(rule)
+
+    assert scenario is not None
+    assert scenario["type"] == "simple_activated_bounce"
+    assert scenario["target_controller"] == "self"
+    assert scenario["target_owner"] == "controller"
+    assert scenario["expected_destination"] == "hand"
+    assert scenario["expected_target_controller"] == "self"
+    assert scenario["expected_tapped_source"] is True
+    assert scenario["expected_discard_count"] == 1
+    assert scenario["expected_discard_target"] == "any_card"
+    assert scenario["controller_mana"]["blue"] == 1
+    assert scenario["target"]["type_line"] == "Creature - Soldier"
+    assert scenario["controller_hand"][0]["name"] == "E2E Activated Bounce Discard 1"
+
+
 def test_manifest_builds_simple_activated_self_keyword_execution_scenario() -> None:
     rule = {
         "normalized_name": "cobalt golem",
