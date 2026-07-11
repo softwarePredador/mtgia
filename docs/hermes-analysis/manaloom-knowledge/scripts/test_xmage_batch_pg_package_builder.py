@@ -3433,6 +3433,54 @@ def test_manifest_builds_target_keyword_draw_spell_execution_scenario() -> None:
     assert len(scenario["library"]) == 2
 
 
+def test_manifest_builds_color_keyword_draw_spell_execution_scenario() -> None:
+    rule = {
+        "normalized_name": "aphotic wisps",
+        "card_name": "Aphotic Wisps",
+        "oracle_hash": "hash-aphotic-wisps",
+        "logical_rule_key": "battle_rule_v1:hash-aphotic-wisps",
+        "required_effect_fields": {
+            "effect": "composite_resolution",
+            "battle_model_scope": "xmage_fixed_color_keyword_target_creature_until_eot_draw_card_spell_v1",
+            "target": "creature",
+            "target_controller": "any",
+            "target_constraints": {"card_types": ["creature"]},
+            "power_delta": 0,
+            "toughness_delta": 0,
+            "target_colors_until_eot": ["B"],
+            "granted_keywords_until_eot": ["fear"],
+            "draw_count": 1,
+            "_composite_rule_components": [
+                {
+                    "effect": "stat_modifier_until_eot",
+                    "battle_model_scope": "xmage_fixed_boost_and_keyword_target_creature_until_eot_spell_v1",
+                    "target": "creature",
+                    "target_constraints": {"card_types": ["creature"]},
+                    "target_controller": "any",
+                    "power_delta": 0,
+                    "toughness_delta": 0,
+                    "target_colors_until_eot": ["B"],
+                    "granted_keywords_until_eot": ["fear"],
+                },
+                {
+                    "effect": "draw_cards",
+                    "battle_model_scope": "xmage_fixed_source_controller_draw_spell_v1",
+                    "count": 1,
+                },
+            ],
+        },
+    }
+
+    scenario = builder.execution_scenario_from_expected_rule(rule)
+
+    assert scenario is not None
+    assert scenario["type"] == "target_keyword_draw_spell"
+    assert scenario["target"]["colors"] == ["W"]
+    assert scenario["expected_target_colors"] == ["B"]
+    assert scenario["expected_keywords"] == ["fear"]
+    assert scenario["expected_draw_count"] == 1
+
+
 def test_manifest_builds_multicolored_target_keyword_draw_fixture() -> None:
     rule = {
         "normalized_name": "psychotic fury",

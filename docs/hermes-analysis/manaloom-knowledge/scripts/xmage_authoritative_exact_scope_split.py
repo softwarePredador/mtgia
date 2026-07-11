@@ -328,6 +328,8 @@ BOOST_ALL_DRAW_SCOPE = "xmage_fixed_boost_all_or_opponents_creatures_until_eot_d
 BOOST_SCRY_SCOPE = "xmage_fixed_boost_target_creature_until_eot_scry_spell_v1"
 KEYWORD_DRAW_SCOPE = "xmage_fixed_keyword_target_creature_until_eot_draw_card_spell_v1"
 BOOST_KEYWORD_DRAW_SCOPE = "xmage_fixed_boost_keyword_target_creature_until_eot_draw_card_spell_v1"
+COLOR_KEYWORD_DRAW_SCOPE = "xmage_fixed_color_keyword_target_creature_until_eot_draw_card_spell_v1"
+COLOR_BOOST_DRAW_SCOPE = "xmage_fixed_color_boost_target_creature_until_eot_draw_card_spell_v1"
 DESTROY_DRAW_SCOPE = "xmage_destroy_target_and_draw_card_spell_v1"
 BOUNCE_DRAW_SCOPE = "xmage_return_target_to_hand_and_draw_card_spell_v1"
 EXILE_SCOPE = "xmage_exile_target_spell_v1"
@@ -9390,6 +9392,20 @@ def fixed_keyword_draw_target_from_source(
     return target_controller, int(draw_matches[0]), target_constraints
 
 
+def becomes_color_target_from_source(source: str) -> str | None:
+    text = source or ""
+    matches = re.findall(
+        r"new\s+BecomesColorTargetEffect\s*\(\s*ObjectColor\.(WHITE|BLUE|BLACK|RED|GREEN)\s*,\s*Duration\.EndOfTurn\s*\)",
+        text,
+        re.S,
+    )
+    if len(matches) != 1:
+        return None
+    if "TargetPointer" in text or ".setTargetPointer" in text:
+        return None
+    return OBJECT_COLOR_TO_SYMBOL.get(matches[0])
+
+
 def fixed_boost_keyword_draw_target_from_source(
     source: str,
     keyword_ability_class: str,
@@ -11720,6 +11736,7 @@ def fixed_boost_keyword_target_from_oracle(metadata: dict[str, Any]) -> tuple[in
 
 def fixed_keyword_draw_target_from_oracle(metadata: dict[str, Any]) -> tuple[str, str, int, dict[str, Any]] | None:
     text = strip_parenthetical_reminders(oracle_text(metadata))
+    text = re.sub(r"\s+", " ", text).strip().lower()
     keyword_words = "|".join(
         re.escape(word)
         for word in sorted(TARGET_GRANT_KEYWORD_ORACLE_WORDS, key=len, reverse=True)
@@ -11736,6 +11753,46 @@ def fixed_keyword_draw_target_from_oracle(metadata: dict[str, Any]) -> tuple[str
     if match.group(1):
         target_constraints["color_count_min"] = 2
     return keyword, target_controller, 1, target_constraints
+
+
+def fixed_color_keyword_draw_target_from_oracle(
+    metadata: dict[str, Any],
+) -> tuple[str, str, str, int, dict[str, Any]] | None:
+    text = strip_parenthetical_reminders(oracle_text(metadata))
+    text = re.sub(r"\s+", " ", text).strip().lower()
+    keyword_words = "|".join(
+        re.escape(word)
+        for word in sorted(TARGET_GRANT_KEYWORD_ORACLE_WORDS, key=len, reverse=True)
+    )
+    color_words = "|".join(re.escape(word) for word in sorted(COLOR_WORD_TO_SYMBOL, key=len, reverse=True))
+    match = re.match(
+        rf"^target creature becomes ({color_words}) and gains ({keyword_words}) until end of turn\. draw a card\.?$",
+        text,
+    )
+    if not match:
+        return None
+    color = COLOR_WORD_TO_SYMBOL[match.group(1)]
+    keyword = TARGET_GRANT_KEYWORD_ORACLE_WORDS[match.group(2)]
+    return color, keyword, "any", 1, {"card_types": ["creature"]}
+
+
+def fixed_color_boost_draw_target_from_oracle(
+    metadata: dict[str, Any],
+) -> tuple[str, int, int, str, int, dict[str, Any]] | None:
+    text = strip_parenthetical_reminders(oracle_text(metadata))
+    text = re.sub(r"\s+", " ", text).strip().lower()
+    color_words = "|".join(re.escape(word) for word in sorted(COLOR_WORD_TO_SYMBOL, key=len, reverse=True))
+    match = re.match(
+        rf"^target creature becomes ({color_words}) and gets ([+-]?\d+)/([+-]?\d+) until end of turn\. draw a card\.?$",
+        text,
+    )
+    if not match:
+        return None
+    power = signed_int_from_oracle(match.group(2))
+    toughness = signed_int_from_oracle(match.group(3))
+    if power is None or toughness is None:
+        return None
+    return COLOR_WORD_TO_SYMBOL[match.group(1)], power, toughness, "any", 1, {"card_types": ["creature"]}
 
 
 def fixed_boost_keyword_draw_target_from_oracle(
@@ -27727,6 +27784,10 @@ def proposal_notes(row: dict[str, Any], scope: str) -> str:
         scope_kind = "fixed target-creature keyword plus draw-card spell"
     elif scope == BOOST_KEYWORD_DRAW_SCOPE:
         scope_kind = "fixed target-creature boost plus keyword plus draw-card spell"
+    elif scope == COLOR_KEYWORD_DRAW_SCOPE:
+        scope_kind = "fixed target-creature color plus keyword plus draw-card spell"
+    elif scope == COLOR_BOOST_DRAW_SCOPE:
+        scope_kind = "fixed target-creature color plus boost plus draw-card spell"
     elif scope == DESTROY_DRAW_SCOPE:
         scope_kind = "fixed destroy-target plus draw-card spell"
     elif scope == BOUNCE_DRAW_SCOPE:
@@ -28092,6 +28153,21 @@ def split_row(
         and len(ability_classes(row)) == 1
         and next(iter(ability_classes(row))) in TARGET_GRANT_KEYWORD_ABILITY_CLASSES
     )
+    color_keyword_draw_spell_unit = (
+        unit == DRAW_UNIT
+        and effect_classes(row)
+        == {"BecomesColorTargetEffect", "DrawCardSourceControllerEffect", "GainAbilityTargetEffect"}
+        and set(row.get("xmage_signals") or []) == {"targeting", "draw"}
+        and len(ability_classes(row)) == 1
+        and next(iter(ability_classes(row))) in TARGET_GRANT_KEYWORD_ABILITY_CLASSES
+    )
+    color_boost_draw_spell_unit = (
+        unit == DRAW_UNIT
+        and effect_classes(row)
+        == {"BecomesColorTargetEffect", "BoostTargetEffect", "DrawCardSourceControllerEffect"}
+        and set(row.get("xmage_signals") or []) == {"targeting", "draw"}
+        and not ability_classes(row)
+    )
     fixed_token_spell_unit = unit in {TOKEN_SPELL_UNIT, TOKEN_SPELL_FLASHBACK_UNIT}
     treasure_etb_creature_unit = (
         unit == TREASURE_UNIT
@@ -28317,6 +28393,8 @@ def split_row(
         and not draw_self_cost_reduction_spell_unit
         and not keyword_draw_spell_unit
         and not boost_keyword_draw_spell_unit
+        and not color_keyword_draw_spell_unit
+        and not color_boost_draw_spell_unit
         and not treasure_etb_creature_unit
         and not etb_each_player_sacrifice_creature_unit
         and not dies_each_player_sacrifice_creature_unit
@@ -35646,6 +35724,90 @@ def split_row(
                 family_id="xmage_fixed_boost_all_draw_card_spell",
             ), "selected_exact_scope"
 
+        if color_boost_draw_spell_unit:
+            if not is_spell(metadata):
+                return None, "not_instant_or_sorcery_spell"
+            source_color = becomes_color_target_from_source(source_text)
+            if source_color is None:
+                return None, "color_boost_draw_source_color_not_exact"
+            source_boost = fixed_boost_draw_from_source(source_text)
+            if source_boost is None:
+                return None, "color_boost_draw_source_boost_not_fixed"
+            oracle_boost = fixed_color_boost_draw_target_from_oracle(metadata)
+            if oracle_boost is None:
+                return None, "color_boost_draw_oracle_not_exact_fixed"
+            (
+                oracle_color,
+                oracle_power,
+                oracle_toughness,
+                oracle_target_controller,
+                oracle_draw_count,
+                oracle_target_constraints,
+            ) = oracle_boost
+            if source_color != oracle_color:
+                return None, "color_boost_draw_source_oracle_color_mismatch"
+            if (int(source_boost["power_delta"]), int(source_boost["toughness_delta"])) != (
+                oracle_power,
+                oracle_toughness,
+            ):
+                return None, "color_boost_draw_source_oracle_boost_mismatch"
+            if str(source_boost.get("target_controller") or "any") != oracle_target_controller:
+                return None, "color_boost_draw_source_oracle_target_mismatch"
+            if int(source_boost.get("draw_count") or 0) != oracle_draw_count:
+                return None, "color_boost_draw_source_oracle_draw_count_mismatch"
+            if dict(source_boost.get("target_constraints") or {}) != oracle_target_constraints:
+                return None, "color_boost_draw_source_oracle_target_constraints_mismatch"
+            color_boost_component = {
+                "effect": "stat_modifier_until_eot",
+                "battle_model_scope": BOOST_TARGET_SCOPE,
+                "target": "creature",
+                "target_constraints": oracle_target_constraints,
+                "target_controller": oracle_target_controller,
+                "power_delta": oracle_power,
+                "toughness_delta": oracle_toughness,
+                "power_boost": oracle_power,
+                "toughness_boost": oracle_toughness,
+                "target_colors_until_eot": [oracle_color],
+                "duration": "until_end_of_turn",
+                "compose_on_resolution": True,
+                "xmage_effect_classes": ["BecomesColorTargetEffect", "BoostTargetEffect"],
+            }
+            draw_component = {
+                "effect": "draw_cards",
+                "battle_model_scope": DRAW_SCOPE,
+                "count": oracle_draw_count,
+                "compose_on_resolution": True,
+                "xmage_effect_class": "DrawCardSourceControllerEffect",
+            }
+            effect_json = {
+                "effect": "composite_resolution",
+                "battle_model_scope": COLOR_BOOST_DRAW_SCOPE,
+                "target": "creature",
+                "target_constraints": oracle_target_constraints,
+                "target_controller": oracle_target_controller,
+                "power_delta": oracle_power,
+                "toughness_delta": oracle_toughness,
+                "power_boost": oracle_power,
+                "toughness_boost": oracle_toughness,
+                "target_colors_until_eot": [oracle_color],
+                "duration": "until_end_of_turn",
+                "draw_count": oracle_draw_count,
+                "count": oracle_draw_count,
+                "_composite_rule_components": [color_boost_component, draw_component],
+                "xmage_effect_classes": [
+                    "BecomesColorTargetEffect",
+                    "BoostTargetEffect",
+                    "DrawCardSourceControllerEffect",
+                ],
+                **flags,
+            }
+            return build_proposal(
+                row,
+                metadata,
+                effect_json,
+                family_id="xmage_fixed_color_boost_draw_card_spell",
+            ), "selected_exact_scope"
+
         if classes == {"BoostTargetEffect", "DrawCardSourceControllerEffect"}:
             unsupported_abilities = ability_classes(row) - ALLOWED_AUXILIARY_RESOLUTION_ABILITY_CLASSES
             if unsupported_abilities:
@@ -35793,6 +35955,96 @@ def split_row(
                 metadata,
                 effect_json,
                 family_id="xmage_fixed_boost_keyword_draw_card_spell",
+            ), "selected_exact_scope"
+
+        if color_keyword_draw_spell_unit:
+            if not is_spell(metadata):
+                return None, "not_instant_or_sorcery_spell"
+            abilities = ability_classes(row)
+            ability_class = next(iter(abilities))
+            keyword = TARGET_GRANT_KEYWORD_ABILITY_CLASSES.get(ability_class)
+            if not keyword:
+                return None, "color_keyword_draw_ability_not_supported"
+            source_color = becomes_color_target_from_source(source_text)
+            if source_color is None:
+                return None, "color_keyword_draw_source_color_not_exact"
+            source_keyword = fixed_keyword_draw_target_from_source(source_text, ability_class)
+            if source_keyword is None:
+                return None, "color_keyword_draw_source_not_exact_fixed"
+            oracle_keyword = fixed_color_keyword_draw_target_from_oracle(metadata)
+            if oracle_keyword is None:
+                return None, "color_keyword_draw_oracle_not_exact_fixed"
+            (
+                oracle_color,
+                oracle_keyword_name,
+                oracle_target_controller,
+                oracle_draw_count,
+                oracle_target_constraints,
+            ) = oracle_keyword
+            source_target_controller, source_draw_count, source_target_constraints = source_keyword
+            if source_color != oracle_color:
+                return None, "color_keyword_draw_source_oracle_color_mismatch"
+            if keyword != oracle_keyword_name:
+                return None, "color_keyword_draw_source_oracle_keyword_mismatch"
+            if source_target_controller != oracle_target_controller:
+                return None, "color_keyword_draw_source_oracle_target_mismatch"
+            if source_draw_count != oracle_draw_count:
+                return None, "color_keyword_draw_source_oracle_draw_count_mismatch"
+            if source_target_constraints != oracle_target_constraints:
+                return None, "color_keyword_draw_source_oracle_target_constraints_mismatch"
+            color_keyword_component = {
+                "effect": "stat_modifier_until_eot",
+                "battle_model_scope": BOOST_KEYWORD_SCOPE,
+                "target": "creature",
+                "target_constraints": oracle_target_constraints,
+                "target_controller": oracle_target_controller,
+                "power_delta": 0,
+                "toughness_delta": 0,
+                "power_boost": 0,
+                "toughness_boost": 0,
+                "target_colors_until_eot": [oracle_color],
+                "duration": "until_end_of_turn",
+                "granted_keywords_until_eot": [keyword],
+                "compose_on_resolution": True,
+                "xmage_effect_classes": ["BecomesColorTargetEffect", "GainAbilityTargetEffect"],
+                "xmage_ability_class": ability_class,
+            }
+            draw_component = {
+                "effect": "draw_cards",
+                "battle_model_scope": DRAW_SCOPE,
+                "count": oracle_draw_count,
+                "compose_on_resolution": True,
+                "xmage_effect_class": "DrawCardSourceControllerEffect",
+            }
+            effect_json = {
+                "effect": "composite_resolution",
+                "battle_model_scope": COLOR_KEYWORD_DRAW_SCOPE,
+                "target": "creature",
+                "target_constraints": oracle_target_constraints,
+                "target_controller": oracle_target_controller,
+                "power_delta": 0,
+                "toughness_delta": 0,
+                "power_boost": 0,
+                "toughness_boost": 0,
+                "target_colors_until_eot": [oracle_color],
+                "duration": "until_end_of_turn",
+                "granted_keywords_until_eot": [keyword],
+                "draw_count": oracle_draw_count,
+                "count": oracle_draw_count,
+                "_composite_rule_components": [color_keyword_component, draw_component],
+                "xmage_effect_classes": [
+                    "BecomesColorTargetEffect",
+                    "GainAbilityTargetEffect",
+                    "DrawCardSourceControllerEffect",
+                ],
+                "xmage_ability_class": ability_class,
+                **flags,
+            }
+            return build_proposal(
+                row,
+                metadata,
+                effect_json,
+                family_id="xmage_fixed_color_keyword_draw_card_spell",
             ), "selected_exact_scope"
 
         if keyword_draw_spell_unit:

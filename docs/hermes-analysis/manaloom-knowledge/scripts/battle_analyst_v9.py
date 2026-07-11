@@ -5666,6 +5666,20 @@ def resolve_gain_control_untap_haste_until_eot_spell(player, opponents, card, ef
     return [target]
 
 
+def stat_modifier_target_colors_until_eot(effect_data):
+    colors = []
+    for value in _as_list(effect_data.get("target_colors_until_eot") or effect_data.get("colors_until_eot")):
+        symbol = _color_symbol(value)
+        if symbol in SYMBOL_TO_COLOR_NAME and symbol not in colors:
+            colors.append(symbol)
+    return colors
+
+
+def ordered_card_color_symbols(card):
+    symbols = _symbols_from_value((card or {}).get("colors"))
+    return [symbol for symbol in ("W", "U", "B", "R", "G") if symbol in symbols]
+
+
 def resolve_stat_modifier_until_eot_spell(player, opponents, card, effect_data, turn, *, finish=True):
     power_delta = int(effect_data.get("power_delta") or effect_data.get("power_boost") or 0)
     toughness_delta = int(effect_data.get("toughness_delta") or effect_data.get("toughness_boost") or 0)
@@ -5674,6 +5688,7 @@ def resolve_stat_modifier_until_eot_spell(player, opponents, card, effect_data, 
         power_delta, toughness_delta = dynamic_deltas
         effect_data = {**effect_data, "power_delta": power_delta, "toughness_delta": toughness_delta}
     requested_count = stat_modifier_target_count(effect_data)
+    target_colors_until_eot = stat_modifier_target_colors_until_eot(effect_data)
     if requested_count > 1 or effect_data.get("up_to_count"):
         candidates = stat_modifier_candidate_targets(player, opponents, card, effect_data)
         selected = choose_stat_modifier_targets(player, opponents, card, effect_data)
@@ -5695,6 +5710,7 @@ def resolve_stat_modifier_until_eot_spell(player, opponents, card, effect_data, 
                 available_targets=len(candidates),
                 target_count=0,
                 granted_keywords_until_eot=granted_keywords,
+                target_colors_until_eot=target_colors_until_eot,
                 result="no_legal_target",
                 turn=turn,
                 **dynamic_replay_fields,
@@ -5718,6 +5734,7 @@ def resolve_stat_modifier_until_eot_spell(player, opponents, card, effect_data, 
                 continue
             power_before = _numeric_card_stat(target, "power")
             toughness_before = _numeric_card_stat(target, "toughness", "power")
+            target_colors_before = ordered_card_color_symbols(target)
             remember_until_eot(target, "power")
             remember_until_eot(target, "toughness")
             target["power"] = power_before + power_delta
@@ -5728,8 +5745,11 @@ def resolve_stat_modifier_until_eot_spell(player, opponents, card, effect_data, 
                 set_until_eot(target, "keywords", merged_keywords)
                 for keyword in granted_keywords:
                     set_until_eot(target, keyword, True)
+            if target_colors_until_eot:
+                set_until_eot(target, "colors", target_colors_until_eot)
             power_after = _numeric_card_stat(target, "power")
             toughness_after = _numeric_card_stat(target, "toughness", "power")
+            target_colors_after = ordered_card_color_symbols(target)
             destination = None
             result = "stat_modifier_until_eot_applied"
             if toughness_after <= 0 and is_battlefield_creature(target):
@@ -5752,6 +5772,9 @@ def resolve_stat_modifier_until_eot_spell(player, opponents, card, effect_data, 
                     "power_delta": power_delta,
                     "toughness_delta": toughness_delta,
                     "granted_keywords_until_eot": granted_keywords,
+                    "target_colors_before": target_colors_before,
+                    "target_colors_after": target_colors_after,
+                    "target_colors_until_eot": target_colors_until_eot,
                     "destination": destination,
                     "result": result,
                     **decision,
@@ -5771,6 +5794,7 @@ def resolve_stat_modifier_until_eot_spell(player, opponents, card, effect_data, 
             power_delta=power_delta,
             toughness_delta=toughness_delta,
             granted_keywords_until_eot=granted_keywords,
+            target_colors_until_eot=target_colors_until_eot,
             **dynamic_replay_fields,
             result=result,
             turn=turn,
@@ -5794,6 +5818,7 @@ def resolve_stat_modifier_until_eot_spell(player, opponents, card, effect_data, 
             power_delta=power_delta,
             toughness_delta=toughness_delta,
             target_type=target_type,
+            target_colors_until_eot=target_colors_until_eot,
             result="no_legal_target",
             turn=turn,
             **dynamic_replay_fields,
@@ -5805,6 +5830,7 @@ def resolve_stat_modifier_until_eot_spell(player, opponents, card, effect_data, 
 
     power_before = _numeric_card_stat(target, "power")
     toughness_before = _numeric_card_stat(target, "toughness", "power")
+    target_colors_before = ordered_card_color_symbols(target)
     remember_until_eot(target, "power")
     remember_until_eot(target, "toughness")
     target["power"] = power_before + power_delta
@@ -5820,8 +5846,11 @@ def resolve_stat_modifier_until_eot_spell(player, opponents, card, effect_data, 
         set_until_eot(target, "keywords", merged_keywords)
         for keyword in granted_keywords:
             set_until_eot(target, keyword, True)
+    if target_colors_until_eot:
+        set_until_eot(target, "colors", target_colors_until_eot)
     power_after = _numeric_card_stat(target, "power")
     toughness_after = _numeric_card_stat(target, "toughness", "power")
+    target_colors_after = ordered_card_color_symbols(target)
     destination = None
     result = "stat_modifier_until_eot_applied"
     if toughness_after <= 0 and is_battlefield_creature(target):
@@ -5852,6 +5881,9 @@ def resolve_stat_modifier_until_eot_spell(player, opponents, card, effect_data, 
         power_delta=power_delta,
         toughness_delta=toughness_delta,
         granted_keywords_until_eot=granted_keywords,
+        target_colors_before=target_colors_before,
+        target_colors_after=target_colors_after,
+        target_colors_until_eot=target_colors_until_eot,
         **dynamic_replay_fields,
         result=result,
         destination=destination,

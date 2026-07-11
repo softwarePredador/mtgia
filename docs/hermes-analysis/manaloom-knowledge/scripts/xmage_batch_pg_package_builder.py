@@ -107,6 +107,7 @@ E2E_REQUIRED_EFFECT_FIELDS = (
     "duration",
     "control_duration",
     "granted_keywords_until_eot",
+    "target_colors_until_eot",
     "additional_cost",
     "requires_one_additional_cost_option",
     "additional_cost_options",
@@ -5411,6 +5412,8 @@ def target_keyword_draw_spell_execution_scenario_from_expected_rule(
         "xmage_fixed_boost_target_creature_until_eot_draw_card_spell_v1",
         "xmage_fixed_keyword_target_creature_until_eot_draw_card_spell_v1",
         "xmage_fixed_boost_keyword_target_creature_until_eot_draw_card_spell_v1",
+        "xmage_fixed_color_keyword_target_creature_until_eot_draw_card_spell_v1",
+        "xmage_fixed_color_boost_target_creature_until_eot_draw_card_spell_v1",
     }:
         return None
     if required.get("effect") != "composite_resolution":
@@ -5435,6 +5438,23 @@ def target_keyword_draw_spell_execution_scenario_from_expected_rule(
         or keyword_component.get("target_constraints")
         or {"card_types": ["creature"]}
     )
+    target_colors_until_eot = [
+        str(value).strip().upper()
+        for value in (
+            required.get("target_colors_until_eot")
+            or keyword_component.get("target_colors_until_eot")
+            or required.get("colors_until_eot")
+            or []
+        )
+        if str(value).strip()
+    ]
+    target_fixture = _target_fixture_from_constraints(
+        "E2E Target Creature",
+        target_constraints,
+        matching=True,
+    )
+    if target_colors_until_eot:
+        target_fixture["colors"] = [_fixture_color_not_in(set(target_colors_until_eot))]
     return {
         "name": f"{rule['card_name']} grants target keyword and draws {draw_count}",
         "type": "target_keyword_draw_spell",
@@ -5442,11 +5462,7 @@ def target_keyword_draw_spell_execution_scenario_from_expected_rule(
             "name": rule["card_name"],
             "type_line": "Sorcery" if required.get("sorcery") is True else "Instant",
         },
-        "target": _target_fixture_from_constraints(
-            "E2E Target Creature",
-            target_constraints,
-            matching=True,
-        ),
+        "target": target_fixture,
         "nonmatching_target": _target_fixture_from_constraints(
             "E2E Illegal Target Creature",
             target_constraints,
@@ -5458,6 +5474,7 @@ def target_keyword_draw_spell_execution_scenario_from_expected_rule(
             required.get("toughness_delta") or keyword_component.get("toughness_delta") or 0
         ),
         "expected_keywords": list(required.get("granted_keywords_until_eot") or []),
+        "expected_target_colors": target_colors_until_eot,
         "expected_draw_count": draw_count,
         "library": [
             {"name": f"E2E Draw Card {index + 1}", "type_line": "Instant", "effect": "draw_cards"}

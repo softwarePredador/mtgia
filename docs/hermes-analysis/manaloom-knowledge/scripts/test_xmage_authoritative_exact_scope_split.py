@@ -10914,6 +10914,110 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertIsNone(proposal)
         self.assertEqual(reason, "keyword_draw_source_oracle_draw_count_mismatch")
 
+    def test_fixed_color_keyword_draw_spell_maps_aphotic_wisps_pattern(self) -> None:
+        row = queue_row(
+            split.DRAW_UNIT,
+            effect_classes=[
+                "BecomesColorTargetEffect",
+                "DrawCardSourceControllerEffect",
+                "GainAbilityTargetEffect",
+            ],
+            ability_classes=["FearAbility"],
+            xmage_signals=["targeting", "draw"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Aphotic Wisps",
+                oracle_text=(
+                    "Target creature becomes black and gains fear until end of turn. "
+                    "(It can't be blocked except by artifact creatures and/or black creatures.)\n"
+                    "Draw a card."
+                ),
+            ),
+            source_text=(
+                "this.getSpellAbility().addTarget(new TargetCreaturePermanent());"
+                "this.getSpellAbility().addEffect(new BecomesColorTargetEffect(ObjectColor.BLACK, Duration.EndOfTurn));"
+                "this.getSpellAbility().addEffect(new GainAbilityTargetEffect(FearAbility.getInstance(), Duration.EndOfTurn));"
+                "this.getSpellAbility().addEffect(new DrawCardSourceControllerEffect(1).concatBy(\"<br>\"));"
+            ),
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.COLOR_KEYWORD_DRAW_SCOPE)
+        self.assertEqual(effect["target_colors_until_eot"], ["B"])
+        self.assertEqual(effect["granted_keywords_until_eot"], ["fear"])
+        self.assertEqual(effect["draw_count"], 1)
+        self.assertEqual(
+            effect["_composite_rule_components"][0]["target_colors_until_eot"],
+            ["B"],
+        )
+
+    def test_fixed_color_keyword_draw_spell_maps_crimson_wisps_pattern(self) -> None:
+        row = queue_row(
+            split.DRAW_UNIT,
+            effect_classes=[
+                "BecomesColorTargetEffect",
+                "DrawCardSourceControllerEffect",
+                "GainAbilityTargetEffect",
+            ],
+            ability_classes=["HasteAbility"],
+            xmage_signals=["targeting", "draw"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Crimson Wisps",
+                oracle_text="Target creature becomes red and gains haste until end of turn. Draw a card.",
+            ),
+            source_text=(
+                "this.getSpellAbility().addEffect(new BecomesColorTargetEffect(ObjectColor.RED, Duration.EndOfTurn));"
+                "this.getSpellAbility().addEffect(new GainAbilityTargetEffect(HasteAbility.getInstance(), Duration.EndOfTurn));"
+                "this.getSpellAbility().addTarget(new TargetCreaturePermanent());"
+                "this.getSpellAbility().addEffect(new DrawCardSourceControllerEffect(1).concatBy(\"<br>\"));"
+            ),
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.COLOR_KEYWORD_DRAW_SCOPE)
+        self.assertEqual(effect["target_colors_until_eot"], ["R"])
+        self.assertEqual(effect["granted_keywords_until_eot"], ["haste"])
+
+    def test_fixed_color_boost_draw_spell_maps_viridescent_wisps_pattern(self) -> None:
+        row = queue_row(
+            split.DRAW_UNIT,
+            effect_classes=[
+                "BecomesColorTargetEffect",
+                "BoostTargetEffect",
+                "DrawCardSourceControllerEffect",
+            ],
+            ability_classes=[],
+            xmage_signals=["targeting", "draw"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Viridescent Wisps",
+                oracle_text="Target creature becomes green and gets +1/+0 until end of turn. Draw a card.",
+            ),
+            source_text=(
+                "this.getSpellAbility().addEffect(new BecomesColorTargetEffect(ObjectColor.GREEN, Duration.EndOfTurn));"
+                "this.getSpellAbility().addEffect(new BoostTargetEffect(1, 0, Duration.EndOfTurn));"
+                "this.getSpellAbility().addTarget(new TargetCreaturePermanent());"
+                "this.getSpellAbility().addEffect(new DrawCardSourceControllerEffect(1).concatBy(\"<br>\"));"
+            ),
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.COLOR_BOOST_DRAW_SCOPE)
+        self.assertEqual(effect["target_colors_until_eot"], ["G"])
+        self.assertEqual(effect["power_delta"], 1)
+        self.assertEqual(effect["toughness_delta"], 0)
+        self.assertEqual(effect["draw_count"], 1)
+
     def test_fixed_boost_keyword_draw_spell_maps_guided_strike_pattern(self) -> None:
         row = queue_row(
             split.DRAW_UNIT,

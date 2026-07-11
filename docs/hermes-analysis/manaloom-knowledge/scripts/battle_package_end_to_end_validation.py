@@ -8399,6 +8399,11 @@ def run_target_keyword_draw_spell(
         for keyword in (scenario.get("expected_keywords") or effect.get("granted_keywords_until_eot") or [])
         if str(keyword or "").strip()
     ]
+    expected_target_colors = [
+        str(color or "").strip().upper()
+        for color in (scenario.get("expected_target_colors") or effect.get("target_colors_until_eot") or [])
+        if str(color or "").strip()
+    ]
     expected_draw_count = int(scenario.get("expected_draw_count") or effect.get("draw_count") or 1)
     before_events = len(events)
     before_power = int(target.get("power") or 0)
@@ -8407,6 +8412,7 @@ def run_target_keyword_draw_spell(
         int(nonmatching_target.get("power") or 0),
         int(nonmatching_target.get("toughness") or 0),
     ) if nonmatching_target is not None else None
+    nonmatching_colors_before = list(nonmatching_target.get("colors") or []) if nonmatching_target is not None else None
     library_before = len(active.library)
     battle.apply_effect_immediate(
         active,
@@ -8433,6 +8439,21 @@ def run_target_keyword_draw_spell(
             fail("battle_execution", f"{card['name']} target missing keyword {keyword!r}")
         if nonmatching_target is not None and battle.card_has_keyword(nonmatching_target, keyword):
             fail("battle_execution", f"{card['name']} incorrectly granted {keyword!r} to illegal target")
+    if expected_target_colors:
+        target_colors = [
+            str(color or "").strip().upper()
+            for color in (target.get("colors") or [])
+            if str(color or "").strip()
+        ]
+        if target_colors != expected_target_colors:
+            fail(
+                "battle_execution",
+                f"{card['name']} target colors={target_colors!r}, expected {expected_target_colors!r}",
+            )
+        if nonmatching_target is not None:
+            nonmatching_colors_after = list(nonmatching_target.get("colors") or [])
+            if nonmatching_colors_after != nonmatching_colors_before:
+                fail("battle_execution", f"{card['name']} incorrectly changed illegal target colors")
     if nonmatching_target is not None and (
         int(nonmatching_target.get("power") or 0),
         int(nonmatching_target.get("toughness") or 0),
@@ -8463,6 +8484,11 @@ def run_target_keyword_draw_spell(
             "battle_events",
             f"{card['name']} resolved keywords={stat_event.get('granted_keywords_until_eot')!r}, expected {expected_keywords!r}",
         )
+    if expected_target_colors and list(stat_event.get("target_colors_until_eot") or []) != expected_target_colors:
+        fail(
+            "battle_events",
+            f"{card['name']} resolved colors={stat_event.get('target_colors_until_eot')!r}, expected {expected_target_colors!r}",
+        )
     draw_component_event = next(
         (
             data
@@ -8484,6 +8510,7 @@ def run_target_keyword_draw_spell(
         "target_power": int(target.get("power") or 0),
         "target_toughness": int(target.get("toughness") or 0),
         "granted_keywords": expected_keywords,
+        "target_colors": expected_target_colors,
         "cards_drawn": expected_draw_count,
         "nonmatching_target": nonmatching_target.get("name") if nonmatching_target is not None else None,
         "hand": [item.get("name") for item in active.hand if isinstance(item, dict)],
