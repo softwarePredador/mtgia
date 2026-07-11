@@ -578,6 +578,9 @@ E2E_REQUIRED_EFFECT_FIELDS = (
     "cost_reduction_graveyard_card_types_min",
     "trigger",
     "trigger_effect",
+    "etb_return_controlled_lands_to_hand_count",
+    "etb_return_controlled_lands_to_hand_min_available",
+    "etb_return_lands_targeting",
     "trigger_controller_scope",
     "trigger_gain_life",
     "trigger_draw_count",
@@ -3340,6 +3343,7 @@ def simple_mana_source_execution_scenario_from_expected_rule(rule: dict[str, Any
         "xmage_simple_tap_mana_source_with_gain_life_v1",
         "xmage_simple_tap_mana_source_with_activated_draw_v1",
         "xmage_simple_mana_source_with_etb_draw_v1",
+        "xmage_simple_mana_source_with_etb_return_lands_to_hand_v1",
         "xmage_simple_tap_restricted_mana_source_permanent_v1",
         "xmage_simple_tap_land_color_dependent_mana_source_permanent_v1",
         "xmage_fixed_color_dynamic_mana_source_permanent_v1",
@@ -3512,6 +3516,26 @@ def simple_mana_source_execution_scenario_from_expected_rule(rule: dict[str, Any
             scenario["controller_lands"] = lands
         else:
             scenario["opponent_lands"] = lands
+    etb_return_lands_count = int(required.get("etb_return_controlled_lands_to_hand_count") or 0)
+    if etb_return_lands_count > 0:
+        returnable_lands = [
+            {
+                "name": f"E2E Returnable Land {index + 1}",
+                "type_line": "Basic Land - Forest",
+                "effect": "land",
+                "tapped": False,
+            }
+            for index in range(etb_return_lands_count)
+        ]
+        scenario["controller_lands"] = [
+            *scenario.get("controller_lands", []),
+            *returnable_lands,
+        ]
+        scenario["resolve_enters_battlefield_triggers"] = True
+        scenario["expected_etb_returned_lands_to_hand_count"] = etb_return_lands_count
+        scenario["expected_etb_returned_lands_to_hand_names"] = [
+            land["name"] for land in returnable_lands
+        ]
     return scenario
 
 

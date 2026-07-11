@@ -351,6 +351,7 @@ PAIN_TALISMAN_SCOPE = "pain_talisman_color_pair_partial_v1"
 MANA_WITH_ACTIVATION_LIFE_GAIN_SCOPE = "xmage_simple_tap_mana_source_with_gain_life_v1"
 MANA_WITH_ACTIVATED_DRAW_SCOPE = "xmage_simple_tap_mana_source_with_activated_draw_v1"
 MANA_WITH_ETB_DRAW_SCOPE = "xmage_simple_mana_source_with_etb_draw_v1"
+MANA_WITH_ETB_RETURN_LANDS_SCOPE = "xmage_simple_mana_source_with_etb_return_lands_to_hand_v1"
 MANA_SPENT_CAST_TRIGGER_SCOPE = "xmage_simple_tap_mana_source_with_mana_spent_cast_trigger_v1"
 MANA_ACTIVATION_NEXT_CAST_X_TRIGGER_SCOPE = "xmage_simple_tap_mana_source_with_next_cast_x_trigger_v1"
 ETB_FIXED_MANA_CREATURE_SCOPE = "xmage_creature_etb_add_fixed_mana_v1"
@@ -26364,6 +26365,54 @@ def etb_fixed_mana_source_blocker(source_text: str, detail: dict[str, Any]) -> s
     return None
 
 
+def mana_source_etb_return_lands_to_hand_detail_from_oracle(
+    metadata: dict[str, Any],
+) -> dict[str, Any] | None:
+    lines = normalized_oracle_lines(metadata)
+    return_lines = [
+        line
+        for line in lines
+        if re.fullmatch(
+            r"when (?:this artifact|[^.]+) enters(?: the battlefield)?, return two lands you control to their owner's hand\.?",
+            line,
+        )
+    ]
+    if len(return_lines) != 1:
+        return None
+    return {
+        "trigger": "enters_battlefield",
+        "trigger_effect": "return_lands_to_hand",
+        "etb_return_controlled_lands_to_hand_count": 2,
+        "etb_return_controlled_lands_to_hand_min_available": True,
+        "etb_return_lands_targeting": "not_target",
+    }
+
+
+def mana_source_etb_return_lands_to_hand_source_blocker(
+    source_text: str,
+    ability_class_values: set[str],
+    effect_class_values: set[str],
+) -> str | None:
+    text = source_text or ""
+    if "EntersBattlefieldTriggeredAbility" not in ability_class_values:
+        return "mana_source_etb_return_lands_source_etb_trigger_missing"
+    if "SimpleManaAbility" not in ability_class_values:
+        return "mana_source_etb_return_lands_source_mana_ability_missing"
+    if "KhalniGemReturnToHandTargetEffect" not in effect_class_values:
+        return "mana_source_etb_return_lands_source_effect_not_supported"
+    required_markers = {
+        "StaticFilters.FILTER_CONTROLLED_PERMANENT_LAND": "mana_source_etb_return_lands_source_filter_mismatch",
+        "Math.min(landCount, 2)": "mana_source_etb_return_lands_source_count_mismatch",
+        "target.withNotTarget(true)": "mana_source_etb_return_lands_source_targeting_mismatch",
+        "Zone.HAND": "mana_source_etb_return_lands_source_destination_mismatch",
+        "player.moveCards": "mana_source_etb_return_lands_source_move_missing",
+    }
+    for marker, reason in required_markers.items():
+        if marker not in text:
+            return reason
+    return None
+
+
 def dies_fixed_mana_source_blocker(source_text: str, detail: dict[str, Any]) -> str | None:
     text = source_text or ""
     if len(re.findall(r"new\s+DiesSourceTriggeredAbility\s*\(", text)) != 1:
@@ -28169,6 +28218,8 @@ def proposal_notes(row: dict[str, Any], scope: str) -> str:
         scope_kind = "mana-source permanent with fixed life gain on mana activation"
     elif scope == MANA_WITH_ETB_DRAW_SCOPE:
         scope_kind = "mana-source permanent with fixed enter-the-battlefield draw trigger"
+    elif scope == MANA_WITH_ETB_RETURN_LANDS_SCOPE:
+        scope_kind = "mana-source permanent with enter-the-battlefield return controlled lands trigger"
     elif scope == ETB_FIXED_MANA_CREATURE_SCOPE:
         scope_kind = "creature with fixed enter-the-battlefield mana trigger"
     elif scope == DIES_FIXED_MANA_PERMANENT_SCOPE:
@@ -41240,6 +41291,64 @@ def split_row(
                 metadata,
                 effect_json,
                 family_id="xmage_simple_mana_source_with_etb_draw",
+            ), "selected_exact_scope"
+        mana_source_etb_return_lands = mana_source_etb_return_lands_to_hand_detail_from_oracle(metadata)
+        if mana_source_etb_return_lands is not None:
+            mana_source_detail = simple_mana_source_detail_from_oracle(metadata)
+            if mana_source_detail is None:
+                source_blocker = simple_mana_source_source_blocker(source_text, mana_ability_classes)
+                if source_blocker:
+                    return None, source_blocker
+                return None, "mana_source_oracle_not_simple"
+            source_blocker = simple_mana_source_source_blocker(
+                source_text,
+                mana_ability_classes,
+                mana_source_detail,
+            )
+            if source_blocker:
+                return None, source_blocker
+            etb_source_blocker = mana_source_etb_return_lands_to_hand_source_blocker(
+                source_text,
+                mana_ability_classes,
+                classes,
+            )
+            if etb_source_blocker:
+                return None, etb_source_blocker
+            type_line = str(metadata.get("type_line") or "").lower()
+            permanent_type = (
+                "creature"
+                if "creature" in type_line
+                else "artifact"
+                if "artifact" in type_line
+                else "permanent"
+            )
+            mana_requires_tap = bool(mana_source_detail.get("mana_activation_requires_tap", True))
+            effect_json = {
+                "effect": "ramp_permanent",
+                "battle_model_scope": MANA_WITH_ETB_RETURN_LANDS_SCOPE,
+                "is_mana_source": True,
+                "mana_produced": int(mana_source_detail["mana_produced"]),
+                "produces": str(mana_source_detail["produces"]),
+                "activation_requires_tap": mana_requires_tap,
+                "mana_activation_requires_tap": mana_requires_tap,
+                "permanent_type": permanent_type,
+                "ability_kind": "mana_and_triggered",
+                "xmage_mana_ability_classes": sorted(
+                    mana_ability_classes - {"EntersBattlefieldTriggeredAbility"}
+                ),
+                "xmage_auxiliary_ability_classes": ["EntersBattlefieldTriggeredAbility"],
+                "xmage_effect_classes": sorted(classes),
+                "xmage_ability_classes": sorted(mana_ability_classes),
+                **mana_source_etb_return_lands,
+            }
+            if mana_source_detail.get("produced_mana_symbols"):
+                effect_json["produced_mana_symbols"] = list(mana_source_detail["produced_mana_symbols"])
+            add_mana_source_activation_detail_fields(effect_json, mana_source_detail)
+            return build_proposal(
+                row,
+                metadata,
+                effect_json,
+                family_id="xmage_simple_mana_source_with_etb_return_lands_to_hand",
             ), "selected_exact_scope"
         tap_and_self_sacrifice_mana_source = (
             classes <= {"BasicManaEffect"}

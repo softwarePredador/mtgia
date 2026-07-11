@@ -1654,6 +1654,50 @@ def test_simple_mana_source_execution_scenario_preserves_enters_tapped_state() -
     assert scenario["source_overrides"] == {"tapped": True}
 
 
+def test_simple_mana_source_execution_scenario_seeds_etb_return_lands() -> None:
+    rule = {
+        "card_name": "Khalni Gem",
+        "logical_rule_key": "battle_rule_v1:khalni-gem",
+        "required_effect_fields": {
+            "effect": "ramp_permanent",
+            "battle_model_scope": "xmage_simple_mana_source_with_etb_return_lands_to_hand_v1",
+            "is_mana_source": True,
+            "mana_produced": 2,
+            "produces": "WUBRG",
+            "mana_activation_requires_tap": True,
+            "trigger": "enters_battlefield",
+            "trigger_effect": "return_lands_to_hand",
+            "etb_return_controlled_lands_to_hand_count": 2,
+            "etb_return_lands_targeting": "not_target",
+        },
+    }
+
+    scenario = builder.simple_mana_source_execution_scenario_from_expected_rule(rule)
+
+    assert scenario["type"] == "simple_mana_source_refresh"
+    assert scenario["resolve_enters_battlefield_triggers"] is True
+    assert scenario["controller_lands"] == [
+        {
+            "name": "E2E Returnable Land 1",
+            "type_line": "Basic Land - Forest",
+            "effect": "land",
+            "tapped": False,
+        },
+        {
+            "name": "E2E Returnable Land 2",
+            "type_line": "Basic Land - Forest",
+            "effect": "land",
+            "tapped": False,
+        },
+    ]
+    assert scenario["expected_etb_returned_lands_to_hand_count"] == 2
+    assert scenario["expected_etb_returned_lands_to_hand_names"] == [
+        "E2E Returnable Land 1",
+        "E2E Returnable Land 2",
+    ]
+    assert scenario["expected_available_mana_after_refresh"] == 2
+
+
 def test_simple_mana_source_execution_scenario_tracks_two_color_choices_as_conditional() -> None:
     rule = {
         "card_name": "Atarka Monument",

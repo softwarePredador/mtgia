@@ -17692,6 +17692,53 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertNotIn("produced_mana_symbols", effect)
         self.assertEqual(effect["xmage_effect_classes"], ["AddManaOfAnyColorEffect"])
 
+    def test_simple_mana_source_etb_return_lands_maps_exact_runtime_scope(self) -> None:
+        row = queue_row(
+            split.RAMP_ARTIFACT_UNIT,
+            effect_classes=[
+                "AddManaOfAnyColorEffect",
+                "KhalniGemReturnToHandTargetEffect",
+                "OneShotEffect",
+            ],
+            ability_kind="activated",
+            ability_classes=["EntersBattlefieldTriggeredAbility", "SimpleManaAbility"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Khalni Gem",
+                type_line="Artifact",
+                mana_cost="{4}",
+                oracle_text=(
+                    "When Khalni Gem enters, return two lands you control to their owner's hand.\n"
+                    "{T}: Add two mana of any one color."
+                ),
+            ),
+            source_text=(
+                "this.addAbility(new EntersBattlefieldTriggeredAbility("
+                "new KhalniGemReturnToHandTargetEffect()));"
+                "this.addAbility(new SimpleManaAbility("
+                "Zone.BATTLEFIELD, new AddManaOfAnyColorEffect(2), new TapSourceCost()));"
+                "int landCount = game.getBattlefield().count("
+                "StaticFilters.FILTER_CONTROLLED_PERMANENT_LAND, source.getControllerId(), source, game);"
+                "TargetPermanent target = new TargetPermanent(Math.min(landCount, 2), "
+                "StaticFilters.FILTER_CONTROLLED_PERMANENT_LAND);"
+                "target.withNotTarget(true);"
+                "return player.moveCards(new CardsImpl(target.getTargets()), Zone.HAND, source, game);"
+            ),
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.MANA_WITH_ETB_RETURN_LANDS_SCOPE)
+        self.assertEqual(effect["mana_produced"], 2)
+        self.assertEqual(effect["produces"], "WUBRG")
+        self.assertEqual(effect["trigger"], "enters_battlefield")
+        self.assertEqual(effect["trigger_effect"], "return_lands_to_hand")
+        self.assertEqual(effect["etb_return_controlled_lands_to_hand_count"], 2)
+        self.assertEqual(effect["etb_return_lands_targeting"], "not_target")
+        self.assertNotIn("_runtime_partial", effect)
+
     def test_simple_artifact_sacrifice_mana_source_maps_composite_mana_constructor(self) -> None:
         row = queue_row(
             split.RAMP_ARTIFACT_UNIT,

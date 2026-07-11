@@ -5218,6 +5218,79 @@ def test_simple_mana_source_refresh_runner_executes_partial_mana_rule() -> None:
     assert result["tapped"] is True
 
 
+def test_simple_mana_source_refresh_runner_resolves_etb_return_lands() -> None:
+    battle = validator.load_battle(validator.DEFAULT_BATTLE)
+    events = []
+    previous_handler = battle.REPLAY_EVENT_HANDLER
+    previous_get_card_effect = battle.get_card_effect
+    battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+    def get_effect(card):
+        if card.get("name") == "Khalni Gem":
+            return {
+                "effect": "ramp_permanent",
+                "battle_model_scope": "xmage_simple_mana_source_with_etb_return_lands_to_hand_v1",
+                "is_mana_source": True,
+                "mana_produced": 2,
+                "produces": "WUBRG",
+                "mana_activation_requires_tap": True,
+                "trigger": "enters_battlefield",
+                "trigger_effect": "return_lands_to_hand",
+                "etb_return_controlled_lands_to_hand_count": 2,
+                "etb_return_lands_targeting": "not_target",
+                "_rule_logical_key": "battle_rule_v1:khalni",
+            }
+        return {"effect": "land"}
+
+    battle.get_card_effect = get_effect
+    try:
+        result = validator.run_simple_mana_source_refresh(
+            battle,
+            {
+                "name": "Khalni Gem returns lands as it enters",
+                "type": "simple_mana_source_refresh",
+                "card": {"name": "Khalni Gem", "type_line": "Artifact"},
+                "controller_lands": [
+                    {
+                        "name": "E2E Returnable Land 1",
+                        "type_line": "Basic Land - Forest",
+                        "effect": "land",
+                    },
+                    {
+                        "name": "E2E Returnable Land 2",
+                        "type_line": "Basic Land - Forest",
+                        "effect": "land",
+                    },
+                ],
+                "resolve_enters_battlefield_triggers": True,
+                "expected_etb_returned_lands_to_hand_count": 2,
+                "expected_etb_returned_lands_to_hand_names": [
+                    "E2E Returnable Land 1",
+                    "E2E Returnable Land 2",
+                ],
+                "expected_available_mana_after_refresh": 2,
+                "expected_tapped": True,
+                "expected_sources": 1,
+                "expected_conditional_mana": 2,
+                "logical_rule_key": "battle_rule_v1:khalni",
+            },
+            events,
+        )
+    finally:
+        battle.REPLAY_EVENT_HANDLER = previous_handler
+        battle.get_card_effect = previous_get_card_effect
+
+    assert result["card_name"] == "Khalni Gem"
+    assert result["available_mana"] == 2
+    assert result["etb_returned_lands_to_hand_count"] == 2
+    assert result["hand_size"] == 2
+    assert any(
+        event == "trigger_resolved"
+        and data.get("effect") == "return_lands_to_hand"
+        and data.get("returned_count") == 2
+        for event, data in events
+    )
+
+
 def test_mana_spent_cast_trigger_runner_resolves_life_gain() -> None:
     battle = validator.load_battle(validator.DEFAULT_BATTLE)
     events = []

@@ -5266,6 +5266,60 @@ def run_simple_mana_source_refresh(
     opponent.battlefield = [*opponent_lands, *opponent_battlefield]
     turn = int(scenario.get("turn") or 5)
     before_events = len(events)
+    expected_etb_return_count = int(scenario.get("expected_etb_returned_lands_to_hand_count") or 0)
+    expected_etb_return_names = sorted(
+        str(value)
+        for value in (scenario.get("expected_etb_returned_lands_to_hand_names") or [])
+        if str(value)
+    )
+
+    if bool(scenario.get("resolve_enters_battlefield_triggers")) or expected_etb_return_count:
+        hand_before_etb = len(active.hand)
+        battle.resolve_generic_permanent_etb(
+            active,
+            [opponent],
+            source,
+            effect,
+            turn,
+            random.Random(int(scenario.get("seed") or 1)),
+            all_players=[active, opponent],
+            phase="e2e_enter_battlefield",
+        )
+        if expected_etb_return_count:
+            returned_cards = [
+                card
+                for card in active.hand[hand_before_etb:]
+                if isinstance(card, dict)
+            ]
+            returned_names = sorted(str(card.get("name") or "") for card in returned_cards)
+            if len(returned_cards) != expected_etb_return_count:
+                fail(
+                    "battle_execution",
+                    f"{card['name']} returned lands={len(returned_cards)}, expected {expected_etb_return_count}",
+                )
+            if expected_etb_return_names and returned_names != expected_etb_return_names:
+                fail(
+                    "battle_execution",
+                    f"{card['name']} returned land names={returned_names}, expected {expected_etb_return_names}",
+                )
+            return_event = next(
+                (
+                    data
+                    for replay_event, data in events[before_events:]
+                    if replay_event == "trigger_resolved"
+                    and data.get("card") == card.get("name")
+                    and data.get("effect") == "return_lands_to_hand"
+                ),
+                None,
+            )
+            if return_event is None:
+                fail("battle_events", f"missing {card['name']} return_lands_to_hand ETB event")
+            if int(return_event.get("returned_count") or 0) != expected_etb_return_count:
+                fail(
+                    "battle_events",
+                    f"{card['name']} returned_count event={return_event.get('returned_count')}, "
+                    f"expected {expected_etb_return_count}",
+                )
 
     active.refresh_mana_sources(turn=turn)
 
@@ -5546,6 +5600,8 @@ def run_simple_mana_source_refresh(
         "support_tapped_count": expected_support_tapped_count,
         "life_after_refresh": active.life,
         "conditional_life_loss_by_color": expected_life_loss_by_color,
+        "etb_returned_lands_to_hand_count": expected_etb_return_count,
+        "hand_size": len(active.hand),
     }
 
 

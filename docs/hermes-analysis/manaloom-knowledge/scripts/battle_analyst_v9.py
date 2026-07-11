@@ -21219,6 +21219,49 @@ def resolve_generic_permanent_etb(
                 opponents=opponents,
                 source_event="etb_land_ramp",
             )
+    if effect_data.get("etb_return_controlled_lands_to_hand_count"):
+        requested = max(0, int(effect_data.get("etb_return_controlled_lands_to_hand_count") or 0))
+        include_source = bool(effect_data.get("etb_return_controlled_lands_can_include_source"))
+        land_candidates = [
+            candidate
+            for candidate in list(getattr(player, "battlefield", []) or [])
+            if isinstance(candidate, dict)
+            and (include_source or candidate is not permanent)
+            and is_effective_land(candidate)
+        ]
+        selected_lands = land_candidates[:requested]
+        hand_before = len(getattr(player, "hand", []) or [])
+        battlefield_lands_before = len(land_candidates)
+        returned_names: list[str] = []
+        destinations: list[str] = []
+        for land in selected_lands:
+            destination = move_permanent_from_battlefield_to_hand(
+                player,
+                land,
+                reason="etb_return_controlled_lands_to_hand",
+                source=permanent,
+                turn=turn,
+            )
+            destinations.append(destination)
+            if destination == "hand":
+                returned_names.append(str(land.get("name") or "?"))
+        emit_replay_event(
+            "trigger_resolved",
+            player=player.name,
+            card=permanent.get("name", "?"),
+            trigger="enters_battlefield",
+            effect="return_lands_to_hand",
+            requested_count=requested,
+            available_land_count=battlefield_lands_before,
+            returned_count=len(returned_names),
+            returned_names=returned_names,
+            destinations=destinations,
+            hand_before=hand_before,
+            hand_after=len(getattr(player, "hand", []) or []),
+            turn=turn,
+            phase=phase,
+            **replay_rule_fields(effect_data),
+        )
     if effect_data.get("etb_discard_hand_then_draw_count"):
         discarded_cards = list(player.hand)
         player.hand = []
