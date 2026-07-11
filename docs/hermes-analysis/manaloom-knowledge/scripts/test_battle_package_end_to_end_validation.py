@@ -5805,6 +5805,39 @@ def test_simple_mana_source_refresh_runner_executes_partial_mana_rule() -> None:
     assert result["tapped"] is True
 
 
+def test_creature_enters_tapped_runner_uses_prepare_entering_permanent() -> None:
+    battle = validator.load_battle(validator.DEFAULT_BATTLE)
+    previous_get_card_effect = battle.get_card_effect
+    battle.get_card_effect = lambda card: {
+        "effect": "creature",
+        "battle_model_scope": "xmage_creature_enters_tapped_v1",
+        "enters_tapped": True,
+        "enters_battlefield_tapped": True,
+    }
+    try:
+        result = validator.run_creature_enters_tapped(
+            battle,
+            {
+                "name": "Diregraf Ghoul enters the battlefield tapped",
+                "type": "creature_enters_tapped",
+                "card": {
+                    "name": "Diregraf Ghoul",
+                    "type_line": "Creature - Zombie",
+                    "power": 2,
+                    "toughness": 2,
+                },
+                "expected_tapped": True,
+            },
+            [],
+        )
+    finally:
+        battle.get_card_effect = previous_get_card_effect
+
+    assert result["card_name"] == "Diregraf Ghoul"
+    assert result["actual_tapped"] is True
+    assert result["battlefield_count"] == 1
+
+
 def test_simple_mana_source_refresh_runner_resolves_etb_return_lands() -> None:
     battle = validator.load_battle(validator.DEFAULT_BATTLE)
     events = []

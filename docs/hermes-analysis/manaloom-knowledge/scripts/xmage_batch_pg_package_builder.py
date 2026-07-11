@@ -3621,6 +3621,28 @@ def simple_mana_source_execution_scenario_from_expected_rule(rule: dict[str, Any
     return scenario
 
 
+def creature_enters_tapped_execution_scenario_from_expected_rule(rule: dict[str, Any]) -> dict[str, Any] | None:
+    required = dict(rule.get("required_effect_fields") or {})
+    if required.get("effect") != "creature":
+        return None
+    if required.get("battle_model_scope") != "xmage_creature_enters_tapped_v1":
+        return None
+    if not required.get("enters_tapped"):
+        return None
+    return {
+        "name": f"{rule['card_name']} enters the battlefield tapped",
+        "type": "creature_enters_tapped",
+        "card": {
+            "name": rule["card_name"],
+            "type_line": "Creature",
+            "power": 2,
+            "toughness": 2,
+        },
+        "expected_tapped": True,
+        "logical_rule_key": rule["logical_rule_key"],
+    }
+
+
 def restricted_mana_formidable_life_reset_execution_scenario_from_expected_rule(
     rule: dict[str, Any],
 ) -> dict[str, Any] | None:
@@ -8806,6 +8828,7 @@ def execution_scenario_from_expected_rule(rule: dict[str, Any]) -> dict[str, Any
         or mana_activation_cast_trigger_execution_scenario_from_expected_rule(rule)
         or restricted_mana_formidable_life_reset_execution_scenario_from_expected_rule(rule)
         or mana_source_etb_draw_unblocked_control_transfer_execution_scenario_from_expected_rule(rule)
+        or creature_enters_tapped_execution_scenario_from_expected_rule(rule)
         or simple_mana_source_execution_scenario_from_expected_rule(rule)
         or sacrifice_mana_source_execution_scenario_from_expected_rule(rule)
         or damage_each_opponent_spell_execution_scenario_from_expected_rule(rule)

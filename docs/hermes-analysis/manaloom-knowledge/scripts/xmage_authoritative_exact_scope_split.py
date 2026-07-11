@@ -200,6 +200,14 @@ ETB_SCRY_CREATURE_UNIT = (
     "xmage_signature::ScryEffect::EntersBattlefieldTriggeredAbility::"
     "no_target_class::no_condition_class::triggered_ability"
 )
+CREATURE_ENTERS_TAPPED_ABILITY_UNIT = (
+    "xmage_signature::no_effect_class::EntersBattlefieldTappedAbility::"
+    "no_target_class::no_condition_class::no_signal"
+)
+CREATURE_ENTERS_TAPPED_EFFECT_UNIT = (
+    "xmage_signature::TapSourceEffect::EntersBattlefieldAbility::"
+    "no_target_class::no_condition_class::no_signal"
+)
 SUPPORTED_UNITS = {
     DRAW_UNIT,
     DAMAGE_UNIT,
@@ -244,6 +252,8 @@ SUPPORTED_UNITS = {
     TARGET_PLAYER_DISCARD_UNIT,
     PREVENT_ALL_COMBAT_DAMAGE_SPELL_UNIT,
     PREVENT_ALL_COMBAT_DAMAGE_CYCLING_SPELL_UNIT,
+    CREATURE_ENTERS_TAPPED_ABILITY_UNIT,
+    CREATURE_ENTERS_TAPPED_EFFECT_UNIT,
 }
 
 DRAW_SCOPE = "xmage_fixed_source_controller_draw_spell_v1"
@@ -516,6 +526,7 @@ CREATURE_ENTERS_LIFE_GAIN_TRIGGER_SCOPE = "xmage_creature_enters_life_gain_trigg
 CREATURE_ENTERS_DRAW_TRIGGER_SCOPE = "xmage_creature_enters_draw_trigger_v1"
 ETB_DRAW_CREATURE_SCOPE = "xmage_creature_etb_draw_cards_v1"
 ETB_SCRY_CREATURE_SCOPE = "xmage_creature_etb_scry_v1"
+CREATURE_ENTERS_TAPPED_SCOPE = "xmage_creature_enters_tapped_v1"
 ETB_OPTIONAL_DISCARD_DRAW_CREATURE_SCOPE = "xmage_creature_etb_optional_discard_draw_cards_v1"
 ETB_DRAW_DISCARD_CREATURE_SCOPE = "xmage_creature_etb_draw_discard_cards_v1"
 ETB_DYNAMIC_DRAW_CREATURE_SCOPE = "xmage_creature_etb_dynamic_draw_cards_v1"
@@ -13966,6 +13977,24 @@ def source_is_static_cant_be_blocked(source: str) -> bool:
         and "CantBeBlockedByCreaturesSourceEffect" not in text
         and "SimpleEvasionAbility" not in text
     )
+
+
+def oracle_is_creature_enters_tapped(metadata: dict[str, Any]) -> bool:
+    text = strip_parenthetical_reminders(str(metadata.get("oracle_text") or ""))
+    text = re.sub(r"\s+", " ", text).strip().lower()
+    return text == "this creature enters tapped."
+
+
+def source_is_creature_enters_tapped(source: str, unit: str) -> bool:
+    text = source or ""
+    if unit == CREATURE_ENTERS_TAPPED_ABILITY_UNIT:
+        return re.search(r"new\s+EntersBattlefieldTappedAbility\s*\(\s*\)", text) is not None
+    if unit == CREATURE_ENTERS_TAPPED_EFFECT_UNIT:
+        return (
+            re.search(r"new\s+EntersBattlefieldAbility\s*\(", text) is not None
+            and re.search(r"new\s+TapSourceEffect\s*\(\s*\)", text) is not None
+        )
+    return False
 
 
 def oracle_is_static_cant_block(metadata: dict[str, Any]) -> bool:
@@ -29406,6 +29435,8 @@ def proposal_notes(row: dict[str, Any], scope: str) -> str:
         scope_kind = "creature static flying with block-only-flying restriction"
     elif scope == STATIC_HORSEMANSHIP_CREATURE_SCOPE:
         scope_kind = "creature static self horsemanship evasion"
+    elif scope == CREATURE_ENTERS_TAPPED_SCOPE:
+        scope_kind = "creature replacement/static entry state entering the battlefield tapped"
     elif scope in {
         ETB_LIFE_GAIN_CREATURE_SCOPE,
         ETB_DYNAMIC_LIFE_GAIN_CREATURE_SCOPE,
@@ -29575,6 +29606,10 @@ def split_row(
         is_static_flying_can_block_only_flying_creature_unit(row)
     )
     static_horsemanship_creature_unit = is_static_horsemanship_creature_unit(row)
+    creature_enters_tapped_unit = unit in {
+        CREATURE_ENTERS_TAPPED_ABILITY_UNIT,
+        CREATURE_ENTERS_TAPPED_EFFECT_UNIT,
+    }
     etb_life_gain_creature_unit = is_creature_etb_life_gain_unit(row)
     creature_enters_life_gain_unit = is_creature_enters_life_gain_unit(row)
     creature_enters_draw_unit = is_creature_enters_draw_unit(row)
@@ -30467,6 +30502,43 @@ def split_row(
             metadata,
             effect_json,
             family_id="xmage_static_self_cant_be_blocked_creature",
+        ), "selected_exact_scope"
+
+    if creature_enters_tapped_unit:
+        if not is_creature_metadata(metadata):
+            return None, "creature_enters_tapped_not_creature"
+        if not oracle_is_creature_enters_tapped(metadata):
+            return None, "creature_enters_tapped_oracle_not_exact"
+        if not source_is_creature_enters_tapped(source_text, unit):
+            return None, "creature_enters_tapped_source_not_exact"
+        effect_json = {
+            "effect": "creature",
+            "battle_model_scope": CREATURE_ENTERS_TAPPED_SCOPE,
+            "ability_kind": "static",
+            "static_effect": "self_enters_tapped",
+            "target": "self",
+            "target_controller": "self",
+            "target_constraints": {"source": "self", "card_types": ["creature"]},
+            "enters_tapped": True,
+            "enters_battlefield_tapped": True,
+            "xmage_ability_class": (
+                "EntersBattlefieldTappedAbility"
+                if unit == CREATURE_ENTERS_TAPPED_ABILITY_UNIT
+                else "EntersBattlefieldAbility"
+            ),
+            "xmage_effect_class": (
+                None
+                if unit == CREATURE_ENTERS_TAPPED_ABILITY_UNIT
+                else "TapSourceEffect"
+            ),
+        }
+        if effect_json["xmage_effect_class"] is None:
+            effect_json.pop("xmage_effect_class")
+        return build_proposal(
+            row,
+            metadata,
+            effect_json,
+            family_id="xmage_creature_enters_tapped",
         ), "selected_exact_scope"
 
     if static_cant_block_creature_unit:
@@ -43724,6 +43796,7 @@ def build_exact_split_report(
                 "no-effect/no-signal ProtectionAbility creature rows, optionally with static self keywords, with exact Oracle/XMage protection from colors, card types, subtypes, or supported filters",
                 "passive::static_cast_as_flash_permission_variant_review_v1 rows with CastAsThoughItHadFlashAllEffect, SimpleStaticAbility, only safe static keyword auxiliaries including FlashAbility, and exact Oracle/XMage timing-permission filters",
                 "no-effect/no-signal CantBeBlockedSourceAbility creature rows with exact Oracle/XMage self can't-be-blocked evasion",
+                "no-effect EntersBattlefieldTappedAbility and TapSourceEffect EntersBattlefieldAbility creature rows with exact Oracle/XMage self enters-tapped state",
                 "no-effect/no-signal basic landwalk creature rows with exact Oracle/XMage self landwalk evasion",
                 "no-effect/no-signal FlyingAbility plus CanBlockOnlyFlyingAbility creature rows with exact Oracle/XMage block-only-flying restriction",
                 "no-effect/no-signal HorsemanshipAbility creature rows with exact Oracle/XMage self horsemanship evasion",

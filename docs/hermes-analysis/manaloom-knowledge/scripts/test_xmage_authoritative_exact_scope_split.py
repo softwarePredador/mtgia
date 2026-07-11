@@ -1086,6 +1086,80 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertIsNone(proposal)
         self.assertEqual(reason, "static_cant_be_blocked_oracle_not_exact")
 
+    def test_creature_enters_tapped_ability_maps_to_runtime(self) -> None:
+        row = queue_row(
+            split.CREATURE_ENTERS_TAPPED_ABILITY_UNIT,
+            effect_classes=[],
+            ability_kind="static",
+            ability_classes=["EntersBattlefieldTappedAbility"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Diregraf Ghoul",
+                type_line="Creature - Zombie",
+                oracle_text="This creature enters tapped.",
+            ),
+            source_text="""
+                import mage.abilities.keyword.EntersBattlefieldTappedAbility;
+                this.addAbility(new EntersBattlefieldTappedAbility());
+            """,
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.CREATURE_ENTERS_TAPPED_SCOPE)
+        self.assertEqual(effect["effect"], "creature")
+        self.assertTrue(effect["enters_tapped"])
+        self.assertTrue(effect["enters_battlefield_tapped"])
+        self.assertEqual(effect["static_effect"], "self_enters_tapped")
+
+    def test_creature_enters_tapped_tap_source_effect_maps_to_runtime(self) -> None:
+        row = queue_row(
+            split.CREATURE_ENTERS_TAPPED_EFFECT_UNIT,
+            effect_classes=["TapSourceEffect"],
+            ability_kind="static",
+            ability_classes=["EntersBattlefieldAbility"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Shambling Ghoul",
+                type_line="Creature - Zombie",
+                oracle_text="This creature enters tapped.",
+            ),
+            source_text="""
+                this.addAbility(new EntersBattlefieldAbility(new TapSourceEffect()));
+            """,
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.CREATURE_ENTERS_TAPPED_SCOPE)
+        self.assertTrue(effect["enters_tapped"])
+        self.assertEqual(effect["xmage_effect_class"], "TapSourceEffect")
+        self.assertEqual(effect["xmage_ability_class"], "EntersBattlefieldAbility")
+
+    def test_creature_enters_tapped_blocks_nonexact_oracle(self) -> None:
+        row = queue_row(
+            split.CREATURE_ENTERS_TAPPED_ABILITY_UNIT,
+            effect_classes=[],
+            ability_kind="static",
+            ability_classes=["EntersBattlefieldTappedAbility"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Conditional Ghoul",
+                type_line="Creature - Zombie",
+                oracle_text="This creature enters tapped unless you control a Swamp.",
+            ),
+            source_text="this.addAbility(new EntersBattlefieldTappedAbility());",
+        )
+
+        self.assertIsNone(proposal)
+        self.assertEqual(reason, "creature_enters_tapped_oracle_not_exact")
+
     def test_static_cant_block_creature_maps_to_runtime(self) -> None:
         row = queue_row(
             split.CANT_BLOCK_SOURCE_UNIT,

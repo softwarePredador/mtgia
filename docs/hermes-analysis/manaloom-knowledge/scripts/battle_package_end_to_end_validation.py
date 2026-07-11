@@ -5921,6 +5921,40 @@ def run_simple_mana_source_refresh(
     }
 
 
+def run_creature_enters_tapped(
+    battle,
+    scenario: dict[str, Any],
+    events: list[tuple[str, dict[str, Any]]],
+) -> dict[str, Any]:
+    card = dict(scenario["card"])
+    effect = battle.get_card_effect(card)
+    if effect.get("effect") != "creature":
+        fail("battle_execution", f"{card['name']} effect={effect.get('effect')!r}")
+    if effect.get("battle_model_scope") != "xmage_creature_enters_tapped_v1":
+        fail("battle_execution", f"{card['name']} scope={effect.get('battle_model_scope')!r}")
+    active = battle.Player(str(scenario.get("player") or "Creature Entry Controller"), None, [])
+    all_players = [active]
+    permanent = battle.prepare_entering_permanent(
+        battle.enrich_card({**card, **effect}),
+        controller=active,
+        all_players=all_players,
+        turn=int(scenario.get("turn") or 1),
+    )
+    active.battlefield.append(permanent)
+    expected_tapped = bool(scenario.get("expected_tapped", True))
+    if bool(permanent.get("tapped")) != expected_tapped:
+        fail("battle_execution", f"{card['name']} tapped={permanent.get('tapped')!r}")
+    if not battle.is_battlefield_creature(permanent):
+        fail("battle_execution", f"{card['name']} did not enter as a creature permanent")
+    return {
+        "scenario": scenario.get("name"),
+        "card_name": card["name"],
+        "expected_tapped": expected_tapped,
+        "actual_tapped": bool(permanent.get("tapped")),
+        "battlefield_count": len(active.battlefield),
+    }
+
+
 def run_restricted_mana_formidable_life_reset(
     battle,
     scenario: dict[str, Any],
@@ -13560,6 +13594,7 @@ SCENARIO_RUNNERS = {
     "single_target_removal_and_scry": run_single_target_removal_and_scry,
     "single_target_removal_and_surveil": run_single_target_removal_and_surveil,
     "multi_target_removal": run_multi_target_removal,
+    "creature_enters_tapped": run_creature_enters_tapped,
     "simple_mana_source_refresh": run_simple_mana_source_refresh,
     "restricted_mana_formidable_life_reset": run_restricted_mana_formidable_life_reset,
     "mana_source_etb_draw_unblocked_control_transfer": run_mana_source_etb_draw_unblocked_control_transfer,

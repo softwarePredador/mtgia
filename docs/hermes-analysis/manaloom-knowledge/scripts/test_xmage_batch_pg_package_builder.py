@@ -1786,6 +1786,29 @@ def test_simple_mana_source_execution_scenario_preserves_enters_tapped_state() -
     assert scenario["source_overrides"] == {"tapped": True}
 
 
+def test_creature_enters_tapped_execution_scenario_is_manifested() -> None:
+    proposal = {
+        "normalized_name": "diregraf ghoul",
+        "card_name": "Diregraf Ghoul",
+        "oracle_hash": "hash-diregraf",
+        "logical_rule_key": "battle_rule_v1:diregraf",
+        "effect_json": {
+            "effect": "creature",
+            "battle_model_scope": "xmage_creature_enters_tapped_v1",
+            "enters_tapped": True,
+            "enters_battlefield_tapped": True,
+        },
+    }
+
+    expected = builder.expected_rule_from_proposal(proposal)
+    scenario = builder.execution_scenario_from_expected_rule(expected)
+
+    assert expected["required_effect_fields"]["enters_tapped"] is True
+    assert scenario["type"] == "creature_enters_tapped"
+    assert scenario["expected_tapped"] is True
+    assert scenario["card"]["type_line"] == "Creature"
+
+
 def test_simple_mana_source_execution_scenario_seeds_etb_return_lands() -> None:
     rule = {
         "card_name": "Khalni Gem",
