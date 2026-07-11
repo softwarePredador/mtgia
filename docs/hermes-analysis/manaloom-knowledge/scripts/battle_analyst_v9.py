@@ -20191,6 +20191,55 @@ def etb_dynamic_draw_count(player, permanent, effect_data):
     return 0
 
 
+def etb_draw_condition_satisfied(player, permanent, effect_data):
+    condition = str((effect_data or {}).get("etb_draw_condition") or "").strip().lower()
+    if not condition:
+        return True
+    status = str((effect_data or {}).get("etb_draw_condition_status") or "").strip().lower()
+    if status != "runtime_executor_v1":
+        return False
+    if condition != "controller_controls_matching_permanent":
+        return False
+    try:
+        min_count = max(1, int((effect_data or {}).get("etb_draw_condition_min_count") or 1))
+    except (TypeError, ValueError):
+        min_count = 1
+    card_types = [
+        str(value).strip().lower()
+        for value in _as_list((effect_data or {}).get("etb_draw_condition_card_types"))
+        if str(value).strip()
+    ]
+    subtypes = [
+        str(value).strip().lower()
+        for value in _as_list((effect_data or {}).get("etb_draw_condition_subtypes"))
+        if str(value).strip()
+    ]
+    colors = [
+        str(value).strip()
+        for value in _as_list((effect_data or {}).get("etb_draw_condition_colors"))
+        if str(value).strip()
+    ]
+    exclude_source = bool((effect_data or {}).get("etb_draw_condition_exclude_source"))
+
+    matched = 0
+    for candidate in _controlled_permanents(player):
+        if exclude_source and candidate is permanent:
+            continue
+        if card_types and not all(
+            card_type == "permanent" or permanent_has_card_type(candidate, card_type)
+            for card_type in card_types
+        ):
+            continue
+        if subtypes and not all(permanent_has_subtype(candidate, subtype) for subtype in subtypes):
+            continue
+        if colors and not any(_permanent_has_color(candidate, color) for color in colors):
+            continue
+        matched += 1
+        if matched >= min_count:
+            return True
+    return False
+
+
 def resolve_etb_optional_discard_draw(
     player,
     opponents,
@@ -20642,37 +20691,56 @@ def resolve_generic_permanent_etb(
         library_before = len(player.library)
         life_loss = int(effect_data.get("etb_life_loss") or 0)
         life_before = int(getattr(player, "life", 0))
-        drawn = player.draw(requested, rng)
-        if all_players is not None:
-            process_player_draw_triggers(
-                player,
-                len(drawn),
-                turn,
-                phase,
-                all_players,
-                stack=stack,
-                turn_player=player,
+        if not etb_draw_condition_satisfied(player, permanent, effect_data):
+            emit_replay_event(
+                "trigger_skipped",
+                player=player.name,
+                card=permanent.get("name", "?"),
+                trigger="enters_battlefield",
+                effect="draw_cards",
+                reason="etb_draw_condition_not_met",
+                cards_requested=requested,
+                etb_draw_condition=effect_data.get("etb_draw_condition"),
+                etb_draw_condition_min_count=effect_data.get("etb_draw_condition_min_count"),
+                etb_draw_condition_card_types=effect_data.get("etb_draw_condition_card_types"),
+                etb_draw_condition_subtypes=effect_data.get("etb_draw_condition_subtypes"),
+                etb_draw_condition_colors=effect_data.get("etb_draw_condition_colors"),
+                turn=turn,
+                phase=phase,
+                **replay_rule_fields(effect_data),
             )
-        if life_loss > 0:
-            change_life(player, -life_loss)
-        emit_replay_event(
-            "trigger_resolved",
-            player=player.name,
-            card=permanent.get("name", "?"),
-            trigger="enters_battlefield",
-            effect="draw_cards",
-            cards_requested=requested,
-            cards_drawn=len(drawn),
-            hand_before=hand_before,
-            hand_after=len(player.hand),
-            library_before=library_before,
-            library_after=len(player.library),
-            life_lost=max(0, life_before - int(getattr(player, "life", life_before))),
-            life_before=life_before,
-            life_after=int(getattr(player, "life", life_before)),
-            turn=turn,
-            **replay_rule_fields(effect_data),
-        )
+        else:
+            drawn = player.draw(requested, rng)
+            if all_players is not None:
+                process_player_draw_triggers(
+                    player,
+                    len(drawn),
+                    turn,
+                    phase,
+                    all_players,
+                    stack=stack,
+                    turn_player=player,
+                )
+            if life_loss > 0:
+                change_life(player, -life_loss)
+            emit_replay_event(
+                "trigger_resolved",
+                player=player.name,
+                card=permanent.get("name", "?"),
+                trigger="enters_battlefield",
+                effect="draw_cards",
+                cards_requested=requested,
+                cards_drawn=len(drawn),
+                hand_before=hand_before,
+                hand_after=len(player.hand),
+                library_before=library_before,
+                library_after=len(player.library),
+                life_lost=max(0, life_before - int(getattr(player, "life", life_before))),
+                life_before=life_before,
+                life_after=int(getattr(player, "life", life_before)),
+                turn=turn,
+                **replay_rule_fields(effect_data),
+            )
     if effect_data.get("etb_scry_count"):
         count = max(0, int(effect_data.get("etb_scry_count") or 0))
         library_before = len(getattr(player, "library", []) or [])

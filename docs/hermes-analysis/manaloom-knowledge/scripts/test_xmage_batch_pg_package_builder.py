@@ -548,6 +548,39 @@ def test_creature_etb_draw_discard_execution_scenario_is_manifested() -> None:
     assert scenario["expected_keywords"] == ["flying"]
 
 
+def test_creature_etb_conditional_draw_execution_scenario_is_manifested() -> None:
+    proposal = {
+        "normalized_name": "scholar of stars",
+        "card_name": "Scholar of Stars",
+        "oracle_hash": "hash-scholar-of-stars",
+        "logical_rule_key": "battle_rule_v1:scholar-of-stars",
+        "effect_json": {
+            "effect": "creature",
+            "battle_model_scope": "xmage_creature_etb_draw_cards_v1",
+            "ability_kind": "triggered",
+            "trigger": "enters_battlefield",
+            "trigger_effect": "draw_cards",
+            "etb_draw_count": 1,
+            "etb_draw_condition_status": "runtime_executor_v1",
+            "etb_draw_condition": "controller_controls_matching_permanent",
+            "etb_draw_condition_min_count": 1,
+            "etb_draw_condition_card_types": ["artifact"],
+        },
+    }
+
+    expected = builder.expected_rule_from_proposal(proposal)
+    required = expected["required_effect_fields"]
+    scenario = builder.execution_scenario_from_expected_rule(expected)
+
+    assert required["etb_draw_condition_status"] == "runtime_executor_v1"
+    assert required["etb_draw_condition"] == "controller_controls_matching_permanent"
+    assert required["etb_draw_condition_card_types"] == ["artifact"]
+    assert scenario["type"] == "creature_etb_draw"
+    assert scenario["expected_draw_count"] == 1
+    assert scenario["expected_condition"] == "controller_controls_matching_permanent"
+    assert scenario["controller_battlefield"][0]["type_line"] == "Artifact"
+
+
 def test_creature_etb_each_player_sacrifice_execution_scenario_is_manifested() -> None:
     proposal = {
         "normalized_name": "fleshbag marauder",

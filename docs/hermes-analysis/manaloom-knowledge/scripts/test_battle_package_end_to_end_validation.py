@@ -4834,6 +4834,60 @@ def test_creature_etb_draw_discard_runner_executes_trigger() -> None:
     assert any(event == "etb_draw_discard_resolved" for event, _ in events)
 
 
+def test_creature_etb_conditional_draw_runner_executes_trigger() -> None:
+    battle = validator.load_battle(validator.DEFAULT_BATTLE)
+    events = []
+    previous_handler = battle.REPLAY_EVENT_HANDLER
+    previous_get_card_effect = battle.get_card_effect
+    battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+    battle.get_card_effect = lambda card: {
+        "effect": "creature",
+        "battle_model_scope": "xmage_creature_etb_draw_cards_v1",
+        "ability_kind": "triggered",
+        "trigger": "enters_battlefield",
+        "trigger_effect": "draw_cards",
+        "etb_draw_count": 1,
+        "etb_draw_condition_status": "runtime_executor_v1",
+        "etb_draw_condition": "controller_controls_matching_permanent",
+        "etb_draw_condition_min_count": 1,
+        "etb_draw_condition_card_types": ["artifact"],
+        "_rule_logical_key": "battle_rule_v1:scholar-of-stars",
+    }
+    try:
+        result = validator.run_creature_etb_draw(
+            battle,
+            {
+                "name": "Scholar of Stars enters and draws",
+                "type": "creature_etb_draw",
+                "card": {"name": "Scholar of Stars", "type_line": "Creature", "effect": "creature"},
+                "controller_battlefield": [
+                    {"name": "E2E Artifact", "type_line": "Artifact", "effect": "artifact"}
+                ],
+                "controller_library": [
+                    {"name": "E2E Drawn Card", "type_line": "Instant", "effect": "draw_cards", "cmc": 2}
+                ],
+                "expected_condition": "controller_controls_matching_permanent",
+                "expected_draw_count": 1,
+                "expected_hand_after": 1,
+                "logical_rule_key": "battle_rule_v1:scholar-of-stars",
+            },
+            events,
+        )
+    finally:
+        battle.REPLAY_EVENT_HANDLER = previous_handler
+        battle.get_card_effect = previous_get_card_effect
+
+    assert result["card_name"] == "Scholar of Stars"
+    assert result["cards_drawn"] == 1
+    assert result["hand_after"] == 1
+    assert any(
+        event == "trigger_resolved"
+        and data.get("card") == "Scholar of Stars"
+        and data.get("effect") == "draw_cards"
+        for event, data in events
+    )
+
+
 def test_creature_etb_target_stat_modifier_runner_executes_trigger() -> None:
     battle = validator.load_battle(validator.DEFAULT_BATTLE)
     events = []

@@ -2180,6 +2180,102 @@ def run_creature_etb_draw_discard(
     }
 
 
+def run_creature_etb_draw(
+    battle,
+    scenario: dict[str, Any],
+    events: list[tuple[str, dict[str, Any]]],
+) -> dict[str, Any]:
+    card = dict(scenario["card"])
+    active = battle.Player(str(scenario.get("player") or "ETB Draw Controller"), None, [])
+    opponent = battle.Player(str(scenario.get("opponent") or "Opponent"), None, [])
+    active.library = [battle.enrich_card(dict(card)) for card in (scenario.get("controller_library") or [])]
+    active.battlefield.extend(
+        battle.enrich_card(dict(permanent))
+        for permanent in (scenario.get("controller_battlefield") or [])
+        if isinstance(permanent, dict)
+    )
+    expected_draw_count = int(scenario.get("expected_draw_count") or 0)
+    expected_hand_after = int(
+        scenario.get("expected_hand_after")
+        if scenario.get("expected_hand_after") is not None
+        else expected_draw_count
+    )
+
+    effect_data = battle.get_card_effect(card)
+    expected_condition = scenario.get("expected_condition")
+    if expected_condition and effect_data.get("etb_draw_condition") != expected_condition:
+        fail(
+            "battle_execution",
+            f"{card['name']} condition={effect_data.get('etb_draw_condition')!r}, expected {expected_condition!r}",
+        )
+    permanent = battle.prepare_entering_permanent(
+        battle.enrich_card({**card, **effect_data}),
+        controller=active,
+        all_players=[active, opponent],
+        turn=int(scenario.get("turn") or 6),
+    )
+    active.battlefield.append(permanent)
+    expected_keywords = [str(value) for value in (scenario.get("expected_keywords") or [])]
+    missing_keywords = [
+        keyword
+        for keyword in expected_keywords
+        if not battle.card_has_keyword(permanent, keyword)
+    ]
+    if missing_keywords:
+        fail(
+            "battle_execution",
+            f"{card['name']} missing expected ETB permanent keywords: {missing_keywords}",
+        )
+
+    before_events = len(events)
+    library_before = len(active.library)
+    battle.resolve_generic_permanent_etb(
+        active,
+        [opponent],
+        permanent,
+        effect_data,
+        int(scenario.get("turn") or 6),
+        random.Random(int(scenario.get("seed") or 6079)),
+        all_players=[active, opponent],
+    )
+
+    event = next(
+        (
+            data
+            for event_name, data in events[before_events:]
+            if event_name == "trigger_resolved"
+            and data.get("card") == card.get("name")
+            and data.get("trigger") == "enters_battlefield"
+            and data.get("effect") == "draw_cards"
+        ),
+        None,
+    )
+    if event is None:
+        fail("battle_events", f"missing {card['name']} ETB draw trigger_resolved event")
+    if int(event.get("cards_drawn") or 0) != expected_draw_count:
+        fail(
+            "battle_events",
+            f"{card['name']} cards_drawn={event.get('cards_drawn')}, expected {expected_draw_count}",
+        )
+    if len(active.hand) != expected_hand_after:
+        fail(
+            "battle_execution",
+            f"{card['name']} hand after ETB draw={len(active.hand)}, expected {expected_hand_after}",
+        )
+    if len(active.library) != library_before - expected_draw_count:
+        fail(
+            "battle_execution",
+            f"{card['name']} library after ETB draw={len(active.library)}",
+        )
+    return {
+        "scenario": scenario.get("name"),
+        "card_name": card["name"],
+        "cards_drawn": expected_draw_count,
+        "hand_after": len(active.hand),
+        "validated_keywords": expected_keywords,
+    }
+
+
 def run_creature_etb_target_stat_modifier(
     battle,
     scenario: dict[str, Any],
@@ -10836,6 +10932,7 @@ SCENARIO_RUNNERS = {
     "creature_etb_create_treasure": run_creature_etb_create_treasure,
     "creature_etb_create_tokens": run_creature_etb_create_tokens,
     "creature_etb_dynamic_life_gain": run_creature_etb_dynamic_life_gain,
+    "creature_etb_draw": run_creature_etb_draw,
     "creature_etb_draw_discard": run_creature_etb_draw_discard,
     "creature_etb_target_stat_modifier": run_creature_etb_target_stat_modifier,
     "creature_etb_library_pick": run_creature_etb_library_pick,

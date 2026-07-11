@@ -10232,6 +10232,164 @@ class XMageExactScopeRuntimeTest(unittest.TestCase):
             )
         )
 
+    def test_creature_etb_conditional_draw_requires_matching_permanent(self) -> None:
+        active = self.battle.Player(
+            "Active",
+            None,
+            [{"name": "Drawn A"}, {"name": "Drawn B"}],
+        )
+        opponent = self.battle.Player("Opponent", None, [])
+        effect = {
+            "effect": "creature",
+            "battle_model_scope": "xmage_creature_etb_draw_cards_v1",
+            "ability_kind": "triggered",
+            "trigger": "enters_battlefield",
+            "etb_draw_count": 1,
+            "etb_draw_condition_status": "runtime_executor_v1",
+            "etb_draw_condition": "controller_controls_matching_permanent",
+            "etb_draw_condition_min_count": 1,
+            "etb_draw_condition_card_types": ["artifact"],
+            "_rule_logical_key": "battle_rule_v1:fixture_etb_conditional_draw",
+        }
+
+        self.battle.apply_effect_immediate(
+            active,
+            [opponent],
+            {
+                "name": "Fixture Scholar",
+                "type_line": "Creature - Human Wizard",
+                "oracle_text": "When Fixture Scholar enters, if you control an artifact, draw a card.",
+                "power": 3,
+                "toughness": 2,
+            },
+            turn=4,
+            rng=random.Random(1461),
+            effect_data_override=effect,
+        )
+
+        self.assertEqual(active.hand, [])
+        self.assertEqual([card["name"] for card in active.library], ["Drawn A", "Drawn B"])
+        self.assertTrue(
+            any(
+                event == "trigger_skipped"
+                and data.get("card") == "Fixture Scholar"
+                and data.get("reason") == "etb_draw_condition_not_met"
+                and data.get("effect") == "draw_cards"
+                for event, data in self.events
+            )
+        )
+
+        active.battlefield.clear()
+        active.hand.clear()
+        active.library = [{"name": "Drawn A"}, {"name": "Drawn B"}]
+        active.battlefield.append(
+            {
+                "name": "Fixture Artifact",
+                "type_line": "Artifact",
+                "effect": "artifact",
+                "card_types": ["artifact"],
+            }
+        )
+        self.events.clear()
+
+        self.battle.apply_effect_immediate(
+            active,
+            [opponent],
+            {
+                "name": "Fixture Scholar",
+                "type_line": "Creature - Human Wizard",
+                "oracle_text": "When Fixture Scholar enters, if you control an artifact, draw a card.",
+                "power": 3,
+                "toughness": 2,
+            },
+            turn=5,
+            rng=random.Random(1462),
+            effect_data_override=effect,
+        )
+
+        self.assertEqual([card["name"] for card in active.hand], ["Drawn A"])
+        self.assertEqual([card["name"] for card in active.library], ["Drawn B"])
+        self.assertTrue(
+            any(
+                event == "trigger_resolved"
+                and data.get("card") == "Fixture Scholar"
+                and data.get("effect") == "draw_cards"
+                and data.get("cards_drawn") == 1
+                for event, data in self.events
+            )
+        )
+
+    def test_creature_etb_conditional_draw_excludes_source_when_required(self) -> None:
+        active = self.battle.Player("Active", None, [{"name": "Drawn A"}])
+        opponent = self.battle.Player("Opponent", None, [])
+        effect = {
+            "effect": "creature",
+            "battle_model_scope": "xmage_creature_etb_draw_cards_v1",
+            "ability_kind": "triggered",
+            "trigger": "enters_battlefield",
+            "etb_draw_count": 1,
+            "etb_draw_condition_status": "runtime_executor_v1",
+            "etb_draw_condition": "controller_controls_matching_permanent",
+            "etb_draw_condition_min_count": 1,
+            "etb_draw_condition_subtypes": ["human"],
+            "etb_draw_condition_exclude_source": True,
+        }
+
+        self.battle.apply_effect_immediate(
+            active,
+            [opponent],
+            {
+                "name": "Fixture Human",
+                "type_line": "Creature - Human Soldier",
+                "oracle_text": "When Fixture Human enters, if you control another Human, draw a card.",
+                "power": 3,
+                "toughness": 2,
+            },
+            turn=4,
+            rng=random.Random(1463),
+            effect_data_override=effect,
+        )
+
+        self.assertEqual(active.hand, [])
+        self.assertTrue(
+            any(
+                event == "trigger_skipped"
+                and data.get("reason") == "etb_draw_condition_not_met"
+                for event, data in self.events
+            )
+        )
+
+        active.battlefield.clear()
+        active.hand.clear()
+        active.library = [{"name": "Drawn A"}]
+        active.battlefield.append(
+            {
+                "name": "Other Human",
+                "type_line": "Creature - Human",
+                "effect": "creature",
+                "power": 1,
+                "toughness": 1,
+            }
+        )
+        self.events.clear()
+
+        self.battle.apply_effect_immediate(
+            active,
+            [opponent],
+            {
+                "name": "Fixture Human",
+                "type_line": "Creature - Human Soldier",
+                "oracle_text": "When Fixture Human enters, if you control another Human, draw a card.",
+                "power": 3,
+                "toughness": 2,
+            },
+            turn=5,
+            rng=random.Random(1464),
+            effect_data_override=effect,
+        )
+
+        self.assertEqual([card["name"] for card in active.hand], ["Drawn A"])
+
     def test_creature_etb_optional_discard_draw_discards_then_draws(self) -> None:
         active = self.battle.Player("Active", None, [{"name": "Drawn A"}])
         opponent = self.battle.Player("Opponent", None, [])

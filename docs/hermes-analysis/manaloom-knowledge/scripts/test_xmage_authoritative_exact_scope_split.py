@@ -25767,6 +25767,121 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertTrue(effect["_keywords_are_self"])
         self.assertEqual(effect["etb_draw_count"], 2)
 
+    def test_creature_etb_conditional_draw_maps_controlled_permanent_conditions(self) -> None:
+        fixtures = [
+            (
+                "Scholar of Stars",
+                "When Scholar of Stars enters the battlefield, if you control an artifact, draw a card.",
+                """
+                    private static final Condition condition = new PermanentsOnTheBattlefieldCondition(
+                        new FilterControlledArtifactPermanent("you control an artifact"));
+                    this.addAbility(new EntersBattlefieldTriggeredAbility(new DrawCardSourceControllerEffect(1))
+                        .withInterveningIf(condition));
+                """,
+                {"etb_draw_condition_card_types": ["artifact"]},
+            ),
+            (
+                "Settlement Blacksmith",
+                "When Settlement Blacksmith enters the battlefield, if you control an Equipment, draw a card.",
+                """
+                    private static final Condition condition = new PermanentsOnTheBattlefieldCondition(
+                        new FilterControlledPermanent(SubType.EQUIPMENT, "you control an Equipment"));
+                    this.addAbility(new EntersBattlefieldTriggeredAbility(new DrawCardSourceControllerEffect(1))
+                        .withInterveningIf(condition));
+                """,
+                {"etb_draw_condition_subtypes": ["equipment"]},
+            ),
+            (
+                "Resistance Squad",
+                "When Resistance Squad enters the battlefield, if you control another Human, draw a card.",
+                """
+                    private static final FilterPermanent filter = new FilterControlledPermanent(SubType.HUMAN, "you control another Human");
+                    static { filter.add(AnotherPredicate.instance); }
+                    this.addAbility(new EntersBattlefieldTriggeredAbility(new DrawCardSourceControllerEffect(1))
+                        .withInterveningIf(condition));
+                """,
+                {
+                    "etb_draw_condition_subtypes": ["human"],
+                    "etb_draw_condition_exclude_source": True,
+                },
+            ),
+            (
+                "Rhox Meditant",
+                "When Rhox Meditant enters the battlefield, if you control a green permanent, draw a card.",
+                """
+                    private static final FilterControlledPermanent filter = new FilterControlledPermanent("you control a green permanent");
+                    static { filter.add(new ColorPredicate(ObjectColor.GREEN)); }
+                    this.addAbility(new EntersBattlefieldTriggeredAbility(new DrawCardSourceControllerEffect(1))
+                        .withInterveningIf(condition));
+                """,
+                {"etb_draw_condition_colors": ["green"]},
+            ),
+            (
+                "Opal Lake Gatekeepers",
+                "When Opal Lake Gatekeepers enters the battlefield, if you control two or more Gates, you may draw a card.",
+                """
+                    this.addAbility(new EntersBattlefieldTriggeredAbility(new DrawCardSourceControllerEffect(1), true)
+                        .withInterveningIf(YouControlTwoOrMoreGatesCondition.instance));
+                """,
+                {
+                    "etb_draw_condition_subtypes": ["gate"],
+                    "etb_draw_condition_min_count": 2,
+                    "etb_draw_optional": True,
+                },
+            ),
+        ]
+        for name, oracle, source_text, expected_fields in fixtures:
+            with self.subTest(name=name):
+                row = queue_row(
+                    split.DRAW_ENGINE_UNIT,
+                    effect_classes=["DrawCardSourceControllerEffect"],
+                    ability_kind="triggered",
+                    ability_classes=["EntersBattlefieldTriggeredAbility"],
+                    xmage_signals=["draw", "condition", "triggered_ability"],
+                )
+                proposal, reason = split.split_row(
+                    row,
+                    metadata(
+                        name=name,
+                        type_line="Creature - Human Wizard",
+                        oracle_text=oracle,
+                    ),
+                    source_text=source_text,
+                )
+
+                self.assertEqual(reason, "selected_exact_scope")
+                effect = proposal["effect_json"]
+                self.assertEqual(effect["battle_model_scope"], split.ETB_DRAW_CREATURE_SCOPE)
+                self.assertEqual(effect["etb_draw_count"], 1)
+                self.assertEqual(effect["etb_draw_condition_status"], "runtime_executor_v1")
+                self.assertEqual(effect["etb_draw_condition"], "controller_controls_matching_permanent")
+                for key, value in expected_fields.items():
+                    self.assertEqual(effect[key], value)
+
+    def test_creature_etb_conditional_draw_blocks_unsupported_condition(self) -> None:
+        row = queue_row(
+            split.DRAW_ENGINE_UNIT,
+            effect_classes=["DrawCardSourceControllerEffect"],
+            ability_kind="triggered",
+            ability_classes=["EntersBattlefieldTriggeredAbility"],
+            xmage_signals=["draw", "condition", "triggered_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Storm Fleet Spy",
+                type_line="Creature - Human Pirate",
+                oracle_text="Raid — When this creature enters, if you attacked this turn, draw a card.",
+            ),
+            source_text="""
+                this.addAbility(new EntersBattlefieldTriggeredAbility(new DrawCardSourceControllerEffect(1))
+                    .withInterveningIf(RaidCondition.instance), new PlayerAttackedWatcher());
+            """,
+        )
+
+        self.assertIsNone(proposal)
+        self.assertEqual(reason, "etb_conditional_draw_oracle_not_exact")
+
     def test_creature_etb_draw_blocks_dynamic_amount(self) -> None:
         row = queue_row(
             split.DRAW_ENGINE_UNIT,

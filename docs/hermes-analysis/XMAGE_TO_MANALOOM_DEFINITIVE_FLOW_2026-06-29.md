@@ -20288,6 +20288,74 @@ Evidence:
 - `docs/hermes-analysis/master_optimizer_reports/operational_surface_alignment_audit_20260711_post_pg739_draw_discard_unless_new_server.md`
 - `docs/hermes-analysis/master_optimizer_reports/legacy_contamination_audit_20260711_post_pg739_draw_discard_unless_new_server.md`
 
+## PG740 Conditional ETB Draw Checkpoint - 2026-07-11
+
+PG740 extends the existing creature ETB draw runtime scope for exact conditional
+draws where XMage and Oracle both prove an
+`enters_battlefield -> draw_cards` trigger gated by the controller controlling
+matching permanents.
+
+Promoted cards:
+
+- `Donatello, Turtle Techie`
+- `Opal Lake Gatekeepers`
+- `Resistance Squad`
+- `Rhox Meditant`
+- `Scholar of Stars`
+- `Settlement Blacksmith`
+
+Runtime boundary:
+
+- supported condition: `controller_controls_matching_permanent`;
+- supported filters: controlled permanent card type, subtype, color, minimum
+  count, and source exclusion for "another" cases;
+- unsupported conditional draw models, such as raid/attacked-this-turn, remain
+  blocked until their own runtime adapter exists.
+
+Validation evidence:
+
+- split report selected `6` exact proposals in
+  `xmage_creature_etb_conditional_draw_cards`;
+- precheck found `6` targets and no promoted/shadow conflicts;
+- apply upserted `6` verified executable rows;
+- postcheck confirmed `6/6` promoted verified/auto rows with matching
+  `oracle_hash`;
+- package E2E passed PostgreSQL, SQLite/Hermes, canonical snapshot,
+  `runtime_get_card_effect`, and `6` battle-execution scenarios;
+- battle evidence confirmed each promoted card drew `1` card with the condition
+  fixture present;
+- PG740B backfilled `55` pre-existing blank `oracle_hash` values on trusted
+  executable curated rules, then PG/Hermes/SQLite contract audit passed `51/51`.
+
+Final post-PG740B state:
+
+- global readiness:
+  `battle_and_oracle_ready=6394`, `battle_family_mapper_required=27482`,
+  `snapshot_has_verified_rule=6419`, `snapshot_has_any_rule=7590`;
+- current "purpose plus verified rule" count:
+  `function_plus_verified_rule=4899` out of `34331` cards;
+- authoritative queue:
+  `target_identity_count=24559`,
+  `xmage_authoritative_source_count=24246`,
+  `xmage_missing_source_exception_count=313`,
+  `xmage_authoritative_parser_gap_count=0`,
+  `xmage_authoritative_adapter_required_count=24246`,
+  `adapter_work_unit_count=11295`;
+- validation gates:
+  package E2E passed, `pg_hermes_sqlite_contract_audit` passed `51/51`,
+  and `draw_engine::xmage_draw_card_variant_review_v1` is now `1561`.
+
+Evidence:
+
+- `docs/hermes-analysis/PG740_CONDITIONAL_ETB_DRAW_EVIDENCE_2026-07-11.md`
+- `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_exact_scope_split_20260711_pg740_conditional_etb_draw_new_server_candidate.md`
+- `docs/hermes-analysis/master_optimizer_reports/pg740_conditional_etb_draw_new_server_package_manifest.json`
+- `docs/hermes-analysis/master_optimizer_reports/pg740_conditional_etb_draw_new_server_post_pg740b_e2e.md`
+- `docs/hermes-analysis/master_optimizer_reports/pg740b_trusted_rule_oracle_hash_backfill_new_server_pg_to_sqlite_sync.json`
+- `docs/hermes-analysis/master_optimizer_reports/global_card_oracle_battle_readiness_20260711_post_pg740b_conditional_etb_draw_hash_backfill_new_server.md`
+- `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260711_post_pg740b_conditional_etb_draw_hash_backfill_new_server_commander_legal.md`
+- `docs/hermes-analysis/master_optimizer_reports/pg_hermes_sqlite_contract_audit_20260711_post_pg740b_conditional_etb_draw_hash_backfill_new_server_final.md`
+
 ## Required Artifacts Per Cycle
 
 Every cycle must produce or refresh:

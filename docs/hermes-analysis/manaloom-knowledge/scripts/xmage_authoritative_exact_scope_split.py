@@ -11449,7 +11449,7 @@ def is_creature_etb_draw_unit(row: dict[str, Any]) -> bool:
         effect_classes(row) == {"DrawCardSourceControllerEffect"}
         and "EntersBattlefieldTriggeredAbility" in abilities
         and remaining.issubset(STATIC_SELF_KEYWORD_ABILITY_CLASSES)
-        and set(row.get("xmage_signals") or []).issubset({"draw", "triggered_ability"})
+        and set(row.get("xmage_signals") or []).issubset({"draw", "triggered_ability", "condition"})
     )
 
 
@@ -22356,6 +22356,110 @@ def etb_draw_count_from_oracle(metadata: dict[str, Any]) -> int | None:
     return int(value)
 
 
+def conditional_etb_draw_from_oracle(metadata: dict[str, Any]) -> dict[str, Any] | str:
+    text = strip_parenthetical_reminders(oracle_text_after_leading_static_keywords(metadata))
+    text = re.sub(r"\s+", " ", text).strip().lower().rstrip(".")
+    number_pattern = r"(a|one|two|three|four|five|\d+)"
+    match = re.fullmatch(
+        rf"(?:when|whenever) (?:this creature|[^.]+?) enters(?: the battlefield)?[, ]+"
+        rf"if you control (?P<condition>[^,]+), (?P<may>you may )?draw (?P<count>{number_pattern}) cards?",
+        text,
+    )
+    if not match:
+        return "etb_conditional_draw_oracle_not_exact"
+    count = number_word_to_int(match.group("count"))
+    if count <= 0:
+        return "etb_conditional_draw_oracle_count_not_fixed"
+    condition = match.group("condition").strip()
+    detail: dict[str, Any] = {
+        "draw_count": int(count),
+        "etb_draw_condition_status": "runtime_executor_v1",
+        "etb_draw_condition": "controller_controls_matching_permanent",
+        "etb_draw_condition_min_count": 1,
+    }
+    if match.group("may"):
+        detail["etb_draw_optional"] = True
+    if condition in {"an artifact", "a artifact"}:
+        detail["etb_draw_condition_card_types"] = ["artifact"]
+    elif condition == "an equipment":
+        detail["etb_draw_condition_subtypes"] = ["equipment"]
+    elif condition == "another human":
+        detail["etb_draw_condition_subtypes"] = ["human"]
+        detail["etb_draw_condition_exclude_source"] = True
+    elif condition == "a green permanent":
+        detail["etb_draw_condition_colors"] = ["green"]
+    elif condition == "two or more gates":
+        detail["etb_draw_condition_subtypes"] = ["gate"]
+        detail["etb_draw_condition_min_count"] = 2
+    else:
+        return "etb_conditional_draw_oracle_condition_not_supported"
+    return detail
+
+
+def conditional_etb_draw_from_source(
+    source_text: str,
+    oracle_data: dict[str, Any],
+) -> dict[str, Any] | str:
+    text = str(source_text or "")
+    if ".withInterveningIf" not in text and "InterveningIf" not in text:
+        return "etb_conditional_draw_source_condition_missing"
+    if "DoIfCostPaid" in text or "CostPaid" in text:
+        return "etb_conditional_draw_source_optional_cost_not_supported"
+    if len(re.findall(r"EntersBattlefieldTriggeredAbility\s*\(", text)) != 1:
+        return "etb_conditional_draw_source_trigger_not_exact"
+    draw_count = java_constructor_int_or_noarg_default(
+        text,
+        "DrawCardSourceControllerEffect",
+        noarg_default=1,
+    )
+    if draw_count is None or int(draw_count) != int(oracle_data.get("draw_count") or 0):
+        return "etb_conditional_draw_source_count_mismatch"
+
+    expected_card_types = [
+        str(value).strip().lower()
+        for value in oracle_data.get("etb_draw_condition_card_types") or []
+        if str(value).strip()
+    ]
+    expected_subtypes = [
+        str(value).strip().lower()
+        for value in oracle_data.get("etb_draw_condition_subtypes") or []
+        if str(value).strip()
+    ]
+    expected_colors = [
+        str(value).strip().lower()
+        for value in oracle_data.get("etb_draw_condition_colors") or []
+        if str(value).strip()
+    ]
+    min_count = int(oracle_data.get("etb_draw_condition_min_count") or 1)
+    exclude_source = bool(oracle_data.get("etb_draw_condition_exclude_source"))
+
+    source_matches = False
+    if expected_card_types == ["artifact"]:
+        source_matches = "FilterControlledArtifactPermanent" in text
+    elif expected_subtypes == ["equipment"]:
+        source_matches = "FilterControlledPermanent(SubType.EQUIPMENT" in re.sub(r"\s+", "", text)
+    elif expected_subtypes == ["human"] and exclude_source:
+        compact = re.sub(r"\s+", "", text)
+        source_matches = (
+            "FilterControlledPermanent(SubType.HUMAN" in compact
+            and "AnotherPredicate.instance" in text
+        )
+    elif expected_colors == ["green"]:
+        source_matches = (
+            "FilterControlledPermanent" in text
+            and "ColorPredicate(ObjectColor.GREEN)" in text
+        )
+    elif expected_subtypes == ["gate"] and min_count == 2:
+        source_matches = "YouControlTwoOrMoreGatesCondition" in text
+
+    if not source_matches:
+        return "etb_conditional_draw_source_condition_not_supported"
+
+    result = dict(oracle_data)
+    result.pop("draw_count", None)
+    return result
+
+
 def etb_scry_count_from_oracle(metadata: dict[str, Any]) -> int | str:
     text = strip_parenthetical_reminders(oracle_text_after_leading_static_keywords(metadata))
     text = re.sub(r"\s+", " ", text).strip()
@@ -31775,6 +31879,36 @@ def split_row(
         if not is_creature_metadata(metadata):
             return None, "etb_draw_not_creature"
         keyword_list = ordered_keywords(keywords_from_ability_classes(row))
+        has_condition_signal = "condition" in set(row.get("xmage_signals") or []) or ".withInterveningIf" in str(source_text or "")
+        conditional_draw = conditional_etb_draw_from_oracle(metadata)
+        if not isinstance(conditional_draw, str):
+            source_conditional_draw = conditional_etb_draw_from_source(source_text, conditional_draw)
+            if isinstance(source_conditional_draw, str):
+                return None, source_conditional_draw
+            effect_json = {
+                "effect": "creature",
+                "battle_model_scope": ETB_DRAW_CREATURE_SCOPE,
+                "ability_kind": "triggered",
+                "trigger": "enters_battlefield",
+                "trigger_effect": "draw_cards",
+                "etb_draw_count": int(conditional_draw["draw_count"]),
+                "xmage_effect_class": "DrawCardSourceControllerEffect",
+                "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+                **source_conditional_draw,
+            }
+            if keyword_list:
+                effect_json["keywords"] = keyword_list
+                effect_json["_keywords_are_self"] = True
+                for keyword in keyword_list:
+                    effect_json[keyword] = True
+            return build_proposal(
+                row,
+                metadata,
+                effect_json,
+                family_id="xmage_creature_etb_conditional_draw_cards",
+            ), "selected_exact_scope"
+        if has_condition_signal:
+            return None, conditional_draw
         optional_discard_draw = etb_optional_discard_draw_from_oracle(metadata)
         if not isinstance(optional_discard_draw, str):
             source_optional_discard_draw = etb_optional_discard_draw_from_source(source_text)

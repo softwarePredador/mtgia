@@ -186,6 +186,14 @@ E2E_REQUIRED_EFFECT_FIELDS = (
     "target_mana_value_max_from_x",
     "pre_recursion_mill_count",
     "etb_draw_count",
+    "etb_draw_condition_status",
+    "etb_draw_condition",
+    "etb_draw_condition_min_count",
+    "etb_draw_condition_card_types",
+    "etb_draw_condition_subtypes",
+    "etb_draw_condition_colors",
+    "etb_draw_condition_exclude_source",
+    "etb_draw_optional",
     "etb_optional_discard_draw",
     "etb_optional_discard_count",
     "etb_optional_discard_draw_count",
@@ -2386,6 +2394,126 @@ def creature_enters_draw_execution_scenario_from_expected_rule(
         "expected_hand_after": count,
         "logical_rule_key": rule["logical_rule_key"],
     }
+
+
+def _condition_fixture_permanents(required: dict[str, Any]) -> list[dict[str, Any]]:
+    min_count = max(1, int(required.get("etb_draw_condition_min_count") or 1))
+    card_types = [
+        str(value).strip().lower()
+        for value in (required.get("etb_draw_condition_card_types") or [])
+        if str(value).strip()
+    ]
+    subtypes = [
+        str(value).strip().lower()
+        for value in (required.get("etb_draw_condition_subtypes") or [])
+        if str(value).strip()
+    ]
+    colors = [
+        str(value).strip().lower()
+        for value in (required.get("etb_draw_condition_colors") or [])
+        if str(value).strip()
+    ]
+    fixtures: list[dict[str, Any]] = []
+    for index in range(min_count):
+        if "artifact" in card_types:
+            fixtures.append(
+                {
+                    "name": f"E2E Controlled Artifact {index + 1}",
+                    "type_line": "Artifact",
+                    "effect": "artifact",
+                    "card_types": ["artifact"],
+                }
+            )
+        elif "equipment" in subtypes:
+            fixtures.append(
+                {
+                    "name": f"E2E Controlled Equipment {index + 1}",
+                    "type_line": "Artifact - Equipment",
+                    "effect": "artifact",
+                    "card_types": ["artifact"],
+                    "subtypes": ["Equipment"],
+                }
+            )
+        elif "human" in subtypes:
+            fixtures.append(
+                {
+                    "name": f"E2E Other Human {index + 1}",
+                    "type_line": "Creature - Human",
+                    "effect": "creature",
+                    "power": 1,
+                    "toughness": 1,
+                    "subtypes": ["Human"],
+                }
+            )
+        elif "gate" in subtypes:
+            fixtures.append(
+                {
+                    "name": f"E2E Controlled Gate {index + 1}",
+                    "type_line": "Land - Gate",
+                    "effect": "land",
+                    "subtypes": ["Gate"],
+                }
+            )
+        elif "green" in colors or "g" in colors:
+            fixtures.append(
+                {
+                    "name": f"E2E Green Permanent {index + 1}",
+                    "type_line": "Creature - Elf",
+                    "effect": "creature",
+                    "mana_cost": "{G}",
+                    "colors": ["G"],
+                    "power": 1,
+                    "toughness": 1,
+                }
+            )
+        else:
+            fixtures.append(
+                {
+                    "name": f"E2E Matching Permanent {index + 1}",
+                    "type_line": "Artifact",
+                    "effect": "artifact",
+                }
+            )
+    return fixtures
+
+
+def creature_etb_draw_execution_scenario_from_expected_rule(
+    rule: dict[str, Any],
+) -> dict[str, Any] | None:
+    required = dict(rule.get("required_effect_fields") or {})
+    if required.get("battle_model_scope") != "xmage_creature_etb_draw_cards_v1":
+        return None
+    if required.get("etb_draw_discard") or required.get("etb_dynamic_draw"):
+        return None
+    draw_count = int(required.get("etb_draw_count") or required.get("draw_count") or 0)
+    if draw_count <= 0:
+        return None
+    scenario: dict[str, Any] = {
+        "name": f"{rule['card_name']} draws on ETB",
+        "type": "creature_etb_draw",
+        "card": {
+            "name": rule["card_name"],
+            "type_line": "Creature - Wizard",
+            "effect": required.get("effect") or "creature",
+        },
+        "controller_library": [
+            {
+                "name": f"E2E Drawn Card {index + 1}",
+                "type_line": "Instant",
+                "effect": "draw_cards",
+                "cmc": 2,
+            }
+            for index in range(draw_count)
+        ],
+        "expected_draw_count": draw_count,
+        "expected_hand_after": draw_count,
+        "expected_keywords": list(required.get("keywords") or []),
+        "logical_rule_key": rule["logical_rule_key"],
+    }
+    if required.get("etb_draw_condition"):
+        scenario["expected_condition"] = required.get("etb_draw_condition")
+        scenario["controller_battlefield"] = _condition_fixture_permanents(required)
+    return scenario
 
 
 def creature_etb_draw_discard_execution_scenario_from_expected_rule(
@@ -6859,6 +6987,7 @@ def execution_scenario_from_expected_rule(rule: dict[str, Any]) -> dict[str, Any
         or creature_etb_dynamic_life_gain_execution_scenario_from_expected_rule(rule)
         or creature_enters_life_gain_execution_scenario_from_expected_rule(rule)
         or creature_enters_draw_execution_scenario_from_expected_rule(rule)
+        or creature_etb_draw_execution_scenario_from_expected_rule(rule)
         or creature_etb_draw_discard_execution_scenario_from_expected_rule(rule)
         or creature_etb_target_stat_modifier_execution_scenario_from_expected_rule(rule)
         or spell_cast_gain_life_execution_scenario_from_expected_rule(rule)
