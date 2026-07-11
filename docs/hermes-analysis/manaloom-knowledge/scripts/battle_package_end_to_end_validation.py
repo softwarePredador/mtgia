@@ -5420,7 +5420,13 @@ def run_simple_activated_draw(
         for library_card in (scenario.get("controller_library") or [])
         if isinstance(library_card, dict)
     ]
-    active.battlefield = [source]
+    source_zone = str(
+        scenario.get("source_zone")
+        or effect.get("activation_zone")
+        or ("graveyard" if effect.get("activation_requires_exile_source_from_graveyard") else "battlefield")
+    ).lower()
+    active.battlefield = [] if source_zone == "graveyard" else [source]
+    active.graveyard = [source] if source_zone == "graveyard" else []
     sacrifice_target = None
     if scenario.get("sacrifice_target"):
         sacrifice_target = battle.enrich_card(dict(scenario["sacrifice_target"]))
@@ -5457,6 +5463,10 @@ def run_simple_activated_draw(
         for item in counter_cost_targets
     }
     expected_sacrificed_source = bool(effect.get("activation_requires_sacrifice"))
+    expected_exiled_source = bool(
+        scenario.get("expected_exiled_source_from_graveyard")
+        or effect.get("activation_requires_exile_source_from_graveyard")
+    )
     all_players = [active, opponent]
     before_events = len(events)
 
@@ -5498,9 +5508,17 @@ def run_simple_activated_draw(
             "battle_execution",
             f"{card['name']} life={active.life}, expected {starting_life - expected_life_paid}",
         )
-    if expected_sacrificed_source:
+    if expected_exiled_source:
+        if source in active.graveyard:
+            fail("battle_execution", f"{card['name']} source remained in graveyard after activation")
+        if source not in getattr(active, "exile", []):
+            fail("battle_execution", f"{card['name']} source was not exiled from graveyard")
+    elif expected_sacrificed_source:
         if source in active.battlefield or source not in active.graveyard:
             fail("battle_execution", f"{card['name']} source sacrifice zone mismatch")
+    elif source_zone == "graveyard":
+        if source not in active.graveyard:
+            fail("battle_execution", f"{card['name']} source left graveyard unexpectedly")
     elif source not in active.battlefield:
         fail("battle_execution", f"{card['name']} source left battlefield unexpectedly")
     if bool(scenario.get("expect_target_sacrificed")):
@@ -5511,7 +5529,13 @@ def run_simple_activated_draw(
         if not battle.is_token_permanent(sacrifice_target) and sacrifice_target not in active.graveyard:
             fail("battle_execution", f"{card['name']} sacrifice target zone mismatch")
 
-    expected_activation_kind = "self_sacrifice_draw" if expected_sacrificed_source else "simple_activated_draw"
+    expected_activation_kind = (
+        "graveyard_self_exile_draw"
+        if expected_exiled_source
+        else "self_sacrifice_draw"
+        if expected_sacrificed_source
+        else "simple_activated_draw"
+    )
     activation_event = next(
         (
             data
@@ -5572,6 +5596,11 @@ def run_simple_activated_draw(
                 "battle_execution",
                 f"{card['name']} removed {before - after} {expected_remove_counter_type} counters, expected {expected_remove_counter_cost_count}",
             )
+    if expected_exiled_source:
+        if not bool(activation_event.get("exiled_source_from_graveyard")):
+            fail("battle_events", f"{card['name']} replay did not mark source exile from graveyard")
+        if str(activation_event.get("source_zone") or "") != "graveyard":
+            fail("battle_events", f"{card['name']} replay source_zone={activation_event.get('source_zone')!r}")
     if not expected_sacrificed_source:
         if int(activation_event.get("discarded_count") or 0) != expected_discard_count:
             fail(
@@ -5607,7 +5636,168 @@ def run_simple_activated_draw(
         "removed_counter_cost_count": expected_remove_counter_cost_count,
         "removed_counter_cost_type": expected_remove_counter_type if expected_remove_counter_cost_count else None,
         "sacrificed_source": expected_sacrificed_source,
+        "exiled_source_from_graveyard": expected_exiled_source,
+        "source_zone": source_zone,
         "target_sacrificed": bool(sacrifice_target is not None and sacrifice_target not in active.battlefield),
+    }
+
+
+def run_simple_activated_draw_discard(
+    battle,
+    scenario: dict[str, Any],
+    events: list[tuple[str, dict[str, Any]]],
+) -> dict[str, Any]:
+    card = dict(scenario["card"])
+    effect = battle.get_card_effect(card)
+    permanent_type = str(effect.get("permanent_type") or "creature")
+    default_type_line = {
+        "creature": "Creature - Citizen",
+        "artifact": "Artifact",
+        "enchantment": "Enchantment",
+    }.get(permanent_type, "Creature")
+    source = battle.enrich_card(
+        {
+            **card,
+            "type_line": default_type_line,
+            "summoning_sick": False,
+            **effect,
+            **dict(scenario.get("source_overrides") or {}),
+        }
+    )
+    active = battle.Player(str(scenario.get("player") or "Activated Draw Discard Controller"), None, [])
+    opponent = battle.Player(str(scenario.get("opponent") or "Activated Draw Discard Opponent"), None, [])
+    active.life = int(scenario.get("starting_life") or 40)
+    active.hand = [
+        battle.enrich_card(dict(hand_card))
+        for hand_card in (scenario.get("controller_hand") or [])
+        if isinstance(hand_card, dict)
+    ]
+    active.library = [
+        battle.enrich_card(dict(library_card))
+        for library_card in (scenario.get("controller_library") or [])
+        if isinstance(library_card, dict)
+    ]
+    source_zone = str(
+        scenario.get("source_zone")
+        or effect.get("activation_zone")
+        or ("graveyard" if effect.get("activation_requires_exile_source_from_graveyard") else "battlefield")
+    ).lower()
+    active.battlefield = [] if source_zone == "graveyard" else [source]
+    active.graveyard = [source] if source_zone == "graveyard" else []
+    add_manifest_mana(active, scenario.get("controller_mana") or {})
+
+    starting_hand_count = len(active.hand)
+    starting_library_count = len(active.library)
+    starting_life = active.life
+    expected_draw_count = int(
+        scenario.get("expected_draw_count")
+        or effect.get("activated_draw_count")
+        or effect.get("draw_count")
+        or 1
+    )
+    expected_discard_count = int(
+        scenario.get("expected_discard_count")
+        or effect.get("activated_discard_count")
+        or effect.get("discard_count")
+        or 1
+    )
+    expected_life_paid = int(scenario.get("expected_life_paid") or 0)
+    expected_tapped_source = bool(scenario.get("expected_tapped_source", effect.get("activation_requires_tap", False)))
+    expected_sacrificed_source = bool(effect.get("activation_requires_sacrifice"))
+    expected_exiled_source = bool(
+        scenario.get("expected_exiled_source_from_graveyard")
+        or effect.get("activation_requires_exile_source_from_graveyard")
+    )
+    before_events = len(events)
+    all_players = [active, opponent]
+
+    activated = battle.activate_utility_artifacts(
+        active,
+        [opponent],
+        all_players,
+        turn=int(scenario.get("turn") or 6152),
+        rng=random.Random(int(scenario.get("seed") or 6152)),
+        phase=str(scenario.get("phase") or "postcombat_main"),
+    )
+    if not activated:
+        fail("battle_execution", f"{card['name']} simple activated draw-discard activation failed")
+    if len(active.library) != starting_library_count - expected_draw_count:
+        fail(
+            "battle_execution",
+            f"{card['name']} library={len(active.library)}, expected {starting_library_count - expected_draw_count}",
+        )
+    expected_hand_count = starting_hand_count + expected_draw_count - expected_discard_count
+    if len(active.hand) != expected_hand_count:
+        fail(
+            "battle_execution",
+            f"{card['name']} hand={len(active.hand)}, expected {expected_hand_count}",
+        )
+    if bool(source.get("tapped")) != expected_tapped_source:
+        fail(
+            "battle_execution",
+            f"{card['name']} source tapped={bool(source.get('tapped'))}, expected {expected_tapped_source}",
+        )
+    if expected_life_paid and active.life != starting_life - expected_life_paid:
+        fail(
+            "battle_execution",
+            f"{card['name']} life={active.life}, expected {starting_life - expected_life_paid}",
+        )
+    if expected_exiled_source:
+        if source in active.graveyard:
+            fail("battle_execution", f"{card['name']} source remained in graveyard after activation")
+        if source not in getattr(active, "exile", []):
+            fail("battle_execution", f"{card['name']} source was not exiled from graveyard")
+    elif expected_sacrificed_source:
+        if source in active.battlefield or source not in active.graveyard:
+            fail("battle_execution", f"{card['name']} source sacrifice zone mismatch")
+    elif source_zone == "graveyard":
+        if source not in active.graveyard:
+            fail("battle_execution", f"{card['name']} source left graveyard unexpectedly")
+    elif source not in active.battlefield:
+        fail("battle_execution", f"{card['name']} source left battlefield unexpectedly")
+
+    expected_activation_kind = (
+        "graveyard_self_exile_draw_discard"
+        if expected_exiled_source
+        else "simple_activated_draw_discard"
+    )
+    activation_event = next(
+        (
+            data
+            for event, data in reversed(events[before_events:])
+            if event == "utility_artifact_activated"
+            and data.get("card") == card.get("name")
+            and data.get("activation_kind") == expected_activation_kind
+        ),
+        None,
+    )
+    if activation_event is None:
+        fail("battle_events", f"missing {card['name']} {expected_activation_kind} event")
+    if int(activation_event.get("cards_drawn") or 0) != expected_draw_count:
+        fail(
+            "battle_events",
+            f"{card['name']} cards_drawn={activation_event.get('cards_drawn')}, expected {expected_draw_count}",
+        )
+    if int(activation_event.get("cards_discarded") or 0) != expected_discard_count:
+        fail(
+            "battle_events",
+            f"{card['name']} cards_discarded={activation_event.get('cards_discarded')}, expected {expected_discard_count}",
+        )
+    if expected_exiled_source:
+        if not bool(activation_event.get("exiled_source_from_graveyard")):
+            fail("battle_events", f"{card['name']} replay did not mark source exile from graveyard")
+        if str(activation_event.get("source_zone") or "") != "graveyard":
+            fail("battle_events", f"{card['name']} replay source_zone={activation_event.get('source_zone')!r}")
+    return {
+        "scenario": scenario.get("name"),
+        "card_name": card["name"],
+        "cards_drawn": expected_draw_count,
+        "cards_discarded": expected_discard_count,
+        "life_paid": expected_life_paid,
+        "source_tapped": bool(source.get("tapped")),
+        "source_zone": source_zone,
+        "exiled_source_from_graveyard": expected_exiled_source,
+        "sacrificed_source": expected_sacrificed_source,
     }
 
 
@@ -10319,6 +10509,7 @@ SCENARIO_RUNNERS = {
     "simple_mana_source_refresh": run_simple_mana_source_refresh,
     "sacrifice_mana_source_activation": run_sacrifice_mana_source_activation,
     "simple_activated_draw": run_simple_activated_draw,
+    "simple_activated_draw_discard": run_simple_activated_draw_discard,
     "simple_activated_damage": run_simple_activated_damage,
     "simple_activated_tap_target": run_simple_activated_tap_target,
     "simple_activated_untap_target": run_simple_activated_untap_target,

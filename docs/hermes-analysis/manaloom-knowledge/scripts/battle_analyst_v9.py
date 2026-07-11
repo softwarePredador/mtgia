@@ -37001,8 +37001,23 @@ def activate_utility_artifacts(player, opponents, all_players, turn, rng, *, pha
         and not permanent.get("utility_artifact_used_this_turn")
         and permanent.get("battle_model_scope") != CURRENCY_CONVERTER_SCOPE
     ]
+    simple_activated_draw_discard_permanents.extend(
+        permanent
+        for permanent in getattr(player, "graveyard", []) or []
+        if isinstance(permanent, dict)
+        and permanent.get("activated_draw_discard")
+        and (
+            permanent.get("activation_zone") == "graveyard"
+            or permanent.get("activation_requires_exile_source_from_graveyard")
+        )
+        and permanent.get("battle_model_scope") != CURRENCY_CONVERTER_SCOPE
+    )
     if phase == "postcombat_main":
         for permanent in simple_activated_draw_discard_permanents:
+            activation_from_graveyard = (
+                permanent.get("activation_zone") == "graveyard"
+                or bool(permanent.get("activation_requires_exile_source_from_graveyard"))
+            )
             activation_cost = adjusted_activated_ability_generic_cost(
                 player,
                 permanent,
@@ -37034,7 +37049,7 @@ def activate_utility_artifacts(player, opponents, all_players, turn, rng, *, pha
                         phase=phase,
                     )
                     continue
-            if permanent.get("activation_requires_tap") and permanent.get("tapped"):
+            if not activation_from_graveyard and permanent.get("activation_requires_tap") and permanent.get("tapped"):
                 _utility_artifact_skip_event(
                     player,
                     permanent,
@@ -37044,7 +37059,8 @@ def activate_utility_artifacts(player, opponents, all_players, turn, rng, *, pha
                 )
                 continue
             if (
-                permanent.get("activation_requires_tap")
+                not activation_from_graveyard
+                and permanent.get("activation_requires_tap")
                 and is_battlefield_creature(permanent)
                 and permanent.get("summoning_sick")
             ):
@@ -37106,7 +37122,7 @@ def activate_utility_artifacts(player, opponents, all_players, turn, rng, *, pha
                     phase=phase,
                 )
                 continue
-            if permanent.get("activation_requires_tap"):
+            if not activation_from_graveyard and permanent.get("activation_requires_tap"):
                 permanent["tapped"] = True
             life_before = player.life
             if life_cost:
@@ -37119,6 +37135,20 @@ def activate_utility_artifacts(player, opponents, all_players, turn, rng, *, pha
             if source_sacrificed:
                 sacrificed_name = permanent.get("name", "?")
                 sacrifice_permanent_for_activation(player, permanent, turn)
+            exiled_source_from_graveyard = False
+            if permanent.get("activation_requires_exile_source_from_graveyard"):
+                if permanent not in getattr(player, "graveyard", []):
+                    _utility_artifact_skip_event(
+                        player,
+                        permanent,
+                        turn,
+                        "missing_graveyard_source_for_activated_draw_discard",
+                        phase=phase,
+                    )
+                    continue
+                player.graveyard.remove(permanent)
+                move_to_exile(player, permanent, reason="activated_draw_discard_graveyard_cost", turn=turn)
+                exiled_source_from_graveyard = True
             permanent["utility_artifact_used_this_turn"] = True
             hand_before_activation = hand_size
             drawn = player.draw(draw_count, rng)
@@ -37193,6 +37223,8 @@ def activate_utility_artifacts(player, opponents, all_players, turn, rng, *, pha
                     "sacrifice_target": sacrifice_target_type or None,
                     "sacrificed": sacrificed_name,
                     "source_sacrificed": source_sacrificed,
+                    "source_zone": "graveyard" if activation_from_graveyard else "battlefield",
+                    "exiled_source_from_graveyard": exiled_source_from_graveyard,
                     "sacrifice_options": [
                         option.get("name", "?")
                         for option in sacrifice_options[:6]
@@ -37211,7 +37243,9 @@ def activate_utility_artifacts(player, opponents, all_players, turn, rng, *, pha
                     "tapped": 1 if permanent.get("activation_requires_tap") else 0,
                     "life": -life_cost,
                     "permanents": -1 if sacrificed_name else 0,
-                    "graveyard": len(discard_resolution.get("to_graveyard") or []),
+                    "graveyard": len(discard_resolution.get("to_graveyard") or [])
+                    - (1 if exiled_source_from_graveyard else 0),
+                    "exile": 1 if exiled_source_from_graveyard else 0,
                 },
                 risk_flags=[
                     flag
@@ -37220,6 +37254,8 @@ def activate_utility_artifacts(player, opponents, all_players, turn, rng, *, pha
                         "life_payment": life_cost > 0,
                         "sacrifice_permanent": sacrificed_name is not None,
                         "source_sacrifice": source_sacrificed,
+                        "graveyard_activation": activation_from_graveyard,
+                        "exile_source": exiled_source_from_graveyard,
                         "sacrifice_token": sacrifice_target is not None and is_token_permanent(sacrifice_target),
                     }.items()
                     if active
@@ -37229,7 +37265,11 @@ def activate_utility_artifacts(player, opponents, all_players, turn, rng, *, pha
                 "utility_artifact_activated",
                 player=player.name,
                 card=permanent.get("name", "?"),
-                activation_kind="simple_activated_draw_discard",
+                activation_kind=(
+                    "graveyard_self_exile_draw_discard"
+                    if exiled_source_from_graveyard
+                    else "simple_activated_draw_discard"
+                ),
                 mana_paid=activation_mana_paid,
                 activation_cost=activation_cost_text,
                 cards_drawn=len(drawn),
@@ -37245,6 +37285,8 @@ def activate_utility_artifacts(player, opponents, all_players, turn, rng, *, pha
                 sacrifice_target=sacrifice_target_type or None,
                 sacrificed=sacrificed_name,
                 source_sacrificed=source_sacrificed,
+                source_zone="graveyard" if activation_from_graveyard else "battlefield",
+                exiled_source_from_graveyard=exiled_source_from_graveyard,
                 trigger_event_count=len(discard_resolution.get("trigger_events") or []),
                 phase=phase,
                 turn=turn,
@@ -37320,8 +37362,23 @@ def activate_utility_artifacts(player, opponents, all_players, turn, rng, *, pha
         )
         and not permanent.get("utility_artifact_used_this_turn")
     ]
+    simple_activated_draw_permanents.extend(
+        permanent
+        for permanent in getattr(player, "graveyard", []) or []
+        if isinstance(permanent, dict)
+        and permanent.get("activated_draw")
+        and (
+            permanent.get("activation_zone") == "graveyard"
+            or permanent.get("activation_requires_exile_source_from_graveyard")
+        )
+        and not permanent.get("utility_artifact_used_this_turn")
+    )
     if phase == "postcombat_main":
         for permanent in simple_activated_draw_permanents:
+            activation_from_graveyard = (
+                permanent.get("activation_zone") == "graveyard"
+                or bool(permanent.get("activation_requires_exile_source_from_graveyard"))
+            )
             activation_cost = adjusted_activated_ability_generic_cost(
                 player,
                 permanent,
@@ -37359,7 +37416,7 @@ def activate_utility_artifacts(player, opponents, all_players, turn, rng, *, pha
                         phase=phase,
                     )
                     continue
-            if permanent.get("activation_requires_tap") and permanent.get("tapped"):
+            if not activation_from_graveyard and permanent.get("activation_requires_tap") and permanent.get("tapped"):
                 _utility_artifact_skip_event(
                     player,
                     permanent,
@@ -37369,7 +37426,8 @@ def activate_utility_artifacts(player, opponents, all_players, turn, rng, *, pha
                 )
                 continue
             if (
-                permanent.get("activation_requires_tap")
+                not activation_from_graveyard
+                and permanent.get("activation_requires_tap")
                 and is_battlefield_creature(permanent)
                 and permanent.get("summoning_sick")
             ):
@@ -37484,7 +37542,7 @@ def activate_utility_artifacts(player, opponents, all_players, turn, rng, *, pha
                     phase=phase,
                 )
                 continue
-            if permanent.get("activation_requires_tap"):
+            if not activation_from_graveyard and permanent.get("activation_requires_tap"):
                 permanent["tapped"] = True
             if _activation_tap_cost(permanent):
                 tap_candidates = _tap_activation_cost_candidates(player, tap_candidates, turn)
@@ -37511,6 +37569,20 @@ def activate_utility_artifacts(player, opponents, all_players, turn, rng, *, pha
             if sacrifice_target is not None:
                 sacrificed_name = sacrifice_target.get("name", "?")
                 sacrifice_permanent_for_activation(player, sacrifice_target, turn)
+            exiled_source_from_graveyard = False
+            if permanent.get("activation_requires_exile_source_from_graveyard"):
+                if permanent not in getattr(player, "graveyard", []):
+                    _utility_artifact_skip_event(
+                        player,
+                        permanent,
+                        turn,
+                        "missing_graveyard_source_for_activated_draw",
+                        phase=phase,
+                    )
+                    continue
+                player.graveyard.remove(permanent)
+                move_to_exile(player, permanent, reason="activated_draw_graveyard_cost", turn=turn)
+                exiled_source_from_graveyard = True
             discard_resolution = {"to_graveyard": []}
             if discard_cards:
                 removed_cards = []
@@ -37592,6 +37664,8 @@ def activate_utility_artifacts(player, opponents, all_players, turn, rng, *, pha
                     "discarded": [card.get("name", "?") for card in discard_cards],
                     "discarded_count": len(discard_cards),
                     "discard_target": activation_discard_target if activation_discard_count else None,
+                    "source_zone": "graveyard" if activation_from_graveyard else "battlefield",
+                    "exiled_source_from_graveyard": exiled_source_from_graveyard,
                 },
                 rule_source="simple_activated_draw_permanent_v1",
                 rule_status=permanent.get("_rule_review_status", "active"),
@@ -37611,7 +37685,9 @@ def activate_utility_artifacts(player, opponents, all_players, turn, rng, *, pha
                     "graveyard": (
                         0 if sacrifice_target is None or is_token_permanent(sacrifice_target) else 1
                     )
-                    + len(discard_resolution.get("to_graveyard") or []),
+                    + len(discard_resolution.get("to_graveyard") or [])
+                    - (1 if exiled_source_from_graveyard else 0),
+                    "exile": 1 if exiled_source_from_graveyard else 0,
                     "cards_discarded": len(discard_cards),
                 },
                 risk_flags=[
@@ -37623,6 +37699,8 @@ def activate_utility_artifacts(player, opponents, all_players, turn, rng, *, pha
                         "tap_cost_target": bool(tap_candidates),
                         "remove_counter_cost": removed_counter_cost_count > 0,
                         "sacrifice_permanent": sacrificed_name is not None,
+                        "graveyard_activation": activation_from_graveyard,
+                        "exile_source": exiled_source_from_graveyard,
                         "sacrifice_token": sacrifice_target is not None and is_token_permanent(sacrifice_target),
                     }.items()
                     if active
@@ -37632,7 +37710,11 @@ def activate_utility_artifacts(player, opponents, all_players, turn, rng, *, pha
                 "utility_artifact_activated",
                 player=player.name,
                 card=permanent.get("name", "?"),
-                activation_kind="simple_activated_draw",
+                activation_kind=(
+                    "graveyard_self_exile_draw"
+                    if exiled_source_from_graveyard
+                    else "simple_activated_draw"
+                ),
                 mana_paid=activation_mana_paid,
                 activation_cost=activation_cost_text,
                 cards_drawn=len(drawn),
@@ -37660,6 +37742,8 @@ def activate_utility_artifacts(player, opponents, all_players, turn, rng, *, pha
                 discarded=[card.get("name", "?") for card in discard_cards],
                 discarded_count=len(discard_cards),
                 discard_target=activation_discard_target if activation_discard_count else None,
+                source_zone="graveyard" if activation_from_graveyard else "battlefield",
+                exiled_source_from_graveyard=exiled_source_from_graveyard,
                 phase=phase,
                 turn=turn,
                 **replay_rule_fields(permanent),

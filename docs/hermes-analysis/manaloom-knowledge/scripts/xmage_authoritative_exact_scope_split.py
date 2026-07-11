@@ -14915,6 +14915,8 @@ def activated_draw_from_oracle(metadata: dict[str, Any]) -> dict[str, Any] | str
     if text.count(":") != 1:
         return "activated_draw_oracle_not_simple"
     cost_text, effect_text = [part.strip() for part in text.split(":", 1)]
+    if "." in cost_text:
+        cost_text = cost_text.rsplit(".", 1)[1].strip()
     match = re.fullmatch(r"draw (a|one|two|three|four|five|\d+) cards?\.?", effect_text)
     if not match:
         return "activated_draw_oracle_not_simple"
@@ -14925,6 +14927,21 @@ def activated_draw_from_oracle(metadata: dict[str, Any]) -> dict[str, Any] | str
         return "activated_draw_oracle_not_simple"
 
     normalized_cost = cost_text
+    activation_zone = None
+    activation_requires_exile_source_from_graveyard = False
+    source_name = str(metadata.get("name") or "").split("//", 1)[0].strip().lower()
+    source_name_pattern = re.escape(source_name) if source_name else r"this card"
+    exile_source_pattern = (
+        rf"(?:^|,\s*)exile (?:this card|{source_name_pattern}) from your graveyard(?:\s*,?|$)"
+    )
+    exile_source_matches = list(re.finditer(exile_source_pattern, normalized_cost))
+    if len(exile_source_matches) > 1:
+        return "activated_draw_oracle_cost_not_supported"
+    if exile_source_matches:
+        activation_zone = "graveyard"
+        activation_requires_exile_source_from_graveyard = True
+        normalized_cost = re.sub(exile_source_pattern, ",", normalized_cost).strip(" ,")
+
     discard_count = 0
     discard_pattern = r"(?:^|,\s*)discard (?:a|one) card(?:\s*,?|$)"
     discard_matches = list(re.finditer(discard_pattern, normalized_cost))
@@ -14991,6 +15008,10 @@ def activated_draw_from_oracle(metadata: dict[str, Any]) -> dict[str, Any] | str
         activation["activation_requires_discard_card"] = True
     if life_cost:
         activation["activation_life_cost"] = life_cost
+    if activation_zone:
+        activation["activation_zone"] = activation_zone
+    if activation_requires_exile_source_from_graveyard:
+        activation["activation_requires_exile_source_from_graveyard"] = True
     if sacrifice_target:
         activation["activation_sacrifice_target"] = sacrifice_target
         activation["activation_requires_sacrifice_target"] = True
@@ -15062,6 +15083,8 @@ def activated_draw_discard_from_oracle(metadata: dict[str, Any]) -> dict[str, An
     if text.count(":") != 1:
         return "activated_draw_discard_oracle_not_simple"
     cost_text, effect_text = [part.strip() for part in text.split(":", 1)]
+    if "." in cost_text:
+        cost_text = cost_text.rsplit(".", 1)[1].strip()
     match = re.fullmatch(
         r"draw (a|one|two|three|four|five|\d+) cards?, then discard "
         r"(a|one|two|three|four|five|\d+) cards?\.?",
@@ -15075,6 +15098,21 @@ def activated_draw_discard_from_oracle(metadata: dict[str, Any]) -> dict[str, An
         return "activated_draw_discard_oracle_not_simple"
 
     normalized_cost = cost_text
+    activation_zone = None
+    activation_requires_exile_source_from_graveyard = False
+    source_name = str(metadata.get("name") or "").split("//", 1)[0].strip().lower()
+    source_name_pattern = re.escape(source_name) if source_name else r"this card"
+    exile_source_pattern = (
+        rf"(?:^|,\s*)exile (?:this card|{source_name_pattern}) from your graveyard(?:\s*,?|$)"
+    )
+    exile_source_matches = list(re.finditer(exile_source_pattern, normalized_cost))
+    if len(exile_source_matches) > 1:
+        return "activated_draw_discard_oracle_cost_not_supported"
+    if exile_source_matches:
+        activation_zone = "graveyard"
+        activation_requires_exile_source_from_graveyard = True
+        normalized_cost = re.sub(exile_source_pattern, ",", normalized_cost).strip(" ,")
+
     life_cost = 0
     life_pattern = r"(?:^|,\s*)pay (?P<life>\d+) life(?:\s*,?|$)"
     life_matches = list(re.finditer(life_pattern, normalized_cost))
@@ -15115,6 +15153,10 @@ def activated_draw_discard_from_oracle(metadata: dict[str, Any]) -> dict[str, An
     activation["discard_count"] = discard_count
     if life_cost:
         activation["activation_life_cost"] = life_cost
+    if activation_zone:
+        activation["activation_zone"] = activation_zone
+    if activation_requires_exile_source_from_graveyard:
+        activation["activation_requires_exile_source_from_graveyard"] = True
     if sacrifice_target:
         activation["activation_sacrifice_target"] = sacrifice_target
         activation["activation_requires_sacrifice_target"] = True
@@ -19214,23 +19256,25 @@ def tap_target_spell_from_source(source: str) -> dict[str, Any] | str:
 
 def activated_draw_from_source(source: str) -> dict[str, Any] | str:
     text = source or ""
-    if "Zone.GRAVEYARD" in text:
-        return "activated_draw_source_not_battlefield"
-    draw_matches = re.findall(
-        r"SimpleActivatedAbility\s*\(\s*new\s+DrawCardSourceControllerEffect\s*\(\s*(\d*)\s*\)",
-        text,
+    draw_pattern = re.compile(
+        r"SimpleActivatedAbility\s*\(\s*(?:Zone\.GRAVEYARD\s*,\s*)?"
+        r"new\s+DrawCardSourceControllerEffect\s*\(\s*(\d*)\s*\)",
         flags=re.DOTALL,
     )
+    draw_matches = list(draw_pattern.finditer(text))
     if len(draw_matches) != 1:
         return "activated_draw_source_count_not_fixed"
-    count = int(draw_matches[0] or "1")
+    count = int(draw_matches[0].group(1) or "1")
     if count <= 0:
         return "activated_draw_source_count_not_fixed"
-    draw_index = text.find("SimpleActivatedAbility")
-    window = text[max(0, draw_index - 500) : draw_index + 1800]
+    draw_index = draw_matches[0].start()
+    window = text[draw_index : draw_index + 1800]
+    activation_zone = "graveyard" if re.search(r"SimpleActivatedAbility\s*\(\s*Zone\.GRAVEYARD", window) else None
+    activation_requires_exile_source_from_graveyard = "ExileSourceFromGraveCost" in window
+    if activation_zone == "graveyard" and not activation_requires_exile_source_from_graveyard:
+        return "activated_draw_source_cost_not_supported"
     risky_cost_classes = {
-        "ExileFrom",
-        "ExileSourceFromGraveCost",
+        "ExileFromGraveCost",
         "MillCardsCost",
         "ReturnToHandSourceCost",
         "RevealTargetFromHandCost",
@@ -19303,6 +19347,12 @@ def activated_draw_from_source(source: str) -> dict[str, Any] | str:
             else {}
         ),
         **({"activation_life_cost": life_cost} if life_cost else {}),
+        **({"activation_zone": activation_zone} if activation_zone else {}),
+        **(
+            {"activation_requires_exile_source_from_graveyard": True}
+            if activation_requires_exile_source_from_graveyard
+            else {}
+        ),
         **(
             {
                 "activation_sacrifice_target": sacrifice_target,
@@ -19686,19 +19736,23 @@ def combat_damage_target_player_discard_from_oracle(metadata: dict[str, Any]) ->
 
 def activated_draw_discard_from_source(source: str) -> dict[str, Any] | str:
     text = source or ""
-    if "Zone.GRAVEYARD" in text:
-        return "activated_draw_discard_source_not_battlefield"
     counts = draw_discard_counts_from_source(text)
     if isinstance(counts, str):
         return counts
     draw_count, discard_count = counts
     effect_index = text.find("DrawDiscardControllerEffect")
-    window = text[max(0, effect_index - 500) : effect_index + 1800]
+    activation_index = text.rfind("SimpleActivatedAbility", 0, effect_index)
+    if activation_index < 0:
+        return "activated_draw_discard_source_not_simple_activated"
+    window = text[activation_index : effect_index + 1800]
+    activation_zone = "graveyard" if re.search(r"SimpleActivatedAbility\s*\(\s*Zone\.GRAVEYARD", window) else None
+    activation_requires_exile_source_from_graveyard = "ExileSourceFromGraveCost" in window
+    if activation_zone == "graveyard" and not activation_requires_exile_source_from_graveyard:
+        return "activated_draw_discard_source_cost_not_supported"
     risky_cost_classes = {
         "DiscardCardCost",
         "DiscardTargetCost",
-        "ExileFrom",
-        "ExileSourceFromGraveCost",
+        "ExileFromGraveCost",
         "MillCardsCost",
         "RemoveCounterCost",
         "ReturnToHandSourceCost",
@@ -19748,6 +19802,12 @@ def activated_draw_discard_from_source(source: str) -> dict[str, Any] | str:
         "activation_requires_tap": requires_tap,
         "activation_requires_sacrifice": requires_sacrifice,
         **({"activation_life_cost": life_cost} if life_cost else {}),
+        **({"activation_zone": activation_zone} if activation_zone else {}),
+        **(
+            {"activation_requires_exile_source_from_graveyard": True}
+            if activation_requires_exile_source_from_graveyard
+            else {}
+        ),
         **(
             {
                 "activation_sacrifice_target": sacrifice_target,
@@ -26948,6 +27008,8 @@ def split_row(
             "activation_requires_tap",
             "activation_requires_sacrifice",
             "activation_life_cost",
+            "activation_zone",
+            "activation_requires_exile_source_from_graveyard",
             "activation_sacrifice_target",
             "activation_discard_count",
             "activation_discard_target",
@@ -27013,6 +27075,8 @@ def split_row(
             "activation_requires_tap",
             "activation_requires_sacrifice",
             "activation_life_cost",
+            "activation_zone",
+            "activation_requires_exile_source_from_graveyard",
             "activation_sacrifice_target",
         ):
             if parsed_activation.get(key) != oracle_activation.get(key):

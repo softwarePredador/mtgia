@@ -7650,6 +7650,81 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         )
         self.assertTrue(effect["activation_requires_tap_target"])
 
+    def test_permanent_activated_draw_maps_graveyard_self_exile_cost(self) -> None:
+        row = queue_row(
+            split.DRAW_ENGINE_UNIT,
+            effect_classes=["DrawCardSourceControllerEffect"],
+            ability_kind="activated",
+            ability_classes=["SimpleActivatedAbility"],
+            xmage_signals=["draw", "activated_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Cobbled Lancer",
+                type_line="Creature - Zombie Horse",
+                oracle_text=(
+                    "As an additional cost to cast this spell, exile a creature card from your graveyard.\n"
+                    "{3}{U}, Exile this card from your graveyard: Draw a card."
+                ),
+            ),
+            source_text="""
+                this.getSpellAbility().addCost(new ExileFromGraveCost(
+                    new TargetCardInYourGraveyard(StaticFilters.FILTER_CARD_CREATURE_YOUR_GRAVEYARD)));
+                Ability ability = new SimpleActivatedAbility(
+                    Zone.GRAVEYARD,
+                    new DrawCardSourceControllerEffect(1),
+                    new ManaCostsImpl<>("{3}{U}")
+                );
+                ability.addCost(new ExileSourceFromGraveCost());
+                this.addAbility(ability);
+            """,
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.PERMANENT_ACTIVATED_DRAW_SCOPE)
+        self.assertEqual(effect["activation_cost_mana"], "{3}{U}")
+        self.assertEqual(effect["activation_cost_generic"], 3)
+        self.assertEqual(effect["activation_cost_colors"], ["U"])
+        self.assertEqual(effect["activation_zone"], "graveyard")
+        self.assertTrue(effect["activation_requires_exile_source_from_graveyard"])
+
+    def test_permanent_activated_draw_discard_maps_graveyard_self_exile_cost(self) -> None:
+        row = queue_row(
+            "draw_engine::xmage_draw_card_variant_review_v1",
+            effect_classes=["DrawDiscardControllerEffect"],
+            ability_kind="activated",
+            ability_classes=["SimpleActivatedAbility"],
+            xmage_signals=["draw", "activated_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Maestros Initiate",
+                type_line="Creature - Human Citizen",
+                oracle_text="{4}{U/R}, Exile this card from your graveyard: Draw two cards, then discard a card.",
+            ),
+            source_text="""
+                Ability ability = new SimpleActivatedAbility(
+                    Zone.GRAVEYARD,
+                    new DrawDiscardControllerEffect(2, 1),
+                    new ManaCostsImpl<>("{4}{U/R}")
+                );
+                ability.addCost(new ExileSourceFromGraveCost());
+                this.addAbility(ability);
+            """,
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.PERMANENT_ACTIVATED_DRAW_DISCARD_SCOPE)
+        self.assertEqual(effect["activated_draw_count"], 2)
+        self.assertEqual(effect["activated_discard_count"], 1)
+        self.assertEqual(effect["activation_cost_mana"], "{4}{U/R}")
+        self.assertEqual(effect["activation_zone"], "graveyard")
+        self.assertTrue(effect["activation_requires_exile_source_from_graveyard"])
+
     def test_permanent_activated_draw_maps_remove_any_counter_nonland_cost(self) -> None:
         row = queue_row(
             split.DRAW_ENGINE_UNIT,

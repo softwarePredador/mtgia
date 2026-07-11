@@ -1794,6 +1794,115 @@ def test_simple_activated_draw_runner_executes_remove_counter_cost() -> None:
     assert result["removed_counter_cost_type"] == "+1/+1"
 
 
+def test_simple_activated_draw_runner_executes_graveyard_self_exile_cost() -> None:
+    battle = validator.load_battle(validator.DEFAULT_BATTLE)
+    events = []
+    previous_handler = battle.REPLAY_EVENT_HANDLER
+    previous_get_card_effect = battle.get_card_effect
+    battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+    battle.get_card_effect = lambda card: {
+        "effect": "draw_engine",
+        "battle_model_scope": "xmage_permanent_simple_activated_draw_v1",
+        "permanent_type": "creature",
+        "activated_draw": True,
+        "activated_draw_count": 1,
+        "activation_cost_mana": "{3}{U}",
+        "activation_cost_generic": 3,
+        "activation_cost_colors": ["U"],
+        "activation_requires_tap": False,
+        "activation_requires_sacrifice": False,
+        "activation_zone": "graveyard",
+        "activation_requires_exile_source_from_graveyard": True,
+        "_rule_logical_key": "battle_rule_v1:cobbled-lancer",
+    }
+    try:
+        result = validator.run_simple_activated_draw(
+            battle,
+            {
+                "name": "Cobbled Lancer activates from graveyard",
+                "type": "simple_activated_draw",
+                "card": {"name": "Cobbled Lancer"},
+                "source_zone": "graveyard",
+                "controller_mana": {"generic": 3, "blue": 1},
+                "controller_library": [
+                    {"name": "E2E Activated Draw Card", "type_line": "Sorcery", "effect": "draw_cards"}
+                ],
+                "expected_draw_count": 1,
+                "expected_tapped_source": False,
+                "expected_exiled_source_from_graveyard": True,
+                "logical_rule_key": "battle_rule_v1:cobbled-lancer",
+            },
+            events,
+        )
+    finally:
+        battle.REPLAY_EVENT_HANDLER = previous_handler
+        battle.get_card_effect = previous_get_card_effect
+
+    assert result["card_name"] == "Cobbled Lancer"
+    assert result["cards_drawn"] == 1
+    assert result["source_zone"] == "graveyard"
+    assert result["exiled_source_from_graveyard"] is True
+
+
+def test_simple_activated_draw_discard_runner_executes_graveyard_self_exile_cost() -> None:
+    battle = validator.load_battle(validator.DEFAULT_BATTLE)
+    events = []
+    previous_handler = battle.REPLAY_EVENT_HANDLER
+    previous_get_card_effect = battle.get_card_effect
+    battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+    battle.get_card_effect = lambda card: {
+        "effect": "draw_engine",
+        "battle_model_scope": "xmage_permanent_simple_activated_draw_discard_v1",
+        "permanent_type": "creature",
+        "activated_draw_discard": True,
+        "activated_draw_count": 2,
+        "activated_discard_count": 1,
+        "draw_count": 2,
+        "discard_count": 1,
+        "activation_cost_mana": "{4}{U/R}",
+        "activation_cost_generic": 4,
+        "activation_cost_colors": ["U/R"],
+        "activation_requires_tap": False,
+        "activation_requires_sacrifice": False,
+        "activation_zone": "graveyard",
+        "activation_requires_exile_source_from_graveyard": True,
+        "_rule_logical_key": "battle_rule_v1:maestros-initiate",
+    }
+    try:
+        result = validator.run_simple_activated_draw_discard(
+            battle,
+            {
+                "name": "Maestros Initiate activates from graveyard",
+                "type": "simple_activated_draw_discard",
+                "card": {"name": "Maestros Initiate"},
+                "source_zone": "graveyard",
+                "controller_mana": {"generic": 4, "blue": 1},
+                "controller_hand": [
+                    {"name": "E2E Spare Card", "type_line": "Sorcery", "effect": "draw_cards"}
+                ],
+                "controller_library": [
+                    {"name": "E2E Draw Discard Card A", "type_line": "Instant", "effect": "direct_damage"},
+                    {"name": "E2E Draw Discard Card B", "type_line": "Sorcery", "effect": "draw_cards"},
+                ],
+                "expected_draw_count": 2,
+                "expected_discard_count": 1,
+                "expected_tapped_source": False,
+                "expected_exiled_source_from_graveyard": True,
+                "logical_rule_key": "battle_rule_v1:maestros-initiate",
+            },
+            events,
+        )
+    finally:
+        battle.REPLAY_EVENT_HANDLER = previous_handler
+        battle.get_card_effect = previous_get_card_effect
+
+    assert result["card_name"] == "Maestros Initiate"
+    assert result["cards_drawn"] == 2
+    assert result["cards_discarded"] == 1
+    assert result["source_zone"] == "graveyard"
+    assert result["exiled_source_from_graveyard"] is True
+
+
 def test_fixed_draw_spell_runner_pays_sacrifice_two_creatures_cost() -> None:
     battle = validator.load_battle(validator.DEFAULT_BATTLE)
     events = []

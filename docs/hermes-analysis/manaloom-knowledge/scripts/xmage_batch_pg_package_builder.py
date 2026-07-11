@@ -3260,6 +3260,11 @@ def simple_activated_draw_execution_scenario_from_expected_rule(
         "expected_life_paid": int(required.get("activation_life_cost") or 0),
         "logical_rule_key": rule["logical_rule_key"],
     }
+    if required.get("activation_zone") == "graveyard":
+        scenario["source_zone"] = "graveyard"
+    if required.get("activation_requires_exile_source_from_graveyard"):
+        scenario["source_zone"] = "graveyard"
+        scenario["expected_exiled_source_from_graveyard"] = True
     if sacrifice_target_type:
         sacrifice_card_type = {
             "artifact": "artifact",
@@ -3298,6 +3303,41 @@ def simple_activated_draw_execution_scenario_from_expected_rule(
         scenario["counter_cost_targets"] = [counter_cost_target]
         scenario["expected_remove_counter_cost_count"] = counter_count
         scenario["expected_remove_counter_type"] = counter_type
+    return scenario
+
+
+def simple_activated_draw_discard_execution_scenario_from_expected_rule(
+    rule: dict[str, Any],
+) -> dict[str, Any] | None:
+    required = dict(rule.get("required_effect_fields") or {})
+    if required.get("battle_model_scope") != "xmage_permanent_simple_activated_draw_discard_v1":
+        return None
+    draw_count = int(required.get("activated_draw_count") or required.get("draw_count") or 1)
+    discard_count = int(required.get("activated_discard_count") or required.get("discard_count") or 1)
+    scenario: dict[str, Any] = {
+        "name": f"{rule['card_name']} activates draw-discard ability",
+        "type": "simple_activated_draw_discard",
+        "card": {"name": rule["card_name"]},
+        "controller_mana": _manifest_mana_for_required_activation(required),
+        "controller_hand": [
+            {"name": "E2E Activated Draw Discard Spare", "type_line": "Sorcery", "effect": "draw_cards", "cmc": 2}
+        ],
+        "controller_library": [
+            {"name": "E2E Activated Draw Discard Card A", "type_line": "Instant", "effect": "direct_damage", "cmc": 1},
+            {"name": "E2E Activated Draw Discard Card B", "type_line": "Sorcery", "effect": "draw_cards", "cmc": 2},
+            {"name": "E2E Activated Draw Discard Card C", "type_line": "Creature - Fixture", "effect": "creature", "cmc": 3},
+        ],
+        "expected_draw_count": draw_count,
+        "expected_discard_count": discard_count,
+        "expected_tapped_source": bool(required.get("activation_requires_tap")),
+        "expected_life_paid": int(required.get("activation_life_cost") or 0),
+        "logical_rule_key": rule["logical_rule_key"],
+    }
+    if required.get("activation_zone") == "graveyard":
+        scenario["source_zone"] = "graveyard"
+    if required.get("activation_requires_exile_source_from_graveyard"):
+        scenario["source_zone"] = "graveyard"
+        scenario["expected_exiled_source_from_graveyard"] = True
     return scenario
 
 
@@ -6500,6 +6540,7 @@ def execution_scenario_from_expected_rule(rule: dict[str, Any]) -> dict[str, Any
         or add_counters_untap_target_spell_execution_scenario_from_expected_rule(rule)
         or boost_untap_target_spell_execution_scenario_from_expected_rule(rule)
         or simple_activated_draw_execution_scenario_from_expected_rule(rule)
+        or simple_activated_draw_discard_execution_scenario_from_expected_rule(rule)
         or fixed_draw_spell_execution_scenario_from_expected_rule(rule)
         or fixed_draw_discard_spell_execution_scenario_from_expected_rule(rule)
         or target_player_draw_execution_scenario_from_expected_rule(rule)

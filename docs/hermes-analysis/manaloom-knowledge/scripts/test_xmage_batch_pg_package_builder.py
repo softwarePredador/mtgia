@@ -1584,6 +1584,70 @@ def test_manifest_builds_simple_activated_draw_execution_scenario_with_remove_co
     assert scenario["counter_cost_targets"][0]["plus_one_counters"] == 1
 
 
+def test_manifest_builds_simple_activated_draw_graveyard_self_exile_scenario() -> None:
+    rule = {
+        "normalized_name": "cobbled-lancer",
+        "card_name": "Cobbled Lancer",
+        "oracle_hash": "hash-cobbled-lancer",
+        "logical_rule_key": "battle_rule_v1:cobbled-lancer",
+        "required_effect_fields": {
+            "effect": "draw_engine",
+            "battle_model_scope": "xmage_permanent_simple_activated_draw_v1",
+            "activated_draw": True,
+            "activated_draw_count": 1,
+            "activation_cost_mana": "{3}{U}",
+            "activation_cost_generic": 3,
+            "activation_cost_colors": ["U"],
+            "activation_requires_tap": False,
+            "activation_zone": "graveyard",
+            "activation_requires_exile_source_from_graveyard": True,
+        },
+    }
+
+    scenario = builder.simple_activated_draw_execution_scenario_from_expected_rule(rule)
+
+    assert scenario is not None
+    assert scenario["type"] == "simple_activated_draw"
+    assert scenario["source_zone"] == "graveyard"
+    assert scenario["expected_exiled_source_from_graveyard"] is True
+    assert scenario["controller_mana"]["generic"] == 3
+    assert scenario["controller_mana"]["blue"] == 1
+
+
+def test_manifest_builds_simple_activated_draw_discard_graveyard_self_exile_scenario() -> None:
+    rule = {
+        "normalized_name": "maestros-initiate",
+        "card_name": "Maestros Initiate",
+        "oracle_hash": "hash-maestros-initiate",
+        "logical_rule_key": "battle_rule_v1:maestros-initiate",
+        "required_effect_fields": {
+            "effect": "draw_engine",
+            "battle_model_scope": "xmage_permanent_simple_activated_draw_discard_v1",
+            "activated_draw_discard": True,
+            "activated_draw_count": 2,
+            "activated_discard_count": 1,
+            "draw_count": 2,
+            "discard_count": 1,
+            "activation_cost_mana": "{4}{U/R}",
+            "activation_cost_generic": 4,
+            "activation_cost_colors": ["U/R"],
+            "activation_requires_tap": False,
+            "activation_zone": "graveyard",
+            "activation_requires_exile_source_from_graveyard": True,
+        },
+    }
+
+    scenario = builder.simple_activated_draw_discard_execution_scenario_from_expected_rule(rule)
+
+    assert scenario is not None
+    assert scenario["type"] == "simple_activated_draw_discard"
+    assert scenario["source_zone"] == "graveyard"
+    assert scenario["expected_exiled_source_from_graveyard"] is True
+    assert scenario["expected_draw_count"] == 2
+    assert scenario["expected_discard_count"] == 1
+    assert scenario["controller_mana"]["generic"] == 4
+
+
 def test_manifest_builds_target_player_x_draw_execution_scenario() -> None:
     rule = {
         "normalized_name": "braingeyser",
