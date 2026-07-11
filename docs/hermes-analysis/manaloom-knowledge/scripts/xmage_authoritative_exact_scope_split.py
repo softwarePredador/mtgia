@@ -26446,6 +26446,23 @@ def mana_spent_cast_trigger_detail_from_oracle(metadata: dict[str, Any]) -> dict
                 "spell_filter": "dragon_creature_spell",
                 "effects": [{"effect": "scry", "count": 2}],
             }
+        elif (
+            filter_text == "a dragon creature spell"
+            and effect_text
+            == "it enters with an additional +1/+1 counter on it and gains hexproof until your next turn"
+        ):
+            trigger = {
+                "spell_filter": "dragon_creature_spell",
+                "effects": [
+                    {
+                        "effect": "enter_with_counter_and_gain_keyword",
+                        "counter_type": "+1/+1",
+                        "counter_count": 1,
+                        "keyword": "hexproof",
+                        "duration": "until_next_turn",
+                    }
+                ],
+            }
         if trigger is None:
             return None
         candidates.append({
@@ -26472,15 +26489,25 @@ def mana_spent_cast_trigger_source_blocker(source_text: str, detail: dict[str, A
     elif spell_filter == "dragon_creature_spell":
         if "FilterCreatureSpell" not in text or "SubType.DRAGON.getPredicate()" not in text:
             return "mana_spent_trigger_source_dragon_filter_mismatch"
-        effect = (trigger.get("effects") or [{}])[0]
-        if effect.get("effect") == "gain_life":
-            if f"GainLifeEffect({int(effect.get('amount') or 0)})" not in text:
-                return "mana_spent_trigger_source_life_gain_mismatch"
-        elif effect.get("effect") == "scry":
-            if f"ScryEffect({int(effect.get('count') or 0)})" not in text:
-                return "mana_spent_trigger_source_scry_mismatch"
-        else:
-            return "mana_spent_trigger_source_effect_not_supported"
+        for effect in trigger.get("effects") or [{}]:
+            if not isinstance(effect, dict):
+                return "mana_spent_trigger_source_effect_not_supported"
+            effect_kind = effect.get("effect")
+            if effect_kind == "gain_life":
+                if f"GainLifeEffect({int(effect.get('amount') or 0)})" not in text:
+                    return "mana_spent_trigger_source_life_gain_mismatch"
+            elif effect_kind == "scry":
+                if f"ScryEffect({int(effect.get('count') or 0)})" not in text:
+                    return "mana_spent_trigger_source_scry_mismatch"
+            elif effect_kind == "enter_with_counter_and_gain_keyword":
+                if "JadeOrbAdditionalCounterEffect" not in text or "CounterType.P1P1" not in text:
+                    return "mana_spent_trigger_source_counter_replacement_mismatch"
+                if "JadeOrbGainHexproofEffect" not in text or "HexproofAbility" not in text:
+                    return "mana_spent_trigger_source_hexproof_mismatch"
+                if "Duration.UntilYourNextTurn" not in text:
+                    return "mana_spent_trigger_source_hexproof_duration_mismatch"
+            else:
+                return "mana_spent_trigger_source_effect_not_supported"
     else:
         return "mana_spent_trigger_source_filter_not_supported"
     return None

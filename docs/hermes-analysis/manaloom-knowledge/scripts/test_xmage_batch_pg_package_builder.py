@@ -1400,6 +1400,42 @@ def test_mana_spent_cast_trigger_manifest_builds_cast_trigger_scenario() -> None
     assert scenario["expected_draw_count"] == 0
 
 
+def test_mana_spent_cast_trigger_manifest_builds_dragon_etb_counter_hexproof_scenario() -> None:
+    rule = {
+        "card_name": "Jade Orb of Dragonkind",
+        "logical_rule_key": "battle_rule_v1:jade",
+        "required_effect_fields": {
+            "effect": "ramp_permanent",
+            "battle_model_scope": "xmage_simple_tap_mana_source_with_mana_spent_cast_trigger_v1",
+            "is_mana_source": True,
+            "mana_produced": 1,
+            "produces": "G",
+            "produced_mana_symbols": ["G"],
+            "mana_activation_requires_tap": True,
+            "mana_spent_cast_trigger": {
+                "spell_filter": "dragon_creature_spell",
+                "effects": [
+                    {
+                        "effect": "enter_with_counter_and_gain_keyword",
+                        "counter_type": "+1/+1",
+                        "counter_count": 1,
+                        "keyword": "hexproof",
+                        "duration": "until_next_turn",
+                    }
+                ],
+            },
+        },
+    }
+
+    scenario = builder.execution_scenario_from_expected_rule(rule)
+
+    assert scenario["type"] == "mana_spent_cast_trigger"
+    assert scenario["card"]["name"] == "Jade Orb of Dragonkind"
+    assert scenario["cast_card"]["type_line"] == "Creature - Dragon"
+    assert scenario["expected_cast_card_plus_one_counters"] == 1
+    assert scenario["expected_cast_card_keywords"] == ["hexproof"]
+
+
 def test_mana_activation_cast_trigger_manifest_builds_x_spell_scenario() -> None:
     rule = {
         "card_name": "Brass Infiniscope",

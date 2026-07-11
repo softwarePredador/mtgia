@@ -3565,6 +3565,20 @@ def mana_spent_cast_trigger_execution_scenario_from_expected_rule(rule: dict[str
         for effect in effects
         if effect.get("effect") == "scry"
     )
+    expected_cast_card_plus_one_counters = sum(
+        int(effect.get("counter_count") or 0)
+        for effect in effects
+        if effect.get("effect") == "enter_with_counter_and_gain_keyword"
+        and effect.get("counter_type") == "+1/+1"
+    )
+    expected_cast_card_keywords = sorted(
+        {
+            str(effect.get("keyword") or "").strip().lower().replace(" ", "_")
+            for effect in effects
+            if effect.get("effect") == "enter_with_counter_and_gain_keyword"
+            and str(effect.get("keyword") or "").strip()
+        }
+    )
     library: list[dict[str, Any]] = []
     library.extend(
         {
@@ -3603,6 +3617,8 @@ def mana_spent_cast_trigger_execution_scenario_from_expected_rule(rule: dict[str
             if effect.get("effect") == "gain_life"
         ),
         "expected_scry_count": expected_scry_count,
+        "expected_cast_card_plus_one_counters": expected_cast_card_plus_one_counters,
+        "expected_cast_card_keywords": expected_cast_card_keywords,
         "logical_rule_key": rule["logical_rule_key"],
     }
 

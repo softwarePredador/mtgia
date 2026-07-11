@@ -1,0 +1,42 @@
+BEGIN;
+
+CREATE SCHEMA IF NOT EXISTS manaloom_deploy_audit;
+
+DROP TABLE IF EXISTS manaloom_deploy_audit.pg764b_trusted_rule_oracle_hash_backfill_new_server_20260711;
+
+CREATE TABLE manaloom_deploy_audit.pg764b_trusted_rule_oracle_hash_backfill_new_server_20260711 AS
+SELECT
+  r.*,
+  md5(coalesce(c.oracle_text, '')) AS computed_oracle_hash,
+  now() AS audit_created_at
+FROM public.card_battle_rules r
+JOIN public.cards c ON c.id = r.card_id
+WHERE r.source = 'curated'
+  AND r.review_status IN ('verified', 'active')
+  AND r.execution_status = 'auto'
+  AND nullif(btrim(coalesce(r.oracle_hash, '')), '') IS NULL
+  AND nullif(btrim(coalesce(c.oracle_text, '')), '') IS NOT NULL;
+
+WITH updated AS (
+  UPDATE public.card_battle_rules r
+  SET
+    oracle_hash = md5(coalesce(c.oracle_text, '')),
+    updated_at = now(),
+    notes = concat_ws(
+      E'\n',
+      nullif(r.notes, ''),
+      'PG764B contract backfill: oracle_hash restored from cards.oracle_text for trusted executable rule after PG764 audit.'
+    )
+  FROM public.cards c
+  WHERE c.id = r.card_id
+    AND r.source = 'curated'
+    AND r.review_status IN ('verified', 'active')
+    AND r.execution_status = 'auto'
+    AND nullif(btrim(coalesce(r.oracle_hash, '')), '') IS NULL
+    AND nullif(btrim(coalesce(c.oracle_text, '')), '') IS NOT NULL
+  RETURNING r.normalized_name, r.card_name, r.logical_rule_key, r.oracle_hash
+)
+SELECT count(*) AS oracle_hash_rows_backfilled
+FROM updated;
+
+COMMIT;

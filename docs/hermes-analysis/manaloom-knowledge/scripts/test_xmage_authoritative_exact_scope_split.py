@@ -33683,7 +33683,7 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
             ],
         )
 
-    def test_mana_spent_dragon_etb_replacement_stays_partial(self) -> None:
+    def test_mana_spent_dragon_etb_replacement_maps_to_exact_runtime_scope(self) -> None:
         proposal, reason = split.split_row(
             queue_row(
                 "ramp_permanent::xmage_artifact_mana_source_variant_review_v1",
@@ -33710,15 +33710,40 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
                     new JadeOrbAdditionalCounterEffect(), filter);
                 manaSpentAbility.addEffect(new JadeOrbGainHexproofEffect());
                 ability.addEffect(new CreateDelayedTriggeredAbilityEffect(manaSpentAbility));
+                class JadeOrbAdditionalCounterEffect extends ReplacementEffectImpl {
+                    Permanent target = ((EntersTheBattlefieldEvent) event).getTarget();
+                    target.addCounters(CounterType.P1P1.createInstance(), source.getControllerId(), source, game, event.getAppliedEffects());
+                }
+                class JadeOrbGainHexproofEffect extends GainAbilityTargetEffect {
+                    JadeOrbGainHexproofEffect() {
+                        super(HexproofAbility.getInstance(), Duration.UntilYourNextTurn, null, true);
+                    }
+                }
                 static { filter.add(SubType.DRAGON.getPredicate()); }
                 private static final FilterSpell filter = new FilterCreatureSpell("a Dragon creature spell");
             """,
         )
 
         self.assertEqual(reason, "selected_exact_scope")
-        self.assertFalse(proposal["safe_for_batch_pg_package"])
-        self.assertEqual(proposal["proposal_status"], "runtime_partial_requires_family_runtime")
-        self.assertTrue(proposal["effect_json"]["_runtime_partial"])
+        self.assertTrue(proposal["safe_for_batch_pg_package"])
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.MANA_SPENT_CAST_TRIGGER_SCOPE)
+        self.assertEqual(
+            effect["mana_spent_cast_trigger"],
+            {
+                "spell_filter": "dragon_creature_spell",
+                "effects": [
+                    {
+                        "effect": "enter_with_counter_and_gain_keyword",
+                        "counter_type": "+1/+1",
+                        "counter_count": 1,
+                        "keyword": "hexproof",
+                        "duration": "until_next_turn",
+                    }
+                ],
+            },
+        )
+        self.assertNotIn("_runtime_partial", effect)
 
 
 if __name__ == "__main__":

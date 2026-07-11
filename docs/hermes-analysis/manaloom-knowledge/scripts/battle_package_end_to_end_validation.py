@@ -5646,6 +5646,29 @@ def run_mana_spent_cast_trigger(
     )
     if actual_scry_count != expected_scry_count:
         fail("battle_execution", f"{card['name']} scried {actual_scry_count}, expected {expected_scry_count}")
+    expected_plus_one_counters = int(scenario.get("expected_cast_card_plus_one_counters") or 0)
+    actual_plus_one_counters = int(cast_card.get("plus_one_counters") or 0)
+    if actual_plus_one_counters != expected_plus_one_counters:
+        fail(
+            "battle_execution",
+            f"{card['name']} cast card +1/+1 counters={actual_plus_one_counters}, "
+            f"expected {expected_plus_one_counters}",
+        )
+    expected_keywords = [
+        str(keyword or "").strip().lower().replace(" ", "_")
+        for keyword in scenario.get("expected_cast_card_keywords") or []
+        if str(keyword or "").strip()
+    ]
+    missing_keywords = [
+        keyword
+        for keyword in expected_keywords
+        if not bool(cast_card.get(keyword))
+    ]
+    if missing_keywords:
+        fail(
+            "battle_execution",
+            f"{card['name']} cast card missing expected keywords: {', '.join(missing_keywords)}",
+        )
     return {
         "scenario": scenario.get("name"),
         "card_name": card["name"],
@@ -5654,6 +5677,8 @@ def run_mana_spent_cast_trigger(
         "draw_count": actual_draw_count,
         "life_gain": actual_life_gain,
         "scry_count": actual_scry_count,
+        "cast_card_plus_one_counters": actual_plus_one_counters,
+        "cast_card_keywords": expected_keywords,
         "available_mana_after_cast": active.available_mana(),
     }
 

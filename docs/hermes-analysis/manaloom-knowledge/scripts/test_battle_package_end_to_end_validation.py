@@ -5277,6 +5277,78 @@ def test_mana_spent_cast_trigger_runner_resolves_life_gain() -> None:
     assert any(event == "mana_spent_cast_trigger_resolved" for event, _data in events)
 
 
+def test_mana_spent_cast_trigger_runner_applies_dragon_counter_and_hexproof() -> None:
+    battle = validator.load_battle(validator.DEFAULT_BATTLE)
+    events = []
+    previous_handler = battle.REPLAY_EVENT_HANDLER
+    previous_get_card_effect = battle.get_card_effect
+    battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+
+    def get_effect(card):
+        if card.get("name") == "Jade Orb of Dragonkind":
+            return {
+                "effect": "ramp_permanent",
+                "battle_model_scope": "xmage_simple_tap_mana_source_with_mana_spent_cast_trigger_v1",
+                "is_mana_source": True,
+                "mana_produced": 1,
+                "produces": "G",
+                "produced_mana_symbols": ["G"],
+                "mana_activation_requires_tap": True,
+                "mana_spent_cast_trigger": {
+                    "spell_filter": "dragon_creature_spell",
+                    "effects": [
+                        {
+                            "effect": "enter_with_counter_and_gain_keyword",
+                            "counter_type": "+1/+1",
+                            "counter_count": 1,
+                            "keyword": "hexproof",
+                            "duration": "until_next_turn",
+                        }
+                    ],
+                },
+                "_rule_logical_key": "battle_rule_v1:jade",
+            }
+        return {"effect": "creature"}
+
+    battle.get_card_effect = get_effect
+    try:
+        result = validator.run_mana_spent_cast_trigger(
+            battle,
+            {
+                "name": "Jade Orb buffs Dragon after spending its mana",
+                "type": "mana_spent_cast_trigger",
+                "card": {"name": "Jade Orb of Dragonkind", "type_line": "Artifact"},
+                "cast_card": {
+                    "name": "E2E Dragon Creature Spell",
+                    "type_line": "Creature - Dragon",
+                    "mana_cost": "{G}",
+                    "cmc": 1,
+                    "effect": "creature",
+                    "power": 3,
+                    "toughness": 3,
+                },
+                "expected_available_mana_after_refresh": 1,
+                "expected_trigger_count": 1,
+                "expected_draw_count": 0,
+                "expected_life_gain": 0,
+                "expected_scry_count": 0,
+                "expected_cast_card_plus_one_counters": 1,
+                "expected_cast_card_keywords": ["hexproof"],
+                "logical_rule_key": "battle_rule_v1:jade",
+            },
+            events,
+        )
+    finally:
+        battle.REPLAY_EVENT_HANDLER = previous_handler
+        battle.get_card_effect = previous_get_card_effect
+
+    assert result["card_name"] == "Jade Orb of Dragonkind"
+    assert result["trigger_count"] == 1
+    assert result["cast_card_plus_one_counters"] == 1
+    assert result["cast_card_keywords"] == ["hexproof"]
+    assert any(event == "mana_spent_cast_trigger_resolved" for event, _data in events)
+
+
 def test_mana_activation_cast_trigger_runner_resolves_x_spell_draw_life() -> None:
     battle = validator.load_battle(validator.DEFAULT_BATTLE)
     events = []

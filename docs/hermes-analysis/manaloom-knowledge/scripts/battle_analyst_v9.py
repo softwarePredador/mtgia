@@ -2678,6 +2678,44 @@ def _resolve_cast_trigger_effects(player, card, effect_data, trigger, *, phase=N
                     "count": count,
                     **scry_result,
                 })
+        elif effect_kind == "enter_with_counter_and_gain_keyword":
+            counter_type = str(trigger_effect.get("counter_type") or "+1/+1")
+            counter_count = max(0, int(trigger_effect.get("counter_count") or 0))
+            keyword = str(trigger_effect.get("keyword") or "").strip().lower().replace(" ", "_")
+            counters_before = int(card.get("plus_one_counters") or 0) if isinstance(card, dict) else 0
+            counters_added = 0
+            if isinstance(card, dict) and counter_count > 0:
+                if counter_type == "+1/+1":
+                    add_plus_one_counters(card, counter_count)
+                    counters_added = counter_count
+                elif counter_type == "-1/-1":
+                    counters_added = add_minus_one_counters(card, counter_count) or 0
+                else:
+                    counters_added = add_named_counters(card, counter_type, counter_count) or 0
+            keyword_granted = False
+            if isinstance(card, dict) and keyword:
+                card[keyword] = True
+                keywords = card.get("keywords")
+                if not isinstance(keywords, list):
+                    keywords = []
+                if keyword not in {str(value).lower().replace(" ", "_") for value in keywords}:
+                    keywords.append(keyword)
+                card["keywords"] = keywords
+                if trigger_effect.get("duration"):
+                    card[f"{keyword}_duration"] = trigger_effect.get("duration")
+                keyword_granted = True
+            if counters_added or keyword_granted:
+                effect_results.append({
+                    "effect": effect_kind,
+                    "counter_type": counter_type,
+                    "counter_count": counter_count,
+                    "counters_before": counters_before,
+                    "counters_added": counters_added,
+                    "counters_after": int(card.get("plus_one_counters") or 0) if isinstance(card, dict) else 0,
+                    "keyword": keyword,
+                    "keyword_granted": keyword_granted,
+                    "duration": trigger_effect.get("duration"),
+                })
     return effect_results
 
 
