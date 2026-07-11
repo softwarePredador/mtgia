@@ -570,6 +570,7 @@ E2E_REQUIRED_EFFECT_FIELDS = (
     "dynamic_mana_battlefield_count_scope",
     "dynamic_mana_battlefield_count_card_types",
     "dynamic_mana_battlefield_count_subtypes",
+    "dynamic_mana_graveyard_count_card_types",
     "conditional_mana_controlled_creature_power_gte",
     "conditional_mana_controlled_creature_count_gte",
     "conditional_mana_produced_when_condition_met",
@@ -3361,12 +3362,34 @@ def _manifest_dynamic_fixed_mana_fixture(required: dict[str, Any]) -> tuple[dict
         return {}, None
     if amount_source == "battlefield_permanent_count":
         scope = str(required.get("dynamic_mana_battlefield_count_scope") or "controller_battlefield").lower()
+        card_types = [str(value).lower() for value in required.get("dynamic_mana_battlefield_count_card_types") or []]
         subtypes = [str(value).lower() for value in required.get("dynamic_mana_battlefield_count_subtypes") or []]
+        if "enchantment" in card_types:
+            return {
+                "controller_battlefield": [
+                    {"name": f"E2E Enchantment {index + 1}", "type_line": "Enchantment"}
+                    for index in range(2)
+                ]
+            }, 3
         if "swamp" in subtypes:
             return {
                 "controller_battlefield": [
                     {"name": f"E2E Swamp {index + 1}", "type_line": "Land - Swamp"}
                     for index in range(3)
+                ]
+            }, 3
+        if "forest" in subtypes:
+            return {
+                "controller_battlefield": [
+                    {"name": f"E2E Forest {index + 1}", "type_line": "Land - Forest"}
+                    for index in range(3)
+                ]
+            }, 3
+        if "ally" in subtypes:
+            return {
+                "controller_battlefield": [
+                    {"name": f"E2E Ally {index + 1}", "type_line": "Creature - Ally"}
+                    for index in range(2)
                 ]
             }, 3
         if "elf" in subtypes:
@@ -3379,6 +3402,15 @@ def _manifest_dynamic_fixed_mana_fixture(required: dict[str, Any]) -> tuple[dict
                 ],
             }
             return fixture, 3 if scope == "all_battlefield" else 2
+    if amount_source == "controller_graveyard_card_count":
+        card_types = [str(value).lower() for value in required.get("dynamic_mana_graveyard_count_card_types") or []]
+        if "creature" in card_types:
+            return {
+                "controller_graveyard": [
+                    {"name": f"E2E Graveyard Creature {index + 1}", "type_line": "Creature"}
+                    for index in range(3)
+                ]
+            }, 3
     if amount_source == "devotion_to_green":
         return {
             "controller_battlefield": [
@@ -3429,6 +3461,7 @@ def simple_mana_source_execution_scenario_from_expected_rule(rule: dict[str, Any
         "xmage_simple_tap_restricted_mana_source_permanent_v1",
         "xmage_simple_tap_land_color_dependent_mana_source_permanent_v1",
         "xmage_fixed_color_dynamic_mana_source_permanent_v1",
+        "xmage_dynamic_any_one_color_mana_source_permanent_v1",
         "xmage_controlled_creature_condition_conditional_mana_source_permanent_v1",
         "xmage_simple_tap_mana_source_with_mana_spent_cast_trigger_v1",
         "pain_talisman_color_pair_partial_v1",
@@ -3490,6 +3523,24 @@ def simple_mana_source_execution_scenario_from_expected_rule(rule: dict[str, Any
             str(mode.get("restriction") or "")
             for mode in conditional_modes
             if str(mode.get("restriction") or "")
+        }
+    )
+    color_names = {
+        "W": "white",
+        "U": "blue",
+        "B": "black",
+        "R": "red",
+        "G": "green",
+        "C": "colorless",
+    }
+    conditional_colors = sorted(
+        {
+            color_names.get(
+                str(mode.get("color") or "").strip().upper(),
+                str(mode.get("color") or "").strip().lower(),
+            )
+            for mode in conditional_modes
+            if str(mode.get("color") or "")
         }
     )
     scenario = {
@@ -3588,6 +3639,8 @@ def simple_mana_source_execution_scenario_from_expected_rule(rule: dict[str, Any
     )
     if conditional_life_loss_by_color:
         scenario["expected_conditional_life_loss_by_color"] = conditional_life_loss_by_color
+    if conditional_colors:
+        scenario["expected_conditional_colors"] = conditional_colors
     land_dependency_controller = str(required.get("land_mana_dependency_controller") or "")
     if land_dependency_controller in {"self", "opponent"}:
         lands, expected_colors = _manifest_land_color_dependency_lands(

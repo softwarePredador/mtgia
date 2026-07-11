@@ -376,6 +376,7 @@ RESTRICTED_MANA_WITH_FORMIDABLE_LIFE_RESET_SCOPE = (
 )
 LAND_COLOR_DEPENDENT_MANA_SCOPE = "xmage_simple_tap_land_color_dependent_mana_source_permanent_v1"
 DYNAMIC_FIXED_COLOR_MANA_SCOPE = "xmage_fixed_color_dynamic_mana_source_permanent_v1"
+DYNAMIC_ANY_ONE_COLOR_MANA_SCOPE = "xmage_dynamic_any_one_color_mana_source_permanent_v1"
 CONTROLLED_CREATURE_CONDITION_CONDITIONAL_MANA_SCOPE = "xmage_controlled_creature_condition_conditional_mana_source_permanent_v1"
 PAIN_TALISMAN_SCOPE = "pain_talisman_color_pair_partial_v1"
 MANA_WITH_ACTIVATION_LIFE_GAIN_SCOPE = "xmage_simple_tap_mana_source_with_gain_life_v1"
@@ -26396,6 +26397,24 @@ def fixed_color_dynamic_mana_source_detail_from_oracle(
             )
             continue
         match = re.fullmatch(
+            r"\{t\}: add \{(?P<symbol>[wubrg])\} for each (?P<subtype>forest) you control",
+            normalized,
+        )
+        if match:
+            candidates.append(
+                {
+                    "produces": match.group("symbol").upper(),
+                    "mana_produced": 1,
+                    "dynamic_mana_amount_source": "battlefield_permanent_count",
+                    "dynamic_mana_battlefield_count_scope": "controller_battlefield",
+                    "dynamic_mana_battlefield_count_subtypes": [match.group("subtype")],
+                    "mana_activation_requires_tap": True,
+                    "source_type_line": type_line,
+                    "source_mana_cost": mana_cost,
+                }
+            )
+            continue
+        match = re.fullmatch(
             r"\{(?P<cost>\d+)\}, \{t\}: add \{(?P<symbol>[wubrg])\} for each (?P<subtype>swamp) you control",
             normalized,
         )
@@ -26450,6 +26469,145 @@ def fixed_color_dynamic_mana_source_detail_from_oracle(
     return None
 
 
+def _dynamic_any_one_color_modes() -> list[dict[str, Any]]:
+    return [
+        {
+            "color": symbol,
+            "restriction": "any_spell",
+            "mode": "dynamic_any_one_color",
+            "status": "runtime_executor_v1",
+        }
+        for symbol in "WUBRG"
+    ]
+
+
+def dynamic_any_one_color_mana_source_detail_from_oracle(
+    metadata: dict[str, Any],
+) -> dict[str, Any] | str | None:
+    candidates: list[dict[str, Any]] = []
+    type_line = str(metadata.get("type_line") or "")
+    mana_cost = str(metadata.get("mana_cost") or "")
+    for line in normalized_oracle_lines(metadata):
+        normalized = strip_parenthetical_reminders(
+            re.sub(r"\s+", " ", str(line or "").strip().lower())
+        ).strip().rstrip(".")
+        base = {
+            "produces": "WUBRG",
+            "mana_produced": 1,
+            "produced_mana_symbols": list("WUBRG"),
+            "conditional_mana_same_color_choice": True,
+            "conditional_mana_modes_status": "runtime_executor_v1",
+            "conditional_mana_modes": _dynamic_any_one_color_modes(),
+            "mana_activation_requires_tap": True,
+            "source_type_line": type_line,
+            "source_mana_cost": mana_cost,
+        }
+        match = re.fullmatch(
+            r"\{t\}: add x mana of any one color, where x is the number of (?P<subtype>allies|elves) (?P<scope>you control|on the battlefield)",
+            normalized,
+        )
+        if match:
+            subtype = {"allies": "ally", "elves": "elf"}[match.group("subtype")]
+            candidates.append(
+                {
+                    **base,
+                    "dynamic_mana_amount_source": "battlefield_permanent_count",
+                    "dynamic_mana_battlefield_count_scope": (
+                        "controller_battlefield"
+                        if match.group("scope") == "you control"
+                        else "all_battlefield"
+                    ),
+                    "dynamic_mana_battlefield_count_subtypes": [subtype],
+                }
+            )
+            continue
+        match = re.fullmatch(
+            r"\{t\}: add x mana of any one color, where x is the number of enchantments you control",
+            normalized,
+        )
+        if match:
+            candidates.append(
+                {
+                    **base,
+                    "dynamic_mana_amount_source": "battlefield_permanent_count",
+                    "dynamic_mana_battlefield_count_scope": "controller_battlefield",
+                    "dynamic_mana_battlefield_count_card_types": ["enchantment"],
+                }
+            )
+            continue
+        match = re.fullmatch(
+            r"\{t\}: add x mana of any one color, where x is the number of creature cards in your graveyard",
+            normalized,
+        )
+        if match:
+            candidates.append(
+                {
+                    **base,
+                    "dynamic_mana_amount_source": "controller_graveyard_card_count",
+                    "dynamic_mana_graveyard_count_card_types": ["creature"],
+                }
+            )
+            continue
+    if len(candidates) == 1:
+        return candidates[0]
+    return None
+
+
+def _source_has_dynamic_any_one_color_mana(text: str) -> bool:
+    if re.search(r"Mana\.AnyMana\s*\(\s*1\s*\)", text):
+        return True
+    for match in re.finditer(r"new\s+Mana\s*\((.*?)\)", text, flags=re.S):
+        args = [str(arg).strip() for arg in split_top_level_args(match.group(1))]
+        if len(args) >= 7 and args[:6] == ["0", "0", "0", "0", "0", "0"] and args[6] == "1":
+            return True
+    return False
+
+
+def dynamic_any_one_color_mana_source_detail_from_source(
+    source_text: str,
+    mana_ability_classes: set[str],
+) -> dict[str, Any] | str | None:
+    text = source_text or ""
+    if "DynamicManaAbility" not in mana_ability_classes:
+        return None
+    if mana_ability_classes != {"DynamicManaAbility"}:
+        return "dynamic_any_one_color_mana_source_ability_class_not_exact"
+    if re.search(r"new\s+[A-Za-z0-9_]+Effect\s*\(", text):
+        return "dynamic_any_one_color_mana_source_effect_class_not_empty"
+    if "SacrificeTargetCost" in text or re.search(r"\.addCost\s*\([^;]*Sacrifice", text, re.S):
+        return "dynamic_any_one_color_mana_source_sacrifice_cost_not_supported"
+    if not _source_has_dynamic_any_one_color_mana(text):
+        return "dynamic_any_one_color_mana_source_color_not_supported"
+    detail: dict[str, Any] = {
+        "produces": "WUBRG",
+        "mana_produced": 1,
+        "produced_mana_symbols": list("WUBRG"),
+        "conditional_mana_same_color_choice": True,
+        "conditional_mana_modes_status": "runtime_executor_v1",
+        "conditional_mana_modes": _dynamic_any_one_color_modes(),
+        "mana_activation_requires_tap": True,
+    }
+    if "CardsInControllerGraveyardCount" in text and "FILTER_CARD_CREATURE" in text:
+        detail["dynamic_mana_amount_source"] = "controller_graveyard_card_count"
+        detail["dynamic_mana_graveyard_count_card_types"] = ["creature"]
+    elif "PermanentsOnBattlefieldCount" in text:
+        detail["dynamic_mana_amount_source"] = "battlefield_permanent_count"
+        if "FilterControlledEnchantmentPermanent" in text:
+            detail["dynamic_mana_battlefield_count_scope"] = "controller_battlefield"
+            detail["dynamic_mana_battlefield_count_card_types"] = ["enchantment"]
+        elif "FilterControlledPermanent" in text and "SubType.ALLY" in text:
+            detail["dynamic_mana_battlefield_count_scope"] = "controller_battlefield"
+            detail["dynamic_mana_battlefield_count_subtypes"] = ["ally"]
+        elif "FilterPermanent" in text and "SubType.ELF" in text:
+            detail["dynamic_mana_battlefield_count_scope"] = "all_battlefield"
+            detail["dynamic_mana_battlefield_count_subtypes"] = ["elf"]
+        else:
+            return "dynamic_any_one_color_mana_source_battlefield_count_not_supported"
+    else:
+        return "dynamic_any_one_color_mana_source_amount_source_not_supported"
+    return detail
+
+
 def fixed_color_dynamic_mana_source_detail_from_source(
     source_text: str,
     mana_ability_classes: set[str],
@@ -26487,6 +26645,9 @@ def fixed_color_dynamic_mana_source_detail_from_source(
         if "FilterControlledPermanent" in text and "SubType.SWAMP" in text:
             detail["dynamic_mana_battlefield_count_scope"] = "controller_battlefield"
             detail["dynamic_mana_battlefield_count_subtypes"] = ["swamp"]
+        elif "FilterControlledPermanent" in text and "SubType.FOREST" in text:
+            detail["dynamic_mana_battlefield_count_scope"] = "controller_battlefield"
+            detail["dynamic_mana_battlefield_count_subtypes"] = ["forest"]
         elif "FilterPermanent" in text and "SubType.ELF" in text:
             detail["dynamic_mana_battlefield_count_scope"] = "all_battlefield"
             detail["dynamic_mana_battlefield_count_subtypes"] = ["elf"]
@@ -42484,6 +42645,72 @@ def split_row(
                 family_id="xmage_land_color_dependent_mana_source",
             ), "selected_exact_scope"
         dynamic_fixed_color_mana_source = fixed_color_dynamic_mana_source_detail_from_oracle(metadata)
+        dynamic_any_one_color_mana_source = dynamic_any_one_color_mana_source_detail_from_oracle(metadata)
+        if dynamic_any_one_color_mana_source is not None:
+            source_dynamic_any_one_color_mana = dynamic_any_one_color_mana_source_detail_from_source(
+                source_text,
+                mana_ability_classes,
+            )
+            if isinstance(source_dynamic_any_one_color_mana, str):
+                return None, source_dynamic_any_one_color_mana
+            if source_dynamic_any_one_color_mana is None:
+                return None, "dynamic_any_one_color_mana_source_source_not_supported"
+            for key in (
+                "produces",
+                "mana_produced",
+                "produced_mana_symbols",
+                "conditional_mana_same_color_choice",
+                "dynamic_mana_amount_source",
+                "dynamic_mana_battlefield_count_scope",
+                "dynamic_mana_battlefield_count_card_types",
+                "dynamic_mana_battlefield_count_subtypes",
+                "dynamic_mana_graveyard_count_card_types",
+                "mana_activation_requires_tap",
+            ):
+                if source_dynamic_any_one_color_mana.get(key) != dynamic_any_one_color_mana_source.get(key):
+                    return None, f"dynamic_any_one_color_mana_source_source_oracle_{key}_mismatch"
+            type_line = str(metadata.get("type_line") or "")
+            effect_json = {
+                "effect": "ramp_permanent",
+                "battle_model_scope": DYNAMIC_ANY_ONE_COLOR_MANA_SCOPE,
+                "is_mana_source": True,
+                "mana_produced": 1,
+                "produces": "WUBRG",
+                "produced_mana_symbols": list("WUBRG"),
+                "conditional_mana_same_color_choice": True,
+                "conditional_mana_modes_status": "runtime_executor_v1",
+                "conditional_mana_modes": _dynamic_any_one_color_modes(),
+                "mana_activation_requires_tap": True,
+                "activation_requires_tap": True,
+                "permanent_type": (
+                    "creature"
+                    if "creature" in type_line.lower()
+                    else "artifact"
+                    if "artifact" in type_line.lower()
+                    else "permanent"
+                ),
+                "ability_kind": "activated_mana",
+                "dynamic_mana_amount_source": dynamic_any_one_color_mana_source["dynamic_mana_amount_source"],
+                "source_type_line": type_line,
+                "source_mana_cost": str(metadata.get("mana_cost") or ""),
+                "xmage_mana_ability_classes": ["DynamicManaAbility"],
+                "xmage_effect_classes": sorted(classes),
+                "xmage_ability_classes": sorted(mana_ability_classes),
+            }
+            for optional_key in (
+                "dynamic_mana_battlefield_count_scope",
+                "dynamic_mana_battlefield_count_card_types",
+                "dynamic_mana_battlefield_count_subtypes",
+                "dynamic_mana_graveyard_count_card_types",
+            ):
+                if dynamic_any_one_color_mana_source.get(optional_key) not in (None, "", []):
+                    effect_json[optional_key] = dynamic_any_one_color_mana_source[optional_key]
+            return build_proposal(
+                row,
+                metadata,
+                effect_json,
+                family_id="xmage_dynamic_any_one_color_mana_source",
+            ), "selected_exact_scope"
         if dynamic_fixed_color_mana_source is not None:
             source_dynamic_fixed_color_mana = fixed_color_dynamic_mana_source_detail_from_source(
                 source_text,

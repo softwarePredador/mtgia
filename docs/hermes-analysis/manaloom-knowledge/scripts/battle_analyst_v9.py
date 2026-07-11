@@ -6611,6 +6611,26 @@ def _battlefield_permanent_count_for_dynamic_mana(player, source):
     return total
 
 
+def _card_matches_dynamic_mana_graveyard_count(card, card_types):
+    if not isinstance(card, dict):
+        return False
+    type_line = str(card.get("type_line") or "").lower()
+    for card_type in _as_list(card_types):
+        wanted = str(card_type or "").strip().lower()
+        if wanted and wanted not in type_line:
+            return False
+    return True
+
+
+def _controller_graveyard_card_count_for_dynamic_mana(player, source):
+    card_types = source.get("dynamic_mana_graveyard_count_card_types") or []
+    return sum(
+        1
+        for card in getattr(player, "graveyard", []) or []
+        if _card_matches_dynamic_mana_graveyard_count(card, card_types)
+    )
+
+
 def devotion_to_color(player, symbol):
     target = str(symbol or "").strip().upper()
     if target not in {"W", "U", "B", "R", "G"}:
@@ -6635,6 +6655,8 @@ def _dynamic_mana_source_production_for_state(player, source):
         return None
     if amount_source == "battlefield_permanent_count":
         return _battlefield_permanent_count_for_dynamic_mana(player, source)
+    if amount_source == "controller_graveyard_card_count":
+        return _controller_graveyard_card_count_for_dynamic_mana(player, source)
     if amount_source == "devotion_to_green":
         return devotion_to_color(player, "G")
     if amount_source == "source_power":

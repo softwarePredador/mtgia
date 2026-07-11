@@ -19189,6 +19189,21 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
                 },
             ),
             (
+                "Rofellos, Llanowar Emissary",
+                "Legendary Creature - Elf Druid",
+                "{T}: Add {G} for each Forest you control.",
+                "{G}{G}",
+                "private static final FilterControlledPermanent filter = new FilterControlledPermanent(\"Forest you control\");\n"
+                "filter.add(SubType.FOREST.getPredicate());\n"
+                "this.addAbility(new DynamicManaAbility(Mana.GreenMana(1), new PermanentsOnBattlefieldCount(filter)));",
+                {
+                    "produces": "G",
+                    "dynamic_mana_amount_source": "battlefield_permanent_count",
+                    "dynamic_mana_battlefield_count_scope": "controller_battlefield",
+                    "dynamic_mana_battlefield_count_subtypes": ["forest"],
+                },
+            ),
+            (
                 "Viridian Joiner",
                 "Creature - Elf Druid",
                 "{T}: Add an amount of {G} equal to Viridian Joiner's power.",
@@ -19225,6 +19240,91 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
                 self.assertEqual(effect["battle_model_scope"], split.DYNAMIC_FIXED_COLOR_MANA_SCOPE)
                 self.assertEqual(effect["source_type_line"], type_line)
                 self.assertEqual(effect["source_mana_cost"], mana_cost)
+                for key, value in expected_fields.items():
+                    self.assertEqual(effect[key], value)
+
+    def test_dynamic_any_one_color_mana_source_maps_exact_scope(self) -> None:
+        fixtures = [
+            (
+                "Harabaz Druid",
+                "Creature - Human Druid Ally",
+                "{T}: Add X mana of any one color, where X is the number of Allies you control.",
+                "{1}{G}",
+                "private static final FilterControlledPermanent filter = new FilterControlledPermanent(SubType.ALLY, \"Allies you control\");\n"
+                "this.addAbility(new DynamicManaAbility(new Mana(0, 0, 0, 0, 0, 0, 1, 0), new PermanentsOnBattlefieldCount(filter), new TapSourceCost(), \"Add X mana of any one color, where X is the number of Allies you control\", true));",
+                {
+                    "dynamic_mana_amount_source": "battlefield_permanent_count",
+                    "dynamic_mana_battlefield_count_scope": "controller_battlefield",
+                    "dynamic_mana_battlefield_count_subtypes": ["ally"],
+                },
+            ),
+            (
+                "Sanctum Weaver",
+                "Enchantment Creature - Dryad",
+                "{T}: Add X mana of any one color, where X is the number of enchantments you control.",
+                "{1}{G}",
+                "private static final FilterPermanent filter = new FilterControlledEnchantmentPermanent();\n"
+                "this.addAbility(new DynamicManaAbility(new Mana(0, 0, 0, 0, 0, 0, 1, 0), new PermanentsOnBattlefieldCount(filter), new TapSourceCost(), \"Add X mana of any one color, where X is the number of enchantments you control\", true));",
+                {
+                    "dynamic_mana_amount_source": "battlefield_permanent_count",
+                    "dynamic_mana_battlefield_count_scope": "controller_battlefield",
+                    "dynamic_mana_battlefield_count_card_types": ["enchantment"],
+                },
+            ),
+            (
+                "Wirewood Channeler",
+                "Creature - Elf Druid",
+                "{T}: Add X mana of any one color, where X is the number of Elves on the battlefield.",
+                "{3}{G}",
+                "private static final FilterPermanent filter = new FilterPermanent(\"Elves\");\n"
+                "filter.add(SubType.ELF.getPredicate());\n"
+                "this.addAbility(new DynamicManaAbility(new Mana(0, 0, 0, 0,0, 0,1, 0), new PermanentsOnBattlefieldCount(filter), new TapSourceCost(), \"Add X mana of any one color, where X is the number of Elves on the battlefield\", true));",
+                {
+                    "dynamic_mana_amount_source": "battlefield_permanent_count",
+                    "dynamic_mana_battlefield_count_scope": "all_battlefield",
+                    "dynamic_mana_battlefield_count_subtypes": ["elf"],
+                },
+            ),
+            (
+                "Deathbloom Ritualist",
+                "Creature - Elf Warlock",
+                "{T}: Add X mana of any one color, where X is the number of creature cards in your graveyard.",
+                "{3}{B}{G}",
+                "private static final CardsInControllerGraveyardCount count = new CardsInControllerGraveyardCount(StaticFilters.FILTER_CARD_CREATURE);\n"
+                "this.addAbility(new DynamicManaAbility(Mana.AnyMana(1), count, new TapSourceCost(), \"Add X mana of any one color, where X is the number of creature cards in your graveyard\", true));",
+                {
+                    "dynamic_mana_amount_source": "controller_graveyard_card_count",
+                    "dynamic_mana_graveyard_count_card_types": ["creature"],
+                },
+            ),
+        ]
+        for name, type_line, oracle_text, mana_cost, source_text, expected_fields in fixtures:
+            with self.subTest(name=name):
+                row = queue_row(
+                    split.RAMP_CREATURE_UNIT,
+                    effect_classes=[],
+                    ability_kind="activated",
+                    ability_classes=["DynamicManaAbility"],
+                )
+                proposal, reason = split.split_row(
+                    row,
+                    metadata(
+                        name=name,
+                        type_line=type_line,
+                        oracle_text=oracle_text,
+                        mana_cost=mana_cost,
+                    ),
+                    source_text=source_text,
+                )
+
+                self.assertEqual(reason, "selected_exact_scope")
+                self.assertEqual(proposal["family_id"], "xmage_dynamic_any_one_color_mana_source")
+                effect = proposal["effect_json"]
+                self.assertEqual(effect["battle_model_scope"], split.DYNAMIC_ANY_ONE_COLOR_MANA_SCOPE)
+                self.assertEqual(effect["produces"], "WUBRG")
+                self.assertEqual(effect["produced_mana_symbols"], list("WUBRG"))
+                self.assertTrue(effect["conditional_mana_same_color_choice"])
+                self.assertEqual(len(effect["conditional_mana_modes"]), 5)
                 for key, value in expected_fields.items():
                     self.assertEqual(effect[key], value)
 

@@ -7886,6 +7886,71 @@ def test_simple_mana_source_runner_validates_fixed_color_dynamic_mana() -> None:
     assert result["conditional_mana"] == 0
 
 
+def test_simple_mana_source_runner_validates_dynamic_any_one_color_mana() -> None:
+    battle = validator.load_battle(validator.DEFAULT_BATTLE)
+    events = []
+    previous_handler = battle.REPLAY_EVENT_HANDLER
+    previous_get_card_effect = battle.get_card_effect
+    battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+    battle.get_card_effect = lambda card: {
+        "effect": "ramp_permanent",
+        "battle_model_scope": "xmage_dynamic_any_one_color_mana_source_permanent_v1",
+        "is_mana_source": True,
+        "mana_produced": 1,
+        "produces": "WUBRG",
+        "produced_mana_symbols": list("WUBRG"),
+        "mana_activation_requires_tap": True,
+        "activation_requires_tap": True,
+        "conditional_mana_same_color_choice": True,
+        "conditional_mana_modes_status": "runtime_executor_v1",
+        "conditional_mana_modes": [
+            {
+                "color": symbol,
+                "restriction": "any_spell",
+                "mode": "dynamic_any_one_color",
+                "status": "runtime_executor_v1",
+            }
+            for symbol in "WUBRG"
+        ],
+        "dynamic_mana_amount_source": "controller_graveyard_card_count",
+        "dynamic_mana_graveyard_count_card_types": ["creature"],
+        "_rule_logical_key": "battle_rule_v1:deathbloom-ritualist",
+    }
+    try:
+        result = validator.run_simple_mana_source_refresh(
+            battle,
+            {
+                "name": "Deathbloom Ritualist refreshes modeled dynamic any-color mana source",
+                "type": "simple_mana_source_refresh",
+                "card": {
+                    "name": "Deathbloom Ritualist",
+                    "type_line": "Creature - Elf Warlock",
+                    "mana_cost": "{3}{B}{G}",
+                },
+                "controller_graveyard": [
+                    {"name": "E2E Graveyard Creature One", "type_line": "Creature"},
+                    {"name": "E2E Graveyard Creature Two", "type_line": "Creature - Elf"},
+                    {"name": "E2E Graveyard Creature Three", "type_line": "Artifact Creature"},
+                    {"name": "E2E Graveyard Sorcery", "type_line": "Sorcery"},
+                ],
+                "expected_available_mana_after_refresh": 3,
+                "expected_conditional_mana": 3,
+                "expected_conditional_colors": ["black", "blue", "green", "red", "white"],
+                "expected_tapped": True,
+                "expected_sources": 1,
+                "logical_rule_key": "battle_rule_v1:deathbloom-ritualist",
+            },
+            events,
+        )
+    finally:
+        battle.REPLAY_EVENT_HANDLER = previous_handler
+        battle.get_card_effect = previous_get_card_effect
+
+    assert result["card_name"] == "Deathbloom Ritualist"
+    assert result["available_mana"] == 3
+    assert result["conditional_mana"] == 3
+
+
 def test_simple_mana_source_runner_validates_controlled_creature_condition_conditional_mana() -> None:
     battle = validator.load_battle(validator.DEFAULT_BATTLE)
     events = []

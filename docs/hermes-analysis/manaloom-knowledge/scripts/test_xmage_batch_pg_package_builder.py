@@ -7346,6 +7346,56 @@ def test_fixed_color_dynamic_mana_source_manifest_builds_count_scenario() -> Non
     assert scenario["type_line"] == "Creature - Human Wizard"
 
 
+def test_dynamic_any_one_color_mana_source_manifest_builds_conditional_scenario() -> None:
+    proposal = {
+        "normalized_name": "sanctum weaver",
+        "card_name": "Sanctum Weaver",
+        "oracle_hash": "hash-sanctum-weaver",
+        "logical_rule_key": "battle_rule_v1:sanctum-weaver",
+        "effect_json": {
+            "effect": "ramp_permanent",
+            "battle_model_scope": "xmage_dynamic_any_one_color_mana_source_permanent_v1",
+            "is_mana_source": True,
+            "mana_produced": 1,
+            "produces": "WUBRG",
+            "produced_mana_symbols": list("WUBRG"),
+            "mana_activation_requires_tap": True,
+            "activation_requires_tap": True,
+            "conditional_mana_same_color_choice": True,
+            "conditional_mana_modes_status": "runtime_executor_v1",
+            "conditional_mana_modes": [
+                {
+                    "color": symbol,
+                    "restriction": "any_spell",
+                    "mode": "dynamic_any_one_color",
+                    "status": "runtime_executor_v1",
+                }
+                for symbol in "WUBRG"
+            ],
+            "dynamic_mana_amount_source": "battlefield_permanent_count",
+            "dynamic_mana_battlefield_count_scope": "controller_battlefield",
+            "dynamic_mana_battlefield_count_card_types": ["enchantment"],
+            "source_type_line": "Enchantment Creature - Dryad",
+            "source_mana_cost": "{1}{G}",
+        },
+    }
+
+    expected = builder.expected_rule_from_proposal(proposal)
+    required = expected["required_effect_fields"]
+
+    assert required["battle_model_scope"] == "xmage_dynamic_any_one_color_mana_source_permanent_v1"
+    assert required["dynamic_mana_battlefield_count_card_types"] == ["enchantment"]
+
+    scenario = builder.execution_scenario_from_expected_rule(expected)
+
+    assert scenario["type"] == "simple_mana_source_refresh"
+    assert scenario["expected_available_mana_after_refresh"] == 3
+    assert scenario["expected_conditional_mana"] == 3
+    assert scenario["expected_conditional_colors"] == ["black", "blue", "green", "red", "white"]
+    assert len(scenario["controller_battlefield"]) == 2
+    assert scenario["type_line"] == "Enchantment Creature - Dryad"
+
+
 def test_controlled_creature_condition_conditional_mana_source_manifest_builds_ferocious_scenario() -> None:
     proposal = {
         "normalized_name": "ilysian caryatid",
