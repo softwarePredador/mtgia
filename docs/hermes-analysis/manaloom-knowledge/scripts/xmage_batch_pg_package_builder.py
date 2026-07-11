@@ -488,6 +488,8 @@ E2E_REQUIRED_EFFECT_FIELDS = (
     "mana_produced",
     "produces",
     "produced_mana_symbols",
+    "conditional_mana_modes",
+    "conditional_mana_modes_status",
     "life_for_colored_mana",
     "mana_activation_life_gain",
     "mana_activation_requires_tap",
@@ -2911,6 +2913,7 @@ def simple_mana_source_execution_scenario_from_expected_rule(rule: dict[str, Any
         "xmage_simple_tap_mana_source_with_gain_life_v1",
         "xmage_simple_tap_mana_source_with_activated_draw_v1",
         "xmage_simple_mana_source_with_etb_draw_v1",
+        "xmage_simple_tap_restricted_mana_source_permanent_v1",
         "pain_talisman_color_pair_partial_v1",
     }:
         return None
@@ -2928,6 +2931,18 @@ def simple_mana_source_execution_scenario_from_expected_rule(rule: dict[str, Any
         {"name": f"E2E Spare Discard Card {index + 1}", "type_line": "Sorcery", "effect": "draw_cards", "cmc": 2}
         for index in range(max(0, activation_discard_count))
     ]
+    conditional_modes = [
+        mode
+        for mode in required.get("conditional_mana_modes") or []
+        if isinstance(mode, dict)
+    ]
+    conditional_restrictions = sorted(
+        {
+            str(mode.get("restriction") or "")
+            for mode in conditional_modes
+            if str(mode.get("restriction") or "")
+        }
+    )
     scenario = {
         "name": f"{rule['card_name']} refreshes modeled mana source",
         "type": "simple_mana_source_refresh",
@@ -2944,16 +2959,46 @@ def simple_mana_source_execution_scenario_from_expected_rule(rule: dict[str, Any
         "expected_produced_mana_symbols": required.get("produced_mana_symbols") or [],
         "expected_conditional_mana": (
             mana_produced
-            if _manifest_has_multiple_mana_choices(required.get("produces"))
-            and not required.get("produced_mana_symbols")
+            if (
+                conditional_modes
+                or (
+                    _manifest_has_multiple_mana_choices(required.get("produces"))
+                    and not required.get("produced_mana_symbols")
+                )
+            )
             and not enters_tapped
             else 0
         ),
+        "expected_conditional_restrictions": conditional_restrictions,
         "expected_activation_limit_per_turn": int(required.get("activation_limit_per_turn") or 0),
         "support_mana_sources": support_sources,
         "source_overrides": {"tapped": True} if enters_tapped else {},
         "logical_rule_key": rule["logical_rule_key"],
     }
+    restriction_fixture_cards = {
+        "creature_spell": (
+            {"name": "E2E Creature Spell", "type_line": "Creature", "mana_cost": "{1}", "cmc": 1},
+            {"name": "E2E Noncreature Spell", "type_line": "Sorcery", "mana_cost": "{1}", "cmc": 1},
+        ),
+        "artifact_spell": (
+            {"name": "E2E Artifact Spell", "type_line": "Artifact", "mana_cost": "{1}", "cmc": 1},
+            {"name": "E2E Creature Spell", "type_line": "Creature", "mana_cost": "{1}", "cmc": 1},
+        ),
+        "instant_or_sorcery_spell": (
+            {"name": "E2E Sorcery Spell", "type_line": "Sorcery", "mana_cost": "{1}", "cmc": 1},
+            {"name": "E2E Creature Spell", "type_line": "Creature", "mana_cost": "{1}", "cmc": 1},
+        ),
+        "noncreature_spell": (
+            {"name": "E2E Noncreature Spell", "type_line": "Artifact", "mana_cost": "{1}", "cmc": 1},
+            {"name": "E2E Creature Spell", "type_line": "Creature", "mana_cost": "{1}", "cmc": 1},
+        ),
+    }
+    for restriction in conditional_restrictions:
+        fixtures = restriction_fixture_cards.get(restriction)
+        if fixtures:
+            scenario["expected_restricted_mana_payable_card"] = fixtures[0]
+            scenario["expected_restricted_mana_blocked_card"] = fixtures[1]
+            break
     if activation_life_cost or activation_life_gain:
         scenario["starting_life"] = 40
         scenario["expected_life_after_refresh"] = 40 - activation_life_cost + activation_life_gain

@@ -330,6 +330,7 @@ EXILE_DRAW_SCOPE = "xmage_exile_target_and_draw_card_spell_v1"
 DESTROY_COMPENSATION_TOKEN_SCOPE = "xmage_destroy_target_with_controller_creature_token_compensation_spell_v1"
 EXILE_COMPENSATION_TOKEN_SCOPE = "xmage_exile_target_with_controller_creature_token_compensation_spell_v1"
 MANA_SCOPE = "xmage_simple_tap_mana_source_permanent_v1"
+RESTRICTED_MANA_SCOPE = "xmage_simple_tap_restricted_mana_source_permanent_v1"
 PAIN_TALISMAN_SCOPE = "pain_talisman_color_pair_partial_v1"
 MANA_WITH_ACTIVATION_LIFE_GAIN_SCOPE = "xmage_simple_tap_mana_source_with_gain_life_v1"
 MANA_WITH_ACTIVATED_DRAW_SCOPE = "xmage_simple_tap_mana_source_with_activated_draw_v1"
@@ -23704,6 +23705,215 @@ def simple_mana_source_detail_from_line(text: str) -> dict[str, Any] | None:
     return None
 
 
+MANA_SPEND_RESTRICTION_ALIASES = {
+    "creature_spell": (
+        "cast a creature spell",
+        "cast creature spells",
+    ),
+    "artifact_spell": (
+        "cast an artifact spell",
+        "cast artifact spells",
+    ),
+    "instant_or_sorcery_spell": (
+        "cast an instant or sorcery spell",
+        "cast instant or sorcery spells",
+        "cast instant and sorcery spells",
+        "cast an instant or sorcery spells",
+    ),
+    "noncreature_spell": (
+        "cast a noncreature spell",
+        "cast noncreature spells",
+    ),
+}
+
+
+def supported_mana_spend_restrictions(restriction_text: str) -> list[str] | None:
+    normalized = strip_parenthetical_reminders(
+        re.sub(r"\s+", " ", str(restriction_text or "").strip().lower())
+    ).strip().rstrip(".")
+    normalized = normalized.removeprefix("to ").strip()
+    if not normalized:
+        return None
+    if any(
+        token in normalized
+        for token in (
+            "activate",
+            "chosen",
+            "legendary",
+            "multicolored",
+            "devoid",
+            "equipment",
+            "enchantment",
+            "lesson",
+            "shrine",
+            "room",
+            "door",
+            "demon",
+            "spirit",
+            "dragon",
+            "vehicle",
+            "outlaw",
+            "source",
+            "can't be countered",
+            "cannot be countered",
+        )
+    ):
+        return None
+    restrictions = [
+        restriction
+        for restriction, phrases in MANA_SPEND_RESTRICTION_ALIASES.items()
+        if normalized in phrases
+    ]
+    return restrictions or None
+
+
+def conditional_mana_modes_for_detail(
+    mana_detail: dict[str, Any],
+    restrictions: list[str],
+) -> list[dict[str, Any]]:
+    colors = list(str(mana_detail.get("produces") or ""))
+    if not colors:
+        colors = list(mana_detail.get("produced_mana_symbols") or [])
+    modes: list[dict[str, Any]] = []
+    for color in colors:
+        symbol = str(color or "").strip().upper()
+        if symbol not in {"W", "U", "B", "R", "G", "C"}:
+            continue
+        for restriction in restrictions:
+            modes.append(
+                {
+                    "color": symbol,
+                    "restriction": restriction,
+                    "mode": "restricted_spell_mana",
+                    "status": "runtime_executor_v1",
+                }
+            )
+    return modes
+
+
+def restricted_mana_source_detail_from_line(text: str) -> dict[str, Any] | None:
+    working_text = strip_parenthetical_reminders(
+        re.sub(r"\s+", " ", str(text or "").strip().lower())
+    ).strip()
+    match = re.match(
+        r"^(?P<mana_line>.+?: add .+?\.) spend this mana only (?P<restriction>to .+?)\.?$",
+        working_text,
+    )
+    if not match:
+        return None
+    mana_detail = simple_mana_source_detail_from_line(match.group("mana_line"))
+    if mana_detail is None:
+        return None
+    restrictions = supported_mana_spend_restrictions(match.group("restriction"))
+    if not restrictions:
+        return None
+    modes = conditional_mana_modes_for_detail(mana_detail, restrictions)
+    if not modes:
+        return None
+    return {
+        **mana_detail,
+        "spend_restrictions": restrictions,
+        "conditional_mana_modes": modes,
+    }
+
+
+def restricted_mana_source_detail_from_oracle(metadata: dict[str, Any]) -> dict[str, Any] | None:
+    candidates = []
+    for line in normalized_oracle_lines(metadata):
+        if "spend this mana only" not in line:
+            continue
+        detail = restricted_mana_source_detail_from_line(line)
+        if detail is None:
+            return None
+        candidates.append(detail)
+    if len(candidates) == 1:
+        return candidates[0]
+    return None
+
+
+def conditional_mana_amount_from_source(source_text: str, class_name: str) -> int | None:
+    text = source_text or ""
+    patterns = [
+        rf"new\s+{re.escape(class_name)}\s*\(\s*new\s+TapSourceCost\s*\(\s*\)\s*,\s*(\d+)\s*,",
+        rf"new\s+{re.escape(class_name)}\s*\(\s*(\d+)\s*,",
+    ]
+    for pattern in patterns:
+        match = re.search(pattern, text)
+        if match:
+            return int(match.group(1))
+    return None
+
+
+def conditional_colored_mana_detail_from_source(source_text: str) -> dict[str, Any] | None:
+    text = source_text or ""
+    color_match = re.search(
+        r"new\s+ConditionalColoredManaAbility\s*\(\s*Mana\.(White|Blue|Black|Red|Green|Colorless)Mana\s*\(\s*(\d+)\s*\)",
+        text,
+    )
+    if not color_match:
+        return None
+    symbol = JAVA_MANA_METHOD_SYMBOLS[color_match.group(1)]
+    amount = int(color_match.group(2))
+    return {
+        "produces": symbol,
+        "mana_produced": amount,
+        "produced_mana_symbols": [symbol] * amount,
+    }
+
+
+def restricted_mana_source_detail_from_source(
+    source_text: str,
+    ability_class_values: set[str],
+) -> dict[str, Any] | str | None:
+    if not ability_class_values.intersection(
+        {
+            "ConditionalAnyColorManaAbility",
+            "ConditionalColorlessManaAbility",
+            "ConditionalColoredManaAbility",
+        }
+    ):
+        return None
+    restrictions = None
+    for raw_restriction in re.findall(
+        r"Spend this mana only\s+(to\s+[^\";\n]+)",
+        source_text or "",
+        flags=re.I,
+    ):
+        restrictions = supported_mana_spend_restrictions(raw_restriction)
+        if restrictions:
+            break
+    if not restrictions:
+        return "restricted_mana_source_source_restriction_not_supported"
+    detail: dict[str, Any] | None = None
+    if "ConditionalAnyColorManaAbility" in ability_class_values:
+        amount = conditional_mana_amount_from_source(source_text, "ConditionalAnyColorManaAbility")
+        if amount is None:
+            return "restricted_mana_source_source_amount_not_supported"
+        detail = {
+            "produces": "WUBRG",
+            "mana_produced": amount,
+        }
+    elif "ConditionalColorlessManaAbility" in ability_class_values:
+        amount = conditional_mana_amount_from_source(source_text, "ConditionalColorlessManaAbility")
+        if amount is None:
+            return "restricted_mana_source_source_amount_not_supported"
+        detail = {
+            "produces": "C",
+            "mana_produced": amount,
+            "produced_mana_symbols": ["C"] * amount,
+        }
+    elif "ConditionalColoredManaAbility" in ability_class_values:
+        detail = conditional_colored_mana_detail_from_source(source_text)
+        if detail is None:
+            return "restricted_mana_source_source_colored_mana_not_supported"
+    if detail is None:
+        return None
+    detail["mana_activation_requires_tap"] = True
+    detail["spend_restrictions"] = restrictions
+    detail["conditional_mana_modes"] = conditional_mana_modes_for_detail(detail, restrictions)
+    return detail
+
+
 def sacrifice_mana_source_detail_from_line(text: str) -> dict[str, Any] | None:
     normalized = strip_parenthetical_reminders(re.sub(r"\s+", " ", str(text or "").strip().lower())).strip()
     prefix_match = re.match(
@@ -37246,6 +37456,77 @@ def split_row(
         if is_spell(metadata):
             return None, "mana_source_spell_not_supported"
         mana_ability_classes = ability_classes(row)
+        restricted_mana_source = restricted_mana_source_detail_from_oracle(metadata)
+        if restricted_mana_source is not None:
+            source_restricted_mana = restricted_mana_source_detail_from_source(
+                source_text,
+                mana_ability_classes,
+            )
+            if isinstance(source_restricted_mana, str):
+                return None, source_restricted_mana
+            if source_restricted_mana is None:
+                return None, "restricted_mana_source_source_not_supported"
+            for key in (
+                "produces",
+                "mana_produced",
+                "mana_activation_requires_tap",
+                "spend_restrictions",
+            ):
+                if source_restricted_mana.get(key) != restricted_mana_source.get(key):
+                    return None, f"restricted_mana_source_source_oracle_{key}_mismatch"
+            type_line = str(metadata.get("type_line") or "").lower()
+            permanent_type = (
+                "creature"
+                if "creature" in type_line
+                else "artifact"
+                if "artifact" in type_line
+                else "permanent"
+            )
+            effect_json = {
+                "effect": "ramp_permanent",
+                "battle_model_scope": RESTRICTED_MANA_SCOPE,
+                "is_mana_source": True,
+                "mana_produced": int(restricted_mana_source["mana_produced"]),
+                "produces": str(restricted_mana_source["produces"]),
+                "mana_activation_requires_tap": True,
+                "activation_requires_tap": True,
+                "permanent_type": permanent_type,
+                "ability_kind": "activated_mana",
+                "conditional_mana_modes": restricted_mana_source["conditional_mana_modes"],
+                "conditional_mana_modes_status": "runtime_executor_v1",
+                "xmage_mana_ability_classes": sorted(
+                    mana_ability_classes
+                    & {
+                        "ConditionalAnyColorManaAbility",
+                        "ConditionalColorlessManaAbility",
+                        "ConditionalColoredManaAbility",
+                    }
+                ),
+                "xmage_effect_classes": sorted(classes),
+                "xmage_ability_classes": sorted(mana_ability_classes),
+            }
+            if restricted_mana_source.get("produced_mana_symbols"):
+                effect_json["produced_mana_symbols"] = list(
+                    restricted_mana_source["produced_mana_symbols"]
+                )
+            static_keywords = sorted(
+                {
+                    STATIC_SELF_KEYWORD_ABILITY_CLASSES[ability]
+                    for ability in mana_ability_classes
+                    if ability in STATIC_SELF_KEYWORD_ABILITY_CLASSES
+                }
+            )
+            if static_keywords:
+                effect_json["keywords"] = static_keywords
+                effect_json["_keywords_are_self"] = True
+            if "EntersBattlefieldTappedAbility" in mana_ability_classes:
+                effect_json["enters_tapped"] = True
+            return build_proposal(
+                row,
+                metadata,
+                effect_json,
+                family_id="xmage_restricted_spell_category_mana_source",
+            ), "selected_exact_scope"
         limited_choice_mana_source = limited_times_color_choice_mana_source_from_source(source_text)
         if isinstance(limited_choice_mana_source, str):
             return None, limited_choice_mana_source
@@ -38166,6 +38447,7 @@ def build_exact_split_report(
                 "grant_protection_from_chosen_color rows with pure GainAbilityTargetEffect one-shot spells, exact target-creature keyword until EOT, and no auxiliary ability classes",
                 "PreventAllDamageByAllPermanentsEffect one-shot spells with exact Oracle 'Prevent all combat damage that would be dealt this turn', exact XMage Duration.EndOfTurn onlyCombat=true source, and optional CyclingAbility as auxiliary resolution-neutral ability",
                 "ramp_permanent::pain_talisman_color_pair_partial_v1 rows with ColorlessManaAbility plus two fixed colored mana abilities, DamageControllerEffect(N) on each colored mode, and exact Oracle color-pair pain mana text",
+                "ramp_permanent mana source rows with ConditionalAnyColorManaAbility, ConditionalColorlessManaAbility, or ConditionalColoredManaAbility, exact supported spell-category spend restriction, and runtime conditional_mana_modes payment evidence",
                 "ramp_permanent::xmage_creature_mana_source_variant_review_v1 rows with EntersBattlefieldTriggeredAbility + BasicManaEffect, exact unconditional fixed ETB mana Oracle/source agreement, and no auxiliary ability class",
                 "recursion::xmage_graveyard_return_variant_review_v1 rows with ReturnFromGraveyardToHandTargetEffect, SimpleActivatedAbility, exact activated graveyard-to-hand Oracle text, and mana/tap/self-sacrifice/discard-a-card source costs only",
                 "recursion::xmage_graveyard_return_variant_review_v1 rows with ReturnFromGraveyardToBattlefieldTargetEffect, SimpleActivatedAbility, exact activated graveyard-to-battlefield Oracle text, and mana/tap/source self-sacrifice costs only",

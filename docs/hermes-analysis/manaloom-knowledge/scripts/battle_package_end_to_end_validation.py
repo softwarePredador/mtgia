@@ -4823,6 +4823,43 @@ def run_simple_mana_source_refresh(
             "battle_execution",
             f"{card['name']} conditional mana={conditional_total}, expected {expected_conditional}",
         )
+    expected_restrictions = sorted(
+        str(value)
+        for value in (scenario.get("expected_conditional_restrictions") or [])
+        if str(value)
+    )
+    if expected_restrictions:
+        actual_restrictions = sorted(
+            {
+                str(mode.get("restriction") or "")
+                for conditional_source in getattr(active, "conditional_mana_sources", []) or []
+                if isinstance(conditional_source, dict)
+                for mode in conditional_source.get("modes") or []
+                if isinstance(mode, dict) and str(mode.get("restriction") or "")
+            }
+        )
+        if actual_restrictions != expected_restrictions:
+            fail(
+                "battle_execution",
+                f"{card['name']} conditional restrictions={actual_restrictions}, "
+                f"expected {expected_restrictions}",
+            )
+    payable_card = scenario.get("expected_restricted_mana_payable_card")
+    if isinstance(payable_card, dict):
+        if not active.can_pay_card(payable_card):
+            fail(
+                "battle_execution",
+                f"{card['name']} restricted mana could not pay allowed card "
+                f"{payable_card.get('name')}",
+            )
+    blocked_card = scenario.get("expected_restricted_mana_blocked_card")
+    if isinstance(blocked_card, dict):
+        if active.can_pay_card(blocked_card):
+            fail(
+                "battle_execution",
+                f"{card['name']} restricted mana incorrectly paid blocked card "
+                f"{blocked_card.get('name')}",
+            )
     expected_life_loss_by_color = {
         str(color): int(value)
         for color, value in dict(

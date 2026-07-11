@@ -5870,3 +5870,50 @@ def test_mana_source_activation_life_gain_manifest_expects_life_gain() -> None:
     assert scenario["starting_life"] == 40
     assert scenario["expected_mana_activation_life_gain"] == 1
     assert scenario["expected_life_after_refresh"] == 41
+
+
+def test_restricted_mana_source_manifest_preserves_conditional_modes() -> None:
+    proposal = {
+        "normalized_name": "beastcaller savant",
+        "card_name": "Beastcaller Savant",
+        "oracle_hash": "hash-beastcaller-savant",
+        "logical_rule_key": "battle_rule_v1:beastcaller-savant",
+        "effect_json": {
+            "effect": "ramp_permanent",
+            "battle_model_scope": "xmage_simple_tap_restricted_mana_source_permanent_v1",
+            "is_mana_source": True,
+            "mana_produced": 1,
+            "produces": "WUBRG",
+            "mana_activation_requires_tap": True,
+            "activation_requires_tap": True,
+            "conditional_mana_modes_status": "runtime_executor_v1",
+            "conditional_mana_modes": [
+                {
+                    "color": "W",
+                    "restriction": "creature_spell",
+                    "mode": "restricted_spell_mana",
+                    "status": "runtime_executor_v1",
+                },
+                {
+                    "color": "U",
+                    "restriction": "creature_spell",
+                    "mode": "restricted_spell_mana",
+                    "status": "runtime_executor_v1",
+                },
+            ],
+        },
+    }
+
+    expected = builder.expected_rule_from_proposal(proposal)
+    required = expected["required_effect_fields"]
+
+    assert required["conditional_mana_modes_status"] == "runtime_executor_v1"
+    assert required["conditional_mana_modes"][0]["restriction"] == "creature_spell"
+
+    scenario = builder.execution_scenario_from_expected_rule(expected)
+
+    assert scenario["type"] == "simple_mana_source_refresh"
+    assert scenario["expected_conditional_mana"] == 1
+    assert scenario["expected_conditional_restrictions"] == ["creature_spell"]
+    assert scenario["expected_restricted_mana_payable_card"]["type_line"] == "Creature"
+    assert scenario["expected_restricted_mana_blocked_card"]["type_line"] == "Sorcery"

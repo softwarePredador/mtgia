@@ -31328,6 +31328,73 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertIsNone(proposal)
         self.assertEqual(reason, "mana_activation_life_gain_source_oracle_amount_mismatch")
 
+    def test_restricted_creature_spell_mana_source_maps_beastcaller_savant(self) -> None:
+        proposal, reason = split.split_row(
+            queue_row(
+                split.RAMP_CREATURE_UNIT,
+                effect_classes=[],
+                ability_classes=["ConditionalAnyColorManaAbility", "HasteAbility"],
+                xmage_signals=["mana"],
+            ),
+            metadata(
+                name="Beastcaller Savant",
+                type_line="Creature - Elf Shaman Ally",
+                oracle_text=(
+                    "Haste\n"
+                    "{T}: Add one mana of any color. Spend this mana only to cast a creature spell."
+                ),
+            ),
+            source_text="""
+                this.addAbility(HasteAbility.getInstance());
+                this.addAbility(new ConditionalAnyColorManaAbility(
+                    1, new ConditionalSpellManaBuilder(StaticFilters.FILTER_SPELL_A_CREATURE)));
+                // Spend this mana only to cast a creature spell.
+            """,
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.RESTRICTED_MANA_SCOPE)
+        self.assertEqual(effect["effect"], "ramp_permanent")
+        self.assertEqual(effect["produces"], "WUBRG")
+        self.assertEqual(effect["mana_produced"], 1)
+        self.assertEqual(effect["keywords"], ["haste"])
+        self.assertEqual(
+            {mode["restriction"] for mode in effect["conditional_mana_modes"]},
+            {"creature_spell"},
+        )
+        self.assertEqual(
+            {mode["color"] for mode in effect["conditional_mana_modes"]},
+            {"W", "U", "B", "R", "G"},
+        )
+
+    def test_restricted_chosen_type_mana_source_stays_blocked(self) -> None:
+        proposal, reason = split.split_row(
+            queue_row(
+                split.RAMP_ARTIFACT_UNIT,
+                effect_classes=[],
+                ability_classes=["ConditionalAnyColorManaAbility"],
+                xmage_signals=["mana"],
+            ),
+            metadata(
+                name="Pillar of Origins",
+                type_line="Artifact",
+                oracle_text=(
+                    "As this artifact enters, choose a creature type.\n"
+                    "{T}: Add one mana of any color. Spend this mana only to cast a creature spell "
+                    "of the chosen type."
+                ),
+            ),
+            source_text="""
+                this.addAbility(new ConditionalAnyColorManaAbility(
+                    new TapSourceCost(), 1, new PillarOfOriginsManaBuilder(), true));
+                staticText = "Spend this mana only to cast a creature spell of the chosen type";
+            """,
+        )
+
+        self.assertIsNone(proposal)
+        self.assertEqual(reason, "mana_source_unsafe_ability_class")
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -13189,6 +13189,50 @@ class XMageExactScopeRuntimeTest(unittest.TestCase):
             )
         )
 
+    def test_restricted_mana_source_refreshes_conditional_mana_not_free_colorless(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        artificer = self.battle.enrich_card(
+            {
+                "name": "Fixture Restricted Artificer",
+                "type_line": "Artifact Creature - Artificer",
+                "effect": "ramp_permanent",
+                "battle_model_scope": "xmage_simple_tap_restricted_mana_source_permanent_v1",
+                "is_mana_source": True,
+                "mana_produced": 1,
+                "produces": "C",
+                "produced_mana_symbols": ["C"],
+                "activation_requires_tap": True,
+                "mana_activation_requires_tap": True,
+                "conditional_mana_modes_status": "runtime_executor_v1",
+                "conditional_mana_modes": [
+                    {
+                        "color": "C",
+                        "restriction": "artifact_spell",
+                        "mode": "restricted_spell_mana",
+                        "status": "runtime_executor_v1",
+                    }
+                ],
+            }
+        )
+        active.battlefield = [artificer]
+
+        active.refresh_mana_sources(turn=7)
+
+        self.assertEqual(active.mana_pool.colorless, 0)
+        self.assertEqual(active.available_mana(), 1)
+        self.assertEqual(len(active.conditional_mana_sources), 1)
+        self.assertTrue(
+            active.can_pay_card(
+                {"name": "Allowed Artifact", "type_line": "Artifact", "mana_cost": "{1}", "cmc": 1}
+            )
+        )
+        self.assertFalse(
+            active.can_pay_card(
+                {"name": "Blocked Creature", "type_line": "Creature", "mana_cost": "{1}", "cmc": 1}
+            )
+        )
+        self.assertTrue(artificer["tapped"])
+
     def test_simple_mana_source_permanent_pays_life_cost_on_refresh(self) -> None:
         active = self.battle.Player("Active", None, [])
         lens = self.battle.enrich_card(

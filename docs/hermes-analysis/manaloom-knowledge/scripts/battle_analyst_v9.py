@@ -6213,6 +6213,15 @@ def add_player_mana_source_to_pool(player, source, turn=None):
     produced = mana_source_production_for_state(player, source)
     if produced <= 0:
         return False
+    configured_conditional_source = _configured_conditional_mana_source_for_state(
+        player,
+        source,
+        produced,
+    )
+    if configured_conditional_source:
+        player.conditional_mana_sources.append(configured_conditional_source)
+        resolve_mana_source_activation_life_gain(player, source, turn=turn)
+        return True
     if add_fixed_produced_mana_symbols_to_pool(player, source, produced):
         resolve_mana_source_activation_life_gain(player, source, turn=turn)
         return True
@@ -11117,6 +11126,18 @@ class Player:
                 )
                 continue
             if not pay_mana_source_activation_costs(self, source, turn=turn):
+                continue
+            configured_conditional_source = _configured_conditional_mana_source_for_state(
+                self,
+                source,
+                produced,
+            )
+            if configured_conditional_source:
+                self.conditional_mana_sources.append(configured_conditional_source)
+                resolve_mana_source_activation_life_gain(self, source, turn=turn)
+                mark_mana_source_used_if_nonstandard_untap(source)
+                record_mana_source_activation(source, turn)
+                active_sources += 1
                 continue
             if add_fixed_produced_mana_symbols_to_pool(self, source, produced):
                 resolve_mana_source_activation_life_gain(self, source, turn=turn)

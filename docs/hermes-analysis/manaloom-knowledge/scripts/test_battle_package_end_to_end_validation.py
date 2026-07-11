@@ -5585,3 +5585,71 @@ def test_proliferate_draw_runner_adds_counters_and_draws() -> None:
     assert result["controller_plus_one_counters"] == 2
     assert result["opponent_charge_counters"] == 3
     assert result["opponent_poison_counters"] == 2
+
+
+def test_simple_mana_source_runner_validates_restricted_spell_mana() -> None:
+    battle = validator.load_battle(validator.DEFAULT_BATTLE)
+    events = []
+    previous_handler = battle.REPLAY_EVENT_HANDLER
+    previous_get_card_effect = battle.get_card_effect
+    battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+    battle.get_card_effect = lambda card: {
+        "effect": "ramp_permanent",
+        "battle_model_scope": "xmage_simple_tap_restricted_mana_source_permanent_v1",
+        "is_mana_source": True,
+        "mana_produced": 1,
+        "produces": "WUBRG",
+        "mana_activation_requires_tap": True,
+        "activation_requires_tap": True,
+        "conditional_mana_modes_status": "runtime_executor_v1",
+        "conditional_mana_modes": [
+            {
+                "color": "W",
+                "restriction": "creature_spell",
+                "mode": "restricted_spell_mana",
+                "status": "runtime_executor_v1",
+            },
+            {
+                "color": "U",
+                "restriction": "creature_spell",
+                "mode": "restricted_spell_mana",
+                "status": "runtime_executor_v1",
+            },
+        ],
+        "_rule_logical_key": "battle_rule_v1:beastcaller-savant",
+    }
+    try:
+        result = validator.run_simple_mana_source_refresh(
+            battle,
+            {
+                "name": "Beastcaller Savant refreshes modeled mana source",
+                "type": "simple_mana_source_refresh",
+                "card": {"name": "Beastcaller Savant", "type_line": "Creature"},
+                "expected_available_mana_after_refresh": 1,
+                "expected_tapped": True,
+                "expected_sources": 1,
+                "expected_conditional_mana": 1,
+                "expected_conditional_restrictions": ["creature_spell"],
+                "expected_restricted_mana_payable_card": {
+                    "name": "E2E Creature Spell",
+                    "type_line": "Creature",
+                    "mana_cost": "{1}",
+                    "cmc": 1,
+                },
+                "expected_restricted_mana_blocked_card": {
+                    "name": "E2E Noncreature Spell",
+                    "type_line": "Sorcery",
+                    "mana_cost": "{1}",
+                    "cmc": 1,
+                },
+                "logical_rule_key": "battle_rule_v1:beastcaller-savant",
+            },
+            events,
+        )
+    finally:
+        battle.REPLAY_EVENT_HANDLER = previous_handler
+        battle.get_card_effect = previous_get_card_effect
+
+    assert result["card_name"] == "Beastcaller Savant"
+    assert result["available_mana"] == 1
+    assert result["conditional_mana"] == 1
