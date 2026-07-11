@@ -3792,6 +3792,114 @@ def test_simple_activated_regenerate_source_runner_executes_extra_costs() -> Non
     assert result["life_paid"] == 2
 
 
+def test_simple_activated_regenerate_target_runner_consumes_shield_on_target_destroy() -> None:
+    battle = validator.load_battle(validator.DEFAULT_BATTLE)
+    events = []
+    previous_handler = battle.REPLAY_EVENT_HANDLER
+    previous_get_card_effect = battle.get_card_effect
+    battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+    battle.get_card_effect = lambda card: {
+        "effect": "artifact",
+        "battle_model_scope": "xmage_permanent_simple_activated_regenerate_target_v1",
+        "activated_effect": "regenerate_target",
+        "activated_battle_model_scope": "xmage_permanent_simple_activated_regenerate_target_v1",
+        "target": "creature",
+        "target_controller": "any",
+        "target_constraints": {"card_types": ["creature"]},
+        "regenerate_target": True,
+        "activation_cost_mana": "{G}",
+        "activation_cost_generic": 0,
+        "activation_cost_colors": ["G"],
+        "activation_requires_tap": False,
+        "_rule_logical_key": "battle_rule_v1:fixture-regenerate-target",
+    }
+    try:
+        result = validator.run_simple_activated_regenerate_target(
+            battle,
+            {
+                "name": "Fixture Relic regenerates target",
+                "type": "simple_activated_regenerate_target",
+                "card": {"name": "Fixture Relic", "type_line": "Artifact", "effect": "artifact"},
+                "target": {"name": "Protected Bear"},
+                "controller_mana": {"green": 1},
+                "expected_tapped_source": False,
+                "expected_regeneration_shields": 1,
+                "logical_rule_key": "battle_rule_v1:fixture-regenerate-target",
+            },
+            events,
+        )
+    finally:
+        battle.REPLAY_EVENT_HANDLER = previous_handler
+        battle.get_card_effect = previous_get_card_effect
+
+    assert result["card_name"] == "Fixture Relic"
+    assert result["target_name"] == "Protected Bear"
+    assert result["destination"] == "battlefield"
+    assert result["source_tapped"] is False
+    assert result["target_tapped"] is True
+    assert result["regeneration_shields_after"] == 0
+
+
+def test_simple_activated_regenerate_target_runner_executes_extra_costs() -> None:
+    battle = validator.load_battle(validator.DEFAULT_BATTLE)
+    events = []
+    previous_handler = battle.REPLAY_EVENT_HANDLER
+    previous_get_card_effect = battle.get_card_effect
+    battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+    battle.get_card_effect = lambda card: {
+        "effect": "artifact",
+        "battle_model_scope": "xmage_permanent_simple_activated_regenerate_target_v1",
+        "activated_effect": "regenerate_target",
+        "activated_battle_model_scope": "xmage_permanent_simple_activated_regenerate_target_v1",
+        "target": "creature",
+        "target_controller": "any",
+        "target_constraints": {"card_types": ["creature"]},
+        "regenerate_target": True,
+        "activation_cost_mana": "{2}",
+        "activation_cost_generic": 2,
+        "activation_cost_colors": [],
+        "activation_requires_tap": True,
+        "activation_discard_count": 1,
+        "activation_discard_target": "any_card",
+        "activation_discard_random": True,
+        "activation_life_cost": 2,
+        "_rule_logical_key": "battle_rule_v1:draconian-cylix",
+    }
+    try:
+        result = validator.run_simple_activated_regenerate_target(
+            battle,
+            {
+                "name": "Draconian Cylix regenerates target with extra costs",
+                "type": "simple_activated_regenerate_target",
+                "card": {"name": "Draconian Cylix", "type_line": "Artifact", "effect": "artifact"},
+                "target": {"name": "Protected Bear"},
+                "controller_mana": {"generic": 2},
+                "controller_hand": [
+                    {"name": "E2E Spare Card", "type_line": "Sorcery", "effect": "draw_cards"}
+                ],
+                "starting_life": 10,
+                "expected_tapped_source": True,
+                "expected_regeneration_shields": 1,
+                "expected_discard_count": 1,
+                "expected_discard_target": "any_card",
+                "expected_life_paid": 2,
+                "logical_rule_key": "battle_rule_v1:draconian-cylix",
+            },
+            events,
+        )
+    finally:
+        battle.REPLAY_EVENT_HANDLER = previous_handler
+        battle.get_card_effect = previous_get_card_effect
+
+    assert result["card_name"] == "Draconian Cylix"
+    assert result["target_name"] == "Protected Bear"
+    assert result["destination"] == "battlefield"
+    assert result["source_tapped"] is True
+    assert result["target_tapped"] is True
+    assert result["discarded_count"] == 1
+    assert result["life_paid"] == 2
+
+
 def test_stat_modifier_until_eot_runner_executes_keyword_only_spell() -> None:
     battle = validator.load_battle(validator.DEFAULT_BATTLE)
     events = []

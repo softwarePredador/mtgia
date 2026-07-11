@@ -413,6 +413,7 @@ ATTACK_TRIGGER_TARGET_KEYWORD_SCOPE = (
 SELF_BOOST_ACTIVATED_SCOPE = "xmage_permanent_simple_activated_self_boost_until_eot_v1"
 SELF_KEYWORD_ACTIVATED_SCOPE = "xmage_permanent_simple_activated_self_keyword_until_eot_v1"
 REGENERATE_SOURCE_ACTIVATED_SCOPE = "xmage_permanent_simple_activated_regenerate_source_v1"
+REGENERATE_TARGET_ACTIVATED_SCOPE = "xmage_permanent_simple_activated_regenerate_target_v1"
 TARGET_BOOST_ACTIVATED_SCOPE = "xmage_permanent_simple_activated_target_boost_until_eot_v1"
 TARGET_KEYWORD_ACTIVATED_SCOPE = "xmage_permanent_simple_activated_target_keyword_until_eot_v1"
 STATIC_KEYWORD_CREATURE_SCOPE = "xmage_static_self_combat_keyword_creature_v1"
@@ -12278,6 +12279,20 @@ def is_permanent_activated_regenerate_source_unit(row: dict[str, Any]) -> bool:
     )
 
 
+def is_permanent_activated_regenerate_target_unit(row: dict[str, Any]) -> bool:
+    abilities = ability_classes(row)
+    remaining = abilities - {"SimpleActivatedAbility"}
+    return (
+        str(row.get("adapter_work_unit") or "").startswith(
+            "xmage_signature::RegenerateTargetEffect::"
+        )
+        and effect_classes(row) == {"RegenerateTargetEffect"}
+        and "SimpleActivatedAbility" in abilities
+        and remaining.issubset(STATIC_SELF_KEYWORD_ABILITY_CLASSES)
+        and set(row.get("xmage_signals") or []) == {"targeting", "activated_ability"}
+    )
+
+
 def is_creature_attack_target_keyword_unit(row: dict[str, Any]) -> bool:
     abilities = ability_classes(row)
     keyword_abilities = abilities.intersection(TARGET_GRANT_KEYWORD_ABILITY_CLASSES)
@@ -16902,6 +16917,105 @@ def activated_regenerate_source_from_source(source: str) -> dict[str, Any] | str
         "activation_cost_colors": colors,
         "activation_requires_tap": "TapSourceCost" in window,
         "activation_requires_sacrifice": False,
+        **({"activation_life_cost": life_cost} if life_cost else {}),
+        **(discard_cost or {}),
+    }
+
+
+def activated_regenerate_target_from_oracle(metadata: dict[str, Any]) -> dict[str, Any] | str:
+    text = strip_parenthetical_reminders(
+        oracle_text_after_leading_static_keywords(metadata)
+    )
+    text = re.sub(r"\s+", " ", text).strip().lower()
+    if text.count(":") != 1:
+        return "activated_regenerate_target_oracle_not_simple"
+    cost_text, effect_text = [part.strip() for part in text.split(":", 1)]
+    if not re.fullmatch(r"regenerate target creature\.?", effect_text):
+        return "activated_regenerate_target_oracle_not_simple"
+    activation = activation_cost_from_oracle_prefix(
+        cost_text,
+        allow_discard=True,
+        allow_life=True,
+    )
+    if isinstance(activation, str):
+        return str(activation).replace("activated_self_boost", "activated_regenerate_target")
+    return {
+        **activation,
+        "target": "creature",
+        "target_controller": "any",
+        "target_constraints": {"card_types": ["creature"]},
+    }
+
+
+def activated_regenerate_target_from_source(source: str) -> dict[str, Any] | str:
+    text = source or ""
+    if "Zone.GRAVEYARD" in text:
+        return "activated_regenerate_target_not_battlefield"
+    risky_cost_classes = {
+        "CompositeCost",
+        "ExileFrom",
+        "ExileFromGraveCost",
+        "ExileSourceFromGraveCost",
+        "OrCost",
+        "RemoveCounterCost",
+        "ReturnToHandSourceCost",
+        "ReturnToHandTargetCost",
+        "SacrificeSourceCost",
+        "SacrificeTargetCost",
+        "TapTargetCost",
+        "UntapSourceCost",
+    }
+    present_risky = sorted(cost for cost in risky_cost_classes if cost in text)
+    if present_risky:
+        return "activated_regenerate_target_cost_not_supported"
+    if len(re.findall(r"new\s+RegenerateTargetEffect\s*\(\s*\)", text, re.S)) != 1:
+        return "activated_regenerate_target_not_single_effect"
+    if len(re.findall(r"new\s+TargetCreaturePermanent\s*\(\s*\)", text, re.S)) != 1:
+        return "activated_regenerate_target_target_not_supported"
+    if re.search(r"new\s+TargetPermanent\s*\(", text, re.S):
+        return "activated_regenerate_target_target_not_supported"
+    regenerate_index = text.find("RegenerateTargetEffect")
+    window = text[max(0, regenerate_index - 500) : regenerate_index + 2000]
+    if "SimpleActivatedAbility" not in window:
+        return "activated_regenerate_target_not_simple_activated"
+    discard_cost = activation_discard_cost_from_source(window)
+    if isinstance(discard_cost, str):
+        return discard_cost.replace("activated_damage", "activated_regenerate_target")
+    life_matches = re.findall(r"PayLifeCost\s*\(\s*(\d+)\s*\)", window)
+    if "PayLifeCost" in window and len(life_matches) != 1:
+        return "activated_regenerate_target_cost_not_supported"
+    life_cost = int(life_matches[0]) if life_matches else 0
+    if life_cost < 0:
+        return "activated_regenerate_target_cost_not_supported"
+    mana_matches = re.findall(r'ManaCostsImpl<[^>]*>\s*\(\s*"([^"]+)"\s*\)', window, re.S)
+    generic_matches = re.findall(r"GenericManaCost\s*\(\s*(\d+)\s*\)", window, re.S)
+    colored_matches = re.findall(r"ColoredManaCost\s*\(\s*ColoredManaSymbol\.([WUBRG])\s*\)", window, re.S)
+    cost_kinds = sum(1 for matches in (mana_matches, generic_matches, colored_matches) if matches)
+    if cost_kinds > 1:
+        return "activated_regenerate_target_cost_not_supported"
+    if len(mana_matches) > 1 or len(generic_matches) > 1 or len(colored_matches) > 1:
+        return "activated_regenerate_target_cost_not_supported"
+    if mana_matches:
+        cost_text = canonical_mana_cost_text(mana_matches[0])
+    elif generic_matches:
+        cost_text = "{" + generic_matches[0] + "}"
+    elif colored_matches:
+        cost_text = "{" + colored_matches[0] + "}"
+    else:
+        cost_text = "{0}"
+    parsed = parse_mana_cost_text(cost_text)
+    if parsed is None:
+        return "activated_regenerate_target_mana_cost_not_supported"
+    generic, colors = parsed
+    return {
+        "activation_cost_mana": cost_text,
+        "activation_cost_generic": generic,
+        "activation_cost_colors": colors,
+        "activation_requires_tap": "TapSourceCost" in window,
+        "activation_requires_sacrifice": False,
+        "target": "creature",
+        "target_controller": "any",
+        "target_constraints": {"card_types": ["creature"]},
         **({"activation_life_cost": life_cost} if life_cost else {}),
         **(discard_cost or {}),
     }
@@ -25988,6 +26102,7 @@ def split_row(
     permanent_activated_target_keyword_unit = is_permanent_activated_target_keyword_unit(row)
     permanent_activated_self_keyword_unit = is_permanent_activated_self_keyword_unit(row)
     permanent_activated_regenerate_source_unit = is_permanent_activated_regenerate_source_unit(row)
+    permanent_activated_regenerate_target_unit = is_permanent_activated_regenerate_target_unit(row)
     permanent_activated_tutor_battlefield_unit = is_permanent_activated_tutor_battlefield_unit(row)
     permanent_activated_tutor_hand_unit = is_permanent_activated_tutor_hand_unit(row)
     attack_target_keyword_unit = is_creature_attack_target_keyword_unit(row)
@@ -26140,6 +26255,7 @@ def split_row(
         and not permanent_activated_target_keyword_unit
         and not permanent_activated_self_keyword_unit
         and not permanent_activated_regenerate_source_unit
+        and not permanent_activated_regenerate_target_unit
         and not permanent_activated_tutor_battlefield_unit
         and not permanent_activated_tutor_hand_unit
         and not attack_target_keyword_unit
@@ -28264,6 +28380,135 @@ def split_row(
             metadata,
             effect_json,
             family_id="xmage_permanent_simple_activated_regenerate_source",
+        ), "selected_exact_scope"
+
+    if permanent_activated_regenerate_target_unit:
+        if not is_permanent_metadata(metadata) or is_spell(metadata):
+            return None, "activated_regenerate_target_not_permanent"
+        oracle_activation = activated_regenerate_target_from_oracle(metadata)
+        if isinstance(oracle_activation, str):
+            return None, oracle_activation
+        parsed_activation = activated_regenerate_target_from_source(source_text)
+        if isinstance(parsed_activation, str):
+            return None, parsed_activation
+        source_cost = (
+            int(parsed_activation["activation_cost_generic"]),
+            list(parsed_activation["activation_cost_colors"]),
+            bool(parsed_activation["activation_requires_tap"]),
+            int(parsed_activation.get("activation_discard_count") or 0),
+            str(parsed_activation.get("activation_discard_target") or ""),
+            bool(parsed_activation.get("activation_discard_random")),
+            int(parsed_activation.get("activation_life_cost") or 0),
+            str(parsed_activation.get("target") or ""),
+            str(parsed_activation.get("target_controller") or ""),
+            tuple(parsed_activation.get("target_constraints", {}).get("card_types") or []),
+        )
+        oracle_cost = (
+            int(oracle_activation["activation_cost_generic"]),
+            list(oracle_activation["activation_cost_colors"]),
+            bool(oracle_activation["activation_requires_tap"]),
+            int(oracle_activation.get("activation_discard_count") or 0),
+            str(oracle_activation.get("activation_discard_target") or ""),
+            bool(oracle_activation.get("activation_discard_random")),
+            int(oracle_activation.get("activation_life_cost") or 0),
+            str(oracle_activation.get("target") or ""),
+            str(oracle_activation.get("target_controller") or ""),
+            tuple(oracle_activation.get("target_constraints", {}).get("card_types") or []),
+        )
+        if source_cost != oracle_cost:
+            return None, "activated_regenerate_target_source_oracle_cost_mismatch"
+        keyword_list = ordered_keywords(keywords_from_ability_classes(row))
+        type_line = str(metadata.get("type_line") or "").lower()
+        permanent_effect = (
+            "creature"
+            if "creature" in type_line
+            else "artifact"
+            if "artifact" in type_line
+            else "enchantment"
+            if "enchantment" in type_line
+            else "planeswalker"
+            if "planeswalker" in type_line
+            else "land"
+            if "land" in type_line
+            else "battle"
+            if "battle" in type_line
+            else "permanent"
+        )
+        activation_extra_fields = {
+            **(
+                {
+                    "activation_discard_count": int(parsed_activation.get("activation_discard_count") or 0),
+                    "activation_discard_target": parsed_activation.get("activation_discard_target") or "any_card",
+                    "activation_requires_discard_card": True,
+                }
+                if int(parsed_activation.get("activation_discard_count") or 0)
+                else {}
+            ),
+            **(
+                {"activation_discard_random": True}
+                if parsed_activation.get("activation_discard_random")
+                else {}
+            ),
+            **(
+                {"activation_life_cost": int(parsed_activation.get("activation_life_cost") or 0)}
+                if int(parsed_activation.get("activation_life_cost") or 0)
+                else {}
+            ),
+        }
+        target_constraints = dict(parsed_activation.get("target_constraints") or {"card_types": ["creature"]})
+        activated_effect = {
+            "effect": "regenerate_target",
+            "battle_model_scope": REGENERATE_TARGET_ACTIVATED_SCOPE,
+            "ability_kind": "activated",
+            "activated_effect": "regenerate_target",
+            "target": "creature",
+            "target_controller": "any",
+            "target_constraints": target_constraints,
+            "duration": "until_end_of_turn",
+            "regenerate_target": True,
+            "xmage_effect_class": "RegenerateTargetEffect",
+            "xmage_ability_class": "SimpleActivatedAbility",
+            "activation_cost_mana": parsed_activation["activation_cost_mana"],
+            "activation_cost_generic": parsed_activation["activation_cost_generic"],
+            "activation_cost_colors": parsed_activation["activation_cost_colors"],
+            "activation_requires_tap": parsed_activation["activation_requires_tap"],
+            "activation_requires_sacrifice": False,
+            **activation_extra_fields,
+        }
+        if keyword_list:
+            activated_effect["keywords"] = keyword_list
+            activated_effect["_keywords_are_self"] = True
+        effect_json = {
+            "effect": permanent_effect,
+            "battle_model_scope": REGENERATE_TARGET_ACTIVATED_SCOPE,
+            "ability_kind": "static_and_activated",
+            "activated_effect": "regenerate_target",
+            "activated_battle_model_scope": REGENERATE_TARGET_ACTIVATED_SCOPE,
+            "target": "creature",
+            "target_controller": "any",
+            "target_constraints": target_constraints,
+            "duration": "until_end_of_turn",
+            "regenerate_target": True,
+            "_activated_rule_effects": [activated_effect],
+            "xmage_effect_class": "RegenerateTargetEffect",
+            "xmage_ability_class": "SimpleActivatedAbility",
+            "activation_cost_mana": parsed_activation["activation_cost_mana"],
+            "activation_cost_generic": parsed_activation["activation_cost_generic"],
+            "activation_cost_colors": parsed_activation["activation_cost_colors"],
+            "activation_requires_tap": parsed_activation["activation_requires_tap"],
+            "activation_requires_sacrifice": False,
+            **activation_extra_fields,
+        }
+        if keyword_list:
+            effect_json["keywords"] = keyword_list
+            effect_json["_keywords_are_self"] = True
+            for keyword in keyword_list:
+                effect_json[keyword] = True
+        return build_proposal(
+            row,
+            metadata,
+            effect_json,
+            family_id="xmage_permanent_simple_activated_regenerate_target",
         ), "selected_exact_scope"
 
     if attack_self_boost_creature_unit:
@@ -37727,6 +37972,7 @@ def build_exact_split_report(
             and not is_permanent_activated_target_keyword_unit(row)
             and not is_permanent_activated_self_keyword_unit(row)
             and not is_permanent_activated_regenerate_source_unit(row)
+            and not is_permanent_activated_regenerate_target_unit(row)
             and not is_permanent_activated_tutor_hand_unit(row)
             and not is_creature_attack_target_keyword_unit(row)
             and not is_creature_attack_self_boost_unit(row)
@@ -37835,6 +38081,7 @@ def build_exact_split_report(
                 "xmage_signature BoostSourceEffect + SimpleActivatedAbility rows with exact activated self boost until EOT and mana/tap source costs only",
                 "xmage_signature GainAbilitySourceEffect + SimpleActivatedAbility rows with exact activated self keyword until EOT and mana/tap source costs only",
                 "xmage_signature RegenerateSourceEffect + SimpleActivatedAbility rows with exact self-regeneration Oracle text and mana/tap source costs only",
+                "xmage_signature RegenerateTargetEffect + SimpleActivatedAbility + TargetCreaturePermanent rows with exact activated target-creature regeneration Oracle text and mana/tap/discard/life source costs only",
                 "xmage_signature BoostTargetEffect + SimpleActivatedAbility + TargetCreaturePermanent rows with exact activated target-creature boost until EOT and mana/tap source costs only",
                 "xmage_signature BoostControlledEffect + SimpleStaticAbility rows with exact static controlled-creature power/toughness boosts and simple creature/artifact/subtype/legendary filters",
                 "xmage_signature BoostAllEffect + SimpleStaticAbility rows with exact static fixed creature power/toughness boosts for all, opponent, color, subtype, token, or land-creature filters",

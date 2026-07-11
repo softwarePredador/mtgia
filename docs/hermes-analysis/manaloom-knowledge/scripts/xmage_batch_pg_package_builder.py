@@ -4418,6 +4418,57 @@ def simple_activated_regenerate_source_execution_scenario_from_expected_rule(
     }
 
 
+def simple_activated_regenerate_target_execution_scenario_from_expected_rule(
+    rule: dict[str, Any],
+) -> dict[str, Any] | None:
+    required = dict(rule.get("required_effect_fields") or {})
+    if required.get("battle_model_scope") != "xmage_permanent_simple_activated_regenerate_target_v1":
+        return None
+    discard_target = str(required.get("activation_discard_target") or "any_card")
+    discard_hand = []
+    if int(required.get("activation_discard_count") or 0):
+        if discard_target == "land_card":
+            discard_hand = [
+                {"name": "E2E Spare Forest", "type_line": "Basic Land - Forest", "effect": "land"},
+                {"name": "E2E Nonland Spell", "type_line": "Sorcery", "effect": "draw_cards", "cmc": 2},
+            ]
+        elif discard_target == "artifact_card":
+            discard_hand = [
+                {"name": "E2E Spare Relic", "type_line": "Artifact", "effect": "mana_source", "cmc": 1},
+                {"name": "E2E Nonartifact Spell", "type_line": "Sorcery", "effect": "draw_cards", "cmc": 2},
+            ]
+        else:
+            discard_hand = [
+                {"name": "E2E Spare Card A", "type_line": "Sorcery", "effect": "draw_cards", "cmc": 2},
+                {"name": "E2E Spare Card B", "type_line": "Instant", "effect": "direct_damage", "cmc": 1},
+            ]
+    return {
+        "name": f"{rule['card_name']} activates regenerate target ability",
+        "type": "simple_activated_regenerate_target",
+        "card": {
+            "name": rule["card_name"],
+            "type_line": required.get("source_type_line") or "Artifact",
+            "effect": required.get("effect") or "artifact",
+        },
+        "target": {
+            "name": "E2E Protected Creature",
+            "type_line": "Creature - Bear",
+            "effect": "creature",
+            "power": 2,
+            "toughness": 2,
+        },
+        "controller_mana": _manifest_mana_for_required_activation(required),
+        "controller_hand": discard_hand,
+        "starting_life": 40,
+        "expected_tapped_source": bool(required.get("activation_requires_tap")),
+        "expected_regeneration_shields": 1,
+        "expected_discard_count": int(required.get("activation_discard_count") or 0),
+        "expected_discard_target": discard_target,
+        "expected_life_paid": int(required.get("activation_life_cost") or 0),
+        "logical_rule_key": rule["logical_rule_key"],
+    }
+
+
 def simple_activated_target_keyword_execution_scenario_from_expected_rule(
     rule: dict[str, Any],
 ) -> dict[str, Any] | None:
@@ -6557,6 +6608,7 @@ def execution_scenario_from_expected_rule(rule: dict[str, Any]) -> dict[str, Any
         or simple_activated_self_boost_execution_scenario_from_expected_rule(rule)
         or simple_activated_self_keyword_execution_scenario_from_expected_rule(rule)
         or simple_activated_regenerate_source_execution_scenario_from_expected_rule(rule)
+        or simple_activated_regenerate_target_execution_scenario_from_expected_rule(rule)
         or simple_activated_target_keyword_execution_scenario_from_expected_rule(rule)
         or controlled_stat_modifier_execution_scenario_from_expected_rule(rule)
         or target_keyword_spell_execution_scenario_from_expected_rule(rule)

@@ -24169,6 +24169,112 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertEqual(effect["activation_discard_target"], "any_card")
         self.assertEqual(effect["_activated_rule_effects"][0]["activation_discard_count"], 1)
 
+    def test_activated_regenerate_target_maps_mana_tap_cost(self) -> None:
+        row = queue_row(
+            "xmage_signature::RegenerateTargetEffect::SimpleActivatedAbility::"
+            "TargetCreaturePermanent::no_condition_class::targeting,activated_ability",
+            effect_classes=["RegenerateTargetEffect"],
+            ability_kind="activated",
+            ability_classes=["SimpleActivatedAbility"],
+            xmage_signals=["targeting", "activated_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Ragnar",
+                type_line="Legendary Creature - Human Cleric",
+                oracle_text="{G}{W}{U}, {T}: Regenerate target creature.",
+            ),
+            source_text=(
+                "Ability ability = new SimpleActivatedAbility("
+                "new RegenerateTargetEffect(), "
+                'new ManaCostsImpl<>("{G}{W}{U}"));'
+                "ability.addCost(new TapSourceCost());"
+                "ability.addTarget(new TargetCreaturePermanent());"
+            ),
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["effect"], "creature")
+        self.assertEqual(effect["battle_model_scope"], split.REGENERATE_TARGET_ACTIVATED_SCOPE)
+        self.assertEqual(effect["activated_effect"], "regenerate_target")
+        self.assertTrue(effect["regenerate_target"])
+        self.assertEqual(effect["target"], "creature")
+        self.assertEqual(effect["target_constraints"], {"card_types": ["creature"]})
+        self.assertEqual(effect["activation_cost_mana"], "{G}{W}{U}")
+        self.assertEqual(effect["activation_cost_generic"], 0)
+        self.assertEqual(effect["activation_cost_colors"], ["G", "W", "U"])
+        self.assertTrue(effect["activation_requires_tap"])
+        self.assertEqual(effect["_activated_rule_effects"][0]["target"], "creature")
+
+    def test_activated_regenerate_target_maps_random_discard_cost(self) -> None:
+        row = queue_row(
+            "xmage_signature::RegenerateTargetEffect::SimpleActivatedAbility::"
+            "TargetCreaturePermanent::no_condition_class::targeting,activated_ability",
+            effect_classes=["RegenerateTargetEffect"],
+            ability_kind="activated",
+            ability_classes=["SimpleActivatedAbility"],
+            xmage_signals=["targeting", "activated_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Draconian Cylix",
+                type_line="Artifact",
+                oracle_text="{2}, {T}, Discard a card at random: Regenerate target creature.",
+            ),
+            source_text=(
+                "Ability ability = new SimpleActivatedAbility("
+                "new RegenerateTargetEffect(), "
+                "new GenericManaCost(2));"
+                "ability.addCost(new TapSourceCost());"
+                "ability.addCost(new DiscardCardCost(true));"
+                "ability.addTarget(new TargetCreaturePermanent());"
+            ),
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["effect"], "artifact")
+        self.assertEqual(effect["battle_model_scope"], split.REGENERATE_TARGET_ACTIVATED_SCOPE)
+        self.assertEqual(effect["activation_cost_mana"], "{2}")
+        self.assertEqual(effect["activation_cost_generic"], 2)
+        self.assertEqual(effect["activation_cost_colors"], [])
+        self.assertEqual(effect["activation_discard_count"], 1)
+        self.assertEqual(effect["activation_discard_target"], "any_card")
+        self.assertTrue(effect["activation_discard_random"])
+        self.assertTrue(effect["_activated_rule_effects"][0]["activation_discard_random"])
+
+    def test_activated_regenerate_target_blocks_filtered_target(self) -> None:
+        row = queue_row(
+            "xmage_signature::RegenerateTargetEffect::SimpleActivatedAbility::"
+            "TargetPermanent::no_condition_class::targeting,activated_ability",
+            effect_classes=["RegenerateTargetEffect"],
+            ability_kind="activated",
+            ability_classes=["SimpleActivatedAbility"],
+            xmage_signals=["targeting", "activated_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Clockwork Gnomes",
+                type_line="Artifact Creature - Gnome",
+                oracle_text="{3}, {T}: Regenerate target artifact creature.",
+            ),
+            source_text=(
+                "FilterPermanent filter = new FilterPermanent(\"artifact creature\");"
+                "Ability ability = new SimpleActivatedAbility("
+                "new RegenerateTargetEffect(), "
+                "new GenericManaCost(3));"
+                "ability.addCost(new TapSourceCost());"
+                "ability.addTarget(new TargetPermanent(filter));"
+            ),
+        )
+
+        self.assertIsNone(proposal)
+        self.assertEqual(reason, "activated_regenerate_target_oracle_not_simple")
+
     def test_activated_self_boost_accepts_colored_mana_cost_source(self) -> None:
         row = queue_row(
             split.SELF_BOOST_ACTIVATED_UNIT,

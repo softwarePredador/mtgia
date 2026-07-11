@@ -7355,6 +7355,165 @@ def run_simple_activated_regenerate_source(
     }
 
 
+def run_simple_activated_regenerate_target(
+    battle,
+    scenario: dict[str, Any],
+    events: list[tuple[str, dict[str, Any]]],
+) -> dict[str, Any]:
+    card = dict(scenario["card"])
+    effect = battle.get_card_effect(card)
+    source = battle.enrich_card(
+        {
+            **card,
+            "type_line": card.get("type_line") or "Artifact",
+            "effect": card.get("effect") or effect.get("effect") or "artifact",
+            "summoning_sick": False,
+            **effect,
+            **dict(scenario.get("source_overrides") or {}),
+        }
+    )
+    target_card = dict(scenario.get("target") or {})
+    target = battle.enrich_card(
+        {
+            "name": target_card.get("name") or "E2E Protected Creature",
+            "type_line": target_card.get("type_line") or "Creature - Bear",
+            "effect": "creature",
+            "power": int(target_card.get("power") or 2),
+            "toughness": int(target_card.get("toughness") or 2),
+            "summoning_sick": False,
+            **target_card,
+        }
+    )
+    active = battle.Player(str(scenario.get("player") or "Activated Controller"), None, [])
+    active.life = int(scenario.get("starting_life") or 40)
+    active.hand = [
+        battle.enrich_card(dict(hand_card))
+        for hand_card in (scenario.get("controller_hand") or [])
+        if isinstance(hand_card, dict)
+    ]
+    active.battlefield = [source, target]
+    add_manifest_mana(active, scenario.get("controller_mana") or {})
+    starting_hand_names = [card.get("name", "?") for card in active.hand if isinstance(card, dict)]
+    starting_life = active.life
+    expected_tapped_source = bool(scenario.get("expected_tapped_source", effect.get("activation_requires_tap", False)))
+    expected_shields = int(scenario.get("expected_regeneration_shields") or 1)
+    expected_discard_count = int(
+        scenario.get("expected_discard_count", effect.get("activation_discard_count") or 0) or 0
+    )
+    expected_discard_target = str(
+        scenario.get("expected_discard_target") or effect.get("activation_discard_target") or "any_card"
+    )
+    expected_life_paid = int(
+        scenario.get("expected_life_paid", effect.get("activation_life_cost") or 0) or 0
+    )
+
+    if not battle.can_activate_generic_regenerate_target_permanent(active, [], source):
+        fail("battle_execution", f"{card['name']} simple activated regenerate target cannot activate")
+    activated = battle.activate_generic_regenerate_target_permanent(
+        active,
+        [],
+        [active],
+        source,
+        turn=int(scenario.get("turn") or 7),
+        rng=random.Random(int(scenario.get("seed") or 6074)),
+        phase=str(scenario.get("phase") or "precombat_main"),
+    )
+    if not activated:
+        fail("battle_execution", f"{card['name']} simple activated regenerate target activation failed")
+    if int(target.get("regeneration_shields") or 0) != expected_shields:
+        fail(
+            "battle_execution",
+            f"{card['name']} target regeneration_shields={target.get('regeneration_shields')!r}",
+        )
+    if bool(source.get("tapped")) != expected_tapped_source:
+        fail(
+            "battle_execution",
+            f"{card['name']} source tapped={bool(source.get('tapped'))}, expected {expected_tapped_source}",
+        )
+    destination = battle.move_creature_from_battlefield(
+        active,
+        target,
+        reason="destroy",
+        source={"name": "E2E Destroy Effect"},
+        all_players=[active],
+    )
+    if destination != "battlefield":
+        fail("battle_execution", f"{card['name']} target regeneration destination={destination!r}")
+    if target not in active.battlefield or target in active.graveyard:
+        fail("battle_execution", f"{card['name']} target was moved despite regeneration")
+    if not target.get("tapped"):
+        fail("battle_execution", f"{card['name']} target was not tapped by regeneration replacement")
+    if int(target.get("regeneration_shields") or 0) != expected_shields - 1:
+        fail(
+            "battle_execution",
+            f"{card['name']} target remaining regeneration_shields={target.get('regeneration_shields')!r}",
+        )
+    activation_event = next(
+        (
+            data
+            for event, data in reversed(events)
+            if event == "activated_ability"
+            and data.get("card") == card.get("name")
+            and data.get("activation_kind") == "simple_activated_regenerate_target"
+        ),
+        None,
+    )
+    if activation_event is None:
+        fail("battle_events", f"missing {card['name']} simple activated regenerate target event")
+    if activation_event.get("target") != target.get("name"):
+        fail(
+            "battle_events",
+            f"{card['name']} activated target={activation_event.get('target')!r}, expected {target.get('name')!r}",
+        )
+    if int(activation_event.get("activation_discard_count") or 0) != expected_discard_count:
+        fail(
+            "battle_events",
+            f"{card['name']} activation_discard_count={activation_event.get('activation_discard_count')!r}",
+        )
+    if int(activation_event.get("activation_life_cost") or 0) != expected_life_paid:
+        fail(
+            "battle_events",
+            f"{card['name']} activation_life_cost={activation_event.get('activation_life_cost')!r}",
+        )
+    if active.life != starting_life - expected_life_paid:
+        fail(
+            "battle_execution",
+            f"{card['name']} life={active.life}, expected {starting_life - expected_life_paid}",
+        )
+    if expected_discard_count:
+        discarded = list(activation_event.get("discarded") or [])
+        if len(discarded) != expected_discard_count:
+            fail("battle_events", f"{card['name']} discarded={discarded!r}")
+        if activation_event.get("activation_discard_target") != expected_discard_target:
+            fail(
+                "battle_events",
+                f"{card['name']} activation_discard_target={activation_event.get('activation_discard_target')!r}",
+            )
+        if not set(discarded).issubset(set(starting_hand_names)):
+            fail("battle_events", f"{card['name']} discarded cards not from starting hand: {discarded!r}")
+    shield_event = next(
+        (
+            data
+            for event, data in reversed(events)
+            if event == "regeneration_shield_used" and data.get("card") == target.get("name")
+        ),
+        None,
+    )
+    if shield_event is None:
+        fail("battle_events", f"missing {target.get('name')} regeneration shield event")
+    return {
+        "scenario": scenario.get("name"),
+        "card_name": card["name"],
+        "target_name": target.get("name"),
+        "destination": destination,
+        "source_tapped": bool(source.get("tapped")),
+        "target_tapped": bool(target.get("tapped")),
+        "regeneration_shields_after": int(target.get("regeneration_shields") or 0),
+        "discarded_count": expected_discard_count,
+        "life_paid": expected_life_paid,
+    }
+
+
 def run_stat_modifier_until_eot(
     battle,
     scenario: dict[str, Any],
@@ -10545,6 +10704,7 @@ SCENARIO_RUNNERS = {
     "simple_activated_self_boost": run_simple_activated_self_boost,
     "simple_activated_self_keyword": run_simple_activated_self_keyword,
     "simple_activated_regenerate_source": run_simple_activated_regenerate_source,
+    "simple_activated_regenerate_target": run_simple_activated_regenerate_target,
     "damage_each_opponent_spell": run_damage_each_opponent_spell,
     "damage_each_opponent_and_their_permanents_spell": run_damage_each_opponent_and_their_permanents_spell,
     "damage_gain_life_spell": run_damage_gain_life_spell,

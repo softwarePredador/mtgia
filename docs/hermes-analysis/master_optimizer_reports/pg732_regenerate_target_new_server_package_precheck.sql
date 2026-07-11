@@ -1,0 +1,86 @@
+WITH proposed(normalized_name, card_name, oracle_hash, logical_rule_key, effect_json, deck_role_json, source, confidence, review_status, execution_status, notes, shadow_handling) AS (
+  VALUES
+    ('draconian cylix', 'Draconian Cylix', 'd97fd078cf041527aed059eb00a10d0b', 'battle_rule_v1:0c440dcef48cbb3e32309b97ef539986', '{"_activated_rule_effects":[{"ability_kind":"activated","activated_effect":"regenerate_target","activation_cost_colors":[],"activation_cost_generic":2,"activation_cost_mana":"{2}","activation_discard_count":1,"activation_discard_random":true,"activation_discard_target":"any_card","activation_requires_discard_card":true,"activation_requires_sacrifice":false,"activation_requires_tap":true,"battle_model_scope":"xmage_permanent_simple_activated_regenerate_target_v1","duration":"until_end_of_turn","effect":"regenerate_target","regenerate_target":true,"target":"creature","target_constraints":{"card_types":["creature"]},"target_controller":"any","xmage_ability_class":"SimpleActivatedAbility","xmage_effect_class":"RegenerateTargetEffect"}],"ability_kind":"static_and_activated","activated_battle_model_scope":"xmage_permanent_simple_activated_regenerate_target_v1","activated_effect":"regenerate_target","activation_cost_colors":[],"activation_cost_generic":2,"activation_cost_mana":"{2}","activation_discard_count":1,"activation_discard_random":true,"activation_discard_target":"any_card","activation_requires_discard_card":true,"activation_requires_sacrifice":false,"activation_requires_tap":true,"battle_model_scope":"xmage_permanent_simple_activated_regenerate_target_v1","duration":"until_end_of_turn","effect":"artifact","regenerate_target":true,"target":"creature","target_constraints":{"card_types":["creature"]},"target_controller":"any","xmage_ability_class":"SimpleActivatedAbility","xmage_effect_class":"RegenerateTargetEffect"}'::jsonb, '{"category":"unknown","effect":"artifact","target":"creature"}'::jsonb, 'curated', 0.96, 'verified', 'auto', 'XMage authoritative exact-scope split: local class DraconianCylix translated into ManaLoom runtime scope xmage_permanent_simple_activated_regenerate_target_v1. This row is package-ready only because the source signature is a narrow runtime-backed exact-scope adapter with focused runtime coverage.', 'deprecate_nonmatching_rows'),
+    ('medicine bag', 'Medicine Bag', 'ea28bf8e78e49277c92eec8fe254a775', 'battle_rule_v1:d1c4a887558b50d3b46fe772fcb0c9a4', '{"_activated_rule_effects":[{"ability_kind":"activated","activated_effect":"regenerate_target","activation_cost_colors":[],"activation_cost_generic":1,"activation_cost_mana":"{1}","activation_discard_count":1,"activation_discard_target":"any_card","activation_requires_discard_card":true,"activation_requires_sacrifice":false,"activation_requires_tap":true,"battle_model_scope":"xmage_permanent_simple_activated_regenerate_target_v1","duration":"until_end_of_turn","effect":"regenerate_target","regenerate_target":true,"target":"creature","target_constraints":{"card_types":["creature"]},"target_controller":"any","xmage_ability_class":"SimpleActivatedAbility","xmage_effect_class":"RegenerateTargetEffect"}],"ability_kind":"static_and_activated","activated_battle_model_scope":"xmage_permanent_simple_activated_regenerate_target_v1","activated_effect":"regenerate_target","activation_cost_colors":[],"activation_cost_generic":1,"activation_cost_mana":"{1}","activation_discard_count":1,"activation_discard_target":"any_card","activation_requires_discard_card":true,"activation_requires_sacrifice":false,"activation_requires_tap":true,"battle_model_scope":"xmage_permanent_simple_activated_regenerate_target_v1","duration":"until_end_of_turn","effect":"artifact","regenerate_target":true,"target":"creature","target_constraints":{"card_types":["creature"]},"target_controller":"any","xmage_ability_class":"SimpleActivatedAbility","xmage_effect_class":"RegenerateTargetEffect"}'::jsonb, '{"category":"unknown","effect":"artifact","target":"creature"}'::jsonb, 'curated', 0.96, 'verified', 'auto', 'XMage authoritative exact-scope split: local class MedicineBag translated into ManaLoom runtime scope xmage_permanent_simple_activated_regenerate_target_v1. This row is package-ready only because the source signature is a narrow runtime-backed exact-scope adapter with focused runtime coverage.', 'deprecate_nonmatching_rows'),
+    ('niall silvain', 'Niall Silvain', '022a3fb30e90c8dd8c8039d75076836d', 'battle_rule_v1:6501962dd6c13804f148ad10b5bb1f5f', '{"_activated_rule_effects":[{"ability_kind":"activated","activated_effect":"regenerate_target","activation_cost_colors":["G","G","G","G"],"activation_cost_generic":0,"activation_cost_mana":"{G}{G}{G}{G}","activation_requires_sacrifice":false,"activation_requires_tap":true,"battle_model_scope":"xmage_permanent_simple_activated_regenerate_target_v1","duration":"until_end_of_turn","effect":"regenerate_target","regenerate_target":true,"target":"creature","target_constraints":{"card_types":["creature"]},"target_controller":"any","xmage_ability_class":"SimpleActivatedAbility","xmage_effect_class":"RegenerateTargetEffect"}],"ability_kind":"static_and_activated","activated_battle_model_scope":"xmage_permanent_simple_activated_regenerate_target_v1","activated_effect":"regenerate_target","activation_cost_colors":["G","G","G","G"],"activation_cost_generic":0,"activation_cost_mana":"{G}{G}{G}{G}","activation_requires_sacrifice":false,"activation_requires_tap":true,"battle_model_scope":"xmage_permanent_simple_activated_regenerate_target_v1","duration":"until_end_of_turn","effect":"creature","regenerate_target":true,"target":"creature","target_constraints":{"card_types":["creature"]},"target_controller":"any","xmage_ability_class":"SimpleActivatedAbility","xmage_effect_class":"RegenerateTargetEffect"}'::jsonb, '{"category":"unknown","effect":"creature","target":"creature"}'::jsonb, 'curated', 0.96, 'verified', 'auto', 'XMage authoritative exact-scope split: local class NiallSilvain translated into ManaLoom runtime scope xmage_permanent_simple_activated_regenerate_target_v1. This row is package-ready only because the source signature is a narrow runtime-backed exact-scope adapter with focused runtime coverage.', 'deprecate_nonmatching_rows'),
+    ('ragnar', 'Ragnar', '61236ce1a825d303c089e78520a8c58d', 'battle_rule_v1:fe054ce418d17a4abf67c0db7f1dd5e0', '{"_activated_rule_effects":[{"ability_kind":"activated","activated_effect":"regenerate_target","activation_cost_colors":["G","W","U"],"activation_cost_generic":0,"activation_cost_mana":"{G}{W}{U}","activation_requires_sacrifice":false,"activation_requires_tap":true,"battle_model_scope":"xmage_permanent_simple_activated_regenerate_target_v1","duration":"until_end_of_turn","effect":"regenerate_target","regenerate_target":true,"target":"creature","target_constraints":{"card_types":["creature"]},"target_controller":"any","xmage_ability_class":"SimpleActivatedAbility","xmage_effect_class":"RegenerateTargetEffect"}],"ability_kind":"static_and_activated","activated_battle_model_scope":"xmage_permanent_simple_activated_regenerate_target_v1","activated_effect":"regenerate_target","activation_cost_colors":["G","W","U"],"activation_cost_generic":0,"activation_cost_mana":"{G}{W}{U}","activation_requires_sacrifice":false,"activation_requires_tap":true,"battle_model_scope":"xmage_permanent_simple_activated_regenerate_target_v1","duration":"until_end_of_turn","effect":"creature","regenerate_target":true,"target":"creature","target_constraints":{"card_types":["creature"]},"target_controller":"any","xmage_ability_class":"SimpleActivatedAbility","xmage_effect_class":"RegenerateTargetEffect"}'::jsonb, '{"category":"unknown","effect":"creature","target":"creature"}'::jsonb, 'curated', 0.96, 'verified', 'auto', 'XMage authoritative exact-scope split: local class Ragnar translated into ManaLoom runtime scope xmage_permanent_simple_activated_regenerate_target_v1. This row is package-ready only because the source signature is a narrow runtime-backed exact-scope adapter with focused runtime coverage.', 'deprecate_nonmatching_rows'),
+    ('rushwood herbalist', 'Rushwood Herbalist', 'a853bed277b6770021ba88adaa1b7804', 'battle_rule_v1:0028f0ac462796f940fae6d2e9ba0099', '{"_activated_rule_effects":[{"ability_kind":"activated","activated_effect":"regenerate_target","activation_cost_colors":["G"],"activation_cost_generic":0,"activation_cost_mana":"{G}","activation_discard_count":1,"activation_discard_target":"any_card","activation_requires_discard_card":true,"activation_requires_sacrifice":false,"activation_requires_tap":true,"battle_model_scope":"xmage_permanent_simple_activated_regenerate_target_v1","duration":"until_end_of_turn","effect":"regenerate_target","regenerate_target":true,"target":"creature","target_constraints":{"card_types":["creature"]},"target_controller":"any","xmage_ability_class":"SimpleActivatedAbility","xmage_effect_class":"RegenerateTargetEffect"}],"ability_kind":"static_and_activated","activated_battle_model_scope":"xmage_permanent_simple_activated_regenerate_target_v1","activated_effect":"regenerate_target","activation_cost_colors":["G"],"activation_cost_generic":0,"activation_cost_mana":"{G}","activation_discard_count":1,"activation_discard_target":"any_card","activation_requires_discard_card":true,"activation_requires_sacrifice":false,"activation_requires_tap":true,"battle_model_scope":"xmage_permanent_simple_activated_regenerate_target_v1","duration":"until_end_of_turn","effect":"creature","regenerate_target":true,"target":"creature","target_constraints":{"card_types":["creature"]},"target_controller":"any","xmage_ability_class":"SimpleActivatedAbility","xmage_effect_class":"RegenerateTargetEffect"}'::jsonb, '{"category":"unknown","effect":"creature","target":"creature"}'::jsonb, 'curated', 0.96, 'verified', 'auto', 'XMage authoritative exact-scope split: local class RushwoodHerbalist translated into ManaLoom runtime scope xmage_permanent_simple_activated_regenerate_target_v1. This row is package-ready only because the source signature is a narrow runtime-backed exact-scope adapter with focused runtime coverage.', 'deprecate_nonmatching_rows'),
+    ('suture spirit', 'Suture Spirit', 'bf66255a2189800895c158dceb26060d', 'battle_rule_v1:cd6925af7127d196d88c7c07cf5287b6', '{"_activated_rule_effects":[{"_keywords_are_self":true,"ability_kind":"activated","activated_effect":"regenerate_target","activation_cost_colors":["W/B","W/B","W/B"],"activation_cost_generic":0,"activation_cost_mana":"{W/B}{W/B}{W/B}","activation_requires_sacrifice":false,"activation_requires_tap":false,"battle_model_scope":"xmage_permanent_simple_activated_regenerate_target_v1","duration":"until_end_of_turn","effect":"regenerate_target","keywords":["flying"],"regenerate_target":true,"target":"creature","target_constraints":{"card_types":["creature"]},"target_controller":"any","xmage_ability_class":"SimpleActivatedAbility","xmage_effect_class":"RegenerateTargetEffect"}],"_keywords_are_self":true,"ability_kind":"static_and_activated","activated_battle_model_scope":"xmage_permanent_simple_activated_regenerate_target_v1","activated_effect":"regenerate_target","activation_cost_colors":["W/B","W/B","W/B"],"activation_cost_generic":0,"activation_cost_mana":"{W/B}{W/B}{W/B}","activation_requires_sacrifice":false,"activation_requires_tap":false,"battle_model_scope":"xmage_permanent_simple_activated_regenerate_target_v1","duration":"until_end_of_turn","effect":"creature","flying":true,"keywords":["flying"],"regenerate_target":true,"target":"creature","target_constraints":{"card_types":["creature"]},"target_controller":"any","xmage_ability_class":"SimpleActivatedAbility","xmage_effect_class":"RegenerateTargetEffect"}'::jsonb, '{"category":"unknown","effect":"creature","target":"creature"}'::jsonb, 'curated', 0.96, 'verified', 'auto', 'XMage authoritative exact-scope split: local class SutureSpirit translated into ManaLoom runtime scope xmage_permanent_simple_activated_regenerate_target_v1. This row is package-ready only because the source signature is a narrow runtime-backed exact-scope adapter with focused runtime coverage.', 'deprecate_nonmatching_rows')
+),
+matched_cards AS (
+  SELECT
+    p.normalized_name,
+    p.card_name,
+    p.oracle_hash,
+    c.id AS card_id,
+    c.name AS db_card_name
+  FROM proposed p
+  LEFT JOIN public.cards c
+    ON (
+         lower(c.name) = p.normalized_name
+         OR split_part(lower(c.name), ' // ', 1) = p.normalized_name
+       )
+   AND md5(coalesce(c.oracle_text, '')) = p.oracle_hash
+),
+target_cards AS (
+  SELECT
+    normalized_name,
+    card_name,
+    oracle_hash,
+    count(card_id) AS target_card_rows,
+    min(card_id::text)::uuid AS canonical_card_id,
+    min(db_card_name) AS canonical_card_name
+  FROM matched_cards
+  GROUP BY normalized_name, card_name, oracle_hash
+),
+rule_rows AS (
+  SELECT p.normalized_name, count(r.*) AS existing_rule_rows
+  FROM proposed p
+  LEFT JOIN public.card_battle_rules r
+    ON (
+         r.normalized_name = p.normalized_name
+         OR r.normalized_name LIKE p.normalized_name || ' // %'
+       )
+  GROUP BY p.normalized_name
+),
+expected_rows AS (
+  SELECT p.normalized_name, count(r.*) AS expected_rule_rows_before
+  FROM proposed p
+  LEFT JOIN public.card_battle_rules r
+    ON (
+         r.normalized_name = p.normalized_name
+         OR r.normalized_name LIKE p.normalized_name || ' // %'
+       )
+   AND r.logical_rule_key = p.logical_rule_key
+  GROUP BY p.normalized_name
+),
+shadow_rows AS (
+  SELECT p.normalized_name, count(r.*) AS would_deprecate_shadow_rows
+  FROM proposed p
+  LEFT JOIN public.card_battle_rules r
+    ON (
+         r.normalized_name = p.normalized_name
+         OR r.normalized_name LIKE p.normalized_name || ' // %'
+       )
+   AND r.logical_rule_key <> p.logical_rule_key
+   AND r.review_status NOT IN ('deprecated', 'rejected')
+   AND r.execution_status <> 'disabled'
+  GROUP BY p.normalized_name
+)
+SELECT
+  p.card_name,
+  p.normalized_name,
+  p.oracle_hash,
+  p.logical_rule_key,
+  p.shadow_handling,
+  tc.target_card_rows,
+  tc.canonical_card_id,
+  rr.existing_rule_rows,
+  er.expected_rule_rows_before,
+  sr.would_deprecate_shadow_rows
+FROM proposed p
+JOIN target_cards tc USING (normalized_name, card_name, oracle_hash)
+JOIN rule_rows rr USING (normalized_name)
+JOIN expected_rows er USING (normalized_name)
+JOIN shadow_rows sr USING (normalized_name)
+ORDER BY p.card_name;

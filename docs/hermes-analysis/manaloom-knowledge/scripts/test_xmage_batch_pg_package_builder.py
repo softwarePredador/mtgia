@@ -5644,6 +5644,39 @@ def test_simple_activated_regenerate_source_execution_scenario_supplies_extra_co
     assert len(scenario["controller_hand"]) >= 1
 
 
+def test_simple_activated_regenerate_target_execution_scenario_supplies_target_and_costs() -> None:
+    rule = {
+        "normalized_name": "draconian cylix",
+        "card_name": "Draconian Cylix",
+        "logical_rule_key": "battle_rule_v1:draconian-cylix",
+        "required_effect_fields": {
+            "effect": "artifact",
+            "battle_model_scope": "xmage_permanent_simple_activated_regenerate_target_v1",
+            "activated_effect": "regenerate_target",
+            "target": "creature",
+            "target_constraints": {"card_types": ["creature"]},
+            "activation_cost_mana": "{2}",
+            "activation_cost_generic": 2,
+            "activation_cost_colors": [],
+            "activation_requires_tap": True,
+            "activation_discard_count": 1,
+            "activation_discard_target": "any_card",
+            "activation_discard_random": True,
+            "regenerate_target": True,
+        },
+    }
+
+    scenario = builder.execution_scenario_from_expected_rule(rule)
+
+    assert scenario["type"] == "simple_activated_regenerate_target"
+    assert scenario["controller_mana"]["generic"] == 2
+    assert scenario["expected_tapped_source"] is True
+    assert scenario["expected_regeneration_shields"] == 1
+    assert scenario["expected_discard_count"] == 1
+    assert scenario["target"]["type_line"].startswith("Creature")
+    assert len(scenario["controller_hand"]) >= 1
+
+
 def test_modal_damage_or_destroy_fields_and_execution_scenario_are_manifested() -> None:
     proposal = {
         "normalized_name": "fiery intervention",
