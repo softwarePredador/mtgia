@@ -7605,3 +7605,41 @@ def test_mana_source_etb_draw_unblocked_control_transfer_manifest_builds_composi
     assert scenario["expected_tapped_after_refresh"] is True
     assert scenario["expected_unblocked_attack_draw_count"] == 3
     assert scenario["expected_untapped_after_transfer"] is True
+
+
+def test_spell_mana_ritual_execution_scenario_is_manifested() -> None:
+    proposal = {
+        "normalized_name": "battle hymn",
+        "card_name": "Battle Hymn",
+        "oracle_hash": "hash-battle-hymn",
+        "logical_rule_key": "battle_rule_v1:battle-hymn",
+        "effect_json": {
+            "effect": "ramp_ritual",
+            "battle_model_scope": "xmage_controlled_creature_count_spell_mana_ritual_v1",
+            "ability_kind": "one_shot",
+            "instant": True,
+            "mana_amount_model": "controller_battlefield_creature_count",
+            "dynamic_mana_amount": True,
+            "dynamic_mana_amount_source": "controller_battlefield_creature_count",
+            "mana_produced": 1,
+            "mana_per_count": 1,
+            "produces": "R",
+            "mana_color_status": "colored_pool_runtime",
+        },
+    }
+
+    expected = builder.expected_rule_from_proposal(proposal)
+    required = expected["required_effect_fields"]
+
+    assert required["mana_amount_model"] == "controller_battlefield_creature_count"
+    assert required["dynamic_mana_amount"] is True
+    assert required["mana_per_count"] == 1
+    assert required["mana_color_status"] == "colored_pool_runtime"
+
+    scenario = builder.execution_scenario_from_expected_rule(expected)
+
+    assert scenario["type"] == "spell_mana_ritual_resolution"
+    assert scenario["expected_mana_added"] == 3
+    assert scenario["expected_mana_symbols"] == ["R", "R", "R"]
+    assert scenario["expected_mana_amount_model"] == "controller_battlefield_creature_count"
+    assert len(scenario["controller_battlefield"]) == 3

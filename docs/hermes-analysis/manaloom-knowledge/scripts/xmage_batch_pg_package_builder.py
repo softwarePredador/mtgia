@@ -557,9 +557,16 @@ E2E_REQUIRED_EFFECT_FIELDS = (
     "flash",
     "is_mana_source",
     "mana_source_contextual_only",
+    "mana_amount_model",
     "mana_produced",
+    "mana_per_count",
     "produces",
     "produced_mana_symbols",
+    "mana_color_status",
+    "dynamic_mana_amount",
+    "mana_produced_from_controlled_creatures",
+    "mana_produced_from_controller_hand_size",
+    "mana_produced_from_controller_graveyard_creatures",
     "mana_spent_cast_trigger",
     "mana_activation_cast_trigger",
     "conditional_mana_modes",
@@ -3448,6 +3455,80 @@ def _manifest_controlled_creature_condition_conditional_mana_fixture(required: d
             for index in range(max(0, count_threshold - 1))
         ]
     }, boosted_amount
+
+
+def spell_mana_ritual_execution_scenario_from_expected_rule(rule: dict[str, Any]) -> dict[str, Any] | None:
+    required = dict(rule.get("required_effect_fields") or {})
+    if required.get("effect") != "ramp_ritual":
+        return None
+    if required.get("battle_model_scope") not in {
+        "xmage_fixed_spell_mana_ritual_v1",
+        "xmage_controlled_creature_count_spell_mana_ritual_v1",
+        "xmage_hand_size_spell_mana_ritual_v1",
+        "xmage_graveyard_creature_count_spell_mana_ritual_v1",
+    }:
+        return None
+    model = str(required.get("mana_amount_model") or "fixed")
+    base_amount = int(required.get("mana_produced") or 0)
+    if base_amount <= 0:
+        return None
+    controller_battlefield: list[dict[str, Any]] = []
+    controller_hand: list[dict[str, Any]] = []
+    controller_graveyard: list[dict[str, Any]] = []
+    expected_mana_added = base_amount
+    if model == "controller_battlefield_creature_count":
+        controller_battlefield = [
+            {
+                "name": f"E2E Ritual Creature {index + 1}",
+                "type_line": "Creature - Citizen",
+                "power": 1,
+                "toughness": 1,
+            }
+            for index in range(3)
+        ]
+        expected_mana_added = 3 * int(required.get("mana_per_count") or 1)
+    elif model == "controller_hand_size":
+        controller_hand = [
+            {"name": f"E2E Ritual Hand Card {index + 1}", "type_line": "Sorcery", "cmc": 2}
+            for index in range(3)
+        ]
+        expected_mana_added = 3 * int(required.get("mana_per_count") or 1)
+    elif model == "controller_graveyard_creature_count":
+        controller_graveyard = [
+            {"name": f"E2E Ritual Graveyard Creature {index + 1}", "type_line": "Creature"}
+            for index in range(3)
+        ]
+        controller_graveyard.append({"name": "E2E Ritual Noncreature", "type_line": "Sorcery"})
+        expected_mana_added = 3 * int(required.get("mana_per_count") or 1)
+    elif model != "fixed":
+        return None
+
+    produced_symbols = [
+        str(symbol).strip().upper()
+        for symbol in (required.get("produced_mana_symbols") or [])
+        if str(symbol).strip()
+    ]
+    produces = str(required.get("produces") or "")
+    expected_mana_symbols = produced_symbols
+    if not expected_mana_symbols and len(produces) == 1 and produces in "WUBRGC":
+        expected_mana_symbols = [produces] * expected_mana_added
+    type_line = "Instant" if required.get("instant") else "Sorcery"
+    return {
+        "name": f"{rule['card_name']} resolves modeled mana ritual",
+        "type": "spell_mana_ritual_resolution",
+        "card": {
+            "name": rule["card_name"],
+            "type_line": type_line,
+            "effect": "ramp_ritual",
+        },
+        "effect": required,
+        "controller_battlefield": controller_battlefield,
+        "controller_hand": controller_hand,
+        "controller_graveyard": controller_graveyard,
+        "expected_mana_added": expected_mana_added,
+        "expected_mana_symbols": expected_mana_symbols,
+        "expected_mana_amount_model": model,
+    }
 
 
 def simple_mana_source_execution_scenario_from_expected_rule(rule: dict[str, Any]) -> dict[str, Any] | None:
@@ -8989,6 +9070,7 @@ def execution_scenario_from_expected_rule(rule: dict[str, Any]) -> dict[str, Any
         or restricted_mana_formidable_life_reset_execution_scenario_from_expected_rule(rule)
         or mana_source_etb_draw_unblocked_control_transfer_execution_scenario_from_expected_rule(rule)
         or creature_enters_tapped_execution_scenario_from_expected_rule(rule)
+        or spell_mana_ritual_execution_scenario_from_expected_rule(rule)
         or simple_mana_source_execution_scenario_from_expected_rule(rule)
         or sacrifice_mana_source_execution_scenario_from_expected_rule(rule)
         or damage_each_opponent_spell_execution_scenario_from_expected_rule(rule)

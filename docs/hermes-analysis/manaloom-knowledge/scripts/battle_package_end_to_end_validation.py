@@ -5532,6 +5532,107 @@ def support_mana_sources_from_manifest(mana: dict[str, Any]) -> list[dict[str, A
     return sources
 
 
+def run_spell_mana_ritual_resolution(
+    battle,
+    scenario: dict[str, Any],
+    events: list[tuple[str, dict[str, Any]]],
+) -> dict[str, Any]:
+    card = dict(scenario["card"])
+    effect = dict(scenario.get("effect") or {})
+    active = battle.Player(str(scenario.get("player") or "Ritual Controller"), None, [])
+    opponent = battle.Player(str(scenario.get("opponent") or "Ritual Opponent"), None, [])
+    if hasattr(battle, "bind_table_context"):
+        battle.bind_table_context([active, opponent])
+    active.battlefield = [
+        dict(permanent)
+        for permanent in (scenario.get("controller_battlefield") or [])
+        if isinstance(permanent, dict)
+    ]
+    active.hand = [
+        dict(hand_card)
+        for hand_card in (scenario.get("controller_hand") or [])
+        if isinstance(hand_card, dict)
+    ]
+    active.graveyard = [
+        dict(graveyard_card)
+        for graveyard_card in (scenario.get("controller_graveyard") or [])
+        if isinstance(graveyard_card, dict)
+    ]
+    turn = int(scenario.get("turn") or 5)
+    before_events = len(events)
+    before_pool = active.mana_pool.snapshot()
+    battle.apply_effect_immediate(
+        active,
+        [opponent],
+        card,
+        turn,
+        random.Random(int(scenario.get("seed") or 1)),
+        effect_data_override=effect,
+        phase="e2e_ritual_resolution",
+    )
+    after_pool = active.mana_pool.snapshot()
+    delta = {
+        color: int(after_pool.get(color, 0)) - int(before_pool.get(color, 0))
+        for color in after_pool
+    }
+    actual_added = sum(delta.values())
+    expected_added = int(scenario.get("expected_mana_added") or 0)
+    if actual_added != expected_added:
+        fail(
+            "battle_execution",
+            f"{card['name']} added mana={actual_added}, expected {expected_added}",
+        )
+    color_names = {
+        "W": "white",
+        "U": "blue",
+        "B": "black",
+        "R": "red",
+        "G": "green",
+        "C": "colorless",
+    }
+    expected_by_color: dict[str, int] = {}
+    for symbol in scenario.get("expected_mana_symbols") or []:
+        color = color_names.get(str(symbol).strip().upper())
+        if color:
+            expected_by_color[color] = expected_by_color.get(color, 0) + 1
+    for color, expected in expected_by_color.items():
+        if int(delta.get(color, 0)) != expected:
+            fail(
+                "battle_execution",
+                f"{card['name']} {color} mana delta={delta.get(color, 0)}, expected {expected}",
+            )
+    if expected_by_color and int(delta.get("generic", 0)) != 0:
+        fail("battle_execution", f"{card['name']} generic mana delta={delta.get('generic')}, expected 0")
+    event = next(
+        (
+            data
+            for replay_event, data in events[before_events:]
+            if replay_event == "ritual_mana_added" and data.get("card") == card.get("name")
+        ),
+        None,
+    )
+    if event is None:
+        fail("battle_events", f"missing {card['name']} ritual_mana_added event")
+    if int(event.get("mana_added") or 0) != expected_added:
+        fail(
+            "battle_events",
+            f"{card['name']} event mana_added={event.get('mana_added')}, expected {expected_added}",
+        )
+    expected_model = str(scenario.get("expected_mana_amount_model") or "")
+    if expected_model and expected_model != "fixed" and event.get("mana_amount_model") != expected_model:
+        fail(
+            "battle_events",
+            f"{card['name']} event mana_amount_model={event.get('mana_amount_model')}, expected {expected_model}",
+        )
+    return {
+        "scenario": scenario["name"],
+        "card": card["name"],
+        "mana_added": actual_added,
+        "mana_delta": delta,
+        "event": "ritual_mana_added",
+    }
+
+
 def run_simple_mana_source_refresh(
     battle,
     scenario: dict[str, Any],
@@ -13670,6 +13771,7 @@ SCENARIO_RUNNERS = {
     "single_target_removal_and_surveil": run_single_target_removal_and_surveil,
     "multi_target_removal": run_multi_target_removal,
     "creature_enters_tapped": run_creature_enters_tapped,
+    "spell_mana_ritual_resolution": run_spell_mana_ritual_resolution,
     "simple_mana_source_refresh": run_simple_mana_source_refresh,
     "restricted_mana_formidable_life_reset": run_restricted_mana_formidable_life_reset,
     "mana_source_etb_draw_unblocked_control_transfer": run_mana_source_etb_draw_unblocked_control_transfer,

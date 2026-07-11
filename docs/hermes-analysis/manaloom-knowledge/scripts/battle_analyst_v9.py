@@ -25626,6 +25626,30 @@ def ritual_mana_produced(player, effect_data, opponents=None):
                 ):
                     tapped_lands += 1
         return tapped_lands * per_land
+    if effect_data.get("mana_produced_from_controlled_creatures") or (
+        effect_data.get("dynamic_mana_amount_source") == "controller_battlefield_creature_count"
+    ):
+        per_creature = max(1, int(effect_data.get("mana_per_count") or 1))
+        count = sum(
+            1
+            for permanent in getattr(player, "battlefield", []) or []
+            if isinstance(permanent, dict) and is_battlefield_creature(permanent)
+        )
+        return count * per_creature
+    if effect_data.get("mana_produced_from_controller_hand_size") or (
+        effect_data.get("dynamic_mana_amount_source") == "controller_hand_size"
+    ):
+        return len(getattr(player, "hand", []) or []) * max(1, int(effect_data.get("mana_per_count") or 1))
+    if effect_data.get("mana_produced_from_controller_graveyard_creatures") or (
+        effect_data.get("dynamic_mana_amount_source") == "controller_graveyard_creature_count"
+    ):
+        per_creature = max(1, int(effect_data.get("mana_per_count") or 1))
+        count = sum(
+            1
+            for card in getattr(player, "graveyard", []) or []
+            if isinstance(card, dict) and is_creature_card(card)
+        )
+        return count * per_creature
     if effect_data.get("mana_produced_from_sacrificed_cmc"):
         return max(0, int(float(effect_data.get("_last_sacrificed_cmc") or 0)))
     threshold_count = effect_data.get("threshold_graveyard_count")
@@ -25655,6 +25679,32 @@ def ritual_mana_replay_fields(player, effect_data, opponents=None):
             "opponents_tapped_land_count": len(tapped_lands),
             "opponents_tapped_lands": tapped_lands[:20],
         }
+    amount_source = effect_data.get("dynamic_mana_amount_source")
+    if effect_data.get("mana_produced_from_controlled_creatures") or amount_source == "controller_battlefield_creature_count":
+        count = sum(
+            1
+            for permanent in getattr(player, "battlefield", []) or []
+            if isinstance(permanent, dict) and is_battlefield_creature(permanent)
+        )
+        return {
+            "mana_amount_model": "controller_battlefield_creature_count",
+            "controlled_creature_count": count,
+        }
+    if effect_data.get("mana_produced_from_controller_hand_size") or amount_source == "controller_hand_size":
+        return {
+            "mana_amount_model": "controller_hand_size",
+            "controller_hand_size": len(getattr(player, "hand", []) or []),
+        }
+    if effect_data.get("mana_produced_from_controller_graveyard_creatures") or amount_source == "controller_graveyard_creature_count":
+        count = sum(
+            1
+            for card in getattr(player, "graveyard", []) or []
+            if isinstance(card, dict) and is_creature_card(card)
+        )
+        return {
+            "mana_amount_model": "controller_graveyard_creature_count",
+            "controller_graveyard_creature_count": count,
+        }
     if not effect_data.get("mana_produced_from_target_opponent_hand_size"):
         return {}
     target = ritual_hand_size_target(opponents)
@@ -25671,13 +25721,47 @@ def ritual_mana_replay_fields(player, effect_data, opponents=None):
     }
 
 
-def activate_hand_exile_mana_ability(player, card, effect_data, turn, opponents=None, *, phase=None):
+MANA_SYMBOL_TO_POOL_COLOR = {
+    "W": "white",
+    "U": "blue",
+    "B": "black",
+    "R": "red",
+    "G": "green",
+    "C": "colorless",
+}
+
+
+def ritual_mana_symbols(effect_data, produced):
+    fixed_symbols = [
+        str(symbol).strip().upper()
+        for symbol in (effect_data.get("produced_mana_symbols") or [])
+        if str(symbol).strip().upper() in MANA_SYMBOL_TO_POOL_COLOR
+    ]
+    if fixed_symbols and len(fixed_symbols) == produced:
+        return fixed_symbols
+    produces = str(effect_data.get("produces") or "").strip().upper()
+    if len(produces) == 1 and produces in MANA_SYMBOL_TO_POOL_COLOR:
+        return [produces] * max(0, int(produced or 0))
+    return []
+
+
+def add_ritual_mana_to_pool(player, effect_data, opponents=None):
     produced = ritual_mana_produced(player, effect_data, opponents)
+    symbols = ritual_mana_symbols(effect_data, produced)
+    if symbols:
+        for symbol in symbols:
+            player.mana_pool.add(MANA_SYMBOL_TO_POOL_COLOR[symbol], 1)
+    else:
+        player.mana_pool.add_generic(produced)
+    return produced, symbols
+
+
+def activate_hand_exile_mana_ability(player, card, effect_data, turn, opponents=None, *, phase=None):
+    produced, symbols = add_ritual_mana_to_pool(player, effect_data, opponents)
     if card in player.hand:
         player.hand.remove(card)
     if card not in player.exile:
         player.exile.append(card)
-    player.mana_pool.add_generic(produced)
     fields = replay_rule_fields(effect_data)
     fields.setdefault("source_zone", "hand")
     emit_replay_event(
@@ -25685,6 +25769,8 @@ def activate_hand_exile_mana_ability(player, card, effect_data, turn, opponents=
         player=player.name,
         card=card.get("name", "?"),
         mana_added=produced,
+        mana_symbols_added=symbols,
+        mana_color_status="colored_pool_runtime" if symbols else "generic_pool_runtime",
         mana_pool_total=player.mana_pool.total(),
         destination="exile",
         activation_kind="hand_exile_mana_ability",
@@ -65263,7 +65349,7 @@ def cast_spells_v8(player, opponents, all_players, turn, phase, stack, rng, max_
         life_snapshot = player.life
         try:
             # Keep this check aligned with the current ritual resolution path.
-            player.mana_pool.add_generic(ritual_mana_produced(player, ritual_effect, opponents))
+            add_ritual_mana_to_pool(player, ritual_effect, opponents)
             for candidate, additional_generic, role in playable_candidates():
                 if (id(candidate), role) in before:
                     continue
@@ -65983,7 +66069,7 @@ def cast_spells_v8(player, opponents, all_players, turn, phase, stack, rng, max_
                         phase=phase,
                     )
                 elif eff.get("effect") == "ramp_ritual":
-                    player.mana_pool.add_generic(ritual_mana_produced(player, eff, opponents))
+                    add_ritual_mana_to_pool(player, eff, opponents)
                     player.graveyard.append(c)
                 elif eff.get("effect") == "land_ramp":
                     put_lands_from_library(player, c, eff, turn, opponents=opponents, source_event="land_ramp")
@@ -67268,10 +67354,9 @@ def resolve_composite_resolution_effect(player, opponents, card, effect_data, tu
                     }
                 )
         elif component_effect == "ramp_ritual":
-            produced = ritual_mana_produced(player, component, opponents)
-            player.mana_pool.add_generic(produced)
+            produced, symbols = add_ritual_mana_to_pool(player, component, opponents)
             outcome = "ritual_mana_added"
-            applied.append({"effect": component_effect, "mana_added": produced})
+            applied.append({"effect": component_effect, "mana_added": produced, "mana_symbols_added": symbols})
         elif component_effect == "treasure_maker":
             if component.get("discover_treasure_difference"):
                 discover_result = effect_data.get("_last_discover_result") or {}
@@ -69128,13 +69213,14 @@ def apply_effect_immediate(
         if effect_data.get("mana_produced_from_target_opponent_hand_size"):
             resolve_jeskas_will(player, opponents, card, effect_data, turn)
             return
-        produced = ritual_mana_produced(player, effect_data, opponents)
-        player.mana_pool.add_generic(produced)
+        produced, symbols = add_ritual_mana_to_pool(player, effect_data, opponents)
         emit_replay_event(
             "ritual_mana_added",
             player=player.name,
             card=card.get("name", "?"),
             mana_added=produced,
+            mana_symbols_added=symbols,
+            mana_color_status="colored_pool_runtime" if symbols else "generic_pool_runtime",
             mana_pool_total=player.mana_pool.total(),
             turn=turn,
             **ritual_mana_replay_fields(player, effect_data, opponents),

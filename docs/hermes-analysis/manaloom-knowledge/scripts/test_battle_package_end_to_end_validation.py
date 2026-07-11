@@ -8238,3 +8238,50 @@ def test_mana_source_etb_draw_unblocked_control_transfer_runner_resolves_full_cy
     assert result["new_controller"] == "Control Transfer Attacker"
     assert result["source_tapped_after_transfer"] is False
     assert any(event == "unblocked_attack_control_transfer_resolved" for event, _ in events)
+
+
+def test_spell_mana_ritual_runner_adds_colored_dynamic_mana() -> None:
+    battle = validator.load_battle(validator.DEFAULT_BATTLE)
+    effect = {
+        "effect": "ramp_ritual",
+        "battle_model_scope": "xmage_controlled_creature_count_spell_mana_ritual_v1",
+        "ability_kind": "one_shot",
+        "instant": True,
+        "mana_amount_model": "controller_battlefield_creature_count",
+        "dynamic_mana_amount": True,
+        "dynamic_mana_amount_source": "controller_battlefield_creature_count",
+        "mana_produced": 1,
+        "mana_per_count": 1,
+        "produces": "R",
+        "mana_color_status": "colored_pool_runtime",
+        "_rule_logical_key": "battle_rule_v1:battle-hymn",
+    }
+    proposal = {
+        "normalized_name": "battle hymn",
+        "card_name": "Battle Hymn",
+        "oracle_hash": "hash-battle-hymn",
+        "logical_rule_key": "battle_rule_v1:battle-hymn",
+        "effect_json": effect,
+    }
+    expected = package_builder.expected_rule_from_proposal(proposal)
+    scenario = package_builder.execution_scenario_from_expected_rule(expected)
+
+    events = []
+    previous_handler = battle.REPLAY_EVENT_HANDLER
+    battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+    try:
+        result = validator.run_spell_mana_ritual_resolution(
+            battle,
+            scenario,
+            events,
+        )
+    finally:
+        battle.REPLAY_EVENT_HANDLER = previous_handler
+
+    assert result["card"] == "Battle Hymn"
+    assert result["mana_added"] == 3
+    assert result["mana_delta"]["red"] == 3
+    assert result["mana_delta"]["generic"] == 0
+    event_payload = next(data for event, data in events if event == "ritual_mana_added")
+    assert event_payload["mana_symbols_added"] == ["R", "R", "R"]
+    assert event_payload["mana_amount_model"] == "controller_battlefield_creature_count"

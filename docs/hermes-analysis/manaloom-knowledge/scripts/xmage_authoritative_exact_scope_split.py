@@ -78,6 +78,7 @@ EXILE_UNIT = "removal_exile::targeted_exile_variant_v1"
 RAMP_ARTIFACT_UNIT = "ramp_permanent::xmage_artifact_mana_source_variant_review_v1"
 RAMP_CREATURE_UNIT = "ramp_permanent::xmage_creature_mana_source_variant_review_v1"
 RAMP_ANY_COLOR_MANA_ROCK_UNIT = "ramp_permanent::one_any_color_mana_rock_v1"
+RAMP_RITUAL_UNIT = "ramp_ritual::xmage_spell_mana_ritual_variant_review_v1"
 PAIN_TALISMAN_UNIT = "ramp_permanent::pain_talisman_color_pair_partial_v1"
 COUNTER_UNIT = "counter_spell::counter_target_stack_object_variant_v1"
 COUNTER_UNLESS_PAYS_UNIT = (
@@ -223,6 +224,7 @@ SUPPORTED_UNITS = {
     RAMP_ARTIFACT_UNIT,
     RAMP_CREATURE_UNIT,
     RAMP_ANY_COLOR_MANA_ROCK_UNIT,
+    RAMP_RITUAL_UNIT,
     PAIN_TALISMAN_UNIT,
     COUNTER_UNIT,
     BOUNCE_UNIT,
@@ -371,6 +373,14 @@ EXILE_DRAW_SCOPE = "xmage_exile_target_and_draw_card_spell_v1"
 DESTROY_COMPENSATION_TOKEN_SCOPE = "xmage_destroy_target_with_controller_creature_token_compensation_spell_v1"
 EXILE_COMPENSATION_TOKEN_SCOPE = "xmage_exile_target_with_controller_creature_token_compensation_spell_v1"
 MANA_SCOPE = "xmage_simple_tap_mana_source_permanent_v1"
+SPELL_FIXED_MANA_RITUAL_SCOPE = "xmage_fixed_spell_mana_ritual_v1"
+SPELL_CONTROLLED_CREATURE_COUNT_MANA_RITUAL_SCOPE = (
+    "xmage_controlled_creature_count_spell_mana_ritual_v1"
+)
+SPELL_HAND_SIZE_MANA_RITUAL_SCOPE = "xmage_hand_size_spell_mana_ritual_v1"
+SPELL_GRAVEYARD_CREATURE_COUNT_MANA_RITUAL_SCOPE = (
+    "xmage_graveyard_creature_count_spell_mana_ritual_v1"
+)
 RESTRICTED_MANA_SCOPE = "xmage_simple_tap_restricted_mana_source_permanent_v1"
 RESTRICTED_MANA_WITH_FORMIDABLE_LIFE_RESET_SCOPE = (
     "xmage_simple_tap_restricted_mana_source_with_formidable_life_total_reset_v1"
@@ -584,6 +594,7 @@ SPELL_UNITS = {
     TREASURE_UNIT,
     LIFE_UNIT,
     EXILE_UNIT,
+    RAMP_RITUAL_UNIT,
     COUNTER_UNIT,
     BOUNCE_UNIT,
     TAP_TARGET_CREATURE_SPELL_UNIT,
@@ -27372,6 +27383,101 @@ def java_simple_mana_symbols_from_source(source_text: str) -> list[str] | None:
     return None
 
 
+SPELL_MANA_RITUAL_SCOPES_BY_MODEL = {
+    "fixed": SPELL_FIXED_MANA_RITUAL_SCOPE,
+    "controller_battlefield_creature_count": SPELL_CONTROLLED_CREATURE_COUNT_MANA_RITUAL_SCOPE,
+    "controller_hand_size": SPELL_HAND_SIZE_MANA_RITUAL_SCOPE,
+    "controller_graveyard_creature_count": SPELL_GRAVEYARD_CREATURE_COUNT_MANA_RITUAL_SCOPE,
+}
+
+
+def spell_mana_ritual_detail_from_oracle(metadata: dict[str, Any]) -> dict[str, Any] | None:
+    candidates: list[dict[str, Any]] = []
+    for line in normalized_oracle_lines(metadata):
+        if "add " not in line:
+            continue
+        fixed_match = re.fullmatch(r"add (?P<mana>(?:\{[wubrgc]\})+)\.?", line)
+        if fixed_match:
+            symbols = fixed_mana_symbols_from_braces(fixed_match.group("mana"))
+            if not symbols:
+                return None
+            candidates.append(
+                {
+                    "mana_amount_model": "fixed",
+                    "mana_produced": len(symbols),
+                    "produces": _unique_mana_symbols(symbols),
+                    "produced_mana_symbols": symbols,
+                }
+            )
+            continue
+        dynamic_match = re.fullmatch(
+            r"add \{(?P<symbol>[wubrgc])\} for each (?P<source>.+?)\.?",
+            line,
+        )
+        if dynamic_match:
+            source_text = dynamic_match.group("source")
+            model = None
+            if source_text == "creature you control":
+                model = "controller_battlefield_creature_count"
+            elif source_text == "card in your hand":
+                model = "controller_hand_size"
+            elif source_text == "creature card in your graveyard":
+                model = "controller_graveyard_creature_count"
+            if model is None:
+                return None
+            symbol = dynamic_match.group("symbol").upper()
+            candidates.append(
+                {
+                    "mana_amount_model": model,
+                    "mana_produced": 1,
+                    "mana_per_count": 1,
+                    "produces": symbol,
+                    "dynamic_mana_amount": True,
+                    "dynamic_mana_amount_source": model,
+                }
+            )
+            continue
+        return None
+    if len(candidates) == 1:
+        return candidates[0]
+    return None
+
+
+def spell_mana_ritual_detail_from_source(source_text: str) -> dict[str, Any] | str | None:
+    text = source_text or ""
+    if "Target" in text or "CreateDelayedTriggeredAbilityEffect" in text:
+        return "spell_mana_ritual_source_has_target_or_delayed_effect"
+    symbols = java_simple_mana_symbols_from_source(text)
+    if not symbols:
+        return "spell_mana_ritual_source_mana_not_fixed_or_single_color_dynamic"
+    if "DynamicManaEffect" not in text:
+        return {
+            "mana_amount_model": "fixed",
+            "mana_produced": len(symbols),
+            "produces": _unique_mana_symbols(symbols),
+            "produced_mana_symbols": symbols,
+        }
+    if len(symbols) != 1:
+        return "spell_mana_ritual_dynamic_source_not_single_symbol"
+    model = None
+    if "CreaturesYouControlCount" in text:
+        model = "controller_battlefield_creature_count"
+    elif "CardsInControllerHandCount" in text:
+        model = "controller_hand_size"
+    elif "CardsInControllerGraveyardCount" in text and "FILTER_CARD_CREATURES" in text:
+        model = "controller_graveyard_creature_count"
+    if model is None:
+        return "spell_mana_ritual_dynamic_source_model_not_supported"
+    return {
+        "mana_amount_model": model,
+        "mana_produced": 1,
+        "mana_per_count": 1,
+        "produces": symbols[0],
+        "dynamic_mana_amount": True,
+        "dynamic_mana_amount_source": model,
+    }
+
+
 def java_any_color_mana_amount_from_source(source_text: str) -> int | None:
     text = source_text or ""
     amount_match = re.search(r"new\s+AddManaOfAnyColorEffect\s*\(\s*(\d+)\s*\)", text)
@@ -29819,6 +29925,8 @@ def proposal_notes(row: dict[str, Any], scope: str) -> str:
         scope_kind = "creature with fixed enter-the-battlefield mana trigger"
     elif scope == DIES_FIXED_MANA_PERMANENT_SCOPE:
         scope_kind = "permanent with fixed dies mana trigger"
+    elif scope in set(SPELL_MANA_RITUAL_SCOPES_BY_MODEL.values()):
+        scope_kind = "instant or sorcery spell that adds exact fixed or count-based mana"
     elif scope == TAP_AND_SELF_SACRIFICE_MANA_SOURCE_SCOPE:
         scope_kind = "tap mana-source permanent with separate self-sacrifice mana ability"
     elif str(row.get("adapter_work_unit") or "") in RAMP_UNITS:
@@ -30591,6 +30699,54 @@ def split_row(
 
     flags = spell_flags(metadata)
     classes = effect_classes(row)
+
+    if unit == RAMP_RITUAL_UNIT:
+        if classes not in (
+            {"BasicManaEffect"},
+            {"AddManaToManaPoolSourceControllerEffect"},
+            {"DynamicManaEffect"},
+        ):
+            return None, "spell_mana_ritual_effect_class_not_exact"
+        if ability_classes(row):
+            return None, "spell_mana_ritual_ability_class_not_simple"
+        if row.get("xmage_target_classes"):
+            return None, "spell_mana_ritual_target_class_not_simple"
+        oracle_mana = spell_mana_ritual_detail_from_oracle(metadata)
+        if oracle_mana is None:
+            return None, "spell_mana_ritual_oracle_not_supported"
+        source_mana = spell_mana_ritual_detail_from_source(source_text)
+        if isinstance(source_mana, str):
+            return None, source_mana
+        if source_mana is None:
+            return None, "spell_mana_ritual_source_not_supported"
+        compare_keys = ("mana_amount_model", "mana_produced", "mana_per_count", "produces")
+        for key in compare_keys:
+            if source_mana.get(key) != oracle_mana.get(key):
+                return None, f"spell_mana_ritual_source_oracle_{key}_mismatch"
+        if list(source_mana.get("produced_mana_symbols") or []) != list(
+            oracle_mana.get("produced_mana_symbols") or []
+        ):
+            return None, "spell_mana_ritual_source_oracle_symbols_mismatch"
+        scope = SPELL_MANA_RITUAL_SCOPES_BY_MODEL.get(str(oracle_mana["mana_amount_model"]))
+        if not scope:
+            return None, "spell_mana_ritual_scope_not_supported"
+        effect_json = {
+            "effect": "ramp_ritual",
+            "battle_model_scope": scope,
+            "ability_kind": "one_shot",
+            "mana_color_status": "colored_pool_runtime",
+            "xmage_effect_class": next(iter(classes)),
+            **oracle_mana,
+            **flags,
+        }
+        if oracle_mana.get("produced_mana_symbols"):
+            effect_json["produced_mana_symbols"] = list(oracle_mana["produced_mana_symbols"])
+        return build_proposal(
+            row,
+            metadata,
+            effect_json,
+            family_id="xmage_spell_mana_ritual",
+        ), "selected_exact_scope"
 
     if color_tap_draw_spell_unit or color_untap_draw_spell_unit:
         if not is_spell(metadata):

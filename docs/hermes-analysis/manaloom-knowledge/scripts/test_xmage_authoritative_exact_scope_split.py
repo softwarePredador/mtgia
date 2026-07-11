@@ -35367,6 +35367,88 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertEqual(effect["unblocked_attack_trigger_controller"], "opponent")
         self.assertNotIn("_runtime_partial", effect)
 
+    def test_fixed_spell_mana_ritual_maps_channel_the_suns(self) -> None:
+        row = queue_row(
+            split.RAMP_RITUAL_UNIT,
+            effect_classes=["AddManaToManaPoolSourceControllerEffect"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Channel the Suns",
+                type_line="Sorcery",
+                oracle_text="Add {W}{U}{B}{R}{G}.",
+            ),
+            source_text=(
+                "Effect effect = new AddManaToManaPoolSourceControllerEffect("
+                "new Mana(1, 1, 1, 1, 1, 0, 0, 0));"
+                "this.getSpellAbility().addEffect(effect);"
+            ),
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["effect"], "ramp_ritual")
+        self.assertEqual(effect["battle_model_scope"], split.SPELL_FIXED_MANA_RITUAL_SCOPE)
+        self.assertEqual(effect["mana_amount_model"], "fixed")
+        self.assertEqual(effect["mana_produced"], 5)
+        self.assertEqual(effect["produces"], "WUBRG")
+        self.assertEqual(effect["produced_mana_symbols"], ["W", "U", "B", "R", "G"])
+        self.assertEqual(effect["mana_color_status"], "colored_pool_runtime")
+
+    def test_dynamic_spell_mana_ritual_maps_simple_count_models(self) -> None:
+        cases = [
+            (
+                "Battle Hymn",
+                "Instant",
+                "Add {R} for each creature you control.",
+                "new DynamicManaEffect(Mana.RedMana(1), CreaturesYouControlCount.SINGULAR)",
+                split.SPELL_CONTROLLED_CREATURE_COUNT_MANA_RITUAL_SCOPE,
+                "controller_battlefield_creature_count",
+                "R",
+            ),
+            (
+                "Inner Fire",
+                "Sorcery",
+                "Add {R} for each card in your hand.",
+                "new DynamicManaEffect(Mana.RedMana(1), CardsInControllerHandCount.ANY_SINGULAR)",
+                split.SPELL_HAND_SIZE_MANA_RITUAL_SCOPE,
+                "controller_hand_size",
+                "R",
+            ),
+            (
+                "Songs of the Damned",
+                "Instant",
+                "Add {B} for each creature card in your graveyard.",
+                "new DynamicManaEffect(Mana.BlackMana(1), "
+                "new CardsInControllerGraveyardCount(StaticFilters.FILTER_CARD_CREATURES))",
+                split.SPELL_GRAVEYARD_CREATURE_COUNT_MANA_RITUAL_SCOPE,
+                "controller_graveyard_creature_count",
+                "B",
+            ),
+        ]
+        for card_name, type_line, oracle, source, scope, model, produces in cases:
+            with self.subTest(card_name=card_name):
+                row = queue_row(
+                    split.RAMP_RITUAL_UNIT,
+                    effect_classes=["DynamicManaEffect"],
+                )
+                proposal, reason = split.split_row(
+                    row,
+                    metadata(name=card_name, type_line=type_line, oracle_text=oracle),
+                    source_text=source,
+                )
+
+                self.assertEqual(reason, "selected_exact_scope")
+                effect = proposal["effect_json"]
+                self.assertEqual(effect["battle_model_scope"], scope)
+                self.assertEqual(effect["mana_amount_model"], model)
+                self.assertEqual(effect["dynamic_mana_amount_source"], model)
+                self.assertTrue(effect["dynamic_mana_amount"])
+                self.assertEqual(effect["mana_per_count"], 1)
+                self.assertEqual(effect["produces"], produces)
+                self.assertEqual(effect["mana_color_status"], "colored_pool_runtime")
+
 
 if __name__ == "__main__":
     unittest.main()
