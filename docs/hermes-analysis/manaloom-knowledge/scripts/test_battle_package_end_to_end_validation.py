@@ -1974,6 +1974,71 @@ def test_target_player_x_draw_runner_validates_shuffle_self() -> None:
     )
 
 
+def test_look_at_hand_draw_runner_reveals_opponent_hand_and_draws() -> None:
+    effect = {
+        "effect": "composite_resolution",
+        "battle_model_scope": "xmage_look_at_target_player_hand_draw_card_spell_v1",
+        "target": "player",
+        "target_player_scope": "opponent",
+        "target_preference": "opponent",
+        "look_at_hand": True,
+        "draw_count": 1,
+        "_composite_rule_components": [
+            {
+                "effect": "look_at_target_player_hand",
+                "battle_model_scope": "xmage_look_at_target_player_hand_spell_v1",
+                "target": "player",
+                "target_player_scope": "opponent",
+                "target_preference": "opponent",
+                "look_at_hand": True,
+                "compose_on_resolution": True,
+            },
+            {
+                "effect": "draw_cards",
+                "battle_model_scope": "xmage_fixed_source_controller_draw_spell_v1",
+                "count": 1,
+                "compose_on_resolution": True,
+            },
+        ],
+        "_rule_logical_key": "battle_rule_v1:sorcerous-sight",
+    }
+    rule = {
+        "card_name": "Sorcerous Sight",
+        "logical_rule_key": "battle_rule_v1:sorcerous-sight",
+        "required_effect_fields": effect,
+    }
+    scenario = package_builder.look_at_hand_draw_execution_scenario_from_expected_rule(rule)
+
+    assert scenario is not None
+    battle = validator.load_battle(validator.DEFAULT_BATTLE)
+    events = []
+    previous_handler = battle.REPLAY_EVENT_HANDLER
+    previous_get_card_effect = battle.get_card_effect
+    battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+    battle.get_card_effect = lambda card: dict(effect)
+    try:
+        result = validator.run_look_at_hand_draw_spell(battle, scenario, events)
+    finally:
+        battle.REPLAY_EVENT_HANDLER = previous_handler
+        battle.get_card_effect = previous_get_card_effect
+
+    assert result["card_name"] == "Sorcerous Sight"
+    assert result["target_player"] == "Opponent"
+    assert result["target_player_scope"] == "opponent"
+    assert result["cards_drawn"] == 1
+    assert result["seen_hand"] == [
+        "E2E Revealed Opponent Spell",
+        "E2E Revealed Opponent Creature",
+    ]
+    assert any(
+        event == "look_at_target_player_hand_resolved"
+        and data.get("card") == "Sorcerous Sight"
+        and data.get("target_player") == "Opponent"
+        and data.get("hand_size") == 2
+        for event, data in events
+    )
+
+
 def test_simple_activated_draw_runner_executes_sacrifice_target_cost() -> None:
     battle = validator.load_battle(validator.DEFAULT_BATTLE)
     events = []

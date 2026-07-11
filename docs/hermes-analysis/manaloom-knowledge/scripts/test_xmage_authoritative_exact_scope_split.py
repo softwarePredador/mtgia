@@ -22415,6 +22415,87 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertIsNone(proposal)
         self.assertEqual(reason, "not_instant_or_sorcery_spell")
 
+    def test_look_at_target_player_hand_draw_maps_peek_scope(self) -> None:
+        row = queue_row(
+            split.DRAW_UNIT,
+            effect_classes=["LookAtTargetPlayerHandEffect", "DrawCardSourceControllerEffect"],
+            xmage_signals=["targeting", "draw"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Peek",
+                type_line="Instant",
+                oracle_text="Look at target player's hand.\nDraw a card.",
+            ),
+            source_text="""
+                this.getSpellAbility().addEffect(new LookAtTargetPlayerHandEffect());
+                this.getSpellAbility().addTarget(new TargetPlayer());
+                this.getSpellAbility().addEffect(new DrawCardSourceControllerEffect(1).concatBy("<br>"));
+            """,
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["effect"], "composite_resolution")
+        self.assertEqual(effect["battle_model_scope"], split.LOOK_AT_HAND_DRAW_SCOPE)
+        self.assertEqual(effect["target_player_scope"], "any")
+        self.assertEqual(effect["draw_count"], 1)
+        self.assertEqual(
+            [component["effect"] for component in effect["_composite_rule_components"]],
+            ["look_at_target_player_hand", "draw_cards"],
+        )
+
+    def test_look_at_target_opponent_hand_draw_maps_sorcerous_sight_scope(self) -> None:
+        row = queue_row(
+            split.DRAW_UNIT,
+            effect_classes=["LookAtTargetPlayerHandEffect", "DrawCardSourceControllerEffect"],
+            xmage_signals=["targeting", "draw"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Sorcerous Sight",
+                type_line="Sorcery",
+                oracle_text="Look at target opponent's hand.\nDraw a card.",
+            ),
+            source_text="""
+                Effect effect = new LookAtTargetPlayerHandEffect();
+                effect.setText("Look at target opponent's hand");
+                this.getSpellAbility().addEffect(effect);
+                this.getSpellAbility().addTarget(new TargetOpponent());
+                this.getSpellAbility().addEffect(new DrawCardSourceControllerEffect(1).concatBy("<br>"));
+            """,
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.LOOK_AT_HAND_DRAW_SCOPE)
+        self.assertEqual(effect["target_player_scope"], "opponent")
+
+    def test_look_at_hand_draw_blocks_source_oracle_target_mismatch(self) -> None:
+        row = queue_row(
+            split.DRAW_UNIT,
+            effect_classes=["LookAtTargetPlayerHandEffect", "DrawCardSourceControllerEffect"],
+            xmage_signals=["targeting", "draw"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Fixture Sight",
+                type_line="Sorcery",
+                oracle_text="Look at target opponent's hand.\nDraw a card.",
+            ),
+            source_text="""
+                this.getSpellAbility().addEffect(new LookAtTargetPlayerHandEffect());
+                this.getSpellAbility().addTarget(new TargetPlayer());
+                this.getSpellAbility().addEffect(new DrawCardSourceControllerEffect(1));
+            """,
+        )
+
+        self.assertIsNone(proposal)
+        self.assertEqual(reason, "look_at_hand_draw_source_oracle_mismatch")
+
     def test_x_target_nonland_permanents_spell_maps_to_tap_target_scope(self) -> None:
         row = queue_row(
             split.TAP_TARGET_NONLAND_PERMANENT_SPELL_UNIT,

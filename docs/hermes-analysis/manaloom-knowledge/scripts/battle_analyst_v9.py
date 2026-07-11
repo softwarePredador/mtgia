@@ -65540,6 +65540,73 @@ def resolve_tempting_offer_runtime(player, opponents, card, effect_data, turn, r
     }
 
 
+def _look_at_hand_target_player(player, opponents, effect_data):
+    candidates = [player] + [
+        opponent for opponent in (opponents or []) if getattr(opponent, "is_alive", lambda: True)()
+    ]
+    declared_names = []
+    for entry in effect_data.get("declared_targets") or []:
+        if isinstance(entry, dict):
+            target = entry.get("target")
+            name = (
+                entry.get("target_player")
+                or entry.get("player")
+                or entry.get("name")
+                or getattr(target, "name", None)
+            )
+            if name:
+                declared_names.append(str(name))
+        elif entry:
+            declared_names.append(str(entry))
+    for declared_name in declared_names:
+        for candidate in candidates:
+            if getattr(candidate, "name", None) == declared_name:
+                if str(effect_data.get("target_player_scope") or "any") == "opponent" and candidate is player:
+                    continue
+                return candidate, "declared_target"
+
+    alive_opponents = [
+        opponent for opponent in (opponents or []) if getattr(opponent, "is_alive", lambda: True)()
+    ]
+    if alive_opponents:
+        alive_opponents = prioritize_evaluation_target_opponents(player, alive_opponents)
+        return alive_opponents[0], "opponent_preferred"
+    if str(effect_data.get("target_player_scope") or "any") == "opponent":
+        return player, "fallback_self_no_opponent"
+    return player, "self_fallback"
+
+
+def resolve_look_at_target_player_hand(player, opponents, card, effect_data, turn, *, phase="resolution"):
+    target_player, target_reason = _look_at_hand_target_player(player, opponents, effect_data)
+    hand_cards = [
+        hand_card
+        for hand_card in (getattr(target_player, "hand", []) or [])
+        if isinstance(hand_card, dict)
+    ]
+    hand_names = [hand_card.get("name", "?") for hand_card in hand_cards]
+    emit_replay_event(
+        "look_at_target_player_hand_resolved",
+        player=player.name,
+        card=card.get("name", "?"),
+        target_player=getattr(target_player, "name", "?"),
+        target_reason=target_reason,
+        target_player_scope=str(effect_data.get("target_player_scope") or "any"),
+        hand_size=len(hand_cards),
+        hand_card_names=hand_names,
+        turn=turn,
+        phase=phase,
+        **replay_rule_fields(effect_data),
+    )
+    return {
+        "effect": "look_at_target_player_hand",
+        "target_player": getattr(target_player, "name", "?"),
+        "target_reason": target_reason,
+        "target_player_scope": str(effect_data.get("target_player_scope") or "any"),
+        "hand_size": len(hand_cards),
+        "hand_card_names": hand_names,
+    }
+
+
 def resolve_composite_resolution_effect(player, opponents, card, effect_data, turn, rng, *, stack=None, phase="resolution"):
     """Resolve opt-in same-spell components without moving the source card twice."""
     applied = []
@@ -66036,6 +66103,19 @@ def resolve_composite_resolution_effect(player, opponents, card, effect_data, tu
                 phase=phase,
                 **component_fields,
             )
+        elif component_effect == "look_at_target_player_hand":
+            component_payload = dict(component)
+            component_payload["_composite_component_index"] = index
+            summary = resolve_look_at_target_player_hand(
+                player,
+                opponents,
+                card,
+                component_payload,
+                turn,
+                phase=phase,
+            )
+            outcome = "look_at_hand_resolved"
+            applied.append(summary)
         elif component_effect == "direct_damage":
             component_payload = dict(component)
             component_payload["_composite_component_index"] = index

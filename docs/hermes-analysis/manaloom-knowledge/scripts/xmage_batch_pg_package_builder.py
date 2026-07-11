@@ -145,6 +145,8 @@ E2E_REQUIRED_EFFECT_FIELDS = (
     "target_count_from_x",
     "target_count_source",
     "target_player_draw",
+    "target_player_scope",
+    "look_at_hand",
     "prevent_all_combat_damage_this_turn",
     "prevent_damage_from_creature_sources_this_turn",
     "prevent_damage_scope",
@@ -4196,6 +4198,56 @@ def target_player_draw_execution_scenario_from_expected_rule(
     }
 
 
+def look_at_hand_draw_execution_scenario_from_expected_rule(
+    rule: dict[str, Any],
+) -> dict[str, Any] | None:
+    required = dict(rule.get("required_effect_fields") or {})
+    if required.get("battle_model_scope") != "xmage_look_at_target_player_hand_draw_card_spell_v1":
+        return None
+    draw_count = int(required.get("draw_count") or required.get("count") or 1)
+    target_player_scope = str(required.get("target_player_scope") or "any")
+    expected_target_player = "Opponent"
+    return {
+        "name": f"{rule['card_name']} looks at target player's hand and draws",
+        "type": "look_at_hand_draw_spell",
+        "card": {
+            "name": rule["card_name"],
+            "type_line": "Sorcery" if required.get("sorcery") else "Instant",
+        },
+        "controller_library": [
+            {
+                "name": f"E2E Look Hand Draw Card {index + 1}",
+                "type_line": "Instant" if index % 2 == 0 else "Sorcery",
+                "effect": "draw_cards",
+                "cmc": index + 1,
+            }
+            for index in range(max(draw_count, 1))
+        ],
+        "opponent_hand": [
+            {
+                "name": "E2E Revealed Opponent Spell",
+                "type_line": "Instant",
+                "effect": "counter",
+                "cmc": 2,
+            },
+            {
+                "name": "E2E Revealed Opponent Creature",
+                "type_line": "Creature - Fixture",
+                "effect": "creature",
+                "cmc": 3,
+            },
+        ],
+        "expected_draw_count": draw_count,
+        "expected_target_player": expected_target_player,
+        "expected_target_player_scope": target_player_scope,
+        "expected_seen_hand": [
+            "E2E Revealed Opponent Spell",
+            "E2E Revealed Opponent Creature",
+        ],
+        "logical_rule_key": rule["logical_rule_key"],
+    }
+
+
 def fixed_draw_spell_execution_scenario_from_expected_rule(
     rule: dict[str, Any],
 ) -> dict[str, Any] | None:
@@ -7804,6 +7856,7 @@ def execution_scenario_from_expected_rule(rule: dict[str, Any]) -> dict[str, Any
         or fixed_draw_spell_execution_scenario_from_expected_rule(rule)
         or graveyard_to_library_draw_execution_scenario_from_expected_rule(rule)
         or fixed_draw_discard_spell_execution_scenario_from_expected_rule(rule)
+        or look_at_hand_draw_execution_scenario_from_expected_rule(rule)
         or target_player_draw_execution_scenario_from_expected_rule(rule)
         or combat_damage_draw_execution_scenario_from_expected_rule(rule)
         or beginning_end_step_draw_execution_scenario_from_expected_rule(rule)

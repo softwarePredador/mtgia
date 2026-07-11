@@ -2504,6 +2504,37 @@ def test_manifest_builds_tap_target_draw_spell_execution_scenario() -> None:
     ]
 
 
+def test_manifest_builds_look_at_hand_draw_spell_execution_scenario() -> None:
+    rule = {
+        "normalized_name": "sorcerous sight",
+        "card_name": "Sorcerous Sight",
+        "oracle_hash": "hash-sorcerous-sight",
+        "logical_rule_key": "battle_rule_v1:hash-sorcerous-sight",
+        "required_effect_fields": {
+            "effect": "composite_resolution",
+            "battle_model_scope": "xmage_look_at_target_player_hand_draw_card_spell_v1",
+            "target": "player",
+            "target_player_scope": "opponent",
+            "target_preference": "opponent",
+            "look_at_hand": True,
+            "draw_count": 1,
+        },
+    }
+
+    scenario = builder.look_at_hand_draw_execution_scenario_from_expected_rule(rule)
+
+    assert scenario is not None
+    assert scenario["type"] == "look_at_hand_draw_spell"
+    assert scenario["card"]["name"] == "Sorcerous Sight"
+    assert scenario["expected_target_player_scope"] == "opponent"
+    assert scenario["expected_target_player"] == "Opponent"
+    assert scenario["expected_draw_count"] == 1
+    assert scenario["expected_seen_hand"] == [
+        "E2E Revealed Opponent Spell",
+        "E2E Revealed Opponent Creature",
+    ]
+
+
 def test_manifest_builds_boost_untap_target_spell_execution_scenario() -> None:
     rule = {
         "normalized_name": "synchronized strike",

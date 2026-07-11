@@ -252,6 +252,8 @@ DRAW_SELF_COST_REDUCTION_SCOPE = "xmage_fixed_source_controller_draw_spell_self_
 STATIC_GENERIC_COST_REDUCTION_SCOPE = "xmage_static_generic_cost_reduction_for_matching_spells_v1"
 STATIC_GENERIC_COST_INCREASE_SCOPE = "xmage_static_generic_cost_increase_for_matching_spells_v1"
 TARGET_DRAW_SCOPE = "xmage_fixed_target_player_draw_spell_v1"
+LOOK_AT_HAND_SCOPE = "xmage_look_at_target_player_hand_spell_v1"
+LOOK_AT_HAND_DRAW_SCOPE = "xmage_look_at_target_player_hand_draw_card_spell_v1"
 TARGET_PLAYER_DISCARD_SCOPE = "xmage_fixed_target_player_discard_spell_v1"
 ETB_TARGET_PLAYER_DISCARD_CREATURE_SCOPE = "xmage_creature_etb_target_player_discard_v1"
 DIES_TARGET_PLAYER_DISCARD_CREATURE_SCOPE = "xmage_creature_dies_target_player_discard_v1"
@@ -20574,6 +20576,57 @@ def tap_target_draw_spell_from_source(source: str) -> dict[str, Any] | str:
     return tap_spec
 
 
+def look_at_hand_draw_spell_from_oracle(metadata: dict[str, Any]) -> dict[str, Any] | str:
+    lines = [
+        re.sub(r"\s+", " ", line).strip()
+        for line in oracle_effect_lines_without_neutral_auxiliary(metadata)
+        if line.strip()
+    ]
+    if len(lines) != 2:
+        return "look_at_hand_draw_oracle_not_simple"
+    look_line = strip_parenthetical_reminders(lines[0]).lower().rstrip(".")
+    match = re.fullmatch(r"look at target (?P<scope>player|opponent)'s hand", look_line)
+    if not match:
+        return "look_at_hand_draw_oracle_target_not_supported"
+    if strip_parenthetical_reminders(lines[1]).lower().rstrip(".") != "draw a card":
+        return "look_at_hand_draw_oracle_not_draw_card"
+    target_player_scope = "opponent" if match.group("scope") == "opponent" else "any"
+    return {
+        "target": "player",
+        "target_player_scope": target_player_scope,
+        "target_preference": "opponent",
+        "draw_count": 1,
+    }
+
+
+def look_at_hand_draw_spell_from_source(source: str) -> dict[str, Any] | str:
+    text = source or ""
+    if len(re.findall(r"new\s+LookAtTargetPlayerHandEffect\s*\(", text)) != 1:
+        return "look_at_hand_draw_source_not_simple_look_effect"
+    draw_matches = re.findall(r"new\s+DrawCardSourceControllerEffect\s*\(\s*(\d*)\s*\)", text)
+    if len(draw_matches) != 1:
+        return "look_at_hand_draw_source_draw_not_fixed"
+    draw_count = int(draw_matches[0] or "1")
+    if draw_count != 1:
+        return "look_at_hand_draw_source_draw_not_one"
+    if re.search(r"new\s+TargetOpponent\s*\(", text):
+        target_player_scope = "opponent"
+    elif re.search(r"new\s+TargetPlayer\s*\(", text):
+        target_player_scope = "any"
+    else:
+        return "look_at_hand_draw_source_target_not_supported"
+    look_match = re.search(r"new\s+LookAtTargetPlayerHandEffect\s*\(", text)
+    draw_match = re.search(r"new\s+DrawCardSourceControllerEffect\s*\(", text)
+    if not look_match or not draw_match or look_match.start() > draw_match.start():
+        return "look_at_hand_draw_source_order_not_look_then_draw"
+    return {
+        "target": "player",
+        "target_player_scope": target_player_scope,
+        "target_preference": "opponent",
+        "draw_count": draw_count,
+    }
+
+
 def activated_draw_from_source(source: str) -> dict[str, Any] | str:
     text = source or ""
     draw_pattern = re.compile(
@@ -28097,6 +28150,8 @@ def proposal_notes(row: dict[str, Any], scope: str) -> str:
         scope_kind = "fixed target-creature color plus tap plus draw-card spell"
     elif scope == COLOR_UNTAP_DRAW_SCOPE:
         scope_kind = "fixed target-creature color plus untap plus draw-card spell"
+    elif scope == LOOK_AT_HAND_DRAW_SCOPE:
+        scope_kind = "fixed look-at-target-player-hand plus draw-card spell"
     elif scope == DESTROY_DRAW_SCOPE:
         scope_kind = "fixed destroy-target plus draw-card spell"
     elif scope == BOUNCE_DRAW_SCOPE:
@@ -28489,6 +28544,12 @@ def split_row(
     tap_draw_spell_unit = (
         unit == DRAW_UNIT
         and effect_classes(row) == {"DrawCardSourceControllerEffect", "TapTargetEffect"}
+        and set(row.get("xmage_signals") or []) == {"targeting", "draw"}
+        and not ability_classes(row)
+    )
+    look_at_hand_draw_spell_unit = (
+        unit == DRAW_UNIT
+        and effect_classes(row) == {"DrawCardSourceControllerEffect", "LookAtTargetPlayerHandEffect"}
         and set(row.get("xmage_signals") or []) == {"targeting", "draw"}
         and not ability_classes(row)
     )
@@ -36078,6 +36139,56 @@ def split_row(
                 metadata,
                 effect_json,
                 family_id="xmage_tap_target_and_draw_card_spell",
+            ), "selected_exact_scope"
+
+        if look_at_hand_draw_spell_unit:
+            source_look_draw = look_at_hand_draw_spell_from_source(source_text)
+            if isinstance(source_look_draw, str):
+                return None, source_look_draw
+            oracle_look_draw = look_at_hand_draw_spell_from_oracle(metadata)
+            if isinstance(oracle_look_draw, str):
+                return None, oracle_look_draw
+            if source_look_draw != oracle_look_draw:
+                return None, "look_at_hand_draw_source_oracle_mismatch"
+            draw_count = int(oracle_look_draw["draw_count"])
+            look_component = {
+                "effect": "look_at_target_player_hand",
+                "battle_model_scope": LOOK_AT_HAND_SCOPE,
+                "target": "player",
+                "target_player_scope": oracle_look_draw["target_player_scope"],
+                "target_preference": oracle_look_draw["target_preference"],
+                "look_at_hand": True,
+                "compose_on_resolution": True,
+                "xmage_effect_class": "LookAtTargetPlayerHandEffect",
+            }
+            draw_component = {
+                "effect": "draw_cards",
+                "battle_model_scope": DRAW_SCOPE,
+                "count": draw_count,
+                "compose_on_resolution": True,
+                "xmage_effect_class": "DrawCardSourceControllerEffect",
+            }
+            effect_json = {
+                "effect": "composite_resolution",
+                "battle_model_scope": LOOK_AT_HAND_DRAW_SCOPE,
+                "target": "player",
+                "target_player_scope": oracle_look_draw["target_player_scope"],
+                "target_preference": oracle_look_draw["target_preference"],
+                "look_at_hand": True,
+                "draw_count": draw_count,
+                "count": draw_count,
+                "_composite_rule_components": [look_component, draw_component],
+                "xmage_effect_classes": [
+                    "LookAtTargetPlayerHandEffect",
+                    "DrawCardSourceControllerEffect",
+                ],
+                **flags,
+            }
+            return build_proposal(
+                row,
+                metadata,
+                effect_json,
+                family_id="xmage_look_at_target_player_hand_draw_card_spell",
             ), "selected_exact_scope"
 
         if classes == {"DamageTargetEffect", "DrawCardSourceControllerEffect"}:

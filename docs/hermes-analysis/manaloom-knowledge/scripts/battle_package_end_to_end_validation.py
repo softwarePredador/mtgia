@@ -11892,6 +11892,104 @@ def run_target_player_draw_spell(
     }
 
 
+def run_look_at_hand_draw_spell(
+    battle,
+    scenario: dict[str, Any],
+    events: list[tuple[str, dict[str, Any]]],
+) -> dict[str, Any]:
+    card = dict(scenario["card"])
+    effect = dict(battle.get_card_effect(card))
+    if effect.get("effect") != "composite_resolution":
+        fail("battle_execution", f"{card['name']} effect={effect.get('effect')!r}")
+    if effect.get("battle_model_scope") != "xmage_look_at_target_player_hand_draw_card_spell_v1":
+        fail("battle_execution", f"{card['name']} scope={effect.get('battle_model_scope')!r}")
+    active = battle.Player(str(scenario.get("player") or "Look Hand Controller"), None, [])
+    opponent = battle.Player(str(scenario.get("opponent") or "Opponent"), None, [])
+    active.library = [
+        battle.enrich_card(dict(library_card))
+        for library_card in (scenario.get("controller_library") or scenario.get("library") or [])
+        if isinstance(library_card, dict)
+    ]
+    opponent.hand = [
+        battle.enrich_card(dict(hand_card))
+        for hand_card in (scenario.get("opponent_hand") or [])
+        if isinstance(hand_card, dict)
+    ]
+    expected_seen_hand = [
+        str(name)
+        for name in (scenario.get("expected_seen_hand") or [card.get("name", "?") for card in opponent.hand])
+    ]
+    expected_draw_count = int(scenario.get("expected_draw_count") or effect.get("draw_count") or 1)
+    expected_target_player = str(scenario.get("expected_target_player") or opponent.name)
+    expected_target_player_scope = str(
+        scenario.get("expected_target_player_scope")
+        or effect.get("target_player_scope")
+        or "any"
+    )
+    starting_hand_count = len(active.hand)
+    starting_library_count = len(active.library)
+    opponent_hand_before = [card.get("name", "?") for card in opponent.hand]
+    before_events = len(events)
+
+    battle.apply_effect_immediate(
+        active,
+        [opponent],
+        battle.enrich_card(card),
+        turn=int(scenario.get("turn") or 6172),
+        rng=random.Random(int(scenario.get("seed") or 6172)),
+        effect_data_override=effect,
+        phase=str(scenario.get("phase") or "precombat_main"),
+    )
+
+    if [card.get("name", "?") for card in opponent.hand] != opponent_hand_before:
+        fail("battle_execution", f"{card['name']} mutated target player's hand")
+    if len(active.hand) != starting_hand_count + expected_draw_count:
+        fail("battle_execution", f"{card['name']} hand={len(active.hand)}, expected {starting_hand_count + expected_draw_count}")
+    if len(active.library) != starting_library_count - expected_draw_count:
+        fail(
+            "battle_execution",
+            f"{card['name']} library={len(active.library)}, expected {starting_library_count - expected_draw_count}",
+        )
+    look_event = next(
+        (
+            data
+            for event, data in events[before_events:]
+            if event == "look_at_target_player_hand_resolved"
+            and data.get("card") == card.get("name")
+        ),
+        None,
+    )
+    if look_event is None:
+        fail("battle_events", f"missing {card['name']} look_at_target_player_hand_resolved event")
+    if look_event.get("target_player") != expected_target_player:
+        fail("battle_events", f"{card['name']} target_player={look_event.get('target_player')!r}")
+    if look_event.get("target_player_scope") != expected_target_player_scope:
+        fail("battle_events", f"{card['name']} target_player_scope={look_event.get('target_player_scope')!r}")
+    if list(look_event.get("hand_card_names") or []) != expected_seen_hand:
+        fail("battle_events", f"{card['name']} hand_card_names={look_event.get('hand_card_names')!r}")
+    draw_component_event = next(
+        (
+            data
+            for event, data in events[before_events:]
+            if event == "composite_rule_component_resolved"
+            and data.get("card") == card.get("name")
+            and data.get("component_effect") == "draw_cards"
+            and data.get("outcome") == "cards_drawn"
+        ),
+        None,
+    )
+    if draw_component_event is None:
+        fail("battle_events", f"missing {card['name']} composite draw_cards component event")
+    return {
+        "scenario": scenario.get("name"),
+        "card_name": card["name"],
+        "target_player": expected_target_player,
+        "target_player_scope": expected_target_player_scope,
+        "seen_hand": expected_seen_hand,
+        "cards_drawn": expected_draw_count,
+    }
+
+
 def run_fixed_draw_spell(
     battle,
     scenario: dict[str, Any],
@@ -12349,6 +12447,7 @@ SCENARIO_RUNNERS = {
     "add_counters_target_spell": run_add_counters_target_spell,
     "add_counters_untap_target_spell": run_add_counters_untap_target_spell,
     "target_player_draw_spell": run_target_player_draw_spell,
+    "look_at_hand_draw_spell": run_look_at_hand_draw_spell,
     "target_keyword_draw_spell": run_target_keyword_draw_spell,
     "simple_activated_add_counters_target": run_simple_activated_add_counters_target,
     "simple_activated_add_counters_self": run_simple_activated_add_counters_self,
