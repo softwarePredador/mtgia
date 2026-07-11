@@ -3416,6 +3416,44 @@ def run_single_target_removal(
                 "battle_events",
                 f"{card['name']} pay_generic_amount={additional_cost_event.get('pay_generic_amount')!r}",
             )
+    expected_countered_creature = str(scenario.get("expected_countered_creature_name") or "").strip()
+    if expected_countered_creature and additional_cost_event is not None:
+        expected_counter_type = str(scenario.get("expected_additional_cost_counter_type") or "-1/-1")
+        expected_counters_added = int(scenario.get("expected_additional_cost_counters_added") or 1)
+        if additional_cost_event.get("countered_creature") != expected_countered_creature:
+            fail(
+                "battle_events",
+                f"{card['name']} countered_creature={additional_cost_event.get('countered_creature')!r}, expected {expected_countered_creature!r}",
+            )
+        if additional_cost_event.get("counter_type") != expected_counter_type:
+            fail(
+                "battle_events",
+                f"{card['name']} counter_type={additional_cost_event.get('counter_type')!r}, expected {expected_counter_type!r}",
+            )
+        if int(additional_cost_event.get("counters_added") or 0) != expected_counters_added:
+            fail(
+                "battle_events",
+                f"{card['name']} counters_added={additional_cost_event.get('counters_added')!r}, expected {expected_counters_added}",
+            )
+        countered_permanent = next(
+            (
+                permanent
+                for permanent in active.battlefield
+                if isinstance(permanent, dict)
+                and permanent.get("name") == expected_countered_creature
+            ),
+            None,
+        )
+        if countered_permanent is None:
+            fail(
+                "battle_execution",
+                f"{card['name']} did not leave countered cost creature {expected_countered_creature} on battlefield",
+            )
+        if int(countered_permanent.get("minus_one_counters") or 0) != expected_counters_added:
+            fail(
+                "battle_execution",
+                f"{card['name']} minus_one_counters={countered_permanent.get('minus_one_counters')!r}, expected {expected_counters_added}",
+            )
     expected_discarded_name = str(scenario.get("expected_discarded_name") or "").strip()
     if expected_discarded_name:
         graveyard_names = [
@@ -3573,6 +3611,8 @@ def run_single_target_removal(
         result["pay_life_amount"] = expected_pay_life_amount
     if expected_pay_generic_amount > 0:
         result["pay_generic_amount"] = expected_pay_generic_amount
+    if expected_countered_creature:
+        result["countered_creature"] = expected_countered_creature
     return result
 
 
@@ -12848,6 +12888,44 @@ def run_fixed_draw_spell(
                 "battle_events",
                 f"missing {card['name']} additional_cost_paid {expected_additional_cost}",
             )
+        expected_countered_creature = str(scenario.get("expected_countered_creature_name") or "").strip()
+        if expected_countered_creature:
+            expected_counter_type = str(scenario.get("expected_additional_cost_counter_type") or "-1/-1")
+            expected_counters_added = int(scenario.get("expected_additional_cost_counters_added") or 1)
+            if additional_cost_event.get("countered_creature") != expected_countered_creature:
+                fail(
+                    "battle_events",
+                    f"{card['name']} countered_creature={additional_cost_event.get('countered_creature')!r}, expected {expected_countered_creature!r}",
+                )
+            if additional_cost_event.get("counter_type") != expected_counter_type:
+                fail(
+                    "battle_events",
+                    f"{card['name']} counter_type={additional_cost_event.get('counter_type')!r}, expected {expected_counter_type!r}",
+                )
+            if int(additional_cost_event.get("counters_added") or 0) != expected_counters_added:
+                fail(
+                    "battle_events",
+                    f"{card['name']} counters_added={additional_cost_event.get('counters_added')!r}, expected {expected_counters_added}",
+                )
+            countered_permanent = next(
+                (
+                    permanent
+                    for permanent in active.battlefield
+                    if isinstance(permanent, dict)
+                    and permanent.get("name") == expected_countered_creature
+                ),
+                None,
+            )
+            if countered_permanent is None:
+                fail(
+                    "battle_execution",
+                    f"{card['name']} did not leave countered cost creature {expected_countered_creature} on battlefield",
+                )
+            if int(countered_permanent.get("minus_one_counters") or 0) != expected_counters_added:
+                fail(
+                    "battle_execution",
+                    f"{card['name']} minus_one_counters={countered_permanent.get('minus_one_counters')!r}, expected {expected_counters_added}",
+                )
     if expected_sacrificed_names:
         battlefield_names = [
             str(permanent.get("name") or "")
@@ -12868,6 +12946,7 @@ def run_fixed_draw_spell(
         "cards_drawn": expected_draw_count,
         "additional_cost": expected_additional_cost or None,
         "sacrificed": expected_sacrificed_names,
+        "countered_creature": str(scenario.get("expected_countered_creature_name") or "") or None,
     }
 
 

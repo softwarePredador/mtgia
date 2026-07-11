@@ -2816,6 +2816,70 @@ def test_manifest_builds_single_target_removal_or_additional_cost_scenario() -> 
     assert scenario["controller_hand"][0]["name"] == "E2E Discard Cost Card"
 
 
+def test_manifest_builds_single_target_removal_minus_one_counter_cost_scenario() -> None:
+    proposal = {
+        "normalized_name": "lethal sting",
+        "card_name": "Lethal Sting",
+        "oracle_hash": "hash-lethal-sting",
+        "logical_rule_key": "battle_rule_v1:hash-lethal-sting",
+        "effect_json": {
+            "effect": "remove_creature",
+            "battle_model_scope": "xmage_destroy_target_spell_v1",
+            "target": "creature",
+            "target_constraints": {"card_types": ["creature"]},
+            "destination": "graveyard",
+            "additional_cost": "put_minus_one_counter_on_controlled_creature",
+            "requires_put_minus_one_counter_on_controlled_creature": True,
+            "put_minus_one_counter_count": 1,
+            "xmage_additional_cost_class": "LethalStingCost",
+            "xmage_additional_cost_target": "controlled_creature",
+        },
+    }
+
+    rule = builder.expected_rule_from_proposal(proposal)
+    scenario = builder.execution_scenario_from_expected_rule(rule)
+
+    assert rule["required_effect_fields"]["requires_put_minus_one_counter_on_controlled_creature"] is True
+    assert scenario is not None
+    assert scenario["type"] == "single_target_removal"
+    assert scenario["expected_additional_cost"] == "put_minus_one_counter_on_controlled_creature"
+    assert scenario["expected_countered_creature_name"] == "E2E Minus One Counter Cost Creature"
+    assert scenario["expected_additional_cost_counter_type"] == "-1/-1"
+    assert scenario["expected_additional_cost_counters_added"] == 1
+
+
+def test_manifest_builds_fixed_draw_minus_one_counter_cost_scenario() -> None:
+    proposal = {
+        "normalized_name": "scarscale ritual",
+        "card_name": "Scarscale Ritual",
+        "oracle_hash": "hash-scarscale-ritual",
+        "logical_rule_key": "battle_rule_v1:hash-scarscale-ritual",
+        "effect_json": {
+            "effect": "draw_cards",
+            "battle_model_scope": "xmage_fixed_source_controller_draw_spell_v1",
+            "count": 2,
+            "draw_count": 2,
+            "additional_cost": "put_minus_one_counter_on_controlled_creature",
+            "requires_put_minus_one_counter_on_controlled_creature": True,
+            "put_minus_one_counter_count": 1,
+            "xmage_additional_cost_class": "ScarscaleRitualCost",
+            "xmage_additional_cost_target": "controlled_creature",
+        },
+    }
+
+    rule = builder.expected_rule_from_proposal(proposal)
+    scenario = builder.execution_scenario_from_expected_rule(rule)
+
+    assert rule["required_effect_fields"]["requires_put_minus_one_counter_on_controlled_creature"] is True
+    assert scenario is not None
+    assert scenario["type"] == "fixed_draw_spell"
+    assert scenario["expected_draw_count"] == 2
+    assert scenario["expected_additional_cost"] == "put_minus_one_counter_on_controlled_creature"
+    assert scenario["expected_countered_creature_name"] == "E2E Minus One Counter Cost Creature"
+    assert scenario["expected_additional_cost_counter_type"] == "-1/-1"
+    assert scenario["expected_additional_cost_counters_added"] == 1
+
+
 def test_manifest_builds_damage_target_create_treasure_execution_scenario() -> None:
     proposal = {
         "normalized_name": "improvised weaponry",

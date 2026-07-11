@@ -16070,6 +16070,83 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertEqual(effect["xmage_additional_cost_class"], "SacrificeTargetCost")
         self.assertEqual(effect["xmage_additional_cost_target"], "creature")
 
+    def test_destroy_target_spell_accepts_lethal_sting_minus_one_counter_cost(self) -> None:
+        row = queue_row(split.DESTROY_UNIT, effect_classes=["DestroyTargetEffect"])
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Lethal Sting",
+                oracle_text=(
+                    "As an additional cost to cast this spell, put a -1/-1 counter on a creature you control. "
+                    "Destroy target creature."
+                )
+            ),
+            source_text=(
+                "this.getSpellAbility().addCost(new LethalStingCost());"
+                "this.getSpellAbility().addEffect(new DestroyTargetEffect());"
+                "this.getSpellAbility().addTarget(new TargetCreaturePermanent());"
+                "class LethalStingCost extends CostImpl {"
+                "public LethalStingCost() {"
+                "this.text = \"put a -1/-1 counter on a creature you control\";"
+                "}"
+                "public boolean pay(Ability ability, Game game, Ability source, UUID controllerId, boolean noMana, Cost costToPay) {"
+                "Target target = new TargetControlledCreaturePermanent();"
+                "permanent.addCounters(CounterType.M1M1.createInstance(), controllerId, ability, game);"
+                "return paid;"
+                "}"
+                "}"
+            ),
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.DESTROY_SCOPE)
+        self.assertEqual(effect["target"], "creature")
+        self.assertEqual(effect["additional_cost"], "put_minus_one_counter_on_controlled_creature")
+        self.assertTrue(effect["requires_put_minus_one_counter_on_controlled_creature"])
+        self.assertEqual(effect["put_minus_one_counter_count"], 1)
+        self.assertEqual(effect["xmage_additional_cost_class"], "LethalStingCost")
+        self.assertEqual(effect["xmage_additional_cost_target"], "controlled_creature")
+
+    def test_fixed_draw_spell_accepts_custom_minus_one_counter_cost(self) -> None:
+        row = queue_row(split.DRAW_UNIT, effect_classes=["DrawCardSourceControllerEffect"])
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Scarscale Ritual",
+                type_line="Sorcery",
+                oracle_text=(
+                    "As an additional cost to cast this spell, put a -1/-1 counter "
+                    "on a creature you control. Draw two cards."
+                ),
+            ),
+            source_text=(
+                "this.getSpellAbility().addCost(new ScarscaleRitualCost());"
+                "this.getSpellAbility().addEffect(new DrawCardSourceControllerEffect(2));"
+                "class ScarscaleRitualCost extends CostImpl {"
+                "public ScarscaleRitualCost() {"
+                "this.text = \"put a -1/-1 counter on a creature you control\";"
+                "}"
+                "public boolean pay(Ability ability, Game game, Ability source, UUID controllerId, boolean noMana, Cost costToPay) {"
+                "Target target = new TargetControlledCreaturePermanent();"
+                "permanent.addCounters(CounterType.M1M1.createInstance(), controllerId, ability, game);"
+                "return paid;"
+                "}"
+                "}"
+            ),
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.DRAW_SCOPE)
+        self.assertEqual(effect["effect"], "draw_cards")
+        self.assertEqual(effect["count"], 2)
+        self.assertEqual(effect["additional_cost"], "put_minus_one_counter_on_controlled_creature")
+        self.assertTrue(effect["requires_put_minus_one_counter_on_controlled_creature"])
+        self.assertEqual(effect["put_minus_one_counter_count"], 1)
+        self.assertEqual(effect["xmage_additional_cost_class"], "ScarscaleRitualCost")
+        self.assertEqual(effect["xmage_additional_cost_target"], "controlled_creature")
+
     def test_destroy_target_spell_accepts_or_discard_or_pay_life_additional_cost(self) -> None:
         row = queue_row(split.DESTROY_UNIT, effect_classes=["DestroyTargetEffect"])
         proposal, reason = split.split_row(

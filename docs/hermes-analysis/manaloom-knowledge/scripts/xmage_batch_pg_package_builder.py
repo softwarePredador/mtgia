@@ -119,6 +119,8 @@ E2E_REQUIRED_EFFECT_FIELDS = (
     "requires_pay_generic",
     "pay_generic_amount",
     "requires_tap_untapped_artifact",
+    "requires_put_minus_one_counter_on_controlled_creature",
+    "put_minus_one_counter_count",
     "requires_sacrifice_creature",
     "requires_sacrifice_creature_count",
     "requires_sacrifice_creature_or_land",
@@ -4610,6 +4612,23 @@ def fixed_draw_spell_execution_scenario_from_expected_rule(
             f"E2E Sacrifice Cost Creature {index + 1}"
             for index in range(creature_count)
         ]
+    if required.get("requires_put_minus_one_counter_on_controlled_creature"):
+        counter_count = max(1, int(required.get("put_minus_one_counter_count") or 1))
+        scenario["controller_battlefield"] = [
+            *scenario.get("controller_battlefield", []),
+            {
+                "name": "E2E Minus One Counter Cost Creature",
+                "type_line": "Creature - Soldier",
+                "effect": "creature",
+                "power": 2,
+                "toughness": 2,
+                "summoning_sick": True,
+            },
+        ]
+        scenario["expected_additional_cost"] = "put_minus_one_counter_on_controlled_creature"
+        scenario["expected_countered_creature_name"] = "E2E Minus One Counter Cost Creature"
+        scenario["expected_additional_cost_counter_type"] = "-1/-1"
+        scenario["expected_additional_cost_counters_added"] = counter_count
     return scenario
 
 
@@ -8033,6 +8052,23 @@ def single_target_removal_execution_scenario_from_expected_rule(
             }
             scenario["expected_additional_cost"] = "pay_generic"
             scenario["expected_pay_generic_amount"] = pay_generic_amount
+    elif selected_additional_cost == "put_minus_one_counter_on_controlled_creature":
+        counter_count = max(1, int(required.get("put_minus_one_counter_count") or 1))
+        scenario["controller_battlefield"] = [
+            *scenario.get("controller_battlefield", []),
+            {
+                "name": "E2E Minus One Counter Cost Creature",
+                "type_line": "Creature - Soldier",
+                "effect": "creature",
+                "power": 2,
+                "toughness": 2,
+                "summoning_sick": True,
+            },
+        ]
+        scenario["expected_additional_cost"] = "put_minus_one_counter_on_controlled_creature"
+        scenario["expected_countered_creature_name"] = "E2E Minus One Counter Cost Creature"
+        scenario["expected_additional_cost_counter_type"] = "-1/-1"
+        scenario["expected_additional_cost_counters_added"] = counter_count
     elif selected_additional_cost in {
         "sacrifice_creature",
         "sacrifice_creature_or_enchantment",

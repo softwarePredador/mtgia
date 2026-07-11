@@ -22008,6 +22008,27 @@ def fixed_spell_additional_cost_fields_from_source(
                 "xmage_additional_cost_class": "PayLifeCost",
             }, None
         return None, unsupported_reason
+    minus_one_counter_cost_match = re.search(
+        r"new\s+([A-Za-z0-9_]+Cost)\s*\(\s*\)",
+        text,
+    )
+    if (
+        minus_one_counter_cost_match
+        and "CostImpl" in text
+        and "CounterType.M1M1" in text
+        and "TargetControlledCreaturePermanent" in text
+        and re.search(
+        r"additional cost.*put a -1/-1 counter on a creature you control",
+        lowered_oracle,
+        )
+    ):
+        return {
+            "additional_cost": "put_minus_one_counter_on_controlled_creature",
+            "requires_put_minus_one_counter_on_controlled_creature": True,
+            "put_minus_one_counter_count": 1,
+            "xmage_additional_cost_class": minus_one_counter_cost_match.group(1),
+            "xmage_additional_cost_target": "controlled_creature",
+        }, None
     if "ReturnToHandChosenControlledPermanentCost" in text:
         return_target = activation_sacrifice_target_from_source(text, text)
         return_patterns = {

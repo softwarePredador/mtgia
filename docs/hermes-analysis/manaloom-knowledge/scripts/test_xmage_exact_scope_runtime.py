@@ -8119,6 +8119,146 @@ class XMageExactScopeRuntimeTest(unittest.TestCase):
             )
         )
 
+    def test_destroy_target_spell_pays_minus_one_counter_cost_before_removal(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        opponent = self.battle.Player("Opponent", None, [])
+        cost_creature = {
+            "name": "Spare Scarab",
+            "type_line": "Creature - Insect",
+            "effect": "creature",
+            "power": 2,
+            "toughness": 2,
+            "summoning_sick": True,
+        }
+        target = {
+            "name": "Target Knight",
+            "type_line": "Creature - Knight",
+            "effect": "creature",
+            "power": 3,
+            "toughness": 3,
+        }
+        active.battlefield.append(cost_creature)
+        opponent.battlefield.append(target)
+        effect = {
+            "effect": "remove_creature",
+            "battle_model_scope": "xmage_destroy_target_spell_v1",
+            "target": "creature",
+            "target_constraints": {"card_types": ["creature"]},
+            "destination": "graveyard",
+            "requires_put_minus_one_counter_on_controlled_creature": True,
+            "put_minus_one_counter_count": 1,
+            "additional_cost": "put_minus_one_counter_on_controlled_creature",
+            "sorcery": True,
+        }
+
+        self.battle.apply_effect_immediate(
+            active,
+            [opponent],
+            {
+                "name": "Lethal Sting",
+                "type_line": "Sorcery",
+                "oracle_text": (
+                    "As an additional cost to cast this spell, put a -1/-1 counter on a creature you control. "
+                    "Destroy target creature."
+                ),
+            },
+            turn=4,
+            rng=random.Random(33),
+            effect_data_override=effect,
+        )
+
+        self.assertIn(cost_creature, active.battlefield)
+        self.assertEqual(cost_creature.get("minus_one_counters"), 1)
+        self.assertNotIn(target, opponent.battlefield)
+        self.assertIn(target, opponent.graveyard)
+        self.assertTrue(
+            any(
+                event == "additional_cost_paid"
+                and data.get("card") == "Lethal Sting"
+                and data.get("cost") == "put_minus_one_counter_on_controlled_creature"
+                and data.get("countered_creature") == "Spare Scarab"
+                and data.get("counter_type") == "-1/-1"
+                and data.get("counters_added") == 1
+                for event, data in self.events
+            )
+        )
+        self.assertTrue(
+            any(
+                event == "removal_resolved"
+                and data.get("card") == "Lethal Sting"
+                and data.get("target") == "Target Knight"
+                and data.get("destination") == "graveyard"
+                for event, data in self.events
+            )
+        )
+
+    def test_fixed_draw_spell_pays_minus_one_counter_cost_before_draw(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        opponent = self.battle.Player("Opponent", None, [])
+        cost_creature = {
+            "name": "Spare Scarab",
+            "type_line": "Creature - Insect",
+            "effect": "creature",
+            "power": 2,
+            "toughness": 2,
+            "summoning_sick": True,
+        }
+        active.battlefield.append(cost_creature)
+        active.library = [
+            {"name": "Drawn Card A", "type_line": "Instant", "effect": "draw_cards", "cmc": 1},
+            {"name": "Drawn Card B", "type_line": "Sorcery", "effect": "draw_cards", "cmc": 2},
+        ]
+        effect = {
+            "effect": "draw_cards",
+            "battle_model_scope": "xmage_fixed_source_controller_draw_spell_v1",
+            "count": 2,
+            "draw_count": 2,
+            "requires_put_minus_one_counter_on_controlled_creature": True,
+            "put_minus_one_counter_count": 1,
+            "additional_cost": "put_minus_one_counter_on_controlled_creature",
+            "sorcery": True,
+        }
+
+        self.battle.apply_effect_immediate(
+            active,
+            [opponent],
+            {
+                "name": "Scarscale Ritual",
+                "type_line": "Sorcery",
+                "oracle_text": (
+                    "As an additional cost to cast this spell, put a -1/-1 counter "
+                    "on a creature you control. Draw two cards."
+                ),
+            },
+            turn=4,
+            rng=random.Random(34),
+            effect_data_override=effect,
+        )
+
+        self.assertIn(cost_creature, active.battlefield)
+        self.assertEqual(cost_creature.get("minus_one_counters"), 1)
+        self.assertEqual(len(active.library), 0)
+        self.assertEqual([card.get("name") for card in active.hand], ["Drawn Card A", "Drawn Card B"])
+        self.assertTrue(
+            any(
+                event == "additional_cost_paid"
+                and data.get("card") == "Scarscale Ritual"
+                and data.get("cost") == "put_minus_one_counter_on_controlled_creature"
+                and data.get("countered_creature") == "Spare Scarab"
+                and data.get("counter_type") == "-1/-1"
+                and data.get("counters_added") == 1
+                for event, data in self.events
+            )
+        )
+        self.assertTrue(
+            any(
+                event == "draw_cards_resolved"
+                and data.get("card") == "Scarscale Ritual"
+                and data.get("cards_drawn") == 2
+                for event, data in self.events
+            )
+        )
+
     def test_removal_compensation_creature_token_preserves_keywords_and_colors(self) -> None:
         active = self.battle.Player("Active", None, [])
         opponent = self.battle.Player("Opponent", None, [])

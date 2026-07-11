@@ -1044,6 +1044,118 @@ def test_single_target_removal_runner_pays_generic_cost() -> None:
     assert result["pay_generic_amount"] == 4
 
 
+def test_single_target_removal_runner_pays_minus_one_counter_cost() -> None:
+    battle = validator.load_battle(validator.DEFAULT_BATTLE)
+    events = []
+    previous_handler = battle.REPLAY_EVENT_HANDLER
+    previous_get_card_effect = battle.get_card_effect
+    battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+    battle.get_card_effect = lambda card: {
+        "effect": "remove_creature",
+        "battle_model_scope": "xmage_destroy_target_spell_v1",
+        "target": "creature",
+        "target_constraints": {"card_types": ["creature"]},
+        "destination": "graveyard",
+        "additional_cost": "put_minus_one_counter_on_controlled_creature",
+        "requires_put_minus_one_counter_on_controlled_creature": True,
+        "put_minus_one_counter_count": 1,
+    }
+    try:
+        result = validator.run_single_target_removal(
+            battle,
+            {
+                "name": "Lethal Sting pays -1/-1 counter cost",
+                "type": "single_target_removal",
+                "card": {"name": "Lethal Sting", "type_line": "Sorcery"},
+                "target": {
+                    "name": "E2E Legal Removal Target",
+                    "type_line": "Creature",
+                    "effect": "creature",
+                    "power": 2,
+                    "toughness": 2,
+                },
+                "controller_battlefield": [
+                    {
+                        "name": "E2E Minus One Counter Cost Creature",
+                        "type_line": "Creature - Soldier",
+                        "effect": "creature",
+                        "power": 2,
+                        "toughness": 2,
+                        "summoning_sick": True,
+                    }
+                ],
+                "expected_destination": "graveyard",
+                "expected_effect": "remove_creature",
+                "expected_target_constraints": {"card_types": ["creature"]},
+                "expected_additional_cost": "put_minus_one_counter_on_controlled_creature",
+                "expected_countered_creature_name": "E2E Minus One Counter Cost Creature",
+                "expected_additional_cost_counter_type": "-1/-1",
+                "expected_additional_cost_counters_added": 1,
+            },
+            events,
+        )
+    finally:
+        battle.REPLAY_EVENT_HANDLER = previous_handler
+        battle.get_card_effect = previous_get_card_effect
+
+    assert result["target"] == "E2E Legal Removal Target"
+    assert result["additional_cost"] == "put_minus_one_counter_on_controlled_creature"
+    assert result["countered_creature"] == "E2E Minus One Counter Cost Creature"
+
+
+def test_fixed_draw_runner_pays_minus_one_counter_cost() -> None:
+    battle = validator.load_battle(validator.DEFAULT_BATTLE)
+    events = []
+    previous_handler = battle.REPLAY_EVENT_HANDLER
+    previous_get_card_effect = battle.get_card_effect
+    battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+    battle.get_card_effect = lambda card: {
+        "effect": "draw_cards",
+        "battle_model_scope": "xmage_fixed_source_controller_draw_spell_v1",
+        "count": 2,
+        "draw_count": 2,
+        "additional_cost": "put_minus_one_counter_on_controlled_creature",
+        "requires_put_minus_one_counter_on_controlled_creature": True,
+        "put_minus_one_counter_count": 1,
+    }
+    try:
+        result = validator.run_fixed_draw_spell(
+            battle,
+            {
+                "name": "Scarscale Ritual pays -1/-1 counter cost",
+                "type": "fixed_draw_spell",
+                "card": {"name": "Scarscale Ritual", "type_line": "Sorcery"},
+                "controller_library": [
+                    {"name": "E2E Draw Card 1", "type_line": "Instant", "effect": "draw_cards", "cmc": 1},
+                    {"name": "E2E Draw Card 2", "type_line": "Sorcery", "effect": "draw_cards", "cmc": 2},
+                ],
+                "controller_battlefield": [
+                    {
+                        "name": "E2E Minus One Counter Cost Creature",
+                        "type_line": "Creature - Soldier",
+                        "effect": "creature",
+                        "power": 2,
+                        "toughness": 2,
+                        "summoning_sick": True,
+                    }
+                ],
+                "expected_draw_count": 2,
+                "expected_additional_cost": "put_minus_one_counter_on_controlled_creature",
+                "expected_countered_creature_name": "E2E Minus One Counter Cost Creature",
+                "expected_additional_cost_counter_type": "-1/-1",
+                "expected_additional_cost_counters_added": 1,
+            },
+            events,
+        )
+    finally:
+        battle.REPLAY_EVENT_HANDLER = previous_handler
+        battle.get_card_effect = previous_get_card_effect
+
+    assert result["cards_drawn"] == 2
+    assert result["additional_cost"] == "put_minus_one_counter_on_controlled_creature"
+    assert result["countered_creature"] == "E2E Minus One Counter Cost Creature"
+
+
 def test_fixed_damage_target_spell_runner_validates_shuffle_self() -> None:
     battle = validator.load_battle(validator.DEFAULT_BATTLE)
     events = []

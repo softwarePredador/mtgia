@@ -9856,6 +9856,8 @@ SAFE_RUNTIME_SECONDARY_ANNOTATION_KEYS = {
     "requires_pay_generic",
     "pay_generic_amount",
     "requires_tap_untapped_artifact",
+    "requires_put_minus_one_counter_on_controlled_creature",
+    "put_minus_one_counter_count",
     "requires_sacrifice_creature",
     "requires_sacrifice_creature_count",
     "requires_sacrifice_creature_or_land",
@@ -24030,6 +24032,50 @@ def choose_creature_for_sacrificed_power_damage(player):
     return ranked[0], option_rows, "maximize_sacrificed_creature_power_without_commander_first"
 
 
+def choose_controlled_creature_for_minus_one_counter_cost(player, source=None):
+    candidates = [
+        permanent
+        for permanent in getattr(player, "battlefield", []) or []
+        if permanent is not source and is_battlefield_creature(permanent)
+    ]
+    if not candidates:
+        return None, [], "no_controlled_creature_for_minus_one_counter_cost"
+
+    def selection_key(permanent):
+        type_line = str(permanent.get("type_line") or "").lower()
+        is_token = permanent.get("tag") == "token" or "token" in type_line
+        toughness = _damage_sweep_creature_toughness(permanent)
+        survives = toughness > 1
+        return (
+            1 if permanent.get("is_commander") else 0,
+            0 if is_token else 1,
+            0 if permanent.get("summoning_sick") else 1,
+            0 if survives else 1,
+            int(float(permanent.get("cmc") or 0)),
+            int(float(permanent.get("power") or 0)),
+            toughness,
+            permanent.get("name", ""),
+        )
+
+    ranked = sorted(candidates, key=selection_key)
+    option_rows = []
+    for rank, permanent in enumerate(ranked, start=1):
+        type_line = str(permanent.get("type_line") or "").lower()
+        option_rows.append(
+            {
+                "name": permanent.get("name", "?"),
+                "selection_rank": rank,
+                "is_commander": bool(permanent.get("is_commander")),
+                "is_token": permanent.get("tag") == "token" or "token" in type_line,
+                "summoning_sick": bool(permanent.get("summoning_sick")),
+                "power": int(float(permanent.get("power") or 0)),
+                "toughness": _damage_sweep_creature_toughness(permanent),
+                "cmc": int(float(permanent.get("cmc") or 0)),
+            }
+        )
+    return ranked[0], option_rows, "prefer_low_value_controlled_creature_for_minus_one_counter_cost"
+
+
 def choose_blight_x_cost_plan(player, opponents, effect_data):
     if not effect_data.get("requires_blight_x"):
         return None
@@ -24238,6 +24284,9 @@ def additional_card_costs_are_payable(player, card, effect_data, cost_context=No
         artifact, _options = choose_untapped_artifact_for_additional_cost(player, card)
         if artifact is None:
             return False
+    if effect_data.get("requires_put_minus_one_counter_on_controlled_creature"):
+        if choose_controlled_creature_for_minus_one_counter_cost(player, card)[0] is None:
+            return False
     if effect_data.get("requires_sacrifice_green_creature"):
         creature, _options, _reason = choose_creature_for_resource_cost(
             player,
@@ -24413,6 +24462,9 @@ def additional_cost_option_effect_fields(option):
         effect_data["pay_generic_amount"] = int((option or {}).get("pay_generic_amount") or 0)
     elif cost == "tap_untapped_artifact":
         effect_data["requires_tap_untapped_artifact"] = True
+    elif cost == "put_minus_one_counter_on_controlled_creature":
+        effect_data["requires_put_minus_one_counter_on_controlled_creature"] = True
+        effect_data["put_minus_one_counter_count"] = int((option or {}).get("put_minus_one_counter_count") or 1)
     elif cost == "sacrifice_creature":
         effect_data["requires_sacrifice_creature"] = True
     elif cost == "sacrifice_two_creatures":
@@ -24502,6 +24554,7 @@ def pay_additional_card_costs(player, card, effect_data, *, turn=None, cost_cont
         and not effect_data.get("requires_pay_life")
         and not effect_data.get("requires_pay_generic")
         and not effect_data.get("requires_tap_untapped_artifact")
+        and not effect_data.get("requires_put_minus_one_counter_on_controlled_creature")
         and not effect_data.get("requires_sacrifice_creature")
         and not effect_data.get("requires_sacrifice_creature_count")
         and not effect_data.get("requires_sacrifice_creature_or_land")
@@ -24607,6 +24660,59 @@ def pay_additional_card_costs(player, card, effect_data, *, turn=None, cost_cont
                 for option in artifact_options[:8]
                 if isinstance(option, dict)
             ],
+            turn=turn,
+        )
+    if effect_data.get("requires_put_minus_one_counter_on_controlled_creature"):
+        counter_target, target_options, selection_reason = choose_controlled_creature_for_minus_one_counter_cost(
+            player,
+            card,
+        )
+        counter_count = max(1, int(effect_data.get("put_minus_one_counter_count") or 1))
+        if counter_target is None:
+            emit_replay_event(
+                "additional_cost_failed",
+                player=player.name,
+                card=card.get("name", "?"),
+                cost="put_minus_one_counter_on_controlled_creature",
+                turn=turn,
+                controlled_creature_options=[
+                    option.get("name", "?")
+                    for option in target_options[:8]
+                    if isinstance(option, dict)
+                ],
+            )
+            return False
+        toughness_before = _damage_sweep_creature_toughness(counter_target)
+        power_before = int(float(counter_target.get("power") or 0))
+        add_minus_one_counters(counter_target, counter_count)
+        destination = None
+        if _damage_sweep_creature_toughness(counter_target) <= 0:
+            destination = move_creature_from_battlefield(
+                player,
+                counter_target,
+                reason="put_minus_one_counter_additional_cost",
+                source=card,
+            )
+        emit_replay_event(
+            "additional_cost_paid",
+            player=player.name,
+            card=card.get("name", "?"),
+            cost="put_minus_one_counter_on_controlled_creature",
+            counter_type="-1/-1",
+            counters_added=counter_count,
+            countered_creature=counter_target.get("name", "?"),
+            target_power_before=power_before,
+            target_toughness_before=toughness_before,
+            target_power_after=counter_target.get("power"),
+            target_toughness_after=counter_target.get("toughness"),
+            destination=destination,
+            controlled_creature_options=[
+                option.get("name", "?")
+                for option in target_options[:8]
+                if isinstance(option, dict)
+            ],
+            selection_reason=selection_reason,
+            runtime_cost_model="put_fixed_minus_one_counter_on_controlled_creature",
             turn=turn,
         )
     if effect_data.get("requires_pay_life"):
