@@ -4843,8 +4843,12 @@ def tap_target_spell_execution_scenario_from_expected_rule(
     rule: dict[str, Any],
 ) -> dict[str, Any] | None:
     required = dict(rule.get("required_effect_fields") or {})
-    if required.get("battle_model_scope") != "xmage_tap_target_spell_v1":
+    if required.get("battle_model_scope") not in {
+        "xmage_tap_target_spell_v1",
+        "xmage_tap_target_and_draw_card_spell_v1",
+    }:
         return None
+    draw_count = int(required.get("draw_count") or required.get("count") or 0)
     target = required.get("target") or "permanent"
     constraints = dict(required.get("target_constraints") or {})
     if not constraints:
@@ -4874,7 +4878,7 @@ def tap_target_spell_execution_scenario_from_expected_rule(
         matching=False,
     )
     nonmatching["tapped"] = False
-    return {
+    scenario = {
         "name": f"{rule['card_name']} taps target permanents",
         "type": "tap_target_spell",
         "card": {
@@ -4889,6 +4893,13 @@ def tap_target_spell_execution_scenario_from_expected_rule(
         "x_value": target_count if required.get("target_count_from_x") else None,
         "logical_rule_key": rule["logical_rule_key"],
     }
+    if required.get("battle_model_scope") == "xmage_tap_target_and_draw_card_spell_v1":
+        scenario["expected_draw_count"] = max(1, draw_count)
+        scenario["library"] = [
+            {"name": f"E2E Tap Draw Card {index + 1}", "type_line": "Instant", "effect": "draw_cards"}
+            for index in range(max(1, draw_count))
+        ]
+    return scenario
 
 
 def color_tap_untap_draw_spell_execution_scenario_from_expected_rule(

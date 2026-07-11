@@ -2473,6 +2473,37 @@ def test_manifest_builds_tap_target_spell_execution_scenario() -> None:
     assert scenario["nonmatching_target"]["name"] == "E2E Illegal Tap Spell Target"
 
 
+def test_manifest_builds_tap_target_draw_spell_execution_scenario() -> None:
+    rule = {
+        "normalized_name": "repel the darkness",
+        "card_name": "Repel the Darkness",
+        "oracle_hash": "hash-repel-the-darkness",
+        "logical_rule_key": "battle_rule_v1:hash-repel-the-darkness",
+        "required_effect_fields": {
+            "effect": "composite_resolution",
+            "battle_model_scope": "xmage_tap_target_and_draw_card_spell_v1",
+            "target": "creature",
+            "target_constraints": {"card_types": ["creature"]},
+            "target_count": 2,
+            "target_count_max": 2,
+            "up_to_count": True,
+            "tap_target": True,
+            "draw_count": 1,
+        },
+    }
+
+    scenario = builder.tap_target_spell_execution_scenario_from_expected_rule(rule)
+
+    assert scenario is not None
+    assert scenario["type"] == "tap_target_spell"
+    assert scenario["card"]["name"] == "Repel the Darkness"
+    assert scenario["expected_target_count"] == 2
+    assert scenario["expected_draw_count"] == 1
+    assert scenario["library"] == [
+        {"name": "E2E Tap Draw Card 1", "type_line": "Instant", "effect": "draw_cards"}
+    ]
+
+
 def test_manifest_builds_boost_untap_target_spell_execution_scenario() -> None:
     rule = {
         "normalized_name": "synchronized strike",

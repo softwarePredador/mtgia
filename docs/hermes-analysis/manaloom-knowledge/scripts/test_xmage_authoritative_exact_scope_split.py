@@ -22330,6 +22330,91 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertTrue(effect["up_to_count"])
         self.assertEqual(effect["target_constraints"], {"card_types": ["creature"]})
 
+    def test_tap_target_creature_draw_spell_maps_to_composite_scope(self) -> None:
+        row = queue_row(
+            split.DRAW_UNIT,
+            effect_classes=["TapTargetEffect", "DrawCardSourceControllerEffect"],
+            xmage_signals=["targeting", "draw"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Pressure Point",
+                type_line="Instant",
+                oracle_text="Tap target creature.\nDraw a card.",
+            ),
+            source_text="""
+                this.getSpellAbility().addEffect(new TapTargetEffect());
+                this.getSpellAbility().addTarget(new TargetCreaturePermanent());
+                this.getSpellAbility().addEffect(new DrawCardSourceControllerEffect(1).concatBy("<br>"));
+            """,
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["effect"], "composite_resolution")
+        self.assertEqual(effect["battle_model_scope"], split.TAP_TARGET_DRAW_SCOPE)
+        self.assertEqual(effect["target"], "creature")
+        self.assertEqual(effect["target_count"], 1)
+        self.assertEqual(effect["draw_count"], 1)
+        self.assertEqual(
+            [component["effect"] for component in effect["_composite_rule_components"]],
+            ["tap_target", "draw_cards"],
+        )
+
+    def test_tap_up_to_two_target_creatures_draw_spell_maps_to_composite_scope(self) -> None:
+        row = queue_row(
+            split.DRAW_UNIT,
+            effect_classes=["TapTargetEffect", "DrawCardSourceControllerEffect"],
+            xmage_signals=["targeting", "draw"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Repel the Darkness",
+                type_line="Instant",
+                oracle_text="Tap up to two target creatures.\nDraw a card.",
+            ),
+            source_text="""
+                this.getSpellAbility().addEffect(new TapTargetEffect());
+                this.getSpellAbility().addEffect(new DrawCardSourceControllerEffect(1).concatBy("<br>"));
+                this.getSpellAbility().addTarget(new TargetCreaturePermanent(0, 2));
+            """,
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.TAP_TARGET_DRAW_SCOPE)
+        self.assertEqual(effect["target_count"], 2)
+        self.assertEqual(effect["target_count_max"], 2)
+        self.assertTrue(effect["up_to_count"])
+
+    def test_tap_draw_spell_blocks_permanent_with_extra_ability(self) -> None:
+        row = queue_row(
+            split.DRAW_UNIT,
+            effect_classes=["TapTargetEffect", "DrawCardSourceControllerEffect"],
+            ability_kind="triggered",
+            ability_classes=["SimpleActivatedAbility"],
+            xmage_signals=["targeting", "draw", "activated_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Verity Circle",
+                type_line="Enchantment",
+                oracle_text="Whenever a creature an opponent controls becomes tapped, if it isn't being declared as an attacker, you may draw a card.",
+            ),
+            source_text="""
+                this.addAbility(new TappedNotAttackingTriggeredAbility(new DrawCardSourceControllerEffect(1), false));
+                Ability ability = new SimpleActivatedAbility(new TapTargetEffect(), new ManaCostsImpl<>("{4}{U}"));
+                ability.addTarget(new TargetCreaturePermanent());
+                this.addAbility(ability);
+            """,
+        )
+
+        self.assertIsNone(proposal)
+        self.assertEqual(reason, "not_instant_or_sorcery_spell")
+
     def test_x_target_nonland_permanents_spell_maps_to_tap_target_scope(self) -> None:
         row = queue_row(
             split.TAP_TARGET_NONLAND_PERMANENT_SPELL_UNIT,

@@ -297,6 +297,7 @@ PERMANENT_ACTIVATED_BOUNCE_SCOPE = "xmage_permanent_simple_activated_return_to_h
 PERMANENT_ACTIVATED_TAP_TARGET_SCOPE = "xmage_permanent_simple_activated_tap_target_v1"
 PERMANENT_ACTIVATED_UNTAP_TARGET_SCOPE = "xmage_permanent_simple_activated_untap_target_v1"
 TAP_TARGET_SPELL_SCOPE = "xmage_tap_target_spell_v1"
+TAP_TARGET_DRAW_SCOPE = "xmage_tap_target_and_draw_card_spell_v1"
 PERMANENT_ACTIVATED_RECURSION_TO_HAND_SCOPE = "xmage_permanent_simple_activated_graveyard_to_hand_v1"
 PERMANENT_ACTIVATED_RECURSION_TO_BATTLEFIELD_SCOPE = "xmage_permanent_simple_activated_graveyard_to_battlefield_v1"
 PERMANENT_ACTIVATED_GRAVEYARD_EXILE_SCOPE = "xmage_permanent_simple_activated_exile_graveyard_card_v1"
@@ -20459,7 +20460,8 @@ def tap_target_spell_from_oracle(metadata: dict[str, Any]) -> dict[str, Any] | s
         return "tap_target_spell_oracle_not_simple"
     text = strip_parenthetical_reminders(lines[0])
     match = re.fullmatch(
-        r"tap (?:(?P<up_to>up to) )?(?P<count>x|\d+|one|two|three|four|five|six|seven|eight|nine|ten) "
+        r"tap (?:(?P<up_to>up to) )?"
+        r"(?:(?P<count>x|\d+|one|two|three|four|five|six|seven|eight|nine|ten) )?"
         r"target (?P<target>creatures?|lands?|nonland permanents?|permanents?)",
         text,
     )
@@ -20468,7 +20470,7 @@ def tap_target_spell_from_oracle(metadata: dict[str, Any]) -> dict[str, Any] | s
     target = tap_target_spell_target_from_text(match.group("target") or "")
     if target is None:
         return "tap_target_spell_oracle_target_not_supported"
-    count = tap_target_count_value(match.group("count") or "")
+    count = tap_target_count_value(match.group("count") or "one")
     if count is None:
         return "tap_target_spell_oracle_count_not_supported"
     spec: dict[str, Any] = {
@@ -20532,6 +20534,44 @@ def tap_target_spell_from_source(source: str) -> dict[str, Any] | str:
         spec["target_count_max"] = 1
         return spec
     return "tap_target_spell_source_target_count_not_supported"
+
+
+def tap_target_draw_spell_from_oracle(metadata: dict[str, Any]) -> dict[str, Any] | str:
+    lines = [
+        re.sub(r"\s+", " ", line).strip()
+        for line in oracle_effect_lines_without_neutral_auxiliary(metadata)
+        if line.strip()
+    ]
+    if len(lines) != 2:
+        return "tap_target_draw_oracle_not_simple"
+    if strip_parenthetical_reminders(lines[1]).lower().rstrip(".") != "draw a card":
+        return "tap_target_draw_oracle_not_draw_card"
+    tap_metadata = dict(metadata)
+    tap_metadata["oracle_text"] = lines[0]
+    tap_spec = tap_target_spell_from_oracle(tap_metadata)
+    if isinstance(tap_spec, str):
+        return tap_spec.replace("tap_target_spell", "tap_target_draw")
+    tap_spec["draw_count"] = 1
+    return tap_spec
+
+
+def tap_target_draw_spell_from_source(source: str) -> dict[str, Any] | str:
+    text = source or ""
+    tap_spec = tap_target_spell_from_source(text)
+    if isinstance(tap_spec, str):
+        return tap_spec.replace("tap_target_spell", "tap_target_draw")
+    draw_matches = re.findall(r"new\s+DrawCardSourceControllerEffect\s*\(\s*(\d*)\s*\)", text)
+    if len(draw_matches) != 1:
+        return "tap_target_draw_source_draw_not_fixed"
+    draw_count = int(draw_matches[0] or "1")
+    if draw_count != 1:
+        return "tap_target_draw_source_draw_not_one"
+    tap_match = re.search(r"new\s+TapTargetEffect\s*\(", text)
+    draw_match = re.search(r"new\s+DrawCardSourceControllerEffect\s*\(", text)
+    if not tap_match or not draw_match or tap_match.start() > draw_match.start():
+        return "tap_target_draw_source_order_not_tap_then_draw"
+    tap_spec["draw_count"] = draw_count
+    return tap_spec
 
 
 def activated_draw_from_source(source: str) -> dict[str, Any] | str:
@@ -28190,6 +28230,8 @@ def proposal_notes(row: dict[str, Any], scope: str) -> str:
         scope_kind = "noncreature permanent with a simple self-sacrifice library-search-to-hand ability"
     elif scope == TAP_TARGET_SPELL_SCOPE:
         scope_kind = "instant or sorcery spell that taps exact target permanents"
+    elif scope == TAP_TARGET_DRAW_SCOPE:
+        scope_kind = "instant or sorcery spell that taps exact target permanents and draws a card"
     elif scope == ADD_COUNTERS_TARGET_SCOPE:
         scope_kind = "instant or sorcery spell that adds fixed counters to one target creature"
     elif scope == ADD_COUNTERS_TARGET_CREATURES_SCOPE:
@@ -28441,6 +28483,12 @@ def split_row(
         unit == DRAW_UNIT
         and effect_classes(row)
         == {"BecomesColorTargetEffect", "DrawCardSourceControllerEffect", "TapTargetEffect"}
+        and set(row.get("xmage_signals") or []) == {"targeting", "draw"}
+        and not ability_classes(row)
+    )
+    tap_draw_spell_unit = (
+        unit == DRAW_UNIT
+        and effect_classes(row) == {"DrawCardSourceControllerEffect", "TapTargetEffect"}
         and set(row.get("xmage_signals") or []) == {"targeting", "draw"}
         and not ability_classes(row)
     )
@@ -35968,6 +36016,68 @@ def split_row(
                 metadata,
                 effect_json,
                 family_id="xmage_fixed_scry_draw_card_spell",
+            ), "selected_exact_scope"
+
+        if tap_draw_spell_unit:
+            source_tap_draw = tap_target_draw_spell_from_source(source_text)
+            if isinstance(source_tap_draw, str):
+                return None, source_tap_draw
+            oracle_tap_draw = tap_target_draw_spell_from_oracle(metadata)
+            if isinstance(oracle_tap_draw, str):
+                return None, oracle_tap_draw
+            for key in (
+                "target",
+                "target_constraints",
+                "target_count",
+                "target_count_max",
+                "target_count_from_x",
+                "target_count_source",
+                "up_to_count",
+                "draw_count",
+            ):
+                if source_tap_draw.get(key) != oracle_tap_draw.get(key):
+                    return None, "tap_target_draw_source_oracle_mismatch"
+            draw_count = int(oracle_tap_draw["draw_count"])
+            tap_component = {
+                "effect": "tap_target",
+                "battle_model_scope": TAP_TARGET_SPELL_SCOPE,
+                "xmage_effect_class": "TapTargetEffect",
+                "compose_on_resolution": True,
+                **{
+                    key: value
+                    for key, value in oracle_tap_draw.items()
+                    if key != "draw_count"
+                },
+            }
+            draw_component = {
+                "effect": "draw_cards",
+                "battle_model_scope": DRAW_SCOPE,
+                "count": draw_count,
+                "compose_on_resolution": True,
+                "xmage_effect_class": "DrawCardSourceControllerEffect",
+            }
+            effect_json = {
+                "effect": "composite_resolution",
+                "battle_model_scope": TAP_TARGET_DRAW_SCOPE,
+                "tap_target": True,
+                "target": oracle_tap_draw["target"],
+                "target_constraints": oracle_tap_draw["target_constraints"],
+                "draw_count": draw_count,
+                "count": draw_count,
+                "_composite_rule_components": [tap_component, draw_component],
+                "xmage_effect_classes": ["TapTargetEffect", "DrawCardSourceControllerEffect"],
+                **{
+                    key: value
+                    for key, value in oracle_tap_draw.items()
+                    if key != "draw_count"
+                },
+                **flags,
+            }
+            return build_proposal(
+                row,
+                metadata,
+                effect_json,
+                family_id="xmage_tap_target_and_draw_card_spell",
             ), "selected_exact_scope"
 
         if classes == {"DamageTargetEffect", "DrawCardSourceControllerEffect"}:

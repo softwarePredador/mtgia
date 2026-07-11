@@ -6688,6 +6688,11 @@ def run_tap_target_spell(
     card = dict(scenario["card"])
     active = battle.Player(str(scenario.get("player") or "Tap Spell Controller"), None, [])
     opponent = battle.Player(str(scenario.get("opponent") or "Tap Spell Opponent"), None, [])
+    active.library = [
+        battle.enrich_card(dict(library_card))
+        for library_card in (scenario.get("library") or [])
+        if isinstance(library_card, dict)
+    ]
     targets = [
         battle.enrich_card(dict(target))
         for target in (scenario.get("targets") or [scenario.get("target") or {}])
@@ -6702,6 +6707,9 @@ def run_tap_target_spell(
     effect_data = dict(battle.get_card_effect(card) or {})
     if scenario.get("x_value") is not None:
         effect_data["x_value"] = int(scenario.get("x_value") or expected_count)
+    expected_draw_count = int(scenario.get("expected_draw_count") or 0)
+    starting_library_count = len(active.library)
+    starting_hand_count = len(active.hand)
     before_events = len(events)
     battle.apply_effect_immediate(
         active,
@@ -6746,11 +6754,36 @@ def run_tap_target_spell(
             "battle_events",
             f"{card['name']} event target_tapped_count={resolved_event.get('target_tapped_count')}, expected {expected_count}",
         )
+    if expected_draw_count:
+        if len(active.hand) != starting_hand_count + expected_draw_count:
+            fail(
+                "battle_execution",
+                f"{card['name']} drew {len(active.hand) - starting_hand_count} cards, expected {expected_draw_count}",
+            )
+        if len(active.library) != starting_library_count - expected_draw_count:
+            fail(
+                "battle_execution",
+                f"{card['name']} library={len(active.library)}, expected {starting_library_count - expected_draw_count}",
+            )
+        draw_component_event = next(
+            (
+                data
+                for event, data in events[before_events:]
+                if event == "composite_rule_component_resolved"
+                and data.get("card") == card.get("name")
+                and data.get("component_effect") == "draw_cards"
+                and data.get("outcome") == "cards_drawn"
+            ),
+            None,
+        )
+        if draw_component_event is None:
+            fail("battle_events", f"missing {card['name']} composite draw_cards component event")
     return {
         "scenario": scenario.get("name"),
         "card_name": card["name"],
         "targets_tapped": tapped_names,
         "target_tapped_count": len(tapped_names),
+        "cards_drawn": expected_draw_count,
     }
 
 

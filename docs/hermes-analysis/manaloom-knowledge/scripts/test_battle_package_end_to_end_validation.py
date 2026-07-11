@@ -2868,6 +2868,85 @@ def test_tap_target_spell_runner_executes_multi_target_spell() -> None:
     ]
 
 
+def test_tap_target_spell_runner_executes_composite_draw() -> None:
+    battle = validator.load_battle(validator.DEFAULT_BATTLE)
+    events = []
+    previous_handler = battle.REPLAY_EVENT_HANDLER
+    previous_get_card_effect = battle.get_card_effect
+    battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+    battle.get_card_effect = lambda card: {
+        "effect": "composite_resolution",
+        "battle_model_scope": "xmage_tap_target_and_draw_card_spell_v1",
+        "target": "creature",
+        "target_constraints": {"card_types": ["creature"]},
+        "target_count": 1,
+        "target_count_max": 1,
+        "tap_target": True,
+        "draw_count": 1,
+        "_composite_rule_components": [
+            {
+                "effect": "tap_target",
+                "battle_model_scope": "xmage_tap_target_spell_v1",
+                "target": "creature",
+                "target_constraints": {"card_types": ["creature"]},
+                "target_count": 1,
+                "target_count_max": 1,
+                "compose_on_resolution": True,
+            },
+            {
+                "effect": "draw_cards",
+                "battle_model_scope": "xmage_fixed_source_controller_draw_spell_v1",
+                "count": 1,
+                "compose_on_resolution": True,
+            },
+        ],
+        "_rule_logical_key": "battle_rule_v1:pressure-point",
+    }
+    try:
+        result = validator.run_tap_target_spell(
+            battle,
+            {
+                "name": "Pressure Point taps target creature and draws",
+                "type": "tap_target_spell",
+                "card": {"name": "Pressure Point", "type_line": "Instant"},
+                "targets": [
+                    {
+                        "name": "E2E Legal Tap Draw Target",
+                        "type_line": "Creature - Fixture",
+                        "effect": "creature",
+                        "power": 2,
+                        "toughness": 2,
+                    }
+                ],
+                "expected_target_count": 1,
+                "expected_draw_count": 1,
+                "library": [
+                    {
+                        "name": "E2E Tap Draw Replacement Card",
+                        "type_line": "Instant",
+                        "effect": "draw_cards",
+                    }
+                ],
+                "logical_rule_key": "battle_rule_v1:pressure-point",
+            },
+            events,
+        )
+    finally:
+        battle.REPLAY_EVENT_HANDLER = previous_handler
+        battle.get_card_effect = previous_get_card_effect
+
+    assert result["card_name"] == "Pressure Point"
+    assert result["target_tapped_count"] == 1
+    assert result["cards_drawn"] == 1
+    assert any(
+        event == "composite_rule_component_resolved"
+        and data.get("card") == "Pressure Point"
+        and data.get("component_effect") == "draw_cards"
+        and data.get("outcome") == "cards_drawn"
+        for event, data in events
+    )
+
+
 def test_boost_untap_target_runner_executes_multi_target_spell() -> None:
     battle = validator.load_battle(validator.DEFAULT_BATTLE)
     events = []
