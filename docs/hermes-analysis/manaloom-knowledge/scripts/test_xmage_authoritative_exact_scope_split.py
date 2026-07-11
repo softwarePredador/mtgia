@@ -7362,7 +7362,7 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertEqual(effect["discard_count"], 1)
         self.assertTrue(effect["discard_random"])
 
-    def test_fixed_target_player_discard_spell_blocks_dynamic_source_count(self) -> None:
+    def test_dynamic_target_player_discard_spell_maps_x_random(self) -> None:
         row = queue_row(
             split.TARGET_PLAYER_DISCARD_UNIT,
             effect_classes=["DiscardTargetEffect"],
@@ -7377,8 +7377,61 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
             ),
         )
 
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.DYNAMIC_TARGET_PLAYER_DISCARD_SCOPE)
+        self.assertEqual(effect["discard_count_source"], "x_value")
+        self.assertEqual(effect["discard_count"], 0)
+        self.assertTrue(effect["discard_random"])
+        self.assertTrue(effect["target_player_discard"])
+
+    def test_dynamic_target_player_discard_spell_maps_domain(self) -> None:
+        row = queue_row(
+            split.TARGET_PLAYER_DISCARD_UNIT,
+            effect_classes=["DiscardTargetEffect"],
+            xmage_signals=["targeting"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                oracle_text=(
+                    "Domain — Target player discards a card for each basic land type among lands you control."
+                )
+            ),
+            source_text=(
+                "this.getSpellAbility().addEffect(new DiscardTargetEffect(DomainValue.REGULAR));"
+                "this.getSpellAbility().addTarget(new TargetPlayer());"
+            ),
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.DYNAMIC_TARGET_PLAYER_DISCARD_SCOPE)
+        self.assertEqual(effect["discard_count_source"], "domain_basic_land_types")
+        self.assertEqual(effect["discard_count"], 0)
+        self.assertFalse(effect["discard_random"])
+
+    def test_dynamic_target_player_discard_spell_blocks_mana_spent_colors(self) -> None:
+        row = queue_row(
+            split.TARGET_PLAYER_DISCARD_UNIT,
+            effect_classes=["DiscardTargetEffect"],
+            xmage_signals=["targeting"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                oracle_text=(
+                    "Converge — Target player discards X cards, where X is the number of colors of mana spent to cast this spell."
+                )
+            ),
+            source_text=(
+                "this.getSpellAbility().addEffect(new DiscardTargetEffect(ColorsOfManaSpentToCastCount.getInstance()));"
+                "this.getSpellAbility().addTarget(new TargetPlayer());"
+            ),
+        )
+
         self.assertIsNone(proposal)
-        self.assertEqual(reason, "target_player_discard_spell_oracle_not_exact_fixed")
+        self.assertEqual(reason, "target_player_discard_spell_dynamic_oracle_mana_spent_colors_not_supported")
 
     def test_fixed_draw_lose_life_spell_blocks_dynamic_source_count(self) -> None:
         row = queue_row(

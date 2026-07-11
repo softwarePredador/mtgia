@@ -255,6 +255,7 @@ TARGET_DRAW_SCOPE = "xmage_fixed_target_player_draw_spell_v1"
 LOOK_AT_HAND_SCOPE = "xmage_look_at_target_player_hand_spell_v1"
 LOOK_AT_HAND_DRAW_SCOPE = "xmage_look_at_target_player_hand_draw_card_spell_v1"
 TARGET_PLAYER_DISCARD_SCOPE = "xmage_fixed_target_player_discard_spell_v1"
+DYNAMIC_TARGET_PLAYER_DISCARD_SCOPE = "xmage_dynamic_target_player_discard_spell_v1"
 ETB_TARGET_PLAYER_DISCARD_CREATURE_SCOPE = "xmage_creature_etb_target_player_discard_v1"
 DIES_TARGET_PLAYER_DISCARD_CREATURE_SCOPE = "xmage_creature_dies_target_player_discard_v1"
 COMBAT_DAMAGE_DISCARD_CREATURE_SCOPE = "xmage_creature_combat_damage_target_player_discard_v1"
@@ -16514,6 +16515,41 @@ def fixed_target_player_discard_spell_from_oracle(metadata: dict[str, Any]) -> d
     }
 
 
+def dynamic_target_player_discard_spell_from_oracle(metadata: dict[str, Any]) -> dict[str, Any] | str:
+    text = re.sub(
+        r"\s+",
+        " ",
+        " ".join(oracle_effect_lines_without_neutral_auxiliary(metadata)),
+    ).strip().lower()
+    if not text:
+        return "target_player_discard_spell_dynamic_oracle_not_simple"
+    x_match = re.fullmatch(
+        r"target player discards x cards?(?P<random> at random)?\.?",
+        text,
+    )
+    if x_match:
+        return {
+            "discard_count": 0,
+            "discard_count_source": "x_value",
+            "discard_random": bool(x_match.group("random")),
+        }
+    domain_match = re.fullmatch(
+        r"(?:domain\s+[—-]\s+)?target player discards a card for each basic land type among lands you control\.?",
+        text,
+    )
+    if domain_match:
+        return {
+            "discard_count": 0,
+            "discard_count_source": "domain_basic_land_types",
+            "discard_random": False,
+        }
+    if "colors of mana spent to cast this spell" in text:
+        return "target_player_discard_spell_dynamic_oracle_mana_spent_colors_not_supported"
+    if "greatest mana value among permanents you control" in text:
+        return "target_player_discard_spell_dynamic_oracle_greatest_mana_value_not_supported"
+    return "target_player_discard_spell_dynamic_oracle_not_supported"
+
+
 def self_cost_reduction_condition_from_oracle(condition_text: str) -> dict[str, Any] | str:
     condition = re.sub(r"\([^)]*\)", "", condition_text)
     condition = re.sub(r"\s+", " ", condition).strip().strip(".").lower()
@@ -21373,6 +21409,43 @@ def fixed_target_player_discard_spell_from_source(source: str) -> dict[str, Any]
         "discard_random": random_raw == "true",
         "xmage_effect_class": "DiscardTargetEffect",
     }
+
+
+def dynamic_target_player_discard_spell_from_source(source: str) -> dict[str, Any] | str:
+    text = source or ""
+    if has_additional_cost(text):
+        return "target_player_discard_spell_dynamic_source_additional_cost_not_supported"
+    if "TargetPointer" in text or ".setTargetPointer" in text:
+        return "target_player_discard_spell_dynamic_source_target_pointer_not_supported"
+    if len(re.findall(r"new\s+TargetPlayer\s*\(", text)) != 1:
+        return "target_player_discard_spell_dynamic_source_target_not_supported"
+    constructor_args = extract_constructor_args(text, "DiscardTargetEffect")
+    if constructor_args is None:
+        return "target_player_discard_spell_dynamic_source_not_simple"
+    parts = split_top_level_args(constructor_args)
+    if not parts:
+        return "target_player_discard_spell_dynamic_source_not_simple"
+    value_expr = parts[0].strip()
+    discard_random = len(parts) > 1 and parts[1].strip().lower() == "true"
+    if "GetXValue" in value_expr:
+        return {
+            "discard_count": 0,
+            "discard_count_source": "x_value",
+            "discard_random": discard_random,
+            "xmage_effect_class": "DiscardTargetEffect",
+        }
+    if "DomainValue.REGULAR" in value_expr:
+        return {
+            "discard_count": 0,
+            "discard_count_source": "domain_basic_land_types",
+            "discard_random": discard_random,
+            "xmage_effect_class": "DiscardTargetEffect",
+        }
+    if "ColorsOfManaSpentToCastCount" in value_expr:
+        return "target_player_discard_spell_dynamic_source_mana_spent_colors_not_supported"
+    if "GreatestAmongPermanentsValue" in value_expr:
+        return "target_player_discard_spell_dynamic_source_greatest_mana_value_not_supported"
+    return "target_player_discard_spell_dynamic_source_not_supported"
 
 
 def _discard_count_phrase_to_int(value: str) -> int:
@@ -28780,6 +28853,8 @@ def proposal_notes(row: dict[str, Any], scope: str) -> str:
         scope_kind = "fixed controller life-gain plus draw-card spell"
     elif scope == TARGET_PLAYER_DISCARD_SCOPE:
         scope_kind = "fixed target-player discard spell"
+    elif scope == DYNAMIC_TARGET_PLAYER_DISCARD_SCOPE:
+        scope_kind = "dynamic target-player discard spell"
     elif scope == ETB_TARGET_PLAYER_DISCARD_CREATURE_SCOPE:
         scope_kind = "creature ETB triggered fixed target-player discard ability"
     elif scope == DIES_TARGET_PLAYER_DISCARD_CREATURE_SCOPE:
@@ -36514,22 +36589,49 @@ def split_row(
         if unsupported_abilities:
             return None, "target_player_discard_spell_ability_class_not_simple"
         oracle_discard = fixed_target_player_discard_spell_from_oracle(metadata)
-        if isinstance(oracle_discard, str):
-            return None, oracle_discard
         source_discard = fixed_target_player_discard_spell_from_source(source_text)
-        if isinstance(source_discard, str):
-            return None, source_discard
-        for key in ("discard_count", "discard_random"):
-            if oracle_discard[key] != source_discard[key]:
-                return None, "target_player_discard_spell_source_oracle_mismatch"
-        discard_count = int(oracle_discard["discard_count"])
-        discard_random = bool(oracle_discard["discard_random"])
+        if not isinstance(oracle_discard, str) and not isinstance(source_discard, str):
+            for key in ("discard_count", "discard_random"):
+                if oracle_discard[key] != source_discard[key]:
+                    return None, "target_player_discard_spell_source_oracle_mismatch"
+            discard_count = int(oracle_discard["discard_count"])
+            discard_random = bool(oracle_discard["discard_random"])
+            effect_json = {
+                "effect": "target_player_discard",
+                "battle_model_scope": TARGET_PLAYER_DISCARD_SCOPE,
+                "count": discard_count,
+                "discard_count": discard_count,
+                "discard_random": discard_random,
+                "target": "player",
+                "target_controller": "target_player",
+                "target_constraints": {"players": ["any"]},
+                "target_preference": "opponent",
+                "target_player_discard": True,
+                "xmage_effect_class": "DiscardTargetEffect",
+                **flags,
+            }
+            return build_proposal(
+                row,
+                metadata,
+                effect_json,
+                family_id="xmage_fixed_target_player_discard_spell",
+            ), "selected_exact_scope"
+        oracle_dynamic_discard = dynamic_target_player_discard_spell_from_oracle(metadata)
+        if isinstance(oracle_dynamic_discard, str):
+            return None, oracle_dynamic_discard
+        source_dynamic_discard = dynamic_target_player_discard_spell_from_source(source_text)
+        if isinstance(source_dynamic_discard, str):
+            return None, source_dynamic_discard
+        for key in ("discard_count_source", "discard_random"):
+            if oracle_dynamic_discard[key] != source_dynamic_discard[key]:
+                return None, "target_player_discard_spell_dynamic_source_oracle_mismatch"
         effect_json = {
             "effect": "target_player_discard",
-            "battle_model_scope": TARGET_PLAYER_DISCARD_SCOPE,
-            "count": discard_count,
-            "discard_count": discard_count,
-            "discard_random": discard_random,
+            "battle_model_scope": DYNAMIC_TARGET_PLAYER_DISCARD_SCOPE,
+            "count": 0,
+            "discard_count": 0,
+            "discard_count_source": oracle_dynamic_discard["discard_count_source"],
+            "discard_random": bool(oracle_dynamic_discard["discard_random"]),
             "target": "player",
             "target_controller": "target_player",
             "target_constraints": {"players": ["any"]},
@@ -36542,7 +36644,7 @@ def split_row(
             row,
             metadata,
             effect_json,
-            family_id="xmage_fixed_target_player_discard_spell",
+            family_id="xmage_dynamic_target_player_discard_spell",
         ), "selected_exact_scope"
 
     if unit == DRAW_UNIT:

@@ -136,6 +136,7 @@ E2E_REQUIRED_EFFECT_FIELDS = (
     "life_loss_rounding",
     "proliferate_count",
     "discard_count",
+    "discard_count_source",
     "discard_random",
     "discard_unless_status",
     "discard_unless_filter",
@@ -4386,6 +4387,63 @@ def simple_activated_draw_discard_execution_scenario_from_expected_rule(
     return scenario
 
 
+def target_player_discard_execution_scenario_from_expected_rule(
+    rule: dict[str, Any],
+) -> dict[str, Any] | None:
+    required = dict(rule.get("required_effect_fields") or {})
+    if required.get("battle_model_scope") not in {
+        "xmage_fixed_target_player_discard_spell_v1",
+        "xmage_dynamic_target_player_discard_spell_v1",
+    }:
+        return None
+    discard_count_source = str(required.get("discard_count_source") or "").strip().lower()
+    scenario_extras: dict[str, Any] = {}
+    if discard_count_source == "x_value":
+        x_value = int(required.get("x_value") or 3)
+        expected_discard_count = x_value
+        scenario_extras["x_value"] = x_value
+        scenario_extras["effect_overrides"] = {
+            "x_value": x_value,
+            "_cast_context": {"x_value": x_value},
+        }
+    elif discard_count_source == "domain_basic_land_types":
+        expected_discard_count = 3
+        scenario_extras["controller_battlefield"] = [
+            {"name": "E2E Plains", "type_line": "Basic Land - Plains", "subtypes": ["plains"]},
+            {"name": "E2E Island", "type_line": "Basic Land - Island", "subtypes": ["island"]},
+            {"name": "E2E Swamp", "type_line": "Basic Land - Swamp", "subtypes": ["swamp"]},
+        ]
+    elif discard_count_source:
+        return None
+    else:
+        expected_discard_count = int(required.get("discard_count") or required.get("count") or 0)
+    if expected_discard_count <= 0:
+        return None
+    return {
+        "name": f"{rule['card_name']} target player discards cards",
+        "type": "target_player_discard_spell",
+        "card": {
+            "name": rule["card_name"],
+            "type_line": "Instant" if required.get("instant") else "Sorcery",
+        },
+        "opponent_hand": [
+            {
+                "name": f"E2E Discard Candidate {index + 1}",
+                "type_line": "Creature - Fixture" if index % 2 else "Instant",
+                "effect": "creature" if index % 2 else "draw_cards",
+                "cmc": index + 1,
+            }
+            for index in range(max(expected_discard_count + 1, 2))
+        ],
+        "expected_discard_count": expected_discard_count,
+        "expected_discard_random": bool(required.get("discard_random")),
+        "expected_target_player": "Opponent",
+        "target_preference": str(required.get("target_preference") or "opponent"),
+        **scenario_extras,
+        "logical_rule_key": rule["logical_rule_key"],
+    }
+
+
 def target_player_draw_execution_scenario_from_expected_rule(
     rule: dict[str, Any],
 ) -> dict[str, Any] | None:
@@ -8371,6 +8429,7 @@ def execution_scenario_from_expected_rule(rule: dict[str, Any]) -> dict[str, Any
         or graveyard_to_library_draw_execution_scenario_from_expected_rule(rule)
         or fixed_draw_discard_spell_execution_scenario_from_expected_rule(rule)
         or look_at_hand_draw_execution_scenario_from_expected_rule(rule)
+        or target_player_discard_execution_scenario_from_expected_rule(rule)
         or target_player_draw_execution_scenario_from_expected_rule(rule)
         or combat_damage_draw_execution_scenario_from_expected_rule(rule)
         or beginning_end_step_draw_execution_scenario_from_expected_rule(rule)

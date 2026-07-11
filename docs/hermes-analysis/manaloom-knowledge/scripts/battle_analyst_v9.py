@@ -67631,6 +67631,15 @@ def _target_player_discard_cards(target_player, discard_count, discard_random, r
     )[:count]
 
 
+def target_player_discard_count_from_effect(player, effect_data):
+    count_source = str((effect_data or {}).get("discard_count_source") or "").strip().lower()
+    if count_source == "x_value":
+        return x_value_from_effect_context(effect_data), count_source
+    if count_source == "domain_basic_land_types":
+        return _domain_basic_land_type_count(player), count_source
+    return max(0, int((effect_data or {}).get("discard_count") or (effect_data or {}).get("count") or 0)), ""
+
+
 def resolve_target_player_discard_effect(
     player,
     opponents,
@@ -67646,7 +67655,7 @@ def resolve_target_player_discard_effect(
     forced_target_player=None,
     forced_target_reason=None,
 ):
-    discard_count = max(0, int(effect_data.get("discard_count") or effect_data.get("count") or 0))
+    discard_count, discard_count_source = target_player_discard_count_from_effect(player, effect_data)
     discard_random = bool(effect_data.get("discard_random"))
     if forced_target_player is not None:
         target_player = forced_target_player
@@ -67674,6 +67683,7 @@ def resolve_target_player_discard_effect(
         "trigger": trigger or effect_data.get("trigger"),
         "effect": "target_player_discard",
         "requested_discard_count": discard_count,
+        "discard_count_source": discard_count_source or None,
         "discarded_count": len(removed),
         "discard_random": discard_random,
         "discarded": [discarded.get("name", "?") for discarded in removed],

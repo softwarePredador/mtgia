@@ -12274,6 +12274,97 @@ def run_beginning_end_step_draw(
     }
 
 
+def run_target_player_discard_spell(
+    battle,
+    scenario: dict[str, Any],
+    events: list[tuple[str, dict[str, Any]]],
+) -> dict[str, Any]:
+    card = dict(scenario["card"])
+    effect = dict(battle.get_card_effect(card))
+    if effect.get("effect") != "target_player_discard":
+        fail("battle_execution", f"{card['name']} effect={effect.get('effect')!r}")
+    if effect.get("target_player_discard") is not True:
+        fail("battle_execution", f"{card['name']} is not marked target_player_discard")
+    if isinstance(scenario.get("effect_overrides"), dict):
+        effect.update(dict(scenario.get("effect_overrides") or {}))
+    x_value = scenario.get("x_value")
+    if x_value is not None:
+        x_value = int(x_value)
+        effect["x_value"] = x_value
+        effect["_cast_context"] = {"x_value": x_value}
+        card["x_value"] = x_value
+        card["_cast_context"] = {"x_value": x_value}
+    active = battle.Player(str(scenario.get("player") or "Spell Controller"), None, [])
+    opponent = battle.Player(str(scenario.get("opponent") or "Opponent"), None, [])
+    active.battlefield = [
+        battle.enrich_card(dict(permanent))
+        for permanent in (scenario.get("controller_battlefield") or [])
+        if isinstance(permanent, dict)
+    ]
+    opponent.hand = [
+        battle.enrich_card(dict(hand_card))
+        for hand_card in (scenario.get("opponent_hand") or [])
+        if isinstance(hand_card, dict)
+    ]
+    starting_opponent_hand_count = len(opponent.hand)
+    expected_discard_count = int(scenario.get("expected_discard_count") or effect.get("discard_count") or effect.get("count") or 0)
+    expected_discard_random = bool(scenario.get("expected_discard_random", effect.get("discard_random")))
+    expected_target_player = str(scenario.get("expected_target_player") or opponent.name)
+    expected_discard_count_source = str(effect.get("discard_count_source") or "").strip()
+    before_events = len(events)
+
+    battle.apply_effect_immediate(
+        active,
+        [opponent],
+        battle.enrich_card(card),
+        turn=int(scenario.get("turn") or 6171),
+        rng=random.Random(int(scenario.get("seed") or 6171)),
+        effect_data_override=effect,
+        phase=str(scenario.get("phase") or "precombat_main"),
+    )
+
+    if len(opponent.hand) != starting_opponent_hand_count - expected_discard_count:
+        fail(
+            "battle_execution",
+            f"{card['name']} opponent hand={len(opponent.hand)}, expected {starting_opponent_hand_count - expected_discard_count}",
+        )
+    if len(opponent.graveyard) != expected_discard_count:
+        fail("battle_execution", f"{card['name']} opponent graveyard={len(opponent.graveyard)}, expected {expected_discard_count}")
+    event = next(
+        (
+            data
+            for event_name, data in events[before_events:]
+            if event_name == "target_player_discard_resolved"
+            and data.get("card") == card.get("name")
+        ),
+        None,
+    )
+    if event is None:
+        fail("battle_events", f"missing {card['name']} target_player_discard_resolved event")
+    if event.get("target_player") != expected_target_player:
+        fail("battle_events", f"{card['name']} target_player={event.get('target_player')!r}")
+    if int(event.get("requested_discard_count") or 0) != expected_discard_count:
+        fail("battle_events", f"{card['name']} requested_discard_count={event.get('requested_discard_count')}")
+    if int(event.get("discarded_count") or 0) != expected_discard_count:
+        fail("battle_events", f"{card['name']} discarded_count={event.get('discarded_count')}")
+    if bool(event.get("discard_random")) != expected_discard_random:
+        fail("battle_events", f"{card['name']} discard_random={event.get('discard_random')!r}")
+    if expected_discard_count_source and event.get("discard_count_source") != expected_discard_count_source:
+        fail(
+            "battle_events",
+            f"{card['name']} discard_count_source={event.get('discard_count_source')!r}",
+        )
+    return {
+        "scenario": scenario.get("name"),
+        "card_name": card["name"],
+        "target_player": expected_target_player,
+        "cards_discarded": expected_discard_count,
+        "discard_random": expected_discard_random,
+        "discard_count_source": expected_discard_count_source or None,
+        "x_value": x_value,
+    }
+
+
 def run_target_player_draw_spell(
     battle,
     scenario: dict[str, Any],
@@ -13108,6 +13199,7 @@ SCENARIO_RUNNERS = {
     "stat_modifier_until_eot_untap_target": run_stat_modifier_until_eot_untap_target,
     "add_counters_target_spell": run_add_counters_target_spell,
     "add_counters_untap_target_spell": run_add_counters_untap_target_spell,
+    "target_player_discard_spell": run_target_player_discard_spell,
     "target_player_draw_spell": run_target_player_draw_spell,
     "look_at_hand_draw_spell": run_look_at_hand_draw_spell,
     "target_keyword_draw_spell": run_target_keyword_draw_spell,
