@@ -1,0 +1,112 @@
+{
+  "battle_execution": {
+    "event_count": 3,
+    "results": [
+      {
+        "card_name": "The Golden Throne",
+        "destination": "exile",
+        "life_after": 1,
+        "scenario": "The Golden Throne replaces a loss by exiling itself"
+      },
+      {
+        "available_mana": 3,
+        "card_name": "The Golden Throne",
+        "conditional_mana": 3,
+        "event": "target_sacrifice_mana_source_activated",
+        "scenario": "The Golden Throne activates contextual sacrifice mana source",
+        "source_sacrificed": false,
+        "target_sacrificed": true
+      }
+    ],
+    "scenario_count": 2
+  },
+  "battle_path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py",
+  "database_target": "127.0.0.1:15432/halder",
+  "generated_at_utc": "2026-07-12T22:07:04.201123+00:00",
+  "manifest": "docs/hermes-analysis/master_optimizer_reports/pg847_golden_throne_new_server_manifest.json",
+  "package_id": "pg847_golden_throne_new_server_manifest",
+  "snapshot": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/known_cards_canonical_snapshot.json",
+  "sqlite_db": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db",
+  "stages": [
+    {
+      "evidence": {
+        "validated_rows": 1
+      },
+      "name": "postgres_source_of_truth",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_target_sacrifice_mana_source_permanent_v1",
+          "card_name": "The Golden Throne",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:109245c854877317216eb2c3c5c0e324",
+          "oracle_hash": "33a6eac65a90700967487d2482bae1e6",
+          "review_status": "verified",
+          "rule_version": 2
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_rows": 1
+      },
+      "name": "sqlite_hermes_cache",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_target_sacrifice_mana_source_permanent_v1",
+          "card_name": "The Golden Throne",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:109245c854877317216eb2c3c5c0e324",
+          "oracle_hash": "33a6eac65a90700967487d2482bae1e6",
+          "review_status": "verified",
+          "rule_version": 2
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_cards": 1
+      },
+      "name": "canonical_snapshot_fallback",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_target_sacrifice_mana_source_permanent_v1",
+          "battle_rule_version": 2,
+          "card_name": "The Golden Throne",
+          "logical_rule_key": "battle_rule_v1:109245c854877317216eb2c3c5c0e324"
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_cards": 1
+      },
+      "name": "runtime_get_card_effect",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "card_name": "The Golden Throne",
+          "component_keys": [],
+          "effect": "ramp_permanent",
+          "logical_rule_key": "battle_rule_v1:109245c854877317216eb2c3c5c0e324"
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "events": 3,
+        "scenarios": 2
+      },
+      "name": "battle_execution",
+      "status": "pass"
+    }
+  ],
+  "status": "pass",
+  "title": "Battle Package End-to-End Validation"
+}

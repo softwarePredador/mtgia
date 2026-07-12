@@ -48747,7 +48747,17 @@ def split_row(
                 else "permanent"
             )
             mana_requires_tap = bool(mana_source_detail.get("mana_activation_requires_tap", False))
+            oracle = oracle_text(metadata)
+            supported_loss_replacement = (
+                "TheGoldenThroneEffect" in classes
+                and "SimpleStaticAbility" in mana_ability_classes
+                and "if you would lose the game" in oracle
+                and "instead exile" in oracle
+                and "life total becomes 1" in oracle
+            )
             auxiliary_abilities_for_target_sacrifice = mana_ability_classes - SAFE_MANA_ABILITY_CLASSES
+            if supported_loss_replacement:
+                auxiliary_abilities_for_target_sacrifice.discard("SimpleStaticAbility")
             unmodeled_effect_classes = sorted(
                 cls
                 for cls in classes
@@ -48758,6 +48768,7 @@ def split_row(
                     "AddManaInAnyCombinationEffect",
                     "ManaEffect",
                     "ValleymakerManaEffect",
+                    *({"TheGoldenThroneEffect"} if supported_loss_replacement else set()),
                 }
             )
             effect_json = {
@@ -48783,6 +48794,15 @@ def split_row(
                 "xmage_effect_classes": sorted(classes),
                 "xmage_cost_class": "SacrificeTargetCost",
             }
+            if supported_loss_replacement:
+                effect_json.update(
+                    {
+                        "replace_losing_game_exile_self_life_total_1": True,
+                        "loss_replacement_event": "lose_game",
+                        "loss_replacement_destination": "exile",
+                        "loss_replacement_life_total": 1,
+                    }
+                )
             if auxiliary_abilities_for_target_sacrifice or unmodeled_effect_classes:
                 effect_json["_runtime_partial"] = True
                 effect_json["_runtime_partial_reason"] = (

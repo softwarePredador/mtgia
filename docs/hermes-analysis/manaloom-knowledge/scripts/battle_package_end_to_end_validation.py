@@ -15673,6 +15673,73 @@ def run_simple_activated_put_from_hand_to_battlefield(
     }
 
 
+def run_loss_replacement(
+    battle,
+    scenario: dict[str, Any],
+    events: list[tuple[str, dict[str, Any]]],
+) -> dict[str, Any]:
+    card = dict(scenario["card"])
+    effect = dict(battle.get_card_effect(card))
+    if not effect.get("replace_losing_game_exile_self_life_total_1"):
+        fail("battle_execution", f"{card['name']} missing loss replacement effect")
+    source = battle.enrich_card(
+        {
+            **card,
+            **effect,
+            "type_line": card.get("type_line") or effect.get("source_type_line") or "Legendary Artifact",
+        }
+    )
+    active = battle.Player(str(scenario.get("player") or "Loss Replacement Controller"), None, [])
+    opponent = battle.Player(str(scenario.get("opponent") or "Loss Replacement Opponent"), None, [])
+    active.battlefield = [source]
+    active.life = int(scenario.get("starting_life") or 0)
+    expected_life = int(scenario.get("expected_life_after") or 1)
+    expected_destination = str(scenario.get("expected_destination") or "exile")
+    before_events = len(events)
+
+    battle.check_sbas_until_stable([active, opponent])
+
+    if getattr(active, "eliminated", False):
+        fail("battle_execution", f"{card['name']} controller was eliminated")
+    if int(getattr(active, "life", 0) or 0) != expected_life:
+        fail("battle_execution", f"{card['name']} life={active.life}, expected {expected_life}")
+    if source in active.battlefield:
+        fail("battle_execution", f"{card['name']} source remained on battlefield")
+    if expected_destination == "exile" and source not in active.exile:
+        fail("battle_execution", f"{card['name']} source missing from exile")
+    replacement_event = next(
+        (
+            data
+            for event, data in reversed(events[before_events:])
+            if event == "loss_replacement_applied"
+            and data.get("card") == card.get("name")
+        ),
+        None,
+    )
+    if replacement_event is None:
+        fail("battle_events", f"missing {card['name']} loss_replacement_applied event")
+    if int(replacement_event.get("life_after") or 0) != expected_life:
+        fail("battle_events", f"{card['name']} life_after={replacement_event.get('life_after')!r}")
+    if str(replacement_event.get("destination") or "") != expected_destination:
+        fail("battle_events", f"{card['name']} destination={replacement_event.get('destination')!r}")
+    expected_reason = str(
+        scenario.get("expected_replaced_loss_reason")
+        or scenario.get("expected_event")
+        or ""
+    )
+    if expected_reason and str(replacement_event.get("replaced_loss_reason") or "") != expected_reason:
+        fail(
+            "battle_events",
+            f"{card['name']} replaced_loss_reason={replacement_event.get('replaced_loss_reason')!r}",
+        )
+    return {
+        "scenario": scenario.get("name"),
+        "card_name": card["name"],
+        "life_after": expected_life,
+        "destination": expected_destination,
+    }
+
+
 SCENARIO_RUNNERS = {
     "attack_self_boost": run_attack_self_boost,
     "aura_static_power_toughness_attachment": run_aura_static_power_toughness_attachment,
@@ -15765,6 +15832,7 @@ SCENARIO_RUNNERS = {
     "target_player_mill_draw_spell": run_target_player_mill_draw_spell,
     "target_player_mill_spell": run_target_player_mill_spell,
     "look_at_hand_draw_spell": run_look_at_hand_draw_spell,
+    "loss_replacement": run_loss_replacement,
     "target_keyword_draw_spell": run_target_keyword_draw_spell,
     "boost_life_gain_spell": run_boost_life_gain_spell,
     "simple_activated_add_counters_target": run_simple_activated_add_counters_target,

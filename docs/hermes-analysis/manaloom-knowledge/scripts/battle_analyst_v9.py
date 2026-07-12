@@ -11600,6 +11600,43 @@ def treasure_mana_value_for_player(player):
     return max(1, value)
 
 
+def loss_replacement_permanent(player):
+    for permanent in getattr(player, "battlefield", []) or []:
+        if not isinstance(permanent, dict):
+            continue
+        if permanent.get("replace_losing_game_exile_self_life_total_1"):
+            return permanent
+    return None
+
+
+def apply_loss_replacement(player, *, reason, **details):
+    permanent = loss_replacement_permanent(player)
+    if permanent is None:
+        return False
+    life_before = int(getattr(player, "life", 0) or 0)
+    destination = move_permanent_from_battlefield_to_exile(
+        player,
+        permanent,
+        reason="replace_losing_game",
+        source=permanent,
+        turn=CURRENT_REPLAY_TURN,
+    )
+    player.life = 1
+    emit_replay_event(
+        "loss_replacement_applied",
+        player=getattr(player, "name", "?"),
+        card=permanent.get("name", "?"),
+        replaced_loss_reason=reason,
+        life_before=life_before,
+        life_after=player.life,
+        destination=destination,
+        turn=CURRENT_REPLAY_TURN,
+        **details,
+        **replay_rule_fields(permanent),
+    )
+    return True
+
+
 class Player:
     def shuffle(self, rng): rng.shuffle(self.library)
 
@@ -12463,7 +12500,9 @@ class Player:
 
     def is_alive(self):
         return not self.eliminated and (
-            self.life > 0 or self.cannot_lose_this_turn
+            self.life > 0
+            or self.cannot_lose_this_turn
+            or loss_replacement_permanent(self) is not None
         )
 
     def has_won(self): return self.win_reason is not None
@@ -14169,6 +14208,7 @@ def check_sbas(all_players):
         is_planeswalker_permanent=is_planeswalker_permanent,
         is_battle_permanent=is_battle_permanent,
         emit_replay_event=emit_replay_event,
+        apply_loss_replacement_func=apply_loss_replacement,
     )
 
 

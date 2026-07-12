@@ -645,6 +645,10 @@ E2E_REQUIRED_EFFECT_FIELDS = (
     "mana_activation_tap_support_type",
     "mana_source_support_can_include_source",
     "mana_activation_requires_sacrifice_target",
+    "replace_losing_game_exile_self_life_total_1",
+    "loss_replacement_event",
+    "loss_replacement_destination",
+    "loss_replacement_life_total",
     "sacrifice_mana_source_contextual_only",
     "sacrifice_mana_produced",
     "sacrifice_produces",
@@ -5047,6 +5051,26 @@ def sacrifice_mana_source_execution_scenario_from_expected_rule(rule: dict[str, 
             "toughness": 1,
         }
     return scenario
+
+
+def loss_replacement_execution_scenario_from_expected_rule(rule: dict[str, Any]) -> dict[str, Any] | None:
+    required = dict(rule.get("required_effect_fields") or {})
+    if not required.get("replace_losing_game_exile_self_life_total_1"):
+        return None
+    return {
+        "name": f"{rule['card_name']} replaces a loss by exiling itself",
+        "type": "loss_replacement",
+        "card": {
+            "name": rule["card_name"],
+            "type_line": str(required.get("source_type_line") or "Legendary Artifact"),
+        },
+        "starting_life": 0,
+        "expected_life_after": int(required.get("loss_replacement_life_total") or 1),
+        "expected_destination": str(required.get("loss_replacement_destination") or "exile"),
+        "replacement_event": str(required.get("loss_replacement_event") or "lose_game"),
+        "expected_replaced_loss_reason": "life_zero",
+        "logical_rule_key": rule["logical_rule_key"],
+    }
 
 
 def simple_activated_damage_execution_scenario_from_expected_rule(
@@ -10685,6 +10709,17 @@ def execution_scenario_from_expected_rule(rule: dict[str, Any]) -> dict[str, Any
     )
 
 
+def execution_scenarios_from_expected_rule(rule: dict[str, Any]) -> list[dict[str, Any]]:
+    scenarios = []
+    replacement = loss_replacement_execution_scenario_from_expected_rule(rule)
+    if replacement is not None:
+        scenarios.append(replacement)
+    primary = execution_scenario_from_expected_rule(rule)
+    if primary is not None:
+        scenarios.append(primary)
+    return scenarios
+
+
 def markdown_package(manifest: dict[str, Any]) -> str:
     lines = [
         f"# {manifest['deploy_id']} XMage Batch PostgreSQL Package",
@@ -10773,8 +10808,7 @@ def build_package(
     execution_scenarios = [
         scenario
         for rule in expected_rules
-        for scenario in [execution_scenario_from_expected_rule(rule)]
-        if scenario is not None
+        for scenario in execution_scenarios_from_expected_rule(rule)
     ]
     manifest = {
         "generated_at": utc_now(),

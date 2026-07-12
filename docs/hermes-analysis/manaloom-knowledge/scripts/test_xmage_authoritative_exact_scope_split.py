@@ -21396,8 +21396,13 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertEqual(effect["mana_produced"], 3)
         self.assertEqual(effect["produces"], "WUBRG")
         self.assertTrue(effect["mana_activation_requires_tap"])
-        self.assertTrue(effect["_runtime_partial"])
-        self.assertIn("TheGoldenThroneEffect", effect["xmage_unmodeled_effect_classes"])
+        self.assertNotIn("_runtime_partial", effect)
+        self.assertEqual(effect["xmage_unmodeled_effect_classes"], [])
+        self.assertEqual(effect["xmage_auxiliary_ability_classes"], [])
+        self.assertTrue(effect["replace_losing_game_exile_self_life_total_1"])
+        self.assertEqual(effect["loss_replacement_event"], "lose_game")
+        self.assertEqual(effect["loss_replacement_destination"], "exile")
+        self.assertEqual(effect["loss_replacement_life_total"], 1)
 
     def test_target_sacrifice_mana_source_uses_mana_ability_window(self) -> None:
         row = queue_row(

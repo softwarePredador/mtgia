@@ -7051,6 +7051,83 @@ def test_simple_mana_source_refresh_runner_executes_partial_mana_rule() -> None:
     assert result["tapped"] is True
 
 
+def test_golden_throne_loss_replacement_exiles_source_and_sets_life_to_one() -> None:
+    battle = validator.load_battle(validator.DEFAULT_BATTLE)
+    events = []
+    previous_handler = battle.REPLAY_EVENT_HANDLER
+    battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+    try:
+        player = battle.Player("Golden Controller", None, [])
+        opponent = battle.Player("Opponent", None, [])
+        throne = {
+            "name": "The Golden Throne",
+            "type_line": "Legendary Artifact",
+            "effect": "ramp_permanent",
+            "battle_model_scope": "xmage_target_sacrifice_mana_source_permanent_v1",
+            "replace_losing_game_exile_self_life_total_1": True,
+            "_rule_logical_key": "battle_rule_v1:golden-throne",
+        }
+        player.battlefield = [throne]
+        player.life = 0
+
+        battle.check_sbas_until_stable([player, opponent])
+    finally:
+        battle.REPLAY_EVENT_HANDLER = previous_handler
+
+    assert player.eliminated is False
+    assert player.life == 1
+    assert throne not in player.battlefield
+    assert throne in player.exile
+    assert any(
+        event == "loss_replacement_applied"
+        and data.get("card") == "The Golden Throne"
+        and data.get("life_before") == 0
+        and data.get("life_after") == 1
+        and data.get("destination") == "exile"
+        for event, data in events
+    )
+
+
+def test_loss_replacement_runner_exercises_manifest_scenario() -> None:
+    battle = validator.load_battle(validator.DEFAULT_BATTLE)
+    events = []
+    previous_handler = battle.REPLAY_EVENT_HANDLER
+    previous_get_card_effect = battle.get_card_effect
+    battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+    battle.get_card_effect = lambda card: {
+        "effect": "ramp_permanent",
+        "battle_model_scope": "xmage_target_sacrifice_mana_source_permanent_v1",
+        "replace_losing_game_exile_self_life_total_1": True,
+        "loss_replacement_event": "lose_game",
+        "loss_replacement_destination": "exile",
+        "loss_replacement_life_total": 1,
+    }
+    try:
+        result = validator.run_loss_replacement(
+            battle,
+            {
+                "name": "The Golden Throne replaces a loss by exiling itself",
+                "type": "loss_replacement",
+                "card": {"name": "The Golden Throne", "type_line": "Legendary Artifact"},
+                "starting_life": 0,
+                "expected_life_after": 1,
+                "expected_destination": "exile",
+                "replacement_event": "lose_game",
+                "expected_replaced_loss_reason": "life_zero",
+                "logical_rule_key": "battle_rule_v1:golden-throne",
+            },
+            events,
+        )
+    finally:
+        battle.REPLAY_EVENT_HANDLER = previous_handler
+        battle.get_card_effect = previous_get_card_effect
+
+    assert result["card_name"] == "The Golden Throne"
+    assert result["life_after"] == 1
+    assert result["destination"] == "exile"
+    assert any(event == "loss_replacement_applied" for event, _ in events)
+
+
 def test_creature_enters_tapped_runner_uses_prepare_entering_permanent() -> None:
     battle = validator.load_battle(validator.DEFAULT_BATTLE)
     previous_get_card_effect = battle.get_card_effect

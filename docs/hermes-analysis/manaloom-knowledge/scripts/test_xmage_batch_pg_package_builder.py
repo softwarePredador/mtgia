@@ -2606,6 +2606,41 @@ def test_target_sacrifice_mana_source_execution_scenario_uses_manifest_aliases()
     assert scenario["sacrifice_target"]["type_line"] == "Creature - Fixture"
 
 
+def test_golden_throne_generates_mana_and_loss_replacement_scenarios() -> None:
+    rule = {
+        "card_name": "The Golden Throne",
+        "logical_rule_key": "battle_rule_v1:golden-throne",
+        "required_effect_fields": {
+            "effect": "ramp_permanent",
+            "battle_model_scope": "xmage_target_sacrifice_mana_source_permanent_v1",
+            "is_mana_source": True,
+            "mana_source_contextual_only": True,
+            "activation_requires_sacrifice_target": True,
+            "activation_sacrifice_target": "creature",
+            "mana_produced": 3,
+            "produces": "WUBRG",
+            "activation_requires_tap": True,
+            "replace_losing_game_exile_self_life_total_1": True,
+            "loss_replacement_event": "lose_game",
+            "loss_replacement_destination": "exile",
+            "loss_replacement_life_total": 1,
+        },
+    }
+
+    scenarios = builder.execution_scenarios_from_expected_rule(rule)
+
+    assert [scenario["type"] for scenario in scenarios] == [
+        "loss_replacement",
+        "sacrifice_mana_source_activation",
+    ]
+    assert scenarios[0]["expected_life_after"] == 1
+    assert scenarios[0]["expected_destination"] == "exile"
+    assert scenarios[0]["replacement_event"] == "lose_game"
+    assert scenarios[0]["expected_replaced_loss_reason"] == "life_zero"
+    assert scenarios[1]["expected_event"] == "target_sacrifice_mana_source_activated"
+    assert scenarios[1]["expected_available_mana_after_activation"] == 3
+
+
 def test_manifest_expected_rule_preserves_library_bottom_pick_fields() -> None:
     proposal = {
         "normalized_name": "shimmer of possibility",
@@ -6833,6 +6868,46 @@ def test_manifest_expected_rule_preserves_tap_and_sacrifice_mana_fields() -> Non
         "permanent_type": "artifact",
         "ability_kind": "mana_and_sacrifice_mana",
     }
+
+
+def test_manifest_expected_rule_preserves_loss_replacement_mana_fields() -> None:
+    proposal = {
+        "normalized_name": "the golden throne",
+        "card_name": "The Golden Throne",
+        "oracle_hash": "hash-golden-throne",
+        "logical_rule_key": "battle_rule_v1:hash-golden-throne",
+        "effect_json": {
+            "effect": "ramp_permanent",
+            "battle_model_scope": "xmage_target_sacrifice_mana_source_permanent_v1",
+            "ability_kind": "activated_mana",
+            "is_mana_source": True,
+            "mana_source_contextual_only": True,
+            "mana_activation_requires_sacrifice_target": True,
+            "activation_requires_sacrifice_target": True,
+            "activation_sacrifice_target": "creature",
+            "mana_produced": 3,
+            "produces": "WUBRG",
+            "activation_requires_tap": True,
+            "mana_activation_requires_tap": True,
+            "replace_losing_game_exile_self_life_total_1": True,
+            "loss_replacement_event": "lose_game",
+            "loss_replacement_destination": "exile",
+            "loss_replacement_life_total": 1,
+            "permanent_type": "artifact",
+        },
+    }
+
+    expected = builder.expected_rule_from_proposal(proposal)
+
+    required = expected["required_effect_fields"]
+    assert required["battle_model_scope"] == "xmage_target_sacrifice_mana_source_permanent_v1"
+    assert required["mana_activation_requires_sacrifice_target"] is True
+    assert required["activation_sacrifice_target"] == "creature"
+    assert required["mana_produced"] == 3
+    assert required["replace_losing_game_exile_self_life_total_1"] is True
+    assert required["loss_replacement_event"] == "lose_game"
+    assert required["loss_replacement_destination"] == "exile"
+    assert required["loss_replacement_life_total"] == 1
 
 
 def test_manifest_expected_rule_preserves_dies_mana_fields() -> None:

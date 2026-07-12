@@ -258,6 +258,7 @@ def check_sbas(
     is_planeswalker_permanent,
     is_battle_permanent,
     emit_replay_event,
+    apply_loss_replacement_func=None,
 ):
     """State-based actions after each spell resolution."""
     def remove_eliminated_player_objects(player_obj):
@@ -275,6 +276,12 @@ def check_sbas(
         if getattr(player_obj, "failed_draw_from_empty_library", False) and not player_obj.eliminated:
             if getattr(player_obj, "cannot_lose_this_turn", False):
                 continue
+            if apply_loss_replacement_func and apply_loss_replacement_func(
+                player_obj,
+                reason="draw_from_empty_library",
+            ):
+                player_obj.failed_draw_from_empty_library = False
+                return True
             player_obj.life = 0
             player_obj.eliminated = True
             emit_replay_event(
@@ -287,6 +294,11 @@ def check_sbas(
         if player_obj.life <= 0 and not player_obj.eliminated:
             if getattr(player_obj, "cannot_lose_this_turn", False):
                 continue
+            if apply_loss_replacement_func and apply_loss_replacement_func(
+                player_obj,
+                reason="life_zero",
+            ):
+                return True
             player_obj.eliminated = True
             emit_replay_event(
                 "player_eliminated",
@@ -302,6 +314,13 @@ def check_sbas(
                 if opponent.name == name and not opponent.eliminated:
                     if getattr(opponent, "cannot_lose_this_turn", False):
                         continue
+                    if apply_loss_replacement_func and apply_loss_replacement_func(
+                        opponent,
+                        reason="commander_damage",
+                        commander_damage_key=source_key,
+                        commander_damage=dmg,
+                    ):
+                        return True
                     opponent.life = 0
                     opponent.eliminated = True
                     emit_replay_event(
@@ -318,6 +337,11 @@ def check_sbas(
         if getattr(player_obj, "poison", 0) >= 10 and not player_obj.eliminated:
             if getattr(player_obj, "cannot_lose_this_turn", False):
                 continue
+            if apply_loss_replacement_func and apply_loss_replacement_func(
+                player_obj,
+                reason="poison",
+            ):
+                return True
             player_obj.life = 0
             player_obj.eliminated = True
             emit_replay_event(
