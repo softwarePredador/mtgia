@@ -7275,6 +7275,55 @@ def test_fixed_create_tokens_runner_validates_static_cant_block() -> None:
     assert result["token_cant_block"] is True
 
 
+def test_static_cant_block_creature_runner_preserves_keyword_and_blocks_blocking() -> None:
+    battle = validator.load_battle(validator.DEFAULT_BATTLE)
+    events = []
+    previous_handler = battle.REPLAY_EVENT_HANDLER
+    previous_get_card_effect = battle.get_card_effect
+    battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+    battle.get_card_effect = lambda card: {
+        "effect": "creature",
+        "battle_model_scope": "xmage_static_self_cant_block_creature_v1",
+        "ability_kind": "static",
+        "static_effect": "self_cant_block",
+        "cant_block": True,
+        "cannot_block": True,
+        "static_cant_block": True,
+        "keywords": ["flying"],
+        "_keywords_are_self": True,
+        "flying": True,
+        "_rule_logical_key": "battle_rule_v1:goblin-glider",
+    }
+    try:
+        result = validator.run_static_cant_block_creature(
+            battle,
+            {
+                "name": "Goblin Glider cannot block as a static creature ability",
+                "type": "static_cant_block_creature",
+                "card": {
+                    "name": "Goblin Glider",
+                    "type_line": "Creature",
+                    "power": 2,
+                    "toughness": 2,
+                    "keywords": ["flying"],
+                    "_keywords_are_self": True,
+                },
+                "expected_cant_block": True,
+                "expected_keywords": ["flying"],
+                "logical_rule_key": "battle_rule_v1:goblin-glider",
+            },
+            events,
+        )
+    finally:
+        battle.REPLAY_EVENT_HANDLER = previous_handler
+        battle.get_card_effect = previous_get_card_effect
+
+    assert result["card_name"] == "Goblin Glider"
+    assert result["cant_block"] is True
+    assert "flying" in result["keywords"]
+    assert result["blockers"] == ["E2E Legal Blocker"]
+
+
 def test_fixed_create_tokens_runner_counts_dynamic_support_state() -> None:
     battle = validator.load_battle(validator.DEFAULT_BATTLE)
     cases = [

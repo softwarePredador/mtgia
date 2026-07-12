@@ -1076,10 +1076,18 @@ def source_declared_ability_classes(source: str) -> set[str]:
     we only want abilities actually added to the card/source, because predicate
     ability classes are target constraints, not auxiliary card mechanics.
     """
-    return {
+    declared = {
         match.group(1)
         for match in re.finditer(r"\bnew\s+([A-Za-z][A-Za-z0-9_]*Ability)\b", source or "")
     }
+    declared.update(
+        match.group(1)
+        for match in re.finditer(
+            r"\baddAbility\s*\(\s*([A-Za-z][A-Za-z0-9_]*Ability)\.getInstance\s*\(",
+            source or "",
+        )
+    )
+    return declared
 
 
 def _java_string_literal_text(value: str) -> str:
@@ -13157,10 +13165,17 @@ def is_static_cant_be_blocked_creature_unit(row: dict[str, Any]) -> bool:
 
 
 def is_static_cant_block_creature_unit(row: dict[str, Any]) -> bool:
+    abilities = ability_classes(row)
+    remaining = abilities - {"CantBlockAbility"}
+    expected_unit = (
+        f"xmage_signature::no_effect_class::{','.join(sorted(abilities))}::"
+        "no_target_class::no_condition_class::no_signal"
+    )
     return (
-        str(row.get("adapter_work_unit") or "") == CANT_BLOCK_SOURCE_UNIT
+        str(row.get("adapter_work_unit") or "") in {CANT_BLOCK_SOURCE_UNIT, expected_unit}
         and not effect_classes(row)
-        and ability_classes(row) == {"CantBlockAbility"}
+        and "CantBlockAbility" in abilities
+        and remaining.issubset(STATIC_SELF_KEYWORD_ABILITY_CLASSES)
         and not (row.get("xmage_signals") or [])
     )
 
@@ -14852,7 +14867,7 @@ def source_is_creature_enters_tapped(source: str, unit: str) -> bool:
 
 
 def oracle_is_static_cant_block(metadata: dict[str, Any]) -> bool:
-    text = strip_parenthetical_reminders(str(metadata.get("oracle_text") or ""))
+    text = strip_parenthetical_reminders(oracle_text_after_leading_static_keywords(metadata))
     text = re.sub(r"\s+", " ", text).strip().lower()
     if not text:
         return False
@@ -14867,13 +14882,19 @@ def oracle_is_static_cant_block(metadata: dict[str, Any]) -> bool:
     }
 
 
-def source_is_static_cant_block(source: str) -> bool:
+def source_is_static_cant_block(source: str, row: dict[str, Any] | None = None) -> bool:
     text = source or ""
-    return (
-        "CantBlockAbility" in text
-        and "SimpleActivatedAbility" not in text
-        and "ReturnSourceFromGraveyard" not in text
-    )
+    if (
+        "CantBlockAbility" not in text
+        or "SimpleActivatedAbility" in text
+        or "ReturnSourceFromGraveyard" in text
+    ):
+        return False
+    if row is None:
+        return True
+    expected = ability_classes(row)
+    declared = source_declared_ability_classes(text)
+    return declared == expected
 
 
 def oracle_is_static_basic_landwalk(metadata: dict[str, Any], land_type: str) -> bool:
@@ -32206,8 +32227,9 @@ def split_row(
             return None, "static_cant_block_not_creature"
         if not oracle_is_static_cant_block(metadata):
             return None, "static_cant_block_oracle_not_exact"
-        if not source_is_static_cant_block(source_text):
+        if not source_is_static_cant_block(source_text, row):
             return None, "static_cant_block_source_not_exact"
+        keyword_list = ordered_keywords(keywords_from_ability_classes(row))
         effect_json = {
             "effect": "creature",
             "battle_model_scope": STATIC_CANT_BLOCK_CREATURE_SCOPE,
@@ -32219,7 +32241,13 @@ def split_row(
             "cannot_block": True,
             "static_cant_block": True,
             "xmage_ability_class": "CantBlockAbility",
+            "xmage_ability_classes": sorted(ability_classes(row)),
         }
+        if keyword_list:
+            effect_json["keywords"] = keyword_list
+            effect_json["_keywords_are_self"] = True
+            for keyword in keyword_list:
+                effect_json[keyword] = True
         return build_proposal(
             row,
             metadata,

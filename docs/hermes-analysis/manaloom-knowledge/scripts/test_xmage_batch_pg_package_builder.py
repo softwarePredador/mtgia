@@ -6613,6 +6613,30 @@ def test_creature_etb_create_tokens_execution_scenario_preserves_static_cant_blo
     assert scenario["expected_token"]["cant_block"] is True
 
 
+def test_static_cant_block_creature_execution_scenario_preserves_static_keywords() -> None:
+    rule = {
+        "normalized_name": "goblin glider",
+        "card_name": "Goblin Glider",
+        "logical_rule_key": "battle_rule_v1:goblin-glider",
+        "required_effect_fields": {
+            "effect": "creature",
+            "battle_model_scope": "xmage_static_self_cant_block_creature_v1",
+            "static_cant_block": True,
+            "cant_block": True,
+            "keywords": ["flying"],
+            "_keywords_are_self": True,
+        },
+    }
+
+    scenario = builder.execution_scenario_from_expected_rule(rule)
+
+    assert scenario["type"] == "static_cant_block_creature"
+    assert scenario["card"]["name"] == "Goblin Glider"
+    assert scenario["card"]["keywords"] == ["flying"]
+    assert scenario["expected_cant_block"] is True
+    assert scenario["expected_keywords"] == ["flying"]
+
+
 def test_creature_dies_create_multi_tokens_execution_scenario() -> None:
     rule = {
         "normalized_name": "wurmcoil engine",

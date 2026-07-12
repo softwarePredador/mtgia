@@ -4179,6 +4179,34 @@ def creature_enters_tapped_execution_scenario_from_expected_rule(rule: dict[str,
     }
 
 
+def static_cant_block_creature_execution_scenario_from_expected_rule(rule: dict[str, Any]) -> dict[str, Any] | None:
+    required = dict(rule.get("required_effect_fields") or {})
+    if required.get("effect") != "creature":
+        return None
+    if required.get("battle_model_scope") != "xmage_static_self_cant_block_creature_v1":
+        return None
+    if not required.get("static_cant_block"):
+        return None
+    keywords = list(required.get("keywords") or [])
+    card = {
+        "name": rule["card_name"],
+        "type_line": "Creature",
+        "power": 2,
+        "toughness": 2,
+    }
+    if keywords:
+        card["keywords"] = keywords
+        card["_keywords_are_self"] = True
+    return {
+        "name": f"{rule['card_name']} cannot block as a static creature ability",
+        "type": "static_cant_block_creature",
+        "card": card,
+        "expected_cant_block": True,
+        "expected_keywords": keywords,
+        "logical_rule_key": rule["logical_rule_key"],
+    }
+
+
 def restricted_mana_formidable_life_reset_execution_scenario_from_expected_rule(
     rule: dict[str, Any],
 ) -> dict[str, Any] | None:
@@ -9554,6 +9582,7 @@ def execution_scenario_from_expected_rule(rule: dict[str, Any]) -> dict[str, Any
         or restricted_mana_formidable_life_reset_execution_scenario_from_expected_rule(rule)
         or mana_source_etb_draw_unblocked_control_transfer_execution_scenario_from_expected_rule(rule)
         or creature_enters_tapped_execution_scenario_from_expected_rule(rule)
+        or static_cant_block_creature_execution_scenario_from_expected_rule(rule)
         or spell_mana_ritual_execution_scenario_from_expected_rule(rule)
         or creature_etb_life_gain_draw_execution_scenario_from_expected_rule(rule)
         or simple_mana_source_execution_scenario_from_expected_rule(rule)

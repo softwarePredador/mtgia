@@ -1622,6 +1622,40 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertTrue(effect["static_cant_block"])
         self.assertEqual(effect["static_effect"], "self_cant_block")
 
+    def test_static_cant_block_creature_preserves_leading_static_keyword(self) -> None:
+        row = queue_row(
+            (
+                "xmage_signature::no_effect_class::CantBlockAbility,FlyingAbility::"
+                "no_target_class::no_condition_class::no_signal"
+            ),
+            effect_classes=[],
+            ability_kind="static",
+            ability_classes=["CantBlockAbility", "FlyingAbility"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Goblin Glider",
+                type_line="Creature - Goblin",
+                oracle_text="Flying\nThis creature can't block.",
+            ),
+            source_text="""
+                import mage.abilities.keyword.CantBlockAbility;
+                import mage.abilities.keyword.FlyingAbility;
+                this.addAbility(FlyingAbility.getInstance());
+                this.addAbility(new CantBlockAbility());
+            """,
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.STATIC_CANT_BLOCK_CREATURE_SCOPE)
+        self.assertTrue(effect["cant_block"])
+        self.assertTrue(effect["flying"])
+        self.assertEqual(effect["keywords"], ["flying"])
+        self.assertTrue(effect["_keywords_are_self"])
+        self.assertEqual(effect["xmage_ability_classes"], ["CantBlockAbility", "FlyingAbility"])
+
     def test_static_cant_block_creature_blocks_nonexact_source(self) -> None:
         row = queue_row(
             split.CANT_BLOCK_SOURCE_UNIT,
@@ -4533,7 +4567,7 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertIsNone(proposal)
         self.assertEqual(reason, "static_graveyard_count_pt_oracle_not_exact")
 
-    def test_static_graveyard_count_power_toughness_blocks_battlefield_plus_graveyard_formula(self) -> None:
+    def test_static_graveyard_count_power_toughness_accepts_battlefield_plus_graveyard_formula(self) -> None:
         row = queue_row(
             split.RECURSION_UNIT,
             effect_classes=["SetBasePowerToughnessSourceEffect"],
@@ -4560,8 +4594,21 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
             ),
         )
 
-        self.assertIsNone(proposal)
-        self.assertEqual(reason, "static_graveyard_count_pt_oracle_not_exact")
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.STATIC_COUNT_PT_SCOPE)
+        self.assertEqual(
+            effect["static_power_toughness_source"],
+            "battlefield_plus_graveyard_subtype_count",
+        )
+        self.assertEqual(
+            effect["stat_modifier_amount_source"],
+            "battlefield_plus_graveyard_subtype_count",
+        )
+        self.assertEqual(effect["battlefield_count_scope"], "all_battlefields")
+        self.assertEqual(effect["battlefield_count_subtypes"], ["zombie"])
+        self.assertEqual(effect["graveyard_count_scope"], "all_graveyards")
+        self.assertEqual(effect["graveyard_count_subtypes"], ["zombie"])
 
     def test_static_graveyard_threshold_boost_threshold_is_package_safe(self) -> None:
         row = queue_row(

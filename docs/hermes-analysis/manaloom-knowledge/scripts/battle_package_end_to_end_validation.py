@@ -6199,6 +6199,70 @@ def run_creature_enters_tapped(
     }
 
 
+def run_static_cant_block_creature(
+    battle,
+    scenario: dict[str, Any],
+    events: list[tuple[str, dict[str, Any]]],
+) -> dict[str, Any]:
+    card = dict(scenario["card"])
+    effect = battle.get_card_effect(card)
+    if effect.get("effect") != "creature":
+        fail("battle_execution", f"{card['name']} effect={effect.get('effect')!r}")
+    if effect.get("battle_model_scope") != "xmage_static_self_cant_block_creature_v1":
+        fail("battle_execution", f"{card['name']} scope={effect.get('battle_model_scope')!r}")
+    active = battle.Player(str(scenario.get("attacker_player") or "Static Attacker"), None, [])
+    opponent = battle.Player(str(scenario.get("defender_player") or "Static Defender"), None, [])
+    attacker = dict(
+        scenario.get("attacker")
+        or {
+            "name": "E2E Attacker",
+            "effect": "creature",
+            "type_line": "Creature",
+            "power": 4,
+            "toughness": 4,
+        }
+    )
+    permanent = battle.enrich_card({**card, **effect})
+    legal_blocker = dict(
+        scenario.get("legal_blocker")
+        or {
+            "name": "E2E Legal Blocker",
+            "effect": "creature",
+            "type_line": "Creature",
+            "power": 5,
+            "toughness": 5,
+        }
+    )
+    active.battlefield = [attacker]
+    opponent.battlefield = [permanent, legal_blocker]
+    if bool(battle.creature_cannot_block(permanent)) != bool(scenario.get("expected_cant_block", True)):
+        fail("battle_execution", f"{card['name']} cant_block={permanent.get('cant_block')!r}")
+    for keyword in scenario.get("expected_keywords") or []:
+        if not battle.card_has_keyword(permanent, keyword):
+            fail("battle_execution", f"{card['name']} missing keyword={keyword!r}")
+    opponent.life = int(scenario.get("defender_life") or attacker.get("power") or 4)
+    attacker["attacking"] = True
+    assignments = battle.declare_blockers_step(
+        opponent,
+        [attacker],
+        int(scenario.get("turn") or 3),
+        random.Random(int(scenario.get("block_seed") or 6070)),
+    )
+    blocker_names = _block_assignment_names(assignments)
+    if permanent.get("name") in blocker_names:
+        fail("battle_execution", f"{card['name']} illegally blocked with cant-block creature")
+    expected_blockers = list(scenario.get("expected_blockers") or [legal_blocker.get("name")])
+    if blocker_names != expected_blockers:
+        fail("battle_execution", f"{card['name']} blockers={blocker_names}, expected {expected_blockers}")
+    return {
+        "scenario": scenario.get("name"),
+        "card_name": card["name"],
+        "cant_block": bool(battle.creature_cannot_block(permanent)),
+        "keywords": list(permanent.get("keywords") or []),
+        "blockers": blocker_names,
+    }
+
+
 def run_restricted_mana_formidable_life_reset(
     battle,
     scenario: dict[str, Any],
@@ -14129,6 +14193,7 @@ SCENARIO_RUNNERS = {
     "static_graveyard_threshold_source_boost": run_static_graveyard_threshold_source_boost,
     "static_cost_increase_spell_cost": run_static_cost_increase_spell_cost,
     "static_cost_reduction_spell_cost": run_static_cost_reduction_spell_cost,
+    "static_cant_block_creature": run_static_cant_block_creature,
     "static_filtered_protection": run_static_filtered_protection,
     "static_subtype_protection": run_static_filtered_protection,
     "static_count_power_toughness": run_static_count_power_toughness,
