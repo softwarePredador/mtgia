@@ -46450,12 +46450,19 @@ def _static_pt_card_type_tokens(card):
     return _static_pt_tokens((card or {}).get("type_line"))
 
 
-def _static_graveyard_count_card_matches(card, allowed_types):
+def _static_graveyard_count_card_matches(card, allowed_types, allowed_subtypes=None):
     normalized = {
         str(value).strip().lower()
         for value in (allowed_types or [])
         if str(value).strip()
     }
+    subtypes = {
+        str(value).strip().lower()
+        for value in (allowed_subtypes or [])
+        if str(value).strip()
+    }
+    if subtypes and not _card_subtype_matches(card, subtypes):
+        return False
     if not normalized or "card" in normalized:
         return True
     if "permanent" in normalized and is_permanent_card(card):
@@ -46483,10 +46490,11 @@ def static_graveyard_count_power_toughness_value(permanent, controller, all_play
     else:
         participants = [controller] if controller is not None else []
     allowed_types = permanent.get("graveyard_count_card_types") or ["card"]
+    allowed_subtypes = permanent.get("graveyard_count_subtypes") or []
     count = 0
     for participant in participants:
         for card in getattr(participant, "graveyard", []) or []:
-            if isinstance(card, dict) and _static_graveyard_count_card_matches(card, allowed_types):
+            if isinstance(card, dict) and _static_graveyard_count_card_matches(card, allowed_types, allowed_subtypes):
                 count += 1
     return count
 
@@ -46660,11 +46668,19 @@ def static_graveyard_threshold_boost_count(permanent, controller, all_players=No
         for participant in participants:
             seen_types.update(_graveyard_card_type_set(participant))
         return len(seen_types)
+    if count_mode in {"distinct_mana_values", "mana_value_count"}:
+        seen_values = set()
+        for participant in participants:
+            for card in getattr(participant, "graveyard", []) or []:
+                if isinstance(card, dict):
+                    seen_values.add(card_mana_value(card))
+        return len(seen_values)
     allowed_types = permanent.get("graveyard_count_card_types") or ["card"]
+    allowed_subtypes = permanent.get("graveyard_count_subtypes") or []
     count = 0
     for participant in participants:
         for card in getattr(participant, "graveyard", []) or []:
-            if isinstance(card, dict) and _static_graveyard_count_card_matches(card, allowed_types):
+            if isinstance(card, dict) and _static_graveyard_count_card_matches(card, allowed_types, allowed_subtypes):
                 count += 1
     return count
 
@@ -46691,10 +46707,11 @@ def static_graveyard_count_source_boost_count(permanent, controller, all_players
     else:
         participants = [controller] if controller is not None else []
     allowed_types = permanent.get("graveyard_count_card_types") or ["card"]
+    allowed_subtypes = permanent.get("graveyard_count_subtypes") or []
     count = 0
     for participant in participants:
         for card in getattr(participant, "graveyard", []) or []:
-            if isinstance(card, dict) and _static_graveyard_count_card_matches(card, allowed_types):
+            if isinstance(card, dict) and _static_graveyard_count_card_matches(card, allowed_types, allowed_subtypes):
                 count += 1
     return count
 

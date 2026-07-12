@@ -2187,6 +2187,7 @@ def static_graveyard_threshold_boost_execution_scenario_from_expected_rule(
     count_mode = str(required.get("graveyard_count_mode") or "").strip().lower()
     scope = str(required.get("graveyard_count_scope") or "controller_graveyard").strip().lower()
     card_types = [str(value).lower() for value in required.get("graveyard_count_card_types") or ["card"]]
+    subtypes = [str(value).lower() for value in required.get("graveyard_count_subtypes") or []]
     threshold = int(required.get("graveyard_count_threshold") or 0)
     opponent_graveyard: list[dict[str, Any]] = []
     if count_mode == "distinct_card_types":
@@ -2197,6 +2198,17 @@ def static_graveyard_threshold_boost_execution_scenario_from_expected_rule(
             {"name": "E2E Graveyard Enchantment", "type_line": "Enchantment"},
         ]
         expected_count = 4
+    elif count_mode == "distinct_mana_values":
+        expected_count = max(threshold, 1)
+        controller_graveyard = [
+            {
+                "name": f"E2E Graveyard MV {index}",
+                "type_line": "Instant",
+                "mana_value": index,
+                "cmc": index,
+            }
+            for index in range(1, expected_count + 1)
+        ]
     elif "permanent" in card_types:
         controller_graveyard = [
             {"name": "E2E Graveyard Creature", "type_line": "Creature"},
@@ -2205,6 +2217,13 @@ def static_graveyard_threshold_boost_execution_scenario_from_expected_rule(
             {"name": "E2E Graveyard Enchantment", "type_line": "Enchantment"},
         ]
         expected_count = len(controller_graveyard)
+    elif subtypes:
+        expected_count = max(threshold, 1)
+        subtype = subtypes[0].title()
+        controller_graveyard = [
+            {"name": f"E2E Graveyard {subtype} {index}", "type_line": f"Sorcery - {subtype}"}
+            for index in range(1, expected_count + 1)
+        ]
     elif card_types and "card" not in card_types:
         expected_count = max(threshold, 1)
         type_word = card_types[0]

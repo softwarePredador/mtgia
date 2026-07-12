@@ -2919,6 +2919,108 @@ class XMageExactScopeRuntimeTest(unittest.TestCase):
             )
         )
 
+    def test_static_graveyard_threshold_source_boost_counts_lesson_subtype_only(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        active.graveyard = [{"name": "Instant A", "type_line": "Instant"}]
+        flyer = {
+            "name": "First-Time Flyer",
+            "type_line": "Creature - Human Pilot Ally",
+            "effect": "creature",
+            "power": 1,
+            "toughness": 2,
+            "battle_model_scope": "xmage_static_source_boost_if_graveyard_threshold_v1",
+            "static_effect": "source_power_toughness_boost_if_graveyard_count",
+            "graveyard_count_scope": "controller_graveyard",
+            "graveyard_count_card_types": ["card"],
+            "graveyard_count_subtypes": ["lesson"],
+            "graveyard_count_threshold": 1,
+            "static_power_bonus": 1,
+            "static_toughness_bonus": 1,
+        }
+        active.battlefield = [flyer]
+
+        self.battle.refresh_graveyard_count_creature_statics_for_player(active, turn=2, phase="test")
+        self.assertFalse(flyer["_static_graveyard_threshold_active"])
+        self.assertEqual(flyer["static_graveyard_threshold_count_current"], 0)
+        self.assertEqual(flyer["power"], 1)
+        self.assertEqual(flyer["toughness"], 2)
+
+        active.graveyard.append({"name": "Introduction to Prophecy", "type_line": "Sorcery - Lesson"})
+        self.battle.refresh_graveyard_count_creature_statics_for_player(
+            active,
+            turn=3,
+            phase="test",
+            emit_events=True,
+        )
+
+        self.assertTrue(flyer["_static_graveyard_threshold_active"])
+        self.assertEqual(flyer["static_graveyard_threshold_count_current"], 1)
+        self.assertEqual(flyer["power"], 2)
+        self.assertEqual(flyer["toughness"], 3)
+        self.assertTrue(
+            any(
+                event == "static_graveyard_threshold_source_boost_changed"
+                and data.get("card") == "First-Time Flyer"
+                and data.get("graveyard_count") == 1
+                and data.get("active") is True
+                for event, data in self.events
+            )
+        )
+
+    def test_static_graveyard_threshold_source_boost_counts_distinct_mana_values(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        active.graveyard = [
+            {"name": "MV One", "type_line": "Instant", "mana_value": 1, "cmc": 1},
+            {"name": "MV Two", "type_line": "Sorcery", "mana_value": 2, "cmc": 2},
+            {"name": "MV Three", "type_line": "Creature", "mana_value": 3, "cmc": 3},
+            {"name": "MV Four", "type_line": "Artifact", "mana_value": 4, "cmc": 4},
+            {"name": "Duplicate MV Four", "type_line": "Enchantment", "mana_value": 4, "cmc": 4},
+        ]
+        infiltrator = {
+            "name": "Syndicate Infiltrator",
+            "type_line": "Creature - Vampire Wizard",
+            "effect": "creature",
+            "power": 3,
+            "toughness": 3,
+            "battle_model_scope": "xmage_static_source_boost_if_graveyard_threshold_v1",
+            "static_effect": "source_power_toughness_boost_if_graveyard_count",
+            "graveyard_count_scope": "controller_graveyard",
+            "graveyard_count_card_types": ["card"],
+            "graveyard_count_mode": "distinct_mana_values",
+            "graveyard_count_threshold": 5,
+            "static_power_bonus": 2,
+            "static_toughness_bonus": 2,
+        }
+        active.battlefield = [infiltrator]
+
+        self.battle.refresh_graveyard_count_creature_statics_for_player(active, turn=2, phase="test")
+        self.assertFalse(infiltrator["_static_graveyard_threshold_active"])
+        self.assertEqual(infiltrator["static_graveyard_threshold_count_current"], 4)
+        self.assertEqual(infiltrator["power"], 3)
+        self.assertEqual(infiltrator["toughness"], 3)
+
+        active.graveyard.append({"name": "MV Five", "type_line": "Land", "mana_value": 5, "cmc": 5})
+        self.battle.refresh_graveyard_count_creature_statics_for_player(
+            active,
+            turn=3,
+            phase="test",
+            emit_events=True,
+        )
+
+        self.assertTrue(infiltrator["_static_graveyard_threshold_active"])
+        self.assertEqual(infiltrator["static_graveyard_threshold_count_current"], 5)
+        self.assertEqual(infiltrator["power"], 5)
+        self.assertEqual(infiltrator["toughness"], 5)
+        self.assertTrue(
+            any(
+                event == "static_graveyard_threshold_source_boost_changed"
+                and data.get("card") == "Syndicate Infiltrator"
+                and data.get("graveyard_count") == 5
+                and data.get("active") is True
+                for event, data in self.events
+            )
+        )
+
     def test_static_graveyard_threshold_source_boost_counts_opponents_graveyards(self) -> None:
         active = self.battle.Player("Active", None, [])
         opponent = self.battle.Player("Opponent", None, [])

@@ -908,6 +908,66 @@ def test_static_graveyard_threshold_typed_controller_graveyard_execution_scenari
     assert scenario["expected_toughness"] == 4
 
 
+def test_static_graveyard_threshold_lesson_subtype_execution_scenario_is_manifested() -> None:
+    proposal = {
+        "normalized_name": "first-time flyer",
+        "card_name": "First-Time Flyer",
+        "oracle_hash": "hash-flyer",
+        "logical_rule_key": "battle_rule_v1:first-time-flyer",
+        "effect_json": {
+            "effect": "creature",
+            "battle_model_scope": "xmage_static_source_boost_if_graveyard_threshold_v1",
+            "static_effect": "source_power_toughness_boost_if_graveyard_count",
+            "graveyard_count_scope": "controller_graveyard",
+            "graveyard_count_card_types": ["card"],
+            "graveyard_count_subtypes": ["lesson"],
+            "graveyard_count_threshold": 1,
+            "static_power_bonus": 1,
+            "static_toughness_bonus": 1,
+        },
+    }
+
+    expected = builder.expected_rule_from_proposal(proposal)
+    scenario = builder.execution_scenario_from_expected_rule(expected)
+
+    assert scenario["type"] == "static_graveyard_threshold_source_boost"
+    assert scenario["controller_graveyard"] == [
+        {"name": "E2E Graveyard Lesson 1", "type_line": "Sorcery - Lesson"}
+    ]
+    assert scenario["expected_count"] == 1
+    assert scenario["expected_power"] == 2
+    assert scenario["expected_toughness"] == 2
+
+
+def test_static_graveyard_threshold_distinct_mana_values_execution_scenario_is_manifested() -> None:
+    proposal = {
+        "normalized_name": "syndicate infiltrator",
+        "card_name": "Syndicate Infiltrator",
+        "oracle_hash": "hash-syndicate",
+        "logical_rule_key": "battle_rule_v1:syndicate-infiltrator",
+        "effect_json": {
+            "effect": "creature",
+            "battle_model_scope": "xmage_static_source_boost_if_graveyard_threshold_v1",
+            "static_effect": "source_power_toughness_boost_if_graveyard_count",
+            "graveyard_count_scope": "controller_graveyard",
+            "graveyard_count_card_types": ["card"],
+            "graveyard_count_mode": "distinct_mana_values",
+            "graveyard_count_threshold": 5,
+            "static_power_bonus": 2,
+            "static_toughness_bonus": 2,
+        },
+    }
+
+    expected = builder.expected_rule_from_proposal(proposal)
+    scenario = builder.execution_scenario_from_expected_rule(expected)
+
+    assert scenario["type"] == "static_graveyard_threshold_source_boost"
+    assert [card["mana_value"] for card in scenario["controller_graveyard"]] == [1, 2, 3, 4, 5]
+    assert scenario["expected_count"] == 5
+    assert scenario["expected_power"] == 3
+    assert scenario["expected_toughness"] == 3
+
+
 def test_creature_etb_draw_discard_execution_scenario_is_manifested() -> None:
     proposal = {
         "normalized_name": "bazaar trademage",

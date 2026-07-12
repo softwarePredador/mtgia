@@ -4790,6 +4790,83 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertEqual(effect["static_toughness_bonus"], 3)
         self.assertIn("trample", effect["keywords"])
 
+    def test_static_graveyard_threshold_boost_controller_lesson_subtype_is_package_safe(self) -> None:
+        row = queue_row(
+            split.RECURSION_UNIT,
+            effect_classes=["BoostSourceEffect", "ConditionalContinuousEffect"],
+            ability_kind="static",
+            ability_classes=["FlyingAbility", "SimpleStaticAbility"],
+            xmage_signals=["condition", "static_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="First-Time Flyer",
+                type_line="Creature - Human Pilot Ally",
+                oracle_text=(
+                    "Flying\n"
+                    "This creature gets +1/+1 as long as there's a Lesson card in your graveyard."
+                ),
+            ),
+            source_text=(
+                "this.addAbility(FlyingAbility.getInstance());"
+                "this.addAbility(new SimpleStaticAbility(new ConditionalContinuousEffect("
+                "new BoostSourceEffect(1, 1, Duration.WhileOnBattlefield), "
+                "LessonsInGraveCondition.ONE, "
+                "\"{this} gets +1/+1 as long as there's a Lesson card in your graveyard\")));"
+            ),
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.STATIC_GRAVEYARD_THRESHOLD_BOOST_SCOPE)
+        self.assertEqual(effect["graveyard_count_scope"], "controller_graveyard")
+        self.assertEqual(effect["graveyard_count_card_types"], ["card"])
+        self.assertEqual(effect["graveyard_count_subtypes"], ["lesson"])
+        self.assertEqual(effect["graveyard_count_threshold"], 1)
+        self.assertEqual(effect["static_power_bonus"], 1)
+        self.assertEqual(effect["static_toughness_bonus"], 1)
+        self.assertIn("flying", effect["keywords"])
+
+    def test_static_graveyard_threshold_boost_distinct_mana_values_is_package_safe(self) -> None:
+        row = queue_row(
+            split.RECURSION_UNIT,
+            effect_classes=["BoostSourceEffect", "ConditionalContinuousEffect"],
+            ability_kind="static",
+            ability_classes=["FlyingAbility", "SimpleStaticAbility"],
+            xmage_signals=["condition", "static_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Syndicate Infiltrator",
+                type_line="Creature - Vampire Wizard",
+                oracle_text=(
+                    "Flying\n"
+                    "As long as there are five or more mana values among cards in your graveyard, "
+                    "Syndicate Infiltrator gets +2/+2."
+                ),
+            ),
+            source_text=(
+                "this.addAbility(FlyingAbility.getInstance());"
+                "this.addAbility(new SimpleStaticAbility(new ConditionalContinuousEffect("
+                "new BoostSourceEffect(2, 2, Duration.WhileOnBattlefield), "
+                "DifferentManaValuesInGraveCondition.FIVE, "
+                "\"as long as there are five or more mana values among cards in your graveyard, {this} gets +2/+2\")));"
+            ),
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.STATIC_GRAVEYARD_THRESHOLD_BOOST_SCOPE)
+        self.assertEqual(effect["graveyard_count_scope"], "controller_graveyard")
+        self.assertEqual(effect["graveyard_count_card_types"], ["card"])
+        self.assertEqual(effect["graveyard_count_mode"], "distinct_mana_values")
+        self.assertEqual(effect["graveyard_count_threshold"], 5)
+        self.assertEqual(effect["static_power_bonus"], 2)
+        self.assertEqual(effect["static_toughness_bonus"], 2)
+        self.assertIn("flying", effect["keywords"])
+
     def test_static_graveyard_count_boost_controller_creatures_is_package_safe(self) -> None:
         row = queue_row(
             split.RECURSION_UNIT,

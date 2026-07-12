@@ -11921,6 +11921,44 @@ def static_graveyard_threshold_boost_from_oracle(metadata: dict[str, Any]) -> di
             "static_power_bonus": power_bonus,
             "static_toughness_bonus": toughness_bonus,
         }
+    lesson_match = re.match(
+        r"^(?:this creature|[a-z0-9' ,./-]+) gets (?P<power>[+-]\d+)/(?P<toughness>[+-]\d+) "
+        r"as long as there(?: is|'s) an? lesson card in your graveyard\.?$",
+        text,
+    )
+    if lesson_match:
+        power_bonus = signed_int_from_oracle(lesson_match.group("power"))
+        toughness_bonus = signed_int_from_oracle(lesson_match.group("toughness"))
+        if power_bonus is None or toughness_bonus is None:
+            return None
+        return {
+            "graveyard_count_scope": "controller_graveyard",
+            "graveyard_count_card_types": ["card"],
+            "graveyard_count_subtypes": ["lesson"],
+            "graveyard_count_threshold": 1,
+            "static_power_bonus": power_bonus,
+            "static_toughness_bonus": toughness_bonus,
+        }
+    mana_value_match = re.match(
+        r"^as long as there are (?P<threshold>\d+|one|two|three|four|five|six|seven|eight|nine|ten) "
+        r"or more mana values among cards in your graveyard, "
+        r"(?:this creature|[a-z0-9' ,./-]+) gets (?P<power>[+-]\d+)/(?P<toughness>[+-]\d+)\.?$",
+        text,
+    )
+    if mana_value_match:
+        threshold = static_graveyard_threshold_int(mana_value_match.group("threshold"))
+        power_bonus = signed_int_from_oracle(mana_value_match.group("power"))
+        toughness_bonus = signed_int_from_oracle(mana_value_match.group("toughness"))
+        if threshold is None or power_bonus is None or toughness_bonus is None:
+            return None
+        return {
+            "graveyard_count_scope": "controller_graveyard",
+            "graveyard_count_card_types": ["card"],
+            "graveyard_count_mode": "distinct_mana_values",
+            "graveyard_count_threshold": threshold,
+            "static_power_bonus": power_bonus,
+            "static_toughness_bonus": toughness_bonus,
+        }
     match = re.match(
         r"^this creature gets (?P<power>[+-]\d+)/(?P<toughness>[+-]\d+) as long as "
         r"(?:there are (?P<threshold_a>\d+|one|two|three|four|five|six|seven|eight|nine|ten) "
@@ -11982,6 +12020,16 @@ def static_graveyard_threshold_boost_from_source(source: str) -> dict[str, Any] 
         threshold = 1
         card_types = ["land"]
         scope = "controller_graveyard"
+    elif "LessonsInGraveCondition.ONE" in text:
+        threshold = 1
+        card_types = ["card"]
+        subtypes = ["lesson"]
+        scope = "controller_graveyard"
+    elif "DifferentManaValuesInGraveCondition.FIVE" in text:
+        threshold = 5
+        card_types = ["card"]
+        count_mode = "distinct_mana_values"
+        scope = "controller_graveyard"
     elif "LessonsInGraveCondition" in text or "DifferentManaValuesInGraveCondition" in text:
         return "static_graveyard_threshold_boost_source_condition_not_supported"
     else:
@@ -11989,6 +12037,7 @@ def static_graveyard_threshold_boost_from_source(source: str) -> dict[str, Any] 
     return {
         "graveyard_count_scope": scope,
         "graveyard_count_card_types": card_types,
+        **({"graveyard_count_subtypes": subtypes} if "subtypes" in locals() else {}),
         **({"graveyard_count_mode": count_mode} if "count_mode" in locals() else {}),
         "graveyard_count_threshold": threshold,
         "static_power_bonus": int(boost_match.group(1)),
