@@ -578,6 +578,7 @@ E2E_REQUIRED_EFFECT_FIELDS = (
     "mana_produced_from_controller_graveyard_creatures",
     "mana_spent_cast_trigger",
     "mana_activation_cast_trigger",
+    "chosen_color_mana",
     "conditional_mana_modes",
     "conditional_mana_modes_status",
     "conditionally_produces_controller_land_colors",

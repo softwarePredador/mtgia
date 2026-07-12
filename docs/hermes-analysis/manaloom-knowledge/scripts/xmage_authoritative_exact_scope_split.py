@@ -27376,6 +27376,23 @@ def _brace_mana_symbols(text: str) -> list[str]:
 
 def mana_detail_from_add_phrase(mana_phrase: str) -> dict[str, Any] | None:
     normalized = re.sub(r"\s+", " ", str(mana_phrase or "").strip().lower()).strip(".")
+    if normalized == "one mana of the chosen color":
+        return {
+            "produces": "WUBRG",
+            "mana_produced": 1,
+            "chosen_color_mana": True,
+            "conditional_mana_same_color_choice": True,
+            "conditional_mana_modes_status": "runtime_executor_v1",
+            "conditional_mana_modes": [
+                {
+                    "color": symbol,
+                    "restriction": "any_spell",
+                    "mode": "chosen_color_mana",
+                    "status": "runtime_executor_v1",
+                }
+                for symbol in "WUBRG"
+            ],
+        }
     any_color_amounts = {
         "one mana of any color": 1,
         "one mana of any one color": 1,
@@ -27661,6 +27678,20 @@ def simple_mana_source_detail_from_line(text: str) -> dict[str, Any] | None:
             detail["activation_limit_per_turn"] = activation_limit_per_turn
         return detail
     return None
+
+
+def is_choose_color_mana_oracle_line(text: str) -> bool:
+    normalized = strip_parenthetical_reminders(
+        re.sub(r"\s+", " ", str(text or "").strip().lower())
+    ).strip().rstrip(".")
+    if "choose a color" not in normalized:
+        return False
+    return bool(
+        re.fullmatch(
+            r"as (?:this|this artifact|this permanent|.+?) enters(?: the battlefield)?, choose a color",
+            normalized,
+        )
+    )
 
 
 MANA_SPEND_RESTRICTION_ALIASES = {
@@ -29277,9 +29308,12 @@ def simple_mana_source_detail_from_oracle(metadata: dict[str, Any]) -> dict[str,
     lines = normalized_oracle_lines(metadata)
     if len(lines) <= 1:
         detail = simple_mana_source_detail_from_line(text)
+        if detail is not None and detail.get("chosen_color_mana"):
+            return None
         if detail is not None:
             return detail
 
+    has_choose_color_line = any(is_choose_color_mana_oracle_line(line) for line in lines)
     candidates = []
     for line in lines:
         line_detail = simple_mana_source_detail_from_line(line)
@@ -29289,7 +29323,10 @@ def simple_mana_source_detail_from_oracle(metadata: dict[str, Any]) -> dict[str,
         if "add " in line and ("{t}" in line or "mana" in line):
             return None
     if len(candidates) == 1:
-        return candidates[0]
+        detail = candidates[0]
+        if detail.get("chosen_color_mana") and not has_choose_color_line:
+            return None
+        return detail
     return None
 
 
@@ -29639,6 +29676,10 @@ def add_mana_source_activation_detail_fields(
         "mana_activation_tap_support_type",
         "mana_source_requires_untapped_creature",
         "mana_source_requires_untapped_artifact_or_creature",
+        "chosen_color_mana",
+        "conditional_mana_same_color_choice",
+        "conditional_mana_modes_status",
+        "conditional_mana_modes",
     ):
         value = mana_source_detail.get(key)
         if value not in (None, "", 0, False):
@@ -29761,6 +29802,21 @@ def simple_mana_source_source_blocker(
     elif expected_life_cost:
         return "mana_source_source_pay_life_cost_missing"
     if mana_source_detail is not None:
+        chosen_color_mana = bool(mana_source_detail.get("chosen_color_mana"))
+        if "AddManaChosenColorEffect" in text and not chosen_color_mana:
+            return "mana_source_chosen_color_source_oracle_mismatch"
+        if chosen_color_mana:
+            if "SimpleManaAbility" not in ability_class_values:
+                return "mana_source_chosen_color_simple_mana_ability_missing"
+            if "AddManaChosenColorEffect" not in text:
+                return "mana_source_chosen_color_effect_missing"
+            if "ChooseColorEffect" not in text:
+                return "mana_source_chosen_color_choice_effect_missing"
+            if not (
+                {"EntersBattlefieldAbility", "AsEntersBattlefieldAbility"}
+                & ability_class_values
+            ):
+                return "mana_source_chosen_color_etb_choice_missing"
         support_blocker = mana_source_support_cost_source_blocker(
             text,
             mana_source_detail,
@@ -46136,7 +46192,21 @@ def split_row(
                 effect_json,
                 family_id=family_id,
             ), "selected_exact_scope"
-        unsupported_auxiliary_abilities = auxiliary_abilities - SAFE_MANA_AUXILIARY_ABILITY_CLASSES
+        mana_source_detail_for_auxiliary = simple_mana_source_detail_from_oracle(metadata)
+        chosen_color_auxiliary_abilities = (
+            {"EntersBattlefieldAbility", "AsEntersBattlefieldAbility"}
+            if (
+                mana_source_detail_for_auxiliary is not None
+                and mana_source_detail_for_auxiliary.get("chosen_color_mana")
+                and {"AddManaChosenColorEffect", "ChooseColorEffect"} <= classes
+            )
+            else set()
+        )
+        unsupported_auxiliary_abilities = (
+            auxiliary_abilities
+            - SAFE_MANA_AUXILIARY_ABILITY_CLASSES
+            - chosen_color_auxiliary_abilities
+        )
         if unsupported_auxiliary_abilities:
             mana_source_detail = simple_mana_source_detail_from_oracle(metadata)
             if mana_source_detail is None:
@@ -46161,10 +46231,15 @@ def split_row(
                 else "permanent"
             )
             mana_requires_tap = bool(mana_source_detail.get("mana_activation_requires_tap", True))
+            modeled_simple_mana_effect_classes = {"BasicManaEffect", "AddManaOfAnyColorEffect"}
+            if mana_source_detail.get("chosen_color_mana"):
+                modeled_simple_mana_effect_classes.update(
+                    {"AddManaChosenColorEffect", "ChooseColorEffect"}
+                )
             non_mana_effect_classes = sorted(
                 cls
                 for cls in classes
-                if cls not in {"BasicManaEffect", "AddManaOfAnyColorEffect"}
+                if cls not in modeled_simple_mana_effect_classes
             )
             static_info_texts = static_info_only_mana_auxiliary_texts(
                 source_text,
@@ -46253,14 +46328,21 @@ def split_row(
                 effect_json,
                 family_id="xmage_simple_mana_source_with_unmodeled_auxiliary",
             ), "selected_exact_scope"
-        if classes - {"BasicManaEffect", "AddManaOfAnyColorEffect"}:
-            return None, "mana_source_effect_class_not_simple"
         mana_source_detail = simple_mana_source_detail_from_oracle(metadata)
         if mana_source_detail is None:
             source_blocker = simple_mana_source_source_blocker(source_text, mana_ability_classes)
             if source_blocker:
                 return None, source_blocker
             return None, "mana_source_oracle_not_simple"
+        simple_mana_effect_classes = {"BasicManaEffect", "AddManaOfAnyColorEffect"}
+        if mana_source_detail.get("chosen_color_mana"):
+            simple_mana_effect_classes.update({"AddManaChosenColorEffect", "ChooseColorEffect"})
+        if classes - simple_mana_effect_classes:
+            return None, "mana_source_effect_class_not_simple"
+        if mana_source_detail.get("chosen_color_mana") and not (
+            {"AddManaChosenColorEffect", "ChooseColorEffect"} <= classes
+        ):
+            return None, "mana_source_chosen_color_effect_class_missing"
         source_blocker = simple_mana_source_source_blocker(
             source_text,
             mana_ability_classes,
@@ -46280,9 +46362,18 @@ def split_row(
             "activation_requires_tap": mana_requires_tap,
             "mana_activation_requires_tap": mana_requires_tap,
             "permanent_type": permanent_type,
-            "xmage_mana_ability_classes": sorted(mana_ability_classes),
+            "xmage_mana_ability_classes": sorted(
+                (mana_ability_classes & SAFE_MANA_ABILITY_CLASSES)
+                if mana_source_detail.get("chosen_color_mana")
+                else mana_ability_classes
+            ),
             "xmage_effect_classes": sorted(classes),
         }
+        if mana_source_detail.get("chosen_color_mana"):
+            effect_json["xmage_ability_classes"] = sorted(mana_ability_classes)
+            effect_json["xmage_auxiliary_ability_classes"] = sorted(
+                mana_ability_classes - (mana_ability_classes & SAFE_MANA_ABILITY_CLASSES)
+            )
         static_keywords = sorted(
             {
                 STATIC_SELF_KEYWORD_ABILITY_CLASSES[ability]

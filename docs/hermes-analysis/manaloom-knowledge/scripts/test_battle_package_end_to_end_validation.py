@@ -8478,6 +8478,65 @@ def test_simple_mana_source_runner_validates_dynamic_any_one_color_mana() -> Non
     assert result["conditional_mana"] == 3
 
 
+def test_simple_mana_source_runner_allows_enter_tapped_chosen_color_modes() -> None:
+    battle = validator.load_battle(validator.DEFAULT_BATTLE)
+    events = []
+    previous_handler = battle.REPLAY_EVENT_HANDLER
+    previous_get_card_effect = battle.get_card_effect
+    battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+    battle.get_card_effect = lambda card: {
+        "effect": "ramp_permanent",
+        "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+        "is_mana_source": True,
+        "mana_produced": 1,
+        "produces": "WUBRG",
+        "chosen_color_mana": True,
+        "conditional_mana_same_color_choice": True,
+        "conditional_mana_modes_status": "runtime_executor_v1",
+        "conditional_mana_modes": [
+            {
+                "color": symbol,
+                "restriction": "any_spell",
+                "mode": "chosen_color_mana",
+                "status": "runtime_executor_v1",
+            }
+            for symbol in "WUBRG"
+        ],
+        "mana_activation_requires_tap": True,
+        "activation_requires_tap": True,
+        "_rule_logical_key": "battle_rule_v1:coldsteel-heart",
+    }
+    try:
+        result = validator.run_simple_mana_source_refresh(
+            battle,
+            {
+                "name": "Coldsteel Heart refreshes modeled chosen-color mana source",
+                "type": "simple_mana_source_refresh",
+                "card": {
+                    "name": "Coldsteel Heart",
+                    "type_line": "Snow Artifact",
+                    "mana_cost": "{2}",
+                },
+                "source_overrides": {"tapped": True},
+                "expected_available_mana_after_refresh": 0,
+                "expected_conditional_mana": 0,
+                "expected_conditional_restrictions": ["any_spell"],
+                "expected_conditional_colors": ["black", "blue", "green", "red", "white"],
+                "expected_tapped": True,
+                "expected_sources": 0,
+                "logical_rule_key": "battle_rule_v1:coldsteel-heart",
+            },
+            events,
+        )
+    finally:
+        battle.REPLAY_EVENT_HANDLER = previous_handler
+        battle.get_card_effect = previous_get_card_effect
+
+    assert result["card_name"] == "Coldsteel Heart"
+    assert result["available_mana"] == 0
+    assert result["conditional_mana"] == 0
+
+
 def test_simple_mana_source_runner_validates_controlled_creature_condition_conditional_mana() -> None:
     battle = validator.load_battle(validator.DEFAULT_BATTLE)
     events = []

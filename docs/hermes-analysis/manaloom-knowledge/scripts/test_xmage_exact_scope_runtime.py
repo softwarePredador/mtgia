@@ -14967,6 +14967,48 @@ class XMageExactScopeRuntimeTest(unittest.TestCase):
             )
         )
 
+    def test_chosen_color_mana_source_refreshes_as_conditional_choice(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        heart = self.battle.enrich_card(
+            {
+                "name": "Coldsteel Heart",
+                "type_line": "Snow Artifact",
+                "effect": "ramp_permanent",
+                "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+                "is_mana_source": True,
+                "mana_produced": 1,
+                "produces": "WUBRG",
+                "chosen_color_mana": True,
+                "conditional_mana_same_color_choice": True,
+                "conditional_mana_modes_status": "runtime_executor_v1",
+                "conditional_mana_modes": [
+                    {
+                        "color": symbol,
+                        "restriction": "any_spell",
+                        "mode": "chosen_color_mana",
+                        "status": "runtime_executor_v1",
+                    }
+                    for symbol in "WUBRG"
+                ],
+                "activation_requires_tap": True,
+                "mana_activation_requires_tap": True,
+                "permanent_type": "artifact",
+            }
+        )
+        active.battlefield = [heart]
+
+        active.refresh_mana_sources(turn=7)
+
+        self.assertEqual(active.mana_pool.total(), 0)
+        self.assertEqual(active.available_mana(), 1)
+        self.assertEqual(len(active.conditional_mana_sources), 1)
+        self.assertTrue(active.conditional_mana_sources[0]["same_color_choice"])
+        self.assertEqual(
+            [mode["color"] for mode in active.conditional_mana_sources[0]["modes"]],
+            ["white", "blue", "black", "red", "green"],
+        )
+        self.assertTrue(heart["tapped"])
+
     def test_mana_source_taps_required_untapped_creature_support(self) -> None:
         active = self.battle.Player("Active", None, [])
         source = self.battle.enrich_card(

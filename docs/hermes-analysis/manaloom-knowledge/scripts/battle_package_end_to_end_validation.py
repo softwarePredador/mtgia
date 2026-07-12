@@ -6081,7 +6081,7 @@ def run_simple_mana_source_refresh(
         for value in (scenario.get("expected_conditional_restrictions") or [])
         if str(value)
     )
-    if expected_restrictions:
+    if expected_restrictions and expected_conditional > 0:
         actual_restrictions = sorted(
             {
                 str(mode.get("restriction") or "")
@@ -6102,7 +6102,7 @@ def run_simple_mana_source_refresh(
         for value in (scenario.get("expected_conditional_colors") or [])
         if str(value)
     )
-    if expected_conditional_colors:
+    if expected_conditional_colors and expected_conditional > 0:
         actual_conditional_colors = sorted(
             {
                 str(mode.get("color") or "")

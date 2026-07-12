@@ -2004,6 +2004,49 @@ def test_simple_mana_source_execution_scenario_tracks_two_color_choices_as_condi
     assert scenario["expected_tapped"] is True
 
 
+def test_chosen_color_mana_source_manifest_preserves_same_color_choice() -> None:
+    proposal = {
+        "normalized_name": "coldsteel heart",
+        "card_name": "Coldsteel Heart",
+        "oracle_hash": "hash-coldsteel-heart",
+        "logical_rule_key": "battle_rule_v1:coldsteel-heart",
+        "effect_json": {
+            "effect": "ramp_permanent",
+            "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+            "is_mana_source": True,
+            "mana_produced": 1,
+            "produces": "WUBRG",
+            "mana_activation_requires_tap": True,
+            "activation_requires_tap": True,
+            "chosen_color_mana": True,
+            "conditional_mana_same_color_choice": True,
+            "conditional_mana_modes_status": "runtime_executor_v1",
+            "conditional_mana_modes": [
+                {
+                    "color": symbol,
+                    "restriction": "any_spell",
+                    "mode": "chosen_color_mana",
+                    "status": "runtime_executor_v1",
+                }
+                for symbol in "WUBRG"
+            ],
+            "permanent_type": "artifact",
+        },
+    }
+
+    expected = builder.expected_rule_from_proposal(proposal)
+    required = expected["required_effect_fields"]
+
+    assert required["chosen_color_mana"] is True
+    assert required["conditional_mana_same_color_choice"] is True
+
+    scenario = builder.execution_scenario_from_expected_rule(expected)
+
+    assert scenario["type"] == "simple_mana_source_refresh"
+    assert scenario["expected_available_mana_after_refresh"] == 1
+    assert scenario["expected_conditional_mana"] == 1
+
+
 def test_self_sacrifice_mana_source_execution_scenario_unlocks_spell() -> None:
     rule = {
         "card_name": "Chromatic Sphere",

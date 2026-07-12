@@ -19222,6 +19222,116 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertEqual(effect["produces"], "B")
         self.assertTrue(effect["enters_tapped"])
 
+    def test_chosen_color_mana_rock_maps_coldsteel_heart(self) -> None:
+        row = queue_row(
+            split.RAMP_ARTIFACT_UNIT,
+            effect_classes=["AddManaChosenColorEffect", "ChooseColorEffect"],
+            ability_kind="activated",
+            ability_classes=[
+                "EntersBattlefieldAbility",
+                "EntersBattlefieldTappedAbility",
+                "SimpleManaAbility",
+            ],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Coldsteel Heart",
+                type_line="Snow Artifact",
+                oracle_text=(
+                    "This artifact enters tapped.\n"
+                    "As this artifact enters, choose a color.\n"
+                    "{T}: Add one mana of the chosen color."
+                ),
+            ),
+            source_text=(
+                "this.addAbility(new EntersBattlefieldTappedAbility());"
+                "this.addAbility(new EntersBattlefieldAbility("
+                "new ChooseColorEffect(Outcome.Neutral), null, "
+                "\"As {this} enters, choose a color.\", null));"
+                "this.addAbility(new SimpleManaAbility(Zone.BATTLEFIELD, "
+                "new AddManaChosenColorEffect(), new TapSourceCost()));"
+            ),
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        self.assertEqual(proposal["family_id"], "xmage_simple_mana_source_permanent")
+        self.assertTrue(proposal["safe_for_batch_pg_package"])
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.MANA_SCOPE)
+        self.assertEqual(effect["produces"], "WUBRG")
+        self.assertEqual(effect["mana_produced"], 1)
+        self.assertTrue(effect["chosen_color_mana"])
+        self.assertTrue(effect["conditional_mana_same_color_choice"])
+        self.assertEqual(effect["conditional_mana_modes_status"], "runtime_executor_v1")
+        self.assertEqual([mode["color"] for mode in effect["conditional_mana_modes"]], list("WUBRG"))
+        self.assertTrue(effect["enters_tapped"])
+        self.assertEqual(effect["xmage_mana_ability_classes"], ["SimpleManaAbility"])
+        self.assertEqual(
+            effect["xmage_ability_classes"],
+            ["EntersBattlefieldAbility", "EntersBattlefieldTappedAbility", "SimpleManaAbility"],
+        )
+
+    def test_chosen_color_mana_rock_requires_oracle_choose_color_line(self) -> None:
+        row = queue_row(
+            split.RAMP_ARTIFACT_UNIT,
+            effect_classes=["AddManaChosenColorEffect", "ChooseColorEffect"],
+            ability_kind="activated",
+            ability_classes=["EntersBattlefieldAbility", "SimpleManaAbility"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Unsafe Chosen Rock",
+                type_line="Artifact",
+                oracle_text="{T}: Add one mana of the chosen color.",
+            ),
+            source_text=(
+                "this.addAbility(new EntersBattlefieldAbility("
+                "new ChooseColorEffect(Outcome.Neutral), null, "
+                "\"As {this} enters, choose a color.\", null));"
+                "this.addAbility(new SimpleManaAbility(Zone.BATTLEFIELD, "
+                "new AddManaChosenColorEffect(), new TapSourceCost()));"
+            ),
+        )
+
+        self.assertIsNone(proposal)
+        self.assertEqual(reason, "mana_source_oracle_not_simple")
+
+    def test_chosen_color_mana_rock_accepts_as_enters_choice(self) -> None:
+        row = queue_row(
+            split.RAMP_ARTIFACT_UNIT,
+            effect_classes=["AddManaChosenColorEffect", "ChooseColorEffect"],
+            ability_kind="activated",
+            ability_classes=["AsEntersBattlefieldAbility", "SimpleManaAbility"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Sol Grail",
+                type_line="Artifact",
+                oracle_text=(
+                    "As this artifact enters, choose a color.\n"
+                    "{T}: Add one mana of the chosen color."
+                ),
+            ),
+            source_text=(
+                "this.addAbility(new AsEntersBattlefieldAbility("
+                "new ChooseColorEffect(Outcome.Neutral)));"
+                "this.addAbility(new SimpleManaAbility(Zone.BATTLEFIELD, "
+                "new AddManaChosenColorEffect(), new TapSourceCost()));"
+            ),
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        self.assertTrue(proposal["safe_for_batch_pg_package"])
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.MANA_SCOPE)
+        self.assertEqual(effect["produces"], "WUBRG")
+        self.assertTrue(effect["chosen_color_mana"])
+        self.assertEqual(effect["xmage_mana_ability_classes"], ["SimpleManaAbility"])
+        self.assertEqual(effect["xmage_auxiliary_ability_classes"], ["AsEntersBattlefieldAbility"])
+
     def test_simple_mana_source_with_static_keyword_auxiliary_maps(self) -> None:
         row = queue_row(
             split.RAMP_ARTIFACT_UNIT,
