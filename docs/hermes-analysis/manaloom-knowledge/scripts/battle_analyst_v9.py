@@ -9886,9 +9886,11 @@ SAFE_RUNTIME_SECONDARY_ANNOTATION_KEYS = {
     "requires_discard_land",
     "requires_pay_life",
     "pay_life_amount",
+    "pay_life_amount_source",
     "requires_pay_generic",
     "pay_generic_amount",
     "requires_tap_untapped_artifact",
+    "requires_tap_untapped_creature_count",
     "requires_put_minus_one_counter_on_controlled_creature",
     "put_minus_one_counter_count",
     "requires_sacrifice_creature",
@@ -24453,6 +24455,13 @@ def choose_untapped_creature_for_resource_cost(player, *, required_color=None):
     return ranked[0], option_rows, selection_reason
 
 
+def _additional_pay_life_amount(effect_data):
+    source = str((effect_data or {}).get("pay_life_amount_source") or "").strip().lower()
+    if source == "x_value":
+        return x_value_from_effect_context(effect_data or {})
+    return int((effect_data or {}).get("pay_life_amount") or 0)
+
+
 def additional_card_costs_are_payable(player, card, effect_data, cost_context=None):
     cost_options = [
         option
@@ -24495,7 +24504,7 @@ def additional_card_costs_are_payable(player, card, effect_data, cost_context=No
         if not discardable_lands:
             return False
     if effect_data.get("requires_pay_life"):
-        amount = int(effect_data.get("pay_life_amount") or 0)
+        amount = _additional_pay_life_amount(effect_data)
         if amount <= 0 or int(getattr(player, "life", 0) or 0) < amount:
             return False
     if effect_data.get("requires_pay_generic"):
@@ -24505,6 +24514,17 @@ def additional_card_costs_are_payable(player, card, effect_data, cost_context=No
     if effect_data.get("requires_tap_untapped_artifact"):
         artifact, _options = choose_untapped_artifact_for_additional_cost(player, card)
         if artifact is None:
+            return False
+    required_tap_creatures = int(effect_data.get("requires_tap_untapped_creature_count") or 0)
+    if required_tap_creatures > 0:
+        creatures = [
+            permanent
+            for permanent in getattr(player, "battlefield", []) or []
+            if permanent is not card
+            and is_battlefield_creature(permanent)
+            and not permanent.get("tapped")
+        ]
+        if len(creatures) < required_tap_creatures:
             return False
     if effect_data.get("requires_put_minus_one_counter_on_controlled_creature"):
         if choose_controlled_creature_for_minus_one_counter_cost(player, card)[0] is None:
@@ -24776,6 +24796,7 @@ def pay_additional_card_costs(player, card, effect_data, *, turn=None, cost_cont
         and not effect_data.get("requires_pay_life")
         and not effect_data.get("requires_pay_generic")
         and not effect_data.get("requires_tap_untapped_artifact")
+        and not effect_data.get("requires_tap_untapped_creature_count")
         and not effect_data.get("requires_put_minus_one_counter_on_controlled_creature")
         and not effect_data.get("requires_sacrifice_creature")
         and not effect_data.get("requires_sacrifice_creature_count")
@@ -24884,6 +24905,50 @@ def pay_additional_card_costs(player, card, effect_data, *, turn=None, cost_cont
             ],
             turn=turn,
         )
+    required_tap_creatures = int(effect_data.get("requires_tap_untapped_creature_count") or 0)
+    if required_tap_creatures > 0:
+        creature_options = [
+            permanent
+            for permanent in getattr(player, "battlefield", []) or []
+            if permanent is not card
+            and is_battlefield_creature(permanent)
+            and not permanent.get("tapped")
+        ]
+        creature_options.sort(
+            key=lambda permanent: (
+                activation_sacrifice_candidate_score(player, permanent),
+                str(permanent.get("name") or ""),
+            )
+        )
+        selected_creatures = creature_options[:required_tap_creatures]
+        if len(selected_creatures) < required_tap_creatures:
+            emit_replay_event(
+                "additional_cost_failed",
+                player=player.name,
+                card=card.get("name", "?"),
+                cost="tap_untapped_creatures",
+                required_count=required_tap_creatures,
+                available_count=len(creature_options),
+                turn=turn,
+            )
+            return False
+        for creature in selected_creatures:
+            creature["tapped"] = True
+        emit_replay_event(
+            "additional_cost_paid",
+            player=player.name,
+            card=card.get("name", "?"),
+            cost="tap_untapped_creatures",
+            tapped=[creature.get("name", "?") for creature in selected_creatures],
+            tapped_count=len(selected_creatures),
+            required_count=required_tap_creatures,
+            creature_options=[
+                option.get("name", "?")
+                for option in creature_options[:8]
+                if isinstance(option, dict)
+            ],
+            turn=turn,
+        )
     if effect_data.get("requires_put_minus_one_counter_on_controlled_creature"):
         counter_target, target_options, selection_reason = choose_controlled_creature_for_minus_one_counter_cost(
             player,
@@ -24938,7 +25003,7 @@ def pay_additional_card_costs(player, card, effect_data, *, turn=None, cost_cont
             turn=turn,
         )
     if effect_data.get("requires_pay_life"):
-        amount = int(effect_data.get("pay_life_amount") or 0)
+        amount = _additional_pay_life_amount(effect_data)
         life_before = int(getattr(player, "life", 0) or 0)
         if amount <= 0 or life_before < amount:
             emit_replay_event(
@@ -24958,6 +25023,8 @@ def pay_additional_card_costs(player, card, effect_data, *, turn=None, cost_cont
             card=card.get("name", "?"),
             cost="pay_life",
             pay_life_amount=amount,
+            pay_life_amount_source=str(effect_data.get("pay_life_amount_source") or "") or None,
+            x_value=x_value_from_effect_context(effect_data) if str(effect_data.get("pay_life_amount_source") or "").strip().lower() == "x_value" else None,
             life_before=life_before,
             life_after=player.life,
             turn=turn,
@@ -70688,7 +70755,12 @@ def apply_effect_immediate(
                 phase=phase,
             )
             return
-        n = effect_data.get("count", 2)
+        draw_count_source = str(effect_data.get("draw_count_source") or "").strip().lower()
+        n = (
+            x_value_from_effect_context(effect_data)
+            if draw_count_source == "x_value"
+            else effect_data.get("count", 2)
+        )
         if effect_data.get("draw_discard_spell"):
             resolve_draw_discard_spell(
                 player,
@@ -70847,6 +70919,8 @@ def apply_effect_immediate(
                 card=card.get("name", "?"),
                 cards_drawn=len(drawn),
                 requested_draw_count=int(n or 0),
+                draw_count_source=draw_count_source or None,
+                x_value=x_value_from_effect_context(effect_data) if draw_count_source == "x_value" else None,
                 library_remaining=len(player.library),
                 hand_size=len(player.hand),
                 turn=turn,

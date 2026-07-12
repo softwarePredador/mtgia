@@ -125,9 +125,11 @@ E2E_REQUIRED_EFFECT_FIELDS = (
     "requires_discard_land",
     "requires_pay_life",
     "pay_life_amount",
+    "pay_life_amount_source",
     "requires_pay_generic",
     "pay_generic_amount",
     "requires_tap_untapped_artifact",
+    "requires_tap_untapped_creature_count",
     "requires_put_minus_one_counter_on_controlled_creature",
     "put_minus_one_counter_count",
     "requires_sacrifice_creature",
@@ -5464,7 +5466,13 @@ def fixed_draw_spell_execution_scenario_from_expected_rule(
     required = dict(rule.get("required_effect_fields") or {})
     if required.get("battle_model_scope") != "xmage_fixed_source_controller_draw_spell_v1":
         return None
+    draw_count_source = str(required.get("draw_count_source") or "").strip().lower()
+    x_value = 3
     expected_draw_count = int(required.get("draw_count") or required.get("count") or 0)
+    if draw_count_source == "x_value":
+        expected_draw_count = x_value
+    elif draw_count_source:
+        return None
     if expected_draw_count <= 0:
         return None
     scenario: dict[str, Any] = {
@@ -5473,6 +5481,7 @@ def fixed_draw_spell_execution_scenario_from_expected_rule(
         "card": {
             "name": rule["card_name"],
             "type_line": "Instant" if required.get("instant") else "Sorcery",
+            **({"x_value": x_value, "_cast_context": {"x_value": x_value}} if draw_count_source == "x_value" else {}),
         },
         "controller_library": [
             {
@@ -5484,8 +5493,42 @@ def fixed_draw_spell_execution_scenario_from_expected_rule(
             for index in range(expected_draw_count)
         ],
         "expected_draw_count": expected_draw_count,
+        **({"x_value": x_value, "expected_draw_count_source": draw_count_source} if draw_count_source else {}),
         "logical_rule_key": rule["logical_rule_key"],
     }
+    if required.get("pay_life_amount_source") == "x_value":
+        scenario["controller_life"] = 20
+        scenario["expected_additional_cost"] = "pay_life"
+        scenario["expected_pay_life_amount"] = x_value
+        scenario["expected_controller_life_after"] = 20 - x_value
+    elif required.get("requires_pay_life"):
+        pay_life_amount = int(required.get("pay_life_amount") or 0)
+        if pay_life_amount > 0:
+            scenario["controller_life"] = 20
+            scenario["expected_additional_cost"] = "pay_life"
+            scenario["expected_pay_life_amount"] = pay_life_amount
+            scenario["expected_controller_life_after"] = 20 - pay_life_amount
+    tap_creature_count = int(required.get("requires_tap_untapped_creature_count") or 0)
+    if tap_creature_count > 0:
+        scenario["controller_battlefield"] = [
+            *scenario.get("controller_battlefield", []),
+            *[
+                {
+                    "name": f"E2E Tap Cost Creature {index + 1}",
+                    "type_line": "Creature - Soldier",
+                    "effect": "creature",
+                    "power": 1,
+                    "toughness": 1,
+                    "tapped": False,
+                }
+                for index in range(tap_creature_count)
+            ],
+        ]
+        scenario["expected_additional_cost"] = "tap_untapped_creatures"
+        scenario["expected_tapped_creature_names"] = [
+            f"E2E Tap Cost Creature {index + 1}"
+            for index in range(tap_creature_count)
+        ]
     if required.get("requires_sacrifice_creature_or_land"):
         scenario["controller_battlefield"] = [
             {

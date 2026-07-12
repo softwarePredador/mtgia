@@ -24249,6 +24249,16 @@ def fixed_spell_additional_cost_fields_from_source(
         return None, unsupported_reason
     if "GenericManaCost" in text:
         return None, unsupported_reason
+    if "PayVariableLifeCost" in text:
+        if re.search(r"additional cost.*pay x life", lowered_oracle):
+            return {
+                "additional_cost": "pay_life",
+                "requires_pay_life": True,
+                "pay_life_amount": 0,
+                "pay_life_amount_source": "x_value",
+                "xmage_additional_cost_class": "PayVariableLifeCost",
+            }, None
+        return None, unsupported_reason
     if "PayLifeCost" in text:
         pay_life_match = re.search(r"PayLifeCost\s*\(\s*(\d+)\s*\)", text)
         if pay_life_match and re.search(r"additional cost.*pay \d+ life", lowered_oracle):
@@ -24257,6 +24267,22 @@ def fixed_spell_additional_cost_fields_from_source(
                 "requires_pay_life": True,
                 "pay_life_amount": int(pay_life_match.group(1)),
                 "xmage_additional_cost_class": "PayLifeCost",
+            }, None
+        return None, unsupported_reason
+    tap_creatures_match = re.search(r"TapTargetCost\s*\(\s*(\d+)\s*,\s*StaticFilters\.FILTER_CONTROLLED_UNTAPPED_CREATURES\s*\)", text)
+    if tap_creatures_match and re.search(
+        r"additional cost.*tap (?:four|\d+) untapped creatures you control",
+        lowered_oracle,
+    ):
+        required_count = int(tap_creatures_match.group(1))
+        oracle_count_match = re.search(r"additional cost.*tap (?P<count>four|\d+) untapped creatures you control", lowered_oracle)
+        oracle_count = number_word_to_int(oracle_count_match.group("count")) if oracle_count_match else 0
+        if required_count > 0 and required_count == oracle_count:
+            return {
+                "additional_cost": "tap_untapped_creatures",
+                "requires_tap_untapped_creature_count": required_count,
+                "xmage_additional_cost_class": "TapTargetCost",
+                "xmage_additional_cost_target": "controlled_untapped_creatures",
             }, None
         return None, unsupported_reason
     minus_one_counter_cost_match = re.search(
@@ -41888,8 +41914,19 @@ def split_row(
         )
         if additional_cost_reason is not None:
             return None, additional_cost_reason
-        count = java_constructor_int(source_text, "DrawCardSourceControllerEffect", default=1)
-        if count is None or count <= 0:
+        draw_args = extract_constructor_args(source_text, "DrawCardSourceControllerEffect") or ""
+        dynamic_draw_fields: dict[str, Any] = {}
+        if "GetXValue" in draw_args:
+            count = 0
+            dynamic_draw_fields = {
+                "draw_count": 0,
+                "draw_count_source": "x_value",
+            }
+        else:
+            count = java_constructor_int(source_text, "DrawCardSourceControllerEffect", default=1)
+            if count is None:
+                return None, "draw_count_missing"
+        if count < 0 or (count == 0 and not dynamic_draw_fields):
             return None, "draw_count_missing"
         effect_json = {
             "effect": "draw_cards",
@@ -41898,6 +41935,7 @@ def split_row(
             "xmage_effect_class": "DrawCardSourceControllerEffect",
             **flags,
             **(additional_cost_fields or {}),
+            **dynamic_draw_fields,
         }
         return build_proposal(row, metadata, effect_json, family_id="xmage_fixed_draw_spell"), "selected_exact_scope"
 

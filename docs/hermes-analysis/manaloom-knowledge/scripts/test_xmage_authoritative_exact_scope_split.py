@@ -9004,6 +9004,71 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertEqual(effect["additional_cost"], "sacrifice_two_creatures")
         self.assertEqual(effect["requires_sacrifice_creature_count"], 2)
 
+    def test_fixed_source_controller_draw_spell_accepts_x_life_cost(self) -> None:
+        row = queue_row(
+            split.DRAW_UNIT,
+            effect_classes=["DrawCardSourceControllerEffect"],
+            ability_classes=["CastOnlyDuringPhaseStepSourceAbility"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Necrologia",
+                type_line="Instant",
+                oracle_text=(
+                    "Cast this spell only during your end step.\n"
+                    "As an additional cost to cast this spell, pay X life.\n"
+                    "Draw X cards."
+                ),
+            ),
+            source_text=(
+                "this.addAbility(new CastOnlyDuringPhaseStepSourceAbility(null, PhaseStep.END_TURN, "
+                "MyTurnCondition.instance, \"Cast this spell only during your end step\"));"
+                "this.getSpellAbility().addCost(new PayVariableLifeCost(true));"
+                "this.getSpellAbility().addEffect(new DrawCardSourceControllerEffect(GetXValue.instance));"
+            ),
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.DRAW_SCOPE)
+        self.assertEqual(effect["count"], 0)
+        self.assertEqual(effect["draw_count"], 0)
+        self.assertEqual(effect["draw_count_source"], "x_value")
+        self.assertEqual(effect["additional_cost"], "pay_life")
+        self.assertTrue(effect["requires_pay_life"])
+        self.assertEqual(effect["pay_life_amount"], 0)
+        self.assertEqual(effect["pay_life_amount_source"], "x_value")
+        self.assertEqual(effect["xmage_additional_cost_class"], "PayVariableLifeCost")
+
+    def test_fixed_source_controller_draw_spell_accepts_tap_four_creatures_cost(self) -> None:
+        row = queue_row(split.DRAW_UNIT, effect_classes=["DrawCardSourceControllerEffect"])
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Shared Discovery",
+                type_line="Sorcery",
+                oracle_text=(
+                    "As an additional cost to cast this spell, tap four untapped creatures you control.\n"
+                    "Draw three cards."
+                ),
+            ),
+            source_text=(
+                "this.getSpellAbility().addCost(new TapTargetCost("
+                "4, StaticFilters.FILTER_CONTROLLED_UNTAPPED_CREATURES));"
+                "this.getSpellAbility().addEffect(new DrawCardSourceControllerEffect(3));"
+            ),
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.DRAW_SCOPE)
+        self.assertEqual(effect["count"], 3)
+        self.assertEqual(effect["additional_cost"], "tap_untapped_creatures")
+        self.assertEqual(effect["requires_tap_untapped_creature_count"], 4)
+        self.assertEqual(effect["xmage_additional_cost_class"], "TapTargetCost")
+        self.assertEqual(effect["xmage_additional_cost_target"], "controlled_untapped_creatures")
+
     def test_reveal_library_pick_spell_creature_or_land_is_package_safe(self) -> None:
         row = queue_row(split.RECURSION_UNIT, effect_classes=["RevealLibraryPickControllerEffect"])
         proposal, reason = split.split_row(

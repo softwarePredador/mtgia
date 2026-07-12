@@ -14003,8 +14003,17 @@ def run_fixed_draw_spell(
     effect = dict(battle.get_card_effect(card))
     if effect.get("effect") != "draw_cards":
         fail("battle_execution", f"{card['name']} effect={effect.get('effect')!r}")
+    x_value = scenario.get("x_value")
+    if x_value is not None:
+        x_value = int(x_value)
+        effect["x_value"] = x_value
+        effect["_cast_context"] = {"x_value": x_value}
+        card["x_value"] = x_value
+        card["_cast_context"] = {"x_value": x_value}
     active = battle.Player(str(scenario.get("player") or "Spell Controller"), None, [])
     opponent = battle.Player(str(scenario.get("opponent") or "Opponent"), None, [])
+    if scenario.get("controller_life") is not None:
+        active.life = int(scenario.get("controller_life") or 0)
     active.library = [
         battle.enrich_card(dict(library_card))
         for library_card in (scenario.get("controller_library") or scenario.get("library") or [])
@@ -14063,6 +14072,12 @@ def run_fixed_draw_spell(
         fail("battle_events", f"{card['name']} cards_drawn={event.get('cards_drawn')}")
     if int(event.get("requested_draw_count") or 0) != expected_draw_count:
         fail("battle_events", f"{card['name']} requested_draw_count={event.get('requested_draw_count')}")
+    expected_draw_count_source = str(scenario.get("expected_draw_count_source") or "").strip()
+    if expected_draw_count_source and str(event.get("draw_count_source") or "") != expected_draw_count_source:
+        fail(
+            "battle_events",
+            f"{card['name']} draw_count_source={event.get('draw_count_source')!r}, expected {expected_draw_count_source!r}",
+        )
     expected_additional_cost = str(scenario.get("expected_additional_cost") or "").strip()
     if expected_additional_cost:
         additional_cost_event = next(
@@ -14080,6 +14095,50 @@ def run_fixed_draw_spell(
                 "battle_events",
                 f"missing {card['name']} additional_cost_paid {expected_additional_cost}",
             )
+        expected_pay_life_amount = int(scenario.get("expected_pay_life_amount") or 0)
+        if expected_pay_life_amount > 0:
+            if int(additional_cost_event.get("pay_life_amount") or 0) != expected_pay_life_amount:
+                fail(
+                    "battle_events",
+                    f"{card['name']} pay_life_amount={additional_cost_event.get('pay_life_amount')!r}, expected {expected_pay_life_amount}",
+                )
+            expected_life_after = int(scenario.get("expected_controller_life_after") or 0)
+            if expected_life_after and int(getattr(active, "life", 0) or 0) != expected_life_after:
+                fail(
+                    "battle_execution",
+                    f"{card['name']} controller life={getattr(active, 'life', None)!r}, expected {expected_life_after}",
+                )
+        expected_tapped_creature_names = [
+            str(name)
+            for name in (scenario.get("expected_tapped_creature_names") or [])
+            if str(name)
+        ]
+        if expected_tapped_creature_names:
+            tapped_event_names = {
+                str(name)
+                for name in (additional_cost_event.get("tapped") or [])
+                if str(name)
+            }
+            for expected_name in expected_tapped_creature_names:
+                if expected_name not in tapped_event_names:
+                    fail(
+                        "battle_events",
+                        f"{card['name']} tapped creatures={sorted(tapped_event_names)!r}, missing {expected_name!r}",
+                    )
+                battlefield_match = next(
+                    (
+                        permanent
+                        for permanent in active.battlefield
+                        if isinstance(permanent, dict)
+                        and permanent.get("name") == expected_name
+                    ),
+                    None,
+                )
+                if battlefield_match is None or not battlefield_match.get("tapped"):
+                    fail(
+                        "battle_execution",
+                        f"{card['name']} did not tap {expected_name}",
+                    )
         expected_countered_creature = str(scenario.get("expected_countered_creature_name") or "").strip()
         if expected_countered_creature:
             expected_counter_type = str(scenario.get("expected_additional_cost_counter_type") or "-1/-1")
@@ -14139,6 +14198,7 @@ def run_fixed_draw_spell(
         "additional_cost": expected_additional_cost or None,
         "sacrificed": expected_sacrificed_names,
         "countered_creature": str(scenario.get("expected_countered_creature_name") or "") or None,
+        "x_value": x_value,
     }
 
 

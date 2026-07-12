@@ -7341,6 +7341,111 @@ class XMageExactScopeRuntimeTest(unittest.TestCase):
             )
         )
 
+    def test_draw_spell_uses_x_value_and_pays_x_life(self) -> None:
+        active = self.battle.Player(
+            "Active",
+            None,
+            [
+                {"name": "Fresh Card A", "cmc": 2},
+                {"name": "Fresh Card B", "cmc": 3},
+                {"name": "Fresh Card C", "cmc": 4},
+            ],
+        )
+        active.life = 20
+        opponent = self.battle.Player("Opponent", None, [])
+        spell = {"name": "Fixture Necrologia", "type_line": "Instant", "cmc": 5, "x_value": 3}
+        effect_data = {
+            "effect": "draw_cards",
+            "battle_model_scope": "xmage_fixed_source_controller_draw_spell_v1",
+            "count": 0,
+            "draw_count": 0,
+            "draw_count_source": "x_value",
+            "additional_cost": "pay_life",
+            "requires_pay_life": True,
+            "pay_life_amount": 0,
+            "pay_life_amount_source": "x_value",
+            "_cast_context": {"x_value": 3},
+        }
+
+        self.battle.apply_effect_immediate(
+            active,
+            [opponent],
+            spell,
+            turn=7,
+            rng=random.Random(7),
+            effect_data_override=effect_data,
+            phase="resolution",
+        )
+
+        self.assertEqual(len(active.hand), 3)
+        self.assertEqual(active.life, 17)
+        self.assertTrue(
+            any(
+                event == "additional_cost_paid"
+                and data.get("card") == "Fixture Necrologia"
+                and data.get("cost") == "pay_life"
+                and data.get("pay_life_amount") == 3
+                and data.get("pay_life_amount_source") == "x_value"
+                for event, data in self.events
+            )
+        )
+        self.assertTrue(
+            any(
+                event == "draw_cards_resolved"
+                and data.get("card") == "Fixture Necrologia"
+                and data.get("draw_count_source") == "x_value"
+                and data.get("x_value") == 3
+                and data.get("cards_drawn") == 3
+                for event, data in self.events
+            )
+        )
+
+    def test_draw_spell_taps_four_untapped_creatures_as_additional_cost(self) -> None:
+        active = self.battle.Player(
+            "Active",
+            None,
+            [
+                {"name": "Fresh Card A", "cmc": 2},
+                {"name": "Fresh Card B", "cmc": 3},
+                {"name": "Fresh Card C", "cmc": 4},
+            ],
+        )
+        active.battlefield = [
+            {"name": f"Tap Cost Creature {index + 1}", "type_line": "Creature - Soldier", "power": 1, "toughness": 1}
+            for index in range(4)
+        ]
+        opponent = self.battle.Player("Opponent", None, [])
+        spell = {"name": "Fixture Shared Discovery", "type_line": "Sorcery", "cmc": 1}
+        effect_data = {
+            "effect": "draw_cards",
+            "battle_model_scope": "xmage_fixed_source_controller_draw_spell_v1",
+            "count": 3,
+            "additional_cost": "tap_untapped_creatures",
+            "requires_tap_untapped_creature_count": 4,
+        }
+
+        self.battle.apply_effect_immediate(
+            active,
+            [opponent],
+            spell,
+            turn=8,
+            rng=random.Random(8),
+            effect_data_override=effect_data,
+            phase="resolution",
+        )
+
+        self.assertEqual(len(active.hand), 3)
+        self.assertTrue(all(permanent.get("tapped") for permanent in active.battlefield))
+        self.assertTrue(
+            any(
+                event == "additional_cost_paid"
+                and data.get("card") == "Fixture Shared Discovery"
+                and data.get("cost") == "tap_untapped_creatures"
+                and data.get("tapped_count") == 4
+                for event, data in self.events
+            )
+        )
+
     def test_x_create_creature_tokens_spell_uses_cast_context_x_value(self) -> None:
         active = self.battle.Player("Active", None, [])
         opponent = self.battle.Player("Opponent", None, [])
