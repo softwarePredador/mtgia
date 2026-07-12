@@ -2205,6 +2205,21 @@ def static_graveyard_threshold_boost_execution_scenario_from_expected_rule(
             {"name": "E2E Graveyard Enchantment", "type_line": "Enchantment"},
         ]
         expected_count = len(controller_graveyard)
+    elif card_types and "card" not in card_types:
+        expected_count = max(threshold, 1)
+        type_word = card_types[0]
+        type_line = {
+            "land": "Land",
+            "artifact": "Artifact",
+            "creature": "Creature",
+            "enchantment": "Enchantment",
+            "instant": "Instant",
+            "sorcery": "Sorcery",
+        }.get(type_word, type_word.title())
+        controller_graveyard = [
+            {"name": f"E2E Graveyard {type_line} {index}", "type_line": type_line}
+            for index in range(1, expected_count + 1)
+        ]
     else:
         expected_count = max(threshold, 1)
         controller_graveyard = [

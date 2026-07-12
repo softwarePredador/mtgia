@@ -11904,6 +11904,23 @@ def static_graveyard_threshold_boost_from_oracle(metadata: dict[str, Any]) -> di
             "static_power_bonus": power_bonus,
             "static_toughness_bonus": toughness_bonus,
         }
+    typed_one_match = re.match(
+        r"^(?:this creature|[a-z0-9' ,./-]+) gets (?P<power>[+-]\d+)/(?P<toughness>[+-]\d+) "
+        r"as long as there is an? (?P<card_type>land) card in your graveyard\.?$",
+        text,
+    )
+    if typed_one_match:
+        power_bonus = signed_int_from_oracle(typed_one_match.group("power"))
+        toughness_bonus = signed_int_from_oracle(typed_one_match.group("toughness"))
+        if power_bonus is None or toughness_bonus is None:
+            return None
+        return {
+            "graveyard_count_scope": "controller_graveyard",
+            "graveyard_count_card_types": [typed_one_match.group("card_type")],
+            "graveyard_count_threshold": 1,
+            "static_power_bonus": power_bonus,
+            "static_toughness_bonus": toughness_bonus,
+        }
     match = re.match(
         r"^this creature gets (?P<power>[+-]\d+)/(?P<toughness>[+-]\d+) as long as "
         r"(?:there are (?P<threshold_a>\d+|one|two|three|four|five|six|seven|eight|nine|ten) "
@@ -11958,6 +11975,13 @@ def static_graveyard_threshold_boost_from_source(source: str) -> dict[str, Any] 
         threshold = 10
         card_types = ["card"]
         scope = "opponents_graveyards"
+    elif re.search(
+        r"CardsInControllerGraveyardCondition\s*\(\s*1\s*,\s*StaticFilters\.FILTER_CARD_LAND\s*\)",
+        text,
+    ):
+        threshold = 1
+        card_types = ["land"]
+        scope = "controller_graveyard"
     elif "LessonsInGraveCondition" in text or "DifferentManaValuesInGraveCondition" in text:
         return "static_graveyard_threshold_boost_source_condition_not_supported"
     else:

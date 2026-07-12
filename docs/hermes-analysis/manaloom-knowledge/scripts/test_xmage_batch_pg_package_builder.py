@@ -878,6 +878,36 @@ def test_static_graveyard_threshold_opponents_graveyard_execution_scenario_is_ma
     assert scenario["expected_toughness"] == 5
 
 
+def test_static_graveyard_threshold_typed_controller_graveyard_execution_scenario_is_manifested() -> None:
+    proposal = {
+        "normalized_name": "murasa behemoth",
+        "card_name": "Murasa Behemoth",
+        "oracle_hash": "hash-murasa",
+        "logical_rule_key": "battle_rule_v1:murasa",
+        "effect_json": {
+            "effect": "creature",
+            "battle_model_scope": "xmage_static_source_boost_if_graveyard_threshold_v1",
+            "static_effect": "source_power_toughness_boost_if_graveyard_count",
+            "graveyard_count_scope": "controller_graveyard",
+            "graveyard_count_card_types": ["land"],
+            "graveyard_count_threshold": 1,
+            "static_power_bonus": 3,
+            "static_toughness_bonus": 3,
+        },
+    }
+
+    expected = builder.expected_rule_from_proposal(proposal)
+    scenario = builder.execution_scenario_from_expected_rule(expected)
+
+    assert scenario["type"] == "static_graveyard_threshold_source_boost"
+    assert scenario["controller_graveyard"] == [
+        {"name": "E2E Graveyard Land 1", "type_line": "Land"}
+    ]
+    assert scenario["expected_count"] == 1
+    assert scenario["expected_power"] == 4
+    assert scenario["expected_toughness"] == 4
+
+
 def test_creature_etb_draw_discard_execution_scenario_is_manifested() -> None:
     proposal = {
         "normalized_name": "bazaar trademage",

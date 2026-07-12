@@ -2872,6 +2872,53 @@ class XMageExactScopeRuntimeTest(unittest.TestCase):
         self.assertEqual(capybara["power"], 6)
         self.assertEqual(capybara["toughness"], 2)
 
+    def test_static_graveyard_threshold_source_boost_counts_land_cards_only(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        active.graveyard = [{"name": "Instant A", "type_line": "Instant"}]
+        behemoth = {
+            "name": "Murasa Behemoth",
+            "type_line": "Creature - Beast",
+            "effect": "creature",
+            "power": 5,
+            "toughness": 5,
+            "battle_model_scope": "xmage_static_source_boost_if_graveyard_threshold_v1",
+            "static_effect": "source_power_toughness_boost_if_graveyard_count",
+            "graveyard_count_scope": "controller_graveyard",
+            "graveyard_count_card_types": ["land"],
+            "graveyard_count_threshold": 1,
+            "static_power_bonus": 3,
+            "static_toughness_bonus": 3,
+        }
+        active.battlefield = [behemoth]
+
+        self.battle.refresh_graveyard_count_creature_statics_for_player(active, turn=2, phase="test")
+        self.assertFalse(behemoth["_static_graveyard_threshold_active"])
+        self.assertEqual(behemoth["static_graveyard_threshold_count_current"], 0)
+        self.assertEqual(behemoth["power"], 5)
+        self.assertEqual(behemoth["toughness"], 5)
+
+        active.graveyard.append({"name": "Forest", "type_line": "Basic Land - Forest"})
+        self.battle.refresh_graveyard_count_creature_statics_for_player(
+            active,
+            turn=3,
+            phase="test",
+            emit_events=True,
+        )
+
+        self.assertTrue(behemoth["_static_graveyard_threshold_active"])
+        self.assertEqual(behemoth["static_graveyard_threshold_count_current"], 1)
+        self.assertEqual(behemoth["power"], 8)
+        self.assertEqual(behemoth["toughness"], 8)
+        self.assertTrue(
+            any(
+                event == "static_graveyard_threshold_source_boost_changed"
+                and data.get("card") == "Murasa Behemoth"
+                and data.get("graveyard_count_card_types") == ["land"]
+                and data.get("active") is True
+                for event, data in self.events
+            )
+        )
+
     def test_static_graveyard_threshold_source_boost_counts_opponents_graveyards(self) -> None:
         active = self.battle.Player("Active", None, [])
         opponent = self.battle.Player("Opponent", None, [])
