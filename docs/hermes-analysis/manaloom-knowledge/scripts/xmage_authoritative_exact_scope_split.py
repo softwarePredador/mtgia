@@ -207,6 +207,9 @@ DIES_TOKEN_CREATURE_UNIT = (
 ACTIVATED_TOKEN_PERMANENT_UNIT_PREFIX = (
     "token_maker::xmage_signature::CreateTokenEffect::SimpleActivatedAbility::"
 )
+ACTIVATED_TOKEN_AS_SORCERY_UNIT_PREFIX = (
+    "token_maker::xmage_signature::CreateTokenEffect::ActivateAsSorceryActivatedAbility::"
+)
 ETB_SCRY_CREATURE_UNIT = (
     "xmage_signature::ScryEffect::EntersBattlefieldTriggeredAbility::"
     "no_target_class::no_condition_class::triggered_ability"
@@ -2964,12 +2967,25 @@ def activated_create_token_from_source(source: str) -> dict[str, Any] | str:
     effect_match = re.search(r"new\s+CreateTokenEffect\s*\(", text)
     if effect_match is None:
         return "activated_token_source_no_create_token_effect"
-    ability_index = text.rfind("new SimpleActivatedAbility", 0, effect_match.start())
-    if ability_index < 0:
+    ability_matches = list(
+        re.finditer(
+            r"new\s+(?:SimpleActivatedAbility|ActivateAsSorceryActivatedAbility)\s*\(",
+            text[: effect_match.start()],
+            re.S,
+        )
+    )
+    if not ability_matches:
         return "activated_token_source_not_simple_activated"
+    ability_index = ability_matches[-1].start()
     window = text[ability_index : effect_match.start() + 1800]
+    activate_as_sorcery = "ActivateAsSorceryActivatedAbility" in window
     graveyard_self_exile = (
-        re.search(r"new\s+SimpleActivatedAbility\s*\(\s*Zone\.GRAVEYARD", window, re.S) is not None
+        re.search(
+            r"new\s+(?:SimpleActivatedAbility|ActivateAsSorceryActivatedAbility)\s*\(\s*Zone\.GRAVEYARD",
+            window,
+            re.S,
+        )
+        is not None
         and "ExileSourceFromGraveCost" in window
     )
     risky_cost_classes = {
@@ -3032,6 +3048,8 @@ def activated_create_token_from_source(source: str) -> dict[str, Any] | str:
                 "activation_requires_exile_source_from_graveyard": True,
             }
         )
+    if activate_as_sorcery:
+        activation["activation_timing"] = "sorcery"
     return activation
 
 
@@ -3086,6 +3104,16 @@ def activated_create_token_oracle_blocker(
     )
     if isinstance(activation, str):
         return activation
+    if re.search(
+        r"(?:^|[.]\s*)activate(?: this ability)? only (?:as a sorcery|any time you could cast a sorcery)[.]?$",
+        effect_text,
+    ):
+        effect_text = re.sub(
+            r"\s*[.]?\s*activate(?: this ability)? only (?:as a sorcery|any time you could cast a sorcery)[.]?$",
+            "",
+            effect_text,
+        ).strip()
+        activation["activation_timing"] = "sorcery"
     for key in (
         "activation_cost_mana",
         "activation_cost_generic",
@@ -3098,6 +3126,7 @@ def activated_create_token_oracle_blocker(
         "activation_discard_random",
         "activation_zone",
         "activation_requires_exile_source_from_graveyard",
+        "activation_timing",
     ):
         if activation.get(key) != source_activation.get(key):
             return "activated_token_source_oracle_cost_mismatch"
@@ -15197,10 +15226,15 @@ def is_creature_dies_token_unit(row: dict[str, Any]) -> bool:
 
 
 def is_permanent_activated_token_unit(row: dict[str, Any]) -> bool:
+    work_unit = str(row.get("adapter_work_unit") or "")
+    abilities = ability_classes(row)
     return (
-        str(row.get("adapter_work_unit") or "").startswith(ACTIVATED_TOKEN_PERMANENT_UNIT_PREFIX)
+        (
+            work_unit.startswith(ACTIVATED_TOKEN_PERMANENT_UNIT_PREFIX)
+            or work_unit.startswith(ACTIVATED_TOKEN_AS_SORCERY_UNIT_PREFIX)
+        )
         and effect_classes(row) == {"CreateTokenEffect"}
-        and ability_classes(row) == {"SimpleActivatedAbility"}
+        and abilities in ({"SimpleActivatedAbility"}, {"ActivateAsSorceryActivatedAbility"})
         and set(row.get("xmage_signals") or []) == {"token", "activated_ability"}
     )
 

@@ -6415,6 +6415,62 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertEqual(effect["activation_cost_mana"], "{5}")
         self.assertEqual(effect["activation_zone"], "graveyard")
 
+    def test_graveyard_self_exile_activated_create_token_maps_activate_as_sorcery(self) -> None:
+        unit = (
+            split.ACTIVATED_TOKEN_AS_SORCERY_UNIT_PREFIX
+            + "no_target_class::no_condition_class::token,activated_ability"
+        )
+        row = queue_row(
+            unit,
+            effect_classes=["CreateTokenEffect"],
+            ability_kind="activated",
+            ability_classes=["ActivateAsSorceryActivatedAbility"],
+            xmage_signals=["token", "activated_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Dauntless Cathar",
+                type_line="Creature - Human Soldier",
+                oracle_text=(
+                    "{1}{W}, Exile this card from your graveyard: "
+                    "Create a 1/1 white Spirit creature token with flying. "
+                    "Activate only as a sorcery."
+                ),
+            ),
+            source_text="""
+                Ability ability = new ActivateAsSorceryActivatedAbility(
+                    Zone.GRAVEYARD,
+                    new CreateTokenEffect(new SpiritWhiteToken()),
+                    new ManaCostsImpl<>("{1}{W}")
+                );
+                ability.addCost(new ExileSourceFromGraveCost());
+                this.addAbility(ability);
+                class SpiritWhiteToken extends TokenImpl {
+                    public SpiritWhiteToken() {
+                        super("Spirit Token", "1/1 white Spirit creature token with flying");
+                        cardType.add(CardType.CREATURE);
+                        subtype.add(SubType.SPIRIT);
+                        color.setWhite(true);
+                        power = new MageInt(1);
+                        toughness = new MageInt(1);
+                        addAbility(new FlyingAbility());
+                    }
+                }
+            """,
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.GRAVEYARD_SELF_EXILE_ACTIVATED_TOKEN_SCOPE)
+        self.assertEqual(effect["activation_zone"], "graveyard")
+        self.assertEqual(effect["activation_timing"], "sorcery")
+        self.assertTrue(effect["activation_requires_exile_source_from_graveyard"])
+        self.assertEqual(effect["activation_cost_mana"], "{1}{W}")
+        self.assertEqual(effect["token_name"], "Spirit Token")
+        self.assertEqual(effect["token_subtype"], "Spirit")
+        self.assertTrue(effect["token_flying"])
+
     def test_token_class_blocks_new_unmodeled_ability(self) -> None:
         token_data, reason = split.parse_simple_token_class(
             """
