@@ -19743,10 +19743,18 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         effect = proposal["effect_json"]
         self.assertEqual(effect["battle_model_scope"], split.MANA_SCOPE)
         self.assertEqual(proposal["family_id"], "xmage_simple_mana_source_with_unmodeled_auxiliary")
-        self.assertEqual(proposal["proposal_status"], "runtime_partial_requires_family_runtime")
-        self.assertEqual(proposal["promotion_lane"], "runtime_partial_review_only")
-        self.assertFalse(proposal["safe_for_batch_pg_package"])
+        self.assertEqual(
+            proposal["proposal_status"],
+            "runtime_partial_batch_pg_candidate_after_precheck",
+        )
+        self.assertEqual(
+            proposal["promotion_lane"],
+            "runtime_partial_batch_candidate_requires_pg_precheck",
+        )
+        self.assertTrue(proposal["safe_for_batch_pg_package"])
         self.assertTrue(effect["_runtime_partial"])
+        self.assertTrue(effect["_runtime_partial_batch_safe"])
+        self.assertEqual(effect["modeled_ability_subset"], "mana_source_only")
         self.assertEqual(effect["produces"], "WUBRG")
         self.assertNotIn("activation_discard_count", effect)
 
@@ -20407,6 +20415,9 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertEqual(reason, "selected_exact_scope")
         effect = proposal["effect_json"]
         self.assertTrue(effect["_runtime_partial"])
+        self.assertNotIn("_runtime_partial_batch_safe", effect)
+        self.assertEqual(proposal["proposal_status"], "runtime_partial_requires_family_runtime")
+        self.assertFalse(proposal["safe_for_batch_pg_package"])
         self.assertEqual(effect["modeled_ability_subset"], "mana_source_only")
         self.assertEqual(effect["xmage_unmodeled_auxiliary_ability_classes"], ["SimpleActivatedAbility"])
         self.assertEqual(effect["xmage_unmodeled_effect_classes"], ["DamageTargetEffect"])

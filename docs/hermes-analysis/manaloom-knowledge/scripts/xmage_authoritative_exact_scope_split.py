@@ -32644,6 +32644,13 @@ def build_proposal(
     rule = {"effect_json": effect_json, "deck_role_json": deck_role_json}
     logical_key = logical_rule_key(rule)
     is_runtime_partial = bool(effect_json.get("_runtime_partial"))
+    is_runtime_partial_batch_safe = (
+        is_runtime_partial
+        and bool(effect_json.get("_runtime_partial_batch_safe"))
+        and effect_json.get("battle_model_scope") == MANA_SCOPE
+        and effect_json.get("modeled_ability_subset") == "mana_source_only"
+        and bool(effect_json.get("is_mana_source"))
+    )
     return {
         "card_id": str(row.get("card_id") or ""),
         "card_name": card_name,
@@ -32652,16 +32659,20 @@ def build_proposal(
         "effect": effect_json.get("effect"),
         "battle_model_scope": effect_json.get("battle_model_scope"),
         "promotion_lane": (
-            "runtime_partial_review_only"
+            "runtime_partial_batch_candidate_requires_pg_precheck"
+            if is_runtime_partial_batch_safe
+            else "runtime_partial_review_only"
             if is_runtime_partial
             else "batch_metadata_candidate_requires_pg_precheck"
         ),
         "proposal_status": (
-            "runtime_partial_requires_family_runtime"
+            "runtime_partial_batch_pg_candidate_after_precheck"
+            if is_runtime_partial_batch_safe
+            else "runtime_partial_requires_family_runtime"
             if is_runtime_partial
             else "batch_pg_candidate_after_precheck"
         ),
-        "safe_for_batch_pg_package": not is_runtime_partial,
+        "safe_for_batch_pg_package": (not is_runtime_partial) or is_runtime_partial_batch_safe,
         "shadow_handling": "deprecate_nonmatching_rows",
         "oracle_hash": str(metadata.get("oracle_hash") or md5_text(str(metadata.get("oracle_text") or ""))),
         "oracle_hash_source": "postgres.cards.oracle_text_md5",
@@ -47829,6 +47840,12 @@ def split_row(
                 "ability_kind": "activated_mana",
                 "modeled_ability_subset": "mana_source_only",
                 "_runtime_partial": True,
+                "_runtime_partial_batch_safe": True,
+                "_runtime_partial_batch_safe_reason": (
+                    "The independent activated mana ability is fully modeled and "
+                    "covered by the simple mana-source runtime/E2E scenario; "
+                    "auxiliary non-mana abilities remain explicitly unmodeled."
+                ),
                 "_runtime_partial_reason": (
                     "Only the XMage mana ability is executable in this rule; "
                     "listed auxiliary ability/effect classes remain unmodeled."
