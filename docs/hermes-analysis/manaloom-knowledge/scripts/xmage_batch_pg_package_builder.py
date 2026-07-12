@@ -4663,6 +4663,22 @@ def mana_spent_cast_trigger_execution_scenario_from_expected_rule(rule: dict[str
             "power": 3,
             "toughness": 3,
         })
+    elif trigger.get("spell_filter") == "creature_spell":
+        cast_card.update({
+            "name": "E2E Creature Spell",
+            "type_line": "Creature - Bear",
+            "effect": "creature",
+            "power": 2,
+            "toughness": 2,
+        })
+    elif trigger.get("spell_filter") == "non_human_creature_spell":
+        cast_card.update({
+            "name": "E2E Non-Human Creature Spell",
+            "type_line": "Creature - Beast",
+            "effect": "creature",
+            "power": 2,
+            "toughness": 2,
+        })
     elif trigger.get("spell_filter") == "mana_value_gte":
         cast_card.update({
             "name": "E2E Six Mana Spell",

@@ -29529,6 +29529,40 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertEqual(effect["activation_cost_colors"], ["R"])
         self.assertFalse(effect["activation_requires_tap"])
 
+    def test_activated_target_boost_accepts_signature_target_permanent_alias(self) -> None:
+        row = queue_row(
+            (
+                "xmage_signature::BoostTargetEffect::SimpleActivatedAbility::"
+                "TargetCreaturePermanent,TargetPermanent::no_condition_class::"
+                "targeting,activated_ability"
+            ),
+            effect_classes=["BoostTargetEffect"],
+            ability_kind="activated",
+            ability_classes=["SimpleActivatedAbility"],
+            xmage_signals=["targeting", "activated_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Fixture Ancestor",
+                type_line="Creature - Minotaur",
+                oracle_text="{T}: Target creature gets +1/+1 until end of turn.",
+            ),
+            source_text=(
+                "Ability ability = new SimpleActivatedAbility("
+                "new BoostTargetEffect(1, 1, Duration.EndOfTurn), "
+                "new TapSourceCost());"
+                "ability.addTarget(new TargetCreaturePermanent());"
+            ),
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.TARGET_BOOST_ACTIVATED_SCOPE)
+        self.assertEqual(effect["power_delta"], 1)
+        self.assertEqual(effect["toughness_delta"], 1)
+        self.assertTrue(effect["activation_requires_tap"])
+
     def test_activated_target_boost_accepts_source_sacrifice_cost(self) -> None:
         row = queue_row(
             split.TARGET_BOOST_ACTIVATED_UNIT,
@@ -37328,6 +37362,146 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertEqual(effect["mana_spent_cast_trigger"]["spell_filter"], "mana_value_gte")
         self.assertEqual(effect["mana_spent_cast_trigger"]["mana_value_gte"], 6)
         self.assertEqual(effect["mana_spent_cast_trigger"]["effects"], [{"effect": "draw_cards", "count": 1}])
+
+    def test_mana_spent_creature_counter_replacement_maps_biophagus(self) -> None:
+        proposal, reason = split.split_row(
+            queue_row(
+                "ramp_permanent::xmage_creature_mana_source_variant_review_v1",
+                effect_classes=["AddCounterEnteringCreatureEffect"],
+                ability_kind="activated_mana",
+                ability_classes=["AnyColorManaAbility"],
+            ),
+            metadata(
+                name="Biophagus",
+                type_line="Creature - Human Tyranid Wizard",
+                oracle_text=(
+                    "Genomic Enhancement — {T}: Add one mana of any color. "
+                    "If this mana is spent to cast a creature spell, "
+                    "that creature enters the battlefield with an additional +1/+1 counter on it."
+                ),
+            ),
+            source_text="""
+                Ability ability = new AnyColorManaAbility(new TapSourceCost(), true).withFlavorWord("Genomic Enhancement");
+                ability.getEffects().get(0).setText("Add one mana of any color. If this mana is spent to cast a creature spell, that creature enters the battlefield with an additional +1/+1 counter on it.");
+                class BiophagusWatcher extends Watcher {
+                    public void watch(GameEvent event, Game game) {
+                        if (event.getType() == GameEvent.EventType.MANA_PAID) {
+                            Spell target = game.getSpell(event.getTargetId());
+                            if (event.getSourceId() != null && target != null && target.isCreature(game) && event.getFlag()) {
+                                game.getState().addEffect(new AddCounterEnteringCreatureEffect(new MageObjectReference(target.getCard(), game)), target.getSpellAbility());
+                            }
+                        }
+                    }
+                }
+            """,
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        self.assertTrue(proposal["safe_for_batch_pg_package"])
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.MANA_SPENT_CAST_TRIGGER_SCOPE)
+        self.assertEqual(effect["produces"], "WUBRG")
+        self.assertEqual(
+            effect["mana_spent_cast_trigger"],
+            {
+                "spell_filter": "creature_spell",
+                "effects": [
+                    {
+                        "effect": "enter_with_counter_and_gain_keyword",
+                        "counter_type": "+1/+1",
+                        "counter_count": 1,
+                    }
+                ],
+            },
+        )
+
+    def test_mana_spent_non_human_counter_replacement_maps_animal_attendant(self) -> None:
+        proposal, reason = split.split_row(
+            queue_row(
+                "ramp_permanent::xmage_creature_mana_source_variant_review_v1",
+                effect_classes=["AddCounterEnteringCreatureEffect"],
+                ability_kind="activated_mana",
+                ability_classes=["AnyColorManaAbility"],
+            ),
+            metadata(
+                name="Animal Attendant",
+                type_line="Creature - Human Citizen",
+                oracle_text=(
+                    "{T}: Add one mana of any color. If that mana is spent to cast a non-Human creature spell, "
+                    "that creature enters with an additional +1/+1 counter on it."
+                ),
+            ),
+            source_text="""
+                Ability ability = new AnyColorManaAbility(new TapSourceCost(), true);
+                class AnimalAttendantWatcher extends Watcher {
+                    public void watch(GameEvent event, Game game) {
+                        if (event.getType() == GameEvent.EventType.MANA_PAID) {
+                            Spell target = game.getSpell(event.getTargetId());
+                            if (event.getSourceId() != null && target != null && target.isCreature(game)
+                                    && !target.hasSubtype(SubType.HUMAN, game) && event.getFlag()) {
+                                game.getState().addEffect(new AddCounterEnteringCreatureEffect(new MageObjectReference(target.getCard(), game)), target.getSpellAbility());
+                            }
+                        }
+                    }
+                }
+            """,
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.MANA_SPENT_CAST_TRIGGER_SCOPE)
+        self.assertEqual(effect["mana_spent_cast_trigger"]["spell_filter"], "non_human_creature_spell")
+        self.assertEqual(effect["mana_spent_cast_trigger"]["effects"][0]["counter_count"], 1)
+
+    def test_mana_spent_dragon_haste_maps_carnelian_orb(self) -> None:
+        proposal, reason = split.split_row(
+            queue_row(
+                "ramp_permanent::xmage_artifact_mana_source_variant_review_v1",
+                effect_classes=[
+                    "BasicManaEffect",
+                    "GainAbilityTargetEffect",
+                    "ManaSpentOnSpellGainsAbilityEffect",
+                ],
+                ability_kind="activated_mana",
+                ability_classes=["HasteAbility", "SimpleManaAbility"],
+            ),
+            metadata(
+                name="Carnelian Orb of Dragonkind",
+                type_line="Artifact",
+                oracle_text=(
+                    "{T}: Add {R}. If that mana is spent on a Dragon creature spell, "
+                    "it gains haste until end of turn."
+                ),
+            ),
+            source_text="""
+                private static final FilterCreatureSpell filter = new FilterCreatureSpell("a Dragon creature spell");
+                static { filter.add(SubType.DRAGON.getPredicate()); }
+                SimpleManaAbility ability = new SimpleManaAbility(
+                    new BasicManaEffect(Mana.RedMana(1)), new TapSourceCost());
+                ability.addEffect(new ManaSpentOnSpellGainsAbilityEffect(filter,
+                    new GainAbilityTargetEffect(HasteAbility.getInstance(), Duration.EndOfTurn, null, true)));
+            """,
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.MANA_SPENT_CAST_TRIGGER_SCOPE)
+        self.assertEqual(effect["produced_mana_symbols"], ["R"])
+        self.assertEqual(
+            effect["mana_spent_cast_trigger"],
+            {
+                "spell_filter": "dragon_creature_spell",
+                "effects": [
+                    {
+                        "effect": "enter_with_counter_and_gain_keyword",
+                        "counter_type": "+1/+1",
+                        "counter_count": 0,
+                        "keyword": "haste",
+                        "duration": "until_end_of_turn",
+                    }
+                ],
+            },
+        )
 
     def test_mana_activation_next_cast_x_trigger_maps_brass_infiniscope(self) -> None:
         proposal, reason = split.split_row(

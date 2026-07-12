@@ -2671,6 +2671,10 @@ def mana_spent_cast_trigger_matches(card, effect_data, trigger):
     if not isinstance(trigger, dict):
         return False
     spell_filter = str(trigger.get("spell_filter") or "").strip().lower()
+    if spell_filter == "creature_spell":
+        return is_battlefield_creature(card)
+    if spell_filter == "non_human_creature_spell":
+        return is_battlefield_creature(card) and not permanent_has_subtype(card, "Human")
     if spell_filter == "dragon_creature_spell":
         return is_battlefield_creature(card) and permanent_has_subtype(card, "Dragon")
     if spell_filter == "mana_value_gte":

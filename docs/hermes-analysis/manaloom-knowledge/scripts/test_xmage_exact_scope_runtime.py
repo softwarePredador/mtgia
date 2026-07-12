@@ -30,6 +30,94 @@ class XMageExactScopeRuntimeTest(unittest.TestCase):
     def tearDown(self) -> None:
         self.battle.REPLAY_EVENT_HANDLER = self.previous_handler
 
+    def test_mana_spent_cast_trigger_matches_creature_filters_and_grants_effects(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        counter_trigger = {
+            "spell_filter": "non_human_creature_spell",
+            "effects": [
+                {
+                    "effect": "enter_with_counter_and_gain_keyword",
+                    "counter_type": "+1/+1",
+                    "counter_count": 1,
+                }
+            ],
+        }
+        beast = {"name": "Fixture Beast", "type_line": "Creature - Beast", "effect": "creature"}
+
+        resolved = self.battle.resolve_mana_spent_cast_triggers(
+            active,
+            beast,
+            {},
+            [
+                {
+                    "source": "Animal Attendant",
+                    "mana_spent_cast_trigger": counter_trigger,
+                    "amount_paid": 1,
+                }
+            ],
+            turn=3,
+            phase="main",
+        )
+
+        self.assertEqual(resolved, 1)
+        self.assertEqual(beast.get("plus_one_counters"), 1)
+        self.assertTrue(any(event == "mana_spent_cast_trigger_resolved" for event, _ in self.events))
+
+        self.events.clear()
+        human = {"name": "Fixture Human", "type_line": "Creature - Human", "effect": "creature"}
+        resolved = self.battle.resolve_mana_spent_cast_triggers(
+            active,
+            human,
+            {},
+            [
+                {
+                    "source": "Animal Attendant",
+                    "mana_spent_cast_trigger": counter_trigger,
+                    "amount_paid": 1,
+                }
+            ],
+            turn=3,
+            phase="main",
+        )
+
+        self.assertEqual(resolved, 0)
+        self.assertNotIn("plus_one_counters", human)
+        self.assertFalse(any(event == "mana_spent_cast_trigger_resolved" for event, _ in self.events))
+
+        haste_trigger = {
+            "spell_filter": "dragon_creature_spell",
+            "effects": [
+                {
+                    "effect": "enter_with_counter_and_gain_keyword",
+                    "counter_type": "+1/+1",
+                    "counter_count": 0,
+                    "keyword": "haste",
+                    "duration": "until_end_of_turn",
+                }
+            ],
+        }
+        dragon = {"name": "Fixture Dragon", "type_line": "Creature - Dragon", "effect": "creature"}
+
+        resolved = self.battle.resolve_mana_spent_cast_triggers(
+            active,
+            dragon,
+            {},
+            [
+                {
+                    "source": "Carnelian Orb of Dragonkind",
+                    "mana_spent_cast_trigger": haste_trigger,
+                    "amount_paid": 1,
+                }
+            ],
+            turn=4,
+            phase="main",
+        )
+
+        self.assertEqual(resolved, 1)
+        self.assertTrue(dragon.get("haste"))
+        self.assertIn("haste", dragon.get("keywords") or [])
+        self.assertEqual(dragon.get("haste_duration"), "until_end_of_turn")
+
     def test_permanent_dies_fixed_mana_adds_colorless_on_graveyard_move(self) -> None:
         active = self.battle.Player("Active", None, [])
         self.battle.CURRENT_REPLAY_TURN = 5

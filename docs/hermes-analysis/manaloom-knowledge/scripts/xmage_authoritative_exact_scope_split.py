@@ -125,6 +125,7 @@ TARGET_BOOST_ACTIVATED_UNIT = (
     "xmage_signature::BoostTargetEffect::SimpleActivatedAbility::"
     "TargetCreaturePermanent::no_condition_class::targeting,activated_ability"
 )
+TARGET_BOOST_ACTIVATED_UNIT_PREFIX = "xmage_signature::BoostTargetEffect::"
 STATIC_CONTROLLED_PT_UNIT = (
     "xmage_signature::BoostControlledEffect::SimpleStaticAbility::"
     "no_target_class::no_condition_class::static_ability"
@@ -14195,11 +14196,16 @@ def is_permanent_activated_self_boost_unit(row: dict[str, Any]) -> bool:
 
 
 def is_permanent_activated_target_boost_unit(row: dict[str, Any]) -> bool:
-    if str(row.get("adapter_work_unit") or "") != TARGET_BOOST_ACTIVATED_UNIT:
+    adapter_work_unit = str(row.get("adapter_work_unit") or "")
+    if not adapter_work_unit.startswith(TARGET_BOOST_ACTIVATED_UNIT_PREFIX):
         return False
+    abilities = ability_classes(row)
+    remaining = abilities - {"SimpleActivatedAbility"}
     return (
         effect_classes(row) == {"BoostTargetEffect"}
-        and ability_classes(row) == {"SimpleActivatedAbility"}
+        and "SimpleActivatedAbility" in abilities
+        and remaining.issubset(STATIC_SELF_KEYWORD_ABILITY_CLASSES)
+        and "::no_condition_class::" in adapter_work_unit
         and set(row.get("xmage_signals") or []) == {"targeting", "activated_ability"}
     )
 
@@ -30369,12 +30375,25 @@ def mana_spent_cast_trigger_detail_from_oracle(metadata: dict[str, Any]) -> dict
     candidates: list[dict[str, Any]] = []
     for line in normalized_oracle_lines(metadata):
         working = strip_parenthetical_reminders(line)
-        if "when you spend this mana to cast" not in working:
+        if "{t}:" in working:
+            working = working[working.index("{t}:") :]
+        if (
+            "when you spend this mana to cast" not in working
+            and "if that mana is spent" not in working
+            and "if this mana is spent" not in working
+        ):
             continue
-        match = re.fullmatch(
-            r"\{t\}: add (?P<mana>.+?)\. when you spend this mana to cast "
-            r"(?P<filter>.+?), (?P<effect>.+?)\.?",
-            working,
+        match = (
+            re.fullmatch(
+                r"\{t\}: add (?P<mana>.+?)\. when you spend this mana to cast "
+                r"(?P<filter>.+?), (?P<effect>.+?)\.?",
+                working,
+            )
+            or re.fullmatch(
+                r"\{t\}: add (?P<mana>.+?)\. if (?:that|this) mana is spent "
+                r"(?:to cast|on) (?P<filter>.+?), (?P<effect>.+?)\.?",
+                working,
+            )
         )
         if not match:
             return None
@@ -30417,6 +30436,55 @@ def mana_spent_cast_trigger_detail_from_oracle(metadata: dict[str, Any]) -> dict
                     }
                 ],
             }
+        elif filter_text == "a dragon creature spell" and effect_text == "it gains haste until end of turn":
+            trigger = {
+                "spell_filter": "dragon_creature_spell",
+                "effects": [
+                    {
+                        "effect": "enter_with_counter_and_gain_keyword",
+                        "counter_type": "+1/+1",
+                        "counter_count": 0,
+                        "keyword": "haste",
+                        "duration": "until_end_of_turn",
+                    }
+                ],
+            }
+        elif (
+            filter_text == "a creature spell"
+            and effect_text
+            in {
+                "that creature enters with an additional +1/+1 counter on it",
+                "that creature enters the battlefield with an additional +1/+1 counter on it",
+            }
+        ):
+            trigger = {
+                "spell_filter": "creature_spell",
+                "effects": [
+                    {
+                        "effect": "enter_with_counter_and_gain_keyword",
+                        "counter_type": "+1/+1",
+                        "counter_count": 1,
+                    }
+                ],
+            }
+        elif (
+            filter_text == "a non-human creature spell"
+            and effect_text
+            in {
+                "that creature enters with an additional +1/+1 counter on it",
+                "that creature enters the battlefield with an additional +1/+1 counter on it",
+            }
+        ):
+            trigger = {
+                "spell_filter": "non_human_creature_spell",
+                "effects": [
+                    {
+                        "effect": "enter_with_counter_and_gain_keyword",
+                        "counter_type": "+1/+1",
+                        "counter_count": 1,
+                    }
+                ],
+            }
         if trigger is None:
             return None
         candidates.append({
@@ -30431,10 +30499,30 @@ def mana_spent_cast_trigger_detail_from_oracle(metadata: dict[str, Any]) -> dict
 
 def mana_spent_cast_trigger_source_blocker(source_text: str, detail: dict[str, Any]) -> str | None:
     text = source_text or ""
-    if "ManaSpentDelayedTriggeredAbility" not in text:
-        return "mana_spent_trigger_source_missing_delayed_trigger"
     trigger = dict(detail.get("mana_spent_cast_trigger") or {})
     spell_filter = str(trigger.get("spell_filter") or "")
+    effects = [effect for effect in trigger.get("effects") or [] if isinstance(effect, dict)]
+    if spell_filter in {"creature_spell", "non_human_creature_spell"}:
+        if "GameEvent.EventType.MANA_PAID" not in text or "event.getFlag()" not in text:
+            return "mana_spent_trigger_source_watcher_not_supported"
+        if "AddCounterEnteringCreatureEffect" not in text:
+            return "mana_spent_trigger_source_counter_replacement_mismatch"
+        if "target.isCreature(game)" not in text:
+            return "mana_spent_trigger_source_creature_filter_mismatch"
+        if spell_filter == "non_human_creature_spell" and "!target.hasSubtype(SubType.HUMAN" not in text:
+            return "mana_spent_trigger_source_non_human_filter_mismatch"
+        if spell_filter == "creature_spell" and "!target.hasSubtype(SubType.HUMAN" in text:
+            return "mana_spent_trigger_source_non_human_filter_mismatch"
+        for effect in effects or [{}]:
+            if effect.get("effect") != "enter_with_counter_and_gain_keyword":
+                return "mana_spent_trigger_source_effect_not_supported"
+            if int(effect.get("counter_count") or 0) != 1:
+                return "mana_spent_trigger_source_counter_replacement_mismatch"
+            if str(effect.get("counter_type") or "+1/+1") != "+1/+1":
+                return "mana_spent_trigger_source_counter_replacement_mismatch"
+        return None
+    if "ManaSpentDelayedTriggeredAbility" not in text and "ManaSpentOnSpellGainsAbilityEffect" not in text:
+        return "mana_spent_trigger_source_missing_delayed_trigger"
     if spell_filter == "mana_value_gte":
         if "ManaValuePredicate(ComparisonType.MORE_THAN, 5)" not in text:
             return "mana_spent_trigger_source_mana_value_filter_mismatch"
@@ -30454,12 +30542,24 @@ def mana_spent_cast_trigger_source_blocker(source_text: str, detail: dict[str, A
                 if f"ScryEffect({int(effect.get('count') or 0)})" not in text:
                     return "mana_spent_trigger_source_scry_mismatch"
             elif effect_kind == "enter_with_counter_and_gain_keyword":
-                if "JadeOrbAdditionalCounterEffect" not in text or "CounterType.P1P1" not in text:
-                    return "mana_spent_trigger_source_counter_replacement_mismatch"
-                if "JadeOrbGainHexproofEffect" not in text or "HexproofAbility" not in text:
-                    return "mana_spent_trigger_source_hexproof_mismatch"
-                if "Duration.UntilYourNextTurn" not in text:
-                    return "mana_spent_trigger_source_hexproof_duration_mismatch"
+                counter_count = int(effect.get("counter_count") or 0)
+                keyword = str(effect.get("keyword") or "").strip().lower()
+                if counter_count == 1 and keyword == "hexproof":
+                    if "JadeOrbAdditionalCounterEffect" not in text or "CounterType.P1P1" not in text:
+                        return "mana_spent_trigger_source_counter_replacement_mismatch"
+                    if "JadeOrbGainHexproofEffect" not in text or "HexproofAbility" not in text:
+                        return "mana_spent_trigger_source_hexproof_mismatch"
+                    if "Duration.UntilYourNextTurn" not in text:
+                        return "mana_spent_trigger_source_hexproof_duration_mismatch"
+                elif counter_count == 0 and keyword == "haste":
+                    if "ManaSpentOnSpellGainsAbilityEffect" not in text:
+                        return "mana_spent_trigger_source_gain_keyword_effect_missing"
+                    if "GainAbilityTargetEffect" not in text or "HasteAbility" not in text:
+                        return "mana_spent_trigger_source_haste_mismatch"
+                    if "Duration.EndOfTurn" not in text:
+                        return "mana_spent_trigger_source_haste_duration_mismatch"
+                else:
+                    return "mana_spent_trigger_source_effect_not_supported"
             else:
                 return "mana_spent_trigger_source_effect_not_supported"
     else:
