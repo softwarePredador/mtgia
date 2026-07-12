@@ -14301,6 +14301,58 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         )
         self.assertEqual(effect["_composite_rule_components"][0]["effect"], "remove_permanent")
 
+    def test_fixed_bounce_draw_spell_ignores_cant_be_countered_auxiliary(self) -> None:
+        row = queue_row(
+            split.DRAW_UNIT,
+            effect_classes=["ReturnToHandTargetEffect", "DrawCardSourceControllerEffect"],
+            ability_classes=["CantBeCounteredSourceAbility"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                oracle_text=(
+                    "This spell can't be countered. Return target nonland permanent "
+                    "to its owner's hand. Draw a card."
+                ),
+            ),
+            source_text=(
+                "this.addAbility(new CantBeCounteredSourceAbility());"
+                "this.getSpellAbility().addEffect(new ReturnToHandTargetEffect());"
+                "this.getSpellAbility().addTarget(new TargetNonlandPermanent());"
+                "this.getSpellAbility().addEffect(new DrawCardSourceControllerEffect(1));"
+            ),
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        self.assertEqual(proposal["effect_json"]["battle_model_scope"], split.BOUNCE_DRAW_SCOPE)
+        self.assertEqual(proposal["effect_json"]["target"], "nonland_permanent")
+
+    def test_fixed_bounce_draw_spell_ignores_freerunning_auxiliary(self) -> None:
+        row = queue_row(
+            split.DRAW_UNIT,
+            effect_classes=["ReturnToHandTargetEffect", "DrawCardSourceControllerEffect"],
+            ability_classes=["FreerunningAbility"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                oracle_text=(
+                    "Freerunning-Return a blue creature you control to its owner's hand. "
+                    "Return target creature to its owner's hand. Draw a card."
+                ),
+            ),
+            source_text=(
+                "this.addAbility(new FreerunningAbility(new ReturnToHandTargetCost()));"
+                "this.getSpellAbility().addTarget(new TargetCreaturePermanent());"
+                "this.getSpellAbility().addEffect(new ReturnToHandTargetEffect());"
+                "this.getSpellAbility().addEffect(new DrawCardSourceControllerEffect(1));"
+            ),
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        self.assertEqual(proposal["effect_json"]["battle_model_scope"], split.BOUNCE_DRAW_SCOPE)
+        self.assertEqual(proposal["effect_json"]["target"], "creature")
+
     def test_fixed_bounce_draw_spell_maps_tapped_creature_constraint(self) -> None:
         row = queue_row(
             split.DRAW_UNIT,

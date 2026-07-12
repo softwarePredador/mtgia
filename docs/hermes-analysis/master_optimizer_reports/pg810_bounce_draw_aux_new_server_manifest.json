@@ -1,0 +1,380 @@
+{
+  "apply_gate": "Do not run apply SQL without explicit approval for the exact command.",
+  "backup_table": "manaloom_deploy_audit.pg810_bounce_draw_aux_new_server_20260712_062447",
+  "deploy_id": "PG810",
+  "execution_scenarios": [
+    {
+      "card": {
+        "name": "Eject",
+        "type_line": "Instant"
+      },
+      "controller_library": [
+        {
+          "effect": "draw_cards",
+          "name": "E2E Draw Card 1",
+          "type_line": "Instant"
+        },
+        {
+          "effect": "draw_cards",
+          "name": "E2E Draw Card 2",
+          "type_line": "Instant"
+        },
+        {
+          "effect": "draw_cards",
+          "name": "E2E Draw Card 3",
+          "type_line": "Instant"
+        }
+      ],
+      "expected_destination": "hand",
+      "expected_draw_count": 1,
+      "expected_effect": "remove_permanent",
+      "expected_target_constraints": {
+        "card_types": [
+          "permanent"
+        ],
+        "exclude_card_types": [
+          "land"
+        ]
+      },
+      "logical_rule_key": "battle_rule_v1:51f9e927e40ac019eb25f99986b0b28d",
+      "name": "Eject removes one legal target and draws 1",
+      "nonmatching_target": {
+        "cmc": 3,
+        "effect": "land enchantment",
+        "name": "E2E Illegal Removal Target",
+        "type_line": "Land Enchantment"
+      },
+      "target": {
+        "cmc": 3,
+        "effect": "enchantment",
+        "name": "E2E Legal Removal Target",
+        "type_line": "Enchantment"
+      },
+      "target_owner": "opponent",
+      "target_zone": "battlefield",
+      "type": "single_target_removal_and_draw"
+    },
+    {
+      "card": {
+        "name": "Escape Detection",
+        "type_line": "Instant"
+      },
+      "controller_library": [
+        {
+          "effect": "draw_cards",
+          "name": "E2E Draw Card 1",
+          "type_line": "Instant"
+        },
+        {
+          "effect": "draw_cards",
+          "name": "E2E Draw Card 2",
+          "type_line": "Instant"
+        },
+        {
+          "effect": "draw_cards",
+          "name": "E2E Draw Card 3",
+          "type_line": "Instant"
+        }
+      ],
+      "expected_destination": "hand",
+      "expected_draw_count": 1,
+      "expected_effect": "remove_creature",
+      "expected_target_constraints": {
+        "card_types": [
+          "creature"
+        ]
+      },
+      "logical_rule_key": "battle_rule_v1:32ef6fa7ac42c6a4bdd8be27fffeaec3",
+      "name": "Escape Detection removes one legal target and draws 1",
+      "nonmatching_target": {
+        "cmc": 0,
+        "effect": "land",
+        "name": "E2E Illegal Removal Target",
+        "type_line": "Land"
+      },
+      "target": {
+        "cmc": 3,
+        "effect": "creature",
+        "name": "E2E Legal Removal Target",
+        "power": 2,
+        "toughness": 2,
+        "type_line": "Creature - Soldier"
+      },
+      "target_owner": "opponent",
+      "target_zone": "battlefield",
+      "type": "single_target_removal_and_draw"
+    }
+  ],
+  "expected_rules": [
+    {
+      "card_name": "Eject",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:51f9e927e40ac019eb25f99986b0b28d",
+      "min_rule_version": 2,
+      "normalized_name": "eject",
+      "oracle_hash": "fc32de9dab55487e91d692afa519d433",
+      "required_effect_fields": {
+        "_composite_rule_components": [
+          {
+            "battle_model_scope": "xmage_return_target_to_hand_spell_v1",
+            "compose_on_resolution": true,
+            "destination": "hand",
+            "effect": "remove_permanent",
+            "target": "nonland_permanent",
+            "target_constraints": {
+              "card_types": [
+                "permanent"
+              ],
+              "exclude_card_types": [
+                "land"
+              ]
+            },
+            "target_controller": "any",
+            "xmage_effect_class": "ReturnToHandTargetEffect"
+          },
+          {
+            "battle_model_scope": "xmage_fixed_source_controller_draw_spell_v1",
+            "compose_on_resolution": true,
+            "count": 1,
+            "effect": "draw_cards",
+            "xmage_effect_class": "DrawCardSourceControllerEffect"
+          }
+        ],
+        "battle_model_scope": "xmage_return_target_to_hand_and_draw_card_spell_v1",
+        "count": 1,
+        "destination": "hand",
+        "draw_count": 1,
+        "effect": "composite_resolution",
+        "instant": true,
+        "sorcery": false,
+        "target": "nonland_permanent",
+        "target_constraints": {
+          "card_types": [
+            "permanent"
+          ],
+          "exclude_card_types": [
+            "land"
+          ]
+        },
+        "xmage_effect_classes": [
+          "ReturnToHandTargetEffect",
+          "DrawCardSourceControllerEffect"
+        ]
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Escape Detection",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:32ef6fa7ac42c6a4bdd8be27fffeaec3",
+      "min_rule_version": 2,
+      "normalized_name": "escape detection",
+      "oracle_hash": "2f41a8c8515ecebe621583a7e1bee239",
+      "required_effect_fields": {
+        "_composite_rule_components": [
+          {
+            "battle_model_scope": "xmage_return_target_to_hand_spell_v1",
+            "compose_on_resolution": true,
+            "destination": "hand",
+            "effect": "remove_creature",
+            "target": "creature",
+            "target_constraints": {
+              "card_types": [
+                "creature"
+              ]
+            },
+            "target_controller": "any",
+            "xmage_effect_class": "ReturnToHandTargetEffect"
+          },
+          {
+            "battle_model_scope": "xmage_fixed_source_controller_draw_spell_v1",
+            "compose_on_resolution": true,
+            "count": 1,
+            "effect": "draw_cards",
+            "xmage_effect_class": "DrawCardSourceControllerEffect"
+          }
+        ],
+        "battle_model_scope": "xmage_return_target_to_hand_and_draw_card_spell_v1",
+        "count": 1,
+        "destination": "hand",
+        "draw_count": 1,
+        "effect": "composite_resolution",
+        "instant": true,
+        "sorcery": false,
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ]
+        },
+        "xmage_effect_classes": [
+          "ReturnToHandTargetEffect",
+          "DrawCardSourceControllerEffect"
+        ]
+      },
+      "review_status": "verified"
+    }
+  ],
+  "family_counts": {
+    "xmage_bounce_draw_card_spell": 2
+  },
+  "files": {
+    "apply": "docs/hermes-analysis/master_optimizer_reports/pg810_bounce_draw_aux_new_server_apply.sql",
+    "manifest": "docs/hermes-analysis/master_optimizer_reports/pg810_bounce_draw_aux_new_server_manifest.json",
+    "package": "docs/hermes-analysis/master_optimizer_reports/pg810_bounce_draw_aux_new_server_package.md",
+    "postcheck": "docs/hermes-analysis/master_optimizer_reports/pg810_bounce_draw_aux_new_server_postcheck.sql",
+    "precheck": "docs/hermes-analysis/master_optimizer_reports/pg810_bounce_draw_aux_new_server_precheck.sql",
+    "rollback": "docs/hermes-analysis/master_optimizer_reports/pg810_bounce_draw_aux_new_server_rollback.sql"
+  },
+  "generated_at": "2026-07-12T06:24:47+00:00",
+  "mutations_performed": [],
+  "runtime_checks": [
+    {
+      "card": {
+        "name": "Eject"
+      },
+      "card_name": "Eject",
+      "effect": "composite_resolution",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:51f9e927e40ac019eb25f99986b0b28d",
+      "normalized_name": "eject",
+      "required_effect_fields": {
+        "_composite_rule_components": [
+          {
+            "battle_model_scope": "xmage_return_target_to_hand_spell_v1",
+            "compose_on_resolution": true,
+            "destination": "hand",
+            "effect": "remove_permanent",
+            "target": "nonland_permanent",
+            "target_constraints": {
+              "card_types": [
+                "permanent"
+              ],
+              "exclude_card_types": [
+                "land"
+              ]
+            },
+            "target_controller": "any",
+            "xmage_effect_class": "ReturnToHandTargetEffect"
+          },
+          {
+            "battle_model_scope": "xmage_fixed_source_controller_draw_spell_v1",
+            "compose_on_resolution": true,
+            "count": 1,
+            "effect": "draw_cards",
+            "xmage_effect_class": "DrawCardSourceControllerEffect"
+          }
+        ],
+        "battle_model_scope": "xmage_return_target_to_hand_and_draw_card_spell_v1",
+        "count": 1,
+        "destination": "hand",
+        "draw_count": 1,
+        "effect": "composite_resolution",
+        "instant": true,
+        "sorcery": false,
+        "target": "nonland_permanent",
+        "target_constraints": {
+          "card_types": [
+            "permanent"
+          ],
+          "exclude_card_types": [
+            "land"
+          ]
+        },
+        "xmage_effect_classes": [
+          "ReturnToHandTargetEffect",
+          "DrawCardSourceControllerEffect"
+        ]
+      }
+    },
+    {
+      "card": {
+        "name": "Escape Detection"
+      },
+      "card_name": "Escape Detection",
+      "effect": "composite_resolution",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:32ef6fa7ac42c6a4bdd8be27fffeaec3",
+      "normalized_name": "escape detection",
+      "required_effect_fields": {
+        "_composite_rule_components": [
+          {
+            "battle_model_scope": "xmage_return_target_to_hand_spell_v1",
+            "compose_on_resolution": true,
+            "destination": "hand",
+            "effect": "remove_creature",
+            "target": "creature",
+            "target_constraints": {
+              "card_types": [
+                "creature"
+              ]
+            },
+            "target_controller": "any",
+            "xmage_effect_class": "ReturnToHandTargetEffect"
+          },
+          {
+            "battle_model_scope": "xmage_fixed_source_controller_draw_spell_v1",
+            "compose_on_resolution": true,
+            "count": 1,
+            "effect": "draw_cards",
+            "xmage_effect_class": "DrawCardSourceControllerEffect"
+          }
+        ],
+        "battle_model_scope": "xmage_return_target_to_hand_and_draw_card_spell_v1",
+        "count": 1,
+        "destination": "hand",
+        "draw_count": 1,
+        "effect": "composite_resolution",
+        "instant": true,
+        "sorcery": false,
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ]
+        },
+        "xmage_effect_classes": [
+          "ReturnToHandTargetEffect",
+          "DrawCardSourceControllerEffect"
+        ]
+      }
+    }
+  ],
+  "selected_card_names": [
+    "Eject",
+    "Escape Detection"
+  ],
+  "selected_count": 2,
+  "slug": "bounce_draw_aux_new_server",
+  "snapshot_checks": [
+    {
+      "card_name": "Eject",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:51f9e927e40ac019eb25f99986b0b28d",
+      "min_rule_version": 2,
+      "normalized_name": "eject",
+      "oracle_hash": "fc32de9dab55487e91d692afa519d433",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_return_target_to_hand_and_draw_card_spell_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Escape Detection",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:32ef6fa7ac42c6a4bdd8be27fffeaec3",
+      "min_rule_version": 2,
+      "normalized_name": "escape detection",
+      "oracle_hash": "2f41a8c8515ecebe621583a7e1bee239",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_return_target_to_hand_and_draw_card_spell_v1"
+      },
+      "review_status": "verified"
+    }
+  ],
+  "status": "prepared_read_only_pending_apply_approval"
+}

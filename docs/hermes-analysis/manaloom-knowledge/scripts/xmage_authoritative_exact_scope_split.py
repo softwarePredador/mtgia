@@ -4075,7 +4075,7 @@ def fixed_exile_draw_from_source(source: str) -> int | None:
 
 
 def fixed_bounce_draw_from_oracle(metadata: dict[str, Any]) -> tuple[str, str, str, int] | None:
-    text = oracle_text(metadata)
+    text = oracle_resolution_text_without_neutral_auxiliary(metadata)
     match = re.match(
         r"^(return target .+? to its owner's hand)\. (?:then )?draw a card\.?$",
         text,
@@ -27255,6 +27255,23 @@ def oracle_effect_lines_without_neutral_auxiliary(metadata: dict[str, Any]) -> l
     ]
 
 
+def oracle_resolution_text_without_neutral_auxiliary(metadata: dict[str, Any]) -> str:
+    raw_text = strip_parenthetical_reminders(str(metadata.get("oracle_text") or ""))
+    parts: list[str] = []
+    for raw_line in raw_text.splitlines():
+        line = re.sub(r"\s+", " ", raw_line.strip()).strip()
+        if not line:
+            continue
+        for sentence in re.split(r"(?<=\.)\s+", line):
+            normalized = re.sub(r"\s+", " ", sentence.strip()).strip()
+            if not normalized:
+                continue
+            if is_resolution_neutral_auxiliary_oracle_line(normalized):
+                continue
+            parts.append(normalized.lower())
+    return re.sub(r"\s+", " ", " ".join(parts)).strip()
+
+
 def has_exact_shuffle_spell_effect(source: str) -> bool:
     text = source or ""
     return bool(re.search(r"\bShuffleSpellEffect\.getInstance\s*\(\s*\)", text))
@@ -40426,9 +40443,11 @@ def split_row(
             unsupported_abilities = ability_classes(row) - ALLOWED_AUXILIARY_RESOLUTION_ABILITY_CLASSES
             if unsupported_abilities:
                 return None, "bounce_draw_ability_class_not_simple"
-            if has_oracle_complexity(metadata):
+            simple_metadata = dict(metadata)
+            simple_metadata["oracle_text"] = oracle_resolution_text_without_neutral_auxiliary(metadata)
+            if has_oracle_complexity(simple_metadata):
                 return None, "bounce_draw_oracle_not_simple"
-            oracle_bounce = fixed_bounce_draw_from_oracle(metadata)
+            oracle_bounce = fixed_bounce_draw_from_oracle(simple_metadata)
             if oracle_bounce is None:
                 return None, "bounce_draw_oracle_not_exact_fixed"
             source_draw_count = fixed_bounce_draw_from_source(source_text)
