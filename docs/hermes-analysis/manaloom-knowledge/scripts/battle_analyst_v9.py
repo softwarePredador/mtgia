@@ -49362,6 +49362,44 @@ def _attached_equipment_count_for_target(controller, target, source=None):
     return count
 
 
+def _controller_for_permanent(player, opponents, target):
+    if not isinstance(target, dict):
+        return None
+    participants = [player] + list(opponents or [])
+    for participant in participants:
+        for permanent in getattr(participant, "battlefield", []) or []:
+            if permanent is target:
+                return participant
+    target_name = str(target.get("name") or "").strip()
+    if not target_name:
+        return None
+    for participant in participants:
+        for permanent in getattr(participant, "battlefield", []) or []:
+            if isinstance(permanent, dict) and str(permanent.get("name") or "").strip() == target_name:
+                return participant
+    return None
+
+
+def _attached_creature_shared_type_count(player, opponents, target, effect_data):
+    target_subtypes = set(_permanent_subtype_values(target))
+    if not target_subtypes:
+        return 0
+    scope = str((effect_data or {}).get("battlefield_count_scope") or "controller_battlefield").lower()
+    battlefield_players, scope_error = _battlefield_players_for_count_scope(player, opponents, scope)
+    if scope_error is not None:
+        return 0
+    count = 0
+    for participant in battlefield_players:
+        for permanent in getattr(participant, "battlefield", []) or []:
+            if permanent is target:
+                continue
+            if not isinstance(permanent, dict) or not is_battlefield_creature(permanent):
+                continue
+            if target_subtypes.intersection(_permanent_subtype_values(permanent)):
+                count += 1
+    return count
+
+
 def dynamic_attachment_static_pt_boost(player, opponents, source, target, effect_data):
     if not isinstance(effect_data, dict) or not effect_data.get("attachment_dynamic_boost"):
         return (
@@ -49377,6 +49415,12 @@ def dynamic_attachment_static_pt_boost(player, opponents, source, target, effect
     elif amount_source == "attached_equipment_count":
         count = _attached_equipment_count_for_target(player, target, source=source)
         replay_fields["attached_equipment_count"] = count
+    elif amount_source == "attached_creature_shared_type_count":
+        count = _attached_creature_shared_type_count(player, opponents, target, effect_data)
+        replay_fields["attached_creature_shared_type_count"] = count
+        replay_fields["battlefield_count_scope"] = str(
+            effect_data.get("battlefield_count_scope") or "controller_battlefield"
+        ).lower()
     else:
         count_effect = {
             **effect_data,
@@ -58389,6 +58433,13 @@ def _stat_modifier_count_from_source(player, opponents, effect_data):
             graveyard_players = [player] + list(opponents or [])
         elif scope == "opponents_graveyards":
             graveyard_players = list(opponents or [])
+        elif scope == "attached_creature_controller_graveyard":
+            target_controller = _controller_for_permanent(
+                player,
+                opponents,
+                effect_data.get("_attached_target"),
+            )
+            graveyard_players = [target_controller] if target_controller is not None else []
         else:
             return None, {
                 "stat_modifier_amount_source": "graveyard_card_count",

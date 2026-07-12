@@ -1242,6 +1242,43 @@ def _attachment_count_fields_from_filter_text(filter_text: str) -> dict[str, Any
         return {"stat_modifier_amount_source": "attached_equipment_count"}
     if token in {"creature in your party", "creatures in your party"}:
         return {"stat_modifier_amount_source": "party_count"}
+    if token in {"creature cards in your graveyard", "creature card in your graveyard"}:
+        return {
+            "stat_modifier_amount_source": "graveyard_card_count",
+            "graveyard_count_scope": "controller_graveyard",
+            "graveyard_count_card_types": ["creature"],
+        }
+    if token in {"creature cards in all graveyards", "creature card in all graveyards"}:
+        return {
+            "stat_modifier_amount_source": "graveyard_card_count",
+            "graveyard_count_scope": "all_graveyards",
+            "graveyard_count_card_types": ["creature"],
+        }
+    if token in {
+        "creature cards in its controller's graveyard",
+        "creature card in its controller's graveyard",
+    }:
+        return {
+            "stat_modifier_amount_source": "graveyard_card_count",
+            "graveyard_count_scope": "attached_creature_controller_graveyard",
+            "graveyard_count_card_types": ["creature"],
+        }
+    if token in {
+        "other creature on the battlefield that shares a creature type with it",
+        "other creatures on the battlefield that share a creature type with it",
+    }:
+        return {
+            "stat_modifier_amount_source": "attached_creature_shared_type_count",
+            "battlefield_count_scope": "all_battlefields",
+        }
+    if token in {
+        "other creature you control that shares a creature type with it",
+        "other creatures you control that share a creature type with it",
+    }:
+        return {
+            "stat_modifier_amount_source": "attached_creature_shared_type_count",
+            "battlefield_count_scope": "controller_battlefield",
+        }
 
     controlled_type_map = {
         "artifact": ["artifact"],
@@ -1371,7 +1408,9 @@ def _java_dynamic_value_assignment(source: str, variable_name: str) -> str | Non
     if not var or not re.fullmatch(r"[A-Za-z_]\w*", var):
         return None
     match = re.search(
-        rf"\b(?:DynamicValue|PermanentsOnBattlefieldCount|CardsInControllerHandCount)\s+"
+        rf"\b(?:DynamicValue|[A-Za-z_]\w*DynamicValue|PermanentsOnBattlefieldCount|"
+        rf"CardsInControllerHandCount|CardsInControllerGraveyardCount|CardsInAllGraveyardsCount|"
+        rf"CardsInEnchantedCreaturesControllerGraveyardCount)\s+"
         rf"{re.escape(var)}\s*=\s*(?P<expr>[^;]+);",
         source or "",
         re.S,
@@ -1379,7 +1418,9 @@ def _java_dynamic_value_assignment(source: str, variable_name: str) -> str | Non
     if match:
         return re.sub(r"\s+", " ", match.group("expr")).strip()
     match = re.search(
-        rf"\b{re.escape(var)}\s*=\s*(?P<expr>new\s+(?:PermanentsOnBattlefieldCount|SignInversionDynamicValue)\s*\([^;]+?\))\s*;",
+        rf"\b{re.escape(var)}\s*=\s*(?P<expr>new\s+(?:PermanentsOnBattlefieldCount|SignInversionDynamicValue|"
+        rf"CardsInControllerGraveyardCount|CardsInAllGraveyardsCount|"
+        rf"CardsInEnchantedCreaturesControllerGraveyardCount)\s*\([^;]+?\))\s*;",
         source or "",
         re.S,
     )
@@ -1439,6 +1480,16 @@ def _attachment_filter_var_count_fields(source: str, filter_name: str) -> dict[s
     return fields
 
 
+def _attachment_graveyard_filter_is_creature(expr: str) -> bool:
+    token = re.sub(r"\s+", " ", str(expr or ""))
+    return bool(
+        "StaticFilters.FILTER_CARD_CREATURE" in token
+        or "StaticFilters.FILTER_CARD_CREATURES" in token
+        or "new FilterCreatureCard" in token
+        or "FilterCreatureCard(" in token
+    )
+
+
 def _attachment_count_source_spec_from_expr(source: str, expr: str) -> dict[str, Any] | str | None:
     text = source or ""
     token = re.sub(r"\s+", " ", str(expr or "").strip())
@@ -1472,6 +1523,35 @@ def _attachment_count_source_spec_from_expr(source: str, expr: str) -> dict[str,
         return {"stat_modifier_amount_source": "party_count", "per": sign}
     if "CivicSaberColorCount" in token or "EnchantedCreatureColorsCount" in token:
         return {"stat_modifier_amount_source": "attached_creature_color_count", "per": sign}
+    if "AlphaStatusDynamicValue" in token:
+        return {
+            "stat_modifier_amount_source": "attached_creature_shared_type_count",
+            "battlefield_count_scope": "all_battlefields",
+            "per": sign * 2,
+        }
+    if "StoneforgeMasterworkDynamicValue" in token:
+        return {
+            "stat_modifier_amount_source": "attached_creature_shared_type_count",
+            "battlefield_count_scope": "controller_battlefield",
+            "per": sign,
+        }
+    graveyard_counter_scopes = {
+        "CardsInControllerGraveyardCount": "controller_graveyard",
+        "CardsInAllGraveyardsCount": "all_graveyards",
+        "CardsInEnchantedCreaturesControllerGraveyardCount": "attached_creature_controller_graveyard",
+    }
+    for counter_class, graveyard_scope in graveyard_counter_scopes.items():
+        if counter_class not in token:
+            continue
+        args = extract_java_call_args(token, counter_class)
+        if not _attachment_graveyard_filter_is_creature(args or token):
+            return "attachment_dynamic_source_filter_not_supported"
+        return {
+            "stat_modifier_amount_source": "graveyard_card_count",
+            "graveyard_count_scope": graveyard_scope,
+            "graveyard_count_card_types": ["creature"],
+            "per": sign,
+        }
     if "AttachedToAttachedPredicate" in text and "PermanentsOnBattlefieldCount" in token:
         return {"stat_modifier_amount_source": "attached_equipment_count", "per": sign}
     if "PermanentsOnBattlefieldCount" in token:
@@ -1536,6 +1616,9 @@ def dynamic_attachment_static_pt_from_source(
                 "battlefield_count_card_types",
                 "battlefield_count_subtypes",
                 "battlefield_count_exclude_source",
+                "graveyard_count_scope",
+                "graveyard_count_card_types",
+                "graveyard_count_subtypes",
             ):
                 if spec.get(key) != count_spec.get(key):
                     return "attachment_dynamic_source_mixed_counts_not_supported"

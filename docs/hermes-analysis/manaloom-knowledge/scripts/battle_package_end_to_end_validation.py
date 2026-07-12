@@ -12272,7 +12272,9 @@ def run_aura_static_power_toughness_attachment(
     opponent = battle.Player(str(scenario.get("opponent") or "Aura Target Opponent"), None, [])
     active.hand = [dict(card) for card in scenario.get("controller_hand") or []]
     active.battlefield.extend(dict(card) for card in scenario.get("controller_battlefield") or [])
+    active.graveyard = [dict(card) for card in scenario.get("controller_graveyard") or []]
     opponent.battlefield.extend(dict(card) for card in scenario.get("opponent_battlefield") or [])
+    opponent.graveyard = [dict(card) for card in scenario.get("opponent_graveyard") or []]
     target = dict(scenario["target"])
     target_owner = str(scenario.get("target_owner") or "controller")
     target_controller = opponent if target_owner == "opponent" else active
@@ -12379,6 +12381,7 @@ def run_equipment_static_power_toughness_attachment(
     active = battle.Player(str(scenario.get("player") or "Equipment Controller"), None, [])
     active.hand = [dict(card) for card in scenario.get("controller_hand") or []]
     active.battlefield.extend(dict(card) for card in scenario.get("controller_battlefield") or [])
+    active.graveyard = [dict(card) for card in scenario.get("controller_graveyard") or []]
     target = dict(scenario["target"])
     active.battlefield.append(target)
     before_events = len(events)

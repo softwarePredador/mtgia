@@ -1,0 +1,822 @@
+{
+  "apply_gate": "Do not run apply SQL without explicit approval for the exact command.",
+  "backup_table": "manaloom_deploy_audit.pg803_attachment_graveyard_shared_type_n_20260712_031823",
+  "deploy_id": "pg803",
+  "execution_scenarios": [
+    {
+      "card": {
+        "name": "Alpha Status",
+        "type_line": "Enchantment - Aura"
+      },
+      "controller_battlefield": [
+        {
+          "base_power": 1,
+          "base_toughness": 1,
+          "name": "E2E Matching Controller Soldier",
+          "power": 1,
+          "subtypes": [
+            "soldier"
+          ],
+          "toughness": 1,
+          "type_line": "Creature - Soldier"
+        },
+        {
+          "base_power": 1,
+          "base_toughness": 1,
+          "name": "E2E Nonmatching Goblin",
+          "power": 1,
+          "subtypes": [
+            "goblin"
+          ],
+          "toughness": 1,
+          "type_line": "Creature - Goblin"
+        }
+      ],
+      "expected_dynamic_count": 2,
+      "expected_dynamic_count_source": "attached_creature_shared_type_count",
+      "expected_moved_to_graveyard": false,
+      "expected_power": 6,
+      "expected_source": "Alpha Status",
+      "expected_toughness": 6,
+      "logical_rule_key": "battle_rule_v1:4637a9f25fc3d815d44d059da775da61",
+      "name": "Alpha Status aura static P/T attaches",
+      "opponent_battlefield": [
+        {
+          "base_power": 1,
+          "base_toughness": 1,
+          "name": "E2E Matching Opponent Human",
+          "power": 1,
+          "subtypes": [
+            "human"
+          ],
+          "toughness": 1,
+          "type_line": "Creature - Human"
+        }
+      ],
+      "target": {
+        "base_power": 2,
+        "base_toughness": 2,
+        "name": "E2E Aura Target for Alpha Status",
+        "power": 2,
+        "subtypes": [
+          "human",
+          "soldier"
+        ],
+        "toughness": 2,
+        "type_line": "Creature - Human Soldier"
+      },
+      "target_owner": "controller",
+      "type": "aura_static_power_toughness_attachment"
+    },
+    {
+      "card": {
+        "name": "Death's Approach",
+        "type_line": "Enchantment - Aura"
+      },
+      "expected_dynamic_count": 3,
+      "expected_dynamic_count_source": "graveyard_card_count",
+      "expected_moved_to_graveyard": true,
+      "expected_power": -1,
+      "expected_source": "Death's Approach",
+      "expected_toughness": -1,
+      "logical_rule_key": "battle_rule_v1:5893f8937a4b929d2a45bc185d7914f9",
+      "name": "Death's Approach aura static P/T attaches",
+      "opponent_graveyard": [
+        {
+          "name": "E2E Graveyard Creature 1",
+          "type_line": "Creature - Soldier"
+        },
+        {
+          "name": "E2E Graveyard Creature 2",
+          "type_line": "Creature - Soldier"
+        },
+        {
+          "name": "E2E Graveyard Creature 3",
+          "type_line": "Creature - Soldier"
+        },
+        {
+          "name": "E2E Graveyard Instant",
+          "type_line": "Instant"
+        }
+      ],
+      "target": {
+        "base_power": 2,
+        "base_toughness": 2,
+        "name": "E2E Aura Target for Death's Approach",
+        "power": 2,
+        "toughness": 2,
+        "type_line": "Creature - Soldier"
+      },
+      "target_owner": "opponent",
+      "type": "aura_static_power_toughness_attachment"
+    },
+    {
+      "card": {
+        "name": "Exoskeletal Armor",
+        "type_line": "Enchantment - Aura"
+      },
+      "controller_graveyard": [
+        {
+          "name": "E2E Graveyard Creature 1",
+          "type_line": "Creature - Soldier"
+        },
+        {
+          "name": "E2E Graveyard Creature 2",
+          "type_line": "Creature - Soldier"
+        },
+        {
+          "name": "E2E Graveyard Instant",
+          "type_line": "Instant"
+        }
+      ],
+      "expected_dynamic_count": 3,
+      "expected_dynamic_count_source": "graveyard_card_count",
+      "expected_moved_to_graveyard": false,
+      "expected_power": 5,
+      "expected_source": "Exoskeletal Armor",
+      "expected_toughness": 5,
+      "logical_rule_key": "battle_rule_v1:fcc874adc294a491e7ac9a650df1f03e",
+      "name": "Exoskeletal Armor aura static P/T attaches",
+      "opponent_graveyard": [
+        {
+          "name": "E2E Graveyard Creature 3",
+          "type_line": "Creature - Soldier"
+        }
+      ],
+      "target": {
+        "base_power": 2,
+        "base_toughness": 2,
+        "name": "E2E Aura Target for Exoskeletal Armor",
+        "power": 2,
+        "toughness": 2,
+        "type_line": "Creature - Soldier"
+      },
+      "target_owner": "controller",
+      "type": "aura_static_power_toughness_attachment"
+    },
+    {
+      "card": {
+        "name": "Stoneforge Masterwork",
+        "type_line": "Artifact - Equipment"
+      },
+      "controller_battlefield": [
+        {
+          "base_power": 1,
+          "base_toughness": 1,
+          "name": "E2E Matching Controller Soldier",
+          "power": 1,
+          "subtypes": [
+            "soldier"
+          ],
+          "toughness": 1,
+          "type_line": "Creature - Soldier"
+        },
+        {
+          "base_power": 1,
+          "base_toughness": 1,
+          "name": "E2E Nonmatching Goblin",
+          "power": 1,
+          "subtypes": [
+            "goblin"
+          ],
+          "toughness": 1,
+          "type_line": "Creature - Goblin"
+        }
+      ],
+      "expected_dynamic_count": 1,
+      "expected_dynamic_count_source": "attached_creature_shared_type_count",
+      "expected_keywords": [],
+      "expected_power": 3,
+      "expected_source": "Stoneforge Masterwork",
+      "expected_toughness": 3,
+      "logical_rule_key": "battle_rule_v1:949bd09f92871413f5d3497f1f71389a",
+      "name": "Stoneforge Masterwork equipment static P/T attaches",
+      "target": {
+        "base_power": 2,
+        "base_toughness": 2,
+        "name": "E2E Equipment Target for Stoneforge Masterwork",
+        "power": 2,
+        "subtypes": [
+          "human",
+          "soldier"
+        ],
+        "toughness": 2,
+        "type_line": "Creature - Human Soldier"
+      },
+      "type": "equipment_static_power_toughness_attachment"
+    },
+    {
+      "card": {
+        "name": "Wreath of Geists",
+        "type_line": "Enchantment - Aura"
+      },
+      "controller_graveyard": [
+        {
+          "name": "E2E Graveyard Creature 1",
+          "type_line": "Creature - Soldier"
+        },
+        {
+          "name": "E2E Graveyard Creature 2",
+          "type_line": "Creature - Soldier"
+        },
+        {
+          "name": "E2E Graveyard Creature 3",
+          "type_line": "Creature - Soldier"
+        },
+        {
+          "name": "E2E Graveyard Instant",
+          "type_line": "Instant"
+        }
+      ],
+      "expected_dynamic_count": 3,
+      "expected_dynamic_count_source": "graveyard_card_count",
+      "expected_moved_to_graveyard": false,
+      "expected_power": 5,
+      "expected_source": "Wreath of Geists",
+      "expected_toughness": 5,
+      "logical_rule_key": "battle_rule_v1:5f327f69a479abce2987fea68bdbb46f",
+      "name": "Wreath of Geists aura static P/T attaches",
+      "target": {
+        "base_power": 2,
+        "base_toughness": 2,
+        "name": "E2E Aura Target for Wreath of Geists",
+        "power": 2,
+        "toughness": 2,
+        "type_line": "Creature - Soldier"
+      },
+      "target_owner": "controller",
+      "type": "aura_static_power_toughness_attachment"
+    }
+  ],
+  "expected_rules": [
+    {
+      "card_name": "Alpha Status",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:4637a9f25fc3d815d44d059da775da61",
+      "min_rule_version": 2,
+      "normalized_name": "alpha status",
+      "oracle_hash": "dc2fe49152d99850434f64f24d3b6436",
+      "required_effect_fields": {
+        "ability_kind": "aura_static",
+        "attachment_dynamic_boost": true,
+        "battle_model_scope": "xmage_aura_static_power_toughness_attachment_v1",
+        "battlefield_count_scope": "all_battlefields",
+        "effect": "aura_static_attachment",
+        "enchant_target": "creature",
+        "enchant_target_controller": "any",
+        "instant": false,
+        "power_base_delta": 0,
+        "power_boost": 0,
+        "power_delta_per_graveyard_count": 2,
+        "sorcery": false,
+        "stat_modifier_amount_source": "attached_creature_shared_type_count",
+        "static_effect": "attached_creature_power_toughness_boost_equal_count",
+        "static_power_bonus": 0,
+        "static_toughness_bonus": 0,
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "zone": "battlefield"
+        },
+        "toughness_base_delta": 0,
+        "toughness_boost": 0,
+        "toughness_delta_per_graveyard_count": 2,
+        "xmage_ability_classes": [
+          "EnchantAbility",
+          "SimpleStaticAbility"
+        ],
+        "xmage_effect_classes": [
+          "AttachEffect",
+          "BoostEnchantedEffect"
+        ]
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Death's Approach",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:5893f8937a4b929d2a45bc185d7914f9",
+      "min_rule_version": 2,
+      "normalized_name": "death's approach",
+      "oracle_hash": "c33040d9c32eb56deeb4d9295862aa7a",
+      "required_effect_fields": {
+        "ability_kind": "aura_static",
+        "attachment_dynamic_boost": true,
+        "battle_model_scope": "xmage_aura_static_power_toughness_attachment_v1",
+        "effect": "aura_static_attachment",
+        "enchant_target": "creature",
+        "enchant_target_controller": "any",
+        "graveyard_count_card_types": [
+          "creature"
+        ],
+        "graveyard_count_scope": "attached_creature_controller_graveyard",
+        "instant": false,
+        "power_base_delta": 0,
+        "power_boost": 0,
+        "power_delta_per_graveyard_count": -1,
+        "sorcery": false,
+        "stat_modifier_amount_source": "graveyard_card_count",
+        "static_effect": "attached_creature_power_toughness_boost_equal_count",
+        "static_power_bonus": 0,
+        "static_toughness_bonus": 0,
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "zone": "battlefield"
+        },
+        "toughness_base_delta": 0,
+        "toughness_boost": 0,
+        "toughness_delta_per_graveyard_count": -1,
+        "xmage_ability_classes": [
+          "EnchantAbility",
+          "SimpleStaticAbility"
+        ],
+        "xmage_effect_classes": [
+          "AttachEffect",
+          "BoostEnchantedEffect"
+        ]
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Exoskeletal Armor",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:fcc874adc294a491e7ac9a650df1f03e",
+      "min_rule_version": 2,
+      "normalized_name": "exoskeletal armor",
+      "oracle_hash": "162e12aada2989c9078456aed98e2095",
+      "required_effect_fields": {
+        "ability_kind": "aura_static",
+        "attachment_dynamic_boost": true,
+        "battle_model_scope": "xmage_aura_static_power_toughness_attachment_v1",
+        "effect": "aura_static_attachment",
+        "enchant_target": "creature",
+        "enchant_target_controller": "any",
+        "graveyard_count_card_types": [
+          "creature"
+        ],
+        "graveyard_count_scope": "all_graveyards",
+        "instant": false,
+        "power_base_delta": 0,
+        "power_boost": 0,
+        "power_delta_per_graveyard_count": 1,
+        "sorcery": false,
+        "stat_modifier_amount_source": "graveyard_card_count",
+        "static_effect": "attached_creature_power_toughness_boost_equal_count",
+        "static_power_bonus": 0,
+        "static_toughness_bonus": 0,
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "zone": "battlefield"
+        },
+        "toughness_base_delta": 0,
+        "toughness_boost": 0,
+        "toughness_delta_per_graveyard_count": 1,
+        "xmage_ability_classes": [
+          "EnchantAbility",
+          "SimpleStaticAbility"
+        ],
+        "xmage_effect_classes": [
+          "AttachEffect",
+          "BoostEnchantedEffect"
+        ]
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Stoneforge Masterwork",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:949bd09f92871413f5d3497f1f71389a",
+      "min_rule_version": 2,
+      "normalized_name": "stoneforge masterwork",
+      "oracle_hash": "dfe3dafdedf9063733f412f35e1c3eab",
+      "required_effect_fields": {
+        "ability_kind": "equipment_static",
+        "attached_keywords": [],
+        "attachment_dynamic_boost": true,
+        "battle_model_scope": "xmage_equipment_static_power_toughness_attachment_v1",
+        "battlefield_count_scope": "controller_battlefield",
+        "effect": "equipment_static_attachment",
+        "instant": false,
+        "power_base_delta": 0,
+        "power_boost": 0,
+        "power_delta_per_graveyard_count": 1,
+        "sorcery": false,
+        "stat_modifier_amount_source": "attached_creature_shared_type_count",
+        "static_effect": "attached_creature_power_toughness_boost_equal_count",
+        "static_power_bonus": 0,
+        "static_toughness_bonus": 0,
+        "target": "creature_you_control",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "controller": "self",
+          "zone": "battlefield"
+        },
+        "toughness_base_delta": 0,
+        "toughness_boost": 0,
+        "toughness_delta_per_graveyard_count": 1,
+        "xmage_ability_classes": [
+          "EquipAbility",
+          "SimpleStaticAbility"
+        ],
+        "xmage_effect_classes": [
+          "BoostEquippedEffect"
+        ]
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Wreath of Geists",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:5f327f69a479abce2987fea68bdbb46f",
+      "min_rule_version": 2,
+      "normalized_name": "wreath of geists",
+      "oracle_hash": "6789d58ba0ee8ed5de943dd5ca5a1be1",
+      "required_effect_fields": {
+        "ability_kind": "aura_static",
+        "attachment_dynamic_boost": true,
+        "battle_model_scope": "xmage_aura_static_power_toughness_attachment_v1",
+        "effect": "aura_static_attachment",
+        "enchant_target": "creature",
+        "enchant_target_controller": "any",
+        "graveyard_count_card_types": [
+          "creature"
+        ],
+        "graveyard_count_scope": "controller_graveyard",
+        "instant": false,
+        "power_base_delta": 0,
+        "power_boost": 0,
+        "power_delta_per_graveyard_count": 1,
+        "sorcery": false,
+        "stat_modifier_amount_source": "graveyard_card_count",
+        "static_effect": "attached_creature_power_toughness_boost_equal_count",
+        "static_power_bonus": 0,
+        "static_toughness_bonus": 0,
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "zone": "battlefield"
+        },
+        "toughness_base_delta": 0,
+        "toughness_boost": 0,
+        "toughness_delta_per_graveyard_count": 1,
+        "xmage_ability_classes": [
+          "EnchantAbility",
+          "SimpleStaticAbility"
+        ],
+        "xmage_effect_classes": [
+          "AttachEffect",
+          "BoostEnchantedEffect"
+        ]
+      },
+      "review_status": "verified"
+    }
+  ],
+  "family_counts": {
+    "xmage_aura_static_power_toughness_attachment": 4,
+    "xmage_equipment_static_power_toughness_attachment": 1
+  },
+  "files": {
+    "apply": "docs/hermes-analysis/master_optimizer_reports/pg803_attachment_graveyard_shared_type_new_server_package_apply.sql",
+    "manifest": "docs/hermes-analysis/master_optimizer_reports/pg803_attachment_graveyard_shared_type_new_server_package_manifest.json",
+    "package": "docs/hermes-analysis/master_optimizer_reports/pg803_attachment_graveyard_shared_type_new_server_package_package.md",
+    "postcheck": "docs/hermes-analysis/master_optimizer_reports/pg803_attachment_graveyard_shared_type_new_server_package_postcheck.sql",
+    "precheck": "docs/hermes-analysis/master_optimizer_reports/pg803_attachment_graveyard_shared_type_new_server_package_precheck.sql",
+    "rollback": "docs/hermes-analysis/master_optimizer_reports/pg803_attachment_graveyard_shared_type_new_server_package_rollback.sql"
+  },
+  "generated_at": "2026-07-12T03:18:23+00:00",
+  "mutations_performed": [],
+  "runtime_checks": [
+    {
+      "card": {
+        "name": "Alpha Status"
+      },
+      "card_name": "Alpha Status",
+      "effect": "aura_static_attachment",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:4637a9f25fc3d815d44d059da775da61",
+      "normalized_name": "alpha status",
+      "required_effect_fields": {
+        "ability_kind": "aura_static",
+        "attachment_dynamic_boost": true,
+        "battle_model_scope": "xmage_aura_static_power_toughness_attachment_v1",
+        "battlefield_count_scope": "all_battlefields",
+        "effect": "aura_static_attachment",
+        "enchant_target": "creature",
+        "enchant_target_controller": "any",
+        "instant": false,
+        "power_base_delta": 0,
+        "power_boost": 0,
+        "power_delta_per_graveyard_count": 2,
+        "sorcery": false,
+        "stat_modifier_amount_source": "attached_creature_shared_type_count",
+        "static_effect": "attached_creature_power_toughness_boost_equal_count",
+        "static_power_bonus": 0,
+        "static_toughness_bonus": 0,
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "zone": "battlefield"
+        },
+        "toughness_base_delta": 0,
+        "toughness_boost": 0,
+        "toughness_delta_per_graveyard_count": 2,
+        "xmage_ability_classes": [
+          "EnchantAbility",
+          "SimpleStaticAbility"
+        ],
+        "xmage_effect_classes": [
+          "AttachEffect",
+          "BoostEnchantedEffect"
+        ]
+      }
+    },
+    {
+      "card": {
+        "name": "Death's Approach"
+      },
+      "card_name": "Death's Approach",
+      "effect": "aura_static_attachment",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:5893f8937a4b929d2a45bc185d7914f9",
+      "normalized_name": "death's approach",
+      "required_effect_fields": {
+        "ability_kind": "aura_static",
+        "attachment_dynamic_boost": true,
+        "battle_model_scope": "xmage_aura_static_power_toughness_attachment_v1",
+        "effect": "aura_static_attachment",
+        "enchant_target": "creature",
+        "enchant_target_controller": "any",
+        "graveyard_count_card_types": [
+          "creature"
+        ],
+        "graveyard_count_scope": "attached_creature_controller_graveyard",
+        "instant": false,
+        "power_base_delta": 0,
+        "power_boost": 0,
+        "power_delta_per_graveyard_count": -1,
+        "sorcery": false,
+        "stat_modifier_amount_source": "graveyard_card_count",
+        "static_effect": "attached_creature_power_toughness_boost_equal_count",
+        "static_power_bonus": 0,
+        "static_toughness_bonus": 0,
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "zone": "battlefield"
+        },
+        "toughness_base_delta": 0,
+        "toughness_boost": 0,
+        "toughness_delta_per_graveyard_count": -1,
+        "xmage_ability_classes": [
+          "EnchantAbility",
+          "SimpleStaticAbility"
+        ],
+        "xmage_effect_classes": [
+          "AttachEffect",
+          "BoostEnchantedEffect"
+        ]
+      }
+    },
+    {
+      "card": {
+        "name": "Exoskeletal Armor"
+      },
+      "card_name": "Exoskeletal Armor",
+      "effect": "aura_static_attachment",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:fcc874adc294a491e7ac9a650df1f03e",
+      "normalized_name": "exoskeletal armor",
+      "required_effect_fields": {
+        "ability_kind": "aura_static",
+        "attachment_dynamic_boost": true,
+        "battle_model_scope": "xmage_aura_static_power_toughness_attachment_v1",
+        "effect": "aura_static_attachment",
+        "enchant_target": "creature",
+        "enchant_target_controller": "any",
+        "graveyard_count_card_types": [
+          "creature"
+        ],
+        "graveyard_count_scope": "all_graveyards",
+        "instant": false,
+        "power_base_delta": 0,
+        "power_boost": 0,
+        "power_delta_per_graveyard_count": 1,
+        "sorcery": false,
+        "stat_modifier_amount_source": "graveyard_card_count",
+        "static_effect": "attached_creature_power_toughness_boost_equal_count",
+        "static_power_bonus": 0,
+        "static_toughness_bonus": 0,
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "zone": "battlefield"
+        },
+        "toughness_base_delta": 0,
+        "toughness_boost": 0,
+        "toughness_delta_per_graveyard_count": 1,
+        "xmage_ability_classes": [
+          "EnchantAbility",
+          "SimpleStaticAbility"
+        ],
+        "xmage_effect_classes": [
+          "AttachEffect",
+          "BoostEnchantedEffect"
+        ]
+      }
+    },
+    {
+      "card": {
+        "name": "Stoneforge Masterwork"
+      },
+      "card_name": "Stoneforge Masterwork",
+      "effect": "equipment_static_attachment",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:949bd09f92871413f5d3497f1f71389a",
+      "normalized_name": "stoneforge masterwork",
+      "required_effect_fields": {
+        "ability_kind": "equipment_static",
+        "attached_keywords": [],
+        "attachment_dynamic_boost": true,
+        "battle_model_scope": "xmage_equipment_static_power_toughness_attachment_v1",
+        "battlefield_count_scope": "controller_battlefield",
+        "effect": "equipment_static_attachment",
+        "instant": false,
+        "power_base_delta": 0,
+        "power_boost": 0,
+        "power_delta_per_graveyard_count": 1,
+        "sorcery": false,
+        "stat_modifier_amount_source": "attached_creature_shared_type_count",
+        "static_effect": "attached_creature_power_toughness_boost_equal_count",
+        "static_power_bonus": 0,
+        "static_toughness_bonus": 0,
+        "target": "creature_you_control",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "controller": "self",
+          "zone": "battlefield"
+        },
+        "toughness_base_delta": 0,
+        "toughness_boost": 0,
+        "toughness_delta_per_graveyard_count": 1,
+        "xmage_ability_classes": [
+          "EquipAbility",
+          "SimpleStaticAbility"
+        ],
+        "xmage_effect_classes": [
+          "BoostEquippedEffect"
+        ]
+      }
+    },
+    {
+      "card": {
+        "name": "Wreath of Geists"
+      },
+      "card_name": "Wreath of Geists",
+      "effect": "aura_static_attachment",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:5f327f69a479abce2987fea68bdbb46f",
+      "normalized_name": "wreath of geists",
+      "required_effect_fields": {
+        "ability_kind": "aura_static",
+        "attachment_dynamic_boost": true,
+        "battle_model_scope": "xmage_aura_static_power_toughness_attachment_v1",
+        "effect": "aura_static_attachment",
+        "enchant_target": "creature",
+        "enchant_target_controller": "any",
+        "graveyard_count_card_types": [
+          "creature"
+        ],
+        "graveyard_count_scope": "controller_graveyard",
+        "instant": false,
+        "power_base_delta": 0,
+        "power_boost": 0,
+        "power_delta_per_graveyard_count": 1,
+        "sorcery": false,
+        "stat_modifier_amount_source": "graveyard_card_count",
+        "static_effect": "attached_creature_power_toughness_boost_equal_count",
+        "static_power_bonus": 0,
+        "static_toughness_bonus": 0,
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "zone": "battlefield"
+        },
+        "toughness_base_delta": 0,
+        "toughness_boost": 0,
+        "toughness_delta_per_graveyard_count": 1,
+        "xmage_ability_classes": [
+          "EnchantAbility",
+          "SimpleStaticAbility"
+        ],
+        "xmage_effect_classes": [
+          "AttachEffect",
+          "BoostEnchantedEffect"
+        ]
+      }
+    }
+  ],
+  "selected_card_names": [
+    "Alpha Status",
+    "Death's Approach",
+    "Exoskeletal Armor",
+    "Stoneforge Masterwork",
+    "Wreath of Geists"
+  ],
+  "selected_count": 5,
+  "slug": "attachment_graveyard_shared_type_new_server",
+  "snapshot_checks": [
+    {
+      "card_name": "Alpha Status",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:4637a9f25fc3d815d44d059da775da61",
+      "min_rule_version": 2,
+      "normalized_name": "alpha status",
+      "oracle_hash": "dc2fe49152d99850434f64f24d3b6436",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_aura_static_power_toughness_attachment_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Death's Approach",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:5893f8937a4b929d2a45bc185d7914f9",
+      "min_rule_version": 2,
+      "normalized_name": "death's approach",
+      "oracle_hash": "c33040d9c32eb56deeb4d9295862aa7a",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_aura_static_power_toughness_attachment_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Exoskeletal Armor",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:fcc874adc294a491e7ac9a650df1f03e",
+      "min_rule_version": 2,
+      "normalized_name": "exoskeletal armor",
+      "oracle_hash": "162e12aada2989c9078456aed98e2095",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_aura_static_power_toughness_attachment_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Stoneforge Masterwork",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:949bd09f92871413f5d3497f1f71389a",
+      "min_rule_version": 2,
+      "normalized_name": "stoneforge masterwork",
+      "oracle_hash": "dfe3dafdedf9063733f412f35e1c3eab",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_equipment_static_power_toughness_attachment_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Wreath of Geists",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:5f327f69a479abce2987fea68bdbb46f",
+      "min_rule_version": 2,
+      "normalized_name": "wreath of geists",
+      "oracle_hash": "6789d58ba0ee8ed5de943dd5ca5a1be1",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_aura_static_power_toughness_attachment_v1"
+      },
+      "review_status": "verified"
+    }
+  ],
+  "status": "prepared_read_only_pending_apply_approval"
+}

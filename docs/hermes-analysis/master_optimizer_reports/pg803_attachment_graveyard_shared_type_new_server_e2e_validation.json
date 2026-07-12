@@ -1,0 +1,302 @@
+{
+  "battle_execution": {
+    "event_count": 7,
+    "results": [
+      {
+        "attached_event": {
+          "power_boost": 4,
+          "target_player": "Aura Controller",
+          "toughness_boost": 4
+        },
+        "card_name": "Alpha Status",
+        "moved_to_graveyard": false,
+        "scenario": "Alpha Status aura static P/T attaches",
+        "target": "E2E Aura Target for Alpha Status",
+        "target_owner": "controller",
+        "target_power": 6,
+        "target_toughness": 6
+      },
+      {
+        "attached_event": {
+          "power_boost": -3,
+          "target_player": "Aura Target Opponent",
+          "toughness_boost": -3
+        },
+        "card_name": "Death's Approach",
+        "moved_to_graveyard": true,
+        "scenario": "Death's Approach aura static P/T attaches",
+        "target": "E2E Aura Target for Death's Approach",
+        "target_owner": "opponent",
+        "target_power": -1,
+        "target_toughness": -1
+      },
+      {
+        "attached_event": {
+          "power_boost": 3,
+          "target_player": "Aura Controller",
+          "toughness_boost": 3
+        },
+        "card_name": "Exoskeletal Armor",
+        "moved_to_graveyard": false,
+        "scenario": "Exoskeletal Armor aura static P/T attaches",
+        "target": "E2E Aura Target for Exoskeletal Armor",
+        "target_owner": "controller",
+        "target_power": 5,
+        "target_toughness": 5
+      },
+      {
+        "attached_event": {
+          "grants": [],
+          "power_boost": 1,
+          "toughness_boost": 1
+        },
+        "card_name": "Stoneforge Masterwork",
+        "scenario": "Stoneforge Masterwork equipment static P/T attaches",
+        "target": "E2E Equipment Target for Stoneforge Masterwork",
+        "target_power": 3,
+        "target_toughness": 3,
+        "validated_keywords": []
+      },
+      {
+        "attached_event": {
+          "power_boost": 3,
+          "target_player": "Aura Controller",
+          "toughness_boost": 3
+        },
+        "card_name": "Wreath of Geists",
+        "moved_to_graveyard": false,
+        "scenario": "Wreath of Geists aura static P/T attaches",
+        "target": "E2E Aura Target for Wreath of Geists",
+        "target_owner": "controller",
+        "target_power": 5,
+        "target_toughness": 5
+      }
+    ],
+    "scenario_count": 5
+  },
+  "battle_path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py",
+  "database_target": "127.0.0.1:15432/halder",
+  "generated_at_utc": "2026-07-12T03:19:33.453513+00:00",
+  "manifest": "docs/hermes-analysis/master_optimizer_reports/pg803_attachment_graveyard_shared_type_new_server_package_manifest.json",
+  "package_id": "pg803_attachment_graveyard_shared_type_new_server_package_manifest",
+  "snapshot": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/known_cards_canonical_snapshot.json",
+  "sqlite_db": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db",
+  "stages": [
+    {
+      "evidence": {
+        "validated_rows": 5
+      },
+      "name": "postgres_source_of_truth",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_aura_static_power_toughness_attachment_v1",
+          "card_name": "Alpha Status",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:4637a9f25fc3d815d44d059da775da61",
+          "oracle_hash": "dc2fe49152d99850434f64f24d3b6436",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_aura_static_power_toughness_attachment_v1",
+          "card_name": "Death's Approach",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:5893f8937a4b929d2a45bc185d7914f9",
+          "oracle_hash": "c33040d9c32eb56deeb4d9295862aa7a",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_aura_static_power_toughness_attachment_v1",
+          "card_name": "Exoskeletal Armor",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:fcc874adc294a491e7ac9a650df1f03e",
+          "oracle_hash": "162e12aada2989c9078456aed98e2095",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_equipment_static_power_toughness_attachment_v1",
+          "card_name": "Stoneforge Masterwork",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:949bd09f92871413f5d3497f1f71389a",
+          "oracle_hash": "dfe3dafdedf9063733f412f35e1c3eab",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_aura_static_power_toughness_attachment_v1",
+          "card_name": "Wreath of Geists",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:5f327f69a479abce2987fea68bdbb46f",
+          "oracle_hash": "6789d58ba0ee8ed5de943dd5ca5a1be1",
+          "review_status": "verified",
+          "rule_version": 2
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_rows": 5
+      },
+      "name": "sqlite_hermes_cache",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_aura_static_power_toughness_attachment_v1",
+          "card_name": "Alpha Status",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:4637a9f25fc3d815d44d059da775da61",
+          "oracle_hash": "dc2fe49152d99850434f64f24d3b6436",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_aura_static_power_toughness_attachment_v1",
+          "card_name": "Death's Approach",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:5893f8937a4b929d2a45bc185d7914f9",
+          "oracle_hash": "c33040d9c32eb56deeb4d9295862aa7a",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_aura_static_power_toughness_attachment_v1",
+          "card_name": "Exoskeletal Armor",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:fcc874adc294a491e7ac9a650df1f03e",
+          "oracle_hash": "162e12aada2989c9078456aed98e2095",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_equipment_static_power_toughness_attachment_v1",
+          "card_name": "Stoneforge Masterwork",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:949bd09f92871413f5d3497f1f71389a",
+          "oracle_hash": "dfe3dafdedf9063733f412f35e1c3eab",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_aura_static_power_toughness_attachment_v1",
+          "card_name": "Wreath of Geists",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:5f327f69a479abce2987fea68bdbb46f",
+          "oracle_hash": "6789d58ba0ee8ed5de943dd5ca5a1be1",
+          "review_status": "verified",
+          "rule_version": 2
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_cards": 5
+      },
+      "name": "canonical_snapshot_fallback",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_aura_static_power_toughness_attachment_v1",
+          "battle_rule_version": 2,
+          "card_name": "Alpha Status",
+          "logical_rule_key": "battle_rule_v1:4637a9f25fc3d815d44d059da775da61"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_aura_static_power_toughness_attachment_v1",
+          "battle_rule_version": 2,
+          "card_name": "Death's Approach",
+          "logical_rule_key": "battle_rule_v1:5893f8937a4b929d2a45bc185d7914f9"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_aura_static_power_toughness_attachment_v1",
+          "battle_rule_version": 2,
+          "card_name": "Exoskeletal Armor",
+          "logical_rule_key": "battle_rule_v1:fcc874adc294a491e7ac9a650df1f03e"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_equipment_static_power_toughness_attachment_v1",
+          "battle_rule_version": 2,
+          "card_name": "Stoneforge Masterwork",
+          "logical_rule_key": "battle_rule_v1:949bd09f92871413f5d3497f1f71389a"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_aura_static_power_toughness_attachment_v1",
+          "battle_rule_version": 2,
+          "card_name": "Wreath of Geists",
+          "logical_rule_key": "battle_rule_v1:5f327f69a479abce2987fea68bdbb46f"
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_cards": 5
+      },
+      "name": "runtime_get_card_effect",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "card_name": "Alpha Status",
+          "component_keys": [],
+          "effect": "aura_static_attachment",
+          "logical_rule_key": "battle_rule_v1:4637a9f25fc3d815d44d059da775da61"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Death's Approach",
+          "component_keys": [],
+          "effect": "aura_static_attachment",
+          "logical_rule_key": "battle_rule_v1:5893f8937a4b929d2a45bc185d7914f9"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Exoskeletal Armor",
+          "component_keys": [],
+          "effect": "aura_static_attachment",
+          "logical_rule_key": "battle_rule_v1:fcc874adc294a491e7ac9a650df1f03e"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Stoneforge Masterwork",
+          "component_keys": [],
+          "effect": "equipment_static_attachment",
+          "logical_rule_key": "battle_rule_v1:949bd09f92871413f5d3497f1f71389a"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Wreath of Geists",
+          "component_keys": [],
+          "effect": "aura_static_attachment",
+          "logical_rule_key": "battle_rule_v1:5f327f69a479abce2987fea68bdbb46f"
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "events": 7,
+        "scenarios": 5
+      },
+      "name": "battle_execution",
+      "status": "pass"
+    }
+  ],
+  "status": "pass",
+  "title": "Battle Package End-to-End Validation"
+}

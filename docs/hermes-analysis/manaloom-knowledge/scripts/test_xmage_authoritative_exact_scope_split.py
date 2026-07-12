@@ -1056,7 +1056,7 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertEqual(effect["power_delta_per_graveyard_count"], 2)
         self.assertEqual(effect["toughness_delta_per_graveyard_count"], 2)
 
-    def test_dynamic_aura_static_power_toughness_blocks_shared_type_runtime(self) -> None:
+    def test_dynamic_aura_static_power_toughness_maps_shared_type_runtime(self) -> None:
         row = queue_row(
             "xmage_signature::AttachEffect,BoostEnchantedEffect::EnchantAbility,SimpleStaticAbility::"
             "TargetCreaturePermanent,TargetPermanent::no_condition_class::targeting,static_ability",
@@ -1082,11 +1082,59 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
                 DynamicValue dynamicValue = new AlphaStatusDynamicValue();
                 this.addAbility(new SimpleStaticAbility(
                     new BoostEnchantedEffect(dynamicValue, dynamicValue, Duration.WhileOnBattlefield)));
+                class AlphaStatusDynamicValue implements DynamicValue {}
             """,
         )
 
-        self.assertIsNone(proposal)
-        self.assertEqual(reason, "attachment_dynamic_oracle_filter_not_supported")
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.AURA_STATIC_PT_ATTACHMENT_SCOPE)
+        self.assertTrue(effect["attachment_dynamic_boost"])
+        self.assertEqual(effect["stat_modifier_amount_source"], "attached_creature_shared_type_count")
+        self.assertEqual(effect["battlefield_count_scope"], "all_battlefields")
+        self.assertEqual(effect["power_delta_per_graveyard_count"], 2)
+        self.assertEqual(effect["toughness_delta_per_graveyard_count"], 2)
+
+    def test_dynamic_aura_static_power_toughness_maps_attached_controller_graveyard(self) -> None:
+        row = queue_row(
+            "xmage_signature::AttachEffect,BoostEnchantedEffect::EnchantAbility,SimpleStaticAbility::"
+            "TargetCreaturePermanent,TargetPermanent::no_condition_class::targeting,static_ability",
+            effect_classes=["AttachEffect", "BoostEnchantedEffect"],
+            ability_kind="static",
+            ability_classes=["EnchantAbility", "SimpleStaticAbility"],
+            xmage_signals=["targeting", "static_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Death's Approach",
+                type_line="Enchantment - Aura",
+                oracle_text=(
+                    "Enchant creature\n"
+                    "Enchanted creature gets -X/-X, where X is the number of creature cards "
+                    "in its controller's graveyard."
+                ),
+            ),
+            source_text="""
+                this.getSpellAbility().addEffect(new AttachEffect(Outcome.UnboostCreature));
+                this.addAbility(new EnchantAbility(new TargetCreaturePermanent()));
+                DynamicValue unboost = new SignInversionDynamicValue(
+                    new CardsInEnchantedCreaturesControllerGraveyardCount(
+                        new FilterCreatureCard("the number of creature cards in its controller's graveyard")));
+                this.addAbility(new SimpleStaticAbility(
+                    new BoostEnchantedEffect(unboost, unboost, Duration.WhileOnBattlefield)));
+            """,
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.AURA_STATIC_PT_ATTACHMENT_SCOPE)
+        self.assertTrue(effect["attachment_dynamic_boost"])
+        self.assertEqual(effect["stat_modifier_amount_source"], "graveyard_card_count")
+        self.assertEqual(effect["graveyard_count_scope"], "attached_creature_controller_graveyard")
+        self.assertEqual(effect["graveyard_count_card_types"], ["creature"])
+        self.assertEqual(effect["power_delta_per_graveyard_count"], -1)
+        self.assertEqual(effect["toughness_delta_per_graveyard_count"], -1)
 
     def test_dynamic_equipment_static_power_toughness_maps_exact_scope(self) -> None:
         row = queue_row(
@@ -1124,6 +1172,44 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertEqual(effect["stat_modifier_amount_source"], "battlefield_permanent_count")
         self.assertEqual(effect["battlefield_count_scope"], "controller_battlefield")
         self.assertEqual(effect["battlefield_count_card_types"], ["land"])
+        self.assertEqual(effect["power_delta_per_graveyard_count"], 1)
+        self.assertEqual(effect["toughness_delta_per_graveyard_count"], 1)
+
+    def test_dynamic_equipment_static_power_toughness_maps_shared_type_runtime(self) -> None:
+        row = queue_row(
+            "xmage_signature::BoostEquippedEffect::AddAbility,EquipAbility,SimpleStaticAbility::"
+            "TargetPermanent::no_condition_class::targeting,static_ability",
+            effect_classes=["BoostEquippedEffect"],
+            ability_kind="static",
+            ability_classes=["AddAbility", "EquipAbility", "SimpleStaticAbility"],
+            xmage_signals=["targeting", "static_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Stoneforge Masterwork",
+                type_line="Artifact - Equipment",
+                oracle_text=(
+                    "Equipped creature gets +1/+1 for each other creature you control "
+                    "that shares a creature type with it.\n"
+                    "Equip {2}"
+                ),
+            ),
+            source_text="""
+                StoneforgeMasterworkDynamicValue countEnchantments = new StoneforgeMasterworkDynamicValue();
+                Effect effect = new BoostEquippedEffect(countEnchantments, countEnchantments);
+                this.addAbility(new SimpleStaticAbility(effect));
+                this.addAbility(new EquipAbility(Outcome.BoostCreature, new GenericManaCost(2), false));
+                class StoneforgeMasterworkDynamicValue implements DynamicValue {}
+            """,
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.EQUIPMENT_STATIC_ATTACHMENT_SCOPE)
+        self.assertTrue(effect["attachment_dynamic_boost"])
+        self.assertEqual(effect["stat_modifier_amount_source"], "attached_creature_shared_type_count")
+        self.assertEqual(effect["battlefield_count_scope"], "controller_battlefield")
         self.assertEqual(effect["power_delta_per_graveyard_count"], 1)
         self.assertEqual(effect["toughness_delta_per_graveyard_count"], 1)
 

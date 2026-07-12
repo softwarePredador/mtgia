@@ -1698,6 +1698,72 @@ def _dynamic_attachment_fixture(
             }
         ]
         count = 2
+    elif amount_source == "graveyard_card_count":
+        creature_cards = [
+            {"name": f"E2E Graveyard Creature {index + 1}", "type_line": "Creature - Soldier"}
+            for index in range(3)
+        ]
+        nonmatching = {"name": "E2E Graveyard Instant", "type_line": "Instant"}
+        scope = str(required.get("graveyard_count_scope") or "controller_graveyard").lower()
+        if scope == "controller_graveyard":
+            fields["controller_graveyard"] = [*creature_cards, nonmatching]
+        elif scope == "all_graveyards":
+            fields["controller_graveyard"] = [*creature_cards[:2], nonmatching]
+            fields["opponent_graveyard"] = [creature_cards[2]]
+        elif scope == "opponents_graveyards":
+            fields["opponent_graveyard"] = [*creature_cards, nonmatching]
+        elif scope == "attached_creature_controller_graveyard":
+            if target_owner == "opponent":
+                fields["opponent_graveyard"] = [*creature_cards, nonmatching]
+            else:
+                fields["controller_graveyard"] = [*creature_cards, nonmatching]
+        else:
+            fields["expected_dynamic_count_status"] = f"unsupported_fixture_graveyard_scope:{scope}"
+        count = 3 if "expected_dynamic_count_status" not in fields else 0
+    elif amount_source == "attached_creature_shared_type_count":
+        target["type_line"] = "Creature - Human Soldier"
+        target["subtypes"] = ["human", "soldier"]
+        matching_controller = {
+            "name": "E2E Matching Controller Soldier",
+            "type_line": "Creature - Soldier",
+            "subtypes": ["soldier"],
+            "base_power": 1,
+            "base_toughness": 1,
+            "power": 1,
+            "toughness": 1,
+        }
+        matching_opponent = {
+            "name": "E2E Matching Opponent Human",
+            "type_line": "Creature - Human",
+            "subtypes": ["human"],
+            "base_power": 1,
+            "base_toughness": 1,
+            "power": 1,
+            "toughness": 1,
+        }
+        nonmatching = {
+            "name": "E2E Nonmatching Goblin",
+            "type_line": "Creature - Goblin",
+            "subtypes": ["goblin"],
+            "base_power": 1,
+            "base_toughness": 1,
+            "power": 1,
+            "toughness": 1,
+        }
+        scope = str(required.get("battlefield_count_scope") or "controller_battlefield").lower()
+        if scope == "controller_battlefield":
+            fields["controller_battlefield"] = [matching_controller, nonmatching]
+            count = 1
+        elif scope == "all_battlefields":
+            fields["controller_battlefield"] = [matching_controller, nonmatching]
+            fields["opponent_battlefield"] = [matching_opponent]
+            count = 2
+        elif scope == "opponents_battlefield":
+            fields["opponent_battlefield"] = [matching_opponent, nonmatching]
+            count = 1
+        else:
+            fields["expected_dynamic_count_status"] = f"unsupported_fixture_battlefield_scope:{scope}"
+            count = 0
     elif amount_source == "battlefield_permanent_count":
         scope = str(required.get("battlefield_count_scope") or "controller_battlefield").lower()
         support_cards = [_attachment_fixture_permanent(required, index) for index in range(2)]

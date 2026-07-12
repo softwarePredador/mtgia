@@ -2061,6 +2061,156 @@ class XMageExactScopeRuntimeTest(unittest.TestCase):
             )
         )
 
+    def test_dynamic_aura_static_attachment_counts_attached_creature_controller_graveyard(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        opponent = self.battle.Player("Opponent", None, [])
+        target = {"name": "Enemy Bear", "type_line": "Creature - Bear", "power": 2, "toughness": 2}
+        opponent.battlefield = [target]
+        opponent.graveyard = [
+            {"name": "Fallen Soldier", "type_line": "Creature - Soldier"},
+            {"name": "Dead Bear", "type_line": "Creature - Bear"},
+            {"name": "Spent Removal", "type_line": "Instant"},
+        ]
+        aura = {"name": "Death's Approach", "type_line": "Enchantment - Aura"}
+        effect = {
+            "effect": "aura_static_attachment",
+            "battle_model_scope": "xmage_aura_static_power_toughness_attachment_v1",
+            "attachment_dynamic_boost": True,
+            "static_effect": "attached_creature_power_toughness_boost_equal_count",
+            "stat_modifier_amount_source": "graveyard_card_count",
+            "graveyard_count_scope": "attached_creature_controller_graveyard",
+            "graveyard_count_card_types": ["creature"],
+            "power_delta_per_graveyard_count": -1,
+            "toughness_delta_per_graveyard_count": -1,
+            "enchant_target_controller": "any",
+        }
+
+        self.battle.apply_aura_static_attachment(active, [opponent], aura, effect, turn=3, rng=random.Random(2))
+
+        self.assertNotIn(target, opponent.battlefield)
+        self.assertIn(target, opponent.graveyard)
+        attached_event = next(
+            data
+            for event, data in self.events
+            if event == "aura_attached_static_pt" and data.get("card") == "Death's Approach"
+        )
+        self.assertEqual(attached_event["attachment_dynamic_count"], 2)
+        self.assertEqual(attached_event["graveyard_count_scope"], "attached_creature_controller_graveyard")
+        self.assertEqual(attached_event["toughness_after"], 0)
+
+    def test_dynamic_aura_static_attachment_counts_controller_graveyard_creatures(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        target = {"name": "Trained Bear", "type_line": "Creature - Bear", "power": 2, "toughness": 2}
+        active.battlefield = [target]
+        active.graveyard = [
+            {"name": "Fallen Soldier", "type_line": "Creature - Soldier"},
+            {"name": "Dead Bear", "type_line": "Creature - Bear"},
+            {"name": "Spent Growth", "type_line": "Sorcery"},
+        ]
+        aura = {"name": "Wreath of Geists", "type_line": "Enchantment - Aura"}
+        effect = {
+            "effect": "aura_static_attachment",
+            "battle_model_scope": "xmage_aura_static_power_toughness_attachment_v1",
+            "attachment_dynamic_boost": True,
+            "static_effect": "attached_creature_power_toughness_boost_equal_count",
+            "stat_modifier_amount_source": "graveyard_card_count",
+            "graveyard_count_scope": "controller_graveyard",
+            "graveyard_count_card_types": ["creature"],
+            "power_delta_per_graveyard_count": 1,
+            "toughness_delta_per_graveyard_count": 1,
+            "enchant_target_controller": "self",
+        }
+
+        self.battle.apply_aura_static_attachment(active, [], aura, effect, turn=2, rng=random.Random(1))
+
+        attached = next(card for card in active.battlefield if card.get("name") == "Wreath of Geists")
+        self.assertEqual(target["power"], 4)
+        self.assertEqual(target["toughness"], 4)
+        self.assertEqual(attached["attachment_dynamic_count_current"], 2)
+
+    def test_dynamic_aura_static_attachment_counts_shared_creature_types_across_battlefield(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        opponent = self.battle.Player("Opponent", None, [])
+        target = {
+            "name": "Veteran Soldier",
+            "type_line": "Creature - Human Soldier",
+            "subtypes": ["human", "soldier"],
+            "power": 3,
+            "toughness": 3,
+        }
+        active.battlefield = [
+            target,
+            {"name": "Ally Soldier", "type_line": "Creature - Soldier", "power": 1, "toughness": 1},
+            {"name": "Ally Goblin", "type_line": "Creature - Goblin", "power": 1, "toughness": 1},
+        ]
+        opponent.battlefield = [
+            {"name": "Opponent Human", "type_line": "Creature - Human", "power": 1, "toughness": 1}
+        ]
+        aura = {"name": "Alpha Status", "type_line": "Enchantment - Aura"}
+        effect = {
+            "effect": "aura_static_attachment",
+            "battle_model_scope": "xmage_aura_static_power_toughness_attachment_v1",
+            "attachment_dynamic_boost": True,
+            "static_effect": "attached_creature_power_toughness_boost_equal_count",
+            "stat_modifier_amount_source": "attached_creature_shared_type_count",
+            "battlefield_count_scope": "all_battlefields",
+            "power_delta_per_graveyard_count": 2,
+            "toughness_delta_per_graveyard_count": 2,
+            "enchant_target_controller": "self",
+        }
+
+        self.battle.apply_aura_static_attachment(active, [opponent], aura, effect, turn=2, rng=random.Random(1))
+
+        attached = next(card for card in active.battlefield if card.get("name") == "Alpha Status")
+        self.assertEqual(target["power"], 7)
+        self.assertEqual(target["toughness"], 7)
+        self.assertEqual(attached["attachment_dynamic_count_current"], 2)
+
+    def test_dynamic_equipment_static_attachment_counts_shared_creature_types_and_refreshes(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        target = {
+            "name": "Equipped Soldier",
+            "type_line": "Creature - Human Soldier",
+            "subtypes": ["human", "soldier"],
+            "power": 2,
+            "toughness": 2,
+        }
+        active.battlefield = [
+            target,
+            {"name": "Ally Soldier", "type_line": "Creature - Soldier", "power": 1, "toughness": 1},
+            {"name": "Ally Goblin", "type_line": "Creature - Goblin", "power": 1, "toughness": 1},
+        ]
+        equipment = {"name": "Stoneforge Masterwork", "type_line": "Artifact - Equipment"}
+        effect = {
+            "effect": "equipment_static_attachment",
+            "battle_model_scope": "xmage_equipment_static_power_toughness_attachment_v1",
+            "attachment_dynamic_boost": True,
+            "static_effect": "attached_creature_power_toughness_boost_equal_count",
+            "stat_modifier_amount_source": "attached_creature_shared_type_count",
+            "battlefield_count_scope": "controller_battlefield",
+            "power_delta_per_graveyard_count": 1,
+            "toughness_delta_per_graveyard_count": 1,
+        }
+
+        self.battle.apply_equipment_static_attachment(active, equipment, effect, turn=2)
+
+        attached = next(card for card in active.battlefield if card.get("name") == "Stoneforge Masterwork")
+        self.assertEqual(target["power"], 3)
+        self.assertEqual(target["toughness"], 3)
+        self.assertEqual(attached["attachment_dynamic_count_current"], 1)
+
+        active.battlefield.append({"name": "New Human", "type_line": "Creature - Human", "power": 1, "toughness": 1})
+        self.battle.refresh_all_dynamic_attachment_static_power_toughness(
+            [active],
+            turn=2,
+            phase="test",
+            emit_events=True,
+        )
+
+        self.assertEqual(target["power"], 4)
+        self.assertEqual(target["toughness"], 4)
+        self.assertEqual(attached["attachment_dynamic_count_current"], 2)
+
     def test_static_graveyard_count_power_toughness_counts_controller_graveyard_and_counters(self) -> None:
         active = self.battle.Player("Active", None, [])
         active.graveyard = [
