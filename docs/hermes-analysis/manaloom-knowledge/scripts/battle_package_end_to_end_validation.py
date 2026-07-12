@@ -12439,6 +12439,8 @@ def run_static_count_power_toughness(
     active.battlefield.extend(dict(card) for card in scenario.get("controller_battlefield") or [])
     active.battlefield.append(source)
     opponent.battlefield.extend(dict(card) for card in scenario.get("opponent_battlefield") or [])
+    active.graveyard = [dict(card) for card in scenario.get("controller_graveyard") or []]
+    opponent.graveyard = [dict(card) for card in scenario.get("opponent_graveyard") or []]
     active.hand = [dict(card) for card in scenario.get("controller_hand") or []]
     opponent.hand = [dict(card) for card in scenario.get("opponent_hand") or []]
     before_events = len(events)

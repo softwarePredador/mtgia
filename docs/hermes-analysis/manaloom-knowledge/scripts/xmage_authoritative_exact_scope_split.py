@@ -10811,6 +10811,7 @@ STATIC_COUNT_PT_BASIC_LAND_SUBTYPES = {
 }
 STATIC_COUNT_PT_IRREGULAR_SUBTYPES = {
     "elves": "elf",
+    "zombies": "zombie",
 }
 STATIC_COUNT_PT_COLOR_WORDS = {
     "white": "W",
@@ -10971,6 +10972,96 @@ def static_count_pt_from_oracle(metadata: dict[str, Any]) -> dict[str, Any] | No
                 battlefield_count_subtypes=subtypes,
             )
     if re.match(
+        r"^[a-z0-9' ,./-]+ power and toughness are each equal to the total mana value of "
+        r"other creatures you control\.?$",
+        text,
+    ):
+        return static_count_pt_result(
+            static_power_toughness_source="controlled_other_creature_total_mana_value",
+            stat_modifier_amount_source="controlled_other_creature_total_mana_value",
+        )
+    if re.match(
+        r"^[a-z0-9' ,./-]+ power and toughness are each equal to the number of "
+        r"differently named lands you control\.?$",
+        text,
+    ):
+        return static_count_pt_result(
+            static_power_toughness_source="controlled_differently_named_lands",
+            stat_modifier_amount_source="controlled_differently_named_lands",
+        )
+    controlled_mana_symbol_match = re.match(
+        r"^[a-z0-9' ,./-]+ power and toughness are each equal to the number of "
+        r"(?P<color>white|blue|black|red|green) mana symbols in the mana costs of "
+        r"permanents you control\.?$",
+        text,
+    )
+    if controlled_mana_symbol_match:
+        return static_count_pt_result(
+            static_power_toughness_source="controlled_permanents_mana_symbol_count",
+            stat_modifier_amount_source="controlled_permanents_mana_symbol_count",
+            mana_symbol_count_color=STATIC_COUNT_PT_COLOR_WORDS[
+                controlled_mana_symbol_match.group("color")
+            ],
+        )
+    graveyard_mana_symbol_match = re.match(
+        r"^[a-z0-9' ,./-]+ power and toughness are each equal to the number of "
+        r"(?P<color>white|blue|black|red|green) mana symbols in the mana costs of "
+        r"cards in your graveyard\.?$",
+        text,
+    )
+    if graveyard_mana_symbol_match:
+        return static_count_pt_result(
+            static_power_toughness_source="controller_graveyard_mana_symbol_count",
+            stat_modifier_amount_source="controller_graveyard_mana_symbol_count",
+            mana_symbol_count_color=STATIC_COUNT_PT_COLOR_WORDS[
+                graveyard_mana_symbol_match.group("color")
+            ],
+        )
+    controlled_plus_graveyard_subtype_match = re.match(
+        r"^[a-z0-9' ,./-]+ power and toughness are each equal to the number of "
+        r"(?P<subtype_a>[a-z][a-z -]+) you control plus the number of "
+        r"(?P<subtype_b>[a-z][a-z -]+) cards in your graveyard\.?$",
+        text,
+    )
+    if controlled_plus_graveyard_subtype_match:
+        subtype_a = static_count_pt_subtype_token(
+            controlled_plus_graveyard_subtype_match.group("subtype_a")
+        )
+        subtype_b = static_count_pt_subtype_token(
+            controlled_plus_graveyard_subtype_match.group("subtype_b")
+        )
+        if subtype_a and subtype_a == subtype_b and " " not in subtype_a:
+            return static_count_pt_result(
+                static_power_toughness_source="battlefield_plus_graveyard_subtype_count",
+                stat_modifier_amount_source="battlefield_plus_graveyard_subtype_count",
+                battlefield_count_scope="controller_battlefield",
+                battlefield_count_subtypes=[subtype_a],
+                graveyard_count_scope="controller_graveyard",
+                graveyard_count_subtypes=[subtype_a],
+            )
+    battlefield_plus_all_graveyards_subtype_match = re.match(
+        r"^[a-z0-9' ,./-]+ power and toughness are each equal to the number of "
+        r"(?P<subtype_a>[a-z][a-z -]+) on the battlefield plus the number of "
+        r"(?P<subtype_b>[a-z][a-z -]+) cards in all graveyards\.?$",
+        text,
+    )
+    if battlefield_plus_all_graveyards_subtype_match:
+        subtype_a = static_count_pt_subtype_token(
+            battlefield_plus_all_graveyards_subtype_match.group("subtype_a")
+        )
+        subtype_b = static_count_pt_subtype_token(
+            battlefield_plus_all_graveyards_subtype_match.group("subtype_b")
+        )
+        if subtype_a and subtype_a == subtype_b and " " not in subtype_a:
+            return static_count_pt_result(
+                static_power_toughness_source="battlefield_plus_graveyard_subtype_count",
+                stat_modifier_amount_source="battlefield_plus_graveyard_subtype_count",
+                battlefield_count_scope="all_battlefields",
+                battlefield_count_subtypes=[subtype_a],
+                graveyard_count_scope="all_graveyards",
+                graveyard_count_subtypes=[subtype_a],
+            )
+    if re.match(
         r"^[a-z0-9' ,./-]+ power and toughness are each equal to the number of cards in your hand\.?$",
         text,
     ):
@@ -11104,6 +11195,55 @@ def static_count_pt_from_source(source: str) -> dict[str, Any] | str | None:
                 battlefield_count_scope="controller_battlefield",
                 battlefield_count_subtypes=subtypes,
             )
+    if "TotalPermanentsManaValue(StaticFilters.FILTER_OTHER_CONTROLLED_CREATURES)" in text:
+        return static_count_pt_result(
+            static_power_toughness_source="controlled_other_creature_total_mana_value",
+            stat_modifier_amount_source="controlled_other_creature_total_mana_value",
+        )
+    if "DifferentlyNamedPermanentCount(StaticFilters.FILTER_CONTROLLED_PERMANENT_LANDS)" in text:
+        return static_count_pt_result(
+            static_power_toughness_source="controlled_differently_named_lands",
+            stat_modifier_amount_source="controlled_differently_named_lands",
+        )
+    chroma_match = re.search(r"new\s+ChromaCount\s*\(\s*ManaType\.([A-Z]+)\s*\)", text)
+    if chroma_match and chroma_match.group(1) in STATIC_COUNT_PT_OBJECT_COLOR_SYMBOLS:
+        color_symbol = STATIC_COUNT_PT_OBJECT_COLOR_SYMBOLS[chroma_match.group(1)]
+        return static_count_pt_result(
+            static_power_toughness_source="controlled_permanents_mana_symbol_count",
+            stat_modifier_amount_source="controlled_permanents_mana_symbol_count",
+            mana_symbol_count_color=color_symbol,
+        )
+    if "ChromaUmbraStalkerCount" in text:
+        return static_count_pt_result(
+            static_power_toughness_source="controller_graveyard_mana_symbol_count",
+            stat_modifier_amount_source="controller_graveyard_mana_symbol_count",
+            mana_symbol_count_color="B",
+        )
+    if (
+        "AdditiveDynamicValue" in text
+        and "PermanentsOnBattlefieldCount" in text
+        and "CardsInControllerGraveyardCount" in text
+    ):
+        subtypes = static_count_pt_source_predicate_subtypes(text)
+        if len(subtypes) == 1:
+            subtype = subtypes[0]
+            return static_count_pt_result(
+                static_power_toughness_source="battlefield_plus_graveyard_subtype_count",
+                stat_modifier_amount_source="battlefield_plus_graveyard_subtype_count",
+                battlefield_count_scope="controller_battlefield",
+                battlefield_count_subtypes=[subtype],
+                graveyard_count_scope="controller_graveyard",
+                graveyard_count_subtypes=[subtype],
+            )
+    if "SoullessOneDynamicCount" in text:
+        return static_count_pt_result(
+            static_power_toughness_source="battlefield_plus_graveyard_subtype_count",
+            stat_modifier_amount_source="battlefield_plus_graveyard_subtype_count",
+            battlefield_count_scope="all_battlefields",
+            battlefield_count_subtypes=["zombie"],
+            graveyard_count_scope="all_graveyards",
+            graveyard_count_subtypes=["zombie"],
+        )
     blocked_markers = (
         "AdditiveDynamicValue",
         "IntPlusDynamicValue",

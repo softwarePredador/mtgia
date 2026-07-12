@@ -3978,6 +3978,114 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertEqual(effect["battlefield_count_scope"], "controller_battlefield")
         self.assertEqual(effect["battlefield_count_subtypes"], ["soldier", "warrior"])
 
+    def test_static_count_power_toughness_extended_dynamic_sources_are_package_safe(self) -> None:
+        fixtures = [
+            (
+                "Ancient Ooze",
+                "Ancient Ooze's power and toughness are each equal to the total mana value of other creatures you control.",
+                "new SetBasePowerToughnessSourceEffect(new TotalPermanentsManaValue(StaticFilters.FILTER_OTHER_CONTROLLED_CREATURES))",
+                {
+                    "static_power_toughness_source": "controlled_other_creature_total_mana_value",
+                    "stat_modifier_amount_source": "controlled_other_creature_total_mana_value",
+                },
+                [],
+            ),
+            (
+                "Awakened Amalgam",
+                "Awakened Amalgam's power and toughness are each equal to the number of differently named lands you control.",
+                "private static final DifferentlyNamedPermanentCount xValue = "
+                "new DifferentlyNamedPermanentCount(StaticFilters.FILTER_CONTROLLED_PERMANENT_LANDS);"
+                "this.addAbility(new SimpleStaticAbility(Zone.ALL, new SetBasePowerToughnessSourceEffect(xValue)));",
+                {
+                    "static_power_toughness_source": "controlled_differently_named_lands",
+                    "stat_modifier_amount_source": "controlled_differently_named_lands",
+                },
+                [],
+            ),
+            (
+                "Primalcrux",
+                "Trample\nChroma - This creature's power and toughness are each equal to the number of green mana symbols in the mana costs of permanents you control.",
+                "DynamicValue xValue = new ChromaCount(ManaType.GREEN);"
+                "Effect effect = new SetBasePowerToughnessSourceEffect(xValue);",
+                {
+                    "static_power_toughness_source": "controlled_permanents_mana_symbol_count",
+                    "stat_modifier_amount_source": "controlled_permanents_mana_symbol_count",
+                    "mana_symbol_count_color": "G",
+                    "keywords": ["trample"],
+                },
+                ["TrampleAbility"],
+            ),
+            (
+                "Umbra Stalker",
+                "Chroma - Umbra Stalker's power and toughness are each equal to the number of black mana symbols in the mana costs of cards in your graveyard.",
+                "DynamicValue xValue = new ChromaUmbraStalkerCount();"
+                "Effect effect = new SetBasePowerToughnessSourceEffect(xValue);",
+                {
+                    "static_power_toughness_source": "controller_graveyard_mana_symbol_count",
+                    "stat_modifier_amount_source": "controller_graveyard_mana_symbol_count",
+                    "mana_symbol_count_color": "B",
+                },
+                [],
+            ),
+            (
+                "Abomination of Llanowar",
+                "Vigilance; menace (This creature can't be blocked except by two or more creatures.)\n"
+                "Abomination of Llanowar's power and toughness are each equal to the number of Elves you control plus the number of Elf cards in your graveyard.",
+                "private static final FilterPermanent filter = new FilterControlledPermanent(SubType.ELF, \"Elves you control\");"
+                "private static final FilterCard filter2 = new FilterCard(\"plus the number of Elf cards\");"
+                "filter2.add(SubType.ELF.getPredicate());"
+                "private static final DynamicValue xValue = new AdditiveDynamicValue("
+                "new PermanentsOnBattlefieldCount(filter), new CardsInControllerGraveyardCount(filter2));"
+                "this.addAbility(new SimpleStaticAbility(Zone.ALL, new SetBasePowerToughnessSourceEffect(xValue)));",
+                {
+                    "static_power_toughness_source": "battlefield_plus_graveyard_subtype_count",
+                    "stat_modifier_amount_source": "battlefield_plus_graveyard_subtype_count",
+                    "battlefield_count_scope": "controller_battlefield",
+                    "battlefield_count_subtypes": ["elf"],
+                    "graveyard_count_scope": "controller_graveyard",
+                    "graveyard_count_subtypes": ["elf"],
+                    "keywords": ["menace", "vigilance"],
+                },
+                ["MenaceAbility", "VigilanceAbility"],
+            ),
+            (
+                "Soulless One",
+                "Soulless One's power and toughness are each equal to the number of Zombies on the battlefield plus the number of Zombie cards in all graveyards.",
+                "this.addAbility(new SimpleStaticAbility(Zone.ALL, "
+                "new SetBasePowerToughnessSourceEffect(new SoullessOneDynamicCount())));",
+                {
+                    "static_power_toughness_source": "battlefield_plus_graveyard_subtype_count",
+                    "stat_modifier_amount_source": "battlefield_plus_graveyard_subtype_count",
+                    "battlefield_count_scope": "all_battlefields",
+                    "battlefield_count_subtypes": ["zombie"],
+                    "graveyard_count_scope": "all_graveyards",
+                    "graveyard_count_subtypes": ["zombie"],
+                },
+                [],
+            ),
+        ]
+        for name, oracle, source, expected_fields, extra_abilities in fixtures:
+            with self.subTest(name=name):
+                row = queue_row(
+                    "xmage_signature::SetBasePowerToughnessSourceEffect::SimpleStaticAbility::"
+                    "no_target_class::no_condition_class::static_ability",
+                    effect_classes=["SetBasePowerToughnessSourceEffect"],
+                    ability_kind="static",
+                    ability_classes=["SimpleStaticAbility", *extra_abilities],
+                    xmage_signals=["static_ability"],
+                )
+                proposal, reason = split.split_row(
+                    row,
+                    metadata(name=name, type_line="Creature - Elemental", oracle_text=oracle),
+                    source_text=source,
+                )
+
+                self.assertEqual(reason, "selected_exact_scope")
+                effect = proposal["effect_json"]
+                self.assertEqual(effect["battle_model_scope"], split.STATIC_COUNT_PT_SCOPE)
+                for field, value in expected_fields.items():
+                    self.assertEqual(effect[field], value)
+
     def test_static_count_power_toughness_hand_size_variants_are_package_safe(self) -> None:
         row = queue_row(
             "xmage_signature::SetBasePowerToughnessSourceEffect::SimpleStaticAbility::"

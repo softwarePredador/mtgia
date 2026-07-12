@@ -1663,6 +1663,8 @@ def static_count_pt_execution_scenario_from_expected_rule(rule: dict[str, Any]) 
         source_card["tapped"] = False
     controller_battlefield = []
     opponent_battlefield = []
+    controller_graveyard = []
+    opponent_graveyard = []
     controller_hand = []
     opponent_hand = []
     if amount_source == "controller_hand_count":
@@ -1693,6 +1695,74 @@ def static_count_pt_execution_scenario_from_expected_rule(rule: dict[str, Any]) 
             for subtype in ("Plains", "Island", "Swamp", "Mountain")
         ]
         expected_count = len(controller_battlefield)
+    elif amount_source == "controlled_other_creature_total_mana_value":
+        source_card["type_line"] = "Creature - Ooze"
+        source_card["cmc"] = 7
+        source_card["mana_cost"] = "{5}{G}{G}"
+        controller_battlefield = [
+            {"name": "E2E Other Creature A", "type_line": "Creature - Beast", "cmc": 3, "mana_cost": "{2}{G}"},
+            {"name": "E2E Other Creature B", "type_line": "Creature - Elf", "cmc": 2, "mana_cost": "{1}{G}"},
+            {"name": "E2E Ignored Artifact", "type_line": "Artifact", "cmc": 5, "mana_cost": "{5}"},
+        ]
+        expected_count = 5
+    elif amount_source == "controlled_differently_named_lands":
+        controller_battlefield = [
+            {"name": "Forest", "type_line": "Basic Land - Forest"},
+            {"name": "Forest", "type_line": "Basic Land - Forest"},
+            {"name": "Island", "type_line": "Basic Land - Island"},
+            {"name": "E2E Ignored Artifact", "type_line": "Artifact"},
+        ]
+        expected_count = 2
+    elif amount_source == "controlled_permanents_mana_symbol_count":
+        color = str(required.get("mana_symbol_count_color") or "G").upper()
+        source_card["mana_cost"] = f"{{{color}}}"
+        controller_battlefield = [
+            {"name": "E2E Double Symbol Permanent", "type_line": "Creature - Elemental", "mana_cost": f"{{{color}}}{{{color}}}"},
+            {"name": "E2E Single Symbol Permanent", "type_line": "Enchantment", "mana_cost": f"{{2}}{{{color}}}"},
+            {"name": "E2E Off Symbol Permanent", "type_line": "Artifact", "mana_cost": "{3}"},
+        ]
+        expected_count = 4
+    elif amount_source == "controller_graveyard_mana_symbol_count":
+        color = str(required.get("mana_symbol_count_color") or "B").upper()
+        controller_graveyard = [
+            {"name": "E2E Double Symbol Grave Card", "type_line": "Creature", "mana_cost": f"{{{color}}}{{{color}}}"},
+            {"name": "E2E Single Symbol Grave Card", "type_line": "Sorcery", "mana_cost": f"{{1}}{{{color}}}"},
+            {"name": "E2E Off Symbol Grave Card", "type_line": "Instant", "mana_cost": "{G}"},
+        ]
+        expected_count = 3
+    elif amount_source == "battlefield_plus_graveyard_subtype_count":
+        subtype = (subtypes or [str(value).lower() for value in required.get("graveyard_count_subtypes") or []] or ["zombie"])[0]
+        source_card["type_line"] = f"Creature - {subtype.title()}"
+        matching_type_line = f"Creature - {subtype.title()}"
+        controller_battlefield.append(
+            {
+                "name": f"E2E Controller Matching {subtype.title()}",
+                "type_line": matching_type_line,
+            }
+        )
+        controller_graveyard.append(
+            {
+                "name": f"E2E Controller Graveyard {subtype.title()}",
+                "type_line": matching_type_line,
+            }
+        )
+        expected_count = 3
+        if str(required.get("battlefield_count_scope") or scope) == "all_battlefields":
+            opponent_battlefield.append(
+                {
+                    "name": f"E2E Opponent Matching {subtype.title()}",
+                    "type_line": matching_type_line,
+                }
+            )
+            expected_count += 1
+        if str(required.get("graveyard_count_scope") or "") == "all_graveyards":
+            opponent_graveyard.append(
+                {
+                    "name": f"E2E Opponent Graveyard {subtype.title()}",
+                    "type_line": matching_type_line,
+                }
+            )
+            expected_count += 1
     elif amount_source != "battlefield_permanent_count":
         return None
     elif card_names:
@@ -1797,6 +1867,8 @@ def static_count_pt_execution_scenario_from_expected_rule(rule: dict[str, Any]) 
         "card": source_card,
         "controller_battlefield": controller_battlefield,
         "opponent_battlefield": opponent_battlefield,
+        "controller_graveyard": controller_graveyard,
+        "opponent_graveyard": opponent_graveyard,
         "controller_hand": controller_hand,
         "opponent_hand": opponent_hand,
         "expected_count": expected_count,

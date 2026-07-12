@@ -2348,6 +2348,159 @@ class XMageExactScopeRuntimeTest(unittest.TestCase):
             )
         )
 
+    def test_static_count_power_toughness_extended_dynamic_sources(self) -> None:
+        fixtures = [
+            (
+                "Ancient Ooze",
+                {
+                    "type_line": "Creature - Ooze",
+                    "mana_cost": "{5}{G}{G}",
+                    "static_power_toughness_source": "controlled_other_creature_total_mana_value",
+                    "stat_modifier_amount_source": "controlled_other_creature_total_mana_value",
+                },
+                [
+                    {"name": "Three Mana Creature", "type_line": "Creature - Beast", "cmc": 3, "mana_cost": "{2}{G}"},
+                    {"name": "Two Mana Creature", "type_line": "Creature - Elf", "cmc": 2, "mana_cost": "{1}{G}"},
+                    {"name": "Ignored Artifact", "type_line": "Artifact", "cmc": 7, "mana_cost": "{7}"},
+                ],
+                [],
+                [],
+                [],
+                5,
+            ),
+            (
+                "Awakened Amalgam",
+                {
+                    "type_line": "Artifact Creature - Golem",
+                    "static_power_toughness_source": "controlled_differently_named_lands",
+                    "stat_modifier_amount_source": "controlled_differently_named_lands",
+                },
+                [
+                    {"name": "Forest", "type_line": "Basic Land - Forest"},
+                    {"name": "Forest", "type_line": "Basic Land - Forest"},
+                    {"name": "Island", "type_line": "Basic Land - Island"},
+                    {"name": "Ignored Artifact", "type_line": "Artifact"},
+                ],
+                [],
+                [],
+                [],
+                2,
+            ),
+            (
+                "Primalcrux",
+                {
+                    "type_line": "Creature - Elemental",
+                    "mana_cost": "{G}{G}{G}{G}{G}{G}",
+                    "static_power_toughness_source": "controlled_permanents_mana_symbol_count",
+                    "stat_modifier_amount_source": "controlled_permanents_mana_symbol_count",
+                    "mana_symbol_count_color": "G",
+                },
+                [
+                    {"name": "Green Permanent A", "type_line": "Creature", "mana_cost": "{G}{G}"},
+                    {"name": "Green Permanent B", "type_line": "Enchantment", "mana_cost": "{2}{G}"},
+                    {"name": "Off Color Permanent", "type_line": "Artifact", "mana_cost": "{R}"},
+                ],
+                [],
+                [],
+                [],
+                9,
+            ),
+            (
+                "Umbra Stalker",
+                {
+                    "type_line": "Creature - Elemental",
+                    "static_power_toughness_source": "controller_graveyard_mana_symbol_count",
+                    "stat_modifier_amount_source": "controller_graveyard_mana_symbol_count",
+                    "mana_symbol_count_color": "B",
+                },
+                [],
+                [],
+                [
+                    {"name": "Double Black Grave Card", "type_line": "Creature", "mana_cost": "{B}{B}"},
+                    {"name": "Single Black Grave Card", "type_line": "Sorcery", "mana_cost": "{1}{B}"},
+                    {"name": "Green Grave Card", "type_line": "Instant", "mana_cost": "{G}"},
+                ],
+                [],
+                3,
+            ),
+            (
+                "Abomination of Llanowar",
+                {
+                    "type_line": "Legendary Creature - Elf Horror",
+                    "static_power_toughness_source": "battlefield_plus_graveyard_subtype_count",
+                    "stat_modifier_amount_source": "battlefield_plus_graveyard_subtype_count",
+                    "battlefield_count_scope": "controller_battlefield",
+                    "battlefield_count_subtypes": ["elf"],
+                    "graveyard_count_scope": "controller_graveyard",
+                    "graveyard_count_subtypes": ["elf"],
+                },
+                [{"name": "Llanowar Scout", "type_line": "Creature - Elf Scout"}],
+                [{"name": "Opponent Elf", "type_line": "Creature - Elf"}],
+                [{"name": "Elvish Mystic", "type_line": "Creature - Elf Druid"}],
+                [{"name": "Opponent Grave Elf", "type_line": "Creature - Elf"}],
+                3,
+            ),
+            (
+                "Soulless One",
+                {
+                    "type_line": "Creature - Zombie Avatar",
+                    "static_power_toughness_source": "battlefield_plus_graveyard_subtype_count",
+                    "stat_modifier_amount_source": "battlefield_plus_graveyard_subtype_count",
+                    "battlefield_count_scope": "all_battlefields",
+                    "battlefield_count_subtypes": ["zombie"],
+                    "graveyard_count_scope": "all_graveyards",
+                    "graveyard_count_subtypes": ["zombie"],
+                },
+                [{"name": "Controller Zombie", "type_line": "Creature - Zombie"}],
+                [{"name": "Opponent Zombie", "type_line": "Creature - Zombie"}],
+                [{"name": "Controller Grave Zombie", "type_line": "Creature - Zombie"}],
+                [{"name": "Opponent Grave Zombie", "type_line": "Creature - Zombie"}],
+                5,
+            ),
+        ]
+        for name, fields, controller_battlefield, opponent_battlefield, controller_graveyard, opponent_graveyard, expected in fixtures:
+            with self.subTest(name=name):
+                fields = dict(fields)
+                active = self.battle.Player("Active", None, [])
+                opponent = self.battle.Player("Opponent", None, [])
+                permanent = {
+                    "name": name,
+                    "type_line": fields.pop("type_line"),
+                    "effect": "creature",
+                    "power": 0,
+                    "toughness": 0,
+                    "battle_model_scope": "xmage_static_source_power_toughness_equal_count_v1",
+                    "static_effect": "source_power_toughness_equal_count",
+                    "static_power_toughness_base": 0,
+                    "static_power_toughness_count_multiplier": 1,
+                    **fields,
+                }
+                active.battlefield = [dict(card) for card in controller_battlefield] + [permanent]
+                opponent.battlefield = [dict(card) for card in opponent_battlefield]
+                active.graveyard = [dict(card) for card in controller_graveyard]
+                opponent.graveyard = [dict(card) for card in opponent_graveyard]
+                self.events.clear()
+
+                self.battle.refresh_graveyard_count_creature_statics_for_player(
+                    active,
+                    turn=5,
+                    phase="test",
+                    emit_events=True,
+                    all_players=[active, opponent],
+                )
+
+                self.assertEqual(permanent["static_count_power_toughness_current"], expected)
+                self.assertEqual(permanent["power"], expected)
+                self.assertEqual(permanent["toughness"], expected)
+                self.assertTrue(
+                    any(
+                        event == "static_count_power_toughness_changed"
+                        and data.get("card") == name
+                        and data.get("static_count_power_toughness_count") == expected
+                        for event, data in self.events
+                    )
+                )
+
     def test_static_graveyard_threshold_source_boost_toggles_without_cumulative_bonus(self) -> None:
         active = self.battle.Player("Active", None, [])
         active.graveyard = [

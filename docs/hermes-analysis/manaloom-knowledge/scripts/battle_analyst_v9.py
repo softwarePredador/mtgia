@@ -58100,6 +58100,40 @@ def _controlled_permanents_mana_symbol_count(player, color):
     return total
 
 
+def _controlled_other_creature_total_mana_value(player, source_permanent=None):
+    total = 0
+    for permanent in _controlled_permanents(player):
+        if source_permanent is not None and permanent is source_permanent:
+            continue
+        if not is_battlefield_creature(permanent):
+            continue
+        total += int(card_mana_value(permanent) or permanent.get("cmc") or 0)
+    return total
+
+
+def _controlled_differently_named_land_count(player):
+    names = set()
+    for permanent in _controlled_permanents(player):
+        if not _card_type_matches(permanent, ["land"]):
+            continue
+        name = normalize_card_name(permanent.get("name") or permanent.get("card_name") or "")
+        if name:
+            names.add(name)
+    return len(names)
+
+
+def _graveyard_mana_symbol_count(players, color):
+    symbol = _color_symbol(color)
+    if symbol not in SYMBOL_TO_COLOR_NAME:
+        return 0
+    total = 0
+    for player in players or []:
+        for graveyard_card in getattr(player, "graveyard", []) or []:
+            mana_cost = str(graveyard_card.get("mana_cost") or "").upper()
+            total += len(re.findall(rf"\{{{re.escape(symbol)}\}}", mana_cost))
+    return total
+
+
 def devotion_to_color(player, color):
     symbol = _color_symbol(color)
     if symbol not in SYMBOL_TO_COLOR_NAME:
@@ -58146,6 +58180,71 @@ def _stat_modifier_count_from_source(player, opponents, effect_data):
         }
     if amount_source == "battlefield_permanent_count":
         return _battlefield_count_for_stat_modifier(player, opponents, effect_data)
+    if amount_source == "controlled_other_creature_total_mana_value":
+        count = _controlled_other_creature_total_mana_value(
+            player,
+            effect_data.get("_count_source_permanent"),
+        )
+        return count, {
+            "stat_modifier_amount_source": "controlled_other_creature_total_mana_value",
+            "controlled_other_creature_total_mana_value": count,
+        }
+    if amount_source == "controlled_differently_named_lands":
+        count = _controlled_differently_named_land_count(player)
+        return count, {
+            "stat_modifier_amount_source": "controlled_differently_named_lands",
+            "controlled_differently_named_land_count": count,
+        }
+    if amount_source == "controlled_permanents_mana_symbol_count":
+        color = str(effect_data.get("mana_symbol_count_color") or "").strip().upper()
+        count = _controlled_permanents_mana_symbol_count(player, color)
+        return count, {
+            "stat_modifier_amount_source": "controlled_permanents_mana_symbol_count",
+            "mana_symbol_count_color": color,
+            "controlled_permanents_mana_symbol_count": count,
+        }
+    if amount_source == "controller_graveyard_mana_symbol_count":
+        color = str(effect_data.get("mana_symbol_count_color") or "").strip().upper()
+        count = _graveyard_mana_symbol_count([player], color)
+        return count, {
+            "stat_modifier_amount_source": "controller_graveyard_mana_symbol_count",
+            "mana_symbol_count_color": color,
+            "controller_graveyard_mana_symbol_count": count,
+        }
+    if amount_source == "battlefield_plus_graveyard_subtype_count":
+        battlefield_count, battlefield_fields = _battlefield_count_for_stat_modifier(
+            player,
+            opponents,
+            effect_data,
+        )
+        if battlefield_count is None:
+            return None, battlefield_fields
+        graveyard_scope = str(effect_data.get("graveyard_count_scope") or "controller_graveyard").lower()
+        if graveyard_scope == "controller_graveyard":
+            graveyard_players = [player]
+        elif graveyard_scope == "all_graveyards":
+            graveyard_players = [player] + list(opponents or [])
+        elif graveyard_scope == "opponents_graveyards":
+            graveyard_players = list(opponents or [])
+        else:
+            return None, {
+                "stat_modifier_amount_source": "battlefield_plus_graveyard_subtype_count",
+                "graveyard_count_scope": graveyard_scope,
+                "graveyard_count_status": "unsupported_scope",
+            }
+        graveyard_count = 0
+        for participant in graveyard_players:
+            for graveyard_card in getattr(participant, "graveyard", []) or []:
+                if _graveyard_damage_card_matches(graveyard_card, effect_data):
+                    graveyard_count += 1
+        count = int(battlefield_count) + int(graveyard_count)
+        return count, {
+            **battlefield_fields,
+            "stat_modifier_amount_source": "battlefield_plus_graveyard_subtype_count",
+            "graveyard_count_scope": graveyard_scope,
+            "graveyard_stat_modifier_count": graveyard_count,
+            "battlefield_plus_graveyard_subtype_count": count,
+        }
     if amount_source == "controller_hand_count":
         count = len(getattr(player, "hand", []) or [])
         return count, {
