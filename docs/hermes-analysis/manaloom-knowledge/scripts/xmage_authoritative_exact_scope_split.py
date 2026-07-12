@@ -295,6 +295,7 @@ DRAW_DISCARD_SPELL_SCOPE = "xmage_fixed_draw_discard_spell_v1"
 DRAW_LOSE_LIFE_SPELL_SCOPE = "xmage_fixed_controller_draw_lose_life_spell_v1"
 TARGET_DRAW_LOSE_LIFE_SPELL_SCOPE = "xmage_fixed_target_player_draw_lose_life_spell_v1"
 DRAW_LOSE_HALF_LIFE_SPELL_SCOPE = "xmage_controller_draw_lose_half_life_rounded_up_spell_v1"
+BEGINNING_UPKEEP_DRAW_LOSE_LIFE_SCOPE = "xmage_beginning_upkeep_draw_lose_life_v1"
 DAMAGE_SCOPE = "xmage_fixed_damage_target_spell_v1"
 CONDITIONAL_DAMAGE_SCOPE = "xmage_conditional_fixed_damage_target_spell_v1"
 MULTI_TARGET_DAMAGE_SCOPE = "xmage_fixed_multi_target_damage_spell_v1"
@@ -14334,6 +14335,16 @@ def is_creature_etb_draw_lose_life_unit(row: dict[str, Any]) -> bool:
     )
 
 
+def is_beginning_upkeep_draw_lose_life_unit(row: dict[str, Any]) -> bool:
+    if str(row.get("adapter_work_unit") or "") != DRAW_ENGINE_UNIT:
+        return False
+    return (
+        effect_classes(row) == {"DrawCardSourceControllerEffect", "LoseLifeSourceControllerEffect"}
+        and ability_classes(row) == {"BeginningOfUpkeepTriggeredAbility"}
+        and set(row.get("xmage_signals") or []).issubset({"draw", "targeting", "triggered_ability"})
+    )
+
+
 def is_permanent_activated_draw_unit(row: dict[str, Any]) -> bool:
     if str(row.get("adapter_work_unit") or "") != DRAW_ENGINE_UNIT:
         return False
@@ -27455,6 +27466,57 @@ def creature_enters_draw_from_source(source_text: str, ability_names: set[str]) 
     return result
 
 
+def beginning_upkeep_draw_lose_life_from_oracle(metadata: dict[str, Any]) -> dict[str, Any] | str:
+    text = re.sub(r"\s+", " ", oracle_text_after_leading_static_keywords(metadata)).strip().lower()
+    number_pattern = r"(a|one|two|three|four|five|\d+)"
+    match = re.fullmatch(
+        rf"at the beginning of (?P<scope>your|each) upkeep, you draw (?P<draw>{number_pattern}) cards? "
+        rf"and (?:you )?lose (?P<life>{number_pattern}) life\.?",
+        text,
+    )
+    if not match:
+        return "beginning_upkeep_draw_lose_life_oracle_not_exact_fixed"
+    draw_count = number_word_to_int(match.group("draw"))
+    life_loss = number_word_to_int(match.group("life"))
+    if draw_count <= 0 or life_loss <= 0:
+        return "beginning_upkeep_draw_lose_life_count_not_fixed"
+    return {
+        "beginning_upkeep_trigger": "each_upkeep" if match.group("scope") == "each" else "controller_upkeep",
+        "beginning_upkeep_draw_count": draw_count,
+        "beginning_upkeep_life_loss": life_loss,
+    }
+
+
+def beginning_upkeep_draw_lose_life_from_source(
+    source_text: str,
+    ability_names: set[str],
+    classes: set[str],
+) -> dict[str, Any] | str:
+    text = str(source_text or "")
+    if ability_names != {"BeginningOfUpkeepTriggeredAbility"}:
+        return "beginning_upkeep_draw_lose_life_source_ability_not_supported"
+    if classes != {"DrawCardSourceControllerEffect", "LoseLifeSourceControllerEffect"}:
+        return "beginning_upkeep_draw_lose_life_source_effect_class_not_supported"
+    if any(marker in text for marker in ("ConditionalOneShotEffect", "DoIfCostPaid", "ManaCostsImpl", "TargetPointer")):
+        return "beginning_upkeep_draw_lose_life_source_not_simple"
+    draw_count = java_constructor_int_or_noarg_default(
+        text,
+        "DrawCardSourceControllerEffect",
+        noarg_default=1,
+    )
+    life_loss = java_constructor_int(text, "LoseLifeSourceControllerEffect")
+    if draw_count is None or life_loss is None or draw_count <= 0 or life_loss <= 0:
+        return "beginning_upkeep_draw_lose_life_source_count_not_fixed"
+    trigger = "each_upkeep" if "TargetController.ANY" in text else "controller_upkeep"
+    return {
+        "beginning_upkeep_trigger": trigger,
+        "beginning_upkeep_draw_count": int(draw_count),
+        "beginning_upkeep_life_loss": int(life_loss),
+        "xmage_effect_classes": ["DrawCardSourceControllerEffect", "LoseLifeSourceControllerEffect"],
+        "xmage_ability_class": "BeginningOfUpkeepTriggeredAbility",
+    }
+
+
 def dies_life_gain_amount_from_oracle(metadata: dict[str, Any]) -> int | None:
     text = re.sub(r"\s+", " ", oracle_text_after_leading_static_keywords(metadata)).strip()
     match = re.fullmatch(
@@ -30047,8 +30109,14 @@ def controlled_creature_condition_conditional_mana_source_detail_from_source(
     return "controlled_creature_condition_conditional_mana_source_pattern_not_supported"
 
 
+def strip_oracle_flavor_prefix(text: str) -> str:
+    return re.sub(r"^[a-z0-9' -]+\s+[—-]\s+", "", str(text or "").strip(), flags=re.I)
+
+
 def sacrifice_mana_source_detail_from_line(text: str) -> dict[str, Any] | None:
-    normalized = strip_parenthetical_reminders(re.sub(r"\s+", " ", str(text or "").strip().lower())).strip()
+    normalized = strip_oracle_flavor_prefix(
+        strip_parenthetical_reminders(re.sub(r"\s+", " ", str(text or "").strip().lower())).strip()
+    )
     prefix_match = re.match(
         r"^(?P<costs>(?:\{(?:t|[0-9wubrgc]+)\},\s*)*)sacrifice [^:]+: add (?P<mana>[^.]+)(?P<tail>\..*)?$",
         normalized,
@@ -30078,7 +30146,9 @@ def sacrifice_mana_source_detail_from_line(text: str) -> dict[str, Any] | None:
 
 
 def target_sacrifice_mana_source_detail_from_line(text: str) -> dict[str, Any] | None:
-    normalized = strip_parenthetical_reminders(re.sub(r"\s+", " ", str(text or "").strip().lower())).strip()
+    normalized = strip_oracle_flavor_prefix(
+        strip_parenthetical_reminders(re.sub(r"\s+", " ", str(text or "").strip().lower())).strip()
+    )
     match = re.match(
         r"^(?P<costs>(?:\{(?:t|[0-9wubrgc]+)\},\s*)*)sacrifice (?P<phrase>[^:]+): (?P<effect>.+?)\.?$",
         normalized,
@@ -33371,6 +33441,7 @@ def split_row(
     etb_draw_creature_unit = is_creature_etb_draw_unit(row)
     etb_scry_creature_unit = is_creature_etb_scry_unit(row)
     etb_draw_lose_life_creature_unit = is_creature_etb_draw_lose_life_unit(row)
+    beginning_upkeep_draw_lose_life_unit = is_beginning_upkeep_draw_lose_life_unit(row)
     etb_draw_discard_creature_unit = is_creature_etb_draw_discard_unit(row)
     dies_draw_creature_unit = is_creature_dies_draw_unit(row)
     combat_damage_draw_creature_unit = is_creature_combat_damage_draw_unit(row)
@@ -33600,6 +33671,7 @@ def split_row(
         and not etb_draw_creature_unit
         and not etb_scry_creature_unit
         and not etb_draw_lose_life_creature_unit
+        and not beginning_upkeep_draw_lose_life_unit
         and not etb_draw_discard_creature_unit
         and not dies_draw_creature_unit
         and not combat_damage_draw_creature_unit
@@ -33746,6 +33818,7 @@ def split_row(
         and not etb_draw_creature_unit
         and not etb_scry_creature_unit
         and not etb_draw_lose_life_creature_unit
+        and not beginning_upkeep_draw_lose_life_unit
         and not etb_draw_discard_creature_unit
         and not dies_draw_creature_unit
         and not combat_damage_draw_creature_unit
@@ -39720,6 +39793,48 @@ def split_row(
             metadata,
             effect_json,
             family_id="xmage_creature_etb_draw_lose_life",
+        ), "selected_exact_scope"
+
+    if beginning_upkeep_draw_lose_life_unit:
+        oracle_draw_life = beginning_upkeep_draw_lose_life_from_oracle(metadata)
+        if isinstance(oracle_draw_life, str):
+            return None, oracle_draw_life
+        source_draw_life = beginning_upkeep_draw_lose_life_from_source(
+            source_text,
+            ability_classes(row),
+            classes,
+        )
+        if isinstance(source_draw_life, str):
+            return None, source_draw_life
+        if (
+            str(source_draw_life.get("beginning_upkeep_trigger") or "")
+            != str(oracle_draw_life.get("beginning_upkeep_trigger") or "")
+            or int(source_draw_life.get("beginning_upkeep_draw_count") or 0)
+            != int(oracle_draw_life.get("beginning_upkeep_draw_count") or 0)
+            or int(source_draw_life.get("beginning_upkeep_life_loss") or 0)
+            != int(oracle_draw_life.get("beginning_upkeep_life_loss") or 0)
+        ):
+            return None, "beginning_upkeep_draw_lose_life_source_oracle_mismatch"
+        draw_count = int(oracle_draw_life["beginning_upkeep_draw_count"])
+        life_loss = int(oracle_draw_life["beginning_upkeep_life_loss"])
+        effect_json = {
+            "effect": "draw_engine",
+            "battle_model_scope": BEGINNING_UPKEEP_DRAW_LOSE_LIFE_SCOPE,
+            "ability_kind": "triggered",
+            "trigger": str(oracle_draw_life["beginning_upkeep_trigger"]),
+            "trigger_effect": "draw_lose_life",
+            "beginning_upkeep_draw_count": draw_count,
+            "beginning_upkeep_life_loss": life_loss,
+            "draw_count": draw_count,
+            "life_loss": life_loss,
+            "xmage_effect_classes": ["DrawCardSourceControllerEffect", "LoseLifeSourceControllerEffect"],
+            "xmage_ability_class": "BeginningOfUpkeepTriggeredAbility",
+        }
+        return build_proposal(
+            row,
+            metadata,
+            effect_json,
+            family_id="xmage_beginning_upkeep_draw_lose_life",
         ), "selected_exact_scope"
 
     if dies_draw_creature_unit:
@@ -49101,6 +49216,7 @@ def build_exact_split_report(
             and not is_creature_etb_draw_discard_unit(row)
             and not is_creature_etb_scry_unit(row)
             and not is_creature_etb_draw_lose_life_unit(row)
+            and not is_beginning_upkeep_draw_lose_life_unit(row)
             and not is_creature_dies_draw_unit(row)
             and not is_creature_combat_damage_draw_unit(row)
             and not is_creature_etb_target_player_discard_unit(row)
@@ -49226,6 +49342,7 @@ def build_exact_split_report(
                 "draw_engine::xmage_draw_card_variant_review_v1 rows with DrawDiscardControllerEffect and EntersBattlefieldTriggeredAbility, exact fixed ETB draw-then-discard Oracle/source agreement, and only static self keywords",
                 "xmage_signature ScryEffect rows with EntersBattlefieldTriggeredAbility, exact fixed ETB scry Oracle/source agreement, and no target or condition",
                 "draw_engine::xmage_draw_card_variant_review_v1 rows with DrawCardSourceControllerEffect + LoseLifeSourceControllerEffect, EntersBattlefieldTriggeredAbility, exact fixed draw/life-loss Oracle/source agreement, and only static self keywords",
+                "draw_engine::xmage_draw_card_variant_review_v1 rows with DrawCardSourceControllerEffect + LoseLifeSourceControllerEffect, BeginningOfUpkeepTriggeredAbility, exact fixed beginning-upkeep draw/life-loss Oracle/source agreement",
                 "draw_engine::xmage_draw_card_variant_review_v1 rows with DrawCardSourceControllerEffect and DiesSourceTriggeredAbility plus only static self keywords",
                 "draw_engine::xmage_draw_card_variant_review_v1 rows with DrawCardSourceControllerEffect and DealsCombatDamageToAPlayerTriggeredAbility, exact fixed combat-damage-to-player draw Oracle/source agreement, and only static self keywords",
                 "DiscardTargetEffect rows with EntersBattlefieldTriggeredAbility, exact fixed ETB target-player/opponent discard Oracle/source agreement, and only static self keywords",

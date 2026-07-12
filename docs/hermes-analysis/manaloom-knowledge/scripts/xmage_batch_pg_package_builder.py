@@ -675,6 +675,8 @@ E2E_REQUIRED_EFFECT_FIELDS = (
     "trigger_controller_scope",
     "trigger_gain_life",
     "trigger_draw_count",
+    "beginning_upkeep_draw_count",
+    "beginning_upkeep_life_loss",
     "trigger_another_creature_enters",
     "trigger_entering_card_types",
     "trigger_entering_power_min",
@@ -5931,6 +5933,56 @@ def draw_lose_life_spell_execution_scenario_from_expected_rule(
     }
 
 
+def beginning_upkeep_draw_lose_life_execution_scenario_from_expected_rule(
+    rule: dict[str, Any],
+) -> dict[str, Any] | None:
+    required = dict(rule.get("required_effect_fields") or {})
+    if required.get("battle_model_scope") != "xmage_beginning_upkeep_draw_lose_life_v1":
+        return None
+    if required.get("trigger_effect") != "draw_lose_life":
+        return None
+    trigger = str(required.get("trigger") or "controller_upkeep")
+    if trigger not in {"controller_upkeep", "each_upkeep"}:
+        return None
+    expected_draw_count = int(
+        required.get("beginning_upkeep_draw_count")
+        or required.get("draw_count")
+        or 0
+    )
+    expected_life_lost = int(
+        required.get("beginning_upkeep_life_loss")
+        or required.get("life_loss")
+        or 0
+    )
+    if expected_draw_count <= 0 or expected_life_lost <= 0:
+        return None
+    starting_life = 20
+    return {
+        "name": f"{rule['card_name']} beginning upkeep draw/life loss",
+        "type": "beginning_upkeep_draw_lose_life",
+        "card": {
+            "name": rule["card_name"],
+            "type_line": "Enchantment",
+        },
+        "active_player": "Opponent" if trigger == "each_upkeep" else "Source Controller",
+        "controller_life": starting_life,
+        "controller_library": [
+            {
+                "name": f"E2E Upkeep Draw Card {index + 1}",
+                "type_line": "Instant" if index % 2 == 0 else "Sorcery",
+                "effect": "draw_cards",
+                "cmc": index + 1,
+            }
+            for index in range(expected_draw_count)
+        ],
+        "expected_trigger": trigger,
+        "expected_draw_count": expected_draw_count,
+        "expected_life_lost": expected_life_lost,
+        "expected_life_after": starting_life - expected_life_lost,
+        "logical_rule_key": rule["logical_rule_key"],
+    }
+
+
 def graveyard_to_library_draw_execution_scenario_from_expected_rule(
     rule: dict[str, Any],
 ) -> dict[str, Any] | None:
@@ -10516,6 +10568,7 @@ def execution_scenario_from_expected_rule(rule: dict[str, Any]) -> dict[str, Any
         or simple_activated_draw_discard_execution_scenario_from_expected_rule(rule)
         or put_from_hand_to_battlefield_execution_scenario_from_expected_rule(rule)
         or fixed_draw_spell_execution_scenario_from_expected_rule(rule)
+        or beginning_upkeep_draw_lose_life_execution_scenario_from_expected_rule(rule)
         or draw_lose_life_spell_execution_scenario_from_expected_rule(rule)
         or graveyard_to_library_draw_execution_scenario_from_expected_rule(rule)
         or fixed_draw_discard_spell_execution_scenario_from_expected_rule(rule)

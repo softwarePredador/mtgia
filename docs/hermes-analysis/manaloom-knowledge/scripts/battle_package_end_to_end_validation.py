@@ -14062,6 +14062,116 @@ def run_beginning_end_step_draw(
     }
 
 
+def run_beginning_upkeep_draw_lose_life(
+    battle,
+    scenario: dict[str, Any],
+    events: list[tuple[str, dict[str, Any]]],
+) -> dict[str, Any]:
+    card = dict(scenario["card"])
+    effect = dict(battle.get_card_effect(card))
+    if effect.get("battle_model_scope") != "xmage_beginning_upkeep_draw_lose_life_v1":
+        fail("battle_execution", f"{card['name']} battle_model_scope={effect.get('battle_model_scope')!r}")
+    if effect.get("trigger_effect") != "draw_lose_life":
+        fail("battle_execution", f"{card['name']} trigger_effect={effect.get('trigger_effect')!r}")
+    if isinstance(scenario.get("effect_overrides"), dict):
+        effect.update(dict(scenario.get("effect_overrides") or {}))
+
+    expected_trigger = str(scenario.get("expected_trigger") or effect.get("trigger") or "controller_upkeep")
+    expected_draw_count = int(
+        scenario.get("expected_draw_count")
+        or effect.get("beginning_upkeep_draw_count")
+        or effect.get("draw_count")
+        or 0
+    )
+    expected_life_lost = int(
+        scenario.get("expected_life_lost")
+        or effect.get("beginning_upkeep_life_loss")
+        or effect.get("life_loss")
+        or 0
+    )
+    if expected_trigger not in {"controller_upkeep", "each_upkeep"}:
+        fail("battle_execution", f"{card['name']} unsupported trigger={expected_trigger!r}")
+    if expected_draw_count <= 0 or expected_life_lost <= 0:
+        fail("battle_execution", f"{card['name']} missing expected draw/life-loss counts")
+
+    controller = battle.Player(str(scenario.get("player") or "Source Controller"), None, [])
+    opponent = battle.Player(str(scenario.get("opponent") or "Opponent"), None, [])
+    controller.life = int(scenario.get("controller_life") or 20)
+    controller.library = [
+        battle.enrich_card(dict(library_card))
+        for library_card in (scenario.get("controller_library") or [])
+        if isinstance(library_card, dict)
+    ]
+    source = battle.enrich_card({**card, **effect})
+    controller.battlefield = [source]
+    participants = [controller, opponent]
+    active_player = (
+        opponent
+        if str(scenario.get("active_player") or "").strip().lower() == "opponent"
+        else controller
+    )
+    turn = int(scenario.get("turn") or 11)
+    if hasattr(battle, "CURRENT_REPLAY_TURN"):
+        battle.CURRENT_REPLAY_TURN = turn
+
+    starting_life = controller.life
+    starting_hand_count = len(controller.hand)
+    starting_library_count = len(controller.library)
+    before_events = len(events)
+    battle.process_beginning_upkeep_draw_lose_life(
+        active_player,
+        participants,
+        turn,
+        random.Random(int(scenario.get("seed") or 8401)),
+        stack=None,
+    )
+
+    expected_life_after = int(scenario.get("expected_life_after") or (starting_life - expected_life_lost))
+    if len(controller.hand) != starting_hand_count + expected_draw_count:
+        fail(
+            "battle_execution",
+            f"{card['name']} hand={len(controller.hand)}, expected {starting_hand_count + expected_draw_count}",
+        )
+    if len(controller.library) != starting_library_count - expected_draw_count:
+        fail(
+            "battle_execution",
+            f"{card['name']} library={len(controller.library)}, expected {starting_library_count - expected_draw_count}",
+        )
+    if int(controller.life) != expected_life_after:
+        fail("battle_execution", f"{card['name']} life={controller.life}, expected {expected_life_after}")
+    event = next(
+        (
+            data
+            for event_name, data in events[before_events:]
+            if event_name == "phase_trigger_resolved"
+            and data.get("card") == card.get("name")
+            and data.get("effect") == "draw_lose_life"
+        ),
+        None,
+    )
+    if event is None:
+        fail("battle_events", f"missing {card['name']} upkeep draw/life-loss event")
+    if event.get("trigger") != expected_trigger:
+        fail("battle_events", f"{card['name']} trigger={event.get('trigger')!r}, expected {expected_trigger!r}")
+    if event.get("active_player") != active_player.name:
+        fail(
+            "battle_events",
+            f"{card['name']} active_player={event.get('active_player')!r}, expected {active_player.name!r}",
+        )
+    if int(event.get("cards_drawn") or 0) != expected_draw_count:
+        fail("battle_events", f"{card['name']} cards_drawn={event.get('cards_drawn')}")
+    if int(event.get("life_lost") or 0) != expected_life_lost:
+        fail("battle_events", f"{card['name']} life_lost={event.get('life_lost')}")
+    return {
+        "scenario": scenario.get("name"),
+        "card_name": card["name"],
+        "trigger": expected_trigger,
+        "active_player": active_player.name,
+        "cards_drawn": expected_draw_count,
+        "life_lost": expected_life_lost,
+    }
+
+
 def run_target_player_discard_spell(
     battle,
     scenario: dict[str, Any],
@@ -15547,6 +15657,7 @@ SCENARIO_RUNNERS = {
     "becomes_blocked_self_boost": run_becomes_blocked_self_boost,
     "board_wipe": run_board_wipe,
     "beginning_end_step_draw": run_beginning_end_step_draw,
+    "beginning_upkeep_draw_lose_life": run_beginning_upkeep_draw_lose_life,
     "combat_damage_draw": run_combat_damage_draw,
     "hand_cycling": run_hand_cycling,
     "prowess_trigger": run_prowess_trigger,

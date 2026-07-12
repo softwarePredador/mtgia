@@ -3308,6 +3308,60 @@ def test_draw_lose_half_life_runner_draws_and_rounds_up_life_loss() -> None:
     )
 
 
+def test_beginning_upkeep_draw_lose_life_runner_resolves_each_upkeep() -> None:
+    effect = {
+        "effect": "draw_engine",
+        "battle_model_scope": "xmage_beginning_upkeep_draw_lose_life_v1",
+        "ability_kind": "triggered",
+        "trigger": "each_upkeep",
+        "trigger_effect": "draw_lose_life",
+        "beginning_upkeep_draw_count": 1,
+        "beginning_upkeep_life_loss": 1,
+        "draw_count": 1,
+        "life_loss": 1,
+        "_rule_logical_key": "battle_rule_v1:baleful-force",
+    }
+    proposal = {
+        "normalized_name": "baleful force",
+        "card_name": "Baleful Force",
+        "oracle_hash": "hash-baleful-force",
+        "logical_rule_key": "battle_rule_v1:baleful-force",
+        "effect_json": effect,
+    }
+    expected = package_builder.expected_rule_from_proposal(proposal)
+    scenario = package_builder.execution_scenario_from_expected_rule(expected)
+
+    assert scenario is not None
+    assert scenario["type"] == "beginning_upkeep_draw_lose_life"
+    assert scenario["active_player"] == "Opponent"
+    battle = validator.load_battle(validator.DEFAULT_BATTLE)
+    events = []
+    previous_handler = battle.REPLAY_EVENT_HANDLER
+    previous_get_card_effect = battle.get_card_effect
+    battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+    battle.get_card_effect = lambda card: dict(effect)
+    try:
+        result = validator.run_beginning_upkeep_draw_lose_life(battle, scenario, events)
+    finally:
+        battle.REPLAY_EVENT_HANDLER = previous_handler
+        battle.get_card_effect = previous_get_card_effect
+
+    assert result["card_name"] == "Baleful Force"
+    assert result["trigger"] == "each_upkeep"
+    assert result["active_player"] == "Opponent"
+    assert result["cards_drawn"] == 1
+    assert result["life_lost"] == 1
+    assert any(
+        event == "phase_trigger_resolved"
+        and data.get("card") == "Baleful Force"
+        and data.get("effect") == "draw_lose_life"
+        and data.get("active_player") == "Opponent"
+        and data.get("cards_drawn") == 1
+        and data.get("life_lost") == 1
+        for event, data in events
+    )
+
+
 def test_each_player_lose_life_draw_runner_changes_both_life_totals_and_draws() -> None:
     effect = {
         "effect": "composite_resolution",

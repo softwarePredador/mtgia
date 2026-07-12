@@ -27250,6 +27250,122 @@ def process_prepare_upkeep_triggers(player, all_players, turn):
     return prepared
 
 
+def process_beginning_upkeep_draw_lose_life(active_player, all_players, turn, rng, stack=None):
+    """Resolve fixed beginning-of-upkeep draw/life-loss engines such as Phyrexian Arena."""
+    def fixed_nonnegative_int(value, default=0):
+        try:
+            return max(0, int(value))
+        except (TypeError, ValueError):
+            return max(0, int(default or 0))
+
+    participants = bind_table_context(all_players or [active_player])
+    resolved = 0
+    for controller in list(participants):
+        if not getattr(controller, "is_alive", lambda: True)():
+            continue
+        for permanent in list(getattr(controller, "battlefield", []) or []):
+            if not isinstance(permanent, dict):
+                continue
+            effect_data = permanent if permanent.get("battle_model_scope") else get_card_effect(permanent)
+            if not isinstance(effect_data, dict):
+                continue
+            if (
+                effect_data.get("battle_model_scope") != "xmage_beginning_upkeep_draw_lose_life_v1"
+                or effect_data.get("trigger_effect") != "draw_lose_life"
+            ):
+                continue
+            trigger = str(effect_data.get("trigger") or "controller_upkeep")
+            if trigger == "controller_upkeep" and controller is not active_player:
+                continue
+            if trigger not in {"controller_upkeep", "each_upkeep"}:
+                continue
+            last_trigger_key = f"beginning_upkeep_draw_lose_life_last_trigger_{getattr(active_player, 'name', '')}"
+            if permanent.get(last_trigger_key) == turn:
+                continue
+            permanent[last_trigger_key] = turn
+            draw_count = max(
+                0,
+                fixed_nonnegative_int(
+                    effect_data.get("beginning_upkeep_draw_count")
+                    or effect_data.get("draw_count")
+                    or 0,
+                    0,
+                ),
+            )
+            life_loss = max(
+                0,
+                fixed_nonnegative_int(
+                    effect_data.get("beginning_upkeep_life_loss")
+                    or effect_data.get("life_loss")
+                    or 0,
+                    0,
+                ),
+            )
+            if draw_count <= 0 and life_loss <= 0:
+                continue
+
+            def resolve_beginning_upkeep_draw_lose_life(
+                controller=controller,
+                permanent=permanent,
+                effect_data=copy.deepcopy(effect_data),
+                trigger=trigger,
+                draw_count=draw_count,
+                life_loss=life_loss,
+            ):
+                drawn_cards = controller.draw(draw_count, rng, phase="upkeep") if draw_count else []
+                process_player_draw_triggers(
+                    controller,
+                    len(drawn_cards),
+                    turn,
+                    "upkeep",
+                    participants,
+                    stack=stack,
+                    turn_player=active_player,
+                )
+                life_before = int(getattr(controller, "life", 0) or 0)
+                if life_loss:
+                    change_life(controller, -life_loss)
+                life_after = int(getattr(controller, "life", life_before) or 0)
+                emit_replay_event(
+                    "phase_trigger_resolved",
+                    player=controller.name,
+                    active_player=getattr(active_player, "name", "?"),
+                    card=permanent.get("name", "?"),
+                    trigger=trigger,
+                    phase="upkeep",
+                    effect="draw_lose_life",
+                    cards_drawn=len(drawn_cards),
+                    requested_draw_count=draw_count,
+                    life_lost=max(0, life_before - life_after),
+                    requested_life_loss=life_loss,
+                    life_before=life_before,
+                    life_after=life_after,
+                    library_remaining=len(controller.library),
+                    hand_size=len(controller.hand),
+                    turn=turn,
+                    **replay_rule_fields(effect_data),
+                )
+
+            resolve_or_enqueue_trigger(
+                controller,
+                permanent,
+                "beginning_upkeep",
+                resolve_beginning_upkeep_draw_lose_life,
+                stack=stack,
+                active_player=active_player,
+                all_players=participants,
+                data={
+                    "trigger": trigger,
+                    "phase": "upkeep",
+                    "effect": "draw_lose_life",
+                    "controller": controller.name,
+                    **replay_rule_fields(effect_data),
+                },
+            )
+            resolved += 1
+    return resolved
+
+
 def cast_prepared_spell_faces(player, opponents, all_players, turn, phase, stack, rng):
     if phase not in MAIN_PHASES:
         return False
@@ -76244,6 +76360,7 @@ def play_turn_v8(player, opponents, all_players, turn, rng, stack):
     process_graveyard_upkeep_self_return(player, turn)
     process_random_instant_sorcery_upkeep_return(player, turn, rng)
     process_prepare_upkeep_triggers(player, all_players, turn)
+    process_beginning_upkeep_draw_lose_life(player, all_players, turn, rng, stack=stack)
     process_radiant_scrollwielder_upkeep_graveyard_recast(player, turn, rng)
     process_rebound_upkeep(player, opponents, all_players, turn, rng, stack=stack)
     process_top_library_upkeep_free_cast(
@@ -76283,6 +76400,10 @@ def play_turn_v8(player, opponents, all_players, turn, rng, stack):
         all_players=all_players,
         stack=stack,
     )
+    while not stack.empty() or _pending_triggers:
+        priority_round(player, all_players, stack, turn, rng, phase="upkeep")
+        if turn_ended_by_effect(player):
+            return
     emit_focus_card_access_snapshot(player, turn=turn, phase="after_upkeep_engines")
 
     # ── DRAW ──

@@ -21232,6 +21232,44 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertEqual(effect["produced_mana_symbols"], ["R"])
         self.assertEqual(effect["xmage_cost_class"], "SacrificeTargetCost")
 
+    def test_target_sacrifice_mana_source_strips_flavor_prefix(self) -> None:
+        row = queue_row(
+            split.RAMP_ARTIFACT_UNIT,
+            effect_classes=["AddManaInAnyCombinationEffect", "TheGoldenThroneEffect"],
+            ability_kind="activated",
+            ability_classes=["SimpleManaAbility", "SimpleStaticAbility"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="The Golden Throne",
+                type_line="Legendary Artifact",
+                oracle_text=(
+                    "Arcane Life-support — If you would lose the game, instead exile "
+                    "The Golden Throne and your life total becomes 1.\n"
+                    "A Thousand Souls Die Every Day — {T}, Sacrifice a creature: "
+                    "Add three mana in any combination of colors."
+                ),
+            ),
+            source_text=(
+                "this.addAbility(new SimpleStaticAbility(new TheGoldenThroneEffect()));"
+                "Ability ability = new SimpleManaAbility(Zone.BATTLEFIELD, "
+                "new AddManaInAnyCombinationEffect(3), new TapSourceCost());"
+                "ability.addCost(new SacrificeTargetCost(StaticFilters.FILTER_PERMANENT_CREATURE));"
+                "this.addAbility(ability);"
+            ),
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.TARGET_SACRIFICE_MANA_SOURCE_SCOPE)
+        self.assertEqual(effect["activation_sacrifice_target"], "creature")
+        self.assertEqual(effect["mana_produced"], 3)
+        self.assertEqual(effect["produces"], "WUBRG")
+        self.assertTrue(effect["mana_activation_requires_tap"])
+        self.assertTrue(effect["_runtime_partial"])
+        self.assertIn("TheGoldenThroneEffect", effect["xmage_unmodeled_effect_classes"])
+
     def test_target_sacrifice_mana_source_uses_mana_ability_window(self) -> None:
         row = queue_row(
             split.RAMP_CREATURE_UNIT,
@@ -31492,6 +31530,98 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
 
         self.assertIsNone(proposal)
         self.assertEqual(reason, "etb_draw_lose_life_oracle_not_exact_fixed")
+
+    def test_beginning_upkeep_draw_lose_life_maps_controller_upkeep(self) -> None:
+        row = queue_row(
+            split.DRAW_ENGINE_UNIT,
+            effect_classes=["DrawCardSourceControllerEffect", "LoseLifeSourceControllerEffect"],
+            ability_kind="triggered",
+            ability_classes=["BeginningOfUpkeepTriggeredAbility"],
+            xmage_signals=["targeting", "draw", "triggered_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Phyrexian Arena",
+                type_line="Enchantment",
+                oracle_text="At the beginning of your upkeep, you draw a card and you lose 1 life.",
+            ),
+            source_text=(
+                "Ability ability = new BeginningOfUpkeepTriggeredAbility("
+                "new DrawCardSourceControllerEffect(1, true));"
+                "ability.addEffect(new LoseLifeSourceControllerEffect(1).concatBy(\"and\"));"
+                "this.addAbility(ability);"
+            ),
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["effect"], "draw_engine")
+        self.assertEqual(effect["battle_model_scope"], split.BEGINNING_UPKEEP_DRAW_LOSE_LIFE_SCOPE)
+        self.assertEqual(effect["trigger"], "controller_upkeep")
+        self.assertEqual(effect["trigger_effect"], "draw_lose_life")
+        self.assertEqual(effect["beginning_upkeep_draw_count"], 1)
+        self.assertEqual(effect["beginning_upkeep_life_loss"], 1)
+
+    def test_beginning_upkeep_draw_lose_life_maps_each_upkeep(self) -> None:
+        row = queue_row(
+            split.DRAW_ENGINE_UNIT,
+            effect_classes=["DrawCardSourceControllerEffect", "LoseLifeSourceControllerEffect"],
+            ability_kind="triggered",
+            ability_classes=["BeginningOfUpkeepTriggeredAbility"],
+            xmage_signals=["draw", "triggered_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Baleful Force",
+                type_line="Creature - Elemental",
+                oracle_text="At the beginning of each upkeep, you draw a card and you lose 1 life.",
+            ),
+            source_text=(
+                "Ability ability = new BeginningOfUpkeepTriggeredAbility("
+                "TargetController.ANY, new DrawCardSourceControllerEffect(1, true), false);"
+                "ability.addEffect(new LoseLifeSourceControllerEffect(1).concatBy(\"and\"));"
+                "this.addAbility(ability);"
+            ),
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.BEGINNING_UPKEEP_DRAW_LOSE_LIFE_SCOPE)
+        self.assertEqual(effect["trigger"], "each_upkeep")
+        self.assertEqual(effect["beginning_upkeep_draw_count"], 1)
+        self.assertEqual(effect["beginning_upkeep_life_loss"], 1)
+
+    def test_beginning_upkeep_draw_lose_life_blocks_dynamic_count(self) -> None:
+        row = queue_row(
+            split.DRAW_ENGINE_UNIT,
+            effect_classes=["DrawCardSourceControllerEffect", "LoseLifeSourceControllerEffect"],
+            ability_kind="triggered",
+            ability_classes=["BeginningOfUpkeepTriggeredAbility"],
+            xmage_signals=["draw", "triggered_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Graveborn Muse",
+                type_line="Creature - Zombie Spirit",
+                oracle_text=(
+                    "At the beginning of your upkeep, you draw X cards and you lose X life, "
+                    "where X is the number of Zombies you control."
+                ),
+            ),
+            source_text=(
+                "DynamicValue xCount = new PermanentsOnBattlefieldCount(filter);"
+                "Ability ability = new BeginningOfUpkeepTriggeredAbility("
+                "new DrawCardSourceControllerEffect(xCount));"
+                "ability.addEffect(new LoseLifeSourceControllerEffect(xCount).concatBy(\"and\"));"
+                "this.addAbility(ability);"
+            ),
+        )
+
+        self.assertIsNone(proposal)
+        self.assertEqual(reason, "beginning_upkeep_draw_lose_life_oracle_not_exact_fixed")
 
     def test_creature_dies_draw_maps_to_triggered_creature_scope(self) -> None:
         row = queue_row(
