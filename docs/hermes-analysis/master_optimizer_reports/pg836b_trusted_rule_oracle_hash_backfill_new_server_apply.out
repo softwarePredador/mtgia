@@ -1,0 +1,11 @@
+PG836B trusted rule oracle_hash backfill apply
+BEGIN
+CREATE SCHEMA
+DROP TABLE
+SELECT 55
+ backup_rows | updated_rows 
+-------------+--------------
+          55 |           55
+(1 row)
+
+COMMIT

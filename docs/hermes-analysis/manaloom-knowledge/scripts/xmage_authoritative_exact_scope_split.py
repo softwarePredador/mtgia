@@ -156,6 +156,10 @@ TOKEN_SPELL_UNIT = (
     "token_maker::xmage_signature::CreateTokenEffect::no_ability_class::"
     "no_target_class::no_condition_class::token"
 )
+TOKEN_DRAW_SPELL_UNIT = (
+    "token_maker::xmage_signature::CreateTokenEffect,DrawCardSourceControllerEffect::"
+    "no_ability_class::no_target_class::no_condition_class::token,draw"
+)
 TOKEN_SPELL_FLASHBACK_UNIT = (
     "token_maker::xmage_signature::CreateTokenEffect::FlashbackAbility::"
     "no_target_class::no_condition_class::token"
@@ -250,6 +254,7 @@ SUPPORTED_UNITS = {
     STATIC_CONTROLLED_PT_UNIT,
     STATIC_CONTROLLED_KEYWORD_UNIT,
     TOKEN_SPELL_UNIT,
+    TOKEN_DRAW_SPELL_UNIT,
     TOKEN_SPELL_FLASHBACK_UNIT,
     LOOK_LIBRARY_PICK_SPELL_UNIT,
     ETB_LOOK_LIBRARY_PICK_CREATURE_UNIT,
@@ -381,6 +386,12 @@ EXILE_SCOPE = "xmage_exile_target_spell_v1"
 EXILE_DRAW_SCOPE = "xmage_exile_target_and_draw_card_spell_v1"
 DESTROY_COMPENSATION_TOKEN_SCOPE = "xmage_destroy_target_with_controller_creature_token_compensation_spell_v1"
 EXILE_COMPENSATION_TOKEN_SCOPE = "xmage_exile_target_with_controller_creature_token_compensation_spell_v1"
+DESTROY_ARTIFACT_COMPENSATION_TOKEN_SCOPE = (
+    "xmage_destroy_target_with_controller_artifact_token_compensation_spell_v1"
+)
+EXILE_ARTIFACT_COMPENSATION_TOKEN_SCOPE = (
+    "xmage_exile_target_with_controller_artifact_token_compensation_spell_v1"
+)
 MANA_SCOPE = "xmage_simple_tap_mana_source_permanent_v1"
 SPELL_FIXED_MANA_RITUAL_SCOPE = "xmage_fixed_spell_mana_ritual_v1"
 SPELL_CONTROLLED_CREATURE_COUNT_MANA_RITUAL_SCOPE = (
@@ -596,6 +607,7 @@ DIES_DAMAGE_CREATURE_SCOPE = "xmage_creature_dies_fixed_damage_target_v1"
 DIES_FIXED_MANA_PERMANENT_SCOPE = "xmage_permanent_dies_add_fixed_mana_v1"
 DIES_RECURSION_CREATURE_SCOPE = "xmage_creature_dies_return_graveyard_card_to_hand_v1"
 TOKEN_SPELL_SCOPE = "xmage_fixed_create_creature_tokens_spell_v1"
+TOKEN_DRAW_SPELL_SCOPE = "xmage_fixed_create_creature_tokens_draw_cards_spell_v1"
 X_TOKEN_SPELL_SCOPE = "xmage_x_create_creature_tokens_spell_v1"
 CONTROLLED_SUBTYPE_TOKEN_SPELL_SCOPE = "xmage_controlled_subtype_create_creature_tokens_spell_v1"
 DYNAMIC_COUNT_TOKEN_SPELL_SCOPE = "xmage_dynamic_count_create_creature_tokens_spell_v1"
@@ -640,6 +652,7 @@ SPELL_UNITS = {
     PREVENT_ALL_COMBAT_DAMAGE_SPELL_UNIT,
     PREVENT_ALL_COMBAT_DAMAGE_CYCLING_SPELL_UNIT,
     TOKEN_SPELL_UNIT,
+    TOKEN_DRAW_SPELL_UNIT,
     LOOK_LIBRARY_PICK_SPELL_UNIT,
     MILL_TARGET_UNIT,
 }
@@ -836,6 +849,19 @@ ARTIFACT_ONLY_TOKEN_RUNTIME_FIELDS = {
         "token_activation_cost_generic": 2,
         "token_activation_requires_tap": False,
         "token_activation_requires_sacrifice": True,
+    },
+    "TreasureToken": {
+        "token_activated_ability": "any_color_mana_self_sacrifice",
+        "token_activated_ability_status": "runtime_supported",
+        "token_is_mana_source": True,
+        "token_mana_source_contextual_only": False,
+        "token_mana_activation_requires_tap": True,
+        "token_activation_requires_tap": True,
+        "token_mana_activation_requires_sacrifice": True,
+        "token_activation_requires_sacrifice": True,
+        "token_mana_produced": 1,
+        "token_produces": "any_color",
+        "token_produced_mana_symbols": list("WUBRG"),
     },
     "PowerstoneToken": {
         "token_activated_ability": "conditional_colorless_mana",
@@ -1895,6 +1921,17 @@ def java_constructor_int_or_noarg_default(
     return None
 
 
+def first_added_effect_position(source: str, class_name: str) -> int:
+    text = source or ""
+    match = re.search(
+        rf"\.addEffect\s*\(\s*new\s+{re.escape(class_name)}\b",
+        text,
+    )
+    if match:
+        return match.start()
+    return text.find(class_name)
+
+
 def has_additional_cost(source: str) -> bool:
     return bool(re.search(r"\.addCost\s*\(", source or ""))
 
@@ -2696,6 +2733,7 @@ def parse_simple_token_class(token_source: str, token_class: str) -> tuple[dict[
                 "ConditionalColorlessManaAbility",
                 "FoodAbility",
                 "SimpleActivatedAbility",
+                "TreasureAbility",
             }
         )
     if token_cant_block:
@@ -3142,17 +3180,38 @@ def removal_compensation_token_oracle_blocker(
 
 
 def compensation_token_fields(token_data: dict[str, Any], token_count: int) -> dict[str, Any]:
+    artifact_only = bool(token_data.get("token_artifact_only"))
     fields: dict[str, Any] = {
-        "target_controller_creature_tokens": token_count,
-        "compensation_creature_tokens": token_count,
         "target_controller_token_name": token_data["token_name"],
         "compensation_token_name": token_data["token_name"],
-        "target_controller_token_power": token_data["token_power"],
-        "compensation_token_power": token_data["token_power"],
-        "target_controller_token_toughness": token_data["token_toughness"],
-        "compensation_token_toughness": token_data["token_toughness"],
-        "compensation_token_status": "dynamic_creature_token_executor",
+        "target_controller_token_class": token_data.get("xmage_token_class"),
+        "compensation_token_class": token_data.get("xmage_token_class"),
+        "compensation_token_status": (
+            "dynamic_artifact_token_executor"
+            if artifact_only
+            else "dynamic_creature_token_executor"
+        ),
     }
+    if artifact_only:
+        fields.update(
+            {
+                "target_controller_artifact_only_tokens": token_count,
+                "compensation_artifact_only_tokens": token_count,
+                "target_controller_token_artifact_only": True,
+                "compensation_token_artifact_only": True,
+            }
+        )
+    else:
+        fields.update(
+            {
+                "target_controller_creature_tokens": token_count,
+                "compensation_creature_tokens": token_count,
+                "target_controller_token_power": token_data["token_power"],
+                "compensation_token_power": token_data["token_power"],
+                "target_controller_token_toughness": token_data["token_toughness"],
+                "compensation_token_toughness": token_data["token_toughness"],
+            }
+        )
     optional_pairs = {
         "token_subtype": ("target_controller_token_subtype", "compensation_token_subtype"),
         "token_colors": ("target_controller_token_colors", "compensation_token_colors"),
@@ -3169,6 +3228,67 @@ def compensation_token_fields(token_data: dict[str, Any], token_count: int) -> d
             "compensation_token_landwalk_land_types",
         ),
         "artifact_tokens": ("target_controller_artifact_tokens", "compensation_artifact_tokens"),
+        "token_artifact_only": ("target_controller_token_artifact_only", "compensation_token_artifact_only"),
+        "token_activated_ability": ("target_controller_token_activated_ability", "compensation_token_activated_ability"),
+        "token_activated_ability_status": (
+            "target_controller_token_activated_ability_status",
+            "compensation_token_activated_ability_status",
+        ),
+        "token_activated_battle_model_scope": (
+            "target_controller_token_activated_battle_model_scope",
+            "compensation_token_activated_battle_model_scope",
+        ),
+        "token_activated_draw_on_self_sacrifice": (
+            "target_controller_token_activated_draw_on_self_sacrifice",
+            "compensation_token_activated_draw_on_self_sacrifice",
+        ),
+        "token_activated_self_sacrifice_draw": (
+            "target_controller_token_activated_self_sacrifice_draw",
+            "compensation_token_activated_self_sacrifice_draw",
+        ),
+        "token_draw_on_self_sacrifice": (
+            "target_controller_token_draw_on_self_sacrifice",
+            "compensation_token_draw_on_self_sacrifice",
+        ),
+        "token_draw_count": ("target_controller_token_draw_count", "compensation_token_draw_count"),
+        "token_activation_cost_mana": (
+            "target_controller_token_activation_cost_mana",
+            "compensation_token_activation_cost_mana",
+        ),
+        "token_activation_cost_generic": (
+            "target_controller_token_activation_cost_generic",
+            "compensation_token_activation_cost_generic",
+        ),
+        "token_activation_requires_tap": (
+            "target_controller_token_activation_requires_tap",
+            "compensation_token_activation_requires_tap",
+        ),
+        "token_activation_requires_sacrifice": (
+            "target_controller_token_activation_requires_sacrifice",
+            "compensation_token_activation_requires_sacrifice",
+        ),
+        "token_is_mana_source": ("target_controller_token_is_mana_source", "compensation_token_is_mana_source"),
+        "token_mana_source_contextual_only": (
+            "target_controller_token_mana_source_contextual_only",
+            "compensation_token_mana_source_contextual_only",
+        ),
+        "token_mana_activation_requires_tap": (
+            "target_controller_token_mana_activation_requires_tap",
+            "compensation_token_mana_activation_requires_tap",
+        ),
+        "token_mana_activation_requires_sacrifice": (
+            "target_controller_token_mana_activation_requires_sacrifice",
+            "compensation_token_mana_activation_requires_sacrifice",
+        ),
+        "token_mana_produced": (
+            "target_controller_token_mana_produced",
+            "compensation_token_mana_produced",
+        ),
+        "token_produces": ("target_controller_token_produces", "compensation_token_produces"),
+        "token_produced_mana_symbols": (
+            "target_controller_token_produced_mana_symbols",
+            "compensation_token_produced_mana_symbols",
+        ),
     }
     for source_key, target_keys in optional_pairs.items():
         if source_key not in token_data:
@@ -13420,6 +13540,42 @@ def simple_oracle_sentences(text: str) -> list[str]:
     return sentences
 
 
+def fixed_token_draw_from_oracle(
+    metadata: dict[str, Any],
+    token_component: dict[str, Any],
+) -> tuple[int, str, str] | str:
+    sentences = simple_oracle_sentences(oracle_text(metadata))
+    if len(sentences) != 2:
+        return "token_draw_oracle_not_two_simple_sentences"
+    draw_count: int | None = None
+    token_sentence: str | None = None
+    order: list[str] = []
+    for sentence in sentences:
+        sentence_draw = fixed_draw_count_from_oracle_sentence(sentence)
+        if sentence_draw is not None:
+            if draw_count is not None:
+                return "token_draw_oracle_multiple_draw_sentences"
+            draw_count = sentence_draw
+            order.append("draw")
+            continue
+        token_blocker = multi_create_token_oracle_blocker(
+            {**metadata, "oracle_text": sentence},
+            [token_component],
+            trigger=None,
+        )
+        if token_blocker is None:
+            if token_sentence is not None:
+                return "token_draw_oracle_multiple_token_sentences"
+            token_sentence = sentence
+            order.append("token")
+            continue
+        return token_blocker.replace("token_", "token_draw_", 1)
+    if draw_count is None or token_sentence is None or len(order) != 2:
+        return "token_draw_oracle_not_simple"
+    resolution_order = "create_tokens_then_draw" if order == ["token", "draw"] else "draw_then_create_tokens"
+    return draw_count, token_sentence, resolution_order
+
+
 def fixed_boost_all_draw_from_oracle(
     metadata: dict[str, Any],
 ) -> tuple[int, int, str, dict[str, Any] | None, int, str] | None:
@@ -18160,6 +18316,7 @@ def restricted_battlefield_target_from_source(source: str) -> str | None:
         return "artifact_enchantment_or_flying_creature"
     if (
         'FilterPermanent("artifact, creature, or enchantment")' in text
+        or "FILTER_PERMANENT_ARTIFACT_CREATURE_OR_ENCHANTMENT" in text
         or (
             "CardType.ARTIFACT" in text
             and "CardType.CREATURE" in text
@@ -32622,6 +32779,8 @@ def proposal_notes(row: dict[str, Any], scope: str) -> str:
         scope_kind = "activated mana-source permanent"
     elif scope == TOKEN_SPELL_SCOPE:
         scope_kind = "fixed spell-resolution creature-token maker"
+    elif scope == TOKEN_DRAW_SPELL_SCOPE:
+        scope_kind = "fixed spell-resolution creature-token maker plus controller draw"
     elif scope == MULTI_TOKEN_SPELL_SCOPE:
         scope_kind = "fixed spell-resolution multi-creature-token maker"
     elif scope == DAMAGE_GAIN_LIFE_SCOPE:
@@ -32702,6 +32861,10 @@ def proposal_notes(row: dict[str, Any], scope: str) -> str:
         scope_kind = "fixed destroy-target spell with target-controller creature-token compensation"
     elif scope == EXILE_COMPENSATION_TOKEN_SCOPE:
         scope_kind = "fixed exile-target spell with target-controller creature-token compensation"
+    elif scope == DESTROY_ARTIFACT_COMPENSATION_TOKEN_SCOPE:
+        scope_kind = "fixed destroy-target spell with target-controller artifact-token compensation"
+    elif scope == EXILE_ARTIFACT_COMPENSATION_TOKEN_SCOPE:
+        scope_kind = "fixed exile-target spell with target-controller artifact-token compensation"
     elif scope == BOOST_KEYWORD_SCOPE:
         scope_kind = "fixed target-creature boost plus until-end-of-turn keyword spell"
     elif scope == BOOST_CONTROLLED_SPELL_SCOPE:
@@ -33162,6 +33325,12 @@ def split_row(
         and effect_classes(row) == {"DrawCardSourceControllerEffect", "SpellCostReductionSourceEffect"}
         and "SimpleStaticAbility" in ability_classes(row)
     )
+    fixed_token_draw_spell_unit = (
+        unit == TOKEN_DRAW_SPELL_UNIT
+        and effect_classes(row) == {"CreateTokenEffect", "DrawCardSourceControllerEffect"}
+        and set(row.get("xmage_signals") or []) == {"token", "draw"}
+        and not ability_classes(row)
+    )
     if (
         unit not in SUPPORTED_UNITS
         and not keyword_creature_unit
@@ -33260,6 +33429,7 @@ def split_row(
         and not boost_keyword_spell_unit
         and not keyword_draw_spell_unit
         and not fixed_token_spell_unit
+        and not fixed_token_draw_spell_unit
         and not graveyard_count_damage_unit
         and not etb_each_player_sacrifice_creature_unit
         and not dies_each_player_sacrifice_creature_unit
@@ -33405,6 +33575,7 @@ def split_row(
         and not color_boost_draw_spell_unit
         and not color_tap_draw_spell_unit
         and not color_untap_draw_spell_unit
+        and not fixed_token_draw_spell_unit
         and not treasure_etb_creature_unit
         and not etb_each_player_sacrifice_creature_unit
         and not dies_each_player_sacrifice_creature_unit
@@ -37089,6 +37260,87 @@ def split_row(
             family_id="xmage_graveyard_simple_activated_self_return_to_hand",
         ), "selected_exact_scope"
 
+    if fixed_token_draw_spell_unit:
+        if not is_spell(metadata):
+            return None, "token_draw_not_instant_or_sorcery_spell"
+        if has_additional_cost(source_text) or "additional cost" in oracle_text(metadata):
+            return None, "token_draw_additional_cost_not_supported"
+        parsed_effect = fixed_create_token_effect_from_source(source_text)
+        parsed_parts = fixed_literal_token_parts(parsed_effect)
+        if isinstance(parsed_parts, str):
+            return None, parsed_parts.replace("token_", "token_draw_", 1)
+        token_class, token_count, parsed_token_fields = parsed_parts
+        token_data, token_reason = parse_simple_token_class(
+            token_class_source(row, source_text, token_class),
+            token_class,
+        )
+        if token_reason:
+            return None, token_reason
+        source_draw_count = java_constructor_int_or_noarg_default(
+            source_text,
+            "DrawCardSourceControllerEffect",
+            noarg_default=1,
+        )
+        if source_draw_count is None:
+            return None, "token_draw_source_draw_count_not_fixed"
+        token_component = {
+            "effect": "token_maker",
+            "battle_model_scope": TOKEN_SPELL_SCOPE,
+            "ability_kind": "one_shot",
+            "compose_on_resolution": True,
+            "token_count": token_count,
+            "xmage_effect_class": "CreateTokenEffect",
+            **token_data,
+            **parsed_token_fields,
+        }
+        oracle_token_draw = fixed_token_draw_from_oracle(metadata, token_component)
+        if isinstance(oracle_token_draw, str):
+            return None, oracle_token_draw
+        oracle_draw_count, _token_sentence, oracle_resolution_order = oracle_token_draw
+        if int(source_draw_count) != int(oracle_draw_count):
+            return None, "token_draw_source_oracle_draw_count_mismatch"
+        token_pos = first_added_effect_position(source_text, "CreateTokenEffect")
+        draw_pos = first_added_effect_position(source_text, "DrawCardSourceControllerEffect")
+        if token_pos < 0 or draw_pos < 0:
+            return None, "token_draw_source_order_not_found"
+        source_resolution_order = (
+            "create_tokens_then_draw" if token_pos < draw_pos else "draw_then_create_tokens"
+        )
+        if source_resolution_order != oracle_resolution_order:
+            return None, "token_draw_source_oracle_resolution_order_mismatch"
+        draw_component = {
+            "effect": "draw_cards",
+            "battle_model_scope": DRAW_SCOPE,
+            "ability_kind": "one_shot",
+            "compose_on_resolution": True,
+            "count": int(source_draw_count),
+            "draw_count": int(source_draw_count),
+            "xmage_effect_class": "DrawCardSourceControllerEffect",
+        }
+        components = (
+            [token_component, draw_component]
+            if source_resolution_order == "create_tokens_then_draw"
+            else [draw_component, token_component]
+        )
+        effect_json = {
+            "effect": "composite_resolution",
+            "battle_model_scope": TOKEN_DRAW_SPELL_SCOPE,
+            "ability_kind": "one_shot",
+            "xmage_effect_classes": ["CreateTokenEffect", "DrawCardSourceControllerEffect"],
+            "token_count": token_count,
+            "draw_count": int(source_draw_count),
+            "resolution_order": source_resolution_order,
+            "_composite_rule_components": components,
+            **token_data,
+            **parsed_token_fields,
+        }
+        return build_proposal(
+            row,
+            metadata,
+            effect_json,
+            family_id="xmage_fixed_create_creature_tokens_draw_cards_spell",
+        ), "selected_exact_scope"
+
     if fixed_token_spell_unit:
         token_auxiliary_fields: dict[str, Any] = {}
         if unit == TOKEN_SPELL_FLASHBACK_UNIT:
@@ -40549,8 +40801,12 @@ def split_row(
         )
         if token_reason is not None:
             return None, token_reason
-        if token_data.get("token_artifact_only"):
-            return None, "compensation_artifact_token_not_supported"
+        artifact_only_compensation = bool(token_data.get("token_artifact_only"))
+        if (
+            artifact_only_compensation
+            and token_data.get("token_activated_ability_status") != "runtime_supported"
+        ):
+            return None, "compensation_artifact_token_activation_not_supported"
         oracle_blocker = removal_compensation_token_oracle_blocker(
             metadata,
             action="destroy",
@@ -40574,9 +40830,19 @@ def split_row(
         if not source_matches_target_constraint(source_text, target_type):
             return None, "destroy_compensation_token_target_source_mismatch"
         target_base = restricted_target_base(target_type)
+        scope = (
+            DESTROY_ARTIFACT_COMPENSATION_TOKEN_SCOPE
+            if artifact_only_compensation
+            else DESTROY_COMPENSATION_TOKEN_SCOPE
+        )
+        family_id = (
+            "xmage_destroy_target_controller_artifact_token_compensation_spell"
+            if artifact_only_compensation
+            else "xmage_destroy_target_controller_creature_token_compensation_spell"
+        )
         effect_json = {
             "effect": effect,
-            "battle_model_scope": DESTROY_COMPENSATION_TOKEN_SCOPE,
+            "battle_model_scope": scope,
             "target": target_base,
             "target_constraints": target_constraints_for(target_type),
             "destination": "graveyard",
@@ -40588,7 +40854,7 @@ def split_row(
             row,
             metadata,
             effect_json,
-            family_id="xmage_destroy_target_controller_creature_token_compensation_spell",
+            family_id=family_id,
         ), "selected_exact_scope"
 
     if unit == EXILE_UNIT and classes == {"CreateTokenControllerTargetEffect", "ExileTargetEffect"}:
@@ -40607,8 +40873,12 @@ def split_row(
         )
         if token_reason is not None:
             return None, token_reason
-        if token_data.get("token_artifact_only"):
-            return None, "compensation_artifact_token_not_supported"
+        artifact_only_compensation = bool(token_data.get("token_artifact_only"))
+        if (
+            artifact_only_compensation
+            and token_data.get("token_activated_ability_status") != "runtime_supported"
+        ):
+            return None, "compensation_artifact_token_activation_not_supported"
         oracle_blocker = removal_compensation_token_oracle_blocker(
             metadata,
             action="exile",
@@ -40632,9 +40902,19 @@ def split_row(
         if not source_matches_target_constraint(source_text, target_type):
             return None, "exile_compensation_token_target_source_mismatch"
         target_base = restricted_target_base(target_type)
+        scope = (
+            EXILE_ARTIFACT_COMPENSATION_TOKEN_SCOPE
+            if artifact_only_compensation
+            else EXILE_COMPENSATION_TOKEN_SCOPE
+        )
+        family_id = (
+            "xmage_exile_target_controller_artifact_token_compensation_spell"
+            if artifact_only_compensation
+            else "xmage_exile_target_controller_creature_token_compensation_spell"
+        )
         effect_json = {
             "effect": effect,
-            "battle_model_scope": EXILE_COMPENSATION_TOKEN_SCOPE,
+            "battle_model_scope": scope,
             "target": target_base,
             "target_constraints": target_constraints_for(target_type),
             "destination": "exile",
@@ -40646,7 +40926,7 @@ def split_row(
             row,
             metadata,
             effect_json,
-            family_id="xmage_exile_target_controller_creature_token_compensation_spell",
+            family_id=family_id,
         ), "selected_exact_scope"
 
     if unit == DAMAGE_UNIT and classes == {"DamageTargetEffect", "ScryEffect"}:

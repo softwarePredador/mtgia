@@ -1,0 +1,167 @@
+{
+  "battle_execution": {
+    "event_count": 8,
+    "results": [
+      {
+        "battlefield_names": [
+          "E2E Illegal Removal Target",
+          "Treasure Token"
+        ],
+        "card_name": "Buy Your Silence",
+        "compensation_token_artifact_only": true,
+        "compensation_token_name": "Treasure Token",
+        "compensation_tokens_created": 1,
+        "destination": "exile",
+        "moved_names": [
+          "E2E Legal Removal Target"
+        ],
+        "nonmatching_target": "E2E Illegal Removal Target",
+        "scenario": "Buy Your Silence removes one legal target",
+        "target": "E2E Legal Removal Target",
+        "target_player": "Opponent"
+      },
+      {
+        "battlefield_names": [
+          "E2E Illegal Removal Target",
+          "Clue Token"
+        ],
+        "card_name": "Zuko's Exile",
+        "compensation_token_artifact_only": true,
+        "compensation_token_name": "Clue Token",
+        "compensation_tokens_created": 1,
+        "destination": "exile",
+        "moved_names": [
+          "E2E Legal Removal Target"
+        ],
+        "nonmatching_target": "E2E Illegal Removal Target",
+        "scenario": "Zuko's Exile removes one legal target",
+        "target": "E2E Legal Removal Target",
+        "target_player": "Opponent"
+      }
+    ],
+    "scenario_count": 2
+  },
+  "battle_path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py",
+  "database_target": "127.0.0.1:15432/halder",
+  "generated_at_utc": "2026-07-12T18:20:35.786067+00:00",
+  "manifest": "docs/hermes-analysis/master_optimizer_reports/pg836_artifact_compensation_new_server_manifest.json",
+  "package_id": "pg836_artifact_compensation_new_server_manifest",
+  "snapshot": "docs/hermes-analysis/master_optimizer_reports/pg836_artifact_compensation_new_server_pg_to_sqlite_sync_tracked_snapshot.json",
+  "sqlite_db": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db",
+  "stages": [
+    {
+      "evidence": {
+        "validated_rows": 2
+      },
+      "name": "postgres_source_of_truth",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_exile_target_with_controller_artifact_token_compensation_spell_v1",
+          "card_name": "Buy Your Silence",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:6bc3d9f3ccc4395630d6c135f4f88397",
+          "oracle_hash": "7272d5d266f6ff4669834b8de560e162",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_exile_target_with_controller_artifact_token_compensation_spell_v1",
+          "card_name": "Zuko's Exile",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:bedf1ce0a21ccd23ffbfc6623b0da8fe",
+          "oracle_hash": "ad108129d0f384a98ba01e0688447cf5",
+          "review_status": "verified",
+          "rule_version": 2
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_rows": 2
+      },
+      "name": "sqlite_hermes_cache",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_exile_target_with_controller_artifact_token_compensation_spell_v1",
+          "card_name": "Buy Your Silence",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:6bc3d9f3ccc4395630d6c135f4f88397",
+          "oracle_hash": "7272d5d266f6ff4669834b8de560e162",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_exile_target_with_controller_artifact_token_compensation_spell_v1",
+          "card_name": "Zuko's Exile",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:bedf1ce0a21ccd23ffbfc6623b0da8fe",
+          "oracle_hash": "ad108129d0f384a98ba01e0688447cf5",
+          "review_status": "verified",
+          "rule_version": 2
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_cards": 2
+      },
+      "name": "canonical_snapshot_fallback",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_exile_target_with_controller_artifact_token_compensation_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Buy Your Silence",
+          "logical_rule_key": "battle_rule_v1:6bc3d9f3ccc4395630d6c135f4f88397"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_exile_target_with_controller_artifact_token_compensation_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Zuko's Exile",
+          "logical_rule_key": "battle_rule_v1:bedf1ce0a21ccd23ffbfc6623b0da8fe"
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_cards": 2
+      },
+      "name": "runtime_get_card_effect",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "card_name": "Buy Your Silence",
+          "component_keys": [],
+          "effect": "remove_permanent",
+          "logical_rule_key": "battle_rule_v1:6bc3d9f3ccc4395630d6c135f4f88397"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Zuko's Exile",
+          "component_keys": [],
+          "effect": "remove_permanent",
+          "logical_rule_key": "battle_rule_v1:bedf1ce0a21ccd23ffbfc6623b0da8fe"
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "events": 8,
+        "scenarios": 2
+      },
+      "name": "battle_execution",
+      "status": "pass"
+    }
+  ],
+  "status": "pass",
+  "title": "Battle Package End-to-End Validation"
+}

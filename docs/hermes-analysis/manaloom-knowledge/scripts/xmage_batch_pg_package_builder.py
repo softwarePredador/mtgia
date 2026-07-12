@@ -542,6 +542,20 @@ E2E_REQUIRED_EFFECT_FIELDS = (
     "dies_each_player_sacrifice",
     "controller_gains_life",
     "controller_gain_life_source",
+    "target_controller_creature_tokens",
+    "target_controller_artifact_only_tokens",
+    "target_controller_artifact_tokens",
+    "target_controller_token_name",
+    "target_controller_token_subtype",
+    "target_controller_token_class",
+    "target_controller_token_artifact_only",
+    "compensation_creature_tokens",
+    "compensation_artifact_only_tokens",
+    "compensation_artifact_tokens",
+    "compensation_token_name",
+    "compensation_token_subtype",
+    "compensation_token_class",
+    "compensation_token_artifact_only",
     "life_gain",
     "life_gain_amount",
     "life_gain_amount_source",
@@ -2801,6 +2815,7 @@ def fixed_create_creature_tokens_execution_scenario_from_expected_rule(
     required = dict(rule.get("required_effect_fields") or {})
     if required.get("battle_model_scope") not in {
         "xmage_fixed_create_creature_tokens_spell_v1",
+        "xmage_fixed_create_creature_tokens_draw_cards_spell_v1",
         "xmage_controlled_subtype_create_creature_tokens_spell_v1",
         "xmage_dynamic_count_create_creature_tokens_spell_v1",
     }:
@@ -2823,6 +2838,13 @@ def fixed_create_creature_tokens_execution_scenario_from_expected_rule(
         },
         "logical_rule_key": rule["logical_rule_key"],
     }
+    expected_draw_count = int(required.get("draw_count") or 0)
+    if expected_draw_count > 0:
+        scenario["expected_draw_count"] = expected_draw_count
+        scenario["controller_library"] = [
+            {"name": f"{rule['card_name']} Library Card {index + 1}", "type_line": "Sorcery"}
+            for index in range(expected_draw_count)
+        ]
     if required.get("token_cant_block"):
         scenario["expected_token"]["cant_block"] = True
     if required.get("token_count_source") == "controlled_permanents_with_subtype":
@@ -9412,6 +9434,10 @@ def single_target_removal_execution_scenario_from_expected_rule(
         "xmage_exile_target_and_target_controller_gain_life_spell_v1",
         "xmage_exile_target_and_source_controller_loses_life_spell_v1",
         "xmage_exile_target_and_source_controller_damage_spell_v1",
+        "xmage_destroy_target_with_controller_creature_token_compensation_spell_v1",
+        "xmage_exile_target_with_controller_creature_token_compensation_spell_v1",
+        "xmage_destroy_target_with_controller_artifact_token_compensation_spell_v1",
+        "xmage_exile_target_with_controller_artifact_token_compensation_spell_v1",
     }:
         return None
     if required.get("effect") not in {"remove_creature", "remove_permanent"}:
@@ -9499,6 +9525,33 @@ def single_target_removal_execution_scenario_from_expected_rule(
     if target_controller_life_gain > 0:
         scenario["target_controller_life"] = 10
         scenario["expected_target_controller_life_gain"] = target_controller_life_gain
+    compensation_creature_tokens = int(
+        required.get("compensation_creature_tokens")
+        or required.get("target_controller_creature_tokens")
+        or 0
+    )
+    compensation_artifact_only_tokens = int(
+        required.get("compensation_artifact_only_tokens")
+        or required.get("target_controller_artifact_only_tokens")
+        or 0
+    )
+    if compensation_creature_tokens > 0 or compensation_artifact_only_tokens > 0:
+        scenario["expected_compensation_token_count"] = (
+            compensation_creature_tokens or compensation_artifact_only_tokens
+        )
+        scenario["expected_compensation_token_name"] = (
+            required.get("compensation_token_name")
+            or required.get("target_controller_token_name")
+        )
+        scenario["expected_compensation_token_subtype"] = (
+            required.get("compensation_token_subtype")
+            or required.get("target_controller_token_subtype")
+        )
+        scenario["expected_compensation_token_artifact_only"] = bool(compensation_artifact_only_tokens)
+        scenario["expected_compensation_token_class"] = (
+            required.get("compensation_token_class")
+            or required.get("target_controller_token_class")
+        )
     source_controller_life_loss = int(required.get("source_controller_life_loss_on_resolve") or 0)
     source_controller_damage = int(required.get("source_controller_damage_on_resolve") or 0)
     target_controller_life_loss = int(required.get("target_controller_life_loss_on_resolve") or 0)

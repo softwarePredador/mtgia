@@ -772,6 +772,15 @@ def run_fixed_create_creature_tokens(
     named_graveyard_card = str(scenario.get("controller_graveyard_named_card") or "").strip()
     for index in range(max(0, int(scenario.get("controller_graveyard_named_card_count") or 0))):
         active.graveyard.append({"name": named_graveyard_card or card["name"], "type_line": "Sorcery"})
+    expected_draw_count = int(scenario.get("expected_draw_count") or 0)
+    if expected_draw_count > 0:
+        library_cards = scenario.get("controller_library") or [
+            {"name": f"{card['name']} Draw Card {index + 1}", "type_line": "Sorcery"}
+            for index in range(expected_draw_count)
+        ]
+        active.library = [dict(entry) for entry in library_cards]
+    starting_hand_count = len(getattr(active, "hand", []) or [])
+    starting_library_count = len(getattr(active, "library", []) or [])
     effect_data = battle.get_card_effect(card)
     dynamic_expected_count = prepare_dynamic_token_count_state(
         battle,
@@ -836,13 +845,59 @@ def run_fixed_create_creature_tokens(
         None,
     )
     if token_event is None:
+        token_event = next(
+            (
+                data
+                for event, data in events[before_events:]
+                if event == "composite_rule_component_resolved"
+                and data.get("card") == card.get("name")
+                and data.get("component_effect") == "token_maker"
+                and data.get("outcome") == "tokens_created"
+            ),
+            None,
+        )
+    if token_event is None:
         fail("battle_events", f"missing {card['name']} tokens_created event")
-    if int(token_event.get("tokens_created") or 0) != expected_count:
-        fail("battle_events", f"{card['name']} event tokens_created={token_event.get('tokens_created')}")
-    if bool(token_event.get("token_tapped")) != bool(expected.get("tapped")):
+    event_token_count = int(token_event.get("tokens_created") or token_event.get("token_count") or 0)
+    if event_token_count != expected_count:
+        fail("battle_events", f"{card['name']} event tokens_created={event_token_count}")
+    if token_event.get("token_tapped") is not None and bool(token_event.get("token_tapped")) != bool(expected.get("tapped")):
         fail("battle_events", f"{card['name']} event token_tapped={token_event.get('token_tapped')}")
-    if "cant_block" in expected and bool(token_event.get("token_cant_block")) != bool(expected.get("cant_block")):
+    if (
+        "cant_block" in expected
+        and token_event.get("token_cant_block") is not None
+        and bool(token_event.get("token_cant_block")) != bool(expected.get("cant_block"))
+    ):
         fail("battle_events", f"{card['name']} event token_cant_block={token_event.get('token_cant_block')}")
+    if expected_draw_count:
+        if len(active.hand) != starting_hand_count + expected_draw_count:
+            fail(
+                "battle_execution",
+                f"{card['name']} drew {len(active.hand) - starting_hand_count} cards, expected {expected_draw_count}",
+            )
+        if len(active.library) != starting_library_count - expected_draw_count:
+            fail(
+                "battle_execution",
+                f"{card['name']} library={len(active.library)}, expected {starting_library_count - expected_draw_count}",
+            )
+        draw_component_event = next(
+            (
+                data
+                for event, data in events[before_events:]
+                if event == "composite_rule_component_resolved"
+                and data.get("card") == card.get("name")
+                and data.get("component_effect") == "draw_cards"
+                and data.get("outcome") == "cards_drawn"
+            ),
+            None,
+        )
+        if draw_component_event is None:
+            fail("battle_events", f"missing {card['name']} composite draw_cards component event")
+        if int(draw_component_event.get("count") or draw_component_event.get("draw_count") or 0) != expected_draw_count:
+            fail(
+                "battle_events",
+                f"{card['name']} draw component count={draw_component_event.get('count') or draw_component_event.get('draw_count')}",
+            )
     return {
         "scenario": scenario.get("name"),
         "card_name": card["name"],
@@ -850,6 +905,7 @@ def run_fixed_create_creature_tokens(
         "token_name": expected_name,
         "token_tapped": bool(expected.get("tapped")),
         "token_cant_block": bool(expected.get("cant_block")),
+        "cards_drawn": expected_draw_count,
     }
 
 
@@ -3671,6 +3727,57 @@ def run_single_target_removal(
         fail("battle_events", f"{card['name']} target_player={removal_event.get('target_player')!r}")
     if str(removal_event.get("destination") or "").lower() != destination:
         fail("battle_events", f"{card['name']} destination={removal_event.get('destination')!r}")
+    expected_compensation_token_count = int(scenario.get("expected_compensation_token_count") or 0)
+    if expected_compensation_token_count > 0:
+        expected_compensation_token_name = str(
+            scenario.get("expected_compensation_token_name") or "Token"
+        )
+        compensation_tokens = [
+            permanent
+            for permanent in target_owner.battlefield
+            if isinstance(permanent, dict)
+            and permanent.get("name") == expected_compensation_token_name
+        ]
+        if len(compensation_tokens) != expected_compensation_token_count:
+            fail(
+                "battle_execution",
+                f"{card['name']} compensation token count={len(compensation_tokens)}, expected {expected_compensation_token_count}",
+            )
+        expected_compensation_artifact_only = bool(
+            scenario.get("expected_compensation_token_artifact_only")
+        )
+        if expected_compensation_artifact_only and any(
+            not permanent.get("token_artifact_only") for permanent in compensation_tokens
+        ):
+            fail("battle_execution", f"{card['name']} compensation token was not artifact-only")
+        expected_compensation_token_class = str(
+            scenario.get("expected_compensation_token_class") or ""
+        ).strip()
+        if expected_compensation_token_class and any(
+            permanent.get("xmage_token_class") != expected_compensation_token_class
+            for permanent in compensation_tokens
+        ):
+            fail(
+                "battle_execution",
+                f"{card['name']} compensation token class mismatch",
+            )
+        compensation_event = next(
+            (
+                data
+                for event, data in events[before_events:]
+                if event == "compensation_tokens_created"
+                and data.get("source") == card.get("name")
+                and data.get("token") == expected_compensation_token_name
+            ),
+            None,
+        )
+        if compensation_event is None:
+            fail("battle_events", f"missing {card['name']} compensation_tokens_created event")
+        if int(compensation_event.get("tokens_created") or 0) != expected_compensation_token_count:
+            fail(
+                "battle_events",
+                f"{card['name']} compensation event tokens_created={compensation_event.get('tokens_created')}",
+            )
     expected_additional_cost = str(scenario.get("expected_additional_cost") or "").strip()
     additional_cost_event = None
     if expected_additional_cost:
@@ -3956,6 +4063,14 @@ def run_single_target_removal(
         result["pay_generic_amount"] = expected_pay_generic_amount
     if expected_countered_creature:
         result["countered_creature"] = expected_countered_creature
+    if expected_compensation_token_count > 0:
+        result["compensation_tokens_created"] = expected_compensation_token_count
+        result["compensation_token_name"] = str(
+            scenario.get("expected_compensation_token_name") or "Token"
+        )
+        result["compensation_token_artifact_only"] = bool(
+            scenario.get("expected_compensation_token_artifact_only")
+        )
     return result
 
 

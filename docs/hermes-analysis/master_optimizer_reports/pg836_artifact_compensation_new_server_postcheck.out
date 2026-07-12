@@ -1,0 +1,6 @@
+    card_name     | normalized_name  |                logical_rule_key                 | promoted_rule_rows | promoted_verified_auto_rows | promoted_oracle_hash_rows | backup_rows 
+------------------+------------------+-------------------------------------------------+--------------------+-----------------------------+---------------------------+-------------
+ Buy Your Silence | buy your silence | battle_rule_v1:6bc3d9f3ccc4395630d6c135f4f88397 |                  1 |                           1 |                         1 |           0
+ Zuko's Exile     | zuko's exile     | battle_rule_v1:bedf1ce0a21ccd23ffbfc6623b0da8fe |                  1 |                           1 |                         1 |           0
+(2 rows)
+

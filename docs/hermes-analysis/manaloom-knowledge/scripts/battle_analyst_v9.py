@@ -14856,6 +14856,23 @@ def removal_annotation_replay_fields(effect_data):
             "compensation_token_status",
             "dynamic_creature_token_executor",
         )
+    artifact_only_tokens = (
+        effect_data.get("target_controller_artifact_only_tokens")
+        if effect_data.get("target_controller_artifact_only_tokens") is not None
+        else effect_data.get("compensation_artifact_only_tokens")
+    )
+    if artifact_only_tokens is not None:
+        fields["target_controller_artifact_only_tokens"] = numeric_stat(artifact_only_tokens) or 0
+        fields["compensation_token_name"] = (
+            effect_data.get("target_controller_token_name")
+            or effect_data.get("compensation_token_name")
+            or "Artifact Token"
+        )
+        fields["compensation_token_artifact_only"] = True
+        fields["compensation_token_status"] = effect_data.get(
+            "compensation_token_status",
+            "dynamic_artifact_token_executor",
+        )
     return fields
 
 
@@ -15237,6 +15254,138 @@ def create_removal_compensation_tokens(effect_data, target_controller, source_ca
                 "map_token_status",
                 "annotation_only_explore_activation_not_autorun",
             ),
+            turn=turn,
+            **removal_annotation_replay_fields(effect_data),
+            **replay_rule_fields(effect_data),
+        )
+    artifact_only_count = numeric_stat(
+        effect_data.get("target_controller_artifact_only_tokens")
+        or effect_data.get("compensation_artifact_only_tokens")
+        or 0
+    ) or 0
+    artifact_created = []
+    if artifact_only_count > 0:
+        token_name = (
+            effect_data.get("target_controller_token_name")
+            or effect_data.get("compensation_token_name")
+            or "Artifact Token"
+        )
+        token_subtype = (
+            effect_data.get("target_controller_token_subtype")
+            or effect_data.get("compensation_token_subtype")
+        )
+        token_class = (
+            effect_data.get("target_controller_token_class")
+            or effect_data.get("compensation_token_class")
+            or effect_data.get("xmage_token_class")
+        )
+        artifact_effect_data = dict(effect_data)
+        prefixed_field_pairs = {
+            "token_activated_ability": (
+                "target_controller_token_activated_ability",
+                "compensation_token_activated_ability",
+            ),
+            "token_activated_ability_status": (
+                "target_controller_token_activated_ability_status",
+                "compensation_token_activated_ability_status",
+            ),
+            "token_activated_battle_model_scope": (
+                "target_controller_token_activated_battle_model_scope",
+                "compensation_token_activated_battle_model_scope",
+            ),
+            "token_activated_draw_on_self_sacrifice": (
+                "target_controller_token_activated_draw_on_self_sacrifice",
+                "compensation_token_activated_draw_on_self_sacrifice",
+            ),
+            "token_activated_self_sacrifice_draw": (
+                "target_controller_token_activated_self_sacrifice_draw",
+                "compensation_token_activated_self_sacrifice_draw",
+            ),
+            "token_draw_on_self_sacrifice": (
+                "target_controller_token_draw_on_self_sacrifice",
+                "compensation_token_draw_on_self_sacrifice",
+            ),
+            "token_draw_count": (
+                "target_controller_token_draw_count",
+                "compensation_token_draw_count",
+            ),
+            "token_activation_cost_mana": (
+                "target_controller_token_activation_cost_mana",
+                "compensation_token_activation_cost_mana",
+            ),
+            "token_activation_cost_generic": (
+                "target_controller_token_activation_cost_generic",
+                "compensation_token_activation_cost_generic",
+            ),
+            "token_activation_requires_tap": (
+                "target_controller_token_activation_requires_tap",
+                "compensation_token_activation_requires_tap",
+            ),
+            "token_activation_requires_sacrifice": (
+                "target_controller_token_activation_requires_sacrifice",
+                "compensation_token_activation_requires_sacrifice",
+            ),
+            "token_is_mana_source": (
+                "target_controller_token_is_mana_source",
+                "compensation_token_is_mana_source",
+            ),
+            "token_mana_source_contextual_only": (
+                "target_controller_token_mana_source_contextual_only",
+                "compensation_token_mana_source_contextual_only",
+            ),
+            "token_mana_activation_requires_tap": (
+                "target_controller_token_mana_activation_requires_tap",
+                "compensation_token_mana_activation_requires_tap",
+            ),
+            "token_mana_activation_requires_sacrifice": (
+                "target_controller_token_mana_activation_requires_sacrifice",
+                "compensation_token_mana_activation_requires_sacrifice",
+            ),
+            "token_mana_produced": (
+                "target_controller_token_mana_produced",
+                "compensation_token_mana_produced",
+            ),
+            "token_produces": (
+                "target_controller_token_produces",
+                "compensation_token_produces",
+            ),
+            "token_produced_mana_symbols": (
+                "target_controller_token_produced_mana_symbols",
+                "compensation_token_produced_mana_symbols",
+            ),
+        }
+        for target_key, source_keys in prefixed_field_pairs.items():
+            if artifact_effect_data.get(target_key) not in (None, "", [], {}):
+                continue
+            for source_key in source_keys:
+                if effect_data.get(source_key) not in (None, "", [], {}):
+                    artifact_effect_data[target_key] = effect_data.get(source_key)
+                    break
+        for _ in range(max(0, min(artifact_only_count, 10))):
+            token = create_artifact_token(
+                target_controller,
+                name=token_name,
+                subtype=token_subtype,
+                token_class=token_class,
+                tapped=bool(
+                    effect_data.get("target_controller_token_tapped")
+                    or effect_data.get("compensation_token_tapped")
+                ),
+                effect_data=artifact_effect_data,
+                source_event="compensation_artifact_token_created",
+                turn=turn,
+            )
+            artifact_created.append(token)
+            created.append(token)
+    if artifact_created:
+        emit_replay_event(
+            "compensation_tokens_created",
+            player=getattr(target_controller, "name", None),
+            source=source_card.get("name", "?") if isinstance(source_card, dict) else "?",
+            token=artifact_created[0].get("name", "Artifact Token"),
+            token_artifact_only=True,
+            token_class=artifact_created[0].get("xmage_token_class"),
+            tokens_created=len(artifact_created),
             turn=turn,
             **removal_annotation_replay_fields(effect_data),
             **replay_rule_fields(effect_data),
@@ -68303,6 +68452,8 @@ def resolve_composite_resolution_effect(player, opponents, card, effect_data, tu
                 applied.append({"effect": component_effect, **discover_result})
             else:
                 count = int(component.get("count") or component.get("amount") or component.get("draw_count") or 1)
+                component_fields["draw_count"] = count
+                component_fields["requested_draw_count"] = count
                 optional_cost = str(component.get("optional_cost") or "").strip()
                 if optional_cost == "discard_card":
                     discard_count = max(
@@ -68358,6 +68509,7 @@ def resolve_composite_resolution_effect(player, opponents, card, effect_data, tu
                             )
                             drawn = player.draw(max(0, count), rng)
                             outcome = "cards_drawn"
+                            component_fields["cards_drawn"] = len(drawn)
                             discarded_names = [
                                 discarded.get("name", "?")
                                 for discarded in discarded_cards
@@ -68381,8 +68533,9 @@ def resolve_composite_resolution_effect(player, opponents, card, effect_data, tu
                                 }
                             )
                 else:
-                    player.draw(max(0, count), rng)
+                    drawn = player.draw(max(0, count), rng)
                     outcome = "cards_drawn"
+                    component_fields["cards_drawn"] = len(drawn)
                     applied.append({"effect": component_effect, "count": count})
         elif component_effect == "proliferate":
             component_payload = dict(component)
@@ -68711,6 +68864,8 @@ def resolve_composite_resolution_effect(player, opponents, card, effect_data, tu
                 all_players=participants,
             )
             outcome = "tokens_created"
+            component_fields["tokens_created"] = token_count
+            component_fields["token_count"] = token_count
             applied.append({"effect": component_effect, "tokens_created": token_count})
         elif component_effect == "phase_out":
             include_lands = bool(component.get("phase_out_includes_lands"))

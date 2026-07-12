@@ -5317,6 +5317,37 @@ def test_manifest_builds_single_target_exile_execution_scenario() -> None:
     assert scenario["nonmatching_target"]["colors"] == ["W"]
 
 
+def test_single_target_exile_artifact_compensation_scenario_includes_token_expectation() -> None:
+    proposal = {
+        "normalized_name": "buy your silence",
+        "card_name": "Buy Your Silence",
+        "oracle_hash": "hash-buy-your-silence",
+        "logical_rule_key": "battle_rule_v1:hash-buy-your-silence",
+        "effect_json": {
+            "effect": "remove_permanent",
+            "battle_model_scope": "xmage_exile_target_with_controller_artifact_token_compensation_spell_v1",
+            "target": "nonland_permanent",
+            "target_constraints": {"card_types": ["permanent"], "exclude_card_types": ["land"]},
+            "destination": "exile",
+            "target_controller_artifact_only_tokens": 1,
+            "target_controller_token_name": "Treasure Token",
+            "target_controller_token_subtype": "Treasure",
+            "target_controller_token_class": "TreasureToken",
+        },
+    }
+
+    rule = builder.expected_rule_from_proposal(proposal)
+    scenario = builder.execution_scenario_from_expected_rule(rule)
+
+    assert scenario is not None
+    assert scenario["type"] == "single_target_removal"
+    assert scenario["expected_destination"] == "exile"
+    assert scenario["expected_compensation_token_count"] == 1
+    assert scenario["expected_compensation_token_name"] == "Treasure Token"
+    assert scenario["expected_compensation_token_artifact_only"] is True
+    assert scenario["expected_compensation_token_class"] == "TreasureToken"
+
+
 def test_single_target_removal_scenario_uses_illegal_fixture_for_simple_creature_target() -> None:
     rule = {
         "normalized_name": "oblivion strike",
@@ -7479,6 +7510,36 @@ def test_fixed_create_tokens_execution_scenario_preserves_static_cant_block() ->
     assert scenario["type"] == "fixed_create_creature_tokens"
     assert scenario["expected_token"]["name"] == "Rat Token"
     assert scenario["expected_token"]["cant_block"] is True
+
+
+def test_fixed_create_tokens_draw_execution_scenario_seeds_library() -> None:
+    rule = {
+        "normalized_name": "fixture prize",
+        "card_name": "Fixture Prize",
+        "logical_rule_key": "battle_rule_v1:fixture-prize",
+        "required_effect_fields": {
+            "effect": "composite_resolution",
+            "battle_model_scope": "xmage_fixed_create_creature_tokens_draw_cards_spell_v1",
+            "token_count": 2,
+            "draw_count": 2,
+            "token_name": "Goblin Token",
+            "token_power": 1,
+            "token_toughness": 1,
+            "token_subtype": "Goblin",
+            "token_colors": ["R"],
+            "_composite_rule_components": [
+                {"effect": "draw_cards", "count": 2},
+                {"effect": "token_maker", "token_count": 2},
+            ],
+        },
+    }
+
+    scenario = builder.execution_scenario_from_expected_rule(rule)
+
+    assert scenario["type"] == "fixed_create_creature_tokens"
+    assert scenario["expected_token"]["count"] == 2
+    assert scenario["expected_draw_count"] == 2
+    assert len(scenario["controller_library"]) == 2
 
 
 def test_dynamic_count_token_spell_execution_scenarios_seed_support_state() -> None:

@@ -3778,6 +3778,82 @@ def test_single_target_removal_runner_validates_target_controller_life_gain() ->
     assert result["target_controller_life_gained"] == 4
 
 
+def test_single_target_removal_runner_validates_artifact_token_compensation() -> None:
+    battle = validator.load_battle(validator.DEFAULT_BATTLE)
+    events = []
+    previous_handler = battle.REPLAY_EVENT_HANDLER
+    previous_get_card_effect = battle.get_card_effect
+    battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+    battle.get_card_effect = lambda card: {
+        "effect": "remove_permanent",
+        "battle_model_scope": "xmage_exile_target_with_controller_artifact_token_compensation_spell_v1",
+        "target": "nonland_permanent",
+        "target_constraints": {"card_types": ["permanent"], "excluded_card_types": ["land"]},
+        "destination": "exile",
+        "target_controller_artifact_only_tokens": 1,
+        "compensation_artifact_only_tokens": 1,
+        "target_controller_token_name": "Treasure Token",
+        "compensation_token_name": "Treasure Token",
+        "target_controller_token_subtype": "Treasure",
+        "compensation_token_subtype": "Treasure",
+        "target_controller_token_class": "TreasureToken",
+        "compensation_token_class": "TreasureToken",
+        "target_controller_token_activated_ability": "any_color_mana_self_sacrifice",
+        "target_controller_token_activated_ability_status": "runtime_supported",
+        "target_controller_token_is_mana_source": True,
+        "target_controller_token_mana_source_contextual_only": False,
+        "target_controller_token_mana_activation_requires_tap": True,
+        "target_controller_token_mana_activation_requires_sacrifice": True,
+        "target_controller_token_mana_produced": 1,
+        "target_controller_token_produces": "any_color",
+        "target_controller_token_produced_mana_symbols": ["W", "U", "B", "R", "G"],
+        "_rule_logical_key": "battle_rule_v1:buy-your-silence-fixture",
+    }
+    try:
+        result = validator.run_single_target_removal(
+            battle,
+            {
+                "name": "Buy Your Silence Fixture exiles one legal target",
+                "type": "single_target_removal",
+                "card": {"name": "Buy Your Silence Fixture", "type_line": "Sorcery"},
+                "target": {
+                    "name": "E2E Legal Removal Target",
+                    "type_line": "Artifact",
+                    "effect": "artifact",
+                    "cmc": 3,
+                },
+                "nonmatching_target": {
+                    "name": "E2E Illegal Removal Target",
+                    "type_line": "Land",
+                    "effect": "land",
+                    "cmc": 0,
+                },
+                "expected_destination": "exile",
+                "expected_effect": "remove_permanent",
+                "expected_target_constraints": {
+                    "card_types": ["permanent"],
+                    "excluded_card_types": ["land"],
+                },
+                "expected_compensation_token_count": 1,
+                "expected_compensation_token_name": "Treasure Token",
+                "expected_compensation_token_subtype": "Treasure",
+                "expected_compensation_token_artifact_only": True,
+                "expected_compensation_token_class": "TreasureToken",
+                "logical_rule_key": "battle_rule_v1:buy-your-silence-fixture",
+            },
+            events,
+        )
+    finally:
+        battle.REPLAY_EVENT_HANDLER = previous_handler
+        battle.get_card_effect = previous_get_card_effect
+
+    assert result["card_name"] == "Buy Your Silence Fixture"
+    assert result["destination"] == "exile"
+    assert result["compensation_tokens_created"] == 1
+    assert result["compensation_token_name"] == "Treasure Token"
+    assert result["compensation_token_artifact_only"] is True
+
+
 def test_single_target_removal_runner_validates_target_controller_life_loss_on_resolve() -> None:
     battle = validator.load_battle(validator.DEFAULT_BATTLE)
     events = []
@@ -7681,6 +7757,88 @@ def test_fixed_create_tokens_runner_validates_static_cant_block() -> None:
     assert result["card_name"] == "Fixture Rat Call"
     assert result["tokens_created"] == 1
     assert result["token_cant_block"] is True
+
+
+def test_fixed_create_tokens_runner_validates_composite_draw_component() -> None:
+    battle = validator.load_battle(validator.DEFAULT_BATTLE)
+    events = []
+    previous_handler = battle.REPLAY_EVENT_HANDLER
+    previous_get_card_effect = battle.get_card_effect
+    battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+    battle.get_card_effect = lambda card: {
+        "effect": "composite_resolution",
+        "battle_model_scope": "xmage_fixed_create_creature_tokens_draw_cards_spell_v1",
+        "ability_kind": "one_shot",
+        "token_count": 2,
+        "draw_count": 2,
+        "token_name": "Goblin Token",
+        "token_power": 1,
+        "token_toughness": 1,
+        "token_subtype": "Goblin",
+        "token_colors": ["R"],
+        "resolution_order": "draw_then_create_tokens",
+        "_composite_rule_components": [
+            {
+                "effect": "draw_cards",
+                "battle_model_scope": "xmage_fixed_source_controller_draw_spell_v1",
+                "count": 2,
+                "draw_count": 2,
+                "compose_on_resolution": True,
+            },
+            {
+                "effect": "token_maker",
+                "battle_model_scope": "xmage_fixed_create_creature_tokens_spell_v1",
+                "token_count": 2,
+                "token_name": "Goblin Token",
+                "token_power": 1,
+                "token_toughness": 1,
+                "token_subtype": "Goblin",
+                "token_colors": ["R"],
+                "compose_on_resolution": True,
+            },
+        ],
+        "_rule_logical_key": "battle_rule_v1:fixture-prize",
+    }
+    try:
+        result = validator.run_fixed_create_creature_tokens(
+            battle,
+            {
+                "name": "Fixture Prize creates modeled creature tokens and draws",
+                "type": "fixed_create_creature_tokens",
+                "card": {"name": "Fixture Prize"},
+                "expected_draw_count": 2,
+                "controller_library": [
+                    {"name": "Library One", "type_line": "Sorcery"},
+                    {"name": "Library Two", "type_line": "Sorcery"},
+                ],
+                "expected_token": {
+                    "name": "Goblin Token",
+                    "count": 2,
+                    "power": 1,
+                    "toughness": 1,
+                    "subtype": "Goblin",
+                    "colors": ["R"],
+                },
+                "logical_rule_key": "battle_rule_v1:fixture-prize",
+            },
+            events,
+        )
+    finally:
+        battle.REPLAY_EVENT_HANDLER = previous_handler
+        battle.get_card_effect = previous_get_card_effect
+
+    assert result["card_name"] == "Fixture Prize"
+    assert result["tokens_created"] == 2
+    assert result["cards_drawn"] == 2
+    draw_events = [
+        data
+        for event, data in events
+        if event == "composite_rule_component_resolved"
+        and data.get("component_effect") == "draw_cards"
+    ]
+    assert draw_events
+    assert draw_events[-1]["draw_count"] == 2
+    assert draw_events[-1]["cards_drawn"] == 2
 
 
 def test_static_cant_block_creature_runner_preserves_keyword_and_blocks_blocking() -> None:

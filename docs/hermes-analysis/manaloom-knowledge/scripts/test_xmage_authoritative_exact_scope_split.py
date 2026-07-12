@@ -5404,6 +5404,108 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertEqual(effect["token_toughness"], 1)
         self.assertEqual(effect["token_colors"], ["R"])
 
+    def test_fixed_create_tokens_then_draw_spell_maps_to_composite_scope(self) -> None:
+        row = queue_row(
+            split.TOKEN_DRAW_SPELL_UNIT,
+            effect_classes=["CreateTokenEffect", "DrawCardSourceControllerEffect"],
+            xmage_signals=["token", "draw"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Fixture Prize",
+                type_line="Sorcery",
+                oracle_text="Draw two cards. Create two 1/1 red Goblin creature tokens.",
+            ),
+            source_text="""
+                this.getSpellAbility().addEffect(new DrawCardSourceControllerEffect(2));
+                this.getSpellAbility().addEffect(new CreateTokenEffect(new GoblinToken(), 2));
+                class GoblinToken extends TokenImpl {
+                    public GoblinToken() {
+                        super("Goblin Token", "1/1 red Goblin creature token");
+                        cardType.add(CardType.CREATURE);
+                        subtype.add(SubType.GOBLIN);
+                        color.setRed(true);
+                        power = new MageInt(1);
+                        toughness = new MageInt(1);
+                    }
+                }
+            """,
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["effect"], "composite_resolution")
+        self.assertEqual(effect["battle_model_scope"], split.TOKEN_DRAW_SPELL_SCOPE)
+        self.assertEqual(effect["token_count"], 2)
+        self.assertEqual(effect["draw_count"], 2)
+        self.assertEqual(effect["resolution_order"], "draw_then_create_tokens")
+        self.assertEqual(
+            [component["effect"] for component in effect["_composite_rule_components"]],
+            ["draw_cards", "token_maker"],
+        )
+
+    def test_fixed_create_tokens_draw_spell_blocks_additional_cost(self) -> None:
+        row = queue_row(
+            split.TOKEN_DRAW_SPELL_UNIT,
+            effect_classes=["CreateTokenEffect", "DrawCardSourceControllerEffect"],
+            xmage_signals=["token", "draw"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Fixture Dispute",
+                type_line="Instant",
+                oracle_text=(
+                    "As an additional cost to cast this spell, sacrifice an artifact or creature. "
+                    "Draw two cards. Create a Treasure token."
+                ),
+            ),
+            source_text="""
+                this.getSpellAbility().addCost(new SacrificeTargetCost(StaticFilters.FILTER_PERMANENT_ARTIFACT_OR_CREATURE));
+                this.getSpellAbility().addEffect(new DrawCardSourceControllerEffect(2));
+                this.getSpellAbility().addEffect(new CreateTokenEffect(new TreasureToken()).concatBy("and"));
+            """,
+        )
+
+        self.assertIsNone(proposal)
+        self.assertEqual(reason, "token_draw_additional_cost_not_supported")
+
+    def test_fixed_create_treasure_draw_spell_maps_treasure_mana_runtime(self) -> None:
+        row = queue_row(
+            split.TOKEN_DRAW_SPELL_UNIT,
+            effect_classes=["CreateTokenEffect", "DrawCardSourceControllerEffect"],
+            xmage_signals=["token", "draw"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Fixture Treasure Prize",
+                type_line="Sorcery",
+                oracle_text="Draw two cards. Create a Treasure token.",
+            ),
+            source_text="""
+                this.getSpellAbility().addEffect(new DrawCardSourceControllerEffect(2));
+                this.getSpellAbility().addEffect(new CreateTokenEffect(new TreasureToken()));
+                class TreasureToken extends TokenImpl {
+                    public TreasureToken() {
+                        super("Treasure Token", "Treasure token");
+                        cardType.add(CardType.ARTIFACT);
+                        subtype.add(SubType.TREASURE);
+                        this.addAbility(new TreasureAbility(false));
+                    }
+                }
+            """,
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.TOKEN_DRAW_SPELL_SCOPE)
+        self.assertTrue(effect["token_artifact_only"])
+        self.assertTrue(effect["token_is_mana_source"])
+        self.assertEqual(effect["token_produces"], "any_color")
+        self.assertEqual(effect["token_produced_mana_symbols"], list("WUBRG"))
+
     def test_fixed_create_creature_tokens_spell_with_flashback_maps_cost(self) -> None:
         row = queue_row(
             split.TOKEN_SPELL_FLASHBACK_UNIT,
@@ -6904,6 +7006,113 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertEqual(effect["target_controller_token_colors"], ["W"])
         self.assertEqual(effect["target_controller_token_keywords"], ["flying"])
         self.assertTrue(effect["target_controller_token_flying"])
+
+    def test_exile_with_controller_artifact_token_compensation_maps_treasure(self) -> None:
+        row = queue_row(
+            split.EXILE_UNIT,
+            effect_classes=["ExileTargetEffect", "CreateTokenControllerTargetEffect"],
+            xmage_signals=["targeting"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Buy Your Silence",
+                type_line="Sorcery",
+                oracle_text="Exile target nonland permanent. Its controller creates a Treasure token.",
+            ),
+            source_text="""
+                this.getSpellAbility().addEffect(new ExileTargetEffect());
+                this.getSpellAbility().addEffect(new CreateTokenControllerTargetEffect(new TreasureToken()));
+                this.getSpellAbility().addTarget(new TargetNonlandPermanent());
+                class TreasureToken extends TokenImpl {
+                    public TreasureToken() {
+                        super("Treasure Token", "Treasure token");
+                        cardType.add(CardType.ARTIFACT);
+                        subtype.add(SubType.TREASURE);
+                        addAbility(new TreasureAbility());
+                    }
+                }
+            """,
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.EXILE_ARTIFACT_COMPENSATION_TOKEN_SCOPE)
+        self.assertEqual(effect["effect"], "remove_permanent")
+        self.assertEqual(effect["target"], "nonland_permanent")
+        self.assertEqual(effect["destination"], "exile")
+        self.assertEqual(effect["target_controller_artifact_only_tokens"], 1)
+        self.assertEqual(effect["target_controller_token_name"], "Treasure Token")
+        self.assertEqual(effect["target_controller_token_subtype"], "Treasure")
+        self.assertEqual(effect["target_controller_token_activated_ability"], "any_color_mana_self_sacrifice")
+        self.assertTrue(effect["target_controller_token_is_mana_source"])
+
+    def test_exile_with_controller_artifact_token_compensation_maps_clue(self) -> None:
+        row = queue_row(
+            split.EXILE_UNIT,
+            effect_classes=["ExileTargetEffect", "CreateTokenControllerTargetEffect"],
+            xmage_signals=["targeting"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Zuko's Exile",
+                type_line="Instant",
+                oracle_text="Exile target artifact, creature, or enchantment. Its controller creates a Clue token.",
+            ),
+            source_text="""
+                this.getSpellAbility().addEffect(new ExileTargetEffect());
+                this.getSpellAbility().addEffect(new CreateTokenControllerTargetEffect(new ClueArtifactToken()));
+                this.getSpellAbility().addTarget(new TargetPermanent(StaticFilters.FILTER_PERMANENT_ARTIFACT_CREATURE_OR_ENCHANTMENT));
+                class ClueArtifactToken extends TokenImpl {
+                    public ClueArtifactToken() {
+                        super("Clue Token", "Clue token");
+                        cardType.add(CardType.ARTIFACT);
+                        subtype.add(SubType.CLUE);
+                        addAbility(new SimpleActivatedAbility(new DrawCardSourceControllerEffect(1), new GenericManaCost(2)));
+                    }
+                }
+            """,
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.EXILE_ARTIFACT_COMPENSATION_TOKEN_SCOPE)
+        self.assertEqual(effect["target"], "permanent")
+        self.assertEqual(effect["target_constraints"], {"card_types": ["artifact", "creature", "enchantment"]})
+        self.assertEqual(effect["target_controller_token_name"], "Clue Token")
+        self.assertEqual(effect["target_controller_token_activated_ability"], "draw_self_sacrifice")
+        self.assertTrue(effect["target_controller_token_activated_self_sacrifice_draw"])
+
+    def test_destroy_with_unsupported_artifact_token_compensation_blocks_lander(self) -> None:
+        row = queue_row(
+            split.DESTROY_UNIT,
+            effect_classes=["DestroyTargetEffect", "CreateTokenControllerTargetEffect"],
+            xmage_signals=["targeting"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Emergency Eject",
+                type_line="Instant",
+                oracle_text="Destroy target nonland permanent. Its controller creates a Lander token.",
+            ),
+            source_text="""
+                this.getSpellAbility().addEffect(new DestroyTargetEffect());
+                this.getSpellAbility().addEffect(new CreateTokenControllerTargetEffect(new LanderToken()));
+                this.getSpellAbility().addTarget(new TargetNonlandPermanent());
+                class LanderToken extends TokenImpl {
+                    public LanderToken() {
+                        super("Lander Token", "Lander token");
+                        cardType.add(CardType.ARTIFACT);
+                        subtype.add(SubType.LANDER);
+                    }
+                }
+            """,
+        )
+
+        self.assertIsNone(proposal)
+        self.assertEqual(reason, "compensation_artifact_token_activation_not_supported")
 
     def test_token_class_parser_accepts_concatenated_java_string_description(self) -> None:
         token_data, reason = split.parse_simple_token_class(

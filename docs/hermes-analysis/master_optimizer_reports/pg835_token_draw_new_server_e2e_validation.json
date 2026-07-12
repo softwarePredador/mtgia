@@ -1,0 +1,235 @@
+{
+  "battle_execution": {
+    "event_count": 13,
+    "results": [
+      {
+        "card_name": "Glimmerburst",
+        "cards_drawn": 2,
+        "scenario": "Glimmerburst creates modeled creature tokens",
+        "token_cant_block": false,
+        "token_name": "Glimmer Token",
+        "token_tapped": false,
+        "tokens_created": 1
+      },
+      {
+        "card_name": "Glittermonger",
+        "discard_target": null,
+        "discarded_count": 0,
+        "exiled_source_from_graveyard": false,
+        "scenario": "Glittermonger activates token ability",
+        "token_name": "Treasure Token",
+        "tokens_created": 1
+      },
+      {
+        "card_name": "Halo Scarab",
+        "discard_target": null,
+        "discarded_count": 0,
+        "exiled_source_from_graveyard": true,
+        "scenario": "Halo Scarab activates token ability",
+        "token_name": "Treasure Token",
+        "tokens_created": 1
+      },
+      {
+        "card_name": "Pirate's Prize",
+        "cards_drawn": 2,
+        "scenario": "Pirate's Prize creates modeled creature tokens",
+        "token_cant_block": false,
+        "token_name": "Treasure Token",
+        "token_tapped": false,
+        "tokens_created": 1
+      }
+    ],
+    "scenario_count": 4
+  },
+  "battle_path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py",
+  "database_target": "127.0.0.1:15432/halder",
+  "generated_at_utc": "2026-07-12T17:59:09.931947+00:00",
+  "manifest": "docs/hermes-analysis/master_optimizer_reports/pg835_token_draw_new_server_manifest.json",
+  "package_id": "pg835_token_draw_new_server_manifest",
+  "snapshot": "docs/hermes-analysis/master_optimizer_reports/pg835_token_draw_new_server_pg_to_sqlite_sync_tracked_snapshot.json",
+  "sqlite_db": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db",
+  "stages": [
+    {
+      "evidence": {
+        "validated_rows": 4
+      },
+      "name": "postgres_source_of_truth",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_create_creature_tokens_draw_cards_spell_v1",
+          "card_name": "Glimmerburst",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:98b779eed4a072890e45c78d36bc47ce",
+          "oracle_hash": "a25051234ee55b0b8079617746dc2868",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_create_token_v1",
+          "card_name": "Glittermonger",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:258e845f63060b52419d6034896b7655",
+          "oracle_hash": "5b4e50720f248f4efc602edf472eb667",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_graveyard_self_exile_activated_create_token_v1",
+          "card_name": "Halo Scarab",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:936a2b6b0a79421cb88b3e205d268b45",
+          "oracle_hash": "2eb45603d56974326170f8c4ea703c63",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_create_creature_tokens_draw_cards_spell_v1",
+          "card_name": "Pirate's Prize",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:9ebee39a8a5e2a280cfbca52a271bb7d",
+          "oracle_hash": "47b24fe1ccecb97beb2368d34a8b0be6",
+          "review_status": "verified",
+          "rule_version": 2
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_rows": 4
+      },
+      "name": "sqlite_hermes_cache",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_create_creature_tokens_draw_cards_spell_v1",
+          "card_name": "Glimmerburst",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:98b779eed4a072890e45c78d36bc47ce",
+          "oracle_hash": "a25051234ee55b0b8079617746dc2868",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_create_token_v1",
+          "card_name": "Glittermonger",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:258e845f63060b52419d6034896b7655",
+          "oracle_hash": "5b4e50720f248f4efc602edf472eb667",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_graveyard_self_exile_activated_create_token_v1",
+          "card_name": "Halo Scarab",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:936a2b6b0a79421cb88b3e205d268b45",
+          "oracle_hash": "2eb45603d56974326170f8c4ea703c63",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_create_creature_tokens_draw_cards_spell_v1",
+          "card_name": "Pirate's Prize",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:9ebee39a8a5e2a280cfbca52a271bb7d",
+          "oracle_hash": "47b24fe1ccecb97beb2368d34a8b0be6",
+          "review_status": "verified",
+          "rule_version": 2
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_cards": 4
+      },
+      "name": "canonical_snapshot_fallback",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_create_creature_tokens_draw_cards_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Glimmerburst",
+          "logical_rule_key": "battle_rule_v1:98b779eed4a072890e45c78d36bc47ce"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_create_token_v1",
+          "battle_rule_version": 2,
+          "card_name": "Glittermonger",
+          "logical_rule_key": "battle_rule_v1:258e845f63060b52419d6034896b7655"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_graveyard_self_exile_activated_create_token_v1",
+          "battle_rule_version": 2,
+          "card_name": "Halo Scarab",
+          "logical_rule_key": "battle_rule_v1:936a2b6b0a79421cb88b3e205d268b45"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_create_creature_tokens_draw_cards_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Pirate's Prize",
+          "logical_rule_key": "battle_rule_v1:9ebee39a8a5e2a280cfbca52a271bb7d"
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_cards": 4
+      },
+      "name": "runtime_get_card_effect",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "card_name": "Glimmerburst",
+          "component_keys": [],
+          "effect": "composite_resolution",
+          "logical_rule_key": "battle_rule_v1:98b779eed4a072890e45c78d36bc47ce"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Glittermonger",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:258e845f63060b52419d6034896b7655"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Halo Scarab",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:936a2b6b0a79421cb88b3e205d268b45"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Pirate's Prize",
+          "component_keys": [],
+          "effect": "composite_resolution",
+          "logical_rule_key": "battle_rule_v1:9ebee39a8a5e2a280cfbca52a271bb7d"
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "events": 13,
+        "scenarios": 4
+      },
+      "name": "battle_execution",
+      "status": "pass"
+    }
+  ],
+  "status": "pass",
+  "title": "Battle Package End-to-End Validation"
+}
