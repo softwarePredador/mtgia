@@ -35,7 +35,7 @@ def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser()
     parser.add_argument("--manifest", required=True)
     parser.add_argument("--sqlite-db", default=str(DEFAULT_SQLITE_DB))
-    parser.add_argument("--snapshot", default=str(DEFAULT_SNAPSHOT))
+    parser.add_argument("--snapshot")
     parser.add_argument("--battle-path", default=str(DEFAULT_BATTLE))
     parser.add_argument("--output-json")
     parser.add_argument("--output-md")
@@ -48,6 +48,17 @@ def fail(stage: str, detail: str) -> None:
 
 def load_json(path: Path) -> Any:
     return json.loads(path.read_text(encoding="utf-8"))
+
+
+def resolve_snapshot_path(manifest_path: Path, explicit_snapshot: str | None) -> Path:
+    if explicit_snapshot:
+        return Path(explicit_snapshot)
+    stem = manifest_path.stem
+    if stem.endswith("_manifest"):
+        sibling = manifest_path.with_name(f"{stem[:-len('_manifest')]}_canonical_fallback.json")
+        if sibling.exists():
+            return sibling
+    return DEFAULT_SNAPSHOT
 
 
 def load_battle(path: Path):
@@ -14338,7 +14349,7 @@ def main() -> int:
     manifest = load_json(manifest_path)
     expected_by_key = expected_rules_by_key(manifest)
     sqlite_db = Path(args.sqlite_db)
-    snapshot = Path(args.snapshot)
+    snapshot = resolve_snapshot_path(manifest_path, args.snapshot)
     battle_path = Path(args.battle_path)
     os.environ["MANALOOM_KNOWLEDGE_DB"] = str(sqlite_db.resolve())
     os.environ["MANALOOM_CANONICAL_KNOWN_CARDS_JSON"] = str(snapshot.resolve())

@@ -13306,7 +13306,6 @@ def is_permanent_activated_life_gain_unit(row: dict[str, Any]) -> bool:
     return (
         effect_classes(row) == {"GainLifeEffect"}
         and ability_classes(row) == {"SimpleActivatedAbility"}
-        and "activated_ability" in set(row.get("xmage_signals") or [])
     )
 
 
@@ -13382,7 +13381,6 @@ def is_permanent_activated_draw_unit(row: dict[str, Any]) -> bool:
     return (
         effect_classes(row) == {"DrawCardSourceControllerEffect"}
         and ability_classes(row) == {"SimpleActivatedAbility"}
-        and "activated_ability" in set(row.get("xmage_signals") or [])
     )
 
 
@@ -13392,7 +13390,6 @@ def is_permanent_activated_draw_discard_unit(row: dict[str, Any]) -> bool:
     return (
         effect_classes(row) == {"DrawDiscardControllerEffect"}
         and ability_classes(row) == {"SimpleActivatedAbility"}
-        and "activated_ability" in set(row.get("xmage_signals") or [])
     )
 
 
@@ -13416,7 +13413,6 @@ def is_permanent_activated_damage_unit(row: dict[str, Any]) -> bool:
         effect_classes(row) == {"DamageTargetEffect"}
         and "SimpleActivatedAbility" in abilities
         and remaining.issubset(STATIC_SELF_KEYWORD_ABILITY_CLASSES)
-        and "activated_ability" in set(row.get("xmage_signals") or [])
     )
 
 
@@ -13427,19 +13423,23 @@ def is_permanent_activated_destroy_unit(row: dict[str, Any]) -> bool:
         ACTIVATED_SELF_SAC_DESTROY_ARTIFACT_OR_ENCHANTMENT_UNIT,
     }:
         return False
+    abilities = ability_classes(row)
+    remaining = abilities - {"SimpleActivatedAbility"}
     return (
         effect_classes(row) == {"DestroyTargetEffect"}
-        and ability_classes(row) == {"SimpleActivatedAbility"}
-        and "activated_ability" in set(row.get("xmage_signals") or [])
+        and "SimpleActivatedAbility" in abilities
+        and remaining.issubset(STATIC_SELF_KEYWORD_ABILITY_CLASSES)
     )
 
 
 def is_permanent_activated_bounce_unit(row: dict[str, Any]) -> bool:
+    abilities = ability_classes(row)
+    remaining = abilities - {"SimpleActivatedAbility"}
     return (
         str(row.get("adapter_work_unit") or "") == BOUNCE_UNIT
         and effect_classes(row) == {"ReturnToHandTargetEffect"}
-        and ability_classes(row) == {"SimpleActivatedAbility"}
-        and {"targeting", "activated_ability"}.issubset(set(row.get("xmage_signals") or []))
+        and "SimpleActivatedAbility" in abilities
+        and remaining.issubset(STATIC_SELF_KEYWORD_ABILITY_CLASSES)
     )
 
 
@@ -13449,7 +13449,6 @@ def is_permanent_activated_tap_target_unit(row: dict[str, Any]) -> bool:
         unit in {TAP_TARGET_CREATURE_UNIT, TAP_TARGET_PERMANENT_UNIT}
         and effect_classes(row) == {"TapTargetEffect"}
         and ability_classes(row) == {"SimpleActivatedAbility"}
-        and {"targeting", "activated_ability"}.issubset(set(row.get("xmage_signals") or []))
     )
 
 
@@ -13458,7 +13457,6 @@ def is_permanent_activated_untap_target_unit(row: dict[str, Any]) -> bool:
         str(row.get("adapter_work_unit") or "") == UNTAP_TARGET_UNIT
         and effect_classes(row) == {"UntapTargetEffect"}
         and ability_classes(row) == {"SimpleActivatedAbility"}
-        and {"targeting", "activated_ability"}.issubset(set(row.get("xmage_signals") or []))
     )
 
 
@@ -13483,7 +13481,6 @@ def is_permanent_activated_tutor_battlefield_unit(row: dict[str, Any]) -> bool:
     return (
         effect_classes(row) == {"SearchLibraryPutInPlayEffect"}
         and ability_classes(row) == {"SimpleActivatedAbility"}
-        and "activated_ability" in set(row.get("xmage_signals") or [])
     )
 
 
@@ -13493,7 +13490,6 @@ def is_permanent_activated_tutor_hand_unit(row: dict[str, Any]) -> bool:
     return (
         effect_classes(row) == {"SearchLibraryPutInHandEffect"}
         and ability_classes(row) == {"SimpleActivatedAbility"}
-        and "activated_ability" in set(row.get("xmage_signals") or [])
     )
 
 
@@ -13501,7 +13497,6 @@ def is_permanent_activated_hand_to_battlefield_unit(row: dict[str, Any]) -> bool
     return (
         effect_classes(row) == {"PutCardFromHandOntoBattlefieldEffect"}
         and ability_classes(row) == {"SimpleActivatedAbility"}
-        and "activated_ability" in set(row.get("xmage_signals") or [])
     )
 
 
@@ -33250,6 +33245,13 @@ def split_row(
         if parsed_activation.get("activation_requires_sacrifice"):
             effect_json["activated_self_sacrifice_destroy"] = True
             activated_effect["activated_self_sacrifice_destroy"] = True
+        keyword_list = ordered_keywords(keywords_from_source_added_ability_classes(source_text, row))
+        if keyword_list:
+            effect_json["keywords"] = keyword_list
+            effect_json["_keywords_are_self"] = True
+            effect_json["xmage_ability_classes"] = sorted(ability_classes(row))
+            for keyword in keyword_list:
+                effect_json[keyword] = True
         return build_proposal(
             row,
             metadata,
@@ -33394,6 +33396,13 @@ def split_row(
         if parsed_activation.get("activation_requires_sacrifice"):
             effect_json["activated_self_sacrifice_bounce"] = True
             activated_effect["activated_self_sacrifice_bounce"] = True
+        keyword_list = ordered_keywords(keywords_from_source_added_ability_classes(source_text, row))
+        if keyword_list:
+            effect_json["keywords"] = keyword_list
+            effect_json["_keywords_are_self"] = True
+            effect_json["xmage_ability_classes"] = sorted(ability_classes(row))
+            for keyword in keyword_list:
+                effect_json[keyword] = True
         return build_proposal(
             row,
             metadata,
@@ -45934,7 +45943,7 @@ def build_exact_split_report(
                 "direct_damage::targeted_damage_variant_v1 rows with DamageTargetEffect, SimpleActivatedAbility plus only static self keywords, fixed activated damage, mana/tap/self-sacrifice source costs only, and simple any-target or creature targets",
                 "xmage_signature DamageEverythingEffect one-shot spell rows with exact fixed damage to each creature and each player, no filter, no X value, and no additional cost",
                 "multi_target_damage::xmage_multi_target_damage_variant_review_v1 rows with one-shot DamageMultiEffect, fixed total damage, exact Oracle/source target-count range, and supported TargetAmount filters",
-                "removal_destroy::targeted_destroy_variant_v1 rows with DestroyTargetEffect, SimpleActivatedAbility, exact activated destroy-target Oracle text, and mana/tap/self-sacrifice source costs only",
+                "removal_destroy::targeted_destroy_variant_v1 rows with DestroyTargetEffect, SimpleActivatedAbility plus optional static self keywords, exact activated destroy-target Oracle text, and mana/tap/self-sacrifice source costs only",
                 "life_gain::xmage_life_gain_variant_review_v1 rows with GainLifeEffect, SimpleActivatedAbility, exact fixed activated life-gain Oracle text, and mana/tap/source self-sacrifice costs only",
                 "tutor::xmage_library_search_variant_review_v1 rows with SearchLibraryPutInHandEffect, SimpleActivatedAbility, exact activated tutor-to-hand Oracle/source agreement, noncreature permanent type, and mana/tap/source self-sacrifice costs only",
                 "xmage_signature BoostControlledEffect one-shot spell rows with exact fixed controlled-creature boost until EOT and no color/modal/dynamic filters",
@@ -45965,6 +45974,7 @@ def build_exact_split_report(
                 "recursion::xmage_graveyard_return_variant_review_v1 rows with ReturnFromGraveyardToHandTargetEffect, DealsCombatDamageToAPlayerTriggeredAbility, exact combat-damage graveyard-to-hand Oracle/source agreement, and only static self keywords",
                 "recursion::xmage_graveyard_return_variant_review_v1 rows with MillCardsControllerEffect + ReturnCardChosenFromGraveyardEffect, exact mill-then-return Oracle/source agreement, and no additional ability class",
                 "recursion::xmage_graveyard_return_variant_review_v1 rows with MillCardsControllerEffect + ReturnCardChosenFromGraveyardEffect, EntersBattlefieldTriggeredAbility, exact ETB mill-then-return Oracle/source agreement, and only static self keywords",
+                "bounce::targeted_return_to_hand_variant_v1 rows with ReturnToHandTargetEffect, SimpleActivatedAbility plus optional static self keywords, exact activated return-target-to-hand Oracle text, and mana/tap/self-sacrifice/discard source costs only",
                 "recursion::xmage_graveyard_return_variant_review_v1 rows with ExileTargetEffect, SimpleActivatedAbility, exact activated graveyard-exile Oracle text, and mana/tap/self-sacrifice source costs only",
                 "recursion::xmage_graveyard_return_variant_review_v1 rows with ReturnFromGraveyardToHandTargetEffect + ExileSpellEffect, no extra ability class, exact fixed graveyard-to-hand Oracle text, and trailing self-exile text",
                 "recursion::xmage_graveyard_return_variant_review_v1 rows with ReturnFromGraveyardToHandTargetEffect, no extra ability class, exact choose-one-or-both Oracle text, and two fixed graveyard-to-hand components",

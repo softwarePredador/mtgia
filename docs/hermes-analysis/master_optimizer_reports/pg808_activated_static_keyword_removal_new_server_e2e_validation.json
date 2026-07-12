@@ -1,0 +1,576 @@
+{
+  "battle_execution": {
+    "event_count": 33,
+    "results": [
+      {
+        "card_name": "Cathar Commando",
+        "destination": "graveyard",
+        "discarded_count": 0,
+        "sacrificed_source": true,
+        "sacrificed_targets": [],
+        "scenario": "Cathar Commando activates destroy ability",
+        "source_tapped": false,
+        "tapped_cost_targets": [],
+        "target": "E2E Legal Activated Destroy Target",
+        "target_sacrificed": false
+      },
+      {
+        "card_name": "Daraja Griffin",
+        "destination": "graveyard",
+        "discarded_count": 0,
+        "sacrificed_source": true,
+        "sacrificed_targets": [],
+        "scenario": "Daraja Griffin activates destroy ability",
+        "source_tapped": false,
+        "tapped_cost_targets": [],
+        "target": "E2E Legal Activated Destroy Target",
+        "target_sacrificed": false
+      },
+      {
+        "card_name": "Goblin Firebomb",
+        "destination": "graveyard",
+        "discarded_count": 0,
+        "sacrificed_source": true,
+        "sacrificed_targets": [],
+        "scenario": "Goblin Firebomb activates destroy ability",
+        "source_tapped": true,
+        "tapped_cost_targets": [],
+        "target": "E2E Legal Activated Destroy Target",
+        "target_sacrificed": false
+      },
+      {
+        "card_name": "Pit Trap",
+        "destination": "graveyard",
+        "discarded_count": 0,
+        "sacrificed_source": true,
+        "sacrificed_targets": [],
+        "scenario": "Pit Trap activates destroy ability",
+        "source_tapped": true,
+        "tapped_cost_targets": [],
+        "target": "E2E Legal Activated Destroy Target",
+        "target_sacrificed": false
+      },
+      {
+        "card_name": "Shattered Acolyte",
+        "destination": "graveyard",
+        "discarded_count": 0,
+        "sacrificed_source": true,
+        "sacrificed_targets": [],
+        "scenario": "Shattered Acolyte activates destroy ability",
+        "source_tapped": false,
+        "tapped_cost_targets": [],
+        "target": "E2E Legal Activated Destroy Target",
+        "target_sacrificed": false
+      },
+      {
+        "card_name": "Tolarian Sentinel",
+        "destination": "hand",
+        "discarded_count": 1,
+        "sacrificed_source": false,
+        "sacrificed_targets": [],
+        "scenario": "Tolarian Sentinel activates return-to-hand ability",
+        "source_tapped": true,
+        "tapped_cost_targets": [],
+        "target": "E2E Legal Activated Bounce Target",
+        "target_controller": "Activated Controller",
+        "target_in_hand": true,
+        "target_sacrificed": false
+      },
+      {
+        "card_name": "Tradewind Rider",
+        "destination": "hand",
+        "discarded_count": 0,
+        "sacrificed_source": false,
+        "sacrificed_targets": [],
+        "scenario": "Tradewind Rider activates return-to-hand ability",
+        "source_tapped": true,
+        "tapped_cost_targets": [
+          "E2E Activated Bounce Tap Cost Target 1",
+          "E2E Activated Bounce Tap Cost Target 2"
+        ],
+        "target": "E2E Legal Activated Bounce Target",
+        "target_controller": "Activated Opponent",
+        "target_in_hand": true,
+        "target_sacrificed": false
+      },
+      {
+        "card_name": "Uktabi Faerie",
+        "destination": "graveyard",
+        "discarded_count": 0,
+        "sacrificed_source": true,
+        "sacrificed_targets": [],
+        "scenario": "Uktabi Faerie activates destroy ability",
+        "source_tapped": false,
+        "tapped_cost_targets": [],
+        "target": "E2E Legal Activated Destroy Target",
+        "target_sacrificed": false
+      },
+      {
+        "card_name": "Undergrowth Leopard",
+        "destination": "graveyard",
+        "discarded_count": 0,
+        "sacrificed_source": true,
+        "sacrificed_targets": [],
+        "scenario": "Undergrowth Leopard activates destroy ability",
+        "source_tapped": false,
+        "tapped_cost_targets": [],
+        "target": "E2E Legal Activated Destroy Target",
+        "target_sacrificed": false
+      },
+      {
+        "card_name": "Visara the Dreadful",
+        "destination": "graveyard",
+        "discarded_count": 0,
+        "sacrificed_source": false,
+        "sacrificed_targets": [],
+        "scenario": "Visara the Dreadful activates destroy ability",
+        "source_tapped": true,
+        "tapped_cost_targets": [],
+        "target": "E2E Legal Activated Destroy Target",
+        "target_sacrificed": false
+      },
+      {
+        "card_name": "Voracious Varmint",
+        "destination": "graveyard",
+        "discarded_count": 0,
+        "sacrificed_source": true,
+        "sacrificed_targets": [],
+        "scenario": "Voracious Varmint activates destroy ability",
+        "source_tapped": false,
+        "tapped_cost_targets": [],
+        "target": "E2E Legal Activated Destroy Target",
+        "target_sacrificed": false
+      }
+    ],
+    "scenario_count": 11
+  },
+  "battle_path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py",
+  "database_target": "127.0.0.1:15432/halder",
+  "generated_at_utc": "2026-07-12T05:38:30.721848+00:00",
+  "manifest": "docs/hermes-analysis/master_optimizer_reports/pg808_activated_static_keyword_removal_new_server_manifest.json",
+  "package_id": "pg808_activated_static_keyword_removal_new_server_manifest",
+  "snapshot": "docs/hermes-analysis/master_optimizer_reports/pg808_activated_static_keyword_removal_new_server_canonical_fallback.json",
+  "sqlite_db": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db",
+  "stages": [
+    {
+      "evidence": {
+        "validated_rows": 11
+      },
+      "name": "postgres_source_of_truth",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_destroy_target_v1",
+          "card_name": "Cathar Commando",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:c74a4d4564518ec70ccb17bf163dd545",
+          "oracle_hash": "addbfa9aefa23089beabfab27714db02",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_destroy_target_v1",
+          "card_name": "Daraja Griffin",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:ff8b067e2e0270d6bb52a9a78eebe65b",
+          "oracle_hash": "9587690f35606241d1c2100355ad6923",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_destroy_target_v1",
+          "card_name": "Goblin Firebomb",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:d17a32fb27fa20f266fc39fba2335a98",
+          "oracle_hash": "460dad7d25f65c6c6f9a44e310a6ad00",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_destroy_target_v1",
+          "card_name": "Pit Trap",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:c77fa2b0165280a6d7d2e3174bf0742a",
+          "oracle_hash": "ff634be601780ed80e5b5ec7f496640f",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_destroy_target_v1",
+          "card_name": "Shattered Acolyte",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:e16b49ab628ab0ef9bf8c777f3912d0b",
+          "oracle_hash": "608ab094a503cd2511fd02e08ff5c5f1",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_return_to_hand_v1",
+          "card_name": "Tolarian Sentinel",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:0e2d7c99004b511fd0cc98b141eb174e",
+          "oracle_hash": "e77d9296d1c06385c7f8ae6482593db6",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_return_to_hand_v1",
+          "card_name": "Tradewind Rider",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:56e0e45bc80b886fccba902200df9769",
+          "oracle_hash": "3e27586e63725d381e352ca9a75a3e8b",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_destroy_target_v1",
+          "card_name": "Uktabi Faerie",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:b789e1d96227dc3866f0088f635202aa",
+          "oracle_hash": "5578d818d07feca96aba9ce090cb7620",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_destroy_target_v1",
+          "card_name": "Undergrowth Leopard",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:eac09c76639e2fe78144d9b0fd10120e",
+          "oracle_hash": "e513f9ec04de22d0989ec88f277acda9",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_destroy_target_v1",
+          "card_name": "Visara the Dreadful",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:90351bb7f3386400193d5b46696cf1b2",
+          "oracle_hash": "3c42cfa964c46c649ecd56d8d2b8fd5a",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_destroy_target_v1",
+          "card_name": "Voracious Varmint",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:eac09c76639e2fe78144d9b0fd10120e",
+          "oracle_hash": "e513f9ec04de22d0989ec88f277acda9",
+          "review_status": "verified",
+          "rule_version": 2
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_rows": 11
+      },
+      "name": "sqlite_hermes_cache",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_destroy_target_v1",
+          "card_name": "Cathar Commando",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:c74a4d4564518ec70ccb17bf163dd545",
+          "oracle_hash": "addbfa9aefa23089beabfab27714db02",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_destroy_target_v1",
+          "card_name": "Daraja Griffin",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:ff8b067e2e0270d6bb52a9a78eebe65b",
+          "oracle_hash": "9587690f35606241d1c2100355ad6923",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_destroy_target_v1",
+          "card_name": "Goblin Firebomb",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:d17a32fb27fa20f266fc39fba2335a98",
+          "oracle_hash": "460dad7d25f65c6c6f9a44e310a6ad00",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_destroy_target_v1",
+          "card_name": "Pit Trap",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:c77fa2b0165280a6d7d2e3174bf0742a",
+          "oracle_hash": "ff634be601780ed80e5b5ec7f496640f",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_destroy_target_v1",
+          "card_name": "Shattered Acolyte",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:e16b49ab628ab0ef9bf8c777f3912d0b",
+          "oracle_hash": "608ab094a503cd2511fd02e08ff5c5f1",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_return_to_hand_v1",
+          "card_name": "Tolarian Sentinel",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:0e2d7c99004b511fd0cc98b141eb174e",
+          "oracle_hash": "e77d9296d1c06385c7f8ae6482593db6",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_return_to_hand_v1",
+          "card_name": "Tradewind Rider",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:56e0e45bc80b886fccba902200df9769",
+          "oracle_hash": "3e27586e63725d381e352ca9a75a3e8b",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_destroy_target_v1",
+          "card_name": "Uktabi Faerie",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:b789e1d96227dc3866f0088f635202aa",
+          "oracle_hash": "5578d818d07feca96aba9ce090cb7620",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_destroy_target_v1",
+          "card_name": "Undergrowth Leopard",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:eac09c76639e2fe78144d9b0fd10120e",
+          "oracle_hash": "e513f9ec04de22d0989ec88f277acda9",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_destroy_target_v1",
+          "card_name": "Visara the Dreadful",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:90351bb7f3386400193d5b46696cf1b2",
+          "oracle_hash": "3c42cfa964c46c649ecd56d8d2b8fd5a",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_destroy_target_v1",
+          "card_name": "Voracious Varmint",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:eac09c76639e2fe78144d9b0fd10120e",
+          "oracle_hash": "e513f9ec04de22d0989ec88f277acda9",
+          "review_status": "verified",
+          "rule_version": 2
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_cards": 11
+      },
+      "name": "canonical_snapshot_fallback",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_destroy_target_v1",
+          "battle_rule_version": 2,
+          "card_name": "Cathar Commando",
+          "logical_rule_key": "battle_rule_v1:c74a4d4564518ec70ccb17bf163dd545"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_destroy_target_v1",
+          "battle_rule_version": 2,
+          "card_name": "Daraja Griffin",
+          "logical_rule_key": "battle_rule_v1:ff8b067e2e0270d6bb52a9a78eebe65b"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_destroy_target_v1",
+          "battle_rule_version": 2,
+          "card_name": "Goblin Firebomb",
+          "logical_rule_key": "battle_rule_v1:d17a32fb27fa20f266fc39fba2335a98"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_destroy_target_v1",
+          "battle_rule_version": 2,
+          "card_name": "Pit Trap",
+          "logical_rule_key": "battle_rule_v1:c77fa2b0165280a6d7d2e3174bf0742a"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_destroy_target_v1",
+          "battle_rule_version": 2,
+          "card_name": "Shattered Acolyte",
+          "logical_rule_key": "battle_rule_v1:e16b49ab628ab0ef9bf8c777f3912d0b"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_return_to_hand_v1",
+          "battle_rule_version": 2,
+          "card_name": "Tolarian Sentinel",
+          "logical_rule_key": "battle_rule_v1:0e2d7c99004b511fd0cc98b141eb174e"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_return_to_hand_v1",
+          "battle_rule_version": 2,
+          "card_name": "Tradewind Rider",
+          "logical_rule_key": "battle_rule_v1:56e0e45bc80b886fccba902200df9769"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_destroy_target_v1",
+          "battle_rule_version": 2,
+          "card_name": "Uktabi Faerie",
+          "logical_rule_key": "battle_rule_v1:b789e1d96227dc3866f0088f635202aa"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_destroy_target_v1",
+          "battle_rule_version": 2,
+          "card_name": "Undergrowth Leopard",
+          "logical_rule_key": "battle_rule_v1:eac09c76639e2fe78144d9b0fd10120e"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_destroy_target_v1",
+          "battle_rule_version": 2,
+          "card_name": "Visara the Dreadful",
+          "logical_rule_key": "battle_rule_v1:90351bb7f3386400193d5b46696cf1b2"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_destroy_target_v1",
+          "battle_rule_version": 2,
+          "card_name": "Voracious Varmint",
+          "logical_rule_key": "battle_rule_v1:eac09c76639e2fe78144d9b0fd10120e"
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_cards": 11
+      },
+      "name": "runtime_get_card_effect",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "card_name": "Cathar Commando",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:c74a4d4564518ec70ccb17bf163dd545"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Daraja Griffin",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:ff8b067e2e0270d6bb52a9a78eebe65b"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Goblin Firebomb",
+          "component_keys": [],
+          "effect": "artifact",
+          "logical_rule_key": "battle_rule_v1:d17a32fb27fa20f266fc39fba2335a98"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Pit Trap",
+          "component_keys": [],
+          "effect": "artifact",
+          "logical_rule_key": "battle_rule_v1:c77fa2b0165280a6d7d2e3174bf0742a"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Shattered Acolyte",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:e16b49ab628ab0ef9bf8c777f3912d0b"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Tolarian Sentinel",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:0e2d7c99004b511fd0cc98b141eb174e"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Tradewind Rider",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:56e0e45bc80b886fccba902200df9769"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Uktabi Faerie",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:b789e1d96227dc3866f0088f635202aa"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Undergrowth Leopard",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:eac09c76639e2fe78144d9b0fd10120e"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Visara the Dreadful",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:90351bb7f3386400193d5b46696cf1b2"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Voracious Varmint",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:eac09c76639e2fe78144d9b0fd10120e"
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "events": 33,
+        "scenarios": 11
+      },
+      "name": "battle_execution",
+      "status": "pass"
+    }
+  ],
+  "status": "pass",
+  "title": "Battle Package End-to-End Validation"
+}

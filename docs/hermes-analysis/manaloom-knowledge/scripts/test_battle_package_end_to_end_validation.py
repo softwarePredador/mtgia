@@ -80,6 +80,26 @@ def test_validate_snapshot_derives_checks_from_expected_rules(tmp_path) -> None:
     assert results[0]["battle_model_scope"] == "look_top_library_play_lands_from_top_if_opponent_more_lands_v1"
 
 
+def test_resolve_snapshot_path_prefers_manifest_canonical_fallback(tmp_path) -> None:
+    manifest_path = tmp_path / "pg999_fixture_manifest.json"
+    fallback_path = tmp_path / "pg999_fixture_canonical_fallback.json"
+    manifest_path.write_text("{}", encoding="utf-8")
+    fallback_path.write_text("{}", encoding="utf-8")
+
+    resolved = validator.resolve_snapshot_path(manifest_path, None)
+
+    assert resolved == fallback_path
+
+
+def test_resolve_snapshot_path_keeps_explicit_snapshot(tmp_path) -> None:
+    manifest_path = tmp_path / "pg999_fixture_manifest.json"
+    explicit_path = tmp_path / "explicit_snapshot.json"
+
+    resolved = validator.resolve_snapshot_path(manifest_path, str(explicit_path))
+
+    assert resolved == explicit_path
+
+
 def test_validate_runtime_lookup_derives_checks_from_expected_rules() -> None:
     class FakeBattle:
         @staticmethod

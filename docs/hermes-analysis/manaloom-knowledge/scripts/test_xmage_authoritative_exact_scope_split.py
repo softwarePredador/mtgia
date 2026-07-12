@@ -15821,7 +15821,7 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertTrue(effect["activation_requires_sacrifice"])
         self.assertTrue(effect["activated_self_sacrifice_destroy"])
 
-    def test_permanent_activated_destroy_blocks_artifact_or_enchantment_unit_with_auxiliary_ability(self) -> None:
+    def test_permanent_activated_destroy_maps_static_keyword_auxiliary_ability(self) -> None:
         row = queue_row(
             split.ACTIVATED_SELF_SAC_DESTROY_ARTIFACT_OR_ENCHANTMENT_UNIT,
             effect_classes=["DestroyTargetEffect"],
@@ -15848,8 +15848,14 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
             """,
         )
 
-        self.assertIsNone(proposal)
-        self.assertEqual(reason, "unsupported_adapter_work_unit")
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.PERMANENT_ACTIVATED_DESTROY_SCOPE)
+        self.assertEqual(effect["activated_remove_target"], "artifact_or_enchantment")
+        self.assertEqual(effect["activation_cost_mana"], "{1}")
+        self.assertTrue(effect["activation_requires_sacrifice"])
+        self.assertEqual(effect["keywords"], ["flash"])
+        self.assertTrue(effect["flash"])
 
     def test_permanent_activated_destroy_maps_artifact_creature_target(self) -> None:
         row = queue_row(
@@ -15890,6 +15896,52 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         )
         self.assertEqual(effect["activation_cost_mana"], "{R}{R}{R}")
         self.assertTrue(effect["activation_requires_tap"])
+
+    def test_permanent_activated_destroy_does_not_promote_filter_keyword_as_self_keyword(self) -> None:
+        row = queue_row(
+            split.DESTROY_UNIT,
+            effect_classes=["DestroyTargetEffect"],
+            ability_kind="activated",
+            ability_classes=["FlyingAbility", "SimpleActivatedAbility"],
+            xmage_signals=["targeting", "activated_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Pit Trap",
+                type_line="Artifact",
+                oracle_text=(
+                    "{2}, {T}, Sacrifice Pit Trap: Destroy target attacking creature without flying. "
+                    "It can't be regenerated."
+                ),
+            ),
+            source_text="""
+                private static final FilterAttackingCreature filter =
+                    new FilterAttackingCreature("attacking creature without flying");
+                static {
+                    filter.add(Predicates.not(new AbilityPredicate(FlyingAbility.class)));
+                }
+                Ability ability = new SimpleActivatedAbility(
+                    new DestroyTargetEffect(true),
+                    new GenericManaCost(2)
+                );
+                ability.addCost(new TapSourceCost());
+                ability.addCost(new SacrificeSourceCost());
+                ability.addTarget(new TargetPermanent(filter));
+                this.addAbility(ability);
+            """,
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.PERMANENT_ACTIVATED_DESTROY_SCOPE)
+        self.assertEqual(effect["activated_remove_target"], "attacking_creature_without_flying")
+        self.assertEqual(
+            effect["target_constraints"],
+            {"card_types": ["creature"], "combat_state": "attacking", "exclude_keywords": ["flying"]},
+        )
+        self.assertNotIn("keywords", effect)
+        self.assertNotIn("flying", effect)
 
     def test_permanent_activated_destroy_maps_filter_permanent_artifact_target(self) -> None:
         row = queue_row(
@@ -30859,6 +30911,36 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertEqual(effect["activation_cost_colors"], ["W"])
         self.assertFalse(effect["activation_requires_tap"])
         self.assertEqual(effect["_activated_rule_effects"][0]["battle_model_scope"], split.PERMANENT_ACTIVATED_BOUNCE_SCOPE)
+
+    def test_permanent_activated_bounce_maps_static_keyword_auxiliary_ability(self) -> None:
+        row = queue_row(
+            split.BOUNCE_UNIT,
+            effect_classes=["ReturnToHandTargetEffect"],
+            ability_kind="activated",
+            ability_classes=["FlyingAbility", "SimpleActivatedAbility"],
+            xmage_signals=["targeting", "activated_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Tradewind Rider",
+                type_line="Creature - Spirit",
+                oracle_text="Flying\n{T}: Return target permanent to its owner's hand.",
+            ),
+            source_text="""
+                this.addAbility(FlyingAbility.getInstance());
+                Ability ability = new SimpleActivatedAbility(new ReturnToHandTargetEffect(), new TapSourceCost());
+                ability.addTarget(new TargetPermanent());
+                this.addAbility(ability);
+            """,
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.PERMANENT_ACTIVATED_BOUNCE_SCOPE)
+        self.assertEqual(effect["activated_remove_target"], "permanent")
+        self.assertEqual(effect["keywords"], ["flying"])
+        self.assertTrue(effect["flying"])
 
     def test_permanent_activated_bounce_maps_spellshaper_discard_cost(self) -> None:
         row = queue_row(
