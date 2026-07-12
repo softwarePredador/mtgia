@@ -12726,6 +12726,48 @@ class Player:
                 phase=phase,
                 all_players=all_players,
             )
+        target_controller_mill_on_counter = (
+            int(effect.get("target_controller_mill_on_counter") or 0)
+            if not counter_tax_paid and target_controller_obj is not None
+            else 0
+        )
+        target_controller_library_before = (
+            len(getattr(target_controller_obj, "library", []) or [])
+            if target_controller_mill_on_counter
+            else None
+        )
+        target_controller_milled_cards = []
+        if target_controller_mill_on_counter:
+            for _ in range(
+                min(
+                    target_controller_mill_on_counter,
+                    len(getattr(target_controller_obj, "library", []) or []),
+                )
+            ):
+                milled_card = target_controller_obj.library.pop(0)
+                target_controller_obj.graveyard.append(milled_card)
+                target_controller_milled_cards.append(milled_card)
+            emit_replay_event(
+                "mill_resolved",
+                player=self.name,
+                card=counter.get("name", "?"),
+                target_player=getattr(target_controller_obj, "name", "?"),
+                target_reason="counter_target_controller",
+                target_controller="target_controller",
+                target_player_mill=True,
+                requested_mill=target_controller_mill_on_counter,
+                cards_milled=len(target_controller_milled_cards),
+                milled=[
+                    milled_card.get("name", "?")
+                    for milled_card in target_controller_milled_cards
+                    if isinstance(milled_card, dict)
+                ][:12],
+                target_library_before=target_controller_library_before,
+                target_library_after=len(getattr(target_controller_obj, "library", []) or []),
+                turn=turn,
+                phase=phase or "stack_response",
+                **replay_rule_fields(effect),
+            )
         countered_to_top = bool(effect.get("countered_spell_to_top_library")) and not counter_tax_paid
         if countered_to_top and isinstance(target_card, dict):
             target_card["_countered_to_top_library"] = True
@@ -12796,6 +12838,19 @@ class Player:
             scry_kept_on_top=(scry_result or {}).get("kept_on_top", []),
             scry_bottomed=(scry_result or {}).get("bottomed", []),
             scry_top_after=(scry_result or {}).get("top_after", []),
+            target_controller_mill_on_counter=target_controller_mill_on_counter,
+            target_controller_cards_milled=len(target_controller_milled_cards),
+            target_controller_library_before=target_controller_library_before,
+            target_controller_library_after=(
+                len(getattr(target_controller_obj, "library", []) or [])
+                if target_controller_library_before is not None
+                else None
+            ),
+            target_controller_milled=[
+                milled_card.get("name", "?")
+                for milled_card in target_controller_milled_cards
+                if isinstance(milled_card, dict)
+            ][:12],
             turn=turn,
             **replay_rule_fields(effect),
         )

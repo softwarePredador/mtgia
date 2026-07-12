@@ -445,6 +445,9 @@ COUNTER_GAIN_LIFE_SCOPE = "xmage_counter_target_and_controller_gain_life_spell_v
 COUNTER_TARGET_CONTROLLER_LOSE_LIFE_SCOPE = (
     "xmage_counter_target_and_target_controller_loses_life_spell_v1"
 )
+COUNTER_TARGET_CONTROLLER_MILL_SCOPE = (
+    "xmage_counter_target_and_target_controller_mill_spell_v1"
+)
 COUNTER_UNLESS_PAYS_SCOPE = "xmage_counter_target_spell_unless_controller_pays_generic_v1"
 COUNTER_UNLESS_PAYS_DRAW_SCOPE = (
     "xmage_counter_target_spell_unless_controller_pays_generic_draw_card_v1"
@@ -5651,6 +5654,66 @@ def fixed_counter_target_controller_life_loss_from_source(
     if target is None:
         return None
     return target, life_loss
+
+
+def fixed_counter_target_controller_mill_from_oracle(
+    metadata: dict[str, Any],
+) -> tuple[str, int] | None:
+    text = strip_parenthetical_reminders(oracle_text(metadata))
+    text = re.sub(r"\s+", " ", text).strip()
+    match = re.match(
+        r"^(?P<counter>counter target .+?)\. "
+        r"(?:its|that spell's) controller mills (?P<count>\w+) cards?\.?$",
+        text,
+    )
+    if not match:
+        return None
+    target = counter_target_from_oracle({"oracle_text": match.group("counter")})
+    mill_count = counter_count_from_text(match.group("count"))
+    if target is None or mill_count is None or mill_count <= 0:
+        return None
+    return target, int(mill_count)
+
+
+def fixed_counter_target_controller_mill_from_source(
+    source_text: str,
+) -> tuple[str, int] | str | None:
+    text = str(source_text or "")
+    if any(
+        marker in text
+        for marker in (
+            "ClashEffect",
+            "ConditionalOneShotEffect",
+            "CounterUnlessPaysEffect",
+            "GetXValue",
+            "ManacostVariableValue",
+            "random",
+        )
+    ):
+        return "counter_mill_source_not_fixed"
+    target = counter_target_from_source(text)
+    if target is None:
+        return "counter_mill_source_target_not_supported"
+    mill_matches = re.findall(r"\.millCards\s*\(\s*(\d+)\s*,", text)
+    if len(mill_matches) != 1:
+        return "counter_mill_source_count_not_single_fixed"
+    has_counter = (
+        "game.getStack().counter" in text
+        or (
+            re.search(r"new\s+CounterTargetEffect\s*\(", text)
+            and "effect.apply(game, source)" in text
+        )
+    )
+    if not has_counter:
+        return "counter_mill_source_counter_not_supported"
+    has_target_controller = (
+        "getControllerId(source.getFirstTarget())" in text
+        or "stackObject.getControllerId()" in text
+        or "getStackObject(getTargetPointer().getFirst(game, source))" in text
+    )
+    if not has_target_controller:
+        return "counter_mill_source_controller_not_target_controller"
+    return target, int(mill_matches[0])
 
 
 def fixed_counter_unless_pays_from_oracle(metadata: dict[str, Any]) -> tuple[str, int, bool] | None:
@@ -14861,6 +14924,33 @@ def is_counter_target_with_replacement_spell_unit(row: dict[str, Any]) -> bool:
         and ability_classes(row).issubset(ALLOWED_AUXILIARY_RESOLUTION_ABILITY_CLASSES)
         and set(row.get("xmage_signals") or []) == {"targeting", "counter"}
         and "TargetSpell" in str(row.get("adapter_work_unit") or "")
+    )
+
+
+COUNTER_TARGET_CONTROLLER_MILL_EFFECT_CLASSES = {
+    "CountermandEffect",
+    "DidntSayPleaseEffect",
+    "PsychicStrikeEffect",
+    "ThoughtCollapseEffect",
+}
+
+
+def is_counter_target_controller_mill_spell_unit(row: dict[str, Any]) -> bool:
+    classes = effect_classes(row)
+    custom_classes = classes & COUNTER_TARGET_CONTROLLER_MILL_EFFECT_CLASSES
+    allowed_classes = COUNTER_TARGET_CONTROLLER_MILL_EFFECT_CLASSES | {
+        "CounterTargetEffect",
+        "OneShotEffect",
+    }
+    return (
+        bool(custom_classes)
+        and classes.issubset(allowed_classes)
+        and not ability_classes(row)
+        and (
+            str(row.get("adapter_work_unit") or "") == COUNTER_UNIT
+            or "TargetSpell" in str(row.get("adapter_work_unit") or "")
+        )
+        and set(row.get("xmage_signals") or []).issubset({"targeting", "counter"})
     )
 
 
@@ -33790,6 +33880,7 @@ def split_row(
     )
     counter_unless_pays_spell_unit = is_counter_unless_pays_spell_unit(row)
     counter_target_with_replacement_spell_unit = is_counter_target_with_replacement_spell_unit(row)
+    counter_target_controller_mill_spell_unit = is_counter_target_controller_mill_spell_unit(row)
     target_keyword_spell_unit = is_target_keyword_spell_unit(row)
     battlefield_to_library_spell_unit = is_battlefield_to_library_spell_unit(row)
     boost_keyword_spell_unit = is_boost_keyword_spell_unit(row)
@@ -33992,6 +34083,7 @@ def split_row(
         and not dies_each_player_sacrifice_creature_unit
         and not counter_unless_pays_spell_unit
         and not counter_target_with_replacement_spell_unit
+        and not counter_target_controller_mill_spell_unit
         and not battlefield_to_library_spell_unit
         and not cycling_only_unit
     ):
@@ -45385,6 +45477,65 @@ def split_row(
             family_id=family_id,
         ), "selected_exact_scope"
 
+    if counter_target_controller_mill_spell_unit:
+        if not is_spell(metadata):
+            return None, "counter_mill_not_instant_or_sorcery_spell"
+        if ability_kind(row) != "one_shot":
+            return None, "counter_mill_not_one_shot_spell_ability"
+        unsupported_abilities = ability_classes(row) - ALLOWED_AUXILIARY_RESOLUTION_ABILITY_CLASSES
+        if unsupported_abilities:
+            return None, "counter_mill_ability_class_not_simple"
+        oracle_counter_mill = fixed_counter_target_controller_mill_from_oracle(metadata)
+        if oracle_counter_mill is None:
+            return None, "counter_mill_oracle_not_exact_fixed"
+        source_counter_mill = fixed_counter_target_controller_mill_from_source(source_text)
+        if isinstance(source_counter_mill, str):
+            return None, source_counter_mill
+        if source_counter_mill is None:
+            return None, "counter_mill_source_not_fixed"
+        target, mill_count = oracle_counter_mill
+        if source_counter_mill != (target, mill_count):
+            return None, "counter_mill_source_oracle_mismatch"
+        counter_component = {
+            "effect": "counter",
+            "battle_model_scope": COUNTER_SCOPE,
+            "target": target,
+            "target_constraints": counter_target_constraints_for(target),
+            "xmage_effect_class": "CounterTargetEffect",
+        }
+        mill_component = {
+            "effect": "mill_cards",
+            "battle_model_scope": TARGET_PLAYER_MILL_SCOPE,
+            "target": "target_controller",
+            "target_player_mill": True,
+            "mill_count": mill_count,
+            "count": mill_count,
+            "compose_on_resolution": True,
+            "xmage_effect_class": next(
+                iter(effect_classes(row) & COUNTER_TARGET_CONTROLLER_MILL_EFFECT_CLASSES),
+                "CounterTargetEffect",
+            ),
+        }
+        effect_json = {
+            "effect": "counter",
+            "battle_model_scope": COUNTER_TARGET_CONTROLLER_MILL_SCOPE,
+            "target": target,
+            "target_constraints": counter_target_constraints_for(target),
+            "target_controller_mill_on_counter": mill_count,
+            "mill_count": mill_count,
+            "target_player_mill": True,
+            "resolution_order": "counter_then_target_controller_mill",
+            "_composite_rule_components": [counter_component, mill_component],
+            "xmage_effect_classes": sorted(effect_classes(row)),
+            **flags,
+        }
+        return build_proposal(
+            row,
+            metadata,
+            effect_json,
+            family_id="xmage_counter_target_controller_mill_spell",
+        ), "selected_exact_scope"
+
     if unit == COUNTER_UNIT:
         if classes == {"CounterTargetEffect", "ScryEffect"}:
             unsupported_abilities = ability_classes(row) - ALLOWED_AUXILIARY_RESOLUTION_ABILITY_CLASSES
@@ -49465,6 +49616,7 @@ def build_exact_split_report(
             and not is_static_cast_as_flash_permission_unit(row)
             and not is_static_cant_be_blocked_creature_unit(row)
             and not is_static_cant_block_creature_unit(row)
+            and not is_counter_target_controller_mill_spell_unit(row)
             and not is_static_basic_landwalk_creature_unit(row)
             and not is_static_filtered_evasion_creature_unit(row)
             and not is_static_flying_can_block_only_flying_creature_unit(row)
@@ -49627,6 +49779,7 @@ def build_exact_split_report(
                 "add_counters::source_add_counters_variant_v1 rows with AddCountersSourceEffect, SimpleActivatedAbility, exact self-counter Oracle text, and mana/tap source costs only",
                 "xmage_signature CounterUnlessPaysEffect one-shot spell rows with exact GenericManaCost(N), exact Oracle 'unless its controller pays {N}', and supported stack target constraints",
                 "xmage_signature CounterTargetWithReplacementEffect one-shot spell rows with exact PutCards.EXILED source replacement, exact Oracle exile-instead counter text, and supported stack target constraints",
+                "xmage_signature custom CounterTarget+mill one-shot spell rows with exact fixed 'Counter target spell. Its controller mills N cards' Oracle/source agreement",
                 "recursion::xmage_graveyard_return_variant_review_v1 rows with PutOnLibraryTargetEffect, EntersBattlefieldTriggeredAbility, exact self-graveyard top/bottom library Oracle text, and only static self keywords",
                 "recursion::xmage_graveyard_return_variant_review_v1 rows with LookLibraryAndPickControllerEffect, EntersBattlefieldTriggeredAbility, exact ETB look-library pick-one-to-hand Oracle/source agreement, and only static self keywords",
                 "tutor::xmage_library_search_variant_review_v1 rows with SearchLibraryPutInPlayEffect, EntersBattlefieldTriggeredAbility, exact ETB land tutor-to-battlefield Oracle/source agreement, and only static self keywords",

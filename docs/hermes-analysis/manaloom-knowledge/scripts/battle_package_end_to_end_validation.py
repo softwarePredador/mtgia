@@ -12432,6 +12432,28 @@ def run_counter_target_response(
             {"name": f"E2E Counter Draw {index + 1}", "type_line": "Instant", "cmc": 1}
             for index in range(expected_cards_drawn)
         ]
+    expected_target_controller_mill_count = int(
+        scenario.get("expected_target_controller_mill_count")
+        or response_card.get("target_controller_mill_on_counter")
+        or 0
+    )
+    if isinstance(scenario.get("target_controller_library"), list):
+        active.library = [
+            battle.enrich_card(dict(card))
+            for card in scenario.get("target_controller_library") or []
+            if isinstance(card, dict)
+        ]
+    elif expected_target_controller_mill_count and not getattr(active, "library", []):
+        active.library = [
+            {
+                "name": f"E2E Counter Target Controller Mill Card {index + 1}",
+                "type_line": "Instant" if index % 2 == 0 else "Creature - Fixture",
+                "cmc": index + 1,
+            }
+            for index in range(max(expected_target_controller_mill_count + 1, 2))
+        ]
+    target_controller_library_before = len(getattr(active, "library", []) or [])
+    target_controller_graveyard_before = len(getattr(active, "graveyard", []) or [])
     responder.hand = [response_card]
     target_stack_object = dict(
         scenario.get("target_stack_object")
@@ -12584,6 +12606,45 @@ def run_counter_target_response(
             "battle_events",
             f"{response_card['name']} expected to draw {expected_cards_drawn} on counter; event={counter_event.get('cards_drawn')}",
         )
+    if expected_target_controller_mill_count:
+        expected_milled = min(expected_target_controller_mill_count, target_controller_library_before)
+        if len(active.library) != target_controller_library_before - expected_milled:
+            fail(
+                "battle_execution",
+                f"{response_card['name']} target controller library={len(active.library)}, expected {target_controller_library_before - expected_milled}",
+            )
+        if len(active.graveyard) != target_controller_graveyard_before + expected_milled:
+            fail(
+                "battle_execution",
+                f"{response_card['name']} target controller graveyard={len(active.graveyard)}, expected {target_controller_graveyard_before + expected_milled}",
+            )
+        mill_event = next(
+            (
+                data
+                for event, data in reversed(events)
+                if event == "mill_resolved"
+                and data.get("card") == response_card.get("name")
+                and data.get("target_player") == active.name
+                and data.get("target_reason") == "counter_target_controller"
+            ),
+            None,
+        )
+        if mill_event is None:
+            fail("battle_events", f"missing {response_card['name']} target-controller mill_resolved event")
+        if int(mill_event.get("requested_mill") or 0) != expected_target_controller_mill_count:
+            fail("battle_events", f"{response_card['name']} requested_mill={mill_event.get('requested_mill')}")
+        if int(mill_event.get("cards_milled") or 0) != expected_milled:
+            fail("battle_events", f"{response_card['name']} cards_milled={mill_event.get('cards_milled')}")
+        if int(counter_event.get("target_controller_mill_on_counter") or 0) != expected_target_controller_mill_count:
+            fail(
+                "battle_events",
+                f"{response_card['name']} target_controller_mill_on_counter={counter_event.get('target_controller_mill_on_counter')}",
+            )
+        if int(counter_event.get("target_controller_cards_milled") or 0) != expected_milled:
+            fail(
+                "battle_events",
+                f"{response_card['name']} target_controller_cards_milled={counter_event.get('target_controller_cards_milled')}",
+            )
     expected_exile = bool(
         scenario.get("expected_countered_spell_to_exile")
         or response_card.get("countered_spell_to_exile")
@@ -12637,6 +12698,7 @@ def run_counter_target_response(
             counter_event.get("countered_spell_to_top_library")
         ),
         "countered_spell_to_exile": bool(counter_event.get("countered_spell_to_exile")),
+        "target_controller_cards_milled": int(counter_event.get("target_controller_cards_milled") or 0),
         "nonmatching_target": (
             nonmatching_stack_object.get("name")
             if isinstance(nonmatching_stack_object, dict)

@@ -1,0 +1,913 @@
+{
+  "apply_gate": "Do not run apply SQL without explicit approval for the exact command.",
+  "backup_table": "manaloom_deploy_audit.pg849_counter_target_controller_mill_new_20260712_224816",
+  "deploy_id": "pg849_counter_target_controller_mill_new_server",
+  "execution_scenarios": [
+    {
+      "card": {
+        "_composite_rule_components": [
+          {
+            "battle_model_scope": "xmage_counter_target_spell_v1",
+            "effect": "counter",
+            "target": "spell",
+            "target_constraints": {
+              "stack_object": "spell",
+              "zone": "stack"
+            },
+            "xmage_effect_class": "CounterTargetEffect"
+          },
+          {
+            "battle_model_scope": "xmage_fixed_target_player_mill_spell_v1",
+            "compose_on_resolution": true,
+            "count": 4,
+            "effect": "mill_cards",
+            "mill_count": 4,
+            "target": "target_controller",
+            "target_player_mill": true,
+            "xmage_effect_class": "CountermandEffect"
+          }
+        ],
+        "battle_model_scope": "xmage_counter_target_and_target_controller_mill_spell_v1",
+        "cmc": 2,
+        "effect": "counter",
+        "instant": true,
+        "mana_cost": "{1}{U}",
+        "mill_count": 4,
+        "name": "Countermand",
+        "resolution_order": "counter_then_target_controller_mill",
+        "sorcery": false,
+        "target": "spell",
+        "target_constraints": {
+          "stack_object": "spell",
+          "zone": "stack"
+        },
+        "target_controller_mill_on_counter": 4,
+        "target_player_mill": true,
+        "type_line": "Instant",
+        "xmage_effect_classes": [
+          "CountermandEffect",
+          "OneShotEffect"
+        ]
+      },
+      "expected_cards_drawn": 0,
+      "expected_countered_spell_to_exile": false,
+      "expected_countered_spell_to_top_library": false,
+      "expected_target_constraints": {
+        "stack_object": "spell",
+        "zone": "stack"
+      },
+      "expected_target_controller_mill_count": 4,
+      "logical_rule_key": "battle_rule_v1:f402fd7b0ba896c377a82bcafb4211c0",
+      "name": "Countermand counters a legal stack object",
+      "nonmatching_stack_effect": {
+        "effect": "activated_ability"
+      },
+      "nonmatching_stack_object": {
+        "cmc": 0,
+        "effect": "activated_ability",
+        "name": "E2E Illegal Counter Target",
+        "type_line": "Activated Ability"
+      },
+      "target_controller_library": [
+        {
+          "cmc": 1,
+          "effect": "draw_cards",
+          "name": "E2E Counter Target Controller Mill Card 1",
+          "type_line": "Instant"
+        },
+        {
+          "cmc": 2,
+          "effect": "creature",
+          "name": "E2E Counter Target Controller Mill Card 2",
+          "type_line": "Creature - Fixture"
+        },
+        {
+          "cmc": 3,
+          "effect": "draw_cards",
+          "name": "E2E Counter Target Controller Mill Card 3",
+          "type_line": "Instant"
+        },
+        {
+          "cmc": 4,
+          "effect": "creature",
+          "name": "E2E Counter Target Controller Mill Card 4",
+          "type_line": "Creature - Fixture"
+        },
+        {
+          "cmc": 5,
+          "effect": "draw_cards",
+          "name": "E2E Counter Target Controller Mill Card 5",
+          "type_line": "Instant"
+        }
+      ],
+      "target_stack_effect": {
+        "effect": "finisher"
+      },
+      "target_stack_object": {
+        "cmc": 3,
+        "effect": "finisher",
+        "mana_cost": "{2}{U}",
+        "name": "E2E Legal Counter Target",
+        "type_line": "Instant"
+      },
+      "type": "counter_target_response"
+    },
+    {
+      "card": {
+        "_composite_rule_components": [
+          {
+            "battle_model_scope": "xmage_counter_target_spell_v1",
+            "effect": "counter",
+            "target": "spell",
+            "target_constraints": {
+              "stack_object": "spell",
+              "zone": "stack"
+            },
+            "xmage_effect_class": "CounterTargetEffect"
+          },
+          {
+            "battle_model_scope": "xmage_fixed_target_player_mill_spell_v1",
+            "compose_on_resolution": true,
+            "count": 3,
+            "effect": "mill_cards",
+            "mill_count": 3,
+            "target": "target_controller",
+            "target_player_mill": true,
+            "xmage_effect_class": "DidntSayPleaseEffect"
+          }
+        ],
+        "battle_model_scope": "xmage_counter_target_and_target_controller_mill_spell_v1",
+        "cmc": 2,
+        "effect": "counter",
+        "instant": true,
+        "mana_cost": "{1}{U}",
+        "mill_count": 3,
+        "name": "Didn't Say Please",
+        "resolution_order": "counter_then_target_controller_mill",
+        "sorcery": false,
+        "target": "spell",
+        "target_constraints": {
+          "stack_object": "spell",
+          "zone": "stack"
+        },
+        "target_controller_mill_on_counter": 3,
+        "target_player_mill": true,
+        "type_line": "Instant",
+        "xmage_effect_classes": [
+          "CounterTargetEffect",
+          "DidntSayPleaseEffect",
+          "OneShotEffect"
+        ]
+      },
+      "expected_cards_drawn": 0,
+      "expected_countered_spell_to_exile": false,
+      "expected_countered_spell_to_top_library": false,
+      "expected_target_constraints": {
+        "stack_object": "spell",
+        "zone": "stack"
+      },
+      "expected_target_controller_mill_count": 3,
+      "logical_rule_key": "battle_rule_v1:3c0bee9a432ecc6ed6777b2f880a5145",
+      "name": "Didn't Say Please counters a legal stack object",
+      "nonmatching_stack_effect": {
+        "effect": "activated_ability"
+      },
+      "nonmatching_stack_object": {
+        "cmc": 0,
+        "effect": "activated_ability",
+        "name": "E2E Illegal Counter Target",
+        "type_line": "Activated Ability"
+      },
+      "target_controller_library": [
+        {
+          "cmc": 1,
+          "effect": "draw_cards",
+          "name": "E2E Counter Target Controller Mill Card 1",
+          "type_line": "Instant"
+        },
+        {
+          "cmc": 2,
+          "effect": "creature",
+          "name": "E2E Counter Target Controller Mill Card 2",
+          "type_line": "Creature - Fixture"
+        },
+        {
+          "cmc": 3,
+          "effect": "draw_cards",
+          "name": "E2E Counter Target Controller Mill Card 3",
+          "type_line": "Instant"
+        },
+        {
+          "cmc": 4,
+          "effect": "creature",
+          "name": "E2E Counter Target Controller Mill Card 4",
+          "type_line": "Creature - Fixture"
+        }
+      ],
+      "target_stack_effect": {
+        "effect": "finisher"
+      },
+      "target_stack_object": {
+        "cmc": 3,
+        "effect": "finisher",
+        "mana_cost": "{2}{U}",
+        "name": "E2E Legal Counter Target",
+        "type_line": "Instant"
+      },
+      "type": "counter_target_response"
+    },
+    {
+      "card": {
+        "_composite_rule_components": [
+          {
+            "battle_model_scope": "xmage_counter_target_spell_v1",
+            "effect": "counter",
+            "target": "spell",
+            "target_constraints": {
+              "stack_object": "spell",
+              "zone": "stack"
+            },
+            "xmage_effect_class": "CounterTargetEffect"
+          },
+          {
+            "battle_model_scope": "xmage_fixed_target_player_mill_spell_v1",
+            "compose_on_resolution": true,
+            "count": 2,
+            "effect": "mill_cards",
+            "mill_count": 2,
+            "target": "target_controller",
+            "target_player_mill": true,
+            "xmage_effect_class": "PsychicStrikeEffect"
+          }
+        ],
+        "battle_model_scope": "xmage_counter_target_and_target_controller_mill_spell_v1",
+        "cmc": 2,
+        "effect": "counter",
+        "instant": true,
+        "mana_cost": "{1}{U}",
+        "mill_count": 2,
+        "name": "Psychic Strike",
+        "resolution_order": "counter_then_target_controller_mill",
+        "sorcery": false,
+        "target": "spell",
+        "target_constraints": {
+          "stack_object": "spell",
+          "zone": "stack"
+        },
+        "target_controller_mill_on_counter": 2,
+        "target_player_mill": true,
+        "type_line": "Instant",
+        "xmage_effect_classes": [
+          "OneShotEffect",
+          "PsychicStrikeEffect"
+        ]
+      },
+      "expected_cards_drawn": 0,
+      "expected_countered_spell_to_exile": false,
+      "expected_countered_spell_to_top_library": false,
+      "expected_target_constraints": {
+        "stack_object": "spell",
+        "zone": "stack"
+      },
+      "expected_target_controller_mill_count": 2,
+      "logical_rule_key": "battle_rule_v1:57349935a74c3f3e23997e05f68a8b1a",
+      "name": "Psychic Strike counters a legal stack object",
+      "nonmatching_stack_effect": {
+        "effect": "activated_ability"
+      },
+      "nonmatching_stack_object": {
+        "cmc": 0,
+        "effect": "activated_ability",
+        "name": "E2E Illegal Counter Target",
+        "type_line": "Activated Ability"
+      },
+      "target_controller_library": [
+        {
+          "cmc": 1,
+          "effect": "draw_cards",
+          "name": "E2E Counter Target Controller Mill Card 1",
+          "type_line": "Instant"
+        },
+        {
+          "cmc": 2,
+          "effect": "creature",
+          "name": "E2E Counter Target Controller Mill Card 2",
+          "type_line": "Creature - Fixture"
+        },
+        {
+          "cmc": 3,
+          "effect": "draw_cards",
+          "name": "E2E Counter Target Controller Mill Card 3",
+          "type_line": "Instant"
+        }
+      ],
+      "target_stack_effect": {
+        "effect": "finisher"
+      },
+      "target_stack_object": {
+        "cmc": 3,
+        "effect": "finisher",
+        "mana_cost": "{2}{U}",
+        "name": "E2E Legal Counter Target",
+        "type_line": "Instant"
+      },
+      "type": "counter_target_response"
+    },
+    {
+      "card": {
+        "_composite_rule_components": [
+          {
+            "battle_model_scope": "xmage_counter_target_spell_v1",
+            "effect": "counter",
+            "target": "spell",
+            "target_constraints": {
+              "stack_object": "spell",
+              "zone": "stack"
+            },
+            "xmage_effect_class": "CounterTargetEffect"
+          },
+          {
+            "battle_model_scope": "xmage_fixed_target_player_mill_spell_v1",
+            "compose_on_resolution": true,
+            "count": 3,
+            "effect": "mill_cards",
+            "mill_count": 3,
+            "target": "target_controller",
+            "target_player_mill": true,
+            "xmage_effect_class": "ThoughtCollapseEffect"
+          }
+        ],
+        "battle_model_scope": "xmage_counter_target_and_target_controller_mill_spell_v1",
+        "cmc": 2,
+        "effect": "counter",
+        "instant": true,
+        "mana_cost": "{1}{U}",
+        "mill_count": 3,
+        "name": "Thought Collapse",
+        "resolution_order": "counter_then_target_controller_mill",
+        "sorcery": false,
+        "target": "spell",
+        "target_constraints": {
+          "stack_object": "spell",
+          "zone": "stack"
+        },
+        "target_controller_mill_on_counter": 3,
+        "target_player_mill": true,
+        "type_line": "Instant",
+        "xmage_effect_classes": [
+          "CounterTargetEffect",
+          "OneShotEffect",
+          "ThoughtCollapseEffect"
+        ]
+      },
+      "expected_cards_drawn": 0,
+      "expected_countered_spell_to_exile": false,
+      "expected_countered_spell_to_top_library": false,
+      "expected_target_constraints": {
+        "stack_object": "spell",
+        "zone": "stack"
+      },
+      "expected_target_controller_mill_count": 3,
+      "logical_rule_key": "battle_rule_v1:be6aee29492f6a8dda8894351e7e3474",
+      "name": "Thought Collapse counters a legal stack object",
+      "nonmatching_stack_effect": {
+        "effect": "activated_ability"
+      },
+      "nonmatching_stack_object": {
+        "cmc": 0,
+        "effect": "activated_ability",
+        "name": "E2E Illegal Counter Target",
+        "type_line": "Activated Ability"
+      },
+      "target_controller_library": [
+        {
+          "cmc": 1,
+          "effect": "draw_cards",
+          "name": "E2E Counter Target Controller Mill Card 1",
+          "type_line": "Instant"
+        },
+        {
+          "cmc": 2,
+          "effect": "creature",
+          "name": "E2E Counter Target Controller Mill Card 2",
+          "type_line": "Creature - Fixture"
+        },
+        {
+          "cmc": 3,
+          "effect": "draw_cards",
+          "name": "E2E Counter Target Controller Mill Card 3",
+          "type_line": "Instant"
+        },
+        {
+          "cmc": 4,
+          "effect": "creature",
+          "name": "E2E Counter Target Controller Mill Card 4",
+          "type_line": "Creature - Fixture"
+        }
+      ],
+      "target_stack_effect": {
+        "effect": "finisher"
+      },
+      "target_stack_object": {
+        "cmc": 3,
+        "effect": "finisher",
+        "mana_cost": "{2}{U}",
+        "name": "E2E Legal Counter Target",
+        "type_line": "Instant"
+      },
+      "type": "counter_target_response"
+    }
+  ],
+  "expected_rules": [
+    {
+      "card_name": "Countermand",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:f402fd7b0ba896c377a82bcafb4211c0",
+      "min_rule_version": 2,
+      "normalized_name": "countermand",
+      "oracle_hash": "37339221401fd8154c74806cb83bd49a",
+      "required_effect_fields": {
+        "_composite_rule_components": [
+          {
+            "battle_model_scope": "xmage_counter_target_spell_v1",
+            "effect": "counter",
+            "target": "spell",
+            "target_constraints": {
+              "stack_object": "spell",
+              "zone": "stack"
+            },
+            "xmage_effect_class": "CounterTargetEffect"
+          },
+          {
+            "battle_model_scope": "xmage_fixed_target_player_mill_spell_v1",
+            "compose_on_resolution": true,
+            "count": 4,
+            "effect": "mill_cards",
+            "mill_count": 4,
+            "target": "target_controller",
+            "target_player_mill": true,
+            "xmage_effect_class": "CountermandEffect"
+          }
+        ],
+        "battle_model_scope": "xmage_counter_target_and_target_controller_mill_spell_v1",
+        "effect": "counter",
+        "instant": true,
+        "mill_count": 4,
+        "resolution_order": "counter_then_target_controller_mill",
+        "sorcery": false,
+        "target": "spell",
+        "target_constraints": {
+          "stack_object": "spell",
+          "zone": "stack"
+        },
+        "target_controller_mill_on_counter": 4,
+        "target_player_mill": true,
+        "xmage_effect_classes": [
+          "CountermandEffect",
+          "OneShotEffect"
+        ]
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Didn't Say Please",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:3c0bee9a432ecc6ed6777b2f880a5145",
+      "min_rule_version": 2,
+      "normalized_name": "didn't say please",
+      "oracle_hash": "1d9b8324a53964a8dc4a4b79ca4e0ac2",
+      "required_effect_fields": {
+        "_composite_rule_components": [
+          {
+            "battle_model_scope": "xmage_counter_target_spell_v1",
+            "effect": "counter",
+            "target": "spell",
+            "target_constraints": {
+              "stack_object": "spell",
+              "zone": "stack"
+            },
+            "xmage_effect_class": "CounterTargetEffect"
+          },
+          {
+            "battle_model_scope": "xmage_fixed_target_player_mill_spell_v1",
+            "compose_on_resolution": true,
+            "count": 3,
+            "effect": "mill_cards",
+            "mill_count": 3,
+            "target": "target_controller",
+            "target_player_mill": true,
+            "xmage_effect_class": "DidntSayPleaseEffect"
+          }
+        ],
+        "battle_model_scope": "xmage_counter_target_and_target_controller_mill_spell_v1",
+        "effect": "counter",
+        "instant": true,
+        "mill_count": 3,
+        "resolution_order": "counter_then_target_controller_mill",
+        "sorcery": false,
+        "target": "spell",
+        "target_constraints": {
+          "stack_object": "spell",
+          "zone": "stack"
+        },
+        "target_controller_mill_on_counter": 3,
+        "target_player_mill": true,
+        "xmage_effect_classes": [
+          "CounterTargetEffect",
+          "DidntSayPleaseEffect",
+          "OneShotEffect"
+        ]
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Psychic Strike",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:57349935a74c3f3e23997e05f68a8b1a",
+      "min_rule_version": 2,
+      "normalized_name": "psychic strike",
+      "oracle_hash": "cdc9a084c42879b19393966222db8237",
+      "required_effect_fields": {
+        "_composite_rule_components": [
+          {
+            "battle_model_scope": "xmage_counter_target_spell_v1",
+            "effect": "counter",
+            "target": "spell",
+            "target_constraints": {
+              "stack_object": "spell",
+              "zone": "stack"
+            },
+            "xmage_effect_class": "CounterTargetEffect"
+          },
+          {
+            "battle_model_scope": "xmage_fixed_target_player_mill_spell_v1",
+            "compose_on_resolution": true,
+            "count": 2,
+            "effect": "mill_cards",
+            "mill_count": 2,
+            "target": "target_controller",
+            "target_player_mill": true,
+            "xmage_effect_class": "PsychicStrikeEffect"
+          }
+        ],
+        "battle_model_scope": "xmage_counter_target_and_target_controller_mill_spell_v1",
+        "effect": "counter",
+        "instant": true,
+        "mill_count": 2,
+        "resolution_order": "counter_then_target_controller_mill",
+        "sorcery": false,
+        "target": "spell",
+        "target_constraints": {
+          "stack_object": "spell",
+          "zone": "stack"
+        },
+        "target_controller_mill_on_counter": 2,
+        "target_player_mill": true,
+        "xmage_effect_classes": [
+          "OneShotEffect",
+          "PsychicStrikeEffect"
+        ]
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Thought Collapse",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:be6aee29492f6a8dda8894351e7e3474",
+      "min_rule_version": 2,
+      "normalized_name": "thought collapse",
+      "oracle_hash": "1d9b8324a53964a8dc4a4b79ca4e0ac2",
+      "required_effect_fields": {
+        "_composite_rule_components": [
+          {
+            "battle_model_scope": "xmage_counter_target_spell_v1",
+            "effect": "counter",
+            "target": "spell",
+            "target_constraints": {
+              "stack_object": "spell",
+              "zone": "stack"
+            },
+            "xmage_effect_class": "CounterTargetEffect"
+          },
+          {
+            "battle_model_scope": "xmage_fixed_target_player_mill_spell_v1",
+            "compose_on_resolution": true,
+            "count": 3,
+            "effect": "mill_cards",
+            "mill_count": 3,
+            "target": "target_controller",
+            "target_player_mill": true,
+            "xmage_effect_class": "ThoughtCollapseEffect"
+          }
+        ],
+        "battle_model_scope": "xmage_counter_target_and_target_controller_mill_spell_v1",
+        "effect": "counter",
+        "instant": true,
+        "mill_count": 3,
+        "resolution_order": "counter_then_target_controller_mill",
+        "sorcery": false,
+        "target": "spell",
+        "target_constraints": {
+          "stack_object": "spell",
+          "zone": "stack"
+        },
+        "target_controller_mill_on_counter": 3,
+        "target_player_mill": true,
+        "xmage_effect_classes": [
+          "CounterTargetEffect",
+          "OneShotEffect",
+          "ThoughtCollapseEffect"
+        ]
+      },
+      "review_status": "verified"
+    }
+  ],
+  "family_counts": {
+    "xmage_counter_target_controller_mill_spell": 4
+  },
+  "files": {
+    "apply": "docs/hermes-analysis/master_optimizer_reports/pg849_counter_target_controller_mill_new_server_package_apply.sql",
+    "manifest": "docs/hermes-analysis/master_optimizer_reports/pg849_counter_target_controller_mill_new_server_package_manifest.json",
+    "package": "docs/hermes-analysis/master_optimizer_reports/pg849_counter_target_controller_mill_new_server_package_package.md",
+    "postcheck": "docs/hermes-analysis/master_optimizer_reports/pg849_counter_target_controller_mill_new_server_package_postcheck.sql",
+    "precheck": "docs/hermes-analysis/master_optimizer_reports/pg849_counter_target_controller_mill_new_server_package_precheck.sql",
+    "rollback": "docs/hermes-analysis/master_optimizer_reports/pg849_counter_target_controller_mill_new_server_package_rollback.sql"
+  },
+  "generated_at": "2026-07-12T22:48:16+00:00",
+  "mutations_performed": [],
+  "runtime_checks": [
+    {
+      "card": {
+        "name": "Countermand"
+      },
+      "card_name": "Countermand",
+      "effect": "counter",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:f402fd7b0ba896c377a82bcafb4211c0",
+      "normalized_name": "countermand",
+      "required_effect_fields": {
+        "_composite_rule_components": [
+          {
+            "battle_model_scope": "xmage_counter_target_spell_v1",
+            "effect": "counter",
+            "target": "spell",
+            "target_constraints": {
+              "stack_object": "spell",
+              "zone": "stack"
+            },
+            "xmage_effect_class": "CounterTargetEffect"
+          },
+          {
+            "battle_model_scope": "xmage_fixed_target_player_mill_spell_v1",
+            "compose_on_resolution": true,
+            "count": 4,
+            "effect": "mill_cards",
+            "mill_count": 4,
+            "target": "target_controller",
+            "target_player_mill": true,
+            "xmage_effect_class": "CountermandEffect"
+          }
+        ],
+        "battle_model_scope": "xmage_counter_target_and_target_controller_mill_spell_v1",
+        "effect": "counter",
+        "instant": true,
+        "mill_count": 4,
+        "resolution_order": "counter_then_target_controller_mill",
+        "sorcery": false,
+        "target": "spell",
+        "target_constraints": {
+          "stack_object": "spell",
+          "zone": "stack"
+        },
+        "target_controller_mill_on_counter": 4,
+        "target_player_mill": true,
+        "xmage_effect_classes": [
+          "CountermandEffect",
+          "OneShotEffect"
+        ]
+      }
+    },
+    {
+      "card": {
+        "name": "Didn't Say Please"
+      },
+      "card_name": "Didn't Say Please",
+      "effect": "counter",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:3c0bee9a432ecc6ed6777b2f880a5145",
+      "normalized_name": "didn't say please",
+      "required_effect_fields": {
+        "_composite_rule_components": [
+          {
+            "battle_model_scope": "xmage_counter_target_spell_v1",
+            "effect": "counter",
+            "target": "spell",
+            "target_constraints": {
+              "stack_object": "spell",
+              "zone": "stack"
+            },
+            "xmage_effect_class": "CounterTargetEffect"
+          },
+          {
+            "battle_model_scope": "xmage_fixed_target_player_mill_spell_v1",
+            "compose_on_resolution": true,
+            "count": 3,
+            "effect": "mill_cards",
+            "mill_count": 3,
+            "target": "target_controller",
+            "target_player_mill": true,
+            "xmage_effect_class": "DidntSayPleaseEffect"
+          }
+        ],
+        "battle_model_scope": "xmage_counter_target_and_target_controller_mill_spell_v1",
+        "effect": "counter",
+        "instant": true,
+        "mill_count": 3,
+        "resolution_order": "counter_then_target_controller_mill",
+        "sorcery": false,
+        "target": "spell",
+        "target_constraints": {
+          "stack_object": "spell",
+          "zone": "stack"
+        },
+        "target_controller_mill_on_counter": 3,
+        "target_player_mill": true,
+        "xmage_effect_classes": [
+          "CounterTargetEffect",
+          "DidntSayPleaseEffect",
+          "OneShotEffect"
+        ]
+      }
+    },
+    {
+      "card": {
+        "name": "Psychic Strike"
+      },
+      "card_name": "Psychic Strike",
+      "effect": "counter",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:57349935a74c3f3e23997e05f68a8b1a",
+      "normalized_name": "psychic strike",
+      "required_effect_fields": {
+        "_composite_rule_components": [
+          {
+            "battle_model_scope": "xmage_counter_target_spell_v1",
+            "effect": "counter",
+            "target": "spell",
+            "target_constraints": {
+              "stack_object": "spell",
+              "zone": "stack"
+            },
+            "xmage_effect_class": "CounterTargetEffect"
+          },
+          {
+            "battle_model_scope": "xmage_fixed_target_player_mill_spell_v1",
+            "compose_on_resolution": true,
+            "count": 2,
+            "effect": "mill_cards",
+            "mill_count": 2,
+            "target": "target_controller",
+            "target_player_mill": true,
+            "xmage_effect_class": "PsychicStrikeEffect"
+          }
+        ],
+        "battle_model_scope": "xmage_counter_target_and_target_controller_mill_spell_v1",
+        "effect": "counter",
+        "instant": true,
+        "mill_count": 2,
+        "resolution_order": "counter_then_target_controller_mill",
+        "sorcery": false,
+        "target": "spell",
+        "target_constraints": {
+          "stack_object": "spell",
+          "zone": "stack"
+        },
+        "target_controller_mill_on_counter": 2,
+        "target_player_mill": true,
+        "xmage_effect_classes": [
+          "OneShotEffect",
+          "PsychicStrikeEffect"
+        ]
+      }
+    },
+    {
+      "card": {
+        "name": "Thought Collapse"
+      },
+      "card_name": "Thought Collapse",
+      "effect": "counter",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:be6aee29492f6a8dda8894351e7e3474",
+      "normalized_name": "thought collapse",
+      "required_effect_fields": {
+        "_composite_rule_components": [
+          {
+            "battle_model_scope": "xmage_counter_target_spell_v1",
+            "effect": "counter",
+            "target": "spell",
+            "target_constraints": {
+              "stack_object": "spell",
+              "zone": "stack"
+            },
+            "xmage_effect_class": "CounterTargetEffect"
+          },
+          {
+            "battle_model_scope": "xmage_fixed_target_player_mill_spell_v1",
+            "compose_on_resolution": true,
+            "count": 3,
+            "effect": "mill_cards",
+            "mill_count": 3,
+            "target": "target_controller",
+            "target_player_mill": true,
+            "xmage_effect_class": "ThoughtCollapseEffect"
+          }
+        ],
+        "battle_model_scope": "xmage_counter_target_and_target_controller_mill_spell_v1",
+        "effect": "counter",
+        "instant": true,
+        "mill_count": 3,
+        "resolution_order": "counter_then_target_controller_mill",
+        "sorcery": false,
+        "target": "spell",
+        "target_constraints": {
+          "stack_object": "spell",
+          "zone": "stack"
+        },
+        "target_controller_mill_on_counter": 3,
+        "target_player_mill": true,
+        "xmage_effect_classes": [
+          "CounterTargetEffect",
+          "OneShotEffect",
+          "ThoughtCollapseEffect"
+        ]
+      }
+    }
+  ],
+  "selected_card_names": [
+    "Countermand",
+    "Didn't Say Please",
+    "Psychic Strike",
+    "Thought Collapse"
+  ],
+  "selected_count": 4,
+  "slug": "pg849_counter_target_controller_mill_new_server",
+  "snapshot_checks": [
+    {
+      "card_name": "Countermand",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:f402fd7b0ba896c377a82bcafb4211c0",
+      "min_rule_version": 2,
+      "normalized_name": "countermand",
+      "oracle_hash": "37339221401fd8154c74806cb83bd49a",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_counter_target_and_target_controller_mill_spell_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Didn't Say Please",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:3c0bee9a432ecc6ed6777b2f880a5145",
+      "min_rule_version": 2,
+      "normalized_name": "didn't say please",
+      "oracle_hash": "1d9b8324a53964a8dc4a4b79ca4e0ac2",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_counter_target_and_target_controller_mill_spell_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Psychic Strike",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:57349935a74c3f3e23997e05f68a8b1a",
+      "min_rule_version": 2,
+      "normalized_name": "psychic strike",
+      "oracle_hash": "cdc9a084c42879b19393966222db8237",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_counter_target_and_target_controller_mill_spell_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Thought Collapse",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:be6aee29492f6a8dda8894351e7e3474",
+      "min_rule_version": 2,
+      "normalized_name": "thought collapse",
+      "oracle_hash": "1d9b8324a53964a8dc4a4b79ca4e0ac2",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_counter_target_and_target_controller_mill_spell_v1"
+      },
+      "review_status": "verified"
+    }
+  ],
+  "status": "prepared_read_only_pending_apply_approval"
+}

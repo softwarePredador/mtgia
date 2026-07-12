@@ -23053,6 +23053,73 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
             ["counter", "life_total_change"],
         )
 
+    def test_counter_target_controller_mill_custom_spell_maps_to_counter_runtime(self) -> None:
+        row = queue_row(
+            (
+                "xmage_signature::CountermandEffect,OneShotEffect::no_ability_class::"
+                "TargetSpell::no_condition_class::targeting"
+            ),
+            effect_classes=["CountermandEffect", "OneShotEffect"],
+            xmage_signals=["targeting"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Countermand",
+                oracle_text="Counter target spell. Its controller mills four cards.",
+            ),
+            source_text=(
+                "this.getSpellAbility().addTarget(new TargetSpell(StaticFilters.FILTER_SPELL));"
+                "this.getSpellAbility().addEffect(new CountermandEffect());"
+                "StackObject stackObject = game.getStack().getStackObject("
+                "getTargetPointer().getFirst(game, source));"
+                "game.getStack().counter(source.getFirstTarget(), source, game);"
+                "Player controller = game.getPlayer(stackObject.getControllerId());"
+                "controller.millCards(4, source, game);"
+            ),
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["effect"], "counter")
+        self.assertEqual(effect["battle_model_scope"], split.COUNTER_TARGET_CONTROLLER_MILL_SCOPE)
+        self.assertEqual(effect["target"], "spell")
+        self.assertEqual(effect["target_controller_mill_on_counter"], 4)
+        self.assertEqual(effect["mill_count"], 4)
+        self.assertEqual(effect["resolution_order"], "counter_then_target_controller_mill")
+        self.assertEqual(
+            [component["effect"] for component in effect["_composite_rule_components"]],
+            ["counter", "mill_cards"],
+        )
+
+    def test_counter_target_controller_mill_counter_unit_maps_to_counter_runtime(self) -> None:
+        row = queue_row(
+            split.COUNTER_UNIT,
+            effect_classes=["CounterTargetEffect", "DidntSayPleaseEffect", "OneShotEffect"],
+            xmage_signals=["targeting", "counter"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Didn't Say Please",
+                oracle_text="Counter target spell. Its controller mills three cards.",
+            ),
+            source_text=(
+                "private static final Effect effect = new CounterTargetEffect();"
+                "this.getSpellAbility().addEffect(new DidntSayPleaseEffect());"
+                "this.getSpellAbility().addTarget(new TargetSpell());"
+                "Player player = game.getPlayer(game.getControllerId(source.getFirstTarget()));"
+                "player.millCards(3, source, game);"
+                "return effect.apply(game, source);"
+            ),
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.COUNTER_TARGET_CONTROLLER_MILL_SCOPE)
+        self.assertEqual(effect["target_controller_mill_on_counter"], 3)
+        self.assertEqual(effect["target_constraints"], {"zone": "stack", "stack_object": "spell"})
+
     def test_counter_life_loss_spell_blocks_dynamic_life_loss(self) -> None:
         row = queue_row(
             split.COUNTER_UNIT,

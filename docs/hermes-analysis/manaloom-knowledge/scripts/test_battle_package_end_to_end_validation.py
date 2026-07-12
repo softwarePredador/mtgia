@@ -1791,6 +1791,72 @@ def test_counter_unless_pays_draw_runner_draws_when_tax_unpaid() -> None:
     assert result["cards_drawn"] == 1
 
 
+def test_counter_target_response_runner_mills_target_controller() -> None:
+    battle = validator.load_battle(validator.DEFAULT_BATTLE)
+    events = []
+    previous_handler = battle.REPLAY_EVENT_HANDLER
+    previous_get_card_effect = battle.get_card_effect
+    battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+    battle.get_card_effect = lambda card: {
+        "effect": "counter",
+        "battle_model_scope": "xmage_counter_target_and_target_controller_mill_spell_v1",
+        "target": "spell",
+        "target_constraints": {"zone": "stack", "stack_object": "spell"},
+        "target_controller_mill_on_counter": 3,
+        "mill_count": 3,
+        "instant": True,
+    }
+    try:
+        result = validator.run_counter_target_response(
+            battle,
+            {
+                "name": "Didn't Say Please counters and mills target controller",
+                "type": "counter_target_response",
+                "card": {
+                    "name": "Didn't Say Please",
+                    "type_line": "Instant",
+                    "mana_cost": "{1}{U}{U}",
+                    "cmc": 3,
+                    "effect": "counter",
+                    "battle_model_scope": "xmage_counter_target_and_target_controller_mill_spell_v1",
+                    "target": "spell",
+                    "target_constraints": {"zone": "stack", "stack_object": "spell"},
+                    "target_controller_mill_on_counter": 3,
+                    "instant": True,
+                },
+                "target_stack_object": {
+                    "name": "Target Threat",
+                    "cmc": 5,
+                    "mana_cost": "{3}{R}{R}",
+                    "type_line": "Creature - Dragon",
+                    "effect": "finisher",
+                },
+                "target_stack_effect": {"effect": "finisher"},
+                "target_controller_library": [
+                    {"name": "Mill Card 1", "type_line": "Instant", "cmc": 1},
+                    {"name": "Mill Card 2", "type_line": "Sorcery", "cmc": 2},
+                    {"name": "Mill Card 3", "type_line": "Creature", "cmc": 3},
+                    {"name": "Library Remainder", "type_line": "Land", "cmc": 0},
+                ],
+                "expected_target_controller_mill_count": 3,
+            },
+            events,
+        )
+    finally:
+        battle.REPLAY_EVENT_HANDLER = previous_handler
+        battle.get_card_effect = previous_get_card_effect
+
+    assert result["countered"] is True
+    assert result["target_controller_cards_milled"] == 3
+    assert any(
+        event == "mill_resolved"
+        and data.get("card") == "Didn't Say Please"
+        and data.get("target_player") == "Active"
+        and data.get("cards_milled") == 3
+        for event, data in events
+    )
+
+
 def test_counter_target_runner_validates_exile_replacement() -> None:
     battle = validator.load_battle(validator.DEFAULT_BATTLE)
     events = []

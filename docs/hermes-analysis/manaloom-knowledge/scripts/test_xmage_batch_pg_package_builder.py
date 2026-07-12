@@ -774,6 +774,30 @@ def test_counter_draw_special_target_execution_scenario_is_manifested() -> None:
     assert scenario["nonmatching_stack_effect"]["targets"][0]["target_controller"] == "Active"
 
 
+def test_counter_target_controller_mill_execution_scenario_is_manifested() -> None:
+    proposal = {
+        "normalized_name": "countermand",
+        "card_name": "Countermand",
+        "oracle_hash": "hash-countermand",
+        "logical_rule_key": "battle_rule_v1:countermand",
+        "effect_json": {
+            "effect": "counter",
+            "battle_model_scope": "xmage_counter_target_and_target_controller_mill_spell_v1",
+            "target": "spell",
+            "target_constraints": {"zone": "stack", "stack_object": "spell"},
+            "target_controller_mill_on_counter": 4,
+            "mill_count": 4,
+        },
+    }
+
+    expected = builder.expected_rule_from_proposal(proposal)
+    scenario = builder.execution_scenario_from_expected_rule(expected)
+
+    assert scenario["type"] == "counter_target_response"
+    assert scenario["expected_target_controller_mill_count"] == 4
+    assert len(scenario["target_controller_library"]) == 5
+
+
 def test_counter_target_player_execution_scenario_is_manifested() -> None:
     proposal = {
         "normalized_name": "outwit",

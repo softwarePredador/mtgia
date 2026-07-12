@@ -179,6 +179,7 @@ E2E_REQUIRED_EFFECT_FIELDS = (
     "target_player_life_gain",
     "target_player_mill",
     "target_player_scope",
+    "target_controller_mill_on_counter",
     "look_at_hand",
     "prevent_all_combat_damage_this_turn",
     "prevent_damage_from_creature_sources_this_turn",
@@ -9437,6 +9438,7 @@ def counter_target_execution_scenario_from_expected_rule(
         or scope not in {
             "xmage_counter_target_spell_v1",
             "xmage_counter_target_and_draw_card_spell_v1",
+            "xmage_counter_target_and_target_controller_mill_spell_v1",
         }
     ):
         return None
@@ -9467,6 +9469,11 @@ def counter_target_execution_scenario_from_expected_rule(
     if str(dynamic_mana_value_source or "").strip().lower() == "x_value":
         counter_card["mana_cost"] = "{X}{U}"
         counter_card["_cast_context"] = {"x_value": int(matching["card"].get("cmc") or 0)}
+    expected_target_controller_mill_count = int(
+        required.get("target_controller_mill_on_counter")
+        or (required.get("mill_count") if scope == "xmage_counter_target_and_target_controller_mill_spell_v1" else 0)
+        or 0
+    )
     scenario = {
         "name": f"{rule['card_name']} counters a legal stack object",
         "type": "counter_target_response",
@@ -9477,12 +9484,23 @@ def counter_target_execution_scenario_from_expected_rule(
         "nonmatching_stack_effect": nonmatching["effect"],
         "expected_target_constraints": constraints,
         "expected_cards_drawn": int(required.get("draw_on_counter") or 0),
+        "expected_target_controller_mill_count": expected_target_controller_mill_count,
         "expected_countered_spell_to_top_library": bool(
             required.get("countered_spell_to_top_library")
         ),
         "expected_countered_spell_to_exile": bool(required.get("countered_spell_to_exile")),
         "logical_rule_key": rule["logical_rule_key"],
     }
+    if expected_target_controller_mill_count > 0:
+        scenario["target_controller_library"] = [
+            {
+                "name": f"E2E Counter Target Controller Mill Card {index + 1}",
+                "type_line": "Instant" if index % 2 == 0 else "Creature - Fixture",
+                "effect": "draw_cards" if index % 2 == 0 else "creature",
+                "cmc": index + 1,
+            }
+            for index in range(max(expected_target_controller_mill_count + 1, 2))
+        ]
     selected_additional_cost = str(required.get("additional_cost") or "").strip()
     additional_cost_options = [
         option
