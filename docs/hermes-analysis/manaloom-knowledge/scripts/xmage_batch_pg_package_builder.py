@@ -879,6 +879,11 @@ def package_deck_role(proposal: dict[str, Any]) -> dict[str, Any]:
         or str(deck_role.get("category") or "") == "manual_review"
         or str(deck_role.get("category") or "") == "unknown"
     )
+    if effect == "composite_resolution":
+        derived_role = battle_rule_registry.deck_role_from_effect(effect_json)
+        existing_category = str(deck_role.get("category") or "")
+        if derived_role.get("subtype") and existing_category in {"", "draw", "manual_review", "unknown"}:
+            return derived_role
     if effect and effect != "external_reference_required_manual_model" and placeholder_role:
         return battle_rule_registry.deck_role_from_effect(effect_json)
     return deck_role
@@ -6084,6 +6089,52 @@ def fixed_damage_target_spell_execution_scenario_from_expected_rule(
     return scenario
 
 
+def damage_target_discard_spell_execution_scenario_from_expected_rule(
+    rule: dict[str, Any],
+) -> dict[str, Any] | None:
+    required = dict(rule.get("required_effect_fields") or {})
+    if required.get("battle_model_scope") != "xmage_fixed_damage_target_then_same_player_discard_spell_v1":
+        return None
+    if required.get("effect") != "composite_resolution":
+        return None
+    damage = int(required.get("amount") or required.get("damage") or 0)
+    discard_count = int(required.get("discard_count") or 0)
+    if damage <= 0 or discard_count <= 0:
+        return None
+    type_line = "Sorcery" if required.get("sorcery") is True else "Instant"
+    target_constraints = dict(required.get("target_constraints") or {})
+    target = _target_fixture_from_constraints(
+        "E2E Damage Discard Legal Target",
+        target_constraints,
+        matching=True,
+    )
+    if target_constraints.get("scope") in {"player", "player_or_planeswalker", "opponent", "opponent_or_planeswalker"}:
+        target = None
+    return {
+        "name": f"{rule['card_name']} deals damage then same target discards",
+        "type": "damage_target_discard_spell",
+        "card": {"name": rule["card_name"], "type_line": type_line},
+        "target": target,
+        "expected_damage": damage,
+        "expected_discard_count": discard_count,
+        "expected_discard_random": bool(required.get("discard_random")),
+        "expected_target": required.get("target"),
+        "expected_target_constraints": target_constraints,
+        "expected_target_player": "Opponent",
+        "opponent_life": max(20, damage + 5),
+        "opponent_hand": [
+            {
+                "name": f"E2E Damage Discard Candidate {index + 1}",
+                "type_line": "Instant" if index % 2 else "Creature - Fixture",
+                "effect": "draw_cards" if index % 2 else "creature",
+                "cmc": index + 1,
+            }
+            for index in range(max(discard_count + 1, 2))
+        ],
+        "logical_rule_key": rule["logical_rule_key"],
+    }
+
+
 def fixed_damage_draw_spell_execution_scenario_from_expected_rule(
     rule: dict[str, Any],
 ) -> dict[str, Any] | None:
@@ -9634,6 +9685,7 @@ def execution_scenario_from_expected_rule(rule: dict[str, Any]) -> dict[str, Any
         or damage_each_opponent_and_their_permanents_execution_scenario_from_expected_rule(rule)
         or damage_gain_life_spell_execution_scenario_from_expected_rule(rule)
         or fixed_life_gain_draw_spell_execution_scenario_from_expected_rule(rule)
+        or damage_target_discard_spell_execution_scenario_from_expected_rule(rule)
         or fixed_damage_draw_spell_execution_scenario_from_expected_rule(rule)
         or fixed_damage_target_spell_execution_scenario_from_expected_rule(rule)
         or damage_target_create_treasure_execution_scenario_from_expected_rule(rule)

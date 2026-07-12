@@ -2806,6 +2806,65 @@ def test_manifest_builds_fixed_damage_exile_if_dies_spell_execution_scenario() -
     assert scenario["expected_exile_if_dies_target"] == "any_target"
 
 
+def test_manifest_builds_damage_target_discard_spell_execution_scenario() -> None:
+    proposal = {
+        "normalized_name": "blightning",
+        "card_name": "Blightning",
+        "oracle_hash": "hash-blightning",
+        "logical_rule_key": "battle_rule_v1:hash-blightning",
+        "effect_json": {
+            "effect": "composite_resolution",
+            "battle_model_scope": "xmage_fixed_damage_target_then_same_player_discard_spell_v1",
+            "amount": 3,
+            "damage": 3,
+            "target": "player_or_planeswalker",
+            "target_constraints": {"scope": "player_or_planeswalker"},
+            "discard_count": 2,
+            "discard_random": False,
+            "target_player_discard": True,
+            "resolution_order": "damage_then_same_player_discard",
+            "_composite_rule_components": [
+                {
+                    "effect": "direct_damage",
+                    "battle_model_scope": "xmage_fixed_damage_target_spell_v1",
+                    "amount": 3,
+                    "target": "player_or_planeswalker",
+                },
+                {
+                    "effect": "target_player_discard",
+                    "battle_model_scope": "xmage_fixed_target_player_discard_spell_v1",
+                    "discard_count": 2,
+                    "target_from_previous_damage": True,
+                },
+            ],
+        },
+        "deck_role_json": {
+            "category": "draw",
+            "effect": "composite_resolution",
+            "target": "player_or_planeswalker",
+        },
+    }
+
+    rule = builder.expected_rule_from_proposal(proposal)
+    scenario = builder.execution_scenario_from_expected_rule(rule)
+    role = builder.package_deck_role(proposal)
+
+    assert scenario is not None
+    assert scenario["type"] == "damage_target_discard_spell"
+    assert scenario["card"]["name"] == "Blightning"
+    assert scenario["expected_damage"] == 3
+    assert scenario["expected_discard_count"] == 2
+    assert scenario["expected_target_player"] == "Opponent"
+    assert scenario["expected_target_constraints"] == {"scope": "player_or_planeswalker"}
+    assert len(scenario["opponent_hand"]) == 3
+    assert role == {
+        "category": "removal",
+        "effect": "composite_resolution",
+        "subtype": "damage_discard",
+        "target": "player_or_planeswalker",
+    }
+
+
 def test_manifest_builds_dynamic_composite_damage_target_spell_execution_scenario() -> None:
     proposal = {
         "normalized_name": "road_rage",

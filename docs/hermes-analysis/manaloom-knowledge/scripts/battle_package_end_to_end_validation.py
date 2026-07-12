@@ -1681,6 +1681,112 @@ def run_damage_draw_spell(
     }
 
 
+def run_damage_target_discard_spell(
+    battle,
+    scenario: dict[str, Any],
+    events: list[tuple[str, dict[str, Any]]],
+) -> dict[str, Any]:
+    card = dict(scenario["card"])
+    active = battle.Player(str(scenario.get("player") or "Damage Discard Controller"), None, [])
+    opponent = battle.Player(str(scenario.get("opponent") or "Opponent"), None, [])
+    opponent.life = int(scenario.get("opponent_life") or 20)
+    opponent.hand = [
+        battle.enrich_card(dict(hand_card))
+        for hand_card in (scenario.get("opponent_hand") or [])
+        if isinstance(hand_card, dict)
+    ]
+    expected_damage = int(scenario.get("expected_damage") or 0)
+    expected_discard_count = int(scenario.get("expected_discard_count") or 0)
+    expected_discard_random = bool(scenario.get("expected_discard_random"))
+    expected_target_player = str(scenario.get("expected_target_player") or opponent.name)
+
+    effect_data = battle.get_card_effect(card)
+    if effect_data.get("effect") != "composite_resolution":
+        fail("battle_execution", f"{card['name']} effect={effect_data.get('effect')!r}")
+    if effect_data.get("battle_model_scope") != "xmage_fixed_damage_target_then_same_player_discard_spell_v1":
+        fail("battle_execution", f"{card['name']} scope={effect_data.get('battle_model_scope')!r}")
+
+    before_events = len(events)
+    opponent_life_before = opponent.life
+    opponent_hand_before = len(opponent.hand)
+
+    battle.apply_effect_immediate(
+        active,
+        [opponent],
+        battle.enrich_card(card),
+        turn=int(scenario.get("turn") or 6080),
+        rng=random.Random(int(scenario.get("seed") or 6080)),
+        effect_data_override=effect_data,
+        phase=str(scenario.get("phase") or "precombat_main"),
+    )
+
+    damage_event = next(
+        (
+            data
+            for event_name, data in events[before_events:]
+            if event_name == "damage_resolved"
+            and data.get("card") == card.get("name")
+        ),
+        None,
+    )
+    if damage_event is None:
+        fail("battle_events", f"missing {card['name']} damage_resolved event")
+    if int(damage_event.get("amount") or 0) != expected_damage:
+        fail("battle_events", f"{card['name']} damage amount={damage_event.get('amount')}")
+    if damage_event.get("target_player") != expected_target_player:
+        fail("battle_events", f"{card['name']} damage target_player={damage_event.get('target_player')!r}")
+    expected_life = opponent_life_before - expected_damage
+    if opponent.life != expected_life:
+        fail("battle_execution", f"{card['name']} opponent life={opponent.life}, expected {expected_life}")
+
+    discard_event = next(
+        (
+            data
+            for event_name, data in events[before_events:]
+            if event_name == "target_player_discard_resolved"
+            and data.get("card") == card.get("name")
+        ),
+        None,
+    )
+    if discard_event is None:
+        fail("battle_events", f"missing {card['name']} target_player_discard_resolved event")
+    if discard_event.get("target_player") != expected_target_player:
+        fail("battle_events", f"{card['name']} discard target_player={discard_event.get('target_player')!r}")
+    if discard_event.get("target_reason") != "previous_damage_target_controller":
+        fail("battle_events", f"{card['name']} discard target_reason={discard_event.get('target_reason')!r}")
+    if int(discard_event.get("discarded_count") or 0) != expected_discard_count:
+        fail("battle_events", f"{card['name']} discarded_count={discard_event.get('discarded_count')}")
+    if bool(discard_event.get("discard_random")) != expected_discard_random:
+        fail("battle_events", f"{card['name']} discard_random={discard_event.get('discard_random')!r}")
+    if len(opponent.hand) != opponent_hand_before - expected_discard_count:
+        fail(
+            "battle_execution",
+            f"{card['name']} opponent hand={len(opponent.hand)}, expected {opponent_hand_before - expected_discard_count}",
+        )
+    if len(opponent.graveyard) != expected_discard_count:
+        fail("battle_execution", f"{card['name']} opponent graveyard={len(opponent.graveyard)}")
+
+    component_events = [
+        data
+        for event_name, data in events[before_events:]
+        if event_name == "composite_rule_component_resolved"
+        and data.get("card") == card.get("name")
+    ]
+    component_effects = [event.get("component_effect") for event in component_events]
+    if component_effects != ["direct_damage", "target_player_discard"]:
+        fail("battle_events", f"{card['name']} composite components={component_effects!r}")
+
+    return {
+        "scenario": scenario.get("name"),
+        "card_name": card["name"],
+        "damage": expected_damage,
+        "target_player": expected_target_player,
+        "cards_discarded": expected_discard_count,
+        "opponent_life": opponent.life,
+        "opponent_hand": [item.get("name") for item in opponent.hand if isinstance(item, dict)],
+    }
+
+
 def run_damage_target_create_treasure(
     battle,
     scenario: dict[str, Any],
@@ -14246,6 +14352,7 @@ SCENARIO_RUNNERS = {
     "fixed_draw_discard_spell": run_fixed_draw_discard_spell,
     "fixed_damage_target_spell": run_fixed_damage_target_spell,
     "damage_draw_spell": run_damage_draw_spell,
+    "damage_target_discard_spell": run_damage_target_discard_spell,
     "dynamic_life_gain": run_dynamic_life_gain,
     "each_player_sacrifice": run_each_player_sacrifice,
     "fixed_create_creature_tokens": run_fixed_create_creature_tokens,

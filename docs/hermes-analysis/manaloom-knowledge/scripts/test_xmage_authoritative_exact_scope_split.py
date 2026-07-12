@@ -8183,6 +8183,59 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertEqual(effect["discard_count"], 1)
         self.assertTrue(effect["discard_random"])
 
+    def test_fixed_damage_then_same_player_discard_spell_maps_blightning_style(self) -> None:
+        row = queue_row(
+            split.DAMAGE_UNIT,
+            effect_classes=[
+                "BlightningEffect",
+                "DamageTargetEffect",
+                "DiscardTargetEffect",
+                "OneShotEffect",
+            ],
+            xmage_signals=["targeting"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Blightning",
+                type_line="Sorcery",
+                oracle_text=(
+                    "Blightning deals 3 damage to target player or planeswalker. "
+                    "That player or that planeswalker's controller discards two cards."
+                ),
+            ),
+            source_text="""
+                this.getSpellAbility().addEffect(new DamageTargetEffect(3));
+                this.getSpellAbility().addEffect(new BlightningEffect());
+                this.getSpellAbility().addTarget(new TargetPlayerOrPlaneswalker());
+
+                class BlightningEffect extends OneShotEffect {
+                    @Override
+                    public boolean apply(Game game, Ability source) {
+                        Player player = game.getPlayerOrPlaneswalkerController(source.getFirstTarget());
+                        Effect effect = new DiscardTargetEffect(2);
+                        effect.setTargetPointer(new FixedTarget(player.getId(), game));
+                        return effect.apply(game, source);
+                    }
+                }
+            """,
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["effect"], "composite_resolution")
+        self.assertEqual(effect["battle_model_scope"], split.DAMAGE_TARGET_DISCARD_SCOPE)
+        self.assertEqual(effect["resolution_order"], "damage_then_same_player_discard")
+        self.assertEqual(effect["amount"], 3)
+        self.assertEqual(effect["discard_count"], 2)
+        self.assertEqual(effect["target"], "player_or_planeswalker")
+        components = effect["_composite_rule_components"]
+        self.assertEqual([component["effect"] for component in components], ["direct_damage", "target_player_discard"])
+        self.assertEqual(components[0]["battle_model_scope"], split.DAMAGE_SCOPE)
+        self.assertEqual(components[1]["battle_model_scope"], split.TARGET_PLAYER_DISCARD_SCOPE)
+        self.assertTrue(components[1]["target_from_previous_damage"])
+        self.assertEqual(components[1]["target_preference"], "previous_damage_target_controller")
+
     def test_fixed_target_player_mill_spell_maps(self) -> None:
         row = queue_row(
             split.MILL_TARGET_UNIT,

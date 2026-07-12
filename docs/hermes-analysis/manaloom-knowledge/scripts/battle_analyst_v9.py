@@ -51833,32 +51833,32 @@ def apply_direct_damage(player, opponents, card, effect_data, turn, rng, *, fini
             life_gained, controller_life_before, controller_life_after, spell_lifelink_gain = (
                 apply_controller_lifegain(target_amount)
             )
-            emit_replay_event(
-                "damage_resolved",
-                player=player.name,
-                card=card.get("name", "?"),
-                amount=target_amount,
-                original_amount=amount,
-                target_player=opp.name,
-                target=target.get("name", "?"),
-                result=result,
-                destination=destination,
-                permanent_type=target_kind,
-                loyalty_before=loyalty_before,
-                loyalty_after=loyalty_after,
-                defense_before=defense_before,
-                defense_after=defense_after,
-                life_gain_requested=life_gain_requested,
-                spell_lifelink_sources=lifelink_sources,
-                spell_lifelink_life_gained=spell_lifelink_gain,
-                life_gained=life_gained,
-                controller_life_before=controller_life_before,
-                controller_life_after=controller_life_after,
-                turn=turn,
-                phase=phase,
+            payload = {
+                "player": player.name,
+                "card": card.get("name", "?"),
+                "amount": target_amount,
+                "original_amount": amount,
+                "target_player": opp.name,
+                "target": target.get("name", "?"),
+                "result": result,
+                "destination": destination,
+                "permanent_type": target_kind,
+                "loyalty_before": loyalty_before,
+                "loyalty_after": loyalty_after,
+                "defense_before": defense_before,
+                "defense_after": defense_after,
+                "life_gain_requested": life_gain_requested,
+                "spell_lifelink_sources": lifelink_sources,
+                "spell_lifelink_life_gained": spell_lifelink_gain,
+                "life_gained": life_gained,
+                "controller_life_before": controller_life_before,
+                "controller_life_after": controller_life_after,
+                "turn": turn,
+                "phase": phase,
                 **dynamic_amount_fields,
                 **replay_rule_fields(effect_data),
-            )
+            }
+            emit_replay_event("damage_resolved", **payload)
             trigger_white_instant_sorcery_lifegain_damage(
                 player,
                 opponents,
@@ -51870,23 +51870,23 @@ def apply_direct_damage(player, opponents, card, effect_data, turn, rng, *, fini
             create_controller_treasures_after_damage(effect_data, player, card, turn)
             if finish_spell:
                 finish_resolved_spell(player, card, turn=turn, effect_data=effect_data)
-            return
+            return payload
     alive_opponents = [opp for opp in opponents if opp.is_alive()]
     if not direct_damage_targets_player(effect_data):
-        emit_replay_event(
-            "damage_resolved",
-            player=player.name,
-            card=card.get("name", "?"),
-            amount=amount,
-            result="no_legal_creature_target",
-            turn=turn,
-            phase=phase,
+        payload = {
+            "player": player.name,
+            "card": card.get("name", "?"),
+            "amount": amount,
+            "result": "no_legal_creature_target",
+            "turn": turn,
+            "phase": phase,
             **dynamic_amount_fields,
             **replay_rule_fields(effect_data),
-        )
+        }
+        emit_replay_event("damage_resolved", **payload)
         if finish_spell:
             finish_resolved_spell(player, card, turn=turn, effect_data=effect_data)
-        return
+        return payload
     if alive_opponents:
         target_player = min(alive_opponents, key=lambda opp: opp.life)
         life_before = target_player.life
@@ -51902,28 +51902,28 @@ def apply_direct_damage(player, opponents, card, effect_data, turn, rng, *, fini
         life_gained, controller_life_before, controller_life_after, spell_lifelink_gain = (
             apply_controller_lifegain(actual_damage_dealt)
         )
-        emit_replay_event(
-            "damage_resolved",
-            player=player.name,
-            card=card.get("name", "?"),
-            amount=target_amount,
-            original_amount=amount,
-            target_player=target_player.name,
-            result="player_damage" if dealt else "prevented",
-            cause="direct_damage",
-            life_before=life_before,
-            life_after=target_player.life,
-            life_gain_requested=life_gain_requested,
-            spell_lifelink_sources=lifelink_sources,
-            spell_lifelink_life_gained=spell_lifelink_gain,
-            life_gained=life_gained,
-            controller_life_before=controller_life_before,
-            controller_life_after=controller_life_after,
-            turn=turn,
-            phase=phase,
+        payload = {
+            "player": player.name,
+            "card": card.get("name", "?"),
+            "amount": target_amount,
+            "original_amount": amount,
+            "target_player": target_player.name,
+            "result": "player_damage" if dealt else "prevented",
+            "cause": "direct_damage",
+            "life_before": life_before,
+            "life_after": target_player.life,
+            "life_gain_requested": life_gain_requested,
+            "spell_lifelink_sources": lifelink_sources,
+            "spell_lifelink_life_gained": spell_lifelink_gain,
+            "life_gained": life_gained,
+            "controller_life_before": controller_life_before,
+            "controller_life_after": controller_life_after,
+            "turn": turn,
+            "phase": phase,
             **dynamic_amount_fields,
             **replay_rule_fields(effect_data),
-        )
+        }
+        emit_replay_event("damage_resolved", **payload)
         trigger_white_instant_sorcery_lifegain_damage(
             player,
             opponents,
@@ -51935,6 +51935,7 @@ def apply_direct_damage(player, opponents, card, effect_data, turn, rng, *, fini
         create_controller_treasures_after_damage(effect_data, player, card, turn)
     if finish_spell:
         finish_resolved_spell(player, card, turn=turn, effect_data=effect_data)
+    return payload if alive_opponents else None
 
 
 GENERIC_TAP_DAMAGE_ACTIVATED_SCOPE = "xmage_tap_fixed_damage_target_activated_ability_v1"
@@ -68070,7 +68071,7 @@ def resolve_composite_resolution_effect(player, opponents, card, effect_data, tu
         elif component_effect == "direct_damage":
             component_payload = dict(component)
             component_payload["_composite_component_index"] = index
-            apply_direct_damage(
+            damage_payload = apply_direct_damage(
                 player,
                 opponents,
                 card,
@@ -68080,6 +68081,10 @@ def resolve_composite_resolution_effect(player, opponents, card, effect_data, tu
                 finish_spell=False,
                 phase=phase,
             )
+            if isinstance(damage_payload, dict):
+                effect_data["_last_direct_damage_payload"] = dict(damage_payload)
+                if damage_payload.get("target_player"):
+                    effect_data["_last_direct_damage_target_player"] = damage_payload.get("target_player")
             amount = int(component.get("amount") or component.get("damage") or 0)
             outcome = "direct_damage_resolved"
             applied.append(
@@ -68087,6 +68092,55 @@ def resolve_composite_resolution_effect(player, opponents, card, effect_data, tu
                     "effect": component_effect,
                     "amount": amount,
                     "target": component.get("target"),
+                }
+            )
+        elif component_effect == "target_player_discard":
+            component_payload = dict(component)
+            component_payload["_composite_component_index"] = index
+            forced_target_player = None
+            forced_target_reason = None
+            if (
+                component_payload.get("target_from_previous_damage")
+                or str(component_payload.get("target_preference") or "").strip().lower()
+                in {
+                    "previous_damage_target",
+                    "previous_damage_target_controller",
+                    "last_damaged_player",
+                }
+            ):
+                target_player_name = (
+                    effect_data.get("_last_direct_damage_target_player")
+                    or (effect_data.get("_last_direct_damage_payload") or {}).get("target_player")
+                )
+                forced_target_player = next(
+                    (
+                        participant
+                        for participant in participants
+                        if getattr(participant, "name", None) == target_player_name
+                    ),
+                    None,
+                )
+                if forced_target_player is not None:
+                    forced_target_reason = "previous_damage_target_controller"
+            discard_payload = resolve_target_player_discard_effect(
+                player,
+                opponents,
+                card,
+                component_payload,
+                turn,
+                rng,
+                phase=phase,
+                all_players=participants,
+                event_name="target_player_discard_resolved",
+                forced_target_player=forced_target_player,
+                forced_target_reason=forced_target_reason,
+            )
+            outcome = "target_player_discard_resolved"
+            applied.append(
+                {
+                    "effect": component_effect,
+                    "discarded_count": int(discard_payload.get("discarded_count") or 0),
+                    "target_player": discard_payload.get("target_player"),
                 }
             )
         elif component_effect == "damage_each_opponent":

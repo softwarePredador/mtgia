@@ -292,6 +292,7 @@ DAMAGE_EACH_OPPONENT_AND_THEIR_PERMANENTS_SCOPE = (
 DAMAGE_EVERYTHING_SCOPE = "xmage_fixed_damage_each_creature_each_player_spell_v1"
 X_DAMAGE_SCOPE = "xmage_x_damage_target_spell_v1"
 DAMAGE_EXILE_IF_DIES_SCOPE = "xmage_fixed_damage_target_exile_if_dies_spell_v1"
+DAMAGE_TARGET_DISCARD_SCOPE = "xmage_fixed_damage_target_then_same_player_discard_spell_v1"
 SACRIFICE_CREATURE_POWER_DAMAGE_SCOPE = "xmage_sacrifice_creature_power_damage_spell_v1"
 DAMAGE_GAIN_LIFE_SCOPE = "xmage_fixed_damage_target_and_controller_gain_life_spell_v1"
 DYNAMIC_DAMAGE_GAIN_LIFE_SCOPE = "xmage_dynamic_damage_target_and_controller_gain_life_spell_v1"
@@ -18132,6 +18133,35 @@ def fixed_target_player_discard_spell_from_oracle(metadata: dict[str, Any]) -> d
     }
 
 
+def fixed_damage_then_same_player_discard_from_oracle(metadata: dict[str, Any]) -> dict[str, Any] | str:
+    text = oracle_text(metadata)
+    name = re.escape(str(metadata.get("name") or "this spell").strip().lower())
+    number_pattern = r"(a|one|two|three|four|five|six|seven|\d+)"
+    match = re.fullmatch(
+        rf"(?:{name}|this spell) deals (?P<damage>{number_pattern}) damage to target "
+        rf"(?P<target>player or planeswalker|player|opponent)\. "
+        rf"that player(?: or that planeswalker's controller)? discards "
+        rf"(?P<discard>{number_pattern}) cards?\.?",
+        text,
+    )
+    if not match:
+        return "damage_discard_oracle_not_exact_fixed"
+    damage_amount = number_word_to_int(match.group("damage"))
+    discard_count = number_word_to_int(match.group("discard"))
+    if damage_amount <= 0 or discard_count <= 0:
+        return "damage_discard_oracle_count_not_fixed"
+    target = match.group("target").replace(" ", "_")
+    if target not in {"player", "opponent", "player_or_planeswalker"}:
+        return "damage_discard_oracle_target_not_supported"
+    return {
+        "damage": damage_amount,
+        "amount": damage_amount,
+        "target": target,
+        "discard_count": discard_count,
+        "discard_random": False,
+    }
+
+
 def fixed_target_player_mill_spell_from_oracle(metadata: dict[str, Any]) -> dict[str, Any] | str:
     text = re.sub(
         r"\s+",
@@ -23260,6 +23290,59 @@ def fixed_target_player_discard_spell_from_source(source: str) -> dict[str, Any]
         "discard_count": discard_count,
         "discard_random": random_raw == "true",
         "xmage_effect_class": "DiscardTargetEffect",
+    }
+
+
+def fixed_damage_then_same_player_discard_from_source(source: str) -> dict[str, Any] | str:
+    text = source or ""
+    if has_additional_cost(text):
+        return "damage_discard_source_additional_cost_not_supported"
+    unsupported_markers = {
+        "ConditionalOneShotEffect",
+        "KickerAbility",
+        "Mode",
+        "Modes",
+        "SplitCard",
+        "SpellAbilityType.SPLIT",
+        "GetXValue",
+        "DomainValue",
+    }
+    if any(marker in text for marker in unsupported_markers):
+        return "damage_discard_source_not_simple"
+    if "getPlayerOrPlaneswalkerController(source.getFirstTarget())" not in text:
+        return "damage_discard_source_target_controller_not_same_target"
+    compact = re.sub(r"\s+", "", text)
+    if "effect.setTargetPointer(newFixedTarget(player.getId(),game))" not in compact:
+        return "damage_discard_source_target_pointer_not_same_player"
+    if not (
+        re.search(r"new\s+TargetPlayerOrPlaneswalker\s*\(", text)
+        or re.search(r"new\s+TargetPlayer\s*\(", text)
+        or re.search(r"new\s+TargetOpponent\s*\(", text)
+    ):
+        return "damage_discard_source_target_not_supported"
+    damage_matches = re.findall(r"\bDamageTargetEffect\s*\(\s*(\d+)\s*\)", text, re.S)
+    discard_matches = re.findall(
+        r"\bDiscardTargetEffect\s*\(\s*(\d+)(?:\s*,\s*(true|false))?\s*\)",
+        text,
+        re.S,
+    )
+    if len(damage_matches) != 1 or len(discard_matches) != 1:
+        return "damage_discard_source_not_single_fixed"
+    damage_amount = int(damage_matches[0])
+    discard_count = int(discard_matches[0][0])
+    discard_random = discard_matches[0][1] == "true"
+    if damage_amount <= 0 or discard_count <= 0:
+        return "damage_discard_source_count_not_fixed"
+    target = damage_target_from_source(text)
+    if target not in {"player", "opponent", "player_or_planeswalker"}:
+        return "damage_discard_source_target_not_supported"
+    return {
+        "damage": damage_amount,
+        "amount": damage_amount,
+        "target": target,
+        "discard_count": discard_count,
+        "discard_random": discard_random,
+        "xmage_effect_classes": ["DamageTargetEffect", "DiscardTargetEffect", "OneShotEffect"],
     }
 
 
@@ -31136,6 +31219,8 @@ def proposal_notes(row: dict[str, Any], scope: str) -> str:
         scope_kind = "fixed damage plus controller life-gain spell"
     elif scope == DAMAGE_EXILE_IF_DIES_SCOPE:
         scope_kind = "fixed damage spell with exile-if-dies replacement"
+    elif scope == DAMAGE_TARGET_DISCARD_SCOPE:
+        scope_kind = "fixed damage spell with same damaged player/controller discard"
     elif scope == GRAVEYARD_COUNT_DAMAGE_SCOPE:
         scope_kind = "dynamic graveyard-count damage spell"
     elif scope == ETB_GRAVEYARD_COUNT_DAMAGE_CREATURE_SCOPE:
@@ -41226,6 +41311,78 @@ def split_row(
                 metadata,
                 effect_json,
                 family_id="xmage_fixed_damage_exile_if_dies_spell",
+            ), "selected_exact_scope"
+
+        damage_then_discard_classes = {
+            "BlightningEffect",
+            "DamageTargetEffect",
+            "DiscardTargetEffect",
+            "OneShotEffect",
+        }
+        if classes == damage_then_discard_classes:
+            if not is_spell(metadata):
+                return None, "not_instant_or_sorcery_spell"
+            unsupported_abilities = ability_classes(row) - ALLOWED_AUXILIARY_RESOLUTION_ABILITY_CLASSES
+            if unsupported_abilities:
+                return None, "damage_discard_ability_class_not_simple"
+            oracle_pair = fixed_damage_then_same_player_discard_from_oracle(metadata)
+            if isinstance(oracle_pair, str):
+                return None, oracle_pair
+            source_pair = fixed_damage_then_same_player_discard_from_source(source_text)
+            if isinstance(source_pair, str):
+                return None, source_pair
+            for key in ("damage", "amount", "target", "discard_count", "discard_random"):
+                if oracle_pair.get(key) != source_pair.get(key):
+                    return None, f"damage_discard_source_oracle_{key}_mismatch"
+            damage_amount = int(oracle_pair["damage"])
+            discard_count = int(oracle_pair["discard_count"])
+            target = str(oracle_pair["target"])
+            target_base = restricted_target_base(target)
+            damage_component = {
+                "effect": "direct_damage",
+                "battle_model_scope": DAMAGE_SCOPE,
+                "amount": damage_amount,
+                "damage": damage_amount,
+                "target": target_base,
+                "target_constraints": target_constraints_for(target),
+                "compose_on_resolution": True,
+                "xmage_effect_class": "DamageTargetEffect",
+            }
+            discard_component = {
+                "effect": "target_player_discard",
+                "battle_model_scope": TARGET_PLAYER_DISCARD_SCOPE,
+                "count": discard_count,
+                "discard_count": discard_count,
+                "discard_random": bool(oracle_pair["discard_random"]),
+                "target": "player",
+                "target_controller": "target_player",
+                "target_constraints": {"players": ["opponent" if target == "opponent" else "any"]},
+                "target_preference": "previous_damage_target_controller",
+                "target_from_previous_damage": True,
+                "target_player_discard": True,
+                "compose_on_resolution": True,
+                "xmage_effect_class": "DiscardTargetEffect",
+            }
+            effect_json = {
+                "effect": "composite_resolution",
+                "battle_model_scope": DAMAGE_TARGET_DISCARD_SCOPE,
+                "amount": damage_amount,
+                "damage": damage_amount,
+                "target": target_base,
+                "target_constraints": target_constraints_for(target),
+                "discard_count": discard_count,
+                "discard_random": bool(oracle_pair["discard_random"]),
+                "target_player_discard": True,
+                "resolution_order": "damage_then_same_player_discard",
+                "_composite_rule_components": [damage_component, discard_component],
+                "xmage_effect_classes": sorted(classes),
+                **flags,
+            }
+            return build_proposal(
+                row,
+                metadata,
+                effect_json,
+                family_id="xmage_fixed_damage_target_then_same_player_discard_spell",
             ), "selected_exact_scope"
 
         if damage_classes == {"DamageTargetEffect"}:

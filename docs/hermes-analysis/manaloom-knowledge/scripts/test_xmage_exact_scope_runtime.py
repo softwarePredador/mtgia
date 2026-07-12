@@ -3614,6 +3614,92 @@ class XMageExactScopeRuntimeTest(unittest.TestCase):
             )
         )
 
+    def test_composite_damage_then_same_target_discard_uses_damage_target_controller(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        opponent = self.battle.Player("Opponent", None, [])
+        opponent.life = 20
+        opponent.hand = [
+            {"name": "A Low", "type_line": "Creature", "mana_cost": "{1}"},
+            {"name": "B Mid", "type_line": "Instant", "mana_cost": "{2}"},
+            {"name": "C High", "type_line": "Sorcery", "mana_cost": "{3}"},
+        ]
+        card = {"name": "Blightning", "type_line": "Sorcery"}
+        effect_data = {
+            "effect": "composite_resolution",
+            "battle_model_scope": "xmage_fixed_damage_target_then_same_player_discard_spell_v1",
+            "amount": 3,
+            "damage": 3,
+            "target": "player_or_planeswalker",
+            "target_constraints": {"scope": "player_or_planeswalker"},
+            "discard_count": 2,
+            "discard_random": False,
+            "_rule_logical_key": "battle_rule_v1:fixture_blightning",
+            "_composite_rule_components": [
+                {
+                    "effect": "direct_damage",
+                    "battle_model_scope": "xmage_fixed_damage_target_spell_v1",
+                    "amount": 3,
+                    "damage": 3,
+                    "target": "player_or_planeswalker",
+                    "target_constraints": {"scope": "player_or_planeswalker"},
+                },
+                {
+                    "effect": "target_player_discard",
+                    "battle_model_scope": "xmage_fixed_target_player_discard_spell_v1",
+                    "count": 2,
+                    "discard_count": 2,
+                    "discard_random": False,
+                    "target": "player",
+                    "target_controller": "target_player",
+                    "target_preference": "previous_damage_target_controller",
+                    "target_from_previous_damage": True,
+                    "target_player_discard": True,
+                },
+            ],
+        }
+
+        self.battle.apply_effect_immediate(
+            active,
+            [opponent],
+            card,
+            turn=8,
+            rng=random.Random(8),
+            effect_data_override=effect_data,
+            phase="precombat_main",
+        )
+
+        self.assertEqual(opponent.life, 17)
+        self.assertEqual([card["name"] for card in opponent.hand], ["C High"])
+        self.assertEqual([card["name"] for card in opponent.graveyard], ["A Low", "B Mid"])
+        self.assertTrue(
+            any(
+                event == "damage_resolved"
+                and data.get("card") == "Blightning"
+                and data.get("target_player") == "Opponent"
+                and data.get("amount") == 3
+                for event, data in self.events
+            )
+        )
+        self.assertTrue(
+            any(
+                event == "target_player_discard_resolved"
+                and data.get("card") == "Blightning"
+                and data.get("target_player") == "Opponent"
+                and data.get("target_reason") == "previous_damage_target_controller"
+                and data.get("discarded_count") == 2
+                for event, data in self.events
+            )
+        )
+        self.assertTrue(
+            any(
+                event == "composite_rule_resolved"
+                and data.get("card") == "Blightning"
+                and data.get("components_applied") == 2
+                and data.get("rule_logical_key") == "battle_rule_v1:fixture_blightning"
+                for event, data in self.events
+            )
+        )
+
     def test_fixed_source_controller_draw_spell_pays_creature_sacrifice_cost(self) -> None:
         active = self.battle.Player(
             "Active",
