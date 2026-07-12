@@ -1012,6 +1012,43 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertEqual(effect["enchant_target_controller"], "any")
         self.assertEqual(effect["xmage_effect_classes"], ["AttachEffect", "BoostEnchantedEffect"])
 
+    def test_fixed_aura_static_power_toughness_attachment_maps_granted_keyword(self) -> None:
+        row = queue_row(
+            "xmage_signature::AttachEffect,BoostEnchantedEffect,GainAbilityAttachedEffect::"
+            "EnchantAbility,FlyingAbility,SimpleStaticAbility::TargetCreaturePermanent,TargetPermanent::"
+            "no_condition_class::targeting,static_ability",
+            effect_classes=["AttachEffect", "BoostEnchantedEffect", "GainAbilityAttachedEffect"],
+            ability_kind="static",
+            ability_classes=["EnchantAbility", "FlyingAbility", "SimpleStaticAbility"],
+            xmage_signals=["targeting", "static_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Arcane Flight",
+                type_line="Enchantment - Aura",
+                oracle_text="Enchant creature\nEnchanted creature gets +1/+1 and has flying.",
+            ),
+            source_text="""
+                this.getSpellAbility().addEffect(new AttachEffect(Outcome.BoostCreature));
+                this.addAbility(new EnchantAbility(new TargetCreaturePermanent()));
+                Ability ability = new SimpleStaticAbility(new BoostEnchantedEffect(1, 1, Duration.WhileOnBattlefield));
+                ability.addEffect(new GainAbilityAttachedEffect(FlyingAbility.getInstance(), AttachmentType.AURA));
+                this.addAbility(ability);
+            """,
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["power_boost"], 1)
+        self.assertEqual(effect["toughness_boost"], 1)
+        self.assertEqual(effect["attached_keywords"], ["flying"])
+        self.assertTrue(effect["grants_flying"])
+        self.assertEqual(
+            effect["xmage_effect_classes"],
+            ["AttachEffect", "BoostEnchantedEffect", "GainAbilityAttachedEffect"],
+        )
+
     def test_dynamic_aura_static_power_toughness_maps_exact_scope(self) -> None:
         row = queue_row(
             "xmage_signature::AttachEffect,BoostEnchantedEffect::EnchantAbility,SimpleStaticAbility::"
@@ -1055,6 +1092,51 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertTrue(effect["battlefield_count_exclude_source"])
         self.assertEqual(effect["power_delta_per_graveyard_count"], 2)
         self.assertEqual(effect["toughness_delta_per_graveyard_count"], 2)
+
+    def test_dynamic_aura_static_power_toughness_maps_granted_keyword(self) -> None:
+        row = queue_row(
+            "xmage_signature::AttachEffect,BoostEnchantedEffect,GainAbilityAttachedEffect::"
+            "EnchantAbility,FlyingAbility,SimpleStaticAbility::TargetCreaturePermanent,TargetPermanent::"
+            "no_condition_class::targeting,static_ability",
+            effect_classes=["AttachEffect", "BoostEnchantedEffect", "GainAbilityAttachedEffect"],
+            ability_kind="static",
+            ability_classes=["EnchantAbility", "FlyingAbility", "SimpleStaticAbility"],
+            xmage_signals=["targeting", "static_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Armored Ascension",
+                type_line="Enchantment - Aura",
+                oracle_text=(
+                    "Enchant creature\n"
+                    "Enchanted creature gets +1/+1 for each Plains you control and has flying."
+                ),
+            ),
+            source_text="""
+                private static final FilterLandPermanent filter =
+                    new FilterControlledLandPermanent("Plains you control");
+                static {
+                    filter.add(SubType.PLAINS.getPredicate());
+                }
+                this.getSpellAbility().addEffect(new AttachEffect(Outcome.BoostCreature));
+                this.addAbility(new EnchantAbility(new TargetCreaturePermanent()));
+                DynamicValue xValue = new PermanentsOnBattlefieldCount(filter);
+                Ability ability = new SimpleStaticAbility(
+                    new BoostEnchantedEffect(xValue, xValue, Duration.WhileOnBattlefield));
+                ability.addEffect(new GainAbilityAttachedEffect(FlyingAbility.getInstance(), AttachmentType.AURA));
+                this.addAbility(ability);
+            """,
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertTrue(effect["attachment_dynamic_boost"])
+        self.assertEqual(effect["battlefield_count_scope"], "controller_battlefield")
+        self.assertEqual(effect["battlefield_count_card_types"], ["land"])
+        self.assertEqual(effect["battlefield_count_subtypes"], ["plains"])
+        self.assertEqual(effect["attached_keywords"], ["flying"])
+        self.assertTrue(effect["grants_flying"])
 
     def test_dynamic_aura_static_power_toughness_maps_shared_type_runtime(self) -> None:
         row = queue_row(

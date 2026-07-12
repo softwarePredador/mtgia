@@ -12321,6 +12321,23 @@ def run_aura_static_power_toughness_attachment(
     source_name = str(scenario.get("expected_source") or card.get("name"))
     if attached_event.get("card") != source_name:
         fail("battle_events", f"{card['name']} attached event source={attached_event.get('card')!r}")
+    expected_keywords = [
+        str(keyword).strip().lower().replace(" ", "_")
+        for keyword in scenario.get("expected_keywords", []) or []
+        if str(keyword).strip()
+    ]
+    if expected_keywords:
+        for keyword in expected_keywords:
+            if not battle.card_has_keyword(target, keyword):
+                fail("battle_execution", f"{card['name']} target missing granted keyword {keyword}")
+        event_grants = {
+            str(keyword).strip().lower().replace(" ", "_")
+            for keyword in attached_event.get("grants", []) or []
+            if str(keyword).strip()
+        }
+        missing_grants = sorted(set(expected_keywords) - event_grants)
+        if missing_grants:
+            fail("battle_events", f"{card['name']} event missing grants {missing_grants}")
     if expected_moved:
         target_move_event = next(
             (
@@ -12367,6 +12384,7 @@ def run_aura_static_power_toughness_attachment(
             "power_boost": attached_event.get("power_boost"),
             "toughness_boost": attached_event.get("toughness_boost"),
             "target_player": attached_event.get("target_player"),
+            "grants": attached_event.get("grants"),
         },
     }
 

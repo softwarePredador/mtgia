@@ -1990,6 +1990,42 @@ class XMageExactScopeRuntimeTest(unittest.TestCase):
             )
         )
 
+    def test_aura_static_power_toughness_attachment_grants_keywords(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        target = {
+            "name": "Academy Drake",
+            "type_line": "Creature - Drake",
+            "power": 2,
+            "toughness": 2,
+            "summoning_sick": True,
+        }
+        active.battlefield = [target]
+        aura = {"name": "Arcane Flight", "type_line": "Enchantment - Aura"}
+        effect = {
+            "effect": "aura_static_attachment",
+            "battle_model_scope": "xmage_aura_static_power_toughness_attachment_v1",
+            "power_boost": 1,
+            "toughness_boost": 1,
+            "attached_keywords": ["flying", "haste"],
+            "enchant_target_controller": "self",
+        }
+
+        self.battle.apply_aura_static_attachment(active, [], aura, effect, turn=2, rng=random.Random(1))
+
+        self.assertEqual(target["power"], 3)
+        self.assertEqual(target["toughness"], 3)
+        self.assertTrue(target["flying"])
+        self.assertTrue(target["haste"])
+        self.assertFalse(target["summoning_sick"])
+        self.assertTrue(
+            any(
+                event == "aura_attached_static_pt"
+                and data.get("card") == "Arcane Flight"
+                and set(data.get("grants") or []) == {"flying", "haste"}
+                for event, data in self.events
+            )
+        )
+
     def test_dynamic_aura_static_attachment_counts_artifacts_and_enchantments_including_aura(self) -> None:
         active = self.battle.Player("Active", None, [])
         target = {"name": "Favored Hoplite", "type_line": "Creature - Human Soldier", "power": 1, "toughness": 2}

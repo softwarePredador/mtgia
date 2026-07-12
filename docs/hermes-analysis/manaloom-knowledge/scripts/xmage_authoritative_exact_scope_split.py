@@ -1129,11 +1129,27 @@ def fixed_aura_static_pt_from_oracle(metadata: dict[str, Any]) -> dict[str, Any]
     text = re.sub(r"\s+", " ", text).strip()
     match = re.match(
         r"^(?P<flash>flash )?enchant creature(?P<controller> you control| an opponent controls)? "
-        r"enchanted creature gets (?P<power>[+-]?\d+)/(?P<toughness>[+-]?\d+)\.?$",
+        r"enchanted creature gets (?P<power>[+-]?\d+)/(?P<toughness>[+-]?\d+)(?P<tail>.*)$",
         text,
     )
     if not match:
         return None
+    tail = match.group("tail").strip()
+    keyword_text = ""
+    if tail:
+        if tail == ".":
+            keyword_text = ""
+        elif tail.startswith("and has "):
+            keyword_text = tail[len("and has ") :].strip()
+        elif tail.startswith(", has "):
+            keyword_text = tail[len(", has ") :].strip()
+        elif tail.startswith(", and has "):
+            keyword_text = tail[len(", and has ") :].strip()
+        else:
+            return None
+    keywords = _equipment_oracle_keyword_list(keyword_text)
+    if keywords is None:
+        return "aura_static_oracle_keyword_not_supported"
     controller = (match.group("controller") or "").strip()
     target_controller = "any"
     if controller == "you control":
@@ -1145,6 +1161,7 @@ def fixed_aura_static_pt_from_oracle(metadata: dict[str, Any]) -> dict[str, Any]
         "toughness_boost": int(match.group("toughness")),
         "enchant_target_controller": target_controller,
         "has_flash": bool(match.group("flash")),
+        "attached_keywords": keywords,
     }
 
 
@@ -1179,6 +1196,13 @@ def fixed_aura_static_pt_from_source(source: str) -> dict[str, Any] | str | None
     )
     if not match:
         return "aura_static_pt_source_boost_not_single_fixed"
+    keywords = attachment_keywords_from_source(
+        text,
+        attachment_type="AURA",
+        reason_prefix="aura_static",
+    )
+    if isinstance(keywords, str):
+        return keywords
     target_controller = "any"
     if "TargetControlledCreaturePermanent" in text:
         target_controller = "self"
@@ -1188,6 +1212,7 @@ def fixed_aura_static_pt_from_source(source: str) -> dict[str, Any] | str | None
         "power_boost": int(match.group("power")),
         "toughness_boost": int(match.group("toughness")),
         "enchant_target_controller": target_controller,
+        "attached_keywords": keywords,
     }
 
 
@@ -1297,6 +1322,8 @@ def _attachment_count_fields_from_filter_text(filter_text: str) -> dict[str, Any
             }
         basic_lands = {"plains", "island", "swamp", "mountain", "forest", "desert"}
         singular = name[:-1] if name.endswith("s") else name
+        if singular == "plain":
+            singular = "plains"
         if singular in basic_lands:
             return {
                 "stat_modifier_amount_source": "battlefield_permanent_count",
@@ -1360,7 +1387,12 @@ def dynamic_attachment_static_pt_from_oracle(
         text,
     )
     if each_match:
-        count_fields = _attachment_count_fields_from_filter_text(each_match.group("filter"))
+        filter_text = each_match.group("filter")
+        tail = each_match.group("tail").strip()
+        if not tail and " and has " in filter_text:
+            filter_text, keyword_tail = filter_text.rsplit(" and has ", 1)
+            tail = f"and has {keyword_tail}"
+        count_fields = _attachment_count_fields_from_filter_text(filter_text)
         if isinstance(count_fields, str):
             return count_fields
         if count_fields is None:
@@ -1372,12 +1404,15 @@ def dynamic_attachment_static_pt_from_oracle(
             toughness_per=_dynamic_boost_sign(each_match.group("toughness")) * int(each_match.group("toughness_value")),
             **count_fields,
         )
-        tail = each_match.group("tail").strip()
-        if tail and subject == "equipped creature":
+        if tail and subject in {"equipped creature", "enchanted creature"}:
             keyword_text = tail[len("and has ") :].strip() if tail.startswith("and has ") else ""
             keywords = _equipment_oracle_keyword_list(keyword_text)
             if keywords is None:
-                return "equipment_static_oracle_keyword_not_supported"
+                return (
+                    "equipment_static_oracle_keyword_not_supported"
+                    if subject == "equipped creature"
+                    else "aura_static_oracle_keyword_not_supported"
+                )
             result["attached_keywords"] = keywords
         return result
 
@@ -1632,17 +1667,15 @@ def dynamic_attachment_static_pt_from_source(
             if key not in {"stat_modifier_amount_source", "per", "static_value"}
         },
     )
-    if effect_class == "BoostEquippedEffect":
-        keyword_source = fixed_equipment_static_attachment_from_source(text)
-        if isinstance(keyword_source, dict):
-            result["attached_keywords"] = list(keyword_source.get("attached_keywords") or [])
-        else:
-            keywords: set[str] = set()
-            for class_name, keyword in EQUIPMENT_ATTACHED_KEYWORD_CLASSES.items():
-                if re.search(rf"\b(?:new\s+)?{re.escape(class_name)}\b", text):
-                    keywords.add(keyword)
-            if keywords:
-                result["attached_keywords"] = sorted(keywords)
+    if effect_class in {"BoostEquippedEffect", "BoostEnchantedEffect"}:
+        attachment_type = None if effect_class == "BoostEquippedEffect" else "AURA"
+        keywords = attachment_keywords_from_source(
+            text,
+            attachment_type=attachment_type,
+            reason_prefix="attachment_static",
+        )
+        if isinstance(keywords, list) and (keywords or "GainAbilityAttachedEffect" in text):
+            result["attached_keywords"] = keywords
     return result
 
 
@@ -1703,6 +1736,31 @@ def _equipment_oracle_keyword_list(value: str) -> list[str] | None:
     return sorted(set(keywords))
 
 
+def attachment_keywords_from_source(
+    source: str,
+    *,
+    attachment_type: str | None = None,
+    reason_prefix: str = "attachment_static",
+) -> list[str] | str:
+    type_pattern = re.escape(str(attachment_type).upper()) if attachment_type else r"(?:EQUIPMENT|AURA)"
+    attached_effect_blocks = re.findall(
+        rf"GainAbilityAttachedEffect\s*\(\s*(.*?)AttachmentType\.{type_pattern}",
+        source or "",
+        re.S,
+    )
+    keywords: set[str] = set()
+    for block in attached_effect_blocks:
+        found = False
+        for class_name, keyword in EQUIPMENT_ATTACHED_KEYWORD_CLASSES.items():
+            if re.search(rf"\b(?:new\s+)?{re.escape(class_name)}\b", block):
+                keywords.add(keyword)
+                found = True
+                break
+        if not found:
+            return f"{reason_prefix}_source_keyword_not_supported"
+    return sorted(keywords)
+
+
 def fixed_equipment_static_attachment_from_oracle(
     metadata: dict[str, Any],
 ) -> dict[str, Any] | str | None:
@@ -1756,26 +1814,18 @@ def fixed_equipment_static_attachment_from_source(source: str) -> dict[str, Any]
     )
     if len(boost_matches) != 1:
         return "equipment_static_source_boost_not_single_fixed"
-    attached_effect_blocks = re.findall(
-        r"GainAbilityAttachedEffect\s*\(\s*(.*?)AttachmentType\.(?:EQUIPMENT|AURA)",
+    keywords = attachment_keywords_from_source(
         text,
-        re.S,
+        attachment_type=None,
+        reason_prefix="equipment_static",
     )
-    keywords: set[str] = set()
-    for block in attached_effect_blocks:
-        found = False
-        for class_name, keyword in EQUIPMENT_ATTACHED_KEYWORD_CLASSES.items():
-            if re.search(rf"\b(?:new\s+)?{re.escape(class_name)}\b", block):
-                keywords.add(keyword)
-                found = True
-                break
-        if not found:
-            return "equipment_static_source_keyword_not_supported"
+    if isinstance(keywords, str):
+        return keywords
     power_raw, toughness_raw = boost_matches[0]
     return {
         "power_boost": int(power_raw),
         "toughness_boost": int(toughness_raw),
-        "attached_keywords": sorted(keywords),
+        "attached_keywords": keywords,
     }
 
 
@@ -13493,11 +13543,21 @@ def is_static_global_pt_unit(row: dict[str, Any]) -> bool:
 
 
 def is_simple_aura_static_pt_unit(row: dict[str, Any]) -> bool:
+    effects = effect_classes(row)
     abilities = ability_classes(row)
+    allowed_effects = {"AttachEffect", "BoostEnchantedEffect", "GainAbilityAttachedEffect"}
+    allowed_abilities = {
+        "EnchantAbility",
+        "SimpleStaticAbility",
+        "FlashAbility",
+        "AddAbility",
+        *EQUIPMENT_ATTACHED_KEYWORD_CLASSES.keys(),
+    }
     return (
-        effect_classes(row) == {"AttachEffect", "BoostEnchantedEffect"}
+        {"AttachEffect", "BoostEnchantedEffect"}.issubset(effects)
+        and effects.issubset(allowed_effects)
         and {"EnchantAbility", "SimpleStaticAbility"}.issubset(abilities)
-        and abilities.issubset({"EnchantAbility", "SimpleStaticAbility", "FlashAbility"})
+        and abilities.issubset(allowed_abilities)
         and set(row.get("xmage_signals") or []).issubset({"targeting", "static_ability"})
     )
 
@@ -31909,8 +31969,9 @@ def split_row(
             "toughness_boost": toughness_boost,
             "static_power_bonus": power_boost,
             "static_toughness_bonus": toughness_boost,
+            "attached_keywords": list(oracle_aura.get("attached_keywords") or []),
             "aura": True,
-            "xmage_effect_classes": ["AttachEffect", "BoostEnchantedEffect"],
+            "xmage_effect_classes": sorted(effect_classes(row)),
             "xmage_ability_classes": sorted(ability_classes(row)),
             **flags,
         }
@@ -31929,6 +31990,8 @@ def split_row(
                 }
             )
             effect_json["static_effect"] = "attached_creature_power_toughness_boost_equal_count"
+        for keyword in oracle_aura.get("attached_keywords") or []:
+            effect_json[f"grants_{keyword}"] = True
         if oracle_aura.get("has_flash"):
             effect_json["has_flash"] = True
             effect_json["flash"] = True

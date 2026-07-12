@@ -49662,6 +49662,32 @@ def apply_aura_static_attachment(player, opponents, card, effect_data, turn, rng
         dynamic_effect["toughness_boost"] = toughness_boost
         aura["attachment_dynamic_count_current"] = dynamic_fields.get("attachment_dynamic_count")
     power_boost, toughness_boost = apply_aura_static_pt_modifier(target, aura, dynamic_effect)
+    attached_keywords = {
+        str(keyword).strip().lower().replace(" ", "_")
+        for keyword in (effect_data.get("attached_keywords") or [])
+        if str(keyword).strip()
+    }
+    grants = []
+    for keyword in (
+        "flying",
+        "reach",
+        "trample",
+        "deathtouch",
+        "first_strike",
+        "double_strike",
+        "lifelink",
+        "indestructible",
+        "haste",
+        "vigilance",
+        "hexproof",
+        "shroud",
+        "menace",
+    ):
+        if effect_data.get(f"grants_{keyword}") or keyword in attached_keywords:
+            target[keyword] = True
+            grants.append(keyword)
+    if "haste" in grants:
+        target["summoning_sick"] = False
     emit_replay_event(
         "aura_attached_static_pt",
         player=player.name,
@@ -49674,6 +49700,7 @@ def apply_aura_static_attachment(player, opponents, card, effect_data, turn, rng
         toughness_after=target.get("toughness"),
         power_boost=power_boost,
         toughness_boost=toughness_boost,
+        grants=grants,
         turn=turn,
         **replay_rule_fields(effect_data),
         **dynamic_fields,

@@ -6267,7 +6267,7 @@ def test_aura_static_power_toughness_execution_scenario_targets_debuff_to_oppone
     assert scenario == {
         "name": "Dead Weight aura static P/T attaches",
         "type": "aura_static_power_toughness_attachment",
-        "card": {"name": "Dead Weight"},
+        "card": {"name": "Dead Weight", "type_line": "Enchantment - Aura"},
         "target": {
             "name": "E2E Aura Target for Dead Weight",
             "type_line": "Creature - Soldier",
@@ -6280,6 +6280,7 @@ def test_aura_static_power_toughness_execution_scenario_targets_debuff_to_oppone
         "expected_power": 0,
         "expected_toughness": 0,
         "expected_moved_to_graveyard": True,
+        "expected_keywords": [],
         "expected_source": "Dead Weight",
         "logical_rule_key": "battle_rule_v1:dead-weight",
     }

@@ -1820,6 +1820,11 @@ def aura_static_pt_execution_scenario_from_expected_rule(rule: dict[str, Any]) -
             required,
             "toughness_delta_per_graveyard_count",
         )
+    attached_keywords = [
+        str(value).strip().lower().replace(" ", "_")
+        for value in required.get("attached_keywords", []) or []
+        if str(value).strip()
+    ]
     target_controller = str(required.get("enchant_target_controller") or "any").lower()
     if target_controller in {"opponent", "opponents"}:
         target_owner = "opponent"
@@ -1852,6 +1857,7 @@ def aura_static_pt_execution_scenario_from_expected_rule(rule: dict[str, Any]) -
         "expected_power": target["base_power"] + power_bonus,
         "expected_toughness": expected_toughness,
         "expected_moved_to_graveyard": expected_toughness <= 0,
+        "expected_keywords": attached_keywords,
         "expected_source": rule["card_name"],
         "logical_rule_key": rule["logical_rule_key"],
         **dynamic_fields,
