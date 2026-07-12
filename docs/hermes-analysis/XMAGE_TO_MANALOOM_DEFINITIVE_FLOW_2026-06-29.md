@@ -438,6 +438,13 @@ patterns:
   with exact fixed "Target player gains N life" Oracle/source agreement and a
   single `TargetPlayer()` ->
   `xmage_fixed_target_player_gain_life_spell_v1`
+- `mill_cards::target_player_mill_fixed_or_x_variant_v1` with exact fixed
+  `MillCardsTargetEffect`, one `TargetPlayer` or `TargetOpponent`, and only
+  resolution-neutral auxiliary abilities ->
+  `xmage_fixed_target_player_mill_spell_v1`; the companion composite
+  `MillCardsTargetEffect + DrawCardSourceControllerEffect` maps to
+  `xmage_fixed_target_player_mill_draw_spell_v1` only when Oracle and XMage
+  agree on target scope, mill count, draw count, and resolution order.
 - `life_gain::xmage_life_gain_variant_review_v1` with
   `DamageTargetEffect + GainLifeEffect` and exact fixed damage/life-gain
   Oracle/source text ->

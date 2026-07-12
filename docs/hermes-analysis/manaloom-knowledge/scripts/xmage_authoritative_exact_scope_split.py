@@ -282,6 +282,7 @@ LOOK_AT_HAND_SCOPE = "xmage_look_at_target_player_hand_spell_v1"
 LOOK_AT_HAND_DRAW_SCOPE = "xmage_look_at_target_player_hand_draw_card_spell_v1"
 TARGET_PLAYER_DISCARD_SCOPE = "xmage_fixed_target_player_discard_spell_v1"
 TARGET_PLAYER_MILL_SCOPE = "xmage_fixed_target_player_mill_spell_v1"
+TARGET_PLAYER_MILL_DRAW_SCOPE = "xmage_fixed_target_player_mill_draw_spell_v1"
 DYNAMIC_TARGET_PLAYER_DISCARD_SCOPE = "xmage_dynamic_target_player_discard_spell_v1"
 ETB_TARGET_PLAYER_DISCARD_CREATURE_SCOPE = "xmage_creature_etb_target_player_discard_v1"
 DIES_TARGET_PLAYER_DISCARD_CREATURE_SCOPE = "xmage_creature_dies_target_player_discard_v1"
@@ -24641,6 +24642,80 @@ def fixed_target_player_mill_spell_from_source(source: str) -> dict[str, Any] | 
     }
 
 
+def fixed_target_player_mill_draw_spell_from_oracle(metadata: dict[str, Any]) -> dict[str, Any] | str:
+    text = re.sub(
+        r"\s+",
+        " ",
+        " ".join(oracle_effect_lines_without_neutral_auxiliary(metadata)),
+    ).strip().lower()
+    if not text:
+        return "target_player_mill_draw_oracle_not_simple"
+    number_pattern = r"(a|one|two|three|four|five|six|seven|eight|nine|ten|\d+)"
+    mill_pattern = rf"target (?P<scope>player|opponent) mills (?P<mill>{number_pattern}) cards?\.?"
+    draw_pattern = rf"draw (?P<draw>{number_pattern}) cards?\.?"
+    mill_then_draw = re.fullmatch(rf"{mill_pattern} {draw_pattern}", text)
+    draw_then_mill = re.fullmatch(rf"{draw_pattern} {mill_pattern}", text)
+    match = mill_then_draw or draw_then_mill
+    if not match:
+        return "target_player_mill_draw_oracle_not_exact_fixed"
+    mill_count = number_word_to_int(match.group("mill"))
+    draw_count = number_word_to_int(match.group("draw"))
+    if mill_count <= 0 or draw_count <= 0:
+        return "target_player_mill_draw_count_not_fixed"
+    return {
+        "mill_count": mill_count,
+        "draw_count": draw_count,
+        "target_player_scope": "opponent" if match.group("scope") == "opponent" else "any",
+        "resolution_order": "mill_then_draw" if mill_then_draw else "draw_then_mill",
+    }
+
+
+def fixed_target_player_mill_draw_spell_from_source(source: str) -> dict[str, Any] | str:
+    text = source or ""
+    if has_additional_cost(text):
+        return "target_player_mill_draw_source_additional_cost_not_supported"
+    unsupported_markers = {
+        "ConditionalOneShotEffect",
+        "DoIfCostPaid",
+        "Mode",
+        "Modes",
+        "TargetPointer",
+        ".setTargetPointer",
+        "GetXValue",
+        "ManacostVariableValue",
+        "DomainValue",
+    }
+    if any(marker in text for marker in unsupported_markers):
+        return "target_player_mill_draw_source_not_simple"
+    target_player_count = len(re.findall(r"new\s+TargetPlayer\s*\(", text))
+    target_opponent_count = len(re.findall(r"new\s+TargetOpponent\s*\(", text))
+    if target_player_count + target_opponent_count != 1:
+        return "target_player_mill_draw_source_target_not_supported"
+    mill_matches = list(re.finditer(r"\bMillCardsTargetEffect\s*\(\s*(\d+)\s*\)", text, re.S))
+    draw_matches = list(re.finditer(r"\bDrawCardSourceControllerEffect\s*\(", text))
+    if len(mill_matches) != 1 or len(draw_matches) != 1:
+        return "target_player_mill_draw_source_not_simple"
+    mill_count = int(mill_matches[0].group(1))
+    draw_count = java_constructor_int_or_noarg_default(
+        text,
+        "DrawCardSourceControllerEffect",
+        noarg_default=1,
+    )
+    if mill_count <= 0 or draw_count <= 0:
+        return "target_player_mill_draw_count_not_fixed"
+    return {
+        "mill_count": mill_count,
+        "draw_count": draw_count,
+        "target_player_scope": "opponent" if target_opponent_count else "any",
+        "resolution_order": (
+            "mill_then_draw"
+            if mill_matches[0].start() < draw_matches[0].start()
+            else "draw_then_mill"
+        ),
+        "xmage_effect_classes": ["MillCardsTargetEffect", "DrawCardSourceControllerEffect"],
+    }
+
+
 def dynamic_target_player_discard_spell_from_source(source: str) -> dict[str, Any] | str:
     text = source or ""
     if has_additional_cost(text):
@@ -41426,6 +41501,77 @@ def split_row(
         ), "selected_exact_scope"
 
     if unit == MILL_TARGET_UNIT:
+        if classes == {"DrawCardSourceControllerEffect", "MillCardsTargetEffect"}:
+            unsupported_abilities = ability_classes(row) - ALLOWED_AUXILIARY_RESOLUTION_ABILITY_CLASSES
+            if unsupported_abilities:
+                return None, "target_player_mill_draw_ability_class_not_simple"
+            oracle_mill_draw = fixed_target_player_mill_draw_spell_from_oracle(metadata)
+            if isinstance(oracle_mill_draw, str):
+                return None, oracle_mill_draw
+            source_mill_draw = fixed_target_player_mill_draw_spell_from_source(source_text)
+            if isinstance(source_mill_draw, str):
+                return None, source_mill_draw
+            for key in ("mill_count", "draw_count", "target_player_scope", "resolution_order"):
+                if oracle_mill_draw[key] != source_mill_draw[key]:
+                    return None, "target_player_mill_draw_source_oracle_mismatch"
+            mill_count = int(oracle_mill_draw["mill_count"])
+            draw_count = int(oracle_mill_draw["draw_count"])
+            target_player_scope = str(oracle_mill_draw["target_player_scope"])
+            resolution_order = str(oracle_mill_draw["resolution_order"])
+            target_constraints = {
+                "players": ["opponent"] if target_player_scope == "opponent" else ["any"]
+            }
+            mill_component = {
+                "effect": "mill_cards",
+                "battle_model_scope": TARGET_PLAYER_MILL_SCOPE,
+                "count": mill_count,
+                "mill_count": mill_count,
+                "target": "player",
+                "target_controller": "target_player",
+                "target_constraints": target_constraints,
+                "target_preference": "opponent",
+                "target_player_mill": True,
+                "target_player_scope": target_player_scope,
+                "compose_on_resolution": True,
+                "xmage_effect_class": "MillCardsTargetEffect",
+            }
+            draw_component = {
+                "effect": "draw_cards",
+                "battle_model_scope": DRAW_SCOPE,
+                "count": draw_count,
+                "draw_count": draw_count,
+                "compose_on_resolution": True,
+                "xmage_effect_class": "DrawCardSourceControllerEffect",
+            }
+            components = (
+                [mill_component, draw_component]
+                if resolution_order == "mill_then_draw"
+                else [draw_component, mill_component]
+            )
+            effect_json = {
+                "effect": "composite_resolution",
+                "battle_model_scope": TARGET_PLAYER_MILL_DRAW_SCOPE,
+                "count": draw_count,
+                "draw_count": draw_count,
+                "mill_count": mill_count,
+                "target": "player",
+                "target_controller": "target_player",
+                "target_constraints": target_constraints,
+                "target_preference": "opponent",
+                "target_player_mill": True,
+                "target_player_scope": target_player_scope,
+                "resolution_order": resolution_order,
+                "_composite_rule_components": components,
+                "xmage_effect_classes": ["MillCardsTargetEffect", "DrawCardSourceControllerEffect"],
+                **flags,
+            }
+            return build_proposal(
+                row,
+                metadata,
+                effect_json,
+                family_id="xmage_fixed_target_player_mill_draw_spell",
+            ), "selected_exact_scope"
+
         if classes != {"MillCardsTargetEffect"}:
             return None, "target_player_mill_spell_effect_class_not_pure"
         unsupported_abilities = ability_classes(row) - ALLOWED_AUXILIARY_RESOLUTION_ABILITY_CLASSES

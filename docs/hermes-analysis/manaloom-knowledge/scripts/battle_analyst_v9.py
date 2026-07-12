@@ -68537,6 +68537,33 @@ def resolve_composite_resolution_effect(player, opponents, card, effect_data, tu
                     outcome = "cards_drawn"
                     component_fields["cards_drawn"] = len(drawn)
                     applied.append({"effect": component_effect, "count": count})
+        elif component_effect == "mill_cards":
+            component_payload = dict(component)
+            component_payload["_composite_component_index"] = index
+            resolve_target_player_mill_spell(
+                player,
+                opponents,
+                card,
+                component_payload,
+                turn,
+                rng,
+                phase=phase,
+                all_players=participants,
+                stack=stack,
+            )
+            mill_count = max(
+                0,
+                int(component.get("mill_count") or component.get("count") or 0),
+            )
+            outcome = "mill_resolved"
+            component_fields["requested_mill"] = mill_count
+            applied.append(
+                {
+                    "effect": component_effect,
+                    "requested_mill": mill_count,
+                    "target": component.get("target"),
+                }
+            )
         elif component_effect == "proliferate":
             component_payload = dict(component)
             component_payload["_composite_component_index"] = index

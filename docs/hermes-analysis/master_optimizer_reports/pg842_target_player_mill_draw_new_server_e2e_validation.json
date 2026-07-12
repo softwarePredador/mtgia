@@ -1,0 +1,231 @@
+{
+  "battle_execution": {
+    "event_count": 20,
+    "results": [
+      {
+        "card_name": "Pilfered Plans",
+        "cards_drawn": 2,
+        "cards_milled": 2,
+        "resolution_order": "mill_then_draw",
+        "scenario": "Pilfered Plans target player mills then draw component",
+        "target_player": "Opponent"
+      },
+      {
+        "card_name": "Thassa's Bounty",
+        "cards_drawn": 3,
+        "cards_milled": 3,
+        "resolution_order": "draw_then_mill",
+        "scenario": "Thassa's Bounty target player mills then draw component",
+        "target_player": "Opponent"
+      },
+      {
+        "card_name": "Thought Scour",
+        "cards_drawn": 1,
+        "cards_milled": 2,
+        "resolution_order": "mill_then_draw",
+        "scenario": "Thought Scour target player mills then draw component",
+        "target_player": "Opponent"
+      },
+      {
+        "card_name": "Weight of Memory",
+        "cards_drawn": 3,
+        "cards_milled": 3,
+        "resolution_order": "draw_then_mill",
+        "scenario": "Weight of Memory target player mills then draw component",
+        "target_player": "Opponent"
+      }
+    ],
+    "scenario_count": 4
+  },
+  "battle_path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py",
+  "database_target": "127.0.0.1:15432/halder",
+  "generated_at_utc": "2026-07-12T20:01:19.091544+00:00",
+  "manifest": "docs/hermes-analysis/master_optimizer_reports/pg842_target_player_mill_draw_new_server_manifest.json",
+  "package_id": "pg842_target_player_mill_draw_new_server_manifest",
+  "snapshot": "docs/hermes-analysis/master_optimizer_reports/pg842_target_player_mill_draw_new_server_canonical_snapshot.json",
+  "sqlite_db": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db",
+  "stages": [
+    {
+      "evidence": {
+        "validated_rows": 4
+      },
+      "name": "postgres_source_of_truth",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_target_player_mill_draw_spell_v1",
+          "card_name": "Pilfered Plans",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:7ff51f5fdbd9cd76eeb3a28e8ce616f9",
+          "oracle_hash": "e490a59b9586ce4ec4d6b45ac4ec5069",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_target_player_mill_draw_spell_v1",
+          "card_name": "Thassa's Bounty",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:5058f463d4e7289465529065f2e16f55",
+          "oracle_hash": "f4c1a48e59f455d35e1525b4999e6a5a",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_target_player_mill_draw_spell_v1",
+          "card_name": "Thought Scour",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:f66bbfb88f92a5b9aa93ced8b6ccff70",
+          "oracle_hash": "b5be321c4136f2a6c70da77a56edb7ab",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_target_player_mill_draw_spell_v1",
+          "card_name": "Weight of Memory",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:5058f463d4e7289465529065f2e16f55",
+          "oracle_hash": "f4c1a48e59f455d35e1525b4999e6a5a",
+          "review_status": "verified",
+          "rule_version": 2
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_rows": 4
+      },
+      "name": "sqlite_hermes_cache",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_target_player_mill_draw_spell_v1",
+          "card_name": "Pilfered Plans",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:7ff51f5fdbd9cd76eeb3a28e8ce616f9",
+          "oracle_hash": "e490a59b9586ce4ec4d6b45ac4ec5069",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_target_player_mill_draw_spell_v1",
+          "card_name": "Thassa's Bounty",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:5058f463d4e7289465529065f2e16f55",
+          "oracle_hash": "f4c1a48e59f455d35e1525b4999e6a5a",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_target_player_mill_draw_spell_v1",
+          "card_name": "Thought Scour",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:f66bbfb88f92a5b9aa93ced8b6ccff70",
+          "oracle_hash": "b5be321c4136f2a6c70da77a56edb7ab",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_target_player_mill_draw_spell_v1",
+          "card_name": "Weight of Memory",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:5058f463d4e7289465529065f2e16f55",
+          "oracle_hash": "f4c1a48e59f455d35e1525b4999e6a5a",
+          "review_status": "verified",
+          "rule_version": 2
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_cards": 4
+      },
+      "name": "canonical_snapshot_fallback",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_target_player_mill_draw_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Pilfered Plans",
+          "logical_rule_key": "battle_rule_v1:7ff51f5fdbd9cd76eeb3a28e8ce616f9"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_target_player_mill_draw_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Thassa's Bounty",
+          "logical_rule_key": "battle_rule_v1:5058f463d4e7289465529065f2e16f55"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_target_player_mill_draw_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Thought Scour",
+          "logical_rule_key": "battle_rule_v1:f66bbfb88f92a5b9aa93ced8b6ccff70"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_target_player_mill_draw_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Weight of Memory",
+          "logical_rule_key": "battle_rule_v1:5058f463d4e7289465529065f2e16f55"
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_cards": 4
+      },
+      "name": "runtime_get_card_effect",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "card_name": "Pilfered Plans",
+          "component_keys": [],
+          "effect": "composite_resolution",
+          "logical_rule_key": "battle_rule_v1:7ff51f5fdbd9cd76eeb3a28e8ce616f9"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Thassa's Bounty",
+          "component_keys": [],
+          "effect": "composite_resolution",
+          "logical_rule_key": "battle_rule_v1:5058f463d4e7289465529065f2e16f55"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Thought Scour",
+          "component_keys": [],
+          "effect": "composite_resolution",
+          "logical_rule_key": "battle_rule_v1:f66bbfb88f92a5b9aa93ced8b6ccff70"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Weight of Memory",
+          "component_keys": [],
+          "effect": "composite_resolution",
+          "logical_rule_key": "battle_rule_v1:5058f463d4e7289465529065f2e16f55"
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "events": 20,
+        "scenarios": 4
+      },
+      "name": "battle_execution",
+      "status": "pass"
+    }
+  ],
+  "status": "pass",
+  "title": "Battle Package End-to-End Validation"
+}

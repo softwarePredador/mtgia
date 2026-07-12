@@ -3081,6 +3081,59 @@ def test_manifest_builds_target_player_mill_execution_scenario() -> None:
     assert len(scenario["opponent_library"]) == 8
 
 
+def test_manifest_builds_target_player_mill_draw_execution_scenario() -> None:
+    rule = {
+        "normalized_name": "thought scour",
+        "card_name": "Thought Scour",
+        "oracle_hash": "hash-thought-scour",
+        "logical_rule_key": "battle_rule_v1:hash-thought-scour",
+        "required_effect_fields": {
+            "effect": "composite_resolution",
+            "battle_model_scope": "xmage_fixed_target_player_mill_draw_spell_v1",
+            "target": "player",
+            "target_controller": "target_player",
+            "target_preference": "opponent",
+            "target_player_scope": "any",
+            "target_player_mill": True,
+            "count": 1,
+            "draw_count": 1,
+            "mill_count": 2,
+            "resolution_order": "mill_then_draw",
+            "instant": True,
+            "_composite_rule_components": [
+                {
+                    "effect": "mill_cards",
+                    "battle_model_scope": "xmage_fixed_target_player_mill_spell_v1",
+                    "count": 2,
+                    "mill_count": 2,
+                    "target": "player",
+                    "target_player_mill": True,
+                    "compose_on_resolution": True,
+                },
+                {
+                    "effect": "draw_cards",
+                    "battle_model_scope": "xmage_fixed_source_controller_draw_spell_v1",
+                    "count": 1,
+                    "draw_count": 1,
+                    "compose_on_resolution": True,
+                },
+            ],
+        },
+    }
+
+    scenario = builder.execution_scenario_from_expected_rule(rule)
+
+    assert scenario is not None
+    assert scenario["type"] == "target_player_mill_draw_spell"
+    assert scenario["card"]["name"] == "Thought Scour"
+    assert scenario["card"]["type_line"] == "Instant"
+    assert scenario["expected_mill_count"] == 2
+    assert scenario["expected_draw_count"] == 1
+    assert scenario["expected_resolution_order"] == "mill_then_draw"
+    assert len(scenario["opponent_library"]) == 3
+    assert len(scenario["controller_library"]) == 2
+
+
 def test_manifest_builds_simple_activated_damage_execution_scenario() -> None:
     rule = {
         "normalized_name": "stormbind",
