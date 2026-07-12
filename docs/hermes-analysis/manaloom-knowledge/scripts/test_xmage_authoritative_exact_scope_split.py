@@ -19497,6 +19497,52 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertEqual(effect["xmage_mana_ability_classes"], ["SimpleManaAbility"])
         self.assertEqual(effect["xmage_auxiliary_ability_classes"], ["AsEntersBattlefieldAbility"])
 
+    def test_chosen_color_mana_source_static_controlled_pt_boost_maps_heraldic_banner(self) -> None:
+        row = queue_row(
+            split.RAMP_ARTIFACT_UNIT,
+            effect_classes=["AddManaChosenColorEffect", "ChooseColorEffect", "HeraldicBannerEffect"],
+            ability_kind="activated",
+            ability_classes=["AsEntersBattlefieldAbility", "SimpleManaAbility", "SimpleStaticAbility"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Heraldic Banner",
+                type_line="Artifact",
+                oracle_text=(
+                    "As this artifact enters, choose a color.\n"
+                    "Creatures you control of the chosen color get +1/+0.\n"
+                    "{T}: Add one mana of the chosen color."
+                ),
+            ),
+            source_text=(
+                "this.addAbility(new AsEntersBattlefieldAbility(new ChooseColorEffect(Outcome.Benefit)));"
+                "this.addAbility(new SimpleStaticAbility(new HeraldicBannerEffect()));"
+                "this.addAbility(new SimpleManaAbility(Zone.BATTLEFIELD, "
+                "new AddManaChosenColorEffect(), new TapSourceCost()));"
+                "class HeraldicBannerEffect extends ContinuousEffectImpl {"
+                "public boolean apply(Game game, Ability source) {"
+                "for (Permanent perm : game.getBattlefield().getActivePermanents("
+                "StaticFilters.FILTER_CONTROLLED_CREATURE, source.getControllerId(), source, game)) {"
+                "if (perm.getColor(game).contains(color)) { perm.addPower(1); }"
+                "}}}"
+            ),
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        self.assertEqual(proposal["family_id"], "xmage_chosen_color_mana_source_static_controlled_pt_boost")
+        self.assertTrue(proposal["safe_for_batch_pg_package"])
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.MANA_SCOPE)
+        self.assertEqual(effect["ability_kind"], "activated_mana_and_static")
+        self.assertTrue(effect["chosen_color_mana"])
+        self.assertEqual(len(effect["_composite_rule_components"]), 1)
+        component = effect["_composite_rule_components"][0]
+        self.assertEqual(component["battle_model_scope"], split.STATIC_CONTROLLED_PT_SCOPE)
+        self.assertEqual(component["static_power_bonus"], 1)
+        self.assertEqual(component["static_toughness_bonus"], 0)
+        self.assertTrue(component["static_required_chosen_color"])
+
     def test_simple_mana_source_with_static_keyword_auxiliary_maps(self) -> None:
         row = queue_row(
             split.RAMP_ARTIFACT_UNIT,

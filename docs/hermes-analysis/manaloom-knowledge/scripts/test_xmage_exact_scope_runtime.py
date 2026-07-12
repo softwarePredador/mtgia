@@ -1605,6 +1605,52 @@ class XMageExactScopeRuntimeTest(unittest.TestCase):
                 self.assertEqual(opponent_match["power"], 2)
                 self.assertEqual(opponent_match["toughness"], 2)
 
+    def test_composite_chosen_color_mana_source_static_pt_boost_uses_best_color(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        banner = {
+            "name": "Heraldic Banner",
+            "type_line": "Artifact",
+            "effect": "ramp_permanent",
+            "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+            "is_mana_source": True,
+            "mana_produced": 1,
+            "produces": "WUBRG",
+            "chosen_color_mana": True,
+            "conditional_mana_same_color_choice": True,
+            "conditional_mana_modes_status": "runtime_executor_v1",
+            "conditional_mana_modes": [
+                {
+                    "color": symbol,
+                    "restriction": "any_spell",
+                    "mode": "chosen_color_mana",
+                    "status": "runtime_executor_v1",
+                }
+                for symbol in "WUBRG"
+            ],
+            "_composite_rule_components": [
+                {
+                    "effect": "passive",
+                    "battle_model_scope": "xmage_static_controlled_power_toughness_boost_v1",
+                    "static_effect": "controlled_power_toughness_boost",
+                    "static_power_bonus": 1,
+                    "static_toughness_bonus": 0,
+                    "static_required_chosen_color": True,
+                }
+            ],
+        }
+        red_creature = {"name": "Red Ally", "type_line": "Creature - Soldier", "colors": ["R"], "power": 2, "toughness": 2}
+        blue_creature = {"name": "Blue Ally", "type_line": "Creature - Soldier", "colors": ["U"], "power": 2, "toughness": 2}
+        active.battlefield = [banner, red_creature, blue_creature]
+
+        self.battle.refresh_controlled_static_power_toughness_bonuses(active)
+
+        self.assertEqual(banner["chosen_color"], "blue")
+        self.assertEqual(blue_creature["power"], 3)
+        self.assertEqual(blue_creature["toughness"], 2)
+        self.assertEqual(red_creature["power"], 2)
+        self.assertEqual(red_creature["toughness"], 2)
+        self.assertEqual(blue_creature["static_power_toughness_sources"], ["Heraldic Banner"])
+
     def test_static_controlled_keyword_applies_to_controller_and_reverts(self) -> None:
         active = self.battle.Player("Active", None, [])
         opponent = self.battle.Player("Opponent", None, [])

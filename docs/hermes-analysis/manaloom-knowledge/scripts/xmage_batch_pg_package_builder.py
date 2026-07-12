@@ -43,6 +43,7 @@ E2E_REQUIRED_EFFECT_FIELDS = (
     "static_granted_keywords",
     "static_required_subtypes",
     "static_required_colors",
+    "static_required_chosen_color",
     "static_required_supertypes",
     "static_required_combat_state",
     "static_required_tapped_state",

@@ -27564,6 +27564,86 @@ def mana_detail_from_add_phrase(mana_phrase: str) -> dict[str, Any] | None:
     }
 
 
+def chosen_color_controlled_pt_component_from_oracle(metadata: dict[str, Any]) -> dict[str, Any] | str | None:
+    lines = normalized_oracle_lines(metadata)
+    if not any(re.fullmatch(r"as this artifact enters, choose a color\.?", line) for line in lines):
+        return None
+    boost_lines = [
+        line
+        for line in lines
+        if re.fullmatch(
+            r"creatures you control of the chosen color get [+-]?\d+/[+-]?\d+\.?",
+            line,
+        )
+    ]
+    if len(boost_lines) != 1:
+        return None
+    match = re.fullmatch(
+        r"creatures you control of the chosen color get (?P<power>[+-]?\d+)/(?P<toughness>[+-]?\d+)\.?",
+        boost_lines[0],
+    )
+    if not match:
+        return None
+    power = signed_int_from_oracle(match.group("power"))
+    toughness = signed_int_from_oracle(match.group("toughness"))
+    if power is None or toughness is None:
+        return None
+    return {
+        "effect": "passive",
+        "battle_model_scope": STATIC_CONTROLLED_PT_SCOPE,
+        "ability_kind": "static",
+        "static_effect": "controlled_power_toughness_boost",
+        "static_applies_to": "creatures_you_control",
+        "target": "controlled_creatures",
+        "target_controller": "self",
+        "target_constraints": {
+            "controller": "self",
+            "card_types": ["creature"],
+            "colors": "chosen_color",
+        },
+        "static_power_bonus": power,
+        "static_toughness_bonus": toughness,
+        "static_required_chosen_color": True,
+        "xmage_effect_class": "HeraldicBannerEffect",
+        "xmage_ability_class": "SimpleStaticAbility",
+    }
+
+
+def chosen_color_controlled_pt_component_from_source(source: str) -> dict[str, Any] | str | None:
+    text = source or ""
+    if "class HeraldicBannerEffect" not in text:
+        return None
+    if "new AsEntersBattlefieldAbility(new ChooseColorEffect" not in text:
+        return "chosen_color_controlled_pt_source_choice_missing"
+    if "new SimpleStaticAbility(new HeraldicBannerEffect())" not in text:
+        return "chosen_color_controlled_pt_source_static_missing"
+    if not re.search(r"perm\.getColor\s*\(\s*game\s*\)\.contains\s*\(\s*color\s*\)", text):
+        return "chosen_color_controlled_pt_source_color_filter_missing"
+    if not re.search(r"perm\.addPower\s*\(\s*1\s*\)", text):
+        return "chosen_color_controlled_pt_source_power_not_supported"
+    if re.search(r"perm\.addToughness\s*\(", text):
+        return "chosen_color_controlled_pt_source_toughness_not_supported"
+    return {
+        "effect": "passive",
+        "battle_model_scope": STATIC_CONTROLLED_PT_SCOPE,
+        "ability_kind": "static",
+        "static_effect": "controlled_power_toughness_boost",
+        "static_applies_to": "creatures_you_control",
+        "target": "controlled_creatures",
+        "target_controller": "self",
+        "target_constraints": {
+            "controller": "self",
+            "card_types": ["creature"],
+            "colors": "chosen_color",
+        },
+        "static_power_bonus": 1,
+        "static_toughness_bonus": 0,
+        "static_required_chosen_color": True,
+        "xmage_effect_class": "HeraldicBannerEffect",
+        "xmage_ability_class": "SimpleStaticAbility",
+    }
+
+
 def simple_mana_source_costs_from_phrase(cost_phrase: str) -> dict[str, Any] | None:
     requires_tap = False
     activation_symbols: list[str] = []
@@ -46426,6 +46506,55 @@ def split_row(
                 set(unsupported_auxiliary_abilities),
                 set(non_mana_effect_classes),
             )
+            chosen_color_static_oracle = chosen_color_controlled_pt_component_from_oracle(metadata)
+            chosen_color_static_source = chosen_color_controlled_pt_component_from_source(source_text)
+            if isinstance(chosen_color_static_oracle, str):
+                return None, chosen_color_static_oracle
+            if isinstance(chosen_color_static_source, str):
+                return None, chosen_color_static_source
+            if chosen_color_static_oracle is not None or chosen_color_static_source is not None:
+                if chosen_color_static_oracle is None:
+                    return None, "chosen_color_controlled_pt_oracle_not_exact"
+                if chosen_color_static_source is None:
+                    return None, "chosen_color_controlled_pt_source_not_exact"
+                if chosen_color_static_oracle != chosen_color_static_source:
+                    return None, "chosen_color_controlled_pt_source_oracle_mismatch"
+                expected_unmodeled_effects = {"HeraldicBannerEffect"}
+                expected_auxiliary_abilities = {"AsEntersBattlefieldAbility", "SimpleStaticAbility"}
+                if not expected_unmodeled_effects.issubset(set(non_mana_effect_classes)):
+                    return None, "chosen_color_controlled_pt_effect_class_missing"
+                if not expected_auxiliary_abilities.issubset(set(auxiliary_abilities)):
+                    return None, "chosen_color_controlled_pt_ability_class_missing"
+                remaining_effect_classes = sorted(set(non_mana_effect_classes) - expected_unmodeled_effects)
+                remaining_auxiliary_abilities = sorted(set(unsupported_auxiliary_abilities) - {"SimpleStaticAbility"})
+                if remaining_effect_classes or remaining_auxiliary_abilities:
+                    return None, "chosen_color_controlled_pt_extra_auxiliary_not_supported"
+                effect_json = {
+                    "effect": "ramp_permanent",
+                    "battle_model_scope": MANA_SCOPE,
+                    "is_mana_source": True,
+                    "mana_produced": int(mana_source_detail["mana_produced"]),
+                    "produces": str(mana_source_detail["produces"]),
+                    "activation_requires_tap": mana_requires_tap,
+                    "mana_activation_requires_tap": mana_requires_tap,
+                    "permanent_type": permanent_type,
+                    "ability_kind": "activated_mana_and_static",
+                    "_composite_rule_components": [chosen_color_static_source],
+                    "xmage_mana_ability_classes": sorted(
+                        mana_ability_classes & SAFE_MANA_ABILITY_CLASSES
+                    ),
+                    "xmage_auxiliary_ability_classes": sorted(auxiliary_abilities),
+                    "xmage_effect_classes": sorted(classes),
+                    "xmage_ability_classes": sorted(mana_ability_classes),
+                    "modeled_ability_subset": "mana_source_and_chosen_color_static_boost",
+                }
+                add_mana_source_activation_detail_fields(effect_json, mana_source_detail)
+                return build_proposal(
+                    row,
+                    metadata,
+                    effect_json,
+                    family_id="xmage_chosen_color_mana_source_static_controlled_pt_boost",
+                ), "selected_exact_scope"
             if static_info_texts:
                 effect_json = {
                     "effect": "ramp_permanent",

@@ -46928,6 +46928,64 @@ def move_zero_toughness_graveyard_count_creature_to_graveyard(
     return True
 
 
+def _chosen_color_for_static_source(source, controller=None):
+    if not isinstance(source, dict):
+        return ""
+    existing = _normalize_color_symbol(source.get("chosen_color"))
+    if existing in {"white", "blue", "black", "red", "green"}:
+        return existing
+    candidates = []
+    modes = _read_conditional_mana_modes(source)
+    for mode in modes:
+        color = _normalize_color_symbol(mode.get("color") or mode.get("mana") or mode.get("produces"))
+        if color in {"white", "blue", "black", "red", "green"} and color not in candidates:
+            candidates.append(color)
+    if not candidates:
+        for symbol in source.get("produced_mana_symbols") or []:
+            color = _normalize_color_symbol(symbol)
+            if color in {"white", "blue", "black", "red", "green"} and color not in candidates:
+                candidates.append(color)
+    if not candidates and source.get("chosen_color_mana"):
+        candidates = ["white", "blue", "black", "red", "green"]
+    if not candidates:
+        return ""
+    scores = {color: 0 for color in candidates}
+    for permanent in getattr(controller, "battlefield", []) or []:
+        if not isinstance(permanent, dict) or permanent is source or not is_battlefield_creature(permanent):
+            continue
+        for color in candidates:
+            if card_has_color(permanent, color):
+                scores[color] += 1
+    chosen = max(candidates, key=lambda color: (scores.get(color, 0), -candidates.index(color)))
+    source["chosen_color"] = chosen
+    parent = source.get("_parent_static_source")
+    if isinstance(parent, dict):
+        parent["chosen_color"] = chosen
+    return chosen
+
+
+def _controlled_static_power_toughness_component(parent, component):
+    if not isinstance(parent, dict) or not isinstance(component, dict):
+        return None
+    if (
+        component.get("battle_model_scope") != STATIC_CONTROLLED_POWER_TOUGHNESS_SCOPE
+        or component.get("static_effect") != "controlled_power_toughness_boost"
+    ):
+        return None
+    merged = dict(component)
+    merged.setdefault("name", parent.get("name", "?"))
+    merged.setdefault("_rule_logical_key", parent.get("_rule_logical_key"))
+    merged.setdefault("_rule_source", parent.get("_rule_source"))
+    merged.setdefault("_rule_review_status", parent.get("_rule_review_status"))
+    merged.setdefault("chosen_color", parent.get("chosen_color"))
+    merged.setdefault("chosen_color_mana", parent.get("chosen_color_mana"))
+    merged.setdefault("conditional_mana_modes", parent.get("conditional_mana_modes"))
+    merged.setdefault("conditional_mana_same_color_choice", parent.get("conditional_mana_same_color_choice"))
+    merged.setdefault("produced_mana_symbols", parent.get("produced_mana_symbols"))
+    merged["_parent_static_source"] = parent
+    return merged
+
+
 def controlled_static_power_toughness_sources(controller):
     sources = []
     for source in getattr(controller, "battlefield", []) or []:
@@ -46938,10 +46996,14 @@ def controlled_static_power_toughness_sources(controller):
             and source.get("static_effect") == "controlled_power_toughness_boost"
         ):
             sources.append(source)
+        for component in source.get("_composite_rule_components") or []:
+            component_source = _controlled_static_power_toughness_component(source, component)
+            if component_source is not None:
+                sources.append(component_source)
     return sources
 
 
-def static_controlled_power_toughness_applies_to(permanent, source, effect_data):
+def static_controlled_power_toughness_applies_to(permanent, source, effect_data, controller=None):
     if not isinstance(permanent, dict) or not isinstance(effect_data, dict):
         return False
     if not is_battlefield_creature(permanent):
@@ -46970,6 +47032,11 @@ def static_controlled_power_toughness_applies_to(permanent, source, effect_data)
         for value in effect_data.get("static_required_colors", []) or []
         if str(value).strip()
     }
+    if effect_data.get("static_required_chosen_color"):
+        chosen_color = _chosen_color_for_static_source(source, controller)
+        if not chosen_color:
+            return False
+        required_colors.add(chosen_color)
     if required_colors and not any(card_has_color(permanent, color) for color in required_colors):
         return False
     combat_state = str(effect_data.get("static_required_combat_state") or "").strip().lower()
@@ -47000,7 +47067,7 @@ def static_controlled_power_toughness_bonus_for_permanent(
     source_names = []
     source_keys = []
     for source in sources if sources is not None else controlled_static_power_toughness_sources(controller):
-        if not static_controlled_power_toughness_applies_to(permanent, source, source):
+        if not static_controlled_power_toughness_applies_to(permanent, source, source, controller):
             continue
         power_bonus += _static_pt_int(source.get("static_power_bonus"), default=0)
         toughness_bonus += _static_pt_int(source.get("static_toughness_bonus"), default=0)
