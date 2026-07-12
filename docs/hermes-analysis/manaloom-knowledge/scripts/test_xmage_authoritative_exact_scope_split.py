@@ -4716,7 +4716,7 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertEqual(effect["static_toughness_bonus"], 2)
         self.assertIn("deathtouch", effect["keywords"])
 
-    def test_static_graveyard_threshold_boost_blocks_opponent_graveyard_count(self) -> None:
+    def test_static_graveyard_threshold_boost_opponent_graveyard_count_is_package_safe(self) -> None:
         row = queue_row(
             split.RECURSION_UNIT,
             effect_classes=["BoostSourceEffect", "ConditionalContinuousEffect"],
@@ -4742,8 +4742,15 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
             ),
         )
 
-        self.assertIsNone(proposal)
-        self.assertEqual(reason, "static_graveyard_threshold_boost_oracle_not_exact")
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.STATIC_GRAVEYARD_THRESHOLD_BOOST_SCOPE)
+        self.assertEqual(effect["graveyard_count_scope"], "opponents_graveyards")
+        self.assertEqual(effect["graveyard_count_card_types"], ["card"])
+        self.assertEqual(effect["graveyard_count_threshold"], 10)
+        self.assertEqual(effect["static_power_bonus"], 4)
+        self.assertEqual(effect["static_toughness_bonus"], 4)
+        self.assertIn("flying", effect["keywords"])
 
     def test_static_graveyard_count_boost_controller_creatures_is_package_safe(self) -> None:
         row = queue_row(

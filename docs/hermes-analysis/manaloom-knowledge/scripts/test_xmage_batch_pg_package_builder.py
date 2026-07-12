@@ -849,6 +849,35 @@ def test_static_graveyard_threshold_distinct_card_types_fields_and_execution_sce
     }
 
 
+def test_static_graveyard_threshold_opponents_graveyard_execution_scenario_is_manifested() -> None:
+    proposal = {
+        "normalized_name": "jace's phantasm",
+        "card_name": "Jace's Phantasm",
+        "oracle_hash": "hash-jace",
+        "logical_rule_key": "battle_rule_v1:jace",
+        "effect_json": {
+            "effect": "creature",
+            "battle_model_scope": "xmage_static_source_boost_if_graveyard_threshold_v1",
+            "static_effect": "source_power_toughness_boost_if_graveyard_count",
+            "graveyard_count_scope": "opponents_graveyards",
+            "graveyard_count_card_types": ["card"],
+            "graveyard_count_threshold": 10,
+            "static_power_bonus": 4,
+            "static_toughness_bonus": 4,
+        },
+    }
+
+    expected = builder.expected_rule_from_proposal(proposal)
+    scenario = builder.execution_scenario_from_expected_rule(expected)
+
+    assert scenario["type"] == "static_graveyard_threshold_source_boost"
+    assert scenario["controller_graveyard"] == []
+    assert len(scenario["opponent_graveyard"]) == 10
+    assert scenario["expected_count"] == 10
+    assert scenario["expected_power"] == 5
+    assert scenario["expected_toughness"] == 5
+
+
 def test_creature_etb_draw_discard_execution_scenario_is_manifested() -> None:
     proposal = {
         "normalized_name": "bazaar trademage",

@@ -11885,6 +11885,25 @@ def static_graveyard_threshold_boost_from_oracle(metadata: dict[str, Any]) -> di
             "static_power_bonus": power_bonus,
             "static_toughness_bonus": toughness_bonus,
         }
+    opponent_match = re.match(
+        r"^(?:this creature|[a-z0-9' ,./-]+) gets (?P<power>[+-]\d+)/(?P<toughness>[+-]\d+) "
+        r"as long as an opponent has (?P<threshold>\d+|one|two|three|four|five|six|seven|eight|nine|ten) "
+        r"or more cards in their graveyard\.?$",
+        text,
+    )
+    if opponent_match:
+        threshold = static_graveyard_threshold_int(opponent_match.group("threshold"))
+        power_bonus = signed_int_from_oracle(opponent_match.group("power"))
+        toughness_bonus = signed_int_from_oracle(opponent_match.group("toughness"))
+        if threshold is None or power_bonus is None or toughness_bonus is None:
+            return None
+        return {
+            "graveyard_count_scope": "opponents_graveyards",
+            "graveyard_count_card_types": ["card"],
+            "graveyard_count_threshold": threshold,
+            "static_power_bonus": power_bonus,
+            "static_toughness_bonus": toughness_bonus,
+        }
     match = re.match(
         r"^this creature gets (?P<power>[+-]\d+)/(?P<toughness>[+-]\d+) as long as "
         r"(?:there are (?P<threshold_a>\d+|one|two|three|four|five|six|seven|eight|nine|ten) "
@@ -11925,23 +11944,26 @@ def static_graveyard_threshold_boost_from_source(source: str) -> dict[str, Any] 
     if "ThresholdCondition.instance" in text:
         threshold = 7
         card_types = ["card"]
+        scope = "controller_graveyard"
     elif "DescendCondition.FOUR" in text:
         threshold = 4
         card_types = ["permanent"]
+        scope = "controller_graveyard"
     elif "DeliriumCondition" in text:
         threshold = 4
         card_types = ["card_type"]
         count_mode = "distinct_card_types"
-    elif (
-        "LessonsInGraveCondition" in text
-        or "CardsInOpponentGraveyardCondition" in text
-        or "DifferentManaValuesInGraveCondition" in text
-    ):
+        scope = "controller_graveyard"
+    elif "CardsInOpponentGraveyardCondition.TEN" in text:
+        threshold = 10
+        card_types = ["card"]
+        scope = "opponents_graveyards"
+    elif "LessonsInGraveCondition" in text or "DifferentManaValuesInGraveCondition" in text:
         return "static_graveyard_threshold_boost_source_condition_not_supported"
     else:
         return "static_graveyard_threshold_boost_source_condition_not_supported"
     return {
-        "graveyard_count_scope": "controller_graveyard",
+        "graveyard_count_scope": scope,
         "graveyard_count_card_types": card_types,
         **({"graveyard_count_mode": count_mode} if "count_mode" in locals() else {}),
         "graveyard_count_threshold": threshold,

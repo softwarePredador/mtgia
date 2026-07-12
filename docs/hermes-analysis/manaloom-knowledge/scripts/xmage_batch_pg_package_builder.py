@@ -2185,8 +2185,10 @@ def static_graveyard_threshold_boost_execution_scenario_from_expected_rule(
     base_power = 1
     base_toughness = 1
     count_mode = str(required.get("graveyard_count_mode") or "").strip().lower()
+    scope = str(required.get("graveyard_count_scope") or "controller_graveyard").strip().lower()
     card_types = [str(value).lower() for value in required.get("graveyard_count_card_types") or ["card"]]
     threshold = int(required.get("graveyard_count_threshold") or 0)
+    opponent_graveyard: list[dict[str, Any]] = []
     if count_mode == "distinct_card_types":
         controller_graveyard = [
             {"name": "E2E Graveyard Creature", "type_line": "Creature"},
@@ -2209,6 +2211,9 @@ def static_graveyard_threshold_boost_execution_scenario_from_expected_rule(
             {"name": f"E2E Graveyard Card {index}", "type_line": "Instant"}
             for index in range(1, expected_count + 1)
         ]
+        if scope == "opponents_graveyards":
+            opponent_graveyard = controller_graveyard
+            controller_graveyard = []
 
     return {
         "name": f"{rule['card_name']} graveyard threshold boost applies",
@@ -2220,6 +2225,7 @@ def static_graveyard_threshold_boost_execution_scenario_from_expected_rule(
             "toughness": base_toughness,
         },
         "controller_graveyard": controller_graveyard,
+        **({"opponent_graveyard": opponent_graveyard} if opponent_graveyard else {}),
         "expected_count": expected_count,
         "expected_active": True,
         "expected_power": base_power + int(required.get("static_power_bonus") or 0),

@@ -2872,6 +2872,62 @@ class XMageExactScopeRuntimeTest(unittest.TestCase):
         self.assertEqual(capybara["power"], 6)
         self.assertEqual(capybara["toughness"], 2)
 
+    def test_static_graveyard_threshold_source_boost_counts_opponents_graveyards(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        opponent = self.battle.Player("Opponent", None, [])
+        opponent.graveyard = [
+            {"name": f"Opponent Card {idx}", "type_line": "Sorcery"}
+            for idx in range(9)
+        ]
+        phantasm = {
+            "name": "Jace's Phantasm",
+            "type_line": "Creature - Illusion",
+            "effect": "creature",
+            "power": 1,
+            "toughness": 1,
+            "battle_model_scope": "xmage_static_source_boost_if_graveyard_threshold_v1",
+            "static_effect": "source_power_toughness_boost_if_graveyard_count",
+            "graveyard_count_scope": "opponents_graveyards",
+            "graveyard_count_card_types": ["card"],
+            "graveyard_count_threshold": 10,
+            "static_power_bonus": 4,
+            "static_toughness_bonus": 4,
+        }
+        active.battlefield = [phantasm]
+
+        self.battle.refresh_graveyard_count_creature_statics_for_player(
+            active,
+            turn=2,
+            phase="test",
+            all_players=[active, opponent],
+        )
+        self.assertFalse(phantasm["_static_graveyard_threshold_active"])
+        self.assertEqual(phantasm["power"], 1)
+        self.assertEqual(phantasm["toughness"], 1)
+
+        opponent.graveyard.append({"name": "Opponent Card 10", "type_line": "Instant"})
+        self.battle.refresh_graveyard_count_creature_statics_for_player(
+            active,
+            turn=3,
+            phase="test",
+            emit_events=True,
+            all_players=[active, opponent],
+        )
+
+        self.assertTrue(phantasm["_static_graveyard_threshold_active"])
+        self.assertEqual(phantasm["static_graveyard_threshold_count_current"], 10)
+        self.assertEqual(phantasm["power"], 5)
+        self.assertEqual(phantasm["toughness"], 5)
+        self.assertTrue(
+            any(
+                event == "static_graveyard_threshold_source_boost_changed"
+                and data.get("card") == "Jace's Phantasm"
+                and data.get("graveyard_count_scope") == "opponents_graveyards"
+                and data.get("active") is True
+                for event, data in self.events
+            )
+        )
+
     def test_static_graveyard_threshold_source_boost_counts_distinct_card_types_for_delirium(self) -> None:
         active = self.battle.Player("Active", None, [])
         active.graveyard = [

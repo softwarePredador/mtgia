@@ -46642,7 +46642,13 @@ def static_graveyard_threshold_boost_count(permanent, controller, all_players=No
     ):
         return None
     scope = str(permanent.get("graveyard_count_scope") or "controller_graveyard")
-    if scope == "all_graveyards":
+    if scope == "opponents_graveyards":
+        participants = [
+            player
+            for player in (all_players or [])
+            if player is not None and (controller is None or id(player) != id(controller))
+        ]
+    elif scope == "all_graveyards":
         participants = [player for player in (all_players or []) if player is not None]
         if controller is not None and all(id(player) != id(controller) for player in participants):
             participants.insert(0, controller)
