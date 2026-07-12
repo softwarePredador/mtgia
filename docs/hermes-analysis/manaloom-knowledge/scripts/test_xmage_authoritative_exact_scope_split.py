@@ -11220,6 +11220,46 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertEqual(effect["target"], "creature_or_planeswalker")
         self.assertEqual(effect["target_constraints"], {"card_types": ["creature", "planeswalker"]})
 
+    def test_fixed_damage_exile_if_dies_spell_maps_carbonize_effect(self) -> None:
+        row = queue_row(
+            split.DAMAGE_UNIT,
+            effect_classes=[
+                "CantRegenerateTargetEffect",
+                "CarbonizeEffect",
+                "DamageTargetEffect",
+                "DiesReplacementEffect",
+                "OneShotEffect",
+            ],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Carbonize",
+                type_line="Instant",
+                oracle_text=(
+                    "Carbonize deals 3 damage to any target. If it's a creature, it can't be regenerated "
+                    "this turn, and if it would die this turn, exile it instead."
+                ),
+            ),
+            source_text=(
+                "this.getSpellAbility().addEffect(new DamageTargetEffect(3));"
+                "this.getSpellAbility().addEffect(new CarbonizeEffect());"
+                "this.getSpellAbility().addTarget(new TargetAnyTarget());"
+                "game.addEffect(new CantRegenerateTargetEffect(Duration.EndOfTurn, \"\")"
+                ".setTargetPointer(new FixedTarget(permanent, game)), source);"
+                "game.addEffect(new DiesReplacementEffect(new MageObjectReference(permanent, game), "
+                "Duration.EndOfTurn), source);"
+            ),
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.DAMAGE_EXILE_IF_DIES_SCOPE)
+        self.assertEqual(effect["amount"], 3)
+        self.assertEqual(effect["target"], "any_target")
+        self.assertTrue(effect["exile_if_dies_from_damage"])
+        self.assertIn("CarbonizeEffect", effect["xmage_effect_classes"])
+
     def test_fixed_damage_exile_if_dies_spell_blocks_additional_cost(self) -> None:
         row = queue_row(split.DAMAGE_UNIT, effect_classes=["DamageTargetEffect", "ExileTargetIfDiesEffect"])
         proposal, reason = split.split_row(

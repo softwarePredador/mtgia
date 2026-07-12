@@ -2777,6 +2777,35 @@ def test_manifest_builds_fixed_damage_target_spell_execution_scenario() -> None:
     assert scenario["nonmatching_target"]["colors"] == ["B"]
 
 
+def test_manifest_builds_fixed_damage_exile_if_dies_spell_execution_scenario() -> None:
+    proposal = {
+        "normalized_name": "carbonize",
+        "card_name": "Carbonize",
+        "oracle_hash": "hash-carbonize",
+        "logical_rule_key": "battle_rule_v1:hash-carbonize",
+        "effect_json": {
+            "effect": "direct_damage",
+            "battle_model_scope": "xmage_fixed_damage_target_exile_if_dies_spell_v1",
+            "amount": 3,
+            "damage": 3,
+            "target": "any_target",
+            "target_constraints": {"scope": "any_target"},
+            "exile_if_dies_from_damage": True,
+            "exile_if_dies_target": "any_target",
+        },
+    }
+
+    rule = builder.expected_rule_from_proposal(proposal)
+    scenario = builder.execution_scenario_from_expected_rule(rule)
+
+    assert scenario is not None
+    assert scenario["type"] == "fixed_damage_target_spell"
+    assert scenario["card"]["name"] == "Carbonize"
+    assert scenario["expected_damage"] == 3
+    assert scenario["expected_exile_if_dies_from_damage"] is True
+    assert scenario["expected_exile_if_dies_target"] == "any_target"
+
+
 def test_manifest_builds_dynamic_composite_damage_target_spell_execution_scenario() -> None:
     proposal = {
         "normalized_name": "road_rage",

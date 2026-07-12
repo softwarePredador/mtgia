@@ -1480,6 +1480,26 @@ def run_damage_gain_life_spell(
             for permanent in opponent.battlefield
         ):
             fail("battle_execution", f"{card['name']} did not remove damaged target {target_name}")
+        expected_exile_if_dies = bool(scenario.get("expected_exile_if_dies_from_damage"))
+        if expected_exile_if_dies:
+            exile_names = [
+                permanent.get("name")
+                for permanent in opponent.exile
+                if isinstance(permanent, dict)
+            ]
+            graveyard_names = [
+                permanent.get("name")
+                for permanent in opponent.graveyard
+                if isinstance(permanent, dict)
+            ]
+            if target_name not in exile_names:
+                fail("battle_execution", f"{card['name']} did not exile damaged target {target_name}")
+            if target_name in graveyard_names:
+                fail("battle_execution", f"{card['name']} put exile-if-dies target {target_name} into graveyard")
+            if damage_event.get("result") != "creature_exiled_by_damage":
+                fail("battle_events", f"{card['name']} damage result={damage_event.get('result')!r}")
+            if damage_event.get("destination") != "exile":
+                fail("battle_events", f"{card['name']} damage destination={damage_event.get('destination')!r}")
         if nonmatching_target and not any(
             isinstance(permanent, dict) and permanent.get("name") == nonmatching_target.get("name")
             for permanent in opponent.battlefield
@@ -1510,6 +1530,7 @@ def run_damage_gain_life_spell(
         "opponent_life": opponent.life,
         "treasures_created": expected_treasure_count,
         "controller_treasures": int(getattr(active, "treasures", 0) or 0),
+        "exile_if_dies_from_damage": bool(scenario.get("expected_exile_if_dies_from_damage")),
         "shuffled_self_into_library": shuffled_self,
         "additional_cost": additional_cost_event.get("cost") if additional_cost_event else None,
     }

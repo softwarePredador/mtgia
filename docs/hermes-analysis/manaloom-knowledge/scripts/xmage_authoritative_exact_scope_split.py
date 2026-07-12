@@ -41181,12 +41181,25 @@ def split_row(
                 return None, "damage_shuffle_exile_if_dies_not_supported"
             damage_classes = {"DamageTargetEffect"}
             damage_shuffle_auxiliary = True
-        if classes == {"DamageTargetEffect", "ExileTargetIfDiesEffect"}:
+        carbonize_style_effect_classes = {
+            "CantRegenerateTargetEffect",
+            "CarbonizeEffect",
+            "DamageTargetEffect",
+            "DiesReplacementEffect",
+            "OneShotEffect",
+        }
+        if classes == {"DamageTargetEffect", "ExileTargetIfDiesEffect"} or classes == carbonize_style_effect_classes:
             if has_additional_cost(source_text) or "additional cost" in oracle_text(metadata):
                 return None, "damage_exile_if_dies_additional_cost_not_supported"
             oracle_lower = oracle_text(metadata).lower()
             if "would die this turn" not in oracle_lower or "exile it instead" not in oracle_lower:
                 return None, "damage_exile_if_dies_oracle_not_exact"
+            if classes == carbonize_style_effect_classes and (
+                "new CarbonizeEffect()" not in source_text
+                or "new CantRegenerateTargetEffect(Duration.EndOfTurn" not in source_text
+                or "new DiesReplacementEffect(new MageObjectReference" not in source_text
+            ):
+                return None, "damage_exile_if_dies_source_not_exact"
             amount = java_constructor_int(source_text, "DamageTargetEffect")
             if amount is None or amount <= 0:
                 return None, "damage_amount_not_fixed"
@@ -41205,7 +41218,7 @@ def split_row(
                 "target_constraints": target_constraints_for(target),
                 "exile_if_dies_from_damage": True,
                 "exile_if_dies_target": target_base,
-                "xmage_effect_classes": ["DamageTargetEffect", "ExileTargetIfDiesEffect"],
+                "xmage_effect_classes": sorted(classes),
                 **flags,
             }
             return build_proposal(

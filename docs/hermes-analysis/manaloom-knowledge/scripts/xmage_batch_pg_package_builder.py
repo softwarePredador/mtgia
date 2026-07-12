@@ -5804,6 +5804,7 @@ def fixed_damage_target_spell_execution_scenario_from_expected_rule(
     scope = str(required.get("battle_model_scope") or "")
     if scope not in {
         "xmage_fixed_damage_target_spell_v1",
+        "xmage_fixed_damage_target_exile_if_dies_spell_v1",
         "xmage_conditional_fixed_damage_target_spell_v1",
         "xmage_dynamic_count_damage_spell_v1",
     }:
@@ -5857,6 +5858,8 @@ def fixed_damage_target_spell_execution_scenario_from_expected_rule(
         "expected_cant_be_countered": bool(required.get("cant_be_countered")),
         "expected_target": required.get("target"),
         "expected_target_constraints": target_constraints,
+        "expected_exile_if_dies_from_damage": bool(required.get("exile_if_dies_from_damage")),
+        "expected_exile_if_dies_target": required.get("exile_if_dies_target"),
         "controller_life": 10,
         "opponent_life": max(20, damage + 5),
         **dynamic_fixture,

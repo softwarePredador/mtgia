@@ -1,0 +1,136 @@
+{
+  "apply_gate": "Do not run apply SQL without explicit approval for the exact command.",
+  "backup_table": "manaloom_deploy_audit.pg811_damage_exile_if_dies_carbonize_new_20260712_064250",
+  "deploy_id": "PG811",
+  "execution_scenarios": [
+    {
+      "card": {
+        "name": "Carbonize",
+        "type_line": "Instant"
+      },
+      "controller_life": 10,
+      "expected_cant_be_countered": false,
+      "expected_damage": 3,
+      "expected_exile_if_dies_from_damage": true,
+      "expected_exile_if_dies_target": "any_target",
+      "expected_life_gain": 0,
+      "expected_target": "any_target",
+      "expected_target_constraints": {
+        "scope": "any_target"
+      },
+      "logical_rule_key": "battle_rule_v1:7c64b48593863ae35e0422b9bb6a8cc1",
+      "name": "Carbonize deals fixed target damage",
+      "nonmatching_target": null,
+      "opponent_life": 20,
+      "target": {
+        "cmc": 3,
+        "effect": "creature",
+        "name": "E2E Fixed Damage Legal Target",
+        "power": 2,
+        "toughness": 2,
+        "type_line": "Creature - Soldier"
+      },
+      "type": "fixed_damage_target_spell"
+    }
+  ],
+  "expected_rules": [
+    {
+      "card_name": "Carbonize",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:7c64b48593863ae35e0422b9bb6a8cc1",
+      "min_rule_version": 2,
+      "normalized_name": "carbonize",
+      "oracle_hash": "f9d34a2e5dca2ec279e2b55c139c2329",
+      "required_effect_fields": {
+        "amount": 3,
+        "battle_model_scope": "xmage_fixed_damage_target_exile_if_dies_spell_v1",
+        "damage": 3,
+        "effect": "direct_damage",
+        "exile_if_dies_from_damage": true,
+        "exile_if_dies_target": "any_target",
+        "instant": true,
+        "sorcery": false,
+        "target": "any_target",
+        "target_constraints": {
+          "scope": "any_target"
+        },
+        "xmage_effect_classes": [
+          "CantRegenerateTargetEffect",
+          "CarbonizeEffect",
+          "DamageTargetEffect",
+          "DiesReplacementEffect",
+          "OneShotEffect"
+        ]
+      },
+      "review_status": "verified"
+    }
+  ],
+  "family_counts": {
+    "xmage_fixed_damage_exile_if_dies_spell": 1
+  },
+  "files": {
+    "apply": "docs/hermes-analysis/master_optimizer_reports/pg811_damage_exile_if_dies_carbonize_new_server_apply.sql",
+    "manifest": "docs/hermes-analysis/master_optimizer_reports/pg811_damage_exile_if_dies_carbonize_new_server_manifest.json",
+    "package": "docs/hermes-analysis/master_optimizer_reports/pg811_damage_exile_if_dies_carbonize_new_server_package.md",
+    "postcheck": "docs/hermes-analysis/master_optimizer_reports/pg811_damage_exile_if_dies_carbonize_new_server_postcheck.sql",
+    "precheck": "docs/hermes-analysis/master_optimizer_reports/pg811_damage_exile_if_dies_carbonize_new_server_precheck.sql",
+    "rollback": "docs/hermes-analysis/master_optimizer_reports/pg811_damage_exile_if_dies_carbonize_new_server_rollback.sql"
+  },
+  "generated_at": "2026-07-12T06:42:50+00:00",
+  "mutations_performed": [],
+  "runtime_checks": [
+    {
+      "card": {
+        "name": "Carbonize"
+      },
+      "card_name": "Carbonize",
+      "effect": "direct_damage",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:7c64b48593863ae35e0422b9bb6a8cc1",
+      "normalized_name": "carbonize",
+      "required_effect_fields": {
+        "amount": 3,
+        "battle_model_scope": "xmage_fixed_damage_target_exile_if_dies_spell_v1",
+        "damage": 3,
+        "effect": "direct_damage",
+        "exile_if_dies_from_damage": true,
+        "exile_if_dies_target": "any_target",
+        "instant": true,
+        "sorcery": false,
+        "target": "any_target",
+        "target_constraints": {
+          "scope": "any_target"
+        },
+        "xmage_effect_classes": [
+          "CantRegenerateTargetEffect",
+          "CarbonizeEffect",
+          "DamageTargetEffect",
+          "DiesReplacementEffect",
+          "OneShotEffect"
+        ]
+      }
+    }
+  ],
+  "selected_card_names": [
+    "Carbonize"
+  ],
+  "selected_count": 1,
+  "slug": "damage_exile_if_dies_carbonize_new_server",
+  "snapshot_checks": [
+    {
+      "card_name": "Carbonize",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:7c64b48593863ae35e0422b9bb6a8cc1",
+      "min_rule_version": 2,
+      "normalized_name": "carbonize",
+      "oracle_hash": "f9d34a2e5dca2ec279e2b55c139c2329",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_damage_target_exile_if_dies_spell_v1"
+      },
+      "review_status": "verified"
+    }
+  ],
+  "status": "prepared_read_only_pending_apply_approval"
+}
