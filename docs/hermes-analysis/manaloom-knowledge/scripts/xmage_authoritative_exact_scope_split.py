@@ -4082,13 +4082,14 @@ def fixed_damage_draw_from_oracle(metadata: dict[str, Any]) -> tuple[int, int, s
     text = re.sub(r"\s+", " ", strip_parenthetical_reminders(oracle_text(metadata))).strip()
     match = re.match(
         r"^.+ deals (\d+) damage to "
-        r"(any target|target opponent|target player|target creature or planeswalker|target creature)"
+        r"(any target that was dealt damage this turn|any target|target opponent|target player|target creature or planeswalker|target creature)"
         r"\. draw a card\.?$",
         text,
     )
     if not match:
         return None
     target_map = {
+        "any target that was dealt damage this turn": "any_target_damaged_this_turn",
         "any target": "any_target",
         "target opponent": "opponent",
         "target player": "player",
@@ -16124,6 +16125,8 @@ def restricted_target_base(target: str) -> str:
         return "enchantment"
     if target in {"island_or_swamp_opponent_controls", "nonbasic_land", "plains_or_island", "mountain"}:
         return "land"
+    if target == "any_target_damaged_this_turn":
+        return "any_target"
     if target == "creature_or_planeswalker_damaged_this_turn_opponent_controls":
         return "creature_or_planeswalker"
     if target == "spirit_or_enchantment":
@@ -16608,6 +16611,15 @@ def restricted_battlefield_target_from_source(source: str) -> str | None:
         return "creature_damaged_this_turn_opponent_controls"
     if "FILTER_CREATURE_DAMAGED_THIS_TURN" in text:
         return "creature_damaged_this_turn"
+    if (
+        "FilterAnyTarget" in text
+        and (
+            "DamagedThisTurnPredicate" in text
+            or "DamageDoneWatcher" in text
+            or "was dealt damage this turn" in text
+        )
+    ):
+        return "any_target_damaged_this_turn"
     if "ManaValuePredicate(ComparisonType.MORE_THAN, 2)" in text:
         return "creature_mana_value_3_or_greater"
     return None
@@ -29559,6 +29571,8 @@ def target_constraints_for(target: str) -> dict[str, Any]:
         return constraints
     if target == "any_target":
         return {"scope": "any_target"}
+    if target == "any_target_damaged_this_turn":
+        return {"scope": "any_target", "damaged_this_turn": True}
     if target == "attacking_creature":
         return {"card_types": ["creature"], "combat_state": "attacking"}
     if target == "attacking_creature_without_flying":

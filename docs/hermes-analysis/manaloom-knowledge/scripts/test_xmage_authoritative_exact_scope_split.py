@@ -12825,6 +12825,68 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
             ["direct_damage", "draw_cards"],
         )
 
+    def test_fixed_damage_draw_spell_maps_damaged_any_target_constraint(self) -> None:
+        row = queue_row(
+            split.DRAW_UNIT,
+            effect_classes=["DamageTargetEffect", "DrawCardSourceControllerEffect"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Needle Drop",
+                type_line="Instant",
+                oracle_text=(
+                    "Needle Drop deals 1 damage to any target that was dealt damage this turn.\n"
+                    "Draw a card."
+                ),
+            ),
+            source_text=(
+                'private static final FilterPermanentOrPlayer filter = new FilterAnyTarget("any target that was dealt damage this turn");'
+                "filter.getPlayerFilter().add(DamagedThisTurnPredicate.instance);"
+                "filter.getPermanentFilter().add(DamagedThisTurnPredicate.instance);"
+                "this.getSpellAbility().addEffect(new DamageTargetEffect(1));"
+                "this.getSpellAbility().addTarget(new TargetPermanentOrPlayer(filter));"
+                "this.getSpellAbility().addEffect(new DrawCardSourceControllerEffect(1));"
+                "this.getSpellAbility().addWatcher(new DamageDoneWatcher());"
+            ),
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.DAMAGE_DRAW_SCOPE)
+        self.assertEqual(effect["amount"], 1)
+        self.assertEqual(effect["target"], "any_target")
+        self.assertEqual(effect["target_constraints"], {"scope": "any_target", "damaged_this_turn": True})
+        self.assertEqual(
+            effect["_composite_rule_components"][0]["target_constraints"],
+            {"scope": "any_target", "damaged_this_turn": True},
+        )
+
+    def test_fixed_damage_draw_spell_rejects_damaged_any_target_without_source_filter(self) -> None:
+        row = queue_row(
+            split.DRAW_UNIT,
+            effect_classes=["DamageTargetEffect", "DrawCardSourceControllerEffect"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Needle Drop",
+                type_line="Instant",
+                oracle_text=(
+                    "Needle Drop deals 1 damage to any target that was dealt damage this turn.\n"
+                    "Draw a card."
+                ),
+            ),
+            source_text=(
+                "this.getSpellAbility().addEffect(new DamageTargetEffect(1));"
+                "this.getSpellAbility().addTarget(new TargetAnyTarget());"
+                "this.getSpellAbility().addEffect(new DrawCardSourceControllerEffect(1));"
+            ),
+        )
+
+        self.assertIsNone(proposal)
+        self.assertEqual(reason, "damage_draw_target_source_mismatch")
+
     def test_fixed_damage_optional_discard_draw_spell_maps_to_composite_runtime(self) -> None:
         row = queue_row(
             split.DRAW_UNIT,

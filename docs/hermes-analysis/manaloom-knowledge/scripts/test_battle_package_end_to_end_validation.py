@@ -888,6 +888,85 @@ def test_damage_draw_spell_runner_pays_optional_discard_and_draws() -> None:
     assert result["hand"] == ["E2E Damage Draw Card 1"]
 
 
+def test_damage_draw_spell_runner_respects_damaged_this_turn_target_constraint() -> None:
+    battle = validator.load_battle(validator.DEFAULT_BATTLE)
+    events = []
+    previous_handler = battle.REPLAY_EVENT_HANDLER
+    previous_get_card_effect = battle.get_card_effect
+    battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+    battle.get_card_effect = lambda card: {
+        "effect": "composite_resolution",
+        "battle_model_scope": "xmage_fixed_damage_target_and_draw_card_spell_v1",
+        "amount": 1,
+        "damage": 1,
+        "target": "any_target",
+        "target_constraints": {"scope": "any_target", "damaged_this_turn": True},
+        "draw_count": 1,
+        "_composite_rule_components": [
+            {
+                "effect": "direct_damage",
+                "battle_model_scope": "xmage_fixed_damage_target_spell_v1",
+                "amount": 1,
+                "damage": 1,
+                "target": "any_target",
+                "target_constraints": {"scope": "any_target", "damaged_this_turn": True},
+                "compose_on_resolution": True,
+            },
+            {
+                "effect": "draw_cards",
+                "battle_model_scope": "xmage_fixed_source_controller_draw_spell_v1",
+                "count": 1,
+                "compose_on_resolution": True,
+            },
+        ],
+        "_rule_logical_key": "battle_rule_v1:needle-drop-fixture",
+    }
+    try:
+        result = validator.run_damage_draw_spell(
+            battle,
+            {
+                "name": "Needle Drop damages a previously damaged target and draws",
+                "type": "damage_draw_spell",
+                "card": {"name": "Needle Drop", "type_line": "Instant"},
+                "target": {
+                    "name": "E2E Previously Damaged Target",
+                    "type_line": "Creature - Fixture",
+                    "effect": "creature",
+                    "power": 2,
+                    "toughness": 1,
+                    "damaged_this_turn": True,
+                    "was_dealt_damage_this_turn": True,
+                    "damage_marked_this_turn": 1,
+                },
+                "nonmatching_target": {
+                    "name": "E2E Undamaged Decoy",
+                    "type_line": "Creature - Fixture",
+                    "effect": "creature",
+                    "power": 2,
+                    "toughness": 1,
+                    "damaged_this_turn": False,
+                    "was_dealt_damage_this_turn": False,
+                    "damage_marked_this_turn": 0,
+                },
+                "expected_damage": 1,
+                "expected_draw_count": 1,
+                "expected_target_constraints": {"scope": "any_target", "damaged_this_turn": True},
+                "controller_library": [
+                    {"name": "E2E Damage Draw Card 1", "type_line": "Instant", "effect": "draw_cards"},
+                    {"name": "E2E Damage Draw Card 2", "type_line": "Instant", "effect": "draw_cards"},
+                ],
+            },
+            events,
+        )
+    finally:
+        battle.REPLAY_EVENT_HANDLER = previous_handler
+        battle.get_card_effect = previous_get_card_effect
+
+    assert result["damage"] == 1
+    assert result["target"] == "E2E Previously Damaged Target"
+    assert result["cards_drawn"] == 1
+
+
 def test_beginning_end_step_draw_runner_executes_conditioned_draw() -> None:
     battle = validator.load_battle(validator.DEFAULT_BATTLE)
     events = []

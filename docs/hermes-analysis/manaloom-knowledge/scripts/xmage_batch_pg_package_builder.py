@@ -5423,7 +5423,7 @@ def fixed_damage_target_spell_execution_scenario_from_expected_rule(
     if target_constraints.get("scope") in {"player", "player_or_planeswalker", "opponent", "opponent_or_planeswalker"}:
         target = None
         nonmatching_target = None
-    elif target_constraints.get("scope") == "any_target":
+    elif target_constraints.get("scope") == "any_target" and not target_constraints.get("damaged_this_turn"):
         nonmatching_target = None
     scenario = {
         "name": f"{rule['card_name']} deals fixed target damage",
@@ -5687,7 +5687,7 @@ def fixed_damage_draw_spell_execution_scenario_from_expected_rule(
     if target_constraints.get("scope") in {"player", "player_or_planeswalker", "opponent", "opponent_or_planeswalker"}:
         target = None
         nonmatching_target = None
-    elif target_constraints.get("scope") == "any_target":
+    elif target_constraints.get("scope") == "any_target" and not target_constraints.get("damaged_this_turn"):
         nonmatching_target = None
     optional_discard = bool(required.get("optional_discard_draw"))
     scenario = {
@@ -7563,6 +7563,9 @@ def _target_fixture_from_constraints(
             "enchanted",
             "is_enchanted",
             "combat_state",
+            "damaged_this_turn",
+            "was_dealt_damage_this_turn",
+            "dealt_damage_this_turn",
             "tapped_state",
             "tap_state",
         )
@@ -7684,6 +7687,14 @@ def _target_fixture_from_constraints(
         fixture["has_activated_ability_with_tap_cost"] = bool(matching)
     if active_constraints.get("requires_counter") or active_constraints.get("with_counter"):
         fixture["counters"] = {"+1/+1": 1} if matching else {}
+    if (
+        active_constraints.get("damaged_this_turn")
+        or active_constraints.get("was_dealt_damage_this_turn")
+        or active_constraints.get("dealt_damage_this_turn")
+    ):
+        fixture["damaged_this_turn"] = bool(matching)
+        fixture["was_dealt_damage_this_turn"] = bool(matching)
+        fixture["damage_marked_this_turn"] = 1 if matching else 0
     if colors:
         fixture["colors"] = colors
     if active_constraints.get("token"):
