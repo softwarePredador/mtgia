@@ -10417,6 +10417,8 @@ CARD_EFFECT_FIELD_RULE_KEYS = (
     "amount",
     "damage",
     "count",
+    "draw_count",
+    "draw_count_source",
     "discard_count",
     "discard_random",
     "target_player_discard",
@@ -69096,6 +69098,31 @@ def _draw_discard_spell_requested_discard_count(discarded_cards, discard_count, 
     return discard_count
 
 
+def _draw_discard_spell_draw_count(player, opponents, effect_data):
+    source = str(effect_data.get("draw_count_source") or "").strip().lower()
+    if source == "x_value":
+        count = x_value_from_effect_context(effect_data)
+        return count, {
+            "draw_count_source": "x_value",
+            "x_value": count,
+        }
+    if source == "battlefield_permanent_count":
+        count, fields = _battlefield_count_for_stat_modifier(player, opponents, effect_data)
+        if count is None:
+            return 0, {
+                "draw_count_source": "battlefield_permanent_count",
+                **fields,
+            }
+        return count, {
+            "draw_count_source": "battlefield_permanent_count",
+            "battlefield_draw_count": count,
+            "battlefield_count_scope": str(effect_data.get("battlefield_count_scope") or "controller_battlefield").lower(),
+            "battlefield_count_card_types": list(_as_list(effect_data.get("battlefield_count_card_types"))),
+            "battlefield_count_subtypes": list(_as_list(effect_data.get("battlefield_count_subtypes"))),
+        }
+    return max(0, int(effect_data.get("draw_count") or effect_data.get("count") or 0)), {}
+
+
 def resolve_draw_discard_spell(
     player,
     opponents,
@@ -69108,7 +69135,7 @@ def resolve_draw_discard_spell(
     all_players=None,
     stack=None,
 ):
-    draw_count = max(0, int(effect_data.get("draw_count") or effect_data.get("count") or 0))
+    draw_count, draw_count_fields = _draw_discard_spell_draw_count(player, opponents, effect_data)
     discard_count = max(0, int(effect_data.get("discard_count") or 0))
     order = str(effect_data.get("draw_discard_order") or "draw_then_discard")
     random_discard = bool(effect_data.get("discard_random"))
@@ -69175,6 +69202,7 @@ def resolve_draw_discard_spell(
         order=order,
         cards_drawn=len(drawn_cards),
         requested_draw_count=draw_count,
+        **draw_count_fields,
         cards_discarded=len(discarded_cards),
         requested_discard_count=requested_discard_count,
         discard_random=random_discard,

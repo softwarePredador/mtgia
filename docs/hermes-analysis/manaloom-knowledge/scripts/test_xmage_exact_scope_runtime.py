@@ -5743,6 +5743,114 @@ class XMageExactScopeRuntimeTest(unittest.TestCase):
             )
         )
 
+    def test_draw_discard_spell_uses_x_value_draw_count(self) -> None:
+        active = self.battle.Player(
+            "Active",
+            None,
+            [
+                {"name": "Fresh Card A", "cmc": 2},
+                {"name": "Fresh Card B", "cmc": 3},
+                {"name": "Fresh Card C", "cmc": 4},
+            ],
+        )
+        opponent = self.battle.Player("Opponent", None, [])
+        active.hand = [{"name": "Low Value Land", "type_line": "Land", "cmc": 0}]
+        spell = {"name": "Fixture Pull", "type_line": "Instant", "cmc": 2, "x_value": 3}
+        effect_data = {
+            "effect": "draw_cards",
+            "battle_model_scope": "xmage_fixed_draw_discard_spell_v1",
+            "draw_discard_spell": True,
+            "count": 0,
+            "draw_count": 0,
+            "draw_count_source": "x_value",
+            "discard_count": 1,
+            "draw_discard_order": "draw_then_discard",
+        }
+
+        self.battle.apply_effect_immediate(
+            active,
+            [opponent],
+            spell,
+            turn=6,
+            rng=random.Random(6),
+            effect_data_override=effect_data,
+            phase="resolution",
+        )
+
+        self.assertEqual(len(active.hand), 3)
+        self.assertEqual(len(active.library), 0)
+        self.assertTrue(
+            any(
+                event == "draw_discard_spell_resolved"
+                and data.get("card") == "Fixture Pull"
+                and data.get("draw_count_source") == "x_value"
+                and data.get("x_value") == 3
+                and data.get("cards_drawn") == 3
+                and data.get("cards_discarded") == 1
+                for event, data in self.events
+            )
+        )
+
+    def test_draw_discard_spell_counts_controlled_islands(self) -> None:
+        active = self.battle.Player(
+            "Active",
+            None,
+            [
+                {"name": "Fresh Card A", "cmc": 2},
+                {"name": "Fresh Card B", "cmc": 3},
+                {"name": "Fresh Card C", "cmc": 4},
+            ],
+        )
+        opponent = self.battle.Player("Opponent", None, [])
+        active.hand = [
+            {"name": "Low Value Land", "type_line": "Land", "cmc": 0},
+            {"name": "Medium Spell", "type_line": "Instant", "cmc": 2},
+        ]
+        active.battlefield = [
+            {"name": "Island A", "type_line": "Basic Land - Island", "cmc": 0},
+            {"name": "Island B", "type_line": "Basic Land - Island", "cmc": 0},
+            {"name": "Island C", "type_line": "Basic Land - Island", "cmc": 0},
+            {"name": "Mountain A", "type_line": "Basic Land - Mountain", "cmc": 0},
+        ]
+        spell = {"name": "Fixture Flow", "type_line": "Instant", "cmc": 5}
+        effect_data = {
+            "effect": "draw_cards",
+            "battle_model_scope": "xmage_fixed_draw_discard_spell_v1",
+            "draw_discard_spell": True,
+            "count": 0,
+            "draw_count": 0,
+            "draw_count_source": "battlefield_permanent_count",
+            "battlefield_count_scope": "controller_battlefield",
+            "battlefield_count_card_types": ["land"],
+            "battlefield_count_subtypes": ["island"],
+            "discard_count": 2,
+            "draw_discard_order": "draw_then_discard",
+        }
+
+        self.battle.apply_effect_immediate(
+            active,
+            [opponent],
+            spell,
+            turn=7,
+            rng=random.Random(7),
+            effect_data_override=effect_data,
+            phase="resolution",
+        )
+
+        self.assertEqual(len(active.hand), 3)
+        self.assertEqual(len(active.library), 0)
+        self.assertTrue(
+            any(
+                event == "draw_discard_spell_resolved"
+                and data.get("card") == "Fixture Flow"
+                and data.get("draw_count_source") == "battlefield_permanent_count"
+                and data.get("battlefield_draw_count") == 3
+                and data.get("cards_drawn") == 3
+                and data.get("cards_discarded") == 2
+                for event, data in self.events
+            )
+        )
+
     def test_draw_lose_life_spell_draws_then_loses_life(self) -> None:
         active = self.battle.Player(
             "Active",

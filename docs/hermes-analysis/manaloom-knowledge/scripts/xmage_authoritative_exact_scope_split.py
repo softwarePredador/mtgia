@@ -18287,6 +18287,43 @@ def draw_discard_unless_filter_from_source(source: str) -> dict[str, Any] | str 
 def fixed_draw_discard_spell_from_oracle(metadata: dict[str, Any]) -> dict[str, Any] | str:
     text = re.sub(r"\s+", " ", oracle_text(metadata)).strip().lower()
     number_pattern = r"(?:a|one|two|three|four|five|\d+)"
+    if "colors of mana spent to cast" in text:
+        return "draw_discard_spell_dynamic_oracle_mana_spent_colors_not_supported"
+    draw_x_then_discard = re.fullmatch(
+        rf"draw x cards?, then discard (?P<discard>{number_pattern}) cards?\.?",
+        text,
+    )
+    if draw_x_then_discard:
+        discard_count = number_word_to_int(draw_x_then_discard.group("discard"))
+        if discard_count <= 0:
+            return "draw_discard_spell_oracle_count_not_fixed"
+        return {
+            "draw_count": 0,
+            "draw_count_source": "x_value",
+            "discard_count": discard_count,
+            "draw_discard_order": "draw_then_discard",
+            "discard_random": False,
+        }
+    draw_for_each_subtype_then_discard = re.fullmatch(
+        rf"draw a card for each (?P<subtype>[a-z]+) you control, then discard (?P<discard>{number_pattern}) cards?\.?",
+        text,
+    )
+    if draw_for_each_subtype_then_discard:
+        subtype = draw_for_each_subtype_then_discard.group("subtype").strip().lower()
+        discard_count = number_word_to_int(draw_for_each_subtype_then_discard.group("discard"))
+        basic_land_subtypes = {"plains", "island", "swamp", "mountain", "forest", "desert"}
+        if discard_count <= 0 or subtype not in basic_land_subtypes:
+            return "draw_discard_spell_oracle_count_not_fixed"
+        return {
+            "draw_count": 0,
+            "draw_count_source": "battlefield_permanent_count",
+            "battlefield_count_scope": "controller_battlefield",
+            "battlefield_count_card_types": ["land"],
+            "battlefield_count_subtypes": [subtype],
+            "discard_count": discard_count,
+            "draw_discard_order": "draw_then_discard",
+            "discard_random": False,
+        }
     draw_then_discard_unless = re.fullmatch(
         rf"draw (?P<draw>{number_pattern}) cards?\. then discard (?P<discard>{number_pattern}) cards? unless you discard (?:a|an) (?P<filter>basic land|artifact|creature|enchantment) card\.?",
         text,
@@ -23430,7 +23467,53 @@ def fixed_draw_discard_spell_from_source(source: str, classes: set[str]) -> dict
             "DrawCardSourceControllerEffect",
             noarg_default=1,
         )
-        if draw_count is None or draw_count <= 0:
+        dynamic_draw_fields: dict[str, Any] = {}
+        if draw_count is None:
+            draw_args = extract_constructor_args(text, "DrawCardSourceControllerEffect") or ""
+            if "ColorsOfManaSpentToCastCount" in draw_args or "ColorsOfManaSpentToCastCount" in text:
+                return "draw_discard_spell_dynamic_source_mana_spent_colors_not_supported"
+            if "GetXValue" in draw_args:
+                draw_count = 0
+                dynamic_draw_fields = {"draw_count_source": "x_value"}
+            elif "PermanentsOnBattlefieldCount" in draw_args:
+                filter_ref = (split_top_level_args(extract_constructor_args(draw_args, "PermanentsOnBattlefieldCount") or "") or [""])[0].strip()
+                declared_subtype = None
+                if filter_ref and re.fullmatch(r"[A-Za-z_][A-Za-z0-9_]*", filter_ref):
+                    declared_match = re.search(
+                        rf"\b{re.escape(filter_ref)}\s*=\s*new\s+FilterControlledPermanent\s*\(\s*SubType\.([A-Z_]+)\s*\)",
+                        text,
+                    )
+                    if declared_match:
+                        declared_subtype = declared_match.group(1).lower()
+                count_spec = _source_count_spec_from_permanents_on_battlefield(
+                    text,
+                    draw_args,
+                )
+                if count_spec is None and declared_subtype:
+                    basic_land_subtypes = {"plains", "island", "swamp", "mountain", "forest", "desert"}
+                    count_spec = {
+                        "damage_amount_source": "battlefield_permanent_count",
+                        "battlefield_count_scope": "controller_battlefield",
+                        "battlefield_count_subtypes": [declared_subtype],
+                    }
+                    if declared_subtype in basic_land_subtypes:
+                        count_spec["battlefield_count_card_types"] = ["land"]
+                if isinstance(count_spec, str):
+                    return count_spec.replace("dynamic_count_damage", "draw_discard_spell_dynamic")
+                if not isinstance(count_spec, dict) or count_spec.get("damage_amount_source") != "battlefield_permanent_count":
+                    return "draw_discard_spell_dynamic_source_count_not_supported"
+                draw_count = 0
+                dynamic_draw_fields = {
+                    "draw_count_source": "battlefield_permanent_count",
+                    **{
+                        key: value
+                        for key, value in count_spec.items()
+                        if key.startswith("battlefield_count_")
+                    },
+                }
+            else:
+                return "draw_discard_spell_source_count_not_fixed"
+        if draw_count < 0 or (draw_count == 0 and not dynamic_draw_fields):
             return "draw_discard_spell_source_count_not_fixed"
         discard_detail = discard_controller_spell_count_from_source(text)
         if isinstance(discard_detail, str):
@@ -23447,6 +23530,7 @@ def fixed_draw_discard_spell_from_source(source: str, classes: set[str]) -> dict
             "draw_discard_order": order,
             "discard_random": random_discard,
             "xmage_effect_classes": ["DrawCardSourceControllerEffect", "DiscardControllerEffect"],
+            **dynamic_draw_fields,
         }
     return "draw_discard_spell_source_effect_class_not_supported"
 
@@ -41701,6 +41785,10 @@ def split_row(
                 return None, source_draw_discard
             comparison_keys = (
                 "draw_count",
+                "draw_count_source",
+                "battlefield_count_scope",
+                "battlefield_count_card_types",
+                "battlefield_count_subtypes",
                 "discard_count",
                 "draw_discard_order",
                 "discard_random",
@@ -41728,6 +41816,10 @@ def split_row(
                 **flags,
             }
             for optional_key in (
+                "draw_count_source",
+                "battlefield_count_scope",
+                "battlefield_count_card_types",
+                "battlefield_count_subtypes",
                 "discard_unless_status",
                 "discard_unless_filter",
                 "discard_unless_count",

@@ -14553,6 +14553,11 @@ def run_fixed_draw_discard_spell(
         for hand_card in (scenario.get("controller_hand") or [])
         if isinstance(hand_card, dict)
     ]
+    active.battlefield = [
+        battle.enrich_card(dict(permanent))
+        for permanent in (scenario.get("controller_battlefield") or [])
+        if isinstance(permanent, dict)
+    ]
     starting_hand_count = len(active.hand)
     starting_library_count = len(active.library)
     expected_draw_count = int(
@@ -14606,6 +14611,12 @@ def run_fixed_draw_discard_spell(
         fail(
             "battle_events",
             f"{card['name']} discard_random={event.get('discard_random')!r}, expected {expected_discard_random!r}",
+        )
+    expected_draw_count_source = str(scenario.get("expected_draw_count_source") or "").strip()
+    if expected_draw_count_source and str(event.get("draw_count_source") or "") != expected_draw_count_source:
+        fail(
+            "battle_events",
+            f"{card['name']} draw_count_source={event.get('draw_count_source')!r}, expected {expected_draw_count_source!r}",
         )
     return {
         "scenario": scenario.get("name"),

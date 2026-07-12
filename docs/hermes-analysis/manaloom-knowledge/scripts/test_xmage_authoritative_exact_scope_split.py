@@ -8814,7 +8814,86 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         )
 
         self.assertIsNone(proposal)
-        self.assertEqual(reason, "draw_discard_spell_source_count_not_fixed")
+        self.assertEqual(reason, "draw_discard_spell_source_oracle_mismatch")
+
+    def test_dynamic_x_draw_discard_spell_maps_pull_from_tomorrow(self) -> None:
+        row = queue_row(
+            split.DRAW_UNIT,
+            effect_classes=["DiscardControllerEffect", "DrawCardSourceControllerEffect"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(name="Pull from Tomorrow", oracle_text="Draw X cards, then discard a card."),
+            source_text=(
+                "getSpellAbility().addEffect(new DrawCardSourceControllerEffect(GetXValue.instance));"
+                "Effect effect = new DiscardControllerEffect(1);"
+                "getSpellAbility().addEffect(effect);"
+            ),
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.DRAW_DISCARD_SPELL_SCOPE)
+        self.assertEqual(effect["draw_count"], 0)
+        self.assertEqual(effect["count"], 0)
+        self.assertEqual(effect["draw_count_source"], "x_value")
+        self.assertEqual(effect["discard_count"], 1)
+        self.assertEqual(effect["draw_discard_order"], "draw_then_discard")
+
+    def test_dynamic_battlefield_count_draw_discard_spell_maps_flow_of_knowledge(self) -> None:
+        row = queue_row(
+            split.DRAW_UNIT,
+            effect_classes=["DiscardControllerEffect", "DrawCardSourceControllerEffect"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Flow of Knowledge",
+                oracle_text="Draw a card for each Island you control, then discard two cards.",
+            ),
+            source_text=(
+                "private static final FilterControlledPermanent filter = "
+                "new FilterControlledPermanent(SubType.ISLAND);"
+                "this.getSpellAbility().addEffect(new DrawCardSourceControllerEffect("
+                "new PermanentsOnBattlefieldCount(filter)));"
+                "this.getSpellAbility().addEffect(new DiscardControllerEffect(2).concatBy(\", then\"));"
+            ),
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.DRAW_DISCARD_SPELL_SCOPE)
+        self.assertEqual(effect["draw_count"], 0)
+        self.assertEqual(effect["draw_count_source"], "battlefield_permanent_count")
+        self.assertEqual(effect["battlefield_count_scope"], "controller_battlefield")
+        self.assertEqual(effect["battlefield_count_card_types"], ["land"])
+        self.assertEqual(effect["battlefield_count_subtypes"], ["island"])
+        self.assertEqual(effect["discard_count"], 2)
+
+    def test_dynamic_draw_discard_spell_blocks_converge_mana_spent_colors(self) -> None:
+        row = queue_row(
+            split.DRAW_UNIT,
+            effect_classes=["DiscardControllerEffect", "DrawCardSourceControllerEffect"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Brilliant Spectrum",
+                oracle_text=(
+                    "Converge — Draw X cards, where X is the number of colors of mana spent "
+                    "to cast this spell. Then discard two cards."
+                ),
+            ),
+            source_text=(
+                "Effect effect = new DrawCardSourceControllerEffect("
+                "ColorsOfManaSpentToCastCount.getInstance());"
+                "this.getSpellAbility().addEffect(effect);"
+                "this.getSpellAbility().addEffect(new DiscardControllerEffect(2).concatBy(\"Then\"));"
+            ),
+        )
+
+        self.assertIsNone(proposal)
+        self.assertEqual(reason, "draw_discard_spell_dynamic_oracle_mana_spent_colors_not_supported")
 
     def test_fixed_source_controller_draw_spell_accepts_creature_sacrifice_cost(self) -> None:
         row = queue_row(split.DRAW_UNIT, effect_classes=["DrawCardSourceControllerEffect"])

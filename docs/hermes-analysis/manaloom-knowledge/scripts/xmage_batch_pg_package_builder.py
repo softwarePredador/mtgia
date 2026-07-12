@@ -5650,7 +5650,33 @@ def fixed_draw_discard_spell_execution_scenario_from_expected_rule(
     required = dict(rule.get("required_effect_fields") or {})
     if required.get("battle_model_scope") != "xmage_fixed_draw_discard_spell_v1":
         return None
+    draw_count_source = str(required.get("draw_count_source") or "").strip().lower()
+    x_value = 3
+    controller_battlefield: list[dict[str, Any]] = []
     expected_draw_count = int(required.get("draw_count") or required.get("count") or 0)
+    if draw_count_source == "x_value":
+        expected_draw_count = x_value
+    elif draw_count_source == "battlefield_permanent_count":
+        subtypes = [
+            str(value).strip().lower()
+            for value in (required.get("battlefield_count_subtypes") or [])
+            if str(value).strip()
+        ]
+        card_types = [
+            str(value).strip().lower()
+            for value in (required.get("battlefield_count_card_types") or [])
+            if str(value).strip()
+        ]
+        subtype = subtypes[0] if subtypes else "island"
+        type_line = "Basic Land - " + subtype.title() if "land" in card_types or subtype in {"plains", "island", "swamp", "mountain", "forest", "desert"} else subtype.title()
+        controller_battlefield = [
+            {"name": f"E2E Controlled {subtype.title()} {index + 1}", "type_line": type_line, "cmc": 0}
+            for index in range(3)
+        ]
+        controller_battlefield.append({"name": "E2E Nonmatching Mountain", "type_line": "Basic Land - Mountain", "cmc": 0})
+        expected_draw_count = 3
+    elif draw_count_source:
+        return None
     expected_discard_count = int(required.get("discard_count") or 0)
     if expected_draw_count <= 0 or expected_discard_count <= 0:
         return None
@@ -5685,7 +5711,9 @@ def fixed_draw_discard_spell_execution_scenario_from_expected_rule(
         "card": {
             "name": rule["card_name"],
             "type_line": "Instant" if required.get("instant") else "Sorcery",
+            **({"_cast_context": {"x_value": x_value}, "x_value": x_value} if draw_count_source == "x_value" else {}),
         },
+        "controller_battlefield": controller_battlefield,
         "controller_library": [
             {
                 "name": f"E2E Draw Discard Library Card {index + 1}",
@@ -5700,6 +5728,7 @@ def fixed_draw_discard_spell_execution_scenario_from_expected_rule(
         "expected_discard_count": expected_discard_count,
         "expected_discard_random": bool(required.get("discard_random")),
         "expected_draw_discard_order": str(required.get("draw_discard_order") or "draw_then_discard"),
+        **({"expected_draw_count_source": draw_count_source} if draw_count_source else {}),
         "logical_rule_key": rule["logical_rule_key"],
     }
 
