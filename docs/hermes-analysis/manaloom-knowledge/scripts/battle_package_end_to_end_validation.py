@@ -15102,6 +15102,12 @@ def run_fixed_draw_discard_spell(
             "battle_events",
             f"{card['name']} draw_count_source={event.get('draw_count_source')!r}, expected {expected_draw_count_source!r}",
         )
+    expected_discard_count_source = str(scenario.get("expected_discard_count_source") or "").strip()
+    if expected_discard_count_source and str(event.get("discard_count_source") or "") != expected_discard_count_source:
+        fail(
+            "battle_events",
+            f"{card['name']} discard_count_source={event.get('discard_count_source')!r}, expected {expected_discard_count_source!r}",
+        )
     return {
         "scenario": scenario.get("name"),
         "card_name": card["name"],

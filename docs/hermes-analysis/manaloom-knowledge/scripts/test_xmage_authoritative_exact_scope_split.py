@@ -9151,6 +9151,29 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertEqual(effect["discard_count"], 1)
         self.assertEqual(effect["draw_discard_order"], "discard_then_draw")
 
+    def test_fixed_draw_discard_spell_maps_discard_hand_then_draw_pair(self) -> None:
+        row = queue_row(
+            split.DRAW_UNIT,
+            effect_classes=["DiscardHandControllerEffect", "DrawCardSourceControllerEffect"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(oracle_text="Discard your hand, then draw two cards."),
+            source_text=(
+                "this.getSpellAbility().addEffect(new DiscardHandControllerEffect());"
+                "this.getSpellAbility().addEffect(new DrawCardSourceControllerEffect(2));"
+            ),
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.DRAW_DISCARD_SPELL_SCOPE)
+        self.assertEqual(effect["draw_count"], 2)
+        self.assertEqual(effect["discard_count"], 0)
+        self.assertEqual(effect["discard_count_source"], "controller_hand_size")
+        self.assertTrue(effect["discard_hand"])
+        self.assertEqual(effect["draw_discard_order"], "discard_then_draw")
+
     def test_fixed_draw_discard_spell_blocks_dynamic_source_count(self) -> None:
         row = queue_row(
             split.DRAW_UNIT,

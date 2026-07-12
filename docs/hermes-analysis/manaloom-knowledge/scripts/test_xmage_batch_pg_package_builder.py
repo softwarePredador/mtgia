@@ -1745,6 +1745,38 @@ def test_manifest_builds_fixed_draw_discard_random_scenario() -> None:
     assert len(scenario["controller_hand"]) == 3
 
 
+def test_manifest_builds_fixed_discard_hand_then_draw_scenario() -> None:
+    rule = {
+        "normalized_name": "dangerous wager",
+        "card_name": "Dangerous Wager",
+        "oracle_hash": "hash-dangerous-wager",
+        "logical_rule_key": "battle_rule_v1:hash-dangerous-wager",
+        "required_effect_fields": {
+            "effect": "draw_cards",
+            "battle_model_scope": "xmage_fixed_draw_discard_spell_v1",
+            "count": 2,
+            "draw_count": 2,
+            "discard_count": 0,
+            "discard_count_source": "controller_hand_size",
+            "discard_hand": True,
+            "discard_random": False,
+            "draw_discard_order": "discard_then_draw",
+            "instant": True,
+        },
+    }
+
+    scenario = builder.execution_scenario_from_expected_rule(rule)
+
+    assert scenario is not None
+    assert scenario["type"] == "fixed_draw_discard_spell"
+    assert scenario["expected_draw_count"] == 2
+    assert scenario["expected_discard_count"] == 3
+    assert scenario["expected_discard_count_source"] == "controller_hand_size"
+    assert scenario["expected_draw_discard_order"] == "discard_then_draw"
+    assert len(scenario["controller_library"]) == 2
+    assert len(scenario["controller_hand"]) == 3
+
+
 def test_manifest_builds_beginning_end_step_draw_execution_scenario() -> None:
     rule = {
         "normalized_name": "the gaffer",

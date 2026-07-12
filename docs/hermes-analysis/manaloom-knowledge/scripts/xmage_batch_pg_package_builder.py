@@ -162,6 +162,7 @@ E2E_REQUIRED_EFFECT_FIELDS = (
     "proliferate_count",
     "discard_count",
     "discard_count_source",
+    "discard_hand",
     "discard_random",
     "discard_unless_status",
     "discard_unless_filter",
@@ -5893,6 +5894,11 @@ def fixed_draw_discard_spell_execution_scenario_from_expected_rule(
     elif draw_count_source:
         return None
     expected_discard_count = int(required.get("discard_count") or 0)
+    discard_count_source = str(required.get("discard_count_source") or "").strip().lower()
+    if discard_count_source == "controller_hand_size":
+        expected_discard_count = 3
+    elif discard_count_source:
+        return None
     if expected_draw_count <= 0 or expected_discard_count <= 0:
         return None
     controller_hand = [
@@ -5941,6 +5947,7 @@ def fixed_draw_discard_spell_execution_scenario_from_expected_rule(
         "controller_hand": controller_hand,
         "expected_draw_count": expected_draw_count,
         "expected_discard_count": expected_discard_count,
+        **({"expected_discard_count_source": discard_count_source} if discard_count_source else {}),
         "expected_discard_random": bool(required.get("discard_random")),
         "expected_draw_discard_order": str(required.get("draw_discard_order") or "draw_then_discard"),
         **({"expected_draw_count_source": draw_count_source} if draw_count_source else {}),

@@ -19026,6 +19026,22 @@ def fixed_draw_discard_spell_from_oracle(metadata: dict[str, Any]) -> dict[str, 
     number_pattern = r"(?:a|one|two|three|four|five|\d+)"
     if "colors of mana spent to cast" in text:
         return "draw_discard_spell_dynamic_oracle_mana_spent_colors_not_supported"
+    discard_hand_then_draw = re.fullmatch(
+        rf"discard your hand[,.]? then draw (?P<draw>{number_pattern}) cards?\.?",
+        text,
+    )
+    if discard_hand_then_draw:
+        draw_count = number_word_to_int(discard_hand_then_draw.group("draw"))
+        if draw_count <= 0:
+            return "draw_discard_spell_oracle_count_not_fixed"
+        return {
+            "draw_count": draw_count,
+            "discard_count": 0,
+            "discard_count_source": "controller_hand_size",
+            "discard_hand": True,
+            "draw_discard_order": "discard_then_draw",
+            "discard_random": False,
+        }
     draw_x_then_discard = re.fullmatch(
         rf"draw x cards?, then discard (?P<discard>{number_pattern}) cards?\.?",
         text,
@@ -24195,17 +24211,39 @@ def fixed_draw_discard_spell_from_source(source: str, classes: set[str]) -> dict
     }
     if any(marker in text for marker in unsupported_markers):
         return "draw_discard_spell_source_not_simple"
-    if classes == {"DrawDiscardControllerEffect"}:
-        counts = draw_discard_counts_from_source(text)
-        if isinstance(counts, str):
-            return counts.replace("activated_draw_discard", "draw_discard_spell")
-        draw_count, discard_count = counts
+        if classes == {"DrawDiscardControllerEffect"}:
+            counts = draw_discard_counts_from_source(text)
+            if isinstance(counts, str):
+                return counts.replace("activated_draw_discard", "draw_discard_spell")
+            draw_count, discard_count = counts
         return {
             "draw_count": draw_count,
             "discard_count": discard_count,
             "draw_discard_order": "draw_then_discard",
+                "discard_random": False,
+                "xmage_effect_classes": ["DrawDiscardControllerEffect"],
+            }
+    if classes == {"DiscardHandControllerEffect", "DrawCardSourceControllerEffect"}:
+        draw_count = java_constructor_int_or_noarg_default(
+            text,
+            "DrawCardSourceControllerEffect",
+            noarg_default=1,
+        )
+        if draw_count is None or draw_count <= 0:
+            return "draw_discard_spell_source_count_not_fixed"
+        draw_match = re.search(r"DrawCardSourceControllerEffect\s*\(", text)
+        discard_match = re.search(r"DiscardHandControllerEffect\s*\(", text)
+        if not draw_match or not discard_match:
+            return "draw_discard_spell_source_not_simple"
+        order = "discard_then_draw" if discard_match.start() < draw_match.start() else "draw_then_discard"
+        return {
+            "draw_count": int(draw_count),
+            "discard_count": 0,
+            "discard_count_source": "controller_hand_size",
+            "discard_hand": True,
+            "draw_discard_order": order,
             "discard_random": False,
-            "xmage_effect_classes": ["DrawDiscardControllerEffect"],
+            "xmage_effect_classes": ["DiscardHandControllerEffect", "DrawCardSourceControllerEffect"],
         }
     if classes == {"DrawCardSourceControllerEffect", "DiscardControllerEffect"}:
         draw_count = java_constructor_int_or_noarg_default(
@@ -42817,6 +42855,7 @@ def split_row(
         if classes in (
             {"DrawDiscardControllerEffect"},
             {"DrawCardSourceControllerEffect", "DiscardControllerEffect"},
+            {"DiscardHandControllerEffect", "DrawCardSourceControllerEffect"},
         ):
             unsupported_abilities = ability_classes(row) - ALLOWED_AUXILIARY_RESOLUTION_ABILITY_CLASSES
             if unsupported_abilities:
@@ -42834,8 +42873,10 @@ def split_row(
                 "battlefield_count_card_types",
                 "battlefield_count_subtypes",
                 "discard_count",
+                "discard_count_source",
                 "draw_discard_order",
                 "discard_random",
+                "discard_hand",
                 "discard_unless_status",
                 "discard_unless_filter",
                 "discard_unless_count",
@@ -42864,6 +42905,8 @@ def split_row(
                 "battlefield_count_scope",
                 "battlefield_count_card_types",
                 "battlefield_count_subtypes",
+                "discard_count_source",
+                "discard_hand",
                 "discard_unless_status",
                 "discard_unless_filter",
                 "discard_unless_count",

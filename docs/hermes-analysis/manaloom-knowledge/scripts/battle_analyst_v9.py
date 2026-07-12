@@ -69551,6 +69551,17 @@ def _draw_discard_spell_requested_discard_count(discarded_cards, discard_count, 
     return discard_count
 
 
+def _draw_discard_spell_discard_count(player, effect_data):
+    source = str(effect_data.get("discard_count_source") or "").strip().lower()
+    if source == "controller_hand_size":
+        count = len([card for card in getattr(player, "hand", []) or [] if isinstance(card, dict)])
+        return count, {
+            "discard_count_source": "controller_hand_size",
+            "discard_hand": True,
+        }
+    return max(0, int(effect_data.get("discard_count") or 0)), {}
+
+
 def _draw_discard_spell_draw_count(player, opponents, effect_data):
     source = str(effect_data.get("draw_count_source") or "").strip().lower()
     if source == "x_value":
@@ -69589,7 +69600,8 @@ def resolve_draw_discard_spell(
     stack=None,
 ):
     draw_count, draw_count_fields = _draw_discard_spell_draw_count(player, opponents, effect_data)
-    discard_count = max(0, int(effect_data.get("discard_count") or 0))
+    discard_count = 0
+    discard_count_fields = {}
     order = str(effect_data.get("draw_discard_order") or "draw_then_discard")
     random_discard = bool(effect_data.get("discard_random"))
     phase_name = phase or "resolution"
@@ -69617,7 +69629,8 @@ def resolve_draw_discard_spell(
         )
 
     def discard_step():
-        nonlocal discarded_cards, discard_resolution
+        nonlocal discard_count, discard_count_fields, discarded_cards, discard_resolution
+        discard_count, discard_count_fields = _draw_discard_spell_discard_count(player, effect_data)
         discarded_cards = _draw_discard_spell_selected_discards(
             player,
             discard_count,
@@ -69658,6 +69671,7 @@ def resolve_draw_discard_spell(
         **draw_count_fields,
         cards_discarded=len(discarded_cards),
         requested_discard_count=requested_discard_count,
+        **discard_count_fields,
         discard_random=random_discard,
         discarded_to_graveyard=[
             entry.get("name", "?")
