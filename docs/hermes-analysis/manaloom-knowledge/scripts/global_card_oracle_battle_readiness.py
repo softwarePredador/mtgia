@@ -38,8 +38,9 @@ DEFAULT_XMAGE_ROOT = Path("/Users/desenvolvimentomobile/Downloads/mage-master")
 
 PRODUCT_SCOPES = {"user_product", "registered_pg_variant"}
 FIXTURE_SCOPES = {"test_or_fixture"}
-TRUSTED_RULE_REVIEW_STATUS = {"verified", "active"}
+TRUSTED_RULE_REVIEW_STATUS = {"verified"}
 TRUSTED_RULE_EXECUTION_STATUS = {"auto"}
+UNVERIFIED_EXECUTABLE_RULE_REVIEW_STATUS = {"active"}
 LOW_PRIORITY_RULE_FAMILIES = {
     "generic_basic_land_or_simple_mana",
     "generic_vanilla_or_keyword_creature",
@@ -179,6 +180,8 @@ def lane_for_card(card: dict[str, Any]) -> list[str]:
             lanes.append("generic_runtime_or_no_card_rule")
         elif oracle_identity_exception and card["commander_legality_status"] not in {"legal", "restricted"}:
             lanes.append("digital_non_commander_rule_exception")
+        elif int(card.get("unverified_executable_rule_count") or 0) > 0:
+            lanes.append("battle_rule_verification_required")
         elif int(card["oracle_identity_trusted_rule_count"] or 0) > 0:
             lanes.append("oracle_identity_rule_link_or_copy")
         elif "oracle_data_sync" not in lanes:
@@ -282,6 +285,10 @@ def fetch_all_card_rows(deck_scope: dict[str, dict[str, Any]]) -> list[dict[str,
                         AND review_status = ANY(%s)
                     )::int AS trusted_rule_count,
                     count(*) FILTER (
+                      WHERE execution_status = ANY(%s)
+                        AND review_status = ANY(%s)
+                    )::int AS unverified_executable_rule_count,
+                    count(*) FILTER (
                       WHERE execution_status = 'review_only'
                          OR review_status = 'needs_review'
                     )::int AS review_or_shadow_rule_count,
@@ -299,7 +306,11 @@ def fetch_all_card_rows(deck_scope: dict[str, dict[str, Any]]) -> list[dict[str,
                     count(*) FILTER (
                       WHERE execution_status = ANY(%s)
                         AND review_status = ANY(%s)
-                    )::int AS trusted_rule_count
+                    )::int AS trusted_rule_count,
+                    count(*) FILTER (
+                      WHERE execution_status = ANY(%s)
+                        AND review_status = ANY(%s)
+                    )::int AS unverified_executable_rule_count
                   FROM card_battle_rules
                   WHERE normalized_name IS NOT NULL AND btrim(normalized_name) <> ''
                   GROUP BY lower(normalized_name)
@@ -356,6 +367,7 @@ def fetch_all_card_rows(deck_scope: dict[str, dict[str, Any]]) -> list[dict[str,
                   COALESCE(rc.trusted_rule_count, 0)::int AS card_id_trusted_rule_count,
                   COALESCE(nrc.active_rule_count, 0)::int AS normalized_name_active_rule_count,
                   COALESCE(nrc.trusted_rule_count, 0)::int AS normalized_name_trusted_rule_count,
+                  GREATEST(COALESCE(rc.unverified_executable_rule_count, 0), COALESCE(nrc.unverified_executable_rule_count, 0))::int AS unverified_executable_rule_count,
                   GREATEST(COALESCE(rc.active_rule_count, 0), COALESCE(nrc.active_rule_count, 0))::int AS active_rule_count,
                   GREATEST(COALESCE(rc.trusted_rule_count, 0), COALESCE(nrc.trusted_rule_count, 0))::int AS trusted_rule_count,
                   COALESCE(orc.oracle_identity_active_rule_count, 0)::int AS oracle_identity_active_rule_count,
@@ -381,9 +393,13 @@ def fetch_all_card_rows(deck_scope: dict[str, dict[str, Any]]) -> list[dict[str,
                     list(TRUSTED_RULE_EXECUTION_STATUS),
                     list(TRUSTED_RULE_REVIEW_STATUS),
                     list(TRUSTED_RULE_EXECUTION_STATUS),
+                    list(UNVERIFIED_EXECUTABLE_RULE_REVIEW_STATUS),
+                    list(TRUSTED_RULE_EXECUTION_STATUS),
                     list(TRUSTED_RULE_REVIEW_STATUS),
                     list(TRUSTED_RULE_EXECUTION_STATUS),
                     list(TRUSTED_RULE_REVIEW_STATUS),
+                    list(TRUSTED_RULE_EXECUTION_STATUS),
+                    list(UNVERIFIED_EXECUTABLE_RULE_REVIEW_STATUS),
                     ready_ids,
                     fixture_ids,
                 ),
@@ -421,6 +437,7 @@ def build_card_inventory(rows: list[dict[str, Any]], *, xmage_root: Path, xmage_
             "oracle_identity_legality_format_count": int(row["oracle_identity_legality_format_count"] or 0),
             "active_rule_count": int(row["active_rule_count"]),
             "trusted_rule_count": int(row["trusted_rule_count"]),
+            "unverified_executable_rule_count": int(row["unverified_executable_rule_count"] or 0),
             "card_id_trusted_rule_count": int(row["card_id_trusted_rule_count"] or 0),
             "normalized_name_trusted_rule_count": int(row["normalized_name_trusted_rule_count"] or 0),
             "oracle_identity_active_rule_count": int(row["oracle_identity_active_rule_count"] or 0),
@@ -460,6 +477,8 @@ def priority_score(card: dict[str, Any]) -> int:
         score += 300
     if "oracle_identity_rule_link_or_copy" in card["lanes"]:
         score += 450
+    if "battle_rule_verification_required" in card["lanes"]:
+        score += 350
     if "battle_family_mapper_required" in card["lanes"]:
         score += 200
     if str(card.get("commander_legality_status") or "") in {"legal", "restricted"}:
@@ -546,6 +565,7 @@ def compact_card(card: dict[str, Any]) -> dict[str, Any]:
         "oracle_identity_legality_format_count": card["oracle_identity_legality_format_count"],
         "set_codes": card["set_codes"],
         "trusted_rule_count": card["trusted_rule_count"],
+        "unverified_executable_rule_count": card["unverified_executable_rule_count"],
         "card_id_trusted_rule_count": card["card_id_trusted_rule_count"],
         "normalized_name_trusted_rule_count": card["normalized_name_trusted_rule_count"],
         "oracle_identity_trusted_rule_count": card["oracle_identity_trusted_rule_count"],
@@ -563,6 +583,9 @@ def recommended_batches(card_inventory: list[dict[str, Any]]) -> list[dict[str, 
     commander_legality_cards = [card for card in card_inventory if "commander_legality_sync" in card["lanes"]]
     oracle_rule_copy_cards = [
         card for card in card_inventory if "oracle_identity_rule_link_or_copy" in card["lanes"]
+    ]
+    rule_verification_cards = [
+        card for card in card_inventory if "battle_rule_verification_required" in card["lanes"]
     ]
     if oracle_cards:
         batches.append(
@@ -611,6 +634,15 @@ def recommended_batches(card_inventory: list[dict[str, Any]]) -> list[dict[str, 
                 "method": "candidate copy/link from trusted rule on same oracle_id; requires oracle_hash check and focused runtime smoke before PG package",
                 "card_count": len(oracle_rule_copy_cards),
                 "top_cards": [card["name"] for card in oracle_rule_copy_cards[:20]],
+            }
+        )
+    if rule_verification_cards:
+        batches.append(
+            {
+                "batch": "battle_rule_verification_required",
+                "method": "active executable rule exists, but snapshot has no verified rule; run focused runtime/E2E proof, then promote review_status to verified via PG package",
+                "card_count": len(rule_verification_cards),
+                "top_cards": [card["name"] for card in rule_verification_cards[:20]],
             }
         )
 

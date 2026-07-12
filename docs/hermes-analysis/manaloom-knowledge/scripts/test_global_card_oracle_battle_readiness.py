@@ -18,6 +18,7 @@ def base_card(**overrides):
         "oracle_identity_legality_format_count": 0,
         "commander_legality_status": "legal",
         "trusted_rule_count": 0,
+        "unverified_executable_rule_count": 0,
         "runtime_requirement": "card_specific_rule_required",
         "oracle_identity_trusted_rule_count": 0,
         "trusted_missing_hash_count": 0,
@@ -38,6 +39,14 @@ class GlobalCardOracleBattleReadinessTest(unittest.TestCase):
         )
         self.assertIn("oracle_identity_rule_link_or_copy", lanes)
         self.assertNotIn("battle_family_mapper_required", lanes)
+
+    def test_active_auto_without_verified_rule_requires_verification_not_mapper(self) -> None:
+        lanes = audit.lane_for_card(
+            base_card(unverified_executable_rule_count=1)
+        )
+        self.assertEqual(lanes, ["battle_rule_verification_required"])
+        self.assertNotIn("battle_family_mapper_required", lanes)
+        self.assertNotIn("battle_and_oracle_ready", lanes)
 
     def test_oracle_identity_legality_copy_is_separate_candidate_lane(self) -> None:
         lanes = audit.lane_for_card(
@@ -126,6 +135,17 @@ class GlobalCardOracleBattleReadinessTest(unittest.TestCase):
             "total_quantity": 999,
         }
         self.assertEqual(audit.priority_score(base), audit.priority_score(registered_deck_heavy))
+
+    def test_verification_lane_sorts_above_new_mapper_work(self) -> None:
+        mapper = {
+            "lanes": ["battle_family_mapper_required"],
+            "commander_legality_status": "legal",
+        }
+        verification = {
+            "lanes": ["battle_rule_verification_required"],
+            "commander_legality_status": "legal",
+        }
+        self.assertGreater(audit.priority_score(verification), audit.priority_score(mapper))
 
 
 if __name__ == "__main__":
