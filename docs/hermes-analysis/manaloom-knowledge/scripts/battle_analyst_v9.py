@@ -10433,6 +10433,18 @@ CARD_EFFECT_FIELD_RULE_KEYS = (
     "produces",
     "activation_requires_tap",
     "mana_activation_requires_tap",
+    "_activated_rule_effects",
+    "activated_effect",
+    "activated_battle_model_scope",
+    "activated_land_animation",
+    "land_animation_power_toughness_source",
+    "land_animation_count_subtype",
+    "land_animation_multiplier",
+    "land_animation_subtype",
+    "land_animation_granted_keywords",
+    "land_animation_duration",
+    "gate_tap_untap_source",
+    "gate_tap_untap_source_cost_subtype",
     "instant",
     "sorcery",
     "requires_blue_target",
@@ -17706,6 +17718,26 @@ def priority_round(active_player, all_players, stack, turn, rng, phase=None):
             if activate_best_generic_untap_target_permanent(
                 active_player,
                 opponents,
+                all_players,
+                turn,
+                rng,
+                phase=phase,
+            ):
+                check_sbas_until_stable(all_players)
+                flush_triggers_in_apnap(active_player, all_players, stack)
+                return True
+            if activate_best_gate_tap_untap_source(
+                active_player,
+                all_players,
+                turn,
+                rng,
+                phase=phase,
+            ):
+                check_sbas_until_stable(all_players)
+                flush_triggers_in_apnap(active_player, all_players, stack)
+                return True
+            if activate_best_gate_land_animation_permanent(
+                active_player,
                 all_players,
                 turn,
                 rng,
@@ -52063,6 +52095,11 @@ SIMPLE_ACTIVATED_TUTOR_HAND_SCOPE = (
 SIMPLE_ACTIVATED_HAND_TO_BATTLEFIELD_SCOPE = (
     "xmage_permanent_simple_activated_put_hand_card_onto_battlefield_v1"
 )
+MANA_WITH_GATE_LAND_ANIMATION_UNTAP_SCOPE = (
+    "xmage_simple_tap_mana_source_with_gate_land_animation_untap_v1"
+)
+LAND_ANIMATION_GATE_COUNT_SCOPE = "xmage_activated_land_becomes_creature_gate_count_v1"
+GATE_TAP_UNTAP_SOURCE_SCOPE = "xmage_activated_tap_gate_untap_source_v1"
 GRAVEYARD_SELF_RETURN_TO_HAND_SCOPE = "xmage_graveyard_simple_activated_self_return_to_hand_v1"
 GRAVEYARD_SELF_RETURN_TO_BATTLEFIELD_SCOPE = (
     "xmage_graveyard_simple_activated_self_return_to_battlefield_v1"
@@ -55838,6 +55875,271 @@ def activate_best_generic_untap_target_permanent(player, opponents, all_players,
         rng,
         phase=phase,
     )
+
+
+def gate_land_animation_effect_for_permanent(permanent):
+    if not isinstance(permanent, dict):
+        return None
+    for effect_data in _activated_rule_effects_for_permanent(permanent):
+        if (
+            effect_data.get("battle_model_scope") == LAND_ANIMATION_GATE_COUNT_SCOPE
+            and effect_data.get("activated_effect") == "land_animation"
+            and effect_data.get("activated_land_animation")
+        ):
+            return effect_data
+    if (
+        permanent.get("activated_effect") == "land_animation_and_gate_untap_source"
+        and permanent.get("activated_battle_model_scope") == LAND_ANIMATION_GATE_COUNT_SCOPE
+    ):
+        return {
+            **permanent,
+            "effect": "land_animation",
+            "battle_model_scope": LAND_ANIMATION_GATE_COUNT_SCOPE,
+            "ability_kind": "activated",
+            "activated_effect": "land_animation",
+            "activated_land_animation": True,
+            "activation_requires_tap": True,
+            "activate_only_as_sorcery": True,
+            "target": "land",
+            "target_controller": "self",
+            "target_constraints": {"controller": "self", "card_types": ["land"]},
+        }
+    return None
+
+
+def gate_tap_untap_source_effect_for_permanent(permanent):
+    if not isinstance(permanent, dict):
+        return None
+    for effect_data in _activated_rule_effects_for_permanent(permanent):
+        if (
+            effect_data.get("battle_model_scope") == GATE_TAP_UNTAP_SOURCE_SCOPE
+            and effect_data.get("activated_effect") == "untap_source"
+            and effect_data.get("gate_tap_untap_source")
+        ):
+            return effect_data
+    if permanent.get("gate_tap_untap_source"):
+        return {
+            **permanent,
+            "effect": "untap_source",
+            "battle_model_scope": GATE_TAP_UNTAP_SOURCE_SCOPE,
+            "ability_kind": "activated",
+            "activated_effect": "untap_source",
+            "gate_tap_untap_source": True,
+            "activation_requires_tap_target": True,
+            "activation_tap_cost": "untapped_controlled_gate",
+            "activation_tap_cost_subtype": permanent.get("gate_tap_untap_source_cost_subtype") or "Gate",
+            "activation_tap_cost_controller": "self",
+        }
+    return None
+
+
+def controlled_gate_permanents(player):
+    return [
+        permanent
+        for permanent in getattr(player, "battlefield", []) or []
+        if isinstance(permanent, dict) and permanent_has_subtype(permanent, "Gate")
+    ]
+
+
+def _untapped_controlled_gate_options(player):
+    options = [gate for gate in controlled_gate_permanents(player) if not gate.get("tapped")]
+    options.sort(
+        key=lambda gate: (
+            1 if permanent_has_card_type(gate, "land") else 0,
+            str(gate.get("name") or ""),
+        ),
+        reverse=True,
+    )
+    return options
+
+
+def _gate_land_animation_target_options(player, source):
+    options = []
+    for permanent in getattr(player, "battlefield", []) or []:
+        if not isinstance(permanent, dict) or permanent is source:
+            continue
+        if not permanent_has_card_type(permanent, "land"):
+            continue
+        already_creature = is_battlefield_creature(permanent)
+        is_gate = permanent_has_subtype(permanent, "Gate")
+        options.append((0 if already_creature else 1, 0 if is_gate else 1, str(permanent.get("name") or ""), permanent))
+    options.sort(key=lambda item: (item[0], item[1], item[2]), reverse=True)
+    return [item[3] for item in options]
+
+
+def can_activate_gate_land_animation(player, source, *, effect_data=None, phase=None):
+    effect_data = effect_data or gate_land_animation_effect_for_permanent(source)
+    if effect_data is None:
+        return False
+    if source not in getattr(player, "battlefield", []):
+        return False
+    if effect_data.get("activate_only_as_sorcery") and phase not in MAIN_PHASES:
+        return False
+    if effect_data.get("activation_requires_tap", True) and source.get("tapped"):
+        return False
+    if (
+        effect_data.get("activation_requires_tap", True)
+        and is_battlefield_creature(source)
+        and source.get("summoning_sick")
+        and not has_haste(source)
+    ):
+        return False
+    return bool(_gate_land_animation_target_options(player, source))
+
+
+def activate_gate_land_animation(player, source, turn, rng, *, phase=None, target=None, effect_data=None):
+    effect_data = effect_data or gate_land_animation_effect_for_permanent(source)
+    if not can_activate_gate_land_animation(player, source, effect_data=effect_data, phase=phase):
+        return False
+    phase = phase or "precombat_main"
+    targets = _gate_land_animation_target_options(player, source)
+    target = target if target in targets else (targets[0] if targets else None)
+    if target is None:
+        return False
+    if effect_data.get("activation_requires_tap", True):
+        source["tapped"] = True
+    gate_count = len(controlled_gate_permanents(player))
+    multiplier = max(1, int(effect_data.get("land_animation_multiplier") or 2))
+    pt = gate_count * multiplier
+    for key in (
+        "type_line",
+        "card_types",
+        "subtypes",
+        "subtype",
+        "effect",
+        "is_creature_permanent",
+        "power",
+        "toughness",
+        "keywords",
+        "haste",
+        "summoning_sick",
+    ):
+        remember_until_eot(target, key)
+    card_types = list(target.get("card_types") or [])
+    if not card_types:
+        type_text = str(target.get("type_line") or "")
+        card_types = [
+            token.capitalize()
+            for token in re.split(r"[\s—-]+", type_text)
+            if token.lower() in {"artifact", "battle", "creature", "enchantment", "land", "planeswalker"}
+        ]
+    target["card_types"] = list(dict.fromkeys([*card_types, "Land", "Creature"]))
+    subtypes = target.get("subtypes") or target.get("subtype") or []
+    if isinstance(subtypes, str):
+        subtypes = [subtypes]
+    animation_subtype = str(effect_data.get("land_animation_subtype") or "Citizen")
+    target["subtypes"] = list(dict.fromkeys([*subtypes, animation_subtype]))
+    target["is_creature_permanent"] = True
+    target["effect"] = target.get("effect") or "land"
+    target["power"] = pt
+    target["toughness"] = pt
+    granted_keywords = [
+        str(keyword).strip().lower().replace(" ", "_")
+        for keyword in (effect_data.get("land_animation_granted_keywords") or ["haste"])
+        if str(keyword).strip()
+    ]
+    target["keywords"] = sorted(_keyword_values(target) | set(granted_keywords))
+    if "haste" in granted_keywords:
+        target["haste"] = True
+        target["summoning_sick"] = False
+    emit_replay_event(
+        "land_animation_resolved",
+        player=player.name,
+        card=source.get("name", "?"),
+        target=target.get("name", "?"),
+        gate_count=gate_count,
+        multiplier=multiplier,
+        power=pt,
+        toughness=pt,
+        subtype=animation_subtype,
+        granted_keywords=granted_keywords,
+        duration=effect_data.get("land_animation_duration") or "until_end_of_turn",
+        source_tapped=bool(source.get("tapped")),
+        turn=turn,
+        phase=phase,
+        **replay_rule_fields(effect_data),
+    )
+    return target
+
+
+def can_activate_gate_tap_untap_source(player, source, *, effect_data=None):
+    effect_data = effect_data or gate_tap_untap_source_effect_for_permanent(source)
+    if effect_data is None:
+        return False
+    if source not in getattr(player, "battlefield", []):
+        return False
+    if not source.get("tapped"):
+        return False
+    return bool(_untapped_controlled_gate_options(player))
+
+
+def activate_gate_tap_untap_source(player, source, turn, *, phase=None, effect_data=None):
+    effect_data = effect_data or gate_tap_untap_source_effect_for_permanent(source)
+    if not can_activate_gate_tap_untap_source(player, source, effect_data=effect_data):
+        return False
+    phase = phase or "precombat_main"
+    gate = _untapped_controlled_gate_options(player)[0]
+    gate["tapped"] = True
+    source["tapped"] = False
+    emit_replay_event(
+        "gate_tap_untap_source_resolved",
+        player=player.name,
+        card=source.get("name", "?"),
+        tapped_gate=gate.get("name", "?"),
+        source_untapped=True,
+        turn=turn,
+        phase=phase,
+        **replay_rule_fields(effect_data),
+    )
+    return True
+
+
+def activate_best_gate_tap_untap_source(player, all_players, turn, rng, *, phase=None):
+    options = []
+    for permanent in list(getattr(player, "battlefield", []) or []):
+        effect_data = gate_tap_untap_source_effect_for_permanent(permanent)
+        if not can_activate_gate_tap_untap_source(player, permanent, effect_data=effect_data):
+            continue
+        options.append((str(permanent.get("name") or ""), permanent, effect_data))
+    if not options:
+        return False
+    options.sort(key=lambda item: item[0])
+    return activate_gate_tap_untap_source(
+        player,
+        options[0][1],
+        turn,
+        phase=phase,
+        effect_data=options[0][2],
+    )
+
+
+def activate_best_gate_land_animation_permanent(player, all_players, turn, rng, *, phase=None):
+    options = []
+    for permanent in list(getattr(player, "battlefield", []) or []):
+        effect_data = gate_land_animation_effect_for_permanent(permanent)
+        if not can_activate_gate_land_animation(player, permanent, effect_data=effect_data, phase=phase):
+            continue
+        target_options = _gate_land_animation_target_options(player, permanent)
+        if not target_options:
+            continue
+        options.append((len(controlled_gate_permanents(player)), str(permanent.get("name") or ""), permanent, effect_data))
+    if not options:
+        return False
+    options.sort(key=lambda item: (item[0], item[1]), reverse=True)
+    source = options[0][2]
+    effect_data = options[0][3]
+    animated = activate_gate_land_animation(
+        player,
+        source,
+        turn,
+        rng,
+        phase=phase,
+        effect_data=effect_data,
+    )
+    if not animated:
+        return False
+    activate_gate_tap_untap_source(player, source, turn, phase=phase)
+    return True
 
 
 def activated_target_add_counters_effect_for_permanent(permanent):

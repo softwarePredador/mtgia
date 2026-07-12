@@ -6533,6 +6533,164 @@ def run_restricted_mana_formidable_life_reset(
     }
 
 
+def run_gate_land_animation_untap(
+    battle,
+    scenario: dict[str, Any],
+    events: list[tuple[str, dict[str, Any]]],
+) -> dict[str, Any]:
+    card = dict(scenario["card"])
+    loaded_effect = battle.get_card_effect(card)
+    manifest_effect = dict(scenario.get("effect") or {})
+    effect = (
+        loaded_effect
+        if loaded_effect.get("battle_model_scope")
+        == "xmage_simple_tap_mana_source_with_gate_land_animation_untap_v1"
+        else manifest_effect
+    )
+    if effect.get("battle_model_scope") != "xmage_simple_tap_mana_source_with_gate_land_animation_untap_v1":
+        fail(
+            "battle_execution",
+            f"{card['name']} missing gate land-animation scope: {effect.get('battle_model_scope')!r}",
+        )
+
+    turn = int(scenario.get("turn") or 5)
+    mana_player = battle.Player("Gate Animation Mana Controller", None, [])
+    mana_source = battle.enrich_card(
+        {
+            **card,
+            "type_line": scenario.get("type_line") or card.get("type_line") or "Creature - Elf Wizard",
+            **effect,
+            "summoning_sick": False,
+            "tapped": False,
+        }
+    )
+    mana_player.battlefield = [mana_source]
+    mana_player.refresh_mana_sources(turn=turn)
+    expected_mana = int(scenario.get("expected_available_mana_after_refresh") or 2)
+    if mana_player.available_mana() != expected_mana:
+        fail(
+            "battle_execution",
+            f"{card['name']} available mana={mana_player.available_mana()}, expected {expected_mana}",
+        )
+
+    active = battle.Player(str(scenario.get("player") or "Gate Animation Controller"), None, [])
+    opponent = battle.Player(str(scenario.get("opponent") or "Gate Animation Opponent"), None, [])
+    if hasattr(battle, "bind_table_context"):
+        battle.bind_table_context([active, opponent])
+    source = battle.enrich_card(
+        {
+            **card,
+            "type_line": scenario.get("type_line") or card.get("type_line") or "Creature - Elf Wizard",
+            **effect,
+            **dict(scenario.get("source_overrides") or {}),
+        }
+    )
+    battlefield = [
+        dict(permanent)
+        for permanent in (scenario.get("controller_battlefield") or [])
+        if isinstance(permanent, dict)
+    ]
+    active.battlefield = [*battlefield, source]
+    target_name = str(scenario.get("target_land_name") or "E2E Target Plaza")
+    target = next(
+        (
+            permanent
+            for permanent in active.battlefield
+            if isinstance(permanent, dict) and permanent.get("name") == target_name
+        ),
+        None,
+    )
+    if target is None:
+        fail("battle_execution", f"{card['name']} missing target land {target_name!r}")
+    before_events = len(events)
+    animated = battle.activate_gate_land_animation(
+        active,
+        source,
+        turn,
+        random.Random(int(scenario.get("seed") or 821)),
+        phase="precombat_main",
+        target=target,
+    )
+    if animated is not target:
+        fail("battle_execution", f"{card['name']} did not animate expected target")
+    expected_power = int(scenario.get("expected_power") or 4)
+    expected_toughness = int(scenario.get("expected_toughness") or expected_power)
+    if int(target.get("power") or 0) != expected_power or int(target.get("toughness") or 0) != expected_toughness:
+        fail(
+            "battle_execution",
+            f"{card['name']} animated P/T={target.get('power')}/{target.get('toughness')}, "
+            f"expected {expected_power}/{expected_toughness}",
+        )
+    expected_subtype = str(scenario.get("expected_land_animation_subtype") or "Citizen")
+    if not battle.permanent_has_subtype(target, expected_subtype):
+        fail("battle_execution", f"{card['name']} target missing subtype {expected_subtype!r}")
+    expected_keywords = {
+        str(keyword).strip().lower().replace(" ", "_")
+        for keyword in scenario.get("expected_land_animation_keywords") or ["haste"]
+        if str(keyword).strip()
+    }
+    actual_keywords = {
+        str(keyword).strip().lower().replace(" ", "_")
+        for keyword in target.get("keywords") or []
+        if str(keyword).strip()
+    }
+    if not expected_keywords.issubset(actual_keywords):
+        fail(
+            "battle_execution",
+            f"{card['name']} animated keywords={sorted(actual_keywords)}, expected {sorted(expected_keywords)}",
+        )
+    if not source.get("tapped"):
+        fail("battle_execution", f"{card['name']} source did not tap for land animation")
+    if not battle.activate_gate_tap_untap_source(active, source, turn, phase="precombat_main"):
+        fail("battle_execution", f"{card['name']} failed to untap by tapping Gate")
+    if source.get("tapped"):
+        fail("battle_execution", f"{card['name']} source remained tapped after Gate untap")
+    tapped_gate_count = sum(
+        1
+        for permanent in active.battlefield
+        if isinstance(permanent, dict)
+        and battle.permanent_has_subtype(permanent, "Gate")
+        and permanent.get("tapped")
+    )
+    expected_tapped_gate_count = int(scenario.get("expected_tapped_gate_count") or 1)
+    if tapped_gate_count != expected_tapped_gate_count:
+        fail(
+            "battle_execution",
+            f"{card['name']} tapped Gate count={tapped_gate_count}, expected {expected_tapped_gate_count}",
+        )
+    animation_event = next(
+        (
+            data
+            for event, data in events[before_events:]
+            if event == "land_animation_resolved" and data.get("card") == card.get("name")
+        ),
+        None,
+    )
+    if animation_event is None:
+        fail("battle_events", f"missing {card['name']} land_animation_resolved event")
+    untap_event = next(
+        (
+            data
+            for event, data in events[before_events:]
+            if event == "gate_tap_untap_source_resolved" and data.get("card") == card.get("name")
+        ),
+        None,
+    )
+    if untap_event is None:
+        fail("battle_events", f"missing {card['name']} gate_tap_untap_source_resolved event")
+    return {
+        "scenario": scenario.get("name"),
+        "card_name": card["name"],
+        "available_mana": mana_player.available_mana(),
+        "animated_target": target.get("name"),
+        "animated_power": target.get("power"),
+        "animated_toughness": target.get("toughness"),
+        "animated_keywords": sorted(actual_keywords),
+        "source_untapped_after_gate_cost": not bool(source.get("tapped")),
+        "tapped_gate_count": tapped_gate_count,
+    }
+
+
 def run_mana_source_etb_draw_unblocked_control_transfer(
     battle,
     scenario: dict[str, Any],
@@ -14370,6 +14528,7 @@ SCENARIO_RUNNERS = {
     "creature_enters_tapped": run_creature_enters_tapped,
     "spell_mana_ritual_resolution": run_spell_mana_ritual_resolution,
     "simple_mana_source_refresh": run_simple_mana_source_refresh,
+    "gate_land_animation_untap": run_gate_land_animation_untap,
     "restricted_mana_formidable_life_reset": run_restricted_mana_formidable_life_reset,
     "mana_source_etb_draw_unblocked_control_transfer": run_mana_source_etb_draw_unblocked_control_transfer,
     "mana_spent_cast_trigger": run_mana_spent_cast_trigger,

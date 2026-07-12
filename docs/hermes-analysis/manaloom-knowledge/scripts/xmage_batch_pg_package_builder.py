@@ -811,6 +811,14 @@ E2E_REQUIRED_EFFECT_FIELDS = (
     "dynamic_toughness_equals_count",
     "dynamic_power_equals_graveyard_count",
     "dynamic_toughness_equals_graveyard_count",
+    "land_animation_power_toughness_source",
+    "land_animation_count_subtype",
+    "land_animation_multiplier",
+    "land_animation_subtype",
+    "land_animation_granted_keywords",
+    "land_animation_duration",
+    "gate_tap_untap_source",
+    "gate_tap_untap_source_cost_subtype",
     "_activated_rule_effects",
     "xmage_ability_class",
     "xmage_ability_classes",
@@ -4236,6 +4244,70 @@ def simple_mana_source_execution_scenario_from_expected_rule(rule: dict[str, Any
             land["name"] for land in returnable_lands
         ]
     return scenario
+
+
+def gate_land_animation_untap_execution_scenario_from_expected_rule(
+    rule: dict[str, Any],
+) -> dict[str, Any] | None:
+    required = dict(rule.get("required_effect_fields") or {})
+    if required.get("battle_model_scope") != "xmage_simple_tap_mana_source_with_gate_land_animation_untap_v1":
+        return None
+    activated_effects = [
+        effect
+        for effect in required.get("_activated_rule_effects") or []
+        if isinstance(effect, dict)
+    ]
+    land_animation = next(
+        (
+            effect
+            for effect in activated_effects
+            if effect.get("battle_model_scope") == "xmage_activated_land_becomes_creature_gate_count_v1"
+        ),
+        None,
+    )
+    gate_untap = next(
+        (
+            effect
+            for effect in activated_effects
+            if effect.get("battle_model_scope") == "xmage_activated_tap_gate_untap_source_v1"
+        ),
+        None,
+    )
+    if land_animation is None or gate_untap is None:
+        return None
+    gate_count = 2
+    multiplier = int(
+        land_animation.get("land_animation_multiplier")
+        or required.get("land_animation_multiplier")
+        or 2
+    )
+    return {
+        "name": f"{rule['card_name']} animates a land and untaps via Gate",
+        "type": "gate_land_animation_untap",
+        "card": {
+            "name": rule["card_name"],
+            "type_line": required.get("source_type_line") or "Creature - Elf Wizard",
+            "mana_cost": required.get("source_mana_cost") or "{2}{G}",
+        },
+        "type_line": required.get("source_type_line") or "Creature - Elf Wizard",
+        "effect": required,
+        "source_overrides": {"summoning_sick": False, "tapped": False},
+        "controller_battlefield": [
+            {"name": "E2E Target Plaza", "type_line": "Land", "effect": "land", "tapped": False},
+            {"name": "E2E Guildgate One", "type_line": "Land - Gate", "effect": "land", "tapped": False},
+            {"name": "E2E Guildgate Two", "type_line": "Land - Gate", "effect": "land", "tapped": False},
+        ],
+        "target_land_name": "E2E Target Plaza",
+        "expected_gate_count": gate_count,
+        "expected_power": gate_count * multiplier,
+        "expected_toughness": gate_count * multiplier,
+        "expected_land_animation_subtype": land_animation.get("land_animation_subtype") or "Citizen",
+        "expected_land_animation_keywords": land_animation.get("land_animation_granted_keywords") or ["haste"],
+        "expected_tapped_gate_count": 1,
+        "expected_available_mana_after_refresh": int(required.get("mana_produced") or 2),
+        "expected_conditional_mana": int(required.get("mana_produced") or 2),
+        "logical_rule_key": rule["logical_rule_key"],
+    }
 
 
 def creature_enters_tapped_execution_scenario_from_expected_rule(rule: dict[str, Any]) -> dict[str, Any] | None:
@@ -9752,6 +9824,7 @@ def execution_scenario_from_expected_rule(rule: dict[str, Any]) -> dict[str, Any
         or spell_mana_ritual_execution_scenario_from_expected_rule(rule)
         or creature_etb_life_gain_draw_execution_scenario_from_expected_rule(rule)
         or spell_cast_gain_life_execution_scenario_from_expected_rule(rule)
+        or gate_land_animation_untap_execution_scenario_from_expected_rule(rule)
         or simple_mana_source_execution_scenario_from_expected_rule(rule)
         or sacrifice_mana_source_execution_scenario_from_expected_rule(rule)
         or damage_each_opponent_spell_execution_scenario_from_expected_rule(rule)

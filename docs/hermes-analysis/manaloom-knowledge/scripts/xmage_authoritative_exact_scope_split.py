@@ -407,6 +407,11 @@ MANA_WITH_ETB_RETURN_LANDS_SCOPE = "xmage_simple_mana_source_with_etb_return_lan
 MANA_SPENT_CAST_TRIGGER_SCOPE = "xmage_simple_tap_mana_source_with_mana_spent_cast_trigger_v1"
 MANA_ACTIVATION_NEXT_CAST_X_TRIGGER_SCOPE = "xmage_simple_tap_mana_source_with_next_cast_x_trigger_v1"
 MANA_WITH_X_SPELL_TOKEN_COUNTER_TRIGGER_SCOPE = "xmage_simple_tap_mana_source_with_x_spell_token_counter_trigger_v1"
+MANA_WITH_GATE_LAND_ANIMATION_UNTAP_SCOPE = (
+    "xmage_simple_tap_mana_source_with_gate_land_animation_untap_v1"
+)
+LAND_ANIMATION_GATE_COUNT_SCOPE = "xmage_activated_land_becomes_creature_gate_count_v1"
+GATE_TAP_UNTAP_SOURCE_SCOPE = "xmage_activated_tap_gate_untap_source_v1"
 ETB_FIXED_MANA_CREATURE_SCOPE = "xmage_creature_etb_add_fixed_mana_v1"
 SELF_SACRIFICE_MANA_SOURCE_SCOPE = "xmage_self_sacrifice_mana_source_permanent_v1"
 TAP_AND_SELF_SACRIFICE_MANA_SOURCE_SCOPE = "xmage_tap_and_self_sacrifice_mana_source_permanent_v1"
@@ -30027,6 +30032,88 @@ def mana_source_support_cost_source_blocker(
     return "mana_source_tap_support_type_not_supported"
 
 
+def gate_land_animation_untap_source_signature_blocker(
+    source_text: str,
+    mana_ability_classes: set[str],
+    effect_classes: set[str],
+    mana_source_detail: dict[str, Any],
+) -> str | None:
+    text = source_text or ""
+    expected_abilities = {
+        "ActivateAsSorceryActivatedAbility",
+        "HasteAbility",
+        "SimpleActivatedAbility",
+        "SimpleManaAbility",
+    }
+    if mana_ability_classes != expected_abilities:
+        return "gate_land_animation_untap_ability_classes_not_exact"
+    expected_effects = {
+        "AddManaInAnyCombinationEffect",
+        "BecomesCreatureTargetEffect",
+        "OneShotEffect",
+        "SageOfTheMazeEffect",
+        "UntapSourceEffect",
+    }
+    if effect_classes != expected_effects:
+        return "gate_land_animation_untap_effect_classes_not_exact"
+    if str(mana_source_detail.get("produces") or "") != "WUBRG":
+        return "gate_land_animation_untap_mana_colors_not_exact"
+    if int(mana_source_detail.get("mana_produced") or 0) != 2:
+        return "gate_land_animation_untap_mana_amount_not_exact"
+    required_markers = (
+        "new AddManaInAnyCombinationEffect(2)",
+        "new TapSourceCost()",
+        "new ActivateAsSorceryActivatedAbility(new SageOfTheMazeEffect(), new TapSourceCost())",
+        "StaticFilters.FILTER_CONTROLLED_PERMANENT_LAND",
+        "new UntapSourceEffect()",
+        "new TapTargetCost(new TargetControlledPermanent(1, filter))",
+        "FilterControlledPermanent(SubType.GATE",
+        "PermanentsOnBattlefieldCount(filter, 2)",
+        "new BecomesCreatureTargetEffect(",
+        ".withSubType(SubType.CITIZEN)",
+        ".withAbility(HasteAbility.getInstance())",
+        "Duration.EndOfTurn",
+    )
+    for marker in required_markers:
+        if marker not in text:
+            return "gate_land_animation_untap_source_signature_mismatch"
+    return None
+
+
+def gate_land_animation_untap_detail_from_oracle(metadata: dict[str, Any]) -> dict[str, Any] | str | None:
+    lines = normalized_oracle_lines(metadata)
+    if len(lines) != 3:
+        return None
+    if not re.fullmatch(r"\{t\}: add two mana in any combination of colors\.?", lines[0]):
+        return None
+    if not re.fullmatch(
+        r"\{t\}: until end of turn, target land you control becomes an x/x citizen "
+        r"creature with haste in addition to its other types, where x is twice the "
+        r"number of gates you control\. activate only as a sorcery\.?",
+        lines[1],
+    ):
+        return None
+    if not re.fullmatch(r"tap an untapped gate you control: untap (this creature|sage of the maze)\.?", lines[2]):
+        return None
+    mana_detail = mana_detail_from_add_phrase("two mana in any combination of colors")
+    if mana_detail is None:
+        return "gate_land_animation_untap_mana_oracle_parse_failed"
+    return {
+        **mana_detail,
+        "mana_activation_requires_tap": True,
+        "land_animation_multiplier": 2,
+        "land_animation_count_subtype": "Gate",
+        "land_animation_target": "land",
+        "land_animation_target_controller": "self",
+        "land_animation_subtype": "Citizen",
+        "land_animation_granted_keywords": ["haste"],
+        "land_animation_duration": "until_end_of_turn",
+        "land_animation_activate_only_as_sorcery": True,
+        "gate_tap_untap_source": True,
+        "gate_tap_untap_source_cost_subtype": "Gate",
+    }
+
+
 def simple_mana_source_source_blocker(
     source_text: str,
     ability_class_values: set[str],
@@ -31796,6 +31883,8 @@ def proposal_notes(row: dict[str, Any], scope: str) -> str:
         scope_kind = "graveyard simple activated self-return-to-hand ability"
     elif scope == GRAVEYARD_SELF_RETURN_TO_BATTLEFIELD_SCOPE:
         scope_kind = "graveyard simple activated self-return-to-battlefield ability"
+    elif scope == MANA_WITH_GATE_LAND_ANIMATION_UNTAP_SCOPE:
+        scope_kind = "creature mana source with activated Gate-count land animation and Gate-tap self-untap abilities"
     return (
         "XMage authoritative exact-scope split: local class "
         f"{row.get('xmage_class')} translated into ManaLoom runtime scope {scope}. "
@@ -45597,6 +45686,88 @@ def split_row(
                 metadata,
                 effect_json,
                 family_id="xmage_controlled_creature_condition_conditional_mana_source",
+            ), "selected_exact_scope"
+        gate_land_animation_untap = gate_land_animation_untap_detail_from_oracle(metadata)
+        if isinstance(gate_land_animation_untap, str):
+            return None, gate_land_animation_untap
+        if gate_land_animation_untap is not None:
+            source_blocker = gate_land_animation_untap_source_signature_blocker(
+                source_text,
+                mana_ability_classes,
+                classes,
+                gate_land_animation_untap,
+            )
+            if source_blocker:
+                return None, source_blocker
+            type_line = str(metadata.get("type_line") or "")
+            land_animation_effect = {
+                "effect": "land_animation",
+                "battle_model_scope": LAND_ANIMATION_GATE_COUNT_SCOPE,
+                "ability_kind": "activated",
+                "activated_effect": "land_animation",
+                "activated_land_animation": True,
+                "activation_requires_tap": True,
+                "activate_only_as_sorcery": True,
+                "target": "land",
+                "target_controller": "self",
+                "target_constraints": {
+                    "controller": "self",
+                    "card_types": ["land"],
+                },
+                "land_animation_power_toughness_source": "controlled_subtype_count_times",
+                "land_animation_count_subtype": "Gate",
+                "land_animation_multiplier": 2,
+                "land_animation_subtype": "Citizen",
+                "land_animation_granted_keywords": ["haste"],
+                "land_animation_duration": "until_end_of_turn",
+                "xmage_effect_class": "SageOfTheMazeEffect",
+                "xmage_ability_class": "ActivateAsSorceryActivatedAbility",
+            }
+            gate_untap_effect = {
+                "effect": "untap_source",
+                "battle_model_scope": GATE_TAP_UNTAP_SOURCE_SCOPE,
+                "ability_kind": "activated",
+                "activated_effect": "untap_source",
+                "gate_tap_untap_source": True,
+                "activation_requires_tap_target": True,
+                "activation_tap_cost": "untapped_controlled_gate",
+                "activation_tap_cost_subtype": "Gate",
+                "activation_tap_cost_controller": "self",
+                "xmage_effect_class": "UntapSourceEffect",
+                "xmage_ability_class": "SimpleActivatedAbility",
+            }
+            effect_json = {
+                "effect": "ramp_permanent",
+                "battle_model_scope": MANA_WITH_GATE_LAND_ANIMATION_UNTAP_SCOPE,
+                "is_mana_source": True,
+                "mana_produced": int(gate_land_animation_untap["mana_produced"]),
+                "produces": str(gate_land_animation_untap["produces"]),
+                "activation_requires_tap": True,
+                "mana_activation_requires_tap": True,
+                "permanent_type": "creature",
+                "source_type_line": type_line,
+                "source_mana_cost": str(metadata.get("mana_cost") or ""),
+                "ability_kind": "mana_and_activated",
+                "activated_effect": "land_animation_and_gate_untap_source",
+                "activated_battle_model_scope": LAND_ANIMATION_GATE_COUNT_SCOPE,
+                "land_animation_power_toughness_source": "controlled_subtype_count_times",
+                "land_animation_count_subtype": "Gate",
+                "land_animation_multiplier": 2,
+                "land_animation_subtype": "Citizen",
+                "land_animation_granted_keywords": ["haste"],
+                "land_animation_duration": "until_end_of_turn",
+                "gate_tap_untap_source": True,
+                "gate_tap_untap_source_cost_subtype": "Gate",
+                "xmage_mana_ability_classes": ["SimpleManaAbility"],
+                "xmage_effect_classes": sorted(classes),
+                "xmage_ability_classes": sorted(mana_ability_classes),
+                "_activated_rule_effects": [land_animation_effect, gate_untap_effect],
+            }
+            return build_proposal(
+                row,
+                metadata,
+                effect_json,
+                family_id="xmage_mana_source_gate_land_animation_untap",
             ), "selected_exact_scope"
         limited_choice_mana_source = limited_times_color_choice_mana_source_from_source(source_text)
         if isinstance(limited_choice_mana_source, str):

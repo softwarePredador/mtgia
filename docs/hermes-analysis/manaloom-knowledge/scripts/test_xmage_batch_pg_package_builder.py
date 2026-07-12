@@ -131,6 +131,58 @@ def test_creature_etb_life_gain_draw_execution_scenario_is_manifested() -> None:
     assert scenario["expected_keywords"] == ["flying"]
 
 
+def test_gate_land_animation_untap_execution_scenario_is_manifested() -> None:
+    proposal = {
+        "normalized_name": "sage of the maze",
+        "card_name": "Sage of the Maze",
+        "oracle_hash": "hash-sage",
+        "logical_rule_key": "battle_rule_v1:sage",
+        "effect_json": {
+            "effect": "ramp_permanent",
+            "battle_model_scope": "xmage_simple_tap_mana_source_with_gate_land_animation_untap_v1",
+            "ability_kind": "mana_and_activated",
+            "mana_produced": 2,
+            "produces": "WUBRG",
+            "source_mana_cost": "{2}{G}",
+            "source_type_line": "Creature - Elf Wizard",
+            "_activated_rule_effects": [
+                {
+                    "effect": "land_animation",
+                    "battle_model_scope": "xmage_activated_land_becomes_creature_gate_count_v1",
+                    "activated_effect": "land_animation",
+                    "activated_land_animation": True,
+                    "activate_only_as_sorcery": True,
+                    "activation_requires_tap": True,
+                    "land_animation_power_toughness_source": "controlled_subtype_count_times",
+                    "land_animation_count_subtype": "Gate",
+                    "land_animation_multiplier": 2,
+                    "land_animation_subtype": "Citizen",
+                    "land_animation_granted_keywords": ["haste"],
+                    "land_animation_duration": "until_end_of_turn",
+                },
+                {
+                    "effect": "untap_source",
+                    "battle_model_scope": "xmage_activated_tap_gate_untap_source_v1",
+                    "activated_effect": "untap_source",
+                    "gate_tap_untap_source": True,
+                    "activation_tap_cost_subtype": "Gate",
+                },
+            ],
+        },
+    }
+
+    expected = builder.expected_rule_from_proposal(proposal)
+    scenario = builder.execution_scenario_from_expected_rule(expected)
+
+    assert expected["required_effect_fields"]["mana_produced"] == 2
+    assert scenario["type"] == "gate_land_animation_untap"
+    assert scenario["expected_power"] == 4
+    assert scenario["expected_toughness"] == 4
+    assert scenario["expected_land_animation_subtype"] == "Citizen"
+    assert scenario["expected_land_animation_keywords"] == ["haste"]
+    assert scenario["expected_tapped_gate_count"] == 1
+
+
 def test_counter_unless_pays_dynamic_fields_and_execution_scenario_are_manifested() -> None:
     proposal = {
         "normalized_name": "spell stutter",

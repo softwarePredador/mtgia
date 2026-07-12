@@ -352,6 +352,81 @@ def test_graveyard_to_library_draw_runner_draws_recovered_card() -> None:
     assert result["library_top_after"] == "E2E Low Value Creature"
 
 
+def test_gate_land_animation_untap_runner_animates_land_and_untaps_source() -> None:
+    battle = validator.load_battle(validator.DEFAULT_BATTLE)
+    effect = {
+        "effect": "ramp_permanent",
+        "battle_model_scope": "xmage_simple_tap_mana_source_with_gate_land_animation_untap_v1",
+        "ability_kind": "mana_and_activated",
+        "mana_produced": 2,
+        "produces": "WUBRG",
+        "_activated_rule_effects": [
+            {
+                "effect": "land_animation",
+                "battle_model_scope": "xmage_activated_land_becomes_creature_gate_count_v1",
+                "activated_effect": "land_animation",
+                "activated_land_animation": True,
+                "activate_only_as_sorcery": True,
+                "activation_requires_tap": True,
+                "land_animation_power_toughness_source": "controlled_subtype_count_times",
+                "land_animation_count_subtype": "Gate",
+                "land_animation_multiplier": 2,
+                "land_animation_subtype": "Citizen",
+                "land_animation_granted_keywords": ["haste"],
+                "land_animation_duration": "until_end_of_turn",
+            },
+            {
+                "effect": "untap_source",
+                "battle_model_scope": "xmage_activated_tap_gate_untap_source_v1",
+                "activated_effect": "untap_source",
+                "gate_tap_untap_source": True,
+                "activation_tap_cost_subtype": "Gate",
+            },
+        ],
+        "_rule_logical_key": "battle_rule_v1:sage",
+    }
+    events = []
+    previous_get_card_effect = battle.get_card_effect
+    previous_handler = battle.REPLAY_EVENT_HANDLER
+    battle.get_card_effect = lambda card: dict(effect)
+    battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+    try:
+        result = validator.run_gate_land_animation_untap(
+            battle,
+            {
+                "name": "Sage of the Maze animates a land and untaps via Gate",
+                "type": "gate_land_animation_untap",
+                "card": {"name": "Sage of the Maze", "type_line": "Creature - Elf Wizard"},
+                "type_line": "Creature - Elf Wizard",
+                "controller_battlefield": [
+                    {"name": "E2E Target Plaza", "type_line": "Land", "effect": "land", "tapped": False},
+                    {"name": "E2E Guildgate One", "type_line": "Land - Gate", "effect": "land", "tapped": False},
+                    {"name": "E2E Guildgate Two", "type_line": "Land - Gate", "effect": "land", "tapped": False},
+                ],
+                "target_land_name": "E2E Target Plaza",
+                "expected_power": 4,
+                "expected_toughness": 4,
+                "expected_land_animation_subtype": "Citizen",
+                "expected_land_animation_keywords": ["haste"],
+                "expected_tapped_gate_count": 1,
+                "expected_available_mana_after_refresh": 2,
+            },
+            events,
+        )
+    finally:
+        battle.get_card_effect = previous_get_card_effect
+        battle.REPLAY_EVENT_HANDLER = previous_handler
+
+    assert result["card_name"] == "Sage of the Maze"
+    assert result["available_mana"] == 2
+    assert result["animated_target"] == "E2E Target Plaza"
+    assert result["animated_power"] == 4
+    assert result["animated_toughness"] == 4
+    assert result["animated_keywords"] == ["haste"]
+    assert result["source_untapped_after_gate_cost"] is True
+    assert result["tapped_gate_count"] == 1
+
+
 def test_equipment_static_attachment_runner_executes_boost_and_keywords() -> None:
     battle = validator.load_battle(validator.DEFAULT_BATTLE)
     events = []

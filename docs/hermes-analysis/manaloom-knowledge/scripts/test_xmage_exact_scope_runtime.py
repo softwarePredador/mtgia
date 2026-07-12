@@ -15302,6 +15302,103 @@ class XMageExactScopeRuntimeTest(unittest.TestCase):
             )
         )
 
+    def test_gate_land_animation_mana_source_animates_land_and_untaps_via_gate(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        source = self.battle.enrich_card(
+            {
+                "name": "Sage of the Maze",
+                "type_line": "Creature - Elf Wizard",
+                "effect": "ramp_permanent",
+                "battle_model_scope": "xmage_simple_tap_mana_source_with_gate_land_animation_untap_v1",
+                "is_mana_source": True,
+                "mana_produced": 2,
+                "produces": "WUBRG",
+                "mana_activation_requires_tap": True,
+                "activation_requires_tap": True,
+                "summoning_sick": False,
+                "_activated_rule_effects": [
+                    {
+                        "effect": "land_animation",
+                        "battle_model_scope": "xmage_activated_land_becomes_creature_gate_count_v1",
+                        "ability_kind": "activated",
+                        "activated_effect": "land_animation",
+                        "activated_land_animation": True,
+                        "activation_requires_tap": True,
+                        "activate_only_as_sorcery": True,
+                        "target": "land",
+                        "target_controller": "self",
+                        "target_constraints": {"controller": "self", "card_types": ["land"]},
+                        "land_animation_power_toughness_source": "controlled_subtype_count_times",
+                        "land_animation_count_subtype": "Gate",
+                        "land_animation_multiplier": 2,
+                        "land_animation_subtype": "Citizen",
+                        "land_animation_granted_keywords": ["haste"],
+                        "land_animation_duration": "until_end_of_turn",
+                    },
+                    {
+                        "effect": "untap_source",
+                        "battle_model_scope": "xmage_activated_tap_gate_untap_source_v1",
+                        "ability_kind": "activated",
+                        "activated_effect": "untap_source",
+                        "gate_tap_untap_source": True,
+                        "activation_requires_tap_target": True,
+                        "activation_tap_cost": "untapped_controlled_gate",
+                        "activation_tap_cost_subtype": "Gate",
+                        "activation_tap_cost_controller": "self",
+                    },
+                ],
+            }
+        )
+        target_land = {"name": "Fixture Plaza", "type_line": "Land", "effect": "land", "tapped": False}
+        gate_one = {"name": "Fixture Gate One", "type_line": "Land - Gate", "effect": "land", "tapped": False}
+        gate_two = {"name": "Fixture Gate Two", "type_line": "Land - Gate", "effect": "land", "tapped": False}
+        active.battlefield = [target_land, gate_one, gate_two, source]
+
+        animated = self.battle.activate_gate_land_animation(
+            active,
+            source,
+            7,
+            random.Random(7),
+            phase="precombat_main",
+            target=target_land,
+        )
+
+        self.assertIs(animated, target_land)
+        self.assertTrue(source["tapped"])
+        self.assertTrue(self.battle.is_battlefield_creature(target_land))
+        self.assertEqual(target_land["power"], 4)
+        self.assertEqual(target_land["toughness"], 4)
+        self.assertTrue(self.battle.permanent_has_subtype(target_land, "Citizen"))
+        self.assertTrue(self.battle.card_has_keyword(target_land, "haste"))
+
+        self.assertTrue(self.battle.activate_gate_tap_untap_source(active, source, 7, phase="precombat_main"))
+        self.assertFalse(source["tapped"])
+        self.assertEqual(
+            sum(
+                1
+                for permanent in active.battlefield
+                if self.battle.permanent_has_subtype(permanent, "Gate") and permanent.get("tapped")
+            ),
+            1,
+        )
+        self.assertTrue(
+            any(
+                event == "land_animation_resolved"
+                and data.get("card") == "Sage of the Maze"
+                and data.get("target") == "Fixture Plaza"
+                and data.get("power") == 4
+                for event, data in self.events
+            )
+        )
+        self.assertTrue(
+            any(
+                event == "gate_tap_untap_source_resolved"
+                and data.get("card") == "Sage of the Maze"
+                and data.get("source_untapped")
+                for event, data in self.events
+            )
+        )
+
     def test_chosen_color_mana_source_refreshes_as_conditional_choice(self) -> None:
         active = self.battle.Player("Active", None, [])
         heart = self.battle.enrich_card(

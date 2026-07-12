@@ -18929,6 +18929,74 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertTrue(effect["mana_activation_requires_tap"])
         self.assertNotIn("produced_mana_symbols", effect)
 
+    def test_sage_of_the_maze_maps_gate_land_animation_and_untap_runtime_scope(self) -> None:
+        row = queue_row(
+            split.RAMP_CREATURE_UNIT,
+            effect_classes=[
+                "AddManaInAnyCombinationEffect",
+                "BecomesCreatureTargetEffect",
+                "OneShotEffect",
+                "SageOfTheMazeEffect",
+                "UntapSourceEffect",
+            ],
+            ability_kind="activated",
+            ability_classes=[
+                "ActivateAsSorceryActivatedAbility",
+                "HasteAbility",
+                "SimpleActivatedAbility",
+                "SimpleManaAbility",
+            ],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Sage of the Maze",
+                type_line="Creature - Elf Wizard",
+                mana_cost="{2}{G}",
+                oracle_text=(
+                    "{T}: Add two mana in any combination of colors.\n"
+                    "{T}: Until end of turn, target land you control becomes an X/X Citizen creature with haste "
+                    "in addition to its other types, where X is twice the number of Gates you control. "
+                    "Activate only as a sorcery.\n"
+                    "Tap an untapped Gate you control: Untap this creature."
+                ),
+            ),
+            source_text="""
+                Ability ability = new SimpleManaAbility(
+                    Zone.BATTLEFIELD, new AddManaInAnyCombinationEffect(2), new TapSourceCost());
+                this.addAbility(ability);
+                ability = new ActivateAsSorceryActivatedAbility(new SageOfTheMazeEffect(), new TapSourceCost());
+                ability.addTarget(new TargetPermanent(StaticFilters.FILTER_CONTROLLED_PERMANENT_LAND));
+                this.addAbility(ability);
+                ability = new SimpleActivatedAbility(new UntapSourceEffect(), new TapTargetCost(new TargetControlledPermanent(1, filter)));
+                this.addAbility(ability);
+                private static final FilterControlledPermanent filter = new FilterControlledPermanent("untapped Gate you control");
+                private static final FilterPermanent filter = new FilterControlledPermanent(SubType.GATE, "Gates you control");
+                private static final DynamicValue xValue = new PermanentsOnBattlefieldCount(filter, 2);
+                game.addEffect(new BecomesCreatureTargetEffect(
+                    new CreatureToken(pt, pt, "")
+                        .withSubType(SubType.CITIZEN)
+                        .withAbility(HasteAbility.getInstance()),
+                    false, true, Duration.EndOfTurn), source);
+            """,
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        self.assertTrue(proposal["safe_for_batch_pg_package"])
+        self.assertEqual(proposal["family_id"], "xmage_mana_source_gate_land_animation_untap")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.MANA_WITH_GATE_LAND_ANIMATION_UNTAP_SCOPE)
+        self.assertEqual(effect["mana_produced"], 2)
+        self.assertEqual(effect["produces"], "WUBRG")
+        self.assertNotIn("_runtime_partial", effect)
+        self.assertEqual(
+            [item["battle_model_scope"] for item in effect["_activated_rule_effects"]],
+            [split.LAND_ANIMATION_GATE_COUNT_SCOPE, split.GATE_TAP_UNTAP_SOURCE_SCOPE],
+        )
+        self.assertEqual(effect["_activated_rule_effects"][0]["land_animation_subtype"], "Citizen")
+        self.assertEqual(effect["_activated_rule_effects"][0]["land_animation_granted_keywords"], ["haste"])
+        self.assertTrue(effect["_activated_rule_effects"][1]["gate_tap_untap_source"])
+
     def test_restricted_mana_source_with_auxiliary_ability_is_not_safe_for_package(self) -> None:
         row = queue_row(
             split.RAMP_CREATURE_UNIT,
