@@ -2985,6 +2985,38 @@ def test_manifest_builds_target_player_life_gain_execution_scenario() -> None:
     assert scenario["expected_target_player"] == "Spell Controller"
 
 
+def test_manifest_builds_target_player_x_life_gain_execution_scenario() -> None:
+    rule = {
+        "normalized_name": "stream of life",
+        "card_name": "Stream of Life",
+        "oracle_hash": "hash-stream-of-life",
+        "logical_rule_key": "battle_rule_v1:hash-stream-of-life",
+        "required_effect_fields": {
+            "effect": "life_total_change",
+            "battle_model_scope": "xmage_fixed_target_player_gain_life_spell_v1",
+            "target": "player",
+            "target_controller": "target_player",
+            "target_preference": "self",
+            "life_gain_amount": 0,
+            "life_gain_amount_source": "x_value",
+            "target_player_life_gain": True,
+            "sorcery": True,
+        },
+    }
+
+    scenario = builder.execution_scenario_from_expected_rule(rule)
+
+    assert scenario is not None
+    assert scenario["type"] == "target_player_life_gain_spell"
+    assert scenario["card"]["name"] == "Stream of Life"
+    assert scenario["card"]["type_line"] == "Sorcery"
+    assert scenario["x_value"] == 5
+    assert scenario["expected_life_gain"] == 5
+    assert scenario["expected_life_after"] == 25
+    assert scenario["expected_life_gain_amount_source"] == "x_value"
+    assert scenario["effect_overrides"]["_cast_context"] == {"x_value": 5}
+
+
 def test_manifest_builds_target_player_x_draw_shuffle_self_execution_scenario() -> None:
     rule = {
         "normalized_name": "blue sun's zenith",

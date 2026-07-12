@@ -5558,7 +5558,20 @@ def target_player_life_gain_execution_scenario_from_expected_rule(
     required = dict(rule.get("required_effect_fields") or {})
     if required.get("battle_model_scope") != "xmage_fixed_target_player_gain_life_spell_v1":
         return None
-    life_gain = int(required.get("life_gain_amount") or 0)
+    amount_source = str(required.get("life_gain_amount_source") or "").strip().lower()
+    scenario_extras: dict[str, Any] = {}
+    if amount_source == "x_value":
+        x_value = int(required.get("x_value") or 5)
+        life_gain = x_value
+        scenario_extras["x_value"] = x_value
+        scenario_extras["effect_overrides"] = {
+            "x_value": x_value,
+            "_cast_context": {"x_value": x_value},
+        }
+    elif amount_source:
+        return None
+    else:
+        life_gain = int(required.get("life_gain_amount") or 0)
     if life_gain <= 0:
         return None
     starting_life = 20
@@ -5574,6 +5587,8 @@ def target_player_life_gain_execution_scenario_from_expected_rule(
         "expected_life_after": starting_life + life_gain,
         "expected_target_player": "Spell Controller",
         "target_preference": str(required.get("target_preference") or "self"),
+        **({"expected_life_gain_amount_source": amount_source} if amount_source else {}),
+        **scenario_extras,
         "logical_rule_key": rule["logical_rule_key"],
     }
 

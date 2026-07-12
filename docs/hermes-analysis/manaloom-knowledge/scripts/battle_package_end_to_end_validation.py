@@ -14266,6 +14266,15 @@ def run_target_player_life_gain_spell(
         fail("battle_execution", f"{card['name']} battle_model_scope={effect.get('battle_model_scope')!r}")
     if effect.get("target_player_life_gain") is not True:
         fail("battle_execution", f"{card['name']} is not marked target_player_life_gain")
+    if isinstance(scenario.get("effect_overrides"), dict):
+        effect.update(dict(scenario.get("effect_overrides") or {}))
+    x_value = scenario.get("x_value")
+    if x_value is not None:
+        x_value = int(x_value)
+        effect["x_value"] = x_value
+        effect["_cast_context"] = {"x_value": x_value}
+        card["x_value"] = x_value
+        card["_cast_context"] = {"x_value": x_value}
     active = battle.Player(str(scenario.get("player") or "Spell Controller"), None, [])
     opponent = battle.Player(str(scenario.get("opponent") or "Opponent"), None, [])
     starting_life = int(scenario.get("starting_life") or 20)
@@ -14273,6 +14282,9 @@ def run_target_player_life_gain_spell(
     expected_life_gain = int(scenario.get("expected_life_gain") or effect.get("life_gain_amount") or 0)
     expected_life_after = int(scenario.get("expected_life_after") or (starting_life + expected_life_gain))
     expected_target_player = str(scenario.get("expected_target_player") or active.name)
+    expected_amount_source = str(
+        scenario.get("expected_life_gain_amount_source") or effect.get("life_gain_amount_source") or ""
+    ).strip()
     before_events = len(events)
 
     battle.apply_effect_immediate(
@@ -14305,12 +14317,19 @@ def run_target_player_life_gain_spell(
         fail("battle_events", f"{card['name']} life_before={event.get('life_before')}")
     if int(event.get("life_after") or 0) != expected_life_after:
         fail("battle_events", f"{card['name']} life_after={event.get('life_after')}")
+    if expected_amount_source and event.get("life_gain_amount_source") != expected_amount_source:
+        fail(
+            "battle_events",
+            f"{card['name']} life_gain_amount_source={event.get('life_gain_amount_source')!r}",
+        )
     return {
         "scenario": scenario.get("name"),
         "card_name": card["name"],
         "target_player": expected_target_player,
         "life_gained": expected_life_gain,
         "life_after": expected_life_after,
+        "life_gain_amount_source": expected_amount_source or None,
+        "x_value": x_value,
     }
 
 

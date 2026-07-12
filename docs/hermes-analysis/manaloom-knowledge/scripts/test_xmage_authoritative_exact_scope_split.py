@@ -8639,7 +8639,7 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertEqual(effect["target_preference"], "self")
         self.assertTrue(effect["target_player_life_gain"])
 
-    def test_target_player_life_gain_spell_blocks_dynamic_x_value(self) -> None:
+    def test_target_player_life_gain_spell_maps_dynamic_x_value(self) -> None:
         row = queue_row(
             split.TARGET_PLAYER_LIFE_GAIN_UNIT,
             effect_classes=["GainLifeTargetEffect"],
@@ -8657,8 +8657,16 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
             ),
         )
 
-        self.assertIsNone(proposal)
-        self.assertEqual(reason, "target_player_life_gain_spell_oracle_not_exact_fixed")
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.TARGET_PLAYER_LIFE_GAIN_SCOPE)
+        self.assertEqual(effect["effect"], "life_total_change")
+        self.assertEqual(effect["life_gain_amount"], 0)
+        self.assertEqual(effect["life_gain_amount_source"], "x_value")
+        self.assertEqual(effect["target_controller"], "target_player")
+        self.assertEqual(effect["target"], "player")
+        self.assertEqual(effect["target_preference"], "self")
+        self.assertTrue(effect["target_player_life_gain"])
 
     def test_target_player_draw_spell_maps_domain_dynamic_count(self) -> None:
         row = queue_row(

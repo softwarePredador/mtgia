@@ -19233,6 +19233,11 @@ def fixed_target_player_life_gain_spell_from_oracle(metadata: dict[str, Any]) ->
     ).strip().lower()
     if not text:
         return "target_player_life_gain_spell_oracle_not_simple"
+    if re.fullmatch(r"target player gains x life\.?", text):
+        return {
+            "life_gain_amount": 0,
+            "life_gain_amount_source": "x_value",
+        }
     number_pattern = r"(one|two|three|four|five|six|seven|eight|nine|ten|\d+)"
     match = re.fullmatch(rf"target player gains {number_pattern} life\.?", text)
     if not match:
@@ -24484,8 +24489,6 @@ def fixed_target_player_life_gain_spell_from_source(source: str) -> dict[str, An
         "Modes",
         "TargetPointer",
         ".setTargetPointer",
-        "GetXValue",
-        "ManacostVariableValue",
         "PermanentsOnBattlefieldCount",
         "GreatestAmongPermanentsValue",
     }
@@ -24495,6 +24498,15 @@ def fixed_target_player_life_gain_spell_from_source(source: str) -> dict[str, An
         return "target_player_life_gain_spell_source_target_not_supported"
     if len(re.findall(r"\bGainLifeTargetEffect\s*\(", text)) != 1:
         return "target_player_life_gain_spell_source_not_simple"
+    if re.search(
+        r"\bGainLifeTargetEffect\s*\(\s*(?:GetXValue\.instance|ManacostVariableValue\.instance)\s*\)",
+        text,
+    ):
+        return {
+            "life_gain_amount": 0,
+            "life_gain_amount_source": "x_value",
+            "xmage_effect_class": "GainLifeTargetEffect",
+        }
     life_gain = java_constructor_int(text, "GainLifeTargetEffect")
     if life_gain is None or life_gain <= 0:
         return "target_player_life_gain_spell_source_count_not_fixed"
@@ -43929,13 +43941,18 @@ def split_row(
         source_life_gain = fixed_target_player_life_gain_spell_from_source(source_text)
         if isinstance(source_life_gain, str):
             return None, source_life_gain
-        if int(oracle_life_gain["life_gain_amount"]) != int(source_life_gain["life_gain_amount"]):
+        oracle_amount_source = str(oracle_life_gain.get("life_gain_amount_source") or "").strip().lower()
+        source_amount_source = str(source_life_gain.get("life_gain_amount_source") or "").strip().lower()
+        if oracle_amount_source != source_amount_source:
+            return None, "target_player_life_gain_spell_source_oracle_mismatch"
+        if not oracle_amount_source and int(oracle_life_gain["life_gain_amount"]) != int(source_life_gain["life_gain_amount"]):
             return None, "target_player_life_gain_spell_source_oracle_mismatch"
         life_gain = int(oracle_life_gain["life_gain_amount"])
         effect_json = {
             "effect": "life_total_change",
             "battle_model_scope": TARGET_PLAYER_LIFE_GAIN_SCOPE,
             "life_gain_amount": life_gain,
+            **({"life_gain_amount_source": oracle_amount_source} if oracle_amount_source else {}),
             "target": "player",
             "target_controller": "target_player",
             "target_constraints": {"players": ["any"]},
