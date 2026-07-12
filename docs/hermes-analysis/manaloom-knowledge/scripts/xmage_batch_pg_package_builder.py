@@ -620,6 +620,8 @@ E2E_REQUIRED_EFFECT_FIELDS = (
     "dynamic_mana_battlefield_count_card_types",
     "dynamic_mana_battlefield_count_subtypes",
     "dynamic_mana_graveyard_count_card_types",
+    "dynamic_mana_minimum_produced",
+    "dynamic_mana_minimum_source",
     "conditional_mana_controlled_creature_power_gte",
     "conditional_mana_controlled_creature_count_gte",
     "conditional_mana_produced_when_condition_met",
@@ -4118,6 +4120,12 @@ def _manifest_dynamic_fixed_mana_fixture(required: dict[str, Any]) -> tuple[dict
                     for index in range(3)
                 ]
             }, 3
+    if amount_source == "controller_life_gained_this_turn":
+        life_gained = 3
+        return {"controller_life_gained_this_turn": life_gained}, max(
+            life_gained,
+            int(required.get("dynamic_mana_minimum_produced") or 0),
+        )
     if amount_source == "devotion_to_green":
         return {
             "controller_battlefield": [

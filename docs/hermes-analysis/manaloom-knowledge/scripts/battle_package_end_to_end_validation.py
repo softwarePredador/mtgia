@@ -6146,6 +6146,13 @@ def run_simple_mana_source_refresh(
                     f"expected {expected_etb_return_count}",
                 )
 
+    controller_life_gained = int(scenario.get("controller_life_gained_this_turn") or 0)
+    if controller_life_gained:
+        if hasattr(active, "record_life_gained"):
+            active.record_life_gained(controller_life_gained, turn)
+        else:
+            active.life_gained_this_turn = controller_life_gained
+
     active.refresh_mana_sources(turn=turn)
 
     expected_available = int(scenario.get("expected_available_mana_after_refresh") or 0)

@@ -29995,10 +29995,17 @@ def dynamic_any_one_color_mana_source_detail_from_oracle(
     candidates: list[dict[str, Any]] = []
     type_line = str(metadata.get("type_line") or "")
     mana_cost = str(metadata.get("mana_cost") or "")
-    for line in normalized_oracle_lines(metadata):
-        normalized = strip_parenthetical_reminders(
+    lines = [
+        strip_parenthetical_reminders(
             re.sub(r"\s+", " ", str(line or "").strip().lower())
         ).strip().rstrip(".")
+        for line in normalized_oracle_lines(metadata)
+    ]
+    has_simple_any_color_mana = any(
+        re.fullmatch(r"\{t\}: add one mana of any color", line)
+        for line in lines
+    )
+    for normalized in lines:
         base = {
             "produces": "WUBRG",
             "mana_produced": 1,
@@ -30026,6 +30033,24 @@ def dynamic_any_one_color_mana_source_detail_from_oracle(
                         else "all_battlefield"
                     ),
                     "dynamic_mana_battlefield_count_subtypes": [subtype],
+                }
+            )
+            continue
+        match = re.fullmatch(
+            r"\{t\}: add x mana of any one color, where x is the amount of life you gained this turn",
+            normalized,
+        )
+        if match:
+            candidates.append(
+                {
+                    **base,
+                    "dynamic_mana_amount_source": "controller_life_gained_this_turn",
+                    "dynamic_mana_minimum_produced": 1 if has_simple_any_color_mana else 0,
+                    "dynamic_mana_minimum_source": (
+                        "independent_any_color_mana_ability"
+                        if has_simple_any_color_mana
+                        else ""
+                    ),
                 }
             )
             continue
@@ -30078,7 +30103,13 @@ def dynamic_any_one_color_mana_source_detail_from_source(
     text = source_text or ""
     if "DynamicManaAbility" not in mana_ability_classes:
         return None
-    if mana_ability_classes != {"DynamicManaAbility"}:
+    allowed_combo = mana_ability_classes == {"DynamicManaAbility"} or (
+        mana_ability_classes == {"AnyColorManaAbility", "DynamicManaAbility"}
+        and re.search(r"this\.addAbility\(new\s+AnyColorManaAbility\s*\(", text)
+        and "ControllerGainedLifeCount.instance" in text
+        and "PlayerGainedLifeWatcher" in text
+    )
+    if not allowed_combo:
         return "dynamic_any_one_color_mana_source_ability_class_not_exact"
     if re.search(r"new\s+[A-Za-z0-9_]+Effect\s*\(", text):
         return "dynamic_any_one_color_mana_source_effect_class_not_empty"
@@ -30095,7 +30126,12 @@ def dynamic_any_one_color_mana_source_detail_from_source(
         "conditional_mana_modes": _dynamic_any_one_color_modes(),
         "mana_activation_requires_tap": True,
     }
-    if "CardsInControllerGraveyardCount" in text and "FILTER_CARD_CREATURE" in text:
+    if "ControllerGainedLifeCount.instance" in text:
+        detail["dynamic_mana_amount_source"] = "controller_life_gained_this_turn"
+        if "AnyColorManaAbility" in mana_ability_classes:
+            detail["dynamic_mana_minimum_produced"] = 1
+            detail["dynamic_mana_minimum_source"] = "independent_any_color_mana_ability"
+    elif "CardsInControllerGraveyardCount" in text and "FILTER_CARD_CREATURE" in text:
         detail["dynamic_mana_amount_source"] = "controller_graveyard_card_count"
         detail["dynamic_mana_graveyard_count_card_types"] = ["creature"]
     elif "PermanentsOnBattlefieldCount" in text:
@@ -47895,6 +47931,8 @@ def split_row(
                 "dynamic_mana_battlefield_count_card_types",
                 "dynamic_mana_battlefield_count_subtypes",
                 "dynamic_mana_graveyard_count_card_types",
+                "dynamic_mana_minimum_produced",
+                "dynamic_mana_minimum_source",
                 "mana_activation_requires_tap",
             ):
                 if source_dynamic_any_one_color_mana.get(key) != dynamic_any_one_color_mana_source.get(key):
@@ -47923,7 +47961,7 @@ def split_row(
                 "dynamic_mana_amount_source": dynamic_any_one_color_mana_source["dynamic_mana_amount_source"],
                 "source_type_line": type_line,
                 "source_mana_cost": str(metadata.get("mana_cost") or ""),
-                "xmage_mana_ability_classes": ["DynamicManaAbility"],
+                "xmage_mana_ability_classes": sorted(mana_ability_classes),
                 "xmage_effect_classes": sorted(classes),
                 "xmage_ability_classes": sorted(mana_ability_classes),
             }
@@ -47932,6 +47970,8 @@ def split_row(
                 "dynamic_mana_battlefield_count_card_types",
                 "dynamic_mana_battlefield_count_subtypes",
                 "dynamic_mana_graveyard_count_card_types",
+                "dynamic_mana_minimum_produced",
+                "dynamic_mana_minimum_source",
             ):
                 if dynamic_any_one_color_mana_source.get(optional_key) not in (None, "", []):
                     effect_json[optional_key] = dynamic_any_one_color_mana_source[optional_key]

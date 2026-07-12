@@ -8804,6 +8804,55 @@ def test_dynamic_any_one_color_mana_source_manifest_builds_conditional_scenario(
     assert scenario["type_line"] == "Enchantment Creature - Dryad"
 
 
+def test_life_gained_dynamic_any_one_color_mana_source_manifest_builds_life_fixture() -> None:
+    proposal = {
+        "normalized_name": "accomplished alchemist",
+        "card_name": "Accomplished Alchemist",
+        "oracle_hash": "hash-accomplished-alchemist",
+        "logical_rule_key": "battle_rule_v1:accomplished-alchemist",
+        "effect_json": {
+            "effect": "ramp_permanent",
+            "battle_model_scope": "xmage_dynamic_any_one_color_mana_source_permanent_v1",
+            "is_mana_source": True,
+            "mana_produced": 1,
+            "produces": "WUBRG",
+            "produced_mana_symbols": list("WUBRG"),
+            "mana_activation_requires_tap": True,
+            "activation_requires_tap": True,
+            "conditional_mana_same_color_choice": True,
+            "conditional_mana_modes_status": "runtime_executor_v1",
+            "conditional_mana_modes": [
+                {
+                    "color": symbol,
+                    "restriction": "any_spell",
+                    "mode": "dynamic_any_one_color",
+                    "status": "runtime_executor_v1",
+                }
+                for symbol in "WUBRG"
+            ],
+            "dynamic_mana_amount_source": "controller_life_gained_this_turn",
+            "dynamic_mana_minimum_produced": 1,
+            "dynamic_mana_minimum_source": "independent_any_color_mana_ability",
+            "source_type_line": "Creature - Elf Druid",
+            "source_mana_cost": "{3}{G}",
+        },
+    }
+
+    expected = builder.expected_rule_from_proposal(proposal)
+    required = expected["required_effect_fields"]
+
+    assert required["dynamic_mana_amount_source"] == "controller_life_gained_this_turn"
+    assert required["dynamic_mana_minimum_produced"] == 1
+
+    scenario = builder.execution_scenario_from_expected_rule(expected)
+
+    assert scenario["type"] == "simple_mana_source_refresh"
+    assert scenario["controller_life_gained_this_turn"] == 3
+    assert scenario["expected_available_mana_after_refresh"] == 3
+    assert scenario["expected_conditional_mana"] == 3
+    assert scenario["expected_conditional_colors"] == ["black", "blue", "green", "red", "white"]
+
+
 def test_controlled_creature_condition_conditional_mana_source_manifest_builds_ferocious_scenario() -> None:
     proposal = {
         "normalized_name": "ilysian caryatid",

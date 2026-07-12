@@ -22156,6 +22156,43 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
                 for key, value in expected_fields.items():
                     self.assertEqual(effect[key], value)
 
+    def test_dynamic_any_one_color_mana_source_with_independent_minimum_maps_exact_scope(self) -> None:
+        row = queue_row(
+            split.RAMP_CREATURE_UNIT,
+            effect_classes=[],
+            ability_kind="activated",
+            ability_classes=["AnyColorManaAbility", "DynamicManaAbility"],
+        )
+
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Accomplished Alchemist",
+                type_line="Creature - Elf Druid",
+                oracle_text=(
+                    "{T}: Add one mana of any color.\n"
+                    "{T}: Add X mana of any one color, where X is the amount of life you gained this turn."
+                ),
+                mana_cost="{3}{G}",
+            ),
+            source_text="""
+                this.addAbility(new AnyColorManaAbility());
+                this.addAbility(new DynamicManaAbility(
+                        Mana.AnyMana(1), ControllerGainedLifeCount.instance, new TapSourceCost(),
+                        "Add X mana of any one color, where X is the amount of life you gained this turn", true
+                ).addHint(ControllerGainedLifeCount.getHint()), new PlayerGainedLifeWatcher());
+            """,
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        self.assertEqual(proposal["family_id"], "xmage_dynamic_any_one_color_mana_source")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.DYNAMIC_ANY_ONE_COLOR_MANA_SCOPE)
+        self.assertEqual(effect["dynamic_mana_amount_source"], "controller_life_gained_this_turn")
+        self.assertEqual(effect["dynamic_mana_minimum_produced"], 1)
+        self.assertEqual(effect["dynamic_mana_minimum_source"], "independent_any_color_mana_ability")
+        self.assertEqual(effect["xmage_mana_ability_classes"], ["AnyColorManaAbility", "DynamicManaAbility"])
+
     def test_controlled_creature_condition_conditional_mana_source_maps_exact_scope(self) -> None:
         fixtures = [
             (

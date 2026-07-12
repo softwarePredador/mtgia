@@ -6673,15 +6673,27 @@ def _dynamic_mana_source_production_for_state(player, source):
     amount_source = str(source.get("dynamic_mana_amount_source") or "").strip().lower()
     if not amount_source:
         return None
+    minimum = max(0, int(source.get("dynamic_mana_minimum_produced") or 0))
+    produced = 0
     if amount_source == "battlefield_permanent_count":
-        return _battlefield_permanent_count_for_dynamic_mana(player, source)
-    if amount_source == "controller_graveyard_card_count":
-        return _controller_graveyard_card_count_for_dynamic_mana(player, source)
-    if amount_source == "devotion_to_green":
-        return devotion_to_color(player, "G")
-    if amount_source == "source_power":
-        return _source_power_value(source)
-    return 0
+        produced = _battlefield_permanent_count_for_dynamic_mana(player, source)
+    elif amount_source == "controller_graveyard_card_count":
+        produced = _controller_graveyard_card_count_for_dynamic_mana(player, source)
+    elif amount_source == "devotion_to_green":
+        produced = devotion_to_color(player, "G")
+    elif amount_source == "source_power":
+        produced = _source_power_value(source)
+    elif amount_source == "controller_life_gained_this_turn":
+        produced = (
+            player.life_gained_this_turn_count(CURRENT_REPLAY_TURN)
+            if hasattr(player, "life_gained_this_turn_count")
+            else int(getattr(player, "life_gained_this_turn", 0) or 0)
+        )
+    else:
+        return 0
+    if minimum:
+        return max(minimum, int(produced or 0))
+    return produced
 
 
 def _controls_creature_with_power_at_least(player, threshold):
