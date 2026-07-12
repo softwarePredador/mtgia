@@ -176,6 +176,7 @@ E2E_REQUIRED_EFFECT_FIELDS = (
     "target_count_from_x",
     "target_count_source",
     "target_player_draw",
+    "target_player_life_gain",
     "target_player_mill",
     "target_player_scope",
     "look_at_hand",
@@ -5551,6 +5552,32 @@ def target_player_draw_execution_scenario_from_expected_rule(
     }
 
 
+def target_player_life_gain_execution_scenario_from_expected_rule(
+    rule: dict[str, Any],
+) -> dict[str, Any] | None:
+    required = dict(rule.get("required_effect_fields") or {})
+    if required.get("battle_model_scope") != "xmage_fixed_target_player_gain_life_spell_v1":
+        return None
+    life_gain = int(required.get("life_gain_amount") or 0)
+    if life_gain <= 0:
+        return None
+    starting_life = 20
+    return {
+        "name": f"{rule['card_name']} target player gains life",
+        "type": "target_player_life_gain_spell",
+        "card": {
+            "name": rule["card_name"],
+            "type_line": "Instant" if required.get("instant") else "Sorcery",
+        },
+        "starting_life": starting_life,
+        "expected_life_gain": life_gain,
+        "expected_life_after": starting_life + life_gain,
+        "expected_target_player": "Spell Controller",
+        "target_preference": str(required.get("target_preference") or "self"),
+        "logical_rule_key": rule["logical_rule_key"],
+    }
+
+
 def target_player_mill_execution_scenario_from_expected_rule(
     rule: dict[str, Any],
 ) -> dict[str, Any] | None:
@@ -10392,6 +10419,7 @@ def execution_scenario_from_expected_rule(rule: dict[str, Any]) -> dict[str, Any
         or look_at_hand_draw_execution_scenario_from_expected_rule(rule)
         or target_player_discard_execution_scenario_from_expected_rule(rule)
         or target_player_draw_execution_scenario_from_expected_rule(rule)
+        or target_player_life_gain_execution_scenario_from_expected_rule(rule)
         or target_player_mill_execution_scenario_from_expected_rule(rule)
         or combat_damage_draw_execution_scenario_from_expected_rule(rule)
         or beginning_end_step_draw_execution_scenario_from_expected_rule(rule)

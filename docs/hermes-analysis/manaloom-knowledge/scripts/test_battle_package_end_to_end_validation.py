@@ -2862,6 +2862,51 @@ def test_target_player_domain_draw_runner_counts_target_basic_land_types() -> No
     )
 
 
+def test_target_player_life_gain_runner_executes_target_player_gain() -> None:
+    effect = {
+        "effect": "life_total_change",
+        "battle_model_scope": "xmage_fixed_target_player_gain_life_spell_v1",
+        "target": "player",
+        "target_controller": "target_player",
+        "target_preference": "self",
+        "life_gain_amount": 7,
+        "target_player_life_gain": True,
+        "_rule_logical_key": "battle_rule_v1:heroes-reunion",
+    }
+    rule = {
+        "card_name": "Heroes' Reunion",
+        "logical_rule_key": "battle_rule_v1:heroes-reunion",
+        "required_effect_fields": effect,
+    }
+    scenario = package_builder.target_player_life_gain_execution_scenario_from_expected_rule(rule)
+
+    assert scenario is not None
+    battle = validator.load_battle(validator.DEFAULT_BATTLE)
+    events = []
+    previous_handler = battle.REPLAY_EVENT_HANDLER
+    previous_get_card_effect = battle.get_card_effect
+    battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+    battle.get_card_effect = lambda card: dict(effect)
+    try:
+        result = validator.run_target_player_life_gain_spell(battle, scenario, events)
+    finally:
+        battle.REPLAY_EVENT_HANDLER = previous_handler
+        battle.get_card_effect = previous_get_card_effect
+
+    assert result["card_name"] == "Heroes' Reunion"
+    assert result["target_player"] == "Spell Controller"
+    assert result["life_gained"] == 7
+    assert result["life_after"] == 27
+    assert any(
+        event == "life_total_changed"
+        and data.get("card") == "Heroes' Reunion"
+        and data.get("target_player") == "Spell Controller"
+        and data.get("requested_delta") == 7
+        and data.get("life_after") == 27
+        for event, data in events
+    )
+
+
 def test_target_player_x_draw_runner_validates_shuffle_self() -> None:
     effect = {
         "effect": "draw_cards",

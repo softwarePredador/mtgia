@@ -180,6 +180,10 @@ TARGET_PLAYER_DISCARD_UNIT = (
     "xmage_signature::DiscardTargetEffect::no_ability_class::"
     "TargetPlayer::no_condition_class::targeting"
 )
+TARGET_PLAYER_LIFE_GAIN_UNIT = (
+    "xmage_signature::GainLifeTargetEffect::no_ability_class::"
+    "TargetPlayer::no_condition_class::targeting"
+)
 MILL_TARGET_UNIT = "mill_cards::target_player_mill_fixed_or_x_variant_v1"
 PREVENT_ALL_COMBAT_DAMAGE_SPELL_UNIT = (
     "xmage_signature::PreventAllDamageByAllPermanentsEffect::no_ability_class::"
@@ -259,6 +263,7 @@ SUPPORTED_UNITS = {
     LOOK_LIBRARY_PICK_SPELL_UNIT,
     ETB_LOOK_LIBRARY_PICK_CREATURE_UNIT,
     TARGET_PLAYER_DISCARD_UNIT,
+    TARGET_PLAYER_LIFE_GAIN_UNIT,
     MILL_TARGET_UNIT,
     PREVENT_ALL_COMBAT_DAMAGE_SPELL_UNIT,
     PREVENT_ALL_COMBAT_DAMAGE_CYCLING_SPELL_UNIT,
@@ -272,6 +277,7 @@ DRAW_SELF_COST_REDUCTION_SCOPE = "xmage_fixed_source_controller_draw_spell_self_
 STATIC_GENERIC_COST_REDUCTION_SCOPE = "xmage_static_generic_cost_reduction_for_matching_spells_v1"
 STATIC_GENERIC_COST_INCREASE_SCOPE = "xmage_static_generic_cost_increase_for_matching_spells_v1"
 TARGET_DRAW_SCOPE = "xmage_fixed_target_player_draw_spell_v1"
+TARGET_PLAYER_LIFE_GAIN_SCOPE = "xmage_fixed_target_player_gain_life_spell_v1"
 LOOK_AT_HAND_SCOPE = "xmage_look_at_target_player_hand_spell_v1"
 LOOK_AT_HAND_DRAW_SCOPE = "xmage_look_at_target_player_hand_draw_card_spell_v1"
 TARGET_PLAYER_DISCARD_SCOPE = "xmage_fixed_target_player_discard_spell_v1"
@@ -19219,6 +19225,24 @@ def fixed_target_player_draw_spell_from_oracle(metadata: dict[str, Any]) -> dict
     return {"draw_count": draw_count}
 
 
+def fixed_target_player_life_gain_spell_from_oracle(metadata: dict[str, Any]) -> dict[str, Any] | str:
+    text = re.sub(
+        r"\s+",
+        " ",
+        " ".join(oracle_effect_lines_without_neutral_auxiliary(metadata)),
+    ).strip().lower()
+    if not text:
+        return "target_player_life_gain_spell_oracle_not_simple"
+    number_pattern = r"(one|two|three|four|five|six|seven|eight|nine|ten|\d+)"
+    match = re.fullmatch(rf"target player gains {number_pattern} life\.?", text)
+    if not match:
+        return "target_player_life_gain_spell_oracle_not_exact_fixed"
+    life_gain = number_word_to_int(match.group(1))
+    if life_gain <= 0:
+        return "target_player_life_gain_spell_count_not_fixed"
+    return {"life_gain_amount": life_gain}
+
+
 def fixed_target_player_discard_spell_from_oracle(metadata: dict[str, Any]) -> dict[str, Any] | str:
     text = re.sub(
         r"\s+",
@@ -24446,6 +24470,37 @@ def fixed_target_player_draw_spell_from_source(source: str) -> dict[str, Any] | 
     return {
         "draw_count": int(draw_count),
         "xmage_effect_class": "DrawCardTargetEffect",
+    }
+
+
+def fixed_target_player_life_gain_spell_from_source(source: str) -> dict[str, Any] | str:
+    text = source or ""
+    if has_additional_cost(text):
+        return "target_player_life_gain_spell_source_additional_cost_not_supported"
+    unsupported_markers = {
+        "ConditionalOneShotEffect",
+        "DoIfCostPaid",
+        "Mode",
+        "Modes",
+        "TargetPointer",
+        ".setTargetPointer",
+        "GetXValue",
+        "ManacostVariableValue",
+        "PermanentsOnBattlefieldCount",
+        "GreatestAmongPermanentsValue",
+    }
+    if any(marker in text for marker in unsupported_markers):
+        return "target_player_life_gain_spell_source_not_simple"
+    if len(re.findall(r"new\s+TargetPlayer\s*\(\s*\)", text)) != 1:
+        return "target_player_life_gain_spell_source_target_not_supported"
+    if len(re.findall(r"\bGainLifeTargetEffect\s*\(", text)) != 1:
+        return "target_player_life_gain_spell_source_not_simple"
+    life_gain = java_constructor_int(text, "GainLifeTargetEffect")
+    if life_gain is None or life_gain <= 0:
+        return "target_player_life_gain_spell_source_count_not_fixed"
+    return {
+        "life_gain_amount": int(life_gain),
+        "xmage_effect_class": "GainLifeTargetEffect",
     }
 
 
@@ -43863,6 +43918,38 @@ def split_row(
             **(additional_cost_fields or {}),
         }
         return build_proposal(row, metadata, effect_json, family_id="xmage_destroy_target_spell"), "selected_exact_scope"
+
+    if unit == TARGET_PLAYER_LIFE_GAIN_UNIT and classes == {"GainLifeTargetEffect"}:
+        unsupported_abilities = ability_classes(row) - ALLOWED_AUXILIARY_RESOLUTION_ABILITY_CLASSES
+        if unsupported_abilities:
+            return None, "target_player_life_gain_spell_ability_class_not_simple"
+        oracle_life_gain = fixed_target_player_life_gain_spell_from_oracle(metadata)
+        if isinstance(oracle_life_gain, str):
+            return None, oracle_life_gain
+        source_life_gain = fixed_target_player_life_gain_spell_from_source(source_text)
+        if isinstance(source_life_gain, str):
+            return None, source_life_gain
+        if int(oracle_life_gain["life_gain_amount"]) != int(source_life_gain["life_gain_amount"]):
+            return None, "target_player_life_gain_spell_source_oracle_mismatch"
+        life_gain = int(oracle_life_gain["life_gain_amount"])
+        effect_json = {
+            "effect": "life_total_change",
+            "battle_model_scope": TARGET_PLAYER_LIFE_GAIN_SCOPE,
+            "life_gain_amount": life_gain,
+            "target": "player",
+            "target_controller": "target_player",
+            "target_constraints": {"players": ["any"]},
+            "target_preference": "self",
+            "target_player_life_gain": True,
+            "xmage_effect_class": "GainLifeTargetEffect",
+            **flags,
+        }
+        return build_proposal(
+            row,
+            metadata,
+            effect_json,
+            family_id="xmage_fixed_target_player_life_gain_spell",
+        ), "selected_exact_scope"
 
     if unit == LIFE_UNIT and classes == {"BoostTargetEffect", "GainLifeEffect"}:
         unsupported_abilities = ability_classes(row) - ALLOWED_AUXILIARY_RESOLUTION_ABILITY_CLASSES

@@ -434,6 +434,10 @@ patterns:
   pays that cost before target removal.
 - `life_gain::xmage_life_gain_variant_review_v1` ->
   `xmage_fixed_controller_gain_life_spell_v1`
+- `xmage_signature::GainLifeTargetEffect::no_ability_class::TargetPlayer::no_condition_class::targeting`
+  with exact fixed "Target player gains N life" Oracle/source agreement and a
+  single `TargetPlayer()` ->
+  `xmage_fixed_target_player_gain_life_spell_v1`
 - `life_gain::xmage_life_gain_variant_review_v1` with
   `DamageTargetEffect + GainLifeEffect` and exact fixed damage/life-gain
   Oracle/source text ->

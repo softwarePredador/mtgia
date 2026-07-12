@@ -14253,6 +14253,67 @@ def run_target_player_draw_spell(
     }
 
 
+def run_target_player_life_gain_spell(
+    battle,
+    scenario: dict[str, Any],
+    events: list[tuple[str, dict[str, Any]]],
+) -> dict[str, Any]:
+    card = dict(scenario["card"])
+    effect = dict(battle.get_card_effect(card))
+    if effect.get("effect") != "life_total_change":
+        fail("battle_execution", f"{card['name']} effect={effect.get('effect')!r}")
+    if effect.get("battle_model_scope") != "xmage_fixed_target_player_gain_life_spell_v1":
+        fail("battle_execution", f"{card['name']} battle_model_scope={effect.get('battle_model_scope')!r}")
+    if effect.get("target_player_life_gain") is not True:
+        fail("battle_execution", f"{card['name']} is not marked target_player_life_gain")
+    active = battle.Player(str(scenario.get("player") or "Spell Controller"), None, [])
+    opponent = battle.Player(str(scenario.get("opponent") or "Opponent"), None, [])
+    starting_life = int(scenario.get("starting_life") or 20)
+    active.life = starting_life
+    expected_life_gain = int(scenario.get("expected_life_gain") or effect.get("life_gain_amount") or 0)
+    expected_life_after = int(scenario.get("expected_life_after") or (starting_life + expected_life_gain))
+    expected_target_player = str(scenario.get("expected_target_player") or active.name)
+    before_events = len(events)
+
+    battle.apply_effect_immediate(
+        active,
+        [opponent],
+        battle.enrich_card(card),
+        turn=int(scenario.get("turn") or 6171),
+        rng=random.Random(int(scenario.get("seed") or 6171)),
+        effect_data_override=effect,
+        phase=str(scenario.get("phase") or "precombat_main"),
+    )
+
+    if active.life != expected_life_after:
+        fail("battle_execution", f"{card['name']} life={active.life}, expected {expected_life_after}")
+    event = next(
+        (
+            data
+            for event, data in events[before_events:]
+            if event == "life_total_changed"
+            and data.get("card") == card.get("name")
+            and data.get("target_player") == expected_target_player
+        ),
+        None,
+    )
+    if event is None:
+        fail("battle_events", f"missing {card['name']} life_total_changed event")
+    if int(event.get("requested_delta") or 0) != expected_life_gain:
+        fail("battle_events", f"{card['name']} requested_delta={event.get('requested_delta')}")
+    if int(event.get("life_before") or 0) != starting_life:
+        fail("battle_events", f"{card['name']} life_before={event.get('life_before')}")
+    if int(event.get("life_after") or 0) != expected_life_after:
+        fail("battle_events", f"{card['name']} life_after={event.get('life_after')}")
+    return {
+        "scenario": scenario.get("name"),
+        "card_name": card["name"],
+        "target_player": expected_target_player,
+        "life_gained": expected_life_gain,
+        "life_after": expected_life_after,
+    }
+
+
 def run_target_player_mill_spell(
     battle,
     scenario: dict[str, Any],
@@ -15313,6 +15374,7 @@ SCENARIO_RUNNERS = {
     "add_counters_untap_target_spell": run_add_counters_untap_target_spell,
     "target_player_discard_spell": run_target_player_discard_spell,
     "target_player_draw_spell": run_target_player_draw_spell,
+    "target_player_life_gain_spell": run_target_player_life_gain_spell,
     "target_player_mill_spell": run_target_player_mill_spell,
     "look_at_hand_draw_spell": run_look_at_hand_draw_spell,
     "target_keyword_draw_spell": run_target_keyword_draw_spell,

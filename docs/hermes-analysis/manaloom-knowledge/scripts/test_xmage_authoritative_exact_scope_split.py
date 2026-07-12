@@ -8611,6 +8611,55 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertEqual(effect["draw_count"], 4)
         self.assertEqual(effect["count"], 4)
 
+    def test_fixed_target_player_life_gain_spell_maps(self) -> None:
+        row = queue_row(
+            split.TARGET_PLAYER_LIFE_GAIN_UNIT,
+            effect_classes=["GainLifeTargetEffect"],
+            xmage_signals=["targeting"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Heroes' Reunion",
+                oracle_text="Target player gains 7 life.",
+            ),
+            source_text=(
+                "this.getSpellAbility().addEffect(new GainLifeTargetEffect(7));"
+                "this.getSpellAbility().addTarget(new TargetPlayer());"
+            ),
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.TARGET_PLAYER_LIFE_GAIN_SCOPE)
+        self.assertEqual(effect["effect"], "life_total_change")
+        self.assertEqual(effect["life_gain_amount"], 7)
+        self.assertEqual(effect["target_controller"], "target_player")
+        self.assertEqual(effect["target"], "player")
+        self.assertEqual(effect["target_preference"], "self")
+        self.assertTrue(effect["target_player_life_gain"])
+
+    def test_target_player_life_gain_spell_blocks_dynamic_x_value(self) -> None:
+        row = queue_row(
+            split.TARGET_PLAYER_LIFE_GAIN_UNIT,
+            effect_classes=["GainLifeTargetEffect"],
+            xmage_signals=["targeting"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Stream of Life",
+                oracle_text="Target player gains X life.",
+            ),
+            source_text=(
+                "this.getSpellAbility().addEffect(new GainLifeTargetEffect(ManacostVariableValue.instance));"
+                "this.getSpellAbility().addTarget(new TargetPlayer());"
+            ),
+        )
+
+        self.assertIsNone(proposal)
+        self.assertEqual(reason, "target_player_life_gain_spell_oracle_not_exact_fixed")
+
     def test_target_player_draw_spell_maps_domain_dynamic_count(self) -> None:
         row = queue_row(
             split.DRAW_UNIT,

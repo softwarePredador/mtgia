@@ -2956,6 +2956,35 @@ def test_manifest_builds_target_player_domain_draw_execution_scenario() -> None:
     assert scenario["expected_target_player"] == "Spell Controller"
 
 
+def test_manifest_builds_target_player_life_gain_execution_scenario() -> None:
+    rule = {
+        "normalized_name": "heroes reunion",
+        "card_name": "Heroes' Reunion",
+        "oracle_hash": "hash-heroes-reunion",
+        "logical_rule_key": "battle_rule_v1:hash-heroes-reunion",
+        "required_effect_fields": {
+            "effect": "life_total_change",
+            "battle_model_scope": "xmage_fixed_target_player_gain_life_spell_v1",
+            "target": "player",
+            "target_controller": "target_player",
+            "target_preference": "self",
+            "life_gain_amount": 7,
+            "target_player_life_gain": True,
+            "instant": True,
+        },
+    }
+
+    scenario = builder.execution_scenario_from_expected_rule(rule)
+
+    assert scenario is not None
+    assert scenario["type"] == "target_player_life_gain_spell"
+    assert scenario["card"]["name"] == "Heroes' Reunion"
+    assert scenario["card"]["type_line"] == "Instant"
+    assert scenario["expected_life_gain"] == 7
+    assert scenario["expected_life_after"] == 27
+    assert scenario["expected_target_player"] == "Spell Controller"
+
+
 def test_manifest_builds_target_player_x_draw_shuffle_self_execution_scenario() -> None:
     rule = {
         "normalized_name": "blue sun's zenith",

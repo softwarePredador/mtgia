@@ -1,0 +1,186 @@
+{
+  "battle_execution": {
+    "event_count": 6,
+    "results": [
+      {
+        "card_name": "Heroes' Reunion",
+        "life_after": 27,
+        "life_gained": 7,
+        "scenario": "Heroes' Reunion target player gains life",
+        "target_player": "Spell Controller"
+      },
+      {
+        "card_name": "Natural Spring",
+        "life_after": 28,
+        "life_gained": 8,
+        "scenario": "Natural Spring target player gains life",
+        "target_player": "Spell Controller"
+      },
+      {
+        "card_name": "Soothing Balm",
+        "life_after": 25,
+        "life_gained": 5,
+        "scenario": "Soothing Balm target player gains life",
+        "target_player": "Spell Controller"
+      }
+    ],
+    "scenario_count": 3
+  },
+  "battle_path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py",
+  "database_target": "127.0.0.1:15432/halder",
+  "generated_at_utc": "2026-07-12T19:09:06.775885+00:00",
+  "manifest": "docs/hermes-analysis/master_optimizer_reports/pg838_target_player_life_gain_new_server_manifest.json",
+  "package_id": "pg838_target_player_life_gain_new_server_manifest",
+  "snapshot": "docs/hermes-analysis/master_optimizer_reports/pg838_target_player_life_gain_new_server_pg_to_sqlite_sync_tracked_snapshot.json",
+  "sqlite_db": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db",
+  "stages": [
+    {
+      "evidence": {
+        "validated_rows": 3
+      },
+      "name": "postgres_source_of_truth",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_target_player_gain_life_spell_v1",
+          "card_name": "Heroes' Reunion",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:675a903affa974b767d7032ed17c9cf0",
+          "oracle_hash": "51ee20702a81f565c6068f3e01b3d93c",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_target_player_gain_life_spell_v1",
+          "card_name": "Natural Spring",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:9e59eee82b6f319acb39d325b85d403a",
+          "oracle_hash": "e386fc1de5b84be7abebce58811b70c3",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_target_player_gain_life_spell_v1",
+          "card_name": "Soothing Balm",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:276b06bc2c0276fb1a68e9a57b8b3ed8",
+          "oracle_hash": "31d97defbfc2ea173e5eaf1581070d8b",
+          "review_status": "verified",
+          "rule_version": 2
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_rows": 3
+      },
+      "name": "sqlite_hermes_cache",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_target_player_gain_life_spell_v1",
+          "card_name": "Heroes' Reunion",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:675a903affa974b767d7032ed17c9cf0",
+          "oracle_hash": "51ee20702a81f565c6068f3e01b3d93c",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_target_player_gain_life_spell_v1",
+          "card_name": "Natural Spring",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:9e59eee82b6f319acb39d325b85d403a",
+          "oracle_hash": "e386fc1de5b84be7abebce58811b70c3",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_target_player_gain_life_spell_v1",
+          "card_name": "Soothing Balm",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:276b06bc2c0276fb1a68e9a57b8b3ed8",
+          "oracle_hash": "31d97defbfc2ea173e5eaf1581070d8b",
+          "review_status": "verified",
+          "rule_version": 2
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_cards": 3
+      },
+      "name": "canonical_snapshot_fallback",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_target_player_gain_life_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Heroes' Reunion",
+          "logical_rule_key": "battle_rule_v1:675a903affa974b767d7032ed17c9cf0"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_target_player_gain_life_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Natural Spring",
+          "logical_rule_key": "battle_rule_v1:9e59eee82b6f319acb39d325b85d403a"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_target_player_gain_life_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Soothing Balm",
+          "logical_rule_key": "battle_rule_v1:276b06bc2c0276fb1a68e9a57b8b3ed8"
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_cards": 3
+      },
+      "name": "runtime_get_card_effect",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "card_name": "Heroes' Reunion",
+          "component_keys": [],
+          "effect": "life_total_change",
+          "logical_rule_key": "battle_rule_v1:675a903affa974b767d7032ed17c9cf0"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Natural Spring",
+          "component_keys": [],
+          "effect": "life_total_change",
+          "logical_rule_key": "battle_rule_v1:9e59eee82b6f319acb39d325b85d403a"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Soothing Balm",
+          "component_keys": [],
+          "effect": "life_total_change",
+          "logical_rule_key": "battle_rule_v1:276b06bc2c0276fb1a68e9a57b8b3ed8"
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "events": 6,
+        "scenarios": 3
+      },
+      "name": "battle_execution",
+      "status": "pass"
+    }
+  ],
+  "status": "pass",
+  "title": "Battle Package End-to-End Validation"
+}
