@@ -68737,6 +68737,82 @@ def resolve_target_player_draw_spell(
     )
 
 
+def _target_player_mill_target_player(player, opponents, effect_data, mill_count):
+    candidates = [player] + [
+        opponent for opponent in (opponents or []) if getattr(opponent, "is_alive", lambda: True)()
+    ]
+    declared_names = []
+    for entry in (effect_data or {}).get("declared_targets") or []:
+        if isinstance(entry, dict):
+            target = entry.get("target")
+            name = (
+                entry.get("target_player")
+                or entry.get("player")
+                or entry.get("name")
+                or getattr(target, "name", None)
+            )
+            if name:
+                declared_names.append(str(name))
+        elif entry:
+            declared_names.append(str(entry))
+    for declared_name in declared_names:
+        for candidate in candidates:
+            if getattr(candidate, "name", None) == declared_name:
+                return candidate, "declared_target"
+
+    preference = str((effect_data or {}).get("target_preference") or "opponent").lower()
+    if preference in {"self", "controller"}:
+        return player, "self_preference"
+    target = choose_mill_target(player, opponents or [], mill_count)
+    if target is player:
+        return target, "fallback_self_no_opponent"
+    return target, "opponent_mill_preferred"
+
+
+def resolve_target_player_mill_spell(
+    player,
+    opponents,
+    card,
+    effect_data,
+    turn,
+    rng,
+    *,
+    phase=None,
+    all_players=None,
+    stack=None,
+):
+    mill_count = max(0, int((effect_data or {}).get("mill_count") or (effect_data or {}).get("count") or 0))
+    target_player, target_reason = _target_player_mill_target_player(
+        player,
+        opponents,
+        effect_data,
+        mill_count,
+    )
+    library_before = len(getattr(target_player, "library", []) or [])
+    milled = []
+    for _ in range(min(mill_count, len(getattr(target_player, "library", []) or []))):
+        milled_card = target_player.library.pop(0)
+        target_player.graveyard.append(milled_card)
+        milled.append(milled_card)
+    emit_replay_event(
+        "mill_resolved",
+        player=player.name,
+        card=card.get("name", "?"),
+        target_player=getattr(target_player, "name", "?"),
+        target_reason=target_reason,
+        target_controller=str((effect_data or {}).get("target_controller") or "target_player"),
+        target_player_mill=True,
+        requested_mill=mill_count,
+        cards_milled=len(milled),
+        milled=[milled_card.get("name", "?") for milled_card in milled if isinstance(milled_card, dict)][:12],
+        target_library_before=library_before,
+        target_library_after=len(getattr(target_player, "library", []) or []),
+        turn=turn,
+        phase=phase or "resolution",
+        **replay_rule_fields(effect_data),
+    )
+
+
 def resolve_draw_lose_life_spell(
     player,
     opponents,
@@ -69984,6 +70060,19 @@ def apply_effect_immediate(
             rng,
             phase=phase or "resolution",
             all_players=all_players_for_entry,
+        )
+        finish_resolved_spell(player, card, turn=turn, effect_data=effect_data)
+    elif effect == "mill_cards":
+        resolve_target_player_mill_spell(
+            player,
+            opponents,
+            card,
+            effect_data,
+            turn,
+            rng,
+            phase=phase or "resolution",
+            all_players=all_players_for_entry,
+            stack=stack,
         )
         finish_resolved_spell(player, card, turn=turn, effect_data=effect_data)
     elif effect == "draw_cards":

@@ -3376,6 +3376,58 @@ class XMageExactScopeRuntimeTest(unittest.TestCase):
             )
         )
 
+    def test_fixed_target_player_mill_spell_mills_opponent(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        opponent = self.battle.Player(
+            "Opponent",
+            None,
+            [
+                {"name": "Mill A"},
+                {"name": "Mill B"},
+                {"name": "Mill C"},
+                {"name": "Mill D"},
+                {"name": "Mill E"},
+            ],
+        )
+        effect = {
+            "effect": "mill_cards",
+            "battle_model_scope": "xmage_fixed_target_player_mill_spell_v1",
+            "count": 3,
+            "mill_count": 3,
+            "target": "player",
+            "target_controller": "target_player",
+            "target_preference": "opponent",
+            "target_player_mill": True,
+            "sorcery": True,
+        }
+
+        self.battle.apply_effect_immediate(
+            active,
+            [opponent],
+            {
+                "name": "Fixture Tome Scour",
+                "type_line": "Sorcery",
+                "oracle_text": "Target player mills three cards.",
+            },
+            turn=5,
+            rng=random.Random(5),
+            effect_data_override=effect,
+        )
+
+        self.assertEqual([card["name"] for card in opponent.library], ["Mill D", "Mill E"])
+        self.assertEqual([card["name"] for card in opponent.graveyard], ["Mill A", "Mill B", "Mill C"])
+        self.assertTrue(
+            any(
+                event == "mill_resolved"
+                and data.get("card") == "Fixture Tome Scour"
+                and data.get("target_player") == "Opponent"
+                and data.get("target_player_mill") is True
+                and data.get("requested_mill") == 3
+                and data.get("cards_milled") == 3
+                for event, data in self.events
+            )
+        )
+
     def test_fixed_target_player_discard_spell_random_uses_rng(self) -> None:
         active = self.battle.Player("Active", None, [])
         opponent = self.battle.Player("Opponent", None, [])

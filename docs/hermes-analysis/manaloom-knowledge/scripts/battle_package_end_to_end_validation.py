@@ -13374,6 +13374,73 @@ def run_target_player_draw_spell(
     }
 
 
+def run_target_player_mill_spell(
+    battle,
+    scenario: dict[str, Any],
+    events: list[tuple[str, dict[str, Any]]],
+) -> dict[str, Any]:
+    card = dict(scenario["card"])
+    effect = dict(battle.get_card_effect(card))
+    if effect.get("effect") != "mill_cards":
+        fail("battle_execution", f"{card['name']} effect={effect.get('effect')!r}")
+    if effect.get("target_player_mill") is not True:
+        fail("battle_execution", f"{card['name']} is not marked target_player_mill")
+    active = battle.Player(str(scenario.get("player") or "Spell Controller"), None, [])
+    opponent = battle.Player(str(scenario.get("opponent") or "Opponent"), None, [])
+    opponent.library = [
+        battle.enrich_card(dict(library_card))
+        for library_card in (scenario.get("opponent_library") or scenario.get("library") or [])
+        if isinstance(library_card, dict)
+    ]
+    starting_opponent_library_count = len(opponent.library)
+    expected_mill_count = int(scenario.get("expected_mill_count") or effect.get("mill_count") or effect.get("count") or 0)
+    expected_milled = min(expected_mill_count, starting_opponent_library_count)
+    expected_target_player = str(scenario.get("expected_target_player") or opponent.name)
+    before_events = len(events)
+
+    battle.apply_effect_immediate(
+        active,
+        [opponent],
+        battle.enrich_card(card),
+        turn=int(scenario.get("turn") or 6172),
+        rng=random.Random(int(scenario.get("seed") or 6172)),
+        effect_data_override=effect,
+        phase=str(scenario.get("phase") or "precombat_main"),
+    )
+
+    if len(opponent.library) != starting_opponent_library_count - expected_milled:
+        fail(
+            "battle_execution",
+            f"{card['name']} opponent library={len(opponent.library)}, expected {starting_opponent_library_count - expected_milled}",
+        )
+    if len(opponent.graveyard) != expected_milled:
+        fail("battle_execution", f"{card['name']} opponent graveyard={len(opponent.graveyard)}, expected {expected_milled}")
+    event = next(
+        (
+            data
+            for event, data in events[before_events:]
+            if event == "mill_resolved"
+            and data.get("card") == card.get("name")
+            and data.get("target_player_mill") is True
+        ),
+        None,
+    )
+    if event is None:
+        fail("battle_events", f"missing {card['name']} mill_resolved event")
+    if event.get("target_player") != expected_target_player:
+        fail("battle_events", f"{card['name']} target_player={event.get('target_player')!r}")
+    if int(event.get("requested_mill") or 0) != expected_mill_count:
+        fail("battle_events", f"{card['name']} requested_mill={event.get('requested_mill')}")
+    if int(event.get("cards_milled") or 0) != expected_milled:
+        fail("battle_events", f"{card['name']} cards_milled={event.get('cards_milled')}")
+    return {
+        "scenario": scenario.get("name"),
+        "card_name": card["name"],
+        "target_player": expected_target_player,
+        "cards_milled": expected_milled,
+    }
+
+
 def run_look_at_hand_draw_spell(
     battle,
     scenario: dict[str, Any],
@@ -14164,6 +14231,7 @@ SCENARIO_RUNNERS = {
     "add_counters_untap_target_spell": run_add_counters_untap_target_spell,
     "target_player_discard_spell": run_target_player_discard_spell,
     "target_player_draw_spell": run_target_player_draw_spell,
+    "target_player_mill_spell": run_target_player_mill_spell,
     "look_at_hand_draw_spell": run_look_at_hand_draw_spell,
     "target_keyword_draw_spell": run_target_keyword_draw_spell,
     "boost_life_gain_spell": run_boost_life_gain_spell,

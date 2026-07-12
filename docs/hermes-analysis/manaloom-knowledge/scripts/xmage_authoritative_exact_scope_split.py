@@ -175,6 +175,7 @@ TARGET_PLAYER_DISCARD_UNIT = (
     "xmage_signature::DiscardTargetEffect::no_ability_class::"
     "TargetPlayer::no_condition_class::targeting"
 )
+MILL_TARGET_UNIT = "mill_cards::target_player_mill_fixed_or_x_variant_v1"
 PREVENT_ALL_COMBAT_DAMAGE_SPELL_UNIT = (
     "xmage_signature::PreventAllDamageByAllPermanentsEffect::no_ability_class::"
     "no_target_class::no_condition_class::no_signal"
@@ -252,6 +253,7 @@ SUPPORTED_UNITS = {
     LOOK_LIBRARY_PICK_SPELL_UNIT,
     ETB_LOOK_LIBRARY_PICK_CREATURE_UNIT,
     TARGET_PLAYER_DISCARD_UNIT,
+    MILL_TARGET_UNIT,
     PREVENT_ALL_COMBAT_DAMAGE_SPELL_UNIT,
     PREVENT_ALL_COMBAT_DAMAGE_CYCLING_SPELL_UNIT,
     CREATURE_ENTERS_TAPPED_ABILITY_UNIT,
@@ -267,6 +269,7 @@ TARGET_DRAW_SCOPE = "xmage_fixed_target_player_draw_spell_v1"
 LOOK_AT_HAND_SCOPE = "xmage_look_at_target_player_hand_spell_v1"
 LOOK_AT_HAND_DRAW_SCOPE = "xmage_look_at_target_player_hand_draw_card_spell_v1"
 TARGET_PLAYER_DISCARD_SCOPE = "xmage_fixed_target_player_discard_spell_v1"
+TARGET_PLAYER_MILL_SCOPE = "xmage_fixed_target_player_mill_spell_v1"
 DYNAMIC_TARGET_PLAYER_DISCARD_SCOPE = "xmage_dynamic_target_player_discard_spell_v1"
 ETB_TARGET_PLAYER_DISCARD_CREATURE_SCOPE = "xmage_creature_etb_target_player_discard_v1"
 DIES_TARGET_PLAYER_DISCARD_CREATURE_SCOPE = "xmage_creature_dies_target_player_discard_v1"
@@ -620,6 +623,7 @@ SPELL_UNITS = {
     PREVENT_ALL_COMBAT_DAMAGE_CYCLING_SPELL_UNIT,
     TOKEN_SPELL_UNIT,
     LOOK_LIBRARY_PICK_SPELL_UNIT,
+    MILL_TARGET_UNIT,
 }
 RAMP_UNITS = {
     RAMP_ARTIFACT_UNIT,
@@ -18087,6 +18091,31 @@ def fixed_target_player_discard_spell_from_oracle(metadata: dict[str, Any]) -> d
     }
 
 
+def fixed_target_player_mill_spell_from_oracle(metadata: dict[str, Any]) -> dict[str, Any] | str:
+    text = re.sub(
+        r"\s+",
+        " ",
+        " ".join(oracle_effect_lines_without_neutral_auxiliary(metadata)),
+    ).strip().lower()
+    if not text:
+        return "target_player_mill_spell_oracle_not_simple"
+    number_pattern = r"(?P<count>a|one|two|three|four|five|six|seven|eight|nine|ten|\d+)"
+    match = re.fullmatch(
+        rf"target (?P<scope>player|opponent) mills {number_pattern} cards?\.?",
+        text,
+    )
+    if not match:
+        return "target_player_mill_spell_oracle_not_exact_fixed"
+    mill_count = number_word_to_int(match.group("count"))
+    if mill_count <= 0:
+        return "target_player_mill_spell_count_not_fixed"
+    target_scope = "opponent" if match.group("scope") == "opponent" else "any"
+    return {
+        "mill_count": mill_count,
+        "target_player_scope": target_scope,
+    }
+
+
 def dynamic_target_player_discard_spell_from_oracle(metadata: dict[str, Any]) -> dict[str, Any] | str:
     text = re.sub(
         r"\s+",
@@ -23030,6 +23059,40 @@ def fixed_target_player_discard_spell_from_source(source: str) -> dict[str, Any]
         "discard_count": discard_count,
         "discard_random": random_raw == "true",
         "xmage_effect_class": "DiscardTargetEffect",
+    }
+
+
+def fixed_target_player_mill_spell_from_source(source: str) -> dict[str, Any] | str:
+    text = source or ""
+    if has_additional_cost(text):
+        return "target_player_mill_spell_source_additional_cost_not_supported"
+    unsupported_markers = {
+        "ConditionalOneShotEffect",
+        "DoIfCostPaid",
+        "Mode",
+        "Modes",
+        "TargetPointer",
+        ".setTargetPointer",
+        "GetXValue",
+        "ManacostVariableValue",
+        "DomainValue",
+    }
+    if any(marker in text for marker in unsupported_markers):
+        return "target_player_mill_spell_source_not_simple"
+    target_player_count = len(re.findall(r"new\s+TargetPlayer\s*\(", text))
+    target_opponent_count = len(re.findall(r"new\s+TargetOpponent\s*\(", text))
+    if target_player_count + target_opponent_count != 1:
+        return "target_player_mill_spell_source_target_not_supported"
+    matches = re.findall(r"\bMillCardsTargetEffect\s*\(\s*(\d+)\s*\)", text, re.S)
+    if len(matches) != 1:
+        return "target_player_mill_spell_source_not_simple"
+    mill_count = int(matches[0])
+    if mill_count <= 0:
+        return "target_player_mill_spell_source_count_not_fixed"
+    return {
+        "mill_count": mill_count,
+        "target_player_scope": "opponent" if target_opponent_count else "any",
+        "xmage_effect_class": "MillCardsTargetEffect",
     }
 
 
@@ -30871,6 +30934,8 @@ def proposal_notes(row: dict[str, Any], scope: str) -> str:
         scope_kind = "fixed controller life-gain plus draw-card spell"
     elif scope == TARGET_PLAYER_DISCARD_SCOPE:
         scope_kind = "fixed target-player discard spell"
+    elif scope == TARGET_PLAYER_MILL_SCOPE:
+        scope_kind = "fixed target-player mill spell"
     elif scope == DYNAMIC_TARGET_PLAYER_DISCARD_SCOPE:
         scope_kind = "dynamic target-player discard spell"
     elif scope == ETB_TARGET_PLAYER_DISCARD_CREATURE_SCOPE:
@@ -38917,6 +38982,46 @@ def split_row(
             metadata,
             effect_json,
             family_id="xmage_dynamic_target_player_discard_spell",
+        ), "selected_exact_scope"
+
+    if unit == MILL_TARGET_UNIT:
+        if classes != {"MillCardsTargetEffect"}:
+            return None, "target_player_mill_spell_effect_class_not_pure"
+        if ability_classes(row):
+            return None, "target_player_mill_spell_ability_class_not_simple"
+        oracle_mill = fixed_target_player_mill_spell_from_oracle(metadata)
+        if isinstance(oracle_mill, str):
+            return None, oracle_mill
+        source_mill = fixed_target_player_mill_spell_from_source(source_text)
+        if isinstance(source_mill, str):
+            return None, source_mill
+        if oracle_mill["mill_count"] != source_mill["mill_count"]:
+            return None, "target_player_mill_spell_source_oracle_mismatch"
+        if oracle_mill["target_player_scope"] != source_mill["target_player_scope"]:
+            return None, "target_player_mill_spell_source_oracle_mismatch"
+        mill_count = int(oracle_mill["mill_count"])
+        target_player_scope = str(oracle_mill["target_player_scope"])
+        effect_json = {
+            "effect": "mill_cards",
+            "battle_model_scope": TARGET_PLAYER_MILL_SCOPE,
+            "count": mill_count,
+            "mill_count": mill_count,
+            "target": "player",
+            "target_controller": "target_player",
+            "target_constraints": {
+                "players": ["opponent"] if target_player_scope == "opponent" else ["any"]
+            },
+            "target_preference": "opponent",
+            "target_player_mill": True,
+            "target_player_scope": target_player_scope,
+            "xmage_effect_class": "MillCardsTargetEffect",
+            **flags,
+        }
+        return build_proposal(
+            row,
+            metadata,
+            effect_json,
+            family_id="xmage_fixed_target_player_mill_spell",
         ), "selected_exact_scope"
 
     if unit == DRAW_UNIT:

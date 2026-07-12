@@ -8183,6 +8183,103 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertEqual(effect["discard_count"], 1)
         self.assertTrue(effect["discard_random"])
 
+    def test_fixed_target_player_mill_spell_maps(self) -> None:
+        row = queue_row(
+            split.MILL_TARGET_UNIT,
+            effect_classes=["MillCardsTargetEffect"],
+            xmage_signals=["targeting"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Tome Scour",
+                type_line="Sorcery",
+                oracle_text="Target player mills five cards.",
+            ),
+            source_text=(
+                "this.getSpellAbility().addTarget(new TargetPlayer());"
+                "this.getSpellAbility().addEffect(new MillCardsTargetEffect(5));"
+            ),
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["effect"], "mill_cards")
+        self.assertEqual(effect["battle_model_scope"], split.TARGET_PLAYER_MILL_SCOPE)
+        self.assertTrue(effect["target_player_mill"])
+        self.assertEqual(effect["target_controller"], "target_player")
+        self.assertEqual(effect["target"], "player")
+        self.assertEqual(effect["target_preference"], "opponent")
+        self.assertEqual(effect["target_player_scope"], "any")
+        self.assertEqual(effect["target_constraints"], {"players": ["any"]})
+        self.assertEqual(effect["mill_count"], 5)
+        self.assertEqual(effect["count"], 5)
+
+    def test_fixed_target_opponent_mill_spell_maps_opponent_constraint(self) -> None:
+        row = queue_row(
+            split.MILL_TARGET_UNIT,
+            effect_classes=["MillCardsTargetEffect"],
+            xmage_signals=["targeting"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Mind Sculpt",
+                type_line="Sorcery",
+                oracle_text="Target opponent mills seven cards.",
+            ),
+            source_text=(
+                "this.getSpellAbility().addEffect(new MillCardsTargetEffect(7));"
+                "this.getSpellAbility().addTarget(new TargetOpponent());"
+            ),
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.TARGET_PLAYER_MILL_SCOPE)
+        self.assertEqual(effect["target_player_scope"], "opponent")
+        self.assertEqual(effect["target_constraints"], {"players": ["opponent"]})
+        self.assertEqual(effect["mill_count"], 7)
+
+    def test_fixed_target_player_mill_spell_blocks_flashback_for_now(self) -> None:
+        row = queue_row(
+            split.MILL_TARGET_UNIT,
+            effect_classes=["MillCardsTargetEffect"],
+            ability_classes=["FlashbackAbility"],
+            xmage_signals=["targeting"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(oracle_text="Target player mills three cards."),
+            source_text=(
+                "this.getSpellAbility().addTarget(new TargetPlayer());"
+                "this.getSpellAbility().addEffect(new MillCardsTargetEffect(3));"
+                "this.addAbility(new FlashbackAbility(this, new ManaCostsImpl<>(\"{1}{U}\")));"
+            ),
+        )
+
+        self.assertIsNone(proposal)
+        self.assertEqual(reason, "target_player_mill_spell_ability_class_not_simple")
+
+    def test_fixed_target_player_mill_spell_blocks_composite_draw(self) -> None:
+        row = queue_row(
+            split.MILL_TARGET_UNIT,
+            effect_classes=["DrawCardSourceControllerEffect", "MillCardsTargetEffect"],
+            xmage_signals=["targeting", "draw"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(oracle_text="Target player mills two cards. Draw a card."),
+            source_text=(
+                "this.getSpellAbility().addTarget(new TargetPlayer());"
+                "this.getSpellAbility().addEffect(new MillCardsTargetEffect(2));"
+                "this.getSpellAbility().addEffect(new DrawCardSourceControllerEffect(1));"
+            ),
+        )
+
+        self.assertIsNone(proposal)
+        self.assertEqual(reason, "target_player_mill_spell_effect_class_not_pure")
+
     def test_dynamic_target_player_discard_spell_maps_x_random(self) -> None:
         row = queue_row(
             split.TARGET_PLAYER_DISCARD_UNIT,

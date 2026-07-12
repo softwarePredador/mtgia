@@ -1,0 +1,183 @@
+{
+  "battle_execution": {
+    "event_count": 6,
+    "results": [
+      {
+        "card_name": "Glimpse the Unthinkable",
+        "cards_milled": 10,
+        "scenario": "Glimpse the Unthinkable target player mills cards",
+        "target_player": "Opponent"
+      },
+      {
+        "card_name": "Mind Sculpt",
+        "cards_milled": 7,
+        "scenario": "Mind Sculpt target player mills cards",
+        "target_player": "Opponent"
+      },
+      {
+        "card_name": "Tome Scour",
+        "cards_milled": 5,
+        "scenario": "Tome Scour target player mills cards",
+        "target_player": "Opponent"
+      }
+    ],
+    "scenario_count": 3
+  },
+  "battle_path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py",
+  "database_target": "127.0.0.1:15432/halder",
+  "generated_at_utc": "2026-07-12T04:49:43.946397+00:00",
+  "manifest": "docs/hermes-analysis/master_optimizer_reports/pg806_target_player_mill_new_server_manifest.json",
+  "package_id": "pg806_target_player_mill_new_server_manifest",
+  "snapshot": "docs/hermes-analysis/master_optimizer_reports/pg806_target_player_mill_new_server_canonical_fallback.json",
+  "sqlite_db": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db",
+  "stages": [
+    {
+      "evidence": {
+        "validated_rows": 3
+      },
+      "name": "postgres_source_of_truth",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_target_player_mill_spell_v1",
+          "card_name": "Glimpse the Unthinkable",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:26e090742b0b13e87d1f9bf6fc965891",
+          "oracle_hash": "e16b3be95a08354fc076ff23a883f997",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_target_player_mill_spell_v1",
+          "card_name": "Mind Sculpt",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:88cc251a233283c4f9a4337283de4c3a",
+          "oracle_hash": "f42f6fc25a0f27270644bb87317e60ce",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_target_player_mill_spell_v1",
+          "card_name": "Tome Scour",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:38770bcda919ef9e031373d431e6297d",
+          "oracle_hash": "abf0b04f9971161f7dfaf8449ebbdc8f",
+          "review_status": "verified",
+          "rule_version": 2
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_rows": 3
+      },
+      "name": "sqlite_hermes_cache",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_target_player_mill_spell_v1",
+          "card_name": "Glimpse the Unthinkable",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:26e090742b0b13e87d1f9bf6fc965891",
+          "oracle_hash": "e16b3be95a08354fc076ff23a883f997",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_target_player_mill_spell_v1",
+          "card_name": "Mind Sculpt",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:88cc251a233283c4f9a4337283de4c3a",
+          "oracle_hash": "f42f6fc25a0f27270644bb87317e60ce",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_target_player_mill_spell_v1",
+          "card_name": "Tome Scour",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:38770bcda919ef9e031373d431e6297d",
+          "oracle_hash": "abf0b04f9971161f7dfaf8449ebbdc8f",
+          "review_status": "verified",
+          "rule_version": 2
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_cards": 3
+      },
+      "name": "canonical_snapshot_fallback",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_target_player_mill_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Glimpse the Unthinkable",
+          "logical_rule_key": "battle_rule_v1:26e090742b0b13e87d1f9bf6fc965891"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_target_player_mill_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Mind Sculpt",
+          "logical_rule_key": "battle_rule_v1:88cc251a233283c4f9a4337283de4c3a"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_target_player_mill_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Tome Scour",
+          "logical_rule_key": "battle_rule_v1:38770bcda919ef9e031373d431e6297d"
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_cards": 3
+      },
+      "name": "runtime_get_card_effect",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "card_name": "Glimpse the Unthinkable",
+          "component_keys": [],
+          "effect": "mill_cards",
+          "logical_rule_key": "battle_rule_v1:26e090742b0b13e87d1f9bf6fc965891"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Mind Sculpt",
+          "component_keys": [],
+          "effect": "mill_cards",
+          "logical_rule_key": "battle_rule_v1:88cc251a233283c4f9a4337283de4c3a"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Tome Scour",
+          "component_keys": [],
+          "effect": "mill_cards",
+          "logical_rule_key": "battle_rule_v1:38770bcda919ef9e031373d431e6297d"
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "events": 6,
+        "scenarios": 3
+      },
+      "name": "battle_execution",
+      "status": "pass"
+    }
+  ],
+  "status": "pass",
+  "title": "Battle Package End-to-End Validation"
+}

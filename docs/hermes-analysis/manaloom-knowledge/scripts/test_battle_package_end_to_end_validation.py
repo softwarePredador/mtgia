@@ -2612,6 +2612,51 @@ def test_target_player_x_draw_runner_validates_shuffle_self() -> None:
     )
 
 
+def test_target_player_mill_runner_mills_opponent_library() -> None:
+    effect = {
+        "effect": "mill_cards",
+        "battle_model_scope": "xmage_fixed_target_player_mill_spell_v1",
+        "target": "player",
+        "target_controller": "target_player",
+        "target_preference": "opponent",
+        "count": 5,
+        "mill_count": 5,
+        "target_player_mill": True,
+        "_rule_logical_key": "battle_rule_v1:tome-scour",
+    }
+    rule = {
+        "card_name": "Tome Scour",
+        "logical_rule_key": "battle_rule_v1:tome-scour",
+        "required_effect_fields": effect,
+    }
+    scenario = package_builder.target_player_mill_execution_scenario_from_expected_rule(rule)
+
+    assert scenario is not None
+    battle = validator.load_battle(validator.DEFAULT_BATTLE)
+    events = []
+    previous_handler = battle.REPLAY_EVENT_HANDLER
+    previous_get_card_effect = battle.get_card_effect
+    battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+    battle.get_card_effect = lambda card: dict(effect)
+    try:
+        result = validator.run_target_player_mill_spell(battle, scenario, events)
+    finally:
+        battle.REPLAY_EVENT_HANDLER = previous_handler
+        battle.get_card_effect = previous_get_card_effect
+
+    assert result["card_name"] == "Tome Scour"
+    assert result["target_player"] == "Opponent"
+    assert result["cards_milled"] == 5
+    assert any(
+        event == "mill_resolved"
+        and data.get("card") == "Tome Scour"
+        and data.get("target_player_mill") is True
+        and data.get("requested_mill") == 5
+        and data.get("cards_milled") == 5
+        for event, data in events
+    )
+
+
 def test_look_at_hand_draw_runner_reveals_opponent_hand_and_draws() -> None:
     effect = {
         "effect": "composite_resolution",

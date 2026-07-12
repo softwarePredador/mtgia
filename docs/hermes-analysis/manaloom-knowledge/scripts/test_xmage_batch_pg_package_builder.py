@@ -1318,6 +1318,42 @@ def test_manifest_expected_rule_preserves_target_player_draw_fields() -> None:
     }
 
 
+def test_manifest_expected_rule_preserves_target_player_mill_fields() -> None:
+    proposal = {
+        "normalized_name": "tome scour",
+        "card_name": "Tome Scour",
+        "oracle_hash": "hash-target-mill",
+        "logical_rule_key": "battle_rule_v1:hash-target-mill",
+        "effect_json": {
+            "effect": "mill_cards",
+            "battle_model_scope": "xmage_fixed_target_player_mill_spell_v1",
+            "target": "player",
+            "target_controller": "target_player",
+            "target_preference": "opponent",
+            "target_constraints": {"players": ["any"]},
+            "target_player_scope": "any",
+            "count": 5,
+            "mill_count": 5,
+            "target_player_mill": True,
+        },
+    }
+
+    expected = builder.expected_rule_from_proposal(proposal)
+
+    assert expected["required_effect_fields"] == {
+        "effect": "mill_cards",
+        "battle_model_scope": "xmage_fixed_target_player_mill_spell_v1",
+        "target": "player",
+        "target_controller": "target_player",
+        "target_constraints": {"players": ["any"]},
+        "target_preference": "opponent",
+        "target_player_scope": "any",
+        "count": 5,
+        "mill_count": 5,
+        "target_player_mill": True,
+    }
+
+
 def test_manifest_expected_rule_preserves_draw_lose_half_life_fields() -> None:
     proposal = {
         "normalized_name": "cruel bargain",
@@ -2466,6 +2502,37 @@ def test_manifest_builds_target_player_x_draw_shuffle_self_execution_scenario() 
     assert scenario["expected_draw_count"] == 3
     assert scenario["expect_shuffle_self"] is True
     assert scenario["expected_spell_destination"] == "library"
+
+
+def test_manifest_builds_target_player_mill_execution_scenario() -> None:
+    rule = {
+        "normalized_name": "mind sculpt",
+        "card_name": "Mind Sculpt",
+        "oracle_hash": "hash-mind-sculpt",
+        "logical_rule_key": "battle_rule_v1:hash-mind-sculpt",
+        "required_effect_fields": {
+            "effect": "mill_cards",
+            "battle_model_scope": "xmage_fixed_target_player_mill_spell_v1",
+            "target": "player",
+            "target_controller": "target_player",
+            "target_preference": "opponent",
+            "target_player_scope": "opponent",
+            "target_player_mill": True,
+            "count": 7,
+            "mill_count": 7,
+            "sorcery": True,
+        },
+    }
+
+    scenario = builder.execution_scenario_from_expected_rule(rule)
+
+    assert scenario is not None
+    assert scenario["type"] == "target_player_mill_spell"
+    assert scenario["card"]["name"] == "Mind Sculpt"
+    assert scenario["card"]["type_line"] == "Sorcery"
+    assert scenario["expected_mill_count"] == 7
+    assert scenario["expected_target_player"] == "Opponent"
+    assert len(scenario["opponent_library"]) == 8
 
 
 def test_manifest_builds_simple_activated_damage_execution_scenario() -> None:

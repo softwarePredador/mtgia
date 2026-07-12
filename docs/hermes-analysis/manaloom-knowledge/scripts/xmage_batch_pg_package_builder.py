@@ -146,6 +146,7 @@ E2E_REQUIRED_EFFECT_FIELDS = (
     "xmage_additional_cost_class",
     "xmage_additional_cost_target",
     "count",
+    "mill_count",
     "draw_count",
     "draw_lose_life_spell",
     "life_loss",
@@ -167,6 +168,7 @@ E2E_REQUIRED_EFFECT_FIELDS = (
     "target_count_from_x",
     "target_count_source",
     "target_player_draw",
+    "target_player_mill",
     "target_player_scope",
     "look_at_hand",
     "prevent_all_combat_damage_this_turn",
@@ -5118,6 +5120,38 @@ def target_player_draw_execution_scenario_from_expected_rule(
     }
 
 
+def target_player_mill_execution_scenario_from_expected_rule(
+    rule: dict[str, Any],
+) -> dict[str, Any] | None:
+    required = dict(rule.get("required_effect_fields") or {})
+    if required.get("battle_model_scope") != "xmage_fixed_target_player_mill_spell_v1":
+        return None
+    expected_mill_count = int(required.get("mill_count") or required.get("count") or 0)
+    if expected_mill_count <= 0:
+        return None
+    return {
+        "name": f"{rule['card_name']} target player mills cards",
+        "type": "target_player_mill_spell",
+        "card": {
+            "name": rule["card_name"],
+            "type_line": "Instant" if required.get("instant") else "Sorcery",
+        },
+        "opponent_library": [
+            {
+                "name": f"E2E Target Player Mill Card {index + 1}",
+                "type_line": "Instant" if index % 2 == 0 else "Creature - Fixture",
+                "effect": "draw_cards" if index % 2 == 0 else "creature",
+                "cmc": index + 1,
+            }
+            for index in range(max(expected_mill_count + 1, 2))
+        ],
+        "expected_mill_count": expected_mill_count,
+        "expected_target_player": "Opponent",
+        "target_preference": str(required.get("target_preference") or "opponent"),
+        "logical_rule_key": rule["logical_rule_key"],
+    }
+
+
 def look_at_hand_draw_execution_scenario_from_expected_rule(
     rule: dict[str, Any],
 ) -> dict[str, Any] | None:
@@ -9610,6 +9644,7 @@ def execution_scenario_from_expected_rule(rule: dict[str, Any]) -> dict[str, Any
         or look_at_hand_draw_execution_scenario_from_expected_rule(rule)
         or target_player_discard_execution_scenario_from_expected_rule(rule)
         or target_player_draw_execution_scenario_from_expected_rule(rule)
+        or target_player_mill_execution_scenario_from_expected_rule(rule)
         or combat_damage_draw_execution_scenario_from_expected_rule(rule)
         or beginning_end_step_draw_execution_scenario_from_expected_rule(rule)
         or hand_cycling_execution_scenario_from_expected_rule(rule)

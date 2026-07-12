@@ -1,0 +1,439 @@
+{
+  "apply_gate": "Do not run apply SQL without explicit approval for the exact command.",
+  "backup_table": "manaloom_deploy_audit.pg806_target_player_mill_new_server_targ_20260712_044819",
+  "deploy_id": "pg806_target_player_mill_new_server",
+  "execution_scenarios": [
+    {
+      "card": {
+        "name": "Glimpse the Unthinkable",
+        "type_line": "Sorcery"
+      },
+      "expected_mill_count": 10,
+      "expected_target_player": "Opponent",
+      "logical_rule_key": "battle_rule_v1:26e090742b0b13e87d1f9bf6fc965891",
+      "name": "Glimpse the Unthinkable target player mills cards",
+      "opponent_library": [
+        {
+          "cmc": 1,
+          "effect": "draw_cards",
+          "name": "E2E Target Player Mill Card 1",
+          "type_line": "Instant"
+        },
+        {
+          "cmc": 2,
+          "effect": "creature",
+          "name": "E2E Target Player Mill Card 2",
+          "type_line": "Creature - Fixture"
+        },
+        {
+          "cmc": 3,
+          "effect": "draw_cards",
+          "name": "E2E Target Player Mill Card 3",
+          "type_line": "Instant"
+        },
+        {
+          "cmc": 4,
+          "effect": "creature",
+          "name": "E2E Target Player Mill Card 4",
+          "type_line": "Creature - Fixture"
+        },
+        {
+          "cmc": 5,
+          "effect": "draw_cards",
+          "name": "E2E Target Player Mill Card 5",
+          "type_line": "Instant"
+        },
+        {
+          "cmc": 6,
+          "effect": "creature",
+          "name": "E2E Target Player Mill Card 6",
+          "type_line": "Creature - Fixture"
+        },
+        {
+          "cmc": 7,
+          "effect": "draw_cards",
+          "name": "E2E Target Player Mill Card 7",
+          "type_line": "Instant"
+        },
+        {
+          "cmc": 8,
+          "effect": "creature",
+          "name": "E2E Target Player Mill Card 8",
+          "type_line": "Creature - Fixture"
+        },
+        {
+          "cmc": 9,
+          "effect": "draw_cards",
+          "name": "E2E Target Player Mill Card 9",
+          "type_line": "Instant"
+        },
+        {
+          "cmc": 10,
+          "effect": "creature",
+          "name": "E2E Target Player Mill Card 10",
+          "type_line": "Creature - Fixture"
+        },
+        {
+          "cmc": 11,
+          "effect": "draw_cards",
+          "name": "E2E Target Player Mill Card 11",
+          "type_line": "Instant"
+        }
+      ],
+      "target_preference": "opponent",
+      "type": "target_player_mill_spell"
+    },
+    {
+      "card": {
+        "name": "Mind Sculpt",
+        "type_line": "Sorcery"
+      },
+      "expected_mill_count": 7,
+      "expected_target_player": "Opponent",
+      "logical_rule_key": "battle_rule_v1:88cc251a233283c4f9a4337283de4c3a",
+      "name": "Mind Sculpt target player mills cards",
+      "opponent_library": [
+        {
+          "cmc": 1,
+          "effect": "draw_cards",
+          "name": "E2E Target Player Mill Card 1",
+          "type_line": "Instant"
+        },
+        {
+          "cmc": 2,
+          "effect": "creature",
+          "name": "E2E Target Player Mill Card 2",
+          "type_line": "Creature - Fixture"
+        },
+        {
+          "cmc": 3,
+          "effect": "draw_cards",
+          "name": "E2E Target Player Mill Card 3",
+          "type_line": "Instant"
+        },
+        {
+          "cmc": 4,
+          "effect": "creature",
+          "name": "E2E Target Player Mill Card 4",
+          "type_line": "Creature - Fixture"
+        },
+        {
+          "cmc": 5,
+          "effect": "draw_cards",
+          "name": "E2E Target Player Mill Card 5",
+          "type_line": "Instant"
+        },
+        {
+          "cmc": 6,
+          "effect": "creature",
+          "name": "E2E Target Player Mill Card 6",
+          "type_line": "Creature - Fixture"
+        },
+        {
+          "cmc": 7,
+          "effect": "draw_cards",
+          "name": "E2E Target Player Mill Card 7",
+          "type_line": "Instant"
+        },
+        {
+          "cmc": 8,
+          "effect": "creature",
+          "name": "E2E Target Player Mill Card 8",
+          "type_line": "Creature - Fixture"
+        }
+      ],
+      "target_preference": "opponent",
+      "type": "target_player_mill_spell"
+    },
+    {
+      "card": {
+        "name": "Tome Scour",
+        "type_line": "Sorcery"
+      },
+      "expected_mill_count": 5,
+      "expected_target_player": "Opponent",
+      "logical_rule_key": "battle_rule_v1:38770bcda919ef9e031373d431e6297d",
+      "name": "Tome Scour target player mills cards",
+      "opponent_library": [
+        {
+          "cmc": 1,
+          "effect": "draw_cards",
+          "name": "E2E Target Player Mill Card 1",
+          "type_line": "Instant"
+        },
+        {
+          "cmc": 2,
+          "effect": "creature",
+          "name": "E2E Target Player Mill Card 2",
+          "type_line": "Creature - Fixture"
+        },
+        {
+          "cmc": 3,
+          "effect": "draw_cards",
+          "name": "E2E Target Player Mill Card 3",
+          "type_line": "Instant"
+        },
+        {
+          "cmc": 4,
+          "effect": "creature",
+          "name": "E2E Target Player Mill Card 4",
+          "type_line": "Creature - Fixture"
+        },
+        {
+          "cmc": 5,
+          "effect": "draw_cards",
+          "name": "E2E Target Player Mill Card 5",
+          "type_line": "Instant"
+        },
+        {
+          "cmc": 6,
+          "effect": "creature",
+          "name": "E2E Target Player Mill Card 6",
+          "type_line": "Creature - Fixture"
+        }
+      ],
+      "target_preference": "opponent",
+      "type": "target_player_mill_spell"
+    }
+  ],
+  "expected_rules": [
+    {
+      "card_name": "Glimpse the Unthinkable",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:26e090742b0b13e87d1f9bf6fc965891",
+      "min_rule_version": 2,
+      "normalized_name": "glimpse the unthinkable",
+      "oracle_hash": "e16b3be95a08354fc076ff23a883f997",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_target_player_mill_spell_v1",
+        "count": 10,
+        "effect": "mill_cards",
+        "instant": false,
+        "mill_count": 10,
+        "sorcery": true,
+        "target": "player",
+        "target_constraints": {
+          "players": [
+            "any"
+          ]
+        },
+        "target_controller": "target_player",
+        "target_player_mill": true,
+        "target_player_scope": "any",
+        "target_preference": "opponent",
+        "xmage_effect_class": "MillCardsTargetEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Mind Sculpt",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:88cc251a233283c4f9a4337283de4c3a",
+      "min_rule_version": 2,
+      "normalized_name": "mind sculpt",
+      "oracle_hash": "f42f6fc25a0f27270644bb87317e60ce",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_target_player_mill_spell_v1",
+        "count": 7,
+        "effect": "mill_cards",
+        "instant": false,
+        "mill_count": 7,
+        "sorcery": true,
+        "target": "player",
+        "target_constraints": {
+          "players": [
+            "opponent"
+          ]
+        },
+        "target_controller": "target_player",
+        "target_player_mill": true,
+        "target_player_scope": "opponent",
+        "target_preference": "opponent",
+        "xmage_effect_class": "MillCardsTargetEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Tome Scour",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:38770bcda919ef9e031373d431e6297d",
+      "min_rule_version": 2,
+      "normalized_name": "tome scour",
+      "oracle_hash": "abf0b04f9971161f7dfaf8449ebbdc8f",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_target_player_mill_spell_v1",
+        "count": 5,
+        "effect": "mill_cards",
+        "instant": false,
+        "mill_count": 5,
+        "sorcery": true,
+        "target": "player",
+        "target_constraints": {
+          "players": [
+            "any"
+          ]
+        },
+        "target_controller": "target_player",
+        "target_player_mill": true,
+        "target_player_scope": "any",
+        "target_preference": "opponent",
+        "xmage_effect_class": "MillCardsTargetEffect"
+      },
+      "review_status": "verified"
+    }
+  ],
+  "family_counts": {
+    "xmage_fixed_target_player_mill_spell": 3
+  },
+  "files": {
+    "apply": "docs/hermes-analysis/master_optimizer_reports/pg806_target_player_mill_new_server_apply.sql",
+    "manifest": "docs/hermes-analysis/master_optimizer_reports/pg806_target_player_mill_new_server_manifest.json",
+    "package": "docs/hermes-analysis/master_optimizer_reports/pg806_target_player_mill_new_server_package.md",
+    "postcheck": "docs/hermes-analysis/master_optimizer_reports/pg806_target_player_mill_new_server_postcheck.sql",
+    "precheck": "docs/hermes-analysis/master_optimizer_reports/pg806_target_player_mill_new_server_precheck.sql",
+    "rollback": "docs/hermes-analysis/master_optimizer_reports/pg806_target_player_mill_new_server_rollback.sql"
+  },
+  "generated_at": "2026-07-12T04:48:19+00:00",
+  "mutations_performed": [],
+  "runtime_checks": [
+    {
+      "card": {
+        "name": "Glimpse the Unthinkable"
+      },
+      "card_name": "Glimpse the Unthinkable",
+      "effect": "mill_cards",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:26e090742b0b13e87d1f9bf6fc965891",
+      "normalized_name": "glimpse the unthinkable",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_target_player_mill_spell_v1",
+        "count": 10,
+        "effect": "mill_cards",
+        "instant": false,
+        "mill_count": 10,
+        "sorcery": true,
+        "target": "player",
+        "target_constraints": {
+          "players": [
+            "any"
+          ]
+        },
+        "target_controller": "target_player",
+        "target_player_mill": true,
+        "target_player_scope": "any",
+        "target_preference": "opponent",
+        "xmage_effect_class": "MillCardsTargetEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Mind Sculpt"
+      },
+      "card_name": "Mind Sculpt",
+      "effect": "mill_cards",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:88cc251a233283c4f9a4337283de4c3a",
+      "normalized_name": "mind sculpt",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_target_player_mill_spell_v1",
+        "count": 7,
+        "effect": "mill_cards",
+        "instant": false,
+        "mill_count": 7,
+        "sorcery": true,
+        "target": "player",
+        "target_constraints": {
+          "players": [
+            "opponent"
+          ]
+        },
+        "target_controller": "target_player",
+        "target_player_mill": true,
+        "target_player_scope": "opponent",
+        "target_preference": "opponent",
+        "xmage_effect_class": "MillCardsTargetEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Tome Scour"
+      },
+      "card_name": "Tome Scour",
+      "effect": "mill_cards",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:38770bcda919ef9e031373d431e6297d",
+      "normalized_name": "tome scour",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_target_player_mill_spell_v1",
+        "count": 5,
+        "effect": "mill_cards",
+        "instant": false,
+        "mill_count": 5,
+        "sorcery": true,
+        "target": "player",
+        "target_constraints": {
+          "players": [
+            "any"
+          ]
+        },
+        "target_controller": "target_player",
+        "target_player_mill": true,
+        "target_player_scope": "any",
+        "target_preference": "opponent",
+        "xmage_effect_class": "MillCardsTargetEffect"
+      }
+    }
+  ],
+  "selected_card_names": [
+    "Glimpse the Unthinkable",
+    "Mind Sculpt",
+    "Tome Scour"
+  ],
+  "selected_count": 3,
+  "slug": "target_player_mill",
+  "snapshot_checks": [
+    {
+      "card_name": "Glimpse the Unthinkable",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:26e090742b0b13e87d1f9bf6fc965891",
+      "min_rule_version": 2,
+      "normalized_name": "glimpse the unthinkable",
+      "oracle_hash": "e16b3be95a08354fc076ff23a883f997",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_target_player_mill_spell_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Mind Sculpt",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:88cc251a233283c4f9a4337283de4c3a",
+      "min_rule_version": 2,
+      "normalized_name": "mind sculpt",
+      "oracle_hash": "f42f6fc25a0f27270644bb87317e60ce",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_target_player_mill_spell_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Tome Scour",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:38770bcda919ef9e031373d431e6297d",
+      "min_rule_version": 2,
+      "normalized_name": "tome scour",
+      "oracle_hash": "abf0b04f9971161f7dfaf8449ebbdc8f",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_target_player_mill_spell_v1"
+      },
+      "review_status": "verified"
+    }
+  ],
+  "status": "prepared_read_only_pending_apply_approval"
+}

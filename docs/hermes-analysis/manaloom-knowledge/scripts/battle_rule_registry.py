@@ -84,6 +84,7 @@ EFFECT_TO_DECK_CATEGORY = {
     "finisher": "wincon",
     "approach": "wincon",
     "token_maker": "wincon",
+    "mill_cards": "wincon",
     "overload_recursion": "wincon",
     "steal_all_creatures": "wincon",
     "pump_all": "wincon",
@@ -339,6 +340,8 @@ def deck_role_from_effect(effect_json: dict[str, Any]) -> dict[str, Any]:
         else:
             category = "support"
             subtype = "permanent_untap"
+    elif effect == "mill_cards":
+        subtype = "library_mill"
     elif effect in {"stat_modifier_until_eot", "stat_modifier_until_eot_untap_target"}:
         power_delta = int(effect_json.get("power_delta") or effect_json.get("power_boost") or 0)
         toughness_delta = int(effect_json.get("toughness_delta") or effect_json.get("toughness_boost") or 0)
