@@ -1,0 +1,69 @@
+PG834A trusted rule oracle_hash backfill precheck
+ would_backfill_rows | distinct_cards | distinct_rule_keys | verified_rows | active_rows | null_hash_rows | empty_hash_rows | empty_oracle_hash_rows
+---------------------+----------------+--------------------+---------------+-------------+----------------+-----------------+------------------------
+                  55 |             54 |                 55 |            32 |          23 |             55 |               0 |                      0
+(1 row)
+
+ backup_table_already_exists
+-----------------------------
+ f
+(1 row)
+
+                card_name                |             normalized_name             | source  | review_status | execution_status | rule_version |                logical_rule_key                 |         new_oracle_hash
+-----------------------------------------+-----------------------------------------+---------+---------------+------------------+--------------+-------------------------------------------------+----------------------------------
+ Akroma's Will                           | akroma's will                           | curated | verified      | auto             |            1 | battle_rule_v1:1134718ef1509d04fbc1291dbdbdf23e | 006e2b72eae264e2aaba82d99d07f593
+ Ancient Den                             | ancient den                             | curated | verified      | auto             |            1 | battle_rule_v1:ea7e00f2d90b2ceead4036ab10cd0200 | c7264c311c98ff99b293a96ad9ab2daf
+ Ancient Tomb                            | ancient tomb                            | curated | verified      | auto             |            1 | battle_rule_v1:c364544e9bd651211acf851db2313ccd | 5f61966c5bfc67508502d929ca891af3
+ Angel's Grace                           | angel's grace                           | curated | verified      | auto             |            2 | battle_rule_v1:2833836fd4d943d3e02d1cfa2d284227 | 627c4ce7adf5be44b93e2b850159e5d9
+ Ashnod's Altar                          | ashnod's altar                          | curated | active        | auto             |            1 | battle_rule_v1:d63eb0bbc240132b9aeb80caf675bcc4 | dd3e1f004f2b178f31b638fad9cad591
+ Basking Broodscale                      | basking broodscale                      | curated | active        | auto             |            1 | battle_rule_v1:4a8564b60f39507bb2bb7fe5ca0b3a72 | 325bca13766fa2c770259e79375080bc
+ Birgi, God of Storytelling              | birgi, god of storytelling              | curated | verified      | auto             |            1 | battle_rule_v1:a7af0fd25d7c196baa8ff58d193b2695 | 5f1ed696a63cd668fd46a2fe9971a54e
+ Chromatic Star                          | chromatic star                          | curated | active        | auto             |            1 | battle_rule_v1:7ff862e1720f195ee0374e3a6767b0da | e42c268c0db1c7273a78d08b85d8918b
+ Chrome Mox                              | chrome mox                              | curated | verified      | auto             |            1 | battle_rule_v1:baf0ceea81b709c31104e0fcb4fc4e95 | 44481be7f5347792ede1a9b679a424b3
+ Crop Rotation                           | crop rotation                           | curated | verified      | auto             |            1 | battle_rule_v1:0cae4a7bd1e862a0063b9c606ff96e6c | 67869230ccb8b4499893e14915ca8b14
+ Dismember                               | dismember                               | curated | verified      | auto             |            1 | battle_rule_v1:2f513570333d9f48be476602a7ce1593 | e3824a160f31571d21bccb7be33474cf
+ Electroduplicate                        | electroduplicate                        | curated | verified      | auto             |            1 | battle_rule_v1:908888276dcbc8c3db1126707691ae2c | 336afa048144f8fb9a88dfc3b6588f4b
+ Entomb                                  | entomb                                  | curated | verified      | auto             |            1 | battle_rule_v1:eb8223965ca43b8748902c1f16770332 | ff9463f33167f2489bb78394a914d43c
+ Everflowing Chalice                     | everflowing chalice                     | curated | verified      | auto             |            1 | battle_rule_v1:67f848a7a9f40c7337ec0c13e0c1de7c | 2916ac287962232283ac7b1dbe684b7d
+ Fellwar Stone                           | fellwar stone                           | curated | active        | auto             |            2 | battle_rule_v1:3906ffa3cbf7d3437d68e44e13e10bba | d63befc8ac40d9a38732f9b5c1a7414a
+ Formidable Speaker                      | formidable speaker                      | curated | active        | auto             |            1 | battle_rule_v1:ba0c54df93c61d9c92a11905c50b7bea | 2339245d7d8beb5a87ea1c0c8b67dc88
+ Gemstone Caverns                        | gemstone caverns                        | curated | active        | auto             |            1 | battle_rule_v1:9384b4cf2ffc3b4afc5cb65fb4febaea | 2c25335e12791e77b9c19c9b3af0a413
+ Great Furnace                           | great furnace                           | curated | verified      | auto             |            1 | battle_rule_v1:9a28465081dd2ac48819f94e919646a6 | ed6887f502cae452812d5f5d0a0c5792
+ Hall of Heliod's Generosity             | hall of heliod's generosity             | curated | active        | auto             |            1 | battle_rule_v1:4bddcb4c084d969a7ac60a4e378b06dd | cf91d14269b30b7db1f05234d34db931
+ Incubation Druid                        | incubation druid                        | curated | active        | auto             |            1 | battle_rule_v1:86b5c2438a3ba7a20bfd9a0845e1bbc6 | 5bb72caef291ea420e5de42a141665ab
+ Inventors' Fair                         | inventors' fair                         | curated | active        | auto             |            1 | battle_rule_v1:c11487143935b327650306d7e7e8c8e2 | 9529349d5e874f6304264ddf6a2d0c2f
+ Library of Leng                         | library of leng                         | curated | active        | auto             |            2 | battle_rule_v1:b6491cf6f7d7df9a3fb0d91abd3d31c3 | 575aef3cc2523831e440ea7dcd55fa6e
+ Lumra, Bellow of the Woods              | lumra, bellow of the woods              | curated | verified      | auto             |            1 | battle_rule_v1:847f9ee3ec1da14f043c8a52a4dbfb52 | 6d55531f06ba4e627600f3962ad9f95f
+ Mana Vault                              | mana vault                              | curated | active        | auto             |            2 | battle_rule_v1:5a2533694ffd19223d3cde1e25d258ff | 35e3fd94c8453c0e326033af49ae18c8
+ Mind Stone                              | mind stone                              | curated | active        | auto             |            1 | battle_rule_v1:53afed56bbee9885bfb6201f8587db07 | 8d1c9b62d7e5642df44a61a63de5e240
+ Miscast                                 | miscast                                 | curated | verified      | auto             |            1 | battle_rule_v1:6b480fbda0d69779cde9b6a366089c4a | dff145f1eaaa76d6f9e44e688bb29726
+ Mox Amber                               | mox amber                               | curated | verified      | auto             |            2 | battle_rule_v1:972703914ee50acd7a4e6f529fea1adf | e47b40cf2afc4c9ceac6bf91815da706
+ Mox Diamond                             | mox diamond                             | curated | verified      | auto             |            1 | battle_rule_v1:80a4b5beca8834e0c642dc8c0663106c | 517f664e6c81ce9c204c09a20e14be2d
+ Mystical Tutor                          | mystical tutor                          | curated | active        | auto             |            1 | battle_rule_v1:86137800253980cc4594e0cf3fd78953 | 6a72f3c0228efaa3bb3bb616122ed036
+ Natural Order                           | natural order                           | curated | verified      | auto             |            1 | battle_rule_v1:8a9cf49fe56ad1fabdb48aead5531bd1 | 313e25b11a10c99127eca70b7fefbb75
+ Nature's Claim                          | nature's claim                          | curated | verified      | auto             |            1 | battle_rule_v1:b68a368de3add71ee716cda718b9bcb9 | c88d03f66daf06b46fd567dca8e34c50
+ Rampant Growth                          | rampant growth                          | curated | verified      | auto             |            1 | battle_rule_v1:439f162ed0ffa2321dd21b0692f07af4 | 4ce07a0d5e5a33a68517b988b63dbe42
+ Reanimate                               | reanimate                               | curated | active        | auto             |            1 | battle_rule_v1:853d724485700fc5e29a050e9f5856a4 | 5936b4653734cd7087eb67229b4efbc3
+ Runaway Steam-Kin                       | runaway steam-kin                       | curated | verified      | auto             |            1 | battle_rule_v1:955e0141660dfdc8b31aaf15056693aa | abe8e79d26d363a82e68a55e6c19c0b3
+ Sami's Curiosity                        | sami's curiosity                        | curated | verified      | auto             |            1 | battle_rule_v1:b25c35d72e00a057dc20945c38059d0e | d88d3c9d7319f3ce78f286614392ffbf
+ Scavenging Ooze                         | scavenging ooze                         | curated | active        | auto             |            1 | battle_rule_v1:c6c94f94c02d497596c4f1b1cd05a9bd | 072765012c562c0dd7e6c1965a77fa17
+ Scroll Rack                             | scroll rack                             | curated | active        | auto             |            2 | battle_rule_v1:3b58ff16a7eb52fb05c1bd8517225cd2 | 8133928f03d5a5a77f2beecfcbd09e30
+ Seething Song                           | seething song                           | curated | verified      | auto             |            2 | battle_rule_v1:3eb15dc581c6b913158f9b63c023f3d7 | ccd492289c6f1c14c8fb7a248d7bbf32
+ Silence                                 | silence                                 | curated | verified      | auto             |            2 | battle_rule_v1:74b210b77b004a677906e0216d44e445 | a0ca3c09a7db091c435ab31adb9c1780
+ Skullclamp                              | skullclamp                              | curated | active        | auto             |            1 | battle_rule_v1:f996204e0cd900b700b6bf7defb607a6 | 01408ac2502c74e39791c1779ab33833
+ Soul-Guide Lantern                      | soul-guide lantern                      | curated | verified      | auto             |            1 | battle_rule_v1:3454aa122d10a4abd906132eb7745339 | 6a9e4cf9a4397715ccd0737e1b8cf270
+ Splendid Reclamation                    | splendid reclamation                    | curated | verified      | auto             |            1 | battle_rule_v1:323e4e2c6e95da761c1614e4dff44778 | 81249444bdb32006d5e687858df04b9a
+ Staff of Compleation                    | staff of compleation                    | curated | active        | auto             |            1 | battle_rule_v1:d464d25de43eb912c79baea1cee783e5 | 6b66f4e89a1a484d4fd15b2acc365603
+ Sunbaked Canyon                         | sunbaked canyon                         | curated | active        | auto             |            1 | battle_rule_v1:07c97c73f65d524510e30b6bbfca0b61 | eae946655b75e4666adfbdb760bee0ff
+ Talisman of Conviction                  | talisman of conviction                  | curated | active        | auto             |            2 | battle_rule_v1:02133e513da5ea98ac74d32d39b16470 | d49ceec937367a344a9f0948eea4f8f2
+ Unexpected Windfall                     | unexpected windfall                     | curated | verified      | auto             |            2 | battle_rule_v1:f9f98ea1925518eea7a7c94c21ef2dc4 | 9c4fbe06104051a2e8b1d295d307b26a
+ Urza's Saga                             | urza's saga                             | curated | active        | auto             |            1 | battle_rule_v1:b62b6dfa5cdc9db4b8b21faf7bfc0498 | 43e3b1636425f22bbd834442ddb93bc0
+ Valakut Awakening                       | valakut awakening                       | curated | verified      | auto             |            2 | battle_rule_v1:245b8d2627720fadfd7a30464d07605a | 22b42fcc181b7aed71f78b2e1e51e887
+ Valakut Awakening // Valakut Stoneforge | valakut awakening // valakut stoneforge | curated | verified      | auto             |            2 | battle_rule_v1:6e1f3b876822abafe1de47610f46858d | 22b42fcc181b7aed71f78b2e1e51e887
+ Vexing Bauble                           | vexing bauble                           | curated | verified      | auto             |            1 | battle_rule_v1:6a85170698c85498bf618c0c0283a770 | 020e696ec9560830bb82bf0244595d69
+ Wall of Omens                           | wall of omens                           | curated | verified      | auto             |            1 | battle_rule_v1:ee84dfe5a22708bf0b0ef435699ed7a4 | 755be179e545f27507f78b6a79a34485
+ War Room                                | war room                                | curated | active        | auto             |            1 | battle_rule_v1:9cdb33ac0e813c0a25d960b65dbc7417 | d9c250570bb91d94ceae9fcd74081ef5
+ Wayfarer's Bauble                       | wayfarer's bauble                       | curated | active        | auto             |            2 | battle_rule_v1:97eb0d5868d1c777b74aa7d35fc85eab | f11935fa793ae03d95ae75d62cdfa516
+ Worldfire                               | worldfire                               | curated | verified      | auto             |            1 | battle_rule_v1:1b9bb9bfd6774cc55d21e50009efa9f3 | dfb75aa49416e7e281ad8e5cdcf721fa
+ Zuran Orb                               | zuran orb                               | curated | verified      | auto             |            1 | battle_rule_v1:d977323f1ef9834d148ef87dc519ba37 | 5fef1974ee8b02952ac5612ea66c5c33
+(55 rows)

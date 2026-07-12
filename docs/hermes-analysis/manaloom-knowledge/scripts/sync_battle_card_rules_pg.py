@@ -699,6 +699,34 @@ def upsert_pg_rules(cur: Any, rows: list[dict[str, Any]]) -> tuple[int, int]:
     return len(values), len(skipped_keys)
 
 
+def backfill_trusted_oracle_hashes(cur: Any) -> int:
+    cur.execute(
+        """
+        WITH updated AS (
+          UPDATE card_battle_rules br
+          SET
+            oracle_hash = md5(c.oracle_text),
+            updated_at = CURRENT_TIMESTAMP,
+            notes = CONCAT_WS(
+              E'\n',
+              NULLIF(br.notes, ''),
+              'sync_battle_card_rules_pg: backfilled oracle_hash from current cards.oracle_text md5 after trusted rule upsert.'
+            )
+          FROM cards c
+          WHERE c.id = br.card_id
+            AND br.review_status IN ('verified', 'active')
+            AND br.execution_status IN ('auto', 'executable')
+            AND COALESCE(br.oracle_hash, '') = ''
+            AND COALESCE(BTRIM(c.oracle_text), '') <> ''
+          RETURNING br.normalized_name, br.logical_rule_key
+        )
+        SELECT COUNT(*)::int FROM updated
+        """
+    )
+    row = cur.fetchone()
+    return int(row[0] if row else 0)
+
+
 def load_pg_rules(cur: Any, *, include_needs_review: bool) -> list[dict[str, Any]]:
     statuses = ["verified", "active"]
     if include_needs_review:
@@ -1155,6 +1183,7 @@ def main() -> int:
         ),
         "pg_inserted_or_updated": 0,
         "pg_skipped_lower_priority": 0,
+        "pg_trusted_oracle_hash_backfilled": 0,
         "pg_rows_loaded": 0,
         "sqlite_inserted_or_updated": 0,
         "canonical_snapshot_rows_exported": 0,
@@ -1168,8 +1197,10 @@ def main() -> int:
             with conn.cursor() as cur:
                 ensure_pg_table(cur)
                 changed, skipped = upsert_pg_rules(cur, seed_rows)
+                backfilled = backfill_trusted_oracle_hashes(cur)
                 report["pg_inserted_or_updated"] += changed
                 report["pg_skipped_lower_priority"] += skipped
+                report["pg_trusted_oracle_hash_backfilled"] = backfilled
 
     if args.apply_sqlite_from_pg:
         with connect() as conn:

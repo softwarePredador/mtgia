@@ -27411,6 +27411,100 @@ class XMageExactScopeRuntimeTest(unittest.TestCase):
             )
         )
 
+    def test_composite_add_counters_then_proliferate_counts_new_counter(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        opponent = self.battle.Player("Opponent", None, [])
+        target = {
+            "name": "Active Bear",
+            "type_line": "Creature - Bear",
+            "effect": "creature",
+            "power": 2,
+            "toughness": 2,
+        }
+        opponent_artifact = {
+            "name": "Charge Relic",
+            "type_line": "Artifact",
+            "effect": "artifact",
+            "charge_counters": 2,
+            "counters": {"charge": 2},
+        }
+        active.battlefield = [target]
+        opponent.battlefield = [opponent_artifact]
+        opponent.poison = 1
+        opponent.counters = {"poison": 1}
+        effect = {
+            "effect": "composite_resolution",
+            "battle_model_scope": "xmage_fixed_add_counters_target_creature_then_proliferate_spell_v1",
+            "target": "creature",
+            "target_constraints": {"card_types": ["creature"]},
+            "target_controller": "any",
+            "counter_type": "+1/+1",
+            "counter_count": 1,
+            "proliferate_count": 1,
+            "resolution_order": "add_counters_then_proliferate",
+            "_composite_rule_components": [
+                {
+                    "effect": "add_counters",
+                    "battle_model_scope": "xmage_fixed_add_counters_target_creature_spell_v1",
+                    "target": "creature",
+                    "target_constraints": {"card_types": ["creature"]},
+                    "target_controller": "any",
+                    "counter_type": "+1/+1",
+                    "counter_count": 1,
+                    "count": 1,
+                    "compose_on_resolution": True,
+                },
+                {
+                    "effect": "proliferate",
+                    "battle_model_scope": "xmage_fixed_proliferate_spell_v1",
+                    "proliferate_count": 1,
+                    "compose_on_resolution": True,
+                },
+            ],
+            "_rule_logical_key": "battle_rule_v1:courage-in-crisis",
+        }
+
+        self.battle.apply_effect_immediate(
+            active,
+            [opponent],
+            {"name": "Courage in Crisis", "type_line": "Sorcery"},
+            turn=7,
+            rng=random.Random(7),
+            effect_data_override=effect,
+        )
+
+        self.assertEqual(target["plus_one_counters"], 2)
+        self.assertEqual((target["power"], target["toughness"]), (4, 4))
+        self.assertEqual(self.battle.get_named_counter_count(opponent_artifact, "charge"), 3)
+        self.assertEqual(opponent.poison, 2)
+        self.assertTrue(
+            any(
+                event == "add_counters_resolved"
+                and data.get("card") == "Courage in Crisis"
+                and data.get("target") == "Active Bear"
+                and data.get("counters_added") == 1
+                for event, data in self.events
+            )
+        )
+        self.assertTrue(
+            any(
+                event == "proliferate_resolved"
+                and data.get("card") == "Courage in Crisis"
+                and data.get("permanent_count") == 2
+                and data.get("player_count") == 1
+                for event, data in self.events
+            )
+        )
+        self.assertTrue(
+            any(
+                event == "composite_rule_resolved"
+                and data.get("card") == "Courage in Crisis"
+                and data.get("components_applied") == 2
+                and data.get("components_skipped") == 0
+                for event, data in self.events
+            )
+        )
+
     def test_simple_activated_regenerate_source_pays_discard_and_life_costs(self) -> None:
         active = self.battle.Player("Active", None, [])
         permanent = {

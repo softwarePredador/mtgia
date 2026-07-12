@@ -1,0 +1,5 @@
+     card_name     |  normalized_name  |           oracle_hash            |                logical_rule_key                 |      shadow_handling       | target_card_rows |          canonical_card_id           | existing_rule_rows | expected_rule_rows_before | would_deprecate_shadow_rows
+-------------------+-------------------+----------------------------------+-------------------------------------------------+----------------------------+------------------+--------------------------------------+--------------------+---------------------------+-----------------------------
+ Courage in Crisis | courage in crisis | fb2360868c692987a6528fcc54d0209d | battle_rule_v1:26da15c77e5f75c18a4e86fd53aad6ce | deprecate_nonmatching_rows |                1 | ca5e1c7e-d612-4cf8-94b4-a4dc1843d95d |                  0 |                         0 |                           0
+ Grim Affliction   | grim affliction   | 19ed492a4425aedba232830fb0d742c4 | battle_rule_v1:da949d8f98db67d7074176895f4dfd6f | deprecate_nonmatching_rows |                1 | cc1ac045-7837-44c4-8b0e-781ed131b254 |                  0 |                         0 |                           0
+(2 rows)

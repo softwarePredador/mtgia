@@ -26,6 +26,26 @@ sync_pg = load_module()
 
 
 class SyncBattleCardRulesPgSelectionTests(unittest.TestCase):
+    def test_backfill_trusted_oracle_hashes_has_no_source_filter(self) -> None:
+        class FakeCursor:
+            def __init__(self) -> None:
+                self.query = ""
+
+            def execute(self, query: str) -> None:
+                self.query = query
+
+            def fetchone(self) -> tuple[int]:
+                return (3,)
+
+        cursor = FakeCursor()
+        updated = sync_pg.backfill_trusted_oracle_hashes(cursor)
+
+        self.assertEqual(updated, 3)
+        self.assertIn("br.review_status IN ('verified', 'active')", cursor.query)
+        self.assertIn("br.execution_status IN ('auto', 'executable')", cursor.query)
+        self.assertIn("md5(c.oracle_text)", cursor.query)
+        self.assertNotIn("br.source IN", cursor.query)
+
     def test_resolve_selected_card_names_from_summary_filters_hotfixes(self) -> None:
         payload = {
             "entries": [

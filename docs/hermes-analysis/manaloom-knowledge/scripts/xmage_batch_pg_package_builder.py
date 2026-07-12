@@ -7141,6 +7141,70 @@ def boost_add_counter_target_spell_execution_scenario_from_expected_rule(
     }
 
 
+def add_counters_proliferate_spell_execution_scenario_from_expected_rule(
+    rule: dict[str, Any],
+) -> dict[str, Any] | None:
+    required = dict(rule.get("required_effect_fields") or {})
+    if required.get("battle_model_scope") != "xmage_fixed_add_counters_target_creature_then_proliferate_spell_v1":
+        return None
+    if required.get("effect") != "composite_resolution":
+        return None
+    components = [
+        component
+        for component in required.get("_composite_rule_components") or []
+        if isinstance(component, dict)
+    ]
+    counter_component = next((component for component in components if component.get("effect") == "add_counters"), None)
+    proliferate_component = next((component for component in components if component.get("effect") == "proliferate"), None)
+    if counter_component is None or proliferate_component is None:
+        return None
+    constraints = dict(required.get("target_constraints") or {"card_types": ["creature"]})
+    target = _target_fixture_from_constraints(
+        "E2E Legal Counter Proliferate Target",
+        constraints,
+        matching=True,
+    )
+    target["power"] = 2
+    target["toughness"] = 2
+    nonmatching = _target_fixture_from_constraints(
+        "E2E Illegal Counter Proliferate Target",
+        constraints,
+        matching=False,
+    )
+    counter_type = str(required.get("counter_type") or counter_component.get("counter_type") or "+1/+1")
+    counter_count = int(required.get("counter_count") or counter_component.get("counter_count") or 1)
+    return {
+        "name": f"{rule['card_name']} adds counters then proliferates",
+        "type": "add_counters_proliferate_spell",
+        "card": {
+            "name": rule["card_name"],
+            "type_line": "Sorcery" if required.get("sorcery") is True else "Instant",
+        },
+        "target": target,
+        "nonmatching_target": nonmatching,
+        "opponent_battlefield": [
+            {
+                "name": "E2E Opponent Charge Artifact",
+                "type_line": "Artifact",
+                "effect": "artifact",
+                "charge_counters": 2,
+                "counters": {"charge": 2},
+            }
+        ],
+        "opponent_poison_counters": 1,
+        "expected_target_constraints": constraints,
+        "expected_counter_type": counter_type,
+        "expected_counter_count": counter_count,
+        "expected_target_plus_one_counters": 2 if counter_type == "+1/+1" and counter_count == 1 else None,
+        "expected_target_power": 4 if counter_type == "+1/+1" and counter_count == 1 else None,
+        "expected_target_toughness": 4 if counter_type == "+1/+1" and counter_count == 1 else None,
+        "expected_opponent_charge_counters": 3,
+        "expected_opponent_poison_counters": 2,
+        "expected_component_count": 2,
+        "logical_rule_key": rule["logical_rule_key"],
+    }
+
+
 def add_counters_untap_target_spell_execution_scenario_from_expected_rule(
     rule: dict[str, Any],
 ) -> dict[str, Any] | None:
@@ -10254,6 +10318,7 @@ def execution_scenario_from_expected_rule(rule: dict[str, Any]) -> dict[str, Any
         or tap_target_spell_execution_scenario_from_expected_rule(rule)
         or gain_control_untap_haste_execution_scenario_from_expected_rule(rule)
         or boost_add_counter_target_spell_execution_scenario_from_expected_rule(rule)
+        or add_counters_proliferate_spell_execution_scenario_from_expected_rule(rule)
         or add_counters_target_spell_execution_scenario_from_expected_rule(rule)
         or add_counters_untap_target_spell_execution_scenario_from_expected_rule(rule)
         or boost_untap_target_spell_execution_scenario_from_expected_rule(rule)

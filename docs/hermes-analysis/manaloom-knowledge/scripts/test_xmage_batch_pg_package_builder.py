@@ -8054,6 +8054,58 @@ def test_proliferate_draw_fields_and_execution_scenario_are_manifested() -> None
     assert scenario["expected_opponent_poison_counters"] == 2
 
 
+def test_add_counters_proliferate_fields_and_execution_scenario_are_manifested() -> None:
+    proposal = {
+        "normalized_name": "courage in crisis",
+        "card_name": "Courage in Crisis",
+        "oracle_hash": "hash-courage-in-crisis",
+        "logical_rule_key": "battle_rule_v1:courage-in-crisis",
+        "effect_json": {
+            "effect": "composite_resolution",
+            "battle_model_scope": "xmage_fixed_add_counters_target_creature_then_proliferate_spell_v1",
+            "target": "creature",
+            "target_constraints": {"card_types": ["creature"]},
+            "target_controller": "any",
+            "counter_type": "+1/+1",
+            "counter_count": 1,
+            "count": 1,
+            "proliferate_count": 1,
+            "resolution_order": "add_counters_then_proliferate",
+            "_composite_rule_components": [
+                {
+                    "effect": "add_counters",
+                    "battle_model_scope": "xmage_fixed_add_counters_target_creature_spell_v1",
+                    "target": "creature",
+                    "target_constraints": {"card_types": ["creature"]},
+                    "counter_type": "+1/+1",
+                    "counter_count": 1,
+                    "count": 1,
+                },
+                {
+                    "effect": "proliferate",
+                    "battle_model_scope": "xmage_fixed_proliferate_spell_v1",
+                    "proliferate_count": 1,
+                },
+            ],
+        },
+    }
+
+    expected = builder.expected_rule_from_proposal(proposal)
+    required = expected["required_effect_fields"]
+
+    assert required["battle_model_scope"] == "xmage_fixed_add_counters_target_creature_then_proliferate_spell_v1"
+    assert required["counter_type"] == "+1/+1"
+    assert required["proliferate_count"] == 1
+
+    scenario = builder.execution_scenario_from_expected_rule(expected)
+
+    assert scenario["type"] == "add_counters_proliferate_spell"
+    assert scenario["expected_counter_type"] == "+1/+1"
+    assert scenario["expected_target_plus_one_counters"] == 2
+    assert scenario["expected_opponent_charge_counters"] == 3
+    assert scenario["expected_opponent_poison_counters"] == 2
+
+
 def test_each_player_lose_life_draw_fields_and_execution_scenario_are_manifested() -> None:
     proposal = {
         "normalized_name": "crushing disappointment",

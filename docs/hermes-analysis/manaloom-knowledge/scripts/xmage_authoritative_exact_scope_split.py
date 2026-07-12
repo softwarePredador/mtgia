@@ -475,6 +475,9 @@ ADD_COUNTERS_UNTAP_TARGET_SCOPE = "xmage_fixed_add_counters_and_untap_target_cre
 ADD_COUNTERS_UNTAP_TARGET_CREATURES_SCOPE = (
     "xmage_fixed_add_counters_and_untap_target_creatures_spell_v1"
 )
+ADD_COUNTERS_PROLIFERATE_TARGET_SCOPE = (
+    "xmage_fixed_add_counters_target_creature_then_proliferate_spell_v1"
+)
 BOOST_ADD_COUNTERS_TARGET_SCOPE = (
     "xmage_fixed_boost_target_creature_until_eot_add_counter_spell_v1"
 )
@@ -9077,6 +9080,57 @@ def fixed_counter_untap_target_from_oracle(metadata: dict[str, Any]) -> dict[str
             "target_controller": "any",
         }
     return "add_counters_untap_oracle_not_exact"
+
+
+def fixed_counter_proliferate_target_from_oracle(metadata: dict[str, Any]) -> dict[str, Any] | str | None:
+    sentences = simple_oracle_sentences(oracle_text(metadata))
+    if len(sentences) != 1:
+        return None
+    text = strip_parenthetical_reminders(sentences[0])
+    text = re.sub(r"\s+", " ", text).strip().lower()
+    match = re.fullmatch(
+        r"put (?P<count>a|an|one|two|three|four|five|six|seven|eight|nine|ten|\d+) "
+        r"(?P<counter>\+1/\+1|-1/-1|[a-z0-9_ +/\-]+?) counters? on target creature"
+        r"(?P<controlled> you control)?, then proliferate\.?",
+        text,
+    )
+    if not match:
+        return None
+    count = counter_count_from_text(match.group("count"))
+    counter_type = counter_type_from_oracle_phrase(match.group("counter"))
+    if count is None or count <= 0 or not counter_type:
+        return "add_counters_proliferate_oracle_counter_not_supported"
+    return {
+        "counter_type": counter_type,
+        "counter_count": count,
+        "target_count": 1,
+        "target_count_min": 1,
+        "target_count_max": 1,
+        "up_to_count": False,
+        "target_controller": "self" if match.group("controlled") else "any",
+        "resolution_order": "add_counters_then_proliferate",
+    }
+
+
+def fixed_counter_proliferate_target_from_source(source: str) -> dict[str, Any] | str | None:
+    text = source or ""
+    if len(re.findall(r"new\s+ProliferateEffect\s*\(", text)) != 1:
+        return "add_counters_proliferate_source_proliferate_not_single"
+    counter_spec = fixed_counter_target_spec_from_source(text)
+    if isinstance(counter_spec, str):
+        return counter_spec.replace("add_counters", "add_counters_proliferate")
+    if counter_spec is None:
+        return "add_counters_proliferate_source_counter_not_fixed"
+    counter_match = re.search(r"AddCountersTargetEffect\s*\(", text)
+    proliferate_match = re.search(r"new\s+ProliferateEffect\s*\(", text)
+    if not counter_match or not proliferate_match:
+        return "add_counters_proliferate_source_not_exact"
+    if counter_match.start() > proliferate_match.start():
+        return "add_counters_proliferate_source_order_not_supported"
+    return {
+        **counter_spec,
+        "resolution_order": "add_counters_then_proliferate",
+    }
 
 
 def activated_self_counter_from_oracle(metadata: dict[str, Any]) -> dict[str, Any] | str:
@@ -45839,6 +45893,84 @@ def split_row(
         return None, "board_wipe_effect_class_not_supported"
 
     if unit == ADD_COUNTERS_TARGET_UNIT:
+        if classes == {"AddCountersTargetEffect", "ProliferateEffect"}:
+            unsupported_abilities = ability_classes(row) - ALLOWED_AUXILIARY_RESOLUTION_ABILITY_CLASSES
+            if unsupported_abilities:
+                return None, "add_counters_proliferate_ability_class_not_simple"
+            oracle_spec = fixed_counter_proliferate_target_from_oracle(metadata)
+            if isinstance(oracle_spec, str):
+                return None, oracle_spec
+            if oracle_spec is None:
+                return None, "add_counters_proliferate_oracle_not_exact"
+            source_spec = fixed_counter_proliferate_target_from_source(source_text)
+            if isinstance(source_spec, str):
+                return None, source_spec
+            if source_spec is None:
+                return None, "add_counters_proliferate_source_not_supported"
+            comparable_keys = (
+                "counter_type",
+                "counter_count",
+                "target_count_min",
+                "target_count_max",
+                "up_to_count",
+                "target_controller",
+                "resolution_order",
+            )
+            if any(source_spec.get(key) != oracle_spec.get(key) for key in comparable_keys):
+                return None, "add_counters_proliferate_source_oracle_mismatch"
+            target_constraints = {"card_types": ["creature"]}
+            counter_type = str(oracle_spec["counter_type"])
+            counter_count = int(oracle_spec["counter_count"])
+            counter_component = {
+                "effect": "add_counters",
+                "battle_model_scope": ADD_COUNTERS_TARGET_SCOPE,
+                "target": "creature",
+                "target_constraints": target_constraints,
+                "target_controller": oracle_spec["target_controller"],
+                "counter_type": counter_type,
+                "counter_count": counter_count,
+                "count": counter_count,
+                "target_count": 1,
+                "target_count_min": 1,
+                "target_count_max": 1,
+                "up_to_count": False,
+                "compose_on_resolution": True,
+                "xmage_effect_class": "AddCountersTargetEffect",
+                **flags,
+            }
+            proliferate_component = {
+                "effect": "proliferate",
+                "battle_model_scope": "xmage_fixed_proliferate_spell_v1",
+                "proliferate_count": 1,
+                "compose_on_resolution": True,
+                "xmage_effect_class": "ProliferateEffect",
+                **flags,
+            }
+            effect_json = {
+                "effect": "composite_resolution",
+                "battle_model_scope": ADD_COUNTERS_PROLIFERATE_TARGET_SCOPE,
+                "target": "creature",
+                "target_constraints": target_constraints,
+                "target_controller": oracle_spec["target_controller"],
+                "counter_type": counter_type,
+                "counter_count": counter_count,
+                "count": counter_count,
+                "target_count": 1,
+                "target_count_min": 1,
+                "target_count_max": 1,
+                "up_to_count": False,
+                "proliferate_count": 1,
+                "resolution_order": "add_counters_then_proliferate",
+                "xmage_effect_classes": ["AddCountersTargetEffect", "ProliferateEffect"],
+                "_composite_rule_components": [counter_component, proliferate_component],
+                **flags,
+            }
+            return build_proposal(
+                row,
+                metadata,
+                effect_json,
+                family_id="xmage_add_counters_target_creature_then_proliferate_spell",
+            ), "selected_exact_scope"
         if classes == {"AddCountersTargetEffect", "BoostTargetEffect"}:
             unsupported_abilities = ability_classes(row) - ALLOWED_AUXILIARY_RESOLUTION_ABILITY_CLASSES
             if unsupported_abilities:

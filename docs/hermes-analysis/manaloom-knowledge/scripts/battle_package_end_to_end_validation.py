@@ -8970,6 +8970,139 @@ def run_boost_add_counter_target_spell(
     }
 
 
+def run_add_counters_proliferate_spell(
+    battle,
+    scenario: dict[str, Any],
+    events: list[tuple[str, dict[str, Any]]],
+) -> dict[str, Any]:
+    card = dict(scenario["card"])
+    active = battle.Player(str(scenario.get("player") or "Counter Proliferate Controller"), None, [])
+    opponent = battle.Player(str(scenario.get("opponent") or "Counter Proliferate Opponent"), None, [])
+    target = battle.enrich_card(dict(scenario.get("target") or {}))
+    if not target:
+        fail("battle_execution", f"{card['name']} add-counter-proliferate scenario has no legal target")
+    target.setdefault("effect", "creature")
+    target.setdefault("power", 2)
+    target.setdefault("toughness", 2)
+    active.battlefield = [target]
+    nonmatching = scenario.get("nonmatching_target")
+    if nonmatching:
+        active.battlefield.append(battle.enrich_card(dict(nonmatching)))
+    opponent.battlefield = [
+        battle.enrich_card(dict(permanent))
+        for permanent in scenario.get("opponent_battlefield") or []
+    ]
+    opponent.poison = int(scenario.get("opponent_poison_counters") or 0)
+    opponent.counters = {"poison": opponent.poison} if opponent.poison > 0 else {}
+    effect = battle.get_card_effect(card)
+    if effect.get("effect") != "composite_resolution":
+        fail("battle_execution", f"{card['name']} effect={effect.get('effect')!r}")
+    if effect.get("battle_model_scope") != "xmage_fixed_add_counters_target_creature_then_proliferate_spell_v1":
+        fail("battle_execution", f"{card['name']} scope={effect.get('battle_model_scope')!r}")
+    expected_counter_type = str(scenario.get("expected_counter_type") or effect.get("counter_type") or "+1/+1")
+    expected_counter_count = int(scenario.get("expected_counter_count") or effect.get("counter_count") or 1)
+    before_counter = _counter_value(battle, target, expected_counter_type)
+    before_events = len(events)
+    battle.apply_effect_immediate(
+        active,
+        [opponent],
+        battle.enrich_card({**card, **effect}),
+        turn=int(scenario.get("turn") or 7),
+        rng=random.Random(int(scenario.get("seed") or 6085)),
+        effect_data_override=effect,
+        phase=str(scenario.get("phase") or "precombat_main"),
+    )
+    after_counter = _counter_value(battle, target, expected_counter_type)
+    expected_after_delta = expected_counter_count + 1
+    if after_counter - before_counter != expected_after_delta:
+        fail(
+            "battle_execution",
+            f"{card['name']} expected {expected_after_delta} {expected_counter_type} counters after proliferate, got {after_counter - before_counter}",
+        )
+    expected_plus_one = scenario.get("expected_target_plus_one_counters")
+    if expected_plus_one is not None and int(target.get("plus_one_counters") or 0) != int(expected_plus_one):
+        fail(
+            "battle_execution",
+            f"{card['name']} plus_one_counters={target.get('plus_one_counters')}, expected {expected_plus_one}",
+        )
+    expected_power = scenario.get("expected_target_power")
+    if expected_power is not None and int(target.get("power") or 0) != int(expected_power):
+        fail("battle_execution", f"{card['name']} power={target.get('power')}, expected {expected_power}")
+    expected_toughness = scenario.get("expected_target_toughness")
+    if expected_toughness is not None and int(target.get("toughness") or 0) != int(expected_toughness):
+        fail("battle_execution", f"{card['name']} toughness={target.get('toughness')}, expected {expected_toughness}")
+    opponent_permanent = opponent.battlefield[0] if opponent.battlefield else {}
+    expected_charge = int(scenario.get("expected_opponent_charge_counters") or 0)
+    if expected_charge and battle.get_named_counter_count(opponent_permanent, "charge") != expected_charge:
+        fail(
+            "battle_execution",
+            f"{card['name']} charge counters={battle.get_named_counter_count(opponent_permanent, 'charge')}, expected {expected_charge}",
+        )
+    expected_poison = int(scenario.get("expected_opponent_poison_counters") or 0)
+    if expected_poison and int(getattr(opponent, "poison", 0) or 0) != expected_poison:
+        fail("battle_execution", f"{card['name']} poison={getattr(opponent, 'poison', 0)}, expected {expected_poison}")
+    counter_event = next(
+        (
+            data
+            for event, data in events[before_events:]
+            if event == "add_counters_resolved"
+            and data.get("card") == card.get("name")
+            and data.get("target") == target.get("name")
+        ),
+        None,
+    )
+    if counter_event is None:
+        fail("battle_events", f"missing {card['name']} add_counters_resolved event")
+    if int(counter_event.get("counters_added") or 0) != expected_counter_count:
+        fail(
+            "battle_events",
+            f"{card['name']} counters_added={counter_event.get('counters_added')}, expected {expected_counter_count}",
+        )
+    proliferate_event = next(
+        (
+            data
+            for event, data in events[before_events:]
+            if event == "proliferate_resolved"
+            and data.get("card") == card.get("name")
+        ),
+        None,
+    )
+    if proliferate_event is None:
+        fail("battle_events", f"missing {card['name']} proliferate_resolved event")
+    if int(proliferate_event.get("permanent_count") or 0) < 2:
+        fail("battle_events", f"{card['name']} permanent_count={proliferate_event.get('permanent_count')!r}")
+    if int(proliferate_event.get("player_count") or 0) < 1:
+        fail("battle_events", f"{card['name']} player_count={proliferate_event.get('player_count')!r}")
+    composite_event = next(
+        (
+            data
+            for event, data in events[before_events:]
+            if event == "composite_rule_resolved"
+            and data.get("card") == card.get("name")
+        ),
+        None,
+    )
+    if composite_event is None:
+        fail("battle_events", f"missing {card['name']} composite_rule_resolved event")
+    expected_component_count = int(scenario.get("expected_component_count") or 2)
+    if int(composite_event.get("components_applied") or 0) != expected_component_count:
+        fail(
+            "battle_events",
+            f"{card['name']} components_applied={composite_event.get('components_applied')}, expected {expected_component_count}",
+        )
+    if int(composite_event.get("components_skipped") or 0) != 0:
+        fail("battle_events", f"{card['name']} components_skipped={composite_event.get('components_skipped')}")
+    return {
+        "scenario": scenario.get("name"),
+        "card_name": card["name"],
+        "target": target.get("name"),
+        "counter_type": expected_counter_type,
+        "counters_after_resolution": after_counter,
+        "opponent_charge_counters": battle.get_named_counter_count(opponent_permanent, "charge"),
+        "opponent_poison_counters": int(getattr(opponent, "poison", 0) or 0),
+    }
+
+
 def run_add_counters_untap_target_spell(
     battle,
     scenario: dict[str, Any],
@@ -15054,6 +15187,7 @@ SCENARIO_RUNNERS = {
     "gain_control_untap_haste_until_eot": run_gain_control_untap_haste_until_eot,
     "stat_modifier_until_eot_untap_target": run_stat_modifier_until_eot_untap_target,
     "boost_add_counter_target_spell": run_boost_add_counter_target_spell,
+    "add_counters_proliferate_spell": run_add_counters_proliferate_spell,
     "add_counters_target_spell": run_add_counters_target_spell,
     "add_counters_untap_target_spell": run_add_counters_untap_target_spell,
     "target_player_discard_spell": run_target_player_discard_spell,

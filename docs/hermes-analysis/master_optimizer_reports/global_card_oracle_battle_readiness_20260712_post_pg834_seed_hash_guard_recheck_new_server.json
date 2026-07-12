@@ -1,0 +1,3334 @@
+{
+  "generated_at": "2026-07-12T17:22:24.860910+00:00",
+  "status": "action_required",
+  "contract": "docs/hermes-analysis/XMAGE_TO_MANALOOM_DEFINITIVE_FLOW_2026-06-29.md",
+  "method": {
+    "read_only": true,
+    "postgres_cards_table_is_base_scope": true,
+    "postgres_is_product_truth": true,
+    "registered_deck_usage_is_qa_only": true,
+    "oracle_sources": [
+      "Scryfall bulk data for Oracle/card data freshness",
+      "MTGJSON as secondary bulk/reference lane"
+    ],
+    "battle_sources": [
+      "local XMage as primary rules-engine reference",
+      "Forge only for ambiguous high-risk cross-checks"
+    ],
+    "promotion_boundary": "broad extraction routes family lanes only; executable truth still needs focused tests and PG package",
+    "xmage_root": "/Users/desenvolvimentomobile/Downloads/mage-master",
+    "xmage_source_check_limit": 250
+  },
+  "summary": {
+    "all_card_inventory": {
+      "cards": {
+        "total_cards": 34331,
+        "missing_oracle_id": 3,
+        "missing_oracle_text": 359,
+        "missing_type_line": 0,
+        "missing_name": 0,
+        "missing_all_legalities": 0,
+        "missing_commander_legality": 0,
+        "not_commander_legal": 2997
+      },
+      "card_intelligence_snapshot": {
+        "total_snapshot_cards": 34331,
+        "snapshot_missing_commander_legality": 0,
+        "snapshot_has_any_rule": 7974,
+        "snapshot_has_verified_rule": 6825
+      }
+    },
+    "routing_adjustments": {
+      "empty_oracle_text_generic_candidates": 359,
+      "oracle_text_empty_but_not_oracle_data_sync": 359
+    },
+    "all_known_cards": 34331,
+    "ready_product_qa_unique_cards": 364,
+    "current_registered_deck_qa_unique_cards": 2203,
+    "lane_counts": {
+      "battle_and_oracle_ready": 6718,
+      "battle_family_mapper_required": 27079,
+      "battle_rule_verification_required": 67,
+      "commander_illegal_block": 2997,
+      "digital_non_commander_rule_exception": 3,
+      "generic_runtime_or_no_card_rule": 359,
+      "official_oracle_identity_unavailable": 3
+    },
+    "ready_product_qa_lane_counts": {
+      "battle_and_oracle_ready": 268,
+      "battle_family_mapper_required": 87,
+      "battle_rule_verification_required": 9
+    },
+    "battle_gap_family_counts": {
+      "manual_model_review": 6190,
+      "triggered_or_static_ability": 3809,
+      "damage_or_life_total_change": 3638,
+      "token_creation": 3450,
+      "draw_selection_topdeck": 3204,
+      "graveyard_recursion": 1876,
+      "targeted_removal": 876,
+      "tutor_search_library": 742,
+      "modal_or_choice_effect": 697,
+      "mana_generation_or_ritual": 595,
+      "alternate_or_free_cast": 493,
+      "protection_prevention": 477,
+      "recursion_or_bounce": 447,
+      "counterspell_or_stack_interaction": 316,
+      "copy_spell_or_permanent": 269
+    },
+    "xmage_source_checked_counts": {
+      "available": 238,
+      "missing": 12
+    },
+    "top_actionable_cards": [
+      {
+        "name": "Aetherflux Reservoir",
+        "priority_score": 400,
+        "lanes": [
+          "battle_rule_verification_required"
+        ],
+        "family": "damage_or_life_total_change",
+        "runtime_requirement": "card_specific_or_family_rule_required",
+        "ready_product_deck_count": 0,
+        "deck_count": 11,
+        "total_quantity": 11,
+        "commander_legality_status": "legal",
+        "legality_format_count": 12,
+        "oracle_identity_legality_format_count": 12,
+        "set_codes": [
+          "brr"
+        ],
+        "trusted_rule_count": 0,
+        "unverified_executable_rule_count": 1,
+        "card_id_trusted_rule_count": 0,
+        "normalized_name_trusted_rule_count": 0,
+        "oracle_identity_trusted_rule_count": 0,
+        "xmage_source": {
+          "checked": false,
+          "available": null
+        }
+      },
+      {
+        "name": "Apex of Power",
+        "priority_score": 400,
+        "lanes": [
+          "battle_rule_verification_required"
+        ],
+        "family": "mana_generation_or_ritual",
+        "runtime_requirement": "card_specific_rule_required",
+        "ready_product_deck_count": 0,
+        "deck_count": 13,
+        "total_quantity": 13,
+        "commander_legality_status": "legal",
+        "legality_format_count": 12,
+        "oracle_identity_legality_format_count": 12,
+        "set_codes": [
+          "afc"
+        ],
+        "trusted_rule_count": 0,
+        "unverified_executable_rule_count": 1,
+        "card_id_trusted_rule_count": 0,
+        "normalized_name_trusted_rule_count": 0,
+        "oracle_identity_trusted_rule_count": 0,
+        "xmage_source": {
+          "checked": false,
+          "available": null
+        }
+      },
+      {
+        "name": "Approach of the Second Sun",
+        "priority_score": 400,
+        "lanes": [
+          "battle_rule_verification_required"
+        ],
+        "family": "manual_model_review",
+        "runtime_requirement": "card_specific_rule_required",
+        "ready_product_deck_count": 1,
+        "deck_count": 23,
+        "total_quantity": 23,
+        "commander_legality_status": "legal",
+        "legality_format_count": 12,
+        "oracle_identity_legality_format_count": 12,
+        "set_codes": [
+          "akh"
+        ],
+        "trusted_rule_count": 0,
+        "unverified_executable_rule_count": 1,
+        "card_id_trusted_rule_count": 0,
+        "normalized_name_trusted_rule_count": 0,
+        "oracle_identity_trusted_rule_count": 0,
+        "xmage_source": {
+          "checked": false,
+          "available": null
+        }
+      },
+      {
+        "name": "Arcane Endeavor",
+        "priority_score": 400,
+        "lanes": [
+          "battle_rule_verification_required"
+        ],
+        "family": "draw_selection_topdeck",
+        "runtime_requirement": "card_specific_rule_required",
+        "ready_product_deck_count": 0,
+        "deck_count": 0,
+        "total_quantity": 0,
+        "commander_legality_status": "legal",
+        "legality_format_count": 5,
+        "oracle_identity_legality_format_count": 5,
+        "set_codes": [
+          "afc"
+        ],
+        "trusted_rule_count": 0,
+        "unverified_executable_rule_count": 1,
+        "card_id_trusted_rule_count": 0,
+        "normalized_name_trusted_rule_count": 0,
+        "oracle_identity_trusted_rule_count": 0,
+        "xmage_source": {
+          "checked": false,
+          "available": null
+        }
+      },
+      {
+        "name": "Archaeomancer's Map",
+        "priority_score": 400,
+        "lanes": [
+          "battle_rule_verification_required"
+        ],
+        "family": "tutor_search_library",
+        "runtime_requirement": "card_specific_or_family_rule_required",
+        "ready_product_deck_count": 0,
+        "deck_count": 0,
+        "total_quantity": 0,
+        "commander_legality_status": "legal",
+        "legality_format_count": 5,
+        "oracle_identity_legality_format_count": 5,
+        "set_codes": [
+          "c21"
+        ],
+        "trusted_rule_count": 0,
+        "unverified_executable_rule_count": 1,
+        "card_id_trusted_rule_count": 0,
+        "normalized_name_trusted_rule_count": 0,
+        "oracle_identity_trusted_rule_count": 0,
+        "xmage_source": {
+          "checked": false,
+          "available": null
+        }
+      },
+      {
+        "name": "Austere Command",
+        "priority_score": 400,
+        "lanes": [
+          "battle_rule_verification_required"
+        ],
+        "family": "modal_or_choice_effect",
+        "runtime_requirement": "card_specific_rule_required",
+        "ready_product_deck_count": 0,
+        "deck_count": 23,
+        "total_quantity": 23,
+        "commander_legality_status": "legal",
+        "legality_format_count": 8,
+        "oracle_identity_legality_format_count": 8,
+        "set_codes": [
+          "2xm"
+        ],
+        "trusted_rule_count": 0,
+        "unverified_executable_rule_count": 1,
+        "card_id_trusted_rule_count": 0,
+        "normalized_name_trusted_rule_count": 0,
+        "oracle_identity_trusted_rule_count": 0,
+        "xmage_source": {
+          "checked": false,
+          "available": null
+        }
+      },
+      {
+        "name": "Basking Broodscale",
+        "priority_score": 400,
+        "lanes": [
+          "battle_rule_verification_required"
+        ],
+        "family": "token_creation",
+        "runtime_requirement": "card_specific_or_family_rule_required",
+        "ready_product_deck_count": 0,
+        "deck_count": 0,
+        "total_quantity": 0,
+        "commander_legality_status": "legal",
+        "legality_format_count": 12,
+        "oracle_identity_legality_format_count": 12,
+        "set_codes": [
+          "mh3"
+        ],
+        "trusted_rule_count": 0,
+        "unverified_executable_rule_count": 1,
+        "card_id_trusted_rule_count": 0,
+        "normalized_name_trusted_rule_count": 0,
+        "oracle_identity_trusted_rule_count": 0,
+        "xmage_source": {
+          "checked": false,
+          "available": null
+        }
+      },
+      {
+        "name": "Blind Obedience",
+        "priority_score": 400,
+        "lanes": [
+          "battle_rule_verification_required"
+        ],
+        "family": "triggered_or_static_ability",
+        "runtime_requirement": "card_specific_or_family_rule_required",
+        "ready_product_deck_count": 0,
+        "deck_count": 20,
+        "total_quantity": 20,
+        "commander_legality_status": "legal",
+        "legality_format_count": 12,
+        "oracle_identity_legality_format_count": 12,
+        "set_codes": [
+          "c16"
+        ],
+        "trusted_rule_count": 0,
+        "unverified_executable_rule_count": 1,
+        "card_id_trusted_rule_count": 0,
+        "normalized_name_trusted_rule_count": 0,
+        "oracle_identity_trusted_rule_count": 0,
+        "xmage_source": {
+          "checked": false,
+          "available": null
+        }
+      },
+      {
+        "name": "Boros Charm",
+        "priority_score": 400,
+        "lanes": [
+          "battle_rule_verification_required"
+        ],
+        "family": "damage_or_life_total_change",
+        "runtime_requirement": "card_specific_rule_required",
+        "ready_product_deck_count": 1,
+        "deck_count": 75,
+        "total_quantity": 75,
+        "commander_legality_status": "legal",
+        "legality_format_count": 15,
+        "oracle_identity_legality_format_count": 15,
+        "set_codes": [
+          "a25"
+        ],
+        "trusted_rule_count": 0,
+        "unverified_executable_rule_count": 1,
+        "card_id_trusted_rule_count": 0,
+        "normalized_name_trusted_rule_count": 0,
+        "oracle_identity_trusted_rule_count": 0,
+        "xmage_source": {
+          "checked": false,
+          "available": null
+        }
+      },
+      {
+        "name": "Breena, the Demagogue",
+        "priority_score": 400,
+        "lanes": [
+          "battle_rule_verification_required"
+        ],
+        "family": "draw_selection_topdeck",
+        "runtime_requirement": "card_specific_or_family_rule_required",
+        "ready_product_deck_count": 0,
+        "deck_count": 9,
+        "total_quantity": 9,
+        "commander_legality_status": "legal",
+        "legality_format_count": 5,
+        "oracle_identity_legality_format_count": 5,
+        "set_codes": [
+          "c21"
+        ],
+        "trusted_rule_count": 0,
+        "unverified_executable_rule_count": 1,
+        "card_id_trusted_rule_count": 0,
+        "normalized_name_trusted_rule_count": 0,
+        "oracle_identity_trusted_rule_count": 0,
+        "xmage_source": {
+          "checked": false,
+          "available": null
+        }
+      },
+      {
+        "name": "Chandra, Hope's Beacon",
+        "priority_score": 400,
+        "lanes": [
+          "battle_rule_verification_required"
+        ],
+        "family": "copy_spell_or_permanent",
+        "runtime_requirement": "card_specific_or_family_rule_required",
+        "ready_product_deck_count": 0,
+        "deck_count": 13,
+        "total_quantity": 13,
+        "commander_legality_status": "legal",
+        "legality_format_count": 12,
+        "oracle_identity_legality_format_count": 12,
+        "set_codes": [
+          "mom"
+        ],
+        "trusted_rule_count": 0,
+        "unverified_executable_rule_count": 1,
+        "card_id_trusted_rule_count": 0,
+        "normalized_name_trusted_rule_count": 0,
+        "oracle_identity_trusted_rule_count": 0,
+        "xmage_source": {
+          "checked": false,
+          "available": null
+        }
+      },
+      {
+        "name": "Channeled Force",
+        "priority_score": 400,
+        "lanes": [
+          "battle_rule_verification_required"
+        ],
+        "family": "draw_selection_topdeck",
+        "runtime_requirement": "card_specific_rule_required",
+        "ready_product_deck_count": 0,
+        "deck_count": 0,
+        "total_quantity": 0,
+        "commander_legality_status": "legal",
+        "legality_format_count": 12,
+        "oracle_identity_legality_format_count": 12,
+        "set_codes": [
+          "iko"
+        ],
+        "trusted_rule_count": 0,
+        "unverified_executable_rule_count": 1,
+        "card_id_trusted_rule_count": 0,
+        "normalized_name_trusted_rule_count": 0,
+        "oracle_identity_trusted_rule_count": 0,
+        "xmage_source": {
+          "checked": false,
+          "available": null
+        }
+      },
+      {
+        "name": "Chromatic Star",
+        "priority_score": 400,
+        "lanes": [
+          "battle_rule_verification_required"
+        ],
+        "family": "mana_generation_or_ritual",
+        "runtime_requirement": "card_specific_or_family_rule_required",
+        "ready_product_deck_count": 0,
+        "deck_count": 0,
+        "total_quantity": 0,
+        "commander_legality_status": "legal",
+        "legality_format_count": 13,
+        "oracle_identity_legality_format_count": 13,
+        "set_codes": [
+          "10e"
+        ],
+        "trusted_rule_count": 0,
+        "unverified_executable_rule_count": 1,
+        "card_id_trusted_rule_count": 0,
+        "normalized_name_trusted_rule_count": 0,
+        "oracle_identity_trusted_rule_count": 0,
+        "xmage_source": {
+          "checked": false,
+          "available": null
+        }
+      },
+      {
+        "name": "Combustible Gearhulk",
+        "priority_score": 400,
+        "lanes": [
+          "battle_rule_verification_required"
+        ],
+        "family": "draw_selection_topdeck",
+        "runtime_requirement": "card_specific_or_family_rule_required",
+        "ready_product_deck_count": 0,
+        "deck_count": 0,
+        "total_quantity": 0,
+        "commander_legality_status": "legal",
+        "legality_format_count": 12,
+        "oracle_identity_legality_format_count": 12,
+        "set_codes": [
+          "c21"
+        ],
+        "trusted_rule_count": 0,
+        "unverified_executable_rule_count": 1,
+        "card_id_trusted_rule_count": 0,
+        "normalized_name_trusted_rule_count": 0,
+        "oracle_identity_trusted_rule_count": 0,
+        "xmage_source": {
+          "checked": false,
+          "available": null
+        }
+      },
+      {
+        "name": "Commander's Plate",
+        "priority_score": 400,
+        "lanes": [
+          "battle_rule_verification_required"
+        ],
+        "family": "protection_prevention",
+        "runtime_requirement": "card_specific_or_family_rule_required",
+        "ready_product_deck_count": 0,
+        "deck_count": 8,
+        "total_quantity": 8,
+        "commander_legality_status": "legal",
+        "legality_format_count": 9,
+        "oracle_identity_legality_format_count": 9,
+        "set_codes": [
+          "cmr"
+        ],
+        "trusted_rule_count": 0,
+        "unverified_executable_rule_count": 1,
+        "card_id_trusted_rule_count": 0,
+        "normalized_name_trusted_rule_count": 0,
+        "oracle_identity_trusted_rule_count": 0,
+        "xmage_source": {
+          "checked": false,
+          "available": null
+        }
+      },
+      {
+        "name": "Curator's Ward",
+        "priority_score": 400,
+        "lanes": [
+          "battle_rule_verification_required"
+        ],
+        "family": "draw_selection_topdeck",
+        "runtime_requirement": "card_specific_or_family_rule_required",
+        "ready_product_deck_count": 0,
+        "deck_count": 0,
+        "total_quantity": 0,
+        "commander_legality_status": "legal",
+        "legality_format_count": 12,
+        "oracle_identity_legality_format_count": 12,
+        "set_codes": [
+          "dom"
+        ],
+        "trusted_rule_count": 0,
+        "unverified_executable_rule_count": 1,
+        "card_id_trusted_rule_count": 0,
+        "normalized_name_trusted_rule_count": 0,
+        "oracle_identity_trusted_rule_count": 0,
+        "xmage_source": {
+          "checked": false,
+          "available": null
+        }
+      },
+      {
+        "name": "Decaying Time Loop",
+        "priority_score": 400,
+        "lanes": [
+          "battle_rule_verification_required"
+        ],
+        "family": "draw_selection_topdeck",
+        "runtime_requirement": "card_specific_rule_required",
+        "ready_product_deck_count": 0,
+        "deck_count": 0,
+        "total_quantity": 0,
+        "commander_legality_status": "legal",
+        "legality_format_count": 5,
+        "oracle_identity_legality_format_count": 5,
+        "set_codes": [
+          "who"
+        ],
+        "trusted_rule_count": 0,
+        "unverified_executable_rule_count": 1,
+        "card_id_trusted_rule_count": 0,
+        "normalized_name_trusted_rule_count": 0,
+        "oracle_identity_trusted_rule_count": 0,
+        "xmage_source": {
+          "checked": false,
+          "available": null
+        }
+      },
+      {
+        "name": "Drown in Dreams",
+        "priority_score": 400,
+        "lanes": [
+          "battle_rule_verification_required"
+        ],
+        "family": "draw_selection_topdeck",
+        "runtime_requirement": "card_specific_rule_required",
+        "ready_product_deck_count": 0,
+        "deck_count": 0,
+        "total_quantity": 0,
+        "commander_legality_status": "legal",
+        "legality_format_count": 5,
+        "oracle_identity_legality_format_count": 5,
+        "set_codes": [
+          "m3c"
+        ],
+        "trusted_rule_count": 0,
+        "unverified_executable_rule_count": 1,
+        "card_id_trusted_rule_count": 0,
+        "normalized_name_trusted_rule_count": 0,
+        "oracle_identity_trusted_rule_count": 0,
+        "xmage_source": {
+          "checked": false,
+          "available": null
+        }
+      },
+      {
+        "name": "Dualcaster Mage",
+        "priority_score": 400,
+        "lanes": [
+          "battle_rule_verification_required"
+        ],
+        "family": "copy_spell_or_permanent",
+        "runtime_requirement": "card_specific_or_family_rule_required",
+        "ready_product_deck_count": 2,
+        "deck_count": 3,
+        "total_quantity": 3,
+        "commander_legality_status": "legal",
+        "legality_format_count": 9,
+        "oracle_identity_legality_format_count": 9,
+        "set_codes": [
+          "2xm"
+        ],
+        "trusted_rule_count": 0,
+        "unverified_executable_rule_count": 1,
+        "card_id_trusted_rule_count": 0,
+        "normalized_name_trusted_rule_count": 0,
+        "oracle_identity_trusted_rule_count": 0,
+        "xmage_source": {
+          "checked": false,
+          "available": null
+        }
+      },
+      {
+        "name": "Electric Revelation",
+        "priority_score": 400,
+        "lanes": [
+          "battle_rule_verification_required"
+        ],
+        "family": "draw_selection_topdeck",
+        "runtime_requirement": "card_specific_rule_required",
+        "ready_product_deck_count": 0,
+        "deck_count": 0,
+        "total_quantity": 0,
+        "commander_legality_status": "legal",
+        "legality_format_count": 13,
+        "oracle_identity_legality_format_count": 13,
+        "set_codes": [
+          "dbl"
+        ],
+        "trusted_rule_count": 0,
+        "unverified_executable_rule_count": 1,
+        "card_id_trusted_rule_count": 0,
+        "normalized_name_trusted_rule_count": 0,
+        "oracle_identity_trusted_rule_count": 0,
+        "xmage_source": {
+          "checked": false,
+          "available": null
+        }
+      },
+      {
+        "name": "Empowered Autogenerator",
+        "priority_score": 400,
+        "lanes": [
+          "battle_rule_verification_required"
+        ],
+        "family": "mana_generation_or_ritual",
+        "runtime_requirement": "card_specific_or_family_rule_required",
+        "ready_product_deck_count": 0,
+        "deck_count": 0,
+        "total_quantity": 0,
+        "commander_legality_status": "legal",
+        "legality_format_count": 5,
+        "oracle_identity_legality_format_count": 5,
+        "set_codes": [
+          "c19"
+        ],
+        "trusted_rule_count": 0,
+        "unverified_executable_rule_count": 1,
+        "card_id_trusted_rule_count": 0,
+        "normalized_name_trusted_rule_count": 0,
+        "oracle_identity_trusted_rule_count": 0,
+        "xmage_source": {
+          "checked": false,
+          "available": null
+        }
+      },
+      {
+        "name": "Enlightened Tutor",
+        "priority_score": 400,
+        "lanes": [
+          "battle_rule_verification_required"
+        ],
+        "family": "tutor_search_library",
+        "runtime_requirement": "card_specific_rule_required",
+        "ready_product_deck_count": 0,
+        "deck_count": 20,
+        "total_quantity": 20,
+        "commander_legality_status": "legal",
+        "legality_format_count": 11,
+        "oracle_identity_legality_format_count": 11,
+        "set_codes": [
+          "6ed"
+        ],
+        "trusted_rule_count": 0,
+        "unverified_executable_rule_count": 1,
+        "card_id_trusted_rule_count": 0,
+        "normalized_name_trusted_rule_count": 0,
+        "oracle_identity_trusted_rule_count": 0,
+        "xmage_source": {
+          "checked": false,
+          "available": null
+        }
+      },
+      {
+        "name": "Ether",
+        "priority_score": 400,
+        "lanes": [
+          "battle_rule_verification_required"
+        ],
+        "family": "copy_spell_or_permanent",
+        "runtime_requirement": "card_specific_or_family_rule_required",
+        "ready_product_deck_count": 0,
+        "deck_count": 0,
+        "total_quantity": 0,
+        "commander_legality_status": "legal",
+        "legality_format_count": 15,
+        "oracle_identity_legality_format_count": 15,
+        "set_codes": [
+          "fin"
+        ],
+        "trusted_rule_count": 0,
+        "unverified_executable_rule_count": 1,
+        "card_id_trusted_rule_count": 0,
+        "normalized_name_trusted_rule_count": 0,
+        "oracle_identity_trusted_rule_count": 0,
+        "xmage_source": {
+          "checked": false,
+          "available": null
+        }
+      },
+      {
+        "name": "Fateful Showdown",
+        "priority_score": 400,
+        "lanes": [
+          "battle_rule_verification_required"
+        ],
+        "family": "draw_selection_topdeck",
+        "runtime_requirement": "card_specific_rule_required",
+        "ready_product_deck_count": 0,
+        "deck_count": 0,
+        "total_quantity": 0,
+        "commander_legality_status": "legal",
+        "legality_format_count": 12,
+        "oracle_identity_legality_format_count": 12,
+        "set_codes": [
+          "kld"
+        ],
+        "trusted_rule_count": 0,
+        "unverified_executable_rule_count": 1,
+        "card_id_trusted_rule_count": 0,
+        "normalized_name_trusted_rule_count": 0,
+        "oracle_identity_trusted_rule_count": 0,
+        "xmage_source": {
+          "checked": false,
+          "available": null
+        }
+      },
+      {
+        "name": "Formidable Speaker",
+        "priority_score": 400,
+        "lanes": [
+          "battle_rule_verification_required"
+        ],
+        "family": "tutor_search_library",
+        "runtime_requirement": "card_specific_or_family_rule_required",
+        "ready_product_deck_count": 0,
+        "deck_count": 15,
+        "total_quantity": 15,
+        "commander_legality_status": "legal",
+        "legality_format_count": 15,
+        "oracle_identity_legality_format_count": 15,
+        "set_codes": [
+          "ecl"
+        ],
+        "trusted_rule_count": 0,
+        "unverified_executable_rule_count": 1,
+        "card_id_trusted_rule_count": 0,
+        "normalized_name_trusted_rule_count": 0,
+        "oracle_identity_trusted_rule_count": 0,
+        "xmage_source": {
+          "checked": false,
+          "available": null
+        }
+      },
+      {
+        "name": "Goblin Engineer",
+        "priority_score": 400,
+        "lanes": [
+          "battle_rule_verification_required"
+        ],
+        "family": "tutor_search_library",
+        "runtime_requirement": "card_specific_or_family_rule_required",
+        "ready_product_deck_count": 0,
+        "deck_count": 1,
+        "total_quantity": 1,
+        "commander_legality_status": "legal",
+        "legality_format_count": 11,
+        "oracle_identity_legality_format_count": 11,
+        "set_codes": [
+          "h1r"
+        ],
+        "trusted_rule_count": 0,
+        "unverified_executable_rule_count": 1,
+        "card_id_trusted_rule_count": 0,
+        "normalized_name_trusted_rule_count": 0,
+        "oracle_identity_trusted_rule_count": 0,
+        "xmage_source": {
+          "checked": false,
+          "available": null
+        }
+      },
+      {
+        "name": "Heat Shimmer",
+        "priority_score": 400,
+        "lanes": [
+          "battle_rule_verification_required"
+        ],
+        "family": "token_creation",
+        "runtime_requirement": "card_specific_rule_required",
+        "ready_product_deck_count": 0,
+        "deck_count": 1,
+        "total_quantity": 1,
+        "commander_legality_status": "legal",
+        "legality_format_count": 12,
+        "oracle_identity_legality_format_count": 12,
+        "set_codes": [
+          "2xm"
+        ],
+        "trusted_rule_count": 0,
+        "unverified_executable_rule_count": 1,
+        "card_id_trusted_rule_count": 0,
+        "normalized_name_trusted_rule_count": 0,
+        "oracle_identity_trusted_rule_count": 0,
+        "xmage_source": {
+          "checked": false,
+          "available": null
+        }
+      },
+      {
+        "name": "Idyllic Tutor",
+        "priority_score": 400,
+        "lanes": [
+          "battle_rule_verification_required"
+        ],
+        "family": "tutor_search_library",
+        "runtime_requirement": "card_specific_rule_required",
+        "ready_product_deck_count": 0,
+        "deck_count": 9,
+        "total_quantity": 9,
+        "commander_legality_status": "legal",
+        "legality_format_count": 13,
+        "oracle_identity_legality_format_count": 13,
+        "set_codes": [
+          "mor"
+        ],
+        "trusted_rule_count": 0,
+        "unverified_executable_rule_count": 1,
+        "card_id_trusted_rule_count": 0,
+        "normalized_name_trusted_rule_count": 0,
+        "oracle_identity_trusted_rule_count": 0,
+        "xmage_source": {
+          "checked": false,
+          "available": null
+        }
+      },
+      {
+        "name": "Imperial Recruiter",
+        "priority_score": 400,
+        "lanes": [
+          "battle_rule_verification_required"
+        ],
+        "family": "tutor_search_library",
+        "runtime_requirement": "card_specific_or_family_rule_required",
+        "ready_product_deck_count": 1,
+        "deck_count": 8,
+        "total_quantity": 8,
+        "commander_legality_status": "legal",
+        "legality_format_count": 8,
+        "oracle_identity_legality_format_count": 8,
+        "set_codes": [
+          "2xm"
+        ],
+        "trusted_rule_count": 0,
+        "unverified_executable_rule_count": 1,
+        "card_id_trusted_rule_count": 0,
+        "normalized_name_trusted_rule_count": 0,
+        "oracle_identity_trusted_rule_count": 0,
+        "xmage_source": {
+          "checked": false,
+          "available": null
+        }
+      },
+      {
+        "name": "Increasing Vengeance",
+        "priority_score": 400,
+        "lanes": [
+          "battle_rule_verification_required"
+        ],
+        "family": "copy_spell_or_permanent",
+        "runtime_requirement": "card_specific_rule_required",
+        "ready_product_deck_count": 0,
+        "deck_count": 0,
+        "total_quantity": 0,
+        "commander_legality_status": "legal",
+        "legality_format_count": 11,
+        "oracle_identity_legality_format_count": 11,
+        "set_codes": [
+          "c19"
+        ],
+        "trusted_rule_count": 0,
+        "unverified_executable_rule_count": 1,
+        "card_id_trusted_rule_count": 0,
+        "normalized_name_trusted_rule_count": 0,
+        "oracle_identity_trusted_rule_count": 0,
+        "xmage_source": {
+          "checked": false,
+          "available": null
+        }
+      },
+      {
+        "name": "Kraum, Ludevic's Opus",
+        "priority_score": 400,
+        "lanes": [
+          "battle_rule_verification_required"
+        ],
+        "family": "draw_selection_topdeck",
+        "runtime_requirement": "card_specific_or_family_rule_required",
+        "ready_product_deck_count": 0,
+        "deck_count": 0,
+        "total_quantity": 0,
+        "commander_legality_status": "legal",
+        "legality_format_count": 9,
+        "oracle_identity_legality_format_count": 9,
+        "set_codes": [
+          "c16"
+        ],
+        "trusted_rule_count": 0,
+        "unverified_executable_rule_count": 1,
+        "card_id_trusted_rule_count": 0,
+        "normalized_name_trusted_rule_count": 0,
+        "oracle_identity_trusted_rule_count": 0,
+        "xmage_source": {
+          "checked": false,
+          "available": null
+        }
+      },
+      {
+        "name": "Leyline of Abundance",
+        "priority_score": 400,
+        "lanes": [
+          "battle_rule_verification_required"
+        ],
+        "family": "mana_generation_or_ritual",
+        "runtime_requirement": "card_specific_or_family_rule_required",
+        "ready_product_deck_count": 0,
+        "deck_count": 0,
+        "total_quantity": 0,
+        "commander_legality_status": "legal",
+        "legality_format_count": 11,
+        "oracle_identity_legality_format_count": 11,
+        "set_codes": [
+          "m20"
+        ],
+        "trusted_rule_count": 0,
+        "unverified_executable_rule_count": 1,
+        "card_id_trusted_rule_count": 0,
+        "normalized_name_trusted_rule_count": 0,
+        "oracle_identity_trusted_rule_count": 0,
+        "xmage_source": {
+          "checked": false,
+          "available": null
+        }
+      },
+      {
+        "name": "Lightning Greaves",
+        "priority_score": 400,
+        "lanes": [
+          "battle_rule_verification_required"
+        ],
+        "family": "manual_model_review",
+        "runtime_requirement": "card_specific_or_family_rule_required",
+        "ready_product_deck_count": 5,
+        "deck_count": 461,
+        "total_quantity": 461,
+        "commander_legality_status": "legal",
+        "legality_format_count": 11,
+        "oracle_identity_legality_format_count": 11,
+        "set_codes": [
+          "2xm"
+        ],
+        "trusted_rule_count": 0,
+        "unverified_executable_rule_count": 1,
+        "card_id_trusted_rule_count": 0,
+        "normalized_name_trusted_rule_count": 0,
+        "oracle_identity_trusted_rule_count": 0,
+        "xmage_source": {
+          "checked": false,
+          "available": null
+        }
+      },
+      {
+        "name": "Machine God's Effigy",
+        "priority_score": 400,
+        "lanes": [
+          "battle_rule_verification_required"
+        ],
+        "family": "mana_generation_or_ritual",
+        "runtime_requirement": "card_specific_or_family_rule_required",
+        "ready_product_deck_count": 0,
+        "deck_count": 0,
+        "total_quantity": 0,
+        "commander_legality_status": "legal",
+        "legality_format_count": 5,
+        "oracle_identity_legality_format_count": 5,
+        "set_codes": [
+          "brc"
+        ],
+        "trusted_rule_count": 0,
+        "unverified_executable_rule_count": 1,
+        "card_id_trusted_rule_count": 0,
+        "normalized_name_trusted_rule_count": 0,
+        "oracle_identity_trusted_rule_count": 0,
+        "xmage_source": {
+          "checked": false,
+          "available": null
+        }
+      },
+      {
+        "name": "Magma Opus",
+        "priority_score": 400,
+        "lanes": [
+          "battle_rule_verification_required"
+        ],
+        "family": "token_creation",
+        "runtime_requirement": "card_specific_rule_required",
+        "ready_product_deck_count": 0,
+        "deck_count": 0,
+        "total_quantity": 0,
+        "commander_legality_status": "legal",
+        "legality_format_count": 11,
+        "oracle_identity_legality_format_count": 11,
+        "set_codes": [
+          "prm"
+        ],
+        "trusted_rule_count": 0,
+        "unverified_executable_rule_count": 1,
+        "card_id_trusted_rule_count": 0,
+        "normalized_name_trusted_rule_count": 0,
+        "oracle_identity_trusted_rule_count": 0,
+        "xmage_source": {
+          "checked": false,
+          "available": null
+        }
+      },
+      {
+        "name": "Mana Vault",
+        "priority_score": 400,
+        "lanes": [
+          "battle_rule_verification_required"
+        ],
+        "family": "mana_generation_or_ritual",
+        "runtime_requirement": "card_specific_or_family_rule_required",
+        "ready_product_deck_count": 1,
+        "deck_count": 152,
+        "total_quantity": 152,
+        "commander_legality_status": "legal",
+        "legality_format_count": 8,
+        "oracle_identity_legality_format_count": 8,
+        "set_codes": [
+          "2ed"
+        ],
+        "trusted_rule_count": 0,
+        "unverified_executable_rule_count": 1,
+        "card_id_trusted_rule_count": 0,
+        "normalized_name_trusted_rule_count": 0,
+        "oracle_identity_trusted_rule_count": 0,
+        "xmage_source": {
+          "checked": false,
+          "available": null
+        }
+      },
+      {
+        "name": "Mithril Coat",
+        "priority_score": 400,
+        "lanes": [
+          "battle_rule_verification_required"
+        ],
+        "family": "protection_prevention",
+        "runtime_requirement": "card_specific_or_family_rule_required",
+        "ready_product_deck_count": 0,
+        "deck_count": 8,
+        "total_quantity": 8,
+        "commander_legality_status": "legal",
+        "legality_format_count": 11,
+        "oracle_identity_legality_format_count": 11,
+        "set_codes": [
+          "ltr"
+        ],
+        "trusted_rule_count": 0,
+        "unverified_executable_rule_count": 1,
+        "card_id_trusted_rule_count": 0,
+        "normalized_name_trusted_rule_count": 0,
+        "oracle_identity_trusted_rule_count": 0,
+        "xmage_source": {
+          "checked": false,
+          "available": null
+        }
+      },
+      {
+        "name": "Molten Duplication",
+        "priority_score": 400,
+        "lanes": [
+          "battle_rule_verification_required"
+        ],
+        "family": "token_creation",
+        "runtime_requirement": "card_specific_rule_required",
+        "ready_product_deck_count": 0,
+        "deck_count": 1,
+        "total_quantity": 1,
+        "commander_legality_status": "legal",
+        "legality_format_count": 15,
+        "oracle_identity_legality_format_count": 15,
+        "set_codes": [
+          "big"
+        ],
+        "trusted_rule_count": 0,
+        "unverified_executable_rule_count": 1,
+        "card_id_trusted_rule_count": 0,
+        "normalized_name_trusted_rule_count": 0,
+        "oracle_identity_trusted_rule_count": 0,
+        "xmage_source": {
+          "checked": false,
+          "available": null
+        }
+      },
+      {
+        "name": "Ol\u00f3rin's Searing Light",
+        "priority_score": 400,
+        "lanes": [
+          "battle_rule_verification_required"
+        ],
+        "family": "damage_or_life_total_change",
+        "runtime_requirement": "card_specific_rule_required",
+        "ready_product_deck_count": 0,
+        "deck_count": 0,
+        "total_quantity": 0,
+        "commander_legality_status": "legal",
+        "legality_format_count": 5,
+        "oracle_identity_legality_format_count": 5,
+        "set_codes": [
+          "ltc"
+        ],
+        "trusted_rule_count": 0,
+        "unverified_executable_rule_count": 1,
+        "card_id_trusted_rule_count": 0,
+        "normalized_name_trusted_rule_count": 0,
+        "oracle_identity_trusted_rule_count": 0,
+        "xmage_source": {
+          "checked": false,
+          "available": null
+        }
+      },
+      {
+        "name": "Ondu Inversion // Ondu Skyruins",
+        "priority_score": 400,
+        "lanes": [
+          "battle_rule_verification_required"
+        ],
+        "family": "manual_model_review",
+        "runtime_requirement": "card_specific_rule_required",
+        "ready_product_deck_count": 0,
+        "deck_count": 0,
+        "total_quantity": 0,
+        "commander_legality_status": "legal",
+        "legality_format_count": 12,
+        "oracle_identity_legality_format_count": 12,
+        "set_codes": [
+          "plst"
+        ],
+        "trusted_rule_count": 0,
+        "unverified_executable_rule_count": 1,
+        "card_id_trusted_rule_count": 0,
+        "normalized_name_trusted_rule_count": 0,
+        "oracle_identity_trusted_rule_count": 0,
+        "xmage_source": {
+          "checked": false,
+          "available": null
+        }
+      },
+      {
+        "name": "One with the Multiverse",
+        "priority_score": 400,
+        "lanes": [
+          "battle_rule_verification_required"
+        ],
+        "family": "alternate_or_free_cast",
+        "runtime_requirement": "card_specific_or_family_rule_required",
+        "ready_product_deck_count": 0,
+        "deck_count": 0,
+        "total_quantity": 0,
+        "commander_legality_status": "legal",
+        "legality_format_count": 12,
+        "oracle_identity_legality_format_count": 12,
+        "set_codes": [
+          "bro"
+        ],
+        "trusted_rule_count": 0,
+        "unverified_executable_rule_count": 1,
+        "card_id_trusted_rule_count": 0,
+        "normalized_name_trusted_rule_count": 0,
+        "oracle_identity_trusted_rule_count": 0,
+        "xmage_source": {
+          "checked": false,
+          "available": null
+        }
+      },
+      {
+        "name": "Past in Flames",
+        "priority_score": 400,
+        "lanes": [
+          "battle_rule_verification_required"
+        ],
+        "family": "graveyard_recursion",
+        "runtime_requirement": "card_specific_rule_required",
+        "ready_product_deck_count": 0,
+        "deck_count": 1,
+        "total_quantity": 1,
+        "commander_legality_status": "legal",
+        "legality_format_count": 10,
+        "oracle_identity_legality_format_count": 10,
+        "set_codes": [
+          "40k"
+        ],
+        "trusted_rule_count": 0,
+        "unverified_executable_rule_count": 1,
+        "card_id_trusted_rule_count": 0,
+        "normalized_name_trusted_rule_count": 0,
+        "oracle_identity_trusted_rule_count": 0,
+        "xmage_source": {
+          "checked": false,
+          "available": null
+        }
+      },
+      {
+        "name": "Path to Exile",
+        "priority_score": 400,
+        "lanes": [
+          "battle_rule_verification_required"
+        ],
+        "family": "targeted_removal",
+        "runtime_requirement": "card_specific_rule_required",
+        "ready_product_deck_count": 1,
+        "deck_count": 171,
+        "total_quantity": 171,
+        "commander_legality_status": "legal",
+        "legality_format_count": 11,
+        "oracle_identity_legality_format_count": 11,
+        "set_codes": [
+          "2x2"
+        ],
+        "trusted_rule_count": 0,
+        "unverified_executable_rule_count": 1,
+        "card_id_trusted_rule_count": 0,
+        "normalized_name_trusted_rule_count": 0,
+        "oracle_identity_trusted_rule_count": 0,
+        "xmage_source": {
+          "checked": false,
+          "available": null
+        }
+      },
+      {
+        "name": "Radiant Scrollwielder",
+        "priority_score": 400,
+        "lanes": [
+          "battle_rule_verification_required"
+        ],
+        "family": "graveyard_recursion",
+        "runtime_requirement": "card_specific_or_family_rule_required",
+        "ready_product_deck_count": 0,
+        "deck_count": 0,
+        "total_quantity": 0,
+        "commander_legality_status": "legal",
+        "legality_format_count": 12,
+        "oracle_identity_legality_format_count": 12,
+        "set_codes": [
+          "prm"
+        ],
+        "trusted_rule_count": 0,
+        "unverified_executable_rule_count": 1,
+        "card_id_trusted_rule_count": 0,
+        "normalized_name_trusted_rule_count": 0,
+        "oracle_identity_trusted_rule_count": 0,
+        "xmage_source": {
+          "checked": false,
+          "available": null
+        }
+      },
+      {
+        "name": "Rakdos, the Muscle",
+        "priority_score": 400,
+        "lanes": [
+          "battle_rule_verification_required"
+        ],
+        "family": "protection_prevention",
+        "runtime_requirement": "card_specific_or_family_rule_required",
+        "ready_product_deck_count": 0,
+        "deck_count": 0,
+        "total_quantity": 0,
+        "commander_legality_status": "legal",
+        "legality_format_count": 15,
+        "oracle_identity_legality_format_count": 15,
+        "set_codes": [
+          "otj"
+        ],
+        "trusted_rule_count": 0,
+        "unverified_executable_rule_count": 1,
+        "card_id_trusted_rule_count": 0,
+        "normalized_name_trusted_rule_count": 0,
+        "oracle_identity_trusted_rule_count": 0,
+        "xmage_source": {
+          "checked": false,
+          "available": null
+        }
+      },
+      {
+        "name": "Reckless Endeavor",
+        "priority_score": 400,
+        "lanes": [
+          "battle_rule_verification_required"
+        ],
+        "family": "token_creation",
+        "runtime_requirement": "card_specific_rule_required",
+        "ready_product_deck_count": 0,
+        "deck_count": 5,
+        "total_quantity": 5,
+        "commander_legality_status": "legal",
+        "legality_format_count": 5,
+        "oracle_identity_legality_format_count": 5,
+        "set_codes": [
+          "afc"
+        ],
+        "trusted_rule_count": 0,
+        "unverified_executable_rule_count": 1,
+        "card_id_trusted_rule_count": 0,
+        "normalized_name_trusted_rule_count": 0,
+        "oracle_identity_trusted_rule_count": 0,
+        "xmage_source": {
+          "checked": false,
+          "available": null
+        }
+      },
+      {
+        "name": "Recruiter of the Guard",
+        "priority_score": 400,
+        "lanes": [
+          "battle_rule_verification_required"
+        ],
+        "family": "tutor_search_library",
+        "runtime_requirement": "card_specific_or_family_rule_required",
+        "ready_product_deck_count": 0,
+        "deck_count": 3,
+        "total_quantity": 3,
+        "commander_legality_status": "legal",
+        "legality_format_count": 10,
+        "oracle_identity_legality_format_count": 10,
+        "set_codes": [
+          "cn2"
+        ],
+        "trusted_rule_count": 0,
+        "unverified_executable_rule_count": 1,
+        "card_id_trusted_rule_count": 0,
+        "normalized_name_trusted_rule_count": 0,
+        "oracle_identity_trusted_rule_count": 0,
+        "xmage_source": {
+          "checked": false,
+          "available": null
+        }
+      },
+      {
+        "name": "Reiterate",
+        "priority_score": 400,
+        "lanes": [
+          "battle_rule_verification_required"
+        ],
+        "family": "copy_spell_or_permanent",
+        "runtime_requirement": "card_specific_rule_required",
+        "ready_product_deck_count": 0,
+        "deck_count": 1,
+        "total_quantity": 1,
+        "commander_legality_status": "legal",
+        "legality_format_count": 8,
+        "oracle_identity_legality_format_count": 8,
+        "set_codes": [
+          "tsp"
+        ],
+        "trusted_rule_count": 0,
+        "unverified_executable_rule_count": 1,
+        "card_id_trusted_rule_count": 0,
+        "normalized_name_trusted_rule_count": 0,
+        "oracle_identity_trusted_rule_count": 0,
+        "xmage_source": {
+          "checked": false,
+          "available": null
+        }
+      },
+      {
+        "name": "Reverberate",
+        "priority_score": 400,
+        "lanes": [
+          "battle_rule_verification_required"
+        ],
+        "family": "copy_spell_or_permanent",
+        "runtime_requirement": "card_specific_rule_required",
+        "ready_product_deck_count": 0,
+        "deck_count": 1,
+        "total_quantity": 1,
+        "commander_legality_status": "legal",
+        "legality_format_count": 8,
+        "oracle_identity_legality_format_count": 8,
+        "set_codes": [
+          "40k"
+        ],
+        "trusted_rule_count": 0,
+        "unverified_executable_rule_count": 1,
+        "card_id_trusted_rule_count": 0,
+        "normalized_name_trusted_rule_count": 0,
+        "oracle_identity_trusted_rule_count": 0,
+        "xmage_source": {
+          "checked": false,
+          "available": null
+        }
+      },
+      {
+        "name": "Reverse the Sands",
+        "priority_score": 400,
+        "lanes": [
+          "battle_rule_verification_required"
+        ],
+        "family": "manual_model_review",
+        "runtime_requirement": "card_specific_rule_required",
+        "ready_product_deck_count": 0,
+        "deck_count": 0,
+        "total_quantity": 0,
+        "commander_legality_status": "legal",
+        "legality_format_count": 8,
+        "oracle_identity_legality_format_count": 8,
+        "set_codes": [
+          "c16"
+        ],
+        "trusted_rule_count": 0,
+        "unverified_executable_rule_count": 1,
+        "card_id_trusted_rule_count": 0,
+        "normalized_name_trusted_rule_count": 0,
+        "oracle_identity_trusted_rule_count": 0,
+        "xmage_source": {
+          "checked": false,
+          "available": null
+        }
+      },
+      {
+        "name": "Ring of the Lucii",
+        "priority_score": 400,
+        "lanes": [
+          "battle_rule_verification_required"
+        ],
+        "family": "mana_generation_or_ritual",
+        "runtime_requirement": "card_specific_or_family_rule_required",
+        "ready_product_deck_count": 0,
+        "deck_count": 2,
+        "total_quantity": 2,
+        "commander_legality_status": "legal",
+        "legality_format_count": 15,
+        "oracle_identity_legality_format_count": 15,
+        "set_codes": [
+          "fin"
+        ],
+        "trusted_rule_count": 0,
+        "unverified_executable_rule_count": 1,
+        "card_id_trusted_rule_count": 0,
+        "normalized_name_trusted_rule_count": 0,
+        "oracle_identity_trusted_rule_count": 0,
+        "xmage_source": {
+          "checked": false,
+          "available": null
+        }
+      },
+      {
+        "name": "Sazacap's Brew",
+        "priority_score": 400,
+        "lanes": [
+          "battle_rule_verification_required"
+        ],
+        "family": "token_creation",
+        "runtime_requirement": "card_specific_rule_required",
+        "ready_product_deck_count": 0,
+        "deck_count": 0,
+        "total_quantity": 0,
+        "commander_legality_status": "legal",
+        "legality_format_count": 17,
+        "oracle_identity_legality_format_count": 17,
+        "set_codes": [
+          "blb"
+        ],
+        "trusted_rule_count": 0,
+        "unverified_executable_rule_count": 1,
+        "card_id_trusted_rule_count": 0,
+        "normalized_name_trusted_rule_count": 0,
+        "oracle_identity_trusted_rule_count": 0,
+        "xmage_source": {
+          "checked": false,
+          "available": null
+        }
+      },
+      {
+        "name": "Scavenging Ooze",
+        "priority_score": 400,
+        "lanes": [
+          "battle_rule_verification_required"
+        ],
+        "family": "targeted_removal",
+        "runtime_requirement": "card_specific_or_family_rule_required",
+        "ready_product_deck_count": 0,
+        "deck_count": 1,
+        "total_quantity": 1,
+        "commander_legality_status": "legal",
+        "legality_format_count": 16,
+        "oracle_identity_legality_format_count": 16,
+        "set_codes": [
+          "c16"
+        ],
+        "trusted_rule_count": 0,
+        "unverified_executable_rule_count": 1,
+        "card_id_trusted_rule_count": 0,
+        "normalized_name_trusted_rule_count": 0,
+        "oracle_identity_trusted_rule_count": 0,
+        "xmage_source": {
+          "checked": false,
+          "available": null
+        }
+      },
+      {
+        "name": "Sensei's Divining Top",
+        "priority_score": 400,
+        "lanes": [
+          "battle_rule_verification_required"
+        ],
+        "family": "draw_selection_topdeck",
+        "runtime_requirement": "card_specific_or_family_rule_required",
+        "ready_product_deck_count": 4,
+        "deck_count": 157,
+        "total_quantity": 157,
+        "commander_legality_status": "legal",
+        "legality_format_count": 7,
+        "oracle_identity_legality_format_count": 7,
+        "set_codes": [
+          "2x2"
+        ],
+        "trusted_rule_count": 0,
+        "unverified_executable_rule_count": 1,
+        "card_id_trusted_rule_count": 0,
+        "normalized_name_trusted_rule_count": 0,
+        "oracle_identity_trusted_rule_count": 0,
+        "xmage_source": {
+          "checked": false,
+          "available": null
+        }
+      },
+      {
+        "name": "Shantotto, Tactician Magician",
+        "priority_score": 400,
+        "lanes": [
+          "battle_rule_verification_required"
+        ],
+        "family": "draw_selection_topdeck",
+        "runtime_requirement": "card_specific_or_family_rule_required",
+        "ready_product_deck_count": 0,
+        "deck_count": 0,
+        "total_quantity": 0,
+        "commander_legality_status": "legal",
+        "legality_format_count": 15,
+        "oracle_identity_legality_format_count": 15,
+        "set_codes": [
+          "fin"
+        ],
+        "trusted_rule_count": 0,
+        "unverified_executable_rule_count": 1,
+        "card_id_trusted_rule_count": 0,
+        "normalized_name_trusted_rule_count": 0,
+        "oracle_identity_trusted_rule_count": 0,
+        "xmage_source": {
+          "checked": false,
+          "available": null
+        }
+      },
+      {
+        "name": "Shark Typhoon",
+        "priority_score": 400,
+        "lanes": [
+          "battle_rule_verification_required"
+        ],
+        "family": "token_creation",
+        "runtime_requirement": "card_specific_or_family_rule_required",
+        "ready_product_deck_count": 0,
+        "deck_count": 37,
+        "total_quantity": 37,
+        "commander_legality_status": "legal",
+        "legality_format_count": 12,
+        "oracle_identity_legality_format_count": 12,
+        "set_codes": [
+          "dsc"
+        ],
+        "trusted_rule_count": 0,
+        "unverified_executable_rule_count": 1,
+        "card_id_trusted_rule_count": 0,
+        "normalized_name_trusted_rule_count": 0,
+        "oracle_identity_trusted_rule_count": 0,
+        "xmage_source": {
+          "checked": false,
+          "available": null
+        }
+      },
+      {
+        "name": "Sisay, Weatherlight Captain",
+        "priority_score": 400,
+        "lanes": [
+          "battle_rule_verification_required"
+        ],
+        "family": "tutor_search_library",
+        "runtime_requirement": "card_specific_or_family_rule_required",
+        "ready_product_deck_count": 0,
+        "deck_count": 5,
+        "total_quantity": 5,
+        "commander_legality_status": "legal",
+        "legality_format_count": 7,
+        "oracle_identity_legality_format_count": 7,
+        "set_codes": [
+          "h1r"
+        ],
+        "trusted_rule_count": 0,
+        "unverified_executable_rule_count": 1,
+        "card_id_trusted_rule_count": 0,
+        "normalized_name_trusted_rule_count": 0,
+        "oracle_identity_trusted_rule_count": 0,
+        "xmage_source": {
+          "checked": false,
+          "available": null
+        }
+      },
+      {
+        "name": "Soulfire Eruption",
+        "priority_score": 400,
+        "lanes": [
+          "battle_rule_verification_required"
+        ],
+        "family": "damage_or_life_total_change",
+        "runtime_requirement": "card_specific_rule_required",
+        "ready_product_deck_count": 0,
+        "deck_count": 13,
+        "total_quantity": 13,
+        "commander_legality_status": "legal",
+        "legality_format_count": 5,
+        "oracle_identity_legality_format_count": 5,
+        "set_codes": [
+          "cmr"
+        ],
+        "trusted_rule_count": 0,
+        "unverified_executable_rule_count": 1,
+        "card_id_trusted_rule_count": 0,
+        "normalized_name_trusted_rule_count": 0,
+        "oracle_identity_trusted_rule_count": 0,
+        "xmage_source": {
+          "checked": false,
+          "available": null
+        }
+      },
+      {
+        "name": "Spelltwine",
+        "priority_score": 400,
+        "lanes": [
+          "battle_rule_verification_required"
+        ],
+        "family": "targeted_removal",
+        "runtime_requirement": "card_specific_rule_required",
+        "ready_product_deck_count": 0,
+        "deck_count": 0,
+        "total_quantity": 0,
+        "commander_legality_status": "legal",
+        "legality_format_count": 7,
+        "oracle_identity_legality_format_count": 7,
+        "set_codes": [
+          "c16"
+        ],
+        "trusted_rule_count": 0,
+        "unverified_executable_rule_count": 1,
+        "card_id_trusted_rule_count": 0,
+        "normalized_name_trusted_rule_count": 0,
+        "oracle_identity_trusted_rule_count": 0,
+        "xmage_source": {
+          "checked": false,
+          "available": null
+        }
+      },
+      {
+        "name": "Sunforger",
+        "priority_score": 400,
+        "lanes": [
+          "battle_rule_verification_required"
+        ],
+        "family": "tutor_search_library",
+        "runtime_requirement": "card_specific_or_family_rule_required",
+        "ready_product_deck_count": 0,
+        "deck_count": 4,
+        "total_quantity": 4,
+        "commander_legality_status": "legal",
+        "legality_format_count": 8,
+        "oracle_identity_legality_format_count": 8,
+        "set_codes": [
+          "2xm"
+        ],
+        "trusted_rule_count": 0,
+        "unverified_executable_rule_count": 1,
+        "card_id_trusted_rule_count": 0,
+        "normalized_name_trusted_rule_count": 0,
+        "oracle_identity_trusted_rule_count": 0,
+        "xmage_source": {
+          "checked": false,
+          "available": null
+        }
+      },
+      {
+        "name": "Tellah, Great Sage",
+        "priority_score": 400,
+        "lanes": [
+          "battle_rule_verification_required"
+        ],
+        "family": "token_creation",
+        "runtime_requirement": "card_specific_or_family_rule_required",
+        "ready_product_deck_count": 0,
+        "deck_count": 0,
+        "total_quantity": 0,
+        "commander_legality_status": "legal",
+        "legality_format_count": 16,
+        "oracle_identity_legality_format_count": 16,
+        "set_codes": [
+          "fin"
+        ],
+        "trusted_rule_count": 0,
+        "unverified_executable_rule_count": 1,
+        "card_id_trusted_rule_count": 0,
+        "normalized_name_trusted_rule_count": 0,
+        "oracle_identity_trusted_rule_count": 0,
+        "xmage_source": {
+          "checked": false,
+          "available": null
+        }
+      },
+      {
+        "name": "The Emperor of Palamecia // The Lord Master of Hell",
+        "priority_score": 400,
+        "lanes": [
+          "battle_rule_verification_required"
+        ],
+        "family": "mana_generation_or_ritual",
+        "runtime_requirement": "card_specific_or_family_rule_required",
+        "ready_product_deck_count": 0,
+        "deck_count": 0,
+        "total_quantity": 0,
+        "commander_legality_status": "legal",
+        "legality_format_count": 15,
+        "oracle_identity_legality_format_count": 15,
+        "set_codes": [
+          "fin"
+        ],
+        "trusted_rule_count": 0,
+        "unverified_executable_rule_count": 1,
+        "card_id_trusted_rule_count": 0,
+        "normalized_name_trusted_rule_count": 0,
+        "oracle_identity_trusted_rule_count": 0,
+        "xmage_source": {
+          "checked": false,
+          "available": null
+        }
+      },
+      {
+        "name": "The Unagi of Kyoshi Island",
+        "priority_score": 400,
+        "lanes": [
+          "battle_rule_verification_required"
+        ],
+        "family": "draw_selection_topdeck",
+        "runtime_requirement": "card_specific_or_family_rule_required",
+        "ready_product_deck_count": 0,
+        "deck_count": 0,
+        "total_quantity": 0,
+        "commander_legality_status": "legal",
+        "legality_format_count": 16,
+        "oracle_identity_legality_format_count": 16,
+        "set_codes": [
+          "ptla"
+        ],
+        "trusted_rule_count": 0,
+        "unverified_executable_rule_count": 1,
+        "card_id_trusted_rule_count": 0,
+        "normalized_name_trusted_rule_count": 0,
+        "oracle_identity_trusted_rule_count": 0,
+        "xmage_source": {
+          "checked": false,
+          "available": null
+        }
+      },
+      {
+        "name": "Twinflame",
+        "priority_score": 400,
+        "lanes": [
+          "battle_rule_verification_required"
+        ],
+        "family": "token_creation",
+        "runtime_requirement": "card_specific_rule_required",
+        "ready_product_deck_count": 0,
+        "deck_count": 1,
+        "total_quantity": 1,
+        "commander_legality_status": "legal",
+        "legality_format_count": 8,
+        "oracle_identity_legality_format_count": 8,
+        "set_codes": [
+          "2x2"
+        ],
+        "trusted_rule_count": 0,
+        "unverified_executable_rule_count": 1,
+        "card_id_trusted_rule_count": 0,
+        "normalized_name_trusted_rule_count": 0,
+        "oracle_identity_trusted_rule_count": 0,
+        "xmage_source": {
+          "checked": false,
+          "available": null
+        }
+      },
+      {
+        "name": "Valakut Awakening // Valakut Stoneforge",
+        "priority_score": 400,
+        "lanes": [
+          "battle_rule_verification_required"
+        ],
+        "family": "draw_selection_topdeck",
+        "runtime_requirement": "card_specific_rule_required",
+        "ready_product_deck_count": 0,
+        "deck_count": 3,
+        "total_quantity": 3,
+        "commander_legality_status": "legal",
+        "legality_format_count": 11,
+        "oracle_identity_legality_format_count": 11,
+        "set_codes": [
+          "pio"
+        ],
+        "trusted_rule_count": 0,
+        "unverified_executable_rule_count": 2,
+        "card_id_trusted_rule_count": 0,
+        "normalized_name_trusted_rule_count": 0,
+        "oracle_identity_trusted_rule_count": 0,
+        "xmage_source": {
+          "checked": false,
+          "available": null
+        }
+      },
+      {
+        "name": "Wayfarer's Bauble",
+        "priority_score": 400,
+        "lanes": [
+          "battle_rule_verification_required"
+        ],
+        "family": "tutor_search_library",
+        "runtime_requirement": "card_specific_or_family_rule_required",
+        "ready_product_deck_count": 0,
+        "deck_count": 81,
+        "total_quantity": 81,
+        "commander_legality_status": "legal",
+        "legality_format_count": 13,
+        "oracle_identity_legality_format_count": 13,
+        "set_codes": [
+          "40k"
+        ],
+        "trusted_rule_count": 0,
+        "unverified_executable_rule_count": 1,
+        "card_id_trusted_rule_count": 0,
+        "normalized_name_trusted_rule_count": 0,
+        "oracle_identity_trusted_rule_count": 0,
+        "xmage_source": {
+          "checked": false,
+          "available": null
+        }
+      },
+      {
+        "name": "Wheel of Fortune",
+        "priority_score": 400,
+        "lanes": [
+          "battle_rule_verification_required"
+        ],
+        "family": "draw_selection_topdeck",
+        "runtime_requirement": "card_specific_rule_required",
+        "ready_product_deck_count": 2,
+        "deck_count": 70,
+        "total_quantity": 70,
+        "commander_legality_status": "legal",
+        "legality_format_count": 7,
+        "oracle_identity_legality_format_count": 7,
+        "set_codes": [
+          "2ed"
+        ],
+        "trusted_rule_count": 0,
+        "unverified_executable_rule_count": 1,
+        "card_id_trusted_rule_count": 0,
+        "normalized_name_trusted_rule_count": 0,
+        "oracle_identity_trusted_rule_count": 0,
+        "xmage_source": {
+          "checked": false,
+          "available": null
+        }
+      },
+      {
+        "name": "\"Lifetime\" Pass Holder",
+        "priority_score": 250,
+        "lanes": [
+          "battle_family_mapper_required"
+        ],
+        "family": "graveyard_recursion",
+        "runtime_requirement": "card_specific_or_family_rule_required",
+        "ready_product_deck_count": 0,
+        "deck_count": 0,
+        "total_quantity": 0,
+        "commander_legality_status": "legal",
+        "legality_format_count": 5,
+        "oracle_identity_legality_format_count": 5,
+        "set_codes": [
+          "unf"
+        ],
+        "trusted_rule_count": 0,
+        "unverified_executable_rule_count": 0,
+        "card_id_trusted_rule_count": 0,
+        "normalized_name_trusted_rule_count": 0,
+        "oracle_identity_trusted_rule_count": 0,
+        "xmage_source": {
+          "checked": true,
+          "available": false,
+          "class_name": null,
+          "path": null,
+          "resolution": null
+        }
+      },
+      {
+        "name": "+2 Mace",
+        "priority_score": 250,
+        "lanes": [
+          "battle_family_mapper_required"
+        ],
+        "family": "manual_model_review",
+        "runtime_requirement": "card_specific_or_family_rule_required",
+        "ready_product_deck_count": 0,
+        "deck_count": 18,
+        "total_quantity": 18,
+        "commander_legality_status": "legal",
+        "legality_format_count": 13,
+        "oracle_identity_legality_format_count": 13,
+        "set_codes": [
+          "afr"
+        ],
+        "trusted_rule_count": 0,
+        "unverified_executable_rule_count": 0,
+        "card_id_trusted_rule_count": 0,
+        "normalized_name_trusted_rule_count": 0,
+        "oracle_identity_trusted_rule_count": 0,
+        "xmage_source": {
+          "checked": true,
+          "available": false,
+          "class_name": null,
+          "path": null,
+          "resolution": null
+        }
+      },
+      {
+        "name": "_____ _____ _____ Trespasser",
+        "priority_score": 250,
+        "lanes": [
+          "battle_family_mapper_required"
+        ],
+        "family": "manual_model_review",
+        "runtime_requirement": "card_specific_or_family_rule_required",
+        "ready_product_deck_count": 0,
+        "deck_count": 0,
+        "total_quantity": 0,
+        "commander_legality_status": "legal",
+        "legality_format_count": 5,
+        "oracle_identity_legality_format_count": 5,
+        "set_codes": [
+          "unf"
+        ],
+        "trusted_rule_count": 0,
+        "unverified_executable_rule_count": 0,
+        "card_id_trusted_rule_count": 0,
+        "normalized_name_trusted_rule_count": 0,
+        "oracle_identity_trusted_rule_count": 0,
+        "xmage_source": {
+          "checked": true,
+          "available": false,
+          "class_name": null,
+          "path": null,
+          "resolution": null
+        }
+      },
+      {
+        "name": "_____ _____ Rocketship",
+        "priority_score": 250,
+        "lanes": [
+          "battle_family_mapper_required"
+        ],
+        "family": "triggered_or_static_ability",
+        "runtime_requirement": "card_specific_or_family_rule_required",
+        "ready_product_deck_count": 0,
+        "deck_count": 0,
+        "total_quantity": 0,
+        "commander_legality_status": "legal",
+        "legality_format_count": 5,
+        "oracle_identity_legality_format_count": 5,
+        "set_codes": [
+          "unf"
+        ],
+        "trusted_rule_count": 0,
+        "unverified_executable_rule_count": 0,
+        "card_id_trusted_rule_count": 0,
+        "normalized_name_trusted_rule_count": 0,
+        "oracle_identity_trusted_rule_count": 0,
+        "xmage_source": {
+          "checked": true,
+          "available": false,
+          "class_name": null,
+          "path": null,
+          "resolution": null
+        }
+      },
+      {
+        "name": "_____ Balls of Fire",
+        "priority_score": 250,
+        "lanes": [
+          "battle_family_mapper_required"
+        ],
+        "family": "damage_or_life_total_change",
+        "runtime_requirement": "card_specific_or_family_rule_required",
+        "ready_product_deck_count": 0,
+        "deck_count": 0,
+        "total_quantity": 0,
+        "commander_legality_status": "legal",
+        "legality_format_count": 5,
+        "oracle_identity_legality_format_count": 5,
+        "set_codes": [
+          "unf"
+        ],
+        "trusted_rule_count": 0,
+        "unverified_executable_rule_count": 0,
+        "card_id_trusted_rule_count": 0,
+        "normalized_name_trusted_rule_count": 0,
+        "oracle_identity_trusted_rule_count": 0,
+        "xmage_source": {
+          "checked": true,
+          "available": false,
+          "class_name": null,
+          "path": null,
+          "resolution": null
+        }
+      },
+      {
+        "name": "_____ Bird Gets the Worm",
+        "priority_score": 250,
+        "lanes": [
+          "battle_family_mapper_required"
+        ],
+        "family": "manual_model_review",
+        "runtime_requirement": "card_specific_or_family_rule_required",
+        "ready_product_deck_count": 0,
+        "deck_count": 0,
+        "total_quantity": 0,
+        "commander_legality_status": "legal",
+        "legality_format_count": 7,
+        "oracle_identity_legality_format_count": 7,
+        "set_codes": [
+          "unf"
+        ],
+        "trusted_rule_count": 0,
+        "unverified_executable_rule_count": 0,
+        "card_id_trusted_rule_count": 0,
+        "normalized_name_trusted_rule_count": 0,
+        "oracle_identity_trusted_rule_count": 0,
+        "xmage_source": {
+          "checked": true,
+          "available": false,
+          "class_name": null,
+          "path": null,
+          "resolution": null
+        }
+      },
+      {
+        "name": "_____-o-saurus",
+        "priority_score": 250,
+        "lanes": [
+          "battle_family_mapper_required"
+        ],
+        "family": "manual_model_review",
+        "runtime_requirement": "card_specific_or_family_rule_required",
+        "ready_product_deck_count": 0,
+        "deck_count": 0,
+        "total_quantity": 0,
+        "commander_legality_status": "legal",
+        "legality_format_count": 7,
+        "oracle_identity_legality_format_count": 7,
+        "set_codes": [
+          "unf"
+        ],
+        "trusted_rule_count": 0,
+        "unverified_executable_rule_count": 0,
+        "card_id_trusted_rule_count": 0,
+        "normalized_name_trusted_rule_count": 0,
+        "oracle_identity_trusted_rule_count": 0,
+        "xmage_source": {
+          "checked": true,
+          "available": false,
+          "class_name": null,
+          "path": null,
+          "resolution": null
+        }
+      },
+      {
+        "name": "________ Goblin",
+        "priority_score": 250,
+        "lanes": [
+          "battle_family_mapper_required"
+        ],
+        "family": "mana_generation_or_ritual",
+        "runtime_requirement": "card_specific_or_family_rule_required",
+        "ready_product_deck_count": 0,
+        "deck_count": 0,
+        "total_quantity": 0,
+        "commander_legality_status": "legal",
+        "legality_format_count": 7,
+        "oracle_identity_legality_format_count": 7,
+        "set_codes": [
+          "unf"
+        ],
+        "trusted_rule_count": 0,
+        "unverified_executable_rule_count": 0,
+        "card_id_trusted_rule_count": 0,
+        "normalized_name_trusted_rule_count": 0,
+        "oracle_identity_trusted_rule_count": 0,
+        "xmage_source": {
+          "checked": true,
+          "available": false,
+          "class_name": null,
+          "path": null,
+          "resolution": null
+        }
+      },
+      {
+        "name": "A Good Day to Pie",
+        "priority_score": 250,
+        "lanes": [
+          "battle_family_mapper_required"
+        ],
+        "family": "graveyard_recursion",
+        "runtime_requirement": "card_specific_rule_required",
+        "ready_product_deck_count": 0,
+        "deck_count": 0,
+        "total_quantity": 0,
+        "commander_legality_status": "legal",
+        "legality_format_count": 7,
+        "oracle_identity_legality_format_count": 7,
+        "set_codes": [
+          "unf"
+        ],
+        "trusted_rule_count": 0,
+        "unverified_executable_rule_count": 0,
+        "card_id_trusted_rule_count": 0,
+        "normalized_name_trusted_rule_count": 0,
+        "oracle_identity_trusted_rule_count": 0,
+        "xmage_source": {
+          "checked": true,
+          "available": false,
+          "class_name": null,
+          "path": null,
+          "resolution": null
+        }
+      },
+      {
+        "name": "A Killer Among Us",
+        "priority_score": 250,
+        "lanes": [
+          "battle_family_mapper_required"
+        ],
+        "family": "token_creation",
+        "runtime_requirement": "card_specific_or_family_rule_required",
+        "ready_product_deck_count": 0,
+        "deck_count": 0,
+        "total_quantity": 0,
+        "commander_legality_status": "legal",
+        "legality_format_count": 14,
+        "oracle_identity_legality_format_count": 14,
+        "set_codes": [
+          "mkm"
+        ],
+        "trusted_rule_count": 0,
+        "unverified_executable_rule_count": 0,
+        "card_id_trusted_rule_count": 0,
+        "normalized_name_trusted_rule_count": 0,
+        "oracle_identity_trusted_rule_count": 0,
+        "xmage_source": {
+          "checked": true,
+          "available": true,
+          "class_name": "AKillerAmongUs",
+          "path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/a/AKillerAmongUs.java",
+          "resolution": "direct_bucket_candidate"
+        }
+      },
+      {
+        "name": "A Little Chat",
+        "priority_score": 250,
+        "lanes": [
+          "battle_family_mapper_required"
+        ],
+        "family": "manual_model_review",
+        "runtime_requirement": "card_specific_rule_required",
+        "ready_product_deck_count": 0,
+        "deck_count": 0,
+        "total_quantity": 0,
+        "commander_legality_status": "legal",
+        "legality_format_count": 11,
+        "oracle_identity_legality_format_count": 11,
+        "set_codes": [
+          "snc"
+        ],
+        "trusted_rule_count": 0,
+        "unverified_executable_rule_count": 0,
+        "card_id_trusted_rule_count": 0,
+        "normalized_name_trusted_rule_count": 0,
+        "oracle_identity_trusted_rule_count": 0,
+        "xmage_source": {
+          "checked": true,
+          "available": true,
+          "class_name": "ALittleChat",
+          "path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/a/ALittleChat.java",
+          "resolution": "direct_bucket_candidate"
+        }
+      },
+      {
+        "name": "A Realm Reborn",
+        "priority_score": 250,
+        "lanes": [
+          "battle_family_mapper_required"
+        ],
+        "family": "mana_generation_or_ritual",
+        "runtime_requirement": "card_specific_or_family_rule_required",
+        "ready_product_deck_count": 0,
+        "deck_count": 0,
+        "total_quantity": 0,
+        "commander_legality_status": "legal",
+        "legality_format_count": 16,
+        "oracle_identity_legality_format_count": 16,
+        "set_codes": [
+          "fin"
+        ],
+        "trusted_rule_count": 0,
+        "unverified_executable_rule_count": 0,
+        "card_id_trusted_rule_count": 0,
+        "normalized_name_trusted_rule_count": 0,
+        "oracle_identity_trusted_rule_count": 0,
+        "xmage_source": {
+          "checked": true,
+          "available": true,
+          "class_name": "ARealmReborn",
+          "path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/a/ARealmReborn.java",
+          "resolution": "direct_bucket_candidate"
+        }
+      },
+      {
+        "name": "A Tale for the Ages",
+        "priority_score": 250,
+        "lanes": [
+          "battle_family_mapper_required"
+        ],
+        "family": "manual_model_review",
+        "runtime_requirement": "card_specific_or_family_rule_required",
+        "ready_product_deck_count": 0,
+        "deck_count": 0,
+        "total_quantity": 0,
+        "commander_legality_status": "legal",
+        "legality_format_count": 15,
+        "oracle_identity_legality_format_count": 15,
+        "set_codes": [
+          "pwoe"
+        ],
+        "trusted_rule_count": 0,
+        "unverified_executable_rule_count": 0,
+        "card_id_trusted_rule_count": 0,
+        "normalized_name_trusted_rule_count": 0,
+        "oracle_identity_trusted_rule_count": 0,
+        "xmage_source": {
+          "checked": true,
+          "available": true,
+          "class_name": "ATaleForTheAges",
+          "path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/a/ATaleForTheAges.java",
+          "resolution": "direct_bucket_candidate"
+        }
+      },
+      {
+        "name": "A.I.M. Scientists",
+        "priority_score": 250,
+        "lanes": [
+          "battle_family_mapper_required"
+        ],
+        "family": "tutor_search_library",
+        "runtime_requirement": "card_specific_or_family_rule_required",
+        "ready_product_deck_count": 0,
+        "deck_count": 0,
+        "total_quantity": 0,
+        "commander_legality_status": "legal",
+        "legality_format_count": 23,
+        "oracle_identity_legality_format_count": 23,
+        "set_codes": [
+          "msh"
+        ],
+        "trusted_rule_count": 0,
+        "unverified_executable_rule_count": 0,
+        "card_id_trusted_rule_count": 0,
+        "normalized_name_trusted_rule_count": 0,
+        "oracle_identity_trusted_rule_count": 0,
+        "xmage_source": {
+          "checked": true,
+          "available": true,
+          "class_name": "AIMScientists",
+          "path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/a/AIMScientists.java",
+          "resolution": "direct_bucket_candidate"
+        }
+      },
+      {
+        "name": "Aang and Katara",
+        "priority_score": 250,
+        "lanes": [
+          "battle_family_mapper_required"
+        ],
+        "family": "token_creation",
+        "runtime_requirement": "card_specific_or_family_rule_required",
+        "ready_product_deck_count": 0,
+        "deck_count": 6,
+        "total_quantity": 6,
+        "commander_legality_status": "legal",
+        "legality_format_count": 9,
+        "oracle_identity_legality_format_count": 9,
+        "set_codes": [
+          "tle"
+        ],
+        "trusted_rule_count": 0,
+        "unverified_executable_rule_count": 0,
+        "card_id_trusted_rule_count": 0,
+        "normalized_name_trusted_rule_count": 0,
+        "oracle_identity_trusted_rule_count": 0,
+        "xmage_source": {
+          "checked": true,
+          "available": true,
+          "class_name": "AangAndKatara",
+          "path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/a/AangAndKatara.java",
+          "resolution": "direct_bucket_candidate"
+        }
+      },
+      {
+        "name": "Aang's Iceberg",
+        "priority_score": 250,
+        "lanes": [
+          "battle_family_mapper_required"
+        ],
+        "family": "draw_selection_topdeck",
+        "runtime_requirement": "card_specific_or_family_rule_required",
+        "ready_product_deck_count": 0,
+        "deck_count": 18,
+        "total_quantity": 18,
+        "commander_legality_status": "legal",
+        "legality_format_count": 16,
+        "oracle_identity_legality_format_count": 16,
+        "set_codes": [
+          "ptla"
+        ],
+        "trusted_rule_count": 0,
+        "unverified_executable_rule_count": 0,
+        "card_id_trusted_rule_count": 0,
+        "normalized_name_trusted_rule_count": 0,
+        "oracle_identity_trusted_rule_count": 0,
+        "xmage_source": {
+          "checked": true,
+          "available": true,
+          "class_name": "AangsIceberg",
+          "path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/a/AangsIceberg.java",
+          "resolution": "direct_bucket_candidate"
+        }
+      },
+      {
+        "name": "Aang's Journey",
+        "priority_score": 250,
+        "lanes": [
+          "battle_family_mapper_required"
+        ],
+        "family": "tutor_search_library",
+        "runtime_requirement": "card_specific_rule_required",
+        "ready_product_deck_count": 0,
+        "deck_count": 32,
+        "total_quantity": 32,
+        "commander_legality_status": "legal",
+        "legality_format_count": 17,
+        "oracle_identity_legality_format_count": 17,
+        "set_codes": [
+          "tla"
+        ],
+        "trusted_rule_count": 0,
+        "unverified_executable_rule_count": 0,
+        "card_id_trusted_rule_count": 0,
+        "normalized_name_trusted_rule_count": 0,
+        "oracle_identity_trusted_rule_count": 0,
+        "xmage_source": {
+          "checked": true,
+          "available": true,
+          "class_name": "AangsJourney",
+          "path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/a/AangsJourney.java",
+          "resolution": "direct_bucket_candidate"
+        }
+      },
+      {
+        "name": "Aang, A Lot to Learn",
+        "priority_score": 250,
+        "lanes": [
+          "battle_family_mapper_required"
+        ],
+        "family": "graveyard_recursion",
+        "runtime_requirement": "card_specific_or_family_rule_required",
+        "ready_product_deck_count": 0,
+        "deck_count": 11,
+        "total_quantity": 11,
+        "commander_legality_status": "legal",
+        "legality_format_count": 9,
+        "oracle_identity_legality_format_count": 9,
+        "set_codes": [
+          "tle"
+        ],
+        "trusted_rule_count": 0,
+        "unverified_executable_rule_count": 0,
+        "card_id_trusted_rule_count": 0,
+        "normalized_name_trusted_rule_count": 0,
+        "oracle_identity_trusted_rule_count": 0,
+        "xmage_source": {
+          "checked": true,
+          "available": true,
+          "class_name": "AangALotToLearn",
+          "path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/a/AangALotToLearn.java",
+          "resolution": "direct_bucket_candidate"
+        }
+      },
+      {
+        "name": "Aang, Air Nomad",
+        "priority_score": 250,
+        "lanes": [
+          "battle_family_mapper_required"
+        ],
+        "family": "manual_model_review",
+        "runtime_requirement": "card_specific_or_family_rule_required",
+        "ready_product_deck_count": 0,
+        "deck_count": 17,
+        "total_quantity": 17,
+        "commander_legality_status": "legal",
+        "legality_format_count": 9,
+        "oracle_identity_legality_format_count": 9,
+        "set_codes": [
+          "pmei"
+        ],
+        "trusted_rule_count": 0,
+        "unverified_executable_rule_count": 0,
+        "card_id_trusted_rule_count": 0,
+        "normalized_name_trusted_rule_count": 0,
+        "oracle_identity_trusted_rule_count": 0,
+        "xmage_source": {
+          "checked": true,
+          "available": true,
+          "class_name": "AangAirNomad",
+          "path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/a/AangAirNomad.java",
+          "resolution": "direct_bucket_candidate"
+        }
+      },
+      {
+        "name": "Aang, Airbending Master",
+        "priority_score": 250,
+        "lanes": [
+          "battle_family_mapper_required"
+        ],
+        "family": "token_creation",
+        "runtime_requirement": "card_specific_or_family_rule_required",
+        "ready_product_deck_count": 0,
+        "deck_count": 16,
+        "total_quantity": 16,
+        "commander_legality_status": "legal",
+        "legality_format_count": 9,
+        "oracle_identity_legality_format_count": 9,
+        "set_codes": [
+          "tle"
+        ],
+        "trusted_rule_count": 0,
+        "unverified_executable_rule_count": 0,
+        "card_id_trusted_rule_count": 0,
+        "normalized_name_trusted_rule_count": 0,
+        "oracle_identity_trusted_rule_count": 0,
+        "xmage_source": {
+          "checked": true,
+          "available": true,
+          "class_name": "AangAirbendingMaster",
+          "path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/a/AangAirbendingMaster.java",
+          "resolution": "direct_bucket_candidate"
+        }
+      },
+      {
+        "name": "Aang, at the Crossroads // Aang, Destined Savior",
+        "priority_score": 250,
+        "lanes": [
+          "battle_family_mapper_required"
+        ],
+        "family": "triggered_or_static_ability",
+        "runtime_requirement": "card_specific_or_family_rule_required",
+        "ready_product_deck_count": 0,
+        "deck_count": 12,
+        "total_quantity": 12,
+        "commander_legality_status": "legal",
+        "legality_format_count": 16,
+        "oracle_identity_legality_format_count": 16,
+        "set_codes": [
+          "ptla"
+        ],
+        "trusted_rule_count": 0,
+        "unverified_executable_rule_count": 0,
+        "card_id_trusted_rule_count": 0,
+        "normalized_name_trusted_rule_count": 0,
+        "oracle_identity_trusted_rule_count": 0,
+        "xmage_source": {
+          "checked": true,
+          "available": true,
+          "class_name": "AangAtTheCrossroads",
+          "path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/a/AangAtTheCrossroads.java",
+          "resolution": "direct_bucket_candidate"
+        }
+      },
+      {
+        "name": "Aang, Swift Savior // Aang and La, Ocean's Fury",
+        "priority_score": 250,
+        "lanes": [
+          "battle_family_mapper_required"
+        ],
+        "family": "manual_model_review",
+        "runtime_requirement": "card_specific_or_family_rule_required",
+        "ready_product_deck_count": 0,
+        "deck_count": 7,
+        "total_quantity": 7,
+        "commander_legality_status": "legal",
+        "legality_format_count": 15,
+        "oracle_identity_legality_format_count": 15,
+        "set_codes": [
+          "ptla"
+        ],
+        "trusted_rule_count": 0,
+        "unverified_executable_rule_count": 0,
+        "card_id_trusted_rule_count": 0,
+        "normalized_name_trusted_rule_count": 0,
+        "oracle_identity_trusted_rule_count": 0,
+        "xmage_source": {
+          "checked": true,
+          "available": true,
+          "class_name": "AangSwiftSavior",
+          "path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/a/AangSwiftSavior.java",
+          "resolution": "direct_bucket_candidate"
+        }
+      },
+      {
+        "name": "Aang, the Last Airbender",
+        "priority_score": 250,
+        "lanes": [
+          "battle_family_mapper_required"
+        ],
+        "family": "triggered_or_static_ability",
+        "runtime_requirement": "card_specific_or_family_rule_required",
+        "ready_product_deck_count": 0,
+        "deck_count": 18,
+        "total_quantity": 18,
+        "commander_legality_status": "legal",
+        "legality_format_count": 15,
+        "oracle_identity_legality_format_count": 15,
+        "set_codes": [
+          "tla"
+        ],
+        "trusted_rule_count": 0,
+        "unverified_executable_rule_count": 0,
+        "card_id_trusted_rule_count": 0,
+        "normalized_name_trusted_rule_count": 0,
+        "oracle_identity_trusted_rule_count": 0,
+        "xmage_source": {
+          "checked": true,
+          "available": true,
+          "class_name": "AangTheLastAirbender",
+          "path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/a/AangTheLastAirbender.java",
+          "resolution": "direct_bucket_candidate"
+        }
+      },
+      {
+        "name": "Aarakocra Sneak",
+        "priority_score": 250,
+        "lanes": [
+          "battle_family_mapper_required"
+        ],
+        "family": "manual_model_review",
+        "runtime_requirement": "card_specific_or_family_rule_required",
+        "ready_product_deck_count": 0,
+        "deck_count": 18,
+        "total_quantity": 18,
+        "commander_legality_status": "legal",
+        "legality_format_count": 7,
+        "oracle_identity_legality_format_count": 7,
+        "set_codes": [
+          "clb"
+        ],
+        "trusted_rule_count": 0,
+        "unverified_executable_rule_count": 0,
+        "card_id_trusted_rule_count": 0,
+        "normalized_name_trusted_rule_count": 0,
+        "oracle_identity_trusted_rule_count": 0,
+        "xmage_source": {
+          "checked": true,
+          "available": true,
+          "class_name": "AarakocraSneak",
+          "path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/a/AarakocraSneak.java",
+          "resolution": "direct_bucket_candidate"
+        }
+      },
+      {
+        "name": "Aatchik, Emerald Radian",
+        "priority_score": 250,
+        "lanes": [
+          "battle_family_mapper_required"
+        ],
+        "family": "token_creation",
+        "runtime_requirement": "card_specific_or_family_rule_required",
+        "ready_product_deck_count": 0,
+        "deck_count": 8,
+        "total_quantity": 8,
+        "commander_legality_status": "legal",
+        "legality_format_count": 16,
+        "oracle_identity_legality_format_count": 16,
+        "set_codes": [
+          "dft"
+        ],
+        "trusted_rule_count": 0,
+        "unverified_executable_rule_count": 0,
+        "card_id_trusted_rule_count": 0,
+        "normalized_name_trusted_rule_count": 0,
+        "oracle_identity_trusted_rule_count": 0,
+        "xmage_source": {
+          "checked": true,
+          "available": true,
+          "class_name": "AatchikEmeraldRadian",
+          "path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/a/AatchikEmeraldRadian.java",
+          "resolution": "direct_bucket_candidate"
+        }
+      },
+      {
+        "name": "Abaddon the Despoiler",
+        "priority_score": 250,
+        "lanes": [
+          "battle_family_mapper_required"
+        ],
+        "family": "manual_model_review",
+        "runtime_requirement": "card_specific_or_family_rule_required",
+        "ready_product_deck_count": 0,
+        "deck_count": 4,
+        "total_quantity": 4,
+        "commander_legality_status": "legal",
+        "legality_format_count": 5,
+        "oracle_identity_legality_format_count": 5,
+        "set_codes": [
+          "40k"
+        ],
+        "trusted_rule_count": 0,
+        "unverified_executable_rule_count": 0,
+        "card_id_trusted_rule_count": 0,
+        "normalized_name_trusted_rule_count": 0,
+        "oracle_identity_trusted_rule_count": 0,
+        "xmage_source": {
+          "checked": true,
+          "available": true,
+          "class_name": "AbaddonTheDespoiler",
+          "path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/a/AbaddonTheDespoiler.java",
+          "resolution": "direct_bucket_candidate"
+        }
+      },
+      {
+        "name": "Abandon Hope",
+        "priority_score": 250,
+        "lanes": [
+          "battle_family_mapper_required"
+        ],
+        "family": "modal_or_choice_effect",
+        "runtime_requirement": "card_specific_rule_required",
+        "ready_product_deck_count": 0,
+        "deck_count": 20,
+        "total_quantity": 20,
+        "commander_legality_status": "legal",
+        "legality_format_count": 7,
+        "oracle_identity_legality_format_count": 7,
+        "set_codes": [
+          "tmp"
+        ],
+        "trusted_rule_count": 0,
+        "unverified_executable_rule_count": 0,
+        "card_id_trusted_rule_count": 0,
+        "normalized_name_trusted_rule_count": 0,
+        "oracle_identity_trusted_rule_count": 0,
+        "xmage_source": {
+          "checked": true,
+          "available": true,
+          "class_name": "AbandonHope",
+          "path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/a/AbandonHope.java",
+          "resolution": "direct_bucket_candidate"
+        }
+      },
+      {
+        "name": "Abandon Reason",
+        "priority_score": 250,
+        "lanes": [
+          "battle_family_mapper_required"
+        ],
+        "family": "damage_or_life_total_change",
+        "runtime_requirement": "card_specific_rule_required",
+        "ready_product_deck_count": 0,
+        "deck_count": 20,
+        "total_quantity": 20,
+        "commander_legality_status": "legal",
+        "legality_format_count": 11,
+        "oracle_identity_legality_format_count": 11,
+        "set_codes": [
+          "emn"
+        ],
+        "trusted_rule_count": 0,
+        "unverified_executable_rule_count": 0,
+        "card_id_trusted_rule_count": 0,
+        "normalized_name_trusted_rule_count": 0,
+        "oracle_identity_trusted_rule_count": 0,
+        "xmage_source": {
+          "checked": true,
+          "available": true,
+          "class_name": "AbandonReason",
+          "path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/a/AbandonReason.java",
+          "resolution": "direct_bucket_candidate"
+        }
+      },
+      {
+        "name": "Abandon the Post",
+        "priority_score": 250,
+        "lanes": [
+          "battle_family_mapper_required"
+        ],
+        "family": "graveyard_recursion",
+        "runtime_requirement": "card_specific_rule_required",
+        "ready_product_deck_count": 0,
+        "deck_count": 20,
+        "total_quantity": 20,
+        "commander_legality_status": "legal",
+        "legality_format_count": 13,
+        "oracle_identity_legality_format_count": 13,
+        "set_codes": [
+          "dbl"
+        ],
+        "trusted_rule_count": 0,
+        "unverified_executable_rule_count": 0,
+        "card_id_trusted_rule_count": 0,
+        "normalized_name_trusted_rule_count": 0,
+        "oracle_identity_trusted_rule_count": 0,
+        "xmage_source": {
+          "checked": true,
+          "available": true,
+          "class_name": "AbandonThePost",
+          "path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/a/AbandonThePost.java",
+          "resolution": "direct_bucket_candidate"
+        }
+      },
+      {
+        "name": "Abandoned Sarcophagus",
+        "priority_score": 250,
+        "lanes": [
+          "battle_family_mapper_required"
+        ],
+        "family": "graveyard_recursion",
+        "runtime_requirement": "card_specific_or_family_rule_required",
+        "ready_product_deck_count": 0,
+        "deck_count": 28,
+        "total_quantity": 28,
+        "commander_legality_status": "legal",
+        "legality_format_count": 12,
+        "oracle_identity_legality_format_count": 12,
+        "set_codes": [
+          "akr"
+        ],
+        "trusted_rule_count": 0,
+        "unverified_executable_rule_count": 0,
+        "card_id_trusted_rule_count": 0,
+        "normalized_name_trusted_rule_count": 0,
+        "oracle_identity_trusted_rule_count": 0,
+        "xmage_source": {
+          "checked": true,
+          "available": true,
+          "class_name": "AbandonedSarcophagus",
+          "path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/a/AbandonedSarcophagus.java",
+          "resolution": "direct_bucket_candidate"
+        }
+      },
+      {
+        "name": "Abattoir Ghoul",
+        "priority_score": 250,
+        "lanes": [
+          "battle_family_mapper_required"
+        ],
+        "family": "damage_or_life_total_change",
+        "runtime_requirement": "card_specific_or_family_rule_required",
+        "ready_product_deck_count": 0,
+        "deck_count": 18,
+        "total_quantity": 18,
+        "commander_legality_status": "legal",
+        "legality_format_count": 7,
+        "oracle_identity_legality_format_count": 7,
+        "set_codes": [
+          "ddq"
+        ],
+        "trusted_rule_count": 0,
+        "unverified_executable_rule_count": 0,
+        "card_id_trusted_rule_count": 0,
+        "normalized_name_trusted_rule_count": 0,
+        "oracle_identity_trusted_rule_count": 0,
+        "xmage_source": {
+          "checked": true,
+          "available": true,
+          "class_name": "AbattoirGhoul",
+          "path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/a/AbattoirGhoul.java",
+          "resolution": "direct_bucket_candidate"
+        }
+      },
+      {
+        "name": "Abbot of Keral Keep",
+        "priority_score": 250,
+        "lanes": [
+          "battle_family_mapper_required"
+        ],
+        "family": "triggered_or_static_ability",
+        "runtime_requirement": "card_specific_or_family_rule_required",
+        "ready_product_deck_count": 0,
+        "deck_count": 19,
+        "total_quantity": 19,
+        "commander_legality_status": "legal",
+        "legality_format_count": 12,
+        "oracle_identity_legality_format_count": 12,
+        "set_codes": [
+          "2x2"
+        ],
+        "trusted_rule_count": 0,
+        "unverified_executable_rule_count": 0,
+        "card_id_trusted_rule_count": 0,
+        "normalized_name_trusted_rule_count": 0,
+        "oracle_identity_trusted_rule_count": 0,
+        "xmage_source": {
+          "checked": true,
+          "available": true,
+          "class_name": "AbbotOfKeralKeep",
+          "path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/a/AbbotOfKeralKeep.java",
+          "resolution": "direct_bucket_candidate"
+        }
+      },
+      {
+        "name": "Abby, Merciless Soldier",
+        "priority_score": 250,
+        "lanes": [
+          "battle_family_mapper_required"
+        ],
+        "family": "token_creation",
+        "runtime_requirement": "card_specific_or_family_rule_required",
+        "ready_product_deck_count": 0,
+        "deck_count": 9,
+        "total_quantity": 9,
+        "commander_legality_status": "legal",
+        "legality_format_count": 5,
+        "oracle_identity_legality_format_count": 5,
+        "set_codes": [
+          "sld"
+        ],
+        "trusted_rule_count": 0,
+        "unverified_executable_rule_count": 0,
+        "card_id_trusted_rule_count": 0,
+        "normalized_name_trusted_rule_count": 0,
+        "oracle_identity_trusted_rule_count": 0,
+        "xmage_source": {
+          "checked": true,
+          "available": true,
+          "class_name": "AbbyMercilessSoldier",
+          "path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/a/AbbyMercilessSoldier.java",
+          "resolution": "direct_bucket_candidate"
+        }
+      }
+    ],
+    "recommended_batches": [
+      {
+        "batch": "battle_rule_verification_required",
+        "method": "active executable rule exists, but snapshot has no verified rule; run focused runtime/E2E proof, then promote review_status to verified via PG package",
+        "card_count": 67,
+        "top_cards": [
+          "Aetherflux Reservoir",
+          "Apex of Power",
+          "Approach of the Second Sun",
+          "Arcane Endeavor",
+          "Archaeomancer's Map",
+          "Austere Command",
+          "Basking Broodscale",
+          "Blind Obedience",
+          "Boros Charm",
+          "Breena, the Demagogue",
+          "Chandra, Hope's Beacon",
+          "Channeled Force",
+          "Chromatic Star",
+          "Combustible Gearhulk",
+          "Commander's Plate",
+          "Curator's Ward",
+          "Decaying Time Loop",
+          "Drown in Dreams",
+          "Dualcaster Mage",
+          "Electric Revelation"
+        ]
+      },
+      {
+        "batch": "battle_family::manual_model_review",
+        "method": "XMage source review -> exact ManaLoom scope -> focused tests -> PG package -> Hermes sync",
+        "card_count": 6190,
+        "xmage_available_checked": 61,
+        "top_cards": [
+          "+2 Mace",
+          "_____ _____ _____ Trespasser",
+          "_____ Bird Gets the Worm",
+          "_____-o-saurus",
+          "A Little Chat",
+          "A Tale for the Ages",
+          "Aang, Air Nomad",
+          "Aang, Swift Savior // Aang and La, Ocean's Fury",
+          "Aarakocra Sneak",
+          "Abaddon the Despoiler",
+          "Abduction",
+          "Abnormal Endurance",
+          "Abominable Treefolk",
+          "Abomination, Terrifying Titan",
+          "Aboshan, Cephalid Emperor",
+          "About Face",
+          "Absolving Lammasu",
+          "Abu Ja'far",
+          "Abyssal Persecutor",
+          "Abzan Battle Priest"
+        ]
+      },
+      {
+        "batch": "battle_family::triggered_or_static_ability",
+        "method": "XMage source review -> exact ManaLoom scope -> focused tests -> PG package -> Hermes sync",
+        "card_count": 3809,
+        "xmage_available_checked": 33,
+        "top_cards": [
+          "_____ _____ Rocketship",
+          "Aang, at the Crossroads // Aang, Destined Savior",
+          "Aang, the Last Airbender",
+          "Abbot of Keral Keep",
+          "Aberrant Manawurm",
+          "Abigale, Poet Laureate // Heroic Stanza",
+          "Aboleth Spawn",
+          "Abomination",
+          "Aboroth",
+          "Absorbing Man",
+          "Abuelo, Ancestral Echo",
+          "Abyssal Nightstalker",
+          "Abyssal Nocturnus",
+          "Accorder Paladin",
+          "Ace, Fearless Rebel",
+          "Acquired Mutation",
+          "Acridian",
+          "Acrobatic Cheerleader",
+          "Adaptive Omnitool",
+          "Adaptive Snapjaw"
+        ]
+      },
+      {
+        "batch": "battle_family::damage_or_life_total_change",
+        "method": "XMage source review -> exact ManaLoom scope -> focused tests -> PG package -> Hermes sync",
+        "card_count": 3638,
+        "xmage_available_checked": 26,
+        "top_cards": [
+          "_____ Balls of Fire",
+          "Abandon Reason",
+          "Abattoir Ghoul",
+          "Absolute Virtue",
+          "Abuna Acolyte",
+          "Abuna's Chant",
+          "Abyssal Hunter",
+          "Abyssal Specter",
+          "Abzan Guide",
+          "Achilles Davenport",
+          "Acidic Dagger",
+          "Acidic Sliver",
+          "Acidic Soil",
+          "Acolyte of the Inferno",
+          "Acolyte's Reward",
+          "Adanto Vanguard",
+          "Admiral Beckett Brass",
+          "Adrenaline Jockey",
+          "Ad\u00e9wal\u00e9, Breaker of Chains",
+          "Aegis Angel"
+        ]
+      },
+      {
+        "batch": "battle_family::token_creation",
+        "method": "XMage source review -> exact ManaLoom scope -> focused tests -> PG package -> Hermes sync",
+        "card_count": 3450,
+        "xmage_available_checked": 30,
+        "top_cards": [
+          "A Killer Among Us",
+          "Aang and Katara",
+          "Aang, Airbending Master",
+          "Aatchik, Emerald Radian",
+          "Abby, Merciless Soldier",
+          "Abdel Adrian, Gorion's Ward",
+          "Abhorrent Overlord",
+          "Abyssal Harvester",
+          "Abzan Ascendancy",
+          "Academy Manufactor",
+          "Accomplished Automaton",
+          "Acererak the Archlich",
+          "Acorn Catapult",
+          "Acorn Harvest",
+          "Additive Evolution",
+          "Adeline, Resplendent Cathar",
+          "Adipose Offspring",
+          "Adorned Crocodile",
+          "Adorned Pouncer",
+          "Adrix and Nev, Twincasters // Adrix and Nev, Twincasters"
+        ]
+      },
+      {
+        "batch": "battle_family::draw_selection_topdeck",
+        "method": "XMage source review -> exact ManaLoom scope -> focused tests -> PG package -> Hermes sync",
+        "card_count": 3204,
+        "xmage_available_checked": 24,
+        "top_cards": [
+          "Aang's Iceberg",
+          "Aberrant",
+          "Abeyance",
+          "Abomination of Gudul",
+          "Abundance",
+          "Abzan Beastmaster",
+          "Abzan Charm",
+          "Academic Dispute",
+          "Academy Elite",
+          "Academy Loremaster",
+          "Academy Wall",
+          "Acolyte Hybrid",
+          "Acquisition Octopus",
+          "Acrobatic Maneuver",
+          "Action News Crew",
+          "Adrestia",
+          "Adventure Awaits",
+          "Adventurer's Airship",
+          "Aegar, the Freezing Flame",
+          "Aeon Chronicler"
+        ]
+      },
+      {
+        "batch": "battle_family::graveyard_recursion",
+        "method": "XMage source review -> exact ManaLoom scope -> focused tests -> PG package -> Hermes sync",
+        "card_count": 1876,
+        "xmage_available_checked": 13,
+        "top_cards": [
+          "\"Lifetime\" Pass Holder",
+          "A Good Day to Pie",
+          "Aang, A Lot to Learn",
+          "Abandon the Post",
+          "Abandoned Sarcophagus",
+          "Aberrant Mind Sorcerer",
+          "Aberrant Researcher // Perfected Form",
+          "Abhorrent Oculus",
+          "Aboshan's Desire",
+          "Abstract Performance",
+          "Accumulate Wisdom",
+          "Activated Sleeper",
+          "Aegis Sculptor",
+          "Aether Burst",
+          "Aether Rift",
+          "Aetherworks Marvel",
+          "Afterburner Expert",
+          "Afterlife from the Loam",
+          "Aftermath Analyst",
+          "Agadeem Occultist"
+        ]
+      },
+      {
+        "batch": "battle_family::targeted_removal",
+        "method": "XMage source review -> exact ManaLoom scope -> focused tests -> PG package -> Hermes sync",
+        "card_count": 876,
+        "xmage_available_checked": 5,
+        "top_cards": [
+          "Absolver Thrull",
+          "Abstruse Appropriation",
+          "Act of Authority",
+          "Active Volcano",
+          "Admonition Angel",
+          "Against All Odds",
+          "Agate Assault",
+          "Agent of Erebos",
+          "Agonizing Demise",
+          "Aim for the Head",
+          "Ainok Survivalist",
+          "Airbender's Reversal",
+          "Ajani Unyielding",
+          "Ajani's Response",
+          "Ajani, Inspiring Leader",
+          "Alpha Deathclaw",
+          "Amulet of Unmaking",
+          "Anchovy & Banana Pizza",
+          "Angel of Deliverance",
+          "Angel of Finality"
+        ]
+      },
+      {
+        "batch": "battle_family::tutor_search_library",
+        "method": "XMage source review -> exact ManaLoom scope -> focused tests -> PG package -> Hermes sync",
+        "card_count": 742,
+        "xmage_available_checked": 6,
+        "top_cards": [
+          "A.I.M. Scientists",
+          "Aang's Journey",
+          "Absorb Vis",
+          "Abzan Monument",
+          "Academy Rector",
+          "Aerial Surveyor",
+          "Agency Outfitter",
+          "Ainok Guide",
+          "Ajani's Aid",
+          "Alabaster Host Intercessor",
+          "Alpine Guide",
+          "Alpine Houndmaster",
+          "Altar of Bone",
+          "Ambitious Farmhand // Seasoned Cathar",
+          "Anchor to Reality",
+          "Ancient Excavation",
+          "Angel of the Ruins",
+          "Angel's Herald",
+          "Angrath's Fury",
+          "Arachnus Spinner"
+        ]
+      },
+      {
+        "batch": "battle_family::modal_or_choice_effect",
+        "method": "XMage source review -> exact ManaLoom scope -> focused tests -> PG package -> Hermes sync",
+        "card_count": 697,
+        "xmage_available_checked": 12,
+        "top_cards": [
+          "Abandon Hope",
+          "Abundant Harvest",
+          "Abzan Advantage",
+          "Abzan Skycaptain",
+          "Academic Probation",
+          "Acquisitions Expert",
+          "Adaptive Automaton",
+          "Adaptive Sporesinger",
+          "Addle",
+          "Aether Gust",
+          "Aether Shockwave",
+          "Aether Spike",
+          "Aethersnatch",
+          "Aggressive Negotiations",
+          "Agonizing Memories",
+          "Alhammarret, High Arbiter",
+          "Alloy Golem",
+          "Amber Prison",
+          "An-Zerrin Ruins",
+          "Angrath's Rampage"
+        ]
+      },
+      {
+        "batch": "battle_family::mana_generation_or_ritual",
+        "method": "XMage source review -> exact ManaLoom scope -> focused tests -> PG package -> Hermes sync",
+        "card_count": 595,
+        "xmage_available_checked": 6,
+        "top_cards": [
+          "________ Goblin",
+          "A Realm Reborn",
+          "Abstract Paintmage",
+          "Abundant Growth",
+          "Accomplished Alchemist",
+          "Adarkar Unicorn",
+          "Advanced Reconstruction",
+          "Alena, Kessig Trapper",
+          "Alpine Moon",
+          "Altar of Shadows",
+          "Altar of the Lost",
+          "Altar of the Pantheon",
+          "Arbor Adherent",
+          "Ardent Electromancer",
+          "Armor Wars",
+          "Arni Slays the Troll",
+          "Astral Cornucopia",
+          "Automated Artificer",
+          "Avatar Roku, Firebender",
+          "Avid Reclaimer"
+        ]
+      },
+      {
+        "batch": "battle_family::alternate_or_free_cast",
+        "method": "XMage source review -> exact ManaLoom scope -> focused tests -> PG package -> Hermes sync",
+        "card_count": 493,
+        "xmage_available_checked": 5,
+        "top_cards": [
+          "Abundant Maw",
+          "Acid-Spewer Dragon",
+          "Adventurous Eater // Have a Bite",
+          "Aerie Bowmasters",
+          "Aether Meltdown",
+          "Aether Searcher",
+          "Aether Web",
+          "Affa Guard Hound",
+          "Ainok Tracker",
+          "Alley Assailant",
+          "Allosaurus Rider",
+          "Allure of the Unknown",
+          "Aloe Alchemist",
+          "Aluren",
+          "Aminatou's Augury",
+          "Amped Raptor",
+          "Annoyed Altisaur",
+          "Apex Devastator",
+          "Aphetto Alchemist",
+          "Aphetto Exterminator"
+        ]
+      },
+      {
+        "batch": "battle_family::protection_prevention",
+        "method": "XMage source review -> exact ManaLoom scope -> focused tests -> PG package -> Hermes sync",
+        "card_count": 477,
+        "xmage_available_checked": 4,
+        "top_cards": [
+          "Absolute Grace",
+          "Absolute Law",
+          "Adept Watershaper",
+          "Aegis of the Gods",
+          "Agent Frank Horrigan",
+          "Agent of the Shadow Thieves",
+          "Airtight Alibi",
+          "Akroma's Memorial",
+          "Akroma, Angel of Fury",
+          "Akroma, Vision of Ixidor",
+          "Almost Perfect",
+          "Alpha Authority",
+          "Alseid of Life's Bounty",
+          "And They Shall Know No Fear",
+          "Angelic Overseer",
+          "Angler Turtle",
+          "Animar, Soul of Elements",
+          "Animus of Predation",
+          "Anya, Merciless Angel",
+          "Apostle's Blessing"
+        ]
+      },
+      {
+        "batch": "battle_family::recursion_or_bounce",
+        "method": "XMage source review -> exact ManaLoom scope -> focused tests -> PG package -> Hermes sync",
+        "card_count": 447,
+        "xmage_available_checked": 7,
+        "top_cards": [
+          "Abiding Grace",
+          "Absorb Identity",
+          "Abuelo's Awakening",
+          "Academy Journeymage",
+          "Admiral Brass, Unsinkable",
+          "Aerith, Last Ancient",
+          "Aether Helix",
+          "Aethersnipe",
+          "Alchemist's Retrieval",
+          "Alesha, Who Laughs at Fate",
+          "Alesha, Who Smiles at Death",
+          "Alley Evasion",
+          "Altar of Bhaal // Bone Offering",
+          "Angel of Flight Alabaster",
+          "Angelic Shield",
+          "Annie Flash, the Veteran",
+          "Applied Biomancy",
+          "Apprentice Necromancer",
+          "Archon of Falling Stars",
+          "Artisan of Kozilek"
+        ]
+      },
+      {
+        "batch": "battle_family::counterspell_or_stack_interaction",
+        "method": "XMage source review -> exact ManaLoom scope -> focused tests -> PG package -> Hermes sync",
+        "card_count": 316,
+        "xmage_available_checked": 4,
+        "top_cards": [
+          "Abstruse Interference",
+          "Access Denied",
+          "Admiral's Order",
+          "Adric, Mathematical Genius",
+          "Amazing Acrobatics",
+          "Anticognition",
+          "Archmage's Charm",
+          "Arenson's Aura",
+          "Artistic Refusal",
+          "Assimilate Essence",
+          "Ayesha Tanaka",
+          "Azorius Guildmage",
+          "Bane's Contingency",
+          "Bant Charm",
+          "Bar the Gate",
+          "Bind",
+          "Bind // Liberate",
+          "Blue Elemental Blast",
+          "Brine Seer",
+          "Brine Shaman"
+        ]
+      },
+      {
+        "batch": "battle_family::copy_spell_or_permanent",
+        "method": "XMage source review -> exact ManaLoom scope -> focused tests -> PG package -> Hermes sync",
+        "card_count": 269,
+        "xmage_available_checked": 2,
+        "top_cards": [
+          "Abstruse Archaic",
+          "Adaptive Training Post",
+          "Aethertow",
+          "Aeve, Progenitor Ooze",
+          "Agrus Kos, Eternal Soldier",
+          "Alania, Divergent Storm",
+          "All of History, All at Once",
+          "Archmage of Echoes",
+          "Ashad, the Lone Cyberman",
+          "Astral Steel",
+          "Aziza, Mage Tower Captain",
+          "Aziza, Mage Tower Captain",
+          "Aziza, Mage Tower Captain",
+          "Aziza, Mage Tower Captain",
+          "Banish into Fable",
+          "Barkshell Blessing",
+          "Beamsplitter Mage",
+          "Bill Potts",
+          "Bitter Ordeal",
+          "Blue Mage's Cane"
+        ]
+      }
+    ]
+  }
+}

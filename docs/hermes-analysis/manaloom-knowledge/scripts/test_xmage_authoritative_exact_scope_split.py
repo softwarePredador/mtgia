@@ -36997,6 +36997,66 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
             ["draw_cards", "proliferate"],
         )
 
+    def test_add_counters_then_proliferate_maps_exact_composite_scope(self) -> None:
+        proposal, reason = split.split_row(
+            queue_row(
+                split.ADD_COUNTERS_TARGET_UNIT,
+                effect_classes=["AddCountersTargetEffect", "ProliferateEffect"],
+            ),
+            metadata(
+                name="Courage in Crisis",
+                type_line="Sorcery",
+                oracle_text=(
+                    "Put a +1/+1 counter on target creature, then proliferate. "
+                    "(Choose any number of permanents and/or players, then give each another counter of each kind already there.)"
+                ),
+            ),
+            source_text="""
+                this.getSpellAbility().addEffect(new AddCountersTargetEffect(CounterType.P1P1.createInstance()));
+                this.getSpellAbility().addEffect(new ProliferateEffect().concatBy(", then"));
+                this.getSpellAbility().addTarget(new TargetCreaturePermanent());
+            """,
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["effect"], "composite_resolution")
+        self.assertEqual(effect["battle_model_scope"], split.ADD_COUNTERS_PROLIFERATE_TARGET_SCOPE)
+        self.assertEqual(effect["counter_type"], "+1/+1")
+        self.assertEqual(effect["counter_count"], 1)
+        self.assertEqual(effect["proliferate_count"], 1)
+        self.assertEqual(effect["resolution_order"], "add_counters_then_proliferate")
+        self.assertEqual(
+            [component["effect"] for component in effect["_composite_rule_components"]],
+            ["add_counters", "proliferate"],
+        )
+
+    def test_add_counters_then_proliferate_blocks_modal_entwine_spell(self) -> None:
+        proposal, reason = split.split_row(
+            queue_row(
+                split.ADD_COUNTERS_TARGET_UNIT,
+                effect_classes=["AddCountersTargetEffect", "ProliferateEffect"],
+                ability_classes=["EntwineAbility"],
+            ),
+            metadata(
+                name="Unbounded Potential",
+                type_line="Instant",
+                oracle_text=(
+                    "Choose one - Put a +1/+1 counter on each of up to two target creatures. "
+                    "Proliferate. Entwine {3}{W}."
+                ),
+            ),
+            source_text="""
+                this.getSpellAbility().addEffect(new AddCountersTargetEffect(CounterType.P1P1.createInstance()));
+                this.getSpellAbility().addTarget(new TargetCreaturePermanent(0, 2));
+                this.getSpellAbility().addMode(new Mode(new ProliferateEffect()));
+                this.addAbility(new EntwineAbility("{3}{W}"));
+            """,
+        )
+
+        self.assertIsNone(proposal)
+        self.assertEqual(reason, "add_counters_proliferate_ability_class_not_simple")
+
     def test_each_player_lose_life_then_draw_maps_exact_composite_scope(self) -> None:
         proposal, reason = split.split_row(
             queue_row(
