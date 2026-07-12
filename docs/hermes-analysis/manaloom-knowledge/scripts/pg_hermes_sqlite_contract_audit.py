@@ -506,7 +506,7 @@ def sqlite_cache_integrity_checks(conn: sqlite3.Connection) -> list[Check]:
                 "battle_card_rules",
                 """
                 source IN ('curated', 'manual')
-                AND review_status IN ('verified', 'active')
+                AND review_status = 'verified'
                 AND execution_status IN ('auto', 'executable')
                 AND COALESCE(oracle_hash, '') = ''
                 """,
@@ -515,7 +515,7 @@ def sqlite_cache_integrity_checks(conn: sqlite3.Connection) -> list[Check]:
                 Check(
                     "sqlite_integrity.battle_rules_trusted_oracle_hash_coverage",
                     "pass" if missing_hash == 0 else "warn",
-                    f"trusted_executable_rules_missing_oracle_hash={missing_hash}",
+                    f"verified_executable_rules_missing_oracle_hash={missing_hash}",
                 )
             )
 
@@ -611,7 +611,7 @@ def pg_integrity_checks() -> list[Check]:
                 SELECT COUNT(*)
                 FROM card_battle_rules
                 WHERE source IN ('curated', 'manual')
-                  AND review_status IN ('verified', 'active')
+                  AND review_status = 'verified'
                   AND execution_status IN ('auto', 'executable')
                   AND COALESCE(oracle_hash, '') = ''
                 """
@@ -623,7 +623,7 @@ def pg_integrity_checks() -> list[Check]:
                        review_status, execution_status, rule_version
                 FROM card_battle_rules
                 WHERE source IN ('curated', 'manual')
-                  AND review_status IN ('verified', 'active')
+                  AND review_status = 'verified'
                   AND execution_status IN ('auto', 'executable')
                   AND COALESCE(oracle_hash, '') = ''
                 ORDER BY card_name, logical_rule_key
@@ -646,7 +646,7 @@ def pg_integrity_checks() -> list[Check]:
         Check(
             "pg_integrity.battle_rules_trusted_oracle_hash_coverage",
             "pass" if missing_hash == 0 else "fail",
-            f"trusted_executable_rules_missing_oracle_hash={missing_hash}",
+            f"verified_executable_rules_missing_oracle_hash={missing_hash}",
             {"sample": sample},
         )
     )

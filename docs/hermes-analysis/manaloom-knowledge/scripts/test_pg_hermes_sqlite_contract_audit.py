@@ -218,6 +218,45 @@ class PgHermesSqliteContractAuditTests(unittest.TestCase):
         )
         self.assertEqual(report["status"], "pass")
 
+    def test_active_rules_without_hash_are_not_counted_as_verified_hash_gaps(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            db_path = Path(tmp) / "knowledge.db"
+            conn = sqlite3.connect(db_path)
+            try:
+                for table in audit.SQLITE_REQUIRED_COLUMNS:
+                    create_contract_table(conn, table)
+                    insert_contract_row(conn, table)
+                insert_contract_row(
+                    conn,
+                    "battle_card_rules",
+                    card_name="Active Rule",
+                    normalized_name="active rule",
+                    logical_rule_key="battle_rule_v1:active",
+                    review_status="active",
+                    execution_status="auto",
+                    oracle_hash="",
+                )
+                insert_contract_row(
+                    conn,
+                    "card_legalities",
+                    card_name="Mana Crypt",
+                    status="banned",
+                )
+                conn.commit()
+            finally:
+                conn.close()
+
+            report = audit.build_report(db_path, skip_pg=True)
+
+        checks = {check["name"]: check for check in report["checks"]}
+        hash_check = checks["sqlite_integrity.battle_rules_trusted_oracle_hash_coverage"]
+        self.assertEqual(hash_check["status"], "pass")
+        self.assertEqual(
+            hash_check["detail"],
+            "verified_executable_rules_missing_oracle_hash=0",
+        )
+        self.assertEqual(report["status"], "pass")
+
     def test_missing_pg_connection_reports_fail_without_traceback(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
             db_path = Path(tmp) / "knowledge.db"
