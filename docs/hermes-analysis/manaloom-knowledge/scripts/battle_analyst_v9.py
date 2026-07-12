@@ -11616,6 +11616,19 @@ class Player:
         self.sacrificed_permanents_this_turn.append(entry)
         return len(self.sacrificed_permanents_this_turn)
 
+    def record_permanent_left_battlefield(self, amount=1, turn_marker=None):
+        if turn_marker is not None and getattr(self, "_permanents_left_battlefield_turn_marker", None) != turn_marker:
+            self.permanents_left_battlefield_this_turn = 0
+            self._permanents_left_battlefield_turn_marker = turn_marker
+        self.permanents_left_battlefield_this_turn += max(0, int(amount or 0))
+        return self.permanents_left_battlefield_this_turn
+
+    def permanents_left_battlefield_this_turn_count(self, turn_marker=None):
+        if turn_marker is not None and getattr(self, "_permanents_left_battlefield_turn_marker", None) != turn_marker:
+            self.permanents_left_battlefield_this_turn = 0
+            self._permanents_left_battlefield_turn_marker = turn_marker
+        return int(getattr(self, "permanents_left_battlefield_this_turn", 0) or 0)
+
     def record_spell_cast(self, turn_marker=None, card=None, mana_value=None):
         if turn_marker is not None and getattr(self, "_spells_cast_turn_marker", None) != turn_marker:
             self.spells_cast_this_turn = 0
@@ -11827,6 +11840,8 @@ class Player:
         self._life_gained_turn_marker = None
         self.creatures_died_this_turn = 0
         self._creatures_died_turn_marker = None
+        self.permanents_left_battlefield_this_turn = 0
+        self._permanents_left_battlefield_turn_marker = None
         self.attacked_this_turn = 0
         self._attacked_turn_marker = None
         self.surge_to_victory_delayed_triggers = []
@@ -15896,6 +15911,9 @@ def move_permanent_from_battlefield_to_hand(owner, permanent, *, reason=None, so
     }
     moved["_zone_id"] = moved.get("_zone_id", 0) + 1
     moved["_last_zone"] = "battlefield"
+    current_turn = turn if turn is not None else CURRENT_REPLAY_TURN
+    if hasattr(owner, "record_permanent_left_battlefield"):
+        owner.record_permanent_left_battlefield(1, current_turn)
     destination = "hand"
     if moved.get("is_commander"):
         event = ReplacementRegistry.process_event(
@@ -15928,7 +15946,7 @@ def move_permanent_from_battlefield_to_hand(owner, permanent, *, reason=None, so
         destination=destination,
         reason=reason,
         source=source.get("name", "?") if isinstance(source, dict) else source,
-        turn=turn if turn is not None else CURRENT_REPLAY_TURN,
+        turn=current_turn,
     )
     resolve_leave_battlefield_treasure_trigger(
         owner,
@@ -15979,6 +15997,9 @@ def move_permanent_from_battlefield_to_library(owner, permanent, *, destination,
     }
     moved["_zone_id"] = moved.get("_zone_id", 0) + 1
     moved["_last_zone"] = "battlefield"
+    current_turn = turn if turn is not None else CURRENT_REPLAY_TURN
+    if hasattr(owner, "record_permanent_left_battlefield"):
+        owner.record_permanent_left_battlefield(1, current_turn)
     final_destination = destination
     if moved.get("is_commander"):
         event = ReplacementRegistry.process_event(
@@ -21372,8 +21393,6 @@ def etb_draw_condition_satisfied(player, permanent, effect_data):
     status = str((effect_data or {}).get("etb_draw_condition_status") or "").strip().lower()
     if status != "runtime_executor_v1":
         return False
-    if condition != "controller_controls_matching_permanent":
-        return False
     try:
         min_count = max(1, int((effect_data or {}).get("etb_draw_condition_min_count") or 1))
     except (TypeError, ValueError):
@@ -21394,6 +21413,59 @@ def etb_draw_condition_satisfied(player, permanent, effect_data):
         if str(value).strip()
     ]
     exclude_source = bool((effect_data or {}).get("etb_draw_condition_exclude_source"))
+
+    if condition == "controller_spent_same_color_mana_to_cast":
+        spent = max(
+            int((effect_data or {}).get("_same_color_mana_spent_to_cast") or 0),
+            int((permanent or {}).get("_same_color_mana_spent_to_cast") or 0),
+            int((effect_data or {}).get("same_color_mana_spent_to_cast") or 0),
+            int((permanent or {}).get("same_color_mana_spent_to_cast") or 0),
+        )
+        return spent >= min_count
+    if condition == "controller_revealed_or_controlled_subtype_as_cast":
+        revealed = bool(
+            (effect_data or {}).get("_revealed_matching_subtype_as_cast")
+            or (permanent or {}).get("_revealed_matching_subtype_as_cast")
+            or (effect_data or {}).get("_revealed_dragon_as_cast")
+            or (permanent or {}).get("_revealed_dragon_as_cast")
+        )
+        if revealed:
+            return True
+        required_subtypes = subtypes or ["dragon"]
+        controlled_count = sum(
+            1
+            for candidate in _controlled_permanents(player)
+            if any(permanent_has_subtype(candidate, subtype) for subtype in required_subtypes)
+        )
+        controlled_count = max(
+            controlled_count,
+            int((effect_data or {}).get("_controlled_matching_subtype_as_cast") or 0),
+            int((permanent or {}).get("_controlled_matching_subtype_as_cast") or 0),
+            int((effect_data or {}).get("_controlled_dragon_as_cast") or 0),
+            int((permanent or {}).get("_controlled_dragon_as_cast") or 0),
+        )
+        return controlled_count >= min_count
+    if condition == "controller_permanent_left_battlefield_this_turn":
+        left_count = int((effect_data or {}).get("_controller_permanents_left_battlefield_this_turn") or 0)
+        left_count = max(
+            left_count,
+            int((permanent or {}).get("_controller_permanents_left_battlefield_this_turn") or 0),
+        )
+        if hasattr(player, "permanents_left_battlefield_this_turn_count"):
+            left_count = max(left_count, int(player.permanents_left_battlefield_this_turn_count(CURRENT_REPLAY_TURN) or 0))
+        else:
+            left_count = max(left_count, int(getattr(player, "permanents_left_battlefield_this_turn", 0) or 0))
+        return left_count >= min_count
+    if condition == "controller_attacked_this_turn":
+        attacked_count = int((effect_data or {}).get("_controller_attacked_this_turn") or 0)
+        attacked_count = max(attacked_count, int((permanent or {}).get("_controller_attacked_this_turn") or 0))
+        if hasattr(player, "attacked_this_turn_count"):
+            attacked_count = max(attacked_count, int(player.attacked_this_turn_count(CURRENT_REPLAY_TURN) or 0))
+        else:
+            attacked_count = max(attacked_count, int(getattr(player, "attacked_this_turn", 0) or 0))
+        return attacked_count >= min_count
+    if condition != "controller_controls_matching_permanent":
+        return False
 
     matched = 0
     for candidate in _controlled_permanents(player):
@@ -23603,6 +23675,8 @@ def move_permanent_from_battlefield(owner, permanent, reason=None, source=None, 
         replacement_event_cls=ReplacementEvent,
     )
     if isinstance(permanent, dict) and destination != "none":
+        if hasattr(owner, "record_permanent_left_battlefield"):
+            owner.record_permanent_left_battlefield(1, CURRENT_REPLAY_TURN)
         if destination == "graveyard":
             permanent["_put_into_graveyard_from_battlefield_turn"] = CURRENT_REPLAY_TURN
             if was_creature and hasattr(owner, "record_creature_died"):
@@ -23998,6 +24072,8 @@ def sacrifice_permanent_for_activation(player, permanent, turn):
         )
     else:
         player.graveyard.append(permanent)
+    if hasattr(player, "record_permanent_left_battlefield"):
+        player.record_permanent_left_battlefield(1, turn)
     player.record_permanent_sacrificed(permanent, turn)
 
 
@@ -31887,6 +31963,8 @@ def move_permanent_from_battlefield_to_exile(owner, permanent, *, reason=None, s
         return destination
     _clear_battlefield_only_state(moved)
     current_turn = turn if turn is not None else CURRENT_REPLAY_TURN
+    if hasattr(owner, "record_permanent_left_battlefield"):
+        owner.record_permanent_left_battlefield(1, current_turn)
     if destination == "exile":
         moved["_put_into_exile_from_battlefield_turn"] = current_turn
     emit_replay_event(

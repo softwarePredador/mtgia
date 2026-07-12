@@ -2800,6 +2800,18 @@ def run_creature_etb_draw(
         if expected_draw_count <= 0:
             expected_draw_count = died_count
             expected_hand_after = died_count
+    attacked_count = int(scenario.get("controller_attacked_this_turn_count") or 0)
+    if attacked_count > 0:
+        if hasattr(active, "record_attacked_this_turn"):
+            active.record_attacked_this_turn(attacked_count, turn_marker=turn)
+        else:
+            active.attacked_this_turn = attacked_count
+    left_battlefield_count = int(scenario.get("controller_permanents_left_battlefield_this_turn_count") or 0)
+    if left_battlefield_count > 0:
+        if hasattr(active, "record_permanent_left_battlefield"):
+            active.record_permanent_left_battlefield(left_battlefield_count, turn_marker=turn)
+        else:
+            active.permanents_left_battlefield_this_turn = left_battlefield_count
     expected_condition = scenario.get("expected_condition")
     if expected_condition and effect_data.get("etb_draw_condition") != expected_condition:
         fail(
@@ -2807,7 +2819,7 @@ def run_creature_etb_draw(
             f"{card['name']} condition={effect_data.get('etb_draw_condition')!r}, expected {expected_condition!r}",
         )
     permanent = battle.prepare_entering_permanent(
-        battle.enrich_card({**card, **effect_data}),
+        battle.enrich_card({**card, **effect_data, **dict(scenario.get("source_overrides") or {})}),
         controller=active,
         all_players=[active, opponent],
         turn=turn,

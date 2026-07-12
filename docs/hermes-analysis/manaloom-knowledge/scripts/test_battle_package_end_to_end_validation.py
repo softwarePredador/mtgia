@@ -7859,6 +7859,84 @@ def test_creature_etb_conditional_draw_runner_executes_trigger() -> None:
     )
 
 
+def test_creature_etb_contextual_conditional_draw_runner_executes_triggers() -> None:
+    cases = [
+        (
+            "Clockwork Servant",
+            "controller_spent_same_color_mana_to_cast",
+            {"source_overrides": {"_same_color_mana_spent_to_cast": 3}},
+        ),
+        (
+            "Orator of Ojutai",
+            "controller_revealed_or_controlled_subtype_as_cast",
+            {
+                "controller_battlefield": [
+                    {"name": "E2E Dragon", "type_line": "Creature - Dragon", "effect": "creature", "subtypes": ["Dragon"]}
+                ]
+            },
+        ),
+        (
+            "Silkweaver Elite",
+            "controller_permanent_left_battlefield_this_turn",
+            {"controller_permanents_left_battlefield_this_turn_count": 1},
+        ),
+        (
+            "Storm Fleet Spy",
+            "controller_attacked_this_turn",
+            {"controller_attacked_this_turn_count": 1},
+        ),
+    ]
+    for card_name, condition, scenario_context in cases:
+        battle = validator.load_battle(validator.DEFAULT_BATTLE)
+        events = []
+        previous_handler = battle.REPLAY_EVENT_HANDLER
+        previous_get_card_effect = battle.get_card_effect
+        battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+        battle.get_card_effect = lambda card, condition=condition: {
+            "effect": "creature",
+            "battle_model_scope": "xmage_creature_etb_draw_cards_v1",
+            "ability_kind": "triggered",
+            "trigger": "enters_battlefield",
+            "trigger_effect": "draw_cards",
+            "etb_draw_count": 1,
+            "etb_draw_condition_status": "runtime_executor_v1",
+            "etb_draw_condition": condition,
+            "etb_draw_condition_min_count": 3 if condition == "controller_spent_same_color_mana_to_cast" else 1,
+            "etb_draw_condition_subtypes": ["dragon"] if "dragon" in condition else [],
+            "_rule_logical_key": f"battle_rule_v1:{card_name.lower().replace(' ', '-')}",
+        }
+        try:
+            result = validator.run_creature_etb_draw(
+                battle,
+                {
+                    "name": f"{card_name} enters and draws",
+                    "type": "creature_etb_draw",
+                    "card": {"name": card_name, "type_line": "Creature", "effect": "creature"},
+                    "controller_library": [
+                        {"name": "E2E Drawn Card", "type_line": "Instant", "effect": "draw_cards", "cmc": 2}
+                    ],
+                    "expected_condition": condition,
+                    "expected_draw_count": 1,
+                    "expected_hand_after": 1,
+                    "logical_rule_key": f"battle_rule_v1:{card_name.lower().replace(' ', '-')}",
+                    **scenario_context,
+                },
+                events,
+            )
+        finally:
+            battle.REPLAY_EVENT_HANDLER = previous_handler
+            battle.get_card_effect = previous_get_card_effect
+
+        assert result["card_name"] == card_name
+        assert result["cards_drawn"] == 1
+        assert any(
+            event == "trigger_resolved"
+            and data.get("card") == card_name
+            and data.get("effect") == "draw_cards"
+            for event, data in events
+        )
+
+
 def test_creature_etb_dynamic_draw_runner_counts_creatures_died_this_turn() -> None:
     battle = validator.load_battle(validator.DEFAULT_BATTLE)
     events = []

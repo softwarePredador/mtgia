@@ -31134,6 +31134,82 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
                 for key, value in expected_fields.items():
                     self.assertEqual(effect[key], value)
 
+    def test_creature_etb_conditional_draw_maps_context_conditions(self) -> None:
+        fixtures = [
+            (
+                "Clockwork Servant",
+                "Adamant -- When Clockwork Servant enters the battlefield, if at least three mana of the same color was spent to cast it, draw a card.",
+                """
+                    this.addAbility(new EntersBattlefieldTriggeredAbility(new DrawCardSourceControllerEffect(1))
+                        .withInterveningIf(AdamantCondition.ANY).setAbilityWord(AbilityWord.ADAMANT));
+                """,
+                {
+                    "etb_draw_condition": "controller_spent_same_color_mana_to_cast",
+                    "etb_draw_condition_min_count": 3,
+                },
+            ),
+            (
+                "Orator of Ojutai",
+                "As an additional cost to cast this spell, you may reveal a Dragon card from your hand.\n"
+                "Defender, flying\n"
+                "When this creature enters, if you revealed a Dragon card or controlled a Dragon as you cast this spell, draw a card.",
+                """
+                    this.getSpellAbility().addCost(new RevealDragonFromHandCost());
+                    this.addAbility(new EntersBattlefieldTriggeredAbility(new DrawCardSourceControllerEffect(1))
+                        .withInterveningIf(RevealedOrControlledDragonCondition.instance), new DragonOnTheBattlefieldWhileSpellWasCastWatcher());
+                """,
+                {
+                    "etb_draw_condition": "controller_revealed_or_controlled_subtype_as_cast",
+                    "etb_draw_condition_subtypes": ["dragon"],
+                },
+            ),
+            (
+                "Silkweaver Elite",
+                "Reach (This creature can block creatures with flying.)\n"
+                "Revolt -- When this creature enters, if a permanent left the battlefield under your control this turn, draw a card.",
+                """
+                    this.addAbility(new EntersBattlefieldTriggeredAbility(new DrawCardSourceControllerEffect(1))
+                        .withInterveningIf(RevoltCondition.instance), new RevoltWatcher());
+                """,
+                {"etb_draw_condition": "controller_permanent_left_battlefield_this_turn"},
+            ),
+            (
+                "Storm Fleet Spy",
+                "Raid -- When this creature enters, if you attacked this turn, draw a card.",
+                """
+                    this.addAbility(new EntersBattlefieldTriggeredAbility(new DrawCardSourceControllerEffect(1))
+                        .withInterveningIf(RaidCondition.instance), new PlayerAttackedWatcher());
+                """,
+                {"etb_draw_condition": "controller_attacked_this_turn"},
+            ),
+        ]
+        for name, oracle, source_text, expected_fields in fixtures:
+            with self.subTest(name=name):
+                row = queue_row(
+                    split.DRAW_ENGINE_UNIT,
+                    effect_classes=["DrawCardSourceControllerEffect"],
+                    ability_kind="triggered",
+                    ability_classes=["EntersBattlefieldTriggeredAbility"],
+                    xmage_signals=["draw", "condition", "triggered_ability"],
+                )
+                proposal, reason = split.split_row(
+                    row,
+                    metadata(
+                        name=name,
+                        type_line="Creature - Human Pirate",
+                        oracle_text=oracle,
+                    ),
+                    source_text=source_text,
+                )
+
+                self.assertEqual(reason, "selected_exact_scope")
+                effect = proposal["effect_json"]
+                self.assertEqual(effect["battle_model_scope"], split.ETB_DRAW_CREATURE_SCOPE)
+                self.assertEqual(effect["etb_draw_count"], 1)
+                self.assertEqual(effect["etb_draw_condition_status"], "runtime_executor_v1")
+                for key, value in expected_fields.items():
+                    self.assertEqual(effect[key], value)
+
     def test_creature_etb_conditional_draw_blocks_unsupported_condition(self) -> None:
         row = queue_row(
             split.DRAW_ENGINE_UNIT,
@@ -31145,18 +31221,18 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         proposal, reason = split.split_row(
             row,
             metadata(
-                name="Storm Fleet Spy",
-                type_line="Creature - Human Pirate",
-                oracle_text="Raid — When this creature enters, if you attacked this turn, draw a card.",
+                name="Faerie Miscreant",
+                type_line="Creature - Faerie Rogue",
+                oracle_text="When Faerie Miscreant enters the battlefield, if you control another creature named Faerie Miscreant, draw a card.",
             ),
             source_text="""
                 this.addAbility(new EntersBattlefieldTriggeredAbility(new DrawCardSourceControllerEffect(1))
-                    .withInterveningIf(RaidCondition.instance), new PlayerAttackedWatcher());
+                    .withInterveningIf(condition));
             """,
         )
 
         self.assertIsNone(proposal)
-        self.assertEqual(reason, "etb_conditional_draw_oracle_not_exact")
+        self.assertEqual(reason, "etb_conditional_draw_oracle_condition_not_supported")
 
     def test_creature_etb_draw_blocks_dynamic_amount(self) -> None:
         row = queue_row(

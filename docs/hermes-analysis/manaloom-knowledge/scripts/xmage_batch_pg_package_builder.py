@@ -3297,6 +3297,12 @@ def creature_enters_draw_execution_scenario_from_expected_rule(
 
 
 def _condition_fixture_permanents(required: dict[str, Any]) -> list[dict[str, Any]]:
+    condition = str(required.get("etb_draw_condition") or "").strip().lower()
+    if condition not in {
+        "controller_controls_matching_permanent",
+        "controller_revealed_or_controlled_subtype_as_cast",
+    }:
+        return []
     min_count = max(1, int(required.get("etb_draw_condition_min_count") or 1))
     card_types = [
         str(value).strip().lower()
@@ -3343,6 +3349,17 @@ def _condition_fixture_permanents(required: dict[str, Any]) -> list[dict[str, An
                     "power": 1,
                     "toughness": 1,
                     "subtypes": ["Human"],
+                }
+            )
+        elif "dragon" in subtypes:
+            fixtures.append(
+                {
+                    "name": f"E2E Controlled Dragon {index + 1}",
+                    "type_line": "Creature - Dragon",
+                    "effect": "creature",
+                    "power": 4,
+                    "toughness": 4,
+                    "subtypes": ["Dragon"],
                 }
             )
         elif "gate" in subtypes:
@@ -3425,7 +3442,18 @@ def creature_etb_draw_execution_scenario_from_expected_rule(
         scenario["creatures_you_control_died_this_turn_count"] = draw_count
     if required.get("etb_draw_condition"):
         scenario["expected_condition"] = required.get("etb_draw_condition")
-        scenario["controller_battlefield"] = _condition_fixture_permanents(required)
+        condition = str(required.get("etb_draw_condition") or "").strip().lower()
+        fixtures = _condition_fixture_permanents(required)
+        if fixtures:
+            scenario["controller_battlefield"] = fixtures
+        if condition == "controller_spent_same_color_mana_to_cast":
+            scenario["source_overrides"] = {"_same_color_mana_spent_to_cast": int(required.get("etb_draw_condition_min_count") or 3)}
+        elif condition == "controller_permanent_left_battlefield_this_turn":
+            scenario["controller_permanents_left_battlefield_this_turn_count"] = int(
+                required.get("etb_draw_condition_min_count") or 1
+            )
+        elif condition == "controller_attacked_this_turn":
+            scenario["controller_attacked_this_turn_count"] = int(required.get("etb_draw_condition_min_count") or 1)
     return scenario
 
 

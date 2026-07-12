@@ -27679,28 +27679,81 @@ def etb_draw_count_from_oracle(metadata: dict[str, Any]) -> int | None:
 
 
 def conditional_etb_draw_from_oracle(metadata: dict[str, Any]) -> dict[str, Any] | str:
-    text = strip_parenthetical_reminders(oracle_text_after_leading_static_keywords(metadata))
+    raw_text = strip_parenthetical_reminders(oracle_text_after_leading_static_keywords(metadata))
+    trigger_match = re.search(
+        r"\b((?:when|whenever)\b[^.]*?\benters(?: the battlefield)?\b[^.]*?\bdraw\b[^.]*)",
+        raw_text,
+        re.IGNORECASE,
+    )
+    if trigger_match:
+        raw_text = trigger_match.group(1)
+    text = raw_text
     text = re.sub(r"\s+", " ", text).strip().lower().rstrip(".")
+    text = re.sub(r"^(?:adamant|revolt|raid)\s*(?:--|-|\u2014)\s*", "", text)
     number_pattern = r"(a|one|two|three|four|five|\d+)"
     match = re.fullmatch(
         rf"(?:when|whenever) (?:this creature|[^.]+?) enters(?: the battlefield)?[, ]+"
         rf"if you control (?P<condition>[^,]+), (?P<may>you may )?draw (?P<count>{number_pattern}) cards?",
         text,
     )
+    contextual_condition: dict[str, Any] | None = None
     if not match:
-        return "etb_conditional_draw_oracle_not_exact"
-    count = number_word_to_int(match.group("count"))
+        contextual_match = re.fullmatch(
+            rf"(?:when|whenever) (?:this creature|[^.]+?) enters(?: the battlefield)?[, ]+"
+            rf"if (?P<condition>.+?), (?P<may>you may )?draw (?P<count>{number_pattern}) cards?",
+            text,
+        )
+        if not contextual_match:
+            return "etb_conditional_draw_oracle_not_exact"
+        condition_text = contextual_match.group("condition").strip()
+        if condition_text == "at least three mana of the same color was spent to cast it":
+            contextual_condition = {
+                "etb_draw_condition": "controller_spent_same_color_mana_to_cast",
+                "etb_draw_condition_min_count": 3,
+            }
+        elif re.fullmatch(
+            r"you revealed a dragon card or controlled a dragon as you cast [^,]+",
+            condition_text,
+        ):
+            contextual_condition = {
+                "etb_draw_condition": "controller_revealed_or_controlled_subtype_as_cast",
+                "etb_draw_condition_min_count": 1,
+                "etb_draw_condition_subtypes": ["dragon"],
+            }
+        elif condition_text in {
+            "a permanent you controlled left the battlefield this turn",
+            "a permanent left the battlefield under your control this turn",
+        }:
+            contextual_condition = {
+                "etb_draw_condition": "controller_permanent_left_battlefield_this_turn",
+                "etb_draw_condition_min_count": 1,
+            }
+        elif condition_text == "you attacked this turn":
+            contextual_condition = {
+                "etb_draw_condition": "controller_attacked_this_turn",
+                "etb_draw_condition_min_count": 1,
+            }
+        else:
+            return "etb_conditional_draw_oracle_condition_not_supported"
+        count = number_word_to_int(contextual_match.group("count"))
+        may = contextual_match.group("may")
+    else:
+        count = number_word_to_int(match.group("count"))
+        may = match.group("may")
     if count <= 0:
         return "etb_conditional_draw_oracle_count_not_fixed"
-    condition = match.group("condition").strip()
     detail: dict[str, Any] = {
         "draw_count": int(count),
         "etb_draw_condition_status": "runtime_executor_v1",
-        "etb_draw_condition": "controller_controls_matching_permanent",
         "etb_draw_condition_min_count": 1,
     }
-    if match.group("may"):
+    if may:
         detail["etb_draw_optional"] = True
+    if contextual_condition is not None:
+        detail.update(contextual_condition)
+        return detail
+    condition = match.group("condition").strip()
+    detail["etb_draw_condition"] = "controller_controls_matching_permanent"
     if condition in {"an artifact", "a artifact"}:
         detail["etb_draw_condition_card_types"] = ["artifact"]
     elif condition == "an equipment":
@@ -27773,6 +27826,21 @@ def conditional_etb_draw_from_source(
         )
     elif expected_subtypes == ["gate"] and min_count == 2:
         source_matches = "YouControlTwoOrMoreGatesCondition" in text
+    else:
+        condition = str(oracle_data.get("etb_draw_condition") or "").strip().lower()
+        if condition == "controller_spent_same_color_mana_to_cast":
+            source_matches = "AdamantCondition.ANY" in text
+        elif condition == "controller_revealed_or_controlled_subtype_as_cast":
+            source_matches = (
+                expected_subtypes == ["dragon"]
+                and "RevealedOrControlledDragonCondition" in text
+                and "RevealDragonFromHandCost" in text
+                and "DragonOnTheBattlefieldWhileSpellWasCastWatcher" in text
+            )
+        elif condition == "controller_permanent_left_battlefield_this_turn":
+            source_matches = "RevoltCondition.instance" in text and "RevoltWatcher" in text
+        elif condition == "controller_attacked_this_turn":
+            source_matches = "RaidCondition.instance" in text and "PlayerAttackedWatcher" in text
 
     if not source_matches:
         return "etb_conditional_draw_source_condition_not_supported"

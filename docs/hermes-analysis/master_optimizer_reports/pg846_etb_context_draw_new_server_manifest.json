@@ -1,0 +1,498 @@
+{
+  "apply_gate": "Do not run apply SQL without explicit approval for the exact command.",
+  "backup_table": "manaloom_deploy_audit.pg846_etb_context_draw_new_server_20260712_213929",
+  "deploy_id": "PG846",
+  "execution_scenarios": [
+    {
+      "card": {
+        "effect": "creature",
+        "name": "Clockwork Servant",
+        "type_line": "Creature - Wizard"
+      },
+      "controller_library": [
+        {
+          "cmc": 2,
+          "effect": "draw_cards",
+          "name": "E2E Drawn Card 1",
+          "type_line": "Instant"
+        }
+      ],
+      "expected_condition": "controller_spent_same_color_mana_to_cast",
+      "expected_draw_count": 1,
+      "expected_hand_after": 1,
+      "expected_keywords": [],
+      "logical_rule_key": "battle_rule_v1:d544333815c26227aa07e8047e88307e",
+      "name": "Clockwork Servant draws on ETB",
+      "source_overrides": {
+        "_same_color_mana_spent_to_cast": 3
+      },
+      "type": "creature_etb_draw"
+    },
+    {
+      "card": {
+        "effect": "creature",
+        "name": "Orator of Ojutai",
+        "type_line": "Creature - Wizard"
+      },
+      "controller_battlefield": [
+        {
+          "effect": "creature",
+          "name": "E2E Controlled Dragon 1",
+          "power": 4,
+          "subtypes": [
+            "Dragon"
+          ],
+          "toughness": 4,
+          "type_line": "Creature - Dragon"
+        }
+      ],
+      "controller_library": [
+        {
+          "cmc": 2,
+          "effect": "draw_cards",
+          "name": "E2E Drawn Card 1",
+          "type_line": "Instant"
+        }
+      ],
+      "expected_condition": "controller_revealed_or_controlled_subtype_as_cast",
+      "expected_draw_count": 1,
+      "expected_hand_after": 1,
+      "expected_keywords": [
+        "flying",
+        "defender"
+      ],
+      "logical_rule_key": "battle_rule_v1:f87475242cdbce13f367c135cf1a428d",
+      "name": "Orator of Ojutai draws on ETB",
+      "type": "creature_etb_draw"
+    },
+    {
+      "card": {
+        "effect": "creature",
+        "name": "Silkweaver Elite",
+        "type_line": "Creature - Wizard"
+      },
+      "controller_library": [
+        {
+          "cmc": 2,
+          "effect": "draw_cards",
+          "name": "E2E Drawn Card 1",
+          "type_line": "Instant"
+        }
+      ],
+      "controller_permanents_left_battlefield_this_turn_count": 1,
+      "expected_condition": "controller_permanent_left_battlefield_this_turn",
+      "expected_draw_count": 1,
+      "expected_hand_after": 1,
+      "expected_keywords": [
+        "reach"
+      ],
+      "logical_rule_key": "battle_rule_v1:8ec70b1d50922db2a5db856656a7e9e0",
+      "name": "Silkweaver Elite draws on ETB",
+      "type": "creature_etb_draw"
+    },
+    {
+      "card": {
+        "effect": "creature",
+        "name": "Skyship Buccaneer",
+        "type_line": "Creature - Wizard"
+      },
+      "controller_attacked_this_turn_count": 1,
+      "controller_library": [
+        {
+          "cmc": 2,
+          "effect": "draw_cards",
+          "name": "E2E Drawn Card 1",
+          "type_line": "Instant"
+        }
+      ],
+      "expected_condition": "controller_attacked_this_turn",
+      "expected_draw_count": 1,
+      "expected_hand_after": 1,
+      "expected_keywords": [
+        "flying"
+      ],
+      "logical_rule_key": "battle_rule_v1:5baa008072a02de51142c97732ecc526",
+      "name": "Skyship Buccaneer draws on ETB",
+      "type": "creature_etb_draw"
+    },
+    {
+      "card": {
+        "effect": "creature",
+        "name": "Storm Fleet Spy",
+        "type_line": "Creature - Wizard"
+      },
+      "controller_attacked_this_turn_count": 1,
+      "controller_library": [
+        {
+          "cmc": 2,
+          "effect": "draw_cards",
+          "name": "E2E Drawn Card 1",
+          "type_line": "Instant"
+        }
+      ],
+      "expected_condition": "controller_attacked_this_turn",
+      "expected_draw_count": 1,
+      "expected_hand_after": 1,
+      "expected_keywords": [],
+      "logical_rule_key": "battle_rule_v1:5cf0a7e83f7388023780e67c5e38f795",
+      "name": "Storm Fleet Spy draws on ETB",
+      "type": "creature_etb_draw"
+    }
+  ],
+  "expected_rules": [
+    {
+      "card_name": "Clockwork Servant",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:d544333815c26227aa07e8047e88307e",
+      "min_rule_version": 2,
+      "normalized_name": "clockwork servant",
+      "oracle_hash": "ca861e39c30a62d3eaf7f65a059a2708",
+      "required_effect_fields": {
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_creature_etb_draw_cards_v1",
+        "effect": "creature",
+        "etb_draw_condition": "controller_spent_same_color_mana_to_cast",
+        "etb_draw_condition_min_count": 3,
+        "etb_draw_condition_status": "runtime_executor_v1",
+        "etb_draw_count": 1,
+        "trigger": "enters_battlefield",
+        "trigger_effect": "draw_cards",
+        "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+        "xmage_effect_class": "DrawCardSourceControllerEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Orator of Ojutai",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:f87475242cdbce13f367c135cf1a428d",
+      "min_rule_version": 2,
+      "normalized_name": "orator of ojutai",
+      "oracle_hash": "45c82fc30a4987eac847a5d72c4dc388",
+      "required_effect_fields": {
+        "_keywords_are_self": true,
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_creature_etb_draw_cards_v1",
+        "effect": "creature",
+        "etb_draw_condition": "controller_revealed_or_controlled_subtype_as_cast",
+        "etb_draw_condition_min_count": 1,
+        "etb_draw_condition_status": "runtime_executor_v1",
+        "etb_draw_condition_subtypes": [
+          "dragon"
+        ],
+        "etb_draw_count": 1,
+        "keywords": [
+          "flying",
+          "defender"
+        ],
+        "trigger": "enters_battlefield",
+        "trigger_effect": "draw_cards",
+        "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+        "xmage_effect_class": "DrawCardSourceControllerEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Silkweaver Elite",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:8ec70b1d50922db2a5db856656a7e9e0",
+      "min_rule_version": 2,
+      "normalized_name": "silkweaver elite",
+      "oracle_hash": "0d89d103f4e6b4c775f6f849ecdd25d2",
+      "required_effect_fields": {
+        "_keywords_are_self": true,
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_creature_etb_draw_cards_v1",
+        "effect": "creature",
+        "etb_draw_condition": "controller_permanent_left_battlefield_this_turn",
+        "etb_draw_condition_min_count": 1,
+        "etb_draw_condition_status": "runtime_executor_v1",
+        "etb_draw_count": 1,
+        "keywords": [
+          "reach"
+        ],
+        "trigger": "enters_battlefield",
+        "trigger_effect": "draw_cards",
+        "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+        "xmage_effect_class": "DrawCardSourceControllerEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Skyship Buccaneer",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:5baa008072a02de51142c97732ecc526",
+      "min_rule_version": 2,
+      "normalized_name": "skyship buccaneer",
+      "oracle_hash": "ab721672227a3b87b1b85c751c355dc9",
+      "required_effect_fields": {
+        "_keywords_are_self": true,
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_creature_etb_draw_cards_v1",
+        "effect": "creature",
+        "etb_draw_condition": "controller_attacked_this_turn",
+        "etb_draw_condition_min_count": 1,
+        "etb_draw_condition_status": "runtime_executor_v1",
+        "etb_draw_count": 1,
+        "keywords": [
+          "flying"
+        ],
+        "trigger": "enters_battlefield",
+        "trigger_effect": "draw_cards",
+        "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+        "xmage_effect_class": "DrawCardSourceControllerEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Storm Fleet Spy",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:5cf0a7e83f7388023780e67c5e38f795",
+      "min_rule_version": 2,
+      "normalized_name": "storm fleet spy",
+      "oracle_hash": "cd69a4bf283b35efca3aab9e8af04da9",
+      "required_effect_fields": {
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_creature_etb_draw_cards_v1",
+        "effect": "creature",
+        "etb_draw_condition": "controller_attacked_this_turn",
+        "etb_draw_condition_min_count": 1,
+        "etb_draw_condition_status": "runtime_executor_v1",
+        "etb_draw_count": 1,
+        "trigger": "enters_battlefield",
+        "trigger_effect": "draw_cards",
+        "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+        "xmage_effect_class": "DrawCardSourceControllerEffect"
+      },
+      "review_status": "verified"
+    }
+  ],
+  "family_counts": {
+    "xmage_creature_etb_conditional_draw_cards": 5
+  },
+  "files": {
+    "apply": "docs/hermes-analysis/master_optimizer_reports/pg846_etb_context_draw_new_server_apply.sql",
+    "manifest": "docs/hermes-analysis/master_optimizer_reports/pg846_etb_context_draw_new_server_manifest.json",
+    "package": "docs/hermes-analysis/master_optimizer_reports/pg846_etb_context_draw_new_server_package.md",
+    "postcheck": "docs/hermes-analysis/master_optimizer_reports/pg846_etb_context_draw_new_server_postcheck.sql",
+    "precheck": "docs/hermes-analysis/master_optimizer_reports/pg846_etb_context_draw_new_server_precheck.sql",
+    "rollback": "docs/hermes-analysis/master_optimizer_reports/pg846_etb_context_draw_new_server_rollback.sql"
+  },
+  "generated_at": "2026-07-12T21:39:29+00:00",
+  "mutations_performed": [],
+  "runtime_checks": [
+    {
+      "card": {
+        "name": "Clockwork Servant"
+      },
+      "card_name": "Clockwork Servant",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:d544333815c26227aa07e8047e88307e",
+      "normalized_name": "clockwork servant",
+      "required_effect_fields": {
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_creature_etb_draw_cards_v1",
+        "effect": "creature",
+        "etb_draw_condition": "controller_spent_same_color_mana_to_cast",
+        "etb_draw_condition_min_count": 3,
+        "etb_draw_condition_status": "runtime_executor_v1",
+        "etb_draw_count": 1,
+        "trigger": "enters_battlefield",
+        "trigger_effect": "draw_cards",
+        "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+        "xmage_effect_class": "DrawCardSourceControllerEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Orator of Ojutai"
+      },
+      "card_name": "Orator of Ojutai",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:f87475242cdbce13f367c135cf1a428d",
+      "normalized_name": "orator of ojutai",
+      "required_effect_fields": {
+        "_keywords_are_self": true,
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_creature_etb_draw_cards_v1",
+        "effect": "creature",
+        "etb_draw_condition": "controller_revealed_or_controlled_subtype_as_cast",
+        "etb_draw_condition_min_count": 1,
+        "etb_draw_condition_status": "runtime_executor_v1",
+        "etb_draw_condition_subtypes": [
+          "dragon"
+        ],
+        "etb_draw_count": 1,
+        "keywords": [
+          "flying",
+          "defender"
+        ],
+        "trigger": "enters_battlefield",
+        "trigger_effect": "draw_cards",
+        "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+        "xmage_effect_class": "DrawCardSourceControllerEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Silkweaver Elite"
+      },
+      "card_name": "Silkweaver Elite",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:8ec70b1d50922db2a5db856656a7e9e0",
+      "normalized_name": "silkweaver elite",
+      "required_effect_fields": {
+        "_keywords_are_self": true,
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_creature_etb_draw_cards_v1",
+        "effect": "creature",
+        "etb_draw_condition": "controller_permanent_left_battlefield_this_turn",
+        "etb_draw_condition_min_count": 1,
+        "etb_draw_condition_status": "runtime_executor_v1",
+        "etb_draw_count": 1,
+        "keywords": [
+          "reach"
+        ],
+        "trigger": "enters_battlefield",
+        "trigger_effect": "draw_cards",
+        "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+        "xmage_effect_class": "DrawCardSourceControllerEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Skyship Buccaneer"
+      },
+      "card_name": "Skyship Buccaneer",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:5baa008072a02de51142c97732ecc526",
+      "normalized_name": "skyship buccaneer",
+      "required_effect_fields": {
+        "_keywords_are_self": true,
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_creature_etb_draw_cards_v1",
+        "effect": "creature",
+        "etb_draw_condition": "controller_attacked_this_turn",
+        "etb_draw_condition_min_count": 1,
+        "etb_draw_condition_status": "runtime_executor_v1",
+        "etb_draw_count": 1,
+        "keywords": [
+          "flying"
+        ],
+        "trigger": "enters_battlefield",
+        "trigger_effect": "draw_cards",
+        "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+        "xmage_effect_class": "DrawCardSourceControllerEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Storm Fleet Spy"
+      },
+      "card_name": "Storm Fleet Spy",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:5cf0a7e83f7388023780e67c5e38f795",
+      "normalized_name": "storm fleet spy",
+      "required_effect_fields": {
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_creature_etb_draw_cards_v1",
+        "effect": "creature",
+        "etb_draw_condition": "controller_attacked_this_turn",
+        "etb_draw_condition_min_count": 1,
+        "etb_draw_condition_status": "runtime_executor_v1",
+        "etb_draw_count": 1,
+        "trigger": "enters_battlefield",
+        "trigger_effect": "draw_cards",
+        "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+        "xmage_effect_class": "DrawCardSourceControllerEffect"
+      }
+    }
+  ],
+  "selected_card_names": [
+    "Clockwork Servant",
+    "Orator of Ojutai",
+    "Silkweaver Elite",
+    "Skyship Buccaneer",
+    "Storm Fleet Spy"
+  ],
+  "selected_count": 5,
+  "slug": "etb_context_draw_new_server",
+  "snapshot_checks": [
+    {
+      "card_name": "Clockwork Servant",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:d544333815c26227aa07e8047e88307e",
+      "min_rule_version": 2,
+      "normalized_name": "clockwork servant",
+      "oracle_hash": "ca861e39c30a62d3eaf7f65a059a2708",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_creature_etb_draw_cards_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Orator of Ojutai",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:f87475242cdbce13f367c135cf1a428d",
+      "min_rule_version": 2,
+      "normalized_name": "orator of ojutai",
+      "oracle_hash": "45c82fc30a4987eac847a5d72c4dc388",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_creature_etb_draw_cards_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Silkweaver Elite",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:8ec70b1d50922db2a5db856656a7e9e0",
+      "min_rule_version": 2,
+      "normalized_name": "silkweaver elite",
+      "oracle_hash": "0d89d103f4e6b4c775f6f849ecdd25d2",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_creature_etb_draw_cards_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Skyship Buccaneer",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:5baa008072a02de51142c97732ecc526",
+      "min_rule_version": 2,
+      "normalized_name": "skyship buccaneer",
+      "oracle_hash": "ab721672227a3b87b1b85c751c355dc9",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_creature_etb_draw_cards_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Storm Fleet Spy",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:5cf0a7e83f7388023780e67c5e38f795",
+      "min_rule_version": 2,
+      "normalized_name": "storm fleet spy",
+      "oracle_hash": "cd69a4bf283b35efca3aab9e8af04da9",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_creature_etb_draw_cards_v1"
+      },
+      "review_status": "verified"
+    }
+  ],
+  "status": "prepared_read_only_pending_apply_approval"
+}

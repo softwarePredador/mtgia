@@ -1184,6 +1184,67 @@ def test_creature_etb_conditional_draw_execution_scenario_is_manifested() -> Non
     assert scenario["controller_battlefield"][0]["type_line"] == "Artifact"
 
 
+def test_creature_etb_contextual_conditional_draw_scenarios_are_manifested() -> None:
+    base = {
+        "normalized_name": "context etb draw",
+        "card_name": "Context ETB Draw",
+        "oracle_hash": "hash-context-etb-draw",
+        "logical_rule_key": "battle_rule_v1:context-etb-draw",
+        "effect_json": {
+            "effect": "creature",
+            "battle_model_scope": "xmage_creature_etb_draw_cards_v1",
+            "ability_kind": "triggered",
+            "trigger": "enters_battlefield",
+            "trigger_effect": "draw_cards",
+            "etb_draw_count": 1,
+            "etb_draw_condition_status": "runtime_executor_v1",
+            "etb_draw_condition_min_count": 1,
+        },
+    }
+
+    adamant = builder.execution_scenario_from_expected_rule(builder.expected_rule_from_proposal({
+        **base,
+        "card_name": "Clockwork Servant",
+        "effect_json": {
+            **base["effect_json"],
+            "etb_draw_condition": "controller_spent_same_color_mana_to_cast",
+            "etb_draw_condition_min_count": 3,
+        },
+    }))
+    assert adamant["source_overrides"]["_same_color_mana_spent_to_cast"] == 3
+
+    dragon = builder.execution_scenario_from_expected_rule(builder.expected_rule_from_proposal({
+        **base,
+        "card_name": "Orator of Ojutai",
+        "effect_json": {
+            **base["effect_json"],
+            "etb_draw_condition": "controller_revealed_or_controlled_subtype_as_cast",
+            "etb_draw_condition_subtypes": ["dragon"],
+        },
+    }))
+    assert dragon["controller_battlefield"][0]["subtypes"] == ["Dragon"]
+
+    revolt = builder.execution_scenario_from_expected_rule(builder.expected_rule_from_proposal({
+        **base,
+        "card_name": "Silkweaver Elite",
+        "effect_json": {
+            **base["effect_json"],
+            "etb_draw_condition": "controller_permanent_left_battlefield_this_turn",
+        },
+    }))
+    assert revolt["controller_permanents_left_battlefield_this_turn_count"] == 1
+
+    raid = builder.execution_scenario_from_expected_rule(builder.expected_rule_from_proposal({
+        **base,
+        "card_name": "Storm Fleet Spy",
+        "effect_json": {
+            **base["effect_json"],
+            "etb_draw_condition": "controller_attacked_this_turn",
+        },
+    }))
+    assert raid["controller_attacked_this_turn_count"] == 1
+
+
 def test_creature_etb_dynamic_draw_execution_scenario_counts_turn_deaths() -> None:
     proposal = {
         "normalized_name": "lilianas standard bearer",
