@@ -1,0 +1,233 @@
+{
+  "apply_gate": "Do not run apply SQL without explicit approval for the exact command.",
+  "backup_table": "manaloom_deploy_audit.pg843_target_player_discard_mill_new_ser_20260712_201055",
+  "deploy_id": "pg843",
+  "execution_scenarios": [
+    {
+      "card": {
+        "name": "Horrifying Revelation",
+        "type_line": "Sorcery"
+      },
+      "expected_discard_count": 1,
+      "expected_mill_count": 1,
+      "expected_resolution_order": "discard_then_mill",
+      "expected_target_player": "Opponent",
+      "logical_rule_key": "battle_rule_v1:c24adcab7800c426dfd2242e9d6b6e48",
+      "name": "Horrifying Revelation target player discards then mills",
+      "opponent_hand": [
+        {
+          "cmc": 1,
+          "effect": "draw_cards",
+          "name": "E2E Target Player Discard Mill Hand Card 1",
+          "type_line": "Sorcery"
+        },
+        {
+          "cmc": 2,
+          "effect": "draw_cards",
+          "name": "E2E Target Player Discard Mill Hand Card 2",
+          "type_line": "Sorcery"
+        }
+      ],
+      "opponent_library": [
+        {
+          "cmc": 1,
+          "effect": "draw_cards",
+          "name": "E2E Target Player Discard Mill Library Card 1",
+          "type_line": "Instant"
+        },
+        {
+          "cmc": 2,
+          "effect": "creature",
+          "name": "E2E Target Player Discard Mill Library Card 2",
+          "type_line": "Creature - Fixture"
+        }
+      ],
+      "target_preference": "opponent",
+      "type": "target_player_discard_mill_spell"
+    }
+  ],
+  "expected_rules": [
+    {
+      "card_name": "Horrifying Revelation",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:c24adcab7800c426dfd2242e9d6b6e48",
+      "min_rule_version": 2,
+      "normalized_name": "horrifying revelation",
+      "oracle_hash": "71078f24d81cecdc3fe4f318677a92ac",
+      "required_effect_fields": {
+        "_composite_rule_components": [
+          {
+            "battle_model_scope": "xmage_fixed_target_player_discard_spell_v1",
+            "compose_on_resolution": true,
+            "count": 1,
+            "discard_count": 1,
+            "effect": "target_player_discard",
+            "target": "player",
+            "target_constraints": {
+              "players": [
+                "any"
+              ]
+            },
+            "target_controller": "target_player",
+            "target_player_discard": true,
+            "target_player_scope": "any",
+            "target_preference": "opponent",
+            "xmage_effect_class": "DiscardTargetEffect"
+          },
+          {
+            "battle_model_scope": "xmage_fixed_target_player_mill_spell_v1",
+            "compose_on_resolution": true,
+            "count": 1,
+            "effect": "mill_cards",
+            "mill_count": 1,
+            "target": "player",
+            "target_constraints": {
+              "players": [
+                "any"
+              ]
+            },
+            "target_controller": "target_player",
+            "target_from_previous_discard": true,
+            "target_player_mill": true,
+            "target_player_scope": "any",
+            "target_preference": "previous_discard_target",
+            "xmage_effect_class": "MillCardsTargetEffect"
+          }
+        ],
+        "battle_model_scope": "xmage_fixed_target_player_discard_mill_spell_v1",
+        "count": 1,
+        "discard_count": 1,
+        "effect": "composite_resolution",
+        "instant": false,
+        "mill_count": 1,
+        "resolution_order": "discard_then_mill",
+        "sorcery": true,
+        "target": "player",
+        "target_constraints": {
+          "players": [
+            "any"
+          ]
+        },
+        "target_controller": "target_player",
+        "target_player_mill": true,
+        "target_player_scope": "any",
+        "target_preference": "opponent",
+        "xmage_effect_classes": [
+          "DiscardTargetEffect",
+          "MillCardsTargetEffect"
+        ]
+      },
+      "review_status": "verified"
+    }
+  ],
+  "family_counts": {
+    "xmage_fixed_target_player_discard_mill_spell": 1
+  },
+  "files": {
+    "apply": "docs/hermes-analysis/master_optimizer_reports/pg843_target_player_discard_mill_new_server_apply.sql",
+    "manifest": "docs/hermes-analysis/master_optimizer_reports/pg843_target_player_discard_mill_new_server_manifest.json",
+    "package": "docs/hermes-analysis/master_optimizer_reports/pg843_target_player_discard_mill_new_server_package.md",
+    "postcheck": "docs/hermes-analysis/master_optimizer_reports/pg843_target_player_discard_mill_new_server_postcheck.sql",
+    "precheck": "docs/hermes-analysis/master_optimizer_reports/pg843_target_player_discard_mill_new_server_precheck.sql",
+    "rollback": "docs/hermes-analysis/master_optimizer_reports/pg843_target_player_discard_mill_new_server_rollback.sql"
+  },
+  "generated_at": "2026-07-12T20:10:55+00:00",
+  "mutations_performed": [],
+  "runtime_checks": [
+    {
+      "card": {
+        "name": "Horrifying Revelation"
+      },
+      "card_name": "Horrifying Revelation",
+      "effect": "composite_resolution",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:c24adcab7800c426dfd2242e9d6b6e48",
+      "normalized_name": "horrifying revelation",
+      "required_effect_fields": {
+        "_composite_rule_components": [
+          {
+            "battle_model_scope": "xmage_fixed_target_player_discard_spell_v1",
+            "compose_on_resolution": true,
+            "count": 1,
+            "discard_count": 1,
+            "effect": "target_player_discard",
+            "target": "player",
+            "target_constraints": {
+              "players": [
+                "any"
+              ]
+            },
+            "target_controller": "target_player",
+            "target_player_discard": true,
+            "target_player_scope": "any",
+            "target_preference": "opponent",
+            "xmage_effect_class": "DiscardTargetEffect"
+          },
+          {
+            "battle_model_scope": "xmage_fixed_target_player_mill_spell_v1",
+            "compose_on_resolution": true,
+            "count": 1,
+            "effect": "mill_cards",
+            "mill_count": 1,
+            "target": "player",
+            "target_constraints": {
+              "players": [
+                "any"
+              ]
+            },
+            "target_controller": "target_player",
+            "target_from_previous_discard": true,
+            "target_player_mill": true,
+            "target_player_scope": "any",
+            "target_preference": "previous_discard_target",
+            "xmage_effect_class": "MillCardsTargetEffect"
+          }
+        ],
+        "battle_model_scope": "xmage_fixed_target_player_discard_mill_spell_v1",
+        "count": 1,
+        "discard_count": 1,
+        "effect": "composite_resolution",
+        "instant": false,
+        "mill_count": 1,
+        "resolution_order": "discard_then_mill",
+        "sorcery": true,
+        "target": "player",
+        "target_constraints": {
+          "players": [
+            "any"
+          ]
+        },
+        "target_controller": "target_player",
+        "target_player_mill": true,
+        "target_player_scope": "any",
+        "target_preference": "opponent",
+        "xmage_effect_classes": [
+          "DiscardTargetEffect",
+          "MillCardsTargetEffect"
+        ]
+      }
+    }
+  ],
+  "selected_card_names": [
+    "Horrifying Revelation"
+  ],
+  "selected_count": 1,
+  "slug": "target_player_discard_mill_new_server",
+  "snapshot_checks": [
+    {
+      "card_name": "Horrifying Revelation",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:c24adcab7800c426dfd2242e9d6b6e48",
+      "min_rule_version": 2,
+      "normalized_name": "horrifying revelation",
+      "oracle_hash": "71078f24d81cecdc3fe4f318677a92ac",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_target_player_discard_mill_spell_v1"
+      },
+      "review_status": "verified"
+    }
+  ],
+  "status": "prepared_read_only_pending_apply_approval"
+}

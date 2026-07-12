@@ -68540,6 +68540,10 @@ def resolve_composite_resolution_effect(player, opponents, card, effect_data, tu
         elif component_effect == "mill_cards":
             component_payload = dict(component)
             component_payload["_composite_component_index"] = index
+            if component_payload.get("target_from_previous_discard"):
+                target_player_name = effect_data.get("_last_target_player_discard_target_player")
+                if target_player_name:
+                    component_payload["declared_targets"] = [target_player_name]
             resolve_target_player_mill_spell(
                 player,
                 opponents,
@@ -69087,6 +69091,8 @@ def resolve_composite_resolution_effect(player, opponents, card, effect_data, tu
                 forced_target_player=forced_target_player,
                 forced_target_reason=forced_target_reason,
             )
+            if discard_payload.get("target_player"):
+                effect_data["_last_target_player_discard_target_player"] = discard_payload.get("target_player")
             outcome = "target_player_discard_resolved"
             applied.append(
                 {

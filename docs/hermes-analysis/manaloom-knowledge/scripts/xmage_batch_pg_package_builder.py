@@ -5669,6 +5669,50 @@ def target_player_mill_draw_execution_scenario_from_expected_rule(
     }
 
 
+def target_player_discard_mill_execution_scenario_from_expected_rule(
+    rule: dict[str, Any],
+) -> dict[str, Any] | None:
+    required = dict(rule.get("required_effect_fields") or {})
+    if required.get("battle_model_scope") != "xmage_fixed_target_player_discard_mill_spell_v1":
+        return None
+    expected_discard_count = int(required.get("discard_count") or required.get("count") or 0)
+    expected_mill_count = int(required.get("mill_count") or 0)
+    if expected_discard_count <= 0 or expected_mill_count <= 0:
+        return None
+    return {
+        "name": f"{rule['card_name']} target player discards then mills",
+        "type": "target_player_discard_mill_spell",
+        "card": {
+            "name": rule["card_name"],
+            "type_line": "Instant" if required.get("instant") else "Sorcery",
+        },
+        "opponent_hand": [
+            {
+                "name": f"E2E Target Player Discard Mill Hand Card {index + 1}",
+                "type_line": "Sorcery",
+                "effect": "draw_cards",
+                "cmc": index + 1,
+            }
+            for index in range(max(expected_discard_count + 1, 2))
+        ],
+        "opponent_library": [
+            {
+                "name": f"E2E Target Player Discard Mill Library Card {index + 1}",
+                "type_line": "Instant" if index % 2 == 0 else "Creature - Fixture",
+                "effect": "draw_cards" if index % 2 == 0 else "creature",
+                "cmc": index + 1,
+            }
+            for index in range(max(expected_mill_count + 1, 2))
+        ],
+        "expected_discard_count": expected_discard_count,
+        "expected_mill_count": expected_mill_count,
+        "expected_target_player": "Opponent",
+        "expected_resolution_order": "discard_then_mill",
+        "target_preference": str(required.get("target_preference") or "opponent"),
+        "logical_rule_key": rule["logical_rule_key"],
+    }
+
+
 def look_at_hand_draw_execution_scenario_from_expected_rule(
     rule: dict[str, Any],
 ) -> dict[str, Any] | None:
@@ -10476,6 +10520,7 @@ def execution_scenario_from_expected_rule(rule: dict[str, Any]) -> dict[str, Any
         or graveyard_to_library_draw_execution_scenario_from_expected_rule(rule)
         or fixed_draw_discard_spell_execution_scenario_from_expected_rule(rule)
         or look_at_hand_draw_execution_scenario_from_expected_rule(rule)
+        or target_player_discard_mill_execution_scenario_from_expected_rule(rule)
         or target_player_discard_execution_scenario_from_expected_rule(rule)
         or target_player_draw_execution_scenario_from_expected_rule(rule)
         or target_player_life_gain_execution_scenario_from_expected_rule(rule)

@@ -444,7 +444,10 @@ patterns:
   `xmage_fixed_target_player_mill_spell_v1`; the companion composite
   `MillCardsTargetEffect + DrawCardSourceControllerEffect` maps to
   `xmage_fixed_target_player_mill_draw_spell_v1` only when Oracle and XMage
-  agree on target scope, mill count, draw count, and resolution order.
+  agree on target scope, mill count, draw count, and resolution order; the
+  companion composite `DiscardTargetEffect + MillCardsTargetEffect` maps to
+  `xmage_fixed_target_player_discard_mill_spell_v1` only when a single shared
+  target player discards a fixed count and then mills a fixed count.
 - `life_gain::xmage_life_gain_variant_review_v1` with
   `DamageTargetEffect + GainLifeEffect` and exact fixed damage/life-gain
   Oracle/source text ->

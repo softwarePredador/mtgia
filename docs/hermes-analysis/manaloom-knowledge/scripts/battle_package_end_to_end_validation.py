@@ -14520,6 +14520,118 @@ def run_target_player_mill_draw_spell(
     }
 
 
+def run_target_player_discard_mill_spell(
+    battle,
+    scenario: dict[str, Any],
+    events: list[tuple[str, dict[str, Any]]],
+) -> dict[str, Any]:
+    card = dict(scenario["card"])
+    effect = dict(battle.get_card_effect(card))
+    if effect.get("effect") != "composite_resolution":
+        fail("battle_execution", f"{card['name']} effect={effect.get('effect')!r}")
+    if effect.get("battle_model_scope") != "xmage_fixed_target_player_discard_mill_spell_v1":
+        fail("battle_execution", f"{card['name']} scope={effect.get('battle_model_scope')!r}")
+    active = battle.Player(str(scenario.get("player") or "Spell Controller"), None, [])
+    opponent = battle.Player(str(scenario.get("opponent") or "Opponent"), None, [])
+    opponent.hand = [
+        battle.enrich_card(dict(hand_card))
+        for hand_card in (scenario.get("opponent_hand") or [])
+        if isinstance(hand_card, dict)
+    ]
+    opponent.library = [
+        battle.enrich_card(dict(library_card))
+        for library_card in (scenario.get("opponent_library") or [])
+        if isinstance(library_card, dict)
+    ]
+    starting_opponent_hand_count = len(opponent.hand)
+    starting_opponent_library_count = len(opponent.library)
+    expected_discard_count = int(scenario.get("expected_discard_count") or effect.get("discard_count") or effect.get("count") or 0)
+    expected_mill_count = int(scenario.get("expected_mill_count") or effect.get("mill_count") or 0)
+    expected_milled = min(expected_mill_count, starting_opponent_library_count)
+    expected_target_player = str(scenario.get("expected_target_player") or opponent.name)
+    before_events = len(events)
+
+    battle.apply_effect_immediate(
+        active,
+        [opponent],
+        battle.enrich_card(card),
+        turn=int(scenario.get("turn") or 6174),
+        rng=random.Random(int(scenario.get("seed") or 6174)),
+        effect_data_override=effect,
+        phase=str(scenario.get("phase") or "precombat_main"),
+    )
+
+    if len(opponent.hand) != starting_opponent_hand_count - expected_discard_count:
+        fail(
+            "battle_execution",
+            f"{card['name']} opponent hand={len(opponent.hand)}, expected {starting_opponent_hand_count - expected_discard_count}",
+        )
+    expected_graveyard_count = expected_discard_count + expected_milled
+    if len(opponent.library) != starting_opponent_library_count - expected_milled:
+        fail(
+            "battle_execution",
+            f"{card['name']} opponent library={len(opponent.library)}, expected {starting_opponent_library_count - expected_milled}",
+        )
+    if len(opponent.graveyard) != expected_graveyard_count:
+        fail(
+            "battle_execution",
+            f"{card['name']} opponent graveyard={len(opponent.graveyard)}, expected {expected_graveyard_count}",
+        )
+
+    discard_event = next(
+        (
+            data
+            for event, data in events[before_events:]
+            if event == "target_player_discard_resolved"
+            and data.get("card") == card.get("name")
+        ),
+        None,
+    )
+    if discard_event is None:
+        fail("battle_events", f"missing {card['name']} target_player_discard_resolved event")
+    if discard_event.get("target_player") != expected_target_player:
+        fail("battle_events", f"{card['name']} discard target_player={discard_event.get('target_player')!r}")
+    if int(discard_event.get("discarded_count") or 0) != expected_discard_count:
+        fail("battle_events", f"{card['name']} discarded_count={discard_event.get('discarded_count')}")
+
+    mill_event = next(
+        (
+            data
+            for event, data in events[before_events:]
+            if event == "mill_resolved"
+            and data.get("card") == card.get("name")
+            and data.get("target_player_mill") is True
+        ),
+        None,
+    )
+    if mill_event is None:
+        fail("battle_events", f"missing {card['name']} mill_resolved event")
+    if mill_event.get("target_player") != expected_target_player:
+        fail("battle_events", f"{card['name']} mill target_player={mill_event.get('target_player')!r}")
+    if int(mill_event.get("cards_milled") or 0) != expected_milled:
+        fail("battle_events", f"{card['name']} cards_milled={mill_event.get('cards_milled')}")
+
+    component_events = [
+        data
+        for event, data in events[before_events:]
+        if event == "composite_rule_component_resolved"
+        and data.get("card") == card.get("name")
+        and data.get("component_effect") in {"target_player_discard", "mill_cards"}
+    ]
+    actual_order = [str(data.get("component_effect") or "") for data in component_events]
+    if actual_order != ["target_player_discard", "mill_cards"]:
+        fail("battle_events", f"{card['name']} composite components={actual_order!r}")
+
+    return {
+        "scenario": scenario.get("name"),
+        "card_name": card["name"],
+        "target_player": expected_target_player,
+        "cards_discarded": expected_discard_count,
+        "cards_milled": expected_milled,
+        "resolution_order": "discard_then_mill",
+    }
+
+
 def run_look_at_hand_draw_spell(
     battle,
     scenario: dict[str, Any],
@@ -15511,6 +15623,7 @@ SCENARIO_RUNNERS = {
     "add_counters_proliferate_spell": run_add_counters_proliferate_spell,
     "add_counters_target_spell": run_add_counters_target_spell,
     "add_counters_untap_target_spell": run_add_counters_untap_target_spell,
+    "target_player_discard_mill_spell": run_target_player_discard_mill_spell,
     "target_player_discard_spell": run_target_player_discard_spell,
     "target_player_draw_spell": run_target_player_draw_spell,
     "target_player_life_gain_spell": run_target_player_life_gain_spell,

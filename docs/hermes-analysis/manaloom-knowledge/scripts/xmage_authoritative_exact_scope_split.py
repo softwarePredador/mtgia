@@ -281,6 +281,7 @@ TARGET_PLAYER_LIFE_GAIN_SCOPE = "xmage_fixed_target_player_gain_life_spell_v1"
 LOOK_AT_HAND_SCOPE = "xmage_look_at_target_player_hand_spell_v1"
 LOOK_AT_HAND_DRAW_SCOPE = "xmage_look_at_target_player_hand_draw_card_spell_v1"
 TARGET_PLAYER_DISCARD_SCOPE = "xmage_fixed_target_player_discard_spell_v1"
+TARGET_PLAYER_DISCARD_MILL_SCOPE = "xmage_fixed_target_player_discard_mill_spell_v1"
 TARGET_PLAYER_MILL_SCOPE = "xmage_fixed_target_player_mill_spell_v1"
 TARGET_PLAYER_MILL_DRAW_SCOPE = "xmage_fixed_target_player_mill_draw_spell_v1"
 DYNAMIC_TARGET_PLAYER_DISCARD_SCOPE = "xmage_dynamic_target_player_discard_spell_v1"
@@ -24716,6 +24717,73 @@ def fixed_target_player_mill_draw_spell_from_source(source: str) -> dict[str, An
     }
 
 
+def fixed_target_player_discard_mill_spell_from_oracle(metadata: dict[str, Any]) -> dict[str, Any] | str:
+    text = re.sub(
+        r"\s+",
+        " ",
+        " ".join(oracle_effect_lines_without_neutral_auxiliary(metadata)),
+    ).strip().lower()
+    if not text:
+        return "target_player_discard_mill_oracle_not_simple"
+    number_pattern = r"(a|one|two|three|four|five|six|seven|eight|nine|ten|\d+)"
+    match = re.fullmatch(
+        rf"target (?P<scope>player|opponent) discards (?P<discard>{number_pattern}) cards?, then mills (?P<mill>{number_pattern}) cards?\.?",
+        text,
+    )
+    if not match:
+        return "target_player_discard_mill_oracle_not_exact_fixed"
+    discard_count = number_word_to_int(match.group("discard"))
+    mill_count = number_word_to_int(match.group("mill"))
+    if discard_count <= 0 or mill_count <= 0:
+        return "target_player_discard_mill_count_not_fixed"
+    return {
+        "discard_count": discard_count,
+        "mill_count": mill_count,
+        "target_player_scope": "opponent" if match.group("scope") == "opponent" else "any",
+        "resolution_order": "discard_then_mill",
+    }
+
+
+def fixed_target_player_discard_mill_spell_from_source(source: str) -> dict[str, Any] | str:
+    text = source or ""
+    if has_additional_cost(text):
+        return "target_player_discard_mill_source_additional_cost_not_supported"
+    unsupported_markers = {
+        "ConditionalOneShotEffect",
+        "DoIfCostPaid",
+        "Mode",
+        "Modes",
+        "TargetPointer",
+        ".setTargetPointer",
+        "GetXValue",
+        "ManacostVariableValue",
+        "DomainValue",
+    }
+    if any(marker in text for marker in unsupported_markers):
+        return "target_player_discard_mill_source_not_simple"
+    target_player_count = len(re.findall(r"new\s+TargetPlayer\s*\(", text))
+    target_opponent_count = len(re.findall(r"new\s+TargetOpponent\s*\(", text))
+    if target_player_count + target_opponent_count != 1:
+        return "target_player_discard_mill_source_target_not_supported"
+    discard_matches = list(re.finditer(r"\bDiscardTargetEffect\s*\(\s*(\d+)\s*\)", text, re.S))
+    mill_matches = list(re.finditer(r"\bMillCardsTargetEffect\s*\(\s*(\d+)\s*\)", text, re.S))
+    if len(discard_matches) != 1 or len(mill_matches) != 1:
+        return "target_player_discard_mill_source_not_simple"
+    if discard_matches[0].start() > mill_matches[0].start():
+        return "target_player_discard_mill_source_order_mismatch"
+    discard_count = int(discard_matches[0].group(1))
+    mill_count = int(mill_matches[0].group(1))
+    if discard_count <= 0 or mill_count <= 0:
+        return "target_player_discard_mill_count_not_fixed"
+    return {
+        "discard_count": discard_count,
+        "mill_count": mill_count,
+        "target_player_scope": "opponent" if target_opponent_count else "any",
+        "resolution_order": "discard_then_mill",
+        "xmage_effect_classes": ["DiscardTargetEffect", "MillCardsTargetEffect"],
+    }
+
+
 def dynamic_target_player_discard_spell_from_source(source: str) -> dict[str, Any] | str:
     text = source or ""
     if has_additional_cost(text):
@@ -41501,6 +41569,79 @@ def split_row(
         ), "selected_exact_scope"
 
     if unit == MILL_TARGET_UNIT:
+        if classes == {"DiscardTargetEffect", "MillCardsTargetEffect"}:
+            unsupported_abilities = ability_classes(row) - ALLOWED_AUXILIARY_RESOLUTION_ABILITY_CLASSES
+            if unsupported_abilities:
+                return None, "target_player_discard_mill_ability_class_not_simple"
+            oracle_discard_mill = fixed_target_player_discard_mill_spell_from_oracle(metadata)
+            if isinstance(oracle_discard_mill, str):
+                return None, oracle_discard_mill
+            source_discard_mill = fixed_target_player_discard_mill_spell_from_source(source_text)
+            if isinstance(source_discard_mill, str):
+                return None, source_discard_mill
+            for key in ("discard_count", "mill_count", "target_player_scope", "resolution_order"):
+                if oracle_discard_mill[key] != source_discard_mill[key]:
+                    return None, "target_player_discard_mill_source_oracle_mismatch"
+            discard_count = int(oracle_discard_mill["discard_count"])
+            mill_count = int(oracle_discard_mill["mill_count"])
+            target_player_scope = str(oracle_discard_mill["target_player_scope"])
+            target_constraints = {
+                "players": ["opponent"] if target_player_scope == "opponent" else ["any"]
+            }
+            discard_component = {
+                "effect": "target_player_discard",
+                "battle_model_scope": TARGET_PLAYER_DISCARD_SCOPE,
+                "count": discard_count,
+                "discard_count": discard_count,
+                "target": "player",
+                "target_controller": "target_player",
+                "target_constraints": target_constraints,
+                "target_preference": "opponent",
+                "target_player_discard": True,
+                "target_player_scope": target_player_scope,
+                "compose_on_resolution": True,
+                "xmage_effect_class": "DiscardTargetEffect",
+            }
+            mill_component = {
+                "effect": "mill_cards",
+                "battle_model_scope": TARGET_PLAYER_MILL_SCOPE,
+                "count": mill_count,
+                "mill_count": mill_count,
+                "target": "player",
+                "target_controller": "target_player",
+                "target_constraints": target_constraints,
+                "target_preference": "previous_discard_target",
+                "target_from_previous_discard": True,
+                "target_player_mill": True,
+                "target_player_scope": target_player_scope,
+                "compose_on_resolution": True,
+                "xmage_effect_class": "MillCardsTargetEffect",
+            }
+            effect_json = {
+                "effect": "composite_resolution",
+                "battle_model_scope": TARGET_PLAYER_DISCARD_MILL_SCOPE,
+                "count": discard_count,
+                "discard_count": discard_count,
+                "mill_count": mill_count,
+                "target": "player",
+                "target_controller": "target_player",
+                "target_constraints": target_constraints,
+                "target_preference": "opponent",
+                "target_player_discard": True,
+                "target_player_mill": True,
+                "target_player_scope": target_player_scope,
+                "resolution_order": "discard_then_mill",
+                "_composite_rule_components": [discard_component, mill_component],
+                "xmage_effect_classes": ["DiscardTargetEffect", "MillCardsTargetEffect"],
+                **flags,
+            }
+            return build_proposal(
+                row,
+                metadata,
+                effect_json,
+                family_id="xmage_fixed_target_player_discard_mill_spell",
+            ), "selected_exact_scope"
+
         if classes == {"DrawCardSourceControllerEffect", "MillCardsTargetEffect"}:
             unsupported_abilities = ability_classes(row) - ALLOWED_AUXILIARY_RESOLUTION_ABILITY_CLASSES
             if unsupported_abilities:

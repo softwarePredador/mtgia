@@ -3116,6 +3116,86 @@ def test_target_player_mill_draw_runner_mills_and_draws() -> None:
     ] == ["mill_cards", "draw_cards"]
 
 
+def test_target_player_discard_mill_runner_uses_same_target() -> None:
+    effect = {
+        "effect": "composite_resolution",
+        "battle_model_scope": "xmage_fixed_target_player_discard_mill_spell_v1",
+        "target": "player",
+        "target_controller": "target_player",
+        "target_preference": "opponent",
+        "count": 1,
+        "discard_count": 1,
+        "mill_count": 1,
+        "target_player_discard": True,
+        "target_player_mill": True,
+        "resolution_order": "discard_then_mill",
+        "_composite_rule_components": [
+            {
+                "effect": "target_player_discard",
+                "battle_model_scope": "xmage_fixed_target_player_discard_spell_v1",
+                "count": 1,
+                "discard_count": 1,
+                "target": "player",
+                "target_controller": "target_player",
+                "target_preference": "opponent",
+                "target_player_discard": True,
+                "compose_on_resolution": True,
+            },
+            {
+                "effect": "mill_cards",
+                "battle_model_scope": "xmage_fixed_target_player_mill_spell_v1",
+                "count": 1,
+                "mill_count": 1,
+                "target": "player",
+                "target_controller": "target_player",
+                "target_preference": "previous_discard_target",
+                "target_from_previous_discard": True,
+                "target_player_mill": True,
+                "compose_on_resolution": True,
+            },
+        ],
+        "_rule_logical_key": "battle_rule_v1:horrifying-revelation",
+    }
+    rule = {
+        "card_name": "Horrifying Revelation",
+        "logical_rule_key": "battle_rule_v1:horrifying-revelation",
+        "required_effect_fields": effect,
+    }
+    scenario = package_builder.target_player_discard_mill_execution_scenario_from_expected_rule(rule)
+
+    assert scenario is not None
+    battle = validator.load_battle(validator.DEFAULT_BATTLE)
+    events = []
+    previous_handler = battle.REPLAY_EVENT_HANDLER
+    previous_get_card_effect = battle.get_card_effect
+    battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+    battle.get_card_effect = lambda card: dict(effect)
+    try:
+        result = validator.run_target_player_discard_mill_spell(battle, scenario, events)
+    finally:
+        battle.REPLAY_EVENT_HANDLER = previous_handler
+        battle.get_card_effect = previous_get_card_effect
+
+    assert result["card_name"] == "Horrifying Revelation"
+    assert result["target_player"] == "Opponent"
+    assert result["cards_discarded"] == 1
+    assert result["cards_milled"] == 1
+    assert [
+        data.get("component_effect")
+        for event, data in events
+        if event == "composite_rule_component_resolved"
+        and data.get("card") == "Horrifying Revelation"
+        and data.get("component_effect") in {"target_player_discard", "mill_cards"}
+    ] == ["target_player_discard", "mill_cards"]
+    target_events = [
+        data.get("target_player")
+        for event, data in events
+        if event in {"target_player_discard_resolved", "mill_resolved"}
+        and data.get("card") == "Horrifying Revelation"
+    ]
+    assert target_events == ["Opponent", "Opponent"]
+
+
 def test_look_at_hand_draw_runner_reveals_opponent_hand_and_draws() -> None:
     effect = {
         "effect": "composite_resolution",

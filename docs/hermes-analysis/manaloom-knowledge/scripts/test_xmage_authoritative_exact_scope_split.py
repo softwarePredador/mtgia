@@ -9044,6 +9044,33 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertEqual(effect["mill_count"], 3)
         self.assertEqual(effect["target_player_scope"], "any")
 
+    def test_fixed_target_player_discard_mill_spell_maps_shared_target(self) -> None:
+        row = queue_row(
+            split.MILL_TARGET_UNIT,
+            effect_classes=["DiscardTargetEffect", "MillCardsTargetEffect"],
+            xmage_signals=["targeting"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(oracle_text="Target player discards a card, then mills a card."),
+            source_text=(
+                "this.getSpellAbility().addTarget(new TargetPlayer());"
+                "this.getSpellAbility().addEffect(new DiscardTargetEffect(1));"
+                "this.getSpellAbility().addEffect(new MillCardsTargetEffect(1).setText(\", then mills a card\"));"
+            ),
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["effect"], "composite_resolution")
+        self.assertEqual(effect["battle_model_scope"], split.TARGET_PLAYER_DISCARD_MILL_SCOPE)
+        self.assertEqual(effect["discard_count"], 1)
+        self.assertEqual(effect["mill_count"], 1)
+        self.assertEqual(effect["resolution_order"], "discard_then_mill")
+        components = effect["_composite_rule_components"]
+        self.assertEqual([component["effect"] for component in components], ["target_player_discard", "mill_cards"])
+        self.assertTrue(components[1]["target_from_previous_discard"])
+
     def test_fixed_target_player_mill_draw_spell_maps_mill_then_draw(self) -> None:
         row = queue_row(
             split.MILL_TARGET_UNIT,

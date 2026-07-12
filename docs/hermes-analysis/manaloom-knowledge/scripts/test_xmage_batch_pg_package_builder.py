@@ -3134,6 +3134,63 @@ def test_manifest_builds_target_player_mill_draw_execution_scenario() -> None:
     assert len(scenario["controller_library"]) == 2
 
 
+def test_manifest_builds_target_player_discard_mill_execution_scenario() -> None:
+    rule = {
+        "normalized_name": "horrifying revelation",
+        "card_name": "Horrifying Revelation",
+        "oracle_hash": "hash-horrifying-revelation",
+        "logical_rule_key": "battle_rule_v1:hash-horrifying-revelation",
+        "required_effect_fields": {
+            "effect": "composite_resolution",
+            "battle_model_scope": "xmage_fixed_target_player_discard_mill_spell_v1",
+            "target": "player",
+            "target_controller": "target_player",
+            "target_preference": "opponent",
+            "target_player_scope": "any",
+            "target_player_discard": True,
+            "target_player_mill": True,
+            "count": 1,
+            "discard_count": 1,
+            "mill_count": 1,
+            "resolution_order": "discard_then_mill",
+            "sorcery": True,
+            "_composite_rule_components": [
+                {
+                    "effect": "target_player_discard",
+                    "battle_model_scope": "xmage_fixed_target_player_discard_spell_v1",
+                    "count": 1,
+                    "discard_count": 1,
+                    "target": "player",
+                    "target_player_discard": True,
+                    "compose_on_resolution": True,
+                },
+                {
+                    "effect": "mill_cards",
+                    "battle_model_scope": "xmage_fixed_target_player_mill_spell_v1",
+                    "count": 1,
+                    "mill_count": 1,
+                    "target": "player",
+                    "target_player_mill": True,
+                    "target_from_previous_discard": True,
+                    "compose_on_resolution": True,
+                },
+            ],
+        },
+    }
+
+    scenario = builder.execution_scenario_from_expected_rule(rule)
+
+    assert scenario is not None
+    assert scenario["type"] == "target_player_discard_mill_spell"
+    assert scenario["card"]["name"] == "Horrifying Revelation"
+    assert scenario["card"]["type_line"] == "Sorcery"
+    assert scenario["expected_discard_count"] == 1
+    assert scenario["expected_mill_count"] == 1
+    assert scenario["expected_resolution_order"] == "discard_then_mill"
+    assert len(scenario["opponent_hand"]) == 2
+    assert len(scenario["opponent_library"]) == 2
+
+
 def test_manifest_builds_simple_activated_damage_execution_scenario() -> None:
     rule = {
         "normalized_name": "stormbind",

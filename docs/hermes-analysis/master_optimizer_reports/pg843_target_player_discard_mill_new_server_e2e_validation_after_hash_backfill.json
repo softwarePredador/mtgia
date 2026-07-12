@@ -1,0 +1,105 @@
+{
+  "battle_execution": {
+    "event_count": 6,
+    "results": [
+      {
+        "card_name": "Horrifying Revelation",
+        "cards_discarded": 1,
+        "cards_milled": 1,
+        "resolution_order": "discard_then_mill",
+        "scenario": "Horrifying Revelation target player discards then mills",
+        "target_player": "Opponent"
+      }
+    ],
+    "scenario_count": 1
+  },
+  "battle_path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py",
+  "database_target": "127.0.0.1:15432/halder",
+  "generated_at_utc": "2026-07-12T20:20:37.290272+00:00",
+  "manifest": "docs/hermes-analysis/master_optimizer_reports/pg843_target_player_discard_mill_new_server_manifest.json",
+  "package_id": "pg843_target_player_discard_mill_new_server_manifest",
+  "snapshot": "docs/hermes-analysis/master_optimizer_reports/pg843b_trusted_rule_oracle_hash_backfill_new_server_canonical_snapshot.json",
+  "sqlite_db": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db",
+  "stages": [
+    {
+      "evidence": {
+        "validated_rows": 1
+      },
+      "name": "postgres_source_of_truth",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_target_player_discard_mill_spell_v1",
+          "card_name": "Horrifying Revelation",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:c24adcab7800c426dfd2242e9d6b6e48",
+          "oracle_hash": "71078f24d81cecdc3fe4f318677a92ac",
+          "review_status": "verified",
+          "rule_version": 2
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_rows": 1
+      },
+      "name": "sqlite_hermes_cache",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_target_player_discard_mill_spell_v1",
+          "card_name": "Horrifying Revelation",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:c24adcab7800c426dfd2242e9d6b6e48",
+          "oracle_hash": "71078f24d81cecdc3fe4f318677a92ac",
+          "review_status": "verified",
+          "rule_version": 2
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_cards": 1
+      },
+      "name": "canonical_snapshot_fallback",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_target_player_discard_mill_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Horrifying Revelation",
+          "logical_rule_key": "battle_rule_v1:c24adcab7800c426dfd2242e9d6b6e48"
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_cards": 1
+      },
+      "name": "runtime_get_card_effect",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "card_name": "Horrifying Revelation",
+          "component_keys": [],
+          "effect": "composite_resolution",
+          "logical_rule_key": "battle_rule_v1:c24adcab7800c426dfd2242e9d6b6e48"
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "events": 6,
+        "scenarios": 1
+      },
+      "name": "battle_execution",
+      "status": "pass"
+    }
+  ],
+  "status": "pass",
+  "title": "Battle Package End-to-End Validation"
+}
