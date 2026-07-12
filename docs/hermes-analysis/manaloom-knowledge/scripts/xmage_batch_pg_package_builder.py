@@ -6823,6 +6823,74 @@ def target_keyword_draw_spell_execution_scenario_from_expected_rule(
     }
 
 
+def boost_life_gain_spell_execution_scenario_from_expected_rule(
+    rule: dict[str, Any],
+) -> dict[str, Any] | None:
+    required = dict(rule.get("required_effect_fields") or {})
+    if required.get("battle_model_scope") != "xmage_fixed_boost_target_creature_until_eot_gain_life_spell_v1":
+        return None
+    if required.get("effect") != "composite_resolution":
+        return None
+    components = [
+        component
+        for component in required.get("_composite_rule_components") or []
+        if isinstance(component, dict)
+    ]
+    boost_component = next(
+        (component for component in components if component.get("effect") == "stat_modifier_until_eot"),
+        None,
+    )
+    life_component = next(
+        (component for component in components if component.get("effect") == "life_total_change"),
+        None,
+    )
+    if boost_component is None or life_component is None:
+        return None
+    life_gain = int(required.get("life_gain_amount") or life_component.get("life_gain_amount") or 0)
+    if life_gain <= 0:
+        return None
+    target_count = max(
+        1,
+        int(
+            required.get("target_count_max")
+            or boost_component.get("target_count_max")
+            or required.get("target_count")
+            or boost_component.get("target_count")
+            or 1
+        ),
+    )
+    power_delta = int(required.get("power_delta") or boost_component.get("power_delta") or 0)
+    toughness_delta = int(required.get("toughness_delta") or boost_component.get("toughness_delta") or 0)
+    target_power = 8 if toughness_delta < 0 else 2
+    target_toughness = 8 if toughness_delta < 0 else 2
+    targets = [
+        {
+            "name": f"E2E Target Creature {index + 1}",
+            "type_line": "Creature - Soldier",
+            "power": target_power,
+            "toughness": target_toughness,
+        }
+        for index in range(target_count)
+    ]
+    return {
+        "name": f"{rule['card_name']} boosts target creature and gains {life_gain} life",
+        "type": "boost_life_gain_spell",
+        "card": {
+            "name": rule["card_name"],
+            "type_line": "Sorcery" if required.get("sorcery") is True else "Instant",
+        },
+        "targets": targets,
+        "expected_power_delta": power_delta,
+        "expected_toughness_delta": toughness_delta,
+        "expected_target_count": target_count,
+        "expected_up_to_count": bool(required.get("up_to_count") or boost_component.get("up_to_count")),
+        "starting_life": 20,
+        "expected_life_gain": life_gain,
+        "expected_life_after": 20 + life_gain,
+        "logical_rule_key": rule["logical_rule_key"],
+    }
+
+
 def boost_scry_spell_execution_scenario_from_expected_rule(
     rule: dict[str, Any],
 ) -> dict[str, Any] | None:
@@ -9158,6 +9226,7 @@ def execution_scenario_from_expected_rule(rule: dict[str, Any]) -> dict[str, Any
         or controlled_stat_modifier_execution_scenario_from_expected_rule(rule)
         or target_keyword_spell_execution_scenario_from_expected_rule(rule)
         or target_keyword_draw_spell_execution_scenario_from_expected_rule(rule)
+        or boost_life_gain_spell_execution_scenario_from_expected_rule(rule)
         or boost_scry_spell_execution_scenario_from_expected_rule(rule)
         or global_stat_modifier_draw_spell_execution_scenario_from_expected_rule(rule)
         or proliferate_draw_spell_execution_scenario_from_expected_rule(rule)

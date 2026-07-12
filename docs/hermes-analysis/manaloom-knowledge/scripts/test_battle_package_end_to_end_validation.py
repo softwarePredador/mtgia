@@ -5917,6 +5917,76 @@ def test_target_keyword_draw_spell_runner_executes_boost_draw_without_keywords()
     assert result["hand"] == ["E2E Draw Card"]
 
 
+def test_boost_life_gain_spell_runner_executes_stat_modifier_and_life_gain() -> None:
+    battle = validator.load_battle(validator.DEFAULT_BATTLE)
+    events = []
+    previous_handler = battle.REPLAY_EVENT_HANDLER
+    previous_get_card_effect = battle.get_card_effect
+    battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+    battle.get_card_effect = lambda card: {
+        "effect": "composite_resolution",
+        "battle_model_scope": "xmage_fixed_boost_target_creature_until_eot_gain_life_spell_v1",
+        "target": "creature",
+        "target_controller": "any",
+        "target_constraints": {"card_types": ["creature"]},
+        "power_delta": -2,
+        "toughness_delta": -2,
+        "life_gain_amount": 2,
+        "_composite_rule_components": [
+            {
+                "effect": "stat_modifier_until_eot",
+                "battle_model_scope": "xmage_fixed_boost_target_creature_until_eot_spell_v1",
+                "target": "creature",
+                "target_controller": "any",
+                "target_constraints": {"card_types": ["creature"]},
+                "power_delta": -2,
+                "toughness_delta": -2,
+            },
+            {
+                "effect": "life_total_change",
+                "battle_model_scope": "xmage_fixed_controller_gain_life_spell_v1",
+                "life_gain_amount": 2,
+                "target": "self",
+            },
+        ],
+        "_rule_logical_key": "battle_rule_v1:moment-of-craving",
+    }
+    try:
+        result = validator.run_boost_life_gain_spell(
+            battle,
+            {
+                "name": "Moment of Craving weakens target and gains 2",
+                "type": "boost_life_gain_spell",
+                "card": {"name": "Moment of Craving", "type_line": "Instant"},
+                "targets": [
+                    {
+                        "name": "E2E Opponent Creature",
+                        "type_line": "Creature - Soldier",
+                        "power": 4,
+                        "toughness": 4,
+                    }
+                ],
+                "expected_power_delta": -2,
+                "expected_toughness_delta": -2,
+                "expected_target_count": 1,
+                "starting_life": 20,
+                "expected_life_gain": 2,
+                "expected_life_after": 22,
+                "logical_rule_key": "battle_rule_v1:moment-of-craving",
+            },
+            events,
+        )
+    finally:
+        battle.REPLAY_EVENT_HANDLER = previous_handler
+        battle.get_card_effect = previous_get_card_effect
+
+    assert result["card_name"] == "Moment of Craving"
+    assert result["target_count"] == 1
+    assert result["life_after"] == 22
+    assert result["targets"][0]["power"] == 2
+    assert result["targets"][0]["toughness"] == 2
+
+
 def test_simple_mana_source_refresh_runner_executes_partial_mana_rule() -> None:
     battle = validator.load_battle(validator.DEFAULT_BATTLE)
     events = []

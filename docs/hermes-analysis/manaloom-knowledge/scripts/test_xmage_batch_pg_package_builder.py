@@ -4415,6 +4415,56 @@ def test_manifest_builds_boost_scry_spell_execution_scenario() -> None:
     assert scenario["expected_scry_count"] == 1
 
 
+def test_manifest_builds_boost_life_gain_spell_execution_scenario() -> None:
+    rule = {
+        "normalized_name": "tandem tactics",
+        "card_name": "Tandem Tactics",
+        "oracle_hash": "hash-tandem-tactics",
+        "logical_rule_key": "battle_rule_v1:hash-tandem-tactics",
+        "required_effect_fields": {
+            "effect": "composite_resolution",
+            "battle_model_scope": "xmage_fixed_boost_target_creature_until_eot_gain_life_spell_v1",
+            "target": "creature",
+            "target_controller": "any",
+            "target_constraints": {"card_types": ["creature"]},
+            "power_delta": 1,
+            "toughness_delta": 2,
+            "life_gain_amount": 2,
+            "target_count": 2,
+            "target_count_min": 0,
+            "target_count_max": 2,
+            "up_to_count": True,
+            "_composite_rule_components": [
+                {
+                    "effect": "stat_modifier_until_eot",
+                    "battle_model_scope": "xmage_fixed_boost_target_creature_until_eot_spell_v1",
+                    "power_delta": 1,
+                    "toughness_delta": 2,
+                    "target_count": 2,
+                    "target_count_min": 0,
+                    "target_count_max": 2,
+                    "up_to_count": True,
+                },
+                {
+                    "effect": "life_total_change",
+                    "battle_model_scope": "xmage_fixed_controller_gain_life_spell_v1",
+                    "life_gain_amount": 2,
+                },
+            ],
+        },
+    }
+
+    scenario = builder.boost_life_gain_spell_execution_scenario_from_expected_rule(rule)
+
+    assert scenario is not None
+    assert scenario["type"] == "boost_life_gain_spell"
+    assert scenario["expected_power_delta"] == 1
+    assert scenario["expected_toughness_delta"] == 2
+    assert scenario["expected_target_count"] == 2
+    assert scenario["expected_life_gain"] == 2
+    assert scenario["expected_life_after"] == 22
+
+
 def test_manifest_builds_global_boost_draw_spell_execution_scenario() -> None:
     rule = {
         "normalized_name": "hydrolash",

@@ -358,6 +358,7 @@ EXILE_SCRY_SCOPE = "xmage_exile_target_and_scry_spell_v1"
 BOUNCE_SCRY_SCOPE = "xmage_return_target_to_hand_and_scry_spell_v1"
 DAMAGE_DRAW_SCOPE = "xmage_fixed_damage_target_and_draw_card_spell_v1"
 BOOST_DRAW_SCOPE = "xmage_fixed_boost_target_creature_until_eot_draw_card_spell_v1"
+BOOST_LIFE_GAIN_SCOPE = "xmage_fixed_boost_target_creature_until_eot_gain_life_spell_v1"
 BOOST_ALL_DRAW_SCOPE = "xmage_fixed_boost_all_or_opponents_creatures_until_eot_draw_card_spell_v1"
 BOOST_SCRY_SCOPE = "xmage_fixed_boost_target_creature_until_eot_scry_spell_v1"
 KEYWORD_DRAW_SCOPE = "xmage_fixed_keyword_target_creature_until_eot_draw_card_spell_v1"
@@ -9684,6 +9685,50 @@ def fixed_boost_scry_from_source(source: str) -> tuple[int, int, int] | None:
     if boost_match is None or boost_match.start() > scry_match[1]:
         return None
     return boost[0], boost[1], scry_match[0]
+
+
+def fixed_boost_life_gain_from_oracle(metadata: dict[str, Any]) -> dict[str, Any] | None:
+    text = strip_leading_parenthetical_reminders(oracle_text(metadata))
+    text = re.sub(r"\s+", " ", text).strip().lower()
+    match = re.fullmatch(
+        r"(?P<boost>(?:target creature(?: you control)?|"
+        r"(?:(?:up to )?(?:one|two|three|\d+) target creatures(?: you control)? each)) "
+        r"gets? [+-]?\d+/[+-]?\d+ until end of turn)\. "
+        r"you gain (?P<life>\d+) life\.?",
+        text,
+    )
+    if not match:
+        return None
+    boost_text = f"{match.group('boost')}."
+    boost_spec = fixed_boost_target_spec_from_oracle({**metadata, "oracle_text": boost_text})
+    if boost_spec is None:
+        return None
+    life_gain = int(match.group("life"))
+    if life_gain <= 0:
+        return None
+    return {
+        **boost_spec,
+        "life_gain_amount": life_gain,
+        "resolution_order": "boost_then_gain",
+    }
+
+
+def fixed_boost_life_gain_from_source(source: str) -> dict[str, Any] | None:
+    text = source or ""
+    boost_spec = fixed_boost_target_spec_from_source(text)
+    if boost_spec is None:
+        return None
+    life_matches = list(re.finditer(r"new\s+GainLifeEffect\s*\(\s*(\d+)\s*\)", text, re.S))
+    if len(life_matches) != 1:
+        return None
+    boost_match = re.search(r"new\s+BoostTargetEffect\s*\(", text)
+    if boost_match is None or boost_match.start() > life_matches[0].start():
+        return None
+    return {
+        **boost_spec,
+        "life_gain_amount": int(life_matches[0].group(1)),
+        "resolution_order": "boost_then_gain",
+    }
 
 
 def fixed_boost_keyword_target_from_source(
@@ -30059,6 +30104,8 @@ def proposal_notes(row: dict[str, Any], scope: str) -> str:
         scope_kind = "fixed counter-target spell with target-controller life loss"
     elif scope == BOOST_DRAW_SCOPE:
         scope_kind = "fixed target-creature boost plus draw-card spell"
+    elif scope == BOOST_LIFE_GAIN_SCOPE:
+        scope_kind = "fixed target-creature boost plus controller life-gain spell"
     elif scope == BOOST_ALL_DRAW_SCOPE:
         scope_kind = "fixed all/opponents/filtered-creature boost plus draw-card spell"
     elif scope == KEYWORD_DRAW_SCOPE:
@@ -40308,6 +40355,90 @@ def split_row(
             **(additional_cost_fields or {}),
         }
         return build_proposal(row, metadata, effect_json, family_id="xmage_destroy_target_spell"), "selected_exact_scope"
+
+    if unit == LIFE_UNIT and classes == {"BoostTargetEffect", "GainLifeEffect"}:
+        unsupported_abilities = ability_classes(row) - ALLOWED_AUXILIARY_RESOLUTION_ABILITY_CLASSES
+        if unsupported_abilities:
+            return None, "boost_life_gain_ability_class_not_simple"
+        if has_non_neutral_oracle_complexity(metadata):
+            return None, "boost_life_gain_oracle_not_simple"
+        oracle_pair = fixed_boost_life_gain_from_oracle(metadata)
+        if oracle_pair is None:
+            return None, "boost_life_gain_oracle_not_exact_fixed"
+        source_pair = fixed_boost_life_gain_from_source(source_text)
+        if source_pair is None:
+            return None, "boost_life_gain_source_not_fixed"
+        comparable_keys = (
+            "power_delta",
+            "toughness_delta",
+            "target_controller",
+            "target_count_min",
+            "target_count_max",
+            "up_to_count",
+            "life_gain_amount",
+            "resolution_order",
+        )
+        if any(source_pair.get(key) != oracle_pair.get(key) for key in comparable_keys):
+            return None, "boost_life_gain_source_oracle_mismatch"
+        power_delta = int(oracle_pair["power_delta"])
+        toughness_delta = int(oracle_pair["toughness_delta"])
+        life_gain = int(oracle_pair["life_gain_amount"])
+        target_controller = str(oracle_pair.get("target_controller") or "any")
+        target_constraints = dict(oracle_pair.get("target_constraints") or {"card_types": ["creature"]})
+        boost_component = {
+            "effect": "stat_modifier_until_eot",
+            "battle_model_scope": BOOST_TARGET_SCOPE,
+            "target": "creature",
+            "target_constraints": target_constraints,
+            "target_controller": target_controller,
+            "power_delta": power_delta,
+            "toughness_delta": toughness_delta,
+            "power_boost": power_delta,
+            "toughness_boost": toughness_delta,
+            "duration": "until_end_of_turn",
+            "compose_on_resolution": True,
+            "xmage_effect_class": "BoostTargetEffect",
+        }
+        if int(oracle_pair["target_count_max"]) > 1 or bool(oracle_pair["up_to_count"]):
+            boost_component["target_count"] = int(oracle_pair["target_count_max"])
+            boost_component["target_count_min"] = int(oracle_pair["target_count_min"])
+            boost_component["target_count_max"] = int(oracle_pair["target_count_max"])
+            boost_component["up_to_count"] = bool(oracle_pair["up_to_count"])
+        life_component = {
+            "effect": "life_total_change",
+            "battle_model_scope": LIFE_SCOPE,
+            "life_gain_amount": life_gain,
+            "target": "self",
+            "compose_on_resolution": True,
+            "xmage_effect_class": "GainLifeEffect",
+        }
+        effect_json = {
+            "effect": "composite_resolution",
+            "battle_model_scope": BOOST_LIFE_GAIN_SCOPE,
+            "target": "creature",
+            "target_constraints": target_constraints,
+            "target_controller": target_controller,
+            "power_delta": power_delta,
+            "toughness_delta": toughness_delta,
+            "power_boost": power_delta,
+            "toughness_boost": toughness_delta,
+            "life_gain_amount": life_gain,
+            "resolution_order": "boost_then_gain",
+            "_composite_rule_components": [boost_component, life_component],
+            "xmage_effect_classes": ["BoostTargetEffect", "GainLifeEffect"],
+            **flags,
+        }
+        if int(oracle_pair["target_count_max"]) > 1 or bool(oracle_pair["up_to_count"]):
+            effect_json["target_count"] = int(oracle_pair["target_count_max"])
+            effect_json["target_count_min"] = int(oracle_pair["target_count_min"])
+            effect_json["target_count_max"] = int(oracle_pair["target_count_max"])
+            effect_json["up_to_count"] = bool(oracle_pair["up_to_count"])
+        return build_proposal(
+            row,
+            metadata,
+            effect_json,
+            family_id="xmage_fixed_boost_target_gain_life_spell",
+        ), "selected_exact_scope"
 
     if unit == LIFE_UNIT and classes == {"DamageTargetEffect", "GainLifeEffect"}:
         unsupported_abilities = ability_classes(row) - ALLOWED_AUXILIARY_RESOLUTION_ABILITY_CLASSES

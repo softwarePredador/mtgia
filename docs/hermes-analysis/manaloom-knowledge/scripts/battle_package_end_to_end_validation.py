@@ -10088,6 +10088,139 @@ def run_target_keyword_draw_spell(
     }
 
 
+def run_boost_life_gain_spell(
+    battle,
+    scenario: dict[str, Any],
+    events: list[tuple[str, dict[str, Any]]],
+) -> dict[str, Any]:
+    card = dict(scenario["card"])
+    effect = battle.get_card_effect(card)
+    if effect.get("effect") != "composite_resolution":
+        fail("battle_execution", f"{card['name']} effect={effect.get('effect')!r}")
+    active = battle.Player(str(scenario.get("player") or "Spell Controller"), None, [])
+    opponent = battle.Player(str(scenario.get("opponent") or "Opponent"), None, [])
+    active.life = int(scenario.get("starting_life") or 20)
+    raw_targets = list(scenario.get("targets") or [])
+    if not raw_targets:
+        raw_targets = [
+            {
+                "name": "E2E Target Creature",
+                "type_line": "Creature - Soldier",
+                "power": 8 if int(scenario.get("expected_toughness_delta") or effect.get("toughness_delta") or 0) < 0 else 2,
+                "toughness": 8 if int(scenario.get("expected_toughness_delta") or effect.get("toughness_delta") or 0) < 0 else 2,
+            }
+        ]
+    targets = [battle.enrich_card(dict(target)) for target in raw_targets]
+    expected_power_delta = int(scenario.get("expected_power_delta") or effect.get("power_delta") or 0)
+    expected_toughness_delta = int(scenario.get("expected_toughness_delta") or effect.get("toughness_delta") or 0)
+    harmful = expected_power_delta < 0 or expected_toughness_delta < 0
+    if harmful:
+        opponent.battlefield = targets
+        active.battlefield = [
+            battle.enrich_card(
+                {
+                    "name": "E2E Own Creature",
+                    "type_line": "Creature - Soldier",
+                    "power": 2,
+                    "toughness": 2,
+                }
+            )
+        ]
+    else:
+        active.battlefield = targets
+    before_stats = {
+        str(target.get("name") or index): (
+            int(target.get("power") or 0),
+            int(target.get("toughness") or 0),
+        )
+        for index, target in enumerate(targets)
+    }
+    expected_target_count = int(scenario.get("expected_target_count") or effect.get("target_count_max") or effect.get("target_count") or 1)
+    expected_life_gain = int(scenario.get("expected_life_gain") or effect.get("life_gain_amount") or 0)
+    before_events = len(events)
+    battle.apply_effect_immediate(
+        active,
+        [opponent],
+        battle.enrich_card({**card, **effect}),
+        turn=int(scenario.get("turn") or 7),
+        rng=random.Random(int(scenario.get("seed") or 6075)),
+        effect_data_override=effect,
+        phase=str(scenario.get("phase") or "precombat_main"),
+    )
+    affected = []
+    for target in targets:
+        target_name = str(target.get("name") or "")
+        before_power, before_toughness = before_stats[target_name]
+        expected_power = before_power + expected_power_delta
+        expected_toughness = before_toughness + expected_toughness_delta
+        if int(target.get("power") or 0) == expected_power and int(target.get("toughness") or 0) == expected_toughness:
+            affected.append(target)
+    if len(affected) != expected_target_count:
+        fail(
+            "battle_execution",
+            f"{card['name']} affected_targets={len(affected)}, expected {expected_target_count}",
+        )
+    expected_life_after = int(scenario.get("expected_life_after") or (int(scenario.get("starting_life") or 20) + expected_life_gain))
+    if active.life != expected_life_after:
+        fail("battle_execution", f"{card['name']} life={active.life}, expected {expected_life_after}")
+    stat_event = next(
+        (
+            data
+            for event, data in events[before_events:]
+            if event == "stat_modifier_until_eot_resolved"
+            and data.get("card") == card.get("name")
+            and (
+                int(data.get("target_count") or 0) == expected_target_count
+                or data.get("target") in {target.get("name") for target in affected}
+            )
+        ),
+        None,
+    )
+    if stat_event is None:
+        fail("battle_events", f"missing {card['name']} stat modifier resolved event")
+    life_event = next(
+        (
+            data
+            for event, data in events[before_events:]
+            if event == "life_total_changed"
+            and data.get("card") == card.get("name")
+            and int(data.get("life_gained") or data.get("requested_delta") or 0) == expected_life_gain
+            and int(data.get("life_after") or 0) == expected_life_after
+        ),
+        None,
+    )
+    if life_event is None:
+        fail("battle_events", f"missing {card['name']} life_total_changed event")
+    composite_event = next(
+        (
+            data
+            for event, data in events[before_events:]
+            if event == "composite_rule_resolved"
+            and data.get("card") == card.get("name")
+            and int(data.get("components_applied") or 0) == 2
+            and int(data.get("components_skipped") or 0) == 0
+        ),
+        None,
+    )
+    if composite_event is None:
+        fail("battle_events", f"missing {card['name']} composite_rule_resolved event")
+    return {
+        "scenario": scenario.get("name"),
+        "card_name": card["name"],
+        "target_count": len(affected),
+        "life_after": active.life,
+        "life_gained": expected_life_gain,
+        "targets": [
+            {
+                "name": target.get("name"),
+                "power": int(target.get("power") or 0),
+                "toughness": int(target.get("toughness") or 0),
+            }
+            for target in affected
+        ],
+    }
+
+
 def run_boost_scry_spell(
     battle,
     scenario: dict[str, Any],
@@ -13925,6 +14058,7 @@ SCENARIO_RUNNERS = {
     "target_player_draw_spell": run_target_player_draw_spell,
     "look_at_hand_draw_spell": run_look_at_hand_draw_spell,
     "target_keyword_draw_spell": run_target_keyword_draw_spell,
+    "boost_life_gain_spell": run_boost_life_gain_spell,
     "simple_activated_add_counters_target": run_simple_activated_add_counters_target,
     "simple_activated_add_counters_self": run_simple_activated_add_counters_self,
     "simple_activated_bounce": run_simple_activated_bounce,

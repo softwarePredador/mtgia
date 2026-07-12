@@ -67326,7 +67326,7 @@ def resolve_composite_resolution_effect(player, opponents, card, effect_data, tu
         elif component_effect == "stat_modifier_until_eot":
             component_payload = dict(component)
             component_payload["_composite_component_index"] = index
-            target = resolve_stat_modifier_until_eot_spell(
+            target_result = resolve_stat_modifier_until_eot_spell(
                 player,
                 opponents,
                 card,
@@ -67336,19 +67336,26 @@ def resolve_composite_resolution_effect(player, opponents, card, effect_data, tu
             )
             power_delta = int(component.get("power_delta") or component.get("power_boost") or 0)
             toughness_delta = int(component.get("toughness_delta") or component.get("toughness_boost") or 0)
-            if target is None:
+            targets = (
+                [target for target in target_result if isinstance(target, dict)]
+                if isinstance(target_result, list)
+                else ([target_result] if isinstance(target_result, dict) else [])
+            )
+            if not targets:
                 outcome = "no_legal_target"
                 skipped.append({"effect": component_effect, "reason": outcome})
             else:
                 outcome = "stat_modifier_until_eot_applied"
-                applied.append(
-                    {
-                        "effect": component_effect,
-                        "target": target.get("name", "?"),
-                        "power_delta": power_delta,
-                        "toughness_delta": toughness_delta,
-                    }
-                )
+                summary = {
+                    "effect": component_effect,
+                    "target_count": len(targets),
+                    "targets": [target.get("name", "?") for target in targets],
+                    "power_delta": power_delta,
+                    "toughness_delta": toughness_delta,
+                }
+                if len(targets) == 1:
+                    summary["target"] = targets[0].get("name", "?")
+                applied.append(summary)
         elif component_effect == "stat_modifier_until_eot_untap_target":
             component_payload = dict(component)
             component_payload["_composite_component_index"] = index

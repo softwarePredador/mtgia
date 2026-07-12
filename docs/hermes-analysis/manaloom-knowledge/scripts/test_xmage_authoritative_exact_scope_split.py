@@ -93,6 +93,90 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
 
         self.assertFalse(split.is_creature_etb_life_gain_draw_unit(row))
 
+    def test_fixed_boost_life_gain_spell_maps_to_composite_runtime_scope(self) -> None:
+        row = queue_row(
+            split.LIFE_UNIT,
+            effect_classes=["BoostTargetEffect", "GainLifeEffect"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Moment of Craving",
+                oracle_text="Target creature gets -2/-2 until end of turn. You gain 2 life.",
+            ),
+            source_text="""
+                this.getSpellAbility().addEffect(new BoostTargetEffect(-2, -2, Duration.EndOfTurn));
+                this.getSpellAbility().addTarget(new TargetCreaturePermanent());
+                this.getSpellAbility().addEffect(new GainLifeEffect(2));
+            """,
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.BOOST_LIFE_GAIN_SCOPE)
+        self.assertEqual(effect["effect"], "composite_resolution")
+        self.assertEqual(effect["power_delta"], -2)
+        self.assertEqual(effect["toughness_delta"], -2)
+        self.assertEqual(effect["life_gain_amount"], 2)
+        self.assertEqual(effect["resolution_order"], "boost_then_gain")
+        self.assertEqual(
+            [component["effect"] for component in effect["_composite_rule_components"]],
+            ["stat_modifier_until_eot", "life_total_change"],
+        )
+
+    def test_fixed_multi_target_boost_life_gain_spell_preserves_target_count(self) -> None:
+        row = queue_row(
+            split.LIFE_UNIT,
+            effect_classes=["BoostTargetEffect", "GainLifeEffect"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Tandem Tactics",
+                oracle_text="Up to two target creatures each get +1/+2 until end of turn. You gain 2 life.",
+            ),
+            source_text="""
+                Effect effect = new BoostTargetEffect(1, 2, Duration.EndOfTurn);
+                this.getSpellAbility().addEffect(effect);
+                this.getSpellAbility().addTarget(new TargetCreaturePermanent(0, 2));
+                this.getSpellAbility().addEffect(new GainLifeEffect(2));
+            """,
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.BOOST_LIFE_GAIN_SCOPE)
+        self.assertEqual(effect["target_count_min"], 0)
+        self.assertEqual(effect["target_count_max"], 2)
+        self.assertTrue(effect["up_to_count"])
+        boost_component = effect["_composite_rule_components"][0]
+        self.assertEqual(boost_component["target_count_min"], 0)
+        self.assertEqual(boost_component["target_count_max"], 2)
+
+    def test_dynamic_boost_life_gain_spell_stays_blocked(self) -> None:
+        row = queue_row(
+            split.LIFE_UNIT,
+            effect_classes=["BoostTargetEffect", "GainLifeEffect"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Battle at the Bridge",
+                oracle_text=(
+                    "Improvise\nTarget creature gets -X/-X until end of turn. You gain X life."
+                ),
+            ),
+            source_text="""
+                DynamicValue xValue = GetXValue.instance;
+                this.getSpellAbility().addEffect(new BoostTargetEffect(xValue, xValue, Duration.EndOfTurn));
+                this.getSpellAbility().addEffect(new GainLifeEffect(GetXValue.instance));
+                this.getSpellAbility().addTarget(new TargetCreaturePermanent());
+            """,
+        )
+
+        self.assertIsNone(proposal)
+        self.assertEqual(reason, "boost_life_gain_oracle_not_exact_fixed")
+
     def test_cycling_only_creature_maps_to_runtime_hand_cycling_scope(self) -> None:
         row = queue_row(
             "xmage_signature::no_effect_class::CyclingAbility::"
