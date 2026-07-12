@@ -10163,6 +10163,135 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertTrue(effect["activation_requires_tap"])
         self.assertFalse(effect["activation_requires_sacrifice"])
 
+    def test_permanent_conditional_activated_draw_maps_hellbent(self) -> None:
+        row = queue_row(
+            split.DRAW_ENGINE_UNIT,
+            effect_classes=["DrawCardSourceControllerEffect"],
+            ability_kind="activated",
+            ability_classes=["ActivateIfConditionActivatedAbility"],
+            xmage_signals=["draw", "condition", "activated_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Fool's Tome",
+                type_line="Artifact",
+                oracle_text="{2}, {T}: Draw a card. Activate this ability only if you have no cards in hand.",
+            ),
+            source_text="""
+                Ability ability = new ActivateIfConditionActivatedAbility(
+                    new DrawCardSourceControllerEffect(1), new GenericManaCost(2), HellbentCondition.instance
+                );
+                ability.addCost(new TapSourceCost());
+                this.addAbility(ability);
+            """,
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.PERMANENT_ACTIVATED_DRAW_SCOPE)
+        self.assertEqual(effect["activation_condition_status"], "runtime_executor_v1")
+        self.assertEqual(effect["activation_condition"], "controller_has_no_cards_in_hand")
+        self.assertEqual(effect["activation_cost_mana"], "{2}")
+        self.assertTrue(effect["activation_requires_tap"])
+
+    def test_permanent_conditional_activated_draw_maps_lands_same_name(self) -> None:
+        row = queue_row(
+            split.DRAW_ENGINE_UNIT,
+            effect_classes=["DrawCardSourceControllerEffect"],
+            ability_kind="activated",
+            ability_classes=["ActivateIfConditionActivatedAbility"],
+            xmage_signals=["draw", "condition", "activated_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Endless Atlas",
+                type_line="Artifact",
+                oracle_text="{2}, {T}: Draw a card. Activate this ability only if you control three or more lands with the same name.",
+            ),
+            source_text="""
+                Ability ability = new ActivateIfConditionActivatedAbility(
+                    new DrawCardSourceControllerEffect(1),
+                    new GenericManaCost(2), EndlessAtlasCondition.instance
+                );
+                ability.addCost(new TapSourceCost());
+                enum EndlessAtlasCondition implements Condition {
+                    instance;
+                    public String toString() {
+                        return "you control three or more lands with the same name";
+                    }
+                }
+            """,
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["activation_condition"], "controller_controls_lands_same_name_gte")
+        self.assertEqual(effect["activation_condition_land_same_name_threshold"], 3)
+
+    def test_permanent_conditional_activated_draw_maps_falkenrath_pit_fighter(self) -> None:
+        row = queue_row(
+            split.DRAW_ENGINE_UNIT,
+            effect_classes=["DrawCardSourceControllerEffect"],
+            ability_kind="activated",
+            ability_classes=["ActivateIfConditionActivatedAbility"],
+            xmage_signals=["draw", "condition", "activated_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Falkenrath Pit Fighter",
+                type_line="Creature - Vampire Warrior",
+                oracle_text="{1}{R}, Discard a card, Sacrifice a Vampire: Draw two cards. Activate only if an opponent lost life this turn.",
+            ),
+            source_text="""
+                private static final FilterControlledPermanent filter = new FilterControlledPermanent(SubType.VAMPIRE, "Vampire");
+                Ability ability = new ActivateIfConditionActivatedAbility(
+                    new DrawCardSourceControllerEffect(2),
+                    new ManaCostsImpl<>("{1}{R}"), OpponentsLostLifeCondition.instance
+                );
+                ability.addCost(new DiscardCardCost());
+                ability.addCost(new SacrificeTargetCost(filter));
+                this.addAbility(ability);
+            """,
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["activated_draw_count"], 2)
+        self.assertEqual(effect["activation_condition"], "opponent_lost_life_this_turn")
+        self.assertEqual(effect["activation_sacrifice_target"], "vampire")
+        self.assertEqual(effect["activation_discard_count"], 1)
+
+    def test_permanent_conditional_activated_draw_blocks_unsupported_discarded_this_turn(self) -> None:
+        row = queue_row(
+            split.DRAW_ENGINE_UNIT,
+            effect_classes=["DrawCardSourceControllerEffect"],
+            ability_kind="activated",
+            ability_classes=["ActivateIfConditionActivatedAbility"],
+            xmage_signals=["draw", "condition", "activated_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Gilt-Blade Prowler",
+                type_line="Creature - Human Rogue",
+                oracle_text="{1}, {T}, Pay 1 life: Draw a card. Activate only if you've discarded a card this turn.",
+            ),
+            source_text="""
+                Ability ability = new ActivateIfConditionActivatedAbility(
+                    new DrawCardSourceControllerEffect(1), new GenericManaCost(1),
+                    ControllerDiscardedThisTurnCondition.instance
+                );
+                ability.addCost(new TapSourceCost());
+                ability.addCost(new PayLifeCost(1));
+            """,
+        )
+
+        self.assertIsNone(proposal)
+        self.assertEqual(reason, "activated_draw_oracle_condition_not_supported")
+
     def test_permanent_activated_draw_maps_self_sacrifice_cost(self) -> None:
         row = queue_row(
             split.DRAW_ENGINE_UNIT,

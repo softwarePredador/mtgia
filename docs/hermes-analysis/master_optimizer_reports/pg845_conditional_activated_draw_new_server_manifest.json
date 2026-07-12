@@ -1,0 +1,716 @@
+{
+  "apply_gate": "Do not run apply SQL without explicit approval for the exact command.",
+  "backup_table": "manaloom_deploy_audit.pg845_conditional_activated_draw_new_ser_20260712_211331",
+  "deploy_id": "PG845",
+  "execution_scenarios": [
+    {
+      "activation_condition": "controller_controls_lands_same_name_gte",
+      "card": {
+        "name": "Endless Atlas"
+      },
+      "controller_battlefield": [
+        {
+          "cmc": 0,
+          "effect": "land",
+          "name": "E2E Shared Plains",
+          "type_line": "Basic Land - Plains"
+        },
+        {
+          "cmc": 0,
+          "effect": "land",
+          "name": "E2E Shared Plains",
+          "type_line": "Basic Land - Plains"
+        },
+        {
+          "cmc": 0,
+          "effect": "land",
+          "name": "E2E Shared Plains",
+          "type_line": "Basic Land - Plains"
+        }
+      ],
+      "controller_hand": [],
+      "controller_library": [
+        {
+          "cmc": 2,
+          "effect": "draw_cards",
+          "name": "E2E Activated Draw Card A",
+          "type_line": "Sorcery"
+        },
+        {
+          "cmc": 1,
+          "effect": "direct_damage",
+          "name": "E2E Activated Draw Card B",
+          "type_line": "Instant"
+        },
+        {
+          "cmc": 3,
+          "effect": "creature",
+          "name": "E2E Activated Draw Card C",
+          "type_line": "Creature - Fixture"
+        },
+        {
+          "cmc": 2,
+          "effect": "artifact",
+          "name": "E2E Activated Draw Card D",
+          "type_line": "Artifact"
+        }
+      ],
+      "controller_mana": {
+        "black": 0,
+        "blue": 0,
+        "generic": 2,
+        "green": 0,
+        "red": 0,
+        "white": 0
+      },
+      "expected_discard_count": 0,
+      "expected_discard_target": "any_card",
+      "expected_draw_count": 1,
+      "expected_life_paid": 0,
+      "expected_tapped_source": true,
+      "logical_rule_key": "battle_rule_v1:2d9432282c7d81378eaa782c1af6f921",
+      "name": "Endless Atlas activates draw ability",
+      "type": "simple_activated_draw"
+    },
+    {
+      "activation_condition": "opponent_lost_life_this_turn",
+      "card": {
+        "name": "Falkenrath Pit Fighter"
+      },
+      "controller_hand": [
+        {
+          "cmc": 2,
+          "effect": "draw_cards",
+          "name": "E2E Spare Draw Cost Card",
+          "type_line": "Sorcery"
+        },
+        {
+          "cmc": 1,
+          "effect": "direct_damage",
+          "name": "E2E Backup Draw Cost Card",
+          "type_line": "Instant"
+        }
+      ],
+      "controller_library": [
+        {
+          "cmc": 2,
+          "effect": "draw_cards",
+          "name": "E2E Activated Draw Card A",
+          "type_line": "Sorcery"
+        },
+        {
+          "cmc": 1,
+          "effect": "direct_damage",
+          "name": "E2E Activated Draw Card B",
+          "type_line": "Instant"
+        },
+        {
+          "cmc": 3,
+          "effect": "creature",
+          "name": "E2E Activated Draw Card C",
+          "type_line": "Creature - Fixture"
+        },
+        {
+          "cmc": 2,
+          "effect": "artifact",
+          "name": "E2E Activated Draw Card D",
+          "type_line": "Artifact"
+        }
+      ],
+      "controller_mana": {
+        "black": 0,
+        "blue": 0,
+        "generic": 1,
+        "green": 0,
+        "red": 1,
+        "white": 0
+      },
+      "expect_target_sacrificed": true,
+      "expected_discard_count": 1,
+      "expected_discard_target": "any_card",
+      "expected_draw_count": 2,
+      "expected_life_paid": 0,
+      "expected_tapped_source": false,
+      "logical_rule_key": "battle_rule_v1:1135af3cd6d0b977ac182845987336f2",
+      "name": "Falkenrath Pit Fighter activates draw ability",
+      "opponent_life_lost_this_turn": 1,
+      "sacrifice_target": {
+        "cmc": 3,
+        "effect": "creature",
+        "name": "E2E Activated Draw Sacrifice Target",
+        "power": 2,
+        "subtypes": [
+          "vampire"
+        ],
+        "toughness": 2,
+        "type_line": "Creature - Vampire"
+      },
+      "type": "simple_activated_draw"
+    },
+    {
+      "activation_condition": "controller_has_no_cards_in_hand",
+      "card": {
+        "name": "Fool's Tome"
+      },
+      "controller_hand": [],
+      "controller_library": [
+        {
+          "cmc": 2,
+          "effect": "draw_cards",
+          "name": "E2E Activated Draw Card A",
+          "type_line": "Sorcery"
+        },
+        {
+          "cmc": 1,
+          "effect": "direct_damage",
+          "name": "E2E Activated Draw Card B",
+          "type_line": "Instant"
+        },
+        {
+          "cmc": 3,
+          "effect": "creature",
+          "name": "E2E Activated Draw Card C",
+          "type_line": "Creature - Fixture"
+        },
+        {
+          "cmc": 2,
+          "effect": "artifact",
+          "name": "E2E Activated Draw Card D",
+          "type_line": "Artifact"
+        }
+      ],
+      "controller_mana": {
+        "black": 0,
+        "blue": 0,
+        "generic": 2,
+        "green": 0,
+        "red": 0,
+        "white": 0
+      },
+      "expected_discard_count": 0,
+      "expected_discard_target": "any_card",
+      "expected_draw_count": 1,
+      "expected_life_paid": 0,
+      "expected_tapped_source": true,
+      "logical_rule_key": "battle_rule_v1:6c94429f211d447502f9c06ee33ef01e",
+      "name": "Fool's Tome activates draw ability",
+      "type": "simple_activated_draw"
+    },
+    {
+      "activation_condition": "controller_has_no_cards_in_hand",
+      "card": {
+        "name": "Ragamuffyn"
+      },
+      "controller_hand": [],
+      "controller_library": [
+        {
+          "cmc": 2,
+          "effect": "draw_cards",
+          "name": "E2E Activated Draw Card A",
+          "type_line": "Sorcery"
+        },
+        {
+          "cmc": 1,
+          "effect": "direct_damage",
+          "name": "E2E Activated Draw Card B",
+          "type_line": "Instant"
+        },
+        {
+          "cmc": 3,
+          "effect": "creature",
+          "name": "E2E Activated Draw Card C",
+          "type_line": "Creature - Fixture"
+        },
+        {
+          "cmc": 2,
+          "effect": "artifact",
+          "name": "E2E Activated Draw Card D",
+          "type_line": "Artifact"
+        }
+      ],
+      "controller_mana": {
+        "black": 0,
+        "blue": 0,
+        "generic": 0,
+        "green": 0,
+        "red": 0,
+        "white": 0
+      },
+      "expect_target_sacrificed": true,
+      "expected_discard_count": 0,
+      "expected_discard_target": "any_card",
+      "expected_draw_count": 1,
+      "expected_life_paid": 0,
+      "expected_tapped_source": true,
+      "logical_rule_key": "battle_rule_v1:8c887ae0a132334d87aac47b41d82096",
+      "name": "Ragamuffyn activates draw ability",
+      "sacrifice_target": {
+        "cmc": 3,
+        "effect": "creature",
+        "name": "E2E Activated Draw Sacrifice Target",
+        "power": 2,
+        "toughness": 2,
+        "type_line": "Creature - Soldier"
+      },
+      "type": "simple_activated_draw"
+    },
+    {
+      "activation_condition": "controller_cast_noncreature_spell_this_turn",
+      "card": {
+        "name": "Tapestry of the Ages"
+      },
+      "controller_hand": [],
+      "controller_library": [
+        {
+          "cmc": 2,
+          "effect": "draw_cards",
+          "name": "E2E Activated Draw Card A",
+          "type_line": "Sorcery"
+        },
+        {
+          "cmc": 1,
+          "effect": "direct_damage",
+          "name": "E2E Activated Draw Card B",
+          "type_line": "Instant"
+        },
+        {
+          "cmc": 3,
+          "effect": "creature",
+          "name": "E2E Activated Draw Card C",
+          "type_line": "Creature - Fixture"
+        },
+        {
+          "cmc": 2,
+          "effect": "artifact",
+          "name": "E2E Activated Draw Card D",
+          "type_line": "Artifact"
+        }
+      ],
+      "controller_mana": {
+        "black": 0,
+        "blue": 0,
+        "generic": 2,
+        "green": 0,
+        "red": 0,
+        "white": 0
+      },
+      "controller_noncreature_spells_cast_this_turn": 1,
+      "expected_discard_count": 0,
+      "expected_discard_target": "any_card",
+      "expected_draw_count": 1,
+      "expected_life_paid": 0,
+      "expected_tapped_source": true,
+      "logical_rule_key": "battle_rule_v1:e2fe8511410d4efad46dbd7288431d17",
+      "name": "Tapestry of the Ages activates draw ability",
+      "type": "simple_activated_draw"
+    }
+  ],
+  "expected_rules": [
+    {
+      "card_name": "Endless Atlas",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:2d9432282c7d81378eaa782c1af6f921",
+      "min_rule_version": 2,
+      "normalized_name": "endless atlas",
+      "oracle_hash": "db628c828e9ac8519d479ef2f8ef58fd",
+      "required_effect_fields": {
+        "ability_kind": "activated",
+        "activated_draw": true,
+        "activated_draw_count": 1,
+        "activated_effect": "draw_cards",
+        "activation_condition": "controller_controls_lands_same_name_gte",
+        "activation_condition_land_same_name_threshold": 3,
+        "activation_condition_status": "runtime_executor_v1",
+        "activation_cost_colors": [],
+        "activation_cost_generic": 2,
+        "activation_cost_mana": "{2}",
+        "activation_requires_sacrifice": false,
+        "activation_requires_tap": true,
+        "battle_model_scope": "xmage_permanent_simple_activated_draw_v1",
+        "count": 1,
+        "effect": "draw_engine",
+        "permanent_type": "artifact",
+        "xmage_ability_class": "SimpleActivatedAbility",
+        "xmage_effect_class": "DrawCardSourceControllerEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Falkenrath Pit Fighter",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:1135af3cd6d0b977ac182845987336f2",
+      "min_rule_version": 2,
+      "normalized_name": "falkenrath pit fighter",
+      "oracle_hash": "47c0bbc6b3de23331823224dd0d3868c",
+      "required_effect_fields": {
+        "ability_kind": "activated",
+        "activated_draw": true,
+        "activated_draw_count": 2,
+        "activated_effect": "draw_cards",
+        "activation_condition": "opponent_lost_life_this_turn",
+        "activation_condition_opponent_life_lost_threshold": 1,
+        "activation_condition_status": "runtime_executor_v1",
+        "activation_cost_colors": [
+          "R"
+        ],
+        "activation_cost_generic": 1,
+        "activation_cost_mana": "{1}{R}",
+        "activation_discard_count": 1,
+        "activation_discard_target": "any_card",
+        "activation_requires_discard_card": true,
+        "activation_requires_sacrifice": false,
+        "activation_requires_sacrifice_target": true,
+        "activation_requires_tap": false,
+        "activation_sacrifice_target": "vampire",
+        "battle_model_scope": "xmage_permanent_simple_activated_draw_v1",
+        "count": 2,
+        "effect": "draw_engine",
+        "permanent_type": "creature",
+        "xmage_ability_class": "SimpleActivatedAbility",
+        "xmage_effect_class": "DrawCardSourceControllerEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Fool's Tome",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:6c94429f211d447502f9c06ee33ef01e",
+      "min_rule_version": 2,
+      "normalized_name": "fool's tome",
+      "oracle_hash": "49e29b58d3c5ddd4db576ed76e322551",
+      "required_effect_fields": {
+        "ability_kind": "activated",
+        "activated_draw": true,
+        "activated_draw_count": 1,
+        "activated_effect": "draw_cards",
+        "activation_condition": "controller_has_no_cards_in_hand",
+        "activation_condition_status": "runtime_executor_v1",
+        "activation_cost_colors": [],
+        "activation_cost_generic": 2,
+        "activation_cost_mana": "{2}",
+        "activation_requires_sacrifice": false,
+        "activation_requires_tap": true,
+        "battle_model_scope": "xmage_permanent_simple_activated_draw_v1",
+        "count": 1,
+        "effect": "draw_engine",
+        "permanent_type": "artifact",
+        "xmage_ability_class": "SimpleActivatedAbility",
+        "xmage_effect_class": "DrawCardSourceControllerEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Ragamuffyn",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:8c887ae0a132334d87aac47b41d82096",
+      "min_rule_version": 2,
+      "normalized_name": "ragamuffyn",
+      "oracle_hash": "d220bbe646cf679b6f263262bcd81eed",
+      "required_effect_fields": {
+        "ability_kind": "activated",
+        "activated_draw": true,
+        "activated_draw_count": 1,
+        "activated_effect": "draw_cards",
+        "activation_condition": "controller_has_no_cards_in_hand",
+        "activation_condition_status": "runtime_executor_v1",
+        "activation_cost_colors": [],
+        "activation_cost_generic": 0,
+        "activation_cost_mana": "{0}",
+        "activation_requires_sacrifice": false,
+        "activation_requires_sacrifice_target": true,
+        "activation_requires_tap": true,
+        "activation_sacrifice_target": "creature_or_land",
+        "battle_model_scope": "xmage_permanent_simple_activated_draw_v1",
+        "count": 1,
+        "effect": "draw_engine",
+        "permanent_type": "creature",
+        "xmage_ability_class": "SimpleActivatedAbility",
+        "xmage_effect_class": "DrawCardSourceControllerEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Tapestry of the Ages",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:e2fe8511410d4efad46dbd7288431d17",
+      "min_rule_version": 2,
+      "normalized_name": "tapestry of the ages",
+      "oracle_hash": "d34211666b040792b018e60faedc4884",
+      "required_effect_fields": {
+        "ability_kind": "activated",
+        "activated_draw": true,
+        "activated_draw_count": 1,
+        "activated_effect": "draw_cards",
+        "activation_condition": "controller_cast_noncreature_spell_this_turn",
+        "activation_condition_spell_count_threshold": 1,
+        "activation_condition_status": "runtime_executor_v1",
+        "activation_cost_colors": [],
+        "activation_cost_generic": 2,
+        "activation_cost_mana": "{2}",
+        "activation_requires_sacrifice": false,
+        "activation_requires_tap": true,
+        "battle_model_scope": "xmage_permanent_simple_activated_draw_v1",
+        "count": 1,
+        "effect": "draw_engine",
+        "permanent_type": "artifact",
+        "xmage_ability_class": "SimpleActivatedAbility",
+        "xmage_effect_class": "DrawCardSourceControllerEffect"
+      },
+      "review_status": "verified"
+    }
+  ],
+  "family_counts": {
+    "xmage_permanent_simple_activated_draw": 5
+  },
+  "files": {
+    "apply": "docs/hermes-analysis/master_optimizer_reports/pg845_conditional_activated_draw_new_server_apply.sql",
+    "manifest": "docs/hermes-analysis/master_optimizer_reports/pg845_conditional_activated_draw_new_server_manifest.json",
+    "package": "docs/hermes-analysis/master_optimizer_reports/pg845_conditional_activated_draw_new_server_package.md",
+    "postcheck": "docs/hermes-analysis/master_optimizer_reports/pg845_conditional_activated_draw_new_server_postcheck.sql",
+    "precheck": "docs/hermes-analysis/master_optimizer_reports/pg845_conditional_activated_draw_new_server_precheck.sql",
+    "rollback": "docs/hermes-analysis/master_optimizer_reports/pg845_conditional_activated_draw_new_server_rollback.sql"
+  },
+  "generated_at": "2026-07-12T21:13:31+00:00",
+  "mutations_performed": [],
+  "runtime_checks": [
+    {
+      "card": {
+        "name": "Endless Atlas"
+      },
+      "card_name": "Endless Atlas",
+      "effect": "draw_engine",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:2d9432282c7d81378eaa782c1af6f921",
+      "normalized_name": "endless atlas",
+      "required_effect_fields": {
+        "ability_kind": "activated",
+        "activated_draw": true,
+        "activated_draw_count": 1,
+        "activated_effect": "draw_cards",
+        "activation_condition": "controller_controls_lands_same_name_gte",
+        "activation_condition_land_same_name_threshold": 3,
+        "activation_condition_status": "runtime_executor_v1",
+        "activation_cost_colors": [],
+        "activation_cost_generic": 2,
+        "activation_cost_mana": "{2}",
+        "activation_requires_sacrifice": false,
+        "activation_requires_tap": true,
+        "battle_model_scope": "xmage_permanent_simple_activated_draw_v1",
+        "count": 1,
+        "effect": "draw_engine",
+        "permanent_type": "artifact",
+        "xmage_ability_class": "SimpleActivatedAbility",
+        "xmage_effect_class": "DrawCardSourceControllerEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Falkenrath Pit Fighter"
+      },
+      "card_name": "Falkenrath Pit Fighter",
+      "effect": "draw_engine",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:1135af3cd6d0b977ac182845987336f2",
+      "normalized_name": "falkenrath pit fighter",
+      "required_effect_fields": {
+        "ability_kind": "activated",
+        "activated_draw": true,
+        "activated_draw_count": 2,
+        "activated_effect": "draw_cards",
+        "activation_condition": "opponent_lost_life_this_turn",
+        "activation_condition_opponent_life_lost_threshold": 1,
+        "activation_condition_status": "runtime_executor_v1",
+        "activation_cost_colors": [
+          "R"
+        ],
+        "activation_cost_generic": 1,
+        "activation_cost_mana": "{1}{R}",
+        "activation_discard_count": 1,
+        "activation_discard_target": "any_card",
+        "activation_requires_discard_card": true,
+        "activation_requires_sacrifice": false,
+        "activation_requires_sacrifice_target": true,
+        "activation_requires_tap": false,
+        "activation_sacrifice_target": "vampire",
+        "battle_model_scope": "xmage_permanent_simple_activated_draw_v1",
+        "count": 2,
+        "effect": "draw_engine",
+        "permanent_type": "creature",
+        "xmage_ability_class": "SimpleActivatedAbility",
+        "xmage_effect_class": "DrawCardSourceControllerEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Fool's Tome"
+      },
+      "card_name": "Fool's Tome",
+      "effect": "draw_engine",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:6c94429f211d447502f9c06ee33ef01e",
+      "normalized_name": "fool's tome",
+      "required_effect_fields": {
+        "ability_kind": "activated",
+        "activated_draw": true,
+        "activated_draw_count": 1,
+        "activated_effect": "draw_cards",
+        "activation_condition": "controller_has_no_cards_in_hand",
+        "activation_condition_status": "runtime_executor_v1",
+        "activation_cost_colors": [],
+        "activation_cost_generic": 2,
+        "activation_cost_mana": "{2}",
+        "activation_requires_sacrifice": false,
+        "activation_requires_tap": true,
+        "battle_model_scope": "xmage_permanent_simple_activated_draw_v1",
+        "count": 1,
+        "effect": "draw_engine",
+        "permanent_type": "artifact",
+        "xmage_ability_class": "SimpleActivatedAbility",
+        "xmage_effect_class": "DrawCardSourceControllerEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Ragamuffyn"
+      },
+      "card_name": "Ragamuffyn",
+      "effect": "draw_engine",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:8c887ae0a132334d87aac47b41d82096",
+      "normalized_name": "ragamuffyn",
+      "required_effect_fields": {
+        "ability_kind": "activated",
+        "activated_draw": true,
+        "activated_draw_count": 1,
+        "activated_effect": "draw_cards",
+        "activation_condition": "controller_has_no_cards_in_hand",
+        "activation_condition_status": "runtime_executor_v1",
+        "activation_cost_colors": [],
+        "activation_cost_generic": 0,
+        "activation_cost_mana": "{0}",
+        "activation_requires_sacrifice": false,
+        "activation_requires_sacrifice_target": true,
+        "activation_requires_tap": true,
+        "activation_sacrifice_target": "creature_or_land",
+        "battle_model_scope": "xmage_permanent_simple_activated_draw_v1",
+        "count": 1,
+        "effect": "draw_engine",
+        "permanent_type": "creature",
+        "xmage_ability_class": "SimpleActivatedAbility",
+        "xmage_effect_class": "DrawCardSourceControllerEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Tapestry of the Ages"
+      },
+      "card_name": "Tapestry of the Ages",
+      "effect": "draw_engine",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:e2fe8511410d4efad46dbd7288431d17",
+      "normalized_name": "tapestry of the ages",
+      "required_effect_fields": {
+        "ability_kind": "activated",
+        "activated_draw": true,
+        "activated_draw_count": 1,
+        "activated_effect": "draw_cards",
+        "activation_condition": "controller_cast_noncreature_spell_this_turn",
+        "activation_condition_spell_count_threshold": 1,
+        "activation_condition_status": "runtime_executor_v1",
+        "activation_cost_colors": [],
+        "activation_cost_generic": 2,
+        "activation_cost_mana": "{2}",
+        "activation_requires_sacrifice": false,
+        "activation_requires_tap": true,
+        "battle_model_scope": "xmage_permanent_simple_activated_draw_v1",
+        "count": 1,
+        "effect": "draw_engine",
+        "permanent_type": "artifact",
+        "xmage_ability_class": "SimpleActivatedAbility",
+        "xmage_effect_class": "DrawCardSourceControllerEffect"
+      }
+    }
+  ],
+  "selected_card_names": [
+    "Endless Atlas",
+    "Falkenrath Pit Fighter",
+    "Fool's Tome",
+    "Ragamuffyn",
+    "Tapestry of the Ages"
+  ],
+  "selected_count": 5,
+  "slug": "conditional_activated_draw_new_server",
+  "snapshot_checks": [
+    {
+      "card_name": "Endless Atlas",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:2d9432282c7d81378eaa782c1af6f921",
+      "min_rule_version": 2,
+      "normalized_name": "endless atlas",
+      "oracle_hash": "db628c828e9ac8519d479ef2f8ef58fd",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_permanent_simple_activated_draw_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Falkenrath Pit Fighter",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:1135af3cd6d0b977ac182845987336f2",
+      "min_rule_version": 2,
+      "normalized_name": "falkenrath pit fighter",
+      "oracle_hash": "47c0bbc6b3de23331823224dd0d3868c",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_permanent_simple_activated_draw_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Fool's Tome",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:6c94429f211d447502f9c06ee33ef01e",
+      "min_rule_version": 2,
+      "normalized_name": "fool's tome",
+      "oracle_hash": "49e29b58d3c5ddd4db576ed76e322551",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_permanent_simple_activated_draw_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Ragamuffyn",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:8c887ae0a132334d87aac47b41d82096",
+      "min_rule_version": 2,
+      "normalized_name": "ragamuffyn",
+      "oracle_hash": "d220bbe646cf679b6f263262bcd81eed",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_permanent_simple_activated_draw_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Tapestry of the Ages",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:e2fe8511410d4efad46dbd7288431d17",
+      "min_rule_version": 2,
+      "normalized_name": "tapestry of the ages",
+      "oracle_hash": "d34211666b040792b018e60faedc4884",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_permanent_simple_activated_draw_v1"
+      },
+      "review_status": "verified"
+    }
+  ],
+  "status": "prepared_read_only_pending_apply_approval"
+}

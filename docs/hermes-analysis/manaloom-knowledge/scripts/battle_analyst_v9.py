@@ -23849,6 +23849,8 @@ def activation_sacrifice_target_matches(permanent, target_type):
         return is_effective_land(permanent) and _permanent_has_subtype(permanent, "forest")
     if target == "goblin":
         return is_battlefield_creature(permanent) and _permanent_has_subtype(permanent, "goblin")
+    if target == "vampire":
+        return is_battlefield_creature(permanent) and _permanent_has_subtype(permanent, "vampire")
     if target == "mountain":
         return is_effective_land(permanent) and _permanent_has_subtype(permanent, "mountain")
     if target == "beast":
@@ -23904,6 +23906,66 @@ def choose_activation_sacrifice_target(player, source, target_type):
         )
     )
     return candidates[0] if candidates else None, candidates
+
+
+def activated_draw_phase_allowed(permanent, phase):
+    condition = str(permanent.get("activation_condition") or "").strip().lower()
+    if condition == "controller_turn_before_attackers_declared":
+        return phase == "precombat_main", "not_before_attackers_declared"
+    return phase == "postcombat_main", "not_postcombat_main"
+
+
+def activated_draw_condition_satisfied(player, opponents, permanent, turn, phase):
+    status = str(permanent.get("activation_condition_status") or "").strip().lower()
+    condition = str(permanent.get("activation_condition") or "").strip().lower()
+    if not condition and not status:
+        return True, {}
+    if status not in {"runtime_executor_v1", "runtime_executor", "executable", "auto"}:
+        return False, {"unsupported_activation_condition_status": status or None}
+    if condition == "controller_has_no_cards_in_hand":
+        hand_size = len(getattr(player, "hand", []) or [])
+        return hand_size == 0, {"controller_hand_size": hand_size}
+    if condition == "controller_controls_lands_same_name_gte":
+        threshold = int(permanent.get("activation_condition_land_same_name_threshold") or 3)
+        counts = {}
+        for candidate in getattr(player, "battlefield", []) or []:
+            if isinstance(candidate, dict) and is_effective_land(candidate):
+                name = normalize_card_name(candidate.get("name", ""))
+                if name:
+                    counts[name] = counts.get(name, 0) + 1
+        max_count = max(counts.values(), default=0)
+        return max_count >= threshold, {
+            "activation_condition_land_same_name_threshold": threshold,
+            "max_controlled_lands_same_name": max_count,
+        }
+    if condition == "controller_cast_noncreature_spell_this_turn":
+        threshold = int(permanent.get("activation_condition_spell_count_threshold") or 1)
+        count = int(getattr(player, "noncreature_spells_cast_this_turn", 0) or 0)
+        return count >= threshold, {
+            "activation_condition_spell_count_threshold": threshold,
+            "controller_noncreature_spells_cast_this_turn": count,
+        }
+    if condition == "opponent_lost_life_this_turn":
+        threshold = int(permanent.get("activation_condition_opponent_life_lost_threshold") or 1)
+        opponent_life_lost = [
+            {
+                "player": getattr(opponent, "name", "Opponent"),
+                "life_lost_this_turn": (
+                    opponent.life_lost_this_turn_count(turn)
+                    if hasattr(opponent, "life_lost_this_turn_count")
+                    else int(getattr(opponent, "life_lost_this_turn", 0) or 0)
+                ),
+            }
+            for opponent in opponents or []
+            if opponent is not None and opponent.is_alive()
+        ]
+        return any(item["life_lost_this_turn"] >= threshold for item in opponent_life_lost), {
+            "activation_condition_opponent_life_lost_threshold": threshold,
+            "opponent_life_lost_this_turn": opponent_life_lost,
+        }
+    if condition == "controller_turn_before_attackers_declared":
+        return phase == "precombat_main", {"activation_phase": phase}
+    return False, {"unsupported_activation_condition": condition or None}
 
 
 def choose_untapped_artifact_for_additional_cost(player, source):
@@ -39920,8 +39982,40 @@ def activate_utility_artifacts(player, opponents, all_players, turn, rng, *, pha
         )
         and not permanent.get("utility_artifact_used_this_turn")
     )
-    if phase == "postcombat_main":
+    if phase in {"precombat_main", "postcombat_main"}:
         for permanent in simple_activated_draw_permanents:
+            phase_ok, phase_reason = activated_draw_phase_allowed(permanent, phase)
+            if not phase_ok:
+                _utility_artifact_skip_event(
+                    player,
+                    permanent,
+                    turn,
+                    phase_reason,
+                    phase=phase,
+                )
+                continue
+            condition_met, condition_details = activated_draw_condition_satisfied(
+                player,
+                opponents,
+                permanent,
+                turn,
+                phase,
+            )
+            if not condition_met:
+                emit_replay_event(
+                    "activated_ability_skipped",
+                    player=player.name,
+                    card=permanent.get("name", "?"),
+                    activation_kind="simple_activated_draw",
+                    effect=permanent.get("effect", "draw_engine"),
+                    reason="activation_condition_not_met",
+                    activation_condition=permanent.get("activation_condition"),
+                    phase=phase,
+                    turn=turn,
+                    **condition_details,
+                    **replay_rule_fields(permanent),
+                )
+                continue
             activation_from_graveyard = (
                 permanent.get("activation_zone") == "graveyard"
                 or bool(permanent.get("activation_requires_exile_source_from_graveyard"))
@@ -40213,6 +40307,7 @@ def activate_utility_artifacts(player, opponents, all_players, turn, rng, *, pha
                     "discard_target": activation_discard_target if activation_discard_count else None,
                     "source_zone": "graveyard" if activation_from_graveyard else "battlefield",
                     "exiled_source_from_graveyard": exiled_source_from_graveyard,
+                    "activation_condition": permanent.get("activation_condition"),
                 },
                 rule_source="simple_activated_draw_permanent_v1",
                 rule_status=permanent.get("_rule_review_status", "active"),
@@ -40293,6 +40388,7 @@ def activate_utility_artifacts(player, opponents, all_players, turn, rng, *, pha
                 exiled_source_from_graveyard=exiled_source_from_graveyard,
                 phase=phase,
                 turn=turn,
+                activation_condition=permanent.get("activation_condition"),
                 **replay_rule_fields(permanent),
             )
             return 1

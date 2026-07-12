@@ -7762,6 +7762,7 @@ def run_simple_activated_draw(
             **dict(scenario.get("source_overrides") or {}),
         }
     )
+    turn = int(scenario.get("turn") or 6151)
     active = battle.Player(str(scenario.get("player") or "Activated Draw Controller"), None, [])
     opponent = battle.Player(str(scenario.get("opponent") or "Activated Draw Opponent"), None, [])
     active.life = int(scenario.get("starting_life") or 40)
@@ -7780,7 +7781,12 @@ def run_simple_activated_draw(
         or effect.get("activation_zone")
         or ("graveyard" if effect.get("activation_requires_exile_source_from_graveyard") else "battlefield")
     ).lower()
-    active.battlefield = [] if source_zone == "graveyard" else [source]
+    controller_battlefield = [
+        battle.enrich_card(dict(item))
+        for item in (scenario.get("controller_battlefield") or [])
+        if isinstance(item, dict)
+    ]
+    active.battlefield = list(controller_battlefield) if source_zone == "graveyard" else [source, *controller_battlefield]
     active.graveyard = [source] if source_zone == "graveyard" else []
     sacrifice_target = None
     if scenario.get("sacrifice_target"):
@@ -7800,6 +7806,12 @@ def run_simple_activated_draw(
     ]
     if counter_cost_targets:
         active.battlefield.extend(counter_cost_targets)
+    noncreature_spells_cast = int(scenario.get("controller_noncreature_spells_cast_this_turn") or 0)
+    for _ in range(noncreature_spells_cast):
+        active.record_noncreature_spell_cast(turn)
+    opponent_life_lost = int(scenario.get("opponent_life_lost_this_turn") or 0)
+    if opponent_life_lost:
+        opponent.record_life_lost(opponent_life_lost, turn)
     add_manifest_mana(active, scenario.get("controller_mana") or {})
 
     starting_hand_names = [card.get("name", "?") for card in active.hand if isinstance(card, dict)]
@@ -7829,7 +7841,7 @@ def run_simple_activated_draw(
         active,
         [opponent],
         all_players,
-        turn=int(scenario.get("turn") or 6151),
+        turn=turn,
         rng=random.Random(int(scenario.get("seed") or 6151)),
         phase=str(scenario.get("phase") or "postcombat_main"),
     )

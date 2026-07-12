@@ -3486,6 +3486,64 @@ def test_simple_activated_draw_runner_executes_sacrifice_target_cost() -> None:
     assert result["target_sacrificed"] is True
 
 
+def test_simple_activated_draw_runner_executes_lands_same_name_condition() -> None:
+    battle = validator.load_battle(validator.DEFAULT_BATTLE)
+    events = []
+    previous_handler = battle.REPLAY_EVENT_HANDLER
+    previous_get_card_effect = battle.get_card_effect
+    battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+    battle.get_card_effect = lambda card: {
+        "effect": "draw_engine",
+        "battle_model_scope": "xmage_permanent_simple_activated_draw_v1",
+        "permanent_type": "artifact",
+        "activated_draw": True,
+        "activated_draw_count": 1,
+        "activation_cost_mana": "{2}",
+        "activation_cost_generic": 2,
+        "activation_cost_colors": [],
+        "activation_requires_tap": True,
+        "activation_requires_sacrifice": False,
+        "activation_condition_status": "runtime_executor_v1",
+        "activation_condition": "controller_controls_lands_same_name_gte",
+        "activation_condition_land_same_name_threshold": 3,
+        "_rule_logical_key": "battle_rule_v1:endless-atlas",
+    }
+    try:
+        result = validator.run_simple_activated_draw(
+            battle,
+            {
+                "name": "Endless Atlas activates draw ability",
+                "type": "simple_activated_draw",
+                "card": {"name": "Endless Atlas"},
+                "controller_mana": {"generic": 2},
+                "controller_battlefield": [
+                    {"name": "Fixture Plains", "type_line": "Basic Land - Plains", "effect": "land"},
+                    {"name": "Fixture Plains", "type_line": "Basic Land - Plains", "effect": "land"},
+                    {"name": "Fixture Plains", "type_line": "Basic Land - Plains", "effect": "land"},
+                ],
+                "controller_library": [
+                    {"name": "E2E Activated Draw Card", "type_line": "Sorcery", "effect": "draw_cards"}
+                ],
+                "expected_draw_count": 1,
+                "expected_tapped_source": True,
+                "logical_rule_key": "battle_rule_v1:endless-atlas",
+            },
+            events,
+        )
+    finally:
+        battle.REPLAY_EVENT_HANDLER = previous_handler
+        battle.get_card_effect = previous_get_card_effect
+
+    assert result["card_name"] == "Endless Atlas"
+    assert result["cards_drawn"] == 1
+    assert any(
+        event == "utility_artifact_activated"
+        and data.get("card") == "Endless Atlas"
+        and data.get("activation_condition") == "controller_controls_lands_same_name_gte"
+        for event, data in events
+    )
+
+
 def test_put_from_hand_to_battlefield_runner_moves_best_hand_card() -> None:
     battle = validator.load_battle(validator.DEFAULT_BATTLE)
     events = []

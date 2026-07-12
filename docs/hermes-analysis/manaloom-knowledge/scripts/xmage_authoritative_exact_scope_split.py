@@ -14348,9 +14348,14 @@ def is_beginning_upkeep_draw_lose_life_unit(row: dict[str, Any]) -> bool:
 def is_permanent_activated_draw_unit(row: dict[str, Any]) -> bool:
     if str(row.get("adapter_work_unit") or "") != DRAW_ENGINE_UNIT:
         return False
+    abilities = ability_classes(row)
     return (
         effect_classes(row) == {"DrawCardSourceControllerEffect"}
-        and ability_classes(row) == {"SimpleActivatedAbility"}
+        and frozenset(abilities)
+        in {
+            frozenset({"SimpleActivatedAbility"}),
+            frozenset({"ActivateIfConditionActivatedAbility"}),
+        }
     )
 
 
@@ -18720,6 +18725,68 @@ def activated_draw_count_from_oracle(metadata: dict[str, Any]) -> int | None:
     return int(value)
 
 
+def activated_draw_condition_from_oracle_sentence(sentence: str) -> dict[str, Any] | str | None:
+    normalized = re.sub(r"\s+", " ", str(sentence or "").strip().lower())
+    normalized = normalized.rstrip(".")
+    normalized = re.sub(r"^activate (?:this )?ability only if ", "", normalized)
+    normalized = re.sub(r"^activate only if ", "", normalized)
+    if normalized == "you have no cards in hand":
+        return {
+            "activation_condition_status": "runtime_executor_v1",
+            "activation_condition": "controller_has_no_cards_in_hand",
+        }
+    if normalized == "you control three or more lands with the same name":
+        return {
+            "activation_condition_status": "runtime_executor_v1",
+            "activation_condition": "controller_controls_lands_same_name_gte",
+            "activation_condition_land_same_name_threshold": 3,
+        }
+    if normalized in {
+        "you've cast a noncreature spell this turn",
+        "you have cast a noncreature spell this turn",
+    }:
+        return {
+            "activation_condition_status": "runtime_executor_v1",
+            "activation_condition": "controller_cast_noncreature_spell_this_turn",
+            "activation_condition_spell_count_threshold": 1,
+        }
+    if normalized == "an opponent lost life this turn":
+        return {
+            "activation_condition_status": "runtime_executor_v1",
+            "activation_condition": "opponent_lost_life_this_turn",
+            "activation_condition_opponent_life_lost_threshold": 1,
+        }
+    if normalized in {
+        "during your turn, before attackers are declared",
+        "activate this ability only during your turn, before attackers are declared",
+    }:
+        return {
+            "activation_condition_status": "runtime_executor_v1",
+            "activation_condition": "controller_turn_before_attackers_declared",
+        }
+    return "activated_draw_oracle_condition_not_supported"
+
+
+def activated_draw_effect_and_condition_from_oracle(effect_text: str) -> tuple[str, dict[str, Any]] | str:
+    sentences = [
+        sentence.strip()
+        for sentence in re.split(r"(?<=\.)\s+", str(effect_text or "").strip())
+        if sentence.strip()
+    ]
+    if not sentences:
+        return "activated_draw_oracle_not_simple"
+    if len(sentences) == 1:
+        return sentences[0], {}
+    if len(sentences) != 2:
+        return "activated_draw_oracle_condition_not_supported"
+    condition_fields = activated_draw_condition_from_oracle_sentence(sentences[1])
+    if isinstance(condition_fields, str):
+        return condition_fields
+    if condition_fields is None:
+        return "activated_draw_oracle_condition_not_supported"
+    return sentences[0], condition_fields
+
+
 def activation_sacrifice_target_from_phrase(phrase: str) -> str | None:
     normalized = re.sub(r"\s+", " ", str(phrase or "").strip().lower())
     normalized = normalized.removeprefix("a ").removeprefix("an ")
@@ -18745,18 +18812,24 @@ def activation_sacrifice_target_from_phrase(phrase: str) -> str | None:
         "mountain": "mountain",
         "beast": "beast",
         "swamp": "swamp",
+        "vampire": "vampire",
         "permanent": "permanent",
     }
     return mapping.get(normalized)
 
 
 def activated_draw_from_oracle(metadata: dict[str, Any]) -> dict[str, Any] | str:
-    text = re.sub(r"\s+", " ", oracle_text(metadata)).strip().lower()
+    text = re.sub(r"\s+", " ", strip_parenthetical_reminders(oracle_text(metadata))).strip().lower()
     if text.count(":") != 1:
         return "activated_draw_oracle_not_simple"
     cost_text, effect_text = [part.strip() for part in text.split(":", 1)]
     if "." in cost_text:
         cost_text = cost_text.rsplit(".", 1)[1].strip()
+    cost_text = re.sub(r"^(?:hellbent|formidable|threshold|delirium|raid)\s*[—-]\s*", "", cost_text)
+    effect_and_condition = activated_draw_effect_and_condition_from_oracle(effect_text)
+    if isinstance(effect_and_condition, str):
+        return effect_and_condition
+    effect_text, condition_fields = effect_and_condition
     match = re.fullmatch(r"draw (a|one|two|three|four|five|\d+) cards?\.?", effect_text)
     if not match:
         return "activated_draw_oracle_not_simple"
@@ -18804,7 +18877,7 @@ def activated_draw_from_oracle(metadata: dict[str, Any]) -> dict[str, Any] | str
     sacrifice_pattern = (
         r"(?:^|,\s*)sacrifice (?P<phrase>"
         r"(?:an?|another) (?:artifact or creature|creature or artifact|artifact or land|creature or land|"
-        r"nontoken permanent|non-token permanent|token|creature|artifact|enchantment|land|permanent)"
+        r"nontoken permanent|non-token permanent|token|creature|artifact|enchantment|land|vampire|permanent)"
         r")(?:\s*,?|$)"
     )
     sacrifice_matches = list(re.finditer(sacrifice_pattern, normalized_cost))
@@ -18860,7 +18933,63 @@ def activated_draw_from_oracle(metadata: dict[str, Any]) -> dict[str, Any] | str
         activation["activation_requires_tap_target"] = True
     if remove_counter_cost:
         activation["activation_remove_counter_cost"] = remove_counter_cost
+    activation.update(condition_fields)
     return activation
+
+
+def activated_draw_condition_from_source(source: str) -> dict[str, Any] | str | None:
+    text = source or ""
+    if "ActivateIfConditionActivatedAbility" not in text:
+        return None
+    supported: list[dict[str, Any]] = []
+    if "HellbentCondition" in text:
+        supported.append(
+            {
+                "activation_condition_status": "runtime_executor_v1",
+                "activation_condition": "controller_has_no_cards_in_hand",
+            }
+        )
+    if "EndlessAtlasCondition" in text and "same name" in text:
+        supported.append(
+            {
+                "activation_condition_status": "runtime_executor_v1",
+                "activation_condition": "controller_controls_lands_same_name_gte",
+                "activation_condition_land_same_name_threshold": 3,
+            }
+        )
+    if "CastNoncreatureSpellThisTurnCondition" in text:
+        supported.append(
+            {
+                "activation_condition_status": "runtime_executor_v1",
+                "activation_condition": "controller_cast_noncreature_spell_this_turn",
+                "activation_condition_spell_count_threshold": 1,
+            }
+        )
+    if "OpponentsLostLifeCondition" in text:
+        supported.append(
+            {
+                "activation_condition_status": "runtime_executor_v1",
+                "activation_condition": "opponent_lost_life_this_turn",
+                "activation_condition_opponent_life_lost_threshold": 1,
+            }
+        )
+    if "MyTurnBeforeAttackersDeclaredCondition" in text:
+        supported.append(
+            {
+                "activation_condition_status": "runtime_executor_v1",
+                "activation_condition": "controller_turn_before_attackers_declared",
+            }
+        )
+    unique = []
+    seen = set()
+    for item in supported:
+        key = item.get("activation_condition")
+        if key not in seen:
+            seen.add(key)
+            unique.append(item)
+    if len(unique) != 1:
+        return "activated_draw_source_condition_not_supported"
+    return unique[0]
 
 
 def activated_draw_from_mana_source_oracle(metadata: dict[str, Any]) -> dict[str, Any] | str:
@@ -24037,7 +24166,7 @@ def look_at_hand_draw_spell_from_source(source: str) -> dict[str, Any] | str:
 def activated_draw_from_source(source: str) -> dict[str, Any] | str:
     text = source or ""
     draw_pattern = re.compile(
-        r"SimpleActivatedAbility\s*\(\s*(?:Zone\.GRAVEYARD\s*,\s*)?"
+        r"(?:SimpleActivatedAbility|ActivateIfConditionActivatedAbility)\s*\(\s*(?:Zone\.GRAVEYARD\s*,\s*)?"
         r"new\s+DrawCardSourceControllerEffect\s*\(\s*(\d*)\s*\)",
         flags=re.DOTALL,
     )
@@ -24079,8 +24208,11 @@ def activated_draw_from_source(source: str) -> dict[str, Any] | str:
         discard_count = 1
     elif "DiscardCardCost" in window or "DiscardTargetCost" in window:
         return "activated_draw_source_cost_not_supported"
-    if "SimpleActivatedAbility" not in window:
+    if "SimpleActivatedAbility" not in window and "ActivateIfConditionActivatedAbility" not in window:
         return "activated_draw_source_not_simple_activated"
+    condition_fields = activated_draw_condition_from_source(text)
+    if isinstance(condition_fields, str):
+        return condition_fields
     cost_text = "{0}"
     mana_match = re.search(r'ManaCostsImpl<[^>]*>\s*\(\s*"([^"]+)"\s*\)', window)
     generic_match = re.search(r"GenericManaCost\s*\(\s*(\d+)\s*\)", window)
@@ -24150,6 +24282,7 @@ def activated_draw_from_source(source: str) -> dict[str, Any] | str:
             else {}
         ),
         **({"activation_remove_counter_cost": remove_counter_cost} if remove_counter_cost else {}),
+        **(condition_fields or {}),
     }
 
 

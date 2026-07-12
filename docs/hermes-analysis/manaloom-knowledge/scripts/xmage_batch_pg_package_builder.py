@@ -728,6 +728,11 @@ E2E_REQUIRED_EFFECT_FIELDS = (
     "activation_discard_random",
     "activation_zone",
     "activation_requires_exile_source_from_graveyard",
+    "activation_condition_status",
+    "activation_condition",
+    "activation_condition_land_same_name_threshold",
+    "activation_condition_spell_count_threshold",
+    "activation_condition_opponent_life_lost_threshold",
     "activation_sacrifice_cost",
     "activation_sacrifice_target",
     "activation_requires_sacrifice_target",
@@ -5354,6 +5359,25 @@ def simple_activated_draw_execution_scenario_from_expected_rule(
         "expected_life_paid": int(required.get("activation_life_cost") or 0),
         "logical_rule_key": rule["logical_rule_key"],
     }
+    activation_condition = str(required.get("activation_condition") or "").strip()
+    if activation_condition:
+        scenario["activation_condition"] = activation_condition
+    if activation_condition == "controller_controls_lands_same_name_gte":
+        scenario["controller_battlefield"] = [
+            {"name": "E2E Shared Plains", "type_line": "Basic Land - Plains", "effect": "land", "cmc": 0},
+            {"name": "E2E Shared Plains", "type_line": "Basic Land - Plains", "effect": "land", "cmc": 0},
+            {"name": "E2E Shared Plains", "type_line": "Basic Land - Plains", "effect": "land", "cmc": 0},
+        ]
+    elif activation_condition == "controller_cast_noncreature_spell_this_turn":
+        scenario["controller_noncreature_spells_cast_this_turn"] = int(
+            required.get("activation_condition_spell_count_threshold") or 1
+        )
+    elif activation_condition == "opponent_lost_life_this_turn":
+        scenario["opponent_life_lost_this_turn"] = int(
+            required.get("activation_condition_opponent_life_lost_threshold") or 1
+        )
+    elif activation_condition == "controller_turn_before_attackers_declared":
+        scenario["phase"] = "precombat_main"
     if required.get("activation_zone") == "graveyard":
         scenario["source_zone"] = "graveyard"
     if required.get("activation_requires_exile_source_from_graveyard"):
@@ -5371,12 +5395,15 @@ def simple_activated_draw_execution_scenario_from_expected_rule(
             "permanent": "artifact",
             "token": "creature",
         }.get(sacrifice_target_type, "creature")
+        sacrifice_constraints = {
+            "card_types": [sacrifice_card_type],
+            **({"token": True} if sacrifice_target_type == "token" else {}),
+        }
+        if sacrifice_target_type == "vampire":
+            sacrifice_constraints = {"card_types": ["creature"], "required_subtypes": ["vampire"]}
         scenario["sacrifice_target"] = _target_fixture_from_constraints(
             "E2E Activated Draw Sacrifice Target",
-            {
-                "card_types": [sacrifice_card_type],
-                **({"token": True} if sacrifice_target_type == "token" else {}),
-            },
+            sacrifice_constraints,
             matching=True,
         )
         scenario["expect_target_sacrificed"] = True
