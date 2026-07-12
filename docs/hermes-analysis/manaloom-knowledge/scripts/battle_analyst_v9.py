@@ -69270,11 +69270,14 @@ def resolve_target_player_draw_spell(
     all_players=None,
     stack=None,
 ):
-    if str(effect_data.get("draw_count_source") or "").strip().lower() == "x_value":
+    target_player, target_reason = _target_player_draw_target_player(player, opponents, effect_data)
+    draw_count_source = str(effect_data.get("draw_count_source") or "").strip().lower()
+    if draw_count_source == "x_value":
         draw_count = x_value_from_effect_context(effect_data)
+    elif draw_count_source == "domain_basic_land_types":
+        draw_count = _domain_basic_land_type_count(target_player)
     else:
         draw_count = max(0, int(effect_data.get("draw_count") or effect_data.get("count") or 0))
-    target_player, target_reason = _target_player_draw_target_player(player, opponents, effect_data)
     drawn_cards = target_player.draw(draw_count, rng)
     process_player_draw_triggers(
         target_player,

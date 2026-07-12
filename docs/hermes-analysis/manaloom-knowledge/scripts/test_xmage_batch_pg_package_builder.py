@@ -2893,6 +2893,37 @@ def test_manifest_builds_target_player_x_draw_execution_scenario() -> None:
     assert scenario["expected_target_player"] == "Spell Controller"
 
 
+def test_manifest_builds_target_player_domain_draw_execution_scenario() -> None:
+    rule = {
+        "normalized_name": "allied strategies",
+        "card_name": "Allied Strategies",
+        "oracle_hash": "hash-allied-strategies",
+        "logical_rule_key": "battle_rule_v1:hash-allied-strategies",
+        "required_effect_fields": {
+            "effect": "draw_cards",
+            "battle_model_scope": "xmage_fixed_target_player_draw_spell_v1",
+            "target": "player",
+            "target_controller": "target_player",
+            "target_preference": "self",
+            "count": 0,
+            "draw_count": 0,
+            "draw_count_source": "domain_basic_land_types",
+            "target_player_draw": True,
+            "sorcery": True,
+        },
+    }
+
+    scenario = builder.execution_scenario_from_expected_rule(rule)
+
+    assert scenario is not None
+    assert scenario["type"] == "target_player_draw_spell"
+    assert scenario["card"]["name"] == "Allied Strategies"
+    assert scenario["expected_draw_count"] == 4
+    assert len(scenario["controller_library"]) == 4
+    assert len(scenario["controller_battlefield"]) == 5
+    assert scenario["expected_target_player"] == "Spell Controller"
+
+
 def test_manifest_builds_target_player_x_draw_shuffle_self_execution_scenario() -> None:
     rule = {
         "normalized_name": "blue sun's zenith",

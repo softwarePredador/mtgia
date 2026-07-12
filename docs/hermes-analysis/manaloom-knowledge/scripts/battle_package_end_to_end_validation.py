@@ -13759,6 +13759,16 @@ def run_target_player_draw_spell(
         for hand_card in (scenario.get("controller_hand") or [])
         if isinstance(hand_card, dict)
     ]
+    active.battlefield = [
+        battle.enrich_card(dict(permanent))
+        for permanent in (scenario.get("controller_battlefield") or [])
+        if isinstance(permanent, dict)
+    ]
+    opponent.battlefield = [
+        battle.enrich_card(dict(permanent))
+        for permanent in (scenario.get("opponent_battlefield") or [])
+        if isinstance(permanent, dict)
+    ]
     starting_hand_count = len(active.hand)
     starting_library_count = len(active.library)
     expected_draw_count = int(scenario.get("expected_draw_count") or effect.get("draw_count") or effect.get("count") or 1)

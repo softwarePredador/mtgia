@@ -8259,6 +8259,39 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertEqual(effect["draw_count"], 4)
         self.assertEqual(effect["count"], 4)
 
+    def test_target_player_draw_spell_maps_domain_dynamic_count(self) -> None:
+        row = queue_row(
+            split.DRAW_UNIT,
+            effect_classes=["DrawCardTargetEffect"],
+            xmage_signals=["targeting", "draw"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Allied Strategies",
+                type_line="Sorcery",
+                oracle_text=(
+                    "Domain — Target player draws a card for each basic land type "
+                    "among lands they control."
+                ),
+            ),
+            source_text=(
+                "this.getSpellAbility().addEffect(new DrawCardTargetEffect(DomainValue.TARGET));"
+                "this.getSpellAbility().addTarget(new TargetPlayer());"
+                "this.getSpellAbility().setAbilityWord(AbilityWord.DOMAIN);"
+            ),
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.TARGET_DRAW_SCOPE)
+        self.assertTrue(effect["target_player_draw"])
+        self.assertEqual(effect["target_controller"], "target_player")
+        self.assertEqual(effect["target"], "player")
+        self.assertEqual(effect["draw_count"], 0)
+        self.assertEqual(effect["count"], 0)
+        self.assertEqual(effect["draw_count_source"], "domain_basic_land_types")
+
     def test_fixed_draw_spell_maps_sacrifice_two_creatures_cost(self) -> None:
         row = queue_row(split.DRAW_UNIT, effect_classes=["DrawCardSourceControllerEffect"])
         proposal, reason = split.split_row(

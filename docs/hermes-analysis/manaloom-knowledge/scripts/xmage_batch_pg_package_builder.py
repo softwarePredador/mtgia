@@ -5325,6 +5325,8 @@ def target_player_draw_execution_scenario_from_expected_rule(
     if draw_count_source == "x_value":
         x_value = int(required.get("x_value") or 3)
         expected_draw_count = x_value
+    elif draw_count_source == "domain_basic_land_types":
+        expected_draw_count = 4
     elif draw_count_source:
         return None
     else:
@@ -5348,6 +5350,19 @@ def target_player_draw_execution_scenario_from_expected_rule(
         "expected_draw_count": expected_draw_count,
         "expected_target_player": "Spell Controller",
         "target_preference": str(required.get("target_preference") or "self"),
+        **(
+            {
+                "controller_battlefield": [
+                    {"name": "E2E Domain Plains", "type_line": "Basic Land - Plains", "subtypes": ["Plains"]},
+                    {"name": "E2E Domain Island", "type_line": "Basic Land - Island", "subtypes": ["Island"]},
+                    {"name": "E2E Domain Swamp", "type_line": "Basic Land - Swamp", "subtypes": ["Swamp"]},
+                    {"name": "E2E Domain Mountain", "type_line": "Basic Land - Mountain", "subtypes": ["Mountain"]},
+                    {"name": "E2E Duplicate Plains", "type_line": "Basic Land - Plains", "subtypes": ["Plains"]},
+                ],
+            }
+            if draw_count_source == "domain_basic_land_types"
+            else {}
+        ),
         **(
             {
                 "expect_shuffle_self": True,

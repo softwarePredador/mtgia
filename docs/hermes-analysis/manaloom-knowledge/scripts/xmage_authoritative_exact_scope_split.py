@@ -18404,6 +18404,7 @@ def fixed_target_player_draw_spell_from_oracle(metadata: dict[str, Any]) -> dict
         " ",
         " ".join(oracle_effect_lines_without_neutral_auxiliary(metadata)),
     ).strip().lower()
+    text = re.sub(r"^domain\s+[—-]\s+", "", text).strip()
     text = re.sub(
         r"\s*shuffle [^.]+ into (?:its|their|his or her) owner['’]s library\.?\s*",
         " ",
@@ -18411,6 +18412,11 @@ def fixed_target_player_draw_spell_from_oracle(metadata: dict[str, Any]) -> dict
     ).strip()
     if not text:
         return "target_player_draw_spell_oracle_not_simple"
+    if re.fullmatch(
+        r"target player draws a card for each basic land type among lands they control\.?",
+        text,
+    ):
+        return {"draw_count": 0, "draw_count_source": "domain_basic_land_types"}
     if re.fullmatch(r"target player draws x cards?\.?", text):
         return {"draw_count": 0, "draw_count_source": "x_value"}
     number_pattern = r"(a|one|two|three|four|five|six|seven|\d+)"
@@ -23550,6 +23556,12 @@ def fixed_target_player_draw_spell_from_source(source: str) -> dict[str, Any] | 
     if len(re.findall(r"\bDrawCardTargetEffect\s*\(", text)) != 1:
         return "target_player_draw_spell_source_not_simple"
     constructor_args = extract_constructor_args(text, "DrawCardTargetEffect")
+    if constructor_args and constructor_args.strip() == "DomainValue.TARGET":
+        return {
+            "draw_count": 0,
+            "draw_count_source": "domain_basic_land_types",
+            "xmage_effect_class": "DrawCardTargetEffect",
+        }
     if constructor_args and constructor_args.strip() in {"GetXValue.instance", "ManacostVariableValue.instance"}:
         return {
             "draw_count": 0,
