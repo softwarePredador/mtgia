@@ -872,6 +872,9 @@ SAFE_MANA_AUXILIARY_ABILITY_CLASSES = {
     *STATIC_SELF_KEYWORD_ABILITY_CLASSES.keys(),
 }
 
+STATIC_INFO_ONLY_MANA_AUXILIARY_ABILITY_CLASSES = {"SimpleStaticAbility"}
+STATIC_INFO_ONLY_MANA_EFFECT_CLASSES = {"InfoEffect"}
+
 STATIC_SELF_KEYWORD_ORDER = [
     "flash",
     "fear",
@@ -1075,6 +1078,40 @@ def source_declared_ability_classes(source: str) -> set[str]:
         match.group(1)
         for match in re.finditer(r"\bnew\s+([A-Za-z][A-Za-z0-9_]*Ability)\b", source or "")
     }
+
+
+def _java_string_literal_text(value: str) -> str:
+    try:
+        return bytes(value, "utf-8").decode("unicode_escape")
+    except UnicodeDecodeError:
+        return value.replace(r"\"", '"').replace(r"\\", "\\")
+
+
+def static_info_effect_texts_from_source(source: str) -> list[str]:
+    text = source or ""
+    return [
+        _java_string_literal_text(match.group(1))
+        for match in re.finditer(r'new\s+InfoEffect\s*\(\s*"((?:\\.|[^"\\])*)"\s*\)', text)
+    ]
+
+
+def static_info_only_mana_auxiliary_texts(
+    source: str,
+    unsupported_auxiliary_abilities: set[str],
+    non_mana_effect_classes: set[str],
+) -> list[str]:
+    if unsupported_auxiliary_abilities != STATIC_INFO_ONLY_MANA_AUXILIARY_ABILITY_CLASSES:
+        return []
+    if non_mana_effect_classes != STATIC_INFO_ONLY_MANA_EFFECT_CLASSES:
+        return []
+    text = source or ""
+    simple_static_ability_count = len(
+        re.findall(r"\bnew\s+SimpleStaticAbility\b", text)
+    )
+    info_texts = static_info_effect_texts_from_source(text)
+    if simple_static_ability_count <= 0 or simple_static_ability_count != len(info_texts):
+        return []
+    return info_texts
 
 
 def unsupported_simple_removal_source_ability_classes(source: str) -> set[str]:
@@ -44429,6 +44466,44 @@ def split_row(
                 for cls in classes
                 if cls not in {"BasicManaEffect", "AddManaOfAnyColorEffect"}
             )
+            static_info_texts = static_info_only_mana_auxiliary_texts(
+                source_text,
+                set(unsupported_auxiliary_abilities),
+                set(non_mana_effect_classes),
+            )
+            if static_info_texts:
+                effect_json = {
+                    "effect": "ramp_permanent",
+                    "battle_model_scope": MANA_SCOPE,
+                    "is_mana_source": True,
+                    "mana_produced": int(mana_source_detail["mana_produced"]),
+                    "produces": str(mana_source_detail["produces"]),
+                    "activation_requires_tap": mana_requires_tap,
+                    "mana_activation_requires_tap": mana_requires_tap,
+                    "permanent_type": permanent_type,
+                    "ability_kind": "activated_mana",
+                    "static_info_only": True,
+                    "xmage_static_info_effect_texts": static_info_texts,
+                    "xmage_mana_ability_classes": sorted(
+                        mana_ability_classes & SAFE_MANA_ABILITY_CLASSES
+                    ),
+                    "xmage_auxiliary_ability_classes": sorted(auxiliary_abilities),
+                    "xmage_effect_classes": sorted(classes),
+                    "xmage_ability_classes": sorted(mana_ability_classes),
+                }
+                if "EntersBattlefieldTappedAbility" in mana_ability_classes:
+                    effect_json["enters_tapped"] = True
+                if mana_source_detail.get("produced_mana_symbols"):
+                    effect_json["produced_mana_symbols"] = list(
+                        mana_source_detail["produced_mana_symbols"]
+                    )
+                add_mana_source_activation_detail_fields(effect_json, mana_source_detail)
+                return build_proposal(
+                    row,
+                    metadata,
+                    effect_json,
+                    family_id="xmage_simple_mana_source_static_info_only",
+                ), "selected_exact_scope"
             effect_json = {
                 "effect": "ramp_permanent",
                 "battle_model_scope": MANA_SCOPE,

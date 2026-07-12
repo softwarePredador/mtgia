@@ -1560,6 +1560,42 @@ def test_manifest_expected_rule_preserves_partial_mana_source_fields() -> None:
     assert required["xmage_unmodeled_auxiliary_ability_classes"] == ["CrewAbility"]
 
 
+def test_manifest_expected_rule_preserves_static_info_only_mana_source_fields() -> None:
+    proposal = {
+        "normalized_name": "gleemox",
+        "card_name": "Gleemox",
+        "oracle_hash": "hash-gleemox",
+        "logical_rule_key": "battle_rule_v1:hash-gleemox",
+        "effect_json": {
+            "effect": "ramp_permanent",
+            "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+            "is_mana_source": True,
+            "mana_produced": 1,
+            "produces": "WUBRG",
+            "mana_activation_requires_tap": True,
+            "static_info_only": True,
+            "xmage_static_info_effect_texts": ["This card is banned."],
+            "xmage_mana_ability_classes": ["AnyColorManaAbility"],
+            "xmage_auxiliary_ability_classes": ["SimpleStaticAbility"],
+            "xmage_ability_classes": ["AnyColorManaAbility", "SimpleStaticAbility"],
+            "xmage_effect_classes": ["InfoEffect"],
+        },
+    }
+
+    expected = builder.expected_rule_from_proposal(proposal)
+
+    required = expected["required_effect_fields"]
+    assert required["static_info_only"] is True
+    assert required["xmage_static_info_effect_texts"] == ["This card is banned."]
+    assert required["xmage_auxiliary_ability_classes"] == ["SimpleStaticAbility"]
+    assert required["xmage_ability_classes"] == ["AnyColorManaAbility", "SimpleStaticAbility"]
+
+    scenario = builder.execution_scenario_from_expected_rule(expected)
+    assert scenario["type"] == "simple_mana_source_refresh"
+    assert scenario["expected_available_mana_after_refresh"] == 1
+    assert scenario["expected_conditional_mana"] == 1
+
+
 def test_mana_spent_cast_trigger_manifest_builds_cast_trigger_scenario() -> None:
     rule = {
         "card_name": "Scaled Nurturer",

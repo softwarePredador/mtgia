@@ -18101,6 +18101,41 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertEqual(effect["produces"], "WUBRG")
         self.assertEqual(effect["keywords"], ["indestructible"])
 
+    def test_simple_mana_source_with_static_info_only_auxiliary_maps_exact(self) -> None:
+        row = queue_row(
+            split.RAMP_ARTIFACT_UNIT,
+            effect_classes=["InfoEffect"],
+            ability_kind="activated",
+            ability_classes=["AnyColorManaAbility", "SimpleStaticAbility"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Gleemox",
+                type_line="Artifact",
+                oracle_text="{T}: Add one mana of any color.",
+            ),
+            source_text=(
+                "this.addAbility(new AnyColorManaAbility());"
+                "this.addAbility(new SimpleStaticAbility("
+                "new InfoEffect(\"This card is banned.\")));"
+            ),
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        self.assertEqual(proposal["family_id"], "xmage_simple_mana_source_static_info_only")
+        self.assertEqual(proposal["proposal_status"], "batch_pg_candidate_after_precheck")
+        self.assertTrue(proposal["safe_for_batch_pg_package"])
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.MANA_SCOPE)
+        self.assertEqual(effect["produces"], "WUBRG")
+        self.assertEqual(effect["mana_produced"], 1)
+        self.assertTrue(effect["static_info_only"])
+        self.assertEqual(effect["xmage_static_info_effect_texts"], ["This card is banned."])
+        self.assertNotIn("_runtime_partial", effect)
+        self.assertNotIn("xmage_unmodeled_auxiliary_ability_classes", effect)
+        self.assertNotIn("xmage_unmodeled_effect_classes", effect)
+
     def test_simple_mana_source_with_activated_self_sacrifice_draw_maps(self) -> None:
         row = queue_row(
             split.RAMP_ARTIFACT_UNIT,
