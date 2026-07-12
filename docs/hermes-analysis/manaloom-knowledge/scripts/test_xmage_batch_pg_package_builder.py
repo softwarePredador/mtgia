@@ -8023,6 +8023,62 @@ def test_proliferate_draw_fields_and_execution_scenario_are_manifested() -> None
     assert scenario["expected_opponent_poison_counters"] == 2
 
 
+def test_each_player_lose_life_draw_fields_and_execution_scenario_are_manifested() -> None:
+    proposal = {
+        "normalized_name": "crushing disappointment",
+        "card_name": "Crushing Disappointment",
+        "oracle_hash": "hash-crushing-disappointment",
+        "logical_rule_key": "battle_rule_v1:crushing-disappointment",
+        "effect_json": {
+            "effect": "composite_resolution",
+            "battle_model_scope": "xmage_each_player_lose_life_draw_card_spell_v1",
+            "draw_count": 2,
+            "count": 2,
+            "life_loss": 2,
+            "life_loss_amount": 2,
+            "each_player_life_loss": 2,
+            "life_total_delta": -2,
+            "life_loss_target": "all_players",
+            "resolution_order": "lose_life_then_draw",
+            "_composite_rule_components": [
+                {
+                    "effect": "life_total_change",
+                    "battle_model_scope": "xmage_each_player_lose_life_component_v1",
+                    "life_loss": 2,
+                    "life_loss_amount": 2,
+                    "life_total_delta": -2,
+                    "target": "all_players",
+                    "target_controller": "all_players",
+                },
+                {
+                    "effect": "draw_cards",
+                    "battle_model_scope": "xmage_fixed_source_controller_draw_spell_v1",
+                    "count": 2,
+                    "draw_count": 2,
+                },
+            ],
+        },
+    }
+
+    expected = builder.expected_rule_from_proposal(proposal)
+    required = expected["required_effect_fields"]
+
+    assert required["battle_model_scope"] == "xmage_each_player_lose_life_draw_card_spell_v1"
+    assert required["draw_count"] == 2
+    assert required["life_loss_amount"] == 2
+    assert required["each_player_life_loss"] == 2
+    assert required["life_loss_target"] == "all_players"
+
+    scenario = builder.execution_scenario_from_expected_rule(expected)
+
+    assert scenario["type"] == "each_player_lose_life_draw_spell"
+    assert scenario["expected_draw_count"] == 2
+    assert scenario["expected_life_lost"] == 2
+    assert scenario["expected_controller_life_after"] == 18
+    assert scenario["expected_opponent_life_after"] == 17
+    assert scenario["expected_resolution_order"] == "lose_life_then_draw"
+
+
 def test_pain_talisman_manifest_preserves_colored_mana_life_loss_modes() -> None:
     proposal = {
         "normalized_name": "talisman of hierarchy",

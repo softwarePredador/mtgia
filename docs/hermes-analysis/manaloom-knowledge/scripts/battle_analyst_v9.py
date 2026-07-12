@@ -68213,40 +68213,56 @@ def resolve_composite_resolution_effect(player, opponents, card, effect_data, tu
                     **component_fields,
                 )
         elif component_effect == "life_total_change":
-            target = _life_total_change_target(player, opponents, component)
-            life_before = int(getattr(target, "life", 0) or 0)
+            target_scope = str(component.get("target") or "").strip().lower()
+            targets = participants if target_scope == "all_players" else [_life_total_change_target(player, opponents, component)]
             dynamic_replay_fields = {}
             if component.get("life_gain_amount_source"):
                 dynamic_amount, dynamic_replay_fields = dynamic_life_gain_amount(player, opponents, component)
                 requested_delta = int(dynamic_amount or 0)
+            elif component.get("life_total_delta") is not None:
+                requested_delta = int(component.get("life_total_delta") or 0)
+            elif component.get("life_loss") is not None or component.get("life_loss_amount") is not None:
+                requested_delta = -int(component.get("life_loss") or component.get("life_loss_amount") or 0)
             else:
                 requested_delta = int(component.get("life_gain_amount") or 0)
-            changed = gain_life(target, requested_delta, cap=999) if requested_delta else False
-            life_after = int(getattr(target, "life", life_before) or 0)
+            mode = "lose_life" if requested_delta < 0 else "gain_life"
             outcome = "life_total_changed"
-            applied.append(
-                {
-                    "effect": component_effect,
-                    "life_gain_amount": requested_delta,
-                    "life_gained": max(0, life_after - life_before),
-                }
-            )
-            emit_replay_event(
-                "life_total_changed",
-                player=player.name,
-                card=card.get("name", "?"),
-                target_player=getattr(target, "name", None),
-                mode="gain_life",
-                requested_delta=requested_delta,
-                life_before=life_before,
-                expected_life_after=life_before + requested_delta,
-                life_after=life_after,
-                changed=changed,
-                component_index=index,
-                turn=turn,
-                **dynamic_replay_fields,
-                **component_fields,
-            )
+            for target in targets:
+                life_before = int(getattr(target, "life", 0) or 0)
+                if requested_delta > 0:
+                    changed = gain_life(target, requested_delta, cap=999)
+                elif requested_delta < 0:
+                    changed = change_life(target, requested_delta)
+                else:
+                    changed = False
+                life_after = int(getattr(target, "life", life_before) or 0)
+                applied.append(
+                    {
+                        "effect": component_effect,
+                        "target_player": getattr(target, "name", None),
+                        "life_total_delta": requested_delta,
+                        "life_gain_amount": max(0, requested_delta),
+                        "life_loss_amount": max(0, -requested_delta),
+                        "life_gained": max(0, life_after - life_before),
+                        "life_lost": max(0, life_before - life_after),
+                    }
+                )
+                emit_replay_event(
+                    "life_total_changed",
+                    player=player.name,
+                    card=card.get("name", "?"),
+                    target_player=getattr(target, "name", None),
+                    mode=mode,
+                    requested_delta=requested_delta,
+                    life_before=life_before,
+                    expected_life_after=life_before + requested_delta,
+                    life_after=life_after,
+                    changed=changed,
+                    component_index=index,
+                    turn=turn,
+                    **dynamic_replay_fields,
+                    **component_fields,
+                )
         elif component_effect == "stat_modifier_until_eot":
             component_payload = dict(component)
             component_payload["_composite_component_index"] = index

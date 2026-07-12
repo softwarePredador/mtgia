@@ -3020,6 +3020,73 @@ def test_draw_lose_half_life_runner_draws_and_rounds_up_life_loss() -> None:
     )
 
 
+def test_each_player_lose_life_draw_runner_changes_both_life_totals_and_draws() -> None:
+    effect = {
+        "effect": "composite_resolution",
+        "battle_model_scope": "xmage_each_player_lose_life_draw_card_spell_v1",
+        "draw_count": 2,
+        "count": 2,
+        "life_loss": 2,
+        "life_loss_amount": 2,
+        "each_player_life_loss": 2,
+        "life_loss_target": "all_players",
+        "resolution_order": "draw_then_lose_life",
+        "_composite_rule_components": [
+            {
+                "effect": "draw_cards",
+                "battle_model_scope": "xmage_fixed_source_controller_draw_spell_v1",
+                "count": 2,
+                "draw_count": 2,
+                "compose_on_resolution": True,
+            },
+            {
+                "effect": "life_total_change",
+                "battle_model_scope": "xmage_each_player_lose_life_component_v1",
+                "life_loss": 2,
+                "life_loss_amount": 2,
+                "life_total_delta": -2,
+                "target": "all_players",
+                "target_controller": "all_players",
+                "compose_on_resolution": True,
+            },
+        ],
+        "_rule_logical_key": "battle_rule_v1:risky-shortcut",
+    }
+    rule = {
+        "card_name": "Risky Shortcut",
+        "logical_rule_key": "battle_rule_v1:risky-shortcut",
+        "required_effect_fields": effect,
+    }
+    scenario = package_builder.each_player_lose_life_draw_spell_execution_scenario_from_expected_rule(rule)
+
+    assert scenario is not None
+    battle = validator.load_battle(validator.DEFAULT_BATTLE)
+    events = []
+    previous_handler = battle.REPLAY_EVENT_HANDLER
+    previous_get_card_effect = battle.get_card_effect
+    battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+    battle.get_card_effect = lambda card: dict(effect)
+    try:
+        result = validator.run_each_player_lose_life_draw_spell(battle, scenario, events)
+    finally:
+        battle.REPLAY_EVENT_HANDLER = previous_handler
+        battle.get_card_effect = previous_get_card_effect
+
+    assert result["card_name"] == "Risky Shortcut"
+    assert result["cards_drawn"] == 2
+    assert result["life_lost_each_player"] == 2
+    assert result["controller_life_after"] == 18
+    assert result["opponent_life_after"] == 17
+    assert result["resolution_order"] == "draw_then_lose_life"
+    assert [
+        data.get("component_effect")
+        for event, data in events
+        if event == "composite_rule_component_resolved"
+        and data.get("card") == "Risky Shortcut"
+        and data.get("component_effect") in {"draw_cards", "life_total_change"}
+    ] == ["draw_cards", "life_total_change"]
+
+
 def test_simple_activated_draw_runner_executes_sacrifice_target_cost() -> None:
     battle = validator.load_battle(validator.DEFAULT_BATTLE)
     events = []

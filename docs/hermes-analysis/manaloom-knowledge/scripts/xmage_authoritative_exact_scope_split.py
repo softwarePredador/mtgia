@@ -353,6 +353,7 @@ DESTROY_CREATE_TREASURE_SCOPE = "xmage_destroy_target_create_treasure_spell_v1"
 LIFE_SCOPE = "xmage_fixed_controller_gain_life_spell_v1"
 DYNAMIC_LIFE_GAIN_SCOPE = "xmage_dynamic_controller_gain_life_spell_v1"
 LIFE_GAIN_DRAW_SCOPE = "xmage_fixed_controller_gain_life_draw_card_spell_v1"
+EACH_PLAYER_LOSE_LIFE_DRAW_SCOPE = "xmage_each_player_lose_life_draw_card_spell_v1"
 SCRY_SCOPE = "xmage_fixed_scry_spell_v1"
 SURVEIL_SCOPE = "xmage_fixed_surveil_spell_v1"
 SCRY_DRAW_SCOPE = "xmage_fixed_scry_and_draw_cards_spell_v1"
@@ -4694,6 +4695,59 @@ def fixed_damage_optional_discard_draw_from_source(source: str) -> tuple[int, in
     if re.search(r"new\s+DiscardCardCost\s*\(\s*\)", text) is None:
         return None
     return int(damage_matches[0].group(1)), draw_count
+
+
+def fixed_each_player_lose_life_draw_from_oracle(
+    metadata: dict[str, Any],
+) -> tuple[int, int, str] | None:
+    text = re.sub(r"\s+", " ", strip_parenthetical_reminders(oracle_text(metadata))).strip()
+    draw_token = r"(a|\d+|one|two|three|four|five|six|seven)"
+    lose_first = re.match(
+        rf"^each player loses (?P<loss>\d+) life\. you draw (?P<draw>{draw_token}) cards?\.?$",
+        text,
+    )
+    if lose_first:
+        return (
+            int(lose_first.group("loss")),
+            word_or_int(lose_first.group("draw")),
+            "lose_life_then_draw",
+        )
+    draw_first = re.match(
+        rf"^draw (?P<draw>{draw_token}) cards?\. each player loses (?P<loss>\d+) life\.?$",
+        text,
+    )
+    if draw_first:
+        return (
+            int(draw_first.group("loss")),
+            word_or_int(draw_first.group("draw")),
+            "draw_then_lose_life",
+        )
+    return None
+
+
+def fixed_each_player_lose_life_draw_from_source(source: str) -> tuple[int, int, str] | None:
+    text = source or ""
+    if has_additional_cost(text):
+        return None
+    loss_matches = list(
+        re.finditer(r"new\s+LoseLifeAllPlayersEffect\s*\(\s*(\d+)\s*\)", text, re.S)
+    )
+    draw_matches = list(re.finditer(r"new\s+DrawCardSourceControllerEffect\s*\(", text))
+    if len(loss_matches) != 1 or len(draw_matches) != 1:
+        return None
+    draw_count = java_constructor_int_or_noarg_default(
+        text,
+        "DrawCardSourceControllerEffect",
+        noarg_default=1,
+    )
+    if draw_count <= 0:
+        return None
+    order = (
+        "lose_life_then_draw"
+        if loss_matches[0].start() < draw_matches[0].start()
+        else "draw_then_lose_life"
+    )
+    return int(loss_matches[0].group(1)), draw_count, order
 
 
 def source_matches_bounce_target(source: str, target: str) -> bool:
@@ -17279,6 +17333,9 @@ def restricted_battlefield_target_from_oracle(metadata: dict[str, Any], action: 
 
 def restricted_battlefield_target_from_source(source: str) -> str | None:
     text = source or ""
+    def has_phrase(phrase: str) -> bool:
+        return re.search(rf"(?<![A-Za-z]){re.escape(phrase)}(?![A-Za-z])", text) is not None
+
     mana_value_target = mana_value_restricted_target_from_source(text)
     if mana_value_target is not None:
         return mana_value_target
@@ -17413,17 +17470,17 @@ def restricted_battlefield_target_from_source(source: str) -> str | None:
         )
     ):
         return "white_or_blue_creature"
-    if 'FilterCreaturePermanent("black creature")' in text or "black creature" in text:
+    if 'FilterCreaturePermanent("black creature")' in text or has_phrase("black creature"):
         return "black_creature"
-    if 'FilterCreaturePermanent("red creature")' in text or "red creature" in text:
+    if 'FilterCreaturePermanent("red creature")' in text or has_phrase("red creature"):
         return "red_creature"
-    if 'FilterCreaturePermanent("green or white creature")' in text or "green or white creature" in text:
+    if 'FilterCreaturePermanent("green or white creature")' in text or has_phrase("green or white creature"):
         return "green_or_white_creature"
-    if 'FilterCreaturePermanent("white creature")' in text or "white creature" in text:
+    if 'FilterCreaturePermanent("white creature")' in text or has_phrase("white creature"):
         return "white_creature"
-    if 'FilterCreaturePermanent("blue creature")' in text or "blue creature" in text:
+    if 'FilterCreaturePermanent("blue creature")' in text or has_phrase("blue creature"):
         return "blue_creature"
-    if 'FilterCreaturePermanent("green creature")' in text or "green creature" in text:
+    if 'FilterCreaturePermanent("green creature")' in text or has_phrase("green creature"):
         return "green_creature"
     if (
         'FilterCreaturePermanent("nonlegendary creature")' in text
@@ -40252,6 +40309,67 @@ def split_row(
                 metadata,
                 effect_json,
                 family_id="xmage_graveyard_to_library_then_draw_spell",
+            ), "selected_exact_scope"
+
+        if classes == {"DrawCardSourceControllerEffect", "LoseLifeAllPlayersEffect"}:
+            unsupported_abilities = ability_classes(row) - ALLOWED_AUXILIARY_RESOLUTION_ABILITY_CLASSES
+            if unsupported_abilities:
+                return None, "each_player_lose_life_draw_ability_class_not_simple"
+            oracle_pair = fixed_each_player_lose_life_draw_from_oracle(metadata)
+            if oracle_pair is None:
+                return None, "each_player_lose_life_draw_oracle_not_exact_fixed"
+            source_pair = fixed_each_player_lose_life_draw_from_source(source_text)
+            if source_pair is None:
+                return None, "each_player_lose_life_draw_source_not_fixed"
+            if source_pair != oracle_pair:
+                return None, "each_player_lose_life_draw_source_oracle_mismatch"
+            life_loss, draw_count, order = oracle_pair
+            life_component = {
+                "effect": "life_total_change",
+                "battle_model_scope": "xmage_each_player_lose_life_component_v1",
+                "life_loss": life_loss,
+                "life_loss_amount": life_loss,
+                "life_total_delta": -life_loss,
+                "target": "all_players",
+                "target_controller": "all_players",
+                "compose_on_resolution": True,
+                "xmage_effect_class": "LoseLifeAllPlayersEffect",
+            }
+            draw_component = {
+                "effect": "draw_cards",
+                "battle_model_scope": DRAW_SCOPE,
+                "count": draw_count,
+                "draw_count": draw_count,
+                "compose_on_resolution": True,
+                "xmage_effect_class": "DrawCardSourceControllerEffect",
+            }
+            components = (
+                [draw_component, life_component]
+                if order == "draw_then_lose_life"
+                else [life_component, draw_component]
+            )
+            effect_json = {
+                "effect": "composite_resolution",
+                "battle_model_scope": EACH_PLAYER_LOSE_LIFE_DRAW_SCOPE,
+                "draw_count": draw_count,
+                "count": draw_count,
+                "life_loss": life_loss,
+                "life_loss_amount": life_loss,
+                "each_player_life_loss": life_loss,
+                "life_loss_target": "all_players",
+                "resolution_order": order,
+                "_composite_rule_components": components,
+                "xmage_effect_classes": [
+                    "DrawCardSourceControllerEffect",
+                    "LoseLifeAllPlayersEffect",
+                ],
+                **flags,
+            }
+            return build_proposal(
+                row,
+                metadata,
+                effect_json,
+                family_id="xmage_each_player_lose_life_draw_card_spell",
             ), "selected_exact_scope"
 
         if classes == {"DrawCardSourceControllerEffect", "ProliferateEffect"}:

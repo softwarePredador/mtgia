@@ -36575,6 +36575,65 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
             ["draw_cards", "proliferate"],
         )
 
+    def test_each_player_lose_life_then_draw_maps_exact_composite_scope(self) -> None:
+        proposal, reason = split.split_row(
+            queue_row(
+                split.DRAW_UNIT,
+                effect_classes=["LoseLifeAllPlayersEffect", "DrawCardSourceControllerEffect"],
+            ),
+            metadata(
+                name="Crushing Disappointment",
+                type_line="Instant",
+                oracle_text="Each player loses 2 life. You draw two cards.",
+            ),
+            source_text="""
+                this.getSpellAbility().addEffect(new LoseLifeAllPlayersEffect(2));
+                this.getSpellAbility().addEffect(new DrawCardSourceControllerEffect(2, true));
+            """,
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["effect"], "composite_resolution")
+        self.assertEqual(effect["battle_model_scope"], split.EACH_PLAYER_LOSE_LIFE_DRAW_SCOPE)
+        self.assertEqual(effect["life_loss_amount"], 2)
+        self.assertEqual(effect["each_player_life_loss"], 2)
+        self.assertEqual(effect["life_loss_target"], "all_players")
+        self.assertEqual(effect["draw_count"], 2)
+        self.assertEqual(effect["resolution_order"], "lose_life_then_draw")
+        self.assertEqual(
+            [component["effect"] for component in effect["_composite_rule_components"]],
+            ["life_total_change", "draw_cards"],
+        )
+
+    def test_draw_then_each_player_lose_life_maps_exact_composite_scope(self) -> None:
+        proposal, reason = split.split_row(
+            queue_row(
+                split.DRAW_UNIT,
+                effect_classes=["DrawCardSourceControllerEffect", "LoseLifeAllPlayersEffect"],
+            ),
+            metadata(
+                name="Risky Shortcut",
+                type_line="Sorcery",
+                oracle_text="Draw two cards. Each player loses 2 life.",
+            ),
+            source_text="""
+                this.getSpellAbility().addEffect(new DrawCardSourceControllerEffect(2));
+                this.getSpellAbility().addEffect(new LoseLifeAllPlayersEffect(2));
+            """,
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.EACH_PLAYER_LOSE_LIFE_DRAW_SCOPE)
+        self.assertEqual(effect["life_loss_amount"], 2)
+        self.assertEqual(effect["draw_count"], 2)
+        self.assertEqual(effect["resolution_order"], "draw_then_lose_life")
+        self.assertEqual(
+            [component["effect"] for component in effect["_composite_rule_components"]],
+            ["draw_cards", "life_total_change"],
+        )
+
     def test_proliferate_draw_triggered_creature_stays_blocked(self) -> None:
         proposal, reason = split.split_row(
             queue_row(
