@@ -5226,6 +5226,149 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertIsNone(proposal)
         self.assertEqual(reason, "static_graveyard_count_boost_oracle_not_exact")
 
+    def test_static_dynamic_count_source_boost_artifacts_you_control_is_package_safe(self) -> None:
+        row = queue_row(
+            "xmage_signature::BoostSourceEffect::SimpleStaticAbility::"
+            "no_target_class::no_condition_class::static_ability",
+            effect_classes=["BoostSourceEffect"],
+            ability_kind="static",
+            ability_classes=["SimpleStaticAbility"],
+            xmage_signals=["static_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Nim Lasher",
+                type_line="Creature - Zombie",
+                oracle_text="This creature gets +1/+0 for each artifact you control.",
+            ),
+            source_text=(
+                "private static final FilterControlledPermanent filter = "
+                "new FilterControlledPermanent(\"artifact you control\");"
+                "static { filter.add(CardType.ARTIFACT.getPredicate()); }"
+                "this.addAbility(new SimpleStaticAbility(new BoostSourceEffect("
+                "new PermanentsOnBattlefieldCount(filter), StaticValue.get(0), "
+                "Duration.WhileOnBattlefield)));"
+            ),
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.STATIC_DYNAMIC_COUNT_SOURCE_BOOST_SCOPE)
+        self.assertEqual(effect["static_effect"], "source_power_toughness_boost_equal_dynamic_count")
+        self.assertEqual(effect["stat_modifier_amount_source"], "battlefield_permanent_count")
+        self.assertEqual(effect["battlefield_count_scope"], "controller_battlefield")
+        self.assertEqual(effect["battlefield_count_card_types"], ["artifact"])
+        self.assertEqual(effect["power_delta_per_graveyard_count"], 1)
+        self.assertEqual(effect["toughness_delta_per_graveyard_count"], 0)
+
+    def test_static_dynamic_count_source_boost_attached_aura_equipment_is_package_safe(self) -> None:
+        row = queue_row(
+            "xmage_signature::BoostSourceEffect::SimpleStaticAbility,TrampleAbility::"
+            "no_target_class::no_condition_class::static_ability",
+            effect_classes=["BoostSourceEffect"],
+            ability_kind="static",
+            ability_classes=["SimpleStaticAbility", "TrampleAbility"],
+            xmage_signals=["static_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Champion of the Flame",
+                type_line="Creature - Human Warrior",
+                oracle_text=(
+                    "Trample\n"
+                    "This creature gets +2/+2 for each Aura and Equipment attached to it."
+                ),
+            ),
+            source_text=(
+                "DynamicValue auraAmount = new AuraAttachedCount(2);"
+                "DynamicValue equipAmount = new EquipmentAttachedCount(2);"
+                "DynamicValue totalAmount = new AdditiveDynamicValue(auraAmount, equipAmount);"
+                "this.addAbility(new SimpleStaticAbility(new BoostSourceEffect("
+                "totalAmount, totalAmount, Duration.WhileOnBattlefield)));"
+            ),
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.STATIC_DYNAMIC_COUNT_SOURCE_BOOST_SCOPE)
+        self.assertEqual(effect["stat_modifier_amount_source"], "attached_permanent_count")
+        self.assertEqual(effect["attached_count_subtypes"], ["aura", "equipment"])
+        self.assertEqual(effect["power_delta_per_graveyard_count"], 2)
+        self.assertEqual(effect["toughness_delta_per_graveyard_count"], 2)
+        self.assertIn("trample", effect["keywords"])
+
+    def test_static_dynamic_count_source_boost_other_creatures_negative_is_package_safe(self) -> None:
+        row = queue_row(
+            "xmage_signature::BoostSourceEffect::SimpleStaticAbility::"
+            "no_target_class::no_condition_class::static_ability",
+            effect_classes=["BoostSourceEffect"],
+            ability_kind="static",
+            ability_classes=["SimpleStaticAbility"],
+            xmage_signals=["static_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Mogg Squad",
+                type_line="Creature - Goblin",
+                oracle_text="This creature gets -1/-1 for each other creature on the battlefield.",
+            ),
+            source_text=(
+                "private static final FilterCreaturePermanent filter = "
+                "new FilterCreaturePermanent(\"other creature on the battlefield\");"
+                "static { filter.add(AnotherPredicate.instance); }"
+                "DynamicValue amount = new SignInversionDynamicValue(new PermanentsOnBattlefieldCount(filter));"
+                "this.addAbility(new SimpleStaticAbility(new BoostSourceEffect("
+                "amount, amount, Duration.WhileOnBattlefield)));"
+            ),
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.STATIC_DYNAMIC_COUNT_SOURCE_BOOST_SCOPE)
+        self.assertEqual(effect["battlefield_count_scope"], "all_battlefields")
+        self.assertEqual(effect["battlefield_count_card_types"], ["creature"])
+        self.assertTrue(effect["battlefield_count_exclude_source"])
+        self.assertEqual(effect["power_delta_per_graveyard_count"], -1)
+        self.assertEqual(effect["toughness_delta_per_graveyard_count"], -1)
+
+    def test_static_dynamic_count_source_boost_legendary_creatures_is_package_safe(self) -> None:
+        row = queue_row(
+            "xmage_signature::BoostSourceEffect::SimpleStaticAbility::"
+            "no_target_class::no_condition_class::static_ability",
+            effect_classes=["BoostSourceEffect"],
+            ability_kind="static",
+            ability_classes=["SimpleStaticAbility"],
+            xmage_signals=["static_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Benalish Honor Guard",
+                type_line="Creature - Human Knight",
+                oracle_text="This creature gets +1/+0 for each legendary creature you control.",
+            ),
+            source_text=(
+                "private static final FilterControlledPermanent filter = "
+                "new FilterControlledCreaturePermanent(\"legendary creature you control\");"
+                "static { filter.add(SuperType.LEGENDARY.getPredicate()); }"
+                "PermanentsOnBattlefieldCount count = new PermanentsOnBattlefieldCount(filter);"
+                "this.addAbility(new SimpleStaticAbility(new BoostSourceEffect("
+                "count, StaticValue.get(0), Duration.WhileOnBattlefield)));"
+            ),
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.STATIC_DYNAMIC_COUNT_SOURCE_BOOST_SCOPE)
+        self.assertEqual(effect["battlefield_count_scope"], "controller_battlefield")
+        self.assertEqual(effect["battlefield_count_card_types"], ["creature"])
+        self.assertEqual(effect["battlefield_count_required_supertypes"], ["legendary"])
+        self.assertEqual(effect["power_delta_per_graveyard_count"], 1)
+        self.assertEqual(effect["toughness_delta_per_graveyard_count"], 0)
+
     def test_fixed_create_creature_tokens_spell_is_package_safe(self) -> None:
         row = queue_row(split.TOKEN_SPELL_UNIT, effect_classes=["CreateTokenEffect"], xmage_signals=["token"])
         proposal, reason = split.split_row(

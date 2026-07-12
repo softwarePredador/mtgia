@@ -2844,6 +2844,146 @@ class XMageExactScopeRuntimeTest(unittest.TestCase):
                     )
                 )
 
+    def test_static_dynamic_count_source_boost_counts_battlefield_without_accumulating(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        opponent = self.battle.Player("Opponent", None, [])
+        vorrac = {
+            "name": "Copperhoof Vorrac",
+            "type_line": "Creature - Boar Beast",
+            "effect": "creature",
+            "power": 2,
+            "toughness": 2,
+            "battle_model_scope": "xmage_static_source_dynamic_count_boost_v1",
+            "static_effect": "source_power_toughness_boost_equal_dynamic_count",
+            "stat_modifier_amount_source": "battlefield_permanent_count",
+            "battlefield_count_scope": "opponents_battlefield",
+            "battlefield_count_card_types": ["permanent"],
+            "battlefield_count_tapped_state": "untapped",
+            "power_delta_per_graveyard_count": 1,
+            "toughness_delta_per_graveyard_count": 1,
+        }
+        active.battlefield = [vorrac]
+        opponent.battlefield = [
+            {"name": "Untapped Soldier", "type_line": "Creature - Soldier", "tapped": False},
+            {"name": "Untapped Relic", "type_line": "Artifact", "tapped": False},
+            {"name": "Tapped Land", "type_line": "Land", "tapped": True},
+        ]
+
+        self.battle.refresh_graveyard_count_creature_statics_for_player(
+            active,
+            turn=5,
+            phase="test",
+            emit_events=True,
+            all_players=[active, opponent],
+        )
+        self.assertEqual(vorrac["static_dynamic_count_boost_current"], 2)
+        self.assertEqual(vorrac["power"], 4)
+        self.assertEqual(vorrac["toughness"], 4)
+
+        self.battle.refresh_graveyard_count_creature_statics_for_player(
+            active,
+            turn=6,
+            phase="test",
+            emit_events=True,
+            all_players=[active, opponent],
+        )
+        self.assertEqual(vorrac["power"], 4)
+        self.assertEqual(vorrac["toughness"], 4)
+        self.assertTrue(
+            any(
+                event == "static_dynamic_count_source_boost_changed"
+                and data.get("card") == "Copperhoof Vorrac"
+                and data.get("stat_modifier_count") == 2
+                for event, data in self.events
+            )
+        )
+
+    def test_static_dynamic_count_source_boost_counts_attached_auras_and_equipment(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        champion = {
+            "name": "Champion of the Flame",
+            "type_line": "Creature - Human Warrior",
+            "effect": "creature",
+            "power": 1,
+            "toughness": 1,
+            "battle_model_scope": "xmage_static_source_dynamic_count_boost_v1",
+            "static_effect": "source_power_toughness_boost_equal_dynamic_count",
+            "stat_modifier_amount_source": "attached_permanent_count",
+            "attached_count_subtypes": ["aura", "equipment"],
+            "power_delta_per_graveyard_count": 2,
+            "toughness_delta_per_graveyard_count": 2,
+        }
+        active.battlefield = [
+            champion,
+            {"name": "Attached Aura", "type_line": "Enchantment - Aura", "attached_to": "Champion of the Flame"},
+            {"name": "Attached Blade", "type_line": "Artifact - Equipment", "attached_to": "Champion of the Flame"},
+            {"name": "Loose Boots", "type_line": "Artifact - Equipment"},
+        ]
+
+        self.battle.refresh_graveyard_count_creature_statics_for_player(
+            active,
+            turn=5,
+            phase="test",
+            emit_events=True,
+            all_players=[active],
+        )
+
+        self.assertEqual(champion["static_dynamic_count_boost_current"], 2)
+        self.assertEqual(champion["power"], 5)
+        self.assertEqual(champion["toughness"], 5)
+        self.assertTrue(
+            any(
+                event == "static_dynamic_count_source_boost_changed"
+                and data.get("card") == "Champion of the Flame"
+                and data.get("attached_permanent_count") == 2
+                for event, data in self.events
+            )
+        )
+
+    def test_static_dynamic_count_source_boost_negative_bonus_can_move_zero_toughness(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        opponent = self.battle.Player("Opponent", None, [])
+        squad = {
+            "name": "Mogg Squad",
+            "type_line": "Creature - Goblin",
+            "effect": "creature",
+            "power": 3,
+            "toughness": 3,
+            "battle_model_scope": "xmage_static_source_dynamic_count_boost_v1",
+            "static_effect": "source_power_toughness_boost_equal_dynamic_count",
+            "stat_modifier_amount_source": "battlefield_permanent_count",
+            "battlefield_count_scope": "all_battlefields",
+            "battlefield_count_card_types": ["creature"],
+            "battlefield_count_exclude_source": True,
+            "power_delta_per_graveyard_count": -1,
+            "toughness_delta_per_graveyard_count": -1,
+        }
+        active.battlefield = [
+            squad,
+            {"name": "Active Bear", "type_line": "Creature - Bear"},
+            {"name": "Active Soldier", "type_line": "Creature - Soldier"},
+        ]
+        opponent.battlefield = [{"name": "Opponent Knight", "type_line": "Creature - Knight"}]
+
+        refreshed = self.battle.refresh_graveyard_count_creature_statics_for_player(
+            active,
+            turn=5,
+            phase="test",
+            emit_events=True,
+            all_players=[active, opponent],
+        )
+
+        self.assertNotIn(squad, active.battlefield)
+        self.assertIn(squad, active.graveyard)
+        self.assertTrue(any(row.get("state_based_action") == "zero_toughness_to_graveyard" for row in refreshed))
+        self.assertTrue(
+            any(
+                event == "state_based_action_zero_toughness"
+                and data.get("card") == "Mogg Squad"
+                for event, data in self.events
+            )
+        )
+
     def test_static_graveyard_threshold_source_boost_toggles_without_cumulative_bonus(self) -> None:
         active = self.battle.Player("Active", None, [])
         active.graveyard = [

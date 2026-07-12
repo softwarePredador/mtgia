@@ -46345,6 +46345,42 @@ def refresh_graveyard_count_creature_statics_for_player(
                 }
             )
             touched = True
+            moved = move_zero_toughness_graveyard_count_creature_to_graveyard(
+                player,
+                permanent,
+                turn=turn,
+                phase=phase,
+                emit_event=emit_events,
+            )
+            if moved:
+                row["state_based_action"] = "zero_toughness_to_graveyard"
+        if permanent.get("battle_model_scope") == STATIC_DYNAMIC_COUNT_SOURCE_BOOST_SCOPE:
+            active = apply_static_dynamic_count_source_boost(
+                permanent,
+                player,
+                all_players=participants,
+                turn=turn,
+                phase=phase,
+                emit_event=emit_events,
+            )
+            row.update(
+                {
+                    "dynamic_count_source_boost_active": active,
+                    "dynamic_count": permanent.get("static_dynamic_count_boost_current"),
+                    "power": permanent.get("power"),
+                    "toughness": permanent.get("toughness"),
+                }
+            )
+            touched = True
+            moved = move_zero_toughness_graveyard_count_creature_to_graveyard(
+                player,
+                permanent,
+                turn=turn,
+                phase=phase,
+                emit_event=emit_events,
+            )
+            if moved:
+                row["state_based_action"] = "zero_toughness_to_graveyard"
         if touched:
             refreshed.append(row)
     return refreshed
@@ -46529,6 +46565,7 @@ STATIC_GRAVEYARD_COUNT_POWER_TOUGHNESS_SCOPE = "xmage_static_source_power_toughn
 STATIC_COUNT_POWER_TOUGHNESS_SCOPE = "xmage_static_source_power_toughness_equal_count_v1"
 STATIC_GRAVEYARD_THRESHOLD_SOURCE_BOOST_SCOPE = "xmage_static_source_boost_if_graveyard_threshold_v1"
 STATIC_GRAVEYARD_COUNT_SOURCE_BOOST_SCOPE = "xmage_static_source_boost_equal_graveyard_count_v1"
+STATIC_DYNAMIC_COUNT_SOURCE_BOOST_SCOPE = "xmage_static_source_dynamic_count_boost_v1"
 
 
 def _static_pt_int(value, default=0):
@@ -46902,6 +46939,84 @@ def apply_static_graveyard_count_source_boost(
     return bool(power_bonus or toughness_bonus)
 
 
+def apply_static_dynamic_count_source_boost(
+    permanent,
+    controller,
+    all_players=None,
+    *,
+    turn=None,
+    phase=None,
+    emit_event=False,
+):
+    if not isinstance(permanent, dict) or controller is None or not is_battlefield_creature(permanent):
+        return False
+    if (
+        permanent.get("battle_model_scope") != STATIC_DYNAMIC_COUNT_SOURCE_BOOST_SCOPE
+        or permanent.get("static_effect") != "source_power_toughness_boost_equal_dynamic_count"
+    ):
+        return False
+    participants = [player for player in (all_players or []) if player is not None]
+    if all(id(player) != id(controller) for player in participants):
+        participants.insert(0, controller)
+    opponents = [player for player in participants if id(player) != id(controller)]
+    effect_data = {**permanent, "_count_source_permanent": permanent}
+    deltas, replay_fields = dynamic_stat_modifier_deltas(controller, opponents, effect_data)
+    if deltas is None:
+        return False
+    old_power_bonus = _static_pt_int(permanent.get("_static_dynamic_count_boost_power_bonus"), default=0)
+    old_toughness_bonus = _static_pt_int(permanent.get("_static_dynamic_count_boost_toughness_bonus"), default=0)
+    current_power = _static_pt_int(permanent.get("power", permanent.get("base_power")), default=1)
+    current_toughness = _static_pt_int(
+        permanent.get("toughness", permanent.get("base_toughness")),
+        default=current_power or 1,
+    )
+    base_power = current_power - old_power_bonus
+    base_toughness = current_toughness - old_toughness_bonus
+    power_bonus = _static_pt_int(deltas[0], default=0)
+    toughness_bonus = _static_pt_int(deltas[1], default=0)
+    before = {
+        "power": permanent.get("power"),
+        "toughness": permanent.get("toughness"),
+        "count": permanent.get("static_dynamic_count_boost_current"),
+    }
+    permanent["power"] = base_power + power_bonus
+    permanent["toughness"] = base_toughness + toughness_bonus
+    if power_bonus or toughness_bonus:
+        permanent["_static_dynamic_count_boost_power_bonus"] = power_bonus
+        permanent["_static_dynamic_count_boost_toughness_bonus"] = toughness_bonus
+    else:
+        permanent.pop("_static_dynamic_count_boost_power_bonus", None)
+        permanent.pop("_static_dynamic_count_boost_toughness_bonus", None)
+    count = int(replay_fields.get("stat_modifier_count") or 0)
+    permanent["static_dynamic_count_boost_current"] = count
+    permanent["static_dynamic_count_boost_amount_source"] = str(
+        permanent.get("stat_modifier_amount_source") or ""
+    )
+    changed = (
+        before["power"] != permanent.get("power")
+        or before["toughness"] != permanent.get("toughness")
+        or before["count"] != count
+    )
+    if emit_event and changed:
+        emit_replay_event(
+            "static_dynamic_count_source_boost_changed",
+            player=getattr(controller, "name", "?"),
+            card=permanent.get("name", "?"),
+            count=count,
+            power_before=before["power"],
+            toughness_before=before["toughness"],
+            power_after=permanent.get("power"),
+            toughness_after=permanent.get("toughness"),
+            power_bonus=power_bonus,
+            toughness_bonus=toughness_bonus,
+            turn=turn,
+            phase=phase,
+            **replay_rule_fields(permanent),
+            **replay_fields,
+        )
+    return bool(power_bonus or toughness_bonus)
+
+
 def static_graveyard_threshold_boost_is_active(permanent, controller, all_players=None):
     count = static_graveyard_threshold_boost_count(
         permanent,
@@ -47007,7 +47122,12 @@ def move_zero_toughness_graveyard_count_creature_to_graveyard(
         player is None
         or not isinstance(permanent, dict)
         or permanent.get("battle_model_scope")
-        not in {STATIC_GRAVEYARD_COUNT_POWER_TOUGHNESS_SCOPE, STATIC_COUNT_POWER_TOUGHNESS_SCOPE}
+        not in {
+            STATIC_GRAVEYARD_COUNT_POWER_TOUGHNESS_SCOPE,
+            STATIC_COUNT_POWER_TOUGHNESS_SCOPE,
+            STATIC_GRAVEYARD_COUNT_SOURCE_BOOST_SCOPE,
+            STATIC_DYNAMIC_COUNT_SOURCE_BOOST_SCOPE,
+        }
         or not is_battlefield_creature(permanent)
     ):
         return False
@@ -47983,6 +48103,14 @@ def prepare_entering_permanent(permanent, controller=None, all_players=None, tur
             emit_event=True,
         )
         apply_static_graveyard_count_source_boost(
+            permanent,
+            controller,
+            all_players=all_players,
+            turn=turn,
+            phase="enter_battlefield",
+            emit_event=True,
+        )
+        apply_static_dynamic_count_source_boost(
             permanent,
             controller,
             all_players=all_players,
@@ -58734,6 +58862,19 @@ def _battlefield_count_card_matches(card, effect_data):
     ]
     if allowed_subtypes and not any(permanent_has_subtype(card, subtype) for subtype in allowed_subtypes):
         return False
+    required_supertypes = [
+        str(value).strip().lower()
+        for value in _as_list(effect_data.get("battlefield_count_required_supertypes"))
+        if str(value).strip()
+    ]
+    if required_supertypes:
+        explicit_supertypes = card.get("supertypes") or card.get("supertype") or []
+        if isinstance(explicit_supertypes, str):
+            explicit_supertypes = [explicit_supertypes]
+        explicit = {str(value).strip().lower() for value in explicit_supertypes}
+        type_tokens = set(str(card.get("type_line") or "").lower().replace("—", " ").split())
+        if not all(supertype in explicit or supertype in type_tokens for supertype in required_supertypes):
+            return False
     excluded_subtypes = [
         str(value).strip().lower()
         for value in _as_list(effect_data.get("battlefield_count_excluded_subtypes"))
@@ -58784,6 +58925,7 @@ def _battlefield_count_card_matches(card, effect_data):
         allowed_types
         or excluded_types
         or allowed_subtypes
+        or required_supertypes
         or excluded_subtypes
         or allowed_names
         or required_colors
@@ -58926,6 +59068,38 @@ def _controlled_differently_named_land_count(player):
         if name:
             names.add(name)
     return len(names)
+
+
+def _attached_permanent_count_for_source(player, opponents, source_permanent, effect_data):
+    if not isinstance(source_permanent, dict):
+        return 0
+    target_name = str(source_permanent.get("name") or source_permanent.get("card_name") or "").strip()
+    if not target_name:
+        return 0
+    allowed_types = [
+        str(value).strip().lower()
+        for value in _as_list((effect_data or {}).get("attached_count_card_types"))
+        if str(value).strip()
+    ]
+    allowed_subtypes = [
+        str(value).strip().lower()
+        for value in _as_list((effect_data or {}).get("attached_count_subtypes"))
+        if str(value).strip()
+    ]
+    participants = [participant for participant in [player, *(opponents or [])] if participant is not None]
+    count = 0
+    for participant in participants:
+        for permanent in getattr(participant, "battlefield", []) or []:
+            if not isinstance(permanent, dict) or permanent is source_permanent:
+                continue
+            if str(permanent.get("attached_to") or "").strip() != target_name:
+                continue
+            if allowed_types and not _card_type_matches(permanent, allowed_types):
+                continue
+            if allowed_subtypes and not any(permanent_has_subtype(permanent, subtype) for subtype in allowed_subtypes):
+                continue
+            count += 1
+    return count
 
 
 def _graveyard_mana_symbol_count(players, color):
@@ -59091,6 +59265,19 @@ def _stat_modifier_count_from_source(player, opponents, effect_data):
             "controller_hand_size": player_count,
             "opponent_hand_sizes": opponent_counts,
         }
+    if amount_source == "attached_permanent_count":
+        count = _attached_permanent_count_for_source(
+            player,
+            opponents,
+            effect_data.get("_count_source_permanent") or effect_data.get("_attached_target"),
+            effect_data,
+        )
+        return count, {
+            "stat_modifier_amount_source": "attached_permanent_count",
+            "attached_permanent_count": count,
+            "attached_count_card_types": list(_as_list(effect_data.get("attached_count_card_types"))),
+            "attached_count_subtypes": list(_as_list(effect_data.get("attached_count_subtypes"))),
+        }
     if amount_source == "domain_basic_land_types":
         count = _domain_basic_land_type_count(player)
         return count, {
@@ -59125,6 +59312,7 @@ def dynamic_stat_modifier_deltas(player, opponents, effect_data):
         toughness_base + (count * toughness_per),
     ), {
         **replay_fields,
+        "stat_modifier_count": int(count),
         "power_base_delta": power_base,
         "toughness_base_delta": toughness_base,
         "power_delta_per_count": power_per,

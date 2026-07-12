@@ -13034,6 +13034,64 @@ def run_static_count_power_toughness(
     }
 
 
+def run_static_dynamic_count_source_boost(
+    battle,
+    scenario: dict[str, Any],
+    events: list[tuple[str, dict[str, Any]]],
+) -> dict[str, Any]:
+    card = dict(scenario["card"])
+    source = battle.enrich_card({**card, **battle.get_card_effect(card)})
+    active = battle.Player(str(scenario.get("player") or "Static Dynamic Count Controller"), None, [])
+    opponent = battle.Player(str(scenario.get("opponent") or "Static Dynamic Count Opponent"), None, [])
+    active.battlefield.extend(dict(card) for card in scenario.get("controller_battlefield") or [])
+    active.battlefield.append(source)
+    opponent.battlefield.extend(dict(card) for card in scenario.get("opponent_battlefield") or [])
+    active.hand = [dict(card) for card in scenario.get("controller_hand") or []]
+    opponent.hand = [dict(card) for card in scenario.get("opponent_hand") or []]
+    active.graveyard = [dict(card) for card in scenario.get("controller_graveyard") or []]
+    opponent.graveyard = [dict(card) for card in scenario.get("opponent_graveyard") or []]
+    before_events = len(events)
+    battle.refresh_graveyard_count_creature_statics_for_player(
+        active,
+        turn=int(scenario.get("turn") or 3),
+        phase="e2e_static_dynamic_count_source_boost",
+        emit_events=True,
+        all_players=[active, opponent],
+    )
+    expected_power = int(scenario["expected_power"])
+    expected_toughness = int(scenario["expected_toughness"])
+    if int(source.get("power") or 0) != expected_power:
+        fail("battle_execution", f"{card['name']} power={source.get('power')}, expected {expected_power}")
+    if int(source.get("toughness") or 0) != expected_toughness:
+        fail("battle_execution", f"{card['name']} toughness={source.get('toughness')}, expected {expected_toughness}")
+    changed_event = next(
+        (
+            data
+            for event, data in events[before_events:]
+            if event == "static_dynamic_count_source_boost_changed"
+            and data.get("card") == card.get("name")
+        ),
+        None,
+    )
+    if changed_event is None:
+        fail("battle_events", f"missing {card['name']} static_dynamic_count_source_boost_changed event")
+    expected_count = int(scenario["expected_count"])
+    event_count = int(changed_event.get("stat_modifier_count", changed_event.get("count") or 0) or 0)
+    if event_count != expected_count:
+        fail(
+            "battle_events",
+            f"{card['name']} count={event_count}, expected {expected_count}",
+        )
+    return {
+        "scenario": scenario.get("name"),
+        "card_name": card["name"],
+        "power": source.get("power"),
+        "toughness": source.get("toughness"),
+        "count": event_count,
+        "amount_source": source.get("stat_modifier_amount_source"),
+    }
+
+
 def run_static_graveyard_threshold_source_boost(
     battle,
     scenario: dict[str, Any],
@@ -14801,6 +14859,7 @@ SCENARIO_RUNNERS = {
     "attack_self_boost": run_attack_self_boost,
     "aura_static_power_toughness_attachment": run_aura_static_power_toughness_attachment,
     "equipment_static_power_toughness_attachment": run_equipment_static_power_toughness_attachment,
+    "static_dynamic_count_source_boost": run_static_dynamic_count_source_boost,
     "becomes_blocked_self_boost": run_becomes_blocked_self_boost,
     "board_wipe": run_board_wipe,
     "beginning_end_step_draw": run_beginning_end_step_draw,

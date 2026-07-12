@@ -555,6 +555,7 @@ E2E_REQUIRED_EFFECT_FIELDS = (
     "battlefield_count_composite_mode",
     "battlefield_count_components",
     "battlefield_count_required_colors",
+    "battlefield_count_required_supertypes",
     "battlefield_count_excluded_card_types",
     "battlefield_count_excluded_subtypes",
     "battlefield_count_card_names",
@@ -562,6 +563,8 @@ E2E_REQUIRED_EFFECT_FIELDS = (
     "battlefield_count_combat_state",
     "battlefield_count_tapped_state",
     "battlefield_count_exclude_source",
+    "attached_count_card_types",
+    "attached_count_subtypes",
     "mana_symbol_count_color",
     "counter_type",
     "counter_count",
@@ -2204,6 +2207,137 @@ def static_count_pt_execution_scenario_from_expected_rule(rule: dict[str, Any]) 
         "expected_count": expected_count,
         "expected_power": expected_value,
         "expected_toughness": expected_value,
+        "logical_rule_key": rule["logical_rule_key"],
+    }
+
+
+def static_dynamic_count_source_boost_execution_scenario_from_expected_rule(
+    rule: dict[str, Any],
+) -> dict[str, Any] | None:
+    required = dict(rule.get("required_effect_fields") or {})
+    if required.get("battle_model_scope") != "xmage_static_source_dynamic_count_boost_v1":
+        return None
+    if required.get("static_effect") != "source_power_toughness_boost_equal_dynamic_count":
+        return None
+
+    amount_source = str(required.get("stat_modifier_amount_source") or "")
+    base_power = 4
+    base_toughness = 4
+    source_card = {
+        "name": rule["card_name"],
+        "type_line": "Creature - E2E",
+        "effect": "creature",
+        "power": base_power,
+        "toughness": base_toughness,
+    }
+    controller_battlefield: list[dict[str, Any]] = []
+    opponent_battlefield: list[dict[str, Any]] = []
+    controller_hand: list[dict[str, Any]] = []
+    expected_count = 0
+
+    if amount_source == "domain_basic_land_types":
+        controller_battlefield = [
+            {"name": subtype, "type_line": f"Basic Land - {subtype}", "subtypes": [subtype]}
+            for subtype in ("Plains", "Island", "Swamp")
+        ]
+        expected_count = len(controller_battlefield)
+    elif amount_source == "controller_hand_count":
+        controller_hand = [
+            {"name": f"E2E Hand Card {index + 1}", "type_line": "Instant"}
+            for index in range(2)
+        ]
+        expected_count = len(controller_hand)
+    elif amount_source == "attached_permanent_count":
+        subtypes = [str(value).lower() for value in required.get("attached_count_subtypes") or []]
+        for subtype in subtypes or ["equipment"]:
+            type_line = "Enchantment - Aura" if subtype == "aura" else "Artifact - Equipment"
+            controller_battlefield.append(
+                {
+                    "name": f"E2E Attached {subtype.title()}",
+                    "type_line": type_line,
+                    "attached_to": rule["card_name"],
+                }
+            )
+        controller_battlefield.append({"name": "E2E Loose Equipment", "type_line": "Artifact - Equipment"})
+        expected_count = len(subtypes or ["equipment"])
+    elif amount_source == "battlefield_permanent_count":
+        scope = str(required.get("battlefield_count_scope") or "controller_battlefield")
+        card_types = [str(value).lower() for value in required.get("battlefield_count_card_types") or []]
+        subtypes = [str(value).lower() for value in required.get("battlefield_count_subtypes") or []]
+        required_supertypes = [
+            str(value).lower() for value in required.get("battlefield_count_required_supertypes") or []
+        ]
+        card_names = [str(value) for value in required.get("battlefield_count_card_names") or []]
+        tapped_state = str(required.get("battlefield_count_tapped_state") or "").lower()
+        keywords = [str(value).lower() for value in required.get("battlefield_count_keywords") or []]
+
+        def matching_card(label: str, tapped: bool = False) -> dict[str, Any]:
+            if card_names:
+                name = card_names[0].title()
+            else:
+                name = f"E2E Matching {label}"
+            if subtypes:
+                subtype = subtypes[0].title()
+                if "land" in card_types or subtype.lower() in {"plains", "island", "swamp", "mountain", "forest"}:
+                    type_line = f"Land - {subtype}"
+                else:
+                    type_line = f"Creature - {subtype}"
+            elif "artifact" in card_types:
+                type_line = "Artifact"
+            elif "enchantment" in card_types:
+                type_line = "Enchantment"
+            elif "land" in card_types:
+                type_line = "Land"
+            elif "creature" in card_types:
+                type_line = "Creature - Soldier"
+            else:
+                type_line = "Artifact"
+            if "legendary" in required_supertypes and "Legendary" not in type_line:
+                type_line = f"Legendary {type_line}"
+            if "basic" in required_supertypes and "Basic" not in type_line:
+                type_line = f"Basic {type_line}"
+            card = {"name": name, "type_line": type_line, "tapped": tapped}
+            for keyword in keywords:
+                card[keyword] = True
+                card.setdefault("keywords", []).append(keyword)
+            return card
+
+        match_count = 1 if int(required.get("power_delta_per_graveyard_count") or 0) < 0 else 2
+        if tapped_state == "untapped":
+            matching_cards = [matching_card("Untapped A", tapped=False), matching_card("Untapped B", tapped=False)]
+            nonmatching = {"name": "E2E Tapped Permanent", "type_line": "Artifact", "tapped": True}
+        else:
+            matching_cards = [matching_card(str(index + 1)) for index in range(match_count)]
+            nonmatching = {"name": "E2E Nonmatching Permanent", "type_line": "Instant"}
+        if scope == "opponents_battlefield":
+            opponent_battlefield.extend(matching_cards)
+            opponent_battlefield.append(nonmatching)
+        elif scope == "all_battlefields":
+            controller_battlefield.append(matching_cards[0])
+            if len(matching_cards) > 1:
+                opponent_battlefield.extend(matching_cards[1:])
+            opponent_battlefield.append(nonmatching)
+        else:
+            controller_battlefield.extend(matching_cards)
+            controller_battlefield.append(nonmatching)
+        expected_count = len(matching_cards)
+    else:
+        return None
+
+    power_per = int(required.get("power_delta_per_graveyard_count") or 0)
+    toughness_per = int(required.get("toughness_delta_per_graveyard_count") or 0)
+    power_base = int(required.get("power_base_delta") or 0)
+    toughness_base = int(required.get("toughness_base_delta") or 0)
+    return {
+        "name": f"{rule['card_name']} static dynamic count source boost recalculates",
+        "type": "static_dynamic_count_source_boost",
+        "card": source_card,
+        "controller_battlefield": controller_battlefield,
+        "opponent_battlefield": opponent_battlefield,
+        "controller_hand": controller_hand,
+        "expected_count": expected_count,
+        "expected_power": base_power + power_base + (expected_count * power_per),
+        "expected_toughness": base_toughness + toughness_base + (expected_count * toughness_per),
         "logical_rule_key": rule["logical_rule_key"],
     }
 
@@ -10023,6 +10157,7 @@ def execution_scenario_from_expected_rule(rule: dict[str, Any]) -> dict[str, Any
         or aura_static_pt_execution_scenario_from_expected_rule(rule)
         or equipment_static_pt_execution_scenario_from_expected_rule(rule)
         or static_graveyard_threshold_boost_execution_scenario_from_expected_rule(rule)
+        or static_dynamic_count_source_boost_execution_scenario_from_expected_rule(rule)
         or static_count_pt_execution_scenario_from_expected_rule(rule)
         or destroy_target_create_treasure_execution_scenario_from_expected_rule(rule)
         or creature_etb_fixed_mana_execution_scenario_from_expected_rule(rule)
