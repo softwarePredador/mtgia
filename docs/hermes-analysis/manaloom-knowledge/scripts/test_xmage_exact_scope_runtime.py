@@ -22513,6 +22513,70 @@ class XMageExactScopeRuntimeTest(unittest.TestCase):
         self.assertTrue(permanent["haste"])
         self.assertFalse(permanent["summoning_sick"])
 
+    def test_prowess_creature_triggers_on_noncreature_spell_only(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        opponent = self.battle.Player("Opponent", None, [])
+        prowess_creature = {
+            "name": "Jeskai Windscout",
+            "type_line": "Creature - Bird Scout",
+            "effect": "creature",
+            "battle_model_scope": "xmage_static_self_prowess_creature_v1",
+            "power": 2,
+            "toughness": 1,
+            "keywords": ["flying", "prowess"],
+            "_keywords_are_self": True,
+            "flying": True,
+            "prowess": True,
+            "trigger": "noncreature_spell_cast",
+            "trigger_effect": "boost_source_until_eot",
+            "trigger_power_bonus_until_eot": 1,
+            "trigger_toughness_bonus_until_eot": 1,
+            "_rule_logical_key": "battle_rule_v1:prowess-fixture",
+        }
+        active.battlefield.append(prowess_creature)
+
+        self.battle.trigger_spell_cast_engines(
+            active,
+            [active, opponent],
+            {"name": "Opt", "type_line": "Instant", "effect": "draw_cards", "cmc": 1},
+            turn=8,
+            phase="precombat_main",
+        )
+
+        self.assertEqual(prowess_creature["power"], 3)
+        self.assertEqual(prowess_creature["toughness"], 2)
+        self.assertTrue(
+            any(
+                event == "trigger_resolved"
+                and data.get("card") == "Jeskai Windscout"
+                and data.get("effect") == "boost_source_until_eot"
+                and data.get("trigger") == "noncreature_spell_cast"
+                and data.get("trigger_spell") == "Opt"
+                and data.get("rule_logical_key") == "battle_rule_v1:prowess-fixture"
+                for event, data in self.events
+            )
+        )
+
+        before_events = len(self.events)
+        self.battle.trigger_spell_cast_engines(
+            active,
+            [active, opponent],
+            {"name": "Grizzly Bears", "type_line": "Creature - Bear", "effect": "creature", "cmc": 2},
+            turn=8,
+            phase="precombat_main",
+        )
+
+        self.assertEqual(prowess_creature["power"], 3)
+        self.assertEqual(prowess_creature["toughness"], 2)
+        self.assertFalse(
+            any(
+                event == "trigger_resolved"
+                and data.get("card") == "Jeskai Windscout"
+                and data.get("effect") == "boost_source_until_eot"
+                for event, data in self.events[before_events:]
+            )
+        )
+
     def test_static_flash_keyword_creature_can_be_cast_outside_main_phase(self) -> None:
         active = self.battle.Player("Active", None, [])
         flash_creature = {

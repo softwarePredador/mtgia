@@ -99,6 +99,38 @@ def test_hand_cycling_runtime_fields_and_execution_scenario_are_manifested() -> 
     assert scenario["controller_mana"]["generic"] == 2
 
 
+def test_prowess_trigger_fields_and_execution_scenario_are_manifested() -> None:
+    proposal = {
+        "normalized_name": "jeskai windscout",
+        "card_name": "Jeskai Windscout",
+        "logical_rule_key": "battle_rule_v1:prowess_fixture",
+        "oracle_hash": "hash-prowess",
+        "effect_json": {
+            "effect": "creature",
+            "battle_model_scope": "xmage_static_self_prowess_creature_v1",
+            "keywords": ["flying", "prowess"],
+            "_keywords_are_self": True,
+            "flying": True,
+            "prowess": True,
+            "trigger": "noncreature_spell_cast",
+            "trigger_effect": "boost_source_until_eot",
+            "trigger_power_bonus_until_eot": 1,
+            "trigger_toughness_bonus_until_eot": 1,
+        },
+    }
+
+    expected = builder.expected_rule_from_proposal(proposal)
+    scenario = builder.execution_scenario_from_expected_rule(expected)
+
+    assert expected["required_effect_fields"]["trigger_power_bonus_until_eot"] == 1
+    assert expected["required_effect_fields"]["trigger_toughness_bonus_until_eot"] == 1
+    assert scenario["type"] == "prowess_trigger"
+    assert scenario["expected_trigger"] == "noncreature_spell_cast"
+    assert scenario["expected_power_bonus"] == 1
+    assert scenario["expected_toughness_bonus"] == 1
+    assert scenario["expected_keywords"] == ["flying", "prowess"]
+
+
 def test_creature_etb_life_gain_draw_execution_scenario_is_manifested() -> None:
     proposal = {
         "normalized_name": "inspiring overseer",

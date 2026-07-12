@@ -638,6 +638,8 @@ E2E_REQUIRED_EFFECT_FIELDS = (
     "cost_reduction_graveyard_card_types_min",
     "trigger",
     "trigger_effect",
+    "trigger_power_bonus_until_eot",
+    "trigger_toughness_bonus_until_eot",
     "etb_return_controlled_lands_to_hand_count",
     "etb_return_controlled_lands_to_hand_min_available",
     "etb_return_lands_targeting",
@@ -4935,6 +4937,54 @@ def hand_cycling_execution_scenario_from_expected_rule(
             }
         ],
         "expected_cycling_cost": cycling_cost,
+        "logical_rule_key": rule["logical_rule_key"],
+    }
+
+
+def prowess_execution_scenario_from_expected_rule(
+    rule: dict[str, Any],
+) -> dict[str, Any] | None:
+    required = dict(rule.get("required_effect_fields") or {})
+    if required.get("battle_model_scope") != "xmage_static_self_prowess_creature_v1":
+        return None
+    if (
+        required.get("trigger") != "noncreature_spell_cast"
+        or required.get("trigger_effect") != "boost_source_until_eot"
+    ):
+        return None
+    power_bonus = int(required.get("trigger_power_bonus_until_eot") or 0)
+    toughness_bonus = int(required.get("trigger_toughness_bonus_until_eot") or 0)
+    if power_bonus != 1 or toughness_bonus != 1:
+        return None
+    keywords = list(required.get("keywords") or [])
+    return {
+        "name": f"{rule['card_name']} triggers prowess from noncreature spell",
+        "type": "prowess_trigger",
+        "card": {
+            "name": rule["card_name"],
+            "type_line": "Creature - Monk",
+            "effect": "creature",
+            "power": 2,
+            "toughness": 2,
+            "keywords": keywords,
+            "_keywords_are_self": True,
+        },
+        "matching_spell": {
+            "name": "E2E Prowess Instant",
+            "type_line": "Instant",
+            "effect": "draw_cards",
+            "cmc": 1,
+        },
+        "nonmatching_spell": {
+            "name": "E2E Prowess Creature",
+            "type_line": "Creature - Soldier",
+            "effect": "creature",
+            "cmc": 1,
+        },
+        "expected_trigger": "noncreature_spell_cast",
+        "expected_power_bonus": power_bonus,
+        "expected_toughness_bonus": toughness_bonus,
+        "expected_keywords": keywords,
         "logical_rule_key": rule["logical_rule_key"],
     }
 
@@ -9855,6 +9905,7 @@ def execution_scenario_from_expected_rule(rule: dict[str, Any]) -> dict[str, Any
         or combat_damage_draw_execution_scenario_from_expected_rule(rule)
         or beginning_end_step_draw_execution_scenario_from_expected_rule(rule)
         or hand_cycling_execution_scenario_from_expected_rule(rule)
+        or prowess_execution_scenario_from_expected_rule(rule)
         or simple_activated_damage_execution_scenario_from_expected_rule(rule)
         or simple_activated_tap_target_execution_scenario_from_expected_rule(rule)
         or simple_activated_untap_target_execution_scenario_from_expected_rule(rule)

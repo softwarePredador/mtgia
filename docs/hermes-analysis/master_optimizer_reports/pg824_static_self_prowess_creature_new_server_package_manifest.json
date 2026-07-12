@@ -1,0 +1,2401 @@
+{
+  "apply_gate": "Do not run apply SQL without explicit approval for the exact command.",
+  "backup_table": "manaloom_deploy_audit.pg824_pg824_static_self_prowess_creature_20260712_095650",
+  "deploy_id": "PG824",
+  "execution_scenarios": [
+    {
+      "card": {
+        "_keywords_are_self": true,
+        "effect": "creature",
+        "keywords": [
+          "prowess"
+        ],
+        "name": "Bloodfire Expert",
+        "power": 2,
+        "toughness": 2,
+        "type_line": "Creature - Monk"
+      },
+      "expected_keywords": [
+        "prowess"
+      ],
+      "expected_power_bonus": 1,
+      "expected_toughness_bonus": 1,
+      "expected_trigger": "noncreature_spell_cast",
+      "logical_rule_key": "battle_rule_v1:aa8b3af252c57022f8b9ed93cda0801b",
+      "matching_spell": {
+        "cmc": 1,
+        "effect": "draw_cards",
+        "name": "E2E Prowess Instant",
+        "type_line": "Instant"
+      },
+      "name": "Bloodfire Expert triggers prowess from noncreature spell",
+      "nonmatching_spell": {
+        "cmc": 1,
+        "effect": "creature",
+        "name": "E2E Prowess Creature",
+        "type_line": "Creature - Soldier"
+      },
+      "type": "prowess_trigger"
+    },
+    {
+      "card": {
+        "_keywords_are_self": true,
+        "effect": "creature",
+        "keywords": [
+          "vigilance",
+          "prowess"
+        ],
+        "name": "Dragon Bell Monk",
+        "power": 2,
+        "toughness": 2,
+        "type_line": "Creature - Monk"
+      },
+      "expected_keywords": [
+        "vigilance",
+        "prowess"
+      ],
+      "expected_power_bonus": 1,
+      "expected_toughness_bonus": 1,
+      "expected_trigger": "noncreature_spell_cast",
+      "logical_rule_key": "battle_rule_v1:f423e23dfba0395763db56e510c618d2",
+      "matching_spell": {
+        "cmc": 1,
+        "effect": "draw_cards",
+        "name": "E2E Prowess Instant",
+        "type_line": "Instant"
+      },
+      "name": "Dragon Bell Monk triggers prowess from noncreature spell",
+      "nonmatching_spell": {
+        "cmc": 1,
+        "effect": "creature",
+        "name": "E2E Prowess Creature",
+        "type_line": "Creature - Soldier"
+      },
+      "type": "prowess_trigger"
+    },
+    {
+      "card": {
+        "_keywords_are_self": true,
+        "effect": "creature",
+        "keywords": [
+          "double_strike",
+          "prowess"
+        ],
+        "name": "Dragon-Style Twins",
+        "power": 2,
+        "toughness": 2,
+        "type_line": "Creature - Monk"
+      },
+      "expected_keywords": [
+        "double_strike",
+        "prowess"
+      ],
+      "expected_power_bonus": 1,
+      "expected_toughness_bonus": 1,
+      "expected_trigger": "noncreature_spell_cast",
+      "logical_rule_key": "battle_rule_v1:35e6d8c2deb4456c52a972f5058ca6de",
+      "matching_spell": {
+        "cmc": 1,
+        "effect": "draw_cards",
+        "name": "E2E Prowess Instant",
+        "type_line": "Instant"
+      },
+      "name": "Dragon-Style Twins triggers prowess from noncreature spell",
+      "nonmatching_spell": {
+        "cmc": 1,
+        "effect": "creature",
+        "name": "E2E Prowess Creature",
+        "type_line": "Creature - Soldier"
+      },
+      "type": "prowess_trigger"
+    },
+    {
+      "card": {
+        "_keywords_are_self": true,
+        "effect": "creature",
+        "keywords": [
+          "flash",
+          "prowess"
+        ],
+        "name": "Elementalist Adept",
+        "power": 2,
+        "toughness": 2,
+        "type_line": "Creature - Monk"
+      },
+      "expected_keywords": [
+        "flash",
+        "prowess"
+      ],
+      "expected_power_bonus": 1,
+      "expected_toughness_bonus": 1,
+      "expected_trigger": "noncreature_spell_cast",
+      "logical_rule_key": "battle_rule_v1:45e7203d626522896cd6cb2a15aebe7b",
+      "matching_spell": {
+        "cmc": 1,
+        "effect": "draw_cards",
+        "name": "E2E Prowess Instant",
+        "type_line": "Instant"
+      },
+      "name": "Elementalist Adept triggers prowess from noncreature spell",
+      "nonmatching_spell": {
+        "cmc": 1,
+        "effect": "creature",
+        "name": "E2E Prowess Creature",
+        "type_line": "Creature - Soldier"
+      },
+      "type": "prowess_trigger"
+    },
+    {
+      "card": {
+        "_keywords_are_self": true,
+        "effect": "creature",
+        "keywords": [
+          "flying",
+          "vigilance",
+          "prowess"
+        ],
+        "name": "Iguana Parrot",
+        "power": 2,
+        "toughness": 2,
+        "type_line": "Creature - Monk"
+      },
+      "expected_keywords": [
+        "flying",
+        "vigilance",
+        "prowess"
+      ],
+      "expected_power_bonus": 1,
+      "expected_toughness_bonus": 1,
+      "expected_trigger": "noncreature_spell_cast",
+      "logical_rule_key": "battle_rule_v1:3a4d72a9277b4fc563f4fa2339bcff15",
+      "matching_spell": {
+        "cmc": 1,
+        "effect": "draw_cards",
+        "name": "E2E Prowess Instant",
+        "type_line": "Instant"
+      },
+      "name": "Iguana Parrot triggers prowess from noncreature spell",
+      "nonmatching_spell": {
+        "cmc": 1,
+        "effect": "creature",
+        "name": "E2E Prowess Creature",
+        "type_line": "Creature - Soldier"
+      },
+      "type": "prowess_trigger"
+    },
+    {
+      "card": {
+        "_keywords_are_self": true,
+        "effect": "creature",
+        "keywords": [
+          "double_strike",
+          "prowess"
+        ],
+        "name": "Jeskai Brushmaster",
+        "power": 2,
+        "toughness": 2,
+        "type_line": "Creature - Monk"
+      },
+      "expected_keywords": [
+        "double_strike",
+        "prowess"
+      ],
+      "expected_power_bonus": 1,
+      "expected_toughness_bonus": 1,
+      "expected_trigger": "noncreature_spell_cast",
+      "logical_rule_key": "battle_rule_v1:35e6d8c2deb4456c52a972f5058ca6de",
+      "matching_spell": {
+        "cmc": 1,
+        "effect": "draw_cards",
+        "name": "E2E Prowess Instant",
+        "type_line": "Instant"
+      },
+      "name": "Jeskai Brushmaster triggers prowess from noncreature spell",
+      "nonmatching_spell": {
+        "cmc": 1,
+        "effect": "creature",
+        "name": "E2E Prowess Creature",
+        "type_line": "Creature - Soldier"
+      },
+      "type": "prowess_trigger"
+    },
+    {
+      "card": {
+        "_keywords_are_self": true,
+        "effect": "creature",
+        "keywords": [
+          "prowess"
+        ],
+        "name": "Jeskai Student",
+        "power": 2,
+        "toughness": 2,
+        "type_line": "Creature - Monk"
+      },
+      "expected_keywords": [
+        "prowess"
+      ],
+      "expected_power_bonus": 1,
+      "expected_toughness_bonus": 1,
+      "expected_trigger": "noncreature_spell_cast",
+      "logical_rule_key": "battle_rule_v1:aa8b3af252c57022f8b9ed93cda0801b",
+      "matching_spell": {
+        "cmc": 1,
+        "effect": "draw_cards",
+        "name": "E2E Prowess Instant",
+        "type_line": "Instant"
+      },
+      "name": "Jeskai Student triggers prowess from noncreature spell",
+      "nonmatching_spell": {
+        "cmc": 1,
+        "effect": "creature",
+        "name": "E2E Prowess Creature",
+        "type_line": "Creature - Soldier"
+      },
+      "type": "prowess_trigger"
+    },
+    {
+      "card": {
+        "_keywords_are_self": true,
+        "effect": "creature",
+        "keywords": [
+          "flying",
+          "prowess"
+        ],
+        "name": "Jeskai Windscout",
+        "power": 2,
+        "toughness": 2,
+        "type_line": "Creature - Monk"
+      },
+      "expected_keywords": [
+        "flying",
+        "prowess"
+      ],
+      "expected_power_bonus": 1,
+      "expected_toughness_bonus": 1,
+      "expected_trigger": "noncreature_spell_cast",
+      "logical_rule_key": "battle_rule_v1:d6804d7cad8e0bf9ffab4ca27f7d794b",
+      "matching_spell": {
+        "cmc": 1,
+        "effect": "draw_cards",
+        "name": "E2E Prowess Instant",
+        "type_line": "Instant"
+      },
+      "name": "Jeskai Windscout triggers prowess from noncreature spell",
+      "nonmatching_spell": {
+        "cmc": 1,
+        "effect": "creature",
+        "name": "E2E Prowess Creature",
+        "type_line": "Creature - Soldier"
+      },
+      "type": "prowess_trigger"
+    },
+    {
+      "card": {
+        "_keywords_are_self": true,
+        "effect": "creature",
+        "keywords": [
+          "prowess"
+        ],
+        "name": "Lightning Visionary",
+        "power": 2,
+        "toughness": 2,
+        "type_line": "Creature - Monk"
+      },
+      "expected_keywords": [
+        "prowess"
+      ],
+      "expected_power_bonus": 1,
+      "expected_toughness_bonus": 1,
+      "expected_trigger": "noncreature_spell_cast",
+      "logical_rule_key": "battle_rule_v1:aa8b3af252c57022f8b9ed93cda0801b",
+      "matching_spell": {
+        "cmc": 1,
+        "effect": "draw_cards",
+        "name": "E2E Prowess Instant",
+        "type_line": "Instant"
+      },
+      "name": "Lightning Visionary triggers prowess from noncreature spell",
+      "nonmatching_spell": {
+        "cmc": 1,
+        "effect": "creature",
+        "name": "E2E Prowess Creature",
+        "type_line": "Creature - Soldier"
+      },
+      "type": "prowess_trigger"
+    },
+    {
+      "card": {
+        "_keywords_are_self": true,
+        "effect": "creature",
+        "keywords": [
+          "flying",
+          "prowess"
+        ],
+        "name": "Lotus Path Djinn",
+        "power": 2,
+        "toughness": 2,
+        "type_line": "Creature - Monk"
+      },
+      "expected_keywords": [
+        "flying",
+        "prowess"
+      ],
+      "expected_power_bonus": 1,
+      "expected_toughness_bonus": 1,
+      "expected_trigger": "noncreature_spell_cast",
+      "logical_rule_key": "battle_rule_v1:d6804d7cad8e0bf9ffab4ca27f7d794b",
+      "matching_spell": {
+        "cmc": 1,
+        "effect": "draw_cards",
+        "name": "E2E Prowess Instant",
+        "type_line": "Instant"
+      },
+      "name": "Lotus Path Djinn triggers prowess from noncreature spell",
+      "nonmatching_spell": {
+        "cmc": 1,
+        "effect": "creature",
+        "name": "E2E Prowess Creature",
+        "type_line": "Creature - Soldier"
+      },
+      "type": "prowess_trigger"
+    },
+    {
+      "card": {
+        "_keywords_are_self": true,
+        "effect": "creature",
+        "keywords": [
+          "flying",
+          "prowess"
+        ],
+        "name": "Mistral Singer",
+        "power": 2,
+        "toughness": 2,
+        "type_line": "Creature - Monk"
+      },
+      "expected_keywords": [
+        "flying",
+        "prowess"
+      ],
+      "expected_power_bonus": 1,
+      "expected_toughness_bonus": 1,
+      "expected_trigger": "noncreature_spell_cast",
+      "logical_rule_key": "battle_rule_v1:d6804d7cad8e0bf9ffab4ca27f7d794b",
+      "matching_spell": {
+        "cmc": 1,
+        "effect": "draw_cards",
+        "name": "E2E Prowess Instant",
+        "type_line": "Instant"
+      },
+      "name": "Mistral Singer triggers prowess from noncreature spell",
+      "nonmatching_spell": {
+        "cmc": 1,
+        "effect": "creature",
+        "name": "E2E Prowess Creature",
+        "type_line": "Creature - Soldier"
+      },
+      "type": "prowess_trigger"
+    },
+    {
+      "card": {
+        "_keywords_are_self": true,
+        "effect": "creature",
+        "keywords": [
+          "haste",
+          "prowess"
+        ],
+        "name": "Monastery Swiftspear",
+        "power": 2,
+        "toughness": 2,
+        "type_line": "Creature - Monk"
+      },
+      "expected_keywords": [
+        "haste",
+        "prowess"
+      ],
+      "expected_power_bonus": 1,
+      "expected_toughness_bonus": 1,
+      "expected_trigger": "noncreature_spell_cast",
+      "logical_rule_key": "battle_rule_v1:618dd843b7e3bd09f084eebecf681943",
+      "matching_spell": {
+        "cmc": 1,
+        "effect": "draw_cards",
+        "name": "E2E Prowess Instant",
+        "type_line": "Instant"
+      },
+      "name": "Monastery Swiftspear triggers prowess from noncreature spell",
+      "nonmatching_spell": {
+        "cmc": 1,
+        "effect": "creature",
+        "name": "E2E Prowess Creature",
+        "type_line": "Creature - Soldier"
+      },
+      "type": "prowess_trigger"
+    },
+    {
+      "card": {
+        "_keywords_are_self": true,
+        "effect": "creature",
+        "keywords": [
+          "flying",
+          "prowess"
+        ],
+        "name": "Niblis of Dusk",
+        "power": 2,
+        "toughness": 2,
+        "type_line": "Creature - Monk"
+      },
+      "expected_keywords": [
+        "flying",
+        "prowess"
+      ],
+      "expected_power_bonus": 1,
+      "expected_toughness_bonus": 1,
+      "expected_trigger": "noncreature_spell_cast",
+      "logical_rule_key": "battle_rule_v1:d6804d7cad8e0bf9ffab4ca27f7d794b",
+      "matching_spell": {
+        "cmc": 1,
+        "effect": "draw_cards",
+        "name": "E2E Prowess Instant",
+        "type_line": "Instant"
+      },
+      "name": "Niblis of Dusk triggers prowess from noncreature spell",
+      "nonmatching_spell": {
+        "cmc": 1,
+        "effect": "creature",
+        "name": "E2E Prowess Creature",
+        "type_line": "Creature - Soldier"
+      },
+      "type": "prowess_trigger"
+    },
+    {
+      "card": {
+        "_keywords_are_self": true,
+        "effect": "creature",
+        "keywords": [
+          "prowess"
+        ],
+        "name": "Nimble-Blade Khenra",
+        "power": 2,
+        "toughness": 2,
+        "type_line": "Creature - Monk"
+      },
+      "expected_keywords": [
+        "prowess"
+      ],
+      "expected_power_bonus": 1,
+      "expected_toughness_bonus": 1,
+      "expected_trigger": "noncreature_spell_cast",
+      "logical_rule_key": "battle_rule_v1:aa8b3af252c57022f8b9ed93cda0801b",
+      "matching_spell": {
+        "cmc": 1,
+        "effect": "draw_cards",
+        "name": "E2E Prowess Instant",
+        "type_line": "Instant"
+      },
+      "name": "Nimble-Blade Khenra triggers prowess from noncreature spell",
+      "nonmatching_spell": {
+        "cmc": 1,
+        "effect": "creature",
+        "name": "E2E Prowess Creature",
+        "type_line": "Creature - Soldier"
+      },
+      "type": "prowess_trigger"
+    },
+    {
+      "card": {
+        "_keywords_are_self": true,
+        "effect": "creature",
+        "keywords": [
+          "flying",
+          "prowess"
+        ],
+        "name": "Ringwarden Owl",
+        "power": 2,
+        "toughness": 2,
+        "type_line": "Creature - Monk"
+      },
+      "expected_keywords": [
+        "flying",
+        "prowess"
+      ],
+      "expected_power_bonus": 1,
+      "expected_toughness_bonus": 1,
+      "expected_trigger": "noncreature_spell_cast",
+      "logical_rule_key": "battle_rule_v1:d6804d7cad8e0bf9ffab4ca27f7d794b",
+      "matching_spell": {
+        "cmc": 1,
+        "effect": "draw_cards",
+        "name": "E2E Prowess Instant",
+        "type_line": "Instant"
+      },
+      "name": "Ringwarden Owl triggers prowess from noncreature spell",
+      "nonmatching_spell": {
+        "cmc": 1,
+        "effect": "creature",
+        "name": "E2E Prowess Creature",
+        "type_line": "Creature - Soldier"
+      },
+      "type": "prowess_trigger"
+    },
+    {
+      "card": {
+        "_keywords_are_self": true,
+        "effect": "creature",
+        "keywords": [
+          "flying",
+          "prowess"
+        ],
+        "name": "Riverwheel Aerialists",
+        "power": 2,
+        "toughness": 2,
+        "type_line": "Creature - Monk"
+      },
+      "expected_keywords": [
+        "flying",
+        "prowess"
+      ],
+      "expected_power_bonus": 1,
+      "expected_toughness_bonus": 1,
+      "expected_trigger": "noncreature_spell_cast",
+      "logical_rule_key": "battle_rule_v1:d6804d7cad8e0bf9ffab4ca27f7d794b",
+      "matching_spell": {
+        "cmc": 1,
+        "effect": "draw_cards",
+        "name": "E2E Prowess Instant",
+        "type_line": "Instant"
+      },
+      "name": "Riverwheel Aerialists triggers prowess from noncreature spell",
+      "nonmatching_spell": {
+        "cmc": 1,
+        "effect": "creature",
+        "name": "E2E Prowess Creature",
+        "type_line": "Creature - Soldier"
+      },
+      "type": "prowess_trigger"
+    },
+    {
+      "card": {
+        "_keywords_are_self": true,
+        "effect": "creature",
+        "keywords": [
+          "prowess"
+        ],
+        "name": "Sanguinary Mage",
+        "power": 2,
+        "toughness": 2,
+        "type_line": "Creature - Monk"
+      },
+      "expected_keywords": [
+        "prowess"
+      ],
+      "expected_power_bonus": 1,
+      "expected_toughness_bonus": 1,
+      "expected_trigger": "noncreature_spell_cast",
+      "logical_rule_key": "battle_rule_v1:aa8b3af252c57022f8b9ed93cda0801b",
+      "matching_spell": {
+        "cmc": 1,
+        "effect": "draw_cards",
+        "name": "E2E Prowess Instant",
+        "type_line": "Instant"
+      },
+      "name": "Sanguinary Mage triggers prowess from noncreature spell",
+      "nonmatching_spell": {
+        "cmc": 1,
+        "effect": "creature",
+        "name": "E2E Prowess Creature",
+        "type_line": "Creature - Soldier"
+      },
+      "type": "prowess_trigger"
+    },
+    {
+      "card": {
+        "_keywords_are_self": true,
+        "effect": "creature",
+        "keywords": [
+          "flying",
+          "haste",
+          "prowess"
+        ],
+        "name": "Stormchaser Mage",
+        "power": 2,
+        "toughness": 2,
+        "type_line": "Creature - Monk"
+      },
+      "expected_keywords": [
+        "flying",
+        "haste",
+        "prowess"
+      ],
+      "expected_power_bonus": 1,
+      "expected_toughness_bonus": 1,
+      "expected_trigger": "noncreature_spell_cast",
+      "logical_rule_key": "battle_rule_v1:21476bd81c39ba0239b3d51001419bee",
+      "matching_spell": {
+        "cmc": 1,
+        "effect": "draw_cards",
+        "name": "E2E Prowess Instant",
+        "type_line": "Instant"
+      },
+      "name": "Stormchaser Mage triggers prowess from noncreature spell",
+      "nonmatching_spell": {
+        "cmc": 1,
+        "effect": "creature",
+        "name": "E2E Prowess Creature",
+        "type_line": "Creature - Soldier"
+      },
+      "type": "prowess_trigger"
+    },
+    {
+      "card": {
+        "_keywords_are_self": true,
+        "effect": "creature",
+        "keywords": [
+          "flying",
+          "vigilance",
+          "prowess"
+        ],
+        "name": "Thor Odinson",
+        "power": 2,
+        "toughness": 2,
+        "type_line": "Creature - Monk"
+      },
+      "expected_keywords": [
+        "flying",
+        "vigilance",
+        "prowess"
+      ],
+      "expected_power_bonus": 1,
+      "expected_toughness_bonus": 1,
+      "expected_trigger": "noncreature_spell_cast",
+      "logical_rule_key": "battle_rule_v1:3a4d72a9277b4fc563f4fa2339bcff15",
+      "matching_spell": {
+        "cmc": 1,
+        "effect": "draw_cards",
+        "name": "E2E Prowess Instant",
+        "type_line": "Instant"
+      },
+      "name": "Thor Odinson triggers prowess from noncreature spell",
+      "nonmatching_spell": {
+        "cmc": 1,
+        "effect": "creature",
+        "name": "E2E Prowess Creature",
+        "type_line": "Creature - Soldier"
+      },
+      "type": "prowess_trigger"
+    },
+    {
+      "card": {
+        "_keywords_are_self": true,
+        "effect": "creature",
+        "keywords": [
+          "prowess"
+        ],
+        "name": "Umara Entangler",
+        "power": 2,
+        "toughness": 2,
+        "type_line": "Creature - Monk"
+      },
+      "expected_keywords": [
+        "prowess"
+      ],
+      "expected_power_bonus": 1,
+      "expected_toughness_bonus": 1,
+      "expected_trigger": "noncreature_spell_cast",
+      "logical_rule_key": "battle_rule_v1:aa8b3af252c57022f8b9ed93cda0801b",
+      "matching_spell": {
+        "cmc": 1,
+        "effect": "draw_cards",
+        "name": "E2E Prowess Instant",
+        "type_line": "Instant"
+      },
+      "name": "Umara Entangler triggers prowess from noncreature spell",
+      "nonmatching_spell": {
+        "cmc": 1,
+        "effect": "creature",
+        "name": "E2E Prowess Creature",
+        "type_line": "Creature - Soldier"
+      },
+      "type": "prowess_trigger"
+    },
+    {
+      "card": {
+        "_keywords_are_self": true,
+        "effect": "creature",
+        "keywords": [
+          "prowess"
+        ],
+        "name": "Vedalken Blademaster",
+        "power": 2,
+        "toughness": 2,
+        "type_line": "Creature - Monk"
+      },
+      "expected_keywords": [
+        "prowess"
+      ],
+      "expected_power_bonus": 1,
+      "expected_toughness_bonus": 1,
+      "expected_trigger": "noncreature_spell_cast",
+      "logical_rule_key": "battle_rule_v1:aa8b3af252c57022f8b9ed93cda0801b",
+      "matching_spell": {
+        "cmc": 1,
+        "effect": "draw_cards",
+        "name": "E2E Prowess Instant",
+        "type_line": "Instant"
+      },
+      "name": "Vedalken Blademaster triggers prowess from noncreature spell",
+      "nonmatching_spell": {
+        "cmc": 1,
+        "effect": "creature",
+        "name": "E2E Prowess Creature",
+        "type_line": "Creature - Soldier"
+      },
+      "type": "prowess_trigger"
+    },
+    {
+      "card": {
+        "_keywords_are_self": true,
+        "effect": "creature",
+        "keywords": [
+          "hexproof",
+          "prowess"
+        ],
+        "name": "Whirlwind Adept",
+        "power": 2,
+        "toughness": 2,
+        "type_line": "Creature - Monk"
+      },
+      "expected_keywords": [
+        "hexproof",
+        "prowess"
+      ],
+      "expected_power_bonus": 1,
+      "expected_toughness_bonus": 1,
+      "expected_trigger": "noncreature_spell_cast",
+      "logical_rule_key": "battle_rule_v1:93bdc2cc4dcb1ed53fc74db4bec45959",
+      "matching_spell": {
+        "cmc": 1,
+        "effect": "draw_cards",
+        "name": "E2E Prowess Instant",
+        "type_line": "Instant"
+      },
+      "name": "Whirlwind Adept triggers prowess from noncreature spell",
+      "nonmatching_spell": {
+        "cmc": 1,
+        "effect": "creature",
+        "name": "E2E Prowess Creature",
+        "type_line": "Creature - Soldier"
+      },
+      "type": "prowess_trigger"
+    },
+    {
+      "card": {
+        "_keywords_are_self": true,
+        "effect": "creature",
+        "keywords": [
+          "flying",
+          "prowess"
+        ],
+        "name": "Wing Commando",
+        "power": 2,
+        "toughness": 2,
+        "type_line": "Creature - Monk"
+      },
+      "expected_keywords": [
+        "flying",
+        "prowess"
+      ],
+      "expected_power_bonus": 1,
+      "expected_toughness_bonus": 1,
+      "expected_trigger": "noncreature_spell_cast",
+      "logical_rule_key": "battle_rule_v1:d6804d7cad8e0bf9ffab4ca27f7d794b",
+      "matching_spell": {
+        "cmc": 1,
+        "effect": "draw_cards",
+        "name": "E2E Prowess Instant",
+        "type_line": "Instant"
+      },
+      "name": "Wing Commando triggers prowess from noncreature spell",
+      "nonmatching_spell": {
+        "cmc": 1,
+        "effect": "creature",
+        "name": "E2E Prowess Creature",
+        "type_line": "Creature - Soldier"
+      },
+      "type": "prowess_trigger"
+    }
+  ],
+  "expected_rules": [
+    {
+      "card_name": "Bloodfire Expert",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:aa8b3af252c57022f8b9ed93cda0801b",
+      "min_rule_version": 2,
+      "normalized_name": "bloodfire expert",
+      "oracle_hash": "e049c755c6165a346e7a0aa8c56d73ef",
+      "required_effect_fields": {
+        "_keywords_are_self": true,
+        "battle_model_scope": "xmage_static_self_prowess_creature_v1",
+        "effect": "creature",
+        "keywords": [
+          "prowess"
+        ],
+        "trigger": "noncreature_spell_cast",
+        "trigger_effect": "boost_source_until_eot",
+        "trigger_power_bonus_until_eot": 1,
+        "trigger_toughness_bonus_until_eot": 1,
+        "xmage_ability_classes": [
+          "ProwessAbility"
+        ]
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Dragon Bell Monk",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:f423e23dfba0395763db56e510c618d2",
+      "min_rule_version": 2,
+      "normalized_name": "dragon bell monk",
+      "oracle_hash": "9213bae27124e68f0d218569952630f5",
+      "required_effect_fields": {
+        "_keywords_are_self": true,
+        "battle_model_scope": "xmage_static_self_prowess_creature_v1",
+        "effect": "creature",
+        "keywords": [
+          "vigilance",
+          "prowess"
+        ],
+        "trigger": "noncreature_spell_cast",
+        "trigger_effect": "boost_source_until_eot",
+        "trigger_power_bonus_until_eot": 1,
+        "trigger_toughness_bonus_until_eot": 1,
+        "xmage_ability_classes": [
+          "ProwessAbility",
+          "VigilanceAbility"
+        ]
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Dragon-Style Twins",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:35e6d8c2deb4456c52a972f5058ca6de",
+      "min_rule_version": 2,
+      "normalized_name": "dragon-style twins",
+      "oracle_hash": "eff0b51df6bfd5de2a2d1ca0760fecde",
+      "required_effect_fields": {
+        "_keywords_are_self": true,
+        "battle_model_scope": "xmage_static_self_prowess_creature_v1",
+        "effect": "creature",
+        "keywords": [
+          "double_strike",
+          "prowess"
+        ],
+        "trigger": "noncreature_spell_cast",
+        "trigger_effect": "boost_source_until_eot",
+        "trigger_power_bonus_until_eot": 1,
+        "trigger_toughness_bonus_until_eot": 1,
+        "xmage_ability_classes": [
+          "DoubleStrikeAbility",
+          "ProwessAbility"
+        ]
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Elementalist Adept",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:45e7203d626522896cd6cb2a15aebe7b",
+      "min_rule_version": 2,
+      "normalized_name": "elementalist adept",
+      "oracle_hash": "f51447178f66c72ccbb7693c0c6e15ba",
+      "required_effect_fields": {
+        "_keywords_are_self": true,
+        "battle_model_scope": "xmage_static_self_prowess_creature_v1",
+        "effect": "creature",
+        "flash": true,
+        "keywords": [
+          "flash",
+          "prowess"
+        ],
+        "trigger": "noncreature_spell_cast",
+        "trigger_effect": "boost_source_until_eot",
+        "trigger_power_bonus_until_eot": 1,
+        "trigger_toughness_bonus_until_eot": 1,
+        "xmage_ability_classes": [
+          "FlashAbility",
+          "ProwessAbility"
+        ]
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Iguana Parrot",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:3a4d72a9277b4fc563f4fa2339bcff15",
+      "min_rule_version": 2,
+      "normalized_name": "iguana parrot",
+      "oracle_hash": "3659cb00a9ba73b4ce0b67a73283a631",
+      "required_effect_fields": {
+        "_keywords_are_self": true,
+        "battle_model_scope": "xmage_static_self_prowess_creature_v1",
+        "effect": "creature",
+        "keywords": [
+          "flying",
+          "vigilance",
+          "prowess"
+        ],
+        "trigger": "noncreature_spell_cast",
+        "trigger_effect": "boost_source_until_eot",
+        "trigger_power_bonus_until_eot": 1,
+        "trigger_toughness_bonus_until_eot": 1,
+        "xmage_ability_classes": [
+          "FlyingAbility",
+          "ProwessAbility",
+          "VigilanceAbility"
+        ]
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Jeskai Brushmaster",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:35e6d8c2deb4456c52a972f5058ca6de",
+      "min_rule_version": 2,
+      "normalized_name": "jeskai brushmaster",
+      "oracle_hash": "eff0b51df6bfd5de2a2d1ca0760fecde",
+      "required_effect_fields": {
+        "_keywords_are_self": true,
+        "battle_model_scope": "xmage_static_self_prowess_creature_v1",
+        "effect": "creature",
+        "keywords": [
+          "double_strike",
+          "prowess"
+        ],
+        "trigger": "noncreature_spell_cast",
+        "trigger_effect": "boost_source_until_eot",
+        "trigger_power_bonus_until_eot": 1,
+        "trigger_toughness_bonus_until_eot": 1,
+        "xmage_ability_classes": [
+          "DoubleStrikeAbility",
+          "ProwessAbility"
+        ]
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Jeskai Student",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:aa8b3af252c57022f8b9ed93cda0801b",
+      "min_rule_version": 2,
+      "normalized_name": "jeskai student",
+      "oracle_hash": "e049c755c6165a346e7a0aa8c56d73ef",
+      "required_effect_fields": {
+        "_keywords_are_self": true,
+        "battle_model_scope": "xmage_static_self_prowess_creature_v1",
+        "effect": "creature",
+        "keywords": [
+          "prowess"
+        ],
+        "trigger": "noncreature_spell_cast",
+        "trigger_effect": "boost_source_until_eot",
+        "trigger_power_bonus_until_eot": 1,
+        "trigger_toughness_bonus_until_eot": 1,
+        "xmage_ability_classes": [
+          "ProwessAbility"
+        ]
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Jeskai Windscout",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:d6804d7cad8e0bf9ffab4ca27f7d794b",
+      "min_rule_version": 2,
+      "normalized_name": "jeskai windscout",
+      "oracle_hash": "5842868d65d7dbca252ae63d912a3876",
+      "required_effect_fields": {
+        "_keywords_are_self": true,
+        "battle_model_scope": "xmage_static_self_prowess_creature_v1",
+        "effect": "creature",
+        "keywords": [
+          "flying",
+          "prowess"
+        ],
+        "trigger": "noncreature_spell_cast",
+        "trigger_effect": "boost_source_until_eot",
+        "trigger_power_bonus_until_eot": 1,
+        "trigger_toughness_bonus_until_eot": 1,
+        "xmage_ability_classes": [
+          "FlyingAbility",
+          "ProwessAbility"
+        ]
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Lightning Visionary",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:aa8b3af252c57022f8b9ed93cda0801b",
+      "min_rule_version": 2,
+      "normalized_name": "lightning visionary",
+      "oracle_hash": "e049c755c6165a346e7a0aa8c56d73ef",
+      "required_effect_fields": {
+        "_keywords_are_self": true,
+        "battle_model_scope": "xmage_static_self_prowess_creature_v1",
+        "effect": "creature",
+        "keywords": [
+          "prowess"
+        ],
+        "trigger": "noncreature_spell_cast",
+        "trigger_effect": "boost_source_until_eot",
+        "trigger_power_bonus_until_eot": 1,
+        "trigger_toughness_bonus_until_eot": 1,
+        "xmage_ability_classes": [
+          "ProwessAbility"
+        ]
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Lotus Path Djinn",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:d6804d7cad8e0bf9ffab4ca27f7d794b",
+      "min_rule_version": 2,
+      "normalized_name": "lotus path djinn",
+      "oracle_hash": "5842868d65d7dbca252ae63d912a3876",
+      "required_effect_fields": {
+        "_keywords_are_self": true,
+        "battle_model_scope": "xmage_static_self_prowess_creature_v1",
+        "effect": "creature",
+        "keywords": [
+          "flying",
+          "prowess"
+        ],
+        "trigger": "noncreature_spell_cast",
+        "trigger_effect": "boost_source_until_eot",
+        "trigger_power_bonus_until_eot": 1,
+        "trigger_toughness_bonus_until_eot": 1,
+        "xmage_ability_classes": [
+          "FlyingAbility",
+          "ProwessAbility"
+        ]
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Mistral Singer",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:d6804d7cad8e0bf9ffab4ca27f7d794b",
+      "min_rule_version": 2,
+      "normalized_name": "mistral singer",
+      "oracle_hash": "5842868d65d7dbca252ae63d912a3876",
+      "required_effect_fields": {
+        "_keywords_are_self": true,
+        "battle_model_scope": "xmage_static_self_prowess_creature_v1",
+        "effect": "creature",
+        "keywords": [
+          "flying",
+          "prowess"
+        ],
+        "trigger": "noncreature_spell_cast",
+        "trigger_effect": "boost_source_until_eot",
+        "trigger_power_bonus_until_eot": 1,
+        "trigger_toughness_bonus_until_eot": 1,
+        "xmage_ability_classes": [
+          "FlyingAbility",
+          "ProwessAbility"
+        ]
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Monastery Swiftspear",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:618dd843b7e3bd09f084eebecf681943",
+      "min_rule_version": 2,
+      "normalized_name": "monastery swiftspear",
+      "oracle_hash": "75087655073477cf969184d4afd5c254",
+      "required_effect_fields": {
+        "_keywords_are_self": true,
+        "battle_model_scope": "xmage_static_self_prowess_creature_v1",
+        "effect": "creature",
+        "keywords": [
+          "haste",
+          "prowess"
+        ],
+        "trigger": "noncreature_spell_cast",
+        "trigger_effect": "boost_source_until_eot",
+        "trigger_power_bonus_until_eot": 1,
+        "trigger_toughness_bonus_until_eot": 1,
+        "xmage_ability_classes": [
+          "HasteAbility",
+          "ProwessAbility"
+        ]
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Niblis of Dusk",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:d6804d7cad8e0bf9ffab4ca27f7d794b",
+      "min_rule_version": 2,
+      "normalized_name": "niblis of dusk",
+      "oracle_hash": "5842868d65d7dbca252ae63d912a3876",
+      "required_effect_fields": {
+        "_keywords_are_self": true,
+        "battle_model_scope": "xmage_static_self_prowess_creature_v1",
+        "effect": "creature",
+        "keywords": [
+          "flying",
+          "prowess"
+        ],
+        "trigger": "noncreature_spell_cast",
+        "trigger_effect": "boost_source_until_eot",
+        "trigger_power_bonus_until_eot": 1,
+        "trigger_toughness_bonus_until_eot": 1,
+        "xmage_ability_classes": [
+          "FlyingAbility",
+          "ProwessAbility"
+        ]
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Nimble-Blade Khenra",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:aa8b3af252c57022f8b9ed93cda0801b",
+      "min_rule_version": 2,
+      "normalized_name": "nimble-blade khenra",
+      "oracle_hash": "e049c755c6165a346e7a0aa8c56d73ef",
+      "required_effect_fields": {
+        "_keywords_are_self": true,
+        "battle_model_scope": "xmage_static_self_prowess_creature_v1",
+        "effect": "creature",
+        "keywords": [
+          "prowess"
+        ],
+        "trigger": "noncreature_spell_cast",
+        "trigger_effect": "boost_source_until_eot",
+        "trigger_power_bonus_until_eot": 1,
+        "trigger_toughness_bonus_until_eot": 1,
+        "xmage_ability_classes": [
+          "ProwessAbility"
+        ]
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Ringwarden Owl",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:d6804d7cad8e0bf9ffab4ca27f7d794b",
+      "min_rule_version": 2,
+      "normalized_name": "ringwarden owl",
+      "oracle_hash": "b2edcf6f2c931c76b5c77db1c7b07f62",
+      "required_effect_fields": {
+        "_keywords_are_self": true,
+        "battle_model_scope": "xmage_static_self_prowess_creature_v1",
+        "effect": "creature",
+        "keywords": [
+          "flying",
+          "prowess"
+        ],
+        "trigger": "noncreature_spell_cast",
+        "trigger_effect": "boost_source_until_eot",
+        "trigger_power_bonus_until_eot": 1,
+        "trigger_toughness_bonus_until_eot": 1,
+        "xmage_ability_classes": [
+          "FlyingAbility",
+          "ProwessAbility"
+        ]
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Riverwheel Aerialists",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:d6804d7cad8e0bf9ffab4ca27f7d794b",
+      "min_rule_version": 2,
+      "normalized_name": "riverwheel aerialists",
+      "oracle_hash": "5842868d65d7dbca252ae63d912a3876",
+      "required_effect_fields": {
+        "_keywords_are_self": true,
+        "battle_model_scope": "xmage_static_self_prowess_creature_v1",
+        "effect": "creature",
+        "keywords": [
+          "flying",
+          "prowess"
+        ],
+        "trigger": "noncreature_spell_cast",
+        "trigger_effect": "boost_source_until_eot",
+        "trigger_power_bonus_until_eot": 1,
+        "trigger_toughness_bonus_until_eot": 1,
+        "xmage_ability_classes": [
+          "FlyingAbility",
+          "ProwessAbility"
+        ]
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Sanguinary Mage",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:aa8b3af252c57022f8b9ed93cda0801b",
+      "min_rule_version": 2,
+      "normalized_name": "sanguinary mage",
+      "oracle_hash": "e049c755c6165a346e7a0aa8c56d73ef",
+      "required_effect_fields": {
+        "_keywords_are_self": true,
+        "battle_model_scope": "xmage_static_self_prowess_creature_v1",
+        "effect": "creature",
+        "keywords": [
+          "prowess"
+        ],
+        "trigger": "noncreature_spell_cast",
+        "trigger_effect": "boost_source_until_eot",
+        "trigger_power_bonus_until_eot": 1,
+        "trigger_toughness_bonus_until_eot": 1,
+        "xmage_ability_classes": [
+          "ProwessAbility"
+        ]
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Stormchaser Mage",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:21476bd81c39ba0239b3d51001419bee",
+      "min_rule_version": 2,
+      "normalized_name": "stormchaser mage",
+      "oracle_hash": "719a1af531faa65dbd637de95d1b8a2b",
+      "required_effect_fields": {
+        "_keywords_are_self": true,
+        "battle_model_scope": "xmage_static_self_prowess_creature_v1",
+        "effect": "creature",
+        "keywords": [
+          "flying",
+          "haste",
+          "prowess"
+        ],
+        "trigger": "noncreature_spell_cast",
+        "trigger_effect": "boost_source_until_eot",
+        "trigger_power_bonus_until_eot": 1,
+        "trigger_toughness_bonus_until_eot": 1,
+        "xmage_ability_classes": [
+          "FlyingAbility",
+          "HasteAbility",
+          "ProwessAbility"
+        ]
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Thor Odinson",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:3a4d72a9277b4fc563f4fa2339bcff15",
+      "min_rule_version": 2,
+      "normalized_name": "thor odinson",
+      "oracle_hash": "d851a68c9af489a012a467a6fecca2b5",
+      "required_effect_fields": {
+        "_keywords_are_self": true,
+        "battle_model_scope": "xmage_static_self_prowess_creature_v1",
+        "effect": "creature",
+        "keywords": [
+          "flying",
+          "vigilance",
+          "prowess"
+        ],
+        "trigger": "noncreature_spell_cast",
+        "trigger_effect": "boost_source_until_eot",
+        "trigger_power_bonus_until_eot": 1,
+        "trigger_toughness_bonus_until_eot": 1,
+        "xmage_ability_classes": [
+          "FlyingAbility",
+          "ProwessAbility",
+          "VigilanceAbility"
+        ]
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Umara Entangler",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:aa8b3af252c57022f8b9ed93cda0801b",
+      "min_rule_version": 2,
+      "normalized_name": "umara entangler",
+      "oracle_hash": "e049c755c6165a346e7a0aa8c56d73ef",
+      "required_effect_fields": {
+        "_keywords_are_self": true,
+        "battle_model_scope": "xmage_static_self_prowess_creature_v1",
+        "effect": "creature",
+        "keywords": [
+          "prowess"
+        ],
+        "trigger": "noncreature_spell_cast",
+        "trigger_effect": "boost_source_until_eot",
+        "trigger_power_bonus_until_eot": 1,
+        "trigger_toughness_bonus_until_eot": 1,
+        "xmage_ability_classes": [
+          "ProwessAbility"
+        ]
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Vedalken Blademaster",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:aa8b3af252c57022f8b9ed93cda0801b",
+      "min_rule_version": 2,
+      "normalized_name": "vedalken blademaster",
+      "oracle_hash": "e049c755c6165a346e7a0aa8c56d73ef",
+      "required_effect_fields": {
+        "_keywords_are_self": true,
+        "battle_model_scope": "xmage_static_self_prowess_creature_v1",
+        "effect": "creature",
+        "keywords": [
+          "prowess"
+        ],
+        "trigger": "noncreature_spell_cast",
+        "trigger_effect": "boost_source_until_eot",
+        "trigger_power_bonus_until_eot": 1,
+        "trigger_toughness_bonus_until_eot": 1,
+        "xmage_ability_classes": [
+          "ProwessAbility"
+        ]
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Whirlwind Adept",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:93bdc2cc4dcb1ed53fc74db4bec45959",
+      "min_rule_version": 2,
+      "normalized_name": "whirlwind adept",
+      "oracle_hash": "b188cf6ab21bdb6d0272ac411863281c",
+      "required_effect_fields": {
+        "_keywords_are_self": true,
+        "battle_model_scope": "xmage_static_self_prowess_creature_v1",
+        "effect": "creature",
+        "keywords": [
+          "hexproof",
+          "prowess"
+        ],
+        "trigger": "noncreature_spell_cast",
+        "trigger_effect": "boost_source_until_eot",
+        "trigger_power_bonus_until_eot": 1,
+        "trigger_toughness_bonus_until_eot": 1,
+        "xmage_ability_classes": [
+          "HexproofAbility",
+          "ProwessAbility"
+        ]
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Wing Commando",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:d6804d7cad8e0bf9ffab4ca27f7d794b",
+      "min_rule_version": 2,
+      "normalized_name": "wing commando",
+      "oracle_hash": "5842868d65d7dbca252ae63d912a3876",
+      "required_effect_fields": {
+        "_keywords_are_self": true,
+        "battle_model_scope": "xmage_static_self_prowess_creature_v1",
+        "effect": "creature",
+        "keywords": [
+          "flying",
+          "prowess"
+        ],
+        "trigger": "noncreature_spell_cast",
+        "trigger_effect": "boost_source_until_eot",
+        "trigger_power_bonus_until_eot": 1,
+        "trigger_toughness_bonus_until_eot": 1,
+        "xmage_ability_classes": [
+          "FlyingAbility",
+          "ProwessAbility"
+        ]
+      },
+      "review_status": "verified"
+    }
+  ],
+  "family_counts": {
+    "xmage_static_self_prowess_creature": 23
+  },
+  "files": {
+    "apply": "docs/hermes-analysis/master_optimizer_reports/pg824_static_self_prowess_creature_new_server_package_apply.sql",
+    "manifest": "docs/hermes-analysis/master_optimizer_reports/pg824_static_self_prowess_creature_new_server_package_manifest.json",
+    "package": "docs/hermes-analysis/master_optimizer_reports/pg824_static_self_prowess_creature_new_server_package_package.md",
+    "postcheck": "docs/hermes-analysis/master_optimizer_reports/pg824_static_self_prowess_creature_new_server_package_postcheck.sql",
+    "precheck": "docs/hermes-analysis/master_optimizer_reports/pg824_static_self_prowess_creature_new_server_package_precheck.sql",
+    "rollback": "docs/hermes-analysis/master_optimizer_reports/pg824_static_self_prowess_creature_new_server_package_rollback.sql"
+  },
+  "generated_at": "2026-07-12T09:56:50+00:00",
+  "mutations_performed": [],
+  "runtime_checks": [
+    {
+      "card": {
+        "name": "Bloodfire Expert"
+      },
+      "card_name": "Bloodfire Expert",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:aa8b3af252c57022f8b9ed93cda0801b",
+      "normalized_name": "bloodfire expert",
+      "required_effect_fields": {
+        "_keywords_are_self": true,
+        "battle_model_scope": "xmage_static_self_prowess_creature_v1",
+        "effect": "creature",
+        "keywords": [
+          "prowess"
+        ],
+        "trigger": "noncreature_spell_cast",
+        "trigger_effect": "boost_source_until_eot",
+        "trigger_power_bonus_until_eot": 1,
+        "trigger_toughness_bonus_until_eot": 1,
+        "xmage_ability_classes": [
+          "ProwessAbility"
+        ]
+      }
+    },
+    {
+      "card": {
+        "name": "Dragon Bell Monk"
+      },
+      "card_name": "Dragon Bell Monk",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:f423e23dfba0395763db56e510c618d2",
+      "normalized_name": "dragon bell monk",
+      "required_effect_fields": {
+        "_keywords_are_self": true,
+        "battle_model_scope": "xmage_static_self_prowess_creature_v1",
+        "effect": "creature",
+        "keywords": [
+          "vigilance",
+          "prowess"
+        ],
+        "trigger": "noncreature_spell_cast",
+        "trigger_effect": "boost_source_until_eot",
+        "trigger_power_bonus_until_eot": 1,
+        "trigger_toughness_bonus_until_eot": 1,
+        "xmage_ability_classes": [
+          "ProwessAbility",
+          "VigilanceAbility"
+        ]
+      }
+    },
+    {
+      "card": {
+        "name": "Dragon-Style Twins"
+      },
+      "card_name": "Dragon-Style Twins",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:35e6d8c2deb4456c52a972f5058ca6de",
+      "normalized_name": "dragon-style twins",
+      "required_effect_fields": {
+        "_keywords_are_self": true,
+        "battle_model_scope": "xmage_static_self_prowess_creature_v1",
+        "effect": "creature",
+        "keywords": [
+          "double_strike",
+          "prowess"
+        ],
+        "trigger": "noncreature_spell_cast",
+        "trigger_effect": "boost_source_until_eot",
+        "trigger_power_bonus_until_eot": 1,
+        "trigger_toughness_bonus_until_eot": 1,
+        "xmage_ability_classes": [
+          "DoubleStrikeAbility",
+          "ProwessAbility"
+        ]
+      }
+    },
+    {
+      "card": {
+        "name": "Elementalist Adept"
+      },
+      "card_name": "Elementalist Adept",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:45e7203d626522896cd6cb2a15aebe7b",
+      "normalized_name": "elementalist adept",
+      "required_effect_fields": {
+        "_keywords_are_self": true,
+        "battle_model_scope": "xmage_static_self_prowess_creature_v1",
+        "effect": "creature",
+        "flash": true,
+        "keywords": [
+          "flash",
+          "prowess"
+        ],
+        "trigger": "noncreature_spell_cast",
+        "trigger_effect": "boost_source_until_eot",
+        "trigger_power_bonus_until_eot": 1,
+        "trigger_toughness_bonus_until_eot": 1,
+        "xmage_ability_classes": [
+          "FlashAbility",
+          "ProwessAbility"
+        ]
+      }
+    },
+    {
+      "card": {
+        "name": "Iguana Parrot"
+      },
+      "card_name": "Iguana Parrot",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:3a4d72a9277b4fc563f4fa2339bcff15",
+      "normalized_name": "iguana parrot",
+      "required_effect_fields": {
+        "_keywords_are_self": true,
+        "battle_model_scope": "xmage_static_self_prowess_creature_v1",
+        "effect": "creature",
+        "keywords": [
+          "flying",
+          "vigilance",
+          "prowess"
+        ],
+        "trigger": "noncreature_spell_cast",
+        "trigger_effect": "boost_source_until_eot",
+        "trigger_power_bonus_until_eot": 1,
+        "trigger_toughness_bonus_until_eot": 1,
+        "xmage_ability_classes": [
+          "FlyingAbility",
+          "ProwessAbility",
+          "VigilanceAbility"
+        ]
+      }
+    },
+    {
+      "card": {
+        "name": "Jeskai Brushmaster"
+      },
+      "card_name": "Jeskai Brushmaster",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:35e6d8c2deb4456c52a972f5058ca6de",
+      "normalized_name": "jeskai brushmaster",
+      "required_effect_fields": {
+        "_keywords_are_self": true,
+        "battle_model_scope": "xmage_static_self_prowess_creature_v1",
+        "effect": "creature",
+        "keywords": [
+          "double_strike",
+          "prowess"
+        ],
+        "trigger": "noncreature_spell_cast",
+        "trigger_effect": "boost_source_until_eot",
+        "trigger_power_bonus_until_eot": 1,
+        "trigger_toughness_bonus_until_eot": 1,
+        "xmage_ability_classes": [
+          "DoubleStrikeAbility",
+          "ProwessAbility"
+        ]
+      }
+    },
+    {
+      "card": {
+        "name": "Jeskai Student"
+      },
+      "card_name": "Jeskai Student",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:aa8b3af252c57022f8b9ed93cda0801b",
+      "normalized_name": "jeskai student",
+      "required_effect_fields": {
+        "_keywords_are_self": true,
+        "battle_model_scope": "xmage_static_self_prowess_creature_v1",
+        "effect": "creature",
+        "keywords": [
+          "prowess"
+        ],
+        "trigger": "noncreature_spell_cast",
+        "trigger_effect": "boost_source_until_eot",
+        "trigger_power_bonus_until_eot": 1,
+        "trigger_toughness_bonus_until_eot": 1,
+        "xmage_ability_classes": [
+          "ProwessAbility"
+        ]
+      }
+    },
+    {
+      "card": {
+        "name": "Jeskai Windscout"
+      },
+      "card_name": "Jeskai Windscout",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:d6804d7cad8e0bf9ffab4ca27f7d794b",
+      "normalized_name": "jeskai windscout",
+      "required_effect_fields": {
+        "_keywords_are_self": true,
+        "battle_model_scope": "xmage_static_self_prowess_creature_v1",
+        "effect": "creature",
+        "keywords": [
+          "flying",
+          "prowess"
+        ],
+        "trigger": "noncreature_spell_cast",
+        "trigger_effect": "boost_source_until_eot",
+        "trigger_power_bonus_until_eot": 1,
+        "trigger_toughness_bonus_until_eot": 1,
+        "xmage_ability_classes": [
+          "FlyingAbility",
+          "ProwessAbility"
+        ]
+      }
+    },
+    {
+      "card": {
+        "name": "Lightning Visionary"
+      },
+      "card_name": "Lightning Visionary",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:aa8b3af252c57022f8b9ed93cda0801b",
+      "normalized_name": "lightning visionary",
+      "required_effect_fields": {
+        "_keywords_are_self": true,
+        "battle_model_scope": "xmage_static_self_prowess_creature_v1",
+        "effect": "creature",
+        "keywords": [
+          "prowess"
+        ],
+        "trigger": "noncreature_spell_cast",
+        "trigger_effect": "boost_source_until_eot",
+        "trigger_power_bonus_until_eot": 1,
+        "trigger_toughness_bonus_until_eot": 1,
+        "xmage_ability_classes": [
+          "ProwessAbility"
+        ]
+      }
+    },
+    {
+      "card": {
+        "name": "Lotus Path Djinn"
+      },
+      "card_name": "Lotus Path Djinn",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:d6804d7cad8e0bf9ffab4ca27f7d794b",
+      "normalized_name": "lotus path djinn",
+      "required_effect_fields": {
+        "_keywords_are_self": true,
+        "battle_model_scope": "xmage_static_self_prowess_creature_v1",
+        "effect": "creature",
+        "keywords": [
+          "flying",
+          "prowess"
+        ],
+        "trigger": "noncreature_spell_cast",
+        "trigger_effect": "boost_source_until_eot",
+        "trigger_power_bonus_until_eot": 1,
+        "trigger_toughness_bonus_until_eot": 1,
+        "xmage_ability_classes": [
+          "FlyingAbility",
+          "ProwessAbility"
+        ]
+      }
+    },
+    {
+      "card": {
+        "name": "Mistral Singer"
+      },
+      "card_name": "Mistral Singer",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:d6804d7cad8e0bf9ffab4ca27f7d794b",
+      "normalized_name": "mistral singer",
+      "required_effect_fields": {
+        "_keywords_are_self": true,
+        "battle_model_scope": "xmage_static_self_prowess_creature_v1",
+        "effect": "creature",
+        "keywords": [
+          "flying",
+          "prowess"
+        ],
+        "trigger": "noncreature_spell_cast",
+        "trigger_effect": "boost_source_until_eot",
+        "trigger_power_bonus_until_eot": 1,
+        "trigger_toughness_bonus_until_eot": 1,
+        "xmage_ability_classes": [
+          "FlyingAbility",
+          "ProwessAbility"
+        ]
+      }
+    },
+    {
+      "card": {
+        "name": "Monastery Swiftspear"
+      },
+      "card_name": "Monastery Swiftspear",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:618dd843b7e3bd09f084eebecf681943",
+      "normalized_name": "monastery swiftspear",
+      "required_effect_fields": {
+        "_keywords_are_self": true,
+        "battle_model_scope": "xmage_static_self_prowess_creature_v1",
+        "effect": "creature",
+        "keywords": [
+          "haste",
+          "prowess"
+        ],
+        "trigger": "noncreature_spell_cast",
+        "trigger_effect": "boost_source_until_eot",
+        "trigger_power_bonus_until_eot": 1,
+        "trigger_toughness_bonus_until_eot": 1,
+        "xmage_ability_classes": [
+          "HasteAbility",
+          "ProwessAbility"
+        ]
+      }
+    },
+    {
+      "card": {
+        "name": "Niblis of Dusk"
+      },
+      "card_name": "Niblis of Dusk",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:d6804d7cad8e0bf9ffab4ca27f7d794b",
+      "normalized_name": "niblis of dusk",
+      "required_effect_fields": {
+        "_keywords_are_self": true,
+        "battle_model_scope": "xmage_static_self_prowess_creature_v1",
+        "effect": "creature",
+        "keywords": [
+          "flying",
+          "prowess"
+        ],
+        "trigger": "noncreature_spell_cast",
+        "trigger_effect": "boost_source_until_eot",
+        "trigger_power_bonus_until_eot": 1,
+        "trigger_toughness_bonus_until_eot": 1,
+        "xmage_ability_classes": [
+          "FlyingAbility",
+          "ProwessAbility"
+        ]
+      }
+    },
+    {
+      "card": {
+        "name": "Nimble-Blade Khenra"
+      },
+      "card_name": "Nimble-Blade Khenra",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:aa8b3af252c57022f8b9ed93cda0801b",
+      "normalized_name": "nimble-blade khenra",
+      "required_effect_fields": {
+        "_keywords_are_self": true,
+        "battle_model_scope": "xmage_static_self_prowess_creature_v1",
+        "effect": "creature",
+        "keywords": [
+          "prowess"
+        ],
+        "trigger": "noncreature_spell_cast",
+        "trigger_effect": "boost_source_until_eot",
+        "trigger_power_bonus_until_eot": 1,
+        "trigger_toughness_bonus_until_eot": 1,
+        "xmage_ability_classes": [
+          "ProwessAbility"
+        ]
+      }
+    },
+    {
+      "card": {
+        "name": "Ringwarden Owl"
+      },
+      "card_name": "Ringwarden Owl",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:d6804d7cad8e0bf9ffab4ca27f7d794b",
+      "normalized_name": "ringwarden owl",
+      "required_effect_fields": {
+        "_keywords_are_self": true,
+        "battle_model_scope": "xmage_static_self_prowess_creature_v1",
+        "effect": "creature",
+        "keywords": [
+          "flying",
+          "prowess"
+        ],
+        "trigger": "noncreature_spell_cast",
+        "trigger_effect": "boost_source_until_eot",
+        "trigger_power_bonus_until_eot": 1,
+        "trigger_toughness_bonus_until_eot": 1,
+        "xmage_ability_classes": [
+          "FlyingAbility",
+          "ProwessAbility"
+        ]
+      }
+    },
+    {
+      "card": {
+        "name": "Riverwheel Aerialists"
+      },
+      "card_name": "Riverwheel Aerialists",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:d6804d7cad8e0bf9ffab4ca27f7d794b",
+      "normalized_name": "riverwheel aerialists",
+      "required_effect_fields": {
+        "_keywords_are_self": true,
+        "battle_model_scope": "xmage_static_self_prowess_creature_v1",
+        "effect": "creature",
+        "keywords": [
+          "flying",
+          "prowess"
+        ],
+        "trigger": "noncreature_spell_cast",
+        "trigger_effect": "boost_source_until_eot",
+        "trigger_power_bonus_until_eot": 1,
+        "trigger_toughness_bonus_until_eot": 1,
+        "xmage_ability_classes": [
+          "FlyingAbility",
+          "ProwessAbility"
+        ]
+      }
+    },
+    {
+      "card": {
+        "name": "Sanguinary Mage"
+      },
+      "card_name": "Sanguinary Mage",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:aa8b3af252c57022f8b9ed93cda0801b",
+      "normalized_name": "sanguinary mage",
+      "required_effect_fields": {
+        "_keywords_are_self": true,
+        "battle_model_scope": "xmage_static_self_prowess_creature_v1",
+        "effect": "creature",
+        "keywords": [
+          "prowess"
+        ],
+        "trigger": "noncreature_spell_cast",
+        "trigger_effect": "boost_source_until_eot",
+        "trigger_power_bonus_until_eot": 1,
+        "trigger_toughness_bonus_until_eot": 1,
+        "xmage_ability_classes": [
+          "ProwessAbility"
+        ]
+      }
+    },
+    {
+      "card": {
+        "name": "Stormchaser Mage"
+      },
+      "card_name": "Stormchaser Mage",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:21476bd81c39ba0239b3d51001419bee",
+      "normalized_name": "stormchaser mage",
+      "required_effect_fields": {
+        "_keywords_are_self": true,
+        "battle_model_scope": "xmage_static_self_prowess_creature_v1",
+        "effect": "creature",
+        "keywords": [
+          "flying",
+          "haste",
+          "prowess"
+        ],
+        "trigger": "noncreature_spell_cast",
+        "trigger_effect": "boost_source_until_eot",
+        "trigger_power_bonus_until_eot": 1,
+        "trigger_toughness_bonus_until_eot": 1,
+        "xmage_ability_classes": [
+          "FlyingAbility",
+          "HasteAbility",
+          "ProwessAbility"
+        ]
+      }
+    },
+    {
+      "card": {
+        "name": "Thor Odinson"
+      },
+      "card_name": "Thor Odinson",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:3a4d72a9277b4fc563f4fa2339bcff15",
+      "normalized_name": "thor odinson",
+      "required_effect_fields": {
+        "_keywords_are_self": true,
+        "battle_model_scope": "xmage_static_self_prowess_creature_v1",
+        "effect": "creature",
+        "keywords": [
+          "flying",
+          "vigilance",
+          "prowess"
+        ],
+        "trigger": "noncreature_spell_cast",
+        "trigger_effect": "boost_source_until_eot",
+        "trigger_power_bonus_until_eot": 1,
+        "trigger_toughness_bonus_until_eot": 1,
+        "xmage_ability_classes": [
+          "FlyingAbility",
+          "ProwessAbility",
+          "VigilanceAbility"
+        ]
+      }
+    },
+    {
+      "card": {
+        "name": "Umara Entangler"
+      },
+      "card_name": "Umara Entangler",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:aa8b3af252c57022f8b9ed93cda0801b",
+      "normalized_name": "umara entangler",
+      "required_effect_fields": {
+        "_keywords_are_self": true,
+        "battle_model_scope": "xmage_static_self_prowess_creature_v1",
+        "effect": "creature",
+        "keywords": [
+          "prowess"
+        ],
+        "trigger": "noncreature_spell_cast",
+        "trigger_effect": "boost_source_until_eot",
+        "trigger_power_bonus_until_eot": 1,
+        "trigger_toughness_bonus_until_eot": 1,
+        "xmage_ability_classes": [
+          "ProwessAbility"
+        ]
+      }
+    },
+    {
+      "card": {
+        "name": "Vedalken Blademaster"
+      },
+      "card_name": "Vedalken Blademaster",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:aa8b3af252c57022f8b9ed93cda0801b",
+      "normalized_name": "vedalken blademaster",
+      "required_effect_fields": {
+        "_keywords_are_self": true,
+        "battle_model_scope": "xmage_static_self_prowess_creature_v1",
+        "effect": "creature",
+        "keywords": [
+          "prowess"
+        ],
+        "trigger": "noncreature_spell_cast",
+        "trigger_effect": "boost_source_until_eot",
+        "trigger_power_bonus_until_eot": 1,
+        "trigger_toughness_bonus_until_eot": 1,
+        "xmage_ability_classes": [
+          "ProwessAbility"
+        ]
+      }
+    },
+    {
+      "card": {
+        "name": "Whirlwind Adept"
+      },
+      "card_name": "Whirlwind Adept",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:93bdc2cc4dcb1ed53fc74db4bec45959",
+      "normalized_name": "whirlwind adept",
+      "required_effect_fields": {
+        "_keywords_are_self": true,
+        "battle_model_scope": "xmage_static_self_prowess_creature_v1",
+        "effect": "creature",
+        "keywords": [
+          "hexproof",
+          "prowess"
+        ],
+        "trigger": "noncreature_spell_cast",
+        "trigger_effect": "boost_source_until_eot",
+        "trigger_power_bonus_until_eot": 1,
+        "trigger_toughness_bonus_until_eot": 1,
+        "xmage_ability_classes": [
+          "HexproofAbility",
+          "ProwessAbility"
+        ]
+      }
+    },
+    {
+      "card": {
+        "name": "Wing Commando"
+      },
+      "card_name": "Wing Commando",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:d6804d7cad8e0bf9ffab4ca27f7d794b",
+      "normalized_name": "wing commando",
+      "required_effect_fields": {
+        "_keywords_are_self": true,
+        "battle_model_scope": "xmage_static_self_prowess_creature_v1",
+        "effect": "creature",
+        "keywords": [
+          "flying",
+          "prowess"
+        ],
+        "trigger": "noncreature_spell_cast",
+        "trigger_effect": "boost_source_until_eot",
+        "trigger_power_bonus_until_eot": 1,
+        "trigger_toughness_bonus_until_eot": 1,
+        "xmage_ability_classes": [
+          "FlyingAbility",
+          "ProwessAbility"
+        ]
+      }
+    }
+  ],
+  "selected_card_names": [
+    "Bloodfire Expert",
+    "Dragon Bell Monk",
+    "Dragon-Style Twins",
+    "Elementalist Adept",
+    "Iguana Parrot",
+    "Jeskai Brushmaster",
+    "Jeskai Student",
+    "Jeskai Windscout",
+    "Lightning Visionary",
+    "Lotus Path Djinn",
+    "Mistral Singer",
+    "Monastery Swiftspear",
+    "Niblis of Dusk",
+    "Nimble-Blade Khenra",
+    "Ringwarden Owl",
+    "Riverwheel Aerialists",
+    "Sanguinary Mage",
+    "Stormchaser Mage",
+    "Thor Odinson",
+    "Umara Entangler",
+    "Vedalken Blademaster",
+    "Whirlwind Adept",
+    "Wing Commando"
+  ],
+  "selected_count": 23,
+  "slug": "pg824_static_self_prowess_creature_new_server",
+  "snapshot_checks": [
+    {
+      "card_name": "Bloodfire Expert",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:aa8b3af252c57022f8b9ed93cda0801b",
+      "min_rule_version": 2,
+      "normalized_name": "bloodfire expert",
+      "oracle_hash": "e049c755c6165a346e7a0aa8c56d73ef",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_static_self_prowess_creature_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Dragon Bell Monk",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:f423e23dfba0395763db56e510c618d2",
+      "min_rule_version": 2,
+      "normalized_name": "dragon bell monk",
+      "oracle_hash": "9213bae27124e68f0d218569952630f5",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_static_self_prowess_creature_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Dragon-Style Twins",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:35e6d8c2deb4456c52a972f5058ca6de",
+      "min_rule_version": 2,
+      "normalized_name": "dragon-style twins",
+      "oracle_hash": "eff0b51df6bfd5de2a2d1ca0760fecde",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_static_self_prowess_creature_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Elementalist Adept",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:45e7203d626522896cd6cb2a15aebe7b",
+      "min_rule_version": 2,
+      "normalized_name": "elementalist adept",
+      "oracle_hash": "f51447178f66c72ccbb7693c0c6e15ba",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_static_self_prowess_creature_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Iguana Parrot",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:3a4d72a9277b4fc563f4fa2339bcff15",
+      "min_rule_version": 2,
+      "normalized_name": "iguana parrot",
+      "oracle_hash": "3659cb00a9ba73b4ce0b67a73283a631",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_static_self_prowess_creature_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Jeskai Brushmaster",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:35e6d8c2deb4456c52a972f5058ca6de",
+      "min_rule_version": 2,
+      "normalized_name": "jeskai brushmaster",
+      "oracle_hash": "eff0b51df6bfd5de2a2d1ca0760fecde",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_static_self_prowess_creature_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Jeskai Student",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:aa8b3af252c57022f8b9ed93cda0801b",
+      "min_rule_version": 2,
+      "normalized_name": "jeskai student",
+      "oracle_hash": "e049c755c6165a346e7a0aa8c56d73ef",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_static_self_prowess_creature_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Jeskai Windscout",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:d6804d7cad8e0bf9ffab4ca27f7d794b",
+      "min_rule_version": 2,
+      "normalized_name": "jeskai windscout",
+      "oracle_hash": "5842868d65d7dbca252ae63d912a3876",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_static_self_prowess_creature_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Lightning Visionary",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:aa8b3af252c57022f8b9ed93cda0801b",
+      "min_rule_version": 2,
+      "normalized_name": "lightning visionary",
+      "oracle_hash": "e049c755c6165a346e7a0aa8c56d73ef",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_static_self_prowess_creature_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Lotus Path Djinn",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:d6804d7cad8e0bf9ffab4ca27f7d794b",
+      "min_rule_version": 2,
+      "normalized_name": "lotus path djinn",
+      "oracle_hash": "5842868d65d7dbca252ae63d912a3876",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_static_self_prowess_creature_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Mistral Singer",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:d6804d7cad8e0bf9ffab4ca27f7d794b",
+      "min_rule_version": 2,
+      "normalized_name": "mistral singer",
+      "oracle_hash": "5842868d65d7dbca252ae63d912a3876",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_static_self_prowess_creature_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Monastery Swiftspear",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:618dd843b7e3bd09f084eebecf681943",
+      "min_rule_version": 2,
+      "normalized_name": "monastery swiftspear",
+      "oracle_hash": "75087655073477cf969184d4afd5c254",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_static_self_prowess_creature_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Niblis of Dusk",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:d6804d7cad8e0bf9ffab4ca27f7d794b",
+      "min_rule_version": 2,
+      "normalized_name": "niblis of dusk",
+      "oracle_hash": "5842868d65d7dbca252ae63d912a3876",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_static_self_prowess_creature_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Nimble-Blade Khenra",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:aa8b3af252c57022f8b9ed93cda0801b",
+      "min_rule_version": 2,
+      "normalized_name": "nimble-blade khenra",
+      "oracle_hash": "e049c755c6165a346e7a0aa8c56d73ef",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_static_self_prowess_creature_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Ringwarden Owl",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:d6804d7cad8e0bf9ffab4ca27f7d794b",
+      "min_rule_version": 2,
+      "normalized_name": "ringwarden owl",
+      "oracle_hash": "b2edcf6f2c931c76b5c77db1c7b07f62",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_static_self_prowess_creature_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Riverwheel Aerialists",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:d6804d7cad8e0bf9ffab4ca27f7d794b",
+      "min_rule_version": 2,
+      "normalized_name": "riverwheel aerialists",
+      "oracle_hash": "5842868d65d7dbca252ae63d912a3876",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_static_self_prowess_creature_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Sanguinary Mage",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:aa8b3af252c57022f8b9ed93cda0801b",
+      "min_rule_version": 2,
+      "normalized_name": "sanguinary mage",
+      "oracle_hash": "e049c755c6165a346e7a0aa8c56d73ef",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_static_self_prowess_creature_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Stormchaser Mage",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:21476bd81c39ba0239b3d51001419bee",
+      "min_rule_version": 2,
+      "normalized_name": "stormchaser mage",
+      "oracle_hash": "719a1af531faa65dbd637de95d1b8a2b",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_static_self_prowess_creature_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Thor Odinson",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:3a4d72a9277b4fc563f4fa2339bcff15",
+      "min_rule_version": 2,
+      "normalized_name": "thor odinson",
+      "oracle_hash": "d851a68c9af489a012a467a6fecca2b5",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_static_self_prowess_creature_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Umara Entangler",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:aa8b3af252c57022f8b9ed93cda0801b",
+      "min_rule_version": 2,
+      "normalized_name": "umara entangler",
+      "oracle_hash": "e049c755c6165a346e7a0aa8c56d73ef",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_static_self_prowess_creature_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Vedalken Blademaster",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:aa8b3af252c57022f8b9ed93cda0801b",
+      "min_rule_version": 2,
+      "normalized_name": "vedalken blademaster",
+      "oracle_hash": "e049c755c6165a346e7a0aa8c56d73ef",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_static_self_prowess_creature_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Whirlwind Adept",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:93bdc2cc4dcb1ed53fc74db4bec45959",
+      "min_rule_version": 2,
+      "normalized_name": "whirlwind adept",
+      "oracle_hash": "b188cf6ab21bdb6d0272ac411863281c",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_static_self_prowess_creature_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Wing Commando",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:d6804d7cad8e0bf9ffab4ca27f7d794b",
+      "min_rule_version": 2,
+      "normalized_name": "wing commando",
+      "oracle_hash": "5842868d65d7dbca252ae63d912a3876",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_static_self_prowess_creature_v1"
+      },
+      "review_status": "verified"
+    }
+  ],
+  "status": "prepared_read_only_pending_apply_approval"
+}

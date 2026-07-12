@@ -505,6 +505,7 @@ REGENERATE_TARGET_ACTIVATED_SCOPE = "xmage_permanent_simple_activated_regenerate
 TARGET_BOOST_ACTIVATED_SCOPE = "xmage_permanent_simple_activated_target_boost_until_eot_v1"
 TARGET_KEYWORD_ACTIVATED_SCOPE = "xmage_permanent_simple_activated_target_keyword_until_eot_v1"
 STATIC_KEYWORD_CREATURE_SCOPE = "xmage_static_self_combat_keyword_creature_v1"
+PROWESS_CREATURE_SCOPE = "xmage_static_self_prowess_creature_v1"
 STATIC_PROTECTION_FROM_COLORS_CREATURE_SCOPE = (
     "xmage_static_self_protection_from_colors_creature_v1"
 )
@@ -907,6 +908,7 @@ STATIC_SELF_KEYWORD_ORDER = [
     "shroud",
     "indestructible",
 ]
+PROWESS_KEYWORD_ABILITY_CLASS = "ProwessAbility"
 FLASH_PERMISSION_AUXILIARY_ABILITY_CLASSES = {
     **STATIC_SELF_KEYWORD_ABILITY_CLASSES,
     "FlashAbility": "flash",
@@ -13290,6 +13292,17 @@ def is_static_keyword_creature_unit(row: dict[str, Any]) -> bool:
     )
 
 
+def is_prowess_creature_unit(row: dict[str, Any]) -> bool:
+    abilities = ability_classes(row)
+    remaining = abilities - {PROWESS_KEYWORD_ABILITY_CLASS}
+    return (
+        PROWESS_KEYWORD_ABILITY_CLASS in abilities
+        and not effect_classes(row)
+        and not (row.get("xmage_signals") or [])
+        and remaining.issubset(STATIC_SELF_KEYWORD_ABILITY_CLASSES)
+    )
+
+
 def is_static_protection_from_colors_creature_unit(row: dict[str, Any]) -> bool:
     abilities = ability_classes(row)
     remaining = abilities - {"ProtectionAbility"}
@@ -14484,6 +14497,13 @@ def ordered_keywords(keywords: set[str]) -> list[str]:
     return [keyword for keyword in STATIC_SELF_KEYWORD_ORDER if keyword in keywords]
 
 
+def ordered_keywords_with_prowess(keywords: set[str]) -> list[str]:
+    ordered = ordered_keywords(keywords)
+    if "prowess" in keywords and "prowess" not in ordered:
+        ordered.append("prowess")
+    return ordered
+
+
 def ordered_protection_colors(colors: set[str] | list[str]) -> list[str]:
     present = {str(color or "").strip().lower() for color in colors if str(color or "").strip()}
     return [color for color in PROTECTION_COLOR_ORDER if color in present]
@@ -14775,6 +14795,33 @@ def static_keywords_from_oracle(metadata: dict[str, Any]) -> set[str] | None:
     if not raw:
         return None
     allowed = set(STATIC_SELF_KEYWORD_ABILITY_CLASSES.values())
+    keywords: set[str] = set()
+    for line in raw.splitlines():
+        line = re.sub(r"\([^)]*\)", "", line).strip().rstrip(".")
+        if not line:
+            if keywords:
+                break
+            continue
+        parts = [
+            normalize_keyword_phrase(part)
+            for part in re.split(r"[,;]", line)
+            if str(part or "").strip()
+        ]
+        if not parts:
+            if keywords:
+                break
+            continue
+        if any(part not in allowed for part in parts):
+            break
+        keywords.update(parts)
+    return keywords or None
+
+
+def static_or_prowess_keywords_from_oracle(metadata: dict[str, Any]) -> set[str] | None:
+    raw = str(metadata.get("oracle_text") or "").strip()
+    if not raw:
+        return None
+    allowed = {*STATIC_SELF_KEYWORD_ABILITY_CLASSES.values(), "prowess"}
     keywords: set[str] = set()
     for line in raw.splitlines():
         line = re.sub(r"\([^)]*\)", "", line).strip().rstrip(".")
@@ -31772,6 +31819,8 @@ def proposal_notes(row: dict[str, Any], scope: str) -> str:
         scope_kind = "permanent static generic cost increase for matching spells"
     elif scope == STATIC_CAST_AS_FLASH_PERMISSION_SCOPE:
         scope_kind = "static cast-as-though-flash timing permission permanent"
+    elif scope == PROWESS_CREATURE_SCOPE:
+        scope_kind = "creature with Prowess noncreature-spell +1/+1 trigger"
     elif scope == STATIC_CANT_BE_BLOCKED_CREATURE_SCOPE:
         scope_kind = "creature static self can't-be-blocked evasion"
     elif scope == STATIC_CANT_BLOCK_CREATURE_SCOPE:
@@ -31949,6 +31998,7 @@ def split_row(
 ) -> tuple[dict[str, Any] | None, str]:
     unit = str(row.get("adapter_work_unit") or "")
     keyword_creature_unit = is_static_keyword_creature_unit(row)
+    prowess_creature_unit = is_prowess_creature_unit(row)
     static_protection_from_colors_creature_unit = (
         is_static_protection_from_colors_creature_unit(row)
     )
@@ -32177,6 +32227,7 @@ def split_row(
     if (
         unit not in SUPPORTED_UNITS
         and not keyword_creature_unit
+        and not prowess_creature_unit
         and not static_protection_from_colors_creature_unit
         and not static_cast_as_flash_permission_unit
         and not static_cant_be_blocked_creature_unit
@@ -37581,6 +37632,40 @@ def split_row(
             metadata,
             effect_json,
             family_id="xmage_static_self_combat_keyword_creature",
+        ), "selected_exact_scope"
+
+    if prowess_creature_unit:
+        if not is_creature_metadata(metadata):
+            return None, "prowess_not_creature"
+        if ".getSpellAbility().addCost" in source_text:
+            return None, "prowess_source_additional_cost_not_supported"
+        static_keywords = keywords_from_ability_classes(row)
+        expected_keywords = {*static_keywords, "prowess"}
+        oracle_keywords = static_or_prowess_keywords_from_oracle(metadata)
+        if oracle_keywords is None:
+            return None, "prowess_oracle_not_exact"
+        if expected_keywords != oracle_keywords:
+            return None, "prowess_oracle_mismatch"
+        keyword_list = ordered_keywords_with_prowess(expected_keywords)
+        effect_json = {
+            "effect": "creature",
+            "battle_model_scope": PROWESS_CREATURE_SCOPE,
+            "keywords": keyword_list,
+            "_keywords_are_self": True,
+            "prowess": True,
+            "trigger": "noncreature_spell_cast",
+            "trigger_effect": "boost_source_until_eot",
+            "trigger_power_bonus_until_eot": 1,
+            "trigger_toughness_bonus_until_eot": 1,
+            "xmage_ability_classes": sorted(ability_classes(row)),
+        }
+        for keyword in keyword_list:
+            effect_json[keyword] = True
+        return build_proposal(
+            row,
+            metadata,
+            effect_json,
+            family_id="xmage_static_self_prowess_creature",
         ), "selected_exact_scope"
 
     if etb_life_gain_draw_creature_unit:
@@ -47017,6 +47102,7 @@ def build_exact_split_report(
         if (
             str(row.get("adapter_work_unit") or "") not in SUPPORTED_UNITS
             and not is_static_keyword_creature_unit(row)
+            and not is_prowess_creature_unit(row)
             and not is_static_protection_from_colors_creature_unit(row)
             and not is_static_cast_as_flash_permission_unit(row)
             and not is_static_cant_be_blocked_creature_unit(row)
@@ -47141,6 +47227,7 @@ def build_exact_split_report(
             "supported_adapter_work_units": sorted(SUPPORTED_UNITS),
             "supported_dynamic_adapter_work_units": [
                 "no-effect/no-signal static self keyword creature rows without ProtectionAbility or WardAbility",
+                "no-effect/no-signal ProwessAbility creature rows, optionally with safe static self keywords, with exact Oracle/XMage noncreature-spell +1/+1 trigger support",
                 "no-effect/no-signal ProtectionAbility creature rows, optionally with static self keywords, with exact Oracle/XMage protection from colors, card types, subtypes, or supported filters",
                 "passive::static_cast_as_flash_permission_variant_review_v1 rows with CastAsThoughItHadFlashAllEffect, SimpleStaticAbility, only safe static keyword auxiliaries including FlashAbility, and exact Oracle/XMage timing-permission filters",
                 "no-effect/no-signal CantBeBlockedSourceAbility creature rows with exact Oracle/XMage self can't-be-blocked evasion",

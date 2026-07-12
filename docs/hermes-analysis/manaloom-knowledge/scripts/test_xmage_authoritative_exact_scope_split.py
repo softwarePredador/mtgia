@@ -231,6 +231,38 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertTrue(effect["flying"])
         self.assertEqual(effect["cycling_cost"], "{2}")
 
+    def test_prowess_creature_maps_to_noncreature_spell_trigger_scope(self) -> None:
+        row = queue_row(
+            "xmage_signature::no_effect_class::FlyingAbility,ProwessAbility::"
+            "no_target_class::no_condition_class::no_signal",
+            effect_classes=[],
+            ability_kind="static",
+            ability_classes=["FlyingAbility", "ProwessAbility"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Jeskai Windscout",
+                type_line="Creature - Bird Scout",
+                oracle_text="Flying\nProwess",
+            ),
+            source_text="""
+                this.addAbility(FlyingAbility.getInstance());
+                this.addAbility(new ProwessAbility());
+            """,
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.PROWESS_CREATURE_SCOPE)
+        self.assertEqual(effect["trigger"], "noncreature_spell_cast")
+        self.assertEqual(effect["trigger_effect"], "boost_source_until_eot")
+        self.assertEqual(effect["trigger_power_bonus_until_eot"], 1)
+        self.assertEqual(effect["trigger_toughness_bonus_until_eot"], 1)
+        self.assertEqual(effect["keywords"], ["flying", "prowess"])
+        self.assertTrue(effect["prowess"])
+        self.assertTrue(effect["flying"])
+
     def test_put_target_creature_on_library_top_maps_battlefield_to_library_scope(self) -> None:
         row = queue_row(
             "xmage_signature::PutOnLibraryTargetEffect::no_ability_class::"

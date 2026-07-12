@@ -155,6 +155,61 @@ def test_hand_cycling_runner_uses_battle_runtime_cycling_executor() -> None:
     assert result["drawn"] == ["E2E Fresh Cycling Draw"]
 
 
+def test_prowess_runner_uses_spell_cast_boost_runtime() -> None:
+    battle = validator.load_battle(validator.DEFAULT_BATTLE)
+    effect = {
+        "effect": "creature",
+        "battle_model_scope": "xmage_static_self_prowess_creature_v1",
+        "keywords": ["flying", "prowess"],
+        "_keywords_are_self": True,
+        "flying": True,
+        "prowess": True,
+        "trigger": "noncreature_spell_cast",
+        "trigger_effect": "boost_source_until_eot",
+        "trigger_power_bonus_until_eot": 1,
+        "trigger_toughness_bonus_until_eot": 1,
+        "_rule_logical_key": "battle_rule_v1:prowess-fixture",
+    }
+    previous_get_card_effect = battle.get_card_effect
+    previous_handler = getattr(battle, "REPLAY_EVENT_HANDLER", None)
+    events: list[tuple[str, dict]] = []
+    battle.get_card_effect = lambda card: dict(effect)
+    battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+    try:
+        result = validator.run_prowess_trigger(
+            battle,
+            {
+                "name": "Jeskai Windscout triggers prowess from noncreature spell",
+                "type": "prowess_trigger",
+                "card": {
+                    "name": "Jeskai Windscout",
+                    "type_line": "Creature - Bird Scout",
+                    "power": 2,
+                    "toughness": 1,
+                },
+                "matching_spell": {"name": "Opt", "type_line": "Instant", "effect": "draw_cards"},
+                "nonmatching_spell": {
+                    "name": "Grizzly Bears",
+                    "type_line": "Creature - Bear",
+                    "effect": "creature",
+                },
+                "expected_power_bonus": 1,
+                "expected_toughness_bonus": 1,
+                "expected_keywords": ["flying", "prowess"],
+            },
+            events,
+        )
+    finally:
+        battle.get_card_effect = previous_get_card_effect
+        battle.REPLAY_EVENT_HANDLER = previous_handler
+
+    assert result["card_name"] == "Jeskai Windscout"
+    assert result["power_after"] == 3
+    assert result["toughness_after"] == 2
+    assert result["trigger_spell"] == "Opt"
+    assert result["keywords"] == ["flying", "prowess"]
+
+
 def test_creature_etb_life_gain_draw_runner_respects_resolution_order() -> None:
     battle = validator.load_battle(validator.DEFAULT_BATTLE)
     effect = {

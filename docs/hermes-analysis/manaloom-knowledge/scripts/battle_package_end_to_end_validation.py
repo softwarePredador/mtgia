@@ -8531,6 +8531,89 @@ def run_hand_cycling(
     }
 
 
+def run_prowess_trigger(
+    battle,
+    scenario: dict[str, Any],
+    events: list[tuple[str, dict[str, Any]]],
+) -> dict[str, Any]:
+    card = battle.enrich_card(dict(scenario["card"]))
+    effect = battle.get_card_effect(card)
+    if isinstance(effect, dict):
+        card.update(effect)
+    card.setdefault("effect", "creature")
+    active = battle.Player(str(scenario.get("player") or "Prowess Controller"), None, [])
+    opponent = battle.Player(str(scenario.get("opponent") or "Prowess Opponent"), None, [])
+    active.battlefield.append(card)
+    starting_power = int(card.get("power") or 0)
+    starting_toughness = int(card.get("toughness") or 0)
+    expected_power_bonus = int(scenario.get("expected_power_bonus") or 1)
+    expected_toughness_bonus = int(scenario.get("expected_toughness_bonus") or 1)
+
+    battle.trigger_spell_cast_engines(
+        active,
+        [active, opponent],
+        dict(scenario["matching_spell"]),
+        turn=int(scenario.get("turn") or 7),
+        phase=str(scenario.get("phase") or "precombat_main"),
+    )
+    if card.get("power") != starting_power + expected_power_bonus:
+        fail(
+            "battle_execution",
+            f"{card['name']} power={card.get('power')}, expected {starting_power + expected_power_bonus}",
+        )
+    if card.get("toughness") != starting_toughness + expected_toughness_bonus:
+        fail(
+            "battle_execution",
+            f"{card['name']} toughness={card.get('toughness')}, expected {starting_toughness + expected_toughness_bonus}",
+        )
+    before_nonmatching_events = len(events)
+    battle.trigger_spell_cast_engines(
+        active,
+        [active, opponent],
+        dict(scenario["nonmatching_spell"]),
+        turn=int(scenario.get("turn") or 7),
+        phase=str(scenario.get("phase") or "precombat_main"),
+    )
+    if card.get("power") != starting_power + expected_power_bonus:
+        fail("battle_execution", f"{card['name']} creature spell incorrectly retriggered power")
+    if card.get("toughness") != starting_toughness + expected_toughness_bonus:
+        fail("battle_execution", f"{card['name']} creature spell incorrectly retriggered toughness")
+    trigger_event = next(
+        (
+            data
+            for event, data in events
+            if event == "trigger_resolved"
+            and data.get("card") == card.get("name")
+            and data.get("effect") == "boost_source_until_eot"
+        ),
+        None,
+    )
+    if trigger_event is None:
+        fail("battle_events", f"missing {card['name']} prowess trigger_resolved event")
+    if any(
+        event == "trigger_resolved"
+        and data.get("card") == card.get("name")
+        and data.get("effect") == "boost_source_until_eot"
+        for event, data in events[before_nonmatching_events:]
+    ):
+        fail("battle_events", f"{card['name']} creature spell produced extra prowess event")
+    expected_keywords = set(str(value) for value in scenario.get("expected_keywords") or [])
+    actual_keywords = set(str(value) for value in card.get("keywords") or [])
+    if not expected_keywords.issubset(actual_keywords):
+        fail(
+            "battle_execution",
+            f"{card['name']} keywords={sorted(actual_keywords)!r}, expected {sorted(expected_keywords)!r}",
+        )
+    return {
+        "scenario": scenario.get("name"),
+        "card_name": card["name"],
+        "power_after": card.get("power"),
+        "toughness_after": card.get("toughness"),
+        "trigger_spell": trigger_event.get("trigger_spell"),
+        "keywords": sorted(actual_keywords),
+    }
+
+
 def run_simple_activated_tap_target(
     battle,
     scenario: dict[str, Any],
@@ -14477,6 +14560,7 @@ SCENARIO_RUNNERS = {
     "beginning_end_step_draw": run_beginning_end_step_draw,
     "combat_damage_draw": run_combat_damage_draw,
     "hand_cycling": run_hand_cycling,
+    "prowess_trigger": run_prowess_trigger,
     "mass_return_to_hand": run_mass_return_to_hand,
     "conditional_land_play": run_conditional_land_play,
     "counter_unless_pays_response": run_counter_unless_pays_response,
