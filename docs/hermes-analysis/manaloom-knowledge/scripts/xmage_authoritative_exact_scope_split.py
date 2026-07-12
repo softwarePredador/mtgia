@@ -330,6 +330,7 @@ PERMANENT_ACTIVATED_BOUNCE_SCOPE = "xmage_permanent_simple_activated_return_to_h
 PERMANENT_ACTIVATED_TAP_TARGET_SCOPE = "xmage_permanent_simple_activated_tap_target_v1"
 PERMANENT_ACTIVATED_UNTAP_TARGET_SCOPE = "xmage_permanent_simple_activated_untap_target_v1"
 TAP_TARGET_SPELL_SCOPE = "xmage_tap_target_spell_v1"
+UNTAP_TARGET_SPELL_SCOPE = "xmage_untap_target_spell_v1"
 TAP_TARGET_DRAW_SCOPE = "xmage_tap_target_and_draw_card_spell_v1"
 PERMANENT_ACTIVATED_RECURSION_TO_HAND_SCOPE = "xmage_permanent_simple_activated_graveyard_to_hand_v1"
 PERMANENT_ACTIVATED_RECURSION_TO_BATTLEFIELD_SCOPE = "xmage_permanent_simple_activated_graveyard_to_battlefield_v1"
@@ -21530,6 +21531,34 @@ def activated_untap_target_from_oracle(metadata: dict[str, Any]) -> dict[str, An
     }
 
 
+def fixed_untap_target_from_oracle(metadata: dict[str, Any]) -> dict[str, Any] | str:
+    text = strip_parenthetical_reminders(oracle_text(metadata))
+    text = re.sub(r"\s+", " ", text).strip().lower()
+    target_patterns = [
+        (r"untap target permanent\.?", "permanent", 1, False),
+        (r"untap target creature\.?", "creature", 1, False),
+        (r"untap target land\.?", "land", 1, False),
+        (r"untap two target lands\.?", "land", 2, False),
+        (r"untap target snow land\.?", "snow_land", 1, False),
+        (r"untap target artifact\.?", "artifact", 1, False),
+        (r"untap target artifact creature\.?", "artifact_creature", 1, False),
+        (r"untap target creature that has an activated ability with \{t\} in its cost\.?", "creature_with_tap_ability", 1, False),
+        (r"untap another target permanent\.?", "permanent", 1, True),
+        (r"untap another target snow permanent\.?", "snow_permanent", 1, True),
+    ]
+    for pattern, target, target_count, another in target_patterns:
+        if re.fullmatch(pattern, text):
+            return {
+                "target": target,
+                "target_constraints": untap_target_constraints_for(target, another=another),
+                "target_count": int(target_count),
+                "target_count_min": int(target_count),
+                "target_count_max": int(target_count),
+                "untap_another": bool(another),
+            }
+    return "untap_target_oracle_not_simple"
+
+
 def _activated_untap_target_from_source_target(text: str, window: str) -> tuple[str, dict[str, Any], int] | str:
     target_count = 1
     target = None
@@ -21575,6 +21604,28 @@ def _activated_untap_target_from_source_target(text: str, window: str) -> tuple[
     if target is None or constraints is None:
         return "activated_untap_target_source_target_not_supported"
     return target, constraints, target_count
+
+
+def fixed_untap_target_from_source(source: str) -> dict[str, Any] | str:
+    text = source or ""
+    if "TargetPointer" in text or ".setTargetPointer" in text or "EachTargetPointer" in text:
+        return "untap_target_source_target_pointer_not_supported"
+    if len(re.findall(r"new\s+UntapTargetEffect\s*\(\s*\)", text, re.S)) != 1:
+        return "untap_target_source_not_single_untap_effect"
+    untap_index = text.find("UntapTargetEffect")
+    window = source_effect_target_window(text, untap_index)
+    parsed_target = _activated_untap_target_from_source_target(text, window)
+    if isinstance(parsed_target, str):
+        return parsed_target.replace("activated_untap_target", "untap_target")
+    target, constraints, target_count = parsed_target
+    return {
+        "target": target,
+        "target_constraints": constraints,
+        "target_count": int(target_count),
+        "target_count_min": int(target_count),
+        "target_count_max": int(target_count),
+        "untap_another": bool(constraints.get("exclude_source")),
+    }
 
 
 def activated_untap_target_from_source(source: str) -> dict[str, Any] | str:
@@ -30271,6 +30322,8 @@ def proposal_notes(row: dict[str, Any], scope: str) -> str:
         scope_kind = "noncreature permanent with a simple self-sacrifice library-search-to-hand ability"
     elif scope == TAP_TARGET_SPELL_SCOPE:
         scope_kind = "instant or sorcery spell that taps exact target permanents"
+    elif scope == UNTAP_TARGET_SPELL_SCOPE:
+        scope_kind = "instant or sorcery spell that untaps exact target permanents"
     elif scope == TAP_TARGET_DRAW_SCOPE:
         scope_kind = "instant or sorcery spell that taps exact target permanents and draws a card"
     elif scope == ADD_COUNTERS_TARGET_SCOPE:
@@ -42775,6 +42828,46 @@ def split_row(
         return build_proposal(row, metadata, effect_json, family_id=family_id), "selected_exact_scope"
 
     if unit == UNTAP_TARGET_UNIT:
+        if classes == {"UntapTargetEffect"}:
+            unsupported_abilities = ability_classes(row) - ALLOWED_AUXILIARY_RESOLUTION_ABILITY_CLASSES
+            if unsupported_abilities:
+                return None, "untap_target_ability_class_not_simple"
+            source_untap = fixed_untap_target_from_source(source_text)
+            if isinstance(source_untap, str):
+                return None, source_untap
+            oracle_untap = fixed_untap_target_from_oracle(metadata)
+            if isinstance(oracle_untap, str):
+                return None, oracle_untap
+            comparable_keys = ("target", "target_constraints", "target_count_min", "target_count_max")
+            if any(source_untap.get(key) != oracle_untap.get(key) for key in comparable_keys):
+                return None, "untap_target_source_oracle_mismatch"
+            target_count = int(oracle_untap["target_count"])
+            effect_json = {
+                "effect": "stat_modifier_until_eot_untap_target",
+                "battle_model_scope": UNTAP_TARGET_SPELL_SCOPE,
+                "target": oracle_untap["target"],
+                "target_constraints": oracle_untap["target_constraints"],
+                "target_controller": "any",
+                "power_delta": 0,
+                "toughness_delta": 0,
+                "power_boost": 0,
+                "toughness_boost": 0,
+                "modifies_stats": False,
+                "duration": "immediate",
+                "untap_target": True,
+                "target_count": target_count,
+                "target_count_min": int(oracle_untap["target_count_min"]),
+                "target_count_max": int(oracle_untap["target_count_max"]),
+                "up_to_count": False,
+                "xmage_effect_class": "UntapTargetEffect",
+                **flags,
+            }
+            return build_proposal(
+                row,
+                metadata,
+                effect_json,
+                family_id="xmage_untap_target_spell",
+            ), "selected_exact_scope"
         if classes == {"AddCountersTargetEffect", "UntapTargetEffect"}:
             unsupported_abilities = ability_classes(row) - ALLOWED_AUXILIARY_RESOLUTION_ABILITY_CLASSES
             if unsupported_abilities:

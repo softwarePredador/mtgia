@@ -5656,6 +5656,9 @@ def stat_modifier_is_harmful(effect_data):
 def stat_modifier_candidate_targets(player, opponents, card, effect_data):
     target_type = str((effect_data or {}).get("target") or "").lower() or _target_type_from_constraints(effect_data) or "creature"
     target_controller = str((effect_data or {}).get("target_controller") or "any").lower()
+    allow_noncreature_targets = bool((effect_data or {}).get("untap_target")) and (
+        (effect_data or {}).get("modifies_stats") is False
+    )
     participants = []
     if target_controller in {"self", "you", "controller", "controlled"}:
         participants = [player]
@@ -5666,7 +5669,7 @@ def stat_modifier_candidate_targets(player, opponents, card, effect_data):
     candidates = []
     for owner in participants:
         for permanent in list(getattr(owner, "battlefield", []) or []):
-            if not is_battlefield_creature(permanent):
+            if not allow_noncreature_targets and not is_battlefield_creature(permanent):
                 continue
             if not is_legal_target(
                 card if isinstance(card, dict) else effect_data,
@@ -5753,6 +5756,7 @@ def choose_stat_modifier_targets(player, opponents, card, effect_data):
 def resolve_stat_modifier_until_eot_untap_target_spell(player, opponents, card, effect_data, turn, *, finish=True):
     power_delta = int(effect_data.get("power_delta") or effect_data.get("power_boost") or 0)
     toughness_delta = int(effect_data.get("toughness_delta") or effect_data.get("toughness_boost") or 0)
+    modifies_stats = bool(effect_data.get("modifies_stats", True))
     target_type = str(effect_data.get("target") or "").lower() or _target_type_from_constraints(effect_data) or "creature"
     target_colors_until_eot = stat_modifier_target_colors_until_eot(effect_data)
     candidates = stat_modifier_candidate_targets(player, opponents, card, effect_data)
@@ -5794,10 +5798,11 @@ def resolve_stat_modifier_until_eot_untap_target_spell(player, opponents, card, 
         toughness_before = _numeric_card_stat(target, "toughness", "power")
         target_colors_before = ordered_card_color_symbols(target)
         tapped_before = bool(target.get("tapped"))
-        remember_until_eot(target, "power")
-        remember_until_eot(target, "toughness")
-        target["power"] = power_before + power_delta
-        target["toughness"] = toughness_before + toughness_delta
+        if modifies_stats:
+            remember_until_eot(target, "power")
+            remember_until_eot(target, "toughness")
+            target["power"] = power_before + power_delta
+            target["toughness"] = toughness_before + toughness_delta
         granted_keywords = [
             str(keyword or "").strip()
             for keyword in (effect_data.get("granted_keywords_until_eot") or [])
@@ -5821,6 +5826,7 @@ def resolve_stat_modifier_until_eot_untap_target_spell(player, opponents, card, 
                 "target_power_after": _numeric_card_stat(target, "power"),
                 "target_toughness_before": toughness_before,
                 "target_toughness_after": _numeric_card_stat(target, "toughness", "power"),
+                "target_stats_modified": modifies_stats,
                 "target_tapped_before": tapped_before,
                 "target_tapped_after": bool(target.get("tapped")),
                 "target_untapped": tapped_before and not bool(target.get("tapped")),

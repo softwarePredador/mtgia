@@ -3160,6 +3160,39 @@ def test_manifest_builds_look_at_hand_draw_spell_execution_scenario() -> None:
     ]
 
 
+def test_manifest_builds_pure_untap_target_spell_execution_scenario() -> None:
+    rule = {
+        "normalized_name": "burst of energy",
+        "card_name": "Burst of Energy",
+        "oracle_hash": "hash-burst-of-energy",
+        "logical_rule_key": "battle_rule_v1:burst-of-energy",
+        "required_effect_fields": {
+            "effect": "stat_modifier_until_eot_untap_target",
+            "battle_model_scope": "xmage_untap_target_spell_v1",
+            "target": "permanent",
+            "target_constraints": {"card_types": ["permanent"]},
+            "target_controller": "any",
+            "power_delta": 0,
+            "toughness_delta": 0,
+            "modifies_stats": False,
+            "untap_target": True,
+            "target_count": 1,
+            "target_count_min": 1,
+            "target_count_max": 1,
+        },
+    }
+
+    scenario = builder.boost_untap_target_spell_execution_scenario_from_expected_rule(rule)
+
+    assert scenario is not None
+    assert scenario["type"] == "stat_modifier_until_eot_untap_target"
+    assert scenario["card"]["name"] == "Burst of Energy"
+    assert scenario["expected_power_delta"] == 0
+    assert scenario["expected_toughness_delta"] == 0
+    assert scenario["expected_target_count"] == 1
+    assert scenario["targets"][0]["tapped"] is True
+
+
 def test_manifest_builds_boost_untap_target_spell_execution_scenario() -> None:
     rule = {
         "normalized_name": "synchronized strike",

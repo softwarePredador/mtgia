@@ -34147,6 +34147,57 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertIsNone(proposal)
         self.assertEqual(reason, "modal_damage_destroy_oracle_mode_not_supported")
 
+    def test_fixed_untap_target_spell_maps_target_permanent_exact_scope(self) -> None:
+        proposal, reason = split.split_row(
+            queue_row(
+                split.UNTAP_TARGET_UNIT,
+                effect_classes=["UntapTargetEffect"],
+                xmage_signals=["targeting"],
+            ),
+            metadata(
+                name="Burst of Energy",
+                type_line="Instant",
+                oracle_text="Untap target permanent.",
+            ),
+            source_text="""
+                this.getSpellAbility().addEffect(new UntapTargetEffect());
+                this.getSpellAbility().addTarget(new TargetPermanent());
+            """,
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["effect"], "stat_modifier_until_eot_untap_target")
+        self.assertEqual(effect["battle_model_scope"], split.UNTAP_TARGET_SPELL_SCOPE)
+        self.assertEqual(effect["target"], "permanent")
+        self.assertEqual(effect["target_count_min"], 1)
+        self.assertEqual(effect["target_count_max"], 1)
+        self.assertEqual(effect["power_delta"], 0)
+        self.assertEqual(effect["toughness_delta"], 0)
+        self.assertFalse(effect["modifies_stats"])
+        self.assertTrue(effect["untap_target"])
+
+    def test_fixed_untap_target_spell_rejects_non_spell_triggered_source(self) -> None:
+        proposal, reason = split.split_row(
+            queue_row(
+                split.UNTAP_TARGET_UNIT,
+                effect_classes=["UntapTargetEffect"],
+                ability_classes=["EntersBattlefieldTriggeredAbility"],
+                xmage_signals=["targeting", "triggered_ability"],
+            ),
+            metadata(
+                name="Breaching Hippocamp",
+                type_line="Creature - Horse Fish",
+                oracle_text="Flash\nWhen Breaching Hippocamp enters, untap another target creature you control.",
+            ),
+            source_text="""
+                this.addAbility(new EntersBattlefieldTriggeredAbility(new UntapTargetEffect()));
+            """,
+        )
+
+        self.assertIsNone(proposal)
+        self.assertEqual(reason, "not_instant_or_sorcery_spell")
+
     def test_fixed_boost_untap_target_maps_single_target_exact_scope(self) -> None:
         proposal, reason = split.split_row(
             queue_row(

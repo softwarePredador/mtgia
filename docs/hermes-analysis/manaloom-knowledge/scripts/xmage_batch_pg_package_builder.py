@@ -6002,6 +6002,7 @@ def boost_untap_target_spell_execution_scenario_from_expected_rule(
 ) -> dict[str, Any] | None:
     required = dict(rule.get("required_effect_fields") or {})
     if required.get("battle_model_scope") not in {
+        "xmage_untap_target_spell_v1",
         "xmage_fixed_boost_and_untap_target_creature_until_eot_spell_v1",
         "xmage_fixed_boost_keyword_and_untap_target_creature_until_eot_spell_v1",
     }:
@@ -6034,7 +6035,11 @@ def boost_untap_target_spell_execution_scenario_from_expected_rule(
     )
     nonmatching["tapped"] = True
     return {
-        "name": f"{rule['card_name']} boosts and untaps target creatures",
+        "name": (
+            f"{rule['card_name']} untaps target permanents"
+            if required.get("battle_model_scope") == "xmage_untap_target_spell_v1"
+            else f"{rule['card_name']} boosts and untaps target creatures"
+        ),
         "type": "stat_modifier_until_eot_untap_target",
         "card": {
             "name": rule["card_name"],

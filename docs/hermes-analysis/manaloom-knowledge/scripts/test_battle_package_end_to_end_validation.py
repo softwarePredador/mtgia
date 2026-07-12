@@ -3879,6 +3879,58 @@ def test_tap_target_spell_runner_executes_composite_draw() -> None:
     )
 
 
+def test_pure_untap_target_runner_executes_without_stat_change() -> None:
+    battle = validator.load_battle(validator.DEFAULT_BATTLE)
+    events = []
+    previous_handler = battle.REPLAY_EVENT_HANDLER
+    previous_get_card_effect = battle.get_card_effect
+    battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+    battle.get_card_effect = lambda card: {
+        "effect": "stat_modifier_until_eot_untap_target",
+        "battle_model_scope": "xmage_untap_target_spell_v1",
+        "target": "permanent",
+        "target_controller": "any",
+        "target_constraints": {"card_types": ["permanent"]},
+        "power_delta": 0,
+        "toughness_delta": 0,
+        "modifies_stats": False,
+        "untap_target": True,
+        "target_count": 1,
+        "target_count_min": 1,
+        "target_count_max": 1,
+        "_rule_logical_key": "battle_rule_v1:burst-of-energy-fixture",
+    }
+    try:
+        result = validator.run_stat_modifier_until_eot_untap_target(
+            battle,
+            {
+                "name": "Burst of Energy untaps target permanent",
+                "type": "stat_modifier_until_eot_untap_target",
+                "card": {"name": "Burst of Energy", "type_line": "Instant"},
+                "targets": [
+                    {
+                        "name": "E2E Tapped Artifact",
+                        "type_line": "Artifact",
+                        "effect": "mana_source",
+                        "tapped": True,
+                    },
+                ],
+                "expected_power_delta": 0,
+                "expected_toughness_delta": 0,
+                "expected_target_count": 1,
+                "expected_target_constraints": {"card_types": ["permanent"]},
+            },
+            events,
+        )
+    finally:
+        battle.REPLAY_EVENT_HANDLER = previous_handler
+        battle.get_card_effect = previous_get_card_effect
+
+    assert result["card_name"] == "Burst of Energy"
+    assert result["targets"] == ["E2E Tapped Artifact"]
+    assert result["targets_untapped_count"] == 1
+
+
 def test_boost_untap_target_runner_executes_multi_target_spell() -> None:
     battle = validator.load_battle(validator.DEFAULT_BATTLE)
     events = []
