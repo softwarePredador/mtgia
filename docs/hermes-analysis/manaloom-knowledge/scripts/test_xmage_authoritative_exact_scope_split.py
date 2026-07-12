@@ -4898,6 +4898,49 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertEqual(effect["static_power_bonus_per_graveyard_count"], 1)
         self.assertEqual(effect["static_toughness_bonus_per_graveyard_count"], 1)
 
+    def test_static_graveyard_count_boost_zero_base_battlefield_plus_graveyard_is_package_safe(self) -> None:
+        row = queue_row(
+            split.RECURSION_UNIT,
+            effect_classes=["BoostSourceEffect"],
+            ability_kind="static",
+            ability_classes=["SimpleStaticAbility", "TrampleAbility"],
+            xmage_signals=["static_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Moon-Vigil Adherents",
+                type_line="Creature - Elf Druid",
+                oracle_text=(
+                    "Trample\n"
+                    "This creature gets +1/+1 for each creature you control and each "
+                    "creature card in your graveyard."
+                ),
+            ),
+            source_text=(
+                "this.power = new MageInt(0);"
+                "this.toughness = new MageInt(0);"
+                "private static final DynamicValue xValue = new AdditiveDynamicValue("
+                "CreaturesYouControlCount.SINGULAR, "
+                "new CardsInControllerGraveyardCount(StaticFilters.FILTER_CARD_CREATURE));"
+                "this.addAbility(new SimpleStaticAbility(new BoostSourceEffect("
+                "xValue, xValue, Duration.WhileOnBattlefield)));"
+            ),
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.STATIC_COUNT_PT_SCOPE)
+        self.assertEqual(effect["static_effect"], "source_power_toughness_equal_count")
+        self.assertEqual(effect["stat_modifier_amount_source"], "battlefield_plus_graveyard_card_count")
+        self.assertEqual(effect["battlefield_count_scope"], "controller_battlefield")
+        self.assertEqual(effect["battlefield_count_card_types"], ["creature"])
+        self.assertEqual(effect["graveyard_count_scope"], "controller_graveyard")
+        self.assertEqual(effect["graveyard_count_card_types"], ["creature"])
+        self.assertEqual(effect["static_power_toughness_base"], 0)
+        self.assertEqual(effect["static_power_toughness_count_multiplier"], 1)
+        self.assertIn("trample", effect["keywords"])
+
     def test_static_graveyard_count_boost_controller_artifacts_power_only_is_package_safe(self) -> None:
         row = queue_row(
             split.RECURSION_UNIT,

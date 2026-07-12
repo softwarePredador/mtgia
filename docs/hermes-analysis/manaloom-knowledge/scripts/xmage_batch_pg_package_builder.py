@@ -2025,19 +2025,32 @@ def static_count_pt_execution_scenario_from_expected_rule(rule: dict[str, Any]) 
             {"name": "E2E Off Symbol Grave Card", "type_line": "Instant", "mana_cost": "{G}"},
         ]
         expected_count = 3
-    elif amount_source == "battlefield_plus_graveyard_subtype_count":
-        subtype = (subtypes or [str(value).lower() for value in required.get("graveyard_count_subtypes") or []] or ["zombie"])[0]
-        source_card["type_line"] = f"Creature - {subtype.title()}"
-        matching_type_line = f"Creature - {subtype.title()}"
+    elif amount_source in {"battlefield_plus_graveyard_subtype_count", "battlefield_plus_graveyard_card_count"}:
+        graveyard_subtypes = [str(value).lower() for value in required.get("graveyard_count_subtypes") or []]
+        graveyard_card_types = [str(value).lower() for value in required.get("graveyard_count_card_types") or []]
+        if subtypes or graveyard_subtypes:
+            subtype = (subtypes or graveyard_subtypes or ["zombie"])[0]
+            source_card["type_line"] = f"Creature - {subtype.title()}"
+            matching_label = subtype.title()
+            matching_type_line = f"Creature - {matching_label}"
+        else:
+            card_type = (card_types or graveyard_card_types or ["creature"])[0]
+            matching_label = card_type.title()
+            matching_type_line = "Creature - Soldier" if card_type == "creature" else matching_label
+            if card_type == "land":
+                source_card["type_line"] = "Creature - Avatar"
+                matching_type_line = "Land"
+            else:
+                source_card["type_line"] = "Creature - Avatar"
         controller_battlefield.append(
             {
-                "name": f"E2E Controller Matching {subtype.title()}",
+                "name": f"E2E Controller Matching {matching_label}",
                 "type_line": matching_type_line,
             }
         )
         controller_graveyard.append(
             {
-                "name": f"E2E Controller Graveyard {subtype.title()}",
+                "name": f"E2E Controller Graveyard {matching_label}",
                 "type_line": matching_type_line,
             }
         )
@@ -2045,7 +2058,7 @@ def static_count_pt_execution_scenario_from_expected_rule(rule: dict[str, Any]) 
         if str(required.get("battlefield_count_scope") or scope) == "all_battlefields":
             opponent_battlefield.append(
                 {
-                    "name": f"E2E Opponent Matching {subtype.title()}",
+                    "name": f"E2E Opponent Matching {matching_label}",
                     "type_line": matching_type_line,
                 }
             )
@@ -2053,7 +2066,7 @@ def static_count_pt_execution_scenario_from_expected_rule(rule: dict[str, Any]) 
         if str(required.get("graveyard_count_scope") or "") == "all_graveyards":
             opponent_graveyard.append(
                 {
-                    "name": f"E2E Opponent Graveyard {subtype.title()}",
+                    "name": f"E2E Opponent Graveyard {matching_label}",
                     "type_line": matching_type_line,
                 }
             )

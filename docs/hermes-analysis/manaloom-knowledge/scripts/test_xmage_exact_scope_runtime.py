@@ -2718,6 +2718,26 @@ class XMageExactScopeRuntimeTest(unittest.TestCase):
                 3,
             ),
             (
+                "Moon-Vigil Adherents",
+                {
+                    "type_line": "Creature - Elf Druid",
+                    "static_power_toughness_source": "battlefield_plus_graveyard_card_count",
+                    "stat_modifier_amount_source": "battlefield_plus_graveyard_card_count",
+                    "battlefield_count_scope": "controller_battlefield",
+                    "battlefield_count_card_types": ["creature"],
+                    "graveyard_count_scope": "controller_graveyard",
+                    "graveyard_count_card_types": ["creature"],
+                },
+                [
+                    {"name": "Controller Creature", "type_line": "Creature - Beast"},
+                    {"name": "Ignored Artifact", "type_line": "Artifact"},
+                ],
+                [{"name": "Opponent Creature", "type_line": "Creature - Soldier"}],
+                [{"name": "Graveyard Creature", "type_line": "Creature - Elf"}],
+                [{"name": "Opponent Grave Creature", "type_line": "Creature - Zombie"}],
+                3,
+            ),
+            (
                 "Soulless One",
                 {
                     "type_line": "Creature - Zombie Avatar",

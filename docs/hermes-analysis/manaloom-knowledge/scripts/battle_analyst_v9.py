@@ -58581,7 +58581,10 @@ def _stat_modifier_count_from_source(player, opponents, effect_data):
             "mana_symbol_count_color": color,
             "controller_graveyard_mana_symbol_count": count,
         }
-    if amount_source == "battlefield_plus_graveyard_subtype_count":
+    if amount_source in {
+        "battlefield_plus_graveyard_subtype_count",
+        "battlefield_plus_graveyard_card_count",
+    }:
         battlefield_count, battlefield_fields = _battlefield_count_for_stat_modifier(
             player,
             opponents,
@@ -58598,7 +58601,7 @@ def _stat_modifier_count_from_source(player, opponents, effect_data):
             graveyard_players = list(opponents or [])
         else:
             return None, {
-                "stat_modifier_amount_source": "battlefield_plus_graveyard_subtype_count",
+                "stat_modifier_amount_source": amount_source,
                 "graveyard_count_scope": graveyard_scope,
                 "graveyard_count_status": "unsupported_scope",
             }
@@ -58610,10 +58613,10 @@ def _stat_modifier_count_from_source(player, opponents, effect_data):
         count = int(battlefield_count) + int(graveyard_count)
         return count, {
             **battlefield_fields,
-            "stat_modifier_amount_source": "battlefield_plus_graveyard_subtype_count",
+            "stat_modifier_amount_source": amount_source,
             "graveyard_count_scope": graveyard_scope,
             "graveyard_stat_modifier_count": graveyard_count,
-            "battlefield_plus_graveyard_subtype_count": count,
+            amount_source: count,
         }
     if amount_source == "controller_hand_count":
         count = len(getattr(player, "hand", []) or [])

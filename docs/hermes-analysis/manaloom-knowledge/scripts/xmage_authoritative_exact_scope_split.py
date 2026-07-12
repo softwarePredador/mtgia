@@ -11843,6 +11843,57 @@ def static_count_pt_from_source(source: str) -> dict[str, Any] | str | None:
     return None
 
 
+def static_count_pt_zero_base_boost_from_oracle(metadata: dict[str, Any]) -> dict[str, Any] | None:
+    text = oracle_text_after_leading_static_keywords(metadata)
+    if re.match(
+        r"^(?:this creature|[a-z0-9' ,./-]+) gets \+1/\+1 for each creature you control "
+        r"and each creature card in your graveyard\.?$",
+        text,
+    ):
+        return static_count_pt_result(
+            static_power_toughness_source="battlefield_plus_graveyard_card_count",
+            stat_modifier_amount_source="battlefield_plus_graveyard_card_count",
+            battlefield_count_scope="controller_battlefield",
+            battlefield_count_card_types=["creature"],
+            graveyard_count_scope="controller_graveyard",
+            graveyard_count_card_types=["creature"],
+        )
+    return None
+
+
+def static_count_pt_zero_base_boost_from_source(source: str) -> dict[str, Any] | str | None:
+    text = source or ""
+    if not re.search(r"this\.power\s*=\s*new\s+MageInt\s*\(\s*0\s*\)", text):
+        return "static_count_pt_boost_source_base_not_zero"
+    if not re.search(r"this\.toughness\s*=\s*new\s+MageInt\s*\(\s*0\s*\)", text):
+        return "static_count_pt_boost_source_base_not_zero"
+    constructor_args = extract_constructor_args(text, "BoostSourceEffect")
+    if constructor_args is None:
+        return None
+    args = split_top_level_args(constructor_args)
+    if len(args) < 3 or args[2] != "Duration.WhileOnBattlefield":
+        return "static_count_pt_boost_source_not_while_on_battlefield"
+    if args[0] != args[1]:
+        return "static_count_pt_boost_source_power_toughness_mismatch"
+    if "AdditiveDynamicValue" not in text:
+        return "static_count_pt_boost_source_count_not_supported"
+    if "CreaturesYouControlCount" not in text:
+        return "static_count_pt_boost_source_count_not_supported"
+    if not re.search(
+        r"CardsInControllerGraveyardCount\s*\(\s*StaticFilters\.FILTER_CARD_CREATURES?\s*\)",
+        text,
+    ):
+        return "static_count_pt_boost_source_count_not_supported"
+    return static_count_pt_result(
+        static_power_toughness_source="battlefield_plus_graveyard_card_count",
+        stat_modifier_amount_source="battlefield_plus_graveyard_card_count",
+        battlefield_count_scope="controller_battlefield",
+        battlefield_count_card_types=["creature"],
+        graveyard_count_scope="controller_graveyard",
+        graveyard_count_card_types=["creature"],
+    )
+
+
 STATIC_GRAVEYARD_THRESHOLD_WORDS = {
     "one": 1,
     "two": 2,
@@ -37095,6 +37146,40 @@ def split_row(
     if static_graveyard_count_boost_unit:
         if not is_creature_metadata(metadata):
             return None, "static_graveyard_count_boost_not_creature"
+        oracle_count = static_count_pt_zero_base_boost_from_oracle(metadata)
+        if oracle_count is not None:
+            source_count = static_count_pt_zero_base_boost_from_source(source_text)
+            if isinstance(source_count, str):
+                return None, source_count
+            if source_count is None:
+                return None, "static_count_pt_boost_source_not_exact"
+            if source_count != oracle_count:
+                return None, "static_count_pt_boost_source_oracle_mismatch"
+            keyword_list = ordered_keywords(keywords_from_ability_classes(row))
+            effect_json = {
+                "effect": "creature",
+                "battle_model_scope": STATIC_COUNT_PT_SCOPE,
+                "ability_kind": "static",
+                "static_effect": "source_power_toughness_equal_count",
+                "target": "self",
+                "target_controller": "self",
+                "dynamic_power_equals_count": True,
+                "dynamic_toughness_equals_count": True,
+                "xmage_effect_class": "BoostSourceEffect",
+                "xmage_ability_class": "SimpleStaticAbility",
+                **source_count,
+            }
+            if keyword_list:
+                effect_json["keywords"] = keyword_list
+                effect_json["_keywords_are_self"] = True
+                for keyword in keyword_list:
+                    effect_json[keyword] = True
+            return build_proposal(
+                row,
+                metadata,
+                effect_json,
+                family_id="xmage_static_source_power_toughness_equal_count",
+            ), "selected_exact_scope"
         oracle_static = static_graveyard_count_boost_from_oracle(metadata)
         if oracle_static is None:
             return None, "static_graveyard_count_boost_oracle_not_exact"

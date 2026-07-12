@@ -812,6 +812,45 @@ def test_static_cost_reduction_colored_symbols_fields_and_execution_scenario_are
     assert scenario["expected_static_cost_reduction_color_symbols"] == ["W", "B"]
 
 
+def test_static_count_battlefield_plus_graveyard_card_count_execution_scenario_is_manifested() -> None:
+    proposal = {
+        "normalized_name": "moon-vigil adherents",
+        "card_name": "Moon-Vigil Adherents",
+        "oracle_hash": "hash-moon-vigil",
+        "logical_rule_key": "battle_rule_v1:moon-vigil",
+        "effect_json": {
+            "effect": "creature",
+            "battle_model_scope": "xmage_static_source_power_toughness_equal_count_v1",
+            "static_effect": "source_power_toughness_equal_count",
+            "static_power_toughness_source": "battlefield_plus_graveyard_card_count",
+            "stat_modifier_amount_source": "battlefield_plus_graveyard_card_count",
+            "static_power_toughness_base": 0,
+            "static_power_toughness_count_multiplier": 1,
+            "battlefield_count_scope": "controller_battlefield",
+            "battlefield_count_card_types": ["creature"],
+            "graveyard_count_scope": "controller_graveyard",
+            "graveyard_count_card_types": ["creature"],
+        },
+    }
+
+    expected = builder.expected_rule_from_proposal(proposal)
+    scenario = builder.execution_scenario_from_expected_rule(expected)
+
+    required = expected["required_effect_fields"]
+    assert required["stat_modifier_amount_source"] == "battlefield_plus_graveyard_card_count"
+    assert scenario["type"] == "static_count_power_toughness"
+    assert scenario["card"]["type_line"] == "Creature - Avatar"
+    assert scenario["controller_battlefield"] == [
+        {"name": "E2E Controller Matching Creature", "type_line": "Creature - Soldier"}
+    ]
+    assert scenario["controller_graveyard"] == [
+        {"name": "E2E Controller Graveyard Creature", "type_line": "Creature - Soldier"}
+    ]
+    assert scenario["expected_count"] == 3
+    assert scenario["expected_power"] == 3
+    assert scenario["expected_toughness"] == 3
+
+
 def test_static_graveyard_threshold_distinct_card_types_fields_and_execution_scenario_are_manifested() -> None:
     proposal = {
         "normalized_name": "gnarlwood dryad",
