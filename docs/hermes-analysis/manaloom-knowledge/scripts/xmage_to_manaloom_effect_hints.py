@@ -1039,6 +1039,43 @@ def _build_mill_spell_fields(
         }
 
     if (
+        card_types & {"ARTIFACT", "CREATURE", "ENCHANTMENT"}
+        and effect_classes == {"MillCardsTargetEffect"}
+        and ability_classes == {"SimpleActivatedAbility"}
+        and mill_count > 0
+        and cost_classes.issubset(
+            {
+                "GenericManaCost",
+                "ColoredManaCost",
+                "ManaCostsImpl",
+                "TapSourceCost",
+                "TapTargetCost",
+            }
+        )
+    ):
+        permanent_type = (
+            "artifact"
+            if "ARTIFACT" in card_types
+            else "creature"
+            if "CREATURE" in card_types
+            else "enchantment"
+        )
+        return {
+            "effect": "passive",
+            "scope": "permanent_simple_activated_target_player_mill_variant_v1",
+            "fields": {
+                "ability_kind": "activated",
+                "activated_effect": "target_player_mill",
+                "activated_target_player_mill_count": mill_count,
+                "target": "player",
+                "target_player_mill": True,
+                "permanent_type": permanent_type,
+            },
+            "reason": "XMage structure matches a permanent with a simple activated fixed target-player mill ability.",
+            "signals": ["MillCardsTargetEffect", "SimpleActivatedAbility", "TargetPlayer"],
+        }
+
+    if (
         card_types == {"ARTIFACT"}
         and "SimpleActivatedAbility" in ability_classes
         and {"TapSourceCost", "SacrificeTargetCost"}.issubset(cost_classes)

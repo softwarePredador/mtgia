@@ -179,6 +179,8 @@ E2E_REQUIRED_EFFECT_FIELDS = (
     "target_player_life_gain",
     "target_player_mill",
     "target_player_scope",
+    "activated_target_player_mill_count",
+    "target_player_mill_activation_requires_tap",
     "target_controller_mill_on_counter",
     "look_at_hand",
     "prevent_all_combat_damage_this_turn",
@@ -5715,6 +5717,58 @@ def target_player_mill_execution_scenario_from_expected_rule(
     }
 
 
+def simple_activated_target_player_mill_execution_scenario_from_expected_rule(
+    rule: dict[str, Any],
+) -> dict[str, Any] | None:
+    required = dict(rule.get("required_effect_fields") or {})
+    if required.get("battle_model_scope") != "xmage_permanent_simple_activated_target_player_mill_v1":
+        return None
+    expected_mill_count = int(
+        required.get("activated_target_player_mill_count")
+        or required.get("mill_count")
+        or required.get("count")
+        or 0
+    )
+    if expected_mill_count <= 0:
+        return None
+    permanent_type = str(required.get("permanent_type") or "artifact").lower()
+    type_line = {
+        "artifact": "Artifact",
+        "creature": "Creature - Merfolk Wizard",
+        "enchantment": "Enchantment",
+    }.get(permanent_type, "Artifact")
+    scenario: dict[str, Any] = {
+        "name": f"{rule['card_name']} activates target-player mill ability",
+        "type": "simple_activated_target_player_mill",
+        "card": {
+            "name": rule["card_name"],
+            "type_line": type_line,
+        },
+        "controller_mana": _manifest_mana_for_required_activation(required),
+        "opponent_library": [
+            {
+                "name": f"E2E Activated Target Mill Card {index + 1}",
+                "type_line": "Instant" if index % 2 == 0 else "Creature - Fixture",
+                "effect": "draw_cards" if index % 2 == 0 else "creature",
+                "cmc": index + 1,
+            }
+            for index in range(max(expected_mill_count + 1, 2))
+        ],
+        "expected_mill_count": expected_mill_count,
+        "expected_target_player": "Opponent",
+        "expected_tapped_source": bool(required.get("activation_requires_tap")),
+        "logical_rule_key": rule["logical_rule_key"],
+    }
+    tap_cost_targets = _manifest_tap_cost_fixtures(
+        "E2E Activated Target Mill Tap Cost Target",
+        required.get("activation_tap_cost") if isinstance(required.get("activation_tap_cost"), dict) else None,
+    )
+    if tap_cost_targets:
+        scenario["tap_cost_targets"] = tap_cost_targets
+        scenario["expected_tap_cost_count"] = len(tap_cost_targets)
+    return scenario
+
+
 def target_player_mill_draw_execution_scenario_from_expected_rule(
     rule: dict[str, Any],
 ) -> dict[str, Any] | None:
@@ -10683,6 +10737,7 @@ def execution_scenario_from_expected_rule(rule: dict[str, Any]) -> dict[str, Any
         or target_player_draw_execution_scenario_from_expected_rule(rule)
         or target_player_life_gain_execution_scenario_from_expected_rule(rule)
         or target_player_mill_draw_execution_scenario_from_expected_rule(rule)
+        or simple_activated_target_player_mill_execution_scenario_from_expected_rule(rule)
         or target_player_mill_execution_scenario_from_expected_rule(rule)
         or combat_damage_draw_execution_scenario_from_expected_rule(rule)
         or beginning_end_step_draw_execution_scenario_from_expected_rule(rule)

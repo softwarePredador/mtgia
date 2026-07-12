@@ -1,0 +1,395 @@
+{
+  "battle_execution": {
+    "event_count": 16,
+    "results": [
+      {
+        "card_name": "Ambassador Laquatus",
+        "cards_milled": 3,
+        "scenario": "Ambassador Laquatus activates target-player mill ability",
+        "tapped_cost_targets": [],
+        "tapped_source": false
+      },
+      {
+        "card_name": "Cathartic Adept",
+        "cards_milled": 1,
+        "scenario": "Cathartic Adept activates target-player mill ability",
+        "tapped_cost_targets": [],
+        "tapped_source": true
+      },
+      {
+        "card_name": "Drowner of Secrets",
+        "cards_milled": 1,
+        "scenario": "Drowner of Secrets activates target-player mill ability",
+        "tapped_cost_targets": [
+          "E2E Activated Target Mill Tap Cost Target"
+        ],
+        "tapped_source": false
+      },
+      {
+        "card_name": "Hair-Strung Koto",
+        "cards_milled": 1,
+        "scenario": "Hair-Strung Koto activates target-player mill ability",
+        "tapped_cost_targets": [
+          "E2E Activated Target Mill Tap Cost Target"
+        ],
+        "tapped_source": false
+      },
+      {
+        "card_name": "Merfolk Mesmerist",
+        "cards_milled": 2,
+        "scenario": "Merfolk Mesmerist activates target-player mill ability",
+        "tapped_cost_targets": [],
+        "tapped_source": true
+      },
+      {
+        "card_name": "Millstone",
+        "cards_milled": 2,
+        "scenario": "Millstone activates target-player mill ability",
+        "tapped_cost_targets": [],
+        "tapped_source": true
+      },
+      {
+        "card_name": "Tower of Murmurs",
+        "cards_milled": 8,
+        "scenario": "Tower of Murmurs activates target-player mill ability",
+        "tapped_cost_targets": [],
+        "tapped_source": true
+      },
+      {
+        "card_name": "Vedalken Entrancer",
+        "cards_milled": 2,
+        "scenario": "Vedalken Entrancer activates target-player mill ability",
+        "tapped_cost_targets": [],
+        "tapped_source": true
+      }
+    ],
+    "scenario_count": 8
+  },
+  "battle_path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py",
+  "database_target": "127.0.0.1:15432/halder",
+  "generated_at_utc": "2026-07-12T23:40:45.700981+00:00",
+  "manifest": "docs/hermes-analysis/master_optimizer_reports/pg851_activated_target_player_mill_new_server_manifest.json",
+  "package_id": "pg851_activated_target_player_mill_new_server_manifest",
+  "snapshot": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/known_cards_canonical_snapshot.json",
+  "sqlite_db": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db",
+  "stages": [
+    {
+      "evidence": {
+        "validated_rows": 8
+      },
+      "name": "postgres_source_of_truth",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_target_player_mill_v1",
+          "card_name": "Ambassador Laquatus",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:e96f7f8d6ee5af0f8cdf5e904bd62b32",
+          "oracle_hash": "ad54b5b88947c8a76fb89d808369a5fb",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_target_player_mill_v1",
+          "card_name": "Cathartic Adept",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:e608086be5ab09c0a603a3c18c02aaf0",
+          "oracle_hash": "39d6fd8448c94ab8241181f2e233298d",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_target_player_mill_v1",
+          "card_name": "Drowner of Secrets",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:2dfe7943384a38c238a9f19d7654368b",
+          "oracle_hash": "d4569dabe8965dfb1e0b8c0a095f5178",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_target_player_mill_v1",
+          "card_name": "Hair-Strung Koto",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:ae75b0e944f3ee083648c47e01a041ae",
+          "oracle_hash": "776b9dc49728f77f039b32b235db1d97",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_target_player_mill_v1",
+          "card_name": "Merfolk Mesmerist",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:678908d11c3b9efffb663e1323a342f5",
+          "oracle_hash": "e8e21863e1bb9b497c7f16d9206a34ab",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_target_player_mill_v1",
+          "card_name": "Millstone",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:cadaf38b811377f55277faf8cda7cbdb",
+          "oracle_hash": "665c181aa39a6360eee485487a7a7c3f",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_target_player_mill_v1",
+          "card_name": "Tower of Murmurs",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:660909401f05c36198940ddc34ccd278",
+          "oracle_hash": "275f84036dff173b7901983ae22a42c1",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_target_player_mill_v1",
+          "card_name": "Vedalken Entrancer",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:678908d11c3b9efffb663e1323a342f5",
+          "oracle_hash": "e8e21863e1bb9b497c7f16d9206a34ab",
+          "review_status": "verified",
+          "rule_version": 2
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_rows": 8
+      },
+      "name": "sqlite_hermes_cache",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_target_player_mill_v1",
+          "card_name": "Ambassador Laquatus",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:e96f7f8d6ee5af0f8cdf5e904bd62b32",
+          "oracle_hash": "ad54b5b88947c8a76fb89d808369a5fb",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_target_player_mill_v1",
+          "card_name": "Cathartic Adept",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:e608086be5ab09c0a603a3c18c02aaf0",
+          "oracle_hash": "39d6fd8448c94ab8241181f2e233298d",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_target_player_mill_v1",
+          "card_name": "Drowner of Secrets",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:2dfe7943384a38c238a9f19d7654368b",
+          "oracle_hash": "d4569dabe8965dfb1e0b8c0a095f5178",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_target_player_mill_v1",
+          "card_name": "Hair-Strung Koto",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:ae75b0e944f3ee083648c47e01a041ae",
+          "oracle_hash": "776b9dc49728f77f039b32b235db1d97",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_target_player_mill_v1",
+          "card_name": "Merfolk Mesmerist",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:678908d11c3b9efffb663e1323a342f5",
+          "oracle_hash": "e8e21863e1bb9b497c7f16d9206a34ab",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_target_player_mill_v1",
+          "card_name": "Millstone",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:cadaf38b811377f55277faf8cda7cbdb",
+          "oracle_hash": "665c181aa39a6360eee485487a7a7c3f",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_target_player_mill_v1",
+          "card_name": "Tower of Murmurs",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:660909401f05c36198940ddc34ccd278",
+          "oracle_hash": "275f84036dff173b7901983ae22a42c1",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_target_player_mill_v1",
+          "card_name": "Vedalken Entrancer",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:678908d11c3b9efffb663e1323a342f5",
+          "oracle_hash": "e8e21863e1bb9b497c7f16d9206a34ab",
+          "review_status": "verified",
+          "rule_version": 2
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_cards": 8
+      },
+      "name": "canonical_snapshot_fallback",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_target_player_mill_v1",
+          "battle_rule_version": 2,
+          "card_name": "Ambassador Laquatus",
+          "logical_rule_key": "battle_rule_v1:e96f7f8d6ee5af0f8cdf5e904bd62b32"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_target_player_mill_v1",
+          "battle_rule_version": 2,
+          "card_name": "Cathartic Adept",
+          "logical_rule_key": "battle_rule_v1:e608086be5ab09c0a603a3c18c02aaf0"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_target_player_mill_v1",
+          "battle_rule_version": 2,
+          "card_name": "Drowner of Secrets",
+          "logical_rule_key": "battle_rule_v1:2dfe7943384a38c238a9f19d7654368b"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_target_player_mill_v1",
+          "battle_rule_version": 2,
+          "card_name": "Hair-Strung Koto",
+          "logical_rule_key": "battle_rule_v1:ae75b0e944f3ee083648c47e01a041ae"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_target_player_mill_v1",
+          "battle_rule_version": 2,
+          "card_name": "Merfolk Mesmerist",
+          "logical_rule_key": "battle_rule_v1:678908d11c3b9efffb663e1323a342f5"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_target_player_mill_v1",
+          "battle_rule_version": 2,
+          "card_name": "Millstone",
+          "logical_rule_key": "battle_rule_v1:cadaf38b811377f55277faf8cda7cbdb"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_target_player_mill_v1",
+          "battle_rule_version": 2,
+          "card_name": "Tower of Murmurs",
+          "logical_rule_key": "battle_rule_v1:660909401f05c36198940ddc34ccd278"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_target_player_mill_v1",
+          "battle_rule_version": 2,
+          "card_name": "Vedalken Entrancer",
+          "logical_rule_key": "battle_rule_v1:678908d11c3b9efffb663e1323a342f5"
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_cards": 8
+      },
+      "name": "runtime_get_card_effect",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "card_name": "Ambassador Laquatus",
+          "component_keys": [],
+          "effect": "passive",
+          "logical_rule_key": "battle_rule_v1:e96f7f8d6ee5af0f8cdf5e904bd62b32"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Cathartic Adept",
+          "component_keys": [],
+          "effect": "passive",
+          "logical_rule_key": "battle_rule_v1:e608086be5ab09c0a603a3c18c02aaf0"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Drowner of Secrets",
+          "component_keys": [],
+          "effect": "passive",
+          "logical_rule_key": "battle_rule_v1:2dfe7943384a38c238a9f19d7654368b"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Hair-Strung Koto",
+          "component_keys": [],
+          "effect": "passive",
+          "logical_rule_key": "battle_rule_v1:ae75b0e944f3ee083648c47e01a041ae"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Merfolk Mesmerist",
+          "component_keys": [],
+          "effect": "passive",
+          "logical_rule_key": "battle_rule_v1:678908d11c3b9efffb663e1323a342f5"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Millstone",
+          "component_keys": [],
+          "effect": "passive",
+          "logical_rule_key": "battle_rule_v1:cadaf38b811377f55277faf8cda7cbdb"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Tower of Murmurs",
+          "component_keys": [],
+          "effect": "passive",
+          "logical_rule_key": "battle_rule_v1:660909401f05c36198940ddc34ccd278"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Vedalken Entrancer",
+          "component_keys": [],
+          "effect": "passive",
+          "logical_rule_key": "battle_rule_v1:678908d11c3b9efffb663e1323a342f5"
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "events": 16,
+        "scenarios": 8
+      },
+      "name": "battle_execution",
+      "status": "pass"
+    }
+  ],
+  "status": "pass",
+  "title": "Battle Package End-to-End Validation"
+}

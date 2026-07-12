@@ -2384,6 +2384,21 @@ def exact_scope_batch_safe(card: dict[str, Any]) -> bool:
             and bool(effect_json.get("storm"))
         )
 
+    if effect == "passive" and scope == "xmage_permanent_simple_activated_target_player_mill_v1":
+        return (
+            bool(types & {"ARTIFACT", "CREATURE", "ENCHANTMENT"})
+            and effect_classes == {"MillCardsTargetEffect"}
+            and ability_classes == {"SimpleActivatedAbility"}
+            and "TargetPlayer" in target_classes
+            and effect_json.get("ability_kind") == "activated"
+            and effect_json.get("activated_effect") == "target_player_mill"
+            and int(effect_json.get("activated_target_player_mill_count") or 0) > 0
+            and int(effect_json.get("mill_count") or 0)
+            == int(effect_json.get("activated_target_player_mill_count") or 0)
+            and effect_json.get("target") == "player"
+            and bool(effect_json.get("target_player_mill"))
+        )
+
     if effect == "ramp_ritual" and scope == "three_black_mana_ritual_v1":
         return (
             types == {"INSTANT"}

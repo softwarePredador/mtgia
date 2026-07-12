@@ -185,6 +185,9 @@ TARGET_PLAYER_LIFE_GAIN_UNIT = (
     "TargetPlayer::no_condition_class::targeting"
 )
 MILL_TARGET_UNIT = "mill_cards::target_player_mill_fixed_or_x_variant_v1"
+PERMANENT_ACTIVATED_TARGET_PLAYER_MILL_UNIT = (
+    "passive::permanent_simple_activated_target_player_mill_variant_v1"
+)
 PREVENT_ALL_COMBAT_DAMAGE_SPELL_UNIT = (
     "xmage_signature::PreventAllDamageByAllPermanentsEffect::no_ability_class::"
     "no_target_class::no_condition_class::no_signal"
@@ -268,6 +271,7 @@ SUPPORTED_UNITS = {
     TARGET_PLAYER_DISCARD_UNIT,
     TARGET_PLAYER_LIFE_GAIN_UNIT,
     MILL_TARGET_UNIT,
+    PERMANENT_ACTIVATED_TARGET_PLAYER_MILL_UNIT,
     PREVENT_ALL_COMBAT_DAMAGE_SPELL_UNIT,
     PREVENT_ALL_COMBAT_DAMAGE_CYCLING_SPELL_UNIT,
     CREATURE_ENTERS_TAPPED_ABILITY_UNIT,
@@ -286,6 +290,9 @@ LOOK_AT_HAND_DRAW_SCOPE = "xmage_look_at_target_player_hand_draw_card_spell_v1"
 TARGET_PLAYER_DISCARD_SCOPE = "xmage_fixed_target_player_discard_spell_v1"
 TARGET_PLAYER_DISCARD_MILL_SCOPE = "xmage_fixed_target_player_discard_mill_spell_v1"
 TARGET_PLAYER_MILL_SCOPE = "xmage_fixed_target_player_mill_spell_v1"
+PERMANENT_ACTIVATED_TARGET_PLAYER_MILL_SCOPE = (
+    "xmage_permanent_simple_activated_target_player_mill_v1"
+)
 TARGET_PLAYER_MILL_DRAW_SCOPE = "xmage_fixed_target_player_mill_draw_spell_v1"
 DYNAMIC_TARGET_PLAYER_DISCARD_SCOPE = "xmage_dynamic_target_player_discard_spell_v1"
 ETB_TARGET_PLAYER_DISCARD_CREATURE_SCOPE = "xmage_creature_etb_target_player_discard_v1"
@@ -22698,6 +22705,9 @@ def activation_tap_cost_from_phrase(phrase: str) -> dict[str, Any] | str:
     elif object_text in {"human", "humans"}:
         constraints["card_types"] = ["creature"]
         constraints["required_subtypes"] = ["human"]
+    elif object_text in {"merfolk"}:
+        constraints["card_types"] = ["creature"]
+        constraints["required_subtypes"] = ["merfolk"]
     else:
         return "activation_tap_cost_not_supported"
     return normalized_activation_tap_cost(
@@ -22800,18 +22810,30 @@ def activation_tap_cost_source_constraints(search_text: str) -> dict[str, Any] |
         or re.search(r"\buntapped creatures?\b", text, re.I)
     ):
         constraints["card_types"] = ["creature"]
-    if "SubType.SOLDIER" in text or re.search(r"\buntapped soldiers?\b", text, re.I):
+    if (
+        "required_subtypes" not in constraints
+        and ("SubType.SOLDIER" in text or re.search(r"\buntapped soldiers?\b", text, re.I))
+    ):
         constraints["card_types"] = ["creature"]
         constraints["required_subtypes"] = ["soldier"]
-    if "SubType.WIZARD" in text or re.search(r"\buntapped wizards?\b", text, re.I):
-        constraints["card_types"] = ["creature"]
-        constraints["required_subtypes"] = ["wizard"]
     if (
         "required_subtypes" not in constraints
         and ("SubType.HUMAN" in text or re.search(r"\buntapped humans?\b", text, re.I))
     ):
         constraints["card_types"] = ["creature"]
         constraints["required_subtypes"] = ["human"]
+    if (
+        "required_subtypes" not in constraints
+        and ("SubType.MERFOLK" in text or re.search(r"\buntapped merfolk\b", text, re.I))
+    ):
+        constraints["card_types"] = ["creature"]
+        constraints["required_subtypes"] = ["merfolk"]
+    if (
+        "required_subtypes" not in constraints
+        and ("SubType.WIZARD" in text or re.search(r"\buntapped wizards?\b", text, re.I))
+    ):
+        constraints["card_types"] = ["creature"]
+        constraints["required_subtypes"] = ["wizard"]
     if "CardType.ARTIFACT" in text or re.search(r"\buntapped artifacts?\b", text, re.I):
         constraints["card_types"] = ["artifact"]
     color_matches = [
@@ -24907,6 +24929,134 @@ def fixed_target_player_mill_spell_from_source(source: str) -> dict[str, Any] | 
     return {
         "mill_count": mill_count,
         "target_player_scope": "opponent" if target_opponent_count else "any",
+        "xmage_effect_class": "MillCardsTargetEffect",
+    }
+
+
+def _strip_activation_tap_cost_phrase(cost_text: str) -> str:
+    text = str(cost_text or "").strip().lower()
+    text = re.sub(
+        r"(?:^|,\s*)tap\s+(?:an?|one|two|three|four|five|six|seven|eight|nine|ten|\d+)\s+[^,]+?(?:,|$)",
+        ",",
+        text,
+    )
+    return text.strip(" ,")
+
+
+def permanent_activated_target_player_mill_from_oracle(metadata: dict[str, Any]) -> dict[str, Any] | str:
+    text = re.sub(
+        r"\s+",
+        " ",
+        oracle_text_after_leading_static_keywords(metadata),
+    ).strip().lower()
+    if text.count(":") != 1:
+        return "activated_target_player_mill_oracle_not_simple"
+    cost_text, effect_text = [part.strip() for part in text.split(":", 1)]
+    number_pattern = r"(?P<count>a|one|two|three|four|five|six|seven|eight|nine|ten|\d+)"
+    match = re.fullmatch(
+        rf"target (?P<scope>player|opponent) mills {number_pattern} cards?\.?",
+        effect_text,
+    )
+    if not match:
+        return "activated_target_player_mill_oracle_not_exact_fixed"
+    mill_count = number_word_to_int(match.group("count"))
+    if mill_count <= 0:
+        return "activated_target_player_mill_count_not_fixed"
+    tap_cost = activation_tap_cost_from_oracle(text)
+    if isinstance(tap_cost, str):
+        return tap_cost.replace("activation_tap", "activated_target_player_mill")
+    mana_cost_text = _strip_activation_tap_cost_phrase(cost_text) if tap_cost else cost_text
+    activation = activation_cost_from_oracle_prefix(
+        mana_cost_text or "{0}",
+        allow_source_sacrifice=False,
+        allow_discard=False,
+        allow_life=False,
+    )
+    if isinstance(activation, str):
+        return activation.replace("activated_self_boost", "activated_target_player_mill")
+    return {
+        "mill_count": mill_count,
+        "target_player_scope": "opponent" if match.group("scope") == "opponent" else "any",
+        **activation,
+        **({"activation_tap_cost": tap_cost, "activation_requires_tap_target": True} if tap_cost else {}),
+    }
+
+
+def permanent_activated_target_player_mill_from_source(source: str) -> dict[str, Any] | str:
+    text = source or ""
+    if "Zone.GRAVEYARD" in text:
+        return "activated_target_player_mill_source_not_battlefield"
+    risky_cost_classes = {
+        "CompositeCost",
+        "DiscardCardCost",
+        "DiscardTargetCost",
+        "ExileFrom",
+        "ExileFromGraveCost",
+        "ExileSourceFromGraveCost",
+        "MillCardsCost",
+        "OrCost",
+        "PayLifeCost",
+        "RemoveCounterCost",
+        "ReturnToHandSourceCost",
+        "ReturnToHandTargetCost",
+        "RevealTargetFromHandCost",
+        "SacrificeSourceCost",
+        "SacrificeTargetCost",
+        "UntapSourceCost",
+        "VariableManaCost",
+        "GetXValue",
+    }
+    effect_matches = list(re.finditer(r"\bMillCardsTargetEffect\s*\(\s*(\d+)\s*\)", text, re.S))
+    if len(effect_matches) != 1:
+        return "activated_target_player_mill_source_count_not_fixed"
+    mill_count = int(effect_matches[0].group(1))
+    if mill_count <= 0:
+        return "activated_target_player_mill_source_count_not_fixed"
+    effect_index = effect_matches[0].start()
+    window = text[max(0, effect_index - 500) : effect_index + 2000]
+    if "SimpleActivatedAbility" not in window:
+        return "activated_target_player_mill_source_not_simple_activated"
+    present_risky = []
+    for cost in risky_cost_classes:
+        if cost == "ExileFrom":
+            if re.search(r"\bExileFrom\s*\(", window):
+                present_risky.append(cost)
+            continue
+        if cost in window:
+            present_risky.append(cost)
+    if present_risky:
+        return "activated_target_player_mill_source_cost_not_supported"
+    target_window = source_effect_target_window(text, effect_index)
+    target_player_count = len(re.findall(r"new\s+TargetPlayer\s*\(", target_window))
+    target_opponent_count = len(re.findall(r"new\s+TargetOpponent\s*\(", target_window))
+    if target_player_count + target_opponent_count != 1:
+        return "activated_target_player_mill_source_target_not_supported"
+    tap_cost = activation_tap_cost_from_source(text, window)
+    if isinstance(tap_cost, str):
+        return tap_cost.replace("activation_tap", "activated_target_player_mill")
+    cost_text = "{0}"
+    mana_match = re.search(r'ManaCostsImpl<[^>]*>\s*\(\s*"([^"]+)"\s*\)', window)
+    generic_match = re.search(r"GenericManaCost\s*\(\s*(\d+)\s*\)", window)
+    colored_match = re.search(r"ColoredManaCost\s*\(\s*ColoredManaSymbol\.([WUBRG])\s*\)", window)
+    if mana_match:
+        cost_text = mana_match.group(1)
+    elif generic_match:
+        cost_text = "{" + generic_match.group(1) + "}"
+    elif colored_match:
+        cost_text = "{" + colored_match.group(1) + "}"
+    cost_text = canonical_mana_cost_text(cost_text)
+    parsed_cost = parse_mana_cost_text(cost_text)
+    if parsed_cost is None:
+        return "activated_target_player_mill_source_mana_cost_not_supported"
+    activation_cost_generic, activation_cost_colors = parsed_cost
+    return {
+        "mill_count": mill_count,
+        "target_player_scope": "opponent" if target_opponent_count else "any",
+        "activation_cost_mana": cost_text,
+        "activation_cost_generic": activation_cost_generic,
+        "activation_cost_colors": activation_cost_colors,
+        "activation_requires_tap": "TapSourceCost" in window,
+        **({"activation_tap_cost": tap_cost, "activation_requires_tap_target": True} if tap_cost else {}),
         "xmage_effect_class": "MillCardsTargetEffect",
     }
 
@@ -33496,6 +33646,8 @@ def proposal_notes(row: dict[str, Any], scope: str) -> str:
         scope_kind = "fixed target-player discard spell"
     elif scope == TARGET_PLAYER_MILL_SCOPE:
         scope_kind = "fixed target-player mill spell"
+    elif scope == PERMANENT_ACTIVATED_TARGET_PLAYER_MILL_SCOPE:
+        scope_kind = "permanent with a simple activated target-player mill ability"
     elif scope == DYNAMIC_TARGET_PLAYER_DISCARD_SCOPE:
         scope_kind = "dynamic target-player discard spell"
     elif scope == ETB_TARGET_PLAYER_DISCARD_CREATURE_SCOPE:
@@ -42044,6 +42196,80 @@ def split_row(
             metadata,
             effect_json,
             family_id="xmage_dynamic_target_player_discard_spell",
+        ), "selected_exact_scope"
+
+    if unit == PERMANENT_ACTIVATED_TARGET_PLAYER_MILL_UNIT:
+        if classes != {"MillCardsTargetEffect"}:
+            return None, "activated_target_player_mill_effect_class_not_pure"
+        if ability_classes(row) != {"SimpleActivatedAbility"}:
+            return None, "activated_target_player_mill_ability_class_not_simple"
+        if not is_permanent_metadata(metadata):
+            return None, "activated_target_player_mill_not_permanent"
+        oracle_mill = permanent_activated_target_player_mill_from_oracle(metadata)
+        if isinstance(oracle_mill, str):
+            return None, oracle_mill
+        source_mill = permanent_activated_target_player_mill_from_source(source_text)
+        if isinstance(source_mill, str):
+            return None, source_mill
+        for key in (
+            "mill_count",
+            "target_player_scope",
+            "activation_cost_mana",
+            "activation_cost_generic",
+            "activation_cost_colors",
+            "activation_requires_tap",
+            "activation_tap_cost",
+        ):
+            if oracle_mill.get(key) != source_mill.get(key):
+                return None, f"activated_target_player_mill_source_oracle_{key}_mismatch"
+        target_player_scope = str(oracle_mill["target_player_scope"])
+        mill_count = int(oracle_mill["mill_count"])
+        effect_json = {
+            "effect": "passive",
+            "battle_model_scope": PERMANENT_ACTIVATED_TARGET_PLAYER_MILL_SCOPE,
+            "ability_kind": "activated",
+            "activated_effect": "target_player_mill",
+            "activated_target_player_mill_count": mill_count,
+            "count": mill_count,
+            "mill_count": mill_count,
+            "target": "player",
+            "target_controller": "target_player",
+            "target_constraints": {
+                "players": ["opponent"] if target_player_scope == "opponent" else ["any"]
+            },
+            "target_preference": "opponent",
+            "target_player_mill": True,
+            "target_player_scope": target_player_scope,
+            "activation_cost_mana": oracle_mill["activation_cost_mana"],
+            "activation_cost_generic": int(oracle_mill["activation_cost_generic"]),
+            "activation_cost_colors": list(oracle_mill["activation_cost_colors"]),
+            "activation_requires_tap": bool(oracle_mill.get("activation_requires_tap")),
+            "target_player_mill_activation_requires_tap": bool(
+                oracle_mill.get("activation_requires_tap")
+            ),
+            "permanent_type": (
+                "artifact"
+                if "artifact" in str(metadata.get("type_line") or "").lower()
+                else "creature"
+                if is_creature_metadata(metadata)
+                else "permanent"
+            ),
+            "xmage_effect_class": "MillCardsTargetEffect",
+            **(
+                {
+                    "activation_tap_cost": oracle_mill["activation_tap_cost"],
+                    "activation_requires_tap_target": True,
+                }
+                if oracle_mill.get("activation_tap_cost")
+                else {}
+            ),
+            **flags,
+        }
+        return build_proposal(
+            row,
+            metadata,
+            effect_json,
+            family_id="xmage_permanent_simple_activated_target_player_mill",
         ), "selected_exact_scope"
 
     if unit == MILL_TARGET_UNIT:

@@ -14603,6 +14603,141 @@ def run_target_player_mill_spell(
     }
 
 
+def run_simple_activated_target_player_mill(
+    battle,
+    scenario: dict[str, Any],
+    events: list[tuple[str, dict[str, Any]]],
+) -> dict[str, Any]:
+    card = dict(scenario["card"])
+    effect = dict(battle.get_card_effect(card))
+    if effect.get("battle_model_scope") != "xmage_permanent_simple_activated_target_player_mill_v1":
+        fail("battle_execution", f"{card['name']} scope={effect.get('battle_model_scope')!r}")
+    if int(effect.get("activated_target_player_mill_count") or 0) <= 0:
+        fail("battle_execution", f"{card['name']} missing activated_target_player_mill_count")
+    permanent_type = str(effect.get("permanent_type") or "artifact")
+    default_type_line = {
+        "artifact": "Artifact",
+        "creature": "Creature - Merfolk Wizard",
+        "enchantment": "Enchantment",
+    }.get(permanent_type, "Artifact")
+    source = battle.enrich_card(
+        {
+            **card,
+            "type_line": default_type_line,
+            "summoning_sick": False,
+            **effect,
+            **dict(scenario.get("source_overrides") or {}),
+        }
+    )
+    active = battle.Player(str(scenario.get("player") or "Activated Mill Controller"), None, [])
+    opponent = battle.Player(str(scenario.get("opponent") or "Opponent"), None, [])
+    opponent.library = [
+        battle.enrich_card(dict(library_card))
+        for library_card in (scenario.get("opponent_library") or scenario.get("library") or [])
+        if isinstance(library_card, dict)
+    ]
+    tap_cost_targets = [
+        battle.enrich_card(dict(item))
+        for item in (scenario.get("tap_cost_targets") or [])
+        if isinstance(item, dict)
+    ]
+    active.battlefield = [source, *tap_cost_targets]
+    add_manifest_mana(active, scenario.get("controller_mana") or {})
+    starting_opponent_library_count = len(opponent.library)
+    starting_opponent_graveyard_count = len(opponent.graveyard)
+    expected_mill_count = int(
+        scenario.get("expected_mill_count")
+        or effect.get("activated_target_player_mill_count")
+        or effect.get("mill_count")
+        or effect.get("count")
+        or 0
+    )
+    expected_milled = min(expected_mill_count, starting_opponent_library_count)
+    expected_tapped_source = bool(
+        scenario.get("expected_tapped_source", effect.get("activation_requires_tap", False))
+    )
+    expected_tap_cost_count = int(scenario.get("expected_tap_cost_count") or 0)
+    before_events = len(events)
+
+    activated = battle.activate_graveyard_recycling_artifacts(
+        active,
+        [opponent],
+        [active, opponent],
+        turn=int(scenario.get("turn") or 6174),
+        rng=random.Random(int(scenario.get("seed") or 6174)),
+        phase=str(scenario.get("phase") or "precombat_main"),
+    )
+    if not activated:
+        fail("battle_execution", f"{card['name']} activated target-player mill failed")
+    if len(opponent.library) != starting_opponent_library_count - expected_milled:
+        fail(
+            "battle_execution",
+            f"{card['name']} opponent library={len(opponent.library)}, expected {starting_opponent_library_count - expected_milled}",
+        )
+    if len(opponent.graveyard) != starting_opponent_graveyard_count + expected_milled:
+        fail(
+            "battle_execution",
+            f"{card['name']} opponent graveyard={len(opponent.graveyard)}, expected {starting_opponent_graveyard_count + expected_milled}",
+        )
+    if bool(source.get("tapped")) != expected_tapped_source:
+        fail(
+            "battle_execution",
+            f"{card['name']} source tapped={bool(source.get('tapped'))}, expected {expected_tapped_source}",
+        )
+    if expected_tap_cost_count:
+        tapped_targets = [item for item in tap_cost_targets if bool(item.get("tapped"))]
+        if len(tapped_targets) != expected_tap_cost_count:
+            fail(
+                "battle_execution",
+                f"{card['name']} tapped tap-cost targets={len(tapped_targets)}, expected {expected_tap_cost_count}",
+            )
+    mill_event = next(
+        (
+            data
+            for event, data in events[before_events:]
+            if event == "mill_resolved"
+            and data.get("card") == card.get("name")
+            and data.get("target_player_mill") is True
+        ),
+        None,
+    )
+    if mill_event is None:
+        fail("battle_events", f"missing {card['name']} mill_resolved event")
+    if int(mill_event.get("requested_mill") or 0) != expected_mill_count:
+        fail("battle_events", f"{card['name']} requested_mill={mill_event.get('requested_mill')}")
+    if int(mill_event.get("cards_milled") or 0) != expected_milled:
+        fail("battle_events", f"{card['name']} cards_milled={mill_event.get('cards_milled')}")
+    activation_event = next(
+        (
+            data
+            for event, data in events[before_events:]
+            if event == "utility_artifact_activated"
+            and data.get("card") == card.get("name")
+            and data.get("activation_kind") == "tap_target_player_mill"
+        ),
+        None,
+    )
+    if activation_event is None:
+        fail("battle_events", f"missing {card['name']} activated target-player mill event")
+    if int(activation_event.get("milled_count") or 0) != expected_milled:
+        fail("battle_events", f"{card['name']} milled_count={activation_event.get('milled_count')}")
+    if expected_tap_cost_count:
+        event_tap_names = list(activation_event.get("tapped_cost_targets") or [])
+        expected_tap_names = [item.get("name") for item in tap_cost_targets]
+        if not set(expected_tap_names).intersection(set(event_tap_names)):
+            fail(
+                "battle_events",
+                f"{card['name']} tapped_cost_targets={event_tap_names!r}, expected {expected_tap_names!r}",
+            )
+    return {
+        "scenario": scenario.get("name"),
+        "card_name": card["name"],
+        "cards_milled": expected_milled,
+        "tapped_source": bool(source.get("tapped")),
+        "tapped_cost_targets": [item.get("name") for item in tap_cost_targets if bool(item.get("tapped"))],
+    }
+
+
 def run_target_player_mill_draw_spell(
     battle,
     scenario: dict[str, Any],
@@ -15898,6 +16033,7 @@ SCENARIO_RUNNERS = {
     "target_player_discard_spell": run_target_player_discard_spell,
     "target_player_draw_spell": run_target_player_draw_spell,
     "target_player_life_gain_spell": run_target_player_life_gain_spell,
+    "simple_activated_target_player_mill": run_simple_activated_target_player_mill,
     "target_player_mill_draw_spell": run_target_player_mill_draw_spell,
     "target_player_mill_spell": run_target_player_mill_spell,
     "look_at_hand_draw_spell": run_look_at_hand_draw_spell,

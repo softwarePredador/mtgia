@@ -37528,7 +37528,13 @@ def activate_graveyard_recycling_artifacts(
 
         target_player_mill_count = int(permanent.get("activated_target_player_mill_count") or 0)
         if phase == "precombat_main" and target_player_mill_count > 0:
-            if permanent.get("target_player_mill_activation_requires_tap", True) and permanent.get("tapped"):
+            requires_source_tap = bool(
+                permanent.get(
+                    "target_player_mill_activation_requires_tap",
+                    permanent.get("activation_requires_tap", True),
+                )
+            )
+            if requires_source_tap and permanent.get("tapped"):
                 _utility_artifact_skip_event(
                     player,
                     permanent,
@@ -37537,6 +37543,59 @@ def activate_graveyard_recycling_artifacts(
                     phase=phase,
                 )
                 continue
+            if (
+                requires_source_tap
+                and is_battlefield_creature(permanent)
+                and permanent.get("summoning_sick")
+                and not has_haste(permanent)
+            ):
+                _utility_artifact_skip_event(
+                    player,
+                    permanent,
+                    turn,
+                    "creature_summoning_sick_for_target_player_mill",
+                    phase=phase,
+                )
+                continue
+            activation_cost_colors = list(permanent.get("activation_cost_colors") or [])
+            base_activation_cost_generic = int(permanent.get("activation_cost_generic") or 0)
+            activation_cost_generic = adjusted_activated_ability_generic_cost(
+                player,
+                permanent,
+                base_activation_cost_generic,
+                activation_colors=activation_cost_colors,
+            )
+            activation_cost_text = (
+                permanent.get("activation_cost_mana")
+                if activation_cost_generic == base_activation_cost_generic
+                else None
+            ) or _activation_cost_text(activation_cost_generic, activation_cost_colors)
+            if not player.can_pay(activation_cost_text):
+                _utility_artifact_skip_event(
+                    player,
+                    permanent,
+                    turn,
+                    "failed_to_pay_target_player_mill_activation_cost",
+                    phase=phase,
+                )
+                continue
+            tap_candidates = []
+            tap_cost_options = []
+            if _activation_tap_cost(permanent):
+                tap_candidates, tap_cost_options = _choose_activation_tap_cost_candidates(
+                    player,
+                    permanent,
+                    permanent,
+                )
+                if len(tap_candidates) != _tap_cost_count(permanent):
+                    _utility_artifact_skip_event(
+                        player,
+                        permanent,
+                        turn,
+                        "no_tap_cost_target_for_target_player_mill",
+                        phase=phase,
+                    )
+                    continue
             target = choose_mill_target(player, opponents, target_player_mill_count)
             if target is None or not getattr(target, "library", None):
                 _utility_artifact_skip_event(
@@ -37547,7 +37606,19 @@ def activate_graveyard_recycling_artifacts(
                     phase=phase,
                 )
                 continue
-            if permanent.get("target_player_mill_activation_requires_tap", True):
+            if not player.spend_mana(activation_cost_text):
+                _utility_artifact_skip_event(
+                    player,
+                    permanent,
+                    turn,
+                    "failed_to_pay_target_player_mill_activation_cost",
+                    phase=phase,
+                )
+                continue
+            tapped_cost_targets = []
+            if _activation_tap_cost(permanent):
+                tapped_cost_targets = _tap_activation_cost_candidates(player, tap_candidates, turn)
+            if requires_source_tap:
                 permanent["tapped"] = True
             permanent["utility_artifact_used_this_turn"] = True
             library_before = len(target.library)
@@ -37557,6 +37628,13 @@ def activate_graveyard_recycling_artifacts(
                 milled_card = target.library.pop(0)
                 target.graveyard.append(milled_card)
                 milled.append(milled_card)
+                resolve_land_cards_enter_graveyard_triggers(
+                    target,
+                    [milled_card],
+                    turn=turn,
+                    source_event="target_player_mill_activation",
+                )
+            mana_paid = activation_cost_generic + len(activation_cost_colors)
             emit_decision_trace(
                 decision_type="utility_artifact_activation",
                 player=player,
@@ -37582,6 +37660,12 @@ def activate_graveyard_recycling_artifacts(
                     "target_player": target.name,
                     "target_library_before": library_before,
                     "target_library_after": len(target.library),
+                    "activation_cost": activation_cost_text,
+                    "activation_cost_generic": activation_cost_generic,
+                    "activation_cost_colors": activation_cost_colors,
+                    "requires_tap": requires_source_tap,
+                    "tap_cost_targets": _tapped_cost_target_names(tapped_cost_targets),
+                    "tap_cost_available_targets": len(tap_cost_options),
                 },
                 rule_source="utility_artifact_activation_v1",
                 rule_status=permanent.get("_rule_review_status", "active"),
@@ -37591,16 +37675,52 @@ def activate_graveyard_recycling_artifacts(
                 strategic_principle="spend a tap-only utility activation when no higher-value graveyard return is available",
                 heuristic_version=DECISION_STRATEGY_VERSION,
                 resource_delta={
+                    "mana": -mana_paid,
+                    "tapped": 1 if requires_source_tap else 0,
+                    "tap_cost_targets": len(tapped_cost_targets),
                     "target_library": -len(milled),
                     "target_graveyard": len(milled),
                 },
-                risk_flags=["tap_artifact", "target_player_mill"],
+                risk_flags=[
+                    flag
+                    for flag, active in {
+                        "tap_ability": requires_source_tap,
+                        "tap_cost_target": bool(tapped_cost_targets),
+                        "target_player_mill": True,
+                    }.items()
+                    if active
+                ],
+            )
+            emit_replay_event(
+                "mill_resolved",
+                player=player.name,
+                card=permanent.get("name", "?"),
+                target_player=target.name,
+                target_controller="target_player",
+                target_player_mill=True,
+                requested_mill=target_player_mill_count,
+                cards_milled=len(milled),
+                milled=[
+                    milled_card.get("name", "?")
+                    for milled_card in milled
+                    if isinstance(milled_card, dict)
+                ][:12],
+                target_library_before=library_before,
+                target_library_after=len(target.library),
+                turn=turn,
+                phase=phase,
+                **replay_rule_fields(permanent),
             )
             emit_replay_event(
                 "utility_artifact_activated",
                 player=player.name,
                 card=permanent.get("name", "?"),
                 activation_kind="tap_target_player_mill",
+                activation_cost=activation_cost_text,
+                mana_paid=mana_paid,
+                tapped=bool(permanent.get("tapped")),
+                tapped_cost_targets=_tapped_cost_target_names(tapped_cost_targets),
+                tap_cost_available_targets=len(tap_cost_options),
                 target_player=target.name,
                 milled=[
                     milled_card.get("name", "?")
