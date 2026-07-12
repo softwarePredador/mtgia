@@ -9021,7 +9021,7 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertEqual(effect["target_constraints"], {"players": ["opponent"]})
         self.assertEqual(effect["mill_count"], 7)
 
-    def test_fixed_target_player_mill_spell_blocks_flashback_for_now(self) -> None:
+    def test_fixed_target_player_mill_spell_allows_neutral_flashback_auxiliary(self) -> None:
         row = queue_row(
             split.MILL_TARGET_UNIT,
             effect_classes=["MillCardsTargetEffect"],
@@ -9038,8 +9038,11 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
             ),
         )
 
-        self.assertIsNone(proposal)
-        self.assertEqual(reason, "target_player_mill_spell_ability_class_not_simple")
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.TARGET_PLAYER_MILL_SCOPE)
+        self.assertEqual(effect["mill_count"], 3)
+        self.assertEqual(effect["target_player_scope"], "any")
 
     def test_fixed_target_player_mill_spell_blocks_composite_draw(self) -> None:
         row = queue_row(

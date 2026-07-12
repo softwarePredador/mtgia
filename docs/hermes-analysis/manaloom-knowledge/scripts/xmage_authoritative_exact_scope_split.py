@@ -41428,7 +41428,8 @@ def split_row(
     if unit == MILL_TARGET_UNIT:
         if classes != {"MillCardsTargetEffect"}:
             return None, "target_player_mill_spell_effect_class_not_pure"
-        if ability_classes(row):
+        unsupported_abilities = ability_classes(row) - ALLOWED_AUXILIARY_RESOLUTION_ABILITY_CLASSES
+        if unsupported_abilities:
             return None, "target_player_mill_spell_ability_class_not_simple"
         oracle_mill = fixed_target_player_mill_spell_from_oracle(metadata)
         if isinstance(oracle_mill, str):
