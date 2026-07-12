@@ -1910,6 +1910,56 @@ class XMageExactScopeRuntimeTest(unittest.TestCase):
             )
         )
 
+    def test_dynamic_equipment_static_attachment_refreshes_land_count_without_cumulative_bonus(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        target = {"name": "Legendary Soldier", "type_line": "Legendary Creature - Soldier", "power": 2, "toughness": 2}
+        active.battlefield = [
+            target,
+            {"name": "Plains", "type_line": "Basic Land - Plains"},
+            {"name": "Mountain", "type_line": "Basic Land - Mountain"},
+            {"name": "Sacred Foundry", "type_line": "Land - Mountain Plains"},
+        ]
+        equipment = {"name": "Blackblade Reforged", "type_line": "Legendary Artifact - Equipment"}
+        effect = {
+            "effect": "equipment_static_attachment",
+            "battle_model_scope": "xmage_equipment_static_power_toughness_attachment_v1",
+            "attachment_dynamic_boost": True,
+            "static_effect": "attached_creature_power_toughness_boost_equal_count",
+            "stat_modifier_amount_source": "battlefield_permanent_count",
+            "battlefield_count_scope": "controller_battlefield",
+            "battlefield_count_card_types": ["land"],
+            "power_delta_per_graveyard_count": 1,
+            "toughness_delta_per_graveyard_count": 1,
+        }
+
+        self.battle.apply_equipment_static_attachment(active, equipment, effect, turn=2)
+
+        attached = next(card for card in active.battlefield if card.get("name") == "Blackblade Reforged")
+        self.assertEqual(target["power"], 5)
+        self.assertEqual(target["toughness"], 5)
+        self.assertEqual(attached["attachment_dynamic_count_current"], 3)
+
+        active.battlefield.append({"name": "Command Tower", "type_line": "Land"})
+        refreshed = self.battle.refresh_all_dynamic_attachment_static_power_toughness(
+            [active],
+            turn=2,
+            phase="test",
+            emit_events=True,
+        )
+
+        self.assertEqual(target["power"], 6)
+        self.assertEqual(target["toughness"], 6)
+        self.assertEqual(attached["attachment_dynamic_count_current"], 4)
+        self.assertEqual(refreshed[0]["count"], 4)
+        self.assertTrue(
+            any(
+                event == "attachment_static_power_toughness_changed"
+                and data.get("card") == "Blackblade Reforged"
+                and data.get("attachment_dynamic_count") == 4
+                for event, data in self.events
+            )
+        )
+
     def test_aura_static_power_toughness_attachment_boosts_own_creature(self) -> None:
         active = self.battle.Player("Active", None, [])
         target = {"name": "Trained Bear", "type_line": "Creature - Bear", "power": 2, "toughness": 2}
@@ -1939,6 +1989,47 @@ class XMageExactScopeRuntimeTest(unittest.TestCase):
                 for event, data in self.events
             )
         )
+
+    def test_dynamic_aura_static_attachment_counts_artifacts_and_enchantments_including_aura(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        target = {"name": "Favored Hoplite", "type_line": "Creature - Human Soldier", "power": 1, "toughness": 2}
+        active.battlefield = [
+            target,
+            {"name": "Clue", "type_line": "Artifact Token"},
+            {"name": "Seal", "type_line": "Enchantment"},
+        ]
+        aura = {"name": "All That Glitters", "type_line": "Enchantment - Aura"}
+        effect = {
+            "effect": "aura_static_attachment",
+            "battle_model_scope": "xmage_aura_static_power_toughness_attachment_v1",
+            "attachment_dynamic_boost": True,
+            "static_effect": "attached_creature_power_toughness_boost_equal_count",
+            "stat_modifier_amount_source": "battlefield_permanent_count",
+            "battlefield_count_scope": "controller_battlefield",
+            "battlefield_count_card_types": ["artifact", "enchantment"],
+            "power_delta_per_graveyard_count": 1,
+            "toughness_delta_per_graveyard_count": 1,
+            "enchant_target_controller": "self",
+        }
+
+        self.battle.apply_aura_static_attachment(active, [], aura, effect, turn=2, rng=random.Random(1))
+
+        attached = next(card for card in active.battlefield if card.get("name") == "All That Glitters")
+        self.assertEqual(target["power"], 4)
+        self.assertEqual(target["toughness"], 5)
+        self.assertEqual(attached["attachment_dynamic_count_current"], 3)
+
+        active.battlefield.append({"name": "Treasure", "type_line": "Artifact Token"})
+        self.battle.refresh_all_dynamic_attachment_static_power_toughness(
+            [active],
+            turn=2,
+            phase="test",
+            emit_events=True,
+        )
+
+        self.assertEqual(target["power"], 5)
+        self.assertEqual(target["toughness"], 6)
+        self.assertEqual(attached["attachment_dynamic_count_current"], 4)
 
     def test_aura_static_power_toughness_debuff_moves_zero_toughness_target_and_aura(self) -> None:
         active = self.battle.Player("Active", None, [])

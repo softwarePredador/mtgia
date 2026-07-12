@@ -88,6 +88,12 @@ E2E_REQUIRED_EFFECT_FIELDS = (
     "toughness_delta",
     "power_boost",
     "toughness_boost",
+    "attachment_dynamic_boost",
+    "stat_modifier_amount_source",
+    "power_base_delta",
+    "toughness_base_delta",
+    "power_delta_per_graveyard_count",
+    "toughness_delta_per_graveyard_count",
     "attached_keywords",
     "grants_flying",
     "grants_reach",
@@ -1551,19 +1557,210 @@ def static_controlled_keyword_execution_scenario_from_expected_rule(
     }
 
 
+def _effect_int(required: dict[str, Any], key: str, default: int = 0) -> int:
+    try:
+        return int(float(required.get(key)))
+    except Exception:
+        return int(default)
+
+
+def _fixture_card_type_matches(card: dict[str, Any], card_types: list[str]) -> bool:
+    if not card_types:
+        return True
+    type_line = str(card.get("type_line") or "").lower()
+    return any(card_type in type_line for card_type in card_types)
+
+
+def _fixture_card_subtype_matches(card: dict[str, Any], subtypes: list[str]) -> bool:
+    if not subtypes:
+        return True
+    type_line = str(card.get("type_line") or "").lower()
+    explicit_subtypes = card.get("subtypes") or []
+    if isinstance(explicit_subtypes, str):
+        explicit_subtypes = [explicit_subtypes]
+    subtype_values = {str(value).strip().lower() for value in explicit_subtypes if str(value).strip()}
+    return any(subtype in type_line or subtype in subtype_values for subtype in subtypes)
+
+
+def _attachment_fixture_permanent(required: dict[str, Any], index: int) -> dict[str, Any]:
+    card_types = [str(value).strip().lower() for value in required.get("battlefield_count_card_types") or [] if value]
+    subtypes = [str(value).strip().lower() for value in required.get("battlefield_count_subtypes") or [] if value]
+    if "land" in card_types:
+        subtype = subtypes[0] if subtypes else ["plains", "island", "swamp", "mountain"][index % 4]
+        return {
+            "name": f"E2E Count Land {index + 1}",
+            "type_line": f"Land - {subtype.title()}",
+            "subtypes": [subtype],
+        }
+    if "creature" in card_types:
+        return {
+            "name": f"E2E Count Creature {index + 1}",
+            "type_line": "Creature - Soldier",
+            "base_power": 1,
+            "base_toughness": 1,
+            "power": 1,
+            "toughness": 1,
+        }
+    if "artifact" in card_types and "enchantment" in card_types:
+        type_line = "Artifact" if index % 2 == 0 else "Enchantment"
+    elif "enchantment" in card_types:
+        type_line = "Enchantment"
+    elif "artifact" in card_types:
+        type_line = "Artifact"
+    else:
+        type_line = "Artifact"
+    return {
+        "name": f"E2E Count Permanent {index + 1}",
+        "type_line": type_line,
+    }
+
+
+def _attachment_fixture_matches(card: dict[str, Any], required: dict[str, Any], source: dict[str, Any]) -> bool:
+    if required.get("battlefield_count_exclude_source") and card is source:
+        return False
+    card_types = [str(value).strip().lower() for value in required.get("battlefield_count_card_types") or [] if value]
+    subtypes = [str(value).strip().lower() for value in required.get("battlefield_count_subtypes") or [] if value]
+    excluded_types = [
+        str(value).strip().lower()
+        for value in required.get("battlefield_count_excluded_card_types") or []
+        if value
+    ]
+    excluded_subtypes = [
+        str(value).strip().lower()
+        for value in required.get("battlefield_count_excluded_subtypes") or []
+        if value
+    ]
+    if card_types and "permanent" not in card_types and not _fixture_card_type_matches(card, card_types):
+        return False
+    if excluded_types and _fixture_card_type_matches(card, excluded_types):
+        return False
+    if subtypes and not _fixture_card_subtype_matches(card, subtypes):
+        return False
+    if excluded_subtypes and _fixture_card_subtype_matches(card, excluded_subtypes):
+        return False
+    return bool(card_types or subtypes or excluded_types or excluded_subtypes)
+
+
+def _dynamic_attachment_fixture(
+    rule: dict[str, Any],
+    required: dict[str, Any],
+    target: dict[str, Any],
+    *,
+    target_owner: str,
+    is_aura: bool,
+) -> tuple[dict[str, Any], int, int]:
+    fixed_power = _effect_int(required, "power_boost", _effect_int(required, "static_power_bonus", 0))
+    fixed_toughness = _effect_int(required, "toughness_boost", _effect_int(required, "static_toughness_bonus", 0))
+    if not required.get("attachment_dynamic_boost"):
+        return {}, fixed_power, fixed_toughness
+
+    amount_source = str(required.get("stat_modifier_amount_source") or "").strip().lower()
+    fields: dict[str, Any] = {"expected_dynamic_count_source": amount_source}
+    count = 0
+    if amount_source == "attached_creature_color_count":
+        target["colors"] = ["W", "U", "B"]
+        target["color_identity"] = ["W", "U", "B"]
+        target["mana_cost"] = "{W}{U}{B}"
+        count = 3
+    elif amount_source == "controller_hand_count":
+        fields["controller_hand"] = [
+            {"name": f"E2E Hand Card {index + 1}", "type_line": "Instant"}
+            for index in range(3)
+        ]
+        count = 3
+    elif amount_source == "domain_basic_land_types":
+        fields["controller_battlefield"] = [
+            {"name": "E2E Plains", "type_line": "Basic Land - Plains", "subtypes": ["plains"]},
+            {"name": "E2E Island", "type_line": "Basic Land - Island", "subtypes": ["island"]},
+            {"name": "E2E Swamp", "type_line": "Basic Land - Swamp", "subtypes": ["swamp"]},
+        ]
+        count = 3
+    elif amount_source == "party_count":
+        fields["controller_battlefield"] = [
+            {
+                "name": f"E2E Party {subtype.title()}",
+                "type_line": f"Creature - {subtype.title()}",
+                "subtypes": [subtype],
+                "base_power": 1,
+                "base_toughness": 1,
+                "power": 1,
+                "toughness": 1,
+            }
+            for subtype in ["cleric", "rogue", "warrior", "wizard"]
+        ]
+        count = 4
+    elif amount_source == "attached_equipment_count":
+        fields["controller_battlefield"] = [
+            {
+                "name": "E2E Already Attached Equipment",
+                "type_line": "Artifact - Equipment",
+                "attached_to": target["name"],
+            }
+        ]
+        count = 2
+    elif amount_source == "battlefield_permanent_count":
+        scope = str(required.get("battlefield_count_scope") or "controller_battlefield").lower()
+        support_cards = [_attachment_fixture_permanent(required, index) for index in range(2)]
+        controller_support = support_cards
+        opponent_support: list[dict[str, Any]] = []
+        if scope == "all_battlefields":
+            controller_support = support_cards[:1]
+            opponent_support = support_cards[1:]
+        elif scope == "opponents_battlefield":
+            controller_support = []
+            opponent_support = support_cards
+        fields["controller_battlefield"] = controller_support
+        if opponent_support:
+            fields["opponent_battlefield"] = opponent_support
+        source = {
+            "name": rule["card_name"],
+            "type_line": "Enchantment - Aura" if is_aura else "Artifact - Equipment",
+        }
+        controller_battlefield = [*controller_support, source]
+        opponent_battlefield = [*opponent_support]
+        if target_owner == "controller":
+            controller_battlefield.append(target)
+        else:
+            opponent_battlefield.append(target)
+        counted_cards = controller_battlefield if scope == "controller_battlefield" else (
+            opponent_battlefield if scope == "opponents_battlefield" else [*controller_battlefield, *opponent_battlefield]
+        )
+        count = sum(1 for card in counted_cards if _attachment_fixture_matches(card, required, source))
+    else:
+        fields["expected_dynamic_count_status"] = "unsupported_fixture_source"
+        count = 0
+
+    fields["expected_dynamic_count"] = int(count)
+    power_bonus = _effect_int(required, "power_base_delta") + (
+        int(count) * _effect_int(required, "power_delta_per_graveyard_count")
+    )
+    toughness_bonus = _effect_int(required, "toughness_base_delta") + (
+        int(count) * _effect_int(required, "toughness_delta_per_graveyard_count")
+    )
+    return fields, power_bonus, toughness_bonus
+
+
 def aura_static_pt_execution_scenario_from_expected_rule(rule: dict[str, Any]) -> dict[str, Any] | None:
     required = dict(rule.get("required_effect_fields") or {})
     if required.get("effect") != "aura_static_attachment":
         return None
-    power_bonus = int(required.get("power_boost") or required.get("static_power_bonus") or 0)
-    toughness_bonus = int(required.get("toughness_boost") or required.get("static_toughness_bonus") or 0)
+    power_bonus = _effect_int(required, "power_boost", _effect_int(required, "static_power_bonus", 0))
+    toughness_bonus = _effect_int(required, "toughness_boost", _effect_int(required, "static_toughness_bonus", 0))
+    power_hint = power_bonus
+    toughness_hint = toughness_bonus
+    if required.get("attachment_dynamic_boost"):
+        power_hint += _effect_int(required, "power_base_delta") + _effect_int(required, "power_delta_per_graveyard_count")
+        toughness_hint += _effect_int(required, "toughness_base_delta") + _effect_int(
+            required,
+            "toughness_delta_per_graveyard_count",
+        )
     target_controller = str(required.get("enchant_target_controller") or "any").lower()
     if target_controller in {"opponent", "opponents"}:
         target_owner = "opponent"
     elif target_controller in {"self", "you", "controller"}:
         target_owner = "controller"
     else:
-        target_owner = "opponent" if power_bonus < 0 or toughness_bonus < 0 else "controller"
+        target_owner = "opponent" if power_hint < 0 or toughness_hint < 0 else "controller"
     target = {
         "name": f"E2E Aura Target for {rule['card_name']}",
         "type_line": "Creature - Soldier",
@@ -1572,11 +1769,18 @@ def aura_static_pt_execution_scenario_from_expected_rule(rule: dict[str, Any]) -
         "power": 2,
         "toughness": 2,
     }
+    dynamic_fields, power_bonus, toughness_bonus = _dynamic_attachment_fixture(
+        rule,
+        required,
+        target,
+        target_owner=target_owner,
+        is_aura=True,
+    )
     expected_toughness = target["base_toughness"] + toughness_bonus
     return {
         "name": f"{rule['card_name']} aura static P/T attaches",
         "type": "aura_static_power_toughness_attachment",
-        "card": {"name": rule["card_name"]},
+        "card": {"name": rule["card_name"], "type_line": "Enchantment - Aura"},
         "target": target,
         "target_owner": target_owner,
         "expected_power": target["base_power"] + power_bonus,
@@ -1584,6 +1788,7 @@ def aura_static_pt_execution_scenario_from_expected_rule(rule: dict[str, Any]) -
         "expected_moved_to_graveyard": expected_toughness <= 0,
         "expected_source": rule["card_name"],
         "logical_rule_key": rule["logical_rule_key"],
+        **dynamic_fields,
     }
 
 
@@ -1591,8 +1796,8 @@ def equipment_static_pt_execution_scenario_from_expected_rule(rule: dict[str, An
     required = dict(rule.get("required_effect_fields") or {})
     if required.get("effect") != "equipment_static_attachment":
         return None
-    power_bonus = int(required.get("power_boost") or required.get("static_power_bonus") or 0)
-    toughness_bonus = int(required.get("toughness_boost") or required.get("static_toughness_bonus") or 0)
+    power_bonus = _effect_int(required, "power_boost", _effect_int(required, "static_power_bonus", 0))
+    toughness_bonus = _effect_int(required, "toughness_boost", _effect_int(required, "static_toughness_bonus", 0))
     attached_keywords = [
         str(value).strip().lower().replace(" ", "_")
         for value in required.get("attached_keywords", []) or []
@@ -1606,6 +1811,13 @@ def equipment_static_pt_execution_scenario_from_expected_rule(rule: dict[str, An
         "power": 2,
         "toughness": 2,
     }
+    dynamic_fields, power_bonus, toughness_bonus = _dynamic_attachment_fixture(
+        rule,
+        required,
+        target,
+        target_owner="controller",
+        is_aura=False,
+    )
     return {
         "name": f"{rule['card_name']} equipment static P/T attaches",
         "type": "equipment_static_power_toughness_attachment",
@@ -1616,6 +1828,7 @@ def equipment_static_pt_execution_scenario_from_expected_rule(rule: dict[str, An
         "expected_keywords": attached_keywords,
         "expected_source": rule["card_name"],
         "logical_rule_key": rule["logical_rule_key"],
+        **dynamic_fields,
     }
 
 

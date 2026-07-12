@@ -1012,7 +1012,7 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertEqual(effect["enchant_target_controller"], "any")
         self.assertEqual(effect["xmage_effect_classes"], ["AttachEffect", "BoostEnchantedEffect"])
 
-    def test_fixed_aura_static_power_toughness_blocks_dynamic_source(self) -> None:
+    def test_dynamic_aura_static_power_toughness_maps_exact_scope(self) -> None:
         row = queue_row(
             "xmage_signature::AttachEffect,BoostEnchantedEffect::EnchantAbility,SimpleStaticAbility::"
             "TargetCreaturePermanent,TargetPermanent::no_condition_class::targeting,static_ability",
@@ -1032,16 +1032,100 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
                 ),
             ),
             source_text="""
+                private static final FilterEnchantmentPermanent filter =
+                    new FilterEnchantmentPermanent("other enchantment on the battlefield");
+                static {
+                    filter.add(AnotherPredicate.instance);
+                }
                 this.getSpellAbility().addEffect(new AttachEffect(Outcome.BoostCreature));
                 this.addAbility(new EnchantAbility(new TargetCreaturePermanent()));
-                DynamicValue countEnchantments = new PermanentsOnBattlefieldCount(filter);
+                DynamicValue countEnchantments = new PermanentsOnBattlefieldCount(filter, 2);
                 this.addAbility(new SimpleStaticAbility(
                     new BoostEnchantedEffect(countEnchantments, countEnchantments, Duration.WhileOnBattlefield)));
             """,
         )
 
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.AURA_STATIC_PT_ATTACHMENT_SCOPE)
+        self.assertTrue(effect["attachment_dynamic_boost"])
+        self.assertEqual(effect["stat_modifier_amount_source"], "battlefield_permanent_count")
+        self.assertEqual(effect["battlefield_count_scope"], "all_battlefields")
+        self.assertEqual(effect["battlefield_count_card_types"], ["enchantment"])
+        self.assertTrue(effect["battlefield_count_exclude_source"])
+        self.assertEqual(effect["power_delta_per_graveyard_count"], 2)
+        self.assertEqual(effect["toughness_delta_per_graveyard_count"], 2)
+
+    def test_dynamic_aura_static_power_toughness_blocks_shared_type_runtime(self) -> None:
+        row = queue_row(
+            "xmage_signature::AttachEffect,BoostEnchantedEffect::EnchantAbility,SimpleStaticAbility::"
+            "TargetCreaturePermanent,TargetPermanent::no_condition_class::targeting,static_ability",
+            effect_classes=["AttachEffect", "BoostEnchantedEffect"],
+            ability_kind="static",
+            ability_classes=["EnchantAbility", "SimpleStaticAbility"],
+            xmage_signals=["targeting", "static_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Alpha Status",
+                type_line="Enchantment - Aura",
+                oracle_text=(
+                    "Enchant creature\n"
+                    "Enchanted creature gets +2/+2 for each other creature on the battlefield "
+                    "that shares a creature type with it."
+                ),
+            ),
+            source_text="""
+                this.getSpellAbility().addEffect(new AttachEffect(Outcome.BoostCreature));
+                this.addAbility(new EnchantAbility(new TargetCreaturePermanent()));
+                DynamicValue dynamicValue = new AlphaStatusDynamicValue();
+                this.addAbility(new SimpleStaticAbility(
+                    new BoostEnchantedEffect(dynamicValue, dynamicValue, Duration.WhileOnBattlefield)));
+            """,
+        )
+
         self.assertIsNone(proposal)
-        self.assertEqual(reason, "aura_static_pt_oracle_not_exact_fixed")
+        self.assertEqual(reason, "attachment_dynamic_oracle_filter_not_supported")
+
+    def test_dynamic_equipment_static_power_toughness_maps_exact_scope(self) -> None:
+        row = queue_row(
+            "xmage_signature::BoostEquippedEffect::AddAbility,EquipAbility,SimpleStaticAbility::"
+            "TargetPermanent::no_condition_class::targeting,static_ability",
+            effect_classes=["BoostEquippedEffect"],
+            ability_kind="static",
+            ability_classes=["AddAbility", "EquipAbility", "SimpleStaticAbility"],
+            xmage_signals=["targeting", "static_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Blackblade Reforged",
+                type_line="Legendary Artifact - Equipment",
+                oracle_text=(
+                    "Equipped creature gets +1/+1 for each land you control.\n"
+                    "Equip legendary creature {3}\n"
+                    "Equip {7}"
+                ),
+            ),
+            source_text="""
+                private static final DynamicValue count =
+                    new PermanentsOnBattlefieldCount(StaticFilters.FILTER_CONTROLLED_PERMANENT_LAND);
+                this.addAbility(new SimpleStaticAbility(new BoostEquippedEffect(count, count)));
+                this.addAbility(new EquipAbility(Outcome.AddAbility, new GenericManaCost(3), new TargetPermanent(filter), false));
+                this.addAbility(new EquipAbility(Outcome.AddAbility, new GenericManaCost(7), false));
+            """,
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.EQUIPMENT_STATIC_ATTACHMENT_SCOPE)
+        self.assertTrue(effect["attachment_dynamic_boost"])
+        self.assertEqual(effect["stat_modifier_amount_source"], "battlefield_permanent_count")
+        self.assertEqual(effect["battlefield_count_scope"], "controller_battlefield")
+        self.assertEqual(effect["battlefield_count_card_types"], ["land"])
+        self.assertEqual(effect["power_delta_per_graveyard_count"], 1)
+        self.assertEqual(effect["toughness_delta_per_graveyard_count"], 1)
 
     def test_exact_split_report_includes_simple_aura_static_power_toughness_unit(self) -> None:
         row = queue_row(

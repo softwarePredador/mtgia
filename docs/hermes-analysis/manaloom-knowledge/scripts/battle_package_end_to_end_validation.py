@@ -12270,6 +12270,9 @@ def run_aura_static_power_toughness_attachment(
     source = battle.enrich_card({**card, **battle.get_card_effect(card)})
     active = battle.Player(str(scenario.get("player") or "Aura Controller"), None, [])
     opponent = battle.Player(str(scenario.get("opponent") or "Aura Target Opponent"), None, [])
+    active.hand = [dict(card) for card in scenario.get("controller_hand") or []]
+    active.battlefield.extend(dict(card) for card in scenario.get("controller_battlefield") or [])
+    opponent.battlefield.extend(dict(card) for card in scenario.get("opponent_battlefield") or [])
     target = dict(scenario["target"])
     target_owner = str(scenario.get("target_owner") or "controller")
     target_controller = opponent if target_owner == "opponent" else active
@@ -12305,6 +12308,14 @@ def run_aura_static_power_toughness_attachment(
     )
     if attached_event is None:
         fail("battle_events", f"missing {card['name']} aura_attached_static_pt event")
+    if scenario.get("expected_dynamic_count") is not None:
+        expected_dynamic_count = int(scenario["expected_dynamic_count"])
+        actual_dynamic_count = int(attached_event.get("attachment_dynamic_count") or 0)
+        if actual_dynamic_count != expected_dynamic_count:
+            fail(
+                "battle_events",
+                f"{card['name']} dynamic count={actual_dynamic_count}, expected {expected_dynamic_count}",
+            )
     source_name = str(scenario.get("expected_source") or card.get("name"))
     if attached_event.get("card") != source_name:
         fail("battle_events", f"{card['name']} attached event source={attached_event.get('card')!r}")
@@ -12366,6 +12377,8 @@ def run_equipment_static_power_toughness_attachment(
     card = dict(scenario["card"])
     source = battle.enrich_card({**card, **battle.get_card_effect(card)})
     active = battle.Player(str(scenario.get("player") or "Equipment Controller"), None, [])
+    active.hand = [dict(card) for card in scenario.get("controller_hand") or []]
+    active.battlefield.extend(dict(card) for card in scenario.get("controller_battlefield") or [])
     target = dict(scenario["target"])
     active.battlefield.append(target)
     before_events = len(events)
@@ -12405,6 +12418,14 @@ def run_equipment_static_power_toughness_attachment(
     )
     if attached_event is None:
         fail("battle_events", f"missing {card['name']} equipment_attached event")
+    if scenario.get("expected_dynamic_count") is not None:
+        expected_dynamic_count = int(scenario["expected_dynamic_count"])
+        actual_dynamic_count = int(attached_event.get("attachment_dynamic_count") or 0)
+        if actual_dynamic_count != expected_dynamic_count:
+            fail(
+                "battle_events",
+                f"{card['name']} dynamic count={actual_dynamic_count}, expected {expected_dynamic_count}",
+            )
     source_name = str(scenario.get("expected_source") or card.get("name"))
     if attached_event.get("card") != source_name:
         fail("battle_events", f"{card['name']} attached event source={attached_event.get('card')!r}")

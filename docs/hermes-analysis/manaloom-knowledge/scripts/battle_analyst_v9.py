@@ -28497,6 +28497,12 @@ def resolve_glyphbridge_selective_creature_wipe(player, opponents, card, effect_
         phase="glyphbridge_selective_creature_wipe",
         emit_events=True,
     )
+    refresh_all_dynamic_attachment_static_power_toughness(
+        participants,
+        turn=turn,
+        phase="glyphbridge_selective_creature_wipe",
+        emit_events=True,
+    )
 
     chosen_by_controller = {}
     chosen_records = []
@@ -49328,6 +49334,107 @@ def apply_equipment_haste_shroud(player, card, effect_data, turn):
     )
 
 
+def attachment_static_pt_hint(effect_data):
+    power_boost = _static_pt_int((effect_data or {}).get("power_boost"), default=0)
+    toughness_boost = _static_pt_int((effect_data or {}).get("toughness_boost"), default=0)
+    if (effect_data or {}).get("attachment_dynamic_boost"):
+        power_boost += _static_pt_int((effect_data or {}).get("power_base_delta"), default=0)
+        toughness_boost += _static_pt_int((effect_data or {}).get("toughness_base_delta"), default=0)
+        power_boost += _static_pt_int((effect_data or {}).get("power_delta_per_graveyard_count"), default=0)
+        toughness_boost += _static_pt_int((effect_data or {}).get("toughness_delta_per_graveyard_count"), default=0)
+    return power_boost, toughness_boost
+
+
+def _attached_equipment_count_for_target(controller, target, source=None):
+    target_name = str((target or {}).get("name") or "")
+    count = 0
+    for permanent in getattr(controller, "battlefield", []) or []:
+        if not isinstance(permanent, dict):
+            continue
+        if source is not None and permanent is source:
+            # The source counts after it is attached below.
+            pass
+        type_line = str(permanent.get("type_line") or "").lower()
+        if "equipment" not in type_line:
+            continue
+        if permanent.get("attached_to") == target_name:
+            count += 1
+    return count
+
+
+def dynamic_attachment_static_pt_boost(player, opponents, source, target, effect_data):
+    if not isinstance(effect_data, dict) or not effect_data.get("attachment_dynamic_boost"):
+        return (
+            _static_pt_int((effect_data or {}).get("power_boost"), default=0),
+            _static_pt_int((effect_data or {}).get("toughness_boost"), default=0),
+            {},
+        )
+    amount_source = str(effect_data.get("stat_modifier_amount_source") or "").strip().lower()
+    replay_fields = {"stat_modifier_amount_source": amount_source}
+    if amount_source == "attached_creature_color_count":
+        count = _permanent_color_count(target)
+        replay_fields["attached_creature_color_count"] = count
+    elif amount_source == "attached_equipment_count":
+        count = _attached_equipment_count_for_target(player, target, source=source)
+        replay_fields["attached_equipment_count"] = count
+    else:
+        count_effect = {
+            **effect_data,
+            "stat_modifier_amount_source": amount_source,
+            "_count_source_permanent": source,
+            "_attached_target": target,
+        }
+        count, replay_fields = _stat_modifier_count_from_source(player, opponents, count_effect)
+        if count is None:
+            count = 0
+    power_base = _static_pt_int(effect_data.get("power_base_delta"), default=0)
+    toughness_base = _static_pt_int(effect_data.get("toughness_base_delta"), default=0)
+    power_per = _static_pt_int(effect_data.get("power_delta_per_graveyard_count"), default=0)
+    toughness_per = _static_pt_int(effect_data.get("toughness_delta_per_graveyard_count"), default=0)
+    power_boost = power_base + (int(count) * power_per)
+    toughness_boost = toughness_base + (int(count) * toughness_per)
+    return power_boost, toughness_boost, {
+        **replay_fields,
+        "attachment_dynamic_count": int(count),
+        "power_base_delta": power_base,
+        "toughness_base_delta": toughness_base,
+        "power_delta_per_count": power_per,
+        "toughness_delta_per_count": toughness_per,
+    }
+
+
+def apply_attachment_static_pt_modifier(target, source, effect_data, power_boost, toughness_boost):
+    source_key = str(
+        source.get("_rule_logical_key")
+        or effect_data.get("_rule_logical_key")
+        or source.get("name")
+        or effect_data.get("name")
+        or "attachment_static_pt"
+    )
+    modifier_map = target.setdefault("_attachment_static_pt_modifiers", {})
+    previous = modifier_map.get(source_key) or {"power": 0, "toughness": 0}
+    base_power = _static_pt_int(target.get("power", target.get("base_power")), default=1) - _static_pt_int(
+        previous.get("power"), default=0
+    )
+    base_toughness = _static_pt_int(
+        target.get("toughness", target.get("base_toughness")),
+        default=base_power or 1,
+    ) - _static_pt_int(previous.get("toughness"), default=0)
+    target["power"] = base_power + int(power_boost)
+    target["toughness"] = base_toughness + int(toughness_boost)
+    modifier_map[source_key] = {
+        "source": source.get("name", "?"),
+        "power": int(power_boost),
+        "toughness": int(toughness_boost),
+    }
+    target["attachment_static_power_toughness_sources"] = [
+        entry.get("source")
+        for entry in modifier_map.values()
+        if isinstance(entry, dict) and entry.get("source")
+    ]
+    return int(power_boost), int(toughness_boost)
+
+
 def apply_equipment_static_attachment(player, card, effect_data, turn):
     equipment = enrich_card({**card, **effect_data})
     equipment["effect"] = "equipment_static_attachment"
@@ -49350,12 +49457,22 @@ def apply_equipment_static_attachment(player, card, effect_data, turn):
 
     target = choose_best_creature_target(creatures)
     grants = []
-    power_boost = int(effect_data.get("power_boost") or 0)
-    toughness_boost = int(effect_data.get("toughness_boost") or 0)
-    if power_boost:
-        target["power"] = int(target.get("power") or 0) + power_boost
-    if toughness_boost:
-        target["toughness"] = int(target.get("toughness") or 0) + toughness_boost
+    equipment["attached_to"] = target.get("name", "?")
+    power_boost, toughness_boost, dynamic_fields = dynamic_attachment_static_pt_boost(
+        player,
+        [],
+        equipment,
+        target,
+        effect_data,
+    )
+    if effect_data.get("attachment_dynamic_boost"):
+        apply_attachment_static_pt_modifier(target, equipment, effect_data, power_boost, toughness_boost)
+        equipment["attachment_dynamic_count_current"] = dynamic_fields.get("attachment_dynamic_count")
+    else:
+        if power_boost:
+            target["power"] = int(target.get("power") or 0) + power_boost
+        if toughness_boost:
+            target["toughness"] = int(target.get("toughness") or 0) + toughness_boost
     attached_keywords = {
         str(keyword).strip().lower().replace(" ", "_")
         for keyword in (effect_data.get("attached_keywords") or [])
@@ -49388,7 +49505,6 @@ def apply_equipment_static_attachment(player, card, effect_data, turn):
     if effect_data.get("protection_from_non_commander_identity_colors"):
         target["protection_from_non_commander_identity_colors"] = True
         grants.append("protection_from_non_commander_identity_colors")
-    equipment["attached_to"] = target.get("name", "?")
     emit_replay_event(
         "equipment_attached",
         player=player.name,
@@ -49400,6 +49516,7 @@ def apply_equipment_static_attachment(player, card, effect_data, turn):
         grants=grants,
         turn=turn,
         **replay_rule_fields(effect_data),
+        **dynamic_fields,
     )
 
 
@@ -49424,8 +49541,7 @@ def choose_aura_static_attachment_target(player, opponents, effect_data):
     candidates = aura_static_attachment_candidates(player, opponents, effect_data)
     if not candidates:
         return None, None
-    power_boost = _static_pt_int(effect_data.get("power_boost"), default=0)
-    toughness_boost = _static_pt_int(effect_data.get("toughness_boost"), default=0)
+    power_boost, toughness_boost = attachment_static_pt_hint(effect_data)
     is_debuff = toughness_boost < 0 or (power_boost < 0 and toughness_boost <= 0)
     if is_debuff:
         opponent_candidates = [
@@ -49456,34 +49572,14 @@ def choose_aura_static_attachment_target(player, opponents, effect_data):
 def apply_aura_static_pt_modifier(target, aura, effect_data):
     power_boost = _static_pt_int(effect_data.get("power_boost"), default=0)
     toughness_boost = _static_pt_int(effect_data.get("toughness_boost"), default=0)
-    source_key = str(
-        aura.get("_rule_logical_key")
-        or effect_data.get("_rule_logical_key")
-        or aura.get("name")
-        or effect_data.get("name")
-        or "aura_static_attachment"
+    power_boost, toughness_boost = apply_attachment_static_pt_modifier(
+        target,
+        aura,
+        effect_data,
+        power_boost,
+        toughness_boost,
     )
-    modifier_map = target.setdefault("_aura_static_pt_modifiers", {})
-    previous = modifier_map.get(source_key) or {"power": 0, "toughness": 0}
-    base_power = _static_pt_int(target.get("power", target.get("base_power")), default=1) - _static_pt_int(
-        previous.get("power"), default=0
-    )
-    base_toughness = _static_pt_int(
-        target.get("toughness", target.get("base_toughness")),
-        default=base_power or 1,
-    ) - _static_pt_int(previous.get("toughness"), default=0)
-    target["power"] = base_power + power_boost
-    target["toughness"] = base_toughness + toughness_boost
-    modifier_map[source_key] = {
-        "source": aura.get("name", "?"),
-        "power": power_boost,
-        "toughness": toughness_boost,
-    }
-    source_names = [
-        entry.get("source")
-        for entry in modifier_map.values()
-        if isinstance(entry, dict) and entry.get("source")
-    ]
+    source_names = list(target.get("attachment_static_power_toughness_sources") or [])
     target["aura_static_power_toughness_sources"] = source_names
     return power_boost, toughness_boost
 
@@ -49506,9 +49602,22 @@ def apply_aura_static_attachment(player, opponents, card, effect_data, turn, rng
         return
 
     before = {"power": target.get("power"), "toughness": target.get("toughness")}
-    power_boost, toughness_boost = apply_aura_static_pt_modifier(target, aura, effect_data)
     aura["attached_to"] = target.get("name", "?")
     aura["attached_to_controller"] = getattr(target_controller, "name", "?")
+    dynamic_effect = dict(effect_data)
+    dynamic_fields = {}
+    if effect_data.get("attachment_dynamic_boost"):
+        power_boost, toughness_boost, dynamic_fields = dynamic_attachment_static_pt_boost(
+            player,
+            opponents,
+            aura,
+            target,
+            effect_data,
+        )
+        dynamic_effect["power_boost"] = power_boost
+        dynamic_effect["toughness_boost"] = toughness_boost
+        aura["attachment_dynamic_count_current"] = dynamic_fields.get("attachment_dynamic_count")
+    power_boost, toughness_boost = apply_aura_static_pt_modifier(target, aura, dynamic_effect)
     emit_replay_event(
         "aura_attached_static_pt",
         player=player.name,
@@ -49523,6 +49632,7 @@ def apply_aura_static_attachment(player, opponents, card, effect_data, turn, rng
         toughness_boost=toughness_boost,
         turn=turn,
         **replay_rule_fields(effect_data),
+        **dynamic_fields,
     )
     if _static_pt_int(target.get("toughness"), default=1) <= 0:
         move_permanent_from_battlefield(
@@ -49540,6 +49650,123 @@ def apply_aura_static_attachment(player, opponents, card, effect_data, turn, rng
                 source=target,
                 all_players=[player] + list(opponents or []),
             )
+
+
+def _find_attached_target(participants, source):
+    attached_to = str((source or {}).get("attached_to") or "").strip()
+    attached_controller = str((source or {}).get("attached_to_controller") or "").strip()
+    if not attached_to:
+        return None, None
+    for participant in participants or []:
+        if participant is None:
+            continue
+        if attached_controller and getattr(participant, "name", "") != attached_controller:
+            continue
+        for permanent in getattr(participant, "battlefield", []) or []:
+            if isinstance(permanent, dict) and str(permanent.get("name") or "") == attached_to:
+                return participant, permanent
+    return None, None
+
+
+def refresh_dynamic_attachment_static_power_toughness_for_player(
+    controller,
+    participants,
+    *,
+    turn=None,
+    phase=None,
+    emit_events=False,
+):
+    refreshed = []
+    participant_list = [player for player in (participants or []) if player is not None]
+    for source in list(getattr(controller, "battlefield", []) or []):
+        if not isinstance(source, dict) or not source.get("attachment_dynamic_boost"):
+            continue
+        target_controller, target = _find_attached_target(participant_list, source)
+        if target is None:
+            continue
+        opponents = [player for player in participant_list if player is not controller]
+        power_boost, toughness_boost, dynamic_fields = dynamic_attachment_static_pt_boost(
+            controller,
+            opponents,
+            source,
+            target,
+            source,
+        )
+        before = {
+            "power": target.get("power"),
+            "toughness": target.get("toughness"),
+            "count": source.get("attachment_dynamic_count_current"),
+        }
+        apply_attachment_static_pt_modifier(
+            target,
+            source,
+            source,
+            power_boost,
+            toughness_boost,
+        )
+        source["attachment_dynamic_count_current"] = dynamic_fields.get("attachment_dynamic_count")
+        changed = (
+            before["power"] != target.get("power")
+            or before["toughness"] != target.get("toughness")
+            or before["count"] != source.get("attachment_dynamic_count_current")
+        )
+        if changed or source.get("attachment_dynamic_count_current") is not None:
+            refreshed.append(
+                {
+                    "card": source.get("name", "?"),
+                    "target": target.get("name", "?"),
+                    "count": source.get("attachment_dynamic_count_current"),
+                    "power": target.get("power"),
+                    "toughness": target.get("toughness"),
+                }
+            )
+        if emit_events and changed:
+            emit_replay_event(
+                "attachment_static_power_toughness_changed",
+                player=getattr(controller, "name", "?"),
+                card=source.get("name", "?"),
+                target_player=getattr(target_controller, "name", "?"),
+                target=target.get("name", "?"),
+                power_before=before["power"],
+                toughness_before=before["toughness"],
+                power_after=target.get("power"),
+                toughness_after=target.get("toughness"),
+                power_boost=power_boost,
+                toughness_boost=toughness_boost,
+                turn=turn,
+                phase=phase,
+                **replay_rule_fields(source),
+                **dynamic_fields,
+            )
+    return refreshed
+
+
+def refresh_all_dynamic_attachment_static_power_toughness(
+    participants,
+    *,
+    turn=None,
+    phase=None,
+    emit_events=False,
+):
+    refreshed = []
+    participant_list = []
+    seen = set()
+    for participant in participants or []:
+        if participant is None or id(participant) in seen:
+            continue
+        seen.add(id(participant))
+        participant_list.append(participant)
+    for controller in participant_list:
+        refreshed.extend(
+            refresh_dynamic_attachment_static_power_toughness_for_player(
+                controller,
+                participant_list,
+                turn=turn,
+                phase=phase,
+                emit_events=emit_events,
+            )
+        )
+    return refreshed
 
 
 def resolve_etb_library_tutor_to_hand(player, opponents, card, effect_data, turn):
@@ -58251,6 +58478,12 @@ def _stat_modifier_count_from_source(player, opponents, effect_data):
             "stat_modifier_amount_source": "controller_hand_count",
             "hand_stat_modifier_count": count,
         }
+    if amount_source == "party_count":
+        count = _controlled_party_count(player)
+        return count, {
+            "stat_modifier_amount_source": "party_count",
+            "party_stat_modifier_count": count,
+        }
     if amount_source == "opponent_max_hand_count":
         opponent_counts = [len(getattr(opponent, "hand", []) or []) for opponent in opponents or []]
         count = max(opponent_counts) if opponent_counts else 0
@@ -59360,6 +59593,12 @@ def apply_damage_wipe_treasure(player, opponents, card, effect_data, turn, rng):
         phase="damage_wipe_treasure",
         emit_events=True,
     )
+    refresh_all_dynamic_attachment_static_power_toughness(
+        [player, *list(opponents)],
+        turn=turn,
+        phase="damage_wipe_treasure",
+        emit_events=True,
+    )
     amount = int(effect_data.get("damage") or effect_data.get("average_damage") or 6)
     amount = apply_controller_noncombat_damage_modifiers(
         player,
@@ -59492,6 +59731,12 @@ def apply_damage_wipe(player, opponents, card, effect_data, turn, *, finish_spel
         emit_events=True,
     )
     refresh_all_global_static_power_toughness_bonuses(
+        [player, *list(opponents)],
+        turn=turn,
+        phase="damage_wipe",
+        emit_events=True,
+    )
+    refresh_all_dynamic_attachment_static_power_toughness(
         [player, *list(opponents)],
         turn=turn,
         phase="damage_wipe",
@@ -68835,7 +69080,13 @@ def apply_effect_immediate(
             phase=phase or "resolution",
             emit_events=True,
         )
-        return controlled_refreshed + keyword_refreshed + global_refreshed
+        attachment_refreshed = refresh_all_dynamic_attachment_static_power_toughness(
+            all_players_for_entry,
+            turn=turn,
+            phase=phase or "resolution",
+            emit_events=True,
+        )
+        return controlled_refreshed + keyword_refreshed + global_refreshed + attachment_refreshed
 
     if effect == "composite_resolution":
         summary = resolve_composite_resolution_effect(
@@ -70365,6 +70616,12 @@ def apply_effect_immediate(
             emit_events=True,
         )
         refresh_all_global_static_power_toughness_bonuses(
+            [player, *list(opponents)],
+            turn=turn,
+            phase="board_wipe",
+            emit_events=True,
+        )
+        refresh_all_dynamic_attachment_static_power_toughness(
             [player, *list(opponents)],
             turn=turn,
             phase="board_wipe",

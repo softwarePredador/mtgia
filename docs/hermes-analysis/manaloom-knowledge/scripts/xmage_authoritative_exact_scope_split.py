@@ -1191,6 +1191,378 @@ def fixed_aura_static_pt_from_source(source: str) -> dict[str, Any] | str | None
     }
 
 
+def _attachment_dynamic_boost_dict(
+    amount_source: str,
+    *,
+    power_per: int,
+    toughness_per: int,
+    power_base: int = 0,
+    toughness_base: int = 0,
+    **count_fields: Any,
+) -> dict[str, Any]:
+    return {
+        "attachment_dynamic_boost": True,
+        "stat_modifier_amount_source": amount_source,
+        "power_base_delta": int(power_base),
+        "toughness_base_delta": int(toughness_base),
+        "power_delta_per_graveyard_count": int(power_per),
+        "toughness_delta_per_graveyard_count": int(toughness_per),
+        **count_fields,
+    }
+
+
+def _attachment_count_fields_from_filter_text(filter_text: str) -> dict[str, Any] | str | None:
+    token = re.sub(r"\s+", " ", str(filter_text or "").strip().lower()).rstrip(".")
+    token = token.replace("and/or", "or")
+    if token in {
+        "artifact or enchantment you control",
+        "artifacts or enchantments you control",
+        "artifact and enchantment you control",
+        "artifacts and enchantments you control",
+    }:
+        return {
+            "stat_modifier_amount_source": "battlefield_permanent_count",
+            "battlefield_count_scope": "controller_battlefield",
+            "battlefield_count_card_types": ["artifact", "enchantment"],
+        }
+    if token in {"other enchantment on the battlefield", "other enchantments on the battlefield"}:
+        return {
+            "stat_modifier_amount_source": "battlefield_permanent_count",
+            "battlefield_count_scope": "all_battlefields",
+            "battlefield_count_card_types": ["enchantment"],
+            "battlefield_count_exclude_source": True,
+        }
+    if token in {"card in your hand", "cards in your hand"}:
+        return {"stat_modifier_amount_source": "controller_hand_count"}
+    if token in {"of its colors", "its colors"}:
+        return {"stat_modifier_amount_source": "attached_creature_color_count"}
+    if token == "basic land type among lands you control":
+        return {"stat_modifier_amount_source": "domain_basic_land_types"}
+    if token in {"equipment attached to it", "equipments attached to it"}:
+        return {"stat_modifier_amount_source": "attached_equipment_count"}
+    if token in {"creature in your party", "creatures in your party"}:
+        return {"stat_modifier_amount_source": "party_count"}
+
+    controlled_type_map = {
+        "artifact": ["artifact"],
+        "creature": ["creature"],
+        "enchantment": ["enchantment"],
+        "land": ["land"],
+    }
+    controlled_match = re.fullmatch(r"(?P<name>[a-z -]+?)s? you control", token)
+    if controlled_match:
+        name = controlled_match.group("name").strip()
+        if name in controlled_type_map:
+            return {
+                "stat_modifier_amount_source": "battlefield_permanent_count",
+                "battlefield_count_scope": "controller_battlefield",
+                "battlefield_count_card_types": controlled_type_map[name],
+            }
+        basic_lands = {"plains", "island", "swamp", "mountain", "forest", "desert"}
+        singular = name[:-1] if name.endswith("s") else name
+        if singular in basic_lands:
+            return {
+                "stat_modifier_amount_source": "battlefield_permanent_count",
+                "battlefield_count_scope": "controller_battlefield",
+                "battlefield_count_card_types": ["land"],
+                "battlefield_count_subtypes": [singular],
+            }
+        if singular == "gate":
+            return {
+                "stat_modifier_amount_source": "battlefield_permanent_count",
+                "battlefield_count_scope": "controller_battlefield",
+                "battlefield_count_card_types": ["land"],
+                "battlefield_count_subtypes": ["gate"],
+            }
+
+    subtype_union_match = re.fullmatch(
+        r"(?P<left>[a-z, -]+?)(?:,? or |,? and |,? and or )(?P<right>[a-z -]+?) you control",
+        token,
+    )
+    if subtype_union_match and "dwarf" in token and "equipment" in token and "vehicle" in token:
+        return {
+            "stat_modifier_amount_source": "battlefield_permanent_count",
+            "battlefield_count_scope": "controller_battlefield",
+            "battlefield_count_subtypes": ["dwarf", "equipment", "vehicle"],
+        }
+    return None
+
+
+def dynamic_attachment_static_pt_from_oracle(
+    metadata: dict[str, Any],
+    *,
+    subject: str,
+) -> dict[str, Any] | str | None:
+    raw_text = strip_parenthetical_reminders(str(metadata.get("oracle_text") or ""))
+    if subject == "equipped creature":
+        lines = [
+            re.sub(r"\s+", " ", line.strip().lower()).rstrip(".")
+            for line in raw_text.splitlines()
+            if line.strip()
+        ]
+        static_lines = [
+            line
+            for line in lines
+            if not _is_safe_equipment_auxiliary_oracle_line(line)
+        ]
+        if len(static_lines) != 1:
+            return None
+        raw_text = static_lines[0]
+    text = raw_text
+    text = re.sub(r"\s+", " ", text).strip().lower()
+    text = re.sub(r"^(?:domain|landfall|threshold) [—-]\s*", "", text)
+    if subject == "enchanted creature":
+        prefix = r"(?:flash )?enchant creature(?: you control| an opponent controls)? "
+    else:
+        prefix = ""
+
+    each_match = re.match(
+        rf"^{prefix}{re.escape(subject)} gets "
+        r"(?P<power>[+-])(?P<power_value>\d+)/(?P<toughness>[+-])(?P<toughness_value>\d+) "
+        r"for each (?P<filter>.+?)(?P<tail>(?: and has .+)?)\.?$",
+        text,
+    )
+    if each_match:
+        count_fields = _attachment_count_fields_from_filter_text(each_match.group("filter"))
+        if isinstance(count_fields, str):
+            return count_fields
+        if count_fields is None:
+            return "attachment_dynamic_oracle_filter_not_supported"
+        amount_source = str(count_fields.pop("stat_modifier_amount_source"))
+        result = _attachment_dynamic_boost_dict(
+            amount_source,
+            power_per=_dynamic_boost_sign(each_match.group("power")) * int(each_match.group("power_value")),
+            toughness_per=_dynamic_boost_sign(each_match.group("toughness")) * int(each_match.group("toughness_value")),
+            **count_fields,
+        )
+        tail = each_match.group("tail").strip()
+        if tail and subject == "equipped creature":
+            keyword_text = tail[len("and has ") :].strip() if tail.startswith("and has ") else ""
+            keywords = _equipment_oracle_keyword_list(keyword_text)
+            if keywords is None:
+                return "equipment_static_oracle_keyword_not_supported"
+            result["attached_keywords"] = keywords
+        return result
+
+    where_match = re.match(
+        rf"^{prefix}{re.escape(subject)} gets "
+        r"(?P<power>[+-])x/(?P<toughness>[+-])x, where x is the number of "
+        r"(?P<filter>.+?)\.?$",
+        text,
+    )
+    if where_match:
+        count_fields = _attachment_count_fields_from_filter_text(where_match.group("filter"))
+        if isinstance(count_fields, str):
+            return count_fields
+        if count_fields is None:
+            return "attachment_dynamic_oracle_filter_not_supported"
+        amount_source = str(count_fields.pop("stat_modifier_amount_source"))
+        return _attachment_dynamic_boost_dict(
+            amount_source,
+            power_per=_dynamic_boost_sign(where_match.group("power")),
+            toughness_per=_dynamic_boost_sign(where_match.group("toughness")),
+            **count_fields,
+        )
+    return None
+
+
+def _java_dynamic_value_assignment(source: str, variable_name: str) -> str | None:
+    var = str(variable_name or "").strip()
+    if not var or not re.fullmatch(r"[A-Za-z_]\w*", var):
+        return None
+    match = re.search(
+        rf"\b(?:DynamicValue|PermanentsOnBattlefieldCount|CardsInControllerHandCount)\s+"
+        rf"{re.escape(var)}\s*=\s*(?P<expr>[^;]+);",
+        source or "",
+        re.S,
+    )
+    if match:
+        return re.sub(r"\s+", " ", match.group("expr")).strip()
+    match = re.search(
+        rf"\b{re.escape(var)}\s*=\s*(?P<expr>new\s+(?:PermanentsOnBattlefieldCount|SignInversionDynamicValue)\s*\([^;]+?\))\s*;",
+        source or "",
+        re.S,
+    )
+    if match:
+        return re.sub(r"\s+", " ", match.group("expr")).strip()
+    return None
+
+
+def _attachment_filter_var_count_fields(source: str, filter_name: str) -> dict[str, Any] | None:
+    text = source or ""
+    name = str(filter_name or "").strip()
+    if not name or not re.fullmatch(r"[A-Za-z_]\w*", name):
+        return None
+    decl_match = re.search(
+        rf"\b(?:FilterPermanent|FilterControlledPermanent|FilterLandPermanent|FilterEnchantmentPermanent|"
+        rf"FilterArtifactOrEnchantmentPermanent)\s+{re.escape(name)}\s*=\s*new\s+(?P<class>\w+)",
+        text,
+    )
+    if not decl_match:
+        return None
+    class_name = decl_match.group("class")
+    scope = "controller_battlefield" if "Controlled" in class_name else "all_battlefields"
+    if re.search(rf"{re.escape(name)}\.add\s*\(\s*TargetController\.YOU\.getControllerPredicate", text):
+        scope = "controller_battlefield"
+    fields: dict[str, Any] = {
+        "stat_modifier_amount_source": "battlefield_permanent_count",
+        "battlefield_count_scope": scope,
+    }
+    if class_name == "FilterArtifactOrEnchantmentPermanent":
+        fields["battlefield_count_card_types"] = ["artifact", "enchantment"]
+    elif "Enchantment" in class_name:
+        fields["battlefield_count_card_types"] = ["enchantment"]
+    elif "Land" in class_name:
+        fields["battlefield_count_card_types"] = ["land"]
+    subtype_matches = re.findall(
+        rf"{re.escape(name)}\.add\s*\([^;]*?SubType\.([A-Z0-9_]+)\.getPredicate",
+        text,
+        re.S,
+    )
+    constructor_subtype = re.search(
+        rf"new\s+{re.escape(class_name)}\s*\(\s*SubType\.([A-Z0-9_]+)",
+        text,
+    )
+    if constructor_subtype:
+        subtype_matches.append(constructor_subtype.group(1))
+    if subtype_matches:
+        fields["battlefield_count_subtypes"] = sorted(
+            {
+                value.lower().replace("_", " ")
+                for value in subtype_matches
+            }
+        )
+    if "AnotherPredicate.instance" in text and name in text:
+        fields["battlefield_count_exclude_source"] = True
+    if len(fields) <= 2:
+        return None
+    return fields
+
+
+def _attachment_count_source_spec_from_expr(source: str, expr: str) -> dict[str, Any] | str | None:
+    text = source or ""
+    token = re.sub(r"\s+", " ", str(expr or "").strip())
+    if re.fullmatch(r"StaticValue\.get\s*\(\s*0\s*\)", token):
+        return {"static_value": 0, "per": 0}
+    assigned = _java_dynamic_value_assignment(text, token)
+    if assigned and assigned != token:
+        return _attachment_count_source_spec_from_expr(text, assigned)
+    sign = -1 if "SignInversionDynamicValue" in token else 1
+    sign_args = extract_constructor_args(token, "SignInversionDynamicValue")
+    if sign_args is not None:
+        nested = _attachment_count_source_spec_from_expr(text, sign_args)
+        if isinstance(nested, str) or nested is None:
+            return nested
+        nested = dict(nested)
+        nested["per"] = -int(nested.get("per") or 1)
+        return nested
+    if "CardsInControllerHandCount.ANY" in token or "CardsInControllerHandCount.ANY_SINGULAR" in token:
+        return {"stat_modifier_amount_source": "controller_hand_count", "per": sign}
+    if "DomainValue.REGULAR" in token:
+        return {"stat_modifier_amount_source": "domain_basic_land_types", "per": sign}
+    if "GateYouControlCount.instance" in token:
+        return {
+            "stat_modifier_amount_source": "battlefield_permanent_count",
+            "battlefield_count_scope": "controller_battlefield",
+            "battlefield_count_card_types": ["land"],
+            "battlefield_count_subtypes": ["gate"],
+            "per": sign,
+        }
+    if "PartyCount.instance" in token:
+        return {"stat_modifier_amount_source": "party_count", "per": sign}
+    if "CivicSaberColorCount" in token or "EnchantedCreatureColorsCount" in token:
+        return {"stat_modifier_amount_source": "attached_creature_color_count", "per": sign}
+    if "AttachedToAttachedPredicate" in text and "PermanentsOnBattlefieldCount" in token:
+        return {"stat_modifier_amount_source": "attached_equipment_count", "per": sign}
+    if "PermanentsOnBattlefieldCount" in token:
+        args = extract_java_call_args(token, "PermanentsOnBattlefieldCount")
+        parts = split_java_args(args or "")
+        if not parts:
+            return "attachment_dynamic_source_filter_not_supported"
+        count_filter = parts[0].strip()
+        per = sign
+        if len(parts) >= 2 and parts[1].strip().lstrip("-").isdigit():
+            per = sign * int(parts[1].strip())
+        fields: dict[str, Any] | None = None
+        if count_filter in {
+            "StaticFilters.FILTER_CONTROLLED_PERMANENT_LAND",
+            "StaticFilters.FILTER_CONTROLLED_PERMANENT_LANDS",
+        }:
+            fields = {
+                "stat_modifier_amount_source": "battlefield_permanent_count",
+                "battlefield_count_scope": "controller_battlefield",
+                "battlefield_count_card_types": ["land"],
+            }
+        elif count_filter == "StaticFilters.FILTER_CONTROLLED_CREATURE":
+            fields = {
+                "stat_modifier_amount_source": "battlefield_permanent_count",
+                "battlefield_count_scope": "controller_battlefield",
+                "battlefield_count_card_types": ["creature"],
+            }
+        elif re.fullmatch(r"[A-Za-z_]\w*", count_filter):
+            fields = _attachment_filter_var_count_fields(text, count_filter)
+        if fields is None:
+            return "attachment_dynamic_source_filter_not_supported"
+        return {**fields, "per": per}
+    return "attachment_dynamic_source_filter_not_supported"
+
+
+def dynamic_attachment_static_pt_from_source(
+    source: str,
+    *,
+    effect_class: str,
+) -> dict[str, Any] | str | None:
+    text = source or ""
+    args_text = extract_constructor_args(text, effect_class)
+    if args_text is None:
+        return None
+    args = split_top_level_args(args_text)
+    if len(args) < 2:
+        return "attachment_dynamic_source_boost_not_single"
+    power_spec = _attachment_count_source_spec_from_expr(text, args[0])
+    toughness_spec = _attachment_count_source_spec_from_expr(text, args[1])
+    if isinstance(power_spec, str):
+        return power_spec
+    if isinstance(toughness_spec, str):
+        return toughness_spec
+    if power_spec is None or toughness_spec is None:
+        return "attachment_dynamic_source_boost_not_single"
+    count_spec = toughness_spec if power_spec.get("static_value") is not None else power_spec
+    for spec in (power_spec, toughness_spec):
+        if spec.get("static_value") is None:
+            for key in (
+                "stat_modifier_amount_source",
+                "battlefield_count_scope",
+                "battlefield_count_card_types",
+                "battlefield_count_subtypes",
+                "battlefield_count_exclude_source",
+            ):
+                if spec.get(key) != count_spec.get(key):
+                    return "attachment_dynamic_source_mixed_counts_not_supported"
+    result = _attachment_dynamic_boost_dict(
+        str(count_spec.get("stat_modifier_amount_source")),
+        power_per=int(power_spec.get("per") or 0),
+        toughness_per=int(toughness_spec.get("per") or 0),
+        **{
+            key: value
+            for key, value in count_spec.items()
+            if key not in {"stat_modifier_amount_source", "per", "static_value"}
+        },
+    )
+    if effect_class == "BoostEquippedEffect":
+        keyword_source = fixed_equipment_static_attachment_from_source(text)
+        if isinstance(keyword_source, dict):
+            result["attached_keywords"] = list(keyword_source.get("attached_keywords") or [])
+        else:
+            keywords: set[str] = set()
+            for class_name, keyword in EQUIPMENT_ATTACHED_KEYWORD_CLASSES.items():
+                if re.search(rf"\b(?:new\s+)?{re.escape(class_name)}\b", text):
+                    keywords.add(keyword)
+            if keywords:
+                result["attached_keywords"] = sorted(keywords)
+    return result
+
+
 EQUIPMENT_ATTACHED_KEYWORD_CLASSES = {
     "FlyingAbility": "flying",
     "VigilanceAbility": "vigilance",
@@ -30408,9 +30780,9 @@ def proposal_notes(row: dict[str, Any], scope: str) -> str:
     elif scope == STATIC_GRAVEYARD_COUNT_BOOST_SCOPE:
         scope_kind = "creature static source power/toughness boost equal to graveyard card count"
     elif scope == AURA_STATIC_PT_ATTACHMENT_SCOPE:
-        scope_kind = "fixed Aura attachment with static enchanted-creature power/toughness modifier"
+        scope_kind = "Aura attachment with static enchanted-creature power/toughness modifier"
     elif scope == EQUIPMENT_STATIC_ATTACHMENT_SCOPE:
-        scope_kind = "fixed Equipment attachment with static equipped-creature power/toughness and keyword modifier"
+        scope_kind = "Equipment attachment with static equipped-creature power/toughness and keyword modifier"
     elif scope == STATIC_GENERIC_COST_REDUCTION_SCOPE:
         scope_kind = "permanent static generic cost reduction for matching spells you cast"
     elif scope == STATIC_GENERIC_COST_INCREASE_SCOPE:
@@ -31335,17 +31707,33 @@ def split_row(
         if "artifact" not in type_line or "equipment" not in type_line:
             return None, "equipment_static_not_artifact_equipment_type"
         oracle_equipment = fixed_equipment_static_attachment_from_oracle(metadata)
+        equipment_dynamic = False
+        if oracle_equipment is None:
+            oracle_equipment = dynamic_attachment_static_pt_from_oracle(
+                metadata,
+                subject="equipped creature",
+            )
+            equipment_dynamic = oracle_equipment is not None and not isinstance(oracle_equipment, str)
         if oracle_equipment is None:
             return None, "equipment_static_oracle_not_exact_fixed"
         if isinstance(oracle_equipment, str):
             return None, oracle_equipment
-        source_equipment = fixed_equipment_static_attachment_from_source(source_text)
+        source_equipment = (
+            dynamic_attachment_static_pt_from_source(
+                source_text,
+                effect_class="BoostEquippedEffect",
+            )
+            if equipment_dynamic
+            else fixed_equipment_static_attachment_from_source(source_text)
+        )
         if source_equipment is None:
             return None, "equipment_static_source_not_exact_fixed"
         if isinstance(source_equipment, str):
             return None, source_equipment
         if source_equipment != oracle_equipment:
             return None, "equipment_static_source_oracle_mismatch"
+        power_boost = int(oracle_equipment.get("power_boost") or 0)
+        toughness_boost = int(oracle_equipment.get("toughness_boost") or 0)
         effect_json = {
             "effect": "equipment_static_attachment",
             "battle_model_scope": EQUIPMENT_STATIC_ATTACHMENT_SCOPE,
@@ -31356,17 +31744,31 @@ def split_row(
                 "card_types": ["creature"],
                 "zone": "battlefield",
             },
-            "power_boost": int(oracle_equipment["power_boost"]),
-            "toughness_boost": int(oracle_equipment["toughness_boost"]),
-            "static_power_bonus": int(oracle_equipment["power_boost"]),
-            "static_toughness_bonus": int(oracle_equipment["toughness_boost"]),
-            "attached_keywords": list(oracle_equipment["attached_keywords"]),
+            "power_boost": power_boost,
+            "toughness_boost": toughness_boost,
+            "static_power_bonus": power_boost,
+            "static_toughness_bonus": toughness_boost,
+            "attached_keywords": list(oracle_equipment.get("attached_keywords") or []),
             "equipment": True,
             "xmage_effect_classes": sorted(effect_classes(row)),
             "xmage_ability_classes": sorted(ability_classes(row)),
             **flags,
         }
-        for keyword in oracle_equipment["attached_keywords"]:
+        if equipment_dynamic:
+            effect_json.update(
+                {
+                    key: value
+                    for key, value in oracle_equipment.items()
+                    if key
+                    not in {
+                        "power_boost",
+                        "toughness_boost",
+                        "attached_keywords",
+                    }
+                }
+            )
+            effect_json["static_effect"] = "attached_creature_power_toughness_boost_equal_count"
+        for keyword in oracle_equipment.get("attached_keywords") or []:
             effect_json[f"grants_{keyword}"] = True
         return build_proposal(
             row,
@@ -31379,11 +31781,25 @@ def split_row(
         if "aura" not in str(metadata.get("type_line") or "").lower():
             return None, "aura_static_pt_not_aura_type"
         oracle_aura = fixed_aura_static_pt_from_oracle(metadata)
+        aura_dynamic = False
+        if oracle_aura is None:
+            oracle_aura = dynamic_attachment_static_pt_from_oracle(
+                metadata,
+                subject="enchanted creature",
+            )
+            aura_dynamic = oracle_aura is not None and not isinstance(oracle_aura, str)
         if oracle_aura is None:
             return None, "aura_static_pt_oracle_not_exact_fixed"
         if isinstance(oracle_aura, str):
             return None, oracle_aura
-        source_aura = fixed_aura_static_pt_from_source(source_text)
+        source_aura = (
+            dynamic_attachment_static_pt_from_source(
+                source_text,
+                effect_class="BoostEnchantedEffect",
+            )
+            if aura_dynamic
+            else fixed_aura_static_pt_from_source(source_text)
+        )
         if source_aura is None:
             return None, "aura_static_pt_source_not_exact_fixed"
         if isinstance(source_aura, str):
@@ -31396,6 +31812,8 @@ def split_row(
         }
         if source_without_flash != oracle_without_flash:
             return None, "aura_static_pt_source_oracle_mismatch"
+        power_boost = int(oracle_aura.get("power_boost") or 0)
+        toughness_boost = int(oracle_aura.get("toughness_boost") or 0)
         effect_json = {
             "effect": "aura_static_attachment",
             "battle_model_scope": AURA_STATIC_PT_ATTACHMENT_SCOPE,
@@ -31403,16 +31821,31 @@ def split_row(
             "target": "creature",
             "target_constraints": {"card_types": ["creature"], "zone": "battlefield"},
             "enchant_target": "creature",
-            "enchant_target_controller": oracle_aura["enchant_target_controller"],
-            "power_boost": int(oracle_aura["power_boost"]),
-            "toughness_boost": int(oracle_aura["toughness_boost"]),
-            "static_power_bonus": int(oracle_aura["power_boost"]),
-            "static_toughness_bonus": int(oracle_aura["toughness_boost"]),
+            "enchant_target_controller": oracle_aura.get("enchant_target_controller", "any"),
+            "power_boost": power_boost,
+            "toughness_boost": toughness_boost,
+            "static_power_bonus": power_boost,
+            "static_toughness_bonus": toughness_boost,
             "aura": True,
             "xmage_effect_classes": ["AttachEffect", "BoostEnchantedEffect"],
             "xmage_ability_classes": sorted(ability_classes(row)),
             **flags,
         }
+        if aura_dynamic:
+            effect_json.update(
+                {
+                    key: value
+                    for key, value in oracle_aura.items()
+                    if key
+                    not in {
+                        "power_boost",
+                        "toughness_boost",
+                        "enchant_target_controller",
+                        "has_flash",
+                    }
+                }
+            )
+            effect_json["static_effect"] = "attached_creature_power_toughness_boost_equal_count"
         if oracle_aura.get("has_flash"):
             effect_json["has_flash"] = True
             effect_json["flash"] = True
