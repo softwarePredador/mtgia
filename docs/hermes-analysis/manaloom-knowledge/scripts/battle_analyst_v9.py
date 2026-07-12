@@ -61918,6 +61918,41 @@ def resolve_possibility_storm_replacement(
     return True
 
 
+def _spell_cast_gain_life_component(parent, component):
+    if not isinstance(parent, dict) or not isinstance(component, dict):
+        return None
+    if (
+        component.get("battle_model_scope") != "xmage_spell_cast_gain_life_v1"
+        or int(component.get("spell_cast_gain_life_amount") or 0) <= 0
+    ):
+        return None
+    merged = dict(component)
+    merged.setdefault("name", parent.get("name", "?"))
+    merged.setdefault("_rule_logical_key", parent.get("_rule_logical_key"))
+    merged.setdefault("_rule_source", parent.get("_rule_source"))
+    merged.setdefault("_rule_review_status", parent.get("_rule_review_status"))
+    merged.setdefault("chosen_color", parent.get("chosen_color"))
+    merged.setdefault("chosen_color_mana", parent.get("chosen_color_mana"))
+    merged.setdefault("conditional_mana_modes", parent.get("conditional_mana_modes"))
+    merged.setdefault("conditional_mana_same_color_choice", parent.get("conditional_mana_same_color_choice"))
+    merged.setdefault("produced_mana_symbols", parent.get("produced_mana_symbols"))
+    merged["_parent_static_source"] = parent
+    return merged
+
+
+def spell_cast_gain_life_sources_for_permanent(permanent):
+    if not isinstance(permanent, dict):
+        return []
+    sources = []
+    if int(permanent.get("spell_cast_gain_life_amount") or 0) > 0:
+        sources.append(permanent)
+    for component in permanent.get("_composite_rule_components") or []:
+        component_source = _spell_cast_gain_life_component(permanent, component)
+        if component_source is not None:
+            sources.append(component_source)
+    return sources
+
+
 def trigger_spell_cast_engines(
     player,
     all_players,
@@ -62521,16 +62556,19 @@ def trigger_spell_cast_engines(
                 all_players=all_players,
             )
             continue
-        gain_life_amount = int(permanent.get("spell_cast_gain_life_amount") or 0)
-        if gain_life_amount > 0 and spell_cast_gain_life_filter_matches(
-            permanent,
-            player,
-            spell,
-            source_zone=source_zone,
-        ):
+        gain_life_triggered = False
+        for gain_life_source in spell_cast_gain_life_sources_for_permanent(permanent):
+            gain_life_amount = int(gain_life_source.get("spell_cast_gain_life_amount") or 0)
+            if gain_life_amount <= 0 or not spell_cast_gain_life_filter_matches(
+                gain_life_source,
+                player,
+                spell,
+                source_zone=source_zone,
+            ):
+                continue
 
             def resolve_spell_cast_gain_life_trigger(
-                permanent=permanent,
+                permanent=gain_life_source,
                 gain_life_amount=gain_life_amount,
                 trigger_kind=trigger_kind,
                 spell=spell,
@@ -62562,6 +62600,10 @@ def trigger_spell_cast_engines(
                     spell_cast_gain_life_any_player=bool(
                         permanent.get("spell_cast_gain_life_any_player")
                     ),
+                    spell_cast_gain_life_required_chosen_color=bool(
+                        permanent.get("spell_cast_gain_life_required_chosen_color")
+                    ),
+                    chosen_color=permanent.get("chosen_color"),
                     phase=phase,
                     turn=turn,
                     **replay_rule_fields(permanent),
@@ -62569,13 +62611,15 @@ def trigger_spell_cast_engines(
 
             resolve_or_enqueue_trigger(
                 player,
-                permanent,
+                gain_life_source,
                 trigger_kind,
                 resolve_spell_cast_gain_life_trigger,
                 stack=stack,
                 active_player=active_player,
                 all_players=all_players,
             )
+            gain_life_triggered = True
+        if gain_life_triggered:
             continue
         draw_threshold = int(permanent.get("spell_cast_draw_if_cmc_at_least") or 0)
         if draw_threshold > 0:
@@ -63617,72 +63661,77 @@ def trigger_spell_cast_engines(
         for permanent in list(getattr(source_controller, "battlefield", []) or []):
             if not isinstance(permanent, dict):
                 continue
-            if not permanent.get("spell_cast_gain_life_any_player"):
-                continue
-            trigger_kind = permanent.get("trigger")
-            if trigger_kind not in {"spell_cast", "noncreature_spell_cast"}:
-                continue
-            spell_is_creature = is_creature_card(spell) or "creature" in str(
-                spell.get("type_line") or ""
-            ).lower()
-            if trigger_kind == "noncreature_spell_cast" and spell_is_creature:
-                continue
-            gain_life_amount = int(permanent.get("spell_cast_gain_life_amount") or 0)
-            if gain_life_amount <= 0 or not spell_cast_gain_life_filter_matches(
-                permanent,
-                source_controller,
-                spell,
-                source_zone=source_zone,
-            ):
-                continue
+            for gain_life_source in spell_cast_gain_life_sources_for_permanent(permanent):
+                if not gain_life_source.get("spell_cast_gain_life_any_player"):
+                    continue
+                trigger_kind = gain_life_source.get("trigger")
+                if trigger_kind not in {"spell_cast", "noncreature_spell_cast"}:
+                    continue
+                spell_is_creature = is_creature_card(spell) or "creature" in str(
+                    spell.get("type_line") or ""
+                ).lower()
+                if trigger_kind == "noncreature_spell_cast" and spell_is_creature:
+                    continue
+                gain_life_amount = int(gain_life_source.get("spell_cast_gain_life_amount") or 0)
+                if gain_life_amount <= 0 or not spell_cast_gain_life_filter_matches(
+                    gain_life_source,
+                    source_controller,
+                    spell,
+                    source_zone=source_zone,
+                ):
+                    continue
 
-            def resolve_any_player_spell_cast_gain_life_trigger(
-                permanent=permanent,
-                gain_life_amount=gain_life_amount,
-                source_controller=source_controller,
-                trigger_kind=trigger_kind,
-                spell=spell,
-            ):
-                life_before = source_controller.life
-                gain_life(source_controller, gain_life_amount, cap=999)
-                life_gained = source_controller.life - life_before
-                emit_replay_event(
-                    "trigger_resolved",
-                    player=source_controller.name,
-                    card=permanent.get("name", "?"),
-                    trigger=trigger_kind,
-                    trigger_spell=spell.get("name", "?"),
-                    trigger_spell_controller=getattr(player, "name", None),
-                    effect="gain_life",
-                    life_gain_requested=gain_life_amount,
-                    life_gained=life_gained,
-                    life_before=life_before,
-                    life_after=source_controller.life,
-                    trigger_spell_type_line=spell.get("type_line"),
-                    trigger_spell_source_zone=source_zone,
-                    spell_cast_gain_life_card_types=permanent.get(
-                        "spell_cast_gain_life_card_types"
+                def resolve_any_player_spell_cast_gain_life_trigger(
+                    permanent=gain_life_source,
+                    gain_life_amount=gain_life_amount,
+                    source_controller=source_controller,
+                    trigger_kind=trigger_kind,
+                    spell=spell,
+                ):
+                    life_before = source_controller.life
+                    gain_life(source_controller, gain_life_amount, cap=999)
+                    life_gained = source_controller.life - life_before
+                    emit_replay_event(
+                        "trigger_resolved",
+                        player=source_controller.name,
+                        card=permanent.get("name", "?"),
+                        trigger=trigger_kind,
+                        trigger_spell=spell.get("name", "?"),
+                        trigger_spell_controller=getattr(player, "name", None),
+                        effect="gain_life",
+                        life_gain_requested=gain_life_amount,
+                        life_gained=life_gained,
+                        life_before=life_before,
+                        life_after=source_controller.life,
+                        trigger_spell_type_line=spell.get("type_line"),
+                        trigger_spell_source_zone=source_zone,
+                        spell_cast_gain_life_card_types=permanent.get(
+                            "spell_cast_gain_life_card_types"
+                        )
+                        or [],
+                        spell_cast_gain_life_required_colors=permanent.get(
+                            "spell_cast_gain_life_required_colors"
+                        )
+                        or [],
+                        spell_cast_gain_life_any_player=True,
+                        spell_cast_gain_life_required_chosen_color=bool(
+                            permanent.get("spell_cast_gain_life_required_chosen_color")
+                        ),
+                        chosen_color=permanent.get("chosen_color"),
+                        phase=phase,
+                        turn=turn,
+                        **replay_rule_fields(permanent),
                     )
-                    or [],
-                    spell_cast_gain_life_required_colors=permanent.get(
-                        "spell_cast_gain_life_required_colors"
-                    )
-                    or [],
-                    spell_cast_gain_life_any_player=True,
-                    phase=phase,
-                    turn=turn,
-                    **replay_rule_fields(permanent),
+
+                resolve_or_enqueue_trigger(
+                    source_controller,
+                    gain_life_source,
+                    trigger_kind,
+                    resolve_any_player_spell_cast_gain_life_trigger,
+                    stack=stack,
+                    active_player=active_player,
+                    all_players=all_players,
                 )
-
-            resolve_or_enqueue_trigger(
-                source_controller,
-                permanent,
-                trigger_kind,
-                resolve_any_player_spell_cast_gain_life_trigger,
-                stack=stack,
-                active_player=active_player,
-                all_players=all_players,
-            )
 
 
 def trigger_opponent_spell_draw_engines(
@@ -64446,6 +64495,11 @@ def spell_cast_gain_life_filter_matches(permanent, controller, spell, *, source_
         for value in _as_list(permanent.get("spell_cast_gain_life_required_colors"))
         if _color_symbol(value)
     ]
+    if permanent.get("spell_cast_gain_life_required_chosen_color"):
+        chosen_color = _chosen_color_for_static_source(permanent, controller)
+        if not chosen_color:
+            return False
+        required_colors.append(chosen_color)
     if required_colors and not any(_spell_has_color(spell, color) for color in required_colors):
         return False
     return True

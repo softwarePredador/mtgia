@@ -19543,6 +19543,64 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertEqual(component["static_toughness_bonus"], 0)
         self.assertTrue(component["static_required_chosen_color"])
 
+    def test_chosen_color_mana_source_spell_cast_gain_life_maps_paradise_plume(self) -> None:
+        row = queue_row(
+            split.RAMP_ARTIFACT_UNIT,
+            effect_classes=["AddManaChosenColorEffect", "ChooseColorEffect", "GainLifeEffect"],
+            ability_kind="activated",
+            ability_classes=[
+                "AsEntersBattlefieldAbility",
+                "ParadisePlumeSpellCastTriggeredAbility",
+                "SimpleManaAbility",
+            ],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Paradise Plume",
+                type_line="Artifact",
+                oracle_text=(
+                    "As this artifact enters, choose a color.\n"
+                    "Whenever a player casts a spell of the chosen color, you may gain 1 life.\n"
+                    "{T}: Add one mana of the chosen color."
+                ),
+            ),
+            source_text=(
+                "this.addAbility(new AsEntersBattlefieldAbility(new ChooseColorEffect(Outcome.Detriment)));"
+                "this.addAbility(new ParadisePlumeSpellCastTriggeredAbility());"
+                "this.addAbility(new SimpleManaAbility(Zone.BATTLEFIELD, "
+                "new AddManaChosenColorEffect(), new TapSourceCost()));"
+                "class ParadisePlumeSpellCastTriggeredAbility extends TriggeredAbilityImpl {"
+                "public ParadisePlumeSpellCastTriggeredAbility() {"
+                "super(Zone.BATTLEFIELD, new GainLifeEffect(1), true);"
+                "}"
+                "public boolean checkEventType(GameEvent event, Game game) {"
+                "return event.getType() == GameEvent.EventType.SPELL_CAST;"
+                "}"
+                "public boolean checkTrigger(GameEvent event, Game game) {"
+                "ObjectColor color = (ObjectColor) game.getState().getValue(getSourceId() + \"_color\");"
+                "FilterSpell filter = new FilterSpell();"
+                "filter.add(new ColorPredicate(color));"
+                "Spell spell = game.getStack().getSpell(event.getTargetId());"
+                "return spell != null && filter.match(spell, getControllerId(), this, game);"
+                "}}"
+            ),
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        self.assertEqual(proposal["family_id"], "xmage_chosen_color_mana_source_spell_cast_gain_life")
+        self.assertTrue(proposal["safe_for_batch_pg_package"])
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.MANA_SCOPE)
+        self.assertEqual(effect["ability_kind"], "activated_mana_and_triggered")
+        self.assertTrue(effect["chosen_color_mana"])
+        self.assertEqual(len(effect["_composite_rule_components"]), 1)
+        component = effect["_composite_rule_components"][0]
+        self.assertEqual(component["battle_model_scope"], split.SPELL_CAST_GAIN_LIFE_SCOPE)
+        self.assertEqual(component["spell_cast_gain_life_amount"], 1)
+        self.assertTrue(component["spell_cast_gain_life_any_player"])
+        self.assertTrue(component["spell_cast_gain_life_required_chosen_color"])
+
     def test_simple_mana_source_with_static_keyword_auxiliary_maps(self) -> None:
         row = queue_row(
             split.RAMP_ARTIFACT_UNIT,

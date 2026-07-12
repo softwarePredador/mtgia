@@ -2253,6 +2253,65 @@ def test_chosen_color_mana_source_manifest_preserves_static_component() -> None:
     assert required["_composite_rule_components"][0]["static_required_chosen_color"] is True
 
 
+def test_chosen_color_mana_source_manifest_creates_spell_cast_life_scenario() -> None:
+    proposal = {
+        "normalized_name": "paradise plume",
+        "card_name": "Paradise Plume",
+        "oracle_hash": "hash-paradise-plume",
+        "logical_rule_key": "battle_rule_v1:paradise-plume",
+        "effect_json": {
+            "effect": "ramp_permanent",
+            "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+            "is_mana_source": True,
+            "mana_produced": 1,
+            "produces": "WUBRG",
+            "mana_activation_requires_tap": True,
+            "activation_requires_tap": True,
+            "chosen_color_mana": True,
+            "conditional_mana_same_color_choice": True,
+            "conditional_mana_modes_status": "runtime_executor_v1",
+            "conditional_mana_modes": [
+                {
+                    "color": symbol,
+                    "restriction": "any_spell",
+                    "mode": "chosen_color_mana",
+                    "status": "runtime_executor_v1",
+                }
+                for symbol in "WUBRG"
+            ],
+            "_composite_rule_components": [
+                {
+                    "effect": "life_gain_engine",
+                    "battle_model_scope": "xmage_spell_cast_gain_life_v1",
+                    "trigger": "spell_cast",
+                    "trigger_effect": "gain_life",
+                    "spell_cast_gain_life": True,
+                    "spell_cast_gain_life_amount": 1,
+                    "spell_cast_gain_life_optional": True,
+                    "spell_cast_gain_life_any_player": True,
+                    "spell_cast_gain_life_required_chosen_color": True,
+                }
+            ],
+            "permanent_type": "artifact",
+        },
+    }
+
+    expected = builder.expected_rule_from_proposal(proposal)
+    required = expected["required_effect_fields"]
+    component = required["_composite_rule_components"][0]
+
+    assert required["chosen_color_mana"] is True
+    assert component["battle_model_scope"] == "xmage_spell_cast_gain_life_v1"
+    assert component["spell_cast_gain_life_required_chosen_color"] is True
+
+    scenario = builder.spell_cast_gain_life_execution_scenario_from_expected_rule(expected)
+    assert scenario is not None
+    assert scenario["matching_spell_controller"] == "opponent"
+    assert scenario["card"]["chosen_color"] == "white"
+    assert scenario["matching_spell"]["colors"] == ["W"]
+    assert scenario["nonmatching_spell"]["colors"] == ["U"]
+
+
 def test_self_sacrifice_mana_source_execution_scenario_unlocks_spell() -> None:
     rule = {
         "card_name": "Chromatic Sphere",

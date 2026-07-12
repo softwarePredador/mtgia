@@ -725,6 +725,7 @@ E2E_REQUIRED_EFFECT_FIELDS = (
     "spell_cast_gain_life_amount",
     "spell_cast_gain_life_card_types",
     "spell_cast_gain_life_required_colors",
+    "spell_cast_gain_life_required_chosen_color",
     "spell_cast_gain_life_source_zone",
     "spell_cast_gain_life_optional",
     "spell_cast_gain_life_any_player",
@@ -3321,17 +3322,30 @@ def spell_cast_gain_life_execution_scenario_from_expected_rule(
     rule: dict[str, Any],
 ) -> dict[str, Any] | None:
     required = dict(rule.get("required_effect_fields") or {})
+    scenario_required = required
     if required.get("battle_model_scope") != "xmage_spell_cast_gain_life_v1":
-        return None
-    amount = int(required.get("spell_cast_gain_life_amount") or 0)
+        components = [
+            component
+            for component in required.get("_composite_rule_components") or []
+            if isinstance(component, dict)
+            and component.get("battle_model_scope") == "xmage_spell_cast_gain_life_v1"
+        ]
+        if not components:
+            return None
+        scenario_required = dict(required)
+        scenario_required.update(components[0])
+    amount = int(scenario_required.get("spell_cast_gain_life_amount") or 0)
     if amount <= 0:
         return None
-    trigger = str(required.get("trigger") or "spell_cast")
-    card_types = [str(value) for value in required.get("spell_cast_gain_life_card_types") or []]
+    trigger = str(scenario_required.get("trigger") or "spell_cast")
+    card_types = [str(value) for value in scenario_required.get("spell_cast_gain_life_card_types") or []]
     required_colors = [
         str(value)
-        for value in required.get("spell_cast_gain_life_required_colors") or []
+        for value in scenario_required.get("spell_cast_gain_life_required_colors") or []
     ]
+    required_chosen_color = bool(scenario_required.get("spell_cast_gain_life_required_chosen_color"))
+    if required_chosen_color and not required_colors:
+        required_colors = ["W"]
     matching_spell = {
         "name": f"E2E Matching Spell for {rule['card_name']}",
         "type_line": "Instant",
@@ -3376,14 +3390,17 @@ def spell_cast_gain_life_execution_scenario_from_expected_rule(
         }
     source_effect = required.get("effect") or "life_gain_engine"
     source_type_line = "Creature - Cleric" if source_effect == "creature" else "Artifact"
+    source_card = {
+        "name": rule["card_name"],
+        "type_line": source_type_line,
+        "effect": source_effect,
+    }
+    if required_chosen_color:
+        source_card["chosen_color"] = "white"
     scenario = {
         "name": f"{rule['card_name']} gains life when matching spell is cast",
         "type": "spell_cast_gain_life",
-        "card": {
-            "name": rule["card_name"],
-            "type_line": source_type_line,
-            "effect": source_effect,
-        },
+        "card": source_card,
         "starting_life": 20,
         "matching_spell": matching_spell,
         "nonmatching_spell": nonmatching_spell,
@@ -3392,14 +3409,14 @@ def spell_cast_gain_life_execution_scenario_from_expected_rule(
         "expected_life_after": 20 + amount,
         "logical_rule_key": rule["logical_rule_key"],
     }
-    if required.get("spell_cast_gain_life_any_player"):
+    if scenario_required.get("spell_cast_gain_life_any_player"):
         scenario["matching_spell_controller"] = "opponent"
         if nonmatching_spell is not None:
             scenario["nonmatching_spell_controller"] = "opponent"
-    if required.get("land_enter_gain_life"):
+    if scenario_required.get("land_enter_gain_life"):
         subtypes = [
             str(value).strip()
-            for value in (required.get("land_enter_gain_life_subtypes") or [])
+            for value in (scenario_required.get("land_enter_gain_life_subtypes") or [])
             if str(value).strip()
         ]
         matching_subtype = subtypes[0] if subtypes else "Plains"
@@ -3422,7 +3439,7 @@ def spell_cast_gain_life_execution_scenario_from_expected_rule(
             "effect": "land",
         }
         scenario["expected_land_life_after"] = (
-            20 + amount + int(required.get("land_enter_gain_life_amount") or amount)
+            20 + amount + int(scenario_required.get("land_enter_gain_life_amount") or amount)
         )
         scenario["expected_land_subtypes"] = subtypes
     return scenario
@@ -9734,6 +9751,7 @@ def execution_scenario_from_expected_rule(rule: dict[str, Any]) -> dict[str, Any
         or static_cant_block_creature_execution_scenario_from_expected_rule(rule)
         or spell_mana_ritual_execution_scenario_from_expected_rule(rule)
         or creature_etb_life_gain_draw_execution_scenario_from_expected_rule(rule)
+        or spell_cast_gain_life_execution_scenario_from_expected_rule(rule)
         or simple_mana_source_execution_scenario_from_expected_rule(rule)
         or sacrifice_mana_source_execution_scenario_from_expected_rule(rule)
         or damage_each_opponent_spell_execution_scenario_from_expected_rule(rule)
@@ -9806,7 +9824,6 @@ def execution_scenario_from_expected_rule(rule: dict[str, Any]) -> dict[str, Any
         or creature_etb_draw_execution_scenario_from_expected_rule(rule)
         or creature_etb_draw_discard_execution_scenario_from_expected_rule(rule)
         or creature_etb_target_stat_modifier_execution_scenario_from_expected_rule(rule)
-        or spell_cast_gain_life_execution_scenario_from_expected_rule(rule)
         or spell_cast_token_maker_execution_scenario_from_expected_rule(rule)
     )
 

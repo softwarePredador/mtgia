@@ -27644,6 +27644,78 @@ def chosen_color_controlled_pt_component_from_source(source: str) -> dict[str, A
     }
 
 
+def chosen_color_spell_cast_gain_life_component_from_oracle(metadata: dict[str, Any]) -> dict[str, Any] | str | None:
+    lines = normalized_oracle_lines(metadata)
+    if not any(re.fullmatch(r"as this artifact enters, choose a color\.?", line) for line in lines):
+        return None
+    gain_lines = [
+        line
+        for line in lines
+        if re.fullmatch(
+            r"whenever a player casts a spell of the chosen color, you may gain \d+ life\.?",
+            line,
+        )
+    ]
+    if len(gain_lines) != 1:
+        return None
+    match = re.fullmatch(
+        r"whenever a player casts a spell of the chosen color, you may gain (?P<amount>\d+) life\.?",
+        gain_lines[0],
+    )
+    if not match:
+        return None
+    amount = int(match.group("amount"))
+    if amount <= 0:
+        return "chosen_color_spell_cast_gain_life_oracle_amount_not_supported"
+    return {
+        "effect": "life_gain_engine",
+        "battle_model_scope": SPELL_CAST_GAIN_LIFE_SCOPE,
+        "ability_kind": "triggered",
+        "trigger": "spell_cast",
+        "trigger_effect": "gain_life",
+        "spell_cast_gain_life": True,
+        "spell_cast_gain_life_amount": amount,
+        "spell_cast_gain_life_optional": True,
+        "spell_cast_gain_life_any_player": True,
+        "spell_cast_gain_life_required_chosen_color": True,
+        "xmage_effect_class": "GainLifeEffect",
+        "xmage_ability_class": "ParadisePlumeSpellCastTriggeredAbility",
+    }
+
+
+def chosen_color_spell_cast_gain_life_component_from_source(source: str) -> dict[str, Any] | str | None:
+    text = source or ""
+    if "class ParadisePlumeSpellCastTriggeredAbility" not in text:
+        return None
+    if "new AsEntersBattlefieldAbility(new ChooseColorEffect" not in text:
+        return "chosen_color_spell_cast_gain_life_source_choice_missing"
+    if "new AddManaChosenColorEffect()" not in text:
+        return "chosen_color_spell_cast_gain_life_source_mana_missing"
+    if "GameEvent.EventType.SPELL_CAST" not in text:
+        return "chosen_color_spell_cast_gain_life_source_trigger_missing"
+    if 'getSourceId() + "_color"' not in text:
+        return "chosen_color_spell_cast_gain_life_source_chosen_color_missing"
+    if "new ColorPredicate(color)" not in text:
+        return "chosen_color_spell_cast_gain_life_source_color_predicate_missing"
+    amount = java_gain_life_effect_amount(text)
+    if amount is None or amount <= 0:
+        return "chosen_color_spell_cast_gain_life_source_amount_not_fixed"
+    return {
+        "effect": "life_gain_engine",
+        "battle_model_scope": SPELL_CAST_GAIN_LIFE_SCOPE,
+        "ability_kind": "triggered",
+        "trigger": "spell_cast",
+        "trigger_effect": "gain_life",
+        "spell_cast_gain_life": True,
+        "spell_cast_gain_life_amount": amount,
+        "spell_cast_gain_life_optional": True,
+        "spell_cast_gain_life_any_player": True,
+        "spell_cast_gain_life_required_chosen_color": True,
+        "xmage_effect_class": "GainLifeEffect",
+        "xmage_ability_class": "ParadisePlumeSpellCastTriggeredAbility",
+    }
+
+
 def simple_mana_source_costs_from_phrase(cost_phrase: str) -> dict[str, Any] | None:
     requires_tap = False
     activation_symbols: list[str] = []
@@ -46554,6 +46626,60 @@ def split_row(
                     metadata,
                     effect_json,
                     family_id="xmage_chosen_color_mana_source_static_controlled_pt_boost",
+                ), "selected_exact_scope"
+            chosen_color_life_oracle = chosen_color_spell_cast_gain_life_component_from_oracle(metadata)
+            chosen_color_life_source = chosen_color_spell_cast_gain_life_component_from_source(source_text)
+            if isinstance(chosen_color_life_oracle, str):
+                return None, chosen_color_life_oracle
+            if isinstance(chosen_color_life_source, str):
+                return None, chosen_color_life_source
+            if chosen_color_life_oracle is not None or chosen_color_life_source is not None:
+                if chosen_color_life_oracle is None:
+                    return None, "chosen_color_spell_cast_gain_life_oracle_not_exact"
+                if chosen_color_life_source is None:
+                    return None, "chosen_color_spell_cast_gain_life_source_not_exact"
+                if chosen_color_life_oracle != chosen_color_life_source:
+                    return None, "chosen_color_spell_cast_gain_life_source_oracle_mismatch"
+                expected_unmodeled_effects = {"GainLifeEffect"}
+                expected_auxiliary_abilities = {
+                    "AsEntersBattlefieldAbility",
+                    "ParadisePlumeSpellCastTriggeredAbility",
+                }
+                if not expected_unmodeled_effects.issubset(set(non_mana_effect_classes)):
+                    return None, "chosen_color_spell_cast_gain_life_effect_class_missing"
+                if not expected_auxiliary_abilities.issubset(set(auxiliary_abilities)):
+                    return None, "chosen_color_spell_cast_gain_life_ability_class_missing"
+                remaining_effect_classes = sorted(set(non_mana_effect_classes) - expected_unmodeled_effects)
+                remaining_auxiliary_abilities = sorted(
+                    set(unsupported_auxiliary_abilities) - expected_auxiliary_abilities
+                )
+                if remaining_effect_classes or remaining_auxiliary_abilities:
+                    return None, "chosen_color_spell_cast_gain_life_extra_auxiliary_not_supported"
+                effect_json = {
+                    "effect": "ramp_permanent",
+                    "battle_model_scope": MANA_SCOPE,
+                    "is_mana_source": True,
+                    "mana_produced": int(mana_source_detail["mana_produced"]),
+                    "produces": str(mana_source_detail["produces"]),
+                    "activation_requires_tap": mana_requires_tap,
+                    "mana_activation_requires_tap": mana_requires_tap,
+                    "permanent_type": permanent_type,
+                    "ability_kind": "activated_mana_and_triggered",
+                    "_composite_rule_components": [chosen_color_life_source],
+                    "xmage_mana_ability_classes": sorted(
+                        mana_ability_classes & SAFE_MANA_ABILITY_CLASSES
+                    ),
+                    "xmage_auxiliary_ability_classes": sorted(auxiliary_abilities),
+                    "xmage_effect_classes": sorted(classes),
+                    "xmage_ability_classes": sorted(mana_ability_classes),
+                    "modeled_ability_subset": "mana_source_and_chosen_color_spell_cast_gain_life",
+                }
+                add_mana_source_activation_detail_fields(effect_json, mana_source_detail)
+                return build_proposal(
+                    row,
+                    metadata,
+                    effect_json,
+                    family_id="xmage_chosen_color_mana_source_spell_cast_gain_life",
                 ), "selected_exact_scope"
             if static_info_texts:
                 effect_json = {

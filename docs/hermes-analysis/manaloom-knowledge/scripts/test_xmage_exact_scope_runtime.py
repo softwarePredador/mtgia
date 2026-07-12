@@ -6190,6 +6190,70 @@ class XMageExactScopeRuntimeTest(unittest.TestCase):
             )
         )
 
+    def test_composite_chosen_color_spell_cast_gain_life_triggers_for_any_player(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        opponent = self.battle.Player("Opponent", None, [])
+        active.life = 20
+        plume = {
+            "name": "Paradise Plume",
+            "type_line": "Artifact",
+            "effect": "ramp_permanent",
+            "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+            "is_mana_source": True,
+            "mana_produced": 1,
+            "produces": "WUBRG",
+            "chosen_color": "white",
+            "chosen_color_mana": True,
+            "conditional_mana_same_color_choice": True,
+            "_rule_logical_key": "battle_rule_v1:paradise-plume-test",
+            "_composite_rule_components": [
+                {
+                    "effect": "life_gain_engine",
+                    "battle_model_scope": "xmage_spell_cast_gain_life_v1",
+                    "trigger": "spell_cast",
+                    "trigger_effect": "gain_life",
+                    "spell_cast_gain_life": True,
+                    "spell_cast_gain_life_amount": 1,
+                    "spell_cast_gain_life_optional": True,
+                    "spell_cast_gain_life_any_player": True,
+                    "spell_cast_gain_life_required_chosen_color": True,
+                }
+            ],
+        }
+        active.battlefield.append(plume)
+
+        self.battle.trigger_spell_cast_engines(
+            opponent,
+            [active, opponent],
+            {"name": "Blue Instant", "type_line": "Instant", "colors": ["U"], "cmc": 2},
+            turn=4,
+            phase="precombat_main",
+        )
+        self.assertEqual(active.life, 20)
+
+        self.battle.trigger_spell_cast_engines(
+            opponent,
+            [active, opponent],
+            {"name": "White Instant", "type_line": "Instant", "colors": ["W"], "cmc": 2},
+            turn=4,
+            phase="precombat_main",
+        )
+        self.assertEqual(active.life, 21)
+        self.assertEqual(plume["chosen_color"], "white")
+        self.assertTrue(
+            any(
+                event == "trigger_resolved"
+                and data.get("card") == "Paradise Plume"
+                and data.get("trigger_spell") == "White Instant"
+                and data.get("trigger_spell_controller") == "Opponent"
+                and data.get("life_gain_requested") == 1
+                and data.get("spell_cast_gain_life_required_chosen_color") is True
+                and data.get("chosen_color") == "white"
+                and data.get("rule_logical_key") == "battle_rule_v1:paradise-plume-test"
+                for event, data in self.events
+            )
+        )
+
     def test_spell_cast_add_counters_grows_source_for_matching_noncreature_spell(self) -> None:
         active = self.battle.Player("Active", None, [])
         opponent = self.battle.Player("Opponent", None, [])
