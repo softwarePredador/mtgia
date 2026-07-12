@@ -2298,6 +2298,56 @@ class XMageExactScopeRuntimeTest(unittest.TestCase):
                     )
                 )
 
+    def test_static_count_power_toughness_adds_base_to_controlled_subtype_count(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        opponent = self.battle.Player("Opponent", None, [])
+        aysen = {
+            "name": "Aysen Crusader",
+            "type_line": "Creature - Human Knight",
+            "effect": "creature",
+            "power": 2,
+            "toughness": 2,
+            "battle_model_scope": "xmage_static_source_power_toughness_equal_count_v1",
+            "static_effect": "source_power_toughness_equal_count",
+            "static_power_toughness_source": "battlefield_permanent_count",
+            "stat_modifier_amount_source": "battlefield_permanent_count",
+            "static_power_toughness_base": 2,
+            "static_power_toughness_count_multiplier": 1,
+            "battlefield_count_scope": "controller_battlefield",
+            "battlefield_count_subtypes": ["soldier", "warrior"],
+        }
+        active.battlefield = [
+            {"name": "Benalish Infantry", "type_line": "Creature - Soldier"},
+            {"name": "Kargan Veteran", "type_line": "Creature - Warrior"},
+            {"name": "Academy Mage", "type_line": "Creature - Wizard"},
+            aysen,
+        ]
+        opponent.battlefield = [
+            {"name": "Opponent Soldier", "type_line": "Creature - Soldier"},
+        ]
+        self.events.clear()
+
+        self.battle.refresh_graveyard_count_creature_statics_for_player(
+            active,
+            turn=5,
+            phase="test",
+            emit_events=True,
+            all_players=[active, opponent],
+        )
+
+        self.assertEqual(aysen["static_count_power_toughness_current"], 4)
+        self.assertEqual(aysen["power"], 4)
+        self.assertEqual(aysen["toughness"], 4)
+        self.assertTrue(
+            any(
+                event == "static_count_power_toughness_changed"
+                and data.get("card") == "Aysen Crusader"
+                and data.get("static_power_toughness_base") == 2
+                and data.get("static_count_power_toughness_count") == 2
+                for event, data in self.events
+            )
+        )
+
     def test_static_graveyard_threshold_source_boost_toggles_without_cumulative_bonus(self) -> None:
         active = self.battle.Player("Active", None, [])
         active.graveyard = [

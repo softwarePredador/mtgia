@@ -3940,6 +3940,44 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertEqual(effect["battlefield_count_subtypes"], ["forest"])
         self.assertEqual(effect["keywords"], ["hexproof"])
 
+    def test_static_count_power_toughness_base_plus_controlled_subtypes_is_package_safe(self) -> None:
+        row = queue_row(
+            "xmage_signature::SetBasePowerToughnessSourceEffect::SimpleStaticAbility::"
+            "no_target_class::no_condition_class::static_ability",
+            effect_classes=["SetBasePowerToughnessSourceEffect"],
+            ability_kind="static",
+            ability_classes=["SimpleStaticAbility"],
+            xmage_signals=["static_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Aysen Crusader",
+                type_line="Creature - Human Knight",
+                oracle_text=(
+                    "Aysen Crusader's power and toughness are each equal to "
+                    "2 plus the number of Soldiers and Warriors you control."
+                ),
+            ),
+            source_text=(
+                "private static final FilterPermanent filter = new FilterControlledPermanent("
+                "\"Soldiers and Warriors you control\");"
+                "filter.add(Predicates.or(SubType.SOLDIER.getPredicate(), "
+                "SubType.WARRIOR.getPredicate()));"
+                "private static final DynamicValue value = new IntPlusDynamicValue(2, "
+                "new PermanentsOnBattlefieldCount(filter));"
+                "this.addAbility(new SimpleStaticAbility(Zone.ALL, "
+                "new SetBasePowerToughnessSourceEffect(value)));"
+            ),
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.STATIC_COUNT_PT_SCOPE)
+        self.assertEqual(effect["static_power_toughness_base"], 2)
+        self.assertEqual(effect["battlefield_count_scope"], "controller_battlefield")
+        self.assertEqual(effect["battlefield_count_subtypes"], ["soldier", "warrior"])
+
     def test_static_count_power_toughness_hand_size_variants_are_package_safe(self) -> None:
         row = queue_row(
             "xmage_signature::SetBasePowerToughnessSourceEffect::SimpleStaticAbility::"

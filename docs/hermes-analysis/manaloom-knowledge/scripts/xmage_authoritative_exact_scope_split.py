@@ -10951,6 +10951,25 @@ def static_count_pt_from_oracle(metadata: dict[str, Any]) -> dict[str, Any] | No
                 STATIC_COUNT_PT_BASIC_LAND_SUBTYPES[basic_land_match.group("subtype")]
             ],
         )
+    base_plus_controlled_subtypes_match = re.match(
+        r"^[a-z0-9' ,./-]+ power and toughness are each equal to "
+        r"(?P<base>\d+) plus the number of (?P<subtype_a>[a-z][a-z -]+) "
+        r"and (?P<subtype_b>[a-z][a-z -]+) you control\.?$",
+        text,
+    )
+    if base_plus_controlled_subtypes_match:
+        subtypes = [
+            static_count_pt_subtype_token(base_plus_controlled_subtypes_match.group("subtype_a")),
+            static_count_pt_subtype_token(base_plus_controlled_subtypes_match.group("subtype_b")),
+        ]
+        if all(subtype and " " not in subtype for subtype in subtypes):
+            return static_count_pt_result(
+                static_power_toughness_base=int(
+                    base_plus_controlled_subtypes_match.group("base")
+                ),
+                battlefield_count_scope="controller_battlefield",
+                battlefield_count_subtypes=subtypes,
+            )
     if re.match(
         r"^[a-z0-9' ,./-]+ power and toughness are each equal to the number of cards in your hand\.?$",
         text,
@@ -11004,6 +11023,15 @@ def static_count_pt_source_subtypes(source: str) -> list[str]:
         token.lower().replace("_", " ")
         for token in re.findall(r"\.add\s*\(\s*SubType\.([A-Z0-9_]+)\.getPredicate\s*\(\s*\)\s*\)", source or "")
     ]
+
+
+def static_count_pt_source_predicate_subtypes(source: str) -> list[str]:
+    subtypes = []
+    for token in re.findall(r"SubType\.([A-Z0-9_]+)\.getPredicate\s*\(\s*\)", source or ""):
+        subtype = token.lower().replace("_", " ")
+        if subtype not in subtypes:
+            subtypes.append(subtype)
+    return subtypes
 
 
 def static_count_pt_source_color_symbols(source: str) -> list[str]:
@@ -11062,6 +11090,20 @@ def static_count_pt_from_source(source: str) -> dict[str, Any] | str | None:
             stat_modifier_amount_source="controller_hand_count",
             static_power_toughness_count_multiplier=multiplier,
         )
+    int_plus_battlefield_count = re.search(
+        r"new\s+IntPlusDynamicValue\s*\(\s*(?P<base>\d+)\s*,\s*new\s+PermanentsOnBattlefieldCount\s*\(",
+        text,
+    )
+    if int_plus_battlefield_count and (
+        "FilterControlledPermanent" in text or "you control" in text
+    ):
+        subtypes = static_count_pt_source_predicate_subtypes(text)
+        if subtypes:
+            return static_count_pt_result(
+                static_power_toughness_base=int(int_plus_battlefield_count.group("base")),
+                battlefield_count_scope="controller_battlefield",
+                battlefield_count_subtypes=subtypes,
+            )
     blocked_markers = (
         "AdditiveDynamicValue",
         "IntPlusDynamicValue",

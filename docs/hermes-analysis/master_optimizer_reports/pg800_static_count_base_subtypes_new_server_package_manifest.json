@@ -1,0 +1,131 @@
+{
+  "apply_gate": "Do not run apply SQL without explicit approval for the exact command.",
+  "backup_table": "manaloom_deploy_audit.pg800_static_count_base_subtypes_new_ser_20260712_015848",
+  "deploy_id": "pg800",
+  "execution_scenarios": [
+    {
+      "card": {
+        "effect": "creature",
+        "name": "Aysen Crusader",
+        "power": 0,
+        "toughness": 0,
+        "type_line": "Creature - Soldier"
+      },
+      "controller_battlefield": [
+        {
+          "name": "E2E Matching Creature for Aysen Crusader",
+          "type_line": "Creature - Soldier"
+        }
+      ],
+      "controller_hand": [],
+      "expected_count": 2,
+      "expected_power": 4,
+      "expected_toughness": 4,
+      "logical_rule_key": "battle_rule_v1:f284ae7cb4a3dcda5810234eb044d041",
+      "name": "Aysen Crusader static count P/T recalculates",
+      "opponent_battlefield": [],
+      "opponent_hand": [],
+      "type": "static_count_power_toughness"
+    }
+  ],
+  "expected_rules": [
+    {
+      "card_name": "Aysen Crusader",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:f284ae7cb4a3dcda5810234eb044d041",
+      "min_rule_version": 2,
+      "normalized_name": "aysen crusader",
+      "oracle_hash": "6a88ec3bf7902c51e92f010fd0d94ac1",
+      "required_effect_fields": {
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_source_power_toughness_equal_count_v1",
+        "battlefield_count_scope": "controller_battlefield",
+        "battlefield_count_subtypes": [
+          "soldier",
+          "warrior"
+        ],
+        "dynamic_power_equals_count": true,
+        "dynamic_toughness_equals_count": true,
+        "effect": "creature",
+        "stat_modifier_amount_source": "battlefield_permanent_count",
+        "static_effect": "source_power_toughness_equal_count",
+        "static_power_toughness_base": 2,
+        "static_power_toughness_count_multiplier": 1,
+        "static_power_toughness_source": "battlefield_permanent_count",
+        "target": "self",
+        "target_controller": "self",
+        "xmage_ability_class": "SimpleStaticAbility",
+        "xmage_effect_class": "SetBasePowerToughnessSourceEffect"
+      },
+      "review_status": "verified"
+    }
+  ],
+  "family_counts": {
+    "xmage_static_source_power_toughness_equal_count": 1
+  },
+  "files": {
+    "apply": "docs/hermes-analysis/master_optimizer_reports/pg800_static_count_base_subtypes_new_server_package_apply.sql",
+    "manifest": "docs/hermes-analysis/master_optimizer_reports/pg800_static_count_base_subtypes_new_server_package_manifest.json",
+    "package": "docs/hermes-analysis/master_optimizer_reports/pg800_static_count_base_subtypes_new_server_package_package.md",
+    "postcheck": "docs/hermes-analysis/master_optimizer_reports/pg800_static_count_base_subtypes_new_server_package_postcheck.sql",
+    "precheck": "docs/hermes-analysis/master_optimizer_reports/pg800_static_count_base_subtypes_new_server_package_precheck.sql",
+    "rollback": "docs/hermes-analysis/master_optimizer_reports/pg800_static_count_base_subtypes_new_server_package_rollback.sql"
+  },
+  "generated_at": "2026-07-12T01:58:48+00:00",
+  "mutations_performed": [],
+  "runtime_checks": [
+    {
+      "card": {
+        "name": "Aysen Crusader"
+      },
+      "card_name": "Aysen Crusader",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:f284ae7cb4a3dcda5810234eb044d041",
+      "normalized_name": "aysen crusader",
+      "required_effect_fields": {
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_source_power_toughness_equal_count_v1",
+        "battlefield_count_scope": "controller_battlefield",
+        "battlefield_count_subtypes": [
+          "soldier",
+          "warrior"
+        ],
+        "dynamic_power_equals_count": true,
+        "dynamic_toughness_equals_count": true,
+        "effect": "creature",
+        "stat_modifier_amount_source": "battlefield_permanent_count",
+        "static_effect": "source_power_toughness_equal_count",
+        "static_power_toughness_base": 2,
+        "static_power_toughness_count_multiplier": 1,
+        "static_power_toughness_source": "battlefield_permanent_count",
+        "target": "self",
+        "target_controller": "self",
+        "xmage_ability_class": "SimpleStaticAbility",
+        "xmage_effect_class": "SetBasePowerToughnessSourceEffect"
+      }
+    }
+  ],
+  "selected_card_names": [
+    "Aysen Crusader"
+  ],
+  "selected_count": 1,
+  "slug": "static_count_base_subtypes_new_server",
+  "snapshot_checks": [
+    {
+      "card_name": "Aysen Crusader",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:f284ae7cb4a3dcda5810234eb044d041",
+      "min_rule_version": 2,
+      "normalized_name": "aysen crusader",
+      "oracle_hash": "6a88ec3bf7902c51e92f010fd0d94ac1",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_static_source_power_toughness_equal_count_v1"
+      },
+      "review_status": "verified"
+    }
+  ],
+  "status": "prepared_read_only_pending_apply_approval"
+}

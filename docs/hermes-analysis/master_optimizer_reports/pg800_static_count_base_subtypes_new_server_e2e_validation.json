@@ -1,0 +1,104 @@
+{
+  "battle_execution": {
+    "event_count": 1,
+    "results": [
+      {
+        "card_name": "Aysen Crusader",
+        "count": 2,
+        "power": 4,
+        "scenario": "Aysen Crusader static count P/T recalculates",
+        "toughness": 4
+      }
+    ],
+    "scenario_count": 1
+  },
+  "battle_path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py",
+  "database_target": "127.0.0.1:15432/halder",
+  "generated_at_utc": "2026-07-12T02:04:43.750670+00:00",
+  "manifest": "docs/hermes-analysis/master_optimizer_reports/pg800_static_count_base_subtypes_new_server_package_manifest.json",
+  "package_id": "pg800_static_count_base_subtypes_new_server_package_manifest",
+  "snapshot": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/known_cards_canonical_snapshot.json",
+  "sqlite_db": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db",
+  "stages": [
+    {
+      "evidence": {
+        "validated_rows": 1
+      },
+      "name": "postgres_source_of_truth",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_source_power_toughness_equal_count_v1",
+          "card_name": "Aysen Crusader",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:f284ae7cb4a3dcda5810234eb044d041",
+          "oracle_hash": "6a88ec3bf7902c51e92f010fd0d94ac1",
+          "review_status": "verified",
+          "rule_version": 2
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_rows": 1
+      },
+      "name": "sqlite_hermes_cache",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_source_power_toughness_equal_count_v1",
+          "card_name": "Aysen Crusader",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:f284ae7cb4a3dcda5810234eb044d041",
+          "oracle_hash": "6a88ec3bf7902c51e92f010fd0d94ac1",
+          "review_status": "verified",
+          "rule_version": 2
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_cards": 1
+      },
+      "name": "canonical_snapshot_fallback",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_source_power_toughness_equal_count_v1",
+          "battle_rule_version": 2,
+          "card_name": "Aysen Crusader",
+          "logical_rule_key": "battle_rule_v1:f284ae7cb4a3dcda5810234eb044d041"
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_cards": 1
+      },
+      "name": "runtime_get_card_effect",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "card_name": "Aysen Crusader",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:f284ae7cb4a3dcda5810234eb044d041"
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "events": 1,
+        "scenarios": 1
+      },
+      "name": "battle_execution",
+      "status": "pass"
+    }
+  ],
+  "status": "pass",
+  "title": "Battle Package End-to-End Validation"
+}
