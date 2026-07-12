@@ -11101,6 +11101,90 @@ class XMageExactScopeRuntimeTest(unittest.TestCase):
             )
         )
 
+    def test_composite_boost_add_counter_spell_resolves_both_components_once(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        opponent = self.battle.Player("Opponent", None, [])
+        target = {
+            "name": "Active Bear",
+            "type_line": "Creature - Bear",
+            "power": 2,
+            "toughness": 2,
+        }
+        active.battlefield = [target]
+        effect = {
+            "effect": "composite_resolution",
+            "battle_model_scope": "xmage_fixed_boost_target_creature_until_eot_add_counter_spell_v1",
+            "target": "creature",
+            "target_constraints": {"card_types": ["creature"]},
+            "target_controller": "any",
+            "power_delta": 2,
+            "toughness_delta": 2,
+            "counter_type": "flying",
+            "counter_count": 1,
+            "_composite_rule_components": [
+                {
+                    "effect": "stat_modifier_until_eot",
+                    "battle_model_scope": "xmage_fixed_boost_target_creature_until_eot_spell_v1",
+                    "target": "creature",
+                    "target_constraints": {"card_types": ["creature"]},
+                    "target_controller": "any",
+                    "power_delta": 2,
+                    "toughness_delta": 2,
+                    "compose_on_resolution": True,
+                },
+                {
+                    "effect": "add_counters",
+                    "battle_model_scope": "xmage_fixed_add_counters_target_creature_spell_v1",
+                    "target": "creature",
+                    "target_constraints": {"card_types": ["creature"]},
+                    "target_controller": "any",
+                    "counter_type": "flying",
+                    "counter_count": 1,
+                    "count": 1,
+                    "compose_on_resolution": True,
+                },
+            ],
+        }
+        card = {
+            "name": "Fixture Spontaneous Flight",
+            "type_line": "Instant",
+            "oracle_text": "Target creature gets +2/+2 until end of turn. Put a flying counter on it.",
+        }
+
+        self.battle.apply_effect_immediate(
+            active,
+            [opponent],
+            card,
+            turn=5,
+            rng=random.Random(49),
+            effect_data_override=effect,
+        )
+
+        self.assertEqual(target["power"], 4)
+        self.assertEqual(target["toughness"], 4)
+        self.assertEqual(self.battle.get_named_counter_count(target, "flying"), 1)
+        self.assertTrue(self.battle.card_has_keyword(target, "flying"))
+        self.assertEqual([card["name"] for card in active.graveyard], ["Fixture Spontaneous Flight"])
+        self.assertTrue(
+            any(
+                event == "add_counters_resolved"
+                and data.get("card") == "Fixture Spontaneous Flight"
+                and data.get("target") == "Active Bear"
+                and data.get("counter_type") == "flying"
+                and data.get("counters_added") == 1
+                for event, data in self.events
+            )
+        )
+        self.assertTrue(
+            any(
+                event == "composite_rule_resolved"
+                and data.get("card") == "Fixture Spontaneous Flight"
+                and data.get("components_applied") == 2
+                and data.get("components_skipped") == 0
+                for event, data in self.events
+            )
+        )
+
     def test_composite_global_boost_draw_spell_resolves_both_components_once(self) -> None:
         active = self.battle.Player("Active", None, [{"name": "Drawn Card"}])
         opponent = self.battle.Player("Opponent", None, [])

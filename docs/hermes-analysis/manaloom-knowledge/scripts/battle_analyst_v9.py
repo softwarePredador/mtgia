@@ -4325,6 +4325,11 @@ def card_has_keyword(card, keyword):
     normalized_keyword = str(keyword or "").lower().replace(" ", "_")
     if card.get(normalized_keyword):
         return True
+    counters = card.get("counters")
+    if isinstance(counters, dict) and int(counters.get(normalized_keyword) or 0) > 0:
+        return True
+    if int(card.get(f"{normalized_keyword}_counters") or 0) > 0:
+        return True
     if normalized_keyword in _oracle_self_keyword_values(card):
         return True
     if card.get("_keywords_are_self") or not str(card.get("oracle_text") or "").strip():
@@ -9834,6 +9839,7 @@ CANONICAL_RUNTIME_ENRICHMENT_KEYS = {
 
 
 COMPOSABLE_RESOLUTION_EFFECTS = {
+    "add_counters",
     "draw_cards",
     "life_total_change",
     "stat_modifier_until_eot",
@@ -68524,6 +68530,39 @@ def resolve_composite_resolution_effect(player, opponents, card, effect_data, tu
                     **dynamic_replay_fields,
                     **component_fields,
                 )
+        elif component_effect == "add_counters":
+            component_payload = dict(component)
+            component_payload["_composite_component_index"] = index
+            target_result = resolve_add_counters_target_effect(
+                player,
+                opponents,
+                card,
+                component_payload,
+                turn,
+                finish_spell=False,
+                phase=phase,
+            )
+            targets = (
+                [target for target in target_result if isinstance(target, dict)]
+                if isinstance(target_result, list)
+                else ([target_result] if isinstance(target_result, dict) else [])
+            )
+            counter_count = int(component.get("counter_count") or component.get("count") or 1)
+            if not targets:
+                outcome = "no_legal_target"
+                skipped.append({"effect": component_effect, "reason": outcome})
+            else:
+                outcome = "add_counters_resolved"
+                summary = {
+                    "effect": component_effect,
+                    "target_count": len(targets),
+                    "targets": [target.get("name", "?") for target in targets],
+                    "counter_type": str(component.get("counter_type") or "+1/+1"),
+                    "counter_count": counter_count,
+                }
+                if len(targets) == 1:
+                    summary["target"] = targets[0].get("name", "?")
+                applied.append(summary)
         elif component_effect == "stat_modifier_until_eot":
             component_payload = dict(component)
             component_payload["_composite_component_index"] = index

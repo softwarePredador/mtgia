@@ -8852,6 +8852,124 @@ def run_add_counters_target_spell(
     }
 
 
+def run_boost_add_counter_target_spell(
+    battle,
+    scenario: dict[str, Any],
+    events: list[tuple[str, dict[str, Any]]],
+) -> dict[str, Any]:
+    card = dict(scenario["card"])
+    active = battle.Player(str(scenario.get("player") or "Boost Counter Controller"), None, [])
+    opponent = battle.Player(str(scenario.get("opponent") or "Boost Counter Opponent"), None, [])
+    target = battle.enrich_card(dict(scenario.get("target") or {}))
+    if not target:
+        fail("battle_execution", f"{card['name']} boost-add-counter scenario has no legal target")
+    target.setdefault("effect", "creature")
+    target.setdefault("power", 2)
+    target.setdefault("toughness", 2)
+    active.battlefield = [target]
+    nonmatching = scenario.get("nonmatching_target")
+    if nonmatching:
+        active.battlefield.append(battle.enrich_card(dict(nonmatching)))
+    effect = battle.get_card_effect(card)
+    if effect.get("effect") != "composite_resolution":
+        fail("battle_execution", f"{card['name']} effect={effect.get('effect')!r}")
+    if effect.get("battle_model_scope") != "xmage_fixed_boost_target_creature_until_eot_add_counter_spell_v1":
+        fail("battle_execution", f"{card['name']} scope={effect.get('battle_model_scope')!r}")
+    expected_power_delta = int(scenario.get("expected_power_delta") or effect.get("power_delta") or 0)
+    expected_toughness_delta = int(scenario.get("expected_toughness_delta") or effect.get("toughness_delta") or 0)
+    expected_counter_type = str(scenario.get("expected_counter_type") or effect.get("counter_type") or "+1/+1")
+    expected_counter_count = int(scenario.get("expected_counter_count") or effect.get("counter_count") or 1)
+    power_before = int(target.get("power") or 0)
+    toughness_before = int(target.get("toughness") or target.get("power") or 0)
+    counter_before = _counter_value(battle, target, expected_counter_type)
+    before_events = len(events)
+    battle.apply_effect_immediate(
+        active,
+        [opponent],
+        battle.enrich_card({**card, **effect}),
+        turn=int(scenario.get("turn") or 7),
+        rng=random.Random(int(scenario.get("seed") or 6084)),
+        effect_data_override=effect,
+        phase=str(scenario.get("phase") or "precombat_main"),
+    )
+    if int(target.get("power") or 0) != power_before + expected_power_delta:
+        fail(
+            "battle_execution",
+            f"{card['name']} power={target.get('power')}, expected {power_before + expected_power_delta}",
+        )
+    if int(target.get("toughness") or 0) != toughness_before + expected_toughness_delta:
+        fail(
+            "battle_execution",
+            f"{card['name']} toughness={target.get('toughness')}, expected {toughness_before + expected_toughness_delta}",
+        )
+    counter_after = _counter_value(battle, target, expected_counter_type)
+    if counter_after - counter_before != expected_counter_count:
+        fail(
+            "battle_execution",
+            f"{card['name']} expected {expected_counter_count} {expected_counter_type} counters, got {counter_after - counter_before}",
+        )
+    for keyword in scenario.get("expected_keywords") or []:
+        if not battle.card_has_keyword(target, str(keyword)):
+            fail("battle_execution", f"{card['name']} expected keyword from counter {keyword!r}")
+    stat_event = next(
+        (
+            data
+            for event, data in events[before_events:]
+            if event == "stat_modifier_until_eot_resolved"
+            and data.get("card") == card.get("name")
+            and data.get("target") == target.get("name")
+        ),
+        None,
+    )
+    if stat_event is None:
+        fail("battle_events", f"missing {card['name']} stat_modifier_until_eot_resolved event")
+    counter_event = next(
+        (
+            data
+            for event, data in events[before_events:]
+            if event == "add_counters_resolved"
+            and data.get("card") == card.get("name")
+            and data.get("target") == target.get("name")
+        ),
+        None,
+    )
+    if counter_event is None:
+        fail("battle_events", f"missing {card['name']} add_counters_resolved event")
+    if int(counter_event.get("counters_added") or 0) != expected_counter_count:
+        fail(
+            "battle_events",
+            f"{card['name']} counters_added={counter_event.get('counters_added')}, expected {expected_counter_count}",
+        )
+    composite_event = next(
+        (
+            data
+            for event, data in events[before_events:]
+            if event == "composite_rule_resolved"
+            and data.get("card") == card.get("name")
+        ),
+        None,
+    )
+    if composite_event is None:
+        fail("battle_events", f"missing {card['name']} composite_rule_resolved event")
+    expected_component_count = int(scenario.get("expected_component_count") or 2)
+    if int(composite_event.get("components_applied") or 0) != expected_component_count:
+        fail(
+            "battle_events",
+            f"{card['name']} components_applied={composite_event.get('components_applied')}, expected {expected_component_count}",
+        )
+    if int(composite_event.get("components_skipped") or 0) != 0:
+        fail("battle_events", f"{card['name']} components_skipped={composite_event.get('components_skipped')}")
+    return {
+        "scenario": scenario.get("name"),
+        "card_name": card["name"],
+        "target": target.get("name"),
+        "power_delta": expected_power_delta,
+        "toughness_delta": expected_toughness_delta,
+        "counter_type": expected_counter_type,
+        "counters_added": expected_counter_count,
+    }
+
+
 def run_add_counters_untap_target_spell(
     battle,
     scenario: dict[str, Any],
@@ -14935,6 +15053,7 @@ SCENARIO_RUNNERS = {
     "target_color_tap_untap_draw_spell": run_target_color_tap_untap_draw_spell,
     "gain_control_untap_haste_until_eot": run_gain_control_untap_haste_until_eot,
     "stat_modifier_until_eot_untap_target": run_stat_modifier_until_eot_untap_target,
+    "boost_add_counter_target_spell": run_boost_add_counter_target_spell,
     "add_counters_target_spell": run_add_counters_target_spell,
     "add_counters_untap_target_spell": run_add_counters_untap_target_spell,
     "target_player_discard_spell": run_target_player_discard_spell,

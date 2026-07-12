@@ -27862,6 +27862,63 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertEqual(effect["target_count_max"], 2)
         self.assertIs(effect["up_to_count"], True)
 
+    def test_fixed_boost_add_named_counter_target_spell_maps_to_composite_scope(self) -> None:
+        row = queue_row(
+            split.ADD_COUNTERS_TARGET_UNIT,
+            effect_classes=["BoostTargetEffect", "AddCountersTargetEffect"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Free from Flesh",
+                oracle_text="Target creature gets +2/+2 until end of turn. Put two oil counters on it.",
+            ),
+            source_text=(
+                "this.getSpellAbility().addEffect(new BoostTargetEffect(2, 2));"
+                "this.getSpellAbility().addEffect(new AddCountersTargetEffect("
+                "CounterType.OIL.createInstance(2)));"
+                "this.getSpellAbility().addTarget(new TargetCreaturePermanent());"
+            ),
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["effect"], "composite_resolution")
+        self.assertEqual(effect["battle_model_scope"], split.BOOST_ADD_COUNTERS_TARGET_SCOPE)
+        self.assertEqual(effect["power_delta"], 2)
+        self.assertEqual(effect["toughness_delta"], 2)
+        self.assertEqual(effect["counter_type"], "oil")
+        self.assertEqual(effect["counter_count"], 2)
+        self.assertEqual(
+            [component["effect"] for component in effect["_composite_rule_components"]],
+            ["stat_modifier_until_eot", "add_counters"],
+        )
+
+    def test_modal_boost_add_counter_target_spell_stays_blocked(self) -> None:
+        row = queue_row(
+            split.ADD_COUNTERS_TARGET_UNIT,
+            effect_classes=["BoostTargetEffect", "AddCountersTargetEffect"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Subtle Strike",
+                oracle_text=(
+                    "Choose one or both - Target creature gets -1/-1 until end of turn. "
+                    "Put a +1/+1 counter on target creature."
+                ),
+            ),
+            source_text=(
+                "this.getSpellAbility().addEffect(new BoostTargetEffect(-1, -1));"
+                "this.getSpellAbility().addTarget(new TargetCreaturePermanent());"
+                "this.getSpellAbility().addMode(new Mode(new AddCountersTargetEffect("
+                "CounterType.P1P1.createInstance())).addTarget(new TargetCreaturePermanent()));"
+            ),
+        )
+
+        self.assertIsNone(proposal)
+        self.assertEqual(reason, "boost_add_counters_oracle_not_simple")
+
     def test_boost_multi_target_spell_stays_blocked(self) -> None:
         row = queue_row(split.BOOST_TARGET_UNIT, effect_classes=["BoostTargetEffect"])
         proposal, reason = split.split_row(

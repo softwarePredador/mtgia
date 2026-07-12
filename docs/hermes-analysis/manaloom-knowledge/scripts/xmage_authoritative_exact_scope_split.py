@@ -475,6 +475,9 @@ ADD_COUNTERS_UNTAP_TARGET_SCOPE = "xmage_fixed_add_counters_and_untap_target_cre
 ADD_COUNTERS_UNTAP_TARGET_CREATURES_SCOPE = (
     "xmage_fixed_add_counters_and_untap_target_creatures_spell_v1"
 )
+BOOST_ADD_COUNTERS_TARGET_SCOPE = (
+    "xmage_fixed_boost_target_creature_until_eot_add_counter_spell_v1"
+)
 DIES_ADD_COUNTERS_CREATURE_SCOPE = "xmage_creature_dies_add_counters_target_creature_v1"
 PERMANENT_ACTIVATED_SELF_ADD_COUNTERS_SCOPE = (
     "xmage_permanent_simple_activated_self_add_counters_v1"
@@ -12865,6 +12868,76 @@ def fixed_boost_target_from_oracle(metadata: dict[str, Any]) -> tuple[int, int] 
     return int(spec["power_delta"]), int(spec["toughness_delta"])
 
 
+def fixed_boost_add_counter_target_from_oracle(metadata: dict[str, Any]) -> dict[str, Any] | None:
+    text = strip_leading_parenthetical_reminders(oracle_text(metadata))
+    text = re.sub(r"\s+", " ", text).strip().lower()
+    match = re.fullmatch(
+        r"target creature(?P<controller> you control)? gets "
+        r"(?P<power>[+-]?\d+)/(?P<toughness>[+-]?\d+) until end of turn\. "
+        r"put (?P<count>a|an|one|two|three|four|five|six|seven|eight|nine|ten|\d+) "
+        r"(?P<counter>[a-z0-9_ +/\\-]+?) counters? on it\.?",
+        text,
+    )
+    if not match:
+        return None
+    power = signed_int_from_oracle(match.group("power"))
+    toughness = signed_int_from_oracle(match.group("toughness"))
+    count = counter_count_from_text(match.group("count"))
+    counter_type = counter_type_from_oracle_phrase(match.group("counter"))
+    if power is None or toughness is None or count is None or count <= 0 or not counter_type:
+        return None
+    return {
+        "power_delta": power,
+        "toughness_delta": toughness,
+        "counter_type": counter_type,
+        "counter_count": count,
+        "target_controller": "self" if match.group("controller") else "any",
+        "target_count": 1,
+        "target_count_min": 1,
+        "target_count_max": 1,
+        "up_to_count": False,
+    }
+
+
+def fixed_boost_add_counter_target_from_source(source: str) -> dict[str, Any] | str | None:
+    text = source or ""
+    if "addMode(" in text or ".addMode(" in text:
+        return "boost_add_counters_source_modal_not_supported"
+    boost = fixed_boost_target_spec_from_source(text)
+    if boost is None:
+        return "boost_add_counters_source_boost_not_fixed"
+    counter_matches = re.findall(
+        r"AddCountersTargetEffect\s*\(\s*CounterType\.(?P<counter>[A-Z0-9_]+)"
+        r"\.createInstance\s*\(\s*(?P<count>\d*)\s*\)",
+        text,
+        re.S,
+    )
+    if len(counter_matches) != 1:
+        return "boost_add_counters_source_counter_not_single_fixed"
+    counter_type = counter_type_from_xmage_counter_type(counter_matches[0][0])
+    if not counter_type:
+        return "boost_add_counters_source_counter_type_not_supported"
+    target_count = target_creature_permanent_count_from_source(text)
+    if isinstance(target_count, str):
+        return target_count.replace("target_creature", "boost_add_counters_target_creature")
+    comparable_target_keys = (
+        "target_controller",
+        "target_count",
+        "target_count_min",
+        "target_count_max",
+        "up_to_count",
+    )
+    if any(boost.get(key) != target_count.get(key) for key in comparable_target_keys):
+        return "boost_add_counters_source_target_mismatch"
+    return {
+        "power_delta": int(boost["power_delta"]),
+        "toughness_delta": int(boost["toughness_delta"]),
+        "counter_type": counter_type,
+        "counter_count": int(counter_matches[0][1] or "1"),
+        **target_count,
+    }
+
+
 def fixed_boost_untap_target_from_oracle(metadata: dict[str, Any]) -> dict[str, Any] | str:
     text = strip_leading_parenthetical_reminders(oracle_text(metadata))
     text = re.sub(r"\s+", " ", text).strip().lower()
@@ -21689,6 +21762,11 @@ def counter_type_from_oracle_phrase(value: str) -> str | None:
         "+1/+1": "+1/+1",
         "-1/-1": "-1/-1",
         "charge": "charge",
+        "oil": "oil",
+        "flying": "flying",
+        "trample": "trample",
+        "first strike": "first_strike",
+        "first_strike": "first_strike",
     }
     return mapping.get(normalized)
 
@@ -21699,6 +21777,10 @@ def counter_type_from_xmage_counter_type(value: str) -> str | None:
         "P1P1": "+1/+1",
         "M1M1": "-1/-1",
         "CHARGE": "charge",
+        "OIL": "oil",
+        "FLYING": "flying",
+        "TRAMPLE": "trample",
+        "FIRST_STRIKE": "first_strike",
     }
     return mapping.get(normalized)
 
@@ -45757,6 +45839,94 @@ def split_row(
         return None, "board_wipe_effect_class_not_supported"
 
     if unit == ADD_COUNTERS_TARGET_UNIT:
+        if classes == {"AddCountersTargetEffect", "BoostTargetEffect"}:
+            unsupported_abilities = ability_classes(row) - ALLOWED_AUXILIARY_RESOLUTION_ABILITY_CLASSES
+            if unsupported_abilities:
+                return None, "boost_add_counters_ability_class_not_simple"
+            oracle_spec = fixed_boost_add_counter_target_from_oracle(metadata)
+            if oracle_spec is None:
+                return None, "boost_add_counters_oracle_not_simple"
+            source_spec = fixed_boost_add_counter_target_from_source(source_text)
+            if isinstance(source_spec, str):
+                return None, source_spec
+            if source_spec is None:
+                return None, "boost_add_counters_source_not_supported"
+            comparable_keys = (
+                "power_delta",
+                "toughness_delta",
+                "counter_type",
+                "counter_count",
+                "target_count_min",
+                "target_count_max",
+                "up_to_count",
+                "target_controller",
+            )
+            if any(source_spec.get(key) != oracle_spec.get(key) for key in comparable_keys):
+                return None, "boost_add_counters_source_oracle_mismatch"
+            target_constraints = {"card_types": ["creature"]}
+            stat_component = {
+                "effect": "stat_modifier_until_eot",
+                "battle_model_scope": BOOST_TARGET_SCOPE,
+                "target": "creature",
+                "target_constraints": target_constraints,
+                "target_controller": oracle_spec["target_controller"],
+                "power_delta": int(oracle_spec["power_delta"]),
+                "toughness_delta": int(oracle_spec["toughness_delta"]),
+                "power_boost": int(oracle_spec["power_delta"]),
+                "toughness_boost": int(oracle_spec["toughness_delta"]),
+                "duration": "until_end_of_turn",
+                "target_count": 1,
+                "target_count_min": 1,
+                "target_count_max": 1,
+                "up_to_count": False,
+                "compose_on_resolution": True,
+                "xmage_effect_class": "BoostTargetEffect",
+                **flags,
+            }
+            counter_component = {
+                "effect": "add_counters",
+                "battle_model_scope": ADD_COUNTERS_TARGET_SCOPE,
+                "target": "creature",
+                "target_constraints": target_constraints,
+                "target_controller": oracle_spec["target_controller"],
+                "counter_type": str(oracle_spec["counter_type"]),
+                "counter_count": int(oracle_spec["counter_count"]),
+                "count": int(oracle_spec["counter_count"]),
+                "target_count": 1,
+                "target_count_min": 1,
+                "target_count_max": 1,
+                "up_to_count": False,
+                "compose_on_resolution": True,
+                "xmage_effect_class": "AddCountersTargetEffect",
+                **flags,
+            }
+            effect_json = {
+                "effect": "composite_resolution",
+                "battle_model_scope": BOOST_ADD_COUNTERS_TARGET_SCOPE,
+                "target": "creature",
+                "target_constraints": target_constraints,
+                "target_controller": oracle_spec["target_controller"],
+                "power_delta": int(oracle_spec["power_delta"]),
+                "toughness_delta": int(oracle_spec["toughness_delta"]),
+                "power_boost": int(oracle_spec["power_delta"]),
+                "toughness_boost": int(oracle_spec["toughness_delta"]),
+                "counter_type": str(oracle_spec["counter_type"]),
+                "counter_count": int(oracle_spec["counter_count"]),
+                "count": int(oracle_spec["counter_count"]),
+                "target_count": 1,
+                "target_count_min": 1,
+                "target_count_max": 1,
+                "up_to_count": False,
+                "xmage_effect_classes": ["BoostTargetEffect", "AddCountersTargetEffect"],
+                "_composite_rule_components": [stat_component, counter_component],
+                **flags,
+            }
+            return build_proposal(
+                row,
+                metadata,
+                effect_json,
+                family_id="xmage_boost_target_creature_until_eot_add_counter_spell",
+            ), "selected_exact_scope"
         if classes != {"AddCountersTargetEffect"}:
             return None, "add_counters_effect_class_not_pure"
         unsupported_abilities = ability_classes(row) - ALLOWED_AUXILIARY_RESOLUTION_ABILITY_CLASSES

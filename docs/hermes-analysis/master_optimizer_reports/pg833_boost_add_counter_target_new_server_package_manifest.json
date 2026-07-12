@@ -1,0 +1,917 @@
+{
+  "apply_gate": "Do not run apply SQL without explicit approval for the exact command.",
+  "backup_table": "manaloom_deploy_audit.pg833_boost_add_counter_target_new_serve_20260712_132401",
+  "deploy_id": "PG833",
+  "execution_scenarios": [
+    {
+      "card": {
+        "name": "Free from Flesh",
+        "type_line": "Instant"
+      },
+      "expected_component_count": 2,
+      "expected_counter_count": 2,
+      "expected_counter_type": "oil",
+      "expected_keywords": [],
+      "expected_power_delta": 2,
+      "expected_target_constraints": {
+        "card_types": [
+          "creature"
+        ]
+      },
+      "expected_toughness_delta": 2,
+      "logical_rule_key": "battle_rule_v1:a6c8ca893db8e31b2651813767ae11ff",
+      "name": "Free from Flesh boosts target creature and adds a counter",
+      "nonmatching_target": {
+        "cmc": 0,
+        "effect": "land",
+        "name": "E2E Illegal Boost Counter Target",
+        "type_line": "Land"
+      },
+      "target": {
+        "cmc": 3,
+        "effect": "creature",
+        "name": "E2E Legal Boost Counter Target",
+        "power": 2,
+        "toughness": 2,
+        "type_line": "Creature - Soldier"
+      },
+      "type": "boost_add_counter_target_spell"
+    },
+    {
+      "card": {
+        "name": "Fully Grown",
+        "type_line": "Instant"
+      },
+      "expected_component_count": 2,
+      "expected_counter_count": 1,
+      "expected_counter_type": "trample",
+      "expected_keywords": [
+        "trample"
+      ],
+      "expected_power_delta": 3,
+      "expected_target_constraints": {
+        "card_types": [
+          "creature"
+        ]
+      },
+      "expected_toughness_delta": 3,
+      "logical_rule_key": "battle_rule_v1:bb1280eb2bb34751693a227336c0fe8a",
+      "name": "Fully Grown boosts target creature and adds a counter",
+      "nonmatching_target": {
+        "cmc": 0,
+        "effect": "land",
+        "name": "E2E Illegal Boost Counter Target",
+        "type_line": "Land"
+      },
+      "target": {
+        "cmc": 3,
+        "effect": "creature",
+        "name": "E2E Legal Boost Counter Target",
+        "power": 2,
+        "toughness": 2,
+        "type_line": "Creature - Soldier"
+      },
+      "type": "boost_add_counter_target_spell"
+    },
+    {
+      "card": {
+        "name": "Heightened Reflexes",
+        "type_line": "Instant"
+      },
+      "expected_component_count": 2,
+      "expected_counter_count": 1,
+      "expected_counter_type": "first_strike",
+      "expected_keywords": [
+        "first_strike"
+      ],
+      "expected_power_delta": 1,
+      "expected_target_constraints": {
+        "card_types": [
+          "creature"
+        ]
+      },
+      "expected_toughness_delta": 0,
+      "logical_rule_key": "battle_rule_v1:1babdef80e17b624eb197357448811eb",
+      "name": "Heightened Reflexes boosts target creature and adds a counter",
+      "nonmatching_target": {
+        "cmc": 0,
+        "effect": "land",
+        "name": "E2E Illegal Boost Counter Target",
+        "type_line": "Land"
+      },
+      "target": {
+        "cmc": 3,
+        "effect": "creature",
+        "name": "E2E Legal Boost Counter Target",
+        "power": 2,
+        "toughness": 2,
+        "type_line": "Creature - Soldier"
+      },
+      "type": "boost_add_counter_target_spell"
+    },
+    {
+      "card": {
+        "name": "Spontaneous Flight",
+        "type_line": "Instant"
+      },
+      "expected_component_count": 2,
+      "expected_counter_count": 1,
+      "expected_counter_type": "flying",
+      "expected_keywords": [
+        "flying"
+      ],
+      "expected_power_delta": 2,
+      "expected_target_constraints": {
+        "card_types": [
+          "creature"
+        ]
+      },
+      "expected_toughness_delta": 2,
+      "logical_rule_key": "battle_rule_v1:2948e42cbec41eac164ff370b1e6c6b8",
+      "name": "Spontaneous Flight boosts target creature and adds a counter",
+      "nonmatching_target": {
+        "cmc": 0,
+        "effect": "land",
+        "name": "E2E Illegal Boost Counter Target",
+        "type_line": "Land"
+      },
+      "target": {
+        "cmc": 3,
+        "effect": "creature",
+        "name": "E2E Legal Boost Counter Target",
+        "power": 2,
+        "toughness": 2,
+        "type_line": "Creature - Soldier"
+      },
+      "type": "boost_add_counter_target_spell"
+    }
+  ],
+  "expected_rules": [
+    {
+      "card_name": "Free from Flesh",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:a6c8ca893db8e31b2651813767ae11ff",
+      "min_rule_version": 2,
+      "normalized_name": "free from flesh",
+      "oracle_hash": "fde893ade3ee82b79267944138f34f0c",
+      "required_effect_fields": {
+        "_composite_rule_components": [
+          {
+            "battle_model_scope": "xmage_fixed_boost_target_creature_until_eot_spell_v1",
+            "compose_on_resolution": true,
+            "duration": "until_end_of_turn",
+            "effect": "stat_modifier_until_eot",
+            "instant": true,
+            "power_boost": 2,
+            "power_delta": 2,
+            "sorcery": false,
+            "target": "creature",
+            "target_constraints": {
+              "card_types": [
+                "creature"
+              ]
+            },
+            "target_controller": "any",
+            "target_count": 1,
+            "target_count_max": 1,
+            "target_count_min": 1,
+            "toughness_boost": 2,
+            "toughness_delta": 2,
+            "up_to_count": false,
+            "xmage_effect_class": "BoostTargetEffect"
+          },
+          {
+            "battle_model_scope": "xmage_fixed_add_counters_target_creature_spell_v1",
+            "compose_on_resolution": true,
+            "count": 2,
+            "counter_count": 2,
+            "counter_type": "oil",
+            "effect": "add_counters",
+            "instant": true,
+            "sorcery": false,
+            "target": "creature",
+            "target_constraints": {
+              "card_types": [
+                "creature"
+              ]
+            },
+            "target_controller": "any",
+            "target_count": 1,
+            "target_count_max": 1,
+            "target_count_min": 1,
+            "up_to_count": false,
+            "xmage_effect_class": "AddCountersTargetEffect"
+          }
+        ],
+        "battle_model_scope": "xmage_fixed_boost_target_creature_until_eot_add_counter_spell_v1",
+        "count": 2,
+        "counter_count": 2,
+        "counter_type": "oil",
+        "effect": "composite_resolution",
+        "instant": true,
+        "power_boost": 2,
+        "power_delta": 2,
+        "sorcery": false,
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ]
+        },
+        "target_controller": "any",
+        "target_count": 1,
+        "target_count_max": 1,
+        "target_count_min": 1,
+        "toughness_boost": 2,
+        "toughness_delta": 2,
+        "up_to_count": false,
+        "xmage_effect_classes": [
+          "BoostTargetEffect",
+          "AddCountersTargetEffect"
+        ]
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Fully Grown",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:bb1280eb2bb34751693a227336c0fe8a",
+      "min_rule_version": 2,
+      "normalized_name": "fully grown",
+      "oracle_hash": "4d625f9e11506dcae0125d7b8a7b4f14",
+      "required_effect_fields": {
+        "_composite_rule_components": [
+          {
+            "battle_model_scope": "xmage_fixed_boost_target_creature_until_eot_spell_v1",
+            "compose_on_resolution": true,
+            "duration": "until_end_of_turn",
+            "effect": "stat_modifier_until_eot",
+            "instant": true,
+            "power_boost": 3,
+            "power_delta": 3,
+            "sorcery": false,
+            "target": "creature",
+            "target_constraints": {
+              "card_types": [
+                "creature"
+              ]
+            },
+            "target_controller": "any",
+            "target_count": 1,
+            "target_count_max": 1,
+            "target_count_min": 1,
+            "toughness_boost": 3,
+            "toughness_delta": 3,
+            "up_to_count": false,
+            "xmage_effect_class": "BoostTargetEffect"
+          },
+          {
+            "battle_model_scope": "xmage_fixed_add_counters_target_creature_spell_v1",
+            "compose_on_resolution": true,
+            "count": 1,
+            "counter_count": 1,
+            "counter_type": "trample",
+            "effect": "add_counters",
+            "instant": true,
+            "sorcery": false,
+            "target": "creature",
+            "target_constraints": {
+              "card_types": [
+                "creature"
+              ]
+            },
+            "target_controller": "any",
+            "target_count": 1,
+            "target_count_max": 1,
+            "target_count_min": 1,
+            "up_to_count": false,
+            "xmage_effect_class": "AddCountersTargetEffect"
+          }
+        ],
+        "battle_model_scope": "xmage_fixed_boost_target_creature_until_eot_add_counter_spell_v1",
+        "count": 1,
+        "counter_count": 1,
+        "counter_type": "trample",
+        "effect": "composite_resolution",
+        "instant": true,
+        "power_boost": 3,
+        "power_delta": 3,
+        "sorcery": false,
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ]
+        },
+        "target_controller": "any",
+        "target_count": 1,
+        "target_count_max": 1,
+        "target_count_min": 1,
+        "toughness_boost": 3,
+        "toughness_delta": 3,
+        "up_to_count": false,
+        "xmage_effect_classes": [
+          "BoostTargetEffect",
+          "AddCountersTargetEffect"
+        ]
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Heightened Reflexes",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:1babdef80e17b624eb197357448811eb",
+      "min_rule_version": 2,
+      "normalized_name": "heightened reflexes",
+      "oracle_hash": "86595d84576bee126e2523a142f09e81",
+      "required_effect_fields": {
+        "_composite_rule_components": [
+          {
+            "battle_model_scope": "xmage_fixed_boost_target_creature_until_eot_spell_v1",
+            "compose_on_resolution": true,
+            "duration": "until_end_of_turn",
+            "effect": "stat_modifier_until_eot",
+            "instant": true,
+            "power_boost": 1,
+            "power_delta": 1,
+            "sorcery": false,
+            "target": "creature",
+            "target_constraints": {
+              "card_types": [
+                "creature"
+              ]
+            },
+            "target_controller": "any",
+            "target_count": 1,
+            "target_count_max": 1,
+            "target_count_min": 1,
+            "toughness_boost": 0,
+            "toughness_delta": 0,
+            "up_to_count": false,
+            "xmage_effect_class": "BoostTargetEffect"
+          },
+          {
+            "battle_model_scope": "xmage_fixed_add_counters_target_creature_spell_v1",
+            "compose_on_resolution": true,
+            "count": 1,
+            "counter_count": 1,
+            "counter_type": "first_strike",
+            "effect": "add_counters",
+            "instant": true,
+            "sorcery": false,
+            "target": "creature",
+            "target_constraints": {
+              "card_types": [
+                "creature"
+              ]
+            },
+            "target_controller": "any",
+            "target_count": 1,
+            "target_count_max": 1,
+            "target_count_min": 1,
+            "up_to_count": false,
+            "xmage_effect_class": "AddCountersTargetEffect"
+          }
+        ],
+        "battle_model_scope": "xmage_fixed_boost_target_creature_until_eot_add_counter_spell_v1",
+        "count": 1,
+        "counter_count": 1,
+        "counter_type": "first_strike",
+        "effect": "composite_resolution",
+        "instant": true,
+        "power_boost": 1,
+        "power_delta": 1,
+        "sorcery": false,
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ]
+        },
+        "target_controller": "any",
+        "target_count": 1,
+        "target_count_max": 1,
+        "target_count_min": 1,
+        "toughness_boost": 0,
+        "toughness_delta": 0,
+        "up_to_count": false,
+        "xmage_effect_classes": [
+          "BoostTargetEffect",
+          "AddCountersTargetEffect"
+        ]
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Spontaneous Flight",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:2948e42cbec41eac164ff370b1e6c6b8",
+      "min_rule_version": 2,
+      "normalized_name": "spontaneous flight",
+      "oracle_hash": "560d5fded4189609f47d244ec7cb3bc0",
+      "required_effect_fields": {
+        "_composite_rule_components": [
+          {
+            "battle_model_scope": "xmage_fixed_boost_target_creature_until_eot_spell_v1",
+            "compose_on_resolution": true,
+            "duration": "until_end_of_turn",
+            "effect": "stat_modifier_until_eot",
+            "instant": true,
+            "power_boost": 2,
+            "power_delta": 2,
+            "sorcery": false,
+            "target": "creature",
+            "target_constraints": {
+              "card_types": [
+                "creature"
+              ]
+            },
+            "target_controller": "any",
+            "target_count": 1,
+            "target_count_max": 1,
+            "target_count_min": 1,
+            "toughness_boost": 2,
+            "toughness_delta": 2,
+            "up_to_count": false,
+            "xmage_effect_class": "BoostTargetEffect"
+          },
+          {
+            "battle_model_scope": "xmage_fixed_add_counters_target_creature_spell_v1",
+            "compose_on_resolution": true,
+            "count": 1,
+            "counter_count": 1,
+            "counter_type": "flying",
+            "effect": "add_counters",
+            "instant": true,
+            "sorcery": false,
+            "target": "creature",
+            "target_constraints": {
+              "card_types": [
+                "creature"
+              ]
+            },
+            "target_controller": "any",
+            "target_count": 1,
+            "target_count_max": 1,
+            "target_count_min": 1,
+            "up_to_count": false,
+            "xmage_effect_class": "AddCountersTargetEffect"
+          }
+        ],
+        "battle_model_scope": "xmage_fixed_boost_target_creature_until_eot_add_counter_spell_v1",
+        "count": 1,
+        "counter_count": 1,
+        "counter_type": "flying",
+        "effect": "composite_resolution",
+        "instant": true,
+        "power_boost": 2,
+        "power_delta": 2,
+        "sorcery": false,
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ]
+        },
+        "target_controller": "any",
+        "target_count": 1,
+        "target_count_max": 1,
+        "target_count_min": 1,
+        "toughness_boost": 2,
+        "toughness_delta": 2,
+        "up_to_count": false,
+        "xmage_effect_classes": [
+          "BoostTargetEffect",
+          "AddCountersTargetEffect"
+        ]
+      },
+      "review_status": "verified"
+    }
+  ],
+  "family_counts": {
+    "xmage_boost_target_creature_until_eot_add_counter_spell": 4
+  },
+  "files": {
+    "apply": "docs/hermes-analysis/master_optimizer_reports/pg833_boost_add_counter_target_new_server_package_apply.sql",
+    "manifest": "docs/hermes-analysis/master_optimizer_reports/pg833_boost_add_counter_target_new_server_package_manifest.json",
+    "package": "docs/hermes-analysis/master_optimizer_reports/pg833_boost_add_counter_target_new_server_package_package.md",
+    "postcheck": "docs/hermes-analysis/master_optimizer_reports/pg833_boost_add_counter_target_new_server_package_postcheck.sql",
+    "precheck": "docs/hermes-analysis/master_optimizer_reports/pg833_boost_add_counter_target_new_server_package_precheck.sql",
+    "rollback": "docs/hermes-analysis/master_optimizer_reports/pg833_boost_add_counter_target_new_server_package_rollback.sql"
+  },
+  "generated_at": "2026-07-12T13:24:01+00:00",
+  "mutations_performed": [],
+  "runtime_checks": [
+    {
+      "card": {
+        "name": "Free from Flesh"
+      },
+      "card_name": "Free from Flesh",
+      "effect": "composite_resolution",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:a6c8ca893db8e31b2651813767ae11ff",
+      "normalized_name": "free from flesh",
+      "required_effect_fields": {
+        "_composite_rule_components": [
+          {
+            "battle_model_scope": "xmage_fixed_boost_target_creature_until_eot_spell_v1",
+            "compose_on_resolution": true,
+            "duration": "until_end_of_turn",
+            "effect": "stat_modifier_until_eot",
+            "instant": true,
+            "power_boost": 2,
+            "power_delta": 2,
+            "sorcery": false,
+            "target": "creature",
+            "target_constraints": {
+              "card_types": [
+                "creature"
+              ]
+            },
+            "target_controller": "any",
+            "target_count": 1,
+            "target_count_max": 1,
+            "target_count_min": 1,
+            "toughness_boost": 2,
+            "toughness_delta": 2,
+            "up_to_count": false,
+            "xmage_effect_class": "BoostTargetEffect"
+          },
+          {
+            "battle_model_scope": "xmage_fixed_add_counters_target_creature_spell_v1",
+            "compose_on_resolution": true,
+            "count": 2,
+            "counter_count": 2,
+            "counter_type": "oil",
+            "effect": "add_counters",
+            "instant": true,
+            "sorcery": false,
+            "target": "creature",
+            "target_constraints": {
+              "card_types": [
+                "creature"
+              ]
+            },
+            "target_controller": "any",
+            "target_count": 1,
+            "target_count_max": 1,
+            "target_count_min": 1,
+            "up_to_count": false,
+            "xmage_effect_class": "AddCountersTargetEffect"
+          }
+        ],
+        "battle_model_scope": "xmage_fixed_boost_target_creature_until_eot_add_counter_spell_v1",
+        "count": 2,
+        "counter_count": 2,
+        "counter_type": "oil",
+        "effect": "composite_resolution",
+        "instant": true,
+        "power_boost": 2,
+        "power_delta": 2,
+        "sorcery": false,
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ]
+        },
+        "target_controller": "any",
+        "target_count": 1,
+        "target_count_max": 1,
+        "target_count_min": 1,
+        "toughness_boost": 2,
+        "toughness_delta": 2,
+        "up_to_count": false,
+        "xmage_effect_classes": [
+          "BoostTargetEffect",
+          "AddCountersTargetEffect"
+        ]
+      }
+    },
+    {
+      "card": {
+        "name": "Fully Grown"
+      },
+      "card_name": "Fully Grown",
+      "effect": "composite_resolution",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:bb1280eb2bb34751693a227336c0fe8a",
+      "normalized_name": "fully grown",
+      "required_effect_fields": {
+        "_composite_rule_components": [
+          {
+            "battle_model_scope": "xmage_fixed_boost_target_creature_until_eot_spell_v1",
+            "compose_on_resolution": true,
+            "duration": "until_end_of_turn",
+            "effect": "stat_modifier_until_eot",
+            "instant": true,
+            "power_boost": 3,
+            "power_delta": 3,
+            "sorcery": false,
+            "target": "creature",
+            "target_constraints": {
+              "card_types": [
+                "creature"
+              ]
+            },
+            "target_controller": "any",
+            "target_count": 1,
+            "target_count_max": 1,
+            "target_count_min": 1,
+            "toughness_boost": 3,
+            "toughness_delta": 3,
+            "up_to_count": false,
+            "xmage_effect_class": "BoostTargetEffect"
+          },
+          {
+            "battle_model_scope": "xmage_fixed_add_counters_target_creature_spell_v1",
+            "compose_on_resolution": true,
+            "count": 1,
+            "counter_count": 1,
+            "counter_type": "trample",
+            "effect": "add_counters",
+            "instant": true,
+            "sorcery": false,
+            "target": "creature",
+            "target_constraints": {
+              "card_types": [
+                "creature"
+              ]
+            },
+            "target_controller": "any",
+            "target_count": 1,
+            "target_count_max": 1,
+            "target_count_min": 1,
+            "up_to_count": false,
+            "xmage_effect_class": "AddCountersTargetEffect"
+          }
+        ],
+        "battle_model_scope": "xmage_fixed_boost_target_creature_until_eot_add_counter_spell_v1",
+        "count": 1,
+        "counter_count": 1,
+        "counter_type": "trample",
+        "effect": "composite_resolution",
+        "instant": true,
+        "power_boost": 3,
+        "power_delta": 3,
+        "sorcery": false,
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ]
+        },
+        "target_controller": "any",
+        "target_count": 1,
+        "target_count_max": 1,
+        "target_count_min": 1,
+        "toughness_boost": 3,
+        "toughness_delta": 3,
+        "up_to_count": false,
+        "xmage_effect_classes": [
+          "BoostTargetEffect",
+          "AddCountersTargetEffect"
+        ]
+      }
+    },
+    {
+      "card": {
+        "name": "Heightened Reflexes"
+      },
+      "card_name": "Heightened Reflexes",
+      "effect": "composite_resolution",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:1babdef80e17b624eb197357448811eb",
+      "normalized_name": "heightened reflexes",
+      "required_effect_fields": {
+        "_composite_rule_components": [
+          {
+            "battle_model_scope": "xmage_fixed_boost_target_creature_until_eot_spell_v1",
+            "compose_on_resolution": true,
+            "duration": "until_end_of_turn",
+            "effect": "stat_modifier_until_eot",
+            "instant": true,
+            "power_boost": 1,
+            "power_delta": 1,
+            "sorcery": false,
+            "target": "creature",
+            "target_constraints": {
+              "card_types": [
+                "creature"
+              ]
+            },
+            "target_controller": "any",
+            "target_count": 1,
+            "target_count_max": 1,
+            "target_count_min": 1,
+            "toughness_boost": 0,
+            "toughness_delta": 0,
+            "up_to_count": false,
+            "xmage_effect_class": "BoostTargetEffect"
+          },
+          {
+            "battle_model_scope": "xmage_fixed_add_counters_target_creature_spell_v1",
+            "compose_on_resolution": true,
+            "count": 1,
+            "counter_count": 1,
+            "counter_type": "first_strike",
+            "effect": "add_counters",
+            "instant": true,
+            "sorcery": false,
+            "target": "creature",
+            "target_constraints": {
+              "card_types": [
+                "creature"
+              ]
+            },
+            "target_controller": "any",
+            "target_count": 1,
+            "target_count_max": 1,
+            "target_count_min": 1,
+            "up_to_count": false,
+            "xmage_effect_class": "AddCountersTargetEffect"
+          }
+        ],
+        "battle_model_scope": "xmage_fixed_boost_target_creature_until_eot_add_counter_spell_v1",
+        "count": 1,
+        "counter_count": 1,
+        "counter_type": "first_strike",
+        "effect": "composite_resolution",
+        "instant": true,
+        "power_boost": 1,
+        "power_delta": 1,
+        "sorcery": false,
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ]
+        },
+        "target_controller": "any",
+        "target_count": 1,
+        "target_count_max": 1,
+        "target_count_min": 1,
+        "toughness_boost": 0,
+        "toughness_delta": 0,
+        "up_to_count": false,
+        "xmage_effect_classes": [
+          "BoostTargetEffect",
+          "AddCountersTargetEffect"
+        ]
+      }
+    },
+    {
+      "card": {
+        "name": "Spontaneous Flight"
+      },
+      "card_name": "Spontaneous Flight",
+      "effect": "composite_resolution",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:2948e42cbec41eac164ff370b1e6c6b8",
+      "normalized_name": "spontaneous flight",
+      "required_effect_fields": {
+        "_composite_rule_components": [
+          {
+            "battle_model_scope": "xmage_fixed_boost_target_creature_until_eot_spell_v1",
+            "compose_on_resolution": true,
+            "duration": "until_end_of_turn",
+            "effect": "stat_modifier_until_eot",
+            "instant": true,
+            "power_boost": 2,
+            "power_delta": 2,
+            "sorcery": false,
+            "target": "creature",
+            "target_constraints": {
+              "card_types": [
+                "creature"
+              ]
+            },
+            "target_controller": "any",
+            "target_count": 1,
+            "target_count_max": 1,
+            "target_count_min": 1,
+            "toughness_boost": 2,
+            "toughness_delta": 2,
+            "up_to_count": false,
+            "xmage_effect_class": "BoostTargetEffect"
+          },
+          {
+            "battle_model_scope": "xmage_fixed_add_counters_target_creature_spell_v1",
+            "compose_on_resolution": true,
+            "count": 1,
+            "counter_count": 1,
+            "counter_type": "flying",
+            "effect": "add_counters",
+            "instant": true,
+            "sorcery": false,
+            "target": "creature",
+            "target_constraints": {
+              "card_types": [
+                "creature"
+              ]
+            },
+            "target_controller": "any",
+            "target_count": 1,
+            "target_count_max": 1,
+            "target_count_min": 1,
+            "up_to_count": false,
+            "xmage_effect_class": "AddCountersTargetEffect"
+          }
+        ],
+        "battle_model_scope": "xmage_fixed_boost_target_creature_until_eot_add_counter_spell_v1",
+        "count": 1,
+        "counter_count": 1,
+        "counter_type": "flying",
+        "effect": "composite_resolution",
+        "instant": true,
+        "power_boost": 2,
+        "power_delta": 2,
+        "sorcery": false,
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ]
+        },
+        "target_controller": "any",
+        "target_count": 1,
+        "target_count_max": 1,
+        "target_count_min": 1,
+        "toughness_boost": 2,
+        "toughness_delta": 2,
+        "up_to_count": false,
+        "xmage_effect_classes": [
+          "BoostTargetEffect",
+          "AddCountersTargetEffect"
+        ]
+      }
+    }
+  ],
+  "selected_card_names": [
+    "Free from Flesh",
+    "Fully Grown",
+    "Heightened Reflexes",
+    "Spontaneous Flight"
+  ],
+  "selected_count": 4,
+  "slug": "boost_add_counter_target_new_server",
+  "snapshot_checks": [
+    {
+      "card_name": "Free from Flesh",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:a6c8ca893db8e31b2651813767ae11ff",
+      "min_rule_version": 2,
+      "normalized_name": "free from flesh",
+      "oracle_hash": "fde893ade3ee82b79267944138f34f0c",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_boost_target_creature_until_eot_add_counter_spell_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Fully Grown",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:bb1280eb2bb34751693a227336c0fe8a",
+      "min_rule_version": 2,
+      "normalized_name": "fully grown",
+      "oracle_hash": "4d625f9e11506dcae0125d7b8a7b4f14",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_boost_target_creature_until_eot_add_counter_spell_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Heightened Reflexes",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:1babdef80e17b624eb197357448811eb",
+      "min_rule_version": 2,
+      "normalized_name": "heightened reflexes",
+      "oracle_hash": "86595d84576bee126e2523a142f09e81",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_boost_target_creature_until_eot_add_counter_spell_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Spontaneous Flight",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:2948e42cbec41eac164ff370b1e6c6b8",
+      "min_rule_version": 2,
+      "normalized_name": "spontaneous flight",
+      "oracle_hash": "560d5fded4189609f47d244ec7cb3bc0",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_boost_target_creature_until_eot_add_counter_spell_v1"
+      },
+      "review_status": "verified"
+    }
+  ],
+  "status": "prepared_read_only_pending_apply_approval"
+}

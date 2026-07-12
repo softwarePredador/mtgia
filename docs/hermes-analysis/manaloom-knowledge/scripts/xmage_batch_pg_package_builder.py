@@ -7096,6 +7096,51 @@ def add_counters_target_spell_execution_scenario_from_expected_rule(
     }
 
 
+def boost_add_counter_target_spell_execution_scenario_from_expected_rule(
+    rule: dict[str, Any],
+) -> dict[str, Any] | None:
+    required = dict(rule.get("required_effect_fields") or {})
+    if required.get("battle_model_scope") != "xmage_fixed_boost_target_creature_until_eot_add_counter_spell_v1":
+        return None
+    if required.get("effect") != "composite_resolution":
+        return None
+    constraints = dict(required.get("target_constraints") or {"card_types": ["creature"]})
+    target = _target_fixture_from_constraints(
+        "E2E Legal Boost Counter Target",
+        constraints,
+        matching=True,
+    )
+    target["power"] = 2
+    target["toughness"] = 2
+    nonmatching = _target_fixture_from_constraints(
+        "E2E Illegal Boost Counter Target",
+        constraints,
+        matching=False,
+    )
+    counter_type = str(required.get("counter_type") or "+1/+1")
+    expected_keywords = []
+    if counter_type in {"flying", "trample", "first_strike"}:
+        expected_keywords.append(counter_type)
+    return {
+        "name": f"{rule['card_name']} boosts target creature and adds a counter",
+        "type": "boost_add_counter_target_spell",
+        "card": {
+            "name": rule["card_name"],
+            "type_line": "Sorcery" if required.get("sorcery") is True else "Instant",
+        },
+        "target": target,
+        "nonmatching_target": nonmatching,
+        "expected_target_constraints": constraints,
+        "expected_power_delta": int(required.get("power_delta") or required.get("power_boost") or 0),
+        "expected_toughness_delta": int(required.get("toughness_delta") or required.get("toughness_boost") or 0),
+        "expected_counter_type": counter_type,
+        "expected_counter_count": int(required.get("counter_count") or required.get("count") or 1),
+        "expected_keywords": expected_keywords,
+        "expected_component_count": 2,
+        "logical_rule_key": rule["logical_rule_key"],
+    }
+
+
 def add_counters_untap_target_spell_execution_scenario_from_expected_rule(
     rule: dict[str, Any],
 ) -> dict[str, Any] | None:
@@ -10208,6 +10253,7 @@ def execution_scenario_from_expected_rule(rule: dict[str, Any]) -> dict[str, Any
         or color_tap_untap_draw_spell_execution_scenario_from_expected_rule(rule)
         or tap_target_spell_execution_scenario_from_expected_rule(rule)
         or gain_control_untap_haste_execution_scenario_from_expected_rule(rule)
+        or boost_add_counter_target_spell_execution_scenario_from_expected_rule(rule)
         or add_counters_target_spell_execution_scenario_from_expected_rule(rule)
         or add_counters_untap_target_spell_execution_scenario_from_expected_rule(rule)
         or boost_untap_target_spell_execution_scenario_from_expected_rule(rule)
