@@ -17879,6 +17879,17 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
                 },
             ),
             (
+                "Angelic Purge",
+                "Exile target artifact, creature, or enchantment.",
+                'new FilterPermanent("artifact, creature, or enchantment");'
+                "filter.add(Predicates.or(CardType.ARTIFACT.getPredicate(),"
+                "CardType.CREATURE.getPredicate(),"
+                "CardType.ENCHANTMENT.getPredicate()));",
+                "remove_permanent",
+                "permanent",
+                {"card_types": ["artifact", "creature", "enchantment"]},
+            ),
+            (
                 "Vanishing Verse",
                 "Exile target monocolored permanent.",
                 'new FilterPermanent("monocolored permanent"); filter.add(MonocoloredPredicate.instance);',
@@ -17968,19 +17979,24 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         row = queue_row(split.EXILE_UNIT, effect_classes=["ExileTargetEffect"])
         proposal, reason = split.split_row(
             row,
-            metadata(oracle_text="As an additional cost to cast this spell, sacrifice a permanent. Exile target creature."),
+            metadata(oracle_text="As an additional cost to cast this spell, sacrifice a permanent. Exile target artifact, creature, or enchantment."),
             source_text=(
                 "this.getSpellAbility().addCost(new SacrificeTargetCost(StaticFilters.FILTER_PERMANENT));"
+                'FilterPermanent filter = new FilterPermanent("artifact, creature, or enchantment");'
+                "filter.add(Predicates.or(CardType.ARTIFACT.getPredicate(),"
+                "CardType.CREATURE.getPredicate(),"
+                "CardType.ENCHANTMENT.getPredicate()));"
                 "this.getSpellAbility().addEffect(new ExileTargetEffect());"
-                "this.getSpellAbility().addTarget(new TargetCreaturePermanent());"
+                "this.getSpellAbility().addTarget(new TargetPermanent(filter));"
             ),
         )
 
         self.assertEqual(reason, "selected_exact_scope")
         effect = proposal["effect_json"]
-        self.assertEqual(effect["effect"], "remove_creature")
+        self.assertEqual(effect["effect"], "remove_permanent")
         self.assertEqual(effect["battle_model_scope"], split.EXILE_SCOPE)
-        self.assertEqual(effect["target"], "creature")
+        self.assertEqual(effect["target"], "permanent")
+        self.assertEqual(effect["target_constraints"], {"card_types": ["artifact", "creature", "enchantment"]})
         self.assertEqual(effect["additional_cost"], "sacrifice_permanent")
         self.assertTrue(effect["requires_sacrifice_permanent"])
         self.assertEqual(effect["xmage_additional_cost_target"], "permanent")

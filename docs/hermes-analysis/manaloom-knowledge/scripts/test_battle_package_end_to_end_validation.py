@@ -1123,6 +1123,64 @@ def test_single_target_removal_runner_pays_or_discard_cost() -> None:
     assert result["additional_cost"] == "discard_card"
 
 
+def test_single_target_removal_runner_pays_sacrifice_permanent_for_exile_ace_target() -> None:
+    battle = validator.load_battle(validator.DEFAULT_BATTLE)
+    events = []
+    previous_handler = battle.REPLAY_EVENT_HANDLER
+    previous_get_card_effect = battle.get_card_effect
+    battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+    battle.get_card_effect = lambda card: {
+        "effect": "remove_permanent",
+        "battle_model_scope": "xmage_exile_target_spell_v1",
+        "target": "permanent",
+        "target_constraints": {"card_types": ["artifact", "creature", "enchantment"]},
+        "destination": "exile",
+        "additional_cost": "sacrifice_permanent",
+        "requires_sacrifice_permanent": True,
+    }
+    try:
+        result = validator.run_single_target_removal(
+            battle,
+            {
+                "name": "Angelic Purge exiles artifact creature or enchantment",
+                "type": "single_target_removal",
+                "card": {"name": "Angelic Purge", "type_line": "Sorcery"},
+                "target": {
+                    "name": "E2E Legal Removal Target",
+                    "type_line": "Creature - Soldier",
+                    "effect": "creature",
+                    "power": 2,
+                    "toughness": 2,
+                },
+                "nonmatching_target": {
+                    "name": "E2E Illegal Removal Target",
+                    "type_line": "Land",
+                    "effect": "land",
+                },
+                "controller_battlefield": [
+                    {
+                        "name": "E2E Sacrifice Cost Permanent",
+                        "type_line": "Enchantment",
+                        "effect": "enchantment",
+                    }
+                ],
+                "expected_destination": "exile",
+                "expected_effect": "remove_permanent",
+                "expected_target_constraints": {"card_types": ["artifact", "creature", "enchantment"]},
+                "expected_additional_cost": "sacrifice_permanent",
+                "expected_sacrificed_name": "E2E Sacrifice Cost Permanent",
+            },
+            events,
+        )
+    finally:
+        battle.REPLAY_EVENT_HANDLER = previous_handler
+        battle.get_card_effect = previous_get_card_effect
+
+    assert result["target"] == "E2E Legal Removal Target"
+    assert result["destination"] == "exile"
+    assert result["additional_cost"] == "sacrifice_permanent"
+
+
 def test_single_target_removal_runner_moves_target_to_library_top() -> None:
     battle = validator.load_battle(validator.DEFAULT_BATTLE)
     events = []

@@ -14641,6 +14641,67 @@ class XMageExactScopeRuntimeTest(unittest.TestCase):
             )
         )
 
+    def test_exile_target_spell_pays_sacrifice_permanent_cost_with_ace_target(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        opponent = self.battle.Player("Opponent", None, [])
+        sacrifice = {
+            "name": "Spare Enchantment",
+            "type_line": "Enchantment",
+            "effect": "enchantment",
+        }
+        illegal_land = {"name": "Illegal Land", "type_line": "Land", "effect": "land"}
+        target = {"name": "Target Creature", "type_line": "Creature - Soldier", "cmc": 2}
+        active.battlefield.append(sacrifice)
+        opponent.battlefield.extend([illegal_land, target])
+        effect = {
+            "effect": "remove_permanent",
+            "battle_model_scope": "xmage_exile_target_spell_v1",
+            "target": "permanent",
+            "target_constraints": {"card_types": ["artifact", "creature", "enchantment"]},
+            "destination": "exile",
+            "additional_cost": "sacrifice_permanent",
+            "requires_sacrifice_permanent": True,
+            "sorcery": True,
+        }
+
+        self.battle.apply_effect_immediate(
+            active,
+            [opponent],
+            {
+                "name": "Angelic Purge",
+                "type_line": "Sorcery",
+                "oracle_text": (
+                    "As an additional cost to cast this spell, sacrifice a permanent.\n"
+                    "Exile target artifact, creature, or enchantment."
+                ),
+            },
+            turn=5,
+            rng=random.Random(5),
+            effect_data_override=effect,
+        )
+
+        self.assertEqual([card["name"] for card in active.graveyard], ["Spare Enchantment", "Angelic Purge"])
+        self.assertEqual([card["name"] for card in opponent.battlefield], ["Illegal Land"])
+        self.assertEqual([card["name"] for card in opponent.exile], ["Target Creature"])
+        self.assertTrue(
+            any(
+                event == "additional_cost_paid"
+                and data.get("card") == "Angelic Purge"
+                and data.get("cost") == "sacrifice_permanent"
+                and data.get("sacrificed") == "Spare Enchantment"
+                for event, data in self.events
+            )
+        )
+        self.assertTrue(
+            any(
+                event == "removal_resolved"
+                and data.get("card") == "Angelic Purge"
+                and data.get("target") == "Target Creature"
+                and data.get("destination") == "exile"
+                for event, data in self.events
+            )
+        )
+
     def test_simple_mana_source_permanent_refreshes_mana(self) -> None:
         active = self.battle.Player("Active", None, [])
         opponent = self.battle.Player("Opponent", None, [])

@@ -4845,6 +4845,7 @@ def exile_target_from_oracle(metadata: dict[str, Any]) -> tuple[str, str] | None
     if restricted is not None:
         return ("remove_creature" if restricted_target_base(restricted) == "creature" else "remove_permanent"), restricted
     patterns: list[tuple[str, tuple[str, str]]] = [
+        (r"^exile target artifact, creature, or enchantment\.?$", ("remove_permanent", "artifact_creature_or_enchantment")),
         (r"^exile target artifact or enchantment\.?$", ("remove_permanent", "artifact_or_enchantment")),
         (r"^exile target creature or planeswalker\.?$", ("remove_permanent", "creature_or_planeswalker")),
         (r"^exile target creature or enchantment\.?$", ("remove_permanent", "creature_or_enchantment")),
@@ -16834,6 +16835,8 @@ def restricted_target_base(target: str) -> str:
         "multicolored_creature_or_enchantment",
         "artifact_enchantment_or_creature_power_4_or_greater",
         "artifact_enchantment_or_flying_creature",
+        "artifact_creature_or_enchantment",
+        "artifact_or_creature_or_enchantment",
         "spirit_or_disturb_creature_or_enchantment",
         "creature_or_spacecraft",
         "creature_vehicle_or_nonbasic_land",
@@ -17233,6 +17236,17 @@ def restricted_battlefield_target_from_source(source: str) -> str | None:
         )
     ):
         return "artifact_enchantment_or_flying_creature"
+    if (
+        'FilterPermanent("artifact, creature, or enchantment")' in text
+        or (
+            "CardType.ARTIFACT" in text
+            and "CardType.CREATURE" in text
+            and "CardType.ENCHANTMENT" in text
+            and "PowerPredicate" not in text
+            and "AbilityPredicate" not in text
+        )
+    ):
+        return "artifact_creature_or_enchantment"
     if "FILTER_CREATURE_FLYING" in text or "AbilityPredicate(FlyingAbility.class)" in text:
         return "flying_creature"
     if "ObjectColor.BLACK" in text and "ObjectColor.RED" in text and "FilterPermanent(\"black or red permanent\")" in text:
@@ -30699,7 +30713,7 @@ def target_constraints_for(target: str) -> dict[str, Any]:
         return {"card_types": ["artifact", "enchantment", "land"]}
     if target == "artifact_or_creature":
         return {"card_types": ["artifact", "creature"]}
-    if target == "artifact_creature_or_enchantment":
+    if target in {"artifact_creature_or_enchantment", "artifact_or_creature_or_enchantment"}:
         return {"card_types": ["artifact", "creature", "enchantment"]}
     if target == "artifact_creature_or_land":
         return {"card_types": ["artifact", "creature", "land"]}
