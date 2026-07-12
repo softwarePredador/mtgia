@@ -675,12 +675,14 @@ E2E_REQUIRED_EFFECT_FIELDS = (
     "activated_self_sacrifice_draw",
     "activated_self_sacrifice_draw_discard",
     "activated_self_sacrifice_destroy",
+    "activated_self_exile_cost",
     "regenerate_source",
     "activation_cost_mana",
     "activation_cost_generic",
     "activation_cost_colors",
     "activation_requires_tap",
     "activation_requires_sacrifice",
+    "activation_requires_exile_source",
     "activation_limit_per_turn",
     "activation_life_cost",
     "activation_exile_top_library_count",
@@ -6759,7 +6761,10 @@ def simple_activated_destroy_execution_scenario_from_expected_rule(
     rule: dict[str, Any],
 ) -> dict[str, Any] | None:
     required = dict(rule.get("required_effect_fields") or {})
-    if required.get("battle_model_scope") != "xmage_permanent_simple_activated_destroy_target_v1":
+    if required.get("battle_model_scope") not in {
+        "xmage_permanent_simple_activated_destroy_target_v1",
+        "xmage_permanent_simple_activated_exile_target_v1",
+    }:
         return None
     constraints = dict(required.get("target_constraints") or {})
     fixture_constraints = dict(constraints)
@@ -6778,6 +6783,7 @@ def simple_activated_destroy_execution_scenario_from_expected_rule(
         "controller_mana": _manifest_mana_for_required_activation(required),
         "expected_tapped_source": bool(required.get("activation_requires_tap")),
         "expected_sacrificed_source": bool(required.get("activation_requires_sacrifice")),
+        "expected_exiled_source": bool(required.get("activation_requires_exile_source")),
         "expected_destination": str(required.get("destination") or "graveyard").lower(),
         "expected_target": required.get("activated_remove_target") or required.get("target"),
         "expected_target_constraints": constraints,

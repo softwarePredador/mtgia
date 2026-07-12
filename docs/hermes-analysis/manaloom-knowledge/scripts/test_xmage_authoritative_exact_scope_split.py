@@ -16366,6 +16366,254 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
             effect["activation_tap_cost"],
         )
 
+    def test_permanent_activated_exile_maps_exile_source_cost(self) -> None:
+        row = queue_row(
+            split.EXILE_UNIT,
+            effect_classes=["ExileTargetEffect"],
+            ability_kind="activated",
+            ability_classes=["SimpleActivatedAbility"],
+            xmage_signals=["targeting", "activated_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Brittle Effigy",
+                type_line="Artifact",
+                oracle_text="{4}, {T}, Exile this artifact: Exile target creature.",
+            ),
+            source_text="""
+                Ability ability = new SimpleActivatedAbility(new ExileTargetEffect(), new GenericManaCost(4));
+                ability.addCost(new TapSourceCost());
+                ability.addCost(new ExileSourceCost());
+                ability.addTarget(new TargetCreaturePermanent());
+                this.addAbility(ability);
+            """,
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.PERMANENT_ACTIVATED_EXILE_SCOPE)
+        self.assertEqual(effect["activated_effect"], "exile_target")
+        self.assertEqual(effect["activated_remove_target"], "creature")
+        self.assertEqual(effect["destination"], "exile")
+        self.assertEqual(effect["activation_cost_mana"], "{4}")
+        self.assertTrue(effect["activation_requires_tap"])
+        self.assertTrue(effect["activation_requires_exile_source"])
+        self.assertTrue(effect["activated_self_exile_cost"])
+
+    def test_permanent_activated_exile_maps_tap_target_subtype_costs(self) -> None:
+        cases = [
+            (
+                "Catapult Master",
+                "Creature - Human Soldier",
+                "Tap five untapped Soldiers you control: Exile target creature.",
+                """
+                    private static final FilterControlledPermanent filter =
+                        new FilterControlledPermanent("untapped Soldiers you control");
+                    static {
+                        filter.add(TappedPredicate.UNTAPPED);
+                        filter.add(SubType.SOLDIER.getPredicate());
+                    }
+                    Ability ability = new SimpleActivatedAbility(
+                        new ExileTargetEffect(),
+                        new TapTargetCost(new TargetControlledPermanent(5, 5, filter, false))
+                    );
+                    ability.addTarget(new TargetCreaturePermanent());
+                    this.addAbility(ability);
+                """,
+                "creature",
+                {"card_types": ["creature"]},
+                {
+                    "count": 5,
+                    "target_controller": "self",
+                    "constraints": {
+                        "card_types": ["creature"],
+                        "required_subtypes": ["soldier"],
+                        "tapped_state": "untapped",
+                    },
+                },
+                False,
+            ),
+            (
+                "Devout Chaplain",
+                "Creature - Human Cleric",
+                "{T}, Tap two untapped Humans you control: Exile target artifact or enchantment.",
+                """
+                    private static final FilterControlledPermanent humanFilter =
+                        new FilterControlledPermanent("untapped Humans you control");
+                    static {
+                        humanFilter.add(TappedPredicate.UNTAPPED);
+                        humanFilter.add(SubType.HUMAN.getPredicate());
+                    }
+                    Ability ability = new SimpleActivatedAbility(new ExileTargetEffect(), new TapSourceCost());
+                    ability.addCost(new TapTargetCost(new TargetControlledPermanent(2, 2, humanFilter, false)));
+                    ability.addTarget(new TargetPermanent(StaticFilters.FILTER_PERMANENT_ARTIFACT_OR_ENCHANTMENT));
+                    this.addAbility(ability);
+                """,
+                "artifact_or_enchantment",
+                {"card_types": ["artifact", "enchantment"]},
+                {
+                    "count": 2,
+                    "target_controller": "self",
+                    "constraints": {
+                        "card_types": ["creature"],
+                        "required_subtypes": ["human"],
+                        "tapped_state": "untapped",
+                    },
+                },
+                True,
+            ),
+        ]
+        for name, type_line, oracle_text, source_text, target, constraints, tap_cost, requires_tap in cases:
+            with self.subTest(name=name):
+                row = queue_row(
+                    split.EXILE_UNIT,
+                    effect_classes=["ExileTargetEffect"],
+                    ability_kind="activated",
+                    ability_classes=["SimpleActivatedAbility"],
+                    xmage_signals=["targeting", "activated_ability"],
+                )
+                proposal, reason = split.split_row(
+                    row,
+                    metadata(name=name, type_line=type_line, oracle_text=oracle_text),
+                    source_text=source_text,
+                )
+
+                self.assertEqual(reason, "selected_exact_scope")
+                effect = proposal["effect_json"]
+                self.assertEqual(effect["battle_model_scope"], split.PERMANENT_ACTIVATED_EXILE_SCOPE)
+                self.assertEqual(effect["activated_remove_target"], target)
+                self.assertEqual(effect["target_constraints"], constraints)
+                self.assertEqual(effect["activation_tap_cost"], tap_cost)
+                self.assertTrue(effect["activation_requires_tap_target"])
+                self.assertEqual(effect["activation_requires_tap"], requires_tap)
+
+    def test_permanent_activated_exile_maps_restricted_targets_and_keywords(self) -> None:
+        cases = [
+            (
+                "Lawbringer",
+                "Creature - Kor Rebel",
+                "{T}, Sacrifice this creature: Exile target red creature.",
+                """
+                    private static final FilterCreaturePermanent filter =
+                        new FilterCreaturePermanent("red creature");
+                    static { filter.add(new ColorPredicate(ObjectColor.RED)); }
+                    Ability ability = new SimpleActivatedAbility(new ExileTargetEffect(), new TapSourceCost());
+                    ability.addCost(new SacrificeSourceCost());
+                    ability.addTarget(new TargetPermanent(filter));
+                    this.addAbility(ability);
+                """,
+                ["SimpleActivatedAbility"],
+                "red_creature",
+                {"card_types": ["creature"], "target_colors": ["R"]},
+                True,
+                [],
+            ),
+            (
+                "Lieutenant Kirtar",
+                "Legendary Creature - Bird Soldier",
+                "Flying\n{1}{W}, Sacrifice Lieutenant Kirtar: Exile target attacking creature.",
+                """
+                    this.addAbility(FlyingAbility.getInstance());
+                    Ability ability = new SimpleActivatedAbility(
+                        new ExileTargetEffect(),
+                        new ManaCostsImpl<>("{1}{W}")
+                    );
+                    ability.addTarget(new TargetAttackingCreature());
+                    ability.addCost(new SacrificeSourceCost());
+                    this.addAbility(ability);
+                """,
+                ["FlyingAbility", "SimpleActivatedAbility"],
+                "attacking_creature",
+                {"card_types": ["creature"], "combat_state": "attacking"},
+                True,
+                ["flying"],
+            ),
+            (
+                "Soul Snare",
+                "Enchantment",
+                "{W}, Sacrifice this enchantment: Exile target creature that's attacking you or a planeswalker you control.",
+                """
+                    Ability ability = new SimpleActivatedAbility(
+                        new ExileTargetEffect(),
+                        new ManaCostsImpl<>("{W}")
+                    );
+                    ability.addCost(new SacrificeSourceCost());
+                    ability.addTarget(new TargetPermanent(new FilterCreatureAttackingYou(true)));
+                    this.addAbility(ability);
+                """,
+                ["SimpleActivatedAbility"],
+                "attacking_you_or_planeswalker_you_control_creature",
+                {
+                    "card_types": ["creature"],
+                    "combat_state": "attacking",
+                    "attacking_defender_scope": "self_or_planeswalker_you_control",
+                },
+                True,
+                [],
+            ),
+            (
+                "Undead Slayer",
+                "Creature - Human Cleric",
+                "{W}, {T}: Exile target Skeleton, Vampire, or Zombie.",
+                """
+                    private static final FilterPermanent filter =
+                        new FilterPermanent("Skeleton, Vampire, or Zombie");
+                    static {
+                        filter.add(Predicates.or(
+                            SubType.SKELETON.getPredicate(),
+                            SubType.VAMPIRE.getPredicate(),
+                            SubType.ZOMBIE.getPredicate()));
+                    }
+                    Ability ability = new SimpleActivatedAbility(
+                        new ExileTargetEffect(),
+                        new ColoredManaCost(ColoredManaSymbol.W)
+                    );
+                    ability.addCost(new TapSourceCost());
+                    ability.addTarget(new TargetPermanent(filter));
+                    this.addAbility(ability);
+                """,
+                ["SimpleActivatedAbility"],
+                "skeleton_vampire_or_zombie_creature",
+                {"card_types": ["creature"], "required_subtypes": ["skeleton", "vampire", "zombie"]},
+                False,
+                [],
+            ),
+        ]
+        for (
+            name,
+            type_line,
+            oracle_text,
+            source_text,
+            ability_classes,
+            target,
+            constraints,
+            requires_sacrifice,
+            keywords,
+        ) in cases:
+            with self.subTest(name=name):
+                row = queue_row(
+                    split.EXILE_UNIT,
+                    effect_classes=["ExileTargetEffect"],
+                    ability_kind="activated",
+                    ability_classes=ability_classes,
+                    xmage_signals=["targeting", "activated_ability"],
+                )
+                proposal, reason = split.split_row(
+                    row,
+                    metadata(name=name, type_line=type_line, oracle_text=oracle_text),
+                    source_text=source_text,
+                )
+
+                self.assertEqual(reason, "selected_exact_scope")
+                effect = proposal["effect_json"]
+                self.assertEqual(effect["battle_model_scope"], split.PERMANENT_ACTIVATED_EXILE_SCOPE)
+                self.assertEqual(effect["activated_remove_target"], target)
+                self.assertEqual(effect["target_constraints"], constraints)
+                self.assertEqual(effect["destination"], "exile")
+                self.assertEqual(effect["activation_requires_sacrifice"], requires_sacrifice)
+                self.assertEqual(effect.get("keywords", []), keywords)
+
     def test_permanent_activated_destroy_blocks_extra_oracle_clause(self) -> None:
         row = queue_row(
             split.DESTROY_UNIT,

@@ -9017,6 +9017,17 @@ def run_simple_activated_destroy(
     expected_sacrificed_source = bool(
         scenario.get("expected_sacrificed_source", effect.get("activation_requires_sacrifice", False))
     )
+    expected_exiled_source = bool(
+        scenario.get("expected_exiled_source", effect.get("activation_requires_exile_source", False))
+    )
+    expected_target_constraints = dict(scenario.get("expected_target_constraints") or {})
+    if expected_target_constraints.get("attacking_defender_scope") and not (
+        target.get("attacking_player")
+        or target.get("attacking_defender")
+        or target.get("attacking_planeswalker_controller")
+    ):
+        target["attacking_player"] = active.name
+        target["attacking_defender"] = active.name
 
     if not battle.can_activate_generic_destroy_permanent(active, source, [opponent]):
         fail("battle_execution", f"{card['name']} simple activated destroy cannot activate")
@@ -9058,6 +9069,9 @@ def run_simple_activated_destroy(
     if expected_sacrificed_source:
         if source in active.battlefield or source not in active.graveyard:
             fail("battle_execution", f"{card['name']} source sacrifice zone mismatch")
+    elif expected_exiled_source:
+        if source in active.battlefield or source not in active.exile:
+            fail("battle_execution", f"{card['name']} source exile zone mismatch")
     elif source not in active.battlefield:
         fail("battle_execution", f"{card['name']} source left battlefield unexpectedly")
     if bool(scenario.get("expect_target_sacrificed")):
@@ -9085,6 +9099,11 @@ def run_simple_activated_destroy(
         fail(
             "battle_events",
             f"{card['name']} sacrificed_source={activation_event.get('sacrificed_source')!r}, expected {expected_sacrificed_source}",
+        )
+    if bool(activation_event.get("exiled_source")) != expected_exiled_source:
+        fail(
+            "battle_events",
+            f"{card['name']} exiled_source={activation_event.get('exiled_source')!r}, expected {expected_exiled_source}",
         )
     expected_tap_cost_count = int(scenario.get("expected_tap_cost_count") or len(tap_cost_targets) or 0)
     if expected_tap_cost_count:

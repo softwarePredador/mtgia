@@ -14415,6 +14415,27 @@ def is_legal_target(spell, target, controller, all_players=None, target_type=Non
         bool(target.get("attacking")) or bool(target.get("blocking"))
     ):
         return False
+    attacking_defender_scope = str(
+        constraints.get("attacking_defender_scope")
+        or constraints.get("attacking_player_scope")
+        or ""
+    ).lower()
+    if attacking_defender_scope in {"self", "controller", "self_or_planeswalker_you_control"}:
+        controller_name = getattr(controller, "name", None)
+        attacking_player = (
+            target.get("attacking_player")
+            or target.get("attacking_defender")
+            or target.get("defending_player")
+        )
+        planeswalker_controller = (
+            target.get("attacking_planeswalker_controller")
+            or target.get("defending_planeswalker_controller")
+        )
+        if not controller_name or (
+            attacking_player != controller_name
+            and planeswalker_controller != controller_name
+        ):
+            return False
     tapped_state = str(constraints.get("tapped_state") or constraints.get("tap_state") or "").lower()
     if tapped_state == "tapped" and not bool(target.get("tapped")):
         return False
@@ -51919,6 +51940,7 @@ def apply_direct_damage(player, opponents, card, effect_data, turn, rng, *, fini
 GENERIC_TAP_DAMAGE_ACTIVATED_SCOPE = "xmage_tap_fixed_damage_target_activated_ability_v1"
 SIMPLE_ACTIVATED_DAMAGE_SCOPE = "xmage_permanent_simple_activated_damage_v1"
 SIMPLE_ACTIVATED_DESTROY_SCOPE = "xmage_permanent_simple_activated_destroy_target_v1"
+SIMPLE_ACTIVATED_EXILE_SCOPE = "xmage_permanent_simple_activated_exile_target_v1"
 SIMPLE_ACTIVATED_BOUNCE_SCOPE = "xmage_permanent_simple_activated_return_to_hand_v1"
 SIMPLE_ACTIVATED_TAP_TARGET_SCOPE = "xmage_permanent_simple_activated_tap_target_v1"
 SIMPLE_ACTIVATED_UNTAP_TARGET_SCOPE = "xmage_permanent_simple_activated_untap_target_v1"
@@ -51954,6 +51976,10 @@ GRAVEYARD_SELF_RETURN_TO_HAND_SCOPE = "xmage_graveyard_simple_activated_self_ret
 GRAVEYARD_SELF_RETURN_TO_BATTLEFIELD_SCOPE = (
     "xmage_graveyard_simple_activated_self_return_to_battlefield_v1"
 )
+SIMPLE_ACTIVATED_REMOVAL_SCOPES = {
+    SIMPLE_ACTIVATED_DESTROY_SCOPE,
+    SIMPLE_ACTIVATED_EXILE_SCOPE,
+}
 
 
 def _activated_rule_effects_for_permanent(permanent):
@@ -52016,16 +52042,18 @@ def _activated_rule_effects_for_permanent(permanent):
             direct_effect[key] = permanent.get(key)
         effects.append(direct_effect)
     if (
-        permanent.get("activated_effect") == "destroy_target"
-        and permanent.get("activated_battle_model_scope") == SIMPLE_ACTIVATED_DESTROY_SCOPE
+        permanent.get("activated_effect") in {"destroy_target", "exile_target"}
+        and permanent.get("activated_battle_model_scope") in SIMPLE_ACTIVATED_REMOVAL_SCOPES
     ):
+        removal_scope = permanent.get("activated_battle_model_scope")
         destroy_effect = {
             "effect": permanent.get("activated_remove_effect") or "remove_permanent",
             "battle_model_scope": permanent.get("activated_battle_model_scope"),
             "ability_kind": "activated",
-            "activated_effect": "destroy_target",
+            "activated_effect": permanent.get("activated_effect") or "destroy_target",
             "activation_requires_tap": bool(permanent.get("activation_requires_tap")),
             "activation_requires_sacrifice": bool(permanent.get("activation_requires_sacrifice")),
+            "activation_requires_exile_source": bool(permanent.get("activation_requires_exile_source")),
             "activation_requires_sacrifice_target": bool(permanent.get("activation_requires_sacrifice_target")),
             "activation_sacrifice_target": permanent.get("activation_sacrifice_target"),
             "activation_sacrifice_cost": permanent.get("activation_sacrifice_cost"),
@@ -52040,7 +52068,9 @@ def _activated_rule_effects_for_permanent(permanent):
             "activation_cost_colors": permanent.get("activation_cost_colors"),
             "target": permanent.get("target"),
             "target_constraints": permanent.get("target_constraints"),
-            "destination": permanent.get("destination") or "graveyard",
+            "destination": permanent.get("destination") or (
+                "exile" if removal_scope == SIMPLE_ACTIVATED_EXILE_SCOPE else "graveyard"
+            ),
             "activated_remove_target": permanent.get("activated_remove_target"),
         }
         for key in (
@@ -54188,7 +54218,7 @@ def activated_destroy_effect_for_permanent(permanent):
         return None
     for effect_data in _activated_rule_effects_for_permanent(permanent):
         if (
-            effect_data.get("battle_model_scope") == SIMPLE_ACTIVATED_DESTROY_SCOPE
+            effect_data.get("battle_model_scope") in SIMPLE_ACTIVATED_REMOVAL_SCOPES
             and effect_data.get("ability_kind") == "activated"
             and effect_data.get("effect") in TARGETED_REMOVAL_EFFECTS
         ):
@@ -54382,7 +54412,14 @@ def activate_generic_destroy_permanent(player, opponents, all_players, permanent
     if _activation_tap_cost(effect_data):
         tapped_cost_targets = _tap_activation_cost_candidates(player, tap_candidates, turn)
     sacrificed_source = False
-    if effect_data.get("activation_requires_sacrifice"):
+    exiled_source = False
+    if effect_data.get("activation_requires_exile_source"):
+        if permanent in player.battlefield:
+            player.battlefield.remove(permanent)
+        if permanent not in player.exile:
+            player.exile.append(permanent)
+        exiled_source = True
+    elif effect_data.get("activation_requires_sacrifice"):
         if permanent in player.battlefield:
             player.battlefield.remove(permanent)
         player.graveyard.append(permanent)
@@ -54437,6 +54474,7 @@ def activate_generic_destroy_permanent(player, opponents, all_players, permanent
             "target_score": list(target_priority(target)),
             "requires_tap": 1 if effect_data.get("activation_requires_tap") else 0,
             "requires_sacrifice": 1 if sacrificed_source else 0,
+            "requires_exile_source": 1 if exiled_source else 0,
             "sacrifice_target": sacrifice_target_type or None,
             "sacrificed_target": (sacrificed_target or {}).get("name"),
             "sacrificed_targets": _sacrificed_cost_target_names(sacrificed_targets),
@@ -54466,9 +54504,10 @@ def activate_generic_destroy_permanent(player, opponents, all_players, permanent
             "mana": -mana_paid,
             "tapped": (1 if effect_data.get("activation_requires_tap") else 0) + len(tapped_cost_targets),
             "permanents": -(
-                (1 if sacrificed_source else 0)
+                (1 if sacrificed_source or exiled_source else 0)
                 + len(sacrificed_targets)
             ),
+            "exile": 1 if exiled_source else 0,
             "graveyard": len(discard_resolution.get("to_graveyard") or []),
             "cards_discarded": activation_discard_count,
             "opponent_permanents_removed": 1,
@@ -54478,6 +54517,7 @@ def activate_generic_destroy_permanent(player, opponents, all_players, permanent
             for flag, active in {
                 "tap_ability": bool(effect_data.get("activation_requires_tap")),
                 "sacrifice_source": sacrificed_source,
+                "exile_source": exiled_source,
                 "sacrifice_target": bool(sacrificed_targets),
                 "tap_cost_target": bool(tapped_cost_targets),
                 "discard_cost": activation_discard_count > 0,
@@ -54495,6 +54535,7 @@ def activate_generic_destroy_permanent(player, opponents, all_players, permanent
         activation_cost=activation_cost,
         tapped=bool(permanent.get("tapped")),
         sacrificed_source=sacrificed_source,
+        exiled_source=exiled_source,
         sacrifice_target=sacrifice_target_type or None,
         sacrificed_target=(sacrificed_target or {}).get("name"),
         sacrificed_targets=_sacrificed_cost_target_names(sacrificed_targets),
@@ -72713,6 +72754,9 @@ def clear_combat_state(all_players):
         for permanent in getattr(participant, "battlefield", []) or []:
             if isinstance(permanent, dict):
                 permanent.pop("attacking", None)
+                permanent.pop("attacking_player", None)
+                permanent.pop("attacking_defender", None)
+                permanent.pop("attacking_planeswalker_controller", None)
                 permanent.pop("blocking", None)
 
 
@@ -73767,8 +73811,17 @@ def declare_attackers_step(attacker, opponents, all_players, turn):
     ):
         return None
 
+    attacker_defenders = {
+        id(creature): defender
+        for defender, group_attackers in attack_groups
+        for creature in group_attackers
+    }
     for creature in attackers:
         creature["attacking"] = True
+        defender = attacker_defenders.get(id(creature))
+        if defender is not None:
+            creature["attacking_player"] = defender.name
+            creature["attacking_defender"] = defender.name
         if not has_vigilance(creature):
             creature["tapped"] = True
             resolve_controlled_dwarf_tap_treasure_triggers(

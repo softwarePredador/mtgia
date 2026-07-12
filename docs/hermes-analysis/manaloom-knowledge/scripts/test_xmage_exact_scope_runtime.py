@@ -13251,6 +13251,148 @@ class XMageExactScopeRuntimeTest(unittest.TestCase):
             )
         )
 
+    def test_simple_activated_exile_exiles_target_and_source(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        opponent = self.battle.Player("Opponent", None, [])
+        active.mana_pool.add("colorless", 4)
+        target = {
+            "name": "Target Bear",
+            "type_line": "Creature - Bear",
+            "power": 2,
+            "toughness": 2,
+        }
+        opponent.battlefield.append(target)
+        permanent = {
+            "name": "Brittle Effigy",
+            "type_line": "Artifact",
+            "effect": "artifact",
+            "battle_model_scope": "xmage_permanent_simple_activated_exile_target_v1",
+            "activated_effect": "exile_target",
+            "activated_battle_model_scope": "xmage_permanent_simple_activated_exile_target_v1",
+            "activated_remove_effect": "remove_creature",
+            "activated_remove_target": "creature",
+            "target": "creature",
+            "target_constraints": {"card_types": ["creature"]},
+            "destination": "exile",
+            "activation_cost_mana": "{4}",
+            "activation_cost_generic": 4,
+            "activation_cost_colors": [],
+            "activation_requires_tap": True,
+            "activation_requires_exile_source": True,
+            "summoning_sick": False,
+            "_rule_logical_key": "battle_rule_v1:brittle_effigy",
+        }
+        active.battlefield.append(permanent)
+
+        activated = self.battle.activate_generic_destroy_permanent(
+            active,
+            [opponent],
+            [active, opponent],
+            permanent,
+            turn=21,
+            rng=random.Random(121),
+            phase="precombat_main",
+        )
+
+        self.assertTrue(activated)
+        self.assertNotIn(permanent, active.battlefield)
+        self.assertIn(permanent, active.exile)
+        self.assertNotIn(target, opponent.battlefield)
+        self.assertIn(target, opponent.exile)
+        self.assertEqual(active.available_mana(), 0)
+        self.assertTrue(
+            any(
+                event == "activated_ability"
+                and data.get("card") == "Brittle Effigy"
+                and data.get("activation_kind") == "simple_activated_destroy"
+                and data.get("exiled_source") is True
+                and data.get("sacrificed_source") is False
+                and data.get("target") == "Target Bear"
+                and data.get("rule_logical_key") == "battle_rule_v1:brittle_effigy"
+                for event, data in self.events
+            )
+        )
+        self.assertTrue(
+            any(
+                event == "removal_resolved"
+                and data.get("card") == "Brittle Effigy"
+                and data.get("target") == "Target Bear"
+                and data.get("destination") == "exile"
+                for event, data in self.events
+            )
+        )
+
+    def test_simple_activated_exile_respects_attacking_defender_scope(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        opponent = self.battle.Player("Opponent", None, [])
+        active.mana_pool.add("white", 1)
+        target = {
+            "name": "Wrong Defender Attacker",
+            "type_line": "Creature - Warrior",
+            "power": 3,
+            "toughness": 3,
+            "attacking": True,
+            "attacking_player": "Other Defender",
+        }
+        opponent.battlefield.append(target)
+        permanent = {
+            "name": "Soul Snare",
+            "type_line": "Enchantment",
+            "effect": "enchantment",
+            "battle_model_scope": "xmage_permanent_simple_activated_exile_target_v1",
+            "activated_effect": "exile_target",
+            "activated_battle_model_scope": "xmage_permanent_simple_activated_exile_target_v1",
+            "activated_remove_effect": "remove_creature",
+            "activated_remove_target": "attacking_you_or_planeswalker_you_control_creature",
+            "target": "creature",
+            "target_constraints": {
+                "card_types": ["creature"],
+                "combat_state": "attacking",
+                "attacking_defender_scope": "self_or_planeswalker_you_control",
+            },
+            "destination": "exile",
+            "activation_cost_mana": "{W}",
+            "activation_cost_generic": 0,
+            "activation_cost_colors": ["W"],
+            "activation_requires_sacrifice": True,
+            "summoning_sick": False,
+        }
+        active.battlefield.append(permanent)
+
+        self.assertFalse(
+            self.battle.can_activate_generic_destroy_permanent(
+                active,
+                permanent,
+                [opponent],
+            )
+        )
+
+        target["attacking_player"] = "Active"
+        activated = self.battle.activate_generic_destroy_permanent(
+            active,
+            [opponent],
+            [active, opponent],
+            permanent,
+            turn=22,
+            rng=random.Random(122),
+            phase="combat",
+        )
+
+        self.assertTrue(activated)
+        self.assertNotIn(permanent, active.battlefield)
+        self.assertIn(permanent, active.graveyard)
+        self.assertNotIn(target, opponent.battlefield)
+        self.assertIn(target, opponent.exile)
+        self.assertTrue(
+            any(
+                event == "activated_ability"
+                and data.get("card") == "Soul Snare"
+                and data.get("sacrificed_source") is True
+                and data.get("target") == "Wrong Defender Attacker"
+                for event, data in self.events
+            )
+        )
+
     def test_simple_activated_destroy_pays_discard_cost_and_respects_nonblack_target(self) -> None:
         active = self.battle.Player("Active", None, [])
         opponent = self.battle.Player("Opponent", None, [])

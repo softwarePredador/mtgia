@@ -329,6 +329,7 @@ CREATURE_TAP_DAMAGE_SCOPE = "xmage_creature_tap_fixed_damage_target_activated_v1
 TAP_DAMAGE_ACTIVATED_SCOPE = "xmage_tap_fixed_damage_target_activated_ability_v1"
 PERMANENT_ACTIVATED_DAMAGE_SCOPE = "xmage_permanent_simple_activated_damage_v1"
 PERMANENT_ACTIVATED_DESTROY_SCOPE = "xmage_permanent_simple_activated_destroy_target_v1"
+PERMANENT_ACTIVATED_EXILE_SCOPE = "xmage_permanent_simple_activated_exile_target_v1"
 PERMANENT_ACTIVATED_BOUNCE_SCOPE = "xmage_permanent_simple_activated_return_to_hand_v1"
 PERMANENT_ACTIVATED_TAP_TARGET_SCOPE = "xmage_permanent_simple_activated_tap_target_v1"
 PERMANENT_ACTIVATED_UNTAP_TARGET_SCOPE = "xmage_permanent_simple_activated_untap_target_v1"
@@ -13432,6 +13433,17 @@ def is_permanent_activated_destroy_unit(row: dict[str, Any]) -> bool:
     )
 
 
+def is_permanent_activated_exile_unit(row: dict[str, Any]) -> bool:
+    abilities = ability_classes(row)
+    remaining = abilities - {"SimpleActivatedAbility"}
+    return (
+        str(row.get("adapter_work_unit") or "") == EXILE_UNIT
+        and effect_classes(row) == {"ExileTargetEffect"}
+        and "SimpleActivatedAbility" in abilities
+        and remaining.issubset(STATIC_SELF_KEYWORD_ABILITY_CLASSES)
+    )
+
+
 def is_permanent_activated_bounce_unit(row: dict[str, Any]) -> bool:
     abilities = ability_classes(row)
     remaining = abilities - {"SimpleActivatedAbility"}
@@ -16774,6 +16786,7 @@ def restricted_target_base(target: str) -> str:
         "nonred_creature",
         "nonwhite_creature",
         "black_creature",
+        "red_creature",
         "white_creature",
         "blue_creature",
         "green_creature",
@@ -16811,9 +16824,11 @@ def restricted_target_base(target: str) -> str:
         "non_spirit_creature",
         "non_vampire_werewolf_zombie_creature",
         "vampire_werewolf_or_zombie_creature",
+        "skeleton_vampire_or_zombie_creature",
         "human_creature",
         "spirit_creature",
         "wall_creature",
+        "attacking_you_or_planeswalker_you_control_creature",
     }:
         return "creature"
     if target in {
@@ -16901,6 +16916,10 @@ def restricted_battlefield_target_from_oracle(metadata: dict[str, Any], action: 
         (r"target attacking creature with power 3 or less", "attacking_creature_power_3_or_less"),
         (r"target attacking creature without flying", "attacking_creature_without_flying"),
         (r"target attacking creature with flying", "attacking_flying_creature"),
+        (
+            r"target creature (?:that's|that is) attacking you or a planeswalker you control",
+            "attacking_you_or_planeswalker_you_control_creature",
+        ),
         (r"target black or red creature (?:that's|that is) attacking or blocking", "black_or_red_attacking_or_blocking_creature"),
         (r"target nonblack attacking creature", "nonblack_attacking_creature"),
         (r"target attacking or blocking creature", "attacking_or_blocking_creature"),
@@ -16919,6 +16938,7 @@ def restricted_battlefield_target_from_oracle(metadata: dict[str, Any], action: 
         (r"target nonred creature", "nonred_creature"),
         (r"target nonwhite creature", "nonwhite_creature"),
         (r"target black creature(?:\. it can't be regenerated)?", "black_creature"),
+        (r"target red creature(?:\. it can't be regenerated)?", "red_creature"),
         (r"target artifact creature", "artifact_creature"),
         (r"target green or white creature", "green_or_white_creature"),
         (r"target white creature(?:\. it can't be regenerated)?", "white_creature"),
@@ -16935,6 +16955,7 @@ def restricted_battlefield_target_from_oracle(metadata: dict[str, Any], action: 
         (r"target non-outlaw creature", "non_outlaw_creature"),
         (r"target enchanted creature or enchantment creature", "enchanted_or_enchantment_creature"),
         (r"target human creature", "human_creature"),
+        (r"target skeleton, vampire, or zombie", "skeleton_vampire_or_zombie_creature"),
         (r"target spirit(?:\.|$)", "spirit_creature"),
         (r"target wall(?:\. it can't be regenerated)?", "wall_creature"),
         (r"target djinn or efreet", "djinn_or_efreet_permanent"),
@@ -17049,6 +17070,8 @@ def restricted_battlefield_target_from_source(source: str) -> str | None:
         return "attacking_or_blocking_creature"
     if re.search(r"new\s+TargetAttackingCreature\s*\(", text) or "FilterAttackingCreature" in text:
         return "attacking_creature"
+    if "FilterCreatureAttackingYou" in text:
+        return "attacking_you_or_planeswalker_you_control_creature"
     if "BlockedPredicate" in text or 'FilterCreaturePermanent("blocked creature")' in text or "blocked creature" in text:
         return "blocked_creature"
     if re.search(r"new\s+TargetBlockingCreature\s*\(", text) or "FilterBlockingCreature" in text:
@@ -17134,6 +17157,8 @@ def restricted_battlefield_target_from_source(source: str) -> str | None:
         return "white_or_blue_creature"
     if 'FilterCreaturePermanent("black creature")' in text or "black creature" in text:
         return "black_creature"
+    if 'FilterCreaturePermanent("red creature")' in text or "red creature" in text:
+        return "red_creature"
     if 'FilterCreaturePermanent("green or white creature")' in text or "green or white creature" in text:
         return "green_or_white_creature"
     if 'FilterCreaturePermanent("white creature")' in text or "white creature" in text:
@@ -17160,11 +17185,18 @@ def restricted_battlefield_target_from_source(source: str) -> str | None:
         "non-Merfolk creature": "non_merfolk_creature",
         "non-Spirit creature": "non_spirit_creature",
         "non-Vampire, non-Werewolf, non-Zombie creature": "non_vampire_werewolf_zombie_creature",
+        "Skeleton, Vampire, or Zombie": "skeleton_vampire_or_zombie_creature",
         "Human creature": "human_creature",
     }
     for phrase, target in subtype_targets.items():
         if f'FilterCreaturePermanent("{phrase}")' in text or phrase in text:
             return target
+    if (
+        "SubType.SKELETON" in text
+        and "SubType.VAMPIRE" in text
+        and "SubType.ZOMBIE" in text
+    ):
+        return "skeleton_vampire_or_zombie_creature"
     if "OutlawPredicate" in text or "non-outlaw creature" in text:
         return "non_outlaw_creature"
     if (
@@ -21219,6 +21251,9 @@ def activation_tap_cost_from_phrase(phrase: str) -> dict[str, Any] | str:
     elif object_text in {"wizard", "wizards"}:
         constraints["card_types"] = ["creature"]
         constraints["required_subtypes"] = ["wizard"]
+    elif object_text in {"human", "humans"}:
+        constraints["card_types"] = ["creature"]
+        constraints["required_subtypes"] = ["human"]
     else:
         return "activation_tap_cost_not_supported"
     return normalized_activation_tap_cost(
@@ -21327,6 +21362,12 @@ def activation_tap_cost_source_constraints(search_text: str) -> dict[str, Any] |
     if "SubType.WIZARD" in text or re.search(r"\buntapped wizards?\b", text, re.I):
         constraints["card_types"] = ["creature"]
         constraints["required_subtypes"] = ["wizard"]
+    if (
+        "required_subtypes" not in constraints
+        and ("SubType.HUMAN" in text or re.search(r"\buntapped humans?\b", text, re.I))
+    ):
+        constraints["card_types"] = ["creature"]
+        constraints["required_subtypes"] = ["human"]
     if "CardType.ARTIFACT" in text or re.search(r"\buntapped artifacts?\b", text, re.I):
         constraints["card_types"] = ["artifact"]
     color_matches = [
@@ -21867,6 +21908,157 @@ def activated_destroy_from_source(source: str) -> dict[str, Any] | str:
         "activation_cost_colors": activation_cost_colors,
         "activation_requires_tap": "TapSourceCost" in window,
         "activation_requires_sacrifice": "SacrificeSourceCost" in window,
+        **(
+            {
+                "activation_sacrifice_cost": sacrifice_cost,
+                "activation_requires_sacrifice_target": True,
+            }
+            if sacrifice_cost is not None
+            else {}
+        ),
+        **(
+            {
+                "activation_sacrifice_target": sacrifice_target,
+                "activation_requires_sacrifice_target": True,
+            }
+            if sacrifice_target is not None
+            else {}
+        ),
+        **(
+            {
+                "activation_tap_cost": tap_cost,
+                "activation_requires_tap_target": True,
+            }
+            if tap_cost is not None
+            else {}
+        ),
+        **(discard_cost or {}),
+    }
+
+
+def activation_exile_source_cost_from_oracle(text: str) -> bool | str:
+    cost_text = str(text or "").lower().rsplit(":", 1)[0]
+    if not re.search(r"(?:^|,\s*)exile\s+", cost_text):
+        return False
+    if re.search(
+        r"(?:^|,\s*)exile this (?:artifact|creature|enchantment|permanent)(?:,|$)",
+        cost_text,
+    ):
+        return True
+    return "activated_exile_oracle_exile_source_cost_not_supported"
+
+
+def activated_exile_from_oracle(metadata: dict[str, Any]) -> dict[str, Any] | None:
+    text = re.sub(r"\s+", " ", oracle_text(metadata)).strip().lower()
+    if text.count(":") != 1:
+        return None
+    exile_source_cost = activation_exile_source_cost_from_oracle(text)
+    if isinstance(exile_source_cost, str):
+        return None
+    discard_cost = activation_discard_cost_from_oracle(text)
+    sacrifice_cost = activation_sacrifice_cost_from_oracle(text)
+    if isinstance(sacrifice_cost, str):
+        return None
+    tap_cost = activation_tap_cost_from_oracle(text)
+    if isinstance(tap_cost, str):
+        return None
+    effect_text = text.rsplit(":", 1)[1].strip()
+    extra_sentences = [
+        sentence.strip()
+        for sentence in re.split(r"(?<=\.)\s+", effect_text)
+        if sentence.strip()
+    ]
+    if len(extra_sentences) != 1:
+        return None
+    effect_metadata = dict(metadata)
+    effect_metadata["oracle_text"] = effect_text
+    target = exile_target_from_oracle(effect_metadata)
+    if target is None:
+        return None
+    effect, target_type = target
+    return {
+        "effect": effect,
+        "target": target_type,
+        "activation_sacrifice_cost": sacrifice_cost,
+        "activation_tap_cost": tap_cost,
+        "activation_requires_exile_source": bool(exile_source_cost),
+        **(discard_cost or {}),
+    }
+
+
+def activated_exile_from_source(source: str) -> dict[str, Any] | str:
+    text = source or ""
+    risky_cost_classes = {
+        "CompositeCost",
+        "ExileFrom",
+        "ExileFromGraveCost",
+        "ExileSourceFromGraveCost",
+        "MillCardsCost",
+        "OrCost",
+        "PayLifeCost",
+        "RemoveCounterCost",
+        "ReturnToHandSourceCost",
+        "RevealTargetFromHandCost",
+    }
+    if "Zone.GRAVEYARD" in text:
+        return "activated_exile_source_not_battlefield"
+    present_risky = sorted(cost for cost in risky_cost_classes if cost in text)
+    if present_risky:
+        return "activated_exile_source_cost_not_supported"
+    if len(re.findall(r"new\s+ExileTargetEffect\s*\(\s*\)", text, re.S)) != 1:
+        return "activated_exile_source_not_simple_exile_effect"
+    effect_index = text.find("ExileTargetEffect")
+    window = text[max(0, effect_index - 500) : effect_index + 2000]
+    if "SimpleActivatedAbility" not in window:
+        return "activated_exile_source_not_simple_activated"
+    discard_cost = activation_discard_cost_from_source(window)
+    if isinstance(discard_cost, str):
+        return discard_cost.replace("activated_damage", "activated_exile")
+    sacrifice_cost = None
+    sacrifice_target = None
+    if "SacrificeTargetCost" in window:
+        sacrifice_cost = activation_sacrifice_cost_from_source(text, window)
+        if isinstance(sacrifice_cost, str):
+            return sacrifice_cost.replace("activated_damage", "activated_exile")
+        if sacrifice_cost is None:
+            return "activated_exile_source_cost_not_supported"
+        sacrifice_target = activation_sacrifice_target_from_cost(sacrifice_cost)
+    tap_cost = activation_tap_cost_from_source(text, window)
+    if isinstance(tap_cost, str):
+        return tap_cost.replace("activation_tap", "activated_exile")
+    target_text = source_effect_target_window(text, effect_index)
+    target = activated_destroy_target_from_source(target_text)
+    if target is None:
+        return "activated_exile_source_target_not_supported"
+    cost_text = "{0}"
+    mana_match = re.search(r'ManaCostsImpl<[^>]*>\s*\(\s*"([^"]+)"\s*\)', window)
+    generic_match = re.search(r"GenericManaCost\s*\(\s*(\d+)\s*\)", window)
+    colored_match = re.search(r"ColoredManaCost\s*\(\s*ColoredManaSymbol\.([WUBRG])\s*\)", window)
+    cost_kinds = sum(1 for match in (mana_match, generic_match, colored_match) if match)
+    if cost_kinds > 1:
+        return "activated_exile_source_mana_cost_not_supported"
+    if mana_match:
+        cost_text = canonical_mana_cost_text(mana_match.group(1))
+    elif generic_match:
+        cost_text = "{" + generic_match.group(1) + "}"
+    elif colored_match:
+        cost_text = "{" + colored_match.group(1) + "}"
+    parsed_cost = parse_mana_cost_text(cost_text)
+    if parsed_cost is None:
+        return "activated_exile_source_mana_cost_not_supported"
+    activation_cost_generic, activation_cost_colors = parsed_cost
+    requires_exile_source = "ExileSourceCost" in window
+    requires_sacrifice = "SacrificeSourceCost" in window
+    if requires_exile_source and requires_sacrifice:
+        return "activated_exile_source_cost_not_supported"
+    return {
+        "target": target,
+        "activation_cost_mana": cost_text,
+        "activation_cost_generic": activation_cost_generic,
+        "activation_cost_colors": activation_cost_colors,
+        "activation_requires_tap": "TapSourceCost" in window,
+        "activation_requires_sacrifice": requires_sacrifice,
+        "activation_requires_exile_source": requires_exile_source,
         **(
             {
                 "activation_sacrifice_cost": sacrifice_cost,
@@ -30458,6 +30650,8 @@ def target_constraints_for(target: str) -> dict[str, Any]:
         return {"card_types": ["creature"], "exclude_colors": ["W"]}
     if target == "black_creature":
         return {"card_types": ["creature"], "target_colors": ["B"]}
+    if target == "red_creature":
+        return {"card_types": ["creature"], "target_colors": ["R"]}
     if target == "white_creature":
         return {"card_types": ["creature"], "target_colors": ["W"]}
     if target == "blue_creature":
@@ -30562,6 +30756,14 @@ def target_constraints_for(target: str) -> dict[str, Any]:
         }
     if target == "vampire_werewolf_or_zombie_creature":
         return {"card_types": ["creature"], "required_subtypes": ["vampire", "werewolf", "zombie"]}
+    if target == "skeleton_vampire_or_zombie_creature":
+        return {"card_types": ["creature"], "required_subtypes": ["skeleton", "vampire", "zombie"]}
+    if target == "attacking_you_or_planeswalker_you_control_creature":
+        return {
+            "card_types": ["creature"],
+            "combat_state": "attacking",
+            "attacking_defender_scope": "self_or_planeswalker_you_control",
+        }
     if target == "human_creature":
         return {"card_types": ["creature"], "required_subtypes": ["human"]}
     if target == "spirit_creature":
@@ -31084,6 +31286,8 @@ def proposal_notes(row: dict[str, Any], scope: str) -> str:
         scope_kind = "permanent with a simple activated damage ability"
     elif scope == PERMANENT_ACTIVATED_DESTROY_SCOPE:
         scope_kind = "permanent with a simple activated destroy-target ability"
+    elif scope == PERMANENT_ACTIVATED_EXILE_SCOPE:
+        scope_kind = "permanent with a simple activated exile-target ability"
     elif scope == PERMANENT_ACTIVATED_DRAW_SCOPE:
         scope_kind = "permanent with a simple activated draw ability"
     elif scope == PERMANENT_ACTIVATED_DRAW_DISCARD_SCOPE:
@@ -31277,6 +31481,7 @@ def split_row(
     permanent_activated_draw_unit = is_permanent_activated_draw_unit(row)
     permanent_activated_damage_unit = is_permanent_activated_damage_unit(row)
     permanent_activated_destroy_unit = is_permanent_activated_destroy_unit(row)
+    permanent_activated_exile_unit = is_permanent_activated_exile_unit(row)
     permanent_activated_bounce_unit = is_permanent_activated_bounce_unit(row)
     permanent_activated_tap_target_unit = is_permanent_activated_tap_target_unit(row)
     permanent_activated_untap_target_unit = is_permanent_activated_untap_target_unit(row)
@@ -31485,6 +31690,7 @@ def split_row(
         and not permanent_activated_draw_unit
         and not permanent_activated_damage_unit
         and not permanent_activated_destroy_unit
+        and not permanent_activated_exile_unit
         and not permanent_activated_bounce_unit
         and not permanent_activated_untap_target_unit
         and not permanent_activated_life_gain_unit
@@ -31627,6 +31833,7 @@ def split_row(
         and not permanent_activated_draw_unit
         and not permanent_activated_damage_unit
         and not permanent_activated_destroy_unit
+        and not permanent_activated_exile_unit
         and not permanent_activated_bounce_unit
         and not permanent_activated_untap_target_unit
         and not permanent_activated_life_gain_unit
@@ -33257,6 +33464,155 @@ def split_row(
             metadata,
             effect_json,
             family_id="xmage_permanent_simple_activated_destroy_target",
+        ), "selected_exact_scope"
+
+    if permanent_activated_exile_unit:
+        if not is_permanent_metadata(metadata) or is_spell(metadata):
+            return None, "activated_exile_not_permanent"
+        oracle_exile = activated_exile_from_oracle(metadata)
+        if oracle_exile is None:
+            return None, "activated_exile_oracle_not_simple"
+        parsed_activation = activated_exile_from_source(source_text)
+        if isinstance(parsed_activation, str):
+            return None, parsed_activation
+        oracle_effect = str(oracle_exile["effect"])
+        oracle_target_type = str(oracle_exile["target"])
+        if str(parsed_activation["target"]) != str(oracle_target_type):
+            return None, "activated_exile_source_oracle_target_mismatch"
+        oracle_sacrifice_cost = normalized_activation_sacrifice_cost(
+            oracle_exile.get("activation_sacrifice_cost")
+        )
+        source_sacrifice_cost = normalized_activation_sacrifice_cost(
+            parsed_activation.get("activation_sacrifice_cost")
+        )
+        if source_sacrifice_cost != oracle_sacrifice_cost:
+            return None, "activated_exile_source_oracle_sacrifice_cost_mismatch"
+        oracle_tap_cost = normalized_activation_tap_cost(
+            oracle_exile.get("activation_tap_cost")
+        )
+        source_tap_cost = normalized_activation_tap_cost(
+            parsed_activation.get("activation_tap_cost")
+        )
+        if source_tap_cost != oracle_tap_cost:
+            return None, "activated_exile_source_oracle_tap_cost_mismatch"
+        if parsed_activation.get("activation_sacrifice_target") and not source_sacrifice_cost:
+            return None, "activated_exile_source_oracle_sacrifice_target_mismatch"
+        if bool(parsed_activation.get("activation_requires_exile_source")) != bool(
+            oracle_exile.get("activation_requires_exile_source")
+        ):
+            return None, "activated_exile_source_oracle_exile_source_cost_mismatch"
+        oracle_discard_count = int(oracle_exile.get("activation_discard_count") or 0)
+        source_discard_count = int(parsed_activation.get("activation_discard_count") or 0)
+        if source_discard_count != oracle_discard_count:
+            return None, "activated_exile_source_oracle_discard_cost_mismatch"
+        if str(parsed_activation.get("activation_discard_target") or "any_card") != str(
+            oracle_exile.get("activation_discard_target") or "any_card"
+        ):
+            return None, "activated_exile_source_oracle_discard_cost_mismatch"
+        if bool(parsed_activation.get("activation_discard_random")) != bool(
+            oracle_exile.get("activation_discard_random")
+        ):
+            return None, "activated_exile_source_oracle_discard_cost_mismatch"
+        type_line = str(metadata.get("type_line") or "").lower()
+        permanent_effect = (
+            "creature"
+            if "creature" in type_line
+            else "artifact"
+            if "artifact" in type_line
+            else "enchantment"
+            if "enchantment" in type_line
+            else "permanent"
+        )
+        target_base = restricted_target_base(oracle_target_type)
+        target_constraints = target_constraints_for(oracle_target_type)
+        activated_effect = {
+            "effect": oracle_effect,
+            "battle_model_scope": PERMANENT_ACTIVATED_EXILE_SCOPE,
+            "ability_kind": "activated",
+            "activated_effect": "exile_target",
+            "activated_remove_effect": oracle_effect,
+            "activated_remove_target": oracle_target_type,
+            "target": target_base,
+            "target_constraints": target_constraints,
+            "destination": "exile",
+            "xmage_effect_class": "ExileTargetEffect",
+            "xmage_ability_class": "SimpleActivatedAbility",
+            **{
+                key: parsed_activation[key]
+                for key in (
+                    "activation_cost_mana",
+                    "activation_cost_generic",
+                    "activation_cost_colors",
+                    "activation_requires_tap",
+                    "activation_requires_sacrifice",
+                    "activation_requires_exile_source",
+                    "activation_sacrifice_cost",
+                    "activation_sacrifice_target",
+                    "activation_requires_sacrifice_target",
+                    "activation_tap_cost",
+                    "activation_requires_tap_target",
+                    "activation_discard_count",
+                    "activation_discard_target",
+                    "activation_requires_discard_card",
+                    "activation_discard_random",
+                )
+                if key in parsed_activation
+            },
+        }
+        effect_json = {
+            "effect": permanent_effect,
+            "battle_model_scope": PERMANENT_ACTIVATED_EXILE_SCOPE,
+            "ability_kind": "static_and_activated",
+            "activated_effect": "exile_target",
+            "activated_battle_model_scope": PERMANENT_ACTIVATED_EXILE_SCOPE,
+            "activated_remove_effect": oracle_effect,
+            "activated_remove_target": oracle_target_type,
+            "target": target_base,
+            "target_constraints": target_constraints,
+            "destination": "exile",
+            "_activated_rule_effects": [activated_effect],
+            "xmage_effect_class": "ExileTargetEffect",
+            "xmage_ability_class": "SimpleActivatedAbility",
+            **{
+                key: parsed_activation[key]
+                for key in (
+                    "activation_cost_mana",
+                    "activation_cost_generic",
+                    "activation_cost_colors",
+                    "activation_requires_tap",
+                    "activation_requires_sacrifice",
+                    "activation_requires_exile_source",
+                    "activation_sacrifice_cost",
+                    "activation_sacrifice_target",
+                    "activation_requires_sacrifice_target",
+                    "activation_tap_cost",
+                    "activation_requires_tap_target",
+                    "activation_discard_count",
+                    "activation_discard_target",
+                    "activation_requires_discard_card",
+                    "activation_discard_random",
+                )
+                if key in parsed_activation
+            },
+        }
+        if parsed_activation.get("activation_requires_sacrifice"):
+            effect_json["activated_self_sacrifice_exile"] = True
+            activated_effect["activated_self_sacrifice_exile"] = True
+        if parsed_activation.get("activation_requires_exile_source"):
+            effect_json["activated_self_exile_cost"] = True
+            activated_effect["activated_self_exile_cost"] = True
+        keyword_list = ordered_keywords(keywords_from_source_added_ability_classes(source_text, row))
+        if keyword_list:
+            effect_json["keywords"] = keyword_list
+            effect_json["_keywords_are_self"] = True
+            effect_json["xmage_ability_classes"] = sorted(ability_classes(row))
+            for keyword in keyword_list:
+                effect_json[keyword] = True
+        return build_proposal(
+            row,
+            metadata,
+            effect_json,
+            family_id="xmage_permanent_simple_activated_exile_target",
         ), "selected_exact_scope"
 
     if permanent_activated_bounce_unit:
@@ -45818,6 +46174,7 @@ def build_exact_split_report(
             and not is_permanent_activated_draw_unit(row)
             and not is_permanent_activated_damage_unit(row)
             and not is_permanent_activated_destroy_unit(row)
+            and not is_permanent_activated_exile_unit(row)
             and not is_permanent_activated_bounce_unit(row)
             and not is_permanent_activated_life_gain_unit(row)
             and not is_permanent_activated_self_boost_unit(row)
