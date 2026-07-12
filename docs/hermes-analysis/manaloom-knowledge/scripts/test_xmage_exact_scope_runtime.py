@@ -22513,6 +22513,38 @@ class XMageExactScopeRuntimeTest(unittest.TestCase):
         self.assertTrue(permanent["haste"])
         self.assertFalse(permanent["summoning_sick"])
 
+    def test_changeling_creature_matches_every_creature_subtype_filter(self) -> None:
+        changeling = {
+            "name": "Avian Changeling",
+            "type_line": "Creature - Shapeshifter",
+            "effect": "creature",
+            "battle_model_scope": "xmage_static_self_changeling_creature_v1",
+            "keywords": ["changeling", "flying"],
+            "_keywords_are_self": True,
+            "changeling": True,
+            "all_creature_types": True,
+            "universal_creature_subtypes": True,
+            "flying": True,
+        }
+
+        self.assertTrue(self.battle.permanent_has_subtype(changeling, "Elf"))
+        self.assertTrue(self.battle.permanent_has_subtype(changeling, "Goblin"))
+        self.assertTrue(self.battle._card_subtype_matches(changeling, ["Dragon"]))
+        self.assertTrue(
+            self.battle.global_stat_modifier_creature_filter_matches(
+                changeling,
+                {"subtypes": ["Wizard"]},
+            )
+        )
+        self.assertFalse(
+            self.battle.global_stat_modifier_creature_filter_matches(
+                changeling,
+                {"exclude_subtypes": ["Goblin"]},
+            )
+        )
+        self.assertTrue(self.battle.card_has_keyword(changeling, "flying"))
+        self.assertTrue(self.battle.card_has_keyword(changeling, "changeling"))
+
     def test_prowess_creature_triggers_on_noncreature_spell_only(self) -> None:
         active = self.battle.Player("Active", None, [])
         opponent = self.battle.Player("Opponent", None, [])

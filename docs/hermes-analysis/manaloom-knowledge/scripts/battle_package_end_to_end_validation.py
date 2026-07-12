@@ -8614,6 +8614,53 @@ def run_prowess_trigger(
     }
 
 
+def run_changeling_subtype_identity(
+    battle,
+    scenario: dict[str, Any],
+    events: list[tuple[str, dict[str, Any]]],
+) -> dict[str, Any]:
+    card = battle.enrich_card(dict(scenario["card"]))
+    effect = battle.get_card_effect(card)
+    if isinstance(effect, dict):
+        card.update(effect)
+    card.setdefault("effect", "creature")
+
+    expected_subtypes = [
+        str(value).strip()
+        for value in scenario.get("expected_subtypes") or []
+        if str(value).strip()
+    ]
+    if not expected_subtypes:
+        fail("battle_execution", f"{card['name']} missing expected_subtypes")
+    for subtype in expected_subtypes:
+        if not battle.permanent_has_subtype(card, subtype):
+            fail("battle_execution", f"{card['name']} did not satisfy subtype {subtype!r}")
+        if not battle._card_subtype_matches(card, [subtype]):
+            fail("battle_execution", f"{card['name']} did not satisfy card subtype filter {subtype!r}")
+        if not battle.global_stat_modifier_creature_filter_matches(card, {"subtypes": [subtype]}):
+            fail("battle_execution", f"{card['name']} did not satisfy creature filter {subtype!r}")
+    excluded_subtype = expected_subtypes[0]
+    if battle.global_stat_modifier_creature_filter_matches(card, {"exclude_subtypes": [excluded_subtype]}):
+        fail("battle_execution", f"{card['name']} ignored excluded subtype {excluded_subtype!r}")
+
+    expected_keywords = [
+        str(value).strip().lower().replace(" ", "_")
+        for value in scenario.get("expected_keywords") or []
+        if str(value).strip()
+    ]
+    for keyword in expected_keywords:
+        if not battle.card_has_keyword(card, keyword):
+            fail("battle_execution", f"{card['name']} missing keyword {keyword!r}")
+    return {
+        "scenario": scenario.get("name"),
+        "card_name": card["name"],
+        "matched_subtypes": expected_subtypes,
+        "excluded_subtype": excluded_subtype,
+        "keywords": expected_keywords,
+        "all_creature_types": bool(card.get("all_creature_types")),
+    }
+
+
 def run_simple_activated_tap_target(
     battle,
     scenario: dict[str, Any],
@@ -14561,6 +14608,7 @@ SCENARIO_RUNNERS = {
     "combat_damage_draw": run_combat_damage_draw,
     "hand_cycling": run_hand_cycling,
     "prowess_trigger": run_prowess_trigger,
+    "changeling_subtype_identity": run_changeling_subtype_identity,
     "mass_return_to_hand": run_mass_return_to_hand,
     "conditional_land_play": run_conditional_land_play,
     "counter_unless_pays_response": run_counter_unless_pays_response,

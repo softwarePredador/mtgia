@@ -1393,8 +1393,7 @@ def _card_subtype_matches(card, allowed_subtypes):
     allowed = {str(value).lower() for value in _as_list(allowed_subtypes) if value}
     if not allowed:
         return True
-    type_line = str(card.get("type_line") or "").lower()
-    return any(re.search(rf"\b{re.escape(subtype)}\b", type_line) for subtype in allowed)
+    return any(permanent_has_subtype(card, subtype) for subtype in allowed)
 
 
 def _static_cost_reduction_scope(effect_data):
@@ -4354,6 +4353,12 @@ def permanent_has_subtype(permanent, subtype):
     if not isinstance(permanent, dict) or not subtype:
         return False
     normalized_subtype = str(subtype).strip().lower()
+    if (
+        permanent.get("all_creature_types")
+        or permanent.get("universal_creature_subtypes")
+        or permanent.get("changeling")
+    ):
+        return True
     explicit_subtypes = permanent.get("subtypes") or permanent.get("subtype") or []
     if isinstance(explicit_subtypes, str):
         explicit_subtypes = [explicit_subtypes]

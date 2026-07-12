@@ -131,6 +131,36 @@ def test_prowess_trigger_fields_and_execution_scenario_are_manifested() -> None:
     assert scenario["expected_keywords"] == ["flying", "prowess"]
 
 
+def test_changeling_fields_and_execution_scenario_are_manifested() -> None:
+    proposal = {
+        "normalized_name": "avian changeling",
+        "card_name": "Avian Changeling",
+        "logical_rule_key": "battle_rule_v1:changeling_fixture",
+        "oracle_hash": "hash-changeling",
+        "effect_json": {
+            "effect": "creature",
+            "battle_model_scope": "xmage_static_self_changeling_creature_v1",
+            "keywords": ["changeling", "flying"],
+            "_keywords_are_self": True,
+            "changeling": True,
+            "all_creature_types": True,
+            "universal_creature_subtypes": True,
+            "creature_type_marker": "all",
+            "flying": True,
+        },
+    }
+
+    expected = builder.expected_rule_from_proposal(proposal)
+    scenario = builder.execution_scenario_from_expected_rule(expected)
+
+    assert expected["required_effect_fields"]["changeling"] is True
+    assert expected["required_effect_fields"]["all_creature_types"] is True
+    assert expected["required_effect_fields"]["universal_creature_subtypes"] is True
+    assert scenario["type"] == "changeling_subtype_identity"
+    assert scenario["expected_subtypes"] == ["Elf", "Goblin", "Dragon", "Wizard"]
+    assert scenario["expected_keywords"] == ["changeling", "flying"]
+
+
 def test_creature_etb_life_gain_draw_execution_scenario_is_manifested() -> None:
     proposal = {
         "normalized_name": "inspiring overseer",

@@ -263,6 +263,94 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertTrue(effect["prowess"])
         self.assertTrue(effect["flying"])
 
+    def test_changeling_creature_maps_to_all_creature_types_scope(self) -> None:
+        row = queue_row(
+            "xmage_signature::no_effect_class::ChangelingAbility,FlyingAbility::"
+            "no_target_class::no_condition_class::no_signal",
+            effect_classes=[],
+            ability_kind="static",
+            ability_classes=["ChangelingAbility", "FlyingAbility"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Avian Changeling",
+                type_line="Creature - Shapeshifter",
+                oracle_text="Changeling (This card is every creature type.)\nFlying",
+            ),
+            source_text="""
+                this.addAbility(ChangelingAbility.getInstance());
+                this.addAbility(FlyingAbility.getInstance());
+            """,
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.CHANGELING_CREATURE_SCOPE)
+        self.assertEqual(effect["keywords"], ["changeling", "flying"])
+        self.assertTrue(effect["changeling"])
+        self.assertTrue(effect["all_creature_types"])
+        self.assertTrue(effect["universal_creature_subtypes"])
+        self.assertTrue(effect["_keywords_are_self"])
+        self.assertTrue(effect["flying"])
+
+    def test_changeling_creature_requires_exact_oracle(self) -> None:
+        row = queue_row(
+            "xmage_signature::no_effect_class::ChangelingAbility,FlyingAbility::"
+            "no_target_class::no_condition_class::no_signal",
+            effect_classes=[],
+            ability_kind="static",
+            ability_classes=["ChangelingAbility", "FlyingAbility"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Unsafe Changeling",
+                type_line="Creature - Shapeshifter",
+                oracle_text="Changeling\nFlying\nWhenever this creature attacks, draw a card.",
+            ),
+            source_text="""
+                this.addAbility(ChangelingAbility.getInstance());
+                this.addAbility(FlyingAbility.getInstance());
+            """,
+        )
+
+        self.assertIsNone(proposal)
+        self.assertEqual(reason, "changeling_oracle_not_exact")
+
+    def test_changeling_creature_is_not_dropped_by_report_prefilter(self) -> None:
+        row = queue_row(
+            "xmage_signature::no_effect_class::ChangelingAbility,FlyingAbility::"
+            "no_target_class::no_condition_class::no_signal",
+            effect_classes=[],
+            ability_kind="static",
+            ability_classes=["ChangelingAbility", "FlyingAbility"],
+        )
+        row["card_name"] = "Avian Changeling"
+        row["normalized_name"] = "avian changeling"
+        row["xmage_path"] = "/tmp/AvianChangeling.java"
+        report = split.build_exact_split_report(
+            {"status": "action_required", "method": {"scope": "test"}, "queue": [row]},
+            card_metadata_by_id={
+                "card-1": metadata(
+                    name="Avian Changeling",
+                    type_line="Creature - Shapeshifter",
+                    oracle_text="Changeling (This card is every creature type.)\nFlying",
+                )
+            },
+            source_reader=lambda _row: (
+                "this.addAbility(ChangelingAbility.getInstance());"
+                "this.addAbility(FlyingAbility.getInstance());"
+            ),
+        )
+
+        self.assertEqual(report["summary"]["proposal_count"], 1)
+        self.assertEqual(report["summary"]["safe_for_batch_pg_package_count"], 1)
+        self.assertEqual(
+            report["proposals"][0]["battle_model_scope"],
+            split.CHANGELING_CREATURE_SCOPE,
+        )
+
     def test_put_target_creature_on_library_top_maps_battlefield_to_library_scope(self) -> None:
         row = queue_row(
             "xmage_signature::PutOnLibraryTargetEffect::no_ability_class::"

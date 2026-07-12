@@ -210,6 +210,49 @@ def test_prowess_runner_uses_spell_cast_boost_runtime() -> None:
     assert result["keywords"] == ["flying", "prowess"]
 
 
+def test_changeling_runner_uses_universal_subtype_runtime() -> None:
+    battle = validator.load_battle(validator.DEFAULT_BATTLE)
+    effect = {
+        "effect": "creature",
+        "battle_model_scope": "xmage_static_self_changeling_creature_v1",
+        "keywords": ["changeling", "flying"],
+        "_keywords_are_self": True,
+        "changeling": True,
+        "all_creature_types": True,
+        "universal_creature_subtypes": True,
+        "creature_type_marker": "all",
+        "flying": True,
+        "_rule_logical_key": "battle_rule_v1:changeling-fixture",
+    }
+    previous_get_card_effect = battle.get_card_effect
+    events: list[tuple[str, dict]] = []
+    battle.get_card_effect = lambda card: dict(effect)
+    try:
+        result = validator.run_changeling_subtype_identity(
+            battle,
+            {
+                "name": "Avian Changeling satisfies all creature subtype filters",
+                "type": "changeling_subtype_identity",
+                "card": {
+                    "name": "Avian Changeling",
+                    "type_line": "Creature - Shapeshifter",
+                    "effect": "creature",
+                },
+                "expected_subtypes": ["Elf", "Goblin", "Dragon", "Wizard"],
+                "expected_keywords": ["changeling", "flying"],
+            },
+            events,
+        )
+    finally:
+        battle.get_card_effect = previous_get_card_effect
+
+    assert result["card_name"] == "Avian Changeling"
+    assert result["matched_subtypes"] == ["Elf", "Goblin", "Dragon", "Wizard"]
+    assert result["excluded_subtype"] == "Elf"
+    assert result["keywords"] == ["changeling", "flying"]
+    assert result["all_creature_types"] is True
+
+
 def test_creature_etb_life_gain_draw_runner_respects_resolution_order() -> None:
     battle = validator.load_battle(validator.DEFAULT_BATTLE)
     effect = {
