@@ -623,6 +623,8 @@ E2E_REQUIRED_EFFECT_FIELDS = (
     "dynamic_mana_battlefield_count_card_types",
     "dynamic_mana_battlefield_count_subtypes",
     "dynamic_mana_graveyard_count_card_types",
+    "dynamic_mana_counter_type",
+    "dynamic_mana_base_amount",
     "dynamic_mana_minimum_produced",
     "dynamic_mana_minimum_source",
     "conditional_mana_controlled_creature_power_gte",
@@ -644,6 +646,8 @@ E2E_REQUIRED_EFFECT_FIELDS = (
     "life_for_colored_mana",
     "mana_activation_life_gain",
     "mana_activation_requires_tap",
+    "mana_activation_remove_all_source_counters",
+    "mana_activation_remove_counter_type",
     "mana_source_requires_untapped_creature",
     "mana_source_requires_untapped_artifact_or_creature",
     "mana_activation_tap_support_count",
@@ -4142,6 +4146,27 @@ def _manifest_dynamic_fixed_mana_fixture(required: dict[str, Any]) -> tuple[dict
         }, 3
     if amount_source == "source_power":
         return {"source_overrides": {"power": 3}}, 3
+    if amount_source == "source_named_counter_count_plus_base":
+        counter_type = str(
+            required.get("dynamic_mana_counter_type")
+            or required.get("mana_activation_remove_counter_type")
+            or "charge"
+        ).strip()
+        base_amount = int(
+            required.get("dynamic_mana_base_amount")
+            or required.get("mana_produced")
+            or 1
+        )
+        counter_count = 2
+        return {
+            "source_overrides": {
+                "counters": {counter_type: counter_count},
+                f"{counter_type}_counters": counter_count,
+            },
+            "expected_mana_source_counter_cost_removed_count": counter_count,
+            "expected_mana_source_counter_cost_removed_type": counter_type,
+            "expected_mana_source_counter_count_after_refresh": 0,
+        }, base_amount + counter_count
     return {}, None
 
 

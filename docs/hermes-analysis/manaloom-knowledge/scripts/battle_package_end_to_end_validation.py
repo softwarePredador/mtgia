@@ -6406,6 +6406,49 @@ def run_simple_mana_source_refresh(
                 f"{card['name']} life_gained={gain_event.get('life_gained')}, "
                 f"expected {expected_activation_life_gain}",
             )
+    expected_counter_cost_removed = int(
+        scenario.get("expected_mana_source_counter_cost_removed_count") or 0
+    )
+    if expected_counter_cost_removed:
+        expected_counter_type = str(
+            scenario.get("expected_mana_source_counter_cost_removed_type") or ""
+        )
+        counter_event = next(
+            (
+                data
+                for replay_event, data in events[before_events:]
+                if replay_event == "mana_source_activation_counter_cost_paid"
+                and data.get("card") == card.get("name")
+            ),
+            None,
+        )
+        if counter_event is None:
+            fail("battle_events", f"missing {card['name']} mana-source counter-cost event")
+        if str(counter_event.get("removed_counter_cost_type") or "") != expected_counter_type:
+            fail(
+                "battle_events",
+                f"{card['name']} removed counter type="
+                f"{counter_event.get('removed_counter_cost_type')}, expected {expected_counter_type}",
+            )
+        if int(counter_event.get("removed_counter_cost_count") or 0) != expected_counter_cost_removed:
+            fail(
+                "battle_events",
+                f"{card['name']} removed counter count="
+                f"{counter_event.get('removed_counter_cost_count')}, "
+                f"expected {expected_counter_cost_removed}",
+            )
+    expected_counter_after = scenario.get("expected_mana_source_counter_count_after_refresh")
+    if expected_counter_after is not None:
+        expected_counter_type = str(
+            scenario.get("expected_mana_source_counter_cost_removed_type") or ""
+        )
+        actual_counter_after = battle.get_named_counter_count(source, expected_counter_type)
+        if actual_counter_after != int(expected_counter_after):
+            fail(
+                "battle_execution",
+                f"{card['name']} {expected_counter_type} counters after refresh="
+                f"{actual_counter_after}, expected {expected_counter_after}",
+            )
     if expected_support_tapped_count:
         support_event = next(
             (

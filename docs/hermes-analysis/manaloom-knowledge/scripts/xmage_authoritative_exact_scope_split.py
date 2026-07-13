@@ -30420,6 +30420,28 @@ def fixed_color_dynamic_mana_source_detail_from_oracle(
             )
             continue
         match = re.fullmatch(
+            r"\{t\}, remove any number of (?P<counter>charge) counters from .+: "
+            r"add \{(?P<symbol>[wubrg])\}, then add an additional \{(?P=symbol)\} "
+            r"for each (?P=counter) counter removed this way",
+            normalized,
+        )
+        if match:
+            candidates.append(
+                {
+                    "produces": match.group("symbol").upper(),
+                    "mana_produced": 1,
+                    "dynamic_mana_amount_source": "source_named_counter_count_plus_base",
+                    "dynamic_mana_counter_type": match.group("counter"),
+                    "dynamic_mana_base_amount": 1,
+                    "mana_activation_remove_all_source_counters": True,
+                    "mana_activation_remove_counter_type": match.group("counter"),
+                    "mana_activation_requires_tap": True,
+                    "source_type_line": type_line,
+                    "source_mana_cost": mana_cost,
+                }
+            )
+            continue
+        match = re.fullmatch(
             r"\{t\}: add an amount of \{(?P<symbol>[wubrg])\} equal to your devotion to (?P<color>green)",
             normalized,
         )
@@ -30688,6 +30710,15 @@ def fixed_color_dynamic_mana_source_detail_from_source(
         detail["dynamic_mana_amount_source"] = "devotion_to_green"
     elif "SourcePermanentPowerValue" in mana_window:
         detail["dynamic_mana_amount_source"] = "source_power"
+    elif (
+        "CountersSourceCount(CounterType.CHARGE)" in mana_window
+        and "RemoveVariableCountersSourceCost(CounterType.CHARGE" in mana_window
+    ):
+        detail["dynamic_mana_amount_source"] = "source_named_counter_count_plus_base"
+        detail["dynamic_mana_counter_type"] = "charge"
+        detail["dynamic_mana_base_amount"] = 1
+        detail["mana_activation_remove_all_source_counters"] = True
+        detail["mana_activation_remove_counter_type"] = "charge"
     elif "PermanentsOnBattlefieldCount" in mana_window or "PermanentsOnBattlefieldCount" in text:
         detail["dynamic_mana_amount_source"] = "battlefield_permanent_count"
         if "FilterControlledPermanent" in text and "SubType.SWAMP" in text:
@@ -48652,6 +48683,10 @@ def split_row(
                 "dynamic_mana_amount_source",
                 "dynamic_mana_battlefield_count_scope",
                 "dynamic_mana_battlefield_count_subtypes",
+                "dynamic_mana_counter_type",
+                "dynamic_mana_base_amount",
+                "mana_activation_remove_all_source_counters",
+                "mana_activation_remove_counter_type",
                 "activation_mana_cost",
                 "mana_activation_requires_tap",
             ):
@@ -48685,6 +48720,10 @@ def split_row(
                 "dynamic_mana_battlefield_count_scope",
                 "dynamic_mana_battlefield_count_card_types",
                 "dynamic_mana_battlefield_count_subtypes",
+                "dynamic_mana_counter_type",
+                "dynamic_mana_base_amount",
+                "mana_activation_remove_all_source_counters",
+                "mana_activation_remove_counter_type",
                 "activation_mana_cost",
             ):
                 if dynamic_fixed_color_mana_source.get(optional_key) not in (None, "", []):

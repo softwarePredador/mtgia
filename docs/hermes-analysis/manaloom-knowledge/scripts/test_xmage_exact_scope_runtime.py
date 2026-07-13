@@ -16376,6 +16376,45 @@ class XMageExactScopeRuntimeTest(unittest.TestCase):
         self.assertEqual(active.available_mana(), 4)
         self.assertEqual(active.mana_pool.green, 4)
 
+    def test_fixed_color_dynamic_mana_source_removes_source_counters_for_extra_mana(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        battery = self.battle.enrich_card(
+            {
+                "name": "Black Mana Battery",
+                "type_line": "Artifact",
+                "effect": "ramp_permanent",
+                "battle_model_scope": "xmage_fixed_color_dynamic_mana_source_permanent_v1",
+                "is_mana_source": True,
+                "mana_produced": 1,
+                "produces": "B",
+                "activation_requires_tap": True,
+                "mana_activation_requires_tap": True,
+                "dynamic_mana_amount_source": "source_named_counter_count_plus_base",
+                "dynamic_mana_counter_type": "charge",
+                "dynamic_mana_base_amount": 1,
+                "mana_activation_remove_all_source_counters": True,
+                "mana_activation_remove_counter_type": "charge",
+                "counters": {"charge": 2},
+                "charge_counters": 2,
+            }
+        )
+        active.battlefield = [battery]
+
+        active.refresh_mana_sources(turn=9)
+
+        self.assertEqual(active.available_mana(), 3)
+        self.assertEqual(active.mana_pool.black, 3)
+        self.assertTrue(battery["tapped"])
+        self.assertEqual(self.battle.get_named_counter_count(battery, "charge"), 0)
+        counter_event = next(
+            data
+            for event, data in self.events
+            if event == "mana_source_activation_counter_cost_paid"
+        )
+        self.assertEqual(counter_event["removed_counter_cost_type"], "charge")
+        self.assertEqual(counter_event["removed_counter_cost_count"], 2)
+        self.assertEqual(counter_event["counters_after"], 0)
+
     def test_controlled_creature_condition_conditional_mana_source_uses_boosted_fixed_green(self) -> None:
         active = self.battle.Player("Active", None, [])
         leafkin = self.battle.enrich_card(

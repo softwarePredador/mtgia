@@ -6683,6 +6683,10 @@ def _dynamic_mana_source_production_for_state(player, source):
         produced = devotion_to_color(player, "G")
     elif amount_source == "source_power":
         produced = _source_power_value(source)
+    elif amount_source == "source_named_counter_count_plus_base":
+        counter_type = str(source.get("dynamic_mana_counter_type") or "").strip()
+        base = max(0, int(source.get("dynamic_mana_base_amount") or source.get("mana_produced") or 0))
+        produced = base + get_named_counter_count(source, counter_type)
     elif amount_source == "controller_life_gained_this_turn":
         produced = (
             player.life_gained_this_turn_count(CURRENT_REPLAY_TURN)
@@ -7128,6 +7132,31 @@ def pay_mana_source_activation_costs(player, source, turn=None):
             card=source.get("name", "?"),
             activation_mana_cost=activation_mana_cost,
             available_mana_after=player.available_mana(),
+            turn=turn,
+            **replay_rule_fields(source),
+        )
+    if source.get("mana_activation_remove_all_source_counters"):
+        counter_type = str(source.get("mana_activation_remove_counter_type") or "").strip()
+        if not counter_type:
+            emit_replay_event(
+                "mana_source_activation_skipped",
+                player=getattr(player, "name", "?"),
+                card=source.get("name", "?"),
+                reason="missing_counter_type_for_activation_cost",
+                turn=turn,
+                **replay_rule_fields(source),
+            )
+            return False
+        counters_before = get_named_counter_count(source, counter_type)
+        removed = remove_named_counters(source, counter_type)
+        emit_replay_event(
+            "mana_source_activation_counter_cost_paid",
+            player=getattr(player, "name", "?"),
+            card=source.get("name", "?"),
+            removed_counter_cost_type=counter_type,
+            removed_counter_cost_count=removed,
+            counters_before=counters_before,
+            counters_after=get_named_counter_count(source, counter_type),
             turn=turn,
             **replay_rule_fields(source),
         )

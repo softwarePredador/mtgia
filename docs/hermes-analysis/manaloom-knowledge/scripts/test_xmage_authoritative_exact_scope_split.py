@@ -22175,6 +22175,63 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         )
         self.assertEqual(effect["xmage_unmodeled_effect_classes"], ["AddCountersSourceEffect"])
 
+    def test_fixed_color_dynamic_mana_source_counter_battery_maps_partial_safe_mana(self) -> None:
+        row = queue_row(
+            split.RAMP_ARTIFACT_UNIT,
+            effect_classes=["AddCountersSourceEffect"],
+            ability_kind="activated",
+            ability_classes=["DynamicManaAbility", "SimpleActivatedAbility"],
+        )
+
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Black Mana Battery",
+                type_line="Artifact",
+                oracle_text=(
+                    "{2}, {T}: Put a charge counter on Black Mana Battery.\n"
+                    "{T}, Remove any number of charge counters from Black Mana Battery: "
+                    "Add {B}, then add an additional {B} for each charge counter removed this way."
+                ),
+                mana_cost="{4}",
+            ),
+            source_text=(
+                "Ability ability = new DynamicManaAbility(\n"
+                "        Mana.BlackMana(1),\n"
+                "        new IntPlusDynamicValue(1, GetXValue.instance),\n"
+                "        new TapSourceCost(),\n"
+                "        \"Add {B}, then add {B} for each charge counter removed this way\",\n"
+                "        true, new IntPlusDynamicValue(1, new CountersSourceCount(CounterType.CHARGE)));\n"
+                "ability.addCost(new RemoveVariableCountersSourceCost(CounterType.CHARGE,\n"
+                "        \"Remove any number of charge counters from {this}\"));\n"
+                "        this.addAbility(ability);\n"
+                "ability = new SimpleActivatedAbility(\n"
+                "        new AddCountersSourceEffect(CounterType.CHARGE.createInstance(1)),\n"
+                "        new GenericManaCost(2));\n"
+                "ability.addCost(new TapSourceCost());\n"
+                "this.addAbility(ability);"
+            ),
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        self.assertTrue(proposal["safe_for_batch_pg_package"])
+        self.assertEqual(proposal["proposal_status"], "runtime_partial_batch_pg_candidate_after_precheck")
+        self.assertEqual(proposal["family_id"], "xmage_fixed_color_dynamic_mana_source")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.DYNAMIC_FIXED_COLOR_MANA_SCOPE)
+        self.assertEqual(effect["modeled_ability_subset"], "mana_source_only")
+        self.assertTrue(effect["_runtime_partial"])
+        self.assertTrue(effect["_runtime_partial_batch_safe"])
+        self.assertEqual(effect["produces"], "B")
+        self.assertEqual(effect["dynamic_mana_amount_source"], "source_named_counter_count_plus_base")
+        self.assertEqual(effect["dynamic_mana_counter_type"], "charge")
+        self.assertEqual(effect["dynamic_mana_base_amount"], 1)
+        self.assertTrue(effect["mana_activation_remove_all_source_counters"])
+        self.assertEqual(effect["mana_activation_remove_counter_type"], "charge")
+        self.assertEqual(effect["xmage_mana_ability_classes"], ["DynamicManaAbility"])
+        self.assertEqual(effect["xmage_unmodeled_auxiliary_ability_classes"], ["SimpleActivatedAbility"])
+        self.assertEqual(effect["xmage_unmodeled_effect_classes"], ["AddCountersSourceEffect"])
+
     def test_dynamic_any_one_color_mana_source_maps_exact_scope(self) -> None:
         fixtures = [
             (
