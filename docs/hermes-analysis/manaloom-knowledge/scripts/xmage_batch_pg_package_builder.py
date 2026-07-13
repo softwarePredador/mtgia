@@ -5927,7 +5927,10 @@ def target_player_life_gain_execution_scenario_from_expected_rule(
     rule: dict[str, Any],
 ) -> dict[str, Any] | None:
     required = dict(rule.get("required_effect_fields") or {})
-    if required.get("battle_model_scope") != "xmage_fixed_target_player_gain_life_spell_v1":
+    if required.get("battle_model_scope") not in {
+        "xmage_fixed_target_player_gain_life_spell_v1",
+        "xmage_dynamic_target_player_gain_life_spell_v1",
+    }:
         return None
     amount_source = str(required.get("life_gain_amount_source") or "").strip().lower()
     scenario_extras: dict[str, Any] = {}
@@ -5939,6 +5942,34 @@ def target_player_life_gain_execution_scenario_from_expected_rule(
             "x_value": x_value,
             "_cast_context": {"x_value": x_value},
         }
+    elif amount_source == "battlefield_permanent_count":
+        base = int(required.get("life_gain_base_amount") or 0)
+        per = int(required.get("life_gain_per_count") or 1)
+        scope = str(required.get("battlefield_count_scope") or "controller_battlefield").strip().lower()
+        card_types = {str(value).strip().lower() for value in required.get("battlefield_count_card_types") or []}
+        if card_types and card_types != {"creature"}:
+            return None
+        if scope == "all_battlefields":
+            controller_count = 2
+            opponent_count = 3
+        elif scope == "controller_battlefield":
+            controller_count = 3
+            opponent_count = 0
+        elif scope == "opponents_battlefield":
+            controller_count = 0
+            opponent_count = 3
+        else:
+            return None
+        scenario_extras["controller_battlefield"] = [
+            {"name": f"E2E Controller Creature {index + 1}", "type_line": "Creature - Soldier"}
+            for index in range(controller_count)
+        ]
+        scenario_extras["opponent_battlefield"] = [
+            {"name": f"E2E Opponent Creature {index + 1}", "type_line": "Creature - Warrior"}
+            for index in range(opponent_count)
+        ]
+        scenario_extras["expected_dynamic_count"] = controller_count + opponent_count
+        life_gain = base + ((controller_count + opponent_count) * per)
     elif amount_source:
         return None
     else:

@@ -289,6 +289,7 @@ STATIC_GENERIC_COST_REDUCTION_SCOPE = "xmage_static_generic_cost_reduction_for_m
 STATIC_GENERIC_COST_INCREASE_SCOPE = "xmage_static_generic_cost_increase_for_matching_spells_v1"
 TARGET_DRAW_SCOPE = "xmage_fixed_target_player_draw_spell_v1"
 TARGET_PLAYER_LIFE_GAIN_SCOPE = "xmage_fixed_target_player_gain_life_spell_v1"
+DYNAMIC_TARGET_PLAYER_LIFE_GAIN_SCOPE = "xmage_dynamic_target_player_gain_life_spell_v1"
 LOOK_AT_HAND_SCOPE = "xmage_look_at_target_player_hand_spell_v1"
 LOOK_AT_HAND_DRAW_SCOPE = "xmage_look_at_target_player_hand_draw_card_spell_v1"
 TARGET_PLAYER_DISCARD_SCOPE = "xmage_fixed_target_player_discard_spell_v1"
@@ -19775,12 +19776,28 @@ def fixed_target_player_life_gain_spell_from_oracle(metadata: dict[str, Any]) ->
     ).strip().lower()
     if not text:
         return "target_player_life_gain_spell_oracle_not_simple"
+    number_pattern = r"(one|two|three|four|five|six|seven|eight|nine|ten|\d+)"
+    dynamic_match = re.fullmatch(
+        rf"target player gains {number_pattern} life for each creature on the battlefield\.?",
+        text,
+    )
+    if dynamic_match:
+        life_gain_per_count = number_word_to_int(dynamic_match.group(1))
+        if life_gain_per_count <= 0:
+            return "target_player_life_gain_spell_count_not_fixed"
+        return {
+            "life_gain_amount": 0,
+            "life_gain_amount_source": "battlefield_permanent_count",
+            "life_gain_base_amount": 0,
+            "life_gain_per_count": life_gain_per_count,
+            "battlefield_count_scope": "all_battlefields",
+            "battlefield_count_card_types": ["creature"],
+        }
     if re.fullmatch(r"target player gains x life\.?", text):
         return {
             "life_gain_amount": 0,
             "life_gain_amount_source": "x_value",
         }
-    number_pattern = r"(one|two|three|four|five|six|seven|eight|nine|ten|\d+)"
     match = re.fullmatch(rf"target player gains {number_pattern} life\.?", text)
     if not match:
         return "target_player_life_gain_spell_oracle_not_exact_fixed"
@@ -25343,10 +25360,54 @@ def fixed_target_player_draw_spell_from_source(source: str) -> dict[str, Any] | 
     }
 
 
+def dynamic_target_player_life_gain_spell_from_source(source: str) -> dict[str, Any] | str | None:
+    text = source or ""
+    if "PermanentsOnBattlefieldCount" not in text or "GainLifeTargetEffect" not in text:
+        return None
+    if len(re.findall(r"new\s+TargetPlayer\s*\(\s*\)", text)) != 1:
+        return "target_player_life_gain_spell_source_target_not_supported"
+    if len(re.findall(r"\bGainLifeTargetEffect\s*\(", text)) != 1:
+        return "target_player_life_gain_spell_source_not_simple"
+    if len(re.findall(r"\bPermanentsOnBattlefieldCount\s*\(", text)) != 1:
+        return "target_player_life_gain_spell_source_not_simple"
+    count_args = extract_java_call_args(text, "PermanentsOnBattlefieldCount")
+    if not count_args:
+        return "target_player_life_gain_spell_source_count_not_fixed"
+    args = split_java_args(count_args)
+    if not args:
+        return "target_player_life_gain_spell_source_count_not_fixed"
+    filter_arg = args[0]
+    per = 1
+    if len(args) > 1:
+        if not re.fullmatch(r"-?\d+", args[1].strip()):
+            return "target_player_life_gain_spell_source_count_not_fixed"
+        per = int(args[1].strip())
+    if per <= 0:
+        return "target_player_life_gain_spell_source_count_not_fixed"
+    if (
+        "FilterCreaturePermanent" not in filter_arg
+        or "FilterControlledCreaturePermanent" in filter_arg
+        or "FilterOpponentsCreaturePermanent" in filter_arg
+    ):
+        return "target_player_life_gain_spell_source_not_simple"
+    return {
+        "life_gain_amount": 0,
+        "life_gain_amount_source": "battlefield_permanent_count",
+        "life_gain_base_amount": 0,
+        "life_gain_per_count": per,
+        "battlefield_count_scope": "all_battlefields",
+        "battlefield_count_card_types": ["creature"],
+        "xmage_effect_class": "GainLifeTargetEffect",
+    }
+
+
 def fixed_target_player_life_gain_spell_from_source(source: str) -> dict[str, Any] | str:
     text = source or ""
     if has_additional_cost(text):
         return "target_player_life_gain_spell_source_additional_cost_not_supported"
+    dynamic_life_gain = dynamic_target_player_life_gain_spell_from_source(text)
+    if dynamic_life_gain is not None:
+        return dynamic_life_gain
     unsupported_markers = {
         "ConditionalOneShotEffect",
         "DoIfCostPaid",
@@ -45928,14 +45989,52 @@ def split_row(
         source_amount_source = str(source_life_gain.get("life_gain_amount_source") or "").strip().lower()
         if oracle_amount_source != source_amount_source:
             return None, "target_player_life_gain_spell_source_oracle_mismatch"
+        dynamic_compare_fields = (
+            "life_gain_base_amount",
+            "life_gain_per_count",
+            "battlefield_count_scope",
+            "battlefield_count_card_types",
+            "battlefield_count_subtypes",
+            "battlefield_count_keywords",
+            "battlefield_count_combat_state",
+            "battlefield_count_tapped_state",
+            "battlefield_count_required_colors",
+            "battlefield_count_excluded_card_types",
+            "battlefield_count_excluded_subtypes",
+        )
+        for key in dynamic_compare_fields:
+            if oracle_life_gain.get(key) != source_life_gain.get(key):
+                return None, f"target_player_life_gain_spell_source_oracle_{key}_mismatch"
         if not oracle_amount_source and int(oracle_life_gain["life_gain_amount"]) != int(source_life_gain["life_gain_amount"]):
             return None, "target_player_life_gain_spell_source_oracle_mismatch"
         life_gain = int(oracle_life_gain["life_gain_amount"])
+        passthrough_dynamic_fields = {
+            key: oracle_life_gain[key]
+            for key in (
+                "life_gain_base_amount",
+                "life_gain_per_count",
+                "battlefield_count_scope",
+                "battlefield_count_card_types",
+                "battlefield_count_subtypes",
+                "battlefield_count_keywords",
+                "battlefield_count_combat_state",
+                "battlefield_count_tapped_state",
+                "battlefield_count_required_colors",
+                "battlefield_count_excluded_card_types",
+                "battlefield_count_excluded_subtypes",
+            )
+            if key in oracle_life_gain
+        }
         effect_json = {
             "effect": "life_total_change",
-            "battle_model_scope": TARGET_PLAYER_LIFE_GAIN_SCOPE,
+            "battle_model_scope": (
+                DYNAMIC_TARGET_PLAYER_LIFE_GAIN_SCOPE
+                if oracle_amount_source
+                else TARGET_PLAYER_LIFE_GAIN_SCOPE
+            ),
             "life_gain_amount": life_gain,
             **({"life_gain_amount_source": oracle_amount_source} if oracle_amount_source else {}),
+            **passthrough_dynamic_fields,
             "target": "player",
             "target_controller": "target_player",
             "target_constraints": {"players": ["any"]},
@@ -45948,7 +46047,11 @@ def split_row(
             row,
             metadata,
             effect_json,
-            family_id="xmage_fixed_target_player_life_gain_spell",
+            family_id=(
+                "xmage_dynamic_target_player_life_gain_spell"
+                if oracle_amount_source
+                else "xmage_fixed_target_player_life_gain_spell"
+            ),
         ), "selected_exact_scope"
 
     if unit == LIFE_UNIT and classes == {"BoostTargetEffect", "GainLifeEffect"}:
@@ -51042,6 +51145,7 @@ def build_exact_split_report(
                 "no-effect/no-signal HorsemanshipAbility creature rows with exact Oracle/XMage self horsemanship evasion",
                 "life_gain::xmage_life_gain_variant_review_v1 rows with GainLifeEffect and EntersBattlefieldTriggeredAbility plus only static self keywords",
                 "life_gain::xmage_life_gain_variant_review_v1 rows with GainLifeEffect and DiesSourceTriggeredAbility plus only static self keywords",
+                "GainLifeTargetEffect target-player spell rows with exact fixed or dynamic battlefield creature-count Oracle/XMage agreement",
                 "draw_engine::xmage_draw_card_variant_review_v1 rows with DrawCardSourceControllerEffect and EntersBattlefieldAllTriggeredAbility, exact creature-enter draw Oracle/source agreement, supported power/subtype/controller filters, no optional trigger cost, and only static self keywords",
                 "draw_engine::xmage_draw_card_variant_review_v1 rows with DrawCardSourceControllerEffect and EntersBattlefieldTriggeredAbility plus only static self keywords",
                 "draw_engine::xmage_draw_card_variant_review_v1 rows with DrawDiscardControllerEffect and EntersBattlefieldTriggeredAbility, exact fixed ETB draw-then-discard Oracle/source agreement, and only static self keywords",

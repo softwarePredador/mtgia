@@ -15175,7 +15175,10 @@ def run_target_player_life_gain_spell(
     effect = dict(battle.get_card_effect(card))
     if effect.get("effect") != "life_total_change":
         fail("battle_execution", f"{card['name']} effect={effect.get('effect')!r}")
-    if effect.get("battle_model_scope") != "xmage_fixed_target_player_gain_life_spell_v1":
+    if effect.get("battle_model_scope") not in {
+        "xmage_fixed_target_player_gain_life_spell_v1",
+        "xmage_dynamic_target_player_gain_life_spell_v1",
+    }:
         fail("battle_execution", f"{card['name']} battle_model_scope={effect.get('battle_model_scope')!r}")
     if effect.get("target_player_life_gain") is not True:
         fail("battle_execution", f"{card['name']} is not marked target_player_life_gain")
@@ -15192,6 +15195,14 @@ def run_target_player_life_gain_spell(
     opponent = battle.Player(str(scenario.get("opponent") or "Opponent"), None, [])
     starting_life = int(scenario.get("starting_life") or 20)
     active.life = starting_life
+    active.battlefield = [
+        battle.enrich_card(dict(item))
+        for item in scenario.get("controller_battlefield") or []
+    ]
+    opponent.battlefield = [
+        battle.enrich_card(dict(item))
+        for item in scenario.get("opponent_battlefield") or []
+    ]
     expected_life_gain = int(scenario.get("expected_life_gain") or effect.get("life_gain_amount") or 0)
     expected_life_after = int(scenario.get("expected_life_after") or (starting_life + expected_life_gain))
     expected_target_player = str(scenario.get("expected_target_player") or active.name)
@@ -15235,6 +15246,13 @@ def run_target_player_life_gain_spell(
             "battle_events",
             f"{card['name']} life_gain_amount_source={event.get('life_gain_amount_source')!r}",
         )
+    if scenario.get("expected_dynamic_count") is not None:
+        expected_dynamic_count = int(scenario.get("expected_dynamic_count") or 0)
+        if int(event.get("dynamic_life_gain_count") or 0) != expected_dynamic_count:
+            fail(
+                "battle_events",
+                f"{card['name']} dynamic_life_gain_count={event.get('dynamic_life_gain_count')}",
+            )
     return {
         "scenario": scenario.get("name"),
         "card_name": card["name"],
