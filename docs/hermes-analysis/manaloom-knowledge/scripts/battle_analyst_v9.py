@@ -22442,6 +22442,9 @@ def resolve_generic_permanent_etb(
             "etb_token_keywords": "token_keywords",
             "etb_token_flying": "token_flying",
             "etb_token_haste": "token_haste",
+            "etb_token_changeling": "token_changeling",
+            "etb_token_all_creature_types": "token_all_creature_types",
+            "etb_token_universal_creature_subtypes": "token_universal_creature_subtypes",
             "etb_token_landwalk": "token_landwalk",
             "etb_token_landwalk_land_type": "token_landwalk_land_type",
             "etb_token_landwalk_land_types": "token_landwalk_land_types",
@@ -22470,6 +22473,9 @@ def resolve_generic_permanent_etb(
             "etb_token_mana_source_contextual_only": "token_mana_source_contextual_only",
             "etb_token_mana_spend_restriction": "token_mana_spend_restriction",
             "etb_token_cant_block": "token_cant_block",
+            "etb_token_cant_be_blocked": "token_cant_be_blocked",
+            "etb_token_unblockable": "token_unblockable",
+            "etb_token_can_block_only_flying": "token_can_block_only_flying",
             "etb_token_static_restrictions": "token_static_restrictions",
         }
         for etb_key, token_key in etb_field_map.items():
@@ -23542,6 +23548,9 @@ def resolve_permanent_dies_token_maker(
         "dies_token_keywords": "token_keywords",
         "dies_token_flying": "token_flying",
         "dies_token_haste": "token_haste",
+        "dies_token_changeling": "token_changeling",
+        "dies_token_all_creature_types": "token_all_creature_types",
+        "dies_token_universal_creature_subtypes": "token_universal_creature_subtypes",
         "dies_token_landwalk": "token_landwalk",
         "dies_token_landwalk_land_type": "token_landwalk_land_type",
         "dies_token_landwalk_land_types": "token_landwalk_land_types",
@@ -23567,11 +23576,14 @@ def resolve_permanent_dies_token_maker(
         "dies_token_draw_on_self_sacrifice": "token_draw_on_self_sacrifice",
         "dies_token_draw_count": "token_draw_count",
         "dies_token_is_mana_source": "token_is_mana_source",
-            "dies_token_mana_source_contextual_only": "token_mana_source_contextual_only",
-            "dies_token_mana_spend_restriction": "token_mana_spend_restriction",
-            "dies_token_cant_block": "token_cant_block",
-            "dies_token_static_restrictions": "token_static_restrictions",
-        }
+        "dies_token_mana_source_contextual_only": "token_mana_source_contextual_only",
+        "dies_token_mana_spend_restriction": "token_mana_spend_restriction",
+        "dies_token_cant_block": "token_cant_block",
+        "dies_token_cant_be_blocked": "token_cant_be_blocked",
+        "dies_token_unblockable": "token_unblockable",
+        "dies_token_can_block_only_flying": "token_can_block_only_flying",
+        "dies_token_static_restrictions": "token_static_restrictions",
+    }
     for dies_key, token_key in dies_field_map.items():
         if dies_key in permanent:
             effect_data[token_key] = permanent[dies_key]
@@ -46241,6 +46253,11 @@ def create_creature_token(
     produced_mana_symbols=None,
     tapped=False,
     cant_block=False,
+    cant_be_blocked=False,
+    can_block_only_flying=False,
+    changeling=False,
+    all_creature_types=False,
+    universal_creature_subtypes=False,
     opponents=None,
     turn=None,
     source_event="token_created",
@@ -46266,6 +46283,15 @@ def create_creature_token(
     if cant_block:
         token["cant_block"] = True
         token["cant_block_source"] = source_event
+    if cant_be_blocked:
+        token["cant_be_blocked"] = True
+        token["unblockable"] = True
+    if can_block_only_flying:
+        token["can_block_only_flying"] = True
+    if changeling or all_creature_types or universal_creature_subtypes:
+        token["changeling"] = True
+        token["all_creature_types"] = True
+        token["universal_creature_subtypes"] = True
     if sacrifice_for_colorless_mana or mana_activation_requires_sacrifice:
         produced_amount = max(1, int(mana_produced or 1))
         token["sacrifice_for_colorless_mana"] = bool(sacrifice_for_colorless_mana)
@@ -46824,6 +46850,18 @@ def create_creature_tokens_from_effect(
     token_produced_mana_symbols = (effect_data or {}).get("token_produced_mana_symbols")
     token_tapped = bool((effect_data or {}).get("token_tapped"))
     token_cant_block = bool((effect_data or {}).get("token_cant_block") or (effect_data or {}).get("cant_block"))
+    token_cant_be_blocked = bool(
+        (effect_data or {}).get("token_cant_be_blocked")
+        or (effect_data or {}).get("token_unblockable")
+        or (effect_data or {}).get("cant_be_blocked")
+        or (effect_data or {}).get("unblockable")
+    )
+    token_can_block_only_flying = bool((effect_data or {}).get("token_can_block_only_flying"))
+    token_changeling = bool(
+        (effect_data or {}).get("token_changeling")
+        or (effect_data or {}).get("token_all_creature_types")
+        or (effect_data or {}).get("token_universal_creature_subtypes")
+    )
     token_artifact_only = bool((effect_data or {}).get("token_artifact_only"))
     token_class = (effect_data or {}).get("xmage_token_class")
     if (effect_data or {}).get("token_prowess") and "prowess" not in token_keywords:
@@ -46881,6 +46919,13 @@ def create_creature_tokens_from_effect(
                         produced_mana_symbols=token_produced_mana_symbols,
                         tapped=token_tapped,
                         cant_block=token_cant_block,
+                        cant_be_blocked=token_cant_be_blocked,
+                        can_block_only_flying=token_can_block_only_flying,
+                        changeling=token_changeling,
+                        all_creature_types=bool((effect_data or {}).get("token_all_creature_types")),
+                        universal_creature_subtypes=bool(
+                            (effect_data or {}).get("token_universal_creature_subtypes")
+                        ),
                         opponents=opponents,
                         turn=turn,
                         source_event=source_event,
@@ -46941,6 +46986,13 @@ def create_creature_tokens_from_effect(
                 produced_mana_symbols=token_produced_mana_symbols,
                 tapped=token_tapped,
                 cant_block=token_cant_block,
+                cant_be_blocked=token_cant_be_blocked,
+                can_block_only_flying=token_can_block_only_flying,
+                changeling=token_changeling,
+                all_creature_types=bool((effect_data or {}).get("token_all_creature_types")),
+                universal_creature_subtypes=bool(
+                    (effect_data or {}).get("token_universal_creature_subtypes")
+                ),
                 opponents=opponents,
                 turn=turn,
                 source_event=source_event,

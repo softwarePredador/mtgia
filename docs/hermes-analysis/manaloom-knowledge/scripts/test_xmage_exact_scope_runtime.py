@@ -7615,6 +7615,89 @@ class XMageExactScopeRuntimeTest(unittest.TestCase):
         self.assertIn("trample", token.get("keywords", []))
         self.assertTrue(self.battle.card_has_keyword(token, "trample"))
 
+    def test_fixed_create_creature_tokens_spell_preserves_token_identity_and_blocking_restrictions(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        opponent = self.battle.Player("Opponent", None, [])
+        effect = {
+            "effect": "token_maker",
+            "battle_model_scope": "xmage_fixed_create_creature_tokens_spell_v1",
+            "ability_kind": "one_shot",
+            "token_count": 1,
+            "token_name": "Shapeshifter Token",
+            "token_subtype": "Shapeshifter",
+            "token_power": 2,
+            "token_toughness": 2,
+            "token_keywords": ["changeling"],
+            "token_changeling": True,
+            "token_all_creature_types": True,
+            "token_universal_creature_subtypes": True,
+            "token_cant_be_blocked": True,
+            "_rule_logical_key": "battle_rule_v1:fixture_token_identity",
+        }
+
+        self.battle.apply_effect_immediate(
+            active,
+            [opponent],
+            {
+                "name": "Fixture Shapeshifter",
+                "type_line": "Sorcery",
+                "oracle_text": "Create a 2/2 colorless Shapeshifter creature token with changeling.",
+            },
+            turn=2,
+            rng=random.Random(2),
+            effect_data_override=effect,
+        )
+
+        tokens = [card for card in active.battlefield if card.get("name") == "Shapeshifter Token"]
+        self.assertEqual(len(tokens), 1)
+        token = tokens[0]
+        self.assertTrue(token.get("changeling"))
+        self.assertTrue(token.get("all_creature_types"))
+        self.assertTrue(token.get("universal_creature_subtypes"))
+        self.assertTrue(self.battle.card_has_keyword(token, "changeling"))
+        self.assertTrue(self.battle.permanent_has_subtype(token, "Dragon"))
+        self.assertTrue(self.battle.attacker_cannot_be_blocked(token))
+        block_only_effect = {
+            "effect": "token_maker",
+            "battle_model_scope": "xmage_fixed_create_creature_tokens_spell_v1",
+            "ability_kind": "one_shot",
+            "token_count": 1,
+            "token_name": "Faerie Token",
+            "token_subtype": "Faerie",
+            "token_power": 1,
+            "token_toughness": 1,
+            "token_flying": True,
+            "token_keywords": ["flying"],
+            "token_can_block_only_flying": True,
+        }
+        self.battle.apply_effect_immediate(
+            active,
+            [opponent],
+            {
+                "name": "Fixture Faerie",
+                "type_line": "Sorcery",
+                "oracle_text": (
+                    'Create a 1/1 blue Faerie creature token with flying and '
+                    '"This creature can block only creatures with flying."'
+                ),
+            },
+            turn=2,
+            rng=random.Random(2),
+            effect_data_override=block_only_effect,
+        )
+        faerie = [card for card in active.battlefield if card.get("name") == "Faerie Token"][0]
+        ground_attacker = {"name": "Ground Attacker", "type_line": "Creature - Bear", "power": 2, "toughness": 2}
+        flying_attacker = {
+            "name": "Flying Attacker",
+            "type_line": "Creature - Bird",
+            "power": 2,
+            "toughness": 2,
+            "flying": True,
+            "keywords": ["flying"],
+        }
+        self.assertFalse(self.battle.blocker_can_block_attacker(faerie, ground_attacker))
+        self.assertTrue(self.battle.blocker_can_block_attacker(faerie, flying_attacker))
+
     def test_fixed_create_creature_tokens_spell_preserves_tapped_tokens(self) -> None:
         active = self.battle.Player("Active", None, [])
         opponent = self.battle.Player("Opponent", None, [])

@@ -783,6 +783,7 @@ SAFE_MANA_ABILITY_CLASSES = {
 }
 
 ALLOWED_TOKEN_ABILITY_KEYWORDS = {
+    "ChangelingAbility": "changeling",
     "DeathtouchAbility": "deathtouch",
     "DoubleStrikeAbility": "double_strike",
     "FirstStrikeAbility": "first_strike",
@@ -804,6 +805,7 @@ ALLOWED_TOKEN_ABILITY_KEYWORDS = {
 }
 
 TOKEN_DESCRIPTION_KEYWORDS = {
+    "changeling": "changeling",
     "deathtouch": "deathtouch",
     "double strike": "double_strike",
     "first strike": "first_strike",
@@ -2721,6 +2723,46 @@ def parse_simple_token_class(token_source: str, token_class: str) -> tuple[dict[
             "",
             keyword_description,
         )
+    token_cant_be_blocked = bool(
+        "CantBeBlockedSourceAbility" in constructor_source
+        and re.search(r'this (?:creature|token) can\'t be blocked\.?', lower_description)
+    )
+    if token_cant_be_blocked:
+        keyword_description = re.sub(
+            r'\s+with\s+"this (?:creature|token) can\'t be blocked\.?"\.?',
+            "",
+            keyword_description,
+        )
+        keyword_description = re.sub(
+            r'\s+and\s+"this (?:creature|token) can\'t be blocked\.?"\.?',
+            "",
+            keyword_description,
+        )
+        keyword_description = re.sub(
+            r'\s+"this (?:creature|token) can\'t be blocked\.?"\.?',
+            "",
+            keyword_description,
+        )
+    token_can_block_only_flying = bool(
+        ("CanBlockOnlyFlyingAbility" in constructor_source or "CanBlockOnlyFlyingEffect" in constructor_source)
+        and re.search(r'this (?:creature|token) can block only creatures with flying\.?', lower_description)
+    )
+    if token_can_block_only_flying:
+        keyword_description = re.sub(
+            r'\s+with\s+"this (?:creature|token) can block only creatures with flying\.?"\.?',
+            "",
+            keyword_description,
+        )
+        keyword_description = re.sub(
+            r'\s+and\s+"this (?:creature|token) can block only creatures with flying\.?"\.?',
+            "",
+            keyword_description,
+        )
+        keyword_description = re.sub(
+            r'\s+"this (?:creature|token) can block only creatures with flying\.?"\.?',
+            "",
+            keyword_description,
+        )
         keyword_description = re.sub(
             r'\s+and\s+"this (?:creature|token) can\'t block\.?"\.?',
             "",
@@ -2778,11 +2820,20 @@ def parse_simple_token_class(token_source: str, token_class: str) -> tuple[dict[
         )
     if token_cant_block:
         allowed_ability_classes.add("SimpleStaticAbility")
+    if token_cant_be_blocked:
+        allowed_ability_classes.add("CantBeBlockedSourceAbility")
+    if token_can_block_only_flying:
+        allowed_ability_classes.update({"CanBlockOnlyFlyingAbility", "SimpleStaticAbility"})
     unsupported_abilities = ability_classes - allowed_ability_classes
     if unsupported_abilities:
         return {}, "token_ability_not_supported"
     token_effect_classes = set(re.findall(r"new\s+([A-Za-z]+Effect)\s*\(", constructor_source))
-    if token_cant_block and (token_effect_classes - {"CantBlockSourceEffect"}):
+    allowed_token_effect_classes: set[str] = set()
+    if token_cant_block:
+        allowed_token_effect_classes.add("CantBlockSourceEffect")
+    if token_can_block_only_flying:
+        allowed_token_effect_classes.add("CanBlockOnlyFlyingEffect")
+    if allowed_token_effect_classes and (token_effect_classes - allowed_token_effect_classes):
         return {}, "token_ability_not_supported"
     colors = [
         symbol
@@ -2840,9 +2891,18 @@ def parse_simple_token_class(token_source: str, token_class: str) -> tuple[dict[
         token_data["token_flying"] = True
     if "haste" in token_keywords:
         token_data["token_haste"] = True
+    if "changeling" in token_keywords:
+        token_data["token_changeling"] = True
+        token_data["token_all_creature_types"] = True
+        token_data["token_universal_creature_subtypes"] = True
     if token_cant_block:
         token_data["token_cant_block"] = True
         token_data["token_static_restrictions"] = ["cant_block"]
+    if token_cant_be_blocked:
+        token_data["token_cant_be_blocked"] = True
+        token_data["token_unblockable"] = True
+    if token_can_block_only_flying:
+        token_data["token_can_block_only_flying"] = True
     landwalk_types = [
         land_type
         for keyword, land_type in TOKEN_BASIC_LANDWALK_KEYWORDS.items()
@@ -25038,18 +25098,18 @@ def fixed_draw_discard_spell_from_source(source: str, classes: set[str]) -> dict
     }
     if any(marker in text for marker in unsupported_markers):
         return "draw_discard_spell_source_not_simple"
-        if classes == {"DrawDiscardControllerEffect"}:
-            counts = draw_discard_counts_from_source(text)
-            if isinstance(counts, str):
-                return counts.replace("activated_draw_discard", "draw_discard_spell")
-            draw_count, discard_count = counts
+    if classes == {"DrawDiscardControllerEffect"}:
+        counts = draw_discard_counts_from_source(text)
+        if isinstance(counts, str):
+            return counts.replace("activated_draw_discard", "draw_discard_spell")
+        draw_count, discard_count = counts
         return {
             "draw_count": draw_count,
             "discard_count": discard_count,
             "draw_discard_order": "draw_then_discard",
-                "discard_random": False,
-                "xmage_effect_classes": ["DrawDiscardControllerEffect"],
-            }
+            "discard_random": False,
+            "xmage_effect_classes": ["DrawDiscardControllerEffect"],
+        }
     if classes == {"DiscardHandControllerEffect", "DrawCardSourceControllerEffect"}:
         draw_count = java_constructor_int_or_noarg_default(
             text,
@@ -39235,6 +39295,9 @@ def split_row(
             "token_keywords": "etb_token_keywords",
             "token_flying": "etb_token_flying",
             "token_haste": "etb_token_haste",
+            "token_changeling": "etb_token_changeling",
+            "token_all_creature_types": "etb_token_all_creature_types",
+            "token_universal_creature_subtypes": "etb_token_universal_creature_subtypes",
             "token_landwalk": "etb_token_landwalk",
             "token_landwalk_land_type": "etb_token_landwalk_land_type",
             "token_landwalk_land_types": "etb_token_landwalk_land_types",
@@ -39263,6 +39326,9 @@ def split_row(
             "token_mana_source_contextual_only": "etb_token_mana_source_contextual_only",
             "token_mana_spend_restriction": "etb_token_mana_spend_restriction",
             "token_cant_block": "etb_token_cant_block",
+            "token_cant_be_blocked": "etb_token_cant_be_blocked",
+            "token_unblockable": "etb_token_unblockable",
+            "token_can_block_only_flying": "etb_token_can_block_only_flying",
             "token_static_restrictions": "etb_token_static_restrictions",
         }
         for source_key, target_key in optional_token_fields.items():
@@ -39426,6 +39492,9 @@ def split_row(
             "token_keywords": "dies_token_keywords",
             "token_flying": "dies_token_flying",
             "token_haste": "dies_token_haste",
+            "token_changeling": "dies_token_changeling",
+            "token_all_creature_types": "dies_token_all_creature_types",
+            "token_universal_creature_subtypes": "dies_token_universal_creature_subtypes",
             "token_landwalk": "dies_token_landwalk",
             "token_landwalk_land_type": "dies_token_landwalk_land_type",
             "token_landwalk_land_types": "dies_token_landwalk_land_types",
@@ -39454,6 +39523,9 @@ def split_row(
             "token_mana_source_contextual_only": "dies_token_mana_source_contextual_only",
             "token_mana_spend_restriction": "dies_token_mana_spend_restriction",
             "token_cant_block": "dies_token_cant_block",
+            "token_cant_be_blocked": "dies_token_cant_be_blocked",
+            "token_unblockable": "dies_token_unblockable",
+            "token_can_block_only_flying": "dies_token_can_block_only_flying",
             "token_static_restrictions": "dies_token_static_restrictions",
         }
         for source_key, target_key in optional_token_fields.items():

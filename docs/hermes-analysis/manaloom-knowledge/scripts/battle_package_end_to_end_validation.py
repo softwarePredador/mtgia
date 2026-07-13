@@ -521,6 +521,29 @@ def token_matches_expected(battle, token: dict[str, Any], expected: dict[str, An
     if "cant_block" in expected:
         if bool(battle.creature_cannot_block(token)) != bool(expected.get("cant_block")):
             return False, f"cant_block={token.get('cant_block')}"
+    if expected.get("cant_be_blocked"):
+        if not battle.attacker_cannot_be_blocked(token):
+            return False, f"cant_be_blocked={token.get('cant_be_blocked')}"
+    if expected.get("can_block_only_flying"):
+        nonflying_attacker = {"name": "E2E Ground Attacker", "type_line": "Creature - Bear", "power": 2, "toughness": 2}
+        flying_attacker = {
+            "name": "E2E Flying Attacker",
+            "type_line": "Creature - Bird",
+            "power": 2,
+            "toughness": 2,
+            "flying": True,
+            "keywords": ["flying"],
+        }
+        if battle.blocker_can_block_attacker(token, nonflying_attacker):
+            return False, "can_block_only_flying allowed nonflying attacker"
+        if not battle.blocker_can_block_attacker(token, flying_attacker):
+            return False, "can_block_only_flying rejected flying attacker"
+    if expected.get("changeling"):
+        if not token.get("changeling") or not token.get("all_creature_types"):
+            return False, "changeling metadata missing"
+        for subtype in ("Elf", "Goblin", "Dragon"):
+            if not battle.permanent_has_subtype(token, subtype):
+                return False, f"changeling subtype {subtype!r} missing"
     if bool(expected.get("sacrifice_for_colorless_mana")):
         if token.get("sacrifice_for_colorless_mana") is not True:
             return False, "missing sacrifice mana ability"

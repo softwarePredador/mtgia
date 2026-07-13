@@ -1,0 +1,212 @@
+{
+  "apply_gate": "Do not run apply SQL without explicit approval for the exact command.",
+  "backup_table": "manaloom_deploy_audit.pg861_token_static_identity_new_server_20260713_035756",
+  "deploy_id": "pg861",
+  "execution_scenarios": [
+    {
+      "card": {
+        "name": "Birthing Boughs"
+      },
+      "controller_hand": [],
+      "controller_mana": {
+        "black": 0,
+        "blue": 0,
+        "generic": 4,
+        "green": 0,
+        "red": 0,
+        "white": 0
+      },
+      "expected_discard_count": 0,
+      "expected_discard_random": false,
+      "expected_discard_target": "any_card",
+      "expected_exiled_source_from_graveyard": false,
+      "expected_tapped_source": true,
+      "expected_token": {
+        "all_creature_types": true,
+        "artifact": false,
+        "changeling": true,
+        "colors": [],
+        "count": 1,
+        "keywords": [
+          "changeling"
+        ],
+        "name": "Shapeshifter Token",
+        "power": 2,
+        "subtype": "Shapeshifter",
+        "tapped": false,
+        "toughness": 2,
+        "universal_creature_subtypes": true
+      },
+      "logical_rule_key": "battle_rule_v1:3566e78c8b8acc37b06979e9f460145c",
+      "name": "Birthing Boughs activates token ability",
+      "source_zone": "battlefield",
+      "type": "simple_activated_create_token"
+    }
+  ],
+  "expected_rules": [
+    {
+      "card_name": "Birthing Boughs",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:3566e78c8b8acc37b06979e9f460145c",
+      "min_rule_version": 2,
+      "normalized_name": "birthing boughs",
+      "oracle_hash": "2465083f401a35e89bd81d155353bfb0",
+      "required_effect_fields": {
+        "_activated_rule_effects": [
+          {
+            "ability_kind": "activated",
+            "activated_effect": "token_maker",
+            "activation_cost_colors": [],
+            "activation_cost_generic": 4,
+            "activation_cost_mana": "{4}",
+            "activation_requires_sacrifice": false,
+            "activation_requires_tap": true,
+            "battle_model_scope": "xmage_permanent_simple_activated_create_token_v1",
+            "effect": "token_maker",
+            "token_all_creature_types": true,
+            "token_changeling": true,
+            "token_count": 1,
+            "token_description": "2/2 colorless Shapeshifter creature token with changeling",
+            "token_keywords": [
+              "changeling"
+            ],
+            "token_name": "Shapeshifter Token",
+            "token_power": 2,
+            "token_subtype": "Shapeshifter",
+            "token_toughness": 2,
+            "token_universal_creature_subtypes": true,
+            "xmage_ability_class": "SimpleActivatedAbility",
+            "xmage_effect_class": "CreateTokenEffect",
+            "xmage_token_class": "ShapeshifterToken"
+          }
+        ],
+        "ability_kind": "static_and_activated",
+        "activated_battle_model_scope": "xmage_permanent_simple_activated_create_token_v1",
+        "activated_effect": "token_maker",
+        "activation_cost_colors": [],
+        "activation_cost_generic": 4,
+        "activation_cost_mana": "{4}",
+        "activation_requires_sacrifice": false,
+        "activation_requires_tap": true,
+        "battle_model_scope": "xmage_permanent_simple_activated_create_token_v1",
+        "effect": "artifact",
+        "token_all_creature_types": true,
+        "token_changeling": true,
+        "token_count": 1,
+        "token_keywords": [
+          "changeling"
+        ],
+        "token_name": "Shapeshifter Token",
+        "token_power": 2,
+        "token_subtype": "Shapeshifter",
+        "token_toughness": 2,
+        "token_universal_creature_subtypes": true,
+        "xmage_ability_class": "SimpleActivatedAbility",
+        "xmage_effect_class": "CreateTokenEffect",
+        "xmage_token_class": "ShapeshifterToken"
+      },
+      "review_status": "verified"
+    }
+  ],
+  "family_counts": {
+    "xmage_permanent_simple_activated_create_token": 1
+  },
+  "files": {
+    "apply": "docs/hermes-analysis/master_optimizer_reports/pg861_token_static_identity_new_server_package_apply.sql",
+    "manifest": "docs/hermes-analysis/master_optimizer_reports/pg861_token_static_identity_new_server_package_manifest.json",
+    "package": "docs/hermes-analysis/master_optimizer_reports/pg861_token_static_identity_new_server_package_package.md",
+    "postcheck": "docs/hermes-analysis/master_optimizer_reports/pg861_token_static_identity_new_server_package_postcheck.sql",
+    "precheck": "docs/hermes-analysis/master_optimizer_reports/pg861_token_static_identity_new_server_package_precheck.sql",
+    "rollback": "docs/hermes-analysis/master_optimizer_reports/pg861_token_static_identity_new_server_package_rollback.sql"
+  },
+  "generated_at": "2026-07-13T03:59:09+00:00",
+  "mutations_performed": [],
+  "runtime_checks": [
+    {
+      "card": {
+        "name": "Birthing Boughs"
+      },
+      "card_name": "Birthing Boughs",
+      "effect": "artifact",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:3566e78c8b8acc37b06979e9f460145c",
+      "normalized_name": "birthing boughs",
+      "required_effect_fields": {
+        "_activated_rule_effects": [
+          {
+            "ability_kind": "activated",
+            "activated_effect": "token_maker",
+            "activation_cost_colors": [],
+            "activation_cost_generic": 4,
+            "activation_cost_mana": "{4}",
+            "activation_requires_sacrifice": false,
+            "activation_requires_tap": true,
+            "battle_model_scope": "xmage_permanent_simple_activated_create_token_v1",
+            "effect": "token_maker",
+            "token_all_creature_types": true,
+            "token_changeling": true,
+            "token_count": 1,
+            "token_description": "2/2 colorless Shapeshifter creature token with changeling",
+            "token_keywords": [
+              "changeling"
+            ],
+            "token_name": "Shapeshifter Token",
+            "token_power": 2,
+            "token_subtype": "Shapeshifter",
+            "token_toughness": 2,
+            "token_universal_creature_subtypes": true,
+            "xmage_ability_class": "SimpleActivatedAbility",
+            "xmage_effect_class": "CreateTokenEffect",
+            "xmage_token_class": "ShapeshifterToken"
+          }
+        ],
+        "ability_kind": "static_and_activated",
+        "activated_battle_model_scope": "xmage_permanent_simple_activated_create_token_v1",
+        "activated_effect": "token_maker",
+        "activation_cost_colors": [],
+        "activation_cost_generic": 4,
+        "activation_cost_mana": "{4}",
+        "activation_requires_sacrifice": false,
+        "activation_requires_tap": true,
+        "battle_model_scope": "xmage_permanent_simple_activated_create_token_v1",
+        "effect": "artifact",
+        "token_all_creature_types": true,
+        "token_changeling": true,
+        "token_count": 1,
+        "token_keywords": [
+          "changeling"
+        ],
+        "token_name": "Shapeshifter Token",
+        "token_power": 2,
+        "token_subtype": "Shapeshifter",
+        "token_toughness": 2,
+        "token_universal_creature_subtypes": true,
+        "xmage_ability_class": "SimpleActivatedAbility",
+        "xmage_effect_class": "CreateTokenEffect",
+        "xmage_token_class": "ShapeshifterToken"
+      }
+    }
+  ],
+  "selected_card_names": [
+    "Birthing Boughs"
+  ],
+  "selected_count": 1,
+  "slug": "token_static_identity_new_server",
+  "snapshot_checks": [
+    {
+      "card_name": "Birthing Boughs",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:3566e78c8b8acc37b06979e9f460145c",
+      "min_rule_version": 2,
+      "normalized_name": "birthing boughs",
+      "oracle_hash": "2465083f401a35e89bd81d155353bfb0",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_permanent_simple_activated_create_token_v1"
+      },
+      "review_status": "verified"
+    }
+  ],
+  "status": "prepared_read_only_pending_apply_approval"
+}

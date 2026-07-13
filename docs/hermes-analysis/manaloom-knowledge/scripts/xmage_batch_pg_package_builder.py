@@ -301,8 +301,14 @@ E2E_REQUIRED_EFFECT_FIELDS = (
     "token_keywords",
     "token_flying",
     "token_haste",
+    "token_changeling",
+    "token_all_creature_types",
+    "token_universal_creature_subtypes",
     "token_tapped",
     "token_cant_block",
+    "token_cant_be_blocked",
+    "token_unblockable",
+    "token_can_block_only_flying",
     "token_static_restrictions",
     "token_landwalk",
     "token_landwalk_land_type",
@@ -344,8 +350,14 @@ E2E_REQUIRED_EFFECT_FIELDS = (
     "etb_token_keywords",
     "etb_token_flying",
     "etb_token_haste",
+    "etb_token_changeling",
+    "etb_token_all_creature_types",
+    "etb_token_universal_creature_subtypes",
     "etb_token_tapped",
     "etb_token_cant_block",
+    "etb_token_cant_be_blocked",
+    "etb_token_unblockable",
+    "etb_token_can_block_only_flying",
     "etb_token_static_restrictions",
     "etb_token_landwalk",
     "etb_token_landwalk_land_type",
@@ -387,8 +399,14 @@ E2E_REQUIRED_EFFECT_FIELDS = (
     "dies_token_keywords",
     "dies_token_flying",
     "dies_token_haste",
+    "dies_token_changeling",
+    "dies_token_all_creature_types",
+    "dies_token_universal_creature_subtypes",
     "dies_token_tapped",
     "dies_token_cant_block",
+    "dies_token_cant_be_blocked",
+    "dies_token_unblockable",
+    "dies_token_can_block_only_flying",
     "dies_token_static_restrictions",
     "dies_token_landwalk",
     "dies_token_landwalk_land_type",
@@ -2638,6 +2656,14 @@ def expected_token_from_component(component: dict[str, Any]) -> dict[str, Any]:
             expected["toughness"] = int(expected["toughness"]) + entering_plus_one_counters
     if component.get("token_cant_block"):
         expected["cant_block"] = True
+    if component.get("token_cant_be_blocked") or component.get("token_unblockable"):
+        expected["cant_be_blocked"] = True
+    if component.get("token_can_block_only_flying"):
+        expected["can_block_only_flying"] = True
+    if component.get("token_changeling"):
+        expected["changeling"] = True
+        expected["all_creature_types"] = True
+        expected["universal_creature_subtypes"] = True
     return expected
 
 
@@ -2729,6 +2755,14 @@ def creature_etb_create_tokens_execution_scenario_from_expected_rule(
     }
     if required.get("etb_token_cant_block"):
         scenario["expected_token"]["cant_block"] = True
+    if required.get("etb_token_cant_be_blocked") or required.get("etb_token_unblockable"):
+        scenario["expected_token"]["cant_be_blocked"] = True
+    if required.get("etb_token_can_block_only_flying"):
+        scenario["expected_token"]["can_block_only_flying"] = True
+    if required.get("etb_token_changeling"):
+        scenario["expected_token"]["changeling"] = True
+        scenario["expected_token"]["all_creature_types"] = True
+        scenario["expected_token"]["universal_creature_subtypes"] = True
     apply_dynamic_token_count_scenario_fields(
         scenario,
         scenario["expected_token"],
@@ -2862,19 +2896,10 @@ def fixed_create_creature_tokens_execution_scenario_from_expected_rule(
         "name": f"{rule['card_name']} creates modeled creature tokens",
         "type": "fixed_create_creature_tokens",
         "card": {"name": rule["card_name"]},
-        "expected_token": {
-            "name": required.get("token_name"),
-            "count": expected_count,
-            "power": required.get("token_power"),
-            "toughness": required.get("token_toughness"),
-            "subtype": required.get("token_subtype"),
-            "colors": required.get("token_colors") or [],
-            "keywords": required.get("token_keywords") or [],
-            "artifact": bool(required.get("artifact_tokens")),
-            "tapped": bool(required.get("token_tapped")),
-        },
+        "expected_token": expected_token_from_component(required),
         "logical_rule_key": rule["logical_rule_key"],
     }
+    scenario["expected_token"]["count"] = expected_count
     expected_draw_count = int(required.get("draw_count") or 0)
     if expected_draw_count > 0:
         scenario["expected_draw_count"] = expected_draw_count
@@ -2956,18 +2981,7 @@ def multi_create_creature_tokens_execution_scenario_from_expected_rule(
     for component in components:
         if not isinstance(component, dict) or component.get("effect") != "token_maker":
             return None
-        expected_token = {
-            "name": component.get("token_name"),
-            "count": int(component.get("token_count") or 1),
-            "power": component.get("token_power"),
-            "toughness": component.get("token_toughness"),
-            "subtype": component.get("token_subtype"),
-            "colors": component.get("token_colors") or [],
-            "keywords": component.get("token_keywords") or [],
-            "artifact": bool(component.get("artifact_tokens")),
-        }
-        if component.get("token_cant_block"):
-            expected_token["cant_block"] = True
+        expected_token = expected_token_from_component(component)
         expected_tokens.append(expected_token)
     return {
         "name": f"{rule['card_name']} creates multiple modeled creature tokens",
@@ -3867,6 +3881,14 @@ def creature_dies_create_tokens_execution_scenario_from_expected_rule(
     }
     if required.get("dies_token_cant_block"):
         scenario["expected_token"]["cant_block"] = True
+    if required.get("dies_token_cant_be_blocked") or required.get("dies_token_unblockable"):
+        scenario["expected_token"]["cant_be_blocked"] = True
+    if required.get("dies_token_can_block_only_flying"):
+        scenario["expected_token"]["can_block_only_flying"] = True
+    if required.get("dies_token_changeling"):
+        scenario["expected_token"]["changeling"] = True
+        scenario["expected_token"]["all_creature_types"] = True
+        scenario["expected_token"]["universal_creature_subtypes"] = True
     apply_dynamic_token_count_scenario_fields(
         scenario,
         scenario["expected_token"],
@@ -3928,10 +3950,15 @@ def simple_activated_create_token_execution_scenario_from_expected_rule(
     }
     if required.get("token_cant_block"):
         scenario["expected_token"]["cant_block"] = True
+    if required.get("token_cant_be_blocked") or required.get("token_unblockable"):
+        scenario["expected_token"]["cant_be_blocked"] = True
+    if required.get("token_can_block_only_flying"):
+        scenario["expected_token"]["can_block_only_flying"] = True
+    if required.get("token_changeling"):
+        scenario["expected_token"]["changeling"] = True
+        scenario["expected_token"]["all_creature_types"] = True
+        scenario["expected_token"]["universal_creature_subtypes"] = True
     return scenario
-    if required.get("token_cant_block"):
-        result["expected_token"]["cant_block"] = True
-    return result
 
 
 def _manifest_mana_for_activation_cost(cost: str | None) -> dict[str, int]:

@@ -1452,7 +1452,7 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
             {split.AURA_STATIC_PT_ATTACHMENT_SCOPE: 1},
         )
 
-    def test_exact_split_report_does_not_count_runtime_partial_as_safe(self) -> None:
+    def test_exact_split_report_counts_runtime_partial_mana_source_as_batch_safe(self) -> None:
         row = queue_row(
             split.RAMP_ARTIFACT_UNIT,
             card_id="card-1",
@@ -1485,10 +1485,10 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         )
 
         self.assertEqual(report["summary"]["proposal_count"], 1)
-        self.assertEqual(report["summary"]["safe_for_batch_pg_package_count"], 0)
+        self.assertEqual(report["summary"]["safe_for_batch_pg_package_count"], 1)
         self.assertEqual(
             report["summary"]["proposal_status_counts"],
-            {"runtime_partial_requires_family_runtime": 1},
+            {"runtime_partial_batch_pg_candidate_after_precheck": 1},
         )
 
     def test_static_cast_as_flash_permission_maps_artifact_filter(self) -> None:
@@ -6961,6 +6961,104 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
 
         self.assertIsNone(proposal)
         self.assertEqual(reason, "token_description_keyword_not_supported")
+
+    def test_fixed_create_creature_tokens_spell_maps_changeling_token(self) -> None:
+        row = queue_row(split.TOKEN_SPELL_UNIT, effect_classes=["CreateTokenEffect"], xmage_signals=["token"])
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Birthing Boughs Fixture",
+                type_line="Sorcery",
+                oracle_text="Create a 2/2 colorless Shapeshifter creature token with changeling.",
+            ),
+            source_text="""
+                this.getSpellAbility().addEffect(new CreateTokenEffect(new ShapeshifterToken()));
+                class ShapeshifterToken extends TokenImpl {
+                    public ShapeshifterToken() {
+                        super("Shapeshifter Token", "2/2 colorless Shapeshifter creature token with changeling");
+                        cardType.add(CardType.CREATURE);
+                        subtype.add(SubType.SHAPESHIFTER);
+                        power = new MageInt(2);
+                        toughness = new MageInt(2);
+                        addAbility(new ChangelingAbility());
+                    }
+                }
+            """,
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.TOKEN_SPELL_SCOPE)
+        self.assertEqual(effect["token_keywords"], ["changeling"])
+        self.assertTrue(effect["token_changeling"])
+        self.assertTrue(effect["token_all_creature_types"])
+        self.assertTrue(effect["token_universal_creature_subtypes"])
+
+    def test_fixed_create_creature_tokens_spell_maps_cant_be_blocked_token(self) -> None:
+        row = queue_row(split.TOKEN_SPELL_UNIT, effect_classes=["CreateTokenEffect"], xmage_signals=["token"])
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Fish Fixture",
+                type_line="Sorcery",
+                oracle_text='Create a 1/1 blue Fish creature token with "This token can\'t be blocked."',
+            ),
+            source_text="""
+                this.getSpellAbility().addEffect(new CreateTokenEffect(new FishToken()));
+                class FishToken extends TokenImpl {
+                    public FishToken() {
+                        super("Fish Token", "1/1 blue Fish creature token with \\"This token can't be blocked.\\"");
+                        cardType.add(CardType.CREATURE);
+                        color.setBlue(true);
+                        subtype.add(SubType.FISH);
+                        power = new MageInt(1);
+                        toughness = new MageInt(1);
+                        addAbility(new CantBeBlockedSourceAbility());
+                    }
+                }
+            """,
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.TOKEN_SPELL_SCOPE)
+        self.assertTrue(effect["token_cant_be_blocked"])
+        self.assertTrue(effect["token_unblockable"])
+
+    def test_fixed_create_creature_tokens_spell_maps_block_only_flying_token(self) -> None:
+        row = queue_row(split.TOKEN_SPELL_UNIT, effect_classes=["CreateTokenEffect"], xmage_signals=["token"])
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Faerie Fixture",
+                type_line="Sorcery",
+                oracle_text=(
+                    'Create a 1/1 blue Faerie creature token with flying and '
+                    '"This creature can block only creatures with flying."'
+                ),
+            ),
+            source_text="""
+                this.getSpellAbility().addEffect(new CreateTokenEffect(new FaerieBlockFliersToken()));
+                class FaerieBlockFliersToken extends TokenImpl {
+                    public FaerieBlockFliersToken() {
+                        super("Faerie Token", "1/1 blue Faerie creature token with flying and \\"This creature can block only creatures with flying.\\"");
+                        cardType.add(CardType.CREATURE);
+                        color.setBlue(true);
+                        subtype.add(SubType.FAERIE);
+                        power = new MageInt(1);
+                        toughness = new MageInt(1);
+                        addAbility(FlyingAbility.getInstance());
+                        addAbility(new SimpleStaticAbility(new CanBlockOnlyFlyingEffect(Duration.WhileOnBattlefield)));
+                    }
+                }
+            """,
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.TOKEN_SPELL_SCOPE)
+        self.assertEqual(effect["token_keywords"], ["flying"])
+        self.assertTrue(effect["token_can_block_only_flying"])
 
     def test_fixed_create_creature_tokens_spell_accepts_prowess_token(self) -> None:
         row = queue_row(split.TOKEN_SPELL_UNIT, effect_classes=["CreateTokenEffect"], xmage_signals=["token"])
@@ -16784,7 +16882,7 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
             },
         )
 
-    def test_permanent_activated_damage_blocks_dynamic_amount(self) -> None:
+    def test_permanent_activated_damage_maps_x_amount(self) -> None:
         row = queue_row(
             split.DAMAGE_UNIT,
             effect_classes=["DamageTargetEffect"],
@@ -16810,8 +16908,13 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
             """,
         )
 
-        self.assertIsNone(proposal)
-        self.assertEqual(reason, "activated_damage_oracle_not_simple")
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.PERMANENT_ACTIVATED_DAMAGE_SCOPE)
+        self.assertEqual(effect["damage_amount_source"], "x_value")
+        self.assertEqual(effect["e2e_x_value"], 3)
+        self.assertEqual(effect["activation_cost_mana"], "{X}{R}")
+        self.assertTrue(effect["activated_self_sacrifice_damage"])
 
     def test_permanent_activated_damage_maps_player_or_planeswalker_target(self) -> None:
         row = queue_row(
@@ -30824,7 +30927,7 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         )
 
         self.assertIsNone(proposal)
-        self.assertEqual(reason, "activated_target_boost_oracle_not_simple")
+        self.assertEqual(reason, "activated_target_boost_source_target_not_supported")
 
     def test_activated_target_keyword_maps_to_keyword_until_eot(self) -> None:
         row = queue_row(
