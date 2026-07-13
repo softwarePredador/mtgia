@@ -18847,12 +18847,26 @@ def priority_round(active_player, all_players, stack, turn, rng, phase=None):
                     )
                     return True
             # v8.2: Smart counter decision based on threat score
-            if player != top_item.controller and counter_worth(score, player, rng):
+            if player != top_item.controller:
                 counters = player.counterspell_cards(
                     castable_only=True,
                     target_card=top_item.card,
                     stack_item=top_item,
                 )
+                opportunistic_cantrip_counter = any(
+                    opportunistic_counter_cantrip_worth(
+                        candidate,
+                        top_item.card,
+                        stack_item=top_item,
+                    )
+                    for candidate in counters
+                )
+            else:
+                counters = []
+                opportunistic_cantrip_counter = False
+            if player != top_item.controller and counters and (
+                counter_worth(score, player, rng) or opportunistic_cantrip_counter
+            ):
                 counter = player.use_counterspell(
                     turn,
                     top_item.card,
@@ -18891,6 +18905,7 @@ def priority_round(active_player, all_players, stack, turn, rng, phase=None):
                             "stack_threat_score": score,
                             "counter_worth": 1,
                             "available_counters": len(counters),
+                            "opportunistic_cantrip_counter": int(opportunistic_cantrip_counter),
                         },
                         rule_source=fields.get("rule_source", "battle_heuristic"),
                         rule_status=fields.get("rule_review_status", "heuristic"),
@@ -18901,7 +18916,11 @@ def priority_round(active_player, all_players, stack, turn, rng, phase=None):
                             if counter.get("_counter_tax_paid")
                             else "counterspell_used"
                         ),
-                        reason="counter_high_threat_spell",
+                        reason=(
+                            "counter_cantrip_legal_stack_ability"
+                            if opportunistic_cantrip_counter and score < 20
+                            else "counter_high_threat_spell"
+                        ),
                     )
                     if not counter.get("_counter_tax_paid"):
                         stack.items[-1].countered = True
@@ -19214,6 +19233,24 @@ def counter_worth(threat_score, opp, rng):
         return rng.random() < 0.2
 
     return False
+
+
+def opportunistic_counter_cantrip_worth(counter, target_card, stack_item=None):
+    """Use cantrip counters on legal non-mana ability windows even when threat scoring is low."""
+    effect = get_card_effect(counter)
+    if int(effect.get("draw_on_counter") or 0) <= 0:
+        return False
+    if not counter_can_target(
+        counter,
+        effect,
+        target_card,
+        stack_item=stack_item,
+    ):
+        return False
+    return _counter_target_stack_object_kind(target_card, stack_item=stack_item) in {
+        "activated_ability",
+        "triggered_ability",
+    }
 
 
 def stack_exile_worth(threat_score, rng):

@@ -5415,6 +5415,7 @@ def counter_target_from_oracle(metadata: dict[str, Any]) -> str | None:
             r"^counter target activated ability, triggered ability, or legendary spell\.?$",
             "activated_or_triggered_ability_or_legendary_spell",
         ),
+        (r"^counter target activated ability\.?$", "activated_ability"),
         (r"^counter target red or green spell\.?$", "red_or_green_spell"),
         (r"^counter target blue instant spell\.?$", "blue_instant_spell"),
         (r"^counter target creature or sorcery spell\.?$", "creature_or_sorcery_spell"),
@@ -5468,7 +5469,8 @@ def counter_target_from_oracle(metadata: dict[str, Any]) -> str | None:
 
 
 def counter_draw_target_from_oracle(metadata: dict[str, Any]) -> str | None:
-    text = oracle_text(metadata)
+    text = strip_parenthetical_reminders(oracle_text(metadata))
+    text = re.sub(r"\s+", " ", text).strip()
     if not text.endswith(" draw a card."):
         return None
     return counter_target_from_oracle({"oracle_text": text.removesuffix(" draw a card.").strip()})
@@ -5999,6 +6001,8 @@ def dynamic_counter_unless_pays_from_source(source_text: str) -> tuple[dict[str,
 
 def counter_target_constraints_for(target: str) -> dict[str, Any]:
     constraints: dict[str, Any] = {"zone": "stack", "stack_object": "spell"}
+    if target == "activated_ability":
+        return {"zone": "stack", "stack_object": "activated_ability"}
     if target == "spell_or_activated_or_triggered_ability":
         return {
             "zone": "stack",
@@ -35005,6 +35009,13 @@ def split_row(
         and effect_classes(row) == {"CantBeCounteredSourceEffect", "DamageTargetEffect"}
         and ability_classes(row) == {"SimpleStaticAbility"}
     )
+    counter_activated_ability_draw_spell_unit = (
+        unit == DRAW_UNIT
+        and effect_classes(row) == {"CounterTargetEffect", "DrawCardSourceControllerEffect"}
+        and ability_classes(row) == {"TargetActivatedAbility"}
+        and counter_draw_target_from_oracle(metadata) == "activated_ability"
+        and "TargetActivatedAbility" in source_text
+    )
 
     if (
         (
@@ -35116,7 +35127,11 @@ def split_row(
     ):
         if not is_spell(metadata):
             return None, "not_instant_or_sorcery_spell"
-        if ability_kind(row) != "one_shot" and not damage_spell_stack_cant_be_countered_unit:
+        if (
+            ability_kind(row) != "one_shot"
+            and not damage_spell_stack_cant_be_countered_unit
+            and not counter_activated_ability_draw_spell_unit
+        ):
             return None, "not_one_shot_spell_ability"
         if has_additional_cost(source_text) or "additional cost" in oracle_text(metadata):
             if unit == DAMAGE_UNIT and effect_classes(row) == {"DamageTargetEffect"}:
@@ -44567,12 +44582,19 @@ def split_row(
         if classes == {"CounterTargetEffect", "DrawCardSourceControllerEffect"}:
             unsupported_abilities = ability_classes(row) - ALLOWED_AUXILIARY_RESOLUTION_ABILITY_CLASSES
             if unsupported_abilities:
-                return None, "counter_draw_ability_class_not_simple"
+                if not (
+                    unsupported_abilities == {"TargetActivatedAbility"}
+                    and counter_draw_target_from_oracle(metadata) == "activated_ability"
+                    and "TargetActivatedAbility" in source_text
+                ):
+                    return None, "counter_draw_ability_class_not_simple"
             if has_oracle_complexity(metadata):
                 return None, "counter_draw_oracle_not_simple"
             target = counter_draw_target_from_oracle(metadata)
             if target is None:
                 return None, "counter_draw_target_not_supported"
+            if target == "activated_ability" and "TargetActivatedAbility" not in source_text:
+                return None, "counter_draw_source_target_not_supported"
             if target in {
                 "spell_targeting_creature",
                 "spell_targeting_permanent_you_control",

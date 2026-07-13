@@ -9631,6 +9631,28 @@ def _stack_object_fixture_from_constraints(
     if not matching and active_constraints.get("require_legendary"):
         stack_object = "spell"
 
+    if not matching and stack_object in {"activated_ability", "triggered_ability", "mana_ability"}:
+        illegal_stack_object = {
+            "activated_ability": "triggered_ability",
+            "triggered_ability": "activated_ability",
+            "mana_ability": "spell",
+        }[stack_object]
+        label = {
+            "activated_ability": "Activated Ability",
+            "triggered_ability": "Triggered Ability",
+            "mana_ability": "Mana Ability",
+            "spell": "Instant",
+        }[illegal_stack_object]
+        return {
+            "card": {
+                "name": name,
+                "type_line": label,
+                "effect": illegal_stack_object,
+                "cmc": 0,
+            },
+            "effect": {"effect": illegal_stack_object},
+        }
+
     if (
         not matching
         and stack_object == "spell"
