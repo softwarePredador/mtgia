@@ -8816,6 +8816,66 @@ def run_prowess_trigger(
     }
 
 
+def run_static_ward_counter(
+    battle,
+    scenario: dict[str, Any],
+    events: list[tuple[str, dict[str, Any]]],
+) -> dict[str, Any]:
+    card = battle.enrich_card(dict(scenario["card"]))
+    effect = battle.get_card_effect(card)
+    if isinstance(effect, dict):
+        card.update(effect)
+    card.setdefault("effect", "creature")
+    active = battle.Player(str(scenario.get("player") or "Ward Controller"), None, [])
+    opponent = battle.Player(str(scenario.get("opponent") or "Ward Opponent"), None, [])
+    active.battlefield.append(card)
+    expected_ward_cost = str(scenario.get("expected_ward_cost") or card.get("ward_cost") or "")
+    if str(card.get("ward_cost") or card.get("ward") or "") != expected_ward_cost:
+        fail(
+            "battle_execution",
+            f"{card['name']} ward_cost={card.get('ward_cost')!r}, expected {expected_ward_cost!r}",
+        )
+    expected_keywords = {
+        str(value).strip().lower().replace(" ", "_")
+        for value in scenario.get("expected_keywords") or []
+        if str(value).strip()
+    }
+    for keyword in expected_keywords:
+        if not battle.card_has_keyword(card, keyword):
+            fail("battle_execution", f"{card['name']} missing keyword {keyword!r}")
+    before_events = len(events)
+    countered = battle.check_ward(
+        card,
+        dict(scenario.get("targeting_spell") or {"name": "E2E Ward Targeting Spell"}),
+        opponent,
+        random.Random(int(scenario.get("seed") or 6074)),
+    )
+    if not countered:
+        fail("battle_execution", f"{card['name']} ward did not counter unpaid target spell")
+    ward_event = next(
+        (
+            data
+            for event, data in events[before_events:]
+            if event == "ward_countered" and data.get("target") == card.get("name")
+        ),
+        None,
+    )
+    if ward_event is None:
+        fail("battle_events", f"missing {card['name']} ward_countered event")
+    if str(ward_event.get("ward_cost") or "") != expected_ward_cost:
+        fail(
+            "battle_events",
+            f"{card['name']} ward event cost={ward_event.get('ward_cost')!r}, expected {expected_ward_cost!r}",
+        )
+    return {
+        "scenario": scenario.get("name"),
+        "card_name": card["name"],
+        "ward_cost": expected_ward_cost,
+        "keywords": sorted(expected_keywords),
+        "countered": True,
+    }
+
+
 def run_changeling_subtype_identity(
     battle,
     scenario: dict[str, Any],
@@ -16194,6 +16254,7 @@ SCENARIO_RUNNERS = {
     "combat_damage_draw": run_combat_damage_draw,
     "hand_cycling": run_hand_cycling,
     "prowess_trigger": run_prowess_trigger,
+    "static_ward_counter": run_static_ward_counter,
     "changeling_subtype_identity": run_changeling_subtype_identity,
     "mass_return_to_hand": run_mass_return_to_hand,
     "conditional_land_play": run_conditional_land_play,

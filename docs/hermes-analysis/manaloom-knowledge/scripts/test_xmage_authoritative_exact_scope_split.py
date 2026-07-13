@@ -29553,6 +29553,65 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
                 self.assertEqual(effect["keywords"], [keyword])
                 self.assertTrue(effect[keyword])
 
+    def test_static_ward_creature_maps_fixed_mana_ward_and_keywords(self) -> None:
+        row = queue_row(
+            "xmage_signature::no_effect_class::ReachAbility,TrampleAbility,WardAbility::"
+            "no_target_class::no_condition_class::no_signal",
+            effect_classes=[],
+            ability_kind="static",
+            ability_classes=["ReachAbility", "TrampleAbility", "WardAbility"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Spider-Rex, Daring Dino",
+                type_line="Legendary Creature - Spider Dinosaur Hero",
+                oracle_text=(
+                    "Reach, trample\n"
+                    "Ward {2} (Whenever this creature becomes the target of a spell or ability "
+                    "an opponent controls, counter it unless that player pays {2}.)"
+                ),
+            ),
+            source_text=(
+                "this.addAbility(ReachAbility.getInstance());"
+                "this.addAbility(TrampleAbility.getInstance());"
+                'this.addAbility(new WardAbility(new ManaCostsImpl<>("{2}")));'
+            ),
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.STATIC_KEYWORD_CREATURE_SCOPE)
+        self.assertEqual(effect["keywords"], ["reach", "trample"])
+        self.assertEqual(effect["ward_cost"], "{2}")
+        self.assertEqual(effect["ward_mana_value"], 2)
+        self.assertTrue(effect["reach"])
+        self.assertTrue(effect["trample"])
+
+    def test_static_ward_creature_blocks_non_mana_ward_costs(self) -> None:
+        row = queue_row(
+            "xmage_signature::no_effect_class::FlyingAbility,WardAbility::"
+            "no_target_class::no_condition_class::no_signal",
+            effect_classes=[],
+            ability_kind="static",
+            ability_classes=["FlyingAbility", "WardAbility"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Owlin Shieldmage",
+                type_line="Creature - Bird Warlock",
+                oracle_text="Flying\nWard-Pay 3 life.",
+            ),
+            source_text=(
+                "this.addAbility(FlyingAbility.getInstance());"
+                "this.addAbility(new WardAbility(new PayLifeCost(3)));"
+            ),
+        )
+
+        self.assertIsNone(proposal)
+        self.assertEqual(reason, "static_ward_oracle_not_exact")
+
     def test_static_keyword_creature_blocks_source_additional_cast_cost(self) -> None:
         row = queue_row(
             "xmage_signature::no_effect_class::FearAbility::TargetCardInHand::no_condition_class::targeting",

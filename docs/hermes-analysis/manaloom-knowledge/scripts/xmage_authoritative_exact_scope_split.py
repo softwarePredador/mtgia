@@ -938,6 +938,7 @@ STATIC_SELF_KEYWORD_ABILITY_CLASSES = {
     "TrampleAbility": "trample",
     "VigilanceAbility": "vigilance",
 }
+STATIC_SELF_WARD_ABILITY_CLASS = "WardAbility"
 
 SAFE_MANA_AUXILIARY_ABILITY_CLASSES = {
     "EntersBattlefieldTappedAbility",
@@ -14174,6 +14175,17 @@ def is_static_keyword_creature_unit(row: dict[str, Any]) -> bool:
     )
 
 
+def is_static_ward_creature_unit(row: dict[str, Any]) -> bool:
+    abilities = ability_classes(row)
+    remaining = abilities - {STATIC_SELF_WARD_ABILITY_CLASS}
+    return (
+        STATIC_SELF_WARD_ABILITY_CLASS in abilities
+        and not effect_classes(row)
+        and not (row.get("xmage_signals") or [])
+        and remaining.issubset(STATIC_SELF_KEYWORD_ABILITY_CLASSES)
+    )
+
+
 def is_prowess_creature_unit(row: dict[str, Any]) -> bool:
     abilities = ability_classes(row)
     remaining = abilities - {PROWESS_KEYWORD_ABILITY_CLASS}
@@ -15781,6 +15793,56 @@ def static_keywords_from_oracle(metadata: dict[str, Any]) -> set[str] | None:
             break
         keywords.update(parts)
     return keywords or None
+
+
+def static_keywords_and_fixed_mana_ward_from_oracle(
+    metadata: dict[str, Any],
+) -> tuple[set[str], str] | str:
+    raw = str(metadata.get("oracle_text") or "").strip()
+    if not raw:
+        return "static_ward_oracle_not_exact"
+    allowed = set(STATIC_SELF_KEYWORD_ABILITY_CLASSES.values())
+    keywords: set[str] = set()
+    ward_cost: str | None = None
+    for raw_line in raw.splitlines():
+        line = strip_parenthetical_reminders(raw_line).strip().rstrip(".")
+        if not line:
+            continue
+        parts = [
+            part.strip()
+            for part in re.split(r"[,;]", line)
+            if str(part or "").strip()
+        ]
+        if not parts:
+            continue
+        for part in parts:
+            normalized = normalize_keyword_phrase(part)
+            if normalized in allowed:
+                keywords.add(normalized)
+                continue
+            ward_match = re.fullmatch(r"ward\s+(\{\d+\})", part.strip(), re.I)
+            if ward_match:
+                if ward_cost is not None:
+                    return "static_ward_oracle_multiple_ward_costs"
+                ward_cost = ward_match.group(1)
+                continue
+            return "static_ward_oracle_not_exact"
+    if ward_cost is None:
+        return "static_ward_oracle_missing_ward"
+    return keywords, ward_cost
+
+
+def fixed_mana_ward_from_source(source: str) -> str | None:
+    text = str(source or "")
+    ward_constructors = re.findall(r"\bnew\s+WardAbility\s*\(", text)
+    if len(ward_constructors) != 1:
+        return None
+    match = re.search(
+        r"new\s+WardAbility\s*\(\s*new\s+ManaCostsImpl<>\s*\(\s*\"(?P<cost>\{\d+\})\"\s*\)",
+        text,
+        re.S,
+    )
+    return str(match.group("cost")) if match else None
 
 
 def static_or_prowess_keywords_from_oracle(metadata: dict[str, Any]) -> set[str] | None:
@@ -34190,6 +34252,7 @@ def split_row(
 ) -> tuple[dict[str, Any] | None, str]:
     unit = str(row.get("adapter_work_unit") or "")
     keyword_creature_unit = is_static_keyword_creature_unit(row)
+    static_ward_creature_unit = is_static_ward_creature_unit(row)
     prowess_creature_unit = is_prowess_creature_unit(row)
     changeling_creature_unit = is_changeling_creature_unit(row)
     static_protection_from_colors_creature_unit = (
@@ -34429,6 +34492,7 @@ def split_row(
     if (
         unit not in SUPPORTED_UNITS
         and not keyword_creature_unit
+        and not static_ward_creature_unit
         and not prowess_creature_unit
         and not changeling_creature_unit
         and not static_protection_from_colors_creature_unit
@@ -39966,6 +40030,46 @@ def split_row(
             metadata,
             effect_json,
             family_id="xmage_static_self_combat_keyword_creature",
+        ), "selected_exact_scope"
+
+    if static_ward_creature_unit:
+        if not is_creature_metadata(metadata):
+            return None, "static_ward_not_creature"
+        if ".getSpellAbility().addCost" in source_text:
+            return None, "static_ward_source_additional_cost_not_supported"
+        static_keywords = keywords_from_ability_classes(row)
+        oracle_ward = static_keywords_and_fixed_mana_ward_from_oracle(metadata)
+        if isinstance(oracle_ward, str):
+            return None, oracle_ward
+        oracle_keywords, oracle_ward_cost = oracle_ward
+        if static_keywords != oracle_keywords:
+            return None, "static_ward_oracle_keyword_mismatch"
+        source_ward_cost = fixed_mana_ward_from_source(source_text)
+        if source_ward_cost is None:
+            return None, "static_ward_source_cost_not_supported"
+        if source_ward_cost != oracle_ward_cost:
+            return None, "static_ward_source_oracle_cost_mismatch"
+        keyword_list = ordered_keywords(static_keywords)
+        effect_json = {
+            "effect": "creature",
+            "battle_model_scope": STATIC_KEYWORD_CREATURE_SCOPE,
+            "keywords": keyword_list,
+            "_keywords_are_self": True,
+            "ward": oracle_ward_cost,
+            "ward_cost": oracle_ward_cost,
+            "ward_cost_status": "runtime_executor_v1",
+            "xmage_ability_classes": sorted(ability_classes(row)),
+        }
+        ward_value_match = re.fullmatch(r"\{(\d+)\}", oracle_ward_cost)
+        if ward_value_match:
+            effect_json["ward_mana_value"] = int(ward_value_match.group(1))
+        for keyword in keyword_list:
+            effect_json[keyword] = True
+        return build_proposal(
+            row,
+            metadata,
+            effect_json,
+            family_id="xmage_static_self_ward_creature",
         ), "selected_exact_scope"
 
     if prowess_creature_unit:
@@ -50178,6 +50282,7 @@ def build_exact_split_report(
         if (
             str(row.get("adapter_work_unit") or "") not in SUPPORTED_UNITS
             and not is_static_keyword_creature_unit(row)
+            and not is_static_ward_creature_unit(row)
             and not is_prowess_creature_unit(row)
             and not is_changeling_creature_unit(row)
             and not is_static_protection_from_colors_creature_unit(row)
@@ -50306,7 +50411,8 @@ def build_exact_split_report(
             "promotion_boundary": "exact runtime-backed spell/permanent scopes only",
             "supported_adapter_work_units": sorted(SUPPORTED_UNITS),
             "supported_dynamic_adapter_work_units": [
-                "no-effect/no-signal static self keyword creature rows without ProtectionAbility or WardAbility",
+                "no-effect/no-signal static self keyword creature rows without ProtectionAbility",
+                "no-effect/no-signal WardAbility creature rows with exact fixed-mana Ward Oracle/XMage agreement and optional safe static self keywords",
                 "no-effect/no-signal ProwessAbility creature rows, optionally with safe static self keywords, with exact Oracle/XMage noncreature-spell +1/+1 trigger support",
                 "no-effect/no-signal ChangelingAbility creature rows, optionally with safe static self keywords, with exact Oracle/XMage all-creature-types support",
                 "no-effect/no-signal ProtectionAbility creature rows, optionally with static self keywords, with exact Oracle/XMage protection from colors, card types, subtypes, or supported filters",

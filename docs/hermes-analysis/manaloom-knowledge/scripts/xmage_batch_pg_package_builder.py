@@ -592,6 +592,10 @@ E2E_REQUIRED_EFFECT_FIELDS = (
     "counter_grants_keywords",
     "keywords",
     "_keywords_are_self",
+    "ward",
+    "ward_cost",
+    "ward_cost_status",
+    "ward_mana_value",
     "changeling",
     "all_creature_types",
     "universal_creature_subtypes",
@@ -5277,6 +5281,42 @@ def prowess_execution_scenario_from_expected_rule(
         "expected_trigger": "noncreature_spell_cast",
         "expected_power_bonus": power_bonus,
         "expected_toughness_bonus": toughness_bonus,
+        "expected_keywords": keywords,
+        "logical_rule_key": rule["logical_rule_key"],
+    }
+
+
+def static_ward_execution_scenario_from_expected_rule(
+    rule: dict[str, Any],
+) -> dict[str, Any] | None:
+    required = dict(rule.get("required_effect_fields") or {})
+    if required.get("battle_model_scope") != "xmage_static_self_combat_keyword_creature_v1":
+        return None
+    ward_cost = str(required.get("ward_cost") or required.get("ward") or "").strip()
+    if not ward_cost or required.get("ward_cost_status") != "runtime_executor_v1":
+        return None
+    keywords = list(required.get("keywords") or [])
+    return {
+        "name": f"{rule['card_name']} counters unpaid ward target spell",
+        "type": "static_ward_counter",
+        "card": {
+            "name": rule["card_name"],
+            "type_line": "Creature - Ward Fixture",
+            "effect": "creature",
+            "power": 4,
+            "toughness": 4,
+            "keywords": keywords,
+            "_keywords_are_self": True,
+            "ward": ward_cost,
+            "ward_cost": ward_cost,
+            "ward_cost_status": "runtime_executor_v1",
+        },
+        "targeting_spell": {
+            "name": "E2E Ward Removal Spell",
+            "type_line": "Instant",
+            "effect": "removal_destroy",
+        },
+        "expected_ward_cost": ward_cost,
         "expected_keywords": keywords,
         "logical_rule_key": rule["logical_rule_key"],
     }
@@ -10840,6 +10880,7 @@ def execution_scenario_from_expected_rule(rule: dict[str, Any]) -> dict[str, Any
         or beginning_end_step_draw_execution_scenario_from_expected_rule(rule)
         or hand_cycling_execution_scenario_from_expected_rule(rule)
         or prowess_execution_scenario_from_expected_rule(rule)
+        or static_ward_execution_scenario_from_expected_rule(rule)
         or changeling_subtype_identity_execution_scenario_from_expected_rule(rule)
         or simple_activated_damage_execution_scenario_from_expected_rule(rule)
         or simple_activated_tap_target_execution_scenario_from_expected_rule(rule)

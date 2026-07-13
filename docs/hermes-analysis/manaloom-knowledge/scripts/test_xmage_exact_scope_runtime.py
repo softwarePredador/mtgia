@@ -23077,6 +23077,51 @@ class XMageExactScopeRuntimeTest(unittest.TestCase):
         self.assertTrue(permanent["haste"])
         self.assertFalse(permanent["summoning_sick"])
 
+    def test_static_ward_creature_counters_spell_when_ward_is_unpaid(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        opponent = self.battle.Player("Opponent", None, [])
+        card = {
+            "name": "Fixture Ward Creature",
+            "type_line": "Creature - Spider Dinosaur",
+            "oracle_text": "Reach, trample\nWard {2}",
+            "controller": active.name,
+            "power": 4,
+            "toughness": 4,
+        }
+        effect = {
+            "effect": "creature",
+            "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+            "keywords": ["reach", "trample"],
+            "_keywords_are_self": True,
+            "reach": True,
+            "trample": True,
+            "ward": "{2}",
+            "ward_cost": "{2}",
+            "ward_cost_status": "runtime_executor_v1",
+        }
+
+        permanent = self.battle.enrich_card({**card, **effect})
+        self.assertEqual(permanent["ward_cost"], "{2}")
+        self.assertTrue(self.battle.card_has_keyword(permanent, "reach"))
+        self.assertTrue(self.battle.card_has_keyword(permanent, "trample"))
+
+        countered = self.battle.check_ward(
+            permanent,
+            {"name": "Doom Blade", "type_line": "Instant", "effect": "removal_destroy"},
+            opponent,
+            random.Random(7),
+        )
+
+        self.assertTrue(countered)
+        self.assertTrue(
+            any(
+                event == "ward_countered"
+                and data.get("target") == "Fixture Ward Creature"
+                and data.get("ward_cost") == "{2}"
+                for event, data in self.events
+            )
+        )
+
     def test_changeling_creature_matches_every_creature_subtype_filter(self) -> None:
         changeling = {
             "name": "Avian Changeling",

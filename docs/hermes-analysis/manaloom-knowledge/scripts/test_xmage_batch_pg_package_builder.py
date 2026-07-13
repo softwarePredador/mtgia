@@ -99,6 +99,39 @@ def test_hand_cycling_runtime_fields_and_execution_scenario_are_manifested() -> 
     assert scenario["controller_mana"]["generic"] == 2
 
 
+def test_static_ward_runtime_fields_and_execution_scenario_are_manifested() -> None:
+    proposal = {
+        "normalized_name": "spider-rex, daring dino",
+        "card_name": "Spider-Rex, Daring Dino",
+        "logical_rule_key": "battle_rule_v1:ward_fixture",
+        "oracle_hash": "hash-ward",
+        "effect_json": {
+            "effect": "creature",
+            "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+            "keywords": ["reach", "trample"],
+            "_keywords_are_self": True,
+            "reach": True,
+            "trample": True,
+            "ward": "{2}",
+            "ward_cost": "{2}",
+            "ward_cost_status": "runtime_executor_v1",
+            "ward_mana_value": 2,
+        },
+    }
+
+    expected = builder.expected_rule_from_proposal(proposal)
+    scenario = builder.execution_scenario_from_expected_rule(expected)
+
+    required = expected["required_effect_fields"]
+    assert required["ward"] == "{2}"
+    assert required["ward_cost"] == "{2}"
+    assert required["ward_cost_status"] == "runtime_executor_v1"
+    assert required["ward_mana_value"] == 2
+    assert scenario["type"] == "static_ward_counter"
+    assert scenario["expected_ward_cost"] == "{2}"
+    assert scenario["expected_keywords"] == ["reach", "trample"]
+
+
 def test_prowess_trigger_fields_and_execution_scenario_are_manifested() -> None:
     proposal = {
         "normalized_name": "jeskai windscout",
