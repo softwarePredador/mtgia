@@ -1,0 +1,4015 @@
+{
+  "apply_gate": "Do not run apply SQL without explicit approval for the exact command.",
+  "backup_table": "manaloom_deploy_audit.pg853_activated_target_boost_new_server_20260713_002650",
+  "deploy_id": "pg853_activated_target_boost_new_server",
+  "execution_scenarios": [
+    {
+      "card": {
+        "name": "Aegis of the Meek"
+      },
+      "controller_mana": {
+        "black": 0,
+        "blue": 0,
+        "generic": 1,
+        "green": 0,
+        "red": 0,
+        "white": 0
+      },
+      "expected_power_delta": 1,
+      "expected_sacrificed_source": false,
+      "expected_tapped_source": true,
+      "expected_target": "creature",
+      "expected_target_constraints": {
+        "card_types": [
+          "creature"
+        ],
+        "power_max": 1,
+        "power_min": 1,
+        "toughness_max": 1,
+        "toughness_min": 1
+      },
+      "expected_toughness_delta": 2,
+      "logical_rule_key": "battle_rule_v1:2ae27e7b044d26f97848d01d210ab78b",
+      "name": "Aegis of the Meek activates target boost ability",
+      "target": {
+        "cmc": 3,
+        "effect": "creature",
+        "name": "E2E Target Boost Legal Target",
+        "power": 1,
+        "toughness": 1,
+        "type_line": "Creature - Soldier"
+      },
+      "target_controller": "self",
+      "type": "simple_activated_target_boost"
+    },
+    {
+      "card": {
+        "name": "Alpha Kavu"
+      },
+      "controller_mana": {
+        "black": 0,
+        "blue": 0,
+        "generic": 1,
+        "green": 1,
+        "red": 0,
+        "white": 0
+      },
+      "expected_power_delta": -1,
+      "expected_sacrificed_source": false,
+      "expected_tapped_source": false,
+      "expected_target": "creature",
+      "expected_target_constraints": {
+        "card_types": [
+          "creature"
+        ],
+        "target_subtypes": [
+          "kavu"
+        ]
+      },
+      "expected_toughness_delta": 1,
+      "logical_rule_key": "battle_rule_v1:39b8573e388d05753b1c5cd494ade119",
+      "name": "Alpha Kavu activates target boost ability",
+      "target": {
+        "cmc": 3,
+        "effect": "creature",
+        "name": "E2E Target Boost Legal Target",
+        "power": 4,
+        "toughness": 4,
+        "type_line": "Creature - Soldier"
+      },
+      "target_controller": "opponent",
+      "type": "simple_activated_target_boost"
+    },
+    {
+      "card": {
+        "name": "Angelic Page"
+      },
+      "controller_mana": {
+        "black": 0,
+        "blue": 0,
+        "generic": 0,
+        "green": 0,
+        "red": 0,
+        "white": 0
+      },
+      "expected_power_delta": 1,
+      "expected_sacrificed_source": false,
+      "expected_tapped_source": true,
+      "expected_target": "creature",
+      "expected_target_constraints": {
+        "card_types": [
+          "creature"
+        ],
+        "combat_state": "attacking_or_blocking"
+      },
+      "expected_toughness_delta": 1,
+      "logical_rule_key": "battle_rule_v1:bdaae8162a6e1149bba3eb9b1082c96b",
+      "name": "Angelic Page activates target boost ability",
+      "target": {
+        "attacking": true,
+        "cmc": 3,
+        "effect": "creature",
+        "name": "E2E Target Boost Legal Target",
+        "power": 4,
+        "toughness": 4,
+        "type_line": "Creature - Soldier"
+      },
+      "target_controller": "self",
+      "type": "simple_activated_target_boost"
+    },
+    {
+      "card": {
+        "name": "Anointer of Champions"
+      },
+      "controller_mana": {
+        "black": 0,
+        "blue": 0,
+        "generic": 0,
+        "green": 0,
+        "red": 0,
+        "white": 0
+      },
+      "expected_power_delta": 1,
+      "expected_sacrificed_source": false,
+      "expected_tapped_source": true,
+      "expected_target": "creature",
+      "expected_target_constraints": {
+        "card_types": [
+          "creature"
+        ],
+        "combat_state": "attacking"
+      },
+      "expected_toughness_delta": 1,
+      "logical_rule_key": "battle_rule_v1:af8ea6d2a1cb9b87bf619615c6ca6e63",
+      "name": "Anointer of Champions activates target boost ability",
+      "target": {
+        "attacking": true,
+        "cmc": 3,
+        "effect": "creature",
+        "name": "E2E Target Boost Legal Target",
+        "power": 4,
+        "toughness": 4,
+        "type_line": "Creature - Soldier"
+      },
+      "target_controller": "self",
+      "type": "simple_activated_target_boost"
+    },
+    {
+      "card": {
+        "name": "Assembly-Worker"
+      },
+      "controller_mana": {
+        "black": 0,
+        "blue": 0,
+        "generic": 0,
+        "green": 0,
+        "red": 0,
+        "white": 0
+      },
+      "expected_power_delta": 1,
+      "expected_sacrificed_source": false,
+      "expected_tapped_source": true,
+      "expected_target": "creature",
+      "expected_target_constraints": {
+        "card_types": [
+          "creature"
+        ],
+        "required_subtype_match": "all",
+        "target_subtypes": [
+          "assembly",
+          "worker"
+        ]
+      },
+      "expected_toughness_delta": 1,
+      "logical_rule_key": "battle_rule_v1:1dd783caf9f450c1d3263b7bb7699ec5",
+      "name": "Assembly-Worker activates target boost ability",
+      "target": {
+        "cmc": 3,
+        "effect": "creature",
+        "name": "E2E Target Boost Legal Target",
+        "power": 4,
+        "toughness": 4,
+        "type_line": "Creature - Soldier"
+      },
+      "target_controller": "self",
+      "type": "simple_activated_target_boost"
+    },
+    {
+      "card": {
+        "name": "Crenellated Wall"
+      },
+      "controller_mana": {
+        "black": 0,
+        "blue": 0,
+        "generic": 0,
+        "green": 0,
+        "red": 0,
+        "white": 0
+      },
+      "expected_power_delta": 0,
+      "expected_sacrificed_source": false,
+      "expected_tapped_source": true,
+      "expected_target": "creature",
+      "expected_target_constraints": {
+        "card_types": [
+          "creature"
+        ]
+      },
+      "expected_toughness_delta": 4,
+      "logical_rule_key": "battle_rule_v1:c9767f4d6cb4ae481d93fe1e11400f06",
+      "name": "Crenellated Wall activates target boost ability",
+      "target": {
+        "cmc": 3,
+        "effect": "creature",
+        "name": "E2E Target Boost Legal Target",
+        "power": 4,
+        "toughness": 4,
+        "type_line": "Creature - Soldier"
+      },
+      "target_controller": "self",
+      "type": "simple_activated_target_boost"
+    },
+    {
+      "card": {
+        "name": "Dwarven Lieutenant"
+      },
+      "controller_mana": {
+        "black": 0,
+        "blue": 0,
+        "generic": 1,
+        "green": 0,
+        "red": 1,
+        "white": 0
+      },
+      "expected_power_delta": 1,
+      "expected_sacrificed_source": false,
+      "expected_tapped_source": false,
+      "expected_target": "creature",
+      "expected_target_constraints": {
+        "card_types": [
+          "creature"
+        ],
+        "target_subtypes": [
+          "dwarf"
+        ]
+      },
+      "expected_toughness_delta": 0,
+      "logical_rule_key": "battle_rule_v1:8bbcde679d280d8695d8beaf568d927f",
+      "name": "Dwarven Lieutenant activates target boost ability",
+      "target": {
+        "cmc": 3,
+        "effect": "creature",
+        "name": "E2E Target Boost Legal Target",
+        "power": 4,
+        "toughness": 4,
+        "type_line": "Creature - Soldier"
+      },
+      "target_controller": "self",
+      "type": "simple_activated_target_boost"
+    },
+    {
+      "card": {
+        "name": "Grassland Crusader"
+      },
+      "controller_mana": {
+        "black": 0,
+        "blue": 0,
+        "generic": 0,
+        "green": 0,
+        "red": 0,
+        "white": 0
+      },
+      "expected_power_delta": 2,
+      "expected_sacrificed_source": false,
+      "expected_tapped_source": true,
+      "expected_target": "creature",
+      "expected_target_constraints": {
+        "card_types": [
+          "creature"
+        ],
+        "target_subtypes": [
+          "elf",
+          "soldier"
+        ]
+      },
+      "expected_toughness_delta": 2,
+      "logical_rule_key": "battle_rule_v1:103e5a32b9023c725d8209cca6ab7e70",
+      "name": "Grassland Crusader activates target boost ability",
+      "target": {
+        "cmc": 3,
+        "effect": "creature",
+        "name": "E2E Target Boost Legal Target",
+        "power": 4,
+        "toughness": 4,
+        "type_line": "Creature - Soldier"
+      },
+      "target_controller": "self",
+      "type": "simple_activated_target_boost"
+    },
+    {
+      "card": {
+        "name": "Hate Weaver"
+      },
+      "controller_mana": {
+        "black": 0,
+        "blue": 0,
+        "generic": 2,
+        "green": 0,
+        "red": 0,
+        "white": 0
+      },
+      "expected_power_delta": 1,
+      "expected_sacrificed_source": false,
+      "expected_tapped_source": false,
+      "expected_target": "creature",
+      "expected_target_constraints": {
+        "card_types": [
+          "creature"
+        ],
+        "target_colors": [
+          "U",
+          "R"
+        ]
+      },
+      "expected_toughness_delta": 0,
+      "logical_rule_key": "battle_rule_v1:e9abc18cd5b0073bb47164c50e3fee6f",
+      "name": "Hate Weaver activates target boost ability",
+      "target": {
+        "cmc": 3,
+        "colors": [
+          "U"
+        ],
+        "effect": "creature",
+        "name": "E2E Target Boost Legal Target",
+        "power": 4,
+        "toughness": 4,
+        "type_line": "Creature - Soldier"
+      },
+      "target_controller": "self",
+      "type": "simple_activated_target_boost"
+    },
+    {
+      "card": {
+        "name": "Hoof Skulkin"
+      },
+      "controller_mana": {
+        "black": 0,
+        "blue": 0,
+        "generic": 3,
+        "green": 0,
+        "red": 0,
+        "white": 0
+      },
+      "expected_power_delta": 1,
+      "expected_sacrificed_source": false,
+      "expected_tapped_source": false,
+      "expected_target": "creature",
+      "expected_target_constraints": {
+        "card_types": [
+          "creature"
+        ],
+        "target_colors": [
+          "G"
+        ]
+      },
+      "expected_toughness_delta": 1,
+      "logical_rule_key": "battle_rule_v1:d923a862e58bdc89bcc435ec5e2c906a",
+      "name": "Hoof Skulkin activates target boost ability",
+      "target": {
+        "cmc": 3,
+        "colors": [
+          "G"
+        ],
+        "effect": "creature",
+        "name": "E2E Target Boost Legal Target",
+        "power": 4,
+        "toughness": 4,
+        "type_line": "Creature - Soldier"
+      },
+      "target_controller": "self",
+      "type": "simple_activated_target_boost"
+    },
+    {
+      "card": {
+        "name": "Icatian Lieutenant"
+      },
+      "controller_mana": {
+        "black": 0,
+        "blue": 0,
+        "generic": 1,
+        "green": 0,
+        "red": 0,
+        "white": 1
+      },
+      "expected_power_delta": 1,
+      "expected_sacrificed_source": false,
+      "expected_tapped_source": false,
+      "expected_target": "creature",
+      "expected_target_constraints": {
+        "card_types": [
+          "creature"
+        ],
+        "target_subtypes": [
+          "soldier"
+        ]
+      },
+      "expected_toughness_delta": 0,
+      "logical_rule_key": "battle_rule_v1:75ffbd696e0fb4e9d5e218ff2aae551a",
+      "name": "Icatian Lieutenant activates target boost ability",
+      "target": {
+        "cmc": 3,
+        "effect": "creature",
+        "name": "E2E Target Boost Legal Target",
+        "power": 4,
+        "toughness": 4,
+        "type_line": "Creature - Soldier"
+      },
+      "target_controller": "self",
+      "type": "simple_activated_target_boost"
+    },
+    {
+      "card": {
+        "name": "Infantry Veteran"
+      },
+      "controller_mana": {
+        "black": 0,
+        "blue": 0,
+        "generic": 0,
+        "green": 0,
+        "red": 0,
+        "white": 0
+      },
+      "expected_power_delta": 1,
+      "expected_sacrificed_source": false,
+      "expected_tapped_source": true,
+      "expected_target": "creature",
+      "expected_target_constraints": {
+        "card_types": [
+          "creature"
+        ],
+        "combat_state": "attacking"
+      },
+      "expected_toughness_delta": 1,
+      "logical_rule_key": "battle_rule_v1:af8ea6d2a1cb9b87bf619615c6ca6e63",
+      "name": "Infantry Veteran activates target boost ability",
+      "target": {
+        "attacking": true,
+        "cmc": 3,
+        "effect": "creature",
+        "name": "E2E Target Boost Legal Target",
+        "power": 4,
+        "toughness": 4,
+        "type_line": "Creature - Soldier"
+      },
+      "target_controller": "self",
+      "type": "simple_activated_target_boost"
+    },
+    {
+      "card": {
+        "name": "Kabuto Moth"
+      },
+      "controller_mana": {
+        "black": 0,
+        "blue": 0,
+        "generic": 0,
+        "green": 0,
+        "red": 0,
+        "white": 0
+      },
+      "expected_power_delta": 1,
+      "expected_sacrificed_source": false,
+      "expected_tapped_source": true,
+      "expected_target": "creature",
+      "expected_target_constraints": {
+        "card_types": [
+          "creature"
+        ]
+      },
+      "expected_toughness_delta": 2,
+      "logical_rule_key": "battle_rule_v1:169904a5d718c1ca55b4aab13f76d843",
+      "name": "Kabuto Moth activates target boost ability",
+      "target": {
+        "cmc": 3,
+        "effect": "creature",
+        "name": "E2E Target Boost Legal Target",
+        "power": 4,
+        "toughness": 4,
+        "type_line": "Creature - Soldier"
+      },
+      "target_controller": "self",
+      "type": "simple_activated_target_boost"
+    },
+    {
+      "card": {
+        "name": "Kithkin Daggerdare"
+      },
+      "controller_mana": {
+        "black": 0,
+        "blue": 0,
+        "generic": 0,
+        "green": 1,
+        "red": 0,
+        "white": 0
+      },
+      "expected_power_delta": 2,
+      "expected_sacrificed_source": false,
+      "expected_tapped_source": true,
+      "expected_target": "creature",
+      "expected_target_constraints": {
+        "card_types": [
+          "creature"
+        ],
+        "combat_state": "attacking"
+      },
+      "expected_toughness_delta": 2,
+      "logical_rule_key": "battle_rule_v1:31180b379df3a73774594e927cf36d30",
+      "name": "Kithkin Daggerdare activates target boost ability",
+      "target": {
+        "attacking": true,
+        "cmc": 3,
+        "effect": "creature",
+        "name": "E2E Target Boost Legal Target",
+        "power": 4,
+        "toughness": 4,
+        "type_line": "Creature - Soldier"
+      },
+      "target_controller": "self",
+      "type": "simple_activated_target_boost"
+    },
+    {
+      "card": {
+        "name": "Phyrexian Debaser"
+      },
+      "controller_mana": {
+        "black": 0,
+        "blue": 0,
+        "generic": 0,
+        "green": 0,
+        "red": 0,
+        "white": 0
+      },
+      "expected_power_delta": -2,
+      "expected_sacrificed_source": true,
+      "expected_tapped_source": true,
+      "expected_target": "creature",
+      "expected_target_constraints": {
+        "card_types": [
+          "creature"
+        ],
+        "exclude_source": true
+      },
+      "expected_toughness_delta": -2,
+      "logical_rule_key": "battle_rule_v1:c042a2a2d2e22937dc43fadef1dbf4ac",
+      "name": "Phyrexian Debaser activates target boost ability",
+      "target": {
+        "cmc": 3,
+        "effect": "creature",
+        "name": "E2E Target Boost Legal Target",
+        "power": 4,
+        "toughness": 4,
+        "type_line": "Creature - Soldier"
+      },
+      "target_controller": "opponent",
+      "type": "simple_activated_target_boost"
+    },
+    {
+      "card": {
+        "name": "Serra Advocate"
+      },
+      "controller_mana": {
+        "black": 0,
+        "blue": 0,
+        "generic": 0,
+        "green": 0,
+        "red": 0,
+        "white": 0
+      },
+      "expected_power_delta": 2,
+      "expected_sacrificed_source": false,
+      "expected_tapped_source": true,
+      "expected_target": "creature",
+      "expected_target_constraints": {
+        "card_types": [
+          "creature"
+        ],
+        "combat_state": "attacking_or_blocking"
+      },
+      "expected_toughness_delta": 2,
+      "logical_rule_key": "battle_rule_v1:f2957ecc36ae4e3e23efa241fcf239f8",
+      "name": "Serra Advocate activates target boost ability",
+      "target": {
+        "attacking": true,
+        "cmc": 3,
+        "effect": "creature",
+        "name": "E2E Target Boost Legal Target",
+        "power": 4,
+        "toughness": 4,
+        "type_line": "Creature - Soldier"
+      },
+      "target_controller": "self",
+      "type": "simple_activated_target_boost"
+    },
+    {
+      "card": {
+        "name": "Spirit Weaver"
+      },
+      "controller_mana": {
+        "black": 0,
+        "blue": 0,
+        "generic": 2,
+        "green": 0,
+        "red": 0,
+        "white": 0
+      },
+      "expected_power_delta": 0,
+      "expected_sacrificed_source": false,
+      "expected_tapped_source": false,
+      "expected_target": "creature",
+      "expected_target_constraints": {
+        "card_types": [
+          "creature"
+        ],
+        "target_colors": [
+          "U",
+          "G"
+        ]
+      },
+      "expected_toughness_delta": 1,
+      "logical_rule_key": "battle_rule_v1:8669f951a8e25c612de030225cace7c2",
+      "name": "Spirit Weaver activates target boost ability",
+      "target": {
+        "cmc": 3,
+        "colors": [
+          "U"
+        ],
+        "effect": "creature",
+        "name": "E2E Target Boost Legal Target",
+        "power": 4,
+        "toughness": 4,
+        "type_line": "Creature - Soldier"
+      },
+      "target_controller": "self",
+      "type": "simple_activated_target_boost"
+    },
+    {
+      "card": {
+        "name": "Sword Dancer"
+      },
+      "controller_mana": {
+        "black": 0,
+        "blue": 0,
+        "generic": 0,
+        "green": 0,
+        "red": 0,
+        "white": 2
+      },
+      "expected_power_delta": -1,
+      "expected_sacrificed_source": false,
+      "expected_tapped_source": false,
+      "expected_target": "creature",
+      "expected_target_constraints": {
+        "card_types": [
+          "creature"
+        ],
+        "combat_state": "attacking"
+      },
+      "expected_toughness_delta": 0,
+      "logical_rule_key": "battle_rule_v1:897b4da05a4b4dcd5dfd281a36f4195e",
+      "name": "Sword Dancer activates target boost ability",
+      "target": {
+        "attacking": true,
+        "cmc": 3,
+        "effect": "creature",
+        "name": "E2E Target Boost Legal Target",
+        "power": 4,
+        "toughness": 4,
+        "type_line": "Creature - Soldier"
+      },
+      "target_controller": "opponent",
+      "type": "simple_activated_target_boost"
+    },
+    {
+      "card": {
+        "name": "Sword of the Chosen"
+      },
+      "controller_mana": {
+        "black": 0,
+        "blue": 0,
+        "generic": 0,
+        "green": 0,
+        "red": 0,
+        "white": 0
+      },
+      "expected_power_delta": 2,
+      "expected_sacrificed_source": false,
+      "expected_tapped_source": true,
+      "expected_target": "creature",
+      "expected_target_constraints": {
+        "card_types": [
+          "creature"
+        ],
+        "required_supertypes": [
+          "legendary"
+        ]
+      },
+      "expected_toughness_delta": 2,
+      "logical_rule_key": "battle_rule_v1:07c868edf81ca3a70b7e63720fbe9d75",
+      "name": "Sword of the Chosen activates target boost ability",
+      "target": {
+        "cmc": 3,
+        "effect": "creature",
+        "name": "E2E Target Boost Legal Target",
+        "power": 4,
+        "toughness": 4,
+        "type_line": "Legendary Creature - Soldier"
+      },
+      "target_controller": "self",
+      "type": "simple_activated_target_boost"
+    },
+    {
+      "card": {
+        "name": "Tuknir Deathlock"
+      },
+      "controller_mana": {
+        "black": 0,
+        "blue": 0,
+        "generic": 0,
+        "green": 1,
+        "red": 1,
+        "white": 0
+      },
+      "expected_power_delta": 2,
+      "expected_sacrificed_source": false,
+      "expected_tapped_source": true,
+      "expected_target": "creature",
+      "expected_target_constraints": {
+        "card_types": [
+          "creature"
+        ]
+      },
+      "expected_toughness_delta": 2,
+      "logical_rule_key": "battle_rule_v1:16bf728ba5de84a9cff44ad9b29b56b4",
+      "name": "Tuknir Deathlock activates target boost ability",
+      "target": {
+        "cmc": 3,
+        "effect": "creature",
+        "name": "E2E Target Boost Legal Target",
+        "power": 4,
+        "toughness": 4,
+        "type_line": "Creature - Soldier"
+      },
+      "target_controller": "self",
+      "type": "simple_activated_target_boost"
+    },
+    {
+      "card": {
+        "name": "Wilderness Hypnotist"
+      },
+      "controller_mana": {
+        "black": 0,
+        "blue": 0,
+        "generic": 0,
+        "green": 0,
+        "red": 0,
+        "white": 0
+      },
+      "expected_power_delta": -2,
+      "expected_sacrificed_source": false,
+      "expected_tapped_source": true,
+      "expected_target": "creature",
+      "expected_target_constraints": {
+        "card_types": [
+          "creature"
+        ],
+        "target_colors": [
+          "R",
+          "G"
+        ]
+      },
+      "expected_toughness_delta": 0,
+      "logical_rule_key": "battle_rule_v1:45bfe4fd066c3f71a2d71272b70ed607",
+      "name": "Wilderness Hypnotist activates target boost ability",
+      "target": {
+        "cmc": 3,
+        "colors": [
+          "R"
+        ],
+        "effect": "creature",
+        "name": "E2E Target Boost Legal Target",
+        "power": 4,
+        "toughness": 4,
+        "type_line": "Creature - Soldier"
+      },
+      "target_controller": "opponent",
+      "type": "simple_activated_target_boost"
+    }
+  ],
+  "expected_rules": [
+    {
+      "card_name": "Aegis of the Meek",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:2ae27e7b044d26f97848d01d210ab78b",
+      "min_rule_version": 2,
+      "normalized_name": "aegis of the meek",
+      "oracle_hash": "bd80c63c481b2e13821b363ceab8b37e",
+      "required_effect_fields": {
+        "_activated_rule_effects": [
+          {
+            "ability_kind": "activated",
+            "activated_effect": "target_stat_modifier_until_eot",
+            "activation_cost_colors": [],
+            "activation_cost_generic": 1,
+            "activation_cost_mana": "{1}",
+            "activation_requires_sacrifice": false,
+            "activation_requires_tap": true,
+            "battle_model_scope": "xmage_permanent_simple_activated_target_boost_until_eot_v1",
+            "duration": "until_end_of_turn",
+            "effect": "stat_modifier_until_eot",
+            "power_boost": 1,
+            "power_delta": 1,
+            "target": "creature",
+            "target_constraints": {
+              "card_types": [
+                "creature"
+              ],
+              "power_max": 1,
+              "power_min": 1,
+              "toughness_max": 1,
+              "toughness_min": 1
+            },
+            "target_controller": "any",
+            "toughness_boost": 2,
+            "toughness_delta": 2,
+            "xmage_ability_class": "SimpleActivatedAbility",
+            "xmage_effect_class": "BoostTargetEffect"
+          }
+        ],
+        "ability_kind": "static_and_activated",
+        "activated_battle_model_scope": "xmage_permanent_simple_activated_target_boost_until_eot_v1",
+        "activated_effect": "target_stat_modifier_until_eot",
+        "activation_cost_colors": [],
+        "activation_cost_generic": 1,
+        "activation_cost_mana": "{1}",
+        "activation_requires_sacrifice": false,
+        "activation_requires_tap": true,
+        "battle_model_scope": "xmage_permanent_simple_activated_target_boost_until_eot_v1",
+        "duration": "until_end_of_turn",
+        "effect": "artifact",
+        "power_boost": 1,
+        "power_delta": 1,
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "power_max": 1,
+          "power_min": 1,
+          "toughness_max": 1,
+          "toughness_min": 1
+        },
+        "target_controller": "any",
+        "toughness_boost": 2,
+        "toughness_delta": 2,
+        "xmage_ability_class": "SimpleActivatedAbility",
+        "xmage_effect_class": "BoostTargetEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Alpha Kavu",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:39b8573e388d05753b1c5cd494ade119",
+      "min_rule_version": 2,
+      "normalized_name": "alpha kavu",
+      "oracle_hash": "33ab9ab2794b354809a082797e7a32ff",
+      "required_effect_fields": {
+        "_activated_rule_effects": [
+          {
+            "ability_kind": "activated",
+            "activated_effect": "target_stat_modifier_until_eot",
+            "activation_cost_colors": [
+              "G"
+            ],
+            "activation_cost_generic": 1,
+            "activation_cost_mana": "{1}{G}",
+            "activation_requires_sacrifice": false,
+            "activation_requires_tap": false,
+            "battle_model_scope": "xmage_permanent_simple_activated_target_boost_until_eot_v1",
+            "duration": "until_end_of_turn",
+            "effect": "stat_modifier_until_eot",
+            "power_boost": -1,
+            "power_delta": -1,
+            "target": "creature",
+            "target_constraints": {
+              "card_types": [
+                "creature"
+              ],
+              "target_subtypes": [
+                "kavu"
+              ]
+            },
+            "target_controller": "any",
+            "toughness_boost": 1,
+            "toughness_delta": 1,
+            "xmage_ability_class": "SimpleActivatedAbility",
+            "xmage_effect_class": "BoostTargetEffect"
+          }
+        ],
+        "ability_kind": "static_and_activated",
+        "activated_battle_model_scope": "xmage_permanent_simple_activated_target_boost_until_eot_v1",
+        "activated_effect": "target_stat_modifier_until_eot",
+        "activation_cost_colors": [
+          "G"
+        ],
+        "activation_cost_generic": 1,
+        "activation_cost_mana": "{1}{G}",
+        "activation_requires_sacrifice": false,
+        "activation_requires_tap": false,
+        "battle_model_scope": "xmage_permanent_simple_activated_target_boost_until_eot_v1",
+        "duration": "until_end_of_turn",
+        "effect": "creature",
+        "power_boost": -1,
+        "power_delta": -1,
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "target_subtypes": [
+            "kavu"
+          ]
+        },
+        "target_controller": "any",
+        "toughness_boost": 1,
+        "toughness_delta": 1,
+        "xmage_ability_class": "SimpleActivatedAbility",
+        "xmage_effect_class": "BoostTargetEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Angelic Page",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:bdaae8162a6e1149bba3eb9b1082c96b",
+      "min_rule_version": 2,
+      "normalized_name": "angelic page",
+      "oracle_hash": "612184b36e46a7b2e4f8bfa1bca32f2a",
+      "required_effect_fields": {
+        "_activated_rule_effects": [
+          {
+            "ability_kind": "activated",
+            "activated_effect": "target_stat_modifier_until_eot",
+            "activation_cost_colors": [],
+            "activation_cost_generic": 0,
+            "activation_cost_mana": "{0}",
+            "activation_requires_sacrifice": false,
+            "activation_requires_tap": true,
+            "battle_model_scope": "xmage_permanent_simple_activated_target_boost_until_eot_v1",
+            "duration": "until_end_of_turn",
+            "effect": "stat_modifier_until_eot",
+            "power_boost": 1,
+            "power_delta": 1,
+            "target": "creature",
+            "target_constraints": {
+              "card_types": [
+                "creature"
+              ],
+              "combat_state": "attacking_or_blocking"
+            },
+            "target_controller": "any",
+            "toughness_boost": 1,
+            "toughness_delta": 1,
+            "xmage_ability_class": "SimpleActivatedAbility",
+            "xmage_effect_class": "BoostTargetEffect"
+          }
+        ],
+        "ability_kind": "static_and_activated",
+        "activated_battle_model_scope": "xmage_permanent_simple_activated_target_boost_until_eot_v1",
+        "activated_effect": "target_stat_modifier_until_eot",
+        "activation_cost_colors": [],
+        "activation_cost_generic": 0,
+        "activation_cost_mana": "{0}",
+        "activation_requires_sacrifice": false,
+        "activation_requires_tap": true,
+        "battle_model_scope": "xmage_permanent_simple_activated_target_boost_until_eot_v1",
+        "duration": "until_end_of_turn",
+        "effect": "creature",
+        "power_boost": 1,
+        "power_delta": 1,
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "combat_state": "attacking_or_blocking"
+        },
+        "target_controller": "any",
+        "toughness_boost": 1,
+        "toughness_delta": 1,
+        "xmage_ability_class": "SimpleActivatedAbility",
+        "xmage_effect_class": "BoostTargetEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Anointer of Champions",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:af8ea6d2a1cb9b87bf619615c6ca6e63",
+      "min_rule_version": 2,
+      "normalized_name": "anointer of champions",
+      "oracle_hash": "c8688d75d4a2d459a474986c45d2b400",
+      "required_effect_fields": {
+        "_activated_rule_effects": [
+          {
+            "ability_kind": "activated",
+            "activated_effect": "target_stat_modifier_until_eot",
+            "activation_cost_colors": [],
+            "activation_cost_generic": 0,
+            "activation_cost_mana": "{0}",
+            "activation_requires_sacrifice": false,
+            "activation_requires_tap": true,
+            "battle_model_scope": "xmage_permanent_simple_activated_target_boost_until_eot_v1",
+            "duration": "until_end_of_turn",
+            "effect": "stat_modifier_until_eot",
+            "power_boost": 1,
+            "power_delta": 1,
+            "target": "creature",
+            "target_constraints": {
+              "card_types": [
+                "creature"
+              ],
+              "combat_state": "attacking"
+            },
+            "target_controller": "any",
+            "toughness_boost": 1,
+            "toughness_delta": 1,
+            "xmage_ability_class": "SimpleActivatedAbility",
+            "xmage_effect_class": "BoostTargetEffect"
+          }
+        ],
+        "ability_kind": "static_and_activated",
+        "activated_battle_model_scope": "xmage_permanent_simple_activated_target_boost_until_eot_v1",
+        "activated_effect": "target_stat_modifier_until_eot",
+        "activation_cost_colors": [],
+        "activation_cost_generic": 0,
+        "activation_cost_mana": "{0}",
+        "activation_requires_sacrifice": false,
+        "activation_requires_tap": true,
+        "battle_model_scope": "xmage_permanent_simple_activated_target_boost_until_eot_v1",
+        "duration": "until_end_of_turn",
+        "effect": "creature",
+        "power_boost": 1,
+        "power_delta": 1,
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "combat_state": "attacking"
+        },
+        "target_controller": "any",
+        "toughness_boost": 1,
+        "toughness_delta": 1,
+        "xmage_ability_class": "SimpleActivatedAbility",
+        "xmage_effect_class": "BoostTargetEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Assembly-Worker",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:1dd783caf9f450c1d3263b7bb7699ec5",
+      "min_rule_version": 2,
+      "normalized_name": "assembly-worker",
+      "oracle_hash": "128c306538f6c84b2d8231f9eba53f95",
+      "required_effect_fields": {
+        "_activated_rule_effects": [
+          {
+            "ability_kind": "activated",
+            "activated_effect": "target_stat_modifier_until_eot",
+            "activation_cost_colors": [],
+            "activation_cost_generic": 0,
+            "activation_cost_mana": "{0}",
+            "activation_requires_sacrifice": false,
+            "activation_requires_tap": true,
+            "battle_model_scope": "xmage_permanent_simple_activated_target_boost_until_eot_v1",
+            "duration": "until_end_of_turn",
+            "effect": "stat_modifier_until_eot",
+            "power_boost": 1,
+            "power_delta": 1,
+            "target": "creature",
+            "target_constraints": {
+              "card_types": [
+                "creature"
+              ],
+              "required_subtype_match": "all",
+              "target_subtypes": [
+                "assembly",
+                "worker"
+              ]
+            },
+            "target_controller": "any",
+            "toughness_boost": 1,
+            "toughness_delta": 1,
+            "xmage_ability_class": "SimpleActivatedAbility",
+            "xmage_effect_class": "BoostTargetEffect"
+          }
+        ],
+        "ability_kind": "static_and_activated",
+        "activated_battle_model_scope": "xmage_permanent_simple_activated_target_boost_until_eot_v1",
+        "activated_effect": "target_stat_modifier_until_eot",
+        "activation_cost_colors": [],
+        "activation_cost_generic": 0,
+        "activation_cost_mana": "{0}",
+        "activation_requires_sacrifice": false,
+        "activation_requires_tap": true,
+        "battle_model_scope": "xmage_permanent_simple_activated_target_boost_until_eot_v1",
+        "duration": "until_end_of_turn",
+        "effect": "creature",
+        "power_boost": 1,
+        "power_delta": 1,
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "required_subtype_match": "all",
+          "target_subtypes": [
+            "assembly",
+            "worker"
+          ]
+        },
+        "target_controller": "any",
+        "toughness_boost": 1,
+        "toughness_delta": 1,
+        "xmage_ability_class": "SimpleActivatedAbility",
+        "xmage_effect_class": "BoostTargetEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Crenellated Wall",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:c9767f4d6cb4ae481d93fe1e11400f06",
+      "min_rule_version": 2,
+      "normalized_name": "crenellated wall",
+      "oracle_hash": "b59c9e276e64ef9c26720be710b79e4b",
+      "required_effect_fields": {
+        "_activated_rule_effects": [
+          {
+            "ability_kind": "activated",
+            "activated_effect": "target_stat_modifier_until_eot",
+            "activation_cost_colors": [],
+            "activation_cost_generic": 0,
+            "activation_cost_mana": "{0}",
+            "activation_requires_sacrifice": false,
+            "activation_requires_tap": true,
+            "battle_model_scope": "xmage_permanent_simple_activated_target_boost_until_eot_v1",
+            "duration": "until_end_of_turn",
+            "effect": "stat_modifier_until_eot",
+            "power_boost": 0,
+            "power_delta": 0,
+            "target": "creature",
+            "target_constraints": {
+              "card_types": [
+                "creature"
+              ]
+            },
+            "target_controller": "any",
+            "toughness_boost": 4,
+            "toughness_delta": 4,
+            "xmage_ability_class": "SimpleActivatedAbility",
+            "xmage_effect_class": "BoostTargetEffect"
+          }
+        ],
+        "ability_kind": "static_and_activated",
+        "activated_battle_model_scope": "xmage_permanent_simple_activated_target_boost_until_eot_v1",
+        "activated_effect": "target_stat_modifier_until_eot",
+        "activation_cost_colors": [],
+        "activation_cost_generic": 0,
+        "activation_cost_mana": "{0}",
+        "activation_requires_sacrifice": false,
+        "activation_requires_tap": true,
+        "battle_model_scope": "xmage_permanent_simple_activated_target_boost_until_eot_v1",
+        "duration": "until_end_of_turn",
+        "effect": "creature",
+        "power_boost": 0,
+        "power_delta": 0,
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ]
+        },
+        "target_controller": "any",
+        "toughness_boost": 4,
+        "toughness_delta": 4,
+        "xmage_ability_class": "SimpleActivatedAbility",
+        "xmage_effect_class": "BoostTargetEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Dwarven Lieutenant",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:8bbcde679d280d8695d8beaf568d927f",
+      "min_rule_version": 2,
+      "normalized_name": "dwarven lieutenant",
+      "oracle_hash": "73690c7aecd048c243775562b83ff703",
+      "required_effect_fields": {
+        "_activated_rule_effects": [
+          {
+            "ability_kind": "activated",
+            "activated_effect": "target_stat_modifier_until_eot",
+            "activation_cost_colors": [
+              "R"
+            ],
+            "activation_cost_generic": 1,
+            "activation_cost_mana": "{1}{R}",
+            "activation_requires_sacrifice": false,
+            "activation_requires_tap": false,
+            "battle_model_scope": "xmage_permanent_simple_activated_target_boost_until_eot_v1",
+            "duration": "until_end_of_turn",
+            "effect": "stat_modifier_until_eot",
+            "power_boost": 1,
+            "power_delta": 1,
+            "target": "creature",
+            "target_constraints": {
+              "card_types": [
+                "creature"
+              ],
+              "target_subtypes": [
+                "dwarf"
+              ]
+            },
+            "target_controller": "any",
+            "toughness_boost": 0,
+            "toughness_delta": 0,
+            "xmage_ability_class": "SimpleActivatedAbility",
+            "xmage_effect_class": "BoostTargetEffect"
+          }
+        ],
+        "ability_kind": "static_and_activated",
+        "activated_battle_model_scope": "xmage_permanent_simple_activated_target_boost_until_eot_v1",
+        "activated_effect": "target_stat_modifier_until_eot",
+        "activation_cost_colors": [
+          "R"
+        ],
+        "activation_cost_generic": 1,
+        "activation_cost_mana": "{1}{R}",
+        "activation_requires_sacrifice": false,
+        "activation_requires_tap": false,
+        "battle_model_scope": "xmage_permanent_simple_activated_target_boost_until_eot_v1",
+        "duration": "until_end_of_turn",
+        "effect": "creature",
+        "power_boost": 1,
+        "power_delta": 1,
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "target_subtypes": [
+            "dwarf"
+          ]
+        },
+        "target_controller": "any",
+        "toughness_boost": 0,
+        "toughness_delta": 0,
+        "xmage_ability_class": "SimpleActivatedAbility",
+        "xmage_effect_class": "BoostTargetEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Grassland Crusader",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:103e5a32b9023c725d8209cca6ab7e70",
+      "min_rule_version": 2,
+      "normalized_name": "grassland crusader",
+      "oracle_hash": "8e5d830bba171b3eb332ddcc51a24a3c",
+      "required_effect_fields": {
+        "_activated_rule_effects": [
+          {
+            "ability_kind": "activated",
+            "activated_effect": "target_stat_modifier_until_eot",
+            "activation_cost_colors": [],
+            "activation_cost_generic": 0,
+            "activation_cost_mana": "{0}",
+            "activation_requires_sacrifice": false,
+            "activation_requires_tap": true,
+            "battle_model_scope": "xmage_permanent_simple_activated_target_boost_until_eot_v1",
+            "duration": "until_end_of_turn",
+            "effect": "stat_modifier_until_eot",
+            "power_boost": 2,
+            "power_delta": 2,
+            "target": "creature",
+            "target_constraints": {
+              "card_types": [
+                "creature"
+              ],
+              "target_subtypes": [
+                "elf",
+                "soldier"
+              ]
+            },
+            "target_controller": "any",
+            "toughness_boost": 2,
+            "toughness_delta": 2,
+            "xmage_ability_class": "SimpleActivatedAbility",
+            "xmage_effect_class": "BoostTargetEffect"
+          }
+        ],
+        "ability_kind": "static_and_activated",
+        "activated_battle_model_scope": "xmage_permanent_simple_activated_target_boost_until_eot_v1",
+        "activated_effect": "target_stat_modifier_until_eot",
+        "activation_cost_colors": [],
+        "activation_cost_generic": 0,
+        "activation_cost_mana": "{0}",
+        "activation_requires_sacrifice": false,
+        "activation_requires_tap": true,
+        "battle_model_scope": "xmage_permanent_simple_activated_target_boost_until_eot_v1",
+        "duration": "until_end_of_turn",
+        "effect": "creature",
+        "power_boost": 2,
+        "power_delta": 2,
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "target_subtypes": [
+            "elf",
+            "soldier"
+          ]
+        },
+        "target_controller": "any",
+        "toughness_boost": 2,
+        "toughness_delta": 2,
+        "xmage_ability_class": "SimpleActivatedAbility",
+        "xmage_effect_class": "BoostTargetEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Hate Weaver",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:e9abc18cd5b0073bb47164c50e3fee6f",
+      "min_rule_version": 2,
+      "normalized_name": "hate weaver",
+      "oracle_hash": "8ffef55b605901b37d4d0823ef0d40c0",
+      "required_effect_fields": {
+        "_activated_rule_effects": [
+          {
+            "ability_kind": "activated",
+            "activated_effect": "target_stat_modifier_until_eot",
+            "activation_cost_colors": [],
+            "activation_cost_generic": 2,
+            "activation_cost_mana": "{2}",
+            "activation_requires_sacrifice": false,
+            "activation_requires_tap": false,
+            "battle_model_scope": "xmage_permanent_simple_activated_target_boost_until_eot_v1",
+            "duration": "until_end_of_turn",
+            "effect": "stat_modifier_until_eot",
+            "power_boost": 1,
+            "power_delta": 1,
+            "target": "creature",
+            "target_constraints": {
+              "card_types": [
+                "creature"
+              ],
+              "target_colors": [
+                "U",
+                "R"
+              ]
+            },
+            "target_controller": "any",
+            "toughness_boost": 0,
+            "toughness_delta": 0,
+            "xmage_ability_class": "SimpleActivatedAbility",
+            "xmage_effect_class": "BoostTargetEffect"
+          }
+        ],
+        "ability_kind": "static_and_activated",
+        "activated_battle_model_scope": "xmage_permanent_simple_activated_target_boost_until_eot_v1",
+        "activated_effect": "target_stat_modifier_until_eot",
+        "activation_cost_colors": [],
+        "activation_cost_generic": 2,
+        "activation_cost_mana": "{2}",
+        "activation_requires_sacrifice": false,
+        "activation_requires_tap": false,
+        "battle_model_scope": "xmage_permanent_simple_activated_target_boost_until_eot_v1",
+        "duration": "until_end_of_turn",
+        "effect": "creature",
+        "power_boost": 1,
+        "power_delta": 1,
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "target_colors": [
+            "U",
+            "R"
+          ]
+        },
+        "target_controller": "any",
+        "toughness_boost": 0,
+        "toughness_delta": 0,
+        "xmage_ability_class": "SimpleActivatedAbility",
+        "xmage_effect_class": "BoostTargetEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Hoof Skulkin",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:d923a862e58bdc89bcc435ec5e2c906a",
+      "min_rule_version": 2,
+      "normalized_name": "hoof skulkin",
+      "oracle_hash": "d68596289204099a770a8e0f0d39db15",
+      "required_effect_fields": {
+        "_activated_rule_effects": [
+          {
+            "ability_kind": "activated",
+            "activated_effect": "target_stat_modifier_until_eot",
+            "activation_cost_colors": [],
+            "activation_cost_generic": 3,
+            "activation_cost_mana": "{3}",
+            "activation_requires_sacrifice": false,
+            "activation_requires_tap": false,
+            "battle_model_scope": "xmage_permanent_simple_activated_target_boost_until_eot_v1",
+            "duration": "until_end_of_turn",
+            "effect": "stat_modifier_until_eot",
+            "power_boost": 1,
+            "power_delta": 1,
+            "target": "creature",
+            "target_constraints": {
+              "card_types": [
+                "creature"
+              ],
+              "target_colors": [
+                "G"
+              ]
+            },
+            "target_controller": "any",
+            "toughness_boost": 1,
+            "toughness_delta": 1,
+            "xmage_ability_class": "SimpleActivatedAbility",
+            "xmage_effect_class": "BoostTargetEffect"
+          }
+        ],
+        "ability_kind": "static_and_activated",
+        "activated_battle_model_scope": "xmage_permanent_simple_activated_target_boost_until_eot_v1",
+        "activated_effect": "target_stat_modifier_until_eot",
+        "activation_cost_colors": [],
+        "activation_cost_generic": 3,
+        "activation_cost_mana": "{3}",
+        "activation_requires_sacrifice": false,
+        "activation_requires_tap": false,
+        "battle_model_scope": "xmage_permanent_simple_activated_target_boost_until_eot_v1",
+        "duration": "until_end_of_turn",
+        "effect": "creature",
+        "power_boost": 1,
+        "power_delta": 1,
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "target_colors": [
+            "G"
+          ]
+        },
+        "target_controller": "any",
+        "toughness_boost": 1,
+        "toughness_delta": 1,
+        "xmage_ability_class": "SimpleActivatedAbility",
+        "xmage_effect_class": "BoostTargetEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Icatian Lieutenant",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:75ffbd696e0fb4e9d5e218ff2aae551a",
+      "min_rule_version": 2,
+      "normalized_name": "icatian lieutenant",
+      "oracle_hash": "ccf08104cc0c0aa529d422c86bf329e3",
+      "required_effect_fields": {
+        "_activated_rule_effects": [
+          {
+            "ability_kind": "activated",
+            "activated_effect": "target_stat_modifier_until_eot",
+            "activation_cost_colors": [
+              "W"
+            ],
+            "activation_cost_generic": 1,
+            "activation_cost_mana": "{1}{W}",
+            "activation_requires_sacrifice": false,
+            "activation_requires_tap": false,
+            "battle_model_scope": "xmage_permanent_simple_activated_target_boost_until_eot_v1",
+            "duration": "until_end_of_turn",
+            "effect": "stat_modifier_until_eot",
+            "power_boost": 1,
+            "power_delta": 1,
+            "target": "creature",
+            "target_constraints": {
+              "card_types": [
+                "creature"
+              ],
+              "target_subtypes": [
+                "soldier"
+              ]
+            },
+            "target_controller": "any",
+            "toughness_boost": 0,
+            "toughness_delta": 0,
+            "xmage_ability_class": "SimpleActivatedAbility",
+            "xmage_effect_class": "BoostTargetEffect"
+          }
+        ],
+        "ability_kind": "static_and_activated",
+        "activated_battle_model_scope": "xmage_permanent_simple_activated_target_boost_until_eot_v1",
+        "activated_effect": "target_stat_modifier_until_eot",
+        "activation_cost_colors": [
+          "W"
+        ],
+        "activation_cost_generic": 1,
+        "activation_cost_mana": "{1}{W}",
+        "activation_requires_sacrifice": false,
+        "activation_requires_tap": false,
+        "battle_model_scope": "xmage_permanent_simple_activated_target_boost_until_eot_v1",
+        "duration": "until_end_of_turn",
+        "effect": "creature",
+        "power_boost": 1,
+        "power_delta": 1,
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "target_subtypes": [
+            "soldier"
+          ]
+        },
+        "target_controller": "any",
+        "toughness_boost": 0,
+        "toughness_delta": 0,
+        "xmage_ability_class": "SimpleActivatedAbility",
+        "xmage_effect_class": "BoostTargetEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Infantry Veteran",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:af8ea6d2a1cb9b87bf619615c6ca6e63",
+      "min_rule_version": 2,
+      "normalized_name": "infantry veteran",
+      "oracle_hash": "c8688d75d4a2d459a474986c45d2b400",
+      "required_effect_fields": {
+        "_activated_rule_effects": [
+          {
+            "ability_kind": "activated",
+            "activated_effect": "target_stat_modifier_until_eot",
+            "activation_cost_colors": [],
+            "activation_cost_generic": 0,
+            "activation_cost_mana": "{0}",
+            "activation_requires_sacrifice": false,
+            "activation_requires_tap": true,
+            "battle_model_scope": "xmage_permanent_simple_activated_target_boost_until_eot_v1",
+            "duration": "until_end_of_turn",
+            "effect": "stat_modifier_until_eot",
+            "power_boost": 1,
+            "power_delta": 1,
+            "target": "creature",
+            "target_constraints": {
+              "card_types": [
+                "creature"
+              ],
+              "combat_state": "attacking"
+            },
+            "target_controller": "any",
+            "toughness_boost": 1,
+            "toughness_delta": 1,
+            "xmage_ability_class": "SimpleActivatedAbility",
+            "xmage_effect_class": "BoostTargetEffect"
+          }
+        ],
+        "ability_kind": "static_and_activated",
+        "activated_battle_model_scope": "xmage_permanent_simple_activated_target_boost_until_eot_v1",
+        "activated_effect": "target_stat_modifier_until_eot",
+        "activation_cost_colors": [],
+        "activation_cost_generic": 0,
+        "activation_cost_mana": "{0}",
+        "activation_requires_sacrifice": false,
+        "activation_requires_tap": true,
+        "battle_model_scope": "xmage_permanent_simple_activated_target_boost_until_eot_v1",
+        "duration": "until_end_of_turn",
+        "effect": "creature",
+        "power_boost": 1,
+        "power_delta": 1,
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "combat_state": "attacking"
+        },
+        "target_controller": "any",
+        "toughness_boost": 1,
+        "toughness_delta": 1,
+        "xmage_ability_class": "SimpleActivatedAbility",
+        "xmage_effect_class": "BoostTargetEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Kabuto Moth",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:169904a5d718c1ca55b4aab13f76d843",
+      "min_rule_version": 2,
+      "normalized_name": "kabuto moth",
+      "oracle_hash": "bf448c1541a0c96b6c9d930299e8c07a",
+      "required_effect_fields": {
+        "_activated_rule_effects": [
+          {
+            "ability_kind": "activated",
+            "activated_effect": "target_stat_modifier_until_eot",
+            "activation_cost_colors": [],
+            "activation_cost_generic": 0,
+            "activation_cost_mana": "{0}",
+            "activation_requires_sacrifice": false,
+            "activation_requires_tap": true,
+            "battle_model_scope": "xmage_permanent_simple_activated_target_boost_until_eot_v1",
+            "duration": "until_end_of_turn",
+            "effect": "stat_modifier_until_eot",
+            "power_boost": 1,
+            "power_delta": 1,
+            "target": "creature",
+            "target_constraints": {
+              "card_types": [
+                "creature"
+              ]
+            },
+            "target_controller": "any",
+            "toughness_boost": 2,
+            "toughness_delta": 2,
+            "xmage_ability_class": "SimpleActivatedAbility",
+            "xmage_effect_class": "BoostTargetEffect"
+          }
+        ],
+        "ability_kind": "static_and_activated",
+        "activated_battle_model_scope": "xmage_permanent_simple_activated_target_boost_until_eot_v1",
+        "activated_effect": "target_stat_modifier_until_eot",
+        "activation_cost_colors": [],
+        "activation_cost_generic": 0,
+        "activation_cost_mana": "{0}",
+        "activation_requires_sacrifice": false,
+        "activation_requires_tap": true,
+        "battle_model_scope": "xmage_permanent_simple_activated_target_boost_until_eot_v1",
+        "duration": "until_end_of_turn",
+        "effect": "creature",
+        "power_boost": 1,
+        "power_delta": 1,
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ]
+        },
+        "target_controller": "any",
+        "toughness_boost": 2,
+        "toughness_delta": 2,
+        "xmage_ability_class": "SimpleActivatedAbility",
+        "xmage_effect_class": "BoostTargetEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Kithkin Daggerdare",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:31180b379df3a73774594e927cf36d30",
+      "min_rule_version": 2,
+      "normalized_name": "kithkin daggerdare",
+      "oracle_hash": "09f8ba3414302a1f6ef48145d2900015",
+      "required_effect_fields": {
+        "_activated_rule_effects": [
+          {
+            "ability_kind": "activated",
+            "activated_effect": "target_stat_modifier_until_eot",
+            "activation_cost_colors": [
+              "G"
+            ],
+            "activation_cost_generic": 0,
+            "activation_cost_mana": "{G}",
+            "activation_requires_sacrifice": false,
+            "activation_requires_tap": true,
+            "battle_model_scope": "xmage_permanent_simple_activated_target_boost_until_eot_v1",
+            "duration": "until_end_of_turn",
+            "effect": "stat_modifier_until_eot",
+            "power_boost": 2,
+            "power_delta": 2,
+            "target": "creature",
+            "target_constraints": {
+              "card_types": [
+                "creature"
+              ],
+              "combat_state": "attacking"
+            },
+            "target_controller": "any",
+            "toughness_boost": 2,
+            "toughness_delta": 2,
+            "xmage_ability_class": "SimpleActivatedAbility",
+            "xmage_effect_class": "BoostTargetEffect"
+          }
+        ],
+        "ability_kind": "static_and_activated",
+        "activated_battle_model_scope": "xmage_permanent_simple_activated_target_boost_until_eot_v1",
+        "activated_effect": "target_stat_modifier_until_eot",
+        "activation_cost_colors": [
+          "G"
+        ],
+        "activation_cost_generic": 0,
+        "activation_cost_mana": "{G}",
+        "activation_requires_sacrifice": false,
+        "activation_requires_tap": true,
+        "battle_model_scope": "xmage_permanent_simple_activated_target_boost_until_eot_v1",
+        "duration": "until_end_of_turn",
+        "effect": "creature",
+        "power_boost": 2,
+        "power_delta": 2,
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "combat_state": "attacking"
+        },
+        "target_controller": "any",
+        "toughness_boost": 2,
+        "toughness_delta": 2,
+        "xmage_ability_class": "SimpleActivatedAbility",
+        "xmage_effect_class": "BoostTargetEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Phyrexian Debaser",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:c042a2a2d2e22937dc43fadef1dbf4ac",
+      "min_rule_version": 2,
+      "normalized_name": "phyrexian debaser",
+      "oracle_hash": "b9cce90ff2eb3e09c885835ae540023e",
+      "required_effect_fields": {
+        "_activated_rule_effects": [
+          {
+            "ability_kind": "activated",
+            "activated_effect": "target_stat_modifier_until_eot",
+            "activation_cost_colors": [],
+            "activation_cost_generic": 0,
+            "activation_cost_mana": "{0}",
+            "activation_requires_sacrifice": true,
+            "activation_requires_tap": true,
+            "battle_model_scope": "xmage_permanent_simple_activated_target_boost_until_eot_v1",
+            "duration": "until_end_of_turn",
+            "effect": "stat_modifier_until_eot",
+            "power_boost": -2,
+            "power_delta": -2,
+            "target": "creature",
+            "target_constraints": {
+              "card_types": [
+                "creature"
+              ],
+              "exclude_source": true
+            },
+            "target_controller": "any",
+            "toughness_boost": -2,
+            "toughness_delta": -2,
+            "xmage_ability_class": "SimpleActivatedAbility",
+            "xmage_effect_class": "BoostTargetEffect"
+          }
+        ],
+        "ability_kind": "static_and_activated",
+        "activated_battle_model_scope": "xmage_permanent_simple_activated_target_boost_until_eot_v1",
+        "activated_effect": "target_stat_modifier_until_eot",
+        "activation_cost_colors": [],
+        "activation_cost_generic": 0,
+        "activation_cost_mana": "{0}",
+        "activation_requires_sacrifice": true,
+        "activation_requires_tap": true,
+        "battle_model_scope": "xmage_permanent_simple_activated_target_boost_until_eot_v1",
+        "duration": "until_end_of_turn",
+        "effect": "creature",
+        "power_boost": -2,
+        "power_delta": -2,
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "exclude_source": true
+        },
+        "target_controller": "any",
+        "toughness_boost": -2,
+        "toughness_delta": -2,
+        "xmage_ability_class": "SimpleActivatedAbility",
+        "xmage_effect_class": "BoostTargetEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Serra Advocate",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:f2957ecc36ae4e3e23efa241fcf239f8",
+      "min_rule_version": 2,
+      "normalized_name": "serra advocate",
+      "oracle_hash": "69ab38010128bf47681dd519e792660b",
+      "required_effect_fields": {
+        "_activated_rule_effects": [
+          {
+            "ability_kind": "activated",
+            "activated_effect": "target_stat_modifier_until_eot",
+            "activation_cost_colors": [],
+            "activation_cost_generic": 0,
+            "activation_cost_mana": "{0}",
+            "activation_requires_sacrifice": false,
+            "activation_requires_tap": true,
+            "battle_model_scope": "xmage_permanent_simple_activated_target_boost_until_eot_v1",
+            "duration": "until_end_of_turn",
+            "effect": "stat_modifier_until_eot",
+            "power_boost": 2,
+            "power_delta": 2,
+            "target": "creature",
+            "target_constraints": {
+              "card_types": [
+                "creature"
+              ],
+              "combat_state": "attacking_or_blocking"
+            },
+            "target_controller": "any",
+            "toughness_boost": 2,
+            "toughness_delta": 2,
+            "xmage_ability_class": "SimpleActivatedAbility",
+            "xmage_effect_class": "BoostTargetEffect"
+          }
+        ],
+        "ability_kind": "static_and_activated",
+        "activated_battle_model_scope": "xmage_permanent_simple_activated_target_boost_until_eot_v1",
+        "activated_effect": "target_stat_modifier_until_eot",
+        "activation_cost_colors": [],
+        "activation_cost_generic": 0,
+        "activation_cost_mana": "{0}",
+        "activation_requires_sacrifice": false,
+        "activation_requires_tap": true,
+        "battle_model_scope": "xmage_permanent_simple_activated_target_boost_until_eot_v1",
+        "duration": "until_end_of_turn",
+        "effect": "creature",
+        "power_boost": 2,
+        "power_delta": 2,
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "combat_state": "attacking_or_blocking"
+        },
+        "target_controller": "any",
+        "toughness_boost": 2,
+        "toughness_delta": 2,
+        "xmage_ability_class": "SimpleActivatedAbility",
+        "xmage_effect_class": "BoostTargetEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Spirit Weaver",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:8669f951a8e25c612de030225cace7c2",
+      "min_rule_version": 2,
+      "normalized_name": "spirit weaver",
+      "oracle_hash": "8d1c91a891e2aa95d486ab19acedba22",
+      "required_effect_fields": {
+        "_activated_rule_effects": [
+          {
+            "ability_kind": "activated",
+            "activated_effect": "target_stat_modifier_until_eot",
+            "activation_cost_colors": [],
+            "activation_cost_generic": 2,
+            "activation_cost_mana": "{2}",
+            "activation_requires_sacrifice": false,
+            "activation_requires_tap": false,
+            "battle_model_scope": "xmage_permanent_simple_activated_target_boost_until_eot_v1",
+            "duration": "until_end_of_turn",
+            "effect": "stat_modifier_until_eot",
+            "power_boost": 0,
+            "power_delta": 0,
+            "target": "creature",
+            "target_constraints": {
+              "card_types": [
+                "creature"
+              ],
+              "target_colors": [
+                "U",
+                "G"
+              ]
+            },
+            "target_controller": "any",
+            "toughness_boost": 1,
+            "toughness_delta": 1,
+            "xmage_ability_class": "SimpleActivatedAbility",
+            "xmage_effect_class": "BoostTargetEffect"
+          }
+        ],
+        "ability_kind": "static_and_activated",
+        "activated_battle_model_scope": "xmage_permanent_simple_activated_target_boost_until_eot_v1",
+        "activated_effect": "target_stat_modifier_until_eot",
+        "activation_cost_colors": [],
+        "activation_cost_generic": 2,
+        "activation_cost_mana": "{2}",
+        "activation_requires_sacrifice": false,
+        "activation_requires_tap": false,
+        "battle_model_scope": "xmage_permanent_simple_activated_target_boost_until_eot_v1",
+        "duration": "until_end_of_turn",
+        "effect": "creature",
+        "power_boost": 0,
+        "power_delta": 0,
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "target_colors": [
+            "U",
+            "G"
+          ]
+        },
+        "target_controller": "any",
+        "toughness_boost": 1,
+        "toughness_delta": 1,
+        "xmage_ability_class": "SimpleActivatedAbility",
+        "xmage_effect_class": "BoostTargetEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Sword Dancer",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:897b4da05a4b4dcd5dfd281a36f4195e",
+      "min_rule_version": 2,
+      "normalized_name": "sword dancer",
+      "oracle_hash": "edf8fc39ce3aa6e3cc7c2c575aee209f",
+      "required_effect_fields": {
+        "_activated_rule_effects": [
+          {
+            "ability_kind": "activated",
+            "activated_effect": "target_stat_modifier_until_eot",
+            "activation_cost_colors": [
+              "W",
+              "W"
+            ],
+            "activation_cost_generic": 0,
+            "activation_cost_mana": "{W}{W}",
+            "activation_requires_sacrifice": false,
+            "activation_requires_tap": false,
+            "battle_model_scope": "xmage_permanent_simple_activated_target_boost_until_eot_v1",
+            "duration": "until_end_of_turn",
+            "effect": "stat_modifier_until_eot",
+            "power_boost": -1,
+            "power_delta": -1,
+            "target": "creature",
+            "target_constraints": {
+              "card_types": [
+                "creature"
+              ],
+              "combat_state": "attacking"
+            },
+            "target_controller": "any",
+            "toughness_boost": 0,
+            "toughness_delta": 0,
+            "xmage_ability_class": "SimpleActivatedAbility",
+            "xmage_effect_class": "BoostTargetEffect"
+          }
+        ],
+        "ability_kind": "static_and_activated",
+        "activated_battle_model_scope": "xmage_permanent_simple_activated_target_boost_until_eot_v1",
+        "activated_effect": "target_stat_modifier_until_eot",
+        "activation_cost_colors": [
+          "W",
+          "W"
+        ],
+        "activation_cost_generic": 0,
+        "activation_cost_mana": "{W}{W}",
+        "activation_requires_sacrifice": false,
+        "activation_requires_tap": false,
+        "battle_model_scope": "xmage_permanent_simple_activated_target_boost_until_eot_v1",
+        "duration": "until_end_of_turn",
+        "effect": "creature",
+        "power_boost": -1,
+        "power_delta": -1,
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "combat_state": "attacking"
+        },
+        "target_controller": "any",
+        "toughness_boost": 0,
+        "toughness_delta": 0,
+        "xmage_ability_class": "SimpleActivatedAbility",
+        "xmage_effect_class": "BoostTargetEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Sword of the Chosen",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:07c868edf81ca3a70b7e63720fbe9d75",
+      "min_rule_version": 2,
+      "normalized_name": "sword of the chosen",
+      "oracle_hash": "a9ce48496e82a20a9516011a0c6ed1c2",
+      "required_effect_fields": {
+        "_activated_rule_effects": [
+          {
+            "ability_kind": "activated",
+            "activated_effect": "target_stat_modifier_until_eot",
+            "activation_cost_colors": [],
+            "activation_cost_generic": 0,
+            "activation_cost_mana": "{0}",
+            "activation_requires_sacrifice": false,
+            "activation_requires_tap": true,
+            "battle_model_scope": "xmage_permanent_simple_activated_target_boost_until_eot_v1",
+            "duration": "until_end_of_turn",
+            "effect": "stat_modifier_until_eot",
+            "power_boost": 2,
+            "power_delta": 2,
+            "target": "creature",
+            "target_constraints": {
+              "card_types": [
+                "creature"
+              ],
+              "required_supertypes": [
+                "legendary"
+              ]
+            },
+            "target_controller": "any",
+            "toughness_boost": 2,
+            "toughness_delta": 2,
+            "xmage_ability_class": "SimpleActivatedAbility",
+            "xmage_effect_class": "BoostTargetEffect"
+          }
+        ],
+        "ability_kind": "static_and_activated",
+        "activated_battle_model_scope": "xmage_permanent_simple_activated_target_boost_until_eot_v1",
+        "activated_effect": "target_stat_modifier_until_eot",
+        "activation_cost_colors": [],
+        "activation_cost_generic": 0,
+        "activation_cost_mana": "{0}",
+        "activation_requires_sacrifice": false,
+        "activation_requires_tap": true,
+        "battle_model_scope": "xmage_permanent_simple_activated_target_boost_until_eot_v1",
+        "duration": "until_end_of_turn",
+        "effect": "artifact",
+        "power_boost": 2,
+        "power_delta": 2,
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "required_supertypes": [
+            "legendary"
+          ]
+        },
+        "target_controller": "any",
+        "toughness_boost": 2,
+        "toughness_delta": 2,
+        "xmage_ability_class": "SimpleActivatedAbility",
+        "xmage_effect_class": "BoostTargetEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Tuknir Deathlock",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:16bf728ba5de84a9cff44ad9b29b56b4",
+      "min_rule_version": 2,
+      "normalized_name": "tuknir deathlock",
+      "oracle_hash": "2d7864f9152fadbad7b065fdba589e6b",
+      "required_effect_fields": {
+        "_activated_rule_effects": [
+          {
+            "ability_kind": "activated",
+            "activated_effect": "target_stat_modifier_until_eot",
+            "activation_cost_colors": [
+              "R",
+              "G"
+            ],
+            "activation_cost_generic": 0,
+            "activation_cost_mana": "{R}{G}",
+            "activation_requires_sacrifice": false,
+            "activation_requires_tap": true,
+            "battle_model_scope": "xmage_permanent_simple_activated_target_boost_until_eot_v1",
+            "duration": "until_end_of_turn",
+            "effect": "stat_modifier_until_eot",
+            "power_boost": 2,
+            "power_delta": 2,
+            "target": "creature",
+            "target_constraints": {
+              "card_types": [
+                "creature"
+              ]
+            },
+            "target_controller": "any",
+            "toughness_boost": 2,
+            "toughness_delta": 2,
+            "xmage_ability_class": "SimpleActivatedAbility",
+            "xmage_effect_class": "BoostTargetEffect"
+          }
+        ],
+        "ability_kind": "static_and_activated",
+        "activated_battle_model_scope": "xmage_permanent_simple_activated_target_boost_until_eot_v1",
+        "activated_effect": "target_stat_modifier_until_eot",
+        "activation_cost_colors": [
+          "R",
+          "G"
+        ],
+        "activation_cost_generic": 0,
+        "activation_cost_mana": "{R}{G}",
+        "activation_requires_sacrifice": false,
+        "activation_requires_tap": true,
+        "battle_model_scope": "xmage_permanent_simple_activated_target_boost_until_eot_v1",
+        "duration": "until_end_of_turn",
+        "effect": "creature",
+        "power_boost": 2,
+        "power_delta": 2,
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ]
+        },
+        "target_controller": "any",
+        "toughness_boost": 2,
+        "toughness_delta": 2,
+        "xmage_ability_class": "SimpleActivatedAbility",
+        "xmage_effect_class": "BoostTargetEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Wilderness Hypnotist",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:45bfe4fd066c3f71a2d71272b70ed607",
+      "min_rule_version": 2,
+      "normalized_name": "wilderness hypnotist",
+      "oracle_hash": "9e7179d80129094661af5e96c7c982a3",
+      "required_effect_fields": {
+        "_activated_rule_effects": [
+          {
+            "ability_kind": "activated",
+            "activated_effect": "target_stat_modifier_until_eot",
+            "activation_cost_colors": [],
+            "activation_cost_generic": 0,
+            "activation_cost_mana": "{0}",
+            "activation_requires_sacrifice": false,
+            "activation_requires_tap": true,
+            "battle_model_scope": "xmage_permanent_simple_activated_target_boost_until_eot_v1",
+            "duration": "until_end_of_turn",
+            "effect": "stat_modifier_until_eot",
+            "power_boost": -2,
+            "power_delta": -2,
+            "target": "creature",
+            "target_constraints": {
+              "card_types": [
+                "creature"
+              ],
+              "target_colors": [
+                "R",
+                "G"
+              ]
+            },
+            "target_controller": "any",
+            "toughness_boost": 0,
+            "toughness_delta": 0,
+            "xmage_ability_class": "SimpleActivatedAbility",
+            "xmage_effect_class": "BoostTargetEffect"
+          }
+        ],
+        "ability_kind": "static_and_activated",
+        "activated_battle_model_scope": "xmage_permanent_simple_activated_target_boost_until_eot_v1",
+        "activated_effect": "target_stat_modifier_until_eot",
+        "activation_cost_colors": [],
+        "activation_cost_generic": 0,
+        "activation_cost_mana": "{0}",
+        "activation_requires_sacrifice": false,
+        "activation_requires_tap": true,
+        "battle_model_scope": "xmage_permanent_simple_activated_target_boost_until_eot_v1",
+        "duration": "until_end_of_turn",
+        "effect": "creature",
+        "power_boost": -2,
+        "power_delta": -2,
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "target_colors": [
+            "R",
+            "G"
+          ]
+        },
+        "target_controller": "any",
+        "toughness_boost": 0,
+        "toughness_delta": 0,
+        "xmage_ability_class": "SimpleActivatedAbility",
+        "xmage_effect_class": "BoostTargetEffect"
+      },
+      "review_status": "verified"
+    }
+  ],
+  "family_counts": {
+    "xmage_permanent_simple_activated_target_boost_until_eot": 21
+  },
+  "files": {
+    "apply": "docs/hermes-analysis/master_optimizer_reports/pg853_activated_target_boost_new_server_package_apply.sql",
+    "manifest": "docs/hermes-analysis/master_optimizer_reports/pg853_activated_target_boost_new_server_package_manifest.json",
+    "package": "docs/hermes-analysis/master_optimizer_reports/pg853_activated_target_boost_new_server_package_package.md",
+    "postcheck": "docs/hermes-analysis/master_optimizer_reports/pg853_activated_target_boost_new_server_package_postcheck.sql",
+    "precheck": "docs/hermes-analysis/master_optimizer_reports/pg853_activated_target_boost_new_server_package_precheck.sql",
+    "rollback": "docs/hermes-analysis/master_optimizer_reports/pg853_activated_target_boost_new_server_package_rollback.sql"
+  },
+  "generated_at": "2026-07-13T00:26:50+00:00",
+  "mutations_performed": [],
+  "runtime_checks": [
+    {
+      "card": {
+        "name": "Aegis of the Meek"
+      },
+      "card_name": "Aegis of the Meek",
+      "effect": "artifact",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:2ae27e7b044d26f97848d01d210ab78b",
+      "normalized_name": "aegis of the meek",
+      "required_effect_fields": {
+        "_activated_rule_effects": [
+          {
+            "ability_kind": "activated",
+            "activated_effect": "target_stat_modifier_until_eot",
+            "activation_cost_colors": [],
+            "activation_cost_generic": 1,
+            "activation_cost_mana": "{1}",
+            "activation_requires_sacrifice": false,
+            "activation_requires_tap": true,
+            "battle_model_scope": "xmage_permanent_simple_activated_target_boost_until_eot_v1",
+            "duration": "until_end_of_turn",
+            "effect": "stat_modifier_until_eot",
+            "power_boost": 1,
+            "power_delta": 1,
+            "target": "creature",
+            "target_constraints": {
+              "card_types": [
+                "creature"
+              ],
+              "power_max": 1,
+              "power_min": 1,
+              "toughness_max": 1,
+              "toughness_min": 1
+            },
+            "target_controller": "any",
+            "toughness_boost": 2,
+            "toughness_delta": 2,
+            "xmage_ability_class": "SimpleActivatedAbility",
+            "xmage_effect_class": "BoostTargetEffect"
+          }
+        ],
+        "ability_kind": "static_and_activated",
+        "activated_battle_model_scope": "xmage_permanent_simple_activated_target_boost_until_eot_v1",
+        "activated_effect": "target_stat_modifier_until_eot",
+        "activation_cost_colors": [],
+        "activation_cost_generic": 1,
+        "activation_cost_mana": "{1}",
+        "activation_requires_sacrifice": false,
+        "activation_requires_tap": true,
+        "battle_model_scope": "xmage_permanent_simple_activated_target_boost_until_eot_v1",
+        "duration": "until_end_of_turn",
+        "effect": "artifact",
+        "power_boost": 1,
+        "power_delta": 1,
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "power_max": 1,
+          "power_min": 1,
+          "toughness_max": 1,
+          "toughness_min": 1
+        },
+        "target_controller": "any",
+        "toughness_boost": 2,
+        "toughness_delta": 2,
+        "xmage_ability_class": "SimpleActivatedAbility",
+        "xmage_effect_class": "BoostTargetEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Alpha Kavu"
+      },
+      "card_name": "Alpha Kavu",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:39b8573e388d05753b1c5cd494ade119",
+      "normalized_name": "alpha kavu",
+      "required_effect_fields": {
+        "_activated_rule_effects": [
+          {
+            "ability_kind": "activated",
+            "activated_effect": "target_stat_modifier_until_eot",
+            "activation_cost_colors": [
+              "G"
+            ],
+            "activation_cost_generic": 1,
+            "activation_cost_mana": "{1}{G}",
+            "activation_requires_sacrifice": false,
+            "activation_requires_tap": false,
+            "battle_model_scope": "xmage_permanent_simple_activated_target_boost_until_eot_v1",
+            "duration": "until_end_of_turn",
+            "effect": "stat_modifier_until_eot",
+            "power_boost": -1,
+            "power_delta": -1,
+            "target": "creature",
+            "target_constraints": {
+              "card_types": [
+                "creature"
+              ],
+              "target_subtypes": [
+                "kavu"
+              ]
+            },
+            "target_controller": "any",
+            "toughness_boost": 1,
+            "toughness_delta": 1,
+            "xmage_ability_class": "SimpleActivatedAbility",
+            "xmage_effect_class": "BoostTargetEffect"
+          }
+        ],
+        "ability_kind": "static_and_activated",
+        "activated_battle_model_scope": "xmage_permanent_simple_activated_target_boost_until_eot_v1",
+        "activated_effect": "target_stat_modifier_until_eot",
+        "activation_cost_colors": [
+          "G"
+        ],
+        "activation_cost_generic": 1,
+        "activation_cost_mana": "{1}{G}",
+        "activation_requires_sacrifice": false,
+        "activation_requires_tap": false,
+        "battle_model_scope": "xmage_permanent_simple_activated_target_boost_until_eot_v1",
+        "duration": "until_end_of_turn",
+        "effect": "creature",
+        "power_boost": -1,
+        "power_delta": -1,
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "target_subtypes": [
+            "kavu"
+          ]
+        },
+        "target_controller": "any",
+        "toughness_boost": 1,
+        "toughness_delta": 1,
+        "xmage_ability_class": "SimpleActivatedAbility",
+        "xmage_effect_class": "BoostTargetEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Angelic Page"
+      },
+      "card_name": "Angelic Page",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:bdaae8162a6e1149bba3eb9b1082c96b",
+      "normalized_name": "angelic page",
+      "required_effect_fields": {
+        "_activated_rule_effects": [
+          {
+            "ability_kind": "activated",
+            "activated_effect": "target_stat_modifier_until_eot",
+            "activation_cost_colors": [],
+            "activation_cost_generic": 0,
+            "activation_cost_mana": "{0}",
+            "activation_requires_sacrifice": false,
+            "activation_requires_tap": true,
+            "battle_model_scope": "xmage_permanent_simple_activated_target_boost_until_eot_v1",
+            "duration": "until_end_of_turn",
+            "effect": "stat_modifier_until_eot",
+            "power_boost": 1,
+            "power_delta": 1,
+            "target": "creature",
+            "target_constraints": {
+              "card_types": [
+                "creature"
+              ],
+              "combat_state": "attacking_or_blocking"
+            },
+            "target_controller": "any",
+            "toughness_boost": 1,
+            "toughness_delta": 1,
+            "xmage_ability_class": "SimpleActivatedAbility",
+            "xmage_effect_class": "BoostTargetEffect"
+          }
+        ],
+        "ability_kind": "static_and_activated",
+        "activated_battle_model_scope": "xmage_permanent_simple_activated_target_boost_until_eot_v1",
+        "activated_effect": "target_stat_modifier_until_eot",
+        "activation_cost_colors": [],
+        "activation_cost_generic": 0,
+        "activation_cost_mana": "{0}",
+        "activation_requires_sacrifice": false,
+        "activation_requires_tap": true,
+        "battle_model_scope": "xmage_permanent_simple_activated_target_boost_until_eot_v1",
+        "duration": "until_end_of_turn",
+        "effect": "creature",
+        "power_boost": 1,
+        "power_delta": 1,
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "combat_state": "attacking_or_blocking"
+        },
+        "target_controller": "any",
+        "toughness_boost": 1,
+        "toughness_delta": 1,
+        "xmage_ability_class": "SimpleActivatedAbility",
+        "xmage_effect_class": "BoostTargetEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Anointer of Champions"
+      },
+      "card_name": "Anointer of Champions",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:af8ea6d2a1cb9b87bf619615c6ca6e63",
+      "normalized_name": "anointer of champions",
+      "required_effect_fields": {
+        "_activated_rule_effects": [
+          {
+            "ability_kind": "activated",
+            "activated_effect": "target_stat_modifier_until_eot",
+            "activation_cost_colors": [],
+            "activation_cost_generic": 0,
+            "activation_cost_mana": "{0}",
+            "activation_requires_sacrifice": false,
+            "activation_requires_tap": true,
+            "battle_model_scope": "xmage_permanent_simple_activated_target_boost_until_eot_v1",
+            "duration": "until_end_of_turn",
+            "effect": "stat_modifier_until_eot",
+            "power_boost": 1,
+            "power_delta": 1,
+            "target": "creature",
+            "target_constraints": {
+              "card_types": [
+                "creature"
+              ],
+              "combat_state": "attacking"
+            },
+            "target_controller": "any",
+            "toughness_boost": 1,
+            "toughness_delta": 1,
+            "xmage_ability_class": "SimpleActivatedAbility",
+            "xmage_effect_class": "BoostTargetEffect"
+          }
+        ],
+        "ability_kind": "static_and_activated",
+        "activated_battle_model_scope": "xmage_permanent_simple_activated_target_boost_until_eot_v1",
+        "activated_effect": "target_stat_modifier_until_eot",
+        "activation_cost_colors": [],
+        "activation_cost_generic": 0,
+        "activation_cost_mana": "{0}",
+        "activation_requires_sacrifice": false,
+        "activation_requires_tap": true,
+        "battle_model_scope": "xmage_permanent_simple_activated_target_boost_until_eot_v1",
+        "duration": "until_end_of_turn",
+        "effect": "creature",
+        "power_boost": 1,
+        "power_delta": 1,
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "combat_state": "attacking"
+        },
+        "target_controller": "any",
+        "toughness_boost": 1,
+        "toughness_delta": 1,
+        "xmage_ability_class": "SimpleActivatedAbility",
+        "xmage_effect_class": "BoostTargetEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Assembly-Worker"
+      },
+      "card_name": "Assembly-Worker",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:1dd783caf9f450c1d3263b7bb7699ec5",
+      "normalized_name": "assembly-worker",
+      "required_effect_fields": {
+        "_activated_rule_effects": [
+          {
+            "ability_kind": "activated",
+            "activated_effect": "target_stat_modifier_until_eot",
+            "activation_cost_colors": [],
+            "activation_cost_generic": 0,
+            "activation_cost_mana": "{0}",
+            "activation_requires_sacrifice": false,
+            "activation_requires_tap": true,
+            "battle_model_scope": "xmage_permanent_simple_activated_target_boost_until_eot_v1",
+            "duration": "until_end_of_turn",
+            "effect": "stat_modifier_until_eot",
+            "power_boost": 1,
+            "power_delta": 1,
+            "target": "creature",
+            "target_constraints": {
+              "card_types": [
+                "creature"
+              ],
+              "required_subtype_match": "all",
+              "target_subtypes": [
+                "assembly",
+                "worker"
+              ]
+            },
+            "target_controller": "any",
+            "toughness_boost": 1,
+            "toughness_delta": 1,
+            "xmage_ability_class": "SimpleActivatedAbility",
+            "xmage_effect_class": "BoostTargetEffect"
+          }
+        ],
+        "ability_kind": "static_and_activated",
+        "activated_battle_model_scope": "xmage_permanent_simple_activated_target_boost_until_eot_v1",
+        "activated_effect": "target_stat_modifier_until_eot",
+        "activation_cost_colors": [],
+        "activation_cost_generic": 0,
+        "activation_cost_mana": "{0}",
+        "activation_requires_sacrifice": false,
+        "activation_requires_tap": true,
+        "battle_model_scope": "xmage_permanent_simple_activated_target_boost_until_eot_v1",
+        "duration": "until_end_of_turn",
+        "effect": "creature",
+        "power_boost": 1,
+        "power_delta": 1,
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "required_subtype_match": "all",
+          "target_subtypes": [
+            "assembly",
+            "worker"
+          ]
+        },
+        "target_controller": "any",
+        "toughness_boost": 1,
+        "toughness_delta": 1,
+        "xmage_ability_class": "SimpleActivatedAbility",
+        "xmage_effect_class": "BoostTargetEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Crenellated Wall"
+      },
+      "card_name": "Crenellated Wall",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:c9767f4d6cb4ae481d93fe1e11400f06",
+      "normalized_name": "crenellated wall",
+      "required_effect_fields": {
+        "_activated_rule_effects": [
+          {
+            "ability_kind": "activated",
+            "activated_effect": "target_stat_modifier_until_eot",
+            "activation_cost_colors": [],
+            "activation_cost_generic": 0,
+            "activation_cost_mana": "{0}",
+            "activation_requires_sacrifice": false,
+            "activation_requires_tap": true,
+            "battle_model_scope": "xmage_permanent_simple_activated_target_boost_until_eot_v1",
+            "duration": "until_end_of_turn",
+            "effect": "stat_modifier_until_eot",
+            "power_boost": 0,
+            "power_delta": 0,
+            "target": "creature",
+            "target_constraints": {
+              "card_types": [
+                "creature"
+              ]
+            },
+            "target_controller": "any",
+            "toughness_boost": 4,
+            "toughness_delta": 4,
+            "xmage_ability_class": "SimpleActivatedAbility",
+            "xmage_effect_class": "BoostTargetEffect"
+          }
+        ],
+        "ability_kind": "static_and_activated",
+        "activated_battle_model_scope": "xmage_permanent_simple_activated_target_boost_until_eot_v1",
+        "activated_effect": "target_stat_modifier_until_eot",
+        "activation_cost_colors": [],
+        "activation_cost_generic": 0,
+        "activation_cost_mana": "{0}",
+        "activation_requires_sacrifice": false,
+        "activation_requires_tap": true,
+        "battle_model_scope": "xmage_permanent_simple_activated_target_boost_until_eot_v1",
+        "duration": "until_end_of_turn",
+        "effect": "creature",
+        "power_boost": 0,
+        "power_delta": 0,
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ]
+        },
+        "target_controller": "any",
+        "toughness_boost": 4,
+        "toughness_delta": 4,
+        "xmage_ability_class": "SimpleActivatedAbility",
+        "xmage_effect_class": "BoostTargetEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Dwarven Lieutenant"
+      },
+      "card_name": "Dwarven Lieutenant",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:8bbcde679d280d8695d8beaf568d927f",
+      "normalized_name": "dwarven lieutenant",
+      "required_effect_fields": {
+        "_activated_rule_effects": [
+          {
+            "ability_kind": "activated",
+            "activated_effect": "target_stat_modifier_until_eot",
+            "activation_cost_colors": [
+              "R"
+            ],
+            "activation_cost_generic": 1,
+            "activation_cost_mana": "{1}{R}",
+            "activation_requires_sacrifice": false,
+            "activation_requires_tap": false,
+            "battle_model_scope": "xmage_permanent_simple_activated_target_boost_until_eot_v1",
+            "duration": "until_end_of_turn",
+            "effect": "stat_modifier_until_eot",
+            "power_boost": 1,
+            "power_delta": 1,
+            "target": "creature",
+            "target_constraints": {
+              "card_types": [
+                "creature"
+              ],
+              "target_subtypes": [
+                "dwarf"
+              ]
+            },
+            "target_controller": "any",
+            "toughness_boost": 0,
+            "toughness_delta": 0,
+            "xmage_ability_class": "SimpleActivatedAbility",
+            "xmage_effect_class": "BoostTargetEffect"
+          }
+        ],
+        "ability_kind": "static_and_activated",
+        "activated_battle_model_scope": "xmage_permanent_simple_activated_target_boost_until_eot_v1",
+        "activated_effect": "target_stat_modifier_until_eot",
+        "activation_cost_colors": [
+          "R"
+        ],
+        "activation_cost_generic": 1,
+        "activation_cost_mana": "{1}{R}",
+        "activation_requires_sacrifice": false,
+        "activation_requires_tap": false,
+        "battle_model_scope": "xmage_permanent_simple_activated_target_boost_until_eot_v1",
+        "duration": "until_end_of_turn",
+        "effect": "creature",
+        "power_boost": 1,
+        "power_delta": 1,
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "target_subtypes": [
+            "dwarf"
+          ]
+        },
+        "target_controller": "any",
+        "toughness_boost": 0,
+        "toughness_delta": 0,
+        "xmage_ability_class": "SimpleActivatedAbility",
+        "xmage_effect_class": "BoostTargetEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Grassland Crusader"
+      },
+      "card_name": "Grassland Crusader",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:103e5a32b9023c725d8209cca6ab7e70",
+      "normalized_name": "grassland crusader",
+      "required_effect_fields": {
+        "_activated_rule_effects": [
+          {
+            "ability_kind": "activated",
+            "activated_effect": "target_stat_modifier_until_eot",
+            "activation_cost_colors": [],
+            "activation_cost_generic": 0,
+            "activation_cost_mana": "{0}",
+            "activation_requires_sacrifice": false,
+            "activation_requires_tap": true,
+            "battle_model_scope": "xmage_permanent_simple_activated_target_boost_until_eot_v1",
+            "duration": "until_end_of_turn",
+            "effect": "stat_modifier_until_eot",
+            "power_boost": 2,
+            "power_delta": 2,
+            "target": "creature",
+            "target_constraints": {
+              "card_types": [
+                "creature"
+              ],
+              "target_subtypes": [
+                "elf",
+                "soldier"
+              ]
+            },
+            "target_controller": "any",
+            "toughness_boost": 2,
+            "toughness_delta": 2,
+            "xmage_ability_class": "SimpleActivatedAbility",
+            "xmage_effect_class": "BoostTargetEffect"
+          }
+        ],
+        "ability_kind": "static_and_activated",
+        "activated_battle_model_scope": "xmage_permanent_simple_activated_target_boost_until_eot_v1",
+        "activated_effect": "target_stat_modifier_until_eot",
+        "activation_cost_colors": [],
+        "activation_cost_generic": 0,
+        "activation_cost_mana": "{0}",
+        "activation_requires_sacrifice": false,
+        "activation_requires_tap": true,
+        "battle_model_scope": "xmage_permanent_simple_activated_target_boost_until_eot_v1",
+        "duration": "until_end_of_turn",
+        "effect": "creature",
+        "power_boost": 2,
+        "power_delta": 2,
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "target_subtypes": [
+            "elf",
+            "soldier"
+          ]
+        },
+        "target_controller": "any",
+        "toughness_boost": 2,
+        "toughness_delta": 2,
+        "xmage_ability_class": "SimpleActivatedAbility",
+        "xmage_effect_class": "BoostTargetEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Hate Weaver"
+      },
+      "card_name": "Hate Weaver",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:e9abc18cd5b0073bb47164c50e3fee6f",
+      "normalized_name": "hate weaver",
+      "required_effect_fields": {
+        "_activated_rule_effects": [
+          {
+            "ability_kind": "activated",
+            "activated_effect": "target_stat_modifier_until_eot",
+            "activation_cost_colors": [],
+            "activation_cost_generic": 2,
+            "activation_cost_mana": "{2}",
+            "activation_requires_sacrifice": false,
+            "activation_requires_tap": false,
+            "battle_model_scope": "xmage_permanent_simple_activated_target_boost_until_eot_v1",
+            "duration": "until_end_of_turn",
+            "effect": "stat_modifier_until_eot",
+            "power_boost": 1,
+            "power_delta": 1,
+            "target": "creature",
+            "target_constraints": {
+              "card_types": [
+                "creature"
+              ],
+              "target_colors": [
+                "U",
+                "R"
+              ]
+            },
+            "target_controller": "any",
+            "toughness_boost": 0,
+            "toughness_delta": 0,
+            "xmage_ability_class": "SimpleActivatedAbility",
+            "xmage_effect_class": "BoostTargetEffect"
+          }
+        ],
+        "ability_kind": "static_and_activated",
+        "activated_battle_model_scope": "xmage_permanent_simple_activated_target_boost_until_eot_v1",
+        "activated_effect": "target_stat_modifier_until_eot",
+        "activation_cost_colors": [],
+        "activation_cost_generic": 2,
+        "activation_cost_mana": "{2}",
+        "activation_requires_sacrifice": false,
+        "activation_requires_tap": false,
+        "battle_model_scope": "xmage_permanent_simple_activated_target_boost_until_eot_v1",
+        "duration": "until_end_of_turn",
+        "effect": "creature",
+        "power_boost": 1,
+        "power_delta": 1,
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "target_colors": [
+            "U",
+            "R"
+          ]
+        },
+        "target_controller": "any",
+        "toughness_boost": 0,
+        "toughness_delta": 0,
+        "xmage_ability_class": "SimpleActivatedAbility",
+        "xmage_effect_class": "BoostTargetEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Hoof Skulkin"
+      },
+      "card_name": "Hoof Skulkin",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:d923a862e58bdc89bcc435ec5e2c906a",
+      "normalized_name": "hoof skulkin",
+      "required_effect_fields": {
+        "_activated_rule_effects": [
+          {
+            "ability_kind": "activated",
+            "activated_effect": "target_stat_modifier_until_eot",
+            "activation_cost_colors": [],
+            "activation_cost_generic": 3,
+            "activation_cost_mana": "{3}",
+            "activation_requires_sacrifice": false,
+            "activation_requires_tap": false,
+            "battle_model_scope": "xmage_permanent_simple_activated_target_boost_until_eot_v1",
+            "duration": "until_end_of_turn",
+            "effect": "stat_modifier_until_eot",
+            "power_boost": 1,
+            "power_delta": 1,
+            "target": "creature",
+            "target_constraints": {
+              "card_types": [
+                "creature"
+              ],
+              "target_colors": [
+                "G"
+              ]
+            },
+            "target_controller": "any",
+            "toughness_boost": 1,
+            "toughness_delta": 1,
+            "xmage_ability_class": "SimpleActivatedAbility",
+            "xmage_effect_class": "BoostTargetEffect"
+          }
+        ],
+        "ability_kind": "static_and_activated",
+        "activated_battle_model_scope": "xmage_permanent_simple_activated_target_boost_until_eot_v1",
+        "activated_effect": "target_stat_modifier_until_eot",
+        "activation_cost_colors": [],
+        "activation_cost_generic": 3,
+        "activation_cost_mana": "{3}",
+        "activation_requires_sacrifice": false,
+        "activation_requires_tap": false,
+        "battle_model_scope": "xmage_permanent_simple_activated_target_boost_until_eot_v1",
+        "duration": "until_end_of_turn",
+        "effect": "creature",
+        "power_boost": 1,
+        "power_delta": 1,
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "target_colors": [
+            "G"
+          ]
+        },
+        "target_controller": "any",
+        "toughness_boost": 1,
+        "toughness_delta": 1,
+        "xmage_ability_class": "SimpleActivatedAbility",
+        "xmage_effect_class": "BoostTargetEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Icatian Lieutenant"
+      },
+      "card_name": "Icatian Lieutenant",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:75ffbd696e0fb4e9d5e218ff2aae551a",
+      "normalized_name": "icatian lieutenant",
+      "required_effect_fields": {
+        "_activated_rule_effects": [
+          {
+            "ability_kind": "activated",
+            "activated_effect": "target_stat_modifier_until_eot",
+            "activation_cost_colors": [
+              "W"
+            ],
+            "activation_cost_generic": 1,
+            "activation_cost_mana": "{1}{W}",
+            "activation_requires_sacrifice": false,
+            "activation_requires_tap": false,
+            "battle_model_scope": "xmage_permanent_simple_activated_target_boost_until_eot_v1",
+            "duration": "until_end_of_turn",
+            "effect": "stat_modifier_until_eot",
+            "power_boost": 1,
+            "power_delta": 1,
+            "target": "creature",
+            "target_constraints": {
+              "card_types": [
+                "creature"
+              ],
+              "target_subtypes": [
+                "soldier"
+              ]
+            },
+            "target_controller": "any",
+            "toughness_boost": 0,
+            "toughness_delta": 0,
+            "xmage_ability_class": "SimpleActivatedAbility",
+            "xmage_effect_class": "BoostTargetEffect"
+          }
+        ],
+        "ability_kind": "static_and_activated",
+        "activated_battle_model_scope": "xmage_permanent_simple_activated_target_boost_until_eot_v1",
+        "activated_effect": "target_stat_modifier_until_eot",
+        "activation_cost_colors": [
+          "W"
+        ],
+        "activation_cost_generic": 1,
+        "activation_cost_mana": "{1}{W}",
+        "activation_requires_sacrifice": false,
+        "activation_requires_tap": false,
+        "battle_model_scope": "xmage_permanent_simple_activated_target_boost_until_eot_v1",
+        "duration": "until_end_of_turn",
+        "effect": "creature",
+        "power_boost": 1,
+        "power_delta": 1,
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "target_subtypes": [
+            "soldier"
+          ]
+        },
+        "target_controller": "any",
+        "toughness_boost": 0,
+        "toughness_delta": 0,
+        "xmage_ability_class": "SimpleActivatedAbility",
+        "xmage_effect_class": "BoostTargetEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Infantry Veteran"
+      },
+      "card_name": "Infantry Veteran",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:af8ea6d2a1cb9b87bf619615c6ca6e63",
+      "normalized_name": "infantry veteran",
+      "required_effect_fields": {
+        "_activated_rule_effects": [
+          {
+            "ability_kind": "activated",
+            "activated_effect": "target_stat_modifier_until_eot",
+            "activation_cost_colors": [],
+            "activation_cost_generic": 0,
+            "activation_cost_mana": "{0}",
+            "activation_requires_sacrifice": false,
+            "activation_requires_tap": true,
+            "battle_model_scope": "xmage_permanent_simple_activated_target_boost_until_eot_v1",
+            "duration": "until_end_of_turn",
+            "effect": "stat_modifier_until_eot",
+            "power_boost": 1,
+            "power_delta": 1,
+            "target": "creature",
+            "target_constraints": {
+              "card_types": [
+                "creature"
+              ],
+              "combat_state": "attacking"
+            },
+            "target_controller": "any",
+            "toughness_boost": 1,
+            "toughness_delta": 1,
+            "xmage_ability_class": "SimpleActivatedAbility",
+            "xmage_effect_class": "BoostTargetEffect"
+          }
+        ],
+        "ability_kind": "static_and_activated",
+        "activated_battle_model_scope": "xmage_permanent_simple_activated_target_boost_until_eot_v1",
+        "activated_effect": "target_stat_modifier_until_eot",
+        "activation_cost_colors": [],
+        "activation_cost_generic": 0,
+        "activation_cost_mana": "{0}",
+        "activation_requires_sacrifice": false,
+        "activation_requires_tap": true,
+        "battle_model_scope": "xmage_permanent_simple_activated_target_boost_until_eot_v1",
+        "duration": "until_end_of_turn",
+        "effect": "creature",
+        "power_boost": 1,
+        "power_delta": 1,
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "combat_state": "attacking"
+        },
+        "target_controller": "any",
+        "toughness_boost": 1,
+        "toughness_delta": 1,
+        "xmage_ability_class": "SimpleActivatedAbility",
+        "xmage_effect_class": "BoostTargetEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Kabuto Moth"
+      },
+      "card_name": "Kabuto Moth",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:169904a5d718c1ca55b4aab13f76d843",
+      "normalized_name": "kabuto moth",
+      "required_effect_fields": {
+        "_activated_rule_effects": [
+          {
+            "ability_kind": "activated",
+            "activated_effect": "target_stat_modifier_until_eot",
+            "activation_cost_colors": [],
+            "activation_cost_generic": 0,
+            "activation_cost_mana": "{0}",
+            "activation_requires_sacrifice": false,
+            "activation_requires_tap": true,
+            "battle_model_scope": "xmage_permanent_simple_activated_target_boost_until_eot_v1",
+            "duration": "until_end_of_turn",
+            "effect": "stat_modifier_until_eot",
+            "power_boost": 1,
+            "power_delta": 1,
+            "target": "creature",
+            "target_constraints": {
+              "card_types": [
+                "creature"
+              ]
+            },
+            "target_controller": "any",
+            "toughness_boost": 2,
+            "toughness_delta": 2,
+            "xmage_ability_class": "SimpleActivatedAbility",
+            "xmage_effect_class": "BoostTargetEffect"
+          }
+        ],
+        "ability_kind": "static_and_activated",
+        "activated_battle_model_scope": "xmage_permanent_simple_activated_target_boost_until_eot_v1",
+        "activated_effect": "target_stat_modifier_until_eot",
+        "activation_cost_colors": [],
+        "activation_cost_generic": 0,
+        "activation_cost_mana": "{0}",
+        "activation_requires_sacrifice": false,
+        "activation_requires_tap": true,
+        "battle_model_scope": "xmage_permanent_simple_activated_target_boost_until_eot_v1",
+        "duration": "until_end_of_turn",
+        "effect": "creature",
+        "power_boost": 1,
+        "power_delta": 1,
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ]
+        },
+        "target_controller": "any",
+        "toughness_boost": 2,
+        "toughness_delta": 2,
+        "xmage_ability_class": "SimpleActivatedAbility",
+        "xmage_effect_class": "BoostTargetEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Kithkin Daggerdare"
+      },
+      "card_name": "Kithkin Daggerdare",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:31180b379df3a73774594e927cf36d30",
+      "normalized_name": "kithkin daggerdare",
+      "required_effect_fields": {
+        "_activated_rule_effects": [
+          {
+            "ability_kind": "activated",
+            "activated_effect": "target_stat_modifier_until_eot",
+            "activation_cost_colors": [
+              "G"
+            ],
+            "activation_cost_generic": 0,
+            "activation_cost_mana": "{G}",
+            "activation_requires_sacrifice": false,
+            "activation_requires_tap": true,
+            "battle_model_scope": "xmage_permanent_simple_activated_target_boost_until_eot_v1",
+            "duration": "until_end_of_turn",
+            "effect": "stat_modifier_until_eot",
+            "power_boost": 2,
+            "power_delta": 2,
+            "target": "creature",
+            "target_constraints": {
+              "card_types": [
+                "creature"
+              ],
+              "combat_state": "attacking"
+            },
+            "target_controller": "any",
+            "toughness_boost": 2,
+            "toughness_delta": 2,
+            "xmage_ability_class": "SimpleActivatedAbility",
+            "xmage_effect_class": "BoostTargetEffect"
+          }
+        ],
+        "ability_kind": "static_and_activated",
+        "activated_battle_model_scope": "xmage_permanent_simple_activated_target_boost_until_eot_v1",
+        "activated_effect": "target_stat_modifier_until_eot",
+        "activation_cost_colors": [
+          "G"
+        ],
+        "activation_cost_generic": 0,
+        "activation_cost_mana": "{G}",
+        "activation_requires_sacrifice": false,
+        "activation_requires_tap": true,
+        "battle_model_scope": "xmage_permanent_simple_activated_target_boost_until_eot_v1",
+        "duration": "until_end_of_turn",
+        "effect": "creature",
+        "power_boost": 2,
+        "power_delta": 2,
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "combat_state": "attacking"
+        },
+        "target_controller": "any",
+        "toughness_boost": 2,
+        "toughness_delta": 2,
+        "xmage_ability_class": "SimpleActivatedAbility",
+        "xmage_effect_class": "BoostTargetEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Phyrexian Debaser"
+      },
+      "card_name": "Phyrexian Debaser",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:c042a2a2d2e22937dc43fadef1dbf4ac",
+      "normalized_name": "phyrexian debaser",
+      "required_effect_fields": {
+        "_activated_rule_effects": [
+          {
+            "ability_kind": "activated",
+            "activated_effect": "target_stat_modifier_until_eot",
+            "activation_cost_colors": [],
+            "activation_cost_generic": 0,
+            "activation_cost_mana": "{0}",
+            "activation_requires_sacrifice": true,
+            "activation_requires_tap": true,
+            "battle_model_scope": "xmage_permanent_simple_activated_target_boost_until_eot_v1",
+            "duration": "until_end_of_turn",
+            "effect": "stat_modifier_until_eot",
+            "power_boost": -2,
+            "power_delta": -2,
+            "target": "creature",
+            "target_constraints": {
+              "card_types": [
+                "creature"
+              ],
+              "exclude_source": true
+            },
+            "target_controller": "any",
+            "toughness_boost": -2,
+            "toughness_delta": -2,
+            "xmage_ability_class": "SimpleActivatedAbility",
+            "xmage_effect_class": "BoostTargetEffect"
+          }
+        ],
+        "ability_kind": "static_and_activated",
+        "activated_battle_model_scope": "xmage_permanent_simple_activated_target_boost_until_eot_v1",
+        "activated_effect": "target_stat_modifier_until_eot",
+        "activation_cost_colors": [],
+        "activation_cost_generic": 0,
+        "activation_cost_mana": "{0}",
+        "activation_requires_sacrifice": true,
+        "activation_requires_tap": true,
+        "battle_model_scope": "xmage_permanent_simple_activated_target_boost_until_eot_v1",
+        "duration": "until_end_of_turn",
+        "effect": "creature",
+        "power_boost": -2,
+        "power_delta": -2,
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "exclude_source": true
+        },
+        "target_controller": "any",
+        "toughness_boost": -2,
+        "toughness_delta": -2,
+        "xmage_ability_class": "SimpleActivatedAbility",
+        "xmage_effect_class": "BoostTargetEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Serra Advocate"
+      },
+      "card_name": "Serra Advocate",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:f2957ecc36ae4e3e23efa241fcf239f8",
+      "normalized_name": "serra advocate",
+      "required_effect_fields": {
+        "_activated_rule_effects": [
+          {
+            "ability_kind": "activated",
+            "activated_effect": "target_stat_modifier_until_eot",
+            "activation_cost_colors": [],
+            "activation_cost_generic": 0,
+            "activation_cost_mana": "{0}",
+            "activation_requires_sacrifice": false,
+            "activation_requires_tap": true,
+            "battle_model_scope": "xmage_permanent_simple_activated_target_boost_until_eot_v1",
+            "duration": "until_end_of_turn",
+            "effect": "stat_modifier_until_eot",
+            "power_boost": 2,
+            "power_delta": 2,
+            "target": "creature",
+            "target_constraints": {
+              "card_types": [
+                "creature"
+              ],
+              "combat_state": "attacking_or_blocking"
+            },
+            "target_controller": "any",
+            "toughness_boost": 2,
+            "toughness_delta": 2,
+            "xmage_ability_class": "SimpleActivatedAbility",
+            "xmage_effect_class": "BoostTargetEffect"
+          }
+        ],
+        "ability_kind": "static_and_activated",
+        "activated_battle_model_scope": "xmage_permanent_simple_activated_target_boost_until_eot_v1",
+        "activated_effect": "target_stat_modifier_until_eot",
+        "activation_cost_colors": [],
+        "activation_cost_generic": 0,
+        "activation_cost_mana": "{0}",
+        "activation_requires_sacrifice": false,
+        "activation_requires_tap": true,
+        "battle_model_scope": "xmage_permanent_simple_activated_target_boost_until_eot_v1",
+        "duration": "until_end_of_turn",
+        "effect": "creature",
+        "power_boost": 2,
+        "power_delta": 2,
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "combat_state": "attacking_or_blocking"
+        },
+        "target_controller": "any",
+        "toughness_boost": 2,
+        "toughness_delta": 2,
+        "xmage_ability_class": "SimpleActivatedAbility",
+        "xmage_effect_class": "BoostTargetEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Spirit Weaver"
+      },
+      "card_name": "Spirit Weaver",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:8669f951a8e25c612de030225cace7c2",
+      "normalized_name": "spirit weaver",
+      "required_effect_fields": {
+        "_activated_rule_effects": [
+          {
+            "ability_kind": "activated",
+            "activated_effect": "target_stat_modifier_until_eot",
+            "activation_cost_colors": [],
+            "activation_cost_generic": 2,
+            "activation_cost_mana": "{2}",
+            "activation_requires_sacrifice": false,
+            "activation_requires_tap": false,
+            "battle_model_scope": "xmage_permanent_simple_activated_target_boost_until_eot_v1",
+            "duration": "until_end_of_turn",
+            "effect": "stat_modifier_until_eot",
+            "power_boost": 0,
+            "power_delta": 0,
+            "target": "creature",
+            "target_constraints": {
+              "card_types": [
+                "creature"
+              ],
+              "target_colors": [
+                "U",
+                "G"
+              ]
+            },
+            "target_controller": "any",
+            "toughness_boost": 1,
+            "toughness_delta": 1,
+            "xmage_ability_class": "SimpleActivatedAbility",
+            "xmage_effect_class": "BoostTargetEffect"
+          }
+        ],
+        "ability_kind": "static_and_activated",
+        "activated_battle_model_scope": "xmage_permanent_simple_activated_target_boost_until_eot_v1",
+        "activated_effect": "target_stat_modifier_until_eot",
+        "activation_cost_colors": [],
+        "activation_cost_generic": 2,
+        "activation_cost_mana": "{2}",
+        "activation_requires_sacrifice": false,
+        "activation_requires_tap": false,
+        "battle_model_scope": "xmage_permanent_simple_activated_target_boost_until_eot_v1",
+        "duration": "until_end_of_turn",
+        "effect": "creature",
+        "power_boost": 0,
+        "power_delta": 0,
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "target_colors": [
+            "U",
+            "G"
+          ]
+        },
+        "target_controller": "any",
+        "toughness_boost": 1,
+        "toughness_delta": 1,
+        "xmage_ability_class": "SimpleActivatedAbility",
+        "xmage_effect_class": "BoostTargetEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Sword Dancer"
+      },
+      "card_name": "Sword Dancer",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:897b4da05a4b4dcd5dfd281a36f4195e",
+      "normalized_name": "sword dancer",
+      "required_effect_fields": {
+        "_activated_rule_effects": [
+          {
+            "ability_kind": "activated",
+            "activated_effect": "target_stat_modifier_until_eot",
+            "activation_cost_colors": [
+              "W",
+              "W"
+            ],
+            "activation_cost_generic": 0,
+            "activation_cost_mana": "{W}{W}",
+            "activation_requires_sacrifice": false,
+            "activation_requires_tap": false,
+            "battle_model_scope": "xmage_permanent_simple_activated_target_boost_until_eot_v1",
+            "duration": "until_end_of_turn",
+            "effect": "stat_modifier_until_eot",
+            "power_boost": -1,
+            "power_delta": -1,
+            "target": "creature",
+            "target_constraints": {
+              "card_types": [
+                "creature"
+              ],
+              "combat_state": "attacking"
+            },
+            "target_controller": "any",
+            "toughness_boost": 0,
+            "toughness_delta": 0,
+            "xmage_ability_class": "SimpleActivatedAbility",
+            "xmage_effect_class": "BoostTargetEffect"
+          }
+        ],
+        "ability_kind": "static_and_activated",
+        "activated_battle_model_scope": "xmage_permanent_simple_activated_target_boost_until_eot_v1",
+        "activated_effect": "target_stat_modifier_until_eot",
+        "activation_cost_colors": [
+          "W",
+          "W"
+        ],
+        "activation_cost_generic": 0,
+        "activation_cost_mana": "{W}{W}",
+        "activation_requires_sacrifice": false,
+        "activation_requires_tap": false,
+        "battle_model_scope": "xmage_permanent_simple_activated_target_boost_until_eot_v1",
+        "duration": "until_end_of_turn",
+        "effect": "creature",
+        "power_boost": -1,
+        "power_delta": -1,
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "combat_state": "attacking"
+        },
+        "target_controller": "any",
+        "toughness_boost": 0,
+        "toughness_delta": 0,
+        "xmage_ability_class": "SimpleActivatedAbility",
+        "xmage_effect_class": "BoostTargetEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Sword of the Chosen"
+      },
+      "card_name": "Sword of the Chosen",
+      "effect": "artifact",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:07c868edf81ca3a70b7e63720fbe9d75",
+      "normalized_name": "sword of the chosen",
+      "required_effect_fields": {
+        "_activated_rule_effects": [
+          {
+            "ability_kind": "activated",
+            "activated_effect": "target_stat_modifier_until_eot",
+            "activation_cost_colors": [],
+            "activation_cost_generic": 0,
+            "activation_cost_mana": "{0}",
+            "activation_requires_sacrifice": false,
+            "activation_requires_tap": true,
+            "battle_model_scope": "xmage_permanent_simple_activated_target_boost_until_eot_v1",
+            "duration": "until_end_of_turn",
+            "effect": "stat_modifier_until_eot",
+            "power_boost": 2,
+            "power_delta": 2,
+            "target": "creature",
+            "target_constraints": {
+              "card_types": [
+                "creature"
+              ],
+              "required_supertypes": [
+                "legendary"
+              ]
+            },
+            "target_controller": "any",
+            "toughness_boost": 2,
+            "toughness_delta": 2,
+            "xmage_ability_class": "SimpleActivatedAbility",
+            "xmage_effect_class": "BoostTargetEffect"
+          }
+        ],
+        "ability_kind": "static_and_activated",
+        "activated_battle_model_scope": "xmage_permanent_simple_activated_target_boost_until_eot_v1",
+        "activated_effect": "target_stat_modifier_until_eot",
+        "activation_cost_colors": [],
+        "activation_cost_generic": 0,
+        "activation_cost_mana": "{0}",
+        "activation_requires_sacrifice": false,
+        "activation_requires_tap": true,
+        "battle_model_scope": "xmage_permanent_simple_activated_target_boost_until_eot_v1",
+        "duration": "until_end_of_turn",
+        "effect": "artifact",
+        "power_boost": 2,
+        "power_delta": 2,
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "required_supertypes": [
+            "legendary"
+          ]
+        },
+        "target_controller": "any",
+        "toughness_boost": 2,
+        "toughness_delta": 2,
+        "xmage_ability_class": "SimpleActivatedAbility",
+        "xmage_effect_class": "BoostTargetEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Tuknir Deathlock"
+      },
+      "card_name": "Tuknir Deathlock",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:16bf728ba5de84a9cff44ad9b29b56b4",
+      "normalized_name": "tuknir deathlock",
+      "required_effect_fields": {
+        "_activated_rule_effects": [
+          {
+            "ability_kind": "activated",
+            "activated_effect": "target_stat_modifier_until_eot",
+            "activation_cost_colors": [
+              "R",
+              "G"
+            ],
+            "activation_cost_generic": 0,
+            "activation_cost_mana": "{R}{G}",
+            "activation_requires_sacrifice": false,
+            "activation_requires_tap": true,
+            "battle_model_scope": "xmage_permanent_simple_activated_target_boost_until_eot_v1",
+            "duration": "until_end_of_turn",
+            "effect": "stat_modifier_until_eot",
+            "power_boost": 2,
+            "power_delta": 2,
+            "target": "creature",
+            "target_constraints": {
+              "card_types": [
+                "creature"
+              ]
+            },
+            "target_controller": "any",
+            "toughness_boost": 2,
+            "toughness_delta": 2,
+            "xmage_ability_class": "SimpleActivatedAbility",
+            "xmage_effect_class": "BoostTargetEffect"
+          }
+        ],
+        "ability_kind": "static_and_activated",
+        "activated_battle_model_scope": "xmage_permanent_simple_activated_target_boost_until_eot_v1",
+        "activated_effect": "target_stat_modifier_until_eot",
+        "activation_cost_colors": [
+          "R",
+          "G"
+        ],
+        "activation_cost_generic": 0,
+        "activation_cost_mana": "{R}{G}",
+        "activation_requires_sacrifice": false,
+        "activation_requires_tap": true,
+        "battle_model_scope": "xmage_permanent_simple_activated_target_boost_until_eot_v1",
+        "duration": "until_end_of_turn",
+        "effect": "creature",
+        "power_boost": 2,
+        "power_delta": 2,
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ]
+        },
+        "target_controller": "any",
+        "toughness_boost": 2,
+        "toughness_delta": 2,
+        "xmage_ability_class": "SimpleActivatedAbility",
+        "xmage_effect_class": "BoostTargetEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Wilderness Hypnotist"
+      },
+      "card_name": "Wilderness Hypnotist",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:45bfe4fd066c3f71a2d71272b70ed607",
+      "normalized_name": "wilderness hypnotist",
+      "required_effect_fields": {
+        "_activated_rule_effects": [
+          {
+            "ability_kind": "activated",
+            "activated_effect": "target_stat_modifier_until_eot",
+            "activation_cost_colors": [],
+            "activation_cost_generic": 0,
+            "activation_cost_mana": "{0}",
+            "activation_requires_sacrifice": false,
+            "activation_requires_tap": true,
+            "battle_model_scope": "xmage_permanent_simple_activated_target_boost_until_eot_v1",
+            "duration": "until_end_of_turn",
+            "effect": "stat_modifier_until_eot",
+            "power_boost": -2,
+            "power_delta": -2,
+            "target": "creature",
+            "target_constraints": {
+              "card_types": [
+                "creature"
+              ],
+              "target_colors": [
+                "R",
+                "G"
+              ]
+            },
+            "target_controller": "any",
+            "toughness_boost": 0,
+            "toughness_delta": 0,
+            "xmage_ability_class": "SimpleActivatedAbility",
+            "xmage_effect_class": "BoostTargetEffect"
+          }
+        ],
+        "ability_kind": "static_and_activated",
+        "activated_battle_model_scope": "xmage_permanent_simple_activated_target_boost_until_eot_v1",
+        "activated_effect": "target_stat_modifier_until_eot",
+        "activation_cost_colors": [],
+        "activation_cost_generic": 0,
+        "activation_cost_mana": "{0}",
+        "activation_requires_sacrifice": false,
+        "activation_requires_tap": true,
+        "battle_model_scope": "xmage_permanent_simple_activated_target_boost_until_eot_v1",
+        "duration": "until_end_of_turn",
+        "effect": "creature",
+        "power_boost": -2,
+        "power_delta": -2,
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "target_colors": [
+            "R",
+            "G"
+          ]
+        },
+        "target_controller": "any",
+        "toughness_boost": 0,
+        "toughness_delta": 0,
+        "xmage_ability_class": "SimpleActivatedAbility",
+        "xmage_effect_class": "BoostTargetEffect"
+      }
+    }
+  ],
+  "selected_card_names": [
+    "Aegis of the Meek",
+    "Alpha Kavu",
+    "Angelic Page",
+    "Anointer of Champions",
+    "Assembly-Worker",
+    "Crenellated Wall",
+    "Dwarven Lieutenant",
+    "Grassland Crusader",
+    "Hate Weaver",
+    "Hoof Skulkin",
+    "Icatian Lieutenant",
+    "Infantry Veteran",
+    "Kabuto Moth",
+    "Kithkin Daggerdare",
+    "Phyrexian Debaser",
+    "Serra Advocate",
+    "Spirit Weaver",
+    "Sword Dancer",
+    "Sword of the Chosen",
+    "Tuknir Deathlock",
+    "Wilderness Hypnotist"
+  ],
+  "selected_count": 21,
+  "slug": "activated_target_boost_new_server",
+  "snapshot_checks": [
+    {
+      "card_name": "Aegis of the Meek",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:2ae27e7b044d26f97848d01d210ab78b",
+      "min_rule_version": 2,
+      "normalized_name": "aegis of the meek",
+      "oracle_hash": "bd80c63c481b2e13821b363ceab8b37e",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_permanent_simple_activated_target_boost_until_eot_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Alpha Kavu",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:39b8573e388d05753b1c5cd494ade119",
+      "min_rule_version": 2,
+      "normalized_name": "alpha kavu",
+      "oracle_hash": "33ab9ab2794b354809a082797e7a32ff",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_permanent_simple_activated_target_boost_until_eot_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Angelic Page",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:bdaae8162a6e1149bba3eb9b1082c96b",
+      "min_rule_version": 2,
+      "normalized_name": "angelic page",
+      "oracle_hash": "612184b36e46a7b2e4f8bfa1bca32f2a",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_permanent_simple_activated_target_boost_until_eot_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Anointer of Champions",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:af8ea6d2a1cb9b87bf619615c6ca6e63",
+      "min_rule_version": 2,
+      "normalized_name": "anointer of champions",
+      "oracle_hash": "c8688d75d4a2d459a474986c45d2b400",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_permanent_simple_activated_target_boost_until_eot_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Assembly-Worker",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:1dd783caf9f450c1d3263b7bb7699ec5",
+      "min_rule_version": 2,
+      "normalized_name": "assembly-worker",
+      "oracle_hash": "128c306538f6c84b2d8231f9eba53f95",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_permanent_simple_activated_target_boost_until_eot_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Crenellated Wall",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:c9767f4d6cb4ae481d93fe1e11400f06",
+      "min_rule_version": 2,
+      "normalized_name": "crenellated wall",
+      "oracle_hash": "b59c9e276e64ef9c26720be710b79e4b",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_permanent_simple_activated_target_boost_until_eot_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Dwarven Lieutenant",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:8bbcde679d280d8695d8beaf568d927f",
+      "min_rule_version": 2,
+      "normalized_name": "dwarven lieutenant",
+      "oracle_hash": "73690c7aecd048c243775562b83ff703",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_permanent_simple_activated_target_boost_until_eot_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Grassland Crusader",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:103e5a32b9023c725d8209cca6ab7e70",
+      "min_rule_version": 2,
+      "normalized_name": "grassland crusader",
+      "oracle_hash": "8e5d830bba171b3eb332ddcc51a24a3c",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_permanent_simple_activated_target_boost_until_eot_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Hate Weaver",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:e9abc18cd5b0073bb47164c50e3fee6f",
+      "min_rule_version": 2,
+      "normalized_name": "hate weaver",
+      "oracle_hash": "8ffef55b605901b37d4d0823ef0d40c0",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_permanent_simple_activated_target_boost_until_eot_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Hoof Skulkin",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:d923a862e58bdc89bcc435ec5e2c906a",
+      "min_rule_version": 2,
+      "normalized_name": "hoof skulkin",
+      "oracle_hash": "d68596289204099a770a8e0f0d39db15",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_permanent_simple_activated_target_boost_until_eot_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Icatian Lieutenant",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:75ffbd696e0fb4e9d5e218ff2aae551a",
+      "min_rule_version": 2,
+      "normalized_name": "icatian lieutenant",
+      "oracle_hash": "ccf08104cc0c0aa529d422c86bf329e3",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_permanent_simple_activated_target_boost_until_eot_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Infantry Veteran",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:af8ea6d2a1cb9b87bf619615c6ca6e63",
+      "min_rule_version": 2,
+      "normalized_name": "infantry veteran",
+      "oracle_hash": "c8688d75d4a2d459a474986c45d2b400",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_permanent_simple_activated_target_boost_until_eot_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Kabuto Moth",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:169904a5d718c1ca55b4aab13f76d843",
+      "min_rule_version": 2,
+      "normalized_name": "kabuto moth",
+      "oracle_hash": "bf448c1541a0c96b6c9d930299e8c07a",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_permanent_simple_activated_target_boost_until_eot_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Kithkin Daggerdare",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:31180b379df3a73774594e927cf36d30",
+      "min_rule_version": 2,
+      "normalized_name": "kithkin daggerdare",
+      "oracle_hash": "09f8ba3414302a1f6ef48145d2900015",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_permanent_simple_activated_target_boost_until_eot_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Phyrexian Debaser",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:c042a2a2d2e22937dc43fadef1dbf4ac",
+      "min_rule_version": 2,
+      "normalized_name": "phyrexian debaser",
+      "oracle_hash": "b9cce90ff2eb3e09c885835ae540023e",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_permanent_simple_activated_target_boost_until_eot_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Serra Advocate",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:f2957ecc36ae4e3e23efa241fcf239f8",
+      "min_rule_version": 2,
+      "normalized_name": "serra advocate",
+      "oracle_hash": "69ab38010128bf47681dd519e792660b",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_permanent_simple_activated_target_boost_until_eot_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Spirit Weaver",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:8669f951a8e25c612de030225cace7c2",
+      "min_rule_version": 2,
+      "normalized_name": "spirit weaver",
+      "oracle_hash": "8d1c91a891e2aa95d486ab19acedba22",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_permanent_simple_activated_target_boost_until_eot_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Sword Dancer",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:897b4da05a4b4dcd5dfd281a36f4195e",
+      "min_rule_version": 2,
+      "normalized_name": "sword dancer",
+      "oracle_hash": "edf8fc39ce3aa6e3cc7c2c575aee209f",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_permanent_simple_activated_target_boost_until_eot_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Sword of the Chosen",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:07c868edf81ca3a70b7e63720fbe9d75",
+      "min_rule_version": 2,
+      "normalized_name": "sword of the chosen",
+      "oracle_hash": "a9ce48496e82a20a9516011a0c6ed1c2",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_permanent_simple_activated_target_boost_until_eot_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Tuknir Deathlock",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:16bf728ba5de84a9cff44ad9b29b56b4",
+      "min_rule_version": 2,
+      "normalized_name": "tuknir deathlock",
+      "oracle_hash": "2d7864f9152fadbad7b065fdba589e6b",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_permanent_simple_activated_target_boost_until_eot_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Wilderness Hypnotist",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:45bfe4fd066c3f71a2d71272b70ed607",
+      "min_rule_version": 2,
+      "normalized_name": "wilderness hypnotist",
+      "oracle_hash": "9e7179d80129094661af5e96c7c982a3",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_permanent_simple_activated_target_boost_until_eot_v1"
+      },
+      "review_status": "verified"
+    }
+  ],
+  "status": "prepared_read_only_pending_apply_approval"
+}

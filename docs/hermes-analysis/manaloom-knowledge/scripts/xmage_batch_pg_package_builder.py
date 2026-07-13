@@ -8171,6 +8171,59 @@ def simple_activated_target_keyword_execution_scenario_from_expected_rule(
     return scenario
 
 
+def simple_activated_target_boost_execution_scenario_from_expected_rule(
+    rule: dict[str, Any],
+) -> dict[str, Any] | None:
+    required = dict(rule.get("required_effect_fields") or {})
+    if required.get("battle_model_scope") != "xmage_permanent_simple_activated_target_boost_until_eot_v1":
+        return None
+    constraints = dict(required.get("target_constraints") or {})
+    if not constraints.get("card_types"):
+        target_type = str(required.get("target") or "creature").strip().lower()
+        constraints["card_types"] = [target_type if target_type else "creature"]
+    target = _target_fixture_from_constraints(
+        "E2E Target Boost Legal Target",
+        constraints,
+        matching=True,
+    )
+    if (
+        "creature" in str(target.get("type_line") or "").lower()
+        and constraints.get("power_min") is None
+        and constraints.get("power_max") is None
+        and constraints.get("toughness_min") is None
+        and constraints.get("toughness_max") is None
+    ):
+        target["power"] = max(int(target.get("power") or 0), 4)
+        target["toughness"] = max(int(target.get("toughness") or 0), 4)
+    power_delta = int(required.get("power_delta") or required.get("power_boost") or 0)
+    toughness_delta = int(required.get("toughness_delta") or required.get("toughness_boost") or 0)
+    required_target_controller = str(required.get("target_controller") or "any").strip().lower()
+    harmful = power_delta < 0 or toughness_delta < 0
+    scenario_target_controller = (
+        "opponent"
+        if required_target_controller in {"any", ""}
+        and harmful
+        else "self"
+        if required_target_controller in {"any", ""}
+        else required_target_controller
+    )
+    return {
+        "name": f"{rule['card_name']} activates target boost ability",
+        "type": "simple_activated_target_boost",
+        "card": {"name": rule["card_name"]},
+        "target": target,
+        "target_controller": scenario_target_controller,
+        "controller_mana": _manifest_mana_for_required_activation(required),
+        "expected_tapped_source": bool(required.get("activation_requires_tap")),
+        "expected_sacrificed_source": bool(required.get("activation_requires_sacrifice")),
+        "expected_power_delta": power_delta,
+        "expected_toughness_delta": toughness_delta,
+        "expected_target": required.get("target") or "creature",
+        "expected_target_constraints": constraints,
+        "logical_rule_key": rule["logical_rule_key"],
+    }
+
+
 def target_keyword_spell_execution_scenario_from_expected_rule(
     rule: dict[str, Any],
 ) -> dict[str, Any] | None:
@@ -9124,7 +9177,12 @@ def _target_fixture_from_constraints(
 
     required_subtypes = {
         str(value).strip().lower()
-        for value in active_constraints.get("required_subtypes") or []
+        for value in (
+            active_constraints.get("required_subtypes")
+            or active_constraints.get("target_subtypes")
+            or active_constraints.get("subtypes")
+            or []
+        )
         if str(value).strip()
     }
     if matching:
@@ -10769,6 +10827,7 @@ def execution_scenario_from_expected_rule(rule: dict[str, Any]) -> dict[str, Any
         or simple_activated_self_keyword_execution_scenario_from_expected_rule(rule)
         or simple_activated_regenerate_source_execution_scenario_from_expected_rule(rule)
         or simple_activated_regenerate_target_execution_scenario_from_expected_rule(rule)
+        or simple_activated_target_boost_execution_scenario_from_expected_rule(rule)
         or simple_activated_target_keyword_execution_scenario_from_expected_rule(rule)
         or controlled_stat_modifier_execution_scenario_from_expected_rule(rule)
         or target_keyword_spell_execution_scenario_from_expected_rule(rule)

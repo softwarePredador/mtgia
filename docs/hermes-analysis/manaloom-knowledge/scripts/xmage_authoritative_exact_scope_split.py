@@ -21378,24 +21378,29 @@ def activated_regenerate_target_from_source(source: str) -> dict[str, Any] | str
 
 
 def activated_target_boost_from_oracle(metadata: dict[str, Any]) -> dict[str, Any] | str:
-    text = re.sub(r"\s+", " ", oracle_text(metadata)).strip().lower()
+    text = strip_parenthetical_reminders(
+        oracle_text_after_leading_static_keywords(metadata)
+    )
+    text = re.sub(r"\s+", " ", text).strip().lower()
     if text.count(":") != 1:
         return "activated_target_boost_oracle_not_simple"
     cost_text, effect_text = [part.strip() for part in text.split(":", 1)]
     match = re.match(
-        r"^target creature gets ([+-]?\d+)/([+-]?\d+) until end of turn\.?$",
+        r"^(target .+?) gets ([+-]?\d+)/([+-]?\d+) until end of turn\.?$",
         effect_text,
     )
     if not match:
         return "activated_target_boost_oracle_not_simple"
+    target_data = activated_target_boost_target_phrase_data(match.group(1))
+    if isinstance(target_data, str):
+        return target_data.replace("source", "oracle")
     activation = activation_cost_from_oracle_prefix(cost_text, allow_source_sacrifice=True)
     if isinstance(activation, str):
         return str(activation).replace("activated_self_boost", "activated_target_boost")
     return {
-        "power_delta": int(match.group(1)),
-        "toughness_delta": int(match.group(2)),
-        "target": "creature",
-        "target_controller": "any",
+        "power_delta": int(match.group(2)),
+        "toughness_delta": int(match.group(3)),
+        **target_data,
         **activation,
     }
 
@@ -21457,8 +21462,9 @@ def activated_target_boost_from_source(source: str) -> dict[str, Any] | str:
     target_constructors = re.findall(r"new\s+(Target\w+)\s*\(", text)
     if len(target_constructors) != 1:
         return "activated_target_boost_source_target_not_supported"
-    if not re.search(r"new\s+TargetCreaturePermanent\s*\(\s*\)", text, re.S):
-        return "activated_target_boost_source_target_not_supported"
+    target_data = activated_target_boost_target_from_source(text)
+    if isinstance(target_data, str):
+        return target_data
     boost_matches = re.findall(
         r"new\s+BoostTargetEffect\s*\(\s*([+-]?\d+)\s*,\s*([+-]?\d+)\s*"
         r"(?:,\s*Duration\.EndOfTurn\s*)?\)",
@@ -21477,10 +21483,142 @@ def activated_target_boost_from_source(source: str) -> dict[str, Any] | str:
     return {
         "power_delta": int(boost_matches[0][0]),
         "toughness_delta": int(boost_matches[0][1]),
-        "target": "creature",
-        "target_controller": "any",
+        **target_data,
         **activation,
     }
+
+
+def activated_target_boost_target_phrase_data(phrase: str) -> dict[str, Any] | str:
+    normalized = re.sub(r"\s+", " ", str(phrase or "").strip().lower())
+    normalized = re.sub(r"^(?:another\s+)?target\s+", "", normalized).strip()
+    exclude_source = bool(re.match(r"^(?:another\s+target|another)\s+", str(phrase or "").strip().lower()))
+    target_controller = "any"
+    if normalized.endswith(" you control"):
+        target_controller = "self"
+        normalized = normalized[: -len(" you control")].strip()
+    combat_state = None
+    for prefix, state in (
+        ("attacking or blocking ", "attacking_or_blocking"),
+        ("attacking ", "attacking"),
+        ("blocking ", "blocking"),
+    ):
+        if normalized.startswith(prefix):
+            combat_state = state
+            normalized = normalized[len(prefix) :].strip()
+            break
+    constraints: dict[str, Any] = {"card_types": ["creature"]}
+    if exclude_source:
+        constraints["exclude_source"] = True
+    if combat_state:
+        constraints["combat_state"] = combat_state
+    pt_match = re.fullmatch(r"(?P<power>\d+)\/(?P<toughness>\d+) creature", normalized)
+    if pt_match:
+        constraints = {
+            "card_types": ["creature"],
+            **({"exclude_source": True} if constraints.get("exclude_source") else {}),
+            **({"combat_state": constraints["combat_state"]} if constraints.get("combat_state") else {}),
+            "power_min": int(pt_match.group("power")),
+            "power_max": int(pt_match.group("power")),
+            "toughness_min": int(pt_match.group("toughness")),
+            "toughness_max": int(pt_match.group("toughness")),
+        }
+        return {
+            "target": "creature",
+            "target_controller": target_controller,
+            "exclude_source": exclude_source,
+            "target_constraints": constraints,
+        }
+    if normalized == "creature":
+        return {
+            "target": "creature",
+            "target_controller": target_controller,
+            "exclude_source": exclude_source,
+            "target_constraints": constraints,
+        }
+    if not normalized.endswith(" creature"):
+        return "activated_target_boost_source_target_not_supported"
+    modifier = normalized[: -len(" creature")].strip(" ,")
+    if not modifier:
+        return "activated_target_boost_source_target_not_supported"
+    if "nonattacking" in modifier or "nonblocking" in modifier:
+        return "activated_target_boost_source_target_not_supported"
+    if modifier == "legendary":
+        constraints["required_supertypes"] = ["legendary"]
+    elif modifier == "snow":
+        constraints["required_supertypes"] = ["snow"]
+    else:
+        color_parts = [part.strip() for part in re.split(r"\s+or\s+", modifier) if part.strip()]
+        color_symbols = [TARGET_KEYWORD_TARGET_COLOR_WORDS.get(part) for part in color_parts]
+        if color_symbols and all(color_symbols):
+            constraints["target_colors"] = ordered_color_symbols([str(symbol) for symbol in color_symbols])
+        else:
+            subtype_phrases = [part.strip() for part in re.split(r"\s+or\s+", modifier) if part.strip()]
+            subtype_values: list[str] = []
+            compound_subtype = False
+            for subtype_phrase in subtype_phrases:
+                tokens = target_keyword_subtypes_from_phrase(subtype_phrase)
+                if not tokens:
+                    return "activated_target_boost_source_target_not_supported"
+                subtype_values.extend(tokens)
+                if len(tokens) > 1:
+                    compound_subtype = True
+            constraints["target_subtypes"] = list(dict.fromkeys(subtype_values))
+            if compound_subtype and len(subtype_phrases) == 1:
+                constraints["required_subtype_match"] = "all"
+    return {
+        "target": "creature",
+        "target_controller": target_controller,
+        "exclude_source": exclude_source,
+        "target_constraints": constraints,
+    }
+
+
+def activated_target_boost_target_from_source(source: str) -> dict[str, Any] | str:
+    text = source or ""
+    if re.search(r"new\s+TargetCreaturePermanent\s*\(\s*\)", text, re.S):
+        return activated_target_boost_target_phrase_data("creature")
+    if re.search(r"new\s+TargetAttackingCreature\s*\(\s*\)", text, re.S):
+        return activated_target_boost_target_phrase_data("attacking creature")
+    if "FilterAttackingOrBlockingCreature" in text:
+        return activated_target_boost_target_phrase_data("attacking or blocking creature")
+    descriptions = re.findall(
+        r"new\s+FilterCreaturePermanent\s*\(\s*\"([^\"]+)\"\s*\)",
+        text,
+        re.S,
+    )
+    if len(descriptions) == 1 and re.search(r"new\s+TargetPermanent\s*\(", text, re.S):
+        target_data = activated_target_boost_target_phrase_data(descriptions[0])
+        if isinstance(target_data, str):
+            return target_data.replace("oracle", "source")
+        constraints = dict(target_data.get("target_constraints") or {})
+        power_match = re.search(
+            r"PowerPredicate\s*\(\s*ComparisonType\.EQUAL_TO\s*,\s*(\d+)\s*\)",
+            text,
+            re.S,
+        )
+        toughness_match = re.search(
+            r"ToughnessPredicate\s*\(\s*ComparisonType\.EQUAL_TO\s*,\s*(\d+)\s*\)",
+            text,
+            re.S,
+        )
+        if power_match:
+            power = int(power_match.group(1))
+            if constraints.get("power_min") not in (None, power) or constraints.get("power_max") not in (None, power):
+                return "activated_target_boost_source_target_not_supported"
+            constraints["power_min"] = power
+            constraints["power_max"] = power
+        if toughness_match:
+            toughness = int(toughness_match.group(1))
+            if (
+                constraints.get("toughness_min") not in (None, toughness)
+                or constraints.get("toughness_max") not in (None, toughness)
+            ):
+                return "activated_target_boost_source_target_not_supported"
+            constraints["toughness_min"] = toughness
+            constraints["toughness_max"] = toughness
+        target_data["target_constraints"] = constraints
+        return target_data
+    return "activated_target_boost_source_target_not_supported"
 
 
 def activated_target_keyword_from_oracle(metadata: dict[str, Any]) -> dict[str, Any] | str:
@@ -36733,6 +36871,10 @@ def split_row(
         for key in ("power_delta", "toughness_delta", "target", "target_controller"):
             if parsed_activation.get(key) != oracle_boost.get(key):
                 return None, f"activated_target_boost_source_oracle_{key}_mismatch"
+        if dict(parsed_activation.get("target_constraints") or {}) != dict(
+            oracle_boost.get("target_constraints") or {}
+        ):
+            return None, "activated_target_boost_source_oracle_target_constraints_mismatch"
         source_cost = (
             int(parsed_activation["activation_cost_generic"]),
             list(parsed_activation["activation_cost_colors"]),
@@ -36747,7 +36889,7 @@ def split_row(
         )
         if source_cost != oracle_cost:
             return None, "activated_target_boost_source_oracle_cost_mismatch"
-        target_constraints = {"card_types": ["creature"]}
+        target_constraints = dict(oracle_boost.get("target_constraints") or {"card_types": ["creature"]})
         if bool(parsed_activation["activation_requires_sacrifice"]):
             target_constraints["exclude_source"] = True
         activated_effect = {
@@ -36755,8 +36897,8 @@ def split_row(
             "battle_model_scope": TARGET_BOOST_ACTIVATED_SCOPE,
             "ability_kind": "activated",
             "activated_effect": "target_stat_modifier_until_eot",
-            "target": "creature",
-            "target_controller": "any",
+            "target": oracle_boost.get("target") or "creature",
+            "target_controller": oracle_boost.get("target_controller") or "any",
             "target_constraints": target_constraints,
             "power_delta": int(oracle_boost["power_delta"]),
             "toughness_delta": int(oracle_boost["toughness_delta"]),
@@ -36787,8 +36929,8 @@ def split_row(
             "ability_kind": "static_and_activated",
             "activated_effect": "target_stat_modifier_until_eot",
             "activated_battle_model_scope": TARGET_BOOST_ACTIVATED_SCOPE,
-            "target": "creature",
-            "target_controller": "any",
+            "target": oracle_boost.get("target") or "creature",
+            "target_controller": oracle_boost.get("target_controller") or "any",
             "target_constraints": target_constraints,
             "power_delta": int(oracle_boost["power_delta"]),
             "toughness_delta": int(oracle_boost["toughness_delta"]),

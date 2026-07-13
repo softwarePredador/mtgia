@@ -10253,7 +10253,25 @@ def run_simple_activated_target_keyword(
             **dict(scenario.get("source_overrides") or {}),
         }
     )
-    target = battle.enrich_card(dict(scenario["target"]))
+    target_payload = dict(scenario["target"])
+    target_constraints = dict(scenario.get("expected_target_constraints") or effect.get("target_constraints") or {})
+    target_subtypes = [
+        str(value).strip().lower()
+        for value in (
+            target_constraints.get("required_subtypes")
+            or target_constraints.get("target_subtypes")
+            or target_constraints.get("subtypes")
+            or []
+        )
+        if str(value).strip()
+    ]
+    if target_subtypes and not target_payload.get("subtypes"):
+        target_payload["subtypes"] = target_subtypes
+        if "creature" in str(target_payload.get("type_line") or "").lower():
+            target_payload["type_line"] = "Creature - " + " ".join(
+                subtype.title() for subtype in target_subtypes
+            )
+    target = battle.enrich_card(target_payload)
     active = battle.Player(str(scenario.get("player") or "Activated Controller"), None, [])
     opponent = battle.Player(str(scenario.get("opponent") or "Activated Opponent"), None, [])
     active.battlefield = [source]
@@ -10348,6 +10366,170 @@ def run_simple_activated_target_keyword(
         "source_tapped": bool(source.get("tapped")),
         "sacrificed_source": expected_sacrificed_source,
         "target_sacrificed": bool(sacrifice_target is not None and sacrifice_target in active.graveyard),
+    }
+
+
+def run_simple_activated_target_boost(
+    battle,
+    scenario: dict[str, Any],
+    events: list[tuple[str, dict[str, Any]]],
+) -> dict[str, Any]:
+    card = dict(scenario["card"])
+    effect = battle.get_card_effect(card)
+    permanent_type = str(effect.get("effect") or "creature")
+    default_type_line = {
+        "creature": "Creature - Soldier",
+        "artifact": "Artifact",
+        "enchantment": "Enchantment",
+    }.get(permanent_type, "Creature - Soldier")
+    source = battle.enrich_card(
+        {
+            **card,
+            "type_line": default_type_line,
+            "effect": permanent_type,
+            "power": int(scenario.get("source_power") or 2),
+            "toughness": int(scenario.get("source_toughness") or 2),
+            "summoning_sick": False,
+            **effect,
+            **dict(scenario.get("source_overrides") or {}),
+        }
+    )
+    target_payload = dict(scenario["target"])
+    target_constraints = dict(scenario.get("expected_target_constraints") or effect.get("target_constraints") or {})
+    target_subtypes = [
+        str(value).strip().lower()
+        for value in (
+            target_constraints.get("required_subtypes")
+            or target_constraints.get("target_subtypes")
+            or target_constraints.get("subtypes")
+            or []
+        )
+        if str(value).strip()
+    ]
+    if target_subtypes and not target_payload.get("subtypes"):
+        target_payload["subtypes"] = target_subtypes
+        if "creature" in str(target_payload.get("type_line") or "").lower():
+            target_payload["type_line"] = "Creature - " + " ".join(
+                subtype.title() for subtype in target_subtypes
+            )
+    target = battle.enrich_card(target_payload)
+    active = battle.Player(str(scenario.get("player") or "Activated Controller"), None, [])
+    opponent = battle.Player(str(scenario.get("opponent") or "Activated Opponent"), None, [])
+    active.battlefield = [source]
+    target_controller = str(scenario.get("target_controller") or "self").lower()
+    if target_controller in {"opponent", "opponents"}:
+        opponent.battlefield = [target]
+    else:
+        active.battlefield.append(target)
+    add_manifest_mana(active, scenario.get("controller_mana") or {})
+    all_players = [active, opponent]
+    expected_tapped_source = bool(scenario.get("expected_tapped_source", effect.get("activation_requires_tap", False)))
+    expected_sacrificed_source = bool(
+        scenario.get("expected_sacrificed_source", effect.get("activation_requires_sacrifice", False))
+    )
+    expected_power_delta = int(
+        scenario.get("expected_power_delta")
+        if scenario.get("expected_power_delta") is not None
+        else effect.get("power_delta") or effect.get("power_boost") or 0
+    )
+    expected_toughness_delta = int(
+        scenario.get("expected_toughness_delta")
+        if scenario.get("expected_toughness_delta") is not None
+        else effect.get("toughness_delta") or effect.get("toughness_boost") or 0
+    )
+    before_power = int(target.get("power") or 0)
+    before_toughness = int(target.get("toughness") or 0)
+
+    if not battle.can_activate_generic_target_boost_permanent(active, [opponent], source):
+        fail("battle_execution", f"{card['name']} simple activated target boost cannot activate")
+    activated = battle.activate_generic_target_boost_permanent(
+        active,
+        [opponent],
+        all_players,
+        source,
+        turn=int(scenario.get("turn") or 7),
+        rng=random.Random(int(scenario.get("seed") or 6075)),
+        phase=str(scenario.get("phase") or "precombat_main"),
+    )
+    if not activated:
+        fail("battle_execution", f"{card['name']} simple activated target boost activation failed")
+    expected_power = before_power + expected_power_delta
+    expected_toughness = before_toughness + expected_toughness_delta
+    if int(target.get("power") or 0) != expected_power:
+        fail(
+            "battle_execution",
+            f"{card['name']} target power={target.get('power')!r}, expected {expected_power}",
+        )
+    if int(target.get("toughness") or 0) != expected_toughness:
+        fail(
+            "battle_execution",
+            f"{card['name']} target toughness={target.get('toughness')!r}, expected {expected_toughness}",
+        )
+    if bool(source.get("tapped")) != expected_tapped_source:
+        fail(
+            "battle_execution",
+            f"{card['name']} source tapped={bool(source.get('tapped'))}, expected {expected_tapped_source}",
+        )
+    if expected_sacrificed_source:
+        if source in active.battlefield or source not in active.graveyard:
+            fail("battle_execution", f"{card['name']} source sacrifice zone mismatch")
+    elif source not in active.battlefield:
+        fail("battle_execution", f"{card['name']} source left battlefield unexpectedly")
+    activation_event = next(
+        (
+            data
+            for event, data in reversed(events)
+            if event == "activated_ability"
+            and data.get("card") == card.get("name")
+            and data.get("activation_kind") == "simple_activated_target_boost"
+        ),
+        None,
+    )
+    if activation_event is None:
+        fail("battle_events", f"missing {card['name']} simple activated target boost event")
+    if activation_event.get("target") != target.get("name"):
+        fail(
+            "battle_events",
+            f"{card['name']} activated target={activation_event.get('target')!r}, expected {target.get('name')!r}",
+        )
+    if bool(activation_event.get("sacrificed_source")) != expected_sacrificed_source:
+        fail(
+            "battle_events",
+            f"{card['name']} sacrificed_source={activation_event.get('sacrificed_source')!r}",
+        )
+    resolved_event = next(
+        (
+            data
+            for event, data in reversed(events)
+            if event == "stat_modifier_until_eot_resolved"
+            and data.get("card") == card.get("name")
+            and data.get("target") == target.get("name")
+        ),
+        None,
+    )
+    if resolved_event is None:
+        fail("battle_events", f"missing {card['name']} target boost resolved event")
+    if int(resolved_event.get("target_power_after") or 0) != expected_power:
+        fail(
+            "battle_events",
+            f"{card['name']} event power={resolved_event.get('target_power_after')!r}, expected {expected_power}",
+        )
+    if int(resolved_event.get("target_toughness_after") or 0) != expected_toughness:
+        fail(
+            "battle_events",
+            f"{card['name']} event toughness={resolved_event.get('target_toughness_after')!r}, expected {expected_toughness}",
+        )
+    return {
+        "scenario": scenario.get("name"),
+        "card_name": card["name"],
+        "target": target.get("name"),
+        "target_controller": target_controller,
+        "target_power": int(target.get("power") or 0),
+        "target_toughness": int(target.get("toughness") or 0),
+        "power_delta": expected_power_delta,
+        "toughness_delta": expected_toughness_delta,
+        "source_tapped": bool(source.get("tapped")),
+        "sacrificed_source": expected_sacrificed_source,
     }
 
 
@@ -16057,6 +16239,7 @@ SCENARIO_RUNNERS = {
     "simple_activated_add_counters_self": run_simple_activated_add_counters_self,
     "simple_activated_bounce": run_simple_activated_bounce,
     "simple_activated_destroy": run_simple_activated_destroy,
+    "simple_activated_target_boost": run_simple_activated_target_boost,
     "simple_activated_target_keyword": run_simple_activated_target_keyword,
     "simple_activated_self_boost": run_simple_activated_self_boost,
     "simple_activated_self_keyword": run_simple_activated_self_keyword,
