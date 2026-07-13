@@ -12175,6 +12175,110 @@ def run_attack_self_boost(
     }
 
 
+def run_landfall_self_boost(
+    battle,
+    scenario: dict[str, Any],
+    events: list[tuple[str, dict[str, Any]]],
+) -> dict[str, Any]:
+    card = dict(scenario["card"])
+    effect = battle.get_card_effect(card)
+    if effect.get("battle_model_scope") != "xmage_creature_landfall_self_boost_until_eot_v1":
+        fail("battle_execution", f"{card['name']} scope={effect.get('battle_model_scope')!r}")
+    source = battle.enrich_card(
+        {
+            **card,
+            "type_line": card.get("type_line") or "Creature - Beast",
+            "effect": "creature",
+            "power": int(card.get("power") or 2),
+            "toughness": int(card.get("toughness") or 2),
+            **effect,
+        }
+    )
+    land = battle.enrich_card(
+        {
+            **dict(scenario.get("land") or {}),
+            "name": (scenario.get("land") or {}).get("name", "E2E Landfall Land"),
+            "type_line": (scenario.get("land") or {}).get("type_line", "Land"),
+            "effect": "land",
+        }
+    )
+    active = battle.Player(str(scenario.get("player") or "Landfall Controller"), None, [])
+    opponent = battle.Player(str(scenario.get("opponent") or "Opponent"), None, [])
+    active.battlefield = [source, land]
+    before_events = len(events)
+    before_power = int(source.get("power") or 0)
+    before_toughness = int(source.get("toughness") or 0)
+    expected_power_delta = int(
+        scenario.get("expected_power_delta")
+        or effect.get("power_delta")
+        or effect.get("power_boost")
+        or 0
+    )
+    expected_toughness_delta = int(
+        scenario.get("expected_toughness_delta")
+        or effect.get("toughness_delta")
+        or effect.get("toughness_boost")
+        or 0
+    )
+    triggered = battle.trigger_landfall(
+        active,
+        land,
+        int(scenario.get("turn") or 7),
+        str(scenario.get("source_event") or "e2e_land_play"),
+        opponents=[opponent],
+        all_players=[active, opponent],
+    )
+    if not triggered:
+        fail("battle_execution", f"{card['name']} landfall trigger did not resolve")
+    expected_power = before_power + expected_power_delta
+    expected_toughness = before_toughness + expected_toughness_delta
+    if int(source.get("power") or 0) != expected_power:
+        fail("battle_execution", f"{card['name']} source power={source.get('power')!r}, expected {expected_power}")
+    if int(source.get("toughness") or 0) != expected_toughness:
+        fail(
+            "battle_execution",
+            f"{card['name']} source toughness={source.get('toughness')!r}, expected {expected_toughness}",
+        )
+    trigger_event = next(
+        (
+            data
+            for event, data in events[before_events:]
+            if event == "trigger_resolved"
+            and data.get("card") == card.get("name")
+            and data.get("trigger") == "landfall"
+            and data.get("effect") == "self_stat_modifier_until_eot"
+        ),
+        None,
+    )
+    if trigger_event is None:
+        fail("battle_events", f"missing {card['name']} landfall self-boost trigger event")
+    resolved_event = next(
+        (
+            data
+            for event, data in events[before_events:]
+            if event == "stat_modifier_until_eot_resolved"
+            and data.get("card") == card.get("name")
+            and data.get("target") == source.get("name")
+            and data.get("trigger") == "landfall"
+        ),
+        None,
+    )
+    if resolved_event is None:
+        fail("battle_events", f"missing {card['name']} landfall self-boost resolved event")
+    if int(resolved_event.get("power_delta") or 0) != expected_power_delta:
+        fail("battle_events", f"{card['name']} power_delta={resolved_event.get('power_delta')!r}")
+    if int(resolved_event.get("toughness_delta") or 0) != expected_toughness_delta:
+        fail("battle_events", f"{card['name']} toughness_delta={resolved_event.get('toughness_delta')!r}")
+    return {
+        "scenario": scenario.get("name"),
+        "card_name": card["name"],
+        "source_power": int(source.get("power") or 0),
+        "source_toughness": int(source.get("toughness") or 0),
+        "power_delta": expected_power_delta,
+        "toughness_delta": expected_toughness_delta,
+    }
+
+
 def run_becomes_blocked_self_boost(
     battle,
     scenario: dict[str, Any],
@@ -16428,6 +16532,7 @@ def run_loss_replacement(
 
 SCENARIO_RUNNERS = {
     "attack_self_boost": run_attack_self_boost,
+    "landfall_self_boost": run_landfall_self_boost,
     "aura_static_power_toughness_attachment": run_aura_static_power_toughness_attachment,
     "equipment_static_power_toughness_attachment": run_equipment_static_power_toughness_attachment,
     "static_dynamic_count_source_boost": run_static_dynamic_count_source_boost,

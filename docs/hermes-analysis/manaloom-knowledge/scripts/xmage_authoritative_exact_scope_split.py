@@ -148,6 +148,10 @@ ATTACK_SELF_BOOST_UNIT = (
     "xmage_signature::BoostSourceEffect::AttacksTriggeredAbility::"
     "no_target_class::no_condition_class::triggered_ability"
 )
+LANDFALL_SELF_BOOST_UNIT = (
+    "xmage_signature::BoostSourceEffect::LandfallAbility::"
+    "no_target_class::no_condition_class::no_signal"
+)
 BECOMES_BLOCKED_SELF_BOOST_UNIT = (
     "xmage_signature::BoostSourceEffect::BecomesBlockedSourceTriggeredAbility::"
     "no_target_class::no_condition_class::triggered_ability"
@@ -626,6 +630,7 @@ DAMAGE_RECURSION_CREATURE_SCOPE = "xmage_creature_combat_damage_return_graveyard
 COMBAT_DAMAGE_DRAW_CREATURE_SCOPE = "xmage_creature_combat_damage_draw_cards_v1"
 ATTACK_RECURSION_PERMANENT_SCOPE = "xmage_permanent_attack_return_graveyard_card_to_hand_v1"
 ATTACK_SELF_BOOST_CREATURE_SCOPE = "xmage_creature_attack_self_boost_until_eot_v1"
+LANDFALL_SELF_BOOST_CREATURE_SCOPE = "xmage_creature_landfall_self_boost_until_eot_v1"
 BECOMES_BLOCKED_SELF_BOOST_CREATURE_SCOPE = (
     "xmage_creature_becomes_blocked_self_boost_until_eot_v1"
 )
@@ -15454,6 +15459,18 @@ def is_creature_attack_self_boost_unit(row: dict[str, Any]) -> bool:
     )
 
 
+def is_creature_landfall_self_boost_unit(row: dict[str, Any]) -> bool:
+    abilities = ability_classes(row)
+    remaining = abilities - {"LandfallAbility"}
+    return (
+        str(row.get("adapter_work_unit") or "") == LANDFALL_SELF_BOOST_UNIT
+        and effect_classes(row) == {"BoostSourceEffect"}
+        and "LandfallAbility" in abilities
+        and remaining.issubset(STATIC_SELF_KEYWORD_ABILITY_CLASSES)
+        and not set(row.get("xmage_signals") or [])
+    )
+
+
 def is_creature_becomes_blocked_self_boost_unit(row: dict[str, Any]) -> bool:
     abilities = ability_classes(row)
     remaining = abilities - {"BecomesBlockedSourceTriggeredAbility"}
@@ -22432,6 +22449,51 @@ def attack_self_boost_from_source(source: str) -> dict[str, int] | str:
         return "attack_self_boost_source_not_single_fixed"
     if len(re.findall(r"new\s+BoostSourceEffect\s*\(", text)) != 1:
         return "attack_self_boost_source_not_single_fixed"
+    return {
+        "power_delta": int(args[0].strip()),
+        "toughness_delta": int(args[1].strip()),
+    }
+
+
+def landfall_self_boost_from_oracle(metadata: dict[str, Any]) -> dict[str, int] | str:
+    text = strip_parenthetical_reminders(
+        oracle_text_after_leading_static_keywords(metadata)
+    )
+    text = re.sub(r"\s+", " ", text).strip().lower()
+    match = re.search(
+        r"^landfall — whenever a land you control enters, this creature gets "
+        r"(?P<power>[+-]\d+)/(?P<toughness>[+-]\d+) until end of turn\.?$",
+        text,
+    )
+    if not match:
+        return "landfall_self_boost_oracle_not_fixed"
+    return {
+        "power_delta": int(match.group("power")),
+        "toughness_delta": int(match.group("toughness")),
+    }
+
+
+def landfall_self_boost_from_source(source: str) -> dict[str, int] | str:
+    text = source or ""
+    if "LandfallAbility" not in text:
+        return "landfall_self_boost_source_not_landfall"
+    constructor_args = extract_constructor_args(text, "BoostSourceEffect")
+    if constructor_args is None:
+        return "landfall_self_boost_source_not_single_fixed"
+    args = split_top_level_args(constructor_args)
+    if len(args) < 3:
+        return "landfall_self_boost_source_not_single_fixed"
+    if args[2].strip() != "Duration.EndOfTurn":
+        return "landfall_self_boost_source_not_end_of_turn"
+    if not re.fullmatch(r"[+-]?\d+", args[0].strip()) or not re.fullmatch(
+        r"[+-]?\d+",
+        args[1].strip(),
+    ):
+        return "landfall_self_boost_source_not_single_fixed"
+    if len(re.findall(r"new\s+BoostSourceEffect\s*\(", text)) != 1:
+        return "landfall_self_boost_source_not_single_fixed"
+    if len(re.findall(r"new\s+LandfallAbility\s*\(", text)) != 1:
+        return "landfall_self_boost_source_not_single_landfall"
     return {
         "power_delta": int(args[0].strip()),
         "toughness_delta": int(args[1].strip()),
@@ -34532,6 +34594,7 @@ def split_row(
     permanent_activated_hand_to_battlefield_unit = is_permanent_activated_hand_to_battlefield_unit(row)
     attack_target_keyword_unit = is_creature_attack_target_keyword_unit(row)
     attack_self_boost_creature_unit = is_creature_attack_self_boost_unit(row)
+    landfall_self_boost_creature_unit = is_creature_landfall_self_boost_unit(row)
     becomes_blocked_self_boost_creature_unit = is_creature_becomes_blocked_self_boost_unit(row)
     becomes_blocked_draw_creature_unit = is_creature_becomes_blocked_draw_unit(row)
     static_controlled_pt_unit = is_static_controlled_pt_unit(row)
@@ -34754,6 +34817,7 @@ def split_row(
         and not permanent_activated_hand_to_battlefield_unit
         and not attack_target_keyword_unit
         and not attack_self_boost_creature_unit
+        and not landfall_self_boost_creature_unit
         and not becomes_blocked_self_boost_creature_unit
         and not becomes_blocked_draw_creature_unit
         and not static_controlled_pt_unit
@@ -34898,6 +34962,7 @@ def split_row(
         and not permanent_activated_tutor_hand_unit
         and not attack_target_keyword_unit
         and not attack_self_boost_creature_unit
+        and not landfall_self_boost_creature_unit
         and not becomes_blocked_self_boost_creature_unit
         and not becomes_blocked_draw_creature_unit
         and not static_controlled_pt_unit
@@ -37808,6 +37873,48 @@ def split_row(
             metadata,
             effect_json,
             family_id="xmage_creature_attack_self_boost_until_eot",
+        ), "selected_exact_scope"
+
+    if landfall_self_boost_creature_unit:
+        if not is_creature_metadata(metadata):
+            return None, "landfall_self_boost_not_creature"
+        oracle_boost = landfall_self_boost_from_oracle(metadata)
+        if isinstance(oracle_boost, str):
+            return None, oracle_boost
+        source_boost = landfall_self_boost_from_source(source_text)
+        if isinstance(source_boost, str):
+            return None, source_boost
+        if source_boost != oracle_boost:
+            return None, "landfall_self_boost_source_oracle_mismatch"
+        effect_json = {
+            "effect": "creature",
+            "battle_model_scope": LANDFALL_SELF_BOOST_CREATURE_SCOPE,
+            "ability_kind": "triggered",
+            "trigger": "landfall",
+            "trigger_effect": "self_stat_modifier_until_eot",
+            "target": "self",
+            "target_controller": "self",
+            "target_constraints": {"source": "self", "card_types": ["creature"]},
+            "power_delta": int(oracle_boost["power_delta"]),
+            "toughness_delta": int(oracle_boost["toughness_delta"]),
+            "power_boost": int(oracle_boost["power_delta"]),
+            "toughness_boost": int(oracle_boost["toughness_delta"]),
+            "duration": "until_end_of_turn",
+            "landfall_self_boost": True,
+            "xmage_effect_class": "BoostSourceEffect",
+            "xmage_ability_class": "LandfallAbility",
+        }
+        keyword_list = ordered_keywords(keywords_from_ability_classes(row))
+        if keyword_list:
+            effect_json["keywords"] = keyword_list
+            effect_json["_keywords_are_self"] = True
+            for keyword in keyword_list:
+                effect_json[keyword] = True
+        return build_proposal(
+            row,
+            metadata,
+            effect_json,
+            family_id="xmage_creature_landfall_self_boost_until_eot",
         ), "selected_exact_scope"
 
     if becomes_blocked_self_boost_creature_unit:
@@ -50638,6 +50745,7 @@ def build_exact_split_report(
             and not is_permanent_activated_hand_to_battlefield_unit(row)
             and not is_creature_attack_target_keyword_unit(row)
             and not is_creature_attack_self_boost_unit(row)
+            and not is_creature_landfall_self_boost_unit(row)
             and not is_creature_becomes_blocked_self_boost_unit(row)
             and not is_creature_becomes_blocked_draw_unit(row)
             and not is_static_controlled_pt_unit(row)
@@ -50782,6 +50890,7 @@ def build_exact_split_report(
                 "grant_protection_from_chosen_color rows with GainAbilityTargetEffect + SimpleActivatedAbility, exact activated target-creature keyword until EOT, and simple mana/tap source costs only",
                 "grant_protection_from_chosen_color rows with GainAbilityTargetEffect + AttacksTriggeredAbility, exact attack-trigger target-creature keyword until EOT, and Oracle/source target constraints agreement",
                 "xmage_signature BoostSourceEffect + AttacksTriggeredAbility rows with exact fixed self boost until EOT and Oracle/source agreement",
+                "xmage_signature BoostSourceEffect + LandfallAbility rows with exact fixed self boost until EOT and Oracle/source agreement",
                 "xmage_signature DrawCardSourceControllerEffect + BecomesBlockedSourceTriggeredAbility rows with exact optional fixed draw when this creature becomes blocked",
                 "grant_protection_from_chosen_color rows with pure GainAbilityTargetEffect one-shot spells, exact target-creature keyword until EOT, and no auxiliary ability classes",
                 "PreventAllDamageByAllPermanentsEffect one-shot spells with exact Oracle 'Prevent all combat damage that would be dealt this turn', exact XMage Duration.EndOfTurn onlyCombat=true source, and optional CyclingAbility as auxiliary resolution-neutral ability",

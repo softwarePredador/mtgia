@@ -251,6 +251,7 @@ E2E_REQUIRED_EFFECT_FIELDS = (
     "etb_draw_discard",
     "etb_discard_count",
     "etb_target_stat_modifier",
+    "landfall_self_boost",
     "etb_dynamic_draw",
     "draw_count_source",
     "etb_draw_count_source",
@@ -8914,6 +8915,35 @@ def attack_self_boost_execution_scenario_from_expected_rule(
     }
 
 
+def landfall_self_boost_execution_scenario_from_expected_rule(
+    rule: dict[str, Any],
+) -> dict[str, Any] | None:
+    required = dict(rule.get("required_effect_fields") or {})
+    if required.get("battle_model_scope") != "xmage_creature_landfall_self_boost_until_eot_v1":
+        return None
+    return {
+        "name": f"{rule['card_name']} boosts itself on landfall",
+        "type": "landfall_self_boost",
+        "card": {
+            "name": rule["card_name"],
+            "type_line": "Creature - Beast",
+            "effect": "creature",
+            "power": 2,
+            "toughness": 2,
+        },
+        "land": {
+            "name": "E2E Landfall Land",
+            "type_line": "Land",
+            "effect": "land",
+        },
+        "expected_power_delta": int(required.get("power_delta") or required.get("power_boost") or 0),
+        "expected_toughness_delta": int(
+            required.get("toughness_delta") or required.get("toughness_boost") or 0
+        ),
+        "logical_rule_key": rule["logical_rule_key"],
+    }
+
+
 def becomes_blocked_self_boost_execution_scenario_from_expected_rule(
     rule: dict[str, Any],
 ) -> dict[str, Any] | None:
@@ -11038,6 +11068,7 @@ def execution_scenario_from_expected_rule(rule: dict[str, Any]) -> dict[str, Any
         or global_stat_modifier_draw_spell_execution_scenario_from_expected_rule(rule)
         or proliferate_draw_spell_execution_scenario_from_expected_rule(rule)
         or attack_self_boost_execution_scenario_from_expected_rule(rule)
+        or landfall_self_boost_execution_scenario_from_expected_rule(rule)
         or becomes_blocked_self_boost_execution_scenario_from_expected_rule(rule)
         or becomes_blocked_draw_execution_scenario_from_expected_rule(rule)
         or damage_wipe_execution_scenario_from_expected_rule(rule)

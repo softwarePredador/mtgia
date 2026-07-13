@@ -20545,6 +20545,66 @@ Evidence:
 - `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_exact_scope_split_20260713_post_pg859_becomes_blocked_draw_new_server_recheck.md`
 - `docs/hermes-analysis/master_optimizer_reports/pg_hermes_sqlite_contract_audit_20260713_post_pg859_becomes_blocked_draw_new_server_final.md`
 
+## 2026-07-13 PG860 Landfall Self-Boost Closure
+
+- Closed the exact XMage subpattern
+  `BoostSourceEffect + LandfallAbility` as ManaLoom scope
+  `xmage_creature_landfall_self_boost_until_eot_v1`.
+- The mapper accepts only source-only landfall boosts with a single
+  `LandfallAbility`, a single fixed
+  `BoostSourceEffect(N, N, Duration.EndOfTurn)`, and exact Oracle/source
+  agreement. Generic review rows remain blocked until split into a
+  runtime-backed exact scope.
+- Runtime behavior is executable in `trigger_landfall`: when a land controlled
+  by the source controller enters, the source creature receives the configured
+  until-end-of-turn power/toughness modifier and emits replay/decision trace
+  events.
+- The PostgreSQL package promoted `9` cards: `Akoum Hellhound`, `Canopy
+  Baloth`, `Hedron Rover`, `Hedron Scrabbler`, `Scythe Leopard`, `Snapping
+  Gnarlid`, `Steppe Lynx`, `Territorial Baloth`, and `Valakut Predator`.
+  Precheck found `9` target rows, `0` existing expected rows, and `0` shadow
+  rows; apply inserted/updated `9`; postcheck verified `9/9` promoted rows as
+  `verified`/`auto` with Oracle hashes.
+- Hermes sync loaded `9` PG rules into SQLite, wrote `9` SQLite rows, and
+  exported a canonical fallback snapshot with `6819` rows. Metadata sync ran
+  against `127.0.0.1:15432/halder` and left one unrelated unresolved cache
+  alias: `Surgical Suite/Hospital Room`.
+- E2E package validation passed across PostgreSQL, SQLite, canonical snapshot,
+  runtime `get_card_effect`, and battle execution for all `9` selected cards.
+  The battle runner proved the expected `+1/+1` or `+2/+2` self boost after a
+  land entered.
+- PG860B backfilled older trusted executable `oracle_hash` gaps exposed by the
+  final PG/Hermes/SQLite audit: precheck found `55` safe rows (`32` verified,
+  `23` active), apply updated `55`, and postcheck left `0` trusted executable
+  rules missing Oracle hash. A full PG -> SQLite sync then loaded `6870` PG
+  rows and updated `6865` SQLite rows.
+- Post-sync readiness is now `battle_and_oracle_ready=6837` and
+  `battle_family_mapper_required=26957`. The Commander-legal authoritative
+  queue is now `target_identity_count=24046`,
+  `xmage_authoritative_source_count=23733`,
+  `xmage_missing_source_exception_count=313`, `parser_gap=0`, and
+  `xmage_authoritative_adapter_required_count=23733`; the post-PG860 exact
+  split recheck has `0` proposals.
+- Final governance audits passed:
+  XMage strategy (`26/26`), operational surface, legacy contamination, and
+  PG/Hermes/SQLite contract (`51/51`).
+- Focused landfall split tests passed, full runtime exact-scope tests passed
+  (`531` OK), package builder tests passed (`264`), and touched scripts compile.
+  A full split-suite attempt exposed `4` existing non-landfall failures in old
+  split expectations; the PG860 diff does not touch those areas.
+
+Evidence:
+
+- `docs/hermes-analysis/PG860_LANDFALL_SELF_BOOST_EVIDENCE_2026-07-13.md`
+- `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_exact_scope_split_20260713_pg860_landfall_self_boost_new_server_candidate.md`
+- `docs/hermes-analysis/master_optimizer_reports/pg860_landfall_self_boost_new_server_package_manifest.json`
+- `docs/hermes-analysis/master_optimizer_reports/pg860_landfall_self_boost_new_server_e2e_validation.md`
+- `docs/hermes-analysis/master_optimizer_reports/pg860b_trusted_rule_oracle_hash_backfill_new_server_pg_to_sqlite_sync.json`
+- `docs/hermes-analysis/master_optimizer_reports/global_card_oracle_battle_readiness_20260713_post_pg860b_hash_backfill_new_server.md`
+- `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260713_post_pg860b_hash_backfill_new_server_commander_legal.md`
+- `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_exact_scope_split_20260713_post_pg860_landfall_self_boost_new_server_recheck.md`
+- `docs/hermes-analysis/master_optimizer_reports/pg_hermes_sqlite_contract_audit_20260713_post_pg860b_hash_backfill_new_server_final.md`
+
 ## Required Artifacts Per Cycle
 
 Every cycle must produce or refresh:

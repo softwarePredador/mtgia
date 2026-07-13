@@ -6916,6 +6916,74 @@ class XMageExactScopeRuntimeTest(unittest.TestCase):
         self.assertEqual(veteran["power"], 2)
         self.assertEqual(veteran["toughness"], 2)
 
+    def test_landfall_self_boosts_source_until_eot(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        opponent = self.battle.Player("Opponent", None, [])
+        lynx = {
+            "name": "Steppe Lynx",
+            "type_line": "Creature - Cat",
+            "effect": "creature",
+            "battle_model_scope": "xmage_creature_landfall_self_boost_until_eot_v1",
+            "ability_kind": "triggered",
+            "trigger": "landfall",
+            "trigger_effect": "self_stat_modifier_until_eot",
+            "target": "self",
+            "target_controller": "self",
+            "power_delta": 2,
+            "toughness_delta": 2,
+            "landfall_self_boost": True,
+            "power": 0,
+            "toughness": 1,
+            "_rule_logical_key": "battle_rule_v1:steppe-lynx-test",
+        }
+        land = {
+            "name": "Plains",
+            "type_line": "Basic Land - Plains",
+            "effect": "land",
+        }
+        active.battlefield.extend([lynx, land])
+
+        resolved = self.battle.trigger_landfall(
+            active,
+            land,
+            4,
+            "test_land_play",
+            opponents=[opponent],
+            all_players=[active, opponent],
+        )
+
+        self.assertTrue(resolved)
+        self.assertEqual(lynx["power"], 2)
+        self.assertEqual(lynx["toughness"], 3)
+        self.assertTrue(
+            any(
+                event == "trigger_resolved"
+                and data.get("card") == "Steppe Lynx"
+                and data.get("trigger") == "landfall"
+                and data.get("effect") == "self_stat_modifier_until_eot"
+                and data.get("power_delta") == 2
+                and data.get("toughness_delta") == 2
+                for event, data in self.events
+            )
+        )
+        self.assertTrue(
+            any(
+                event == "stat_modifier_until_eot_resolved"
+                and data.get("card") == "Steppe Lynx"
+                and data.get("target") == "Steppe Lynx"
+                and data.get("target_power_before") == 0
+                and data.get("target_power_after") == 2
+                and data.get("target_toughness_before") == 1
+                and data.get("target_toughness_after") == 3
+                for event, data in self.events
+            )
+        )
+
+        self.battle.clear_until_eot(active)
+
+        self.assertEqual(lynx["power"], 0)
+        self.assertEqual(lynx["toughness"], 1)
+
     def test_becomes_blocked_self_boosts_source_until_eot(self) -> None:
         active = self.battle.Player("Active", None, [])
         opponent = self.battle.Player("Opponent", None, [])

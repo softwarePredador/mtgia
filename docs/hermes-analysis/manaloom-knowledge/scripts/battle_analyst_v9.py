@@ -33990,6 +33990,7 @@ ATTACK_TRIGGER_TARGET_KEYWORD_SCOPE = (
     "xmage_creature_attack_grant_keyword_target_creature_until_eot_v1"
 )
 ATTACK_SELF_BOOST_SCOPE = "xmage_creature_attack_self_boost_until_eot_v1"
+LANDFALL_SELF_BOOST_SCOPE = "xmage_creature_landfall_self_boost_until_eot_v1"
 BECOMES_BLOCKED_SELF_BOOST_SCOPE = (
     "xmage_creature_becomes_blocked_self_boost_until_eot_v1"
 )
@@ -34130,6 +34131,34 @@ def resolve_attack_self_boost_triggers(player, attackers, all_players, turn, *, 
         check_sbas_until_stable(all_players)
         resolved += 1
     return resolved
+
+
+def landfall_self_boost_effect_for_permanent(permanent):
+    if not isinstance(permanent, dict):
+        return None
+    candidates = []
+    if permanent.get("battle_model_scope") == LANDFALL_SELF_BOOST_SCOPE:
+        candidates.append(dict(permanent))
+    try:
+        resolved = get_card_effect(permanent)
+    except Exception:
+        resolved = {}
+    if (
+        isinstance(resolved, dict)
+        and resolved.get("battle_model_scope") == LANDFALL_SELF_BOOST_SCOPE
+    ):
+        candidates.append(resolved)
+    for effect_data in candidates:
+        if (
+            effect_data.get("ability_kind") == "triggered"
+            and effect_data.get("trigger") == "landfall"
+            and (
+                effect_data.get("trigger_effect") == "self_stat_modifier_until_eot"
+                or effect_data.get("landfall_self_boost") is True
+            )
+        ):
+            return effect_data
+    return None
 
 
 def becomes_blocked_self_boost_effect_for_permanent(permanent):
@@ -48998,6 +49027,7 @@ def trigger_landfall(
             permanent.get("landfall_optional_pay_copy_attached_creature_else_insect")
             or permanent.get("landfall_token_maker")
             or permanent.get("landfall_damage_each_opponent")
+            or permanent.get("landfall_self_boost")
         )
     ]
     if not landfall_sources:
@@ -49170,6 +49200,117 @@ def trigger_landfall(
                 turn=turn,
                 **replay_rule_fields(permanent),
             )
+        for permanent in list(player.battlefield):
+            if not isinstance(permanent, dict):
+                continue
+            effect_data = landfall_self_boost_effect_for_permanent(permanent)
+            if effect_data is None:
+                continue
+            power_delta = int(effect_data.get("power_delta") or effect_data.get("power_boost") or 0)
+            toughness_delta = int(
+                effect_data.get("toughness_delta") or effect_data.get("toughness_boost") or 0
+            )
+            if power_delta == 0 and toughness_delta == 0:
+                continue
+            fields = replay_rule_fields(effect_data)
+            power_before = _numeric_card_stat(permanent, "power")
+            toughness_before = _numeric_card_stat(permanent, "toughness", "power")
+            set_until_eot(permanent, "power", power_before + power_delta)
+            set_until_eot(permanent, "toughness", toughness_before + toughness_delta)
+            power_after = _numeric_card_stat(permanent, "power")
+            toughness_after = _numeric_card_stat(permanent, "toughness", "power")
+            destination = None
+            result = "stat_modifier_until_eot_applied"
+            if toughness_after <= 0 and is_battlefield_creature(permanent):
+                destination = move_creature_from_battlefield(
+                    player,
+                    permanent,
+                    reason="zero_toughness",
+                    source=permanent,
+                    all_players=all_players,
+                )
+                result = "creature_put_into_graveyard_zero_toughness"
+            emit_decision_trace(
+                decision_type="landfall_trigger_self_boost",
+                player=player,
+                turn=turn,
+                phase="trigger_resolution",
+                available_options=[
+                    decision_card_option(
+                        permanent,
+                        effect_data,
+                        action="landfall_trigger_self_boost",
+                        score=max(1, sum(target_priority(permanent))),
+                    )
+                ],
+                chosen_option=decision_card_option(
+                    permanent,
+                    effect_data,
+                    action="landfall_trigger_self_boost",
+                ),
+                rejected_options=[],
+                score_components={
+                    "source": permanent.get("name", "?"),
+                    "trigger_land": land_permanent.get("name", "?")
+                    if isinstance(land_permanent, dict)
+                    else "Land",
+                    "power_delta": power_delta,
+                    "toughness_delta": toughness_delta,
+                    "power_before": power_before,
+                    "toughness_before": toughness_before,
+                    "power_after": power_after,
+                    "toughness_after": toughness_after,
+                },
+                rule_source=fields.get("rule_source", "battle_rule"),
+                rule_status=fields.get("rule_review_status", "verified"),
+                confidence="high",
+                expected_benefit_score=max(3, power_delta + max(0, toughness_delta)),
+                actual_outcome="landfall_trigger_self_boost_used",
+                reason="apply_landfall_trigger_self_stat_modifier",
+                heuristic_version=DECISION_STRATEGY_VERSION,
+                resource_delta={"temporary_power": power_delta, "temporary_toughness": toughness_delta},
+                risk_flags=["temporary_stat_modifier", "landfall_trigger"],
+            )
+            emit_replay_event(
+                "trigger_resolved",
+                player=player.name,
+                card=permanent.get("name", "?"),
+                trigger="landfall",
+                trigger_land=land_permanent.get("name", "?") if isinstance(land_permanent, dict) else "Land",
+                source_event=source_event,
+                effect="self_stat_modifier_until_eot",
+                target=permanent.get("name", "?"),
+                target_player=player.name,
+                power_delta=power_delta,
+                toughness_delta=toughness_delta,
+                turn=turn,
+                phase="trigger_resolution",
+                **fields,
+            )
+            emit_replay_event(
+                "stat_modifier_until_eot_resolved",
+                player=player.name,
+                card=permanent.get("name", "?"),
+                trigger="landfall",
+                trigger_land=land_permanent.get("name", "?") if isinstance(land_permanent, dict) else "Land",
+                source_event=source_event,
+                target_player=player.name,
+                target=permanent.get("name", "?"),
+                target_power_before=power_before,
+                target_power_after=power_after,
+                target_toughness_before=toughness_before,
+                target_toughness_after=toughness_after,
+                power_delta=power_delta,
+                toughness_delta=toughness_delta,
+                granted_keywords_until_eot=[],
+                result=result,
+                destination=destination,
+                turn=turn,
+                phase="trigger_resolution",
+                **fields,
+            )
+            if all_players is not None:
+                check_sbas_until_stable(all_players)
 
     resolve_or_enqueue_trigger(
         player,

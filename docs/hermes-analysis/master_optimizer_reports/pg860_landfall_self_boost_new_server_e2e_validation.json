@@ -1,0 +1,441 @@
+{
+  "battle_execution": {
+    "event_count": 18,
+    "results": [
+      {
+        "card_name": "Akoum Hellhound",
+        "power_delta": 2,
+        "scenario": "Akoum Hellhound boosts itself on landfall",
+        "source_power": 4,
+        "source_toughness": 4,
+        "toughness_delta": 2
+      },
+      {
+        "card_name": "Canopy Baloth",
+        "power_delta": 2,
+        "scenario": "Canopy Baloth boosts itself on landfall",
+        "source_power": 4,
+        "source_toughness": 4,
+        "toughness_delta": 2
+      },
+      {
+        "card_name": "Hedron Rover",
+        "power_delta": 2,
+        "scenario": "Hedron Rover boosts itself on landfall",
+        "source_power": 4,
+        "source_toughness": 4,
+        "toughness_delta": 2
+      },
+      {
+        "card_name": "Hedron Scrabbler",
+        "power_delta": 1,
+        "scenario": "Hedron Scrabbler boosts itself on landfall",
+        "source_power": 3,
+        "source_toughness": 3,
+        "toughness_delta": 1
+      },
+      {
+        "card_name": "Scythe Leopard",
+        "power_delta": 1,
+        "scenario": "Scythe Leopard boosts itself on landfall",
+        "source_power": 3,
+        "source_toughness": 3,
+        "toughness_delta": 1
+      },
+      {
+        "card_name": "Snapping Gnarlid",
+        "power_delta": 1,
+        "scenario": "Snapping Gnarlid boosts itself on landfall",
+        "source_power": 3,
+        "source_toughness": 3,
+        "toughness_delta": 1
+      },
+      {
+        "card_name": "Steppe Lynx",
+        "power_delta": 2,
+        "scenario": "Steppe Lynx boosts itself on landfall",
+        "source_power": 4,
+        "source_toughness": 4,
+        "toughness_delta": 2
+      },
+      {
+        "card_name": "Territorial Baloth",
+        "power_delta": 2,
+        "scenario": "Territorial Baloth boosts itself on landfall",
+        "source_power": 4,
+        "source_toughness": 4,
+        "toughness_delta": 2
+      },
+      {
+        "card_name": "Valakut Predator",
+        "power_delta": 2,
+        "scenario": "Valakut Predator boosts itself on landfall",
+        "source_power": 4,
+        "source_toughness": 4,
+        "toughness_delta": 2
+      }
+    ],
+    "scenario_count": 9
+  },
+  "battle_path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py",
+  "database_target": "127.0.0.1:15432/halder",
+  "generated_at_utc": "2026-07-13T03:26:18.705477+00:00",
+  "manifest": "docs/hermes-analysis/master_optimizer_reports/pg860_landfall_self_boost_new_server_package_manifest.json",
+  "package_id": "pg860_landfall_self_boost_new_server_package_manifest",
+  "snapshot": "docs/hermes-analysis/master_optimizer_reports/pg860_landfall_self_boost_new_server_canonical_snapshot.json",
+  "sqlite_db": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db",
+  "stages": [
+    {
+      "evidence": {
+        "validated_rows": 9
+      },
+      "name": "postgres_source_of_truth",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_landfall_self_boost_until_eot_v1",
+          "card_name": "Akoum Hellhound",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:345c1797fecda5bc321a8572fd8a48ac",
+          "oracle_hash": "7e252ede6bebc323ac6118190316941f",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_landfall_self_boost_until_eot_v1",
+          "card_name": "Canopy Baloth",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:345c1797fecda5bc321a8572fd8a48ac",
+          "oracle_hash": "7e252ede6bebc323ac6118190316941f",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_landfall_self_boost_until_eot_v1",
+          "card_name": "Hedron Rover",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:345c1797fecda5bc321a8572fd8a48ac",
+          "oracle_hash": "7e252ede6bebc323ac6118190316941f",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_landfall_self_boost_until_eot_v1",
+          "card_name": "Hedron Scrabbler",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:2ba4ee6bbeae52a5ffbd5e90b414a107",
+          "oracle_hash": "4e5363696d0a4ba4059ea4866f51e313",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_landfall_self_boost_until_eot_v1",
+          "card_name": "Scythe Leopard",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:2ba4ee6bbeae52a5ffbd5e90b414a107",
+          "oracle_hash": "4e5363696d0a4ba4059ea4866f51e313",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_landfall_self_boost_until_eot_v1",
+          "card_name": "Snapping Gnarlid",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:2ba4ee6bbeae52a5ffbd5e90b414a107",
+          "oracle_hash": "4e5363696d0a4ba4059ea4866f51e313",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_landfall_self_boost_until_eot_v1",
+          "card_name": "Steppe Lynx",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:345c1797fecda5bc321a8572fd8a48ac",
+          "oracle_hash": "7e252ede6bebc323ac6118190316941f",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_landfall_self_boost_until_eot_v1",
+          "card_name": "Territorial Baloth",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:345c1797fecda5bc321a8572fd8a48ac",
+          "oracle_hash": "7e252ede6bebc323ac6118190316941f",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_landfall_self_boost_until_eot_v1",
+          "card_name": "Valakut Predator",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:345c1797fecda5bc321a8572fd8a48ac",
+          "oracle_hash": "7e252ede6bebc323ac6118190316941f",
+          "review_status": "verified",
+          "rule_version": 2
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_rows": 9
+      },
+      "name": "sqlite_hermes_cache",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_landfall_self_boost_until_eot_v1",
+          "card_name": "Akoum Hellhound",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:345c1797fecda5bc321a8572fd8a48ac",
+          "oracle_hash": "7e252ede6bebc323ac6118190316941f",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_landfall_self_boost_until_eot_v1",
+          "card_name": "Canopy Baloth",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:345c1797fecda5bc321a8572fd8a48ac",
+          "oracle_hash": "7e252ede6bebc323ac6118190316941f",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_landfall_self_boost_until_eot_v1",
+          "card_name": "Hedron Rover",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:345c1797fecda5bc321a8572fd8a48ac",
+          "oracle_hash": "7e252ede6bebc323ac6118190316941f",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_landfall_self_boost_until_eot_v1",
+          "card_name": "Hedron Scrabbler",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:2ba4ee6bbeae52a5ffbd5e90b414a107",
+          "oracle_hash": "4e5363696d0a4ba4059ea4866f51e313",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_landfall_self_boost_until_eot_v1",
+          "card_name": "Scythe Leopard",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:2ba4ee6bbeae52a5ffbd5e90b414a107",
+          "oracle_hash": "4e5363696d0a4ba4059ea4866f51e313",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_landfall_self_boost_until_eot_v1",
+          "card_name": "Snapping Gnarlid",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:2ba4ee6bbeae52a5ffbd5e90b414a107",
+          "oracle_hash": "4e5363696d0a4ba4059ea4866f51e313",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_landfall_self_boost_until_eot_v1",
+          "card_name": "Steppe Lynx",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:345c1797fecda5bc321a8572fd8a48ac",
+          "oracle_hash": "7e252ede6bebc323ac6118190316941f",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_landfall_self_boost_until_eot_v1",
+          "card_name": "Territorial Baloth",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:345c1797fecda5bc321a8572fd8a48ac",
+          "oracle_hash": "7e252ede6bebc323ac6118190316941f",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_landfall_self_boost_until_eot_v1",
+          "card_name": "Valakut Predator",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:345c1797fecda5bc321a8572fd8a48ac",
+          "oracle_hash": "7e252ede6bebc323ac6118190316941f",
+          "review_status": "verified",
+          "rule_version": 2
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_cards": 9
+      },
+      "name": "canonical_snapshot_fallback",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_landfall_self_boost_until_eot_v1",
+          "battle_rule_version": 2,
+          "card_name": "Akoum Hellhound",
+          "logical_rule_key": "battle_rule_v1:345c1797fecda5bc321a8572fd8a48ac"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_landfall_self_boost_until_eot_v1",
+          "battle_rule_version": 2,
+          "card_name": "Canopy Baloth",
+          "logical_rule_key": "battle_rule_v1:345c1797fecda5bc321a8572fd8a48ac"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_landfall_self_boost_until_eot_v1",
+          "battle_rule_version": 2,
+          "card_name": "Hedron Rover",
+          "logical_rule_key": "battle_rule_v1:345c1797fecda5bc321a8572fd8a48ac"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_landfall_self_boost_until_eot_v1",
+          "battle_rule_version": 2,
+          "card_name": "Hedron Scrabbler",
+          "logical_rule_key": "battle_rule_v1:2ba4ee6bbeae52a5ffbd5e90b414a107"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_landfall_self_boost_until_eot_v1",
+          "battle_rule_version": 2,
+          "card_name": "Scythe Leopard",
+          "logical_rule_key": "battle_rule_v1:2ba4ee6bbeae52a5ffbd5e90b414a107"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_landfall_self_boost_until_eot_v1",
+          "battle_rule_version": 2,
+          "card_name": "Snapping Gnarlid",
+          "logical_rule_key": "battle_rule_v1:2ba4ee6bbeae52a5ffbd5e90b414a107"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_landfall_self_boost_until_eot_v1",
+          "battle_rule_version": 2,
+          "card_name": "Steppe Lynx",
+          "logical_rule_key": "battle_rule_v1:345c1797fecda5bc321a8572fd8a48ac"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_landfall_self_boost_until_eot_v1",
+          "battle_rule_version": 2,
+          "card_name": "Territorial Baloth",
+          "logical_rule_key": "battle_rule_v1:345c1797fecda5bc321a8572fd8a48ac"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_landfall_self_boost_until_eot_v1",
+          "battle_rule_version": 2,
+          "card_name": "Valakut Predator",
+          "logical_rule_key": "battle_rule_v1:345c1797fecda5bc321a8572fd8a48ac"
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_cards": 9
+      },
+      "name": "runtime_get_card_effect",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "card_name": "Akoum Hellhound",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:345c1797fecda5bc321a8572fd8a48ac"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Canopy Baloth",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:345c1797fecda5bc321a8572fd8a48ac"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Hedron Rover",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:345c1797fecda5bc321a8572fd8a48ac"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Hedron Scrabbler",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:2ba4ee6bbeae52a5ffbd5e90b414a107"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Scythe Leopard",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:2ba4ee6bbeae52a5ffbd5e90b414a107"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Snapping Gnarlid",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:2ba4ee6bbeae52a5ffbd5e90b414a107"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Steppe Lynx",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:345c1797fecda5bc321a8572fd8a48ac"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Territorial Baloth",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:345c1797fecda5bc321a8572fd8a48ac"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Valakut Predator",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:345c1797fecda5bc321a8572fd8a48ac"
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "events": 18,
+        "scenarios": 9
+      },
+      "name": "battle_execution",
+      "status": "pass"
+    }
+  ],
+  "status": "pass",
+  "title": "Battle Package End-to-End Validation"
+}

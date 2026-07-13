@@ -5620,6 +5620,38 @@ def test_manifest_builds_attack_self_boost_execution_scenario() -> None:
     assert scenario["expected_toughness_delta"] == 1
 
 
+def test_manifest_builds_landfall_self_boost_execution_scenario() -> None:
+    proposal = {
+        "normalized_name": "steppe lynx",
+        "card_name": "Steppe Lynx",
+        "oracle_hash": "hash-steppe-lynx",
+        "logical_rule_key": "battle_rule_v1:steppe-lynx",
+        "effect_json": {
+            "effect": "creature",
+            "battle_model_scope": "xmage_creature_landfall_self_boost_until_eot_v1",
+            "ability_kind": "triggered",
+            "trigger": "landfall",
+            "trigger_effect": "self_stat_modifier_until_eot",
+            "power_delta": 2,
+            "toughness_delta": 2,
+            "landfall_self_boost": True,
+        },
+    }
+
+    expected = builder.expected_rule_from_proposal(proposal)
+    required = expected["required_effect_fields"]
+
+    assert required["landfall_self_boost"] is True
+
+    scenario = builder.execution_scenario_from_expected_rule(expected)
+
+    assert scenario["type"] == "landfall_self_boost"
+    assert scenario["card"]["name"] == "Steppe Lynx"
+    assert scenario["land"]["type_line"] == "Land"
+    assert scenario["expected_power_delta"] == 2
+    assert scenario["expected_toughness_delta"] == 2
+
+
 def test_manifest_builds_becomes_blocked_self_boost_execution_scenario() -> None:
     rule = {
         "normalized_name": "gang of elk",

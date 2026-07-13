@@ -2664,6 +2664,66 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertIsNone(proposal)
         self.assertEqual(reason, "becomes_blocked_self_boost_source_oracle_mismatch")
 
+    def test_landfall_self_boost_maps_fixed_until_eot(self) -> None:
+        row = queue_row(
+            split.LANDFALL_SELF_BOOST_UNIT,
+            effect_classes=["BoostSourceEffect"],
+            ability_kind="triggered",
+            ability_classes=["LandfallAbility"],
+            xmage_signals=[],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Steppe Lynx",
+                type_line="Creature - Cat",
+                oracle_text=(
+                    "Landfall — Whenever a land you control enters, this creature "
+                    "gets +2/+2 until end of turn."
+                ),
+            ),
+            source_text="""
+                this.addAbility(new LandfallAbility(
+                    new BoostSourceEffect(2, 2, Duration.EndOfTurn), false));
+            """,
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.LANDFALL_SELF_BOOST_CREATURE_SCOPE)
+        self.assertEqual(effect["trigger"], "landfall")
+        self.assertEqual(effect["trigger_effect"], "self_stat_modifier_until_eot")
+        self.assertEqual(effect["power_delta"], 2)
+        self.assertEqual(effect["toughness_delta"], 2)
+        self.assertTrue(effect["landfall_self_boost"])
+
+    def test_landfall_self_boost_rejects_source_oracle_mismatch(self) -> None:
+        row = queue_row(
+            split.LANDFALL_SELF_BOOST_UNIT,
+            effect_classes=["BoostSourceEffect"],
+            ability_kind="triggered",
+            ability_classes=["LandfallAbility"],
+            xmage_signals=[],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Mismatch Lynx",
+                type_line="Creature - Cat",
+                oracle_text=(
+                    "Landfall — Whenever a land you control enters, this creature "
+                    "gets +2/+2 until end of turn."
+                ),
+            ),
+            source_text="""
+                this.addAbility(new LandfallAbility(
+                    new BoostSourceEffect(1, 1, Duration.EndOfTurn), false));
+            """,
+        )
+
+        self.assertIsNone(proposal)
+        self.assertEqual(reason, "landfall_self_boost_source_oracle_mismatch")
+
     def test_becomes_blocked_draw_maps_optional_fixed_draw(self) -> None:
         row = queue_row(
             split.DRAW_ENGINE_UNIT,
