@@ -9089,3 +9089,37 @@ def test_spell_mana_ritual_execution_scenario_is_manifested() -> None:
     assert scenario["expected_mana_symbols"] == ["R", "R", "R"]
     assert scenario["expected_mana_amount_model"] == "controller_battlefield_creature_count"
     assert len(scenario["controller_battlefield"]) == 3
+
+
+def test_static_attacks_each_combat_manifest_builds_execution_scenario() -> None:
+    proposal = {
+        "normalized_name": "goblin brigand",
+        "card_name": "Goblin Brigand",
+        "oracle_hash": "hash-goblin-brigand",
+        "logical_rule_key": "battle_rule_v1:goblin-brigand",
+        "effect_json": {
+            "effect": "creature",
+            "battle_model_scope": "xmage_static_self_attacks_each_combat_creature_v1",
+            "ability_kind": "static",
+            "static_effect": "self_attacks_each_combat_if_able",
+            "target": "self",
+            "target_controller": "self",
+            "attacks_each_combat_if_able": True,
+            "must_attack_each_combat_if_able": True,
+            "must_attack_if_able": True,
+        },
+    }
+
+    expected = builder.expected_rule_from_proposal(proposal)
+    required = expected["required_effect_fields"]
+
+    assert required["attacks_each_combat_if_able"] is True
+    assert required["must_attack_each_combat_if_able"] is True
+    assert required["must_attack_if_able"] is True
+
+    scenario = builder.execution_scenario_from_expected_rule(expected)
+
+    assert scenario["type"] == "static_attacks_each_combat_creature"
+    assert scenario["expected_must_attack"] is True
+    assert scenario["expected_should_attack"] is True
+    assert scenario["expected_attackers"] == ["Goblin Brigand"]

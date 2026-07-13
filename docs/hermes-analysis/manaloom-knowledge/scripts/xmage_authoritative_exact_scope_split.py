@@ -563,6 +563,9 @@ STATIC_PROTECTION_FROM_FILTERED_CREATURE_SCOPE = (
 STATIC_CAST_AS_FLASH_PERMISSION_SCOPE = "xmage_static_cast_spells_as_flash_permission_v1"
 STATIC_CANT_BE_BLOCKED_CREATURE_SCOPE = "xmage_static_self_cant_be_blocked_creature_v1"
 STATIC_CANT_BLOCK_CREATURE_SCOPE = "xmage_static_self_cant_block_creature_v1"
+STATIC_ATTACKS_EACH_COMBAT_CREATURE_SCOPE = (
+    "xmage_static_self_attacks_each_combat_creature_v1"
+)
 STATIC_LANDWALK_CREATURE_SCOPE = "xmage_static_self_basic_landwalk_creature_v1"
 STATIC_FILTERED_EVASION_CREATURE_SCOPE = "xmage_static_filtered_evasion_creature_v1"
 STATIC_FLYING_CAN_BLOCK_ONLY_FLYING_CREATURE_SCOPE = (
@@ -939,6 +942,7 @@ STATIC_SELF_KEYWORD_ABILITY_CLASSES = {
     "VigilanceAbility": "vigilance",
 }
 STATIC_SELF_WARD_ABILITY_CLASS = "WardAbility"
+STATIC_ATTACKS_EACH_COMBAT_ABILITY_CLASS = "AttacksEachCombatStaticAbility"
 
 SAFE_MANA_AUXILIARY_ABILITY_CLASSES = {
     "EntersBattlefieldTappedAbility",
@@ -14186,6 +14190,17 @@ def is_static_ward_creature_unit(row: dict[str, Any]) -> bool:
     )
 
 
+def is_static_attacks_each_combat_creature_unit(row: dict[str, Any]) -> bool:
+    abilities = ability_classes(row)
+    remaining = abilities - {STATIC_ATTACKS_EACH_COMBAT_ABILITY_CLASS}
+    return (
+        STATIC_ATTACKS_EACH_COMBAT_ABILITY_CLASS in abilities
+        and not effect_classes(row)
+        and set(row.get("xmage_signals") or []).issubset({"static_ability"})
+        and remaining.issubset(STATIC_SELF_KEYWORD_ABILITY_CLASSES)
+    )
+
+
 def is_prowess_creature_unit(row: dict[str, Any]) -> bool:
     abilities = ability_classes(row)
     remaining = abilities - {PROWESS_KEYWORD_ABILITY_CLASS}
@@ -16164,6 +16179,37 @@ def source_is_static_cant_block(source: str, row: dict[str, Any] | None = None) 
     if (
         "CantBlockAbility" not in text
         or "SimpleActivatedAbility" in text
+        or "ReturnSourceFromGraveyard" in text
+    ):
+        return False
+    if row is None:
+        return True
+    expected = ability_classes(row)
+    declared = source_declared_ability_classes(text)
+    return declared == expected
+
+
+def oracle_is_static_attacks_each_combat(metadata: dict[str, Any]) -> bool:
+    text = strip_parenthetical_reminders(oracle_text_after_leading_static_keywords(metadata))
+    text = re.sub(r"\s+", " ", text).strip().lower()
+    if not text:
+        return False
+    text_without_period = text[:-1] if text.endswith(".") else text
+    source_name = re.sub(r"\s+", " ", str(metadata.get("name") or "").strip().lower())
+    if source_name and text_without_period == f"{source_name} attacks each combat if able":
+        return True
+    return text_without_period in {
+        "this creature attacks each combat if able",
+        "this card attacks each combat if able",
+    }
+
+
+def source_is_static_attacks_each_combat(source: str, row: dict[str, Any] | None = None) -> bool:
+    text = source or ""
+    if (
+        "AttacksEachCombatStaticAbility" not in text
+        or "SimpleActivatedAbility" in text
+        or "AttacksIfAble" in text
         or "ReturnSourceFromGraveyard" in text
     ):
         return False
@@ -34253,6 +34299,7 @@ def split_row(
     unit = str(row.get("adapter_work_unit") or "")
     keyword_creature_unit = is_static_keyword_creature_unit(row)
     static_ward_creature_unit = is_static_ward_creature_unit(row)
+    static_attacks_each_combat_creature_unit = is_static_attacks_each_combat_creature_unit(row)
     prowess_creature_unit = is_prowess_creature_unit(row)
     changeling_creature_unit = is_changeling_creature_unit(row)
     static_protection_from_colors_creature_unit = (
@@ -34493,6 +34540,7 @@ def split_row(
         unit not in SUPPORTED_UNITS
         and not keyword_creature_unit
         and not static_ward_creature_unit
+        and not static_attacks_each_combat_creature_unit
         and not prowess_creature_unit
         and not changeling_creature_unit
         and not static_protection_from_colors_creature_unit
@@ -40070,6 +40118,41 @@ def split_row(
             metadata,
             effect_json,
             family_id="xmage_static_self_ward_creature",
+        ), "selected_exact_scope"
+
+    if static_attacks_each_combat_creature_unit:
+        if not is_creature_metadata(metadata):
+            return None, "static_attacks_each_combat_not_creature"
+        if ".getSpellAbility().addCost" in source_text:
+            return None, "static_attacks_each_combat_source_additional_cost_not_supported"
+        if not oracle_is_static_attacks_each_combat(metadata):
+            return None, "static_attacks_each_combat_oracle_not_exact"
+        if not source_is_static_attacks_each_combat(source_text, row):
+            return None, "static_attacks_each_combat_source_not_exact"
+        keyword_list = ordered_keywords(keywords_from_ability_classes(row))
+        effect_json = {
+            "effect": "creature",
+            "battle_model_scope": STATIC_ATTACKS_EACH_COMBAT_CREATURE_SCOPE,
+            "ability_kind": "static",
+            "static_effect": "self_attacks_each_combat_if_able",
+            "target": "self",
+            "target_controller": "self",
+            "attacks_each_combat_if_able": True,
+            "must_attack_each_combat_if_able": True,
+            "must_attack_if_able": True,
+            "xmage_ability_class": STATIC_ATTACKS_EACH_COMBAT_ABILITY_CLASS,
+            "xmage_ability_classes": sorted(ability_classes(row)),
+        }
+        if keyword_list:
+            effect_json["keywords"] = keyword_list
+            effect_json["_keywords_are_self"] = True
+            for keyword in keyword_list:
+                effect_json[keyword] = True
+        return build_proposal(
+            row,
+            metadata,
+            effect_json,
+            family_id="xmage_static_self_attacks_each_combat_creature",
         ), "selected_exact_scope"
 
     if prowess_creature_unit:
@@ -50283,6 +50366,7 @@ def build_exact_split_report(
             str(row.get("adapter_work_unit") or "") not in SUPPORTED_UNITS
             and not is_static_keyword_creature_unit(row)
             and not is_static_ward_creature_unit(row)
+            and not is_static_attacks_each_combat_creature_unit(row)
             and not is_prowess_creature_unit(row)
             and not is_changeling_creature_unit(row)
             and not is_static_protection_from_colors_creature_unit(row)
@@ -50413,6 +50497,7 @@ def build_exact_split_report(
             "supported_dynamic_adapter_work_units": [
                 "no-effect/no-signal static self keyword creature rows without ProtectionAbility",
                 "no-effect/no-signal WardAbility creature rows with exact fixed-mana Ward Oracle/XMage agreement and optional safe static self keywords",
+                "no-effect/static_ability AttacksEachCombatStaticAbility creature rows with exact Oracle/XMage self attacks-each-combat-if-able agreement and optional safe static self keywords",
                 "no-effect/no-signal ProwessAbility creature rows, optionally with safe static self keywords, with exact Oracle/XMage noncreature-spell +1/+1 trigger support",
                 "no-effect/no-signal ChangelingAbility creature rows, optionally with safe static self keywords, with exact Oracle/XMage all-creature-types support",
                 "no-effect/no-signal ProtectionAbility creature rows, optionally with static self keywords, with exact Oracle/XMage protection from colors, card types, subtypes, or supported filters",

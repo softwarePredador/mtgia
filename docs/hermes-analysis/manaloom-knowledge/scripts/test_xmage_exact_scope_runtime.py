@@ -23122,6 +23122,27 @@ class XMageExactScopeRuntimeTest(unittest.TestCase):
             )
         )
 
+    def test_static_attacks_each_combat_creature_is_selected_even_with_zero_power(self) -> None:
+        card = {
+            "name": "Fixture Must Attack Creature",
+            "type_line": "Creature - Goblin",
+            "effect": "creature",
+            "battle_model_scope": "xmage_static_self_attacks_each_combat_creature_v1",
+            "power": 0,
+            "toughness": 3,
+            "attacks_each_combat_if_able": True,
+            "must_attack_each_combat_if_able": True,
+            "must_attack_if_able": True,
+            "summoning_sick": False,
+            "tapped": False,
+        }
+
+        permanent = self.battle.enrich_card(card)
+        self.assertTrue(self.battle.can_attack_this_combat(permanent))
+        self.assertTrue(self.battle.must_attack_if_able(permanent))
+        self.assertTrue(self.battle.should_attack_with_creature(permanent))
+        self.assertEqual(self.battle.apply_basic_attack_requirements([permanent]), [permanent])
+
     def test_changeling_creature_matches_every_creature_subtype_filter(self) -> None:
         changeling = {
             "name": "Avian Changeling",

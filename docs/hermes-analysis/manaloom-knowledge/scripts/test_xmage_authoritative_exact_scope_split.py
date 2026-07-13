@@ -29612,6 +29612,58 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertIsNone(proposal)
         self.assertEqual(reason, "static_ward_oracle_not_exact")
 
+    def test_static_attacks_each_combat_creature_maps_exact_requirement(self) -> None:
+        row = queue_row(
+            "xmage_signature::no_effect_class::AttacksEachCombatStaticAbility::"
+            "no_target_class::no_condition_class::static_ability",
+            effect_classes=[],
+            ability_kind="static",
+            ability_classes=["AttacksEachCombatStaticAbility"],
+            xmage_signals=["static_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Goblin Brigand",
+                type_line="Creature - Goblin Warrior",
+                oracle_text="This creature attacks each combat if able.",
+            ),
+            source_text="this.addAbility(new AttacksEachCombatStaticAbility());",
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(
+            effect["battle_model_scope"],
+            split.STATIC_ATTACKS_EACH_COMBAT_CREATURE_SCOPE,
+        )
+        self.assertTrue(effect["attacks_each_combat_if_able"])
+        self.assertTrue(effect["must_attack_each_combat_if_able"])
+        self.assertTrue(effect["must_attack_if_able"])
+        self.assertEqual(effect["xmage_ability_class"], "AttacksEachCombatStaticAbility")
+
+    def test_static_attacks_each_combat_creature_blocks_nonmatching_oracle(self) -> None:
+        row = queue_row(
+            "xmage_signature::no_effect_class::AttacksEachCombatStaticAbility::"
+            "no_target_class::no_condition_class::static_ability",
+            effect_classes=[],
+            ability_kind="static",
+            ability_classes=["AttacksEachCombatStaticAbility"],
+            xmage_signals=["static_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Fixture Goblin",
+                type_line="Creature - Goblin",
+                oracle_text="This creature can't block.",
+            ),
+            source_text="this.addAbility(new AttacksEachCombatStaticAbility());",
+        )
+
+        self.assertIsNone(proposal)
+        self.assertEqual(reason, "static_attacks_each_combat_oracle_not_exact")
+
     def test_static_keyword_creature_blocks_source_additional_cast_cost(self) -> None:
         row = queue_row(
             "xmage_signature::no_effect_class::FearAbility::TargetCardInHand::no_condition_class::targeting",

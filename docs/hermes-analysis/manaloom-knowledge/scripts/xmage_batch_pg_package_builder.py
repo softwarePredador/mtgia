@@ -839,6 +839,9 @@ E2E_REQUIRED_EFFECT_FIELDS = (
     "cant_block",
     "cannot_block",
     "static_cant_block",
+    "attacks_each_combat_if_able",
+    "must_attack_each_combat_if_able",
+    "must_attack_if_able",
     "landwalk",
     "landwalk_keyword",
     "landwalk_land_type",
@@ -4608,6 +4611,45 @@ def static_cant_block_creature_execution_scenario_from_expected_rule(rule: dict[
         "type": "static_cant_block_creature",
         "card": card,
         "expected_cant_block": True,
+        "expected_keywords": keywords,
+        "logical_rule_key": rule["logical_rule_key"],
+    }
+
+
+def static_attacks_each_combat_creature_execution_scenario_from_expected_rule(
+    rule: dict[str, Any],
+) -> dict[str, Any] | None:
+    required = dict(rule.get("required_effect_fields") or {})
+    if required.get("effect") != "creature":
+        return None
+    if required.get("battle_model_scope") != "xmage_static_self_attacks_each_combat_creature_v1":
+        return None
+    if not (
+        required.get("attacks_each_combat_if_able")
+        and required.get("must_attack_each_combat_if_able")
+        and required.get("must_attack_if_able")
+    ):
+        return None
+    keywords = list(required.get("keywords") or [])
+    card = {
+        "name": rule["card_name"],
+        "type_line": "Creature",
+        "effect": "creature",
+        "power": 0,
+        "toughness": 3,
+        "summoning_sick": False,
+        "tapped": False,
+    }
+    if keywords:
+        card["keywords"] = keywords
+        card["_keywords_are_self"] = True
+    return {
+        "name": f"{rule['card_name']} must attack each combat if able",
+        "type": "static_attacks_each_combat_creature",
+        "card": card,
+        "expected_must_attack": True,
+        "expected_should_attack": True,
+        "expected_attackers": [rule["card_name"]],
         "expected_keywords": keywords,
         "logical_rule_key": rule["logical_rule_key"],
     }
@@ -10837,6 +10879,7 @@ def execution_scenario_from_expected_rule(rule: dict[str, Any]) -> dict[str, Any
         or mana_source_etb_draw_unblocked_control_transfer_execution_scenario_from_expected_rule(rule)
         or creature_enters_tapped_execution_scenario_from_expected_rule(rule)
         or static_cant_block_creature_execution_scenario_from_expected_rule(rule)
+        or static_attacks_each_combat_creature_execution_scenario_from_expected_rule(rule)
         or spell_mana_ritual_execution_scenario_from_expected_rule(rule)
         or creature_etb_life_gain_draw_execution_scenario_from_expected_rule(rule)
         or spell_cast_gain_life_execution_scenario_from_expected_rule(rule)

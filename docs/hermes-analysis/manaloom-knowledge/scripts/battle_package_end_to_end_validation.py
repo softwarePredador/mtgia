@@ -6578,6 +6578,45 @@ def run_static_cant_block_creature(
     }
 
 
+def run_static_attacks_each_combat_creature(
+    battle,
+    scenario: dict[str, Any],
+    events: list[tuple[str, dict[str, Any]]],
+) -> dict[str, Any]:
+    card = dict(scenario["card"])
+    effect = battle.get_card_effect(card)
+    if effect.get("effect") != "creature":
+        fail("battle_execution", f"{card['name']} effect={effect.get('effect')!r}")
+    if effect.get("battle_model_scope") != "xmage_static_self_attacks_each_combat_creature_v1":
+        fail("battle_execution", f"{card['name']} scope={effect.get('battle_model_scope')!r}")
+    active = battle.Player(str(scenario.get("attacker_player") or "Static Attacker"), None, [])
+    permanent = battle.enrich_card({**card, **effect})
+    permanent.setdefault("summoning_sick", False)
+    permanent.setdefault("tapped", False)
+    active.battlefield = [permanent]
+    if bool(battle.must_attack_if_able(permanent)) != bool(scenario.get("expected_must_attack", True)):
+        fail("battle_execution", f"{card['name']} must_attack={battle.must_attack_if_able(permanent)!r}")
+    if bool(battle.should_attack_with_creature(permanent)) != bool(scenario.get("expected_should_attack", True)):
+        fail("battle_execution", f"{card['name']} should_attack={battle.should_attack_with_creature(permanent)!r}")
+    for keyword in scenario.get("expected_keywords") or []:
+        if not battle.card_has_keyword(permanent, keyword):
+            fail("battle_execution", f"{card['name']} missing keyword={keyword!r}")
+    attackers = battle.apply_basic_attack_requirements(
+        [permanent] if battle.should_attack_with_creature(permanent) else []
+    )
+    attacker_names = [str(attacker.get("name") or "") for attacker in attackers]
+    expected_attackers = list(scenario.get("expected_attackers") or [card.get("name")])
+    if attacker_names != expected_attackers:
+        fail("battle_execution", f"{card['name']} attackers={attacker_names}, expected {expected_attackers}")
+    return {
+        "scenario": scenario.get("name"),
+        "card_name": card["name"],
+        "must_attack": bool(battle.must_attack_if_able(permanent)),
+        "should_attack": bool(battle.should_attack_with_creature(permanent)),
+        "attackers": attacker_names,
+    }
+
+
 def run_restricted_mana_formidable_life_reset(
     battle,
     scenario: dict[str, Any],
@@ -16367,6 +16406,7 @@ SCENARIO_RUNNERS = {
     "static_cost_increase_spell_cost": run_static_cost_increase_spell_cost,
     "static_cost_reduction_spell_cost": run_static_cost_reduction_spell_cost,
     "static_cant_block_creature": run_static_cant_block_creature,
+    "static_attacks_each_combat_creature": run_static_attacks_each_combat_creature,
     "static_filtered_protection": run_static_filtered_protection,
     "static_subtype_protection": run_static_filtered_protection,
     "static_count_power_toughness": run_static_count_power_toughness,
