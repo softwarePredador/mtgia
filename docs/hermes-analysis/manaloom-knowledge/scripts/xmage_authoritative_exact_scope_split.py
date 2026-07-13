@@ -20473,6 +20473,29 @@ def parse_mana_cost_text(cost_text: str) -> tuple[int, list[str]] | None:
     return generic, colors
 
 
+def parse_mana_cost_text_allow_x(cost_text: str) -> tuple[int, list[str], bool] | None:
+    generic = 0
+    colors: list[str] = []
+    x_seen = False
+    for symbol in re.findall(r"\{([^}]+)\}", cost_text or ""):
+        normalized = str(symbol or "").strip().upper()
+        if normalized == "X":
+            x_seen = True
+        elif normalized.isdigit():
+            generic += int(normalized)
+        elif normalized == "S":
+            generic += 1
+        elif normalized in {"W", "U", "B", "R", "G"}:
+            colors.append(normalized)
+        elif re.fullmatch(r"[WUBRG](?:/[WUBRG])+", normalized):
+            colors.append(normalized)
+        elif re.fullmatch(r"(?:[WUBRG]/P|P/[WUBRG])", normalized):
+            colors.append(normalized)
+        else:
+            return None
+    return generic, colors, x_seen
+
+
 def canonical_mana_cost_text(cost_text: str) -> str:
     return re.sub(
         r"\{([^}]+)\}",
@@ -23054,6 +23077,37 @@ def activated_damage_from_oracle(metadata: dict[str, Any]) -> dict[str, Any] | N
         **({"activation_remove_counter_cost": remove_counter_cost} if remove_counter_cost else {}),
     }
     effect_text = text.rsplit(":", 1)[1].strip()
+    x_match = re.match(
+        r"^(?:it|this (?:artifact|creature|enchantment)|[^.]+?) deals x damage to "
+        r"(any target|target attacking or blocking creature|target creature|target player|target opponent|target player or planeswalker|target opponent or planeswalker|target creature or planeswalker)\.?$",
+        effect_text,
+    )
+    if x_match:
+        target_map = {
+            "any target": "any_target",
+            "target attacking or blocking creature": "attacking_or_blocking_creature",
+            "target creature": "creature",
+            "target player": "player",
+            "target opponent": "opponent",
+            "target player or planeswalker": "player_or_planeswalker",
+            "target opponent or planeswalker": "opponent_or_planeswalker",
+            "target creature or planeswalker": "creature_or_planeswalker",
+        }
+        sacrifice_cost = activation_sacrifice_cost_from_oracle(text)
+        if isinstance(sacrifice_cost, str):
+            return None
+        return {
+            "amount": 0,
+            "damage": 0,
+            "damage_amount_source": "x_value",
+            "target": target_map[x_match.group(1)],
+            "activation_sacrifice_cost": sacrifice_cost,
+            "activation_tap_cost": tap_cost,
+            "activation_life_cost": life_cost,
+            "e2e_x_value": 3,
+            **(discard_cost or {}),
+            **extra_costs,
+        }
     restricted = restricted_battlefield_target_from_oracle({"oracle_text": effect_text}, "damage")
     if restricted is not None:
         match = re.match(
@@ -23107,7 +23161,9 @@ def activated_damage_from_oracle(metadata: dict[str, Any]) -> dict[str, Any] | N
 def activated_damage_from_source(source: str) -> dict[str, Any] | str:
     text = source or ""
     risky_cost_classes = {
+        "EarlyTargetCost",
         "ExileSourceFromGraveCost",
+        "KnollspineInvocationDiscardCost",
         "MillCardsCost",
         "ReturnToHandSourceCost",
         "RevealTargetFromHandCost",
@@ -23115,10 +23171,15 @@ def activated_damage_from_source(source: str) -> dict[str, Any] | str:
     if "Zone.GRAVEYARD" in text:
         return "activated_damage_source_not_battlefield"
     damage_matches = re.findall(r"DamageTargetEffect\s*\(\s*(\d*)\s*(?:,|\))", text)
-    if len(damage_matches) != 1:
+    x_damage_matches = re.findall(
+        r"DamageTargetEffect\s*\(\s*(?:GetXValue\.instance|ManacostVariableValue\.instance)\s*(?:,|\))",
+        text,
+    )
+    if len(damage_matches) + len(x_damage_matches) != 1:
         return "activated_damage_source_count_not_fixed"
-    count = int(damage_matches[0] or "0")
-    if count <= 0:
+    amount_source = "x_value" if x_damage_matches else None
+    count = 0 if amount_source == "x_value" else int(damage_matches[0] or "0")
+    if amount_source != "x_value" and count <= 0:
         return "activated_damage_source_count_not_fixed"
     damage_index = text.find("DamageTargetEffect")
     target_text = source_effect_target_window(text, damage_index)
@@ -23178,15 +23239,20 @@ def activated_damage_from_source(source: str) -> dict[str, Any] | str:
         cost_text = "{" + generic_match.group(1) + "}"
     elif colored_match:
         cost_text = "{" + colored_match.group(1) + "}"
-    parsed_cost = parse_mana_cost_text(cost_text)
+    parsed_cost = parse_mana_cost_text_allow_x(cost_text)
     if parsed_cost is None:
         return "activated_damage_source_mana_cost_not_supported"
-    activation_cost_generic, activation_cost_colors = parsed_cost
+    activation_cost_generic, activation_cost_colors, activation_cost_uses_x = parsed_cost
+    if amount_source == "x_value" and not activation_cost_uses_x:
+        return "activated_damage_source_x_cost_missing"
+    if amount_source != "x_value" and activation_cost_uses_x:
+        return "activated_damage_source_unexpected_x_cost"
     requires_tap = "TapSourceCost" in window
     requires_sacrifice = "SacrificeSourceCost" in window
     return {
         "amount": count,
         "damage": count,
+        **({"damage_amount_source": amount_source, "e2e_x_value": 3} if amount_source else {}),
         "target": target,
         "activation_cost_mana": cost_text,
         "activation_cost_generic": activation_cost_generic,
@@ -41474,6 +41540,16 @@ def split_row(
             "activated_effect": "direct_damage",
             "activated_battle_model_scope": PERMANENT_ACTIVATED_DAMAGE_SCOPE,
             "activated_damage_amount": oracle_amount,
+            "amount": int(parsed_activation.get("amount") or 0),
+            "damage": int(parsed_activation.get("damage") or 0),
+            **(
+                {
+                    "damage_amount_source": parsed_activation["damage_amount_source"],
+                    "e2e_x_value": int(parsed_activation.get("e2e_x_value") or 3),
+                }
+                if parsed_activation.get("damage_amount_source")
+                else {}
+            ),
             "target": oracle_target,
             "target_constraints": target_constraints_for(oracle_target),
             "_activated_rule_effects": [activated_effect],

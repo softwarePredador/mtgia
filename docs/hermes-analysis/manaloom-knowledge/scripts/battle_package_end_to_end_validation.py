@@ -7527,7 +7527,13 @@ def run_simple_activated_damage(
     events: list[tuple[str, dict[str, Any]]],
 ) -> dict[str, Any]:
     card = dict(scenario["card"])
-    effect = battle.get_card_effect(card)
+    effect = dict(battle.get_card_effect(card) or {})
+    if scenario.get("x_value") is not None:
+        x_value = int(scenario.get("x_value") or 0)
+        effect["x_value"] = x_value
+        effect["_resolution_context"] = {"x_value": x_value}
+        card["x_value"] = x_value
+        card["_resolution_context"] = {"x_value": x_value}
     permanent_type = str(effect.get("effect") or "permanent")
     default_type_line = {
         "creature": "Creature - Wizard",
@@ -7651,6 +7657,13 @@ def run_simple_activated_damage(
     )
     if activation_event is None:
         fail("battle_events", f"missing {card['name']} simple activated damage event")
+    if scenario.get("expected_x_value") is not None and int(activation_event.get("x_value") or 0) != int(
+        scenario.get("expected_x_value") or 0
+    ):
+        fail(
+            "battle_events",
+            f"{card['name']} x_value={activation_event.get('x_value')!r}, expected {scenario.get('expected_x_value')!r}",
+        )
     expected_tap_cost_count = int(scenario.get("expected_tap_cost_count") or len(tap_cost_targets) or 0)
     if expected_tap_cost_count:
         if len(tap_cost_targets) < expected_tap_cost_count:

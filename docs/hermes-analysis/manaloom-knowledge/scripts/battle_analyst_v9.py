@@ -54201,7 +54201,8 @@ def generic_tap_damage_effect_for_permanent(permanent):
                 amount = int(effect_data.get("amount") or effect_data.get("damage") or 0)
             except (TypeError, ValueError):
                 amount = 0
-            if amount > 0:
+            damage_amount_source = str(effect_data.get("damage_amount_source") or "").strip()
+            if amount > 0 or damage_amount_source:
                 return effect_data
     return None
 
@@ -54590,12 +54591,7 @@ def can_activate_generic_tap_damage_permanent(player, permanent, opponents, *, e
         and not has_haste(permanent)
     ):
         return False
-    activation_cost = effect_data.get("activation_cost_mana")
-    if not activation_cost:
-        activation_cost = _activation_cost_text(
-            int(effect_data.get("activation_cost_generic") or 0),
-            effect_data.get("activation_cost_colors") or [],
-        )
+    activation_cost = activation_cost_text_for_effect(effect_data)
     if not player.can_pay(activation_cost):
         return False
     if _activation_sacrifice_cost(effect_data):
@@ -54660,12 +54656,7 @@ def activate_generic_tap_damage_permanent(player, opponents, permanent, turn, rn
     ):
         return False
     phase = phase or "precombat_main"
-    activation_cost = effect_data.get("activation_cost_mana")
-    if not activation_cost:
-        activation_cost = _activation_cost_text(
-            int(effect_data.get("activation_cost_generic") or 0),
-            effect_data.get("activation_cost_colors") or [],
-        )
+    activation_cost = activation_cost_text_for_effect(effect_data)
     if not player.spend_mana(activation_cost):
         return False
     old_tap_damage_scope = effect_data.get("battle_model_scope") == GENERIC_TAP_DAMAGE_ACTIVATED_SCOPE
@@ -54762,11 +54753,15 @@ def activate_generic_tap_damage_permanent(player, opponents, permanent, turn, rn
         if removed_counter_cost_count != required_counter_count:
             return False
     fields = replay_rule_fields(effect_data)
-    damage = int(effect_data.get("amount") or effect_data.get("damage") or 0)
+    if effect_data.get("damage_amount_source"):
+        dynamic_damage, _dynamic_fields = dynamic_damage_amount(player, opponents, effect_data)
+        damage = int(dynamic_damage or 0)
+    else:
+        damage = int(effect_data.get("amount") or effect_data.get("damage") or 0)
     requires_tap = bool(effect_data.get("activation_requires_tap"))
     activation_cost_generic = int(effect_data.get("activation_cost_generic") or 0)
     activation_cost_colors = list(effect_data.get("activation_cost_colors") or [])
-    mana_paid = activation_cost_generic + len(activation_cost_colors)
+    mana_paid = _mana_cost_text_value(activation_cost)
     emit_decision_trace(
         decision_type="activated_ability",
         player=player,
@@ -54881,6 +54876,11 @@ def activate_generic_tap_damage_permanent(player, opponents, permanent, turn, rn
         remove_counter_cost_available_targets=len(remove_counter_cost_options),
         removed_counter_cost_type=removed_counter_cost_type,
         removed_counter_cost_count=removed_counter_cost_count,
+        x_value=(
+            x_value_from_effect_context(effect_data)
+            if str(effect_data.get("damage_amount_source") or "").lower() == "x_value"
+            else None
+        ),
         turn=turn,
         phase=phase,
         **fields,
@@ -65825,11 +65825,24 @@ def executable_activated_rule_effects(permanent, *, effect=None):
 
 def activation_cost_text_for_effect(effect_data):
     if effect_data.get("activation_cost_mana"):
-        return str(effect_data.get("activation_cost_mana"))
-    return _activation_cost_text(
-        int(effect_data.get("activation_cost_generic") or 0),
-        effect_data.get("activation_cost_colors") or [],
-    )
+        cost_text = str(effect_data.get("activation_cost_mana"))
+    else:
+        cost_text = _activation_cost_text(
+            int(effect_data.get("activation_cost_generic") or 0),
+            effect_data.get("activation_cost_colors") or [],
+        )
+    if re.search(r"\{X\}", cost_text, re.I):
+        x_value = x_value_from_effect_context(
+            effect_data,
+            default=effect_data.get("e2e_x_value") or 3,
+        )
+        if isinstance(effect_data, dict):
+            effect_data["x_value"] = x_value
+            context = dict(effect_data.get("_resolution_context") or {})
+            context["x_value"] = x_value
+            effect_data["_resolution_context"] = context
+        cost_text = re.sub(r"\{X\}", "{" + str(x_value) + "}", cost_text, flags=re.I)
+    return cost_text
 
 
 def activated_copy_creature_token_station_ready(permanent, effect_data):

@@ -3954,7 +3954,11 @@ def _manifest_mana_for_required_activation(
     colors_field: str = "activation_cost_colors",
 ) -> dict[str, int]:
     if required.get(cost_field) is not None:
-        return _manifest_mana_for_activation_cost(required.get(cost_field))
+        cost_text = str(required.get(cost_field))
+        if re.search(r"\{X\}", cost_text, re.I):
+            x_value = int(required.get("e2e_x_value") or required.get("x_value") or 3)
+            cost_text = re.sub(r"\{X\}", "{" + str(x_value) + "}", cost_text, flags=re.I)
+        return _manifest_mana_for_activation_cost(cost_text)
     mana = _manifest_mana_for_activation_cost(None)
     mana["generic"] = int(required.get(generic_field) or 0)
     for symbol in list(required.get(colors_field) or []):
@@ -5090,6 +5094,13 @@ def simple_activated_damage_execution_scenario_from_expected_rule(
     required = dict(rule.get("required_effect_fields") or {})
     if required.get("battle_model_scope") != "xmage_permanent_simple_activated_damage_v1":
         return None
+    x_value = int(required.get("e2e_x_value") or required.get("x_value") or 3)
+    damage_amount_source = str(required.get("damage_amount_source") or "").strip().lower()
+    expected_damage = (
+        x_value
+        if damage_amount_source == "x_value"
+        else int(required.get("activated_damage_amount") or required.get("amount") or 0)
+    )
     discard_target = str(required.get("activation_discard_target") or "any_card")
     discard_hand = []
     if int(required.get("activation_discard_count") or 0):
@@ -5111,13 +5122,16 @@ def simple_activated_damage_execution_scenario_from_expected_rule(
         "starting_life": 40,
         "controller_mana": _manifest_mana_for_required_activation(required),
         "controller_hand": discard_hand,
-        "expected_damage": int(required.get("activated_damage_amount") or required.get("amount") or 0),
+        "expected_damage": expected_damage,
         "expected_discard_count": int(required.get("activation_discard_count") or 0),
         "expected_discard_target": discard_target,
         "expected_discard_random": bool(required.get("activation_discard_random")),
         "expected_life_paid": int(required.get("activation_life_cost") or 0),
         "logical_rule_key": rule["logical_rule_key"],
     }
+    if damage_amount_source == "x_value":
+        scenario["x_value"] = x_value
+        scenario["expected_x_value"] = x_value
     tap_cost_targets = _manifest_tap_cost_fixtures(
         "E2E Activated Damage Tap Cost Target",
         required.get("activation_tap_cost") if isinstance(required.get("activation_tap_cost"), dict) else None,

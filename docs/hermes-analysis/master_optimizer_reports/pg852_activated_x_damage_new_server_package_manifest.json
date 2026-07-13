@@ -1,0 +1,578 @@
+{
+  "apply_gate": "Do not run apply SQL without explicit approval for the exact command.",
+  "backup_table": "manaloom_deploy_audit.pg852_activated_x_damage_new_server_20260712_235735",
+  "deploy_id": "PG852",
+  "execution_scenarios": [
+    {
+      "card": {
+        "name": "Ballista Squad"
+      },
+      "controller_hand": [],
+      "controller_mana": {
+        "black": 0,
+        "blue": 0,
+        "generic": 3,
+        "green": 0,
+        "red": 0,
+        "white": 1
+      },
+      "expected_damage": 3,
+      "expected_discard_count": 0,
+      "expected_discard_random": false,
+      "expected_discard_target": "any_card",
+      "expected_life_paid": 0,
+      "expected_target": "attacking_or_blocking_creature",
+      "expected_x_value": 3,
+      "logical_rule_key": "battle_rule_v1:710a219d5a896a02e7028bfc6349bc83",
+      "name": "Ballista Squad activates damage ability",
+      "opponent_life": 7,
+      "starting_life": 40,
+      "target": {
+        "attacking": true,
+        "cmc": 3,
+        "effect": "creature",
+        "name": "E2E Legal Activated Damage Target",
+        "power": 2,
+        "toughness": 2,
+        "type_line": "Creature - Soldier"
+      },
+      "type": "simple_activated_damage",
+      "x_value": 3
+    },
+    {
+      "card": {
+        "name": "Cinder Elemental"
+      },
+      "controller_hand": [],
+      "controller_mana": {
+        "black": 0,
+        "blue": 0,
+        "generic": 3,
+        "green": 0,
+        "red": 1,
+        "white": 0
+      },
+      "expected_damage": 3,
+      "expected_discard_count": 0,
+      "expected_discard_random": false,
+      "expected_discard_target": "any_card",
+      "expected_life_paid": 0,
+      "expected_x_value": 3,
+      "logical_rule_key": "battle_rule_v1:3eec9da8077f0b046a6165abefc549e7",
+      "name": "Cinder Elemental activates damage ability",
+      "opponent_life": 7,
+      "starting_life": 40,
+      "type": "simple_activated_damage",
+      "x_value": 3
+    },
+    {
+      "card": {
+        "name": "Pain Kami"
+      },
+      "controller_hand": [],
+      "controller_mana": {
+        "black": 0,
+        "blue": 0,
+        "generic": 3,
+        "green": 0,
+        "red": 1,
+        "white": 0
+      },
+      "expected_damage": 3,
+      "expected_discard_count": 0,
+      "expected_discard_random": false,
+      "expected_discard_target": "any_card",
+      "expected_life_paid": 0,
+      "expected_target": "creature",
+      "expected_x_value": 3,
+      "logical_rule_key": "battle_rule_v1:0cd76164b3a7d4d43ff86d69f3d6f2e1",
+      "name": "Pain Kami activates damage ability",
+      "opponent_life": 7,
+      "starting_life": 40,
+      "target": {
+        "cmc": 3,
+        "effect": "creature",
+        "name": "E2E Legal Activated Damage Target",
+        "power": 2,
+        "toughness": 2,
+        "type_line": "Creature - Soldier"
+      },
+      "type": "simple_activated_damage",
+      "x_value": 3
+    }
+  ],
+  "expected_rules": [
+    {
+      "card_name": "Ballista Squad",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:710a219d5a896a02e7028bfc6349bc83",
+      "min_rule_version": 2,
+      "normalized_name": "ballista squad",
+      "oracle_hash": "b83a1f67ed318231a171f1a5e38d8f4f",
+      "required_effect_fields": {
+        "_activated_rule_effects": [
+          {
+            "ability_kind": "activated",
+            "activated_effect": "direct_damage",
+            "activation_cost_colors": [
+              "W"
+            ],
+            "activation_cost_generic": 0,
+            "activation_cost_mana": "{X}{W}",
+            "activation_life_cost": 0,
+            "activation_requires_sacrifice": false,
+            "activation_requires_tap": true,
+            "activation_sacrifice_cost": null,
+            "activation_tap_cost": null,
+            "amount": 0,
+            "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+            "damage": 0,
+            "damage_amount_source": "x_value",
+            "e2e_x_value": 3,
+            "effect": "direct_damage",
+            "target": "attacking_or_blocking_creature",
+            "target_constraints": {
+              "card_types": [
+                "creature"
+              ],
+              "combat_state": "attacking_or_blocking"
+            },
+            "xmage_ability_class": "SimpleActivatedAbility",
+            "xmage_effect_class": "DamageTargetEffect"
+          }
+        ],
+        "ability_kind": "static_and_activated",
+        "activated_battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+        "activated_damage_amount": 0,
+        "activated_effect": "direct_damage",
+        "activation_cost_colors": [
+          "W"
+        ],
+        "activation_cost_generic": 0,
+        "activation_cost_mana": "{X}{W}",
+        "activation_life_cost": 0,
+        "activation_requires_sacrifice": false,
+        "activation_requires_tap": true,
+        "amount": 0,
+        "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+        "damage": 0,
+        "damage_amount_source": "x_value",
+        "e2e_x_value": 3,
+        "effect": "creature",
+        "target": "attacking_or_blocking_creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "combat_state": "attacking_or_blocking"
+        },
+        "xmage_ability_class": "SimpleActivatedAbility",
+        "xmage_effect_class": "DamageTargetEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Cinder Elemental",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:3eec9da8077f0b046a6165abefc549e7",
+      "min_rule_version": 2,
+      "normalized_name": "cinder elemental",
+      "oracle_hash": "526abe5bb0e0a87b45acd6ba5526d96c",
+      "required_effect_fields": {
+        "_activated_rule_effects": [
+          {
+            "ability_kind": "activated",
+            "activated_effect": "direct_damage",
+            "activated_self_sacrifice_damage": true,
+            "activation_cost_colors": [
+              "R"
+            ],
+            "activation_cost_generic": 0,
+            "activation_cost_mana": "{X}{R}",
+            "activation_life_cost": 0,
+            "activation_requires_sacrifice": true,
+            "activation_requires_tap": true,
+            "activation_sacrifice_cost": null,
+            "activation_tap_cost": null,
+            "amount": 0,
+            "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+            "damage": 0,
+            "damage_amount_source": "x_value",
+            "e2e_x_value": 3,
+            "effect": "direct_damage",
+            "target": "any_target",
+            "target_constraints": {
+              "scope": "any_target"
+            },
+            "xmage_ability_class": "SimpleActivatedAbility",
+            "xmage_effect_class": "DamageTargetEffect"
+          }
+        ],
+        "ability_kind": "static_and_activated",
+        "activated_battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+        "activated_damage_amount": 0,
+        "activated_effect": "direct_damage",
+        "activation_cost_colors": [
+          "R"
+        ],
+        "activation_cost_generic": 0,
+        "activation_cost_mana": "{X}{R}",
+        "activation_life_cost": 0,
+        "activation_requires_sacrifice": true,
+        "activation_requires_tap": true,
+        "amount": 0,
+        "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+        "damage": 0,
+        "damage_amount_source": "x_value",
+        "e2e_x_value": 3,
+        "effect": "creature",
+        "target": "any_target",
+        "target_constraints": {
+          "scope": "any_target"
+        },
+        "xmage_ability_class": "SimpleActivatedAbility",
+        "xmage_effect_class": "DamageTargetEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Pain Kami",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:0cd76164b3a7d4d43ff86d69f3d6f2e1",
+      "min_rule_version": 2,
+      "normalized_name": "pain kami",
+      "oracle_hash": "26a05e4293b86b7271616759793588eb",
+      "required_effect_fields": {
+        "_activated_rule_effects": [
+          {
+            "ability_kind": "activated",
+            "activated_effect": "direct_damage",
+            "activated_self_sacrifice_damage": true,
+            "activation_cost_colors": [
+              "R"
+            ],
+            "activation_cost_generic": 0,
+            "activation_cost_mana": "{X}{R}",
+            "activation_life_cost": 0,
+            "activation_requires_sacrifice": true,
+            "activation_requires_tap": false,
+            "activation_sacrifice_cost": null,
+            "activation_tap_cost": null,
+            "amount": 0,
+            "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+            "damage": 0,
+            "damage_amount_source": "x_value",
+            "e2e_x_value": 3,
+            "effect": "direct_damage",
+            "target": "creature",
+            "target_constraints": {
+              "card_types": [
+                "creature"
+              ]
+            },
+            "xmage_ability_class": "SimpleActivatedAbility",
+            "xmage_effect_class": "DamageTargetEffect"
+          }
+        ],
+        "ability_kind": "static_and_activated",
+        "activated_battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+        "activated_damage_amount": 0,
+        "activated_effect": "direct_damage",
+        "activation_cost_colors": [
+          "R"
+        ],
+        "activation_cost_generic": 0,
+        "activation_cost_mana": "{X}{R}",
+        "activation_life_cost": 0,
+        "activation_requires_sacrifice": true,
+        "activation_requires_tap": false,
+        "amount": 0,
+        "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+        "damage": 0,
+        "damage_amount_source": "x_value",
+        "e2e_x_value": 3,
+        "effect": "creature",
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ]
+        },
+        "xmage_ability_class": "SimpleActivatedAbility",
+        "xmage_effect_class": "DamageTargetEffect"
+      },
+      "review_status": "verified"
+    }
+  ],
+  "family_counts": {
+    "xmage_permanent_simple_activated_damage": 3
+  },
+  "files": {
+    "apply": "docs/hermes-analysis/master_optimizer_reports/pg852_activated_x_damage_new_server_package_apply.sql",
+    "manifest": "docs/hermes-analysis/master_optimizer_reports/pg852_activated_x_damage_new_server_package_manifest.json",
+    "package": "docs/hermes-analysis/master_optimizer_reports/pg852_activated_x_damage_new_server_package_package.md",
+    "postcheck": "docs/hermes-analysis/master_optimizer_reports/pg852_activated_x_damage_new_server_package_postcheck.sql",
+    "precheck": "docs/hermes-analysis/master_optimizer_reports/pg852_activated_x_damage_new_server_package_precheck.sql",
+    "rollback": "docs/hermes-analysis/master_optimizer_reports/pg852_activated_x_damage_new_server_package_rollback.sql"
+  },
+  "generated_at": "2026-07-12T23:57:35+00:00",
+  "mutations_performed": [],
+  "runtime_checks": [
+    {
+      "card": {
+        "name": "Ballista Squad"
+      },
+      "card_name": "Ballista Squad",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:710a219d5a896a02e7028bfc6349bc83",
+      "normalized_name": "ballista squad",
+      "required_effect_fields": {
+        "_activated_rule_effects": [
+          {
+            "ability_kind": "activated",
+            "activated_effect": "direct_damage",
+            "activation_cost_colors": [
+              "W"
+            ],
+            "activation_cost_generic": 0,
+            "activation_cost_mana": "{X}{W}",
+            "activation_life_cost": 0,
+            "activation_requires_sacrifice": false,
+            "activation_requires_tap": true,
+            "activation_sacrifice_cost": null,
+            "activation_tap_cost": null,
+            "amount": 0,
+            "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+            "damage": 0,
+            "damage_amount_source": "x_value",
+            "e2e_x_value": 3,
+            "effect": "direct_damage",
+            "target": "attacking_or_blocking_creature",
+            "target_constraints": {
+              "card_types": [
+                "creature"
+              ],
+              "combat_state": "attacking_or_blocking"
+            },
+            "xmage_ability_class": "SimpleActivatedAbility",
+            "xmage_effect_class": "DamageTargetEffect"
+          }
+        ],
+        "ability_kind": "static_and_activated",
+        "activated_battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+        "activated_damage_amount": 0,
+        "activated_effect": "direct_damage",
+        "activation_cost_colors": [
+          "W"
+        ],
+        "activation_cost_generic": 0,
+        "activation_cost_mana": "{X}{W}",
+        "activation_life_cost": 0,
+        "activation_requires_sacrifice": false,
+        "activation_requires_tap": true,
+        "amount": 0,
+        "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+        "damage": 0,
+        "damage_amount_source": "x_value",
+        "e2e_x_value": 3,
+        "effect": "creature",
+        "target": "attacking_or_blocking_creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "combat_state": "attacking_or_blocking"
+        },
+        "xmage_ability_class": "SimpleActivatedAbility",
+        "xmage_effect_class": "DamageTargetEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Cinder Elemental"
+      },
+      "card_name": "Cinder Elemental",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:3eec9da8077f0b046a6165abefc549e7",
+      "normalized_name": "cinder elemental",
+      "required_effect_fields": {
+        "_activated_rule_effects": [
+          {
+            "ability_kind": "activated",
+            "activated_effect": "direct_damage",
+            "activated_self_sacrifice_damage": true,
+            "activation_cost_colors": [
+              "R"
+            ],
+            "activation_cost_generic": 0,
+            "activation_cost_mana": "{X}{R}",
+            "activation_life_cost": 0,
+            "activation_requires_sacrifice": true,
+            "activation_requires_tap": true,
+            "activation_sacrifice_cost": null,
+            "activation_tap_cost": null,
+            "amount": 0,
+            "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+            "damage": 0,
+            "damage_amount_source": "x_value",
+            "e2e_x_value": 3,
+            "effect": "direct_damage",
+            "target": "any_target",
+            "target_constraints": {
+              "scope": "any_target"
+            },
+            "xmage_ability_class": "SimpleActivatedAbility",
+            "xmage_effect_class": "DamageTargetEffect"
+          }
+        ],
+        "ability_kind": "static_and_activated",
+        "activated_battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+        "activated_damage_amount": 0,
+        "activated_effect": "direct_damage",
+        "activation_cost_colors": [
+          "R"
+        ],
+        "activation_cost_generic": 0,
+        "activation_cost_mana": "{X}{R}",
+        "activation_life_cost": 0,
+        "activation_requires_sacrifice": true,
+        "activation_requires_tap": true,
+        "amount": 0,
+        "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+        "damage": 0,
+        "damage_amount_source": "x_value",
+        "e2e_x_value": 3,
+        "effect": "creature",
+        "target": "any_target",
+        "target_constraints": {
+          "scope": "any_target"
+        },
+        "xmage_ability_class": "SimpleActivatedAbility",
+        "xmage_effect_class": "DamageTargetEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Pain Kami"
+      },
+      "card_name": "Pain Kami",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:0cd76164b3a7d4d43ff86d69f3d6f2e1",
+      "normalized_name": "pain kami",
+      "required_effect_fields": {
+        "_activated_rule_effects": [
+          {
+            "ability_kind": "activated",
+            "activated_effect": "direct_damage",
+            "activated_self_sacrifice_damage": true,
+            "activation_cost_colors": [
+              "R"
+            ],
+            "activation_cost_generic": 0,
+            "activation_cost_mana": "{X}{R}",
+            "activation_life_cost": 0,
+            "activation_requires_sacrifice": true,
+            "activation_requires_tap": false,
+            "activation_sacrifice_cost": null,
+            "activation_tap_cost": null,
+            "amount": 0,
+            "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+            "damage": 0,
+            "damage_amount_source": "x_value",
+            "e2e_x_value": 3,
+            "effect": "direct_damage",
+            "target": "creature",
+            "target_constraints": {
+              "card_types": [
+                "creature"
+              ]
+            },
+            "xmage_ability_class": "SimpleActivatedAbility",
+            "xmage_effect_class": "DamageTargetEffect"
+          }
+        ],
+        "ability_kind": "static_and_activated",
+        "activated_battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+        "activated_damage_amount": 0,
+        "activated_effect": "direct_damage",
+        "activation_cost_colors": [
+          "R"
+        ],
+        "activation_cost_generic": 0,
+        "activation_cost_mana": "{X}{R}",
+        "activation_life_cost": 0,
+        "activation_requires_sacrifice": true,
+        "activation_requires_tap": false,
+        "amount": 0,
+        "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+        "damage": 0,
+        "damage_amount_source": "x_value",
+        "e2e_x_value": 3,
+        "effect": "creature",
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ]
+        },
+        "xmage_ability_class": "SimpleActivatedAbility",
+        "xmage_effect_class": "DamageTargetEffect"
+      }
+    }
+  ],
+  "selected_card_names": [
+    "Ballista Squad",
+    "Cinder Elemental",
+    "Pain Kami"
+  ],
+  "selected_count": 3,
+  "slug": "activated_x_damage_new_server",
+  "snapshot_checks": [
+    {
+      "card_name": "Ballista Squad",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:710a219d5a896a02e7028bfc6349bc83",
+      "min_rule_version": 2,
+      "normalized_name": "ballista squad",
+      "oracle_hash": "b83a1f67ed318231a171f1a5e38d8f4f",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_permanent_simple_activated_damage_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Cinder Elemental",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:3eec9da8077f0b046a6165abefc549e7",
+      "min_rule_version": 2,
+      "normalized_name": "cinder elemental",
+      "oracle_hash": "526abe5bb0e0a87b45acd6ba5526d96c",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_permanent_simple_activated_damage_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Pain Kami",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:0cd76164b3a7d4d43ff86d69f3d6f2e1",
+      "min_rule_version": 2,
+      "normalized_name": "pain kami",
+      "oracle_hash": "26a05e4293b86b7271616759793588eb",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_permanent_simple_activated_damage_v1"
+      },
+      "review_status": "verified"
+    }
+  ],
+  "status": "prepared_read_only_pending_apply_approval"
+}
