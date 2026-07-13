@@ -2664,6 +2664,61 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertIsNone(proposal)
         self.assertEqual(reason, "becomes_blocked_self_boost_source_oracle_mismatch")
 
+    def test_becomes_blocked_draw_maps_optional_fixed_draw(self) -> None:
+        row = queue_row(
+            split.DRAW_ENGINE_UNIT,
+            effect_classes=["DrawCardSourceControllerEffect"],
+            ability_kind="triggered",
+            ability_classes=["BecomesBlockedSourceTriggeredAbility"],
+            xmage_signals=["draw", "triggered_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Drelnoch",
+                type_line="Creature - Yeti Mutant",
+                oracle_text="Whenever Drelnoch becomes blocked, you may draw two cards.",
+            ),
+            source_text="""
+                this.addAbility(new BecomesBlockedSourceTriggeredAbility(
+                    new DrawCardSourceControllerEffect(2), true));
+            """,
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.BECOMES_BLOCKED_DRAW_CREATURE_SCOPE)
+        self.assertEqual(effect["trigger"], "becomes_blocked")
+        self.assertEqual(effect["trigger_effect"], "draw_cards")
+        self.assertEqual(effect["draw_count"], 2)
+        self.assertEqual(effect["becomes_blocked_draw_count"], 2)
+        self.assertTrue(effect["becomes_blocked_draw_optional"])
+        self.assertTrue(effect["becomes_blocked_trigger_draw"])
+
+    def test_becomes_blocked_draw_rejects_non_optional_source(self) -> None:
+        row = queue_row(
+            split.DRAW_ENGINE_UNIT,
+            effect_classes=["DrawCardSourceControllerEffect"],
+            ability_kind="triggered",
+            ability_classes=["BecomesBlockedSourceTriggeredAbility"],
+            xmage_signals=["draw", "triggered_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Strict Draw Nautilus",
+                type_line="Creature - Nautilus",
+                oracle_text="Whenever Strict Draw Nautilus becomes blocked, you may draw a card.",
+            ),
+            source_text="""
+                this.addAbility(new BecomesBlockedSourceTriggeredAbility(
+                    new DrawCardSourceControllerEffect(1), false));
+            """,
+        )
+
+        self.assertIsNone(proposal)
+        self.assertEqual(reason, "becomes_blocked_draw_source_not_optional")
+
     def test_attack_trigger_grants_flying_to_controlled_subtype_without_flying(self) -> None:
         row = queue_row(
             split.BOOST_KEYWORD_UNIT,

@@ -461,6 +461,9 @@ E2E_REQUIRED_EFFECT_FIELDS = (
     "combat_damage_draw_optional",
     "combat_damage_draw_optional_cost",
     "combat_damage_draw_optional_cost_count",
+    "becomes_blocked_draw_count",
+    "becomes_blocked_draw_optional",
+    "becomes_blocked_trigger_draw",
     "graveyard_exile_target",
     "graveyard_exile_target_count",
     "graveyard_exile_destination",
@@ -8940,6 +8943,42 @@ def becomes_blocked_self_boost_execution_scenario_from_expected_rule(
     }
 
 
+def becomes_blocked_draw_execution_scenario_from_expected_rule(
+    rule: dict[str, Any],
+) -> dict[str, Any] | None:
+    required = dict(rule.get("required_effect_fields") or {})
+    if required.get("battle_model_scope") != "xmage_creature_becomes_blocked_draw_cards_v1":
+        return None
+    draw_count = int(required.get("becomes_blocked_draw_count") or required.get("draw_count") or 0)
+    if draw_count <= 0:
+        return None
+    return {
+        "name": f"{rule['card_name']} draws when blocked",
+        "type": "becomes_blocked_draw",
+        "card": {
+            "name": rule["card_name"],
+            "type_line": "Creature - Merfolk",
+            "effect": "creature",
+            "power": 2,
+            "toughness": 2,
+            "attacking": True,
+            "summoning_sick": False,
+        },
+        "blocker_count": 1,
+        "controller_library": [
+            {
+                "name": f"E2E Draw Card {index + 1}",
+                "type_line": "Sorcery",
+                "effect": "draw_cards",
+            }
+            for index in range(draw_count)
+        ],
+        "expected_draw_count": draw_count,
+        "expected_optional": bool(required.get("becomes_blocked_draw_optional")),
+        "logical_rule_key": rule["logical_rule_key"],
+    }
+
+
 def each_player_sacrifice_execution_scenario_from_expected_rule(
     rule: dict[str, Any],
 ) -> dict[str, Any] | None:
@@ -11000,6 +11039,7 @@ def execution_scenario_from_expected_rule(rule: dict[str, Any]) -> dict[str, Any
         or proliferate_draw_spell_execution_scenario_from_expected_rule(rule)
         or attack_self_boost_execution_scenario_from_expected_rule(rule)
         or becomes_blocked_self_boost_execution_scenario_from_expected_rule(rule)
+        or becomes_blocked_draw_execution_scenario_from_expected_rule(rule)
         or damage_wipe_execution_scenario_from_expected_rule(rule)
         or board_wipe_execution_scenario_from_expected_rule(rule)
         or mass_return_to_hand_execution_scenario_from_expected_rule(rule)

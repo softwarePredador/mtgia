@@ -12305,6 +12305,102 @@ def run_becomes_blocked_self_boost(
     }
 
 
+def run_becomes_blocked_draw(
+    battle,
+    scenario: dict[str, Any],
+    events: list[tuple[str, dict[str, Any]]],
+) -> dict[str, Any]:
+    card = dict(scenario["card"])
+    effect = battle.get_card_effect(card)
+    if effect.get("battle_model_scope") != "xmage_creature_becomes_blocked_draw_cards_v1":
+        fail("battle_execution", f"{card['name']} scope={effect.get('battle_model_scope')!r}")
+    source = battle.enrich_card(
+        {
+            **card,
+            "type_line": card.get("type_line") or "Creature - Merfolk",
+            "effect": "creature",
+            "power": int(card.get("power") or 2),
+            "toughness": int(card.get("toughness") or 2),
+            "attacking": True,
+            "summoning_sick": False,
+            **effect,
+        }
+    )
+    active = battle.Player(
+        str(scenario.get("player") or "Draw Controller"),
+        None,
+        [
+            battle.enrich_card(dict(library_card))
+            for library_card in (scenario.get("controller_library") or [])
+            if isinstance(library_card, dict)
+        ],
+    )
+    opponent = battle.Player(str(scenario.get("opponent") or "Opponent"), None, [])
+    blocker_count = max(1, int(scenario.get("blocker_count") or 1))
+    blockers = [
+        battle.enrich_card(
+            {
+                "name": f"E2E Blocker {index + 1}",
+                "type_line": "Creature - Soldier",
+                "effect": "creature",
+                "power": 2,
+                "toughness": 2,
+                "blocking": True,
+            }
+        )
+        for index in range(blocker_count)
+    ]
+    active.battlefield = [source]
+    opponent.battlefield = blockers
+    before_events = len(events)
+    hand_before = len(active.hand)
+    library_before = len(active.library)
+    expected_draw_count = int(scenario.get("expected_draw_count") or effect.get("becomes_blocked_draw_count") or 1)
+    resolved = battle.resolve_becomes_blocked_draw_triggers(
+        active,
+        [(source, blockers)],
+        [active, opponent],
+        turn=int(scenario.get("turn") or 7),
+        phase=str(scenario.get("phase") or "declare_blockers"),
+        rng=random.Random(int(scenario.get("draw_seed") or 8581)),
+    )
+    if len(resolved) != 1:
+        fail("battle_execution", f"{card['name']} becomes-blocked draw resolved={len(resolved)}, expected 1")
+    expected_drawn = min(expected_draw_count, library_before)
+    if len(active.hand) != hand_before + expected_drawn:
+        fail("battle_execution", f"{card['name']} hand={len(active.hand)}, expected {hand_before + expected_drawn}")
+    if len(active.library) != library_before - expected_drawn:
+        fail(
+            "battle_execution",
+            f"{card['name']} library={len(active.library)}, expected {library_before - expected_drawn}",
+        )
+    event = next(
+        (
+            data
+            for event_name, data in events[before_events:]
+            if event_name == "trigger_resolved"
+            and data.get("card") == card.get("name")
+            and data.get("trigger") == "becomes_blocked"
+            and data.get("effect") == "draw_cards"
+        ),
+        None,
+    )
+    if event is None:
+        fail("battle_events", f"missing {card['name']} becomes-blocked draw trigger event")
+    if int(event.get("cards_drawn") or 0) != expected_drawn:
+        fail("battle_events", f"{card['name']} cards_drawn={event.get('cards_drawn')!r}")
+    if bool(event.get("optional")) != bool(scenario.get("expected_optional")):
+        fail("battle_events", f"{card['name']} optional={event.get('optional')!r}")
+    return {
+        "scenario": scenario.get("name"),
+        "card_name": card["name"],
+        "cards_drawn": expected_drawn,
+        "hand_after": len(active.hand),
+        "library_after": len(active.library),
+        "blocker_count": blocker_count,
+    }
+
+
 def assert_expected_event_fields(stage: str, card_name: str, event_data: dict[str, Any], expected: dict[str, Any]) -> None:
     for key, expected_value in expected.items():
         if event_data.get(key) != expected_value:
@@ -16336,6 +16432,7 @@ SCENARIO_RUNNERS = {
     "equipment_static_power_toughness_attachment": run_equipment_static_power_toughness_attachment,
     "static_dynamic_count_source_boost": run_static_dynamic_count_source_boost,
     "becomes_blocked_self_boost": run_becomes_blocked_self_boost,
+    "becomes_blocked_draw": run_becomes_blocked_draw,
     "board_wipe": run_board_wipe,
     "beginning_end_step_draw": run_beginning_end_step_draw,
     "beginning_upkeep_draw_lose_life": run_beginning_upkeep_draw_lose_life,

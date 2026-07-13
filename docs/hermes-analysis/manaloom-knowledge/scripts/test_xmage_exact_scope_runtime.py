@@ -7019,6 +7019,62 @@ class XMageExactScopeRuntimeTest(unittest.TestCase):
             )
         )
 
+    def test_becomes_blocked_draws_cards_for_controller(self) -> None:
+        active = self.battle.Player(
+            "Active",
+            None,
+            [
+                {"name": "Drawn One", "type_line": "Sorcery"},
+                {"name": "Drawn Two", "type_line": "Instant"},
+            ],
+        )
+        opponent = self.battle.Player("Opponent", None, [])
+        drelnoch = {
+            "name": "Drelnoch",
+            "type_line": "Creature - Yeti Mutant",
+            "effect": "creature",
+            "battle_model_scope": "xmage_creature_becomes_blocked_draw_cards_v1",
+            "ability_kind": "triggered",
+            "trigger": "becomes_blocked",
+            "trigger_effect": "draw_cards",
+            "draw_count": 2,
+            "becomes_blocked_draw_count": 2,
+            "becomes_blocked_draw_optional": True,
+            "becomes_blocked_trigger_draw": True,
+            "power": 3,
+            "toughness": 3,
+            "attacking": True,
+            "_rule_logical_key": "battle_rule_v1:drelnoch-test",
+        }
+        blocker = {"name": "Blocker", "type_line": "Creature - Soldier", "power": 2, "toughness": 2}
+        active.battlefield.append(drelnoch)
+        opponent.battlefield.append(blocker)
+
+        resolved = self.battle.resolve_becomes_blocked_draw_triggers(
+            active,
+            [(drelnoch, [blocker])],
+            [active, opponent],
+            turn=4,
+            phase="declare_blockers",
+            rng=random.Random(1),
+        )
+
+        self.assertEqual(len(resolved), 1)
+        self.assertEqual(len(active.hand), 2)
+        self.assertEqual([card["name"] for card in active.hand], ["Drawn One", "Drawn Two"])
+        self.assertEqual(len(active.library), 0)
+        self.assertTrue(
+            any(
+                event == "trigger_resolved"
+                and data.get("card") == "Drelnoch"
+                and data.get("trigger") == "becomes_blocked"
+                and data.get("effect") == "draw_cards"
+                and data.get("cards_drawn") == 2
+                and data.get("optional") is True
+                for event, data in self.events
+            )
+        )
+
     def test_becomes_blocked_self_boost_counts_beyond_first_penalty(self) -> None:
         active = self.battle.Player("Active", None, [])
         opponent = self.battle.Player("Opponent", None, [])

@@ -1,0 +1,189 @@
+{
+  "battle_execution": {
+    "event_count": 6,
+    "results": [
+      {
+        "blocker_count": 1,
+        "card_name": "Chambered Nautilus",
+        "cards_drawn": 1,
+        "hand_after": 1,
+        "library_after": 0,
+        "scenario": "Chambered Nautilus draws when blocked"
+      },
+      {
+        "blocker_count": 1,
+        "card_name": "Drelnoch",
+        "cards_drawn": 2,
+        "hand_after": 2,
+        "library_after": 0,
+        "scenario": "Drelnoch draws when blocked"
+      },
+      {
+        "blocker_count": 1,
+        "card_name": "Saprazzan Heir",
+        "cards_drawn": 3,
+        "hand_after": 3,
+        "library_after": 0,
+        "scenario": "Saprazzan Heir draws when blocked"
+      }
+    ],
+    "scenario_count": 3
+  },
+  "battle_path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py",
+  "database_target": "127.0.0.1:15432/halder",
+  "generated_at_utc": "2026-07-13T03:06:51.317250+00:00",
+  "manifest": "docs/hermes-analysis/master_optimizer_reports/pg859_becomes_blocked_draw_new_server_package_manifest.json",
+  "package_id": "pg859_becomes_blocked_draw_new_server_package_manifest",
+  "snapshot": "docs/hermes-analysis/master_optimizer_reports/pg859_becomes_blocked_draw_new_server_canonical_snapshot.json",
+  "sqlite_db": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db",
+  "stages": [
+    {
+      "evidence": {
+        "validated_rows": 3
+      },
+      "name": "postgres_source_of_truth",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_becomes_blocked_draw_cards_v1",
+          "card_name": "Chambered Nautilus",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:d30bc9023761d3c0035872b663eb35fa",
+          "oracle_hash": "9721a3b0315e6346ff56d0055dbb58cb",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_becomes_blocked_draw_cards_v1",
+          "card_name": "Drelnoch",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:126fa55e5b5560ecd24a49d3e4c7a884",
+          "oracle_hash": "c46a683852501275cfd935cbcf2e04e7",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_becomes_blocked_draw_cards_v1",
+          "card_name": "Saprazzan Heir",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:5330887d250e84d9e2b7bd8628695f19",
+          "oracle_hash": "8f2dd0efdd8b14e6813362e6a8a5ddfa",
+          "review_status": "verified",
+          "rule_version": 2
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_rows": 3
+      },
+      "name": "sqlite_hermes_cache",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_becomes_blocked_draw_cards_v1",
+          "card_name": "Chambered Nautilus",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:d30bc9023761d3c0035872b663eb35fa",
+          "oracle_hash": "9721a3b0315e6346ff56d0055dbb58cb",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_becomes_blocked_draw_cards_v1",
+          "card_name": "Drelnoch",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:126fa55e5b5560ecd24a49d3e4c7a884",
+          "oracle_hash": "c46a683852501275cfd935cbcf2e04e7",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_becomes_blocked_draw_cards_v1",
+          "card_name": "Saprazzan Heir",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:5330887d250e84d9e2b7bd8628695f19",
+          "oracle_hash": "8f2dd0efdd8b14e6813362e6a8a5ddfa",
+          "review_status": "verified",
+          "rule_version": 2
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_cards": 3
+      },
+      "name": "canonical_snapshot_fallback",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_becomes_blocked_draw_cards_v1",
+          "battle_rule_version": 2,
+          "card_name": "Chambered Nautilus",
+          "logical_rule_key": "battle_rule_v1:d30bc9023761d3c0035872b663eb35fa"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_becomes_blocked_draw_cards_v1",
+          "battle_rule_version": 2,
+          "card_name": "Drelnoch",
+          "logical_rule_key": "battle_rule_v1:126fa55e5b5560ecd24a49d3e4c7a884"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_becomes_blocked_draw_cards_v1",
+          "battle_rule_version": 2,
+          "card_name": "Saprazzan Heir",
+          "logical_rule_key": "battle_rule_v1:5330887d250e84d9e2b7bd8628695f19"
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_cards": 3
+      },
+      "name": "runtime_get_card_effect",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "card_name": "Chambered Nautilus",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:d30bc9023761d3c0035872b663eb35fa"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Drelnoch",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:126fa55e5b5560ecd24a49d3e4c7a884"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Saprazzan Heir",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:5330887d250e84d9e2b7bd8628695f19"
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "events": 6,
+        "scenarios": 3
+      },
+      "name": "battle_execution",
+      "status": "pass"
+    }
+  ],
+  "status": "pass",
+  "title": "Battle Package End-to-End Validation"
+}

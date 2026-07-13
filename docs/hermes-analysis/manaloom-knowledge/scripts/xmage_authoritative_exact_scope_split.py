@@ -629,6 +629,7 @@ ATTACK_SELF_BOOST_CREATURE_SCOPE = "xmage_creature_attack_self_boost_until_eot_v
 BECOMES_BLOCKED_SELF_BOOST_CREATURE_SCOPE = (
     "xmage_creature_becomes_blocked_self_boost_until_eot_v1"
 )
+BECOMES_BLOCKED_DRAW_CREATURE_SCOPE = "xmage_creature_becomes_blocked_draw_cards_v1"
 DIES_DRAW_CREATURE_SCOPE = "xmage_creature_dies_draw_cards_v1"
 DIES_LIFE_GAIN_CREATURE_SCOPE = "xmage_creature_dies_gain_life_v1"
 DIES_DAMAGE_CREATURE_SCOPE = "xmage_creature_dies_fixed_damage_target_v1"
@@ -15465,6 +15466,20 @@ def is_creature_becomes_blocked_self_boost_unit(row: dict[str, Any]) -> bool:
     )
 
 
+def is_creature_becomes_blocked_draw_unit(row: dict[str, Any]) -> bool:
+    if str(row.get("adapter_work_unit") or "") != DRAW_ENGINE_UNIT:
+        return False
+    abilities = ability_classes(row)
+    remaining = abilities - {"BecomesBlockedSourceTriggeredAbility"}
+    return (
+        effect_classes(row) == {"DrawCardSourceControllerEffect"}
+        and "BecomesBlockedSourceTriggeredAbility" in abilities
+        and remaining.issubset(STATIC_SELF_KEYWORD_ABILITY_CLASSES)
+        and set(row.get("xmage_signals") or []).issubset({"draw", "triggered_ability"})
+        and {"draw", "triggered_ability"}.issubset(set(row.get("xmage_signals") or []))
+    )
+
+
 def keywords_from_ability_classes(row: dict[str, Any]) -> set[str]:
     return {
         STATIC_SELF_KEYWORD_ABILITY_CLASSES[ability]
@@ -22531,6 +22546,61 @@ def becomes_blocked_self_boost_from_source(source: str) -> dict[str, Any] | str:
         "power_delta": int(power_delta),
         "toughness_delta": int(toughness_delta),
         "blocker_count_mode": power_mode,
+    }
+
+
+def becomes_blocked_draw_from_oracle(metadata: dict[str, Any]) -> dict[str, Any] | str:
+    text = re.sub(
+        r"\s+",
+        " ",
+        strip_parenthetical_reminders(oracle_text_after_leading_static_keywords(metadata)),
+    ).strip().lower()
+    match = re.fullmatch(
+        r"whenever (?:this creature|[^,.]+?) becomes blocked, "
+        r"(?P<optional>you may )?draw (?P<count>a|one|two|three|four|five|\d+) cards?\.?",
+        text,
+    )
+    if not match:
+        return "becomes_blocked_draw_oracle_not_exact"
+    count = number_word_to_int(match.group("count"))
+    if count <= 0:
+        return "becomes_blocked_draw_oracle_count_not_supported"
+    return {
+        "draw_count": count,
+        "optional": bool(match.group("optional")),
+    }
+
+
+def becomes_blocked_draw_from_source(source: str) -> dict[str, Any] | str:
+    text = source or ""
+    if "BecomesBlockedSourceTriggeredAbility" not in text:
+        return "becomes_blocked_draw_source_not_trigger"
+    if len(re.findall(r"new\s+DrawCardSourceControllerEffect\s*\(", text)) != 1:
+        return "becomes_blocked_draw_source_effect_count_not_supported"
+    trigger_args = extract_constructor_args(text, "BecomesBlockedSourceTriggeredAbility")
+    if trigger_args is None:
+        return "becomes_blocked_draw_source_trigger_not_exact"
+    args = split_top_level_args(trigger_args)
+    if len(args) < 2:
+        return "becomes_blocked_draw_source_trigger_not_exact"
+    if not re.fullmatch(
+        r"new\s+DrawCardSourceControllerEffect\s*\(\s*(?:\d+)?\s*\)",
+        args[0].strip(),
+        re.S,
+    ):
+        return "becomes_blocked_draw_source_effect_not_direct"
+    if args[1].strip() != "true":
+        return "becomes_blocked_draw_source_not_optional"
+    count = java_constructor_int_or_noarg_default(
+        text,
+        "DrawCardSourceControllerEffect",
+        noarg_default=1,
+    )
+    if count is None or count <= 0:
+        return "becomes_blocked_draw_source_count_not_fixed"
+    return {
+        "draw_count": count,
+        "optional": True,
     }
 
 
@@ -34463,6 +34533,7 @@ def split_row(
     attack_target_keyword_unit = is_creature_attack_target_keyword_unit(row)
     attack_self_boost_creature_unit = is_creature_attack_self_boost_unit(row)
     becomes_blocked_self_boost_creature_unit = is_creature_becomes_blocked_self_boost_unit(row)
+    becomes_blocked_draw_creature_unit = is_creature_becomes_blocked_draw_unit(row)
     static_controlled_pt_unit = is_static_controlled_pt_unit(row)
     static_controlled_keyword_unit = is_static_controlled_keyword_unit(row)
     static_global_pt_unit = is_static_global_pt_unit(row)
@@ -34684,6 +34755,7 @@ def split_row(
         and not attack_target_keyword_unit
         and not attack_self_boost_creature_unit
         and not becomes_blocked_self_boost_creature_unit
+        and not becomes_blocked_draw_creature_unit
         and not static_controlled_pt_unit
         and not static_controlled_keyword_unit
         and not static_global_pt_unit
@@ -34827,6 +34899,7 @@ def split_row(
         and not attack_target_keyword_unit
         and not attack_self_boost_creature_unit
         and not becomes_blocked_self_boost_creature_unit
+        and not becomes_blocked_draw_creature_unit
         and not static_controlled_pt_unit
         and not static_global_pt_unit
         and not simple_aura_static_pt_unit
@@ -37778,6 +37851,49 @@ def split_row(
             metadata,
             effect_json,
             family_id="xmage_creature_becomes_blocked_self_boost_until_eot",
+        ), "selected_exact_scope"
+
+    if becomes_blocked_draw_creature_unit:
+        if not is_creature_metadata(metadata):
+            return None, "becomes_blocked_draw_not_creature"
+        oracle_draw = becomes_blocked_draw_from_oracle(metadata)
+        if isinstance(oracle_draw, str):
+            return None, oracle_draw
+        source_draw = becomes_blocked_draw_from_source(source_text)
+        if isinstance(source_draw, str):
+            return None, source_draw
+        if int(source_draw.get("draw_count") or 0) != int(oracle_draw.get("draw_count") or 0):
+            return None, "becomes_blocked_draw_source_oracle_count_mismatch"
+        if bool(source_draw.get("optional")) != bool(oracle_draw.get("optional")):
+            return None, "becomes_blocked_draw_source_oracle_optional_mismatch"
+        draw_count = int(oracle_draw["draw_count"])
+        effect_json = {
+            "effect": "creature",
+            "battle_model_scope": BECOMES_BLOCKED_DRAW_CREATURE_SCOPE,
+            "ability_kind": "triggered",
+            "trigger": "becomes_blocked",
+            "trigger_effect": "draw_cards",
+            "target": "self",
+            "target_controller": "self",
+            "target_constraints": {"source": "self", "card_types": ["creature"]},
+            "draw_count": draw_count,
+            "becomes_blocked_draw_count": draw_count,
+            "becomes_blocked_draw_optional": bool(oracle_draw.get("optional")),
+            "becomes_blocked_trigger_draw": True,
+            "xmage_effect_class": "DrawCardSourceControllerEffect",
+            "xmage_ability_class": "BecomesBlockedSourceTriggeredAbility",
+        }
+        keyword_list = ordered_keywords(keywords_from_ability_classes(row))
+        if keyword_list:
+            effect_json["keywords"] = keyword_list
+            effect_json["_keywords_are_self"] = True
+            for keyword in keyword_list:
+                effect_json[keyword] = True
+        return build_proposal(
+            row,
+            metadata,
+            effect_json,
+            family_id="xmage_creature_becomes_blocked_draw_cards",
         ), "selected_exact_scope"
 
     if attack_target_keyword_unit:
@@ -50522,6 +50638,8 @@ def build_exact_split_report(
             and not is_permanent_activated_hand_to_battlefield_unit(row)
             and not is_creature_attack_target_keyword_unit(row)
             and not is_creature_attack_self_boost_unit(row)
+            and not is_creature_becomes_blocked_self_boost_unit(row)
+            and not is_creature_becomes_blocked_draw_unit(row)
             and not is_static_controlled_pt_unit(row)
             and not is_static_global_pt_unit(row)
             and not is_simple_aura_static_pt_unit(row)
@@ -50613,6 +50731,7 @@ def build_exact_split_report(
                 "draw_engine::xmage_draw_card_variant_review_v1 rows with DrawCardSourceControllerEffect + LoseLifeSourceControllerEffect, BeginningOfUpkeepTriggeredAbility, exact fixed beginning-upkeep draw/life-loss Oracle/source agreement",
                 "draw_engine::xmage_draw_card_variant_review_v1 rows with DrawCardSourceControllerEffect and DiesSourceTriggeredAbility plus only static self keywords",
                 "draw_engine::xmage_draw_card_variant_review_v1 rows with DrawCardSourceControllerEffect and DealsCombatDamageToAPlayerTriggeredAbility, exact fixed combat-damage-to-player draw Oracle/source agreement, and only static self keywords",
+                "draw_engine::xmage_draw_card_variant_review_v1 rows with DrawCardSourceControllerEffect and BecomesBlockedSourceTriggeredAbility, exact fixed becomes-blocked draw Oracle/source agreement, optional trigger, and only static self keywords",
                 "DiscardTargetEffect rows with EntersBattlefieldTriggeredAbility, exact fixed ETB target-player/opponent discard Oracle/source agreement, and only static self keywords",
                 "DiscardTargetEffect rows with DiesSourceTriggeredAbility, exact fixed dies target-player/opponent discard Oracle/source agreement, and only static self keywords",
                 "DiscardTargetEffect rows with DealsCombatDamageToAPlayerTriggeredAbility, exact fixed damaged-player discard Oracle/source agreement, and only static self keywords",
@@ -50663,6 +50782,7 @@ def build_exact_split_report(
                 "grant_protection_from_chosen_color rows with GainAbilityTargetEffect + SimpleActivatedAbility, exact activated target-creature keyword until EOT, and simple mana/tap source costs only",
                 "grant_protection_from_chosen_color rows with GainAbilityTargetEffect + AttacksTriggeredAbility, exact attack-trigger target-creature keyword until EOT, and Oracle/source target constraints agreement",
                 "xmage_signature BoostSourceEffect + AttacksTriggeredAbility rows with exact fixed self boost until EOT and Oracle/source agreement",
+                "xmage_signature DrawCardSourceControllerEffect + BecomesBlockedSourceTriggeredAbility rows with exact optional fixed draw when this creature becomes blocked",
                 "grant_protection_from_chosen_color rows with pure GainAbilityTargetEffect one-shot spells, exact target-creature keyword until EOT, and no auxiliary ability classes",
                 "PreventAllDamageByAllPermanentsEffect one-shot spells with exact Oracle 'Prevent all combat damage that would be dealt this turn', exact XMage Duration.EndOfTurn onlyCombat=true source, and optional CyclingAbility as auxiliary resolution-neutral ability",
                 "no-effect CyclingAbility creature rows, optionally with static self keywords, where Oracle and XMage agree on a runtime cycling cost and no other text remains after leading static keywords",

@@ -1,0 +1,346 @@
+{
+  "apply_gate": "Do not run apply SQL without explicit approval for the exact command.",
+  "backup_table": "manaloom_deploy_audit.pg859_becomes_blocked_draw_new_server_be_20260713_030532",
+  "deploy_id": "pg859_becomes_blocked_draw_new_server",
+  "execution_scenarios": [
+    {
+      "blocker_count": 1,
+      "card": {
+        "attacking": true,
+        "effect": "creature",
+        "name": "Chambered Nautilus",
+        "power": 2,
+        "summoning_sick": false,
+        "toughness": 2,
+        "type_line": "Creature - Merfolk"
+      },
+      "controller_library": [
+        {
+          "effect": "draw_cards",
+          "name": "E2E Draw Card 1",
+          "type_line": "Sorcery"
+        }
+      ],
+      "expected_draw_count": 1,
+      "expected_optional": true,
+      "logical_rule_key": "battle_rule_v1:d30bc9023761d3c0035872b663eb35fa",
+      "name": "Chambered Nautilus draws when blocked",
+      "type": "becomes_blocked_draw"
+    },
+    {
+      "blocker_count": 1,
+      "card": {
+        "attacking": true,
+        "effect": "creature",
+        "name": "Drelnoch",
+        "power": 2,
+        "summoning_sick": false,
+        "toughness": 2,
+        "type_line": "Creature - Merfolk"
+      },
+      "controller_library": [
+        {
+          "effect": "draw_cards",
+          "name": "E2E Draw Card 1",
+          "type_line": "Sorcery"
+        },
+        {
+          "effect": "draw_cards",
+          "name": "E2E Draw Card 2",
+          "type_line": "Sorcery"
+        }
+      ],
+      "expected_draw_count": 2,
+      "expected_optional": true,
+      "logical_rule_key": "battle_rule_v1:126fa55e5b5560ecd24a49d3e4c7a884",
+      "name": "Drelnoch draws when blocked",
+      "type": "becomes_blocked_draw"
+    },
+    {
+      "blocker_count": 1,
+      "card": {
+        "attacking": true,
+        "effect": "creature",
+        "name": "Saprazzan Heir",
+        "power": 2,
+        "summoning_sick": false,
+        "toughness": 2,
+        "type_line": "Creature - Merfolk"
+      },
+      "controller_library": [
+        {
+          "effect": "draw_cards",
+          "name": "E2E Draw Card 1",
+          "type_line": "Sorcery"
+        },
+        {
+          "effect": "draw_cards",
+          "name": "E2E Draw Card 2",
+          "type_line": "Sorcery"
+        },
+        {
+          "effect": "draw_cards",
+          "name": "E2E Draw Card 3",
+          "type_line": "Sorcery"
+        }
+      ],
+      "expected_draw_count": 3,
+      "expected_optional": true,
+      "logical_rule_key": "battle_rule_v1:5330887d250e84d9e2b7bd8628695f19",
+      "name": "Saprazzan Heir draws when blocked",
+      "type": "becomes_blocked_draw"
+    }
+  ],
+  "expected_rules": [
+    {
+      "card_name": "Chambered Nautilus",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:d30bc9023761d3c0035872b663eb35fa",
+      "min_rule_version": 2,
+      "normalized_name": "chambered nautilus",
+      "oracle_hash": "9721a3b0315e6346ff56d0055dbb58cb",
+      "required_effect_fields": {
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_creature_becomes_blocked_draw_cards_v1",
+        "becomes_blocked_draw_count": 1,
+        "becomes_blocked_draw_optional": true,
+        "becomes_blocked_trigger_draw": true,
+        "draw_count": 1,
+        "effect": "creature",
+        "target": "self",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "source": "self"
+        },
+        "target_controller": "self",
+        "trigger": "becomes_blocked",
+        "trigger_effect": "draw_cards",
+        "xmage_ability_class": "BecomesBlockedSourceTriggeredAbility",
+        "xmage_effect_class": "DrawCardSourceControllerEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Drelnoch",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:126fa55e5b5560ecd24a49d3e4c7a884",
+      "min_rule_version": 2,
+      "normalized_name": "drelnoch",
+      "oracle_hash": "c46a683852501275cfd935cbcf2e04e7",
+      "required_effect_fields": {
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_creature_becomes_blocked_draw_cards_v1",
+        "becomes_blocked_draw_count": 2,
+        "becomes_blocked_draw_optional": true,
+        "becomes_blocked_trigger_draw": true,
+        "draw_count": 2,
+        "effect": "creature",
+        "target": "self",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "source": "self"
+        },
+        "target_controller": "self",
+        "trigger": "becomes_blocked",
+        "trigger_effect": "draw_cards",
+        "xmage_ability_class": "BecomesBlockedSourceTriggeredAbility",
+        "xmage_effect_class": "DrawCardSourceControllerEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Saprazzan Heir",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:5330887d250e84d9e2b7bd8628695f19",
+      "min_rule_version": 2,
+      "normalized_name": "saprazzan heir",
+      "oracle_hash": "8f2dd0efdd8b14e6813362e6a8a5ddfa",
+      "required_effect_fields": {
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_creature_becomes_blocked_draw_cards_v1",
+        "becomes_blocked_draw_count": 3,
+        "becomes_blocked_draw_optional": true,
+        "becomes_blocked_trigger_draw": true,
+        "draw_count": 3,
+        "effect": "creature",
+        "target": "self",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "source": "self"
+        },
+        "target_controller": "self",
+        "trigger": "becomes_blocked",
+        "trigger_effect": "draw_cards",
+        "xmage_ability_class": "BecomesBlockedSourceTriggeredAbility",
+        "xmage_effect_class": "DrawCardSourceControllerEffect"
+      },
+      "review_status": "verified"
+    }
+  ],
+  "family_counts": {
+    "xmage_creature_becomes_blocked_draw_cards": 3
+  },
+  "files": {
+    "apply": "docs/hermes-analysis/master_optimizer_reports/pg859_becomes_blocked_draw_new_server_package_apply.sql",
+    "manifest": "docs/hermes-analysis/master_optimizer_reports/pg859_becomes_blocked_draw_new_server_package_manifest.json",
+    "package": "docs/hermes-analysis/master_optimizer_reports/pg859_becomes_blocked_draw_new_server_package_package.md",
+    "postcheck": "docs/hermes-analysis/master_optimizer_reports/pg859_becomes_blocked_draw_new_server_package_postcheck.sql",
+    "precheck": "docs/hermes-analysis/master_optimizer_reports/pg859_becomes_blocked_draw_new_server_package_precheck.sql",
+    "rollback": "docs/hermes-analysis/master_optimizer_reports/pg859_becomes_blocked_draw_new_server_package_rollback.sql"
+  },
+  "generated_at": "2026-07-13T03:05:32+00:00",
+  "mutations_performed": [],
+  "runtime_checks": [
+    {
+      "card": {
+        "name": "Chambered Nautilus"
+      },
+      "card_name": "Chambered Nautilus",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:d30bc9023761d3c0035872b663eb35fa",
+      "normalized_name": "chambered nautilus",
+      "required_effect_fields": {
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_creature_becomes_blocked_draw_cards_v1",
+        "becomes_blocked_draw_count": 1,
+        "becomes_blocked_draw_optional": true,
+        "becomes_blocked_trigger_draw": true,
+        "draw_count": 1,
+        "effect": "creature",
+        "target": "self",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "source": "self"
+        },
+        "target_controller": "self",
+        "trigger": "becomes_blocked",
+        "trigger_effect": "draw_cards",
+        "xmage_ability_class": "BecomesBlockedSourceTriggeredAbility",
+        "xmage_effect_class": "DrawCardSourceControllerEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Drelnoch"
+      },
+      "card_name": "Drelnoch",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:126fa55e5b5560ecd24a49d3e4c7a884",
+      "normalized_name": "drelnoch",
+      "required_effect_fields": {
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_creature_becomes_blocked_draw_cards_v1",
+        "becomes_blocked_draw_count": 2,
+        "becomes_blocked_draw_optional": true,
+        "becomes_blocked_trigger_draw": true,
+        "draw_count": 2,
+        "effect": "creature",
+        "target": "self",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "source": "self"
+        },
+        "target_controller": "self",
+        "trigger": "becomes_blocked",
+        "trigger_effect": "draw_cards",
+        "xmage_ability_class": "BecomesBlockedSourceTriggeredAbility",
+        "xmage_effect_class": "DrawCardSourceControllerEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Saprazzan Heir"
+      },
+      "card_name": "Saprazzan Heir",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:5330887d250e84d9e2b7bd8628695f19",
+      "normalized_name": "saprazzan heir",
+      "required_effect_fields": {
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_creature_becomes_blocked_draw_cards_v1",
+        "becomes_blocked_draw_count": 3,
+        "becomes_blocked_draw_optional": true,
+        "becomes_blocked_trigger_draw": true,
+        "draw_count": 3,
+        "effect": "creature",
+        "target": "self",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "source": "self"
+        },
+        "target_controller": "self",
+        "trigger": "becomes_blocked",
+        "trigger_effect": "draw_cards",
+        "xmage_ability_class": "BecomesBlockedSourceTriggeredAbility",
+        "xmage_effect_class": "DrawCardSourceControllerEffect"
+      }
+    }
+  ],
+  "selected_card_names": [
+    "Chambered Nautilus",
+    "Drelnoch",
+    "Saprazzan Heir"
+  ],
+  "selected_count": 3,
+  "slug": "becomes_blocked_draw_new_server",
+  "snapshot_checks": [
+    {
+      "card_name": "Chambered Nautilus",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:d30bc9023761d3c0035872b663eb35fa",
+      "min_rule_version": 2,
+      "normalized_name": "chambered nautilus",
+      "oracle_hash": "9721a3b0315e6346ff56d0055dbb58cb",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_creature_becomes_blocked_draw_cards_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Drelnoch",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:126fa55e5b5560ecd24a49d3e4c7a884",
+      "min_rule_version": 2,
+      "normalized_name": "drelnoch",
+      "oracle_hash": "c46a683852501275cfd935cbcf2e04e7",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_creature_becomes_blocked_draw_cards_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Saprazzan Heir",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:5330887d250e84d9e2b7bd8628695f19",
+      "min_rule_version": 2,
+      "normalized_name": "saprazzan heir",
+      "oracle_hash": "8f2dd0efdd8b14e6813362e6a8a5ddfa",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_creature_becomes_blocked_draw_cards_v1"
+      },
+      "review_status": "verified"
+    }
+  ],
+  "status": "prepared_read_only_pending_apply_approval"
+}

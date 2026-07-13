@@ -20498,6 +20498,53 @@ Evidence:
 - `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260713_post_pg858_static_cant_be_blocked_by_more_than_one_new_server_commander_legal.md`
 - `docs/hermes-analysis/master_optimizer_reports/pg_hermes_sqlite_contract_audit_20260713_post_pg858_static_cant_be_blocked_by_more_than_one_new_server_final.md`
 
+## 2026-07-13 PG859 Becomes-Blocked Draw Closure
+
+- Closed the exact XMage draw-engine subpattern
+  `DrawCardSourceControllerEffect + BecomesBlockedSourceTriggeredAbility` as
+  ManaLoom scope `xmage_creature_becomes_blocked_draw_cards_v1`.
+- The mapper accepts only rows in
+  `draw_engine::xmage_draw_card_variant_review_v1` with signals
+  `draw,triggered_ability`, exact optional Oracle text, and source
+  `BecomesBlockedSourceTriggeredAbility(..., true)` with a fixed
+  `DrawCardSourceControllerEffect(n)`. Generic draw-review rows remain
+  blocked until split into a runtime-backed exact scope.
+- Runtime behavior is executable during declare blockers through
+  `resolve_becomes_blocked_draw_triggers`, with replay events and decision
+  trace payloads. Package E2E proved `Chambered Nautilus`, `Drelnoch`, and
+  `Saprazzan Heir` draw `1`, `2`, and `3` cards respectively when blocked.
+- The PostgreSQL package promoted `3` cards: `Chambered Nautilus`, `Drelnoch`,
+  and `Saprazzan Heir`. Precheck found `3` target rows, `0` existing expected
+  rows, and `0` shadow rows; apply inserted/updated `3`; postcheck verified
+  `3/3` promoted rows as `verified`/`auto` with Oracle hashes.
+- Hermes sync loaded `3` PG rules into SQLite, wrote `3` SQLite rows, and
+  exported a canonical fallback snapshot with `6810` rows. Metadata sync ran
+  against `127.0.0.1:15432/halder` and left one unrelated unresolved cache
+  alias: `Surgical Suite/Hospital Room`.
+- E2E package validation passed across PostgreSQL, SQLite, canonical snapshot,
+  runtime `get_card_effect`, and battle execution for all `3` selected cards.
+- Post-sync readiness increased `snapshot_has_verified_rule` to `6935` and
+  `battle_and_oracle_ready` to `6828`. The Commander-legal authoritative queue
+  is now `target_identity_count=24055`,
+  `xmage_authoritative_source_count=23742`,
+  `xmage_missing_source_exception_count=313`, `parser_gap=0`, and
+  `xmage_authoritative_adapter_required_count=23742`; the post-PG859 exact
+  split recheck has `0` proposals.
+- Final governance audits passed:
+  XMage strategy (`26/26`), operational surface, legacy contamination, and
+  PG/Hermes/SQLite contract (`51/51`).
+
+Evidence:
+
+- `docs/hermes-analysis/PG859_BECOMES_BLOCKED_DRAW_EVIDENCE_2026-07-13.md`
+- `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_exact_scope_split_20260713_pg859_becomes_blocked_draw_new_server_candidate.md`
+- `docs/hermes-analysis/master_optimizer_reports/pg859_becomes_blocked_draw_new_server_package_manifest.json`
+- `docs/hermes-analysis/master_optimizer_reports/pg859_becomes_blocked_draw_new_server_e2e_validation.md`
+- `docs/hermes-analysis/master_optimizer_reports/global_card_oracle_battle_readiness_20260713_post_pg859_becomes_blocked_draw_new_server.md`
+- `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260713_post_pg859_becomes_blocked_draw_new_server_commander_legal.md`
+- `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_exact_scope_split_20260713_post_pg859_becomes_blocked_draw_new_server_recheck.md`
+- `docs/hermes-analysis/master_optimizer_reports/pg_hermes_sqlite_contract_audit_20260713_post_pg859_becomes_blocked_draw_new_server_final.md`
+
 ## Required Artifacts Per Cycle
 
 Every cycle must produce or refresh:

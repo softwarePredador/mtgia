@@ -33993,6 +33993,7 @@ ATTACK_SELF_BOOST_SCOPE = "xmage_creature_attack_self_boost_until_eot_v1"
 BECOMES_BLOCKED_SELF_BOOST_SCOPE = (
     "xmage_creature_becomes_blocked_self_boost_until_eot_v1"
 )
+BECOMES_BLOCKED_DRAW_SCOPE = "xmage_creature_becomes_blocked_draw_cards_v1"
 
 
 def attack_self_boost_effect_for_permanent(permanent):
@@ -34168,6 +34169,134 @@ def _becomes_blocked_multiplier(effect_data, blocker_count):
     if mode == "beyond_first":
         return max(0, int(blocker_count or 0) - 1)
     return 0
+
+
+def becomes_blocked_draw_effect_for_permanent(permanent):
+    if not isinstance(permanent, dict):
+        return None
+    candidates = []
+    if permanent.get("battle_model_scope") == BECOMES_BLOCKED_DRAW_SCOPE:
+        candidates.append(dict(permanent))
+    try:
+        resolved = get_card_effect(permanent)
+    except Exception:
+        resolved = {}
+    if (
+        isinstance(resolved, dict)
+        and resolved.get("battle_model_scope") == BECOMES_BLOCKED_DRAW_SCOPE
+    ):
+        candidates.append(resolved)
+    for effect_data in candidates:
+        if (
+            effect_data.get("ability_kind") == "triggered"
+            and effect_data.get("trigger") == "becomes_blocked"
+            and (
+                effect_data.get("trigger_effect") == "draw_cards"
+                or effect_data.get("becomes_blocked_trigger_draw") is True
+            )
+        ):
+            return effect_data
+    return None
+
+
+def resolve_becomes_blocked_draw_triggers(
+    player,
+    block_assignments,
+    all_players,
+    turn,
+    *,
+    phase="declare_blockers",
+    rng=None,
+    stack=None,
+):
+    trigger_events = []
+    rng = rng or random.Random(turn or 0)
+    for source, blockers in list(block_assignments or []):
+        if source not in getattr(player, "battlefield", []):
+            continue
+        blocker_count = len(list(blockers or []))
+        if blocker_count <= 0:
+            continue
+        effect_data = becomes_blocked_draw_effect_for_permanent(source)
+        if effect_data is None:
+            continue
+        draw_count = max(1, int(effect_data.get("becomes_blocked_draw_count") or effect_data.get("draw_count") or 1))
+        hand_before = len(getattr(player, "hand", []) or [])
+        library_before = len(getattr(player, "library", []) or [])
+        drawn = player.draw(draw_count, rng)
+        if all_players is not None:
+            process_player_draw_triggers(
+                player,
+                len(drawn),
+                turn,
+                phase,
+                all_players,
+                stack=stack,
+                turn_player=player,
+            )
+        fields = replay_rule_fields(effect_data)
+        payload = {
+            "player": player.name,
+            "card": source.get("name", "?"),
+            "trigger": "becomes_blocked",
+            "effect": "draw_cards",
+            "draw_count": draw_count,
+            "cards_requested": draw_count,
+            "cards_drawn": len(drawn),
+            "drawn_cards": [
+                drawn_card.get("name", "?")
+                for drawn_card in drawn
+                if isinstance(drawn_card, dict)
+            ],
+            "hand_before": hand_before,
+            "hand_after": len(getattr(player, "hand", []) or []),
+            "library_before": library_before,
+            "library_after": len(getattr(player, "library", []) or []),
+            "optional": bool(effect_data.get("becomes_blocked_draw_optional")),
+            "blocker_count": blocker_count,
+            "turn": turn,
+            "phase": phase,
+            **fields,
+        }
+        emit_decision_trace(
+            decision_type="becomes_blocked_trigger_draw",
+            player=player,
+            turn=turn,
+            phase=phase,
+            available_options=[
+                decision_card_option(
+                    source,
+                    effect_data,
+                    action="becomes_blocked_trigger_draw",
+                    score=max(1, draw_count * 2),
+                )
+            ],
+            chosen_option=decision_card_option(
+                source,
+                effect_data,
+                action="becomes_blocked_trigger_draw",
+            ),
+            rejected_options=[],
+            score_components={
+                "source": source.get("name", "?"),
+                "draw_count": draw_count,
+                "cards_drawn": len(drawn),
+                "blocker_count": blocker_count,
+            },
+            rule_source=fields.get("rule_source", "battle_rule"),
+            rule_status=fields.get("rule_review_status", "verified"),
+            confidence="high",
+            expected_benefit_score=max(1, draw_count * 2),
+            actual_outcome="becomes_blocked_trigger_draw_used",
+            reason="apply_becomes_blocked_trigger_draw",
+            heuristic_version=DECISION_STRATEGY_VERSION,
+            resource_delta={"cards_drawn": len(drawn)},
+            risk_flags=["draw_trigger", "becomes_blocked_trigger"],
+        )
+        emit_replay_event("trigger_resolved", **payload)
+        emit_replay_event("becomes_blocked_draw_resolved", **payload)
+        trigger_events.append(payload)
+    return trigger_events
 
 
 def resolve_becomes_blocked_self_boost_triggers(
@@ -76663,6 +76792,15 @@ def combat_phase_v8(attacker, opponents, all_players, turn, rng, stack):
             all_players,
             turn,
             phase="declare_blockers",
+        )
+        resolve_becomes_blocked_draw_triggers(
+            attacker,
+            group_assignments,
+            all_players,
+            turn,
+            phase="declare_blockers",
+            rng=rng,
+            stack=stack,
         )
     block_assignments = [
         assignment

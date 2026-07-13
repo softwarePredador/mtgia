@@ -5648,6 +5648,40 @@ def test_manifest_builds_becomes_blocked_self_boost_execution_scenario() -> None
     assert scenario["blocker_count"] == 3
 
 
+def test_manifest_builds_becomes_blocked_draw_execution_scenario() -> None:
+    proposal = {
+        "normalized_name": "drelnoch",
+        "card_name": "Drelnoch",
+        "oracle_hash": "hash-drelnoch",
+        "logical_rule_key": "battle_rule_v1:drelnoch",
+        "effect_json": {
+            "effect": "creature",
+            "battle_model_scope": "xmage_creature_becomes_blocked_draw_cards_v1",
+            "ability_kind": "triggered",
+            "trigger": "becomes_blocked",
+            "trigger_effect": "draw_cards",
+            "draw_count": 2,
+            "becomes_blocked_draw_count": 2,
+            "becomes_blocked_draw_optional": True,
+            "becomes_blocked_trigger_draw": True,
+        },
+    }
+
+    expected = builder.expected_rule_from_proposal(proposal)
+    required = expected["required_effect_fields"]
+
+    assert required["becomes_blocked_draw_count"] == 2
+    assert required["becomes_blocked_draw_optional"] is True
+    assert required["becomes_blocked_trigger_draw"] is True
+
+    scenario = builder.execution_scenario_from_expected_rule(expected)
+
+    assert scenario["type"] == "becomes_blocked_draw"
+    assert scenario["expected_draw_count"] == 2
+    assert scenario["expected_optional"] is True
+    assert len(scenario["controller_library"]) == 2
+
+
 def test_manifest_builds_single_target_exile_execution_scenario() -> None:
     rule = {
         "normalized_name": "radiant purge",
