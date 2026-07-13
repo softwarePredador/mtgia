@@ -9231,16 +9231,28 @@ def damage_wipe_execution_scenario_from_expected_rule(
         "xmage_fixed_damage_each_creature_each_player_spell_v1",
     }:
         return None
-    expected_damage = int(required.get("damage") or required.get("amount") or 1)
-    return {
+    x_value = int(required.get("e2e_x_value") or required.get("x_value") or 3)
+    damage_amount_source = str(required.get("damage_amount_source") or "").strip().lower()
+    expected_damage = (
+        x_value
+        if damage_amount_source == "x_value"
+        else int(required.get("damage") or required.get("amount") or 1)
+    )
+    type_line = "Instant" if bool(required.get("instant")) else "Sorcery"
+    scenario = {
         "name": f"{rule['card_name']} deals damage to matching permanents",
         "type": "damage_wipe",
-        "card": {"name": rule["card_name"], "type_line": "Sorcery"},
+        "card": {"name": rule["card_name"], "type_line": type_line},
         "expected_damage": expected_damage,
         "expected_damage_scope": required.get("damage_scope") or "each_creature",
         "expected_damage_players": bool(required.get("damage_players")),
         "logical_rule_key": rule["logical_rule_key"],
     }
+    if damage_amount_source == "x_value":
+        scenario["x_value"] = x_value
+        scenario["expected_x_value"] = x_value
+        scenario["_cast_context"] = {"x_value": x_value}
+    return scenario
 
 
 def mass_return_to_hand_execution_scenario_from_expected_rule(

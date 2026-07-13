@@ -48353,13 +48353,17 @@ def split_row(
         unsupported_abilities = ability_classes(row) - ALLOWED_AUXILIARY_RESOLUTION_ABILITY_CLASSES
         if unsupported_abilities:
             return None, "board_wipe_ability_class_not_simple"
-        if has_oracle_complexity(metadata):
+        resolution_metadata = {
+            **metadata,
+            "oracle_text": oracle_resolution_text_without_neutral_auxiliary(metadata),
+        }
+        if has_oracle_complexity(resolution_metadata):
             return None, "board_wipe_oracle_not_simple"
         source_blocker = board_wipe_source_blocker(source_text, classes)
         if source_blocker:
             return None, source_blocker
         if classes == {"DestroyAllEffect"}:
-            destroy_spec = destroy_all_spec_from_oracle(metadata)
+            destroy_spec = destroy_all_spec_from_oracle(resolution_metadata)
             if destroy_spec is None:
                 return None, "board_wipe_destroy_scope_not_supported"
             if not destroy_all_source_matches_spec(source_text, destroy_spec):
@@ -48374,7 +48378,7 @@ def split_row(
             }
             return build_proposal(row, metadata, effect_json, family_id="xmage_destroy_all_spell"), "selected_exact_scope"
         if classes == {"DamageAllEffect"}:
-            x_damage_spec = x_damage_all_spec_from_oracle(metadata)
+            x_damage_spec = x_damage_all_spec_from_oracle(resolution_metadata)
             if x_damage_spec is not None:
                 x_source_blocker = x_damage_all_source_blocker(source_text, x_damage_spec)
                 if x_source_blocker is not None:
@@ -48390,7 +48394,7 @@ def split_row(
                     **flags,
                 }
                 return build_proposal(row, metadata, effect_json, family_id="xmage_x_damage_all_spell"), "selected_exact_scope"
-            dynamic_damage_spec = dynamic_damage_all_spec_from_oracle(metadata)
+            dynamic_damage_spec = dynamic_damage_all_spec_from_oracle(resolution_metadata)
             if isinstance(dynamic_damage_spec, str):
                 return None, dynamic_damage_spec
             if dynamic_damage_spec is not None:
@@ -48423,7 +48427,7 @@ def split_row(
             amount = java_constructor_int(source_text, "DamageAllEffect")
             if amount is None or amount <= 0:
                 return None, "board_wipe_damage_amount_not_fixed"
-            damage_spec = damage_all_spec_from_oracle(metadata)
+            damage_spec = damage_all_spec_from_oracle(resolution_metadata)
             if damage_spec is None:
                 return None, "board_wipe_damage_scope_not_supported"
             if not damage_all_source_matches_spec(source_text, damage_spec):
@@ -48439,7 +48443,7 @@ def split_row(
             }
             return build_proposal(row, metadata, effect_json, family_id="xmage_damage_all_spell"), "selected_exact_scope"
         if classes == {"SacrificeAllEffect"}:
-            oracle_sacrifice = each_player_sacrifice_spec_from_oracle(metadata)
+            oracle_sacrifice = each_player_sacrifice_spec_from_oracle(resolution_metadata)
             if isinstance(oracle_sacrifice, str):
                 return None, oracle_sacrifice
             if oracle_sacrifice is None:

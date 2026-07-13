@@ -1,0 +1,689 @@
+{
+  "checks": [
+    {
+      "detail": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db",
+      "name": "sqlite_db.active",
+      "status": "pass"
+    },
+    {
+      "data": {
+        "columns": [
+          "card_name",
+          "confidence",
+          "created_at",
+          "deck_role_json",
+          "effect_json",
+          "execution_status",
+          "last_seen_at",
+          "logical_rule_key",
+          "normalized_name",
+          "notes",
+          "oracle_hash",
+          "review_status",
+          "rule_version",
+          "source",
+          "updated_at"
+        ],
+        "extra_columns": []
+      },
+      "detail": "ok",
+      "name": "sqlite_schema.battle_card_rules",
+      "status": "pass"
+    },
+    {
+      "detail": "rows=10416",
+      "name": "sqlite_rows.battle_card_rules",
+      "status": "pass"
+    },
+    {
+      "data": {
+        "columns": [
+          "card_name",
+          "format",
+          "scryfall_id",
+          "status",
+          "synced_at"
+        ],
+        "extra_columns": []
+      },
+      "detail": "ok",
+      "name": "sqlite_schema.card_legalities",
+      "status": "pass"
+    },
+    {
+      "detail": "rows=35010",
+      "name": "sqlite_rows.card_legalities",
+      "status": "pass"
+    },
+    {
+      "data": {
+        "columns": [
+          "card_id",
+          "cmc",
+          "color_identity_json",
+          "colors_json",
+          "keywords_json",
+          "mana_cost",
+          "name",
+          "normalized_name",
+          "oracle_text",
+          "power",
+          "scryfall_id",
+          "source",
+          "toughness",
+          "type_line",
+          "updated_at"
+        ],
+        "extra_columns": []
+      },
+      "detail": "ok",
+      "name": "sqlite_schema.card_oracle_cache",
+      "status": "pass"
+    },
+    {
+      "detail": "rows=8776",
+      "name": "sqlite_rows.card_oracle_cache",
+      "status": "pass"
+    },
+    {
+      "data": {
+        "columns": [
+          "battle_rules_json",
+          "card_id",
+          "card_name",
+          "cmc",
+          "deck_hash",
+          "deck_id",
+          "functional_tag",
+          "functional_tags_json",
+          "id",
+          "is_commander",
+          "is_partner",
+          "oracle_text",
+          "quantity",
+          "ruleset_hash",
+          "semantic_tags_v2_json",
+          "semantics_hash",
+          "sync_run_id",
+          "tag_confidence",
+          "type_line"
+        ],
+        "extra_columns": []
+      },
+      "detail": "ok",
+      "name": "sqlite_schema.deck_cards",
+      "status": "pass"
+    },
+    {
+      "detail": "rows=2699",
+      "name": "sqlite_rows.deck_cards",
+      "status": "pass"
+    },
+    {
+      "data": {
+        "columns": [
+          "archetype",
+          "card_name",
+          "category",
+          "color_identity",
+          "edhrec_rank",
+          "format",
+          "is_banned",
+          "scryfall_id",
+          "synced_at"
+        ],
+        "extra_columns": []
+      },
+      "detail": "ok",
+      "name": "sqlite_schema.format_staples",
+      "status": "pass"
+    },
+    {
+      "detail": "rows=748",
+      "name": "sqlite_rows.format_staples",
+      "status": "pass"
+    },
+    {
+      "data": {
+        "columns": [
+          "archetype",
+          "budget_level",
+          "card_count",
+          "card_list",
+          "commander",
+          "created_at",
+          "deck_name",
+          "id",
+          "notes",
+          "source",
+          "source_url",
+          "wincon_backup",
+          "wincon_primary"
+        ],
+        "extra_columns": []
+      },
+      "detail": "ok",
+      "name": "sqlite_schema.learned_decks",
+      "status": "pass"
+    },
+    {
+      "detail": "rows=120",
+      "name": "sqlite_rows.learned_decks",
+      "status": "pass"
+    },
+    {
+      "detail": "scanned=10416",
+      "name": "sqlite_json.battle_card_rules.deck_role_json",
+      "status": "pass"
+    },
+    {
+      "detail": "scanned=10416",
+      "name": "sqlite_json.battle_card_rules.effect_json",
+      "status": "pass"
+    },
+    {
+      "detail": "scanned=8776",
+      "name": "sqlite_json.card_oracle_cache.color_identity_json",
+      "status": "pass"
+    },
+    {
+      "detail": "scanned=8776",
+      "name": "sqlite_json.card_oracle_cache.colors_json",
+      "status": "pass"
+    },
+    {
+      "detail": "scanned=8776",
+      "name": "sqlite_json.card_oracle_cache.keywords_json",
+      "status": "pass"
+    },
+    {
+      "detail": "scanned=2699",
+      "name": "sqlite_json.deck_cards.battle_rules_json",
+      "status": "pass"
+    },
+    {
+      "detail": "scanned=2699",
+      "name": "sqlite_json.deck_cards.functional_tags_json",
+      "status": "pass"
+    },
+    {
+      "detail": "scanned=2699",
+      "name": "sqlite_json.deck_cards.semantic_tags_v2_json",
+      "status": "pass"
+    },
+    {
+      "detail": "scanned=120",
+      "name": "sqlite_json.learned_decks.card_list",
+      "status": "pass"
+    },
+    {
+      "detail": "postgres_cache_rows_missing_card_id=0",
+      "name": "sqlite_integrity.card_oracle_cache_card_id",
+      "status": "pass"
+    },
+    {
+      "detail": "deck_id_607_missing_card_id=0",
+      "name": "sqlite_integrity.deck_cards_target_card_id",
+      "status": "pass"
+    },
+    {
+      "detail": "all_deck_cards_missing_card_id=0",
+      "name": "sqlite_integrity.deck_cards_global_card_id",
+      "status": "pass"
+    },
+    {
+      "data": {
+        "canonical_field": "deck_cards.card_id",
+        "sample": [],
+        "source_field": "card_oracle_cache.card_id"
+      },
+      "detail": "deck_cards_rows_with_card_id_drift=0",
+      "name": "sqlite_integrity.deck_cards_card_id_cache_drift",
+      "status": "pass"
+    },
+    {
+      "data": {
+        "alias_fields": [
+          "deck_cards.card_name",
+          "card_oracle_cache.name"
+        ],
+        "canonical_field": "deck_cards.card_id",
+        "sample": [
+          {
+            "card_id": "115a89fa-3dac-4cf4-8b6b-c6de50a3d62e",
+            "deck_card_name": "Forest",
+            "deck_id": 25,
+            "oracle_cache_name": "Forest // Forest"
+          },
+          {
+            "card_id": "bd53a3aa-0caf-4140-8c21-37c0bf4cf8a2",
+            "deck_card_name": "Overgrown Tomb",
+            "deck_id": 25,
+            "oracle_cache_name": "Overgrown Tomb // Overgrown Tomb"
+          },
+          {
+            "card_id": "a08016ec-4371-41b8-9e0f-5b3a086b9169",
+            "deck_card_name": "Plains",
+            "deck_id": 25,
+            "oracle_cache_name": "Plains // Plains"
+          },
+          {
+            "card_id": "258cb391-43bd-49ac-8abb-06ff150bdb05",
+            "deck_card_name": "Swamp",
+            "deck_id": 25,
+            "oracle_cache_name": "Swamp // Swamp"
+          },
+          {
+            "card_id": "6fcc9f76-6cf4-47cd-a2e8-8877b06d8e81",
+            "deck_card_name": "Temple Garden",
+            "deck_id": 25,
+            "oracle_cache_name": "Temple Garden // Temple Garden"
+          },
+          {
+            "card_id": "b07b9a40-a94a-4827-97a0-03b30c8acd59",
+            "deck_card_name": "Island",
+            "deck_id": 42,
+            "oracle_cache_name": "Island // Island"
+          },
+          {
+            "card_id": "73d87611-651a-4318-a0ae-5e83446dd762",
+            "deck_card_name": "Mountain",
+            "deck_id": 42,
+            "oracle_cache_name": "Mountain // Mountain"
+          },
+          {
+            "card_id": "7abe0d61-bc71-4dda-a926-adc21424fd1a",
+            "deck_card_name": "The Emperor of Palamecia",
+            "deck_id": 42,
+            "oracle_cache_name": "The Emperor of Palamecia // The Lord Master of Hell"
+          },
+          {
+            "card_id": "d030fce7-e65c-48e8-971d-7b1a82a9b9d4",
+            "deck_card_name": "Lim-Dul's Vault",
+            "deck_id": 54,
+            "oracle_cache_name": "Lim-D\u00fbl's Vault"
+          },
+          {
+            "card_id": "115a89fa-3dac-4cf4-8b6b-c6de50a3d62e",
+            "deck_card_name": "Forest",
+            "deck_id": 62,
+            "oracle_cache_name": "Forest // Forest"
+          },
+          {
+            "card_id": "2eada05e-c49f-485a-be20-999021905916",
+            "deck_card_name": "Growing Rites of Itlimoc",
+            "deck_id": 62,
+            "oracle_cache_name": "Growing Rites of Itlimoc // Itlimoc, Cradle of the Sun"
+          },
+          {
+            "card_id": "324e0c5c-0ec0-4ec2-a992-114dd2b509f5",
+            "deck_card_name": "Invasion of Ikoria",
+            "deck_id": 62,
+            "oracle_cache_name": "Invasion of Ikoria // Zilortha, Apex of Ikoria"
+          },
+          {
+            "card_id": "b07b9a40-a94a-4827-97a0-03b30c8acd59",
+            "deck_card_name": "Island",
+            "deck_id": 62,
+            "oracle_cache_name": "Island // Island"
+          },
+          {
+            "card_id": "01366181-765f-4f3a-bb1a-c1f01f131756",
+            "deck_card_name": "Altar of the Wretched",
+            "deck_id": 74,
+            "oracle_cache_name": "Altar of the Wretched // Wretched Bonemass"
+          },
+          {
+            "card_id": "e715bdfc-8bc4-4da8-b7bf-1d6f48d5fc85",
+            "deck_card_name": "Birgi, God of Storytelling",
+            "deck_id": 74,
+            "oracle_cache_name": "Birgi, God of Storytelling // Harnfel, Horn of Bounty"
+          },
+          {
+            "card_id": "a0a16250-67f3-4ac4-bbce-7102fd7f46a9",
+            "deck_card_name": "Blood Crypt",
+            "deck_id": 74,
+            "oracle_cache_name": "Blood Crypt // Blood Crypt"
+          },
+          {
+            "card_id": "3904c1fb-4177-4b10-ba88-9e6398b1db1f",
+            "deck_card_name": "Bridgeworks Battle",
+            "deck_id": 84,
+            "oracle_cache_name": "Bridgeworks Battle // Tanglespan Bridgeworks"
+          },
+          {
+            "card_id": "e1ac2ff4-65ab-418b-916c-e30f19a0c34a",
+            "deck_card_name": "Hydroelectric Specimen",
+            "deck_id": 84,
+            "oracle_cache_name": "Hydroelectric Specimen // Hydroelectric Laboratory"
+          },
+          {
+            "card_id": "324e0c5c-0ec0-4ec2-a992-114dd2b509f5",
+            "deck_card_name": "Invasion of Ikoria",
+            "deck_id": 84,
+            "oracle_cache_name": "Invasion of Ikoria // Zilortha, Apex of Ikoria"
+          },
+          {
+            "card_id": "b07b9a40-a94a-4827-97a0-03b30c8acd59",
+            "deck_card_name": "Island",
+            "deck_id": 84,
+            "oracle_cache_name": "Island // Island"
+          }
+        ]
+      },
+      "detail": "name_alias_rows_with_matching_card_id=37",
+      "name": "sqlite_integrity.deck_cards_name_aliases_canonicalized_by_card_id",
+      "status": "pass"
+    },
+    {
+      "detail": "verified_executable_rules_missing_oracle_hash=0",
+      "name": "sqlite_integrity.battle_rules_trusted_oracle_hash_coverage",
+      "status": "pass"
+    },
+    {
+      "detail": "actual=legal expected=legal",
+      "name": "sqlite_integrity.commander_legality.worldfire",
+      "status": "pass"
+    },
+    {
+      "detail": "actual=banned expected=banned",
+      "name": "sqlite_integrity.commander_legality.mana_crypt",
+      "status": "pass"
+    },
+    {
+      "data": {
+        "unresolved_sample": []
+      },
+      "detail": "sqlite_runtime_keys=9954 pg_runtime_keys=9954 unresolved=0",
+      "name": "pg_sqlite_parity.battle_card_rules_runtime_keys",
+      "status": "pass"
+    },
+    {
+      "detail": "deck_id=607 pg_deck_id=8938b746-1a9e-46ce-b0d9-c2ec932ddddd sqlite_rows=94 pg_rows=94 sqlite_qty=100 pg_qty=100",
+      "name": "pg_sqlite_parity.protected_deck_607_pg_snapshot",
+      "status": "pass"
+    },
+    {
+      "detail": "deck_id=6 pg_deck_id=528c877f-f829-4207-95e6-73981776c323 sqlite_rows=100 pg_rows=100 sqlite_qty=100 pg_qty=100",
+      "name": "pg_sqlite_parity.legacy_deck_6_pg_snapshot",
+      "status": "pass"
+    },
+    {
+      "detail": "127.0.0.1:15432/halder",
+      "name": "pg_connection",
+      "status": "pass"
+    },
+    {
+      "data": {
+        "columns": [
+          "card_id",
+          "card_name",
+          "confidence",
+          "created_at",
+          "deck_role_json",
+          "effect_json",
+          "execution_status",
+          "last_seen_at",
+          "logical_rule_key",
+          "normalized_name",
+          "notes",
+          "oracle_hash",
+          "review_status",
+          "reviewed_at",
+          "reviewed_by",
+          "rule_version",
+          "source",
+          "updated_at"
+        ],
+        "rows": 10650
+      },
+      "detail": "ok",
+      "name": "pg_schema.card_battle_rules",
+      "status": "pass"
+    },
+    {
+      "detail": "rows=10650",
+      "name": "pg_rows.card_battle_rules",
+      "status": "pass"
+    },
+    {
+      "data": {
+        "columns": [
+          "battle_rule_count",
+          "battle_rules",
+          "best_commander_synergy_score",
+          "best_role_score",
+          "card_id",
+          "card_name",
+          "cmc",
+          "collector_number",
+          "color_identity",
+          "colors",
+          "commander_synergy_details",
+          "commander_synergy_rows",
+          "function_tag_details",
+          "function_tags",
+          "id",
+          "image_url",
+          "keywords",
+          "latest_ruling_at",
+          "legalities",
+          "mana_cost",
+          "max_function_tag_confidence",
+          "max_semantic_confidence",
+          "name",
+          "normalized_card_name",
+          "oracle_id",
+          "oracle_text",
+          "price_usd",
+          "price_usd_foil",
+          "rarity",
+          "role_score_details",
+          "ruling_count",
+          "scored_roles",
+          "scryfall_id",
+          "semantic_tags_v2",
+          "set_code",
+          "source_coverage",
+          "type_line",
+          "verified_battle_rule_count",
+          "verified_battle_rules"
+        ],
+        "rows": 34331
+      },
+      "detail": "ok",
+      "name": "pg_schema.card_intelligence_snapshot",
+      "status": "pass"
+    },
+    {
+      "detail": "rows=34331",
+      "name": "pg_rows.card_intelligence_snapshot",
+      "status": "pass"
+    },
+    {
+      "data": {
+        "columns": [
+          "card_id",
+          "format",
+          "id",
+          "status"
+        ],
+        "rows": 393767
+      },
+      "detail": "ok",
+      "name": "pg_schema.card_legalities",
+      "status": "pass"
+    },
+    {
+      "detail": "rows=393767",
+      "name": "pg_rows.card_legalities",
+      "status": "pass"
+    },
+    {
+      "data": {
+        "columns": [
+          "ai_description",
+          "card_faces_json",
+          "cmc",
+          "collector_number",
+          "color_identity",
+          "colors",
+          "created_at",
+          "edhrec_rank",
+          "foil",
+          "id",
+          "image_url",
+          "is_reserved",
+          "keywords",
+          "layout",
+          "mana_cost",
+          "name",
+          "oracle_id",
+          "oracle_text",
+          "power",
+          "price",
+          "price_updated_at",
+          "price_usd",
+          "price_usd_foil",
+          "rarity",
+          "scryfall_id",
+          "set_code",
+          "toughness",
+          "type_line"
+        ],
+        "rows": 34331
+      },
+      "detail": "ok",
+      "name": "pg_schema.cards",
+      "status": "pass"
+    },
+    {
+      "detail": "rows=34331",
+      "name": "pg_rows.cards",
+      "status": "pass"
+    },
+    {
+      "data": {
+        "columns": [
+          "active_learned_deck_count",
+          "active_learned_decks",
+          "best_learned_score",
+          "best_synergy_score",
+          "commander_name",
+          "commander_name_normalized",
+          "latest_learned_updated_at",
+          "latest_promoted_at",
+          "learned_archetypes",
+          "learned_legal_statuses",
+          "source_coverage",
+          "synergy_rows",
+          "top_synergy_cards",
+          "top_usage_cards",
+          "total_usage_count",
+          "usage_card_rows"
+        ],
+        "rows": 113
+      },
+      "detail": "ok",
+      "name": "pg_schema.commander_learning_snapshot",
+      "status": "pass"
+    },
+    {
+      "detail": "rows=113",
+      "name": "pg_rows.commander_learning_snapshot",
+      "status": "pass"
+    },
+    {
+      "data": {
+        "columns": [
+          "card_id",
+          "condition",
+          "deck_id",
+          "id",
+          "is_commander",
+          "quantity"
+        ],
+        "rows": 58980
+      },
+      "detail": "ok",
+      "name": "pg_schema.deck_cards",
+      "status": "pass"
+    },
+    {
+      "detail": "rows=58980",
+      "name": "pg_rows.deck_cards",
+      "status": "pass"
+    },
+    {
+      "data": {
+        "columns": [
+          "archetype",
+          "card_name",
+          "category",
+          "color_identity",
+          "created_at",
+          "edhrec_rank",
+          "format",
+          "id",
+          "is_banned",
+          "last_synced_at",
+          "scryfall_id"
+        ],
+        "rows": 748
+      },
+      "detail": "ok",
+      "name": "pg_schema.format_staples",
+      "status": "pass"
+    },
+    {
+      "detail": "rows=748",
+      "name": "pg_rows.format_staples",
+      "status": "pass"
+    },
+    {
+      "data": {
+        "columns": [
+          "archetype",
+          "card_list",
+          "commander_name",
+          "created_at",
+          "format",
+          "id",
+          "partner_commander_name",
+          "placement",
+          "shell_label",
+          "source_url",
+          "strategy_archetype"
+        ],
+        "rows": 653
+      },
+      "detail": "ok",
+      "name": "pg_schema.meta_decks",
+      "status": "pass"
+    },
+    {
+      "detail": "rows=653",
+      "name": "pg_rows.meta_decks",
+      "status": "pass"
+    },
+    {
+      "data": {
+        "sample": []
+      },
+      "detail": "verified_executable_rules_missing_oracle_hash=0",
+      "name": "pg_integrity.battle_rules_trusted_oracle_hash_coverage",
+      "status": "pass"
+    }
+  ],
+  "generated_at": "2026-07-13T05:59:28.431523+00:00",
+  "mutations_performed": [],
+  "postgres_target": "127.0.0.1:15432/halder",
+  "sqlite_db": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db",
+  "status": "pass",
+  "summary": {
+    "check_count": 51,
+    "status_counts": {
+      "pass": 51
+    }
+  }
+}

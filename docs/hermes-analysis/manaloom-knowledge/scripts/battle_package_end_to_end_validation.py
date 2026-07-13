@@ -3645,6 +3645,10 @@ def run_single_target_removal(
     events: list[tuple[str, dict[str, Any]]],
 ) -> dict[str, Any]:
     card = dict(scenario["card"])
+    if scenario.get("x_value") is not None:
+        x_value = int(scenario.get("x_value") or 0)
+        card["x_value"] = x_value
+        card["_cast_context"] = {"x_value": x_value}
     active = battle.Player(str(scenario.get("player") or "Active"), None, [])
     opponent = battle.Player(str(scenario.get("opponent") or "Opponent"), None, [])
     controller_starting_life = int(scenario.get("controller_life") or getattr(active, "life", 20) or 20)
@@ -5436,6 +5440,10 @@ def run_damage_wipe(
     events: list[tuple[str, dict[str, Any]]],
 ) -> dict[str, Any]:
     card = dict(scenario["card"])
+    if scenario.get("x_value") is not None:
+        x_value = int(scenario.get("x_value") or 0)
+        card["x_value"] = x_value
+        card["_cast_context"] = {"x_value": x_value}
     active = battle.Player(str(scenario.get("player") or "Active"), None, [])
     opponent = battle.Player(str(scenario.get("opponent") or "Opponent"), None, [])
     active.life = int(scenario.get("active_life") or 20)
@@ -5508,6 +5516,18 @@ def run_damage_wipe(
         )
     if bool(wipe_event.get("damage_players")) != expected_damage_players:
         fail("battle_events", f"{card['name']} damage_players={wipe_event.get('damage_players')}")
+    if int(wipe_event.get("damage") or wipe_event.get("amount") or expected_damage) != expected_damage:
+        fail(
+            "battle_events",
+            f"{card['name']} damage={wipe_event.get('damage') or wipe_event.get('amount')}, expected {expected_damage}",
+        )
+    if scenario.get("expected_x_value") is not None and int(wipe_event.get("x_value") or 0) != int(
+        scenario.get("expected_x_value") or 0
+    ):
+        fail(
+            "battle_events",
+            f"{card['name']} x_value={wipe_event.get('x_value')!r}, expected {scenario.get('expected_x_value')!r}",
+        )
     if expected_damage_players and int(wipe_event.get("players_damaged") or 0) != 2:
         fail("battle_events", f"{card['name']} players_damaged={wipe_event.get('players_damaged')}")
     return {
