@@ -417,6 +417,7 @@ EXILE_ARTIFACT_COMPENSATION_TOKEN_SCOPE = (
 )
 MANA_SCOPE = "xmage_simple_tap_mana_source_permanent_v1"
 SPELL_FIXED_MANA_RITUAL_SCOPE = "xmage_fixed_spell_mana_ritual_v1"
+DESTROY_FIXED_MANA_RITUAL_SCOPE = "xmage_destroy_target_and_fixed_mana_ritual_spell_v1"
 SPELL_CONTROLLED_CREATURE_COUNT_MANA_RITUAL_SCOPE = (
     "xmage_controlled_creature_count_spell_mana_ritual_v1"
 )
@@ -3560,6 +3561,8 @@ def destroy_target_from_oracle(metadata: dict[str, Any]) -> tuple[str, str] | No
         return "remove_permanent", "artifact_or_enchantment"
     if re.search(r"destroy target artifact\b", text):
         return "remove_permanent", "artifact"
+    if re.search(r"destroy target equipment\b", text):
+        return "remove_permanent", "equipment"
     if re.search(r"destroy target enchantment\b", text):
         return "remove_permanent", "enchantment"
     if re.search(r"destroy target nonland permanent\b", text):
@@ -31563,6 +31566,62 @@ def spell_mana_ritual_detail_from_source(source_text: str) -> dict[str, Any] | s
     }
 
 
+def fixed_add_mana_sentence_from_oracle(metadata: dict[str, Any]) -> dict[str, Any] | None:
+    text = " ".join(normalized_oracle_lines(metadata))
+    text = re.sub(r"\s+", " ", text).strip().lower()
+    matches = re.findall(r"(?:^|[.])\s*add (?P<mana>(?:\{[wubrgc]\})+)\.?", text)
+    if len(matches) != 1:
+        return None
+    symbols = fixed_mana_symbols_from_braces(matches[0])
+    if not symbols:
+        return None
+    return {
+        "mana_amount_model": "fixed",
+        "mana_produced": len(symbols),
+        "produces": _unique_mana_symbols(symbols),
+        "produced_mana_symbols": symbols,
+    }
+
+
+def source_matches_destroy_target_for_fixed_mana_ritual(source_text: str, target: str) -> bool:
+    text = source_text or ""
+    if len(re.findall(r"new\s+DestroyTargetEffect\s*\(\s*\)", text, re.S)) != 1:
+        return False
+    if len(re.findall(r"new\s+BasicManaEffect\s*\(", text, re.S)) != 1:
+        return False
+    target_patterns = {
+        "artifact": (
+            r"TargetArtifactPermanent\s*\(",
+            r'FilterPermanent\s*\(\s*"artifact"\s*\)',
+            r"FILTER_PERMANENT_ARTIFACT",
+        ),
+        "creature": (r"TargetCreaturePermanent\s*\(", r"FILTER_PERMANENT_CREATURE"),
+        "land": (r"TargetLandPermanent\s*\(", r"FILTER_LANDS", r"FILTER_LAND"),
+        "equipment": (r"FILTER_PERMANENT_EQUIPMENT", r"SubType\.EQUIPMENT"),
+    }
+    patterns = target_patterns.get(target)
+    if patterns is None:
+        return False
+    return any(re.search(pattern, text, re.S) for pattern in patterns)
+
+
+def fixed_destroy_mana_ritual_from_oracle(metadata: dict[str, Any]) -> dict[str, Any] | None:
+    target = destroy_target_from_oracle(metadata)
+    if target is None:
+        return None
+    effect, target_type = target
+    mana = fixed_add_mana_sentence_from_oracle(metadata)
+    if mana is None:
+        return None
+    return {
+        "remove_effect": effect,
+        "target_type": target_type,
+        "target": restricted_target_base(target_type),
+        "target_constraints": target_constraints_for(target_type),
+        **mana,
+    }
+
+
 def java_any_color_mana_amount_from_source(source_text: str) -> int | None:
     text = source_text or ""
     amount_match = re.search(r"new\s+AddManaOfAnyColorEffect\s*\(\s*(\d+)\s*\)", text)
@@ -35077,6 +35136,64 @@ def split_row(
     classes = effect_classes(row)
 
     if unit == RAMP_RITUAL_UNIT:
+        if classes == {"BasicManaEffect", "DestroyTargetEffect"}:
+            if ability_classes(row):
+                return None, "destroy_mana_ritual_ability_class_not_simple"
+            oracle_combo = fixed_destroy_mana_ritual_from_oracle(metadata)
+            if oracle_combo is None:
+                return None, "destroy_mana_ritual_oracle_not_supported"
+            target_type = str(oracle_combo["target_type"])
+            if not source_matches_destroy_target_for_fixed_mana_ritual(source_text, target_type):
+                return None, "destroy_mana_ritual_source_target_mismatch"
+            source_symbols = java_simple_mana_symbols_from_source(source_text)
+            oracle_symbols = list(oracle_combo.get("produced_mana_symbols") or [])
+            if source_symbols != oracle_symbols:
+                return None, "destroy_mana_ritual_source_oracle_symbols_mismatch"
+            target = str(oracle_combo["target"])
+            target_constraints = dict(oracle_combo["target_constraints"])
+            remove_component = {
+                "effect": oracle_combo["remove_effect"],
+                "battle_model_scope": DESTROY_SCOPE,
+                "target": target,
+                "target_constraints": target_constraints,
+                "destination": "graveyard",
+                "compose_on_resolution": True,
+                "xmage_effect_class": "DestroyTargetEffect",
+            }
+            mana_component = {
+                "effect": "ramp_ritual",
+                "battle_model_scope": SPELL_FIXED_MANA_RITUAL_SCOPE,
+                "ability_kind": "one_shot",
+                "mana_color_status": "colored_pool_runtime",
+                "xmage_effect_class": "BasicManaEffect",
+                "compose_on_resolution": True,
+                "mana_amount_model": "fixed",
+                "mana_produced": int(oracle_combo["mana_produced"]),
+                "produces": str(oracle_combo["produces"]),
+                "produced_mana_symbols": oracle_symbols,
+            }
+            effect_json = {
+                "effect": "composite_resolution",
+                "battle_model_scope": DESTROY_FIXED_MANA_RITUAL_SCOPE,
+                "target": target,
+                "target_constraints": target_constraints,
+                "destination": "graveyard",
+                "mana_color_status": "colored_pool_runtime",
+                "mana_amount_model": "fixed",
+                "mana_produced": int(oracle_combo["mana_produced"]),
+                "produces": str(oracle_combo["produces"]),
+                "produced_mana_symbols": oracle_symbols,
+                "resolution_order": "destroy_then_add_mana",
+                "_composite_rule_components": [remove_component, mana_component],
+                "xmage_effect_classes": ["DestroyTargetEffect", "BasicManaEffect"],
+                **flags,
+            }
+            return build_proposal(
+                row,
+                metadata,
+                effect_json,
+                family_id="xmage_destroy_target_fixed_mana_ritual_spell",
+            ), "selected_exact_scope"
         if classes not in (
             {"BasicManaEffect"},
             {"AddManaToManaPoolSourceControllerEffect"},

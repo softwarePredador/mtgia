@@ -375,6 +375,11 @@ def deck_role_from_effect(effect_json: dict[str, Any]) -> dict[str, Any]:
         elif component_effects == {"direct_damage", "target_player_discard"}:
             category = "removal"
             subtype = "damage_discard"
+        elif "ramp_ritual" in component_effects and component_effects.intersection(
+            {"remove_creature", "remove_permanent"}
+        ):
+            category = "removal"
+            subtype = "removal_mana_ritual"
     elif effect == "static_global_power_toughness_boost":
         power_delta = int(effect_json.get("static_power_bonus") or effect_json.get("power_boost") or 0)
         toughness_delta = int(effect_json.get("static_toughness_bonus") or effect_json.get("toughness_boost") or 0)

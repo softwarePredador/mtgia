@@ -4818,6 +4818,107 @@ def run_destroy_target_create_treasure(
     }
 
 
+def run_destroy_target_mana_ritual(
+    battle,
+    scenario: dict[str, Any],
+    events: list[tuple[str, dict[str, Any]]],
+) -> dict[str, Any]:
+    card = dict(scenario["card"])
+    active = battle.Player(str(scenario.get("player") or "Lorehold"), None, [])
+    opponent = battle.Player(str(scenario.get("opponent") or "Opponent"), None, [])
+    target = battle.enrich_card(dict(scenario["target"]))
+    nonmatching = battle.enrich_card(dict(scenario.get("nonmatching_target") or {}))
+    opponent.battlefield = [permanent for permanent in [nonmatching, target] if permanent]
+    expected_mana_added = int(scenario.get("expected_mana_added") or 0)
+    before_pool = active.mana_pool.snapshot()
+    before_events = len(events)
+
+    battle.apply_effect_immediate(
+        active,
+        [opponent],
+        card,
+        turn=int(scenario.get("turn") or 6),
+        rng=random.Random(int(scenario.get("seed") or 8621)),
+    )
+
+    if target in opponent.battlefield:
+        fail("battle_execution", f"{card['name']} did not remove target {target.get('name')}")
+    if target not in opponent.graveyard:
+        fail("battle_execution", f"{card['name']} did not move target to graveyard")
+    if nonmatching and nonmatching not in opponent.battlefield:
+        fail("battle_execution", f"{card['name']} incorrectly removed nonmatching target")
+
+    after_pool = active.mana_pool.snapshot()
+    delta = {
+        color: int(after_pool.get(color, 0)) - int(before_pool.get(color, 0))
+        for color in after_pool
+    }
+    actual_added = sum(delta.values())
+    if actual_added != expected_mana_added:
+        fail(
+            "battle_execution",
+            f"{card['name']} added mana={actual_added}, expected {expected_mana_added}",
+        )
+    color_names = {
+        "W": "white",
+        "U": "blue",
+        "B": "black",
+        "R": "red",
+        "G": "green",
+        "C": "colorless",
+    }
+    expected_by_color: dict[str, int] = {}
+    for symbol in scenario.get("expected_mana_symbols") or []:
+        color = color_names.get(str(symbol).strip().upper())
+        if color:
+            expected_by_color[color] = expected_by_color.get(color, 0) + 1
+    for color, expected in expected_by_color.items():
+        if int(delta.get(color, 0)) != expected:
+            fail(
+                "battle_execution",
+                f"{card['name']} {color} mana delta={delta.get(color, 0)}, expected {expected}",
+            )
+    if expected_by_color and int(delta.get("generic", 0)) != 0:
+        fail("battle_execution", f"{card['name']} generic mana delta={delta.get('generic')}, expected 0")
+
+    component_events = [
+        data
+        for event, data in events[before_events:]
+        if event == "composite_rule_component_resolved" and data.get("card") == card.get("name")
+    ]
+    component_effects = [data.get("component_effect") for data in component_events]
+    if component_effects != [scenario.get("expected_effect"), "ramp_ritual"]:
+        fail("battle_events", f"{card['name']} composite components={component_effects!r}")
+    if any(data.get("outcome") in {"unsupported_component", "no_legal_target"} for data in component_events):
+        fail("battle_events", f"{card['name']} component outcomes={[data.get('outcome') for data in component_events]!r}")
+    composite_event = next(
+        (
+            data
+            for event, data in events[before_events:]
+            if event == "composite_rule_resolved" and data.get("card") == card.get("name")
+        ),
+        None,
+    )
+    if composite_event is None:
+        fail("battle_events", f"missing {card['name']} composite_rule_resolved event")
+    expected_component_count = int(scenario.get("expected_component_count") or 2)
+    if int(composite_event.get("components_applied") or 0) != expected_component_count:
+        fail(
+            "battle_events",
+            f"{card['name']} components_applied={composite_event.get('components_applied')}, expected {expected_component_count}",
+        )
+    if int(composite_event.get("components_skipped") or 0) != 0:
+        fail("battle_events", f"{card['name']} components_skipped={composite_event.get('components_skipped')}")
+    return {
+        "scenario": scenario.get("name"),
+        "card_name": card["name"],
+        "target": target.get("name"),
+        "mana_added": actual_added,
+        "mana_delta": delta,
+        "target_moved_to_graveyard": target in opponent.graveyard,
+    }
+
+
 def _sacrifice_fixture_permanent(name: str, card_type: str, *, multicolored: bool = False) -> dict[str, Any]:
     if card_type == "land":
         return {"name": name, "type_line": "Land", "effect": "land", "cmc": 0}
@@ -16593,6 +16694,7 @@ SCENARIO_RUNNERS = {
     "creature_enters_life_gain": run_creature_enters_life_gain,
     "creature_etb_scry": run_creature_etb_scry,
     "destroy_target_create_treasure": run_destroy_target_create_treasure,
+    "destroy_target_mana_ritual": run_destroy_target_mana_ritual,
     "damage_target_create_treasure": run_damage_target_create_treasure,
     "damage_prevention": run_damage_prevention,
     "fixed_draw_spell": run_fixed_draw_spell,

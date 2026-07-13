@@ -1,0 +1,267 @@
+{
+  "battle_execution": {
+    "event_count": 24,
+    "results": [
+      {
+        "card_name": "Deconstruct",
+        "mana_added": 3,
+        "mana_delta": {
+          "black": 0,
+          "blue": 0,
+          "colorless": 0,
+          "generic": 0,
+          "green": 3,
+          "red": 0,
+          "white": 0,
+          "wildcard": 0
+        },
+        "scenario": "Deconstruct destroys target and adds modeled mana",
+        "target": "E2E Legal Destroy Mana Target",
+        "target_moved_to_graveyard": true
+      },
+      {
+        "card_name": "Liturgy of Blood",
+        "mana_added": 3,
+        "mana_delta": {
+          "black": 3,
+          "blue": 0,
+          "colorless": 0,
+          "generic": 0,
+          "green": 0,
+          "red": 0,
+          "white": 0,
+          "wildcard": 0
+        },
+        "scenario": "Liturgy of Blood destroys target and adds modeled mana",
+        "target": "E2E Legal Destroy Mana Target",
+        "target_moved_to_graveyard": true
+      },
+      {
+        "card_name": "Seismic Spike",
+        "mana_added": 2,
+        "mana_delta": {
+          "black": 0,
+          "blue": 0,
+          "colorless": 0,
+          "generic": 0,
+          "green": 0,
+          "red": 2,
+          "white": 0,
+          "wildcard": 0
+        },
+        "scenario": "Seismic Spike destroys target and adds modeled mana",
+        "target": "E2E Legal Destroy Mana Target",
+        "target_moved_to_graveyard": true
+      },
+      {
+        "card_name": "Turn to Dust",
+        "mana_added": 1,
+        "mana_delta": {
+          "black": 0,
+          "blue": 0,
+          "colorless": 0,
+          "generic": 0,
+          "green": 1,
+          "red": 0,
+          "white": 0,
+          "wildcard": 0
+        },
+        "scenario": "Turn to Dust destroys target and adds modeled mana",
+        "target": "E2E Legal Destroy Mana Target",
+        "target_moved_to_graveyard": true
+      }
+    ],
+    "scenario_count": 4
+  },
+  "battle_path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py",
+  "database_target": "127.0.0.1:15432/halder",
+  "generated_at_utc": "2026-07-13T04:49:59.075256+00:00",
+  "manifest": "docs/hermes-analysis/master_optimizer_reports/pg863_destroy_mana_ritual_new_server_manifest.json",
+  "package_id": "pg863_destroy_mana_ritual_new_server_manifest",
+  "snapshot": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/known_cards_canonical_snapshot.json",
+  "sqlite_db": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db",
+  "stages": [
+    {
+      "evidence": {
+        "validated_rows": 4
+      },
+      "name": "postgres_source_of_truth",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_destroy_target_and_fixed_mana_ritual_spell_v1",
+          "card_name": "Deconstruct",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:3c02c24a2346797911c20945d2f1a9f0",
+          "oracle_hash": "08f659e0e917ed1ddb367a9c86897b45",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_destroy_target_and_fixed_mana_ritual_spell_v1",
+          "card_name": "Liturgy of Blood",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:7f91b8beaa5f42a0d97e520e388ab01a",
+          "oracle_hash": "793a1d6947010edec6e943eef9da9139",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_destroy_target_and_fixed_mana_ritual_spell_v1",
+          "card_name": "Seismic Spike",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:dd8dce7535424809092d8737ac86ce3f",
+          "oracle_hash": "6ed975bb71da90e04ccbff411312aa15",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_destroy_target_and_fixed_mana_ritual_spell_v1",
+          "card_name": "Turn to Dust",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:f4a9e330eee70bed3982dcb7d586e238",
+          "oracle_hash": "32481b22834ca33b610c00906439c510",
+          "review_status": "verified",
+          "rule_version": 2
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_rows": 4
+      },
+      "name": "sqlite_hermes_cache",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_destroy_target_and_fixed_mana_ritual_spell_v1",
+          "card_name": "Deconstruct",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:3c02c24a2346797911c20945d2f1a9f0",
+          "oracle_hash": "08f659e0e917ed1ddb367a9c86897b45",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_destroy_target_and_fixed_mana_ritual_spell_v1",
+          "card_name": "Liturgy of Blood",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:7f91b8beaa5f42a0d97e520e388ab01a",
+          "oracle_hash": "793a1d6947010edec6e943eef9da9139",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_destroy_target_and_fixed_mana_ritual_spell_v1",
+          "card_name": "Seismic Spike",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:dd8dce7535424809092d8737ac86ce3f",
+          "oracle_hash": "6ed975bb71da90e04ccbff411312aa15",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_destroy_target_and_fixed_mana_ritual_spell_v1",
+          "card_name": "Turn to Dust",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:f4a9e330eee70bed3982dcb7d586e238",
+          "oracle_hash": "32481b22834ca33b610c00906439c510",
+          "review_status": "verified",
+          "rule_version": 2
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_cards": 4
+      },
+      "name": "canonical_snapshot_fallback",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_destroy_target_and_fixed_mana_ritual_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Deconstruct",
+          "logical_rule_key": "battle_rule_v1:3c02c24a2346797911c20945d2f1a9f0"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_destroy_target_and_fixed_mana_ritual_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Liturgy of Blood",
+          "logical_rule_key": "battle_rule_v1:7f91b8beaa5f42a0d97e520e388ab01a"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_destroy_target_and_fixed_mana_ritual_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Seismic Spike",
+          "logical_rule_key": "battle_rule_v1:dd8dce7535424809092d8737ac86ce3f"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_destroy_target_and_fixed_mana_ritual_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Turn to Dust",
+          "logical_rule_key": "battle_rule_v1:f4a9e330eee70bed3982dcb7d586e238"
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_cards": 4
+      },
+      "name": "runtime_get_card_effect",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "card_name": "Deconstruct",
+          "component_keys": [],
+          "effect": "composite_resolution",
+          "logical_rule_key": "battle_rule_v1:3c02c24a2346797911c20945d2f1a9f0"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Liturgy of Blood",
+          "component_keys": [],
+          "effect": "composite_resolution",
+          "logical_rule_key": "battle_rule_v1:7f91b8beaa5f42a0d97e520e388ab01a"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Seismic Spike",
+          "component_keys": [],
+          "effect": "composite_resolution",
+          "logical_rule_key": "battle_rule_v1:dd8dce7535424809092d8737ac86ce3f"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Turn to Dust",
+          "component_keys": [],
+          "effect": "composite_resolution",
+          "logical_rule_key": "battle_rule_v1:f4a9e330eee70bed3982dcb7d586e238"
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "events": 24,
+        "scenarios": 4
+      },
+      "name": "battle_execution",
+      "status": "pass"
+    }
+  ],
+  "status": "pass",
+  "title": "Battle Package End-to-End Validation"
+}

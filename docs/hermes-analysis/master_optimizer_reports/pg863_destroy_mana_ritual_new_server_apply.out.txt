@@ -1,0 +1,16 @@
+BEGIN
+psql:docs/hermes-analysis/master_optimizer_reports/pg863_destroy_mana_ritual_new_server_apply.sql:3: NOTICE:  schema "manaloom_deploy_audit" already exists, skipping
+CREATE SCHEMA
+SELECT 0
+DO
+ deprecated_shadow_rows
+------------------------
+                      0
+(1 row)
+
+ upserted_rows
+---------------
+             4
+(1 row)
+
+COMMIT

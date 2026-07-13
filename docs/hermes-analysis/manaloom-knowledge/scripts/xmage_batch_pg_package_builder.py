@@ -4311,6 +4311,81 @@ def spell_mana_ritual_execution_scenario_from_expected_rule(rule: dict[str, Any]
     }
 
 
+def destroy_target_mana_ritual_execution_scenario_from_expected_rule(
+    rule: dict[str, Any],
+) -> dict[str, Any] | None:
+    required = dict(rule.get("required_effect_fields") or {})
+    if required.get("battle_model_scope") != "xmage_destroy_target_and_fixed_mana_ritual_spell_v1":
+        return None
+    if required.get("effect") != "composite_resolution":
+        return None
+    components = [
+        component
+        for component in (required.get("_composite_rule_components") or [])
+        if isinstance(component, dict)
+    ]
+    removal_component = next(
+        (
+            component
+            for component in components
+            if component.get("effect") in {"remove_creature", "remove_permanent"}
+        ),
+        None,
+    )
+    mana_component = next(
+        (component for component in components if component.get("effect") == "ramp_ritual"),
+        None,
+    )
+    if removal_component is None or mana_component is None:
+        return None
+    target_constraints = dict(
+        removal_component.get("target_constraints")
+        or required.get("target_constraints")
+        or {}
+    )
+    produced_symbols = [
+        str(symbol).strip().upper()
+        for symbol in (
+            mana_component.get("produced_mana_symbols")
+            or required.get("produced_mana_symbols")
+            or []
+        )
+        if str(symbol).strip()
+    ]
+    produces = str(mana_component.get("produces") or required.get("produces") or "")
+    expected_mana_added = int(mana_component.get("mana_produced") or required.get("mana_produced") or 0)
+    if expected_mana_added <= 0:
+        return None
+    expected_mana_symbols = produced_symbols
+    if not expected_mana_symbols and len(produces) == 1 and produces in "WUBRGC":
+        expected_mana_symbols = [produces] * expected_mana_added
+    return {
+        "name": f"{rule['card_name']} destroys target and adds modeled mana",
+        "type": "destroy_target_mana_ritual",
+        "card": {
+            "name": rule["card_name"],
+            "type_line": "Sorcery" if required.get("sorcery") is True else "Instant",
+        },
+        "target": _target_fixture_from_constraints(
+            "E2E Legal Destroy Mana Target",
+            target_constraints,
+            matching=True,
+        ),
+        "nonmatching_target": _target_fixture_from_constraints(
+            "E2E Illegal Destroy Mana Target",
+            target_constraints,
+            matching=False,
+        ),
+        "expected_destination": "graveyard",
+        "expected_effect": removal_component.get("effect"),
+        "expected_target_constraints": target_constraints,
+        "expected_mana_added": expected_mana_added,
+        "expected_mana_symbols": expected_mana_symbols,
+        "expected_component_count": 2,
+        "logical_rule_key": rule["logical_rule_key"],
+    }
+
+
 def simple_mana_source_execution_scenario_from_expected_rule(rule: dict[str, Any]) -> dict[str, Any] | None:
     required = dict(rule.get("required_effect_fields") or {})
     if required.get("effect") != "ramp_permanent" or not required.get("is_mana_source"):
@@ -11104,6 +11179,7 @@ def execution_scenario_from_expected_rule(rule: dict[str, Any]) -> dict[str, Any
         or each_player_sacrifice_execution_scenario_from_expected_rule(rule)
         or multi_target_damage_execution_scenario_from_expected_rule(rule)
         or multi_target_removal_execution_scenario_from_expected_rule(rule)
+        or destroy_target_mana_ritual_execution_scenario_from_expected_rule(rule)
         or single_target_removal_and_draw_execution_scenario_from_expected_rule(rule)
         or single_target_removal_and_scry_execution_scenario_from_expected_rule(rule)
         or single_target_removal_and_surveil_execution_scenario_from_expected_rule(rule)
