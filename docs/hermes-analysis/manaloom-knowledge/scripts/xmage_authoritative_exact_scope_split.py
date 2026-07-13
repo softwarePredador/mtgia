@@ -30630,6 +30630,30 @@ def dynamic_any_one_color_mana_source_detail_from_source(
     return detail
 
 
+def dynamic_mana_ability_windows(source_text: str) -> list[str]:
+    text = source_text or ""
+    positions = [
+        match.start()
+        for match in re.finditer(r"new\s+DynamicManaAbility\b", text)
+    ]
+    windows: list[str] = []
+    for index, position in enumerate(positions):
+        next_position = positions[index + 1] if index + 1 < len(positions) else len(text)
+        end_candidates = [
+            value
+            for value in (
+                text.find("\n        //", position + 1),
+                text.find("\n        this.addAbility", position + 1),
+                text.find("\n        Ability ", position + 1),
+                next_position,
+            )
+            if value > position
+        ]
+        end = min(end_candidates) if end_candidates else min(len(text), position + 1600)
+        windows.append(text[position:end])
+    return windows
+
+
 def fixed_color_dynamic_mana_source_detail_from_source(
     source_text: str,
     mana_ability_classes: set[str],
@@ -30637,15 +30661,17 @@ def fixed_color_dynamic_mana_source_detail_from_source(
     text = source_text or ""
     if "DynamicManaAbility" not in mana_ability_classes:
         return None
-    if mana_ability_classes != {"DynamicManaAbility"}:
+    windows = dynamic_mana_ability_windows(text)
+    if len(windows) != 1:
         return "dynamic_fixed_color_mana_source_ability_class_not_exact"
-    if re.search(r"new\s+[A-Za-z0-9_]+Effect\s*\(", text):
+    mana_window = windows[0]
+    if re.search(r"new\s+[A-Za-z0-9_]+Effect\s*\(", mana_window):
         return "dynamic_fixed_color_mana_source_effect_class_not_empty"
-    if "SacrificeTargetCost" in text or re.search(r"\.addCost\s*\([^;]*Sacrifice", text, re.S):
+    if "SacrificeTargetCost" in mana_window or re.search(r"\.addCost\s*\([^;]*Sacrifice", mana_window, re.S):
         return "dynamic_fixed_color_mana_source_sacrifice_cost_not_supported"
     color_match = re.search(
         r"DynamicManaAbility\s*\(\s*Mana\.(White|Blue|Black|Red|Green)Mana\s*\(\s*1\s*\)",
-        text,
+        mana_window,
     )
     if not color_match:
         return "dynamic_fixed_color_mana_source_color_not_supported"
@@ -30655,14 +30681,14 @@ def fixed_color_dynamic_mana_source_detail_from_source(
         "mana_produced": 1,
         "mana_activation_requires_tap": True,
     }
-    generic_cost_match = re.search(r"new\s+GenericManaCost\s*\(\s*(\d+)\s*\)", text)
+    generic_cost_match = re.search(r"new\s+GenericManaCost\s*\(\s*(\d+)\s*\)", mana_window)
     if generic_cost_match:
         detail["activation_mana_cost"] = f"{{{generic_cost_match.group(1)}}}"
-    if "DevotionCount.G" in text:
+    if "DevotionCount.G" in mana_window or "DevotionCount.G" in text:
         detail["dynamic_mana_amount_source"] = "devotion_to_green"
-    elif "SourcePermanentPowerValue" in text:
+    elif "SourcePermanentPowerValue" in mana_window:
         detail["dynamic_mana_amount_source"] = "source_power"
-    elif "PermanentsOnBattlefieldCount" in text:
+    elif "PermanentsOnBattlefieldCount" in mana_window or "PermanentsOnBattlefieldCount" in text:
         detail["dynamic_mana_amount_source"] = "battlefield_permanent_count"
         if "FilterControlledPermanent" in text and "SubType.SWAMP" in text:
             detail["dynamic_mana_battlefield_count_scope"] = "controller_battlefield"
@@ -34081,7 +34107,8 @@ def build_proposal(
     is_runtime_partial_batch_safe = (
         is_runtime_partial
         and bool(effect_json.get("_runtime_partial_batch_safe"))
-        and effect_json.get("battle_model_scope") == MANA_SCOPE
+        and effect_json.get("battle_model_scope")
+        in {MANA_SCOPE, DYNAMIC_FIXED_COLOR_MANA_SCOPE}
         and effect_json.get("modeled_ability_subset") == "mana_source_only"
         and bool(effect_json.get("is_mana_source"))
     )
@@ -48662,6 +48689,30 @@ def split_row(
             ):
                 if dynamic_fixed_color_mana_source.get(optional_key) not in (None, "", []):
                     effect_json[optional_key] = dynamic_fixed_color_mana_source[optional_key]
+            auxiliary_ability_classes = sorted(
+                mana_ability_classes
+                - {"DynamicManaAbility"}
+                - SAFE_MANA_AUXILIARY_ABILITY_CLASSES
+            )
+            if auxiliary_ability_classes or classes:
+                effect_json["modeled_ability_subset"] = "mana_source_only"
+                effect_json["_runtime_partial"] = True
+                effect_json["_runtime_partial_batch_safe"] = True
+                effect_json["_runtime_partial_batch_safe_reason"] = (
+                    "The DynamicManaAbility mana production is fully modeled by "
+                    "the fixed-color dynamic mana runtime/E2E scenario; auxiliary "
+                    "non-mana abilities remain explicitly unmodeled."
+                )
+                effect_json["_runtime_partial_reason"] = (
+                    "Only the XMage fixed-color DynamicManaAbility is executable "
+                    "in this rule; listed auxiliary ability/effect classes remain "
+                    "unmodeled."
+                )
+                effect_json["xmage_auxiliary_ability_classes"] = sorted(
+                    mana_ability_classes - {"DynamicManaAbility"}
+                )
+                effect_json["xmage_unmodeled_auxiliary_ability_classes"] = auxiliary_ability_classes
+                effect_json["xmage_unmodeled_effect_classes"] = sorted(classes)
             return build_proposal(
                 row,
                 metadata,

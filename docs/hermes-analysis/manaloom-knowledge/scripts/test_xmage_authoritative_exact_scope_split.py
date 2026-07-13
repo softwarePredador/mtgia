@@ -22127,6 +22127,54 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
                 for key, value in expected_fields.items():
                     self.assertEqual(effect[key], value)
 
+    def test_fixed_color_dynamic_mana_source_with_auxiliary_maps_partial_safe_mana(self) -> None:
+        row = queue_row(
+            split.RAMP_CREATURE_UNIT,
+            effect_classes=["AddCountersSourceEffect"],
+            ability_kind="activated",
+            ability_classes=[
+                "DynamicManaAbility",
+                "EntersBattlefieldControlledTriggeredAbility",
+            ],
+        )
+
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Marwyn, the Nurturer",
+                type_line="Legendary Creature - Elf Druid",
+                oracle_text=(
+                    "Whenever another Elf you control enters, put a +1/+1 counter on Marwyn, the Nurturer.\n"
+                    "{T}: Add an amount of {G} equal to Marwyn's power."
+                ),
+                mana_cost="{2}{G}",
+            ),
+            source_text=(
+                "this.addAbility(new EntersBattlefieldControlledTriggeredAbility("
+                "new AddCountersSourceEffect(CounterType.P1P1.createInstance()), filter));\n"
+                "this.addAbility(new DynamicManaAbility("
+                "Mana.GreenMana(1), SourcePermanentPowerValue.NOT_NEGATIVE, "
+                "\"Add an amount of {G} equal to {this}'s power\"));"
+            ),
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        self.assertTrue(proposal["safe_for_batch_pg_package"])
+        self.assertEqual(proposal["proposal_status"], "runtime_partial_batch_pg_candidate_after_precheck")
+        self.assertEqual(proposal["family_id"], "xmage_fixed_color_dynamic_mana_source")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.DYNAMIC_FIXED_COLOR_MANA_SCOPE)
+        self.assertEqual(effect["modeled_ability_subset"], "mana_source_only")
+        self.assertTrue(effect["_runtime_partial"])
+        self.assertTrue(effect["_runtime_partial_batch_safe"])
+        self.assertEqual(effect["dynamic_mana_amount_source"], "source_power")
+        self.assertEqual(effect["xmage_mana_ability_classes"], ["DynamicManaAbility"])
+        self.assertEqual(
+            effect["xmage_unmodeled_auxiliary_ability_classes"],
+            ["EntersBattlefieldControlledTriggeredAbility"],
+        )
+        self.assertEqual(effect["xmage_unmodeled_effect_classes"], ["AddCountersSourceEffect"])
+
     def test_dynamic_any_one_color_mana_source_maps_exact_scope(self) -> None:
         fixtures = [
             (
