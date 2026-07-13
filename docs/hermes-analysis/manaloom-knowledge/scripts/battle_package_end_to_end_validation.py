@@ -6617,6 +6617,55 @@ def run_static_attacks_each_combat_creature(
     }
 
 
+def run_static_cant_be_blocked_by_more_than_one_creature(
+    battle,
+    scenario: dict[str, Any],
+    events: list[tuple[str, dict[str, Any]]],
+) -> dict[str, Any]:
+    card = dict(scenario["card"])
+    effect = battle.get_card_effect(card)
+    if effect.get("effect") != "creature":
+        fail("battle_execution", f"{card['name']} effect={effect.get('effect')!r}")
+    if (
+        effect.get("battle_model_scope")
+        != "xmage_static_self_cant_be_blocked_by_more_than_one_creature_v1"
+    ):
+        fail("battle_execution", f"{card['name']} scope={effect.get('battle_model_scope')!r}")
+    attacker_player = battle.Player(str(scenario.get("attacker_player") or "Static Attacker"), None, [])
+    defender = battle.Player(str(scenario.get("defender_player") or "Static Defender"), None, [])
+    permanent = battle.enrich_card({**card, **effect})
+    permanent["attacking"] = True
+    permanent.setdefault("summoning_sick", False)
+    permanent.setdefault("tapped", True)
+    blocker_cards = [dict(blocker) for blocker in scenario.get("blockers") or []]
+    if len(blocker_cards) < 2:
+        fail("manifest", f"{card['name']} requires at least two blocker fixtures")
+    attacker_player.battlefield = [permanent]
+    defender.battlefield = blocker_cards
+    defender.life = int(scenario.get("defender_life") or permanent.get("power") or 6)
+    max_blockers = int(scenario.get("expected_max_blockers") or 1)
+    if int(battle.attacker_max_blockers(permanent) or 0) != max_blockers:
+        fail("battle_execution", f"{card['name']} max_blockers={battle.attacker_max_blockers(permanent)!r}")
+    assignments = battle.declare_blockers_step(
+        defender,
+        [permanent],
+        int(scenario.get("turn") or 4),
+        random.Random(int(scenario.get("block_seed") or 6071)),
+    )
+    blocker_names = _block_assignment_names(assignments)
+    expected_blockers = list(scenario.get("expected_blockers") or [blocker_cards[0].get("name")])
+    if blocker_names != expected_blockers:
+        fail("battle_execution", f"{card['name']} blockers={blocker_names}, expected {expected_blockers}")
+    if len(blocker_names) > max_blockers:
+        fail("battle_execution", f"{card['name']} exceeded max blockers: {blocker_names}")
+    return {
+        "scenario": scenario.get("name"),
+        "card_name": card["name"],
+        "max_blockers": max_blockers,
+        "blockers": blocker_names,
+    }
+
+
 def run_restricted_mana_formidable_life_reset(
     battle,
     scenario: dict[str, Any],
@@ -16407,6 +16456,7 @@ SCENARIO_RUNNERS = {
     "static_cost_reduction_spell_cost": run_static_cost_reduction_spell_cost,
     "static_cant_block_creature": run_static_cant_block_creature,
     "static_attacks_each_combat_creature": run_static_attacks_each_combat_creature,
+    "static_cant_be_blocked_by_more_than_one_creature": run_static_cant_be_blocked_by_more_than_one_creature,
     "static_filtered_protection": run_static_filtered_protection,
     "static_subtype_protection": run_static_filtered_protection,
     "static_count_power_toughness": run_static_count_power_toughness,

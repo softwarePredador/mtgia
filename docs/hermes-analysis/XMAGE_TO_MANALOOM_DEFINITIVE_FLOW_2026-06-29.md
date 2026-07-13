@@ -20452,6 +20452,52 @@ Evidence:
 - `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260711_post_pg750c_active_hash_backfill_new_server_commander_legal.md`
 - `docs/hermes-analysis/master_optimizer_reports/pg_hermes_sqlite_contract_audit_20260711_post_pg750c_active_hash_backfill_new_server_final.md`
 
+## 2026-07-13 PG858 Static Self Max-One-Blocker Closure
+
+- Closed the exact XMage unit
+  `xmage_signature::CantBeBlockedByMoreThanOneSourceEffect::SimpleStaticAbility::no_target_class::no_condition_class::static_ability`
+  as ManaLoom scope
+  `xmage_static_self_cant_be_blocked_by_more_than_one_creature_v1`.
+- The mapper accepts only source-only `SimpleStaticAbility(new
+  CantBeBlockedByMoreThanOneSourceEffect())` and exact Oracle text saying the
+  source creature cannot be blocked by more than one creature. It rejects
+  `AllEffect`, attached/equipment variants, activated variants, end-of-turn
+  variants, and composite source files.
+- Runtime behavior is executable in blocker assignment through
+  `max_blockers=1` / `max_blocked_by=1`. Focused runtime and E2E scenarios
+  prove two available blockers are reduced to one selected blocker.
+- The PostgreSQL package promoted `6` cards: `Bristling Boar`, `Charging
+  Rhino`, `Huang Zhong, Shu General`, `Ironhoof Ox`, `Norwood Riders`, and
+  `Stalking Tiger`. Precheck found `6` target rows, `0` existing expected
+  rows, and `0` shadow rows; apply inserted/updated `6`; postcheck verified
+  `6/6` promoted rows as `verified`/`auto` with Oracle hashes.
+- Hermes sync loaded `6` PG rules into SQLite, wrote `6` SQLite rows, and
+  exported a canonical fallback snapshot with `6807` rows. Metadata sync ran
+  against `127.0.0.1:15432/halder` and left one unrelated unresolved cache
+  alias: `Surgical Suite/Hospital Room`.
+- E2E package validation passed across PostgreSQL, SQLite, canonical snapshot,
+  runtime `get_card_effect`, and battle execution for all `6` selected cards.
+- Post-sync readiness increased `snapshot_has_verified_rule` to `6932` and
+  `battle_and_oracle_ready` to `6825`. The Commander-legal authoritative queue
+  is now `target_identity_count=24058`,
+  `xmage_authoritative_source_count=23745`,
+  `xmage_missing_source_exception_count=313`, `parser_gap=0`, and
+  `xmage_authoritative_adapter_required_count=23745`; the exact max-one-blocker
+  work unit has `0` remaining rows.
+- Final governance audits passed:
+  XMage strategy (`26/26`), operational surface, legacy contamination, and
+  PG/Hermes/SQLite contract (`51/51`).
+
+Evidence:
+
+- `docs/hermes-analysis/PG858_STATIC_CANT_BE_BLOCKED_BY_MORE_THAN_ONE_EVIDENCE_2026-07-13.md`
+- `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_exact_scope_split_20260713_pg858_static_cant_be_blocked_by_more_than_one_new_server_candidate.md`
+- `docs/hermes-analysis/master_optimizer_reports/pg858_static_cant_be_blocked_by_more_than_one_new_server_package_manifest.json`
+- `docs/hermes-analysis/master_optimizer_reports/pg858_static_cant_be_blocked_by_more_than_one_new_server_e2e_validation.md`
+- `docs/hermes-analysis/master_optimizer_reports/global_card_oracle_battle_readiness_20260713_post_pg858_static_cant_be_blocked_by_more_than_one_new_server.md`
+- `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260713_post_pg858_static_cant_be_blocked_by_more_than_one_new_server_commander_legal.md`
+- `docs/hermes-analysis/master_optimizer_reports/pg_hermes_sqlite_contract_audit_20260713_post_pg858_static_cant_be_blocked_by_more_than_one_new_server_final.md`
+
 ## Required Artifacts Per Cycle
 
 Every cycle must produce or refresh:

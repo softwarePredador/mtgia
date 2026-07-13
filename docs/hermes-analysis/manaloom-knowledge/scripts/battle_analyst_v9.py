@@ -74557,6 +74557,23 @@ def attacker_cannot_be_blocked(creature, defending_player=None):
     )
 
 
+def attacker_max_blockers(creature):
+    if not isinstance(creature, dict):
+        return 0
+    raw_limit = creature.get("max_blockers")
+    if raw_limit is None:
+        raw_limit = creature.get("max_blocked_by")
+    if raw_limit is None and (
+        creature.get("cant_be_blocked_by_more_than_one")
+        or creature.get("cant_be_blocked_by_more_than_one_creature")
+    ):
+        raw_limit = 1
+    try:
+        return max(0, int(raw_limit or 0))
+    except (TypeError, ValueError):
+        return 0
+
+
 def cant_attack_alone(creature):
     return bool(
         creature.get("cant_attack_alone")
@@ -75743,6 +75760,9 @@ def declare_blockers_step(target, attackers, turn, rng):
             # Avoid an automatic full-board suicide unless it prevents lethal.
             if estimated_losses == len(blockers):
                 blockers = []
+        max_blockers = attacker_max_blockers(a)
+        if max_blockers > 0 and len(blockers) > max_blockers:
+            blockers = blockers[:max_blockers]
         for blocker in blockers:
             blocker["blocking"] = True
         assigned_blockers.extend(blockers)

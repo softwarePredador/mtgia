@@ -563,6 +563,9 @@ STATIC_PROTECTION_FROM_FILTERED_CREATURE_SCOPE = (
 STATIC_CAST_AS_FLASH_PERMISSION_SCOPE = "xmage_static_cast_spells_as_flash_permission_v1"
 STATIC_CANT_BE_BLOCKED_CREATURE_SCOPE = "xmage_static_self_cant_be_blocked_creature_v1"
 STATIC_CANT_BLOCK_CREATURE_SCOPE = "xmage_static_self_cant_block_creature_v1"
+STATIC_CANT_BE_BLOCKED_BY_MORE_THAN_ONE_CREATURE_SCOPE = (
+    "xmage_static_self_cant_be_blocked_by_more_than_one_creature_v1"
+)
 STATIC_ATTACKS_EACH_COMBAT_CREATURE_SCOPE = (
     "xmage_static_self_attacks_each_combat_creature_v1"
 )
@@ -1083,6 +1086,10 @@ CANT_BLOCK_SOURCE_UNIT = (
 FILTERED_EVASION_UNIT = (
     "xmage_signature::CantBeBlockedByCreaturesSourceEffect::SimpleEvasionAbility::"
     "no_target_class::no_condition_class::no_signal"
+)
+CANT_BE_BLOCKED_BY_MORE_THAN_ONE_SOURCE_UNIT = (
+    "xmage_signature::CantBeBlockedByMoreThanOneSourceEffect::SimpleStaticAbility::"
+    "no_target_class::no_condition_class::static_ability"
 )
 FLYING_CAN_BLOCK_ONLY_FLYING_UNIT = (
     "xmage_signature::no_effect_class::CanBlockOnlyFlyingAbility,FlyingAbility::"
@@ -14271,6 +14278,15 @@ def is_static_cant_block_creature_unit(row: dict[str, Any]) -> bool:
     )
 
 
+def is_static_cant_be_blocked_by_more_than_one_creature_unit(row: dict[str, Any]) -> bool:
+    return (
+        str(row.get("adapter_work_unit") or "") == CANT_BE_BLOCKED_BY_MORE_THAN_ONE_SOURCE_UNIT
+        and effect_classes(row) == {"CantBeBlockedByMoreThanOneSourceEffect"}
+        and ability_classes(row) == {"SimpleStaticAbility"}
+        and set(row.get("xmage_signals") or []) == {"static_ability"}
+    )
+
+
 def is_static_filtered_evasion_creature_unit(row: dict[str, Any]) -> bool:
     return (
         str(row.get("adapter_work_unit") or "") == FILTERED_EVASION_UNIT
@@ -16187,6 +16203,52 @@ def source_is_static_cant_block(source: str, row: dict[str, Any] | None = None) 
     expected = ability_classes(row)
     declared = source_declared_ability_classes(text)
     return declared == expected
+
+
+def oracle_is_static_cant_be_blocked_by_more_than_one(metadata: dict[str, Any]) -> bool:
+    text = strip_parenthetical_reminders(oracle_text_after_leading_static_keywords(metadata))
+    text = re.sub(r"\s+", " ", text).strip().lower()
+    if not text:
+        return False
+    text_without_period = text[:-1] if text.endswith(".") else text
+    source_name = re.sub(r"\s+", " ", str(metadata.get("name") or "").strip().lower())
+    accepted = {
+        "this creature can't be blocked by more than one creature",
+        "this card can't be blocked by more than one creature",
+    }
+    if source_name:
+        accepted.add(f"{source_name} can't be blocked by more than one creature")
+        short_name = source_name.split(",", 1)[0].strip()
+        if short_name:
+            accepted.add(f"{short_name} can't be blocked by more than one creature")
+    return text_without_period in accepted
+
+
+def source_is_static_cant_be_blocked_by_more_than_one(
+    source: str,
+    row: dict[str, Any] | None = None,
+) -> bool:
+    text = source or ""
+    if (
+        "CantBeBlockedByMoreThanOneSourceEffect" not in text
+        or "CantBeBlockedByMoreThanOneAllEffect" in text
+        or "CantBeBlockedByMoreThanOneAttachedEffect" in text
+        or "SimpleActivatedAbility" in text
+        or "Duration.EndOfTurn" in text
+    ):
+        return False
+    if not re.search(
+        r"new\s+SimpleStaticAbility\s*\(\s*new\s+CantBeBlockedByMoreThanOneSourceEffect\s*\(\s*\)\s*\)",
+        text,
+        re.S,
+    ):
+        return False
+    if row is None:
+        return True
+    return (
+        effect_classes(row) == {"CantBeBlockedByMoreThanOneSourceEffect"}
+        and ability_classes(row) == {"SimpleStaticAbility"}
+    )
 
 
 def oracle_is_static_attacks_each_combat(metadata: dict[str, Any]) -> bool:
@@ -34308,6 +34370,9 @@ def split_row(
     static_cast_as_flash_permission_unit = is_static_cast_as_flash_permission_unit(row)
     static_cant_be_blocked_creature_unit = is_static_cant_be_blocked_creature_unit(row)
     static_cant_block_creature_unit = is_static_cant_block_creature_unit(row)
+    static_cant_be_blocked_by_more_than_one_creature_unit = (
+        is_static_cant_be_blocked_by_more_than_one_creature_unit(row)
+    )
     static_basic_landwalk_creature_unit = is_static_basic_landwalk_creature_unit(row)
     static_filtered_evasion_creature_unit = is_static_filtered_evasion_creature_unit(row)
     static_flying_can_block_only_flying_creature_unit = (
@@ -34547,6 +34612,7 @@ def split_row(
         and not static_cast_as_flash_permission_unit
         and not static_cant_be_blocked_creature_unit
         and not static_cant_block_creature_unit
+        and not static_cant_be_blocked_by_more_than_one_creature_unit
         and not static_basic_landwalk_creature_unit
         and not static_filtered_evasion_creature_unit
         and not static_flying_can_block_only_flying_creature_unit
@@ -35452,6 +35518,34 @@ def split_row(
             metadata,
             effect_json,
             family_id="xmage_static_self_cant_block_creature",
+        ), "selected_exact_scope"
+
+    if static_cant_be_blocked_by_more_than_one_creature_unit:
+        if not is_creature_metadata(metadata):
+            return None, "static_cant_be_blocked_by_more_than_one_not_creature"
+        if not oracle_is_static_cant_be_blocked_by_more_than_one(metadata):
+            return None, "static_cant_be_blocked_by_more_than_one_oracle_not_exact"
+        if not source_is_static_cant_be_blocked_by_more_than_one(source_text, row):
+            return None, "static_cant_be_blocked_by_more_than_one_source_not_exact"
+        effect_json = {
+            "effect": "creature",
+            "battle_model_scope": STATIC_CANT_BE_BLOCKED_BY_MORE_THAN_ONE_CREATURE_SCOPE,
+            "ability_kind": "static",
+            "static_effect": "self_cant_be_blocked_by_more_than_one_creature",
+            "target": "self",
+            "target_controller": "self",
+            "cant_be_blocked_by_more_than_one": True,
+            "cant_be_blocked_by_more_than_one_creature": True,
+            "max_blockers": 1,
+            "max_blocked_by": 1,
+            "xmage_effect_class": "CantBeBlockedByMoreThanOneSourceEffect",
+            "xmage_ability_class": "SimpleStaticAbility",
+        }
+        return build_proposal(
+            row,
+            metadata,
+            effect_json,
+            family_id="xmage_static_self_cant_be_blocked_by_more_than_one_creature",
         ), "selected_exact_scope"
 
     if static_filtered_evasion_creature_unit:
@@ -50373,6 +50467,7 @@ def build_exact_split_report(
             and not is_static_cast_as_flash_permission_unit(row)
             and not is_static_cant_be_blocked_creature_unit(row)
             and not is_static_cant_block_creature_unit(row)
+            and not is_static_cant_be_blocked_by_more_than_one_creature_unit(row)
             and not is_counter_target_controller_mill_spell_unit(row)
             and not is_static_basic_landwalk_creature_unit(row)
             and not is_static_filtered_evasion_creature_unit(row)
@@ -50503,6 +50598,7 @@ def build_exact_split_report(
                 "no-effect/no-signal ProtectionAbility creature rows, optionally with static self keywords, with exact Oracle/XMage protection from colors, card types, subtypes, or supported filters",
                 "passive::static_cast_as_flash_permission_variant_review_v1 rows with CastAsThoughItHadFlashAllEffect, SimpleStaticAbility, only safe static keyword auxiliaries including FlashAbility, and exact Oracle/XMage timing-permission filters",
                 "no-effect/no-signal CantBeBlockedSourceAbility creature rows with exact Oracle/XMage self can't-be-blocked evasion",
+                "xmage_signature CantBeBlockedByMoreThanOneSourceEffect rows with exact source-only SimpleStaticAbility and Oracle/XMage self max-one-blocker restriction",
                 "no-effect EntersBattlefieldTappedAbility and TapSourceEffect EntersBattlefieldAbility creature rows with exact Oracle/XMage self enters-tapped state",
                 "no-effect/no-signal basic landwalk creature rows with exact Oracle/XMage self landwalk evasion",
                 "no-effect/no-signal FlyingAbility plus CanBlockOnlyFlyingAbility creature rows with exact Oracle/XMage block-only-flying restriction",

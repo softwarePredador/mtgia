@@ -1,0 +1,613 @@
+{
+  "apply_gate": "Do not run apply SQL without explicit approval for the exact command.",
+  "backup_table": "manaloom_deploy_audit.pg858_static_cant_be_blocked_by_more_tha_20260713_024015",
+  "deploy_id": "pg858_static_cant_be_blocked_by_more_than_one_new_server",
+  "execution_scenarios": [
+    {
+      "blockers": [
+        {
+          "effect": "creature",
+          "name": "E2E Large Blocker",
+          "power": 4,
+          "toughness": 4,
+          "type_line": "Creature - Giant"
+        },
+        {
+          "effect": "creature",
+          "name": "E2E Medium Blocker",
+          "power": 3,
+          "toughness": 3,
+          "type_line": "Creature - Beast"
+        }
+      ],
+      "card": {
+        "effect": "creature",
+        "name": "Bristling Boar",
+        "power": 6,
+        "summoning_sick": false,
+        "tapped": true,
+        "toughness": 6,
+        "type_line": "Creature"
+      },
+      "defender_life": 6,
+      "expected_blockers": [
+        "E2E Large Blocker"
+      ],
+      "expected_max_blockers": 1,
+      "logical_rule_key": "battle_rule_v1:e665aa82549400232d658ee0ea2b3c86",
+      "name": "Bristling Boar can be blocked by no more than one creature",
+      "type": "static_cant_be_blocked_by_more_than_one_creature"
+    },
+    {
+      "blockers": [
+        {
+          "effect": "creature",
+          "name": "E2E Large Blocker",
+          "power": 4,
+          "toughness": 4,
+          "type_line": "Creature - Giant"
+        },
+        {
+          "effect": "creature",
+          "name": "E2E Medium Blocker",
+          "power": 3,
+          "toughness": 3,
+          "type_line": "Creature - Beast"
+        }
+      ],
+      "card": {
+        "effect": "creature",
+        "name": "Charging Rhino",
+        "power": 6,
+        "summoning_sick": false,
+        "tapped": true,
+        "toughness": 6,
+        "type_line": "Creature"
+      },
+      "defender_life": 6,
+      "expected_blockers": [
+        "E2E Large Blocker"
+      ],
+      "expected_max_blockers": 1,
+      "logical_rule_key": "battle_rule_v1:e665aa82549400232d658ee0ea2b3c86",
+      "name": "Charging Rhino can be blocked by no more than one creature",
+      "type": "static_cant_be_blocked_by_more_than_one_creature"
+    },
+    {
+      "blockers": [
+        {
+          "effect": "creature",
+          "name": "E2E Large Blocker",
+          "power": 4,
+          "toughness": 4,
+          "type_line": "Creature - Giant"
+        },
+        {
+          "effect": "creature",
+          "name": "E2E Medium Blocker",
+          "power": 3,
+          "toughness": 3,
+          "type_line": "Creature - Beast"
+        }
+      ],
+      "card": {
+        "effect": "creature",
+        "name": "Huang Zhong, Shu General",
+        "power": 6,
+        "summoning_sick": false,
+        "tapped": true,
+        "toughness": 6,
+        "type_line": "Creature"
+      },
+      "defender_life": 6,
+      "expected_blockers": [
+        "E2E Large Blocker"
+      ],
+      "expected_max_blockers": 1,
+      "logical_rule_key": "battle_rule_v1:e665aa82549400232d658ee0ea2b3c86",
+      "name": "Huang Zhong, Shu General can be blocked by no more than one creature",
+      "type": "static_cant_be_blocked_by_more_than_one_creature"
+    },
+    {
+      "blockers": [
+        {
+          "effect": "creature",
+          "name": "E2E Large Blocker",
+          "power": 4,
+          "toughness": 4,
+          "type_line": "Creature - Giant"
+        },
+        {
+          "effect": "creature",
+          "name": "E2E Medium Blocker",
+          "power": 3,
+          "toughness": 3,
+          "type_line": "Creature - Beast"
+        }
+      ],
+      "card": {
+        "effect": "creature",
+        "name": "Ironhoof Ox",
+        "power": 6,
+        "summoning_sick": false,
+        "tapped": true,
+        "toughness": 6,
+        "type_line": "Creature"
+      },
+      "defender_life": 6,
+      "expected_blockers": [
+        "E2E Large Blocker"
+      ],
+      "expected_max_blockers": 1,
+      "logical_rule_key": "battle_rule_v1:e665aa82549400232d658ee0ea2b3c86",
+      "name": "Ironhoof Ox can be blocked by no more than one creature",
+      "type": "static_cant_be_blocked_by_more_than_one_creature"
+    },
+    {
+      "blockers": [
+        {
+          "effect": "creature",
+          "name": "E2E Large Blocker",
+          "power": 4,
+          "toughness": 4,
+          "type_line": "Creature - Giant"
+        },
+        {
+          "effect": "creature",
+          "name": "E2E Medium Blocker",
+          "power": 3,
+          "toughness": 3,
+          "type_line": "Creature - Beast"
+        }
+      ],
+      "card": {
+        "effect": "creature",
+        "name": "Norwood Riders",
+        "power": 6,
+        "summoning_sick": false,
+        "tapped": true,
+        "toughness": 6,
+        "type_line": "Creature"
+      },
+      "defender_life": 6,
+      "expected_blockers": [
+        "E2E Large Blocker"
+      ],
+      "expected_max_blockers": 1,
+      "logical_rule_key": "battle_rule_v1:e665aa82549400232d658ee0ea2b3c86",
+      "name": "Norwood Riders can be blocked by no more than one creature",
+      "type": "static_cant_be_blocked_by_more_than_one_creature"
+    },
+    {
+      "blockers": [
+        {
+          "effect": "creature",
+          "name": "E2E Large Blocker",
+          "power": 4,
+          "toughness": 4,
+          "type_line": "Creature - Giant"
+        },
+        {
+          "effect": "creature",
+          "name": "E2E Medium Blocker",
+          "power": 3,
+          "toughness": 3,
+          "type_line": "Creature - Beast"
+        }
+      ],
+      "card": {
+        "effect": "creature",
+        "name": "Stalking Tiger",
+        "power": 6,
+        "summoning_sick": false,
+        "tapped": true,
+        "toughness": 6,
+        "type_line": "Creature"
+      },
+      "defender_life": 6,
+      "expected_blockers": [
+        "E2E Large Blocker"
+      ],
+      "expected_max_blockers": 1,
+      "logical_rule_key": "battle_rule_v1:e665aa82549400232d658ee0ea2b3c86",
+      "name": "Stalking Tiger can be blocked by no more than one creature",
+      "type": "static_cant_be_blocked_by_more_than_one_creature"
+    }
+  ],
+  "expected_rules": [
+    {
+      "card_name": "Bristling Boar",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:e665aa82549400232d658ee0ea2b3c86",
+      "min_rule_version": 2,
+      "normalized_name": "bristling boar",
+      "oracle_hash": "bcb549218b34db88162050d1931b46ac",
+      "required_effect_fields": {
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_self_cant_be_blocked_by_more_than_one_creature_v1",
+        "cant_be_blocked_by_more_than_one": true,
+        "cant_be_blocked_by_more_than_one_creature": true,
+        "effect": "creature",
+        "max_blocked_by": 1,
+        "max_blockers": 1,
+        "static_effect": "self_cant_be_blocked_by_more_than_one_creature",
+        "target": "self",
+        "target_controller": "self",
+        "xmage_ability_class": "SimpleStaticAbility",
+        "xmage_effect_class": "CantBeBlockedByMoreThanOneSourceEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Charging Rhino",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:e665aa82549400232d658ee0ea2b3c86",
+      "min_rule_version": 2,
+      "normalized_name": "charging rhino",
+      "oracle_hash": "bcb549218b34db88162050d1931b46ac",
+      "required_effect_fields": {
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_self_cant_be_blocked_by_more_than_one_creature_v1",
+        "cant_be_blocked_by_more_than_one": true,
+        "cant_be_blocked_by_more_than_one_creature": true,
+        "effect": "creature",
+        "max_blocked_by": 1,
+        "max_blockers": 1,
+        "static_effect": "self_cant_be_blocked_by_more_than_one_creature",
+        "target": "self",
+        "target_controller": "self",
+        "xmage_ability_class": "SimpleStaticAbility",
+        "xmage_effect_class": "CantBeBlockedByMoreThanOneSourceEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Huang Zhong, Shu General",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:e665aa82549400232d658ee0ea2b3c86",
+      "min_rule_version": 2,
+      "normalized_name": "huang zhong, shu general",
+      "oracle_hash": "96580290ff2f3bc38af6e36268c076ed",
+      "required_effect_fields": {
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_self_cant_be_blocked_by_more_than_one_creature_v1",
+        "cant_be_blocked_by_more_than_one": true,
+        "cant_be_blocked_by_more_than_one_creature": true,
+        "effect": "creature",
+        "max_blocked_by": 1,
+        "max_blockers": 1,
+        "static_effect": "self_cant_be_blocked_by_more_than_one_creature",
+        "target": "self",
+        "target_controller": "self",
+        "xmage_ability_class": "SimpleStaticAbility",
+        "xmage_effect_class": "CantBeBlockedByMoreThanOneSourceEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Ironhoof Ox",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:e665aa82549400232d658ee0ea2b3c86",
+      "min_rule_version": 2,
+      "normalized_name": "ironhoof ox",
+      "oracle_hash": "bcb549218b34db88162050d1931b46ac",
+      "required_effect_fields": {
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_self_cant_be_blocked_by_more_than_one_creature_v1",
+        "cant_be_blocked_by_more_than_one": true,
+        "cant_be_blocked_by_more_than_one_creature": true,
+        "effect": "creature",
+        "max_blocked_by": 1,
+        "max_blockers": 1,
+        "static_effect": "self_cant_be_blocked_by_more_than_one_creature",
+        "target": "self",
+        "target_controller": "self",
+        "xmage_ability_class": "SimpleStaticAbility",
+        "xmage_effect_class": "CantBeBlockedByMoreThanOneSourceEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Norwood Riders",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:e665aa82549400232d658ee0ea2b3c86",
+      "min_rule_version": 2,
+      "normalized_name": "norwood riders",
+      "oracle_hash": "bcb549218b34db88162050d1931b46ac",
+      "required_effect_fields": {
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_self_cant_be_blocked_by_more_than_one_creature_v1",
+        "cant_be_blocked_by_more_than_one": true,
+        "cant_be_blocked_by_more_than_one_creature": true,
+        "effect": "creature",
+        "max_blocked_by": 1,
+        "max_blockers": 1,
+        "static_effect": "self_cant_be_blocked_by_more_than_one_creature",
+        "target": "self",
+        "target_controller": "self",
+        "xmage_ability_class": "SimpleStaticAbility",
+        "xmage_effect_class": "CantBeBlockedByMoreThanOneSourceEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Stalking Tiger",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:e665aa82549400232d658ee0ea2b3c86",
+      "min_rule_version": 2,
+      "normalized_name": "stalking tiger",
+      "oracle_hash": "bcb549218b34db88162050d1931b46ac",
+      "required_effect_fields": {
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_self_cant_be_blocked_by_more_than_one_creature_v1",
+        "cant_be_blocked_by_more_than_one": true,
+        "cant_be_blocked_by_more_than_one_creature": true,
+        "effect": "creature",
+        "max_blocked_by": 1,
+        "max_blockers": 1,
+        "static_effect": "self_cant_be_blocked_by_more_than_one_creature",
+        "target": "self",
+        "target_controller": "self",
+        "xmage_ability_class": "SimpleStaticAbility",
+        "xmage_effect_class": "CantBeBlockedByMoreThanOneSourceEffect"
+      },
+      "review_status": "verified"
+    }
+  ],
+  "family_counts": {
+    "xmage_static_self_cant_be_blocked_by_more_than_one_creature": 6
+  },
+  "files": {
+    "apply": "docs/hermes-analysis/master_optimizer_reports/pg858_static_cant_be_blocked_by_more_than_one_new_server_package_apply.sql",
+    "manifest": "docs/hermes-analysis/master_optimizer_reports/pg858_static_cant_be_blocked_by_more_than_one_new_server_package_manifest.json",
+    "package": "docs/hermes-analysis/master_optimizer_reports/pg858_static_cant_be_blocked_by_more_than_one_new_server_package_package.md",
+    "postcheck": "docs/hermes-analysis/master_optimizer_reports/pg858_static_cant_be_blocked_by_more_than_one_new_server_package_postcheck.sql",
+    "precheck": "docs/hermes-analysis/master_optimizer_reports/pg858_static_cant_be_blocked_by_more_than_one_new_server_package_precheck.sql",
+    "rollback": "docs/hermes-analysis/master_optimizer_reports/pg858_static_cant_be_blocked_by_more_than_one_new_server_package_rollback.sql"
+  },
+  "generated_at": "2026-07-13T02:40:15+00:00",
+  "mutations_performed": [],
+  "runtime_checks": [
+    {
+      "card": {
+        "name": "Bristling Boar"
+      },
+      "card_name": "Bristling Boar",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:e665aa82549400232d658ee0ea2b3c86",
+      "normalized_name": "bristling boar",
+      "required_effect_fields": {
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_self_cant_be_blocked_by_more_than_one_creature_v1",
+        "cant_be_blocked_by_more_than_one": true,
+        "cant_be_blocked_by_more_than_one_creature": true,
+        "effect": "creature",
+        "max_blocked_by": 1,
+        "max_blockers": 1,
+        "static_effect": "self_cant_be_blocked_by_more_than_one_creature",
+        "target": "self",
+        "target_controller": "self",
+        "xmage_ability_class": "SimpleStaticAbility",
+        "xmage_effect_class": "CantBeBlockedByMoreThanOneSourceEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Charging Rhino"
+      },
+      "card_name": "Charging Rhino",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:e665aa82549400232d658ee0ea2b3c86",
+      "normalized_name": "charging rhino",
+      "required_effect_fields": {
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_self_cant_be_blocked_by_more_than_one_creature_v1",
+        "cant_be_blocked_by_more_than_one": true,
+        "cant_be_blocked_by_more_than_one_creature": true,
+        "effect": "creature",
+        "max_blocked_by": 1,
+        "max_blockers": 1,
+        "static_effect": "self_cant_be_blocked_by_more_than_one_creature",
+        "target": "self",
+        "target_controller": "self",
+        "xmage_ability_class": "SimpleStaticAbility",
+        "xmage_effect_class": "CantBeBlockedByMoreThanOneSourceEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Huang Zhong, Shu General"
+      },
+      "card_name": "Huang Zhong, Shu General",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:e665aa82549400232d658ee0ea2b3c86",
+      "normalized_name": "huang zhong, shu general",
+      "required_effect_fields": {
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_self_cant_be_blocked_by_more_than_one_creature_v1",
+        "cant_be_blocked_by_more_than_one": true,
+        "cant_be_blocked_by_more_than_one_creature": true,
+        "effect": "creature",
+        "max_blocked_by": 1,
+        "max_blockers": 1,
+        "static_effect": "self_cant_be_blocked_by_more_than_one_creature",
+        "target": "self",
+        "target_controller": "self",
+        "xmage_ability_class": "SimpleStaticAbility",
+        "xmage_effect_class": "CantBeBlockedByMoreThanOneSourceEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Ironhoof Ox"
+      },
+      "card_name": "Ironhoof Ox",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:e665aa82549400232d658ee0ea2b3c86",
+      "normalized_name": "ironhoof ox",
+      "required_effect_fields": {
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_self_cant_be_blocked_by_more_than_one_creature_v1",
+        "cant_be_blocked_by_more_than_one": true,
+        "cant_be_blocked_by_more_than_one_creature": true,
+        "effect": "creature",
+        "max_blocked_by": 1,
+        "max_blockers": 1,
+        "static_effect": "self_cant_be_blocked_by_more_than_one_creature",
+        "target": "self",
+        "target_controller": "self",
+        "xmage_ability_class": "SimpleStaticAbility",
+        "xmage_effect_class": "CantBeBlockedByMoreThanOneSourceEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Norwood Riders"
+      },
+      "card_name": "Norwood Riders",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:e665aa82549400232d658ee0ea2b3c86",
+      "normalized_name": "norwood riders",
+      "required_effect_fields": {
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_self_cant_be_blocked_by_more_than_one_creature_v1",
+        "cant_be_blocked_by_more_than_one": true,
+        "cant_be_blocked_by_more_than_one_creature": true,
+        "effect": "creature",
+        "max_blocked_by": 1,
+        "max_blockers": 1,
+        "static_effect": "self_cant_be_blocked_by_more_than_one_creature",
+        "target": "self",
+        "target_controller": "self",
+        "xmage_ability_class": "SimpleStaticAbility",
+        "xmage_effect_class": "CantBeBlockedByMoreThanOneSourceEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Stalking Tiger"
+      },
+      "card_name": "Stalking Tiger",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:e665aa82549400232d658ee0ea2b3c86",
+      "normalized_name": "stalking tiger",
+      "required_effect_fields": {
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_self_cant_be_blocked_by_more_than_one_creature_v1",
+        "cant_be_blocked_by_more_than_one": true,
+        "cant_be_blocked_by_more_than_one_creature": true,
+        "effect": "creature",
+        "max_blocked_by": 1,
+        "max_blockers": 1,
+        "static_effect": "self_cant_be_blocked_by_more_than_one_creature",
+        "target": "self",
+        "target_controller": "self",
+        "xmage_ability_class": "SimpleStaticAbility",
+        "xmage_effect_class": "CantBeBlockedByMoreThanOneSourceEffect"
+      }
+    }
+  ],
+  "selected_card_names": [
+    "Bristling Boar",
+    "Charging Rhino",
+    "Huang Zhong, Shu General",
+    "Ironhoof Ox",
+    "Norwood Riders",
+    "Stalking Tiger"
+  ],
+  "selected_count": 6,
+  "slug": "static_cant_be_blocked_by_more_than_one_new_server",
+  "snapshot_checks": [
+    {
+      "card_name": "Bristling Boar",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:e665aa82549400232d658ee0ea2b3c86",
+      "min_rule_version": 2,
+      "normalized_name": "bristling boar",
+      "oracle_hash": "bcb549218b34db88162050d1931b46ac",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_static_self_cant_be_blocked_by_more_than_one_creature_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Charging Rhino",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:e665aa82549400232d658ee0ea2b3c86",
+      "min_rule_version": 2,
+      "normalized_name": "charging rhino",
+      "oracle_hash": "bcb549218b34db88162050d1931b46ac",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_static_self_cant_be_blocked_by_more_than_one_creature_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Huang Zhong, Shu General",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:e665aa82549400232d658ee0ea2b3c86",
+      "min_rule_version": 2,
+      "normalized_name": "huang zhong, shu general",
+      "oracle_hash": "96580290ff2f3bc38af6e36268c076ed",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_static_self_cant_be_blocked_by_more_than_one_creature_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Ironhoof Ox",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:e665aa82549400232d658ee0ea2b3c86",
+      "min_rule_version": 2,
+      "normalized_name": "ironhoof ox",
+      "oracle_hash": "bcb549218b34db88162050d1931b46ac",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_static_self_cant_be_blocked_by_more_than_one_creature_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Norwood Riders",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:e665aa82549400232d658ee0ea2b3c86",
+      "min_rule_version": 2,
+      "normalized_name": "norwood riders",
+      "oracle_hash": "bcb549218b34db88162050d1931b46ac",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_static_self_cant_be_blocked_by_more_than_one_creature_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Stalking Tiger",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:e665aa82549400232d658ee0ea2b3c86",
+      "min_rule_version": 2,
+      "normalized_name": "stalking tiger",
+      "oracle_hash": "bcb549218b34db88162050d1931b46ac",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_static_self_cant_be_blocked_by_more_than_one_creature_v1"
+      },
+      "review_status": "verified"
+    }
+  ],
+  "status": "prepared_read_only_pending_apply_approval"
+}

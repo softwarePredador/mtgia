@@ -35,6 +35,10 @@ E2E_REQUIRED_EFFECT_FIELDS = (
     "enchant_target",
     "enchant_target_controller",
     "static_effect",
+    "max_blockers",
+    "max_blocked_by",
+    "cant_be_blocked_by_more_than_one",
+    "cant_be_blocked_by_more_than_one_creature",
     "static_applies_to",
     "static_power_bonus",
     "static_toughness_bonus",
@@ -4651,6 +4655,54 @@ def static_attacks_each_combat_creature_execution_scenario_from_expected_rule(
         "expected_should_attack": True,
         "expected_attackers": [rule["card_name"]],
         "expected_keywords": keywords,
+        "logical_rule_key": rule["logical_rule_key"],
+    }
+
+
+def static_cant_be_blocked_by_more_than_one_creature_execution_scenario_from_expected_rule(
+    rule: dict[str, Any],
+) -> dict[str, Any] | None:
+    required = dict(rule.get("required_effect_fields") or {})
+    if required.get("effect") != "creature":
+        return None
+    if required.get("battle_model_scope") != "xmage_static_self_cant_be_blocked_by_more_than_one_creature_v1":
+        return None
+    if not required.get("cant_be_blocked_by_more_than_one"):
+        return None
+    max_blockers = int(required.get("max_blockers") or required.get("max_blocked_by") or 0)
+    if max_blockers != 1:
+        return None
+    return {
+        "name": f"{rule['card_name']} can be blocked by no more than one creature",
+        "type": "static_cant_be_blocked_by_more_than_one_creature",
+        "card": {
+            "name": rule["card_name"],
+            "type_line": "Creature",
+            "effect": "creature",
+            "power": 6,
+            "toughness": 6,
+            "summoning_sick": False,
+            "tapped": True,
+        },
+        "blockers": [
+            {
+                "name": "E2E Large Blocker",
+                "type_line": "Creature - Giant",
+                "effect": "creature",
+                "power": 4,
+                "toughness": 4,
+            },
+            {
+                "name": "E2E Medium Blocker",
+                "type_line": "Creature - Beast",
+                "effect": "creature",
+                "power": 3,
+                "toughness": 3,
+            },
+        ],
+        "defender_life": 6,
+        "expected_max_blockers": 1,
+        "expected_blockers": ["E2E Large Blocker"],
         "logical_rule_key": rule["logical_rule_key"],
     }
 
@@ -10925,6 +10977,7 @@ def execution_scenario_from_expected_rule(rule: dict[str, Any]) -> dict[str, Any
         or prowess_execution_scenario_from_expected_rule(rule)
         or static_ward_execution_scenario_from_expected_rule(rule)
         or changeling_subtype_identity_execution_scenario_from_expected_rule(rule)
+        or static_cant_be_blocked_by_more_than_one_creature_execution_scenario_from_expected_rule(rule)
         or simple_activated_damage_execution_scenario_from_expected_rule(rule)
         or simple_activated_tap_target_execution_scenario_from_expected_rule(rule)
         or simple_activated_untap_target_execution_scenario_from_expected_rule(rule)

@@ -9123,3 +9123,38 @@ def test_static_attacks_each_combat_manifest_builds_execution_scenario() -> None
     assert scenario["expected_must_attack"] is True
     assert scenario["expected_should_attack"] is True
     assert scenario["expected_attackers"] == ["Goblin Brigand"]
+
+
+def test_static_cant_be_blocked_by_more_than_one_manifest_builds_execution_scenario() -> None:
+    proposal = {
+        "normalized_name": "bristling boar",
+        "card_name": "Bristling Boar",
+        "oracle_hash": "hash-bristling-boar",
+        "logical_rule_key": "battle_rule_v1:bristling-boar",
+        "effect_json": {
+            "effect": "creature",
+            "battle_model_scope": "xmage_static_self_cant_be_blocked_by_more_than_one_creature_v1",
+            "ability_kind": "static",
+            "static_effect": "self_cant_be_blocked_by_more_than_one_creature",
+            "target": "self",
+            "target_controller": "self",
+            "cant_be_blocked_by_more_than_one": True,
+            "cant_be_blocked_by_more_than_one_creature": True,
+            "max_blockers": 1,
+            "max_blocked_by": 1,
+        },
+    }
+
+    expected = builder.expected_rule_from_proposal(proposal)
+    required = expected["required_effect_fields"]
+
+    assert required["cant_be_blocked_by_more_than_one"] is True
+    assert required["cant_be_blocked_by_more_than_one_creature"] is True
+    assert required["max_blockers"] == 1
+    assert required["max_blocked_by"] == 1
+
+    scenario = builder.execution_scenario_from_expected_rule(expected)
+
+    assert scenario["type"] == "static_cant_be_blocked_by_more_than_one_creature"
+    assert scenario["expected_max_blockers"] == 1
+    assert scenario["expected_blockers"] == ["E2E Large Blocker"]

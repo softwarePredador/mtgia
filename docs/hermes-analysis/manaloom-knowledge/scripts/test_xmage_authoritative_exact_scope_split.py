@@ -1799,6 +1799,108 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertIsNone(proposal)
         self.assertEqual(reason, "static_cant_block_source_not_exact")
 
+    def test_static_cant_be_blocked_by_more_than_one_creature_maps_to_runtime(self) -> None:
+        row = queue_row(
+            split.CANT_BE_BLOCKED_BY_MORE_THAN_ONE_SOURCE_UNIT,
+            effect_classes=["CantBeBlockedByMoreThanOneSourceEffect"],
+            ability_kind="static",
+            ability_classes=["SimpleStaticAbility"],
+            xmage_signals=["static_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Bristling Boar",
+                type_line="Creature - Boar",
+                oracle_text="This creature can't be blocked by more than one creature.",
+            ),
+            source_text="""
+                import mage.abilities.effects.common.combat.CantBeBlockedByMoreThanOneSourceEffect;
+                this.addAbility(new SimpleStaticAbility(new CantBeBlockedByMoreThanOneSourceEffect()));
+            """,
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(
+            effect["battle_model_scope"],
+            split.STATIC_CANT_BE_BLOCKED_BY_MORE_THAN_ONE_CREATURE_SCOPE,
+        )
+        self.assertEqual(effect["effect"], "creature")
+        self.assertTrue(effect["cant_be_blocked_by_more_than_one"])
+        self.assertTrue(effect["cant_be_blocked_by_more_than_one_creature"])
+        self.assertEqual(effect["max_blockers"], 1)
+        self.assertEqual(effect["max_blocked_by"], 1)
+        self.assertEqual(effect["static_effect"], "self_cant_be_blocked_by_more_than_one_creature")
+
+    def test_static_cant_be_blocked_by_more_than_one_creature_accepts_legend_short_name(self) -> None:
+        row = queue_row(
+            split.CANT_BE_BLOCKED_BY_MORE_THAN_ONE_SOURCE_UNIT,
+            effect_classes=["CantBeBlockedByMoreThanOneSourceEffect"],
+            ability_kind="static",
+            ability_classes=["SimpleStaticAbility"],
+            xmage_signals=["static_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Huang Zhong, Shu General",
+                type_line="Legendary Creature - Human Soldier",
+                oracle_text="Huang Zhong can't be blocked by more than one creature.",
+            ),
+            source_text="""
+                this.addAbility(new SimpleStaticAbility(new CantBeBlockedByMoreThanOneSourceEffect()));
+            """,
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        self.assertEqual(
+            proposal["effect_json"]["battle_model_scope"],
+            split.STATIC_CANT_BE_BLOCKED_BY_MORE_THAN_ONE_CREATURE_SCOPE,
+        )
+
+    def test_static_cant_be_blocked_by_more_than_one_creature_blocks_all_effect(self) -> None:
+        row = queue_row(
+            (
+                "xmage_signature::CantBeBlockedByMoreThanOneAllEffect,"
+                "CantBeBlockedByMoreThanOneSourceEffect::SimpleStaticAbility::"
+                "no_target_class::no_condition_class::static_ability"
+            ),
+            effect_classes=[
+                "CantBeBlockedByMoreThanOneAllEffect",
+                "CantBeBlockedByMoreThanOneSourceEffect",
+            ],
+            ability_kind="static",
+            ability_classes=["SimpleStaticAbility"],
+            xmage_signals=["static_ability"],
+        )
+
+        self.assertFalse(split.is_static_cant_be_blocked_by_more_than_one_creature_unit(row))
+
+    def test_static_cant_be_blocked_by_more_than_one_creature_blocks_duration_variant(self) -> None:
+        row = queue_row(
+            split.CANT_BE_BLOCKED_BY_MORE_THAN_ONE_SOURCE_UNIT,
+            effect_classes=["CantBeBlockedByMoreThanOneSourceEffect"],
+            ability_kind="static",
+            ability_classes=["SimpleStaticAbility"],
+            xmage_signals=["static_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Temporary Fixture",
+                type_line="Creature - Beast",
+                oracle_text="This creature can't be blocked by more than one creature.",
+            ),
+            source_text="""
+                this.addAbility(new SimpleStaticAbility(
+                    new CantBeBlockedByMoreThanOneSourceEffect(1, Duration.EndOfTurn)));
+            """,
+        )
+
+        self.assertIsNone(proposal)
+        self.assertEqual(reason, "static_cant_be_blocked_by_more_than_one_source_not_exact")
+
     def test_static_horsemanship_creature_maps_to_runtime(self) -> None:
         row = queue_row(
             split.HORSEMANSHIP_SOURCE_UNIT,

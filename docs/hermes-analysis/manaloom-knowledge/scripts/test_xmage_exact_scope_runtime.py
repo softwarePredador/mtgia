@@ -1258,6 +1258,49 @@ class XMageExactScopeRuntimeTest(unittest.TestCase):
         self.assertNotIn("blocking", cant_blocker)
         self.assertTrue(legal_blocker.get("blocking"))
 
+    def test_static_cant_be_blocked_by_more_than_one_limits_block_assignments(self) -> None:
+        defender = self.battle.Player("Defender", None, [])
+        defender.life = 6
+        attacker = {
+            "name": "Bristling Boar",
+            "type_line": "Creature - Boar",
+            "effect": "creature",
+            "power": 6,
+            "toughness": 6,
+            "battle_model_scope": "xmage_static_self_cant_be_blocked_by_more_than_one_creature_v1",
+            "cant_be_blocked_by_more_than_one": True,
+            "cant_be_blocked_by_more_than_one_creature": True,
+            "max_blockers": 1,
+            "max_blocked_by": 1,
+        }
+        blocker_a = {
+            "name": "Large Blocker",
+            "type_line": "Creature - Giant",
+            "effect": "creature",
+            "power": 4,
+            "toughness": 4,
+        }
+        blocker_b = {
+            "name": "Medium Blocker",
+            "type_line": "Creature - Beast",
+            "effect": "creature",
+            "power": 3,
+            "toughness": 3,
+        }
+        defender.battlefield = [blocker_a, blocker_b]
+
+        assignments = self.battle.declare_blockers_step(
+            defender,
+            [attacker],
+            turn=4,
+            rng=random.Random(1),
+        )
+
+        self.assertEqual(assignments, [(attacker, [blocker_a])])
+        self.assertTrue(blocker_a.get("blocking"))
+        self.assertNotIn("blocking", blocker_b)
+        self.assertEqual(self.battle.attacker_max_blockers(attacker), 1)
+
     def test_static_horsemanship_restricts_blockers_to_horsemanship(self) -> None:
         attacker = {
             "name": "Barbarian General",
