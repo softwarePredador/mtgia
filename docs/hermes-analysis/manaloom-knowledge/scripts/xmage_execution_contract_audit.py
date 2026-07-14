@@ -205,6 +205,8 @@ def build_report() -> dict[str, object]:
                 "upsert_env \"$backend_env\" DB_HOST \"$DB_HOST\"",
                 "docker service update",
                 "--update-order stop-first",
+                "MANALOOM_XMAGE_MEMORY_LIMIT_MB:-4096",
+                "MANALOOM_FORGE_MEMORY_LIMIT_MB:-2560",
             ],
         ),
         source_check(

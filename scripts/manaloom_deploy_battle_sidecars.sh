@@ -30,6 +30,8 @@ PROJECT="${EASYPANEL_PROJECT_NAME:-evolution}"
 BACKEND_SERVICE="${EASYPANEL_APP_NAME:-cartinhas}"
 XMAGE_SERVICE="${MANALOOM_XMAGE_SERVICE:-xmage-sidecar}"
 FORGE_SERVICE="${MANALOOM_FORGE_SERVICE:-forge-sidecar}"
+XMAGE_MEMORY_LIMIT_MB="${MANALOOM_XMAGE_MEMORY_LIMIT_MB:-4096}"
+FORGE_MEMORY_LIMIT_MB="${MANALOOM_FORGE_MEMORY_LIMIT_MB:-2560}"
 
 required=(
   EASYPANEL_BASE_URL
@@ -156,8 +158,8 @@ upsert_sidecar() {
   fi
 }
 
-upsert_sidecar "$XMAGE_SERVICE" "$xmage_image" $'PORT=8080\nXMAGE_SERVER_JAVA_OPTS=-Xms256m -Xmx2g\nXMAGE_SIDECAR_JAVA_OPTS=-Xms128m -Xmx512m\n' 3072
-upsert_sidecar "$FORGE_SERVICE" "$forge_image" $'PORT=8080\nFORGE_JAVA_COMMAND=xvfb-run -a java -Xms128m -Xmx1536m\n' 2560
+upsert_sidecar "$XMAGE_SERVICE" "$xmage_image" $'PORT=8080\nXMAGE_SERVER_JAVA_OPTS=-Xms256m -Xmx2g\nXMAGE_SIDECAR_JAVA_OPTS=-Xms128m -Xmx512m\n' "$XMAGE_MEMORY_LIMIT_MB"
+upsert_sidecar "$FORGE_SERVICE" "$forge_image" $'PORT=8080\nFORGE_JAVA_COMMAND=xvfb-run -a java -Xms128m -Xmx1536m\n' "$FORGE_MEMORY_LIMIT_MB"
 
 wait_for_service() {
   local swarm_service="$1"

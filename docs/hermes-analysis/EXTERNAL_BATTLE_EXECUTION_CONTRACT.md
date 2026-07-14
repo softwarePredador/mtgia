@@ -88,6 +88,9 @@ XMage runs in-process beside its server, so timeout handling has two layers:
   restarts both XMage processes from a clean state.
 
 A timed-out XMage process is therefore never reused for another battle.
+The combined XMage server and sidecar container keeps its Java heaps capped at
+2.5 GiB and has a 4 GiB service limit, leaving explicit room for native JVM,
+SQLite, metaspace, and replay-buffer overhead.
 
 Forge has additional guards because its official CLI can exit `0` after
 omitting an unsupported card or failing to load a deck:
