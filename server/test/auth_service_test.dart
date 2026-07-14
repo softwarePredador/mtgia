@@ -10,6 +10,8 @@ import 'package:server/auth_service.dart';
 void main() {
   late AuthService authService;
 
+  setUpAll(AuthService.resetForTesting);
+
   setUp(() {
     authService = AuthService();
   });

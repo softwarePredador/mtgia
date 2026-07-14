@@ -12,6 +12,11 @@ VALIDATION_SELECTION_MODE="${VALIDATION_SELECTION_MODE:-corpus}"
 VALIDATION_ARTIFACT_DIR="${VALIDATION_ARTIFACT_DIR:-test/artifacts/optimization_resolution_suite}"
 VALIDATION_SUMMARY_JSON_PATH="${VALIDATION_SUMMARY_JSON_PATH:-test/artifacts/optimization_resolution_suite/latest_summary.json}"
 VALIDATION_SUMMARY_MD_PATH="${VALIDATION_SUMMARY_MD_PATH:-../RELATORIO_RESOLUCAO_SUITE_COMMANDER_$(date +%Y-%m-%d).md}"
+RUN_STAMP="$(date -u +%Y%m%d%H%M%S)"
+BACKEND_TEST_JWT_SECRET="${JWT_SECRET:-local_resolution_gate_jwt_secret_not_for_production_${RUN_STAMP}}"
+VALIDATION_USER_EMAIL="${VALIDATION_USER_EMAIL:-optimization.validation.bot.${RUN_STAMP}@example.invalid}"
+VALIDATION_USERNAME="${VALIDATION_USERNAME:-optimization_validation_bot_${RUN_STAMP}}"
+VALIDATION_USER_PASSWORD="${VALIDATION_USER_PASSWORD:-OptimizationPass123!}"
 
 SERVER_PID=""
 STARTED_BY_SCRIPT=0
@@ -91,6 +96,18 @@ select_free_local_port() {
   done
 
   return 1
+}
+
+server_build_is_stale() {
+  local build_entry="$SERVER_DIR/build/bin/server.dart"
+  if [[ ! -f "$build_entry" || "${FORCE_BUILD:-0}" == "1" ]]; then
+    return 0
+  fi
+
+  find "$SERVER_DIR/lib" "$SERVER_DIR/routes" "$SERVER_DIR/bin" \
+    -type f \
+    -newer "$build_entry" \
+    -print -quit | grep -q .
 }
 
 cleanup() {
@@ -182,7 +199,7 @@ else
     fi
   fi
 
-  if [[ ! -f "$SERVER_DIR/build/bin/server.dart" || "${FORCE_BUILD:-0}" == "1" ]]; then
+  if server_build_is_stale; then
     echo "ℹ️ Gerando build do backend para execução não-interativa..."
     (
       cd "$SERVER_DIR"
@@ -193,7 +210,8 @@ else
   echo "ℹ️ API não detectada. Iniciando servidor compilado local em porta ${PORT}..."
   (
     cd "$SERVER_DIR"
-    PORT="$PORT" dart run build/bin/server.dart
+    PORT="$PORT" JWT_SECRET="$BACKEND_TEST_JWT_SECRET" \
+      "$ROOT_DIR/server/bin/with_new_server_pg.sh" dart run build/bin/server.dart
   ) >/tmp/mtgia_resolution_gate.log 2>&1 &
 
   SERVER_PID="$!"
@@ -231,7 +249,12 @@ print_header "Executando runner oficial de resolução"
   VALIDATION_ARTIFACT_DIR="$VALIDATION_ARTIFACT_DIR" \
   VALIDATION_SUMMARY_JSON_PATH="$VALIDATION_SUMMARY_JSON_PATH" \
   VALIDATION_SUMMARY_MD_PATH="$VALIDATION_SUMMARY_MD_PATH" \
-  dart run bin/run_three_commander_resolution_validation.dart
+  VALIDATION_USER_EMAIL="$VALIDATION_USER_EMAIL" \
+  VALIDATION_USERNAME="$VALIDATION_USERNAME" \
+  VALIDATION_USER_PASSWORD="$VALIDATION_USER_PASSWORD" \
+  JWT_SECRET="$BACKEND_TEST_JWT_SECRET" \
+  "$ROOT_DIR/server/bin/with_new_server_pg.sh" \
+    dart run bin/run_three_commander_resolution_validation.dart
 )
 
 python3 - "$SERVER_DIR/$VALIDATION_SUMMARY_JSON_PATH" "$VALIDATION_LIMIT" <<'PY'

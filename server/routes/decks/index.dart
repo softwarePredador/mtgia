@@ -383,18 +383,27 @@ Future<Response> _createDeck(RequestContext context) async {
         '[DECK_CREATE_TIMING] validate_rules_done elapsed_ms=${stopwatch.elapsedMilliseconds}',
       );
 
-      // Prepara a inserção das cartas do deck
-      final cardInsertSql = Sql.named(
-        'INSERT INTO deck_cards (deck_id, card_id, quantity, is_commander) VALUES (@deckId, @cardId, @quantity, @isCommander)',
-      );
+      if (normalizedCards.isNotEmpty) {
+        final values = <String>[];
+        final params = <String, dynamic>{'deckId': newDeckId};
 
-      for (final card in normalizedCards) {
-        await session.execute(cardInsertSql, parameters: {
-          'deckId': newDeckId,
-          'cardId': card['card_id'],
-          'quantity': card['quantity'],
-          'isCommander': card['is_commander'] ?? false,
-        });
+        for (var i = 0; i < normalizedCards.length; i++) {
+          final card = normalizedCards[i];
+          final pId = 'cardId$i';
+          final pQty = 'quantity$i';
+          final pCommander = 'isCommander$i';
+
+          values.add('(@deckId, @$pId, @$pQty, @$pCommander)');
+          params[pId] = card['card_id'];
+          params[pQty] = card['quantity'];
+          params[pCommander] = card['is_commander'] ?? false;
+        }
+
+        final cardInsertSql = '''
+          INSERT INTO deck_cards (deck_id, card_id, quantity, is_commander)
+          VALUES ${values.join(', ')}
+        ''';
+        await session.execute(Sql.named(cardInsertSql), parameters: params);
       }
 
       print(

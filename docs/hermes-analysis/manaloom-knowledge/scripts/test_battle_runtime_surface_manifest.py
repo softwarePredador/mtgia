@@ -9,12 +9,12 @@ import battle_runtime_surface_manifest as manifest_mod
 
 
 REPO_ROOT = Path(__file__).resolve().parents[4]
-EXPECTED_TOTAL_FILES = 155
+EXPECTED_TOTAL_FILES = 165
 EXPECTED_CATEGORY_COUNTS = {
     "core runtime": 31,
     "focused evidence/promotion": 34,
     "learned-deck source": 16,
-    "optimizer/scorecard": 20,
+    "optimizer/scorecard": 30,
     "recurring audit gate": 30,
     "renderer": 4,
     "review queue": 1,
@@ -23,13 +23,13 @@ EXPECTED_CATEGORY_COUNTS = {
 EXPECTED_AUTOMATION_COVERAGE_COUNTS = {
     "covered_by_recurring_run": 31,
     "imported_by_core_runtime": 6,
-    "outside_recurring_run": 118,
+    "outside_recurring_run": 128,
 }
 EXPECTED_GATE_EXPECTED_COUNTS = {
     "core_runtime_import_regression": 6,
     "recurring_audit_required": 31,
-    "targeted_manual_gate_required_before_change": 53,
-    "targeted_test_required_before_change": 65,
+    "targeted_manual_gate_required_before_change": 58,
+    "targeted_test_required_before_change": 70,
 }
 REQUIRED_HIGH_SIGNAL_PATHS = {
     "docs/hermes-analysis/manaloom-knowledge/scripts/battle_card_adjustment_throughput_benchmark.py",
@@ -50,6 +50,9 @@ REQUIRED_HIGH_SIGNAL_PATHS = {
     "docs/hermes-analysis/manaloom-knowledge/scripts/test_battle_runtime_surface_manifest.py",
     "docs/hermes-analysis/manaloom-knowledge/scripts/test_mtg_battle_external_source_audit.py",
     "docs/hermes-analysis/manaloom-knowledge/scripts/replay_decision_auditor.py",
+    "docs/hermes-analysis/manaloom-knowledge/scripts/global_commander_battle_feedback_model.py",
+    "docs/hermes-analysis/manaloom-knowledge/scripts/global_commander_candidate_battle_probe_audit.py",
+    "docs/hermes-analysis/manaloom-knowledge/scripts/global_commander_larger_battle_gate_audit.py",
     "server/bin/manaloom_battle_rule_review_queue.py",
     "server/bin/manaloom_battle_rule_focused_evidence.py",
     "server/bin/learned_deck_coherence_audit.py",

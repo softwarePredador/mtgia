@@ -45,6 +45,10 @@ paths:
   - test/sync_cards_test.dart
 
 presets:
+  all-local:
+    paths:
+      - test
+    exclude_tags: "live || live_backend || live_db_write || live_external"
   live:
     paths:
       - test/ai_archetypes_flow_test.dart

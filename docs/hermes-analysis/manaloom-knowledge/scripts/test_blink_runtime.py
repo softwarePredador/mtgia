@@ -144,6 +144,7 @@ def test_emiel_activated_blink_pays_three_and_excludes_self():
         )
         target = value_creature("Priest of Ancient Lore")
         active.battlefield = [emiel, target]
+        active.library = [{"name": "Plains", "type_line": "Basic Land - Plains", "effect": "land"}]
         active.mana_pool.add_generic(3)
 
         activations = battle.process_precombat_main_phase_engines(

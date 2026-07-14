@@ -98,7 +98,7 @@ write_final_summary() {
 main() {
   write_summary_header
 
-  run_step "Dart analyze server" "cd \"$ROOT_DIR/server\" && dart analyze"
+  run_step "Dart analyze server" "cd \"$ROOT_DIR/server\" && dart pub get && dart analyze"
   run_step "Focused AI and data contract tests" "cd \"$ROOT_DIR/server\" && JWT_SECRET=local_deep_ai_alignment_${TS} dart test test/commander_ai_prompt_eval_suite_test.dart test/commander_deckbuilding_contract_support_test.dart test/commander_learned_deck_support_test.dart test/ai_generate_learning_boundary_test.dart test/experimental_deck_ai_authorization_source_test.dart test/candidate_quality_data_support_test.dart test/data_model_migration_test.dart test/optimize_route_request_support_test.dart test/optimize_route_recommendation_context_support_test.dart test/optimization_quality_gate_test.dart test/ai_optimize_authorization_source_test.dart test/production_ai_mock_fallback_policy_test.dart test/openai_runtime_config_test.dart test/commander_reference_card_stats_support_test.dart test/commander_reference_profile_support_test.dart"
   run_step "Commander AI prompt eval quality gate" "\"$ROOT_DIR/scripts/quality_gate.sh\" ai-eval"
   if [[ -x "$ROOT_DIR/scripts/manaloom_old_server_reference_audit.sh" ]]; then

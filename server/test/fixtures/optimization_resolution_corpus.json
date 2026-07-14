@@ -1,129 +1,121 @@
 {
-  "name": "optimization-resolution-corpus-v1",
-  "generated_at": "2026-03-23",
+  "name": "optimization-resolution-corpus-new-easypanel-2026-07-06",
+  "generated_at": "2026-07-06",
+  "source": "new EasyPanel PostgreSQL halder; decks filtered to 100 cards and 34-40 lands",
   "decks": [
     {
-      "deck_id": "8c22deb9-80bd-489f-8e87-1344eabac698",
-      "label": "Auntie Ool, Cursewretch",
-      "expected_flow_path": "rebuild_guided",
-      "note": "Deck precisa de rebuild orientado por counters."
+      "deck_id": "8938b746-1a9e-46ce-b0d9-c2ec932ddddd",
+      "label": "Lorehold 607 - Current Champion",
+      "expected_flow_paths": ["optimized_directly", "safe_no_change", "rebuild_guided"],
+      "note": "Protected Lorehold baseline; 34 lands in the new server."
     },
     {
-      "deck_id": "f2a2a34a-4561-4a77-886d-7067b672ac85",
-      "label": "Jin-Gitaxias // The Great Synthesis",
-      "expected_flow_paths": [
-        "optimized_directly",
-        "safe_no_change"
-      ],
-      "note": "Deck saudável; aceitamos otimização direta ou preservação segura sem mudança."
+      "deck_id": "d26a20bb-0331-4971-ab44-0d405fff7bcd",
+      "label": "Dina, Essence Brewer",
+      "expected_flow_paths": ["optimized_directly", "safe_no_change", "rebuild_guided"],
+      "note": "Current Strixhaven QA Commander seed; 38 lands."
     },
     {
-      "deck_id": "df780797-bcc4-47cb-82d6-08d01ae3b03b",
-      "label": "Talrand, Sky Summoner",
-      "expected_flow_path": "rebuild_guided",
-      "note": "Shell degenerado para validar full_non_commander_rebuild."
-    },
-    {
-      "deck_id": "104cbd8c-6877-4551-9c4f-c0742f1760ad",
-      "label": "Atraxa, Praetors' Voice",
-      "expected_flow_paths": [
-        "optimized_directly",
-        "safe_no_change"
-      ],
-      "note": "Seed Atraxa estabilizado; aceitamos otimização direta ou preservação segura."
-    },
-    {
-      "deck_id": "5bf67c2e-fdeb-40a9-be91-ebb7edac7489",
-      "label": "Muldrotha, the Gravetide",
-      "expected_flow_path": "safe_no_change",
-      "note": "Seed Muldrotha saudável; baseline atual preserva o deck sem trocas."
-    },
-    {
-      "deck_id": "c4b6065d-0750-4bf0-8f7b-972e722a67d8",
-      "label": "Sythis, Harvest's Hand",
-      "expected_flow_path": "safe_no_change",
-      "note": "Seed Sythis saudável; baseline atual preserva o deck sem trocas."
-    },
-    {
-      "deck_id": "7e8b7632-8a89-40d6-ae93-1db6d6a90745",
-      "label": "Isshin, Two Heavens as One",
-      "expected_flow_path": "safe_no_change",
-      "note": "Seed Isshin saudável; baseline atual preserva o deck sem trocas."
-    },
-    {
-      "deck_id": "169d8b11-5210-4bfc-b8f0-9fbfe6bbb635",
-      "label": "Krenko, Mob Boss",
-      "expected_flow_path": "safe_no_change",
-      "note": "Seed Krenko saudável; baseline atual preserva o deck sem trocas."
-    },
-    {
-      "deck_id": "532cbc1d-a906-4075-91e4-da64f9e5fa4f",
+      "deck_id": "25d34306-c696-4bf6-8263-61554abaf81c",
       "label": "Urza, Lord High Artificer",
-      "expected_flow_path": "safe_no_change",
-      "note": "Seed Urza saudável; baseline atual preserva o deck sem trocas."
+      "expected_flow_paths": ["optimized_directly", "safe_no_change", "rebuild_guided"],
+      "note": "Current LotB Commander seed; 40 lands."
     },
     {
-      "deck_id": "cca9f573-5366-44ab-96a8-4ca16456c3f8",
-      "label": "Edgar Markov",
-      "expected_flow_paths": [
-        "optimized_directly",
-        "safe_no_change"
-      ],
-      "note": "Seed Edgar estabilizado; aceitamos otimização direta ou preservação segura."
+      "deck_id": "4027884b-3dc7-42b1-8ca3-9bdbb18adf3c",
+      "label": "Niv-Mizzet, Parun scorecard fixture",
+      "expected_flow_paths": ["optimized_directly", "safe_no_change", "rebuild_guided"],
+      "note": "Semantic v2 scorecard fixture; 35 lands."
     },
     {
-      "deck_id": "c017a412-0f8c-4d9f-b35a-df5395705fdf",
-      "label": "Miirym, Sentinel Wyrm",
-      "expected_flow_path": "safe_no_change",
-      "note": "Seed Miirym estabilizado em 2026-03-23; baseline atual preserva o deck sem trocas."
+      "deck_id": "400ca9e5-1b7e-4664-beea-f05def319b72",
+      "label": "Niv-Mizzet, Parun scorecard fixture alt",
+      "expected_flow_paths": ["optimized_directly", "safe_no_change", "rebuild_guided"],
+      "note": "Semantic v2 scorecard fixture; 35 lands."
     },
     {
-      "deck_id": "3d12d60b-c40f-4fed-8d3a-edb9351f2198",
-      "label": "Meren of Clan Nel Toth",
-      "expected_flow_path": "safe_no_change",
-      "note": "Seed Meren estabilizado em 2026-03-23; baseline atual preserva o deck sem trocas."
+      "deck_id": "1ed0d8a3-6b5a-40ba-8432-cb3fc7869763",
+      "label": "Krenko, Mob Boss scorecard fixture",
+      "expected_flow_paths": ["optimized_directly", "safe_no_change", "rebuild_guided"],
+      "note": "Semantic v2 scorecard fixture; 34 lands."
     },
     {
-      "deck_id": "764ce781-7fd9-44b2-839e-8ea563f0006f",
-      "label": "Korvold, Fae-Cursed King",
-      "expected_flow_path": "safe_no_change",
-      "note": "Seed Korvold estabilizado em 2026-03-23; baseline atual preserva o deck sem trocas."
+      "deck_id": "e0da6e91-0bf1-49e5-b651-5eab6735e88c",
+      "label": "Brago, King Eternal scorecard fixture",
+      "expected_flow_paths": ["optimized_directly", "safe_no_change", "rebuild_guided"],
+      "note": "Semantic v2 scorecard fixture; 34 lands."
     },
     {
-      "deck_id": "eca0d9ad-4818-47a3-aa84-787a2851b3a3",
+      "deck_id": "38500285-3a1e-4872-a60f-c33b41309681",
+      "label": "Teysa Karlov scorecard fixture",
+      "expected_flow_paths": ["optimized_directly", "safe_no_change", "rebuild_guided"],
+      "note": "Semantic v2 scorecard fixture; 35 lands."
+    },
+    {
+      "deck_id": "13b58b67-5e72-4584-9841-a859241a906a",
+      "label": "Animar, Soul of Elements",
+      "expected_flow_paths": ["optimized_directly", "safe_no_change", "rebuild_guided"],
+      "note": "Current user Commander deck; 34 lands."
+    },
+    {
+      "deck_id": "220a9e4a-3a1f-4f91-b5ca-cf0bbf54028d",
       "label": "Kaalia of the Vast",
-      "expected_flow_path": "safe_no_change",
-      "note": "Seed Kaalia estabilizado em 2026-03-23; baseline atual preserva o deck sem trocas."
+      "expected_flow_paths": ["optimized_directly", "safe_no_change", "rebuild_guided"],
+      "note": "Current user Commander deck; 35 lands."
     },
     {
-      "deck_id": "6cfa4644-16a6-4070-9e73-619acc5e77e3",
-      "label": "Wilhelt, the Rotcleaver",
-      "expected_flow_path": "safe_no_change",
-      "note": "Seed Wilhelt estabilizado em 2026-03-23; baseline atual preserva o deck sem trocas."
+      "deck_id": "9eec03d2-b5fd-41d3-b987-482a3b69f07d",
+      "label": "Urza, Lord High Artificer alt",
+      "expected_flow_paths": ["optimized_directly", "safe_no_change", "rebuild_guided"],
+      "note": "Current LotB Commander seed; 40 lands."
     },
     {
-      "deck_id": "86cfa127-c737-43d7-aec9-b41d1668880e",
-      "label": "Prosper, Tome-Bound",
-      "expected_flow_path": "safe_no_change",
-      "note": "Seed Prosper estabilizado em 2026-03-23; baseline atual preserva o deck sem trocas."
+      "deck_id": "8457a713-f861-4477-a21d-0e3315da5fc6",
+      "label": "Lorehold Reference Stats",
+      "expected_flow_paths": ["optimized_directly", "safe_no_change", "rebuild_guided"],
+      "note": "Current Lorehold reference stats seed; 37 lands."
     },
     {
-      "deck_id": "2070158d-5aa0-4918-9325-5f1eff41d359",
-      "label": "Jodah, the Unifier",
-      "expected_flow_path": "safe_no_change",
-      "note": "Caso five-color estabilizado em 2026-03-23; baseline atual preserva o deck sem trocas."
+      "deck_id": "4636850d-887e-430e-8d83-94b6d4314acd",
+      "label": "Lorehold Strixhaven QA",
+      "expected_flow_paths": ["optimized_directly", "safe_no_change", "rebuild_guided"],
+      "note": "Current Strixhaven QA Commander seed; 37 lands."
     },
     {
-      "deck_id": "458a8df7-afde-4232-b4da-e1ce8e9fbb0c",
-      "label": "Kozilek, the Great Distortion",
-      "expected_flow_path": "rebuild_guided",
-      "note": "Caso colorless estabilizado em 2026-03-23; baseline atual resolve por rebuild_guided."
+      "deck_id": "cc984556-d83b-43ec-9b38-ae7ba3e632e7",
+      "label": "Atraxa, Praetors' Voice validation",
+      "expected_flow_paths": ["optimized_directly", "safe_no_change", "rebuild_guided"],
+      "note": "Commander-only validation seed; 36 lands."
     },
     {
-      "deck_id": "4a2e3a8f-32a3-4298-8309-a693b8e0f996",
-      "label": "Wilson, Refined Grizzly + Sword Coast Sailor",
-      "expected_flow_path": "safe_no_change",
-      "note": "Caso background estabilizado em 2026-03-23; baseline atual preserva o deck saudável com dois comandantes legais."
+      "deck_id": "5bedf511-2694-41b2-b457-ba5b9e02e34b",
+      "label": "Kozilek, the Great Distortion validation",
+      "expected_flow_paths": ["optimized_directly", "safe_no_change", "rebuild_guided"],
+      "note": "Commander-only validation seed; 36 lands."
+    },
+    {
+      "deck_id": "d44a8622-f71d-4602-bc63-e1d67f880d49",
+      "label": "Jodah, the Unifier validation",
+      "expected_flow_paths": ["optimized_directly", "safe_no_change", "rebuild_guided"],
+      "note": "Commander-only validation seed; 36 lands."
+    },
+    {
+      "deck_id": "3d60c143-e1da-4bbe-8033-62fef0102d1a",
+      "label": "Prosper, Tome-Bound validation",
+      "expected_flow_paths": ["optimized_directly", "safe_no_change", "rebuild_guided"],
+      "note": "Commander-only validation seed; 36 lands."
+    },
+    {
+      "deck_id": "f77de4dc-6c6a-497e-94db-cdd58e2302c9",
+      "label": "Wilhelt, the Rotcleaver validation",
+      "expected_flow_paths": ["optimized_directly", "safe_no_change", "rebuild_guided"],
+      "note": "Commander-only validation seed; 36 lands."
+    },
+    {
+      "deck_id": "a22048e2-0dca-46ef-b0e9-14e6a9b4abfb",
+      "label": "Korvold, Fae-Cursed King validation",
+      "expected_flow_paths": ["optimized_directly", "safe_no_change", "rebuild_guided"],
+      "note": "Commander-only validation seed; 36 lands."
     }
   ]
 }

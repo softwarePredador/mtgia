@@ -518,6 +518,48 @@ def sqlite_cache_integrity_checks(conn: sqlite3.Connection) -> list[Check]:
                     f"verified_executable_rules_missing_oracle_hash={missing_hash}",
                 )
             )
+        if {
+            "normalized_name",
+            "logical_rule_key",
+            "effect_json",
+            "review_status",
+            "execution_status",
+        }.issubset(columns):
+            competing_rows = conn.execute(
+                """
+                SELECT
+                  normalized_name,
+                  json_extract(effect_json, '$.effect') AS effect,
+                  json_extract(effect_json, '$.battle_model_scope') AS battle_model_scope,
+                  COUNT(DISTINCT logical_rule_key) AS rule_count
+                FROM battle_card_rules
+                WHERE review_status IN ('verified', 'active')
+                  AND execution_status IN ('auto', 'executable')
+                  AND COALESCE(json_extract(effect_json, '$.effect'), '') <> ''
+                  AND COALESCE(json_extract(effect_json, '$.battle_model_scope'), '') <> ''
+                GROUP BY normalized_name, effect, battle_model_scope
+                HAVING COUNT(DISTINCT logical_rule_key) > 1
+                ORDER BY normalized_name, effect, battle_model_scope
+                """
+            ).fetchall()
+            checks.append(
+                Check(
+                    "sqlite_integrity.battle_rules_competing_exact_scope",
+                    "pass" if not competing_rows else "fail",
+                    f"competing_verified_executable_scope_groups={len(competing_rows)}",
+                    {
+                        "sample": [
+                            {
+                                "normalized_name": row[0],
+                                "effect": row[1],
+                                "battle_model_scope": row[2],
+                                "rule_count": int(row[3]),
+                            }
+                            for row in competing_rows[:20]
+                        ]
+                    },
+                )
+            )
 
     if table_exists(conn, "card_legalities"):
         for card_name, expected in (("Worldfire", "legal"), ("Mana Crypt", "banned")):
@@ -680,6 +722,30 @@ def pg_integrity_checks() -> list[Check]:
                 }
                 for row in cur.fetchall()
             ]
+            cur.execute(
+                """
+                SELECT
+                  br.card_id,
+                  MIN(br.card_name) AS card_name,
+                  br.effect_json->>'effect' AS effect,
+                  br.effect_json->>'battle_model_scope' AS battle_model_scope,
+                  COUNT(DISTINCT br.logical_rule_key) AS rule_count,
+                  STRING_AGG(DISTINCT br.logical_rule_key, ',' ORDER BY br.logical_rule_key) AS logical_rule_keys
+                FROM card_battle_rules br
+                WHERE br.card_id IS NOT NULL
+                  AND br.review_status IN ('verified', 'active')
+                  AND br.execution_status IN ('auto', 'executable')
+                  AND COALESCE(br.effect_json->>'effect', '') <> ''
+                  AND COALESCE(br.effect_json->>'battle_model_scope', '') <> ''
+                GROUP BY
+                  br.card_id,
+                  br.effect_json->>'effect',
+                  br.effect_json->>'battle_model_scope'
+                HAVING COUNT(DISTINCT br.logical_rule_key) > 1
+                ORDER BY card_name, effect, battle_model_scope
+                """
+            )
+            competing_scope_rows = cur.fetchall()
     checks.append(
         Check(
             "pg_integrity.battle_rules_trusted_oracle_hash_coverage",
@@ -694,6 +760,26 @@ def pg_integrity_checks() -> list[Check]:
             "pass" if mismatched_hash == 0 else "fail",
             f"verified_executable_rules_stale_oracle_hash={mismatched_hash}",
             {"sample": mismatched_sample},
+        )
+    )
+    checks.append(
+        Check(
+            "pg_integrity.battle_rules_competing_exact_scope",
+            "pass" if not competing_scope_rows else "fail",
+            f"competing_verified_executable_scope_groups={len(competing_scope_rows)}",
+            {
+                "sample": [
+                    {
+                        "card_id": str(row[0]),
+                        "card_name": row[1],
+                        "effect": row[2],
+                        "battle_model_scope": row[3],
+                        "rule_count": int(row[4]),
+                        "logical_rule_keys": str(row[5]).split(","),
+                    }
+                    for row in competing_scope_rows[:20]
+                ]
+            },
         )
     )
     return checks

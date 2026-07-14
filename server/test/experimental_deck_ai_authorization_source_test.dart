@@ -113,8 +113,11 @@ void main() {
         simulate,
         contains('OR (CAST(@allowPublic AS boolean) AND d.is_public = true)'),
       );
-      expect(
-          simulate, contains("column_name IN ('simulation_type', 'metrics')"));
+      expect(simulate, contains('AND column_name IN ('));
+      expect(simulate, contains("'simulation_type',"));
+      expect(simulate, contains("'metrics',"));
+      expect(simulate, contains("'winner_deck_id',"));
+      expect(simulate, contains("'turns_played'"));
       expect(simulate, contains("contains('simulation_type')"));
       expect(simulate, contains("contains('metrics')"));
       expect(simulate, contains('@simulationType'));

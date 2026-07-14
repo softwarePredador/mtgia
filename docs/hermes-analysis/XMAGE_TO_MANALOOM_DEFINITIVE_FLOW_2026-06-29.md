@@ -56,6 +56,12 @@ truth only when its matching runtime adapter exists and the package passes
 precheck/apply/postcheck. Never duplicate external coverage into PostgreSQL
 only to claim launch readiness.
 
+In bridge/audit terms, `resolved local XMage source is final behavior truth`
+for the pinned external-execution lane. A `candidate becomes executable ManaLoom battle truth`
+only after its matching runtime adapter exists, focused tests pass, and the
+PostgreSQL package completes precheck/apply/postcheck. The
+first statement must never be used to skip the second gate for native rules.
+
 External execution must also fail closed operationally. XMage timeouts return
 `504` and recycle the sidecar/container before another request; Forge isolates
 each simulation in a process and kills it at the outer timeout. Neither timeout

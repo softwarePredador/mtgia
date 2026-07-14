@@ -79,7 +79,16 @@ print(f"postgresql://{user}:{password}@{host}:{port}/{db}?sslmode=disable")
 PY
 )"
 
-if ! pg_isready -h "$PGHOST" -p "$PGPORT" -d "$PGDATABASE" -U "$PGUSER" >/dev/null 2>&1; then
+pg_ready=0
+for _attempt in $(seq 1 20); do
+  if pg_isready -h "$PGHOST" -p "$PGPORT" -d "$PGDATABASE" -U "$PGUSER" >/dev/null 2>&1; then
+    pg_ready=1
+    break
+  fi
+  sleep 0.5
+done
+
+if [[ "$pg_ready" -ne 1 ]]; then
   echo "with_new_server_pg: PostgreSQL tunnel is not ready at ${PGHOST}:${PGPORT}/${PGDATABASE}" >&2
   exit 1
 fi

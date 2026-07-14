@@ -92,6 +92,13 @@ class SourceDeckCandidate {
   }
 }
 
+class ValidationAuthSession {
+  const ValidationAuthSession({required this.token, required this.email});
+
+  final String token;
+  final String email;
+}
+
 class ValidationCorpusEntry {
   ValidationCorpusEntry({
     required this.deckId,
@@ -212,14 +219,20 @@ Future<void> main() async {
   }
 
   final pool = db.connection;
+  ValidationAuthSession? authSession;
 
   try {
-    final token = await _getOrCreateAuthToken(apiBaseUrl);
-    final candidates = await _loadSourceCandidates(pool);
+    authSession = await _getOrCreateAuthToken(apiBaseUrl);
+    final token = authSession.token;
     final corpusEntries = _corpusPath != null
         ? _loadCorpusEntries(_corpusPath!)
         : const <ValidationCorpusEntry>[];
     final usingCorpus = corpusEntries.isNotEmpty;
+    final corpusDeckIds = corpusEntries.map((entry) => entry.deckId).toSet();
+    final candidates = await _loadSourceCandidates(
+      pool,
+      deckIds: usingCorpus ? corpusDeckIds : const <String>{},
+    );
     final selected = usingCorpus
         ? _selectCandidatesFromCorpus(
             candidates,
@@ -243,7 +256,8 @@ Future<void> main() async {
     final results = <ResolutionRunResult>[];
     final runStartedAt = DateTime.now().toIso8601String();
 
-    for (final candidate in selected) {
+    for (var index = 0; index < selected.length; index += 1) {
+      final candidate = selected[index];
       print('');
       print(
         '=== ${candidate.commanderName} | ${candidate.resolvedArchetype} ===',
@@ -253,6 +267,7 @@ Future<void> main() async {
         token: token,
         pool: pool,
         candidate: candidate,
+        runIndex: index + 1,
       );
       results.add(result);
       print(
@@ -299,6 +314,9 @@ Future<void> main() async {
       exitCode = 1;
     }
   } finally {
+    if (authSession != null) {
+      await _cleanupValidationUser(pool, authSession.email);
+    }
     await db.close();
   }
 }
@@ -308,6 +326,7 @@ Future<ResolutionRunResult> _runResolutionForDeck({
   required String token,
   required Pool pool,
   required SourceDeckCandidate candidate,
+  required int runIndex,
 }) async {
   final cloneDeckId = await _createDeckClone(
     apiBaseUrl: apiBaseUrl,
@@ -447,6 +466,8 @@ Future<ResolutionRunResult> _runResolutionForDeck({
 
   final artifactPath = await _writeDeckArtifact(
     commanderName: candidate.commanderName,
+    sourceDeckId: candidate.deckId,
+    runIndex: runIndex,
     payload: {
       'source_deck_id': candidate.deckId,
       'source_deck_name': candidate.deckName,
@@ -570,10 +591,14 @@ Future<bool> _ensureServerIsReachable(String apiBaseUrl) async {
   }
 }
 
-Future<String> _getOrCreateAuthToken(String apiBaseUrl) async {
-  const email = 'optimization.validation.bot@example.com';
-  const password = 'OptimizationPass123!';
-  const username = 'optimization_validation_bot';
+Future<ValidationAuthSession> _getOrCreateAuthToken(String apiBaseUrl) async {
+  final runSuffix = DateTime.now().millisecondsSinceEpoch.toRadixString(16);
+  final email = Platform.environment['VALIDATION_USER_EMAIL'] ??
+      'optimization.validation.bot.$runSuffix@example.invalid';
+  final password = Platform.environment['VALIDATION_USER_PASSWORD'] ??
+      'OptimizationPass123!';
+  final username = Platform.environment['VALIDATION_USERNAME'] ??
+      'optimization_validation_bot_$runSuffix';
 
   Future<http.Response> login() {
     return http.post(
@@ -614,10 +639,34 @@ Future<String> _getOrCreateAuthToken(String apiBaseUrl) async {
   if (token == null || token.isEmpty) {
     throw Exception('Token ausente na autenticacao.');
   }
-  return token;
+  return ValidationAuthSession(token: token, email: email);
 }
 
-Future<List<SourceDeckCandidate>> _loadSourceCandidates(Pool pool) async {
+Future<void> _cleanupValidationUser(Pool pool, String email) async {
+  final normalizedEmail = email.trim().toLowerCase();
+  if (!normalizedEmail.startsWith('optimization.validation.bot.') ||
+      !normalizedEmail.endsWith('@example.invalid')) {
+    print('Cleanup ignorado para identidade de validacao customizada.');
+    return;
+  }
+
+  final result = await pool.execute(
+    Sql.named('DELETE FROM users WHERE LOWER(email) = @email'),
+    parameters: {'email': normalizedEmail},
+  );
+  print(
+    'Cleanup da sessao de validacao: ${result.affectedRows} usuario(s) removido(s).',
+  );
+}
+
+Future<List<SourceDeckCandidate>> _loadSourceCandidates(
+  Pool pool, {
+  Set<String> deckIds = const <String>{},
+}) async {
+  final corpusFilterSql = deckIds.isNotEmpty
+      ? '        AND d.id::text = ANY(@deckIds::text[])\n'
+      : '';
+  final limitSql = deckIds.isNotEmpty ? '' : '      LIMIT 120\n';
   final decksResult = await pool.execute(
     Sql.named('''
       SELECT
@@ -645,10 +694,13 @@ Future<List<SourceDeckCandidate>> _loadSourceCandidates(Pool pool) async {
       WHERE d.deleted_at IS NULL
         AND LOWER(d.format) = 'commander'
         AND stats.total_cards = 100
-$_generatedDeckNameFilters
+${corpusFilterSql}$_generatedDeckNameFilters
       ORDER BY d.created_at DESC NULLS LAST
-      LIMIT 120
+${limitSql}
     '''),
+    parameters: {
+      if (deckIds.isNotEmpty) 'deckIds': deckIds.toList(),
+    },
   );
 
   final candidates = <SourceDeckCandidate>[];
@@ -1175,10 +1227,16 @@ Map<String, dynamic> _decodeJson(http.Response response) {
 
 Future<String> _writeDeckArtifact({
   required String commanderName,
+  required String sourceDeckId,
+  required int runIndex,
   required Map<String, dynamic> payload,
 }) async {
   final slug = _slugify(commanderName);
-  final path = '$_artifactDirPath/$slug.json';
+  final sourceToken = sourceDeckId.replaceAll('-', '');
+  final suffix =
+      sourceToken.length >= 8 ? sourceToken.substring(0, 8) : sourceToken;
+  final path =
+      '$_artifactDirPath/${runIndex.toString().padLeft(2, '0')}_${slug}_$suffix.json';
   await File(path).writeAsString(
     const JsonEncoder.withIndent('  ').convert(payload),
   );

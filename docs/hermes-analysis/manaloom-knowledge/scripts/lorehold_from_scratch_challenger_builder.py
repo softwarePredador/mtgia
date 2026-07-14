@@ -1490,10 +1490,10 @@ def build_plan(
     conn.close()
 
     report_stem = f"{stem}_{plan_key}"
-    json_path = REPORT_DIR / f"{report_stem}.json"
-    md_path = REPORT_DIR / f"{report_stem}.md"
-    decklist_path = REPORT_DIR / f"{report_stem}.decklist.txt"
-    matrix_prefix = REPORT_DIR / f"{report_stem}_matrix"
+    json_path = out_dir / f"{report_stem}.json"
+    md_path = out_dir / f"{report_stem}.md"
+    decklist_path = out_dir / f"{report_stem}.decklist.txt"
+    matrix_prefix = out_dir / f"{report_stem}_matrix"
     battle_stem = f"{report_stem}_fixed607_gate"
     matrix_command = [
         "python3",
@@ -1554,8 +1554,8 @@ def build_plan(
         "matrix_json": str(matrix_prefix.with_suffix(".json")),
         "matrix_markdown": str(matrix_prefix.with_suffix(".md")),
         "battle_gate_command": battle_gate_command,
-        "battle_gate_json": str(REPORT_DIR / f"{battle_stem}.json"),
-        "battle_gate_markdown": str(REPORT_DIR / f"{battle_stem}.md"),
+        "battle_gate_json": str(out_dir / f"{battle_stem}.json"),
+        "battle_gate_markdown": str(out_dir / f"{battle_stem}.md"),
         "postgres_writes": False,
         "source_db_mutated": False,
         **metadata,
@@ -1681,8 +1681,8 @@ def main() -> int:
         games=max(1, args.games),
         game_timeout_seconds=max(0.0, float(args.game_timeout_seconds or 0)),
     )
-    json_path = REPORT_DIR / f"{args.stem}.json"
-    md_path = REPORT_DIR / f"{args.stem}.md"
+    json_path = args.out_dir / f"{args.stem}.json"
+    md_path = args.out_dir / f"{args.stem}.md"
     json_path.write_text(
         json.dumps(report, indent=2, ensure_ascii=False, sort_keys=True) + "\n",
         encoding="utf-8",

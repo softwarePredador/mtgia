@@ -20,6 +20,12 @@ class ReportRetentionAuditTests(unittest.TestCase):
         self.assertIn(".db", audit.RAW_REPORT_SUFFIXES)
         self.assertIn(".log", audit.RAW_REPORT_SUFFIXES)
 
+    def test_current_project_revalidation_evidence_is_an_active_reference(self) -> None:
+        evidence = audit.DOCS_DIR / "PROJECT_REVALIDATION_AND_GLOBAL_QUEUE_2026-07-14.md"
+
+        self.assertIn(evidence, audit.CURRENT_CONTRACT_FILES)
+        self.assertTrue(evidence.exists())
+
 
 if __name__ == "__main__":
     unittest.main()

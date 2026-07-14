@@ -88,9 +88,11 @@ class XMageStrategyConsistencyAuditTests(unittest.TestCase):
                         "BATTLE_RULES_FAMILY_PIPELINE_CONTRACT_2026-06-29.md",
                         "If the contract checkpoint passes",
                         "Local XMage as the authoritative open rules-engine behavior source",
+                        "Pinned Forge as a secondary executable rules engine",
+                        "A pinned XMage or Forge battle",
                         "resolved local XMage source is final behavior truth",
                         "source-authoritative adapter candidates",
-                        "only when the matching runtime adapter exists",
+                        "only when its matching runtime adapter exists",
                         "PostgreSQL remains the durable source of truth",
                         "Hermes is cache/runtime evidence, not truth",
                         "xmage_authoritative_adaptation_queue.py",
@@ -128,6 +130,9 @@ class XMageStrategyConsistencyAuditTests(unittest.TestCase):
                         "frozen_operating_contract",
                         "XMAGE_TO_MANALOOM_DEFINITIVE_FLOW_2026-06-29.md",
                         "current_operating_standard",
+                        "EXTERNAL_BATTLE_EXECUTION_CONTRACT.md",
+                        "XMage pinado como executor primario",
+                        "xmage_execution_contract_audit.py",
                         "Nao devem ser usados como contrato operacional",
                         "xmage_strategy_consistency_audit.py",
                     ]
@@ -135,7 +140,7 @@ class XMageStrategyConsistencyAuditTests(unittest.TestCase):
                 encoding="utf-8",
             )
             doc_index.write_text(
-                "BATTLE_RULES_FAMILY_PIPELINE_CONTRACT_2026-06-29.md checkpoint curto de invariantes XMAGE_TO_MANALOOM_DEFINITIVE_FLOW_2026-06-29.md current supersede o uso operacional dos planos XMage de 2026-06-23/24",
+                "EXTERNAL_BATTLE_EXECUTION_CONTRACT.md XMage primario, Forge secundario apenas para gap estruturado BATTLE_RULES_FAMILY_PIPELINE_CONTRACT_2026-06-29.md checkpoint curto de invariantes XMAGE_TO_MANALOOM_DEFINITIVE_FLOW_2026-06-29.md current supersede o uso operacional dos planos XMage de 2026-06-23/24",
                 encoding="utf-8",
             )
             report_readme.write_text(
@@ -174,6 +179,7 @@ class XMageStrategyConsistencyAuditTests(unittest.TestCase):
                 pipeline_manifest_md=str(manifest),
                 runtime_surface_md=str(runtime),
                 external_source_md=str(external),
+                execution_contract=str(audit.DEFAULT_EXECUTION_CONTRACT),
                 expected_forced_deck_id=[6, 607, 608],
                 expected_effective_deck_id=[6, 25, 31, 607, 608],
             )

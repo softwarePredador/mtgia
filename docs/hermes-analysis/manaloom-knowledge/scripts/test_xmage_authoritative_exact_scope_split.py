@@ -9030,7 +9030,10 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
 
         self.assertEqual(reason, "selected_exact_scope")
         effect = proposal["effect_json"]
-        self.assertEqual(effect["battle_model_scope"], split.TARGET_PLAYER_LIFE_GAIN_SCOPE)
+        self.assertEqual(
+            effect["battle_model_scope"],
+            split.DYNAMIC_TARGET_PLAYER_LIFE_GAIN_SCOPE,
+        )
         self.assertEqual(effect["effect"], "life_total_change")
         self.assertEqual(effect["life_gain_amount"], 0)
         self.assertEqual(effect["life_gain_amount_source"], "x_value")
@@ -24111,7 +24114,7 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         )
 
         self.assertIsNone(proposal)
-        self.assertEqual(reason, "counter_draw_target_not_supported")
+        self.assertEqual(reason, "counter_draw_source_target_not_supported")
 
     def test_counter_spell_with_unless_clause_stays_blocked(self) -> None:
         row = queue_row(split.COUNTER_UNIT, effect_classes=["CounterTargetEffect"])

@@ -58,6 +58,9 @@ class LoreholdFromScratchChallengerBuilderTest(unittest.TestCase):
         self.assertIn("607", candidate["battle_gate_command"])
         self.assertIn("--deck-ids", candidate["battle_gate_command"])
         self.assertIn("--matrix", candidate["battle_gate_command"])
+        self.assertEqual(Path(candidate["json"]).parent, Path(tmp))
+        self.assertEqual(Path(candidate["markdown"]).parent, Path(tmp))
+        self.assertEqual(Path(candidate["decklist"]).parent, Path(tmp))
 
     def test_miracle_pressure_conversion_preserves_607_land_floor(self):
         with tempfile.TemporaryDirectory() as tmp:

@@ -4,6 +4,10 @@ set -euo pipefail
 ROOT_DIR="$(cd "$(dirname "$0")/.." && pwd)"
 MODE="${1:-quick}"
 API_BASE_URL="${API_BASE_URL:-http://localhost:8080}"
+FLUTTER_TEST_TIMEOUT_SECONDS="${FLUTTER_TEST_TIMEOUT_SECONDS:-1200}"
+
+trap 'echo "❌ Quality gate interrompido." >&2; exit 130' INT
+trap 'echo "❌ Quality gate encerrado." >&2; exit 143' TERM
 
 print_header() {
   echo ""
@@ -24,12 +28,12 @@ run_backend_full() {
 
   if _is_backend_api_ready; then
     echo "ℹ️ API detectada em ${API_BASE_URL} — habilitando testes de integração backend."
-    RUN_INTEGRATION_TESTS=1 TEST_API_BASE_URL="$API_BASE_URL" dart test -j 1
+    RUN_INTEGRATION_TESTS=1 TEST_API_BASE_URL="$API_BASE_URL" dart test -P all-local -j 1
   else
     echo "⚠️ API não detectada (ou resposta não-JSON esperada) em ${API_BASE_URL}."
     echo "   Rodando suíte backend sem integração."
     echo "   Dica: inicie 'cd server && dart_frog dev' ou exporte API_BASE_URL para sua URL do Easypanel."
-    dart test
+    dart test -P all-local
   fi
 }
 
@@ -78,11 +82,45 @@ run_frontend_quick() {
   flutter analyze --no-fatal-infos
 }
 
+run_flutter_tests_with_proof() {
+  if [[ ! "$FLUTTER_TEST_TIMEOUT_SECONDS" =~ ^[1-9][0-9]*$ ]]; then
+    echo "❌ FLUTTER_TEST_TIMEOUT_SECONDS deve ser um inteiro positivo."
+    return 2
+  fi
+
+  local output_file status tee_status
+  output_file="$(mktemp)"
+  set +e
+  perl -e 'alarm shift; exec @ARGV' \
+    "$FLUTTER_TEST_TIMEOUT_SECONDS" \
+    flutter test --no-version-check --reporter compact --timeout 2m \
+    2>&1 | tee "$output_file"
+  local pipeline_status=("${PIPESTATUS[@]}")
+  status="${pipeline_status[0]}"
+  tee_status="${pipeline_status[1]}"
+  set -e
+  if [[ "$status" -eq 0 && "$tee_status" -ne 0 ]]; then
+    status="$tee_status"
+  fi
+
+  if [[ "$status" -ne 0 ]]; then
+    echo "❌ Flutter tests falharam ou excederam ${FLUTTER_TEST_TIMEOUT_SECONDS}s."
+    rm -f "$output_file"
+    return "$status"
+  fi
+  if ! grep -Fq "All tests passed!" "$output_file"; then
+    echo "❌ Flutter tests terminaram sem prova explícita de conclusão."
+    rm -f "$output_file"
+    return 1
+  fi
+  rm -f "$output_file"
+}
+
 run_frontend_full() {
   print_header "Frontend full checks"
   cd "$ROOT_DIR/app"
   flutter analyze --no-fatal-infos
-  flutter test
+  run_flutter_tests_with_proof
 }
 
 run_resolution_corpus() {
@@ -132,6 +170,7 @@ ensure_cmd() {
 ensure_prerequisites() {
   ensure_cmd dart
   ensure_cmd flutter
+  ensure_cmd perl
 }
 
 print_usage() {

@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:postgres/postgres.dart';
 import 'package:test/test.dart';
 
@@ -21,6 +23,18 @@ Pool _unusedPool() {
 
 void main() {
   group('optimize swap candidate support', () {
+    test('binder preference parameters have explicit PostgreSQL types', () {
+      final source = File('lib/ai/optimize_swap_candidate_support.dart')
+          .readAsStringSync();
+
+      expect(source, contains('CAST(@prefer_collection AS boolean)'));
+      expect(source, contains("NULLIF(CAST(@user_id AS text), '')"));
+      expect(
+        source,
+        contains("CAST(NULLIF(CAST(@user_id AS text), '') AS uuid)"),
+      );
+    });
+
     test('returns no swaps for empty deck without touching database', () async {
       final pool = _unusedPool();
       addTearDown(pool.close);

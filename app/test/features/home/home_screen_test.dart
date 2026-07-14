@@ -129,10 +129,27 @@ void main() {
     addTearDown(tester.view.resetDevicePixelRatio);
 
     await tester.pumpWidget(_buildSubject());
-    await precacheImage(
+    var imageLoaded = false;
+    Object? imageError;
+    precacheImage(
       const AssetImage('assets/branding/home_hero_banner.png'),
       tester.element(find.byType(HomeScreen)),
+    ).then<void>(
+      (_) => imageLoaded = true,
+      onError: (Object error, StackTrace stackTrace) => imageError = error,
     );
+    for (
+      var attempt = 0;
+      attempt < 50 && !imageLoaded && imageError == null;
+      attempt++
+    ) {
+      await tester.runAsync(
+        () => Future<void>.delayed(const Duration(milliseconds: 20)),
+      );
+      await tester.pump(const Duration(milliseconds: 100));
+    }
+    expect(imageError, isNull);
+    expect(imageLoaded, isTrue, reason: 'home hero asset did not load');
     await tester.pump(const Duration(milliseconds: 900));
 
     await expectLater(

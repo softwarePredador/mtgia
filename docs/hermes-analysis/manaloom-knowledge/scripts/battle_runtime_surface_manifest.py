@@ -331,6 +331,16 @@ OPTIMIZER_BASENAMES = {
     "test_universal_optimizer_known_cards.py",
     "lorehold_optimizer_equal_gate.py",
     "test_lorehold_optimizer_equal_gate.py",
+    "global_commander_battle_feedback_model.py",
+    "test_global_commander_battle_feedback_model.py",
+    "global_commander_candidate_added_card_natural_replay_trace_generator.py",
+    "test_global_commander_candidate_added_card_natural_replay_trace_generator.py",
+    "global_commander_candidate_battle_probe_audit.py",
+    "test_global_commander_candidate_battle_probe_audit.py",
+    "global_commander_candidate_battle_probe_runner.py",
+    "test_global_commander_candidate_battle_probe_runner.py",
+    "global_commander_larger_battle_gate_audit.py",
+    "test_global_commander_larger_battle_gate_audit.py",
 }
 
 FOCUSED_EVIDENCE_BASENAMES = {

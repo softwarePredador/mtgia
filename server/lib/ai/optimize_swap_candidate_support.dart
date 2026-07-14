@@ -135,9 +135,9 @@ Future<List<Map<String, dynamic>>> findSynergyReplacements({
           SELECT COALESCE(SUM(bi.quantity), 0)::int AS owned_quantity
           FROM user_binder_items bi
           WHERE bi.card_id = c.id
-            AND @prefer_collection = TRUE
-            AND @user_id IS NOT NULL
-            AND bi.user_id = CAST(@user_id AS uuid)
+            AND CAST(@prefer_collection AS boolean) = TRUE
+            AND NULLIF(CAST(@user_id AS text), '') IS NOT NULL
+            AND bi.user_id = CAST(NULLIF(CAST(@user_id AS text), '') AS uuid)
             AND COALESCE(bi.list_type, 'have') = 'have'
         ) owned ON TRUE
         WHERE (cl.status = 'legal' OR cl.status = 'restricted' OR cl.status IS NULL)

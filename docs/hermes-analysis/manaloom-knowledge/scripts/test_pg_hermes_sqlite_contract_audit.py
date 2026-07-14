@@ -107,6 +107,55 @@ class PgHermesSqliteContractAuditTests(unittest.TestCase):
         self.assertEqual(failures, [])
         self.assertEqual(report["status"], "pass")
 
+    def test_competing_verified_executable_scope_fails_contract(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            db_path = Path(tmp) / "knowledge.db"
+            conn = sqlite3.connect(db_path)
+            try:
+                for table in audit.SQLITE_REQUIRED_COLUMNS:
+                    create_contract_table(conn, table)
+                    insert_contract_row(conn, table)
+                conn.execute("DELETE FROM battle_card_rules")
+                shared_effect = '{"effect":"ramp_permanent","battle_model_scope":"fast_mana_v1"}'
+                insert_contract_row(
+                    conn,
+                    "battle_card_rules",
+                    card_name="Example Mox",
+                    normalized_name="example mox",
+                    logical_rule_key="battle_rule_v1:first",
+                    effect_json=shared_effect,
+                )
+                insert_contract_row(
+                    conn,
+                    "battle_card_rules",
+                    card_name="Example Mox",
+                    normalized_name="example mox",
+                    logical_rule_key="battle_rule_v1:second",
+                    effect_json=shared_effect,
+                )
+                insert_contract_row(
+                    conn,
+                    "card_legalities",
+                    card_name="Mana Crypt",
+                    status="banned",
+                )
+                conn.commit()
+            finally:
+                conn.close()
+
+            report = audit.build_report(db_path, skip_pg=True)
+
+        checks = {check["name"]: check for check in report["checks"]}
+        duplicate_check = checks[
+            "sqlite_integrity.battle_rules_competing_exact_scope"
+        ]
+        self.assertEqual(duplicate_check["status"], "fail")
+        self.assertEqual(
+            duplicate_check["detail"],
+            "competing_verified_executable_scope_groups=1",
+        )
+        self.assertEqual(report["status"], "fail")
+
     def test_missing_sqlite_column_fails_contract(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
             db_path = Path(tmp) / "knowledge.db"

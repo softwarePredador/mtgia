@@ -261,7 +261,7 @@ def test_pg078_deck606_l2_hash_scope_rules_resolve_from_sqlite():
         "Wear // Tear": (
             "remove_permanent",
             "split_artifact_or_enchantment_removal_v1",
-            "battle_rule_v1:a89224366575c83b24415529fe686a0e",
+                "battle_rule_v1:04938744ea1c609cc9d77c851ee8bd08",
             "bccbbc9c0ebfc638e73f0ee82a7d72d3",
         ),
         "Thought Vessel": (
