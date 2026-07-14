@@ -168,13 +168,34 @@ exit 1
 wait_for_service "${PROJECT}_${XMAGE_SERVICE}"
 wait_for_service "${PROJECT}_${FORGE_SERVICE}"
 
-ssh "${ssh_args[@]}" "$ssh_target" "
+wait_for_sidecar_health() {
+  local swarm_service="$1"
+  local service_alias="$2"
+
+  ssh "${ssh_args[@]}" "$ssh_target" "
 set -euo pipefail
-network_id=\$(docker service inspect '${PROJECT}_${BACKEND_SERVICE}' --format '{{range .Spec.TaskTemplate.Networks}}{{println .Target}}{{end}}' | head -1)
+network_id=\$(docker service inspect '$swarm_service' | jq -r \
+  --arg alias '$service_alias' \
+  '.[0].Spec.TaskTemplate.Networks[] | select((.Aliases // []) | index(\$alias)) | .Target' | head -1)
+if [[ -z \"\$network_id\" ]]; then
+  echo 'project network alias not found for $swarm_service: $service_alias' >&2
+  exit 1
+fi
 network_name=\$(docker network inspect \"\$network_id\" --format '{{.Name}}')
-docker run --rm --network \"\$network_name\" curlimages/curl:8.10.1 -fsS 'http://$XMAGE_SERVICE:8080/health' >/dev/null
-docker run --rm --network \"\$network_name\" curlimages/curl:8.10.1 -fsS 'http://$FORGE_SERVICE:8080/health' >/dev/null
+docker run --rm --network \"\$network_name\" --entrypoint sh curlimages/curl:8.10.1 -c '
+  for attempt in \$(seq 1 180); do
+    if curl -fsS --connect-timeout 2 --max-time 5 http://$service_alias:8080/health; then
+      exit 0
+    fi
+    sleep 2
+  done
+  exit 1
+'
 "
+}
+
+wait_for_sidecar_health "${PROJECT}_${XMAGE_SERVICE}" "$XMAGE_SERVICE"
+wait_for_sidecar_health "${PROJECT}_${FORGE_SERVICE}" "$FORGE_SERVICE"
 
 services_json="$(trpc_post projects.listProjectsAndServices null)"
 backend_env="$(jq -er --arg project "$PROJECT" --arg service "$BACKEND_SERVICE" '.json.services[] | select(.projectName == $project and .name == $service and .type == "app") | .env' <<<"$services_json")"
