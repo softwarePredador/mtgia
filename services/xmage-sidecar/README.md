@@ -64,7 +64,7 @@ Configure the ManaLoom server with `XMAGE_SIDECAR_URL` and `BATTLE_ENGINE`:
 
 Sidecar operational failures return HTTP 502 from ManaLoom and are not
 reinterpreted as successful native battles. Explicit engine timeouts remain
-HTTP 504. The public route caps the requested engine budget at 45 seconds so
+HTTP 504. The public route caps the requested engine budget at 40 seconds so
 the timeout response can cross the production proxy before its 60-second
 deadline; direct sidecar benchmarks retain the wider internal timeout range.
 

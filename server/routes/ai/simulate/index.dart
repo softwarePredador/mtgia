@@ -12,8 +12,8 @@ import '../../../lib/ai/xmage_battle_client.dart';
 import '../../../lib/http_responses.dart';
 import '../../../lib/logger.dart';
 
-const _publicBattleDefaultTimeoutMs = 45000;
-const _publicBattleMaximumTimeoutMs = 45000;
+const _publicBattleDefaultTimeoutMs = 40000;
+const _publicBattleMaximumTimeoutMs = 40000;
 const _externalClientGraceMs = 8000;
 
 /// POST /ai/simulate

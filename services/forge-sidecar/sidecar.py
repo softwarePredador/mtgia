@@ -8,6 +8,7 @@ import math
 import os
 import re
 import shlex
+import signal
 import subprocess
 import threading
 import time
@@ -22,6 +23,7 @@ from typing import Any
 
 MAX_REQUEST_BYTES = 2 * 1024 * 1024
 MAX_LOG_EVENTS = 20_000
+PROCESS_TIMEOUT_GRACE_SECONDS = 5
 FORGE_VERSION = "2.0.14-SNAPSHOT"
 SIMULATION_LOCK = threading.Lock()
 
@@ -56,6 +58,44 @@ class SimulationTimeout(Exception):
 
 class SimulationFailed(Exception):
     pass
+
+
+def run_isolated_process(
+    command: list[str],
+    *,
+    cwd: Path,
+    timeout: float,
+    env: dict[str, str],
+) -> subprocess.CompletedProcess[str]:
+    process = subprocess.Popen(
+        command,
+        cwd=cwd,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+        text=True,
+        env=env,
+        start_new_session=True,
+    )
+    try:
+        stdout, stderr = process.communicate(timeout=timeout)
+    except subprocess.TimeoutExpired as error:
+        try:
+            os.killpg(process.pid, signal.SIGKILL)
+        except ProcessLookupError:
+            pass
+        stdout, stderr = process.communicate()
+        raise subprocess.TimeoutExpired(
+            error.cmd,
+            error.timeout,
+            output=stdout,
+            stderr=stderr,
+        ) from error
+    return subprocess.CompletedProcess(
+        command,
+        process.returncode,
+        stdout=stdout,
+        stderr=stderr,
+    )
 
 
 def normalized_name(value: str) -> str:
@@ -340,17 +380,17 @@ class ForgeService:
         started_at = datetime.now(timezone.utc).isoformat().replace("+00:00", "Z")
         try:
             with SIMULATION_LOCK:
-                completed = subprocess.run(
+                completed = run_isolated_process(
                     command,
                     cwd=self.forge_home,
-                    capture_output=True,
-                    text=True,
-                    timeout=(timeout_ms / 1000) + 30,
-                    check=False,
+                    timeout=(timeout_ms / 1000) + PROCESS_TIMEOUT_GRACE_SECONDS,
                     env=os.environ.copy(),
                 )
         except subprocess.TimeoutExpired as error:
-            raise SimulationTimeout(f"Forge battle exceeded {timeout_ms + 30_000} ms including startup") from error
+            process_budget_ms = timeout_ms + PROCESS_TIMEOUT_GRACE_SECONDS * 1000
+            raise SimulationTimeout(
+                f"Forge battle exceeded {process_budget_ms} ms including startup"
+            ) from error
         finally:
             deck_a_file.unlink(missing_ok=True)
             deck_b_file.unlink(missing_ok=True)
@@ -599,11 +639,14 @@ class ForgeHandler(BaseHTTPRequestHandler):
 
     def _send(self, status: int, body: dict[str, Any]) -> None:
         payload = json.dumps(body, ensure_ascii=True, separators=(",", ":")).encode("utf-8")
-        self.send_response(status)
-        self.send_header("content-type", "application/json; charset=utf-8")
-        self.send_header("content-length", str(len(payload)))
-        self.end_headers()
-        self.wfile.write(payload)
+        try:
+            self.send_response(status)
+            self.send_header("content-type", "application/json; charset=utf-8")
+            self.send_header("content-length", str(len(payload)))
+            self.end_headers()
+            self.wfile.write(payload)
+        except (BrokenPipeError, ConnectionResetError):
+            return
 
     def log_message(self, format: str, *args: Any) -> None:
         print(f"forge-sidecar {self.address_string()} {format % args}")

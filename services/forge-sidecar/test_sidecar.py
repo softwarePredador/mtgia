@@ -143,10 +143,73 @@ class ForgeSidecarTest(unittest.TestCase):
                 stderr="",
             )
             with mock.patch.object(
-                forge_sidecar.subprocess, "run", return_value=completed
+                forge_sidecar, "run_isolated_process", return_value=completed
             ):
                 with self.assertRaises(forge_sidecar.SimulationTimeout):
                     service.simulate(request)
+
+    def test_isolated_process_kills_process_group_on_timeout(self):
+        process = mock.Mock(pid=321, returncode=-9)
+        process.communicate.side_effect = [
+            forge_sidecar.subprocess.TimeoutExpired("forge", 6),
+            ("stdout", "stderr"),
+        ]
+
+        with mock.patch.object(
+            forge_sidecar.subprocess, "Popen", return_value=process
+        ) as popen:
+            with mock.patch.object(forge_sidecar.os, "killpg") as killpg:
+                with self.assertRaises(forge_sidecar.subprocess.TimeoutExpired):
+                    forge_sidecar.run_isolated_process(
+                        ["forge"], cwd=Path("/tmp"), timeout=6, env={}
+                    )
+
+        self.assertTrue(popen.call_args.kwargs["start_new_session"])
+        killpg.assert_called_once_with(321, forge_sidecar.signal.SIGKILL)
+        self.assertEqual(2, process.communicate.call_count)
+
+    def test_process_timeout_uses_only_bounded_startup_grace(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            forge_jar = root / "forge.jar"
+            forge_jar.touch()
+            service = forge_sidecar.ForgeService(
+                forge_home=root,
+                forge_jar=forge_jar,
+                bootstrap_jar=None,
+                java_command=("java",),
+                deck_dir=root / "decks",
+                card_index={"commander": "Commander", "plains": "Plains"},
+                forge_commit="abc",
+            )
+            request = {
+                "timeout_ms": 1000,
+                "deck_a": _deck_payload("deck-a", "Deck A"),
+                "deck_b": _deck_payload("deck-b", "Deck B"),
+            }
+            timeout = forge_sidecar.subprocess.TimeoutExpired("forge", 6)
+
+            with mock.patch.object(
+                forge_sidecar, "run_isolated_process", side_effect=timeout
+            ) as run:
+                with self.assertRaisesRegex(
+                    forge_sidecar.SimulationTimeout, "exceeded 6000 ms"
+                ):
+                    service.simulate(request)
+
+            self.assertEqual(6, run.call_args.kwargs["timeout"])
+
+    def test_send_ignores_disconnected_client(self):
+        handler = forge_sidecar.ForgeHandler.__new__(forge_sidecar.ForgeHandler)
+        handler.send_response = mock.Mock()
+        handler.send_header = mock.Mock()
+        handler.end_headers = mock.Mock()
+        handler.wfile = mock.Mock()
+        handler.wfile.write.side_effect = BrokenPipeError
+
+        handler._send(504, {"error": "simulation_timeout"})
+
+        handler.wfile.write.assert_called_once()
 
 
 def _deck(deck_id, name):

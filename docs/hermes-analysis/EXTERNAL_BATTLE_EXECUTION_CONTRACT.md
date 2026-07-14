@@ -73,7 +73,7 @@ Both sidecars expose:
 Both require exact 100-card Commander decks with one commander. Unsupported
 cards return HTTP `422`; timeouts return `504`.
 
-The public `/ai/simulate` battle route caps `timeout_ms` at 45 seconds and
+The public `/ai/simulate` battle route caps `timeout_ms` at 40 seconds and
 allows eight seconds for sidecar cleanup and HTTP delivery. This keeps the
 worst-case response below the production proxy deadline. Direct sidecar calls
 retain their wider timeout range for controlled offline benchmarks.
@@ -104,7 +104,10 @@ omitting an unsupported card or failing to load a deck:
 - Forge's runtime unsupported-card message is converted to `422`;
 - process exit `0` is insufficient without an actual `Game Result`;
 - a completed result with internal engine errors is rejected;
-- each game runs in an isolated process and is killed on outer timeout;
+- each game runs in an isolated process and is killed after at most five
+  seconds of process-startup grace beyond the requested engine budget;
+- the Forge process, Java child, and Xvfb descendants share an isolated process
+  group that is killed as one unit on timeout;
 - the requested seed is installed before Forge starts;
 - simulations are serialized.
 
