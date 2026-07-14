@@ -8,3 +8,5 @@ def test_current_xmage_execution_contract_is_aligned():
     assert report["summary"]["failed"] == 0
     checks = {check["name"]: check for check in report["checks"]}
     assert checks["server.no_silent_configuration_fallback"]["status"] == "pass"
+    assert checks["deployment.coordinated_sidecars"]["status"] == "pass"
+    assert checks["forge.reproducible_image"]["status"] == "pass"

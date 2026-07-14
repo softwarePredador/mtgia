@@ -150,7 +150,7 @@ upsert_sidecar() {
 }
 
 upsert_sidecar "$XMAGE_SERVICE" "$xmage_image" $'PORT=8080\nXMAGE_SERVER_JAVA_OPTS=-Xms256m -Xmx2g\nXMAGE_SIDECAR_JAVA_OPTS=-Xms128m -Xmx512m\n' 3072
-upsert_sidecar "$FORGE_SERVICE" "$forge_image" $'PORT=8080\nFORGE_JAVA_COMMAND=xvfb-run -a java -Xms128m -Xmx2g\n' 2560
+upsert_sidecar "$FORGE_SERVICE" "$forge_image" $'PORT=8080\nFORGE_JAVA_COMMAND=xvfb-run -a java -Xms128m -Xmx1536m\n' 2560
 
 wait_for_service() {
   local swarm_service="$1"

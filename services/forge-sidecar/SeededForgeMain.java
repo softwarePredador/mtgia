@@ -1,6 +1,9 @@
 package com.manaloom.forge;
 
+import forge.GuiDesktop;
+import forge.gui.GuiBase;
 import forge.util.MyRandom;
+import forge.view.SimulateMatch;
 
 import java.util.Random;
 
@@ -13,6 +16,20 @@ public final class SeededForgeMain {
         if (seedValue != null && !seedValue.isBlank()) {
             MyRandom.setRandom(new Random(Long.parseLong(seedValue)));
         }
-        forge.view.Main.main(args);
+
+        System.setProperty("java.util.Arrays.useLegacyMergeSort", "true");
+        System.setProperty("sun.java2d.d3d", "false");
+        GuiBase.setInterface(new GuiDesktop());
+
+        try {
+            SimulateMatch.simulate(args);
+            System.out.flush();
+            System.err.flush();
+            System.exit(0);
+        } catch (Throwable error) {
+            error.printStackTrace(System.err);
+            System.err.flush();
+            System.exit(1);
+        }
     }
 }

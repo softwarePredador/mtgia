@@ -29,7 +29,17 @@ RUN mkdir -p /tmp/bootstrap-classes \
 FROM eclipse-temurin:17-jre
 
 RUN apt-get update \
-    && apt-get install -y --no-install-recommends python3 xauth xvfb \
+    && apt-get install -y --no-install-recommends \
+      fontconfig \
+      libfreetype6 \
+      libx11-6 \
+      libxext6 \
+      libxi6 \
+      libxrender1 \
+      libxtst6 \
+      python3 \
+      xauth \
+      xvfb \
     && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
@@ -40,12 +50,20 @@ COPY services/forge-sidecar/FORGE_COMMIT /app/FORGE_COMMIT
 COPY services/forge-sidecar/forge.profile.properties /app/forge.profile.properties
 COPY services/forge-sidecar/sidecar.py /app/sidecar.py
 
-RUN mkdir -p /tmp/forge/decks/commander /tmp/forge/cache
+RUN mkdir -p \
+      /tmp/forge/decks/commander \
+      /tmp/forge/cache \
+      /app/forge-gui \
+      /app/forge-gui-desktop \
+    && ln -s /app/res /app/forge-gui/res \
+    && ln -s /app/forge.profile.properties /app/forge-gui/forge.profile.properties \
+    && ln -s /app/res /app/forge-gui-desktop/res \
+    && ln -s /app/forge.profile.properties /app/forge-gui-desktop/forge.profile.properties
 
-ENV FORGE_HOME=/app \
+ENV FORGE_HOME=/app/forge-gui-desktop \
     FORGE_JAR=/app/forge.jar \
     FORGE_BOOTSTRAP_JAR=/app/forge-bootstrap.jar \
-    FORGE_JAVA_COMMAND="xvfb-run -a java -Xms128m -Xmx2g" \
+    FORGE_JAVA_COMMAND="xvfb-run -a java -Xms128m -Xmx1536m" \
     FORGE_CARD_SCRIPTS=/app/res/cardsfolder \
     FORGE_DECK_DIR=/tmp/forge/decks/commander \
     FORGE_COMMIT_FILE=/app/FORGE_COMMIT \
