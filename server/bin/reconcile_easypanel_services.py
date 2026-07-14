@@ -7,6 +7,7 @@ import argparse
 import json
 import os
 import secrets
+import ssl
 import subprocess
 import time
 import urllib.error
@@ -47,6 +48,15 @@ class ServiceState:
 
 class EasyPanelError(RuntimeError):
     pass
+
+
+def _ssl_context() -> ssl.SSLContext:
+    try:
+        import certifi  # type: ignore
+
+        return ssl.create_default_context(cafile=certifi.where())
+    except Exception:
+        return ssl.create_default_context()
 
 
 def _parse_dotenv(text: str) -> OrderedDict[str, str]:
@@ -134,7 +144,11 @@ class EasyPanelClient:
             },
         )
         try:
-            with urllib.request.urlopen(request, timeout=timeout) as response:
+            with urllib.request.urlopen(
+                request,
+                timeout=timeout,
+                context=_ssl_context(),
+            ) as response:
                 payload = json.loads(response.read().decode("utf-8", "replace"))
                 if "json" in payload:
                     return payload["json"]

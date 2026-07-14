@@ -36,6 +36,14 @@ internal health endpoints, synchronizes the backend PostgreSQL target from
 deploy refuses to run when the service spec does not point to the internal
 new-server PostgreSQL target.
 
+The PostgreSQL-writing scheduler is deployed separately with
+`scripts/manaloom_deploy_ops_image.sh`. That deploy is SHA-pinned, preserves
+the existing `/data/manaloom-ops` volume, refuses an old or external database
+target, and verifies inside the running container that rule synchronization
+cannot replace a trusted `oracle_hash` with an empty cache value. The
+`manaloom-ops` runtime must never remain on an older repository SHA after a
+rule-sync contract change.
+
 ## Source And Product Boundaries
 
 - Scryfall/MTGJSON/PostgreSQL remain card identity, Oracle, legality, and

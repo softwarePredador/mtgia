@@ -14,6 +14,7 @@ SIDECAR = REPO_ROOT / "services/xmage-sidecar"
 FORGE_SIDECAR = REPO_ROOT / "services/forge-sidecar"
 SERVER = REPO_ROOT / "server"
 CONTRACT = REPO_ROOT / "docs/hermes-analysis/EXTERNAL_BATTLE_EXECUTION_CONTRACT.md"
+RULE_SYNC = REPO_ROOT / "docs/hermes-analysis/manaloom-knowledge/scripts/sync_battle_card_rules_pg.py"
 XMAGE_PIN = "34d81ea4995ce15d7e1a788dc6d2a3595d35bcec"
 FORGE_PIN = "a62915f500c2411484689294659c6bb84ea215f8"
 
@@ -207,6 +208,28 @@ def build_report() -> dict[str, object]:
             ],
         ),
         source_check(
+            "deployment.current_ops_runtime",
+            REPO_ROOT / "scripts/manaloom_deploy_ops_image.sh",
+            [
+                "HEAD must match origin/master before ops deploy",
+                "server/Dockerfile.manaloom-ops",
+                "docs/hermes-analysis/manaloom-knowledge",
+                "evolution_manaloom-ops",
+                "--update-order stop-first",
+                "oracle_hash = COALESCE(NULLIF(EXCLUDED.oracle_hash, ''), card_battle_rules.oracle_hash)",
+                "backfill_trusted_oracle_hashes",
+            ],
+        ),
+        source_check(
+            "postgres.trusted_hash_preservation",
+            RULE_SYNC,
+            [
+                "oracle_hash = COALESCE(NULLIF(EXCLUDED.oracle_hash, ''), card_battle_rules.oracle_hash)",
+                "def backfill_trusted_oracle_hashes",
+                "backfilled = backfill_trusted_oracle_hashes(cur)",
+            ],
+        ),
+        source_check(
             "server.engine_configuration",
             SERVER / "lib/ai/battle_engine_config.dart",
             [
@@ -302,6 +325,7 @@ def build_report() -> dict[str, object]:
                 "33,080",
                 "1,212",
                 "does not create `card_battle_rules` rows",
+                "manaloom_deploy_ops_image.sh",
             ],
         ),
     ]

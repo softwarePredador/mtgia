@@ -12,7 +12,9 @@ from __future__ import annotations
 import argparse
 import json
 import os
+import shlex
 import ssl
+import subprocess
 import sys
 import urllib.error
 import urllib.request
@@ -26,7 +28,7 @@ REPO_ROOT = Path(__file__).resolve().parents[2]
 SERVER_DIR = REPO_ROOT / "server"
 DEFAULT_ARTIFACT_DIR = REPO_ROOT / "server" / "test" / "artifacts" / "easypanel_runtime_alignment"
 DEFAULT_HEALTH_URL = "https://evolution-cartinhas.2ta7qx.easypanel.host/health"
-DEFAULT_SERVICES = ("manaloom-ops", "hermes-lab")
+DEFAULT_SERVICES = ("manaloom-ops",)
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import reconcile_easypanel_services as reconcile  # noqa: E402
@@ -101,26 +103,93 @@ def _fetch_service_env_snapshot(
     *,
     project_name: str,
     service_names: tuple[str, ...],
+    runtime_env: dict[str, str],
 ) -> dict[str, dict[str, Any]]:
     payload = client.list_projects_and_services()
     snapshots: dict[str, dict[str, Any]] = {}
     for service_name in service_names:
-        state = reconcile._collect_service_state(payload, project_name, service_name)
-        env_map = reconcile._parse_dotenv(state.env_text)
-        snapshots[service_name] = {
-            "enabled": state.enabled,
-            "sha": state.sha,
-            "source_ref": state.source_ref,
-            "source_path": state.source_path,
-            "replicas": state.replicas,
-            "zero_downtime": state.zero_downtime,
-            "knowledge_db": env_map.get("HERMES_KNOWLEDGE_DB"),
-            "manaloom_knowledge_db": env_map.get("MANALOOM_KNOWLEDGE_DB"),
-            "openai_api_key_present": bool(env_map.get("OPENAI_API_KEY")),
-            "hermes_model": env_map.get("HERMES_MODEL"),
-            "api_server_enabled": env_map.get("API_SERVER_ENABLED"),
-        }
+        try:
+            state = reconcile._collect_service_state(payload, project_name, service_name)
+            env_map = reconcile._parse_dotenv(state.env_text)
+            snapshots[service_name] = {
+                "enabled": state.enabled,
+                "sha": state.sha,
+                "image": None,
+                "runtime_source": "easypanel_api",
+                "source_ref": state.source_ref,
+                "source_path": state.source_path,
+                "replicas": state.replicas,
+                "zero_downtime": state.zero_downtime,
+                "knowledge_db": env_map.get("HERMES_KNOWLEDGE_DB"),
+                "manaloom_knowledge_db": env_map.get("MANALOOM_KNOWLEDGE_DB"),
+                "openai_api_key_present": bool(env_map.get("OPENAI_API_KEY")),
+                "hermes_model": env_map.get("HERMES_MODEL"),
+                "api_server_enabled": env_map.get("API_SERVER_ENABLED"),
+            }
+        except reconcile.EasyPanelError:
+            snapshots[service_name] = _fetch_swarm_service_snapshot(
+                runtime_env,
+                swarm_service_name=f"{project_name}_{service_name}",
+            )
     return snapshots
+
+
+def _snapshot_from_swarm_inspect(service: dict[str, Any]) -> dict[str, Any]:
+    spec = service.get("Spec") or {}
+    task = spec.get("TaskTemplate") or {}
+    container = task.get("ContainerSpec") or {}
+    replicated = (spec.get("Mode") or {}).get("Replicated") or {}
+    update = spec.get("UpdateConfig") or {}
+    env_map = reconcile._parse_dotenv("\n".join(container.get("Env") or []))
+    return {
+        "enabled": True,
+        "sha": env_map.get("GIT_SHA"),
+        "image": container.get("Image"),
+        "runtime_source": "docker_swarm",
+        "source_ref": None,
+        "source_path": None,
+        "replicas": replicated.get("Replicas"),
+        "zero_downtime": update.get("Order") != "stop-first",
+        "knowledge_db": env_map.get("HERMES_KNOWLEDGE_DB"),
+        "manaloom_knowledge_db": env_map.get("MANALOOM_KNOWLEDGE_DB"),
+        "openai_api_key_present": bool(env_map.get("OPENAI_API_KEY")),
+        "hermes_model": env_map.get("HERMES_MODEL"),
+        "api_server_enabled": env_map.get("API_SERVER_ENABLED"),
+    }
+
+
+def _fetch_swarm_service_snapshot(
+    runtime_env: dict[str, str],
+    *,
+    swarm_service_name: str,
+) -> dict[str, Any]:
+    host = runtime_env.get("MANALOOM_EASYPANEL_SSH_HOST") or (
+        f"{runtime_env.get('EASYPANEL_SSH_USER', 'root')}@{runtime_env.get('EASYPANEL_SERVER_IP', '')}"
+    )
+    key = runtime_env.get("MANALOOM_EASYPANEL_SSH_KEY") or runtime_env.get("EASYPANEL_SSH_KEY")
+    if not host or host.endswith("@") or not key:
+        raise reconcile.EasyPanelError(
+            f"service {swarm_service_name} is absent from EasyPanel and SSH fallback is not configured"
+        )
+    output = subprocess.check_output(
+        [
+            "ssh",
+            "-o",
+            "BatchMode=yes",
+            "-o",
+            "StrictHostKeyChecking=accept-new",
+            "-i",
+            key,
+            host,
+            f"docker service inspect {shlex.quote(swarm_service_name)}",
+        ],
+        text=True,
+        timeout=30,
+    )
+    services = json.loads(output)
+    if len(services) != 1:
+        raise reconcile.EasyPanelError(f"unexpected Swarm inspect result for {swarm_service_name}")
+    return _snapshot_from_swarm_inspect(services[0])
 
 
 def _query_pg_metrics(runtime_env: dict[str, str]) -> dict[str, Any]:
@@ -245,7 +314,7 @@ def _build_findings(
             )
 
     hermes_lab = services.get("hermes-lab", {})
-    if not hermes_lab.get("openai_api_key_present"):
+    if "hermes-lab" in services and not hermes_lab.get("openai_api_key_present"):
         findings.append(
             {
                 "priority": "P0",
@@ -256,7 +325,7 @@ def _build_findings(
 
     ops_db = services.get("manaloom-ops", {}).get("knowledge_db")
     lab_db = hermes_lab.get("knowledge_db")
-    if ops_db != lab_db:
+    if "hermes-lab" in services and ops_db != lab_db:
         findings.append(
             {
                 "priority": "P2",
@@ -300,6 +369,8 @@ def _build_report(payload: dict[str, Any]) -> str:
                 "",
                 f"- enabled: `{snapshot.get('enabled')}`",
                 f"- sha: `{snapshot.get('sha')}`",
+                f"- image: `{snapshot.get('image')}`",
+                f"- runtime_source: `{snapshot.get('runtime_source')}`",
                 f"- source_ref: `{snapshot.get('source_ref')}`",
                 f"- source_path: `{snapshot.get('source_path')}`",
                 f"- knowledge_db: `{snapshot.get('knowledge_db')}`",
@@ -363,7 +434,12 @@ def main(argv: list[str] | None = None) -> int:
 
     local_head = reconcile._local_head_sha()
     public_health = _fetch_public_health(args.health_url, insecure=args.insecure_health)
-    services = _fetch_service_env_snapshot(client, project_name=args.project, service_names=DEFAULT_SERVICES)
+    services = _fetch_service_env_snapshot(
+        client,
+        project_name=args.project,
+        service_names=DEFAULT_SERVICES,
+        runtime_env=runtime_env,
+    )
     pg_metrics = _query_pg_metrics(runtime_env)
     findings = _build_findings(
         local_head=local_head,
