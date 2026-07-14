@@ -231,6 +231,16 @@ def build_report() -> dict[str, object]:
             ],
         ),
         source_check(
+            "sqlite.priority_safe_hash_backfill",
+            REPO_ROOT / "docs/hermes-analysis/manaloom-knowledge/scripts/battle_rule_registry.py",
+            [
+                "if incoming_priority < current_priority:",
+                "oracle_hash=COALESCE(",
+                "NULLIF(oracle_hash, ''),",
+                "NULLIF(?, '')",
+            ],
+        ),
+        source_check(
             "server.engine_configuration",
             SERVER / "lib/ai/battle_engine_config.dart",
             [

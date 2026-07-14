@@ -1270,6 +1270,52 @@ class SyncBattleCardRulesPgSelectionTests(unittest.TestCase):
 
         self.assertEqual(row[0], "22b42fcc181b7aed71f78b2e1e51e887")
 
+    def test_lower_priority_pg_row_only_backfills_missing_sqlite_hash(self) -> None:
+        with tempfile.TemporaryDirectory() as tmpdir:
+            sqlite_db = Path(tmpdir) / "knowledge.db"
+            with sqlite3.connect(sqlite_db) as conn:
+                sync_pg.battle_rule_registry.ensure_battle_card_rules(conn)
+                sync_pg.battle_rule_registry.upsert_battle_card_rule(
+                    conn,
+                    "High Noon",
+                    {"effect": "cast_limit", "max_spells_per_turn": 1},
+                    source="curated",
+                    confidence=0.95,
+                    review_status="verified",
+                    execution_status="auto",
+                    oracle_hash=None,
+                    logical_rule_key_value="battle_rule_v1:high-noon",
+                    rule_version=2,
+                )
+                changed = sync_pg.battle_rule_registry.upsert_battle_card_rule(
+                    conn,
+                    "High Noon",
+                    {"effect": "generated_placeholder"},
+                    source="generated",
+                    confidence=0.5,
+                    review_status="needs_review",
+                    execution_status="auto",
+                    oracle_hash="current-oracle-md5",
+                    logical_rule_key_value="battle_rule_v1:high-noon",
+                    rule_version=1,
+                )
+                row = conn.execute(
+                    """
+                    SELECT effect_json, source, confidence, review_status, rule_version, oracle_hash
+                    FROM battle_card_rules
+                    WHERE normalized_name = 'high noon'
+                      AND logical_rule_key = 'battle_rule_v1:high-noon'
+                    """
+                ).fetchone()
+
+        self.assertFalse(changed)
+        self.assertEqual(json.loads(row[0])["effect"], "cast_limit")
+        self.assertEqual(row[1], "curated")
+        self.assertEqual(row[2], 0.95)
+        self.assertEqual(row[3], "verified")
+        self.assertEqual(row[4], 2)
+        self.assertEqual(row[5], "current-oracle-md5")
+
 
 if __name__ == "__main__":
     unittest.main()

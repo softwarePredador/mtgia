@@ -767,10 +767,15 @@ def upsert_battle_card_rule(
             conn.execute(
                 """
                 UPDATE battle_card_rules
-                SET last_seen_at=?
+                SET
+                    oracle_hash=COALESCE(
+                        NULLIF(oracle_hash, ''),
+                        NULLIF(?, '')
+                    ),
+                    last_seen_at=?
                 WHERE normalized_name=? AND logical_rule_key=?
                 """,
-                (now, normalized, rule_key),
+                (oracle_hash, now, normalized, rule_key),
             )
             _invalidate_rule_caches_for_connection(conn)
             return False
