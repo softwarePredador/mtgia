@@ -11,7 +11,7 @@ require_tool() {
   }
 }
 
-for tool in curl git jq ssh; do
+for tool in base64 curl git jq ssh; do
   require_tool "$tool"
 done
 
@@ -37,6 +37,13 @@ required=(
   EASYPANEL_SERVER_IP
   EASYPANEL_SSH_USER
   EASYPANEL_SSH_KEY
+  DB_HOST
+  DB_PORT
+  DB_NAME
+  DB_USER
+  DB_PASS
+  DB_SSL_MODE
+  DATABASE_URL
 )
 for key in "${required[@]}"; do
   if [[ -z "${!key:-}" ]]; then
@@ -171,6 +178,7 @@ wait_for_service "${PROJECT}_${FORGE_SERVICE}"
 wait_for_sidecar_health() {
   local swarm_service="$1"
   local service_alias="$2"
+  local expected_fragment="${3:-}"
 
   ssh "${ssh_args[@]}" "$ssh_target" "
 set -euo pipefail
@@ -184,8 +192,11 @@ fi
 network_name=\$(docker network inspect \"\$network_id\" --format '{{.Name}}')
 docker run --rm --network \"\$network_name\" --entrypoint sh curlimages/curl:8.10.1 -c '
   for attempt in \$(seq 1 180); do
-    if curl -fsS --connect-timeout 2 --max-time 5 http://$service_alias:8080/health; then
-      exit 0
+    if response=\$(curl -fsS --connect-timeout 2 --max-time 5 http://$service_alias:8080/health); then
+      if [ -z '$expected_fragment' ] || printf '%s' "\$response" | grep -Fq '$expected_fragment'; then
+        printf '%s\n' "\$response"
+        exit 0
+      fi
     fi
     sleep 2
   done
@@ -194,7 +205,7 @@ docker run --rm --network \"\$network_name\" --entrypoint sh curlimages/curl:8.1
 "
 }
 
-wait_for_sidecar_health "${PROJECT}_${XMAGE_SERVICE}" "$XMAGE_SERVICE"
+wait_for_sidecar_health "${PROJECT}_${XMAGE_SERVICE}" "$XMAGE_SERVICE" '"catalog_ready":true'
 wait_for_sidecar_health "${PROJECT}_${FORGE_SERVICE}" "$FORGE_SERVICE"
 
 services_json="$(trpc_post projects.listProjectsAndServices null)"
@@ -224,10 +235,56 @@ upsert_env() {
 backend_env="$(upsert_env "$backend_env" BATTLE_ENGINE auto)"
 backend_env="$(upsert_env "$backend_env" XMAGE_SIDECAR_URL "http://$XMAGE_SERVICE:8080")"
 backend_env="$(upsert_env "$backend_env" FORGE_SIDECAR_URL "http://$FORGE_SERVICE:8080")"
+backend_env="$(upsert_env "$backend_env" DB_HOST "$DB_HOST")"
+backend_env="$(upsert_env "$backend_env" DB_PORT "$DB_PORT")"
+backend_env="$(upsert_env "$backend_env" DB_NAME "$DB_NAME")"
+backend_env="$(upsert_env "$backend_env" DB_USER "$DB_USER")"
+backend_env="$(upsert_env "$backend_env" DB_PASS "$DB_PASS")"
+backend_env="$(upsert_env "$backend_env" DATABASE_URL "$DATABASE_URL")"
+backend_env="$(upsert_env "$backend_env" DB_SSL_MODE "$DB_SSL_MODE")"
 
 trpc_post services.app.updateEnv "$(jq -cn --arg project "$PROJECT" --arg service "$BACKEND_SERVICE" --arg env "$backend_env" '{projectName:$project,serviceName:$service,env:$env}')" >/dev/null
-trpc_post services.app.deployService "$(jq -cn --arg project "$PROJECT" --arg service "$BACKEND_SERVICE" '{projectName:$project,serviceName:$service,forceRebuild:false}')" >/dev/null
-wait_for_service "${PROJECT}_${BACKEND_SERVICE}"
+
+encode_base64() {
+  printf '%s' "$1" | base64 | tr -d '\n'
+}
+
+db_host_b64="$(encode_base64 "$DB_HOST")"
+db_port_b64="$(encode_base64 "$DB_PORT")"
+db_name_b64="$(encode_base64 "$DB_NAME")"
+db_user_b64="$(encode_base64 "$DB_USER")"
+db_pass_b64="$(encode_base64 "$DB_PASS")"
+database_url_b64="$(encode_base64 "$DATABASE_URL")"
+db_ssl_mode_b64="$(encode_base64 "$DB_SSL_MODE")"
+backend_swarm_service="${PROJECT}_${BACKEND_SERVICE}"
+
+ssh "${ssh_args[@]}" "$ssh_target" "
+set -euo pipefail
+decode() { printf '%s' \"\$1\" | base64 -d; }
+db_host=\$(decode '$db_host_b64')
+db_port=\$(decode '$db_port_b64')
+db_name=\$(decode '$db_name_b64')
+db_user=\$(decode '$db_user_b64')
+db_pass=\$(decode '$db_pass_b64')
+database_url=\$(decode '$database_url_b64')
+db_ssl_mode=\$(decode '$db_ssl_mode_b64')
+update_args=(
+  docker service update
+  --update-order stop-first
+  --env-add 'BATTLE_ENGINE=auto'
+  --env-add 'XMAGE_SIDECAR_URL=http://$XMAGE_SERVICE:8080'
+  --env-add 'FORGE_SIDECAR_URL=http://$FORGE_SERVICE:8080'
+  --env-add \"DB_HOST=\$db_host\"
+  --env-add \"DB_PORT=\$db_port\"
+  --env-add \"DB_NAME=\$db_name\"
+  --env-add \"DB_USER=\$db_user\"
+  --env-add \"DB_PASS=\$db_pass\"
+  --env-add \"DATABASE_URL=\$database_url\"
+  --env-add \"DB_SSL_MODE=\$db_ssl_mode\"
+)
+\"\${update_args[@]}\" '$backend_swarm_service' >/dev/null
+"
+wait_for_service "$backend_swarm_service"
 
 ssh "${ssh_args[@]}" "$ssh_target" "rm -rf '$remote_dir'"
 

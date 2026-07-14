@@ -47,6 +47,7 @@ public final class SidecarMain {
         int xmagePort = envInt("XMAGE_SERVER_PORT", 17171);
         int httpPort = envInt("PORT", 8080);
         XmageBattleService battleService = new XmageBattleService(xmageHost, xmagePort);
+        battleService.warmUp();
 
         HttpServer server = HttpServer.create(new InetSocketAddress("0.0.0.0", httpPort), 32);
         server.createContext("/health", exchange -> {
@@ -61,6 +62,7 @@ public final class SidecarMain {
             body.put("engine_commit", XMAGE_COMMIT);
             body.put("xmage_host", xmageHost);
             body.put("xmage_port", xmagePort);
+            body.put("catalog_ready", true);
             send(exchange, 200, body);
         });
         server.createContext("/cards/coverage", exchange -> handleCardCoverage(exchange, battleService));

@@ -6,7 +6,8 @@ reported and are never removed from a deck.
 
 ## HTTP contract
 
-- `GET /health`: engine version and pinned commit.
+- `GET /health`: engine version, pinned commit, and `catalog_ready=true` after
+  the card catalog has been indexed.
 - `POST /coverage`: validates two 100-card, one-commander decks and returns
   `ready` plus structured `unsupported_cards`.
 - `POST /cards/coverage`: batch-checks arbitrary catalog rows without requiring

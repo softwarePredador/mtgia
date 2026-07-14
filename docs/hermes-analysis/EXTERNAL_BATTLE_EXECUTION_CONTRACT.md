@@ -31,7 +31,10 @@ FORGE_SIDECAR_URL=http://forge-sidecar:8080
 Production deploy is coordinated by
 `scripts/manaloom_deploy_battle_sidecars.sh`. It builds both pinned images on
 the new server, registers or updates the EasyPanel services, verifies both
-internal health endpoints, and only then enables `auto` on the backend.
+internal health endpoints, synchronizes the backend PostgreSQL target from
+`server/.env`, and only then enables `auto` on the backend. The backend image
+deploy refuses to run when the service spec does not point to the internal
+new-server PostgreSQL target.
 
 ## Source And Product Boundaries
 
@@ -63,6 +66,9 @@ cards return HTTP `422`; timeouts return `504`.
 
 XMage runs in-process beside its server, so timeout handling has two layers:
 
+- the sidecar indexes its card catalog before opening the HTTP port, so
+  `GET /health` with `catalog_ready=true` is a readiness signal rather than a
+  process-only liveness signal;
 - the battle loop stops at the requested timeout without waiting on synchronous
   table/session cleanup;
 - an HTTP watchdog cancels any execution that does not return within a
@@ -116,6 +122,15 @@ the launch battle runtime work.
 - A separate full Forge log exercised both `Lorehold, the Historian` and
   `Improvisation Capstone`; `Molecule Man` is resolution-proven but still needs
   a focused-use trace before claiming card-level battle proof.
+- Production timeout validation returned HTTP `504`, exited the contaminated
+  XMage task with code `70`, and recovered with a new healthy task.
+- The authenticated production `/ai/simulate` route completed a controlled
+  XMage battle in 16 turns and 17,853 ms with 322 events, 192 snapshots, and
+  zero engine errors; persisted provenance was
+  `canonical_rules_execution`.
+- The production Forge sidecar completed Korvold vs Krenko in 8 turns and
+  37,226 ms with 404 events, 16 snapshots, 17 cards cast, 4 activations, and
+  zero engine errors.
 
 ## Validation
 

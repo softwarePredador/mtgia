@@ -48,6 +48,10 @@ final class XmageBattleService {
         this.port = port;
     }
 
+    void warmUp() {
+        ensureCardDatabase();
+    }
+
     Map<String, Object> simulate(JsonObject request) throws Exception {
         SIMULATION_LOCK.lockInterruptibly();
         try {
