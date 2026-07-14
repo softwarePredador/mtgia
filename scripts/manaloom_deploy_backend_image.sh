@@ -18,6 +18,8 @@ SSH_HOST="${MANALOOM_EASYPANEL_SSH_HOST:-${EASYPANEL_SSH_USER:-root}@${EASYPANEL
 SSH_KEY="${MANALOOM_EASYPANEL_SSH_KEY:-${EASYPANEL_SSH_KEY:-}}"
 SERVICE="${MANALOOM_BACKEND_SERVICE:-evolution_cartinhas}"
 IMAGE_REPO="${MANALOOM_BACKEND_IMAGE_REPO:-localhost:5000/manaloom/cartinhas}"
+EASYPANEL_PROJECT="${EASYPANEL_PROJECT_NAME:-evolution}"
+EASYPANEL_SERVICE="${EASYPANEL_APP_NAME:-cartinhas}"
 REMOTE_BUILD_ROOT="${MANALOOM_REMOTE_BUILD_ROOT:-/opt/manaloom/deploy}"
 EXPECTED_DB_HOST="${MANALOOM_EXPECTED_DB_HOST:-evolution_manaloom-postgres}"
 EXPECTED_DB_PORT="${MANALOOM_EXPECTED_DB_PORT:-5432}"
@@ -31,9 +33,11 @@ require_tool() {
 }
 
 require_tool git
+require_tool curl
+require_tool jq
 require_tool ssh
 
-for key in SSH_HOST SSH_KEY DB_HOST DB_PORT DB_NAME DB_USER DB_PASS DB_SSL_MODE DATABASE_URL; do
+for key in SSH_HOST SSH_KEY EASYPANEL_BASE_URL EASYPANEL_API_TOKEN DB_HOST DB_PORT DB_NAME DB_USER DB_PASS DB_SSL_MODE DATABASE_URL; do
   if [[ -z "${!key:-}" ]]; then
     echo "variavel obrigatoria ausente: $key" >&2
     exit 2
@@ -50,6 +54,21 @@ if [[ "$DATABASE_URL" != *"@$EXPECTED_DB_HOST:$EXPECTED_DB_PORT/$EXPECTED_DB_NAM
   echo "DATABASE_URL nao aponta para o PostgreSQL interno esperado" >&2
   exit 2
 fi
+
+curl_args=(-fsS)
+if [[ "${MANALOOM_EASYPANEL_INSECURE_TLS:-0}" == "1" ]]; then
+  curl_args+=(-k)
+fi
+
+trpc_post() {
+  local procedure="$1"
+  local payload="$2"
+  curl "${curl_args[@]}" \
+    -H "Authorization: Bearer $EASYPANEL_API_TOKEN" \
+    -H 'Content-Type: application/json' \
+    --data "$(jq -cn --argjson input "$payload" '{json:$input}')" \
+    "$EASYPANEL_BASE_URL/api/trpc/$procedure"
+}
 
 cd "$ROOT_DIR"
 
@@ -103,6 +122,13 @@ docker service ps '$SERVICE' --no-trunc
 exit 1
 REMOTE
 
+source_payload="$(jq -cn \
+  --arg project "$EASYPANEL_PROJECT" \
+  --arg service "$EASYPANEL_SERVICE" \
+  --arg image "$IMAGE_REPO:$short_sha" \
+  '{projectName:$project,serviceName:$service,image:$image}')"
+trpc_post services.app.updateSourceImage "$source_payload" >/dev/null
+
 runtime_contract="$(ssh -o BatchMode=yes -o StrictHostKeyChecking=accept-new -i "$SSH_KEY" "$SSH_HOST" "
 container=\$(docker ps --filter label=com.docker.swarm.service.name='$SERVICE' -q | head -1)
 docker inspect \"\$container\" --format '{{range .Config.Env}}{{println .}}{{end}}' |
@@ -117,6 +143,17 @@ runtime_image="$(ssh -o BatchMode=yes -o StrictHostKeyChecking=accept-new -i "$S
   "docker service inspect '$SERVICE' --format '{{.Spec.TaskTemplate.ContainerSpec.Image}}'")"
 if [[ "${runtime_image%%@*}" != "$IMAGE_REPO:$short_sha" ]]; then
   echo "deploy convergiu com imagem mutavel ou SHA divergente: $runtime_image" >&2
+  exit 2
+fi
+
+services_payload="$(trpc_post projects.listProjectsAndServices null)"
+configured_image="$(jq -er \
+  --arg project "$EASYPANEL_PROJECT" \
+  --arg service "$EASYPANEL_SERVICE" \
+  '.json.services[] | select(.projectName == $project and .name == $service and .type == "app") | .source.image' \
+  <<<"$services_payload")"
+if [[ "$configured_image" != "$IMAGE_REPO:$short_sha" ]]; then
+  echo "deploy convergiu com origem EasyPanel mutavel ou SHA divergente: $configured_image" >&2
   exit 2
 fi
 
