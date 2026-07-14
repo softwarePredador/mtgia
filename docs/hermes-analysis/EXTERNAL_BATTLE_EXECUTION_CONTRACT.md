@@ -53,7 +53,8 @@ rule-sync contract change.
 - PostgreSQL remains the product source of truth for native ManaLoom rules and
   metadata. External execution does not create `card_battle_rules` rows.
 - Hermes remains cache/laboratory/audit evidence and cannot overwrite
-  PostgreSQL truth.
+  PostgreSQL truth. Cache refreshes re-read existing PostgreSQL-backed aliases
+  and derive a missing cache hash from the current PostgreSQL Oracle text.
 - A completed battle proves the engine ran the two decks. It proves an
   individual card only when the event log shows that card drawn/used or a
   focused scenario exercises it.

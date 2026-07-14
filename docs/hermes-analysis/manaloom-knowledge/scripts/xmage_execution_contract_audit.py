@@ -227,6 +227,7 @@ def build_report() -> dict[str, object]:
                 "oracle_hash = COALESCE(NULLIF(EXCLUDED.oracle_hash, ''), card_battle_rules.oracle_hash)",
                 "def backfill_trusted_oracle_hashes",
                 "backfilled = backfill_trusted_oracle_hashes(cur)",
+                "COALESCE(NULLIF(br.oracle_hash, ''), md5(c.oracle_text)) AS oracle_hash",
             ],
         ),
         source_check(

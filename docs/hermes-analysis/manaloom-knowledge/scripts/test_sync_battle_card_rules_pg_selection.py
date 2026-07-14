@@ -26,6 +26,41 @@ sync_pg = load_module()
 
 
 class SyncBattleCardRulesPgSelectionTests(unittest.TestCase):
+    def test_load_pg_rules_uses_oracle_hash_fallback_for_runtime_overlay(self) -> None:
+        class FakeCursor:
+            def __init__(self) -> None:
+                self.query = ""
+
+            def execute(self, query: str, _params: tuple[list[str]]) -> None:
+                self.query = query
+
+            def fetchall(self) -> list[tuple[object, ...]]:
+                return [
+                    (
+                        "high noon",
+                        "battle_rule_v1:test",
+                        "High Noon",
+                        {"effect": "cast_limit"},
+                        {"category": "stax"},
+                        "generated",
+                        0.8,
+                        "needs_review",
+                        "auto",
+                        1,
+                        "oracle-md5",
+                        "",
+                        None,
+                        None,
+                    )
+                ]
+
+        cursor = FakeCursor()
+        rows = sync_pg.load_pg_rules(cursor, include_needs_review=True)
+
+        self.assertIn("LEFT JOIN cards c ON c.id = br.card_id", cursor.query)
+        self.assertIn("COALESCE(NULLIF(br.oracle_hash, ''), md5(c.oracle_text))", cursor.query)
+        self.assertEqual(rows[0]["oracle_hash"], "oracle-md5")
+
     def test_backfill_trusted_oracle_hashes_has_no_source_filter(self) -> None:
         class FakeCursor:
             def __init__(self) -> None:

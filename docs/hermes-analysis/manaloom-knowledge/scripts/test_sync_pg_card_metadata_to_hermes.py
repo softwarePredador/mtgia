@@ -202,6 +202,21 @@ class SyncPgCardMetadataToHermesTest(unittest.TestCase):
         self.assertIn("Canonical Only", names)
         self.assertNotIn("Legacy Only", names)
 
+    def test_collect_requested_names_refreshes_existing_postgres_cache_rows(self) -> None:
+        self.cur.execute(
+            """
+            INSERT INTO card_oracle_cache (
+                normalized_name, card_id, name, colors_json, color_identity_json,
+                keywords_json, source, updated_at
+            ) VALUES ('district guide', NULL, 'District Guide', '[]', '[]', '[]',
+                      'postgres_cards', '2026-07-14T00:00:00Z')
+            """
+        )
+
+        names = sync.collect_requested_names(self.cur)
+
+        self.assertIn("District Guide", names)
+
 
 if __name__ == "__main__":
     unittest.main()

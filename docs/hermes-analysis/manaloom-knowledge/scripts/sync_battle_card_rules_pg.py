@@ -735,23 +735,24 @@ def load_pg_rules(cur: Any, *, include_needs_review: bool) -> list[dict[str, Any
     cur.execute(
         """
         SELECT
-          normalized_name,
-          logical_rule_key,
-          card_name,
-          effect_json,
-          deck_role_json,
-          source,
-          confidence::float,
-          review_status,
-          execution_status,
-          rule_version,
-          oracle_hash,
-          notes,
-          updated_at,
-          last_seen_at
-        FROM card_battle_rules
-        WHERE review_status = ANY(%s)
-        ORDER BY normalized_name, logical_rule_key
+          br.normalized_name,
+          br.logical_rule_key,
+          br.card_name,
+          br.effect_json,
+          br.deck_role_json,
+          br.source,
+          br.confidence::float,
+          br.review_status,
+          br.execution_status,
+          br.rule_version,
+          COALESCE(NULLIF(br.oracle_hash, ''), md5(c.oracle_text)) AS oracle_hash,
+          br.notes,
+          br.updated_at,
+          br.last_seen_at
+        FROM card_battle_rules br
+        LEFT JOIN cards c ON c.id = br.card_id
+        WHERE br.review_status = ANY(%s)
+        ORDER BY br.normalized_name, br.logical_rule_key
         """,
         (statuses,),
     )

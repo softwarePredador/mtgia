@@ -175,6 +175,16 @@ def ensure_deck_cards_metadata_columns(cur: sqlite3.Cursor) -> None:
 def collect_requested_names(cur: sqlite3.Cursor) -> set[str]:
     names: set[str] = set()
 
+    if table_exists(cur, "card_oracle_cache"):
+        for (name,) in cur.execute(
+            """
+            SELECT DISTINCT name
+            FROM card_oracle_cache
+            WHERE source = 'postgres_cards' AND COALESCE(name,'')!=''
+            """
+        ):
+            names.add(str(name))
+
     if table_exists(cur, "deck_cards"):
         for (name,) in cur.execute(
             "SELECT DISTINCT card_name FROM deck_cards WHERE COALESCE(card_name,'')!=''"
