@@ -195,7 +195,7 @@ def build_report() -> dict[str, object]:
                 "wait_for_sidecar_health()",
                 'wait_for_sidecar_health "${PROJECT}_${XMAGE_SERVICE}" "$XMAGE_SERVICE"',
                 'wait_for_sidecar_health "${PROJECT}_${FORGE_SERVICE}" "$FORGE_SERVICE"',
-                "'\"catalog_ready\":true'",
+                '"$XMAGE_SERVICE" catalog_ready',
                 "http://$service_alias:8080/health",
                 "upsert_env \"$backend_env\" BATTLE_ENGINE auto",
                 "upsert_env \"$backend_env\" DB_HOST \"$DB_HOST\"",

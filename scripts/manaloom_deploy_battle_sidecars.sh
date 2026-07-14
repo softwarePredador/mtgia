@@ -205,7 +205,7 @@ docker run --rm --network \"\$network_name\" --entrypoint sh curlimages/curl:8.1
 "
 }
 
-wait_for_sidecar_health "${PROJECT}_${XMAGE_SERVICE}" "$XMAGE_SERVICE" '"catalog_ready":true'
+wait_for_sidecar_health "${PROJECT}_${XMAGE_SERVICE}" "$XMAGE_SERVICE" catalog_ready
 wait_for_sidecar_health "${PROJECT}_${FORGE_SERVICE}" "$FORGE_SERVICE"
 
 services_json="$(trpc_post projects.listProjectsAndServices null)"
