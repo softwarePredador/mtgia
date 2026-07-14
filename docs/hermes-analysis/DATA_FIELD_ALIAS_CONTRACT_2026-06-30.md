@@ -16,7 +16,7 @@ fields such as `oracle*`, `card_id`, `card_name`, `normalized_name`,
 | Normalized name | `normalized_name` | local normalizers in scripts | Use only as lookup fallback or SQLite cache key. If a matching `card_id` exists, `card_id` wins. |
 | Oracle text | `oracle_text` from PostgreSQL/Scryfall-backed card data | cached `deck_cards.oracle_text`, `card_oracle_cache.oracle_text` | Cached Oracle text must be refreshed from the cache/sync path, not edited independently. |
 | Battle rule identity | `logical_rule_key` | `_rule_logical_key` in replay payloads | `logical_rule_key` is the durable rule key; replay aliases are evidence fields only. |
-| Battle rule drift | `oracle_hash` | `_rule_oracle_hash` in replay payloads | New exact runtime promotions must include Oracle hash. Missing hashes in old trusted rows are warnings until touched by a package. |
+| Battle rule drift | `oracle_hash` | `_rule_oracle_hash` in replay payloads | Verified executable rules must carry `md5(cards.oracle_text)` for their canonical `card_id`. Missing or stale hashes fail the live contract. |
 | Source/reference | explicit `source`, `source_url`, `source_ref`, `report_path` | free-text notes | Source fields are provenance, not identity. Do not join or dedupe business objects by source text. |
 
 ## Guardrails Now Enforced
@@ -29,9 +29,12 @@ now checks the cross-field drift that caused duplicate work risk:
 - Name differences such as `Birgi, God of Storytelling` versus
   `Birgi, God of Storytelling // Harnfel, Horn of Bounty` are allowed only when
   the same `card_id` canonicalizes both rows.
-- Trusted executable `battle_card_rules` missing `oracle_hash` are surfaced as
-  warnings. This remains a backlog for old rows, not a reason to block every
-  current runtime package.
+- Trusted executable `battle_card_rules` with a missing hash or a hash that
+  differs from current `cards.oracle_text` fail the PostgreSQL contract.
+- PostgreSQL and Hermes SQLite hashes are compared for every shared runtime
+  rule key, so a PostgreSQL repair cannot leave a stale cache silently active.
+- A stale non-empty hash is never auto-replaced: the rule payload must first be
+  checked against current Oracle text, then PostgreSQL is updated and synced.
 - Global card readiness audits must treat `card_battle_rules` coverage as
   effective when either `card_id` matches or the existing storage key
   `normalized_name + logical_rule_key` matches. `oracle_id` is a propagation
@@ -67,7 +70,7 @@ first:
 1. `card_id` over any card name alias.
 2. `oracle_id` over `scryfall_id` for playable identity.
 3. `logical_rule_key` over effect text or generated rule labels.
-4. `oracle_hash` over timestamp/source notes for rule drift detection.
+4. Current `oracle_hash` over timestamp/source notes for rule drift detection.
 5. Aggregated snapshots over raw multi-row joins.
 
 For battle-rule coverage specifically, do not create a new row only because a

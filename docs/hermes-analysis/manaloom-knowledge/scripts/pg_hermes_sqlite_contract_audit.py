@@ -642,12 +642,58 @@ def pg_integrity_checks() -> list[Check]:
                 }
                 for row in cur.fetchall()
             ]
+            cur.execute(
+                """
+                SELECT COUNT(*)
+                FROM card_battle_rules br
+                JOIN cards c ON c.id = br.card_id
+                WHERE br.source IN ('curated', 'manual')
+                  AND br.review_status = 'verified'
+                  AND br.execution_status IN ('auto', 'executable')
+                  AND COALESCE(br.oracle_hash, '') <> ''
+                  AND br.oracle_hash <> md5(c.oracle_text)
+                """
+            )
+            mismatched_hash = int(cur.fetchone()[0] or 0)
+            cur.execute(
+                """
+                SELECT br.card_name, br.normalized_name, br.logical_rule_key,
+                       br.oracle_hash, md5(c.oracle_text) AS current_oracle_hash
+                FROM card_battle_rules br
+                JOIN cards c ON c.id = br.card_id
+                WHERE br.source IN ('curated', 'manual')
+                  AND br.review_status = 'verified'
+                  AND br.execution_status IN ('auto', 'executable')
+                  AND COALESCE(br.oracle_hash, '') <> ''
+                  AND br.oracle_hash <> md5(c.oracle_text)
+                ORDER BY br.card_name, br.logical_rule_key
+                LIMIT 20
+                """
+            )
+            mismatched_sample = [
+                {
+                    "card_name": row[0],
+                    "normalized_name": row[1],
+                    "logical_rule_key": row[2],
+                    "oracle_hash": row[3],
+                    "current_oracle_hash": row[4],
+                }
+                for row in cur.fetchall()
+            ]
     checks.append(
         Check(
             "pg_integrity.battle_rules_trusted_oracle_hash_coverage",
             "pass" if missing_hash == 0 else "fail",
             f"verified_executable_rules_missing_oracle_hash={missing_hash}",
             {"sample": sample},
+        )
+    )
+    checks.append(
+        Check(
+            "pg_integrity.battle_rules_oracle_hash_current",
+            "pass" if mismatched_hash == 0 else "fail",
+            f"verified_executable_rules_stale_oracle_hash={mismatched_hash}",
+            {"sample": mismatched_sample},
         )
     )
     return checks
@@ -685,6 +731,35 @@ def pg_runtime_keys() -> set[tuple[str, str]]:
             return {(str(row[0]), str(row[1])) for row in cur.fetchall()}
 
 
+def pg_runtime_rule_hashes() -> dict[tuple[str, str], str]:
+    with connect() as conn:
+        with conn.cursor() as cur:
+            cur.execute(
+                """
+                SELECT normalized_name, logical_rule_key, oracle_hash
+                FROM card_battle_rules
+                WHERE review_status IN ('verified', 'active', 'needs_review', 'deprecated')
+                  AND execution_status != 'disabled'
+                  AND COALESCE(oracle_hash, '') <> ''
+                """
+            )
+            return {
+                (str(row[0]), str(row[1])): str(row[2])
+                for row in cur.fetchall()
+            }
+
+
+def oracle_hash_drift_rows(
+    sqlite_hashes: dict[tuple[str, str], str],
+    pg_hashes: dict[tuple[str, str], str],
+) -> list[tuple[str, str, str, str]]:
+    return sorted(
+        (key[0], key[1], sqlite_hashes[key], pg_hashes[key])
+        for key in sqlite_hashes.keys() & pg_hashes.keys()
+        if sqlite_hashes[key] != pg_hashes[key]
+    )
+
+
 def pg_sqlite_parity_checks(conn: sqlite3.Connection, *, skip_pg: bool) -> list[Check]:
     checks: list[Check] = []
     if skip_pg:
@@ -693,16 +768,22 @@ def pg_sqlite_parity_checks(conn: sqlite3.Connection, *, skip_pg: bool) -> list[
 
     if table_exists(conn, "battle_card_rules"):
         pg_keys = pg_runtime_keys()
+        pg_hashes = pg_runtime_rule_hashes()
         reviewed_keys = reviewed_runtime_keys()
         sqlite_rows = conn.execute(
             """
-            SELECT normalized_name, logical_rule_key, source
+            SELECT normalized_name, logical_rule_key, source, oracle_hash
             FROM battle_card_rules
             WHERE review_status IN ('verified', 'active', 'needs_review', 'deprecated')
               AND execution_status != 'disabled'
             """
         ).fetchall()
         sqlite_keys = {(str(row[0]), str(row[1])) for row in sqlite_rows}
+        sqlite_hashes = {
+            (str(row[0]), str(row[1])): str(row[3])
+            for row in sqlite_rows
+            if str(row[3] or "").strip()
+        }
         unresolved = sorted(sqlite_keys - pg_keys - reviewed_keys)
         checks.append(
             Check(
@@ -710,6 +791,25 @@ def pg_sqlite_parity_checks(conn: sqlite3.Connection, *, skip_pg: bool) -> list[
                 "pass" if not unresolved else "fail",
                 f"sqlite_runtime_keys={len(sqlite_keys)} pg_runtime_keys={len(pg_keys)} unresolved={len(unresolved)}",
                 {"unresolved_sample": unresolved[:20]},
+            )
+        )
+        hash_drift = oracle_hash_drift_rows(sqlite_hashes, pg_hashes)
+        checks.append(
+            Check(
+                "pg_sqlite_parity.battle_rule_oracle_hashes",
+                "pass" if not hash_drift else "fail",
+                f"comparable_rules={len(sqlite_hashes.keys() & pg_hashes.keys())} hash_drift={len(hash_drift)}",
+                {
+                    "drift_sample": [
+                        {
+                            "normalized_name": row[0],
+                            "logical_rule_key": row[1],
+                            "sqlite_oracle_hash": row[2],
+                            "pg_oracle_hash": row[3],
+                        }
+                        for row in hash_drift[:20]
+                    ]
+                },
             )
         )
 

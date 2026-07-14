@@ -66,6 +66,23 @@ def insert_contract_row(
 
 
 class PgHermesSqliteContractAuditTests(unittest.TestCase):
+    def test_oracle_hash_drift_rows_reports_only_shared_mismatches(self) -> None:
+        sqlite_hashes = {
+            ("same", "rule-a"): "hash-a",
+            ("drift", "rule-b"): "old-hash",
+            ("sqlite-only", "rule-c"): "hash-c",
+        }
+        pg_hashes = {
+            ("same", "rule-a"): "hash-a",
+            ("drift", "rule-b"): "current-hash",
+            ("pg-only", "rule-d"): "hash-d",
+        }
+
+        self.assertEqual(
+            audit.oracle_hash_drift_rows(sqlite_hashes, pg_hashes),
+            [("drift", "rule-b", "old-hash", "current-hash")],
+        )
+
     def test_complete_sqlite_contract_passes_without_pg(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
             db_path = Path(tmp) / "knowledge.db"

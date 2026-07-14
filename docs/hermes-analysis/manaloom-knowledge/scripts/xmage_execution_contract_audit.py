@@ -233,6 +233,26 @@ def build_report() -> dict[str, object]:
             ],
         ),
         source_check(
+            "ops.pg_hermes_contract_preflight",
+            SERVER / "bin/master_optimizer_preflight.sh",
+            [
+                "pg_hermes_sqlite_contract_audit.py",
+                "--sqlite-db \"$SQLITE_DB\"",
+                "pg_contract_report=",
+            ],
+        ),
+        source_check(
+            "pg.oracle_hash_drift_guard",
+            REPO_ROOT
+            / "docs/hermes-analysis/manaloom-knowledge/scripts/pg_hermes_sqlite_contract_audit.py",
+            [
+                "pg_integrity.battle_rules_oracle_hash_current",
+                "verified_executable_rules_stale_oracle_hash",
+                "pg_sqlite_parity.battle_rule_oracle_hashes",
+                "oracle_hash_drift_rows",
+            ],
+        ),
+        source_check(
             "sqlite.priority_safe_hash_backfill",
             REPO_ROOT / "docs/hermes-analysis/manaloom-knowledge/scripts/battle_rule_registry.py",
             [

@@ -76,6 +76,14 @@ battle_rules_report="$ARTIFACT_DIR/battle_card_rules_cache_sync_$(date -u +%Y%m%
   --include-needs-review \
   --report "$battle_rules_report"
 
+pg_contract_report=""
+if [[ -d /data/manaloom-ops ]]; then
+  pg_contract_report="$ARTIFACT_DIR/pg_hermes_sqlite_contract_$(date -u +%Y%m%d_%H%M%S)"
+  "$PYTHON_BIN" "$SCRIPT_DIR/pg_hermes_sqlite_contract_audit.py" \
+    --sqlite-db "$SQLITE_DB" \
+    --out-prefix "$pg_contract_report"
+fi
+
 if [[ "$DECK_ID" == "6" && "$LOREHOLD_CANONICAL_OVERRIDE" == "1" ]]; then
   canonical_log="$ARTIFACT_DIR/lorehold_canonical_preflight_$(date -u +%Y%m%d_%H%M%S).log"
   "$PYTHON_BIN" "$SCRIPT_DIR/lorehold_canonical_deck_snapshot.py" \
@@ -100,4 +108,5 @@ echo "target_deck_log=$target_deck_log"
 echo "sync_report=$sync_report"
 echo "battle_rules_pg_report=$battle_rules_pg_report"
 echo "battle_rules_report=$battle_rules_report"
+echo "pg_contract_report=${pg_contract_report:-skipped_outside_manaloom_ops}"
 echo "preflight_log=$preflight_log"
