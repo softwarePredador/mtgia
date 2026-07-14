@@ -1,7 +1,0 @@
-    card_name     | normalized_name  |                logical_rule_key                 | promoted_rule_rows | promoted_verified_auto_rows | promoted_oracle_hash_rows | backup_rows
-------------------+------------------+-------------------------------------------------+--------------------+-----------------------------+---------------------------+-------------
- Deconstruct      | deconstruct      | battle_rule_v1:3c02c24a2346797911c20945d2f1a9f0 |                  1 |                           1 |                         1 |           0
- Liturgy of Blood | liturgy of blood | battle_rule_v1:7f91b8beaa5f42a0d97e520e388ab01a |                  1 |                           1 |                         1 |           0
- Seismic Spike    | seismic spike    | battle_rule_v1:dd8dce7535424809092d8737ac86ce3f |                  1 |                           1 |                         1 |           0
- Turn to Dust     | turn to dust     | battle_rule_v1:f4a9e330eee70bed3982dcb7d586e238 |                  1 |                           1 |                         1 |           0
-(4 rows)

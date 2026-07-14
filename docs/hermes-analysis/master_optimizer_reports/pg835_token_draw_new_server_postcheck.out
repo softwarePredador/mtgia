@@ -1,8 +1,0 @@
-   card_name    | normalized_name |                logical_rule_key                 | promoted_rule_rows | promoted_verified_auto_rows | promoted_oracle_hash_rows | backup_rows 
-----------------+-----------------+-------------------------------------------------+--------------------+-----------------------------+---------------------------+-------------
- Glimmerburst   | glimmerburst    | battle_rule_v1:98b779eed4a072890e45c78d36bc47ce |                  1 |                           1 |                         1 |           0
- Glittermonger  | glittermonger   | battle_rule_v1:258e845f63060b52419d6034896b7655 |                  1 |                           1 |                         1 |           0
- Halo Scarab    | halo scarab     | battle_rule_v1:936a2b6b0a79421cb88b3e205d268b45 |                  1 |                           1 |                         1 |           0
- Pirate's Prize | pirate's prize  | battle_rule_v1:9ebee39a8a5e2a280cfbca52a271bb7d |                  1 |                           1 |                         1 |           0
-(4 rows)
-

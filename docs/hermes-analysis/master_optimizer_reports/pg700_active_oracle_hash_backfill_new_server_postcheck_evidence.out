@@ -1,9 +1,0 @@
- checked_rows | rows_with_expected_hash | rows_still_missing_hash
---------------+-------------------------+-------------------------
-           23 |                      23 |                       0
-(1 row)
-
- remaining_trusted_auto_missing_oracle_hash_rows
--------------------------------------------------
-                                               0
-(1 row)

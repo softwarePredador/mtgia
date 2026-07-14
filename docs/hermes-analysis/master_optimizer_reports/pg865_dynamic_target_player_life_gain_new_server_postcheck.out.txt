@@ -1,5 +1,0 @@
- card_name  | normalized_name |                logical_rule_key                 | promoted_rule_rows | promoted_verified_auto_rows | promoted_oracle_hash_rows | backup_rows 
-------------+-----------------+-------------------------------------------------+--------------------+-----------------------------+---------------------------+-------------
- Congregate | congregate      | battle_rule_v1:bf7acad5ae158abca8bffdefc93315b7 |                  1 |                           1 |                         1 |           0
-(1 row)
-

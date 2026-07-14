@@ -1,9 +1,0 @@
-BEGIN
-CREATE SCHEMA
-SELECT 44
- updated_rows 
---------------
-           44
-(1 row)
-
-COMMIT

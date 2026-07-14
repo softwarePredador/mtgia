@@ -1,5 +1,0 @@
-     card_name     |  normalized_name  |                logical_rule_key                 | promoted_rule_rows | promoted_verified_auto_rows | promoted_oracle_hash_rows | backup_rows
--------------------+-------------------+-------------------------------------------------+--------------------+-----------------------------+---------------------------+-------------
- Burst of Strength | burst of strength | battle_rule_v1:085839334ad80f440ae0a12b576361d2 |                  1 |                           1 |                         1 |           0
- Dragonscale Boon  | dragonscale boon  | battle_rule_v1:8cb1a93aad935ca2838cbc890bdd2343 |                  1 |                           1 |                         1 |           0
-(2 rows)

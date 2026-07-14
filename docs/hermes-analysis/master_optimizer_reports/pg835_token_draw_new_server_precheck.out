@@ -1,8 +1,0 @@
-   card_name    | normalized_name |           oracle_hash            |                logical_rule_key                 |      shadow_handling       | target_card_rows |          canonical_card_id           | existing_rule_rows | expected_rule_rows_before | would_deprecate_shadow_rows 
-----------------+-----------------+----------------------------------+-------------------------------------------------+----------------------------+------------------+--------------------------------------+--------------------+---------------------------+-----------------------------
- Glimmerburst   | glimmerburst    | a25051234ee55b0b8079617746dc2868 | battle_rule_v1:98b779eed4a072890e45c78d36bc47ce | deprecate_nonmatching_rows |                1 | 0c9a3920-1e80-4a34-9eea-b0fc902885b5 |                  0 |                         0 |                           0
- Glittermonger  | glittermonger   | 5b4e50720f248f4efc602edf472eb667 | battle_rule_v1:258e845f63060b52419d6034896b7655 | deprecate_nonmatching_rows |                1 | 62b14049-6506-4f88-8b53-30fea05f7973 |                  0 |                         0 |                           0
- Halo Scarab    | halo scarab     | 2eb45603d56974326170f8c4ea703c63 | battle_rule_v1:936a2b6b0a79421cb88b3e205d268b45 | deprecate_nonmatching_rows |                1 | 27491fa7-e2de-457b-8ea7-2bb9c18c05f6 |                  0 |                         0 |                           0
- Pirate's Prize | pirate's prize  | 47b24fe1ccecb97beb2368d34a8b0be6 | battle_rule_v1:9ebee39a8a5e2a280cfbca52a271bb7d | deprecate_nonmatching_rows |                1 | 8c406325-6c8a-4efd-b832-508b9bf658ac |                  0 |                         0 |                           0
-(4 rows)
-

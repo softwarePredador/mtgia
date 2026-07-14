@@ -1,6 +1,0 @@
-      card_name      |   normalized_name   |                logical_rule_key                 | promoted_rule_rows | promoted_verified_auto_rows | promoted_oracle_hash_rows | backup_rows
----------------------+---------------------+-------------------------------------------------+--------------------+-----------------------------+---------------------------+-------------
- Coordinated Assault | coordinated assault | battle_rule_v1:be978331d0c7514f1825e2b9308c0296 |                  1 |                           1 |                         1 |           0
- Cutthroat Maneuver  | cutthroat maneuver  | battle_rule_v1:2fdc264ddc771d31693afa3f35ed606d |                  1 |                           1 |                         1 |           0
- Press the Advantage | press the advantage | battle_rule_v1:6e167a383e79e3fc6914663b25c95ffa |                  1 |                           1 |                         1 |           0
-(3 rows)

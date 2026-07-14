@@ -1,6 +1,0 @@
-    card_name     | normalized_name  |           oracle_hash            |                logical_rule_key                 |      shadow_handling       | target_card_rows |          canonical_card_id           | existing_rule_rows | expected_rule_rows_before | would_deprecate_shadow_rows 
-------------------+------------------+----------------------------------+-------------------------------------------------+----------------------------+------------------+--------------------------------------+--------------------+---------------------------+-----------------------------
- Buy Your Silence | buy your silence | 7272d5d266f6ff4669834b8de560e162 | battle_rule_v1:6bc3d9f3ccc4395630d6c135f4f88397 | deprecate_nonmatching_rows |                1 | 9b0f427c-8663-4d80-bd37-3dd21400ddb0 |                  1 |                         1 |                           0
- Zuko's Exile     | zuko's exile     | ad108129d0f384a98ba01e0688447cf5 | battle_rule_v1:bedf1ce0a21ccd23ffbfc6623b0da8fe | deprecate_nonmatching_rows |                1 | 2fd6999a-be99-494c-b722-73c61d822321 |                  1 |                         1 |                           0
-(2 rows)
-

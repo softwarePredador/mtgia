@@ -1,5 +1,0 @@
- card_name  | normalized_name |           oracle_hash            |                logical_rule_key                 |      shadow_handling       | target_card_rows |          canonical_card_id           | existing_rule_rows | expected_rule_rows_before | would_deprecate_shadow_rows 
-------------+-----------------+----------------------------------+-------------------------------------------------+----------------------------+------------------+--------------------------------------+--------------------+---------------------------+-----------------------------
- Congregate | congregate      | ebb154d2c956f845a46af485d848f9dd | battle_rule_v1:bf7acad5ae158abca8bffdefc93315b7 | deprecate_nonmatching_rows |                1 | 386d0455-e072-4681-90cc-6d16004440a7 |                  0 |                         0 |                           0
-(1 row)
-

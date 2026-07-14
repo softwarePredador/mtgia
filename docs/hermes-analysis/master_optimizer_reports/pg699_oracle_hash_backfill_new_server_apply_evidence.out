@@ -1,9 +1,0 @@
-BEGIN
-CREATE SCHEMA
-SELECT 32
- backfilled_rows
------------------
-              32
-(1 row)
-
-COMMIT

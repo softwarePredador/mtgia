@@ -1,5 +1,0 @@
-     card_name     |  normalized_name  |                logical_rule_key                 | promoted_rule_rows | promoted_verified_auto_rows | promoted_oracle_hash_rows | backup_rows
--------------------+-------------------+-------------------------------------------------+--------------------+-----------------------------+---------------------------+-------------
- Courage in Crisis | courage in crisis | battle_rule_v1:26da15c77e5f75c18a4e86fd53aad6ce |                  1 |                           1 |                         1 |           0
- Grim Affliction   | grim affliction   | battle_rule_v1:da949d8f98db67d7074176895f4dfd6f |                  1 |                           1 |                         1 |           0
-(2 rows)

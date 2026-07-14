@@ -1,9 +1,0 @@
-     card_name      |  normalized_name   |                logical_rule_key                 | promoted_rule_rows | promoted_verified_auto_rows | promoted_oracle_hash_rows | backup_rows 
---------------------+--------------------+-------------------------------------------------+--------------------+-----------------------------+---------------------------+-------------
- Akroma's Vengeance | akroma's vengeance | battle_rule_v1:a003e239c83a3dbda454e5f284772921 |                  1 |                           1 |                         1 |           0
- Fuel the Flames    | fuel the flames    | battle_rule_v1:fd2d6f103034bb760e37bcdba5ca7183 |                  1 |                           1 |                         1 |           0
- Hush               | hush               | battle_rule_v1:8cca937904da37d443131e25b0e866a5 |                  1 |                           1 |                         1 |           0
- Starstorm          | starstorm          | battle_rule_v1:529435595dfa892ca9d7d99e56608b91 |                  1 |                           1 |                         1 |           0
- Sweltering Suns    | sweltering suns    | battle_rule_v1:d3f4bf0986864fe567d07cacb4c295a5 |                  1 |                           1 |                         1 |           0
-(5 rows)
-

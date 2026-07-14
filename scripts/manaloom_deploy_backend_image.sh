@@ -84,7 +84,7 @@ docker push '$IMAGE_REPO:$short_sha'
 docker push '$IMAGE_REPO:latest'
 docker service update \
   --update-order stop-first \
-  --image '$IMAGE_REPO:latest' \
+  --image '$IMAGE_REPO:$short_sha' \
   --env-add GIT_SHA='$sha' \
   --env-add SENTRY_RELEASE='$sha' \
   --env-add DEPLOY_TIMESTAMP='$deploy_timestamp' \
@@ -113,8 +113,15 @@ if [[ "$runtime_contract" != "$sha|$EXPECTED_DB_HOST|$EXPECTED_DB_PORT|$EXPECTED
   exit 2
 fi
 
+runtime_image="$(ssh -o BatchMode=yes -o StrictHostKeyChecking=accept-new -i "$SSH_KEY" "$SSH_HOST" \
+  "docker service inspect '$SERVICE' --format '{{.Spec.TaskTemplate.ContainerSpec.Image}}'")"
+if [[ "${runtime_image%%@*}" != "$IMAGE_REPO:$short_sha" ]]; then
+  echo "deploy convergiu com imagem mutavel ou SHA divergente: $runtime_image" >&2
+  exit 2
+fi
+
 ssh -o BatchMode=yes -o StrictHostKeyChecking=accept-new -i "$SSH_KEY" "$SSH_HOST" \
   "rm -rf '$remote_dir'"
 
-printf '{"status":"deployed","service":"%s","image":"%s:latest","git_sha":"%s","remote_dir_removed":"%s"}\n' \
-  "$SERVICE" "$IMAGE_REPO" "$sha" "$remote_dir"
+printf '{"status":"deployed","service":"%s","image":"%s:%s","git_sha":"%s","remote_dir_removed":"%s"}\n' \
+  "$SERVICE" "$IMAGE_REPO" "$short_sha" "$sha" "$remote_dir"

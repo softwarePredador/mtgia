@@ -1,6 +1,0 @@
-    card_name     | normalized_name  |                logical_rule_key                 | promoted_rule_rows | promoted_verified_auto_rows | promoted_oracle_hash_rows | backup_rows
-------------------+------------------+-------------------------------------------------+--------------------+-----------------------------+---------------------------+-------------
- Bind             | bind             | battle_rule_v1:880274ce7e5acbdff6b6bac0b95165e0 |                  1 |                           1 |                         1 |           0
- Bind // Liberate | bind // liberate | battle_rule_v1:880274ce7e5acbdff6b6bac0b95165e0 |                  2 |                           2 |                         2 |           0
- Squelch          | squelch          | battle_rule_v1:880274ce7e5acbdff6b6bac0b95165e0 |                  1 |                           1 |                         1 |           0
-(3 rows)
