@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Sync the SQLite game_changers table into edh_bracket_policy.dart.
+"""Sync the reviewed Commander Game Changer source into Dart policy.
 
 Usage:
   python sync_game_changers_to_dart.py
@@ -9,15 +9,15 @@ Usage:
 from __future__ import annotations
 
 import argparse
+import json
 import re
-import sqlite3
 import sys
 from pathlib import Path
 
 
 SCRIPT_DIR = Path(__file__).resolve().parent
 REPO_ROOT = SCRIPT_DIR.parents[3]
-DEFAULT_DB = SCRIPT_DIR / "knowledge.db"
+DEFAULT_SOURCE = REPO_ROOT / "server" / "config" / "commander_game_changers.json"
 DEFAULT_DART = REPO_ROOT / "server" / "lib" / "edh_bracket_policy.dart"
 
 BEGIN = "// BEGIN GENERATED GAME CHANGERS"
@@ -28,21 +28,24 @@ def dart_string(value: str) -> str:
     return "'" + value.replace("\\", "\\\\").replace("'", "\\'") + "'"
 
 
-def read_game_changer_names(db_path: Path) -> list[str]:
-    with sqlite3.connect(db_path) as conn:
-        rows = conn.execute(
-            """
-            SELECT card_name
-            FROM game_changers
-            WHERE card_name IS NOT NULL AND TRIM(card_name) <> ''
-            ORDER BY lower(card_name)
-            """
-        ).fetchall()
-
-    names = [row[0].strip().lower() for row in rows]
+def read_game_changer_names(source_path: Path) -> list[str]:
+    payload = json.loads(source_path.read_text(encoding="utf-8"))
+    if payload.get("schema_version") != "commander_game_changers_v1":
+        raise SystemExit("Unsupported Commander Game Changer source schema")
+    if not str(payload.get("source_url") or "").startswith("https://magic.wizards.com/"):
+        raise SystemExit("Game Changer source must cite an official Wizards URL")
+    if not str(payload.get("source_checked_at") or "").strip():
+        raise SystemExit("Game Changer source_checked_at is required")
+    rows = payload.get("names")
+    if not isinstance(rows, list):
+        raise SystemExit("Game Changer names must be a JSON list")
+    names = sorted(
+        [str(value).strip().lower() for value in rows if str(value).strip()],
+        key=str.casefold,
+    )
     if len(names) != len(set(names)):
         duplicates = sorted({name for name in names if names.count(name) > 1})
-        raise SystemExit(f"Duplicate game changer names in SQLite: {duplicates}")
+        raise SystemExit(f"Duplicate game changer names in source: {duplicates}")
     if len(names) != 53:
         raise SystemExit(f"Expected 53 game changers, found {len(names)}")
     return names
@@ -72,11 +75,11 @@ def replace_generated_block(source: str, block: str) -> str:
 def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--check", action="store_true")
-    parser.add_argument("--db", type=Path, default=DEFAULT_DB)
+    parser.add_argument("--source", type=Path, default=DEFAULT_SOURCE)
     parser.add_argument("--dart", type=Path, default=DEFAULT_DART)
     args = parser.parse_args()
 
-    names = read_game_changer_names(args.db)
+    names = read_game_changer_names(args.source)
     block = render_block(names)
     source = args.dart.read_text(encoding="utf-8")
     updated = replace_generated_block(source, block)
@@ -85,7 +88,7 @@ def main() -> int:
         if updated != source:
             print("Game Changers Dart list is out of sync with SQLite", file=sys.stderr)
             return 1
-        print("Game Changers Dart list matches SQLite")
+        print("Game Changers Dart list matches reviewed JSON source")
         return 0
 
     args.dart.write_text(updated, encoding="utf-8")

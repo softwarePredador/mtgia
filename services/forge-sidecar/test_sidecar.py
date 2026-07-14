@@ -15,6 +15,11 @@ SPEC.loader.exec_module(forge_sidecar)
 
 
 class ForgeSidecarTest(unittest.TestCase):
+    def test_global_corpus_payload_limit_and_process_identity(self):
+        self.assertEqual(8 * 1024 * 1024, forge_sidecar.MAX_REQUEST_BYTES)
+        self.assertTrue(forge_sidecar.PROCESS_ID)
+        self.assertTrue(forge_sidecar.STARTED_AT.endswith("Z"))
+
     def test_card_index_and_split_name_resolution(self):
         with tempfile.TemporaryDirectory() as directory:
             path = Path(directory) / "e" / "emerias_call.txt"
@@ -97,6 +102,8 @@ class ForgeSidecarTest(unittest.TestCase):
         self.assertEqual(7, result["turns"])
         self.assertEqual("Sol Ring", result["events"][1]["card_name"])
         self.assertEqual(1, result["metrics"]["cards_cast"])
+        self.assertEqual([], result["decision_trace"])
+        self.assertFalse(result["learning_contract"]["strategy_or_swap_proof"])
 
     def test_event_parser_stops_after_game_result(self):
         events = forge_sidecar._events_from_output(

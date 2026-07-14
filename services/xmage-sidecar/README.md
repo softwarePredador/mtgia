@@ -6,8 +6,9 @@ reported and are never removed from a deck.
 
 ## HTTP contract
 
-- `GET /health`: engine version, pinned commit, `catalog_ready=true`, and the
-  indexed name count after the card catalog has been loaded.
+- `GET /health`: engine version, pinned commit, `catalog_ready=true`, indexed
+  name count, `sidecar_process_id`, and `sidecar_started_at` after the card
+  catalog has been loaded.
 - `POST /coverage`: validates two 100-card, one-commander decks and returns
   `ready` plus structured `unsupported_cards`.
 - `POST /cards/coverage`: batch-checks arbitrary catalog rows without requiring
@@ -21,6 +22,12 @@ reported and are never removed from a deck.
 Simulation timeout is a hard process boundary. The HTTP watchdog allows a
 five-second cleanup grace, returns `504`, and exits the sidecar so the container
 restarts both XMage processes. A timed-out engine state is never reused.
+The timeout body identifies the contaminated process and sets
+`restart_required=true`. Batch runners must wait until `/health` exposes a
+different process ID before sending another game.
+
+Request bodies are capped at 8 MiB. This supports one full current card-corpus
+coverage request while retaining a bounded memory contract.
 
 The request contains `request_id`, `seed`, `timeout_ms`, `deck_a`, and `deck_b`.
 Each deck contains `id`, `name`, and card rows with `name`, `set_code`,
@@ -29,6 +36,13 @@ Each deck contains `id`, `name`, and card rows with `name`, `set_code`,
 The result includes engine provenance, seed, winner, turns, normalized events,
 visual snapshots, final state, and compact metrics. XMage rules execution does
 not by itself prove deck legality or deck-building quality.
+
+XMage watcher replays expose visible stack entries, battlefield entries, zone
+changes, tap/damage/counter changes, and combat declarations. Hidden hand and
+library identities are not visible, and XMage does not expose the AI's rejected
+options or rationale. The response therefore carries
+`learning_contract.schema_version=external_battle_learning_v1`, an empty
+`decision_trace`, and `strategy_or_swap_proof=false`.
 
 ## Build and test
 
@@ -77,4 +91,5 @@ bin/benchmark.sh request.json benchmark.tsv 20 30000
 ```
 
 The TSV keeps every seed, status, duration, winner, event count, snapshot
-count, and XMage error count. Timeouts remain visible as failed rows.
+count, and XMage error count. Timeouts remain visible as failed rows, and the
+runner waits for a distinct replacement process before continuing.

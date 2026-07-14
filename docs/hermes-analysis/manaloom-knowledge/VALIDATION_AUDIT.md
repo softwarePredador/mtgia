@@ -1,4 +1,16 @@
-# Validacao de Conhecimento — Resultados Reais vs Minhas Afirmacoes
+# Validacao de Conhecimento - Relatorio Historico
+
+Status: `superseded_historical_evidence`.
+
+This 2026-05-26 report documents defects in the classifier that existed at
+that time. It is not the current operating contract and its removed
+`validate_gc_bracket.py` helper must not be recreated: that helper duplicated
+only part of the Dart logic and depended on an untracked `/tmp` file. Current
+truth and executable gates are documented in `GAME_CHANGERS.md`, sourced from
+`server/config/commander_game_changers.json`, and tested directly in Dart.
+
+The historical text below is preserved only to explain why the classifier was
+changed.
 
 > Este documento CONTEM os resultados reais de duas fontes:
 > 1. Codigo real do ManaLoom (tagCardForBracket + classifyOptimizationFunctionalRole)

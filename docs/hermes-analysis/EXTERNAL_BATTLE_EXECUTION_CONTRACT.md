@@ -55,9 +55,10 @@ rule-sync contract change.
 - Hermes remains cache/laboratory/audit evidence and cannot overwrite
   PostgreSQL truth. Cache refreshes re-read existing PostgreSQL-backed aliases
   and derive a missing cache hash from the current PostgreSQL Oracle text.
-- A completed battle proves the engine ran the two decks. It proves an
-  individual card only when the event log shows that card drawn/used or a
-  focused scenario exercises it.
+- A completed battle proves the engine ran the two decks. It proves visible
+  activity for an individual card only when a typed event names that card or a
+  focused scenario exercises it. XMage's watcher cannot expose named hidden
+  draws, so hand-count changes are never promoted to named-card evidence.
 - Rules execution is not Commander legality, deck quality, strategy, or swap
   proof.
 
@@ -72,6 +73,10 @@ Both sidecars expose:
 
 Both require exact 100-card Commander decks with one commander. Unsupported
 cards return HTTP `422`; timeouts return `504`.
+
+Both accept at most 8 MiB per request. The limit is intentionally above the
+current full-corpus coverage payload and below an unbounded bulk-upload
+contract.
 
 The public `/ai/simulate` battle route caps `timeout_ms` at 40 seconds and
 allows eight seconds for sidecar cleanup and HTTP delivery. This keeps the
@@ -92,6 +97,11 @@ XMage runs in-process beside its server, so timeout handling has two layers:
   five-second cleanup grace, sends `504`, and exits the sidecar so the container
   restarts both XMage processes from a clean state.
 
+Every response exposes `sidecar_process_id` and `sidecar_started_at`. XMage
+timeouts also expose `restart_required=true`. A batch runner must observe a
+different healthy process ID after a timeout; a health response from the old
+process during its one-second shutdown window is not recovery proof.
+
 A timed-out XMage process is therefore never reused for another battle.
 The combined XMage server and sidecar container keeps its Java heaps capped at
 2.5 GiB and has a 4 GiB service limit, leaving explicit room for native JVM,
@@ -110,6 +120,35 @@ omitting an unsupported card or failing to load a deck:
   group that is killed as one unit on timeout;
 - the requested seed is installed before Forge starts;
 - simulations are serialized.
+
+## Replay And Learning Contract
+
+External results publish `learning_contract.schema_version` as
+`external_battle_learning_v1` and keep `decision_trace` explicit. The signals
+have these meanings:
+
+| Signal | XMage | Forge | Safe conclusion |
+| --- | --- | --- | --- |
+| Completed game/winner | yes | yes | canonical engine execution completed |
+| Visible stack entry | typed from state | parsed from engine log | named spell/ability became visible |
+| Battlefield/zone transition | typed from state | partial | visible state changed; hidden origin/destination may remain unknown |
+| Attack/block declaration | typed from combat state | not guaranteed | named visible combat participation only when emitted |
+| Tap/damage/counter transition | typed from permanent state | not guaranteed | state changed; the causal choice is not inferred |
+| Named card draw from hidden library | no | not trusted | unavailable |
+| AI alternatives, scores, rationale | no | no | unavailable |
+| Strategy or add/cut superiority | no | no | requires a separate controlled comparison |
+
+`visible_activity_only` is sufficient for card exposure and rules-execution
+evidence. It is insufficient for a deck promotion. A swap comparison requires:
+
+1. legal equal-cardinality base and candidate decks;
+2. same commander, opponents, engine version, timeout policy, and seed set;
+3. typed exposure of the added and removed lane, or a separately labelled
+   forced-access diagnostic;
+4. enough completed natural games to avoid deciding from timeout selection;
+5. strategy/role metrics in addition to win rate;
+6. no promotion when the candidate merely avoided drawing or using its changed
+   card.
 
 ## Measured Catalog Baseline
 
@@ -131,12 +170,33 @@ These are resolution counts, not 34,331 focused card-use tests. The remaining
 31,208 XMage-resolved cards must not be translated card by card merely to make
 the launch battle runtime work.
 
+### Current adaptation-queue pilot
+
+The 2026-07-14 queue rebuild covered 26,890 current target identities in 35.94
+seconds. Local XMage source resolved 23,955 identities (89.09%), leaving 2,935
+without local source and 11,344 adapter work units after family grouping. The
+exact native split considered 6,960 residual rows and produced only three safe
+native proposals in 9.07 seconds. This demonstrates that the broad simple
+native families are largely exhausted; the remaining native work is long-tail
+family/manual work, not 26,890 independent card implementations.
+
+Production XMage `/cards/coverage` processed those 23,955 source-resolved rows
+in four requests under the former 2 MiB cap: 23,823 supported, 132 unsupported,
+99.44% coverage, and 4,394 ms aggregate service time. The original 2.49 MiB
+single request was rejected; the 8 MiB contract removes that artificial batch
+fragmentation.
+
 ## Executed Proof
 
 - XMage completed Korvold vs Krenko in 11 turns with 262 events, 158 snapshots,
   and zero engine errors.
 - A 20-seed XMage sample completed 9 games within a 30-second cap; completed
   games had 8,919 ms median and 24,368 ms p95. Timeouts remain explicit.
+- A fresh three-seed Miirym-versus-Meren pilot at the same 30-second cap
+  completed 0/3: two explicit `504` timeouts and one request that reached the
+  restart window. This does not invalidate the completed sample, but proves
+  that 30-second synchronous runs are not a reliable mass-learning SLA. The
+  process-identity gate now prevents the restart-window race.
 - XMage rejected deck 607 with exactly three unresolved entries:
   `Improvisation Capstone`, `Molecule Man`, and `Lorehold, the Historian`.
 - Forge resolved all 100 cards of deck 607 and completed Commander against
@@ -154,6 +214,12 @@ the launch battle runtime work.
 - The production Forge sidecar completed Korvold vs Krenko in 8 turns and
   37,226 ms with 404 events, 16 snapshots, 17 cards cast, 4 activations, and
   zero engine errors.
+- The only persisted production XMage replay available during the 2026-07-14
+  audit had 183 events but no card cast, draw, attack, activation, target, or
+  decision event; 179 rows were generic waiting messages. That replay remains
+  execution evidence, not strategy-learning evidence. The typed replay
+  contract in this revision closes the observability gap for future games; it
+  does not retroactively upgrade old rows.
 
 ## Validation
 

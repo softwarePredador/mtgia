@@ -208,6 +208,10 @@ class BattleReplayReadService {
     final gameLogTurns = _toInt(gameLogMap['turns']);
     final engine = gameLogMap['engine']?.toString();
     final engineContract = gameLogMap['engine_contract']?.toString();
+    final rawLearningContract = gameLogMap['learning_contract'];
+    final learningContract = rawLearningContract is Map
+        ? Map<String, dynamic>.from(rawLearningContract)
+        : const <String, dynamic>{};
     final isCanonicalRulesExecution =
         (engine == 'xmage' && engineContract == 'canonical_rules_execution') ||
             (engine == 'forge' &&
@@ -232,6 +236,7 @@ class BattleReplayReadService {
         'engine_version': gameLogMap['engine_version'],
       if (gameLogMap['engine_commit'] != null)
         'engine_commit': gameLogMap['engine_commit'],
+      if (learningContract.isNotEmpty) 'learning_contract': learningContract,
       'simulation_contract': {
         'status': isCanonicalRulesExecution
             ? engineContract
@@ -242,6 +247,12 @@ class BattleReplayReadService {
           'rules_engine_priority': engine == 'xmage' ? 'primary' : 'secondary',
         'canonical_legality_source': false,
         'strategy_or_swap_proof': false,
+        'event_learning_grade':
+            learningContract.isEmpty ? 'not_declared' : 'visible_activity_only',
+        'named_draw_identity_available':
+            learningContract['named_draw_identity_available'] == true,
+        'ai_decision_rationale_available':
+            learningContract['ai_decision_rationale_available'] == true,
       },
     };
   }

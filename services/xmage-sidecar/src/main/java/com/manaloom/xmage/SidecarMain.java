@@ -21,13 +21,17 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.time.Instant;
+import java.util.UUID;
 
 public final class SidecarMain {
     static final String XMAGE_COMMIT = "34d81ea4995ce15d7e1a788dc6d2a3595d35bcec";
     static final String XMAGE_VERSION = "1.4.60";
 
     private static final Gson GSON = new Gson();
-    private static final int MAX_REQUEST_BYTES = 2 * 1024 * 1024;
+    static final int MAX_REQUEST_BYTES = 8 * 1024 * 1024;
+    static final String PROCESS_ID = UUID.randomUUID().toString();
+    static final String STARTED_AT = Instant.now().toString();
     private static final long DEFAULT_SIMULATION_TIMEOUT_MS = 120000L;
     private static final long MIN_SIMULATION_TIMEOUT_MS = 1000L;
     private static final long MAX_SIMULATION_TIMEOUT_MS = 900000L;
@@ -104,7 +108,9 @@ public final class SidecarMain {
                 simulation.cancel(true);
             }
             try {
-                send(exchange, 504, errorBody("simulation_timeout", error.getMessage()));
+                Map<String, Object> body = errorBody("simulation_timeout", error.getMessage());
+                body.put("restart_required", true);
+                send(exchange, 504, body);
             } finally {
                 restartAfterTimeout();
             }
@@ -194,7 +200,7 @@ public final class SidecarMain {
             while ((read = input.read(buffer)) >= 0) {
                 total += read;
                 if (total > MAX_REQUEST_BYTES) {
-                    throw new IllegalArgumentException("request body exceeds 2 MiB");
+                    throw new IllegalArgumentException("request body exceeds 8 MiB");
                 }
                 output.write(buffer, 0, read);
             }
@@ -203,12 +209,23 @@ public final class SidecarMain {
     }
 
     private static void send(HttpExchange exchange, int status, Object body) throws IOException {
-        byte[] payload = GSON.toJson(body).getBytes(StandardCharsets.UTF_8);
+        byte[] payload = GSON.toJson(withProcessMetadata(body)).getBytes(StandardCharsets.UTF_8);
         exchange.getResponseHeaders().set("Content-Type", "application/json; charset=utf-8");
         exchange.sendResponseHeaders(status, payload.length);
         try (OutputStream output = exchange.getResponseBody()) {
             output.write(payload);
         }
+    }
+
+    @SuppressWarnings("unchecked")
+    private static Object withProcessMetadata(Object body) {
+        if (!(body instanceof Map)) {
+            return body;
+        }
+        Map<String, Object> result = new LinkedHashMap<>((Map<String, Object>) body);
+        result.put("sidecar_process_id", PROCESS_ID);
+        result.put("sidecar_started_at", STARTED_AT);
+        return result;
     }
 
     private static Map<String, Object> errorBody(String code, String message) {

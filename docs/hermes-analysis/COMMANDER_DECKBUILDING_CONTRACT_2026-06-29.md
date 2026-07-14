@@ -40,6 +40,25 @@ template"; it is a planning order:
 12. validate by legal service, strategy matrix, goldfish/curve checks, battle
     gates, and replay traces, then iterate.
 
+Current-policy reconciliation on 2026-07-14 adds these guardrails:
+
+- the 2026-02-09 Commander update retains five brackets and the AND rule for
+  hybrid color identity;
+- `Biorhythm` and `Farewell` are Game Changers; `Lutri, the Spellchaser` is
+  legal in the deck but prohibited as a companion;
+- EDHREC synergy is inclusion for a commander/theme minus inclusion in that
+  color identity. It is a specificity signal, not a card-quality score;
+- 17Lands game/replay rows are useful for validating event schemas, sequencing,
+  casts, attacks, and damage, but their Limited population is not Commander
+  deck-strength truth;
+- public deck sites are evidence inputs only. Automated collection must obey
+  their terms and available export/API contracts.
+
+External battle engines add execution evidence, not deckbuilding intent. A
+candidate cannot win a swap gate unless the changed cards receive typed natural
+exposure. Forced access may diagnose a rule or interaction, but it cannot be
+counted as natural deck-performance proof.
+
 Canonical planning flow identifiers exposed by backend diagnostics:
 
 1. `format_legality_and_power_bracket`

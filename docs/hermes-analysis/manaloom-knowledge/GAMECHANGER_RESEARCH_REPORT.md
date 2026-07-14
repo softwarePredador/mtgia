@@ -1,5 +1,12 @@
 # Game Changer Research Report — Lacunas e Recomendações
 
+Status: `superseded_historical_evidence`.
+
+This generated 2026-06-06 report describes the retired SQLite research model,
+not current runtime behavior. Current membership and drift gates live in
+`GAME_CHANGERS.md` and `server/config/commander_game_changers.json`. Do not use
+the detection counts or SQLite fields below for product or deck decisions.
+
 <!-- DB_HASH: f232206364f9cb96846041e19fe33929 -->
 > Gerado automaticamente pelo cron `manaloom-gamechanger-research`.
 > Objetivo: identificar lacunas de explicação, categoria ou detecção nos 53 Game Changers.

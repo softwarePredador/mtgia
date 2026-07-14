@@ -182,6 +182,13 @@ void main() {
                 'engine_version': '1.4.60',
                 'engine_commit': 'pinned-commit',
                 'engine_contract': 'canonical_rules_execution',
+                'learning_contract': const {
+                  'schema_version': 'external_battle_learning_v1',
+                  'named_draw_identity_available': false,
+                  'visible_stack_activity_available': true,
+                  'ai_decision_rationale_available': false,
+                  'strategy_or_swap_proof': false,
+                },
                 'game_log': const [],
               },
               const {'engine': 'xmage'},
@@ -209,6 +216,18 @@ void main() {
       expect(
         replay['simulation_contract'],
         containsPair('advisory_only', false),
+      );
+      expect(
+        replay['simulation_contract'],
+        containsPair('event_learning_grade', 'visible_activity_only'),
+      );
+      expect(
+        replay['simulation_contract'],
+        containsPair('named_draw_identity_available', false),
+      );
+      expect(
+        replay['learning_contract'],
+        containsPair('schema_version', 'external_battle_learning_v1'),
       );
     });
 

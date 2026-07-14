@@ -25,6 +25,33 @@ tmp_request="$(mktemp)"
 tmp_result="$(mktemp)"
 trap 'rm -f "$tmp_request" "$tmp_result"' EXIT
 
+process_id() {
+  curl --silent --show-error --max-time 5 "$sidecar_url/health" 2>/dev/null |
+    jq -r '.sidecar_process_id // empty' 2>/dev/null
+}
+
+wait_for_replacement_process() {
+  local old_process_id="$1"
+  local attempts=0
+  local current_process_id=""
+  while (( attempts < 120 )); do
+    current_process_id="$(process_id || true)"
+    if [[ -n "$current_process_id" && "$current_process_id" != "$old_process_id" ]]; then
+      return 0
+    fi
+    sleep 1
+    attempts=$((attempts + 1))
+  done
+  echo "XMage sidecar did not expose a replacement process within 120 seconds" >&2
+  return 1
+}
+
+initial_process_id="$(process_id || true)"
+if [[ -z "$initial_process_id" ]]; then
+  echo "XMage sidecar is not ready or does not expose sidecar_process_id" >&2
+  exit 1
+fi
+
 printf 'seed\thttp_code\tstatus\tduration_ms\tturns\tevents\tsnapshots\terrors\twinner_deck_id\n' > "$output_file"
 for seed in $(seq 1 "$runs"); do
   jq \
@@ -48,6 +75,8 @@ for seed in $(seq 1 "$runs"); do
     printf '%s\t%s\tclient_error\t0\t0\t0\t0\t0\t\n' "$seed" "$http_code" >> "$output_file"
     continue
   fi
+  restart_required="$(jq -r '.restart_required // false' "$tmp_result")"
+  timed_out_process_id="$(jq -r '.sidecar_process_id // empty' "$tmp_result")"
   jq -r \
     --arg seed "$seed" \
     --arg http_code "$http_code" \
@@ -62,6 +91,13 @@ for seed in $(seq 1 "$runs"); do
       (.metrics.total_errors // 0),
       (.winner_deck_id // "")
     ] | @tsv' "$tmp_result" >> "$output_file"
+  if [[ "$restart_required" == "true" ]]; then
+    if [[ -z "$timed_out_process_id" ]]; then
+      echo "timeout response did not identify the process that must be replaced" >&2
+      exit 1
+    fi
+    wait_for_replacement_process "$timed_out_process_id"
+  fi
 done
 
 awk -F '\t' '

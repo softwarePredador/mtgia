@@ -5,12 +5,26 @@ import com.google.gson.JsonObject;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 final class XmageBattleServiceTest {
+    @Test
+    void sidecarPublishesAProcessIdentityAndAcceptsGlobalCorpusPayloads() {
+        assertEquals(8 * 1024 * 1024, SidecarMain.MAX_REQUEST_BYTES);
+        assertNotNull(SidecarMain.PROCESS_ID);
+        assertFalse(SidecarMain.PROCESS_ID.trim().isEmpty());
+        assertNotNull(SidecarMain.STARTED_AT);
+    }
+
     @Test
     void simulationTimeoutUsesTheSameBoundsAsTheBattleService() {
         JsonObject request = new JsonObject();
@@ -89,6 +103,47 @@ final class XmageBattleServiceTest {
         assertEquals(2, missing.get(0).get("input_index"));
     }
 
+    @Test
+    void replayEventsExposeVisibleCardActivityWithoutInventingHiddenDraws() {
+        Map<String, Object> solRingUntapped = replayCard("sol", "Sol Ring", false);
+        Map<String, Object> goblin = replayCard("goblin", "Goblin Token", false);
+        Map<String, Object> initial = replaySnapshot(
+                Arrays.asList(solRingUntapped, goblin),
+                Collections.emptyList(),
+                Collections.emptyList()
+        );
+
+        Map<String, Object> solRingTapped = replayCard("sol", "Sol Ring", true);
+        Map<String, Object> lightningBolt = replayCard("bolt", "Lightning Bolt", false);
+        Map<String, Object> combatGroup = new LinkedHashMap<>();
+        combatGroup.put("defender_id", "deck_b");
+        combatGroup.put("defender_name", "deck_b");
+        combatGroup.put("attackers", Collections.singletonList(goblin));
+        combatGroup.put("blockers", Collections.emptyList());
+        Map<String, Object> active = replaySnapshot(
+                Arrays.asList(solRingTapped, goblin),
+                Collections.singletonList(lightningBolt),
+                Collections.singletonList(combatGroup)
+        );
+
+        List<Map<String, Object>> events = ReplayNormalizer.events(
+                Collections.emptyList(),
+                Arrays.asList(initial, active)
+        );
+
+        assertTrue(hasAction(events, "tap_change", "Sol Ring"));
+        assertTrue(hasAction(events, "stack_entry", "Lightning Bolt"));
+        assertTrue(hasAction(events, "attacker_declared", "Goblin Token"));
+        assertFalse(hasAction(events, "battlefield_entry", "Sol Ring"));
+        assertFalse(events.stream().anyMatch(event -> "draw".equals(event.get("action"))));
+        Map<String, Object> stackEntry = events.stream()
+                .filter(event -> "stack_entry".equals(event.get("action")))
+                .findFirst()
+                .orElseThrow(AssertionError::new);
+        assertEquals("spell", stackEntry.get("stack_object_kind"));
+        assertEquals("visible_activity_only", stackEntry.get("learning_grade"));
+    }
+
     private static JsonObject deck(String name, JsonObject... cards) {
         JsonObject deck = new JsonObject();
         deck.addProperty("id", name);
@@ -107,5 +162,50 @@ final class XmageBattleServiceTest {
         card.addProperty("quantity", quantity);
         card.addProperty("is_commander", commander);
         return card;
+    }
+
+    private static Map<String, Object> replayCard(String id, String name, boolean tapped) {
+        Map<String, Object> card = new LinkedHashMap<>();
+        card.put("id", id);
+        card.put("name", name);
+        card.put("is_ability", false);
+        card.put("tapped", tapped);
+        card.put("damage", 0);
+        card.put("counters", Collections.emptyList());
+        return card;
+    }
+
+    private static Map<String, Object> replaySnapshot(
+            List<Map<String, Object>> battlefield,
+            List<Map<String, Object>> stack,
+            List<Map<String, Object>> combat
+    ) {
+        Map<String, Object> player = new LinkedHashMap<>();
+        player.put("name", "deck_a");
+        player.put("life", 40);
+        player.put("battlefield", battlefield);
+        player.put("graveyard", new ArrayList<>());
+        player.put("exile", new ArrayList<>());
+        player.put("command", new ArrayList<>());
+
+        Map<String, Object> snapshot = new LinkedHashMap<>();
+        snapshot.put("turn", 1);
+        snapshot.put("phase", "COMBAT");
+        snapshot.put("step", "DECLARE_ATTACKERS");
+        snapshot.put("active_player", "deck_a");
+        snapshot.put("players", Collections.singletonList(player));
+        snapshot.put("stack", stack);
+        snapshot.put("combat", combat);
+        return snapshot;
+    }
+
+    private static boolean hasAction(
+            List<Map<String, Object>> events,
+            String action,
+            String cardName
+    ) {
+        return events.stream().anyMatch(event ->
+                action.equals(event.get("action")) && cardName.equals(event.get("card_name"))
+        );
     }
 }

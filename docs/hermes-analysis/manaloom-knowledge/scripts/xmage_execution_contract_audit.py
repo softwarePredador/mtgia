@@ -75,6 +75,9 @@ def build_report() -> dict[str, object]:
                 "battleService.warmUp()",
                 'body.put("catalog_ready", true)',
                 'body.put("indexed_names", battleService.catalogSize())',
+                "MAX_REQUEST_BYTES = 8 * 1024 * 1024",
+                'body.put("restart_required", true)',
+                'result.put("sidecar_process_id", PROCESS_ID)',
                 "simulation.get(timeoutMs + HARD_TIMEOUT_GRACE_MS",
                 "simulation.cancel(true)",
                 "System.exit(70)",
@@ -103,6 +106,10 @@ def build_report() -> dict[str, object]:
                 'playerState.put("library_size"',
                 'event.put("card_name"',
                 'result.put("tapped"',
+                'snapshot.put("combat"',
+                '"stack_entry"',
+                '"attacker_declared"',
+                '"counter_change"',
             ],
         ),
         source_check(
@@ -151,6 +158,8 @@ def build_report() -> dict[str, object]:
                 '"/cards/coverage"',
                 '"/coverage"',
                 '"/simulate"',
+                "MAX_REQUEST_BYTES = 8 * 1024 * 1024",
+                '"learning_contract"',
             ],
         ),
         source_check(
@@ -324,6 +333,8 @@ def build_report() -> dict[str, object]:
                 "rules_engine_priority",
                 "canonical_legality_source",
                 "strategy_or_swap_proof",
+                "event_learning_grade",
+                "named_draw_identity_available",
             ],
         ),
         source_check(
@@ -342,6 +353,7 @@ def build_report() -> dict[str, object]:
                 "coverageReportsUnsupportedCardsWithoutDroppingThem",
                 "cardCoverageSupportsCatalogBatchesWithoutDeckShape",
                 "simulationTimeoutUsesTheSameBoundsAsTheBattleService",
+                "replayEventsExposeVisibleCardActivityWithoutInventingHiddenDraws",
             ],
         ),
         source_check(
@@ -359,6 +371,7 @@ def build_report() -> dict[str, object]:
             [
                 "test_parse_requires_real_game_result",
                 "test_parse_completed_game_and_card_use",
+                "test_global_corpus_payload_limit_and_process_identity",
             ],
         ),
         source_check(

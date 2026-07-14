@@ -21,7 +21,9 @@ from pathlib import Path
 from typing import Any
 
 
-MAX_REQUEST_BYTES = 2 * 1024 * 1024
+MAX_REQUEST_BYTES = 8 * 1024 * 1024
+PROCESS_ID = str(uuid.uuid4())
+STARTED_AT = datetime.now(timezone.utc).isoformat().replace("+00:00", "Z")
 MAX_LOG_EVENTS = 20_000
 PROCESS_TIMEOUT_GRACE_SECONDS = 5
 FORGE_VERSION = "2.0.14-SNAPSHOT"
@@ -301,6 +303,8 @@ class ForgeService:
             "engine_version": FORGE_VERSION,
             "engine_commit": self.forge_commit,
             "indexed_cards": len(self.card_index),
+            "sidecar_process_id": PROCESS_ID,
+            "sidecar_started_at": STARTED_AT,
         }
 
     def coverage(self, request: dict[str, Any]) -> dict[str, Any]:
@@ -482,6 +486,15 @@ def parse_simulation_output(
         "visual_snapshots": snapshots,
         "final_state": snapshots[-1] if snapshots else {"turn": turns},
         "unsupported_cards": [],
+        "decision_trace": [],
+        "learning_contract": {
+            "schema_version": "external_battle_learning_v1",
+            "named_draw_identity_available": False,
+            "visible_stack_activity_available": True,
+            "combat_activity_available": False,
+            "ai_decision_rationale_available": False,
+            "strategy_or_swap_proof": False,
+        },
         "metrics": {
             "event_count": len(events),
             "snapshot_count": len(snapshots),
@@ -628,7 +641,7 @@ class ForgeHandler(BaseHTTPRequestHandler):
         except ValueError as error:
             raise InvalidRequest("invalid content-length") from error
         if length < 1 or length > MAX_REQUEST_BYTES:
-            raise InvalidRequest("request body must be between 1 byte and 2 MiB")
+            raise InvalidRequest("request body must be between 1 byte and 8 MiB")
         try:
             value = json.loads(self.rfile.read(length))
         except (json.JSONDecodeError, UnicodeDecodeError) as error:
@@ -638,7 +651,12 @@ class ForgeHandler(BaseHTTPRequestHandler):
         return value
 
     def _send(self, status: int, body: dict[str, Any]) -> None:
-        payload = json.dumps(body, ensure_ascii=True, separators=(",", ":")).encode("utf-8")
+        response = {
+            **body,
+            "sidecar_process_id": body.get("sidecar_process_id", PROCESS_ID),
+            "sidecar_started_at": body.get("sidecar_started_at", STARTED_AT),
+        }
+        payload = json.dumps(response, ensure_ascii=True, separators=(",", ":")).encode("utf-8")
         try:
             self.send_response(status)
             self.send_header("content-type", "application/json; charset=utf-8")

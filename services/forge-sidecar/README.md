@@ -24,6 +24,15 @@ Endpoints:
 - `POST /coverage`
 - `POST /simulate`
 
+Request bodies are capped at 8 MiB so the current global card corpus can be
+checked in one bounded call. Every response exposes `sidecar_process_id` and
+`sidecar_started_at`.
+
+Forge logs expose visible casts and activations but do not provide AI rationale
+or a trustworthy named-draw trace. Results therefore publish
+`external_battle_learning_v1`, an empty `decision_trace`, and
+`strategy_or_swap_proof=false`.
+
 Local unit tests:
 
 ```bash

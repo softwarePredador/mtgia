@@ -266,6 +266,17 @@ final class XmageBattleService {
         result.put("visual_snapshots", snapshots);
         result.put("final_state", snapshots.isEmpty() ? null : snapshots.get(snapshots.size() - 1));
         result.put("unsupported_cards", new ArrayList<>());
+        result.put("decision_trace", new ArrayList<>());
+
+        Map<String, Object> learningContract = new LinkedHashMap<>();
+        learningContract.put("schema_version", "external_battle_learning_v1");
+        learningContract.put("named_draw_identity_available", false);
+        learningContract.put("visible_stack_activity_available", true);
+        learningContract.put("visible_battlefield_entries_available", true);
+        learningContract.put("combat_activity_available", true);
+        learningContract.put("ai_decision_rationale_available", false);
+        learningContract.put("strategy_or_swap_proof", false);
+        result.put("learning_contract", learningContract);
 
         Map<String, Object> metrics = new LinkedHashMap<>();
         metrics.put("event_count", events.size());
@@ -273,8 +284,39 @@ final class XmageBattleService {
         metrics.put("total_errors", finalView == null ? null : finalView.getTotalErrorsCount());
         metrics.put("total_effects", finalView == null ? null : finalView.getTotalEffectsCount());
         metrics.put("game_cycle", finalView == null ? null : finalView.getGameCycle());
+        metrics.put("semantic_event_count", countEvents(events, null));
+        metrics.put("visible_spells_cast", countEvents(events, "stack_entry", "spell"));
+        metrics.put("visible_abilities_activated", countEvents(events, "stack_entry", "ability"));
+        metrics.put("visible_battlefield_entries", countEvents(events, "battlefield_entry"));
+        metrics.put("attackers_declared", countEvents(events, "attacker_declared"));
+        metrics.put("decision_trace_count", 0);
         result.put("metrics", metrics);
         return result;
+    }
+
+    private int countEvents(List<Map<String, Object>> events, String action) {
+        int count = 0;
+        for (Map<String, Object> event : events) {
+            String eventAction = String.valueOf(event.get("action"));
+            if (action == null) {
+                if (ReplayNormalizer.isSemanticAction(eventAction)) {
+                    count++;
+                }
+            } else if (action.equals(eventAction)) {
+                count++;
+            }
+        }
+        return count;
+    }
+
+    private int countEvents(List<Map<String, Object>> events, String action, String stackObjectKind) {
+        int count = 0;
+        for (Map<String, Object> event : events) {
+            if (action.equals(event.get("action")) && stackObjectKind.equals(event.get("stack_object_kind"))) {
+                count++;
+            }
+        }
+        return count;
     }
 
     private PlayerView winner(GameView view) {
