@@ -73,6 +73,11 @@ Both sidecars expose:
 Both require exact 100-card Commander decks with one commander. Unsupported
 cards return HTTP `422`; timeouts return `504`.
 
+The public `/ai/simulate` battle route caps `timeout_ms` at 45 seconds and
+allows eight seconds for sidecar cleanup and HTTP delivery. This keeps the
+worst-case response below the production proxy deadline. Direct sidecar calls
+retain their wider timeout range for controlled offline benchmarks.
+
 XMage runs in-process beside its server, so timeout handling has two layers:
 
 - the sidecar indexes its card catalog before opening the HTTP port, so

@@ -12,6 +12,10 @@ import '../../../lib/ai/xmage_battle_client.dart';
 import '../../../lib/http_responses.dart';
 import '../../../lib/logger.dart';
 
+const _publicBattleDefaultTimeoutMs = 45000;
+const _publicBattleMaximumTimeoutMs = 45000;
+const _externalClientGraceMs = 8000;
+
 /// POST /ai/simulate
 /// Simula performance de um deck
 ///
@@ -91,9 +95,9 @@ Future<Response> onRequest(RequestContext context) async {
           : DateTime.now().microsecondsSinceEpoch % 2147483647;
       final timeoutMs = _normalizedSimulationCount(
         data['timeout_ms'],
-        defaultValue: 120000,
+        defaultValue: _publicBattleDefaultTimeoutMs,
         min: 1000,
-        max: 900000,
+        max: _publicBattleMaximumTimeoutMs,
       );
       final externalRequest = {
         'request_id': 'api-${DateTime.now().microsecondsSinceEpoch}',
@@ -129,7 +133,11 @@ Future<Response> onRequest(RequestContext context) async {
             },
           );
         } on ForgeServiceException catch (error) {
-          return _externalEngineFailure('forge', error.message);
+          return _externalEngineFailure(
+            'forge',
+            error.message,
+            upstreamStatusCode: error.statusCode,
+          );
         }
       } else {
         try {
@@ -161,10 +169,18 @@ Future<Response> onRequest(RequestContext context) async {
               xmageUnsupportedCards: error.unsupportedCards,
             );
           } on ForgeServiceException catch (forgeError) {
-            return _externalEngineFailure('forge', forgeError.message);
+            return _externalEngineFailure(
+              'forge',
+              forgeError.message,
+              upstreamStatusCode: forgeError.statusCode,
+            );
           }
         } on XmageServiceException catch (error) {
-          return _externalEngineFailure('xmage', error.message);
+          return _externalEngineFailure(
+            'xmage',
+            error.message,
+            upstreamStatusCode: error.statusCode,
+          );
         }
       }
 
@@ -455,7 +471,7 @@ Future<Map<String, dynamic>> _simulateXmage(
 ) async {
   final client = XmageBattleClient(
     baseUrl: sidecarUrl,
-    timeout: Duration(milliseconds: timeoutMs + 30000),
+    timeout: Duration(milliseconds: timeoutMs + _externalClientGraceMs),
   );
   try {
     return await client.simulate(request);
@@ -471,7 +487,7 @@ Future<Map<String, dynamic>> _simulateForge(
 ) async {
   final client = ForgeBattleClient(
     baseUrl: sidecarUrl,
-    timeout: Duration(milliseconds: timeoutMs + 45000),
+    timeout: Duration(milliseconds: timeoutMs + _externalClientGraceMs),
   );
   try {
     return await client.simulate(request);
@@ -525,12 +541,17 @@ Response _engineConfigurationFailure(
       },
     );
 
-Response _externalEngineFailure(String engine, String message) {
+Response _externalEngineFailure(
+  String engine,
+  String message, {
+  int? upstreamStatusCode,
+}) {
+  final timedOut = upstreamStatusCode == HttpStatus.gatewayTimeout;
   Log.e('$engine battle failed: $message');
   return Response.json(
-    statusCode: HttpStatus.badGateway,
+    statusCode: timedOut ? HttpStatus.gatewayTimeout : HttpStatus.badGateway,
     body: {
-      'error': '${engine}_unavailable',
+      'error': timedOut ? '${engine}_timeout' : '${engine}_unavailable',
       'details': message,
     },
   );

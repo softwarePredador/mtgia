@@ -273,7 +273,12 @@ def build_report() -> dict[str, object]:
                 "xmage_coverage_incomplete",
                 "forge_coverage_incomplete",
                 "manaloom_native_legacy",
-                "_externalEngineFailure('xmage'",
+                "return _externalEngineFailure(",
+                "_publicBattleDefaultTimeoutMs = 45000",
+                "_publicBattleMaximumTimeoutMs = 45000",
+                "_externalClientGraceMs = 8000",
+                "upstreamStatusCode == HttpStatus.gatewayTimeout",
+                "'${engine}_timeout'",
                 "winner_deck_id",
                 "turns_played",
                 "_simulationMetrics",
@@ -320,6 +325,7 @@ def build_report() -> dict[str, object]:
             [
                 "exposes unsupported cards",
                 "does not reinterpret sidecar failures",
+                "classifies a client deadline as gateway timeout",
             ],
         ),
         source_check(

@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:async';
 
 import 'package:http/http.dart' as http;
 import 'package:http/testing.dart';
@@ -71,6 +72,25 @@ void main() {
       throwsA(
         isA<XmageServiceException>()
             .having((error) => error.statusCode, 'status', 500),
+      ),
+    );
+  });
+
+  test('classifies a client deadline as gateway timeout', () async {
+    final client = XmageBattleClient(
+      baseUrl: 'http://xmage.internal:8080',
+      timeout: const Duration(milliseconds: 1),
+      client: MockClient((_) async {
+        await Future<void>.delayed(const Duration(milliseconds: 20));
+        return http.Response('{}', 200);
+      }),
+    );
+
+    await expectLater(
+      client.simulate({'seed': 42}),
+      throwsA(
+        isA<XmageServiceException>()
+            .having((error) => error.statusCode, 'status', 504),
       ),
     );
   });

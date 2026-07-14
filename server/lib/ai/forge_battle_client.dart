@@ -51,6 +51,7 @@ class ForgeBattleClient {
     } on TimeoutException {
       throw ForgeServiceException(
         'Forge simulation exceeded ${_timeout.inSeconds} seconds',
+        statusCode: 504,
       );
     } on http.ClientException catch (error) {
       throw ForgeServiceException('Forge request failed: ${error.message}');

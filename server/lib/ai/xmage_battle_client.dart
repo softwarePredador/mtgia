@@ -51,6 +51,7 @@ class XmageBattleClient {
     } on TimeoutException {
       throw XmageServiceException(
         'XMage simulation exceeded ${_timeout.inSeconds} seconds',
+        statusCode: 504,
       );
     } on http.ClientException catch (error) {
       throw XmageServiceException('XMage request failed: ${error.message}');
