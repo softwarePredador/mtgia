@@ -26,6 +26,26 @@ Arquivo-base:
 
 - `server/Dockerfile`
 
+## Sidecars de battle
+
+O runtime global de regras usa dois serviços internos, sem domínio público:
+
+- `evolution/xmage-sidecar`: executor primário pinado;
+- `evolution/forge-sidecar`: executor secundário para gaps estruturados XMage.
+
+O deploy coordenado é:
+
+```bash
+MANALOOM_EASYPANEL_INSECURE_TLS=1 \
+  scripts/manaloom_deploy_battle_sidecars.sh
+scripts/manaloom_deploy_backend_image.sh
+```
+
+O primeiro script só configura o backend com `BATTLE_ENGINE=auto` depois de os
+dois health checks internos passarem. As URLs internas são
+`http://xmage-sidecar:8080` e `http://forge-sidecar:8080`; os sidecars não devem
+ser publicados na internet.
+
 Comportamento atual:
 
 - build de produção via `dart_frog build`
@@ -115,6 +135,9 @@ Se o erro de archive voltar em outro serviço, validar nesta ordem:
 - `DB_PASS`
 - `JWT_SECRET`
 - `RATE_LIMIT_DISTRIBUTED=true`
+- `BATTLE_ENGINE=auto`
+- `XMAGE_SIDECAR_URL=http://xmage-sidecar:8080`
+- `FORGE_SIDECAR_URL=http://forge-sidecar:8080`
 
 ### Observabilidade
 

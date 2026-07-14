@@ -206,6 +206,12 @@ class BattleReplayReadService {
     final winnerLabel = gameLogMap['winner']?.toString();
     final gameLogType = gameLogMap['type']?.toString();
     final gameLogTurns = _toInt(gameLogMap['turns']);
+    final engine = gameLogMap['engine']?.toString();
+    final engineContract = gameLogMap['engine_contract']?.toString();
+    final isCanonicalRulesExecution =
+        (engine == 'xmage' && engineContract == 'canonical_rules_execution') ||
+            (engine == 'forge' &&
+                engineContract == 'canonical_rules_execution_secondary');
 
     return {
       ...summary,
@@ -221,9 +227,19 @@ class BattleReplayReadService {
       'events': events,
       'decision_trace': decisions,
       'visual_snapshots': visualSnapshots,
-      'simulation_contract': const {
-        'status': 'experimental_advisory',
-        'advisory_only': true,
+      if (engine != null && engine.isNotEmpty) 'engine': engine,
+      if (gameLogMap['engine_version'] != null)
+        'engine_version': gameLogMap['engine_version'],
+      if (gameLogMap['engine_commit'] != null)
+        'engine_commit': gameLogMap['engine_commit'],
+      'simulation_contract': {
+        'status': isCanonicalRulesExecution
+            ? engineContract
+            : 'experimental_advisory',
+        'advisory_only': !isCanonicalRulesExecution,
+        'canonical_rules_execution': isCanonicalRulesExecution,
+        if (isCanonicalRulesExecution)
+          'rules_engine_priority': engine == 'xmage' ? 'primary' : 'secondary',
         'canonical_legality_source': false,
         'strategy_or_swap_proof': false,
       },

@@ -19,6 +19,8 @@ Execution contract:
   all-card completion goal, current baseline, and stop criteria.
 - `NEW_SERVER_POSTGRES_WORKFLOW_2026-07-06.md` freezes the current PostgreSQL
   access target for local package apply/sync work on the new EasyPanel server.
+- `EXTERNAL_BATTLE_EXECUTION_CONTRACT.md` freezes the launch runtime order
+  XMage -> Forge -> explicit native residual and its evidence boundaries.
 - If the contract checkpoint passes, do not revalidate the full strategy again;
   rebuild the queue and continue family/subpattern work.
 
@@ -38,8 +40,8 @@ Use a staged source-and-gate pipeline:
    rulings, and hash inputs.
 2. Local XMage as the authoritative open rules-engine behavior source for any
    card with a resolvable local XMage class.
-3. Forge as a secondary implementation cross-check for ambiguous or high-risk
-   scopes.
+3. Pinned Forge as a secondary executable rules engine for structured XMage
+   coverage gaps and as an implementation cross-check for high-risk scopes.
 4. XMage signal extraction into source-authoritative adapter candidates and
    ManaLoom adapter work units.
 5. Exact-scope adapter/runtime support per family/subpattern.
@@ -47,11 +49,12 @@ Use a staged source-and-gate pipeline:
    precheck evidence.
 7. PostgreSQL -> Hermes/SQLite sync and replay/audit validation after apply.
 
-The definitive rule: resolved local XMage source is final behavior truth for
-that card. Broad XMage extraction may create source-authoritative adapter
-candidates in bulk, but a candidate becomes executable ManaLoom battle truth
-only when the matching runtime adapter exists and the PostgreSQL package passes
-precheck/apply/postcheck.
+The definitive rule has two distinct products. A pinned XMage or Forge battle
+is canonical external rules execution and does not require a native
+`card_battle_rules` row. A ManaLoom-native rule becomes executable PostgreSQL
+truth only when its matching runtime adapter exists and the package passes
+precheck/apply/postcheck. Never duplicate external coverage into PostgreSQL
+only to claim launch readiness.
 
 ## Global All-Card Scope
 
@@ -7362,16 +7365,18 @@ Use them downstream for strategy/deckbuilding, not for card-rule promotion.
 
 ### Forge-First Flow
 
-Rejected as primary, accepted as cross-check.
+Rejected as primary, accepted as secondary coverage executor and cross-check.
 
 Reason:
 
-- Forge is another Java rules engine, useful for disagreement analysis.
-- Using Forge as the main input doubles parser/modeling work while the current
-  blocker is already proven inside XMage -> ManaLoom mapping.
+- Forge is another Java rules engine, useful for executable XMage coverage gaps
+  and disagreement analysis.
+- It must not displace XMage as the primary executor or cause duplicate native
+  modeling work for cards already covered externally.
 
-Use it only when XMage signal extraction is ambiguous or a high-risk family
-needs a second engine reference.
+Use the pinned sidecar when XMage returns structured coverage gaps. Use Forge
+source as a modeling cross-check when XMage extraction is ambiguous or a
+high-risk native family needs a second reference.
 
 ## Current Evidence
 
@@ -7730,7 +7735,7 @@ PG -> Hermes sync.
 | Scryfall bulk | Oracle identity/text/rulings/layout/hash | No |
 | MTGJSON bulk | Secondary normalized card/ruling/legalities data | No |
 | XMage local source | Primary rules-engine reference and signal source | No, only candidates |
-| Forge source | Secondary engine cross-check | No, only candidates |
+| Forge pinned runtime/source | Secondary execution for XMage gaps and cross-check | Executes battles; does not promote PG rows |
 | 17Lands/logs/meta/community | Strategy/deckbuilding evidence | No |
 | Pattern registry | Shadow batching/test planning | No |
 
@@ -7789,7 +7794,7 @@ Input:
 
 - normalized card names;
 - local XMage root `/Users/desenvolvimentomobile/Downloads/mage-master`;
-- optional Forge reference for cross-check.
+- pinned Forge runtime/source for XMage coverage gaps and cross-check.
 
 Output:
 
@@ -7802,8 +7807,9 @@ Output:
 Rules:
 
 - Missing XMage source is an exception lane, not the main queue.
-- Forge is used only when XMage is ambiguous or a high-risk family needs a
-  second implementation reference.
+- Forge runtime is used when XMage returns a structured coverage gap. Forge
+  source is also used when XMage is ambiguous or a high-risk native family
+  needs a second implementation reference.
 
 ### Gate 3 - Family Routing
 

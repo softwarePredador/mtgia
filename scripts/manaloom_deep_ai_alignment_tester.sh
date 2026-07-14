@@ -62,6 +62,9 @@ run_auditors() {
   run_step "XMage strategy consistency audit" \
     "python3 \"$ROOT_DIR/docs/hermes-analysis/manaloom-knowledge/scripts/xmage_strategy_consistency_audit.py\" --output-prefix \"$REPORT_DIR/xmage_strategy_consistency_audit_${TS}_deep_ai_tester\""
 
+  run_step "XMage execution contract audit" \
+    "python3 \"$ROOT_DIR/docs/hermes-analysis/manaloom-knowledge/scripts/xmage_execution_contract_audit.py\" --output-prefix \"$REPORT_DIR/xmage_execution_contract_audit_${TS}_deep_ai_tester\""
+
   run_step "Operational surface alignment audit" \
     "python3 \"$ROOT_DIR/docs/hermes-analysis/manaloom-knowledge/scripts/operational_surface_alignment_audit.py\" --out-prefix \"$REPORT_DIR/operational_surface_alignment_audit_${TS}_deep_ai_tester\""
 

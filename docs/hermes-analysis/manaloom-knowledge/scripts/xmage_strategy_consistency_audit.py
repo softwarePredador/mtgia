@@ -1,10 +1,12 @@
 #!/usr/bin/env python3
-"""Audit whether the repo is aligned with the definitive XMage -> ManaLoom flow.
+"""Audit whether the repo is aligned with the definitive battle-rules flow.
 
 This is a governance audit, not a card-rule promoter. It checks that docs,
 scripts, and current evidence still agree on the 2026-06-29 operating model:
 
-- official rules / Oracle metadata / local XMage are source inputs;
+- official rules / Oracle metadata / pinned XMage and Forge are source inputs;
+- XMage is the primary external executor and Forge handles structured gaps;
+- external execution is separate from native PostgreSQL rule promotion;
 - broad XMage extraction creates review candidates only;
 - pattern registry rows stay shadow-only and non-executable;
 - generic ``xmage_*_review_v1`` scopes do not become PostgreSQL truth;
@@ -29,6 +31,7 @@ REPORT_DIR = REPO_ROOT / "docs/hermes-analysis/master_optimizer_reports"
 
 DEFAULT_DEFINITIVE_FLOW = REPO_ROOT / "docs/hermes-analysis/XMAGE_TO_MANALOOM_DEFINITIVE_FLOW_2026-06-29.md"
 DEFAULT_FROZEN_CONTRACT = REPO_ROOT / "docs/hermes-analysis/BATTLE_RULES_FAMILY_PIPELINE_CONTRACT_2026-06-29.md"
+DEFAULT_EXECUTION_CONTRACT = REPO_ROOT / "docs/hermes-analysis/EXTERNAL_BATTLE_EXECUTION_CONTRACT.md"
 DEFAULT_DOC_INDEX = REPO_ROOT / "docs/hermes-analysis/BATTLE_DOCUMENTATION_STATUS_INDEX_2026-06-19.md"
 DEFAULT_ROOT_README = REPO_ROOT / "docs/hermes-analysis/README.md"
 DEFAULT_REPORT_README = REPORT_DIR / "README.md"
@@ -154,9 +157,10 @@ def audit_docs(args: argparse.Namespace) -> list[Check]:
                 "BATTLE_RULES_FAMILY_PIPELINE_CONTRACT_2026-06-29.md",
                 "If the contract checkpoint passes",
                 "Local XMage as the authoritative open rules-engine behavior source",
-                "resolved local XMage source is final behavior truth",
+                "Pinned Forge as a secondary executable rules engine",
+                "A pinned XMage or Forge battle",
                 "source-authoritative adapter candidates",
-                "only when the matching runtime adapter exists",
+                "only when its matching runtime adapter exists",
                 "PostgreSQL remains the durable source of truth",
                 "Hermes is cache/runtime evidence, not truth",
                 "xmage_authoritative_adaptation_queue.py",
@@ -166,8 +170,24 @@ def audit_docs(args: argparse.Namespace) -> list[Check]:
             check_name="docs.definitive_flow_contract",
         ),
         contains_all(
+            Path(args.execution_contract),
+            [
+                "Status: `current_operating_standard`",
+                "pinned XMage is the primary rules executor",
+                "pinned Forge is tried only when XMage returns a structured coverage gap",
+                "does not create `card_battle_rules` rows",
+                "A completed battle proves the engine ran the two decks",
+                "33,080",
+                "1,212",
+            ],
+            check_name="docs.external_execution_contract",
+        ),
+        contains_all(
             Path(args.root_readme),
             [
+                "EXTERNAL_BATTLE_EXECUTION_CONTRACT.md",
+                "XMage pinado como executor primario",
+                "xmage_execution_contract_audit.py",
                 "BATTLE_RULES_FAMILY_PIPELINE_CONTRACT_2026-06-29.md",
                 "frozen_operating_contract",
                 "XMAGE_TO_MANALOOM_DEFINITIVE_FLOW_2026-06-29.md",
@@ -188,6 +208,8 @@ def audit_docs(args: argparse.Namespace) -> list[Check]:
         contains_all(
             Path(args.doc_index),
             [
+                "EXTERNAL_BATTLE_EXECUTION_CONTRACT.md",
+                "XMage primario, Forge secundario apenas para gap estruturado",
                 "BATTLE_RULES_FAMILY_PIPELINE_CONTRACT_2026-06-29.md",
                 "checkpoint curto de invariantes",
                 "XMAGE_TO_MANALOOM_DEFINITIVE_FLOW_2026-06-29.md",
@@ -493,6 +515,7 @@ def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--definitive-flow", default=str(DEFAULT_DEFINITIVE_FLOW))
     parser.add_argument("--frozen-contract", default=str(DEFAULT_FROZEN_CONTRACT))
+    parser.add_argument("--execution-contract", default=str(DEFAULT_EXECUTION_CONTRACT))
     parser.add_argument("--doc-index", default=str(DEFAULT_DOC_INDEX))
     parser.add_argument("--root-readme", default=str(DEFAULT_ROOT_README))
     parser.add_argument("--report-readme", default=str(DEFAULT_REPORT_README))

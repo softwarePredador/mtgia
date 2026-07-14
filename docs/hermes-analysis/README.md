@@ -4,7 +4,7 @@
 > Esta e a porta de entrada para decidir quais docs ler e quais ignorar em
 > tarefas Hermes.
 
-Updated: 2026-07-06
+Updated: 2026-07-14
 
 Esta pasta mistura contrato operacional, historico de auditoria, relatorios de
 rodadas e memorias antigas. Para evitar confusao, use esta ordem de leitura.
@@ -94,6 +94,17 @@ rodadas e memorias antigas. Para evitar confusao, use esta ordem de leitura.
 
 ## Decisoes atuais XMage -> ManaLoom
 
+- `EXTERNAL_BATTLE_EXECUTION_CONTRACT.md`
+  - Status: `current_operating_standard`.
+  - Contrato de runtime global para launch: XMage pinado como executor primario,
+    Forge pinado somente para gaps estruturados de cobertura XMage e
+    `manaloom_native_legacy` como residual explicito.
+  - Separa execucao externa de regras da adaptacao nativa em
+    `card_battle_rules`; batalha externa nao promove PostgreSQL e nao prova
+    legalidade, qualidade de deck ou uso individual sem evento/focused test.
+  - Auditoria ativa:
+    `manaloom-knowledge/scripts/xmage_execution_contract_audit.py`.
+
 - `BATTLE_RULES_FAMILY_PIPELINE_CONTRACT_2026-06-29.md`
   - Status: `frozen_operating_contract`.
   - Contrato congelado de seguimento: rode um checkpoint curto de invariantes e
@@ -115,7 +126,9 @@ rodadas e memorias antigas. Para evitar confusao, use esta ordem de leitura.
   - Define a hierarquia de fontes: regras oficiais + Scryfall/MTGJSON para
     identidade/oracle/rulings, XMage local como verdade de engine para cartas
     com classe resolvida,
-    Forge/Magarena/Cockatrice apenas como comparacao quando necessario,
+    Forge pinado como executor secundario para gaps estruturados XMage e como
+    comparacao de implementacao quando necessario; Magarena/Cockatrice seguem
+    apenas como referencia comparativa,
     PostgreSQL como fonte duravel e Hermes/SQLite como cache/lab.
   - Evidencia atual:
     `master_optimizer_reports/xmage_authoritative_adaptation_queue_20260701_post_pg323_creature_etb_add_counters_wave_commander_legal.md`.

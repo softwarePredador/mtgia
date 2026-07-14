@@ -148,6 +148,136 @@ void main() {
       expect(
           replay['simulation_contract'], containsPair('advisory_only', true));
     });
+
+    test('marks pinned XMage execution as canonical rules evidence', () async {
+      final pool = _ScriptedPool([
+        _result(rows: const [
+          [true],
+        ]),
+        _result(
+          columns: const [
+            'id',
+            'deck_a_id',
+            'deck_b_id',
+            'simulation_type',
+            'winner_deck_id',
+            'turns_played',
+            'game_log',
+            'metrics',
+            'created_at',
+            'deck_a_name',
+            'deck_b_name',
+          ],
+          rows: [
+            [
+              'sim-xmage',
+              'deck-1',
+              'deck-2',
+              'battle',
+              'deck-1',
+              8,
+              {
+                'type': 'battle',
+                'engine': 'xmage',
+                'engine_version': '1.4.60',
+                'engine_commit': 'pinned-commit',
+                'engine_contract': 'canonical_rules_execution',
+                'game_log': const [],
+              },
+              const {'engine': 'xmage'},
+              DateTime.utc(2026, 7, 14, 12),
+              'Lorehold',
+              'Atraxa',
+            ],
+          ],
+        ),
+      ]);
+      final service = BattleReplayReadService(pool);
+
+      final replay = await service.fetchReplay(
+        userId: 'user-1',
+        deckId: 'deck-1',
+        replayId: 'sim-xmage',
+      );
+
+      expect(replay!['engine'], 'xmage');
+      expect(replay['engine_commit'], 'pinned-commit');
+      expect(
+        replay['simulation_contract'],
+        containsPair('canonical_rules_execution', true),
+      );
+      expect(
+        replay['simulation_contract'],
+        containsPair('advisory_only', false),
+      );
+    });
+
+    test('marks pinned Forge execution as secondary canonical rules evidence',
+        () async {
+      final pool = _ScriptedPool([
+        _result(rows: const [
+          [true],
+        ]),
+        _result(
+          columns: const [
+            'id',
+            'deck_a_id',
+            'deck_b_id',
+            'simulation_type',
+            'winner_deck_id',
+            'turns_played',
+            'game_log',
+            'metrics',
+            'created_at',
+            'deck_a_name',
+            'deck_b_name',
+          ],
+          rows: [
+            [
+              'sim-forge',
+              'deck-1',
+              'deck-2',
+              'battle',
+              'deck-2',
+              10,
+              {
+                'type': 'battle',
+                'engine': 'forge',
+                'engine_version': '2.0.14-SNAPSHOT',
+                'engine_commit': 'pinned-forge-commit',
+                'engine_contract': 'canonical_rules_execution_secondary',
+                'game_log': const [],
+              },
+              const {'engine': 'forge'},
+              DateTime.utc(2026, 7, 14, 12),
+              'Lorehold',
+              'Korvold',
+            ],
+          ],
+        ),
+      ]);
+      final service = BattleReplayReadService(pool);
+
+      final replay = await service.fetchReplay(
+        userId: 'user-1',
+        deckId: 'deck-1',
+        replayId: 'sim-forge',
+      );
+
+      expect(replay!['engine'], 'forge');
+      expect(
+        replay['simulation_contract'],
+        containsPair('canonical_rules_execution', true),
+      );
+      expect(
+        replay['simulation_contract'],
+        containsPair('rules_engine_priority', 'secondary'),
+      );
+      expect(
+        replay['simulation_contract'],
+        containsPair('strategy_or_swap_proof', false),
+      );
+    });
   });
 }
 

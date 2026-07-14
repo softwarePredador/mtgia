@@ -1,0 +1,324 @@
+#!/usr/bin/env python3
+"""Audit XMage primary, Forge secondary, and explicit native fallback."""
+
+from __future__ import annotations
+
+import argparse
+import json
+from dataclasses import asdict, dataclass
+from pathlib import Path
+
+
+REPO_ROOT = Path(__file__).resolve().parents[4]
+SIDECAR = REPO_ROOT / "services/xmage-sidecar"
+FORGE_SIDECAR = REPO_ROOT / "services/forge-sidecar"
+SERVER = REPO_ROOT / "server"
+CONTRACT = REPO_ROOT / "docs/hermes-analysis/EXTERNAL_BATTLE_EXECUTION_CONTRACT.md"
+XMAGE_PIN = "34d81ea4995ce15d7e1a788dc6d2a3595d35bcec"
+FORGE_PIN = "a62915f500c2411484689294659c6bb84ea215f8"
+
+
+@dataclass(frozen=True)
+class Check:
+    name: str
+    status: str
+    detail: str
+
+
+def source_check(name: str, path: Path, required: list[str]) -> Check:
+    if not path.exists():
+        return Check(name, "fail", f"missing={path.relative_to(REPO_ROOT)}")
+    text = path.read_text(encoding="utf-8")
+    missing = [marker for marker in required if marker not in text]
+    if missing:
+        return Check(name, "fail", f"missing_markers={missing}")
+    return Check(name, "pass", str(path.relative_to(REPO_ROOT)))
+
+
+def source_absence_check(name: str, path: Path, forbidden: list[str]) -> Check:
+    if not path.exists():
+        return Check(name, "fail", f"missing={path.relative_to(REPO_ROOT)}")
+    text = path.read_text(encoding="utf-8")
+    present = [marker for marker in forbidden if marker in text]
+    if present:
+        return Check(name, "fail", f"forbidden_markers={present}")
+    return Check(name, "pass", str(path.relative_to(REPO_ROOT)))
+
+
+def build_report() -> dict[str, object]:
+    pin_file = SIDECAR / "XMAGE_COMMIT"
+    pin_value = pin_file.read_text(encoding="utf-8").strip() if pin_file.exists() else ""
+    forge_pin_file = FORGE_SIDECAR / "FORGE_COMMIT"
+    forge_pin_value = (
+        forge_pin_file.read_text(encoding="utf-8").strip()
+        if forge_pin_file.exists()
+        else ""
+    )
+    checks = [
+        Check(
+            "xmage.pin",
+            "pass" if pin_value == XMAGE_PIN else "fail",
+            f"expected={XMAGE_PIN} actual={pin_value or 'missing'}",
+        ),
+        source_check(
+            "sidecar.http_contract",
+            SIDECAR / "src/main/java/com/manaloom/xmage/SidecarMain.java",
+            [
+                XMAGE_PIN,
+                'createContext("/cards/coverage"',
+                'createContext("/coverage"',
+                'createContext("/simulate"',
+                '"xmage_coverage_incomplete"',
+                "send(exchange, 422",
+                "send(exchange, 504",
+            ],
+        ),
+        source_check(
+            "sidecar.strict_resolution",
+            SIDECAR / "src/main/java/com/manaloom/xmage/XmageBattleService.java",
+            [
+                "UnsupportedCardsException",
+                "unresolvedCards(deckKey)",
+                "throw new UnsupportedCardsException(missing)",
+                'result.put("unsupported_cards", unsupported)',
+                '"XMage completed with "',
+                "connectionUsername",
+            ],
+        ),
+        source_check(
+            "sidecar.replay_contract",
+            SIDECAR / "src/main/java/com/manaloom/xmage/ReplayNormalizer.java",
+            [
+                'playerState.put("hand_size"',
+                'playerState.put("library_size"',
+                'event.put("card_name"',
+                'result.put("tapped"',
+            ],
+        ),
+        source_check(
+            "sidecar.reproducible_image",
+            SIDECAR / "Dockerfile",
+            [
+                f"ARG XMAGE_COMMIT={XMAGE_PIN}",
+                'git checkout "$XMAGE_COMMIT"',
+                'test "$(git rev-parse HEAD)" = "$XMAGE_COMMIT"',
+                "sqlite-jdbc",
+                "mage-server.zip",
+            ],
+        ),
+        source_check(
+            "server.strict_client",
+            SERVER / "lib/ai/xmage_battle_client.dart",
+            [
+                "class XmageCoverageIncomplete",
+                "class XmageServiceException",
+                "response.statusCode == 422",
+                "xmage_coverage_incomplete",
+            ],
+        ),
+        Check(
+            "forge.pin",
+            "pass" if forge_pin_value == FORGE_PIN else "fail",
+            f"expected={FORGE_PIN} actual={forge_pin_value or 'missing'}",
+        ),
+        source_check(
+            "forge.strict_sidecar",
+            FORGE_SIDECAR / "sidecar.py",
+            [
+                "class CoverageIncomplete",
+                '"forge_coverage_incomplete"',
+                "UNSUPPORTED_CARD",
+                "GAME_RESULT_WIN",
+                "Forge returned no completed game result",
+                "Forge completed with {errors} engine errors",
+                "subprocess.run",
+                "SIMULATION_LOCK",
+                '"/cards/coverage"',
+                '"/coverage"',
+                '"/simulate"',
+            ],
+        ),
+        source_check(
+            "forge.reproducible_image",
+            FORGE_SIDECAR / "Dockerfile",
+            [
+                f"ARG FORGE_COMMIT={FORGE_PIN}",
+                'git checkout --detach "${FORGE_COMMIT}"',
+                'test "$(git rev-parse HEAD)" = "${FORGE_COMMIT}"',
+                "SeededForgeMain.java",
+                "xvfb-run -a java",
+            ],
+        ),
+        source_check(
+            "server.strict_forge_client",
+            SERVER / "lib/ai/forge_battle_client.dart",
+            [
+                "class ForgeCoverageIncomplete",
+                "class ForgeServiceException",
+                "response.statusCode == 422",
+                "forge_coverage_incomplete",
+            ],
+        ),
+        source_check(
+            "server.environment_contract",
+            SERVER / ".env.example",
+            [
+                "BATTLE_ENGINE=auto",
+                "XMAGE_SIDECAR_URL=http://xmage-sidecar:8080",
+                "FORGE_SIDECAR_URL=http://forge-sidecar:8080",
+            ],
+        ),
+        source_check(
+            "deployment.coordinated_sidecars",
+            REPO_ROOT / "scripts/manaloom_deploy_battle_sidecars.sh",
+            [
+                "HEAD must match origin/master before sidecar deploy",
+                "services.app.createService",
+                "services.app.updateSourceImage",
+                "http://$XMAGE_SERVICE:8080/health",
+                "http://$FORGE_SERVICE:8080/health",
+                "upsert_env \"$backend_env\" BATTLE_ENGINE auto",
+            ],
+        ),
+        source_check(
+            "server.engine_configuration",
+            SERVER / "lib/ai/battle_engine_config.dart",
+            [
+                "environment['BATTLE_ENGINE'] ?? 'auto'",
+                "XMAGE_SIDECAR_URL is required for BATTLE_ENGINE=$mode",
+                "FORGE_SIDECAR_URL is required for BATTLE_ENGINE=$mode",
+                "mode == 'native'",
+            ],
+        ),
+        source_check(
+            "server.engine_router",
+            SERVER / "routes/ai/simulate/index.dart",
+            [
+                "BattleEngineConfig.fromEnvironment",
+                "_engineConfigurationFailure",
+                "canonical_rules_execution",
+                "canonical_rules_execution_secondary",
+                "xmage_coverage_incomplete",
+                "forge_coverage_incomplete",
+                "manaloom_native_legacy",
+                "_externalEngineFailure('xmage'",
+                "winner_deck_id",
+                "turns_played",
+                "_simulationMetrics",
+            ],
+        ),
+        source_absence_check(
+            "server.no_silent_configuration_fallback",
+            SERVER / "routes/ai/simulate/index.dart",
+            ["forge_not_configured", "xmage_sidecar_not_configured"],
+        ),
+        source_check(
+            "server.replay_provenance",
+            SERVER / "lib/battle/battle_replay_read_service.dart",
+            [
+                "isCanonicalRulesExecution",
+                "canonical_rules_execution",
+                "canonical_rules_execution_secondary",
+                "rules_engine_priority",
+                "canonical_legality_source",
+                "strategy_or_swap_proof",
+            ],
+        ),
+        source_check(
+            "tests.server_engine_configuration",
+            SERVER / "test/battle_engine_config_test.dart",
+            [
+                "defaults to auto and requires the primary XMage sidecar",
+                "auto requires Forge instead of silently skipping the secondary lane",
+                "native is the only mode that does not require a sidecar",
+            ],
+        ),
+        source_check(
+            "tests.sidecar",
+            SIDECAR / "src/test/java/com/manaloom/xmage/XmageBattleServiceTest.java",
+            [
+                "coverageReportsUnsupportedCardsWithoutDroppingThem",
+                "cardCoverageSupportsCatalogBatchesWithoutDeckShape",
+            ],
+        ),
+        source_check(
+            "tests.server",
+            SERVER / "test/xmage_battle_client_test.dart",
+            [
+                "exposes unsupported cards",
+                "does not reinterpret sidecar failures",
+            ],
+        ),
+        source_check(
+            "tests.forge",
+            FORGE_SIDECAR / "test_sidecar.py",
+            [
+                "test_parse_requires_real_game_result",
+                "test_parse_completed_game_and_card_use",
+            ],
+        ),
+        source_check(
+            "tests.server_forge",
+            SERVER / "test/forge_battle_client_test.dart",
+            [
+                "exposes unsupported cards",
+                "does not reinterpret Forge process failures",
+            ],
+        ),
+        source_check(
+            "execution.contract",
+            CONTRACT,
+            [
+                "BATTLE_ENGINE=auto",
+                "XMAGE_SIDECAR_URL",
+                "FORGE_SIDECAR_URL",
+                "33,080",
+                "1,212",
+                "does not create `card_battle_rules` rows",
+            ],
+        ),
+    ]
+    failed = sum(check.status == "fail" for check in checks)
+    return {
+        "status": "pass" if failed == 0 else "fail",
+        "summary": {"checks": len(checks), "passed": len(checks) - failed, "failed": failed},
+        "checks": [asdict(check) for check in checks],
+        "mutations_performed": [],
+    }
+
+
+def render_markdown(report: dict[str, object]) -> str:
+    lines = [
+        "# External Battle Execution Contract Audit",
+        "",
+        f"- Status: `{report['status']}`",
+        f"- Summary: `{json.dumps(report['summary'], sort_keys=True)}`",
+        "",
+        "| Check | Status | Detail |",
+        "| --- | --- | --- |",
+    ]
+    for check in report["checks"]:
+        detail = str(check["detail"]).replace("|", "\\|")
+        lines.append(f"| `{check['name']}` | `{check['status']}` | {detail} |")
+    return "\n".join(lines) + "\n"
+
+
+def main() -> int:
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--output-prefix", required=True)
+    args = parser.parse_args()
+    report = build_report()
+    prefix = Path(args.output_prefix)
+    prefix.parent.mkdir(parents=True, exist_ok=True)
+    prefix.with_suffix(".json").write_text(
+        json.dumps(report, indent=2, sort_keys=True) + "\n",
+        encoding="utf-8",
+    )
+    prefix.with_suffix(".md").write_text(render_markdown(report), encoding="utf-8")
+    print(f"status={report['status']}")
+    print(f"summary={json.dumps(report['summary'], sort_keys=True)}")
+    return 0 if report["status"] == "pass" else 1
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())
