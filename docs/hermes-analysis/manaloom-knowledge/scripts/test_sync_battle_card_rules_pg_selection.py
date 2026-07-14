@@ -1316,6 +1316,63 @@ class SyncBattleCardRulesPgSelectionTests(unittest.TestCase):
         self.assertEqual(row[4], 2)
         self.assertEqual(row[5], "current-oracle-md5")
 
+    def test_pg_mirror_removes_curated_shadow_after_rule_leaves_reviewed_set(self) -> None:
+        with tempfile.TemporaryDirectory() as tmpdir:
+            sqlite_db = Path(tmpdir) / "knowledge.db"
+            with sqlite3.connect(sqlite_db) as conn:
+                sync_pg.battle_rule_registry.ensure_battle_card_rules(conn)
+                sync_pg.battle_rule_registry.upsert_battle_card_rule(
+                    conn,
+                    "High Noon",
+                    {"effect": "cast_limit", "max_spells_per_turn": 1},
+                    source="curated",
+                    confidence=0.95,
+                    review_status="verified",
+                    execution_status="auto",
+                    oracle_hash=None,
+                    logical_rule_key_value="battle_rule_v1:high-noon",
+                    rule_version=2,
+                )
+                conn.commit()
+
+            sync_pg.mirror_pg_rules_to_sqlite(
+                str(sqlite_db),
+                [
+                    {
+                        "normalized_name": "high noon",
+                        "card_name": "High Noon",
+                        "logical_rule_key": "battle_rule_v1:high-noon",
+                        "effect_json": {"effect": "generated_placeholder"},
+                        "deck_role_json": {"category": "unknown"},
+                        "source": "generated",
+                        "confidence": 0.5,
+                        "review_status": "needs_review",
+                        "execution_status": "auto",
+                        "rule_version": 1,
+                        "notes": "current PG row",
+                        "oracle_hash": "current-oracle-md5",
+                    }
+                ],
+                reviewed_rows=[],
+            )
+
+            with sqlite3.connect(sqlite_db) as conn:
+                row = conn.execute(
+                    """
+                    SELECT effect_json, source, confidence, review_status, rule_version, oracle_hash
+                    FROM battle_card_rules
+                    WHERE normalized_name = 'high noon'
+                      AND logical_rule_key = 'battle_rule_v1:high-noon'
+                    """
+                ).fetchone()
+
+        self.assertEqual(json.loads(row[0])["effect"], "generated_placeholder")
+        self.assertEqual(row[1], "generated")
+        self.assertEqual(row[2], 0.5)
+        self.assertEqual(row[3], "needs_review")
+        self.assertEqual(row[4], 1)
+        self.assertEqual(row[5], "current-oracle-md5")
+
 
 if __name__ == "__main__":
     unittest.main()

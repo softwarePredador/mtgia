@@ -241,6 +241,16 @@ def build_report() -> dict[str, object]:
             ],
         ),
         source_check(
+            "sqlite.stale_review_shadow_cleanup",
+            RULE_SYNC,
+            [
+                "def cleanup_stale_local_priority_shadows",
+                "if key is None or key in reviewed_keys:",
+                "SOURCE_PRIORITY.get(current_source, 0) <= incoming_priority",
+                "changed += cleanup_stale_local_priority_shadows(",
+            ],
+        ),
+        source_check(
             "server.engine_configuration",
             SERVER / "lib/ai/battle_engine_config.dart",
             [

@@ -1082,6 +1082,57 @@ def cleanup_sqlite_rows_absent_from_runtime_rows(
     return changed
 
 
+def cleanup_stale_local_priority_shadows(
+    conn: sqlite3.Connection,
+    pg_rows: list[dict[str, Any]],
+    reviewed_rows: list[dict[str, Any]],
+) -> int:
+    """Remove local high-priority rows no longer backed by reviewed inventory.
+
+    A formerly reviewed key can later return to generated-only status in PG.
+    Source-priority protection must not let that stale local row keep shadowing
+    the current PG source after it leaves the versioned reviewed set.
+    """
+    reviewed_keys = {
+        key
+        for row in reviewed_rows
+        if str(row.get("source") or "") in {"curated", "manual"}
+        for key in [runtime_rule_key(row)]
+        if key is not None
+    }
+    deleted = 0
+    for row in pg_rows:
+        key = runtime_rule_key(row)
+        if key is None or key in reviewed_keys:
+            continue
+        normalized_name, logical_rule_key = key
+        incoming_source = str(row.get("source") or "")
+        incoming_priority = SOURCE_PRIORITY.get(incoming_source, 0)
+        current = conn.execute(
+            """
+            SELECT source
+            FROM battle_card_rules
+            WHERE normalized_name = ? AND logical_rule_key = ?
+            """,
+            (normalized_name, logical_rule_key),
+        ).fetchone()
+        if current is None:
+            continue
+        current_source = str(current[0] or "")
+        if SOURCE_PRIORITY.get(current_source, 0) <= incoming_priority:
+            continue
+        deleted += conn.execute(
+            """
+            DELETE FROM battle_card_rules
+            WHERE normalized_name = ? AND logical_rule_key = ?
+            """,
+            (normalized_name, logical_rule_key),
+        ).rowcount or 0
+    if deleted:
+        battle_rule_registry._invalidate_rule_caches_for_connection(conn)
+    return int(deleted)
+
+
 def mirror_pg_rules_to_sqlite(
     sqlite_db: str,
     rows: list[dict[str, Any]],
@@ -1103,6 +1154,11 @@ def mirror_pg_rules_to_sqlite(
         battle_rule_registry.ensure_battle_card_rules(conn)
         cleanup_obsolete_manual_rows(conn)
         cleanup_stale_reviewed_rows(conn, reviewed_rows or [])
+        changed += cleanup_stale_local_priority_shadows(
+            conn,
+            filtered_rows,
+            reviewed_rows or [],
+        )
         changed += cleanup_sqlite_rows_absent_from_runtime_rows(
             conn,
             runtime_rows,
