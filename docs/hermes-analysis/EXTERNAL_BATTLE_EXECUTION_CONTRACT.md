@@ -69,6 +69,9 @@ XMage runs in-process beside its server, so timeout handling has two layers:
 - the sidecar indexes its card catalog before opening the HTTP port, so
   `GET /health` with `catalog_ready=true` is a readiness signal rather than a
   process-only liveness signal;
+- bulk `/cards/coverage` uses XMage's loaded name index instead of issuing one
+  H2 lookup per input row; deck validation and simulation still resolve real
+  `CardInfo` objects;
 - the battle loop stops at the requested timeout without waiting on synchronous
   table/session cleanup;
 - an HTTP watchdog cancels any execution that does not return within a

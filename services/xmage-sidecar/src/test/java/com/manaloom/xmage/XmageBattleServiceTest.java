@@ -70,6 +70,9 @@ final class XmageBattleServiceTest {
         JsonObject supported = card("Sol Ring", 1, false);
         supported.addProperty("card_id", "supported-id");
         cards.add(supported);
+        JsonObject split = card("Fire // Ice", 1, false);
+        split.addProperty("card_id", "split-id");
+        cards.add(split);
         JsonObject unsupported = card("Molecule Man", 1, false);
         unsupported.addProperty("card_id", "unsupported-id");
         cards.add(unsupported);
@@ -79,11 +82,11 @@ final class XmageBattleServiceTest {
         List<Map<String, Object>> missing =
                 (List<Map<String, Object>>) coverage.get("unsupported_cards");
 
-        assertEquals(2, coverage.get("total"));
-        assertEquals(1, coverage.get("supported"));
+        assertEquals(3, coverage.get("total"));
+        assertEquals(2, coverage.get("supported"));
         assertEquals(1, coverage.get("unsupported"));
         assertEquals("unsupported-id", missing.get(0).get("card_id"));
-        assertEquals(1, missing.get(0).get("input_index"));
+        assertEquals(2, missing.get(0).get("input_index"));
     }
 
     private static JsonObject deck(String name, JsonObject... cards) {

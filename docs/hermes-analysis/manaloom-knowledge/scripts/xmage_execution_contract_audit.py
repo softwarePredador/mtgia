@@ -73,6 +73,7 @@ def build_report() -> dict[str, object]:
                 "send(exchange, 504",
                 "battleService.warmUp()",
                 'body.put("catalog_ready", true)',
+                'body.put("indexed_names", battleService.catalogSize())',
                 "simulation.get(timeoutMs + HARD_TIMEOUT_GRACE_MS",
                 "simulation.cancel(true)",
                 "System.exit(70)",
@@ -83,6 +84,8 @@ def build_report() -> dict[str, object]:
             SIDECAR / "src/main/java/com/manaloom/xmage/XmageBattleService.java",
             [
                 "UnsupportedCardsException",
+                "CardRepository.instance.getNames()",
+                "availableCardNames.contains(name)",
                 "unresolvedCards(deckKey)",
                 "throw new UnsupportedCardsException(missing)",
                 'result.put("unsupported_cards", unsupported)',

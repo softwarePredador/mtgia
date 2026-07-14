@@ -6,12 +6,15 @@ reported and are never removed from a deck.
 
 ## HTTP contract
 
-- `GET /health`: engine version, pinned commit, and `catalog_ready=true` after
-  the card catalog has been indexed.
+- `GET /health`: engine version, pinned commit, `catalog_ready=true`, and the
+  indexed name count after the card catalog has been loaded.
 - `POST /coverage`: validates two 100-card, one-commander decks and returns
   `ready` plus structured `unsupported_cards`.
 - `POST /cards/coverage`: batch-checks arbitrary catalog rows without requiring
-  decks; this is the queue gate for the global card corpus.
+  decks; this is the queue gate for the global card corpus. It uses XMage's
+  in-memory name index; deck validation and simulation still resolve concrete
+  `CardInfo` objects. Full multi-face names use exact repository resolution as
+  a compatibility fallback because XMage's name index stores individual faces.
 - `POST /simulate`: runs a covered battle. Coverage failures return HTTP 422;
   execution timeouts return HTTP 504.
 

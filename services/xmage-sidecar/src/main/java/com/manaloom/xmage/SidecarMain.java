@@ -63,6 +63,7 @@ public final class SidecarMain {
             body.put("xmage_host", xmageHost);
             body.put("xmage_port", xmagePort);
             body.put("catalog_ready", true);
+            body.put("indexed_names", battleService.catalogSize());
             send(exchange, 200, body);
         });
         server.createContext("/cards/coverage", exchange -> handleCardCoverage(exchange, battleService));

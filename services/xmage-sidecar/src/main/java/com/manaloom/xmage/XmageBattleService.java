@@ -26,10 +26,13 @@ import mage.view.TableView;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.TimeoutException;
 import java.util.concurrent.locks.ReentrantLock;
@@ -39,6 +42,7 @@ final class XmageBattleService {
     private static final String DECK_TYPE = "Variant Magic - Freeform Commander";
     private static final ReentrantLock SIMULATION_LOCK = new ReentrantLock();
     private static volatile boolean cardDatabaseReady;
+    private static volatile Set<String> availableCardNames = Collections.emptySet();
 
     private final String host;
     private final int port;
@@ -50,6 +54,11 @@ final class XmageBattleService {
 
     void warmUp() {
         ensureCardDatabase();
+    }
+
+    int catalogSize() {
+        ensureCardDatabase();
+        return availableCardNames.size();
     }
 
     Map<String, Object> simulate(JsonObject request) throws Exception {
@@ -95,7 +104,7 @@ final class XmageBattleService {
         for (JsonElement row : rows) {
             JsonObject cardRow = row.getAsJsonObject();
             CardInput card = CardInput.parse(cardRow);
-            if (card.resolve() == null) {
+            if (!card.isAvailable()) {
                 Map<String, Object> missing = card.unsupported(null);
                 missing.put("input_index", index);
                 if (cardRow.has("card_id") && !cardRow.get("card_id").isJsonNull()) {
@@ -317,6 +326,11 @@ final class XmageBattleService {
     private static synchronized void ensureCardDatabase() {
         if (!cardDatabaseReady) {
             CardScanner.scan();
+            Set<String> names = new HashSet<>(CardRepository.instance.getNames());
+            if (names.isEmpty()) {
+                throw new IllegalStateException("XMage card catalog is empty after scan");
+            }
+            availableCardNames = Collections.unmodifiableSet(names);
             cardDatabaseReady = true;
         }
     }
@@ -471,6 +485,11 @@ final class XmageBattleService {
                 resolved = CardRepository.instance.findPreferredCoreExpansionCard(name, setCode);
             }
             return resolved;
+        }
+
+        boolean isAvailable() {
+            return availableCardNames.contains(name)
+                    || (name.contains(" // ") && resolve() != null);
         }
 
         Map<String, Object> unsupported(String deckKey) {
