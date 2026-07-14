@@ -71,6 +71,9 @@ def build_report() -> dict[str, object]:
                 '"xmage_coverage_incomplete"',
                 "send(exchange, 422",
                 "send(exchange, 504",
+                "simulation.get(timeoutMs + HARD_TIMEOUT_GRACE_MS",
+                "simulation.cancel(true)",
+                "System.exit(70)",
             ],
         ),
         source_check(
@@ -83,6 +86,7 @@ def build_report() -> dict[str, object]:
                 'result.put("unsupported_cards", unsupported)',
                 '"XMage completed with "',
                 "connectionUsername",
+                "if (!timedOut)",
             ],
         ),
         source_check(
@@ -252,6 +256,7 @@ def build_report() -> dict[str, object]:
             [
                 "coverageReportsUnsupportedCardsWithoutDroppingThem",
                 "cardCoverageSupportsCatalogBatchesWithoutDeckShape",
+                "simulationTimeoutUsesTheSameBoundsAsTheBattleService",
             ],
         ),
         source_check(

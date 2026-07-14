@@ -14,6 +14,10 @@ reported and are never removed from a deck.
 - `POST /simulate`: runs a covered battle. Coverage failures return HTTP 422;
   execution timeouts return HTTP 504.
 
+Simulation timeout is a hard process boundary. The HTTP watchdog allows a
+five-second cleanup grace, returns `504`, and exits the sidecar so the container
+restarts both XMage processes. A timed-out engine state is never reused.
+
 The request contains `request_id`, `seed`, `timeout_ms`, `deck_a`, and `deck_b`.
 Each deck contains `id`, `name`, and card rows with `name`, `set_code`,
 `collector_number`, `quantity`, and `is_commander`.

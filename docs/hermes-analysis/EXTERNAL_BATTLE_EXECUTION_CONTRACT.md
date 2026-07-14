@@ -61,6 +61,16 @@ Both sidecars expose:
 Both require exact 100-card Commander decks with one commander. Unsupported
 cards return HTTP `422`; timeouts return `504`.
 
+XMage runs in-process beside its server, so timeout handling has two layers:
+
+- the battle loop stops at the requested timeout without waiting on synchronous
+  table/session cleanup;
+- an HTTP watchdog cancels any execution that does not return within a
+  five-second cleanup grace, sends `504`, and exits the sidecar so the container
+  restarts both XMage processes from a clean state.
+
+A timed-out XMage process is therefore never reused for another battle.
+
 Forge has additional guards because its official CLI can exit `0` after
 omitting an unsupported card or failing to load a deck:
 

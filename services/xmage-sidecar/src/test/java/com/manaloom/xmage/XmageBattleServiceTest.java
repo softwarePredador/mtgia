@@ -12,6 +12,21 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 
 final class XmageBattleServiceTest {
     @Test
+    void simulationTimeoutUsesTheSameBoundsAsTheBattleService() {
+        JsonObject request = new JsonObject();
+        assertEquals(120000L, SidecarMain.simulationTimeoutMillis(request));
+
+        request.addProperty("timeout_ms", 0L);
+        assertEquals(1000L, SidecarMain.simulationTimeoutMillis(request));
+
+        request.addProperty("timeout_ms", 45000L);
+        assertEquals(45000L, SidecarMain.simulationTimeoutMillis(request));
+
+        request.addProperty("timeout_ms", 1000000L);
+        assertEquals(900000L, SidecarMain.simulationTimeoutMillis(request));
+    }
+
+    @Test
     void connectionUsernameAlwaysHasASafeSuffix() {
         assertEquals("ml_request", XmageBattleService.connectionUsername("---"));
         assertEquals("ml_abc12345", XmageBattleService.connectionUsername("abc-12345-xyz"));

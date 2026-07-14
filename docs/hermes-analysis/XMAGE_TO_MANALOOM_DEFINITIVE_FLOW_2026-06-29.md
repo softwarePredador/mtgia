@@ -56,6 +56,11 @@ truth only when its matching runtime adapter exists and the package passes
 precheck/apply/postcheck. Never duplicate external coverage into PostgreSQL
 only to claim launch readiness.
 
+External execution must also fail closed operationally. XMage timeouts return
+`504` and recycle the sidecar/container before another request; Forge isolates
+each simulation in a process and kills it at the outer timeout. Neither timeout
+may become a native-success fallback.
+
 ## Global All-Card Scope
 
 As of 2026-07-01, card-rule acceleration is global over every PostgreSQL

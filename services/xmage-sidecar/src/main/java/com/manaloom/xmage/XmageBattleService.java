@@ -195,15 +195,17 @@ final class XmageBattleService {
                     System.currentTimeMillis() - startedAt
             );
         } finally {
-            if (roomId != null && tableId != null) {
+            if (!timedOut) {
+                if (roomId != null && tableId != null) {
+                    try {
+                        session.removeTable(roomId, tableId);
+                    } catch (Throwable ignored) {
+                    }
+                }
                 try {
-                    session.removeTable(roomId, tableId);
+                    session.connectStop(false, false);
                 } catch (Throwable ignored) {
                 }
-            }
-            try {
-                session.connectStop(false, false);
-            } catch (Throwable ignored) {
             }
         }
     }

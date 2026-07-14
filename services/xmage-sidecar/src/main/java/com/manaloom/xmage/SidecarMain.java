@@ -14,8 +14,13 @@ import java.net.InetSocketAddress;
 import java.nio.charset.StandardCharsets;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 public final class SidecarMain {
     static final String XMAGE_COMMIT = "34d81ea4995ce15d7e1a788dc6d2a3595d35bcec";
@@ -23,6 +28,16 @@ public final class SidecarMain {
 
     private static final Gson GSON = new Gson();
     private static final int MAX_REQUEST_BYTES = 2 * 1024 * 1024;
+    private static final long DEFAULT_SIMULATION_TIMEOUT_MS = 120000L;
+    private static final long MIN_SIMULATION_TIMEOUT_MS = 1000L;
+    private static final long MAX_SIMULATION_TIMEOUT_MS = 900000L;
+    private static final long HARD_TIMEOUT_GRACE_MS = 5000L;
+    private static final AtomicBoolean RESTART_SCHEDULED = new AtomicBoolean();
+    private static final ExecutorService SIMULATION_EXECUTOR = Executors.newSingleThreadExecutor(task -> {
+        Thread thread = new Thread(task, "xmage-simulation");
+        thread.setDaemon(true);
+        return thread;
+    });
 
     private SidecarMain() {
     }
@@ -63,9 +78,18 @@ public final class SidecarMain {
             return;
         }
 
+        Future<Map<String, Object>> simulation = null;
         try {
             JsonObject request = JsonParser.parseString(readBody(exchange)).getAsJsonObject();
-            send(exchange, 200, battleService.simulate(request));
+            long timeoutMs = simulationTimeoutMillis(request);
+            simulation = SIMULATION_EXECUTOR.submit(() -> battleService.simulate(request));
+            Map<String, Object> result;
+            try {
+                result = simulation.get(timeoutMs + HARD_TIMEOUT_GRACE_MS, TimeUnit.MILLISECONDS);
+            } catch (ExecutionException error) {
+                throw unwrapSimulationFailure(error);
+            }
+            send(exchange, 200, result);
         } catch (XmageBattleService.UnsupportedCardsException error) {
             Map<String, Object> body = errorBody("xmage_coverage_incomplete", error.getMessage());
             body.put("unsupported_cards", error.getUnsupportedCards());
@@ -73,11 +97,53 @@ public final class SidecarMain {
         } catch (IllegalArgumentException error) {
             send(exchange, 400, errorBody("invalid_request", error.getMessage()));
         } catch (TimeoutException error) {
-            send(exchange, 504, errorBody("simulation_timeout", error.getMessage()));
+            if (simulation != null) {
+                simulation.cancel(true);
+            }
+            try {
+                send(exchange, 504, errorBody("simulation_timeout", error.getMessage()));
+            } finally {
+                restartAfterTimeout();
+            }
         } catch (Exception error) {
             error.printStackTrace(System.err);
             send(exchange, 500, errorBody("simulation_failed", error.getMessage()));
         }
+    }
+
+    static long simulationTimeoutMillis(JsonObject request) {
+        long requested = request.has("timeout_ms") && !request.get("timeout_ms").isJsonNull()
+                ? request.get("timeout_ms").getAsLong()
+                : DEFAULT_SIMULATION_TIMEOUT_MS;
+        return Math.max(MIN_SIMULATION_TIMEOUT_MS, Math.min(requested, MAX_SIMULATION_TIMEOUT_MS));
+    }
+
+    private static Exception unwrapSimulationFailure(ExecutionException error) {
+        Throwable cause = error.getCause();
+        if (cause instanceof Exception) {
+            return (Exception) cause;
+        }
+        if (cause instanceof Error) {
+            throw (Error) cause;
+        }
+        return error;
+    }
+
+    private static void restartAfterTimeout() {
+        if (!RESTART_SCHEDULED.compareAndSet(false, true)) {
+            return;
+        }
+        Thread restart = new Thread(() -> {
+            try {
+                Thread.sleep(1000L);
+            } catch (InterruptedException ignored) {
+                Thread.currentThread().interrupt();
+            }
+            System.err.println("Restarting XMage sidecar after simulation timeout");
+            System.exit(70);
+        }, "xmage-timeout-restart");
+        restart.setDaemon(false);
+        restart.start();
     }
 
     private static void handleCoverage(HttpExchange exchange, XmageBattleService battleService)
