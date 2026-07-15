@@ -9,6 +9,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 import sqlite3
 import subprocess
 import sys
@@ -27,7 +28,12 @@ from master_optimizer_common import (
 SCRIPT_DIR = Path(__file__).resolve().parent
 REPO_ROOT = SCRIPT_DIR.parents[3]
 DOCS_DIR = REPO_ROOT / "docs" / "hermes-analysis"
-REPORT_DIR = DOCS_DIR / "master_optimizer_reports"
+REPORT_DIR = Path(
+    os.environ.get(
+        "MANALOOM_MASTER_OPTIMIZER_REPORT_DIR",
+        str(DOCS_DIR / "master_optimizer_reports"),
+    )
+)
 
 DEFAULT_DB = resolve_default_knowledge_db()
 DEFAULT_BATTLE = SCRIPT_DIR / "battle_analyst_v9.py"
