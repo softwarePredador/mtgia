@@ -44442,6 +44442,8 @@ def activate_wish_counter_tutor_artifact(
     *,
     phase="precombat_main",
 ):
+    if not isinstance(permanent, dict):
+        return False
     if phase not in MAIN_PHASES or permanent not in getattr(player, "battlefield", []):
         return False
     if not permanent.get("activated_wish_counter_tutor_to_hand"):

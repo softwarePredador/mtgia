@@ -185,6 +185,20 @@ def test_wishclaw_enters_with_counters_then_tutors_and_transfers_control():
     )
 
 
+def test_wishclaw_scanner_ignores_legacy_non_mapping_battlefield_entries():
+    active = battle.Player("Active", None, [])
+    opponent = battle.Player("Opponent", None, [])
+    active.battlefield.append("legacy_fixture_permanent")
+
+    assert not battle.activate_wish_counter_tutor_artifact(
+        active,
+        [opponent],
+        active.battlefield[0],
+        turn=1,
+        rng=random.Random(5),
+    )
+
+
 def test_forensic_registry_accepts_only_now_executable_pending_effects():
     for effect in {
         "aura_static_attachment",
