@@ -1120,7 +1120,7 @@
     "review_status": "verified",
     "source": "curated"
   },
-  "Birgi, God of Storytelling // Harnfel, Horn of Bounty": {
+  "Birgi, God of Storytelling": {
     "confidence": 0.94,
     "deck_role_json": {
       "category": "ramp",

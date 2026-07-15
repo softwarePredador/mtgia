@@ -324,10 +324,7 @@ class ReviewedBattleCardRulesTests(unittest.TestCase):
         self.assertIn("Aven Mindcensor", by_name)
         self.assertIn("Basking Broodscale", by_name)
         self.assertIn("Big Score", by_name)
-        self.assertIn(
-            "Birgi, God of Storytelling // Harnfel, Horn of Bounty",
-            by_name,
-        )
+        self.assertIn("Birgi, God of Storytelling", by_name)
         self.assertIn("Blind Obedience", by_name)
         self.assertIn("Breena, the Demagogue", by_name)
         self.assertIn("Chrome Mox", by_name)
@@ -644,7 +641,7 @@ class ReviewedBattleCardRulesTests(unittest.TestCase):
         self.assertEqual(by_name["Basking Broodscale"]["review_status"], "active")
         self.assertEqual(by_name["Basking Broodscale"]["effect_json"]["effect"], "creature")
         self.assertTrue(by_name["Basking Broodscale"]["effect_json"]["is_creature_permanent"])
-        birgi = by_name["Birgi, God of Storytelling // Harnfel, Horn of Bounty"]
+        birgi = by_name["Birgi, God of Storytelling"]
         self.assertEqual(birgi["source"], "curated")
         self.assertEqual(birgi["effect_json"]["effect"], "ramp_engine")
         self.assertEqual(
@@ -1132,7 +1129,7 @@ class ReviewedBattleCardRulesTests(unittest.TestCase):
         )
         self.assertEqual(by_name["Arcane Endeavor"]["source"], "curated")
         self.assertEqual(by_name["Arcane Endeavor"]["effect_json"]["effect"], "draw_cards")
-        birgi = by_name["Birgi, God of Storytelling // Harnfel, Horn of Bounty"]
+        birgi = by_name["Birgi, God of Storytelling"]
         self.assertEqual(birgi["source"], "curated")
         self.assertEqual(birgi["effect_json"]["effect"], "ramp_engine")
         self.assertEqual(
