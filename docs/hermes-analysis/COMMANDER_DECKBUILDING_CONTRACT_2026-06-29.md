@@ -59,6 +59,13 @@ candidate cannot win a swap gate unless the changed cards receive typed natural
 exposure. Forced access may diagnose a rule or interaction, but it cannot be
 counted as natural deck-performance proof.
 
+External replay events are positive lower-bound evidence. Event absence is not
+proof of non-use, and an equal XMage seed is not a byte-identical replay
+contract. Candidate/base gates must record engine commit, sidecar process ID,
+seed cohort, timeout/censoring, and positive exposure; an unexposed changed card
+routes to more natural trials or a labelled forced-access diagnostic, never to
+a negative card-quality conclusion.
+
 Canonical planning flow identifiers exposed by backend diagnostics:
 
 1. `format_legality_and_power_bracket`

@@ -493,6 +493,9 @@ def parse_simulation_output(
             "visible_stack_activity_available": True,
             "combat_activity_available": False,
             "ai_decision_rationale_available": False,
+            "seed_semantics": "engine_random_seed_not_event_replay",
+            "event_stream_completeness": "best_effort_engine_log_lower_bound",
+            "absence_proves_nonuse": False,
             "strategy_or_swap_proof": False,
         },
         "metrics": {

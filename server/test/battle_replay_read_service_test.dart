@@ -187,6 +187,10 @@ void main() {
                   'named_draw_identity_available': false,
                   'visible_stack_activity_available': true,
                   'ai_decision_rationale_available': false,
+                  'seed_semantics': 'engine_random_seed_not_event_replay',
+                  'event_stream_completeness':
+                      'best_effort_visible_state_lower_bound',
+                  'absence_proves_nonuse': false,
                   'strategy_or_swap_proof': false,
                 },
                 'game_log': const [],
@@ -224,6 +228,21 @@ void main() {
       expect(
         replay['simulation_contract'],
         containsPair('named_draw_identity_available', false),
+      );
+      expect(
+        replay['simulation_contract'],
+        containsPair(
+          'event_stream_completeness',
+          'best_effort_visible_state_lower_bound',
+        ),
+      );
+      expect(
+        replay['simulation_contract'],
+        containsPair('absence_proves_nonuse', false),
+      );
+      expect(
+        replay['simulation_contract'],
+        containsPair('seed_semantics', 'engine_random_seed_not_event_replay'),
       );
       expect(
         replay['learning_contract'],

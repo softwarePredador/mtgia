@@ -275,6 +275,9 @@ final class XmageBattleService {
         learningContract.put("visible_battlefield_entries_available", true);
         learningContract.put("combat_activity_available", true);
         learningContract.put("ai_decision_rationale_available", false);
+        learningContract.put("seed_semantics", "engine_random_seed_not_event_replay");
+        learningContract.put("event_stream_completeness", "best_effort_visible_state_lower_bound");
+        learningContract.put("absence_proves_nonuse", false);
         learningContract.put("strategy_or_swap_proof", false);
         result.put("learning_contract", learningContract);
 

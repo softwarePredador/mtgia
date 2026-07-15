@@ -32,6 +32,8 @@ Future<Response> onRequest(RequestContext context, String deckId) async {
           'status': 'experimental_advisory',
           'advisory_only': true,
           'canonical_legality_source': false,
+          'event_stream_completeness': 'per_replay_learning_contract',
+          'absence_proves_nonuse': false,
           'strategy_or_swap_proof': false,
         },
       },

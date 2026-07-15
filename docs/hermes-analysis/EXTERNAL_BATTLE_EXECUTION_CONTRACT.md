@@ -150,6 +150,23 @@ evidence. It is insufficient for a deck promotion. A swap comparison requires:
 6. no promotion when the candidate merely avoided drawing or using its changed
    card.
 
+The event stream is a best-effort visible-state lower bound. A typed event is
+positive evidence that the named activity occurred. Missing events are not
+proof that a card was not drawn or used: hidden information is unavailable and
+the asynchronous XMage watcher can coalesce visible transitions. The response
+therefore publishes:
+
+- `seed_semantics=engine_random_seed_not_event_replay`;
+- `event_stream_completeness=best_effort_visible_state_lower_bound` for XMage
+  or `best_effort_engine_log_lower_bound` for Forge;
+- `absence_proves_nonuse=false`.
+
+XMage stack abilities are identified from the actual `MageObjectType` or
+`StackAbilityView`, not from `CardView.isAbility()` alone. The event keeps the
+stack object and also publishes `source_card_id` and `source_card_name` when
+XMage exposes them. This prevents activated abilities such as Krenko's from
+being counted as spells.
+
 ## Measured Catalog Baseline
 
 Live PostgreSQL read-only inventory on 2026-07-14:
@@ -181,10 +198,9 @@ native families are largely exhausted; the remaining native work is long-tail
 family/manual work, not 26,890 independent card implementations.
 
 Production XMage `/cards/coverage` processed those 23,955 source-resolved rows
-in four requests under the former 2 MiB cap: 23,823 supported, 132 unsupported,
-99.44% coverage, and 4,394 ms aggregate service time. The original 2.49 MiB
-single request was rejected; the 8 MiB contract removes that artificial batch
-fragmentation.
+in one 2.49 MiB request under the new 8 MiB limit: 23,823 supported, 132
+unsupported, 99.44% coverage, and 3,808 ms wall time. Under the former 2 MiB
+cap the same rows required four requests and 4,394 ms aggregate service time.
 
 ## Executed Proof
 
@@ -220,6 +236,18 @@ fragmentation.
   execution evidence, not strategy-learning evidence. The typed replay
   contract in this revision closes the observability gap for future games; it
   does not retroactively upgrade old rows.
+- A fresh production Krenko-versus-Isamaru rules probe completed in 17,554 ms,
+  20 turns, and zero engine errors. It emitted 700 events and 225 snapshots,
+  including 2 visible spells, 6 Krenko activations, 85 battlefield entries,
+  and 65 declared attackers. Every activation carried
+  `source_card_name=Krenko, Mob Boss` after the stack-object classification fix.
+- Repeating that probe with the same seed and same sidecar process preserved
+  winner, turn count, and game cycle but produced 704 events, 244 snapshots,
+  and 67 captured attackers. This proves that equal seed controls engine
+  randomness but does not make the observer stream a byte-identical replay.
+- An A/B using the exact Korvold-versus-Krenko request and seed 10001 timed out
+  at 30 seconds on both the pre-telemetry image `d9d6a07b5` and current image.
+  The timeout is not a regression caused by enriched replay observation.
 
 ## Validation
 

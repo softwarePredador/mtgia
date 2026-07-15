@@ -249,6 +249,12 @@ class BattleReplayReadService {
         'strategy_or_swap_proof': false,
         'event_learning_grade':
             learningContract.isEmpty ? 'not_declared' : 'visible_activity_only',
+        'event_stream_completeness':
+            learningContract['event_stream_completeness'] ?? 'not_declared',
+        'absence_proves_nonuse':
+            learningContract['absence_proves_nonuse'] == true,
+        'seed_semantics':
+            learningContract['seed_semantics'] ?? 'not_declared',
         'named_draw_identity_available':
             learningContract['named_draw_identity_available'] == true,
         'ai_decision_rationale_available':

@@ -67,6 +67,14 @@ External execution must also fail closed operationally. XMage timeouts return
 each simulation in a process and kills it at the outer timeout. Neither timeout
 may become a native-success fallback.
 
+External replay observation is deliberately narrower than executable rules
+truth. A typed stack, zone, permanent, combat, or life event is positive
+activity evidence, but a missing event cannot prove non-use. XMage's request
+seed controls the engine random source; it does not guarantee a byte-identical
+asynchronous watcher stream. Deck-learning consumers must preserve the
+`learning_contract`, engine commit, process ID, seed, and timeout outcome rather
+than collapsing a completed battle into a per-card truth label.
+
 ## Global All-Card Scope
 
 As of 2026-07-01, card-rule acceleration is global over every PostgreSQL

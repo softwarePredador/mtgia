@@ -103,6 +103,11 @@ class ForgeSidecarTest(unittest.TestCase):
         self.assertEqual("Sol Ring", result["events"][1]["card_name"])
         self.assertEqual(1, result["metrics"]["cards_cast"])
         self.assertEqual([], result["decision_trace"])
+        self.assertEqual(
+            "best_effort_engine_log_lower_bound",
+            result["learning_contract"]["event_stream_completeness"],
+        )
+        self.assertFalse(result["learning_contract"]["absence_proves_nonuse"])
         self.assertFalse(result["learning_contract"]["strategy_or_swap_proof"])
 
     def test_event_parser_stops_after_game_result(self):
