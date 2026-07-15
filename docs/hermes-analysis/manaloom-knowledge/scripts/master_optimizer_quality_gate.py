@@ -14,6 +14,7 @@ from master_optimizer_common import (
     ensure_optimizer_tables,
     latest_baseline,
     quality_gate_candidate,
+    require_battle_gate_for_optimizer,
     write_report,
 )
 
@@ -26,6 +27,11 @@ def main() -> int:
     parser.add_argument("--report", action="store_true")
     args = parser.parse_args()
     phases = tuple(item.strip() for item in args.phase.split(",") if item.strip())
+
+    try:
+        require_battle_gate_for_optimizer()
+    except RuntimeError as exc:
+        raise SystemExit(str(exc)) from exc
 
     with connect() as conn:
         ensure_optimizer_tables(conn)

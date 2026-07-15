@@ -18,6 +18,7 @@ from pathlib import Path
 
 from master_optimizer_common import (
     battle_gate_cli_lines,
+    battle_gate_optimizer_blockers,
     battle_gate_report_lines,
     resolve_default_knowledge_db,
 )
@@ -125,6 +126,16 @@ def db_coverage(db_path: Path) -> dict[str, int]:
 
 def run_preflight(args: argparse.Namespace) -> list[CheckResult]:
     checks: list[CheckResult] = []
+    battle_gate_blockers = battle_gate_optimizer_blockers()
+    checks.append(
+        CheckResult(
+            "battle_replay_gate",
+            "error" if battle_gate_blockers else "ok",
+            "; ".join(battle_gate_blockers)
+            if battle_gate_blockers
+            else "trusted_for_strategy_learning with no mandatory divergences",
+        )
+    )
 
     required_files = {
         "knowledge_db": args.db,

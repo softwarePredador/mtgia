@@ -376,6 +376,26 @@ class MasterOptimizerHashTests(unittest.TestCase):
             cli,
         )
 
+    def test_optimizer_battle_gate_accepts_only_trusted_summary_without_divergences(self) -> None:
+        trusted = {
+            "battle_replay_final_status": "trusted_for_strategy_learning",
+            "mandatory_gate_divergences": [],
+        }
+        self.assertEqual(optimizer.battle_gate_optimizer_blockers(trusted), [])
+        optimizer.require_battle_gate_for_optimizer(trusted)
+
+        for status in ("missing_summary", "review_required", "blocked"):
+            with self.subTest(status=status):
+                summary = {
+                    "battle_replay_final_status": status,
+                    "mandatory_gate_divergences": ["gate=review_required"],
+                }
+                blockers = optimizer.battle_gate_optimizer_blockers(summary)
+                self.assertTrue(any(status in blocker for blocker in blockers))
+                self.assertTrue(any("mandatory_divergences" in blocker for blocker in blockers))
+                with self.assertRaisesRegex(RuntimeError, "Optimizer battle gate blocked"):
+                    optimizer.require_battle_gate_for_optimizer(summary)
+
     def test_optimizer_operational_surfaces_publish_battle_gate(self) -> None:
         report_scripts = [
             "master_optimizer_apply.py",
@@ -392,6 +412,19 @@ class MasterOptimizerHashTests(unittest.TestCase):
             with self.subTest(filename=filename):
                 source = (optimizer.SCRIPT_DIR / filename).read_text(encoding="utf-8")
                 self.assertIn("battle_gate_report_lines", source)
+
+        guarded_scripts = [
+            "master_optimizer_apply.py",
+            "master_optimizer_baseline.py",
+            "master_optimizer_confirmation.py",
+            "master_optimizer_gate_baseline.py",
+            "master_optimizer_quality_gate.py",
+            "slot_optimizer.py",
+        ]
+        for filename in guarded_scripts:
+            with self.subTest(guarded=filename):
+                source = (optimizer.SCRIPT_DIR / filename).read_text(encoding="utf-8")
+                self.assertIn("require_battle_gate_for_optimizer", source)
 
         cli_scripts = [
             "master_optimizer_loop.py",

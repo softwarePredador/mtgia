@@ -100,6 +100,7 @@ docker service update \
   --env-add MANALOOM_NATIVE_BATTLE_HOST=0.0.0.0 \
   --env-add MANALOOM_NATIVE_BATTLE_PORT=8080 \
   --env-add MANALOOM_LOREHOLD_CANONICAL_OVERRIDE=0 \
+  --env-add MANALOOM_BATTLE_GATE_SUMMARY=/data/manaloom-ops/artifacts/battle-strategy-audit/latest/summary.json \
   --env-add MANALOOM_CANONICAL_KNOWN_CARDS_JSON=/data/manaloom-ops/known_cards_canonical_snapshot.runtime.json \
   '$SERVICE'
 

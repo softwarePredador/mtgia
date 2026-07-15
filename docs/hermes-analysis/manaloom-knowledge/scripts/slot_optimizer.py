@@ -32,6 +32,7 @@ from master_optimizer_common import (
     functional_tags_for_row,
     json_list,
     latest_baseline,
+    require_battle_gate_for_optimizer,
     normalize_name,
     quality_gate_candidate,
     run_battle,
@@ -760,6 +761,11 @@ def main() -> int:
     parser.add_argument("--phase", default="phase1")
     parser.add_argument("--reset-current-baseline", action="store_true")
     args = parser.parse_args()
+
+    try:
+        require_battle_gate_for_optimizer()
+    except RuntimeError as exc:
+        raise SystemExit(str(exc)) from exc
 
     if LOCK_FILE.exists():
         age = int(__import__("time").time() - LOCK_FILE.stat().st_mtime)

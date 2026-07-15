@@ -742,6 +742,24 @@ def load_battle_gate_summary(summary_path: Path | None = None) -> dict[str, Any]
         }
 
 
+def battle_gate_optimizer_blockers(summary: dict[str, Any] | None = None) -> list[str]:
+    data = summary or load_battle_gate_summary()
+    status = str(data.get("battle_replay_final_status") or "unknown")
+    divergences = [str(item) for item in data.get("mandatory_gate_divergences") or []]
+    blockers: list[str] = []
+    if status != "trusted_for_strategy_learning":
+        blockers.append(f"battle_gate_not_trusted_for_strategy_learning:{status}")
+    if divergences:
+        blockers.append("battle_gate_mandatory_divergences:" + ",".join(divergences))
+    return blockers
+
+
+def require_battle_gate_for_optimizer(summary: dict[str, Any] | None = None) -> None:
+    blockers = battle_gate_optimizer_blockers(summary)
+    if blockers:
+        raise RuntimeError("Optimizer battle gate blocked: " + "; ".join(blockers))
+
+
 def _sample(values: object, limit: int = 8) -> list[object]:
     if isinstance(values, list):
         return values[:limit]

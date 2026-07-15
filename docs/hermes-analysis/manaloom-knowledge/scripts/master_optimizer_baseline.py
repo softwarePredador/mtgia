@@ -11,6 +11,7 @@ from master_optimizer_common import (
     connect,
     ensure_optimizer_tables,
     get_deck_summary,
+    require_battle_gate_for_optimizer,
     run_battle,
     utc_now,
     write_report,
@@ -60,6 +61,11 @@ def main() -> int:
     parser.add_argument("--simulation-seed", type=int, default=42)
     parser.add_argument("--report", action="store_true")
     args = parser.parse_args()
+
+    try:
+        require_battle_gate_for_optimizer()
+    except RuntimeError as exc:
+        raise SystemExit(str(exc)) from exc
 
     with connect() as conn:
         ensure_optimizer_tables(conn)

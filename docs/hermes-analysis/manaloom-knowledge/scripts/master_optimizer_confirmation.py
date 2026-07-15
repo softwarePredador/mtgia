@@ -15,6 +15,7 @@ from master_optimizer_common import (
     ensure_optimizer_tables,
     latest_baseline,
     quality_gate_candidate,
+    require_battle_gate_for_optimizer,
     run_battle,
     temporary_swap,
     utc_now,
@@ -110,6 +111,11 @@ def main() -> int:
     )
     parser.add_argument("--report", action="store_true")
     args = parser.parse_args()
+
+    try:
+        require_battle_gate_for_optimizer()
+    except RuntimeError as exc:
+        raise SystemExit(str(exc)) from exc
 
     tested = []
     blocked = []

@@ -296,6 +296,7 @@ class SlotOptimizerRealRolesTests(unittest.TestCase):
             ]
             with (
                 mock.patch.object(slot_optimizer, "LOCK_FILE", lock_path),
+                mock.patch.object(slot_optimizer, "require_battle_gate_for_optimizer"),
                 mock.patch.object(slot_optimizer, "connect", return_value=nullcontext(conn)),
                 mock.patch.object(slot_optimizer, "latest_baseline", return_value=baseline),
                 mock.patch.object(slot_optimizer, "assert_current_deck_matches_baseline"),
@@ -350,6 +351,21 @@ class SlotOptimizerRealRolesTests(unittest.TestCase):
         self.assertIsNotNone(review)
         self.assertEqual(review["status"], "blocked")
         self.assertEqual(json.loads(review["reasons_json"]), ["battle_timeout_7s"])
+
+    def test_main_refuses_to_scan_without_trusted_battle_gate(self) -> None:
+        with (
+            mock.patch.object(
+                slot_optimizer,
+                "require_battle_gate_for_optimizer",
+                side_effect=RuntimeError(
+                    "Optimizer battle gate blocked: "
+                    "battle_gate_not_trusted_for_strategy_learning:missing_summary"
+                ),
+            ),
+            mock.patch("sys.argv", ["slot_optimizer.py"]),
+        ):
+            with self.assertRaisesRegex(SystemExit, "missing_summary"):
+                slot_optimizer.main()
 
 
 if __name__ == "__main__":

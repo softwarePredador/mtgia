@@ -18,6 +18,7 @@ from master_optimizer_common import (
     get_deck_summary,
     latest_baseline,
     quality_gate_candidate,
+    require_battle_gate_for_optimizer,
     ruleset_hash,
     semantics_hash,
     utc_now,
@@ -64,6 +65,11 @@ def main() -> int:
     parser.add_argument("--min-delta", type=float, default=0.5)
     parser.add_argument("--report", action="store_true")
     args = parser.parse_args()
+
+    try:
+        require_battle_gate_for_optimizer()
+    except RuntimeError as exc:
+        raise SystemExit(str(exc)) from exc
 
     with connect() as conn:
         ensure_optimizer_tables(conn)

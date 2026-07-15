@@ -13,6 +13,7 @@ from master_optimizer_common import (
     connect,
     ensure_optimizer_tables,
     get_deck_summary,
+    require_battle_gate_for_optimizer,
     utc_now,
     write_report,
 )
@@ -79,6 +80,10 @@ def main() -> int:
     summary_path = Path(args.summary)
     summary = json.loads(summary_path.read_text(encoding="utf-8"))
     summary["_summary_path"] = str(summary_path)
+    try:
+        require_battle_gate_for_optimizer(summary)
+    except RuntimeError as exc:
+        raise SystemExit(str(exc)) from exc
     stats = gate_stats(summary)
 
     with connect() as conn:
