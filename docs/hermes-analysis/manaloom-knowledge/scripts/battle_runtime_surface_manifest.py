@@ -82,6 +82,7 @@ DIRECT_RECURRING_RUN_PATHS = {
     "docs/hermes-analysis/manaloom-knowledge/scripts/test_battle_effect_coverage_residual_audit.py",
     "docs/hermes-analysis/manaloom-knowledge/scripts/test_battle_focused_template_dispatch_audit.py",
     "docs/hermes-analysis/manaloom-knowledge/scripts/test_battle_rule_registry_runtime_safe.py",
+    "docs/hermes-analysis/manaloom-knowledge/scripts/test_battle_script_entrypoint_symbols.py",
     "docs/hermes-analysis/manaloom-knowledge/scripts/test_battle_forensic_audit_supported_effects.py",
     "docs/hermes-analysis/manaloom-knowledge/scripts/test_replay_decision_auditor_scope.py",
     "docs/hermes-analysis/manaloom-knowledge/scripts/test_battle_runtime_surface_manifest.py",
@@ -124,6 +125,10 @@ CORE_TEST_BASENAMES = {
     "test_battle_analyst_v10_3.py",
     "test_battle_functional_tags_json.py",
     "test_battle_rule_alternatives.py",
+    "native_battle_sidecar.py",
+    "native_battle_worker.py",
+    "native_battle_sidecar_test.py",
+    "native_battle_worker_test.py",
 }
 
 RULE_SOURCE_CONTRACT = {
@@ -263,6 +268,8 @@ RECURRING_GATE_BASENAMES = {
     "test_battle_effect_coverage_residual_audit.py",
     "test_battle_focused_template_dispatch_audit.py",
     "test_battle_forensic_audit_supported_effects.py",
+    "test_battle_script_entrypoint_symbols.py",
+    "manaloom_battle_strategy_audit_runner_test.py",
     "test_replay_decision_auditor_scope.py",
     "test_battle_runtime_surface_manifest.py",
     "test_battle_table_intent_audit.py",
@@ -379,6 +386,7 @@ FOCUSED_EVIDENCE_BASENAMES = {
     "test_global_card_oracle_battle_readiness.py",
     "lorehold_entreat_rule_package_preapply.py",
     "test_lorehold_entreat_rule_package_preapply.py",
+    "manaloom_battle_product_e2e_audit.py",
 }
 
 
