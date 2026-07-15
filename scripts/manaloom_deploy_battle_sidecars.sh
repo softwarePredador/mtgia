@@ -229,10 +229,6 @@ docker run --rm --network \"\$network_name\" --entrypoint sh curlimages/curl:8.1
 
 wait_for_sidecar_health "${PROJECT}_${XMAGE_SERVICE}" "$XMAGE_SERVICE" catalog_ready
 wait_for_sidecar_health "${PROJECT}_${FORGE_SERVICE}" "$FORGE_SERVICE"
-if ! service_exists "$NATIVE_SERVICE"; then
-  echo "required native battle service is missing: $PROJECT/$NATIVE_SERVICE" >&2
-  exit 1
-fi
 wait_for_sidecar_health \
   "${PROJECT}_${NATIVE_SERVICE}" \
   "$NATIVE_SERVICE" \
