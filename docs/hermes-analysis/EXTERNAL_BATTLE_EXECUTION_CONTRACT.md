@@ -2,6 +2,13 @@
 
 Status: `current_operating_standard`.
 
+Operational closure, residual compaction, and resumable mass-battle commands
+are defined in
+`docs/hermes-analysis/GLOBAL_BATTLE_RULES_AND_LEARNING_CLOSURE_2026-07-15.md`.
+The supported entrypoint is `scripts/manaloom_global_battle_closure.sh`; local
+Java source candidates require live catalog reconciliation before they count
+as executable coverage.
+
 This contract separates global battle execution from ManaLoom's native
 `card_battle_rules` adaptation. The product no longer needs to translate every
 card into a native family before it can run a battle.
@@ -169,6 +176,13 @@ XMage stack abilities are identified from the actual `MageObjectType` or
 stack object and also publishes `source_card_id` and `source_card_name` when
 XMage exposes them. This prevents activated abilities such as Krenko's from
 being counted as spells.
+
+The backend also persists `battle_positive_evidence_v1`. It accepts only typed,
+named positive activity under `external_battle_learning_v1`, never infers
+non-use from absence, and always keeps `promotion_allowed=false`. Offline mass
+batches use `external_battle_async_registry_v1` and atomic
+`external_battle_async_checkpoint_v1`; full replay payloads are retained as
+compressed `.json.gz` files.
 
 ## Measured Catalog Baseline
 

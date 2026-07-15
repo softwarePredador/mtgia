@@ -147,6 +147,7 @@ def audit_docs(args: argparse.Namespace) -> list[Check]:
                 "ramp_permanent",
                 "targeted_interaction",
                 "Hazel's Brewmaster",
+                "xmage_source_catalog_reconciliation.py",
             ],
             check_name="docs.frozen_family_pipeline_contract",
         ),
@@ -179,6 +180,8 @@ def audit_docs(args: argparse.Namespace) -> list[Check]:
                 "A completed battle proves the engine ran the two decks",
                 "33,080",
                 "1,212",
+                "GLOBAL_BATTLE_RULES_AND_LEARNING_CLOSURE_2026-07-15.md",
+                "battle_positive_evidence_v1",
             ],
             check_name="docs.external_execution_contract",
         ),
@@ -228,6 +231,19 @@ def audit_docs(args: argparse.Namespace) -> list[Check]:
             ],
             check_name="docs.report_archive_boundary",
         ),
+        contains_all(
+            REPO_ROOT
+            / "docs/hermes-analysis/GLOBAL_BATTLE_RULES_AND_LEARNING_CLOSURE_2026-07-15.md",
+            [
+                "current_operating_runbook",
+                "external_card_coverage_closure_v1",
+                "xmage_source_catalog_reconciliation_v1",
+                "external_battle_async_registry_v1",
+                "battle_positive_evidence_v1",
+                "promotion_allowed=false",
+            ],
+            check_name="docs.global_battle_learning_closure",
+        ),
     ]
     return checks
 
@@ -235,6 +251,16 @@ def audit_docs(args: argparse.Namespace) -> list[Check]:
 def audit_script_surface() -> list[Check]:
     scripts = REPO_ROOT / "docs/hermes-analysis/manaloom-knowledge/scripts"
     return [
+        contains_all(
+            REPO_ROOT / "scripts/manaloom_global_battle_closure.sh",
+            [
+                "external_card_coverage_closure.py",
+                "xmage_source_catalog_reconciliation.py",
+                "external_battle_async_runner.py",
+                "global_residual.json",
+            ],
+            check_name="scripts.global_battle_closure_entrypoint",
+        ),
         contains_all(
             scripts / "xmage_current_replay_batch_pipeline.py",
             [

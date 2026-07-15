@@ -108,6 +108,8 @@ Map<String, dynamic> buildCommanderDeckbuildingContractDiagnostics({
   Map<String, dynamic>? referenceDeckEvaluation,
   Map<String, dynamic>? referenceDeckCorpusDiagnostics,
   Map<String, dynamic>? referenceDeterministicDeckDiagnostics,
+  Map<String, dynamic>? battleLearningEvidence,
+  Map<String, dynamic>? battleComparisonGate,
   String? generationMode,
   bool battleGateRequired = true,
 }) {
@@ -166,6 +168,20 @@ Map<String, dynamic> buildCommanderDeckbuildingContractDiagnostics({
     referenceDeckCorpusDiagnostics,
     const ['reference_deck_corpus_evaluation', 'core_package_coverage_ratio'],
   );
+  final positiveBattleExposure =
+      battleLearningEvidence?['positive_exposure_ready'] == true;
+  final comparisonInputReady =
+      battleComparisonGate?['schema_version'] ==
+          'external_battle_comparison_gate_v1' &&
+      battleComparisonGate?['comparison_input_ready'] == true &&
+      battleComparisonGate?['promotion_allowed'] == false;
+  final battleGateStatus = !battleGateRequired
+      ? 'not_required'
+      : comparisonInputReady
+          ? 'comparison_input_ready'
+          : positiveBattleExposure
+              ? 'positive_exposure_recorded'
+              : 'pending';
 
   final gates = <String, dynamic>{
     'commander_present': commanderName.isNotEmpty,
@@ -180,7 +196,10 @@ Map<String, dynamic> buildCommanderDeckbuildingContractDiagnostics({
     'has_any_reference_lane': hasReferenceLane,
     'deterministic_reference_ready': deterministicFallbackReady,
     'battle_gate_required': battleGateRequired,
-    'battle_gate_status': battleGateRequired ? 'pending' : 'not_required',
+    'battle_gate_status': battleGateStatus,
+    'battle_positive_exposure': positiveBattleExposure,
+    'battle_comparison_input_ready': comparisonInputReady,
+    'battle_swap_superiority_proven': false,
   };
 
   final blockers = <String>[];
@@ -230,7 +249,11 @@ Map<String, dynamic> buildCommanderDeckbuildingContractDiagnostics({
   if (coreCoverageRatio != null && coreCoverageRatio < 0.35) {
     warnings.add('reference_core_package_low_coverage');
   }
-  if (battleGateRequired) {
+  if (comparisonInputReady) {
+    nextActions.add(
+      'Avaliar estatistica e estrategia; evidencia de exposicao nao promove swap automaticamente.',
+    );
+  } else if (battleGateRequired) {
     nextActions.add(
       'Rodar battle gate igualado antes de promover mudanca estrutural.',
     );
@@ -297,6 +320,10 @@ Map<String, dynamic> buildCommanderDeckbuildingContractDiagnostics({
     if (referenceDeterministicDeckDiagnostics != null)
       'deterministic_reference_diagnostics':
           referenceDeterministicDeckDiagnostics,
+    if (battleLearningEvidence != null)
+      'battle_learning_evidence': battleLearningEvidence,
+    if (battleComparisonGate != null)
+      'battle_comparison_gate': battleComparisonGate,
   };
 }
 

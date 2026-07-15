@@ -85,10 +85,12 @@ class XMageAuthoritativeAdaptationQueueTest(unittest.TestCase):
             "xmage_missing_source_exception",
         )
 
-    def test_compact_row_marks_xmage_source_as_authoritative_not_review_only(self) -> None:
+    def test_compact_row_requires_runtime_catalog_confirmation(self) -> None:
         resolved = ResolvedSource("AlphaDraw", Path("/tmp/AlphaDraw.java"), "class_index_candidate")
         row = compact_queue_row(card("Alpha Draw"), resolved=resolved, parsed_entry=parsed())
         self.assertEqual(row["source_truth_status"], "xmage_authoritative")
+        self.assertEqual(row["source_resolution_status"], "local_source_candidate")
+        self.assertTrue(row["runtime_catalog_confirmation_required"])
         self.assertEqual(row["translation_lane"], "xmage_authoritative_adapter_required")
         self.assertTrue(row["logical_rule_key"].startswith("battle_rule_v1:"))
 

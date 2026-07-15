@@ -35,6 +35,12 @@ Before starting or promoting a family wave, verify these invariants:
 | Card-level proof | A battle aggregate is not card-level proof unless the candidate card was drawn/used or a focused test exercised it |
 | Consumer joins | Consumers must use one-row-per-card snapshots or aggregate multi-row rule/tag tables before deck joins |
 
+`resolvable XMage class` in this frozen table means a source candidate. It only
+counts as executable coverage after
+`xmage_source_catalog_reconciliation.py` confirms the exact card identity in
+the pinned live XMage catalog, or routes a structured XMage gap to pinned
+Forge. Similar Java class names are not sufficient.
+
 The governance command for this checkpoint is:
 
 ```bash
@@ -49,8 +55,9 @@ After the checkpoint passes, work in this order:
 1. Rebuild the current replay/deck scope queue.
 2. Rebuild the global authoritative XMage adaptation queue with
    `xmage_authoritative_adaptation_queue.py`.
-3. Treat resolved XMage classes as final card behavior source and implement the
-   largest ManaLoom adapter work units first.
+3. Reconcile resolved local classes with the live catalog, then treat confirmed
+   XMage identities as final behavior source and implement the largest
+   ManaLoom adapter work units first.
 4. Split broad authoritative work units with
    `xmage_authoritative_exact_scope_split.py` or an equivalent exact family
    splitter; do not feed generic `xmage_*_review_v1` scopes directly into a

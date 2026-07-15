@@ -4,7 +4,7 @@
 > Esta e a porta de entrada para decidir quais docs ler e quais ignorar em
 > tarefas Hermes.
 
-Updated: 2026-07-14
+Updated: 2026-07-15
 
 Esta pasta mistura contrato operacional, historico de auditoria, relatorios de
 rodadas e memorias antigas. Para evitar confusao, use esta ordem de leitura.
@@ -93,6 +93,15 @@ rodadas e memorias antigas. Para evitar confusao, use esta ordem de leitura.
     publicar um pacote/auditoria.
 
 ## Decisoes atuais XMage -> ManaLoom
+
+- `GLOBAL_BATTLE_RULES_AND_LEARNING_CLOSURE_2026-07-15.md`
+  - Status: `current_operating_runbook`.
+  - Entry point unico para reconstruir cobertura PostgreSQL/XMage/Forge/native,
+    reconciliar candidatos Java com o catalogo vivo, compactar o residual por
+    familia e executar/retomar filas de battle com evidencia positiva.
+  - Comando: `scripts/manaloom_global_battle_closure.sh`.
+  - Artefatos brutos ficam em `/tmp`; respostas completas de battle sao gzip e
+    o checkpoint guarda apenas estado e evidencia resumida.
 
 - `EXTERNAL_BATTLE_EXECUTION_CONTRACT.md`
   - Status: `current_operating_standard`.

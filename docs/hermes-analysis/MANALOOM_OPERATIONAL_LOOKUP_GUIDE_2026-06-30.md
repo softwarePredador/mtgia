@@ -22,6 +22,7 @@ Hermes SQLite is cache/lab evidence, not durable truth.
 | --- | --- | --- |
 | Data fields, joins, aliases, `oracle*`, `card_id`, names, rule keys | `DATA_FIELD_ALIAS_CONTRACT_2026-06-30.md` and the `manaloom-data-semantic-layer` skill | `pg_hermes_sqlite_contract_audit.py` and `workspace_contract_drift_audit.py` |
 | XMage to ManaLoom card-rule work | `XMAGE_TO_MANALOOM_DEFINITIVE_FLOW_2026-06-29.md` | `xmage_strategy_consistency_audit.py` |
+| Global card execution coverage and resumable external battles | `GLOBAL_BATTLE_RULES_AND_LEARNING_CLOSURE_2026-07-15.md` | `scripts/manaloom_global_battle_closure.sh` |
 | Battle-rule family pipeline | `BATTLE_RULES_FAMILY_PIPELINE_CONTRACT_2026-06-29.md` | focused runtime tests plus PostgreSQL package evidence |
 | Commander deckbuilding and optimize | `COMMANDER_DECKBUILDING_CONTRACT_2026-06-29.md` | `deckbuilding_contract_surface_audit.py` |
 | Lorehold current deckbuilder handoff | `manaloom-knowledge/scripts/README.md` section `Lorehold Deckbuilder Handoff` | `operational_surface_alignment_audit.py` |
@@ -29,6 +30,21 @@ Hermes SQLite is cache/lab evidence, not durable truth.
 | Current operational alignment across docs/scripts | this guide plus `docs/hermes-analysis/README.md` | `operational_surface_alignment_audit.py` |
 | Workspace drift, stale DB paths, cron path rules | `workspace_contract_drift_audit.py` | no manual path assumptions |
 | Broad legacy contamination | `LEGACY_CONTAMINATION_BASELINE_2026-06-30.json` | `legacy_contamination_audit.py`; new or increased old patterns fail |
+
+## Global Coverage And Battle Entry Point
+
+Do not create another coverage ledger or asynchronous battle runner. Use:
+
+```bash
+scripts/manaloom_global_battle_closure.sh coverage [output_root]
+scripts/manaloom_global_battle_closure.sh battle <registry.json> [state_dir]
+```
+
+`coverage` is read-only and resolves every PostgreSQL card through exact live
+XMage, exact Forge fallback, and verified native coverage. Local Java source
+matches remain candidates until catalog reconciliation. `battle` accepts only
+`external_battle_async_registry_v1`, persists its checkpoint in `state_dir`,
+and never turns exposure into promotion.
 
 ## Canonical Database Lookup
 
@@ -108,6 +124,8 @@ operational work queue and the planner trace review, not from a promotion gate.
 
 | Script/flow | Required safe parameter rule |
 | --- | --- |
+| `manaloom_global_battle_closure.sh coverage` | optional `output_root`; defaults to compact `/tmp` evidence and never mutates PostgreSQL/Hermes |
+| `manaloom_global_battle_closure.sh battle` | requires an `external_battle_async_registry_v1` file; optional persistent `state_dir`; every job needs unique `job_id` and integer `request.seed` |
 | `xmage_current_replay_batch_pipeline.py` | use `--xmage-root /Users/desenvolvimentomobile/Downloads/mage-master`; include deck `6` and Lorehold `607-616` only when the scope requires Lorehold plus historical baseline comparison |
 | Lorehold strategy/cut models | protected baseline is `607`; do not use historical deck `6` as current candidate shell |
 | `lorehold_variant_battle_gate.py` | when testing a modified `607` candidate DB, pass `--candidate-deck-id 607` |

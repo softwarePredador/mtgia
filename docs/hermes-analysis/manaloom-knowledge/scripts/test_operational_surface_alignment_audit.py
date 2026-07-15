@@ -42,6 +42,13 @@ class OperationalSurfaceAlignmentAuditTests(unittest.TestCase):
             "scripts.pg_hermes_sqlite_contract_wrapper_uses_new_server",
             check_names,
         )
+        self.assertIn("docs.global_battle_closure_is_current", check_names)
+        self.assertIn("scripts.global_card_coverage_closure_exists", check_names)
+        self.assertIn("scripts.source_catalog_reconciliation_exists", check_names)
+        self.assertIn(
+            "scripts.external_battle_runner_is_resumable_and_non_promoting",
+            check_names,
+        )
 
     def test_forbidden_stale_snippet_fails(self) -> None:
         with tempfile.TemporaryDirectory() as tmp_dir:

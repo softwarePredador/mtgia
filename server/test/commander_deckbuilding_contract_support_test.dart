@@ -243,5 +243,87 @@ void main() {
         ]),
       );
     });
+
+    test('accepts only a validated comparison gate as comparison input', () {
+      final diagnostics = buildCommanderDeckbuildingContractDiagnostics(
+        format: 'Commander',
+        generatedDeck: const {
+          'commander': {'name': 'Krenko, Mob Boss'},
+          'cards': [
+            {'name': 'Mountain', 'quantity': 99},
+          ],
+        },
+        validationSummary: const {
+          'is_valid': true,
+          'invalid_cards': <String>[],
+        },
+        referenceProfile: const {
+          'commander': 'Krenko, Mob Boss',
+          'confidence': 'high',
+        },
+        referenceDeterministicDeckDiagnostics: const {
+          'main_deck_quantity': 99,
+          'distinct_card_count': 99,
+        },
+        battleLearningEvidence: const {
+          'schema_version': 'battle_positive_evidence_v1',
+          'positive_exposure_ready': true,
+          'swap_superiority_proven': false,
+          'promotion_allowed': false,
+        },
+        battleComparisonGate: const {
+          'schema_version': 'external_battle_comparison_gate_v1',
+          'comparison_input_ready': true,
+          'swap_superiority_proven': false,
+          'promotion_allowed': false,
+        },
+      );
+
+      final gates = diagnostics['gates'] as Map;
+      expect(gates['battle_gate_status'], 'comparison_input_ready');
+      expect(gates['battle_positive_exposure'], isTrue);
+      expect(gates['battle_comparison_input_ready'], isTrue);
+      expect(gates['battle_swap_superiority_proven'], isFalse);
+      expect(
+        diagnostics['next_actions'],
+        contains(
+          'Avaliar estatistica e estrategia; evidencia de exposicao nao promove swap automaticamente.',
+        ),
+      );
+    });
+
+    test('single battle evidence cannot declare a comparison ready', () {
+      final diagnostics = buildCommanderDeckbuildingContractDiagnostics(
+        format: 'Commander',
+        generatedDeck: const {
+          'commander': {'name': 'Krenko, Mob Boss'},
+          'cards': [
+            {'name': 'Mountain', 'quantity': 99},
+          ],
+        },
+        validationSummary: const {
+          'is_valid': true,
+          'invalid_cards': <String>[],
+        },
+        referenceProfile: const {
+          'commander': 'Krenko, Mob Boss',
+          'confidence': 'high',
+        },
+        referenceDeterministicDeckDiagnostics: const {
+          'main_deck_quantity': 99,
+          'distinct_card_count': 99,
+        },
+        battleLearningEvidence: const {
+          'schema_version': 'battle_positive_evidence_v1',
+          'positive_exposure_ready': true,
+          'comparison_input_ready': true,
+          'promotion_allowed': false,
+        },
+      );
+
+      final gates = diagnostics['gates'] as Map;
+      expect(gates['battle_gate_status'], 'positive_exposure_recorded');
+      expect(gates['battle_comparison_input_ready'], isFalse);
+    });
   });
 }

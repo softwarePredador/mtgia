@@ -15,12 +15,17 @@ REPO_ROOT = SCRIPT_DIR.parents[3]
 REPORT_DIR = REPO_ROOT / "docs" / "hermes-analysis" / "master_optimizer_reports"
 
 CONTRACT_DOC = REPO_ROOT / "docs/hermes-analysis/COMMANDER_DECKBUILDING_CONTRACT_2026-06-29.md"
+GLOBAL_BATTLE_CLOSURE_DOC = (
+    REPO_ROOT / "docs/hermes-analysis/GLOBAL_BATTLE_RULES_AND_LEARNING_CLOSURE_2026-07-15.md"
+)
 SUPPORT_FILE = REPO_ROOT / "server/lib/ai/commander_deckbuilding_contract_support.dart"
+BATTLE_EVIDENCE_SUPPORT_FILE = REPO_ROOT / "server/lib/ai/battle_learning_evidence_support.dart"
 REFERENCE_PROFILE_SUPPORT_FILE = REPO_ROOT / "server/lib/ai/commander_reference_profile_support.dart"
 STAPLE_POLICY_FILE = REPO_ROOT / "server/lib/ai/commander_staple_impact_policy.dart"
 REBUILD_GUIDED_SERVICE = REPO_ROOT / "server/lib/ai/rebuild_guided_service.dart"
 GENERATE_ROUTE = REPO_ROOT / "server/routes/ai/generate/index.dart"
 SUPPORT_TEST = REPO_ROOT / "server/test/commander_deckbuilding_contract_support_test.dart"
+EXTERNAL_BATTLE_RUNNER = SCRIPT_DIR / "external_battle_async_runner.py"
 BATTLE_ANALYST = SCRIPT_DIR / "battle_analyst_v9.py"
 GLOBAL_COMMANDER_FORCE_FOCUS_ACCESS_SCOPE_TEST = (
     SCRIPT_DIR / "test_global_commander_force_focus_access_scope.py"
@@ -1728,6 +1733,46 @@ def build_audit() -> dict[str, Any]:
                 "commanderStapleImpactPolicyDiagnostics",
                 "buildCommanderDeckbuildingContractDiagnostics",
                 "ready_for_battle_gate",
+                "battleLearningEvidence",
+                "battleComparisonGate",
+                "battle_comparison_input_ready",
+                "battle_swap_superiority_proven': false",
+            ],
+        )
+    )
+    checks.append(
+        check_contains(
+            GLOBAL_BATTLE_CLOSURE_DOC,
+            [
+                "external_battle_async_registry_v1",
+                "battle_positive_evidence_v1",
+                "comparison_input_ready=true",
+                "promotion_allowed=false",
+            ],
+        )
+    )
+    checks.append(
+        check_contains(
+            BATTLE_EVIDENCE_SUPPORT_FILE,
+            [
+                "battle_positive_evidence_v1",
+                "absence_proves_nonuse': false",
+                "natural_same_lane_exposure",
+                "comparison_input_ready",
+                "swap_superiority_proven': false",
+                "promotion_allowed': false",
+            ],
+        )
+    )
+    checks.append(
+        check_contains(
+            EXTERNAL_BATTLE_RUNNER,
+            [
+                "external_battle_async_registry_v1",
+                "external_battle_async_checkpoint_v1",
+                "absence_proves_nonuse",
+                "swap_superiority_proven",
+                "promotion_allowed",
             ],
         )
     )

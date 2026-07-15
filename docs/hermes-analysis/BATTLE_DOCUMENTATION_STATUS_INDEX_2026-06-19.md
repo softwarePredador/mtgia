@@ -8,7 +8,7 @@ divergencia, omissao ou artefato novo ainda nao listado aqui, o register
 prevalece. A tabela de fontes atuais e um roteador de leitura, nao uma lista
 exaustiva de todos os artefatos citados no register.
 
-Ultima reconciliacao do contrato de execucao: `2026-07-14`.
+Ultima reconciliacao do contrato de execucao: `2026-07-15`.
 O snapshot native/Hermes retido neste indice e
 `/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/20260620_160459/summary.json`.
 Ele nao substitui a cobertura global XMage/Forge definida em
@@ -45,6 +45,7 @@ Regra operacional:
 | --- | --- | --- |
 | `BATTLE_VALIDATION_REGISTER_2026-06-19.md` | current | Fonte viva de pendencias, tratativas fechadas e evidencia principal. |
 | `BATTLE_SYSTEM_LOGIC.md` | current | Arquitetura/logica atual; cruzar qualquer conclusao de pronto com o register. |
+| `GLOBAL_BATTLE_RULES_AND_LEARNING_CLOSURE_2026-07-15.md` | current | Runbook unico para cobertura global, reconciliacao source/catalog, residual semantico, runner assincrono retomavel e evidencia positiva consumivel pelo deckbuilder. |
 | `EXTERNAL_BATTLE_EXECUTION_CONTRACT.md` | current | Contrato atual de execucao global: XMage primario, Forge secundario apenas para gap estruturado e runtime native como residual explicito; nao confundir cobertura externa com promocao PostgreSQL ou prova individual de carta. |
 | `BATTLE_RULES_FAMILY_PIPELINE_CONTRACT_2026-06-29.md` | current | Contrato congelado para seguir battle rules/family mapping: checkpoint curto de invariantes, depois familias/subpadroes; nao reabrir estrategia inteira quando o checkpoint passa. |
 | `XMAGE_TO_MANALOOM_DEFINITIVE_FLOW_2026-06-29.md` | current | Fluxo operacional atual para absorcao XMage/Oracle -> ManaLoom; supersede o uso operacional dos planos XMage de 2026-06-23/24 e fixa gates contra promocao automatica de escopos genericos. |

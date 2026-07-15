@@ -14,6 +14,7 @@ SIDECAR = REPO_ROOT / "services/xmage-sidecar"
 FORGE_SIDECAR = REPO_ROOT / "services/forge-sidecar"
 SERVER = REPO_ROOT / "server"
 CONTRACT = REPO_ROOT / "docs/hermes-analysis/EXTERNAL_BATTLE_EXECUTION_CONTRACT.md"
+CLOSURE = REPO_ROOT / "docs/hermes-analysis/GLOBAL_BATTLE_RULES_AND_LEARNING_CLOSURE_2026-07-15.md"
 RULE_SYNC = REPO_ROOT / "docs/hermes-analysis/manaloom-knowledge/scripts/sync_battle_card_rules_pg.py"
 XMAGE_PIN = "34d81ea4995ce15d7e1a788dc6d2a3595d35bcec"
 FORGE_PIN = "a62915f500c2411484689294659c6bb84ea215f8"
@@ -339,6 +340,74 @@ def build_report() -> dict[str, object]:
                 "winner_deck_id",
                 "turns_played",
                 "_simulationMetrics",
+                "buildBattleLearningEvidence(result)",
+            ],
+        ),
+        source_check(
+            "server.positive_battle_evidence",
+            SERVER / "lib/ai/battle_learning_evidence_support.dart",
+            [
+                "battle_positive_evidence_v1",
+                "external_battle_learning_v1",
+                "absence_proves_nonuse",
+                "positive_exposure_ready",
+                "natural_same_lane_exposure",
+                "comparison_input_ready",
+                "swap_superiority_proven",
+                "promotion_allowed",
+            ],
+        ),
+        source_check(
+            "coverage.global_closure",
+            REPO_ROOT
+            / "docs/hermes-analysis/manaloom-knowledge/scripts/external_card_coverage_closure.py",
+            [
+                "external_card_coverage_closure_v1",
+                'ENGINE_ORDER = ("xmage", "forge", "native")',
+                "identity_reconciliation_is_not_coverage_until_runtime_uses_it",
+                "residual_semantic_family_counts",
+                '"promotion_allowed": False',
+            ],
+        ),
+        source_check(
+            "coverage.source_catalog_reconciliation",
+            REPO_ROOT
+            / "docs/hermes-analysis/manaloom-knowledge/scripts/xmage_source_catalog_reconciliation.py",
+            [
+                "xmage_source_catalog_reconciliation_v1",
+                "local_source_candidate_not_executable",
+                "runtime_catalog_confirmation_required",
+                "forge_catalog_fallback",
+            ],
+        ),
+        source_check(
+            "battle.resumable_async_runner",
+            REPO_ROOT
+            / "docs/hermes-analysis/manaloom-knowledge/scripts/external_battle_async_runner.py",
+            [
+                "external_battle_async_registry_v1",
+                "external_battle_async_checkpoint_v1",
+                "external_battle_comparison_gate_v1",
+                "restart_required",
+                "sidecar_process_id",
+                "comparison_input_ready",
+                "swap_superiority_proven",
+                "promotion_allowed",
+                ".json.gz",
+                "registry_hash",
+            ],
+        ),
+        source_check(
+            "operations.single_global_closure_entrypoint",
+            REPO_ROOT / "scripts/manaloom_global_battle_closure.sh",
+            [
+                "external_card_coverage_closure.py",
+                "xmage_source_catalog_reconciliation.py",
+                "external_battle_async_runner.py",
+                "easypanel-evolution",
+                "rm -rf '$REMOTE_DIR'",
+                "global_residual.json",
+                "source_catalog_residual.json",
             ],
         ),
         source_absence_check(
@@ -422,6 +491,23 @@ def build_report() -> dict[str, object]:
                 "manaloom_deploy_ops_image.sh",
                 "best-effort visible-state lower bound",
                 "absence_proves_nonuse=false",
+                "GLOBAL_BATTLE_RULES_AND_LEARNING_CLOSURE_2026-07-15.md",
+                "battle_positive_evidence_v1",
+            ],
+        ),
+        source_check(
+            "execution.global_closure_runbook",
+            CLOSURE,
+            [
+                "scripts/manaloom_global_battle_closure.sh coverage",
+                "external_card_coverage_closure_v1",
+                "xmage_source_catalog_reconciliation_v1",
+                "external_battle_async_registry_v1",
+                "external_battle_async_checkpoint_v1",
+                "battle_positive_evidence_v1",
+                "promotion_allowed=false",
+                "33,119",
+                "1,212",
             ],
         ),
     ]

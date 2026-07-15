@@ -5,6 +5,7 @@ import 'package:dart_frog/dart_frog.dart';
 import 'package:postgres/postgres.dart';
 
 import '../../../lib/ai/battle_engine_config.dart';
+import '../../../lib/ai/battle_learning_evidence_support.dart';
 import '../../../lib/ai/battle_simulator.dart';
 import '../../../lib/ai/forge_battle_client.dart';
 import '../../../lib/ai/goldfish_simulator.dart';
@@ -183,6 +184,8 @@ Future<Response> onRequest(RequestContext context) async {
           );
         }
       }
+
+      result['battle_learning_evidence'] = buildBattleLearningEvidence(result);
 
       await _saveSimulation(
         pool: pool,

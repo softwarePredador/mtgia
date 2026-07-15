@@ -1,8 +1,22 @@
 # Hermes Battle Scripts
 
-## Active Engine
+## Active Execution Order
 
-`battle_analyst_v9.py` is the active battle engine for ManaLoom/Hermes.
+The canonical execution order is live XMage, then Forge only for a structured
+XMage coverage gap, then verified native ManaLoom behavior. Use the single
+entrypoint and frozen runbook:
+
+```bash
+scripts/manaloom_global_battle_closure.sh coverage
+scripts/manaloom_global_battle_closure.sh battle registry.json /tmp/battle-state
+```
+
+See `GLOBAL_BATTLE_RULES_AND_LEARNING_CLOSURE_2026-07-15.md`. The entrypoint
+keeps local Java source candidates separate from exact runtime catalog
+coverage, checkpoints battle queues, and never promotes rules or deck swaps.
+
+`battle_analyst_v9.py` is the active native residual and Hermes laboratory
+engine. It is not a substitute for exact XMage/Forge catalog coverage.
 
 Operational scripts should use:
 
@@ -10,7 +24,7 @@ Operational scripts should use:
 export MANALOOM_BATTLE_SCRIPT="/opt/data/workspace/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py"
 ```
 
-Local fallbacks in optimizer, replay, sync and audit scripts now point to v9.
+Native fallbacks in optimizer, replay, sync and audit scripts point to v9.
 When `MANALOOM_BATTLE_SCRIPT` / `BATTLE_SCRIPTS_DIR` are absent, the local
 helpers under `server/bin/` resolve the current repo root dynamically instead of
 assuming `/opt/data/workspace/mtgia`.

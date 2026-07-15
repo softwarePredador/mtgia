@@ -27,6 +27,7 @@ FAILURE_MODE_MATRIX = DOCS_DIR / "MANALOOM_FAILURE_MODE_VALIDATION_MATRIX_2026-0
 XMAGE_FLOW = DOCS_DIR / "XMAGE_TO_MANALOOM_DEFINITIVE_FLOW_2026-06-29.md"
 BATTLE_RULES_CONTRACT = DOCS_DIR / "BATTLE_RULES_FAMILY_PIPELINE_CONTRACT_2026-06-29.md"
 DECKBUILDING_CONTRACT = DOCS_DIR / "COMMANDER_DECKBUILDING_CONTRACT_2026-06-29.md"
+GLOBAL_BATTLE_CLOSURE = DOCS_DIR / "GLOBAL_BATTLE_RULES_AND_LEARNING_CLOSURE_2026-07-15.md"
 APP_AI_BRIDGE_CONTRACT = DOCS_DIR / "APP_AI_KNOWLEDGE_BRIDGE_CONTRACT_2026-07-06.md"
 NEW_SERVER_POSTGRES_WORKFLOW = DOCS_DIR / "NEW_SERVER_POSTGRES_WORKFLOW_2026-07-06.md"
 XMAGE_AUDIT = SCRIPT_DIR / "xmage_strategy_consistency_audit.py"
@@ -53,6 +54,9 @@ LOREHOLD_EXPOSURE_AWARE_GATE_QUEUE = SCRIPT_DIR / "lorehold_exposure_aware_gate_
 LOREHOLD_FAILURE_SYNERGY = SCRIPT_DIR / "lorehold_failure_targeted_synergy_hypotheses.py"
 LOREHOLD_FAILURE_TRACE = SCRIPT_DIR / "lorehold_failure_targeted_trace_audit.py"
 LEGACY_CONTAMINATION_AUDIT = SCRIPT_DIR / "legacy_contamination_audit.py"
+EXTERNAL_CARD_COVERAGE = SCRIPT_DIR / "external_card_coverage_closure.py"
+EXTERNAL_BATTLE_RUNNER = SCRIPT_DIR / "external_battle_async_runner.py"
+SOURCE_CATALOG_RECONCILIATION = SCRIPT_DIR / "xmage_source_catalog_reconciliation.py"
 BUILD_OPTIMIZED_DECK = SCRIPT_DIR / "build_optimized_deck.py"
 UNIVERSAL_OPTIMIZER = SCRIPT_DIR / "universal_optimizer.py"
 ROUTE_GENERATE = REPO_ROOT / "server" / "routes" / "ai" / "generate" / "index.dart"
@@ -170,6 +174,9 @@ def build_checks() -> list[Check]:
             OPERATIONAL_LOOKUP_GUIDE,
             [
                 "Status: `current_lookup_index`",
+                "GLOBAL_BATTLE_RULES_AND_LEARNING_CLOSURE_2026-07-15.md",
+                "manaloom_global_battle_closure.sh coverage",
+                "external_battle_async_registry_v1",
                 "resolve_default_knowledge_db()",
                 "lorehold_failure_targeted_synergy_hypotheses.py",
                 "--allow-legacy-registry-runner",
@@ -263,7 +270,10 @@ def build_checks() -> list[Check]:
         check_contains(
             SCRIPTS_README,
             [
-                "`battle_analyst_v9.py` is the active battle engine",
+                "The canonical execution order is live XMage",
+                "manaloom_global_battle_closure.sh coverage",
+                "manaloom_global_battle_closure.sh battle",
+                "active native residual and Hermes laboratory",
                 "Legacy engines",
                 "Refresh the SQLite battle cache from PostgreSQL first",
                 "legacy_contamination_audit.py",
@@ -571,6 +581,43 @@ def build_checks() -> list[Check]:
                 "ready_for_battle_gate",
             ],
             "server.deckbuilding_contract_support_exists",
+        ),
+        check_contains(
+            GLOBAL_BATTLE_CLOSURE,
+            [
+                "external_card_coverage_closure_v1",
+                "external_battle_async_registry_v1",
+                "battle_positive_evidence_v1",
+                "promotion_allowed=false",
+            ],
+            "docs.global_battle_closure_is_current",
+        ),
+        check_contains(
+            EXTERNAL_CARD_COVERAGE,
+            [
+                "external_card_coverage_closure_v1",
+                "family_gates",
+                "promotion_allowed",
+            ],
+            "scripts.global_card_coverage_closure_exists",
+        ),
+        check_contains(
+            SOURCE_CATALOG_RECONCILIATION,
+            [
+                "xmage_source_catalog_reconciliation_v1",
+                "local_source_candidate_not_executable",
+            ],
+            "scripts.source_catalog_reconciliation_exists",
+        ),
+        check_contains(
+            EXTERNAL_BATTLE_RUNNER,
+            [
+                "external_battle_async_checkpoint_v1",
+                "response.status == 422",
+                "swap_superiority_proven",
+                "promotion_allowed",
+            ],
+            "scripts.external_battle_runner_is_resumable_and_non_promoting",
         ),
     ]
 

@@ -2,6 +2,13 @@
 
 Status: `frozen_operating_contract`.
 
+Battle inputs now follow
+`docs/hermes-analysis/GLOBAL_BATTLE_RULES_AND_LEARNING_CLOSURE_2026-07-15.md`.
+Commander diagnostics may consume `battle_positive_evidence_v1` as exposure or
+comparison input. They must never treat it as automatic swap superiority;
+`promotion_allowed` remains false until the separate statistical and strategy
+gate closes.
+
 This file freezes the operating contract for ManaLoom Commander deckbuilding.
 It is separate from `XMAGE_TO_MANALOOM_DEFINITIVE_FLOW_2026-06-29.md` and
 `BATTLE_RULES_FAMILY_PIPELINE_CONTRACT_2026-06-29.md`.

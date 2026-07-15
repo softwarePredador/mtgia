@@ -2,6 +2,13 @@
 
 Status: `current_operating_standard`.
 
+Current operational execution and learning closure is centralized in
+`docs/hermes-analysis/GLOBAL_BATTLE_RULES_AND_LEARNING_CLOSURE_2026-07-15.md`
+and `scripts/manaloom_global_battle_closure.sh`. A local XMage Java path is a
+source candidate until `xmage_source_catalog_reconciliation.py` confirms the
+exact identity against the pinned runtime catalogs. Historical package records
+below remain evidence, not alternate current runners.
+
 This document supersedes the operational parts of:
 
 - `XMAGE_ABSORPTION_IMPLEMENTATION_PLAN_2026-06-23.md`
