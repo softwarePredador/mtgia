@@ -810,6 +810,7 @@ register_event_contract_group(
 register_event_contract_group(
     """
     activated_ability_resolved
+    ad_nauseam_resolved
     aura_attached_static_pt
     basic_land_compensation_resolved
     becomes_blocked_draw_resolved
@@ -863,6 +864,8 @@ register_event_contract_group(
     mill_engine_resolved
     modal_exile_board_wipe_resolved
     multi_target_damage_resolved
+    opponent_graveyard_betrayal_resolved
+    opponent_graveyard_betrayal_returned
     phase_trigger_resolved
     prepared_spell_resolved
     proliferate_resolved

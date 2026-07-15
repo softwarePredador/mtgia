@@ -15769,6 +15769,7 @@ class Player:
         self._cards_discarded_turn_marker = None
         self.surge_to_victory_delayed_triggers = []
         self.temporary_exile_returns = []
+        self.opponent_graveyard_betrayal_returns = []
         self.failed_draw_from_empty_library = False
         self.turn_end_requested = False
         self.turn_end_source = None
@@ -27183,6 +27184,187 @@ def resolve_temporary_exile_return_next_end_step(
     )
     finish_resolved_spell(player, card, turn=turn, effect_data=effect_data)
     return target
+
+
+def resolve_ad_nauseam(player, card, effect_data, turn, *, phase="resolution"):
+    """Resolve the compact Ad Nauseam choice model recorded by the verified rule."""
+    fields = replay_rule_fields(effect_data)
+    life_before = int(getattr(player, "life", 0) or 0)
+    life_floor = max(0, int(effect_data.get("ad_nauseam_life_floor") or 1))
+    revealed = []
+    life_lost = 0
+    stop_reason = "library_empty"
+
+    while player.library:
+        top_card = player.library[0]
+        mana_value = max(0, int(card_mana_value(top_card) or 0))
+        if effect_data.get("stop_before_life_below_floor", True) and (
+            int(getattr(player, "life", 0) or 0) - mana_value < life_floor
+        ):
+            stop_reason = "life_floor_choice"
+            break
+        player.library.pop(0)
+        player.hand.append(top_card)
+        current_life = int(getattr(player, "life", 0) or 0)
+        change_life(player, -mana_value)
+        actual_loss = max(0, current_life - int(getattr(player, "life", current_life) or 0))
+        life_lost += actual_loss
+        revealed.append(
+            {
+                "card": top_card.get("name", "?") if isinstance(top_card, dict) else str(top_card),
+                "mana_value": mana_value,
+                "life_lost": actual_loss,
+            }
+        )
+
+    emit_replay_event(
+        "ad_nauseam_resolved",
+        player=player.name,
+        card=card.get("name", "?"),
+        revealed=revealed,
+        revealed_count=len(revealed),
+        cards_moved_to_hand=len(revealed),
+        life_before=life_before,
+        life_lost=life_lost,
+        life_after=int(getattr(player, "life", 0) or 0),
+        life_floor=life_floor,
+        stop_reason=stop_reason,
+        destination="hand",
+        turn=turn,
+        phase=phase,
+        **fields,
+    )
+    finish_resolved_spell(player, card, turn=turn, effect_data=effect_data)
+    return revealed
+
+
+def resolve_opponent_graveyard_betrayal(
+    player,
+    opponents,
+    card,
+    effect_data,
+    turn,
+    *,
+    phase="resolution",
+):
+    """Exile opponents' graveyards and schedule remaining cards to return."""
+    fields = replay_rule_fields(effect_data)
+    exiled_entries = []
+    exiled_names = []
+    for owner in list(opponents or []):
+        cards = list(getattr(owner, "graveyard", []) or [])
+        if not cards:
+            continue
+        owner.graveyard.clear()
+        for exiled_card in cards:
+            if isinstance(exiled_card, dict):
+                exiled_card["_betrayal_permission_controller"] = player.name
+                exiled_card["_betrayal_permission_until_turn"] = int(turn)
+                exiled_card["_betrayal_owner"] = owner.name
+                exiled_card["_betrayal_source"] = card.get("name", "?")
+            move_to_exile(
+                owner,
+                exiled_card,
+                reason="opponent_graveyard_betrayal",
+                turn=turn,
+            )
+            exiled_entries.append({"owner": owner, "card": exiled_card})
+            exiled_names.append(
+                exiled_card.get("name", "?")
+                if isinstance(exiled_card, dict)
+                else str(exiled_card)
+            )
+
+    if exiled_entries:
+        player.opponent_graveyard_betrayal_returns.append(
+            {
+                "entries": exiled_entries,
+                "source": card.get("name", "?"),
+                "created_turn": int(turn),
+                "rule_fields": fields,
+            }
+        )
+
+    emit_replay_event(
+        "opponent_graveyard_betrayal_resolved",
+        player=player.name,
+        card=card.get("name", "?"),
+        exiled_cards=exiled_names,
+        exiled_count=len(exiled_names),
+        opponents_affected=sorted(
+            {
+                entry["owner"].name
+                for entry in exiled_entries
+            }
+        ),
+        destination="exile",
+        cast_permission_duration=effect_data.get("cast_permission_duration", "until_end_of_turn"),
+        cast_permission_status=effect_data.get(
+            "cast_permission_status",
+            "tracked_not_selected_by_ai",
+        ),
+        mana_any_type_for_casting=bool(effect_data.get("mana_any_type_for_casting", True)),
+        return_trigger=effect_data.get("return_trigger", "next_end_step"),
+        turn=turn,
+        phase=phase,
+        **fields,
+    )
+    finish_resolved_spell(player, card, turn=turn, effect_data=effect_data)
+    return exiled_entries
+
+
+def process_opponent_graveyard_betrayal_returns(active_player, all_players, turn):
+    returned = []
+    for controller in list(all_players or []):
+        pending = list(getattr(controller, "opponent_graveyard_betrayal_returns", []) or [])
+        controller.opponent_graveyard_betrayal_returns = []
+        for entry in pending:
+            if int(entry.get("created_turn") or 0) > int(turn):
+                controller.opponent_graveyard_betrayal_returns.append(entry)
+                continue
+            returned_names = []
+            owner_names = []
+            for card_entry in entry.get("entries") or []:
+                owner = card_entry.get("owner")
+                returned_card = card_entry.get("card")
+                if owner is None or returned_card not in getattr(owner, "exile", []):
+                    continue
+                owner.exile.remove(returned_card)
+                if isinstance(returned_card, dict):
+                    for key in (
+                        "_betrayal_permission_controller",
+                        "_betrayal_permission_until_turn",
+                        "_betrayal_owner",
+                        "_betrayal_source",
+                        "_exile_face_down",
+                        "_exile_public",
+                        "_exile_reason",
+                        "_exile_turn",
+                    ):
+                        returned_card.pop(key, None)
+                owner.graveyard.append(returned_card)
+                returned.append(returned_card)
+                returned_names.append(
+                    returned_card.get("name", "?")
+                    if isinstance(returned_card, dict)
+                    else str(returned_card)
+                )
+                owner_names.append(owner.name)
+            emit_replay_event(
+                "opponent_graveyard_betrayal_returned",
+                player=controller.name,
+                active_player=getattr(active_player, "name", None),
+                card=entry.get("source", "?"),
+                returned_cards=returned_names,
+                returned_count=len(returned_names),
+                owners=owner_names,
+                destination="owners_graveyards",
+                result="remaining_exiled_cards_returned",
+                turn=turn,
+                phase="end_step",
+                **dict(entry.get("rule_fields") or {}),
+            )
+    return returned
 
 
 def process_temporary_exile_returns(active_player, all_players, turn, rng):
@@ -56558,6 +56740,10 @@ def resolve_etb_library_tutor_to_hand(player, opponents, card, effect_data, turn
         target_type=target_type,
         found=moved[0].get("name", "?") if moved else None,
         found_cards=[item.get("name", "?") for item in moved],
+        candidate_count=len(candidates),
+        no_target_reason=None if moved else "library_has_no_legal_candidate",
+        search_zone_hidden=True,
+        search_may_fail_to_find=True,
         destination=destination,
         trigger="enters_battlefield",
         turn=turn,
@@ -78425,6 +78611,23 @@ def apply_effect_immediate(
             phase=phase,
         )
         finish_resolved_spell(player, card, turn=turn, effect_data=effect_data)
+    elif effect == "ad_nauseam":
+        resolve_ad_nauseam(
+            player,
+            card,
+            effect_data,
+            turn,
+            phase=phase or "resolution",
+        )
+    elif effect == "opponent_graveyard_betrayal":
+        resolve_opponent_graveyard_betrayal(
+            player,
+            opponents,
+            card,
+            effect_data,
+            turn,
+            phase=phase or "resolution",
+        )
     elif effect == "temporary_exile_return_next_end_step":
         resolve_temporary_exile_return_next_end_step(
             player,
@@ -80371,6 +80574,10 @@ def apply_effect_immediate(
             delirium_active=delirium_active,
             found=found.get("name", "?") if found else None,
             found_cards=[item.get("name", "?") for item in moved_cards],
+            candidate_count=len(candidates),
+            no_target_reason=None if found else "library_has_no_legal_candidate",
+            search_zone_hidden=True,
+            search_may_fail_to_find=True,
             destination=destination,
             turn=turn,
             **fields,
@@ -83699,6 +83906,7 @@ def play_turn_v8(player, opponents, all_players, turn, rng, stack):
 
     # ── END STEP (v8.3) ──
     process_temporary_exile_returns(player, all_players, turn, rng)
+    process_opponent_graveyard_betrayal_returns(player, all_players, turn)
     process_end_step_phase_engines(player, all_players, turn, rng, stack=stack)
     process_unfinity_end_step(player, opponents, all_players, turn, rng)
     process_specialize_end_step(player, all_players, turn, rng)

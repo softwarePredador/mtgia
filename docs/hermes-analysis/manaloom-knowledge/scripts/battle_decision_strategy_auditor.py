@@ -380,6 +380,17 @@ def immediate_payoff_after_resource_spend(
         if candidate.get("player") != player or candidate.get("turn") != turn:
             continue
         kind = candidate.get("event")
+        if (
+            kind == "land_ramp_resolved"
+            and candidate.get("card") == spent_card
+            and (candidate.get("found") or int(candidate.get("count") or 0) > 0)
+        ):
+            return {
+                "event": kind,
+                "card": candidate.get("card"),
+                "found": candidate.get("found") or [],
+                "reason": "same_spell_land_replacement_resolved",
+            }
         if kind == "commander_cast":
             return {
                 "event": kind,

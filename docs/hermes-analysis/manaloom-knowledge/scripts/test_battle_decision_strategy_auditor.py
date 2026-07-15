@@ -334,6 +334,35 @@ def test_strategy_auditor_accepts_documented_land_sacrifice_benefit():
     assert result["summary"]["findings"] == 0
 
 
+def test_strategy_auditor_accepts_crop_rotation_when_its_land_replacement_resolves():
+    result = auditor.audit_strategy(
+        events=[
+            {
+                "event": "additional_cost_paid",
+                "player": "Thrasios",
+                "turn": 1,
+                "card": "Crop Rotation",
+                "cost": "sacrifice_land",
+                "sacrificed": "Flooded Grove",
+                "land_options": [{"name": "Flooded Grove"}],
+                "selection_reason": "prefer_redundant_tapped_basic_land_preserve_unique_colors",
+                "strategic_risk_flags": ["spending_last_land", "spending_unique_color_land"],
+            },
+            {
+                "event": "land_ramp_resolved",
+                "player": "Thrasios",
+                "turn": 1,
+                "card": "Crop Rotation",
+                "count": 1,
+                "found": ["Ancient Tomb"],
+            },
+        ],
+        decisions=[],
+    )
+
+    assert result["summary"]["findings"] == 0
+
+
 def test_strategy_auditor_still_blocks_last_land_spend_without_payoff():
     result = auditor.audit_strategy(
         events=[
@@ -737,6 +766,7 @@ if __name__ == "__main__":
         test_strategy_auditor_accepts_documented_land_discard_unlock_context,
         test_strategy_auditor_accepts_land_discard_payoff_after_trigger_window,
         test_strategy_auditor_accepts_documented_land_sacrifice_benefit,
+        test_strategy_auditor_accepts_crop_rotation_when_its_land_replacement_resolves,
         test_strategy_auditor_still_blocks_last_land_spend_without_payoff,
         test_strategy_auditor_flags_unjustified_tutor_and_wipe_wheel,
         test_strategy_auditor_accepts_already_resolving_board_wipe_copy,

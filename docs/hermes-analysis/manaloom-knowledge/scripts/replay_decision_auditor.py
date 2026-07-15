@@ -410,7 +410,13 @@ def audit_turn_events(events: list[dict[str, Any]]) -> list[dict[str, Any]]:
                 approach_won.add((replay_id, str(event.get("player") or "?")))
 
         elif kind == "tutor_resolved":
-            if not event.get("found"):
+            justified_hidden_zone_miss = (
+                event.get("no_target_reason") == "library_has_no_legal_candidate"
+                and event.get("candidate_count") == 0
+                and event.get("search_zone_hidden") is True
+                and event.get("search_may_fail_to_find") is True
+            )
+            if not event.get("found") and not justified_hidden_zone_miss:
                 add_finding(findings, "medium", event, "Tutor resolved without finding a target.")
 
         elif kind == "removal_resolved":

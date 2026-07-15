@@ -24,6 +24,7 @@ def load_module(name: str, filename: str):
 battle = load_module("battle_pending_runtime_closure", "battle_analyst_v9.py")
 forensic = load_module("battle_pending_forensic_closure", "battle_forensic_audit.py")
 critic = load_module("battle_pending_action_critic_closure", "battle_action_critic.py")
+replay_auditor = load_module("battle_pending_replay_auditor_closure", "replay_decision_auditor.py")
 
 
 def capture_events():
@@ -204,13 +205,141 @@ def test_wishclaw_scanner_ignores_legacy_non_mapping_battlefield_entries():
 
 def test_forensic_registry_accepts_only_now_executable_pending_effects():
     for effect in {
+        "ad_nauseam",
         "aura_static_attachment",
         "graveyard_to_library_top",
+        "opponent_graveyard_betrayal",
         "temporary_exile_return_next_end_step",
         "tutor_artifact",
         "untap_lands",
     }:
         assert effect in forensic.SUPPORTED_EFFECTS
+
+
+def test_ad_nauseam_reveals_until_the_verified_life_floor_choice():
+    events = capture_events()
+    active = battle.Player(
+        "Active",
+        None,
+        [
+            card("Free Spell", "Instant", cmc=0),
+            card("Three Drop", "Creature", cmc=3),
+            card("Unsafe Five Drop", "Sorcery", cmc=5),
+        ],
+    )
+    active.life = 7
+    effect = {
+        "effect": "ad_nauseam",
+        "ad_nauseam_life_floor": 1,
+        "stop_before_life_below_floor": True,
+        "exiles_self": False,
+        "_rule_source": "curated",
+        "_rule_review_status": "verified",
+        "_rule_logical_key": "battle_rule_v1:ad_nauseam_fixture",
+    }
+    source = card("Ad Nauseam", "Instant", cmc=5)
+
+    battle.apply_effect_immediate(
+        active,
+        [],
+        source,
+        turn=5,
+        rng=random.Random(10),
+        effect_data_override=effect,
+        phase="end_step",
+    )
+
+    assert [item["name"] for item in active.hand] == ["Free Spell", "Three Drop"]
+    assert [item["name"] for item in active.library] == ["Unsafe Five Drop"]
+    assert active.life == 4
+    assert source in active.graveyard
+    resolved = next(event for event in events if event["event"] == "ad_nauseam_resolved")
+    assert resolved["revealed_count"] == 2
+    assert resolved["life_lost"] == 3
+    assert resolved["stop_reason"] == "life_floor_choice"
+
+
+def test_mnemonic_betrayal_exiles_opponent_graveyards_then_returns_remaining_cards():
+    events = capture_events()
+    active = battle.Player("Active", None, [])
+    opponent_a = battle.Player("Opponent A", None, [])
+    opponent_b = battle.Player("Opponent B", None, [])
+    card_a = card("A Spell", "Instant", cmc=1)
+    card_b = card("A Land", "Land", cmc=0)
+    card_c = card("B Creature", "Creature", cmc=2)
+    opponent_a.graveyard.extend([card_a, card_b])
+    opponent_b.graveyard.append(card_c)
+    source = card("Mnemonic Betrayal", "Sorcery", cmc=3)
+    effect = {
+        "effect": "opponent_graveyard_betrayal",
+        "cast_permission_duration": "until_end_of_turn",
+        "cast_permission_status": "tracked_not_selected_by_ai",
+        "mana_any_type_for_casting": True,
+        "return_trigger": "next_end_step",
+        "exiles_self": True,
+        "_rule_source": "curated",
+        "_rule_review_status": "verified",
+        "_rule_logical_key": "battle_rule_v1:betrayal_fixture",
+    }
+
+    battle.apply_effect_immediate(
+        active,
+        [opponent_a, opponent_b],
+        source,
+        turn=6,
+        rng=random.Random(11),
+        effect_data_override=effect,
+        phase="precombat_main",
+    )
+
+    assert opponent_a.graveyard == []
+    assert opponent_b.graveyard == []
+    assert opponent_a.exile == [card_a, card_b]
+    assert opponent_b.exile == [card_c]
+    assert source in active.exile
+    assert card_a["_betrayal_permission_controller"] == "Active"
+
+    returned = battle.process_opponent_graveyard_betrayal_returns(
+        active,
+        [active, opponent_a, opponent_b],
+        turn=6,
+    )
+    assert returned == [card_a, card_b, card_c]
+    assert opponent_a.exile == []
+    assert opponent_b.exile == []
+    assert opponent_a.graveyard == [card_a, card_b]
+    assert opponent_b.graveyard == [card_c]
+    assert "_betrayal_permission_controller" not in card_a
+    assert any(
+        event["event"] == "opponent_graveyard_betrayal_resolved"
+        and event.get("exiled_count") == 3
+        for event in events
+    )
+    assert any(
+        event["event"] == "opponent_graveyard_betrayal_returned"
+        and event.get("returned_count") == 3
+        for event in events
+    )
+
+
+def test_hidden_zone_tutor_miss_with_exhausted_candidates_is_not_a_turn_finding():
+    findings = replay_auditor.audit_turn_events(
+        [
+            {
+                "event": "tutor_resolved",
+                "replay_id": "seed_fixture",
+                "turn": 4,
+                "player": "Active",
+                "card": "Spellseeker",
+                "found": None,
+                "candidate_count": 0,
+                "no_target_reason": "library_has_no_legal_candidate",
+                "search_zone_hidden": True,
+                "search_may_fail_to_find": True,
+            }
+        ]
+    )
+    assert findings == []
 
 
 def test_action_critic_accepts_paid_counter_tax_as_legal_result():
@@ -354,6 +483,9 @@ if __name__ == "__main__":
         test_response_effect_copy_keeps_resolution_provenance,
         test_activated_ability_cost_is_not_paid_while_casting_its_permanent,
         test_land_ramp_does_not_pay_a_cast_sacrifice_again_on_resolution,
+        test_ad_nauseam_reveals_until_the_verified_life_floor_choice,
+        test_mnemonic_betrayal_exiles_opponent_graveyards_then_returns_remaining_cards,
+        test_hidden_zone_tutor_miss_with_exhausted_candidates_is_not_a_turn_finding,
     ]
     for test in tests:
         test()

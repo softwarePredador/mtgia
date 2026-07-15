@@ -30,6 +30,7 @@ REPORT_DIR = SCRIPT_DIR.parents[1] / "master_optimizer_reports"
 
 SUPPORTED_EFFECTS = {
     "add_mana",
+    "ad_nauseam",
     "aetherflux_lifegain",
     "aetherflux_reservoir",
     "approach",
@@ -87,6 +88,7 @@ SUPPORTED_EFFECTS = {
     "loot",
     "modal_boros_charm",
     "overload_recursion",
+    "opponent_graveyard_betrayal",
     "passive",
     "phase_out",
     "phase_creatures",
