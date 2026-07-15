@@ -4,7 +4,11 @@ set -euo pipefail
 SERVER_BIN_DIR="$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)"
 REPO_ROOT="${MANALOOM_REPO:-$(CDPATH= cd -- "$SERVER_BIN_DIR/../.." && pwd)}"
 SCRIPT_DIR="${MANALOOM_HERMES_SCRIPT_DIR:-$REPO_ROOT/docs/hermes-analysis/manaloom-knowledge/scripts}"
-ARTIFACT_DIR="${MANALOOM_MASTER_OPTIMIZER_ARTIFACT_DIR:-$REPO_ROOT/server/test/artifacts/master_optimizer_preflight}"
+DEFAULT_ARTIFACT_DIR="$REPO_ROOT/server/test/artifacts/master_optimizer_preflight"
+if [[ -d /data/manaloom-ops ]]; then
+  DEFAULT_ARTIFACT_DIR="/data/manaloom-ops/artifacts/master-optimizer-preflight"
+fi
+ARTIFACT_DIR="${MANALOOM_MASTER_OPTIMIZER_ARTIFACT_DIR:-$DEFAULT_ARTIFACT_DIR}"
 DEFAULT_REPORT_DIR="$REPO_ROOT/docs/hermes-analysis/master_optimizer_reports"
 if [[ -d /data/manaloom-ops ]]; then
   DEFAULT_REPORT_DIR="$ARTIFACT_DIR/master_optimizer_reports"
