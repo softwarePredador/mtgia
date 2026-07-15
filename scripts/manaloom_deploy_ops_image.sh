@@ -99,6 +99,7 @@ docker service update \
   --env-add MANALOOM_NATIVE_BATTLE_SYNC_ON_BOOT=1 \
   --env-add MANALOOM_NATIVE_BATTLE_HOST=0.0.0.0 \
   --env-add MANALOOM_NATIVE_BATTLE_PORT=8080 \
+  --env-add MANALOOM_LOREHOLD_CANONICAL_OVERRIDE=0 \
   --env-add MANALOOM_CANONICAL_KNOWN_CARDS_JSON=/data/manaloom-ops/known_cards_canonical_snapshot.runtime.json \
   '$SERVICE'
 
@@ -106,18 +107,22 @@ for attempt in \$(seq 1 60); do
   replicas="\$(docker service ls --filter name='$SERVICE' --format '{{.Replicas}}' | head -n 1)"
   if [[ "\$replicas" == "1/1" ]]; then
     container="\$(docker ps --filter label=com.docker.swarm.service.name='$SERVICE' -q | head -1)"
-    docker exec "\$container" grep -Fq \
-      "oracle_hash = COALESCE(NULLIF(EXCLUDED.oracle_hash, ''), card_battle_rules.oracle_hash)" \
-      /app/docs/hermes-analysis/manaloom-knowledge/scripts/sync_battle_card_rules_pg.py
-    docker exec "\$container" grep -Fq \
-      "def backfill_trusted_oracle_hashes" \
-      /app/docs/hermes-analysis/manaloom-knowledge/scripts/sync_battle_card_rules_pg.py
-    docker exec "\$container" test -s \
-      /data/manaloom-ops/known_cards_canonical_snapshot.runtime.json
-    docker exec "\$container" python3 -c \
-      "import json, urllib.request; data=json.load(urllib.request.urlopen('http://127.0.0.1:8080/health', timeout=5)); assert data['status']=='ok'; assert data['engine_contract']=='native_reviewed_rules_execution'; assert data['git_sha']=='$sha'; assert data['verified_rule_count']>0; print(json.dumps(data, sort_keys=True))"
-    docker service ls --filter name='$SERVICE' --format '{{.Name}} {{.Image}} {{.Replicas}}'
-    exit 0
+    if docker exec "\$container" test -s \
+        /data/manaloom-ops/known_cards_canonical_snapshot.runtime.json && \
+      docker exec "\$container" python3 -c \
+        "import json, urllib.request; data=json.load(urllib.request.urlopen('http://127.0.0.1:8080/health', timeout=5)); assert data['status']=='ok'; assert data['engine_contract']=='native_reviewed_rules_execution'; assert data['git_sha']=='$sha'; assert data['verified_rule_count']>0" \
+        >/dev/null 2>&1; then
+      docker exec "\$container" grep -Fq \
+        "oracle_hash = COALESCE(NULLIF(EXCLUDED.oracle_hash, ''), card_battle_rules.oracle_hash)" \
+        /app/docs/hermes-analysis/manaloom-knowledge/scripts/sync_battle_card_rules_pg.py
+      docker exec "\$container" grep -Fq \
+        "def backfill_trusted_oracle_hashes" \
+        /app/docs/hermes-analysis/manaloom-knowledge/scripts/sync_battle_card_rules_pg.py
+      docker exec "\$container" python3 -c \
+        "import json, urllib.request; data=json.load(urllib.request.urlopen('http://127.0.0.1:8080/health', timeout=5)); print(json.dumps(data, sort_keys=True))"
+      docker service ls --filter name='$SERVICE' --format '{{.Name}} {{.Image}} {{.Replicas}}'
+      exit 0
+    fi
   fi
   sleep 2
 done
@@ -129,9 +134,9 @@ REMOTE
 deployed_contract="$(ssh -o BatchMode=yes -i "$SSH_KEY" "$SSH_HOST" "
 container=\$(docker ps --filter label=com.docker.swarm.service.name='$SERVICE' -q | head -1)
 docker inspect \"\$container\" --format '{{range .Config.Env}}{{println .}}{{end}}' |
-  awk -F= '/^GIT_SHA=/{sha=\$2} /^DB_HOST=/{host=\$2} /^DB_PORT=/{port=\$2} /^DB_NAME=/{name=\$2} /^MANALOOM_NATIVE_BATTLE_HTTP_ENABLED=/{http=\$2} /^MANALOOM_NATIVE_BATTLE_SYNC_ON_BOOT=/{sync=\$2} END{print sha \"|\" host \"|\" port \"|\" name \"|\" http \"|\" sync}'
+  awk -F= '/^GIT_SHA=/{sha=\$2} /^DB_HOST=/{host=\$2} /^DB_PORT=/{port=\$2} /^DB_NAME=/{name=\$2} /^MANALOOM_NATIVE_BATTLE_HTTP_ENABLED=/{http=\$2} /^MANALOOM_NATIVE_BATTLE_SYNC_ON_BOOT=/{sync=\$2} /^MANALOOM_LOREHOLD_CANONICAL_OVERRIDE=/{override=\$2} END{print sha \"|\" host \"|\" port \"|\" name \"|\" http \"|\" sync \"|\" override}'
 ")"
-if [[ "$deployed_contract" != "$sha|$EXPECTED_DB_HOST|$EXPECTED_DB_PORT|$EXPECTED_DB_NAME|1|1" ]]; then
+if [[ "$deployed_contract" != "$sha|$EXPECTED_DB_HOST|$EXPECTED_DB_PORT|$EXPECTED_DB_NAME|1|1|0" ]]; then
   echo "deploy convergiu com SHA ou alvo PostgreSQL divergente" >&2
   exit 2
 fi

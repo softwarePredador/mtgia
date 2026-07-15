@@ -155,7 +155,12 @@ class RuntimePgRuleFallbackForPromotedHotfixesTests(unittest.TestCase):
                 self.assertNotIn(card_name, battle.MANUAL_RULE_RUNTIME_WAIVERS)
                 self.assertNotIn(card_name, battle.HANDCRAFTED_KNOWN_CARDS)
 
-                registry_rule = battle.battle_rule_registry.lookup_battle_card_rule(battle.DB, card_name)
+                registry_rule = battle.battle_rule_registry.lookup_battle_card_rule(
+                    battle.DB,
+                    card_name,
+                    include_review_only=False,
+                    runtime_safe_only=True,
+                )
                 self.assertIsNotNone(registry_rule, msg=f"{card_name} missing from SQLite/PG registry")
                 self.assertTrue(registry_rule.get("effect_json"), msg=f"{card_name} registry rule has empty effect_json")
 

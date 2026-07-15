@@ -3,6 +3,7 @@
 import random
 import sqlite3
 import tempfile
+from contextlib import closing
 from pathlib import Path
 
 
@@ -4936,7 +4937,7 @@ def register_tests(battle, player):
             assert rule["battle_model_scope"] == scope
             assert rule["produces"] == "R"
             assert rule["mana_produced"] == mana_produced
-            assert rule["mana_color_status"] == "abstracted_to_generic_pool_runtime"
+            assert rule["mana_color_status"] == "colored_pool_runtime"
             assert rule["_rule_logical_key"] == logical_key
             assert rule["_rule_oracle_hash"] == oracle_hash
             assert rule["_rule_execution_status"] == "auto"
@@ -4957,9 +4958,11 @@ def register_tests(battle, player):
             rite = {"name": "Rite of Flame", "cmc": 1, "type_line": "Sorcery"}
             seething = {"name": "Seething Song", "cmc": 3, "type_line": "Instant"}
             battle.apply_effect_immediate(active, [], rite, 3, random.Random(58))
-            assert active.mana_pool.generic == 2
+            assert active.mana_pool.red == 2
+            assert active.mana_pool.generic == 0
             battle.apply_effect_immediate(active, [], seething, 3, random.Random(59))
-            assert active.mana_pool.generic == 7
+            assert active.mana_pool.red == 7
+            assert active.mana_pool.generic == 0
         finally:
             battle.REPLAY_EVENT_HANDLER = None
 
@@ -5088,7 +5091,8 @@ def register_tests(battle, player):
 
         assert simian not in active.hand
         assert simian in active.exile
-        assert active.mana_pool.generic == 1
+        assert active.mana_pool.red == 1
+        assert active.mana_pool.generic == 0
         assert any(
             event == "ritual_mana_added"
             and data.get("card") == "Simian Spirit Guide"
@@ -10385,7 +10389,7 @@ def register_tests(battle, player):
             "Storm-Kiln Artist": (
                 "battle_rule_v1:128e222b4de1e6308d98743711b54985",
                 "cb2cf161073de3983ac24385743ab78a",
-                "creature_body_artifact_power_magecraft_treasure_annotation_v1",
+                "creature_body_artifact_power_annotation_magecraft_treasure_runtime_v1",
             ),
         }
         cards = [
@@ -10433,6 +10437,11 @@ def register_tests(battle, player):
                     assert effect_data["activated_protection_status"] == "runtime_executor_v1"
                     assert effect_data["runtime_modeled_effect"] == (
                         "creature_body_plus_targeted_protection_response"
+                    )
+                elif card["name"] == "Storm-Kiln Artist":
+                    assert effect_data["magecraft_treasure_status"] == "runtime_executor_v1"
+                    assert effect_data["runtime_modeled_effect"] == (
+                        "creature_body_magecraft_treasure"
                     )
                 elif card["name"] != "Drannith Magistrate":
                     assert effect_data["runtime_modeled_effect"] == "creature_body_only"
@@ -13506,7 +13515,7 @@ def register_tests(battle, player):
         old_db = battle.DB
         with tempfile.TemporaryDirectory() as tmpdir:
             db_path = Path(tmpdir) / "rules.db"
-            with sqlite3.connect(db_path) as conn:
+            with closing(sqlite3.connect(db_path)) as conn:
                 battle.battle_rule_registry.upsert_battle_card_rule(
                     conn,
                     "Angel's Grace",
@@ -13552,7 +13561,7 @@ def register_tests(battle, player):
         old_db = battle.DB
         with tempfile.TemporaryDirectory() as tmpdir:
             db_path = Path(tmpdir) / "rules.db"
-            with sqlite3.connect(db_path) as conn:
+            with closing(sqlite3.connect(db_path)) as conn:
                 battle.battle_rule_registry.upsert_battle_card_rule(
                     conn,
                     "Angel's Grace",
@@ -13604,10 +13613,12 @@ def register_tests(battle, player):
             assert top_effect["reorder_top"] is True
             assert top_effect["reorder_top_status"] == "lorehold_first_draw_planning_executor"
             assert top_effect["activated_draw_put_self_on_top"] is True
-            assert top_effect["activated_draw_put_self_on_top_status"] == "runtime_executor_v1"
-            assert top_effect["generic_draw_activation_status"] == "runtime_executor_v1"
+            assert top_effect["activated_draw_put_self_on_top_status"] == (
+                "lorehold_first_draw_miracle_window_executor"
+            )
+            assert top_effect["generic_draw_activation_status"] == "annotation_only"
             assert top_effect["battle_model_scope"] == (
-                "senseis_top_reorder_and_draw_put_self_on_top_runtime_v1"
+                "senseis_top_reorder_draw_lorehold_first_draw_miracle_v1"
             )
             assert top_effect["_rule_logical_key"] == "battle_rule_v1:70c8478871f352b46cee1af296117951"
             assert top_effect["_rule_oracle_hash"] == "f2c5ac0f52963cd710470adc25cc6d7c"
@@ -17535,7 +17546,7 @@ def register_tests(battle, player):
         try:
             with tempfile.TemporaryDirectory() as tmpdir:
                 db_path = Path(tmpdir) / "rules.db"
-                with sqlite3.connect(db_path) as conn:
+                with closing(sqlite3.connect(db_path)) as conn:
                     battle.battle_rule_registry.upsert_battle_card_rule(
                         conn,
                         "Deflecting Palm",

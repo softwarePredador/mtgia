@@ -239,6 +239,7 @@ def _desired_env(service_name: str, runtime_env: dict[str, str], existing_env: O
             "MANALOOM_NATIVE_BATTLE_SYNC_ON_BOOT": "1",
             "MANALOOM_NATIVE_BATTLE_HOST": "0.0.0.0",
             "MANALOOM_NATIVE_BATTLE_PORT": "8080",
+            "MANALOOM_LOREHOLD_CANONICAL_OVERRIDE": "0",
             "PULL_LEARNING_EVENTS_CRON": "0 * * * *",
             "AUTO_SYNC_LEARNED_DECKS_CRON": "0 */2 * * *",
             "MANALOOM_SYNC_CARD_LEGALITIES_CRON": "30 */6 * * *",

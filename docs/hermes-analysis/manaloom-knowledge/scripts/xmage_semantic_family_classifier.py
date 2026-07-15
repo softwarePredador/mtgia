@@ -4522,7 +4522,7 @@ def exact_scope_batch_safe(card: dict[str, Any]) -> bool:
             and bool(effect_json.get("token_sacrifice_for_colorless_mana"))
         )
 
-    if effect == "remove_permanent" and scope == "destroy_creature_or_planeswalker_target_controller_basic_land_tapped_annotation_v1":
+    if effect == "remove_permanent" and scope == "destroy_creature_or_planeswalker_target_controller_basic_land_tapped_runtime_v1":
         return (
             types == {"INSTANT"}
             and effect_classes == {"DestroyTargetEffect", "SearchLibraryPutInPlayTargetControllerEffect"}
@@ -4531,7 +4531,11 @@ def exact_scope_batch_safe(card: dict[str, Any]) -> bool:
             and bool(effect_json.get("instant"))
             and effect_json.get("target") == "creature_or_planeswalker"
             and bool(effect_json.get("target_controller_basic_land_tapped"))
-            and effect_json.get("basic_land_compensation_status") == "annotation_only"
+            and effect_json.get("basic_land_compensation_status") == "runtime_executor_v1"
+            and int(effect_json.get("basic_land_compensation_count") or 0) == 1
+            and effect_json.get("basic_land_compensation_destination") == "battlefield_tapped"
+            and effect_json.get("basic_land_compensation_target") == "target_controller"
+            and bool(effect_json.get("shuffle_after_basic_land_compensation"))
         )
 
     if effect == "remove_permanent" and scope == "destroy_target_land_target_controller_basic_land_tapped_runtime_nonfliers_cant_block_runtime_v1":

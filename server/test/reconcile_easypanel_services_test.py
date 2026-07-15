@@ -61,6 +61,7 @@ def test_desired_env_for_manaloom_ops_matches_cutover_contract() -> None:
     assert desired["MANALOOM_CANONICAL_KNOWN_CARDS_JSON"] == (
         "/data/manaloom-ops/known_cards_canonical_snapshot.runtime.json"
     )
+    assert desired["MANALOOM_LOREHOLD_CANONICAL_OVERRIDE"] == "0"
     assert desired["DB_HOST"] == "db.example"
     assert desired["DB_PORT"] == "5432"
     assert desired["DB_NAME"] == "mana"

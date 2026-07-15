@@ -12429,7 +12429,6 @@ def normalize_effect_by_oracle(card, effect_data):
         "rite_of_flame_singleton_baseline_red_ritual_v1",
     }:
         normalized.setdefault("produces", "R")
-        normalized["mana_color_status"] = "abstracted_to_generic_pool_runtime"
         normalized["pg058_l3b_simple_red_ritual_family"] = "deck6_simple_red_rituals"
         if ritual_scope == "rite_of_flame_singleton_baseline_red_ritual_v1":
             normalized["singleton_commander_baseline"] = True
@@ -12437,6 +12436,10 @@ def normalize_effect_by_oracle(card, effect_data):
             normalized["oracle_runtime_scope"] = (
                 "single_shot_red_ritual_runtime_graveyard_copy_scaling_annotation_only"
             )
+    if normalized.get("effect") == "ramp_ritual":
+        produces = str(normalized.get("produces") or "").strip().upper()
+        if produces in {"W", "U", "B", "R", "G", "C"}:
+            normalized["mana_color_status"] = "colored_pool_runtime"
 
     if normalized_name == "angel's grace" and normalized.get("effect") == "cannot_lose_turn":
         normalized["battle_model_scope"] = (
@@ -21278,6 +21281,7 @@ def survival_response_reservation_context(player, card, effect_data=None, additi
         restricted_after,
         conditional_after,
         _conditional_life_payments,
+        _conditional_mana_spent_sources,
     ) = payment_plan
     life_after = player.life - life_payment
     if _can_pay_any_survival_response_from_state(

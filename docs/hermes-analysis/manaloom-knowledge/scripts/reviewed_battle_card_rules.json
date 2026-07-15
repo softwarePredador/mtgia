@@ -5458,7 +5458,7 @@
     "source": "curated"
   },
   "Path to Exile": {
-    "confidence": 0.9,
+    "confidence": 0.94,
     "deck_role_json": {
       "category": "removal",
       "effect": "remove_creature",
@@ -5466,19 +5466,24 @@
       "timing": "instant"
     },
     "effect_json": {
-      "basic_land_compensation_status": "annotation_only",
-      "battle_model_scope": "path_to_exile_creature_exile_basic_land_compensation_annotation_v1",
+      "basic_land_compensation_count": 1,
+      "basic_land_compensation_destination": "battlefield_tapped",
+      "basic_land_compensation_status": "runtime_executor_v1",
+      "basic_land_compensation_target": "target_controller",
+      "battle_model_scope": "path_to_exile_creature_exile_basic_land_compensation_runtime_v1",
       "cmc": 1.0,
       "destination": "exile",
       "effect": "remove_creature",
       "exile_target": true,
       "instant": true,
+      "oracle_runtime_scope": "creature_exile_target_controller_optional_basic_land_to_battlefield_tapped_runtime_v1",
+      "shuffle_after_basic_land_compensation": true,
       "target": "creature",
       "target_controller_basic_land_tapped": true
     },
-    "notes": "PG-037 oracle-reviewed on 2026-06-22 against PostgreSQL/Scryfall text: Path to Exile exiles target creature. Runtime executes the exile destination; the target-controller basic-land search/tapped battlefield compensation remains annotation_only and is not a dynamic search/shuffle executor.",
-    "oracle_hash": "861c960a37be744e45f13200349e2532",
-    "review_status": "active",
+    "notes": "Runtime-reviewed: Path to Exile exiles target creature and executes the optional target-controller basic-land search, tapped battlefield move, and shuffle through the shared compensation executor.",
+    "oracle_hash": "a2403ad40c99415f5f409bb09d9ea23e",
+    "review_status": "verified",
     "source": "curated"
   },
   "Perpetual Timepiece": {
@@ -6745,6 +6750,7 @@
       "cmc": 3.0,
       "effect": "ramp_ritual",
       "instant": true,
+      "mana_color_status": "colored_pool_runtime",
       "mana_produced": 5,
       "produces": "R"
     },

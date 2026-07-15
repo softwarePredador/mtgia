@@ -2399,7 +2399,7 @@ class XMageToManaLoomEffectHintsTests(unittest.TestCase):
         self.assertEqual(primary["target_controller_gains_life"], 4)
         self.assertTrue(primary["instant"])
 
-    def test_erode_maps_to_exact_creature_or_planeswalker_basic_land_annotation_scope(self) -> None:
+    def test_erode_maps_to_exact_creature_or_planeswalker_basic_land_runtime_scope(self) -> None:
         result = hints.build_effect_hints(
             {
                 "effect_classes": [
@@ -2421,11 +2421,14 @@ class XMageToManaLoomEffectHintsTests(unittest.TestCase):
         self.assertEqual(primary["effect"], "remove_permanent")
         self.assertEqual(
             primary["battle_model_scope"],
-            "destroy_creature_or_planeswalker_target_controller_basic_land_tapped_annotation_v1",
+            "destroy_creature_or_planeswalker_target_controller_basic_land_tapped_runtime_v1",
         )
         self.assertEqual(primary["target"], "creature_or_planeswalker")
         self.assertTrue(primary["target_controller_basic_land_tapped"])
-        self.assertEqual(primary["basic_land_compensation_status"], "annotation_only")
+        self.assertEqual(primary["basic_land_compensation_status"], "runtime_executor_v1")
+        self.assertEqual(primary["basic_land_compensation_count"], 1)
+        self.assertEqual(primary["basic_land_compensation_destination"], "battlefield_tapped")
+        self.assertTrue(primary["shuffle_after_basic_land_compensation"])
         self.assertTrue(primary["instant"])
 
     def test_sundering_eruption_maps_to_exact_land_destroy_annotation_scope(self) -> None:

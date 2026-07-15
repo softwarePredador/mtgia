@@ -4773,12 +4773,17 @@ def _build_exact_runtime_variant_fields(
     ):
         return {
             "effect": "remove_permanent",
-            "scope": "destroy_creature_or_planeswalker_target_controller_basic_land_tapped_annotation_v1",
+            "scope": "destroy_creature_or_planeswalker_target_controller_basic_land_tapped_runtime_v1",
             "fields": {
                 "instant": True,
                 "target": "creature_or_planeswalker",
                 "target_controller_basic_land_tapped": True,
-                "basic_land_compensation_status": "annotation_only",
+                "basic_land_compensation_status": "runtime_executor_v1",
+                "basic_land_compensation_count": 1,
+                "basic_land_compensation_destination": "battlefield_tapped",
+                "basic_land_compensation_target": "target_controller",
+                "oracle_runtime_scope": "target_controller_basic_land_search_to_battlefield_tapped_runtime_v1",
+                "shuffle_after_basic_land_compensation": True,
             },
             "reason": (
                 "XMage structure matches Erode destroying target creature or planeswalker, "

@@ -373,6 +373,56 @@ def test_attack_restriction_details_include_vow_sources():
     assert "unattributed" not in sources
 
 
+def test_survival_response_reservation_uses_current_payment_plan_contract():
+    active = player("Active")
+    active.life = 10
+    active.mana_pool.white = 1
+    active.mana_pool.generic = 2
+    candidate = {
+        "name": "Candidate spell",
+        "type_line": "Sorcery",
+        "mana_cost": "{1}",
+        "cmc": 1,
+        "effect": "draw_cards",
+        "tag": "draw_cards",
+    }
+    response = {
+        "name": "Teferi's Protection",
+        "type_line": "Instant",
+        "mana_cost": "{2}{W}",
+        "cmc": 3,
+    }
+    active.hand = [candidate, response]
+
+    context = battle.survival_response_reservation_context(
+        active,
+        candidate,
+        {"effect": "draw_cards"},
+    )
+
+    assert context is not None
+    assert context["reason"] == "preserve_survival_response_mana_at_low_life"
+    assert context["reserved_response_cards"] == ["Teferi's Protection"]
+
+
+def test_red_ritual_fallback_marks_the_runtime_pool_as_colored():
+    effect = battle.normalize_effect_by_oracle(
+        {
+            "name": "Synthetic red ritual",
+            "type_line": "Sorcery",
+            "oracle_text": "Add {R}{R}.",
+        },
+        {
+            "effect": "ramp_ritual",
+            "battle_model_scope": "single_shot_red_ritual_v1",
+            "mana_produced": 2,
+        },
+    )
+
+    assert effect["produces"] == "R"
+    assert effect["mana_color_status"] == "colored_pool_runtime"
+
+
 if __name__ == "__main__":
     tests = [
         *battle_sba_zone_tests.register_tests(battle, player, card),
@@ -399,6 +449,8 @@ if __name__ == "__main__":
         test_pg078_deck606_l2_hash_scope_rules_resolve_from_sqlite,
         test_attack_restriction_details_include_limit_sources,
         test_attack_restriction_details_include_vow_sources,
+        test_survival_response_reservation_uses_current_payment_plan_contract,
+        test_red_ritual_fallback_marks_the_runtime_pool_as_colored,
     ]
     for test in tests:
         if hasattr(battle, "clear_pending_triggers"):

@@ -852,10 +852,14 @@ class ReviewedBattleCardRulesTests(unittest.TestCase):
         self.assertEqual(by_name["One with the Multiverse"]["effect_json"]["effect"], "passive")
         self.assertTrue(by_name["One with the Multiverse"]["effect_json"]["play_from_top_of_library"])
         self.assertEqual(by_name["Path to Exile"]["source"], "curated")
-        self.assertEqual(by_name["Path to Exile"]["review_status"], "active")
+        self.assertEqual(by_name["Path to Exile"]["review_status"], "verified")
         self.assertEqual(by_name["Path to Exile"]["effect_json"]["effect"], "remove_creature")
         self.assertTrue(by_name["Path to Exile"]["effect_json"]["exile_target"])
         self.assertTrue(by_name["Path to Exile"]["effect_json"]["target_controller_basic_land_tapped"])
+        self.assertEqual(
+            by_name["Path to Exile"]["effect_json"]["basic_land_compensation_status"],
+            "runtime_executor_v1",
+        )
         self.assertEqual(by_name["Pirate's Pillage"]["source"], "curated")
         self.assertEqual(by_name["Pirate's Pillage"]["effect_json"]["effect"], "treasure_maker")
         self.assertEqual(by_name["Pirate's Pillage"]["effect_json"]["treasure_count"], 2)
@@ -1545,11 +1549,15 @@ class ReviewedBattleCardRulesTests(unittest.TestCase):
         self.assertTrue(kraum["opponent_second_spell_each_turn"])
         self.assertFalse(kraum["draw_on_enter"])
         self.assertEqual(path_to_exile["_rule_source"], "curated")
-        self.assertEqual(path_to_exile["_rule_review_status"], "active")
+        self.assertEqual(path_to_exile["_rule_review_status"], "verified")
         self.assertEqual(path_to_exile["effect"], "remove_creature")
         self.assertEqual(path_to_exile["target"], "creature")
         self.assertTrue(path_to_exile["exile_target"])
         self.assertTrue(path_to_exile["target_controller_basic_land_tapped"])
+        self.assertEqual(
+            path_to_exile["basic_land_compensation_status"],
+            "runtime_executor_v1",
+        )
         self.assertEqual(swords_to_plowshares["_rule_source"], "curated")
         self.assertEqual(swords_to_plowshares["_rule_review_status"], "verified")
         self.assertEqual(swords_to_plowshares["effect"], "remove_creature")

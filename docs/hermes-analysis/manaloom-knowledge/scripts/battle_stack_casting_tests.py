@@ -3,6 +3,7 @@
 import random
 import sqlite3
 import tempfile
+from contextlib import closing
 from pathlib import Path
 
 
@@ -130,7 +131,7 @@ def register_tests(battle, player):
         old_db = battle.DB
         with tempfile.TemporaryDirectory() as tmpdir:
             db_path = Path(tmpdir) / "rules.db"
-            with sqlite3.connect(db_path) as conn:
+            with closing(sqlite3.connect(db_path)) as conn:
                 battle.battle_rule_registry.upsert_battle_card_rule(
                     conn,
                     "Angel's Grace",
@@ -208,7 +209,7 @@ def register_tests(battle, player):
         old_db = battle.DB
         with tempfile.TemporaryDirectory() as tmpdir:
             db_path = Path(tmpdir) / "rules.db"
-            with sqlite3.connect(db_path) as conn:
+            with closing(sqlite3.connect(db_path)) as conn:
                 battle.battle_rule_registry.upsert_battle_card_rule(
                     conn,
                     "Angel's Grace",

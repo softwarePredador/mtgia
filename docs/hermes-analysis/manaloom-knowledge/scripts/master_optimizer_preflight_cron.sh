@@ -7,7 +7,7 @@ REPORT_DIR="$REPO/docs/hermes-analysis/master_optimizer_reports"
 ARTIFACT_DIR="${MANALOOM_MASTER_OPTIMIZER_ARTIFACT_DIR:-/opt/data/artifacts/hermes_master_optimizer}"
 SECRET_ENV="${MANALOOM_POSTGRES_ENV:-/opt/data/secrets/manaloom-postgres.env}"
 DECK_ID="${MANALOOM_OPTIMIZER_DECK_ID:-6}"
-LOREHOLD_CANONICAL_OVERRIDE="${MANALOOM_LOREHOLD_CANONICAL_OVERRIDE:-1}"
+LOREHOLD_CANONICAL_OVERRIDE="${MANALOOM_LOREHOLD_CANONICAL_OVERRIDE:-0}"
 
 if [[ -z "${HERMES_KNOWLEDGE_BACKUP_DIR:-}" ]]; then
   if [[ -d /data/manaloom-ops ]]; then
