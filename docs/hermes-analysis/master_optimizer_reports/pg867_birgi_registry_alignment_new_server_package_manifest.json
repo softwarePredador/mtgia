@@ -1,0 +1,78 @@
+{
+  "apply_gate": "Do not run apply SQL without explicit approval for the exact command.",
+  "backup_table": "manaloom_deploy_audit.pg867_birgi_registry_alignment_new_serve_20260715_153348",
+  "deploy_id": "pg867_birgi_registry_alignment_new_server_20260715_154500",
+  "execution_scenarios": [],
+  "expected_rules": [
+    {
+      "card_name": "Birgi, God of Storytelling // Harnfel, Horn of Bounty",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:c21762e62b990dbb474be0b5764d71a7",
+      "min_rule_version": 2,
+      "normalized_name": "birgi, god of storytelling",
+      "oracle_hash": "5f1ed696a63cd668fd46a2fe9971a54e",
+      "required_effect_fields": {
+        "ability_kind": "triggered",
+        "battle_model_scope": "spell_cast_red_mana_trigger_boast_harnfel_annotation_v1",
+        "effect": "ramp_engine",
+        "produces": "R",
+        "trigger": "spell_cast"
+      },
+      "review_status": "verified"
+    }
+  ],
+  "family_counts": {
+    "spell_cast_mana_engine": 1
+  },
+  "files": {
+    "apply": "docs/hermes-analysis/master_optimizer_reports/pg867_birgi_registry_alignment_new_server_package_apply.sql",
+    "manifest": "docs/hermes-analysis/master_optimizer_reports/pg867_birgi_registry_alignment_new_server_package_manifest.json",
+    "package": "docs/hermes-analysis/master_optimizer_reports/pg867_birgi_registry_alignment_new_server_package_package.md",
+    "postcheck": "docs/hermes-analysis/master_optimizer_reports/pg867_birgi_registry_alignment_new_server_package_postcheck.sql",
+    "precheck": "docs/hermes-analysis/master_optimizer_reports/pg867_birgi_registry_alignment_new_server_package_precheck.sql",
+    "rollback": "docs/hermes-analysis/master_optimizer_reports/pg867_birgi_registry_alignment_new_server_package_rollback.sql"
+  },
+  "generated_at": "2026-07-15T15:33:48+00:00",
+  "mutations_performed": [],
+  "runtime_checks": [
+    {
+      "card": {
+        "name": "Birgi, God of Storytelling // Harnfel, Horn of Bounty"
+      },
+      "card_name": "Birgi, God of Storytelling // Harnfel, Horn of Bounty",
+      "effect": "ramp_engine",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:c21762e62b990dbb474be0b5764d71a7",
+      "normalized_name": "birgi, god of storytelling",
+      "required_effect_fields": {
+        "ability_kind": "triggered",
+        "battle_model_scope": "spell_cast_red_mana_trigger_boast_harnfel_annotation_v1",
+        "effect": "ramp_engine",
+        "produces": "R",
+        "trigger": "spell_cast"
+      }
+    }
+  ],
+  "selected_card_names": [
+    "Birgi, God of Storytelling // Harnfel, Horn of Bounty"
+  ],
+  "selected_count": 1,
+  "slug": "pg867_birgi_registry_alignment_new_server",
+  "snapshot_checks": [
+    {
+      "card_name": "Birgi, God of Storytelling // Harnfel, Horn of Bounty",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:c21762e62b990dbb474be0b5764d71a7",
+      "min_rule_version": 2,
+      "normalized_name": "birgi, god of storytelling",
+      "oracle_hash": "5f1ed696a63cd668fd46a2fe9971a54e",
+      "required_effect_fields": {
+        "battle_model_scope": "spell_cast_red_mana_trigger_boast_harnfel_annotation_v1"
+      },
+      "review_status": "verified"
+    }
+  ],
+  "status": "prepared_read_only_pending_apply_approval"
+}

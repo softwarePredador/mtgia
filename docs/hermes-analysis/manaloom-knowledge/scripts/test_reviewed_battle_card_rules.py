@@ -324,7 +324,10 @@ class ReviewedBattleCardRulesTests(unittest.TestCase):
         self.assertIn("Aven Mindcensor", by_name)
         self.assertIn("Basking Broodscale", by_name)
         self.assertIn("Big Score", by_name)
-        self.assertIn("Birgi, God of Storytelling", by_name)
+        self.assertIn(
+            "Birgi, God of Storytelling // Harnfel, Horn of Bounty",
+            by_name,
+        )
         self.assertIn("Blind Obedience", by_name)
         self.assertIn("Breena, the Demagogue", by_name)
         self.assertIn("Chrome Mox", by_name)
@@ -641,9 +644,15 @@ class ReviewedBattleCardRulesTests(unittest.TestCase):
         self.assertEqual(by_name["Basking Broodscale"]["review_status"], "active")
         self.assertEqual(by_name["Basking Broodscale"]["effect_json"]["effect"], "creature")
         self.assertTrue(by_name["Basking Broodscale"]["effect_json"]["is_creature_permanent"])
-        self.assertEqual(by_name["Birgi, God of Storytelling"]["source"], "curated")
+        birgi = by_name["Birgi, God of Storytelling // Harnfel, Horn of Bounty"]
+        self.assertEqual(birgi["source"], "curated")
+        self.assertEqual(birgi["effect_json"]["effect"], "ramp_engine")
         self.assertEqual(
-            by_name["Birgi, God of Storytelling"]["effect_json"]["spell_cast_add_mana"],
+            birgi["logical_rule_key"],
+            "battle_rule_v1:c21762e62b990dbb474be0b5764d71a7",
+        )
+        self.assertEqual(
+            birgi["effect_json"]["spell_cast_add_mana"],
             1,
         )
         self.assertEqual(by_name["Big Score"]["source"], "curated")
@@ -1123,9 +1132,11 @@ class ReviewedBattleCardRulesTests(unittest.TestCase):
         )
         self.assertEqual(by_name["Arcane Endeavor"]["source"], "curated")
         self.assertEqual(by_name["Arcane Endeavor"]["effect_json"]["effect"], "draw_cards")
-        self.assertEqual(by_name["Birgi, God of Storytelling"]["source"], "curated")
+        birgi = by_name["Birgi, God of Storytelling // Harnfel, Horn of Bounty"]
+        self.assertEqual(birgi["source"], "curated")
+        self.assertEqual(birgi["effect_json"]["effect"], "ramp_engine")
         self.assertEqual(
-            by_name["Birgi, God of Storytelling"]["effect_json"]["spell_cast_add_mana"],
+            birgi["effect_json"]["spell_cast_add_mana"],
             1,
         )
         self.assertEqual(by_name["Big Score"]["source"], "curated")

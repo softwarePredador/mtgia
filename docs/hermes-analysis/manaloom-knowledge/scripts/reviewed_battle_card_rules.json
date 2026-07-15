@@ -1120,24 +1120,34 @@
     "review_status": "verified",
     "source": "curated"
   },
-  "Birgi, God of Storytelling": {
-    "confidence": 0.92,
+  "Birgi, God of Storytelling // Harnfel, Horn of Bounty": {
+    "confidence": 0.94,
     "deck_role_json": {
-      "category": "engine",
-      "effect": "creature"
+      "category": "ramp",
+      "effect": "ramp_engine",
+      "subtype": "spell_cast_mana_engine"
     },
     "effect_json": {
-      "battle_model_scope": "spell_cast_red_mana_trigger_v1",
+      "ability_kind": "triggered",
+      "back_face_harnfel_discard_exile_two_play_this_turn": true,
+      "back_face_status": "annotation_only",
+      "battle_model_scope": "spell_cast_red_mana_trigger_boast_harnfel_annotation_v1",
+      "boast_twice_each_turn": true,
+      "boast_twice_status": "annotation_only",
       "cmc": 3.0,
-      "effect": "creature",
+      "effect": "ramp_engine",
       "is_creature_permanent": true,
+      "mana_persists_steps": true,
       "power": 3,
+      "produces": "R",
       "spell_cast_add_mana": 1,
       "spell_cast_mana_color": "R",
       "toughness": 3,
       "trigger": "spell_cast"
     },
-    "notes": "Oracle-reviewed on 2026-06-17 against official/Scryfall text: whenever you cast a spell, add {R} until end of turn. Runtime keeps the creature body and the spell-cast mana trigger without modeling every backside/modal nuance.",
+    "execution_status": "auto",
+    "logical_rule_key": "battle_rule_v1:c21762e62b990dbb474be0b5764d71a7",
+    "notes": "XMage-authoritative Birgi front-face spell-cast red mana engine. Runtime executes the creature body and mana trigger; boast-twice and the Harnfel back face remain explicit annotations.",
     "oracle_hash": "5f1ed696a63cd668fd46a2fe9971a54e",
     "review_status": "verified",
     "source": "curated"
