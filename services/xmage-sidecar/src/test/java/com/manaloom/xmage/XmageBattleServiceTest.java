@@ -8,8 +8,10 @@ import java.util.List;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -45,6 +47,26 @@ final class XmageBattleServiceTest {
         assertEquals("ml_request", XmageBattleService.connectionUsername("---"));
         assertEquals("ml_abc12345", XmageBattleService.connectionUsername("abc-12345-xyz"));
         assertEquals("ml_request", XmageBattleService.connectionUsername(null));
+    }
+
+    @Test
+    void unicodeIdentityAliasesResolveOnlyWhenTheCatalogKeyIsUnique() {
+        assertEquals(
+                "ratonhnhaketon",
+                XmageBattleService.identityAliasKey("Ratonhnhak\u00e9\ua789ton")
+        );
+
+        Set<String> names = new HashSet<>(Arrays.asList(
+                "Ratonhnhaketon",
+                "Fire // Ice",
+                "Fire-Ice",
+                "Sol Ring"
+        ));
+        Map<String, String> aliases = XmageBattleService.buildUniqueCardAliases(names);
+
+        assertEquals("Ratonhnhaketon", aliases.get("ratonhnhaketon"));
+        assertEquals("Sol Ring", aliases.get("solring"));
+        assertFalse(aliases.containsKey("fireice"));
     }
 
     @Test
@@ -87,6 +109,9 @@ final class XmageBattleServiceTest {
         JsonObject split = card("Fire // Ice", 1, false);
         split.addProperty("card_id", "split-id");
         cards.add(split);
+        JsonObject unicodeAlias = card("Ratonhnhak\u00e9\ua789ton", 1, false);
+        unicodeAlias.addProperty("card_id", "unicode-alias-id");
+        cards.add(unicodeAlias);
         JsonObject unsupported = card("Molecule Man", 1, false);
         unsupported.addProperty("card_id", "unsupported-id");
         cards.add(unsupported);
@@ -96,11 +121,11 @@ final class XmageBattleServiceTest {
         List<Map<String, Object>> missing =
                 (List<Map<String, Object>>) coverage.get("unsupported_cards");
 
-        assertEquals(3, coverage.get("total"));
-        assertEquals(2, coverage.get("supported"));
+        assertEquals(4, coverage.get("total"));
+        assertEquals(3, coverage.get("supported"));
         assertEquals(1, coverage.get("unsupported"));
         assertEquals("unsupported-id", missing.get(0).get("card_id"));
-        assertEquals(2, missing.get(0).get("input_index"));
+        assertEquals(3, missing.get(0).get("input_index"));
     }
 
     @Test

@@ -24,6 +24,7 @@ import mage.view.PlayerView;
 import mage.view.TableView;
 
 import java.time.Instant;
+import java.text.Normalizer;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -43,6 +44,7 @@ final class XmageBattleService {
     private static final ReentrantLock SIMULATION_LOCK = new ReentrantLock();
     private static volatile boolean cardDatabaseReady;
     private static volatile Set<String> availableCardNames = Collections.emptySet();
+    private static volatile Map<String, String> uniqueCardAliases = Collections.emptyMap();
 
     private final String host;
     private final int port;
@@ -376,8 +378,31 @@ final class XmageBattleService {
                 throw new IllegalStateException("XMage card catalog is empty after scan");
             }
             availableCardNames = Collections.unmodifiableSet(names);
+            uniqueCardAliases = Collections.unmodifiableMap(buildUniqueCardAliases(names));
             cardDatabaseReady = true;
         }
+    }
+
+    static String identityAliasKey(String value) {
+        String decomposed = Normalizer.normalize(value == null ? "" : value, Normalizer.Form.NFKD);
+        return decomposed.replaceAll("[^A-Za-z0-9]", "").toLowerCase(java.util.Locale.ROOT);
+    }
+
+    static Map<String, String> buildUniqueCardAliases(Set<String> names) {
+        Map<String, String> aliases = new LinkedHashMap<>();
+        Set<String> ambiguous = new HashSet<>();
+        for (String name : names) {
+            String key = identityAliasKey(name);
+            if (key.isEmpty() || ambiguous.contains(key)) {
+                continue;
+            }
+            String previous = aliases.putIfAbsent(key, name);
+            if (previous != null && !previous.equals(name)) {
+                aliases.remove(key);
+                ambiguous.add(key);
+            }
+        }
+        return aliases;
     }
 
     private static JsonObject requireObject(JsonObject input, String key) {
@@ -522,18 +547,33 @@ final class XmageBattleService {
             CardInfo resolved = null;
             if (!setCode.isEmpty() && !number.isEmpty()) {
                 resolved = CardRepository.instance.findCard(setCode, number, true);
-                if (resolved != null && !resolved.getName().equals(name)) {
+                if (resolved != null && !sameResolvedIdentity(resolved.getName())) {
                     resolved = null;
                 }
             }
             if (resolved == null) {
                 resolved = CardRepository.instance.findPreferredCoreExpansionCard(name, setCode);
             }
+            if (resolved == null) {
+                String alias = uniqueCardAliases.get(identityAliasKey(name));
+                if (alias != null) {
+                    resolved = CardRepository.instance.findPreferredCoreExpansionCard(alias, setCode);
+                }
+            }
             return resolved;
+        }
+
+        private boolean sameResolvedIdentity(String resolvedName) {
+            if (resolvedName.equals(name)) {
+                return true;
+            }
+            String alias = uniqueCardAliases.get(identityAliasKey(name));
+            return resolvedName.equals(alias);
         }
 
         boolean isAvailable() {
             return availableCardNames.contains(name)
+                    || uniqueCardAliases.containsKey(identityAliasKey(name))
                     || (name.contains(" // ") && resolve() != null);
         }
 

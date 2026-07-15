@@ -137,6 +137,87 @@ def residual_semantic_family(row: Mapping[str, Any]) -> str:
     return "other_long_tail"
 
 
+def residual_execution_scope(row: Mapping[str, Any]) -> str:
+    oracle = normalize_name(row.get("oracle_text"))
+    type_line = normalize_name(row.get("type_line"))
+    layout = normalize_name(row.get("layout"))
+    set_type = normalize_name(row.get("set_type"))
+    set_code = normalize_name(row.get("set_code"))
+    online_only = row.get("is_online_only") is True or normalize_name(
+        row.get("is_online_only")
+    ) in {"1", "true", "yes"}
+    if online_only or set_type == "alchemy":
+        return "digital_only_ruleset"
+    if layout in {"double_faced_token", "emblem", "token"} or any(
+        marker in type_line
+        for marker in (
+            "attraction",
+            "contraption",
+            "conspiracy",
+            "dungeon",
+            "phenomenon",
+            "plane",
+            "scheme",
+            "stickers",
+            "token",
+        )
+    ):
+        return "auxiliary_game_object"
+    if set_type == "memorabilia" or set_code in {
+        "pssc",
+        "tbth",
+        "tdag",
+        "tfth",
+        "thp1",
+        "thp2",
+        "thp3",
+    }:
+        return "scenario_or_challenge_deck_ruleset"
+    if any(
+        marker in oracle
+        for marker in (
+            "a person outside the game",
+            "ask a person",
+            "artist credit",
+            "booster pack",
+            "from outside the game",
+            "in its art",
+            "looking directly",
+            "physical",
+            "target drink",
+            "your age",
+            "you speak",
+            "a toy you own",
+            "you own from outside",
+        )
+    ):
+        return "physical_or_external_interaction"
+    if set_type == "funny" or set_code in {
+        "cmb1",
+        "hho",
+        "j17",
+        "mb2",
+        "olep",
+        "p30m",
+        "pal04",
+        "pcel",
+        "pf24",
+        "pf25",
+        "pf26",
+        "punk",
+        "ugl",
+        "und",
+        "unf",
+        "unh",
+        "unk",
+        "ust",
+    }:
+        return "nonstandard_or_playtest_ruleset"
+    if not oracle:
+        return "missing_oracle_or_product_identity"
+    return "conventional_magic_rules"
+
+
 @dataclass(frozen=True)
 class HttpResult:
     status: int
@@ -374,22 +455,35 @@ def build_closure(
         else:
             lane = "unresolved"
         covered = lane in {"xmage_exact", "forge_exact", "native_verified"}
-        ledger.append(
-            {
-                "key": key,
-                "card_id": row.get("card_id") or row.get("id"),
-                "oracle_id": row.get("oracle_id"),
-                "name": row["name"],
-                "layout": row.get("layout"),
-                "lane": lane,
-                "covered": covered,
-                "engine_name_candidate": engine_name,
-                "residual_family": None if covered else residual_family(row),
-                "residual_semantic_family": None
-                if covered
-                else residual_semantic_family(row),
-            }
-        )
+        ledger_row = {
+            "key": key,
+            "card_id": row.get("card_id") or row.get("id"),
+            "oracle_id": row.get("oracle_id"),
+            "name": row["name"],
+            "layout": row.get("layout"),
+            "lane": lane,
+            "covered": covered,
+            "engine_name_candidate": engine_name,
+            "residual_family": None if covered else residual_family(row),
+            "residual_semantic_family": None
+            if covered
+            else residual_semantic_family(row),
+            "residual_execution_scope": None
+            if covered
+            else residual_execution_scope(row),
+        }
+        if not covered:
+            ledger_row.update(
+                {
+                    "set_code": row.get("set_code"),
+                    "collector_number": row.get("collector_number"),
+                    "set_type": row.get("set_type"),
+                    "is_online_only": row.get("is_online_only"),
+                    "type_line": row.get("type_line"),
+                    "oracle_text": row.get("oracle_text"),
+                }
+            )
+        ledger.append(ledger_row)
 
     lane_counts = Counter(row["lane"] for row in ledger)
     family_counts = Counter(
@@ -400,9 +494,25 @@ def build_closure(
         for row in ledger
         if row.get("residual_semantic_family")
     )
+    execution_scope_counts = Counter(
+        row["residual_execution_scope"]
+        for row in ledger
+        if row.get("residual_execution_scope")
+    )
     covered_count = sum(1 for row in ledger if row["covered"])
     total = len(ledger)
     residual_count = total - covered_count
+    identities: dict[str, list[bool]] = {}
+    for row in ledger:
+        identity = str(row.get("oracle_id") or "").strip()
+        if not identity:
+            identity = f"name:{normalize_name(row.get('name'))}"
+        identities.setdefault(identity, []).append(bool(row["covered"]))
+    fully_covered_identities = sum(all(states) for states in identities.values())
+    partially_covered_identities = sum(
+        any(states) and not all(states) for states in identities.values()
+    )
+    residual_identities = len(identities) - fully_covered_identities
     family_gates = [
         {
             "family": family,
@@ -429,10 +539,20 @@ def build_closure(
             "covered": covered_count,
             "residual": residual_count,
             "coverage_ratio": round(covered_count / max(total, 1), 6),
+            "total_identities": len(identities),
+            "fully_covered_identities": fully_covered_identities,
+            "partially_covered_identities": partially_covered_identities,
+            "residual_identities": residual_identities,
+            "identity_coverage_ratio": round(
+                fully_covered_identities / max(len(identities), 1), 6
+            ),
             "lane_counts": dict(sorted(lane_counts.items())),
             "residual_family_counts": dict(sorted(family_counts.items())),
             "residual_semantic_family_counts": dict(
                 sorted(semantic_family_counts.items())
+            ),
+            "residual_execution_scope_counts": dict(
+                sorted(execution_scope_counts.items())
             ),
         },
         "family_gates": family_gates,
@@ -457,6 +577,11 @@ def write_markdown(payload: Mapping[str, Any], path: Path) -> None:
         f"| Covered | {summary['covered']} |",
         f"| Residual | {summary['residual']} |",
         f"| Coverage ratio | {summary['coverage_ratio']:.4%} |",
+        f"| Total identities | {summary['total_identities']} |",
+        f"| Fully covered identities | {summary['fully_covered_identities']} |",
+        f"| Partially covered identities | {summary['partially_covered_identities']} |",
+        f"| Residual identities | {summary['residual_identities']} |",
+        f"| Identity coverage ratio | {summary['identity_coverage_ratio']:.4%} |",
         "",
         "## Lanes",
         "",
@@ -471,6 +596,17 @@ def write_markdown(payload: Mapping[str, Any], path: Path) -> None:
     lines.extend(["", "## Semantic Residual Families", "", "| Family | Cards |", "| --- | ---: |"])
     for family, count in summary["residual_semantic_family_counts"].items():
         lines.append(f"| `{family}` | {count} |")
+    lines.extend(
+        [
+            "",
+            "## Residual Execution Scopes",
+            "",
+            "| Scope | Cards |",
+            "| --- | ---: |",
+        ]
+    )
+    for scope, count in summary["residual_execution_scope_counts"].items():
+        lines.append(f"| `{scope}` | {count} |")
     lines.extend(["", "## Family Gates", "", "| Family | Next gate |", "| --- | --- |"])
     for gate in payload.get("family_gates") or []:
         lines.append(f"| `{gate['family']}` | `{gate['next_gate']}` |")

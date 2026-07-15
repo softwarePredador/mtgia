@@ -100,16 +100,28 @@ run_coverage() {
   "$ROOT_DIR/server/bin/with_new_server_pg.sh" psql -X -A -t \
     -o "$WORK_DIR/cards.json" -c \
     "SELECT COALESCE(json_agg(json_build_object(
-      'card_id', id::text,
-      'oracle_id', oracle_id::text,
-      'name', name,
-      'type_line', type_line,
-      'set_code', set_code,
-      'collector_number', collector_number,
-      'layout', layout,
-      'oracle_text', oracle_text,
-      'card_faces_json', card_faces_json
-    ) ORDER BY name, id::text), '[]'::json) FROM cards"
+      'card_id', c.id::text,
+      'oracle_id', c.oracle_id::text,
+      'name', c.name,
+      'type_line', c.type_line,
+      'set_code', c.set_code,
+      'collector_number', c.collector_number,
+      'layout', c.layout,
+      'oracle_text', c.oracle_text,
+      'card_faces_json', c.card_faces_json,
+      'set_type', s.type,
+      'is_online_only', s.is_online_only
+    ) ORDER BY c.name, c.id::text), '[]'::json)
+    FROM cards c
+    LEFT JOIN LATERAL (
+      SELECT candidate.type, candidate.is_online_only
+      FROM sets candidate
+      WHERE lower(candidate.code) = lower(c.set_code)
+      ORDER BY (candidate.code = c.set_code) DESC,
+               candidate.updated_at DESC NULLS LAST,
+               candidate.code
+      LIMIT 1
+    ) s ON true"
 
   "$ROOT_DIR/server/bin/with_new_server_pg.sh" psql -X -A -t \
     -o "$WORK_DIR/native.json" -c \

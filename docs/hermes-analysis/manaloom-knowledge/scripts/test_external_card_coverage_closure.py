@@ -145,8 +145,8 @@ class ExternalCardCoverageClosureTest(unittest.TestCase):
 
     def test_card_keys_keep_duplicate_printings_distinct(self):
         cards = [
-            {"id": "printing-a", "name": "Same Card"},
-            {"id": "printing-b", "name": "Same Card"},
+            {"id": "printing-a", "oracle_id": "identity", "name": "Same Card"},
+            {"id": "printing-b", "oracle_id": "identity", "name": "Same Card"},
         ]
         client = FakeClient({"xmage": {"same card"}, "forge": set()})
         payload = closure.build_closure(
@@ -157,6 +157,8 @@ class ExternalCardCoverageClosureTest(unittest.TestCase):
         )
         self.assertEqual(payload["summary"]["total"], 2)
         self.assertEqual(len({row["key"] for row in payload["ledger"]}), 2)
+        self.assertEqual(payload["summary"]["total_identities"], 1)
+        self.assertEqual(payload["summary"]["fully_covered_identities"], 1)
 
     def test_missing_oracle_is_classified_not_silently_dropped(self):
         client = FakeClient({"xmage": set(), "forge": set()})
@@ -170,6 +172,65 @@ class ExternalCardCoverageClosureTest(unittest.TestCase):
         self.assertEqual(
             payload["ledger"][0]["residual_family"],
             "missing_oracle_or_nonstandard_object::token",
+        )
+        self.assertEqual(
+            payload["ledger"][0]["residual_execution_scope"],
+            "auxiliary_game_object",
+        )
+
+    def test_residual_keeps_routing_metadata_and_execution_scope(self):
+        client = FakeClient({"xmage": set(), "forge": set()})
+        payload = closure.build_closure(
+            [
+                {
+                    "id": "digital",
+                    "oracle_id": "digital-identity",
+                    "name": "Digital Card",
+                    "set_code": "ydmu",
+                    "set_type": "alchemy",
+                    "is_online_only": True,
+                    "type_line": "Sorcery",
+                    "oracle_text": "Draw two cards.",
+                }
+            ],
+            xmage_url="http://xmage",
+            forge_url="http://forge",
+            client=client,
+        )
+        residual = payload["ledger"][0]
+        self.assertEqual(residual["set_code"], "ydmu")
+        self.assertEqual(residual["type_line"], "Sorcery")
+        self.assertEqual(residual["oracle_text"], "Draw two cards.")
+        self.assertEqual(residual["residual_execution_scope"], "digital_only_ruleset")
+        self.assertEqual(
+            payload["summary"]["residual_execution_scope_counts"],
+            {"digital_only_ruleset": 1},
+        )
+
+    def test_challenge_deck_and_playtest_products_are_not_conventional(self):
+        self.assertEqual(
+            closure.residual_execution_scope(
+                {
+                    "name": "Challenge Card",
+                    "set_code": "tfth",
+                    "set_type": "memorabilia",
+                    "type_line": "Sorcery",
+                    "oracle_text": "Destroy target Head.",
+                }
+            ),
+            "scenario_or_challenge_deck_ruleset",
+        )
+        self.assertEqual(
+            closure.residual_execution_scope(
+                {
+                    "name": "Convention Card",
+                    "set_code": "pf25",
+                    "set_type": "promo",
+                    "type_line": "Enchantment",
+                    "oracle_text": "The top card of your library is a Food token.",
+                }
+            ),
+            "nonstandard_or_playtest_ruleset",
         )
 
 
