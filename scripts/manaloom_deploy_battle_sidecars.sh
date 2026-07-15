@@ -163,19 +163,37 @@ upsert_sidecar "$FORGE_SERVICE" "$forge_image" $'PORT=8080\nFORGE_JAVA_COMMAND=x
 
 wait_for_service() {
   local swarm_service="$1"
+  local expected_image="${2:-}"
   ssh "${ssh_args[@]}" "$ssh_target" "
+set -euo pipefail
+expected_image='$expected_image'
 for attempt in \$(seq 1 180); do
   replicas=\$(docker service ls --filter name='$swarm_service' --format '{{.Replicas}}' | head -1)
-  if [[ \"\$replicas\" == '1/1' ]]; then exit 0; fi
+  spec_image=\$(docker service inspect '$swarm_service' --format '{{.Spec.TaskTemplate.ContainerSpec.Image}}')
+  running_image=\$(docker service ps '$swarm_service' --filter desired-state=running --format '{{.Image}}' | head -1)
+  update_state=\$(docker service inspect '$swarm_service' --format '{{if .UpdateStatus}}{{.UpdateStatus.State}}{{end}}')
+  spec_image=\${spec_image%%@*}
+  running_image=\${running_image%%@*}
+  image_ready=0
+  if [[ -z \"\$expected_image\" || (\"\$spec_image\" == \"\$expected_image\" && \"\$running_image\" == \"\$expected_image\") ]]; then
+    image_ready=1
+  fi
+  if [[ \"\$replicas\" == '1/1' && \"\$image_ready\" == '1' && ( -z \"\$update_state\" || \"\$update_state\" == 'completed' ) ]]; then
+    exit 0
+  fi
+  if [[ \"\$update_state\" == 'paused' || \"\$update_state\" == 'rollback_started' || \"\$update_state\" == 'rollback_paused' ]]; then
+    break
+  fi
   sleep 2
 done
+docker service inspect '$swarm_service' --format 'image={{.Spec.TaskTemplate.ContainerSpec.Image}} update={{if .UpdateStatus}}{{.UpdateStatus.State}} {{.UpdateStatus.Message}}{{end}}'
 docker service ps '$swarm_service' --no-trunc
 exit 1
 "
 }
 
-wait_for_service "${PROJECT}_${XMAGE_SERVICE}"
-wait_for_service "${PROJECT}_${FORGE_SERVICE}"
+wait_for_service "${PROJECT}_${XMAGE_SERVICE}" "$xmage_image"
+wait_for_service "${PROJECT}_${FORGE_SERVICE}" "$forge_image"
 
 wait_for_sidecar_health() {
   local swarm_service="$1"
@@ -273,6 +291,7 @@ db_ssl_mode=\$(decode '$db_ssl_mode_b64')
 update_args=(
   docker service update
   --update-order stop-first
+  --rollback-order stop-first
   --env-add 'BATTLE_ENGINE=auto'
   --env-add 'XMAGE_SIDECAR_URL=http://$XMAGE_SERVICE:8080'
   --env-add 'FORGE_SIDECAR_URL=http://$FORGE_SERVICE:8080'

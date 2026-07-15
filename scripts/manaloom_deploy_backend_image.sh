@@ -103,6 +103,8 @@ docker push '$IMAGE_REPO:$short_sha'
 docker push '$IMAGE_REPO:latest'
 docker service update \
   --update-order stop-first \
+  --rollback-order stop-first \
+  --detach=true \
   --image '$IMAGE_REPO:$short_sha' \
   --env-add GIT_SHA='$sha' \
   --env-add SENTRY_RELEASE='$sha' \
@@ -111,13 +113,27 @@ docker service update \
 
 for attempt in \$(seq 1 45); do
   replicas="\$(docker service ls --filter name='$SERVICE' --format '{{.Replicas}}' | head -n 1)"
-  if [ "\$replicas" = "1/1" ]; then
+  spec_image="\$(docker service inspect '$SERVICE' --format '{{.Spec.TaskTemplate.ContainerSpec.Image}}')"
+  running_image="\$(docker service ps '$SERVICE' --filter desired-state=running --format '{{.Image}}' | head -n 1)"
+  update_state="\$(docker service inspect '$SERVICE' --format '{{if .UpdateStatus}}{{.UpdateStatus.State}}{{end}}')"
+  spec_image="\${spec_image%%@*}"
+  running_image="\${running_image%%@*}"
+  if [ "\$replicas" = "1/1" ] && \
+     [ "\$spec_image" = '$IMAGE_REPO:$short_sha' ] && \
+     [ "\$running_image" = '$IMAGE_REPO:$short_sha' ] && \
+     { [ -z "\$update_state" ] || [ "\$update_state" = "completed" ]; }; then
     docker service ls --filter name='$SERVICE' --format '{{.Name}} {{.Image}} {{.Replicas}}'
     exit 0
   fi
+  case "\$update_state" in
+    paused|rollback_started|rollback_paused)
+      break
+      ;;
+  esac
   sleep 2
 done
 
+docker service inspect '$SERVICE' --format 'image={{.Spec.TaskTemplate.ContainerSpec.Image}} update={{if .UpdateStatus}}{{.UpdateStatus.State}} {{.UpdateStatus.Message}}{{end}}'
 docker service ps '$SERVICE' --no-trunc
 exit 1
 REMOTE

@@ -34,7 +34,10 @@ the new server, registers or updates the EasyPanel services, verifies both
 internal health endpoints, synchronizes the backend PostgreSQL target from
 `server/.env`, and only then enables `auto` on the backend. The backend image
 deploy refuses to run when the service spec does not point to the internal
-new-server PostgreSQL target.
+new-server PostgreSQL target. Both deploy paths require the expected image in
+the service spec and in the running task, a completed update state, and `1/1`
+replicas; an old healthy task cannot satisfy deployment success. Host-port
+services use `stop-first` for update and rollback.
 
 The PostgreSQL-writing scheduler is deployed separately with
 `scripts/manaloom_deploy_ops_image.sh`. That deploy is SHA-pinned, preserves
