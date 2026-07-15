@@ -994,7 +994,7 @@ if __name__ == "__main__":
     tests = [
         test_supported_effects_cover_live_engine_handlers,
         test_rise_of_the_eldrazi_uses_composite_oracle_runtime,
-        test_manual_runtime_waiver_cards_do_not_use_functional_tags,
+        test_runtime_rule_cards_do_not_use_functional_tags,
         test_promoted_infernal_plunge_uses_curated_pg_rule_not_functional_tags,
         test_sacrifice_waiver_uses_sacrificed_creature_mana_value,
         test_brain_freeze_runtime_resolves_storm_mill_event,
