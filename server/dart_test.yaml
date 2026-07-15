@@ -1,11 +1,14 @@
 paths:
   - test/auth_service_test.dart
+  - test/battle_engine_config_test.dart
+  - test/battle_learning_evidence_support_test.dart
   - test/card_resolution_support_test.dart
   - test/cards_route_test.dart
   - test/color_identity_test.dart
   - test/commander_only_runtime_validation_config_test.dart
   - test/commander_reference_profile_support_test.dart
   - test/deck_validation_test.dart
+  - test/deck_battle_learning_evidence_test.dart
   - test/external_commander_deck_expansion_support_test.dart
   - test/external_commander_meta_candidate_support_test.dart
   - test/external_commander_meta_import_support_test.dart
@@ -27,6 +30,7 @@ paths:
   - test/mtg_data_integrity_support_test.dart
   - test/mtg_rules_validation_test.dart
   - test/mtgtop8_meta_support_test.dart
+  - test/native_battle_client_test.dart
   - test/observability_test.dart
   - test/openai_runtime_config_test.dart
   - test/optimization_final_validation_test.dart
@@ -56,6 +60,7 @@ presets:
       - test/ai_optimize_flow_test.dart
       - test/ai_optimize_telemetry_contract_test.dart
       - test/auth_flow_integration_test.dart
+      - test/battle_product_e2e_test.dart
       - test/commander_reference_atraxa_test.dart
       - test/commander_reference_profile_generate_live_test.dart
       - test/core_flow_smoke_test.dart
@@ -73,3 +78,4 @@ tags:
   live_backend:
   live_db_write:
   live_external:
+  battle_product_e2e:

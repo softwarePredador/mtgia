@@ -333,6 +333,17 @@ Future<Response> _createDeck(RequestContext context) async {
 
       // Resolver card_id quando veio "name" e agregar num formato único
       final normalizedCards = <Map<String, dynamic>>[];
+      final unresolvedNames = cards
+          .whereType<Map>()
+          .where((card) => (card['card_id']?.toString().trim() ?? '').isEmpty)
+          .map((card) => card['name']?.toString().trim() ?? '')
+          .where((name) => name.isNotEmpty)
+          .toSet();
+      final resolvedCardIds = await resolveDeckCardIdsByName(
+        session: session,
+        names: unresolvedNames,
+        preferredFormat: format,
+      );
 
       for (final card in cards) {
         if (card is! Map) {
@@ -353,11 +364,7 @@ Future<Response> _createDeck(RequestContext context) async {
         }
 
         if (cardId == null || cardId.isEmpty) {
-          cardId = await resolveDeckCardIdByName(
-            session: session,
-            name: cardName!.trim(),
-            preferredFormat: format,
-          );
+          cardId = resolvedCardIds[cardName!.trim()];
           if (cardId == null || cardId.isEmpty) {
             throw Exception('Card not found: ${cardName.trim()}');
           }

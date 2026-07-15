@@ -107,7 +107,8 @@ rodadas e memorias antigas. Para evitar confusao, use esta ordem de leitura.
   - Status: `current_operating_standard`.
   - Contrato de runtime global para launch: XMage pinado como executor primario,
     Forge pinado somente para gaps estruturados de cobertura XMage e
-    `manaloom_native_legacy` como residual explicito.
+    `manaloom_native_reviewed` como residual explicito e fail-closed, usando
+    apenas regras PostgreSQL verificadas/executaveis sincronizadas no Hermes.
   - Separa execucao externa de regras da adaptacao nativa em
     `card_battle_rules`; batalha externa nao promove PostgreSQL e nao prova
     legalidade, qualidade de deck ou uso individual sem evento/focused test.

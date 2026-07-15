@@ -1,5 +1,6 @@
 const battlePositiveEvidenceSchema = 'battle_positive_evidence_v1';
 const externalBattleLearningSchema = 'external_battle_learning_v1';
+const nativeBattleLearningSchema = 'native_battle_learning_v1';
 
 const _positiveActionTokens = <String>{
   'ability',
@@ -24,6 +25,9 @@ const _cardNameFields = <String>[
   'permanent_name',
   'attacker_name',
   'blocker_name',
+  'card',
+  'source',
+  'target_card',
 ];
 
 /// Extracts only positive, named card activity from a battle result.
@@ -37,9 +41,12 @@ Map<String, dynamic> buildBattleLearningEvidence(
   bool naturalSample = true,
 }) {
   final contract = _learningContract(result);
-  final contractValid =
-      contract['schema_version'] == externalBattleLearningSchema &&
-          contract['absence_proves_nonuse'] == false;
+  final learningSchema = contract['schema_version']?.toString();
+  final contractValid = const {
+        externalBattleLearningSchema,
+        nativeBattleLearningSchema,
+      }.contains(learningSchema) &&
+      contract['absence_proves_nonuse'] == false;
   final exposed = <String, Set<String>>{};
   final eventCounts = <String, int>{};
 
@@ -73,7 +80,10 @@ Map<String, dynamic> buildBattleLearningEvidence(
   final allFocusExposed = focusRows.isNotEmpty &&
       focusRows.every((row) => row['positive_exposure'] == true);
   final completed = _isCompleted(result);
-  final positiveExposureReady = completed && contractValid && allFocusExposed;
+  final requestedExposureReady =
+      focusRows.isEmpty ? exposed.isNotEmpty : allFocusExposed;
+  final positiveExposureReady =
+      completed && contractValid && requestedExposureReady;
   final naturalSameLaneExposure =
       positiveExposureReady && sameLane && naturalSample;
 
@@ -85,6 +95,7 @@ Map<String, dynamic> buildBattleLearningEvidence(
     'schema_version': battlePositiveEvidenceSchema,
     'completed': completed,
     'learning_contract_valid': contractValid,
+    'learning_contract_schema': learningSchema,
     'absence_proves_nonuse': false,
     'event_stream_is_lower_bound': true,
     'event_counts': sortedEventCounts,

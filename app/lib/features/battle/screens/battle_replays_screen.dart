@@ -251,7 +251,7 @@ class _BattleReplaysScreenState extends State<BattleReplaysScreen> {
         icon: Icons.history_toggle_off_rounded,
         title: 'Nenhum replay salvo',
         message:
-            'Rode uma simulacao para criar historico. Battle usa o simulador experimental do backend e deve ser lido como evidencia advisory.',
+            'Rode uma simulacao para criar historico. Cada replay informa o motor e o contrato de execucao usados.',
         accent: AppTheme.brass400,
         actionLabel: 'Rodar goldfish',
         onAction: _runGoldfish,

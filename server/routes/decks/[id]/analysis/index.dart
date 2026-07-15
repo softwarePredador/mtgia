@@ -3,6 +3,7 @@ import 'package:dart_frog/dart_frog.dart';
 import 'package:postgres/postgres.dart';
 
 import '../../../../lib/ai/commander_deckbuilding_contract_support.dart';
+import '../../../../lib/ai/deck_battle_learning_evidence.dart';
 import '../../../../lib/ai/functional_card_tags.dart';
 import '../../../../lib/meta/meta_deck_card_list_support.dart';
 import '../../../../lib/meta/meta_deck_format_support.dart';
@@ -136,6 +137,10 @@ Future<Response> _analyzeDeck(RequestContext context, String deckId) async {
     );
 
     final cards = cardsResult.map((row) => row.toColumnMap()).toList();
+    final battleLearningEvidence = await loadDeckBattleLearningEvidence(
+      pool: pool,
+      deckId: deckId,
+    );
 
     // 3. Análise: Curva de Mana, Cores e Preço
     final manaCurve = <int, int>{};
@@ -469,6 +474,7 @@ Future<Response> _analyzeDeck(RequestContext context, String deckId) async {
         issues: issues,
       ),
       'battle_readiness': _buildBattleReadinessSummary(cards),
+      'battle_learning_evidence': battleLearningEvidence,
       'card_battle_readiness': _buildCardBattleReadiness(cards),
       'understanding_summary': _buildUnderstandingSummary(
         cards: cards,
@@ -480,6 +486,7 @@ Future<Response> _analyzeDeck(RequestContext context, String deckId) async {
         totalCards: totalCards,
         cards: cards,
         issues: issues,
+        battleLearningEvidence: battleLearningEvidence,
       ),
       'launch_capabilities': _buildLaunchCapabilities(
         format: format,
@@ -569,6 +576,7 @@ Map<String, dynamic> _buildCommanderContractSummary({
   required int totalCards,
   required List<Map<String, dynamic>> cards,
   required List<Map<String, dynamic>> issues,
+  required Map<String, dynamic> battleLearningEvidence,
 }) {
   final normalizedFormat = format.toLowerCase().trim();
   final isCommander =
@@ -645,6 +653,7 @@ Map<String, dynamic> _buildCommanderContractSummary({
       'warnings': warnings,
     },
     battleGateRequired: true,
+    battleLearningEvidence: battleLearningEvidence,
   );
 
   return buildCommanderDeckbuildingAppSummary(

@@ -37,19 +37,45 @@ void main() {
       'BATTLE_ENGINE': 'auto',
       'XMAGE_SIDECAR_URL': 'http://xmage:8080',
       'FORGE_SIDECAR_URL': 'http://forge:8080',
+      'NATIVE_BATTLE_SIDECAR_URL': 'http://native:8080',
     });
 
     expect(config.mode, 'auto');
     expect(config.xmageSidecarUrl, 'http://xmage:8080');
     expect(config.forgeSidecarUrl, 'http://forge:8080');
+    expect(config.nativeSidecarUrl, 'http://native:8080');
   });
 
-  test('native is the only mode that does not require a sidecar', () {
+  test('native requires the reviewed native sidecar', () {
+    expect(
+      () => BattleEngineConfig.fromEnvironment(const {
+        'BATTLE_ENGINE': 'native',
+      }),
+      throwsA(isA<BattleEngineConfigurationException>()),
+    );
     final config = BattleEngineConfig.fromEnvironment(const {
       'BATTLE_ENGINE': 'native',
+      'NATIVE_BATTLE_SIDECAR_URL': 'http://native:8080',
     });
 
     expect(config.isNative, isTrue);
+  });
+
+  test('auto refuses the legacy in-process native fallback', () {
+    expect(
+      () => BattleEngineConfig.fromEnvironment(const {
+        'BATTLE_ENGINE': 'auto',
+        'XMAGE_SIDECAR_URL': 'http://xmage:8080',
+        'FORGE_SIDECAR_URL': 'http://forge:8080',
+      }),
+      throwsA(
+        isA<BattleEngineConfigurationException>().having(
+          (error) => error.message,
+          'message',
+          contains('NATIVE_BATTLE_SIDECAR_URL'),
+        ),
+      ),
+    );
   });
 
   test('strict modes require only their selected engine', () {

@@ -42,6 +42,10 @@ class ManaLoomOpsDaemonTest(unittest.TestCase):
                     os.environ["DB_NAME"] = original_db_name
         self.assertEqual(env["DB_HOST"], "db.example")
         self.assertEqual(env["DB_NAME"], "mana")
+        self.assertEqual(
+            env["MANALOOM_CANONICAL_KNOWN_CARDS_JSON"],
+            str(module.CANONICAL_SNAPSHOT),
+        )
 
     def test_collect_boot_jobs_runs_pull_for_pending_events(self) -> None:
         module = _load_module()

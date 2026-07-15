@@ -75,4 +75,35 @@ void main() {
     expect(evidence['positive_exposure_ready'], isTrue);
     expect(evidence['comparison_input_ready'], isFalse);
   });
+
+  test('completed battle records generic named exposure without focus cards',
+      () {
+    final evidence = buildBattleLearningEvidence(
+      completedResult([
+        {'event_type': 'spell_cast', 'card': 'Aerialephant'},
+      ]),
+    );
+
+    expect(evidence['positive_exposure_ready'], isTrue);
+    expect(
+      evidence['exposed_card_names_normalized'],
+      contains('aerialephant'),
+    );
+  });
+
+  test('reviewed native learning contract is accepted', () {
+    final result = completedResult([
+      {'event_type': 'ability_resolved', 'source': 'Aerialephant'},
+    ]);
+    result['learning_contract'] = {
+      'schema_version': nativeBattleLearningSchema,
+      'absence_proves_nonuse': false,
+    };
+
+    final evidence = buildBattleLearningEvidence(result);
+
+    expect(evidence['learning_contract_valid'], isTrue);
+    expect(evidence['learning_contract_schema'], nativeBattleLearningSchema);
+    expect(evidence['positive_exposure_ready'], isTrue);
+  });
 }

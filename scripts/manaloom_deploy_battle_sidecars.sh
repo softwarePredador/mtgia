@@ -30,6 +30,7 @@ PROJECT="${EASYPANEL_PROJECT_NAME:-evolution}"
 BACKEND_SERVICE="${EASYPANEL_APP_NAME:-cartinhas}"
 XMAGE_SERVICE="${MANALOOM_XMAGE_SERVICE:-xmage-sidecar}"
 FORGE_SERVICE="${MANALOOM_FORGE_SERVICE:-forge-sidecar}"
+NATIVE_SERVICE="${MANALOOM_NATIVE_BATTLE_SERVICE:-manaloom-ops}"
 XMAGE_MEMORY_LIMIT_MB="${MANALOOM_XMAGE_MEMORY_LIMIT_MB:-4096}"
 FORGE_MEMORY_LIMIT_MB="${MANALOOM_FORGE_MEMORY_LIMIT_MB:-2560}"
 
@@ -55,6 +56,7 @@ for key in "${required[@]}"; do
 done
 
 cd "$ROOT_DIR"
+"$ROOT_DIR/scripts/manaloom_battle_product_gate.sh"
 git fetch origin master --quiet
 sha="$(git rev-parse HEAD)"
 origin_sha="$(git rev-parse origin/master)"
@@ -227,6 +229,14 @@ docker run --rm --network \"\$network_name\" --entrypoint sh curlimages/curl:8.1
 
 wait_for_sidecar_health "${PROJECT}_${XMAGE_SERVICE}" "$XMAGE_SERVICE" catalog_ready
 wait_for_sidecar_health "${PROJECT}_${FORGE_SERVICE}" "$FORGE_SERVICE"
+if ! service_exists "$NATIVE_SERVICE"; then
+  echo "required native battle service is missing: $PROJECT/$NATIVE_SERVICE" >&2
+  exit 1
+fi
+wait_for_sidecar_health \
+  "${PROJECT}_${NATIVE_SERVICE}" \
+  "$NATIVE_SERVICE" \
+  native_reviewed_rules_execution
 
 services_json="$(trpc_post projects.listProjectsAndServices null)"
 backend_env="$(jq -er --arg project "$PROJECT" --arg service "$BACKEND_SERVICE" '.json.services[] | select(.projectName == $project and .name == $service and .type == "app") | .env' <<<"$services_json")"
@@ -255,6 +265,7 @@ upsert_env() {
 backend_env="$(upsert_env "$backend_env" BATTLE_ENGINE auto)"
 backend_env="$(upsert_env "$backend_env" XMAGE_SIDECAR_URL "http://$XMAGE_SERVICE:8080")"
 backend_env="$(upsert_env "$backend_env" FORGE_SIDECAR_URL "http://$FORGE_SERVICE:8080")"
+backend_env="$(upsert_env "$backend_env" NATIVE_BATTLE_SIDECAR_URL "http://$NATIVE_SERVICE:8080")"
 backend_env="$(upsert_env "$backend_env" DB_HOST "$DB_HOST")"
 backend_env="$(upsert_env "$backend_env" DB_PORT "$DB_PORT")"
 backend_env="$(upsert_env "$backend_env" DB_NAME "$DB_NAME")"
@@ -295,6 +306,7 @@ update_args=(
   --env-add 'BATTLE_ENGINE=auto'
   --env-add 'XMAGE_SIDECAR_URL=http://$XMAGE_SERVICE:8080'
   --env-add 'FORGE_SIDECAR_URL=http://$FORGE_SERVICE:8080'
+  --env-add 'NATIVE_BATTLE_SIDECAR_URL=http://$NATIVE_SERVICE:8080'
   --env-add \"DB_HOST=\$db_host\"
   --env-add \"DB_PORT=\$db_port\"
   --env-add \"DB_NAME=\$db_name\"
@@ -309,5 +321,5 @@ wait_for_service "$backend_swarm_service"
 
 ssh "${ssh_args[@]}" "$ssh_target" "rm -rf '$remote_dir'"
 
-printf '{"status":"deployed","git_sha":"%s","xmage_service":"%s","forge_service":"%s","backend_service":"%s"}\n' \
-  "$sha" "$XMAGE_SERVICE" "$FORGE_SERVICE" "$BACKEND_SERVICE"
+printf '{"status":"deployed","git_sha":"%s","xmage_service":"%s","forge_service":"%s","native_service":"%s","backend_service":"%s"}\n' \
+  "$sha" "$XMAGE_SERVICE" "$FORGE_SERVICE" "$NATIVE_SERVICE" "$BACKEND_SERVICE"

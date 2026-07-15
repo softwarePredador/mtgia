@@ -23,14 +23,19 @@ Future<Response> onRequest(RequestContext context, String deckId) async {
       deckId: deckId,
       limit: limit,
     );
+    final hasAdvisoryReplay = replays.any(
+      (replay) =>
+          (replay['simulation_contract'] as Map?)?['advisory_only'] == true,
+    );
     return Response.json(
       body: {
         'data': replays,
         'source': 'battle_simulations',
-        'advisory': true,
+        'advisory': hasAdvisoryReplay,
         'simulation_contract': const {
-          'status': 'experimental_advisory',
-          'advisory_only': true,
+          'status': 'per_replay_engine_contract',
+          'advisory_only': false,
+          'rules_execution_status': 'per_replay',
           'canonical_legality_source': false,
           'event_stream_completeness': 'per_replay_learning_contract',
           'absence_proves_nonuse': false,

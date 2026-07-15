@@ -159,7 +159,8 @@ Both Python and Dart publish `battle_positive_evidence_v1`.
 Positive exposure requires:
 
 1. a completed engine result;
-2. `external_battle_learning_v1` with `absence_proves_nonuse=false`;
+2. `external_battle_learning_v1` or `native_battle_learning_v1` with
+   `absence_proves_nonuse=false`;
 3. a typed action such as stack entry, cast, activation, zone transition,
    battlefield entry, combat, damage, tap, or counter change;
 4. a named card field attached to that action.
@@ -193,8 +194,10 @@ next_gate=statistical_and_strategy_evaluation
 ```
 
 The backend `/ai/simulate` route now writes the same safe evidence summary into
-persisted battle results. Commander diagnostics can consume it, but never turn
-it into automatic promotion.
+persisted battle results. Its order is XMage, Forge only for a structured XMage
+gap, then the reviewed native sidecar after complete-deck native coverage.
+Commander diagnostics consume only natural positive exposure and never turn it
+into automatic promotion.
 
 ## Measured proof on 2026-07-15
 
@@ -310,6 +313,21 @@ truth only through the existing package process:
 
 Pattern-registry rows remain shadow-only. External engine coverage does not
 create `card_battle_rules` rows.
+
+## Product E2E gate
+
+Every battle-related deploy runs
+`scripts/manaloom_battle_product_gate.sh` before changing a service. The gate
+checks the app-to-API route, external-to-native routing, verified native
+coverage, typed evidence persistence, deck-analysis consumption, unit tests,
+static analysis, and deployment syntax.
+
+The live contract test is `server/test/battle_product_e2e_test.dart`. It creates
+two temporary legal Commander decks through the public API, naturally casts and
+resolves a reviewed residual card, persists the replay, confirms
+`/decks/:id/analysis` consumes the natural evidence, and deletes the decks. An
+optional forced-access run proves diagnostic labelling but cannot satisfy the
+natural deckbuilder gate.
 
 ## Definition of done
 

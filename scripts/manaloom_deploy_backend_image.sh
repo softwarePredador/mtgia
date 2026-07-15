@@ -24,6 +24,10 @@ REMOTE_BUILD_ROOT="${MANALOOM_REMOTE_BUILD_ROOT:-/opt/manaloom/deploy}"
 EXPECTED_DB_HOST="${MANALOOM_EXPECTED_DB_HOST:-evolution_manaloom-postgres}"
 EXPECTED_DB_PORT="${MANALOOM_EXPECTED_DB_PORT:-5432}"
 EXPECTED_DB_NAME="${MANALOOM_EXPECTED_DB_NAME:-halder}"
+EXPECTED_BATTLE_ENGINE="${MANALOOM_EXPECTED_BATTLE_ENGINE:-auto}"
+EXPECTED_XMAGE_URL="${MANALOOM_EXPECTED_XMAGE_URL:-http://xmage-sidecar:8080}"
+EXPECTED_FORGE_URL="${MANALOOM_EXPECTED_FORGE_URL:-http://forge-sidecar:8080}"
+EXPECTED_NATIVE_URL="${MANALOOM_EXPECTED_NATIVE_URL:-http://manaloom-ops:8080}"
 
 require_tool() {
   command -v "$1" >/dev/null 2>&1 || {
@@ -72,6 +76,8 @@ trpc_post() {
 
 cd "$ROOT_DIR"
 
+"$ROOT_DIR/scripts/manaloom_battle_product_gate.sh"
+
 git fetch origin master --quiet
 sha="$(git rev-parse HEAD)"
 short_sha="$(git rev-parse --short=12 HEAD)"
@@ -85,10 +91,10 @@ fi
 
 runtime_db_target="$(ssh -o BatchMode=yes -o StrictHostKeyChecking=accept-new -i "$SSH_KEY" "$SSH_HOST" "
 docker service inspect '$SERVICE' --format '{{range .Spec.TaskTemplate.ContainerSpec.Env}}{{println .}}{{end}}' |
-  awk -F= '/^DB_HOST=/{host=\$2} /^DB_PORT=/{port=\$2} /^DB_NAME=/{name=\$2} END{print host \"|\" port \"|\" name}'
+  awk -F= '/^DB_HOST=/{host=\$2} /^DB_PORT=/{port=\$2} /^DB_NAME=/{name=\$2} /^BATTLE_ENGINE=/{engine=\$2} /^XMAGE_SIDECAR_URL=/{xmage=\$2} /^FORGE_SIDECAR_URL=/{forge=\$2} /^NATIVE_BATTLE_SIDECAR_URL=/{native=\$2} END{print host \"|\" port \"|\" name \"|\" engine \"|\" xmage \"|\" forge \"|\" native}'
 ")"
-if [[ "$runtime_db_target" != "$EXPECTED_DB_HOST|$EXPECTED_DB_PORT|$EXPECTED_DB_NAME" ]]; then
-  echo "deploy recusado: a spec do backend nao aponta para o PostgreSQL interno esperado" >&2
+if [[ "$runtime_db_target" != "$EXPECTED_DB_HOST|$EXPECTED_DB_PORT|$EXPECTED_DB_NAME|$EXPECTED_BATTLE_ENGINE|$EXPECTED_XMAGE_URL|$EXPECTED_FORGE_URL|$EXPECTED_NATIVE_URL" ]]; then
+  echo "deploy recusado: contrato PostgreSQL/battle da spec do backend esta divergente" >&2
   exit 2
 fi
 
@@ -148,10 +154,10 @@ trpc_post services.app.updateSourceImage "$source_payload" >/dev/null
 runtime_contract="$(ssh -o BatchMode=yes -o StrictHostKeyChecking=accept-new -i "$SSH_KEY" "$SSH_HOST" "
 container=\$(docker ps --filter label=com.docker.swarm.service.name='$SERVICE' -q | head -1)
 docker inspect \"\$container\" --format '{{range .Config.Env}}{{println .}}{{end}}' |
-  awk -F= '/^GIT_SHA=/{sha=\$2} /^DB_HOST=/{host=\$2} /^DB_PORT=/{port=\$2} /^DB_NAME=/{name=\$2} END{print sha \"|\" host \"|\" port \"|\" name}'
+  awk -F= '/^GIT_SHA=/{sha=\$2} /^DB_HOST=/{host=\$2} /^DB_PORT=/{port=\$2} /^DB_NAME=/{name=\$2} /^BATTLE_ENGINE=/{engine=\$2} /^XMAGE_SIDECAR_URL=/{xmage=\$2} /^FORGE_SIDECAR_URL=/{forge=\$2} /^NATIVE_BATTLE_SIDECAR_URL=/{native=\$2} END{print sha \"|\" host \"|\" port \"|\" name \"|\" engine \"|\" xmage \"|\" forge \"|\" native}'
 ")"
-if [[ "$runtime_contract" != "$sha|$EXPECTED_DB_HOST|$EXPECTED_DB_PORT|$EXPECTED_DB_NAME" ]]; then
-  echo "deploy convergiu com SHA ou alvo PostgreSQL divergente" >&2
+if [[ "$runtime_contract" != "$sha|$EXPECTED_DB_HOST|$EXPECTED_DB_PORT|$EXPECTED_DB_NAME|$EXPECTED_BATTLE_ENGINE|$EXPECTED_XMAGE_URL|$EXPECTED_FORGE_URL|$EXPECTED_NATIVE_URL" ]]; then
+  echo "deploy convergiu com SHA ou contrato PostgreSQL/battle divergente" >&2
   exit 2
 fi
 

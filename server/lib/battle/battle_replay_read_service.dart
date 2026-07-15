@@ -169,6 +169,10 @@ class BattleReplayReadService {
     final winnerName = winnerDeckId == null
         ? row['winner_label']?.toString()
         : _winnerNameForRow(row, winnerDeckId);
+    final metrics = _jsonValue(row['metrics']);
+    final metricsMap = metrics is Map ? metrics : const <String, dynamic>{};
+    final engine = metricsMap['engine']?.toString();
+    final engineContract = metricsMap['engine_contract']?.toString();
 
     return {
       'id': row['id']?.toString(),
@@ -186,7 +190,12 @@ class BattleReplayReadService {
         'winner_name': winnerName,
       'turns_played': _toInt(row['turns_played']),
       'event_count': _toInt(row['event_count']),
-      'metrics': _jsonValue(row['metrics']),
+      'metrics': metrics,
+      if (engine != null && engine.isNotEmpty) 'engine': engine,
+      'simulation_contract': _simulationContract(
+        engine: engine,
+        engineContract: engineContract,
+      ),
       'created_at': _timestamp(row['created_at']),
       'source': 'battle_simulations',
       'status': 'completed',
@@ -212,10 +221,6 @@ class BattleReplayReadService {
     final learningContract = rawLearningContract is Map
         ? Map<String, dynamic>.from(rawLearningContract)
         : const <String, dynamic>{};
-    final isCanonicalRulesExecution =
-        (engine == 'xmage' && engineContract == 'canonical_rules_execution') ||
-            (engine == 'forge' &&
-                engineContract == 'canonical_rules_execution_secondary');
 
     return {
       ...summary,
@@ -237,29 +242,52 @@ class BattleReplayReadService {
       if (gameLogMap['engine_commit'] != null)
         'engine_commit': gameLogMap['engine_commit'],
       if (learningContract.isNotEmpty) 'learning_contract': learningContract,
-      'simulation_contract': {
-        'status': isCanonicalRulesExecution
-            ? engineContract
-            : 'experimental_advisory',
-        'advisory_only': !isCanonicalRulesExecution,
-        'canonical_rules_execution': isCanonicalRulesExecution,
-        if (isCanonicalRulesExecution)
-          'rules_engine_priority': engine == 'xmage' ? 'primary' : 'secondary',
-        'canonical_legality_source': false,
-        'strategy_or_swap_proof': false,
-        'event_learning_grade':
-            learningContract.isEmpty ? 'not_declared' : 'visible_activity_only',
-        'event_stream_completeness':
-            learningContract['event_stream_completeness'] ?? 'not_declared',
-        'absence_proves_nonuse':
-            learningContract['absence_proves_nonuse'] == true,
-        'seed_semantics':
-            learningContract['seed_semantics'] ?? 'not_declared',
-        'named_draw_identity_available':
-            learningContract['named_draw_identity_available'] == true,
-        'ai_decision_rationale_available':
-            learningContract['ai_decision_rationale_available'] == true,
-      },
+      'simulation_contract': _simulationContract(
+        engine: engine,
+        engineContract: engineContract,
+        learningContract: learningContract,
+      ),
+    };
+  }
+
+  Map<String, dynamic> _simulationContract({
+    required String? engine,
+    required String? engineContract,
+    Map<String, dynamic> learningContract = const {},
+  }) {
+    final isExternalCanonicalExecution =
+        (engine == 'xmage' && engineContract == 'canonical_rules_execution') ||
+            (engine == 'forge' &&
+                engineContract == 'canonical_rules_execution_secondary');
+    final isReviewedNativeExecution = engine == 'manaloom_native_reviewed' &&
+        engineContract == 'native_reviewed_rules_execution';
+    final isRulesExecution =
+        isExternalCanonicalExecution || isReviewedNativeExecution;
+    return {
+      'status': isRulesExecution ? engineContract : 'experimental_advisory',
+      'advisory_only': !isRulesExecution,
+      'rules_execution': isRulesExecution,
+      'canonical_rules_execution': isExternalCanonicalExecution,
+      'reviewed_native_rules_execution': isReviewedNativeExecution,
+      if (isRulesExecution)
+        'rules_engine_priority': engine == 'xmage'
+            ? 'primary'
+            : engine == 'forge'
+                ? 'secondary'
+                : 'native_residual',
+      'canonical_legality_source': false,
+      'strategy_or_swap_proof': false,
+      'event_learning_grade':
+          learningContract.isEmpty ? 'not_declared' : 'visible_activity_only',
+      'event_stream_completeness':
+          learningContract['event_stream_completeness'] ?? 'not_declared',
+      'absence_proves_nonuse':
+          learningContract['absence_proves_nonuse'] == true,
+      'seed_semantics': learningContract['seed_semantics'] ?? 'not_declared',
+      'named_draw_identity_available':
+          learningContract['named_draw_identity_available'] == true,
+      'ai_decision_rationale_available':
+          learningContract['ai_decision_rationale_available'] == true,
     };
   }
 

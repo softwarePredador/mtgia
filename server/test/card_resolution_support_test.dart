@@ -103,7 +103,7 @@ void main() {
           File('routes/decks/[id]/index.dart').readAsStringSync();
 
       expect(batchRoute, contains('resolveDeckCardNameCandidates'));
-      expect(createRoute, contains('resolveDeckCardIdByName'));
+      expect(createRoute, contains('resolveDeckCardIdsByName'));
       expect(updateRoute, contains('resolveDeckCardIdByName'));
       expect(
         createRoute,

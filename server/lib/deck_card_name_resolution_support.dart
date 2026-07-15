@@ -21,25 +21,43 @@ Future<String?> resolveDeckCardIdByName({
   required String name,
   required String preferredFormat,
 }) async {
-  final candidatesByInput = await resolveDeckCardNameCandidates(
+  final resolved = await resolveDeckCardIdsByName(
     session: session,
     names: [name],
     preferredFormat: preferredFormat,
   );
-  final candidates = candidatesByInput[name.trim()] ?? const [];
-  final decision = resolveCardCandidateNames(
-    name,
-    candidates.map((candidate) => candidate.candidateName),
-  );
-  if (!decision.isResolved) return null;
+  return resolved[name.trim()];
+}
 
-  final matchedName = decision.matchedName!.toLowerCase();
-  for (final candidate in candidates) {
-    if (candidate.candidateName.toLowerCase() == matchedName) {
-      return candidate.cardId;
+Future<Map<String, String>> resolveDeckCardIdsByName({
+  required Session session,
+  required Iterable<String> names,
+  required String preferredFormat,
+}) async {
+  final cleanNames =
+      names.map((name) => name.trim()).where((name) => name.isNotEmpty).toSet();
+  final candidatesByInput = await resolveDeckCardNameCandidates(
+    session: session,
+    names: cleanNames,
+    preferredFormat: preferredFormat,
+  );
+  final resolved = <String, String>{};
+  for (final name in cleanNames) {
+    final candidates = candidatesByInput[name] ?? const [];
+    final decision = resolveCardCandidateNames(
+      name,
+      candidates.map((candidate) => candidate.candidateName),
+    );
+    if (!decision.isResolved) continue;
+    final matchedName = decision.matchedName!.toLowerCase();
+    for (final candidate in candidates) {
+      if (candidate.candidateName.toLowerCase() == matchedName) {
+        resolved[name] = candidate.cardId;
+        break;
+      }
     }
   }
-  return null;
+  return resolved;
 }
 
 Future<Map<String, List<DeckCardNameCandidate>>> resolveDeckCardNameCandidates({

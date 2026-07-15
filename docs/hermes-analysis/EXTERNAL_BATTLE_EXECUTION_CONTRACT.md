@@ -19,13 +19,16 @@ For `BATTLE_ENGINE=auto`:
 
 1. pinned XMage is the primary rules executor;
 2. pinned Forge is tried only when XMage returns a structured coverage gap;
-3. `manaloom_native_legacy` is the explicit residual fallback;
+3. `manaloom_native_reviewed` is the explicit residual fallback and accepts
+   only cards covered by verified executable PostgreSQL rules (plus audited
+   intrinsic basic-land handling);
 4. an operational failure from XMage or Forge returns an error and is never
    reinterpreted as a successful native battle.
 
-`auto` is the default and requires both sidecar URLs. Strict modes are `xmage`,
-`forge`, and `native`. Missing required configuration returns `503`; it cannot
-silently select an old runner. Only explicit `native` works without a sidecar.
+`auto` is the default and requires all three sidecar URLs. Strict modes are
+`xmage`, `forge`, and `native`. Missing required configuration returns `503`;
+it cannot silently select an old in-process runner. Explicit `native` also
+requires the reviewed native sidecar.
 
 Required environment:
 
@@ -33,12 +36,13 @@ Required environment:
 BATTLE_ENGINE=auto
 XMAGE_SIDECAR_URL=http://xmage-sidecar:8080
 FORGE_SIDECAR_URL=http://forge-sidecar:8080
+NATIVE_BATTLE_SIDECAR_URL=http://manaloom-ops:8080
 ```
 
 Production deploy is coordinated by
-`scripts/manaloom_deploy_battle_sidecars.sh`. It builds both pinned images on
-the new server, registers or updates the EasyPanel services, verifies both
-internal health endpoints, synchronizes the backend PostgreSQL target from
+`scripts/manaloom_deploy_battle_sidecars.sh`. It builds both pinned external
+images on the new server, requires the reviewed native service, verifies all
+three internal health endpoints, synchronizes the backend PostgreSQL target from
 `server/.env`, and only then enables `auto` on the backend. The backend image
 deploy refuses to run when the service spec does not point to the internal
 new-server PostgreSQL target. Both deploy paths require the expected image in
@@ -46,13 +50,19 @@ the service spec and in the running task, a completed update state, and `1/1`
 replicas; an old healthy task cannot satisfy deployment success. Host-port
 services use `stop-first` for update and rollback.
 
+All three battle deploy scripts execute
+`scripts/manaloom_battle_product_gate.sh` before deployment. The live product
+proof is `server/test/battle_product_e2e_test.dart`; it must be run after deploy
+with `RUN_BATTLE_PRODUCT_E2E=1` against the public API.
+
 The PostgreSQL-writing scheduler is deployed separately with
 `scripts/manaloom_deploy_ops_image.sh`. That deploy is SHA-pinned, preserves
 the existing `/data/manaloom-ops` volume, refuses an old or external database
 target, and verifies inside the running container that rule synchronization
 cannot replace a trusted `oracle_hash` with an empty cache value. The
 `manaloom-ops` runtime must never remain on an older repository SHA after a
-rule-sync contract change.
+rule-sync contract change. It synchronizes verified rules and the canonical
+snapshot from PostgreSQL before opening the native health endpoint.
 
 ## Source And Product Boundaries
 
@@ -74,7 +84,7 @@ rule-sync contract change.
 
 ## Strict Sidecar Requirements
 
-Both sidecars expose:
+Both external sidecars expose:
 
 - `GET /health`
 - `POST /cards/coverage`
@@ -83,6 +93,11 @@ Both sidecars expose:
 
 Both require exact 100-card Commander decks with one commander. Unsupported
 cards return HTTP `422`; timeouts return `504`.
+
+The reviewed native sidecar exposes `GET /health`, `POST /cards/coverage`, and
+`POST /simulate`. It validates the complete submitted deck before running the
+isolated worker; validating only the Forge residual is forbidden because the
+native worker executes the entire game.
 
 Both accept at most 8 MiB per request. The limit is intentionally above the
 current full-corpus coverage payload and below an unbounded bulk-upload
@@ -134,7 +149,8 @@ omitting an unsupported card or failing to load a deck:
 ## Replay And Learning Contract
 
 External results publish `learning_contract.schema_version` as
-`external_battle_learning_v1` and keep `decision_trace` explicit. The signals
+`external_battle_learning_v1`; reviewed native results publish
+`native_battle_learning_v1`. Both keep `decision_trace` explicit. The signals
 have these meanings:
 
 | Signal | XMage | Forge | Safe conclusion |
@@ -178,8 +194,10 @@ XMage exposes them. This prevents activated abilities such as Krenko's from
 being counted as spells.
 
 The backend also persists `battle_positive_evidence_v1`. It accepts only typed,
-named positive activity under `external_battle_learning_v1`, never infers
-non-use from absence, and always keeps `promotion_allowed=false`. Offline mass
+named positive activity under either approved learning schema, never infers
+non-use from absence, and always keeps `promotion_allowed=false`. Forced-access
+diagnostics are persisted as `natural_sample=false` and are excluded from
+deckbuilder aggregation. Offline mass
 batches use `external_battle_async_registry_v1` and atomic
 `external_battle_async_checkpoint_v1`; full replay payloads are retained as
 compressed `.json.gz` files.

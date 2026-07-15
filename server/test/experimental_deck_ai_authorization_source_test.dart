@@ -122,6 +122,15 @@ void main() {
       expect(simulate, contains("contains('metrics')"));
       expect(simulate, contains('@simulationType'));
       expect(simulate, contains('@metrics::jsonb'));
+      expect(simulate, contains('NativeBattleClient'));
+      expect(simulate, contains('engineConfig.nativeSidecarUrl'));
+      expect(simulate, contains("'required_rule_cards'"));
+      expect(
+        simulate,
+        contains('requiredRuleCards: _allDeckCardRows(externalRequest)'),
+      );
+      expect(simulate, contains('_isNaturalBattleResult(data, result)'));
+      expect(simulate, isNot(contains('BattleSimulator(')));
       expect(matchup, contains('final userId = context.read<String>()'));
       expect(matchup, contains('user_id = CAST(@user_id AS uuid)'));
       expect(matchup, contains('card_intelligence_snapshot'));

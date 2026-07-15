@@ -13,6 +13,7 @@ final class BattleEngineConfig {
     required this.mode,
     required this.xmageSidecarUrl,
     required this.forgeSidecarUrl,
+    required this.nativeSidecarUrl,
   });
 
   factory BattleEngineConfig.fromEnvironment(Map<String, String> environment) {
@@ -26,6 +27,8 @@ final class BattleEngineConfig {
 
     final xmageSidecarUrl = (environment['XMAGE_SIDECAR_URL'] ?? '').trim();
     final forgeSidecarUrl = (environment['FORGE_SIDECAR_URL'] ?? '').trim();
+    final nativeSidecarUrl =
+        (environment['NATIVE_BATTLE_SIDECAR_URL'] ?? '').trim();
 
     if ((mode == 'auto' || mode == 'xmage') && xmageSidecarUrl.isEmpty) {
       throw BattleEngineConfigurationException(
@@ -39,17 +42,25 @@ final class BattleEngineConfig {
         'FORGE_SIDECAR_URL is required for BATTLE_ENGINE=$mode',
       );
     }
+    if ((mode == 'auto' || mode == 'native') && nativeSidecarUrl.isEmpty) {
+      throw BattleEngineConfigurationException(
+        '${mode}_native_not_configured',
+        'NATIVE_BATTLE_SIDECAR_URL is required for BATTLE_ENGINE=$mode',
+      );
+    }
 
     return BattleEngineConfig(
       mode: mode,
       xmageSidecarUrl: xmageSidecarUrl,
       forgeSidecarUrl: forgeSidecarUrl,
+      nativeSidecarUrl: nativeSidecarUrl,
     );
   }
 
   final String mode;
   final String xmageSidecarUrl;
   final String forgeSidecarUrl;
+  final String nativeSidecarUrl;
 
   bool get isNative => mode == 'native';
   bool get isStrictXmage => mode == 'xmage';

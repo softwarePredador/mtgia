@@ -48,6 +48,7 @@ if [[ "$DB_HOST" != "$EXPECTED_DB_HOST" ||
 fi
 
 cd "$ROOT_DIR"
+"$ROOT_DIR/scripts/manaloom_battle_product_gate.sh"
 git fetch origin master --quiet
 sha="$(git rev-parse HEAD)"
 short_sha="$(git rev-parse --short=12 HEAD)"
@@ -94,6 +95,11 @@ docker service update \
   --image '$IMAGE_REPO:$short_sha' \
   --env-add GIT_SHA='$sha' \
   --env-add DEPLOY_TIMESTAMP='$deploy_timestamp' \
+  --env-add MANALOOM_NATIVE_BATTLE_HTTP_ENABLED=1 \
+  --env-add MANALOOM_NATIVE_BATTLE_SYNC_ON_BOOT=1 \
+  --env-add MANALOOM_NATIVE_BATTLE_HOST=0.0.0.0 \
+  --env-add MANALOOM_NATIVE_BATTLE_PORT=8080 \
+  --env-add MANALOOM_CANONICAL_KNOWN_CARDS_JSON=/data/manaloom-ops/known_cards_canonical_snapshot.runtime.json \
   '$SERVICE'
 
 for attempt in \$(seq 1 60); do
@@ -106,6 +112,10 @@ for attempt in \$(seq 1 60); do
     docker exec "\$container" grep -Fq \
       "def backfill_trusted_oracle_hashes" \
       /app/docs/hermes-analysis/manaloom-knowledge/scripts/sync_battle_card_rules_pg.py
+    docker exec "\$container" test -s \
+      /data/manaloom-ops/known_cards_canonical_snapshot.runtime.json
+    docker exec "\$container" python3 -c \
+      "import json, urllib.request; data=json.load(urllib.request.urlopen('http://127.0.0.1:8080/health', timeout=5)); assert data['status']=='ok'; assert data['engine_contract']=='native_reviewed_rules_execution'; assert data['git_sha']=='$sha'; assert data['verified_rule_count']>0; print(json.dumps(data, sort_keys=True))"
     docker service ls --filter name='$SERVICE' --format '{{.Name}} {{.Image}} {{.Replicas}}'
     exit 0
   fi
@@ -119,9 +129,9 @@ REMOTE
 deployed_contract="$(ssh -o BatchMode=yes -i "$SSH_KEY" "$SSH_HOST" "
 container=\$(docker ps --filter label=com.docker.swarm.service.name='$SERVICE' -q | head -1)
 docker inspect \"\$container\" --format '{{range .Config.Env}}{{println .}}{{end}}' |
-  awk -F= '/^GIT_SHA=/{sha=\$2} /^DB_HOST=/{host=\$2} /^DB_PORT=/{port=\$2} /^DB_NAME=/{name=\$2} END{print sha \"|\" host \"|\" port \"|\" name}'
+  awk -F= '/^GIT_SHA=/{sha=\$2} /^DB_HOST=/{host=\$2} /^DB_PORT=/{port=\$2} /^DB_NAME=/{name=\$2} /^MANALOOM_NATIVE_BATTLE_HTTP_ENABLED=/{http=\$2} /^MANALOOM_NATIVE_BATTLE_SYNC_ON_BOOT=/{sync=\$2} END{print sha \"|\" host \"|\" port \"|\" name \"|\" http \"|\" sync}'
 ")"
-if [[ "$deployed_contract" != "$sha|$EXPECTED_DB_HOST|$EXPECTED_DB_PORT|$EXPECTED_DB_NAME" ]]; then
+if [[ "$deployed_contract" != "$sha|$EXPECTED_DB_HOST|$EXPECTED_DB_PORT|$EXPECTED_DB_NAME|1|1" ]]; then
   echo "deploy convergiu com SHA ou alvo PostgreSQL divergente" >&2
   exit 2
 fi

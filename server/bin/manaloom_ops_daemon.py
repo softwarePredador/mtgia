@@ -5,6 +5,7 @@ import re
 import sqlite3
 import subprocess
 import sys
+import threading
 import time
 from dataclasses import dataclass
 from datetime import datetime
@@ -34,11 +35,19 @@ JOBS_JSON = Path(
 KNOWLEDGE_DB = Path(
     os.environ.get("HERMES_KNOWLEDGE_DB", str(DATA_ROOT / "knowledge.db"))
 ).resolve()
+CANONICAL_SNAPSHOT = Path(
+    os.environ.get(
+        "MANALOOM_CANONICAL_KNOWN_CARDS_JSON",
+        str(DATA_ROOT / "known_cards_canonical_snapshot.runtime.json"),
+    )
+).resolve()
 ENV_FILE = Path(os.environ.get("MTGIA_ENV_FILE", str(REPO_ROOT / "server/.env"))).resolve()
 PYTHON_BIN = os.environ.get("PYTHON_BIN", "python3")
 MANALOOM_DART_BIN = os.environ.get("MANALOOM_DART_BIN", "dart")
 RUN_PREFLIGHT_ON_BOOT = os.environ.get("MANALOOM_RUN_PREFLIGHT_ON_BOOT", "0") == "1"
 BOOT_PULL_PENDING_EVENTS = os.environ.get("MANALOOM_BOOT_PULL_PENDING_EVENTS", "1") == "1"
+NATIVE_BATTLE_HTTP_ENABLED = os.environ.get("MANALOOM_NATIVE_BATTLE_HTTP_ENABLED", "1") == "1"
+NATIVE_BATTLE_SYNC_ON_BOOT = os.environ.get("MANALOOM_NATIVE_BATTLE_SYNC_ON_BOOT", "1") == "1"
 
 
 @dataclass(frozen=True)
@@ -73,6 +82,13 @@ def _base_env() -> dict[str, str]:
             "MANALOOM_DART_BIN": MANALOOM_DART_BIN,
             "HERMES_KNOWLEDGE_DB": str(KNOWLEDGE_DB),
             "MANALOOM_KNOWLEDGE_DB": str(KNOWLEDGE_DB),
+            "MANALOOM_CANONICAL_KNOWN_CARDS_JSON": str(CANONICAL_SNAPSHOT),
+            "MANALOOM_NATIVE_BATTLE_HOST": os.environ.get(
+                "MANALOOM_NATIVE_BATTLE_HOST", "0.0.0.0"
+            ),
+            "MANALOOM_NATIVE_BATTLE_PORT": os.environ.get(
+                "MANALOOM_NATIVE_BATTLE_PORT", "8080"
+            ),
             "HERMES_ARTIFACT_DIR": str(ARTIFACT_DIR / "hermes_auto_sync"),
             "HERMES_PROFILE_ARTIFACTS_DIR": str(REPO_ROOT / "server/test/artifacts"),
             "HERMES_MANA_BASE_REPORT": str(
@@ -111,6 +127,65 @@ def _base_env() -> dict[str, str]:
         }
     )
     return env
+
+
+def _sync_native_battle_rules(env: dict[str, str]) -> None:
+    if not NATIVE_BATTLE_SYNC_ON_BOOT:
+        return
+    script = (
+        REPO_ROOT
+        / "docs"
+        / "hermes-analysis"
+        / "manaloom-knowledge"
+        / "scripts"
+        / "sync_battle_card_rules_pg.py"
+    )
+    completed = subprocess.run(
+        [
+            PYTHON_BIN,
+            str(script),
+            "--sqlite-db",
+            str(KNOWLEDGE_DB),
+            "--apply-sqlite-from-pg",
+            "--export-canonical-fallback-json",
+            str(CANONICAL_SNAPSHOT),
+        ],
+        cwd=REPO_ROOT,
+        env=env,
+        check=False,
+        text=True,
+        capture_output=True,
+    )
+    if completed.returncode != 0:
+        detail = (completed.stderr or completed.stdout or "unknown sync failure")[-2000:]
+        raise RuntimeError(f"native battle rule sync failed: {detail}")
+    print(
+        f"[manaloom-ops] native battle rules synchronized db={KNOWLEDGE_DB}",
+        flush=True,
+    )
+
+
+def _start_native_battle_http() -> object | None:
+    if not NATIVE_BATTLE_HTTP_ENABLED:
+        return None
+    os.environ["MANALOOM_KNOWLEDGE_DB"] = str(KNOWLEDGE_DB)
+    os.environ["MANALOOM_CANONICAL_KNOWN_CARDS_JSON"] = str(CANONICAL_SNAPSHOT)
+    from native_battle_sidecar import create_server
+
+    server = create_server()
+    thread = threading.Thread(
+        target=server.serve_forever,
+        name="manaloom-native-battle-http",
+        daemon=True,
+    )
+    thread.start()
+    if not thread.is_alive():
+        raise RuntimeError("native battle HTTP thread failed to start")
+    print(
+        f"[manaloom-ops] native battle HTTP started address={server.server_address}",
+        flush=True,
+    )
+    return server
 
 
 def _knowledge_db_has_validator_tables(path: Path) -> bool:
@@ -561,6 +636,8 @@ def main() -> int:
     KNOWLEDGE_DB.parent.mkdir(parents=True, exist_ok=True)
 
     env = _base_env()
+    _sync_native_battle_rules(env)
+    native_battle_server = _start_native_battle_http()
     state = _load_existing_state(JOBS)
     _write_jobs_manifest(JOBS, state)
 
@@ -571,6 +648,10 @@ def main() -> int:
     print(f"[manaloom-ops] knowledge_db={KNOWLEDGE_DB}", flush=True)
     print(f"[manaloom-ops] jobs_json={JOBS_JSON}", flush=True)
     print(f"[manaloom-ops] cron_output_dir={CRON_OUTPUT_DIR}", flush=True)
+    print(
+        f"[manaloom-ops] native_battle_http={'enabled' if native_battle_server else 'disabled'}",
+        flush=True,
+    )
     for job in JOBS:
         print(
             f"[manaloom-ops] job name={job.name} schedule={job.schedule} script={job.script_name}",

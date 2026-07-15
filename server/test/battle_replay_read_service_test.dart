@@ -35,7 +35,11 @@ void main() {
               'battle',
               'deck-1',
               5,
-              {'turns': 5},
+              {
+                'turns': 5,
+                'engine': 'manaloom_native_reviewed',
+                'engine_contract': 'native_reviewed_rules_execution',
+              },
               createdAt,
               'Lorehold',
               'Atraxa',
@@ -59,6 +63,11 @@ void main() {
       expect(replays.single['winner_name'], 'Lorehold');
       expect(replays.single['event_count'], 12);
       expect(replays.single['created_at'], createdAt.toIso8601String());
+      expect(replays.single['engine'], 'manaloom_native_reviewed');
+      expect(
+        replays.single['simulation_contract'],
+        containsPair('reviewed_native_rules_execution', true),
+      );
     });
 
     test('maps replay detail with events and decision trace', () async {
@@ -314,6 +323,85 @@ void main() {
       expect(
         replay['simulation_contract'],
         containsPair('strategy_or_swap_proof', false),
+      );
+    });
+
+    test('marks reviewed native execution as residual rules evidence',
+        () async {
+      final pool = _ScriptedPool([
+        _result(rows: const [
+          [true],
+        ]),
+        _result(
+          columns: const [
+            'id',
+            'deck_a_id',
+            'deck_b_id',
+            'simulation_type',
+            'winner_deck_id',
+            'turns_played',
+            'game_log',
+            'metrics',
+            'created_at',
+            'deck_a_name',
+            'deck_b_name',
+          ],
+          rows: [
+            [
+              'sim-native',
+              'deck-1',
+              'deck-2',
+              'battle',
+              'deck-1',
+              9,
+              {
+                'type': 'battle',
+                'engine': 'manaloom_native_reviewed',
+                'engine_commit': 'native-commit',
+                'engine_contract': 'native_reviewed_rules_execution',
+                'learning_contract': const {
+                  'schema_version': 'native_battle_learning_v1',
+                  'absence_proves_nonuse': false,
+                },
+                'game_log': const [],
+              },
+              const {'engine': 'manaloom_native_reviewed'},
+              DateTime.utc(2026, 7, 15, 12),
+              'Lorehold',
+              'Korvold',
+            ],
+          ],
+        ),
+      ]);
+      final replay = await BattleReplayReadService(pool).fetchReplay(
+        userId: 'user-1',
+        deckId: 'deck-1',
+        replayId: 'sim-native',
+      );
+
+      expect(
+        replay!['simulation_contract'],
+        containsPair('status', 'native_reviewed_rules_execution'),
+      );
+      expect(
+        replay['simulation_contract'],
+        containsPair('rules_execution', true),
+      );
+      expect(
+        replay['simulation_contract'],
+        containsPair('canonical_rules_execution', false),
+      );
+      expect(
+        replay['simulation_contract'],
+        containsPair('reviewed_native_rules_execution', true),
+      );
+      expect(
+        replay['simulation_contract'],
+        containsPair('rules_engine_priority', 'native_residual'),
+      );
+      expect(
+        replay['simulation_contract'],
+        containsPair('advisory_only', false),
       );
     });
   });

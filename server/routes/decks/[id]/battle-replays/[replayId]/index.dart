@@ -1,8 +1,8 @@
 import 'package:dart_frog/dart_frog.dart';
 import 'package:postgres/postgres.dart';
 
-import '../../../../lib/battle/battle_replay_read_service.dart';
-import '../../../../lib/http_responses.dart';
+import '../../../../../lib/battle/battle_replay_read_service.dart';
+import '../../../../../lib/http_responses.dart';
 
 Future<Response> onRequest(
   RequestContext context,

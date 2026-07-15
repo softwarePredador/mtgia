@@ -28,9 +28,14 @@ RUN chmod +x \
   /app/server/bin/master_optimizer_preflight.sh \
   /app/server/bin/manaloom_knowledge_import.sh \
   /app/server/bin/manaloom_ops_entrypoint.sh \
-  /app/server/bin/manaloom_ops_daemon.py
+  /app/server/bin/manaloom_ops_daemon.py \
+  /app/server/bin/native_battle_sidecar.py \
+  /app/server/bin/native_battle_worker.py
 
 ENV MANALOOM_OPS_DATA_DIR=/data/manaloom-ops
+ENV MANALOOM_NATIVE_BATTLE_HOST=0.0.0.0
+ENV MANALOOM_NATIVE_BATTLE_PORT=8080
+EXPOSE 8080
 VOLUME ["/data/manaloom-ops"]
 
 CMD ["/bin/bash", "/app/server/bin/manaloom_ops_entrypoint.sh"]

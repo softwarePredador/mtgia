@@ -131,6 +131,10 @@ void main() {
         expect(body['functional_tags'], isA<Map<String, dynamic>>());
         expect(body['readiness'], isA<Map<String, dynamic>>());
         expect(body['battle_readiness'], isA<Map<String, dynamic>>());
+        expect(
+          body['battle_learning_evidence'],
+          isA<Map<String, dynamic>>(),
+        );
         expect(body['card_battle_readiness'], isA<List>());
         expect(body['understanding_summary'], isA<Map<String, dynamic>>());
         expect(body['commander_contract'], isA<Map<String, dynamic>>());
@@ -142,6 +146,8 @@ void main() {
         final readiness = body['readiness'] as Map<String, dynamic>;
         final battleReadiness =
             body['battle_readiness'] as Map<String, dynamic>;
+        final battleLearningEvidence =
+            body['battle_learning_evidence'] as Map<String, dynamic>;
         final cardBattleReadiness = body['card_battle_readiness'] as List;
         final understanding =
             body['understanding_summary'] as Map<String, dynamic>;
@@ -156,6 +162,11 @@ void main() {
         expect(battleReadiness['schema_version'], isA<String>());
         expect(battleReadiness['status'], isA<String>());
         expect(battleReadiness['samples'], isA<Map<String, dynamic>>());
+        expect(
+          battleLearningEvidence['aggregate_schema_version'],
+          'deck_battle_learning_evidence_v1',
+        );
+        expect(battleLearningEvidence['promotion_allowed'], isFalse);
         for (final item in cardBattleReadiness) {
           expect(item, isA<Map<String, dynamic>>());
           final cardReadiness = item as Map<String, dynamic>;

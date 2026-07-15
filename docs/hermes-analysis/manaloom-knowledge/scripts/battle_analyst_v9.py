@@ -83391,10 +83391,20 @@ def play_turn_sequence_v8(player, opponents, all_players, turn, rng, stack, max_
         )
 
 
+def battle_runtime_max_turns(default=35):
+    try:
+        return max(
+            1,
+            min(100, int(os.environ.get("MANALOOM_BATTLE_MAX_TURNS", default))),
+        )
+    except (TypeError, ValueError):
+        return default
+
+
 def simulate_game_with_real_opponents(my_commander, my_deck, opponent_data_list, rng, game_id=0):
     """Simulate game with real learned opponents (pre-built decks)."""
     clear_pending_triggers()
-    turn, max_turns = 0, 35
+    turn, max_turns = 0, battle_runtime_max_turns()
     stack = Stack()
 
     target_player = Player(
@@ -83483,7 +83493,7 @@ def classify_loss(player, opponents, turn, result, reason):
 
 def simulate_game_v8(my_commander, my_deck, opp_profile, rng, game_id=0):
     clear_pending_triggers()
-    turn, max_turns = 0, 35
+    turn, max_turns = 0, battle_runtime_max_turns()
     stack = Stack()
 
     target_player = Player(

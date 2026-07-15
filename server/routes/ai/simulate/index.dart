@@ -6,9 +6,9 @@ import 'package:postgres/postgres.dart';
 
 import '../../../lib/ai/battle_engine_config.dart';
 import '../../../lib/ai/battle_learning_evidence_support.dart';
-import '../../../lib/ai/battle_simulator.dart';
 import '../../../lib/ai/forge_battle_client.dart';
 import '../../../lib/ai/goldfish_simulator.dart';
+import '../../../lib/ai/native_battle_client.dart';
 import '../../../lib/ai/xmage_battle_client.dart';
 import '../../../lib/http_responses.dart';
 import '../../../lib/logger.dart';
@@ -89,6 +89,7 @@ Future<Response> onRequest(RequestContext context) async {
       }
       final xmageSidecarUrl = engineConfig.xmageSidecarUrl;
       final forgeSidecarUrl = engineConfig.forgeSidecarUrl;
+      final nativeSidecarUrl = engineConfig.nativeSidecarUrl;
       final strictXmage = engineConfig.isStrictXmage;
       final strictForge = engineConfig.isStrictForge;
       final seed = data['seed'] is int
@@ -110,12 +111,26 @@ Future<Response> onRequest(RequestContext context) async {
       Map<String, dynamic> result;
 
       if (engineConfig.isNative) {
-        result = _nativeBattle(
-          deckCards,
-          opponentCards,
-          maxTurns: (data['max_turns'] as int?) ?? 30,
-          fallbackReason: 'native_mode_configured',
-        );
+        try {
+          result = await _simulateNative(
+            nativeSidecarUrl,
+            _withNativeRequirements(
+              externalRequest,
+              requiredRuleCards: _allDeckCardRows(externalRequest),
+              data: data,
+            ),
+            timeoutMs,
+          );
+          result['fallback_reason'] = 'native_mode_configured';
+        } on NativeBattleCoverageIncomplete catch (error) {
+          return _nativeCoverageFailure(error);
+        } on NativeBattleServiceException catch (error) {
+          return _externalEngineFailure(
+            'native_battle',
+            error.message,
+            upstreamStatusCode: error.statusCode,
+          );
+        }
       } else if (strictForge) {
         try {
           result = await _simulateForge(
@@ -161,19 +176,26 @@ Future<Response> onRequest(RequestContext context) async {
           try {
             result = await _forgeOrNativeFallback(
               forgeSidecarUrl: forgeSidecarUrl,
+              nativeSidecarUrl: nativeSidecarUrl,
               externalRequest: externalRequest,
               timeoutMs: timeoutMs,
-              deckCards: deckCards,
-              opponentCards: opponentCards,
-              maxTurns: (data['max_turns'] as int?) ?? 30,
               fallbackReason: 'xmage_coverage_incomplete',
               xmageUnsupportedCards: error.unsupportedCards,
+              data: data,
             );
           } on ForgeServiceException catch (forgeError) {
             return _externalEngineFailure(
               'forge',
               forgeError.message,
               upstreamStatusCode: forgeError.statusCode,
+            );
+          } on NativeBattleCoverageIncomplete catch (nativeError) {
+            return _nativeCoverageFailure(nativeError);
+          } on NativeBattleServiceException catch (nativeError) {
+            return _externalEngineFailure(
+              'native_battle',
+              nativeError.message,
+              upstreamStatusCode: nativeError.statusCode,
             );
           }
         } on XmageServiceException catch (error) {
@@ -185,7 +207,12 @@ Future<Response> onRequest(RequestContext context) async {
         }
       }
 
-      result['battle_learning_evidence'] = buildBattleLearningEvidence(result);
+      result['battle_learning_evidence'] = buildBattleLearningEvidence(
+        result,
+        focusCards: _stringList(data['focus_cards']),
+        sameLane: data['same_lane'] == true,
+        naturalSample: _isNaturalBattleResult(data, result),
+      );
 
       await _saveSimulation(
         pool: pool,
@@ -442,31 +469,6 @@ Map<String, dynamic> _externalDeckPayload(
           .toList(growable: false),
     };
 
-Map<String, dynamic> _nativeBattle(
-  List<Map<String, dynamic>> deckCards,
-  List<Map<String, dynamic>> opponentCards, {
-  required int maxTurns,
-  required String fallbackReason,
-  List<Map<String, dynamic>> xmageUnsupportedCards = const [],
-  List<Map<String, dynamic>> forgeUnsupportedCards = const [],
-}) {
-  final native = BattleSimulator(
-    deckACards: deckCards,
-    deckBCards: opponentCards,
-    maxTurns: maxTurns,
-  ).simulate();
-  return {
-    'engine': 'manaloom_native_legacy',
-    'engine_contract': 'experimental_advisory',
-    'fallback_reason': fallbackReason,
-    if (xmageUnsupportedCards.isNotEmpty)
-      'xmage_unsupported_cards': xmageUnsupportedCards,
-    if (forgeUnsupportedCards.isNotEmpty)
-      'forge_unsupported_cards': forgeUnsupportedCards,
-    ...native.toJson(),
-  };
-}
-
 Future<Map<String, dynamic>> _simulateXmage(
   String sidecarUrl,
   Map<String, dynamic> request,
@@ -499,15 +501,30 @@ Future<Map<String, dynamic>> _simulateForge(
   }
 }
 
+Future<Map<String, dynamic>> _simulateNative(
+  String sidecarUrl,
+  Map<String, dynamic> request,
+  int timeoutMs,
+) async {
+  final client = NativeBattleClient(
+    baseUrl: sidecarUrl,
+    timeout: Duration(milliseconds: timeoutMs + _externalClientGraceMs),
+  );
+  try {
+    return await client.simulate(request);
+  } finally {
+    client.close();
+  }
+}
+
 Future<Map<String, dynamic>> _forgeOrNativeFallback({
   required String forgeSidecarUrl,
+  required String nativeSidecarUrl,
   required Map<String, dynamic> externalRequest,
   required int timeoutMs,
-  required List<Map<String, dynamic>> deckCards,
-  required List<Map<String, dynamic>> opponentCards,
-  required int maxTurns,
   required String fallbackReason,
   List<Map<String, dynamic>> xmageUnsupportedCards = const [],
+  Map<String, dynamic> data = const {},
 }) async {
   try {
     final result = await _simulateForge(
@@ -522,16 +539,71 @@ Future<Map<String, dynamic>> _forgeOrNativeFallback({
     }
     return result;
   } on ForgeCoverageIncomplete catch (error) {
-    return _nativeBattle(
-      deckCards,
-      opponentCards,
-      maxTurns: maxTurns,
-      fallbackReason: '${fallbackReason}_forge_coverage_incomplete',
-      xmageUnsupportedCards: xmageUnsupportedCards,
-      forgeUnsupportedCards: error.unsupportedCards,
+    final result = await _simulateNative(
+      nativeSidecarUrl,
+      _withNativeRequirements(
+        externalRequest,
+        requiredRuleCards: _allDeckCardRows(externalRequest),
+        data: data,
+      ),
+      timeoutMs,
     );
+    result['fallback_reason'] = '${fallbackReason}_forge_coverage_incomplete';
+    if (xmageUnsupportedCards.isNotEmpty) {
+      result['xmage_unsupported_cards'] = xmageUnsupportedCards;
+    }
+    result['forge_unsupported_cards'] = error.unsupportedCards;
+    return result;
   }
 }
+
+Map<String, dynamic> _withNativeRequirements(
+  Map<String, dynamic> request, {
+  required List<Map<String, dynamic>> requiredRuleCards,
+  required Map<String, dynamic> data,
+}) =>
+    {
+      ...request,
+      'required_rule_cards': requiredRuleCards,
+      'max_turns': (data['max_turns'] as int?) ?? 30,
+      if (data['focus_cards'] is List) 'focus_cards': data['focus_cards'],
+      if (data['force_focus_access_mode'] is String)
+        'force_focus_access_mode': data['force_focus_access_mode'],
+      'natural_sample': data['natural_sample'] != false,
+    };
+
+bool _isNaturalBattleResult(
+  Map<String, dynamic> request,
+  Map<String, dynamic> result,
+) {
+  if (request['natural_sample'] == false) return false;
+  final forcedMode =
+      result['forced_access_mode']?.toString().trim().toLowerCase();
+  return forcedMode == null || forcedMode.isEmpty || forcedMode == 'none';
+}
+
+List<Map<String, dynamic>> _allDeckCardRows(
+  Map<String, dynamic> request,
+) {
+  final rows = <Map<String, dynamic>>[];
+  for (final deckKey in const ['deck_a', 'deck_b']) {
+    final deck = request[deckKey];
+    if (deck is! Map || deck['cards'] is! List) continue;
+    rows.addAll(
+      (deck['cards'] as List)
+          .whereType<Map>()
+          .map((row) => row.cast<String, dynamic>()),
+    );
+  }
+  return rows;
+}
+
+List<String> _stringList(Object? value) => value is List
+    ? value
+        .map((item) => item?.toString().trim() ?? '')
+        .where((item) => item.isNotEmpty)
+        .toList(growable: false)
+    : const [];
 
 Response _engineConfigurationFailure(
   BattleEngineConfigurationException error,
@@ -559,6 +631,15 @@ Response _externalEngineFailure(
     },
   );
 }
+
+Response _nativeCoverageFailure(NativeBattleCoverageIncomplete error) =>
+    Response.json(
+      statusCode: HttpStatus.unprocessableEntity,
+      body: {
+        'error': 'native_coverage_incomplete',
+        'unsupported_cards': error.unsupportedCards,
+      },
+    );
 
 String? _winnerDeckId(
   Map<String, dynamic> result,
