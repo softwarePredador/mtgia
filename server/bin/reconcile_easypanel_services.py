@@ -1,5 +1,10 @@
 #!/usr/bin/env python3
-"""Reconcile ManaLoom EasyPanel service env/deploy settings."""
+"""Reconcile optional ManaLoom services managed by the EasyPanel app API.
+
+The required manaloom-ops runtime is a direct Docker Swarm service. Deploy it
+with scripts/manaloom_deploy_ops_image.sh; this utility intentionally cannot
+mutate that service through the unrelated EasyPanel app contract.
+"""
 
 from __future__ import annotations
 
@@ -22,7 +27,7 @@ from urllib.parse import urljoin
 REPO_ROOT = Path(__file__).resolve().parents[2]
 DEFAULT_ENV_CANDIDATES = [REPO_ROOT / ".env", REPO_ROOT / "server" / ".env"]
 DEFAULT_PROJECT = "evolution"
-DEFAULT_SERVICES = ("manaloom-ops", "hermes-lab")
+SUPPORTED_SERVICES = ("hermes-lab",)
 SECRET_KEYS = {
     "OPENAI_API_KEY",
     "API_SERVER_KEY",
@@ -223,60 +228,6 @@ def _collect_service_state(payload: dict[str, Any], project_name: str, service_n
 
 
 def _desired_env(service_name: str, runtime_env: dict[str, str], existing_env: OrderedDict[str, str]) -> dict[str, str]:
-    def _runtime_or_existing(key: str) -> str | None:
-        return runtime_env.get(key) or existing_env.get(key)
-
-    if service_name == "manaloom-ops":
-        desired = {
-            "MANALOOM_OPS_DATA_DIR": "/data/manaloom-ops",
-            "HERMES_KNOWLEDGE_DB": "/data/manaloom-ops/knowledge.db",
-            "MANALOOM_KNOWLEDGE_DB": "/data/manaloom-ops/knowledge.db",
-            "MANALOOM_CANONICAL_KNOWN_CARDS_JSON": "/data/manaloom-ops/known_cards_canonical_snapshot.runtime.json",
-            "MTGIA_ENV_FILE": "/app/server/.env",
-            "MANALOOM_DART_BIN": "dart",
-            "MANALOOM_RUN_PREFLIGHT_ON_BOOT": "0",
-            "MANALOOM_NATIVE_BATTLE_HTTP_ENABLED": "1",
-            "MANALOOM_NATIVE_BATTLE_SYNC_ON_BOOT": "1",
-            "MANALOOM_NATIVE_BATTLE_HOST": "0.0.0.0",
-            "MANALOOM_NATIVE_BATTLE_PORT": "8080",
-            "MANALOOM_LOREHOLD_CANONICAL_OVERRIDE": "0",
-            "MANALOOM_BATTLE_GATE_SUMMARY": (
-                "/data/manaloom-ops/artifacts/battle-strategy-audit/latest/summary.json"
-            ),
-            "MANALOOM_BATTLE_STRATEGY_BASE_DIR": "/data/manaloom-ops",
-            "MANALOOM_BATTLE_STRATEGY_ARTIFACT_ROOT": (
-                "/data/manaloom-ops/artifacts/battle-strategy-audit"
-            ),
-            "MANALOOM_BATTLE_STRATEGY_AUDIT_CRON": (
-                "5 0,1,2,3,4,5,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23 * * *"
-            ),
-            "MANALOOM_BATTLE_STRATEGY_SEEDS": "16",
-            "MANALOOM_BATTLE_STRATEGY_NIGHTLY_CRON": "5 6 * * *",
-            "MANALOOM_BATTLE_STRATEGY_NIGHTLY_SEEDS": "64",
-            "PULL_LEARNING_EVENTS_CRON": "0 * * * *",
-            "AUTO_SYNC_LEARNED_DECKS_CRON": "0 */2 * * *",
-            "MANALOOM_SYNC_CARD_LEGALITIES_CRON": "30 */6 * * *",
-            "MANALOOM_SYNC_CARD_LEGALITIES_APPLY": "1",
-            "MANALOOM_SYNC_LEGALITIES_SETS": "",
-            "MANALOOM_NEW_CARD_CANDIDATE_REVIEW_CRON": "35 */6 * * *",
-            "MANALOOM_CARD_DATA_GAP_REVIEW_CRON": "50 */6 * * *",
-            "MANALOOM_BATTLE_RULE_REVIEW_QUEUE_CRON": "55 */6 * * *",
-            "MANALOOM_BATTLE_RULE_LLM_REVIEW": "0",
-            "MANALOOM_BATTLE_RULE_LLM_MODEL": "gpt-4o-mini",
-            "MANALOOM_BATTLE_RULE_LLM_LIMIT": "3",
-            "MANALOOM_BATTLE_RULE_LLM_TIMEOUT": "30",
-            "AUTO_PROMOTE_LEARNED_DECKS_CRON": "30 */6 * * *",
-            "MASTER_OPTIMIZER_PREFLIGHT_CRON": "15 * * * *",
-            "MANALOOM_KNOWLEDGE_IMPORT_CRON": "20 */12 * * *",
-            "MANALOOM_IMPORT_APPLY": "1",
-            "HERMES_MANA_BASE_VALIDATOR_CRON": "45 */6 * * *",
-            "HERMES_CRON_GOVERNOR_REPORT_CRON": "0 */12 * * *",
-        }
-        for key in ("DB_HOST", "DB_PORT", "DB_NAME", "DB_USER", "DB_PASS", "DATABASE_URL"):
-            value = _runtime_or_existing(key)
-            if value:
-                desired[key] = value
-        return desired
     if service_name == "hermes-lab":
         api_server_key = (
             runtime_env.get("API_SERVER_KEY")
@@ -377,6 +328,11 @@ def reconcile_service(
     wait_timeout: int,
     expected_sha: str,
 ) -> dict[str, Any]:
+    if service_name not in SUPPORTED_SERVICES:
+        raise EasyPanelError(
+            f"unsupported EasyPanel app service: {service_name}; "
+            "deploy manaloom-ops with scripts/manaloom_deploy_ops_image.sh"
+        )
     state = _collect_service_state(client.list_projects_and_services(), project_name, service_name)
     existing_env = _parse_dotenv(state.env_text)
     desired_updates = _desired_env(service_name, runtime_env, existing_env)
@@ -445,7 +401,13 @@ def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--env-file", type=Path, help="Additional dotenv file to load")
     parser.add_argument("--project", default=DEFAULT_PROJECT)
-    parser.add_argument("--services", nargs="+", default=list(DEFAULT_SERVICES), choices=list(DEFAULT_SERVICES))
+    parser.add_argument(
+        "--services",
+        nargs="+",
+        required=True,
+        choices=list(SUPPORTED_SERVICES),
+        help="Optional EasyPanel app services to reconcile",
+    )
     parser.add_argument("--apply", action="store_true")
     parser.add_argument("--deploy", action="store_true")
     parser.add_argument("--wait-timeout", type=int, default=240)

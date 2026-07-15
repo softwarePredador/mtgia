@@ -3,6 +3,26 @@
 > **Antes de alterar qualquer endpoint app-facing, consultar e atualizar `server/doc/API_CONTRACTS_AND_DATA_MAP.md`**.
 > **Antes de criar/alterar runtime visual do app, consultar e atualizar `app/doc/UI_TEST_SURFACE_MAP.md`**.
 
+## 2026-07-15 — Runtime operacional no servidor novo
+
+Decisao atual, que substitui os caminhos de deploy descritos nas entradas
+historicas de junho:
+
+- `evolution_manaloom-ops` e um servico Docker Swarm direto no servidor ativo;
+- deploy e reconciliacao desse runtime usam
+  `scripts/manaloom_deploy_ops_image.sh`, nunca o reconciliador de apps da API
+  do EasyPanel;
+- `server/bin/audit_easypanel_cron_runtime.py` consulta Swarm via SSH quando o
+  servico nao aparece na API do EasyPanel;
+- `hermes-lab` e opcional e report/research-only. Sua ausencia nao bloqueia
+  backend, battle, deckbuilder, PostgreSQL, SQLite operacional ou desligamento
+  do servidor antigo;
+- o audit pode exigir explicitamente esse laboratorio com
+  `--require-hermes-lab`; sem esse argumento, ausencia e registrada como
+  `not_configured`;
+- contrato e comandos atuais:
+  `docs/hermes-analysis/NEW_SERVER_POSTGRES_WORKFLOW_2026-07-06.md`.
+
 ## 2026-07-01 — Sync global de legalidades e auditoria all-card
 
 Motivo:

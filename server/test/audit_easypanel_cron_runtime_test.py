@@ -136,3 +136,63 @@ def test_extract_runtime_findings_accepts_bootstrap_artifact_without_recent_log(
         finding["code"] == "hermes_lab_bootstrap_not_visible"
         for finding in findings
     )
+
+
+def test_extract_runtime_findings_accepts_optional_absent_hermes_lab() -> None:
+    findings = MODULE._extract_runtime_findings(
+        service_envs={
+            "manaloom-ops": {
+                "present": True,
+                "openai_api_key_present": False,
+            },
+            "hermes-lab": {
+                "present": False,
+                "runtime_source": "not_configured",
+            },
+        },
+        ops_jobs={
+            "jobs_total": 1,
+            "jobs": [
+                {
+                    "name": "pull_learning_events",
+                    "state": "active",
+                    "enabled": True,
+                    "last_status": "ok",
+                    "output_evidence": {"path": "/tmp/out.log"},
+                }
+            ],
+        },
+        lab_jobs={"jobs_total": 0, "jobs": []},
+        ops_logs=["scheduler started"],
+        lab_logs=[],
+    )
+
+    assert not any(finding["code"].startswith("hermes_lab") for finding in findings)
+
+
+def test_extract_runtime_findings_can_require_hermes_lab_explicitly() -> None:
+    findings = MODULE._extract_runtime_findings(
+        service_envs={
+            "manaloom-ops": {
+                "present": True,
+                "openai_api_key_present": False,
+            },
+            "hermes-lab": {"present": False},
+        },
+        ops_jobs={"jobs_total": 1, "jobs": []},
+        lab_jobs={"jobs_total": 0, "jobs": []},
+        ops_logs=["scheduler started"],
+        lab_logs=[],
+        hermes_lab_required=True,
+    )
+
+    assert any(
+        finding["code"] == "hermes_lab_required_but_absent"
+        for finding in findings
+    )
+    assert MODULE._audit_status(findings) == "blocked"
+
+
+def test_audit_status_distinguishes_review_from_pass() -> None:
+    assert MODULE._audit_status([]) == "pass"
+    assert MODULE._audit_status([{"priority": "P1"}]) == "review_required"

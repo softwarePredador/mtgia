@@ -38,47 +38,17 @@ def test_redact_value_hides_secret_payloads() -> None:
     assert MODULE._redact_value("HERMES_GITHUB_TOKEN", "ghp-example") == "present"
 
 
-def test_desired_env_for_manaloom_ops_matches_cutover_contract() -> None:
-    desired = MODULE._desired_env(
-        "manaloom-ops",
-        {
-            "DB_HOST": "db.example",
-            "DB_PORT": "5432",
-            "DB_NAME": "mana",
-            "DB_USER": "postgres",
-            "DB_PASS": "secret",
-        },
-        MODULE._parse_dotenv(""),
-    )
-    assert desired["PULL_LEARNING_EVENTS_CRON"] == "0 * * * *"
-    assert desired["MANALOOM_SYNC_CARD_LEGALITIES_CRON"] == "30 */6 * * *"
-    assert desired["MANALOOM_SYNC_CARD_LEGALITIES_APPLY"] == "1"
-    assert desired["MANALOOM_SYNC_LEGALITIES_SETS"] == ""
-    assert desired["MANALOOM_NEW_CARD_CANDIDATE_REVIEW_CRON"] == "35 */6 * * *"
-    assert desired["MTGIA_ENV_FILE"] == "/app/server/.env"
-    assert desired["HERMES_KNOWLEDGE_DB"] == "/data/manaloom-ops/knowledge.db"
-    assert desired["MANALOOM_KNOWLEDGE_DB"] == "/data/manaloom-ops/knowledge.db"
-    assert desired["MANALOOM_CANONICAL_KNOWN_CARDS_JSON"] == (
-        "/data/manaloom-ops/known_cards_canonical_snapshot.runtime.json"
-    )
-    assert desired["MANALOOM_LOREHOLD_CANONICAL_OVERRIDE"] == "0"
-    assert desired["MANALOOM_BATTLE_GATE_SUMMARY"] == (
-        "/data/manaloom-ops/artifacts/battle-strategy-audit/latest/summary.json"
-    )
-    assert desired["MANALOOM_BATTLE_STRATEGY_BASE_DIR"] == "/data/manaloom-ops"
-    assert desired["MANALOOM_BATTLE_STRATEGY_ARTIFACT_ROOT"] == (
-        "/data/manaloom-ops/artifacts/battle-strategy-audit"
-    )
-    assert desired["MANALOOM_BATTLE_STRATEGY_SEEDS"] == "16"
-    assert desired["MANALOOM_BATTLE_STRATEGY_NIGHTLY_SEEDS"] == "64"
-    assert desired["DB_HOST"] == "db.example"
-    assert desired["DB_PORT"] == "5432"
-    assert desired["DB_NAME"] == "mana"
-    assert desired["DB_USER"] == "postgres"
-    assert desired["DB_PASS"] == "secret"
-    assert desired["MANALOOM_KNOWLEDGE_IMPORT_CRON"] == "20 */12 * * *"
-    assert desired["MANALOOM_IMPORT_APPLY"] == "1"
-    assert desired["HERMES_CRON_GOVERNOR_REPORT_CRON"] == "0 */12 * * *"
+def test_reconciler_rejects_direct_swarm_ops_service() -> None:
+    try:
+        MODULE._desired_env(
+            "manaloom-ops",
+            {},
+            MODULE._parse_dotenv(""),
+        )
+    except MODULE.EasyPanelError as exc:
+        assert "unsupported service" in str(exc)
+    else:
+        raise AssertionError("manaloom-ops must not use EasyPanel app reconciliation")
 
 
 def test_desired_env_for_hermes_lab_generates_missing_api_key() -> None:
@@ -103,7 +73,7 @@ def test_desired_env_for_hermes_lab_generates_missing_api_key() -> None:
 def main() -> None:
     test_merge_env_updates_only_target_keys()
     test_redact_value_hides_secret_payloads()
-    test_desired_env_for_manaloom_ops_matches_cutover_contract()
+    test_reconciler_rejects_direct_swarm_ops_service()
     test_desired_env_for_hermes_lab_generates_missing_api_key()
     print("reconcile_easypanel_services_test.py: ok")
 

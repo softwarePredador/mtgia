@@ -134,6 +134,27 @@ historical `summary.json` into the persistent volume to open the gate. Deploy
 the versioned runner, execute it in the live `manaloom-ops` container, and use
 the newly generated summary as evidence.
 
+### Runtime ownership and audit
+
+`evolution_manaloom-ops` is intentionally managed as a direct Docker Swarm
+service on the active host. It is not an EasyPanel API app record.
+
+- Deploy/update: `./scripts/manaloom_deploy_ops_image.sh`.
+- Read-only runtime and cron audit:
+  `python3 server/bin/audit_easypanel_cron_runtime.py --artifact-dir /tmp/manaloom-cron-audit`.
+- Runtime/PG alignment:
+  `server/bin/with_new_server_pg.sh python3 server/bin/audit_easypanel_runtime_alignment.py --stdout-only`.
+- Optional provider lab: `hermes-lab` is report/research-only and is not a
+  dependency of the product, battle runtime, PostgreSQL sync, or old-server
+  shutdown. Pass `--require-hermes-lab` to the cron audit only when explicitly
+  validating that optional service.
+- `server/bin/reconcile_easypanel_services.py` is limited to explicitly named,
+  optional EasyPanel app services. It must never be used for `manaloom-ops`.
+
+The cron audit first checks the EasyPanel API and then uses the SSH target from
+`server/.env` for direct Swarm services. It records an absent optional
+`hermes-lab` as `not_configured`; it does not invent a product blocker.
+
 ## Historical-only Quarantine
 
 These old targets are historical-only quarantine markers. They may appear in

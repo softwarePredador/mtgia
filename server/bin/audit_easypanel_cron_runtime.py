@@ -1,11 +1,13 @@
 #!/usr/bin/env python3
-"""Read-only EasyPanel cron/runtime audit for ManaLoom services.
+"""Read-only cron/runtime audit for ManaLoom services on the active server.
 
-This audit proves the live state of the two runtime services:
-- manaloom-ops: deterministic operational scheduler
-- hermes-lab: provider-backed Hermes scheduler
+This audit proves the live state of:
+- manaloom-ops: required deterministic scheduler, managed as a direct Swarm service
+- hermes-lab: optional provider-backed report/research scheduler
 
-It does not mutate EasyPanel, containers, PostgreSQL, or SQLite.
+EasyPanel API apps are inspected through its API. Direct Swarm services are
+inspected over the SSH target from server/.env. The audit does not mutate
+EasyPanel, containers, PostgreSQL, or SQLite.
 """
 
 from __future__ import annotations
@@ -16,12 +18,13 @@ import json
 import os
 import shlex
 import ssl
+import subprocess
 import sys
 import time
 from dataclasses import dataclass
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import Any
+from typing import Any, Callable
 from urllib.parse import quote, urljoin, urlparse
 import urllib.request
 
@@ -55,6 +58,9 @@ class ContainerInfo:
     state: str | None
     health: str | None
     created_at: str | None
+
+
+ShellRunner = Callable[[str, str], str]
 
 
 def _utc_now() -> datetime:
@@ -225,6 +231,160 @@ def _container_shell(
     return _join_ws_output(chunks)
 
 
+def _run_container_shell(
+    ws_base: str,
+    token: str,
+    container_id: str,
+    command: str,
+    *,
+    insecure: bool,
+    shell_runner: ShellRunner | None = None,
+) -> str:
+    if shell_runner is not None:
+        return shell_runner(container_id, command)
+    return _container_shell(
+        ws_base,
+        token,
+        container_id,
+        command,
+        insecure=insecure,
+    )
+
+
+def _ssh_target(runtime_env: dict[str, str]) -> tuple[list[str], str]:
+    host = runtime_env.get("MANALOOM_EASYPANEL_SSH_HOST") or (
+        f"{runtime_env.get('EASYPANEL_SSH_USER', 'root')}@"
+        f"{runtime_env.get('EASYPANEL_SERVER_IP', '')}"
+    )
+    key = runtime_env.get("MANALOOM_EASYPANEL_SSH_KEY") or runtime_env.get(
+        "EASYPANEL_SSH_KEY"
+    )
+    if not host or host.endswith("@") or not key:
+        raise RuntimeError("SSH target for direct Swarm audit is not configured")
+    return [
+        "ssh",
+        "-o",
+        "BatchMode=yes",
+        "-o",
+        "StrictHostKeyChecking=accept-new",
+        "-i",
+        key,
+        host,
+    ], host
+
+
+def _ssh_exec(
+    runtime_env: dict[str, str],
+    command: str,
+    *,
+    timeout: int = 30,
+) -> str:
+    ssh_args, _ = _ssh_target(runtime_env)
+    return subprocess.check_output(
+        [*ssh_args, command],
+        text=True,
+        timeout=timeout,
+        stderr=subprocess.DEVNULL,
+    )
+
+
+def _swarm_service_inspect(
+    runtime_env: dict[str, str],
+    service_name: str,
+) -> dict[str, Any] | None:
+    try:
+        output = _ssh_exec(
+            runtime_env,
+            f"docker service inspect {shlex.quote(service_name)}",
+        )
+    except subprocess.CalledProcessError:
+        return None
+    services = json.loads(output)
+    if not isinstance(services, list) or len(services) != 1:
+        raise RuntimeError(f"unexpected Swarm inspect result for {service_name}")
+    return services[0]
+
+
+def _swarm_runtime(
+    runtime_env: dict[str, str],
+    short_name: str,
+    service_name: str,
+) -> tuple[dict[str, Any], ContainerInfo, ShellRunner] | None:
+    service = _swarm_service_inspect(runtime_env, service_name)
+    if service is None:
+        return None
+
+    spec = service.get("Spec") or {}
+    task = spec.get("TaskTemplate") or {}
+    container_spec = task.get("ContainerSpec") or {}
+    env_map = reconcile._parse_dotenv("\n".join(container_spec.get("Env") or []))
+    container_id = _ssh_exec(
+        runtime_env,
+        (
+            "docker ps --filter "
+            f"label=com.docker.swarm.service.name={shlex.quote(service_name)} "
+            "--format '{{.ID}}' | head -n 1"
+        ),
+    ).strip()
+    if not container_id:
+        raise RuntimeError(f"no running container returned for {service_name}")
+    container_rows = json.loads(
+        _ssh_exec(runtime_env, f"docker inspect {shlex.quote(container_id)}")
+    )
+    if not isinstance(container_rows, list) or len(container_rows) != 1:
+        raise RuntimeError(f"unexpected container inspect result for {service_name}")
+    container_row = container_rows[0]
+    state = container_row.get("State") or {}
+    health = state.get("Health") or {}
+    replicated = (spec.get("Mode") or {}).get("Replicated") or {}
+
+    service_env = {
+        "present": True,
+        "runtime_source": "docker_swarm",
+        "sha": env_map.get("GIT_SHA"),
+        "enabled": int(replicated.get("Replicas") or 0) > 0,
+        "knowledge_db": env_map.get("HERMES_KNOWLEDGE_DB"),
+        "manaloom_knowledge_db": env_map.get("MANALOOM_KNOWLEDGE_DB"),
+        "openai_api_key_present": bool(env_map.get("OPENAI_API_KEY")),
+        "hermes_model": env_map.get("HERMES_MODEL"),
+        "hermes_provider": env_map.get("HERMES_PROVIDER"),
+        "api_server_enabled": env_map.get("API_SERVER_ENABLED"),
+    }
+    container = ContainerInfo(
+        service_name=short_name,
+        container_id=container_id,
+        image=container_spec.get("Image"),
+        status=state.get("Status"),
+        state=state.get("Status"),
+        health=health.get("Status"),
+        created_at=_iso(container_row.get("Created")),
+    )
+
+    def shell_runner(target_container_id: str, command: str) -> str:
+        return _ssh_exec(
+            runtime_env,
+            (
+                f"docker exec {shlex.quote(target_container_id)} sh -lc "
+                f"{shlex.quote(command)}"
+            ),
+        )
+
+    return service_env, container, shell_runner
+
+
+def _swarm_service_logs(
+    runtime_env: dict[str, str],
+    service_name: str,
+    *,
+    tail: int = 120,
+) -> list[str]:
+    output = _ssh_exec(
+        runtime_env,
+        f"docker service logs --raw --tail {int(tail)} {shlex.quote(service_name)}",
+    )
+    return _sanitize_output(output).splitlines()
+
+
 def _sanitize_output(text: str) -> str:
     text = text.replace("\r\n", "\n").replace("\r", "\n")
     return text.strip()
@@ -291,6 +451,7 @@ def _shell_probe_file(
     *,
     insecure: bool,
     tail_lines: int = 20,
+    shell_runner: ShellRunner | None = None,
 ) -> tuple[bool, str]:
     quoted_path = shlex.quote(path)
     command = (
@@ -300,12 +461,13 @@ def _shell_probe_file(
         f"tail -n {tail_lines} {quoted_path}; "
         "else echo __MISSING__; fi'"
     )
-    output = _container_shell(
+    output = _run_container_shell(
         ws_base,
         token,
         container_id,
         command,
         insecure=insecure,
+        shell_runner=shell_runner,
     )
     clean = _sanitize_output(output)
     if clean.startswith("__FOUND__"):
@@ -320,6 +482,7 @@ def _shell_latest_file_in_dir(
     path: str,
     *,
     insecure: bool,
+    shell_runner: ShellRunner | None = None,
 ) -> str | None:
     quoted_path = shlex.quote(path)
     command = (
@@ -328,12 +491,13 @@ def _shell_latest_file_in_dir(
         f"find {quoted_path} -maxdepth 1 -type f | sort | tail -n 1; "
         "else echo __MISSING__; fi'"
     )
-    output = _container_shell(
+    output = _run_container_shell(
         ws_base,
         token,
         container_id,
         command,
         insecure=insecure,
+        shell_runner=shell_runner,
     )
     clean = _sanitize_output(output)
     if not clean or clean == "__MISSING__":
@@ -347,8 +511,9 @@ def _runtime_probe(
     container_id: str,
     *,
     insecure: bool,
+    shell_runner: ShellRunner | None = None,
 ) -> dict[str, str]:
-    output = _container_shell(
+    output = _run_container_shell(
         ws_base,
         token,
         container_id,
@@ -361,6 +526,7 @@ def _runtime_probe(
             "printf \"repo_exists=%s\\n\" \"$(test -d /opt/data/workspace/mtgia && echo yes || echo no)\"'"
         ),
         insecure=insecure,
+        shell_runner=shell_runner,
     )
     return _parse_probe_lines(output)
 
@@ -373,6 +539,7 @@ def _collect_job_output_evidence(
     jobs: dict[str, Any],
     *,
     insecure: bool,
+    shell_runner: ShellRunner | None = None,
 ) -> None:
     for job in jobs.get("jobs", []):
         evidence: dict[str, Any] | None = None
@@ -384,6 +551,7 @@ def _collect_job_output_evidence(
                     container_id,
                     target["path"],
                     insecure=insecure,
+                    shell_runner=shell_runner,
                 )
                 if not found:
                     continue
@@ -399,6 +567,7 @@ def _collect_job_output_evidence(
                 container_id,
                 target["path"],
                 insecure=insecure,
+                shell_runner=shell_runner,
             )
             if not latest_path:
                 continue
@@ -408,6 +577,7 @@ def _collect_job_output_evidence(
                 container_id,
                 latest_path,
                 insecure=insecure,
+                shell_runner=shell_runner,
             )
             if not found:
                 continue
@@ -428,14 +598,16 @@ def _shell_read_json(
     path: str,
     *,
     insecure: bool,
+    shell_runner: ShellRunner | None = None,
 ) -> tuple[dict[str, Any] | list[Any] | None, str]:
     quoted_path = shlex.quote(path)
-    output = _container_shell(
+    output = _run_container_shell(
         ws_base,
         token,
         container_id,
         f"sh -lc 'if [ -f {quoted_path} ]; then cat {quoted_path}; else echo __MISSING__; fi'",
         insecure=insecure,
+        shell_runner=shell_runner,
     )
     clean = _sanitize_output(output)
     if not clean or clean == "__MISSING__":
@@ -504,10 +676,21 @@ def _extract_runtime_findings(
     lab_logs: list[str],
     startup_status: dict[str, Any] | None = None,
     bootstrap_report: dict[str, Any] | None = None,
+    hermes_lab_required: bool = False,
 ) -> list[dict[str, Any]]:
     findings: list[dict[str, Any]] = []
+    lab_config = service_envs.get("hermes-lab") or {}
+    lab_present = bool(lab_config) and bool(lab_config.get("present", True))
 
-    if not service_envs.get("hermes-lab", {}).get("openai_api_key_present"):
+    if hermes_lab_required and not lab_present:
+        findings.append(
+            {
+                "priority": "P0",
+                "code": "hermes_lab_required_but_absent",
+                "message": "hermes-lab was required for this audit but is not deployed",
+            }
+        )
+    elif lab_present and not lab_config.get("openai_api_key_present"):
         findings.append(
             {
                 "priority": "P0",
@@ -534,7 +717,7 @@ def _extract_runtime_findings(
             }
         )
 
-    if lab_jobs.get("jobs_total", 0) == 0:
+    if lab_present and lab_jobs.get("jobs_total", 0) == 0:
         findings.append(
             {
                 "priority": "P1",
@@ -552,7 +735,7 @@ def _extract_runtime_findings(
             }
         )
 
-    bootstrap_proven = (
+    bootstrap_proven = not lab_present or (
         any("bootstrap" in line.lower() for line in lab_logs)
         or bool(bootstrap_report and bootstrap_report.get("desired_jobs"))
         or bool(startup_status and startup_status.get("bootstrap_report_path"))
@@ -573,6 +756,8 @@ def _extract_runtime_findings(
         ("manaloom-ops", ops_jobs),
         ("hermes-lab", lab_jobs),
     ):
+        if service_name == "hermes-lab" and not lab_present:
+            continue
         for job in jobs.get("jobs", []):
             state = str(job.get("state") or "").lower()
             enabled = bool(job.get("enabled", True))
@@ -607,6 +792,15 @@ def _extract_runtime_findings(
     return findings
 
 
+def _audit_status(findings: list[dict[str, Any]]) -> str:
+    priorities = {str(finding.get("priority")) for finding in findings}
+    if "P0" in priorities:
+        return "blocked"
+    if priorities:
+        return "review_required"
+    return "pass"
+
+
 def _write_markdown(
     path: Path,
     *,
@@ -628,6 +822,7 @@ def _write_markdown(
         "# EasyPanel Cron Runtime Audit",
         "",
         f"- generated_at_utc: `{generated_at}`",
+        f"- status: `{_audit_status(findings)}`",
         f"- local_head: `{local_head}`",
     ]
     if public_health:
@@ -647,6 +842,8 @@ def _write_markdown(
                 "",
                 f"## {service_name}",
                 "",
+                f"- present: `{env.get('present')}`",
+                f"- runtime_source: `{env.get('runtime_source')}`",
                 f"- service_sha: `{env.get('sha')}`",
                 f"- enabled: `{env.get('enabled')}`",
                 f"- openai_api_key_present: `{env.get('openai_api_key_present')}`",
@@ -746,6 +943,11 @@ def main() -> int:
     parser.add_argument("--artifact-dir", type=str, default=None)
     parser.add_argument("--project", type=str, default=DEFAULT_PROJECT)
     parser.add_argument("--insecure-health", action="store_true")
+    parser.add_argument(
+        "--require-hermes-lab",
+        action="store_true",
+        help="Fail the audit when the optional provider-backed lab is absent",
+    )
     args = parser.parse_args()
 
     artifact_dir = _artifact_dir(args.artifact_dir)
@@ -786,75 +988,105 @@ def main() -> int:
     service_envs: dict[str, dict[str, Any]] = {}
     containers: dict[str, ContainerInfo] = {}
     runtime_probes: dict[str, dict[str, str]] = {}
+    shell_runners: dict[str, ShellRunner | None] = {}
+    runtime_sources: dict[str, str] = {}
     for short_name, api_service in DEFAULT_SERVICES.items():
-        state = reconcile._collect_service_state(
-            services_payload,
-            args.project,
-            short_name,
-        )
-        env_map = reconcile._parse_dotenv(state.env_text)
-        service_envs[short_name] = {
-            "sha": state.sha,
-            "enabled": state.enabled,
-            "knowledge_db": env_map.get("HERMES_KNOWLEDGE_DB"),
-            "manaloom_knowledge_db": env_map.get("MANALOOM_KNOWLEDGE_DB"),
-            "openai_api_key_present": bool(env_map.get("OPENAI_API_KEY")),
-            "hermes_model": env_map.get("HERMES_MODEL"),
-            "hermes_provider": env_map.get("HERMES_PROVIDER"),
-            "api_server_enabled": env_map.get("API_SERVER_ENABLED"),
-        }
-        containers_payload = client._post(
-            "projects.getDockerContainers",
-            {"service": api_service},
-        )
-        containers[short_name] = _parse_container(containers_payload, short_name)
+        try:
+            state = reconcile._collect_service_state(
+                services_payload,
+                args.project,
+                short_name,
+            )
+        except reconcile.EasyPanelError:
+            swarm = _swarm_runtime(runtime_env, short_name, api_service)
+            if swarm is None:
+                service_envs[short_name] = {
+                    "present": False,
+                    "runtime_source": "not_configured",
+                    "enabled": False,
+                }
+                if short_name == "manaloom-ops":
+                    raise SystemExit("required Swarm service evolution_manaloom-ops is absent")
+                continue
+            service_envs[short_name], containers[short_name], shell_runner = swarm
+            shell_runners[short_name] = shell_runner
+            runtime_sources[short_name] = "docker_swarm"
+        else:
+            env_map = reconcile._parse_dotenv(state.env_text)
+            service_envs[short_name] = {
+                "present": True,
+                "runtime_source": "easypanel_api",
+                "sha": state.sha,
+                "enabled": state.enabled,
+                "knowledge_db": env_map.get("HERMES_KNOWLEDGE_DB"),
+                "manaloom_knowledge_db": env_map.get("MANALOOM_KNOWLEDGE_DB"),
+                "openai_api_key_present": bool(env_map.get("OPENAI_API_KEY")),
+                "hermes_model": env_map.get("HERMES_MODEL"),
+                "hermes_provider": env_map.get("HERMES_PROVIDER"),
+                "api_server_enabled": env_map.get("API_SERVER_ENABLED"),
+            }
+            containers_payload = client._post(
+                "projects.getDockerContainers",
+                {"service": api_service},
+            )
+            containers[short_name] = _parse_container(containers_payload, short_name)
+            shell_runners[short_name] = None
+            runtime_sources[short_name] = "easypanel_api"
+
         runtime_probes[short_name] = _runtime_probe(
             ws_base,
             token,
             containers[short_name].container_id,
             insecure=args.insecure_health,
+            shell_runner=shell_runners[short_name],
         )
 
-    ops_logs = _collect_service_logs(
-        ws_base,
-        token,
-        DEFAULT_SERVICES["manaloom-ops"],
-        insecure=args.insecure_health,
-    )
-    lab_logs = _collect_service_logs(
-        ws_base,
-        token,
-        DEFAULT_SERVICES["hermes-lab"],
-        insecure=args.insecure_health,
-    )
+    def collect_logs(short_name: str) -> list[str]:
+        if short_name not in containers:
+            return []
+        service_name = DEFAULT_SERVICES[short_name]
+        if runtime_sources[short_name] == "docker_swarm":
+            return _swarm_service_logs(runtime_env, service_name)
+        return _collect_service_logs(
+            ws_base,
+            token,
+            service_name,
+            insecure=args.insecure_health,
+        )
 
-    ops_jobs_json, ops_jobs_raw = _shell_read_json(
-        ws_base,
-        token,
-        containers["manaloom-ops"].container_id,
+    ops_logs = collect_logs("manaloom-ops")
+    lab_logs = collect_logs("hermes-lab")
+
+    def read_runtime_json(
+        short_name: str,
+        path: str,
+    ) -> tuple[dict[str, Any] | list[Any] | None, str]:
+        if short_name not in containers:
+            return None, "__NOT_CONFIGURED__"
+        return _shell_read_json(
+            ws_base,
+            token,
+            containers[short_name].container_id,
+            path,
+            insecure=args.insecure_health,
+            shell_runner=shell_runners[short_name],
+        )
+
+    ops_jobs_json, ops_jobs_raw = read_runtime_json(
+        "manaloom-ops",
         "/data/manaloom-ops/cron/jobs.json",
-        insecure=args.insecure_health,
     )
-    lab_jobs_json, lab_jobs_raw = _shell_read_json(
-        ws_base,
-        token,
-        containers["hermes-lab"].container_id,
+    lab_jobs_json, lab_jobs_raw = read_runtime_json(
+        "hermes-lab",
         "/opt/data/cron/jobs.json",
-        insecure=args.insecure_health,
     )
-    startup_status_json, startup_status_raw = _shell_read_json(
-        ws_base,
-        token,
-        containers["hermes-lab"].container_id,
+    startup_status_json, startup_status_raw = read_runtime_json(
+        "hermes-lab",
         "/opt/data/artifacts/hermes_lab_runtime/startup_status.json",
-        insecure=args.insecure_health,
     )
-    bootstrap_report_json, bootstrap_report_raw = _shell_read_json(
-        ws_base,
-        token,
-        containers["hermes-lab"].container_id,
+    bootstrap_report_json, bootstrap_report_raw = read_runtime_json(
+        "hermes-lab",
         "/opt/data/artifacts/hermes_cron_bootstrap/latest_bootstrap_report.json",
-        insecure=args.insecure_health,
     )
 
     ops_jobs = _jobs_summary(ops_jobs_json)
@@ -866,15 +1098,18 @@ def main() -> int:
         containers["manaloom-ops"].container_id,
         ops_jobs,
         insecure=args.insecure_health,
+        shell_runner=shell_runners["manaloom-ops"],
     )
-    _collect_job_output_evidence(
-        ws_base,
-        token,
-        "hermes-lab",
-        containers["hermes-lab"].container_id,
-        lab_jobs,
-        insecure=args.insecure_health,
-    )
+    if "hermes-lab" in containers:
+        _collect_job_output_evidence(
+            ws_base,
+            token,
+            "hermes-lab",
+            containers["hermes-lab"].container_id,
+            lab_jobs,
+            insecure=args.insecure_health,
+            shell_runner=shell_runners["hermes-lab"],
+        )
     findings = _extract_runtime_findings(
         service_envs=service_envs,
         ops_jobs=ops_jobs,
@@ -883,10 +1118,13 @@ def main() -> int:
         lab_logs=lab_logs,
         startup_status=startup_status_json if isinstance(startup_status_json, dict) else None,
         bootstrap_report=bootstrap_report_json if isinstance(bootstrap_report_json, dict) else None,
+        hermes_lab_required=args.require_hermes_lab,
     )
+    audit_status = _audit_status(findings)
 
     generated_at = _utc_now().isoformat(timespec="seconds")
     summary = {
+        "status": audit_status,
         "generated_at_utc": generated_at,
         "local_head": local_head,
         "public_health": public_health,
@@ -950,14 +1188,16 @@ def main() -> int:
         json.dumps(
             {
                 "artifact_dir": str(artifact_dir),
+                "status": audit_status,
                 "findings": findings,
                 "manaloom_ops_jobs": ops_jobs.get("jobs_total"),
                 "hermes_lab_jobs": lab_jobs.get("jobs_total"),
+                "hermes_lab_present": service_envs["hermes-lab"].get("present"),
             },
             ensure_ascii=False,
         )
     )
-    return 0
+    return 2 if audit_status == "blocked" else 0
 
 
 if __name__ == "__main__":
