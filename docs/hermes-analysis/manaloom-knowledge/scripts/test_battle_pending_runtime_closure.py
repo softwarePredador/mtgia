@@ -338,3 +338,20 @@ def test_land_ramp_does_not_pay_a_cast_sacrifice_again_on_resolution():
         event["event"] == "additional_cost_paid" and event.get("cost") == "sacrifice_land"
         for event in events
     )
+
+
+if __name__ == "__main__":
+    tests = [
+        test_noxious_revival_moves_any_graveyard_target_to_its_owners_library_top,
+        test_touch_the_spirit_realm_temporarily_exiles_then_returns_under_owner_control,
+        test_wishclaw_enters_with_counters_then_tutors_and_transfers_control,
+        test_wishclaw_scanner_ignores_legacy_non_mapping_battlefield_entries,
+        test_forensic_registry_accepts_only_now_executable_pending_effects,
+        test_action_critic_accepts_paid_counter_tax_as_legal_result,
+        test_response_effect_copy_keeps_resolution_provenance,
+        test_activated_ability_cost_is_not_paid_while_casting_its_permanent,
+        test_land_ramp_does_not_pay_a_cast_sacrifice_again_on_resolution,
+    ]
+    for test in tests:
+        test()
+    print(f"{len(tests)} tests passed")

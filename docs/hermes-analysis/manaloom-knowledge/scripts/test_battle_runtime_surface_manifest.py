@@ -9,25 +9,25 @@ import battle_runtime_surface_manifest as manifest_mod
 
 
 REPO_ROOT = Path(__file__).resolve().parents[4]
-EXPECTED_TOTAL_FILES = 177
+EXPECTED_TOTAL_FILES = 178
 EXPECTED_CATEGORY_COUNTS = {
     "core runtime": 36,
     "focused evidence/promotion": 37,
     "learned-deck source": 16,
     "optimizer/scorecard": 30,
-    "recurring audit gate": 32,
+    "recurring audit gate": 33,
     "renderer": 4,
     "review queue": 1,
     "rule registry/sync": 21,
 }
 EXPECTED_AUTOMATION_COVERAGE_COUNTS = {
-    "covered_by_recurring_run": 32,
+    "covered_by_recurring_run": 33,
     "imported_by_core_runtime": 7,
     "outside_recurring_run": 138,
 }
 EXPECTED_GATE_EXPECTED_COUNTS = {
     "core_runtime_import_regression": 7,
-    "recurring_audit_required": 32,
+    "recurring_audit_required": 33,
     "targeted_manual_gate_required_before_change": 64,
     "targeted_test_required_before_change": 74,
 }
@@ -49,6 +49,7 @@ REQUIRED_HIGH_SIGNAL_PATHS = {
     "docs/hermes-analysis/manaloom-knowledge/scripts/test_battle_card_acceleration_source_audit.py",
     "docs/hermes-analysis/manaloom-knowledge/scripts/test_battle_external_engine_crosscheck.py",
     "docs/hermes-analysis/manaloom-knowledge/scripts/test_battle_mtga_player_log_parser.py",
+    "docs/hermes-analysis/manaloom-knowledge/scripts/test_battle_pending_runtime_closure.py",
     "docs/hermes-analysis/manaloom-knowledge/scripts/test_battle_runtime_surface_manifest.py",
     "docs/hermes-analysis/manaloom-knowledge/scripts/test_external_battle_async_runner.py",
     "docs/hermes-analysis/manaloom-knowledge/scripts/test_mtg_battle_external_source_audit.py",
