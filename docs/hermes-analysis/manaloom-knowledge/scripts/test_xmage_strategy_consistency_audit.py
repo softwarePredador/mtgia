@@ -116,6 +116,7 @@ class XMageStrategyConsistencyAuditTests(unittest.TestCase):
                         "A battle aggregate is not card-level proof unless the candidate card was drawn/used or a focused test exercised it",
                         "Rebuild the current replay/deck scope queue",
                         "xmage_authoritative_adaptation_queue.py",
+                        "xmage_source_catalog_reconciliation.py",
                         "ramp_permanent",
                         "targeted_interaction",
                         "Hazel's Brewmaster",

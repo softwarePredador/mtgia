@@ -20,7 +20,8 @@ their meanings.
 | Deckbuilding learning | Positive typed exposure plus controlled comparison | Causal superiority from one battle |
 
 A local Java path is source evidence, not runtime coverage. The pinned XMage
-catalog must resolve the exact product identity. This rule prevents class-name
+catalog must resolve the exact product identity or an audited unique Unicode
+normalization that preserves punctuation. This rule prevents class-name
 collisions such as `Clear, the Mind` being associated with `ClearTheMind.java`.
 
 ## One entrypoint
@@ -83,7 +84,7 @@ Current read-only baseline:
 | Semantic family | Residual cards |
 | --- | ---: |
 | `creature_combat_or_ability` | 290 |
-| `token_creation` | 236 |
+| `token_creation` | 235 |
 | `targeted_or_mass_removal` | 144 |
 | `damage_or_life` | 134 |
 | `other_long_tail` | 118 |
@@ -200,23 +201,29 @@ Global coverage:
 | Lane | Cards |
 | --- | ---: |
 | PostgreSQL rows | 34,331 |
-| XMage exact | 31,208 |
-| Forge exact after XMage gap | 1,872 |
+| XMage exact | 31,285 |
+| Forge exact after XMage gap | 1,796 |
 | Native verified after external gap | 39 |
-| Operationally covered | 33,119 |
-| Explicit residual | 1,212 |
-| Coverage | 96.4697% |
+| Operationally covered | 33,120 |
+| Explicit residual | 1,211 |
+| Coverage | 96.4726% |
+
+The 1,211 residual rows contain zero conventional-rules cards: 861 are
+nonstandard or playtest cards, 138 are auxiliary game objects, 103 are
+digital-only cards, 55 require physical or external interaction, and 54 belong
+to scenario or challenge-deck rulesets. At Oracle-identity level, 32,871 of
+34,080 identities are fully covered and 1,209 remain.
 
 Local-source/catalog reconciliation:
 
 | Status | Cards |
 | --- | ---: |
-| XMage catalog confirmed | 23,823 |
-| Forge catalog fallback | 122 |
-| Local source candidate not executable | 10 |
+| XMage catalog confirmed | 23,890 |
+| Forge catalog fallback | 56 |
+| Local source candidate not executable | 9 |
 | Total local source candidates | 23,955 |
 
-The 10 rejected local candidates are:
+The 9 rejected local candidates are:
 
 - `Clear, the Mind`;
 - `Gather, the Townsfolk`;
@@ -224,7 +231,6 @@ The 10 rejected local candidates are:
 - `Monster Mash-Up`;
 - `Rampant, Growth`;
 - `Ransack, the Lab`;
-- `Ratonhnhaké꞉ton`;
 - `The Archenemy's Charm`;
 - `The Horizon Seeker`;
 - `The Warmonger`.

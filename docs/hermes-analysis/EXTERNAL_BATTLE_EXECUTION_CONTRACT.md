@@ -186,23 +186,38 @@ compressed `.json.gz` files.
 
 ## Measured Catalog Baseline
 
-Live PostgreSQL read-only inventory on 2026-07-14:
+Live PostgreSQL read-only inventory and production sidecar reconciliation on
+2026-07-15, deployed from `528203c9b8473331a200e9364fee73a6be04c782`:
 
 | Lane | Cards | Catalog coverage |
 | --- | ---: | ---: |
 | PostgreSQL `cards` | 34,331 | 100% |
-| XMage direct resolution | 31,208 | 90.9033% |
-| XMage residual | 3,123 | 9.0967% |
-| Forge resolution inside XMage residual | 1,872 | 5.4528% |
-| XMage + Forge external execution resolution | 33,080 | 96.3561% |
+| XMage direct resolution | 31,285 | 91.1276% |
+| XMage residual | 3,046 | 8.8724% |
+| Forge resolution inside XMage residual | 1,796 | 5.2314% |
+| XMage + Forge external execution resolution | 33,081 | 96.3590% |
 | Native executable rules inside final external residual | 39 | 0.1136% |
-| Current operational union | 33,119 | 96.4697% |
-| Explicit residual | 1,212 | 3.5303% |
+| Current operational union | 33,120 | 96.4726% |
+| Explicit residual | 1,211 | 3.5274% |
 
 These are resolution counts, not 34,331 focused card-use tests. The remaining
-1,212 cards are the only global family/manual/product-exclusion queue; the
-31,208 XMage-resolved cards must not be translated card by card merely to make
+1,211 cards are the only global subsystem/product-exclusion queue; the 31,285
+XMage-resolved cards must not be translated card by card merely to make
 the launch battle runtime work.
+
+Identity reconciliation covers 32,871 of 34,080 Oracle identities (96.4525%)
+and leaves 1,209 identities. The row residual is fully classified as 861
+nonstandard or playtest cards, 138 auxiliary game objects, 103 digital-only
+cards, 55 physical or external-interaction cards, and 54 scenario or challenge
+deck cards. There are zero residual rows in `conventional_magic_rules`.
+
+`Ratonhnhaké꞉ton` is the conventional row closed by the current XMage
+identity bridge. Resolution remains exact-first; the alias path removes Unicode
+combining marks and this card's modifier colon only, retains punctuation, and
+is admitted only when the resulting catalog key is unique. The production
+positive/negative probe resolved this card while rejecting the distinct MB2
+playtest card `Glimpse, the Unthinkable`. A before/after residual reconciliation
+confirmed that only the intended Raton row left the queue.
 
 ### Current adaptation-queue pilot
 
