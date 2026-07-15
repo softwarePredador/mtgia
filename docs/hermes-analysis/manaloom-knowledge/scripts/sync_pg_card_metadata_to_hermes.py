@@ -106,6 +106,12 @@ def parse_args() -> argparse.Namespace:
         default="",
         help="Optional JSON report path with sanitized coverage details.",
     )
+    parser.add_argument(
+        "--extra-names-json",
+        action="append",
+        default=[],
+        help="Optional JSON list (repeatable) of additional card names to sync.",
+    )
     return parser.parse_args()
 
 
@@ -254,6 +260,22 @@ def collect_requested_names(cur: sqlite3.Cursor) -> set[str]:
     names.update(str(name) for name in known_cards.keys() if name)
 
     return {name.strip() for name in names if name and name.strip()}
+
+
+def load_extra_requested_names(paths: list[str]) -> set[str]:
+    names: set[str] = set()
+    for raw_path in paths or []:
+        path = Path(raw_path).expanduser().resolve()
+        decoded = json.loads(path.read_text(encoding="utf-8"))
+        if isinstance(decoded, dict):
+            decoded = decoded.get("names") or decoded.get("cards") or []
+        if not isinstance(decoded, list):
+            raise ValueError(f"extra names JSON must be a list: {path}")
+        for value in decoded:
+            name = value.get("name") if isinstance(value, dict) else value
+            if name and str(name).strip():
+                names.add(str(name).strip())
+    return names
 
 
 def table_exists(cur: sqlite3.Cursor, table: str) -> bool:
@@ -719,6 +741,7 @@ def main() -> None:
     ensure_cache_table(sqlite_cur)
 
     requested_names = collect_requested_names(sqlite_cur)
+    requested_names.update(load_extra_requested_names(args.extra_names_json))
     if args.limit and args.limit > 0:
         requested_names = set(sorted(requested_names)[: args.limit])
 

@@ -49,6 +49,33 @@ New card-specific battle behavior must be represented as reviewed data in
 `reviewed_battle_card_rules.json`, synced through `sync_battle_card_rules*.py`,
 and covered by a focused regression test.
 
+## HBG Specialize Family
+
+`build_specialize_rule_registry.py` is the canonical generator for the 19 HBG
+Specialize families: 19 base cards plus 95 WUBRG faces. It writes
+`specialize_card_registry.json` and the matching 114 entries in
+`reviewed_battle_card_rules.json`. Every entry has a stable semantic
+`logical_rule_key`; effect metadata revisions must update that row instead of
+creating a parallel rule.
+
+```bash
+python3 docs/hermes-analysis/manaloom-knowledge/scripts/build_specialize_rule_registry.py --check
+python3 -m pytest -q \
+  docs/hermes-analysis/manaloom-knowledge/scripts/test_digital_specialize_runtime.py
+
+server/bin/with_new_server_pg.sh python3 \
+  docs/hermes-analysis/manaloom-knowledge/scripts/sync_battle_card_rules_pg.py \
+  --skip-generated \
+  --only-cards-json /tmp/specialize-card-names.json \
+  --report /tmp/specialize-dry-run.json
+```
+
+Add `--apply-pg` only after the dry-run selects exactly 114 cards. Then use
+`--apply-sqlite-from-pg` with the same selector to refresh Hermes and export
+`known_cards_canonical_snapshot.json`. The required postcondition is exactly
+114 active rows in both stores: 19 base scopes, 95 face scopes, 114 matching
+Oracle hashes, and no alternate logical keys.
+
 ## Validation
 
 Run the operational surface alignment audit before claiming scripts/docs are

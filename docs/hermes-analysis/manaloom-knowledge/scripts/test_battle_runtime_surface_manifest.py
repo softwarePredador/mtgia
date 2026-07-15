@@ -9,27 +9,27 @@ import battle_runtime_surface_manifest as manifest_mod
 
 
 REPO_ROOT = Path(__file__).resolve().parents[4]
-EXPECTED_TOTAL_FILES = 165
+EXPECTED_TOTAL_FILES = 168
 EXPECTED_CATEGORY_COUNTS = {
     "core runtime": 31,
-    "focused evidence/promotion": 34,
+    "focused evidence/promotion": 36,
     "learned-deck source": 16,
     "optimizer/scorecard": 30,
     "recurring audit gate": 30,
     "renderer": 4,
     "review queue": 1,
-    "rule registry/sync": 19,
+    "rule registry/sync": 20,
 }
 EXPECTED_AUTOMATION_COVERAGE_COUNTS = {
     "covered_by_recurring_run": 31,
     "imported_by_core_runtime": 6,
-    "outside_recurring_run": 128,
+    "outside_recurring_run": 131,
 }
 EXPECTED_GATE_EXPECTED_COUNTS = {
     "core_runtime_import_regression": 6,
     "recurring_audit_required": 31,
-    "targeted_manual_gate_required_before_change": 58,
-    "targeted_test_required_before_change": 70,
+    "targeted_manual_gate_required_before_change": 60,
+    "targeted_test_required_before_change": 71,
 }
 REQUIRED_HIGH_SIGNAL_PATHS = {
     "docs/hermes-analysis/manaloom-knowledge/scripts/battle_card_adjustment_throughput_benchmark.py",
@@ -41,6 +41,8 @@ REQUIRED_HIGH_SIGNAL_PATHS = {
     "docs/hermes-analysis/manaloom-knowledge/scripts/battle_effect_coverage_audit.py",
     "docs/hermes-analysis/manaloom-knowledge/scripts/battle_mtga_player_log_parser.py",
     "docs/hermes-analysis/manaloom-knowledge/scripts/battle_runtime_surface_manifest.py",
+    "docs/hermes-analysis/manaloom-knowledge/scripts/build_specialize_rule_registry.py",
+    "docs/hermes-analysis/manaloom-knowledge/scripts/external_battle_async_runner.py",
     "docs/hermes-analysis/manaloom-knowledge/scripts/mtg_battle_external_source_audit.py",
     "docs/hermes-analysis/manaloom-knowledge/scripts/seventeenlands_history_learning.py",
     "docs/hermes-analysis/manaloom-knowledge/scripts/test_battle_card_adjustment_throughput_benchmark.py",
@@ -48,6 +50,7 @@ REQUIRED_HIGH_SIGNAL_PATHS = {
     "docs/hermes-analysis/manaloom-knowledge/scripts/test_battle_external_engine_crosscheck.py",
     "docs/hermes-analysis/manaloom-knowledge/scripts/test_battle_mtga_player_log_parser.py",
     "docs/hermes-analysis/manaloom-knowledge/scripts/test_battle_runtime_surface_manifest.py",
+    "docs/hermes-analysis/manaloom-knowledge/scripts/test_external_battle_async_runner.py",
     "docs/hermes-analysis/manaloom-knowledge/scripts/test_mtg_battle_external_source_audit.py",
     "docs/hermes-analysis/manaloom-knowledge/scripts/replay_decision_auditor.py",
     "docs/hermes-analysis/manaloom-knowledge/scripts/global_commander_battle_feedback_model.py",

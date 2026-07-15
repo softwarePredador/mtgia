@@ -217,9 +217,15 @@ def test_naktamun_prepares_on_upkeep_and_casts_wheel_face():
 
     assert prepared_count == 1
     assert cast is True
-    assert naktamun in active.graveyard
+    assert naktamun in active.battlefield
+    assert naktamun not in active.graveyard
+    assert naktamun["prepared"] is False
     assert len(active.hand) == 7
     assert len(opponent.hand) == 7
+
+    opponent.hand = []
+    assert battle.process_prepare_upkeep_triggers(active, [active, opponent], turn=6) == 1
+    assert naktamun["prepared"] is True
 
 
 def test_charmbreaker_devils_returns_random_spell_and_gets_plus_four():

@@ -83,15 +83,15 @@ Current read-only baseline:
 
 | Semantic family | Residual cards |
 | --- | ---: |
-| `creature_combat_or_ability` | 290 |
-| `token_creation` | 235 |
-| `targeted_or_mass_removal` | 144 |
-| `damage_or_life` | 134 |
-| `other_long_tail` | 118 |
-| `draw_selection_topdeck` | 105 |
+| `creature_combat_or_ability` | 256 |
+| `token_creation` | 215 |
+| `targeted_or_mass_removal` | 128 |
+| `damage_or_life` | 123 |
+| `other_long_tail` | 117 |
+| `draw_selection_topdeck` | 93 |
 | `triggered_static_or_replacement` | 78 |
 | `mana_generation_or_cost` | 38 |
-| `graveyard_recursion` | 33 |
+| `graveyard_recursion` | 24 |
 | `tutor_search_library` | 25 |
 | `counterspell_or_stack` | 5 |
 | `product_identity_or_nonstandard_object` | 5 |
@@ -203,16 +203,16 @@ Global coverage:
 | PostgreSQL rows | 34,331 |
 | XMage exact | 31,285 |
 | Forge exact after XMage gap | 1,796 |
-| Native verified after external gap | 39 |
-| Operationally covered | 33,120 |
-| Explicit residual | 1,211 |
-| Coverage | 96.4726% |
+| Native verified after external gap | 142 |
+| Operationally covered | 33,223 |
+| Explicit residual | 1,108 |
+| Coverage | 96.7726% |
 
-The 1,211 residual rows contain zero conventional-rules cards: 861 are
-nonstandard or playtest cards, 138 are auxiliary game objects, 103 are
-digital-only cards, 55 require physical or external interaction, and 54 belong
-to scenario or challenge-deck rulesets. At Oracle-identity level, 32,871 of
-34,080 identities are fully covered and 1,209 remain.
+The 1,108 residual rows contain zero conventional-rules or digital-only cards:
+861 are nonstandard or playtest cards, 138 are auxiliary game objects, 55
+require physical or external interaction, and 54 belong to scenario or
+challenge-deck rulesets. At Oracle-identity level, 32,974 of 34,080 identities
+are fully covered and 1,106 remain.
 
 Local-source/catalog reconciliation:
 
@@ -244,6 +244,27 @@ Production async-runner proof:
 - no strategy or superiority claim emitted;
 - a second invocation preserved one attempt and did not rerun the job;
 - full result retention fell from approximately 3.2 MiB JSON to 44 KiB gzip.
+
+## HBG Specialize native closure
+
+The native digital residual is closed by one generated family registry rather
+than card-by-card branches:
+
+- 19 base cards and 95 WUBRG derived faces;
+- 114 reviewed, verified, executable rules with stable semantic
+  `logical_rule_key` values;
+- one shared activation/transition/trigger runtime in `battle_analyst_v9.py`;
+- five Lae'zel faces explicitly marked for their "enters or specializes"
+  transition;
+- exact PostgreSQL and Hermes postcheck: 114 rows, 114 Oracle hashes, 19 base
+  scopes, 95 face scopes, and no stale keys.
+
+Run `build_specialize_rule_registry.py --check` and
+`test_digital_specialize_runtime.py` before promotion. Use
+`sync_battle_card_rules_pg.py --only-cards-json <selector>` for dry-run, exact
+PostgreSQL apply, and PostgreSQL-to-Hermes synchronization. A change to effect
+metadata must update the existing stable key; it must not create a second rule
+for the same Specialize card.
 
 ## PostgreSQL and Hermes boundary
 

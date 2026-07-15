@@ -161,6 +161,13 @@ def parse_args() -> argparse.Namespace:
         help="Restrict apply/mirror to specific card names. Can be repeated.",
     )
     parser.add_argument(
+        "--only-cards-json",
+        help=(
+            "Restrict apply/mirror to card names from a JSON array or from an "
+            "object containing card_names."
+        ),
+    )
+    parser.add_argument(
         "--only-summary-json",
         help="Audit summary JSON to derive a card subset.",
     )
@@ -210,8 +217,19 @@ def load_summary_entries(path: str | Path | None) -> list[dict[str, Any]]:
     return entries if isinstance(entries, list) else []
 
 
+def load_card_names(path: str | Path | None) -> list[str]:
+    if not path:
+        return []
+    payload = json.loads(Path(path).read_text(encoding="utf-8"))
+    values = payload if isinstance(payload, list) else payload.get("card_names", [])
+    if not isinstance(values, list):
+        raise ValueError("only-cards JSON must be an array or contain a card_names array")
+    return [str(value).strip() for value in values if str(value).strip()]
+
+
 def resolve_selected_card_names(args: argparse.Namespace) -> list[str]:
     selected = {str(name).strip() for name in (args.only_card or []) if str(name).strip()}
+    selected.update(load_card_names(getattr(args, "only_cards_json", None)))
     summary_entries = load_summary_entries(args.only_summary_json)
     if summary_entries:
         classifications = {str(value).strip() for value in (args.only_classification or []) if str(value).strip()}
@@ -1229,6 +1247,7 @@ def main() -> int:
         "selected_card_count": len(selected_card_names),
         "selected_cards": selected_card_names,
         "only_summary_json": args.only_summary_json,
+        "only_cards_json": args.only_cards_json,
         "only_classification": args.only_classification,
         "only_recommended_action": args.only_recommended_action,
         "input_rows": len(seed_rows),

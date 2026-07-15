@@ -101,12 +101,33 @@ class SyncBattleCardRulesPgSelectionTests(unittest.TestCase):
             summary_path.write_text(json.dumps(payload), encoding="utf-8")
             args = argparse.Namespace(
                 only_card=[],
+                only_cards_json=None,
                 only_summary_json=str(summary_path),
                 only_classification=["temporary_hotfix"],
                 only_recommended_action=["reconcile_pg_rule"],
             )
             selected = sync_pg.resolve_selected_card_names(args)
         self.assertEqual(selected, ["Lightning Greaves"])
+
+    def test_resolve_selected_card_names_accepts_json_batch(self) -> None:
+        with tempfile.TemporaryDirectory() as tmpdir:
+            names_path = Path(tmpdir) / "names.json"
+            names_path.write_text(
+                json.dumps(["Gale, Conduit of the Arcane", "Gale, Holy Conduit"]),
+                encoding="utf-8",
+            )
+            args = argparse.Namespace(
+                only_card=["Gale, Holy Conduit"],
+                only_cards_json=str(names_path),
+                only_summary_json=None,
+                only_classification=[],
+                only_recommended_action=[],
+            )
+            selected = sync_pg.resolve_selected_card_names(args)
+        self.assertEqual(
+            selected,
+            ["Gale, Conduit of the Arcane", "Gale, Holy Conduit"],
+        )
 
     def test_filter_rows_by_card_names_uses_normalized_names(self) -> None:
         rows = [
