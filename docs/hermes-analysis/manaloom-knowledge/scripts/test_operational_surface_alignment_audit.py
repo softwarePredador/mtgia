@@ -49,6 +49,10 @@ class OperationalSurfaceAlignmentAuditTests(unittest.TestCase):
             "scripts.external_battle_runner_is_resumable_and_non_promoting",
             check_names,
         )
+        self.assertIn(
+            "server.easypanel_runtime_audit_uses_new_server_pg_tunnel",
+            check_names,
+        )
 
     def test_forbidden_stale_snippet_fails(self) -> None:
         with tempfile.TemporaryDirectory() as tmp_dir:

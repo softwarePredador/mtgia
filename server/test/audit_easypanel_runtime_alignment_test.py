@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import importlib.util
+import json
 import sys
 from pathlib import Path
 
@@ -94,3 +95,34 @@ def test_build_findings_flags_missing_openai_and_sha_drift() -> None:
     assert "public_sha_drift" in codes
     assert "hermes-lab_sha_drift" in codes
     assert "hermes_lab_missing_openai" in codes
+
+
+def test_internal_postgres_metrics_use_new_server_tunnel(monkeypatch) -> None:
+    calls = []
+
+    def fake_check_output(command, **kwargs):
+        calls.append((command, kwargs))
+        return json.dumps(
+            {
+                "deck_learning_events": {
+                    "total": 1,
+                    "synced": 1,
+                    "pending": 0,
+                    "latest_pending_age_hours": None,
+                    "pending_samples": [],
+                }
+            }
+        )
+
+    monkeypatch.setattr(MODULE.subprocess, "check_output", fake_check_output)
+    payload = MODULE._query_pg_metrics(
+        {
+            "DB_HOST": "evolution_manaloom-postgres",
+            "MANALOOM_EXPECTED_DB_HOST": "evolution_manaloom-postgres",
+        }
+    )
+
+    assert payload["deck_learning_events"]["pending"] == 0
+    assert calls[0][0][0] == str(MODULE.NEW_SERVER_PG_WRAPPER)
+    assert calls[0][0][-1] == "--pg-metrics-only"
+    assert calls[0][1]["timeout"] == 60

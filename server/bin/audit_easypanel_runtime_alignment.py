@@ -29,6 +29,7 @@ SERVER_DIR = REPO_ROOT / "server"
 DEFAULT_ARTIFACT_DIR = REPO_ROOT / "server" / "test" / "artifacts" / "easypanel_runtime_alignment"
 DEFAULT_HEALTH_URL = "https://evolution-cartinhas.2ta7qx.easypanel.host/health"
 DEFAULT_SERVICES = ("manaloom-ops",)
+NEW_SERVER_PG_WRAPPER = SERVER_DIR / "bin" / "with_new_server_pg.sh"
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import reconcile_easypanel_services as reconcile  # noqa: E402
@@ -192,7 +193,7 @@ def _fetch_swarm_service_snapshot(
     return _snapshot_from_swarm_inspect(services[0])
 
 
-def _query_pg_metrics(runtime_env: dict[str, str]) -> dict[str, Any]:
+def _query_pg_metrics_direct(runtime_env: dict[str, str]) -> dict[str, Any]:
     psycopg2, extras = _load_psycopg2()
     connect_kwargs = _pg_connection_kwargs(runtime_env)
     conn = psycopg2.connect(cursor_factory=extras.RealDictCursor, **connect_kwargs)
@@ -283,6 +284,29 @@ def _query_pg_metrics(runtime_env: dict[str, str]) -> dict[str, Any]:
             "latest_imported": _iso(analysis_row.get("latest_imported")),
         },
     }
+
+
+def _query_pg_metrics(runtime_env: dict[str, str]) -> dict[str, Any]:
+    expected_internal_host = runtime_env.get(
+        "MANALOOM_EXPECTED_DB_HOST",
+        "evolution_manaloom-postgres",
+    )
+    if runtime_env.get("DB_HOST") != expected_internal_host:
+        return _query_pg_metrics_direct(runtime_env)
+    output = subprocess.check_output(
+        [
+            str(NEW_SERVER_PG_WRAPPER),
+            sys.executable,
+            str(Path(__file__).resolve()),
+            "--pg-metrics-only",
+        ],
+        text=True,
+        timeout=60,
+    )
+    payload = json.loads(output)
+    if not isinstance(payload, dict):
+        raise RuntimeError("PostgreSQL tunnel metrics did not return an object")
+    return payload
 
 
 def _build_findings(
@@ -424,7 +448,12 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--artifact-dir", default=str(DEFAULT_ARTIFACT_DIR))
     parser.add_argument("--insecure-health", action="store_true")
     parser.add_argument("--stdout-only", action="store_true")
+    parser.add_argument("--pg-metrics-only", action="store_true", help=argparse.SUPPRESS)
     args = parser.parse_args(argv)
+
+    if args.pg_metrics_only:
+        print(json.dumps(_query_pg_metrics_direct(dict(os.environ)), sort_keys=True))
+        return 0
 
     runtime_env = reconcile.load_runtime_env()
     client = reconcile.EasyPanelClient(

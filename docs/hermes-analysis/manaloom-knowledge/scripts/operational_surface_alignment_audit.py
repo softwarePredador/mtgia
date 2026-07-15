@@ -65,6 +65,7 @@ QUALITY_GATE = REPO_ROOT / "scripts" / "quality_gate.sh"
 OLD_SERVER_REFERENCE_WRAPPER = REPO_ROOT / "scripts" / "manaloom_old_server_reference_audit.sh"
 REPORT_RETENTION_WRAPPER = REPO_ROOT / "scripts" / "manaloom_report_retention_audit.sh"
 PG_HERMES_SQLITE_CONTRACT_WRAPPER = REPO_ROOT / "scripts" / "manaloom_pg_hermes_sqlite_contract_audit.sh"
+EASYPANEL_RUNTIME_AUDIT = REPO_ROOT / "server" / "bin" / "audit_easypanel_runtime_alignment.py"
 LEGACY_CONTAMINATION_BASELINE = DOCS_DIR / "LEGACY_CONTAMINATION_BASELINE_2026-06-30.json"
 
 CURRENT_XMAGE_MANIFEST = (
@@ -618,6 +619,15 @@ def build_checks() -> list[Check]:
                 "promotion_allowed",
             ],
             "scripts.external_battle_runner_is_resumable_and_non_promoting",
+        ),
+        check_contains(
+            EASYPANEL_RUNTIME_AUDIT,
+            [
+                "with_new_server_pg.sh",
+                "_query_pg_metrics_direct",
+                "--pg-metrics-only",
+            ],
+            "server.easypanel_runtime_audit_uses_new_server_pg_tunnel",
         ),
     ]
 
