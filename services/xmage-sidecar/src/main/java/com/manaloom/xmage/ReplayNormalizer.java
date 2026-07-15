@@ -7,6 +7,7 @@ import mage.view.CounterView;
 import mage.view.GameView;
 import mage.view.PermanentView;
 import mage.view.PlayerView;
+import mage.view.StackAbilityView;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -272,6 +273,10 @@ final class ReplayNormalizer {
         event.put("card", zoneCard.card);
         event.put("card_id", zoneCard.card.get("id"));
         event.put("card_name", zoneCard.card.get("name"));
+        if (zoneCard.card.get("source_card_id") != null) {
+            event.put("source_card_id", zoneCard.card.get("source_card_id"));
+            event.put("source_card_name", zoneCard.card.get("source_card_name"));
+        }
         return event;
     }
 
@@ -434,8 +439,15 @@ final class ReplayNormalizer {
         result.put("name", card.getName());
         result.put("set_code", card.getExpansionSetCode());
         result.put("card_number", card.getCardNumber());
-        result.put("is_ability", card.isAbility());
+        result.put("is_ability", isAbility(card));
         result.put("object_type", String.valueOf(card.getMageObjectType()));
+        if (card instanceof StackAbilityView) {
+            CardView source = ((StackAbilityView) card).getSourceCard();
+            if (source != null) {
+                result.put("source_card_id", id(source.getId()));
+                result.put("source_card_name", source.getName());
+            }
+        }
         if (card instanceof PermanentView) {
             PermanentView permanent = (PermanentView) card;
             result.put("tapped", permanent.isTapped());
@@ -470,7 +482,7 @@ final class ReplayNormalizer {
             if (card.getId() == null) {
                 cardHash = combine(cardHash, objectHash(card.getName()));
             }
-            cardHash = combine(cardHash, card.isAbility() ? 1L : 0L);
+            cardHash = combine(cardHash, isAbility(card) ? 1L : 0L);
             if (card instanceof PermanentView) {
                 PermanentView permanent = (PermanentView) card;
                 cardHash = combine(cardHash, permanent.isTapped() ? 1L : 0L);
@@ -499,6 +511,14 @@ final class ReplayNormalizer {
 
     private static long objectHash(Object value) {
         return value == null ? 0L : value.hashCode();
+    }
+
+    private static boolean isAbility(CardView card) {
+        if (card instanceof StackAbilityView || card.isAbility()) {
+            return true;
+        }
+        return card.getMageObjectType() != null
+                && card.getMageObjectType().name().contains("ABILITY");
     }
 
     private static long uuidHash(UUID value) {

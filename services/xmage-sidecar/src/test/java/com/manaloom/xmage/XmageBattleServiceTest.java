@@ -115,6 +115,10 @@ final class XmageBattleServiceTest {
 
         Map<String, Object> solRingTapped = replayCard("sol", "Sol Ring", true);
         Map<String, Object> lightningBolt = replayCard("bolt", "Lightning Bolt", false);
+        Map<String, Object> activatedAbility = replayCard("ability", "Ability", false);
+        activatedAbility.put("is_ability", true);
+        activatedAbility.put("source_card_id", "krenko");
+        activatedAbility.put("source_card_name", "Krenko, Mob Boss");
         Map<String, Object> combatGroup = new LinkedHashMap<>();
         combatGroup.put("defender_id", "deck_b");
         combatGroup.put("defender_name", "deck_b");
@@ -122,7 +126,7 @@ final class XmageBattleServiceTest {
         combatGroup.put("blockers", Collections.emptyList());
         Map<String, Object> active = replaySnapshot(
                 Arrays.asList(solRingTapped, goblin),
-                Collections.singletonList(lightningBolt),
+                Arrays.asList(lightningBolt, activatedAbility),
                 Collections.singletonList(combatGroup)
         );
 
@@ -142,6 +146,11 @@ final class XmageBattleServiceTest {
                 .orElseThrow(AssertionError::new);
         assertEquals("spell", stackEntry.get("stack_object_kind"));
         assertEquals("visible_activity_only", stackEntry.get("learning_grade"));
+        Map<String, Object> abilityEntry = events.stream()
+                .filter(event -> "ability".equals(event.get("stack_object_kind")))
+                .findFirst()
+                .orElseThrow(AssertionError::new);
+        assertEquals("Krenko, Mob Boss", abilityEntry.get("source_card_name"));
     }
 
     private static JsonObject deck(String name, JsonObject... cards) {
