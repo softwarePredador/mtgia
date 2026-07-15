@@ -44,32 +44,57 @@ final class ReplayNormalizer {
     private ReplayNormalizer() {
     }
 
-    static String fingerprint(GameView view) {
-        StringBuilder result = new StringBuilder();
-        result.append(view.getTurn()).append('|').append(view.getPhase()).append('|').append(view.getStep());
-        result.append('|').append(view.getActivePlayerName());
-        appendCardFingerprint(result, view.getStack().values());
-        for (PlayerView player : sortedPlayers(view)) {
-            result.append('|').append(player.getName())
-                    .append(':').append(player.getLife())
-                    .append(':').append(player.getLibraryCount())
-                    .append(':').append(player.getHandCount())
-                    .append(':').append(player.getBattlefield().size())
-                    .append(':').append(player.getGraveyard().size())
-                    .append(':').append(player.getExile().size());
-            appendCardFingerprint(result, player.getBattlefield().values());
-            appendCardFingerprint(result, player.getGraveyard().values());
-            appendCardFingerprint(result, player.getExile().values());
+    static long fingerprint(GameView view) {
+        long result = combine(0x6a09e667f3bcc909L, view.getTurn());
+        result = combine(result, objectHash(view.getPhase()));
+        result = combine(result, objectHash(view.getStep()));
+        result = combine(result, objectHash(view.getActivePlayerName()));
+        result = combine(result, cardsFingerprint(view.getStack().values()));
+
+        long playersSum = 0L;
+        long playersXor = 0L;
+        for (PlayerView player : view.getPlayers()) {
+            long playerHash = combine(0x3c6ef372fe94f82bL, objectHash(player.getName()));
+            playerHash = combine(playerHash, player.getLife());
+            playerHash = combine(playerHash, player.getLibraryCount());
+            playerHash = combine(playerHash, player.getHandCount());
+            playerHash = combine(playerHash, cardsFingerprint(player.getBattlefield().values()));
+            playerHash = combine(playerHash, cardsFingerprint(player.getGraveyard().values()));
+            playerHash = combine(playerHash, cardsFingerprint(player.getExile().values()));
+
+            long commandSum = 0L;
+            long commandXor = 0L;
             for (CommandObjectView card : player.getCommandObjectList()) {
-                result.append(":command:").append(card.getId()).append(':').append(card.getName());
+                long cardHash = uuidHash(card.getId());
+                if (card.getId() == null) {
+                    cardHash = combine(cardHash, objectHash(card.getName()));
+                }
+                long mixed = mix(cardHash);
+                commandSum += mixed;
+                commandXor ^= Long.rotateLeft(mixed, (int) (mixed & 63));
             }
+            playerHash = combine(playerHash, commandSum);
+            playerHash = combine(playerHash, commandXor);
+
+            long mixed = mix(playerHash);
+            playersSum += mixed;
+            playersXor ^= Long.rotateLeft(mixed, (int) (mixed & 63));
         }
+        result = combine(result, playersSum);
+        result = combine(result, playersXor);
+
+        long combatSum = 0L;
+        long combatXor = 0L;
         for (CombatGroupView group : view.getCombat()) {
-            result.append("|combat:").append(group.getDefenderId()).append(':').append(group.isBlocked());
-            appendCardFingerprint(result, group.getAttackers().values());
-            appendCardFingerprint(result, group.getBlockers().values());
+            long groupHash = combine(uuidHash(group.getDefenderId()), group.isBlocked() ? 1L : 0L);
+            groupHash = combine(groupHash, cardsFingerprint(group.getAttackers().values()));
+            groupHash = combine(groupHash, cardsFingerprint(group.getBlockers().values()));
+            long mixed = mix(groupHash);
+            combatSum += mixed;
+            combatXor ^= Long.rotateLeft(mixed, (int) (mixed & 63));
         }
-        return result.toString();
+        result = combine(result, combatSum);
+        return combine(result, combatXor);
     }
 
     static List<Map<String, Object>> snapshots(List<GameView> views) {
@@ -436,27 +461,60 @@ final class ReplayNormalizer {
         return result;
     }
 
-    private static void appendCardFingerprint(
-            StringBuilder result,
-            Iterable<? extends CardView> cards
-    ) {
+    private static long cardsFingerprint(Iterable<? extends CardView> cards) {
+        long sum = 0L;
+        long xor = 0L;
+        int count = 0;
         for (CardView card : cards) {
-            result.append(":card:").append(card.getId())
-                    .append(':').append(card.getName())
-                    .append(':').append(card.isAbility());
+            long cardHash = uuidHash(card.getId());
+            if (card.getId() == null) {
+                cardHash = combine(cardHash, objectHash(card.getName()));
+            }
+            cardHash = combine(cardHash, card.isAbility() ? 1L : 0L);
             if (card instanceof PermanentView) {
                 PermanentView permanent = (PermanentView) card;
-                result.append(':').append(permanent.isTapped())
-                        .append(':').append(permanent.getDamage());
+                cardHash = combine(cardHash, permanent.isTapped() ? 1L : 0L);
+                cardHash = combine(cardHash, permanent.getDamage());
                 List<CounterView> counters = permanent.getCounters();
                 if (counters != null) {
+                    long countersSum = 0L;
+                    long countersXor = 0L;
                     for (CounterView counter : counters) {
-                        result.append(":counter:").append(counter.getName())
-                                .append(':').append(counter.getCount());
+                        long counterHash = combine(objectHash(counter.getName()), counter.getCount());
+                        long mixedCounter = mix(counterHash);
+                        countersSum += mixedCounter;
+                        countersXor ^= Long.rotateLeft(mixedCounter, (int) (mixedCounter & 63));
                     }
+                    cardHash = combine(cardHash, countersSum);
+                    cardHash = combine(cardHash, countersXor);
                 }
             }
+            long mixed = mix(cardHash);
+            sum += mixed;
+            xor ^= Long.rotateLeft(mixed, (int) (mixed & 63));
+            count++;
         }
+        return combine(combine(sum, xor), count);
+    }
+
+    private static long objectHash(Object value) {
+        return value == null ? 0L : value.hashCode();
+    }
+
+    private static long uuidHash(UUID value) {
+        return value == null ? 0L : mix(value.getMostSignificantBits() ^ value.getLeastSignificantBits());
+    }
+
+    private static long combine(long current, long value) {
+        return mix(current ^ (value + 0x9e3779b97f4a7c15L));
+    }
+
+    private static long mix(long value) {
+        value ^= value >>> 33;
+        value *= 0xff51afd7ed558ccdL;
+        value ^= value >>> 33;
+        value *= 0xc4ceb9fe1a85ec53L;
+        return value ^ (value >>> 33);
     }
 
     private static String id(UUID id) {

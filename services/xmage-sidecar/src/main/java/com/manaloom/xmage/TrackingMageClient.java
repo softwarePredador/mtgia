@@ -30,7 +30,8 @@ final class TrackingMageClient implements MageClient {
     private volatile GameView lastView;
     private volatile boolean gameOver;
     private volatile boolean won;
-    private volatile String lastFingerprint = "";
+    private volatile long lastFingerprint;
+    private volatile boolean hasFingerprint;
 
     void setSession(Session session) {
         this.session = session;
@@ -146,9 +147,10 @@ final class TrackingMageClient implements MageClient {
             return;
         }
         lastView = view;
-        String fingerprint = ReplayNormalizer.fingerprint(view);
-        if (!fingerprint.equals(lastFingerprint)) {
+        long fingerprint = ReplayNormalizer.fingerprint(view);
+        if (!hasFingerprint || fingerprint != lastFingerprint) {
             lastFingerprint = fingerprint;
+            hasFingerprint = true;
             views.add(view);
         }
     }
