@@ -1,0 +1,88 @@
+{
+  "apply_gate": "Do not run apply SQL without explicit approval for the exact command.",
+  "backup_table": "manaloom_deploy_audit.pg868_grinding_station_runtime_new_serve_20260715_163640",
+  "deploy_id": "pg868_grinding_station_runtime_new_server_20260715_163620",
+  "execution_scenarios": [],
+  "expected_rules": [
+    {
+      "card_name": "Grinding Station",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:717756665b21129116b06005239d6754",
+      "min_rule_version": 2,
+      "normalized_name": "grinding station",
+      "oracle_hash": "288857f5e91e9574eff7a561f5d6708e",
+      "required_effect_fields": {
+        "ability_kind": "triggered",
+        "activation_requires_sacrifice_permanent": true,
+        "activation_requires_tap": true,
+        "activation_sacrifice_target_type": "artifact",
+        "artifact_enters_untap_source": true,
+        "artifact_enters_untap_source_status": "runtime_executor_v1",
+        "battle_model_scope": "artifact_tap_sacrifice_permanent_target_player_mill_v1",
+        "effect": "mill_engine",
+        "mill_count": 3,
+        "target": "player"
+      },
+      "review_status": "verified"
+    }
+  ],
+  "family_counts": {
+    "mill_engine": 1
+  },
+  "files": {
+    "apply": "docs/hermes-analysis/master_optimizer_reports/pg868_grinding_station_runtime_new_server_package_apply.sql",
+    "manifest": "docs/hermes-analysis/master_optimizer_reports/pg868_grinding_station_runtime_new_server_package_manifest.json",
+    "package": "docs/hermes-analysis/master_optimizer_reports/pg868_grinding_station_runtime_new_server_package_package.md",
+    "postcheck": "docs/hermes-analysis/master_optimizer_reports/pg868_grinding_station_runtime_new_server_package_postcheck.sql",
+    "precheck": "docs/hermes-analysis/master_optimizer_reports/pg868_grinding_station_runtime_new_server_package_precheck.sql",
+    "rollback": "docs/hermes-analysis/master_optimizer_reports/pg868_grinding_station_runtime_new_server_package_rollback.sql"
+  },
+  "generated_at": "2026-07-15T16:36:40+00:00",
+  "mutations_performed": [],
+  "runtime_checks": [
+    {
+      "card": {
+        "name": "Grinding Station"
+      },
+      "card_name": "Grinding Station",
+      "effect": "mill_engine",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:717756665b21129116b06005239d6754",
+      "normalized_name": "grinding station",
+      "required_effect_fields": {
+        "ability_kind": "triggered",
+        "activation_requires_sacrifice_permanent": true,
+        "activation_requires_tap": true,
+        "activation_sacrifice_target_type": "artifact",
+        "artifact_enters_untap_source": true,
+        "artifact_enters_untap_source_status": "runtime_executor_v1",
+        "battle_model_scope": "artifact_tap_sacrifice_permanent_target_player_mill_v1",
+        "effect": "mill_engine",
+        "mill_count": 3,
+        "target": "player"
+      }
+    }
+  ],
+  "selected_card_names": [
+    "Grinding Station"
+  ],
+  "selected_count": 1,
+  "slug": "pg868_grinding_station_runtime_new_server",
+  "snapshot_checks": [
+    {
+      "card_name": "Grinding Station",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:717756665b21129116b06005239d6754",
+      "min_rule_version": 2,
+      "normalized_name": "grinding station",
+      "oracle_hash": "288857f5e91e9574eff7a561f5d6708e",
+      "required_effect_fields": {
+        "battle_model_scope": "artifact_tap_sacrifice_permanent_target_player_mill_v1"
+      },
+      "review_status": "verified"
+    }
+  ],
+  "status": "prepared_read_only_pending_apply_approval"
+}

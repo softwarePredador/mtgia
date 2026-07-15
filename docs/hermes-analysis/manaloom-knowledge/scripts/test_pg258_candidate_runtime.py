@@ -251,7 +251,7 @@ def test_grinding_station_sacrifices_artifact_to_mill_target_player():
         "target": "player",
         "mill_count": 3,
         "artifact_enters_untap_source": True,
-        "artifact_enters_untap_source_status": "annotation_only",
+        "artifact_enters_untap_source_status": "runtime_executor_v1",
     }
     station = battle.prepare_entering_permanent(
         card("Grinding Station", "Artifact", **station_effect)
@@ -270,17 +270,54 @@ def test_grinding_station_sacrifices_artifact_to_mill_target_player():
             FixedRng(),
             phase="precombat_main",
         )
+        assert activated == 1
+        assert station["tapped"] is True
+        assert station["utility_artifact_used_this_turn"] is True
+        assert treasure not in player.battlefield
+        assert len(opponent.library) == 2
+        assert len(opponent.graveyard) == 3
+
+        servo = battle.prepare_entering_permanent(
+            card("Servo Token", "Artifact Creature Token", is_token=True, power=1, toughness=1),
+            controller=player,
+            all_players=[player, opponent],
+            turn=5,
+        )
+        player.battlefield.append(servo)
+
+        assert station["tapped"] is False
+        assert station["utility_artifact_used_this_turn"] is False
+        activated_again = battle.activate_mill_engines(
+            player,
+            [opponent],
+            [player, opponent],
+            5,
+            FixedRng(),
+            phase="postcombat_main",
+        )
     finally:
         battle.REPLAY_EVENT_HANDLER = None
 
-    assert activated == 1
+    assert activated_again == 1
     assert station["tapped"] is True
-    assert treasure not in player.battlefield
-    assert len(opponent.library) == 2
-    assert len(opponent.graveyard) == 3
+    assert servo not in player.battlefield
+    assert len(opponent.library) == 0
+    assert len(opponent.graveyard) == 5
+    activations = [
+        data
+        for event, data in events
+        if event == "mill_engine_activated"
+    ]
+    assert [event.get("sacrificed") for event in activations] == [
+        "Treasure Token",
+        "Servo Token",
+    ]
+    assert [event.get("cards_milled") for event in activations] == [3, 2]
     assert any(
-        event == "mill_engine_activated"
-        and data.get("sacrificed") == "Treasure Token"
-        and data.get("cards_milled") == 3
+        event == "trigger_resolved"
+        and data.get("card") == "Grinding Station"
+        and data.get("trigger") == "artifact_enters_battlefield"
+        and data.get("effect") == "untap_source"
+        and data.get("entered_artifact") == "Servo Token"
         for event, data in events
     )

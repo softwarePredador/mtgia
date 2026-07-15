@@ -74,6 +74,33 @@ def test_package_deck_role_preserves_true_external_reference_placeholder() -> No
     assert builder.package_deck_role(proposal) == proposal["deck_role_json"]
 
 
+def test_grinding_station_runtime_contract_fields_are_manifested() -> None:
+    proposal = {
+        "normalized_name": "grinding station",
+        "card_name": "Grinding Station",
+        "logical_rule_key": "battle_rule_v1:grinding_station_fixture",
+        "oracle_hash": "hash-grinding-station",
+        "effect_json": {
+            "effect": "mill_engine",
+            "battle_model_scope": "artifact_tap_sacrifice_permanent_target_player_mill_v1",
+            "target": "player",
+            "mill_count": 3,
+            "activation_requires_tap": True,
+            "activation_requires_sacrifice_permanent": True,
+            "activation_sacrifice_target_type": "artifact",
+            "artifact_enters_untap_source": True,
+            "artifact_enters_untap_source_status": "runtime_executor_v1",
+        },
+    }
+
+    required = builder.expected_rule_from_proposal(proposal)["required_effect_fields"]
+
+    assert required["activation_requires_sacrifice_permanent"] is True
+    assert required["activation_sacrifice_target_type"] == "artifact"
+    assert required["artifact_enters_untap_source"] is True
+    assert required["artifact_enters_untap_source_status"] == "runtime_executor_v1"
+
+
 def test_hand_cycling_runtime_fields_and_execution_scenario_are_manifested() -> None:
     proposal = {
         "normalized_name": "barkhide mauler",

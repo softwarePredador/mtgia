@@ -682,6 +682,54 @@ def test_cast_scanner_does_not_announce_a_known_illegal_spell():
     )
 
 
+def test_copy_token_preserves_intrinsic_haste_and_is_combat_legal():
+    events = capture_events()
+    active = battle.Player("Active", None, [])
+    opponent = battle.Player("Opponent", None, [])
+    lorehold = card(
+        "Lorehold, the Historian",
+        "Legendary Creature - Elder Dragon",
+        cmc=5,
+        power=5,
+        toughness=5,
+        oracle_text="Flying, haste",
+        keywords=["flying", "haste"],
+    )
+    opponent.battlefield.append(lorehold)
+    clone_legion = card("Clone Legion", "Sorcery", cmc=9)
+    effect = {
+        "effect": "copy_creature_token",
+        "copy_target_types": ["creature"],
+        "target_controller": "opponent",
+        "copy_all_matching_targets": True,
+        "_rule_source": "curated",
+        "_rule_review_status": "verified",
+        "_rule_logical_key": "battle_rule_v1:clone_legion_fixture",
+    }
+
+    created = battle.resolve_copy_creature_token(
+        active,
+        clone_legion,
+        effect,
+        turn=10,
+        opponents=[opponent],
+        finish_spell=False,
+    )
+
+    assert created and len(created) == 1
+    token = created[0]
+    assert token["copy_of"] == "Lorehold, the Historian"
+    assert token["haste"] is True
+    assert token["summoning_sick"] is False
+    assert battle.can_attack_this_combat(token) is True
+    assert any(
+        event["event"] == "copy_creature_token_created"
+        and event.get("target") == "Lorehold, the Historian"
+        and event.get("haste") is True
+        for event in events
+    )
+
+
 if __name__ == "__main__":
     tests = [
         test_noxious_revival_moves_any_graveyard_target_to_its_owners_library_top,
@@ -701,6 +749,7 @@ if __name__ == "__main__":
         test_ghostly_flicker_family_requires_and_returns_two_controlled_targets,
         test_grasp_family_exiles_one_nonland_per_opponent_until_source_leaves,
         test_cast_scanner_does_not_announce_a_known_illegal_spell,
+        test_copy_token_preserves_intrinsic_haste_and_is_combat_legal,
     ]
     for test in tests:
         test()

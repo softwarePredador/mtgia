@@ -54819,6 +54819,35 @@ def resolve_tapped_permanent_entry_untap(permanent, controller, *, entered_tappe
     return True
 
 
+def resolve_artifact_entry_untap_mill_engines(permanent, controller, *, turn=None):
+    if controller is None or not is_artifact_permanent(permanent):
+        return 0
+    untapped = 0
+    for source in list(getattr(controller, "battlefield", []) or []):
+        if not isinstance(source, dict):
+            continue
+        if source.get("effect") != "mill_engine":
+            continue
+        if not source.get("artifact_enters_untap_source") or not source.get("tapped"):
+            continue
+        source["tapped"] = False
+        source["utility_artifact_used_this_turn"] = False
+        untapped += 1
+        emit_replay_event(
+            "trigger_resolved",
+            player=getattr(controller, "name", "?"),
+            card=source.get("name", "?"),
+            trigger="artifact_enters_battlefield",
+            effect="untap_source",
+            entered_artifact=permanent.get("name", "?"),
+            tapped_before=True,
+            tapped_after=False,
+            turn=turn if turn is not None else CURRENT_REPLAY_TURN,
+            **replay_rule_fields(source),
+        )
+    return untapped
+
+
 def prepare_entering_permanent(permanent, controller=None, all_players=None, turn=None):
     """Apply shared creature-entry state for permanents with engine effects."""
     if not isinstance(permanent, dict):
@@ -54959,6 +54988,11 @@ def prepare_entering_permanent(permanent, controller=None, all_players=None, tur
         permanent,
         controller,
         entered_tapped=enters_tapped,
+        turn=turn,
+    )
+    resolve_artifact_entry_untap_mill_engines(
+        permanent,
+        controller,
         turn=turn,
     )
     return permanent
@@ -58172,7 +58206,10 @@ def _apply_copy_token_modifiers(token, effect_data):
     if effect_data.get("token_toughness") is not None:
         token["toughness"] = int(effect_data.get("token_toughness") or 0)
     token_is_creature = is_battlefield_creature(token) or bool(effect_data.get("force_token_creature"))
-    token["haste"] = bool(effect_data.get("token_haste", False))
+    intrinsic_haste = "haste" in _oracle_self_keyword_values(token)
+    if token.get("_keywords_are_self") or not str(token.get("oracle_text") or "").strip():
+        intrinsic_haste = intrinsic_haste or "haste" in _keyword_values(token)
+    token["haste"] = intrinsic_haste or bool(effect_data.get("token_haste", False))
     token["summoning_sick"] = token_is_creature and not token["haste"]
     token["tapped"] = bool(effect_data.get("token_tapped"))
     if effect_data.get("token_colors"):
