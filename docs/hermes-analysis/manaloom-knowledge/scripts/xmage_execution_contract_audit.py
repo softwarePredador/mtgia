@@ -209,7 +209,7 @@ def build_report() -> dict[str, object]:
                 "BATTLE_ENGINE=auto",
                 "XMAGE_SIDECAR_URL=http://xmage-sidecar:8080",
                 "FORGE_SIDECAR_URL=http://forge-sidecar:8080",
-                "NATIVE_BATTLE_SIDECAR_URL=http://manaloom-ops:8080",
+                "NATIVE_BATTLE_SIDECAR_URL=http://evolution_manaloom-ops:8080",
             ],
         ),
         source_check(
