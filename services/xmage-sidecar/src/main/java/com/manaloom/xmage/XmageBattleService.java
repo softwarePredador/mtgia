@@ -384,8 +384,12 @@ final class XmageBattleService {
     }
 
     static String identityAliasKey(String value) {
-        String decomposed = Normalizer.normalize(value == null ? "" : value, Normalizer.Form.NFKD);
-        return decomposed.replaceAll("[^A-Za-z0-9]", "").toLowerCase(java.util.Locale.ROOT);
+        String decomposed = Normalizer.normalize(value == null ? "" : value, Normalizer.Form.NFD);
+        return decomposed
+                .replace("\ua789", "")
+                .replaceAll("\\p{M}+", "")
+                .trim()
+                .toLowerCase(java.util.Locale.ROOT);
     }
 
     static Map<String, String> buildUniqueCardAliases(Set<String> names) {

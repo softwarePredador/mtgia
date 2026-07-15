@@ -15,6 +15,7 @@ import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -55,9 +56,15 @@ final class XmageBattleServiceTest {
                 "ratonhnhaketon",
                 XmageBattleService.identityAliasKey("Ratonhnhak\u00e9\ua789ton")
         );
+        assertNotEquals(
+                XmageBattleService.identityAliasKey("Glimpse the Unthinkable"),
+                XmageBattleService.identityAliasKey("Glimpse, the Unthinkable")
+        );
 
         Set<String> names = new HashSet<>(Arrays.asList(
                 "Ratonhnhaketon",
+                "Cafe",
+                "Caf\u00e9",
                 "Fire // Ice",
                 "Fire-Ice",
                 "Sol Ring"
@@ -65,8 +72,10 @@ final class XmageBattleServiceTest {
         Map<String, String> aliases = XmageBattleService.buildUniqueCardAliases(names);
 
         assertEquals("Ratonhnhaketon", aliases.get("ratonhnhaketon"));
-        assertEquals("Sol Ring", aliases.get("solring"));
-        assertFalse(aliases.containsKey("fireice"));
+        assertEquals("Sol Ring", aliases.get("sol ring"));
+        assertEquals("Fire // Ice", aliases.get("fire // ice"));
+        assertEquals("Fire-Ice", aliases.get("fire-ice"));
+        assertFalse(aliases.containsKey("cafe"));
     }
 
     @Test
@@ -112,6 +121,9 @@ final class XmageBattleServiceTest {
         JsonObject unicodeAlias = card("Ratonhnhak\u00e9\ua789ton", 1, false);
         unicodeAlias.addProperty("card_id", "unicode-alias-id");
         cards.add(unicodeAlias);
+        JsonObject punctuationVariant = card("Glimpse, the Unthinkable", 1, false);
+        punctuationVariant.addProperty("card_id", "punctuation-variant-id");
+        cards.add(punctuationVariant);
         JsonObject unsupported = card("Molecule Man", 1, false);
         unsupported.addProperty("card_id", "unsupported-id");
         cards.add(unsupported);
@@ -121,11 +133,13 @@ final class XmageBattleServiceTest {
         List<Map<String, Object>> missing =
                 (List<Map<String, Object>>) coverage.get("unsupported_cards");
 
-        assertEquals(4, coverage.get("total"));
+        assertEquals(5, coverage.get("total"));
         assertEquals(3, coverage.get("supported"));
-        assertEquals(1, coverage.get("unsupported"));
-        assertEquals("unsupported-id", missing.get(0).get("card_id"));
+        assertEquals(2, coverage.get("unsupported"));
+        assertEquals("punctuation-variant-id", missing.get(0).get("card_id"));
         assertEquals(3, missing.get(0).get("input_index"));
+        assertEquals("unsupported-id", missing.get(1).get("card_id"));
+        assertEquals(4, missing.get(1).get("input_index"));
     }
 
     @Test
