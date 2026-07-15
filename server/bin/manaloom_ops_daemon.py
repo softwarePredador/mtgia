@@ -476,6 +476,7 @@ def _write_jobs_manifest(
                 "last_started_at": job_state.get("last_started_at"),
                 "last_finished_at": job_state.get("last_finished_at"),
                 "last_exit_code": job_state.get("last_exit_code"),
+                "last_error": job_state.get("last_error"),
                 "latest_output": job_state.get("latest_output"),
             }
         )
@@ -500,6 +501,7 @@ def _load_existing_state(jobs: list[Job]) -> dict[str, dict[str, object]]:
         "last_started_at",
         "last_finished_at",
         "last_exit_code",
+        "last_error",
         "latest_output",
     )
     state: dict[str, dict[str, object]] = {}
@@ -514,6 +516,9 @@ def _load_existing_state(jobs: list[Job]) -> dict[str, dict[str, object]]:
             for field in fields
             if field in row and row[field] is not None
         }
+        if state[job_name].get("last_status") == "running":
+            state[job_name]["last_status"] = "error"
+            state[job_name]["last_error"] = "interrupted_by_process_restart"
     for job in jobs:
         recovered = _recover_state_from_output_dir(job)
         if not recovered:
@@ -632,6 +637,7 @@ def _run_job(job: Job, env: dict[str, str], state: dict[str, dict[str, object]])
             "last_started_at": started_at,
             "last_finished_at": None,
             "last_exit_code": None,
+            "last_error": None,
             "latest_output": str(log_path),
         }
         _write_jobs_manifest(JOBS, state)
@@ -663,6 +669,7 @@ def _run_job(job: Job, env: dict[str, str], state: dict[str, dict[str, object]])
             "last_started_at": started_at,
             "last_finished_at": finished_at,
             "last_exit_code": result.returncode,
+            "last_error": None,
             "latest_output": str(log_path),
         }
         _write_jobs_manifest(JOBS, state)
@@ -699,6 +706,7 @@ def _start_background_job(
                         "last_status": "error",
                         "last_finished_at": finished_at,
                         "last_exit_code": 1,
+                        "last_error": str(exc),
                     }
                     _write_jobs_manifest(JOBS, state)
                 print(

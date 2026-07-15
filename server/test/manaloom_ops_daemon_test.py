@@ -155,6 +155,39 @@ class ManaLoomOpsDaemonTest(unittest.TestCase):
             "2026-06-18T07:36:27",
         )
 
+    def test_load_existing_state_marks_running_job_interrupted_after_restart(self) -> None:
+        module = _load_module()
+        with tempfile.TemporaryDirectory() as tmp:
+            jobs_json = Path(tmp) / "jobs.json"
+            jobs_json.write_text(
+                json.dumps(
+                    [
+                        {
+                            "id": "manaloom_battle_strategy_audit",
+                            "name": "manaloom_battle_strategy_audit",
+                            "last_status": "running",
+                            "last_started_at": "2026-07-15T12:05:02",
+                            "last_exit_code": None,
+                        }
+                    ]
+                ),
+                encoding="utf-8",
+            )
+            original_jobs_json = module.JOBS_JSON
+            original_output_dir = module.CRON_OUTPUT_DIR
+            try:
+                module.JOBS_JSON = jobs_json
+                module.CRON_OUTPUT_DIR = Path(tmp) / "cron" / "output"
+                state = module._load_existing_state(module.JOBS)
+            finally:
+                module.JOBS_JSON = original_jobs_json
+                module.CRON_OUTPUT_DIR = original_output_dir
+
+        recovered = state["manaloom_battle_strategy_audit"]
+        self.assertEqual(recovered["last_status"], "error")
+        self.assertEqual(recovered["last_error"], "interrupted_by_process_restart")
+        self.assertEqual(recovered["last_started_at"], "2026-07-15T12:05:02")
+
     def test_load_existing_state_prefers_newer_log_over_stale_manifest_error(self) -> None:
         module = _load_module()
         with tempfile.TemporaryDirectory() as tmp:
