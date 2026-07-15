@@ -196,20 +196,27 @@ Live PostgreSQL read-only inventory and production sidecar reconciliation on
 | XMage residual | 3,046 | 8.8724% |
 | Forge resolution inside XMage residual | 1,796 | 5.2314% |
 | XMage + Forge external execution resolution | 33,081 | 96.3590% |
-| Native executable rules inside final external residual | 142 | 0.4136% |
-| Current operational union | 33,223 | 96.7726% |
-| Explicit residual | 1,108 | 3.2274% |
+| Native executable rules inside final external residual | 187 | 0.5447% |
+| Current operational union | 33,268 | 96.9037% |
+| Explicit technical residual | 1,063 | 3.0963% |
 
 These are resolution counts, not 34,331 focused card-use tests. The remaining
-1,108 cards are the only global subsystem/product-exclusion queue; the 31,285
+1,063 cards are the only global subsystem/product-exclusion queue; the 31,285
 XMage-resolved cards must not be translated card by card merely to make
 the launch battle runtime work.
 
-Identity reconciliation covers 32,974 of 34,080 Oracle identities (96.7547%)
-and leaves 1,106 identities. The row residual is fully classified as 861
-nonstandard or playtest cards, 138 auxiliary game objects, 55 physical or
+Identity reconciliation covers 33,019 of 34,080 Oracle identities (96.8867%)
+and leaves 1,061 terminal technical identities. The row residual is fully
+classified as 816 nonstandard or playtest cards, 138 auxiliary game objects, 55 physical or
 external-interaction cards, and 54 scenario or challenge deck cards. There are
 zero residual rows in `conventional_magic_rules` or the digital-only scope.
+
+Every canonical coverage run also emits
+`global_residual_terminal_dispositions_v1`. It rejects conventional and unknown
+scopes, assigns one reason and next subsystem gate to every technical row, and
+keeps every exclusion non-promotable. The current gate reports 1,063 terminal
+dispositions, zero actionable residual, zero unknown dispositions, and zero
+promotion-eligible rows.
 
 `Ratonhnhaké꞉ton` is the conventional row closed by the current XMage
 identity bridge. Resolution remains exact-first; the alias path removes Unicode

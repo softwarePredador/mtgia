@@ -15,8 +15,9 @@ Usage:
 
 coverage
   Rebuilds the PostgreSQL -> XMage -> Forge -> native ledger, reconciles local
-  XMage source candidates with live catalogs, and keeps only compact residual
-  evidence under output_root (default: /tmp/manaloom-global-closure-output).
+  XMage source candidates with live catalogs, assigns a non-promotable terminal
+  disposition to every technical residual, and keeps only compact evidence
+  under output_root (default: /tmp/manaloom-global-closure-output).
 
 battle
   Runs or resumes an external_battle_async_registry_v1 queue. The checkpoint
@@ -110,7 +111,8 @@ run_coverage() {
       'oracle_text', c.oracle_text,
       'card_faces_json', c.card_faces_json,
       'set_type', s.type,
-      'is_online_only', s.is_online_only
+      'is_online_only', s.is_online_only,
+      'commander_legality', commander_legality.status
     ) ORDER BY c.name, c.id::text), '[]'::json)
     FROM cards c
     LEFT JOIN LATERAL (
@@ -121,7 +123,13 @@ run_coverage() {
                candidate.updated_at DESC NULLS LAST,
                candidate.code
       LIMIT 1
-    ) s ON true"
+    ) s ON true
+    LEFT JOIN LATERAL (
+      SELECT max(lower(candidate.status)) AS status
+      FROM card_legalities candidate
+      WHERE candidate.card_id = c.id
+        AND lower(candidate.format) = 'commander'
+    ) commander_legality ON true"
 
   "$ROOT_DIR/server/bin/with_new_server_pg.sh" psql -X -A -t \
     -o "$WORK_DIR/native.json" -c \
@@ -178,6 +186,9 @@ run_coverage() {
   jq '{schema_version, generated_at, status, method, summary, family_gates,
        residual: [.ledger[] | select(.covered == false)]}' \
     "$WORK_DIR/global_coverage.json" >"$output_dir/global_residual.json"
+  python3 "$KNOWLEDGE_SCRIPTS/global_residual_terminal_dispositions.py" \
+    --residual "$output_dir/global_residual.json" \
+    --out-prefix "$output_dir/terminal_dispositions"
   jq '{schema_version, generated_at, status, method, summary,
        residual: [.rows[] | select(.operationally_covered == false)]}' \
     "$WORK_DIR/source_catalog_reconciliation.json" \
@@ -186,10 +197,12 @@ run_coverage() {
   jq -n \
     --slurpfile global "$WORK_DIR/global_coverage.json" \
     --slurpfile source "$WORK_DIR/source_catalog_reconciliation.json" \
+    --slurpfile terminal "$output_dir/terminal_dispositions.json" \
     '{schema_version:"global_battle_closure_summary_v1",
       generated_at:($global[0].generated_at),
       global:$global[0].summary,
       source_catalog:$source[0].summary,
+      terminal_dispositions:$terminal[0].summary,
       postgres_mutations:[]}' \
     >"$output_dir/summary.json"
 

@@ -95,6 +95,7 @@ CORE_SUPPORT_BASENAMES = {
     "battle_mana_cost_support.py",
     "battle_replacement_support.py",
     "battle_sba_support.py",
+    "battle_unfinity_sticker_support.py",
     "battle_zone_transition_support.py",
 }
 
@@ -281,6 +282,7 @@ RULE_REGISTRY_BASENAMES = {
     "sync_battle_card_rules_pg.py",
     "backfill_battle_rule_oracle_hashes.py",
     "build_specialize_rule_registry.py",
+    "build_unfinity_sticker_rule_registry.py",
     "test_audit_handcrafted_battle_rule_canonicalization.py",
     "test_audit_multi_rule_runtime_readiness.py",
     "test_battle_rule_registry_runtime_safe.py",

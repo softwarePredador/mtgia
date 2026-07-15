@@ -1,0 +1,481 @@
+{
+  "card_count": 45,
+  "cards": {
+    "A Good Day to Pie": {
+      "card_id": "c970c598-e9ea-43ff-95e6-9edb4ca10a2f",
+      "families": [
+        "sticker_card_specialized_descriptor",
+        "unfinity_ticket_sticker_core"
+      ],
+      "logical_rule_key": "battle_rule_v1:7cea0ab3329b942fa24b1b77ce9156c6",
+      "oracle_hash": "2be3fd92e4894d72dc08a6564f332157",
+      "scryfall_id": "92de7cf0-ac3e-46ae-86b2-7d8ebb0276e4"
+    },
+    "Aerialephant": {
+      "card_id": "ed289762-edde-442b-958b-100ca2bb513a",
+      "families": [
+        "ticket_then_sticker_etb",
+        "unfinity_ticket_sticker_core"
+      ],
+      "logical_rule_key": "battle_rule_v1:fc5eea49049a09eb56c9c996310ae6f4",
+      "oracle_hash": "81466970d68263c055ba135c78d29ba6",
+      "scryfall_id": "20046568-b067-49fb-93b4-2ee86421f14b"
+    },
+    "Ambassador Blorpityblorpboop": {
+      "card_id": "86b47862-7401-4aad-a4da-bbaab2af6a76",
+      "families": [
+        "sticker_card_specialized_descriptor",
+        "ticket_then_sticker_etb",
+        "unfinity_ticket_sticker_core"
+      ],
+      "logical_rule_key": "battle_rule_v1:0522b5375ea29bf522389e71dc36d58d",
+      "oracle_hash": "2004527bf2d2af51ad094c4f2db564de",
+      "scryfall_id": "183a9488-e21f-448b-8b69-e53b56fa0a56"
+    },
+    "Baaallerina": {
+      "card_id": "64f081ca-ede7-434b-b081-ddd6e18721a4",
+      "families": [
+        "name_sticker_etb_and_metric",
+        "sticker_activated_ability",
+        "unfinity_ticket_sticker_core"
+      ],
+      "logical_rule_key": "battle_rule_v1:9d1d3ddf541c99d24a1d2dc551877abf",
+      "oracle_hash": "8dae1115439fc95e14a66aadd2344e98",
+      "scryfall_id": "3bf3e503-0628-4550-84a9-7c1dd0a97457"
+    },
+    "Big Winner": {
+      "card_id": "912b5287-a1ba-4b6c-9803-87c4cbd4338a",
+      "families": [
+        "stickered_permanent_static_keyword",
+        "unfinity_ticket_sticker_core"
+      ],
+      "logical_rule_key": "battle_rule_v1:d82ddb604b19044d7df71abd0d936c6e",
+      "oracle_hash": "eda774224692dd63d7a8c99e88b80e41",
+      "scryfall_id": "b181f5f7-d857-4ed0-996c-bb65b37bfb1b"
+    },
+    "Bioluminary": {
+      "card_id": "6b5e1a88-9cab-40da-a419-344163877b4b",
+      "families": [
+        "sticker_card_specialized_descriptor",
+        "unfinity_ticket_sticker_core"
+      ],
+      "logical_rule_key": "battle_rule_v1:ca609e2d62f250c8d4091ae805c8ad71",
+      "oracle_hash": "3235821aaa881f00bb0f6374bd1d3177",
+      "scryfall_id": "fb8b8c58-7bdc-4daa-b48b-728a26e174dd"
+    },
+    "Carnival Carnivore": {
+      "card_id": "3b908d99-016a-404f-b8f0-c662d11a29d4",
+      "families": [
+        "ticket_then_sticker_etb",
+        "unfinity_ticket_sticker_core"
+      ],
+      "logical_rule_key": "battle_rule_v1:12589f96c42a980e0fe1cc8a483f6561",
+      "oracle_hash": "6e0c9f78156b4be3629312acd62c7068",
+      "scryfall_id": "ba5bc14b-db2c-4561-a6a4-a02443791260"
+    },
+    "Chicken Troupe": {
+      "card_id": "2c310261-5138-4ebb-b554-1c807fe849c2",
+      "families": [
+        "ticket_then_sticker_etb",
+        "unfinity_ticket_sticker_core"
+      ],
+      "logical_rule_key": "battle_rule_v1:f01de10d2bcc68f0de8c8a41166fe9d4",
+      "oracle_hash": "74497dca6a50166927e53ab107753966",
+      "scryfall_id": "68982532-c0c8-477b-9dd4-180c6d22731e"
+    },
+    "Clandestine Chameleon": {
+      "card_id": "c0d5eff6-a44c-4bef-99d1-15ddd9fb7e18",
+      "families": [
+        "sticker_card_specialized_descriptor",
+        "ticket_then_sticker_etb",
+        "unfinity_ticket_sticker_core"
+      ],
+      "logical_rule_key": "battle_rule_v1:e5a553ac44bcbd202d13eaa20079ac8f",
+      "oracle_hash": "773d1fefbb0ba87cfa48d484e840bf17",
+      "scryfall_id": "886e00ab-c694-4839-b3fb-7a72048db4b2"
+    },
+    "Command Performance": {
+      "card_id": "e2fe5dc9-ab0a-44bf-b765-9a6962521b0a",
+      "families": [
+        "sticker_card_specialized_descriptor",
+        "unfinity_ticket_sticker_core"
+      ],
+      "logical_rule_key": "battle_rule_v1:1b24ecc7542cbaa1f6e618b433fc4d36",
+      "oracle_hash": "c4ca814350dd1b4b313a2a0bb501ba31",
+      "scryfall_id": "f6c079cd-69c2-4da4-ba41-91844a4d2f06"
+    },
+    "Croakid Amphibonaut": {
+      "card_id": "7bb41ade-1a89-40c5-9785-6b8c1bb89fd6",
+      "families": [
+        "stickered_permanent_static_keyword",
+        "unfinity_ticket_sticker_core"
+      ],
+      "logical_rule_key": "battle_rule_v1:292983c5e4dcc836c16c1cbdea074ec1",
+      "oracle_hash": "1c2cf416da11ab3f383643e7b417576e",
+      "scryfall_id": "8b1796d2-5b19-48ab-8699-01f45d427498"
+    },
+    "Done for the Day": {
+      "card_id": "2058ed3b-3df8-4f9d-adb3-1cae6671d04d",
+      "families": [
+        "sticker_card_specialized_descriptor",
+        "unfinity_ticket_sticker_core"
+      ],
+      "logical_rule_key": "battle_rule_v1:0ed9d3826ca7f64f23904c499b86ed1f",
+      "oracle_hash": "064b5bf1ea1ec2982545ef918b446b98",
+      "scryfall_id": "2a248d6a-aa83-4e59-848b-46de8204b538"
+    },
+    "Fight the _____ Fight": {
+      "card_id": "8e5c51c6-220a-480e-891f-6864294c90a1",
+      "families": [
+        "name_sticker_etb_and_metric",
+        "sticker_card_specialized_descriptor",
+        "unfinity_ticket_sticker_core"
+      ],
+      "logical_rule_key": "battle_rule_v1:944d1cf46db027fd8793b1909018d092",
+      "oracle_hash": "de0aa5e89c4e17dd1e1a436719017da0",
+      "scryfall_id": "5f589a11-1601-4a17-92d6-58e9dd9b00f2"
+    },
+    "Finishing Move": {
+      "card_id": "a64dca88-fd2e-41ed-84a3-9cb082786f16",
+      "families": [
+        "sticker_card_specialized_descriptor",
+        "unfinity_ticket_sticker_core"
+      ],
+      "logical_rule_key": "battle_rule_v1:23afa702f87ab89c47468d848509cfa6",
+      "oracle_hash": "2ebd8374e827845d35f37aaef2a0151e",
+      "scryfall_id": "d41dc3a5-58e4-444a-b388-5a32ccbed0eb"
+    },
+    "Glitterflitter": {
+      "card_id": "96e36913-a82e-47b6-b1dd-a0a6b193f32f",
+      "families": [
+        "ticket_then_sticker_etb",
+        "unfinity_ticket_sticker_core"
+      ],
+      "logical_rule_key": "battle_rule_v1:7a050554f60fbee52dac71df2fe36694",
+      "oracle_hash": "29ce603db85113df8c486a124a5cfed7",
+      "scryfall_id": "3786047e-f136-49f8-81d6-08beb3f9bcfd"
+    },
+    "Goblin Airbrusher": {
+      "card_id": "797ccb46-4d7d-4949-ae0f-2bb956a53eb1",
+      "families": [
+        "sticker_card_specialized_descriptor",
+        "unfinity_ticket_sticker_core"
+      ],
+      "logical_rule_key": "battle_rule_v1:0cac9737aadcb2eae5542002a9d31095",
+      "oracle_hash": "23f5583d1da91a780b6dd33c14198b21",
+      "scryfall_id": "906881da-6bb3-4a0e-9bd1-d1a5bc484144"
+    },
+    "Grabby Tabby": {
+      "card_id": "7e070682-0d82-4022-aebd-7a941496258a",
+      "families": [
+        "stickered_permanent_static_keyword",
+        "unfinity_ticket_sticker_core"
+      ],
+      "logical_rule_key": "battle_rule_v1:c1b9a01e5d35268343ba388bf81a3b95",
+      "oracle_hash": "4392a9c5ca5115622334e8bc2885048a",
+      "scryfall_id": "67ee367c-e346-48b6-8694-01c8d5f020cb"
+    },
+    "Last Voyage of the _____": {
+      "card_id": "3ab67ca5-9616-471d-8543-6baf1cc9fdcc",
+      "families": [
+        "name_sticker_etb_and_metric",
+        "sticker_card_specialized_descriptor",
+        "unfinity_ticket_sticker_core"
+      ],
+      "logical_rule_key": "battle_rule_v1:e8719b2a39391a429a4470105378a434",
+      "oracle_hash": "5638b89c4b92d24ce3d2e541497a7cb4",
+      "scryfall_id": "54ddf766-b528-488d-9b98-8a101bdb5de9"
+    },
+    "Lineprancers": {
+      "card_id": "9bc16895-5a09-4f23-8a68-ebe8c598624a",
+      "families": [
+        "sticker_activated_ability",
+        "sticker_card_specialized_descriptor",
+        "unfinity_ticket_sticker_core"
+      ],
+      "logical_rule_key": "battle_rule_v1:3bbb4e6cf45581b12d2ce7abc32b9c20",
+      "oracle_hash": "de8a2075e6fb4a518504abda81cca589",
+      "scryfall_id": "71433aef-5a06-449e-93b1-9565cb0afd93"
+    },
+    "Make a _____ Splash": {
+      "card_id": "56996882-c483-4f3c-afe8-77f47e12456f",
+      "families": [
+        "name_sticker_etb_and_metric",
+        "sticker_card_specialized_descriptor",
+        "unfinity_ticket_sticker_core"
+      ],
+      "logical_rule_key": "battle_rule_v1:bb0815b1e93c4b271337890d912e7169",
+      "oracle_hash": "5f4ccd79006d5097dad128ef0f5599b6",
+      "scryfall_id": "fe2601a4-cbd5-4866-92a2-5586f737c9af"
+    },
+    "Minotaur de Force": {
+      "card_id": "d8e04260-a4a3-416d-bace-2f2097032069",
+      "families": [
+        "ticket_then_sticker_etb",
+        "unfinity_ticket_sticker_core"
+      ],
+      "logical_rule_key": "battle_rule_v1:69b0b17ca8e6d0298908ba2832b33587",
+      "oracle_hash": "e7b6ea55c9cd1aa6fe2b532a8e469738",
+      "scryfall_id": "67151297-3d25-4882-b562-56025ee81f48"
+    },
+    "Park Bleater": {
+      "card_id": "707f7f3d-d8a4-4933-97d3-c35ec95cf9c9",
+      "families": [
+        "sticker_activated_ability",
+        "sticker_card_specialized_descriptor",
+        "unfinity_ticket_sticker_core"
+      ],
+      "logical_rule_key": "battle_rule_v1:93d8b150d87922c7e97bcb32e77e5519",
+      "oracle_hash": "b1b71808e7a7bfe1770badc90a9e16b6",
+      "scryfall_id": "02f31e00-646d-4971-8704-1583bbfcddd6"
+    },
+    "Pin Collection": {
+      "card_id": "e98a2c54-977b-4fa1-9bac-bbcdc9b2efad",
+      "families": [
+        "sticker_card_specialized_descriptor",
+        "unfinity_ticket_sticker_core"
+      ],
+      "logical_rule_key": "battle_rule_v1:4f4aeda1755c80b3e9ab145afc559f2b",
+      "oracle_hash": "85b36dfc7d4ee85e823bedc659ad4618",
+      "scryfall_id": "69fedfbb-5d88-4fe0-81e1-1e97a56c6aca"
+    },
+    "Prize Wall": {
+      "card_id": "e407d344-5014-4303-a9bb-438ef366c9c7",
+      "families": [
+        "sticker_activated_ability",
+        "unfinity_ticket_sticker_core"
+      ],
+      "logical_rule_key": "battle_rule_v1:24b1a4335ef2f59ea2d796bf1493cb69",
+      "oracle_hash": "0097098310190af24ab9336aebf5c9f6",
+      "scryfall_id": "41b05346-8531-4086-96a5-e973aff150cb"
+    },
+    "Proficient Pyrodancer": {
+      "card_id": "66c3d581-ce5d-495b-b95c-bbeea614eea2",
+      "families": [
+        "sticker_activated_ability",
+        "sticker_card_specialized_descriptor",
+        "unfinity_ticket_sticker_core"
+      ],
+      "logical_rule_key": "battle_rule_v1:2aa9643eb7960a3c2d95fc11478cf0a3",
+      "oracle_hash": "5f8de52d537fbfb8675d6ab44422156e",
+      "scryfall_id": "ddd3f530-1ea4-4b1e-9f9b-5d34fa626529"
+    },
+    "Robo-Pi\u00f1ata": {
+      "card_id": "dbba61cb-612d-4cf1-844e-fff5b34e1c00",
+      "families": [
+        "sticker_card_specialized_descriptor",
+        "unfinity_ticket_sticker_core"
+      ],
+      "logical_rule_key": "battle_rule_v1:f20bb5fbc7cf81dd72fa6050c790a298",
+      "oracle_hash": "47971c56f4e7dcf3e98f76ec2433bb5b",
+      "scryfall_id": "9ce17fde-71ec-482a-b9f9-78681bc894d8"
+    },
+    "Roxi, Publicist to the Stars": {
+      "card_id": "a3726939-29c4-451c-8c5a-3634a78d1f8b",
+      "families": [
+        "sticker_card_specialized_descriptor",
+        "unfinity_ticket_sticker_core"
+      ],
+      "logical_rule_key": "battle_rule_v1:6fdf243104ff34baaf5371aeddcc5191",
+      "oracle_hash": "9863adfdd0ca4b8f0cf7af7eff23f4d8",
+      "scryfall_id": "5e24a352-7c90-458b-9bb2-bd4bc22bc748"
+    },
+    "Sanguine Sipper": {
+      "card_id": "3a190638-af1d-41f7-b7f1-d9e5ba6de3a7",
+      "families": [
+        "stickered_permanent_static_keyword",
+        "unfinity_ticket_sticker_core"
+      ],
+      "logical_rule_key": "battle_rule_v1:b5f3e9d11f8126fd18f5f3af5ec8be72",
+      "oracle_hash": "63f269422ebcc64881c8a3c31e5c9753",
+      "scryfall_id": "ea787e29-5e24-4136-bdf6-bee338899e34"
+    },
+    "Scampire": {
+      "card_id": "26228457-8922-490d-a925-54c213a6c6d2",
+      "families": [
+        "sticker_activated_ability",
+        "sticker_card_specialized_descriptor",
+        "unfinity_ticket_sticker_core"
+      ],
+      "logical_rule_key": "battle_rule_v1:bc7350cb6f5e172fda5a001fe1127a01",
+      "oracle_hash": "cdd1958fb2445f3371598266bc55a6fb",
+      "scryfall_id": "64dbed80-b3a2-4a0f-afe4-c3d968173e50"
+    },
+    "Scared Stiff": {
+      "card_id": "61dcae7c-4dd5-414c-81c5-7feb97a4d8e0",
+      "families": [
+        "stickered_permanent_static_keyword",
+        "unfinity_ticket_sticker_core"
+      ],
+      "logical_rule_key": "battle_rule_v1:29255ebbcc4b777c591f3031dc7998c5",
+      "oracle_hash": "5d9307daacf9f045cadec061cc8ff726",
+      "scryfall_id": "4a5d8acd-a460-43b2-816a-70f61d7831af"
+    },
+    "Stiltstrider": {
+      "card_id": "e9434875-18bf-4c7b-9425-eb98c6919b73",
+      "families": [
+        "ticket_then_sticker_etb",
+        "unfinity_ticket_sticker_core"
+      ],
+      "logical_rule_key": "battle_rule_v1:a082b8bb98b1eac56928473252f0c0b6",
+      "oracle_hash": "d51e9cd05b801bbb5bf65cb273766241",
+      "scryfall_id": "9c0d7d7d-5513-4e2b-b834-1ff999ab24f5"
+    },
+    "Sword-Swallowing Seraph": {
+      "card_id": "787979a1-fa15-49f2-a1af-c5b0d2ca2df6",
+      "families": [
+        "sticker_activated_ability",
+        "sticker_card_specialized_descriptor",
+        "unfinity_ticket_sticker_core"
+      ],
+      "logical_rule_key": "battle_rule_v1:c381822527468cdc45faef1fc6def018",
+      "oracle_hash": "84eee3533d98b90ebbb6b0a409e62ab6",
+      "scryfall_id": "01efde9a-a20d-4972-b17f-c2d9eb024b0b"
+    },
+    "Ticketomaton": {
+      "card_id": "030be7a6-a74b-4c16-9c7e-e90fcd950021",
+      "families": [
+        "ticket_then_sticker_etb",
+        "unfinity_ticket_sticker_core"
+      ],
+      "logical_rule_key": "battle_rule_v1:34b87224f9b477f1b0fdc2d08960ee48",
+      "oracle_hash": "67443431b759a4b354aab534c38b8f39",
+      "scryfall_id": "dc8290d7-83b0-49ef-b0de-7ebb3633a149"
+    },
+    "Tusk and Whiskers": {
+      "card_id": "b2a9ec26-26e9-4cb6-9601-5943afe5b411",
+      "families": [
+        "sticker_activated_ability",
+        "sticker_card_specialized_descriptor",
+        "unfinity_ticket_sticker_core"
+      ],
+      "logical_rule_key": "battle_rule_v1:04cf9802cd3596efb371a37cf3ee02f3",
+      "oracle_hash": "84e0db429c54fbddb8768ec9328d48c7",
+      "scryfall_id": "de45de7e-5bba-4612-8bb7-755710d93ecf"
+    },
+    "Unlawful Entry": {
+      "card_id": "553fc4fd-2cc0-4e8b-99f0-942467b2cc68",
+      "families": [
+        "sticker_card_specialized_descriptor",
+        "unfinity_ticket_sticker_core"
+      ],
+      "logical_rule_key": "battle_rule_v1:ad4ae75d751910eee0bb98e28aa7f98a",
+      "oracle_hash": "b15b337e3ca00e43b6e605193070132c",
+      "scryfall_id": "898ee071-dd37-4a02-895d-a41b568d7eef"
+    },
+    "Wee Champion": {
+      "card_id": "1cc136b4-a176-42a7-b9f1-3497e6b6c957",
+      "families": [
+        "sticker_card_specialized_descriptor",
+        "unfinity_ticket_sticker_core"
+      ],
+      "logical_rule_key": "battle_rule_v1:491d3cc0b1110a1a99154a8db4d949c7",
+      "oracle_hash": "4853277a8ff7dbddeee0813ec3b041ec",
+      "scryfall_id": "ad8b90c0-4c66-4fc6-a749-cd10e6deabdb"
+    },
+    "Wicker Picker": {
+      "card_id": "eeb2bb31-db04-491e-9ae8-26f2d71786bc",
+      "families": [
+        "sticker_card_specialized_descriptor",
+        "unfinity_ticket_sticker_core"
+      ],
+      "logical_rule_key": "battle_rule_v1:331e8291287f1ca06fee7cdbe2c01885",
+      "oracle_hash": "492d5e5cbfe55ba40e0e1758e63dc140",
+      "scryfall_id": "15a71d11-da00-4c1a-bf64-ec3f627ed6a3"
+    },
+    "Wizards of the _____": {
+      "card_id": "d72eb852-d151-4e0c-b9ed-5ecb1d2ff81f",
+      "families": [
+        "name_sticker_etb_and_metric",
+        "unfinity_ticket_sticker_core"
+      ],
+      "logical_rule_key": "battle_rule_v1:0805c2e27fce01447b58c866e5872874",
+      "oracle_hash": "46ac3cc8ca3747c0e033752231394dcf",
+      "scryfall_id": "786b0b50-adc7-4d58-b578-1e80680b89bd"
+    },
+    "Wolf in _____ Clothing": {
+      "card_id": "e951b429-93fd-4903-95fe-70e2fd237a98",
+      "families": [
+        "name_sticker_etb_and_metric",
+        "unfinity_ticket_sticker_core"
+      ],
+      "logical_rule_key": "battle_rule_v1:ba91674422157349d191214d90f6b0ad",
+      "oracle_hash": "4044f2833295bd33cf94220628864bc6",
+      "scryfall_id": "58c9454b-7027-48f4-9e17-310e27b916d1"
+    },
+    "_____ Balls of Fire": {
+      "card_id": "55be37fc-2181-4b75-bb25-08f3cc8f90e0",
+      "families": [
+        "name_sticker_etb_and_metric",
+        "sticker_card_specialized_descriptor",
+        "unfinity_ticket_sticker_core"
+      ],
+      "logical_rule_key": "battle_rule_v1:496ae851c0943488cece942db59fc670",
+      "oracle_hash": "5a58024659730070247c6bef4f8a9bd4",
+      "scryfall_id": "82c2a58b-0ee2-454b-9ddd-670c1e788166"
+    },
+    "_____ Bird Gets the Worm": {
+      "card_id": "31dd2b4b-f950-469b-8961-1277da9507fa",
+      "families": [
+        "name_sticker_etb_and_metric",
+        "unfinity_ticket_sticker_core"
+      ],
+      "logical_rule_key": "battle_rule_v1:551e1d19040834a88f1b9238ebb1bdfc",
+      "oracle_hash": "7169dc882ca77d588c4101691e8cf73c",
+      "scryfall_id": "2ce375c8-7c37-40b3-95cf-e0aa958bb317"
+    },
+    "_____ _____ Rocketship": {
+      "card_id": "4c26a57d-3e34-4223-8d77-ae5c8f79d916",
+      "families": [
+        "name_sticker_etb_and_metric",
+        "sticker_card_specialized_descriptor",
+        "unfinity_ticket_sticker_core"
+      ],
+      "logical_rule_key": "battle_rule_v1:98434e3138553cadf6f6d647c5cfe8b2",
+      "oracle_hash": "9de4220d0d0be975fb3560f0704e10ba",
+      "scryfall_id": "1009f979-b1fa-4427-bf9e-2a533a4ca19b"
+    },
+    "_____ _____ _____ Trespasser": {
+      "card_id": "c9f57fdf-5c2e-482d-9fa3-87ce6335800e",
+      "families": [
+        "name_sticker_etb_and_metric",
+        "sticker_activated_ability",
+        "unfinity_ticket_sticker_core"
+      ],
+      "logical_rule_key": "battle_rule_v1:8f86f2fd804505ffa652ac2f819ed215",
+      "oracle_hash": "0b4ac5be930252b598022513ea4d25e1",
+      "scryfall_id": "75854e14-5f15-443d-b342-b27fc3ab4b6e"
+    },
+    "_____-o-saurus": {
+      "card_id": "f78fc90f-ca89-48cd-b83a-f41e62d8ceaa",
+      "families": [
+        "name_sticker_etb_and_metric",
+        "unfinity_ticket_sticker_core"
+      ],
+      "logical_rule_key": "battle_rule_v1:c034ef899044110b06256d93d2d3cc91",
+      "oracle_hash": "d4b75c7b122b745b5a72380b3e99b277",
+      "scryfall_id": "32921952-8846-418d-8689-c42dbc24a7b8"
+    },
+    "________ Goblin": {
+      "card_id": "4da0940d-452f-4021-847f-274aee95774d",
+      "families": [
+        "name_sticker_etb_and_metric",
+        "unfinity_ticket_sticker_core"
+      ],
+      "logical_rule_key": "battle_rule_v1:95d9526d34bbf83d5265bd63d5e99138",
+      "oracle_hash": "14532d873e8f7ce4da451a032221f02c",
+      "scryfall_id": "88222fd2-8316-426c-8218-64f6be5ca0f8"
+    }
+  },
+  "family_counts": {
+    "name_sticker_etb_and_metric": 12,
+    "sticker_activated_ability": 9,
+    "sticker_card_specialized_descriptor": 25,
+    "stickered_permanent_static_keyword": 5,
+    "ticket_then_sticker_etb": 9,
+    "unfinity_ticket_sticker_core": 45
+  },
+  "mechanic_contract": "CR 123 stickers, CR 717 Attractions, and Unfinity ticket costs executed by shared family descriptors.",
+  "schema_version": 1,
+  "source": "PostgreSQL cards mirrored through Hermes card_oracle_cache"
+}

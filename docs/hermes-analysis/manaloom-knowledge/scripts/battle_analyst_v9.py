@@ -97,6 +97,7 @@ from battle_sba_support import (
     check_sbas_until_stable as _check_sbas_until_stable,
     check_token_lifecycle as _check_token_lifecycle,
 )
+import battle_unfinity_sticker_support as unfinity_stickers
 
 try:
     import battle_rule_registry
@@ -14352,6 +14353,1164 @@ def apply_loss_replacement(player, *, reason, **details):
     return True
 
 
+DEFAULT_UNFINITY_ATTRACTIONS = (
+    "Costume Shop",
+    "Balloon Stand",
+    "Bounce Chamber",
+    "Bumper Cars",
+    "Clown Extruder",
+    "Concession Stand",
+    "Cover the Spot",
+    "Dart Throw",
+    "Drop Tower",
+    "Ferris Wheel",
+)
+
+
+def grant_unfinity_tickets(player, amount, source, *, turn=None, phase=None, trigger=None):
+    amount = max(0, int(amount or 0))
+    if amount <= 0:
+        return 0
+    before = int(getattr(player, "tickets", 0) or 0)
+    player.tickets = before + amount
+    emit_replay_event(
+        "ticket_counters_changed",
+        player=getattr(player, "name", "?"),
+        card=source.get("name", "?") if isinstance(source, dict) else str(source),
+        ticket_delta=amount,
+        tickets_before=before,
+        tickets_after=player.tickets,
+        trigger=trigger,
+        turn=turn,
+        phase=phase,
+        **replay_rule_fields(source if isinstance(source, dict) else {}),
+    )
+    return amount
+
+
+def unfinity_owned_sticker_targets(player, target_kind="nonland_permanent", *, exclude=None):
+    target_kind = str(target_kind or "nonland_permanent").strip().lower()
+    if target_kind == "graveyard_creature":
+        return [
+            card
+            for card in list(getattr(player, "graveyard", []) or [])
+            if isinstance(card, dict) and is_creature_card(card)
+        ]
+    values = []
+    for permanent in list(getattr(player, "battlefield", []) or []):
+        if not isinstance(permanent, dict) or permanent is exclude:
+            continue
+        if target_kind in {"nonland_permanent", "any"} and is_effective_land(permanent):
+            continue
+        if target_kind == "creature" and not is_battlefield_creature(permanent):
+            continue
+        values.append(permanent)
+    return values
+
+
+def _unfinity_best_target(values, *, prefer_stickered=False):
+    candidates = [value for value in values if isinstance(value, dict)]
+    if not candidates:
+        return None
+    return max(
+        candidates,
+        key=lambda card: (
+            1 if prefer_stickered and unfinity_stickers.is_stickered(card) else 0,
+            1 if is_battlefield_creature(card) else 0,
+            card_power_value(card, default=0) + int(float(card.get("toughness") or 0)),
+            str(card.get("name") or ""),
+        ),
+    )
+
+
+def _unfinity_attachment_source_key(source):
+    if not isinstance(source, dict):
+        return "unfinity_attachment"
+    return str(
+        source.get("_rule_logical_key")
+        or source.get("logical_rule_key")
+        or source.get("name")
+        or "unfinity_attachment"
+    )
+
+
+def _refresh_unfinity_equipment_sticker_inheritance(target, source):
+    source_key = _unfinity_attachment_source_key(source)
+    stickers = unfinity_stickers.stickers_on(source, "ability")
+    keywords = {
+        str(keyword).strip().lower().replace(" ", "_")
+        for sticker in stickers
+        for keyword in sticker.get("keywords") or []
+        if str(keyword).strip()
+    }
+    inherited = target.setdefault("_unfinity_equipment_sticker_inheritance", {})
+    inherited[source_key] = sorted(keywords)
+    original = target.setdefault("_unfinity_equipment_keyword_original", {})
+    active_keywords = {
+        keyword
+        for values in inherited.values()
+        for keyword in values or []
+    }
+    known_keywords = set(original) | active_keywords
+    for keyword in known_keywords:
+        original.setdefault(keyword, target.get(keyword))
+        if keyword in active_keywords:
+            target[keyword] = True
+        elif original.get(keyword) is None:
+            target.pop(keyword, None)
+        else:
+            target[keyword] = original[keyword]
+    ability_texts = target.setdefault("_unfinity_equipment_ability_sticker_texts", {})
+    ability_texts[source_key] = [str(sticker.get("text") or "") for sticker in stickers]
+    target["inherited_ability_sticker_texts"] = sorted(
+        {
+            text
+            for values in ability_texts.values()
+            for text in values or []
+            if text
+        }
+    )
+
+
+def _remove_unfinity_attachment_state(target, source):
+    if not isinstance(target, dict) or not isinstance(source, dict):
+        return
+    source_key = _unfinity_attachment_source_key(source)
+    modifier_map = target.get("_attachment_static_pt_modifiers") or {}
+    modifier = modifier_map.pop(source_key, None)
+    if isinstance(modifier, dict):
+        target["power"] = card_power_value(target, default=0) - int(modifier.get("power") or 0)
+        target["toughness"] = int(float(target.get("toughness") or 0)) - int(
+            modifier.get("toughness") or 0
+        )
+    target["attachment_static_power_toughness_sources"] = [
+        entry.get("source")
+        for entry in modifier_map.values()
+        if isinstance(entry, dict) and entry.get("source")
+    ]
+    inherited = target.get("_unfinity_equipment_sticker_inheritance") or {}
+    inherited.pop(source_key, None)
+    ability_texts = target.get("_unfinity_equipment_ability_sticker_texts") or {}
+    ability_texts.pop(source_key, None)
+    original = target.get("_unfinity_equipment_keyword_original") or {}
+    active_keywords = {
+        keyword
+        for values in inherited.values()
+        for keyword in values or []
+    }
+    for keyword, original_value in list(original.items()):
+        if keyword in active_keywords:
+            target[keyword] = True
+        elif original_value is None:
+            target.pop(keyword, None)
+        else:
+            target[keyword] = original_value
+    target["inherited_ability_sticker_texts"] = sorted(
+        {
+            text
+            for values in ability_texts.values()
+            for text in values or []
+            if text
+        }
+    )
+
+
+def resolve_unfinity_attachment_leave(owner, source, destination, *, all_players=None):
+    if destination in {None, "none", "battlefield"} or not isinstance(source, dict):
+        return False
+    target = source.get("attached_to_object")
+    if not isinstance(target, dict):
+        target_name = str(source.get("attached_to") or "")
+        target = next(
+            (
+                permanent
+                for permanent in getattr(owner, "battlefield", []) or []
+                if isinstance(permanent, dict) and str(permanent.get("name") or "") == target_name
+            ),
+            None,
+        )
+    if not isinstance(target, dict):
+        return False
+    _remove_unfinity_attachment_state(target, source)
+    sacrificed = False
+    if (
+        source.get("sacrifice_attached_creature_when_source_leaves")
+        and target in getattr(owner, "battlefield", [])
+    ):
+        move_creature_from_battlefield(
+            owner,
+            target,
+            reason="attached_unfinity_aura_left_battlefield",
+            source=source,
+            all_players=all_players or _table_players_for(owner),
+        )
+        sacrificed = True
+    emit_replay_event(
+        "unfinity_attachment_left_battlefield",
+        player=getattr(owner, "name", "?"),
+        card=source.get("name", "?"),
+        attached_to=target.get("name", "?"),
+        destination=destination,
+        attached_creature_sacrificed=sacrificed,
+        turn=CURRENT_REPLAY_TURN,
+        **replay_rule_fields(source),
+    )
+    return True
+
+
+def refresh_unfinity_sticker_static_state(player, *, turn=None, phase=None):
+    battlefield = [
+        permanent
+        for permanent in list(getattr(player, "battlefield", []) or [])
+        if isinstance(permanent, dict)
+    ]
+    public_cards = battlefield + [
+        card
+        for card in list(getattr(player, "graveyard", []) or [])
+        if isinstance(card, dict)
+    ]
+    controls_stickered = any(unfinity_stickers.is_stickered(card) for card in battlefield)
+    art_sticker_count = sum(
+        1 for card in public_cards if unfinity_stickers.has_sticker_kind(card, "art")
+    )
+    pt_power, pt_toughness = unfinity_stickers.power_toughness_sticker_totals(battlefield)
+    refreshed = []
+    for permanent in battlefield:
+        conditional_keyword = str(
+            permanent.get("conditional_keyword_if_control_stickered") or ""
+        ).strip().lower().replace(" ", "_")
+        if conditional_keyword:
+            originals = permanent.setdefault("_unfinity_conditional_keyword_original", {})
+            originals.setdefault(conditional_keyword, permanent.get(conditional_keyword))
+            if controls_stickered:
+                permanent[conditional_keyword] = True
+            elif originals.get(conditional_keyword) is None:
+                permanent.pop(conditional_keyword, None)
+            else:
+                permanent[conditional_keyword] = originals[conditional_keyword]
+        if permanent.get("base_pt_from_controlled_pt_stickers") and (pt_power or pt_toughness):
+            permanent["power"] = pt_power
+            permanent["toughness"] = pt_toughness
+        if permanent.get("power_from_art_stickered_public_cards"):
+            permanent["power"] = art_sticker_count
+        if permanent.get("inherits_owned_ability_sticker_keywords"):
+            inherited = {
+                str(keyword).strip().lower().replace(" ", "_")
+                for card in public_cards
+                for sticker in unfinity_stickers.stickers_on(card, "ability")
+                for keyword in sticker.get("keywords") or []
+            }
+            originals = permanent.setdefault("_unfinity_inherited_keyword_original", {})
+            old_inherited = set(permanent.get("_unfinity_inherited_sticker_keywords") or [])
+            for keyword in old_inherited | inherited:
+                originals.setdefault(keyword, permanent.get(keyword))
+            for keyword in old_inherited - inherited:
+                if originals.get(keyword) is None:
+                    permanent.pop(keyword, None)
+                else:
+                    permanent[keyword] = originals[keyword]
+            for keyword in inherited:
+                permanent[keyword] = True
+            permanent["_unfinity_inherited_sticker_keywords"] = sorted(inherited)
+            permanent["inherited_ability_sticker_texts"] = sorted(
+                {
+                    str(sticker.get("text") or "")
+                    for card in public_cards
+                    for sticker in unfinity_stickers.stickers_on(card, "ability")
+                    if str(sticker.get("text") or "")
+                }
+            )
+        attached_target = permanent.get("attached_to_object")
+        if isinstance(attached_target, dict):
+            metric = str(permanent.get("attached_name_sticker_metric") or "")
+            power_per_match = int(permanent.get("attached_name_sticker_power_per_match") or 0)
+            toughness_per_match = int(
+                permanent.get("attached_name_sticker_toughness_per_match") or 0
+            )
+            if metric and (power_per_match or toughness_per_match):
+                matches = unfinity_stickers.name_sticker_metric(permanent, metric)
+                apply_attachment_static_pt_modifier(
+                    attached_target,
+                    permanent,
+                    permanent,
+                    power_per_match * matches,
+                    toughness_per_match * matches,
+                )
+            if permanent.get("equipment_inherits_ability_stickers"):
+                _refresh_unfinity_equipment_sticker_inheritance(attached_target, permanent)
+        refreshed.append(
+            {
+                "card": permanent.get("name", "?"),
+                "stickered": unfinity_stickers.is_stickered(permanent),
+                "conditional_keyword": conditional_keyword or None,
+            }
+        )
+    return refreshed
+
+
+def process_unfinity_sticker_placement_triggers(
+    player,
+    opponents,
+    source,
+    target,
+    sticker,
+    *,
+    turn=None,
+    phase=None,
+):
+    kind = str(sticker.get("kind") or "")
+    for permanent in list(getattr(player, "battlefield", []) or []):
+        if not isinstance(permanent, dict):
+            continue
+        trigger_kind = str(permanent.get("sticker_placement_trigger_kind") or "any")
+        if trigger_kind not in {"", "any", kind}:
+            continue
+        trigger_effect = str(permanent.get("sticker_placement_trigger_effect") or "")
+        if not trigger_effect:
+            continue
+        if permanent.get("sticker_placement_trigger_source_only") and permanent is not target:
+            continue
+        result = {}
+        if trigger_effect == "create_treasure":
+            count = int(
+                permanent.get("art_sticker_treasure_count")
+                if kind == "art"
+                else permanent.get("sticker_treasure_count")
+                or 1
+            )
+            before = player.treasures
+            player.treasures += max(0, count)
+            result = {
+                "treasures_created": max(0, count),
+                "treasures_before": before,
+                "treasures_after": player.treasures,
+            }
+        elif trigger_effect == "source_pump_or_counter":
+            if kind == "art":
+                add_plus_one_counters(permanent, 1)
+                result = {"plus_one_counters_added": 1}
+            else:
+                set_until_eot(permanent, "power", card_power_value(permanent, default=0) + 1)
+                set_until_eot(
+                    permanent,
+                    "toughness",
+                    int(float(permanent.get("toughness") or 0)) + 1,
+                )
+                result = {"power_bonus_until_eot": 1, "toughness_bonus_until_eot": 1}
+        elif trigger_effect == "add_counter_to_stickered_creature":
+            if is_battlefield_creature(target):
+                add_plus_one_counters(target, 1)
+                result = {"plus_one_counters_added": 1, "target": target.get("name", "?")}
+        elif trigger_effect == "damage_any_target_from_name_metric":
+            amount = unfinity_stickers.name_sticker_metric(
+                permanent,
+                str(permanent.get("sticker_trigger_metric") or "letter_o"),
+            )
+            damaged = next((opponent for opponent in opponents or [] if opponent.is_alive()), None)
+            if damaged is not None and amount > 0:
+                deal_damage_to_player_with_static_replacements(
+                    player,
+                    damaged,
+                    permanent,
+                    amount,
+                    turn=turn,
+                    phase=phase,
+                )
+            result = {"damage": amount, "target_player": getattr(damaged, "name", None)}
+        elif trigger_effect == "tap_opponent_creatures_from_name_metric":
+            amount = unfinity_stickers.name_sticker_metric(
+                permanent,
+                str(permanent.get("sticker_trigger_metric") or "letter_u"),
+            )
+            targets = [
+                creature
+                for opponent in opponents or []
+                for creature in getattr(opponent, "battlefield", []) or []
+                if is_battlefield_creature(creature) and not creature.get("tapped")
+            ][:amount]
+            for creature in targets:
+                creature["tapped"] = True
+            result = {
+                "tapped_count": len(targets),
+                "targets": [card.get("name", "?") for card in targets],
+            }
+        emit_replay_event(
+            "sticker_placement_trigger_resolved",
+            player=getattr(player, "name", "?"),
+            card=permanent.get("name", "?"),
+            trigger_effect=trigger_effect,
+            sticker_kind=kind,
+            sticker_target=target.get("name", "?"),
+            result=result,
+            turn=turn,
+            phase=phase,
+            **replay_rule_fields(permanent),
+        )
+
+    if kind in {"name", "art"} and is_battlefield_creature(target):
+        for graveyard_card in list(getattr(player, "graveyard", []) or []):
+            if not isinstance(graveyard_card, dict):
+                continue
+            graveyard_effect = get_card_effect(graveyard_card)
+            if str(graveyard_effect.get("return_from_graveyard_on_sticker_kind") or "") != kind:
+                continue
+            player.graveyard.remove(graveyard_card)
+            player.hand.append(graveyard_card)
+            emit_replay_event(
+                "sticker_graveyard_return_trigger_resolved",
+                player=getattr(player, "name", "?"),
+                card=graveyard_card.get("name", "?"),
+                sticker_kind=kind,
+                sticker_target=target.get("name", "?"),
+                destination="hand",
+                turn=turn,
+                phase=phase,
+                **replay_rule_fields(graveyard_effect),
+            )
+    for participant in [player, *list(opponents or [])]:
+        refresh_unfinity_sticker_static_state(participant, turn=turn, phase=phase)
+
+
+def place_unfinity_sticker(
+    player,
+    opponents,
+    source,
+    *,
+    target=None,
+    target_kind="nonland_permanent",
+    kind="any",
+    metric=None,
+    max_ticket_cost=None,
+    without_paying=False,
+    turn=None,
+    phase=None,
+    rng=None,
+):
+    state = unfinity_stickers.ensure_sticker_state(player, rng)
+    if target is None:
+        target = _unfinity_best_target(unfinity_owned_sticker_targets(player, target_kind))
+    if target is None:
+        emit_replay_event(
+            "sticker_placement_skipped",
+            player=getattr(player, "name", "?"),
+            card=source.get("name", "?") if isinstance(source, dict) else str(source),
+            reason="no_owned_legal_target",
+            target_kind=target_kind,
+            sticker_kind=kind,
+            turn=turn,
+            phase=phase,
+            **replay_rule_fields(source if isinstance(source, dict) else {}),
+        )
+        return None
+    tickets_before = int(getattr(player, "tickets", 0) or 0)
+    sticker = unfinity_stickers.place_sticker(
+        player,
+        target,
+        kind=kind,
+        metric=metric,
+        max_ticket_cost=max_ticket_cost,
+        without_paying=without_paying,
+    )
+    if sticker is None:
+        return None
+    emit_replay_event(
+        "sticker_placed",
+        player=getattr(player, "name", "?"),
+        card=source.get("name", "?") if isinstance(source, dict) else str(source),
+        target=target.get("name", "?"),
+        target_zone="graveyard" if target in getattr(player, "graveyard", []) else "battlefield",
+        sticker_kind=sticker.get("kind"),
+        sticker_text=sticker.get("text"),
+        sticker_sheet=sticker.get("sheet_name"),
+        ticket_cost=int(sticker.get("ticket_cost") or 0),
+        tickets_before=tickets_before,
+        tickets_after=int(getattr(player, "tickets", 0) or 0),
+        supplemental_sheet_count=state.get("sheet_count"),
+        active_sheet_count=state.get("active_sheet_count"),
+        turn=turn,
+        phase=phase,
+        **replay_rule_fields(source if isinstance(source, dict) else {}),
+    )
+    process_unfinity_sticker_placement_triggers(
+        player,
+        opponents,
+        source,
+        target,
+        sticker,
+        turn=turn,
+        phase=phase,
+    )
+    return {"target": target, "sticker": sticker}
+
+
+def resolve_unfinity_sticker_etb(
+    player,
+    opponents,
+    permanent,
+    effect_data,
+    turn,
+    rng,
+    *,
+    all_players=None,
+    phase="battlefield_etb",
+):
+    if not effect_data.get("unfinity_sticker_runtime"):
+        return []
+    results = []
+    ticket_count = int(effect_data.get("etb_ticket_count") or 0)
+    if ticket_count:
+        grant_unfinity_tickets(
+            player,
+            ticket_count,
+            permanent,
+            turn=turn,
+            phase=phase,
+            trigger="enters_battlefield",
+        )
+    sticker_count = max(0, int(effect_data.get("etb_sticker_count") or 0))
+    for _ in range(sticker_count):
+        target_kind = effect_data.get("etb_sticker_target") or "nonland_permanent"
+        target = permanent if target_kind == "self" else None
+        max_ticket_cost = effect_data.get("etb_sticker_max_ticket_cost")
+        if effect_data.get("etb_sticker_max_ticket_cost_source") == "x_value":
+            max_ticket_cost = int(effect_data.get("x_value") or permanent.get("x_value") or 0)
+        placement = place_unfinity_sticker(
+            player,
+            opponents,
+            permanent,
+            target=target,
+            target_kind=target_kind,
+            kind=effect_data.get("etb_sticker_kind") or "any",
+            metric=effect_data.get("etb_sticker_metric"),
+            max_ticket_cost=max_ticket_cost,
+            without_paying=bool(effect_data.get("etb_sticker_without_paying")),
+            turn=turn,
+            phase=phase,
+            rng=rng,
+        )
+        if placement:
+            results.append(placement)
+    if results and effect_data.get("etb_after_sticker_effect"):
+        latest_target = results[-1]["target"]
+        metric = str(effect_data.get("etb_after_sticker_metric") or "unique_vowels")
+        amount = unfinity_stickers.name_sticker_metric(latest_target, metric)
+        after_effect = str(effect_data.get("etb_after_sticker_effect") or "")
+        if after_effect == "gain_life_metric":
+            gain_life(player, amount, cap=999)
+        elif after_effect == "add_red_mana_metric":
+            player.mana_pool.add("red", amount)
+        elif after_effect == "add_plus_one_counters_metric":
+            add_plus_one_counters(latest_target, amount)
+        elif after_effect == "draw_one_if_metric" and amount > 0:
+            player.draw(1, rng, phase=phase)
+        elif after_effect == "opponent_creatures_minus_one_metric":
+            targets = [
+                creature
+                for opponent in opponents or []
+                for creature in getattr(opponent, "battlefield", []) or []
+                if is_battlefield_creature(creature)
+            ][:amount]
+            for creature in targets:
+                set_until_eot(creature, "power", card_power_value(creature, default=0) - 1)
+                set_until_eot(
+                    creature,
+                    "toughness",
+                    int(float(creature.get("toughness") or 0)) - 1,
+                )
+        emit_replay_event(
+            "unfinity_sticker_etb_followup_resolved",
+            player=getattr(player, "name", "?"),
+            card=permanent.get("name", "?"),
+            effect=after_effect,
+            metric=metric,
+            amount=amount,
+            turn=turn,
+            phase=phase,
+            **replay_rule_fields(effect_data),
+        )
+    if effect_data.get("etb_reanimate_creature_attach_self"):
+        target = _unfinity_best_target(
+            [
+                card
+                for card in list(getattr(player, "graveyard", []) or [])
+                if isinstance(card, dict) and is_creature_card(card)
+            ]
+        )
+        if target is not None:
+            player.graveyard.remove(target)
+            returned = prepare_entering_permanent(enrich_card(target), controller=player, all_players=all_players, turn=turn)
+            player.battlefield.append(returned)
+            permanent["attached_to"] = returned.get("name")
+            permanent["attached_to_object"] = returned
+            bonus = int(permanent.get("attached_name_sticker_power_per_match") or 0) * (
+                unfinity_stickers.name_sticker_metric(
+                    permanent,
+                    str(permanent.get("attached_name_sticker_metric") or "length_at_most_7"),
+                )
+            )
+            returned["last_voyage_attachment_power_bonus"] = bonus
+            emit_replay_event(
+                "unfinity_reanimate_attachment_resolved",
+                player=getattr(player, "name", "?"),
+                card=permanent.get("name", "?"),
+                returned=returned.get("name", "?"),
+                power_bonus=bonus,
+                turn=turn,
+                phase=phase,
+                **replay_rule_fields(effect_data),
+            )
+    if effect_data.get("etb_name_sticker_fight"):
+        own = _unfinity_best_target(
+            [
+                creature
+                for creature in unfinity_owned_sticker_targets(player, "creature")
+                if creature is not permanent
+            ]
+        )
+        opposing = _unfinity_best_target(
+            [
+                creature
+                for opponent in opponents or []
+                for creature in getattr(opponent, "battlefield", []) or []
+                if is_battlefield_creature(creature)
+            ]
+        )
+        if own is not None:
+            permanent["attached_to"] = own.get("name")
+            permanent["attached_to_object"] = own
+        if own is not None and opposing is not None:
+            mark_permanent_dealt_damage_this_turn(opposing, card_power_value(own, default=0), turn)
+            mark_permanent_dealt_damage_this_turn(own, card_power_value(opposing, default=0), turn)
+    refresh_unfinity_sticker_static_state(player, turn=turn, phase=phase)
+    return results
+
+
+def ensure_unfinity_attraction_deck(player, rng):
+    if getattr(player, "attraction_deck", None):
+        return player.attraction_deck
+    values = [
+        {
+            "name": name,
+            "type_line": "Artifact - Attraction",
+            "effect": "passive",
+            "attraction": True,
+            "attraction_lights": [2, 3, 6] if name == "Costume Shop" else [2, 4, 6],
+            "visit_effect": "place_sticker" if name == "Costume Shop" else "compact_attraction_value",
+        }
+        for name in DEFAULT_UNFINITY_ATTRACTIONS
+    ]
+    (rng or random.Random(0)).shuffle(values)
+    player.attraction_deck = values
+    return player.attraction_deck
+
+
+def resolve_unfinity_sticker_spell(player, opponents, card, effect_data, turn, rng, *, phase=None):
+    if not effect_data.get("unfinity_sticker_spell"):
+        return False
+    modes = list(effect_data.get("unfinity_spell_modes") or [])
+    mode_count = max(0, int(effect_data.get("unfinity_mode_count") or len(modes)))
+    if effect_data.get("choose_distinct_modes"):
+        priority = {
+            "get_tickets": 0,
+            "place_sticker": 1,
+            "open_attraction": 2,
+            "visit_attractions": 3,
+        }
+        modes = sorted(modes, key=lambda mode: priority.get(str(mode.get("effect") or ""), 10))
+    selected = []
+    for mode in modes[:mode_count]:
+        mode_effect = str(mode.get("effect") or "")
+        detail = {"effect": mode_effect}
+        if mode_effect == "get_tickets":
+            detail["ticket_count"] = grant_unfinity_tickets(
+                player,
+                int(mode.get("count") or 0),
+                effect_data,
+                turn=turn,
+                phase=phase,
+                trigger="spell_resolution",
+            )
+        elif mode_effect == "place_sticker":
+            placement = place_unfinity_sticker(
+                player,
+                opponents,
+                effect_data,
+                target_kind=mode.get("target") or "nonland_permanent",
+                kind=mode.get("kind") or "any",
+                metric=mode.get("metric"),
+                turn=turn,
+                phase=phase,
+                rng=rng,
+            )
+            detail["placed"] = bool(placement)
+        elif mode_effect == "tap_opponent_creatures":
+            requested = max(0, int(mode.get("count") or 0))
+            targets = [
+                creature
+                for opponent in opponents or []
+                for creature in getattr(opponent, "battlefield", []) or []
+                if is_battlefield_creature(creature) and not creature.get("tapped")
+            ][:requested]
+            for target in targets:
+                target["tapped"] = True
+            detail["tapped"] = [target.get("name", "?") for target in targets]
+        elif mode_effect == "pump_flying":
+            target = _unfinity_best_target(unfinity_owned_sticker_targets(player, "creature"))
+            if target:
+                set_until_eot(
+                    target,
+                    "power",
+                    card_power_value(target, default=0) + int(mode.get("power") or 0),
+                )
+                if mode.get("keyword"):
+                    set_until_eot(target, str(mode["keyword"]), True)
+            detail["target"] = target.get("name", "?") if target else None
+        elif mode_effect == "own_creature_damage_opponent_creature":
+            own = _unfinity_best_target(unfinity_owned_sticker_targets(player, "creature"))
+            opposing = _unfinity_best_target(
+                [
+                    creature
+                    for opponent in opponents or []
+                    for creature in getattr(opponent, "battlefield", []) or []
+                    if is_battlefield_creature(creature)
+                ]
+            )
+            amount = card_power_value(own, default=0) if own and opposing else 0
+            if opposing and amount > 0:
+                mark_permanent_dealt_damage_this_turn(opposing, amount, turn)
+            detail.update(
+                {
+                    "source_creature": own.get("name", "?") if own else None,
+                    "target": opposing.get("name", "?") if opposing else None,
+                    "damage": amount,
+                }
+            )
+        elif mode_effect == "open_attraction":
+            deck = ensure_unfinity_attraction_deck(player, rng)
+            attraction = deck.pop(0) if deck else None
+            if attraction:
+                player.battlefield.append(attraction)
+            detail["opened"] = attraction.get("name", "?") if attraction else None
+        elif mode_effect == "visit_attractions":
+            roll = (rng or random.Random(turn or 0)).randint(1, 6)
+            visited = []
+            for attraction in list(getattr(player, "battlefield", []) or []):
+                if not isinstance(attraction, dict) or not attraction.get("attraction"):
+                    continue
+                if roll not in attraction.get("attraction_lights", []):
+                    continue
+                visited.append(attraction.get("name", "?"))
+                if attraction.get("visit_effect") == "place_sticker":
+                    place_unfinity_sticker(
+                        player,
+                        opponents,
+                        attraction,
+                        target_kind="nonland_permanent",
+                        kind="any",
+                        turn=turn,
+                        phase=phase,
+                        rng=rng,
+                    )
+            detail.update({"roll": roll, "visited": visited})
+        selected.append(detail)
+    emit_replay_event(
+        "unfinity_sticker_spell_resolved",
+        player=getattr(player, "name", "?"),
+        card=card.get("name", "?") if isinstance(card, dict) else str(card),
+        modes=selected,
+        turn=turn,
+        phase=phase,
+        **replay_rule_fields(effect_data),
+    )
+    finish_resolved_spell(player, card, turn=turn, effect_data=effect_data)
+    return True
+
+
+def activate_unfinity_sticker_abilities(
+    player,
+    opponents,
+    all_players,
+    turn,
+    rng,
+    *,
+    phase="precombat_main",
+):
+    activations = 0
+    for permanent in list(getattr(player, "battlefield", []) or []):
+        if not isinstance(permanent, dict):
+            continue
+        abilities = sorted(
+            [value for value in permanent.get("unfinity_activated_abilities") or [] if isinstance(value, dict)],
+            key=lambda value: int(value.get("priority") or 0),
+            reverse=True,
+        )
+        for index, ability in enumerate(abilities):
+            marker = f"_unfinity_activated_{index}_turn"
+            if permanent.get(marker) == turn:
+                continue
+            if ability.get("requires_tap") and (
+                permanent.get("tapped")
+                or (is_battlefield_creature(permanent) and permanent.get("summoning_sick"))
+            ):
+                continue
+            cost = ability.get("mana_cost") or "{0}"
+            if not player.can_pay(cost):
+                continue
+            effect = str(ability.get("effect") or "")
+            target = None
+            if effect in {"grant_keyword_to_stickered", "pump_art_stickered"}:
+                target = _unfinity_best_target(
+                    [
+                        card
+                        for card in unfinity_owned_sticker_targets(player, "creature")
+                        if unfinity_stickers.has_sticker_kind(
+                            card,
+                            "art" if effect == "pump_art_stickered" else str(ability.get("required_sticker_kind") or "name"),
+                        )
+                    ]
+                )
+            elif effect == "add_counter_to_name_stickered":
+                target = _unfinity_best_target(
+                    [
+                        card
+                        for card in unfinity_owned_sticker_targets(player, "creature", exclude=permanent)
+                        if unfinity_stickers.has_sticker_kind(card, "name")
+                    ]
+                )
+            elif effect == "reanimate_stickered_graveyard":
+                target = _unfinity_best_target(
+                    [
+                        card
+                        for card in getattr(player, "graveyard", []) or []
+                        if isinstance(card, dict)
+                        and is_creature_card(card)
+                        and unfinity_stickers.is_stickered(card)
+                    ]
+                )
+            elif effect == "place_sticker" and ability.get("target") == "creature_entered_this_turn":
+                target = _unfinity_best_target(
+                    [
+                        card
+                        for card in unfinity_owned_sticker_targets(player, "creature")
+                        if card.get("_entered_battlefield_turn") == turn
+                    ]
+                )
+            if effect in {
+                "grant_keyword_to_stickered",
+                "pump_art_stickered",
+                "add_counter_to_name_stickered",
+                "reanimate_stickered_graveyard",
+            } and target is None:
+                continue
+            if effect == "place_sticker" and ability.get("target") == "creature_entered_this_turn" and target is None:
+                continue
+            if not player.spend_mana(cost):
+                continue
+            if ability.get("requires_tap"):
+                permanent["tapped"] = True
+            permanent[marker] = turn
+            detail = {"effect": effect, "mana_cost": cost}
+            if effect == "gain_ticket":
+                detail["ticket_count"] = grant_unfinity_tickets(
+                    player,
+                    int(ability.get("count") or 1),
+                    permanent,
+                    turn=turn,
+                    phase=phase,
+                    trigger="activated_ability",
+                )
+            elif effect == "place_sticker":
+                if int(ability.get("ticket_count") or 0):
+                    grant_unfinity_tickets(
+                        player,
+                        int(ability.get("ticket_count") or 0),
+                        permanent,
+                        turn=turn,
+                        phase=phase,
+                        trigger="activated_ability",
+                    )
+                placement = place_unfinity_sticker(
+                    player,
+                    opponents,
+                    permanent,
+                    target=target,
+                    target_kind=ability.get("target_kind") or "nonland_permanent",
+                    kind=ability.get("kind") or "any",
+                    metric=ability.get("metric"),
+                    turn=turn,
+                    phase=phase,
+                    rng=rng,
+                )
+                detail["placed"] = bool(placement)
+            elif effect == "grant_keyword_to_stickered":
+                keyword = str(ability.get("keyword") or "flying")
+                set_until_eot(target, keyword, True)
+                detail.update({"target": target.get("name", "?"), "keyword": keyword})
+            elif effect == "pump_art_stickered":
+                set_until_eot(
+                    target,
+                    "power",
+                    card_power_value(target, default=0) + int(ability.get("power_bonus") or 0),
+                )
+                if ability.get("keyword"):
+                    set_until_eot(target, str(ability["keyword"]), True)
+                detail.update({"target": target.get("name", "?"), "power_bonus": int(ability.get("power_bonus") or 0)})
+            elif effect == "add_counter_to_name_stickered":
+                add_plus_one_counters(target, int(ability.get("count") or 1))
+                detail["target"] = target.get("name", "?")
+            elif effect == "self_name_sticker_pump_unblockable":
+                amount = unfinity_stickers.name_sticker_metric(permanent, "count")
+                set_until_eot(permanent, "power", card_power_value(permanent, default=0) + amount)
+                set_until_eot(permanent, "unblockable", True)
+                detail["power_bonus"] = amount
+            elif effect == "reanimate_stickered_graveyard":
+                player.graveyard.remove(target)
+                returned = prepare_entering_permanent(
+                    enrich_card(target),
+                    controller=player,
+                    all_players=all_players,
+                    turn=turn,
+                )
+                returned["haste"] = True
+                returned["summoning_sick"] = False
+                returned["exile_at_end_step"] = True
+                player.battlefield.append(returned)
+                detail["returned"] = returned.get("name", "?")
+            elif effect == "force_block_pt_stickered":
+                own = _unfinity_best_target(
+                    [
+                        card
+                        for card in unfinity_owned_sticker_targets(player, "creature", exclude=permanent)
+                        if unfinity_stickers.has_sticker_kind(card, "power_toughness")
+                    ]
+                )
+                opposing = _unfinity_best_target(
+                    [
+                        card
+                        for opponent in opponents or []
+                        for card in getattr(opponent, "battlefield", []) or []
+                        if is_battlefield_creature(card)
+                    ]
+                )
+                if own and opposing:
+                    set_until_eot(opposing, "must_block_target", own.get("name"))
+                detail.update(
+                    {
+                        "attacker": own.get("name", "?") if own else None,
+                        "forced_blocker": opposing.get("name", "?") if opposing else None,
+                    }
+                )
+            emit_replay_event(
+                "unfinity_activated_ability_resolved",
+                player=getattr(player, "name", "?"),
+                card=permanent.get("name", "?"),
+                ability=detail,
+                turn=turn,
+                phase=phase,
+                **replay_rule_fields(permanent),
+            )
+            activations += 1
+            if permanent.get("tapped"):
+                break
+    return activations
+
+
+def process_unfinity_controlled_creature_enters(
+    player,
+    opponents,
+    entering_permanent,
+    turn,
+    *,
+    all_players=None,
+):
+    resolved = 0
+    for source in list(getattr(player, "battlefield", []) or []):
+        if not isinstance(source, dict) or source is entering_permanent:
+            continue
+        ticket_count = int(source.get("other_creature_enters_ticket_count") or 0)
+        if ticket_count:
+            grant_unfinity_tickets(
+                player,
+                ticket_count,
+                source,
+                turn=turn,
+                phase="creature_enters_battlefield",
+                trigger="another_creature_you_own_enters",
+            )
+            resolved += 1
+        if source.get("creature_spells_have_sticker_kicker") and entering_permanent.get("was_cast"):
+            kicker_cost = source.get("sticker_kicker_cost") or "{1}"
+            if player.can_pay(kicker_cost) and player.spend_mana(kicker_cost):
+                grant_unfinity_tickets(
+                    player,
+                    int(source.get("sticker_kicker_ticket_count") or 1),
+                    source,
+                    turn=turn,
+                    phase="creature_enters_battlefield",
+                    trigger="sticker_kicker",
+                )
+                place_unfinity_sticker(
+                    player,
+                    opponents,
+                    source,
+                    target=entering_permanent,
+                    target_kind="creature",
+                    kind="any",
+                    turn=turn,
+                    phase="creature_enters_battlefield",
+                )
+                resolved += 1
+    return resolved
+
+
+def process_unfinity_combat_damage_triggers(
+    player,
+    opponents,
+    damaging_creatures,
+    turn,
+    rng,
+    *,
+    phase="combat_damage",
+):
+    resolved = 0
+    for creature in list(damaging_creatures or []):
+        if not isinstance(creature, dict):
+            continue
+        ticket_count = int(creature.get("combat_damage_ticket_count") or 0)
+        if ticket_count <= 0:
+            continue
+        grant_unfinity_tickets(
+            player,
+            ticket_count,
+            creature,
+            turn=turn,
+            phase=phase,
+            trigger="combat_damage_to_player",
+        )
+        if creature.get("combat_damage_place_sticker"):
+            place_unfinity_sticker(
+                player,
+                opponents,
+                creature,
+                target_kind="nonland_permanent",
+                kind="any",
+                turn=turn,
+                phase=phase,
+                rng=rng,
+            )
+        resolved += 1
+    return resolved
+
+
+def process_unfinity_attack_triggers(player, attackers, turn, *, phase="declare_attackers"):
+    resolved = 0
+    for creature in list(attackers or []):
+        if not isinstance(creature, dict) or not creature.get("attack_name_sticker_letter_pump"):
+            continue
+        name_stickers = unfinity_stickers.stickers_on(creature, "name")
+        initials = [str(sticker.get("text") or "")[:1].lower() for sticker in name_stickers]
+        amount = max((initials.count(initial) for initial in set(initials)), default=0)
+        set_until_eot(creature, "power", card_power_value(creature, default=0) + amount)
+        set_until_eot(
+            creature,
+            "toughness",
+            int(float(creature.get("toughness") or 0)) + amount,
+        )
+        emit_replay_event(
+            "unfinity_attack_trigger_resolved",
+            player=getattr(player, "name", "?"),
+            card=creature.get("name", "?"),
+            power_bonus=amount,
+            toughness_bonus=amount,
+            turn=turn,
+            phase=phase,
+            **replay_rule_fields(creature),
+        )
+        resolved += 1
+    return resolved
+
+
+def process_unfinity_end_step(player, opponents, all_players, turn, rng):
+    resolved = 0
+    for source in list(getattr(player, "battlefield", []) or []):
+        if not isinstance(source, dict) or not source.get("end_step_employee_performer_robot"):
+            continue
+        controlled = list(getattr(player, "battlefield", []) or [])
+        matched = {
+            subtype
+            for subtype in ("employee", "performer", "robot")
+            if any(permanent_has_subtype(card, subtype) for card in controlled if isinstance(card, dict))
+        }
+        if not matched:
+            continue
+        if int(getattr(player, "tickets", 0) or 0) < 3:
+            grant_unfinity_tickets(
+                player,
+                1,
+                source,
+                turn=turn,
+                phase="end_step",
+                trigger="controller_end_step",
+            )
+            selected_resource = "ticket"
+        else:
+            player.treasures += 1
+            selected_resource = "treasure"
+        placed = None
+        if len(matched) == 3:
+            placed = place_unfinity_sticker(
+                player,
+                opponents,
+                source,
+                target_kind="nonland_permanent",
+                kind="any",
+                turn=turn,
+                phase="end_step",
+                rng=rng,
+            )
+        emit_replay_event(
+            "unfinity_end_step_trigger_resolved",
+            player=getattr(player, "name", "?"),
+            card=source.get("name", "?"),
+            matched_subtypes=sorted(matched),
+            selected_resource=selected_resource,
+            sticker_placed=bool(placed),
+            turn=turn,
+            phase="end_step",
+            **replay_rule_fields(source),
+        )
+        resolved += 1
+    return resolved
+
+
+def resolve_unfinity_dies_choice(owner, permanent, destination, *, all_players=None):
+    if destination != "graveyard" or not isinstance(permanent, dict):
+        return False
+    if not permanent.get("dies_choose_ticket_or_sticker"):
+        return False
+    participants = list(all_players or _table_players_for(owner))
+    opponents = [participant for participant in participants if participant is not owner]
+    placement = place_unfinity_sticker(
+        owner,
+        opponents,
+        permanent,
+        target_kind="nonland_permanent",
+        kind="any",
+        turn=CURRENT_REPLAY_TURN,
+        phase="dies_trigger",
+    )
+    if placement is None:
+        grant_unfinity_tickets(
+            owner,
+            int(permanent.get("dies_ticket_count") or 2),
+            permanent,
+            turn=CURRENT_REPLAY_TURN,
+            phase="dies_trigger",
+            trigger="dies",
+        )
+    return True
+
+
 class Player:
     def shuffle(self, rng): rng.shuffle(self.library)
 
@@ -14563,6 +15722,13 @@ class Player:
         self.static_spell_limit_restrictions = []
         self.approach_count = 0
         self.treasures = 0
+        self.tickets = 0
+        self.sticker_sheets = []
+        self.active_sticker_sheets = []
+        self.used_sticker_ids = set()
+        self._sticker_state_initialized = False
+        self.attraction_deck = []
+        self.attraction_junkyard = []
         self.draw_engines = 0
         self.copy_engines = 0
         self.counters_available = 0
@@ -18810,9 +19976,19 @@ def move_permanent_from_battlefield_to_hand(owner, permanent, *, reason=None, so
     elif destination == "command_zone":
         owner.command_zone.append(moved)
     else:
+        stickers_removed = unfinity_stickers.clear_stickers_for_hidden_zone(moved)
         _clear_battlefield_only_state(moved)
         owner.hand.append(moved)
         destination = "hand"
+        if stickers_removed:
+            emit_replay_event(
+                "stickers_removed_in_hidden_zone",
+                player=getattr(owner, "name", "?"),
+                card=moved.get("name", "?"),
+                destination="hand",
+                stickers_removed=stickers_removed,
+                turn=current_turn,
+            )
     emit_replay_event(
         "permanent_moved_from_battlefield",
         player=getattr(owner, "name", "?"),
@@ -18838,6 +20014,12 @@ def move_permanent_from_battlefield_to_hand(owner, permanent, *, reason=None, so
         destination=destination,
         reason=reason,
         source=source,
+        all_players=_table_players_for(owner),
+    )
+    resolve_unfinity_attachment_leave(
+        owner,
+        moved,
+        destination,
         all_players=_table_players_for(owner),
     )
     refresh_controlled_static_indestructible(
@@ -18905,12 +20087,22 @@ def move_permanent_from_battlefield_to_library(owner, permanent, *, destination,
     elif final_destination == "command_zone":
         owner.command_zone.append(moved)
     else:
+        stickers_removed = unfinity_stickers.clear_stickers_for_hidden_zone(moved)
         _clear_battlefield_only_state(moved)
         if final_destination == "library_bottom":
             owner.library.append(moved)
         else:
             owner.library.insert(0, moved)
             final_destination = "library_top"
+        if stickers_removed:
+            emit_replay_event(
+                "stickers_removed_in_hidden_zone",
+                player=getattr(owner, "name", "?"),
+                card=moved.get("name", "?"),
+                destination=final_destination,
+                stickers_removed=stickers_removed,
+                turn=current_turn,
+            )
     emit_replay_event(
         "permanent_moved_from_battlefield",
         player=getattr(owner, "name", "?"),
@@ -18946,6 +20138,12 @@ def move_permanent_from_battlefield_to_library(owner, permanent, *, destination,
         destination=final_destination,
         reason=reason,
         source=source,
+        all_players=_table_players_for(owner),
+    )
+    resolve_unfinity_attachment_leave(
+        owner,
+        moved,
+        final_destination,
         all_players=_table_players_for(owner),
     )
     refresh_controlled_static_indestructible(
@@ -24671,6 +25869,16 @@ def resolve_generic_permanent_etb(
         rng,
         all_players=all_players,
     )
+    resolve_unfinity_sticker_etb(
+        player,
+        opponents,
+        permanent,
+        effect_data,
+        turn,
+        rng,
+        all_players=all_players,
+        phase=phase,
+    )
     if effect_data.get("specialize_transition_on_enter"):
         participants = list(all_players or [player, *list(opponents or [])])
         family = effect_data.get("specialize_family")
@@ -26964,6 +28172,18 @@ def move_creature_from_battlefield(owner, creature, reason=None, source=None, al
         source=source,
         all_players=all_players,
     )
+    resolve_unfinity_dies_choice(
+        owner,
+        creature,
+        destination,
+        all_players=all_players,
+    )
+    resolve_unfinity_attachment_leave(
+        owner,
+        creature,
+        destination,
+        all_players=all_players,
+    )
     resolve_leave_battlefield_treasure_trigger(
         owner,
         creature,
@@ -27131,6 +28351,18 @@ def move_permanent_from_battlefield(owner, permanent, reason=None, source=None, 
         destination=destination,
         reason=reason,
         source=source,
+        all_players=all_players,
+    )
+    resolve_unfinity_dies_choice(
+        owner,
+        permanent,
+        destination,
+        all_players=all_players,
+    )
+    resolve_unfinity_attachment_leave(
+        owner,
+        permanent,
+        destination,
         all_players=all_players,
     )
     resolve_leave_battlefield_treasure_trigger(
@@ -35707,6 +36939,12 @@ def move_permanent_from_battlefield_to_exile(owner, permanent, *, reason=None, s
         destination=destination,
         reason=reason,
         source=source,
+    )
+    resolve_unfinity_attachment_leave(
+        owner,
+        moved,
+        destination,
+        all_players=_table_players_for(owner),
     )
     refresh_controlled_static_indestructible(
         owner,
@@ -49660,6 +50898,13 @@ def process_controlled_creature_enters_triggers(
             },
         )
         resolved += 1
+    resolved += process_unfinity_controlled_creature_enters(
+        player,
+        opponents,
+        entering_permanent,
+        turn,
+        all_players=all_players,
+    )
     return resolved
 
 
@@ -52536,6 +53781,8 @@ def prepare_entering_permanent(permanent, controller=None, all_players=None, tur
     """Apply shared creature-entry state for permanents with engine effects."""
     if not isinstance(permanent, dict):
         return permanent
+    if turn is not None:
+        permanent["_entered_battlefield_turn"] = turn
     if permanent.get("station_level_required") and not permanent.get("station_threshold"):
         permanent["station_threshold"] = int(permanent.get("station_level_required") or 0)
     if permanent.get("station_threshold"):
@@ -54460,10 +55707,28 @@ def apply_attachment_static_pt_modifier(target, source, effect_data, power_boost
     return int(power_boost), int(toughness_boost)
 
 
-def apply_equipment_static_attachment(player, card, effect_data, turn):
+def apply_equipment_static_attachment(
+    player,
+    card,
+    effect_data,
+    turn,
+    opponents=None,
+    rng=None,
+):
     equipment = enrich_card({**card, **effect_data})
     equipment["effect"] = "equipment_static_attachment"
     player.battlefield.append(equipment)
+    if effect_data.get("unfinity_sticker_runtime"):
+        resolve_unfinity_sticker_etb(
+            player,
+            opponents or [],
+            equipment,
+            effect_data,
+            turn,
+            rng or random.Random(turn or 0),
+            all_players=[player, *list(opponents or [])],
+            phase="equipment_enters_battlefield",
+        )
     creatures = [
         permanent
         for permanent in player.battlefield
@@ -54483,6 +55748,7 @@ def apply_equipment_static_attachment(player, card, effect_data, turn):
     target = choose_best_creature_target(creatures)
     grants = []
     equipment["attached_to"] = target.get("name", "?")
+    equipment["attached_to_object"] = target
     power_boost, toughness_boost, dynamic_fields = dynamic_attachment_static_pt_boost(
         player,
         [],
@@ -54490,7 +55756,7 @@ def apply_equipment_static_attachment(player, card, effect_data, turn):
         target,
         effect_data,
     )
-    if effect_data.get("attachment_dynamic_boost"):
+    if effect_data.get("attachment_dynamic_boost") or effect_data.get("unfinity_sticker_runtime"):
         apply_attachment_static_pt_modifier(target, equipment, effect_data, power_boost, toughness_boost)
         equipment["attachment_dynamic_count_current"] = dynamic_fields.get("attachment_dynamic_count")
     else:
@@ -54530,6 +55796,8 @@ def apply_equipment_static_attachment(player, card, effect_data, turn):
     if effect_data.get("protection_from_non_commander_identity_colors"):
         target["protection_from_non_commander_identity_colors"] = True
         grants.append("protection_from_non_commander_identity_colors")
+    if effect_data.get("equipment_inherits_ability_stickers"):
+        _refresh_unfinity_equipment_sticker_inheritance(target, equipment)
     emit_replay_event(
         "equipment_attached",
         player=player.name,
@@ -70410,6 +71678,14 @@ def activate_blink_abilities(player, opponents, all_players, turn, rng, *, phase
 
 
 def process_precombat_main_phase_engines(player, opponents, all_players, turn, rng, *, stack=None):
+    activate_unfinity_sticker_abilities(
+        player,
+        opponents,
+        all_players,
+        turn,
+        rng,
+        phase="precombat_main",
+    )
     activate_blink_abilities(
         player,
         opponents,
@@ -70729,6 +72005,14 @@ def process_precombat_main_phase_engines(player, opponents, all_players, turn, r
 
 
 def process_postcombat_main_phase_engines(player, opponents, all_players, turn, rng=None, *, stack=None):
+    activate_unfinity_sticker_abilities(
+        player,
+        opponents,
+        all_players,
+        turn,
+        rng or random.Random(turn or 0),
+        phase="postcombat_main",
+    )
     if not player.is_alive():
         return 0
 
@@ -75490,6 +76774,16 @@ def apply_effect_immediate(
         )
         return controlled_refreshed + keyword_refreshed + global_refreshed + attachment_refreshed
 
+    if resolve_unfinity_sticker_spell(
+        player,
+        opponents,
+        card,
+        effect_data,
+        turn,
+        rng,
+        phase=phase or "resolution",
+    ):
+        return
     if effect == "draw_bottom_perpetual_evoke":
         resolve_draw_bottom_perpetual_evoke_spell(
             player,
@@ -76927,7 +78221,14 @@ def apply_effect_immediate(
     elif effect == "equipment_haste_shroud":
         apply_equipment_haste_shroud(player, card, effect_data, turn)
     elif effect == "equipment_static_attachment":
-        apply_equipment_static_attachment(player, card, effect_data, turn)
+        apply_equipment_static_attachment(
+            player,
+            card,
+            effect_data,
+            turn,
+            opponents=opponents,
+            rng=rng,
+        )
     elif effect == "aura_static_attachment":
         apply_aura_static_attachment(player, opponents, card, effect_data, turn, rng)
     elif effect == "vow_counter_each_player_sacrifice_rest":
@@ -79084,6 +80385,11 @@ def beginning_of_combat_step(attacker, opponents, all_players, turn, rng, stack)
         turn=turn,
     )
     process_specialize_beginning_of_combat(attacker, opponents, all_players, turn)
+    refresh_unfinity_sticker_static_state(
+        attacker,
+        turn=turn,
+        phase="beginning_of_combat",
+    )
     run_priority_loop(attacker, all_players, stack, turn, "beginning_of_combat", rng)
 
 
@@ -80436,14 +81742,30 @@ def declare_blockers_step(target, attackers, turn, rng):
             if blocker not in assigned_blockers
             and blocker_can_block_attacker(blocker, a)
         ]
+        forced_blockers = [
+            blocker
+            for blocker in available
+            if str(blocker.get("must_block_target") or "") == str(a.get("name") or "")
+        ]
+        if forced_blockers:
+            available = forced_blockers + [
+                blocker for blocker in available if blocker not in forced_blockers
+            ]
         lethal_attack = target.life <= a.get("power", 2)
-        must_block = bool(a.get("must_be_blocked_if_able"))
+        must_block = bool(a.get("must_be_blocked_if_able") or forced_blockers)
         if not available or (not must_block and not lethal_attack and rng.random() >= 0.35):
             block_assignments.append((a, []))
             continue
         blockers = []
         combined_power = 0
-        for blocker in sorted(available, key=lambda creature: creature.get("power", 2), reverse=True):
+        for blocker in sorted(
+            available,
+            key=lambda creature: (
+                1 if creature in forced_blockers else 0,
+                creature.get("power", 2),
+            ),
+            reverse=True,
+        ):
             blockers.append(blocker)
             combined_power += blocker.get("power", 2)
             if combined_power >= a.get("toughness", a.get("power", 2)):
@@ -81134,6 +82456,14 @@ def combat_damage_steps(attacker, opponents, target, attackers, block_assignment
                 rng,
                 phase="first_strike_damage" if first_strike_phase else "combat_damage",
             )
+            process_unfinity_combat_damage_triggers(
+                attacker,
+                opponents,
+                damaging_creatures_to_player,
+                turn,
+                rng,
+                phase="first_strike_damage" if first_strike_phase else "combat_damage",
+            )
         destroy_lethal_creatures()
 
     if any(
@@ -81279,6 +82609,12 @@ def combat_phase_v8(attacker, opponents, all_players, turn, rng, stack):
         attacker,
         attackers,
         all_players,
+        turn,
+        phase="combat",
+    )
+    process_unfinity_attack_triggers(
+        attacker,
+        attackers,
         turn,
         phase="combat",
     )
@@ -81868,6 +83204,7 @@ def play_turn_v8(player, opponents, all_players, turn, rng, stack):
 
     # ── END STEP (v8.3) ──
     process_end_step_phase_engines(player, all_players, turn, rng, stack=stack)
+    process_unfinity_end_step(player, opponents, all_players, turn, rng)
     process_specialize_end_step(player, all_players, turn, rng)
     while not stack.empty() or _pending_triggers:
         priority_round(player, all_players, stack, turn, rng, phase="end_step")

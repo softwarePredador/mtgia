@@ -233,6 +233,65 @@ class ExternalCardCoverageClosureTest(unittest.TestCase):
             "nonstandard_or_playtest_ruleset",
         )
 
+    def test_unfinity_commander_legal_cards_are_conventional(self):
+        self.assertEqual(
+            closure.residual_execution_scope(
+                {
+                    "name": "Aerialephant",
+                    "set_code": "unf",
+                    "set_type": "funny",
+                    "commander_legality": "legal",
+                    "type_line": "Creature - Elephant Performer",
+                    "oracle_text": (
+                        "When Aerialephant enters, you get {TK}, then you may put "
+                        "a sticker on a nonland permanent you own."
+                    ),
+                }
+            ),
+            "conventional_magic_rules",
+        )
+        self.assertEqual(
+            closure.residual_execution_scope(
+                {
+                    "name": "Aardwolf's Advantage",
+                    "set_code": "unf",
+                    "set_type": "funny",
+                    "commander_legality": "not_legal",
+                    "type_line": "Sorcery",
+                    "oracle_text": "Creatures you control gain alpha strike.",
+                }
+            ),
+            "nonstandard_or_playtest_ruleset",
+        )
+
+    def test_legal_auxiliary_and_playtest_objects_remain_excluded(self):
+        self.assertEqual(
+            closure.residual_execution_scope(
+                {
+                    "name": "Costume Shop",
+                    "set_code": "unf",
+                    "set_type": "funny",
+                    "commander_legality": "legal",
+                    "type_line": "Artifact - Attraction",
+                    "oracle_text": "Visit - You may put a sticker on a permanent.",
+                }
+            ),
+            "auxiliary_game_object",
+        )
+        self.assertEqual(
+            closure.residual_execution_scope(
+                {
+                    "name": "Clear, the Mind",
+                    "set_code": "unk",
+                    "set_type": "funny",
+                    "commander_legality": "legal",
+                    "type_line": "Sorcery",
+                    "oracle_text": "Spell commander. Draw a card.",
+                }
+            ),
+            "nonstandard_or_playtest_ruleset",
+        )
+
 
 if __name__ == "__main__":
     unittest.main()

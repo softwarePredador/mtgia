@@ -143,6 +143,7 @@ def residual_execution_scope(row: Mapping[str, Any]) -> str:
     layout = normalize_name(row.get("layout"))
     set_type = normalize_name(row.get("set_type"))
     set_code = normalize_name(row.get("set_code"))
+    commander_legality = normalize_name(row.get("commander_legality"))
     online_only = row.get("is_online_only") is True or normalize_name(
         row.get("is_online_only")
     ) in {"1", "true", "yes"}
@@ -192,6 +193,12 @@ def residual_execution_scope(row: Mapping[str, Any]) -> str:
         )
     ):
         return "physical_or_external_interaction"
+    # Unfinity mixes acorn and Eternal-legal cards in the same funny set. Only
+    # its normal Commander-legal cards may cross this product-level boundary;
+    # other funny/playtest products stay excluded even if imported legalities
+    # contain a name-collision false positive.
+    if set_code == "unf" and commander_legality == "legal" and oracle:
+        return "conventional_magic_rules"
     if set_type == "funny" or set_code in {
         "cmb1",
         "hho",
@@ -479,6 +486,7 @@ def build_closure(
                     "collector_number": row.get("collector_number"),
                     "set_type": row.get("set_type"),
                     "is_online_only": row.get("is_online_only"),
+                    "commander_legality": row.get("commander_legality"),
                     "type_line": row.get("type_line"),
                     "oracle_text": row.get("oracle_text"),
                 }
