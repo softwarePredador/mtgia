@@ -79,6 +79,9 @@ def test_touch_the_spirit_realm_temporarily_exiles_then_returns_under_owner_cont
     events = capture_events()
     active = battle.Player("Active", None, [])
     opponent = battle.Player("Opponent", None, [])
+    active.battlefield.append(
+        card("Own High Value Artifact", "Legendary Artifact", cmc=9, effect="draw_engine")
+    )
     target = card(
         "Threat",
         "Creature - Giant",

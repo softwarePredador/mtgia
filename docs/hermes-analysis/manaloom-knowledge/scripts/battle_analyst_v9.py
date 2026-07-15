@@ -27112,15 +27112,19 @@ def resolve_temporary_exile_return_next_end_step(
                 continue
             if not (is_artifact_permanent(permanent) or is_battlefield_creature(permanent)):
                 continue
-            score = target_priority(permanent)
-            if controller is player:
-                score -= 35
-            candidates.append((score, controller, permanent))
+            candidates.append(
+                (
+                    controller is not player,
+                    target_priority(permanent),
+                    controller,
+                    permanent,
+                )
+            )
     candidates.sort(
         key=lambda item: (
             item[0],
-            item[1] is not player,
-            item[2].get("name", "?"),
+            item[1],
+            item[3].get("name", "?"),
         ),
         reverse=True,
     )
@@ -27139,7 +27143,7 @@ def resolve_temporary_exile_return_next_end_step(
         finish_resolved_spell(player, card, turn=turn, effect_data=effect_data)
         return None
 
-    _score, target_controller, target = candidates[0]
+    _opponent_target, _score, target_controller, target = candidates[0]
     target_name = target.get("name", "?")
     target_controller.battlefield.remove(target)
     move_to_exile(
