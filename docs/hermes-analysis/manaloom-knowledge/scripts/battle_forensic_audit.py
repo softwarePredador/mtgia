@@ -30,6 +30,7 @@ REPORT_DIR = SCRIPT_DIR.parents[1] / "master_optimizer_reports"
 
 SUPPORTED_EFFECTS = {
     "add_mana",
+    "additional_land_play_static",
     "ad_nauseam",
     "aetherflux_lifegain",
     "aetherflux_reservoir",
@@ -40,6 +41,7 @@ SUPPORTED_EFFECTS = {
     "airbend_other_creatures",
     "board_wipe",
     "blink",
+    "blink_multiple",
     "brain_freeze",
     "combo",
     "composite_resolution",
@@ -67,6 +69,7 @@ SUPPORTED_EFFECTS = {
     "equipment_static_attachment",
     "equipment_haste_shroud",
     "exile_artifact_enchantment_creature_convoke_wipe",
+    "exile_each_opponent_nonland_until_source_leaves",
     "exile_top_nonland_free_cast",
     "fated_clash_protect_then_destroy",
     "exile_value",
@@ -122,6 +125,7 @@ SUPPORTED_EFFECTS = {
     "temporary_exile_return_next_end_step",
     "untap_lands",
     "untap_land_engine",
+    "untap_tapped_permanent_etb_engine",
 }
 
 CARD_EVENT_KINDS = {
@@ -137,6 +141,7 @@ CARD_EVENT_KINDS = {
 }
 
 GAME_IMPACT_EFFECTS = {
+    "additional_land_play_static",
     "aetherflux_lifegain",
     "aetherflux_reservoir",
     "approach",
@@ -144,6 +149,7 @@ GAME_IMPACT_EFFECTS = {
     "attack_tax",
     "airbend_other_creatures",
     "board_wipe",
+    "blink_multiple",
     "brain_freeze",
     "counter",
     "cannot_lose_turn",
@@ -158,6 +164,7 @@ GAME_IMPACT_EFFECTS = {
     "equipment_static_attachment",
     "equipment_haste_shroud",
     "exile_artifact_enchantment_creature_convoke_wipe",
+    "exile_each_opponent_nonland_until_source_leaves",
     "exile_top_nonland_free_cast",
     "fated_clash_protect_then_destroy",
     "extra_turn",
@@ -193,6 +200,7 @@ GAME_IMPACT_EFFECTS = {
     "token_maker",
     "treasure_maker",
     "tutor",
+    "untap_tapped_permanent_etb_engine",
 }
 
 HEURISTIC_SOURCES = {

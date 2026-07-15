@@ -48,6 +48,7 @@ EXECUTION_STATUS_PRIORITY = {
 }
 
 EFFECT_TO_DECK_CATEGORY = {
+    "additional_land_play_static": "ramp",
     "ramp_permanent": "ramp",
     "ramp_ritual": "ramp",
     "ramp_engine": "ramp",
@@ -95,6 +96,7 @@ EFFECT_TO_DECK_CATEGORY = {
     "damage_wipe": "wipe",
     "damage_wipe_treasure": "wipe",
     "exile_artifact_enchantment_creature_convoke_wipe": "wipe",
+    "exile_each_opponent_nonland_until_source_leaves": "removal",
     "remove_creature": "removal",
     "fated_clash_protect_then_destroy": "wipe",
     "remove_permanent": "removal",
@@ -105,6 +107,7 @@ EFFECT_TO_DECK_CATEGORY = {
     "damage_modifier": "wincon",
     "goad_opponents_creatures_cant_block": "wincon",
     "copy_spell": "engine",
+    "blink_multiple": "engine",
     "exile_top_nonland_free_cast": "engine",
     "recursion": "engine",
     "add_counters": "support",
@@ -116,6 +119,7 @@ EFFECT_TO_DECK_CATEGORY = {
     "land_recursion": "engine",
     "land_recursion_creature": "engine",
     "topdeck_play": "ramp",
+    "untap_tapped_permanent_etb_engine": "ramp",
     "life_artifact": "protection",
     "ripple_engine": "engine",
     "passive": "unknown",

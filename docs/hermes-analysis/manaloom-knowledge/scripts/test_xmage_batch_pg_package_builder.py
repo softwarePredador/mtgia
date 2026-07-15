@@ -1674,6 +1674,40 @@ def test_manifest_expected_rule_from_proposal_contains_e2e_fields() -> None:
     }
 
 
+def test_manifest_keeps_runtime_defining_fields_for_global_closure_families() -> None:
+    proposal = {
+        "normalized_name": "grasp of fate",
+        "card_name": "Grasp of Fate",
+        "oracle_hash": "hash-grasp",
+        "logical_rule_key": "battle_rule_v1:grasp",
+        "effect_json": {
+            "effect": "exile_each_opponent_nonland_until_source_leaves",
+            "battle_model_scope": "xmage_exile_each_opponent_nonland_until_source_leaves_v1",
+            "trigger": "enters_battlefield",
+            "trigger_controller": "self",
+            "for_each_opponent": True,
+            "target_count_min_per_opponent": 0,
+            "target_count_max_per_opponent": 1,
+            "return_trigger": "source_leaves_battlefield",
+            "return_destination": "battlefield_under_owners_control",
+            "zone_transition": "exile_then_return",
+            "additional_land_plays_each_turn": 1,
+            "untap_tapped_permanent_on_entry": True,
+            "xmage_target_class": "TargetNonlandPermanent",
+            "xmage_target_adjuster_class": "ForEachPlayerTargetsAdjuster",
+        },
+    }
+
+    required = builder.expected_rule_from_proposal(proposal)["required_effect_fields"]
+
+    assert required["for_each_opponent"] is True
+    assert required["target_count_max_per_opponent"] == 1
+    assert required["return_trigger"] == "source_leaves_battlefield"
+    assert required["additional_land_plays_each_turn"] == 1
+    assert required["untap_tapped_permanent_on_entry"] is True
+    assert required["xmage_target_class"] == "TargetNonlandPermanent"
+
+
 def test_manifest_expected_rule_preserves_target_player_draw_fields() -> None:
     proposal = {
         "normalized_name": "inspiration",

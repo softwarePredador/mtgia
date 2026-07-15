@@ -684,6 +684,7 @@ register_event_contract_group(
     """
     attack_recursion_trigger_skipped
     aura_unattached
+    blink_multiple_skipped
     blink_skipped
     combat_damage_draw_skipped
     dies_self_return_skipped
@@ -698,6 +699,18 @@ register_event_contract_group(
     """,
     "ignored_with_reason",
     "explicit skip/unsupported branch; emitted reason metadata is the contract evidence.",
+)
+
+register_event_contract_group(
+    """
+    blink_multiple_resolved
+    exile_each_opponent_nonland_resolved
+    linked_exile_cards_returned
+    permanent_static_engine_entered
+    tapped_permanent_entry_untapped
+    """,
+    "strategy_signal",
+    "family runtime resolution changes persistent battlefield or zone state and is replay strategy evidence.",
 )
 
 register_event_contract_group(

@@ -657,6 +657,32 @@
     "review_status": "verified",
     "source": "curated"
   },
+  "Amulet of Vigor": {
+    "confidence": 0.99,
+    "deck_role_json": {
+      "category": "ramp",
+      "effect": "untap_tapped_permanent_etb_engine",
+      "subtype": "tapped_entry_untap_engine"
+    },
+    "effect_json": {
+      "ability_kind": "permanent",
+      "artifact": true,
+      "battle_model_scope": "xmage_tapped_permanent_entry_untap_v1",
+      "cmc": 1.0,
+      "effect": "untap_tapped_permanent_etb_engine",
+      "trigger": "permanent_enters_battlefield_tapped_under_your_control",
+      "trigger_controller": "self",
+      "untap_tapped_permanent_on_entry": true,
+      "xmage_ability_class": "AmuletOfVigorTriggeredAbility",
+      "xmage_effect_class": "UntapTargetEffect"
+    },
+    "execution_status": "auto",
+    "logical_rule_key": "battle_rule_v1:743fd8f0de4dfb77da6f173623545b87",
+    "notes": "XMage-authoritative triggered untap family, backed by focused ManaLoom entry-state runtime coverage.",
+    "oracle_hash": "0d3c7434ed983edcde555ec98cc71b96",
+    "review_status": "verified",
+    "source": "curated"
+  },
   "Ancient Den": {
     "confidence": 0.99,
     "deck_role_json": {
@@ -1958,6 +1984,30 @@
     "review_status": "verified",
     "source": "curated"
   },
+  "Exploration": {
+    "confidence": 0.99,
+    "deck_role_json": {
+      "category": "ramp",
+      "effect": "additional_land_play_static",
+      "subtype": "additional_land_play"
+    },
+    "effect_json": {
+      "ability_kind": "static",
+      "additional_land_plays_each_turn": 1,
+      "battle_model_scope": "xmage_play_additional_lands_controller_v1",
+      "cmc": 1.0,
+      "duration": "while_on_battlefield",
+      "effect": "additional_land_play_static",
+      "xmage_ability_class": "SimpleStaticAbility",
+      "xmage_effect_class": "PlayAdditionalLandsControllerEffect"
+    },
+    "execution_status": "auto",
+    "logical_rule_key": "battle_rule_v1:1e7136a8801e5aa8f35435008f736e9d",
+    "notes": "XMage-authoritative static additional-land family, backed by focused ManaLoom land-limit runtime coverage.",
+    "oracle_hash": "575e8137f1155c881728e3c827307870",
+    "review_status": "verified",
+    "source": "curated"
+  },
   "Farewell": {
     "confidence": 0.9,
     "deck_role_json": {
@@ -2387,6 +2437,35 @@
     "review_status": "active",
     "source": "curated"
   },
+  "Ghostly Flicker": {
+    "confidence": 0.99,
+    "deck_role_json": {
+      "category": "engine",
+      "effect": "blink_multiple",
+      "subtype": "multi_permanent_blink",
+      "timing": "instant"
+    },
+    "effect_json": {
+      "ability_kind": "spell",
+      "battle_model_scope": "xmage_exile_then_return_two_controlled_permanents_v1",
+      "cmc": 3.0,
+      "destination": "battlefield_under_your_control",
+      "effect": "blink_multiple",
+      "instant": true,
+      "target": "artifact_creature_or_land_you_control",
+      "target_count_max": 2,
+      "target_count_min": 2,
+      "xmage_effect_class": "ExileThenReturnTargetEffect",
+      "xmage_target_class": "TargetPermanent",
+      "zone_transition": "exile_then_return_simultaneously"
+    },
+    "execution_status": "auto",
+    "logical_rule_key": "battle_rule_v1:a1a210055dbccd291a81ea82cff2d47a",
+    "notes": "XMage-authoritative exact-two controlled permanent blink family, backed by focused simultaneous selection and return coverage.",
+    "oracle_hash": "4725dcda34e923c03bec0d9163d256e0",
+    "review_status": "verified",
+    "source": "curated"
+  },
   "Ghoulcaller's Bell": {
     "confidence": 0.91,
     "deck_role_json": {
@@ -2549,6 +2628,36 @@
     "logical_rule_key": "battle_rule_v1:c1b9a01e5d35268343ba388bf81a3b95",
     "notes": "Oracle-reviewed Commander-legal Unfinity card executed by shared ticket/sticker family runtime.",
     "oracle_hash": "4392a9c5ca5115622334e8bc2885048a",
+    "review_status": "verified",
+    "source": "curated"
+  },
+  "Grasp of Fate": {
+    "confidence": 0.99,
+    "deck_role_json": {
+      "category": "removal",
+      "effect": "exile_each_opponent_nonland_until_source_leaves",
+      "subtype": "multiplayer_linked_exile"
+    },
+    "effect_json": {
+      "ability_kind": "triggered",
+      "battle_model_scope": "xmage_exile_each_opponent_nonland_until_source_leaves_v1",
+      "cmc": 3.0,
+      "effect": "exile_each_opponent_nonland_until_source_leaves",
+      "for_each_opponent": true,
+      "return_destination": "battlefield_under_owners_control",
+      "return_trigger": "source_leaves_battlefield",
+      "target": "up_to_one_nonland_permanent_each_opponent_controls",
+      "target_count_max_per_opponent": 1,
+      "target_count_min_per_opponent": 0,
+      "trigger": "enters_battlefield",
+      "xmage_effect_class": "ExileUntilSourceLeavesEffect",
+      "xmage_target_adjuster_class": "ForEachPlayerTargetsAdjuster",
+      "xmage_target_class": "TargetNonlandPermanent"
+    },
+    "execution_status": "auto",
+    "logical_rule_key": "battle_rule_v1:4a3b11288c4a9b76e69dce2e8c7748f6",
+    "notes": "XMage-authoritative multiplayer linked-exile family, backed by focused per-opponent target and source-leave return coverage.",
+    "oracle_hash": "0954b51cb2142383eab9d76adc926c4b",
     "review_status": "verified",
     "source": "curated"
   },

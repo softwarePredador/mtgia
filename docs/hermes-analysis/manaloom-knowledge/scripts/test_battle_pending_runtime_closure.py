@@ -205,13 +205,17 @@ def test_wishclaw_scanner_ignores_legacy_non_mapping_battlefield_entries():
 
 def test_forensic_registry_accepts_only_now_executable_pending_effects():
     for effect in {
+        "additional_land_play_static",
         "ad_nauseam",
         "aura_static_attachment",
+        "blink_multiple",
+        "exile_each_opponent_nonland_until_source_leaves",
         "graveyard_to_library_top",
         "opponent_graveyard_betrayal",
         "temporary_exile_return_next_end_step",
         "tutor_artifact",
         "untap_lands",
+        "untap_tapped_permanent_etb_engine",
     }:
         assert effect in forensic.SUPPORTED_EFFECTS
 
@@ -472,6 +476,212 @@ def test_land_ramp_does_not_pay_a_cast_sacrifice_again_on_resolution():
     )
 
 
+def test_amulet_family_untaps_a_permanent_that_enters_tapped():
+    events = capture_events()
+    active = battle.Player("Active", None, [])
+    active.battlefield.append(
+        card(
+            "Amulet Fixture",
+            "Artifact",
+            effect="untap_tapped_permanent_etb_engine",
+            untap_tapped_permanent_on_entry=True,
+        )
+    )
+
+    entered = battle.prepare_entering_permanent(
+        card("Tapped Land", "Land", cmc=0, enters_tapped=True),
+        controller=active,
+        all_players=[active],
+        turn=2,
+    )
+
+    assert entered["tapped"] is False
+    assert any(
+        event["event"] == "tapped_permanent_entry_untapped"
+        and event.get("card") == "Tapped Land"
+        and event.get("source_count") == 1
+        for event in events
+    )
+
+
+def test_exploration_family_allows_exactly_one_additional_land_play():
+    capture_events()
+    active = battle.Player("Active", None, [])
+    active.hand = [
+        card("Forest A", "Basic Land - Forest", cmc=0, effect="land"),
+        card("Forest B", "Basic Land - Forest", cmc=0, effect="land"),
+        card("Forest C", "Basic Land - Forest", cmc=0, effect="land"),
+    ]
+    effect = {
+        "effect": "additional_land_play_static",
+        "additional_land_plays_each_turn": 1,
+        "_rule_source": "curated",
+        "_rule_review_status": "verified",
+    }
+    battle.apply_effect_immediate(
+        active,
+        [],
+        card("Exploration Fixture", "Enchantment", cmc=1),
+        turn=1,
+        rng=random.Random(20),
+        effect_data_override=effect,
+        phase="precombat_main",
+    )
+
+    stack = battle.Stack()
+    for _ in range(2):
+        candidate = battle.choose_land_play_candidate(active, [])
+        assert candidate is not None
+        assert battle.play_land_candidate(active, [], [active], 1, stack, candidate)
+
+    assert active.lands_played_this_turn == 2
+    assert active.max_lands_per_turn == 2
+    assert battle.choose_land_play_candidate(active, []) is None
+
+
+def test_ghostly_flicker_family_requires_and_returns_two_controlled_targets():
+    events = capture_events()
+    active = battle.Player("Active", None, [card("Drawn", "Instant", cmc=1)])
+    artifact = card("Value Rock", "Artifact", cmc=2, tapped=True)
+    creature = card(
+        "Value Creature",
+        "Creature - Wizard",
+        cmc=3,
+        power=2,
+        toughness=2,
+        etb_draw_count=1,
+    )
+    active.battlefield.extend([artifact, creature])
+    effect = {
+        "effect": "blink_multiple",
+        "blink_target_scope": "artifact_creature_or_land_you_control",
+        "target_count_min": 2,
+        "target_count_max": 2,
+        "_rule_source": "curated",
+        "_rule_review_status": "verified",
+    }
+
+    battle.apply_effect_immediate(
+        active,
+        [],
+        card("Ghostly Flicker Fixture", "Instant", cmc=3),
+        turn=3,
+        rng=random.Random(21),
+        effect_data_override=effect,
+        phase="precombat_main",
+    )
+
+    assert sorted(permanent["name"] for permanent in active.battlefield) == [
+        "Value Creature",
+        "Value Rock",
+    ]
+    assert [item["name"] for item in active.hand] == ["Drawn"]
+    resolved = next(event for event in events if event["event"] == "blink_multiple_resolved")
+    assert resolved["target_count"] == 2
+    assert sorted(resolved["targets"]) == ["Value Creature", "Value Rock"]
+
+
+def test_grasp_family_exiles_one_nonland_per_opponent_until_source_leaves():
+    events = capture_events()
+    active = battle.Player("Active", None, [])
+    opponent_a = battle.Player("Opponent A", None, [])
+    opponent_b = battle.Player("Opponent B", None, [])
+    threat_a = card("Threat A", "Creature - Giant", cmc=7, power=7, toughness=7)
+    spare_a = card("Spare A", "Artifact", cmc=1)
+    threat_b = card("Threat B", "Planeswalker", cmc=6)
+    land_b = card("Land B", "Land", cmc=0)
+    opponent_a.battlefield.extend([threat_a, spare_a])
+    opponent_b.battlefield.extend([threat_b, land_b])
+    effect = {
+        "effect": "exile_each_opponent_nonland_until_source_leaves",
+        "target": "up_to_one_nonland_permanent_each_opponent_controls",
+        "_rule_source": "curated",
+        "_rule_review_status": "verified",
+    }
+
+    battle.apply_effect_immediate(
+        active,
+        [opponent_a, opponent_b],
+        card("Grasp Fixture", "Enchantment", cmc=3),
+        turn=4,
+        rng=random.Random(22),
+        effect_data_override=effect,
+        phase="precombat_main",
+    )
+
+    grasp = next(permanent for permanent in active.battlefield if permanent["name"] == "Grasp Fixture")
+    assert threat_a in opponent_a.exile
+    assert threat_b in opponent_b.exile
+    assert spare_a in opponent_a.battlefield
+    assert land_b in opponent_b.battlefield
+    exiled_event = next(
+        event for event in events if event["event"] == "exile_each_opponent_nonland_resolved"
+    )
+    assert [entry["link_id"] for entry in exiled_event["exiled"]] == [
+        "grasp fixture:4:1:0",
+        "grasp fixture:4:1:1",
+    ]
+
+    battle.move_permanent_from_battlefield(
+        active,
+        grasp,
+        reason="destroy",
+        all_players=[active, opponent_a, opponent_b],
+    )
+
+    assert any(permanent["name"] == "Threat A" for permanent in opponent_a.battlefield)
+    assert any(permanent["name"] == "Threat B" for permanent in opponent_b.battlefield)
+    assert opponent_a.exile == []
+    assert opponent_b.exile == []
+    assert any(
+        event["event"] == "linked_exile_cards_returned"
+        and event.get("returned_count") == 2
+        for event in events
+    )
+
+
+def test_cast_scanner_does_not_announce_a_known_illegal_spell():
+    events = capture_events()
+    active = battle.Player("Active", None, [])
+    opponent = battle.Player("Opponent", None, [])
+    active.hand = [card("The One Ring", "Legendary Artifact", cmc=4, mana_cost="{4}")]
+    active.mana_pool.generic = 10
+    active.spells_cast_this_turn = 1
+    active.static_spell_limit_restrictions = [
+        {
+            "source": "Limit Fixture",
+            "spell_limit_per_turn": 1,
+            "restricted_spell_scope": "spells",
+        }
+    ]
+    original_get_card_effect = battle.get_card_effect
+    battle.get_card_effect = lambda candidate: (
+        {"effect": "passive", "artifact": True}
+        if candidate.get("name") == "The One Ring"
+        else original_get_card_effect(candidate)
+    )
+    try:
+        acted = battle.cast_spells_v8(
+            active,
+            [opponent],
+            [active, opponent],
+            turn=5,
+            phase="precombat_main",
+            stack=battle.Stack(),
+            rng=random.Random(23),
+            max_actions=1,
+        )
+    finally:
+        battle.get_card_effect = original_get_card_effect
+
+    assert acted is False
+    assert not any(
+        event["event"] in {"cast_announced", "cast_illegal"}
+        and event.get("card") == "The One Ring"
+        for event in events
+    )
+
+
 if __name__ == "__main__":
     tests = [
         test_noxious_revival_moves_any_graveyard_target_to_its_owners_library_top,
@@ -486,6 +696,11 @@ if __name__ == "__main__":
         test_ad_nauseam_reveals_until_the_verified_life_floor_choice,
         test_mnemonic_betrayal_exiles_opponent_graveyards_then_returns_remaining_cards,
         test_hidden_zone_tutor_miss_with_exhausted_candidates_is_not_a_turn_finding,
+        test_amulet_family_untaps_a_permanent_that_enters_tapped,
+        test_exploration_family_allows_exactly_one_additional_land_play,
+        test_ghostly_flicker_family_requires_and_returns_two_controlled_targets,
+        test_grasp_family_exiles_one_nonland_per_opponent_until_source_leaves,
+        test_cast_scanner_does_not_announce_a_known_illegal_spell,
     ]
     for test in tests:
         test()

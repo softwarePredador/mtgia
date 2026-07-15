@@ -733,7 +733,8 @@ def clear_turn_scoped_permanent_flags(all_players):
         participant._attacked_turn_marker = CURRENT_REPLAY_TURN
         participant.cards_discarded_this_turn = 0
         participant._cards_discarded_turn_marker = CURRENT_REPLAY_TURN
-        participant.max_lands_per_turn = 1
+        participant._temporary_additional_land_plays = 0
+        refresh_additional_land_play_limit(participant)
 
 
 class EngineMetrics:
@@ -4196,7 +4197,10 @@ def resolve_specialize_combat_damage_triggers(
                 participants,
                 turn_player=player,
             )
-            player.max_lands_per_turn = int(player.max_lands_per_turn or 1) + 1
+            player._temporary_additional_land_plays = (
+                int(getattr(player, "_temporary_additional_land_plays", 0) or 0) + 1
+            )
+            refresh_additional_land_play_limit(player)
             detail.update({"drawn": len(drawn), "additional_land_plays": 1})
         elif color == "R":
             for opponent in opponents:
@@ -15701,6 +15705,9 @@ class Player:
         self.pending_mana_activation_cast_triggers = []
         self.lands_played_this_turn = 0
         self.max_lands_per_turn = 1
+        self._static_additional_land_plays = 0
+        self._temporary_additional_land_plays = 0
+        self._linked_exile_sequence = 0
         self.is_human = is_human
         self.strategy = strategy
         self.hexproof = False
@@ -19873,6 +19880,179 @@ def _remove_battlefield_object(owner, permanent):
     return None
 
 
+def resolve_linked_exile_source_leave(
+    owner,
+    source_permanent,
+    *,
+    destination,
+    reason=None,
+    all_players=None,
+    turn=None,
+):
+    if not isinstance(source_permanent, dict):
+        return []
+    linked_entries = list(source_permanent.pop("_linked_exile_entries", []) or [])
+    if not linked_entries:
+        return []
+    participants = list(all_players or _table_players_for(owner) or [owner])
+    current_turn = turn if turn is not None else CURRENT_REPLAY_TURN
+    returned = []
+    for entry in linked_entries:
+        if not isinstance(entry, dict):
+            continue
+        target_owner = next(
+            (
+                participant
+                for participant in participants
+                if getattr(participant, "name", None) == entry.get("owner")
+            ),
+            None,
+        )
+        if target_owner is None:
+            continue
+        link_id = entry.get("link_id")
+        target = next(
+            (
+                card
+                for card in getattr(target_owner, "exile", []) or []
+                if isinstance(card, dict)
+                and card.get("_linked_exile_source_id") == link_id
+            ),
+            None,
+        )
+        if target is None:
+            continue
+        target_owner.exile.remove(target)
+        target.pop("_linked_exile_source_id", None)
+        target.pop("_linked_exile_source_name", None)
+        permanent = prepare_entering_permanent(
+            enrich_card({**get_card_effect(target), **target}),
+            controller=target_owner,
+            all_players=participants,
+            turn=current_turn,
+        )
+        target_owner.battlefield.append(permanent)
+        other_players = [participant for participant in participants if participant is not target_owner]
+        resolve_generic_permanent_etb(
+            target_owner,
+            other_players,
+            permanent,
+            permanent,
+            current_turn,
+            random.Random(f"linked-exile:{link_id}:{current_turn}"),
+            all_players=participants,
+            phase="linked_exile_return",
+        )
+        if is_battlefield_creature(permanent):
+            process_controlled_creature_enters_triggers(
+                target_owner,
+                other_players,
+                permanent,
+                current_turn,
+                source_event="linked_exile_return",
+                all_players=participants,
+            )
+            process_opponent_controlled_creature_enters_triggers(
+                target_owner,
+                permanent,
+                current_turn,
+                source_event="linked_exile_return",
+                all_players=participants,
+            )
+        returned.append(
+            {
+                "owner": target_owner.name,
+                "card": permanent.get("name", "?"),
+            }
+        )
+    emit_replay_event(
+        "linked_exile_cards_returned",
+        player=getattr(owner, "name", "?"),
+        card=source_permanent.get("name", "?"),
+        destination=destination,
+        reason=reason,
+        returned=returned,
+        returned_count=len(returned),
+        turn=current_turn,
+        **replay_rule_fields(source_permanent),
+    )
+    return returned
+
+
+def resolve_exile_each_opponent_nonland_until_source_leaves(
+    player,
+    opponents,
+    source_permanent,
+    effect_data,
+    turn,
+    *,
+    all_players=None,
+):
+    participants = list(all_players or [player, *(opponents or [])])
+    player._linked_exile_sequence = int(getattr(player, "_linked_exile_sequence", 0) or 0) + 1
+    link_base = source_permanent.setdefault(
+        "_linked_exile_instance_id",
+        (
+            f"{normalize_card_name(source_permanent.get('name', 'source'))}:"
+            f"{turn}:{player._linked_exile_sequence}"
+        ),
+    )
+    linked_entries = []
+    for opponent_index, opponent in enumerate(opponents or []):
+        legal_targets = []
+        for permanent in getattr(opponent, "battlefield", []) or []:
+            if not isinstance(permanent, dict):
+                continue
+            if "land" in str(permanent.get("type_line") or "").lower():
+                continue
+            if not is_legal_target(
+                effect_data,
+                permanent,
+                player,
+                all_players=participants,
+                target_type="nonland_permanent",
+                target_controller=opponent,
+            ):
+                continue
+            legal_targets.append(permanent)
+        if not legal_targets:
+            continue
+        legal_targets.sort(key=target_priority, reverse=True)
+        target = legal_targets[0]
+        destination = move_permanent_from_battlefield_to_exile(
+            opponent,
+            target,
+            reason="exile_until_source_leaves",
+            source=source_permanent,
+            turn=turn,
+        )
+        if destination != "exile" or target not in getattr(opponent, "exile", []):
+            continue
+        link_id = f"{link_base}:{opponent_index}"
+        target["_linked_exile_source_id"] = link_id
+        target["_linked_exile_source_name"] = source_permanent.get("name", "?")
+        linked_entries.append(
+            {
+                "owner": getattr(opponent, "name", "?"),
+                "card": target.get("name", "?"),
+                "link_id": link_id,
+            }
+        )
+    source_permanent["_linked_exile_entries"] = linked_entries
+    emit_replay_event(
+        "exile_each_opponent_nonland_resolved",
+        player=player.name,
+        card=source_permanent.get("name", "?"),
+        exiled=linked_entries,
+        exiled_count=len(linked_entries),
+        opponent_count=len(opponents or []),
+        duration="until_source_leaves_battlefield",
+        turn=turn,
+        **replay_rule_fields(effect_data),
+    )
+    return linked_entries
+
+
 def _clear_battlefield_only_state(permanent):
     if not isinstance(permanent, dict):
         return
@@ -20012,6 +20192,15 @@ def move_permanent_from_battlefield_to_hand(owner, permanent, *, reason=None, so
         source=source.get("name", "?") if isinstance(source, dict) else source,
         turn=current_turn,
     )
+    resolve_linked_exile_source_leave(
+        owner,
+        moved,
+        destination=destination,
+        reason=reason,
+        all_players=_table_players_for(owner),
+        turn=current_turn,
+    )
+    refresh_additional_land_play_limit(owner)
     resolve_leave_battlefield_treasure_trigger(
         owner,
         moved,
@@ -20136,6 +20325,15 @@ def move_permanent_from_battlefield_to_library(owner, permanent, *, destination,
         vanished_token=final_destination == "vanished_token",
         turn=turn if turn is not None else CURRENT_REPLAY_TURN,
     )
+    resolve_linked_exile_source_leave(
+        owner,
+        moved,
+        destination=final_destination,
+        reason=reason,
+        all_players=_table_players_for(owner),
+        turn=current_turn,
+    )
+    refresh_additional_land_play_limit(owner)
     resolve_leave_battlefield_treasure_trigger(
         owner,
         moved,
@@ -26941,6 +27139,15 @@ def resolve_blink_permanent(
 
     target_name = target.get("name", "?")
     player.battlefield.remove(target)
+    resolve_linked_exile_source_leave(
+        player,
+        target,
+        destination="exile_then_return",
+        reason="blink",
+        all_players=all_players,
+        turn=turn,
+    )
+    refresh_additional_land_play_limit(player)
     target_effect = get_card_effect(target)
     reentry_payload = {**target_effect, **target}
     for transient_key in BLINK_TRANSIENT_KEYS:
@@ -27091,6 +27298,132 @@ def resolve_blink_effect(
     )
     if returned is not None:
         returned["_blink_target_score"] = target_score
+    return returned
+
+
+def multi_blink_candidates(player, effect_data):
+    candidates = []
+    for permanent in getattr(player, "battlefield", []) or []:
+        if not isinstance(permanent, dict) or _blink_target_is_token(permanent):
+            continue
+        type_line = str(permanent.get("type_line") or "").lower()
+        if not (
+            is_artifact_permanent(permanent)
+            or is_battlefield_creature(permanent)
+            or "land" in type_line
+        ):
+            continue
+        score = _harnessed_blink_target_score(permanent)
+        if "land" in type_line:
+            score = 8 if permanent.get("tapped") else 1
+        elif score <= -900:
+            score = 0
+        candidates.append((score, permanent))
+    candidates.sort(key=lambda item: (-item[0], item[1].get("name", "?")))
+    return [permanent for _score, permanent in candidates]
+
+
+def resolve_multi_blink_effect(
+    player,
+    opponents,
+    card,
+    effect_data,
+    turn,
+    rng,
+    *,
+    all_players=None,
+    phase="resolution",
+):
+    participants = list(all_players or [player, *(opponents or [])])
+    required_count = max(1, int(effect_data.get("target_count_min") or 2))
+    maximum_count = max(required_count, int(effect_data.get("target_count_max") or required_count))
+    candidates = multi_blink_candidates(player, effect_data)
+    if not candidates:
+        emit_replay_event(
+            "blink_multiple_skipped",
+            player=player.name,
+            card=card.get("name", "?"),
+            reason="all_declared_targets_missing",
+            candidate_count=0,
+            required_target_count=required_count,
+            turn=turn,
+            phase=phase,
+            **replay_rule_fields(effect_data),
+        )
+        return []
+
+    selected = candidates[:maximum_count]
+    target_names = [target.get("name", "?") for target in selected]
+    for target in selected:
+        if target in player.battlefield:
+            player.battlefield.remove(target)
+            resolve_linked_exile_source_leave(
+                player,
+                target,
+                destination="exile_then_return",
+                reason="blink_multiple",
+                all_players=participants,
+                turn=turn,
+            )
+
+    returned = []
+    other_players = [participant for participant in participants if participant is not player]
+    for target in selected:
+        target_effect = get_card_effect(target)
+        reentry_payload = {**target_effect, **target}
+        for transient_key in BLINK_TRANSIENT_KEYS:
+            reentry_payload.pop(transient_key, None)
+        reentry_payload["_zone_id"] = int(target.get("_zone_id") or 0) + 1
+        permanent = prepare_entering_permanent(
+            enrich_card(reentry_payload),
+            controller=player,
+            all_players=participants,
+            turn=turn,
+        )
+        player.battlefield.append(permanent)
+        returned.append(permanent)
+
+    for permanent in returned:
+        resolve_generic_permanent_etb(
+            player,
+            other_players,
+            permanent,
+            permanent,
+            turn,
+            rng,
+            all_players=participants,
+            phase=phase,
+        )
+        if is_battlefield_creature(permanent):
+            process_controlled_creature_enters_triggers(
+                player,
+                other_players,
+                permanent,
+                turn,
+                source_event="blink_multiple",
+                all_players=participants,
+            )
+            process_opponent_controlled_creature_enters_triggers(
+                player,
+                permanent,
+                turn,
+                source_event="blink_multiple",
+                all_players=participants,
+            )
+
+    emit_replay_event(
+        "blink_multiple_resolved",
+        player=player.name,
+        card=card.get("name", "?"),
+        targets=target_names,
+        returned=[permanent.get("name", "?") for permanent in returned],
+        target_count=len(returned),
+        zone_transition="exile_then_return_simultaneously",
+        turn=turn,
+        phase=phase,
+        **replay_rule_fields(effect_data),
+    )
+    check_sbas_until_stable(participants)
     return returned
 
 
@@ -28440,6 +28773,16 @@ def move_creature_from_battlefield(owner, creature, reason=None, source=None, al
             source=source.get("name", "?") if isinstance(source, dict) else source,
             turn=CURRENT_REPLAY_TURN,
         )
+    if destination != "none":
+        resolve_linked_exile_source_leave(
+            owner,
+            creature,
+            destination=destination,
+            reason=reason,
+            all_players=all_players,
+            turn=CURRENT_REPLAY_TURN,
+        )
+        refresh_additional_land_play_limit(owner)
     resolve_permanent_dies_draw(
         owner,
         creature,
@@ -28621,6 +28964,16 @@ def move_permanent_from_battlefield(owner, permanent, reason=None, source=None, 
             source=source.get("name", "?") if isinstance(source, dict) else source,
             turn=CURRENT_REPLAY_TURN,
         )
+    if destination != "none":
+        resolve_linked_exile_source_leave(
+            owner,
+            permanent,
+            destination=destination,
+            reason=reason,
+            all_players=all_players,
+            turn=CURRENT_REPLAY_TURN,
+        )
+        refresh_additional_land_play_limit(owner)
     resolve_permanent_dies_draw(
         owner,
         permanent,
@@ -33807,7 +34160,30 @@ def graveyard_land_play_permission(player):
     return None
 
 
+def refresh_additional_land_play_limit(player):
+    """Recompute the current turn land allowance from live static sources."""
+    static_additional = 0
+    for permanent in getattr(player, "battlefield", []) or []:
+        if not isinstance(permanent, dict):
+            continue
+        try:
+            static_additional += max(
+                0,
+                int(permanent.get("additional_land_plays_each_turn") or 0),
+            )
+        except (TypeError, ValueError):
+            continue
+    temporary_additional = max(
+        0,
+        int(getattr(player, "_temporary_additional_land_plays", 0) or 0),
+    )
+    player._static_additional_land_plays = static_additional
+    player.max_lands_per_turn = 1 + static_additional + temporary_additional
+    return player.max_lands_per_turn
+
+
 def choose_land_play_candidate(player, opponents):
+    refresh_additional_land_play_limit(player)
     if player.lands_played_this_turn >= player.max_lands_per_turn:
         return None
     lands_in_hand = [card for card in player.hand if is_effective_land(card)]
@@ -37293,6 +37669,15 @@ def move_permanent_from_battlefield_to_exile(owner, permanent, *, reason=None, s
         source=source.get("name", "?") if isinstance(source, dict) else source,
         turn=current_turn,
     )
+    resolve_linked_exile_source_leave(
+        owner,
+        moved,
+        destination=destination,
+        reason=reason,
+        all_players=_table_players_for(owner),
+        turn=current_turn,
+    )
+    refresh_additional_land_play_limit(owner)
     resolve_leave_battlefield_treasure_trigger(
         owner,
         moved,
@@ -50127,6 +50512,13 @@ def spell_has_required_library_target(player, effect_data):
     )
 
 
+def spell_has_required_battlefield_targets(player, effect_data):
+    if str((effect_data or {}).get("effect") or "") != "blink_multiple":
+        return True
+    required_count = max(1, int((effect_data or {}).get("target_count_min") or 2))
+    return len(multi_blink_candidates(player, effect_data or {})) >= required_count
+
+
 def tutor_destination_for_target_type(target_type):
     target_type = str(target_type or "any").lower()
     if str(target_type).endswith("_to_top"):
@@ -54398,6 +54790,35 @@ def refresh_life_total_threshold_statics_for_player(
     return refreshed
 
 
+def resolve_tapped_permanent_entry_untap(permanent, controller, *, entered_tapped, turn=None):
+    if not entered_tapped or controller is None or not isinstance(permanent, dict):
+        return False
+    sources = [
+        source
+        for source in getattr(controller, "battlefield", []) or []
+        if isinstance(source, dict)
+        and (
+            source.get("untap_tapped_permanent_on_entry")
+            or source.get("effect") == "untap_tapped_permanent_etb_engine"
+        )
+    ]
+    if not sources:
+        return False
+    permanent["tapped"] = False
+    emit_replay_event(
+        "tapped_permanent_entry_untapped",
+        player=getattr(controller, "name", "?"),
+        card=permanent.get("name", "?"),
+        source_cards=[source.get("name", "?") for source in sources],
+        source_count=len(sources),
+        entered_tapped=True,
+        tapped_after=False,
+        turn=turn if turn is not None else CURRENT_REPLAY_TURN,
+        **replay_rule_fields(sources[0]),
+    )
+    return True
+
+
 def prepare_entering_permanent(permanent, controller=None, all_players=None, turn=None):
     """Apply shared creature-entry state for permanents with engine effects."""
     if not isinstance(permanent, dict):
@@ -54534,6 +54955,12 @@ def prepare_entering_permanent(permanent, controller=None, all_players=None, tur
         )
     elif enters_tapped:
         permanent["tapped"] = True
+    resolve_tapped_permanent_entry_untap(
+        permanent,
+        controller,
+        entered_tapped=enters_tapped,
+        turn=turn,
+    )
     return permanent
 
 
@@ -74549,6 +74976,7 @@ def cast_spells_v8(player, opponents, all_players, turn, phase, stack, rng, max_
     castable = [
         c for c in player.hand
         if not is_effective_land(c)
+        and can_cast_in_phase(c, get_card_effect(c), phase, controller=player)
         and card_is_runtime_castable(player, c, get_card_effect(c))
         and get_card_effect(c).get("effect") not in (
             "counter",
@@ -74579,6 +75007,7 @@ def cast_spells_v8(player, opponents, all_players, turn, phase, stack, rng, max_
         )
         and not should_hold_squee_for_lorehold_recursion(player, c, phase)
         and spell_has_required_library_target(player, get_card_effect(c))
+        and spell_has_required_battlefield_targets(player, get_card_effect(c))
     ]
     # v8: Miracle check for Lorehold
     if player.is_human:
@@ -77712,6 +78141,41 @@ def apply_effect_immediate(
             turn=turn,
             **replay_rule_fields(effect_data),
         )
+    elif effect in {
+        "additional_land_play_static",
+        "untap_tapped_permanent_etb_engine",
+    }:
+        permanent = prepare_resolved_permanent(enrich_card({**card, **effect_data}))
+        permanent["effect"] = effect
+        player.battlefield.append(permanent)
+        if effect == "additional_land_play_static":
+            refresh_additional_land_play_limit(player)
+        emit_replay_event(
+            "permanent_static_engine_entered",
+            player=player.name,
+            card=card.get("name", "?"),
+            effect=effect,
+            additional_land_plays_each_turn=int(
+                permanent.get("additional_land_plays_each_turn") or 0
+            ),
+            untap_tapped_permanent_on_entry=bool(
+                permanent.get("untap_tapped_permanent_on_entry")
+            ),
+            turn=turn,
+            **replay_rule_fields(effect_data),
+        )
+    elif effect == "exile_each_opponent_nonland_until_source_leaves":
+        permanent = prepare_resolved_permanent(enrich_card({**card, **effect_data}))
+        permanent["effect"] = effect
+        player.battlefield.append(permanent)
+        resolve_exile_each_opponent_nonland_until_source_leaves(
+            player,
+            opponents,
+            permanent,
+            effect_data,
+            turn,
+            all_players=all_players_for_entry,
+        )
     elif effect == "goad_opponents_creatures_cant_block":
         affected = []
         source_player = getattr(player, "name", None)
@@ -77792,6 +78256,18 @@ def apply_effect_immediate(
                 summoning_sick=permanent.get("summoning_sick"),
                 turn=turn,
             )
+    elif effect == "blink_multiple":
+        resolve_multi_blink_effect(
+            player,
+            opponents,
+            card,
+            effect_data,
+            turn,
+            rng,
+            all_players=all_players_for_entry,
+            phase=phase or "resolution",
+        )
+        finish_resolved_spell(player, card, turn=turn, effect_data=effect_data)
     elif effect == "blink":
         resolve_blink_effect(
             player,
@@ -83931,6 +84407,7 @@ def play_turn_v8(player, opponents, all_players, turn, rng, stack):
                 if not is_effective_land(c)
                 and is_instant(c)
                 and is_modeled_battle_card(c)
+                and can_cast_in_phase(c, get_card_effect(c), "end_step", controller=opp)
                 and opp.can_pay_card(c)
                 and get_card_effect(c).get("effect") != "counter"
                 and not should_hold_for_response_window(
@@ -83940,6 +84417,7 @@ def play_turn_v8(player, opponents, all_players, turn, rng, stack):
                     "end_step",
                 )
                 and spell_has_required_library_target(opp, get_card_effect(c))
+                and spell_has_required_battlefield_targets(opp, get_card_effect(c))
             ]
             for c in instants_in_hand[:1]:  # 1 instant per opponent per end step
                 if opp.can_pay_card(c):
