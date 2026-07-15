@@ -257,6 +257,162 @@ CONTRACTS: dict[str, dict[str, Any]] = {
 }
 
 
+def deterministic_field_contract(
+    owner: str,
+    waiver_reason: str,
+    *,
+    required_score_keys: set[str] | None = None,
+    required_score_key_any_group: list[set[str]] | None = None,
+    research_category: str | None = None,
+) -> dict[str, Any]:
+    contract: dict[str, Any] = {
+        "owner": owner,
+        "strategy_auditor": "generic_strategy_fields_only",
+        "research_category": research_category,
+        "specific_status": "accepted_field_contract_waiver",
+        "waiver_reason": waiver_reason,
+        "fixture_gate": "field_contract_required_before_observed_learning",
+    }
+    if required_score_keys:
+        contract["required_score_keys"] = required_score_keys
+    if required_score_key_any_group:
+        contract["required_score_key_any_group"] = required_score_key_any_group
+    return contract
+
+
+# Static emitters remain fail-closed until each decision family has an explicit
+# shape. These contracts waive a dedicated strategy model, not trace evidence.
+CONTRACTS.update(
+    {
+        "activated_ability": deterministic_field_contract(
+            "activated-ability-field-contract",
+            "Generic activated abilities must identify their concrete target, output, or selection family.",
+            required_score_key_any_group=[
+                {"candidate_count", "selected_count"},
+                {"damage"},
+                {"token_count"},
+                {"target", "target_type"},
+                {"target_count", "target_type"},
+                {"counter_type", "counter_count"},
+                {"power_delta", "toughness_delta"},
+                {"keywords"},
+                {"regeneration_shields_before"},
+            ],
+        ),
+        "activated_self_damage_reflect": deterministic_field_contract(
+            "activated-self-damage-reflect-field-contract",
+            "Self-damage conversion must expose damage, reflections, and chosen player.",
+            required_score_keys={"self_damage", "reflected_triggers", "chosen_player"},
+        ),
+        "attack_trigger_self_boost": deterministic_field_contract(
+            "attack-trigger-self-boost-field-contract",
+            "The trigger must expose its source and before/after combat stats.",
+            required_score_keys={
+                "source", "power_delta", "toughness_delta", "power_before",
+                "power_after", "toughness_before", "toughness_after",
+            },
+        ),
+        "attack_trigger_target_keyword": deterministic_field_contract(
+            "attack-trigger-target-keyword-field-contract",
+            "The trigger must expose source, selected target, keywords, and target count.",
+            required_score_keys={"source", "target", "keywords", "available_targets"},
+        ),
+        "becomes_blocked_trigger_draw": deterministic_field_contract(
+            "becomes-blocked-draw-field-contract",
+            "The blocked trigger must expose requested and actual draws.",
+            required_score_keys={"source", "draw_count", "cards_drawn", "blocker_count"},
+        ),
+        "becomes_blocked_trigger_self_boost": deterministic_field_contract(
+            "becomes-blocked-self-boost-field-contract",
+            "The blocked trigger must expose blocker scaling and before/after stats.",
+            required_score_keys={
+                "source", "blocker_count", "multiplier", "power_delta",
+                "toughness_delta", "power_before", "power_after",
+                "toughness_before", "toughness_after",
+            },
+        ),
+        "formidable_life_total_reset_activation": deterministic_field_contract(
+            "formidable-life-reset-field-contract",
+            "The activation must prove formidable threshold and resulting life total.",
+            required_score_keys={
+                "controlled_creatures_total_power", "required_power",
+                "life_before", "life_after", "target_life",
+            },
+        ),
+        "graveyard_activation": deterministic_field_contract(
+            "graveyard-activation-field-contract",
+            "Graveyard activations must identify their deterministic movement or cost family.",
+            required_score_key_any_group=[
+                {"candidate_count", "moved_count", "owner_library_destination"},
+                {"activation_cost", "activation_cost_generic", "activation_cost_colors"},
+            ],
+        ),
+        "graveyard_exile_spell": deterministic_field_contract(
+            "graveyard-exile-spell-field-contract",
+            "The spell must expose target scope and requested versus actual exile count.",
+            required_score_keys={"target_type", "requested_count", "exiled_count", "single_graveyard"},
+        ),
+        "landfall_trigger_self_boost": deterministic_field_contract(
+            "landfall-self-boost-field-contract",
+            "The landfall trigger must expose trigger land and before/after stats.",
+            required_score_keys={
+                "source", "trigger_land", "power_delta", "toughness_delta",
+                "power_before", "power_after", "toughness_before", "toughness_after",
+            },
+        ),
+        "mass_return_to_hand": deterministic_field_contract(
+            "mass-return-to-hand-field-contract",
+            "Mass bounce must expose scope and movement totals by controller.",
+            required_score_keys={
+                "return_card_types", "return_controller", "permanents_seen",
+                "returned", "own_permanents_returned", "opponent_permanents_returned",
+            },
+        ),
+        "modal_exile_board_wipe": deterministic_field_contract(
+            "modal-exile-board-wipe-field-contract",
+            "The selected exile modes and affected permanent totals must be explicit.",
+            required_score_keys={
+                "exile_modes", "battlefield_exiled", "graveyard_exiled",
+                "artifact_exiled", "creature_exiled", "enchantment_exiled",
+            },
+            research_category="board_wipe_wheel",
+        ),
+        "possibility_storm_replacement": deterministic_field_contract(
+            "possibility-storm-replacement-field-contract",
+            "The replacement must expose original spell, hit, moved counts, and cast result.",
+            required_score_keys={
+                "original_spell", "original_types", "hit_card", "exiled_until_count",
+                "bottomed_count", "cast_result",
+            },
+        ),
+        "spell_resolution": deterministic_field_contract(
+            "spell-resolution-field-contract",
+            "Targeted resolution must expose requested and selected target counts.",
+            required_score_keys={"target_type", "requested_target_count", "selected_target_count"},
+        ),
+        "unblocked_attack_control_transfer_trigger": deterministic_field_contract(
+            "unblocked-control-transfer-field-contract",
+            "The trigger must expose unblocked attackers, draw, and controller transfer.",
+            required_score_keys={
+                "unblocked_attackers", "draw_count", "old_controller", "new_controller",
+                "source_tapped_before", "source_tapped_after",
+            },
+        ),
+        "utility_permanent_activation": deterministic_field_contract(
+            "utility-permanent-activation-field-contract",
+            "Each utility activation must identify its concrete draw, movement, counter, or life-gain family.",
+            required_score_key_any_group=[
+                {"cards_drawn", "hand_before", "hand_after"},
+                {"exiled_count", "target_type"},
+                {"moved_count", "destination"},
+                {"counter_type", "counter_count"},
+                {"life_gain_requested"},
+            ],
+        ),
+    }
+)
+
+
 def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     parser = argparse.ArgumentParser()
     parser.add_argument("--engine-source", type=Path, default=DEFAULT_ENGINE_SOURCE)

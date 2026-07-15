@@ -674,6 +674,246 @@ EVENT_CONTRACT_OVERRIDES = {
     ),
 }
 
+
+def register_event_contract_group(events, classification, reason):
+    for event in events.split():
+        EVENT_CONTRACT_OVERRIDES.setdefault(event, (classification, reason))
+
+
+register_event_contract_group(
+    """
+    attack_recursion_trigger_skipped
+    aura_unattached
+    blink_skipped
+    combat_damage_draw_skipped
+    dies_self_return_skipped
+    etb_draw_discard_skipped
+    etb_optional_discard_draw_skipped
+    etb_treasure_skipped
+    mana_source_activation_skipped
+    spell_resolution_skipped
+    sticker_placement_skipped
+    targeted_protection_activation_skipped
+    ward_cost_unmodeled
+    """,
+    "ignored_with_reason",
+    "explicit skip/unsupported branch; emitted reason metadata is the contract evidence.",
+)
+
+register_event_contract_group(
+    """
+    additional_cost_option_selected
+    attachment_static_power_toughness_changed
+    buyback_returned_to_hand
+    conditional_mana_life_cost_paid
+    countered_spell_moved_to_exile
+    countered_spell_moved_to_graveyard
+    countered_spell_moved_to_library_top
+    delayed_upkeep_payment_created
+    draw_replacement_applied
+    free_cast_spell_moved_to_graveyard
+    goliath_daydreamer_dream_counter_replacement_marked
+    life_gain_replacement_applied
+    loss_replacement_applied
+    mana_activation_cast_trigger_created
+    mana_source_activation_cost_paid
+    mana_source_activation_counter_cost_paid
+    mana_source_activation_discard_cost_paid
+    mana_source_activation_life_cost_paid
+    mana_source_mill_cost_paid
+    mana_source_support_tapped
+    permanent_counters_removed
+    permanent_moved_from_battlefield
+    permanent_put_on_library
+    permanent_to_battlefield
+    permanent_transformed
+    shield_counter_replacement_applied
+    spell_type_cast_lock_expired
+    state_based_action_zero_toughness
+    static_controlled_keyword_changed
+    static_count_power_toughness_changed
+    static_damage_modifier_entered
+    static_damage_replacement_applied
+    static_dynamic_count_source_boost_changed
+    static_global_power_toughness_boost_changed
+    static_graveyard_count_creature_state_changed
+    static_graveyard_count_power_toughness_changed
+    static_graveyard_count_source_boost_changed
+    static_graveyard_threshold_source_boost_changed
+    static_indestructible_applied
+    static_indestructible_removed
+    static_life_total_threshold_state_changed
+    static_permission_entered
+    static_power_toughness_boost_changed
+    static_restriction_applied
+    static_spell_limit_registered
+    sticker_placed
+    stickers_removed_in_hidden_zone
+    storm_copies_created
+    ticket_counters_changed
+    top_library_static_permission_used
+    topdeck_play_static_permission_entered
+    """,
+    "technical",
+    "deterministic cost, zone, counter, replacement or continuous-state ledger event.",
+)
+
+register_event_contract_group(
+    """
+    as_enters_choose_player
+    brain_in_a_jar_free_cast
+    brain_in_a_jar_scry
+    chosen_card_type_resolved
+    combat_damage_prevented
+    combat_damage_prevention_created
+    cycling_activated
+    damage_prevention_shield_created
+    etb_scry_resolved
+    focus_card_access_snapshot
+    forced_focus_access_applied
+    goliath_daydreamer_free_cast
+    hand_to_topdeck_activation
+    kaylas_music_box_play_from_exile
+    life_gain_prevented
+    life_total_changed
+    look_at_target_player_hand_resolved
+    opponent_library_free_cast
+    possibility_storm_free_cast
+    possibility_storm_resolved
+    protection_damage_prevented
+    radiant_scrollwielder_exile_cast
+    regeneration_shield_used
+    removal_prevented_by_indestructible
+    scry_resolved
+    specialize_activated
+    specialize_temporary_control_returned
+    surveil_resolved
+    tap_target_countered_by_ward
+    temporary_control_returned
+    top_library_looked
+    turn_limited_free_exile_cast
+    unblocked_attack_control_transfer_resolved
+    utility_permanent_activated
+    """,
+    "strategy_signal",
+    "choice, access, prevention or control signal consumed as replay/decision context.",
+)
+
+register_event_contract_group(
+    """
+    token_created
+    """,
+    "renderer_only",
+    "token board-state delta is rendered in replay snapshots; the causing action is audited separately.",
+)
+
+register_event_contract_group(
+    """
+    activated_ability_resolved
+    aura_attached_static_pt
+    basic_land_compensation_resolved
+    becomes_blocked_draw_resolved
+    blink_resolved
+    cant_block_until_eot_resolved
+    card_conjured_to_battlefield
+    combat_damage_draw_resolved
+    conjure_random_card_to_exile_resolved
+    conjure_random_pool_resolved
+    controlled_stat_modifier_until_eot_resolved
+    covercast_intensified
+    damage_each_opponent_and_opponent_creatures_resolved
+    dies_damage_trigger_resolved
+    dies_draw_resolved
+    dies_life_gain_resolved
+    dies_mana_resolved
+    dies_recursion_resolved
+    dies_self_return_resolved
+    dies_token_maker_resolved
+    discover_resolved
+    draw_bottom_perpetual_evoke_resolved
+    draw_discard_spell_resolved
+    draw_lose_life_spell_resolved
+    each_player_sacrifice_resolved
+    end_turn_effect_resolved
+    etb_discard_hand_then_draw_resolved
+    etb_draw_discard_resolved
+    etb_optional_discard_draw_resolved
+    etb_token_maker_resolved
+    evoke_sacrifice_resolved
+    exile_value_free_casts_resolved
+    formidable_life_total_reset_resolved
+    gain_control_untap_haste_until_eot_resolved
+    gate_tap_untap_source_resolved
+    global_stat_modifier_until_eot_resolved
+    glyphbridge_selective_creature_wipe_resolved
+    goad_opponents_creatures_cant_block_resolved
+    graveyard_exile_activated
+    graveyard_exile_resolved
+    graveyard_to_library_activated
+    graveyard_to_library_top_resolved
+    land_animation_resolved
+    life_gain_activated
+    life_loss_on_counter_resolved
+    life_loss_on_destroy_resolved
+    mana_activation_cast_trigger_resolved
+    mana_source_activation_life_gain_resolved
+    mana_spent_cast_trigger_resolved
+    mass_return_to_hand_resolved
+    mill_engine_activated
+    mill_engine_resolved
+    modal_exile_board_wipe_resolved
+    multi_target_damage_resolved
+    phase_trigger_resolved
+    prepared_spell_resolved
+    proliferate_resolved
+    pump_all_resolved
+    put_land_from_hand_to_battlefield_resolved
+    random_discard_artifact_damage_resolved
+    recursion_followup_draw_resolved
+    seek_resolved
+    single_combat_resolved
+    source_controller_damage_on_resolve
+    source_controller_life_loss_on_resolve
+    specialize_attack_trigger
+    specialize_base_etb
+    specialize_beginning_combat_trigger
+    specialize_combat_damage_trigger
+    specialize_end_step_trigger
+    specialize_face_etb
+    specialize_graveyard_ability_activated
+    specialize_leave_battlefield_trigger
+    specialize_life_loss_trigger
+    specialize_opponent_target_blink_triggered
+    specialize_spell_cast_trigger
+    stat_modifier_until_eot_resolved
+    stat_modifier_until_eot_untap_target_resolved
+    state_trigger_resolved
+    sticker_graveyard_return_trigger_resolved
+    sticker_placement_trigger_resolved
+    storm_triggered
+    sweeper_damage_resolved
+    tap_target_resolved
+    target_controller_damage_on_resolve
+    target_controller_life_loss_on_resolve
+    temporary_exile_resolved
+    temporary_exile_returned
+    tempting_offer_resolved
+    tibalts_trickery_replacement_resolved
+    tutor_artifact_resolved
+    unfinity_activated_ability_resolved
+    unfinity_attachment_left_battlefield
+    unfinity_attack_trigger_resolved
+    unfinity_end_step_trigger_resolved
+    unfinity_reanimate_attachment_resolved
+    unfinity_sticker_etb_followup_resolved
+    unfinity_sticker_spell_resolved
+    untap_target_resolved
+    upkeep_random_missing_color_added
+    """,
+    "forensic_card_event",
+    "card effect or trigger outcome retained as forensic rule and state-transition evidence.",
+)
+
 SEVERITY_ORDER = {
     "ok": 0,
     "info": 1,
@@ -1045,12 +1285,17 @@ def criticize_actions(
                     "Counter event lacks priority provenance.",
                     "Emit phase and priority_window for every counter interaction.",
                 ))
-            if event.get("result") not in {"countered", "fizzled", "no_legal_target"}:
+            if event.get("result") not in {
+                "countered",
+                "fizzled",
+                "no_legal_target",
+                "not_countered_tax_paid",
+            }:
                 findings.append(action_finding(
                     "medium",
                     "counter_without_result",
                     "Counter event lacks a legal interaction result.",
-                    "Record result as countered, fizzled or no_legal_target.",
+                    "Record result as countered, fizzled, no_legal_target or not_countered_tax_paid.",
                 ))
 
         if kind == "redirect_removal_resolved":

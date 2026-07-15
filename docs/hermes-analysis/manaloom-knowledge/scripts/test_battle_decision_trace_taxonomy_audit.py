@@ -161,11 +161,43 @@ def test_missing_type_specific_score_key_is_reported():
     assert summary["status"] == "review_required"
 
 
+def test_utility_permanent_activation_has_a_concrete_observed_contract():
+    with tempfile.TemporaryDirectory() as tmp_name:
+        tmp = Path(tmp_name)
+        engine = tmp / "engine.py"
+        write_engine(engine, ["utility_permanent_activation"])
+        write_trace(
+            tmp / "seed_1/replay.decision_trace.jsonl",
+            [
+                base_decision(
+                    "utility_permanent_activation",
+                    {"cards_drawn": 1, "hand_before": 2, "hand_after": 3},
+                )
+            ],
+        )
+
+        audit = audit_module.build_audit(input_dir=tmp, engine_source=engine)
+
+    assert audit["summary"]["status"] == "decision_trace_taxonomy_ready"
+    assert audit["summary"]["decision_trace_contract_findings"] == 0
+
+
+def test_real_engine_has_an_explicit_contract_for_every_static_decision_type():
+    with tempfile.TemporaryDirectory() as tmp_name:
+        audit = audit_module.build_audit(input_dir=Path(tmp_name))
+
+    assert audit["summary"]["decision_trace_static_without_contract"] == 0
+    assert audit["summary"]["decision_trace_kinds_without_specific_contract"] == 0
+    assert audit["summary"]["status"] == "decision_trace_taxonomy_ready"
+
+
 if __name__ == "__main__":
     tests = [
         test_known_field_contract_waivers_are_not_generic_only_gaps,
         test_observed_unknown_decision_type_is_reported,
         test_missing_type_specific_score_key_is_reported,
+        test_utility_permanent_activation_has_a_concrete_observed_contract,
+        test_real_engine_has_an_explicit_contract_for_every_static_decision_type,
     ]
     for test in tests:
         test()

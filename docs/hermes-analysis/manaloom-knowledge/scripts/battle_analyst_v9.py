@@ -15768,6 +15768,7 @@ class Player:
         self.cards_discarded_this_turn = 0
         self._cards_discarded_turn_marker = None
         self.surge_to_victory_delayed_triggers = []
+        self.temporary_exile_returns = []
         self.failed_draw_from_empty_library = False
         self.turn_end_requested = False
         self.turn_end_source = None
@@ -16495,7 +16496,13 @@ class Player:
             if not self.spend_mana(cost):
                 return None
         self.hand.remove(counter)
-        if not pay_additional_card_costs(self, counter, effect, turn=turn):
+        if not pay_additional_card_costs(
+            self,
+            counter,
+            effect,
+            turn=turn,
+            cost_purpose="spell_cast",
+        ):
             self.hand.append(counter)
             return None
         self.graveyard.append(counter)
@@ -22749,7 +22756,7 @@ def priority_round(active_player, all_players, stack, turn, rng, phase=None):
                                 **replay_rule_fields(eff),
                             )
                             attach_direct_resolution_context(
-                                eff,
+                                response_effect,
                                 c,
                                 phase,
                                 priority_window="response_direct_resolution",
@@ -27086,6 +27093,153 @@ def resolve_blink_effect(
     return returned
 
 
+def resolve_temporary_exile_return_next_end_step(
+    player,
+    opponents,
+    card,
+    effect_data,
+    turn,
+    rng,
+    *,
+    all_players=None,
+    phase="resolution",
+):
+    participants = list(all_players or [player, *(opponents or [])])
+    candidates = []
+    for controller in participants:
+        for permanent in list(getattr(controller, "battlefield", []) or []):
+            if not isinstance(permanent, dict):
+                continue
+            if not (is_artifact_permanent(permanent) or is_battlefield_creature(permanent)):
+                continue
+            score = target_priority(permanent)
+            if controller is player:
+                score -= 35
+            candidates.append((score, controller, permanent))
+    candidates.sort(
+        key=lambda item: (
+            item[0],
+            item[1] is not player,
+            item[2].get("name", "?"),
+        ),
+        reverse=True,
+    )
+    fields = replay_rule_fields(effect_data)
+    if not candidates:
+        emit_replay_event(
+            "temporary_exile_resolved",
+            player=player.name,
+            card=card.get("name", "?"),
+            result="no_legal_target",
+            target_type="artifact_or_creature",
+            turn=turn,
+            phase=phase,
+            **fields,
+        )
+        finish_resolved_spell(player, card, turn=turn, effect_data=effect_data)
+        return None
+
+    _score, target_controller, target = candidates[0]
+    target_name = target.get("name", "?")
+    target_controller.battlefield.remove(target)
+    move_to_exile(
+        target_controller,
+        target,
+        reason="temporary_exile_return_next_end_step",
+        turn=turn,
+    )
+    owner_name = str(target.get("owner") or target_controller.name)
+    owner = next(
+        (participant for participant in participants if participant.name == owner_name),
+        target_controller,
+    )
+    player.temporary_exile_returns.append(
+        {
+            "card": target,
+            "exile_holder": target_controller,
+            "owner": owner,
+            "source": card.get("name", "?"),
+            "created_turn": turn,
+            "rule_fields": fields,
+        }
+    )
+    emit_replay_event(
+        "temporary_exile_resolved",
+        player=player.name,
+        card=card.get("name", "?"),
+        target=target_name,
+        target_controller=target_controller.name,
+        target_owner=owner.name,
+        result="exiled_until_next_end_step",
+        destination="exile",
+        return_trigger="next_end_step",
+        turn=turn,
+        phase=phase,
+        **fields,
+    )
+    finish_resolved_spell(player, card, turn=turn, effect_data=effect_data)
+    return target
+
+
+def process_temporary_exile_returns(active_player, all_players, turn, rng):
+    returned = []
+    for controller in list(all_players or []):
+        pending = list(getattr(controller, "temporary_exile_returns", []) or [])
+        controller.temporary_exile_returns = []
+        for entry in pending:
+            if int(entry.get("created_turn") or 0) > int(turn):
+                controller.temporary_exile_returns.append(entry)
+                continue
+            card = entry.get("card")
+            exile_holder = entry.get("exile_holder")
+            owner = entry.get("owner")
+            if (
+                not isinstance(card, dict)
+                or exile_holder is None
+                or owner is None
+                or card not in getattr(exile_holder, "exile", [])
+            ):
+                continue
+            exile_holder.exile.remove(card)
+            payload = copy.deepcopy(card)
+            payload.pop("_exile_reason", None)
+            payload["_zone_id"] = int(card.get("_zone_id") or 0) + 1
+            effect_data = get_card_effect(payload)
+            permanent = prepare_entering_permanent(
+                enrich_card({**payload, **effect_data}),
+                controller=owner,
+                all_players=all_players,
+                turn=turn,
+            )
+            owner.battlefield.append(permanent)
+            opponents = [participant for participant in all_players if participant is not owner]
+            resolve_generic_permanent_etb(
+                owner,
+                opponents,
+                permanent,
+                effect_data,
+                turn,
+                rng,
+                all_players=all_players,
+                phase="end_step",
+            )
+            emit_replay_event(
+                "temporary_exile_returned",
+                player=controller.name,
+                active_player=getattr(active_player, "name", None),
+                card=entry.get("source", "?"),
+                returned=permanent.get("name", "?"),
+                owner=owner.name,
+                destination="battlefield",
+                result="returned_under_owners_control",
+                turn=turn,
+                phase="end_step",
+                **dict(entry.get("rule_fields") or {}),
+            )
+            returned.append(permanent)
+    return returned
+
+
 def _choose_harnessed_blink_target(player, source_permanent):
     candidates = []
     for permanent in getattr(player, "battlefield", []) or []:
@@ -29591,6 +29745,8 @@ def additional_card_costs_are_payable_for_spell_cast(
     base_cost=None,
     cost_context=None,
 ):
+    if str(effect_data.get("ability_kind") or "").lower() == "activated":
+        return True
     cost_options = [
         option
         for option in effect_data.get("additional_cost_options") or []
@@ -29669,8 +29825,21 @@ def additional_cost_option_effect_fields(option):
     return effect_data
 
 
-def pay_additional_card_costs(player, card, effect_data, *, turn=None, cost_context=None):
+def pay_additional_card_costs(
+    player,
+    card,
+    effect_data,
+    *,
+    turn=None,
+    cost_context=None,
+    cost_purpose="resolution",
+):
     """Pay non-mana costs that materially affect battlefield validity."""
+    if (
+        cost_purpose == "spell_cast"
+        and str(effect_data.get("ability_kind") or "").lower() == "activated"
+    ):
+        return True
     if effect_data.get("_additional_card_costs_paid"):
         return True
     cost_context = dict(cost_context or {})
@@ -29695,6 +29864,7 @@ def pay_additional_card_costs(player, card, effect_data, *, turn=None, cost_cont
                 option_effect_data,
                 turn=turn,
                 cost_context=cost_context,
+                cost_purpose=cost_purpose,
             ):
                 emit_replay_event(
                     "additional_cost_option_selected",
@@ -41050,6 +41220,117 @@ def resolve_graveyard_exile_spell(player, opponents, all_players, card, effect_d
     return exiled
 
 
+def resolve_graveyard_to_library_top_spell(
+    player,
+    opponents,
+    all_players,
+    card,
+    effect_data,
+    turn,
+    *,
+    phase=None,
+):
+    participants = list(all_players or [player, *(opponents or [])])
+    target_pairs, all_options = graveyard_to_library_target_pairs(
+        player,
+        card,
+        effect_data,
+        participants,
+        turn,
+    )
+    fields = replay_rule_fields(effect_data)
+    target_type = effect_data.get("target") or "any_card"
+    if not target_pairs:
+        emit_replay_event(
+            "graveyard_to_library_top_resolved",
+            player=player.name,
+            card=card.get("name", "?"),
+            target_type=target_type,
+            result="no_legal_graveyard_target",
+            destination="owners_library_top",
+            turn=turn,
+            phase=phase or "resolution",
+            **fields,
+        )
+        return []
+
+    moved = []
+    moved_owners = []
+    for owner, target in target_pairs:
+        removed = remove_cards_from_graveyard(
+            owner,
+            [target],
+            turn=turn,
+            source_event="graveyard_to_library_top_spell",
+        )
+        if not removed:
+            continue
+        moved_card = removed[0]
+        owner.library.insert(0, moved_card)
+        moved.append(moved_card)
+        moved_owners.append(owner)
+
+    available_options = [
+        decision_card_option(
+            option_card,
+            get_card_effect(option_card),
+            score=score,
+            action="put_graveyard_card_on_owners_library_top",
+            target_owner=owner.name,
+            destination="owners_library_top",
+        )
+        for score, owner, option_card in all_options[:8]
+    ]
+    emit_decision_trace(
+        decision_type="graveyard_activation",
+        player=player,
+        turn=turn,
+        phase=phase or "resolution",
+        available_options=available_options,
+        chosen_option=(
+            decision_card_option(
+                moved[0],
+                get_card_effect(moved[0]),
+                action="put_graveyard_card_on_owners_library_top",
+                target_owner=moved_owners[0].name,
+                destination="owners_library_top",
+            )
+            if moved
+            else {"action": "no_legal_graveyard_target"}
+        ),
+        rejected_options=available_options[1:8],
+        score_components={
+            "candidate_count": len(all_options),
+            "moved_count": len(moved),
+            "target_controller": effect_data.get("target_controller") or "any_player",
+            "owner_library_destination": True,
+        },
+        rule_source=fields.get("rule_source", "xmage_graveyard_to_library_top_v1"),
+        rule_status=fields.get("rule_review_status", "verified"),
+        confidence="high" if moved else "low",
+        expected_benefit_score=(all_options[0][0] if all_options else 0),
+        actual_outcome="graveyard_card_moved_to_owners_library_top" if moved else "no_legal_target",
+        reason="select_best_legal_graveyard_target_for_owner_library_top",
+        resource_delta={"graveyard_cards": -len(moved), "library_cards": len(moved)},
+        risk_flags=[],
+    )
+    emit_replay_event(
+        "graveyard_to_library_top_resolved",
+        player=player.name,
+        card=card.get("name", "?"),
+        target_type=target_type,
+        moved=[item.get("name", "?") for item in moved],
+        target_owners=[owner.name for owner in moved_owners],
+        library_owners=[owner.name for owner in moved_owners],
+        destination="owners_library_top",
+        result="moved" if moved else "no_legal_graveyard_target",
+        turn=turn,
+        phase=phase or "resolution",
+        **fields,
+    )
+    return moved
+
+
 def activate_graveyard_exile_permanents(
     player,
     opponents,
@@ -44152,6 +44433,143 @@ def activate_permanent_library_tutors_to_hand(
     ) else 0
 
 
+def activate_wish_counter_tutor_artifact(
+    player,
+    opponents,
+    permanent,
+    turn,
+    rng,
+    *,
+    phase="precombat_main",
+):
+    if phase not in MAIN_PHASES or permanent not in getattr(player, "battlefield", []):
+        return False
+    if not permanent.get("activated_wish_counter_tutor_to_hand"):
+        return False
+    if permanent.get("tapped") or permanent.get("utility_artifact_used_this_turn"):
+        return False
+    counters = int(permanent.get("wish_counters") or 0)
+    remove_count = max(1, int(permanent.get("activation_requires_remove_counter_count") or 1))
+    if counters < remove_count:
+        return False
+    live_opponents = [opponent for opponent in opponents or [] if opponent.is_alive()]
+    if not live_opponents:
+        return False
+    activation_cost = adjusted_activated_ability_generic_cost(
+        player,
+        permanent,
+        int(permanent.get("activation_cost_generic") or 1),
+    )
+    activation_cost_text = _activation_cost_text(activation_cost)
+    if not player.can_pay(activation_cost_text):
+        return False
+    target_type = str(permanent.get("activated_tutor_target") or permanent.get("target") or "any")
+    candidates = constrained_library_tutor_candidates(player, target_type, permanent)
+    if not candidates:
+        return False
+    scored = [
+        (candidate, *tutor_candidate_score(candidate, target_type, player, opponents, turn))
+        for candidate in candidates
+    ]
+    scored.sort(
+        key=lambda item: (
+            -item[1],
+            -int(float(item[0].get("cmc") or 0)),
+            item[0].get("name", ""),
+        )
+    )
+    selected, selected_score, selected_reason = scored[0]
+    if not player.spend_mana(activation_cost_text):
+        return False
+
+    counters_before = counters
+    permanent["wish_counters"] = counters - remove_count
+    permanent["tapped"] = True
+    permanent["utility_artifact_used_this_turn"] = True
+    moved, destination = move_library_tutor_selection(
+        player,
+        [selected],
+        f"{target_type}_to_hand",
+        permanent,
+    )
+    chosen = moved[0] if moved else selected
+    new_controller = min(
+        live_opponents,
+        key=lambda opponent: (table_visible_threat_score(opponent), opponent.name),
+    )
+    player.battlefield.remove(permanent)
+    permanent["controller"] = new_controller.name
+    new_controller.battlefield.append(permanent)
+    fields = replay_rule_fields(permanent)
+    emit_decision_trace(
+        decision_type="utility_artifact_activation",
+        player=player,
+        turn=turn,
+        phase=phase,
+        available_options=[
+            decision_card_option(
+                candidate,
+                get_card_effect(candidate),
+                score=score,
+                action="activate_wishclaw_tutor",
+                target_type=target_type,
+                destination="hand",
+                reason=reason,
+            )
+            for candidate, score, reason in scored[:8]
+        ],
+        chosen_option=decision_card_option(
+            chosen,
+            get_card_effect(chosen),
+            score=selected_score,
+            action="activate_wishclaw_tutor",
+            target_type=target_type,
+            destination="hand",
+            reason=selected_reason,
+        ),
+        rejected_options=[],
+        score_components={
+            "activation_cost_generic": activation_cost,
+            "wish_counters_before": counters_before,
+            "wish_counters_after": permanent["wish_counters"],
+            "candidate_count": len(scored),
+            "new_controller": new_controller.name,
+        },
+        rule_source=fields.get("rule_source", "wishclaw_talisman_runtime_v1"),
+        rule_status=fields.get("rule_review_status", "verified"),
+        confidence="high",
+        expected_benefit_score=selected_score,
+        actual_outcome="tutored_card_then_transferred_control",
+        reason="activate_wish_counter_tutor_then_transfer_to_lowest_threat_opponent",
+        resource_delta={
+            "cards": len(moved),
+            "mana": -activation_cost,
+            "wish_counters": -remove_count,
+            "controlled_permanents": -1,
+        },
+        risk_flags=["opponent_gains_control"],
+    )
+    emit_replay_event(
+        "utility_artifact_activated",
+        player=player.name,
+        card=permanent.get("name", "?"),
+        activation_kind="wish_counter_tutor_to_hand_control_transfer",
+        mana_paid=activation_cost,
+        counters_before=counters_before,
+        counters_after=permanent["wish_counters"],
+        counter_type="wish",
+        found=chosen.get("name", "?"),
+        destination=destination,
+        original_controller=player.name,
+        new_controller=new_controller.name,
+        result="tutored_and_control_transferred",
+        phase=phase,
+        turn=turn,
+        **fields,
+    )
+    return True
+
+
 def activate_utility_artifacts(player, opponents, all_players, turn, rng, *, phase="postcombat_main"):
     if not player.is_alive():
         return 0
@@ -44202,6 +44620,17 @@ def activate_utility_artifacts(player, opponents, all_players, turn, rng, *, pha
         normalize_card_name(permanent.get("name", "")): permanent
         for permanent in utility_artifacts
     }
+
+    for permanent in list(getattr(player, "battlefield", []) or []):
+        if activate_wish_counter_tutor_artifact(
+            player,
+            opponents,
+            permanent,
+            turn,
+            rng,
+            phase=phase,
+        ):
+            return 1
 
     for permanent in list(getattr(player, "battlefield", []) or []):
         if activate_karns_sylex(
@@ -54400,12 +54829,16 @@ def sacrifice_land_for_effect(player, card, turn, *, required=True, effect_data=
 
 def put_lands_from_library(player, card, effect_data, turn, *, opponents=None, source_event="land_ramp"):
     count = int(effect_data.get("land_count") or effect_data.get("lands_to_battlefield") or 1)
-    if effect_data.get("requires_sacrifice_land") and not sacrifice_land_for_effect(
-        player,
-        card,
-        turn,
-        required=True,
-        effect_data=effect_data,
+    if (
+        effect_data.get("requires_sacrifice_land")
+        and not effect_data.get("_additional_card_costs_paid")
+        and not sacrifice_land_for_effect(
+            player,
+            card,
+            turn,
+            required=True,
+            effect_data=effect_data,
+        )
     ):
         return []
     found = []
@@ -72826,6 +73259,7 @@ def cast_top_library_small_creature_from_static_permission(
         effect_data,
         turn=turn,
         cost_context=cast_plan.get("cost_context"),
+        cost_purpose="spell_cast",
     ):
         player.graveyard.append(card)
         return False
@@ -73315,6 +73749,7 @@ def cast_spells_v8(player, opponents, all_players, turn, phase, stack, rng, max_
                 cmd_eff,
                 turn=turn,
                 cost_context=cmd_cast_plan.get("cost_context"),
+                cost_purpose="spell_cast",
             ):
                 return False
             player.command_zone.pop(0)
@@ -73680,6 +74115,7 @@ def cast_spells_v8(player, opponents, all_players, turn, phase, stack, rng, max_
                     eff,
                     turn=turn,
                     cost_context=strategy_context,
+                    cost_purpose="spell_cast",
                 ):
                     player.graveyard.append(c)
                     return False
@@ -73889,6 +74325,7 @@ def cast_spells_v8(player, opponents, all_players, turn, phase, stack, rng, max_
                         eff,
                         turn=turn,
                         cost_context=cast_plan.get("cost_context"),
+                        cost_purpose="spell_cast",
                     ):
                         player.graveyard.append(c)
                         return False
@@ -74082,6 +74519,7 @@ def cast_spells_v8(player, opponents, all_players, turn, phase, stack, rng, max_
                     eff,
                     turn=turn,
                     cost_context=cast_plan.get("cost_context"),
+                    cost_purpose="spell_cast",
                 ):
                     player.graveyard.append(c)
                     return False
@@ -74223,6 +74661,7 @@ def cast_spells_v8(player, opponents, all_players, turn, phase, stack, rng, max_
                     eff,
                     turn=turn,
                     cost_context=cast_plan.get("cost_context"),
+                    cost_purpose="spell_cast",
                 ):
                     player.graveyard.append(c)
                     continue
@@ -74424,6 +74863,7 @@ def cast_spells_v8(player, opponents, all_players, turn, phase, stack, rng, max_
                     eff,
                     turn=turn,
                     cost_context=cast_plan.get("cost_context"),
+                    cost_purpose="spell_cast",
                 ):
                     player.graveyard.append(c)
                     continue
@@ -77379,6 +77819,29 @@ def apply_effect_immediate(
                 phase=phase or "resolution",
                 **replay_rule_fields(effect_data),
             )
+    elif effect == "tutor_artifact":
+        permanent = prepare_resolved_permanent(enrich_card({**card, **effect_data}))
+        permanent["effect"] = "tutor_artifact"
+        permanent["wish_counters"] = max(
+            0,
+            int(effect_data.get("enters_with_wish_counters") or 0),
+        )
+        permanent["tapped"] = False
+        player.battlefield.append(permanent)
+        emit_replay_event(
+            "tutor_artifact_resolved",
+            player=player.name,
+            card=card.get("name", "?"),
+            counter_type="wish" if permanent.get("wish_counters") else None,
+            counters=permanent.get("wish_counters", 0),
+            activated_tutor_target=permanent.get("activated_tutor_target"),
+            opponent_gains_control_after_activation=bool(
+                permanent.get("opponent_gains_control_after_activation")
+            ),
+            turn=turn,
+            phase=phase or "resolution",
+            **replay_rule_fields(effect_data),
+        )
     elif effect == "ramp_ritual":
         if not pay_additional_card_costs(player, card, effect_data, turn=turn):
             finish_resolved_spell(player, card, turn=turn)
@@ -77945,6 +78408,28 @@ def apply_effect_immediate(
             phase=phase,
         )
         finish_resolved_spell(player, card, turn=turn, effect_data=effect_data)
+    elif effect == "graveyard_to_library_top":
+        resolve_graveyard_to_library_top_spell(
+            player,
+            opponents,
+            all_players_for_entry,
+            card,
+            effect_data,
+            turn,
+            phase=phase,
+        )
+        finish_resolved_spell(player, card, turn=turn, effect_data=effect_data)
+    elif effect == "temporary_exile_return_next_end_step":
+        resolve_temporary_exile_return_next_end_step(
+            player,
+            opponents,
+            card,
+            effect_data,
+            turn,
+            rng,
+            all_players=all_players_for_entry,
+            phase=phase or "resolution",
+        )
     elif effect == "free_cast":
         if (
             effect_data.get("battle_model_scope")
@@ -83207,6 +83692,7 @@ def play_turn_v8(player, opponents, all_players, turn, rng, stack):
 
 
     # ── END STEP (v8.3) ──
+    process_temporary_exile_returns(player, all_players, turn, rng)
     process_end_step_phase_engines(player, all_players, turn, rng, stack=stack)
     process_unfinity_end_step(player, opponents, all_players, turn, rng)
     process_specialize_end_step(player, all_players, turn, rng)

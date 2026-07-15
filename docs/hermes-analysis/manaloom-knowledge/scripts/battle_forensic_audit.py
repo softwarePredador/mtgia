@@ -33,6 +33,7 @@ SUPPORTED_EFFECTS = {
     "aetherflux_lifegain",
     "aetherflux_reservoir",
     "approach",
+    "aura_static_attachment",
     "attack_limit",
     "attack_tax",
     "airbend_other_creatures",
@@ -72,6 +73,7 @@ SUPPORTED_EFFECTS = {
     "finisher",
     "gift_hexproof_indestructible",
     "graveyard_flashback_grant",
+    "graveyard_to_library_top",
     "hand_filter",
     "hate_artifact",
     "indestructible",
@@ -114,6 +116,9 @@ SUPPORTED_EFFECTS = {
     "topdeck_manipulation",
     "treasure_maker",
     "tutor",
+    "tutor_artifact",
+    "temporary_exile_return_next_end_step",
+    "untap_lands",
     "untap_land_engine",
 }
 
