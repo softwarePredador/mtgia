@@ -1474,6 +1474,9 @@ rodadas e memorias antigas. Para evitar confusao, use esta ordem de leitura.
 - `EASYPANEL_MANALOOM_OPS_CUTOVER_2026-06-17.md`
   - Contrato operacional do worker deterministico `manaloom-ops`.
   - Use para conferir cadencias reais, volume persistente e ordem de cutover.
+  - A auditoria oficial de estrategia de battle e produzida pelo runner
+    versionado `server/bin/manaloom_battle_strategy_audit.sh`, agendado no
+    `manaloom-ops`; LaunchAgents locais nao sao fonte operacional.
 
 - `EASYPANEL_AWS_RETIREMENT_CRON_MATRIX_2026-06-17.md`
   - Matriz final cron por cron para desligar a AWS sem manter duplicidade.

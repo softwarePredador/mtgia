@@ -243,6 +243,16 @@ def _desired_env(service_name: str, runtime_env: dict[str, str], existing_env: O
             "MANALOOM_BATTLE_GATE_SUMMARY": (
                 "/data/manaloom-ops/artifacts/battle-strategy-audit/latest/summary.json"
             ),
+            "MANALOOM_BATTLE_STRATEGY_BASE_DIR": "/data/manaloom-ops",
+            "MANALOOM_BATTLE_STRATEGY_ARTIFACT_ROOT": (
+                "/data/manaloom-ops/artifacts/battle-strategy-audit"
+            ),
+            "MANALOOM_BATTLE_STRATEGY_AUDIT_CRON": (
+                "5 0,1,2,3,4,5,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23 * * *"
+            ),
+            "MANALOOM_BATTLE_STRATEGY_SEEDS": "16",
+            "MANALOOM_BATTLE_STRATEGY_NIGHTLY_CRON": "5 6 * * *",
+            "MANALOOM_BATTLE_STRATEGY_NIGHTLY_SEEDS": "64",
             "PULL_LEARNING_EVENTS_CRON": "0 * * * *",
             "AUTO_SYNC_LEARNED_DECKS_CRON": "0 */2 * * *",
             "MANALOOM_SYNC_CARD_LEGALITIES_CRON": "30 */6 * * *",

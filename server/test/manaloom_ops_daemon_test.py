@@ -46,6 +46,11 @@ class ManaLoomOpsDaemonTest(unittest.TestCase):
             env["MANALOOM_CANONICAL_KNOWN_CARDS_JSON"],
             str(module.CANONICAL_SNAPSHOT),
         )
+        self.assertEqual(
+            env["MANALOOM_BATTLE_STRATEGY_ARTIFACT_ROOT"],
+            str(module.ARTIFACT_DIR / "battle-strategy-audit"),
+        )
+        self.assertEqual(env["MANALOOM_REPO_DIR"], str(module.REPO_ROOT))
 
     def test_collect_boot_jobs_runs_pull_for_pending_events(self) -> None:
         module = _load_module()
@@ -214,6 +219,20 @@ class ManaLoomOpsDaemonTest(unittest.TestCase):
         job = module.JOBS[names.index("manaloom_sync_card_legalities_from_scryfall")]
         self.assertEqual(job.schedule, "30 */6 * * *")
         self.assertIn("sync_card_legalities_from_scryfall.sh", job.command)
+
+    def test_battle_strategy_jobs_produce_gate_evidence_in_background(self) -> None:
+        module = _load_module()
+        jobs = {job.name: job for job in module.JOBS}
+        hourly = jobs["manaloom_battle_strategy_audit"]
+        nightly = jobs["manaloom_battle_strategy_nightly"]
+
+        self.assertTrue(hourly.background)
+        self.assertTrue(nightly.background)
+        self.assertIn("${MANALOOM_BATTLE_STRATEGY_SEEDS:-16}", hourly.command)
+        self.assertIn("${MANALOOM_BATTLE_STRATEGY_NIGHTLY_SEEDS:-64}", nightly.command)
+        self.assertTrue(module._matches_schedule(hourly.schedule, module.datetime(2026, 7, 15, 5, 5)))
+        self.assertFalse(module._matches_schedule(hourly.schedule, module.datetime(2026, 7, 15, 6, 5)))
+        self.assertTrue(module._matches_schedule(nightly.schedule, module.datetime(2026, 7, 15, 6, 5)))
 
 
 if __name__ == "__main__":

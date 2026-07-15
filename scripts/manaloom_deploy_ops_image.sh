@@ -101,6 +101,12 @@ docker service update \
   --env-add MANALOOM_NATIVE_BATTLE_PORT=8080 \
   --env-add MANALOOM_LOREHOLD_CANONICAL_OVERRIDE=0 \
   --env-add MANALOOM_BATTLE_GATE_SUMMARY=/data/manaloom-ops/artifacts/battle-strategy-audit/latest/summary.json \
+  --env-add MANALOOM_BATTLE_STRATEGY_BASE_DIR=/data/manaloom-ops \
+  --env-add MANALOOM_BATTLE_STRATEGY_ARTIFACT_ROOT=/data/manaloom-ops/artifacts/battle-strategy-audit \
+  --env-add 'MANALOOM_BATTLE_STRATEGY_AUDIT_CRON=5 0,1,2,3,4,5,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23 * * *' \
+  --env-add MANALOOM_BATTLE_STRATEGY_SEEDS=16 \
+  --env-add 'MANALOOM_BATTLE_STRATEGY_NIGHTLY_CRON=5 6 * * *' \
+  --env-add MANALOOM_BATTLE_STRATEGY_NIGHTLY_SEEDS=64 \
   --env-add MANALOOM_CANONICAL_KNOWN_CARDS_JSON=/data/manaloom-ops/known_cards_canonical_snapshot.runtime.json \
   '$SERVICE'
 
@@ -119,6 +125,11 @@ for attempt in \$(seq 1 60); do
       docker exec "\$container" grep -Fq \
         "def backfill_trusted_oracle_hashes" \
         /app/docs/hermes-analysis/manaloom-knowledge/scripts/sync_battle_card_rules_pg.py
+      docker exec "\$container" test -x /app/server/bin/manaloom_battle_strategy_audit.sh
+      docker exec "\$container" /app/server/bin/manaloom_battle_strategy_audit.sh \
+        --dry-run --seeds 1 >/dev/null
+      docker exec "\$container" python3 -c \
+        "import json; jobs=json.load(open('/data/manaloom-ops/cron/jobs.json')); names={row['name'] for row in jobs}; assert {'manaloom_battle_strategy_audit','manaloom_battle_strategy_nightly'} <= names"
       docker exec "\$container" python3 -c \
         "import json, urllib.request; data=json.load(urllib.request.urlopen('http://127.0.0.1:8080/health', timeout=5)); print(json.dumps(data, sort_keys=True))"
       docker service ls --filter name='$SERVICE' --format '{{.Name}} {{.Image}} {{.Replicas}}'

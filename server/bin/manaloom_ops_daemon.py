@@ -57,6 +57,10 @@ class Job:
     lockfile: Path
     command: str
     script_name: str
+    background: bool = False
+
+
+STATE_WRITE_LOCK = threading.Lock()
 
 
 def _base_env() -> dict[str, str]:
@@ -106,6 +110,14 @@ def _base_env() -> dict[str, str]:
             "MANALOOM_BATTLE_RULE_PROMOTION_EVIDENCE_FILE": str(
                 ARTIFACT_DIR / "battle_rule_focused_evidence/latest_evidence.json"
             ),
+            "MANALOOM_BATTLE_STRATEGY_BASE_DIR": str(DATA_ROOT),
+            "MANALOOM_BATTLE_STRATEGY_ARTIFACT_ROOT": str(
+                ARTIFACT_DIR / "battle-strategy-audit"
+            ),
+            "MANALOOM_BATTLE_STRATEGY_LOG_DIR": str(DATA_ROOT / "logs"),
+            "MANALOOM_BATTLE_STRATEGY_LOG_TO_STDOUT": "1",
+            "MANALOOM_BATTLE_STRATEGY_DESKTOP_NOTIFICATIONS": "0",
+            "MANALOOM_REPO_DIR": str(REPO_ROOT),
             "HERMES_CRON_JOBS_JSON": str(JOBS_JSON),
             "HERMES_CRON_OUTPUT_DIR": str(CRON_OUTPUT_DIR),
             "HERMES_SCRIPTS_DIR": str(REPO_ROOT / "server/bin"),
@@ -349,6 +361,35 @@ JOBS = [
         script_name="auto_promote_learned_decks.sh",
     ),
     Job(
+        name="manaloom_battle_strategy_audit",
+        schedule=os.environ.get(
+            "MANALOOM_BATTLE_STRATEGY_AUDIT_CRON",
+            "5 0,1,2,3,4,5,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23 * * *",
+        ),
+        lockfile=LOCK_DIR / "manaloom_battle_strategy_audit_scheduler.lock",
+        command=(
+            'cd "$MTGIA_HOME" && '
+            'MANALOOM_BATTLE_STRATEGY_INVOCATION_KIND=scheduled_hourly '
+            './server/bin/manaloom_battle_strategy_audit.sh '
+            '--seeds "${MANALOOM_BATTLE_STRATEGY_SEEDS:-16}"'
+        ),
+        script_name="manaloom_battle_strategy_audit.sh",
+        background=True,
+    ),
+    Job(
+        name="manaloom_battle_strategy_nightly",
+        schedule=os.environ.get("MANALOOM_BATTLE_STRATEGY_NIGHTLY_CRON", "5 6 * * *"),
+        lockfile=LOCK_DIR / "manaloom_battle_strategy_nightly_scheduler.lock",
+        command=(
+            'cd "$MTGIA_HOME" && '
+            'MANALOOM_BATTLE_STRATEGY_INVOCATION_KIND=scheduled_nightly '
+            './server/bin/manaloom_battle_strategy_audit.sh '
+            '--seeds "${MANALOOM_BATTLE_STRATEGY_NIGHTLY_SEEDS:-64}"'
+        ),
+        script_name="manaloom_battle_strategy_audit.sh",
+        background=True,
+    ),
+    Job(
         name="master_optimizer_preflight",
         schedule=os.environ.get("MASTER_OPTIMIZER_PREFLIGHT_CRON", "15 * * * *"),
         lockfile=LOCK_DIR / "master_optimizer_preflight.lock",
@@ -430,6 +471,7 @@ def _write_jobs_manifest(
                 "script": job.script_name,
                 "schedule": job.schedule,
                 "schedule_display": job.schedule,
+                "background": job.background,
                 "last_status": job_state.get("last_status"),
                 "last_started_at": job_state.get("last_started_at"),
                 "last_finished_at": job_state.get("last_finished_at"),
@@ -583,12 +625,16 @@ def _tail_excerpt(path: Path, max_lines: int = 6) -> str:
 def _run_job(job: Job, env: dict[str, str], state: dict[str, dict[str, object]]) -> None:
     started_at = datetime.now().isoformat(timespec="seconds")
     log_path = _job_log_path(job)
-    state[job.name] = {
-        **state.get(job.name, {}),
-        "last_started_at": started_at,
-        "latest_output": str(log_path),
-    }
-    _write_jobs_manifest(JOBS, state)
+    with STATE_WRITE_LOCK:
+        state[job.name] = {
+            **state.get(job.name, {}),
+            "last_status": "running",
+            "last_started_at": started_at,
+            "last_finished_at": None,
+            "last_exit_code": None,
+            "latest_output": str(log_path),
+        }
+        _write_jobs_manifest(JOBS, state)
     print(
         f"[manaloom-ops] run name={job.name} schedule={job.schedule} "
         f"at={started_at} log={log_path}",
@@ -611,14 +657,15 @@ def _run_job(job: Job, env: dict[str, str], state: dict[str, dict[str, object]])
             stderr=subprocess.STDOUT,
         )
     finished_at = datetime.now().isoformat(timespec="seconds")
-    state[job.name] = {
-        "last_status": "ok" if result.returncode == 0 else "error",
-        "last_started_at": started_at,
-        "last_finished_at": finished_at,
-        "last_exit_code": result.returncode,
-        "latest_output": str(log_path),
-    }
-    _write_jobs_manifest(JOBS, state)
+    with STATE_WRITE_LOCK:
+        state[job.name] = {
+            "last_status": "ok" if result.returncode == 0 else "error",
+            "last_started_at": started_at,
+            "last_finished_at": finished_at,
+            "last_exit_code": result.returncode,
+            "latest_output": str(log_path),
+        }
+        _write_jobs_manifest(JOBS, state)
     excerpt = _tail_excerpt(log_path)
     print(
         f"[manaloom-ops] done name={job.name} exit_code={result.returncode}",
@@ -626,6 +673,50 @@ def _run_job(job: Job, env: dict[str, str], state: dict[str, dict[str, object]])
     )
     if excerpt:
         print(f"[manaloom-ops] excerpt name={job.name} tail={excerpt}", flush=True)
+
+
+def _start_background_job(
+    job: Job,
+    env: dict[str, str],
+    state: dict[str, dict[str, object]],
+    active_jobs: dict[str, threading.Thread],
+    active_jobs_lock: threading.Lock,
+) -> bool:
+    with active_jobs_lock:
+        current = active_jobs.get(job.name)
+        if current is not None and current.is_alive():
+            print(f"[manaloom-ops] skip active background job name={job.name}", flush=True)
+            return False
+
+        def run() -> None:
+            try:
+                _run_job(job, env, state)
+            except Exception as exc:
+                finished_at = datetime.now().isoformat(timespec="seconds")
+                with STATE_WRITE_LOCK:
+                    state[job.name] = {
+                        **state.get(job.name, {}),
+                        "last_status": "error",
+                        "last_finished_at": finished_at,
+                        "last_exit_code": 1,
+                    }
+                    _write_jobs_manifest(JOBS, state)
+                print(
+                    f"[manaloom-ops] background error name={job.name} error={exc}",
+                    flush=True,
+                )
+            finally:
+                with active_jobs_lock:
+                    active_jobs.pop(job.name, None)
+
+        thread = threading.Thread(
+            target=run,
+            name=f"manaloom-ops-{job.name}",
+            daemon=True,
+        )
+        active_jobs[job.name] = thread
+        thread.start()
+        return True
 
 
 def main() -> int:
@@ -640,6 +731,8 @@ def main() -> int:
     native_battle_server = _start_native_battle_http()
     state = _load_existing_state(JOBS)
     _write_jobs_manifest(JOBS, state)
+    active_jobs: dict[str, threading.Thread] = {}
+    active_jobs_lock = threading.Lock()
 
     print("[manaloom-ops] scheduler started", flush=True)
     print(f"[manaloom-ops] repo_root={REPO_ROOT}", flush=True)
@@ -676,7 +769,16 @@ def main() -> int:
             for job in JOBS:
                 try:
                     if _matches_schedule(job.schedule, now):
-                        _run_job(job, env, state)
+                        if job.background:
+                            _start_background_job(
+                                job,
+                                env,
+                                state,
+                                active_jobs,
+                                active_jobs_lock,
+                            )
+                        else:
+                            _run_job(job, env, state)
                 except Exception as exc:  # keep scheduler alive even on bad schedule
                     print(
                         f"[manaloom-ops] error name={job.name} schedule={job.schedule} "

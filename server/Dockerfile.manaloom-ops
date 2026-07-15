@@ -26,6 +26,7 @@ RUN chmod +x \
   /app/server/bin/pull_learning_events.sh \
   /app/server/bin/auto_sync_learned_decks.sh \
   /app/server/bin/master_optimizer_preflight.sh \
+  /app/server/bin/manaloom_battle_strategy_audit.sh \
   /app/server/bin/manaloom_knowledge_import.sh \
   /app/server/bin/manaloom_ops_entrypoint.sh \
   /app/server/bin/manaloom_ops_daemon.py \

@@ -65,6 +65,12 @@ def test_desired_env_for_manaloom_ops_matches_cutover_contract() -> None:
     assert desired["MANALOOM_BATTLE_GATE_SUMMARY"] == (
         "/data/manaloom-ops/artifacts/battle-strategy-audit/latest/summary.json"
     )
+    assert desired["MANALOOM_BATTLE_STRATEGY_BASE_DIR"] == "/data/manaloom-ops"
+    assert desired["MANALOOM_BATTLE_STRATEGY_ARTIFACT_ROOT"] == (
+        "/data/manaloom-ops/artifacts/battle-strategy-audit"
+    )
+    assert desired["MANALOOM_BATTLE_STRATEGY_SEEDS"] == "16"
+    assert desired["MANALOOM_BATTLE_STRATEGY_NIGHTLY_SEEDS"] == "64"
     assert desired["DB_HOST"] == "db.example"
     assert desired["DB_PORT"] == "5432"
     assert desired["DB_NAME"] == "mana"

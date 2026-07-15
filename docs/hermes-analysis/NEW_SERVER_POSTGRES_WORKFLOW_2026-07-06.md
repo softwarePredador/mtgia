@@ -111,6 +111,29 @@ python3 docs/hermes-analysis/manaloom-knowledge/scripts/legacy_contamination_aud
 - PostgreSQL remains the product source of truth; Hermes SQLite remains cache
   and audit/runtime evidence.
 
+## Battle Strategy Audit
+
+The official battle-strategy evidence producer runs in the versioned
+`evolution_manaloom-ops` service. It must not depend on local LaunchAgents or
+paths under a developer home directory.
+
+- Runner: `server/bin/manaloom_battle_strategy_audit.sh`.
+- Scheduler: `server/bin/manaloom_ops_daemon.py`.
+- Persistent artifact root:
+  `/data/manaloom-ops/artifacts/battle-strategy-audit`.
+- Consumer contract:
+  `/data/manaloom-ops/artifacts/battle-strategy-audit/latest/summary.json`.
+- Recurring audit: `16` seeds, outside the nightly validation window.
+- Nightly audit: `64` seeds at `06:05 UTC`.
+- Both jobs run in background and share the runner lock, so a long replay does
+  not block PostgreSQL/Hermes synchronization jobs or start a duplicate audit.
+
+The optimizer must remain fail-closed when the summary is missing,
+`review_required`, or contains mandatory divergences. Never copy a local or
+historical `summary.json` into the persistent volume to open the gate. Deploy
+the versioned runner, execute it in the live `manaloom-ops` container, and use
+the newly generated summary as evidence.
+
 ## Historical-only Quarantine
 
 These old targets are historical-only quarantine markers. They may appear in
