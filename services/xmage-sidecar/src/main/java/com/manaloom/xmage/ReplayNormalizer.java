@@ -440,13 +440,22 @@ final class ReplayNormalizer {
             StringBuilder result,
             Iterable<? extends CardView> cards
     ) {
-        List<Map<String, Object>> normalized = ReplayNormalizer.cards(cards);
-        for (Map<String, Object> card : normalized) {
-            result.append(":card:").append(card.get("id"))
-                    .append(':').append(card.get("name"))
-                    .append(':').append(card.get("tapped"))
-                    .append(':').append(card.get("damage"))
-                    .append(':').append(card.get("counters"));
+        for (CardView card : cards) {
+            result.append(":card:").append(card.getId())
+                    .append(':').append(card.getName())
+                    .append(':').append(card.isAbility());
+            if (card instanceof PermanentView) {
+                PermanentView permanent = (PermanentView) card;
+                result.append(':').append(permanent.isTapped())
+                        .append(':').append(permanent.getDamage());
+                List<CounterView> counters = permanent.getCounters();
+                if (counters != null) {
+                    for (CounterView counter : counters) {
+                        result.append(":counter:").append(counter.getName())
+                                .append(':').append(counter.getCount());
+                    }
+                }
+            }
         }
     }
 
