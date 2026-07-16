@@ -5,7 +5,9 @@ import '../../../lib/archetype_counters_service.dart';
 import '../../../lib/http_responses.dart';
 import '../../../lib/ai/optimization_functional_roles.dart';
 import '../../../lib/basic_land_utils.dart' as land_utils;
+import '../../../lib/logger.dart';
 import '../../../lib/meta/meta_deck_card_list_support.dart';
+import '../../../lib/observability.dart';
 
 /// Endpoint para simular matchup entre dois decks
 ///
@@ -38,11 +40,7 @@ Future<Response> onRequest(RequestContext context) async {
     final countersService = ArchetypeCountersService(pool);
 
     // 1. Buscar dados de ambos os decks
-    final myDeckData = await _getDeckData(
-      pool,
-      myDeckId,
-      userId: userId,
-    );
+    final myDeckData = await _getDeckData(pool, myDeckId, userId: userId);
     final opponentDeckData = await _getDeckData(
       pool,
       opponentDeckId,
@@ -82,7 +80,13 @@ Future<Response> onRequest(RequestContext context) async {
       isMetaDeck: false,
     );
   } catch (e, stack) {
-    print('Erro em simulate-matchup: $e\n$stack');
+    Log.e('[simulate-matchup] request failed type=${e.runtimeType}');
+    await captureRouteException(
+      context,
+      e,
+      stackTrace: stack,
+      tags: const {'route': 'ai_simulate_matchup'},
+    );
     return internalServerError('Failed to simulate matchup');
   }
 }
@@ -95,17 +99,22 @@ Future<Map<String, dynamic>?> _getDeckData(
   bool allowPublicDeck = false,
 }) async {
   try {
-    final hasCardIntelligenceSnapshot =
-        await _hasTable(pool, 'card_intelligence_snapshot');
-    final cardSourceJoin = hasCardIntelligenceSnapshot
-        ? 'JOIN card_intelligence_snapshot c ON c.card_id = dc.card_id'
-        : 'JOIN cards c ON c.id = dc.card_id';
-    final functionalTagsSelect = hasCardIntelligenceSnapshot
-        ? 'c.function_tag_details AS functional_tags'
-        : await _functionalTagsSelectSql(pool);
-    final semanticV2Select = hasCardIntelligenceSnapshot
-        ? 'c.semantic_tags_v2 AS semantic_tags_v2'
-        : await _semanticV2SelectSql(pool);
+    final hasCardIntelligenceSnapshot = await _hasTable(
+      pool,
+      'card_intelligence_snapshot',
+    );
+    final cardSourceJoin =
+        hasCardIntelligenceSnapshot
+            ? 'JOIN card_intelligence_snapshot c ON c.card_id = dc.card_id'
+            : 'JOIN cards c ON c.id = dc.card_id';
+    final functionalTagsSelect =
+        hasCardIntelligenceSnapshot
+            ? 'c.function_tag_details AS functional_tags'
+            : await _functionalTagsSelectSql(pool);
+    final semanticV2Select =
+        hasCardIntelligenceSnapshot
+            ? 'c.semantic_tags_v2 AS semantic_tags_v2'
+            : await _semanticV2SelectSql(pool);
 
     final deckResult = await pool.execute(
       Sql.named('''
@@ -230,12 +239,14 @@ Future<Map<String, dynamic>?> _getDeckData(
       }
     }
 
-    final recommendationColors = commanderColorIdentity.isNotEmpty
-        ? commanderColorIdentity
-        : observedDeckColors;
-    final colorIdentitySource = commanderColorIdentity.isNotEmpty
-        ? 'commander_color_identity'
-        : 'observed_card_colors';
+    final recommendationColors =
+        commanderColorIdentity.isNotEmpty
+            ? commanderColorIdentity
+            : observedDeckColors;
+    final colorIdentitySource =
+        commanderColorIdentity.isNotEmpty
+            ? 'commander_color_identity'
+            : 'observed_card_colors';
 
     return {
       'id': deckResult.first[0] as String,
@@ -255,19 +266,21 @@ Future<Map<String, dynamic>?> _getDeckData(
       },
     };
   } catch (e) {
-    print('[ERROR] handler: $e');
-    print('Erro ao buscar deck $deckId: $e');
+    Log.w('[simulate-matchup] deck lookup unavailable type=${e.runtimeType}');
     return null;
   }
 }
 
 /// Busca dados de um meta deck
 Future<Map<String, dynamic>?> _getMetaDeckData(
-    Pool pool, String metaDeckId) async {
+  Pool pool,
+  String metaDeckId,
+) async {
   try {
     final result = await pool.execute(
       Sql.named(
-          'SELECT id, format, archetype, card_list, placement FROM meta_decks WHERE id = @id'),
+        'SELECT id, format, archetype, card_list, placement FROM meta_decks WHERE id = @id',
+      ),
       parameters: {'id': metaDeckId},
     );
 
@@ -290,8 +303,9 @@ Future<Map<String, dynamic>?> _getMetaDeckData(
       'is_meta_deck': true,
     };
   } catch (e) {
-    print('[ERROR] handler: $e');
-    print('Erro ao buscar meta deck $metaDeckId: $e');
+    Log.w(
+      '[simulate-matchup] meta deck lookup unavailable type=${e.runtimeType}',
+    );
     return null;
   }
 }
@@ -309,8 +323,9 @@ Future<Response> _analyzeMatchup({
   // Detectar arquétipos
   final myCards =
       (myDeck['cards'] as List?)?.cast<Map<String, dynamic>>() ?? [];
-  final myArchetypeData =
-      await countersService.detectDeckArchetype(cards: myCards);
+  final myArchetypeData = await countersService.detectDeckArchetype(
+    cards: myCards,
+  );
   final myArchetype = myArchetypeData['archetype'] as String;
 
   String opponentArchetype;
@@ -319,8 +334,9 @@ Future<Response> _analyzeMatchup({
   } else {
     final oppCards =
         (opponentDeck['cards'] as List?)?.cast<Map<String, dynamic>>() ?? [];
-    final oppArchetypeData =
-        await countersService.detectDeckArchetype(cards: oppCards);
+    final oppArchetypeData = await countersService.detectDeckArchetype(
+      cards: oppCards,
+    );
     opponentArchetype = oppArchetypeData['archetype'] as String;
   }
 
@@ -369,7 +385,8 @@ Future<Response> _analyzeMatchup({
   if (myCMC < oppCMC - 0.5) {
     myScore += 7;
     advantages.add(
-        'Curva de mana mais baixa (${myCMC.toStringAsFixed(1)} vs ${oppCMC.toStringAsFixed(1)})');
+      'Curva de mana mais baixa (${myCMC.toStringAsFixed(1)} vs ${oppCMC.toStringAsFixed(1)})',
+    );
   } else if (myCMC > oppCMC + 0.5) {
     myScore -= 5;
     disadvantages.add('Curva de mana mais alta');
@@ -398,28 +415,30 @@ Future<Response> _analyzeMatchup({
     myScore -= 5;
     disadvantages.add('Sem hate cards contra $opponentArchetype');
     recommendations.addAll(
-        hateCardsForOpponent.take(3).map((c) => 'Considerar adicionar: $c'));
+      hateCardsForOpponent.take(3).map((c) => 'Considerar adicionar: $c'),
+    );
   }
 
   // Matchup arquétipo vs arquétipo
-  final matchupModifier =
-      _getArchetypeMatchupModifier(myArchetype, opponentArchetype);
+  final matchupModifier = _getArchetypeMatchupModifier(
+    myArchetype,
+    opponentArchetype,
+  );
   myScore += matchupModifier;
   if (matchupModifier > 0) {
-    advantages
-        .add('$myArchetype geralmente tem vantagem contra $opponentArchetype');
+    advantages.add(
+      '$myArchetype geralmente tem vantagem contra $opponentArchetype',
+    );
   } else if (matchupModifier < 0) {
-    disadvantages
-        .add('$opponentArchetype geralmente tem vantagem contra $myArchetype');
+    disadvantages.add(
+      '$opponentArchetype geralmente tem vantagem contra $myArchetype',
+    );
   }
 
   // Simular partidas (Monte Carlo simplificado)
-  final seed = simulationSeed ??
-      _stableMatchupSeed(
-        myDeck,
-        opponentDeck,
-        simulationCount,
-      );
+  final seed =
+      simulationSeed ??
+      _stableMatchupSeed(myDeck, opponentDeck, simulationCount);
   final random = Random(seed);
   int wins = 0;
   int totalTurns = 0;
@@ -466,54 +485,55 @@ Future<Response> _analyzeMatchup({
       },
     );
   } catch (e) {
-    print('[ERROR] handler: $e');
-    print('Aviso: Não foi possível salvar matchup: $e');
+    Log.w('[simulate-matchup] persistence unavailable type=${e.runtimeType}');
   }
 
-  return Response.json(body: {
-    'my_deck': {
-      'id': myDeck['id'],
-      'name': myDeck['name'],
-      'archetype': myArchetype,
-      'commander': myDeck['commander'],
-      'colors': myDeck['colors'],
-      'color_identity_source': myDeck['color_identity_source'],
-    },
-    'opponent_deck': {
-      'id': opponentDeck['id'],
-      'name': opponentDeck['name'],
-      'archetype': opponentArchetype,
-      'is_meta_deck': isMetaDeck,
-      if (!isMetaDeck)
-        'color_identity_source': opponentDeck['color_identity_source'],
-    },
-    'simulation': {
-      'runs': simulationCount,
-      'seed': seed,
-      'wins': wins,
-      'losses': simulationCount - wins,
-      'win_rate': (winRate * 100).toStringAsFixed(1) + '%',
-      'win_rate_numeric': winRate,
-      'average_game_length': avgTurns.toStringAsFixed(1),
-    },
-    'stored_matchup': {
-      'previous': previousMatchup,
-      'current': {
-        'win_rate_numeric': winRate,
-        'notes': 'Auto-generated: ${advantages.join(", ")}',
+  return Response.json(
+    body: {
+      'my_deck': {
+        'id': myDeck['id'],
+        'name': myDeck['name'],
+        'archetype': myArchetype,
+        'commander': myDeck['commander'],
+        'colors': myDeck['colors'],
+        'color_identity_source': myDeck['color_identity_source'],
       },
+      'opponent_deck': {
+        'id': opponentDeck['id'],
+        'name': opponentDeck['name'],
+        'archetype': opponentArchetype,
+        'is_meta_deck': isMetaDeck,
+        if (!isMetaDeck)
+          'color_identity_source': opponentDeck['color_identity_source'],
+      },
+      'simulation': {
+        'runs': simulationCount,
+        'seed': seed,
+        'wins': wins,
+        'losses': simulationCount - wins,
+        'win_rate': (winRate * 100).toStringAsFixed(1) + '%',
+        'win_rate_numeric': winRate,
+        'average_game_length': avgTurns.toStringAsFixed(1),
+      },
+      'stored_matchup': {
+        'previous': previousMatchup,
+        'current': {
+          'win_rate_numeric': winRate,
+          'notes': 'Auto-generated: ${advantages.join(", ")}',
+        },
+      },
+      'analysis': {
+        'base_win_chance': myScore,
+        'advantages': advantages,
+        'disadvantages': disadvantages,
+      },
+      'recommendations': {
+        'cards_to_add': recommendations,
+        'hate_cards_for_opponent': hateCardsForOpponent.take(5).toList(),
+      },
+      'matchup_verdict': _getMatchupVerdict(winRate),
     },
-    'analysis': {
-      'base_win_chance': myScore,
-      'advantages': advantages,
-      'disadvantages': disadvantages,
-    },
-    'recommendations': {
-      'cards_to_add': recommendations,
-      'hate_cards_for_opponent': hateCardsForOpponent.take(5).toList(),
-    },
-    'matchup_verdict': _getMatchupVerdict(winRate),
-  });
+  );
 }
 
 Future<Map<String, dynamic>?> _loadStoredMatchup(
@@ -530,10 +550,7 @@ Future<Map<String, dynamic>?> _loadStoredMatchup(
           AND opponent_deck_id = CAST(@opponent_deck_id AS uuid)
         LIMIT 1
       '''),
-      parameters: {
-        'deck_id': deckId,
-        'opponent_deck_id': opponentDeckId,
-      },
+      parameters: {'deck_id': deckId, 'opponent_deck_id': opponentDeckId},
     );
     if (rows.isEmpty) return null;
     final m = rows.first.toColumnMap();
@@ -543,7 +560,9 @@ Future<Map<String, dynamic>?> _loadStoredMatchup(
       'updated_at': m['updated_at']?.toString(),
     };
   } catch (e) {
-    print('[simulate-matchup] stored matchup unavailable: $e');
+    Log.w(
+      '[simulate-matchup] stored matchup unavailable type=${e.runtimeType}',
+    );
     return null;
   }
 }

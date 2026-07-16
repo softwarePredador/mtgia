@@ -956,8 +956,22 @@ void main() {
     expect(payload.strengths, 'tempo');
 
     expect(
-      () => parseDeckAiAnalysisResponse(ApiResponse(500, {'error': 'falhou'})),
-      throwsA(isA<Exception>()),
+      () => parseDeckAiAnalysisResponse(
+        ApiResponse(500, {'error': 'Authorization: Bearer leaked'}),
+      ),
+      throwsA(
+        isA<Exception>()
+            .having(
+              (error) => error.toString(),
+              'message',
+              isNot(contains('Bearer')),
+            )
+            .having(
+              (error) => error.toString(),
+              'friendly message',
+              contains('Servidor indisponível'),
+            ),
+      ),
     );
   });
 

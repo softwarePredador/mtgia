@@ -110,7 +110,7 @@ class EdhrecService {
         return null;
       }
     } catch (e) {
-      Log.e('EDHREC request failed: $e');
+      Log.e('EDHREC request failed type=${e.runtimeType}');
       return null;
     }
   }
@@ -164,7 +164,7 @@ class EdhrecService {
       Log.w('EDHREC average-deck error: ${response.statusCode}');
       return null;
     } catch (e) {
-      Log.e('EDHREC average-deck request failed: $e');
+      Log.e('EDHREC average-deck request failed type=${e.runtimeType}');
       return null;
     }
   }

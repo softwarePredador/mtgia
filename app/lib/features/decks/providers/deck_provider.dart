@@ -671,7 +671,7 @@ class DeckProvider extends ChangeNotifier {
   }
 
   /// Faz polling no job de otimização até completar ou falhar.
-  /// Polling interval de 5s para evitar rate limiting (429).
+  /// O intervalo negociado com o backend respeita o mínimo de um segundo.
   Future<Map<String, dynamic>> _pollOptimizeJob(
     String jobId, {
     int pollInterval = 5000,

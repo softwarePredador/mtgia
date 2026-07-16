@@ -8,7 +8,12 @@ import 'package:postgres/postgres.dart';
 import '../../../../lib/ai/functional_card_tags.dart';
 import '../../../../lib/ai/optimization_ramp_profile.dart';
 import '../../../../lib/basic_land_utils.dart' as land_utils;
+import '../../../../lib/ai_provider_runtime_support.dart';
+import '../../../../lib/ai_provider_usage_support.dart';
+import '../../../../lib/logger.dart';
+import '../../../../lib/observability.dart';
 import '../../../../lib/openai_runtime_config.dart';
+import '../../../../lib/openai_structured_output_support.dart';
 
 /// POST /decks/:id/ai-analysis
 ///
@@ -28,9 +33,9 @@ Future<Response> onRequest(RequestContext context, String deckId) async {
   final pool = context.read<Pool>();
 
   try {
-    final body = await context.request
-        .json()
-        .catchError((_) => const <String, dynamic>{});
+    final body = await context.request.json().catchError(
+      (_) => const <String, dynamic>{},
+    );
     final force = body is Map ? (body['force'] == true) : false;
 
     final deckResult = await pool.execute(
@@ -75,15 +80,19 @@ Future<Response> onRequest(RequestContext context, String deckId) async {
       );
     }
 
-    final hasCardIntelligenceSnapshot =
-        await _hasTable(pool, 'card_intelligence_snapshot');
+    final hasCardIntelligenceSnapshot = await _hasTable(
+      pool,
+      'card_intelligence_snapshot',
+    );
     final hasSemanticV2 = await _hasTable(pool, 'card_semantic_tags_v2');
-    final cardSourceJoin = hasCardIntelligenceSnapshot
-        ? 'JOIN card_intelligence_snapshot c ON c.card_id = dc.card_id'
-        : 'JOIN cards c ON c.id = dc.card_id';
-    final functionalTagsSelect = hasCardIntelligenceSnapshot
-        ? 'c.function_tag_details'
-        : '''
+    final cardSourceJoin =
+        hasCardIntelligenceSnapshot
+            ? 'JOIN card_intelligence_snapshot c ON c.card_id = dc.card_id'
+            : 'JOIN cards c ON c.id = dc.card_id';
+    final functionalTagsSelect =
+        hasCardIntelligenceSnapshot
+            ? 'c.function_tag_details'
+            : '''
           COALESCE(
             (
               SELECT jsonb_agg(
@@ -101,9 +110,10 @@ Future<Response> onRequest(RequestContext context, String deckId) async {
             '[]'::jsonb
           )
         ''';
-    final semanticV2Select = hasCardIntelligenceSnapshot
-        ? 'c.semantic_tags_v2'
-        : hasSemanticV2
+    final semanticV2Select =
+        hasCardIntelligenceSnapshot
+            ? 'c.semantic_tags_v2'
+            : hasSemanticV2
             ? '''
           COALESCE(
             (
@@ -192,8 +202,11 @@ Future<Response> onRequest(RequestContext context, String deckId) async {
     } else {
       try {
         analysis = await _aiAnalysis(
+          pool: pool,
           apiKey: apiKey,
           aiConfig: aiConfig,
+          userId: userId,
+          deckId: deckId,
           format: format,
           archetype: archetype,
           bracket: bracket,
@@ -249,8 +262,14 @@ Future<Response> onRequest(RequestContext context, String deckId) async {
         if (isMock) 'is_mock': true,
       },
     );
-  } catch (e) {
-    print('[ERROR] Failed to analyze deck: $e');
+  } catch (e, stackTrace) {
+    Log.e('[deck-ai-analysis] request failed type=${e.runtimeType}');
+    await captureRouteException(
+      context,
+      e,
+      stackTrace: stackTrace,
+      tags: const {'route': 'deck_ai_analysis'},
+    );
     return Response.json(
       statusCode: HttpStatus.internalServerError,
       body: {'error': 'Failed to analyze deck'},
@@ -265,6 +284,7 @@ class _DeckMetrics {
   final int commanderCount;
   final List<String> commanders;
   final double averageCmcNonLands;
+
   /// Inclusive player-facing ramp role count.
   final int rampCount;
   final int rampFloorCount;
@@ -299,8 +319,9 @@ class _DeckMetrics {
       'land_count': landCount,
       'commander_count': commanderCount,
       'commanders': commanders,
-      'average_cmc_non_lands':
-          double.parse(averageCmcNonLands.toStringAsFixed(2)),
+      'average_cmc_non_lands': double.parse(
+        averageCmcNonLands.toStringAsFixed(2),
+      ),
       'ramp_count': rampCount,
       'ramp_floor': rampFloorCount,
       'ramp_contextual': rampContextualCount,
@@ -401,9 +422,10 @@ Map<String, dynamic> _heuristicAnalysis({
   final maxTotal =
       format == 'commander' ? 100 : (format == 'brawl' ? 60 : null);
 
-  final completionPct = (maxTotal == null || maxTotal == 0)
-      ? 1.0
-      : (metrics.totalCards / maxTotal).clamp(0.0, 1.0);
+  final completionPct =
+      (maxTotal == null || maxTotal == 0)
+          ? 1.0
+          : (metrics.totalCards / maxTotal).clamp(0.0, 1.0);
 
   var score = 0;
 
@@ -418,14 +440,26 @@ Map<String, dynamic> _heuristicAnalysis({
 
   // Terrenos
   if (format == 'commander') {
-    score += _bandScore(metrics.landCount,
-        idealMin: 33, idealMax: 38, maxPoints: 15);
+    score += _bandScore(
+      metrics.landCount,
+      idealMin: 33,
+      idealMax: 38,
+      maxPoints: 15,
+    );
   } else if (format == 'brawl') {
-    score += _bandScore(metrics.landCount,
-        idealMin: 22, idealMax: 26, maxPoints: 12);
+    score += _bandScore(
+      metrics.landCount,
+      idealMin: 22,
+      idealMax: 26,
+      maxPoints: 12,
+    );
   } else {
-    score += _bandScore(metrics.landCount,
-        idealMin: 22, idealMax: 28, maxPoints: 10);
+    score += _bandScore(
+      metrics.landCount,
+      idealMin: 22,
+      idealMax: 28,
+      maxPoints: 10,
+    );
   }
 
   // Pacote mínimo (ramp/draw/removal)
@@ -445,8 +479,9 @@ Map<String, dynamic> _heuristicAnalysis({
 
   strengths.add('Progresso do deck: ${(completionPct * 100).round()}%');
   if (metrics.commanderCount > 0 && metrics.commanders.isNotEmpty) {
-    strengths
-        .add('Comandante definido: ${metrics.commanders.take(2).join(', ')}');
+    strengths.add(
+      'Comandante definido: ${metrics.commanders.take(2).join(', ')}',
+    );
   }
   if (metrics.rampFloorCount >= 8)
     strengths.add('Ramp estrutural OK (${metrics.rampFloorCount})');
@@ -472,27 +507,31 @@ Map<String, dynamic> _heuristicAnalysis({
     weaknesses.add('Falta remoções (${metrics.removalCount}) — ideal 8+');
 
   final sText = strengths.join('. ') + '.';
-  final wText = weaknesses.isEmpty
-      ? 'Nenhuma fraqueza crítica detectada no heurístico.'
-      : (weaknesses.join('. ') + '.');
+  final wText =
+      weaknesses.isEmpty
+          ? 'Nenhuma fraqueza crítica detectada no heurístico.'
+          : (weaknesses.join('. ') + '.');
 
-  return {
-    'synergy_score': score,
-    'strengths': sText,
-    'weaknesses': wText,
-  };
+  return {'synergy_score': score, 'strengths': sText, 'weaknesses': wText};
 }
 
-int _bandScore(int value,
-    {required int idealMin, required int idealMax, required int maxPoints}) {
+int _bandScore(
+  int value, {
+  required int idealMin,
+  required int idealMax,
+  required int maxPoints,
+}) {
   if (value >= idealMin && value <= idealMax) return maxPoints;
   final delta = value < idealMin ? (idealMin - value) : (value - idealMax);
   return max(0, maxPoints - (delta * (maxPoints / 6)).round());
 }
 
 Future<Map<String, dynamic>> _aiAnalysis({
+  required Pool pool,
   required String apiKey,
   required OpenAiRuntimeConfig aiConfig,
+  required String userId,
+  required String deckId,
   required String format,
   required String archetype,
   required int? bracket,
@@ -535,34 +574,78 @@ Regras:
     'max_total_cards': maxTotal,
     'metrics': metrics.toJson(),
   };
+  final model = aiConfig.modelFor(
+    key: 'OPENAI_MODEL_AI_ANALYSIS',
+    fallback: 'gpt-4o-mini',
+    devFallback: 'gpt-4o-mini',
+    stagingFallback: 'gpt-4o-mini',
+    prodFallback: 'gpt-4o-mini',
+  );
 
-  final response = await http.post(
-    Uri.parse('https://api.openai.com/v1/chat/completions'),
-    headers: {
-      'Content-Type': 'application/json',
-      'Authorization': 'Bearer $apiKey',
-    },
-    body: jsonEncode({
-      'model': aiConfig.modelFor(
-        key: 'OPENAI_MODEL_AI_ANALYSIS',
-        fallback: 'gpt-4o-mini',
-        devFallback: 'gpt-4o-mini',
-        stagingFallback: 'gpt-4o-mini',
-        prodFallback: 'gpt-4o-mini',
-      ),
-      'messages': [
-        {'role': 'system', 'content': systemPrompt},
-        {'role': 'user', 'content': jsonEncode(payload)},
-      ],
-      'temperature': aiConfig.temperatureFor(
-        key: 'OPENAI_TEMP_AI_ANALYSIS',
-        fallback: 0.2,
-        devFallback: 0.25,
-        stagingFallback: 0.2,
-        prodFallback: 0.15,
-      ),
-      'response_format': {'type': 'json_object'},
-    }),
+  final providerStopwatch = Stopwatch()..start();
+  late final http.Response response;
+  try {
+    response = await http
+        .post(
+          Uri.parse('https://api.openai.com/v1/chat/completions'),
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer $apiKey',
+          },
+          body: jsonEncode({
+            ...aiSafetyIdentifierPayload(userId),
+            'model': model,
+            'messages': [
+              {'role': 'system', 'content': systemPrompt},
+              {'role': 'user', 'content': jsonEncode(payload)},
+            ],
+            'temperature': aiConfig.temperatureFor(
+              key: 'OPENAI_TEMP_AI_ANALYSIS',
+              fallback: 0.2,
+              devFallback: 0.25,
+              stagingFallback: 0.2,
+              prodFallback: 0.15,
+            ),
+            ...openAiTokenLimitPayload(model: model, maxTokens: 700),
+            'response_format': openAiStructuredResponseFormat(
+              model: model,
+              name: 'deck_analysis',
+              schema: openAiDeckAnalysisSchema,
+            ),
+          }),
+        )
+        .timeout(
+          aiConfig.timeoutFor(
+            key: 'OPENAI_TIMEOUT_AI_ANALYSIS_SECONDS',
+            fallback: const Duration(seconds: 15),
+            prodFallback: const Duration(seconds: 20),
+            min: const Duration(seconds: 3),
+            max: const Duration(seconds: 60),
+          ),
+        );
+  } catch (error) {
+    await recordAiProviderCall(
+      db: pool,
+      endpoint: 'ai_analysis',
+      model: model,
+      latencyMs: providerStopwatch.elapsedMilliseconds,
+      success: false,
+      userId: userId,
+      deckId: deckId,
+      failureCode: 'provider_transport_${error.runtimeType}',
+    );
+    rethrow;
+  }
+  await recordAiProviderCall(
+    db: pool,
+    endpoint: 'ai_analysis',
+    model: model,
+    latencyMs: providerStopwatch.elapsedMilliseconds,
+    success: response.statusCode == HttpStatus.ok,
+    userId: userId,
+    deckId: deckId,
+    responseBodyBytes: response.bodyBytes,
+    failureCode: 'provider_http_${response.statusCode}',
   );
 
   if (response.statusCode != 200) {
@@ -571,8 +654,9 @@ Regras:
 
   final decoded =
       jsonDecode(utf8.decode(response.bodyBytes)) as Map<String, dynamic>;
-  final content = (((decoded['choices'] as List).first as Map)['message']
-      as Map)['content'] as String;
+  final content =
+      (((decoded['choices'] as List).first as Map)['message'] as Map)['content']
+          as String;
   final json = jsonDecode(content) as Map<String, dynamic>;
 
   return json;

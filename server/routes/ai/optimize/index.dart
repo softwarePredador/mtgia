@@ -981,7 +981,10 @@ Future<Response> onRequest(RequestContext context) async {
         }
       } catch (e) {
         optimizeCommanderPrioritySource = 'load_failed';
-        Log.w('Falha ao carregar priority pool do optimize: $e');
+        Log.w(
+          'Falha ao carregar priority pool do optimize '
+          'type=${e.runtimeType}',
+        );
       }
     }
 
@@ -1015,7 +1018,10 @@ Future<Response> onRequest(RequestContext context) async {
         );
       }
     } catch (e) {
-      Log.w('Falha ao montar shortlist deterministico do optimize: $e');
+      Log.w(
+        'Falha ao montar shortlist deterministico do optimize '
+        'type=${e.runtimeType}',
+      );
     }
 
     Map<String, dynamic> jsonResponse;
@@ -1143,6 +1149,8 @@ Future<Response> onRequest(RequestContext context) async {
             metaEvidenceContext: optimizeMetaEvidenceContext,
             userId: authenticatedUserId,
             deckId: deckId,
+            preferCollection: recommendationContext.preferCollection == true,
+            budgetLimitBrl: recommendationContext.budgetLimitBrl,
           ),
         );
         return optimize_route_retry.attachAiOptimizeAttemptMetadata(
@@ -1150,8 +1158,8 @@ Future<Response> onRequest(RequestContext context) async {
           deterministicFirstEnabled: deterministicFirstEnabled,
           trigger: trigger,
         );
-      } catch (e, stackTrace) {
-        Log.e('Optimization failed: $e\nStack trace:\n$stackTrace');
+      } catch (e) {
+        Log.e('Optimization failed type=${e.runtimeType}');
         return null;
       }
     }
@@ -1204,7 +1212,7 @@ Future<Response> onRequest(RequestContext context) async {
         () => normalizeOptimizePayload(jsonResponse, defaultMode: 'optimize'),
       );
 
-      // Se o modo complete já veio “determinístico” (com card_id/quantity),
+      // Se o modo complete já veio determinístico (com card_id/quantity),
       // devolve diretamente sem passar pelo fluxo antigo de validação por nomes.
       if (jsonResponse['mode'] == 'complete' &&
           jsonResponse['additions_detailed'] is List) {
@@ -1336,7 +1344,7 @@ Future<Response> onRequest(RequestContext context) async {
             _emptySuggestionFallbackAppliedCount++;
             emptySuggestionFallbackReason = fallbackApplication.successReason;
             Log.i(
-              '✅ [AI Optimize] Fallback aplicado com ${fallbackApplication.pairCount} swap(s) após retorno vazio da IA.',
+              '[AI Optimize] Fallback aplicado com ${fallbackApplication.pairCount} swap(s) após retorno vazio da IA.',
             );
           }
         }
@@ -1359,11 +1367,11 @@ Future<Response> onRequest(RequestContext context) async {
       if (removals.isEmpty && additions.isEmpty && !isComplete) {
         if (recognizedSuggestionFormat) {
           Log.d(
-            'ℹ️ [AI Optimize] Payload reconhecido, mas sem sugestões úteis (provável filtro/retorno vazio). Keys: ${jsonResponse.keys.toList()}',
+            '[AI Optimize] Payload reconhecido, mas sem sugestões úteis (provável filtro/retorno vazio). Keys: ${jsonResponse.keys.toList()}',
           );
         } else {
           Log.w(
-            '⚠️ [AI Optimize] IA retornou formato não reconhecido. Keys: ${jsonResponse.keys.toList()}',
+            '[AI Optimize] IA retornou formato não reconhecido. Keys: ${jsonResponse.keys.toList()}',
           );
         }
       }
@@ -1690,7 +1698,10 @@ Future<Response> onRequest(RequestContext context) async {
               validAdditions = trimResult.additions;
             }
           } catch (e) {
-            Log.w('Falha ao buscar substitutas IA: $e - usando fallback');
+            Log.w(
+              'Falha ao buscar substitutas IA; usando fallback '
+              'type=${e.runtimeType}',
+            );
             // Fallback: truncar remoções para não perder cartas
             final trimResult = optimize_route_rebalance
                 .trimOptimizeRebalanceToPairs(
@@ -1829,7 +1840,10 @@ Future<Response> onRequest(RequestContext context) async {
             }
           }
         } catch (e) {
-          Log.w('EDHREC validation failed (non-blocking): $e');
+          Log.w(
+            'EDHREC validation failed (non-blocking) '
+            'type=${e.runtimeType}',
+          );
         }
       }
 
@@ -1881,10 +1895,10 @@ Future<Response> onRequest(RequestContext context) async {
                 );
               }
               qualityGateWarnings.add(
-                '🔒 Gate de qualidade removeu ${gateResult.droppedReasons.length} troca(s) insegura(s) antes da resposta final.',
+                'Gate de qualidade removeu ${gateResult.droppedReasons.length} troca(s) insegura(s) antes da resposta final.',
               );
               qualityGateWarnings.addAll(
-                gateResult.droppedReasons.map((reason) => '🔒 $reason'),
+                gateResult.droppedReasons.map((reason) => reason),
               );
 
               final safeAdditionNames =
@@ -1904,7 +1918,7 @@ Future<Response> onRequest(RequestContext context) async {
               validAdditions =
                   validAdditions.take(intensity.targetMax).toList();
               qualityGateWarnings.add(
-                '🔒 Escopo aggressive limitado a ${intensity.targetMax} troca(s) após ranking e gate; $overflow candidata(s) excedentes ficaram como reserva.',
+                'Escopo aggressive limitado a ${intensity.targetMax} troca(s) após ranking e gate; $overflow candidata(s) excedentes ficaram como reserva.',
               );
               final safeAdditionNames =
                   validAdditions.map((name) => name.toLowerCase()).toSet();
@@ -1985,7 +1999,11 @@ Future<Response> onRequest(RequestContext context) async {
             final themeService = ThemeContextualRulesService(pool);
             final validator = OptimizationValidator(
               openAiKey: apiKey,
+              safetyIdentifierSource: authenticatedUserId,
               themeService: themeService,
+              providerLogDb: pool,
+              providerUserId: authenticatedUserId,
+              providerDeckId: deckId,
             );
             final validationResult = await optimize_route_validator
                 .runOptimizeRouteValidation(
@@ -2018,7 +2036,7 @@ Future<Response> onRequest(RequestContext context) async {
             validationWarnings = validationResult.validationWarnings;
             optimizationValidationReport = validationResult.validationReport;
           } catch (validationError) {
-            Log.e('Validation failed: $validationError');
+            Log.e('Validation failed type=${validationError.runtimeType}');
             return respondWithOptimizeTelemetry(
               statusCode: HttpStatus.internalServerError,
               body: {
@@ -2028,7 +2046,7 @@ Future<Response> onRequest(RequestContext context) async {
                   'code': 'OPTIMIZE_VALIDATION_FAILED',
                   'message':
                       'A validacao automatica da otimizacao falhou. A resposta foi bloqueada para evitar retornar um resultado nao verificado.',
-                  'details': '$validationError',
+                  'details': 'A validação interna não pôde ser concluída.',
                 },
                 'mode': 'optimize',
                 'removals': validRemovals,
@@ -2046,7 +2064,7 @@ Future<Response> onRequest(RequestContext context) async {
             );
           }
         } catch (e) {
-          Log.e('Erro na verificação pós-otimização: $e');
+          Log.e('Erro na verificação pós-otimização type=${e.runtimeType}');
           return respondWithOptimizeTelemetry(
             statusCode: HttpStatus.internalServerError,
             body: {
@@ -2056,7 +2074,7 @@ Future<Response> onRequest(RequestContext context) async {
                 'code': 'OPTIMIZE_POST_ANALYSIS_FAILED',
                 'message':
                     'A verificacao final falhou e a resposta foi bloqueada para evitar retornar uma otimizacao sem checagem completa.',
-                'details': '$e',
+                'details': 'A verificação interna não pôde ser concluída.',
               },
               'mode': 'optimize',
               'removals': validRemovals,
@@ -2265,7 +2283,7 @@ Future<Response> onRequest(RequestContext context) async {
           pool,
         );
       } catch (e) {
-        Log.w('Persisted fallback telemetry unavailable: $e');
+        Log.w('Persisted fallback telemetry unavailable type=${e.runtimeType}');
       }
 
       final preCmc =
@@ -2552,7 +2570,10 @@ Future<Response> onRequest(RequestContext context) async {
           preferredColors: commanderColorIdentity.toList(),
         );
       } catch (e) {
-        Log.w('Falha ao persistir cache/preferências de optimize: $e');
+        Log.w(
+          'Falha ao persistir cache/preferências de optimize '
+          'type=${e.runtimeType}',
+        );
       }
 
       return respondWithOptimizeTelemetry(
@@ -2570,13 +2591,13 @@ Future<Response> onRequest(RequestContext context) async {
       );
     }
   } catch (e, stackTrace) {
-    Log.e('handler: $e\nStack trace:\n$stackTrace');
+    Log.e('[ai-optimize] request failed type=${e.runtimeType}');
     await captureRouteException(
       context,
       e,
       stackTrace: stackTrace,
       tags: const {'route': 'ai_optimize'},
     );
-    return internalServerError('Failed to optimize deck', details: e);
+    return internalServerError('Failed to optimize deck');
   }
 }

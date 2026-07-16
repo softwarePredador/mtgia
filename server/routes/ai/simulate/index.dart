@@ -12,6 +12,7 @@ import '../../../lib/ai/native_battle_client.dart';
 import '../../../lib/ai/xmage_battle_client.dart';
 import '../../../lib/http_responses.dart';
 import '../../../lib/logger.dart';
+import '../../../lib/observability.dart';
 
 const _publicBattleDefaultTimeoutMs = 40000;
 const _publicBattleMaximumTimeoutMs = 40000;
@@ -56,11 +57,7 @@ Future<Response> onRequest(RequestContext context) async {
     );
 
     // Busca cartas do deck principal sempre dentro do escopo do usuário.
-    final deckCards = await _fetchDeckCards(
-      pool,
-      deckId,
-      userId: userId,
-    );
+    final deckCards = await _fetchDeckCards(pool, deckId, userId: userId);
     if (deckCards.isEmpty) {
       return notFound('Deck not found or empty');
     }
@@ -92,9 +89,10 @@ Future<Response> onRequest(RequestContext context) async {
       final nativeSidecarUrl = engineConfig.nativeSidecarUrl;
       final strictXmage = engineConfig.isStrictXmage;
       final strictForge = engineConfig.isStrictForge;
-      final seed = data['seed'] is int
-          ? data['seed'] as int
-          : DateTime.now().microsecondsSinceEpoch % 2147483647;
+      final seed =
+          data['seed'] is int
+              ? data['seed'] as int
+              : DateTime.now().microsecondsSinceEpoch % 2147483647;
       final timeoutMs = _normalizedSimulationCount(
         data['timeout_ms'],
         defaultValue: _publicBattleDefaultTimeoutMs,
@@ -235,7 +233,8 @@ Future<Response> onRequest(RequestContext context) async {
       final opponentId = data['opponent_deck_id'] as String?;
       if (opponentId == null || opponentId.isEmpty) {
         return badRequest(
-            'opponent_deck_id is required for matchup simulation');
+          'opponent_deck_id is required for matchup simulation',
+        );
       }
 
       final opponentCards = await _fetchDeckCards(
@@ -281,18 +280,20 @@ Future<Response> onRequest(RequestContext context) async {
       );
 
       return Response.json(
-        body: {
-          'type': 'goldfish',
-          'deck_id': deckId,
-          ...result.toJson(),
-        },
+        body: {'type': 'goldfish', 'deck_id': deckId, ...result.toJson()},
       );
     }
   } on FormatException catch (e) {
-    print('[ERROR] Invalid JSON: ${e.message}: $e');
+    Log.w('[ai-simulate] invalid JSON type=${e.runtimeType}');
     return badRequest('Invalid JSON: ${e.message}');
   } catch (e, st) {
-    Log.e('Error in /ai/simulate: $e\n$st');
+    Log.e('[ai-simulate] request failed type=${e.runtimeType}');
+    await captureRouteException(
+      context,
+      e,
+      stackTrace: st,
+      tags: const {'route': 'ai_simulate'},
+    );
     return internalServerError('Internal server error');
   }
 }
@@ -411,8 +412,7 @@ Future<void> _saveSimulation({
       final turnsPlayed = (result['turns'] as num?)?.toInt();
 
       await pool.execute(
-        Sql.named(
-          '''
+        Sql.named('''
           INSERT INTO battle_simulations (
             deck_a_id,
             deck_b_id,
@@ -431,8 +431,7 @@ Future<void> _saveSimulation({
             ${hasWinnerDeckId ? ', @winnerDeckId' : ''}
             ${hasTurnsPlayed ? ', @turnsPlayed' : ''}
           )
-          ''',
-        ),
+          '''),
         parameters: {
           'deckAId': deckAId,
           'deckBId': deckBId,
@@ -445,29 +444,29 @@ Future<void> _saveSimulation({
       );
     }
   } catch (e) {
-    print('[ERROR] handler: $e');
     // Não falha a request se não conseguir salvar
-    Log.w('Could not save simulation: $e');
+    Log.w('[ai-simulate] persistence unavailable type=${e.runtimeType}');
   }
 }
 
 Map<String, dynamic> _externalDeckPayload(
   String deckId,
   List<Map<String, dynamic>> cards,
-) =>
-    {
-      'id': deckId,
-      'name': cards.first['deck_name']?.toString() ?? deckId,
-      'cards': cards
-          .map((card) => {
-                'name': card['name'],
-                'set_code': card['set_code'],
-                'collector_number': card['collector_number'],
-                'quantity': card['quantity'],
-                'is_commander': card['is_commander'],
-              })
-          .toList(growable: false),
-    };
+) => {
+  'id': deckId,
+  'name': cards.first['deck_name']?.toString() ?? deckId,
+  'cards': cards
+      .map(
+        (card) => {
+          'name': card['name'],
+          'set_code': card['set_code'],
+          'collector_number': card['collector_number'],
+          'quantity': card['quantity'],
+          'is_commander': card['is_commander'],
+        },
+      )
+      .toList(growable: false),
+};
 
 Future<Map<String, dynamic>> _simulateXmage(
   String sidecarUrl,
@@ -561,16 +560,15 @@ Map<String, dynamic> _withNativeRequirements(
   Map<String, dynamic> request, {
   required List<Map<String, dynamic>> requiredRuleCards,
   required Map<String, dynamic> data,
-}) =>
-    {
-      ...request,
-      'required_rule_cards': requiredRuleCards,
-      'max_turns': (data['max_turns'] as int?) ?? 30,
-      if (data['focus_cards'] is List) 'focus_cards': data['focus_cards'],
-      if (data['force_focus_access_mode'] is String)
-        'force_focus_access_mode': data['force_focus_access_mode'],
-      'natural_sample': data['natural_sample'] != false,
-    };
+}) => {
+  ...request,
+  'required_rule_cards': requiredRuleCards,
+  'max_turns': (data['max_turns'] as int?) ?? 30,
+  if (data['focus_cards'] is List) 'focus_cards': data['focus_cards'],
+  if (data['force_focus_access_mode'] is String)
+    'force_focus_access_mode': data['force_focus_access_mode'],
+  'natural_sample': data['natural_sample'] != false,
+};
 
 bool _isNaturalBattleResult(
   Map<String, dynamic> request,
@@ -582,39 +580,34 @@ bool _isNaturalBattleResult(
   return forcedMode == null || forcedMode.isEmpty || forcedMode == 'none';
 }
 
-List<Map<String, dynamic>> _allDeckCardRows(
-  Map<String, dynamic> request,
-) {
+List<Map<String, dynamic>> _allDeckCardRows(Map<String, dynamic> request) {
   final rows = <Map<String, dynamic>>[];
   for (final deckKey in const ['deck_a', 'deck_b']) {
     final deck = request[deckKey];
     if (deck is! Map || deck['cards'] is! List) continue;
     rows.addAll(
-      (deck['cards'] as List)
-          .whereType<Map>()
-          .map((row) => row.cast<String, dynamic>()),
+      (deck['cards'] as List).whereType<Map>().map(
+        (row) => row.cast<String, dynamic>(),
+      ),
     );
   }
   return rows;
 }
 
-List<String> _stringList(Object? value) => value is List
-    ? value
-        .map((item) => item?.toString().trim() ?? '')
-        .where((item) => item.isNotEmpty)
-        .toList(growable: false)
-    : const [];
+List<String> _stringList(Object? value) =>
+    value is List
+        ? value
+            .map((item) => item?.toString().trim() ?? '')
+            .where((item) => item.isNotEmpty)
+            .toList(growable: false)
+        : const [];
 
 Response _engineConfigurationFailure(
   BattleEngineConfigurationException error,
-) =>
-    Response.json(
-      statusCode: HttpStatus.serviceUnavailable,
-      body: {
-        'error': error.code,
-        'details': error.message,
-      },
-    );
+) => Response.json(
+  statusCode: HttpStatus.serviceUnavailable,
+  body: {'error': error.code, 'details': error.message},
+);
 
 Response _externalEngineFailure(
   String engine,
@@ -622,12 +615,15 @@ Response _externalEngineFailure(
   int? upstreamStatusCode,
 }) {
   final timedOut = upstreamStatusCode == HttpStatus.gatewayTimeout;
-  Log.e('$engine battle failed: $message');
+  Log.e('$engine battle failed');
   return Response.json(
     statusCode: timedOut ? HttpStatus.gatewayTimeout : HttpStatus.badGateway,
     body: {
       'error': timedOut ? '${engine}_timeout' : '${engine}_unavailable',
-      'details': message,
+      'details':
+          timedOut
+              ? 'The battle engine timed out.'
+              : 'The battle engine is temporarily unavailable.',
     },
   );
 }
@@ -664,7 +660,8 @@ Map<String, dynamic> _simulationMetrics(Map<String, dynamic> result) {
     'duration_ms': result['duration_ms'],
     'turns': result['turns'],
     'winner_deck_id': result['winner_deck_id'],
-    'event_count': (result['events'] as List?)?.length ??
+    'event_count':
+        (result['events'] as List?)?.length ??
         (result['game_log'] as List?)?.length,
     'snapshot_count': (result['visual_snapshots'] as List?)?.length,
   }..removeWhere((_, value) => value == null);

@@ -341,6 +341,8 @@ Future<void> processCompleteModeAsync({
           coreCards: themeProfile.coreCards,
           maxTotal: maxTotal,
           state: state,
+          deckId: deckId,
+          userId: userId,
         ),
       );
     } else {
@@ -508,8 +510,12 @@ Future<void> processCompleteModeAsync({
       }
       await OptimizeJobStore.complete(pool, jobId, result: jsonResponse);
     }
-  } catch (e, stackTrace) {
-    Log.e('Background optimize job $jobId failed: $e\n$stackTrace');
-    await OptimizeJobStore.fail(pool, jobId, error: e.toString());
+  } catch (e) {
+    Log.e('Background optimize job $jobId failed type=${e.runtimeType}');
+    await OptimizeJobStore.fail(
+      pool,
+      jobId,
+      error: 'Falha interna ao processar a otimização.',
+    );
   }
 }

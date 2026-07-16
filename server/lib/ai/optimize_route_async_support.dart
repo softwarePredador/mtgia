@@ -56,10 +56,7 @@ Map<String, dynamic> buildOptimizeModeAsyncAcceptedBody({
     'total_stages': 6,
     'intensity': intensity.selected,
     'optimize_intensity': intensity.toJson(returnedSwaps: 0),
-    'async': {
-      'accepted_ms': elapsedMs,
-      'executor': 'optimize_async_job',
-    },
+    'async': {'accepted_ms': elapsedMs, 'executor': 'optimize_async_job'},
     'timings': timings,
     'stage_telemetry': timings,
   };
@@ -81,8 +78,11 @@ void startOptimizeModeAsyncJob({
         syncPayload: syncPayload,
         authorization: authorization,
       ),
-      (error, stackTrace) {
-        Log.e('Background optimize job $jobId crashed: $error\n$stackTrace');
+      (error, _) {
+        Log.e(
+          'Background optimize job $jobId crashed '
+          'type=${error.runtimeType}',
+        );
         unawaited(
           OptimizeJobStore.fail(
             pool,
@@ -171,10 +171,17 @@ void startCompleteModeAsyncJob({
         hasKeepThemeOverride: hasKeepThemeOverride,
         recommendationContext: recommendationContext,
       ),
-      (error, stackTrace) {
-        Log.e('Background optimize job $jobId crashed: $error\n$stackTrace');
+      (error, _) {
+        Log.e(
+          'Background optimize job $jobId crashed '
+          'type=${error.runtimeType}',
+        );
         unawaited(
-          OptimizeJobStore.fail(pool, jobId, error: error.toString()),
+          OptimizeJobStore.fail(
+            pool,
+            jobId,
+            error: 'Falha interna ao processar a otimização.',
+          ),
         );
       },
     ),

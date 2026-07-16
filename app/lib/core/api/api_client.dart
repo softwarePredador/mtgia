@@ -53,6 +53,9 @@ class ApiClient {
     _cachedToken = token;
   }
 
+  static bool get hasAuthenticationToken =>
+      _cachedToken?.trim().isNotEmpty == true;
+
   /// Instância singleton do http.Client para reutilizar conexões TCP.
   /// Pode ser injetada via construtor para testes.
   static http.Client _httpClient = http.Client();
@@ -138,7 +141,12 @@ class ApiClient {
   @visibleForTesting
   static Duration timeoutForEndpoint(String endpoint, {Duration? override}) {
     if (override != null) return override;
-    return endpoint.startsWith('/ai/')
+    final path = Uri.tryParse(endpoint)?.path ?? endpoint;
+    final isAiEndpoint =
+        path.startsWith('/ai/') ||
+        path.endsWith('/ai-analysis') ||
+        path.endsWith('/recommendations');
+    return isAiEndpoint
         ? const Duration(minutes: 2)
         : const Duration(seconds: 15);
   }

@@ -18,13 +18,13 @@ class UserPlanSnapshot {
   final double estimatedCostUsd;
 
   Map<String, dynamic> toJson() => {
-        'plan_name': planName,
-        'status': status,
-        'ai_monthly_limit': aiMonthlyLimit,
-        'ai_requests_used': aiRequestsUsed,
-        'ai_requests_remaining': aiRequestsRemaining,
-        'estimated_cost_usd': estimatedCostUsd,
-      };
+    'plan_name': planName,
+    'status': status,
+    'ai_monthly_limit': aiMonthlyLimit,
+    'ai_requests_used': aiRequestsUsed,
+    'ai_requests_remaining': aiRequestsRemaining,
+    'estimated_cost_usd': estimatedCostUsd,
+  };
 }
 
 class PlanService {
@@ -89,20 +89,30 @@ class PlanService {
       parameters: {'userId': userId},
     );
 
-    final planName = planResult.isNotEmpty
-        ? (planResult.first[0] as String? ?? 'free')
-        : 'free';
-    final status = planResult.isNotEmpty
-        ? (planResult.first[1] as String? ?? 'active')
-        : 'active';
+    final planName =
+        planResult.isNotEmpty
+            ? (planResult.first[0] as String? ?? 'free')
+            : 'free';
+    final status =
+        planResult.isNotEmpty
+            ? (planResult.first[1] as String? ?? 'active')
+            : 'active';
 
     final aiMonthlyLimit = planName == 'pro' ? _proLimit : _defaultFreeLimit;
 
     final usageResult = await pool.execute(
       Sql.named('''
         SELECT
-          COUNT(*)::int AS requests_used,
-          COALESCE(SUM(COALESCE(input_tokens, 0) + COALESCE(output_tokens, 0)), 0)::int AS total_tokens
+          COUNT(*) FILTER (
+            WHERE endpoint LIKE 'plan:%' AND success = TRUE
+          )::int AS requests_used,
+          COALESCE(
+            SUM(COALESCE(input_tokens, 0) + COALESCE(output_tokens, 0))
+              FILTER (
+                WHERE endpoint LIKE 'provider:%' AND success = TRUE
+              ),
+            0
+          )::int AS total_tokens
         FROM ai_logs
         WHERE user_id = @userId
           AND created_at >= NOW() - INTERVAL '30 days'

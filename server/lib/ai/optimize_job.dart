@@ -37,7 +37,8 @@ class OptimizeJobStore {
   }) async {
     unawaited(
       _cleanupIfDue(pool).catchError(
-        (Object error) => Log.w('Optimize job cleanup failed: $error'),
+        (Object error) =>
+            Log.w('Optimize job cleanup failed type=${error.runtimeType}'),
       ),
     );
     final id = _generateId();
@@ -48,11 +49,10 @@ class OptimizeJobStore {
       userId: userId,
     );
     _memoryJobs[id] = job;
-    unawaited(
-      () async {
-        try {
-          await pool.execute(
-            Sql.named('''
+    unawaited(() async {
+      try {
+        await pool.execute(
+          Sql.named('''
         INSERT INTO ai_optimize_jobs (
           id, deck_id, archetype, user_id, status, stage, stage_number,
           total_stages, result, error, quality_error, created_at, updated_at
@@ -63,28 +63,29 @@ class OptimizeJobStore {
           @result::jsonb, @error, @quality_error::jsonb, NOW(), NOW()
         )
       '''),
-            parameters: {
-              'id': job.id,
-              'deck_id': job.deckId,
-              'archetype': job.archetype,
-              'user_id': job.userId,
-              'status': job.status,
-              'stage': job.stage,
-              'stage_number': job.stageNumber,
-              'total_stages': job.totalStages,
-              'result': job.result == null ? null : jsonEncode(job.result),
-              'error': job.error,
-              'quality_error': job.qualityError == null
-                  ? null
-                  : jsonEncode(job.qualityError),
-            },
-          );
-        } catch (error) {
-          Log.w('Optimize job ${job.id} initial persistence failed: $error');
-          // Memory-backed polling remains available for the current process.
-        }
-      }(),
-    );
+          parameters: {
+            'id': job.id,
+            'deck_id': job.deckId,
+            'archetype': job.archetype,
+            'user_id': job.userId,
+            'status': job.status,
+            'stage': job.stage,
+            'stage_number': job.stageNumber,
+            'total_stages': job.totalStages,
+            'result': job.result == null ? null : jsonEncode(job.result),
+            'error': job.error,
+            'quality_error':
+                job.qualityError == null ? null : jsonEncode(job.qualityError),
+          },
+        );
+      } catch (error) {
+        Log.w(
+          'Optimize job ${job.id} initial persistence failed '
+          'type=${error.runtimeType}',
+        );
+        // Memory-backed polling remains available for the current process.
+      }
+    }());
     return id;
   }
 
@@ -145,14 +146,13 @@ class OptimizeJobStore {
           updated_at = NOW()
         WHERE id = @id
       '''),
-        parameters: {
-          'id': id,
-          'stage': stage,
-          'stage_number': stageNumber,
-        },
+        parameters: {'id': id, 'stage': stage, 'stage_number': stageNumber},
       );
     } catch (error) {
-      Log.w('Optimize job $id progress persistence failed: $error');
+      Log.w(
+        'Optimize job $id progress persistence failed '
+        'type=${error.runtimeType}',
+      );
       if (memoryJob == null) rethrow;
     }
   }
@@ -186,13 +186,13 @@ class OptimizeJobStore {
           updated_at = NOW()
         WHERE id = @id
       '''),
-        parameters: {
-          'id': id,
-          'result': jsonEncode(result),
-        },
+        parameters: {'id': id, 'result': jsonEncode(result)},
       );
     } catch (error) {
-      Log.w('Optimize job $id completion persistence failed: $error');
+      Log.w(
+        'Optimize job $id completion persistence failed '
+        'type=${error.runtimeType}',
+      );
       if (memoryJob == null) rethrow;
     }
   }
@@ -233,7 +233,10 @@ class OptimizeJobStore {
         },
       );
     } catch (error) {
-      Log.w('Optimize job $id failure persistence failed: $error');
+      Log.w(
+        'Optimize job $id failure persistence failed '
+        'type=${error.runtimeType}',
+      );
       if (memoryJob == null) rethrow;
     }
   }
@@ -304,8 +307,8 @@ class OptimizeJob {
     this.qualityError,
     DateTime? createdAt,
     DateTime? updatedAt,
-  })  : createdAt = createdAt ?? DateTime.now(),
-        updatedAt = updatedAt ?? DateTime.now();
+  }) : createdAt = createdAt ?? DateTime.now(),
+       updatedAt = updatedAt ?? DateTime.now();
 
   factory OptimizeJob.fromRow(Map<String, dynamic> row) {
     return OptimizeJob(
@@ -328,36 +331,32 @@ class OptimizeJob {
   bool get isTerminal => status == 'completed' || status == 'failed';
 
   Map<String, dynamic> toJson() => {
-        'job_id': id,
-        'deck_id': deckId,
-        'archetype': archetype,
-        'status': status,
-        'stage': stage,
-        'stage_number': stageNumber,
-        'total_stages': totalStages,
-        if (result != null) 'result': result,
-        if (error != null) 'error': error,
-        if (qualityError != null) 'quality_error': qualityError,
-        'created_at': createdAt.toIso8601String(),
-        'updated_at': updatedAt.toIso8601String(),
-      };
+    'job_id': id,
+    'deck_id': deckId,
+    'archetype': archetype,
+    'status': status,
+    'stage': stage,
+    'stage_number': stageNumber,
+    'total_stages': totalStages,
+    if (result != null) 'result': result,
+    if (error != null) 'error': error,
+    if (qualityError != null) 'quality_error': qualityError,
+    'created_at': createdAt.toIso8601String(),
+    'updated_at': updatedAt.toIso8601String(),
+  };
 }
 
 Map<String, dynamic>? _decodeJsonMap(dynamic value) {
   if (value == null) return null;
   if (value is Map<String, dynamic>) return value;
   if (value is Map) {
-    return value.map(
-      (key, mapValue) => MapEntry(key.toString(), mapValue),
-    );
+    return value.map((key, mapValue) => MapEntry(key.toString(), mapValue));
   }
   if (value is String) {
     final decoded = jsonDecode(value);
     if (decoded is Map<String, dynamic>) return decoded;
     if (decoded is Map) {
-      return decoded.map(
-        (key, mapValue) => MapEntry(key.toString(), mapValue),
-      );
+      return decoded.map((key, mapValue) => MapEntry(key.toString(), mapValue));
     }
   }
   return null;

@@ -2,9 +2,12 @@ import 'dart:convert';
 import 'dart:math';
 import 'package:http/http.dart' as http;
 import 'package:dotenv/dotenv.dart';
+import '../ai_provider_runtime_support.dart';
+import '../ai_provider_usage_support.dart';
 import '../logger.dart';
 import '../openai_runtime_config.dart';
 import '../basic_land_utils.dart' as land_utils;
+import '../openai_structured_output_support.dart';
 import 'cmc_safety.dart';
 import 'goldfish_simulator.dart';
 import 'optimization_functional_roles.dart';
@@ -29,13 +32,21 @@ typedef ThemeDeckValidationCallback =
 /// 3. Critic IA — Segunda chamada à IA que CRITICA as trocas (auto-revisão)
 class OptimizationValidator {
   final String? openAiKey;
+  final String? safetyIdentifierSource;
   final ThemeContextualRulesService? themeService;
   final ThemeDeckValidationCallback? themeValidator;
+  final dynamic providerLogDb;
+  final String? providerUserId;
+  final String? providerDeckId;
 
   OptimizationValidator({
     this.openAiKey,
+    this.safetyIdentifierSource,
     this.themeService,
     this.themeValidator,
+    this.providerLogDb,
+    this.providerUserId,
+    this.providerDeckId,
   });
 
   /// Executa TODAS as camadas de validação e retorna um veredito unificado
@@ -81,7 +92,7 @@ class OptimizationValidator {
           'critical=${themeValidation.hasCriticalViolation}',
         );
       } catch (e) {
-        Log.w('ThemeValidation error: $e');
+        Log.w('ThemeValidation unavailable type=${e.runtimeType}');
       }
     }
 
@@ -455,6 +466,8 @@ class OptimizationValidator {
       stagingFallback: 0.2,
       prodFallback: 0.15,
     );
+    final providerStopwatch = Stopwatch()..start();
+    var providerCallRecorded = false;
 
     try {
       final criticPrompt =
@@ -488,21 +501,52 @@ SUA TAREFA: Avaliar se as trocas são REALMENTE boas. Retorne apenas JSON:
   "overall_assessment": "Frase resumo de 1-2 linhas"
 }''';
 
-      final response = await http.post(
-        Uri.parse('https://api.openai.com/v1/chat/completions'),
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': 'Bearer $openAiKey',
-        },
-        body: jsonEncode({
-          'model': model,
-          'messages': [
-            {'role': 'user', 'content': criticPrompt},
-          ],
-          'temperature': temperature,
-          'response_format': {'type': 'json_object'},
-        }),
-      );
+      final response = await http
+          .post(
+            Uri.parse('https://api.openai.com/v1/chat/completions'),
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': 'Bearer $openAiKey',
+            },
+            body: jsonEncode({
+              ...aiSafetyIdentifierPayload(safetyIdentifierSource),
+              'model': model,
+              'messages': [
+                {'role': 'user', 'content': criticPrompt},
+              ],
+              'temperature': temperature,
+              ...openAiTokenLimitPayload(model: model, maxTokens: 900),
+              'response_format': openAiStructuredResponseFormat(
+                model: model,
+                name: 'optimization_critic',
+                schema: openAiOptimizationCriticSchema,
+              ),
+            }),
+          )
+          .timeout(
+            aiConfig.timeoutFor(
+              key: 'OPENAI_TIMEOUT_OPTIMIZATION_CRITIC_SECONDS',
+              fallback: const Duration(seconds: 12),
+              prodFallback: const Duration(seconds: 15),
+              min: const Duration(seconds: 3),
+              max: const Duration(seconds: 30),
+            ),
+          );
+
+      if (providerLogDb != null) {
+        await recordAiProviderCall(
+          db: providerLogDb,
+          endpoint: 'optimization_critic',
+          model: model,
+          latencyMs: providerStopwatch.elapsedMilliseconds,
+          success: response.statusCode == 200,
+          userId: providerUserId,
+          deckId: providerDeckId,
+          responseBodyBytes: response.bodyBytes,
+          failureCode: 'provider_http_${response.statusCode}',
+        );
+        providerCallRecorded = true;
+      }
 
       if (response.statusCode == 200) {
         final data = jsonDecode(utf8.decode(response.bodyBytes));
@@ -513,7 +557,19 @@ SUA TAREFA: Avaliar se as trocas são REALMENTE boas. Retorne apenas JSON:
       Log.w('Critic AI failed: HTTP ${response.statusCode}');
       return null;
     } catch (e) {
-      Log.w('Critic AI error: $e');
+      if (providerLogDb != null && !providerCallRecorded) {
+        await recordAiProviderCall(
+          db: providerLogDb,
+          endpoint: 'optimization_critic',
+          model: model,
+          latencyMs: providerStopwatch.elapsedMilliseconds,
+          success: false,
+          userId: providerUserId,
+          deckId: providerDeckId,
+          failureCode: 'provider_transport_${e.runtimeType}',
+        );
+      }
+      Log.w('Critic AI unavailable type=${e.runtimeType}');
       return null;
     }
   }

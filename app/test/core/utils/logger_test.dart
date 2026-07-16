@@ -10,7 +10,25 @@ void main() {
       expect(() => AppLogger.info('test info'), returnsNormally);
       expect(() => AppLogger.warning('test warning'), returnsNormally);
       expect(() => AppLogger.error('test error'), returnsNormally);
-      expect(() => AppLogger.error('test error', Exception('test')), returnsNormally);
+      expect(
+        () => AppLogger.error('test error', Exception('test')),
+        returnsNormally,
+      );
+    });
+
+    test('redacts provider credentials and personal data', () {
+      final sanitized = sanitizeAppLogMessage(
+        'Authorization: Bearer secret-token '
+        'OPENAI_API_KEY=sk-example-secret '
+        'https://example.test?access_token=url-secret '
+        'user@example.com',
+      );
+
+      expect(sanitized, isNot(contains('secret-token')));
+      expect(sanitized, isNot(contains('sk-example-secret')));
+      expect(sanitized, isNot(contains('url-secret')));
+      expect(sanitized, isNot(contains('user@example.com')));
+      expect(sanitized, contains('[REDACTED]'));
     });
   });
 }

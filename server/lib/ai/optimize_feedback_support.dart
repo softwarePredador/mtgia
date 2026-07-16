@@ -45,9 +45,10 @@ OptimizeMlFeedback buildOptimizeMlFeedback({
   List<String> blockedByColorIdentity = const [],
   List<Map<String, dynamic>> blockedByBracket = const [],
 }) {
-  final acceptedCards = statusCode >= 200 && statusCode < 300
-      ? _dedupeCardNames(additions)
-      : const <String>[];
+  final acceptedCards =
+      statusCode >= 200 && statusCode < 300
+          ? _dedupeCardNames(additions)
+          : const <String>[];
   final rejectedCards = _buildRejectedCards(
     statusCode: statusCode,
     removals: removals,
@@ -109,7 +110,7 @@ Future<void> recordOptimizeMlFeedback({
       userComment: feedback.userComment,
     );
   } catch (e) {
-    Log.w('Falha ao registrar feedback ML do optimize: $e');
+    Log.w('Falha ao registrar feedback ML type=${e.runtimeType}');
   }
 }
 

@@ -122,7 +122,6 @@ class CommercialProvider extends ChangeNotifier {
     await load();
     await _rolloverIfNeeded();
     if (!canUseAi) return false;
-    if (_isRemoteSynced) return true;
     _usedAiActions += 1;
     await _saveUsage();
     notifyListeners();

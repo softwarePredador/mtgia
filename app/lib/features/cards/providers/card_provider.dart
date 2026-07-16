@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+
 import '../../../core/api/api_client.dart';
+import '../../../core/utils/logger.dart';
 import '../../decks/models/deck_card_item.dart';
 
 class CardProvider extends ChangeNotifier {
@@ -145,11 +147,22 @@ class CardProvider extends ChangeNotifier {
       });
 
       if (response.statusCode == 200) {
-        return response.data['explanation'] as String;
+        final data = response.data;
+        if (data is Map) {
+          final explanation = data['explanation']?.toString().trim();
+          if (explanation != null && explanation.isNotEmpty) {
+            return explanation;
+          }
+        }
       }
       return null;
-    } catch (e) {
-      return 'Erro ao obter explicação: $e';
+    } catch (error, stackTrace) {
+      AppLogger.error(
+        '[CardProvider] Falha ao obter explicação da carta',
+        error,
+        stackTrace,
+      );
+      return null;
     }
   }
 

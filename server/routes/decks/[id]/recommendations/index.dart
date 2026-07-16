@@ -3,6 +3,8 @@ import 'package:dart_frog/dart_frog.dart';
 import 'package:postgres/postgres.dart';
 import 'package:dotenv/dotenv.dart';
 import '../../../../lib/deck_recommendations_route_support.dart';
+import '../../../../lib/logger.dart';
+import '../../../../lib/observability.dart';
 import '../../../../lib/openai_runtime_config.dart';
 import '../../../../lib/ai/edhrec_trend_service.dart';
 
@@ -145,13 +147,23 @@ Future<Response> _generateRecommendations(
       trendFinder: (commander) {
         return EdhrecTrendService(pool).getCardTrends(commander);
       },
+      providerLogDb: pool,
     );
     return Response.json(statusCode: result.statusCode, body: result.body);
-  } catch (e) {
-    print('[ERROR] Failed to generate recommendations: $e');
+  } catch (error, stackTrace) {
+    Log.e('[DECK_RECOMMENDATIONS] request failed type=${error.runtimeType}');
+    await captureRouteException(
+      context,
+      error,
+      stackTrace: stackTrace,
+      tags: const {'route': 'deck_recommendations'},
+    );
     return Response.json(
       statusCode: HttpStatus.internalServerError,
-      body: {'error': 'Failed to generate recommendations: $e'},
+      body: {
+        'error':
+            'Não foi possível gerar recomendações agora. Tente novamente em instantes.',
+      },
     );
   }
 }
@@ -337,7 +349,10 @@ Future<List<String>> _findCardsForCategory({
     }
     return candidates;
   } catch (e) {
-    print('[WARN] _findCardsForCategory error: $e');
+    Log.w(
+      '[DECK_RECOMMENDATIONS] category lookup unavailable '
+      'type=${e.runtimeType}',
+    );
     return [];
   }
 }

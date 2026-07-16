@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:dotenv/dotenv.dart';
 import 'package:http/http.dart' as http;
 import 'package:server/ai/edhrec_trend_service.dart';
+import 'package:server/ai_provider_runtime_support.dart';
 import 'package:server/deck_recommendations_advisory_support.dart';
 import 'package:server/deck_recommendations_fallback_support.dart';
 import 'package:server/deck_recommendations_route_support.dart';
@@ -12,40 +13,42 @@ import 'package:test/test.dart';
 
 void main() {
   group('deck recommendations route support', () {
-    test('returns not found before loading cards or external services',
-        () async {
-      var cardLoads = 0;
-      var candidateCalls = 0;
+    test(
+      'returns not found before loading cards or external services',
+      () async {
+        var cardLoads = 0;
+        var candidateCalls = 0;
 
-      final result = await buildDeckRecommendationsRouteResult(
-        deckId: 'missing-deck',
-        userId: 'user-1',
-        apiKey: null,
-        aiConfig: _config(),
-        deckLoader: ({required deckId, required userId}) async => null,
-        deckCardLoader: ({required deckId}) async {
-          cardLoads++;
-          return const <Map<String, dynamic>>[];
-        },
-        candidateFinder: ({
-          required roles,
-          required oraclePatterns,
-          required deckColors,
-          required excludeNames,
-          required limit,
-          required format,
-          landOnly = false,
-        }) async {
-          candidateCalls++;
-          return const <String>[];
-        },
-      );
+        final result = await buildDeckRecommendationsRouteResult(
+          deckId: 'missing-deck',
+          userId: 'user-1',
+          apiKey: null,
+          aiConfig: _config(),
+          deckLoader: ({required deckId, required userId}) async => null,
+          deckCardLoader: ({required deckId}) async {
+            cardLoads++;
+            return const <Map<String, dynamic>>[];
+          },
+          candidateFinder: ({
+            required roles,
+            required oraclePatterns,
+            required deckColors,
+            required excludeNames,
+            required limit,
+            required format,
+            landOnly = false,
+          }) async {
+            candidateCalls++;
+            return const <String>[];
+          },
+        );
 
-      expect(result.statusCode, HttpStatus.notFound);
-      expect(result.body, {'error': 'Deck not found'});
-      expect(cardLoads, 0);
-      expect(candidateCalls, 0);
-    });
+        expect(result.statusCode, HttpStatus.notFound);
+        expect(result.body, {'error': 'Deck not found'});
+        expect(cardLoads, 0);
+        expect(candidateCalls, 0);
+      },
+    );
 
     test('executes no-key handler core without Pool or OpenAI', () async {
       final candidateRequests = <Map<String, dynamic>>[];
@@ -173,12 +176,21 @@ void main() {
         },
       );
 
-      expect(result.statusCode, HttpStatus.tooManyRequests);
+      expect(result.statusCode, HttpStatus.serviceUnavailable);
       expect(
-          postedUrl.toString(), 'https://api.openai.com/v1/chat/completions');
+        postedUrl.toString(),
+        'https://api.openai.com/v1/chat/completions',
+      );
       expect(postedHeaders, containsPair('Authorization', 'Bearer sk-test'));
       expect(postedPayload?['model'], 'gpt-4o-mini');
-      expect(postedPayload?['response_format'], {'type': 'json_object'});
+      final responseFormat =
+          postedPayload?['response_format'] as Map<String, dynamic>;
+      expect(responseFormat['type'], 'json_schema');
+      expect(responseFormat['json_schema'], containsPair('strict', true));
+      expect(
+        postedPayload?['safety_identifier'],
+        allOf(startsWith('manaloom_'), isNot(contains('user-1'))),
+      );
       final messages = postedPayload?['messages'] as List<dynamic>;
       expect(messages.last['content'], contains('Lorehold Fixture'));
       expect(messages.last['content'], contains('33-38 lands'));
@@ -188,7 +200,7 @@ void main() {
       );
       expect(candidateCalls, 0);
       expect(trendCalls, 0);
-      expect(result.body['error'], 'OpenAI API Error: rate limit');
+      expect(result.body['error'], aiProviderUnavailableMessage);
       expect(result.body['source'], openAiRecommendationsSource);
       expect(result.body['advisory'], isTrue);
       expect(result.body['recommendations']['add'], isEmpty);
@@ -198,6 +210,48 @@ void main() {
         containsPair('backend_post_validated', false),
       );
     });
+
+    test(
+      'rejects malformed OpenAI success payload without exposing it',
+      () async {
+        const malformedProviderBody =
+            'provider-internal payload with Authorization: Bearer secret';
+        final result = await buildDeckRecommendationsRouteResult(
+          deckId: 'deck-6',
+          userId: 'user-1',
+          apiKey: 'sk-test',
+          aiConfig: _config(),
+          deckLoader: ({required deckId, required userId}) async {
+            return const DeckRecommendationRecord(
+              name: 'Lorehold Fixture',
+              format: 'commander',
+              description: 'malformed provider response',
+            );
+          },
+          deckCardLoader:
+              ({required deckId}) async => _completeLoreholdFixture(),
+          candidateFinder:
+              ({
+                required roles,
+                required oraclePatterns,
+                required deckColors,
+                required excludeNames,
+                required limit,
+                required format,
+                landOnly = false,
+              }) async => const <String>[],
+          trendFinder: (_) async => const <EdhrecCardTrend>[],
+          openAiPost: (_, {headers, body}) async {
+            return http.Response(malformedProviderBody, HttpStatus.ok);
+          },
+        );
+
+        expect(result.statusCode, HttpStatus.badGateway);
+        expect(result.body.toString(), isNot(contains(malformedProviderBody)));
+        expect(result.body['recommendations']['add'], isEmpty);
+        expect(result.body['advisory'], isTrue);
+      },
+    );
   });
 }
 

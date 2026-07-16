@@ -1,8 +1,19 @@
 import 'dart:convert';
+
 import 'package:http/http.dart' as http;
+
 import '../logger.dart';
 
 class SynergyEngine {
+  SynergyEngine({
+    http.Client? client,
+    Duration requestTimeout = const Duration(seconds: 8),
+  }) : _client = client,
+       _requestTimeout = requestTimeout;
+
+  final http.Client? _client;
+  final Duration _requestTimeout;
+
   /// Esta função é o segredo. Ela não busca apenas "cartas boas".
   /// Ela lê o texto do Comandante (via Oracle) e traduz para queries de mecânica do Scryfall.
   Future<List<String>> fetchCommanderSynergies({
@@ -14,23 +25,30 @@ class SynergyEngine {
     final commanderData = await _getCardData(commanderName);
     if (commanderData == null) return [];
 
-    final oracleText = (commanderData['oracle_text'] as String? ?? '').toLowerCase();
-    final typeLine = (commanderData['type_line'] as String? ?? '').toLowerCase();
-    
-    List<String> queries = [];
+    final oracleText =
+        (commanderData['oracle_text'] as String? ?? '').toLowerCase();
+    final typeLine =
+        (commanderData['type_line'] as String? ?? '').toLowerCase();
+
+    final queries = <String>[];
     final colorQuery = "id<=${colors.join('')}";
 
     // 2. Análise Semântica Simplificada (Keyword Mapping)
-    
+
     // Exemplo: Comandante de Artefatos (Urza, Breya)
     if (oracleText.contains('artifact') || typeLine.contains('artifact')) {
-      queries.add('function:artifact-payoff $colorQuery'); // Cartas que recompensam artefatos
+      queries.add(
+        'function:artifact-payoff $colorQuery',
+      ); // Cartas que recompensam artefatos
       queries.add('t:artifact order:edhrec $colorQuery'); // Melhores artefatos
     }
 
     // Exemplo: Comandante de Encantamentos (Sythis, Zur)
-    if (oracleText.contains('enchantment') || oracleText.contains('enchanted')) {
-      queries.add('function:enchantress $colorQuery'); // Compra carta com encantamento
+    if (oracleText.contains('enchantment') ||
+        oracleText.contains('enchanted')) {
+      queries.add(
+        'function:enchantress $colorQuery',
+      ); // Compra carta com encantamento
       queries.add('t:enchantment order:edhrec $colorQuery');
     }
 
@@ -41,7 +59,9 @@ class SynergyEngine {
     }
 
     // Exemplo: Comandante de Cemitério/Reanimator (Muldrotha, Meren)
-    if (oracleText.contains('graveyard') || oracleText.contains('return') || oracleText.contains('sacrifice')) {
+    if (oracleText.contains('graveyard') ||
+        oracleText.contains('return') ||
+        oracleText.contains('sacrifice')) {
       queries.add('function:reanimate $colorQuery');
       queries.add('function:sacrifice-outlet $colorQuery'); // Altares
       queries.add('function:entomb $colorQuery'); // Colocar no cemitério
@@ -67,26 +87,41 @@ class SynergyEngine {
   }
 
   Future<Map<String, dynamic>?> _getCardData(String name) async {
-    final uri = Uri.parse('https://api.scryfall.com/cards/named?exact=${Uri.encodeComponent(name)}');
-    final response = await http.get(uri);
-    if (response.statusCode == 200) return jsonDecode(response.body);
+    final uri = Uri.parse(
+      'https://api.scryfall.com/cards/named?exact=${Uri.encodeComponent(name)}',
+    );
+    try {
+      final response = await _get(uri);
+      if (response.statusCode == 200) {
+        return jsonDecode(response.body) as Map<String, dynamic>;
+      }
+    } catch (error) {
+      Log.w('Scryfall commander lookup unavailable type=${error.runtimeType}');
+    }
     return null;
   }
 
   Future<List<String>> searchScryfall(String query) async {
     // Query formatada para Commander, ordenada por popularidade (EDHREC)
     // e removendo banidas
-    final finalQuery = query.contains('format:') ? query : '$query format:commander -is:banned';
+    final finalQuery =
+        query.contains('format:')
+            ? query
+            : '$query format:commander -is:banned';
     final uri = Uri.https('api.scryfall.com', '/cards/search', {
       'q': finalQuery,
       'order': 'edhrec', // Crucial: Traz o que os players realmente usam
     });
 
     try {
-      final response = await http.get(uri);
+      final response = await _get(uri);
       if (response.statusCode == 200) {
-        final data = jsonDecode(response.body);
-        final results = (data['data'] as List).take(20).map((c) => c['name'] as String).toList();
+        final data = jsonDecode(response.body) as Map<String, dynamic>;
+        final results =
+            (data['data'] as List)
+                .take(20)
+                .map((c) => (c as Map<String, dynamic>)['name'] as String)
+                .toList();
         if (results.isNotEmpty) return results;
       }
 
@@ -99,17 +134,25 @@ class SynergyEngine {
             'q': fallbackQuery,
             'order': 'edhrec',
           });
-          final fbResponse = await http.get(fallbackUri);
+          final fbResponse = await _get(fallbackUri);
           if (fbResponse.statusCode == 200) {
-            final fbData = jsonDecode(fbResponse.body);
-            return (fbData['data'] as List).take(20).map((c) => c['name'] as String).toList();
+            final fbData = jsonDecode(fbResponse.body) as Map<String, dynamic>;
+            return (fbData['data'] as List)
+                .take(20)
+                .map((c) => (c as Map<String, dynamic>)['name'] as String)
+                .toList();
           }
         }
       }
     } catch (e) {
-      Log.w('Erro Scryfall: $e');
+      Log.w('Scryfall request unavailable type=${e.runtimeType}');
     }
     return [];
+  }
+
+  Future<http.Response> _get(Uri uri) {
+    final request = _client?.get(uri) ?? http.get(uri);
+    return request.timeout(_requestTimeout);
   }
 
   /// Converte queries "function:" para queries textuais equivalentes como fallback

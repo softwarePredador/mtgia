@@ -255,12 +255,14 @@ DeckDeleteState applyDeckDeletionToState(
 
 DeckAiAnalysisPayload parseDeckAiAnalysisResponse(ApiResponse response) {
   if (response.statusCode != 200) {
-    final data = response.data;
-    final msg =
-        (data is Map && data['error'] != null)
-            ? data['error'].toString()
-            : 'Falha ao analisar deck: ${response.statusCode}';
-    throw Exception(msg);
+    throw Exception(
+      FriendlyErrorMapper.fromApiResponse(
+        response,
+        context: FriendlyErrorContext.deckDetails,
+        fallback:
+            'Não foi possível analisar este deck agora. Tente novamente em instantes.',
+      ),
+    );
   }
 
   final data = (response.data as Map).cast<String, dynamic>();

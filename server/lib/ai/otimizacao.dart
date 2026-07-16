@@ -3,11 +3,13 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:http/http.dart' as http;
 import 'package:dotenv/dotenv.dart';
+import '../ai_provider_runtime_support.dart';
 import '../ai_log_service.dart';
 import '../basic_land_utils.dart' as land_utils;
 import '../logger.dart';
 import '../ml_knowledge_service.dart';
 import '../openai_runtime_config.dart';
+import '../openai_structured_output_support.dart';
 import 'edhrec_service.dart';
 import 'format_staples_service.dart';
 import 'hate_cards_service.dart';
@@ -51,6 +53,8 @@ class DeckOptimizerService {
     String? metaEvidenceContext,
     String? userId,
     String? deckId,
+    bool preferCollection = false,
+    int? budgetLimitBrl,
   }) async {
     final List<dynamic> currentCards = deckData['cards'];
     final List<String> colors = List<String>.from(deckData['colors']);
@@ -186,7 +190,7 @@ class DeckOptimizerService {
           'ML Knowledge: ${mlData.recommendations.length} recomendações, ${mlData.relevantSynergies.length} sinergias (${mlData.queryTimeMs}ms)',
         );
       } catch (e) {
-        Log.w('ML Knowledge error (continuando sem): $e');
+        Log.w('ML Knowledge unavailable type=${e.runtimeType}');
       }
     }
 
@@ -206,7 +210,7 @@ class DeckOptimizerService {
           );
         }
       } catch (e) {
-        Log.w('Hate Cards error (continuando sem): $e');
+        Log.w('Hate Cards unavailable type=${e.runtimeType}');
       }
     }
 
@@ -233,7 +237,7 @@ class DeckOptimizerService {
           Log.i('Commander profile loaded for: ${commanders.first}');
         }
       } catch (e) {
-        Log.w('Failed to load commander profile: $e');
+        Log.w('Failed to load commander profile type=${e.runtimeType}');
       }
     }
 
@@ -264,7 +268,7 @@ class DeckOptimizerService {
           Log.i('Theme rules loaded: ${rules.length} rules');
         }
       } catch (e) {
-        Log.w('Failed to load theme rules: $e');
+        Log.w('Failed to load theme rules type=${e.runtimeType}');
       }
     }
 
@@ -284,6 +288,8 @@ class DeckOptimizerService {
       metaEvidenceContext: metaEvidenceContext,
       userId: userId,
       deckId: deckId,
+      preferCollection: preferCollection,
+      budgetLimitBrl: budgetLimitBrl,
       mlContext: combinedMlContext.isNotEmpty ? combinedMlContext : null,
       commanderProfileText: commanderProfileText,
       themeRules: themeRules,
@@ -398,7 +404,7 @@ class DeckOptimizerService {
           'ML Knowledge (complete): ${mlData.recommendations.length} recomendações (${mlData.queryTimeMs}ms)',
         );
       } catch (e) {
-        Log.w('ML Knowledge error (continuando sem): $e');
+        Log.w('ML Knowledge unavailable type=${e.runtimeType}');
       }
     }
 
@@ -415,7 +421,7 @@ class DeckOptimizerService {
           Log.i('Hate Cards (complete): ${hateCards.length} categorias');
         }
       } catch (e) {
-        Log.w('Hate Cards error (continuando sem): $e');
+        Log.w('Hate Cards unavailable type=${e.runtimeType}');
       }
     }
 
@@ -756,6 +762,8 @@ class DeckOptimizerService {
     String? mlContext,
     String? commanderProfileText,
     Map<String, dynamic>? themeRules,
+    required bool preferCollection,
+    int? budgetLimitBrl,
   }) async {
     final stopwatch = Stopwatch()..start();
     final env = DotEnv(includePlatformEnvironment: true, quiet: true)..load();
@@ -797,10 +805,12 @@ class DeckOptimizerService {
       "suggested_swaps": suggestedSwaps,
       "constraints": <String, dynamic>{
         "keep_theme": keepTheme,
+        "prefer_collection": preferCollection,
+        if (budgetLimitBrl != null) "budget_limit_brl": budgetLimitBrl,
         if (detectedTheme != null) "deck_theme": detectedTheme,
         if (coreCards != null && coreCards.isNotEmpty) "core_cards": coreCards,
         "notes":
-            "Se keep_theme=true: NÃO mude o plano/tema do deck; preserve as core_cards (nunca remover). Preserve o papel funcional das trocas.",
+            "Se keep_theme=true: NÃO mude o plano/tema do deck; preserve as core_cards (nunca remover). Preserve o papel funcional das trocas. Se prefer_collection=true, priorize deterministic_swap_candidates com collection_match=true ou owned_quantity>0. Respeite budget_limit_brl como orçamento total.",
       },
       "context": <String, dynamic>{
         "statistically_weak_cards": weakCandidates,
@@ -836,6 +846,7 @@ class DeckOptimizerService {
               'Authorization': 'Bearer $openAiKey',
             },
             body: jsonEncode({
+              ...aiSafetyIdentifierPayload(userId),
               'model': model,
               'messages': [
                 {
@@ -845,10 +856,23 @@ class DeckOptimizerService {
                 {'role': 'user', 'content': userPrompt},
               ],
               'temperature': temperature,
-              'response_format': {"type": "json_object"},
+              ...openAiTokenLimitPayload(model: model, maxTokens: 2400),
+              'response_format': openAiStructuredResponseFormat(
+                model: model,
+                name: 'deck_optimization',
+                schema: openAiDeckOptimizationSchema,
+              ),
             }),
           )
-          .timeout(const Duration(seconds: 30));
+          .timeout(
+            aiConfig.timeoutFor(
+              key: 'OPENAI_TIMEOUT_OPTIMIZE_SECONDS',
+              fallback: const Duration(seconds: 30),
+              prodFallback: const Duration(seconds: 30),
+              min: const Duration(seconds: 5),
+              max: const Duration(seconds: 90),
+            ),
+          );
 
       stopwatch.stop();
 
@@ -860,7 +884,7 @@ class DeckOptimizerService {
         await _logService?.log(
           userId: userId,
           deckId: deckId,
-          endpoint: 'optimize',
+          endpoint: 'provider:optimize',
           model: model,
           promptSummary:
               'Commander: ${commanders.join(" & ")}, Archetype: $archetype, Bracket: $bracket',
@@ -872,27 +896,14 @@ class DeckOptimizerService {
         );
 
         return result;
-      } else {
-        // Log de erro
-        await _logService?.log(
-          userId: userId,
-          deckId: deckId,
-          endpoint: 'optimize',
-          model: model,
-          promptSummary:
-              'Commander: ${commanders.join(" & ")}, Archetype: $archetype',
-          latencyMs: stopwatch.elapsedMilliseconds,
-          success: false,
-          errorMessage: 'HTTP ${response.statusCode}: ${response.body}',
-        );
-        throw Exception('Failed to optimize deck');
       }
+      throw Exception('Failed to optimize deck: HTTP ${response.statusCode}');
     } catch (e) {
       stopwatch.stop();
       await _logService?.log(
         userId: userId,
         deckId: deckId,
-        endpoint: 'optimize',
+        endpoint: 'provider:optimize',
         model: model,
         promptSummary:
             'Commander: ${commanders.join(" & ")}, Archetype: $archetype',
@@ -921,7 +932,7 @@ class DeckOptimizerService {
       Log.w('Arquivo prompt.md não encontrado em ${file.path}');
       return "Você é um especialista em otimização de decks de Magic: The Gathering.";
     } catch (e) {
-      Log.e('Erro ao ler prompt.md: $e');
+      Log.e('Erro ao ler prompt.md type=${e.runtimeType}');
       return "Você é um especialista em otimização de decks de Magic: The Gathering.";
     }
   }
@@ -988,16 +999,30 @@ class DeckOptimizerService {
               'Authorization': 'Bearer $openAiKey',
             },
             body: jsonEncode({
+              ...aiSafetyIdentifierPayload(userId),
               'model': model,
               'messages': [
                 {'role': 'system', 'content': _getSystemPromptComplete()},
                 {'role': 'user', 'content': userPrompt},
               ],
               'temperature': temperature,
-              'response_format': {"type": "json_object"},
+              ...openAiTokenLimitPayload(model: model, maxTokens: 1800),
+              'response_format': openAiStructuredResponseFormat(
+                model: model,
+                name: 'deck_completion',
+                schema: openAiDeckCompletionSchema,
+              ),
             }),
           )
-          .timeout(const Duration(seconds: 30));
+          .timeout(
+            aiConfig.timeoutFor(
+              key: 'OPENAI_TIMEOUT_COMPLETE_SECONDS',
+              fallback: const Duration(seconds: 30),
+              prodFallback: const Duration(seconds: 30),
+              min: const Duration(seconds: 5),
+              max: const Duration(seconds: 90),
+            ),
+          );
 
       stopwatch.stop();
 
@@ -1009,7 +1034,7 @@ class DeckOptimizerService {
         await _logService?.log(
           userId: userId,
           deckId: deckId,
-          endpoint: 'complete',
+          endpoint: 'provider:complete',
           model: model,
           promptSummary:
               'Commander: ${commanders.join(" & ")}, Archetype: $archetype, Additions: $targetAdditions',
@@ -1023,25 +1048,13 @@ class DeckOptimizerService {
         return result;
       }
 
-      // Log de erro HTTP
-      await _logService?.log(
-        userId: userId,
-        deckId: deckId,
-        endpoint: 'complete',
-        model: model,
-        promptSummary:
-            'Commander: ${commanders.join(" & ")}, Archetype: $archetype',
-        latencyMs: stopwatch.elapsedMilliseconds,
-        success: false,
-        errorMessage: 'HTTP ${response.statusCode}',
-      );
-      throw Exception('Failed to complete deck');
+      throw Exception('Failed to complete deck: HTTP ${response.statusCode}');
     } catch (e) {
       stopwatch.stop();
       await _logService?.log(
         userId: userId,
         deckId: deckId,
-        endpoint: 'complete',
+        endpoint: 'provider:complete',
         model: model,
         promptSummary:
             'Commander: ${commanders.join(" & ")}, Archetype: $archetype',

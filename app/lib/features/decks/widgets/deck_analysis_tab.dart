@@ -6,6 +6,8 @@ import 'package:manaloom/core/utils/mana_helper.dart';
 import 'package:manaloom/core/widgets/cached_card_image.dart';
 import 'package:provider/provider.dart';
 
+import '../../commercial/models/manaloom_plan.dart';
+import '../../commercial/widgets/ai_usage_gate.dart';
 import '../providers/deck_provider.dart';
 import '../models/deck_analysis.dart';
 import '../models/deck_card_item.dart';
@@ -22,7 +24,6 @@ class DeckAnalysisTab extends StatefulWidget {
 
 class _DeckAnalysisTabState extends State<DeckAnalysisTab> {
   bool _isRefreshingAi = false;
-  bool _autoAnalysisTriggered = false;
   final Set<String> _autoFetchedFunctionalDeckIds = <String>{};
 
   // Cached analysis data — recalculated only when deck changes
@@ -76,6 +77,11 @@ class _DeckAnalysisTabState extends State<DeckAnalysisTab> {
 
   Future<void> _refreshAi({bool force = false}) async {
     if (_isRefreshingAi) return;
+    final hasAiQuota = await reserveAiActionOrShowPaywall(
+      context,
+      kind: AiUsageKind.deckAnalysis,
+    );
+    if (!hasAiQuota || !mounted) return;
     setState(() => _isRefreshingAi = true);
 
     try {
@@ -116,22 +122,6 @@ class _DeckAnalysisTabState extends State<DeckAnalysisTab> {
     );
     final effectiveDeck =
         (deck != null && deck.id == widget.deck.id) ? deck : widget.deck;
-
-    // Auto-trigger AI analysis for decks with enough cards that were never analyzed
-    final hasAnalysis =
-        (effectiveDeck.synergyScore ?? 0) > 0 ||
-        (effectiveDeck.strengths ?? '').trim().isNotEmpty ||
-        (effectiveDeck.weaknesses ?? '').trim().isNotEmpty;
-    final totalCardCount = effectiveDeck.cardCount;
-    if (!_autoAnalysisTriggered &&
-        !_isRefreshingAi &&
-        !hasAnalysis &&
-        totalCardCount >= 60) {
-      _autoAnalysisTriggered = true;
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        if (mounted) _refreshAi();
-      });
-    }
 
     // Use cached mana curve & color distribution (recalculated only when deck changes)
     _recalculateIfNeeded(effectiveDeck);

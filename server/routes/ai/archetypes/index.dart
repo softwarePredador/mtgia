@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
@@ -8,10 +9,13 @@ import 'package:postgres/postgres.dart';
 
 import '../../../lib/endpoint_cache.dart';
 import '../../../lib/ai/commander_reference_profile_support.dart';
+import '../../../lib/ai_provider_runtime_support.dart';
+import '../../../lib/ai_provider_usage_support.dart';
 import '../../../lib/http_responses.dart';
 import '../../../lib/logger.dart';
 import '../../../lib/observability.dart';
 import '../../../lib/openai_runtime_config.dart';
+import '../../../lib/openai_structured_output_support.dart';
 
 Future<Response> onRequest(RequestContext context) async {
   if (context.request.method != HttpMethod.post) {
@@ -97,7 +101,7 @@ Future<Response> onRequest(RequestContext context) async {
       } catch (error) {
         Log.w(
           '[ARCHETYPES] commander_reference_profile unavailable '
-          'commander="${commanders.first}" error=$error',
+          'commander="${commanders.first}" type=${error.runtimeType}',
         );
       }
     }
@@ -107,9 +111,10 @@ Future<Response> onRequest(RequestContext context) async {
       deckName: deckName,
       deckFormat: deckFormat,
       cardFingerprintParts: cardFingerprintParts,
-      referenceProfileVersion: referenceProfile == null
-          ? null
-          : commanderReferenceProfileCacheVersion(referenceProfile),
+      referenceProfileVersion:
+          referenceProfile == null
+              ? null
+              : commanderReferenceProfileCacheVersion(referenceProfile),
     );
     final cachedPayload = EndpointCache.instance.get(cacheKey);
     if (cachedPayload != null) {
@@ -250,46 +255,116 @@ Formato obrigatório:
 
     // 3. Call OpenAI
     final openAiCallStopwatch = Stopwatch()..start();
-    final response = await http.post(
-      Uri.parse('https://api.openai.com/v1/chat/completions'),
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': 'Bearer $apiKey',
-      },
-      body: jsonEncode({
-        'model': aiConfig.modelFor(
-          key: 'OPENAI_MODEL_ARCHETYPES',
-          fallback: 'gpt-4o-mini',
-          devFallback: 'gpt-4o-mini',
-          stagingFallback: 'gpt-4o-mini',
-          prodFallback: 'gpt-4o-mini',
-        ),
-        'messages': [
-          {
-            'role': 'system',
-            'content':
-                'Você é um juiz nível 3 e deck builder competitivo de MTG especializado em Commander/EDH. Analise comandantes, sinergias e identidade de cor para sugerir arquétipos viáveis. Considere o formato multiplayer (40 vida, 3-4 jogadores) ao avaliar planos de vitória. Seja objetivo, técnico e útil. Responda sempre em JSON válido.'
-          },
-          {'role': 'user', 'content': prompt}
-        ],
-        'temperature': aiConfig.temperatureFor(
-          key: 'OPENAI_TEMP_ARCHETYPES',
-          fallback: 0.3,
-          devFallback: 0.35,
-          stagingFallback: 0.3,
-          prodFallback: 0.25,
-        ),
-        'response_format': {'type': 'json_object'},
-      }),
+    final providerTimeout = aiConfig.timeoutFor(
+      key: 'OPENAI_TIMEOUT_ARCHETYPES_SECONDS',
+      fallback: const Duration(seconds: 15),
+      prodFallback: const Duration(seconds: 20),
+      min: const Duration(seconds: 3),
+      max: const Duration(seconds: 60),
     );
+    final model = aiConfig.modelFor(
+      key: 'OPENAI_MODEL_ARCHETYPES',
+      fallback: 'gpt-4o-mini',
+      devFallback: 'gpt-4o-mini',
+      stagingFallback: 'gpt-4o-mini',
+      prodFallback: 'gpt-4o-mini',
+    );
+    late final http.Response response;
+    try {
+      response = await http
+          .post(
+            Uri.parse('https://api.openai.com/v1/chat/completions'),
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': 'Bearer $apiKey',
+            },
+            body: jsonEncode({
+              ...aiSafetyIdentifierPayload(userId),
+              'model': model,
+              'messages': [
+                {
+                  'role': 'system',
+                  'content':
+                      'Você é um juiz nível 3 e deck builder competitivo de MTG especializado em Commander/EDH. Analise comandantes, sinergias e identidade de cor para sugerir arquétipos viáveis. Considere o formato multiplayer (40 vida, 3-4 jogadores) ao avaliar planos de vitória. Seja objetivo, técnico e útil. Responda sempre em JSON válido.',
+                },
+                {'role': 'user', 'content': prompt},
+              ],
+              'temperature': aiConfig.temperatureFor(
+                key: 'OPENAI_TEMP_ARCHETYPES',
+                fallback: 0.3,
+                devFallback: 0.35,
+                stagingFallback: 0.3,
+                prodFallback: 0.25,
+              ),
+              ...openAiTokenLimitPayload(model: model, maxTokens: 900),
+              'response_format': openAiStructuredResponseFormat(
+                model: model,
+                name: 'deck_archetypes',
+                schema: openAiArchetypesSchema,
+              ),
+            }),
+          )
+          .timeout(providerTimeout);
+    } on TimeoutException {
+      openAiCallMs = openAiCallStopwatch.elapsedMilliseconds;
+      await recordAiProviderCall(
+        db: pool,
+        endpoint: 'archetypes',
+        model: model,
+        latencyMs: openAiCallMs,
+        success: false,
+        userId: userId,
+        deckId: deckId,
+        failureCode: 'provider_timeout',
+      );
+      Log.w(
+        '[ARCHETYPES] provider timeout timeout_ms=${providerTimeout.inMilliseconds}',
+      );
+      return apiError(HttpStatus.gatewayTimeout, aiProviderUnavailableMessage);
+    } catch (error) {
+      openAiCallMs = openAiCallStopwatch.elapsedMilliseconds;
+      await recordAiProviderCall(
+        db: pool,
+        endpoint: 'archetypes',
+        model: model,
+        latencyMs: openAiCallMs,
+        success: false,
+        userId: userId,
+        deckId: deckId,
+        failureCode: 'provider_transport_${error.runtimeType}',
+      );
+      rethrow;
+    }
     openAiCallMs = openAiCallStopwatch.elapsedMilliseconds;
+    await recordAiProviderCall(
+      db: pool,
+      endpoint: 'archetypes',
+      model: model,
+      latencyMs: openAiCallMs,
+      success: response.statusCode == HttpStatus.ok,
+      userId: userId,
+      deckId: deckId,
+      responseBodyBytes: response.bodyBytes,
+      failureCode: 'provider_http_${response.statusCode}',
+    );
 
     if (response.statusCode == 200) {
       final responseParseStopwatch = Stopwatch()..start();
-      final data = jsonDecode(utf8.decode(response.bodyBytes));
-      final content = data['choices'][0]['message']['content'] as String;
-      final jsonStr = _extractArchetypesJsonPayload(content);
-      final jsonResult = jsonDecode(jsonStr) as Map<String, dynamic>;
+      late final Map<String, dynamic> jsonResult;
+      try {
+        final data = jsonDecode(utf8.decode(response.bodyBytes));
+        final content = data['choices'][0]['message']['content'] as String;
+        final jsonStr = _extractArchetypesJsonPayload(content);
+        jsonResult = jsonDecode(jsonStr) as Map<String, dynamic>;
+      } catch (error) {
+        Log.w(
+          '[ARCHETYPES] invalid provider response type=${error.runtimeType}',
+        );
+        return apiError(
+          HttpStatus.badGateway,
+          'A IA não devolveu arquétipos válidos. Tente novamente.',
+        );
+      }
       responseParseMs = responseParseStopwatch.elapsedMilliseconds;
       totalStopwatch.stop();
       _annotateArchetypesPayload(
@@ -349,11 +424,14 @@ Formato obrigatório:
         );
         return Response.json(body: responseBody);
       }
-      return internalServerError('OpenAI API Error: ${response.statusCode}');
+      Log.w('[ARCHETYPES] provider failure status=${response.statusCode}');
+      return apiError(
+        mapAiProviderHttpStatus(response.statusCode),
+        aiProviderUnavailableMessage,
+      );
     }
   } catch (error, stackTrace) {
-    Log.e('[ERROR] Failed to analyze archetypes: $error');
-    Log.e('[ERROR] Stacktrace: $stackTrace');
+    Log.e('[ARCHETYPES] request failed type=${error.runtimeType}');
     await captureRouteException(
       context,
       error,
@@ -395,10 +473,7 @@ Map<String, dynamic> _buildMockArchetypesPayload({
     'is_mock': true,
   };
   if (warningCode != null && warningMessage != null) {
-    payload['warnings'] = {
-      'code': warningCode,
-      'message': warningMessage,
-    };
+    payload['warnings'] = {'code': warningCode, 'message': warningMessage};
   }
   return payload;
 }
@@ -427,7 +502,8 @@ Map<String, dynamic> _buildCommanderReferenceArchetypesPayload(
   Map<String, dynamic> profile,
 ) {
   final commander = profile['commander']?.toString().trim() ?? '';
-  final themes = (profile['themes'] as List?)
+  final themes =
+      (profile['themes'] as List?)
           ?.whereType<Map>()
           .map((theme) => theme.cast<String, dynamic>())
           .toList() ??
@@ -487,9 +563,10 @@ List<Map<String, dynamic>> _referenceOptionsForCommander(
     mapped.add({
       'id': rawName.toLowerCase().replaceAll(RegExp(r'[^a-z0-9]+'), '-'),
       'title': title,
-      'description': theme['notes']?.toString().trim().isNotEmpty == true
-          ? theme['notes'].toString().trim()
-          : 'Linha sugerida pelo perfil de referência do comandante, mantendo identidade de cor e validação antes do preview.',
+      'description':
+          theme['notes']?.toString().trim().isNotEmpty == true
+              ? theme['notes'].toString().trim()
+              : 'Linha sugerida pelo perfil de referência do comandante, mantendo identidade de cor e validação antes do preview.',
       'difficulty': _difficultyForTheme(theme['confidence']),
     });
   }
@@ -511,9 +588,10 @@ String _humanizeReferenceTheme(String value) {
       .split(RegExp(r'[_\\-\\s]+'))
       .where((part) => part.trim().isNotEmpty)
       .map((part) {
-    final lower = part.toLowerCase();
-    return lower.substring(0, 1).toUpperCase() + lower.substring(1);
-  }).join(' ');
+        final lower = part.toLowerCase();
+        return lower.substring(0, 1).toUpperCase() + lower.substring(1);
+      })
+      .join(' ');
 }
 
 String _difficultyForTheme(Object? confidence) {
@@ -560,10 +638,7 @@ void _annotateArchetypesPayload(
   required int openAiCallMs,
   required int responseParseMs,
 }) {
-  payload['cache'] = {
-    'hit': cacheHit,
-    'key': cacheKey,
-  };
+  payload['cache'] = {'hit': cacheHit, 'key': cacheKey};
   payload['timings'] = {
     'total_ms': totalMs,
     'stages_ms': {

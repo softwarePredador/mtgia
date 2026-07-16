@@ -4,6 +4,8 @@ import 'package:dart_frog/dart_frog.dart';
 import 'package:postgres/postgres.dart';
 
 import '../../../../lib/ai/optimize_job.dart';
+import '../../../../lib/logger.dart';
+import '../../../../lib/observability.dart';
 
 /// GET /ai/optimize/jobs/:id
 ///
@@ -23,28 +25,36 @@ Future<Response> onRequest(RequestContext context, String id) async {
     );
   }
 
-  final userId = context.read<String>();
-  final pool = context.read<Pool>();
-  final job = await OptimizeJobStore.get(pool, id);
-  if (job == null) {
+  try {
+    final userId = context.read<String>();
+    final pool = context.read<Pool>();
+    final job = await OptimizeJobStore.get(pool, id);
+    if (job == null) {
+      return Response.json(
+        statusCode: HttpStatus.notFound,
+        body: {'error': 'Job não encontrado ou expirado.', 'job_id': id},
+      );
+    }
+
+    if (job.userId.isEmpty || job.userId != userId) {
+      return Response.json(
+        statusCode: HttpStatus.notFound,
+        body: {'error': 'Job não encontrado ou expirado.', 'job_id': id},
+      );
+    }
+
+    return Response.json(body: job.toJson());
+  } catch (error, stackTrace) {
+    Log.e('[ai-optimize-job] polling failed type=${error.runtimeType}');
+    await captureRouteException(
+      context,
+      error,
+      stackTrace: stackTrace,
+      tags: const {'route': 'ai_optimize_job'},
+    );
     return Response.json(
-      statusCode: HttpStatus.notFound,
-      body: {
-        'error': 'Job não encontrado ou expirado.',
-        'job_id': id,
-      },
+      statusCode: HttpStatus.internalServerError,
+      body: {'error': 'Não foi possível consultar o job agora.'},
     );
   }
-
-  if (job.userId.isEmpty || job.userId != userId) {
-    return Response.json(
-      statusCode: HttpStatus.notFound,
-      body: {
-        'error': 'Job não encontrado ou expirado.',
-        'job_id': id,
-      },
-    );
-  }
-
-  return Response.json(body: job.toJson());
 }

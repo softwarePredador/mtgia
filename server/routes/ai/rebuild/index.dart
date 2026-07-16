@@ -8,6 +8,8 @@ import '../../../lib/ai/deck_state_analysis.dart';
 import '../../../lib/color_identity.dart';
 import '../../../lib/deck_rules_service.dart';
 import '../../../lib/http_responses.dart';
+import '../../../lib/logger.dart';
+import '../../../lib/observability.dart';
 
 Future<Response> onRequest(RequestContext context) async {
   if (context.request.method != HttpMethod.post) {
@@ -314,8 +316,15 @@ Future<Response> onRequest(RequestContext context) async {
         if (e.cardName != null) 'card_name': e.cardName,
       },
     );
-  } catch (e) {
-    return internalServerError('Failed to rebuild deck', details: e);
+  } catch (error, stackTrace) {
+    Log.e('[ai-rebuild] request failed type=${error.runtimeType}');
+    await captureRouteException(
+      context,
+      error,
+      stackTrace: stackTrace,
+      tags: const {'route': 'ai_rebuild'},
+    );
+    return internalServerError('Failed to rebuild deck');
   }
 }
 

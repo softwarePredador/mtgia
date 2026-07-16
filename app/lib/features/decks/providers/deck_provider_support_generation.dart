@@ -1,11 +1,15 @@
 import 'dart:async';
 
+import 'package:flutter/foundation.dart';
+
 import '../../../core/api/api_client.dart';
 import '../../../core/observability/app_observability.dart';
 import '../../../core/utils/logger.dart';
 import 'deck_provider_support_common.dart';
 
-const _defaultGeneratePollInterval = Duration(seconds: 5);
+const _defaultGeneratePollInterval = Duration(seconds: 1);
+const _minimumGeneratePollInterval = Duration(seconds: 1);
+const _maximumGeneratePollInterval = Duration(seconds: 10);
 
 typedef GenerateDeckProgressCallback =
     void Function(GenerateDeckProgressSnapshot progress);
@@ -296,7 +300,7 @@ Future<Map<String, dynamic>> generateDeckFromPrompt(
       timeout: pollTimeout,
       pollInterval:
           pollInterval ??
-          _pollIntervalFromResponse(accepted) ??
+          pollIntervalFromGenerateAccepted(accepted) ??
           _defaultGeneratePollInterval,
     );
   }
@@ -517,13 +521,22 @@ Map<String, dynamic> _asStringMap(dynamic value) {
   return const <String, dynamic>{};
 }
 
-Duration? _pollIntervalFromResponse(Map<String, dynamic> accepted) {
+@visibleForTesting
+Duration? pollIntervalFromGenerateAccepted(Map<String, dynamic> accepted) {
   final raw = accepted['poll_interval_ms'];
   final parsed = raw is int ? raw : int.tryParse(raw?.toString() ?? '');
   if (parsed == null || parsed <= 0) {
     return null;
   }
-  return Duration(milliseconds: parsed.clamp(5000, 10000).toInt());
+  return Duration(
+    milliseconds:
+        parsed
+            .clamp(
+              _minimumGeneratePollInterval.inMilliseconds,
+              _maximumGeneratePollInterval.inMilliseconds,
+            )
+            .toInt(),
+  );
 }
 
 Duration _rateLimitBackoffForGeneratePoll({

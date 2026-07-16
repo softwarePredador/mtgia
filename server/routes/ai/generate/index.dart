@@ -12,6 +12,8 @@ import '../../../lib/ai_generate_internal_url_support.dart';
 import '../../../lib/ai_generate_performance_support.dart';
 import '../../../lib/ai/commander_reference_card_stats_support.dart';
 import '../../../lib/ai/commander_deckbuilding_contract_support.dart';
+import '../../../lib/ai_provider_runtime_support.dart';
+import '../../../lib/ai_provider_usage_support.dart';
 import '../../../lib/ai/commander_reference_deck_corpus_support.dart';
 import '../../../lib/ai/commander_reference_generate_fallback_support.dart';
 import '../../../lib/ai/commander_learned_deck_support.dart';
@@ -28,6 +30,7 @@ import '../../../lib/meta/meta_deck_format_support.dart';
 import '../../../lib/meta/meta_deck_reference_support.dart';
 import '../../../lib/observability.dart';
 import '../../../lib/openai_runtime_config.dart';
+import '../../../lib/openai_structured_output_support.dart';
 
 const _aiGenerateReferencePromptPolicyVersion =
     'ai_generate_reference_prompt_v6';
@@ -35,6 +38,13 @@ const _aiGenerateReferencePromptPolicyVersion =
 Future<Response> onRequest(RequestContext context) async {
   if (context.request.method != HttpMethod.post) {
     return methodNotAllowed();
+  }
+
+  String? userId;
+  try {
+    userId = context.read<String>();
+  } catch (_) {
+    userId = null;
   }
 
   try {
@@ -101,7 +111,7 @@ Future<Response> onRequest(RequestContext context) async {
     } catch (error) {
       Log.w(
         'Commander reference profile/card stats unavailable; continuing legacy generate path. '
-        'error=$error',
+        'type=${error.runtimeType}',
       );
     }
 
@@ -330,8 +340,7 @@ Future<Response> onRequest(RequestContext context) async {
         }
       }
     } catch (error) {
-      print('[ERROR] handler: $error');
-      Log.w('Erro ao buscar contexto do meta: $error');
+      Log.w('[ai-generate] meta context unavailable type=${error.runtimeType}');
     } finally {
       timings['meta_context_ms'] = metaStopwatch.elapsedMilliseconds;
     }
@@ -442,6 +451,13 @@ $metaContext
       min: 800,
       max: 6000,
     );
+    final model = aiConfig.modelFor(
+      key: 'OPENAI_MODEL_GENERATE',
+      fallback: 'gpt-4o-mini',
+      devFallback: 'gpt-4o-mini',
+      stagingFallback: 'gpt-4o-mini',
+      prodFallback: 'gpt-4o-mini',
+    );
 
     http.Response response;
     final openAiStopwatch = Stopwatch()..start();
@@ -454,13 +470,8 @@ $metaContext
               'Authorization': 'Bearer $apiKey',
             },
             body: jsonEncode({
-              'model': aiConfig.modelFor(
-                key: 'OPENAI_MODEL_GENERATE',
-                fallback: 'gpt-4o-mini',
-                devFallback: 'gpt-4o-mini',
-                stagingFallback: 'gpt-4o-mini',
-                prodFallback: 'gpt-4o-mini',
-              ),
+              ...aiSafetyIdentifierPayload(userId),
+              'model': model,
               'messages': [
                 {
                   'role': 'system',
@@ -475,13 +486,26 @@ $metaContext
                 stagingFallback: 0.4,
                 prodFallback: 0.35,
               ),
-              'max_tokens': maxTokens,
-              'response_format': {'type': 'json_object'},
+              ...openAiTokenLimitPayload(model: model, maxTokens: maxTokens),
+              'response_format': openAiStructuredResponseFormat(
+                model: model,
+                name: 'deck_generation',
+                schema: openAiDeckGenerationSchema,
+              ),
             }),
           )
           .timeout(openAiTimeout);
     } on TimeoutException {
       timings['openai_ms'] = openAiStopwatch.elapsedMilliseconds;
+      await recordAiProviderCall(
+        db: pool,
+        endpoint: 'generate',
+        model: model,
+        latencyMs: timings['openai_ms']!,
+        success: false,
+        userId: userId,
+        failureCode: 'provider_timeout',
+      );
       Log.w(
         'AI generate OpenAI timeout; using deterministic fallback. '
         'format=$format timeout_ms=${openAiTimeout.inMilliseconds} '
@@ -532,9 +556,31 @@ $metaContext
           ...responseBody,
         },
       );
+    } catch (error) {
+      await recordAiProviderCall(
+        db: pool,
+        endpoint: 'generate',
+        model: model,
+        latencyMs: openAiStopwatch.elapsedMilliseconds,
+        success: false,
+        userId: userId,
+        failureCode: 'provider_transport_${error.runtimeType}',
+      );
+      rethrow;
     } finally {
       timings['openai_ms'] = openAiStopwatch.elapsedMilliseconds;
     }
+
+    await recordAiProviderCall(
+      db: pool,
+      endpoint: 'generate',
+      model: model,
+      latencyMs: timings['openai_ms']!,
+      success: response.statusCode == HttpStatus.ok,
+      userId: userId,
+      responseBodyBytes: response.bodyBytes,
+      failureCode: 'provider_http_${response.statusCode}',
+    );
 
     if (response.statusCode != 200) {
       if (aiConfig.shouldUseFallbackForInvalidApiKey(
@@ -577,8 +623,8 @@ $metaContext
       }
 
       return apiError(
-        response.statusCode,
-        'OpenAI API Error: ${response.body}',
+        mapAiProviderHttpStatus(response.statusCode),
+        aiProviderUnavailableMessage,
       );
     }
 
@@ -882,7 +928,7 @@ $metaContext
     writeAiGenerateCache(cacheKey: cacheKey, payload: finalBody, ttl: cacheTtl);
     return Response.json(body: finalBody);
   } catch (error, stackTrace) {
-    print('[ERROR] Failed to generate deck: $error');
+    Log.e('[ai-generate] request failed type=${error.runtimeType}');
     await captureRouteException(
       context,
       error,
@@ -948,7 +994,10 @@ Future<Response> _startAiGenerateAsyncJob({
         authorization: authorization,
       ),
       (error, stackTrace) {
-        Log.e('Background ai_generate job $jobId crashed: $error\n$stackTrace');
+        Log.e(
+          'Background ai_generate job $jobId crashed '
+          'type=${error.runtimeType}',
+        );
         unawaited(
           AiGenerateJobStore.fail(
             pool,
@@ -1047,7 +1096,7 @@ Future<String?> _resolveReferenceGenerateCacheVersion({
   } catch (error) {
     Log.w(
       'Commander reference cache version unavailable for async generate; '
-      'using legacy cache key. error=$error',
+      'using legacy cache key. type=${error.runtimeType}',
     );
     return null;
   }
@@ -1528,9 +1577,10 @@ Future<Map<String, dynamic>> _buildMockGenerateResponse({
       if (warnings.isNotEmpty) 'warnings': warnings,
     };
   } catch (e) {
+    Log.w('Falha ao validar deck fallback type=${e.runtimeType}');
     final fallbackValidationSummary = {
       'is_valid': false,
-      'errors': ['Falha ao validar deck mock: $e'],
+      'errors': ['Falha interna ao validar o deck fallback.'],
       'invalid_cards': const <String>[],
       'suggestions': const <String, List<String>>{},
       'warnings': const <String>[],
@@ -1898,7 +1948,10 @@ Future<Map<String, dynamic>?> _pickMockBrawlCommander(Pool pool) async {
       }
     }
   } catch (e) {
-    Log.w('Falha ao escolher comandante mock para brawl: $e');
+    Log.w(
+      'Falha ao escolher comandante mock para brawl '
+      'type=${e.runtimeType}',
+    );
   }
 
   return null;
