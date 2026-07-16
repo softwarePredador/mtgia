@@ -60,6 +60,29 @@ void main() {
       );
     });
 
+    test('landing leaves the next product section visible at first load', () {
+      final home = File('../web-public/src/app/page.tsx').readAsStringSync();
+
+      expect(
+        RegExp(r'min-h-\[calc\(100svh-11rem\)\]').allMatches(home),
+        hasLength(2),
+      );
+      expect(home, isNot(contains('min-h-[calc(100svh-4rem)]')));
+      expect(home, contains('id="produto" className="pb-20 pt-12 sm:py-20"'));
+      expect(home, contains('grid-cols-3 gap-2'));
+    });
+
+    test('legacy Scryfall redirects bypass the Next image optimizer', () {
+      final home = File('../web-public/src/app/page.tsx').readAsStringSync();
+
+      expect(home, contains('function bypassImageOptimizer'));
+      expect(home, contains('hostname === "api.scryfall.com"'));
+      expect(
+        RegExp(r'unoptimized=\{bypassImageOptimizer\(').allMatches(home),
+        hasLength(2),
+      );
+    });
+
     test('full and E2E gates execute the public web smoke', () {
       final qualityGate = File('../scripts/quality_gate.sh').readAsStringSync();
       final e2eSuite =

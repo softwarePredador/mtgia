@@ -42,6 +42,14 @@ function formatCountLabel(count: number, singular: string, plural: string) {
   return `${count} ${count === 1 ? singular : plural}`;
 }
 
+function bypassImageOptimizer(imageUrl: string) {
+  try {
+    return new URL(imageUrl).hostname === "api.scryfall.com";
+  } catch {
+    return false;
+  }
+}
+
 export default async function HomePage() {
   const siteFeed = await loadPublicSiteFeed();
   const marketplaceItems = siteFeed.marketplace.cards.slice(0, 3);
@@ -49,7 +57,7 @@ export default async function HomePage() {
 
   return (
     <main>
-      <section className="relative min-h-[calc(100svh-4rem)] overflow-hidden border-b border-mist-700">
+      <section className="relative min-h-[calc(100svh-11rem)] overflow-hidden border-b border-mist-700">
         <Image
           src="/branding/home_hero_banner.png"
           alt=""
@@ -61,25 +69,25 @@ export default async function HomePage() {
         />
         <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(11,13,18,0.99)_0%,rgba(11,13,18,0.9)_42%,rgba(11,13,18,0.52)_72%,rgba(11,13,18,0.88)_100%)]" />
         <div className="absolute inset-x-0 bottom-0 h-40 bg-gradient-to-t from-obsidian-950 to-transparent" />
-        <Container className="relative flex min-h-[calc(100svh-4rem)] items-center py-12 sm:py-14">
+        <Container className="relative flex min-h-[calc(100svh-11rem)] items-center py-8 sm:py-10">
           <div className="w-full max-w-[calc(100vw-2.5rem)] sm:max-w-3xl">
-            <div className="relative mb-6 h-20 w-20 overflow-hidden rounded-[22px] border border-brass-400/28 bg-obsidian-950 shadow-brass sm:mb-7 sm:h-24 sm:w-24 sm:rounded-[26px]">
+            <div className="relative mb-4 h-16 w-16 overflow-hidden rounded-[18px] border border-brass-400/28 bg-obsidian-950 shadow-brass sm:mb-6 sm:h-24 sm:w-24 sm:rounded-[26px]">
               <Image src="/branding/app_logo.png" alt="ManaLoom" fill sizes="(min-width: 640px) 96px, 80px" className="object-cover" />
             </div>
-            <p className="text-sm font-bold uppercase tracking-[0.24em] text-brass-400">Commander, coleção e mercado</p>
-            <h1 className="mt-4 max-w-4xl break-words font-display text-[3.4rem] font-semibold leading-[0.98] text-ivory-100 sm:text-7xl sm:leading-[0.95]">
+            <p className="text-xs font-bold uppercase tracking-[0.24em] text-brass-400 sm:text-sm">Commander, coleção e mercado</p>
+            <h1 className="mt-3 max-w-4xl break-words font-display text-[3.2rem] font-semibold leading-[0.98] text-ivory-100 sm:mt-4 sm:text-7xl sm:leading-[0.95]">
               ManaLoom
             </h1>
-            <p className="mt-5 max-w-2xl text-base leading-7 text-mist-300 sm:text-lg sm:leading-8">
+            <p className="mt-4 max-w-2xl text-base leading-7 text-mist-300 sm:mt-5 sm:text-lg sm:leading-8">
               Construa decks, acompanhe sua coleção e encontre oportunidades de troca com cartas e preços reais.
             </p>
-            <div className="mt-8 flex flex-wrap gap-3">
+            <div className="mt-6 flex flex-wrap gap-3 sm:mt-8">
               <ButtonLink href={routes.app}>Abrir app</ButtonLink>
               <ButtonLink href={routes.marketplace} variant="secondary">
                 Ver mercado
               </ButtonLink>
             </div>
-            <div className="mt-10 grid max-w-3xl grid-cols-1 gap-4 sm:grid-cols-3">
+            <div className="mt-7 grid max-w-3xl grid-cols-3 gap-2 sm:mt-10 sm:gap-4">
               <Stat label="Ofertas ativas" value={formatNumber(siteFeed.marketplace.cards.length)} />
               <Stat label="Decks completos" value={formatNumber(siteFeed.publicDecks.total)} />
               <Stat label="Preços monitorados" value={formatNumber(siteFeed.marketplace.movers.totalTracked)} />
@@ -88,7 +96,7 @@ export default async function HomePage() {
         </Container>
       </section>
 
-      <section id="produto" className="py-20">
+      <section id="produto" className="pb-20 pt-12 sm:py-20">
         <Container className="grid gap-12 lg:grid-cols-[0.68fr_1.32fr]">
           <SectionHeader eyebrow="Produto" title="Da primeira lista ao upgrade da mesa.">
             <p>
@@ -138,6 +146,7 @@ export default async function HomePage() {
                         fill
                         sizes="128px"
                         loading="lazy"
+                        unoptimized={bypassImageOptimizer(deck.commanderImageUrl)}
                         className="object-cover"
                       />
                     </div>
@@ -194,6 +203,7 @@ export default async function HomePage() {
                         fill
                         sizes="112px"
                         loading="lazy"
+                        unoptimized={bypassImageOptimizer(item.imageUrl)}
                         className="object-cover"
                       />
                     </div>
