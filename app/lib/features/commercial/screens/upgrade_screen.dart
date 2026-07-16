@@ -103,7 +103,7 @@ class _CheckoutReadinessPanel extends StatelessWidget {
           SizedBox(width: 10),
           Expanded(
             child: Text(
-              'Checkout interno habilita o Pro neste dispositivo para validar oferta e paywall. Para produção, conectar Stripe/Mercado Pago no backend.',
+              'A assinatura é concluída em um ambiente de pagamento seguro. O plano só é ativado após a confirmação do pagamento.',
               style: TextStyle(color: AppTheme.textSecondary, height: 1.4),
             ),
           ),

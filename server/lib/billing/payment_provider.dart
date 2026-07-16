@@ -84,8 +84,7 @@ class ManaLoomPaymentProvider {
       statusCode: HttpStatus.notImplemented,
       body: {
         'checkout_status': 'payment_provider_not_configured',
-        'message':
-            'Checkout real ainda nao esta configurado. Configure MANALOOM_PRO_CHECKOUT_URL ou habilite MANALOOM_INTERNAL_CHECKOUT_ENABLED em ambiente controlado.',
+        'message': 'O ManaLoom Pro ainda não está disponível para contratação.',
       },
     );
   }
@@ -102,8 +101,7 @@ class ManaLoomPaymentProvider {
         statusCode: HttpStatus.notImplemented,
         body: {
           'webhook_status': 'payment_provider_not_configured',
-          'message':
-              'Webhook de pagamento indisponivel ate MANALOOM_BILLING_PROVIDER e MANALOOM_BILLING_WEBHOOK_SECRET serem configurados.',
+          'message': 'Processamento de pagamento indisponível.',
         },
       );
     }
@@ -125,8 +123,7 @@ class ManaLoomPaymentProvider {
       body: {
         'webhook_status': 'provider_adapter_not_implemented',
         'provider': provider,
-        'message':
-            'Webhook autenticado, mas o adaptador do provedor ainda precisa ser implementado antes de ativar planos automaticamente.',
+        'message': 'Processamento de pagamento indisponível.',
       },
     );
   }

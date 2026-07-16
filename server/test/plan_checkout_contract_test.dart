@@ -4,9 +4,8 @@ import 'package:test/test.dart';
 
 void main() {
   test('plan checkout route does not activate Pro without explicit config', () {
-    final route = File(
-      'routes/users/me/plan/checkout/index.dart',
-    ).readAsStringSync();
+    final route =
+        File('routes/users/me/plan/checkout/index.dart').readAsStringSync();
     final provider =
         File('lib/billing/payment_provider.dart').readAsStringSync();
     final webhook =
@@ -31,5 +30,32 @@ void main() {
     expect(service, contains("plan_name = 'pro'"));
     expect(service, contains("renews_at = NOW() + INTERVAL '30 days'"));
     expect(service, contains('ON CONFLICT (user_id) DO UPDATE'));
+  });
+
+  test('commercial surfaces do not expose deployment instructions', () {
+    final sources = [
+      File(
+        '../app/lib/features/commercial/screens/upgrade_screen.dart',
+      ).readAsStringSync(),
+      File(
+        '../app/lib/features/commercial/screens/legal_screen.dart',
+      ).readAsStringSync(),
+      File(
+        '../app/lib/features/commercial/providers/commercial_provider.dart',
+      ).readAsStringSync(),
+      File('lib/billing/payment_provider.dart').readAsStringSync(),
+    ];
+
+    for (final source in sources) {
+      expect(source, isNot(contains('MVP de validação')));
+      expect(source, isNot(contains('Stripe/Mercado Pago')));
+      expect(source, isNot(contains('Configure MANALOOM')));
+      expect(source, isNot(contains('adaptador do provedor')));
+    }
+
+    expect(
+      sources.join('\n'),
+      contains('O ManaLoom Pro ainda não está disponível para contratação.'),
+    );
   });
 }

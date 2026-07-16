@@ -45,7 +45,7 @@ class CommercialLegalScreen extends StatelessWidget {
             title: 'Monetização',
             icon: Icons.payments_outlined,
             body:
-                'Planos pagos devem informar limite de uso, cobrança, cancelamento, reembolso e suporte antes da compra. O checkout interno atual é um MVP de validação e precisa de integração de pagamento real para produção.',
+                'Antes de concluir uma assinatura, confira no checkout os limites de uso, valores, recorrência, cancelamento, reembolso e canais de suporte aplicáveis ao plano.',
           ),
         ],
       ),

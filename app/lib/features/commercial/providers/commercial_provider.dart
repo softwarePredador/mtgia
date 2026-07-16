@@ -176,7 +176,7 @@ class CommercialProvider extends ChangeNotifier {
                 : checkoutUrl,
         message:
             data['message']?.toString() ??
-            'Checkout de pagamento ainda precisa ser configurado.',
+            'O ManaLoom Pro ainda não está disponível para contratação.',
       );
     } catch (error) {
       debugPrint('[CommercialProvider] startProCheckout failed: $error');

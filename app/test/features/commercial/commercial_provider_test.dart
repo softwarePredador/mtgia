@@ -151,7 +151,8 @@ void main() {
         return http.Response(
           jsonEncode({
             'checkout_status': 'payment_provider_not_configured',
-            'message': 'Checkout real ainda nao esta configurado.',
+            'message':
+                'O ManaLoom Pro ainda não está disponível para contratação.',
           }),
           501,
           headers: {'content-type': 'application/json'},
@@ -164,6 +165,6 @@ void main() {
 
     expect(result.activated, isFalse);
     expect(result.requiresExternalPayment, isTrue);
-    expect(result.message, contains('Checkout real'));
+    expect(result.message, contains('ainda não está disponível'));
   });
 }
