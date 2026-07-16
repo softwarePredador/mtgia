@@ -64,8 +64,8 @@ export default async function PublicDeckPage({ params }: PageProps) {
                 alt=""
                 fill
                 priority
+                fetchPriority="high"
                 sizes="(min-width: 1024px) 1152px, 100vw"
-                unoptimized
                 className="object-cover object-center opacity-45"
               />
             ) : (

@@ -3,7 +3,7 @@ import Image from "next/image";
 import Link from "next/link";
 
 import { ManaCost } from "@/components/data-visuals";
-import { ButtonLink, Container, SectionHeader, Stat } from "@/components/ui";
+import { ButtonLink, Container, RouteLink, SectionHeader, Stat } from "@/components/ui";
 import { productCapabilities } from "@/lib/product-data";
 import { loadPublicSiteFeed, type MarketplaceCardSummary } from "@/lib/public-server";
 import { routes } from "@/lib/routes";
@@ -55,6 +55,7 @@ export default async function HomePage() {
           alt=""
           fill
           priority
+          fetchPriority="high"
           sizes="100vw"
           className="object-cover object-center opacity-90"
         />
@@ -96,7 +97,7 @@ export default async function HomePage() {
           </SectionHeader>
           <div className="grid gap-4 md:grid-cols-2">
             {productCapabilities.map((capability) => (
-              <Link
+              <RouteLink
                 key={capability.title}
                 href={capability.href}
                 className="focus-ring border-t border-mist-700 py-5 transition hover:border-brass-400"
@@ -104,7 +105,7 @@ export default async function HomePage() {
                 <p className="text-xs font-bold uppercase tracking-[0.18em] text-brass-400">{capability.surface}</p>
                 <h2 className="mt-3 font-display text-2xl font-semibold">{capability.title}</h2>
                 <p className="mt-3 text-sm leading-6 text-mist-300">{capability.description}</p>
-              </Link>
+              </RouteLink>
             ))}
           </div>
         </Container>
@@ -136,8 +137,7 @@ export default async function HomePage() {
                         alt={deck.commanderName ?? deck.name}
                         fill
                         sizes="128px"
-                        unoptimized
-                        loading="eager"
+                        loading="lazy"
                         className="object-cover"
                       />
                     </div>
@@ -193,8 +193,7 @@ export default async function HomePage() {
                         alt={item.cardName}
                         fill
                         sizes="112px"
-                        unoptimized
-                        loading="eager"
+                        loading="lazy"
                         className="object-cover"
                       />
                     </div>

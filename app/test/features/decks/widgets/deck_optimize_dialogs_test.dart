@@ -233,6 +233,40 @@ void main() {
     );
   });
 
+  testWidgets('guided rebuild error hides technical exception details', (
+    tester,
+  ) async {
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Builder(
+          builder: (context) {
+            return Scaffold(
+              body: TextButton(
+                onPressed:
+                    () => showGuidedRebuildErrorSnackBar(
+                      context,
+                      Exception('PostgreSQL connection refused at 10.0.0.1'),
+                    ),
+                child: const Text('technical-error'),
+              ),
+            );
+          },
+        ),
+      ),
+    );
+
+    await tester.tap(find.text('technical-error'));
+    await tester.pump();
+
+    expect(
+      find.text(
+        'Sem conexão com o servidor. Confira sua internet e tente novamente.',
+      ),
+      findsOneWidget,
+    );
+    expect(find.textContaining('PostgreSQL'), findsNothing);
+  });
+
   testWidgets('guided rebuild failure helper opens dialog', (tester) async {
     await tester.pumpWidget(
       MaterialApp(
@@ -467,4 +501,33 @@ void main() {
       expect(selected, 'midrange');
     },
   );
+
+  testWidgets('optimization options maps technical loading errors', (
+    tester,
+  ) async {
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Scaffold(
+          body: OptimizationOptionsSection(
+            snapshot: AsyncSnapshot.withError(
+              ConnectionState.done,
+              Exception('PostgreSQL connection refused at 10.0.0.1'),
+            ),
+            showAllStrategies: true,
+            accent: Colors.blue,
+            onRetry: () {},
+            onSelectArchetype: (_) {},
+          ),
+        ),
+      ),
+    );
+
+    expect(
+      find.text(
+        'Sem conexão com o servidor. Confira sua internet e tente novamente.',
+      ),
+      findsOneWidget,
+    );
+    expect(find.textContaining('PostgreSQL'), findsNothing);
+  });
 }

@@ -21,6 +21,8 @@ flutter test patrol_test/manaloom_patrol_smoke_test.dart \
 
 if [[ "${MANALOOM_RUN_PATROL_DEVICE_TESTS:-0}" == "1" ]]; then
   print_header "ManaLoom Patrol device/web CLI run"
+  patrol_cli_log="$(mktemp /tmp/manaloom_patrol_cli.XXXXXX.log)"
+  trap 'rm -f "${patrol_cli_log:-}"' EXIT
   patrol_args=(
     test
     --target
@@ -38,8 +40,38 @@ if [[ "${MANALOOM_RUN_PATROL_DEVICE_TESTS:-0}" == "1" ]]; then
     patrol_args+=(--web-headless="$MANALOOM_PATROL_WEB_HEADLESS")
   fi
 
+  set -o pipefail
   PATROL_ANALYTICS_ENABLED=false dart run patrol_cli:main test \
-    "${patrol_args[@]:1}"
+    "${patrol_args[@]:1}" 2>&1 | tee "$patrol_cli_log"
+
+  python3 - "$patrol_cli_log" \
+    "$ROOT_DIR/app/patrol_test/manaloom_patrol_smoke_test.dart" <<'PY'
+import re
+import sys
+from pathlib import Path
+
+ansi = re.compile(r"\x1b\[[0-9;]*m")
+output = ansi.sub("", Path(sys.argv[1]).read_text(encoding="utf-8"))
+source = Path(sys.argv[2]).read_text(encoding="utf-8")
+expected = len(re.findall(r"\bpatrolTest\s*\(", source))
+summary = re.search(r"Total:\s*(\d+)", output)
+
+if expected <= 0:
+    raise SystemExit("BLOCKED: a suite Patrol nao declara testes.")
+if summary is None:
+    raise SystemExit("BLOCKED: o Patrol CLI nao publicou o total executado.")
+
+actual = int(summary.group(1))
+if actual != expected:
+    raise SystemExit(
+        f"BLOCKED: Patrol executou {actual} de {expected} testes esperados."
+    )
+
+print(f"Patrol CLI confirmou {actual}/{expected} testes no alvo real.")
+PY
+
+  rm -f "$patrol_cli_log"
+  patrol_cli_log=""
 else
   echo ""
   echo "Patrol CLI real nao foi executado porque MANALOOM_RUN_PATROL_DEVICE_TESTS=1 nao foi definido."

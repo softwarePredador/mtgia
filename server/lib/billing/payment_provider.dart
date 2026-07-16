@@ -7,20 +7,14 @@ import 'package:postgres/postgres.dart';
 import '../plan_service.dart';
 
 class BillingCheckoutRequest {
-  const BillingCheckoutRequest({
-    required this.userId,
-    required this.planName,
-  });
+  const BillingCheckoutRequest({required this.userId, required this.planName});
 
   final String userId;
   final String planName;
 }
 
 class BillingResult {
-  const BillingResult({
-    required this.statusCode,
-    required this.body,
-  });
+  const BillingResult({required this.statusCode, required this.body});
 
   final int statusCode;
   final Map<String, dynamic> body;
@@ -30,8 +24,8 @@ class ManaLoomPaymentProvider {
   ManaLoomPaymentProvider({
     required Pool pool,
     Map<String, String>? environment,
-  })  : _planService = PlanService(pool),
-        _environment = environment ?? Platform.environment;
+  }) : _planService = PlanService(pool),
+       _environment = environment ?? Platform.environment;
 
   final PlanService _planService;
   final Map<String, String> _environment;
@@ -62,14 +56,26 @@ class ManaLoomPaymentProvider {
     }
 
     final externalCheckoutUrl = _env('MANALOOM_PRO_CHECKOUT_URL');
-    if (externalCheckoutUrl.isNotEmpty) {
+    final externalCheckoutUri = secureBillingCheckoutUri(externalCheckoutUrl);
+    if (externalCheckoutUri != null) {
       return BillingResult(
         statusCode: HttpStatus.paymentRequired,
         body: {
           'checkout_status': 'external_payment_required',
           'message':
               'Finalize o pagamento no checkout externo para ativar o Pro.',
-          'checkout_url': externalCheckoutUrl,
+          'checkout_url': externalCheckoutUri.toString(),
+        },
+      );
+    }
+
+    if (externalCheckoutUrl.isNotEmpty) {
+      return const BillingResult(
+        statusCode: HttpStatus.internalServerError,
+        body: {
+          'checkout_status': 'invalid_payment_configuration',
+          'message':
+              'O checkout de pagamento está com uma configuração inválida.',
         },
       );
     }
@@ -133,13 +139,21 @@ class ManaLoomPaymentProvider {
   }
 }
 
+Uri? secureBillingCheckoutUri(String value) {
+  final uri = Uri.tryParse(value.trim());
+  if (uri == null || uri.scheme != 'https' || uri.host.isEmpty) return null;
+  return uri;
+}
+
 bool _verifyHmacSha256(String rawBody, String signature, String secret) {
   final normalized = signature.trim().replaceFirst(RegExp(r'^sha256='), '');
   if (normalized.isEmpty) return false;
 
-  final digest = Hmac(sha256, utf8.encode(secret))
-      .convert(utf8.encode(rawBody))
-      .toString();
+  final digest =
+      Hmac(
+        sha256,
+        utf8.encode(secret),
+      ).convert(utf8.encode(rawBody)).toString();
   return _constantTimeEquals(normalized.toLowerCase(), digest.toLowerCase());
 }
 

@@ -40,16 +40,35 @@ class DeckAddCardsMenu extends StatelessWidget {
     ];
 
     return PopupMenuButton<String>(
+      tooltip: 'Adicionar cartas',
       onSelected: onSelected,
       offset: const Offset(0, -120),
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(AppTheme.radiusMd),
       ),
       itemBuilder: (context) => items,
-      child: const FloatingActionButton.extended(
-        onPressed: null,
-        icon: Icon(Icons.add),
-        label: Text('Adicionar Cartas'),
+      child: Material(
+        color: Theme.of(context).colorScheme.primaryContainer,
+        elevation: 6,
+        shadowColor: AppTheme.backgroundAbyss.withValues(alpha: 0.34),
+        borderRadius: BorderRadius.circular(AppTheme.radiusLg),
+        child: const SizedBox(
+          height: 56,
+          child: Padding(
+            padding: EdgeInsets.symmetric(horizontal: 20),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(Icons.add),
+                SizedBox(width: 10),
+                Text(
+                  'Adicionar Cartas',
+                  style: TextStyle(fontWeight: FontWeight.w700),
+                ),
+              ],
+            ),
+          ),
+        ),
       ),
     );
   }

@@ -31,7 +31,7 @@ class _IdleMarketProvider extends MarketProvider {
   }) async {}
 }
 
-Widget _buildSubject() {
+Widget _buildSubject({bool? lifeCounterAvailable}) {
   return MultiProvider(
     providers: [
       ChangeNotifierProvider<AuthProvider>(
@@ -46,7 +46,10 @@ Widget _buildSubject() {
         create: (_) => NotificationProvider(),
       ),
     ],
-    child: MaterialApp(theme: AppTheme.darkTheme, home: const HomeScreen()),
+    child: MaterialApp(
+      theme: AppTheme.darkTheme,
+      home: HomeScreen(lifeCounterAvailable: lifeCounterAvailable),
+    ),
   );
 }
 
@@ -75,6 +78,8 @@ void main() {
     expect(find.text('Acesso rápido'), findsOneWidget);
     expect(find.text('Jogar agora'), findsWidgets);
     expect(find.text('Construir deck'), findsOneWidget);
+    expect(find.byTooltip('Perfil'), findsOneWidget);
+    expect(find.byTooltip('Menu'), findsNothing);
 
     expect(find.text('Decks recentes'), findsOneWidget);
     expect(find.text('Você ainda não tem decks'), findsOneWidget);
@@ -90,6 +95,19 @@ void main() {
       find.text('Crie seu primeiro deck ou gere um com IA!'),
       findsNothing,
     );
+  });
+
+  testWidgets('web capability replaces unavailable life counter actions', (
+    tester,
+  ) async {
+    await tester.pumpWidget(_buildSubject(lifeCounterAvailable: false));
+    await tester.pump(const Duration(milliseconds: 900));
+
+    expect(find.text('Jogar agora'), findsNothing);
+    expect(find.text('Montar deck'), findsOneWidget);
+    expect(find.text('Comunidade'), findsOneWidget);
+    expect(find.text('Construir deck'), findsOneWidget);
+    expect(tester.takeException(), isNull);
   });
 
   testWidgets('keeps home intent cards readable on SM A135M width', (

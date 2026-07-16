@@ -13,6 +13,7 @@ const _allowedEvents = <String>{
   'base_choice_generate',
   'base_choice_import',
   'deck_created',
+  'deck_generated',
   'deck_optimized',
   'deck_rebuild_created',
   'onboarding_completed',
@@ -53,9 +54,10 @@ Future<Response> _postEvent(RequestContext context) async {
   final deckId = body['deck_id']?.toString().trim();
 
   final metadataRaw = body['metadata'];
-  final metadata = metadataRaw is Map
-      ? metadataRaw.map((k, v) => MapEntry(k.toString(), v))
-      : <String, dynamic>{};
+  final metadata =
+      metadataRaw is Map
+          ? metadataRaw.map((k, v) => MapEntry(k.toString(), v))
+          : <String, dynamic>{};
 
   try {
     await pool.execute(
@@ -76,13 +78,12 @@ Future<Response> _postEvent(RequestContext context) async {
       },
     );
 
-    return Response.json(
-      statusCode: HttpStatus.created,
-      body: {'ok': true},
-    );
+    return Response.json(statusCode: HttpStatus.created, body: {'ok': true});
   } catch (e) {
-    return internalServerError('Falha ao registrar evento de ativação',
-        details: e);
+    return internalServerError(
+      'Falha ao registrar evento de ativação',
+      details: e,
+    );
   }
 }
 
@@ -112,12 +113,11 @@ Future<Response> _getSummary(RequestContext context) async {
       events.add({'event_name': row[0], 'count': row[1]});
     }
 
-    return Response.json(body: {
-      'days': safeDays,
-      'events': events,
-    });
+    return Response.json(body: {'days': safeDays, 'events': events});
   } catch (e) {
-    return internalServerError('Falha ao buscar resumo de ativação',
-        details: e);
+    return internalServerError(
+      'Falha ao buscar resumo de ativação',
+      details: e,
+    );
   }
 }

@@ -12,6 +12,10 @@ export const metadata: Metadata = {
   },
   description:
     "Construa, otimize e acompanhe decks de Commander com IA, relatórios compartilháveis e mercado de cartas.",
+  icons: {
+    icon: "/branding/app_logo.png",
+    apple: "/branding/app_logo.png"
+  },
   openGraph: {
     type: "website",
     siteName: "ManaLoom",

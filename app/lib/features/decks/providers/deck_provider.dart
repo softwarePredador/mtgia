@@ -73,6 +73,48 @@ class DeckProvider extends ChangeNotifier {
        _trackActivationEvent =
            trackActivationEvent ?? ActivationFunnelService.instance.track;
 
+  void _trackActivationInBackground(
+    String eventName, {
+    String? format,
+    String? deckId,
+    required String source,
+    Map<String, dynamic>? metadata,
+  }) {
+    unawaited(
+      _trackActivationSafely(
+        eventName,
+        format: format,
+        deckId: deckId,
+        source: source,
+        metadata: metadata,
+      ),
+    );
+  }
+
+  Future<void> _trackActivationSafely(
+    String eventName, {
+    String? format,
+    String? deckId,
+    required String source,
+    Map<String, dynamic>? metadata,
+  }) async {
+    try {
+      await _trackActivationEvent(
+        eventName,
+        format: format,
+        deckId: deckId,
+        source: source,
+        metadata: metadata,
+      );
+    } catch (error, stackTrace) {
+      AppLogger.error(
+        '[DeckProvider] Failed to track $eventName',
+        error,
+        stackTrace,
+      );
+    }
+  }
+
   Future<void> removeCardFromDeck({
     required String deckId,
     required String cardId,
@@ -407,18 +449,10 @@ class DeckProvider extends ChangeNotifier {
         // Recarrega em background para hidratar campos faltantes (ex.: card_count, description, etc).
         unawaited(fetchDecks(silent: true));
 
-        unawaited(
-          _trackActivationEvent(
-            'deck_created',
-            format: format,
-            source: 'deck_provider.createDeck',
-          ).catchError((e) {
-            AppLogger.error(
-              '[DeckProvider] Failed to track deck_created',
-              e is Object ? e : Exception('deck_created tracking failed: $e'),
-              StackTrace.current,
-            );
-          }),
+        _trackActivationInBackground(
+          'deck_created',
+          format: format,
+          source: 'deck_provider.createDeck',
         );
 
         return true;
@@ -564,6 +598,7 @@ class DeckProvider extends ChangeNotifier {
       recommendationContext: recommendationContext,
     );
 
+    late final Map<String, dynamic> result;
     if (requestResult.isAsync) {
       onProgress?.call(
         intensity == OptimizeIntensity.aggressive
@@ -572,14 +607,16 @@ class DeckProvider extends ChangeNotifier {
         1,
         requestResult.totalStages ?? 6,
       );
-      return _pollOptimizeJob(
+      result = await _pollOptimizeJob(
         requestResult.jobId!,
         pollInterval: requestResult.pollIntervalMs ?? 2000,
         onProgress: onProgress,
       );
+    } else {
+      result = requestResult.result!;
     }
 
-    await _trackActivationEvent(
+    _trackActivationInBackground(
       'deck_optimized',
       deckId: deckId,
       source: 'deck_provider.optimizeDeck',
@@ -592,7 +629,7 @@ class DeckProvider extends ChangeNotifier {
           'recommendation_context': recommendationContext,
       },
     );
-    return requestResult.result!;
+    return result;
   }
 
   Future<Map<String, dynamic>> rebuildDeck(
@@ -619,7 +656,7 @@ class DeckProvider extends ChangeNotifier {
 
     final draftDeckId = result.draftDeckId;
     if (draftDeckId != null && draftDeckId.isNotEmpty) {
-      await _trackActivationEvent(
+      _trackActivationInBackground(
         'deck_rebuild_created',
         deckId: draftDeckId,
         source: 'deck_provider.rebuildDeck',
@@ -783,16 +820,28 @@ class DeckProvider extends ChangeNotifier {
     GenerateDeckCancellation? cancellation,
     Duration pollTimeout = const Duration(seconds: 90),
     Duration? pollInterval,
-  }) => generateDeckFromPrompt(
-    _apiClient,
-    prompt: prompt,
-    format: format,
-    commanderName: commanderName,
-    onProgress: onProgress,
-    cancellation: cancellation,
-    pollTimeout: pollTimeout,
-    pollInterval: pollInterval,
-  );
+  }) async {
+    final result = await generateDeckFromPrompt(
+      _apiClient,
+      prompt: prompt,
+      format: format,
+      commanderName: commanderName,
+      onProgress: onProgress,
+      cancellation: cancellation,
+      pollTimeout: pollTimeout,
+      pollInterval: pollInterval,
+    );
+    _trackActivationInBackground(
+      'deck_generated',
+      format: format.trim().toLowerCase(),
+      source: 'deck_provider.generateDeck',
+      metadata: {
+        'prompt_length': prompt.trim().length,
+        'commander_selected': commanderName?.trim().isNotEmpty == true,
+      },
+    );
+    return result;
+  }
 
   Future<Map<String, dynamic>> fetchCommanderLearningDeck({
     required String commanderName,

@@ -1,12 +1,35 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../../../core/theme/app_theme.dart';
 import '../providers/commercial_provider.dart';
 
+typedef CommercialCheckoutStarter = Future<CommercialCheckoutResult> Function();
+typedef ExternalCheckoutLauncher = Future<bool> Function(Uri uri);
+
+Future<bool> launchExternalCheckout(Uri uri) => launchUrl(
+  uri,
+  mode: LaunchMode.externalApplication,
+  webOnlyWindowName: '_blank',
+);
+
+Uri? secureExternalCheckoutUri(String? value) {
+  final uri = Uri.tryParse(value?.trim() ?? '');
+  if (uri == null || uri.scheme != 'https' || uri.host.isEmpty) return null;
+  return uri;
+}
+
 class CheckoutScreen extends StatefulWidget {
-  const CheckoutScreen({super.key});
+  const CheckoutScreen({
+    super.key,
+    this.startCheckout,
+    this.externalCheckoutLauncher = launchExternalCheckout,
+  });
+
+  final CommercialCheckoutStarter? startCheckout;
+  final ExternalCheckoutLauncher externalCheckoutLauncher;
 
   @override
   State<CheckoutScreen> createState() => _CheckoutScreenState();
@@ -14,21 +37,33 @@ class CheckoutScreen extends StatefulWidget {
 
 class _CheckoutScreenState extends State<CheckoutScreen> {
   bool _isProcessing = false;
+  bool _isOpeningCheckout = false;
   String? _statusMessage;
   bool _requiresExternalPayment = false;
+  Uri? _checkoutUri;
 
   Future<void> _confirm() async {
     setState(() {
       _isProcessing = true;
       _statusMessage = null;
       _requiresExternalPayment = false;
+      _checkoutUri = null;
     });
-    final result = await context.read<CommercialProvider>().startProCheckout();
+    final result =
+        await (widget.startCheckout?.call() ??
+            context.read<CommercialProvider>().startProCheckout());
     if (!mounted) return;
+    final checkoutUri = secureExternalCheckoutUri(result.checkoutUrl);
     setState(() {
       _isProcessing = false;
-      _statusMessage = result.message;
+      _statusMessage =
+          result.requiresExternalPayment &&
+                  result.checkoutUrl != null &&
+                  checkoutUri == null
+              ? 'O link de pagamento recebido não é seguro. Tente novamente.'
+              : result.message;
       _requiresExternalPayment = result.requiresExternalPayment;
+      _checkoutUri = checkoutUri;
     });
     if (!result.activated) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -50,6 +85,30 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
       ),
     );
     context.go('/plans');
+  }
+
+  Future<void> _openExternalCheckout() async {
+    final uri = _checkoutUri;
+    if (uri == null || _isOpeningCheckout) return;
+
+    setState(() => _isOpeningCheckout = true);
+    var launched = false;
+    try {
+      launched = await widget.externalCheckoutLauncher(uri);
+    } catch (_) {
+      launched = false;
+    }
+    if (!mounted) return;
+    setState(() => _isOpeningCheckout = false);
+
+    if (!launched) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Não foi possível abrir o pagamento. Tente novamente.'),
+          backgroundColor: AppTheme.error,
+        ),
+      );
+    }
   }
 
   @override
@@ -88,10 +147,10 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                   label: 'Uso de IA',
                   value: '2.500 ações/mês',
                 ),
-                const _CheckoutLine(label: 'Status', value: 'Checkout backend'),
+                const _CheckoutLine(label: 'Status', value: 'Pagamento seguro'),
                 const SizedBox(height: 12),
                 const Text(
-                  'Este fluxo chama o backend para ativar o Pro somente quando o checkout interno ou provedor de pagamento estiver configurado.',
+                  'Seu plano será ativado após a confirmação do pagamento.',
                   style: TextStyle(color: AppTheme.textSecondary, height: 1.4),
                 ),
               ],
@@ -102,6 +161,9 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
             _CheckoutStatusPanel(
               message: _statusMessage!,
               requiresExternalPayment: _requiresExternalPayment,
+              checkoutUri: _checkoutUri,
+              isOpeningCheckout: _isOpeningCheckout,
+              onOpenCheckout: _openExternalCheckout,
             ),
           ],
           const SizedBox(height: 16),
@@ -116,7 +178,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                       child: CircularProgressIndicator(strokeWidth: 2),
                     )
                     : const Icon(Icons.lock_open),
-            label: Text(_isProcessing ? 'Processando...' : 'Ativar Pro'),
+            label: Text(_isProcessing ? 'Processando...' : 'Continuar'),
           ),
           TextButton(
             onPressed: _isProcessing ? null : () => context.go('/plans'),
@@ -132,10 +194,16 @@ class _CheckoutStatusPanel extends StatelessWidget {
   const _CheckoutStatusPanel({
     required this.message,
     required this.requiresExternalPayment,
+    required this.checkoutUri,
+    required this.isOpeningCheckout,
+    required this.onOpenCheckout,
   });
 
   final String message;
   final bool requiresExternalPayment;
+  final Uri? checkoutUri;
+  final bool isOpeningCheckout;
+  final VoidCallback onOpenCheckout;
 
   @override
   Widget build(BuildContext context) {
@@ -148,25 +216,49 @@ class _CheckoutStatusPanel extends StatelessWidget {
         borderRadius: BorderRadius.circular(AppTheme.radiusMd),
         border: Border.all(color: color.withValues(alpha: 0.55)),
       ),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          Icon(
-            requiresExternalPayment
-                ? Icons.payments_outlined
-                : Icons.error_outline,
-            color: color,
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Icon(
+                requiresExternalPayment
+                    ? Icons.payments_outlined
+                    : Icons.error_outline,
+                color: color,
+              ),
+              const SizedBox(width: 10),
+              Expanded(
+                child: Text(
+                  message,
+                  style: const TextStyle(
+                    color: AppTheme.textSecondary,
+                    height: 1.4,
+                  ),
+                ),
+              ),
+            ],
           ),
-          const SizedBox(width: 10),
-          Expanded(
-            child: Text(
-              message,
-              style: const TextStyle(
-                color: AppTheme.textSecondary,
-                height: 1.4,
+          if (checkoutUri != null) ...[
+            const SizedBox(height: 12),
+            FilledButton.icon(
+              key: const Key('checkout-open-payment-button'),
+              onPressed: isOpeningCheckout ? null : onOpenCheckout,
+              icon:
+                  isOpeningCheckout
+                      ? const SizedBox.square(
+                        dimension: 18,
+                        child: CircularProgressIndicator(strokeWidth: 2),
+                      )
+                      : const Icon(Icons.open_in_new_rounded),
+              label: Text(
+                isOpeningCheckout
+                    ? 'Abrindo pagamento...'
+                    : 'Continuar para pagamento',
               ),
             ),
-          ),
+          ],
         ],
       ),
     );

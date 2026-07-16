@@ -21,6 +21,11 @@ const _corsHeaders = {
   'Access-Control-Allow-Methods': 'GET, POST, PUT, PATCH, DELETE, OPTIONS',
   'Access-Control-Allow-Headers': 'Content-Type, Authorization, X-Request-Id',
   'Access-Control-Max-Age': '86400',
+  'X-Content-Type-Options': 'nosniff',
+  'X-Frame-Options': 'SAMEORIGIN',
+  'Referrer-Policy': 'no-referrer',
+  'Permissions-Policy': 'camera=(), microphone=(), geolocation=()',
+  'Strict-Transport-Security': 'max-age=31536000',
 };
 
 Handler middleware(Handler handler) {
@@ -34,10 +39,7 @@ Handler middleware(Handler handler) {
     if (context.request.method == HttpMethod.options) {
       return Response(
         statusCode: HttpStatus.noContent,
-        headers: {
-          ..._corsHeaders,
-          'x-request-id': requestId,
-        },
+        headers: {..._corsHeaders, 'x-request-id': requestId},
       );
     }
 
@@ -50,10 +52,7 @@ Handler middleware(Handler handler) {
           return Response.json(
             statusCode: HttpStatus.serviceUnavailable,
             body: {'error': 'Serviço temporariamente indisponível (DB)'},
-            headers: {
-              ..._corsHeaders,
-              'x-request-id': requestId,
-            },
+            headers: {..._corsHeaders, 'x-request-id': requestId},
           );
         }
         _connected = true;
@@ -63,8 +62,9 @@ Handler middleware(Handler handler) {
           .use(provider<Pool>((_) => _db.connection))
           .use(provider<RequestTrace>((_) => trace))(context);
 
-      final contentLength =
-          int.tryParse(response.headers['content-length'] ?? '');
+      final contentLength = int.tryParse(
+        response.headers['content-length'] ?? '',
+      );
       if (response.statusCode == HttpStatus.methodNotAllowed &&
           (contentLength == null || contentLength == 0)) {
         response = Response.json(
@@ -102,12 +102,8 @@ Handler middleware(Handler handler) {
         stackTrace: st,
         request: context.request,
         trace: trace,
-        tags: const {
-          'source': 'root_middleware',
-        },
-        extras: {
-          'endpoint': endpoint,
-        },
+        tags: const {'source': 'root_middleware'},
+        extras: {'endpoint': endpoint},
       );
 
       print('[ERROR] middleware: $e');
@@ -123,10 +119,7 @@ Handler middleware(Handler handler) {
       return Response.json(
         statusCode: HttpStatus.internalServerError,
         body: {'error': 'Erro interno do servidor'},
-        headers: {
-          ..._corsHeaders,
-          'x-request-id': requestId,
-        },
+        headers: {..._corsHeaders, 'x-request-id': requestId},
       );
     }
   };
@@ -140,7 +133,8 @@ void _recordHttpObservability({
   required int latencyMs,
 }) {
   final path = context.request.uri.path;
-  final isSocialEndpoint = path == '/trades' ||
+  final isSocialEndpoint =
+      path == '/trades' ||
       path.startsWith('/trades/') ||
       path == '/conversations' ||
       path.startsWith('/conversations/') ||
@@ -156,12 +150,14 @@ void _recordHttpObservability({
   }
 
   final userId = _safeUserId(context);
-  final classification = response.statusCode >= 500
-      ? 'server_error'
-      : response.statusCode >= 400
+  final classification =
+      response.statusCode >= 500
+          ? 'server_error'
+          : response.statusCode >= 400
           ? 'client_error'
           : 'slow_request';
-  final logMessage = '[http_observability] classification=$classification '
+  final logMessage =
+      '[http_observability] classification=$classification '
       'endpoint=$endpoint status=${response.statusCode} '
       'duration_ms=$latencyMs request_id=${trace.requestId} '
       'user_id=${userId ?? 'n/a'}';

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../core/theme/app_theme.dart';
+import '../../../core/utils/friendly_error_mapper.dart';
 import '../providers/deck_provider_support.dart';
 import 'deck_optimize_sheet_widgets.dart';
 import 'deck_ui_components.dart';
@@ -582,6 +583,10 @@ class OptimizationOptionsSection extends StatelessWidget {
     }
 
     if (snapshot.hasError) {
+      final message = FriendlyErrorMapper.fromException(
+        snapshot.error,
+        context: FriendlyErrorContext.deckOptimize,
+      );
       return Center(
         child: SingleChildScrollView(
           child: Column(
@@ -590,7 +595,7 @@ class OptimizationOptionsSection extends StatelessWidget {
             children: [
               Icon(Icons.error_outline, size: 48, color: AppTheme.error),
               const SizedBox(height: 16),
-              Text('Erro: ${snapshot.error}', textAlign: TextAlign.center),
+              Text(message, textAlign: TextAlign.center),
               const SizedBox(height: 16),
               ElevatedButton(
                 onPressed: onRetry,

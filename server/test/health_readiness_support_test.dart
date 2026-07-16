@@ -31,16 +31,30 @@ void main() {
   group('ready route contract', () {
     test('/ready delegates to /health/ready handler', () {
       final route = File('routes/ready/index.dart').readAsStringSync();
-      final contract = File(
-        'doc/API_CONTRACTS_AND_DATA_MAP.md',
-      ).readAsStringSync();
+      final contract =
+          File('doc/API_CONTRACTS_AND_DATA_MAP.md').readAsStringSync();
 
       expect(route, contains("import '../health/ready/index.dart'"));
       expect(route, contains('health_ready.onRequest(context)'));
       expect(
-          contract, contains('| `GET /ready` | internal/stable ops alias |'));
+        contract,
+        contains('| `GET /ready` | internal/stable ops alias |'),
+      );
       expect(
-          contract, isNot(contains('| `GET /ready` | internal/deprecated |')));
+        contract,
+        isNot(contains('| `GET /ready` | internal/deprecated |')),
+      );
+    });
+
+    test('readiness reports latency without leaking dependency exceptions', () {
+      final route = File('routes/health/ready/index.dart').readAsStringSync();
+
+      expect(route, contains('databaseStopwatch.elapsedMilliseconds'));
+      expect(route, contains('cardsStopwatch.elapsedMilliseconds'));
+      expect(route, contains("'error_code': 'database_check_failed'"));
+      expect(route, contains("'error_code': 'cards_data_check_failed'"));
+      expect(route, isNot(contains("'error': e.toString()")));
+      expect(route, isNot(contains("'latency_ms': null")));
     });
   });
 }

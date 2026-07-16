@@ -398,6 +398,8 @@ void main() {
       () async {
         var pollCount = 0;
         final progressMessages = <String>[];
+        final trackedEvents = <String>[];
+        Map<String, dynamic>? trackedMetadata;
         final apiClient = _FakeApiClient(
           postHandlers: {
             '/ai/generate': (body) {
@@ -433,7 +435,21 @@ void main() {
             },
           },
         );
-        final provider = DeckProvider(apiClient: apiClient);
+        final provider = DeckProvider(
+          apiClient: apiClient,
+          trackActivationEvent: (
+            String eventName, {
+            String? format,
+            String? deckId,
+            String source = 'app',
+            Map<String, dynamic>? metadata,
+          }) async {
+            trackedEvents.add(eventName);
+            trackedMetadata = metadata;
+            expect(format, 'commander');
+            expect(source, 'deck_provider.generateDeck');
+          },
+        );
 
         final result = await provider.generateDeck(
           prompt: 'Talrand spellslinger',
@@ -453,6 +469,9 @@ void main() {
           progressMessages.any((message) => message.contains('Pedido aceito')),
           isTrue,
         );
+        expect(trackedEvents, ['deck_generated']);
+        expect(trackedMetadata?['prompt_length'], 20);
+        expect(trackedMetadata?['commander_selected'], isFalse);
       },
     );
 
@@ -766,6 +785,7 @@ void main() {
       () async {
         var pollCount = 0;
         final progress = <String>[];
+        final trackedEvents = <String>[];
         final apiClient = _FakeApiClient(
           postHandlers: {
             '/ai/optimize': (body) {
@@ -801,7 +821,20 @@ void main() {
             },
           },
         );
-        final provider = DeckProvider(apiClient: apiClient);
+        final provider = DeckProvider(
+          apiClient: apiClient,
+          trackActivationEvent: (
+            String eventName, {
+            String? format,
+            String? deckId,
+            String source = 'app',
+            Map<String, dynamic>? metadata,
+          }) async {
+            trackedEvents.add(eventName);
+            expect(deckId, 'deck-1');
+            expect(source, 'deck_provider.optimizeDeck');
+          },
+        );
 
         final result = await provider.optimizeDeck(
           'deck-1',
@@ -817,8 +850,38 @@ void main() {
           '/ai/optimize/jobs/job-aggressive',
           '/ai/optimize/jobs/job-aggressive',
         ]);
+        expect(trackedEvents, ['deck_optimized']);
       },
     );
+
+    test('telemetry failure never breaks a successful optimize flow', () async {
+      final apiClient = _FakeApiClient(
+        postHandlers: {
+          '/ai/optimize':
+              (_) => ApiResponse(200, {
+                'mode': 'optimize',
+                'removals': const <String>[],
+                'additions': const <String>[],
+              }),
+        },
+      );
+      final provider = DeckProvider(
+        apiClient: apiClient,
+        trackActivationEvent:
+            (
+              String eventName, {
+              String? format,
+              String? deckId,
+              String source = 'app',
+              Map<String, dynamic>? metadata,
+            }) => Future<void>.error(StateError('telemetry offline')),
+      );
+
+      final result = await provider.optimizeDeck('deck-1', 'control');
+      await Future<void>.delayed(Duration.zero);
+
+      expect(result['mode'], 'optimize');
+    });
 
     test(
       'optimizeDeck polling timeout remains five minutes for one-second intervals',

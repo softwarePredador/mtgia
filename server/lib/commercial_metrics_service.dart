@@ -13,14 +13,16 @@ class CommercialMetricsService {
     final hasReports = await _tableExists('shared_deck_reports');
     final hasPostGame = await _tableExists('post_game_notes');
 
-    final activation = hasActivation
-        ? await _activationFunnel(safeDays)
-        : _missing('activation_funnel_events');
+    final activation =
+        hasActivation
+            ? await _activationFunnel(safeDays)
+            : _missing('activation_funnel_events');
     final ai = hasAiLogs ? await _aiPerformance(safeDays) : _missing('ai_logs');
     final plans = hasUserPlans ? await _planMix() : _missing('user_plans');
-    final reports = hasReports
-        ? await _sharedReports(safeDays)
-        : _missing('shared_deck_reports');
+    final reports =
+        hasReports
+            ? await _sharedReports(safeDays)
+            : _missing('shared_deck_reports');
     final retention =
         hasPostGame ? await _retention(safeDays) : _missing('post_game_notes');
 
@@ -30,9 +32,10 @@ class CommercialMetricsService {
       'generated_at': DateTime.now().toUtc().toIso8601String(),
       'activation_funnel': activation,
       'ai_performance': ai,
-      'ai_performance_history': hasAiLogs
-          ? await aiPerformanceHistory(days: safeDays, bucket: 'day')
-          : _missing('ai_logs'),
+      'ai_performance_history':
+          hasAiLogs
+              ? await aiPerformanceHistory(days: safeDays, bucket: 'day')
+              : _missing('ai_logs'),
       'plan_mix': plans,
       'shareable_reports': reports,
       'retention': retention,
@@ -40,6 +43,11 @@ class CommercialMetricsService {
   }
 
   static int normalizeWindowDays(int days) => days.clamp(1, 90);
+  static int countAiActivationEvents(Map<String, int> events) =>
+      (events['deck_generated'] ?? 0) +
+      (events['deck_optimized'] ?? 0) +
+      (events['deck_rebuild_created'] ?? 0);
+
   static String normalizeHistoryBucket(String? bucket) {
     final normalized = bucket?.trim().toLowerCase();
     return normalized == 'hour' ? 'hour' : 'day';
@@ -56,10 +64,7 @@ class CommercialMetricsService {
     String bucket = 'day',
   }) async {
     final normalizedBucket = normalizeHistoryBucket(bucket);
-    final safeDays = normalizeHistoryWindowDays(
-      days,
-      bucket: normalizedBucket,
-    );
+    final safeDays = normalizeHistoryWindowDays(days, bucket: normalizedBucket);
     final hasAiLogs = await _tableExists('ai_logs');
     if (!hasAiLogs) return _missing('ai_logs');
 
@@ -130,14 +135,16 @@ class CommercialMetricsService {
       });
     }
 
-    final periods = periodsByStart.values.map((period) {
-      final requestCount = period['request_count'] as int;
-      final errorCount = period['error_count'] as int;
-      return {
-        ...period,
-        'error_rate': requestCount > 0 ? _ratio(errorCount, requestCount) : 0.0,
-      };
-    }).toList();
+    final periods =
+        periodsByStart.values.map((period) {
+          final requestCount = period['request_count'] as int;
+          final errorCount = period['error_count'] as int;
+          return {
+            ...period,
+            'error_rate':
+                requestCount > 0 ? _ratio(errorCount, requestCount) : 0.0,
+          };
+        }).toList();
 
     return {
       'status': 'ok',
@@ -158,9 +165,9 @@ class CommercialMetricsService {
   }
 
   Map<String, dynamic> _missing(String table) => {
-        'status': 'not_initialized',
-        'table': table,
-      };
+    'status': 'not_initialized',
+    'table': table,
+  };
 
   Future<Map<String, dynamic>> _activationFunnel(int days) async {
     final result = await pool.execute(
@@ -181,14 +188,14 @@ class CommercialMetricsService {
 
     final signups = await _countUsers(days);
     final deckCreated = events['deck_created'] ?? 0;
-    final aiUsed =
-        (events['deck_optimized'] ?? 0) + (events['deck_rebuild_created'] ?? 0);
+    final aiUsed = countAiActivationEvents(events);
 
     return {
       'status': 'ok',
       'signups': signups,
       'events': events,
       'deck_created_count': deckCreated,
+      'deck_generated_count': events['deck_generated'] ?? 0,
       'ai_used_count': aiUsed,
       'deck_created_per_signup':
           signups > 0 ? _ratio(deckCreated, signups) : 0.0,
@@ -255,30 +262,24 @@ class CommercialMetricsService {
   }
 
   Future<Map<String, dynamic>> _planMix() async {
-    final result = await pool.execute(Sql.named('''
+    final result = await pool.execute(
+      Sql.named('''
       SELECT plan_name, status, COUNT(*)::int AS total
       FROM user_plans
       GROUP BY plan_name, status
       ORDER BY plan_name ASC, status ASC
-    '''));
+    '''),
+    );
 
     final rows = <Map<String, dynamic>>[];
     var total = 0;
     for (final row in result) {
       final count = (row[2] as int?) ?? 0;
       total += count;
-      rows.add({
-        'plan_name': row[0],
-        'status': row[1],
-        'count': count,
-      });
+      rows.add({'plan_name': row[0], 'status': row[1], 'count': count});
     }
 
-    return {
-      'status': 'ok',
-      'total_users_with_plan': total,
-      'plans': rows,
-    };
+    return {'status': 'ok', 'total_users_with_plan': total, 'plans': rows};
   }
 
   Future<Map<String, dynamic>> _sharedReports(int days) async {
@@ -371,9 +372,9 @@ class CommercialMetricsService {
 
 String _dateIso(Object? value) {
   if (value is DateTime) return value.toUtc().toIso8601String();
-  return DateTime.tryParse(value?.toString() ?? '')
-          ?.toUtc()
-          .toIso8601String() ??
+  return DateTime.tryParse(
+        value?.toString() ?? '',
+      )?.toUtc().toIso8601String() ??
       value.toString();
 }
 

@@ -344,6 +344,9 @@ main() {
   run_step "Patrol product E2E local" \
     "\"$ROOT_DIR/scripts/quality_gate.sh\" patrol-smoke"
 
+  run_step "Public web product E2E" \
+    "\"$ROOT_DIR/scripts/quality_gate.sh\" web"
+
   run_step "Flutter deckbuilder E2E and deck UI contracts" \
     "cd \"$ROOT_DIR/app\" && flutter test test/features/decks --no-version-check --reporter compact"
 

@@ -76,6 +76,11 @@ run_frontend_full() {
   run_flutter_tests_with_proof
 }
 
+run_public_web_full() {
+  print_header "Public web full checks"
+  "$ROOT_DIR/scripts/manaloom_public_web_smoke.sh"
+}
+
 run_ui_audit() {
   print_header "ManaLoom Flutter UI audit"
   cd "$ROOT_DIR/app"
@@ -170,6 +175,7 @@ Uso:
   ./scripts/quality_gate.sh full    # validação completa (dart test + flutter analyze + flutter test)
   ./scripts/quality_gate.sh resolution # gate recorrente do corpus de resolução
   ./scripts/quality_gate.sh ui-audit # golden/accessibility audit das telas críticas Flutter
+  ./scripts/quality_gate.sh web # lint, build, dependency audit e smoke HTTP do site público
   ./scripts/quality_gate.sh deps # valida dependências declaradas no app/server
   ./scripts/quality_gate.sh custom-lint # roda regras customizadas ManaLoom no app/server
   ./scripts/quality_gate.sh patrol-smoke # valida fluxos E2E criticos do Patrol
@@ -200,6 +206,7 @@ Exemplos:
   ./scripts/quality_gate.sh full
   ./scripts/quality_gate.sh resolution
   ./scripts/quality_gate.sh ui-audit
+  ./scripts/quality_gate.sh web
   ./scripts/quality_gate.sh deps
   ./scripts/quality_gate.sh custom-lint
   ./scripts/quality_gate.sh patrol-smoke
@@ -226,12 +233,16 @@ main() {
     full)
       run_backend_full
       run_frontend_full
+      run_public_web_full
       ;;
     resolution)
       run_resolution_corpus
       ;;
     ui-audit)
       run_ui_audit
+      ;;
+    web)
+      run_public_web_full
       ;;
     deps)
       run_dependency_audit

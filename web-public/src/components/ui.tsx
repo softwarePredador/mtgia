@@ -7,6 +7,38 @@ type ButtonLinkProps = {
   variant?: "primary" | "secondary" | "quiet";
 };
 
+type RouteLinkProps = {
+  href: string;
+  children: ReactNode;
+  className?: string;
+};
+
+function crossesIntoFlutterApp(href: string) {
+  return (
+    href === "/app" ||
+    href.startsWith("/app/") ||
+    href.startsWith("/app?") ||
+    href.startsWith("/app#")
+  );
+}
+
+export function RouteLink({ href, children, className }: RouteLinkProps) {
+  if (crossesIntoFlutterApp(href)) {
+    // /app is served by the Flutter service, outside the Next.js router.
+    return (
+      <a href={href} className={className}>
+        {children}
+      </a>
+    );
+  }
+
+  return (
+    <Link href={href} className={className}>
+      {children}
+    </Link>
+  );
+}
+
 export function ButtonLink({ href, children, variant = "primary" }: ButtonLinkProps) {
   const styles = {
     primary:
@@ -18,12 +50,12 @@ export function ButtonLink({ href, children, variant = "primary" }: ButtonLinkPr
   };
 
   return (
-    <Link
+    <RouteLink
       href={href}
       className={`focus-ring inline-flex min-h-11 items-center justify-center rounded-lg border px-4 py-2 text-sm font-bold transition ${styles[variant]}`}
     >
       {children}
-    </Link>
+    </RouteLink>
   );
 }
 

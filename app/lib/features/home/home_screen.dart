@@ -1,5 +1,6 @@
 import 'dart:math' as math;
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:manaloom/core/widgets/shell_app_bar_actions.dart';
@@ -22,7 +23,9 @@ String? _scryfallImageUrl(String? name) {
 }
 
 class HomeScreen extends StatefulWidget {
-  const HomeScreen({super.key});
+  final bool? lifeCounterAvailable;
+
+  const HomeScreen({super.key, this.lifeCounterAvailable});
 
   @override
   State<HomeScreen> createState() => _HomeScreenState();
@@ -74,6 +77,7 @@ class _HomeScreenState extends State<HomeScreen>
       (dp) => dp.decks.toList(),
     );
     final recentDecks = decks.take(4).toList();
+    final lifeCounterAvailable = widget.lifeCounterAvailable ?? !kIsWeb;
 
     return Scaffold(
       backgroundColor: AppTheme.transparent,
@@ -100,11 +104,11 @@ class _HomeScreenState extends State<HomeScreen>
                   children: [
                     const _HomeHeader(),
                     const SizedBox(height: 12),
-                    const _HomeHero(),
+                    _HomeHero(lifeCounterAvailable: lifeCounterAvailable),
                     const SizedBox(height: 16),
                     const _SectionHeader(label: 'Acesso rápido'),
                     const SizedBox(height: 10),
-                    const _QuickActions(),
+                    _QuickActions(lifeCounterAvailable: lifeCounterAvailable),
                     const SizedBox(height: 18),
                     _SectionHeader(
                       label: 'Decks recentes',
@@ -145,9 +149,9 @@ class _HomeHeader extends StatelessWidget {
             width: 48,
             child: IconButton(
               onPressed: () => context.go('/profile'),
-              icon: const Icon(Icons.menu_rounded),
+              icon: const Icon(Icons.account_circle_outlined),
               color: AppTheme.textSecondary,
-              tooltip: 'Menu',
+              tooltip: 'Perfil',
             ),
           ),
           Expanded(
@@ -191,11 +195,14 @@ class _HomeHeader extends StatelessWidget {
 }
 
 class _HomeHero extends StatelessWidget {
-  const _HomeHero();
+  final bool lifeCounterAvailable;
+
+  const _HomeHero({required this.lifeCounterAvailable});
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final actionLabel = lifeCounterAvailable ? 'Jogar agora' : 'Montar deck';
     return RepaintBoundary(
       key: const Key('home-hero-frame'),
       child: Container(
@@ -285,19 +292,22 @@ class _HomeHero extends StatelessWidget {
                           fontSize: AppTheme.fontSm,
                         ),
                       ),
-                      onPressed: () => openLifeCounterRoute(context),
-                      child: const Row(
+                      onPressed:
+                          lifeCounterAvailable
+                              ? () => openLifeCounterRoute(context)
+                              : () => context.go('/onboarding/core-flow'),
+                      child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Expanded(
                             child: FittedBox(
                               fit: BoxFit.scaleDown,
                               alignment: Alignment.centerLeft,
-                              child: Text('Jogar agora'),
+                              child: Text(actionLabel),
                             ),
                           ),
-                          SizedBox(width: 8),
-                          Icon(Icons.arrow_forward_rounded, size: 17),
+                          const SizedBox(width: 8),
+                          const Icon(Icons.arrow_forward_rounded, size: 17),
                         ],
                       ),
                     ),
@@ -352,17 +362,27 @@ class _SectionHeader extends StatelessWidget {
 }
 
 class _QuickActions extends StatelessWidget {
-  const _QuickActions();
+  final bool lifeCounterAvailable;
+
+  const _QuickActions({required this.lifeCounterAvailable});
 
   @override
   Widget build(BuildContext context) {
     final actions = [
-      _QuickActionData(
-        icon: Icons.favorite_rounded,
-        title: 'Jogar agora',
-        accent: AppTheme.brass400,
-        onTap: () => openLifeCounterRoute(context),
-      ),
+      if (lifeCounterAvailable)
+        _QuickActionData(
+          icon: Icons.favorite_rounded,
+          title: 'Jogar agora',
+          accent: AppTheme.brass400,
+          onTap: () => openLifeCounterRoute(context),
+        )
+      else
+        _QuickActionData(
+          icon: Icons.groups_rounded,
+          title: 'Comunidade',
+          accent: AppTheme.brass400,
+          onTap: () => context.go('/community'),
+        ),
       _QuickActionData(
         icon: Icons.construction_rounded,
         title: 'Construir deck',

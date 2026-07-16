@@ -151,7 +151,6 @@ export default async function MarketplacePage() {
                             alt={item.cardName}
                             fill
                             sizes="112px"
-                            unoptimized
                             className="object-cover"
                           />
                         </div>

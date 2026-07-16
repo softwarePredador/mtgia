@@ -277,11 +277,12 @@ void showGuidedRebuildCreatedSnackBar(BuildContext context) {
 }
 
 void showGuidedRebuildErrorSnackBar(BuildContext context, Object error) {
+  final message = FriendlyErrorMapper.fromException(
+    error,
+    context: FriendlyErrorContext.deckOptimize,
+  );
   ScaffoldMessenger.of(context).showSnackBar(
-    SnackBar(
-      content: Text('Erro ao criar reconstrução: $error'),
-      backgroundColor: AppTheme.error,
-    ),
+    SnackBar(content: Text(message), backgroundColor: AppTheme.error),
   );
 }
 

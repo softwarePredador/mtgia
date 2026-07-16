@@ -3,7 +3,7 @@ import Image from "next/image";
 import type { ReactNode } from "react";
 
 import { routes } from "@/lib/routes";
-import { Container } from "./ui";
+import { Container, RouteLink } from "./ui";
 
 const navItems = [
   { href: `${routes.home}#produto`, label: "Produto" },
@@ -37,13 +37,13 @@ export function SiteShell({ children }: { children: ReactNode }) {
               </Link>
             ))}
           </nav>
-          <Link
+          <RouteLink
             href={routes.app}
             className="focus-ring inline-flex h-11 shrink-0 items-center justify-center rounded-lg border border-brass-400 bg-brass-400 px-3 text-sm font-bold text-obsidian-950 transition hover:bg-brass-300 sm:px-4"
           >
             <span className="sm:hidden">App</span>
             <span className="hidden sm:inline">Abrir app</span>
-          </Link>
+          </RouteLink>
         </Container>
       </header>
       {children}

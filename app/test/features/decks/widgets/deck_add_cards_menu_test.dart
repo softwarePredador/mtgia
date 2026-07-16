@@ -26,6 +26,13 @@ void main() {
   ) async {
     await pumpMenu(tester, scannerEnabled: false);
 
+    final menu = tester.widget<PopupMenuButton<String>>(
+      find.byType(PopupMenuButton<String>),
+    );
+    expect(menu.enabled, isTrue);
+    expect(menu.tooltip, 'Adicionar cartas');
+    expect(find.byType(FloatingActionButton), findsNothing);
+
     await tester.tap(find.byType(PopupMenuButton<String>));
     await tester.pumpAndSettle();
 

@@ -8,6 +8,11 @@
     "start": "next start",
     "lint": "eslint . --max-warnings=0"
   },
+  "overrides": {
+    "next": {
+      "postcss": "8.5.19"
+    }
+  },
   "dependencies": {
     "next": "^15.5.0",
     "react": "^19.1.0",
