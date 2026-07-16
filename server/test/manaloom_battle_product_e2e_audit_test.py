@@ -93,6 +93,18 @@ class ManaLoomBattleProductE2EAuditTest(unittest.TestCase):
             self.assertTrue(row["replacement"])
             self.assertTrue(row["reason"])
 
+    def test_static_gate_restores_locked_dependencies_before_analysis(self) -> None:
+        gate_source = (
+            REPO_ROOT / "scripts" / "manaloom_battle_product_gate.sh"
+        ).read_text(encoding="utf-8")
+        static_start = gate_source.index("run_static_gate()")
+        isolated_start = gate_source.index("run_isolated_e2e()")
+        static_source = gate_source[static_start:isolated_start]
+
+        pub_get = static_source.index("dart pub get --enforce-lockfile")
+        analyze = static_source.index("dart analyze")
+        self.assertLess(pub_get, analyze)
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -472,6 +472,7 @@ run_static_gate() {
 
   (
     cd server
+    dart pub get --enforce-lockfile
     dart analyze \
       lib/ai/battle_engine_config.dart \
       lib/ai/battle_learning_evidence_support.dart \
