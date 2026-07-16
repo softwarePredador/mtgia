@@ -1,16 +1,18 @@
 import 'package:postgres/postgres.dart';
 
+import 'logger.dart';
+
 /// Serviço para logging de chamadas de IA
-/// 
+///
 /// Permite observabilidade das chamadas sem expor dados sensíveis.
 /// Útil para debugging, auditoria de custos e análise de performance.
 class AiLogService {
-  final dynamic _db;  // Accepts both Connection and Pool
+  final dynamic _db; // Accepts both Connection and Pool
 
   AiLogService(this._db);
 
   /// Registra uma chamada de IA
-  /// 
+  ///
   /// [userId] - ID do usuário que fez a chamada (opcional)
   /// [deckId] - ID do deck relacionado (opcional)
   /// [endpoint] - Nome do endpoint ('optimize', 'generate', etc.)
@@ -22,7 +24,7 @@ class AiLogService {
   /// [outputTokens] - Tokens de saída (opcional)
   /// [success] - Se a chamada foi bem sucedida
   /// [errorMessage] - Mensagem de erro (se falhou)
-  Future<void> log({
+  Future<bool> log({
     String? userId,
     String? deckId,
     required String endpoint,
@@ -61,12 +63,16 @@ class AiLogService {
           'inputTokens': inputTokens,
           'outputTokens': outputTokens,
           'success': success,
-          'errorMessage': errorMessage,
+          'errorMessage': _truncate(
+            sanitizeAiLogErrorMessage(errorMessage),
+            500,
+          ),
         },
       );
-    } catch (e) {
-      // Não falhar a operação principal se o logging falhar
-      print('⚠️ Falha ao salvar log de IA: $e');
+      return true;
+    } catch (error) {
+      Log.w('AI log persistence failed type=${error.runtimeType}');
+      return false;
     }
   }
 
@@ -81,11 +87,11 @@ class AiLogService {
     String Function(T result)? summarizeResponse,
   }) async {
     final stopwatch = Stopwatch()..start();
-    
+
     try {
       final result = await call();
       stopwatch.stop();
-      
+
       await log(
         userId: userId,
         deckId: deckId,
@@ -96,11 +102,11 @@ class AiLogService {
         latencyMs: stopwatch.elapsedMilliseconds,
         success: true,
       );
-      
+
       return result;
     } catch (e) {
       stopwatch.stop();
-      
+
       await log(
         userId: userId,
         deckId: deckId,
@@ -111,7 +117,7 @@ class AiLogService {
         success: false,
         errorMessage: e.toString(),
       );
-      
+
       rethrow;
     }
   }
@@ -160,13 +166,9 @@ class AiLogService {
   }
 
   /// Estatísticas de uso
-  Future<Map<String, dynamic>> getStats({
-    DateTime? since,
-  }) async {
-    final sinceClause = since != null 
-        ? "WHERE created_at >= @since" 
-        : "";
-    
+  Future<Map<String, dynamic>> getStats({DateTime? since}) async {
+    final sinceClause = since != null ? "WHERE created_at >= @since" : "";
+
     final result = await _db.execute(
       Sql.named('''
         SELECT 
@@ -204,10 +206,8 @@ class AiLogService {
   Future<List<Map<String, dynamic>>> getStatsByEndpoint({
     DateTime? since,
   }) async {
-    final sinceClause = since != null 
-        ? "WHERE created_at >= @since" 
-        : "";
-    
+    final sinceClause = since != null ? "WHERE created_at >= @since" : "";
+
     final result = await _db.execute(
       Sql.named('''
         SELECT 
@@ -232,4 +232,14 @@ class AiLogService {
     if (text.length <= maxLength) return text;
     return '${text.substring(0, maxLength - 3)}...';
   }
+}
+
+String? sanitizeAiLogErrorMessage(String? value) {
+  if (value == null || value.trim().isEmpty) return null;
+  return value
+      .replaceAll(
+        RegExp(r'Bearer\s+[^\s,;]+', caseSensitive: false),
+        'Bearer [redacted]',
+      )
+      .replaceAll(RegExp(r'sk-[A-Za-z0-9_-]+'), '[redacted]');
 }

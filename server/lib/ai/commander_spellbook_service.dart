@@ -155,7 +155,9 @@ class CommanderSpellbookService {
         parameters: {'deck_ids': ids},
       );
     } catch (e) {
-      Log.w('CommanderSpellbook findDeckCombos query failed: $e');
+      Log.w(
+        'CommanderSpellbook findDeckCombos query failed type=${e.runtimeType}',
+      );
       return const DeckCombosResult(complete: [], nearMisses: []);
     }
 

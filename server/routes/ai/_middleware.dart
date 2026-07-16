@@ -3,6 +3,27 @@ import '../../lib/auth_middleware.dart';
 import '../../lib/plan_middleware.dart';
 import '../../lib/rate_limit_middleware.dart';
 
+enum AiEndpointAccessPolicy { meteredAction, rateLimitedLocal, authOnly }
+
+const meteredAiActionPaths = <String>{
+  '/ai/generate',
+  '/ai/optimize',
+  '/ai/explain',
+  '/ai/rebuild',
+};
+
+AiEndpointAccessPolicy aiEndpointAccessPolicyForPath(String path) {
+  if (path == '/ai/commander-learning' ||
+      path.startsWith('/ai/generate/jobs/') ||
+      path.startsWith('/ai/optimize/jobs/')) {
+    return AiEndpointAccessPolicy.authOnly;
+  }
+  if (meteredAiActionPaths.contains(path)) {
+    return AiEndpointAccessPolicy.meteredAction;
+  }
+  return AiEndpointAccessPolicy.rateLimitedLocal;
+}
+
 /// Middleware de autenticação e rate limiting para rotas de IA
 ///
 /// Aplica:
@@ -15,6 +36,9 @@ import '../../lib/rate_limit_middleware.dart';
 /// - Previne uso abusivo do sistema
 Handler middleware(Handler handler) {
   final authOnlyHandler = handler.use(authMiddleware());
+  final rateLimitedLocalHandler = handler
+      .use(aiRateLimit())
+      .use(authMiddleware());
   final costlyAiHandler = handler
       .use(aiRateLimit())
       .use(aiPlanLimitMiddleware())
@@ -22,18 +46,13 @@ Handler middleware(Handler handler) {
 
   return (context) {
     final path = context.request.uri.path;
-    // Learned deck availability is a local PostgreSQL read used by the generate
-    // screen. It must remain authenticated, but should not consume paid AI quota
-    // or the cost-oriented AI rate-limit bucket.
-    //
-    // Async job polling is also a status read. The job routes still verify the
-    // authenticated owner before returning data, but polling must not consume AI
-    // quota or the rate-limit bucket that protects expensive generation calls.
-    if (path == '/ai/commander-learning' ||
-        path.startsWith('/ai/generate/jobs/') ||
-        path.startsWith('/ai/optimize/jobs/')) {
-      return authOnlyHandler(context);
+    switch (aiEndpointAccessPolicyForPath(path)) {
+      case AiEndpointAccessPolicy.meteredAction:
+        return costlyAiHandler(context);
+      case AiEndpointAccessPolicy.rateLimitedLocal:
+        return rateLimitedLocalHandler(context);
+      case AiEndpointAccessPolicy.authOnly:
+        return authOnlyHandler(context);
     }
-    return costlyAiHandler(context);
   };
 }

@@ -85,6 +85,14 @@ void main() {
         equals(const Duration(seconds: 15)),
       );
       expect(
+        ApiClient.timeoutForEndpoint('/decks/1/ai-analysis'),
+        equals(const Duration(minutes: 2)),
+      );
+      expect(
+        ApiClient.timeoutForEndpoint('/decks/1/recommendations?force=true'),
+        equals(const Duration(minutes: 2)),
+      );
+      expect(
         ApiClient.timeoutForEndpoint(
           '/ai/optimize',
           override: const Duration(seconds: 3),

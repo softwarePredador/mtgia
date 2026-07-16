@@ -103,9 +103,10 @@ void main() {
     );
     expect(
       provider.usedAiActions,
-      2499,
-      reason: 'remote-backed usage is consumed by the backend route',
+      2500,
+      reason: 'the app reflects the reserved action until remote refresh',
     );
+    expect(provider.remainingAiActions, 0);
   });
 
   test(

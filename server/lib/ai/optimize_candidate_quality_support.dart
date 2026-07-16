@@ -89,15 +89,17 @@ int _scoreAggressiveCandidateQualityPair({
       signal.sources.contains(aggressiveCandidateMetaSignalSource)
           ? 45
           : signal.sources.isNotEmpty
-              ? 18
-              : 0;
+          ? 18
+          : 0;
   final evidenceBonus = (signal.synergyEvidenceCount * 4).clamp(0, 48).toInt();
   final roleScoreComponent = (signal.roleScore * 2.1).round();
   final synergyComponent = (signal.synergyScore * 2.4).round();
   final functionComponent = (signal.functionConfidence * 80).round();
   final rejectionPenalty = (signal.rejectionPenalty / 4).round();
-  final bracketPenalty =
-      _aggressiveBracketScopePenalty(signal.bracketScope, bracket);
+  final bracketPenalty = _aggressiveBracketScopePenalty(
+    signal.bracketScope,
+    bracket,
+  );
   final budgetPenalty = _aggressiveBudgetPenalty(signal.budgetTier, bracket);
 
   return removalScore +
@@ -117,24 +119,25 @@ List<Map<String, dynamic>> rankAggressiveCandidateQualityPairs({
   required Map<String, AggressiveCandidateQualitySignal> signalsByName,
   required int? bracket,
 }) {
-  final ranked = pairs.map((pair) {
-    final addName = pair['add']?.toString() ?? '';
-    final signal = signalsByName[_normalizeAggressiveSignalKey(addName)];
-    final score = _scoreAggressiveCandidateQualityPair(
-      pair: pair,
-      signal: signal,
-      bracket: bracket,
-    );
-    return {
-      ...pair,
-      'candidate_quality_score': score,
-      if (signal != null) 'candidate_quality_signal': signal.toJson(),
-      if (signal != null && signal.roles.isNotEmpty)
-        'add_role': signal.roles.first,
-      if (signal != null && signal.sources.isNotEmpty)
-        'candidate_quality_sources': signal.sources.toList()..sort(),
-    };
-  }).toList();
+  final ranked =
+      pairs.map((pair) {
+        final addName = pair['add']?.toString() ?? '';
+        final signal = signalsByName[_normalizeAggressiveSignalKey(addName)];
+        final score = _scoreAggressiveCandidateQualityPair(
+          pair: pair,
+          signal: signal,
+          bracket: bracket,
+        );
+        return {
+          ...pair,
+          'candidate_quality_score': score,
+          if (signal != null) 'candidate_quality_signal': signal.toJson(),
+          if (signal != null && signal.roles.isNotEmpty)
+            'add_role': signal.roles.first,
+          if (signal != null && signal.sources.isNotEmpty)
+            'candidate_quality_sources': signal.sources.toList()..sort(),
+        };
+      }).toList();
 
   ranked.sort((a, b) {
     final byScore = ((b['candidate_quality_score'] as num?) ?? 0).compareTo(
@@ -157,22 +160,23 @@ Map<String, int> bucketOptimizeQualityGateDroppedReasons(
   final buckets = <String, int>{};
   for (final reason in droppedReasons) {
     final normalized = reason.toLowerCase();
-    final bucket = normalized.contains('dados incompletos')
-        ? 'incomplete_card_data'
-        : normalized.contains('delta cmc') || normalized.contains('cmc')
+    final bucket =
+        normalized.contains('dados incompletos')
+            ? 'incomplete_card_data'
+            : normalized.contains('delta cmc') || normalized.contains('cmc')
             ? 'curve_or_role_mismatch'
             : normalized.contains('papel')
-                ? 'role_mismatch'
-                : normalized.contains('mana') || normalized.contains('land')
-                    ? 'mana_or_land_safety'
-                    : 'quality_gate_rejected';
+            ? 'role_mismatch'
+            : normalized.contains('mana') || normalized.contains('land')
+            ? 'mana_or_land_safety'
+            : 'quality_gate_rejected';
     buckets[bucket] = (buckets[bucket] ?? 0) + 1;
   }
   return buckets;
 }
 
 Future<Map<String, AggressiveCandidateQualitySignal>>
-    loadAggressiveCandidateQualitySignals({
+loadAggressiveCandidateQualitySignals({
   required Pool pool,
   required List<String> candidateNames,
   required List<String> commanders,
@@ -297,14 +301,16 @@ LEFT JOIN penalty_rows pr ON pr.name_lower = r.name_lower
     for (final row in result) {
       final nameLower = row[0] as String? ?? '';
       if (nameLower.isEmpty) continue;
-      final roles = ((row[1] as List?) ?? const <Object?>[])
-          .map((role) => role.toString())
-          .where((role) => role.trim().isNotEmpty)
-          .toSet();
-      final sources = ((row[9] as List?) ?? const <Object?>[])
-          .map((source) => source.toString())
-          .where((source) => source.trim().isNotEmpty)
-          .toSet();
+      final roles =
+          ((row[1] as List?) ?? const <Object?>[])
+              .map((role) => role.toString())
+              .where((role) => role.trim().isNotEmpty)
+              .toSet();
+      final sources =
+          ((row[9] as List?) ?? const <Object?>[])
+              .map((source) => source.toString())
+              .where((source) => source.trim().isNotEmpty)
+              .toSet();
       signals[nameLower] = AggressiveCandidateQualitySignal(
         cardName: nameLower,
         roles: roles,
@@ -321,7 +327,9 @@ LEFT JOIN penalty_rows pr ON pr.name_lower = r.name_lower
 
     return signals..removeWhere((_, signal) => !signal.hasSignal);
   } catch (e) {
-    Log.w('Aggressive candidate quality signals unavailable: $e');
+    Log.w(
+      'Aggressive candidate quality signals unavailable type=${e.runtimeType}',
+    );
     return const <String, AggressiveCandidateQualitySignal>{};
   }
 }

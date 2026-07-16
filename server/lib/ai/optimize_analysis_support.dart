@@ -32,13 +32,14 @@ Map<String, dynamic> buildOptimizationAnalysisLogEntry({
 }) {
   final beforeTypes =
       (deckAnalysis['type_distribution'] as Map?)?.cast<String, dynamic>() ??
-          const <String, dynamic>{};
+      const <String, dynamic>{};
   final afterTypes =
       (postAnalysis?['type_distribution'] as Map?)?.cast<String, dynamic>() ??
-          const <String, dynamic>{};
+      const <String, dynamic>{};
   final validationJson = validationReport?.toJson();
   final validationFromQualityError = qualityError?['validation'];
-  final validationScoreCandidate = validationJson?['validation_score'] ??
+  final validationScoreCandidate =
+      validationJson?['validation_score'] ??
       validationJson?['score'] ??
       (validationFromQualityError is Map
           ? validationFromQualityError['validation_score'] ??
@@ -46,7 +47,8 @@ Map<String, dynamic> buildOptimizationAnalysisLogEntry({
           : null);
   final validationScore =
       validationReport?.score ?? _toNullableInt(validationScoreCandidate);
-  final validationVerdict = validationReport?.verdict ??
+  final validationVerdict =
+      validationReport?.verdict ??
       validationJson?['validation_verdict']?.toString() ??
       validationJson?['verdict']?.toString() ??
       (validationFromQualityError is Map
@@ -54,18 +56,16 @@ Map<String, dynamic> buildOptimizationAnalysisLogEntry({
               validationFromQualityError['verdict']?.toString()
           : null) ??
       (statusCode == 200 ? 'aprovado' : 'rejeitado');
-  final qualityReasons = qualityError?['reasons'] is List
-      ? (qualityError?['reasons'] as List).map((e) => '$e').toList()
-      : const <String>[];
+  final qualityReasons =
+      qualityError?['reasons'] is List
+          ? (qualityError?['reasons'] as List).map((e) => '$e').toList()
+          : const <String>[];
 
   final acceptedPairs = <Map<String, dynamic>>[];
   final pairCount =
       removals.length < additions.length ? removals.length : additions.length;
   for (var i = 0; i < pairCount; i++) {
-    acceptedPairs.add({
-      'remove': removals[i],
-      'add': additions[i],
-    });
+    acceptedPairs.add({'remove': removals[i], 'add': additions[i]});
   }
 
   return {
@@ -74,7 +74,8 @@ Map<String, dynamic> buildOptimizationAnalysisLogEntry({
     'commander_name': commanderName,
     'commander_colors': commanderColors,
     'initial_card_count': _extractDeckCardCount(deckAnalysis),
-    'final_card_count': _extractDeckCardCount(postAnalysis) ??
+    'final_card_count':
+        _extractDeckCardCount(postAnalysis) ??
         _extractDeckCardCount(deckAnalysis),
     'operation_mode': operationMode,
     'target_archetype': targetArchetype,
@@ -117,15 +118,12 @@ Map<String, dynamic> buildOptimizationAnalysisLogEntry({
       'blocked_by_bracket': blockedByBracket,
       'status_code': statusCode,
     },
-    'role_delta': {
-      'before': beforeTypes,
-      'after': afterTypes,
-    },
+    'role_delta': {'before': beforeTypes, 'after': afterTypes},
     'execution_time_ms': executionTimeMs,
     'effectiveness_score': validationScore?.toDouble(),
     'improvements_achieved':
         (postAnalysis?['improvements'] as List?)?.map((e) => '$e').toList() ??
-            const <String>[],
+        const <String>[],
     'potential_issues': [
       if (qualityError != null) qualityError,
       if (blockedByColorIdentity.isNotEmpty)
@@ -262,7 +260,9 @@ Future<void> recordOptimizeAnalysisOutcome({
       },
     );
   } catch (e) {
-    Log.w('Falha ao persistir optimization_analysis_logs: $e');
+    Log.w(
+      'Falha ao persistir optimization_analysis_logs type=${e.runtimeType}',
+    );
   }
 }
 

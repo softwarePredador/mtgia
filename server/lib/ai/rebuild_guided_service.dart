@@ -1709,7 +1709,10 @@ class RebuildGuidedService {
       if (payload is Map) return payload.cast<String, dynamic>();
       return null;
     } catch (e) {
-      Log.w('Falha ao carregar commander_reference_profile para rebuild: $e');
+      Log.w(
+        'Falha ao carregar commander_reference_profile para rebuild '
+        'type=${e.runtimeType}',
+      );
       return null;
     }
   }

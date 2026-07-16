@@ -209,7 +209,7 @@ class ThemeContextualRulesService {
       );
       return result.map((row) => ThemeContextualRule.fromRow(row)).toList();
     } catch (e) {
-      Log.w('ThemeContextualRules: erro: $e');
+      Log.w('ThemeContextualRules unavailable type=${e.runtimeType}');
       return [];
     }
   }

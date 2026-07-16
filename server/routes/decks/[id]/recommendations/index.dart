@@ -3,6 +3,8 @@ import 'package:dart_frog/dart_frog.dart';
 import 'package:postgres/postgres.dart';
 import 'package:dotenv/dotenv.dart';
 import '../../../../lib/deck_recommendations_route_support.dart';
+import '../../../../lib/logger.dart';
+import '../../../../lib/observability.dart';
 import '../../../../lib/openai_runtime_config.dart';
 import '../../../../lib/ai/edhrec_trend_service.dart';
 
@@ -14,7 +16,9 @@ Future<Response> onRequest(RequestContext context, String deckId) async {
 }
 
 Future<Response> _generateRecommendations(
-    RequestContext context, String deckId) async {
+  RequestContext context,
+  String deckId,
+) async {
   final pool = context.read<Pool>();
   final userId = context.read<String>();
   final env = _recommendationsEnv(context);
@@ -27,10 +31,7 @@ Future<Response> _generateRecommendations(
       userId: userId,
       apiKey: apiKey,
       aiConfig: aiConfig,
-      deckLoader: ({
-        required deckId,
-        required userId,
-      }) async {
+      deckLoader: ({required deckId, required userId}) async {
         final deckResult = await pool.execute(
           Sql.named('''
             SELECT name, format, description
@@ -51,17 +52,22 @@ Future<Response> _generateRecommendations(
         );
       },
       deckCardLoader: ({required deckId}) async {
-        final hasCardIntelligenceSnapshot =
-            await _hasTable(pool, 'card_intelligence_snapshot');
-        final cardSourceJoin = hasCardIntelligenceSnapshot
-            ? 'JOIN card_intelligence_snapshot c ON c.card_id = dc.card_id'
-            : 'JOIN cards c ON dc.card_id = c.id';
-        final functionalTagsSelect = hasCardIntelligenceSnapshot
-            ? 'c.function_tag_details AS functional_tags'
-            : await _functionalTagsSelectSql(pool);
-        final semanticV2Select = hasCardIntelligenceSnapshot
-            ? 'c.semantic_tags_v2 AS semantic_tags_v2'
-            : await _semanticV2SelectSql(pool);
+        final hasCardIntelligenceSnapshot = await _hasTable(
+          pool,
+          'card_intelligence_snapshot',
+        );
+        final cardSourceJoin =
+            hasCardIntelligenceSnapshot
+                ? 'JOIN card_intelligence_snapshot c ON c.card_id = dc.card_id'
+                : 'JOIN cards c ON dc.card_id = c.id';
+        final functionalTagsSelect =
+            hasCardIntelligenceSnapshot
+                ? 'c.function_tag_details AS functional_tags'
+                : await _functionalTagsSelectSql(pool);
+        final semanticV2Select =
+            hasCardIntelligenceSnapshot
+                ? 'c.semantic_tags_v2 AS semantic_tags_v2'
+                : await _semanticV2SelectSql(pool);
 
         final cardsResult = await pool.execute(
           Sql.named('''
@@ -141,13 +147,23 @@ Future<Response> _generateRecommendations(
       trendFinder: (commander) {
         return EdhrecTrendService(pool).getCardTrends(commander);
       },
+      providerLogDb: pool,
     );
     return Response.json(statusCode: result.statusCode, body: result.body);
-  } catch (e) {
-    print('[ERROR] Failed to generate recommendations: $e');
+  } catch (error, stackTrace) {
+    Log.e('[DECK_RECOMMENDATIONS] request failed type=${error.runtimeType}');
+    await captureRouteException(
+      context,
+      error,
+      stackTrace: stackTrace,
+      tags: const {'route': 'deck_recommendations'},
+    );
     return Response.json(
       statusCode: HttpStatus.internalServerError,
-      body: {'error': 'Failed to generate recommendations: $e'},
+      body: {
+        'error':
+            'Não foi possível gerar recomendações agora. Tente novamente em instantes.',
+      },
     );
   }
 }
@@ -234,12 +250,13 @@ Future<List<String>> _findCardsForCategory({
   bool landOnly = false,
 }) async {
   try {
-    final normalizedRoles = roles
-        .map((role) => role.trim().toLowerCase())
-        .where((role) => role.isNotEmpty)
-        .toSet()
-        .toList()
-      ..sort();
+    final normalizedRoles =
+        roles
+            .map((role) => role.trim().toLowerCase())
+            .where((role) => role.isNotEmpty)
+            .toSet()
+            .toList()
+          ..sort();
     final predicates = <String>[];
 
     if (normalizedRoles.isNotEmpty &&
@@ -278,12 +295,13 @@ Future<List<String>> _findCardsForCategory({
 
     if (predicates.isEmpty) return [];
 
-    final landFilter = landOnly
-        ? '''
+    final landFilter =
+        landOnly
+            ? '''
           AND c.type_line ILIKE '%land%'
           AND c.type_line NOT ILIKE '%basic%land%'
         '''
-        : '''
+            : '''
           AND c.type_line NOT ILIKE '%land%'
         ''';
 
@@ -308,9 +326,10 @@ Future<List<String>> _findCardsForCategory({
       '''),
       parameters: {
         'format': format.toLowerCase(),
-        'deck_colors': deckColors.isEmpty
-            ? null
-            : TypedValue(Type.textArray, deckColors.toList()..sort()),
+        'deck_colors':
+            deckColors.isEmpty
+                ? null
+                : TypedValue(Type.textArray, deckColors.toList()..sort()),
         'role_tags': TypedValue(Type.textArray, normalizedRoles),
         'limit_plus': limit + 20,
       },
@@ -326,7 +345,10 @@ Future<List<String>> _findCardsForCategory({
     }
     return candidates;
   } catch (e) {
-    print('[WARN] _findCardsForCategory error: $e');
+    Log.w(
+      '[DECK_RECOMMENDATIONS] category lookup unavailable '
+      'type=${e.runtimeType}',
+    );
     return [];
   }
 }

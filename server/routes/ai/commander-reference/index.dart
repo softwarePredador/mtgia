@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
@@ -18,9 +19,14 @@ import '../../../lib/ai/edhrec_service.dart';
 import '../../../lib/basic_land_utils.dart' as basic_lands;
 import '../../../lib/generated_deck_validation_service.dart';
 import '../../../lib/http_responses.dart';
+import '../../../lib/logger.dart';
 import '../../../lib/meta/meta_deck_card_list_support.dart';
 import '../../../lib/meta/meta_deck_format_support.dart';
 import '../../../lib/meta/mtgtop8_meta_support.dart';
+import '../../../lib/observability.dart';
+
+const _mtgTop8RequestTimeout = Duration(seconds: 5);
+const _mtgTop8RefreshBudget = Duration(seconds: 15);
 
 Future<Response> onRequest(RequestContext context) async {
   if (context.request.method != HttpMethod.get) {
@@ -375,13 +381,17 @@ Future<Response> onRequest(RequestContext context) async {
         if (refreshSummary != null) 'refresh': refreshSummary,
       },
     );
-  } catch (e) {
+  } catch (e, stackTrace) {
+    Log.e('[commander-reference] request failed type=${e.runtimeType}');
+    await captureRouteException(
+      context,
+      e,
+      stackTrace: stackTrace,
+      tags: const {'route': 'ai_commander_reference'},
+    );
     return Response.json(
       statusCode: HttpStatus.internalServerError,
-      body: {
-        'error': 'Failed to build commander reference model.',
-        'details': e.toString(),
-      },
+      body: {'error': 'Failed to build commander reference model.'},
     );
   }
 }
@@ -1163,25 +1173,40 @@ Future<Map<String, dynamic>> _refreshCommanderFromMtgTop8({
   var scannedEvents = 0;
   var scannedDecks = 0;
   var matchedCommander = false;
+  var timedOut = false;
+  final refreshStopwatch = Stopwatch()..start();
 
+  formatLoop:
   for (final formatCode in formats) {
+    if (refreshStopwatch.elapsed >= _mtgTop8RefreshBudget) {
+      timedOut = true;
+      break;
+    }
     final formatUrl = '$mtgTop8BaseUrl/format?f=$formatCode';
-    final formatRes = await http.get(Uri.parse(formatUrl));
-    if (formatRes.statusCode != 200) continue;
+    final formatRes = await _tryGetMtgTop8(Uri.parse(formatUrl));
+    if (formatRes == null || formatRes.statusCode != 200) continue;
 
     final formatDoc = html_parser.parse(formatRes.body);
     final eventLinks = extractRecentMtgTop8EventPaths(formatDoc, limit: 3);
 
     for (final eventPath in eventLinks) {
+      if (refreshStopwatch.elapsed >= _mtgTop8RefreshBudget) {
+        timedOut = true;
+        break formatLoop;
+      }
       scannedEvents += 1;
       final eventUrl = resolveMtgTop8Url(eventPath);
-      final eventRes = await http.get(Uri.parse(eventUrl));
-      if (eventRes.statusCode != 200) continue;
+      final eventRes = await _tryGetMtgTop8(Uri.parse(eventUrl));
+      if (eventRes == null || eventRes.statusCode != 200) continue;
 
       final eventDoc = html_parser.parse(eventRes.body);
       final rows = eventDoc.querySelectorAll('div.hover_tr').take(10).toList();
 
       for (final row in rows) {
+        if (refreshStopwatch.elapsed >= _mtgTop8RefreshBudget) {
+          timedOut = true;
+          break formatLoop;
+        }
         final parsedRow = parseMtgTop8EventDeckRow(
           row,
           defaultFormatCode: formatCode,
@@ -1198,8 +1223,8 @@ Future<Map<String, dynamic>> _refreshCommanderFromMtgTop8({
         if (exists.isNotEmpty) continue;
 
         final exportUrl = '$mtgTop8BaseUrl/mtgo?d=${parsedRow.deckId}';
-        final exportRes = await http.get(Uri.parse(exportUrl));
-        if (exportRes.statusCode != 200) continue;
+        final exportRes = await _tryGetMtgTop8(Uri.parse(exportUrl));
+        if (exportRes == null || exportRes.statusCode != 200) continue;
 
         final cardList = exportRes.body;
         if (!_deckListContainsCommander(cardList, commanderToken)) {
@@ -1233,7 +1258,24 @@ Future<Map<String, dynamic>> _refreshCommanderFromMtgTop8({
     'scanned_events': scannedEvents,
     'scanned_decks': scannedDecks,
     'matched_commander': matchedCommander,
+    'timed_out': timedOut,
+    'elapsed_ms': refreshStopwatch.elapsedMilliseconds,
   };
+}
+
+Future<http.Response?> _tryGetMtgTop8(Uri uri) async {
+  try {
+    return await http.get(uri).timeout(_mtgTop8RequestTimeout);
+  } on TimeoutException {
+    Log.w('[commander-reference] MTGTop8 request timed out');
+    return null;
+  } catch (error) {
+    Log.w(
+      '[commander-reference] MTGTop8 request unavailable '
+      'type=${error.runtimeType}',
+    );
+    return null;
+  }
 }
 
 bool _deckListContainsCommander(String cardList, String commanderToken) {

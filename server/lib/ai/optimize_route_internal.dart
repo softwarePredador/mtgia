@@ -257,7 +257,7 @@ Future<void> recordOptimizeAnalysisOutcome({
 }
 
 /// Processa o modo complete em background (async job).
-/// Chamada via `unawaited()` â€” NÃƒO bloqueia a resposta HTTP.
+/// Chamada via `unawaited()` - NÃO bloqueia a resposta HTTP.
 Future<void> processCompleteModeAsync({
   required String jobId,
   required Pool pool,
@@ -294,7 +294,7 @@ Future<void> processCompleteModeAsync({
     await OptimizeJobStore.progress(
       pool,
       jobId,
-      stage: 'Preparando referÃªncias do commander...',
+      stage: 'Preparando referências do commander...',
       stageNumber: 1,
     );
 
@@ -320,7 +320,7 @@ Future<void> processCompleteModeAsync({
       await OptimizeJobStore.progress(
         pool,
         jobId,
-        stage: 'Consultando IA para sugestÃµes...',
+        stage: 'Consultando IA para sugestões...',
         stageNumber: 2,
       );
       await telemetry.trackAsync(
@@ -339,13 +339,15 @@ Future<void> processCompleteModeAsync({
           coreCards: themeProfile.coreCards,
           maxTotal: maxTotal,
           state: state,
+          deckId: deckId,
+          userId: userId,
         ),
       );
     } else {
       await OptimizeJobStore.progress(
         pool,
         jobId,
-        stage: 'Pulando IA (modo determinÃ­stico)...',
+        stage: 'Pulando IA (modo determinístico)...',
         stageNumber: 2,
       );
     }
@@ -361,7 +363,7 @@ Future<void> processCompleteModeAsync({
     await OptimizeJobStore.progress(
       pool,
       jobId,
-      stage: 'Preenchendo com cartas sinÃ©rgicas...',
+      stage: 'Preenchendo com cartas sinérgicas...',
       stageNumber: 3,
     );
     await OptimizeJobStore.progress(
@@ -413,7 +415,7 @@ Future<void> processCompleteModeAsync({
         await OptimizeJobStore.fail(
           pool,
           jobId,
-          error: 'Complete mode nÃ£o atingiu qualidade mÃ­nima.',
+          error: 'Complete mode não atingiu qualidade mínima.',
           qualityError: qualityError.cast<String, dynamic>(),
         );
         return;
@@ -467,7 +469,7 @@ Future<void> processCompleteModeAsync({
       }
       await OptimizeJobStore.complete(pool, jobId, result: responseBody);
     } else {
-      // Fallback: se por algum motivo nÃ£o veio como complete
+      // Fallback: se por algum motivo não veio como complete
       if (cacheKey != null && cacheKey.isNotEmpty) {
         jsonResponse['cache'] = {'hit': false, 'cache_key': cacheKey};
       }
@@ -497,8 +499,12 @@ Future<void> processCompleteModeAsync({
       }
       await OptimizeJobStore.complete(pool, jobId, result: jsonResponse);
     }
-  } catch (e, stackTrace) {
-    Log.e('Background optimize job $jobId failed: $e\n$stackTrace');
-    await OptimizeJobStore.fail(pool, jobId, error: e.toString());
+  } catch (e) {
+    Log.e('Background optimize job $jobId failed type=${e.runtimeType}');
+    await OptimizeJobStore.fail(
+      pool,
+      jobId,
+      error: 'Falha interna ao processar a otimização.',
+    );
   }
 }

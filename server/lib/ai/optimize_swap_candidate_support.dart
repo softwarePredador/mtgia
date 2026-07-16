@@ -683,7 +683,10 @@ Future<Map<String, int>> _loadRejectedOptimizeAdditionCounts({
         (row[0] as String?) ?? '': (row[1] as int?) ?? 0,
     }..removeWhere((key, value) => key.trim().isEmpty || value <= 0);
   } catch (e) {
-    Log.w('Falha ao carregar penalidades historicas de optimize: $e');
+    Log.w(
+      'Falha ao carregar penalidades historicas de optimize '
+      'type=${e.runtimeType}',
+    );
     return const <String, int>{};
   }
 }

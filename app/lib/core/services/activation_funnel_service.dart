@@ -13,6 +13,8 @@ class ActivationFunnelService {
     String source = 'app',
     Map<String, dynamic>? metadata,
   }) async {
+    if (!ApiClient.hasAuthenticationToken) return;
+
     try {
       await _apiClient.post('/users/me/activation-events', {
         'event_name': eventName,

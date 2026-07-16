@@ -565,7 +565,10 @@ Future<DeckThemeProfileResult> detectThemeProfile(
         };
       }
     } catch (e) {
-      Log.w('[_detectThemeProfile] Falha ao buscar meta insights: $e');
+      Log.w(
+        '[_detectThemeProfile] Falha ao buscar meta insights '
+        'type=${e.runtimeType}',
+      );
     }
   }
 

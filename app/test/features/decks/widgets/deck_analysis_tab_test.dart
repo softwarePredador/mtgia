@@ -262,7 +262,7 @@ void main() {
     expect(find.text('Atualizar análise'), findsOneWidget);
   });
 
-  testWidgets('auto-generates AI summary for complete unanalyzed decks', (
+  testWidgets('generates AI summary only after an explicit player action', (
     tester,
   ) async {
     final deck = _makeDeck(
@@ -292,6 +292,10 @@ void main() {
     );
 
     await tester.pumpWidget(_subject(deck, apiClient: apiClient));
+    await tester.pumpAndSettle();
+
+    expect(apiClient.postRequests, isEmpty);
+    await tester.tap(find.text('Gerar análise'));
     await tester.pumpAndSettle();
 
     expect(apiClient.postRequests, hasLength(1));

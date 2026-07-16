@@ -11,9 +11,12 @@ Map<String, dynamic> evaluateCommanderAiPromptSuite(
   int? minimumScoreOverride,
 }) {
   final cases = _mapList(suite['cases']);
-  final selectedCases = onlyCaseId == null
-      ? cases
-      : cases.where((entry) => entry['id']?.toString() == onlyCaseId).toList();
+  final selectedCases =
+      onlyCaseId == null
+          ? cases
+          : cases
+              .where((entry) => entry['id']?.toString() == onlyCaseId)
+              .toList();
   if (selectedCases.isEmpty) {
     throw ArgumentError('No eval case matched: ${onlyCaseId ?? '(none)'}');
   }
@@ -33,13 +36,14 @@ Map<String, dynamic> evaluateCommanderAiPromptSuite(
     );
   }
 
-  final score = evaluated.isEmpty
-      ? 0
-      : (evaluated
-                  .map((entry) => _intValue(entry['score']) ?? 0)
-                  .reduce((a, b) => a + b) /
-              evaluated.length)
-          .round();
+  final score =
+      evaluated.isEmpty
+          ? 0
+          : (evaluated
+                      .map((entry) => _intValue(entry['score']) ?? 0)
+                      .reduce((a, b) => a + b) /
+                  evaluated.length)
+              .round();
   final failedCases = evaluated
       .where((entry) => entry['status'] != 'pass')
       .map((entry) => entry['id']?.toString() ?? 'unknown')
@@ -364,14 +368,16 @@ Map<String, dynamic> loadCommanderAiPromptEvalFixture(String path) {
 }
 
 String commanderAiPromptEvalMarkdown(Map<String, dynamic> report) {
-  final buffer = StringBuffer()
-    ..writeln('# Commander AI Prompt Eval')
-    ..writeln()
-    ..writeln('- status: `${report['status']}`')
-    ..writeln('- score: `${report['score']}`')
-    ..writeln(
-        '- cases: `${report['passed_case_count']}/${report['case_count']}`')
-    ..writeln();
+  final buffer =
+      StringBuffer()
+        ..writeln('# Commander AI Prompt Eval')
+        ..writeln()
+        ..writeln('- status: `${report['status']}`')
+        ..writeln('- score: `${report['score']}`')
+        ..writeln(
+          '- cases: `${report['passed_case_count']}/${report['case_count']}`',
+        )
+        ..writeln();
   for (final testCase in _mapList(report['cases'])) {
     buffer
       ..writeln('## ${testCase['id']}')
@@ -382,7 +388,8 @@ String commanderAiPromptEvalMarkdown(Map<String, dynamic> report) {
       ..writeln('- swaps: `${testCase['swap_count']}`')
       ..writeln('- purchase_total_brl: `${testCase['purchase_total_brl']}`')
       ..writeln(
-          '- collection_match_count: `${testCase['collection_match_count']}`')
+        '- collection_match_count: `${testCase['collection_match_count']}`',
+      )
       ..writeln();
     final failures = _mapList(testCase['failures']);
     if (failures.isEmpty) {
@@ -417,10 +424,7 @@ int _scoreChecks(List<Map<String, dynamic>> checks) {
 Map<String, Map<String, dynamic>> _catalog(dynamic raw) {
   final source = _mapValue(raw);
   return source.map(
-    (key, value) => MapEntry(
-      _normalizeName(key),
-      _mapValue(value),
-    ),
+    (key, value) => MapEntry(_normalizeName(key), _mapValue(value)),
   );
 }
 
@@ -454,15 +458,13 @@ Map<String, int> _roleCounts(
   return counts;
 }
 
-List<String> _applySwaps(
-  List<String> deck,
-  List<Map<String, String>> swaps,
-) {
+List<String> _applySwaps(List<String> deck, List<Map<String, String>> swaps) {
   final updated = deck.toList();
   for (final swap in swaps) {
     final outKey = _normalizeName(swap['out'] ?? '');
-    final index =
-        updated.indexWhere((entry) => _normalizeName(entry) == outKey);
+    final index = updated.indexWhere(
+      (entry) => _normalizeName(entry) == outKey,
+    );
     if (index >= 0) {
       updated[index] = swap['in'] ?? updated[index];
     }
@@ -498,7 +500,7 @@ String _combinedSwapText(Map<String, dynamic> swap) {
 
 Set<String> _explanationSignals(String text) {
   final signals = <String>{};
-  final lower = text.toLowerCase();
+  final lower = _foldEvidenceText(text);
   if (_containsAny(lower, const ['function', 'funcao', 'role', 'lane'])) {
     signals.add('function');
   }
@@ -515,6 +517,17 @@ Set<String> _explanationSignals(String text) {
     signals.add('bracket');
   }
   return signals;
+}
+
+String _foldEvidenceText(String value) {
+  return value
+      .toLowerCase()
+      .replaceAll(RegExp(r'[áàâãä]'), 'a')
+      .replaceAll(RegExp(r'[éèêë]'), 'e')
+      .replaceAll(RegExp(r'[íìîï]'), 'i')
+      .replaceAll(RegExp(r'[óòôõö]'), 'o')
+      .replaceAll(RegExp(r'[úùûü]'), 'u')
+      .replaceAll('ç', 'c');
 }
 
 bool _containsUnsupportedBattleClaim(String text) {
@@ -538,9 +551,7 @@ Set<String> _identitySet(dynamic raw) {
 }
 
 Map<String, dynamic> ifPresent(Map<String, dynamic> source) {
-  return Map.fromEntries(
-    source.entries.where((entry) => entry.value != null),
-  );
+  return Map.fromEntries(source.entries.where((entry) => entry.value != null));
 }
 
 Map<String, int> _intMap(dynamic raw) {

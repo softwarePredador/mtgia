@@ -195,12 +195,25 @@ Retorne APENAS um objeto JSON. Sem markdown, sem intro.
       "out": "Nome Exato da Carta a Remover",
       "in": "Nome Exato da Carta a Adicionar",
       "category": "Mana Ramp" | "Card Draw" | "Removal" | "Synergy" | "Land Base" | "Win Condition" | "Protection" | "Board Wipe",
-      "reasoning": "Explicação técnica e direta. Ex: 'X custa 4 manas e faz o mesmo que Y que custa 2. Y também tem sinergia com o Comandante pois é um Artefato.'",
+      "reasoning": "Use obrigatoriamente os cinco rótulos: 'Função:', 'Risco:', 'Curva:', 'Preço:' e 'Bracket:'. Explique em cada rótulo a preservação da lane, o tradeoff, o impacto de mana value, orçamento/coleção e adequação ao bracket.",
       "priority": "High" | "Medium" | "Low"
     },
     ... (Tente atingir o número especificado em "suggested_swaps", mas PODE retornar menos quando não houver swaps seguros e coerentes com tema/função.)
   ]
 }
+
+Cada `reasoning` deve conter explicitamente os cinco rótulos acima, mesmo quando
+um deles não alterar a decisão (por exemplo, `Preço: carta já possuída, custo
+adicional BRL 0`). Não declare prova de battle, win rate ou superioridade
+empírica sem evidência de battle fornecida no contexto.
+
+COLEÇÃO E ORÇAMENTO
+
+- Quando `prefer_collection=true`, priorize candidatos com `collection_match=true`
+  ou `owned_quantity > 0` sobre alternativas equivalentes não possuídas.
+- Se existir candidato possuído, legal e da mesma lane funcional, use ao menos um
+  deles antes de sugerir compra.
+- Respeite `budget_limit_brl` como limite total de compra, não como limite por carta.
 
 
 REGRAS FINAIS DE SEGURANÇA

@@ -202,7 +202,10 @@ Future<void> prepareCompleteCommanderSeed({
         }
       }
     } catch (e) {
-      Log.w('Falha ao carregar EDHREC live para fallback complete: $e');
+      Log.w(
+        'Falha ao carregar EDHREC live para fallback complete '
+        'type=${e.runtimeType}',
+      );
     }
   }
 }
@@ -296,6 +299,8 @@ Future<void> runCompleteAiSuggestionLoop({
   required List<String> coreCards,
   required int maxTotal,
   required CompleteBuildAccumulator state,
+  required String deckId,
+  required String? userId,
   int maxIterations = 4,
 }) async {
   if (optimizer == null) {
@@ -368,13 +373,15 @@ Future<void> runCompleteAiSuggestionLoop({
             detectedTheme: detectedTheme,
             coreCards: coreCards,
             metaEvidenceContext: state.commanderMetaEvidenceText,
+            userId: userId,
+            deckId: deckId,
           )
           .timeout(aiTimeout);
     } catch (e) {
       Log.w(
         'Falha no completeDeck da IA; aplicando fallback determinístico. '
         'iteration=${state.iterations} missing=$missingNow requested=$requestedAdditions '
-        'timeout_s=${aiTimeout.inSeconds} error=$e',
+        'timeout_s=${aiTimeout.inSeconds} type=${e.runtimeType}',
       );
       break;
     }
@@ -925,7 +932,7 @@ Future<void> fillCompleteDeckRemainder({
 
       Log.d('  Spells não-terreno adicionadas: $actuallyAddedSpells');
     } catch (e) {
-      Log.w('Falha ao buscar spells sinérgicas: $e');
+      Log.w('Falha ao buscar spells sinérgicas type=${e.runtimeType}');
     }
   }
 
@@ -1418,7 +1425,10 @@ Future<Map<String, dynamic>> buildCompleteFinalResponse({
       );
       postAnalysisComplete = postAnalyzer.generateAnalysis();
     } catch (e) {
-      Log.w('Falha ao gerar post_analysis para modo complete: $e');
+      Log.w(
+        'Falha ao gerar post_analysis para modo complete '
+        'type=${e.runtimeType}',
+      );
     }
   }
 

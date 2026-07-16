@@ -8,6 +8,8 @@ import '../../../lib/ai/commander_reference_helpers.dart';
 import '../../../lib/ai/commander_reference_profile_support.dart';
 import '../../../lib/generated_deck_validation_service.dart';
 import '../../../lib/http_responses.dart';
+import '../../../lib/logger.dart';
+import '../../../lib/observability.dart';
 
 Future<Response> onRequest(RequestContext context) async {
   if (context.request.method != HttpMethod.get) {
@@ -21,12 +23,14 @@ Future<Response> onRequest(RequestContext context) async {
     final pool = context.read<Pool>();
     if (commander.isEmpty) {
       final activeDecks = await _loadActiveLearnedDeckSummaries(pool);
-      return Response.json(body: {
-        'available': activeDecks.isNotEmpty,
-        'source': 'pg_commander_learned_deck_summary',
-        'count': activeDecks.length,
-        'commanders': activeDecks,
-      });
+      return Response.json(
+        body: {
+          'available': activeDecks.isNotEmpty,
+          'source': 'pg_commander_learned_deck_summary',
+          'count': activeDecks.length,
+          'commanders': activeDecks,
+        },
+      );
     }
 
     final learnedDeck = await _loadActiveLearnedDeck(
@@ -34,19 +38,21 @@ Future<Response> onRequest(RequestContext context) async {
       commanderName: commander,
     );
     if (learnedDeck == null) {
-      return Response.json(body: {
-        'commander': commander,
-        'available': false,
-        'message':
-            'Nenhum deck aprendido ativo encontrado para esse comandante.',
-      });
+      return Response.json(
+        body: {
+          'commander': commander,
+          'available': false,
+          'message':
+              'Nenhum deck aprendido ativo encontrado para esse comandante.',
+        },
+      );
     }
 
     final roleMetadataResult =
         await canonicalizeCommanderLearnedDeckMetadataWithStatus(
-      pool,
-      learnedDeck,
-    );
+          pool,
+          learnedDeck,
+        );
     final roleMetadata = roleMetadataResult.metadata;
     final recommendedDeck = await _buildRecommendedDeck(
       pool: pool,
@@ -55,23 +61,29 @@ Future<Response> onRequest(RequestContext context) async {
       roleSummarySource: roleMetadataResult.source,
       roleSummaryFallbackReason: roleMetadataResult.fallbackReason,
     );
-    return Response.json(body: {
-      'commander': learnedDeck.commanderName,
-      'available': true,
-      'source': 'pg_commander_learned_decks',
-      'promoted_deck': _promotedDeckSummary(
-        learnedDeck,
-        roleMetadata: roleMetadata,
-        roleSummarySource: roleMetadataResult.source,
-        roleSummaryFallbackReason: roleMetadataResult.fallbackReason,
-      ),
-      'recommended_deck': recommendedDeck,
-    });
-  } catch (error) {
-    return internalServerError(
-      'Failed to load commander learning deck.',
-      details: error,
+    return Response.json(
+      body: {
+        'commander': learnedDeck.commanderName,
+        'available': true,
+        'source': 'pg_commander_learned_decks',
+        'promoted_deck': _promotedDeckSummary(
+          learnedDeck,
+          roleMetadata: roleMetadata,
+          roleSummarySource: roleMetadataResult.source,
+          roleSummaryFallbackReason: roleMetadataResult.fallbackReason,
+        ),
+        'recommended_deck': recommendedDeck,
+      },
     );
+  } catch (error, stackTrace) {
+    Log.e('[commander-learning] request failed type=${error.runtimeType}');
+    await captureRouteException(
+      context,
+      error,
+      stackTrace: stackTrace,
+      tags: const {'route': 'ai_commander_learning'},
+    );
+    return internalServerError('Failed to load commander learning deck.');
   }
 }
 
@@ -106,14 +118,14 @@ Future<CommanderLearnedDeckInput?> _loadActiveLearnedDeck({
         ORDER BY promoted_at DESC NULLS LAST, updated_at DESC
         LIMIT 10
       '''),
-      parameters: {
-        'commander': normalizeCommanderReferenceName(commanderName),
-      },
+      parameters: {'commander': normalizeCommanderReferenceName(commanderName)},
     );
     if (result.isEmpty) return null;
     for (final row in result) {
-      final candidate =
-          _learnedDeckFromRow(row, fallbackCommanderName: commanderName);
+      final candidate = _learnedDeckFromRow(
+        row,
+        fallbackCommanderName: commanderName,
+      );
       if (isCompleteCommanderLearnedDeckInput(candidate)) {
         return candidate;
       }
@@ -199,25 +211,28 @@ Future<List<Map<String, dynamic>>> _loadActiveLearnedDeckSummaries(
       ORDER BY primary_deck.commander_name ASC
     ''');
 
-    return result.map((row) {
-      final archetypes = _stringList(row[12]);
-      return <String, dynamic>{
-        'commander': row[0]?.toString(),
-        'deck_name': row[1]?.toString(),
-        'source_system': row[2]?.toString(),
-        'source_ref': row[3]?.toString(),
-        'source_url': row[4]?.toString(),
-        'archetype': row[5]?.toString() ??
-            (archetypes.isEmpty ? null : archetypes.first),
-        'card_count': intValue(row[6]),
-        'score': nullableDouble(row[7]),
-        'legal_status': row[8]?.toString(),
-        'promoted_at': row[9]?.toString(),
-        'last_synced_at': row[10]?.toString(),
-        'active_learned_deck_count': intValue(row[11]),
-        'learned_archetypes': archetypes,
-      };
-    }).toList(growable: false);
+    return result
+        .map((row) {
+          final archetypes = _stringList(row[12]);
+          return <String, dynamic>{
+            'commander': row[0]?.toString(),
+            'deck_name': row[1]?.toString(),
+            'source_system': row[2]?.toString(),
+            'source_ref': row[3]?.toString(),
+            'source_url': row[4]?.toString(),
+            'archetype':
+                row[5]?.toString() ??
+                (archetypes.isEmpty ? null : archetypes.first),
+            'card_count': intValue(row[6]),
+            'score': nullableDouble(row[7]),
+            'legal_status': row[8]?.toString(),
+            'promoted_at': row[9]?.toString(),
+            'last_synced_at': row[10]?.toString(),
+            'active_learned_deck_count': intValue(row[11]),
+            'learned_archetypes': archetypes,
+          };
+        })
+        .toList(growable: false);
   } catch (error) {
     if (isUndefinedLearnedDeckTableError(error)) return const [];
     rethrow;
@@ -261,8 +276,10 @@ Future<Map<String, dynamic>> _buildRecommendedDeck({
   final normalizedCommander = normalizeCommanderReferenceName(commanderName);
   final deckEntries = learnedDeck.cards;
   final mainCards = deckEntries
-      .where((card) =>
-          normalizeCommanderReferenceName(card.name) != normalizedCommander)
+      .where(
+        (card) =>
+            normalizeCommanderReferenceName(card.name) != normalizedCommander,
+      )
       .map((card) => {'name': card.name, 'quantity': card.quantity})
       .toList(growable: false);
   final metadataByName = await loadCardMetadataByName(
@@ -307,8 +324,8 @@ Future<Map<String, dynamic>> _buildRecommendedDeck({
       'role_summary_fallback_reason': roleSummaryFallbackReason,
     'commander': {
       'name': commanderName,
-      'commander_legal_status': metadataByName[normalizedCommander]
-          ?['commander_legal_status'],
+      'commander_legal_status':
+          metadataByName[normalizedCommander]?['commander_legal_status'],
     },
     'total_cards_including_commander': decklist.fold<int>(
       0,
@@ -330,25 +347,24 @@ Map<String, dynamic> _promotedDeckSummary(
   required Map<String, dynamic> roleMetadata,
   required String roleSummarySource,
   required String? roleSummaryFallbackReason,
-}) =>
-    {
-      'commander': deck.commanderName,
-      'deck_name': deck.deckName,
-      'source_system': deck.sourceSystem,
-      'source_ref': deck.sourceRef,
-      'source_url': deck.sourceUrl,
-      'archetype': deck.archetype,
-      'card_count': deck.cardCount,
-      'score': deck.score,
-      'legal_status': deck.legalStatus,
-      'promoted_at': deck.promotedAt?.toIso8601String(),
-      'last_synced_at': deck.updatedAt?.toIso8601String(),
-      'win_conditions': _winConditions(deck),
-      'role_summary': _roleSummaryFromMetadata(roleMetadata),
-      'role_summary_source': roleSummarySource,
-      if (roleSummaryFallbackReason != null)
-        'role_summary_fallback_reason': roleSummaryFallbackReason,
-    };
+}) => {
+  'commander': deck.commanderName,
+  'deck_name': deck.deckName,
+  'source_system': deck.sourceSystem,
+  'source_ref': deck.sourceRef,
+  'source_url': deck.sourceUrl,
+  'archetype': deck.archetype,
+  'card_count': deck.cardCount,
+  'score': deck.score,
+  'legal_status': deck.legalStatus,
+  'promoted_at': deck.promotedAt?.toIso8601String(),
+  'last_synced_at': deck.updatedAt?.toIso8601String(),
+  'win_conditions': _winConditions(deck),
+  'role_summary': _roleSummaryFromMetadata(roleMetadata),
+  'role_summary_source': roleSummarySource,
+  if (roleSummaryFallbackReason != null)
+    'role_summary_fallback_reason': roleSummaryFallbackReason,
+};
 
 List<Map<String, dynamic>> _winConditions(CommanderLearnedDeckInput deck) {
   final wincons = <Map<String, dynamic>>[];
@@ -426,9 +442,10 @@ List<String> _stringList(Object? value) {
             .toList(growable: false);
       }
     } catch (_) {}
-    final normalized = text.startsWith('{') && text.endsWith('}')
-        ? text.substring(1, text.length - 1)
-        : text;
+    final normalized =
+        text.startsWith('{') && text.endsWith('}')
+            ? text.substring(1, text.length - 1)
+            : text;
     return normalized
         .split(RegExp(r'\s*,\s*'))
         .map((entry) => entry.trim())

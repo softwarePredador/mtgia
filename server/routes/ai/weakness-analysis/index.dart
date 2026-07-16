@@ -5,6 +5,8 @@ import '../../../lib/http_responses.dart';
 import '../../../lib/ai/optimization_functional_roles.dart';
 import '../../../lib/ai/commander_spellbook_service.dart';
 import '../../../lib/ai/deck_advanced_analysis.dart';
+import '../../../lib/logger.dart';
+import '../../../lib/observability.dart';
 
 /// Endpoint para análise de fraquezas do deck
 ///
@@ -502,7 +504,9 @@ Future<Response> onRequest(RequestContext context) async {
         commanderColorIdentity: recommendationColors,
       );
     } catch (e) {
-      print('[weakness-analysis] combo detection falhou: $e');
+      Log.w(
+        '[weakness-analysis] combo detection unavailable type=${e.runtimeType}',
+      );
     }
 
     final completeCombos = comboResult.complete;
@@ -646,9 +650,10 @@ Future<Response> onRequest(RequestContext context) async {
         );
       }
     } catch (e) {
-      print('[ERROR] handler: $e');
-      // Não falha se não conseguir salvar
-      print('Aviso: Não foi possível salvar relatório de fraquezas: $e');
+      // O relatório continua útil mesmo quando o histórico não pode ser salvo.
+      Log.w(
+        '[weakness-analysis] persistence unavailable type=${e.runtimeType}',
+      );
     }
 
     final weaknessHistory = await _loadWeaknessHistory(pool, deckId);
@@ -716,7 +721,13 @@ Future<Response> onRequest(RequestContext context) async {
       },
     );
   } catch (e, stack) {
-    print('Erro em weakness-analysis: $e\n$stack');
+    Log.e('[weakness-analysis] request failed type=${e.runtimeType}');
+    await captureRouteException(
+      context,
+      e,
+      stackTrace: stack,
+      tags: const {'route': 'ai_weakness_analysis'},
+    );
     return internalServerError('Failed to analyze deck weaknesses');
   }
 }
@@ -769,7 +780,9 @@ Future<Map<String, dynamic>> _loadWeaknessHistory(
           }).toList(),
     };
   } catch (e) {
-    print('[weakness-analysis] weakness history unavailable: $e');
+    Log.w(
+      '[weakness-analysis] weakness history unavailable type=${e.runtimeType}',
+    );
     return const {'stored_reports': 0, 'by_severity': {}, 'recent': []};
   }
 }
@@ -879,7 +892,10 @@ Future<List<String>> _findWeaknessRecommendations({
 
     if (recommendations.isNotEmpty) return recommendations;
   } catch (e) {
-    print('[weakness-analysis] recommendation lookup unavailable: $e');
+    Log.w(
+      '[weakness-analysis] recommendation lookup unavailable '
+      'type=${e.runtimeType}',
+    );
   }
 
   return fallback.take(limit).toList();

@@ -82,7 +82,9 @@ Future<OptimizeDeckRequestResult> requestOptimizeDeck(
     final data = asDynamicMap(response.data);
     final jobId = data['job_id']?.toString();
     if (jobId == null || jobId.isEmpty) {
-      throw Exception('Job assíncrono inválido retornado pelo servidor.');
+      throw Exception(
+        'Não foi possível iniciar a otimização agora. Tente novamente em instantes.',
+      );
     }
     final pollInterval = data['poll_interval_ms'] as int? ?? 2000;
     final totalStages = data['total_stages'] as int? ?? 6;
@@ -191,7 +193,14 @@ Future<RebuildDeckRequestResult> requestRebuildDeck(
     );
   }
 
-  throw Exception('Falha ao reconstruir deck: ${response.statusCode}');
+  throw Exception(
+    FriendlyErrorMapper.fromApiResponse(
+      response,
+      context: FriendlyErrorContext.deckOptimize,
+      fallback:
+          'Não foi possível reconstruir este deck agora. Tente novamente em instantes.',
+    ),
+  );
 }
 
 Future<OptimizeJobPollResult> pollOptimizeJobRequest(
@@ -248,7 +257,9 @@ Future<OptimizeJobPollResult> pollOptimizeJobRequest(
   }
 
   if (response.statusCode == 404) {
-    throw Exception('Job de otimização expirou ou não foi encontrado.');
+    throw Exception(
+      'A otimização demorou mais que o esperado. Inicie uma nova tentativa.',
+    );
   }
 
   throw Exception(

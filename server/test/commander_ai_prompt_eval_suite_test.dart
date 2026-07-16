@@ -9,10 +9,13 @@ void main() {
     late Map<String, dynamic> fixture;
 
     setUpAll(() {
-      fixture = jsonDecode(
-        File('test/fixtures/commander_ai_prompt_eval_cases.json')
-            .readAsStringSync(),
-      ) as Map<String, dynamic>;
+      fixture =
+          jsonDecode(
+                File(
+                  'test/fixtures/commander_ai_prompt_eval_cases.json',
+                ).readAsStringSync(),
+              )
+              as Map<String, dynamic>;
     });
 
     test('passes all fixed product eval cases', () {
@@ -34,8 +37,8 @@ void main() {
             'in': 'Feed the Swarm',
             'category': 'Removal',
             'reasoning':
-                'Funcao: removal barato. Risco: corta engine importante. Curva: baixa. Preco: BRL 6. Bracket: bracket 3.'
-          }
+                'Funcao: removal barato. Risco: corta engine importante. Curva: baixa. Preco: BRL 6. Bracket: bracket 3.',
+          },
         ],
       };
 
@@ -47,9 +50,10 @@ void main() {
 
       expect(report['status'], 'fail');
       final firstCase = (report['cases'] as List).single as Map;
-      final failureCodes = ((firstCase['failures'] as List).cast<Map>())
-          .map((entry) => entry['code'])
-          .toSet();
+      final failureCodes =
+          ((firstCase['failures'] as List).cast<Map>())
+              .map((entry) => entry['code'])
+              .toSet();
       expect(failureCodes, contains('swap_1_protected_anchor_preserved'));
       expect(failureCodes, contains('swap_1_not_blocked_by_battle_feedback'));
     });
@@ -62,8 +66,8 @@ void main() {
             'out': 'Cultivate',
             'in': 'Nature\'s Lore',
             'category': 'Mana Ramp',
-            'reasoning': 'Better ramp.'
-          }
+            'reasoning': 'Better ramp.',
+          },
         ],
       };
 
@@ -75,10 +79,45 @@ void main() {
 
       expect(report['status'], 'fail');
       final firstCase = (report['cases'] as List).single as Map;
-      final failureCodes = ((firstCase['failures'] as List).cast<Map>())
-          .map((entry) => entry['code'])
-          .toSet();
+      final failureCodes =
+          ((firstCase['failures'] as List).cast<Map>())
+              .map((entry) => entry['code'])
+              .toSet();
       expect(failureCodes, contains('swap_1_rich_explanation'));
+    });
+
+    test('accepts accented Portuguese evidence labels', () {
+      final lorehold = (fixture['cases'] as List)
+          .cast<Map<String, dynamic>>()
+          .firstWhere(
+            (testCase) =>
+                testCase['id'] == 'lorehold_protected_anchor_bracket2',
+          );
+      final candidate =
+          jsonDecode(jsonEncode(lorehold['candidate_response']))
+              as Map<String, dynamic>;
+      for (final swap in (candidate['swaps'] as List).cast<Map>()) {
+        swap['reasoning'] =
+            'Função: preserva a lane. Risco: baixo. Curva: reduz mana value. '
+            'Preço: já possuída, BRL 0. Bracket: adequada ao nível 2.';
+      }
+
+      final evaluated = evaluateCommanderAiPromptCase(
+        lorehold,
+        candidateResponse: candidate,
+        minimumScore: 90,
+      );
+      final failureCodes =
+          ((evaluated['failures'] as List).cast<Map>())
+              .map((entry) => entry['code'])
+              .toSet();
+
+      expect(
+        failureCodes.where(
+          (code) => code.toString().endsWith('_rich_explanation'),
+        ),
+        isEmpty,
+      );
     });
 
     test('renders markdown report with case summaries', () {

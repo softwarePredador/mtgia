@@ -3,6 +3,8 @@ import 'package:dotenv/dotenv.dart';
 import 'package:postgres/postgres.dart';
 
 import '../../../../lib/http_responses.dart';
+import '../../../../lib/logger.dart';
+import '../../../../lib/observability.dart';
 
 Future<Response> onRequest(RequestContext context) async {
   if (context.request.method != HttpMethod.get) {
@@ -20,11 +22,7 @@ Future<Response> onRequest(RequestContext context) async {
       return badRequest(parsed.error!);
     }
 
-    final isAdmin = await _isAdminUser(
-      pool: pool,
-      userId: userId,
-      env: env,
-    );
+    final isAdmin = await _isAdminUser(pool: pool, userId: userId, env: env);
 
     final includeGlobal = parsed.includeGlobal;
     if (includeGlobal && !isAdmin) {
@@ -49,10 +47,7 @@ Future<Response> onRequest(RequestContext context) async {
           'table': 'ai_optimize_fallback_telemetry',
           'window_days': parsed.days,
           'filters': parsed.toJson(),
-          'scope': {
-            'include_global': includeGlobal,
-            'is_admin': isAdmin,
-          },
+          'scope': {'include_global': includeGlobal, 'is_admin': isAdmin},
           if (includeGlobal) 'global': empty,
           if (includeGlobal) 'window': empty,
           'current_user_window': empty,
@@ -80,7 +75,11 @@ Future<Response> onRequest(RequestContext context) async {
     List<Map<String, dynamic>>? windowByDay;
 
     if (includeGlobal) {
-      global = await _loadAggregate(pool, mode: parsed.mode, deckId: parsed.deckId);
+      global = await _loadAggregate(
+        pool,
+        mode: parsed.mode,
+        deckId: parsed.deckId,
+      );
       window = await _loadAggregate(
         pool,
         days: parsed.days,
@@ -97,33 +96,41 @@ Future<Response> onRequest(RequestContext context) async {
       );
     }
 
-    return Response.json(body: {
-      'status': 'ok',
-      'source': 'persisted_db',
-      'window_days': parsed.days,
-      'filters': parsed.toJson(),
-      'scope': {
-        'include_global': includeGlobal,
-        'is_admin': isAdmin,
+    return Response.json(
+      body: {
+        'status': 'ok',
+        'source': 'persisted_db',
+        'window_days': parsed.days,
+        'filters': parsed.toJson(),
+        'scope': {'include_global': includeGlobal, 'is_admin': isAdmin},
+        if (includeGlobal) 'global': global,
+        if (includeGlobal) 'window': window,
+        if (includeGlobal) 'window_by_day': windowByDay,
+        'current_user_window': userWindow,
+        'current_user_by_day': userByDay,
       },
-      if (includeGlobal) 'global': global,
-      if (includeGlobal) 'window': window,
-      if (includeGlobal) 'window_by_day': windowByDay,
-      'current_user_window': userWindow,
-      'current_user_by_day': userByDay,
-    });
-  } catch (e) {
-    return internalServerError('Failed to load optimize telemetry', details: e);
+    );
+  } catch (error, stackTrace) {
+    Log.e('[optimize-telemetry] request failed type=${error.runtimeType}');
+    await captureRouteException(
+      context,
+      error,
+      stackTrace: stackTrace,
+      tags: const {'route': 'ai_optimize_telemetry'},
+    );
+    return internalServerError('Failed to load optimize telemetry');
   }
 }
 
 Future<bool> _isTelemetryTableAvailable(Pool pool) async {
-  final result = await pool.execute(Sql.named('''
+  final result = await pool.execute(
+    Sql.named('''
     SELECT COUNT(*)::int AS c
     FROM information_schema.tables
     WHERE table_schema = 'public'
       AND table_name = 'ai_optimize_fallback_telemetry'
-  '''));
+  '''),
+  );
 
   if (result.isEmpty) return false;
   final value = result.first.toColumnMap()['c'];
@@ -142,7 +149,8 @@ Future<Map<String, dynamic>> _loadAggregate(
 
   if (days != null) {
     conditions.add(
-        "created_at >= NOW() - (CAST(@days AS int) * INTERVAL '1 day')");
+      "created_at >= NOW() - (CAST(@days AS int) * INTERVAL '1 day')",
+    );
     params['days'] = days;
   }
   if (mode != null) {
@@ -158,7 +166,8 @@ Future<Map<String, dynamic>> _loadAggregate(
     params['user_id'] = userId;
   }
 
-  final whereClause = conditions.isEmpty ? '' : 'WHERE ${conditions.join(' AND ')}';
+  final whereClause =
+      conditions.isEmpty ? '' : 'WHERE ${conditions.join(' AND ')}';
 
   final result = await pool.execute(
     Sql.named('''
@@ -223,10 +232,7 @@ Future<List<Map<String, dynamic>>> _loadByDay(
   return result.map((row) {
     final map = row.toColumnMap();
     final aggregate = _rowToAggregate(map);
-    return {
-      'day': map['day']?.toString(),
-      ...aggregate,
-    };
+    return {'day': map['day']?.toString(), ...aggregate};
   }).toList();
 }
 
@@ -314,20 +320,18 @@ Future<bool> _isAdminUser({
   required DotEnv env,
 }) async {
   final rawIds = env['TELEMETRY_ADMIN_USER_IDS'] ?? '';
-  final ids = rawIds
-      .split(',')
-      .map((e) => e.trim())
-      .where((e) => e.isNotEmpty)
-      .toSet();
+  final ids =
+      rawIds.split(',').map((e) => e.trim()).where((e) => e.isNotEmpty).toSet();
 
   if (ids.contains(userId)) return true;
 
   final rawEmails = env['TELEMETRY_ADMIN_EMAILS'] ?? '';
-  final emails = rawEmails
-      .split(',')
-      .map((e) => e.trim().toLowerCase())
-      .where((e) => e.isNotEmpty)
-      .toSet();
+  final emails =
+      rawEmails
+          .split(',')
+          .map((e) => e.trim().toLowerCase())
+          .where((e) => e.isNotEmpty)
+          .toSet();
 
   try {
     final result = await pool.execute(
@@ -341,7 +345,8 @@ Future<bool> _isAdminUser({
     );
 
     if (result.isEmpty) return false;
-    final email = (result.first.toColumnMap()['email']?.toString() ?? '').trim();
+    final email =
+        (result.first.toColumnMap()['email']?.toString() ?? '').trim();
     return email.isNotEmpty && emails.contains(email);
   } catch (_) {
     return false;
@@ -372,19 +377,19 @@ class _TelemetryQuery {
   }) : error = null;
 
   _TelemetryQuery.error(this.error)
-      : days = 7,
-        includeGlobal = false,
-        mode = null,
-        deckId = null,
-        userId = null;
+    : days = 7,
+      includeGlobal = false,
+      mode = null,
+      deckId = null,
+      userId = null;
 
   Map<String, dynamic> toJson() => {
-        'days': days,
-        'include_global': includeGlobal,
-        if (mode != null) 'mode': mode,
-        if (deckId != null) 'deck_id': deckId,
-        if (userId != null) 'user_id': userId,
-      };
+    'days': days,
+    'include_global': includeGlobal,
+    if (mode != null) 'mode': mode,
+    if (deckId != null) 'deck_id': deckId,
+    if (userId != null) 'user_id': userId,
+  };
 }
 
 int _toInt(dynamic value) {

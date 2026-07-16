@@ -86,7 +86,7 @@ void main() {
         routeSupport,
         contains('fallbackResponseShape: fallbackResponseShape'),
       );
-      expect(routeSupport, contains('content,'));
+      expect(routeSupport, contains('jsonDecode(content)'));
       expect(routeAdapterTest, contains('implements RequestContext'));
       expect(routeAdapterTest, contains('implements Pool'));
       expect(routeAdapterTest, contains('recommendations_route.onRequest'));
@@ -182,7 +182,8 @@ void main() {
       expect(aiAnalysis, contains('function_tag_details'));
       expect(aiAnalysis, contains('semantic_tags_v2'));
       expect(aiAnalysis, contains('JOIN cards c ON c.id = dc.card_id'));
-      expect(aiAnalysis, contains('idealMin: 33, idealMax: 38'));
+      expect(aiAnalysis, contains('idealMin: 33'));
+      expect(aiAnalysis, contains('idealMax: 38'));
       expect(aiAnalysis, contains('ideal 33-38'));
       expect(aiAnalysis, contains('33-38 terrenos'));
     });
