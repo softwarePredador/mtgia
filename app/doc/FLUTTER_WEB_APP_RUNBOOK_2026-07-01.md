@@ -1,7 +1,7 @@
 # ManaLoom Flutter Web App Runbook
 
 Data: 2026-07-01
-Status: `READY_FOR_LOCAL_QA_AND_REACT_INTEGRATION`
+Status: `PRODUCTION_DEPLOY_CONTRACT_IMPLEMENTED`
 
 ## Objetivo
 
@@ -106,6 +106,30 @@ Se React/Next estiver no dominio raiz, os assets do Flutter nao devem ser
 movidos para `/`; eles devem continuar sob `/app/` para combinar com o
 `base-href`.
 
+## Deploy reproduzivel
+
+O deploy oficial e executado a partir de um worktree limpo no mesmo SHA de
+`origin/master`:
+
+```sh
+./scripts/manaloom_deploy_flutter_web.sh
+```
+
+O script:
+
+- gera o build release com `--base-href /app/`;
+- cria uma imagem Nginx imutavel identificada pelo SHA;
+- registra ou atualiza `evolution_manaloom-app` no EasyPanel;
+- grava uma configuracao Traefik separada e persistente para `/app`;
+- preserva o Next publico na raiz;
+- valida `/app/`, o bootstrap e o fallback de `/app/decks`.
+
+Arquivos do contrato:
+
+- `app/Dockerfile.web`;
+- `app/web/nginx.conf`;
+- `scripts/manaloom_deploy_flutter_web.sh`.
+
 ## Estado das rotas
 
 As rotas internas ainda continuam declaradas no Flutter sem prefixo no codigo
@@ -134,12 +158,13 @@ Isso mantem a web logada funcional para deck builder, IA, colecao, planos,
 perfil, comunidade, trade e retencao, sem prometer suporte web completo para
 recursos nativos.
 
-## Proximos passos
+## Validacao apos deploy
 
-1. Rodar QA visual com o helper local.
-2. Testar login e rotas principais contra backend esperado.
-3. Repetir build com `SENTRY_DSN` real quando houver DSN seguro no ambiente.
-4. Configurar o deploy real com `/app/` e fallback SPA.
-5. Integrar CTAs do React publico para `/app`.
-6. Depois de estabilizar o proxy, decidir se links publicos profundos devem
-   apontar para `/app/#/...` ou para caminhos diretos via path strategy.
+```sh
+curl -I https://evolution-manaloom-web-public.2ta7qx.easypanel.host/app/
+curl -I https://evolution-manaloom-web-public.2ta7qx.easypanel.host/app/flutter_bootstrap.js
+curl -I https://evolution-manaloom-web-public.2ta7qx.easypanel.host/app/decks
+```
+
+O deploy usa o DSN Sentry do ambiente quando ele existe e nunca o grava no
+repositorio.

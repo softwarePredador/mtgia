@@ -34,8 +34,10 @@ NEXT_PUBLIC_MANALOOM_API_BASE_URL=https://seu-backend.example.com npm run dev
 ## Deploy atual
 
 - Public web: `https://evolution-manaloom-web-public.2ta7qx.easypanel.host`
+- Flutter autenticado: `https://evolution-manaloom-web-public.2ta7qx.easypanel.host/app/`
 - API ManaLoom: `https://evolution-cartinhas.2ta7qx.easypanel.host`
 - Serviço EasyPanel/Swarm: `evolution_manaloom-web-public`
+- Serviço Flutter EasyPanel/Swarm: `evolution_manaloom-app`
 
 ## Build
 
@@ -100,6 +102,5 @@ Substituicao recomendada para novas áreas:
 
 - Validar `/reports/[id]` com relatórios reais criados pelo app antes de campanha pública.
 - Criar contrato editorial real antes de publicar posts em `/blog/[slug]`.
-- Definir deploy/rewrite para servir Flutter Web em `/app`.
 - Adicionar imagens OG reais quando a identidade visual publica estiver fechada.
 - Rodar QA em mobile/desktop, refresh direto de rotas dinamicas, SEO e compartilhamento social.
