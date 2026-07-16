@@ -113,7 +113,12 @@ health_status="$(jq -r '.status' "$health_file")"
 ready_status="$(jq -r '.status' "$ready_file")"
 ai_runtime_status="$(jq -r '.checks.ai_runtime.status // "missing"' "$ready_file")"
 ai_provider_configured="$(jq -r '.checks.ai_runtime.provider_configured // false' "$ready_file")"
-ai_mock_fallbacks="$(jq -r '.checks.ai_runtime.mock_fallbacks_allowed // true' "$ready_file")"
+ai_mock_fallbacks="$(jq -r '
+  if (.checks.ai_runtime | has("mock_fallbacks_allowed"))
+  then .checks.ai_runtime.mock_fallbacks_allowed
+  else true
+  end
+' "$ready_file")"
 git_sha="$(jq -r '.git_sha // ""' "$health_file")"
 smoke_status="$(jq -r '.status' "$smoke_file")"
 benchmark_status="$(jq -r '.status' "$benchmark_file")"

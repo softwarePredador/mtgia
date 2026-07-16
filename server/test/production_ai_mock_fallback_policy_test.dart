@@ -15,27 +15,36 @@ void main() {
       expect(source, contains('HttpStatus.serviceUnavailable'));
     });
 
-    test('generate blocks deterministic validation fallback in production', () {
-      final source = File('routes/ai/generate/index.dart').readAsStringSync();
-      final invalidBranchIndex = source.indexOf(
-        'if (!validation.isValid || validation.invalidCards.isNotEmpty)',
-      );
-      final fallbackMarkerIndex = source.indexOf(
-        'final fallbackWarningCode',
-        invalidBranchIndex,
-      );
-      final guardIndex = source.indexOf(
-        '!aiConfig.allowsMockFallbacks',
-        invalidBranchIndex,
-      );
+    test(
+      'generate blocks invalid output but accepts bounded validated repair',
+      () {
+        final source = File('routes/ai/generate/index.dart').readAsStringSync();
+        final invalidBranchIndex = source.indexOf(
+          'if (providerOutputMustBeRejected)',
+        );
+        final fallbackMarkerIndex = source.indexOf(
+          'final fallbackWarningCode',
+          invalidBranchIndex,
+        );
+        final guardIndex = source.indexOf(
+          '!aiConfig.allowsMockFallbacks',
+          invalidBranchIndex,
+        );
 
-      expect(invalidBranchIndex, isNonNegative);
-      expect(fallbackMarkerIndex, isNonNegative);
-      expect(guardIndex, isNonNegative);
-      expect(guardIndex, lessThan(fallbackMarkerIndex));
-      expect(source, contains("'fallback_status': 'blocked_in_production'"));
-      expect(source, contains('Generated deck failed validation'));
-    });
+        expect(invalidBranchIndex, isNonNegative);
+        expect(fallbackMarkerIndex, isNonNegative);
+        expect(guardIndex, isNonNegative);
+        expect(guardIndex, lessThan(fallbackMarkerIndex));
+        expect(source, contains("'fallback_status': 'blocked_in_production'"));
+        expect(source, contains('Generated deck failed validation'));
+        expect(
+          source,
+          contains('evaluateAiGenerateProviderRepair(validation)'),
+        );
+        expect(source, contains("'provider_validated_repair'"));
+        expect(source, contains("'learning_eligible': false"));
+      },
+    );
 
     test('archetypes blocks missing OpenAI provider before mock response', () {
       final source = File('routes/ai/archetypes/index.dart').readAsStringSync();

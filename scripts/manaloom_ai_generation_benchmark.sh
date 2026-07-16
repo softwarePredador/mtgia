@@ -103,9 +103,24 @@ for run in $(seq 1 "$RUNS"); do
         time_connect_ms: (($time_connect | tonumber) * 1000 | round),
         time_starttransfer_ms: (($time_starttransfer | tonumber) * 1000 | round),
         time_total_ms: (($time_total | tonumber) * 1000 | round),
-        is_mock: ($body[0].is_mock // $body[0].generated_deck.is_mock // null),
+        is_mock: (
+          if ($body[0] | has("is_mock")) then $body[0].is_mock
+          elif (($body[0].generated_deck // {}) | has("is_mock"))
+          then $body[0].generated_deck.is_mock
+          else null
+          end
+        ),
         generation_mode: ($body[0].generation_mode // null),
         deckbuilding_contract_present: ($body[0].deckbuilding_contract != null),
+        validation_is_valid: ($body[0].validation.is_valid == true),
+        invalid_cards_count: (($body[0].validation.invalid_cards // []) | length),
+        provider_repair_eligible: ($body[0].provider_repair.eligible == true),
+        learning_eligible: (
+          if ($body[0] | has("learning_eligible"))
+          then $body[0].learning_eligible
+          else null
+          end
+        ),
         generated_card_count: card_count,
         error: ($body[0].error // null)
       }
@@ -114,14 +129,22 @@ done
 
 jq -s '
   def sorted_times: map(.time_total_ms) | sort;
-  def successful_runs: map(select(.http_code == 200)) | length;
+  def successful_runs:
+    map(select(
+      .http_code == 200 and
+      .validation_is_valid == true and
+      .deckbuilding_contract_present == true and
+      .generated_card_count >= 60 and
+      .is_mock == false and
+      (.generation_mode != "mock_fallback")
+    )) | length;
   def mock_response_count:
     map(select(.is_mock == true or .generation_mode == "mock_fallback"))
     | length;
   def percentile($p):
     sorted_times as $values
     | if ($values | length) == 0 then null
-      else $values[((($values | length) - 1) * $p / 100) | floor]
+      else $values[([((($values | length) * $p / 100) | ceil) - 1, 0] | max)]
       end;
   {
     status: (
@@ -134,6 +157,7 @@ jq -s '
     runs: length,
     successful_runs: successful_runs,
     mock_response_count: mock_response_count,
+    repaired_run_count: (map(select(.provider_repair_eligible == true)) | length),
     avg_total_ms: ((map(.time_total_ms) | add) / length | round),
     p50_total_ms: percentile(50),
     p95_total_ms: percentile(95),

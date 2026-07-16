@@ -21,6 +21,7 @@ import '../../../lib/ai/commander_learned_deck_support.dart';
 import '../../../lib/ai/commander_reference_profile_support.dart';
 import '../../../lib/ai/deck_learning_event_support.dart';
 import '../../../lib/ai/functional_card_tags.dart';
+import '../../../lib/ai/generate_provider_repair_policy.dart';
 import '../../../lib/color_identity.dart';
 import '../../../lib/generated_deck_validation_service.dart';
 import '../../../lib/http_responses.dart';
@@ -715,10 +716,17 @@ $metaContext
     );
     timings['validation_ms'] = validationStopwatch.elapsedMilliseconds;
 
-    final generatedCardNames = cards
+    final generatedCardNames = ((validation.generatedDeck['cards'] as List?) ??
+            const [])
+        .whereType<Map>()
         .map((card) => card['name']?.toString().trim() ?? '')
         .where((name) => name.isNotEmpty)
         .toList(growable: false);
+    final providerRepairDecision = evaluateAiGenerateProviderRepair(validation);
+    final generationMode =
+        providerRepairDecision.eligible
+            ? 'provider_validated_repair'
+            : 'ai_generate';
 
     Map<String, dynamic>? referenceDeckEvaluation;
     if (referenceProfile != null) {
@@ -773,13 +781,22 @@ $metaContext
           referenceDeckCorpusDiagnostics: referenceDeckCorpusDiagnostics,
           referenceDeterministicDeckDiagnostics:
               referenceDeterministicDeckDiagnostics,
-          generationMode: 'ai_generate',
+          generationMode: generationMode,
         );
 
     final responseBody = <String, dynamic>{
       'prompt': prompt,
       'format': format,
       'generated_deck': validation.generatedDeck,
+      'is_mock': false,
+      'generation_mode': generationMode,
+      if (validation.invalidCards.isNotEmpty)
+        'provider_repair': providerRepairDecision.toJson(),
+      if (providerRepairDecision.eligible) ...{
+        'ai_generation_repaired': true,
+        'learning_eligible': false,
+        'learning_exclusion_reason': 'provider_output_had_unresolved_cards',
+      },
       'meta_context_used': metaContext.isNotEmpty,
       'stats': {
         'total_suggested': validation.totalSuggestedEntries,
@@ -820,7 +837,9 @@ $metaContext
     };
 
     // Fire-and-forget: loga deck gerado para aprendizado (mesmo nao salvo)
-    if (format.toLowerCase() == 'commander' && validation.isValid) {
+    if (format.toLowerCase() == 'commander' &&
+        validation.isValid &&
+        validation.invalidCards.isEmpty) {
       unawaited(
         logGeneratedDeckForLearning(
           pool: pool,
@@ -838,7 +857,11 @@ $metaContext
       };
     }
 
-    if (!validation.isValid || validation.invalidCards.isNotEmpty) {
+    final providerOutputMustBeRejected =
+        !validation.isValid ||
+        (validation.invalidCards.isNotEmpty &&
+            !providerRepairDecision.eligible);
+    if (providerOutputMustBeRejected) {
       Log.w(
         'AI generate returned invalid or unresolved deck. '
         'format=$format errors=${validation.errors.join(' | ')} '
@@ -854,6 +877,7 @@ $metaContext
             payload: {
               'error': 'Generated deck failed validation',
               'fallback_status': 'blocked_in_production',
+              'provider_repair': providerRepairDecision.toJson(),
               ...responseBody,
             },
             cacheKey: cacheKey,
@@ -919,6 +943,15 @@ $metaContext
       );
     }
 
+    if (providerRepairDecision.eligible) {
+      Log.w(
+        'AI generate served a strictly validated bounded repair. '
+        'format=$format invalid_cards=${validation.invalidCards.length} '
+        'removed_cards=${providerRepairDecision.removedCardCount} '
+        'resolved_ratio=${providerRepairDecision.resolvedCardRatio}',
+      );
+    }
+
     timings['total_ms'] = totalStopwatch.elapsedMilliseconds;
     final finalBody = withAiGenerateRuntimeMetadata(
       payload: responseBody,
@@ -926,7 +959,14 @@ $metaContext
       cacheHit: false,
       timings: timings,
     );
-    writeAiGenerateCache(cacheKey: cacheKey, payload: finalBody, ttl: cacheTtl);
+    writeAiGenerateCache(
+      cacheKey: cacheKey,
+      payload: finalBody,
+      ttl:
+          providerRepairDecision.eligible
+              ? const Duration(seconds: 120)
+              : cacheTtl,
+    );
     return Response.json(body: finalBody);
   } catch (error, stackTrace) {
     Log.e('[ai-generate] request failed type=${error.runtimeType}');
