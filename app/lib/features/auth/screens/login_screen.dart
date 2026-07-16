@@ -60,11 +60,8 @@ class _LoginScreenState extends State<LoginScreen> {
     }
 
     if (success) {
-      debugPrint(
-        '[📱 LoginScreen] ✅ login OK — aguardando redirect do GoRouter',
-      );
-      // Navegação é feita automaticamente pelo redirect do GoRouter
-      // quando o status muda para 'authenticated'.
+      debugPrint('[📱 LoginScreen] ✅ login OK — navegando para /home');
+      context.go('/home');
       return;
     }
 
@@ -85,10 +82,9 @@ class _LoginScreenState extends State<LoginScreen> {
         children: [
           const AuthBrandHeader(
             title: 'ManaLoom',
-            subtitle: 'Entre na sua conta',
-            eyebrow: 'Tecendo estratégias lendárias',
+            subtitle: 'Acesse decks, coleção, trades e partidas.',
           ),
-          const SizedBox(height: 22),
+          const SizedBox(height: 20),
           AuthFormSurface(
             child: Form(
               key: _formKey,
@@ -166,7 +162,6 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
                   const SizedBox(height: 22),
 
-                  // Botão Login com gradiente
                   Consumer<AuthProvider>(
                     builder: (context, auth, child) {
                       if (auth.status == AuthStatus.loading) {
@@ -179,9 +174,8 @@ class _LoginScreenState extends State<LoginScreen> {
                             ),
                           ),
                           child: const Center(
-                            child: SizedBox(
-                              height: 20,
-                              width: 20,
+                            child: SizedBox.square(
+                              dimension: AppTheme.iconSpinnerSm,
                               child: CircularProgressIndicator(
                                 strokeWidth: 2,
                                 valueColor: AlwaysStoppedAnimation<Color>(

@@ -200,6 +200,9 @@ Future<void> showDeckEditionPicker({
 }) async {
   await showModalBottomSheet(
     context: context,
+    useRootNavigator: true,
+    useSafeArea: true,
+    showDragHandle: true,
     isScrollControlled: true,
     shape: const RoundedRectangleBorder(
       borderRadius: BorderRadius.vertical(
@@ -306,6 +309,7 @@ Future<void> showDeckEditionPicker({
                           key: Key('deck-edition-option-$id'),
                           leading: CachedCardImage(
                             imageUrl: it['image_url'],
+                            fallbackImageUrl: card.fallbackImageUrl,
                             width: 40,
                             height: 56,
                             borderRadius: BorderRadius.circular(
@@ -364,155 +368,255 @@ Future<void> showDeckCardDetailsDialog({
 }) async {
   await showDialog(
     context: context,
-    builder:
-        (dialogContext) => Dialog(
-          key: Key('deck-card-details-dialog-${card.id}'),
-          backgroundColor: AppTheme.surfaceElevated,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(AppTheme.radiusMd),
-            side: BorderSide(
-              color: AppTheme.outlineMuted.withValues(alpha: 0.72),
-            ),
-          ),
-          child: SingleChildScrollView(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                if (card.imageUrl != null)
-                  ClipRRect(
-                    borderRadius: const BorderRadius.vertical(
-                      top: Radius.circular(AppTheme.radiusMd),
-                    ),
-                    child: AspectRatio(
-                      aspectRatio: 0.714,
-                      child: CachedCardImage(
-                        imageUrl: card.imageUrl,
-                        fit: BoxFit.cover,
-                      ),
-                    ),
-                  ),
-                Padding(
-                  padding: const EdgeInsets.all(16),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        card.name,
-                        style: Theme.of(
-                          dialogContext,
-                        ).textTheme.titleLarge?.copyWith(
-                          fontWeight: FontWeight.bold,
-                          color: AppTheme.textPrimary,
-                        ),
-                      ),
-                      const SizedBox(height: 8),
-                      _DeckEditionInfo(card: card),
-                      if (card.manaCost != null) ...[
-                        const SizedBox(height: 8),
-                        Row(
-                          children: [
-                            Text(
-                              'Custo: ',
-                              style: Theme.of(dialogContext)
-                                  .textTheme
-                                  .bodyMedium
-                                  ?.copyWith(color: AppTheme.textSecondary),
-                            ),
-                            ManaCostRow(cost: card.manaCost),
-                          ],
-                        ),
-                      ],
-                      const SizedBox(height: 4),
-                      Text(
-                        card.typeLine,
-                        style: Theme.of(
-                          dialogContext,
-                        ).textTheme.bodyMedium?.copyWith(
-                          fontStyle: FontStyle.italic,
-                          color: AppTheme.textSecondary,
-                        ),
-                      ),
-                      if (_hasEditionInfo(card)) ...[
-                        const SizedBox(height: 8),
-                        Align(
-                          alignment: Alignment.centerLeft,
-                          child: ActionChip(
-                            key: Key('deck-card-change-edition-${card.id}'),
-                            avatar: const Icon(
-                              Icons.collections_bookmark,
-                              size: 16,
-                              color: AppTheme.frost400,
-                            ),
-                            label: const Text('Trocar edição'),
-                            labelStyle: const TextStyle(
-                              color: AppTheme.frost400,
-                              fontWeight: FontWeight.w700,
-                            ),
-                            backgroundColor: AppTheme.frost400.withValues(
-                              alpha: 0.12,
-                            ),
-                            side: BorderSide(
-                              color: AppTheme.frost400.withValues(alpha: 0.28),
-                            ),
-                            onPressed: () {
-                              Navigator.pop(dialogContext);
-                              onShowEditionPicker();
-                            },
-                          ),
-                        ),
-                      ],
-                      const SizedBox(height: 8),
-                      ActionChip(
-                        avatar: const Icon(
-                          Icons.auto_awesome_rounded,
-                          size: 16,
-                          color: AppTheme.frost400,
-                        ),
-                        label: const Text('Explicar com IA'),
-                        labelStyle: const TextStyle(
-                          color: AppTheme.frost400,
-                          fontWeight: FontWeight.w800,
-                        ),
-                        backgroundColor: AppTheme.frost400.withValues(
-                          alpha: 0.12,
-                        ),
-                        side: BorderSide(
-                          color: AppTheme.frost400.withValues(alpha: 0.28),
-                        ),
-                        onPressed: onShowAiExplanation,
-                      ),
-                      if (card.oracleText != null) ...[
-                        const SizedBox(height: 16),
-                        const Divider(),
-                        const SizedBox(height: 8),
-                        OracleTextWidget(card.oracleText!),
-                      ],
-                    ],
-                  ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.all(8),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      TextButton.icon(
-                        onPressed: onOpenFullDetails,
-                        icon: const Icon(Icons.open_in_new, size: 16),
-                        label: const Text('Ver Detalhes'),
-                      ),
-                      TextButton(
-                        onPressed: () => Navigator.pop(dialogContext),
-                        child: const Text('Fechar'),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
+    builder: (dialogContext) {
+      final media = MediaQuery.sizeOf(dialogContext);
+      return Dialog(
+        key: Key('deck-card-details-dialog-${card.id}'),
+        backgroundColor: AppTheme.surfaceElevated,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(AppTheme.radiusMd),
+          side: BorderSide(
+            color: AppTheme.outlineMuted.withValues(alpha: 0.72),
           ),
         ),
+        child: ConstrainedBox(
+          constraints: BoxConstraints(
+            maxWidth: media.width >= 640 ? 560 : media.width - 32,
+            maxHeight: media.height * 0.86,
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Flexible(
+                child: SingleChildScrollView(
+                  padding: const EdgeInsets.all(16),
+                  child: _DeckCardDetailsDialogBody(
+                    card: card,
+                    onShowAiExplanation: onShowAiExplanation,
+                    onShowEditionPicker: () async {
+                      Navigator.pop(dialogContext);
+                      await onShowEditionPicker();
+                    },
+                  ),
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.all(8),
+                child: Wrap(
+                  alignment: WrapAlignment.end,
+                  spacing: 8,
+                  runSpacing: 4,
+                  children: [
+                    TextButton.icon(
+                      onPressed: onOpenFullDetails,
+                      icon: const Icon(Icons.open_in_new, size: 16),
+                      label: const Text('Ver Detalhes'),
+                    ),
+                    TextButton(
+                      onPressed: () => Navigator.pop(dialogContext),
+                      child: const Text('Fechar'),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+      );
+    },
   );
+}
+
+class _DeckCardDetailsDialogBody extends StatelessWidget {
+  const _DeckCardDetailsDialogBody({
+    required this.card,
+    required this.onShowAiExplanation,
+    required this.onShowEditionPicker,
+  });
+
+  final DeckCardItem card;
+  final Future<void> Function() onShowAiExplanation;
+  final Future<void> Function() onShowEditionPicker;
+
+  @override
+  Widget build(BuildContext context) {
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final compact = constraints.maxWidth < 430;
+        final imageWidth =
+            compact
+                ? constraints.maxWidth.clamp(118.0, 156.0)
+                : constraints.maxWidth.clamp(124.0, 136.0);
+        final info = _DeckCardDetailsInfo(
+          card: card,
+          onShowAiExplanation: onShowAiExplanation,
+          onShowEditionPicker: onShowEditionPicker,
+        );
+
+        if (compact) {
+          return Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Center(
+                child: _DeckCardDetailsImage(card: card, width: imageWidth),
+              ),
+              const SizedBox(height: 14),
+              info,
+            ],
+          );
+        }
+
+        return Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            _DeckCardDetailsImage(card: card, width: imageWidth),
+            const SizedBox(width: 16),
+            Expanded(child: info),
+          ],
+        );
+      },
+    );
+  }
+}
+
+class _DeckCardDetailsImage extends StatelessWidget {
+  const _DeckCardDetailsImage({required this.card, required this.width});
+
+  final DeckCardItem card;
+  final double width;
+
+  static const double _cardAspectRatio = 1.397;
+
+  @override
+  Widget build(BuildContext context) {
+    final height = width * _cardAspectRatio;
+
+    return Container(
+      key: Key('deck-card-details-image-${card.id}'),
+      width: width,
+      height: height,
+      decoration: BoxDecoration(
+        color: AppTheme.backgroundAbyss,
+        borderRadius: BorderRadius.circular(AppTheme.radiusSm),
+        border: Border.all(
+          color: AppTheme.outlineMuted.withValues(alpha: 0.45),
+          width: AppTheme.strokeThin,
+        ),
+      ),
+      clipBehavior: Clip.antiAlias,
+      child: CachedCardImage(
+        imageUrl: card.effectiveImageUrl,
+        fallbackImageUrl: card.fallbackImageUrl,
+        width: width,
+        height: height,
+        fit: BoxFit.contain,
+      ),
+    );
+  }
+}
+
+class _DeckCardDetailsInfo extends StatelessWidget {
+  const _DeckCardDetailsInfo({
+    required this.card,
+    required this.onShowAiExplanation,
+    required this.onShowEditionPicker,
+  });
+
+  final DeckCardItem card;
+  final Future<void> Function() onShowAiExplanation;
+  final Future<void> Function() onShowEditionPicker;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          card.name,
+          style: theme.textTheme.titleLarge?.copyWith(
+            fontWeight: FontWeight.bold,
+            color: AppTheme.textPrimary,
+          ),
+        ),
+        const SizedBox(height: 8),
+        _DeckEditionInfo(card: card),
+        if (card.manaCost != null) ...[
+          const SizedBox(height: 10),
+          Row(
+            children: [
+              Text(
+                'Custo: ',
+                style: theme.textTheme.bodyMedium?.copyWith(
+                  color: AppTheme.textSecondary,
+                ),
+              ),
+              ManaCostRow(cost: card.manaCost),
+            ],
+          ),
+        ],
+        const SizedBox(height: 6),
+        Text(
+          card.typeLine,
+          style: theme.textTheme.bodyMedium?.copyWith(
+            fontStyle: FontStyle.italic,
+            color: AppTheme.textSecondary,
+          ),
+        ),
+        const SizedBox(height: 10),
+        Wrap(
+          spacing: 8,
+          runSpacing: 8,
+          children: [
+            if (_hasEditionInfo(card))
+              ActionChip(
+                key: Key('deck-card-change-edition-${card.id}'),
+                avatar: const Icon(
+                  Icons.collections_bookmark,
+                  size: 16,
+                  color: AppTheme.frost400,
+                ),
+                label: const Text('Trocar edição'),
+                labelStyle: const TextStyle(
+                  color: AppTheme.frost400,
+                  fontWeight: FontWeight.w700,
+                ),
+                backgroundColor: AppTheme.frost400.withValues(alpha: 0.12),
+                side: BorderSide(
+                  color: AppTheme.frost400.withValues(alpha: 0.28),
+                ),
+                onPressed: onShowEditionPicker,
+              ),
+            ActionChip(
+              avatar: const Icon(
+                Icons.auto_awesome_rounded,
+                size: 16,
+                color: AppTheme.frost400,
+              ),
+              label: const Text('Explicar com IA'),
+              labelStyle: const TextStyle(
+                color: AppTheme.frost400,
+                fontWeight: FontWeight.w800,
+              ),
+              backgroundColor: AppTheme.frost400.withValues(alpha: 0.12),
+              side: BorderSide(
+                color: AppTheme.frost400.withValues(alpha: 0.28),
+              ),
+              onPressed: onShowAiExplanation,
+            ),
+          ],
+        ),
+        if (card.oracleText != null) ...[
+          const SizedBox(height: 16),
+          Divider(color: AppTheme.outlineMuted.withValues(alpha: 0.45)),
+          const SizedBox(height: 8),
+          OracleTextWidget(card.oracleText!),
+        ],
+      ],
+    );
+  }
 }
 
 bool _hasEditionInfo(DeckCardItem card) {
@@ -616,6 +720,9 @@ Future<void> showDeckPricingDetailsSheet({
 
   await showModalBottomSheet(
     context: context,
+    useRootNavigator: true,
+    useSafeArea: true,
+    showDragHandle: true,
     isScrollControlled: true,
     shape: const RoundedRectangleBorder(
       borderRadius: BorderRadius.vertical(

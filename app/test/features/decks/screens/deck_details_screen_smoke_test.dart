@@ -356,9 +356,11 @@ void main() {
     await _pumpScreen(tester, apiClient: apiClient, provider: provider);
     await tester.pumpAndSettle();
 
+    expect(find.text('Adicionar Cartas'), findsNothing);
     await tester.tap(find.text('Cartas'));
     await tester.pumpAndSettle();
 
+    expect(find.text('Adicionar Cartas'), findsOneWidget);
     expect(find.text('Comandante'), findsOneWidget);
     expect(find.byIcon(Icons.workspace_premium_rounded), findsOneWidget);
     expect(
@@ -367,6 +369,10 @@ void main() {
     );
     expect(find.text('Deck principal'), findsNothing);
     expect(find.text('Talrand, Sky Summoner'), findsOneWidget);
+
+    await tester.tap(find.text('Análise'));
+    await tester.pumpAndSettle();
+    expect(find.text('Adicionar Cartas'), findsNothing);
   });
 
   testWidgets(

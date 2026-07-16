@@ -23,58 +23,42 @@ class SheetHeroCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [accent.withValues(alpha: 0.18), AppTheme.surfaceElevated],
-        ),
-        borderRadius: BorderRadius.circular(AppTheme.radiusLg),
-        border: Border.all(
-          color: accent.withValues(alpha: 0.24),
-          width: AppTheme.strokeMedium,
-        ),
-      ),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Container(
-            width: 42,
-            height: 42,
-            decoration: BoxDecoration(
-              color: accent.withValues(alpha: 0.16),
-              borderRadius: BorderRadius.circular(AppTheme.radiusMd),
-            ),
-            child: Icon(icon, color: accent),
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Container(
+          width: 40,
+          height: 40,
+          decoration: BoxDecoration(
+            color: accent.withValues(alpha: 0.14),
+            borderRadius: BorderRadius.circular(AppTheme.radiusMd),
           ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  title,
-                  style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                    color: AppTheme.textPrimary,
-                    fontWeight: FontWeight.w700,
-                  ),
+          child: Icon(icon, color: accent, size: 21),
+        ),
+        const SizedBox(width: 12),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                title,
+                style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                  color: AppTheme.textPrimary,
+                  fontWeight: FontWeight.w800,
                 ),
-                const SizedBox(height: 4),
-                Text(
-                  subtitle,
-                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                    color: AppTheme.textSecondary,
-                    height: AppTheme.lineHeightCompact,
-                  ),
+              ),
+              const SizedBox(height: 2),
+              Text(
+                subtitle,
+                style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                  color: AppTheme.textSecondary,
+                  height: AppTheme.lineHeightCompact,
                 ),
-              ],
-            ),
+              ),
+            ],
           ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 }
@@ -180,6 +164,8 @@ class OptimizationPreviewDialog extends StatefulWidget {
   final Map<String, dynamic> postAnalysis;
   final Map<String, dynamic> warnings;
   final Map<String, dynamic> metaReferenceContext;
+  final Map<String, dynamic> optimizationContract;
+  final Map<String, dynamic> battleValidation;
   final List<Map<String, dynamic>> displayRemovals;
   final List<Map<String, dynamic>> displayAdditions;
   final VoidCallback onCancel;
@@ -202,6 +188,8 @@ class OptimizationPreviewDialog extends StatefulWidget {
     required this.postAnalysis,
     required this.warnings,
     required this.metaReferenceContext,
+    required this.optimizationContract,
+    required this.battleValidation,
     required this.displayRemovals,
     required this.displayAdditions,
     required this.onCancel,
@@ -222,13 +210,37 @@ class _OptimizationPreviewDialogState extends State<OptimizationPreviewDialog> {
   @override
   void initState() {
     super.initState();
-    _selectedRemovalIndexes = {
-      for (var index = 0; index < widget.displayRemovals.length; index++) index,
-    };
-    _selectedAdditionIndexes = {
-      for (var index = 0; index < widget.displayAdditions.length; index++)
-        index,
-    };
+    if (_pairedSelectionRequired) {
+      final pairCount =
+          widget.displayRemovals.length < widget.displayAdditions.length
+              ? widget.displayRemovals.length
+              : widget.displayAdditions.length;
+      _selectedRemovalIndexes = {
+        for (var index = 0; index < pairCount; index++) index,
+      };
+      _selectedAdditionIndexes = {
+        for (var index = 0; index < pairCount; index++) index,
+      };
+    } else {
+      _selectedRemovalIndexes = {
+        for (var index = 0; index < widget.displayRemovals.length; index++)
+          index,
+      };
+      _selectedAdditionIndexes = {
+        for (var index = 0; index < widget.displayAdditions.length; index++)
+          index,
+      };
+    }
+  }
+
+  bool get _pairedSelectionRequired {
+    final rawDecision = widget.optimizationContract['user_decision'];
+    final decision =
+        rawDecision is Map
+            ? rawDecision.cast<String, dynamic>()
+            : const <String, dynamic>{};
+    return decision['paired_selection_required'] == true ||
+        widget.mode == 'optimize';
   }
 
   List<String> _warningLines() {
@@ -288,6 +300,10 @@ class _OptimizationPreviewDialogState extends State<OptimizationPreviewDialog> {
 
   void _toggleRemoval(int index, bool selected) {
     setState(() {
+      if (_pairedSelectionRequired) {
+        _setPairedSelection(index, selected);
+        return;
+      }
       if (selected) {
         _selectedRemovalIndexes.add(index);
       } else {
@@ -298,12 +314,31 @@ class _OptimizationPreviewDialogState extends State<OptimizationPreviewDialog> {
 
   void _toggleAddition(int index, bool selected) {
     setState(() {
+      if (_pairedSelectionRequired) {
+        _setPairedSelection(index, selected);
+        return;
+      }
       if (selected) {
         _selectedAdditionIndexes.add(index);
       } else {
         _selectedAdditionIndexes.remove(index);
       }
     });
+  }
+
+  void _setPairedSelection(int index, bool selected) {
+    if (index < 0 ||
+        index >= widget.displayRemovals.length ||
+        index >= widget.displayAdditions.length) {
+      return;
+    }
+    if (selected) {
+      _selectedRemovalIndexes.add(index);
+      _selectedAdditionIndexes.add(index);
+    } else {
+      _selectedRemovalIndexes.remove(index);
+      _selectedAdditionIndexes.remove(index);
+    }
   }
 
   void _confirmSelected() {
@@ -349,6 +384,8 @@ class _OptimizationPreviewDialogState extends State<OptimizationPreviewDialog> {
       'after': widget.postAnalysis,
       'warnings': widget.warnings,
       'meta_reference_context': widget.metaReferenceContext,
+      'optimization_contract': widget.optimizationContract,
+      'battle_validation': widget.battleValidation,
       'removals': selected(widget.displayRemovals, _selectedRemovalIndexes),
       'additions': selected(widget.displayAdditions, _selectedAdditionIndexes),
     };
@@ -422,9 +459,22 @@ class _OptimizationPreviewDialogState extends State<OptimizationPreviewDialog> {
     return '-';
   }
 
+  Map<String, dynamic> get _deckbuilderValidation {
+    final raw = widget.optimizationContract['deckbuilder_validation'];
+    return raw is Map ? raw.cast<String, dynamic>() : const {};
+  }
+
+  Map<String, dynamic> get _battleValidation {
+    if (widget.battleValidation.isNotEmpty) return widget.battleValidation;
+    final raw = widget.optimizationContract['battle_validation'];
+    return raw is Map ? raw.cast<String, dynamic>() : const {};
+  }
+
   @override
   Widget build(BuildContext context) {
     final warningLines = _warningLines();
+    final deckbuilderValidation = _deckbuilderValidation;
+    final battleValidation = _battleValidation;
 
     return AlertDialog(
       key: const Key('optimize-preview-dialog'),
@@ -569,6 +619,45 @@ class _OptimizationPreviewDialogState extends State<OptimizationPreviewDialog> {
                         'land_count',
                       ]),
                       icon: Icons.terrain_outlined,
+                    ),
+                    _TrustSignal(
+                      label: 'Validação',
+                      value:
+                          deckbuilderValidation['label']?.toString() ??
+                          'Preview seguro',
+                      icon: Icons.verified_outlined,
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 16),
+              DialogSectionCard(
+                title: 'Validação da recomendação',
+                accent: AppTheme.success,
+                icon: Icons.verified_user_outlined,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    _ValidationLine(
+                      icon: Icons.fact_check_outlined,
+                      color: AppTheme.success,
+                      title:
+                          deckbuilderValidation['label']?.toString() ??
+                          'Preview seguro',
+                      message:
+                          deckbuilderValidation['message']?.toString() ??
+                          'As sugestões passaram pelas regras do deck antes de aparecerem aqui.',
+                    ),
+                    const SizedBox(height: 10),
+                    _ValidationLine(
+                      icon: Icons.sports_esports_outlined,
+                      color: AppTheme.brass400,
+                      title:
+                          battleValidation['label']?.toString() ??
+                          'Battle pendente',
+                      message:
+                          battleValidation['message']?.toString() ??
+                          'Depois de aplicar, rode playtest, battle ou replay para confirmar desempenho real em mesa.',
                     ),
                   ],
                 ),
@@ -748,6 +837,8 @@ class _MetaReferenceSection extends StatelessWidget {
     final prioritySource = contextData['priority_source']?.toString() ?? '';
     final selectionReason = contextData['selection_reason']?.toString() ?? '';
     final scopeLabel = metaScope['label']?.toString() ?? '';
+    final prioritySourceLabel = _friendlyMetaSourceLabel(prioritySource);
+    final selectionReasonLabel = _friendlyMetaSelectionLabel(selectionReason);
 
     return DialogSectionCard(
       title: 'Referências meta usadas',
@@ -774,15 +865,15 @@ class _MetaReferenceSection extends StatelessWidget {
                   color: AppTheme.mythicGold,
                   icon: Icons.shield_outlined,
                 ),
-              if (selectionReason.isNotEmpty)
+              if (selectionReasonLabel.isNotEmpty)
                 DeckMetaChip(
-                  label: selectionReason,
+                  label: selectionReasonLabel,
                   color: AppTheme.frost400,
                   icon: Icons.filter_alt_outlined,
                 ),
-              if (prioritySource.isNotEmpty)
+              if (prioritySourceLabel.isNotEmpty)
                 DeckMetaChip(
-                  label: prioritySource,
+                  label: prioritySourceLabel,
                   color: AppTheme.textSecondary,
                   icon: Icons.source_outlined,
                 ),
@@ -1103,6 +1194,64 @@ class _MetricDiffRow extends StatelessWidget {
   }
 }
 
+class _ValidationLine extends StatelessWidget {
+  final IconData icon;
+  final Color color;
+  final String title;
+  final String message;
+
+  const _ValidationLine({
+    required this.icon,
+    required this.color,
+    required this.title,
+    required this.message,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Container(
+          width: 28,
+          height: 28,
+          decoration: BoxDecoration(
+            color: color.withValues(alpha: 0.14),
+            borderRadius: BorderRadius.circular(AppTheme.radiusSm),
+          ),
+          child: Icon(icon, size: 16, color: color),
+        ),
+        const SizedBox(width: 10),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                title,
+                style: theme.textTheme.labelLarge?.copyWith(
+                  color: AppTheme.textPrimary,
+                  fontWeight: FontWeight.w800,
+                ),
+              ),
+              if (message.trim().isNotEmpty) ...[
+                const SizedBox(height: 2),
+                Text(
+                  message,
+                  style: theme.textTheme.bodySmall?.copyWith(
+                    color: AppTheme.textSecondary,
+                    height: AppTheme.lineHeightCompact,
+                  ),
+                ),
+              ],
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+}
+
 class _TrustSignal {
   final String label;
   final String value;
@@ -1190,41 +1339,60 @@ class _SelectableSuggestionLineItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final name = item['name']?.toString() ?? '';
+    final playerFacing =
+        (item['player_facing'] is Map)
+            ? (item['player_facing'] as Map).cast<String, dynamic>()
+            : const <String, dynamic>{};
+    final battleValidation =
+        (item['battle_validation'] is Map)
+            ? (item['battle_validation'] as Map).cast<String, dynamic>()
+            : const <String, dynamic>{};
     final confidenceMap =
         (item['confidence'] is Map)
             ? (item['confidence'] as Map).cast<String, dynamic>()
             : const <String, dynamic>{};
     final confidenceLevel = confidenceMap['level']?.toString() ?? '';
     final score = (confidenceMap['score'] as num?)?.toDouble();
-    final reason = item['reason']?.toString() ?? '';
-    final role = item['role']?.toString() ?? item['function']?.toString() ?? '';
-    final priority = item['priority']?.toString() ?? '';
-    final risk = item['risk']?.toString() ?? '';
+    final reason =
+        playerFacing['summary']?.toString() ?? item['reason']?.toString() ?? '';
+    final role =
+        playerFacing['primary_role_label']?.toString() ??
+        _friendlyRoleLabel(
+          item['role']?.toString() ?? item['function']?.toString() ?? '',
+        );
+    final priority =
+        playerFacing['priority_label']?.toString() ??
+        _friendlyPriorityLabel(item['priority']?.toString() ?? '');
+    final risk =
+        playerFacing['risk_label']?.toString() ??
+        _friendlyRiskLabel(item['risk']?.toString() ?? '');
     final curve =
-        item['curve']?.toString() ??
-        item['curve_slot']?.toString() ??
-        item['cmc']?.toString() ??
-        '';
-    final price =
-        item['price_brl']?.toString() ??
-        item['estimated_price_brl']?.toString() ??
-        item['price']?.toString() ??
-        '';
+        playerFacing['curve_label']?.toString() ??
+        _friendlyCurveLabel(
+          item['curve']?.toString() ??
+              item['curve_slot']?.toString() ??
+              item['cmc']?.toString() ??
+              '',
+        );
+    final price = _friendlyPriceLabel(
+      item['estimated_price_brl'] ?? item['price_brl'] ?? item['price'],
+    );
     final bracket =
         item['bracket']?.toString() ??
         item['bracket_note']?.toString() ??
         item['power_level']?.toString() ??
         '';
-    final impact =
-        item['impact']?.toString() ?? item['impact_estimate']?.toString() ?? '';
+    final collection = _collectionLabel(item);
+    final battleLabel = battleValidation['label']?.toString() ?? '';
     final metadata = [
       if (role.isNotEmpty) role,
-      if (priority.isNotEmpty) 'prioridade $priority',
-      if (risk.isNotEmpty) 'risco $risk',
-      if (curve.isNotEmpty) 'curva $curve',
-      if (price.isNotEmpty) 'preço $price',
-      if (bracket.isNotEmpty) 'bracket $bracket',
-      if (impact.isNotEmpty) impact,
+      if (priority.isNotEmpty) priority,
+      if (risk.isNotEmpty) risk,
+      if (curve.isNotEmpty) curve,
+      if (price.isNotEmpty) price,
+      if (collection.isNotEmpty) collection,
+      if (bracket.isNotEmpty) 'mesa $bracket',
+      if (battleLabel.isNotEmpty) battleLabel,
     ].join(' • ');
 
     String suffix = '';
@@ -1312,5 +1480,145 @@ class _SelectableSuggestionLineItem extends StatelessWidget {
         ),
       ),
     );
+  }
+}
+
+String _friendlyRoleLabel(String role) {
+  switch (role.trim().toLowerCase()) {
+    case 'ramp':
+    case 'mana':
+    case 'mana_ramp':
+      return 'aceleração de mana';
+    case 'draw':
+    case 'card_draw':
+    case 'card_advantage':
+      return 'compra e vantagem';
+    case 'interaction':
+    case 'removal':
+    case 'spot_removal':
+      return 'interação';
+    case 'wipe':
+    case 'board_wipe':
+    case 'sweeper':
+      return 'limpeza de mesa';
+    case 'protection':
+      return 'proteção';
+    case 'win_condition':
+    case 'finisher':
+      return 'condição de vitória';
+    case 'land':
+    case 'lands':
+      return 'base de mana';
+    case 'tutor':
+      return 'busca de peças';
+    case 'utility':
+      return 'consistência';
+    default:
+      return role.trim();
+  }
+}
+
+String _friendlyPriorityLabel(String priority) {
+  switch (priority.trim().toLowerCase()) {
+    case 'high':
+    case 'alta':
+      return 'prioridade alta';
+    case 'medium':
+    case 'media':
+    case 'média':
+      return 'prioridade média';
+    case 'low':
+    case 'baixa':
+      return 'prioridade baixa';
+    default:
+      return priority.trim().isEmpty ? '' : priority.trim();
+  }
+}
+
+String _friendlyRiskLabel(String risk) {
+  switch (risk.trim().toLowerCase()) {
+    case 'low':
+    case 'baixo':
+      return 'baixo risco';
+    case 'medium':
+    case 'medio':
+    case 'médio':
+      return 'risco moderado';
+    case 'high':
+    case 'alto':
+      return 'alto risco';
+    default:
+      return risk.trim().isEmpty ? '' : risk.trim();
+  }
+}
+
+String _friendlyCurveLabel(String value) {
+  final text = value.trim();
+  if (text.isEmpty) return '';
+  if (text.toLowerCase().contains('curva')) return text;
+  return 'curva $text';
+}
+
+String _friendlyPriceLabel(Object? value) {
+  if (value == null) return '';
+  if (value is num) return 'R\$ ${value.toStringAsFixed(2)}';
+  final text = value.toString().trim();
+  if (text.isEmpty) return '';
+  if (text.toLowerCase().startsWith('r\$')) return text;
+  final parsed = double.tryParse(text.replaceAll(',', '.'));
+  if (parsed != null) return 'R\$ ${parsed.toStringAsFixed(2)}';
+  return text;
+}
+
+String _collectionLabel(Map<String, dynamic> item) {
+  final ownedQuantity = item['owned_quantity'];
+  final collectionMatch = item['collection_match'] == true;
+  final purchaseRequired = item['purchase_required'] == true;
+  if (collectionMatch) {
+    final qty =
+        ownedQuantity is num && ownedQuantity > 0
+            ? ownedQuantity.toInt().toString()
+            : '';
+    return qty.isEmpty ? 'na coleção' : '$qty na coleção';
+  }
+  if (purchaseRequired) return 'precisa comprar';
+  return '';
+}
+
+String _friendlyMetaSourceLabel(String source) {
+  switch (source.trim().toLowerCase()) {
+    case 'competitive_meta_exact_shell_match':
+      return 'Referência competitiva';
+    case 'competitive_meta_commander_match':
+      return 'Mesmo comandante no meta';
+    case 'commander_learning':
+    case 'learned_deck':
+      return 'Aprendizado do comandante';
+    case 'edhrec':
+      return 'EDHREC';
+    default:
+      final text = source.trim();
+      if (text.isEmpty) return '';
+      if (text.contains('_')) return '';
+      return text;
+  }
+}
+
+String _friendlyMetaSelectionLabel(String reason) {
+  switch (reason.trim().toLowerCase()) {
+    case 'exact shell match':
+    case 'exact_shell_match':
+      return 'Plano parecido';
+    case 'commander match':
+    case 'commander_match':
+      return 'Mesmo comandante';
+    case 'theme match':
+    case 'theme_match':
+      return 'Mesmo tema';
+    default:
+      final text = reason.trim();
+      if (text.isEmpty) return '';
+      if (text.contains('_')) return '';
+      return text;
   }
 }

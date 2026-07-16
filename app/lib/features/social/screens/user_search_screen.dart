@@ -26,6 +26,7 @@ class _UserSearchScreenState extends State<UserSearchScreen> {
   }
 
   void _onSearchChanged(String value) {
+    setState(() {});
     _debounce?.cancel();
     _debounce = Timer(const Duration(milliseconds: 400), () {
       context.read<SocialProvider>().searchUsers(value);
@@ -55,19 +56,23 @@ class _UserSearchScreenState extends State<UserSearchScreen> {
                 hintText: 'Buscar por nome de usuário...',
                 hintStyle: const TextStyle(color: AppTheme.textSecondary),
                 prefixIcon: const Icon(Icons.search, color: AppTheme.brass400),
-                suffixIcon: IconButton(
-                  key: const Key('user-search-clear-button'),
-                  tooltip: 'Limpar busca',
-                  icon: const Icon(
-                    Icons.clear,
-                    color: AppTheme.textSecondary,
-                    size: 18,
-                  ),
-                  onPressed: () {
-                    _searchController.clear();
-                    context.read<SocialProvider>().clearSearch();
-                  },
-                ),
+                suffixIcon:
+                    _searchController.text.isEmpty
+                        ? null
+                        : IconButton(
+                          key: const Key('user-search-clear-button'),
+                          tooltip: 'Limpar busca',
+                          icon: const Icon(
+                            Icons.clear,
+                            color: AppTheme.textSecondary,
+                            size: 18,
+                          ),
+                          onPressed: () {
+                            _debounce?.cancel();
+                            setState(_searchController.clear);
+                            context.read<SocialProvider>().clearSearch();
+                          },
+                        ),
                 filled: true,
                 fillColor: AppTheme.surfaceSlate,
                 border: OutlineInputBorder(

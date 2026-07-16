@@ -20,7 +20,13 @@ import '../theme/app_theme.dart';
 /// )
 /// ```
 class CachedCardImage extends StatelessWidget {
+  static const _scryfallHeaders = <String, String>{
+    'User-Agent': 'ManaLoom/1.0',
+    'Accept': 'image/*',
+  };
+
   final String? imageUrl;
+  final String? fallbackImageUrl;
   final double? width;
   final double? height;
   final BoxFit fit;
@@ -29,6 +35,7 @@ class CachedCardImage extends StatelessWidget {
   const CachedCardImage({
     super.key,
     required this.imageUrl,
+    this.fallbackImageUrl,
     this.width,
     this.height,
     this.fit = BoxFit.cover,
@@ -54,7 +61,7 @@ class CachedCardImage extends StatelessWidget {
       normalized = 'https://${normalized.substring('http://'.length)}';
     }
 
-    final uri = Uri.tryParse(normalized);
+    var uri = Uri.tryParse(normalized);
     if (uri == null || !uri.hasScheme || uri.host.isEmpty) {
       return null;
     }
@@ -63,44 +70,71 @@ class CachedCardImage extends StatelessWidget {
       return null;
     }
 
+    if (uri.host == 'api.scryfall.com' &&
+        uri.path == '/cards/named' &&
+        uri.queryParameters.containsKey('set')) {
+      final query = Map<String, String>.from(uri.queryParameters)
+        ..remove('set');
+      query.putIfAbsent('version', () => 'normal');
+      uri = uri.replace(queryParameters: query);
+    }
+
     return uri.toString();
   }
 
   @override
   Widget build(BuildContext context) {
     final effectiveImageUrl = _sanitizeImageUrl(imageUrl);
-    if (effectiveImageUrl == null) {
+    final effectiveFallbackUrl = _sanitizeImageUrl(fallbackImageUrl);
+    final primaryUrl = effectiveImageUrl ?? effectiveFallbackUrl;
+    final fallbackUrl =
+        effectiveFallbackUrl != null && effectiveFallbackUrl != primaryUrl
+            ? effectiveFallbackUrl
+            : null;
+
+    if (primaryUrl == null) {
       return _placeholder();
     }
 
+    final image = _networkImage(primaryUrl, fallbackUrl: fallbackUrl);
+
+    if (borderRadius != null) {
+      return ClipRRect(borderRadius: borderRadius!, child: image);
+    }
+
+    return image;
+  }
+
+  Widget _networkImage(String effectiveImageUrl, {String? fallbackUrl}) {
     final image = CachedNetworkImage(
       imageUrl: effectiveImageUrl,
       width: width,
       height: height,
       fit: fit,
-      httpHeaders: const {'User-Agent': 'ManaLoom/1.0'},
+      httpHeaders: _scryfallHeaders,
       fadeInDuration: const Duration(milliseconds: 200),
       placeholder: (_, __) => _loadingWidget(),
       errorWidget: (_, __, error) {
         debugPrint(
           '[🖼️ CachedCardImage] falha ao carregar $effectiveImageUrl -> $error',
         );
-        return Image.network(
-          effectiveImageUrl,
-          width: width,
-          height: height,
-          fit: fit,
-          headers: const {'User-Agent': 'ManaLoom/1.0'},
-          errorBuilder: (_, __, ___) => _errorWidget(),
-        );
+        if (fallbackUrl != null) {
+          return CachedNetworkImage(
+            imageUrl: fallbackUrl,
+            width: width,
+            height: height,
+            fit: fit,
+            httpHeaders: _scryfallHeaders,
+            fadeInDuration: const Duration(milliseconds: 120),
+            placeholder: (_, __) => _loadingWidget(),
+            errorWidget: (_, __, ___) => _errorWidget(),
+          );
+        }
+        return _errorWidget();
       },
       // Cache por 30 dias (default do flutter_cache_manager)
       // As imagens do Scryfall raramente mudam, então cache longo é seguro.
     );
-
-    if (borderRadius != null) {
-      return ClipRRect(borderRadius: borderRadius!, child: image);
-    }
 
     return image;
   }

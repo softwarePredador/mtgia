@@ -1,11 +1,14 @@
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:manaloom/core/theme/app_theme.dart';
+import 'package:manaloom/core/utils/friendly_error_mapper.dart';
 import 'package:manaloom/core/utils/mana_helper.dart';
+import 'package:manaloom/core/widgets/cached_card_image.dart';
 import 'package:provider/provider.dart';
 
 import '../providers/deck_provider.dart';
 import '../models/deck_analysis.dart';
+import '../models/deck_card_item.dart';
 import '../models/deck_details.dart';
 
 class DeckAnalysisTab extends StatefulWidget {
@@ -82,9 +85,13 @@ class _DeckAnalysisTabState extends State<DeckAnalysisTab> {
       );
     } catch (e) {
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(e.toString().replaceFirst('Exception: ', ''))),
+      final message = FriendlyErrorMapper.fromException(
+        e,
+        context: FriendlyErrorContext.deckDetails,
       );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(message)));
     } finally {
       if (mounted) {
         setState(() => _isRefreshingAi = false);
@@ -173,6 +180,7 @@ class _DeckAnalysisTabState extends State<DeckAnalysisTab> {
     return Padding(
       padding: const EdgeInsets.all(16),
       child: Column(
+        mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
@@ -192,10 +200,7 @@ class _DeckAnalysisTabState extends State<DeckAnalysisTab> {
           const SizedBox(height: 16),
           _AnalysisSummaryStrip(
             legalityScore: _legalityScore(effectiveDeck),
-            priceLabel:
-                effectiveDeck.pricingTotal == null
-                    ? 'N/D'
-                    : 'R\$ ${effectiveDeck.pricingTotal!.toStringAsFixed(0)}',
+            price: _priceSummary(effectiveDeck),
             averageCmc: averageCmc,
             landCount: landCount,
           ),
@@ -226,7 +231,7 @@ class _DeckAnalysisTabState extends State<DeckAnalysisTab> {
                 children: [
                   if (effectiveDeck.synergyScore != null) ...[
                     _AnalysisCard(
-                      title: 'Score de sinergia',
+                      title: 'Sinergia do deck',
                       score: effectiveDeck.synergyScore!,
                       color: AppTheme.manaViolet,
                     ),
@@ -273,7 +278,7 @@ class _DeckAnalysisTabState extends State<DeckAnalysisTab> {
             subtitle:
                 'Entenda quais cartas entraram nas contagens de ramp, compra, remoção, wipes e proteção.',
             child: _FunctionalTagsOverview(
-              deckId: effectiveDeck.id,
+              deck: effectiveDeck,
               analysis: functionalAnalysis,
               isLoading: functionalAnalysisLoading,
               errorMessage: functionalAnalysisError,
@@ -432,6 +437,25 @@ class _DeckAnalysisTabState extends State<DeckAnalysisTab> {
     return (countScore + (hasCommander ? 15 : 0)).clamp(0, 100);
   }
 
+  _DeckPriceSummary _priceSummary(DeckDetails deck) {
+    final direct = deck.pricingTotal;
+    if (direct != null) {
+      return _DeckPriceSummary(
+        total: direct,
+        currency: deck.pricingCurrency ?? 'BRL',
+        missingCards: deck.pricingMissingCards,
+      );
+    }
+
+    final fromStats = _priceFromStats(deck.stats);
+    if (fromStats != null) return fromStats;
+
+    return _DeckPriceSummary(
+      currency: deck.pricingCurrency ?? 'BRL',
+      missingCards: deck.pricingMissingCards,
+    );
+  }
+
   List<PieChartSectionData> _buildPieSections(Map<String, int> counts) {
     final total = counts.values.fold(0, (sum, item) => sum + item);
     if (total == 0) return [];
@@ -504,108 +528,292 @@ class _DeckAnalysisTabState extends State<DeckAnalysisTab> {
   }
 }
 
+class _DeckPriceSummary {
+  const _DeckPriceSummary({
+    this.total,
+    required this.currency,
+    this.missingCards,
+  });
+
+  final double? total;
+  final String currency;
+  final int? missingCards;
+
+  bool get hasTotal => total != null;
+
+  String get displayValue {
+    final value = total;
+    if (value == null) return 'Pendente';
+    return _formatDeckCurrency(value, currency);
+  }
+
+  String get helperText {
+    if (total == null) return 'Atualize preços';
+    final missing = missingCards;
+    if (missing != null && missing > 0) return '$missing sem preço';
+    return 'Estimado';
+  }
+}
+
+_DeckPriceSummary? _priceFromStats(Map<String, dynamic> stats) {
+  final directCandidates = <_PriceCandidate>[
+    _PriceCandidate(stats['pricing_total'], stats['pricing_currency']),
+    _PriceCandidate(stats['estimated_total_brl'], 'BRL'),
+    _PriceCandidate(stats['estimated_total_usd'], 'USD'),
+    _PriceCandidate(stats['total_brl'], 'BRL'),
+    _PriceCandidate(stats['total_usd'], 'USD'),
+  ];
+
+  for (final candidate in directCandidates) {
+    final total = _readPriceDouble(candidate.value);
+    if (total != null) {
+      return _DeckPriceSummary(
+        total: total,
+        currency: candidate.currency?.toString() ?? 'BRL',
+        missingCards: _readInt(stats['pricing_missing_cards']),
+      );
+    }
+  }
+
+  final pricing = stats['pricing'];
+  if (pricing is Map) {
+    final nested = pricing.cast<dynamic, dynamic>();
+    final candidates = <_PriceCandidate>[
+      _PriceCandidate(nested['estimated_total_brl'], 'BRL'),
+      _PriceCandidate(nested['estimated_total_usd'], 'USD'),
+      _PriceCandidate(nested['pricing_total'], nested['currency']),
+      _PriceCandidate(nested['total_brl'], 'BRL'),
+      _PriceCandidate(nested['total_usd'], 'USD'),
+      _PriceCandidate(nested['total'], nested['currency']),
+    ];
+    for (final candidate in candidates) {
+      final total = _readPriceDouble(candidate.value);
+      if (total != null) {
+        return _DeckPriceSummary(
+          total: total,
+          currency: candidate.currency?.toString() ?? 'BRL',
+          missingCards:
+              _readInt(nested['missing_price_cards']) ??
+              _readInt(nested['pricing_missing_cards']),
+        );
+      }
+    }
+  }
+
+  return null;
+}
+
+class _PriceCandidate {
+  const _PriceCandidate(this.value, this.currency);
+
+  final Object? value;
+  final Object? currency;
+}
+
+double? _readPriceDouble(Object? value) {
+  if (value is num) return value.toDouble();
+  final text = value?.toString().trim();
+  if (text == null || text.isEmpty) return null;
+  final cleaned = text.replaceAll(RegExp(r'[^0-9,.-]'), '');
+  final normalized =
+      cleaned.contains('.') && cleaned.contains(',')
+          ? cleaned.replaceAll('.', '').replaceAll(',', '.')
+          : cleaned.replaceAll(',', '.');
+  return double.tryParse(normalized);
+}
+
+int? _readInt(Object? value) {
+  if (value is int) return value;
+  if (value is num) return value.round();
+  return int.tryParse(value?.toString() ?? '');
+}
+
+String _formatDeckCurrency(double value, String currency) {
+  final normalized = currency.trim().toUpperCase();
+  final fixed = value.toStringAsFixed(2);
+  final parts = fixed.split('.');
+  final whole = parts.first;
+  final cents = parts.length > 1 ? parts[1] : '00';
+  final grouped = whole.replaceAllMapped(
+    RegExp(r'\B(?=(\d{3})+(?!\d))'),
+    (_) => '.',
+  );
+
+  if (normalized == 'USD') {
+    return 'US\$ $grouped,$cents';
+  }
+  if (normalized == 'EUR') {
+    return '€ $grouped,$cents';
+  }
+  if (normalized == 'BRL' || normalized == 'R\$') {
+    return 'R\$ $grouped,$cents';
+  }
+  if (normalized.isEmpty) {
+    return 'R\$ $grouped,$cents';
+  }
+  return '$normalized $grouped,$cents';
+}
+
 class _AnalysisSummaryStrip extends StatelessWidget {
   const _AnalysisSummaryStrip({
     required this.legalityScore,
-    required this.priceLabel,
+    required this.price,
     required this.averageCmc,
     required this.landCount,
   });
 
   final int legalityScore;
-  final String priceLabel;
+  final _DeckPriceSummary price;
   final double averageCmc;
   final int landCount;
 
   @override
   Widget build(BuildContext context) {
-    return GridView.count(
-      crossAxisCount: 4,
-      shrinkWrap: true,
-      physics: const NeverScrollableScrollPhysics(),
-      mainAxisSpacing: 10,
-      crossAxisSpacing: 10,
-      childAspectRatio: 0.74,
-      children: [
-        _SummaryMetricRing(
-          label: 'Legalidade',
-          value: '$legalityScore/100',
-          accent: AppTheme.success,
-        ),
-        _SummaryMetricRing(
-          label: 'Preço total',
-          value: priceLabel,
-          accent: AppTheme.brass400,
-        ),
-        _SummaryMetricRing(
-          label: 'Curva média',
-          value: averageCmc.toStringAsFixed(1),
-          accent: AppTheme.frost400,
-        ),
-        _SummaryMetricRing(
-          label: 'Terrenos',
-          value: '$landCount',
-          accent: AppTheme.frost600,
-        ),
-      ],
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final columns = constraints.maxWidth < 560 ? 2 : 4;
+        const gap = 10.0;
+        final width = (constraints.maxWidth - ((columns - 1) * gap)) / columns;
+        return Wrap(
+          spacing: gap,
+          runSpacing: gap,
+          children: [
+            SizedBox(
+              width: width,
+              child: _SummaryMetricTile(
+                icon: Icons.verified_outlined,
+                label: 'Legalidade',
+                value: '$legalityScore/100',
+                helper: legalityScore >= 100 ? 'Pronto' : 'Revisar lista',
+                accent: AppTheme.success,
+              ),
+            ),
+            SizedBox(
+              width: width,
+              child: _SummaryMetricTile(
+                icon:
+                    price.hasTotal
+                        ? Icons.payments_outlined
+                        : Icons.price_check_outlined,
+                label: 'Preço total',
+                value: price.displayValue,
+                helper: price.helperText,
+                accent: AppTheme.brass400,
+              ),
+            ),
+            SizedBox(
+              width: width,
+              child: _SummaryMetricTile(
+                icon: Icons.show_chart_rounded,
+                label: 'Curva média',
+                value: averageCmc.toStringAsFixed(1),
+                helper: 'Valor de mana',
+                accent: AppTheme.frost400,
+              ),
+            ),
+            SizedBox(
+              width: width,
+              child: _SummaryMetricTile(
+                icon: Icons.landscape_outlined,
+                label: 'Terrenos',
+                value: '$landCount',
+                helper: 'No deck principal',
+                accent: AppTheme.frost600,
+              ),
+            ),
+          ],
+        );
+      },
     );
   }
 }
 
-class _SummaryMetricRing extends StatelessWidget {
-  const _SummaryMetricRing({
+class _SummaryMetricTile extends StatelessWidget {
+  const _SummaryMetricTile({
+    required this.icon,
     required this.label,
     required this.value,
+    required this.helper,
     required this.accent,
   });
 
+  final IconData icon;
   final String label;
   final String value;
+  final String helper;
   final Color accent;
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     return Container(
-      padding: const EdgeInsets.all(8),
+      constraints: const BoxConstraints(minHeight: 108),
+      padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
         color: AppTheme.surfaceElevated.withValues(alpha: 0.88),
-        borderRadius: BorderRadius.circular(AppTheme.radiusLg),
+        borderRadius: BorderRadius.circular(AppTheme.radiusMd),
         border: Border.all(
-          color: accent.withValues(alpha: 0.42),
-          width: AppTheme.strokeRegular,
+          color: accent.withValues(alpha: 0.34),
+          width: AppTheme.strokeThin,
         ),
       ),
       child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Container(
-            width: 42,
-            height: 42,
-            alignment: Alignment.center,
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              border: Border.all(color: accent, width: 2),
-              color: accent.withValues(alpha: 0.08),
-            ),
-            child: Text(
-              value,
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              style: theme.textTheme.labelMedium?.copyWith(
-                color: AppTheme.textPrimary,
-                fontWeight: FontWeight.w900,
+          Row(
+            children: [
+              Container(
+                width: 32,
+                height: 32,
+                alignment: Alignment.center,
+                decoration: BoxDecoration(
+                  color: accent.withValues(alpha: 0.12),
+                  borderRadius: BorderRadius.circular(AppTheme.radiusSm),
+                ),
+                child: Icon(icon, color: accent, size: 18),
               ),
-            ),
+              const Spacer(),
+              Container(
+                width: 8,
+                height: 8,
+                decoration: BoxDecoration(
+                  color: accent,
+                  shape: BoxShape.circle,
+                ),
+              ),
+            ],
           ),
-          const SizedBox(height: 6),
+          const SizedBox(height: 14),
           Text(
             label,
-            textAlign: TextAlign.center,
-            maxLines: 2,
+            maxLines: 1,
             overflow: TextOverflow.ellipsis,
             style: theme.textTheme.labelSmall?.copyWith(
               color: AppTheme.textSecondary,
+              fontWeight: FontWeight.w700,
+            ),
+          ),
+          const SizedBox(height: 3),
+          FittedBox(
+            fit: BoxFit.scaleDown,
+            alignment: Alignment.centerLeft,
+            child: Text(
+              value,
+              maxLines: 1,
+              style: theme.textTheme.titleLarge?.copyWith(
+                color: AppTheme.textPrimary,
+                fontWeight: FontWeight.w900,
+                height: 1.0,
+              ),
+            ),
+          ),
+          const SizedBox(height: 3),
+          Text(
+            helper,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: theme.textTheme.labelSmall?.copyWith(
+              color: AppTheme.textHint,
               fontWeight: FontWeight.w700,
             ),
           ),
@@ -631,44 +839,95 @@ class _AnalysisActionBar extends StatelessWidget {
     final theme = Theme.of(context);
     final accent = hasAnalysis ? AppTheme.success : theme.colorScheme.primary;
 
-    return Wrap(
-      spacing: 12,
-      runSpacing: 12,
-      crossAxisAlignment: WrapCrossAlignment.center,
-      children: [
-        Container(
-          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
-          decoration: BoxDecoration(
-            color: accent.withValues(alpha: 0.12),
-            borderRadius: BorderRadius.circular(AppTheme.radiusMd),
-          ),
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Icon(
-                hasAnalysis
-                    ? Icons.check_circle_outline
-                    : Icons.pending_outlined,
-                size: 16,
-                color: accent,
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final stacked = constraints.maxWidth < 420;
+        final status = _AnalysisStatusPill(
+          label: hasAnalysis ? 'Leitura pronta' : 'Leitura pendente',
+          icon:
+              hasAnalysis ? Icons.check_circle_outline : Icons.pending_outlined,
+          accent: accent,
+        );
+        final action = SizedBox(
+          height: 44,
+          width: stacked ? double.infinity : 196,
+          child: FilledButton.icon(
+            onPressed: isRefreshing ? null : onRefresh,
+            icon: Icon(hasAnalysis ? Icons.refresh : Icons.auto_awesome),
+            label: Text(hasAnalysis ? 'Atualizar análise' : 'Gerar análise'),
+            style: FilledButton.styleFrom(
+              backgroundColor: AppTheme.brass500,
+              foregroundColor: AppTheme.backgroundAbyss,
+              disabledBackgroundColor: AppTheme.outlineMuted,
+              disabledForegroundColor: AppTheme.textHint,
+              textStyle: theme.textTheme.titleSmall?.copyWith(
+                fontWeight: FontWeight.w900,
               ),
-              const SizedBox(width: 8),
-              Text(
-                hasAnalysis ? 'Leitura pronta' : 'Leitura pendente',
-                style: theme.textTheme.titleSmall?.copyWith(
-                  color: AppTheme.textPrimary,
-                  fontWeight: FontWeight.w700,
-                ),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(AppTheme.radiusMd),
               ),
-            ],
+            ),
           ),
-        ),
-        FilledButton.tonalIcon(
-          onPressed: isRefreshing ? null : onRefresh,
-          icon: Icon(hasAnalysis ? Icons.refresh : Icons.auto_awesome),
-          label: Text(hasAnalysis ? 'Atualizar análise' : 'Gerar análise'),
-        ),
-      ],
+        );
+
+        if (stacked) {
+          return Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [status, const SizedBox(height: 10), action],
+          );
+        }
+
+        return Row(
+          children: [
+            Expanded(child: status),
+            const SizedBox(width: 10),
+            action,
+          ],
+        );
+      },
+    );
+  }
+}
+
+class _AnalysisStatusPill extends StatelessWidget {
+  const _AnalysisStatusPill({
+    required this.label,
+    required this.icon,
+    required this.accent,
+  });
+
+  final String label;
+  final IconData icon;
+  final Color accent;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return Container(
+      height: 44,
+      padding: const EdgeInsets.symmetric(horizontal: 12),
+      decoration: BoxDecoration(
+        color: accent.withValues(alpha: 0.12),
+        borderRadius: BorderRadius.circular(AppTheme.radiusMd),
+        border: Border.all(color: accent.withValues(alpha: 0.26)),
+      ),
+      child: Row(
+        children: [
+          Icon(icon, size: 18, color: accent),
+          const SizedBox(width: 8),
+          Expanded(
+            child: Text(
+              label,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: theme.textTheme.titleSmall?.copyWith(
+                color: AppTheme.textPrimary,
+                fontWeight: FontWeight.w900,
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 }
@@ -823,14 +1082,14 @@ const _functionalBuckets = <_FunctionalBucketSpec>[
 
 class _FunctionalTagsOverview extends StatelessWidget {
   const _FunctionalTagsOverview({
-    required this.deckId,
+    required this.deck,
     required this.analysis,
     required this.isLoading,
     required this.errorMessage,
     required this.onRefresh,
   });
 
-  final String deckId;
+  final DeckDetails deck;
   final DeckAnalysisData? analysis;
   final bool isLoading;
   final String? errorMessage;
@@ -844,7 +1103,7 @@ class _FunctionalTagsOverview extends StatelessWidget {
       return const _FunctionalAnalysisStatus(
         key: Key('deck-analysis-functional-loading'),
         icon: Icons.hourglass_top_rounded,
-        message: 'Carregando contagens funcionais do backend...',
+        message: 'Lendo as funcoes das cartas do deck...',
         child: Padding(
           padding: EdgeInsets.only(top: 12),
           child: LinearProgressIndicator(),
@@ -875,7 +1134,7 @@ class _FunctionalTagsOverview extends StatelessWidget {
         key: const Key('deck-analysis-functional-empty'),
         icon: Icons.category_outlined,
         message:
-            'As funções ainda não estão disponíveis para este deck. Atualize para buscar a leitura do backend.',
+            'As funções ainda não estão disponíveis para este deck. Atualize para buscar a leitura do deck.',
         child: Padding(
           padding: const EdgeInsets.only(top: 12),
           child: FilledButton.tonalIcon(
@@ -888,15 +1147,11 @@ class _FunctionalTagsOverview extends StatelessWidget {
       );
     }
 
-    final coverage = data.functionalTags?.coverage;
-    final coverageRatio = coverage?.taggedCopyRatio;
-    final coverageText = coverage?.summary ?? 'Amostras não informadas';
-
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Container(
-          key: Key('deck-analysis-functional-origin-$deckId'),
+          key: Key('deck-analysis-functional-origin-${deck.id}'),
           width: double.infinity,
           padding: const EdgeInsets.all(12),
           decoration: BoxDecoration(
@@ -916,38 +1171,22 @@ class _FunctionalTagsOverview extends StatelessWidget {
                 crossAxisAlignment: WrapCrossAlignment.center,
                 children: [
                   _FunctionalInfoChip(
-                    icon: Icons.source_outlined,
-                    label: data.sourceLabel,
+                    icon: Icons.auto_awesome_outlined,
+                    label:
+                        data.hasFunctionalTags
+                            ? 'Leitura por funções do deck'
+                            : 'Leitura básica do deck',
                   ),
                   _FunctionalInfoChip(
-                    icon: Icons.analytics_outlined,
-                    label: coverageText,
+                    icon: Icons.touch_app_outlined,
+                    label: 'Abra um grupo para ver as cartas',
                   ),
-                  if (data.functionalTags?.source?.hasAnySignal == true)
-                    _FunctionalInfoChip(
-                      icon: Icons.account_tree_outlined,
-                      label: data.functionalTags!.source!.summary,
-                    ),
                 ],
               ),
-              if (coverageRatio != null) ...[
-                const SizedBox(height: 10),
-                ClipRRect(
-                  borderRadius: BorderRadius.circular(AppTheme.radiusXs),
-                  child: LinearProgressIndicator(
-                    value: coverageRatio.clamp(0, 1).toDouble(),
-                    minHeight: 5,
-                    color: AppTheme.loomCyan,
-                    backgroundColor: AppTheme.outlineMuted.withValues(
-                      alpha: 0.35,
-                    ),
-                  ),
-                ),
-              ],
               if (!data.hasFunctionalTags) ...[
                 const SizedBox(height: 8),
                 Text(
-                  'Resposta legada: contagens visíveis, mas sem amostras de cartas.',
+                  'Esta leitura mostra os totais, mas ainda não trouxe a lista de cartas de cada função.',
                   style: theme.textTheme.bodySmall?.copyWith(
                     color: AppTheme.textSecondary,
                     height: 1.3,
@@ -962,7 +1201,7 @@ class _FunctionalTagsOverview extends StatelessWidget {
           (bucket) => Padding(
             padding: const EdgeInsets.only(bottom: 10),
             child: _FunctionalBucketTile(
-              deckId: deckId,
+              deck: deck,
               bucket: bucket,
               analysis: data,
             ),
@@ -1073,12 +1312,12 @@ class _FunctionalInfoChip extends StatelessWidget {
 
 class _FunctionalBucketTile extends StatelessWidget {
   const _FunctionalBucketTile({
-    required this.deckId,
+    required this.deck,
     required this.bucket,
     required this.analysis,
   });
 
-  final String deckId;
+  final DeckDetails deck;
   final _FunctionalBucketSpec bucket;
   final DeckAnalysisData analysis;
 
@@ -1090,6 +1329,7 @@ class _FunctionalBucketTile extends StatelessWidget {
       compositionKey: bucket.compositionKey,
     );
     final samples = analysis.samplesFor(bucket.tagKey);
+    final cardsByName = _cardsByName(deck);
     final samplePreview =
         samples.isEmpty
             ? 'Sem amostras nesta resposta.'
@@ -1105,7 +1345,7 @@ class _FunctionalBucketTile extends StatelessWidget {
         ),
       ),
       child: ExpansionTile(
-        key: Key('deck-analysis-functional-bucket-$deckId-${bucket.key}'),
+        key: Key('deck-analysis-functional-bucket-${deck.id}-${bucket.key}'),
         tilePadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 2),
         childrenPadding: const EdgeInsets.fromLTRB(12, 0, 12, 12),
         iconColor: bucket.color,
@@ -1133,7 +1373,9 @@ class _FunctionalBucketTile extends StatelessWidget {
             ),
             const SizedBox(width: 8),
             Container(
-              key: Key('deck-analysis-functional-count-$deckId-${bucket.key}'),
+              key: Key(
+                'deck-analysis-functional-count-${deck.id}-${bucket.key}',
+              ),
               padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 4),
               decoration: BoxDecoration(
                 color: bucket.color.withValues(alpha: 0.14),
@@ -1170,14 +1412,11 @@ class _FunctionalBucketTile extends StatelessWidget {
           ),
           const SizedBox(height: 10),
           _FunctionalBucketSamples(
-            deckId: deckId,
+            deckId: deck.id,
             bucket: bucket,
             samples: samples,
+            cardsByName: cardsByName,
             totalCount: count,
-            sourceLabel: analysis.sourceLabel,
-            coverageSummary:
-                analysis.functionalTags?.coverage.summary ??
-                'Cobertura não informada',
           ),
         ],
       ),
@@ -1190,46 +1429,43 @@ class _FunctionalBucketSamples extends StatelessWidget {
     required this.deckId,
     required this.bucket,
     required this.samples,
+    required this.cardsByName,
     required this.totalCount,
-    required this.sourceLabel,
-    required this.coverageSummary,
   });
 
   final String deckId;
   final _FunctionalBucketSpec bucket;
   final List<DeckFunctionalTagSample> samples;
+  final Map<String, DeckCardItem> cardsByName;
   final int totalCount;
-  final String sourceLabel;
-  final String coverageSummary;
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final visibleSamples = samples.take(5).toList(growable: false);
+    final visibleSamples = samples.toList(growable: false);
+    final sampleSummary =
+        visibleSamples.length >= totalCount
+            ? 'Cartas deste grupo: ${visibleSamples.length}.'
+            : 'Cartas deste grupo: mostrando ${visibleSamples.length} de $totalCount.';
 
     return Column(
       key: Key('deck-analysis-functional-samples-$deckId-${bucket.key}'),
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         _FunctionalMetaLine(
-          icon: Icons.source_outlined,
-          text: 'Origem da contagem: $sourceLabel',
+          icon: Icons.info_outline_rounded,
+          text: _friendlyBucketExplanation(bucket),
         ),
         const SizedBox(height: 6),
         _FunctionalMetaLine(
-          icon: Icons.analytics_outlined,
-          text: 'Cobertura geral: $coverageSummary',
-        ),
-        const SizedBox(height: 6),
-        _FunctionalMetaLine(
-          icon: Icons.rule_rounded,
+          icon: Icons.touch_app_outlined,
           text:
-              'Como é contado: ${bucket.description} A contagem inclui cartas marcadas com a função "${bucket.label}" no backend.',
+              'Toque em uma carta para ver a imagem e o motivo dela entrar aqui.',
         ),
         const SizedBox(height: 10),
         if (visibleSamples.isEmpty)
           Text(
-            'Este backend retornou a contagem, mas não enviou amostras de cartas para este indicador.',
+            'Ainda não há uma lista de cartas para este indicador.',
             style: theme.textTheme.bodySmall?.copyWith(
               color: AppTheme.textSecondary,
               height: AppTheme.lineHeightCompact,
@@ -1237,7 +1473,7 @@ class _FunctionalBucketSamples extends StatelessWidget {
           )
         else ...[
           Text(
-            'Cartas consideradas: mostrando ${visibleSamples.length} de $totalCount.',
+            sampleSummary,
             key: Key(
               'deck-analysis-functional-considered-$deckId-${bucket.key}',
             ),
@@ -1257,6 +1493,8 @@ class _FunctionalBucketSamples extends StatelessWidget {
                   'deck-analysis-functional-sample-$deckId-${bucket.key}-$index',
                 ),
                 sample: sample,
+                card: cardsByName[_normalizeCardName(sample.name)],
+                bucket: bucket,
                 accent: bucket.color,
               ),
             );
@@ -1299,125 +1537,211 @@ class _FunctionalSampleRow extends StatelessWidget {
   const _FunctionalSampleRow({
     super.key,
     required this.sample,
+    required this.card,
+    required this.bucket,
     required this.accent,
   });
 
   final DeckFunctionalTagSample sample;
+  final DeckCardItem? card;
+  final _FunctionalBucketSpec bucket;
   final Color accent;
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final detail =
-        sample.reason?.trim().isNotEmpty == true ? sample.reason : sample.role;
-    final metadata = [
-      if (sample.confidence != null)
-        'confiança ${(sample.confidence!.clamp(0, 1) * 100).round()}%',
-      if (_friendlyFunctionalCode(sample.speed).isNotEmpty)
-        _friendlyFunctionalCode(sample.speed),
-      if (_friendlyFunctionalCode(sample.manaEfficiency).isNotEmpty)
-        _friendlyFunctionalCode(sample.manaEfficiency),
-    ];
-    final semanticDetails = [
-      if (_friendlyFunctionalCode(sample.cardAdvantageType).isNotEmpty)
-        _friendlyFunctionalCode(sample.cardAdvantageType),
-      if (_friendlyFunctionalCode(sample.interactionScope).isNotEmpty)
-        _friendlyFunctionalCode(sample.interactionScope),
-      if (_friendlyFunctionalCode(sample.protectionType).isNotEmpty)
-        _friendlyFunctionalCode(sample.protectionType),
-      if (_friendlyFunctionalCode(sample.recursionType).isNotEmpty)
-        _friendlyFunctionalCode(sample.recursionType),
-    ];
-    final evidence = _friendlyFunctionalEvidence(sample.evidence);
+    final imageUrl = card?.effectiveImageUrl ?? _scryfallImageUrl(sample.name);
+    final fallbackImageUrl =
+        card?.fallbackImageUrl ?? _scryfallImageUrl(sample.name);
+    final typeLine = (card?.typeLine ?? '').trim();
+    final quantity = card?.quantity;
 
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
-      decoration: BoxDecoration(
-        color: accent.withValues(alpha: 0.08),
+    final reason = _friendlySampleReason(bucket);
+
+    return Semantics(
+      button: true,
+      label: 'Ver ${sample.name}',
+      child: Material(
+        color: Colors.transparent,
         borderRadius: BorderRadius.circular(AppTheme.radiusSm),
-      ),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Icon(Icons.check_circle_outline, size: 15, color: accent),
-          const SizedBox(width: 8),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+        child: InkWell(
+          borderRadius: BorderRadius.circular(AppTheme.radiusSm),
+          onTap:
+              () => _showFunctionalSamplePreview(
+                context,
+                sample: sample,
+                imageUrl: imageUrl,
+                fallbackImageUrl: fallbackImageUrl,
+                typeLine: typeLine,
+                quantity: quantity,
+                reason: reason,
+                accent: accent,
+              ),
+          child: Container(
+            width: double.infinity,
+            padding: const EdgeInsets.all(10),
+            decoration: BoxDecoration(
+              color: accent.withValues(alpha: 0.08),
+              borderRadius: BorderRadius.circular(AppTheme.radiusSm),
+            ),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                Text(
-                  sample.name,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: theme.textTheme.bodyMedium?.copyWith(
-                    color: AppTheme.textPrimary.withValues(alpha: 0.92),
-                    fontWeight: FontWeight.w700,
-                  ),
+                CachedCardImage(
+                  imageUrl: imageUrl,
+                  fallbackImageUrl: fallbackImageUrl,
+                  width: AppTheme.touchTargetMin,
+                  height: 64,
+                  borderRadius: BorderRadius.circular(AppTheme.radiusSm),
                 ),
-                if (detail != null) ...[
-                  const SizedBox(height: 2),
-                  Text(
-                    detail,
-                    key: Key(
-                      'deck-analysis-functional-sample-reason-${sample.name}',
-                    ),
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                    style: theme.textTheme.bodySmall?.copyWith(
-                      color: AppTheme.textSecondary,
-                      height: 1.25,
-                    ),
-                  ),
-                ],
-                if (metadata.isNotEmpty) ...[
-                  const SizedBox(height: 2),
-                  Text(
-                    metadata.join(' • '),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: theme.textTheme.bodySmall?.copyWith(
-                      color: AppTheme.textSecondary.withValues(alpha: 0.82),
-                      height: 1.2,
-                    ),
-                  ),
-                ],
-                if (semanticDetails.isNotEmpty) ...[
-                  const SizedBox(height: 5),
-                  Wrap(
-                    spacing: 6,
-                    runSpacing: 6,
+                const SizedBox(width: 10),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      for (final item in semanticDetails)
-                        _FunctionalDetailPill(label: item, accent: accent),
+                      Text(
+                        sample.name,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: theme.textTheme.bodyMedium?.copyWith(
+                          color: AppTheme.textPrimary.withValues(alpha: 0.92),
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                      if (typeLine.isNotEmpty) ...[
+                        const SizedBox(height: 2),
+                        Text(
+                          typeLine,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: theme.textTheme.bodySmall?.copyWith(
+                            color: AppTheme.textSecondary,
+                            height: 1.25,
+                          ),
+                        ),
+                      ],
+                      const SizedBox(height: 3),
+                      Text(
+                        reason,
+                        key: Key(
+                          'deck-analysis-functional-sample-reason-${sample.name}',
+                        ),
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                        style: theme.textTheme.bodySmall?.copyWith(
+                          color: AppTheme.textSecondary.withValues(alpha: 0.88),
+                          height: 1.25,
+                        ),
+                      ),
                     ],
                   ),
-                ],
-                if (evidence.isNotEmpty) ...[
-                  const SizedBox(height: 5),
-                  Text(
-                    'Evidência: $evidence',
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: theme.textTheme.bodySmall?.copyWith(
-                      color: AppTheme.textSecondary.withValues(alpha: 0.72),
-                      height: 1.2,
-                    ),
-                  ),
+                ),
+                if (quantity != null && quantity > 1) ...[
+                  const SizedBox(width: 8),
+                  _FunctionalQuantityBadge(quantity: quantity, accent: accent),
                 ],
               ],
             ),
           ),
-        ],
+        ),
       ),
     );
   }
 }
 
-class _FunctionalDetailPill extends StatelessWidget {
-  const _FunctionalDetailPill({required this.label, required this.accent});
+void _showFunctionalSamplePreview(
+  BuildContext context, {
+  required DeckFunctionalTagSample sample,
+  required String? imageUrl,
+  required String? fallbackImageUrl,
+  required String typeLine,
+  required int? quantity,
+  required String reason,
+  required Color accent,
+}) {
+  showDialog<void>(
+    context: context,
+    builder: (context) {
+      final theme = Theme.of(context);
+      return Dialog(
+        insetPadding: const EdgeInsets.all(20),
+        backgroundColor: AppTheme.surfaceElevated,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(AppTheme.radiusLg),
+        ),
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 420),
+          child: Padding(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Expanded(
+                      child: Text(
+                        sample.name,
+                        style: theme.textTheme.titleMedium?.copyWith(
+                          color: AppTheme.textPrimary,
+                          fontWeight: FontWeight.w900,
+                        ),
+                      ),
+                    ),
+                    IconButton(
+                      tooltip: 'Fechar',
+                      onPressed: () => Navigator.of(context).pop(),
+                      icon: const Icon(Icons.close_rounded),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 12),
+                Center(
+                  child: CachedCardImage(
+                    imageUrl: imageUrl,
+                    fallbackImageUrl: fallbackImageUrl,
+                    width: 220,
+                    height: 306,
+                    borderRadius: BorderRadius.circular(AppTheme.radiusSm),
+                  ),
+                ),
+                const SizedBox(height: 12),
+                if (typeLine.isNotEmpty)
+                  Text(
+                    typeLine,
+                    style: theme.textTheme.bodyMedium?.copyWith(
+                      color: AppTheme.textSecondary,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                const SizedBox(height: 8),
+                Text(
+                  reason,
+                  style: theme.textTheme.bodySmall?.copyWith(
+                    color: AppTheme.textSecondary,
+                    height: 1.35,
+                  ),
+                ),
+                if (quantity != null && quantity > 1) ...[
+                  const SizedBox(height: 10),
+                  _FunctionalQuantityBadge(quantity: quantity, accent: accent),
+                ],
+              ],
+            ),
+          ),
+        ),
+      );
+    },
+  );
+}
 
-  final String label;
+class _FunctionalQuantityBadge extends StatelessWidget {
+  const _FunctionalQuantityBadge({
+    required this.quantity,
+    required this.accent,
+  });
+
+  final int quantity;
   final Color accent;
 
   @override
@@ -1431,7 +1755,7 @@ class _FunctionalDetailPill extends StatelessWidget {
         border: Border.all(color: accent.withValues(alpha: 0.18), width: 0.6),
       ),
       child: Text(
-        label,
+        'x$quantity',
         style: theme.textTheme.labelSmall?.copyWith(
           color: AppTheme.textPrimary.withValues(alpha: 0.82),
           fontWeight: FontWeight.w700,
@@ -1441,48 +1765,56 @@ class _FunctionalDetailPill extends StatelessWidget {
   }
 }
 
-String _friendlyFunctionalCode(String? raw) {
-  final value = raw?.trim();
-  if (value == null || value.isEmpty || value == 'none' || value == 'unknown') {
-    return '';
-  }
-  return switch (value) {
-    'fast' => 'rápida',
-    'medium' => 'média',
-    'slow' => 'lenta',
-    'cheap' => 'baixo custo',
-    'fair' => 'custo justo',
-    'expensive' => 'custo alto',
-    'card_draw' => 'compra carta',
-    'selection' => 'seleção',
-    'loot' => 'filtra mão',
-    'spot' => 'pontual',
-    'single_target' => 'alvo único',
-    'mass' => 'global',
-    'board' => 'mesa',
-    'hexproof' => 'hexproof',
-    'indestructible' => 'indestrutível',
-    'phase_out' => 'phase out',
-    'blink' => 'blink/proteção',
-    'counterspell' => 'anula mágicas',
-    'graveyard_to_hand' => 'cemitério para mão',
-    'graveyard_to_battlefield' => 'reanima',
-    _ => value.replaceAll('_', ' '),
+Map<String, DeckCardItem> _cardsByName(DeckDetails deck) {
+  final cards = <DeckCardItem>[
+    ...deck.commander,
+    ...deck.mainBoard.values.expand((list) => list),
+  ];
+  return {for (final card in cards) _normalizeCardName(card.name): card};
+}
+
+String _normalizeCardName(String value) => value.trim().toLowerCase();
+
+String? _scryfallImageUrl(String cardName) {
+  final trimmed = cardName.trim();
+  if (trimmed.isEmpty) return null;
+  return Uri.https('api.scryfall.com', '/cards/named', {
+    'exact': trimmed,
+    'format': 'image',
+    'version': 'normal',
+  }).toString();
+}
+
+String _friendlyBucketExplanation(_FunctionalBucketSpec bucket) {
+  return switch (bucket.key) {
+    'ramp' =>
+      'Mostra cartas que ajudam o deck a gerar mana, reduzir custos ou chegar antes nas jogadas principais.',
+    'draw' =>
+      'Mostra cartas que mantêm recursos na mão ou ajudam a encontrar as próximas jogadas.',
+    'removal' =>
+      'Mostra respostas para lidar com ameaças e proteger seu plano de jogo.',
+    'board_wipe' =>
+      'Mostra efeitos para limpar a mesa quando os oponentes desenvolvem demais.',
+    'protection' =>
+      'Mostra cartas que protegem comandante, permanentes ou peças importantes.',
+    'tutor' => 'Mostra cartas que buscam peças específicas do plano.',
+    'recursion' => 'Mostra cartas que recuperam recursos do cemitério.',
+    'wincon' => 'Mostra cartas que ajudam a fechar a partida.',
+    _ => bucket.description,
   };
 }
 
-String _friendlyFunctionalEvidence(String? raw) {
-  final value = raw?.trim();
-  if (value == null || value.isEmpty) return '';
-  return switch (value) {
-    'persisted_semantic_v2' => 'tag semântica persistida',
-    'heuristic_functional_tags_v1' => 'heurística funcional v1',
-    'card_draw_text' => 'texto da carta indica compra/vantagem',
-    'mana_ramp_text' => 'texto da carta acelera mana',
-    'removal_text' => 'texto da carta remove/interage',
-    'board_wipe_text' => 'texto da carta afeta várias permanentes',
-    'protection_text' => 'texto da carta protege permanente ou plano',
-    _ => value.replaceAll('_', ' '),
+String _friendlySampleReason(_FunctionalBucketSpec bucket) {
+  return switch (bucket.key) {
+    'ramp' => 'Ajuda a acelerar ou estabilizar a mana do deck.',
+    'draw' => 'Ajuda a manter cartas disponíveis durante a partida.',
+    'removal' => 'Ajuda a responder ameaças da mesa.',
+    'board_wipe' => 'Ajuda a resetar a mesa quando necessário.',
+    'protection' => 'Ajuda a proteger seu plano de jogo.',
+    'tutor' => 'Ajuda a encontrar uma carta importante.',
+    'recursion' => 'Ajuda a recuperar valor do cemitério.',
+    'wincon' => 'Ajuda a criar ou fechar uma condição de vitória.',
+    _ => 'Carta considerada nesta função do deck.',
   };
 }
 

@@ -48,6 +48,35 @@ class DeckCardItem {
   /// Condição física da carta (TCGPlayer standard)
   final CardCondition condition;
 
+  /// URL usada pela UI quando o backend/import ainda não trouxe `image_url`.
+  ///
+  /// Mantém a URL explícita como fonte principal e cai para a imagem pública do
+  /// Scryfall por nome exato da carta apenas quando necessário.
+  String? get effectiveImageUrl {
+    final explicit = imageUrl?.trim();
+    if (explicit != null && explicit.isNotEmpty) {
+      return explicit;
+    }
+
+    return fallbackImageUrl;
+  }
+
+  /// Imagem pública por nome, sem prender a UI a uma edição específica.
+  ///
+  /// Serve como fallback visual quando a imagem da impressão/importação falha.
+  String? get fallbackImageUrl {
+    final cardName = name.trim();
+    if (cardName.isEmpty) {
+      return null;
+    }
+
+    return Uri.https('api.scryfall.com', '/cards/named', {
+      'exact': cardName,
+      'format': 'image',
+      'version': 'normal',
+    }).toString();
+  }
+
   DeckCardItem({
     required this.id,
     required this.name,

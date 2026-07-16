@@ -73,11 +73,12 @@ class _RuntimeApi {
   Future<Map<String, dynamic>> deleteJson(
     String endpoint, {
     required String token,
+    Set<int> expected = const {200},
   }) async {
     final response = await _client
         .delete(Uri.parse('$baseUrl$endpoint'), headers: _headers(token))
         .timeout(const Duration(seconds: 20));
-    return _decode(response, expected: {200});
+    return _decode(response, expected: expected);
   }
 
   Future<_RuntimeUser> registerUser(String prefix) async {
@@ -198,6 +199,13 @@ void main() {
         name: deckName,
         cardId: card['id'] as String,
         marker: marker,
+      );
+      addTearDown(
+        () => api.deleteJson(
+          '/decks/$deckId',
+          token: creator.token,
+          expected: const {204, 404},
+        ),
       );
       // ignore: avoid_print
       print('PROFILE_COMMUNITY_PUBLIC_DECK_ID $deckId');

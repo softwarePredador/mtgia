@@ -69,11 +69,14 @@ class _SplashScreenState extends State<SplashScreen>
   }
 
   Future<void> _initializeApp(AuthProvider authProvider) async {
-    // Wait for animation to start
-    await Future.delayed(const Duration(milliseconds: 100));
+    final startedAt = DateTime.now();
     await authProvider.initialize();
 
-    await Future.delayed(const Duration(seconds: 3));
+    const minimumDwell = Duration(milliseconds: 650);
+    final remaining = minimumDwell - DateTime.now().difference(startedAt);
+    if (remaining > Duration.zero) {
+      await Future<void>.delayed(remaining);
+    }
 
     if (!mounted) return;
 

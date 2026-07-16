@@ -4,6 +4,8 @@ import 'package:manaloom/features/decks/models/deck_card_item.dart';
 import 'package:manaloom/features/decks/widgets/deck_details_dialogs.dart';
 import 'dart:async';
 
+import '../../../support/layout_test_tools.dart';
+
 DeckCardItem _buildCard() => DeckCardItem(
   id: 'card-1',
   name: 'Arcane Signet',
@@ -216,6 +218,11 @@ void main() {
       find.byKey(const Key('deck-card-details-dialog-card-1')),
       findsOneWidget,
     );
+    final imageSize = tester.getSize(
+      find.byKey(const Key('deck-card-details-image-card-1')),
+    );
+    expect(imageSize.height, greaterThan(imageSize.width));
+    expect(imageSize.height / imageSize.width, closeTo(1.397, 0.02));
     expect(find.text('TST #42'), findsOneWidget);
     expect(find.text('Test Set • 2026-01-01 • common'), findsOneWidget);
     expect(
@@ -245,6 +252,64 @@ void main() {
       findsNothing,
     );
   });
+
+  testWidgets(
+    'showDeckCardDetailsDialog keeps footer actions tappable on compact mobile layout',
+    (tester) async {
+      enableFatalHitTestWarnings();
+      setTestViewport(tester, const Size(320, 568));
+
+      final card = _buildCard().copyWith(manaCost: '{2}');
+      var detailsCalls = 0;
+
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Builder(
+            builder: (context) {
+              return Scaffold(
+                body: Center(
+                  child: ElevatedButton(
+                    onPressed: () async {
+                      await showDeckCardDetailsDialog(
+                        context: context,
+                        card: card,
+                        onShowAiExplanation: () async {},
+                        onShowEditionPicker: () async {},
+                        onOpenFullDetails: () {
+                          detailsCalls++;
+                        },
+                      );
+                    },
+                    child: const Text('abrir'),
+                  ),
+                ),
+              );
+            },
+          ),
+        ),
+      );
+
+      await tester.tap(find.text('abrir'));
+      await tester.pumpAndSettle();
+
+      expect(find.text('Arcane Signet'), findsOneWidget);
+      final imageSize = tester.getSize(
+        find.byKey(const Key('deck-card-details-image-card-1')),
+      );
+      expect(imageSize.height, greaterThan(imageSize.width));
+      expect(imageSize.height / imageSize.width, closeTo(1.397, 0.02));
+      expect(find.text('Ver Detalhes'), findsOneWidget);
+      expect(find.text('Fechar'), findsOneWidget);
+
+      await tester.tap(find.text('Ver Detalhes'));
+      await tester.pumpAndSettle();
+      expect(detailsCalls, 1);
+
+      await tester.tap(find.text('Fechar'));
+      await tester.pumpAndSettle();
+      expectNoLayoutExceptions(tester);
+    },
+  );
 
   testWidgets('showDeckRemoveCardConfirmationDialog returns confirmation', (
     tester,

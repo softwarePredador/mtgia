@@ -74,12 +74,7 @@ void main() {
     expect(find.text('Olá,\nPlaneswalker'), findsOneWidget);
     expect(find.text('Acesso rápido'), findsOneWidget);
     expect(find.text('Jogar agora'), findsWidgets);
-    expect(find.text('Abrir contador de vida'), findsOneWidget);
     expect(find.text('Construir deck'), findsOneWidget);
-    expect(find.text('Criar, importar ou ajustar'), findsOneWidget);
-    expect(find.text('Ver e gerenciar seus decks'), findsOneWidget);
-    expect(find.text('Suas cartas e coleções'), findsOneWidget);
-    expect(find.text('Marketplace e propostas'), findsOneWidget);
 
     expect(find.text('Decks recentes'), findsOneWidget);
     expect(find.text('Você ainda não tem decks'), findsOneWidget);
@@ -88,8 +83,8 @@ void main() {
       findsOneWidget,
     );
     expect(find.text('Criar novo deck'), findsOneWidget);
-    expect(find.textContaining('Gerar com IA'), findsOneWidget);
-    expect(find.text('Atividade recente'), findsOneWidget);
+    expect(find.text('Atividade recente'), findsNothing);
+    expect(find.text('Nova proposta recebida'), findsNothing);
     expect(find.text('Iniciar fluxo guiado'), findsNothing);
     expect(
       find.text('Crie seu primeiro deck ou gere um com IA!'),

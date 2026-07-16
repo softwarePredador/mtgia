@@ -59,14 +59,13 @@ class _DeckDetailsScreenState extends State<DeckDetailsScreen>
   bool _isPricingLoading = false;
   final Set<String> _hiddenCardIds = <String>{};
   final TextEditingController _cardSearchController = TextEditingController();
-  bool _pricingAutoLoaded = false;
   bool _validationAutoLoaded = false;
   bool _isValidating = false;
   bool _autoOpenedOptimization = false;
   Map<String, dynamic>? _validationResult;
   Set<String> _invalidCardNames = {};
   String? _lastValidationDeckSignature;
-  final Set<String> _autoFetchedDiagnosticAnalysisDeckIds = <String>{};
+  int _selectedTabIndex = 0;
 
   /// Extrai o nome da carta problemática do resultado da validação.
   /// Usa o campo estruturado 'card_name' quando disponível,
@@ -94,10 +93,16 @@ class _DeckDetailsScreenState extends State<DeckDetailsScreen>
   void initState() {
     super.initState();
     _tabController = TabController(length: 3, vsync: this);
+    _tabController.addListener(_handleTabChanged);
     WidgetsBinding.instance.addPostFrameCallback((_) {
       context.read<DeckProvider>().fetchDeckDetails(widget.deckId);
       _openInitialOptimizationIntent();
     });
+  }
+
+  void _handleTabChanged() {
+    if (_tabController.index == _selectedTabIndex) return;
+    setState(() => _selectedTabIndex = _tabController.index);
   }
 
   void _openInitialOptimizationIntent() {
@@ -146,6 +151,7 @@ class _DeckDetailsScreenState extends State<DeckDetailsScreen>
 
   @override
   void dispose() {
+    _tabController.removeListener(_handleTabChanged);
     _tabController.dispose();
     _cardSearchController.dispose();
     super.dispose();
@@ -277,7 +283,8 @@ class _DeckDetailsScreenState extends State<DeckDetailsScreen>
           ],
         ),
       ),
-      floatingActionButton: _buildAddCardsMenu(context),
+      floatingActionButton:
+          _selectedTabIndex == 1 ? _buildAddCardsMenu(context) : null,
       body: Builder(
         builder: (context) {
           final isLoading = context.select<DeckProvider, bool>(
@@ -351,7 +358,6 @@ class _DeckDetailsScreenState extends State<DeckDetailsScreen>
           final maxCards =
               format == 'commander' ? 100 : (format == 'brawl' ? 60 : null);
           final totalCards = _totalCards(deck);
-          final hasMeaningfulDeckState = totalCards > 0;
           final isReadyForAutoValidation = _shouldAutoValidateDeck(
             format: deck.format,
             totalCards: totalCards,
@@ -360,9 +366,6 @@ class _DeckDetailsScreenState extends State<DeckDetailsScreen>
               .select<DeckProvider, DeckAnalysisData?>(
                 (p) => p.deckAnalysisFor(deck.id),
               );
-          final diagnosticAnalysisLoading = context.select<DeckProvider, bool>(
-            (p) => p.isDeckAnalysisLoading(deck.id),
-          );
           final cardQuery = _cardSearchController.text.trim().toLowerCase();
           List<DeckCardItem> filterCards(List<DeckCardItem> cards) {
             if (cardQuery.isEmpty) return cards;
@@ -376,16 +379,6 @@ class _DeckDetailsScreenState extends State<DeckDetailsScreen>
                 .toList();
           }
 
-          // Auto-load pricing when deck is ready
-          if (hasMeaningfulDeckState &&
-              !_pricingAutoLoaded &&
-              !_isPricingLoading) {
-            _pricingAutoLoaded = true;
-            WidgetsBinding.instance.addPostFrameCallback((_) {
-              if (mounted) _loadPricing(force: false);
-            });
-          }
-
           // Auto-validate deck when ready
           if (isReadyForAutoValidation &&
               !_validationAutoLoaded &&
@@ -393,17 +386,6 @@ class _DeckDetailsScreenState extends State<DeckDetailsScreen>
             _validationAutoLoaded = true;
             WidgetsBinding.instance.addPostFrameCallback((_) {
               if (mounted) _autoValidateDeck();
-            });
-          }
-
-          if (hasMeaningfulDeckState &&
-              diagnosticAnalysis == null &&
-              !diagnosticAnalysisLoading &&
-              _autoFetchedDiagnosticAnalysisDeckIds.add(deck.id)) {
-            WidgetsBinding.instance.addPostFrameCallback((_) {
-              if (mounted) {
-                context.read<DeckProvider>().fetchDeckAnalysis(deck.id);
-              }
             });
           }
 
@@ -465,93 +447,108 @@ class _DeckDetailsScreenState extends State<DeckDetailsScreen>
               ),
 
               // Tab 2: Cartas
-              ListView(
-                padding: const EdgeInsets.all(16),
-                children: [
-                  _DeckCardsSearchHeader(
-                    controller: _cardSearchController,
-                    totalCards: totalCards,
-                    onChanged: () => setState(() {}),
-                  ),
-                  const SizedBox(height: 12),
-                  if (maxCards != null)
-                    Padding(
-                      padding: const EdgeInsets.only(bottom: 12),
-                      child: DeckProgressIndicator(
-                        deck: deck,
-                        totalCards: totalCards,
-                        maxCards: maxCards,
-                        hasCommander: deck.commander.isNotEmpty,
-                      ),
-                    ),
-                  if (_invalidCardNames.isNotEmpty)
-                    Padding(
-                      padding: const EdgeInsets.only(bottom: 12),
-                      child: Container(
-                        padding: const EdgeInsets.all(12),
-                        decoration: BoxDecoration(
-                          color: theme.colorScheme.error.withValues(alpha: 0.1),
-                          borderRadius: BorderRadius.circular(
-                            AppTheme.radiusMd,
-                          ),
-                          border: Border.all(
-                            color: theme.colorScheme.error.withValues(
-                              alpha: 0.4,
-                            ),
-                            width: AppTheme.strokeThin,
-                          ),
+              CustomScrollView(
+                cacheExtent: 180,
+                slivers: [
+                  SliverPadding(
+                    padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
+                    sliver: SliverList.list(
+                      children: [
+                        _DeckCardsSearchHeader(
+                          controller: _cardSearchController,
+                          totalCards: totalCards,
+                          onChanged: () => setState(() {}),
                         ),
-                        child: Row(
-                          children: [
-                            Icon(
-                              Icons.warning_amber_rounded,
-                              color: theme.colorScheme.error,
-                              size: 20,
+                        const SizedBox(height: 12),
+                        if (maxCards != null)
+                          Padding(
+                            padding: const EdgeInsets.only(bottom: 12),
+                            child: DeckProgressIndicator(
+                              deck: deck,
+                              totalCards: totalCards,
+                              maxCards: maxCards,
+                              hasCommander: deck.commander.isNotEmpty,
                             ),
-                            const SizedBox(width: 8),
-                            Expanded(
-                              child: Text(
-                                '${_invalidCardNames.length} carta(s) com problema: ${_invalidCardNames.join(", ")}',
-                                style: theme.textTheme.bodySmall?.copyWith(
-                                  color: theme.colorScheme.error,
-                                  fontWeight: FontWeight.w600,
+                          ),
+                        if (_invalidCardNames.isNotEmpty)
+                          Padding(
+                            padding: const EdgeInsets.only(bottom: 12),
+                            child: Container(
+                              padding: const EdgeInsets.all(12),
+                              decoration: BoxDecoration(
+                                color: theme.colorScheme.error.withValues(
+                                  alpha: 0.1,
+                                ),
+                                borderRadius: BorderRadius.circular(
+                                  AppTheme.radiusMd,
+                                ),
+                                border: Border.all(
+                                  color: theme.colorScheme.error.withValues(
+                                    alpha: 0.4,
+                                  ),
+                                  width: AppTheme.strokeThin,
                                 ),
                               ),
+                              child: Row(
+                                children: [
+                                  Icon(
+                                    Icons.warning_amber_rounded,
+                                    color: theme.colorScheme.error,
+                                    size: 20,
+                                  ),
+                                  const SizedBox(width: 8),
+                                  Expanded(
+                                    child: Text(
+                                      '${_invalidCardNames.length} carta(s) com problema: ${_invalidCardNames.join(", ")}',
+                                      style: theme.textTheme.bodySmall
+                                          ?.copyWith(
+                                            color: theme.colorScheme.error,
+                                            fontWeight: FontWeight.w600,
+                                          ),
+                                    ),
+                                  ),
+                                ],
+                              ),
                             ),
-                          ],
-                        ),
-                      ),
+                          ),
+                      ],
                     ),
+                  ),
                   if (deck.commander.isNotEmpty)
-                    _buildCardSection(
+                    ..._buildCardSectionSlivers(
                       context,
                       title: 'Comandante',
                       cards: filterCards(deck.commander),
                       deckFormat: deck.format,
                     ),
-                  ...deck.mainBoard.entries.map(
-                    (entry) => _buildCardSection(
+                  for (final entry in deck.mainBoard.entries)
+                    ..._buildCardSectionSlivers(
                       context,
                       title: entry.key,
                       cards: filterCards(entry.value),
                       deckFormat: deck.format,
                     ),
-                  ),
                   if (cardQuery.isNotEmpty &&
                       filterCards(deck.commander).isEmpty &&
                       deck.mainBoard.values
                           .expand((cards) => filterCards(cards))
                           .isEmpty)
-                    Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 28),
-                      child: Text(
-                        'Nenhuma carta encontrada nesse deck.',
-                        style: theme.textTheme.bodyMedium?.copyWith(
-                          color: AppTheme.textSecondary,
+                    SliverToBoxAdapter(
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 28,
                         ),
-                        textAlign: TextAlign.center,
+                        child: Text(
+                          'Nenhuma carta encontrada nesse deck.',
+                          style: theme.textTheme.bodyMedium?.copyWith(
+                            color: AppTheme.textSecondary,
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
                       ),
                     ),
+                  const SliverToBoxAdapter(child: SizedBox(height: 112)),
                 ],
               ),
 
@@ -559,7 +556,11 @@ class _DeckDetailsScreenState extends State<DeckDetailsScreen>
               SingleChildScrollView(
                 child: Column(
                   children: [
-                    SampleHandWidget(deck: deck),
+                    SampleHandWidget(
+                      deck: deck,
+                      onShowCardDetails:
+                          (card) => _showCardDetails(context, card),
+                    ),
                     DeckAnalysisTab(deck: deck),
                   ],
                 ),
@@ -580,14 +581,14 @@ class _DeckDetailsScreenState extends State<DeckDetailsScreen>
     _invalidCardNames = {};
   }
 
-  Widget _buildCardSection(
+  List<Widget> _buildCardSectionSlivers(
     BuildContext context, {
     required String title,
     required List<DeckCardItem> cards,
     required String deckFormat,
   }) {
     if (cards.isEmpty) {
-      return const SizedBox.shrink();
+      return const [];
     }
 
     final theme = Theme.of(context);
@@ -602,11 +603,16 @@ class _DeckDetailsScreenState extends State<DeckDetailsScreen>
       });
     }
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Padding(
-          padding: const EdgeInsets.fromLTRB(4, 10, 4, 8),
+    final visibleCards = sortedCards
+        .where((card) => !_hiddenCardIds.contains(card.id))
+        .toList(growable: false);
+
+    if (visibleCards.isEmpty) return const [];
+
+    return [
+      SliverToBoxAdapter(
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(20, 10, 20, 8),
           child: Row(
             children: [
               if (isCommanderSection) ...[
@@ -650,19 +656,23 @@ class _DeckDetailsScreenState extends State<DeckDetailsScreen>
             ],
           ),
         ),
-        ...sortedCards
-            .where((card) => !_hiddenCardIds.contains(card.id))
-            .map(
-              (card) => _buildDeckCardTile(
-                context,
-                card: card,
-                deckFormat: deckFormat,
-                deckProvider: deckProvider,
-              ),
+      ),
+      SliverPadding(
+        padding: const EdgeInsets.symmetric(horizontal: 16),
+        sliver: SliverList(
+          delegate: SliverChildBuilderDelegate(
+            (context, index) => _buildDeckCardTile(
+              context,
+              card: visibleCards[index],
+              deckFormat: deckFormat,
+              deckProvider: deckProvider,
             ),
-        const SizedBox(height: 8),
-      ],
-    );
+            childCount: visibleCards.length,
+          ),
+        ),
+      ),
+      const SliverToBoxAdapter(child: SizedBox(height: 8)),
+    ];
   }
 
   Widget _buildDeckCardTile(
@@ -796,14 +806,15 @@ class _DeckDetailsScreenState extends State<DeckDetailsScreen>
           onTap: () => _showCardDetails(context, card),
           child: Stack(
             children: [
-              if (isCommanderCard && card.imageUrl != null)
+              if (isCommanderCard && card.effectiveImageUrl != null)
                 Positioned.fill(
                   child: ClipRRect(
                     borderRadius: BorderRadius.circular(AppTheme.radiusMd),
                     child: Opacity(
                       opacity: 0.08,
                       child: CachedCardImage(
-                        imageUrl: card.imageUrl,
+                        imageUrl: card.effectiveImageUrl,
+                        fallbackImageUrl: card.fallbackImageUrl,
                         fit: BoxFit.cover,
                       ),
                     ),
@@ -837,7 +848,8 @@ class _DeckDetailsScreenState extends State<DeckDetailsScreen>
                     ClipRRect(
                       borderRadius: BorderRadius.circular(AppTheme.radiusSm),
                       child: CachedCardImage(
-                        imageUrl: card.imageUrl,
+                        imageUrl: card.effectiveImageUrl,
+                        fallbackImageUrl: card.fallbackImageUrl,
                         width: AppTheme.touchTargetMin,
                         height: 62,
                       ),
@@ -1261,7 +1273,10 @@ class _DeckDetailsScreenState extends State<DeckDetailsScreen>
     final startsFromRebuild = initialIntent == 'rebuild';
     showModalBottomSheet(
       context: context,
+      useRootNavigator: true,
+      useSafeArea: true,
       isScrollControlled: true,
+      showDragHandle: true,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(
           top: Radius.circular(AppTheme.radiusXl),
@@ -1269,9 +1284,9 @@ class _DeckDetailsScreenState extends State<DeckDetailsScreen>
       ),
       builder:
           (context) => DraggableScrollableSheet(
-            initialChildSize: 0.6,
-            minChildSize: 0.4,
-            maxChildSize: 0.9,
+            initialChildSize: 0.82,
+            minChildSize: 0.55,
+            maxChildSize: 0.96,
             expand: false,
             builder:
                 (context, scrollController) => _OptimizationSheet(
@@ -1449,6 +1464,7 @@ class _DeckCardsSearchHeader extends StatelessWidget {
           ),
           const SizedBox(height: 10),
           TextField(
+            key: const Key('deck-details-card-search-field'),
             controller: controller,
             onChanged: (_) => onChanged(),
             decoration: InputDecoration(
@@ -1776,6 +1792,8 @@ class _OptimizationSheetState extends State<_OptimizationSheet> {
           postAnalysis: preview.postAnalysis,
           warnings: preview.warnings,
           metaReferenceContext: preview.metaReferenceContext,
+          optimizationContract: preview.optimizationContract,
+          battleValidation: preview.battleValidation,
           displayRemovals: preview.displayRemovals,
           displayAdditions: preview.displayAdditions,
           onCopyDebug:
@@ -1828,26 +1846,33 @@ class _OptimizationSheetState extends State<_OptimizationSheet> {
         showOptimizeApplyErrorSnackBar(context, error);
       },
       addBulk:
-          (deckId, cards) =>
-              deckProvider.addCardsBulk(deckId: deckId, cards: cards),
+          (deckId, cards, {mutationContext}) => deckProvider.addCardsBulk(
+            deckId: deckId,
+            cards: cards,
+            mutationContext: mutationContext,
+          ),
       applyWithIds:
           (
             deckId,
             removalsDetailed,
             additionsDetailed, {
             expectedDeckSignature,
+            mutationContext,
           }) => deckProvider.applyOptimizationWithIds(
             deckId: deckId,
             removalsDetailed: removalsDetailed,
             additionsDetailed: additionsDetailed,
             expectedDeckSignature: expectedDeckSignature,
+            mutationContext: mutationContext,
           ),
       applyByNames:
-          (deckId, removals, additions) => deckProvider.applyOptimization(
-            deckId: deckId,
-            cardsToRemove: removals,
-            cardsToAdd: additions,
-          ),
+          (deckId, removals, additions, {mutationContext}) =>
+              deckProvider.applyOptimization(
+                deckId: deckId,
+                cardsToRemove: removals,
+                cardsToAdd: additions,
+                mutationContext: mutationContext,
+              ),
       updateDeckStrategy: deckProvider.updateDeckStrategy,
     );
   }

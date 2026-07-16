@@ -139,6 +139,13 @@ class _RuntimeApi {
     return data['id'] as String;
   }
 
+  Future<void> hideBinderItem(String itemId, {required String token}) async {
+    await putJson('/binder/$itemId', {
+      'for_trade': false,
+      'for_sale': false,
+    }, token: token);
+  }
+
   Map<String, String> _headers(String? token) {
     return {
       'Content-Type': 'application/json',
@@ -258,6 +265,7 @@ void main() {
         cardId: card['id'] as String,
         marker: marker,
       );
+      addTearDown(() => api.hideBinderItem(binderItemId, token: seller.token));
       final trade = await api.postJson(
         '/trades',
         {

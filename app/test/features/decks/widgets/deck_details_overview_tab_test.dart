@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:manaloom/core/theme/app_theme.dart';
 import 'package:manaloom/features/decks/models/deck_card_item.dart';
 import 'package:manaloom/features/decks/models/deck_details.dart';
+import 'package:manaloom/features/decks/widgets/deck_details_aux_widgets.dart';
 import 'package:manaloom/features/decks/widgets/deck_details_overview_tab.dart';
 
 void main() {
@@ -230,6 +232,44 @@ void main() {
     expect(importTapped, 1);
   });
 
+  testWidgets('hides internal import source from description display', (
+    tester,
+  ) async {
+    const internalDescription =
+        'Imported from Hermes deck 607 current champion snapshot 2026-06-30. '
+        'Source: docs/hermes-analysis/master_optimizer_reports/report.txt';
+    String? editedDescription;
+
+    await tester.pumpWidget(
+      createSubject(
+        deck: makeDeck().copyWith(description: internalDescription),
+        totalCards: 100,
+        validationResult: const {'ok': true},
+        onValidationTap: () {},
+        onOpenCards: () {},
+        onForcePricingRefresh: () {},
+        onShowPricingDetails: () {},
+        onTogglePublic: () {},
+        onShowOptimizationOptions: () {},
+        onSelectCommander: () {},
+        onImportList: () {},
+        onEditDescription: (value) => editedDescription = value,
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(
+      find.textContaining('Deck importado de uma análise validada'),
+      findsOneWidget,
+    );
+    expect(find.textContaining('docs/hermes-analysis'), findsNothing);
+
+    await tester.ensureVisible(find.text('Editar'));
+    await tester.tap(find.text('Editar'));
+    await tester.pumpAndSettle();
+    expect(editedDescription, internalDescription);
+  });
+
   testWidgets('renders commander hero identity when commander exists', (
     tester,
   ) async {
@@ -266,5 +306,21 @@ void main() {
 
     expect(strategyTop.dy, lessThan(commanderSectionTop.dy));
     expect(commanderSectionTop.dy, lessThan(descriptionTop.dy));
+  });
+
+  testWidgets('color identity pips normalize symbols and use mana svg assets', (
+    tester,
+  ) async {
+    await tester.pumpWidget(
+      const MaterialApp(
+        home: Scaffold(body: ColorIdentityPips(colors: ['r', 'W', 'w'])),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.byType(SvgPicture), findsNWidgets(2));
+    expect(find.text('r'), findsNothing);
+    expect(find.text('R'), findsNothing);
+    expect(find.text('W'), findsNothing);
   });
 }

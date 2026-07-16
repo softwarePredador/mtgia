@@ -29,6 +29,10 @@ class AuthProvider extends ChangeNotifier {
 
   /// Inicializa o provider verificando se há token salvo
   Future<void> initialize() async {
+    if (_status != AuthStatus.initial) {
+      return;
+    }
+
     final existingInitialization = _initializeFuture;
     if (existingInitialization != null) {
       debugPrint('[🔑 Auth] initialize() reutilizando chamada em andamento');

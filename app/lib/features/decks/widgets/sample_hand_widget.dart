@@ -16,12 +16,14 @@ class SampleHandWidget extends StatefulWidget {
   final DeckDetails deck;
   final bool compact;
   final int? randomSeed;
+  final ValueChanged<DeckCardItem>? onShowCardDetails;
 
   const SampleHandWidget({
     super.key,
     required this.deck,
     this.compact = false,
     this.randomSeed,
+    this.onShowCardDetails,
   });
 
   @override
@@ -332,57 +334,13 @@ class _SampleHandWidgetState extends State<SampleHandWidget>
             // Hand display
             FadeTransition(
               opacity: _fadeAnim,
-              child: SizedBox(
+              child: _SampleHandCarousel(
+                cards: _hand,
+                compact: widget.compact,
                 height: previewHeight,
-                child: ListView.builder(
-                  scrollDirection: Axis.horizontal,
-                  itemCount: _hand.length,
-                  itemBuilder: (context, index) {
-                    final card = _hand[index];
-                    final isLand = card.typeLine.toLowerCase().contains('land');
-                    return Padding(
-                      padding: EdgeInsets.only(
-                        right: index < _hand.length - 1 ? 8 : 0,
-                      ),
-                      child: Column(
-                        children: [
-                          ClipRRect(
-                            borderRadius: BorderRadius.circular(
-                              AppTheme.radiusSm,
-                            ),
-                            child: CachedCardImage(
-                              imageUrl: card.imageUrl,
-                              width: imageWidth,
-                              height: imageHeight,
-                              fit: BoxFit.cover,
-                              borderRadius: BorderRadius.circular(
-                                AppTheme.radiusSm,
-                              ),
-                            ),
-                          ),
-                          const SizedBox(height: 4),
-                          SizedBox(
-                            width: imageWidth,
-                            child: Text(
-                              card.name,
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                              textAlign: TextAlign.center,
-                              style: TextStyle(
-                                color:
-                                    isLand
-                                        ? AppTheme.mythicGold
-                                        : AppTheme.textPrimary,
-                                fontSize: AppTheme.fontXs,
-                                fontWeight: FontWeight.w500,
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    );
-                  },
-                ),
+                imageWidth: imageWidth,
+                imageHeight: imageHeight,
+                onShowCardDetails: widget.onShowCardDetails,
               ),
             ),
             const SizedBox(height: 12),
@@ -427,6 +385,269 @@ class _SampleHandWidgetState extends State<SampleHandWidget>
             ),
           ],
         ],
+      ),
+    );
+  }
+}
+
+class _SampleHandCarousel extends StatelessWidget {
+  final List<DeckCardItem> cards;
+  final bool compact;
+  final double height;
+  final double imageWidth;
+  final double imageHeight;
+  final ValueChanged<DeckCardItem>? onShowCardDetails;
+
+  const _SampleHandCarousel({
+    required this.cards,
+    required this.compact,
+    required this.height,
+    required this.imageWidth,
+    required this.imageHeight,
+    this.onShowCardDetails,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      height: height,
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          final itemExtent = imageWidth + 12;
+          final maxFraction = compact ? 0.42 : 0.34;
+          final viewportFraction =
+              (itemExtent / max(1, constraints.maxWidth))
+                  .clamp(0.18, maxFraction)
+                  .toDouble();
+
+          return _SampleHandPageView(
+            key: ValueKey(
+              'sample-hand-carousel-${cards.length}-${viewportFraction.toStringAsFixed(2)}',
+            ),
+            cards: cards,
+            viewportFraction: viewportFraction,
+            imageWidth: imageWidth,
+            imageHeight: imageHeight,
+            onShowCardDetails: onShowCardDetails,
+          );
+        },
+      ),
+    );
+  }
+}
+
+class _SampleHandPageView extends StatefulWidget {
+  final List<DeckCardItem> cards;
+  final double viewportFraction;
+  final double imageWidth;
+  final double imageHeight;
+  final ValueChanged<DeckCardItem>? onShowCardDetails;
+
+  const _SampleHandPageView({
+    super.key,
+    required this.cards,
+    required this.viewportFraction,
+    required this.imageWidth,
+    required this.imageHeight,
+    this.onShowCardDetails,
+  });
+
+  @override
+  State<_SampleHandPageView> createState() => _SampleHandPageViewState();
+}
+
+class _SampleHandPageViewState extends State<_SampleHandPageView> {
+  late final PageController _controller;
+  int _currentIndex = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = PageController(viewportFraction: widget.viewportFraction);
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  void _goTo(int index) {
+    if (index < 0 || index >= widget.cards.length) return;
+    _controller.animateToPage(
+      index,
+      duration: const Duration(milliseconds: 240),
+      curve: Curves.easeOutCubic,
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Stack(
+      children: [
+        PageView.builder(
+          key: const Key('sample-hand-carousel'),
+          controller: _controller,
+          physics: const BouncingScrollPhysics(),
+          itemCount: widget.cards.length,
+          onPageChanged: (index) => setState(() => _currentIndex = index),
+          itemBuilder: (context, index) {
+            final card = widget.cards[index];
+            return AnimatedBuilder(
+              animation: _controller,
+              builder: (context, child) {
+                var page = _currentIndex.toDouble();
+                if (_controller.hasClients && _controller.page != null) {
+                  page = _controller.page!;
+                }
+                final distance = (page - index).abs().clamp(0.0, 1.0);
+                final scale = 1.0 - (distance * 0.08);
+                final opacity = 1.0 - (distance * 0.22);
+
+                return Opacity(
+                  opacity: opacity,
+                  child: Transform.scale(
+                    scale: scale,
+                    alignment: Alignment.center,
+                    child: child,
+                  ),
+                );
+              },
+              child: Center(
+                child: _SampleHandCard(
+                  key: Key('sample-hand-card-$index'),
+                  card: card,
+                  imageWidth: widget.imageWidth,
+                  imageHeight: widget.imageHeight,
+                  onShowCardDetails: widget.onShowCardDetails,
+                ),
+              ),
+            );
+          },
+        ),
+        if (widget.cards.length > 1) ...[
+          Positioned(
+            left: 0,
+            top: 0,
+            bottom: 18,
+            child: _CarouselNavButton(
+              icon: Icons.chevron_left_rounded,
+              enabled: _currentIndex > 0,
+              onTap: () => _goTo(_currentIndex - 1),
+            ),
+          ),
+          Positioned(
+            right: 0,
+            top: 0,
+            bottom: 18,
+            child: _CarouselNavButton(
+              icon: Icons.chevron_right_rounded,
+              enabled: _currentIndex < widget.cards.length - 1,
+              onTap: () => _goTo(_currentIndex + 1),
+            ),
+          ),
+        ],
+      ],
+    );
+  }
+}
+
+class _SampleHandCard extends StatelessWidget {
+  final DeckCardItem card;
+  final double imageWidth;
+  final double imageHeight;
+  final ValueChanged<DeckCardItem>? onShowCardDetails;
+
+  const _SampleHandCard({
+    super.key,
+    required this.card,
+    required this.imageWidth,
+    required this.imageHeight,
+    this.onShowCardDetails,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final isLand = card.typeLine.toLowerCase().contains('land');
+
+    return Semantics(
+      button: onShowCardDetails != null,
+      label: 'Ver detalhes de ${card.name}',
+      child: Material(
+        type: MaterialType.transparency,
+        child: InkWell(
+          onTap:
+              onShowCardDetails == null ? null : () => onShowCardDetails!(card),
+          borderRadius: BorderRadius.circular(AppTheme.radiusSm),
+          child: Column(
+            children: [
+              ClipRRect(
+                borderRadius: BorderRadius.circular(AppTheme.radiusSm),
+                child: CachedCardImage(
+                  imageUrl: card.effectiveImageUrl,
+                  fallbackImageUrl: card.fallbackImageUrl,
+                  width: imageWidth,
+                  height: imageHeight,
+                  fit: BoxFit.cover,
+                  borderRadius: BorderRadius.circular(AppTheme.radiusSm),
+                ),
+              ),
+              const SizedBox(height: 4),
+              SizedBox(
+                width: imageWidth,
+                child: Text(
+                  card.name,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    color: isLand ? AppTheme.mythicGold : AppTheme.textPrimary,
+                    fontSize: AppTheme.fontXs,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _CarouselNavButton extends StatelessWidget {
+  final IconData icon;
+  final bool enabled;
+  final VoidCallback onTap;
+
+  const _CarouselNavButton({
+    required this.icon,
+    required this.enabled,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return IgnorePointer(
+      ignoring: !enabled,
+      child: AnimatedOpacity(
+        opacity: enabled ? 1 : 0,
+        duration: const Duration(milliseconds: 160),
+        child: Center(
+          child: Material(
+            color: AppTheme.backgroundAbyss.withValues(alpha: 0.56),
+            shape: const CircleBorder(),
+            child: InkWell(
+              onTap: onTap,
+              customBorder: const CircleBorder(),
+              child: SizedBox(
+                width: 30,
+                height: 30,
+                child: Icon(icon, color: AppTheme.textPrimary, size: 22),
+              ),
+            ),
+          ),
+        ),
       ),
     );
   }

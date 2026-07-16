@@ -12,6 +12,16 @@ import '../../../core/widgets/cached_card_image.dart';
 import '../models/deck.dart';
 import '../providers/deck_provider.dart';
 
+String? _scryfallDeckImageUrl(String? name) {
+  final cardName = name?.trim();
+  if (cardName == null || cardName.isEmpty) return null;
+  return Uri.https('api.scryfall.com', '/cards/named', {
+    'exact': cardName,
+    'format': 'image',
+    'version': 'normal',
+  }).toString();
+}
+
 class DeckListScreen extends StatefulWidget {
   const DeckListScreen({super.key});
 
@@ -452,6 +462,7 @@ class _DeckListScreenState extends State<DeckListScreen> {
                                 ),
                               ),
                               child: TextField(
+                                key: const Key('deck-list-search-field'),
                                 controller: _searchController,
                                 onChanged: (_) => setState(() {}),
                                 textAlignVertical: TextAlignVertical.center,
@@ -596,13 +607,15 @@ class _DeckListScreenState extends State<DeckListScreen> {
                 )
               else
                 SliverPadding(
-                  padding: const EdgeInsets.fromLTRB(14, 2, 14, 96),
+                  padding: const EdgeInsets.fromLTRB(14, 2, 14, 132),
                   sliver: SliverLayoutBuilder(
                     builder: (context, constraints) {
                       final isWide = constraints.crossAxisExtent >= 640;
-                      if (!isWide && visibleDecks.length <= 2) {
+                      if (!isWide) {
+                        final showSparseActions = visibleDecks.length <= 2;
                         return SliverList.builder(
-                          itemCount: visibleDecks.length + 1,
+                          itemCount:
+                              visibleDecks.length + (showSparseActions ? 1 : 0),
                           itemBuilder: (context, index) {
                             if (index == visibleDecks.length) {
                               return _SparseDeckActions(
@@ -668,6 +681,7 @@ class _DeckListScreenState extends State<DeckListScreen> {
                   }
                 },
                 offset: const Offset(0, -160),
+                tooltip: 'Criar ou importar deck',
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(AppTheme.radiusMd),
                 ),
@@ -717,10 +731,9 @@ class _DeckListScreenState extends State<DeckListScreen> {
                       ),
                     ],
                 child: IgnorePointer(
-                  child: FloatingActionButton.extended(
+                  child: FloatingActionButton.small(
                     onPressed: () {},
-                    icon: const Icon(Icons.add),
-                    label: const Text('Novo Deck'),
+                    child: const Icon(Icons.add),
                   ),
                 ),
               ),
@@ -890,6 +903,15 @@ String _timeAgo(DateTime date) {
   return 'agora';
 }
 
+String _compactDeckPrice(double value, String? currency) {
+  final code = (currency ?? 'USD').trim().toUpperCase();
+  final amount =
+      value >= 1000
+          ? '${(value / 1000).toStringAsFixed(value >= 10000 ? 0 : 1)}k'
+          : value.toStringAsFixed(value >= 100 ? 0 : 2);
+  return '$code $amount';
+}
+
 class _SparseDeckActions extends StatelessWidget {
   const _SparseDeckActions({
     required this.onGenerate,
@@ -1016,6 +1038,7 @@ class _DeckSpotlightCard extends StatelessWidget {
     final theme = Theme.of(context);
     final imageUrl = deck.commanderImageUrl?.trim();
     final hasArt = imageUrl != null && imageUrl.isNotEmpty;
+    final fallbackImageUrl = _scryfallDeckImageUrl(deck.commanderName);
 
     return Material(
       color: AppTheme.transparent,
@@ -1045,6 +1068,7 @@ class _DeckSpotlightCard extends StatelessWidget {
                           ),
                           child: CachedCardImage(
                             imageUrl: imageUrl,
+                            fallbackImageUrl: fallbackImageUrl,
                             fit: BoxFit.cover,
                           ),
                         )
@@ -1077,6 +1101,7 @@ class _DeckSpotlightCard extends StatelessWidget {
                       hasArt
                           ? CachedCardImage(
                             imageUrl: imageUrl,
+                            fallbackImageUrl: fallbackImageUrl,
                             width: 82,
                             height: 144,
                             fit: BoxFit.cover,
@@ -1113,29 +1138,35 @@ class _DeckSpotlightCard extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
-                      deck.name,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: theme.textTheme.titleMedium?.copyWith(
-                        color: AppTheme.textPrimary,
-                        fontFamily: AppTheme.displayFontFamily,
-                        fontSize: AppTheme.fontLg,
-                        fontWeight: FontWeight.w800,
-                        height: 1.05,
+                    Padding(
+                      padding: const EdgeInsets.only(right: 34),
+                      child: Text(
+                        deck.name,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: theme.textTheme.titleMedium?.copyWith(
+                          color: AppTheme.textPrimary,
+                          fontFamily: AppTheme.displayFontFamily,
+                          fontSize: AppTheme.fontLg,
+                          fontWeight: FontWeight.w800,
+                          height: 1.05,
+                        ),
                       ),
                     ),
                     const SizedBox(height: 4),
-                    Text(
-                      (deck.commanderName ?? '').trim().isEmpty
-                          ? _formatDeckLabel(deck.format)
-                          : 'Comandante: ${deck.commanderName}',
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: theme.textTheme.labelSmall?.copyWith(
-                        color: AppTheme.textSecondary,
-                        fontSize: AppTheme.fontXs,
-                        fontWeight: FontWeight.w700,
+                    Padding(
+                      padding: const EdgeInsets.only(right: 34),
+                      child: Text(
+                        (deck.commanderName ?? '').trim().isEmpty
+                            ? _formatDeckLabel(deck.format)
+                            : 'Comandante: ${deck.commanderName}',
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: theme.textTheme.labelSmall?.copyWith(
+                          color: AppTheme.textSecondary,
+                          fontSize: AppTheme.fontXs,
+                          fontWeight: FontWeight.w700,
+                        ),
                       ),
                     ),
                     const SizedBox(height: 10),
@@ -1178,7 +1209,10 @@ class _DeckSpotlightCard extends StatelessWidget {
                             color: AppTheme.brass400,
                           ),
                           Text(
-                            deck.pricingTotal!.toStringAsFixed(0),
+                            _compactDeckPrice(
+                              deck.pricingTotal!,
+                              deck.pricingCurrency,
+                            ),
                             style: const TextStyle(
                               color: AppTheme.brass400,
                               fontSize: AppTheme.fontXs,
@@ -1453,6 +1487,7 @@ class _DeckGalleryCard extends StatelessWidget {
     final theme = Theme.of(context);
     final commanderImageUrl = deck.commanderImageUrl?.trim();
     final hasArt = commanderImageUrl != null && commanderImageUrl.isNotEmpty;
+    final fallbackImageUrl = _scryfallDeckImageUrl(deck.commanderName);
     final maxCards = _maxCardsForFormat(deck.format);
     final isComplete = maxCards != null && deck.cardCount >= maxCards;
     final accent = _accentColor(deck.format);
@@ -1482,6 +1517,7 @@ class _DeckGalleryCard extends StatelessWidget {
                     hasArt
                         ? CachedCardImage(
                           imageUrl: commanderImageUrl,
+                          fallbackImageUrl: fallbackImageUrl,
                           fit: BoxFit.cover,
                         )
                         : _DeckFallbackArt(accent: accent, format: deck.format),

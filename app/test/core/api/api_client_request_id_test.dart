@@ -66,6 +66,15 @@ void main() {
       expect(ApiClient.isReportableHttpStatus(500), isTrue);
     });
 
+    test('retries only transient GET server statuses', () {
+      expect(ApiClient.isTransientGetStatus(500), isTrue);
+      expect(ApiClient.isTransientGetStatus(502), isTrue);
+      expect(ApiClient.isTransientGetStatus(503), isTrue);
+      expect(ApiClient.isTransientGetStatus(504), isTrue);
+      expect(ApiClient.isTransientGetStatus(400), isFalse);
+      expect(ApiClient.isTransientGetStatus(501), isFalse);
+    });
+
     test('uses longer timeout for AI endpoints', () {
       expect(
         ApiClient.timeoutForEndpoint('/ai/generate/jobs/job-1'),
@@ -153,10 +162,15 @@ void main() {
     });
 
     test('keeps request correlation available on HTTP errors', () async {
+      var attempts = 0;
       ApiClient.resetForTesting(
         performanceUnavailable: true,
         httpClient: MockClient((request) async {
+          attempts++;
           expect(request.headers['x-request-id'], startsWith('mob-'));
+          if (attempts == 2) {
+            expect(request.headers['x-retry-attempt'], '1');
+          }
           return http.Response(
             '{"error":"maintenance"}',
             503,
@@ -174,6 +188,32 @@ void main() {
       expect(response.requestId, startsWith('mob-'));
       expect(response.responseRequestId, 'backend-request-503');
       expect(response.data, containsPair('error', 'maintenance'));
+      expect(attempts, 2);
+    });
+
+    test('recovers when a transient GET succeeds on retry', () async {
+      var attempts = 0;
+      ApiClient.resetForTesting(
+        performanceUnavailable: true,
+        httpClient: MockClient((request) async {
+          attempts++;
+          if (attempts == 1) {
+            return http.Response('{"error":"temporary"}', 500);
+          }
+          expect(request.headers['x-retry-attempt'], '1');
+          return http.Response(
+            '{"status":"ready"}',
+            200,
+            headers: const {'content-type': 'application/json'},
+          );
+        }),
+      );
+
+      final response = await ApiClient().get('/ready');
+
+      expect(response.statusCode, 200);
+      expect(response.data, containsPair('status', 'ready'));
+      expect(attempts, 2);
     });
   });
 }

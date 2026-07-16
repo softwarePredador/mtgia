@@ -114,6 +114,46 @@ void main() {
       expect(card.colorIdentity, ['W', 'U']);
     });
 
+    test('effectiveImageUrl deve preservar URL explícita quando existir', () {
+      final card = DeckCardItem(
+        id: 'card-explicit',
+        name: 'Sol Ring',
+        typeLine: 'Artifact',
+        imageUrl: ' https://cards.example/sol-ring.jpg ',
+        setCode: 'cmr',
+        rarity: 'uncommon',
+        quantity: 1,
+        isCommander: false,
+      );
+
+      expect(card.effectiveImageUrl, 'https://cards.example/sol-ring.jpg');
+      expect(
+        card.fallbackImageUrl,
+        'https://api.scryfall.com/cards/named?exact=Sol+Ring&format=image&version=normal',
+      );
+    });
+
+    test('effectiveImageUrl deve usar fallback Scryfall por nome da carta', () {
+      final card = DeckCardItem(
+        id: 'card-fallback',
+        name: 'Battlefield Forge',
+        typeLine: 'Land',
+        setCode: 'bro',
+        rarity: 'rare',
+        quantity: 1,
+        isCommander: false,
+      );
+
+      expect(
+        card.effectiveImageUrl,
+        'https://api.scryfall.com/cards/named?exact=Battlefield+Forge&format=image&version=normal',
+      );
+      expect(
+        card.fallbackImageUrl,
+        'https://api.scryfall.com/cards/named?exact=Battlefield+Forge&format=image&version=normal',
+      );
+    });
+
     test('copyWith deve substituir apenas os campos especificados', () {
       final card = DeckCardItem(
         id: 'card-1',

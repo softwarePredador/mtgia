@@ -89,7 +89,7 @@ class ApiClient {
     if (_envBaseUrl.trim().isEmpty) {
       if (kDebugMode) {
         debugPrint(
-          '[🌐 ApiClient] API_BASE_URL ausente; usando servidor público. Para backend local, passe --dart-define=API_BASE_URL=http://127.0.0.1:8080',
+          '[🌐 ApiClient] API_BASE_URL ausente; usando servidor público. Para backend local, passe --dart-define=API_BASE_URL=<url-do-backend>',
         );
       } else if (baseUrl.isEmpty) {
         debugPrint(
@@ -127,6 +127,13 @@ class ApiClient {
   }
 
   static bool isReportableHttpStatus(int statusCode) => statusCode >= 400;
+
+  @visibleForTesting
+  static bool isTransientGetStatus(int statusCode) =>
+      statusCode == 500 ||
+      statusCode == 502 ||
+      statusCode == 503 ||
+      statusCode == 504;
 
   @visibleForTesting
   static Duration timeoutForEndpoint(String endpoint, {Duration? override}) {
@@ -184,9 +191,12 @@ class ApiClient {
     try {
       await metric?.start();
 
-      final response = await _httpClient
-          .get(Uri.parse(url), headers: headers)
-          .timeout(effectiveTimeout);
+      final response = await _getWithTransientRetry(
+        Uri.parse(url),
+        headers: headers,
+        timeout: effectiveTimeout,
+        endpoint: endpoint,
+      ).timeout(effectiveTimeout);
 
       stopwatch.stop();
 
@@ -234,6 +244,48 @@ class ApiClient {
       );
       rethrow;
     }
+  }
+
+  Future<http.Response> _getWithTransientRetry(
+    Uri uri, {
+    required Map<String, String> headers,
+    required Duration timeout,
+    required String endpoint,
+  }) async {
+    Object? firstError;
+
+    for (var attempt = 0; attempt < 2; attempt++) {
+      try {
+        final response = await _httpClient
+            .get(
+              uri,
+              headers: {
+                ...headers,
+                if (attempt > 0) 'x-retry-attempt': attempt.toString(),
+              },
+            )
+            .timeout(timeout);
+
+        if (attempt == 0 && isTransientGetStatus(response.statusCode)) {
+          debugPrint(
+            '[⚠️ ApiClient] GET $endpoint retornou ${response.statusCode}; repetindo uma vez.',
+          );
+          await Future<void>.delayed(const Duration(milliseconds: 150));
+          continue;
+        }
+
+        return response;
+      } catch (error) {
+        if (attempt > 0) rethrow;
+        firstError = error;
+        debugPrint(
+          '[⚠️ ApiClient] GET $endpoint falhou transitoriamente; repetindo uma vez.',
+        );
+        await Future<void>.delayed(const Duration(milliseconds: 150));
+      }
+    }
+
+    throw StateError('GET retry exhausted: $firstError');
   }
 
   Future<ApiResponse> post(

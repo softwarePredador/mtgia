@@ -7,6 +7,8 @@ import '../../../core/models/user_trust_insight.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/widgets/app_state_panel.dart';
 import '../../../core/widgets/cached_card_image.dart';
+import '../../cards/screens/card_detail_screen.dart';
+import '../../decks/models/deck_card_item.dart';
 import '../../trades/screens/create_trade_screen.dart';
 import '../providers/binder_provider.dart';
 
@@ -77,13 +79,13 @@ class _MarketplaceTabContentState extends State<MarketplaceTabContent>
     super.build(context);
     return Column(
       children: [
-        const _MarketplaceTrustHeader(),
         // Search bar (local state only — no provider rebuild needed)
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
           child: TextField(
             key: const Key('marketplace-search-field'),
             controller: _searchController,
+            onChanged: (_) => setState(() {}),
             onSubmitted: (_) => _doSearch(),
             style: const TextStyle(
               color: AppTheme.textPrimary,
@@ -96,14 +98,20 @@ class _MarketplaceTabContentState extends State<MarketplaceTabContent>
                 Icons.search,
                 color: AppTheme.textSecondary,
               ),
-              suffixIcon: IconButton(
-                tooltip: 'Limpar busca',
-                icon: const Icon(Icons.clear, color: AppTheme.textSecondary),
-                onPressed: () {
-                  _searchController.clear();
-                  _doSearch();
-                },
-              ),
+              suffixIcon:
+                  _searchController.text.isEmpty
+                      ? null
+                      : IconButton(
+                        tooltip: 'Limpar busca',
+                        icon: const Icon(
+                          Icons.clear,
+                          color: AppTheme.textSecondary,
+                        ),
+                        onPressed: () {
+                          setState(_searchController.clear);
+                          _doSearch();
+                        },
+                      ),
               filled: true,
               fillColor: AppTheme.surfaceSlate,
               contentPadding: const EdgeInsets.symmetric(vertical: 0),
@@ -187,7 +195,7 @@ class _MarketplaceTabContentState extends State<MarketplaceTabContent>
         key: Key('marketplace-list-loading'),
         icon: Icons.storefront_rounded,
         title: 'Carregando marketplace',
-        message: 'Buscando cartas disponíveis, confiança e sinais de troca.',
+        message: 'Buscando cartas disponiveis, precos e sinais de troca.',
         accent: AppTheme.frost400,
       );
     }
@@ -231,6 +239,15 @@ class _MarketplaceTabContentState extends State<MarketplaceTabContent>
         }
         return _MarketplaceCard(
           item: provider.marketItems[index],
+          onCardTap: () {
+            final mktItem = provider.marketItems[index];
+            Navigator.of(context).push(
+              MaterialPageRoute(
+                builder:
+                    (_) => CardDetailScreen(card: _cardFromMarket(mktItem)),
+              ),
+            );
+          },
           onOwnerTap: () {
             final ownerId = provider.marketItems[index].ownerId;
             context.push('/community/user/$ownerId');
@@ -272,6 +289,29 @@ class _MarketplaceTabContentState extends State<MarketplaceTabContent>
           },
         );
       },
+    );
+  }
+
+  DeckCardItem _cardFromMarket(MarketplaceItem item) {
+    return DeckCardItem(
+      id: item.cardId,
+      name: item.cardName,
+      manaCost: item.cardManaCost,
+      typeLine:
+          (item.cardTypeLine ?? '').trim().isEmpty
+              ? 'Carta'
+              : item.cardTypeLine!.trim(),
+      imageUrl: item.cardImageUrl,
+      setCode: item.cardSetCode ?? '',
+      rarity:
+          (item.cardRarity ?? '').trim().isEmpty
+              ? 'unknown'
+              : item.cardRarity!.trim(),
+      isReserved: item.cardIsReserved,
+      quantity: item.quantity,
+      isCommander: false,
+      foil: item.isFoil,
+      condition: CardCondition.fromCode(item.condition),
     );
   }
 }
@@ -333,70 +373,19 @@ class _ConditionDropdown extends StatelessWidget {
   }
 }
 
-class _MarketplaceTrustHeader extends StatelessWidget {
-  const _MarketplaceTrustHeader();
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: double.infinity,
-      margin: const EdgeInsets.fromLTRB(12, 12, 12, 4),
-      padding: const EdgeInsets.all(14),
-      decoration: BoxDecoration(
-        color: AppTheme.surfaceSlate,
-        borderRadius: BorderRadius.circular(AppTheme.radiusLg),
-        border: Border.all(color: AppTheme.outlineMuted.withValues(alpha: 0.7)),
-      ),
-      child: const Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Icon(
-            Icons.verified_user_outlined,
-            color: AppTheme.frost400,
-            size: 22,
-          ),
-          SizedBox(width: 10),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  'Marketplace verificável',
-                  style: TextStyle(
-                    color: AppTheme.textPrimary,
-                    fontSize: AppTheme.fontMd,
-                    fontWeight: FontWeight.w800,
-                  ),
-                ),
-                SizedBox(height: 4),
-                Text(
-                  'Confira condição, idioma, quantidade, preço e vendedor antes de propor.',
-                  style: TextStyle(
-                    color: AppTheme.textSecondary,
-                    fontSize: AppTheme.fontSm,
-                    height: AppTheme.lineHeightCompact,
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
 // =====================================================================
 // Marketplace item card
 // =====================================================================
 
 class _MarketplaceCard extends StatelessWidget {
   final MarketplaceItem item;
+  final VoidCallback? onCardTap;
   final VoidCallback? onOwnerTap;
   final VoidCallback? onTradeTap;
 
   const _MarketplaceCard({
     required this.item,
+    this.onCardTap,
     this.onOwnerTap,
     this.onTradeTap,
   });
@@ -404,7 +393,6 @@ class _MarketplaceCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Card(
-      key: Key('marketplace-item-card-${item.id}'),
       margin: const EdgeInsets.only(bottom: 10),
       color: AppTheme.surfaceSlate,
       shape: RoundedRectangleBorder(
@@ -414,240 +402,256 @@ class _MarketplaceCard extends StatelessWidget {
           width: AppTheme.strokeHairline,
         ),
       ),
-      child: Padding(
-        padding: const EdgeInsets.all(12),
-        child: Row(
-          children: [
-            // Card image
-            CachedCardImage(
-              imageUrl: item.cardImageUrl,
-              width: 50,
-              height: 70,
-              borderRadius: BorderRadius.circular(AppTheme.radiusSm),
-            ),
-            const SizedBox(width: 12),
+      child: Material(
+        color: AppTheme.transparent,
+        borderRadius: BorderRadius.circular(AppTheme.radiusMd),
+        child: InkWell(
+          key: Key('marketplace-item-card-${item.id}'),
+          onTap: onCardTap,
+          borderRadius: BorderRadius.circular(AppTheme.radiusMd),
+          child: Padding(
+            padding: const EdgeInsets.all(12),
+            child: Row(
+              children: [
+                // Card image
+                CachedCardImage(
+                  imageUrl: item.cardImageUrl,
+                  width: 50,
+                  height: 70,
+                  borderRadius: BorderRadius.circular(AppTheme.radiusSm),
+                ),
+                const SizedBox(width: 12),
 
-            // Info
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // Card name
-                  Text(
-                    item.cardName,
-                    style: const TextStyle(
-                      color: AppTheme.textPrimary,
-                      fontWeight: FontWeight.w600,
-                      fontSize: AppTheme.fontMd,
-                    ),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                  const SizedBox(height: 4),
-
-                  // Badges
-                  Wrap(
-                    spacing: 6,
-                    runSpacing: 4,
-                    crossAxisAlignment: WrapCrossAlignment.center,
+                // Info
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      _badge('×${item.quantity}', AppTheme.frost400),
-                      _badge(item.condition, _condColor(item.condition)),
-                      _badge(
-                        item.language.toUpperCase(),
-                        AppTheme.textSecondary,
+                      // Card name
+                      Text(
+                        item.cardName,
+                        style: const TextStyle(
+                          color: AppTheme.textPrimary,
+                          fontWeight: FontWeight.w600,
+                          fontSize: AppTheme.fontMd,
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
                       ),
-                      if ((item.cardSetCode ?? '').isNotEmpty)
-                        _badge(
-                          item.cardSetCode!.toUpperCase(),
-                          AppTheme.textSecondary,
-                        ),
-                      if (item.isFoil)
-                        Icon(
-                          Icons.flare_rounded,
-                          size: 14,
-                          color: AppTheme.brass400.withValues(alpha: 0.8),
-                        ),
-                      if (item.cardIsReserved)
-                        _badge('Reserved', AppTheme.brass400),
-                    ],
-                  ),
-                  const SizedBox(height: 4),
+                      const SizedBox(height: 4),
 
-                  // Trade / Sale tags + price
-                  Wrap(
-                    spacing: 6,
-                    runSpacing: 4,
-                    crossAxisAlignment: WrapCrossAlignment.center,
-                    children: [
-                      if (item.forTrade) _statusTag('Troca', AppTheme.frost400),
-                      if (item.forSale) _statusTag('Venda', AppTheme.brass400),
-                      if (item.price != null)
-                        Text(
-                          'R\$ ${item.price!.toStringAsFixed(2)}',
-                          style: const TextStyle(
-                            color: AppTheme.brass400,
-                            fontSize: AppTheme.fontMd,
-                            fontWeight: FontWeight.bold,
+                      // Badges
+                      Wrap(
+                        spacing: 6,
+                        runSpacing: 4,
+                        crossAxisAlignment: WrapCrossAlignment.center,
+                        children: [
+                          _badge('×${item.quantity}', AppTheme.frost400),
+                          _badge(item.condition, _condColor(item.condition)),
+                          _badge(
+                            item.language.toUpperCase(),
+                            AppTheme.textSecondary,
                           ),
-                        ),
-                    ],
-                  ),
-                  if (item.priceInsight != null) ...[
-                    const SizedBox(height: 6),
-                    _priceInsight(item.priceInsight!),
-                  ],
-                  const SizedBox(height: 6),
-
-                  // Owner + location
-                  GestureDetector(
-                    key: Key('marketplace-owner-${item.ownerId}'),
-                    onTap: onOwnerTap,
-                    child: Row(
-                      children: [
-                        CircleAvatar(
-                          radius: 10,
-                          backgroundColor: AppTheme.frost400.withValues(
-                            alpha: 0.3,
-                          ),
-                          backgroundImage:
-                              item.ownerAvatarUrl != null
-                                  ? CachedNetworkImageProvider(
-                                    item.ownerAvatarUrl!,
-                                  )
-                                  : null,
-                          child:
-                              item.ownerAvatarUrl == null
-                                  ? Text(
-                                    item.ownerUsername.isNotEmpty
-                                        ? item.ownerUsername[0].toUpperCase()
-                                        : '?',
-                                    style: const TextStyle(
-                                      fontSize: AppTheme.fontXs,
-                                      color: AppTheme.frost400,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  )
-                                  : null,
-                        ),
-                        const SizedBox(width: 6),
-                        Flexible(
-                          child: Text(
-                            item.ownerDisplayLabel,
-                            style: const TextStyle(
-                              color: AppTheme.frost400,
-                              fontSize: AppTheme.fontSm,
+                          if ((item.cardSetCode ?? '').isNotEmpty)
+                            _badge(
+                              item.cardSetCode!.toUpperCase(),
+                              AppTheme.textSecondary,
                             ),
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                        ),
-                        if (item.ownerLocationLabel != null) ...[
-                          const SizedBox(width: 6),
-                          Icon(
-                            Icons.location_on,
-                            size: 12,
-                            color: AppTheme.textSecondary.withValues(
-                              alpha: 0.6,
+                          if (item.isFoil)
+                            Icon(
+                              Icons.flare_rounded,
+                              size: 14,
+                              color: AppTheme.brass400.withValues(alpha: 0.8),
                             ),
-                          ),
-                          const SizedBox(width: 2),
-                          Flexible(
-                            child: Text(
-                              item.ownerLocationLabel!,
-                              style: TextStyle(
-                                color: AppTheme.textSecondary.withValues(
-                                  alpha: 0.8,
-                                ),
-                                fontSize: AppTheme.fontXs,
-                              ),
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                          ),
+                          if (item.cardIsReserved)
+                            _badge('Reserved', AppTheme.brass400),
                         ],
-                      ],
-                    ),
-                  ),
-                  const SizedBox(height: 4),
-                  _trustSignals(item.ownerTrust),
-                  // Trade notes
-                  if (item.ownerTradeNotes != null &&
-                      item.ownerTradeNotes!.isNotEmpty) ...[
-                    const SizedBox(height: 4),
-                    Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Icon(
-                          Icons.info_outline,
-                          size: 12,
-                          color: AppTheme.textSecondary.withValues(alpha: 0.6),
-                        ),
-                        const SizedBox(width: 4),
-                        Expanded(
-                          child: Text(
-                            item.ownerTradeNotes!,
-                            style: TextStyle(
-                              color: AppTheme.textSecondary.withValues(
-                                alpha: 0.7,
-                              ),
-                              fontSize: AppTheme.fontXs,
-                              fontStyle: FontStyle.italic,
-                            ),
-                            maxLines: 2,
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
+                      ),
+                      const SizedBox(height: 4),
 
-                  // ── Interaction button ──
-                  if (onTradeTap != null) ...[
-                    const SizedBox(height: 8),
-                    SizedBox(
-                      width: double.infinity,
-                      height: 32,
-                      child: OutlinedButton.icon(
-                        key: Key('marketplace-propose-trade-${item.id}'),
-                        onPressed: onTradeTap,
-                        style: OutlinedButton.styleFrom(
-                          foregroundColor:
-                              item.forSale
-                                  ? AppTheme.brass400
-                                  : AppTheme.frost400,
-                          side: BorderSide(
-                            color: (item.forSale
-                                    ? AppTheme.brass400
-                                    : AppTheme.frost400)
-                                .withValues(alpha: 0.5),
-                          ),
-                          padding: const EdgeInsets.symmetric(horizontal: 10),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(
-                              AppTheme.radiusSm,
+                      // Trade / Sale tags + price
+                      Wrap(
+                        spacing: 6,
+                        runSpacing: 4,
+                        crossAxisAlignment: WrapCrossAlignment.center,
+                        children: [
+                          if (item.forTrade)
+                            _statusTag('Troca', AppTheme.frost400),
+                          if (item.forSale)
+                            _statusTag('Venda', AppTheme.brass400),
+                          if (item.price != null)
+                            Text(
+                              'R\$ ${item.price!.toStringAsFixed(2)}',
+                              style: const TextStyle(
+                                color: AppTheme.brass400,
+                                fontSize: AppTheme.fontMd,
+                                fontWeight: FontWeight.bold,
+                              ),
                             ),
-                          ),
-                        ),
-                        icon: Icon(
-                          item.forSale
-                              ? Icons.shopping_cart_outlined
-                              : Icons.swap_horiz,
-                          size: 14,
-                        ),
-                        label: Text(
-                          item.forSale && !item.forTrade
-                              ? 'Quero comprar'
-                              : item.forTrade && !item.forSale
-                              ? 'Propor troca'
-                              : 'Propor troca/compra',
-                          style: const TextStyle(fontSize: AppTheme.fontSm),
+                        ],
+                      ),
+                      if (item.priceInsight != null) ...[
+                        const SizedBox(height: 6),
+                        _priceInsight(item.priceInsight!),
+                      ],
+                      const SizedBox(height: 6),
+
+                      // Owner + location
+                      GestureDetector(
+                        key: Key('marketplace-owner-${item.ownerId}'),
+                        onTap: onOwnerTap,
+                        child: Row(
+                          children: [
+                            CircleAvatar(
+                              radius: 10,
+                              backgroundColor: AppTheme.frost400.withValues(
+                                alpha: 0.3,
+                              ),
+                              backgroundImage:
+                                  item.ownerAvatarUrl != null
+                                      ? CachedNetworkImageProvider(
+                                        item.ownerAvatarUrl!,
+                                      )
+                                      : null,
+                              child:
+                                  item.ownerAvatarUrl == null
+                                      ? Text(
+                                        item.ownerUsername.isNotEmpty
+                                            ? item.ownerUsername[0]
+                                                .toUpperCase()
+                                            : '?',
+                                        style: const TextStyle(
+                                          fontSize: AppTheme.fontXs,
+                                          color: AppTheme.frost400,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      )
+                                      : null,
+                            ),
+                            const SizedBox(width: 6),
+                            Flexible(
+                              child: Text(
+                                item.ownerDisplayLabel,
+                                style: const TextStyle(
+                                  color: AppTheme.frost400,
+                                  fontSize: AppTheme.fontSm,
+                                ),
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ),
+                            if (item.ownerLocationLabel != null) ...[
+                              const SizedBox(width: 6),
+                              Icon(
+                                Icons.location_on,
+                                size: 12,
+                                color: AppTheme.textSecondary.withValues(
+                                  alpha: 0.6,
+                                ),
+                              ),
+                              const SizedBox(width: 2),
+                              Flexible(
+                                child: Text(
+                                  item.ownerLocationLabel!,
+                                  style: TextStyle(
+                                    color: AppTheme.textSecondary.withValues(
+                                      alpha: 0.8,
+                                    ),
+                                    fontSize: AppTheme.fontXs,
+                                  ),
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              ),
+                            ],
+                          ],
                         ),
                       ),
-                    ),
-                  ],
-                ],
-              ),
+                      const SizedBox(height: 4),
+                      _trustSignals(item.ownerTrust),
+                      // Trade notes
+                      if (item.ownerTradeNotes != null &&
+                          item.ownerTradeNotes!.isNotEmpty) ...[
+                        const SizedBox(height: 4),
+                        Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Icon(
+                              Icons.info_outline,
+                              size: 12,
+                              color: AppTheme.textSecondary.withValues(
+                                alpha: 0.6,
+                              ),
+                            ),
+                            const SizedBox(width: 4),
+                            Expanded(
+                              child: Text(
+                                item.ownerTradeNotes!,
+                                style: TextStyle(
+                                  color: AppTheme.textSecondary.withValues(
+                                    alpha: 0.7,
+                                  ),
+                                  fontSize: AppTheme.fontXs,
+                                  fontStyle: FontStyle.italic,
+                                ),
+                                maxLines: 2,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+
+                      // ── Interaction button ──
+                      if (onTradeTap != null) ...[
+                        const SizedBox(height: 8),
+                        SizedBox(
+                          width: double.infinity,
+                          height: 32,
+                          child: OutlinedButton.icon(
+                            key: Key('marketplace-propose-trade-${item.id}'),
+                            onPressed: onTradeTap,
+                            style: OutlinedButton.styleFrom(
+                              foregroundColor:
+                                  item.forSale
+                                      ? AppTheme.brass400
+                                      : AppTheme.frost400,
+                              side: BorderSide(
+                                color: (item.forSale
+                                        ? AppTheme.brass400
+                                        : AppTheme.frost400)
+                                    .withValues(alpha: 0.5),
+                              ),
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 10,
+                              ),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(
+                                  AppTheme.radiusSm,
+                                ),
+                              ),
+                            ),
+                            icon: Icon(
+                              item.forSale
+                                  ? Icons.shopping_cart_outlined
+                                  : Icons.swap_horiz,
+                              size: 14,
+                            ),
+                            label: Text(
+                              item.forSale && !item.forTrade
+                                  ? 'Quero comprar'
+                                  : item.forTrade && !item.forSale
+                                  ? 'Propor troca'
+                                  : 'Propor troca/compra',
+                              style: const TextStyle(fontSize: AppTheme.fontSm),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ],
+                  ),
+                ),
+              ],
             ),
-          ],
+          ),
         ),
       ),
     );

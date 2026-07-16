@@ -461,7 +461,10 @@ class _DecksTab extends StatelessWidget {
           color: AppTheme.surfaceSlate,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(AppTheme.radiusMd),
-            side: const BorderSide(color: AppTheme.outlineMuted, width: AppTheme.strokeHairline),
+            side: const BorderSide(
+              color: AppTheme.outlineMuted,
+              width: AppTheme.strokeHairline,
+            ),
           ),
           child: InkWell(
             borderRadius: BorderRadius.circular(AppTheme.radiusMd),
@@ -697,7 +700,10 @@ class _UsersListTabState extends State<_UsersListTab> {
           color: AppTheme.surfaceSlate,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(AppTheme.radiusMd),
-            side: const BorderSide(color: AppTheme.outlineMuted, width: AppTheme.strokeHairline),
+            side: const BorderSide(
+              color: AppTheme.outlineMuted,
+              width: AppTheme.strokeHairline,
+            ),
           ),
           child: ListTile(
             leading: CircleAvatar(
@@ -902,6 +908,9 @@ class _PublicBinderListViewState extends State<_PublicBinderListView>
     final isHave = widget.listType == 'have';
     showModalBottomSheet(
       context: context,
+      useRootNavigator: true,
+      useSafeArea: true,
+      showDragHandle: true,
       backgroundColor: AppTheme.surfaceSlate,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
@@ -1202,7 +1211,10 @@ class _PublicBinderItemCard extends StatelessWidget {
       color: AppTheme.surfaceSlate,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(AppTheme.radiusMd),
-        side: const BorderSide(color: AppTheme.outlineMuted, width: AppTheme.strokeHairline),
+        side: const BorderSide(
+          color: AppTheme.outlineMuted,
+          width: AppTheme.strokeHairline,
+        ),
       ),
       child: InkWell(
         borderRadius: BorderRadius.circular(AppTheme.radiusMd),

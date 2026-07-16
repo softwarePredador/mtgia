@@ -74,19 +74,20 @@ class CardDetailScreen extends StatelessWidget {
   // Card image (tappable for fullscreen)
   // ---------------------------------------------------------------------------
   Widget _buildCardImage(BuildContext context) {
+    final imageUrl = card.effectiveImageUrl;
     return GestureDetector(
       onTap: () => _showFullscreenImage(context),
       child: AspectRatio(
         aspectRatio: _mtgCardAspectRatio,
         child:
-            card.imageUrl != null && card.imageUrl!.isNotEmpty
+            imageUrl != null && imageUrl.isNotEmpty
                 ? ClipRRect(
                   borderRadius: const BorderRadius.only(
                     bottomLeft: Radius.circular(AppTheme.radiusLg),
                     bottomRight: Radius.circular(AppTheme.radiusLg),
                   ),
                   child: CachedCardImage(
-                    imageUrl: card.imageUrl,
+                    imageUrl: imageUrl,
                     width: double.infinity,
                     fit: BoxFit.contain,
                   ),
@@ -128,7 +129,8 @@ class CardDetailScreen extends StatelessWidget {
   }
 
   void _showFullscreenImage(BuildContext context) {
-    if (card.imageUrl == null || card.imageUrl!.isEmpty) return;
+    final imageUrl = card.effectiveImageUrl;
+    if (imageUrl == null || imageUrl.isEmpty) return;
 
     showDialog(
       context: context,
@@ -144,7 +146,7 @@ class CardDetailScreen extends StatelessWidget {
                 insetPadding: const EdgeInsets.all(16),
                 child: InteractiveViewer(
                   child: CachedCardImage(
-                    imageUrl: card.imageUrl,
+                    imageUrl: imageUrl,
                     fit: BoxFit.contain,
                   ),
                 ),

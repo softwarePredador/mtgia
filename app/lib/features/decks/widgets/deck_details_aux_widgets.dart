@@ -52,7 +52,7 @@ class DeckPricingRow extends StatelessWidget {
         subtitle += ' • $ago';
       }
     } else {
-      subtitle = 'Calculando custo...';
+      subtitle = 'Atualize quando quiser calcular o custo';
     }
 
     return Container(
@@ -224,28 +224,50 @@ class ColorIdentityPips extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final sorted = List<String>.from(colors)..sort((a, b) {
-      final ai = _wubrgOrder.indexOf(a);
-      final bi = _wubrgOrder.indexOf(b);
-      return (ai == -1 ? 99 : ai).compareTo(bi == -1 ? 99 : bi);
-    });
+    final sorted =
+        colors
+            .map((color) => color.trim().toUpperCase())
+            .where(_wubrgOrder.contains)
+            .toSet()
+            .toList()
+          ..sort((a, b) {
+            final ai = _wubrgOrder.indexOf(a);
+            final bi = _wubrgOrder.indexOf(b);
+            return ai.compareTo(bi);
+          });
 
-    return Row(
-      mainAxisSize: MainAxisSize.min,
-      children:
-          sorted.map((c) {
-            return Padding(
-              padding: const EdgeInsets.only(right: 3),
-              child: SizedBox(
-                width: AppTheme.iconSpinnerSm,
-                height: AppTheme.iconSpinnerSm,
-                child: SvgPicture.asset(
-                  'assets/symbols/$c.svg',
-                  placeholderBuilder: (_) => FallbackColorPip(letter: c),
+    if (sorted.isEmpty) {
+      return const SizedBox.shrink();
+    }
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 5),
+      decoration: BoxDecoration(
+        color: AppTheme.backgroundAbyss.withValues(alpha: 0.62),
+        borderRadius: BorderRadius.circular(AppTheme.radiusPill),
+        border: Border.all(
+          color: AppTheme.outlineMuted.withValues(alpha: 0.82),
+          width: AppTheme.strokeThin,
+        ),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children:
+            sorted.map((symbol) {
+              return Padding(
+                padding: EdgeInsets.only(right: symbol == sorted.last ? 0 : 4),
+                child: SizedBox(
+                  width: 18,
+                  height: 18,
+                  child: SvgPicture.asset(
+                    'assets/symbols/$symbol.svg',
+                    semanticsLabel: '$symbol mana',
+                    placeholderBuilder: (_) => FallbackColorPip(letter: symbol),
+                  ),
                 ),
-              ),
-            );
-          }).toList(),
+              );
+            }).toList(),
+      ),
     );
   }
 }
@@ -258,8 +280,8 @@ class FallbackColorPip extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: AppTheme.iconSpinnerSm,
-      height: AppTheme.iconSpinnerSm,
+      width: 18,
+      height: 18,
       decoration: BoxDecoration(
         color: AppTheme.manaPipBackground(letter),
         shape: BoxShape.circle,

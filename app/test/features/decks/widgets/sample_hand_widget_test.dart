@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:manaloom/core/theme/app_theme.dart';
+import 'package:manaloom/core/widgets/cached_card_image.dart';
 import 'package:manaloom/features/decks/models/deck_card_item.dart';
 import 'package:manaloom/features/decks/models/deck_details.dart';
 import 'package:manaloom/features/decks/widgets/sample_hand_widget.dart';
+
+import '../../../support/layout_test_tools.dart';
 
 void main() {
   DeckCardItem card({
@@ -42,7 +45,7 @@ void main() {
         card(
           id: 'cmdr',
           name: 'Talrand, Sky Summoner',
-          typeLine: 'Legendary Creature — Merfolk Wizard',
+          typeLine: 'Legendary Creature - Merfolk Wizard',
           manaCost: '{2}{U}{U}',
           quantity: 1,
           isCommander: true,
@@ -53,7 +56,7 @@ void main() {
           card(
             id: 'land',
             name: 'Island',
-            typeLine: 'Basic Land — Island',
+            typeLine: 'Basic Land - Island',
             quantity: 35,
           ),
           card(
@@ -93,7 +96,7 @@ void main() {
           card(
             id: 'filler',
             name: 'Pteramander',
-            typeLine: 'Creature — Salamander Drake',
+            typeLine: 'Creature - Salamander Drake',
             manaCost: '{U}',
             oracleText: 'Flying',
             quantity: 37,
@@ -103,17 +106,22 @@ void main() {
     );
   }
 
-  Widget createSubject({bool compact = false}) {
+  Widget createSubject({
+    bool compact = false,
+    double width = 300,
+    ValueChanged<DeckCardItem>? onShowCardDetails,
+  }) {
     return MaterialApp(
       theme: AppTheme.darkTheme,
       home: Scaffold(
         body: SizedBox(
-          width: 300,
+          width: width,
           child: SingleChildScrollView(
             child: SampleHandWidget(
               deck: makeDeck(),
               compact: compact,
               randomSeed: 7,
+              onShowCardDetails: onShowCardDetails,
             ),
           ),
         ),
@@ -158,6 +166,43 @@ void main() {
       );
     });
 
+    testWidgets('opens details callback from a drawn card', (tester) async {
+      DeckCardItem? selectedCard;
+      await tester.pumpWidget(
+        createSubject(onShowCardDetails: (card) => selectedCard = card),
+      );
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.byKey(const Key('sample-hand-draw')));
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.byKey(const Key('sample-hand-card-0')));
+      await tester.pumpAndSettle();
+
+      expect(selectedCard, isNotNull);
+      expect(selectedCard!.isCommander, isFalse);
+    });
+
+    testWidgets('drawn hand uses carousel snap without layout issues', (
+      tester,
+    ) async {
+      await tester.pumpWidget(createSubject());
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.byKey(const Key('sample-hand-draw')));
+      await tester.pumpAndSettle();
+
+      expect(find.byKey(const Key('sample-hand-carousel')), findsOneWidget);
+
+      await tester.drag(
+        find.byKey(const Key('sample-hand-carousel')),
+        const Offset(-220, 0),
+      );
+      await tester.pumpAndSettle();
+
+      expectNoLayoutExceptions(tester);
+    });
+
     testWidgets('supports compact mode and mulligan without overflow', (
       tester,
     ) async {
@@ -173,7 +218,41 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(find.text('6 cartas'), findsOneWidget);
-      expect(tester.takeException(), isNull);
+      expectNoLayoutExceptions(tester);
     });
+
+    testWidgets(
+      'compact mobile layout uses fallback card art and keeps actions tappable',
+      (tester) async {
+        enableFatalHitTestWarnings();
+        setTestViewport(tester, const Size(320, 568));
+
+        await tester.pumpWidget(createSubject(compact: true, width: 320));
+        await tester.pumpAndSettle();
+
+        await tester.tap(find.byKey(const Key('sample-hand-draw')));
+        await tester.pumpAndSettle();
+
+        final images = tester.widgetList<CachedCardImage>(
+          find.byType(CachedCardImage),
+        );
+        expect(images, isNotEmpty);
+        expect(
+          images.every(
+            (image) =>
+                image.imageUrl != null &&
+                image.imageUrl!.startsWith('https://api.scryfall.com/'),
+          ),
+          isTrue,
+        );
+
+        await tester.tap(find.byKey(const Key('sample-hand-mulligan')));
+        await tester.pumpAndSettle();
+        await tester.tap(find.byKey(const Key('sample-hand-new-hand')));
+        await tester.pumpAndSettle();
+
+        expectNoLayoutExceptions(tester);
+      },
+    );
   });
 }

@@ -98,7 +98,15 @@ class _CommunityDeckDetailScreenState extends State<CommunityDeckDetailScreen> {
 
   Future<void> _submitComment() async {
     final body = _commentController.text.trim();
-    if (body.length < 3) return;
+    if (body.length < 3) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Escreva pelo menos 3 caracteres para comentar.'),
+          backgroundColor: AppTheme.error,
+        ),
+      );
+      return;
+    }
     setState(() => _isSubmittingComment = true);
     final ok = await context.read<CommunityProvider>().addDeckComment(
       widget.deckId,
@@ -665,9 +673,8 @@ class _CommunityFeedbackPanel extends StatelessWidget {
                 onPressed: isReporting ? null : onReport,
                 icon:
                     isReporting
-                        ? const SizedBox(
-                          width: 18,
-                          height: 18,
+                        ? const SizedBox.square(
+                          dimension: AppTheme.iconSpinnerSm,
                           child: CircularProgressIndicator(strokeWidth: 2),
                         )
                         : const Icon(Icons.flag_outlined),
@@ -676,6 +683,7 @@ class _CommunityFeedbackPanel extends StatelessWidget {
           ),
           const SizedBox(height: 8),
           TextField(
+            key: const Key('community-deck-comment-field'),
             controller: controller,
             minLines: 1,
             maxLines: 3,
@@ -685,20 +693,26 @@ class _CommunityFeedbackPanel extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 8),
-          Align(
-            alignment: Alignment.centerRight,
-            child: ElevatedButton.icon(
-              onPressed: isSubmitting ? null : onSubmit,
-              icon:
-                  isSubmitting
-                      ? const SizedBox(
-                        width: 16,
-                        height: 16,
-                        child: CircularProgressIndicator(strokeWidth: 2),
-                      )
-                      : const Icon(Icons.send_outlined),
-              label: const Text('Publicar'),
-            ),
+          ValueListenableBuilder<TextEditingValue>(
+            valueListenable: controller,
+            builder: (context, value, _) {
+              final canSubmit = !isSubmitting && value.text.trim().length >= 3;
+              return Align(
+                alignment: Alignment.centerRight,
+                child: ElevatedButton.icon(
+                  key: const Key('community-deck-comment-submit-button'),
+                  onPressed: canSubmit ? onSubmit : null,
+                  icon:
+                      isSubmitting
+                          ? const SizedBox.square(
+                            dimension: AppTheme.iconSpinnerSm,
+                            child: CircularProgressIndicator(strokeWidth: 2),
+                          )
+                          : const Icon(Icons.send_outlined),
+                  label: const Text('Publicar'),
+                ),
+              );
+            },
           ),
           const SizedBox(height: 10),
           if (comments.isEmpty)

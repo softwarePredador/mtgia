@@ -203,19 +203,24 @@ class _ExploreTabState extends State<_ExploreTab>
                     Icons.search,
                     color: AppTheme.brass400,
                   ),
-                  suffixIcon: IconButton(
-                    key: const Key('community-explore-search-clear-button'),
-                    tooltip: 'Limpar busca',
-                    icon: const Icon(
-                      Icons.clear,
-                      color: AppTheme.textSecondary,
-                      size: 18,
-                    ),
-                    onPressed: () {
-                      _searchController.clear();
-                      _doSearch();
-                    },
-                  ),
+                  suffixIcon:
+                      _searchController.text.isEmpty
+                          ? null
+                          : IconButton(
+                            key: const Key(
+                              'community-explore-search-clear-button',
+                            ),
+                            tooltip: 'Limpar busca',
+                            icon: const Icon(
+                              Icons.clear,
+                              color: AppTheme.textSecondary,
+                              size: 18,
+                            ),
+                            onPressed: () {
+                              setState(_searchController.clear);
+                              _doSearch();
+                            },
+                          ),
                   filled: true,
                   fillColor: AppTheme.surfaceSlate.withValues(alpha: 0.94),
                   border: OutlineInputBorder(
@@ -241,6 +246,7 @@ class _ExploreTabState extends State<_ExploreTab>
                     vertical: 12,
                   ),
                 ),
+                onChanged: (_) => setState(() {}),
                 onSubmitted: (_) => _doSearch(),
               ),
               const SizedBox(height: 8),
@@ -597,6 +603,7 @@ class _UserSearchTabState extends State<_UserSearchTab>
   }
 
   void _onSearchChanged(String value) {
+    setState(() {});
     _debounce?.cancel();
     _debounce = Timer(const Duration(milliseconds: 400), () {
       context.read<SocialProvider>().searchUsers(value);
@@ -623,19 +630,22 @@ class _UserSearchTabState extends State<_UserSearchTab>
                 Icons.person_search,
                 color: AppTheme.brass400,
               ),
-              suffixIcon: IconButton(
-                key: const Key('community-users-search-clear-button'),
-                tooltip: 'Limpar busca',
-                icon: const Icon(
-                  Icons.clear,
-                  color: AppTheme.textSecondary,
-                  size: 18,
-                ),
-                onPressed: () {
-                  _searchController.clear();
-                  context.read<SocialProvider>().clearSearch();
-                },
-              ),
+              suffixIcon:
+                  _searchController.text.isEmpty
+                      ? null
+                      : IconButton(
+                        key: const Key('community-users-search-clear-button'),
+                        tooltip: 'Limpar busca',
+                        icon: const Icon(
+                          Icons.clear,
+                          color: AppTheme.textSecondary,
+                          size: 18,
+                        ),
+                        onPressed: () {
+                          setState(_searchController.clear);
+                          context.read<SocialProvider>().clearSearch();
+                        },
+                      ),
               filled: true,
               fillColor: AppTheme.surfaceSlate.withValues(alpha: 0.94),
               border: OutlineInputBorder(

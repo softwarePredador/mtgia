@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../../core/theme/app_theme.dart';
 import '../../../core/utils/mana_helper.dart';
+import '../../../core/widgets/cached_card_image.dart';
 import '../models/deck_analysis.dart';
 import '../models/deck_card_item.dart';
 import '../models/deck_details.dart';
@@ -11,6 +12,7 @@ class DeckDiagnosticPanel extends StatelessWidget {
   final DeckAnalysisData? analysis;
   final VoidCallback? onOpenAnalysis;
   final VoidCallback? onOpenBattleReplays;
+  final ValueChanged<DeckCardItem>? onShowCardDetails;
 
   const DeckDiagnosticPanel({
     super.key,
@@ -18,6 +20,7 @@ class DeckDiagnosticPanel extends StatelessWidget {
     this.analysis,
     this.onOpenAnalysis,
     this.onOpenBattleReplays,
+    this.onShowCardDetails,
   });
 
   @override
@@ -31,7 +34,11 @@ class DeckDiagnosticPanel extends StatelessWidget {
     );
     final summaryTone =
         hasWarnings ? _DiagnosticTone.warn : _DiagnosticTone.good;
-    final summaryLabel = hasWarnings ? 'Pontos de atenção' : 'Base saudável';
+    final summaryLabel = hasWarnings ? 'Ajustes sugeridos' : 'Base saudável';
+    final playerNotice = _PlayerReadinessNotice.fromAnalysis(
+      analysis,
+      hasMetricWarnings: hasWarnings,
+    );
 
     return Container(
       key: const Key('deck-diagnostic-panel'),
@@ -63,7 +70,7 @@ class DeckDiagnosticPanel extends StatelessWidget {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              'Leitura rápida do deck',
+                              'Próximos ajustes do deck',
                               style: theme.textTheme.titleMedium?.copyWith(
                                 color: AppTheme.textPrimary,
                                 fontWeight: FontWeight.w700,
@@ -71,7 +78,7 @@ class DeckDiagnosticPanel extends StatelessWidget {
                             ),
                             const SizedBox(height: 4),
                             Text(
-                              'Resumo de mana, curva e funções para orientar os próximos ajustes.',
+                              'Priorize o que melhora a partida: mana, compra, respostas e curva.',
                               style: theme.textTheme.bodySmall?.copyWith(
                                 color: AppTheme.textSecondary,
                               ),
@@ -113,7 +120,7 @@ class DeckDiagnosticPanel extends StatelessWidget {
                             Icons.psychology_alt_outlined,
                             size: 18,
                           ),
-                          label: const Text('Battle / replays'),
+                          label: const Text('Ver testes'),
                         ),
                     ],
                   ),
@@ -121,24 +128,13 @@ class DeckDiagnosticPanel extends StatelessWidget {
               );
             },
           ),
-          if (analysis?.hasLaunchSignals ?? false) ...[
+          if (playerNotice != null) ...[
             const SizedBox(height: 14),
-            _LaunchReadinessStrip(analysis: analysis!),
-            if (analysis!.launchCapabilities?.visibleBetaSurfaces.isNotEmpty ??
-                false) ...[
-              const SizedBox(height: 10),
-              _LaunchCapabilityBadges(
-                capabilities: analysis!.launchCapabilities!,
-              ),
-            ],
-            if (analysis!.cardBattleReadiness.isNotEmpty) ...[
-              const SizedBox(height: 10),
-              _CardBattleReadinessBadges(items: analysis!.cardBattleReadiness),
-            ],
+            _PlayerReadinessCard(notice: playerNotice),
           ],
           const SizedBox(height: 16),
           Text(
-            'Indicadores principais',
+            'O que melhorar primeiro',
             style: theme.textTheme.titleSmall?.copyWith(
               color: AppTheme.textPrimary,
               fontWeight: FontWeight.w700,
@@ -163,7 +159,15 @@ class DeckDiagnosticPanel extends StatelessWidget {
                         .map(
                           (metric) => SizedBox(
                             width: itemWidth,
-                            child: _DiagnosticMetricCard(metric: metric),
+                            child: _DiagnosticMetricCard(
+                              metric: metric,
+                              onOpenEvidence:
+                                  () => _showDiagnosticEvidenceSheet(
+                                    context,
+                                    metric.evidence,
+                                    onShowCardDetails: onShowCardDetails,
+                                  ),
+                            ),
                           ),
                         )
                         .toList(),
@@ -172,7 +176,7 @@ class DeckDiagnosticPanel extends StatelessWidget {
           ),
           const SizedBox(height: 18),
           Text(
-            'O que entrou na conta',
+            'Ver cartas por função',
             style: theme.textTheme.titleSmall?.copyWith(
               color: AppTheme.textPrimary,
               fontWeight: FontWeight.w700,
@@ -180,17 +184,25 @@ class DeckDiagnosticPanel extends StatelessWidget {
           ),
           const SizedBox(height: 4),
           Text(
-            'Cartas consideradas em cada indicador. Tutores não entram como compra.',
+            'Abra um grupo para ver quais cartas sustentam aquela parte do plano.',
             style: theme.textTheme.bodySmall?.copyWith(
               color: AppTheme.textSecondary,
               height: 1.3,
             ),
           ),
           const SizedBox(height: 10),
-          _DiagnosticEvidenceGrid(evidence: snapshot.evidence),
+          _DiagnosticEvidenceGrid(
+            evidence: snapshot.evidence,
+            onOpenEvidence:
+                (evidence) => _showDiagnosticEvidenceSheet(
+                  context,
+                  evidence,
+                  onShowCardDetails: onShowCardDetails,
+                ),
+          ),
           const SizedBox(height: 18),
           Text(
-            'Diagnóstico textual',
+            'Resumo em linguagem simples',
             style: theme.textTheme.titleSmall?.copyWith(
               color: AppTheme.textPrimary,
               fontWeight: FontWeight.w700,
@@ -206,391 +218,94 @@ class DeckDiagnosticPanel extends StatelessWidget {
   }
 }
 
-class _LaunchCapabilityBadges extends StatelessWidget {
-  final DeckLaunchCapabilities capabilities;
-
-  const _LaunchCapabilityBadges({required this.capabilities});
-
-  @override
-  Widget build(BuildContext context) {
-    final surfaces = capabilities.visibleBetaSurfaces
-        .take(4)
-        .toList(growable: false);
-    if (surfaces.isEmpty) return const SizedBox.shrink();
-
-    return Wrap(
-      key: const Key('deck-launch-capability-badges'),
-      spacing: 8,
-      runSpacing: 8,
-      children: surfaces.map(_LaunchCapabilityBadge.new).toList(),
-    );
-  }
-}
-
-class _LaunchCapabilityBadge extends StatelessWidget {
-  final DeckLaunchSurfaceCapability capability;
-
-  const _LaunchCapabilityBadge(this.capability);
-
-  @override
-  Widget build(BuildContext context) {
-    final isAdvisory = capability.stage == 'advisory';
-    final tone = isAdvisory ? _DiagnosticTone.neutral : _DiagnosticTone.warn;
-
-    return Container(
-      key: Key('deck-launch-capability-${capability.key}'),
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 7),
-      decoration: BoxDecoration(
-        color: tone.background,
-        borderRadius: BorderRadius.circular(AppTheme.radiusMd),
-        border: Border.all(color: tone.border.withValues(alpha: 0.64)),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(
-            isAdvisory ? Icons.info_outline_rounded : Icons.science_outlined,
-            size: 14,
-            color: tone.foreground,
-          ),
-          const SizedBox(width: 6),
-          Text(
-            '${capability.safeLabel} ${capability.stage}',
-            style: TextStyle(
-              color: tone.foreground,
-              fontSize: AppTheme.fontSm,
-              fontWeight: FontWeight.w800,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _CardBattleReadinessBadges extends StatelessWidget {
-  final List<DeckCardBattleReadiness> items;
-
-  const _CardBattleReadinessBadges({required this.items});
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final visible = items.take(8).toList(growable: false);
-    final hiddenCount = items.length - visible.length;
-
-    return Container(
-      key: const Key('deck-card-battle-readiness-badges'),
-      width: double.infinity,
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: AppTheme.surfaceSlate.withValues(alpha: 0.72),
-        borderRadius: BorderRadius.circular(AppTheme.radiusMd),
-        border: Border.all(
-          color: AppTheme.outlineMuted.withValues(alpha: 0.45),
-        ),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            'Battle por carta',
-            style: theme.textTheme.labelLarge?.copyWith(
-              color: AppTheme.textPrimary,
-              fontWeight: FontWeight.w800,
-            ),
-          ),
-          const SizedBox(height: 10),
-          Wrap(
-            spacing: 8,
-            runSpacing: 8,
-            children: [
-              ...visible.map(_CardBattleBadge.new),
-              if (hiddenCount > 0)
-                _OverflowBadge(label: '+$hiddenCount cartas'),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _CardBattleBadge extends StatelessWidget {
-  final DeckCardBattleReadiness item;
-
-  const _CardBattleBadge(this.item);
-
-  @override
-  Widget build(BuildContext context) {
-    final tone = _cardBattleTone(item.status);
-
-    return ConstrainedBox(
-      constraints: const BoxConstraints(maxWidth: 260),
-      child: Container(
-        key: Key('deck-card-battle-readiness-${item.name}'),
-        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
-        decoration: BoxDecoration(
-          color: tone.background,
-          borderRadius: BorderRadius.circular(AppTheme.radiusMd),
-          border: Border.all(color: tone.border.withValues(alpha: 0.65)),
-        ),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(
-              item.isCommander
-                  ? Icons.military_tech_outlined
-                  : Icons.psychology_alt_outlined,
-              size: 15,
-              color: tone.foreground,
-            ),
-            const SizedBox(width: 6),
-            Flexible(
-              child: Text(
-                item.name,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: TextStyle(
-                  color: tone.foreground,
-                  fontSize: AppTheme.fontSm,
-                  fontWeight: FontWeight.w800,
-                ),
-              ),
-            ),
-            const SizedBox(width: 6),
-            Flexible(
-              child: Text(
-                item.safeStatusLabel,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: TextStyle(
-                  color: AppTheme.textPrimary.withValues(alpha: 0.86),
-                  fontSize: AppTheme.fontSm,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class _OverflowBadge extends StatelessWidget {
-  final String label;
-
-  const _OverflowBadge({required this.label});
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
-      decoration: BoxDecoration(
-        color: AppTheme.surfaceElevated,
-        borderRadius: BorderRadius.circular(AppTheme.radiusMd),
-        border: Border.all(color: AppTheme.outlineMuted.withValues(alpha: 0.5)),
-      ),
-      child: Text(
-        label,
-        style: const TextStyle(
-          color: AppTheme.textSecondary,
-          fontSize: AppTheme.fontSm,
-          fontWeight: FontWeight.w700,
-        ),
-      ),
-    );
-  }
-}
-
-class _LaunchReadinessStrip extends StatelessWidget {
-  final DeckAnalysisData analysis;
-
-  const _LaunchReadinessStrip({required this.analysis});
-
-  @override
-  Widget build(BuildContext context) {
-    final cards = <Widget>[];
-    final readiness = analysis.readiness;
-    final battle = analysis.battleReadiness;
-    final understanding = analysis.understandingSummary;
-    final commanderContract = analysis.commanderContract;
-
-    if (readiness != null) {
-      final tone =
-          readiness.hasBlockers
-              ? _DiagnosticTone.danger
-              : readiness.warningCount > 0
-              ? _DiagnosticTone.warn
-              : _DiagnosticTone.good;
-      cards.add(
-        _LaunchSignalCard(
-          key: const Key('deck-launch-readiness-card'),
-          label: 'Prontidão',
-          value: readiness.statusLabel,
-          detail: readiness.primaryAction,
-          icon:
-              readiness.hasBlockers
-                  ? Icons.report_problem_outlined
-                  : Icons.verified_user_outlined,
-          tone: tone,
-        ),
-      );
-    }
-
-    if (battle != null) {
-      cards.add(
-        _LaunchSignalCard(
-          key: const Key('deck-launch-battle-card'),
-          label: 'Simulação',
-          value: battle.statusLabel,
-          detail:
-              '${battle.verifiedSimulationCopies}/${battle.totalCopies} cópias verificadas',
-          footer: battle.verifiedPercentLabel,
-          icon: Icons.psychology_alt_outlined,
-          tone: _battleTone(battle.status),
-        ),
-      );
-    }
-
-    if (understanding != null) {
-      cards.add(
-        _LaunchSignalCard(
-          key: const Key('deck-launch-understanding-card'),
-          label: 'Cobertura',
-          value: understanding.functionalCoverageLabel,
-          detail:
-              '${understanding.functionalTaggedCopies}/${understanding.totalCopies} cópias com função',
-          footer: understanding.verifiedBattleLabel,
-          icon: Icons.hub_outlined,
-          tone: _understandingTone(understanding),
-        ),
-      );
-    }
-
-    if (commanderContract != null && commanderContract.shouldDisplay) {
-      cards.add(
-        _LaunchSignalCard(
-          key: const Key('deck-launch-commander-contract-card'),
-          label: 'Plano Commander',
-          value: commanderContract.safeStatusLabel,
-          detail: commanderContract.primaryDetail,
-          footer: commanderContract.footerLabel,
-          icon: Icons.account_tree_outlined,
-          tone: _commanderContractTone(commanderContract),
-        ),
-      );
-    }
-
-    if (cards.isEmpty) return const SizedBox.shrink();
-
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        final columns =
-            constraints.maxWidth < 420
-                ? 1
-                : (constraints.maxWidth < 760 ? 2 : 3);
-        final spacing = 10.0;
-        final itemWidth =
-            (constraints.maxWidth - ((columns - 1) * spacing)) / columns;
-
-        return Wrap(
-          spacing: spacing,
-          runSpacing: spacing,
-          children: cards
-              .map((card) => SizedBox(width: itemWidth, child: card))
-              .toList(growable: false),
-        );
-      },
-    );
-  }
-
-  static _DiagnosticTone _battleTone(String status) {
-    switch (status) {
-      case 'verified_simulation':
-        return _DiagnosticTone.good;
-      case 'partial_simulation':
-      case 'pending_adapter':
-        return _DiagnosticTone.warn;
-      case 'rules_text_only':
-      case 'not_available':
-        return _DiagnosticTone.neutral;
-      default:
-        return _DiagnosticTone.neutral;
-    }
-  }
-
-  static _DiagnosticTone _understandingTone(
-    DeckUnderstandingSummary understanding,
-  ) {
-    if (understanding.totalCopies <= 0) return _DiagnosticTone.neutral;
-    if (understanding.functionalCoverageRatio >= 0.8 &&
-        understanding.verifiedBattleRatio >= 0.8) {
-      return _DiagnosticTone.good;
-    }
-    if (understanding.functionalCoverageRatio >= 0.5 ||
-        understanding.verifiedBattleRatio >= 0.5) {
-      return _DiagnosticTone.warn;
-    }
-    return _DiagnosticTone.neutral;
-  }
-
-  static _DiagnosticTone _commanderContractTone(
-    DeckCommanderContractSummary contract,
-  ) {
-    if (contract.hasBlockers) return _DiagnosticTone.danger;
-    switch (contract.status) {
-      case 'ready':
-        return _DiagnosticTone.good;
-      case 'ready_for_battle_gate':
-        return _DiagnosticTone.warn;
-      default:
-        return _DiagnosticTone.neutral;
-    }
-  }
-}
-
-_DiagnosticTone _cardBattleTone(String status) {
-  switch (status) {
-    case 'verified_simulation':
-      return _DiagnosticTone.good;
-    case 'partial_simulation':
-    case 'pending_adapter':
-      return _DiagnosticTone.warn;
-    default:
-      return _DiagnosticTone.neutral;
-  }
-}
-
-class _LaunchSignalCard extends StatelessWidget {
-  final String label;
-  final String value;
-  final String detail;
-  final String? footer;
-  final IconData icon;
-  final _DiagnosticTone tone;
-
-  const _LaunchSignalCard({
-    super.key,
-    required this.label,
-    required this.value,
+class _PlayerReadinessNotice {
+  const _PlayerReadinessNotice({
+    required this.title,
     required this.detail,
-    this.footer,
     required this.icon,
     required this.tone,
   });
 
+  final String title;
+  final String detail;
+  final IconData icon;
+  final _DiagnosticTone tone;
+
+  static _PlayerReadinessNotice? fromAnalysis(
+    DeckAnalysisData? analysis, {
+    required bool hasMetricWarnings,
+  }) {
+    final readiness = analysis?.readiness;
+
+    if (readiness == null) {
+      if (!hasMetricWarnings) return null;
+      return const _PlayerReadinessNotice(
+        title: 'Ajustes recomendados antes da próxima partida',
+        detail:
+            'Comece pelos indicadores em amarelo ou vermelho para melhorar consistência.',
+        icon: Icons.tune_rounded,
+        tone: _DiagnosticTone.warn,
+      );
+    }
+
+    if (readiness.hasBlockers) {
+      return _PlayerReadinessNotice(
+        title: 'Corrigir lista antes de jogar',
+        detail: _friendlyReadinessAction(readiness),
+        icon: Icons.report_problem_outlined,
+        tone: _DiagnosticTone.danger,
+      );
+    }
+
+    if (readiness.warningCount > 0 || hasMetricWarnings) {
+      return _PlayerReadinessNotice(
+        title: 'Deck jogável, mas com ajustes importantes',
+        detail: _friendlyReadinessAction(readiness),
+        icon: Icons.tune_rounded,
+        tone: _DiagnosticTone.warn,
+      );
+    }
+
+    return const _PlayerReadinessNotice(
+      title: 'Base pronta para testar',
+      detail:
+          'A estrutura principal parece equilibrada. Use os indicadores abaixo para ajustes finos.',
+      icon: Icons.check_circle_outline_rounded,
+      tone: _DiagnosticTone.good,
+    );
+  }
+}
+
+String _friendlyReadinessAction(DeckReadinessSummary readiness) {
+  final action = readiness.primaryAction.trim();
+  if (action.isEmpty || action == 'Inteligência avançada liberada.') {
+    return 'Use os indicadores abaixo para decidir o próximo ajuste.';
+  }
+  if (action == 'Revisar avisos antes da simulação.') {
+    return 'Revise os pontos sinalizados abaixo antes da próxima partida.';
+  }
+  if (action == 'Resolver bloqueios antes de avançar.') {
+    return 'Corrija os problemas estruturais do deck antes de continuar.';
+  }
+  return action;
+}
+
+class _PlayerReadinessCard extends StatelessWidget {
+  final _PlayerReadinessNotice notice;
+
+  const _PlayerReadinessCard({required this.notice});
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
 
     return Container(
+      key: const Key('deck-player-readiness-card'),
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
         color: AppTheme.surfaceSlate.withValues(alpha: 0.82),
         borderRadius: BorderRadius.circular(AppTheme.radiusMd),
-        border: Border.all(color: tone.border.withValues(alpha: 0.68)),
+        border: Border.all(color: notice.tone.border.withValues(alpha: 0.68)),
       ),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -599,10 +314,10 @@ class _LaunchSignalCard extends StatelessWidget {
             width: 30,
             height: 30,
             decoration: BoxDecoration(
-              color: tone.background,
+              color: notice.tone.background,
               borderRadius: BorderRadius.circular(AppTheme.radiusSm),
             ),
-            child: Icon(icon, color: tone.foreground, size: 17),
+            child: Icon(notice.icon, color: notice.tone.foreground, size: 17),
           ),
           const SizedBox(width: 10),
           Expanded(
@@ -610,27 +325,17 @@ class _LaunchSignalCard extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  label,
+                  notice.title,
                   maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: theme.textTheme.labelMedium?.copyWith(
-                    color: AppTheme.textSecondary,
-                    fontWeight: FontWeight.w700,
-                  ),
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  value,
-                  maxLines: 2,
                   overflow: TextOverflow.ellipsis,
                   style: theme.textTheme.titleSmall?.copyWith(
                     color: AppTheme.textPrimary,
-                    fontWeight: FontWeight.w700,
+                    fontWeight: FontWeight.w800,
                   ),
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  detail,
+                  notice.detail,
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
                   style: theme.textTheme.bodySmall?.copyWith(
@@ -638,18 +343,6 @@ class _LaunchSignalCard extends StatelessWidget {
                     height: 1.25,
                   ),
                 ),
-                if (footer != null) ...[
-                  const SizedBox(height: 6),
-                  Text(
-                    footer!,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: theme.textTheme.labelSmall?.copyWith(
-                      color: tone.foreground,
-                      fontWeight: FontWeight.w700,
-                    ),
-                  ),
-                ],
               ],
             ),
           ),
@@ -661,8 +354,12 @@ class _LaunchSignalCard extends StatelessWidget {
 
 class _DiagnosticMetricCard extends StatelessWidget {
   final _DiagnosticMetric metric;
+  final VoidCallback onOpenEvidence;
 
-  const _DiagnosticMetricCard({required this.metric});
+  const _DiagnosticMetricCard({
+    required this.metric,
+    required this.onOpenEvidence,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -672,91 +369,105 @@ class _DiagnosticMetricCard extends StatelessWidget {
       builder: (context, constraints) {
         final isCompact = constraints.maxWidth < 170;
 
-        return Container(
-          key: Key('deck-diagnostic-metric-${metric.label}'),
-          padding: const EdgeInsets.all(14),
-          decoration: BoxDecoration(
-            color: AppTheme.surfaceSlate.withValues(alpha: 0.92),
+        return Semantics(
+          button: true,
+          label: 'Ver cartas de ${metric.label}',
+          child: Material(
+            color: AppTheme.transparent,
             borderRadius: BorderRadius.circular(AppTheme.radiusMd),
-            border: Border.all(
-              color: metric.tone.border.withValues(alpha: 0.68),
-            ),
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              if (isCompact) ...[
-                Text(
-                  metric.label,
-                  style: theme.textTheme.labelLarge?.copyWith(
-                    color: AppTheme.textSecondary,
-                    fontWeight: FontWeight.w600,
+            child: InkWell(
+              key: Key('deck-diagnostic-metric-${metric.label}'),
+              onTap: onOpenEvidence,
+              borderRadius: BorderRadius.circular(AppTheme.radiusMd),
+              child: Container(
+                padding: const EdgeInsets.all(14),
+                decoration: BoxDecoration(
+                  color: AppTheme.surfaceSlate.withValues(alpha: 0.92),
+                  borderRadius: BorderRadius.circular(AppTheme.radiusMd),
+                  border: Border.all(
+                    color: metric.tone.border.withValues(alpha: 0.68),
                   ),
                 ),
-                const SizedBox(height: 8),
-                _MetricToneBadge(label: metric.status, tone: metric.tone),
-              ] else
-                Row(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Expanded(
-                      child: Text(
+                    if (isCompact) ...[
+                      Text(
                         metric.label,
                         style: theme.textTheme.labelLarge?.copyWith(
                           color: AppTheme.textSecondary,
                           fontWeight: FontWeight.w600,
                         ),
                       ),
-                    ),
-                    const SizedBox(width: 8),
-                    Flexible(
-                      child: Align(
-                        alignment: Alignment.centerRight,
-                        child: _MetricToneBadge(
-                          label: metric.status,
-                          tone: metric.tone,
+                      const SizedBox(height: 8),
+                      _MetricToneBadge(label: metric.status, tone: metric.tone),
+                    ] else
+                      Row(
+                        children: [
+                          Expanded(
+                            child: Text(
+                              metric.label,
+                              style: theme.textTheme.labelLarge?.copyWith(
+                                color: AppTheme.textSecondary,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ),
+                          const SizedBox(width: 8),
+                          Flexible(
+                            child: Align(
+                              alignment: Alignment.centerRight,
+                              child: _MetricToneBadge(
+                                label: metric.status,
+                                tone: metric.tone,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    const SizedBox(height: 10),
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.end,
+                      children: [
+                        Expanded(
+                          child: Text(
+                            metric.value,
+                            style: theme.textTheme.headlineSmall?.copyWith(
+                              color: AppTheme.textPrimary,
+                              fontWeight: FontWeight.w700,
+                            ),
+                          ),
                         ),
+                        const SizedBox(width: 8),
+                        Container(
+                          width: 28,
+                          height: 28,
+                          decoration: BoxDecoration(
+                            color: metric.tone.background,
+                            borderRadius: BorderRadius.circular(
+                              AppTheme.radiusSm,
+                            ),
+                          ),
+                          child: Icon(
+                            metric.icon,
+                            size: 16,
+                            color: metric.tone.foreground,
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      metric.target,
+                      style: theme.textTheme.bodySmall?.copyWith(
+                        color: AppTheme.textSecondary.withValues(alpha: 0.9),
+                        height: 1.3,
                       ),
                     ),
                   ],
                 ),
-              const SizedBox(height: 10),
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.end,
-                children: [
-                  Expanded(
-                    child: Text(
-                      metric.value,
-                      style: theme.textTheme.headlineSmall?.copyWith(
-                        color: AppTheme.textPrimary,
-                        fontWeight: FontWeight.w700,
-                      ),
-                    ),
-                  ),
-                  const SizedBox(width: 8),
-                  Container(
-                    width: 28,
-                    height: 28,
-                    decoration: BoxDecoration(
-                      color: metric.tone.background,
-                      borderRadius: BorderRadius.circular(AppTheme.radiusSm),
-                    ),
-                    child: Icon(
-                      metric.icon,
-                      size: 16,
-                      color: metric.tone.foreground,
-                    ),
-                  ),
-                ],
               ),
-              const SizedBox(height: 8),
-              Text(
-                metric.target,
-                style: theme.textTheme.bodySmall?.copyWith(
-                  color: AppTheme.textSecondary.withValues(alpha: 0.9),
-                  height: 1.3,
-                ),
-              ),
-            ],
+            ),
           ),
         );
       },
@@ -766,8 +477,12 @@ class _DiagnosticMetricCard extends StatelessWidget {
 
 class _DiagnosticEvidenceGrid extends StatelessWidget {
   final List<_DiagnosticEvidence> evidence;
+  final ValueChanged<_DiagnosticEvidence> onOpenEvidence;
 
-  const _DiagnosticEvidenceGrid({required this.evidence});
+  const _DiagnosticEvidenceGrid({
+    required this.evidence,
+    required this.onOpenEvidence,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -786,7 +501,10 @@ class _DiagnosticEvidenceGrid extends StatelessWidget {
                   .map(
                     (item) => SizedBox(
                       width: itemWidth,
-                      child: _DiagnosticEvidenceCard(evidence: item),
+                      child: _DiagnosticEvidenceCard(
+                        evidence: item,
+                        onTap: () => onOpenEvidence(item),
+                      ),
                     ),
                   )
                   .toList(),
@@ -798,67 +516,409 @@ class _DiagnosticEvidenceGrid extends StatelessWidget {
 
 class _DiagnosticEvidenceCard extends StatelessWidget {
   final _DiagnosticEvidence evidence;
+  final VoidCallback onTap;
 
-  const _DiagnosticEvidenceCard({required this.evidence});
+  const _DiagnosticEvidenceCard({required this.evidence, required this.onTap});
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final preview = evidence.cardLabels.take(5).toList();
-    final hiddenCount = evidence.cardLabels.length - preview.length;
+    final preview = evidence.previewLabels.take(5).toList();
+    final hiddenCount = evidence.previewLabels.length - preview.length;
 
-    return Container(
-      key: Key('deck-diagnostic-evidence-${evidence.label}'),
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: AppTheme.surfaceSlate.withValues(alpha: 0.74),
+    return Semantics(
+      button: true,
+      label: 'Ver cartas de ${evidence.label}',
+      child: Material(
+        color: AppTheme.transparent,
         borderRadius: BorderRadius.circular(AppTheme.radiusMd),
-        border: Border.all(
-          color: AppTheme.outlineMuted.withValues(alpha: 0.5),
-          width: 0.8,
-        ),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              Icon(evidence.icon, size: 15, color: AppTheme.mythicGold),
-              const SizedBox(width: 6),
-              Expanded(
-                child: Text(
-                  '${evidence.label} (${evidence.count})',
-                  style: theme.textTheme.labelLarge?.copyWith(
-                    color: AppTheme.textPrimary,
-                    fontWeight: FontWeight.w700,
-                  ),
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 8),
-          if (preview.isEmpty)
-            Text(
-              'Nenhuma carta detectada.',
-              style: theme.textTheme.bodySmall?.copyWith(
-                color: AppTheme.textSecondary,
-                fontStyle: FontStyle.italic,
-              ),
-            )
-          else
-            Text(
-              [
-                ...preview,
-                if (hiddenCount > 0) '+$hiddenCount outras',
-              ].join(' • '),
-              style: theme.textTheme.bodySmall?.copyWith(
-                color: AppTheme.textSecondary,
-                height: 1.35,
+        child: InkWell(
+          key: Key('deck-diagnostic-evidence-${evidence.label}'),
+          onTap: onTap,
+          borderRadius: BorderRadius.circular(AppTheme.radiusMd),
+          child: Container(
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: AppTheme.surfaceSlate.withValues(alpha: 0.74),
+              borderRadius: BorderRadius.circular(AppTheme.radiusMd),
+              border: Border.all(
+                color: AppTheme.outlineMuted.withValues(alpha: 0.5),
+                width: 0.8,
               ),
             ),
-        ],
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Icon(evidence.icon, size: 15, color: AppTheme.mythicGold),
+                    const SizedBox(width: 6),
+                    Expanded(
+                      child: Text(
+                        '${evidence.label} (${evidence.count})',
+                        style: theme.textTheme.labelLarge?.copyWith(
+                          color: AppTheme.textPrimary,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                    ),
+                    const Icon(
+                      Icons.chevron_right_rounded,
+                      size: 18,
+                      color: AppTheme.textSecondary,
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 8),
+                if (preview.isEmpty)
+                  Text(
+                    'Nenhuma carta detectada.',
+                    style: theme.textTheme.bodySmall?.copyWith(
+                      color: AppTheme.textSecondary,
+                      fontStyle: FontStyle.italic,
+                    ),
+                  )
+                else
+                  Text(
+                    [
+                      ...preview,
+                      if (hiddenCount > 0) '+$hiddenCount outras',
+                    ].join(' • '),
+                    style: theme.textTheme.bodySmall?.copyWith(
+                      color: AppTheme.textSecondary,
+                      height: 1.35,
+                    ),
+                  ),
+              ],
+            ),
+          ),
+        ),
       ),
     );
+  }
+}
+
+Future<void> _showDiagnosticEvidenceSheet(
+  BuildContext context,
+  _DiagnosticEvidence evidence, {
+  ValueChanged<DeckCardItem>? onShowCardDetails,
+}) {
+  return showModalBottomSheet<void>(
+    context: context,
+    isScrollControlled: true,
+    backgroundColor: AppTheme.surfaceElevated,
+    barrierColor: AppTheme.backgroundAbyss.withValues(alpha: 0.72),
+    shape: const RoundedRectangleBorder(
+      borderRadius: BorderRadius.vertical(
+        top: Radius.circular(AppTheme.radiusLg),
+      ),
+    ),
+    builder:
+        (sheetContext) => _DiagnosticEvidenceSheet(
+          evidence: evidence,
+          onShowCardDetails: onShowCardDetails,
+        ),
+  );
+}
+
+class _DiagnosticEvidenceSheet extends StatelessWidget {
+  final _DiagnosticEvidence evidence;
+  final ValueChanged<DeckCardItem>? onShowCardDetails;
+
+  const _DiagnosticEvidenceSheet({
+    required this.evidence,
+    this.onShowCardDetails,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final media = MediaQuery.of(context);
+    final maxHeight = media.size.height * 0.78;
+
+    return SafeArea(
+      top: false,
+      child: ConstrainedBox(
+        key: Key('deck-diagnostic-evidence-sheet-${evidence.label}'),
+        constraints: BoxConstraints(maxHeight: maxHeight),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Center(
+              child: Container(
+                width: 42,
+                height: 4,
+                margin: const EdgeInsets.only(top: 10, bottom: 12),
+                decoration: BoxDecoration(
+                  color: AppTheme.outlineMuted.withValues(alpha: 0.78),
+                  borderRadius: BorderRadius.circular(AppTheme.radiusPill),
+                ),
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(18, 0, 12, 12),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Container(
+                    width: 34,
+                    height: 34,
+                    decoration: BoxDecoration(
+                      color: AppTheme.mythicGold.withValues(alpha: 0.14),
+                      borderRadius: BorderRadius.circular(AppTheme.radiusSm),
+                    ),
+                    child: Icon(
+                      evidence.icon,
+                      size: 18,
+                      color: AppTheme.mythicGold,
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          '${evidence.label} (${evidence.count})',
+                          style: theme.textTheme.titleMedium?.copyWith(
+                            color: AppTheme.textPrimary,
+                            fontWeight: FontWeight.w800,
+                          ),
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          evidence.description,
+                          style: theme.textTheme.bodySmall?.copyWith(
+                            color: AppTheme.textSecondary,
+                            height: 1.35,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  IconButton(
+                    tooltip: 'Fechar',
+                    onPressed: () => Navigator.of(context).pop(),
+                    icon: const Icon(Icons.close_rounded),
+                    color: AppTheme.textSecondary,
+                  ),
+                ],
+              ),
+            ),
+            Divider(
+              height: 1,
+              color: AppTheme.outlineMuted.withValues(alpha: 0.48),
+            ),
+            Flexible(
+              child:
+                  evidence.entries.isEmpty
+                      ? _DiagnosticEvidenceEmpty(evidence: evidence)
+                      : ListView.separated(
+                        padding: const EdgeInsets.all(14),
+                        itemCount: evidence.entries.length,
+                        separatorBuilder: (_, __) => const SizedBox(height: 8),
+                        itemBuilder: (context, index) {
+                          final entry = evidence.entries[index];
+                          return _DiagnosticEvidenceListTile(
+                            entry: entry,
+                            evidenceLabel: evidence.label,
+                            onTap:
+                                entry.card != null && onShowCardDetails != null
+                                    ? () {
+                                      Navigator.of(context).pop();
+                                      onShowCardDetails!(entry.card!);
+                                    }
+                                    : null,
+                          );
+                        },
+                      ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _DiagnosticEvidenceEmpty extends StatelessWidget {
+  final _DiagnosticEvidence evidence;
+
+  const _DiagnosticEvidenceEmpty({required this.evidence});
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return Padding(
+      padding: const EdgeInsets.all(20),
+      child: Text(
+        'Nenhuma carta foi detectada para ${evidence.label.toLowerCase()} nesta leitura.',
+        style: theme.textTheme.bodyMedium?.copyWith(
+          color: AppTheme.textSecondary,
+          height: 1.4,
+        ),
+      ),
+    );
+  }
+}
+
+class _DiagnosticEvidenceListTile extends StatelessWidget {
+  final _DiagnosticEvidenceEntry entry;
+  final String evidenceLabel;
+  final VoidCallback? onTap;
+
+  const _DiagnosticEvidenceListTile({
+    required this.entry,
+    required this.evidenceLabel,
+    this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final card = entry.card;
+    final quantity = entry.quantity;
+    final detail = entry.detail ?? _friendlyEvidenceReason(evidenceLabel);
+    final imageUrl = card?.effectiveImageUrl ?? _scryfallImageUrl(entry.name);
+
+    return Material(
+      color: AppTheme.surfaceSlate.withValues(alpha: 0.78),
+      borderRadius: BorderRadius.circular(AppTheme.radiusMd),
+      child: InkWell(
+        key: Key('deck-diagnostic-evidence-card-${entry.name}'),
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(AppTheme.radiusMd),
+        child: Padding(
+          padding: const EdgeInsets.all(10),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              CachedCardImage(
+                imageUrl: imageUrl,
+                fallbackImageUrl:
+                    card?.fallbackImageUrl ?? _scryfallImageUrl(entry.name),
+                width: AppTheme.touchTargetMin,
+                height: 64,
+                borderRadius: BorderRadius.circular(AppTheme.radiusSm),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Row(
+                      children: [
+                        Expanded(
+                          child: Text(
+                            entry.name,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: theme.textTheme.bodyMedium?.copyWith(
+                              color: AppTheme.textPrimary,
+                              fontWeight: FontWeight.w700,
+                            ),
+                          ),
+                        ),
+                        if (quantity != null && quantity > 1) ...[
+                          const SizedBox(width: 8),
+                          _EvidenceQuantityBadge(quantity: quantity),
+                        ],
+                      ],
+                    ),
+                    if ((card?.typeLine ?? '').trim().isNotEmpty) ...[
+                      const SizedBox(height: 3),
+                      Text(
+                        card!.typeLine,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: theme.textTheme.bodySmall?.copyWith(
+                          color: AppTheme.textSecondary,
+                        ),
+                      ),
+                    ],
+                    const SizedBox(height: 3),
+                    Text(
+                      detail,
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                      style: theme.textTheme.labelSmall?.copyWith(
+                        color: AppTheme.textSecondary,
+                        height: 1.25,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              if (onTap != null) ...[
+                const SizedBox(width: 8),
+                const Icon(
+                  Icons.open_in_new_rounded,
+                  color: AppTheme.textSecondary,
+                  size: 16,
+                ),
+              ],
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _EvidenceQuantityBadge extends StatelessWidget {
+  final int quantity;
+
+  const _EvidenceQuantityBadge({required this.quantity});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 3),
+      decoration: BoxDecoration(
+        color: AppTheme.mythicGold.withValues(alpha: 0.14),
+        borderRadius: BorderRadius.circular(AppTheme.radiusSm),
+        border: Border.all(color: AppTheme.mythicGold.withValues(alpha: 0.28)),
+      ),
+      child: Text(
+        'x$quantity',
+        style: const TextStyle(
+          color: AppTheme.mythicGold,
+          fontSize: AppTheme.fontXs,
+          fontWeight: FontWeight.w800,
+        ),
+      ),
+    );
+  }
+}
+
+String? _scryfallImageUrl(String cardName) {
+  final trimmed = cardName.trim();
+  if (trimmed.isEmpty) return null;
+  return Uri.https('api.scryfall.com', '/cards/named', {
+    'exact': trimmed,
+    'format': 'image',
+    'version': 'normal',
+  }).toString();
+}
+
+String _friendlyEvidenceReason(String label) {
+  switch (label) {
+    case 'Terrenos':
+      return 'Conta para a base de mana do deck.';
+    case 'Ramp':
+      return 'Ajuda a acelerar mana, reduzir custo ou chegar antes nas jogadas principais.';
+    case 'Compra':
+      return 'Ajuda a comprar, selecionar ou manter cartas disponíveis.';
+    case 'Interação':
+      return 'Ajuda a responder ameaças e proteger seu plano de jogo.';
+    case 'Wipes':
+      return 'Ajuda a resetar a mesa quando os oponentes desenvolvem demais.';
+    case 'CMC médio':
+      return 'Entra no cálculo da curva do deck.';
+    default:
+      return 'Carta considerada nesta leitura do deck.';
   }
 }
 
@@ -1030,13 +1090,78 @@ class _DeckDiagnosticSnapshot {
 
     var weightedCmc = 0;
     var nonLandCount = 0;
+    final nonLandCards = <DeckCardItem>[];
     for (final card in cards) {
       if (_isLand(card)) continue;
+      nonLandCards.add(card);
       final quantity = card.quantity <= 0 ? 1 : card.quantity;
       weightedCmc += ManaHelper.calculateCMC(card.manaCost) * quantity;
       nonLandCount += quantity;
     }
     final averageCmc = nonLandCount == 0 ? 0.0 : weightedCmc / nonLandCount;
+
+    final landEvidence = _DiagnosticEvidence(
+      label: 'Terrenos',
+      count: landCount,
+      icon: Icons.terrain_rounded,
+      entries: _entriesFromCards(landCards),
+      description: 'Base de mana usada para desenvolver suas jogadas.',
+    );
+    final rampEvidence = _DiagnosticEvidence(
+      label: 'Ramp',
+      count: rampCount,
+      icon: Icons.bolt_rounded,
+      entries: _entriesFromBucket(
+        rampAnalysis,
+        rampCards,
+        cards,
+        tagKey: 'ramp',
+      ),
+      description: 'Pedras, redução de custo e efeitos que aceleram seu jogo.',
+    );
+    final drawEvidence = _DiagnosticEvidence(
+      label: 'Compra',
+      count: drawCount,
+      icon: Icons.auto_stories_rounded,
+      entries: _entriesFromBucket(
+        drawAnalysis,
+        drawCards,
+        cards,
+        tagKey: 'draw',
+      ),
+      description: 'Cartas que ajudam a manter recursos ao longo da partida.',
+    );
+    final interactionEvidence = _DiagnosticEvidence(
+      label: 'Interação',
+      count: interactionCount,
+      icon: Icons.shield_outlined,
+      entries: _entriesFromBucket(
+        interactionAnalysis,
+        interactionCards,
+        cards,
+        tagKey: 'removal',
+      ),
+      description: 'Respostas para criaturas, permanentes e jogadas da mesa.',
+    );
+    final wipeEvidence = _DiagnosticEvidence(
+      label: 'Wipes',
+      count: wipeCount,
+      icon: Icons.cleaning_services_outlined,
+      entries: _entriesFromBucket(
+        wipeAnalysis,
+        wipeCards,
+        cards,
+        tagKey: 'board_wipe',
+      ),
+      description: 'Efeitos que limpam a mesa quando o jogo sai do controle.',
+    );
+    final curveEvidence = _DiagnosticEvidence(
+      label: 'CMC médio',
+      count: nonLandCount,
+      icon: Icons.show_chart_rounded,
+      entries: _entriesFromCards(nonLandCards, sortByCmcDescending: true),
+      description: 'Mágicas não-terreno usadas para entender o peso da curva.',
+    );
 
     final landEval = _rangeEvaluation(
       value: landCount,
@@ -1089,6 +1214,7 @@ class _DeckDiagnosticSnapshot {
         target: 'Alvo ${targets.minLands}-${targets.maxLands}',
         tone: landEval.tone,
         icon: landEval.icon,
+        evidence: landEvidence,
       ),
       _DiagnosticMetric(
         label: 'Ramp',
@@ -1097,6 +1223,7 @@ class _DeckDiagnosticSnapshot {
         target: 'Meta ${targets.minRamp}+',
         tone: rampEval.tone,
         icon: rampEval.icon,
+        evidence: rampEvidence,
       ),
       _DiagnosticMetric(
         label: 'Compra',
@@ -1105,6 +1232,7 @@ class _DeckDiagnosticSnapshot {
         target: 'Meta ${targets.minDraw}+',
         tone: drawEval.tone,
         icon: drawEval.icon,
+        evidence: drawEvidence,
       ),
       _DiagnosticMetric(
         label: 'Interação',
@@ -1113,6 +1241,7 @@ class _DeckDiagnosticSnapshot {
         target: 'Meta ${targets.minInteraction}+',
         tone: interactionEval.tone,
         icon: interactionEval.icon,
+        evidence: interactionEvidence,
       ),
       _DiagnosticMetric(
         label: 'Wipes',
@@ -1121,6 +1250,7 @@ class _DeckDiagnosticSnapshot {
         target: 'Meta ${targets.minWipes}+',
         tone: wipeEval.tone,
         icon: wipeEval.icon,
+        evidence: wipeEvidence,
       ),
       _DiagnosticMetric(
         label: 'CMC médio',
@@ -1129,6 +1259,7 @@ class _DeckDiagnosticSnapshot {
         target: 'Ideal até ${targets.curveTarget.toStringAsFixed(1)}',
         tone: curveEval.tone,
         icon: curveEval.icon,
+        evidence: curveEvidence,
       ),
     ];
 
@@ -1144,32 +1275,10 @@ class _DeckDiagnosticSnapshot {
     );
 
     final evidence = <_DiagnosticEvidence>[
-      _DiagnosticEvidence(
-        label: 'Ramp',
-        count: rampCount,
-        icon: Icons.bolt_rounded,
-        cardLabels: rampAnalysis?.cardLabels ?? _formatEvidenceCards(rampCards),
-      ),
-      _DiagnosticEvidence(
-        label: 'Compra',
-        count: drawCount,
-        icon: Icons.auto_stories_rounded,
-        cardLabels: drawAnalysis?.cardLabels ?? _formatEvidenceCards(drawCards),
-      ),
-      _DiagnosticEvidence(
-        label: 'Interação',
-        count: interactionCount,
-        icon: Icons.shield_outlined,
-        cardLabels:
-            interactionAnalysis?.cardLabels ??
-            _formatEvidenceCards(interactionCards),
-      ),
-      _DiagnosticEvidence(
-        label: 'Wipes',
-        count: wipeCount,
-        icon: Icons.cleaning_services_outlined,
-        cardLabels: wipeAnalysis?.cardLabels ?? _formatEvidenceCards(wipeCards),
-      ),
+      rampEvidence,
+      drawEvidence,
+      interactionEvidence,
+      wipeEvidence,
     ];
 
     return _DeckDiagnosticSnapshot(
@@ -1341,14 +1450,72 @@ class _DeckDiagnosticSnapshot {
     return cards.fold<int>(0, (sum, card) => sum + card.quantity);
   }
 
-  static List<String> _formatEvidenceCards(List<DeckCardItem> cards) {
-    final sorted = [...cards]..sort((a, b) => a.name.compareTo(b.name));
+  static List<_DiagnosticEvidenceEntry> _entriesFromCards(
+    List<DeckCardItem> cards, {
+    bool sortByCmcDescending = false,
+  }) {
+    final sorted = [...cards]..sort((a, b) {
+      if (sortByCmcDescending) {
+        final cmcCompare = ManaHelper.calculateCMC(
+          b.manaCost,
+        ).compareTo(ManaHelper.calculateCMC(a.manaCost));
+        if (cmcCompare != 0) return cmcCompare;
+      }
+      return a.name.compareTo(b.name);
+    });
     return sorted
-        .map(
-          (card) =>
-              card.quantity > 1 ? '${card.name} x${card.quantity}' : card.name,
-        )
+        .map((card) => _DiagnosticEvidenceEntry.fromCard(card))
         .toList(growable: false);
+  }
+
+  static List<_DiagnosticEvidenceEntry> _entriesFromBucket(
+    _DiagnosticFunctionalBucket? bucket,
+    List<DeckCardItem> fallbackCards,
+    List<DeckCardItem> allCards, {
+    required String tagKey,
+  }) {
+    if (bucket == null || bucket.samples.isEmpty) {
+      return _entriesFromCards(fallbackCards);
+    }
+
+    final cardsByName = <String, DeckCardItem>{};
+    for (final card in allCards) {
+      cardsByName[_normalizeCardName(card.name)] = card;
+    }
+
+    final entries = <_DiagnosticEvidenceEntry>[];
+    final seen = <String>{};
+
+    void addEntry(_DiagnosticEvidenceEntry entry) {
+      final key = _normalizeCardName(entry.name);
+      if (key.isEmpty || !seen.add(key)) return;
+      entries.add(entry);
+    }
+
+    for (final sample in bucket.samples) {
+      final card = cardsByName[_normalizeCardName(sample.name)];
+      addEntry(
+        _DiagnosticEvidenceEntry(
+          name: sample.name,
+          quantity: card?.quantity,
+          card: card,
+          detail: _friendlyEvidenceReasonForKey(tagKey),
+        ),
+      );
+    }
+
+    for (final entry in _entriesFromCards(fallbackCards)) {
+      addEntry(
+        _DiagnosticEvidenceEntry(
+          name: entry.name,
+          quantity: entry.quantity,
+          card: entry.card,
+          detail: entry.detail ?? _friendlyEvidenceReasonForKey(tagKey),
+        ),
+      );
+    }
+
+    return entries;
   }
 
   static _DiagnosticFunctionalBucket? _analysisBucket(
@@ -1364,20 +1531,41 @@ class _DeckDiagnosticSnapshot {
 
     return _DiagnosticFunctionalBucket(
       count: analysis.countFor(tagKey: tagKey, compositionKey: compositionKey),
-      cardLabels: _formatFunctionalSamples(analysis.samplesFor(tagKey)),
+      samples: _formatFunctionalSamples(analysis.samplesFor(tagKey)),
     );
   }
 
-  static List<String> _formatFunctionalSamples(
+  static List<DeckFunctionalTagSample> _formatFunctionalSamples(
     List<DeckFunctionalTagSample> samples,
   ) {
-    final labels = samples
-        .map((sample) => sample.name.trim())
-        .where((name) => name.isNotEmpty)
-        .toSet()
-        .toList(growable: false);
-    labels.sort();
-    return labels;
+    final byName = <String, DeckFunctionalTagSample>{};
+    for (final sample in samples) {
+      final key = _normalizeCardName(sample.name);
+      if (key.isEmpty) continue;
+      byName.putIfAbsent(key, () => sample);
+    }
+    final values = byName.values.toList(growable: false)
+      ..sort((a, b) => a.name.compareTo(b.name));
+    return values;
+  }
+
+  static String _normalizeCardName(String value) {
+    return value.trim().toLowerCase();
+  }
+
+  static String _friendlyEvidenceReasonForKey(String key) {
+    switch (key) {
+      case 'ramp':
+        return _friendlyEvidenceReason('Ramp');
+      case 'draw':
+        return _friendlyEvidenceReason('Compra');
+      case 'removal':
+        return _friendlyEvidenceReason('Interação');
+      case 'board_wipe':
+        return _friendlyEvidenceReason('Wipes');
+      default:
+        return 'Carta considerada nesta leitura do deck.';
+    }
   }
 
   static bool _isLand(DeckCardItem card) =>
@@ -1626,6 +1814,7 @@ class _DiagnosticMetric {
   final String target;
   final _DiagnosticTone tone;
   final IconData icon;
+  final _DiagnosticEvidence evidence;
 
   const _DiagnosticMetric({
     required this.label,
@@ -1634,6 +1823,7 @@ class _DiagnosticMetric {
     required this.target,
     required this.tone,
     required this.icon,
+    required this.evidence,
   });
 }
 
@@ -1641,23 +1831,56 @@ class _DiagnosticEvidence {
   final String label;
   final int count;
   final IconData icon;
-  final List<String> cardLabels;
+  final List<_DiagnosticEvidenceEntry> entries;
+  final String description;
 
   const _DiagnosticEvidence({
     required this.label,
     required this.count,
     required this.icon,
-    required this.cardLabels,
+    required this.entries,
+    required this.description,
   });
+
+  List<String> get previewLabels {
+    return entries.map((entry) => entry.previewLabel).toList(growable: false);
+  }
+}
+
+class _DiagnosticEvidenceEntry {
+  final String name;
+  final int? quantity;
+  final DeckCardItem? card;
+  final String? detail;
+
+  const _DiagnosticEvidenceEntry({
+    required this.name,
+    this.quantity,
+    this.card,
+    this.detail,
+  });
+
+  factory _DiagnosticEvidenceEntry.fromCard(DeckCardItem card) {
+    return _DiagnosticEvidenceEntry(
+      name: card.name,
+      quantity: card.quantity,
+      card: card,
+    );
+  }
+
+  String get previewLabel {
+    final suffix = quantity != null && quantity! > 1 ? ' x$quantity' : '';
+    return '$name$suffix';
+  }
 }
 
 class _DiagnosticFunctionalBucket {
   final int count;
-  final List<String> cardLabels;
+  final List<DeckFunctionalTagSample> samples;
 
   const _DiagnosticFunctionalBucket({
     required this.count,
-    required this.cardLabels,
+    required this.samples,
   });
 }
 

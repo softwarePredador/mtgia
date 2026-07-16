@@ -32,6 +32,16 @@ void main() {
           },
         ],
       },
+      'optimization_contract': const {
+        'deckbuilder_validation': {
+          'status': 'passed_preview_gate',
+          'label': 'Preview seguro',
+        },
+      },
+      'battle_validation': const {
+        'status': 'pending_after_apply',
+        'label': 'Battle pendente',
+      },
     });
 
     expect(preview.hasChanges, isTrue);
@@ -45,6 +55,11 @@ void main() {
       'competitive_meta_exact_shell_match',
     );
     expect(preview.intensity, OptimizeIntensity.focused);
+    expect(
+      preview.optimizationContract['deckbuilder_validation'],
+      isA<Map<String, dynamic>>(),
+    );
+    expect(preview.battleValidation['status'], 'pending_after_apply');
   });
 
   test('requestOptimizePreview validates swap integrity payload', () async {
@@ -431,13 +446,83 @@ void main() {
       preview,
       selection: const OptimizePreviewSelection(
         selectedRemovalIndexes: {0},
-        selectedAdditionIndexes: {1},
+        selectedAdditionIndexes: {0},
       ),
     );
 
     expect(plan.mode, OptimizeApplyMode.applyWithIds);
     expect(plan.removalsDetailed.single['card_id'], 'remove-1');
-    expect(plan.additionsDetailed.single['card_id'], 'add-2');
+    expect(plan.additionsDetailed.single['card_id'], 'add-1');
+    expect(plan.mutationContext['type'], 'optimization_apply');
+    expect(plan.mutationContext['selected_change_count'], 2);
+    expect(
+      (plan.mutationContext['selection']
+          as Map<String, dynamic>)['addition_indexes'],
+      [0],
+    );
+    expect(
+      (plan.mutationContext['removals'] as List).single['name'],
+      'Mind Stone',
+    );
+  });
+
+  test('buildOptimizeApplyPlan rejects an unpaired preview selection', () {
+    final preview = OptimizePreviewData.fromResult({
+      'mode': 'optimize',
+      'removals': const ['Mind Stone', 'Cancel'],
+      'additions': const ['Arcane Signet', 'Counterspell'],
+      'removals_detailed': const [
+        {'card_id': 'remove-1', 'name': 'Mind Stone'},
+        {'card_id': 'remove-2', 'name': 'Cancel'},
+      ],
+      'additions_detailed': const [
+        {'card_id': 'add-1', 'name': 'Arcane Signet'},
+        {'card_id': 'add-2', 'name': 'Counterspell'},
+      ],
+    });
+
+    expect(
+      () => buildOptimizeApplyPlan(
+        preview,
+        selection: const OptimizePreviewSelection(
+          selectedRemovalIndexes: {0},
+          selectedAdditionIndexes: {1},
+        ),
+      ),
+      throwsStateError,
+    );
+  });
+
+  test('buildOptimizeApplyPlan carries validation context for persistence', () {
+    final preview = OptimizePreviewData.fromResult({
+      'mode': 'optimize',
+      'intensity': 'focused',
+      'removals': const ['Mind Stone'],
+      'additions': const ['Arcane Signet'],
+      'deck_analysis': const {'average_cmc': 3.2},
+      'post_analysis': const {'average_cmc': 3.0},
+      'optimization_contract': const {
+        'deckbuilder_validation': {
+          'status': 'passed_preview_gate',
+          'label': 'Preview seguro',
+        },
+      },
+      'battle_validation': const {
+        'status': 'pending_after_apply',
+        'label': 'Battle pendente',
+      },
+    });
+
+    final plan = buildOptimizeApplyPlan(preview);
+
+    expect(plan.mutationContext['source'], 'optimize_preview');
+    expect(plan.mutationContext['intensity'], 'focused');
+    expect(plan.mutationContext['before_snapshot'], {'average_cmc': 3.2});
+    expect(plan.mutationContext['after_snapshot'], {'average_cmc': 3.0});
+    expect(
+      (plan.mutationContext['battle_validation'] as Map)['label'],
+      'Battle pendente',
+    );
   });
 
   test('executeOptimizeApplyPlan dispatches to correct executor', () async {
@@ -455,21 +540,27 @@ void main() {
         ],
         expectedDeckSignature: 'sig-1',
       ),
-      addBulk: (_, __) async {
+      addBulk: (_, __, {mutationContext}) async {
         calls.add('bulk');
         return true;
       },
-      applyWithIds: (_, __, ___, {expectedDeckSignature}) async {
-        calls.add('ids:$expectedDeckSignature');
+      applyWithIds: (
+        _,
+        __,
+        ___, {
+        expectedDeckSignature,
+        mutationContext,
+      }) async {
+        calls.add('ids:$expectedDeckSignature:${mutationContext?['mode']}');
         return true;
       },
-      applyByNames: (_, __, ___) async {
+      applyByNames: (_, __, ___, {mutationContext}) async {
         calls.add('names');
         return true;
       },
     );
 
-    expect(calls, ['ids:sig-1']);
+    expect(calls, ['ids:sig-1:null']);
   });
 
   test(
@@ -486,16 +577,24 @@ void main() {
           removals: ['Mind Stone'],
           additions: ['Arcane Signet'],
         ),
-        addBulk: (_, __) async {
+        addBulk: (_, __, {mutationContext}) async {
           calls.add('bulk');
           return true;
         },
-        applyWithIds: (_, __, ___, {expectedDeckSignature}) async {
+        applyWithIds: (
+          _,
+          __,
+          ___, {
+          expectedDeckSignature,
+          mutationContext,
+        }) async {
           calls.add('ids');
           return true;
         },
-        applyByNames: (_, removals, additions) async {
-          calls.add('names:${removals.join(",")}:${additions.join(",")}');
+        applyByNames: (_, removals, additions, {mutationContext}) async {
+          calls.add(
+            'names:${removals.join(",")}:${additions.join(",")}:${mutationContext?['archetype']}:${mutationContext?['bracket']}',
+          );
           return true;
         },
         updateDeckStrategy: ({
@@ -508,7 +607,7 @@ void main() {
       );
 
       expect(calls, [
-        'names:Mind Stone:Arcane Signet',
+        'names:Mind Stone:Arcane Signet:control:2',
         'strategy:deck-1:control:2',
       ]);
     },
@@ -698,16 +797,24 @@ void main() {
       onSuccess: () => calls.add('success'),
       onAiError: (_) async => calls.add('ai-error'),
       onGenericError: (_) => calls.add('generic-error'),
-      addBulk: (_, __) async {
+      addBulk: (_, __, {mutationContext}) async {
         calls.add('bulk');
         return true;
       },
-      applyWithIds: (_, __, ___, {expectedDeckSignature}) async {
+      applyWithIds: (
+        _,
+        __,
+        ___, {
+        expectedDeckSignature,
+        mutationContext,
+      }) async {
         calls.add('ids');
         return true;
       },
-      applyByNames: (_, removals, additions) async {
-        calls.add('names:${removals.join(",")}:${additions.join(",")}');
+      applyByNames: (_, removals, additions, {mutationContext}) async {
+        calls.add(
+          'names:${removals.join(",")}:${additions.join(",")}:${mutationContext?['archetype']}',
+        );
         return true;
       },
       updateDeckStrategy: ({
@@ -723,7 +830,7 @@ void main() {
     expect(calls, [
       'preview:optimize',
       'apply-start',
-      'names:Mind Stone:Arcane Signet',
+      'names:Mind Stone:Arcane Signet:control',
       'strategy:deck-1:control:2',
       'success',
     ]);
@@ -764,16 +871,24 @@ void main() {
         onSuccess: () => calls.add('success'),
         onAiError: (_) async => calls.add('ai-error'),
         onGenericError: (error) => calls.add('generic-error:$error'),
-        addBulk: (_, __) async {
+        addBulk: (_, __, {mutationContext}) async {
           calls.add('bulk');
           return true;
         },
-        applyWithIds: (_, __, ___, {expectedDeckSignature}) async {
+        applyWithIds: (
+          _,
+          __,
+          ___, {
+          expectedDeckSignature,
+          mutationContext,
+        }) async {
           calls.add('ids');
           return true;
         },
-        applyByNames: (_, removals, additions) async {
-          calls.add('names:${removals.join(",")}:${additions.join(",")}');
+        applyByNames: (_, removals, additions, {mutationContext}) async {
+          calls.add(
+            'names:${removals.join(",")}:${additions.join(",")}:${mutationContext?['archetype']}',
+          );
           return false;
         },
         updateDeckStrategy: ({
@@ -788,7 +903,7 @@ void main() {
       expect(calls.take(3).toList(), [
         'preview:optimize',
         'apply-start',
-        'names:Mind Stone:Arcane Signet',
+        'names:Mind Stone:Arcane Signet:control',
       ]);
       expect(calls, hasLength(4));
       expect(

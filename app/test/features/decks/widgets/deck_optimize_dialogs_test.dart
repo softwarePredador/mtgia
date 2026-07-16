@@ -327,6 +327,18 @@ void main() {
                           {'name': 'Mystic Remora', 'reference_count': 2},
                         ],
                       },
+                      optimizationContract: const {
+                        'deckbuilder_validation': {
+                          'label': 'Preview seguro',
+                          'message':
+                              'As sugestões passaram pelas regras do deck.',
+                        },
+                      },
+                      battleValidation: const {
+                        'label': 'Battle pendente',
+                        'message':
+                            'Rode playtest, battle ou replay depois de aplicar.',
+                      },
                       displayRemovals: const [
                         {'name': 'Cancel'},
                       ],
@@ -349,6 +361,9 @@ void main() {
     expect(find.textContaining('Agressivo'), findsOneWidget);
     expect(find.text('Atenção ao ajuste agressivo'), findsOneWidget);
     expect(find.textContaining('não como cópia cega'), findsOneWidget);
+    expect(find.text('Validação da recomendação'), findsOneWidget);
+    expect(find.text('Preview seguro'), findsAtLeastNWidgets(1));
+    expect(find.text('Battle pendente'), findsOneWidget);
     expect(find.text('#1 Talrand Tempo'), findsOneWidget);
     expect(find.text('Mystic Remora'), findsAtLeastNWidgets(1));
     expect(find.text('Ajuste competitivo guiado'), findsOneWidget);
@@ -417,7 +432,8 @@ void main() {
     expect(selection, isNotNull);
     expect(selection!.selectedRemovalIndexes, isNot(contains(0)));
     expect(selection!.selectedRemovalIndexes, contains(1));
-    expect(selection!.selectedAdditionIndexes.length, 2);
+    expect(selection!.selectedAdditionIndexes, isNot(contains(0)));
+    expect(selection!.selectedAdditionIndexes, contains(1));
   });
 
   testWidgets(

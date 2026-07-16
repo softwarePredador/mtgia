@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:manaloom/features/binder/providers/binder_provider.dart';
 import 'package:manaloom/features/binder/screens/marketplace_screen.dart';
+import 'package:manaloom/features/cards/screens/card_detail_screen.dart';
 import 'package:provider/provider.dart';
 
 class _FakeBinderProvider extends BinderProvider {
@@ -82,9 +83,45 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(find.text('Kenrith, the Returned King'), findsOneWidget);
+      expect(find.byTooltip('Limpar busca'), findsNothing);
+      await tester.enterText(
+        find.byKey(const Key('marketplace-search-field')),
+        'Kenrith',
+      );
+      await tester.pump();
+      expect(find.byTooltip('Limpar busca'), findsOneWidget);
       expect(tester.takeException(), isNull);
     },
   );
+
+  testWidgets('Marketplace item abre detalhe da carta', (tester) async {
+    final provider = _FakeBinderProvider([
+      MarketplaceItem(
+        id: 'market-detail-1',
+        cardId: 'card-detail-1',
+        cardName: 'Arcane Signet',
+        cardSetCode: 'cmm',
+        cardManaCost: '{2}',
+        cardRarity: 'common',
+        cardTypeLine: 'Artifact',
+        quantity: 1,
+        condition: 'NM',
+        forTrade: true,
+        ownerId: 'user-1',
+        ownerUsername: 'usuario_teste',
+      ),
+    ]);
+
+    await tester.pumpWidget(buildTestWidget(390, provider));
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.text('Arcane Signet'));
+    await tester.pumpAndSettle();
+
+    expect(find.byType(CardDetailScreen), findsOneWidget);
+    expect(find.text('Arcane Signet'), findsWidgets);
+    expect(find.text('Artifact'), findsOneWidget);
+  });
 
   testWidgets(
     'MarketplaceTabContent exposes keyed loading, error and empty states',

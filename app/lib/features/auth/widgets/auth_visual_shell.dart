@@ -24,18 +24,16 @@ class AuthVisualShell extends StatelessWidget {
           const DecoratedBox(
             decoration: BoxDecoration(gradient: AppTheme.scaffoldGradient),
           ),
-          Positioned(
-            top: -164,
-            left: -96,
-            right: -96,
-            height: 468,
+          Positioned.fill(
             child: IgnorePointer(
               child: Opacity(
-                opacity: 0.42,
+                opacity: 0.34,
                 child: Image.asset(
                   'assets/branding/home_hero.png',
-                  fit: BoxFit.contain,
+                  fit: BoxFit.cover,
+                  alignment: Alignment.topCenter,
                   filterQuality: FilterQuality.high,
+                  excludeFromSemantics: true,
                 ),
               ),
             ),
@@ -48,52 +46,49 @@ class AuthVisualShell extends StatelessWidget {
                     begin: Alignment.topCenter,
                     end: Alignment.bottomCenter,
                     colors: [
-                      AppTheme.backgroundAbyss.withValues(alpha: 0.2),
-                      AppTheme.backgroundAbyss.withValues(alpha: 0.8),
-                      AppTheme.backgroundAbyss,
+                      AppTheme.backgroundAbyss.withValues(alpha: 0.38),
+                      AppTheme.backgroundAbyss.withValues(alpha: 0.76),
+                      AppTheme.backgroundAbyss.withValues(alpha: 0.94),
                     ],
-                    stops: const [0, 0.34, 1],
-                  ),
-                ),
-              ),
-            ),
-          ),
-          Positioned(
-            left: -92,
-            right: -92,
-            bottom: -188,
-            height: 360,
-            child: IgnorePointer(
-              child: DecoratedBox(
-                decoration: BoxDecoration(
-                  gradient: RadialGradient(
-                    colors: [
-                      AppTheme.frost600.withValues(alpha: 0.14),
-                      AppTheme.transparent,
-                    ],
+                    stops: const [0, 0.58, 1],
                   ),
                 ),
               ),
             ),
           ),
           SafeArea(
-            child: SingleChildScrollView(
-              padding: const EdgeInsets.fromLTRB(20, 14, 20, 32),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  if (leading != null) ...[
-                    Align(alignment: Alignment.centerLeft, child: leading!),
-                    const SizedBox(height: 8),
-                  ],
-                  Center(
-                    child: ConstrainedBox(
-                      constraints: BoxConstraints(maxWidth: maxWidth),
-                      child: child,
+            child: LayoutBuilder(
+              builder: (context, constraints) {
+                const padding = EdgeInsets.fromLTRB(20, 18, 20, 32);
+                return SingleChildScrollView(
+                  padding: padding,
+                  child: ConstrainedBox(
+                    constraints: BoxConstraints(
+                      minHeight: (constraints.maxHeight - padding.vertical)
+                          .clamp(0, double.infinity),
+                    ),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        if (leading != null) ...[
+                          Align(
+                            alignment: Alignment.centerLeft,
+                            child: leading!,
+                          ),
+                          const SizedBox(height: 8),
+                        ],
+                        Center(
+                          child: ConstrainedBox(
+                            constraints: BoxConstraints(maxWidth: maxWidth),
+                            child: child,
+                          ),
+                        ),
+                      ],
                     ),
                   ),
-                ],
-              ),
+                );
+              },
             ),
           ),
         ],
@@ -108,7 +103,7 @@ class AuthBrandHeader extends StatelessWidget {
     required this.title,
     required this.subtitle,
     this.eyebrow,
-    this.logoSize = 104,
+    this.logoSize = 88,
   });
 
   final String title;
@@ -133,9 +128,9 @@ class AuthBrandHeader extends StatelessWidget {
             ),
             boxShadow: [
               BoxShadow(
-                color: AppTheme.brass400.withValues(alpha: 0.18),
-                blurRadius: 28,
-                spreadRadius: -6,
+                color: AppTheme.brass400.withValues(alpha: 0.14),
+                blurRadius: 22,
+                spreadRadius: -8,
               ),
             ],
           ),
@@ -145,35 +140,27 @@ class AuthBrandHeader extends StatelessWidget {
               'assets/branding/app_logo.png',
               fit: BoxFit.cover,
               filterQuality: FilterQuality.high,
+              semanticLabel: 'Logo do ManaLoom',
             ),
           ),
         ),
         if (eyebrow != null) ...[
-          const SizedBox(height: 16),
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 13, vertical: 7),
-            decoration: BoxDecoration(
-              color: AppTheme.brass500.withValues(alpha: 0.14),
-              borderRadius: BorderRadius.circular(AppTheme.radiusXl),
-              border: Border.all(
-                color: AppTheme.brass400.withValues(alpha: 0.22),
-              ),
-            ),
-            child: Text(
-              eyebrow!,
-              style: theme.textTheme.labelMedium?.copyWith(
-                color: AppTheme.brass400,
-                fontWeight: FontWeight.w700,
-                letterSpacing: 0,
-              ),
+          const SizedBox(height: 14),
+          Text(
+            eyebrow!,
+            textAlign: TextAlign.center,
+            style: theme.textTheme.labelMedium?.copyWith(
+              color: AppTheme.brass400,
+              fontWeight: FontWeight.w700,
+              letterSpacing: 0,
             ),
           ),
         ],
-        const SizedBox(height: 16),
+        const SizedBox(height: 14),
         Text(
           title,
           textAlign: TextAlign.center,
-          style: theme.textTheme.headlineLarge?.copyWith(
+          style: theme.textTheme.headlineMedium?.copyWith(
             color: AppTheme.textPrimary,
             fontWeight: FontWeight.w700,
             letterSpacing: 0,
@@ -201,21 +188,16 @@ class AuthFormSurface extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.all(22),
+      padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: AppTheme.surfaceElevated.withValues(alpha: 0.88),
-        borderRadius: BorderRadius.circular(AppTheme.radiusLogoInner),
+        color: AppTheme.surfaceElevated.withValues(alpha: 0.92),
+        borderRadius: BorderRadius.circular(AppTheme.radiusMd),
         border: Border.all(color: AppTheme.brass400.withValues(alpha: 0.16)),
         boxShadow: [
           BoxShadow(
-            color: AppTheme.backgroundAbyss.withValues(alpha: 0.56),
-            blurRadius: 28,
-            offset: const Offset(0, 18),
-          ),
-          BoxShadow(
-            color: AppTheme.brass700.withValues(alpha: 0.12),
-            blurRadius: 24,
-            spreadRadius: -10,
+            color: AppTheme.backgroundAbyss.withValues(alpha: 0.46),
+            blurRadius: 20,
+            offset: const Offset(0, 12),
           ),
         ],
       ),

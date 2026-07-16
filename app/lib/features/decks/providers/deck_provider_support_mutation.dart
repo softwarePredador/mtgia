@@ -84,10 +84,14 @@ Future<DeckMutationResult> addCardsBulkRequest(
   ApiClient apiClient, {
   required String deckId,
   required List<Map<String, dynamic>> cards,
+  Map<String, dynamic>? mutationContext,
 }) async {
-  final response = await apiClient.post('/decks/$deckId/cards/bulk', {
+  final body = {
     'cards': cards,
-  });
+    if (mutationContext != null && mutationContext.isNotEmpty)
+      'mutation_context': mutationContext,
+  };
+  final response = await apiClient.post('/decks/$deckId/cards/bulk', body);
   return parseDeckMutationResponse(
     response,
     fallbackMessage: 'Falha ao adicionar em lote',
@@ -208,12 +212,14 @@ Future<DeckPersistResult> persistDeckCardsPayloadWithValidation(
   ApiClient apiClient, {
   required String deckId,
   required List<Map<String, dynamic>> cardsPayload,
+  Map<String, dynamic>? mutationContext,
 }) async {
   final stopwatch = Stopwatch()..start();
   await persistDeckCardsPayloadRequest(
     apiClient,
     deckId: deckId,
     cardsPayload: cardsPayload,
+    mutationContext: mutationContext,
   );
   stopwatch.stop();
   final validation = await validateDeckRequest(apiClient, deckId);
@@ -250,10 +256,14 @@ Future<void> persistDeckCardsPayloadRequest(
   ApiClient apiClient, {
   required String deckId,
   required List<Map<String, dynamic>> cardsPayload,
+  Map<String, dynamic>? mutationContext,
 }) async {
-  final response = await apiClient.put('/decks/$deckId', {
+  final body = {
     'cards': cardsPayload,
-  });
+    if (mutationContext != null && mutationContext.isNotEmpty)
+      'mutation_context': mutationContext,
+  };
+  final response = await apiClient.put('/decks/$deckId', body);
   ensureSuccessfulDeckMutationResponse(
     response,
     fallbackMessage: 'Falha ao atualizar deck',

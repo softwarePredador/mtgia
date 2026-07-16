@@ -144,6 +144,8 @@ class RecommendationContextSection extends StatelessWidget {
             max: 500,
             divisions: 20,
             label: 'R\$ ${budgetLimit.round()}',
+            semanticFormatterCallback:
+                (value) => 'Orçamento de R\$ ${value.round()}',
             onChanged: onBudgetLimitChanged,
           ),
           const SizedBox(height: 6),
@@ -707,22 +709,10 @@ class OptimizationSheetBody extends StatelessWidget {
       controller: scrollController,
       padding: const EdgeInsets.all(16.0),
       children: [
-        Center(
-          child: Container(
-            width: 40,
-            height: 4,
-            margin: const EdgeInsets.only(bottom: 16),
-            decoration: BoxDecoration(
-              color: AppTheme.textHint,
-              borderRadius: BorderRadius.circular(AppTheme.radiusXs),
-            ),
-          ),
-        ),
         SheetHeroCard(
           icon: Icons.tune_rounded,
           title: 'Otimizar Deck',
-          subtitle:
-              'Escolha entre ajuste leve, rebuild guiado quando necessário e sinal competitivo/cEDH sem aplicar nada antes do preview.',
+          subtitle: 'Estratégia, potência, coleção e orçamento.',
           accent: accent,
         ),
         const SizedBox(height: 16),

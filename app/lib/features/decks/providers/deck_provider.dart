@@ -665,11 +665,13 @@ class DeckProvider extends ChangeNotifier {
   Future<bool> addCardsBulk({
     required String deckId,
     required List<Map<String, dynamic>> cards,
+    Map<String, dynamic>? mutationContext,
   }) async {
     final result = await addCardsBulkRequest(
       _apiClient,
       deckId: deckId,
       cards: cards,
+      mutationContext: mutationContext,
     );
     if (result.isSuccess) {
       await _refreshDeckDetailsAfterMutation(deckId);
@@ -853,12 +855,14 @@ class DeckProvider extends ChangeNotifier {
   Future<bool> _persistDeckCardsPayload({
     required String deckId,
     required List<Map<String, dynamic>> cardsPayload,
+    Map<String, dynamic>? mutationContext,
   }) async {
     AppLogger.debug('💾 [DeckProvider] Salvando alterações no servidor...');
     final result = await persistDeckCardsPayloadWithValidation(
       _apiClient,
       deckId: deckId,
       cardsPayload: cardsPayload,
+      mutationContext: mutationContext,
     );
     AppLogger.debug(
       '⏱️ [DeckProvider] Tempo de resposta do servidor: ${result.elapsedMilliseconds}ms',
@@ -893,6 +897,7 @@ class DeckProvider extends ChangeNotifier {
     required String deckId,
     required List<String> cardsToRemove,
     required List<String> cardsToAdd,
+    Map<String, dynamic>? mutationContext,
   }) async {
     try {
       AppLogger.debug('🔄 [DeckProvider] Iniciando otimização do deck $deckId');
@@ -915,6 +920,7 @@ class DeckProvider extends ChangeNotifier {
       return _persistDeckCardsPayload(
         deckId: deckId,
         cardsPayload: payloadResult.cardsPayload,
+        mutationContext: mutationContext,
       );
     } catch (e, stackTrace) {
       AppLogger.error('[DeckProvider] Erro fatal na otimização', e);
@@ -939,6 +945,7 @@ class DeckProvider extends ChangeNotifier {
     required List<Map<String, dynamic>> removalsDetailed,
     required List<Map<String, dynamic>> additionsDetailed,
     String? expectedDeckSignature,
+    Map<String, dynamic>? mutationContext,
   }) async {
     try {
       AppLogger.debug('🚀 [DeckProvider] Otimização rápida com IDs diretos');
@@ -1055,6 +1062,7 @@ class DeckProvider extends ChangeNotifier {
       return await _persistDeckCardsPayload(
         deckId: deckId,
         cardsPayload: cardsPayload,
+        mutationContext: mutationContext,
       );
     } catch (e, stackTrace) {
       AppLogger.error('[DeckProvider] Erro na otimização rápida', e);

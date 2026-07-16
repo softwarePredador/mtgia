@@ -198,7 +198,7 @@ void main() {
 
     await provider.initialize();
 
-    expect(api.getCalls, 2);
+    expect(api.getCalls, 1);
   });
 
   test('late profile refresh cannot repopulate user after logout', () async {

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:manaloom/core/api/api_client.dart';
 import 'package:manaloom/core/theme/app_theme.dart';
+import 'package:manaloom/core/widgets/cached_card_image.dart';
 import 'package:manaloom/features/decks/models/deck_card_item.dart';
 import 'package:manaloom/features/decks/models/deck_details.dart';
 import 'package:manaloom/features/decks/providers/deck_provider.dart';
@@ -63,6 +64,10 @@ DeckDetails _makeDeck({
   String? strengths,
   String? weaknesses,
   int cardCount = 100,
+  double? pricingTotal,
+  String? pricingCurrency,
+  int? pricingMissingCards,
+  Map<String, dynamic> stats = const {},
 }) {
   return DeckDetails(
     id: id,
@@ -78,7 +83,10 @@ DeckDetails _makeDeck({
     synergyScore: synergyScore,
     strengths: strengths,
     weaknesses: weaknesses,
-    stats: const {},
+    pricingTotal: pricingTotal,
+    pricingCurrency: pricingCurrency,
+    pricingMissingCards: pricingMissingCards,
+    stats: stats,
     commander: [
       DeckCardItem(
         id: 'cmd-1',
@@ -231,6 +239,29 @@ void main() {
     expect(apiClient.postRequests, isEmpty);
   });
 
+  testWidgets('summary metrics keep price and actions legible', (tester) async {
+    final deck = _makeDeck(
+      id: 'deck-priced',
+      name: 'Talrand Priced',
+      synergyScore: 82,
+      strengths: 'Plano consistente.',
+      weaknesses: 'Poucos pontos críticos.',
+      pricingTotal: 1234.56,
+      pricingCurrency: 'BRL',
+      pricingMissingCards: 2,
+    );
+
+    await tester.pumpWidget(_subject(deck));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Preço total'), findsOneWidget);
+    expect(find.text('R\$ 1.234,56'), findsOneWidget);
+    expect(find.text('2 sem preço'), findsOneWidget);
+    expect(find.text('R\$ ...'), findsNothing);
+    expect(find.text('Leitura pronta'), findsOneWidget);
+    expect(find.text('Atualizar análise'), findsOneWidget);
+  });
+
   testWidgets('auto-generates AI summary for complete unanalyzed decks', (
     tester,
   ) async {
@@ -366,16 +397,42 @@ void main() {
     expect(find.text('Sol Ring'), findsOneWidget);
     expect(find.text('Arcane Signet'), findsOneWidget);
     expect(
-      find.textContaining('Cartas consideradas: mostrando 2 de 10'),
+      find.textContaining('Cartas deste grupo: mostrando 2 de 10'),
       findsOneWidget,
     );
-    expect(find.textContaining('Como é contado:'), findsOneWidget);
+    expect(find.textContaining('Como é contado:'), findsNothing);
+    expect(find.textContaining('Origem da contagem'), findsNothing);
+    expect(find.textContaining('functional_tags'), findsNothing);
+    expect(find.textContaining('functional_card_tags'), findsNothing);
+    expect(find.textContaining('persistidas'), findsNothing);
+    expect(find.textContaining('cópias analisadas'), findsNothing);
+    expect(find.textContaining('cópias classificadas'), findsNothing);
+    expect(find.text('Abra um grupo para ver as cartas'), findsOneWidget);
+    expect(find.textContaining('Ajuda a acelerar'), findsWidgets);
+
+    final rampImages = tester.widgetList<CachedCardImage>(
+      find.byType(CachedCardImage),
+    );
     expect(
-      find.textContaining('Origem da contagem: functional_tags'),
-      findsOneWidget,
+      rampImages.any(
+        (image) =>
+            image.imageUrl != null &&
+            image.imageUrl!.startsWith('https://api.scryfall.com/'),
+      ),
+      isTrue,
     );
-    expect(find.textContaining('63/100 cópias classificadas'), findsWidgets);
-    expect(find.textContaining('41 persistidas'), findsOneWidget);
+
+    final solRingSample = find.byKey(
+      const Key('deck-analysis-functional-sample-deck-functional-ramp-0'),
+    );
+    await tester.ensureVisible(solRingSample);
+    await tester.tap(solRingSample);
+    await tester.pumpAndSettle();
+
+    expect(find.byType(Dialog), findsOneWidget);
+    expect(find.text('Sol Ring'), findsWidgets);
+    await tester.tap(find.byTooltip('Fechar'));
+    await tester.pumpAndSettle();
 
     final drawBucket = find.byKey(
       const Key('deck-analysis-functional-bucket-deck-functional-draw'),
@@ -385,11 +442,12 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.text('Skullclamp'), findsWidgets);
-    expect(find.textContaining('Conta como compra'), findsOneWidget);
-    expect(find.textContaining('confiança 91%'), findsOneWidget);
-    expect(find.text('compra carta'), findsOneWidget);
-    expect(find.textContaining('baixo custo'), findsOneWidget);
-    expect(find.textContaining('Evidência: texto da carta'), findsOneWidget);
+    expect(find.textContaining('Ajuda a manter cartas'), findsWidgets);
+    expect(find.textContaining('Conta como compra'), findsNothing);
+    expect(find.textContaining('confiança'), findsNothing);
+    expect(find.text('compra carta'), findsNothing);
+    expect(find.textContaining('baixo custo'), findsNothing);
+    expect(find.textContaining('Evidência:'), findsNothing);
   });
 
   testWidgets('renders legacy composition counts without samples', (
@@ -423,7 +481,7 @@ void main() {
 
     expect(
       find.text(
-        'Resposta legada: contagens visíveis, mas sem amostras de cartas.',
+        'Esta leitura mostra os totais, mas ainda não trouxe a lista de cartas de cada função.',
       ),
       findsOneWidget,
     );
@@ -434,7 +492,13 @@ void main() {
     await tester.tap(rampBucket);
     await tester.pumpAndSettle();
 
-    expect(find.textContaining('stats.composition legado'), findsWidgets);
-    expect(find.textContaining('não enviou amostras'), findsOneWidget);
+    expect(find.textContaining('Leitura básica do deck'), findsWidgets);
+    expect(find.textContaining('stats.composition'), findsNothing);
+    expect(find.textContaining('backend'), findsNothing);
+    expect(find.textContaining('Resposta legada'), findsNothing);
+    expect(
+      find.text('Ainda não há uma lista de cartas para este indicador.'),
+      findsOneWidget,
+    );
   });
 }

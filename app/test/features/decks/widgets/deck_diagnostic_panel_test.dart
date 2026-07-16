@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:manaloom/core/theme/app_theme.dart';
+import 'package:manaloom/core/widgets/cached_card_image.dart';
 import 'package:manaloom/features/decks/models/deck_analysis.dart';
 import 'package:manaloom/features/decks/models/deck_card_item.dart';
 import 'package:manaloom/features/decks/models/deck_details.dart';
@@ -321,6 +322,7 @@ void main() {
     DeckDetails deck, {
     double width = 400,
     DeckAnalysisData? analysis,
+    ValueChanged<DeckCardItem>? onShowCardDetails,
   }) {
     return MaterialApp(
       theme: AppTheme.darkTheme,
@@ -332,6 +334,7 @@ void main() {
               deck: deck,
               analysis: analysis,
               onOpenAnalysis: () {},
+              onShowCardDetails: onShowCardDetails,
             ),
           ),
         ),
@@ -346,14 +349,14 @@ void main() {
       await tester.pumpWidget(createSubject(makeHealthyCommanderDeck()));
       await tester.pumpAndSettle();
 
-      expect(find.text('Leitura rápida do deck'), findsOneWidget);
-      expect(find.text('Indicadores principais'), findsOneWidget);
+      expect(find.text('Próximos ajustes do deck'), findsOneWidget);
+      expect(find.text('O que melhorar primeiro'), findsOneWidget);
       expect(find.text('Terrenos'), findsOneWidget);
       expect(find.text('Ramp'), findsOneWidget);
       expect(find.text('Compra'), findsOneWidget);
       expect(find.text('Interação'), findsOneWidget);
       expect(find.text('CMC médio'), findsOneWidget);
-      expect(find.text('O que entrou na conta'), findsOneWidget);
+      expect(find.text('Ver cartas por função'), findsOneWidget);
       expect(find.text('Compra (8)'), findsOneWidget);
       expect(find.text('Chart a Course x8'), findsOneWidget);
       expect(
@@ -369,7 +372,229 @@ void main() {
       expect(find.text('Análise completa'), findsOneWidget);
     });
 
-    testWidgets('renders backend launch readiness signals when available', (
+    testWidgets('opens metric evidence list and card details callback', (
+      tester,
+    ) async {
+      DeckCardItem? selectedCard;
+
+      await tester.pumpWidget(
+        createSubject(
+          makeHealthyCommanderDeck(),
+          onShowCardDetails: (card) => selectedCard = card,
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.byKey(const Key('deck-diagnostic-metric-Ramp')));
+      await tester.pumpAndSettle();
+
+      expect(
+        find.byKey(const Key('deck-diagnostic-evidence-sheet-Ramp')),
+        findsOneWidget,
+      );
+      expect(find.text('Ramp (9)'), findsWidgets);
+      expect(find.text('Arcane Signet'), findsWidgets);
+      expect(find.text('Artifact'), findsOneWidget);
+      expect(
+        find.textContaining('Ajuda a acelerar mana'),
+        findsAtLeastNWidgets(1),
+      );
+
+      final images = tester.widgetList<CachedCardImage>(
+        find.byType(CachedCardImage),
+      );
+      expect(images, isNotEmpty);
+      expect(
+        images.any(
+          (image) =>
+              image.imageUrl != null &&
+              image.imageUrl!.startsWith('https://api.scryfall.com/'),
+        ),
+        isTrue,
+      );
+
+      await tester.tap(
+        find.byKey(const Key('deck-diagnostic-evidence-card-Arcane Signet')),
+      );
+      await tester.pumpAndSettle();
+
+      expect(selectedCard?.name, 'Arcane Signet');
+      expect(
+        find.byKey(const Key('deck-diagnostic-evidence-sheet-Ramp')),
+        findsNothing,
+      );
+    });
+
+    testWidgets('opens evidence card list from counted bucket', (tester) async {
+      await tester.pumpWidget(createSubject(makeHealthyCommanderDeck()));
+      await tester.pumpAndSettle();
+
+      await tester.ensureVisible(
+        find.byKey(const Key('deck-diagnostic-evidence-Compra')),
+      );
+      await tester.tap(
+        find.byKey(const Key('deck-diagnostic-evidence-Compra')),
+      );
+      await tester.pumpAndSettle();
+
+      expect(
+        find.byKey(const Key('deck-diagnostic-evidence-sheet-Compra')),
+        findsOneWidget,
+      );
+      expect(find.text('Compra (8)'), findsWidgets);
+      expect(find.text('Chart a Course'), findsWidgets);
+      expect(find.text('Sorcery'), findsOneWidget);
+    });
+
+    testWidgets(
+      'completes partial backend samples with local deck cards in evidence sheet',
+      (tester) async {
+        final drawCards = [
+          card(
+            id: 'draw-1',
+            name: 'Artist\'s Talent',
+            typeLine: 'Enchantment — Class',
+            manaCost: '{1}{R}',
+            oracleText: 'Whenever you cast a noncreature spell, draw a card.',
+          ),
+          card(
+            id: 'draw-2',
+            name: 'Dawn\'s Truce',
+            typeLine: 'Instant',
+            manaCost: '{1}{W}',
+            oracleText: 'Draw a card.',
+          ),
+          card(
+            id: 'draw-3',
+            name: 'Sensei\'s Divining Top',
+            typeLine: 'Artifact',
+            manaCost: '{1}',
+            oracleText:
+                'Draw a card, then put this on top of its owner\'s library.',
+          ),
+          card(
+            id: 'draw-4',
+            name: 'Starfall Invocation',
+            typeLine: 'Sorcery',
+            manaCost: '{3}{W}{W}',
+            oracleText: 'Destroy all creatures. Draw a card.',
+          ),
+          card(
+            id: 'draw-5',
+            name: 'Tempt with Bunnies',
+            typeLine: 'Sorcery',
+            manaCost: '{2}{W}',
+            oracleText: 'Create tokens, then draw a card.',
+          ),
+          card(
+            id: 'draw-6',
+            name: 'Reckless Impulse',
+            typeLine: 'Sorcery',
+            manaCost: '{1}{R}',
+            oracleText:
+                'Exile the top two cards of your library. Until the end of your next turn, you may play those cards.',
+          ),
+          card(
+            id: 'draw-7',
+            name: 'Esper Sentinel',
+            typeLine: 'Artifact Creature — Human Soldier',
+            manaCost: '{W}',
+            oracleText:
+                'Whenever an opponent casts their first noncreature spell each turn, draw a card unless that player pays {X}.',
+          ),
+        ];
+        final deck = DeckDetails(
+          id: 'deck-partial-samples',
+          name: 'Boros Draw',
+          format: 'commander',
+          commanderName: 'Lorehold, the Historian',
+          isPublic: false,
+          createdAt: DateTime(2026, 7, 7),
+          cardCount: 100,
+          stats: const {},
+          commander: [
+            card(
+              id: 'partial-cmdr',
+              name: 'Lorehold, the Historian',
+              typeLine: 'Legendary Creature — Human Cleric',
+              manaCost: '{R}{W}',
+              isCommander: true,
+            ),
+          ],
+          mainBoard: {
+            'Mainboard': [
+              card(
+                id: 'partial-land',
+                name: 'Plains',
+                typeLine: 'Basic Land — Plains',
+                quantity: 35,
+              ),
+              ...drawCards,
+              card(
+                id: 'partial-ramp',
+                name: 'Arcane Signet',
+                typeLine: 'Artifact',
+                manaCost: '{2}',
+                oracleText: '{T}: Add one mana of any color.',
+                quantity: 8,
+              ),
+              card(
+                id: 'partial-filler',
+                name: 'Lorehold Apprentice',
+                typeLine: 'Creature — Human Cleric',
+                manaCost: '{1}{R}{W}',
+                oracleText: 'Magecraft — Create a 3/2 Spirit creature token.',
+                quantity: 49,
+              ),
+            ],
+          },
+        );
+        final analysis = DeckAnalysisData.fromJson({
+          'deck_id': deck.id,
+          'format': 'commander',
+          'stats': {
+            'composition': {'draw': 7},
+          },
+          'functional_tags': {
+            'counts': {'draw': 7},
+            'sample_details': {
+              'draw': [
+                {'name': 'Artist\'s Talent'},
+                {'name': 'Dawn\'s Truce'},
+              ],
+            },
+          },
+        });
+
+        await tester.pumpWidget(createSubject(deck, analysis: analysis));
+        await tester.pumpAndSettle();
+
+        await tester.ensureVisible(
+          find.byKey(const Key('deck-diagnostic-evidence-Compra')),
+        );
+        await tester.tap(
+          find.byKey(const Key('deck-diagnostic-evidence-Compra')),
+        );
+        await tester.pumpAndSettle();
+
+        expect(
+          find.byKey(const Key('deck-diagnostic-evidence-sheet-Compra')),
+          findsOneWidget,
+        );
+        expect(find.text('Compra (7)'), findsWidgets);
+        expect(find.text('Artist\'s Talent'), findsWidgets);
+        expect(find.text('Dawn\'s Truce'), findsWidgets);
+        expect(find.text('Esper Sentinel'), findsWidgets);
+
+        await tester.drag(find.byType(ListView), const Offset(0, -520));
+        await tester.pumpAndSettle();
+
+        expect(find.text('Reckless Impulse'), findsWidgets);
+        expect(find.text('Tempt with Bunnies'), findsWidgets);
+      },
+    );
+
+    testWidgets('keeps backend confidence signals out of player view', (
       tester,
     ) async {
       final deck = makeHealthyCommanderDeck();
@@ -530,50 +755,38 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(
-        find.byKey(const Key('deck-launch-readiness-card')),
+        find.byKey(const Key('deck-player-readiness-card')),
         findsOneWidget,
       );
-      expect(find.byKey(const Key('deck-launch-battle-card')), findsOneWidget);
+      expect(find.text('Base pronta para testar'), findsOneWidget);
       expect(
-        find.byKey(const Key('deck-launch-understanding-card')),
-        findsOneWidget,
-      );
-      expect(
-        find.byKey(const Key('deck-launch-commander-contract-card')),
-        findsOneWidget,
-      );
-      expect(find.text('Prontidão'), findsOneWidget);
-      expect(find.text('Commander válido'), findsOneWidget);
-      expect(find.text('Inteligência avançada liberada.'), findsOneWidget);
-      expect(find.text('Simulação parcial'), findsOneWidget);
-      expect(find.text('72/100 cópias verificadas'), findsOneWidget);
-      expect(find.text('82% classificado'), findsOneWidget);
-      expect(find.text('Plano Commander'), findsOneWidget);
-      expect(find.text('Pronto para battle gate'), findsOneWidget);
-      expect(find.text('Battle gate: Pendente'), findsOneWidget);
-      expect(
-        find.byKey(const Key('deck-launch-capability-badges')),
-        findsOneWidget,
-      );
-      expect(
-        find.byKey(const Key('deck-launch-capability-battle_readiness')),
-        findsOneWidget,
-      );
-      expect(find.text('Battle readiness beta'), findsOneWidget);
-      expect(find.text('Recomendações advisory'), findsOneWidget);
-      expect(
-        find.byKey(const Key('deck-card-battle-readiness-badges')),
-        findsOneWidget,
-      );
-      expect(find.text('Battle por carta'), findsOneWidget);
-      expect(
-        find.byKey(
-          const Key('deck-card-battle-readiness-Talrand, Sky Summoner'),
+        find.text(
+          'A estrutura principal parece equilibrada. Use os indicadores abaixo para ajustes finos.',
         ),
         findsOneWidget,
       );
-      expect(find.text('Simulação verificada'), findsOneWidget);
-      expect(find.text('Adaptador pendente'), findsOneWidget);
+      expect(find.byKey(const Key('deck-launch-battle-card')), findsNothing);
+      expect(
+        find.byKey(const Key('deck-launch-understanding-card')),
+        findsNothing,
+      );
+      expect(
+        find.byKey(const Key('deck-launch-commander-contract-card')),
+        findsNothing,
+      );
+      expect(
+        find.byKey(const Key('deck-card-battle-readiness-badges')),
+        findsNothing,
+      );
+      expect(find.text('Simulação parcial'), findsNothing);
+      expect(find.text('72/100 cópias verificadas'), findsNothing);
+      expect(find.text('82% classificado'), findsNothing);
+      expect(find.text('Plano Commander'), findsNothing);
+      expect(find.text('Battle readiness beta'), findsNothing);
+      expect(find.text('Recomendações advisory'), findsNothing);
+      expect(find.text('Battle por carta'), findsNothing);
+      expect(find.text('Simulação verificada'), findsNothing);
+      expect(find.text('Adaptador pendente'), findsNothing);
       expect(tester.takeException(), isNull);
     });
 
@@ -758,6 +971,34 @@ void main() {
       expect(find.text('Ruby Medallion'), findsOneWidget);
       expect(find.text('Scroll Rack'), findsOneWidget);
       expect(find.text('Chaos Warp'), findsOneWidget);
+
+      await tester.tap(find.byKey(const Key('deck-diagnostic-metric-Ramp')));
+      await tester.pumpAndSettle();
+
+      expect(
+        find.byKey(const Key('deck-diagnostic-evidence-sheet-Ramp')),
+        findsOneWidget,
+      );
+      expect(find.textContaining('functional_tags'), findsNothing);
+      expect(find.textContaining('functional_card_tags'), findsNothing);
+      expect(find.textContaining('persisted_semantic_v2'), findsNothing);
+      expect(find.textContaining('schema'), findsNothing);
+      expect(
+        find.textContaining('Ajuda a acelerar mana'),
+        findsAtLeastNWidgets(1),
+      );
+
+      final images = tester.widgetList<CachedCardImage>(
+        find.byType(CachedCardImage),
+      );
+      expect(
+        images.any(
+          (image) =>
+              image.imageUrl != null &&
+              image.imageUrl!.startsWith('https://api.scryfall.com/'),
+        ),
+        isTrue,
+      );
     });
   });
 }

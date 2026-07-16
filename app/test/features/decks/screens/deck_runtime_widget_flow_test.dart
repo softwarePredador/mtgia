@@ -179,7 +179,7 @@ GoRouter _buildRouter(AuthProvider authProvider) {
       }
 
       if (isAuthRoute && authProvider.isAuthenticated) {
-        return '/decks';
+        return '/home';
       }
 
       return null;
@@ -189,6 +189,10 @@ GoRouter _buildRouter(AuthProvider authProvider) {
       GoRoute(
         path: '/register',
         builder: (context, state) => const RegisterScreen(),
+      ),
+      GoRoute(
+        path: '/home',
+        builder: (context, state) => const DeckListScreen(),
       ),
       GoRoute(
         path: '/decks',
@@ -503,10 +507,10 @@ void main() {
 
       await tester.pumpAndSettle();
 
-      expect(find.text('Criar Conta'), findsAtLeastNWidgets(1));
+      expect(find.text('Criar conta'), findsAtLeastNWidgets(1));
 
       await tester.enterText(
-        find.widgetWithText(TextFormField, 'Nome de Usuário'),
+        find.widgetWithText(TextFormField, 'Nome de usuário'),
         'runtime_user',
       );
       await tester.enterText(
@@ -518,10 +522,10 @@ void main() {
         '123456',
       );
       await tester.enterText(
-        find.widgetWithText(TextFormField, 'Confirmar Senha'),
+        find.widgetWithText(TextFormField, 'Confirmar senha'),
         '123456',
       );
-      final registerSubmit = find.widgetWithText(InkWell, 'Criar Conta');
+      final registerSubmit = find.widgetWithText(InkWell, 'Criar conta');
       await tester.ensureVisible(registerSubmit);
       await tester.tap(registerSubmit);
       await tester.pumpAndSettle();

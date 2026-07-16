@@ -66,8 +66,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
     if (!mounted) return;
 
     if (success) {
-      // Navegação é feita automaticamente pelo redirect do GoRouter
-      // quando o status muda para 'authenticated'.
+      context.go('/home');
       return;
     }
 
@@ -99,12 +98,11 @@ class _RegisterScreenState extends State<RegisterScreen> {
       child: Column(
         children: [
           const AuthBrandHeader(
-            title: 'Criar Conta',
-            subtitle: 'Comece sua jornada no ManaLoom',
-            eyebrow: 'Comece no ManaLoom',
-            logoSize: 84,
+            title: 'Criar conta',
+            subtitle: 'Configure seu acesso em menos de um minuto.',
+            logoSize: 76,
           ),
-          const SizedBox(height: 20),
+          const SizedBox(height: 18),
           AuthFormSurface(
             child: Form(
               key: _formKey,
@@ -116,10 +114,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     key: const Key('register-username-field'),
                     controller: _usernameController,
                     decoration: InputDecoration(
-                      labelText: 'Nome de Usuário',
+                      labelText: 'Nome de usuário',
                       hintText: 'ex: mage42',
-                      helperText: 'Seu @ único no app. Escolha um nick depois.',
-                      helperMaxLines: 2,
+                      helperText: 'Você poderá ajustar isso depois.',
                       prefixIcon: const Icon(Icons.alternate_email),
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(AppTheme.radiusMd),
@@ -216,7 +213,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     controller: _confirmPasswordController,
                     obscureText: _obscureConfirmPassword,
                     decoration: InputDecoration(
-                      labelText: 'Confirmar Senha',
+                      labelText: 'Confirmar senha',
                       hintText: '••••••••',
                       prefixIcon: const Icon(Icons.lock_outline),
                       suffixIcon: IconButton(
@@ -253,7 +250,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   ),
                   const SizedBox(height: 22),
 
-                  // Botão Registrar com gradiente
                   Consumer<AuthProvider>(
                     builder: (context, auth, child) {
                       if (auth.status == AuthStatus.loading) {
@@ -266,9 +262,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
                             ),
                           ),
                           child: const Center(
-                            child: SizedBox(
-                              height: 20,
-                              width: 20,
+                            child: SizedBox.square(
+                              dimension: AppTheme.iconSpinnerSm,
                               child: CircularProgressIndicator(
                                 strokeWidth: 2,
                                 valueColor: AlwaysStoppedAnimation<Color>(
@@ -304,7 +299,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                             onTap: _handleRegister,
                             child: const Center(
                               child: Text(
-                                'Criar Conta',
+                                'Criar conta',
                                 style: TextStyle(
                                   color: AppTheme.backgroundAbyss,
                                   fontSize: AppTheme.fontLg,

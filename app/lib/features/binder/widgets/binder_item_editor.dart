@@ -49,6 +49,8 @@ class BinderItemEditor extends StatefulWidget {
   }) {
     return showModalBottomSheet(
       context: context,
+      useRootNavigator: true,
+      useSafeArea: true,
       isScrollControlled: true,
       backgroundColor: AppTheme.surfaceSlate,
       shape: const RoundedRectangleBorder(

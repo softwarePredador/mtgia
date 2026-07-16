@@ -8,17 +8,18 @@ import 'package:http/http.dart' as http;
 import 'package:test/test.dart';
 
 void main() {
-  final skipIntegration = Platform.environment['RUN_INTEGRATION_TESTS'] == '0'
-      ? 'Teste live desativado por RUN_INTEGRATION_TESTS=0.'
-      : null;
+  final skipIntegration =
+      Platform.environment['RUN_INTEGRATION_TESTS'] == '0'
+          ? 'Teste live desativado por RUN_INTEGRATION_TESTS=0.'
+          : null;
   final baseUrl =
       Platform.environment['TEST_API_BASE_URL'] ?? 'http://127.0.0.1:8082';
 
   Map<String, String> jsonHeaders([String? token]) => {
-        'Content-Type': 'application/json',
-        'X-Request-Id': 'social-live-${DateTime.now().microsecondsSinceEpoch}',
-        if (token != null) 'Authorization': 'Bearer $token',
-      };
+    'Content-Type': 'application/json',
+    'X-Request-Id': 'social-live-${DateTime.now().microsecondsSinceEpoch}',
+    if (token != null) 'Authorization': 'Bearer $token',
+  };
 
   Future<Map<String, dynamic>> registerUser(String suffix) async {
     final body = {
@@ -56,15 +57,15 @@ void main() {
     final response = switch (method) {
       'GET' => await http.get(uri, headers: jsonHeaders(token)),
       'POST' => await http.post(
-          uri,
-          headers: jsonHeaders(token),
-          body: jsonEncode(body ?? const {}),
-        ),
+        uri,
+        headers: jsonHeaders(token),
+        body: jsonEncode(body ?? const {}),
+      ),
       'PUT' => await http.put(
-          uri,
-          headers: jsonHeaders(token),
-          body: jsonEncode(body ?? const {}),
-        ),
+        uri,
+        headers: jsonHeaders(token),
+        body: jsonEncode(body ?? const {}),
+      ),
       _ => throw ArgumentError('Unsupported method $method'),
     };
     expect(response.statusCode, expectedStatus, reason: response.body);
@@ -72,11 +73,7 @@ void main() {
   }
 
   Future<int> unreadCount(String token) async {
-    final body = await jsonRequest(
-      'GET',
-      '/notifications/count',
-      token: token,
-    );
+    final body = await jsonRequest('GET', '/notifications/count', token: token);
     return body['unread'] as int? ?? 0;
   }
 
@@ -125,6 +122,14 @@ void main() {
       },
     );
     final binderItemId = binder['id'] as String;
+    addTearDown(
+      () => jsonRequest(
+        'PUT',
+        '/binder/$binderItemId',
+        token: sellerToken,
+        body: {'for_trade': false, 'for_sale': false},
+      ),
+    );
 
     return {
       'sellerToken': sellerToken,
@@ -198,6 +203,14 @@ void main() {
           },
         );
         final binderItemId = binder['id'] as String;
+        addTearDown(
+          () => jsonRequest(
+            'PUT',
+            '/binder/$binderItemId',
+            token: sellerToken,
+            body: {'for_trade': false, 'for_sale': false},
+          ),
+        );
 
         final invalidTrade = await http.post(
           Uri.parse('$baseUrl/trades'),
@@ -271,22 +284,22 @@ void main() {
           '/notifications?limit=20',
           token: buyerToken,
         );
-        final acceptedTypes = (acceptedNotifications['data'] as List<dynamic>)
-            .cast<Map<String, dynamic>>()
-            .map((item) => item['type'])
-            .toSet();
+        final acceptedTypes =
+            (acceptedNotifications['data'] as List<dynamic>)
+                .cast<Map<String, dynamic>>()
+                .map((item) => item['type'])
+                .toSet();
         expect(acceptedTypes, contains('trade_accepted'));
-        final acceptedNotification =
-            notificationByType(acceptedNotifications, 'trade_accepted');
+        final acceptedNotification = notificationByType(
+          acceptedNotifications,
+          'trade_accepted',
+        );
         expect(acceptedNotification['reference_id'], tradeId);
 
         final invalidStatus = await http.put(
           Uri.parse('$baseUrl/trades/$tradeId/status'),
           headers: jsonHeaders(sellerToken),
-          body: jsonEncode({
-            'status': 'shipped',
-            'delivery_method': 'mail',
-          }),
+          body: jsonEncode({'status': 'shipped', 'delivery_method': 'mail'}),
         );
         expect(invalidStatus.statusCode, 400);
 
@@ -316,13 +329,16 @@ void main() {
           '/notifications?limit=20',
           token: buyerToken,
         );
-        final buyerTypes = (buyerNotifications['data'] as List<dynamic>)
-            .cast<Map<String, dynamic>>()
-            .map((item) => item['type'])
-            .toSet();
+        final buyerTypes =
+            (buyerNotifications['data'] as List<dynamic>)
+                .cast<Map<String, dynamic>>()
+                .map((item) => item['type'])
+                .toSet();
         expect(buyerTypes, contains('trade_shipped'));
-        final shippedNotification =
-            notificationByType(buyerNotifications, 'trade_shipped');
+        final shippedNotification = notificationByType(
+          buyerNotifications,
+          'trade_shipped',
+        );
         expect(shippedNotification['reference_id'], tradeId);
 
         final tradeMessage = await jsonRequest(
@@ -380,10 +396,11 @@ void main() {
           '/notifications?limit=20',
           token: sellerToken,
         );
-        final types = (notifications['data'] as List<dynamic>)
-            .cast<Map<String, dynamic>>()
-            .map((item) => item['type'])
-            .toSet();
+        final types =
+            (notifications['data'] as List<dynamic>)
+                .cast<Map<String, dynamic>>()
+                .map((item) => item['type'])
+                .toSet();
         expect(
           types,
           containsAll([
@@ -395,7 +412,9 @@ void main() {
         );
         expect(
           notificationByType(
-              notifications, 'trade_offer_received')['reference_id'],
+            notifications,
+            'trade_offer_received',
+          )['reference_id'],
           tradeId,
         );
         expect(
@@ -415,7 +434,9 @@ void main() {
         );
         expect(
           notificationByType(
-              completedNotifications, 'trade_completed')['reference_id'],
+            completedNotifications,
+            'trade_completed',
+          )['reference_id'],
           tradeId,
         );
       },
@@ -501,10 +522,11 @@ void main() {
           '/notifications?limit=20',
           token: buyerToken,
         );
-        final acceptedTypes = (acceptedNotifications['data'] as List<dynamic>)
-            .cast<Map<String, dynamic>>()
-            .map((item) => item['type'])
-            .toSet();
+        final acceptedTypes =
+            (acceptedNotifications['data'] as List<dynamic>)
+                .cast<Map<String, dynamic>>()
+                .map((item) => item['type'])
+                .toSet();
         expect(acceptedTypes, contains('trade_accepted'));
 
         final declineTrade = await createSaleTrade(
@@ -528,10 +550,11 @@ void main() {
           '/notifications?limit=20',
           token: buyerToken,
         );
-        final declinedTypes = (declinedNotifications['data'] as List<dynamic>)
-            .cast<Map<String, dynamic>>()
-            .map((item) => item['type'])
-            .toSet();
+        final declinedTypes =
+            (declinedNotifications['data'] as List<dynamic>)
+                .cast<Map<String, dynamic>>()
+                .map((item) => item['type'])
+                .toSet();
         expect(declinedTypes, contains('trade_declined'));
       },
       timeout: const Timeout(Duration(minutes: 2)),

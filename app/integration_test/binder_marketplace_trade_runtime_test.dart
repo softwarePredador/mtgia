@@ -111,6 +111,13 @@ class _RuntimeApi {
     }
   }
 
+  Future<void> hideBinderItem(String itemId, {required String token}) async {
+    await putJson('/binder/$itemId', {
+      'for_trade': false,
+      'for_sale': false,
+    }, token: token);
+  }
+
   Future<http.Response> _sendWithRateLimitRetry({
     required String endpoint,
     required Future<http.Response> Function() request,
@@ -363,7 +370,10 @@ void main() {
         price: 12.34,
         notes: '$marker seller marketplace sale item',
       );
-      await api.addBinderItem(
+      addTearDown(
+        () => api.hideBinderItem(sellerBinderItemId, token: seller.token),
+      );
+      final buyerBinderItemId = await api.addBinderItem(
         token: buyer.token,
         cardId: buyerCard['id'] as String,
         quantity: 1,
@@ -371,6 +381,9 @@ void main() {
         forTrade: true,
         forSale: false,
         notes: '$marker buyer visible binder item',
+      );
+      addTearDown(
+        () => api.hideBinderItem(buyerBinderItemId, token: buyer.token),
       );
 
       final transientBuyerItemId = await api.addBinderItem(

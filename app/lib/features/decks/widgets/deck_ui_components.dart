@@ -122,6 +122,7 @@ class DeckMetaChip extends StatelessWidget {
   final Color color;
   final IconData? icon;
   final VoidCallback? onTap;
+  final bool prominent;
 
   const DeckMetaChip({
     super.key,
@@ -129,18 +130,23 @@ class DeckMetaChip extends StatelessWidget {
     required this.color,
     this.icon,
     this.onTap,
+    this.prominent = false,
   });
 
   @override
   Widget build(BuildContext context) {
+    final backgroundAlpha = prominent ? 0.23 : 0.14;
+    final borderAlpha = prominent ? 0.64 : 0.28;
+    final borderWidth =
+        prominent ? AppTheme.strokeRegular : AppTheme.strokeThin;
     final content = Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
       decoration: BoxDecoration(
-        color: color.withValues(alpha: 0.14),
+        color: color.withValues(alpha: backgroundAlpha),
         borderRadius: BorderRadius.circular(AppTheme.radiusXl),
         border: Border.all(
-          color: color.withValues(alpha: 0.28),
-          width: AppTheme.strokeThin,
+          color: color.withValues(alpha: borderAlpha),
+          width: borderWidth,
         ),
       ),
       child: Row(

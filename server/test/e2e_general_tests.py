@@ -7,7 +7,8 @@
          Health, Rules, Sets, Cards, Market
 ═══════════════════════════════════════════════════════════════
 Uso:
-  python3 server/test/e2e_general_tests.py [--verbose] [--api URL]
+  MANALOOM_CONFIRM_LIVE_MUTATIONS=I_HAVE_EXPLICIT_APPROVAL \
+    python3 server/test/e2e_general_tests.py --api URL [--verbose]
 """
 
 import argparse
@@ -19,7 +20,11 @@ from typing import Any, Optional
 
 import requests
 
-DEFAULT_API = "https://evolution-cartinhas.2ta7qx.easypanel.host"
+try:
+    from .legacy_live_e2e_guard import require_legacy_live_e2e_approval
+except ImportError:  # Direct script execution.
+    from legacy_live_e2e_guard import require_legacy_live_e2e_approval
+
 VERBOSE = False
 
 # Rate-limit safe delay between auth requests
@@ -1166,6 +1171,53 @@ class TestRunner:
         self._test(CAT, "DELETE deck inexistente → 404",
                    code == 404, f"Got {code}")
 
+    def cleanup_created_decks(self):
+        """Remove every deck owned by this run's isolated QA users."""
+        CAT = "CLEANUP"
+        all_clean = True
+        deleted = 0
+
+        for label, token in (
+            ("A", self.user_a_token),
+            ("B", self.user_b_token),
+            ("C", self.user_c_token),
+        ):
+            if not token:
+                continue
+
+            code, body = self._req("GET", "/decks", token=token)
+            if code != 200 or not isinstance(body, list):
+                all_clean = False
+                print(f"  ❌ [{CAT}] Could not list User {label} decks: {code}")
+                continue
+
+            for deck in body:
+                deck_id = deck.get("id", "")
+                if not deck_id:
+                    continue
+                delete_code, _ = self._req(
+                    "DELETE", f"/decks/{deck_id}", token=token
+                )
+                if delete_code == 204:
+                    deleted += 1
+                    continue
+
+                all_clean = False
+                # A failed delete must not leave a QA fixture visible publicly.
+                self._req(
+                    "PUT",
+                    f"/decks/{deck_id}",
+                    token=token,
+                    json_data={"is_public": False},
+                )
+
+        self._test(
+            CAT,
+            f"QA decks removidos ao final ({deleted})",
+            all_clean,
+            "At least one fixture could not be deleted and was made private.",
+        )
+
     # ═══════════════════════════════════════════════════════════
     #  AI ENDPOINT TESTS
     # ═══════════════════════════════════════════════════════════
@@ -1504,21 +1556,24 @@ class TestRunner:
             print("\n💀 SETUP FALHOU! Abortando testes.")
             return False
 
-        self.test_deck_crud()
-        self.test_deck_cards()
-        self.test_deck_advanced()
-        self.test_ai()
-        self.test_community()
-        self.test_social()
-        self.test_user_profile()
-        self.test_conversations()
-        self.test_import()
-        self.test_notifications()
-        self.test_cards()
-        self.test_infrastructure()
-        self.test_deck_delete()
-        # Auth tests run LAST so the rate-limit window from setup has expired
-        self.test_auth()
+        try:
+            self.test_deck_crud()
+            self.test_deck_cards()
+            self.test_deck_advanced()
+            self.test_ai()
+            self.test_community()
+            self.test_social()
+            self.test_user_profile()
+            self.test_conversations()
+            self.test_import()
+            self.test_notifications()
+            self.test_cards()
+            self.test_infrastructure()
+            self.test_deck_delete()
+            # Auth tests run LAST so the rate-limit window from setup has expired
+            self.test_auth()
+        finally:
+            self.cleanup_created_decks()
 
         return self.print_summary()
 
@@ -1562,11 +1617,12 @@ class TestRunner:
 # ─── Main ──────────────────────────────────────────────────────────
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="MTG General E2E Test Suite")
-    parser.add_argument("--api", default=DEFAULT_API, help="API base URL")
+    parser.add_argument("--api", required=True, help="Explicit API base URL")
     parser.add_argument("--verbose", "-v", action="store_true", help="Show all requests")
     args = parser.parse_args()
 
     VERBOSE = args.verbose
-    runner = TestRunner(args.api)
+    approved_api = require_legacy_live_e2e_approval(args.api)
+    runner = TestRunner(approved_api)
     success = runner.run_all()
     sys.exit(0 if success else 1)

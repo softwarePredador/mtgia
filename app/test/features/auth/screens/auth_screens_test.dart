@@ -24,7 +24,11 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.text('ManaLoom'), findsOneWidget);
-    expect(find.text('Entre na sua conta'), findsOneWidget);
+    expect(
+      find.text('Acesse decks, coleção, trades e partidas.'),
+      findsOneWidget,
+    );
+    expect(find.text('Tecendo estratégias lendárias'), findsNothing);
     expect(find.text('Entrar'), findsOneWidget);
     expect(find.text('Criar conta'), findsOneWidget);
     expect(find.byKey(const Key('login-email-field')), findsOneWidget);
@@ -37,9 +41,12 @@ void main() {
     await tester.pumpWidget(_buildWithAuth(const RegisterScreen()));
     await tester.pumpAndSettle();
 
-    expect(find.text('Comece no ManaLoom'), findsOneWidget);
-    expect(find.text('Criar Conta'), findsNWidgets(2));
-    expect(find.text('Comece sua jornada no ManaLoom'), findsOneWidget);
+    expect(find.text('Comece no ManaLoom'), findsNothing);
+    expect(find.text('Criar conta'), findsNWidgets(2));
+    expect(
+      find.text('Configure seu acesso em menos de um minuto.'),
+      findsOneWidget,
+    );
     expect(find.text('Entrar'), findsOneWidget);
     expect(find.byKey(const Key('register-username-field')), findsOneWidget);
     expect(find.byKey(const Key('register-email-field')), findsOneWidget);

@@ -185,6 +185,7 @@ class OptimizeApplyPlan {
   final List<String> removals;
   final List<String> additions;
   final String? expectedDeckSignature;
+  final Map<String, dynamic> mutationContext;
 
   const OptimizeApplyPlan({
     required this.mode,
@@ -194,24 +195,44 @@ class OptimizeApplyPlan {
     this.removals = const <String>[],
     this.additions = const <String>[],
     this.expectedDeckSignature,
+    this.mutationContext = const <String, dynamic>{},
   });
+
+  OptimizeApplyPlan withMutationContext(Map<String, dynamic> context) {
+    return OptimizeApplyPlan(
+      mode: mode,
+      bulkCards: bulkCards,
+      removalsDetailed: removalsDetailed,
+      additionsDetailed: additionsDetailed,
+      removals: removals,
+      additions: additions,
+      expectedDeckSignature: expectedDeckSignature,
+      mutationContext: context,
+    );
+  }
 }
 
 typedef OptimizeAddBulkExecutor =
-    Future<bool> Function(String deckId, List<Map<String, dynamic>> cards);
+    Future<bool> Function(
+      String deckId,
+      List<Map<String, dynamic>> cards, {
+      Map<String, dynamic>? mutationContext,
+    });
 typedef OptimizeApplyWithIdsExecutor =
     Future<bool> Function(
       String deckId,
       List<Map<String, dynamic>> removalsDetailed,
       List<Map<String, dynamic>> additionsDetailed, {
       String? expectedDeckSignature,
+      Map<String, dynamic>? mutationContext,
     });
 typedef OptimizeApplyByNamesExecutor =
     Future<bool> Function(
       String deckId,
       List<String> removals,
-      List<String> additions,
-    );
+      List<String> additions, {
+      Map<String, dynamic>? mutationContext,
+    });
 typedef GuidedRebuildExecutor =
     Future<Map<String, dynamic>> Function(
       String deckId, {
@@ -283,6 +304,8 @@ class OptimizePreviewData {
   final Map<String, dynamic> optimizeIntensity;
   final String? outcomeCode;
   final OptimizeSwapIntegrityPayload? swapIntegrity;
+  final Map<String, dynamic> optimizationContract;
+  final Map<String, dynamic> battleValidation;
 
   const OptimizePreviewData({
     required this.removals,
@@ -304,6 +327,8 @@ class OptimizePreviewData {
     required this.optimizeIntensity,
     required this.outcomeCode,
     required this.swapIntegrity,
+    required this.optimizationContract,
+    required this.battleValidation,
   });
 
   bool get hasChanges => removals.isNotEmpty || additions.isNotEmpty;
@@ -391,6 +416,14 @@ class OptimizePreviewData {
       optimizeIntensity: optimizeIntensity,
       outcomeCode: result['outcome_code']?.toString(),
       swapIntegrity: swapIntegrity,
+      optimizationContract:
+          (result['optimization_contract'] is Map)
+              ? (result['optimization_contract'] as Map).cast<String, dynamic>()
+              : const <String, dynamic>{},
+      battleValidation:
+          (result['battle_validation'] is Map)
+              ? (result['battle_validation'] as Map).cast<String, dynamic>()
+              : const <String, dynamic>{},
     );
   }
 }
@@ -748,6 +781,86 @@ List<T> _selectByIndexes<T>(List<T> values, Set<int>? selectedIndexes) {
   ];
 }
 
+List<int> _sortedIndexes(Set<int>? indexes) {
+  if (indexes == null) return const <int>[];
+  final values = indexes.toList()..sort();
+  return values;
+}
+
+List<Map<String, dynamic>> _mapsByIndexes(
+  List<Map<String, dynamic>> values,
+  Set<int>? selectedIndexes,
+) {
+  return _selectByIndexes(
+    values,
+    selectedIndexes,
+  ).map((entry) => Map<String, dynamic>.from(entry)).toList(growable: false);
+}
+
+Map<String, dynamic> buildOptimizeMutationContext(
+  OptimizePreviewData preview, {
+  OptimizePreviewSelection? selection,
+}) {
+  final selectedRemovalsDetailed = _mapsByIndexes(
+    preview.removalsDetailed,
+    selection?.selectedRemovalIndexes,
+  );
+  final selectedAdditionsDetailed = _mapsByIndexes(
+    preview.additionsDetailed,
+    selection?.selectedAdditionIndexes,
+  );
+  final selectedRemovals = _selectByIndexes(
+    preview.removals,
+    selection?.selectedRemovalIndexes,
+  );
+  final selectedAdditions = _selectByIndexes(
+    preview.additions,
+    selection?.selectedAdditionIndexes,
+  );
+  final removalIndexes = _sortedIndexes(selection?.selectedRemovalIndexes);
+  final additionIndexes = _sortedIndexes(selection?.selectedAdditionIndexes);
+  final detailedSelectedChangeCount =
+      selectedRemovalsDetailed.length + selectedAdditionsDetailed.length;
+  final namedSelectedChangeCount =
+      selectedRemovals.length + selectedAdditions.length;
+  final selectedChangeCount =
+      (selection == null)
+          ? (detailedSelectedChangeCount > 0
+              ? detailedSelectedChangeCount
+              : namedSelectedChangeCount)
+          : selection.selectedCount;
+
+  return {
+    'type': 'optimization_apply',
+    'source': 'optimize_preview',
+    'schema_version': 'optimize_apply_context_v1_2026-07-07',
+    'mode': preview.mode,
+    'intensity': preview.intensity.apiValue,
+    'optimize_intensity': preview.optimizeIntensity,
+    if (preview.outcomeCode != null) 'outcome_code': preview.outcomeCode,
+    'selected_change_count': selectedChangeCount,
+    'selection': {
+      'removal_indexes': removalIndexes,
+      'addition_indexes': additionIndexes,
+      'selected_change_count': selectedChangeCount,
+    },
+    'removals':
+        selectedRemovalsDetailed.isNotEmpty
+            ? selectedRemovalsDetailed
+            : selectedRemovals,
+    'additions':
+        selectedAdditionsDetailed.isNotEmpty
+            ? selectedAdditionsDetailed
+            : selectedAdditions,
+    'before_snapshot': preview.deckAnalysis,
+    'after_snapshot': preview.postAnalysis,
+    'warnings': preview.warnings,
+    'meta_reference_context': preview.metaReferenceContext,
+    'optimization_contract': preview.optimizationContract,
+    'battle_validation': preview.battleValidation,
+  };
+}
+
 OptimizeApplyPlan buildOptimizeApplyPlan(
   OptimizePreviewData preview, {
   OptimizePreviewSelection? selection,
@@ -755,6 +868,13 @@ OptimizeApplyPlan buildOptimizeApplyPlan(
   if (!preview.hasChanges) {
     return const OptimizeApplyPlan(mode: OptimizeApplyMode.none);
   }
+
+  _validatePairedOptimizeSelection(preview, selection);
+
+  final mutationContext = buildOptimizeMutationContext(
+    preview,
+    selection: selection,
+  );
 
   final selectedAdditionsDetailed = _selectByIndexes(
     preview.additionsDetailed,
@@ -796,6 +916,7 @@ OptimizeApplyPlan buildOptimizeApplyPlan(
                 },
               )
               .toList(),
+      mutationContext: mutationContext,
     );
   }
 
@@ -806,6 +927,7 @@ OptimizeApplyPlan buildOptimizeApplyPlan(
       removalsDetailed: selectedRemovalsDetailed,
       additionsDetailed: selectedAdditionsDetailed,
       expectedDeckSignature: preview.swapIntegrity?.deckSignature,
+      mutationContext: mutationContext,
     );
   }
 
@@ -813,7 +935,44 @@ OptimizeApplyPlan buildOptimizeApplyPlan(
     mode: OptimizeApplyMode.applyByNames,
     removals: selectedRemovals,
     additions: selectedAdditions,
+    mutationContext: mutationContext,
   );
+}
+
+void _validatePairedOptimizeSelection(
+  OptimizePreviewData preview,
+  OptimizePreviewSelection? selection,
+) {
+  if (preview.mode != 'optimize') return;
+
+  final usesDetailed =
+      preview.removalsDetailed.isNotEmpty ||
+      preview.additionsDetailed.isNotEmpty;
+  final removalCount =
+      usesDetailed ? preview.removalsDetailed.length : preview.removals.length;
+  final additionCount =
+      usesDetailed
+          ? preview.additionsDetailed.length
+          : preview.additions.length;
+  if (removalCount != additionCount) {
+    throw StateError(
+      'Preview de optimize inválido: entradas e saídas precisam formar pares.',
+    );
+  }
+  if (selection == null) return;
+
+  final removals = selection.selectedRemovalIndexes;
+  final additions = selection.selectedAdditionIndexes;
+  final sameIndexes =
+      removals.length == additions.length && removals.every(additions.contains);
+  final indexesInRange =
+      removals.every((index) => index >= 0 && index < removalCount) &&
+      additions.every((index) => index >= 0 && index < additionCount);
+  if (!sameIndexes || !indexesInRange) {
+    throw StateError(
+      'Seleção de optimize inválida: cada remoção deve manter sua entrada pareada.',
+    );
+  }
 }
 
 Future<bool> executeOptimizeApplyPlan({
@@ -827,16 +986,26 @@ Future<bool> executeOptimizeApplyPlan({
     case OptimizeApplyMode.none:
       return false;
     case OptimizeApplyMode.addBulk:
-      return addBulk(deckId, plan.bulkCards);
+      return addBulk(
+        deckId,
+        plan.bulkCards,
+        mutationContext: plan.mutationContext,
+      );
     case OptimizeApplyMode.applyWithIds:
       return applyWithIds(
         deckId,
         plan.removalsDetailed,
         plan.additionsDetailed,
         expectedDeckSignature: plan.expectedDeckSignature,
+        mutationContext: plan.mutationContext,
       );
     case OptimizeApplyMode.applyByNames:
-      return applyByNames(deckId, plan.removals, plan.additions);
+      return applyByNames(
+        deckId,
+        plan.removals,
+        plan.additions,
+        mutationContext: plan.mutationContext,
+      );
   }
 }
 
@@ -850,9 +1019,14 @@ Future<void> executeConfirmedOptimization({
   required OptimizeApplyByNamesExecutor applyByNames,
   required DeckStrategyUpdateExecutor updateDeckStrategy,
 }) async {
+  final contextualPlan = plan.withMutationContext({
+    ...plan.mutationContext,
+    'archetype': archetype,
+    'bracket': bracket,
+  });
   final applied = await executeOptimizeApplyPlan(
     deckId: deckId,
-    plan: plan,
+    plan: contextualPlan,
     addBulk: addBulk,
     applyWithIds: applyWithIds,
     applyByNames: applyByNames,

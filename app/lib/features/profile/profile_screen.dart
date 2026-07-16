@@ -185,6 +185,23 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
     return Scaffold(
       backgroundColor: AppTheme.backgroundAbyss,
+      floatingActionButton:
+          user == null
+              ? null
+              : FloatingActionButton.extended(
+                key: const Key('profile-save-button'),
+                tooltip: 'Salvar perfil',
+                onPressed: _isSaving ? null : _save,
+                icon:
+                    _isSaving
+                        ? const SizedBox(
+                          width: 18,
+                          height: 18,
+                          child: CircularProgressIndicator(strokeWidth: 2),
+                        )
+                        : const Icon(Icons.save_outlined),
+                label: Text(_isSaving ? 'Salvando' : 'Salvar'),
+              ),
       appBar: AppBar(
         toolbarHeight: 54,
         title: const Text('Perfil'),
@@ -222,7 +239,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
                       Container(
-                        padding: const EdgeInsets.fromLTRB(18, 20, 18, 18),
+                        padding: const EdgeInsets.all(16),
                         decoration: BoxDecoration(
                           color: AppTheme.surfaceSlate,
                           borderRadius: BorderRadius.circular(
@@ -241,12 +258,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             ),
                           ],
                         ),
-                        child: Column(
+                        child: Row(
                           children: [
                             Stack(
                               children: [
                                 CircleAvatar(
-                                  radius: 46,
+                                  radius: 34,
                                   backgroundColor: AppTheme.brass500.withValues(
                                     alpha: 0.16,
                                   ),
@@ -306,10 +323,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                           onTap:
                                               () => _showAvatarDialog(context),
                                           child: const Padding(
-                                            padding: EdgeInsets.all(6),
+                                            padding: EdgeInsets.all(5),
                                             child: Icon(
                                               Icons.camera_alt,
-                                              size: 16,
+                                              size: 14,
                                               color: AppTheme.backgroundAbyss,
                                             ),
                                           ),
@@ -320,43 +337,40 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                 ),
                               ],
                             ),
-                            const SizedBox(height: 14),
-                            Padding(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 12,
-                              ),
-                              child: Text(
-                                user.username,
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
-                                softWrap: false,
-                                textAlign: TextAlign.center,
-                                style: theme.textTheme.titleLarge?.copyWith(
-                                  color: AppTheme.textPrimary,
-                                  fontWeight: FontWeight.w900,
-                                ),
-                              ),
-                            ),
-                            const SizedBox(height: 3),
-                            Padding(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 12,
-                              ),
-                              child: Text(
-                                user.email,
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
-                                softWrap: false,
-                                textAlign: TextAlign.center,
-                                style: theme.textTheme.bodyMedium?.copyWith(
-                                  color: AppTheme.textSecondary,
-                                ),
+                            const SizedBox(width: 14),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Text(
+                                    user.username,
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                    softWrap: false,
+                                    style: theme.textTheme.titleMedium
+                                        ?.copyWith(
+                                          color: AppTheme.textPrimary,
+                                          fontWeight: FontWeight.w900,
+                                        ),
+                                  ),
+                                  const SizedBox(height: 3),
+                                  Text(
+                                    user.email,
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                    softWrap: false,
+                                    style: theme.textTheme.bodySmall?.copyWith(
+                                      color: AppTheme.textSecondary,
+                                    ),
+                                  ),
+                                ],
                               ),
                             ),
                           ],
                         ),
                       ),
-                      const SizedBox(height: 32),
+                      const SizedBox(height: 18),
                       _ProfileSectionPanel(
                         title: 'Configurações',
                         icon: Icons.auto_awesome_rounded,
@@ -378,7 +392,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                 horizontal: 4,
                               ),
                               child: Text(
-                                'Seu nick público — é como os outros jogadores vão te encontrar na busca e ver nos seus decks. Se não preencher, será usado o nome de usuário (@${user.username}).',
+                                'Nome exibido na busca, nos decks e nas trocas.',
                                 style: theme.textTheme.bodySmall?.copyWith(
                                   color: AppTheme.textSecondary,
                                   fontSize: AppTheme.fontSm,
@@ -401,7 +415,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                 horizontal: 4,
                               ),
                               child: Text(
-                                'Informe sua localização para facilitar trocas presenciais com outros jogadores.',
+                                'Usada para facilitar trocas presenciais.',
                                 style: theme.textTheme.bodySmall?.copyWith(
                                   color: AppTheme.textSecondary,
                                   fontSize: AppTheme.fontSm,
@@ -475,22 +489,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                 alignLabelWithHint: true,
                               ),
                             ),
-                            const SizedBox(height: 16),
-                            ElevatedButton.icon(
-                              key: const Key('profile-save-button'),
-                              onPressed: _isSaving ? null : _save,
-                              icon:
-                                  _isSaving
-                                      ? const SizedBox(
-                                        width: 18,
-                                        height: 18,
-                                        child: CircularProgressIndicator(
-                                          strokeWidth: 2,
-                                        ),
-                                      )
-                                      : const Icon(Icons.save),
-                              label: Text(_isSaving ? 'Salvando...' : 'Salvar'),
-                            ),
                           ],
                         ),
                       ),
@@ -558,7 +556,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           ],
                         ),
                       ),
-                      const SizedBox(height: 32),
+                      const SizedBox(height: 112),
                     ],
                   ),
                 ),

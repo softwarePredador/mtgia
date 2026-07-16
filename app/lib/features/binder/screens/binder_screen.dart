@@ -569,14 +569,22 @@ class _BinderListViewState extends State<_BinderListView>
 // Stats bar
 // =====================================================================
 
-class _StatsBar extends StatelessWidget {
+class _StatsBar extends StatefulWidget {
   final BinderStats stats;
   final VoidCallback? onAdd;
   final VoidCallback? onScan;
   const _StatsBar({required this.stats, this.onAdd, this.onScan});
 
   @override
+  State<_StatsBar> createState() => _StatsBarState();
+}
+
+class _StatsBarState extends State<_StatsBar> {
+  bool _expanded = false;
+
+  @override
   Widget build(BuildContext context) {
+    final stats = widget.stats;
     final duplicateCopies =
         stats.duplicateCopies > 0
             ? stats.duplicateCopies
@@ -585,22 +593,41 @@ class _StatsBar extends StatelessWidget {
             : 0;
     return Container(
       key: const Key('binder-stats-dashboard'),
-      constraints: const BoxConstraints(maxHeight: 300),
+      constraints: BoxConstraints(maxHeight: _expanded ? 300 : 136),
       padding: const EdgeInsets.fromLTRB(12, 10, 12, 8),
       color: AppTheme.surfaceElevated,
       child: SingleChildScrollView(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text(
-              'Resumo da coleção',
-              style: TextStyle(
-                color: AppTheme.textPrimary,
-                fontSize: AppTheme.fontSm,
-                fontWeight: FontWeight.w800,
-              ),
+            Row(
+              children: [
+                const Expanded(
+                  child: Text(
+                    'Resumo da coleção',
+                    style: TextStyle(
+                      color: AppTheme.textPrimary,
+                      fontSize: AppTheme.fontSm,
+                      fontWeight: FontWeight.w800,
+                    ),
+                  ),
+                ),
+                IconButton(
+                  key: const Key('binder-stats-expand-button'),
+                  tooltip:
+                      _expanded
+                          ? 'Ocultar detalhes'
+                          : 'Ver detalhes da coleção',
+                  visualDensity: VisualDensity.compact,
+                  onPressed: () => setState(() => _expanded = !_expanded),
+                  icon: Icon(
+                    _expanded ? Icons.expand_less : Icons.expand_more,
+                    color: AppTheme.textSecondary,
+                  ),
+                ),
+              ],
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: 4),
             SingleChildScrollView(
               scrollDirection: Axis.horizontal,
               child: Row(
@@ -668,26 +695,26 @@ class _StatsBar extends StatelessWidget {
                     value: '${stats.priceMissingCount}',
                     tooltip: 'Itens sem preço próprio ou de mercado',
                   ),
-                  if (onScan != null)
+                  if (widget.onScan != null)
                     _ActionIconButton(
                       key: const Key('binder-scan-card-action'),
                       icon: Icons.camera_alt,
                       tooltip: 'Escanear carta',
-                      onPressed: onScan!,
+                      onPressed: widget.onScan!,
                       color: AppTheme.frost400,
                     ),
-                  if (onAdd != null)
+                  if (widget.onAdd != null)
                     _ActionIconButton(
                       key: const Key('binder-add-card-action'),
                       icon: Icons.add,
                       tooltip: 'Adicionar carta',
-                      onPressed: onAdd!,
+                      onPressed: widget.onAdd!,
                       color: AppTheme.brass500,
                     ),
                 ],
               ),
             ),
-            if (stats.setProgress.isNotEmpty) ...[
+            if (_expanded && stats.setProgress.isNotEmpty) ...[
               const SizedBox(height: 10),
               _DashboardSection(
                 title: 'Progresso por coleção',
@@ -708,7 +735,7 @@ class _StatsBar extends StatelessWidget {
                     }).toList(),
               ),
             ],
-            if (stats.wishlist.isNotEmpty) ...[
+            if (_expanded && stats.wishlist.isNotEmpty) ...[
               const SizedBox(height: 10),
               _DashboardSection(
                 title: 'Wishlist e faltantes',
@@ -731,7 +758,7 @@ class _StatsBar extends StatelessWidget {
                     }).toList(),
               ),
             ],
-            if (stats.distributions.isNotEmpty) ...[
+            if (_expanded && stats.distributions.isNotEmpty) ...[
               const SizedBox(height: 10),
               _DistributionWrap(distributions: stats.distributions),
             ],
@@ -1143,37 +1170,48 @@ class _SearchFilterBar extends StatelessWidget {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          TextField(
-            key: const Key('binder-search-field'),
-            controller: searchController,
-            onSubmitted: (_) => onSearch(),
-            style: const TextStyle(
-              color: AppTheme.textPrimary,
-              fontSize: AppTheme.fontMd,
-            ),
-            decoration: InputDecoration(
-              hintText: 'Buscar carta...',
-              hintStyle: const TextStyle(color: AppTheme.textSecondary),
-              prefixIcon: const Icon(
-                Icons.search,
-                color: AppTheme.textSecondary,
-              ),
-              suffixIcon: IconButton(
-                tooltip: 'Limpar busca',
-                icon: const Icon(Icons.clear, color: AppTheme.textSecondary),
-                onPressed: () {
-                  searchController.clear();
-                  onSearch();
-                },
-              ),
-              filled: true,
-              fillColor: AppTheme.surfaceSlate,
-              contentPadding: const EdgeInsets.symmetric(vertical: 0),
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(AppTheme.radiusMd),
-                borderSide: BorderSide.none,
-              ),
-            ),
+          ValueListenableBuilder<TextEditingValue>(
+            valueListenable: searchController,
+            builder: (context, searchValue, _) {
+              return TextField(
+                key: const Key('binder-search-field'),
+                controller: searchController,
+                onSubmitted: (_) => onSearch(),
+                style: const TextStyle(
+                  color: AppTheme.textPrimary,
+                  fontSize: AppTheme.fontMd,
+                ),
+                decoration: InputDecoration(
+                  hintText: 'Buscar carta...',
+                  hintStyle: const TextStyle(color: AppTheme.textSecondary),
+                  prefixIcon: const Icon(
+                    Icons.search,
+                    color: AppTheme.textSecondary,
+                  ),
+                  suffixIcon:
+                      searchValue.text.isEmpty
+                          ? null
+                          : IconButton(
+                            tooltip: 'Limpar busca',
+                            icon: const Icon(
+                              Icons.clear,
+                              color: AppTheme.textSecondary,
+                            ),
+                            onPressed: () {
+                              searchController.clear();
+                              onSearch();
+                            },
+                          ),
+                  filled: true,
+                  fillColor: AppTheme.surfaceSlate,
+                  contentPadding: const EdgeInsets.symmetric(vertical: 0),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(AppTheme.radiusMd),
+                    borderSide: BorderSide.none,
+                  ),
+                ),
+              );
+            },
           ),
           const SizedBox(height: 8),
           SingleChildScrollView(
@@ -1468,11 +1506,11 @@ class _FilterDropdown extends StatelessWidget {
             fontSize: AppTheme.fontSm,
           ),
           items: [
-            const DropdownMenuItem(
+            DropdownMenuItem(
               value: null,
               child: Text(
-                'Todas',
-                style: TextStyle(color: AppTheme.textSecondary),
+                '$hint: todas',
+                style: const TextStyle(color: AppTheme.textSecondary),
               ),
             ),
             ...items.map((c) => DropdownMenuItem(value: c, child: Text(c))),

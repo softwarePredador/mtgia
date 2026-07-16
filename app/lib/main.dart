@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:ui' show PointerDeviceKind;
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -11,6 +12,7 @@ import 'core/services/push_notification_service.dart';
 import 'core/services/realtime_notification_coordinator.dart';
 import 'core/services/performance_service.dart';
 import 'core/theme/app_theme.dart';
+import 'core/widgets/debug_accessibility_tools.dart';
 import 'core/widgets/platform_unavailable_screen.dart';
 import 'features/home/home_screen.dart';
 import 'features/decks/screens/deck_list_screen.dart';
@@ -168,6 +170,16 @@ Future<void> _runStartupTask({
   }
 }
 
+class ManaLoomScrollBehavior extends MaterialScrollBehavior {
+  const ManaLoomScrollBehavior();
+
+  @override
+  Set<PointerDeviceKind> get dragDevices => {
+    ...super.dragDevices,
+    PointerDeviceKind.mouse,
+  };
+}
+
 class ManaLoomApp extends StatefulWidget {
   const ManaLoomApp({super.key});
 
@@ -175,7 +187,7 @@ class ManaLoomApp extends StatefulWidget {
   State<ManaLoomApp> createState() => _ManaLoomAppState();
 }
 
-class _ManaLoomAppState extends State<ManaLoomApp> {
+class _ManaLoomAppState extends State<ManaLoomApp> with WidgetsBindingObserver {
   late final AuthProvider _authProvider;
   late final DeckProvider _deckProvider;
   late final CardProvider _cardProvider;
@@ -190,10 +202,12 @@ class _ManaLoomAppState extends State<ManaLoomApp> {
   late final RealtimeNotificationCoordinator _realtimeCoordinator;
   late final GoRouter _router;
   bool _hadAuthenticatedSession = false;
+  Timer? _authenticatedWarmupTimer;
 
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     _authProvider = AuthProvider();
     _deckProvider = DeckProvider();
     _cardProvider = CardProvider();
@@ -554,16 +568,14 @@ class _ManaLoomAppState extends State<ManaLoomApp> {
     final status = _authProvider.status;
 
     if (_authProvider.isAuthenticated) {
+      if (_hadAuthenticatedSession) {
+        unawaited(AppObservability.instance.setUserContext(_authProvider.user));
+        return;
+      }
+
       _hadAuthenticatedSession = true;
       unawaited(AppObservability.instance.setUserContext(_authProvider.user));
-      _notificationProvider.startPolling();
-      _messageProvider.startPolling();
-      unawaited(_commercialProvider.refreshFromServer());
-
-      // Registra FCM token para push notifications
-      if (!_disableFirebaseStartup && !_disablePushInit) {
-        unawaited(PushNotificationService().requestPermissionAndRegister());
-      }
+      _scheduleAuthenticatedWarmup();
       return;
     }
 
@@ -573,6 +585,8 @@ class _ManaLoomAppState extends State<ManaLoomApp> {
     }
 
     if (status == AuthStatus.unauthenticated) {
+      _authenticatedWarmupTimer?.cancel();
+      _authenticatedWarmupTimer = null;
       unawaited(AppObservability.instance.clearUserContext());
       // Parar polling e limpar todo o estado dos providers ao deslogar
       _notificationProvider.stopPolling();
@@ -588,6 +602,42 @@ class _ManaLoomAppState extends State<ManaLoomApp> {
       _hadAuthenticatedSession = false;
 
       _clearAllProvidersState();
+    }
+  }
+
+  void _scheduleAuthenticatedWarmup() {
+    _authenticatedWarmupTimer?.cancel();
+    _authenticatedWarmupTimer = Timer(const Duration(milliseconds: 1200), () {
+      _authenticatedWarmupTimer = null;
+      if (!_authProvider.isAuthenticated || !_hadAuthenticatedSession) return;
+
+      _notificationProvider.startPolling();
+      _messageProvider.startPolling();
+      unawaited(_commercialProvider.refreshFromServer());
+
+      if (!_disableFirebaseStartup && !_disablePushInit) {
+        unawaited(PushNotificationService().requestPermissionAndRegister());
+      }
+    });
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    switch (state) {
+      case AppLifecycleState.resumed:
+        if (_authProvider.isAuthenticated && _hadAuthenticatedSession) {
+          _scheduleAuthenticatedWarmup();
+        }
+        return;
+      case AppLifecycleState.inactive:
+      case AppLifecycleState.hidden:
+      case AppLifecycleState.paused:
+      case AppLifecycleState.detached:
+        _authenticatedWarmupTimer?.cancel();
+        _authenticatedWarmupTimer = null;
+        _notificationProvider.stopPolling();
+        _messageProvider.stopPolling();
+        return;
     }
   }
 
@@ -608,7 +658,26 @@ class _ManaLoomAppState extends State<ManaLoomApp> {
 
   @override
   void dispose() {
+    _authenticatedWarmupTimer?.cancel();
+    WidgetsBinding.instance.removeObserver(this);
     _authProvider.removeListener(_onAuthChanged);
+    _notificationProvider.stopPolling();
+    _messageProvider.stopPolling();
+    final pushService = PushNotificationService();
+    pushService.onForegroundMessage = null;
+    pushService.onMessageTap = null;
+    _router.dispose();
+    _deckProvider.dispose();
+    _cardProvider.dispose();
+    _marketProvider.dispose();
+    _communityProvider.dispose();
+    _socialProvider.dispose();
+    _binderProvider.dispose();
+    _tradeProvider.dispose();
+    _messageProvider.dispose();
+    _notificationProvider.dispose();
+    _commercialProvider.dispose();
+    _authProvider.dispose();
     super.dispose();
   }
 
@@ -631,7 +700,9 @@ class _ManaLoomAppState extends State<ManaLoomApp> {
       child: MaterialApp.router(
         title: 'ManaLoom - Deck Builder',
         theme: AppTheme.darkTheme,
+        scrollBehavior: const ManaLoomScrollBehavior(),
         routerConfig: _router,
+        builder: buildManaLoomDebugAccessibilityTools,
         debugShowCheckedModeBanner: false,
       ),
     );

@@ -138,6 +138,8 @@ Future<OptimizePreviewSelection?> showOptimizationPreviewDialog(
   required Map<String, dynamic> postAnalysis,
   required Map<String, dynamic> warnings,
   required Map<String, dynamic> metaReferenceContext,
+  Map<String, dynamic> optimizationContract = const <String, dynamic>{},
+  Map<String, dynamic> battleValidation = const <String, dynamic>{},
   required List<Map<String, dynamic>> displayRemovals,
   required List<Map<String, dynamic>> displayAdditions,
   Future<void> Function()? onCopyDebug,
@@ -159,6 +161,8 @@ Future<OptimizePreviewSelection?> showOptimizationPreviewDialog(
           postAnalysis: postAnalysis,
           warnings: warnings,
           metaReferenceContext: metaReferenceContext,
+          optimizationContract: optimizationContract,
+          battleValidation: battleValidation,
           displayRemovals: displayRemovals,
           displayAdditions: displayAdditions,
           onCancel: () => Navigator.pop(ctx),
@@ -196,7 +200,7 @@ Future<void> showOptimizeNoChangesFeedback(
 void showOptimizeDebugCopiedSnackBar(BuildContext context) {
   ScaffoldMessenger.of(
     context,
-  ).showSnackBar(const SnackBar(content: Text('Debug copiado')));
+  ).showSnackBar(const SnackBar(content: Text('Dados copiados para suporte.')));
 }
 
 void showOptimizeSuccessSnackBar(BuildContext context) {
