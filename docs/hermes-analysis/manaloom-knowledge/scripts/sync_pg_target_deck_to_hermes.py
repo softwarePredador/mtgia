@@ -234,6 +234,9 @@ def normalize_battle_rules(value: Any) -> list[dict[str, Any]]:
         if not isinstance(item, dict):
             continue
         rule = dict(item)
+        review_status = str(rule.get("review_status") or "").lower()
+        if review_status in {"rejected", "deprecated"}:
+            continue
         key = str(rule.get("logical_rule_key") or logical_rule_key(rule))
         rule["logical_rule_key"] = key
         current = selected.get(key)

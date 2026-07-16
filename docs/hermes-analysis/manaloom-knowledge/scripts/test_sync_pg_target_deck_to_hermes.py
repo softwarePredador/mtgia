@@ -389,6 +389,54 @@ class SyncPgTargetDeckToHermesTests(unittest.TestCase):
         self.assertEqual(amount_one["review_status"], "verified")
         self.assertNotEqual(rules[0]["logical_rule_key"], rules[1]["logical_rule_key"])
 
+    def test_snapshot_hash_ignores_rejected_and_deprecated_rule_history(self) -> None:
+        base_card = {
+            "card_id": "00000000-0000-0000-0000-000000000001",
+            "name": "Plains // Plains",
+            "quantity": 4,
+            "is_commander": False,
+            "functional_tag": "land",
+            "functional_tags_json": ["land"],
+            "semantic_tags_v2_json": [],
+            "cmc": 0,
+            "type_line": "Basic Land - Plains",
+            "oracle_text": "{T}: Add {W}.",
+        }
+        active_rule = {
+            "logical_rule_key": "battle_rule_v1:active",
+            "rule_version": 2,
+            "source": "curated",
+            "review_status": "verified",
+            "execution_status": "auto",
+            "effect": {"effect": "land", "produces": "W"},
+            "deck_role": {"category": "ramp"},
+        }
+
+        hashes = []
+        for stale_status, stale_note in (
+            ("deprecated", "old bulk rule"),
+            ("rejected", "different historical row"),
+        ):
+            card = dict(base_card)
+            card["battle_rules_json"] = [
+                active_rule,
+                {
+                    "logical_rule_key": "battle_rule_v1:stale",
+                    "rule_version": 1,
+                    "source": "curated",
+                    "review_status": stale_status,
+                    "execution_status": "disabled",
+                    "effect": {"effect": "land"},
+                    "deck_role": {"category": "land"},
+                    "notes": stale_note,
+                },
+            ]
+            normalized = sync.normalize_snapshot_cards([card])
+            self.assertEqual(len(normalized[0]["battle_rules"]), 1)
+            hashes.append(sync.snapshot_hashes(normalized)[2])
+
+        self.assertEqual(hashes[0], hashes[1])
+
 
 if __name__ == "__main__":
     unittest.main()
