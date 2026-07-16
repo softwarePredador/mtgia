@@ -30,4 +30,15 @@ void main() {
     expect(source, contains('MANALOOM_DEPLOY_AI_DRAIN_TIMEOUT_SECONDS'));
     expect(source, contains('deploy recusado:'));
   });
+
+  test('backend deploy retries readiness during proxy convergence', () {
+    final source =
+        File('../scripts/manaloom_deploy_backend_image.sh').readAsStringSync();
+
+    expect(source, contains('MANALOOM_DEPLOY_READINESS_ATTEMPTS'));
+    expect(source, contains(r'for attempt in $(seq 1 "$readiness_attempts")'));
+    expect(source, contains('readiness ainda indisponivel apos deploy'));
+    expect(source, contains(r'sleep "$((attempt * 2))"'));
+    expect(source, contains(r'if [[ -z "$readiness_payload" ]]'));
+  });
 }

@@ -266,14 +266,30 @@ if [[ "$runtime_sha|$runtime_db_host|$runtime_db_port|$runtime_db_name|$runtime_
   exit 2
 fi
 
-readiness_payload="$(curl -fsS "$API_BASE_URL/health/ready")"
-if ! jq -e '
-  .status == "ready" and
-  .environment == "production" and
-  .checks.ai_runtime.status == "healthy" and
-  .checks.ai_runtime.provider_configured == true and
-  .checks.ai_runtime.mock_fallbacks_allowed == false
-' >/dev/null <<<"$readiness_payload"; then
+readiness_payload=""
+readiness_attempts="${MANALOOM_DEPLOY_READINESS_ATTEMPTS:-8}"
+if ! [[ "$readiness_attempts" =~ ^[1-9][0-9]*$ ]]; then
+  echo "MANALOOM_DEPLOY_READINESS_ATTEMPTS deve ser inteiro positivo" >&2
+  exit 2
+fi
+for attempt in $(seq 1 "$readiness_attempts"); do
+  if readiness_payload="$(curl -fsS "$API_BASE_URL/health/ready" 2>/dev/null)" &&
+     jq -e '
+       .status == "ready" and
+       .environment == "production" and
+       .checks.ai_runtime.status == "healthy" and
+       .checks.ai_runtime.provider_configured == true and
+       .checks.ai_runtime.mock_fallbacks_allowed == false
+     ' >/dev/null <<<"$readiness_payload"; then
+    break
+  fi
+  readiness_payload=""
+  if [[ "$attempt" -lt "$readiness_attempts" ]]; then
+    echo "readiness ainda indisponivel apos deploy; tentativa $attempt/$readiness_attempts" >&2
+    sleep "$((attempt * 2))"
+  fi
+done
+if [[ -z "$readiness_payload" ]]; then
   echo "deploy convergiu, mas o readiness de IA recusou o runtime" >&2
   exit 2
 fi
