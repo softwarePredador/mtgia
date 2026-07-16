@@ -1,15 +1,16 @@
 FROM dart:stable
 
-WORKDIR /app
+WORKDIR /app/server
 
 # Dart Frog CLI (necessário para `dart_frog build`)
 ENV PATH="$PATH:/root/.pub-cache/bin"
 RUN dart pub global activate dart_frog_cli
 
-COPY pubspec.yaml ./
-RUN dart pub get
+COPY tools/manaloom_lints /app/tools/manaloom_lints
+COPY server/pubspec.yaml server/pubspec.lock ./
+RUN dart pub get --enforce-lockfile
 
-COPY . .
+COPY server/ .
 
 # Gera o servidor de produção (build/bin/server.dart)
 RUN dart_frog build

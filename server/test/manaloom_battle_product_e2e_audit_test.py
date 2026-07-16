@@ -105,6 +105,39 @@ class ManaLoomBattleProductE2EAuditTest(unittest.TestCase):
         analyze = static_source.index("dart analyze")
         self.assertLess(pub_get, analyze)
 
+    def test_deploy_builds_include_the_local_lint_package(self) -> None:
+        backend_docker = (REPO_ROOT / "server" / "Dockerfile").read_text(
+            encoding="utf-8"
+        )
+        ops_docker = (
+            REPO_ROOT / "server" / "Dockerfile.manaloom-ops"
+        ).read_text(encoding="utf-8")
+        backend_deploy = (
+            REPO_ROOT / "scripts" / "manaloom_deploy_backend_image.sh"
+        ).read_text(encoding="utf-8")
+        ops_deploy = (
+            REPO_ROOT / "scripts" / "manaloom_deploy_ops_image.sh"
+        ).read_text(encoding="utf-8")
+
+        for dockerfile in (backend_docker, ops_docker):
+            self.assertIn(
+                "COPY tools/manaloom_lints /app/tools/manaloom_lints",
+                dockerfile,
+            )
+            self.assertIn("server/pubspec.lock", dockerfile)
+            self.assertIn("dart pub get --enforce-lockfile", dockerfile)
+
+        self.assertIn(
+            "git archive HEAD server tools/manaloom_lints",
+            backend_deploy,
+        )
+        self.assertIn("-f server/Dockerfile", backend_deploy)
+        self.assertIn(
+            "git archive HEAD server docs/hermes-analysis/manaloom-knowledge "
+            "tools/manaloom_lints",
+            ops_deploy,
+        )
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -74,11 +74,13 @@ reinicia a imagem já pinada no Docker Swarm; isso não reconstrói o código do
 Fluxo correto para publicar backend nesse servidor:
 
 1. Confirmar que `HEAD == origin/master` no checkout local.
-2. Enviar apenas a árvore commitada de `server/` para o servidor:
-   `git archive HEAD:server`.
+2. Enviar o contexto mínimo commitado do backend e de suas dependências locais:
+   `git archive HEAD server tools/manaloom_lints`.
 3. No servidor, construir e publicar no registry local:
-   `docker build -t localhost:5000/manaloom/cartinhas:<sha-curto> -t localhost:5000/manaloom/cartinhas:latest .`
+   `docker build -f server/Dockerfile -t localhost:5000/manaloom/cartinhas:<sha-curto> -t localhost:5000/manaloom/cartinhas:latest .`
    e `docker push` das duas tags.
+   O Dockerfile copia `server/pubspec.lock` e `tools/manaloom_lints` antes de
+   executar `dart pub get --enforce-lockfile`.
 4. Atualizar o service Swarm com update `stop-first`, porque a porta host
    `18080` impede start-first/zero-downtime em nó único:
    `docker service update --update-order stop-first --image localhost:5000/manaloom/cartinhas:latest ... evolution_cartinhas`.

@@ -14,8 +14,9 @@ RUN apt-get update \
     util-linux \
   && rm -rf /var/lib/apt/lists/*
 
-COPY server/pubspec.yaml ./pubspec.yaml
-RUN dart pub get
+COPY tools/manaloom_lints /app/tools/manaloom_lints
+COPY server/pubspec.yaml server/pubspec.lock ./
+RUN dart pub get --enforce-lockfile
 
 COPY . /app
 

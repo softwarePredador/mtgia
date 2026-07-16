@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-ROOT_DIR="$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)"
+ROOT_DIR="$(CDPATH='' cd -- "$(dirname -- "$0")/.." && pwd)"
 ENV_FILE="${MANALOOM_NEW_SERVER_ENV:-$ROOT_DIR/server/.env}"
 
 if [[ ! -f "$ENV_FILE" ]]; then
@@ -98,13 +98,19 @@ if [[ "$runtime_db_target" != "$EXPECTED_DB_HOST|$EXPECTED_DB_PORT|$EXPECTED_DB_
   exit 2
 fi
 
-git archive HEAD:server | ssh -o BatchMode=yes -o StrictHostKeyChecking=accept-new -i "$SSH_KEY" "$SSH_HOST" \
+git archive HEAD server tools/manaloom_lints | ssh -o BatchMode=yes -o StrictHostKeyChecking=accept-new -i "$SSH_KEY" "$SSH_HOST" \
   "rm -rf '$remote_dir' && mkdir -p '$remote_dir' && tar -x -C '$remote_dir'"
 
+# Local deploy values are embedded; remote values are escaped.
+# shellcheck disable=SC2087
 ssh -o BatchMode=yes -o StrictHostKeyChecking=accept-new -i "$SSH_KEY" "$SSH_HOST" <<REMOTE
 set -euo pipefail
 cd '$remote_dir'
-docker build -t '$IMAGE_REPO:$short_sha' -t '$IMAGE_REPO:latest' .
+docker build \
+  -f server/Dockerfile \
+  -t '$IMAGE_REPO:$short_sha' \
+  -t '$IMAGE_REPO:latest' \
+  .
 docker push '$IMAGE_REPO:$short_sha'
 docker push '$IMAGE_REPO:latest'
 docker service update \
