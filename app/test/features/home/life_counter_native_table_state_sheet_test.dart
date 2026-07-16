@@ -54,9 +54,7 @@ void main() {
     expect(find.text('Table State'), findsOneWidget);
 
     await tester.tap(
-      find.byKey(
-        const Key('life-counter-native-table-state-monarch-player-0'),
-      ),
+      find.byKey(const Key('life-counter-native-table-state-monarch-player-0')),
     );
     await tester.pumpAndSettle();
 
@@ -116,13 +114,16 @@ void main() {
     ).copyWith(
       lives: const [40, 40, 0, 40],
       poison: const [0, 0, 0, 0],
+      playerEliminationReasons: const [
+        LifeCounterPlayerEliminationReason.none,
+        LifeCounterPlayerEliminationReason.none,
+        LifeCounterPlayerEliminationReason.life,
+        LifeCounterPlayerEliminationReason.none,
+      ],
     );
 
     await tester.pumpWidget(
-      _Host(
-        initialSession: session,
-        onResult: (value) => result = value,
-      ),
+      _Host(initialSession: session, onResult: (value) => result = value),
     );
 
     await tester.tap(find.text('Open'));
@@ -132,16 +133,12 @@ void main() {
     expect(find.text('Player 3 (out)'), findsWidgets);
 
     await tester.tap(
-      find.byKey(
-        const Key('life-counter-native-table-state-monarch-player-0'),
-      ),
+      find.byKey(const Key('life-counter-native-table-state-monarch-player-0')),
     );
     await tester.pumpAndSettle();
 
     await tester.tap(
-      find.byKey(
-        const Key('life-counter-native-table-state-monarch-player-1'),
-      ),
+      find.byKey(const Key('life-counter-native-table-state-monarch-player-1')),
       warnIfMissed: false,
     );
     await tester.pumpAndSettle();

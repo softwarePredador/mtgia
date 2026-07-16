@@ -2,11 +2,11 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:crypto/crypto.dart';
-import 'package:dotenv/dotenv.dart';
 import 'package:http/http.dart' as http;
 import 'package:postgres/postgres.dart';
 
 import '../lib/database.dart';
+import '../lib/runtime_environment.dart';
 
 /// Sincroniza as Comprehensive Rules (Wizards) para a tabela `rules`.
 ///
@@ -60,12 +60,8 @@ Opções:
 
   validateRulesSyncArguments(args);
   final checkOnly = args.contains('--check');
-  final env = DotEnv(includePlatformEnvironment: true, quiet: true)..load();
-  final environment =
-      (env['ENVIRONMENT'] ??
-              Platform.environment['ENVIRONMENT'] ??
-              'development')
-          .toLowerCase();
+  final env = loadRuntimeEnvironment();
+  final environment = (env['ENVIRONMENT'] ?? 'development').toLowerCase();
   final force = args.contains('--force') || args.contains('-f');
   final fromFile = _parseFromFile(args);
   final sourceUrlOverride = _readArg(args, '--source-url=');

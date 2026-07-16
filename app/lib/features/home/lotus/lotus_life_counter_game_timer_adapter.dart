@@ -23,11 +23,16 @@ class LotusLifeCounterGameTimerAdapter {
       }
 
       final payload = decoded.cast<String, dynamic>();
-      return LifeCounterGameTimerState(
-        startTimeEpochMs: (payload['startTime'] as num?)?.toInt(),
-        isPaused: payload['isPaused'] == true,
-        pausedTimeEpochMs: (payload['pausedTime'] as num?)?.toInt(),
-      );
+      final isPaused = payload['isPaused'] == true;
+      return LifeCounterGameTimerState.tryFromJson(<String, dynamic>{
+        'start_time_epoch_ms': (payload['startTime'] as num?)?.toInt(),
+        'is_paused': isPaused,
+        // Lotus represents a running timer with pausedTime: 0. Canonical state
+        // uses null while running, otherwise the persisted state is internally
+        // inconsistent and is rejected on the next store load.
+        'paused_time_epoch_ms':
+            isPaused ? (payload['pausedTime'] as num?)?.toInt() : null,
+      });
     } catch (_) {
       return null;
     }

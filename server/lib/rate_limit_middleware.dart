@@ -1,10 +1,10 @@
 import 'dart:io';
 import 'package:dart_frog/dart_frog.dart';
-import 'package:dotenv/dotenv.dart';
 import 'package:postgres/postgres.dart';
 
 import 'distributed_rate_limiter.dart';
 import 'internal_ai_request_token.dart';
+import 'runtime_environment.dart';
 
 /// Rate Limiter Middleware para prevenir abuso de endpoints
 ///
@@ -69,12 +69,13 @@ class RateLimiter {
       return value.trim();
     }
 
-    final fingerprintParts = [
-      headers['User-Agent']?.trim() ?? '',
-      headers['Accept-Language']?.trim() ?? '',
-      headers['Sec-CH-UA']?.trim() ?? '',
-      headers['Host']?.trim() ?? '',
-    ].where((value) => value.isNotEmpty).toList();
+    final fingerprintParts =
+        [
+          headers['User-Agent']?.trim() ?? '',
+          headers['Accept-Language']?.trim() ?? '',
+          headers['Sec-CH-UA']?.trim() ?? '',
+          headers['Host']?.trim() ?? '',
+        ].where((value) => value.isNotEmpty).toList();
 
     if (fingerprintParts.isEmpty) {
       return 'anonymous';
@@ -89,8 +90,9 @@ class RateLimiter {
 
     // Limpar requisições antigas da janela
     if (_requestLog.containsKey(clientId)) {
-      _requestLog[clientId]!
-          .removeWhere((timestamp) => timestamp.isBefore(windowStart));
+      _requestLog[clientId]!.removeWhere(
+        (timestamp) => timestamp.isBefore(windowStart),
+      );
     } else {
       _requestLog[clientId] = [];
     }
@@ -106,8 +108,9 @@ class RateLimiter {
   }
 
   void cleanup() {
-    final cutoff =
-        DateTime.now().subtract(Duration(seconds: windowSeconds * 2));
+    final cutoff = DateTime.now().subtract(
+      Duration(seconds: windowSeconds * 2),
+    );
     _requestLog.removeWhere((_, timestamps) {
       timestamps.removeWhere((t) => t.isBefore(cutoff));
       return timestamps.isEmpty;
@@ -124,6 +127,7 @@ Map<String, dynamic> buildRateLimitResponseBody({
   required String message,
   required int retryAfterSeconds,
   required String bucket,
+  String scope = 'client',
   String? backend,
 }) {
   return {
@@ -133,9 +137,20 @@ Map<String, dynamic> buildRateLimitResponseBody({
     'retry_after_seconds': retryAfterSeconds,
     'retry_after_ms': retryAfterSeconds * 1000,
     'rate_limit_bucket': bucket,
-    'rate_limit_scope': 'client',
+    'rate_limit_scope': scope,
     if (backend != null) 'rate_limit_backend': backend,
   };
+}
+
+String buildAiRateLimitIdentifier({
+  required String? userId,
+  required Map<String, String> headers,
+}) {
+  final normalizedUserId = userId?.trim();
+  if (normalizedUserId != null && normalizedUserId.isNotEmpty) {
+    return 'user:$normalizedUserId';
+  }
+  return RateLimiter.buildClientIdentifierFromHeaders(headers);
 }
 
 Map<String, String> buildRateLimitHeaders({
@@ -169,27 +184,24 @@ final _aiRateLimiter = RateLimiter(
   windowSeconds: 60, // 10 requisições por minuto (IA é custosa)
 );
 
-final _aiRateLimiterDev = RateLimiter(
-  maxRequests: 60,
+final _aiRateLimiterDev = RateLimiter(maxRequests: 60, windowSeconds: 60);
+
+final _aiPollingRateLimiter = RateLimiter(maxRequests: 120, windowSeconds: 60);
+
+final _aiPollingRateLimiterDev = RateLimiter(
+  maxRequests: 600,
   windowSeconds: 60,
 );
 
 bool _isProduction() {
-  final env = DotEnv(includePlatformEnvironment: true, quiet: true)..load();
-  final mode = (env['ENVIRONMENT'] ??
-          Platform.environment['ENVIRONMENT'] ??
-          'development')
-      .toLowerCase();
+  final env = loadRuntimeEnvironment();
+  final mode = (env['ENVIRONMENT'] ?? 'development').toLowerCase();
   return mode == 'production';
 }
 
 bool _useDistributedRateLimitInProd() {
-  final env = DotEnv(includePlatformEnvironment: true, quiet: true)..load();
-  final raw = (env['RATE_LIMIT_DISTRIBUTED'] ??
-          Platform.environment['RATE_LIMIT_DISTRIBUTED'] ??
-          'true')
-      .toLowerCase()
-      .trim();
+  final env = loadRuntimeEnvironment();
+  final raw = (env['RATE_LIMIT_DISTRIBUTED'] ?? 'true').toLowerCase().trim();
   return raw == '1' || raw == 'true' || raw == 'yes';
 }
 
@@ -337,19 +349,49 @@ Middleware authRateLimit() {
 }
 
 /// Middleware específico para rotas de IA (controla custos)
-Middleware aiRateLimit() {
+Middleware aiRateLimit() => _aiRateLimit(
+  productionLimiter: _aiRateLimiter,
+  developmentLimiter: _aiRateLimiterDev,
+  bucket: 'ai',
+  message: 'Você atingiu o limite de requisições de IA. Aguarde 1 minuto.',
+);
+
+/// Polling is frequent by design, but remains bounded per authenticated user.
+Middleware aiPollingRateLimit() => _aiRateLimit(
+  productionLimiter: _aiPollingRateLimiter,
+  developmentLimiter: _aiPollingRateLimiterDev,
+  bucket: 'ai-poll',
+  message: 'Muitas atualizações em sequência. Aguarde alguns segundos.',
+);
+
+Middleware _aiRateLimit({
+  required RateLimiter productionLimiter,
+  required RateLimiter developmentLimiter,
+  required String bucket,
+  required String message,
+}) {
   return (handler) {
     return (context) async {
       if (InternalAiRequestToken.matches(context.request.headers)) {
         return handler(context);
       }
 
-      final limiter = _isProduction() ? _aiRateLimiter : _aiRateLimiterDev;
-      final clientId = RateLimiter._defaultIdentifier(context);
+      final limiter = _isProduction() ? productionLimiter : developmentLimiter;
+      String? userId;
+      try {
+        userId = context.read<String>();
+      } catch (_) {
+        userId = null;
+      }
+      final clientId = buildAiRateLimitIdentifier(
+        userId: userId,
+        headers: context.request.headers,
+      );
+      final rateLimitScope = clientId.startsWith('user:') ? 'user' : 'client';
 
       final distributedAllowed = await _isAllowedDistributedIfAvailable(
         context,
-        bucket: 'ai',
+        bucket: bucket,
         clientId: clientId,
         maxRequests: limiter.maxRequests,
         windowSeconds: limiter.windowSeconds,
@@ -360,10 +402,10 @@ Middleware aiRateLimit() {
           statusCode: HttpStatus.tooManyRequests,
           body: buildRateLimitResponseBody(
             error: 'Too Many AI Requests',
-            message:
-                'Você atingiu o limite de requisições de IA. Aguarde 1 minuto.',
+            message: message,
             retryAfterSeconds: 60,
-            bucket: 'ai',
+            bucket: bucket,
+            scope: rateLimitScope,
             backend: 'distributed',
           ),
           headers: buildRateLimitHeaders(
@@ -383,10 +425,10 @@ Middleware aiRateLimit() {
           statusCode: HttpStatus.tooManyRequests,
           body: buildRateLimitResponseBody(
             error: 'Too Many AI Requests',
-            message:
-                'Você atingiu o limite de requisições de IA. Aguarde 1 minuto.',
+            message: message,
             retryAfterSeconds: 60,
-            bucket: 'ai',
+            bucket: bucket,
+            scope: rateLimitScope,
             backend: 'in_memory_fallback',
           ),
           headers: buildRateLimitHeaders(

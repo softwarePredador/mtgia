@@ -196,6 +196,20 @@ void main() {
       expect(timerDomState['paused'], isFalse);
       expect((timerDomState['text'] as String).isNotEmpty, isTrue);
 
+      await tester.pump(const Duration(seconds: 2));
+      final advancedTimerDomState = await _readTimerDomState(
+        tester,
+        snapshotStore,
+        state,
+      );
+      expect(advancedTimerDomState['present'], isTrue);
+      expect(advancedTimerDomState['paused'], isFalse);
+      expect(
+        advancedTimerDomState['text'],
+        isNot(timerDomState['text']),
+        reason: 'A running game timer must advance on the live WebView.',
+      );
+
       final rawSnapshot = await snapshotStore.load();
       expect(rawSnapshot, isNotNull);
       expect(rawSnapshot!.values['gameTimerState'], isNotNull);

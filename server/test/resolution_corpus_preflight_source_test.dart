@@ -31,7 +31,9 @@ void main() {
         expect(approval, greaterThanOrEqualTo(0));
         expect(approval, lessThan(registration));
         expect(
-          mainSource.indexOf('_ensureServerIsReachable(apiBaseUrl)'),
+          mainSource.indexOf(
+            'final serverOk = await _ensureServerIsReachable(',
+          ),
           greaterThan(approval),
         );
         expect(source, contains('MANALOOM_CONFIRM_POSTGRES_WRITES'));
@@ -117,6 +119,10 @@ void main() {
         ),
       );
       expect(source, contains(r'VALIDATION_RUN_TOKEN="$RUN_TOKEN"'));
+      expect(source, contains('VALIDATION_DEFER_CLEANUP_TO_HARNESS=1'));
+      expect(source, contains('RATE_LIMIT_DISTRIBUTED=false'));
+      expect(source, contains('MANALOOM_E2E_ISOLATED_RUNTIME=1'));
+      expect(source, contains('payload.get("e2e_isolated_runtime")'));
       expect(source, contains("POSITION(:'validation_run_token' IN name)"));
       expect(source, contains('mock_responses != 0'));
       expect(source, contains('mock_non_actionable != 0'));
@@ -159,13 +165,19 @@ void main() {
         expect(registration, greaterThan(cleanupArmed));
         expect(cleanup, greaterThan(registration));
         expect(close, greaterThan(cleanup));
+        expect(mainSource, contains('if (deferCleanupToHarness)'));
+        expect(mainSource, contains('} else {'));
+        expect(mainSource, contains("'cleanup_owner': deferCleanupToHarness"));
         expect(mainSource, isNot(contains('if (authSession != null)')));
-        expect(
-          source,
-          contains('LOWER(email) = @email AND LOWER(username) = @username'),
-        );
+        expect(source, contains('LOWER(email) = LOWER(@email)'));
+        expect(source, contains('LOWER(username) = LOWER(@username)'));
         expect(source, contains("payload['status'] == 'ready'"));
         expect(source, contains("payload['service'] == 'mtgia-server'"));
+        expect(source, contains("payload['e2e_isolated_runtime'] == true"));
+        expect(
+          source,
+          contains("e2eValidation['product_learning_writes_suppressed']"),
+        );
         expect(
           source,
           contains(
@@ -230,7 +242,7 @@ void main() {
       },
     );
 
-    test('persistent telemetry is measured and never deleted by the gate', () {
+    test('persistent telemetry is measured and exact E2E rows are cleaned', () {
       final source =
           File(
             '../scripts/quality_gate_resolution_corpus.sh',
@@ -248,13 +260,29 @@ void main() {
       expect(source, contains('rows_created_in_window'));
       expect(source, contains('"measurement_scope"'));
       expect(source, contains('"limitation"'));
-      expect(source, contains('ON CONFLICT updates'));
-      expect(source, contains('"telemetry_deleted": False'));
+      expect(source, contains('exact validation-owned cleanup'));
+      expect(source, contains('"telemetry_deleted": cleanup_ok == "1"'));
+      expect(source, contains('manaloom_validation_user_ids'));
+      expect(source, contains('manaloom_validation_deck_ids'));
+      expect(source, contains("decisions_reasoning->>'validation_run_token'"));
+      expect(source, contains('manaloom_validation_context'));
+      expect(source, contains('SELECT run_started_at'));
+      expect(source, contains(r'DO $telemetry_postcheck$'));
+      expect(source, contains("'postcheck_passed', true"));
+      expect(source, contains('RAISE EXCEPTION'));
+      expect(source, contains('deck_learning_events'));
+      expect(source, contains('ai_optimize_jobs'));
+      expect(source, contains('commander_card_usage'));
+      expect(source, contains('manaloom_validation_usage_adjustments'));
+      expect(source, contains('UPDATE commander_card_usage'));
+      expect(source, contains('DELETE FROM commander_card_usage'));
+      expect(source, contains('ml_prompt_feedback_delta'));
+      expect(source, contains('"learning_write_guard"'));
       for (final table in telemetryTables) {
         expect(source, contains("'$table'"), reason: table);
         expect(
           source.toUpperCase(),
-          isNot(contains('DELETE FROM ${table.toUpperCase()}')),
+          contains('DELETE FROM ${table.toUpperCase()}'),
           reason: table,
         );
       }
@@ -684,10 +712,9 @@ void main() {
       );
       expect(
         runSource,
-        contains(
-          "'query_scope': 'ai_logs deck_id + endpoint optimize + run window'",
-        ),
+        contains("'ai_logs deck_id + endpoint provider:optimize + run window'"),
       );
+      expect(source, contains("AND endpoint = 'provider:optimize'"));
       expect(
         runSource,
         contains(

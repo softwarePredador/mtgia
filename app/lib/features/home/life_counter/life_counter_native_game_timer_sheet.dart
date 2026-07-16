@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 
 import '../../../core/theme/app_theme.dart';
@@ -39,6 +41,7 @@ class _LifeCounterNativeGameTimerSheet extends StatefulWidget {
 class _LifeCounterNativeGameTimerSheetState
     extends State<_LifeCounterNativeGameTimerSheet> {
   late LifeCounterGameTimerState _draftState;
+  Timer? _ticker;
 
   bool get _isActive => _draftState.isActive;
   bool get _isPaused => _draftState.isPaused;
@@ -49,6 +52,34 @@ class _LifeCounterNativeGameTimerSheetState
   void initState() {
     super.initState();
     _draftState = widget.initialState;
+    _syncTicker();
+  }
+
+  @override
+  void dispose() {
+    _ticker?.cancel();
+    super.dispose();
+  }
+
+  void _syncTicker() {
+    _ticker?.cancel();
+    _ticker = null;
+    if (!_isActive || _isPaused) {
+      return;
+    }
+
+    _ticker = Timer.periodic(const Duration(seconds: 1), (_) {
+      if (mounted) {
+        setState(() {});
+      }
+    });
+  }
+
+  void _updateDraftState(LifeCounterGameTimerState nextState) {
+    setState(() {
+      _draftState = nextState;
+      _syncTicker();
+    });
   }
 
   @override
@@ -97,7 +128,7 @@ class _LifeCounterNativeGameTimerSheetState
                             ),
                             SizedBox(height: 6),
                             Text(
-                              'ManaLoom owns the timer shell while the Lotus tabletop stays visually identical.',
+                              'Track elapsed game time, manage breaks, and keep every match moving at the table.',
                               style: TextStyle(
                                 color: AppTheme.textSecondary,
                                 fontSize: AppTheme.fontMd,
@@ -122,9 +153,9 @@ class _LifeCounterNativeGameTimerSheetState
                     padding: const EdgeInsets.fromLTRB(20, 18, 20, 12),
                     children: [
                       _SectionCard(
-                        title: 'Current Timer State',
+                        title: 'Timer',
                         subtitle:
-                            'Preview of the timer state that will be pushed back into the tabletop.',
+                            'Review elapsed time and timer status before applying your changes.',
                         child: Wrap(
                           spacing: 10,
                           runSpacing: 10,
@@ -148,7 +179,7 @@ class _LifeCounterNativeGameTimerSheetState
                         title: 'Actions',
                         subtitle:
                             _isActive
-                                ? 'Pause, resume or reset the table timer before applying it back to Lotus.'
+                                ? 'Pause, resume, or reset the timer whenever the game needs a break.'
                                 : 'Start a new game timer from zero.',
                         child: Wrap(
                           spacing: 10,
@@ -160,12 +191,11 @@ class _LifeCounterNativeGameTimerSheetState
                                   'life-counter-native-game-timer-start',
                                 ),
                                 onPressed: () {
-                                  setState(() {
-                                    _draftState =
-                                        LifeCounterGameTimerEngine.start(
-                                          nowEpochMs: _nowEpochMs,
-                                        );
-                                  });
+                                  _updateDraftState(
+                                    LifeCounterGameTimerEngine.start(
+                                      nowEpochMs: _nowEpochMs,
+                                    ),
+                                  );
                                 },
                                 icon: const Icon(Icons.play_arrow_rounded),
                                 label: const Text('Start'),
@@ -176,13 +206,12 @@ class _LifeCounterNativeGameTimerSheetState
                                   'life-counter-native-game-timer-pause',
                                 ),
                                 onPressed: () {
-                                  setState(() {
-                                    _draftState =
-                                        LifeCounterGameTimerEngine.pause(
-                                          _draftState,
-                                          nowEpochMs: _nowEpochMs,
-                                        );
-                                  });
+                                  _updateDraftState(
+                                    LifeCounterGameTimerEngine.pause(
+                                      _draftState,
+                                      nowEpochMs: _nowEpochMs,
+                                    ),
+                                  );
                                 },
                                 icon: const Icon(Icons.pause_rounded),
                                 label: const Text('Pause'),
@@ -193,13 +222,12 @@ class _LifeCounterNativeGameTimerSheetState
                                   'life-counter-native-game-timer-resume',
                                 ),
                                 onPressed: () {
-                                  setState(() {
-                                    _draftState =
-                                        LifeCounterGameTimerEngine.resume(
-                                          _draftState,
-                                          nowEpochMs: _nowEpochMs,
-                                        );
-                                  });
+                                  _updateDraftState(
+                                    LifeCounterGameTimerEngine.resume(
+                                      _draftState,
+                                      nowEpochMs: _nowEpochMs,
+                                    ),
+                                  );
                                 },
                                 icon: const Icon(Icons.play_arrow_rounded),
                                 label: const Text('Resume'),
@@ -210,10 +238,9 @@ class _LifeCounterNativeGameTimerSheetState
                                   'life-counter-native-game-timer-reset',
                                 ),
                                 onPressed: () {
-                                  setState(() {
-                                    _draftState =
-                                        LifeCounterGameTimerEngine.reset();
-                                  });
+                                  _updateDraftState(
+                                    LifeCounterGameTimerEngine.reset(),
+                                  );
                                 },
                                 icon: const Icon(Icons.restart_alt_rounded),
                                 label: const Text('Reset'),

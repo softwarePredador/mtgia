@@ -166,6 +166,11 @@ class LifeCounterTurnTrackerEngine {
       return session.copyWith(
         clearCurrentTurnPlayerIndex: true,
         clearFirstPlayerIndex: true,
+        currentTurnNumber: 1,
+        turnTrackerActive: false,
+        turnTrackerOngoingGame: false,
+        turnTimerActive: false,
+        turnTimerSeconds: 0,
       );
     }
 

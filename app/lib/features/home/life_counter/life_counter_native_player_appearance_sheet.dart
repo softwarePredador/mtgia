@@ -106,6 +106,7 @@ class _LifeCounterNativePlayerAppearanceSheetState
   late TextEditingController _customBackgroundController;
   late TextEditingController _profileNameController;
   late LifeCounterPlayerAppearance _appearance;
+  late List<LifeCounterPlayerAppearance> _draftAppearances;
   late List<LifeCounterPlayerAppearanceProfile> _profiles;
   String? _backgroundError;
   String? _profileError;
@@ -119,7 +120,7 @@ class _LifeCounterNativePlayerAppearanceSheetState
 
   LifeCounterSession get _draftSession {
     final playerAppearances = List<LifeCounterPlayerAppearance>.from(
-      widget.initialSession.resolvedPlayerAppearances,
+      _draftAppearances,
     );
     playerAppearances[_targetPlayerIndex] = _draftAppearance;
 
@@ -136,6 +137,9 @@ class _LifeCounterNativePlayerAppearanceSheetState
     _nicknameController = TextEditingController();
     _customBackgroundController = TextEditingController();
     _profileNameController = TextEditingController();
+    _draftAppearances = List<LifeCounterPlayerAppearance>.from(
+      widget.initialSession.resolvedPlayerAppearances,
+    );
     _profiles = List<LifeCounterPlayerAppearanceProfile>.from(
       widget.initialProfiles,
     );
@@ -151,8 +155,7 @@ class _LifeCounterNativePlayerAppearanceSheetState
   }
 
   void _syncFromTarget() {
-    _appearance =
-        widget.initialSession.resolvedPlayerAppearances[_targetPlayerIndex];
+    _appearance = _draftAppearances[_targetPlayerIndex];
     _nicknameController.text = _appearance.nickname;
     _customBackgroundController.text = _appearance.background;
     _backgroundError = null;
@@ -161,6 +164,7 @@ class _LifeCounterNativePlayerAppearanceSheetState
 
   void _changeTarget(int playerIndex) {
     setState(() {
+      _draftAppearances[_targetPlayerIndex] = _draftAppearance;
       _targetPlayerIndex = playerIndex;
       _syncFromTarget();
     });
@@ -240,8 +244,10 @@ class _LifeCounterNativePlayerAppearanceSheetState
     }
 
     setState(() {
-      _appearance =
-          importedSession.resolvedPlayerAppearances[_targetPlayerIndex];
+      _draftAppearances = List<LifeCounterPlayerAppearance>.from(
+        importedSession.resolvedPlayerAppearances,
+      );
+      _appearance = _draftAppearances[_targetPlayerIndex];
       _nicknameController.text = _appearance.nickname;
       _customBackgroundController.text = _appearance.background;
       _backgroundError = null;
@@ -251,7 +257,7 @@ class _LifeCounterNativePlayerAppearanceSheetState
       ?..hideCurrentSnackBar()
       ..showSnackBar(
         const SnackBar(
-          content: Text('Player appearance imported into ManaLoom.'),
+          content: Text('Player appearance imported.'),
           behavior: SnackBarBehavior.floating,
         ),
       );
@@ -354,8 +360,7 @@ class _LifeCounterNativePlayerAppearanceSheetState
   Widget _buildProfilesSection() {
     return _SectionCard(
       title: 'Profiles',
-      subtitle:
-          'Save reusable player appearance presets under ManaLoom ownership.',
+      subtitle: 'Save this appearance to reuse in future games.',
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -469,7 +474,7 @@ class _LifeCounterNativePlayerAppearanceSheetState
                             ),
                             SizedBox(height: 6),
                             Text(
-                              'ManaLoom owns player background identity while the tabletop stays visually identical.',
+                              'Customize names and backgrounds for each player.',
                               style: TextStyle(
                                 color: AppTheme.textSecondary,
                                 fontSize: AppTheme.fontMd,
@@ -521,13 +526,13 @@ class _LifeCounterNativePlayerAppearanceSheetState
                       const SizedBox(height: 18),
                       _SectionCard(
                         title: 'Nickname',
-                        subtitle:
-                            'Keep the Lotus nickname field under the canonical player contract.',
+                        subtitle: 'Set an optional name for this player.',
                         child: TextField(
                           key: const Key(
                             'life-counter-native-player-appearance-nickname',
                           ),
                           controller: _nicknameController,
+                          onChanged: (_) => setState(() {}),
                           decoration: const InputDecoration(
                             labelText: 'Nickname',
                             hintText: 'Optional player label',
@@ -542,7 +547,7 @@ class _LifeCounterNativePlayerAppearanceSheetState
                       _SectionCard(
                         title: 'Background',
                         subtitle:
-                            '$playerLabel keeps the same tabletop card, but the owned shell now decides the player background payload.',
+                            '$playerLabel: choose a preset or enter a custom color.',
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
@@ -616,7 +621,7 @@ class _LifeCounterNativePlayerAppearanceSheetState
                       _SectionCard(
                         title: 'Background Images',
                         subtitle:
-                            'Image upload still lives in the Lotus runtime for now, but ManaLoom already owns whether those references survive.',
+                            'Review or clear the images already set for this player.',
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
@@ -721,7 +726,7 @@ Future<LifeCounterSession?> _showPlayerAppearanceImportDialog(
           minLines: 6,
           style: const TextStyle(color: AppTheme.textPrimary),
           decoration: const InputDecoration(
-            hintText: 'Paste a ManaLoom player appearance export payload',
+            hintText: 'Paste a player appearance export',
           ),
         ),
         actions: [
@@ -831,6 +836,9 @@ class _BackgroundPreview extends StatelessWidget {
         children: [
           Text(
             nickname.isEmpty ? 'Preview' : nickname,
+            key: const Key(
+              'life-counter-native-player-appearance-preview-nickname',
+            ),
             style: TextStyle(
               color: foreground,
               fontSize: AppTheme.fontXxl,
@@ -1061,7 +1069,7 @@ class _ImageStatusRow extends StatelessWidget {
               ),
               const SizedBox(height: 4),
               Text(
-                hasValue ? 'Reference preserved' : 'No reference saved',
+                hasValue ? 'Image kept' : 'No image saved',
                 style: const TextStyle(
                   color: AppTheme.textSecondary,
                   fontSize: AppTheme.fontSm,

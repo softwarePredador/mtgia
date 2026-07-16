@@ -39,6 +39,9 @@ class CommercialProvider extends ChangeNotifier {
 
   SharedPreferences? _preferences;
   Future<void>? _loadFuture;
+  Future<void>? _remoteRefreshFuture;
+  Future<void>? _sessionResetFuture;
+  int _remoteRefreshGeneration = 0;
   bool _isLoaded = false;
   bool _isRemoteSynced = false;
   bool _isRefreshingRemote = false;
@@ -85,15 +88,34 @@ class CommercialProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> refreshFromServer() async {
+  Future<void> refreshFromServer() {
+    final reset = _sessionResetFuture;
+    if (reset != null) {
+      return reset.then((_) => refreshFromServer());
+    }
+    final existing = _remoteRefreshFuture;
+    if (existing != null) return existing;
+
+    final generation = _remoteRefreshGeneration;
+    final refresh = _refreshFromServer(generation);
+    _remoteRefreshFuture = refresh;
+    return refresh.whenComplete(() {
+      if (identical(_remoteRefreshFuture, refresh)) {
+        _remoteRefreshFuture = null;
+      }
+    });
+  }
+
+  Future<void> _refreshFromServer(int generation) async {
     await load();
-    if (_isRefreshingRemote) return;
+    if (generation != _remoteRefreshGeneration) return;
     _isRefreshingRemote = true;
     _lastRemoteError = null;
     notifyListeners();
 
     try {
       final response = await _apiClient.get('/users/me/plan');
+      if (generation != _remoteRefreshGeneration) return;
       if (response.statusCode == 200 && response.data is Map<String, dynamic>) {
         final payload = response.data as Map<String, dynamic>;
         final planPayload = payload['plan'];
@@ -101,20 +123,26 @@ class CommercialProvider extends ChangeNotifier {
           await _applyRemotePlan(planPayload);
           _isRemoteSynced = true;
           _lastRemoteError = null;
+        } else {
+          _isRemoteSynced = false;
+          _lastRemoteError = 'O servidor retornou um plano inválido.';
         }
       } else if (response.statusCode == 401 || response.statusCode == 403) {
         _isRemoteSynced = false;
       } else {
         _isRemoteSynced = false;
-        _lastRemoteError = 'Falha ao carregar plano (${response.statusCode}).';
+        _lastRemoteError = 'Não foi possível sincronizar o plano agora.';
       }
     } catch (error) {
+      if (generation != _remoteRefreshGeneration) return;
       _isRemoteSynced = false;
       _lastRemoteError = 'Plano remoto indisponível.';
       debugPrint('[CommercialProvider] refreshFromServer failed: $error');
     } finally {
-      _isRefreshingRemote = false;
-      notifyListeners();
+      if (generation == _remoteRefreshGeneration) {
+        _isRefreshingRemote = false;
+        notifyListeners();
+      }
     }
   }
 
@@ -126,18 +154,6 @@ class CommercialProvider extends ChangeNotifier {
     await _saveUsage();
     notifyListeners();
     return true;
-  }
-
-  Future<void> setPlan(ManaLoomPlanTier tier) async {
-    await load();
-    if (_tier == tier) return;
-    _tier = tier;
-    _monthlyAiLimitOverride = null;
-    _isRemoteSynced = false;
-    final prefs = _preferences ?? await _preferencesLoader();
-    await prefs.setString(_planKey, tier.id);
-    await _rolloverIfNeeded();
-    notifyListeners();
   }
 
   Future<CommercialCheckoutResult> startProCheckout() async {
@@ -187,20 +203,33 @@ class CommercialProvider extends ChangeNotifier {
     }
   }
 
-  Future<void> clearRemoteSnapshot() async {
+  Future<void> clearRemoteSnapshot() {
+    _remoteRefreshGeneration += 1;
+    _remoteRefreshFuture = null;
+    final existing = _sessionResetFuture;
+    if (existing != null) return existing;
+
+    final reset = _clearRemoteSnapshot();
+    _sessionResetFuture = reset;
+    return reset.whenComplete(() {
+      if (identical(_sessionResetFuture, reset)) {
+        _sessionResetFuture = null;
+      }
+    });
+  }
+
+  Future<void> _clearRemoteSnapshot() async {
     await load();
     _isRemoteSynced = false;
     _isRefreshingRemote = false;
     _lastRemoteError = null;
-    _monthlyAiLimitOverride = null;
-    await _rolloverIfNeeded();
-    notifyListeners();
-  }
-
-  Future<void> resetUsageForCurrentPeriod() async {
-    await load();
+    _tier = ManaLoomPlanTier.free;
     _periodKey = _periodFrom(_now());
     _usedAiActions = 0;
+    _monthlyAiLimitOverride = null;
+    final prefs = _preferences ?? await _preferencesLoader();
+    _preferences = prefs;
+    await prefs.setString(_planKey, _tier.id);
     await _saveUsage();
     notifyListeners();
   }
@@ -232,7 +261,10 @@ class CommercialProvider extends ChangeNotifier {
     _tier = tier;
     _usedAiActions = used.clamp(0, limit);
     _monthlyAiLimitOverride = limit;
-    _periodKey = _periodFrom(_now());
+    final remotePeriodStart = DateTime.tryParse(
+      planPayload['usage_period_start']?.toString() ?? '',
+    );
+    _periodKey = _periodFrom(remotePeriodStart?.toUtc() ?? _now());
 
     final prefs = _preferences ?? await _preferencesLoader();
     _preferences = prefs;

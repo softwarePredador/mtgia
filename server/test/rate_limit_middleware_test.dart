@@ -15,21 +15,39 @@ void main() {
     });
 
     test(
-        'builds a fingerprint fallback instead of anonymous when headers exist',
-        () {
-      final clientId = RateLimiter.buildClientIdentifierFromHeaders({
-        'User-Agent': 'Mozilla/5.0',
-        'Accept-Language': 'pt-BR',
-        'Host': 'localhost:8080',
-      });
+      'builds a fingerprint fallback instead of anonymous when headers exist',
+      () {
+        final clientId = RateLimiter.buildClientIdentifierFromHeaders({
+          'User-Agent': 'Mozilla/5.0',
+          'Accept-Language': 'pt-BR',
+          'Host': 'localhost:8080',
+        });
 
-      expect(clientId, startsWith('fingerprint:'));
-    });
+        expect(clientId, startsWith('fingerprint:'));
+      },
+    );
 
     test('keeps anonymous only when no identifying headers exist', () {
       final clientId = RateLimiter.buildClientIdentifierFromHeaders(const {});
 
       expect(clientId, equals('anonymous'));
+    });
+
+    test('AI limits authenticated traffic by user instead of shared IP', () {
+      expect(
+        buildAiRateLimitIdentifier(
+          userId: ' user-123 ',
+          headers: const {'X-Forwarded-For': '203.0.113.10'},
+        ),
+        'user:user-123',
+      );
+      expect(
+        buildAiRateLimitIdentifier(
+          userId: null,
+          headers: const {'X-Forwarded-For': '203.0.113.10'},
+        ),
+        '203.0.113.10',
+      );
     });
 
     test('allows requests up to limit then blocks', () {
@@ -86,6 +104,22 @@ void main() {
       expect(body['rate_limit_bucket'], equals('ai'));
       expect(body['rate_limit_scope'], equals('client'));
       expect(body['rate_limit_backend'], equals('in_memory_fallback'));
+    });
+
+    test('can identify an authenticated user rate-limit scope', () {
+      final body = buildRateLimitResponseBody(
+        error: 'Too Many AI Requests',
+        message: 'Aguarde 1 minuto.',
+        retryAfterSeconds: 60,
+        bucket: 'ai',
+        scope: 'user',
+      );
+
+      expect(body['rate_limit_scope'], 'user');
+    });
+
+    test('exposes a dedicated high-frequency AI polling middleware', () {
+      expect(aiPollingRateLimit(), isNotNull);
     });
 
     test('builds 429 headers with remaining zero and reset', () {

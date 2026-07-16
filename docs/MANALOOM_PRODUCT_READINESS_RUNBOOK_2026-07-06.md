@@ -31,11 +31,15 @@
   - app tenta criar link publico ao compartilhar preview de otimizacao.
   - Next.js reativou `/reports/[id]` sem dados mockados.
 - Metricas comerciais e operacionais:
+  - somente `/health`, `/health/live`, `/health/ready` e `/ready` sao publicos;
+    os endpoints abaixo exigem `X-ManaLoom-Ops-Key` ou JWT de administrador.
   - `GET /health/metrics`: latencia e erro por endpoint em memoria.
   - `GET /health/dashboard`: request metrics, IA e resumo comercial.
   - `GET /health/commercial`: funil, IA, planos, relatorios e retencao.
   - `GET /health/ai-history`: serie historica de requisicoes de IA por bucket
     `day` ou `hour`.
+  - `ai_performance`/`ai_history` medem apenas chamadas ao provedor; consumo de
+    plano aparece separadamente em `ai_action_usage`.
 - Scripts operacionais:
   - `scripts/manaloom_product_smoke.sh`: smoke ponta a ponta no stack novo.
   - `scripts/manaloom_ai_generation_benchmark.sh`: benchmark real de
@@ -54,7 +58,11 @@
     simulador iOS, cobre cadastro, superficies principais, planos/checkout/legal
     e paywall visual.
   - `scripts/manaloom_deploy_backend_image.sh`: publica o backend via imagem no
-    registry local do EasyPanel novo e atualiza `evolution_cartinhas`.
+    registry local do EasyPanel novo e atualiza `evolution_cartinhas`; antes da
+    atualização, aguarda `ai_generate_jobs` e `ai_optimize_jobs` ficarem sem
+    jobs ativos. O limite padrão de 300 segundos pode ser ajustado com
+    `MANALOOM_DEPLOY_AI_DRAIN_TIMEOUT_SECONDS` e seu esgotamento bloqueia o
+    deploy.
 - Hosts publicos default alinhados para:
   - API: `https://evolution-cartinhas.2ta7qx.easypanel.host`
   - web publico: `https://evolution-manaloom-web-public.2ta7qx.easypanel.host`
@@ -79,16 +87,28 @@
 ```bash
 curl -fsS https://evolution-cartinhas.2ta7qx.easypanel.host/health
 curl -fsS https://evolution-cartinhas.2ta7qx.easypanel.host/ready
-curl -fsS https://evolution-cartinhas.2ta7qx.easypanel.host/health/commercial
-curl -fsS 'https://evolution-cartinhas.2ta7qx.easypanel.host/health/ai-history?days=30&bucket=day'
 curl -I https://evolution-manaloom-web-public.2ta7qx.easypanel.host/pricing
 curl -I https://evolution-manaloom-web-public.2ta7qx.easypanel.host/reports/nao-existe
 ```
 
 Esperado:
 
-- health/ready respondem 200.
-- commercial responde 200 com funil agregado, sem dados pessoais.
+- health/ready respondem 200 e `checks.ai_runtime` confirma provedor real,
+  perfil `prod` e fallback mock desativado.
+- endpoints operacionais respondem 401 sem credencial; o quality gate busca a
+  chave diretamente da spec remota e valida acesso sem persisti-la localmente.
+- reservas de cota interrompidas expiram na leitura do plano e são removidas
+  globalmente pelo job diário `manaloom_ai_runtime_cleanup`.
+- o mesmo job limita logs de IA a 180 dias, jobs assíncronos a 30 minutos e
+  eventos distribuídos de rate limit a 24 horas; o `dry-run` informa todos os
+  elegíveis antes de qualquer remoção.
+- ações de IA são limitadas por usuário autenticado; polling usa bucket próprio
+  de alta frequência e eventos distribuídos antigos são removidos diariamente.
+- jobs assíncronos mantêm apenas uma reserva durante a execução: sucesso terminal
+  consome a ação; timeout, `422`, falha ou crash liberam a cota.
+- `GET /health/dashboard`, com credencial operacional, expõe
+  `dashboard.ai_jobs` com jobs ativos, concluídos/falhos em 24 horas e idade do
+  job ativo mais antigo.
 - pricing responde 200.
 - report inexistente responde 404; report criado pelo app responde 200.
 

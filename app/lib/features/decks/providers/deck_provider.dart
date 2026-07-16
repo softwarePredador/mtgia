@@ -21,7 +21,9 @@ export 'deck_provider_support.dart'
         GenerateDeckCancelledException,
         GenerateDeckProgressCallback,
         GenerateDeckProgressSnapshot,
-        GenerateDeckTimeoutException;
+        GenerateDeckTimeoutException,
+        maxAiGenerateCommanderNameLength,
+        maxAiGeneratePromptLength;
 
 typedef ActivationEventTracker =
     Future<void> Function(
@@ -32,10 +34,13 @@ typedef ActivationEventTracker =
       Map<String, dynamic>? metadata,
     });
 
+typedef PollDelay = Future<void> Function(Duration duration);
+
 /// Provider para gerenciar estado da listagem de decks
 class DeckProvider extends ChangeNotifier {
   final ApiClient _apiClient;
   final ActivationEventTracker _trackActivationEvent;
+  final PollDelay _pollDelay;
 
   List<Deck> _decks = [];
   DeckDetails? _selectedDeck;
@@ -69,9 +74,11 @@ class DeckProvider extends ChangeNotifier {
   DeckProvider({
     ApiClient? apiClient,
     ActivationEventTracker? trackActivationEvent,
+    PollDelay? pollDelay,
   }) : _apiClient = apiClient ?? ApiClient(),
        _trackActivationEvent =
-           trackActivationEvent ?? ActivationFunnelService.instance.track;
+           trackActivationEvent ?? ActivationFunnelService.instance.track,
+       _pollDelay = pollDelay ?? ((duration) => Future<void>.delayed(duration));
 
   void _trackActivationInBackground(
     String eventName, {
@@ -610,6 +617,10 @@ class DeckProvider extends ChangeNotifier {
       result = await _pollOptimizeJob(
         requestResult.jobId!,
         pollInterval: requestResult.pollIntervalMs ?? 2000,
+        maxPollingDuration: Duration(
+          milliseconds:
+              requestResult.pollTimeoutMs ?? defaultOptimizePollTimeoutMs,
+        ),
         onProgress: onProgress,
       );
     } else {
@@ -675,18 +686,19 @@ class DeckProvider extends ChangeNotifier {
   Future<Map<String, dynamic>> _pollOptimizeJob(
     String jobId, {
     int pollInterval = 5000,
+    Duration maxPollingDuration = const Duration(minutes: 5),
     void Function(String stage, int stageNumber, int totalStages)? onProgress,
   }) async {
-    const maxPollingDuration = Duration(minutes: 5);
-    final safePollInterval = pollInterval <= 0 ? 1000 : pollInterval;
-    final maxPolls =
-        (maxPollingDuration.inMilliseconds / safePollInterval).ceil();
-    for (var i = 0; i < maxPolls; i++) {
-      await Future.delayed(Duration(milliseconds: safePollInterval));
+    final safePollInterval = normalizeOptimizePollIntervalMs(pollInterval);
+    final elapsed = Stopwatch()..start();
+    var pollCount = 0;
+    while (elapsed.elapsed < maxPollingDuration) {
+      await _pollDelay(Duration(milliseconds: safePollInterval));
       final result = await pollOptimizeJobRequest(_apiClient, jobId);
+      pollCount += 1;
       if (result.isCompleted) {
         AppLogger.debug(
-          '🧪 [AI Optimize] job $jobId completed after ${i + 1} polls',
+          '🧪 [AI Optimize] job $jobId completed after $pollCount polls',
         );
         return result.result!;
       }
@@ -818,7 +830,7 @@ class DeckProvider extends ChangeNotifier {
     String? commanderName,
     GenerateDeckProgressCallback? onProgress,
     GenerateDeckCancellation? cancellation,
-    Duration pollTimeout = const Duration(seconds: 90),
+    Duration? pollTimeout,
     Duration? pollInterval,
   }) async {
     final result = await generateDeckFromPrompt(
@@ -859,7 +871,12 @@ class DeckProvider extends ChangeNotifier {
     final response = await _apiClient.get(endpoint);
     if (response.statusCode < 200 || response.statusCode >= 300) {
       throw Exception(
-        'Falha ao buscar deck aprendido (${response.statusCode}).',
+        FriendlyErrorMapper.fromApiResponse(
+          response,
+          context: FriendlyErrorContext.deckGenerate,
+          fallback:
+              'Não foi possível buscar o deck aprendido agora. Tente novamente em instantes.',
+        ),
       );
     }
 
@@ -873,7 +890,12 @@ class DeckProvider extends ChangeNotifier {
     final response = await _apiClient.get('/ai/commander-learning');
     if (response.statusCode < 200 || response.statusCode >= 300) {
       throw Exception(
-        'Falha ao listar decks aprendidos (${response.statusCode}).',
+        FriendlyErrorMapper.fromApiResponse(
+          response,
+          context: FriendlyErrorContext.deckGenerate,
+          fallback:
+              'Não foi possível listar os decks aprendidos agora. Tente novamente em instantes.',
+        ),
       );
     }
 

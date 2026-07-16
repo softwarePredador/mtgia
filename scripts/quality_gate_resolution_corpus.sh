@@ -32,6 +32,8 @@ SERVER_LISTENER_PIDS=""
 SERVER_STOP_OK=1
 STARTED_BY_SCRIPT=0
 MUTATION_ARMED=0
+DB_RUN_STARTED_AT=""
+TELEMETRY_CLEANUP_JSON='{}'
 
 print_header() {
   echo ""
@@ -72,7 +74,11 @@ try:
 except (OSError, ValueError):
     raise SystemExit(1)
 
-if payload.get("status") != "ready" or payload.get("service") != "mtgia-server":
+if (
+    payload.get("status") != "ready"
+    or payload.get("service") != "mtgia-server"
+    or payload.get("e2e_isolated_runtime") is not True
+):
     raise SystemExit(1)
 PY
   then
@@ -257,15 +263,426 @@ cleanup_validation_identity() {
     return 0
   fi
 
-  if "$ROOT_DIR/server/bin/with_new_server_pg.sh" \
-    psql -X -q -v ON_ERROR_STOP=1 \
+  local cleanup_result
+  if cleanup_result="$("$ROOT_DIR/server/bin/with_new_server_pg.sh" \
+    psql -X -q -t -A -v ON_ERROR_STOP=1 \
       -v validation_email="$VALIDATION_USER_EMAIL" \
-      -v validation_username="$VALIDATION_USERNAME" <<'SQL'
-DELETE FROM users
+      -v validation_username="$VALIDATION_USERNAME" \
+      -v validation_run_token="$RUN_TOKEN" \
+      -v run_started_at="$DB_RUN_STARTED_AT" <<'SQL'
+BEGIN;
+
+CREATE TEMP TABLE manaloom_validation_context ON COMMIT DROP AS
+SELECT
+  :'run_started_at'::timestamptz AS run_started_at,
+  :'validation_run_token'::text AS run_token;
+
+CREATE TEMP TABLE manaloom_validation_user_ids ON COMMIT DROP AS
+SELECT id
+FROM users
 WHERE LOWER(email) = LOWER(:'validation_email')
   AND LOWER(username) = LOWER(:'validation_username');
+
+CREATE TEMP TABLE manaloom_validation_deck_ids ON COMMIT DROP AS
+SELECT id
+FROM decks
+WHERE user_id IN (SELECT id FROM manaloom_validation_user_ids);
+
+CREATE TEMP TABLE manaloom_cleanup_counts (
+  table_name TEXT PRIMARY KEY,
+  rows_deleted INTEGER NOT NULL
+) ON COMMIT DROP;
+
+CREATE TEMP TABLE manaloom_validation_usage_adjustments ON COMMIT DROP AS
+WITH event_cards AS (
+  SELECT DISTINCT
+    event.id AS event_id,
+    LOWER(REGEXP_REPLACE(
+      TRIM(REPLACE(REPLACE(COALESCE(event.commander_name, ''), CHR(8216), CHR(39)), CHR(8217), CHR(39))),
+      '\s+', ' ', 'g'
+    )) AS commander_name_normalized,
+    LOWER(REGEXP_REPLACE(
+      TRIM(REPLACE(REPLACE(card->>'name', CHR(8216), CHR(39)), CHR(8217), CHR(39))),
+      '\s+', ' ', 'g'
+    )) AS card_name_normalized
+  FROM deck_learning_events event
+  CROSS JOIN LATERAL jsonb_array_elements(
+    CASE
+      WHEN jsonb_typeof(event.event_data->'cards') = 'array'
+        THEN event.event_data->'cards'
+      ELSE '[]'::jsonb
+    END
+  ) card
+  WHERE event.created_at >= (
+      SELECT run_started_at FROM manaloom_validation_context
+    )
+    AND event.deck_id IN (SELECT id FROM manaloom_validation_deck_ids)
+    AND COALESCE((card->>'is_commander')::boolean, FALSE) = FALSE
+    AND NULLIF(TRIM(card->>'name'), '') IS NOT NULL
+)
+SELECT
+  commander_name_normalized,
+  card_name_normalized,
+  COUNT(*)::int AS usage_count
+FROM event_cards
+WHERE commander_name_normalized <> ''
+  AND card_name_normalized <> ''
+  AND commander_name_normalized <> card_name_normalized
+GROUP BY commander_name_normalized, card_name_normalized;
+
+CREATE TEMP TABLE manaloom_nonvalidation_usage_last ON COMMIT DROP AS
+WITH event_cards AS (
+  SELECT DISTINCT
+    event.id AS event_id,
+    event.created_at,
+    LOWER(REGEXP_REPLACE(
+      TRIM(REPLACE(REPLACE(COALESCE(event.commander_name, ''), CHR(8216), CHR(39)), CHR(8217), CHR(39))),
+      '\s+', ' ', 'g'
+    )) AS commander_name_normalized,
+    LOWER(REGEXP_REPLACE(
+      TRIM(REPLACE(REPLACE(card->>'name', CHR(8216), CHR(39)), CHR(8217), CHR(39))),
+      '\s+', ' ', 'g'
+    )) AS card_name_normalized
+  FROM deck_learning_events event
+  CROSS JOIN LATERAL jsonb_array_elements(
+    CASE
+      WHEN jsonb_typeof(event.event_data->'cards') = 'array'
+        THEN event.event_data->'cards'
+      ELSE '[]'::jsonb
+    END
+  ) card
+  WHERE event.source = 'user_created'
+    AND event.deck_id NOT IN (SELECT id FROM manaloom_validation_deck_ids)
+    AND COALESCE((card->>'is_commander')::boolean, FALSE) = FALSE
+    AND NULLIF(TRIM(card->>'name'), '') IS NOT NULL
+)
+SELECT
+  commander_name_normalized,
+  card_name_normalized,
+  MAX(created_at) AS last_used_at
+FROM event_cards
+WHERE commander_name_normalized <> ''
+  AND card_name_normalized <> ''
+  AND commander_name_normalized <> card_name_normalized
+GROUP BY commander_name_normalized, card_name_normalized;
+
+DO $usage_precheck$
+DECLARE
+  unsafe_rows INTEGER;
+BEGIN
+  SELECT COUNT(*) INTO unsafe_rows
+  FROM manaloom_validation_usage_adjustments adjustment
+  LEFT JOIN commander_card_usage usage
+    ON usage.commander_name_normalized = adjustment.commander_name_normalized
+   AND usage.card_name_normalized = adjustment.card_name_normalized
+  WHERE usage.usage_count IS NULL
+     OR usage.usage_count < adjustment.usage_count;
+  IF unsafe_rows <> 0 THEN
+    RAISE EXCEPTION 'validation commander usage cleanup is unsafe: % row(s)', unsafe_rows;
+  END IF;
+END
+$usage_precheck$;
+
+WITH updated AS (
+  UPDATE commander_card_usage usage
+  SET
+    usage_count = usage.usage_count - adjustment.usage_count,
+    last_used_at = COALESCE(
+      real_usage.last_used_at,
+      LEAST(
+        usage.last_used_at,
+        (SELECT run_started_at FROM manaloom_validation_context) - INTERVAL '1 microsecond'
+      )
+    )
+  FROM manaloom_validation_usage_adjustments adjustment
+  LEFT JOIN manaloom_nonvalidation_usage_last real_usage
+    ON real_usage.commander_name_normalized = adjustment.commander_name_normalized
+   AND real_usage.card_name_normalized = adjustment.card_name_normalized
+  WHERE usage.commander_name_normalized = adjustment.commander_name_normalized
+    AND usage.card_name_normalized = adjustment.card_name_normalized
+    AND usage.usage_count > adjustment.usage_count
+  RETURNING 1
+)
+INSERT INTO manaloom_cleanup_counts
+SELECT 'commander_card_usage_updated', COUNT(*)::int FROM updated;
+
+WITH deleted AS (
+  DELETE FROM commander_card_usage usage
+  USING manaloom_validation_usage_adjustments adjustment
+  WHERE usage.commander_name_normalized = adjustment.commander_name_normalized
+    AND usage.card_name_normalized = adjustment.card_name_normalized
+    AND usage.usage_count = adjustment.usage_count
+  RETURNING 1
+)
+INSERT INTO manaloom_cleanup_counts
+SELECT 'commander_card_usage_deleted', COUNT(*)::int FROM deleted;
+
+WITH deleted AS (
+  DELETE FROM ai_logs
+  WHERE created_at >= (
+      SELECT run_started_at FROM manaloom_validation_context
+    )
+    AND (
+      user_id IN (SELECT id FROM manaloom_validation_user_ids)
+      OR deck_id IN (SELECT id FROM manaloom_validation_deck_ids)
+    )
+  RETURNING 1
+)
+INSERT INTO manaloom_cleanup_counts
+SELECT 'ai_logs', COUNT(*)::int FROM deleted;
+
+WITH deleted AS (
+  DELETE FROM ai_optimize_cache
+  WHERE created_at >= (
+      SELECT run_started_at FROM manaloom_validation_context
+    )
+    AND (
+      user_id IN (SELECT id FROM manaloom_validation_user_ids)
+      OR deck_id IN (SELECT id FROM manaloom_validation_deck_ids)
+    )
+  RETURNING 1
+)
+INSERT INTO manaloom_cleanup_counts
+SELECT 'ai_optimize_cache', COUNT(*)::int FROM deleted;
+
+WITH deleted AS (
+  DELETE FROM ai_optimize_fallback_telemetry
+  WHERE created_at >= (
+      SELECT run_started_at FROM manaloom_validation_context
+    )
+    AND (
+      user_id IN (SELECT id FROM manaloom_validation_user_ids)
+      OR deck_id IN (SELECT id FROM manaloom_validation_deck_ids)
+    )
+  RETURNING 1
+)
+INSERT INTO manaloom_cleanup_counts
+SELECT 'ai_optimize_fallback_telemetry', COUNT(*)::int FROM deleted;
+
+WITH deleted AS (
+  DELETE FROM ml_prompt_feedback
+  WHERE created_at >= (
+      SELECT run_started_at FROM manaloom_validation_context
+    )
+    AND (
+      user_id IN (SELECT id FROM manaloom_validation_user_ids)
+      OR deck_id IN (SELECT id FROM manaloom_validation_deck_ids)
+    )
+  RETURNING 1
+)
+INSERT INTO manaloom_cleanup_counts
+SELECT 'ml_prompt_feedback', COUNT(*)::int FROM deleted;
+
+WITH deleted AS (
+  DELETE FROM optimization_analysis_logs
+  WHERE created_at >= (
+      SELECT run_started_at FROM manaloom_validation_context
+    )
+    AND (
+      decisions_reasoning->>'validation_run_token' = (
+        SELECT run_token FROM manaloom_validation_context
+      )
+      OR decisions_reasoning->>'deck_id' IN (
+        SELECT id::text FROM manaloom_validation_deck_ids
+      )
+      OR decisions_reasoning->>'user_id' IN (
+        SELECT id::text FROM manaloom_validation_user_ids
+      )
+    )
+  RETURNING 1
+)
+INSERT INTO manaloom_cleanup_counts
+SELECT 'optimization_analysis_logs', COUNT(*)::int FROM deleted;
+
+WITH deleted AS (
+  DELETE FROM rate_limit_events
+  WHERE created_at >= (
+      SELECT run_started_at FROM manaloom_validation_context
+    )
+    AND identifier IN (
+      SELECT id::text FROM manaloom_validation_user_ids
+    )
+  RETURNING 1
+)
+INSERT INTO manaloom_cleanup_counts
+SELECT 'rate_limit_events', COUNT(*)::int FROM deleted;
+
+WITH deleted AS (
+  DELETE FROM deck_learning_events
+  WHERE created_at >= (
+      SELECT run_started_at FROM manaloom_validation_context
+    )
+    AND deck_id IN (
+      SELECT id FROM manaloom_validation_deck_ids
+    )
+  RETURNING 1
+)
+INSERT INTO manaloom_cleanup_counts
+SELECT 'deck_learning_events', COUNT(*)::int FROM deleted;
+
+WITH deleted AS (
+  DELETE FROM ai_optimize_jobs
+  WHERE created_at >= (
+      SELECT run_started_at FROM manaloom_validation_context
+    )
+    AND deck_id IN (
+      SELECT id FROM manaloom_validation_deck_ids
+    )
+  RETURNING 1
+)
+INSERT INTO manaloom_cleanup_counts
+SELECT 'ai_optimize_jobs', COUNT(*)::int FROM deleted;
+
+DO $telemetry_postcheck$
+DECLARE
+  remaining INTEGER;
+BEGIN
+  SELECT COUNT(*) INTO remaining
+  FROM ai_logs
+  WHERE created_at >= (
+      SELECT run_started_at FROM manaloom_validation_context
+    )
+    AND (
+      user_id IN (SELECT id FROM manaloom_validation_user_ids)
+      OR deck_id IN (SELECT id FROM manaloom_validation_deck_ids)
+    );
+  IF remaining <> 0 THEN
+    RAISE EXCEPTION 'validation-owned ai_logs remain: %', remaining;
+  END IF;
+
+  SELECT COUNT(*) INTO remaining
+  FROM ai_optimize_cache
+  WHERE created_at >= (
+      SELECT run_started_at FROM manaloom_validation_context
+    )
+    AND (
+      user_id IN (SELECT id FROM manaloom_validation_user_ids)
+      OR deck_id IN (SELECT id FROM manaloom_validation_deck_ids)
+    );
+  IF remaining <> 0 THEN
+    RAISE EXCEPTION 'validation-owned ai_optimize_cache rows remain: %', remaining;
+  END IF;
+
+  SELECT COUNT(*) INTO remaining
+  FROM ai_optimize_fallback_telemetry
+  WHERE created_at >= (
+      SELECT run_started_at FROM manaloom_validation_context
+    )
+    AND (
+      user_id IN (SELECT id FROM manaloom_validation_user_ids)
+      OR deck_id IN (SELECT id FROM manaloom_validation_deck_ids)
+    );
+  IF remaining <> 0 THEN
+    RAISE EXCEPTION 'validation-owned fallback rows remain: %', remaining;
+  END IF;
+
+  SELECT COUNT(*) INTO remaining
+  FROM ml_prompt_feedback
+  WHERE created_at >= (
+      SELECT run_started_at FROM manaloom_validation_context
+    )
+    AND (
+      user_id IN (SELECT id FROM manaloom_validation_user_ids)
+      OR deck_id IN (SELECT id FROM manaloom_validation_deck_ids)
+    );
+  IF remaining <> 0 THEN
+    RAISE EXCEPTION 'validation-owned feedback rows remain: %', remaining;
+  END IF;
+
+  SELECT COUNT(*) INTO remaining
+  FROM optimization_analysis_logs
+  WHERE created_at >= (
+      SELECT run_started_at FROM manaloom_validation_context
+    )
+    AND (
+      decisions_reasoning->>'validation_run_token' = (
+        SELECT run_token FROM manaloom_validation_context
+      )
+      OR decisions_reasoning->>'deck_id' IN (
+        SELECT id::text FROM manaloom_validation_deck_ids
+      )
+      OR decisions_reasoning->>'user_id' IN (
+        SELECT id::text FROM manaloom_validation_user_ids
+      )
+    );
+  IF remaining <> 0 THEN
+    RAISE EXCEPTION 'validation-owned analysis rows remain: %', remaining;
+  END IF;
+
+  SELECT COUNT(*) INTO remaining
+  FROM rate_limit_events
+  WHERE created_at >= (
+      SELECT run_started_at FROM manaloom_validation_context
+    )
+    AND identifier IN (SELECT id::text FROM manaloom_validation_user_ids);
+  IF remaining <> 0 THEN
+    RAISE EXCEPTION 'validation-owned rate-limit rows remain: %', remaining;
+  END IF;
+
+  SELECT COUNT(*) INTO remaining
+  FROM deck_learning_events
+  WHERE created_at >= (
+      SELECT run_started_at FROM manaloom_validation_context
+    )
+    AND deck_id IN (SELECT id FROM manaloom_validation_deck_ids);
+  IF remaining <> 0 THEN
+    RAISE EXCEPTION 'validation-owned learning events remain: %', remaining;
+  END IF;
+
+  SELECT COUNT(*) INTO remaining
+  FROM ai_optimize_jobs
+  WHERE created_at >= (
+      SELECT run_started_at FROM manaloom_validation_context
+    )
+    AND deck_id IN (SELECT id FROM manaloom_validation_deck_ids);
+  IF remaining <> 0 THEN
+    RAISE EXCEPTION 'validation-owned optimize jobs remain: %', remaining;
+  END IF;
+
+END
+$telemetry_postcheck$;
+
+WITH deleted AS (
+  DELETE FROM users
+  WHERE LOWER(email) = LOWER(:'validation_email')
+    AND LOWER(username) = LOWER(:'validation_username')
+  RETURNING 1
+)
+INSERT INTO manaloom_cleanup_counts
+SELECT 'users', COUNT(*)::int FROM deleted;
+
+DO $identity_postcheck$
+DECLARE
+  remaining INTEGER;
+BEGIN
+  SELECT COUNT(*) INTO remaining
+  FROM users
+  WHERE id IN (SELECT id FROM manaloom_validation_user_ids);
+  IF remaining <> 0 THEN
+    RAISE EXCEPTION 'validation users remain: %', remaining;
+  END IF;
+
+  SELECT COUNT(*) INTO remaining
+  FROM decks
+  WHERE id IN (SELECT id FROM manaloom_validation_deck_ids);
+  IF remaining <> 0 THEN
+    RAISE EXCEPTION 'validation decks remain: %', remaining;
+  END IF;
+END
+$identity_postcheck$;
+
+SELECT jsonb_build_object(
+  'scope', 'validation_identity_and_run_token',
+  'postcheck_passed', true,
+  'run_token', :'validation_run_token',
+  'rows_deleted', jsonb_object_agg(table_name, rows_deleted ORDER BY table_name)
+)::text
+FROM manaloom_cleanup_counts;
+
+COMMIT;
 SQL
-  then
+  )"; then
+    TELEMETRY_CLEANUP_JSON="$(printf '%s\n' "$cleanup_result" | tail -n 1)"
     MUTATION_ARMED=0
     return 0
   fi
@@ -359,6 +776,19 @@ SELECT jsonb_build_object(
     'rate_limit_events', jsonb_build_object(
       'total', (SELECT COUNT(*) FROM rate_limit_events),
       'created_since_start', (SELECT COUNT(*) FROM rate_limit_events, params WHERE created_at >= params.run_started_at)
+    ),
+    'deck_learning_events', jsonb_build_object(
+      'total', (SELECT COUNT(*) FROM deck_learning_events),
+      'created_since_start', (SELECT COUNT(*) FROM deck_learning_events, params WHERE created_at >= params.run_started_at)
+    ),
+    'ai_optimize_jobs', jsonb_build_object(
+      'total', (SELECT COUNT(*) FROM ai_optimize_jobs),
+      'created_since_start', (SELECT COUNT(*) FROM ai_optimize_jobs, params WHERE created_at >= params.run_started_at)
+    ),
+    'commander_card_usage', jsonb_build_object(
+      'total', (SELECT COALESCE(SUM(usage_count), 0) FROM commander_card_usage),
+      'created_since_start', 0,
+      'measurement', 'sum_usage_count'
     )
   )
 )::text;
@@ -376,6 +806,8 @@ write_mutation_audit() {
   local listener_close_ok="$8"
   local process_stop_ok="$9"
   local listener_pids="${10}"
+  local observed_json="${11}"
+  local telemetry_cleanup_json="${12}"
 
   python3 - \
     "$MUTATION_AUDIT_PATH" \
@@ -389,6 +821,8 @@ write_mutation_audit() {
     "$listener_close_ok" \
     "$process_stop_ok" \
     "$listener_pids" \
+    "$observed_json" \
+    "$telemetry_cleanup_json" \
     "$before_json" \
     "$after_json" <<'PY'
 import json
@@ -407,30 +841,43 @@ from pathlib import Path
     listener_close_ok,
     process_stop_ok,
     listener_pids,
+    observed_raw,
+    telemetry_cleanup_raw,
     before_raw,
     after_raw,
 ) = sys.argv[1:]
 
 before = json.loads(before_raw)
+observed = json.loads(observed_raw)
 after = json.loads(after_raw)
-table_names = sorted(set(before["tables"]) | set(after["tables"]))
+telemetry_cleanup = json.loads(telemetry_cleanup_raw or "{}")
+table_names = sorted(
+    set(before["tables"]) | set(observed["tables"]) | set(after["tables"])
+)
 telemetry = {}
 for table_name in table_names:
     before_row = before["tables"].get(table_name, {})
+    observed_row = observed["tables"].get(table_name, {})
     after_row = after["tables"].get(table_name, {})
     before_total = int(before_row.get("total") or 0)
+    observed_total = int(observed_row.get("total") or 0)
     after_total = int(after_row.get("total") or 0)
     telemetry[table_name] = {
         "before_total": before_total,
+        "observed_before_cleanup_total": observed_total,
         "after_total": after_total,
         "delta_total": after_total - before_total,
+        "gross_delta_before_cleanup": observed_total - before_total,
+        "rows_created_in_window_before_cleanup": int(
+            observed_row.get("created_since_start") or 0
+        ),
         "rows_created_in_window": int(
             after_row.get("created_since_start") or 0
         ),
     }
 
 payload = {
-    "schema_version": 1,
+    "schema_version": 2,
     "run_token": run_token,
     "api_base_url": api_base_url,
     "db_started_at": before.get("window_started_at"),
@@ -441,6 +888,7 @@ payload = {
         "generated_decks_before": int(deck_baseline),
         "generated_decks_after": int(deck_after),
         "pass": cleanup_ok == "1",
+        "telemetry": telemetry_cleanup,
     },
     "runtime_cleanup": {
         "captured_listener_pids": [
@@ -452,18 +900,43 @@ payload = {
     },
     "persistent_telemetry": {
         "measurement_scope": (
-            "row-count deltas plus rows whose created_at is at or after "
-            "the database run-start timestamp"
+            "row-count deltas before and after exact validation-owned cleanup, "
+            "plus rows whose created_at is at or after the database run-start "
+            "timestamp"
         ),
         "limitation": (
             "shared-database counts are not attributable to this run when "
-            "other writers are active; updates to pre-existing rows are not "
-            "detectable when a table does not expose an updated_at signal, "
-            "including cache ON CONFLICT updates"
+            "other writers are active; cleanup is therefore restricted to "
+            "the exact validation user/decks and validation_run_token, within "
+            "the run window"
         ),
         "tables": telemetry,
     },
-    "telemetry_deleted": False,
+    "learning_write_guard": {
+        "policy": "isolated runtime must not write product learning",
+        "pass": (
+            telemetry.get("commander_card_usage", {}).get(
+                "gross_delta_before_cleanup", 0
+            ) == 0
+            and telemetry.get("deck_learning_events", {}).get(
+                "gross_delta_before_cleanup", 0
+            ) == 0
+            and telemetry.get("ml_prompt_feedback", {}).get(
+                "gross_delta_before_cleanup", 0
+            ) == 0
+        ),
+        "commander_card_usage_delta": telemetry.get(
+            "commander_card_usage", {}
+        ).get("gross_delta_before_cleanup", 0),
+        "deck_learning_events_delta": telemetry.get(
+            "deck_learning_events", {}
+        ).get("gross_delta_before_cleanup", 0),
+        "ml_prompt_feedback_delta": telemetry.get(
+            "ml_prompt_feedback", {}
+        ).get("gross_delta_before_cleanup", 0),
+    },
+    "e2e_isolated_runtime": True,
+    "telemetry_deleted": cleanup_ok == "1",
 }
 
 path = Path(output_path)
@@ -511,7 +984,7 @@ Este gate:
   1. sobe uma API local propria, vinculada somente a 127.0.0.1, em porta livre
   2. conta automaticamente o corpus estavel
   3. roda o runner oficial de resolucao com VALIDATION_LIMIT do corpus
-  4. remove a identidade/decks temporarios e mede telemetria persistente
+  4. remove identidade, decks e telemetria pertencentes exatamente a esta validacao
   5. falha se houver unresolved, failed, total inconsistente ou residuo temporario
 EOF
 }
@@ -635,6 +1108,9 @@ echo "ℹ️ Iniciando API isolada e sem hot reload em ${API_BASE_URL}..."
   "$ROOT_DIR/server/bin/with_new_server_pg.sh" env \
     PORT="$PORT" \
     JWT_SECRET="$BACKEND_TEST_JWT_SECRET" \
+    RATE_LIMIT_DISTRIBUTED=false \
+    MANALOOM_E2E_ISOLATED_RUNTIME=1 \
+    MANALOOM_E2E_VALIDATION_RUN_TOKEN="$RUN_TOKEN" \
     dart run build/bin/server.dart
 ) >"${VALIDATION_RUN_DIR}/server.log" 2>&1 &
 
@@ -688,6 +1164,7 @@ set +e
   VALIDATION_USERNAME="$VALIDATION_USERNAME" \
   VALIDATION_USER_PASSWORD="$VALIDATION_USER_PASSWORD" \
   VALIDATION_RUN_TOKEN="$RUN_TOKEN" \
+  VALIDATION_DEFER_CLEANUP_TO_HARNESS=1 \
   JWT_SECRET="$BACKEND_TEST_JWT_SECRET" \
   "$ROOT_DIR/server/bin/with_new_server_pg.sh" \
     dart run bin/run_three_commander_resolution_validation.dart
@@ -701,6 +1178,7 @@ if ! assert_listener_closed "$PORT"; then
   LISTENER_CLOSE_OK=0
 fi
 
+TELEMETRY_OBSERVED="$(persistent_telemetry_snapshot "$DB_RUN_STARTED_AT" | tr -d '\r\n')"
 CLEANUP_OK=1
 if ! cleanup_validation_identity; then
   CLEANUP_OK=0
@@ -724,9 +1202,21 @@ write_mutation_audit \
   "$CLEANUP_OK" \
   "$LISTENER_CLOSE_OK" \
   "$SERVER_STOP_OK" \
-  "$SERVER_LISTENER_PIDS"
+  "$SERVER_LISTENER_PIDS" \
+  "$TELEMETRY_OBSERVED" \
+  "$TELEMETRY_CLEANUP_JSON"
 
 echo "📊 Auditoria de mutação: $MUTATION_AUDIT_PATH"
+
+LEARNING_WRITE_GUARD_OK="$(python3 - "$MUTATION_AUDIT_PATH" <<'PY'
+import json
+import sys
+from pathlib import Path
+
+payload = json.loads(Path(sys.argv[1]).read_text(encoding="utf-8"))
+print("1" if payload.get("learning_write_guard", {}).get("pass") is True else "0")
+PY
+)"
 
 if [[ "$CLEANUP_OK" -ne 1 ]]; then
   echo "❌ Cleanup incompleto: identidade ou decks temporários permaneceram." >&2
@@ -735,6 +1225,11 @@ fi
 
 if [[ "$LISTENER_CLOSE_OK" -ne 1 || "$SERVER_STOP_OK" -ne 1 ]]; then
   echo "❌ Encerramento incompleto da API isolada; cleanup e auditoria já foram concluídos." >&2
+  exit 2
+fi
+
+if [[ "$LEARNING_WRITE_GUARD_OK" -ne 1 ]]; then
+  echo "❌ O runtime E2E alterou aprendizado global do produto; gate bloqueado." >&2
   exit 2
 fi
 

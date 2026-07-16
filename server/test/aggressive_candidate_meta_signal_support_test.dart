@@ -57,27 +57,51 @@ void main() {
       );
     });
 
-    test('score rewards competitive evidence and applies rejection demotion',
-        () {
-      final strong = scoreAggressiveMetaSignal(
-        evidenceCount: 8,
-        roleScore: 82,
-        functionConfidence: 0.9,
-        subformat: 'competitive_commander',
-        rejectionPenalty: 0,
-        freshnessDays: 5,
-      );
-      final demoted = scoreAggressiveMetaSignal(
-        evidenceCount: 8,
-        roleScore: 82,
-        functionConfidence: 0.9,
-        subformat: 'competitive_commander',
-        rejectionPenalty: 240,
-        freshnessDays: 5,
-      );
+    test(
+      'score rewards competitive evidence and applies rejection demotion',
+      () {
+        final strong = scoreAggressiveMetaSignal(
+          evidenceCount: 8,
+          roleScore: 82,
+          functionConfidence: 0.9,
+          subformat: 'competitive_commander',
+          rejectionPenalty: 0,
+          freshnessDays: 5,
+        );
+        final demoted = scoreAggressiveMetaSignal(
+          evidenceCount: 8,
+          roleScore: 82,
+          functionConfidence: 0.9,
+          subformat: 'competitive_commander',
+          rejectionPenalty: 240,
+          freshnessDays: 5,
+        );
 
-      expect(strong, greaterThan(demoted));
-      expect(strong, greaterThanOrEqualTo(80));
+        expect(strong, greaterThan(demoted));
+        expect(strong, greaterThanOrEqualTo(80));
+      },
+    );
+
+    test('normalizes open-ended bracket scopes and accepts legacy aliases', () {
+      expect(
+        bracketScopeForMetaSignal(
+          subformat: 'competitive_commander',
+          existingBracketScope: 'any',
+          score: 70,
+        ),
+        equals('bracket_3_plus'),
+      );
+      expect(
+        bracketScopeForMetaSignal(
+          subformat: 'commander',
+          existingBracketScope: 'bracket_2_4',
+          score: 70,
+        ),
+        equals('bracket_2_plus'),
+      );
+      expect(candidateBracketScopeMinimum('bracket_3_4'), equals(3));
+      expect(candidateBracketScopeMinimum('bracket_3_plus'), equals(3));
+      expect(candidateBracketScopeMinimum('any'), isNull);
     });
 
     test('replacement examples keep same role logic', () {

@@ -133,18 +133,61 @@
     {
       "id": "life_counter",
       "label": "Life Counter/Lotus",
+      "strict_file_inventory": true,
       "files": [
-        "app/lib/features/home/life_counter_screen.dart",
+        "app/lib/features/home/life_counter_route.dart",
         "app/lib/features/home/lotus_life_counter_screen.dart",
+        "app/lib/features/home/lotus/lotus_host_controller.dart",
+        "app/lib/features/home/lotus/lotus_host_overlays.dart",
+        "app/lib/features/home/lotus/lotus_visual_skin.dart",
+        "app/assets/lotus/index.html",
+        "app/assets/lotus/flutter_bootstrap.js",
+        "app/assets/lotus/css/styles.min.css",
+        "app/assets/lotus/js/app.min.js",
+        "app/assets/lotus/fonts/Inter.ttf",
+        "app/assets/lotus/fonts/Fraunces.ttf",
         "app/lib/features/home/life_counter/life_counter_native_card_search_sheet.dart",
+        "app/lib/features/home/life_counter/life_counter_native_commander_damage_sheet.dart",
+        "app/lib/features/home/life_counter/life_counter_native_day_night_sheet.dart",
+        "app/lib/features/home/life_counter/life_counter_native_dice_sheet.dart",
+        "app/lib/features/home/life_counter/life_counter_native_game_modes_sheet.dart",
+        "app/lib/features/home/life_counter/life_counter_native_game_timer_sheet.dart",
+        "app/lib/features/home/life_counter/life_counter_native_history_sheet.dart",
         "app/lib/features/home/life_counter/life_counter_native_settings_sheet.dart",
         "app/lib/features/home/life_counter/life_counter_native_player_appearance_sheet.dart",
-        "app/lib/features/home/life_counter/life_counter_native_set_life_sheet.dart",
+        "app/lib/features/home/life_counter/life_counter_native_player_counter_sheet.dart",
         "app/lib/features/home/life_counter/life_counter_native_player_state_sheet.dart",
-        "app/lib/features/home/life_counter/life_counter_native_dice_sheet.dart"
+        "app/lib/features/home/life_counter/life_counter_native_set_life_sheet.dart",
+        "app/lib/features/home/life_counter/life_counter_native_table_state_sheet.dart",
+        "app/lib/features/home/life_counter/life_counter_native_turn_tracker_sheet.dart"
       ],
-      "captures": ["commander_damage_overlay", "turn_tracker_hint_overlay", "life_counter_card_search_sheet", "life_counter_set_life_sheet_35", "life_counter_player_appearance_presets"],
-      "focus": ["linguagem tabletop propria", "contadores legiveis por jogador", "overlays/settings", "cores separaveis", "touch targets em mesa"]
+      "captures": [
+        "life_counter_main_2_players",
+        "life_counter_main_3_players",
+        "life_counter_main_4_players",
+        "life_counter_main_5_players",
+        "life_counter_main_6_players",
+        "life_counter_main_4_players_landscape",
+        "life_counter_menu_open_active_state",
+        "life_counter_settings",
+        "life_counter_history",
+        "commander_damage_overlay",
+        "turn_tracker_hint_overlay",
+        "life_counter_card_search_sheet",
+        "life_counter_set_life_sheet_35",
+        "life_counter_player_appearance_presets",
+        "life_counter_player_appearance_custom_image",
+        "life_counter_exit_flow"
+      ],
+      "focus": [
+        "linguagem tabletop propria",
+        "contadores legiveis por jogador",
+        "densidade de 2 a 6 jogadores e landscape",
+        "overlays/settings e safe areas",
+        "cores separaveis e estados ativos",
+        "imagem personalizada preservada",
+        "touch targets em mesa"
+      ]
     }
   ]
 }

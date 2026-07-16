@@ -10,6 +10,7 @@ import '../../../core/widgets/app_state_panel.dart';
 import '../../../core/widgets/cached_card_image.dart';
 import '../providers/deck_provider.dart';
 import '../models/deck_analysis.dart';
+import '../models/commander_bracket.dart';
 import '../models/deck_card_item.dart';
 import '../models/deck_details.dart';
 import '../../cards/providers/card_provider.dart';
@@ -1261,17 +1262,32 @@ class _DeckDetailsScreenState extends State<DeckDetailsScreen>
       kind: AiUsageKind.cardExplanation,
     );
     if (!hasAiQuota || !context.mounted) return;
-    await showDeckAiExplanationFlow(
-      context: context,
-      card: card,
-      explainCard: context.read<CardProvider>().explainCard,
-    );
+    try {
+      await showDeckAiExplanationFlow(
+        context: context,
+        card: card,
+        explainCard: context.read<CardProvider>().explainCard,
+      );
+    } finally {
+      if (context.mounted) {
+        await refreshAiUsageAfterAction(context);
+      }
+    }
   }
 
-  void _showOptimizationOptions(BuildContext context, {String? initialIntent}) {
+  Future<void> _showOptimizationOptions(
+    BuildContext context, {
+    String? initialIntent,
+  }) async {
+    final hasAiQuota = await reserveAiActionOrShowPaywall(
+      context,
+      kind: AiUsageKind.deckAnalysis,
+    );
+    if (!hasAiQuota || !context.mounted) return;
+
     final startsFromPostGame = initialIntent == 'post_game';
     final startsFromRebuild = initialIntent == 'rebuild';
-    showModalBottomSheet(
+    await showModalBottomSheet<void>(
       context: context,
       useRootNavigator: true,
       useSafeArea: true,
@@ -1302,6 +1318,9 @@ class _DeckDetailsScreenState extends State<DeckDetailsScreen>
                 ),
           ),
     );
+    if (context.mounted) {
+      await refreshAiUsageAfterAction(context);
+    }
   }
 
   Future<void> _showEditionPicker(
@@ -1522,18 +1541,7 @@ String _deckValidationSignature(DeckDetails deck) {
 }
 
 String _bracketLabel(int bracket) {
-  switch (bracket) {
-    case 1:
-      return 'Casual';
-    case 2:
-      return 'Mid-power';
-    case 3:
-      return 'High-power';
-    case 4:
-      return 'cEDH';
-    default:
-      return 'Mid-power';
-  }
+  return commanderBracketLabel(bracket);
 }
 
 class _OptimizationSheet extends StatefulWidget {
@@ -1665,14 +1673,20 @@ class _OptimizationSheetState extends State<_OptimizationSheet> {
         if (!hasAiQuota) {
           throw const _GuidedRebuildPaywallBlocked();
         }
-        return deckProvider.rebuildDeck(
-          deckId,
-          archetype: archetype,
-          theme: theme,
-          bracket: bracket,
-          rebuildScope: rebuildScope,
-          saveMode: saveMode,
-        );
+        try {
+          return await deckProvider.rebuildDeck(
+            deckId,
+            archetype: archetype,
+            theme: theme,
+            bracket: bracket,
+            rebuildScope: rebuildScope,
+            saveMode: saveMode,
+          );
+        } finally {
+          if (context.mounted) {
+            await refreshAiUsageAfterAction(context);
+          }
+        }
       },
       refreshDeckDetails: deckProvider.fetchDeckDetails,
       onLoadingStart: () {
@@ -1746,135 +1760,142 @@ class _OptimizationSheetState extends State<_OptimizationSheet> {
     showOptimizeProgressLoading(context, progressState);
     isLoadingDialogOpen = true;
 
-    await executeOptimizeFlow(
-      deckId: widget.deckId,
-      archetype: archetype,
-      bracket: _selectedBracket,
-      keepTheme: _keepTheme,
-      intensity: _selectedIntensity,
-      executeRequest:
-          (
-            deckId,
-            archetype, {
-            required bracket,
-            required keepTheme,
-            required intensity,
-            required onProgress,
-          }) => deckProvider.optimizeDeck(
-            deckId,
-            archetype,
-            bracket: bracket,
-            keepTheme: keepTheme,
-            intensity: intensity,
-            onProgress: onProgress,
-            recommendationContext: _recommendationContext(),
-          ),
-      onProgressUpdate: (state) {
-        progressState.value = state;
-      },
-      confirmPreview: (optimizeOutcome) async {
-        closeLoadingDialog();
-        if (!context.mounted) return null;
-        final result = optimizeOutcome.result;
-        final preview = optimizeOutcome.preview;
+    try {
+      await executeOptimizeFlow(
+        deckId: widget.deckId,
+        archetype: archetype,
+        bracket: _selectedBracket,
+        keepTheme: _keepTheme,
+        intensity: _selectedIntensity,
+        executeRequest:
+            (
+              deckId,
+              archetype, {
+              required bracket,
+              required keepTheme,
+              required intensity,
+              required onProgress,
+            }) => deckProvider.optimizeDeck(
+              deckId,
+              archetype,
+              bracket: bracket,
+              keepTheme: keepTheme,
+              intensity: intensity,
+              onProgress: onProgress,
+              recommendationContext: _recommendationContext(),
+            ),
+        onProgressUpdate: (state) {
+          progressState.value = state;
+        },
+        confirmPreview: (optimizeOutcome) async {
+          closeLoadingDialog();
+          if (!context.mounted) return null;
+          final result = optimizeOutcome.result;
+          final preview = optimizeOutcome.preview;
 
-        final selection = await showOptimizationPreviewDialog(
-          context,
-          mode: preview.mode,
-          archetype: archetype,
-          keepTheme: preview.constraints['keep_theme'] == true,
-          preservedTheme: preview.themeInfo['theme']?.toString(),
-          reasoning: preview.reasoning,
-          intensity: preview.intensity,
-          optimizeIntensity: preview.optimizeIntensity,
-          qualityWarning: preview.qualityWarning,
-          deckAnalysis: preview.deckAnalysis,
-          postAnalysis: preview.postAnalysis,
-          warnings: preview.warnings,
-          metaReferenceContext: preview.metaReferenceContext,
-          optimizationContract: preview.optimizationContract,
-          battleValidation: preview.battleValidation,
-          displayRemovals: preview.displayRemovals,
-          displayAdditions: preview.displayAdditions,
-          onCopyDebug:
-              kDebugMode
-                  ? () async {
-                    await _copyOptimizeDebug(
-                      deckId: widget.deckId,
-                      archetype: archetype,
-                      bracket: _selectedBracket,
-                      intensity: _selectedIntensity,
-                      result: result,
-                    );
-                    if (!context.mounted) return;
-                    showOptimizeDebugCopiedSnackBar(context);
-                  }
-                  : null,
-          onCreateShareLink: _createOptimizationShareLink,
-        );
-        if (selection == null) return null;
-        return buildOptimizeApplyPlan(preview, selection: selection);
-      },
-      onApplyStart: () {
-        if (!context.mounted) return;
-        showApplyOptimizationLoading(context);
-        isLoadingDialogOpen = true;
-      },
-      onNoChanges: (outcome) async {
-        closeLoadingDialog();
-        if (!context.mounted) return;
-        await showOptimizeNoChangesFeedback(context, outcome);
-      },
-      onSuccess: () {
-        closeLoadingDialog();
-        if (!context.mounted) return;
-        closeOptimizeSheetAndShowSuccess(context);
-      },
-      onAiError: (error) async {
-        closeLoadingDialog();
-        if (!context.mounted) return;
-        await _handleOptimizeAiFailure(
-          context,
-          deckProvider,
-          error,
-          archetype: archetype,
-        );
-      },
-      onGenericError: (error) {
-        closeLoadingDialog();
-        if (!context.mounted) return;
-        showOptimizeApplyErrorSnackBar(context, error);
-      },
-      addBulk:
-          (deckId, cards, {mutationContext}) => deckProvider.addCardsBulk(
-            deckId: deckId,
-            cards: cards,
-            mutationContext: mutationContext,
-          ),
-      applyWithIds:
-          (
-            deckId,
-            removalsDetailed,
-            additionsDetailed, {
-            expectedDeckSignature,
-            mutationContext,
-          }) => deckProvider.applyOptimizationWithIds(
-            deckId: deckId,
-            removalsDetailed: removalsDetailed,
-            additionsDetailed: additionsDetailed,
-            expectedDeckSignature: expectedDeckSignature,
-            mutationContext: mutationContext,
-          ),
-      applyByNames:
-          (deckId, removals, additions, {mutationContext}) =>
-              deckProvider.applyOptimization(
-                deckId: deckId,
-                cardsToRemove: removals,
-                cardsToAdd: additions,
-                mutationContext: mutationContext,
-              ),
-      updateDeckStrategy: deckProvider.updateDeckStrategy,
-    );
+          final selection = await showOptimizationPreviewDialog(
+            context,
+            mode: preview.mode,
+            archetype: archetype,
+            keepTheme: preview.constraints['keep_theme'] == true,
+            preservedTheme: preview.themeInfo['theme']?.toString(),
+            reasoning: preview.reasoning,
+            intensity: preview.intensity,
+            optimizeIntensity: preview.optimizeIntensity,
+            qualityWarning: preview.qualityWarning,
+            deckAnalysis: preview.deckAnalysis,
+            postAnalysis: preview.postAnalysis,
+            warnings: preview.warnings,
+            metaReferenceContext: preview.metaReferenceContext,
+            optimizationContract: preview.optimizationContract,
+            battleValidation: preview.battleValidation,
+            displayRemovals: preview.displayRemovals,
+            displayAdditions: preview.displayAdditions,
+            onCopyDebug:
+                kDebugMode
+                    ? () async {
+                      await _copyOptimizeDebug(
+                        deckId: widget.deckId,
+                        archetype: archetype,
+                        bracket: _selectedBracket,
+                        intensity: _selectedIntensity,
+                        result: result,
+                      );
+                      if (!context.mounted) return;
+                      showOptimizeDebugCopiedSnackBar(context);
+                    }
+                    : null,
+            onCreateShareLink: _createOptimizationShareLink,
+          );
+          if (selection == null) return null;
+          return buildOptimizeApplyPlan(preview, selection: selection);
+        },
+        onApplyStart: () {
+          if (!context.mounted) return;
+          showApplyOptimizationLoading(context);
+          isLoadingDialogOpen = true;
+        },
+        onNoChanges: (outcome) async {
+          closeLoadingDialog();
+          if (!context.mounted) return;
+          await showOptimizeNoChangesFeedback(context, outcome);
+        },
+        onSuccess: () {
+          closeLoadingDialog();
+          if (!context.mounted) return;
+          closeOptimizeSheetAndShowSuccess(context);
+        },
+        onAiError: (error) async {
+          closeLoadingDialog();
+          if (!context.mounted) return;
+          await _handleOptimizeAiFailure(
+            context,
+            deckProvider,
+            error,
+            archetype: archetype,
+          );
+        },
+        onGenericError: (error) {
+          closeLoadingDialog();
+          if (!context.mounted) return;
+          showOptimizeApplyErrorSnackBar(context, error);
+        },
+        addBulk:
+            (deckId, cards, {mutationContext}) => deckProvider.addCardsBulk(
+              deckId: deckId,
+              cards: cards,
+              mutationContext: mutationContext,
+            ),
+        applyWithIds:
+            (
+              deckId,
+              removalsDetailed,
+              additionsDetailed, {
+              expectedDeckSignature,
+              mutationContext,
+            }) => deckProvider.applyOptimizationWithIds(
+              deckId: deckId,
+              removalsDetailed: removalsDetailed,
+              additionsDetailed: additionsDetailed,
+              expectedDeckSignature: expectedDeckSignature,
+              mutationContext: mutationContext,
+            ),
+        applyByNames:
+            (deckId, removals, additions, {mutationContext}) =>
+                deckProvider.applyOptimization(
+                  deckId: deckId,
+                  cardsToRemove: removals,
+                  cardsToAdd: additions,
+                  mutationContext: mutationContext,
+                ),
+        updateDeckStrategy: deckProvider.updateDeckStrategy,
+      );
+    } finally {
+      if (context.mounted) {
+        await refreshAiUsageAfterAction(context);
+      }
+      progressState.dispose();
+    }
   }
 
   @override
@@ -1884,7 +1905,7 @@ class _OptimizationSheetState extends State<_OptimizationSheet> {
     _rebuildIntent = widget.initialRebuildIntent;
     final deck = context.read<DeckProvider>().selectedDeck;
     final savedBracket = deck?.bracket;
-    if (savedBracket != null) _selectedBracket = savedBracket;
+    if (isCommanderBracket(savedBracket)) _selectedBracket = savedBracket!;
     _optionsFuture = context.read<DeckProvider>().fetchOptimizationOptions(
       widget.deckId,
     );

@@ -32,10 +32,7 @@ class PlanScreen extends StatelessWidget {
           _PlanComparisonCard(
             plan: ManaLoomPlan.free,
             active: provider.tier == ManaLoomPlanTier.free,
-            onAction:
-                provider.isRemoteSynced
-                    ? null
-                    : () => provider.setPlan(ManaLoomPlanTier.free),
+            onAction: null,
           ),
           const SizedBox(height: 12),
           _PlanComparisonCard(
@@ -141,7 +138,13 @@ class _PlanComparisonCard extends StatelessWidget {
                     )
                     : OutlinedButton(
                       onPressed: active ? null : onAction,
-                      child: Text(active ? 'Free ativo' : 'Usar Free'),
+                      child: Text(
+                        active
+                            ? 'Free ativo'
+                            : onAction == null
+                            ? 'Incluído no Pro'
+                            : 'Usar Free',
+                      ),
                     ),
           ),
         ],

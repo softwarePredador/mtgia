@@ -273,9 +273,13 @@ void main() {
 
         final session = await LifeCounterSessionStore().load();
         expect(session, isNotNull);
-        expect(session!.lives[1], 0);
+        expect(session!.lives[1], -5);
+        expect(
+          session.resolvedPlayerEliminationReasons[1],
+          LifeCounterPlayerEliminationReason.life,
+        );
         expect(session.lastTableEvent, 'Jogador 2 foi nocauteado');
-        expect(host.loadBundleCallCount, 1);
+        expect(host.loadBundleCallCount, 2);
       },
     );
 
@@ -351,15 +355,11 @@ void main() {
       await tester.pumpAndSettle();
 
       await tester.ensureVisible(
-        find.byKey(
-          const Key('life-counter-native-set-life-adjust-minus-10'),
-        ),
+        find.byKey(const Key('life-counter-native-set-life-adjust-minus-10')),
       );
       await tester.pumpAndSettle();
       await tester.tap(
-        find.byKey(
-          const Key('life-counter-native-set-life-adjust-minus-10'),
-        ),
+        find.byKey(const Key('life-counter-native-set-life-adjust-minus-10')),
       );
       await tester.pumpAndSettle();
       await tester.tap(
@@ -369,9 +369,13 @@ void main() {
 
       final session = await LifeCounterSessionStore().load();
       expect(session, isNotNull);
-      expect(session!.lives[1], 0);
+      expect(session!.lives[1], -5);
+      expect(
+        session.resolvedPlayerEliminationReasons[1],
+        LifeCounterPlayerEliminationReason.life,
+      );
       expect(session.lastTableEvent, 'Jogador 2 foi nocauteado');
-      expect(host.loadBundleCallCount, 1);
+      expect(host.loadBundleCallCount, 2);
     });
   });
 }

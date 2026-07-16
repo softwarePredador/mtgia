@@ -1,13 +1,12 @@
-import 'dart:io';
 import 'dart:convert';
 import 'package:bcrypt/bcrypt.dart';
 import 'package:crypto/crypto.dart';
 import 'package:dart_jsonwebtoken/dart_jsonwebtoken.dart';
-import 'package:dotenv/dotenv.dart';
 import 'package:meta/meta.dart' show visibleForTesting;
 import 'package:postgres/postgres.dart';
 import 'database.dart';
 import 'plan_service.dart';
+import 'runtime_environment.dart';
 
 /// Serviço centralizado de autenticação
 ///
@@ -27,14 +26,16 @@ class AuthService {
       _jwtSecret = jwtSecret;
       return;
     }
-    final env = DotEnv(includePlatformEnvironment: true, quiet: true)..load();
-    final secret = env['JWT_SECRET'] ?? Platform.environment['JWT_SECRET'];
+    final env = loadRuntimeEnvironment();
+    final secret = env['JWT_SECRET'];
 
     if (secret == null || secret.isEmpty) {
-      throw StateError('ERRO CRÍTICO: JWT_SECRET não configurado!\n'
-          'Adicione no arquivo .env:\n'
-          'JWT_SECRET=sua_chave_secreta_aleatoria_aqui\n\n'
-          'Gere uma chave segura com: openssl rand -base64 48');
+      throw StateError(
+        'ERRO CRÍTICO: JWT_SECRET não configurado!\n'
+        'Adicione no arquivo .env:\n'
+        'JWT_SECRET=sua_chave_secreta_aleatoria_aqui\n\n'
+        'Gere uma chave segura com: openssl rand -base64 48',
+      );
     }
 
     _jwtSecret = secret;
@@ -63,8 +64,9 @@ class AuthService {
   bool verifyPassword(String password, String hashedPassword) {
     try {
       if (hashedPassword.startsWith(_bcryptSha256Prefix)) {
-        final strippedHash =
-            hashedPassword.substring(_bcryptSha256Prefix.length);
+        final strippedHash = hashedPassword.substring(
+          _bcryptSha256Prefix.length,
+        );
         final normalizedPassword = _preparePassword(password);
         return BCrypt.checkpw(normalizedPassword, strippedHash);
       }
@@ -262,7 +264,8 @@ class AuthService {
 
     final result = await conn.execute(
       Sql.named(
-          'SELECT id, username, email, display_name, avatar_url FROM users WHERE id = @userId'),
+        'SELECT id, username, email, display_name, avatar_url FROM users WHERE id = @userId',
+      ),
       parameters: {'userId': userId},
     );
 
@@ -296,10 +299,7 @@ class AuthService {
 }
 
 class _PasswordPreparation {
-  const _PasswordPreparation({
-    required this.value,
-    required this.preHashed,
-  });
+  const _PasswordPreparation({required this.value, required this.preHashed});
 
   final String value;
   final bool preHashed;

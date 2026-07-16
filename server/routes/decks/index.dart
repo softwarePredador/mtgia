@@ -5,6 +5,7 @@ import 'package:postgres/postgres.dart';
 
 import '../../lib/deck_schema_support.dart';
 import '../../lib/deck_card_name_resolution_support.dart';
+import '../../lib/commander_bracket.dart';
 import '../../lib/deck_rules_service.dart';
 import '../../lib/http_responses.dart';
 import '../../lib/logger.dart';
@@ -277,9 +278,11 @@ Future<Response> _createDeck(RequestContext context) async {
   final name = body['name'] as String?;
   final format = body['format'] as String?;
   final archetype = body['archetype'] as String?;
-  final bracketRaw = body['bracket'];
-  final bracket =
-      bracketRaw is int ? bracketRaw : int.tryParse('${bracketRaw ?? ''}');
+  final bracketResult = parseCommanderBracket(body['bracket']);
+  if (bracketResult.error != null) {
+    return badRequest(bracketResult.error!);
+  }
+  final bracket = bracketResult.value;
   final isPublic = body['is_public'] == true;
   final cards =
       body['cards'] as List? ??
@@ -428,15 +431,27 @@ Future<Response> _createDeck(RequestContext context) async {
       return deckMap;
     });
 
-    unawaited(
-      _logDeckCreateLearning(
-        pool: conn,
-        deckId: newDeck['id'].toString(),
-        deckName: name,
-        format: format,
-        rawCards: cards,
-      ),
-    );
+    final productLearningEnabled = shouldWriteProductLearning();
+    if (productLearningEnabled) {
+      unawaited(
+        _logDeckCreateLearning(
+          pool: conn,
+          deckId: newDeck['id'].toString(),
+          deckName: name,
+          format: format,
+          rawCards: cards,
+        ),
+      );
+    } else {
+      newDeck['e2e_validation'] = const {
+        'isolated_runtime': true,
+        'product_learning_writes_suppressed': true,
+      };
+      Log.d(
+        'Deck learning writes suppressed for isolated E2E deck '
+        '${newDeck['id']}.',
+      );
+    }
 
     return Response.json(body: newDeck);
   } on DeckRulesException catch (e) {
@@ -473,40 +488,44 @@ Future<void> _logDeckCreateLearning({
     final commanderQuantity = learningCards
         .where((card) => card['is_commander'] == true)
         .fold<int>(0, (sum, card) => sum + learningCardQuantityTotal([card]));
+    final eventData = <String, dynamic>{
+      'deck_name': deckName,
+      'cards_quantity_total': cardQuantityTotal,
+      'commander_quantity': commanderQuantity,
+      'main_quantity': cardQuantityTotal - commanderQuantity,
+      'cards':
+          learningCards
+              .map(
+                (card) => {
+                  'name':
+                      card['name']?.toString() ?? card['card_id']?.toString(),
+                  'quantity': card['quantity'],
+                  'is_commander': card['is_commander'] == true,
+                },
+              )
+              .toList(),
+    };
 
     if (commanderName != null && commanderName.isNotEmpty) {
-      await upsertCommanderCardUsage(
+      await recordUserCreatedDeckLearning(
         pool: pool,
+        deckId: deckId,
         commanderName: commanderName,
+        format: format,
+        cardCount: cardQuantityTotal,
         cards: learningCards,
+        eventData: eventData,
+      );
+    } else {
+      await logDeckLearningEvent(
+        pool: pool,
+        deckId: deckId,
+        format: format,
+        cardCount: cardQuantityTotal,
+        source: 'user_created',
+        eventData: eventData,
       );
     }
-
-    await logDeckLearningEvent(
-      pool: pool,
-      deckId: deckId,
-      commanderName: commanderName,
-      format: format,
-      cardCount: cardQuantityTotal,
-      source: 'user_created',
-      eventData: {
-        'deck_name': deckName,
-        'cards_quantity_total': cardQuantityTotal,
-        'commander_quantity': commanderQuantity,
-        'main_quantity': cardQuantityTotal - commanderQuantity,
-        'cards':
-            learningCards
-                .map(
-                  (card) => {
-                    'name':
-                        card['name']?.toString() ?? card['card_id']?.toString(),
-                    'quantity': card['quantity'],
-                    'is_commander': card['is_commander'] == true,
-                  },
-                )
-                .toList(),
-      },
-    );
   } catch (error) {
     Log.e('⚠️ Falha ao registrar aprendizado do deck $deckId: $error');
   }

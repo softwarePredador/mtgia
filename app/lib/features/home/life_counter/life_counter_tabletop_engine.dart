@@ -47,13 +47,53 @@ class LifeCounterPlayerBoardSummary {
 class LifeCounterTabletopEngine {
   LifeCounterTabletopEngine._();
 
+  static const LifeCounterPlayerStatusSummary _lifeEliminationSummary =
+      LifeCounterPlayerStatusSummary(
+        kind: LifeCounterPlayerStatusKind.knockedOut,
+        label: 'Knocked out',
+        description: 'This player is at zero or less life.',
+      );
+  static const LifeCounterPlayerStatusSummary _poisonEliminationSummary =
+      LifeCounterPlayerStatusSummary(
+        kind: LifeCounterPlayerStatusKind.poisonLethal,
+        label: 'Poison lethal',
+        description: 'This player reached the poison lethal threshold.',
+      );
+  static const LifeCounterPlayerStatusSummary
+  _commanderDamageEliminationSummary = LifeCounterPlayerStatusSummary(
+    kind: LifeCounterPlayerStatusKind.commanderDamageLethal,
+    label: 'Commander damage lethal',
+    description: 'One commander source reached lethal damage for this player.',
+  );
+  static const LifeCounterPlayerStatusSummary
+  _activeLifeWarningSummary = LifeCounterPlayerStatusSummary(
+    kind: LifeCounterPlayerStatusKind.active,
+    label: 'Active player',
+    description:
+        'Life is zero or less, but this player remains active until Auto-KO or a manual knock out records the defeat.',
+  );
+  static const LifeCounterPlayerStatusSummary
+  _activePoisonWarningSummary = LifeCounterPlayerStatusSummary(
+    kind: LifeCounterPlayerStatusKind.active,
+    label: 'Active player',
+    description:
+        'The poison lethal threshold was reached, but this player remains active until Auto-KO or a manual knock out records the defeat.',
+  );
+  static const LifeCounterPlayerStatusSummary
+  _activeCommanderDamageWarningSummary = LifeCounterPlayerStatusSummary(
+    kind: LifeCounterPlayerStatusKind.active,
+    label: 'Active player',
+    description:
+        'Commander damage is lethal, but this player remains active until Auto-KO or a manual knock out records the defeat.',
+  );
+
   static LifeCounterSession setLifeTotal(
     LifeCounterSession session, {
     required int playerIndex,
     required int life,
   }) {
     final lives = List<int>.from(session.lives);
-    lives[playerIndex] = life.clamp(0, 999);
+    lives[playerIndex] = life.clamp(-999, 999);
     return session.copyWith(lives: lives, clearLastTableEvent: true);
   }
 
@@ -68,6 +108,13 @@ class LifeCounterTabletopEngine {
       playerIndex: playerIndex,
       life: currentLife + delta,
     );
+  }
+
+  static int lifeTotalAfterCommanderDamageDelta({
+    required int previousLife,
+    required int damageDelta,
+  }) {
+    return (previousLife - damageDelta).clamp(-999, 999);
   }
 
   static LifeCounterSession setPartnerCommander(
@@ -88,8 +135,15 @@ class LifeCounterTabletopEngine {
     final specialStates = List<LifeCounterPlayerSpecialState>.from(
       session.playerSpecialStates,
     );
+    final eliminationReasons = List<LifeCounterPlayerEliminationReason>.from(
+      session.resolvedPlayerEliminationReasons,
+    );
     specialStates[playerIndex] = state;
-    return session.copyWith(playerSpecialStates: specialStates);
+    eliminationReasons[playerIndex] = LifeCounterPlayerEliminationReason.none;
+    return session.copyWith(
+      playerSpecialStates: specialStates,
+      playerEliminationReasons: eliminationReasons,
+    );
   }
 
   static bool isPlayerLifeLethal(
@@ -110,7 +164,20 @@ class LifeCounterTabletopEngine {
     LifeCounterSession session, {
     required int playerIndex,
   }) {
-    return session.commanderDamage[playerIndex].any((damage) => damage >= 21);
+    final damageDetails = session.resolvedCommanderDamageDetails[playerIndex];
+    for (
+      var sourcePlayerIndex = 0;
+      sourcePlayerIndex < session.playerCount;
+      sourcePlayerIndex += 1
+    ) {
+      if (_isCommanderDamageDetailLethal(
+        damageDetails[sourcePlayerIndex],
+        sourceHasPartner: session.partnerCommanders[sourcePlayerIndex],
+      )) {
+        return true;
+      }
+    }
+    return false;
   }
 
   static bool isCommanderDamageSourceLethal(
@@ -118,12 +185,18 @@ class LifeCounterTabletopEngine {
     required int targetPlayerIndex,
     required int sourcePlayerIndex,
   }) {
-    return readCommanderDamageFromSource(
-          session,
-          targetPlayerIndex: targetPlayerIndex,
-          sourcePlayerIndex: sourcePlayerIndex,
-        ) >=
-        21;
+    return _isCommanderDamageDetailLethal(
+      session
+          .resolvedCommanderDamageDetails[targetPlayerIndex][sourcePlayerIndex],
+      sourceHasPartner: session.partnerCommanders[sourcePlayerIndex],
+    );
+  }
+
+  static LifeCounterPlayerEliminationReason lethalEliminationReason(
+    LifeCounterSession session, {
+    required int playerIndex,
+  }) {
+    return _deriveLethalEliminationReason(session, playerIndex: playerIndex);
   }
 
   static List<int> commanderDamageLethalSources(
@@ -238,27 +311,25 @@ class LifeCounterTabletopEngine {
         break;
     }
 
+    switch (session.resolvedPlayerEliminationReasons[playerIndex]) {
+      case LifeCounterPlayerEliminationReason.life:
+        return _lifeEliminationSummary;
+      case LifeCounterPlayerEliminationReason.poison:
+        return _poisonEliminationSummary;
+      case LifeCounterPlayerEliminationReason.commanderDamage:
+        return _commanderDamageEliminationSummary;
+      case LifeCounterPlayerEliminationReason.none:
+        break;
+    }
+
     if (isPlayerCommanderDamageLethal(session, playerIndex: playerIndex)) {
-      return const LifeCounterPlayerStatusSummary(
-        kind: LifeCounterPlayerStatusKind.commanderDamageLethal,
-        label: 'Commander damage lethal',
-        description:
-            'One commander source reached lethal damage for this player.',
-      );
+      return _activeCommanderDamageWarningSummary;
     }
     if (isPlayerPoisonLethal(session, playerIndex: playerIndex)) {
-      return const LifeCounterPlayerStatusSummary(
-        kind: LifeCounterPlayerStatusKind.poisonLethal,
-        label: 'Poison lethal',
-        description: 'This player reached the poison lethal threshold.',
-      );
+      return _activePoisonWarningSummary;
     }
     if (isPlayerLifeLethal(session, playerIndex: playerIndex)) {
-      return const LifeCounterPlayerStatusSummary(
-        kind: LifeCounterPlayerStatusKind.knockedOut,
-        label: 'Knocked out',
-        description: 'This player is at zero or less life.',
-      );
+      return _activeLifeWarningSummary;
     }
     return const LifeCounterPlayerStatusSummary(
       kind: LifeCounterPlayerStatusKind.active,
@@ -315,8 +386,10 @@ class LifeCounterTabletopEngine {
     LifeCounterSession session, {
     required int playerIndex,
   }) {
-    return playerStatusSummary(session, playerIndex: playerIndex).kind ==
-        LifeCounterPlayerStatusKind.active;
+    return session.playerSpecialStates[playerIndex] ==
+            LifeCounterPlayerSpecialState.none &&
+        session.resolvedPlayerEliminationReasons[playerIndex] ==
+            LifeCounterPlayerEliminationReason.none;
   }
 
   static bool hasAnyActivePlayers(LifeCounterSession session) {
@@ -387,7 +460,11 @@ class LifeCounterTabletopEngine {
       return session;
     }
 
-    return markPlayerKnockedOut(session, playerIndex: playerIndex);
+    return _markPlayerEliminated(
+      session,
+      playerIndex: playerIndex,
+      reason: _deriveLethalEliminationReason(session, playerIndex: playerIndex),
+    );
   }
 
   static LifeCounterSession applyAutoKnockOutAcrossPlayers(
@@ -418,13 +495,13 @@ class LifeCounterTabletopEngine {
     required LifeCounterSettings settings,
     bool preserveManualSpecialStates = true,
   }) {
-    final autoAdjustedSession = applyAutoKnockOutAcrossPlayers(
+    final reconciledSession = _reconcilePlayerEliminationReasons(
       session,
       settings: settings,
       preserveManualSpecialStates: preserveManualSpecialStates,
     );
     final sanitizedTableSession = sanitizeTableOwnershipForActivePlayers(
-      autoAdjustedSession,
+      reconciledSession,
     );
     return LifeCounterTurnTrackerEngine.sanitizeTrackerPointersForActivePlayers(
       sanitizedTableSession,
@@ -552,7 +629,12 @@ class LifeCounterTabletopEngine {
     required String counterKey,
   }) {
     if (_isKnownCounterKey(counterKey)) {
-      return session;
+      return _updateKnownCounterPresence(
+        session,
+        playerIndex: playerIndex,
+        counterKey: counterKey,
+        present: true,
+      );
     }
 
     final extraCounters = session.resolvedPlayerExtraCounters
@@ -568,7 +650,12 @@ class LifeCounterTabletopEngine {
     required String counterKey,
   }) {
     if (_isKnownCounterKey(counterKey)) {
-      return session;
+      return _updateKnownCounterPresence(
+        session,
+        playerIndex: playerIndex,
+        counterKey: counterKey,
+        present: false,
+      );
     }
 
     final extraCounters = session.resolvedPlayerExtraCounters
@@ -617,15 +704,30 @@ class LifeCounterTabletopEngine {
       case 'poison':
         final poison = List<int>.from(session.poison);
         poison[playerIndex] = normalizedValue;
-        return session.copyWith(poison: poison);
+        return _updateKnownCounterPresence(
+          session.copyWith(poison: poison),
+          playerIndex: playerIndex,
+          counterKey: counterKey,
+          present: true,
+        );
       case 'energy':
         final energy = List<int>.from(session.energy);
         energy[playerIndex] = normalizedValue;
-        return session.copyWith(energy: energy);
+        return _updateKnownCounterPresence(
+          session.copyWith(energy: energy),
+          playerIndex: playerIndex,
+          counterKey: counterKey,
+          present: true,
+        );
       case 'xp':
         final experience = List<int>.from(session.experience);
         experience[playerIndex] = normalizedValue;
-        return session.copyWith(experience: experience);
+        return _updateKnownCounterPresence(
+          session.copyWith(experience: experience),
+          playerIndex: playerIndex,
+          counterKey: counterKey,
+          present: true,
+        );
       case 'tax-1':
       case 'tax-2':
         final details = List<LifeCounterCommanderCastDetail>.from(
@@ -643,11 +745,16 @@ class LifeCounterTabletopEngine {
                   commanderOneCasts: current.commanderOneCasts,
                   commanderTwoCasts: casts,
                 );
-        return session.copyWith(
-          commanderCasts: details
-              .map((entry) => entry.totalCasts)
-              .toList(growable: false),
-          commanderCastDetails: details,
+        return _updateKnownCounterPresence(
+          session.copyWith(
+            commanderCasts: details
+                .map((entry) => entry.totalCasts)
+                .toList(growable: false),
+            commanderCastDetails: details,
+          ),
+          playerIndex: playerIndex,
+          counterKey: counterKey,
+          present: true,
         );
       default:
         final extraCounters = session.resolvedPlayerExtraCounters
@@ -670,11 +777,16 @@ class LifeCounterTabletopEngine {
     final specialStates = List<LifeCounterPlayerSpecialState>.from(
       session.playerSpecialStates,
     );
+    final eliminationReasons = List<LifeCounterPlayerEliminationReason>.from(
+      session.resolvedPlayerEliminationReasons,
+    );
     lives[playerIndex] = 0;
     specialStates[playerIndex] = LifeCounterPlayerSpecialState.none;
+    eliminationReasons[playerIndex] = LifeCounterPlayerEliminationReason.life;
     return session.copyWith(
       lives: lives,
       playerSpecialStates: specialStates,
+      playerEliminationReasons: eliminationReasons,
       lastTableEvent: 'Jogador ${playerIndex + 1} foi nocauteado',
     );
   }
@@ -686,9 +798,14 @@ class LifeCounterTabletopEngine {
     final specialStates = List<LifeCounterPlayerSpecialState>.from(
       session.playerSpecialStates,
     );
+    final eliminationReasons = List<LifeCounterPlayerEliminationReason>.from(
+      session.resolvedPlayerEliminationReasons,
+    );
     specialStates[playerIndex] = LifeCounterPlayerSpecialState.deckedOut;
+    eliminationReasons[playerIndex] = LifeCounterPlayerEliminationReason.none;
     return session.copyWith(
       playerSpecialStates: specialStates,
+      playerEliminationReasons: eliminationReasons,
       lastTableEvent: 'Jogador ${playerIndex + 1} ficou sem grimorio',
     );
   }
@@ -700,9 +817,14 @@ class LifeCounterTabletopEngine {
     final specialStates = List<LifeCounterPlayerSpecialState>.from(
       session.playerSpecialStates,
     );
+    final eliminationReasons = List<LifeCounterPlayerEliminationReason>.from(
+      session.resolvedPlayerEliminationReasons,
+    );
     specialStates[playerIndex] = LifeCounterPlayerSpecialState.answerLeft;
+    eliminationReasons[playerIndex] = LifeCounterPlayerEliminationReason.none;
     return session.copyWith(
       playerSpecialStates: specialStates,
+      playerEliminationReasons: eliminationReasons,
       lastTableEvent: 'Jogador ${playerIndex + 1} deixou a mesa',
     );
   }
@@ -716,6 +838,9 @@ class LifeCounterTabletopEngine {
     final specialStates = List<LifeCounterPlayerSpecialState>.from(
       session.playerSpecialStates,
     );
+    final eliminationReasons = List<LifeCounterPlayerEliminationReason>.from(
+      session.resolvedPlayerEliminationReasons,
+    );
     final commanderDamage = session.commanderDamage
         .map((row) => List<int>.from(row))
         .toList(growable: false);
@@ -726,6 +851,7 @@ class LifeCounterTabletopEngine {
     lives[playerIndex] = session.startingLife;
     poison[playerIndex] = 0;
     specialStates[playerIndex] = LifeCounterPlayerSpecialState.none;
+    eliminationReasons[playerIndex] = LifeCounterPlayerEliminationReason.none;
     commanderDamage[playerIndex] = List<int>.filled(session.playerCount, 0);
     commanderDamageDetails[playerIndex] =
         List<LifeCounterCommanderDamageDetail>.filled(
@@ -737,6 +863,7 @@ class LifeCounterTabletopEngine {
       lives: lives,
       poison: poison,
       playerSpecialStates: specialStates,
+      playerEliminationReasons: eliminationReasons,
       commanderDamage: commanderDamage,
       commanderDamageDetails: commanderDamageDetails,
       lastTableEvent:
@@ -748,12 +875,159 @@ class LifeCounterTabletopEngine {
     return _isKnownCounterKey(counterKey);
   }
 
+  static LifeCounterSession _updateKnownCounterPresence(
+    LifeCounterSession session, {
+    required int playerIndex,
+    required String counterKey,
+    required bool present,
+  }) {
+    if (!_isKnownCounterKey(counterKey)) {
+      return session;
+    }
+
+    final counterPresence = session.resolvedPlayerCounterPresence
+        .map((entry) => List<String>.from(entry))
+        .toList(growable: false);
+    final playerPresence = counterPresence[playerIndex];
+    final changed =
+        present
+            ? !playerPresence.contains(counterKey)
+            : playerPresence.contains(counterKey);
+    if (!changed) {
+      return session;
+    }
+
+    if (present) {
+      playerPresence.add(counterKey);
+      playerPresence.sort(
+        (left, right) => lifeCounterKnownPlayerCounterKeys
+            .indexOf(left)
+            .compareTo(lifeCounterKnownPlayerCounterKeys.indexOf(right)),
+      );
+    } else {
+      playerPresence.remove(counterKey);
+    }
+    return session.copyWith(playerCounterPresence: counterPresence);
+  }
+
   static bool _isKnownCounterKey(String counterKey) {
-    return counterKey == 'poison' ||
-        counterKey == 'energy' ||
-        counterKey == 'xp' ||
-        counterKey == 'tax-1' ||
-        counterKey == 'tax-2';
+    return lifeCounterKnownPlayerCounterKeys.contains(counterKey);
+  }
+
+  static bool _isCommanderDamageDetailLethal(
+    LifeCounterCommanderDamageDetail detail, {
+    required bool sourceHasPartner,
+  }) {
+    return detail.commanderOneDamage >= 21 ||
+        (sourceHasPartner && detail.commanderTwoDamage >= 21);
+  }
+
+  static LifeCounterPlayerEliminationReason _deriveLethalEliminationReason(
+    LifeCounterSession session, {
+    required int playerIndex,
+  }) {
+    if (isPlayerCommanderDamageLethal(session, playerIndex: playerIndex)) {
+      return LifeCounterPlayerEliminationReason.commanderDamage;
+    }
+    if (isPlayerPoisonLethal(session, playerIndex: playerIndex)) {
+      return LifeCounterPlayerEliminationReason.poison;
+    }
+    if (isPlayerLifeLethal(session, playerIndex: playerIndex)) {
+      return LifeCounterPlayerEliminationReason.life;
+    }
+    return LifeCounterPlayerEliminationReason.none;
+  }
+
+  static LifeCounterSession _reconcilePlayerEliminationReasons(
+    LifeCounterSession session, {
+    required LifeCounterSettings settings,
+    required bool preserveManualSpecialStates,
+  }) {
+    var reconciledSession = session;
+
+    for (
+      var playerIndex = 0;
+      playerIndex < reconciledSession.playerCount;
+      playerIndex += 1
+    ) {
+      final specialState = reconciledSession.playerSpecialStates[playerIndex];
+      final currentReason =
+          reconciledSession.resolvedPlayerEliminationReasons[playerIndex];
+
+      if (preserveManualSpecialStates &&
+          specialState != LifeCounterPlayerSpecialState.none) {
+        if (currentReason != LifeCounterPlayerEliminationReason.none) {
+          reconciledSession = _replacePlayerEliminationReason(
+            reconciledSession,
+            playerIndex: playerIndex,
+            reason: LifeCounterPlayerEliminationReason.none,
+          );
+        }
+        continue;
+      }
+
+      final lethalReason = _deriveLethalEliminationReason(
+        reconciledSession,
+        playerIndex: playerIndex,
+      );
+      if (currentReason == LifeCounterPlayerEliminationReason.none) {
+        if (settings.autoKill &&
+            lethalReason != LifeCounterPlayerEliminationReason.none) {
+          reconciledSession = _markPlayerEliminated(
+            reconciledSession,
+            playerIndex: playerIndex,
+            reason: lethalReason,
+          );
+        }
+        continue;
+      }
+
+      if (currentReason != lethalReason) {
+        reconciledSession = _replacePlayerEliminationReason(
+          reconciledSession,
+          playerIndex: playerIndex,
+          reason: lethalReason,
+        );
+      }
+    }
+
+    return reconciledSession;
+  }
+
+  static LifeCounterSession _replacePlayerEliminationReason(
+    LifeCounterSession session, {
+    required int playerIndex,
+    required LifeCounterPlayerEliminationReason reason,
+  }) {
+    final eliminationReasons = List<LifeCounterPlayerEliminationReason>.from(
+      session.resolvedPlayerEliminationReasons,
+    );
+    eliminationReasons[playerIndex] = reason;
+    return session.copyWith(playerEliminationReasons: eliminationReasons);
+  }
+
+  static LifeCounterSession _markPlayerEliminated(
+    LifeCounterSession session, {
+    required int playerIndex,
+    required LifeCounterPlayerEliminationReason reason,
+  }) {
+    if (reason == LifeCounterPlayerEliminationReason.none) {
+      return session;
+    }
+
+    final specialStates = List<LifeCounterPlayerSpecialState>.from(
+      session.playerSpecialStates,
+    );
+    final eliminationReasons = List<LifeCounterPlayerEliminationReason>.from(
+      session.resolvedPlayerEliminationReasons,
+    );
+    specialStates[playerIndex] = LifeCounterPlayerSpecialState.none;
+    eliminationReasons[playerIndex] = reason;
+    return session.copyWith(
+      playerSpecialStates: specialStates,
+      playerEliminationReasons: eliminationReasons,
+      lastTableEvent: 'Jogador ${playerIndex + 1} foi nocauteado',
+    );
   }
 
   static int? _sanitizeOwnershipPlayer(

@@ -6,7 +6,7 @@ class Deck {
   final String? description;
   final String?
   archetype; // Arquétipo do deck (aggro, control, midrange, combo, etc)
-  final int? bracket; // 1..4 (EDH bracket)
+  final int? bracket; // 1..5 (Commander bracket)
   final int? synergyScore;
   final String? strengths;
   final String? weaknesses;
@@ -67,7 +67,8 @@ class Deck {
       isPublic: json['is_public'] as bool? ?? false,
       createdAt: DateTime.parse(json['created_at'] as String),
       cardCount: json['card_count'] as int? ?? 0,
-      colorIdentity: (json['color_identity'] as List<dynamic>?)
+      colorIdentity:
+          (json['color_identity'] as List<dynamic>?)
               ?.map((e) => e.toString())
               .toList() ??
           const [],

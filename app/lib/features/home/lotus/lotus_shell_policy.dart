@@ -155,6 +155,21 @@ String get lotusShellCleanupScript {
 .game-mode-info-overlay {
   font-family: var(--manaloom-ui-font, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif) !important;
   color: rgba(245, 247, 252, 0.96) !important;
+}
+
+.life-history-overlay,
+.settings-overlay,
+.card-search-overlay {
+  background: rgb(3, 8, 18) !important;
+}
+
+.planechase-overlay,
+.archenemy-overlay,
+.bounty-overlay,
+.edit-planechase-cards-overlay,
+.edit-archenemy-cards-overlay,
+.edit-bounty-cards-overlay,
+.game-mode-info-overlay {
   background: rgba(4, 8, 18, 0.68) !important;
 }
 

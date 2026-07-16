@@ -1,10 +1,11 @@
 import 'package:dart_frog/dart_frog.dart';
-import 'package:dotenv/dotenv.dart';
 import 'package:postgres/postgres.dart';
 
+import '../../../../lib/admin_access_support.dart';
 import '../../../../lib/http_responses.dart';
 import '../../../../lib/logger.dart';
 import '../../../../lib/observability.dart';
+import '../../../../lib/runtime_environment.dart';
 
 Future<Response> onRequest(RequestContext context) async {
   if (context.request.method != HttpMethod.get) {
@@ -14,7 +15,7 @@ Future<Response> onRequest(RequestContext context) async {
   try {
     final userId = context.read<String>();
     final pool = context.read<Pool>();
-    final env = DotEnv(includePlatformEnvironment: true, quiet: true)..load();
+    final env = loadRuntimeEnvironment();
 
     final query = context.request.uri.queryParameters;
     final parsed = _parseTelemetryQuery(query);
@@ -22,7 +23,11 @@ Future<Response> onRequest(RequestContext context) async {
       return badRequest(parsed.error!);
     }
 
-    final isAdmin = await _isAdminUser(pool: pool, userId: userId, env: env);
+    final isAdmin = await isConfiguredAdminUser(
+      pool: pool,
+      userId: userId,
+      env: env,
+    );
 
     final includeGlobal = parsed.includeGlobal;
     if (includeGlobal && !isAdmin) {
@@ -312,45 +317,6 @@ _TelemetryQuery _parseTelemetryQuery(Map<String, String> query) {
     deckId: deckId != null && deckId.isNotEmpty ? deckId : null,
     userId: userId != null && userId.isNotEmpty ? userId : null,
   );
-}
-
-Future<bool> _isAdminUser({
-  required Pool pool,
-  required String userId,
-  required DotEnv env,
-}) async {
-  final rawIds = env['TELEMETRY_ADMIN_USER_IDS'] ?? '';
-  final ids =
-      rawIds.split(',').map((e) => e.trim()).where((e) => e.isNotEmpty).toSet();
-
-  if (ids.contains(userId)) return true;
-
-  final rawEmails = env['TELEMETRY_ADMIN_EMAILS'] ?? '';
-  final emails =
-      rawEmails
-          .split(',')
-          .map((e) => e.trim().toLowerCase())
-          .where((e) => e.isNotEmpty)
-          .toSet();
-
-  try {
-    final result = await pool.execute(
-      Sql.named('''
-        SELECT LOWER(email) AS email
-        FROM users
-        WHERE id = CAST(@user_id AS uuid)
-        LIMIT 1
-      '''),
-      parameters: {'user_id': userId},
-    );
-
-    if (result.isEmpty) return false;
-    final email =
-        (result.first.toColumnMap()['email']?.toString() ?? '').trim();
-    return email.isNotEmpty && emails.contains(email);
-  } catch (_) {
-    return false;
-  }
 }
 
 bool _isUuid(String value) {

@@ -3,13 +3,14 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:dart_frog/dart_frog.dart';
-import 'package:dotenv/dotenv.dart';
 import 'package:http/http.dart' as http;
 import 'package:postgres/postgres.dart';
 
 import '../../../lib/ai_generate_job.dart';
 import '../../../lib/ai_generate_internal_url_support.dart';
 import '../../../lib/ai_generate_performance_support.dart';
+import '../../../lib/ai_plan_reservation_handle.dart';
+import '../../../lib/ai_plan_reservation_settlement.dart';
 import '../../../lib/ai/commander_reference_card_stats_support.dart';
 import '../../../lib/ai/commander_deckbuilding_contract_support.dart';
 import '../../../lib/ai_provider_runtime_support.dart';
@@ -31,6 +32,7 @@ import '../../../lib/meta/meta_deck_reference_support.dart';
 import '../../../lib/observability.dart';
 import '../../../lib/openai_runtime_config.dart';
 import '../../../lib/openai_structured_output_support.dart';
+import '../../../lib/runtime_environment.dart';
 
 const _aiGenerateReferencePromptPolicyVersion =
     'ai_generate_reference_prompt_v6';
@@ -47,14 +49,19 @@ Future<Response> onRequest(RequestContext context) async {
     userId = null;
   }
 
+  AiGenerateRequestInput input;
   try {
-    final body = await context.request.json() as Map<String, dynamic>;
-    final prompt = body['prompt'] as String?;
-    final format = body['format'] as String? ?? 'Commander';
+    input = parseAiGenerateRequestInput(await context.request.json());
+  } on AiGenerateRequestValidationException catch (error) {
+    return badRequest(error.message);
+  } catch (_) {
+    return badRequest('JSON invalido');
+  }
 
-    if (prompt == null || prompt.isEmpty) {
-      return badRequest('Prompt is required');
-    }
+  try {
+    final body = input.body;
+    final prompt = input.prompt;
+    final format = input.format;
 
     if (isAiGenerateAsyncRequested(body)) {
       return _startAiGenerateAsyncJob(
@@ -68,7 +75,7 @@ Future<Response> onRequest(RequestContext context) async {
     final totalStopwatch = Stopwatch()..start();
     final timings = <String, int>{};
     final bracket = body['bracket'];
-    final requestedCommanderName = body['commander_name']?.toString().trim();
+    final requestedCommanderName = input.commanderName;
     final pool = context.read<Pool>();
 
     Map<String, dynamic>? referenceProfile;
@@ -172,7 +179,7 @@ Future<Response> onRequest(RequestContext context) async {
       );
     }
 
-    final env = DotEnv(includePlatformEnvironment: true, quiet: true)..load();
+    final env = loadRuntimeEnvironment();
     final aiConfig = OpenAiRuntimeConfig(env);
     final apiKey = env['OPENAI_API_KEY'];
     final cacheTtl = Duration(
@@ -451,13 +458,7 @@ $metaContext
       min: 800,
       max: 6000,
     );
-    final model = aiConfig.modelFor(
-      key: 'OPENAI_MODEL_GENERATE',
-      fallback: 'gpt-4o-mini',
-      devFallback: 'gpt-4o-mini',
-      stagingFallback: 'gpt-4o-mini',
-      prodFallback: 'gpt-4o-mini',
-    );
+    final model = aiConfig.generateModel;
 
     http.Response response;
     final openAiStopwatch = Stopwatch()..start();
@@ -979,6 +980,7 @@ Future<Response> _startAiGenerateAsyncJob({
     format: format,
     userId: authenticatedUserId,
   );
+  final planReservation = deferAiPlanReservationIfAvailable(context);
 
   final syncPayload = buildAiGenerateSyncPayloadForAsyncJob(body);
   final authorization = context.request.headers['authorization'];
@@ -986,23 +988,39 @@ Future<Response> _startAiGenerateAsyncJob({
 
   unawaited(
     runZonedGuarded(
-      () => _processAiGenerateAsyncJob(
-        pool: pool,
-        jobId: jobId,
-        internalGenerateUrl: internalGenerateUrl,
-        syncPayload: syncPayload,
-        authorization: authorization,
-      ),
+      () async {
+        final successful = await _processAiGenerateAsyncJob(
+          pool: pool,
+          jobId: jobId,
+          internalGenerateUrl: internalGenerateUrl,
+          syncPayload: syncPayload,
+          authorization: authorization,
+        );
+        if (planReservation != null) {
+          try {
+            await settleDeferredAiPlanReservation(
+              pool: pool,
+              handle: planReservation,
+              successful: successful,
+            );
+          } catch (error) {
+            Log.w(
+              'AI generate quota settlement failed '
+              'type=${error.runtimeType}',
+            );
+          }
+        }
+      },
       (error, stackTrace) {
         Log.e(
           'Background ai_generate job $jobId crashed '
           'type=${error.runtimeType}',
         );
         unawaited(
-          AiGenerateJobStore.fail(
-            pool,
-            jobId,
-            error: 'Falha interna ao processar geracao async.',
+          _failGenerateJobAndReleaseQuota(
+            pool: pool,
+            jobId: jobId,
+            planReservation: planReservation,
           ),
         );
       },
@@ -1018,6 +1036,7 @@ Future<Response> _startAiGenerateAsyncJob({
           'Geracao iniciada em background. Consulte o progresso via polling.',
       'poll_url': '/ai/generate/jobs/$jobId',
       'poll_interval_ms': 1000,
+      'job_timeout_ms': const Duration(minutes: 3).inMilliseconds,
       'total_stages': 4,
       'cache': {'hit': false, 'cache_key': cacheKey},
       'timings': {'accepted_ms': requestStopwatch.elapsedMilliseconds},
@@ -1102,7 +1121,7 @@ Future<String?> _resolveReferenceGenerateCacheVersion({
   }
 }
 
-Future<void> _processAiGenerateAsyncJob({
+Future<bool> _processAiGenerateAsyncJob({
   required Pool pool,
   required String jobId,
   required Uri internalGenerateUrl,
@@ -1146,7 +1165,7 @@ Future<void> _processAiGenerateAsyncJob({
       jobId,
       error: 'Tempo limite excedido ao gerar deck async.',
     );
-    return;
+    return false;
   }
 
   await AiGenerateJobStore.progress(
@@ -1171,7 +1190,7 @@ Future<void> _processAiGenerateAsyncJob({
       jobId,
       error: 'Generate async recebeu resposta invalida do executor interno.',
     );
-    return;
+    return false;
   }
 
   resultBody['async'] = {
@@ -1188,7 +1207,7 @@ Future<void> _processAiGenerateAsyncJob({
       statusCode: response.statusCode,
       result: resultBody,
     );
-    return;
+    return response.statusCode == HttpStatus.ok;
   }
 
   await AiGenerateJobStore.fail(
@@ -1196,6 +1215,33 @@ Future<void> _processAiGenerateAsyncJob({
     jobId,
     error: resultBody['error']?.toString() ?? 'Falha ao gerar deck async.',
   );
+  return false;
+}
+
+Future<void> _failGenerateJobAndReleaseQuota({
+  required Pool pool,
+  required String jobId,
+  required AiPlanReservationHandle? planReservation,
+}) async {
+  try {
+    await AiGenerateJobStore.fail(
+      pool,
+      jobId,
+      error: 'Falha interna ao processar geracao async.',
+    );
+  } catch (error) {
+    Log.w('AI generate failure persistence failed type=${error.runtimeType}');
+  }
+  if (planReservation == null) return;
+  try {
+    await settleDeferredAiPlanReservation(
+      pool: pool,
+      handle: planReservation,
+      successful: false,
+    );
+  } catch (error) {
+    Log.w('AI generate quota release failed type=${error.runtimeType}');
+  }
 }
 
 Map<String, dynamic>? _buildReferenceDeckCorpusDiagnostics({

@@ -23,31 +23,105 @@ void main() {
       expect(request.hasKeepThemeOverride, isFalse);
       expect(request.hasRequiredDeckFields, isTrue);
       expect(request.telemetryDeckId, 'deck-1');
+      expect(request.validationError, isNull);
     },
   );
 
-  test('parseOptimizeRouteRequest preserves route quirks intentionally', () {
+  test('parseOptimizeRouteRequest rejects unsafe field types and sizes', () {
+    final wrongType = parseOptimizeRouteRequest({
+      'deck_id': 42,
+      'archetype': 'control',
+      'keep_theme': 'yes',
+    });
+    final oversized = parseOptimizeRouteRequest({
+      'deck_id': 'deck-1',
+      'archetype': 'x' * 121,
+    });
+
+    expect(wrongType.validationError, 'deck_id must be a string');
+    expect(wrongType.hasRequiredDeckFields, isFalse);
+    expect(oversized.validationError, 'archetype exceeds the allowed size');
+    expect(oversized.hasRequiredDeckFields, isFalse);
+  });
+
+  test('parseOptimizeRouteRequest accepts strict public request fields', () {
     final request = parseOptimizeRouteRequest({
       'deck_id': 'deck-2',
       'archetype': 'aggro',
       'bracket': '3',
       'keep_theme': false,
-      'mode': ' incomplete draft ',
+      'mode': ' complete ',
       'intensity': 'aggressive',
-      '_force_sync': false,
-      'force_sync': true,
-      'async': 'truthy but not true',
+      'async': false,
     });
 
     expect(request.parsedBracket, 3);
     expect(request.parsedKeepTheme, isFalse);
-    expect(request.requestedModeRaw, 'incomplete draft');
+    expect(request.requestedModeRaw, 'complete');
     expect(request.requestMode, 'complete');
     expect(request.intensity.selected, 'aggressive');
-    expect(request.forceSyncExecutor, isTrue);
+    expect(request.forceSyncExecutor, isFalse);
     expect(request.asyncRequested, isFalse);
     expect(request.hasBracketOverride, isTrue);
     expect(request.hasKeepThemeOverride, isTrue);
+    expect(request.validationError, isNull);
+  });
+
+  test('parseOptimizeRouteRequest reserves force sync for internal calls', () {
+    final publicRequest = parseOptimizeRouteRequest({
+      'deck_id': 'deck-2',
+      'archetype': 'aggro',
+      '_force_sync': true,
+    });
+    final legacyPublicRequest = parseOptimizeRouteRequest({
+      'deck_id': 'deck-2',
+      'archetype': 'aggro',
+      'force_sync': true,
+    });
+    final internalRequest = parseOptimizeRouteRequest({
+      'deck_id': 'deck-2',
+      'archetype': 'aggro',
+      '_force_sync': true,
+      'async': false,
+    }, allowForceSync: true);
+
+    expect(
+      publicRequest.validationError,
+      'force_sync is not a public request field',
+    );
+    expect(publicRequest.forceSyncExecutor, isFalse);
+    expect(
+      legacyPublicRequest.validationError,
+      'force_sync is not a public request field',
+    );
+    expect(legacyPublicRequest.forceSyncExecutor, isFalse);
+    expect(internalRequest.validationError, isNull);
+    expect(internalRequest.forceSyncExecutor, isTrue);
+  });
+
+  test('parseOptimizeRouteRequest rejects ambiguous modes and field types', () {
+    final invalidMode = parseOptimizeRouteRequest({
+      'deck_id': 'deck-2',
+      'archetype': 'aggro',
+      'mode': 'incomplete draft',
+    });
+    final invalidAsync = parseOptimizeRouteRequest({
+      'deck_id': 'deck-2',
+      'archetype': 'aggro',
+      'async': 'true',
+    });
+    final invalidContext = parseOptimizeRouteRequest({
+      'deck_id': 'deck-2',
+      'archetype': 'aggro',
+      'recommendation_context': 'collection-first',
+    });
+
+    expect(invalidMode.validationError, 'mode must be optimize or complete');
+    expect(invalidAsync.validationError, 'async must be a boolean');
+    expect(
+      invalidContext.validationError,
+      'recommendation_context must be an object',
+    );
   });
 
   test(
@@ -66,8 +140,23 @@ void main() {
       expect(request.asyncRequested, isTrue);
       expect(request.hasRequiredDeckFields, isFalse);
       expect(request.telemetryDeckId, 'unknown');
+      expect(request.validationError, 'bracket must be an integer');
     },
   );
+
+  test('parseOptimizeRouteRequest rejects out-of-range brackets', () {
+    for (final bracket in [0, 6]) {
+      final request = parseOptimizeRouteRequest({
+        'deck_id': 'deck-2',
+        'archetype': 'aggro',
+        'bracket': bracket,
+      });
+
+      expect(request.parsedBracket, isNull);
+      expect(request.hasBracketOverride, isFalse);
+      expect(request.validationError, 'bracket must be between 1 and 5');
+    }
+  });
 
   test('parseOptimizeRouteRequest accepts recommendation context from app', () {
     final request = parseOptimizeRouteRequest({

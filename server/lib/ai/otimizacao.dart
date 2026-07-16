@@ -2,7 +2,6 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 import 'package:http/http.dart' as http;
-import 'package:dotenv/dotenv.dart';
 import '../ai_provider_runtime_support.dart';
 import '../ai_log_service.dart';
 import '../basic_land_utils.dart' as land_utils;
@@ -10,6 +9,7 @@ import '../logger.dart';
 import '../ml_knowledge_service.dart';
 import '../openai_runtime_config.dart';
 import '../openai_structured_output_support.dart';
+import '../runtime_environment.dart';
 import 'edhrec_service.dart';
 import 'format_staples_service.dart';
 import 'hate_cards_service.dart';
@@ -766,15 +766,9 @@ class DeckOptimizerService {
     int? budgetLimitBrl,
   }) async {
     final stopwatch = Stopwatch()..start();
-    final env = DotEnv(includePlatformEnvironment: true, quiet: true)..load();
+    final env = loadRuntimeEnvironment();
     final aiConfig = OpenAiRuntimeConfig(env);
-    final model = aiConfig.modelFor(
-      key: 'OPENAI_MODEL_OPTIMIZE',
-      fallback: 'gpt-4o',
-      devFallback: 'gpt-4o-mini',
-      stagingFallback: 'gpt-4o-mini',
-      prodFallback: 'gpt-4o',
-    );
+    final model = aiConfig.optimizeModel;
     final temperature = aiConfig.temperatureFor(
       key: 'OPENAI_TEMP_OPTIMIZE',
       fallback: 0.3,
@@ -954,15 +948,9 @@ class DeckOptimizerService {
     String? mlContext,
   }) async {
     final stopwatch = Stopwatch()..start();
-    final env = DotEnv(includePlatformEnvironment: true, quiet: true)..load();
+    final env = loadRuntimeEnvironment();
     final aiConfig = OpenAiRuntimeConfig(env);
-    final model = aiConfig.modelFor(
-      key: 'OPENAI_MODEL_COMPLETE',
-      fallback: 'gpt-4o',
-      devFallback: 'gpt-4o-mini',
-      stagingFallback: 'gpt-4o-mini',
-      prodFallback: 'gpt-4o',
-    );
+    final model = aiConfig.completeModel;
     final temperature = aiConfig.temperatureFor(
       key: 'OPENAI_TEMP_COMPLETE',
       fallback: 0.3,

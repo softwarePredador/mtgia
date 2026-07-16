@@ -3,8 +3,9 @@ import 'dart:io';
 import 'package:dart_frog/dart_frog.dart';
 import 'package:postgres/postgres.dart';
 
-import 'ai_log_service.dart';
+import 'ai_plan_reservation_handle.dart';
 import 'internal_ai_request_token.dart';
+import 'logger.dart';
 import 'plan_service.dart';
 
 bool isSuccessfulAiPlanActionStatus(int statusCode) =>
@@ -27,7 +28,27 @@ Middleware aiPlanLimitMiddleware() {
       }
 
       final pool = context.read<Pool>();
-      final snapshot = await PlanService(pool).getSnapshot(userId);
+      final planService = PlanService(pool);
+      final actionEndpoint =
+          'plan:${context.request.method.name.toLowerCase()}:${context.request.uri.path}';
+      AiPlanReservationDecision decision;
+      try {
+        decision = await planService.reserveAiAction(
+          userId,
+          actionEndpoint: actionEndpoint,
+        );
+      } catch (error) {
+        Log.w('AI plan reservation failed type=${error.runtimeType}');
+        return Response.json(
+          statusCode: HttpStatus.serviceUnavailable,
+          body: {
+            'error': 'Plano temporariamente indisponível',
+            'message':
+                'Não foi possível confirmar sua cota de IA agora. Tente novamente em instantes.',
+          },
+        );
+      }
+      final snapshot = decision.snapshot;
 
       if (snapshot.status != 'active') {
         return Response.json(
@@ -42,7 +63,7 @@ Middleware aiPlanLimitMiddleware() {
         );
       }
 
-      if (snapshot.aiRequestsRemaining <= 0) {
+      if (!decision.isAllowed) {
         return Response.json(
           statusCode: HttpStatus.paymentRequired,
           body: {
@@ -63,21 +84,55 @@ Middleware aiPlanLimitMiddleware() {
         );
       }
 
+      final reservationId = decision.reservationId!;
+      final reservationHandle = AiPlanReservationHandle(
+        userId: userId,
+        reservationId: reservationId,
+      );
       final stopwatch = Stopwatch()..start();
-      final response = await handler(context);
-      var usageRecorded = false;
-      if (isSuccessfulAiPlanActionStatus(response.statusCode)) {
-        usageRecorded = await AiLogService(pool).log(
-          userId: userId,
-          endpoint:
-              'plan:${context.request.method.name.toLowerCase()}:${context.request.uri.path}',
-          model: 'application_action',
-          latencyMs: stopwatch.elapsedMilliseconds,
-          success: true,
+      Response response;
+      try {
+        response = await handler(
+          context.provide<AiPlanReservationHandle>(() => reservationHandle),
         );
+      } catch (_) {
+        try {
+          await planService.releaseAiActionReservation(
+            userId: userId,
+            reservationId: reservationId,
+          );
+        } catch (error) {
+          Log.w('AI plan reservation release failed type=${error.runtimeType}');
+        }
+        rethrow;
       }
-      final usedAfterRequest =
-          snapshot.aiRequestsUsed + (usageRecorded ? 1 : 0);
+
+      final succeeded = isSuccessfulAiPlanActionStatus(response.statusCode);
+      final deferredAccepted =
+          reservationHandle.settlementDeferred &&
+          response.statusCode == HttpStatus.accepted;
+      if (!deferredAccepted) {
+        try {
+          if (succeeded) {
+            await planService.finalizeAiActionReservation(
+              userId: userId,
+              reservationId: reservationId,
+              latencyMs: stopwatch.elapsedMilliseconds,
+            );
+          } else {
+            await planService.releaseAiActionReservation(
+              userId: userId,
+              reservationId: reservationId,
+            );
+          }
+        } catch (error) {
+          Log.w(
+            'AI plan reservation settlement failed type=${error.runtimeType}',
+          );
+        }
+      }
+
+      final usedAfterRequest = snapshot.aiRequestsUsed + (succeeded ? 1 : 0);
       return response.copyWith(
         headers: {
           ...response.headers,

@@ -7,6 +7,43 @@ import 'deck_provider_support_common.dart';
 const _genericOptimizeJobFailureMessage =
     'Não foi possível concluir a otimização agora. Tente novamente em instantes.';
 
+const minOptimizePollIntervalMs = 1000;
+const maxOptimizePollIntervalMs = 10000;
+const defaultOptimizePollTimeoutMs = 300000;
+const optimizePollTimeoutGraceMs = 15000;
+const minOptimizePollTimeoutMs = 30000;
+const maxOptimizePollTimeoutMs = 420000;
+
+int normalizeOptimizePollIntervalMs(Object? raw, {int fallback = 2000}) {
+  final parsed = switch (raw) {
+    int value => value,
+    num value => value.toInt(),
+    String value => int.tryParse(value.trim()),
+    _ => null,
+  };
+  final effective = parsed != null && parsed > 0 ? parsed : fallback;
+  return effective.clamp(minOptimizePollIntervalMs, maxOptimizePollIntervalMs);
+}
+
+int normalizeOptimizePollTimeoutMs(
+  Object? raw, {
+  int fallback = defaultOptimizePollTimeoutMs,
+}) {
+  final parsed = switch (raw) {
+    int value => value,
+    num value => value.toInt(),
+    String value => int.tryParse(value.trim()),
+    _ => null,
+  };
+  if (parsed == null || parsed <= 0) {
+    return fallback.clamp(minOptimizePollTimeoutMs, maxOptimizePollTimeoutMs);
+  }
+  return (parsed + optimizePollTimeoutGraceMs).clamp(
+    minOptimizePollTimeoutMs,
+    maxOptimizePollTimeoutMs,
+  );
+}
+
 Map<String, dynamic> buildOptimizeRequestPayload({
   required String deckId,
   required String archetype,
@@ -44,7 +81,6 @@ Future<OptimizeDeckRequestResult> requestOptimizeDeck(
     recommendationContext: recommendationContext,
   );
 
-  await saveOptimizeDebugSnapshot(request: payload);
   AppLogger.debug('🧪 [AI Optimize] request=$payload');
   await AppObservability.instance.recordEvent(
     'ai_optimize_requested',
@@ -64,7 +100,6 @@ Future<OptimizeDeckRequestResult> requestOptimizeDeck(
 
   if (response.statusCode == 200) {
     final data = asDynamicMap(response.data);
-    await saveOptimizeDebugSnapshot(response: data);
     AppLogger.debug('🧪 [AI Optimize] response=$data');
     if (data['mode'] == 'rebuild_guided' ||
         data['outcome_code'] == 'rebuild_guided') {
@@ -86,21 +121,22 @@ Future<OptimizeDeckRequestResult> requestOptimizeDeck(
         'Não foi possível iniciar a otimização agora. Tente novamente em instantes.',
       );
     }
-    final pollInterval = data['poll_interval_ms'] as int? ?? 2000;
+    final pollInterval = normalizeOptimizePollIntervalMs(
+      data['poll_interval_ms'],
+    );
+    final pollTimeout = normalizeOptimizePollTimeoutMs(data['job_timeout_ms']);
     final totalStages = data['total_stages'] as int? ?? 6;
     AppLogger.debug('🧪 [AI Optimize] async job criado: $jobId');
     return OptimizeDeckRequestResult.async(
       jobId: jobId,
       pollIntervalMs: pollInterval,
+      pollTimeoutMs: pollTimeout,
       totalStages: totalStages,
     );
   }
 
   if (response.statusCode == 422) {
     final data = asDynamicMap(response.data);
-    await saveOptimizeDebugSnapshot(
-      response: {'statusCode': 422, 'data': data},
-    );
     final qualityError = asDynamicMap(data['quality_error']);
     final errorMsg =
         data['error'] as String? ??
@@ -115,9 +151,6 @@ Future<OptimizeDeckRequestResult> requestOptimizeDeck(
     );
   }
 
-  await saveOptimizeDebugSnapshot(
-    response: {'statusCode': response.statusCode, 'data': response.data},
-  );
   throw Exception(
     FriendlyErrorMapper.fromApiResponse(
       response,
@@ -214,7 +247,6 @@ Future<OptimizeJobPollResult> pollOptimizeJobRequest(
     final status = data['status'] as String?;
     if (status == 'completed') {
       final resultMap = asDynamicMap(data['result']);
-      await saveOptimizeDebugSnapshot(response: resultMap);
       if (resultMap['mode'] == 'rebuild_guided' ||
           resultMap['outcome_code'] == 'rebuild_guided') {
         throw buildDeckAiFlowException(

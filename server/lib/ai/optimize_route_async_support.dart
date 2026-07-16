@@ -2,6 +2,8 @@ import 'dart:async';
 
 import 'package:postgres/postgres.dart';
 
+import '../ai_plan_reservation_handle.dart';
+import '../ai_plan_reservation_settlement.dart';
 import '../logger.dart';
 import 'optimize_job.dart';
 import 'optimize_route_internal.dart';
@@ -53,6 +55,7 @@ Map<String, dynamic> buildOptimizeModeAsyncAcceptedBody({
         'Optimize agressivo iniciado em background. Acompanhe o progresso via polling.',
     'poll_url': '/ai/optimize/jobs/$jobId',
     'poll_interval_ms': 1000,
+    'job_timeout_ms': OptimizeJobStore.executionTimeout.inMilliseconds,
     'total_stages': 6,
     'intensity': intensity.selected,
     'optimize_intensity': intensity.toJson(returnedSwaps: 0),
@@ -68,26 +71,35 @@ void startOptimizeModeAsyncJob({
   required Uri internalOptimizeUrl,
   required Map<String, dynamic> syncPayload,
   required String? authorization,
+  AiPlanReservationHandle? planReservation,
 }) {
   unawaited(
     runZonedGuarded(
-      () => processOptimizeModeAsync(
-        pool: pool,
-        jobId: jobId,
-        internalOptimizeUrl: internalOptimizeUrl,
-        syncPayload: syncPayload,
-        authorization: authorization,
-      ),
+      () async {
+        await processOptimizeModeAsync(
+          pool: pool,
+          jobId: jobId,
+          internalOptimizeUrl: internalOptimizeUrl,
+          syncPayload: syncPayload,
+          authorization: authorization,
+        );
+        await _settleOptimizeJobQuota(
+          pool: pool,
+          jobId: jobId,
+          planReservation: planReservation,
+        );
+      },
       (error, _) {
         Log.e(
           'Background optimize job $jobId crashed '
           'type=${error.runtimeType}',
         );
         unawaited(
-          OptimizeJobStore.fail(
-            pool,
-            jobId,
+          _failOptimizeJobAndReleaseQuota(
+            pool: pool,
+            jobId: jobId,
             error: 'Falha interna ao processar optimize async.',
+            planReservation: planReservation,
           ),
         );
       },
@@ -107,6 +119,7 @@ Map<String, dynamic> buildCompleteModeAsyncAcceptedBody({
         'Otimização iniciada em background. Consulte o progresso via polling.',
     'poll_url': '/ai/optimize/jobs/$jobId',
     'poll_interval_ms': 2000,
+    'job_timeout_ms': OptimizeJobStore.executionTimeout.inMilliseconds,
     'total_stages': 6,
     'intensity': intensity.selected,
     'optimize_intensity': intensity.toJson(returnedSwaps: 0),
@@ -141,49 +154,101 @@ void startCompleteModeAsyncJob({
   required bool hasBracketOverride,
   required bool hasKeepThemeOverride,
   required OptimizeRecommendationContext recommendationContext,
+  AiPlanReservationHandle? planReservation,
 }) {
   unawaited(
     runZonedGuarded(
-      () => processCompleteModeAsync(
-        jobId: jobId,
-        pool: pool,
-        deckId: deckId,
-        deckFormat: deckFormat,
-        maxTotal: maxTotal,
-        currentTotalCards: currentTotalCards,
-        commanders: commanders,
-        allCardData: allCardData,
-        deckColors: deckColors,
-        commanderColorIdentity: commanderColorIdentity,
-        originalCountsById: originalCountsById,
-        optimizer: optimizer,
-        themeProfile: themeProfile,
-        targetArchetype: targetArchetype,
-        bracket: bracket,
-        keepTheme: keepTheme,
-        deckAnalysis: deckAnalysis,
-        userId: userId,
-        deckSignature: deckSignature,
-        cacheKey: cacheKey,
-        intensity: intensity,
-        userPreferences: userPreferences,
-        hasBracketOverride: hasBracketOverride,
-        hasKeepThemeOverride: hasKeepThemeOverride,
-        recommendationContext: recommendationContext,
-      ),
+      () async {
+        await processCompleteModeAsync(
+          jobId: jobId,
+          pool: pool,
+          deckId: deckId,
+          deckFormat: deckFormat,
+          maxTotal: maxTotal,
+          currentTotalCards: currentTotalCards,
+          commanders: commanders,
+          allCardData: allCardData,
+          deckColors: deckColors,
+          commanderColorIdentity: commanderColorIdentity,
+          originalCountsById: originalCountsById,
+          optimizer: optimizer,
+          themeProfile: themeProfile,
+          targetArchetype: targetArchetype,
+          bracket: bracket,
+          keepTheme: keepTheme,
+          deckAnalysis: deckAnalysis,
+          userId: userId,
+          deckSignature: deckSignature,
+          cacheKey: cacheKey,
+          intensity: intensity,
+          userPreferences: userPreferences,
+          hasBracketOverride: hasBracketOverride,
+          hasKeepThemeOverride: hasKeepThemeOverride,
+          recommendationContext: recommendationContext,
+        );
+        await _settleOptimizeJobQuota(
+          pool: pool,
+          jobId: jobId,
+          planReservation: planReservation,
+        );
+      },
       (error, _) {
         Log.e(
           'Background optimize job $jobId crashed '
           'type=${error.runtimeType}',
         );
         unawaited(
-          OptimizeJobStore.fail(
-            pool,
-            jobId,
+          _failOptimizeJobAndReleaseQuota(
+            pool: pool,
+            jobId: jobId,
             error: 'Falha interna ao processar a otimização.',
+            planReservation: planReservation,
           ),
         );
       },
     ),
   );
+}
+
+Future<void> _settleOptimizeJobQuota({
+  required Pool pool,
+  required String jobId,
+  required AiPlanReservationHandle? planReservation,
+}) async {
+  if (planReservation == null) return;
+  try {
+    final job = await OptimizeJobStore.get(pool, jobId);
+    await settleDeferredAiPlanReservation(
+      pool: pool,
+      handle: planReservation,
+      successful: job?.status == 'completed',
+    );
+  } catch (error) {
+    Log.w('Optimize async quota settlement failed type=${error.runtimeType}');
+  }
+}
+
+Future<void> _failOptimizeJobAndReleaseQuota({
+  required Pool pool,
+  required String jobId,
+  required String error,
+  required AiPlanReservationHandle? planReservation,
+}) async {
+  try {
+    await OptimizeJobStore.fail(pool, jobId, error: error);
+  } catch (failure) {
+    Log.w(
+      'Optimize async failure persistence failed type=${failure.runtimeType}',
+    );
+  }
+  if (planReservation == null) return;
+  try {
+    await settleDeferredAiPlanReservation(
+      pool: pool,
+      handle: planReservation,
+      successful: false,
+    );
+  } catch (failure) {
+    Log.w('Optimize async quota release failed type=${failure.runtimeType}');
+  }
 }

@@ -10,6 +10,12 @@ import 'deck_provider_support_common.dart';
 const _defaultGeneratePollInterval = Duration(seconds: 1);
 const _minimumGeneratePollInterval = Duration(seconds: 1);
 const _maximumGeneratePollInterval = Duration(seconds: 10);
+const _defaultGeneratePollTimeout = Duration(minutes: 3, seconds: 15);
+const _minimumGeneratePollTimeout = Duration(seconds: 30);
+const _maximumGeneratePollTimeout = Duration(minutes: 5);
+const _generateJobPersistenceGrace = Duration(seconds: 15);
+const maxAiGeneratePromptLength = 8000;
+const maxAiGenerateCommanderNameLength = 300;
 
 typedef GenerateDeckProgressCallback =
     void Function(GenerateDeckProgressSnapshot progress);
@@ -215,13 +221,28 @@ Future<Map<String, dynamic>> generateDeckFromPrompt(
   String? commanderName,
   GenerateDeckProgressCallback? onProgress,
   GenerateDeckCancellation? cancellation,
-  Duration pollTimeout = const Duration(seconds: 90),
+  Duration? pollTimeout,
   Duration? pollInterval,
 }) async {
+  final normalizedPrompt = prompt.trim();
+  if (normalizedPrompt.isEmpty) {
+    throw Exception('Descreva o deck que deseja criar.');
+  }
+  if (normalizedPrompt.length > maxAiGeneratePromptLength) {
+    throw Exception(
+      'A descrição está muito longa. Reduza o texto antes de gerar o deck.',
+    );
+  }
   final normalizedFormat = format.trim().toLowerCase();
   final normalizedCommanderName = _normalizeGenerateCommanderName(
     commanderName,
   );
+  if ((normalizedCommanderName?.length ?? 0) >
+      maxAiGenerateCommanderNameLength) {
+    throw Exception(
+      'O nome do comandante está muito longo. Revise o campo e tente novamente.',
+    );
+  }
   _throwIfGenerateCancelled(cancellation);
   onProgress?.call(
     const GenerateDeckProgressSnapshot(
@@ -232,7 +253,7 @@ Future<Map<String, dynamic>> generateDeckFromPrompt(
   );
 
   final response = await apiClient.post('/ai/generate', {
-    'prompt': prompt,
+    'prompt': normalizedPrompt,
     'format': normalizedFormat,
     'async': true,
     if (normalizedCommanderName != null)
@@ -260,12 +281,9 @@ Future<Map<String, dynamic>> generateDeckFromPrompt(
         'has_job_id': jobId != null && jobId.isNotEmpty,
         'has_poll_url': pollUrl != null && pollUrl.isNotEmpty,
       });
-      return _generateDeckSyncFallback(
-        apiClient,
-        prompt: prompt,
-        normalizedFormat: normalizedFormat,
-        commanderName: normalizedCommanderName,
-        reason: 'missing_job_contract',
+      throw Exception(
+        'A geração foi aceita, mas o acompanhamento não pôde ser iniciado. '
+        'Tente novamente em instantes.',
       );
     }
 
@@ -292,12 +310,12 @@ Future<Map<String, dynamic>> generateDeckFromPrompt(
       apiClient,
       pollUrl: pollUrl,
       jobId: jobId,
-      prompt: prompt,
-      normalizedFormat: normalizedFormat,
-      commanderName: normalizedCommanderName,
       cancellation: cancellation,
       onProgress: onProgress,
-      timeout: pollTimeout,
+      timeout:
+          pollTimeout ??
+          pollTimeoutFromGenerateAccepted(accepted) ??
+          _defaultGeneratePollTimeout,
       pollInterval:
           pollInterval ??
           pollIntervalFromGenerateAccepted(accepted) ??
@@ -312,7 +330,7 @@ Future<Map<String, dynamic>> generateDeckFromPrompt(
     });
     return _generateDeckSyncFallback(
       apiClient,
-      prompt: prompt,
+      prompt: normalizedPrompt,
       normalizedFormat: normalizedFormat,
       commanderName: normalizedCommanderName,
       reason: 'async_not_supported',
@@ -323,18 +341,21 @@ Future<Map<String, dynamic>> generateDeckFromPrompt(
 }
 
 Map<String, dynamic>? _tryParseLegacyGenerateResponse(ApiResponse response) {
-  if (response.statusCode != 200 && response.statusCode != 422) {
+  if (response.statusCode != 200) {
     return null;
   }
 
   final data = response.data;
   if (data is Map<String, dynamic>) {
-    return data;
+    return _requireReviewableGenerateResult(data);
   }
   if (data is Map) {
-    return data.cast<String, dynamic>();
+    return _requireReviewableGenerateResult(data.cast<String, dynamic>());
   }
-  throw Exception('Resposta invalida ao gerar deck (${response.statusCode}).');
+  throw Exception(
+    'A IA concluiu a geração, mas a lista não pôde ser interpretada. '
+    'Tente novamente em instantes.',
+  );
 }
 
 Future<Map<String, dynamic>> _generateDeckSyncFallback(
@@ -363,9 +384,6 @@ Future<Map<String, dynamic>> _pollGeneratedDeckJob(
   ApiClient apiClient, {
   required String pollUrl,
   required String jobId,
-  required String prompt,
-  required String normalizedFormat,
-  required String? commanderName,
   required GenerateDeckCancellation? cancellation,
   required GenerateDeckProgressCallback? onProgress,
   required Duration timeout,
@@ -382,21 +400,6 @@ Future<Map<String, dynamic>> _pollGeneratedDeckJob(
 
     final response = await apiClient.get(pollUrl);
     _throwIfGenerateCancelled(cancellation);
-
-    if (_shouldFallbackToSyncGenerate(response)) {
-      _recordGenerateEvent('ai_generate_poll_fallback_sync', {
-        'status_code': response.statusCode,
-        'job_id': jobId,
-        'attempt': attempt,
-      });
-      return _generateDeckSyncFallback(
-        apiClient,
-        prompt: prompt,
-        normalizedFormat: normalizedFormat,
-        commanderName: commanderName,
-        reason: 'poll_not_supported',
-      );
-    }
 
     if (response.statusCode == 429) {
       _recordGenerateEvent('ai_generate_poll_rate_limited', {
@@ -433,21 +436,34 @@ Future<Map<String, dynamic>> _pollGeneratedDeckJob(
 
     final payload = _asStringMap(response.data);
     final status = payload['status']?.toString().trim().toLowerCase() ?? '';
-    onProgress?.call(
-      GenerateDeckProgressSnapshot(
-        step: _progressStepForJobPayload(payload, attempt),
-        message: _progressMessageForJobPayload(payload, attempt),
-        status: status.isEmpty ? null : status,
-        jobId: jobId,
-        elapsedMs: stopwatch.elapsedMilliseconds,
-      ),
-    );
+    if (!_isCompletedGenerateStatus(status) &&
+        !_isFailedGenerateStatus(status)) {
+      onProgress?.call(
+        GenerateDeckProgressSnapshot(
+          step: _progressStepForJobPayload(payload, attempt),
+          message: _progressMessageForJobPayload(payload, attempt),
+          status: status.isEmpty ? null : status,
+          jobId: jobId,
+          elapsedMs: stopwatch.elapsedMilliseconds,
+        ),
+      );
+    }
 
     if (_isCompletedGenerateStatus(status)) {
       final resultRaw = payload['result'];
       final resultStatusCode =
           int.tryParse(payload['result_status_code']?.toString() ?? '') ?? 200;
       final result = _asStringMap(resultRaw);
+
+      if (resultStatusCode < 200 || resultStatusCode >= 300) {
+        _recordGenerateEvent('ai_generate_polling_failure', {
+          'status_code': resultStatusCode,
+          'job_id': jobId,
+          'attempt': attempt,
+          'reason': 'completed_with_error_status',
+        });
+        throw _generateFriendlyException(ApiResponse(resultStatusCode, result));
+      }
 
       if (result.isEmpty) {
         _recordGenerateEvent('ai_generate_polling_failure', {
@@ -460,6 +476,8 @@ Future<Map<String, dynamic>> _pollGeneratedDeckJob(
           'A IA terminou, mas não devolveu uma lista revisável. Tente novamente.',
         );
       }
+
+      final reviewableResult = _requireReviewableGenerateResult(result);
 
       AppLogger.info(
         '[DeckGenerate] async completed job_id=$jobId '
@@ -479,7 +497,7 @@ Future<Map<String, dynamic>> _pollGeneratedDeckJob(
           elapsedMs: stopwatch.elapsedMilliseconds,
         ),
       );
-      return result;
+      return reviewableResult;
     }
 
     if (_isFailedGenerateStatus(status)) {
@@ -501,6 +519,24 @@ Future<Map<String, dynamic>> _pollGeneratedDeckJob(
     'timeout_ms': timeout.inMilliseconds,
   });
   throw const GenerateDeckTimeoutException();
+}
+
+Map<String, dynamic> _requireReviewableGenerateResult(
+  Map<String, dynamic> result,
+) {
+  final generatedDeck = _asStringMap(result['generated_deck']);
+  final cards = generatedDeck['cards'];
+  final validation = _asStringMap(result['validation']);
+  if (generatedDeck.isEmpty ||
+      cards is! List ||
+      cards.isEmpty ||
+      validation['is_valid'] != true) {
+    throw Exception(
+      'A IA concluiu a geração, mas não devolveu um deck válido para revisão. '
+      'Tente novamente em instantes.',
+    );
+  }
+  return result;
 }
 
 String? _normalizeGenerateCommanderName(String? commanderName) {
@@ -534,6 +570,25 @@ Duration? pollIntervalFromGenerateAccepted(Map<String, dynamic> accepted) {
             .clamp(
               _minimumGeneratePollInterval.inMilliseconds,
               _maximumGeneratePollInterval.inMilliseconds,
+            )
+            .toInt(),
+  );
+}
+
+@visibleForTesting
+Duration? pollTimeoutFromGenerateAccepted(Map<String, dynamic> accepted) {
+  final raw = accepted['job_timeout_ms'];
+  final parsed = raw is int ? raw : int.tryParse(raw?.toString() ?? '');
+  if (parsed == null || parsed <= 0) {
+    return null;
+  }
+  final timeoutMs = parsed + _generateJobPersistenceGrace.inMilliseconds;
+  return Duration(
+    milliseconds:
+        timeoutMs
+            .clamp(
+              _minimumGeneratePollTimeout.inMilliseconds,
+              _maximumGeneratePollTimeout.inMilliseconds,
             )
             .toInt(),
   );
@@ -646,6 +701,12 @@ Exception _generateFriendlyException(ApiResponse response) {
   if (statusCode >= 500) {
     return Exception(
       'A IA ficou indisponível por alguns instantes. Tente novamente em breve.',
+    );
+  }
+  if (statusCode == 422) {
+    return Exception(
+      'Não conseguimos gerar um deck válido com essa descrição. '
+      'Ajuste o pedido e tente novamente.',
     );
   }
   if (statusCode >= 400) {

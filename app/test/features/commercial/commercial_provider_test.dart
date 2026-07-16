@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:async';
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:http/http.dart' as http;
@@ -36,9 +37,9 @@ void main() {
   });
 
   test('Pro plan raises AI usage limit and persists tier', () async {
+    SharedPreferences.setMockInitialValues({'manaloom.commercial.plan': 'pro'});
     final provider = CommercialProvider(now: () => DateTime(2026, 7, 1));
     await provider.load();
-    await provider.setPlan(ManaLoomPlanTier.pro);
 
     expect(provider.tier, ManaLoomPlanTier.pro);
     expect(provider.monthlyAiLimit, 2500);
@@ -81,6 +82,8 @@ void main() {
               'ai_monthly_limit': 2500,
               'ai_requests_used': 2499,
               'ai_requests_remaining': 1,
+              'usage_period_start': '2026-06-01T00:00:00.000Z',
+              'usage_period_end': '2026-07-01T00:00:00.000Z',
             },
           }),
           200,
@@ -96,18 +99,188 @@ void main() {
     expect(provider.tier, ManaLoomPlanTier.pro);
     expect(provider.monthlyAiLimit, 2500);
     expect(provider.usedAiActions, 2499);
+    expect(provider.periodKey, '2026-06');
     expect(provider.remainingAiActions, 1);
-    expect(
-      await provider.consumeAiAction(AiUsageKind.deckOptimization),
-      isTrue,
-    );
-    expect(
-      provider.usedAiActions,
-      2500,
-      reason: 'the app reflects the reserved action until remote refresh',
-    );
-    expect(provider.remainingAiActions, 0);
   });
+
+  test('concurrent remote refreshes share one authoritative request', () async {
+    final release = Completer<void>();
+    var requestCount = 0;
+    ApiClient.resetForTesting(
+      token: 'test-token',
+      httpClient: MockClient((request) async {
+        requestCount += 1;
+        await release.future;
+        return http.Response(
+          jsonEncode({
+            'plan': {
+              'plan_name': 'free',
+              'status': 'active',
+              'ai_monthly_limit': 120,
+              'ai_requests_used': 7,
+              'ai_requests_remaining': 113,
+            },
+          }),
+          200,
+          headers: {'content-type': 'application/json'},
+        );
+      }),
+    );
+    final provider = CommercialProvider(now: () => DateTime(2026, 7, 1));
+
+    final first = provider.refreshFromServer();
+    final second = provider.refreshFromServer();
+    release.complete();
+    await Future.wait([first, second]);
+
+    expect(requestCount, 1);
+    expect(provider.isRemoteSynced, isTrue);
+    expect(provider.usedAiActions, 7);
+  });
+
+  test(
+    'malformed remote plan invalidates a previously synced snapshot',
+    () async {
+      var requestCount = 0;
+      ApiClient.resetForTesting(
+        token: 'test-token',
+        httpClient: MockClient((request) async {
+          requestCount += 1;
+          return http.Response(
+            jsonEncode(
+              requestCount == 1
+                  ? {
+                    'plan': {
+                      'plan_name': 'pro',
+                      'ai_monthly_limit': 2500,
+                      'ai_requests_used': 8,
+                    },
+                  }
+                  : {'plan': 'invalid'},
+            ),
+            200,
+            headers: {'content-type': 'application/json'},
+          );
+        }),
+      );
+      final provider = CommercialProvider(now: () => DateTime(2026, 7, 1));
+
+      await provider.refreshFromServer();
+      expect(provider.isRemoteSynced, isTrue);
+      await provider.refreshFromServer();
+
+      expect(provider.isRemoteSynced, isFalse);
+      expect(provider.lastRemoteError, contains('plano inválido'));
+      expect(provider.usedAiActions, 8);
+    },
+  );
+
+  test('session reset discards an in-flight remote plan response', () async {
+    final release = Completer<void>();
+    ApiClient.resetForTesting(
+      token: 'test-token',
+      httpClient: MockClient((request) async {
+        await release.future;
+        return http.Response(
+          jsonEncode({
+            'plan': {
+              'plan_name': 'pro',
+              'status': 'active',
+              'ai_monthly_limit': 2500,
+              'ai_requests_used': 15,
+              'ai_requests_remaining': 2485,
+            },
+          }),
+          200,
+          headers: {'content-type': 'application/json'},
+        );
+      }),
+    );
+    final provider = CommercialProvider(now: () => DateTime(2026, 7, 1));
+
+    final refresh = provider.refreshFromServer();
+    await provider.clearRemoteSnapshot();
+    release.complete();
+    await refresh;
+
+    expect(provider.isRemoteSynced, isFalse);
+    expect(provider.tier, ManaLoomPlanTier.free);
+    expect(provider.usedAiActions, 0);
+  });
+
+  test('refresh started during session reset uses the new session', () async {
+    var requestCount = 0;
+    ApiClient.resetForTesting(
+      token: 'new-session-token',
+      httpClient: MockClient((request) async {
+        requestCount += 1;
+        return http.Response(
+          jsonEncode({
+            'plan': {
+              'plan_name': 'pro',
+              'status': 'active',
+              'ai_monthly_limit': 2500,
+              'ai_requests_used': 21,
+              'ai_requests_remaining': 2479,
+              'usage_period_start': '2026-07-01T00:00:00.000Z',
+            },
+          }),
+          200,
+          headers: {'content-type': 'application/json'},
+        );
+      }),
+    );
+    final provider = CommercialProvider(now: () => DateTime(2026, 7, 1));
+    await provider.load();
+
+    final reset = provider.clearRemoteSnapshot();
+    final refresh = provider.refreshFromServer();
+    await Future.wait([reset, refresh]);
+
+    expect(requestCount, 1);
+    expect(provider.isRemoteSynced, isTrue);
+    expect(provider.tier, ManaLoomPlanTier.pro);
+    expect(provider.usedAiActions, 21);
+  });
+
+  test(
+    'session reset removes the previous user plan and usage snapshot',
+    () async {
+      ApiClient.resetForTesting(
+        token: 'test-token',
+        httpClient: MockClient((request) async {
+          return http.Response(
+            jsonEncode({
+              'plan': {
+                'plan_name': 'pro',
+                'status': 'active',
+                'ai_monthly_limit': 2500,
+                'ai_requests_used': 37,
+                'ai_requests_remaining': 2463,
+              },
+            }),
+            200,
+            headers: {'content-type': 'application/json'},
+          );
+        }),
+      );
+      final provider = CommercialProvider(now: () => DateTime(2026, 7, 1));
+      await provider.refreshFromServer();
+      expect(provider.tier, ManaLoomPlanTier.pro);
+      expect(provider.usedAiActions, 37);
+
+      await provider.clearRemoteSnapshot();
+
+      expect(provider.tier, ManaLoomPlanTier.free);
+      expect(provider.usedAiActions, 0);
+      expect(provider.monthlyAiLimit, ManaLoomPlan.free.monthlyAiLimit);
+
+      final reloaded = CommercialProvider(now: () => DateTime(2026, 7, 1));
+      await reloaded.load();
+      expect(reloaded.tier, ManaLoomPlanTier.free);
+      expect(reloaded.usedAiActions, 0);
+    },
+  );
 
   test(
     'backend checkout activation refreshes the local plan snapshot',

@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
@@ -10,11 +11,16 @@ import 'package:manaloom/features/home/lotus/lotus_js_bridges.dart';
 import 'package:manaloom/features/home/lotus_life_counter_screen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-class _FakeLotusHost implements LotusHost {
-  _FakeLotusHost({required this.onShellMessageRequested, this.onLoadBundle});
+class _FakeLotusHost implements LotusHost, LotusStorageFlushBarrier {
+  _FakeLotusHost({
+    required this.onShellMessageRequested,
+    this.onLoadBundle,
+    this.onFlushStorageSnapshot,
+  });
 
   final LotusShellMessageCallback onShellMessageRequested;
   final Future<void> Function(_FakeLotusHost host)? onLoadBundle;
+  final Future<bool> Function()? onFlushStorageSnapshot;
 
   @override
   final ValueNotifier<bool> isLoading = ValueNotifier<bool>(true);
@@ -23,6 +29,7 @@ class _FakeLotusHost implements LotusHost {
   final ValueNotifier<String?> errorMessage = ValueNotifier<String?>(null);
 
   int loadBundleCallCount = 0;
+  int flushStorageSnapshotCallCount = 0;
   bool isDisposed = false;
   final List<String> executedScripts = <String>[];
 
@@ -77,6 +84,12 @@ class _FakeLotusHost implements LotusHost {
       'bountyCardPoolActive': false,
       'maxActiveModes': 2,
     });
+  }
+
+  @override
+  Future<bool> flushStorageSnapshot({String reason = 'flutter_exit'}) async {
+    flushStorageSnapshotCallCount += 1;
+    return await onFlushStorageSnapshot?.call() ?? true;
   }
 
   void completeSuccessfulLoad() {
@@ -212,6 +225,7 @@ void main() {
       'close shell message returns to home when life counter is stacked',
       (tester) async {
         late _FakeLotusHost host;
+        final flushBarrier = Completer<bool>();
         final router = GoRouter(
           initialLocation: '/home',
           routes: [
@@ -235,6 +249,7 @@ void main() {
                     }) {
                       host = _FakeLotusHost(
                         onShellMessageRequested: onShellMessageRequested,
+                        onFlushStorageSnapshot: () => flushBarrier.future,
                         onLoadBundle:
                             (host) async => host.completeSuccessfulLoad(),
                       );
@@ -254,11 +269,78 @@ void main() {
         host.emitShellMessage(
           '{"type":"close-life-counter","source":"test_shell"}',
         );
+        await tester.pump();
+
+        expect(find.byType(LotusLifeCounterScreen), findsOneWidget);
+        expect(find.text('open-life-counter'), findsNothing);
+        expect(host.flushStorageSnapshotCallCount, 1);
+        expect(host.isDisposed, isFalse);
+
+        flushBarrier.complete(true);
         await tester.pumpAndSettle();
 
         expect(find.text('open-life-counter'), findsOneWidget);
+        expect(host.isDisposed, isTrue);
       },
     );
+
+    testWidgets('exit storage barrier has a bounded timeout', (tester) async {
+      late _FakeLotusHost host;
+      final neverCompletes = Completer<bool>();
+      final router = GoRouter(
+        initialLocation: '/home',
+        routes: [
+          GoRoute(
+            path: '/home',
+            builder:
+                (context, state) => Scaffold(
+                  body: TextButton(
+                    onPressed: () => openLifeCounterRoute(context),
+                    child: const Text('open-life-counter'),
+                  ),
+                ),
+          ),
+          GoRoute(
+            path: lifeCounterRoutePath,
+            builder:
+                (context, state) => LotusLifeCounterScreen(
+                  hostFactory: ({
+                    required onAppReviewRequested,
+                    required onShellMessageRequested,
+                  }) {
+                    host = _FakeLotusHost(
+                      onShellMessageRequested: onShellMessageRequested,
+                      onFlushStorageSnapshot: () => neverCompletes.future,
+                      onLoadBundle:
+                          (host) async => host.completeSuccessfulLoad(),
+                    );
+                    return host;
+                  },
+                ),
+          ),
+        ],
+      );
+
+      await tester.pumpWidget(MaterialApp.router(routerConfig: router));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('open-life-counter'));
+      await tester.pumpAndSettle();
+
+      host.emitShellMessage(
+        '{"type":"close-life-counter","source":"timeout_test"}',
+      );
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 899));
+
+      expect(find.byType(LotusLifeCounterScreen), findsOneWidget);
+      expect(host.flushStorageSnapshotCallCount, 1);
+
+      await tester.pump(const Duration(milliseconds: 2));
+      await tester.pumpAndSettle();
+
+      expect(find.text('open-life-counter'), findsOneWidget);
+      expect(host.isDisposed, isTrue);
+    });
 
     testWidgets('close shell message falls back to home when route is direct', (
       tester,

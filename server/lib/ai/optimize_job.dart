@@ -5,6 +5,7 @@ import 'dart:math';
 import 'package:meta/meta.dart' show visibleForTesting;
 import 'package:postgres/postgres.dart';
 
+import '../e2e_validation_policy.dart';
 import '../logger.dart';
 
 /// Gerenciador de jobs assíncronos de otimização de deck.
@@ -13,12 +14,14 @@ import '../logger.dart';
 /// processamento pesado (IA + múltiplos fallbacks) roda em background.
 /// O cliente faz polling via GET /ai/optimize/jobs/:id.
 ///
-/// Armazenamento in-memory (singleton). Jobs expiram após 30 minutos.
+/// PostgreSQL é a fonte de verdade; o mapa local é apenas um cache do processo.
+/// Jobs expiram após 30 minutos.
 class OptimizeJobStore {
   OptimizeJobStore._();
 
   static const _jobTtl = Duration(minutes: 30);
   static const _cleanupInterval = Duration(minutes: 5);
+  static const executionTimeout = Duration(minutes: 6);
   static final Map<String, OptimizeJob> _memoryJobs = <String, OptimizeJob>{};
   static DateTime? _lastCleanupAt;
 
@@ -48,11 +51,8 @@ class OptimizeJobStore {
       archetype: archetype,
       userId: userId,
     );
-    _memoryJobs[id] = job;
-    unawaited(() async {
-      try {
-        await pool.execute(
-          Sql.named('''
+    await pool.execute(
+      Sql.named('''
         INSERT INTO ai_optimize_jobs (
           id, deck_id, archetype, user_id, status, stage, stage_number,
           total_stages, result, error, quality_error, created_at, updated_at
@@ -63,37 +63,43 @@ class OptimizeJobStore {
           @result::jsonb, @error, @quality_error::jsonb, NOW(), NOW()
         )
       '''),
-          parameters: {
-            'id': job.id,
-            'deck_id': job.deckId,
-            'archetype': job.archetype,
-            'user_id': job.userId,
-            'status': job.status,
-            'stage': job.stage,
-            'stage_number': job.stageNumber,
-            'total_stages': job.totalStages,
-            'result': job.result == null ? null : jsonEncode(job.result),
-            'error': job.error,
-            'quality_error':
-                job.qualityError == null ? null : jsonEncode(job.qualityError),
-          },
-        );
-      } catch (error) {
-        Log.w(
-          'Optimize job ${job.id} initial persistence failed '
-          'type=${error.runtimeType}',
-        );
-        // Memory-backed polling remains available for the current process.
-      }
-    }());
+      parameters: {
+        'id': job.id,
+        'deck_id': job.deckId,
+        'archetype': job.archetype,
+        'user_id': job.userId,
+        'status': job.status,
+        'stage': job.stage,
+        'stage_number': job.stageNumber,
+        'total_stages': job.totalStages,
+        'result': job.result == null ? null : jsonEncode(job.result),
+        'error': job.error,
+        'quality_error':
+            job.qualityError == null ? null : jsonEncode(job.qualityError),
+      },
+    );
+    _memoryJobs[id] = job;
     return id;
   }
 
   /// Busca um job pelo ID.
   static Future<OptimizeJob?> get(Pool pool, String id) async {
     await _cleanupIfDue(pool);
-    final memoryJob = _memoryJobs[id];
-    if (memoryJob != null) return memoryJob;
+    await pool.execute(
+      Sql.named('''
+        UPDATE ai_optimize_jobs
+        SET
+          status = 'failed',
+          stage = 'Erro',
+          error = 'A otimização foi interrompida. Inicie uma nova tentativa.',
+          updated_at = NOW()
+        WHERE id = @id
+          AND status IN ('pending', 'processing')
+          AND updated_at <
+            NOW() - (CAST(@timeout_seconds AS int) * INTERVAL '1 second')
+      '''),
+      parameters: {'id': id, 'timeout_seconds': executionTimeout.inSeconds},
+    );
     final result = await pool.execute(
       Sql.named('''
         SELECT
@@ -117,7 +123,9 @@ class OptimizeJobStore {
       parameters: {'id': id},
     );
     if (result.isEmpty) return null;
-    return OptimizeJob.fromRow(result.first.toColumnMap());
+    final persistedJob = OptimizeJob.fromRow(result.first.toColumnMap());
+    _memoryJobs[id] = persistedJob;
+    return persistedJob;
   }
 
   /// Atualiza o progresso de um job.
@@ -127,17 +135,8 @@ class OptimizeJobStore {
     required String stage,
     required int stageNumber,
   }) async {
-    final memoryJob = _memoryJobs[id];
-    if (memoryJob != null) {
-      memoryJob
-        ..status = 'processing'
-        ..stage = stage
-        ..stageNumber = stageNumber
-        ..updatedAt = DateTime.now();
-    }
-    try {
-      await pool.execute(
-        Sql.named('''
+    final updated = await pool.execute(
+      Sql.named('''
         UPDATE ai_optimize_jobs
         SET
           status = 'processing',
@@ -145,15 +144,20 @@ class OptimizeJobStore {
           stage_number = @stage_number,
           updated_at = NOW()
         WHERE id = @id
+        RETURNING id
       '''),
-        parameters: {'id': id, 'stage': stage, 'stage_number': stageNumber},
-      );
-    } catch (error) {
-      Log.w(
-        'Optimize job $id progress persistence failed '
-        'type=${error.runtimeType}',
-      );
-      if (memoryJob == null) rethrow;
+      parameters: {'id': id, 'stage': stage, 'stage_number': stageNumber},
+    );
+    if (updated.isEmpty) {
+      throw StateError('Optimize job $id was not persisted before progress.');
+    }
+    final memoryJob = _memoryJobs[id];
+    if (memoryJob != null) {
+      memoryJob
+        ..status = 'processing'
+        ..stage = stage
+        ..stageNumber = stageNumber
+        ..updatedAt = DateTime.now();
     }
   }
 
@@ -163,6 +167,24 @@ class OptimizeJobStore {
     String id, {
     required Map<String, dynamic> result,
   }) async {
+    final updated = await pool.execute(
+      Sql.named('''
+        UPDATE ai_optimize_jobs
+        SET
+          status = 'completed',
+          stage = 'Concluído',
+          result = @result::jsonb,
+          error = NULL,
+          quality_error = NULL,
+          updated_at = NOW()
+        WHERE id = @id
+        RETURNING id
+      '''),
+      parameters: {'id': id, 'result': jsonEncode(result)},
+    );
+    if (updated.isEmpty) {
+      throw StateError('Optimize job $id was not persisted before completion.');
+    }
     final memoryJob = _memoryJobs[id];
     if (memoryJob != null) {
       memoryJob
@@ -173,28 +195,6 @@ class OptimizeJobStore {
         ..qualityError = null
         ..updatedAt = DateTime.now();
     }
-    try {
-      await pool.execute(
-        Sql.named('''
-        UPDATE ai_optimize_jobs
-        SET
-          status = 'completed',
-          stage = 'Concluído',
-          result = @result::jsonb,
-          error = NULL,
-          quality_error = NULL,
-          updated_at = NOW()
-        WHERE id = @id
-      '''),
-        parameters: {'id': id, 'result': jsonEncode(result)},
-      );
-    } catch (error) {
-      Log.w(
-        'Optimize job $id completion persistence failed '
-        'type=${error.runtimeType}',
-      );
-      if (memoryJob == null) rethrow;
-    }
   }
 
   /// Marca o job como falho.
@@ -204,18 +204,8 @@ class OptimizeJobStore {
     required String error,
     Map<String, dynamic>? qualityError,
   }) async {
-    final memoryJob = _memoryJobs[id];
-    if (memoryJob != null) {
-      memoryJob
-        ..status = 'failed'
-        ..stage = 'Erro'
-        ..error = error
-        ..qualityError = qualityError
-        ..updatedAt = DateTime.now();
-    }
-    try {
-      await pool.execute(
-        Sql.named('''
+    final updated = await pool.execute(
+      Sql.named('''
         UPDATE ai_optimize_jobs
         SET
           status = 'failed',
@@ -224,20 +214,25 @@ class OptimizeJobStore {
           quality_error = @quality_error::jsonb,
           updated_at = NOW()
         WHERE id = @id
+        RETURNING id
       '''),
-        parameters: {
-          'id': id,
-          'error': error,
-          'quality_error':
-              qualityError == null ? null : jsonEncode(qualityError),
-        },
-      );
-    } catch (error) {
-      Log.w(
-        'Optimize job $id failure persistence failed '
-        'type=${error.runtimeType}',
-      );
-      if (memoryJob == null) rethrow;
+      parameters: {
+        'id': id,
+        'error': error,
+        'quality_error': qualityError == null ? null : jsonEncode(qualityError),
+      },
+    );
+    if (updated.isEmpty) {
+      throw StateError('Optimize job $id was not persisted before failure.');
+    }
+    final memoryJob = _memoryJobs[id];
+    if (memoryJob != null) {
+      memoryJob
+        ..status = 'failed'
+        ..stage = 'Erro'
+        ..error = error
+        ..qualityError = qualityError
+        ..updatedAt = DateTime.now();
     }
   }
 
@@ -252,7 +247,9 @@ class OptimizeJobStore {
     _memoryJobs.removeWhere(
       (_, job) => job.createdAt.isBefore(now.subtract(_jobTtl)),
     );
-    await _cleanup(pool);
+    if (shouldRunGlobalHousekeeping()) {
+      await _cleanup(pool);
+    }
   }
 
   static Future<void> _cleanup(Pool pool) async {

@@ -14,40 +14,60 @@ class DistributedRateLimiter {
   });
 
   Future<bool> isAllowed(String identifier) async {
-    final countResult = await pool.runTx((session) {
-      return session.execute(
+    return pool.runTx((session) async {
+      // Acquire the lock in its own statement. PostgreSQL READ COMMITTED takes
+      // a fresh snapshot per statement, so contenders see prior committed
+      // inserts after the advisory lock becomes available.
+      await session.execute(
         Sql.named('''
-          WITH lock_row AS (
-            SELECT pg_advisory_xact_lock(hashtext(@lock_key))
-          ),
-          deleted AS (
-            DELETE FROM rate_limit_events
-            WHERE bucket = @bucket
-              AND identifier = @identifier
-              AND created_at < NOW() - (CAST(@window_seconds AS int) * INTERVAL '2 second')
-          ),
-          inserted AS (
-            INSERT INTO rate_limit_events (bucket, identifier, created_at)
-            VALUES (@bucket, @identifier, NOW())
-            RETURNING 1
+          SELECT pg_advisory_xact_lock(
+            hashtext(@bucket),
+            hashtext(@identifier)
           )
-          SELECT COUNT(*)::int AS c
-          FROM rate_limit_events, lock_row
+        '''),
+        parameters: {'bucket': bucket, 'identifier': identifier},
+      );
+      await session.execute(
+        Sql.named('''
+          DELETE FROM rate_limit_events
           WHERE bucket = @bucket
             AND identifier = @identifier
-            AND created_at >= NOW() - (CAST(@window_seconds AS int) * INTERVAL '1 second')
+            AND created_at <
+              NOW() - (CAST(@window_seconds AS int) * INTERVAL '2 second')
         '''),
         parameters: {
           'bucket': bucket,
           'identifier': identifier,
           'window_seconds': windowSeconds,
-          'lock_key': '$bucket:$identifier',
         },
       );
+
+      final countResult = await session.execute(
+        Sql.named('''
+          SELECT COUNT(*)::int AS c
+          FROM rate_limit_events
+          WHERE bucket = @bucket
+            AND identifier = @identifier
+            AND created_at >=
+              NOW() - (CAST(@window_seconds AS int) * INTERVAL '1 second')
+        '''),
+        parameters: {
+          'bucket': bucket,
+          'identifier': identifier,
+          'window_seconds': windowSeconds,
+        },
+      );
+      final count = countResult.first.toColumnMap()['c'] as int? ?? 0;
+      if (count >= maxRequests) return false;
+
+      await session.execute(
+        Sql.named('''
+          INSERT INTO rate_limit_events (bucket, identifier, created_at)
+          VALUES (@bucket, @identifier, NOW())
+        '''),
+        parameters: {'bucket': bucket, 'identifier': identifier},
+      );
+      return true;
     });
-
-    final count = (countResult.first.toColumnMap()['c'] as int?) ?? 0;
-
-    return count <= maxRequests;
   }
 }

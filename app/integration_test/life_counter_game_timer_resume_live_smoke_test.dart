@@ -9,6 +9,7 @@ import 'package:manaloom/features/home/life_counter/life_counter_game_timer_stat
 import 'package:manaloom/features/home/life_counter/life_counter_player_appearance_profile_store.dart';
 import 'package:manaloom/features/home/life_counter/life_counter_session.dart';
 import 'package:manaloom/features/home/life_counter/life_counter_session_store.dart';
+import 'package:manaloom/features/home/life_counter/life_counter_settings.dart';
 import 'package:manaloom/features/home/life_counter/life_counter_settings_store.dart';
 import 'package:manaloom/features/home/lotus/lotus_storage_snapshot_store.dart';
 import 'package:manaloom/features/home/lotus/lotus_ui_snapshot_store.dart';
@@ -153,6 +154,12 @@ void main() {
               const Duration(seconds: 45).inMilliseconds,
           isPaused: true,
           pausedTimeEpochMs: DateTime.now().millisecondsSinceEpoch,
+        ),
+      );
+      await settingsStore.save(
+        LifeCounterSettings.defaults.copyWith(
+          gameTimer: true,
+          gameTimerMainScreen: true,
         ),
       );
       await sessionStore.save(LifeCounterSession.initial(playerCount: 4));

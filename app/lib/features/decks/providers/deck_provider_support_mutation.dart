@@ -169,10 +169,25 @@ List<Map<String, dynamic>> parseOptimizationOptionsResponse(
   ApiResponse response,
 ) {
   if (response.statusCode == 200) {
-    final data = response.data as Map<String, dynamic>;
-    return (data['options'] as List).cast<Map<String, dynamic>>();
+    final data = response.data;
+    if (data is Map && data['options'] is List) {
+      return (data['options'] as List)
+          .whereType<Map>()
+          .map((option) => option.cast<String, dynamic>())
+          .toList(growable: false);
+    }
+    throw Exception(
+      'A IA não devolveu estratégias válidas para este deck. Tente novamente.',
+    );
   }
-  throw Exception('Falha ao buscar opções: ${response.statusCode}');
+  throw Exception(
+    FriendlyErrorMapper.fromApiResponse(
+      response,
+      context: FriendlyErrorContext.deckOptimize,
+      fallback:
+          'Não foi possível carregar estratégias agora. Tente novamente em instantes.',
+    ),
+  );
 }
 
 Future<List<Map<String, dynamic>>> fetchOptimizationOptionsRequest(

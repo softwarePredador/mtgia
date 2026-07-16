@@ -1,18 +1,11 @@
-import 'dart:io';
-
-import 'package:dotenv/dotenv.dart';
 import 'log_sanitizer.dart';
+import 'runtime_environment.dart';
 
 class Log {
-  static final _env = DotEnv(includePlatformEnvironment: true, quiet: true)
-    ..load();
+  static final _env = loadRuntimeEnvironment();
 
   static bool get _isProd {
-    final v = (_env['ENVIRONMENT'] ??
-            Platform.environment['ENVIRONMENT'] ??
-            'development')
-        .trim()
-        .toLowerCase();
+    final v = (_env['ENVIRONMENT'] ?? 'development').trim().toLowerCase();
     return v == 'production';
   }
 

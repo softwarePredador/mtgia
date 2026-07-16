@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:manaloom/features/home/life_counter/life_counter_game_timer_state.dart';
 import 'package:manaloom/features/home/life_counter/life_counter_game_timer_state_store.dart';
+import 'package:manaloom/features/home/life_counter/life_counter_settings_store.dart';
 import 'package:manaloom/features/home/life_counter/life_counter_session.dart';
 import 'package:manaloom/features/home/life_counter/life_counter_session_store.dart';
 import 'package:manaloom/features/home/lotus/lotus_host.dart';
@@ -13,7 +14,7 @@ import 'package:manaloom/features/home/lotus/lotus_storage_snapshot_store.dart';
 import 'package:manaloom/features/home/lotus_life_counter_screen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-class _FakeLotusHost implements LotusHost {
+class _FakeLotusHost implements LotusHost, LotusCanonicalStorageRebaser {
   _FakeLotusHost({
     required this.onShellMessageRequested,
     this.onRunJavaScriptReturningResult,
@@ -29,6 +30,7 @@ class _FakeLotusHost implements LotusHost {
   final ValueNotifier<String?> errorMessage = ValueNotifier<String?>(null);
 
   int loadBundleCallCount = 0;
+  int canonicalRebaseCallCount = 0;
   final List<String> executedScripts = <String>[];
 
   @override
@@ -104,6 +106,14 @@ class _FakeLotusHost implements LotusHost {
     });
   }
 
+  @override
+  Future<bool> rebaseStorageFromCanonical({
+    String reason = 'native_canonical_sync',
+  }) async {
+    canonicalRebaseCallCount += 1;
+    return true;
+  }
+
   void completeSuccessfulLoad() {
     errorMessage.value = null;
     isLoading.value = false;
@@ -117,6 +127,21 @@ class _FakeLotusHost implements LotusHost {
   void dispose() {
     isLoading.dispose();
     errorMessage.dispose();
+  }
+}
+
+class _CoordinatedPatchLotusHost extends _FakeLotusHost
+    implements LotusLiveStoragePatchCoordinator {
+  _CoordinatedPatchLotusHost({required super.onShellMessageRequested});
+
+  int coordinatedPatchCallCount = 0;
+  Map<String, String?>? lastCoordinatedPatch;
+
+  @override
+  Future<bool> applyLiveStoragePatch(Map<String, String?> values) async {
+    coordinatedPatchCallCount += 1;
+    lastCoordinatedPatch = Map<String, String?>.from(values);
+    return true;
   }
 }
 
@@ -710,6 +735,12 @@ void main() {
               LifeCounterPlayerSpecialState.none,
               LifeCounterPlayerSpecialState.none,
             ],
+            playerEliminationReasons: [
+              LifeCounterPlayerEliminationReason.none,
+              LifeCounterPlayerEliminationReason.life,
+              LifeCounterPlayerEliminationReason.none,
+              LifeCounterPlayerEliminationReason.none,
+            ],
             lastPlayerRolls: [null, null, null, null],
             lastHighRolls: [null, null, null, null],
             commanderDamage: [
@@ -847,17 +878,22 @@ void main() {
         expect(state, isNotNull);
         expect(state!.isActive, isTrue);
         expect(state.isPaused, isTrue);
+        final settings = await LifeCounterSettingsStore().load();
+        expect(settings, isNotNull);
+        expect(settings!.gameTimer, isTrue);
+        expect(settings.gameTimerMainScreen, isTrue);
         expect(host.loadBundleCallCount, 1);
+        expect(host.canonicalRebaseCallCount, 1);
         expect(
           host.executedScripts.any((script) => script.contains(".game-timer")),
-          isTrue,
+          isFalse,
         );
         expect(
           logs.any(
             (message) =>
                 message.contains('message=native_game_timer_applied') &&
-                message.contains('apply_strategy: live_runtime') &&
-                message.contains('live_patch_eligible: true') &&
+                message.contains('apply_strategy: canonical_store_sync') &&
+                message.contains('live_patch_eligible: false') &&
                 message.contains('reload_required: false') &&
                 message.contains('sync_blockers: []'),
           ),
@@ -866,7 +902,7 @@ void main() {
       });
     });
 
-    testWidgets('starts inactive game timer live from clock shell shortcut', (
+    testWidgets('starts inactive game timer through canonical runtime reload', (
       tester,
     ) async {
       late _FakeLotusHost host;
@@ -918,10 +954,15 @@ void main() {
         expect(state, isNotNull);
         expect(state!.isActive, isTrue);
         expect(state.isPaused, isFalse);
+        final settings = await LifeCounterSettingsStore().load();
+        expect(settings, isNotNull);
+        expect(settings!.gameTimer, isTrue);
+        expect(settings.gameTimerMainScreen, isTrue);
         expect(host.loadBundleCallCount, 1);
+        expect(host.canonicalRebaseCallCount, 1);
         expect(
           host.executedScripts.any((script) => script.contains(".game-timer")),
-          isTrue,
+          isFalse,
         );
         expect(
           logs.any(
@@ -935,8 +976,8 @@ void main() {
           logs.any(
             (message) =>
                 message.contains('message=native_game_timer_applied') &&
-                message.contains('apply_strategy: live_runtime') &&
-                message.contains('live_patch_eligible: true') &&
+                message.contains('apply_strategy: canonical_store_sync') &&
+                message.contains('live_patch_eligible: false') &&
                 message.contains('reload_required: false') &&
                 message.contains('sync_blockers: []'),
           ),
@@ -945,7 +986,7 @@ void main() {
       });
     });
 
-    testWidgets('resets active game timer live from shell shortcut', (
+    testWidgets('resets active game timer through canonical runtime reload', (
       tester,
     ) async {
       late _FakeLotusHost host;
@@ -1010,13 +1051,22 @@ void main() {
 
         final state = await LifeCounterGameTimerStateStore().load();
         expect(state, isNull);
+        final settings = await LifeCounterSettingsStore().load();
+        expect(settings, isNotNull);
+        expect(settings!.gameTimer, isFalse);
+        expect(settings.gameTimerMainScreen, isFalse);
         expect(host.loadBundleCallCount, 1);
+        expect(host.canonicalRebaseCallCount, 1);
+        expect(
+          host.executedScripts.any((script) => script.contains(".game-timer")),
+          isFalse,
+        );
         expect(
           logs.any(
             (message) =>
                 message.contains('message=native_game_timer_applied') &&
-                message.contains('apply_strategy: live_runtime') &&
-                message.contains('live_patch_eligible: true') &&
+                message.contains('apply_strategy: canonical_store_sync') &&
+                message.contains('live_patch_eligible: false') &&
                 message.contains('reload_required: false') &&
                 message.contains('sync_blockers: []'),
           ),
@@ -1025,7 +1075,7 @@ void main() {
       });
     });
 
-    testWidgets('resumes paused game timer live from shell shortcut', (
+    testWidgets('resumes paused game timer through canonical runtime reload', (
       tester,
     ) async {
       late _FakeLotusHost host;
@@ -1093,17 +1143,22 @@ void main() {
         expect(state!.isActive, isTrue);
         expect(state.isPaused, isFalse);
         expect(state.pausedTimeEpochMs, isNull);
+        final settings = await LifeCounterSettingsStore().load();
+        expect(settings, isNotNull);
+        expect(settings!.gameTimer, isTrue);
+        expect(settings.gameTimerMainScreen, isTrue);
         expect(host.loadBundleCallCount, 1);
+        expect(host.canonicalRebaseCallCount, 1);
         expect(
           host.executedScripts.any((script) => script.contains(".game-timer")),
-          isTrue,
+          isFalse,
         );
         expect(
           logs.any(
             (message) =>
                 message.contains('message=native_game_timer_applied') &&
-                message.contains('apply_strategy: live_runtime') &&
-                message.contains('live_patch_eligible: true') &&
+                message.contains('apply_strategy: canonical_store_sync') &&
+                message.contains('live_patch_eligible: false') &&
                 message.contains('reload_required: false') &&
                 message.contains('sync_blockers: []'),
           ),
@@ -1115,7 +1170,7 @@ void main() {
     testWidgets(
       'applies monarch and initiative table state without reloading the Lotus bundle',
       (tester) async {
-        late _FakeLotusHost host;
+        late _CoordinatedPatchLotusHost host;
 
         await _captureDebugLogs((logs) async {
           await LifeCounterSessionStore().save(
@@ -1173,7 +1228,7 @@ void main() {
                   required onAppReviewRequested,
                   required onShellMessageRequested,
                 }) {
-                  host = _FakeLotusHost(
+                  host = _CoordinatedPatchLotusHost(
                     onShellMessageRequested: onShellMessageRequested,
                   )..completeSuccessfulLoad();
                   return host;
@@ -1224,6 +1279,14 @@ void main() {
           expect(session.initiativePlayer, 1);
           expect(session.stormCount, 0);
           expect(host.loadBundleCallCount, 1);
+          expect(host.coordinatedPatchCallCount, 1);
+          expect(host.lastCoordinatedPatch, contains('__manaloom_table_state'));
+          expect(
+            host.executedScripts.any(
+              (script) => script.contains('receivePatch'),
+            ),
+            isFalse,
+          );
           expect(
             logs.any(
               (message) =>
@@ -1801,7 +1864,7 @@ void main() {
       },
     );
     testWidgets(
-      'applies solid player appearance background live without reloading the Lotus bundle',
+      'reloads the canonical solid player appearance without patching Lotus DOM',
       (tester) async {
         late _FakeLotusHost host;
 
@@ -1907,14 +1970,14 @@ void main() {
           final session = await LifeCounterSessionStore().load();
           expect(session, isNotNull);
           expect(session!.resolvedPlayerAppearances[1].background, '#CF7AEF');
-          expect(host.loadBundleCallCount, 1);
+          expect(host.loadBundleCallCount, 2);
           expect(
             host.executedScripts.any(
               (script) =>
                   script.contains('receivePatch') &&
                   script.contains('__manaloom_player_appearances'),
             ),
-            isTrue,
+            isFalse,
           );
           expect(
             host.executedScripts.any(
@@ -1924,7 +1987,7 @@ void main() {
                   ) &&
                   script.contains('player_card_missing'),
             ),
-            isTrue,
+            isFalse,
           );
           expect(
             logs.any(
@@ -1932,9 +1995,10 @@ void main() {
                   message.contains(
                     'message=native_player_appearance_applied',
                   ) &&
-                  message.contains('apply_strategy: live_runtime') &&
-                  message.contains('live_patch_eligible: true') &&
-                  message.contains('reload_required: false') &&
+                  message.contains('apply_strategy: canonical_reload') &&
+                  message.contains('live_patch_eligible: false') &&
+                  message.contains('reload_required: true') &&
+                  message.contains('surface_reset_strategy: bundle_reload') &&
                   message.contains('sync_blockers: []'),
             ),
             isTrue,

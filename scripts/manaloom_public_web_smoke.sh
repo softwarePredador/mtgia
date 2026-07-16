@@ -13,13 +13,33 @@ PORT="${MANALOOM_PUBLIC_WEB_SMOKE_PORT:-}"
 SERVER_PID=""
 
 cleanup() {
+  local status="$?"
+  trap - EXIT INT TERM
   if [[ -n "$SERVER_PID" ]] && kill -0 "$SERVER_PID" >/dev/null 2>&1; then
-    kill "$SERVER_PID" >/dev/null 2>&1 || true
+    kill -TERM "$SERVER_PID" >/dev/null 2>&1 || true
+    for ((attempt = 1; attempt <= 50; attempt++)); do
+      if ! kill -0 "$SERVER_PID" >/dev/null 2>&1; then
+        break
+      fi
+      sleep 0.1
+    done
+    if kill -0 "$SERVER_PID" >/dev/null 2>&1; then
+      echo "Public web server did not stop after SIGTERM; forcing cleanup." >&2
+      kill -KILL "$SERVER_PID" >/dev/null 2>&1 || true
+      if [[ "$status" -eq 0 ]]; then
+        status=1
+      fi
+    fi
+  fi
+  if [[ -n "$SERVER_PID" ]]; then
     wait "$SERVER_PID" 2>/dev/null || true
   fi
   rm -rf "$SERVER_DIR" "$WORK_DIR"
+  exit "$status"
 }
-trap cleanup EXIT INT TERM
+trap cleanup EXIT
+trap 'exit 130' INT
+trap 'exit 143' TERM
 
 for command_name in npm node curl python3; do
   if ! command -v "$command_name" >/dev/null 2>&1; then
@@ -68,7 +88,10 @@ cp -R public "$SERVER_DIR/public"
 
 (
   cd "$SERVER_DIR"
-  HOSTNAME=127.0.0.1 PORT="$PORT" node server.js
+  # Replace the helper shell with Node so SERVER_PID always identifies the
+  # actual listener. Killing only the helper used to orphan next-server after
+  # an otherwise successful smoke run.
+  exec env HOSTNAME=127.0.0.1 PORT="$PORT" node server.js
 ) >"$SERVER_LOG" 2>&1 &
 SERVER_PID=$!
 

@@ -92,5 +92,34 @@ void main() {
       expect(loaded.gameCounter, 12);
       expect(loaded.hasContent, isFalse);
     });
+
+    test(
+      'generates and persists a missing game start date only once',
+      () async {
+        var nowCalls = 0;
+        final store = LifeCounterHistoryStore(
+          nowProvider: () {
+            nowCalls += 1;
+            return DateTime.fromMillisecondsSinceEpoch(
+              1711803000000 + nowCalls,
+            );
+          },
+        );
+
+        await store.save(const LifeCounterHistoryState.empty());
+        final firstLoad = await store.load();
+        final secondLoad = await store.load();
+
+        expect(nowCalls, 1);
+        expect(firstLoad, isNotNull);
+        expect(secondLoad, isNotNull);
+        expect(firstLoad!.hasStableCurrentGameMeta, isTrue);
+        expect(
+          secondLoad!.currentGameMeta?['startDate'],
+          firstLoad.currentGameMeta?['startDate'],
+        );
+        expect(secondLoad.toJsonString(), firstLoad.toJsonString());
+      },
+    );
   });
 }

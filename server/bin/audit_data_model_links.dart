@@ -3,12 +3,12 @@
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:dotenv/dotenv.dart';
 import 'package:postgres/postgres.dart';
 
 import '../lib/ai/candidate_quality_data_support.dart';
 import '../lib/ai/commander_learning_snapshot_support.dart';
 import '../lib/import_card_lookup_service.dart';
+import '../lib/runtime_environment.dart';
 
 final _tableDdlPattern = RegExp(
   r'CREATE\s+(?:TEMP(?:ORARY)?\s+|UNLOGGED\s+)?TABLE\s+(?:IF\s+NOT\s+EXISTS\s+)?([A-Za-z_][A-Za-z0-9_]*)',
@@ -110,9 +110,10 @@ Future<void> main(List<String> args) async {
   final serverRoot = Directory('${repoRoot.path}/server');
 
   final staticAudit = _runStaticAudit(repoRoot);
-  final dbAudit = options.skipDb
-      ? <String, dynamic>{'skipped': true, 'reason': '--skip-db'}
-      : await _runDatabaseAudit(serverRoot, options.requireDb);
+  final dbAudit =
+      options.skipDb
+          ? <String, dynamic>{'skipped': true, 'reason': '--skip-db'}
+          : await _runDatabaseAudit(serverRoot, options.requireDb);
 
   final report = <String, dynamic>{
     'generated_at': DateTime.now().toUtc().toIso8601String(),
@@ -216,7 +217,7 @@ Future<Map<String, dynamic>> _runDatabaseAudit(
   Directory serverRoot,
   bool requireDb,
 ) async {
-  final env = DotEnv(quiet: true)..load(['${serverRoot.path}/.env']);
+  final env = loadRuntimeEnvironment(filenames: ['${serverRoot.path}/.env']);
   env.addAll(Platform.environment);
 
   final host = env['DB_HOST'];
@@ -231,7 +232,8 @@ Future<Map<String, dynamic>> _runDatabaseAudit(
       password == null) {
     if (requireDb) {
       throw StateError(
-          'DB env vars missing: DB_HOST, DB_PORT, DB_NAME, DB_USER, DB_PASS');
+        'DB env vars missing: DB_HOST, DB_PORT, DB_NAME, DB_USER, DB_PASS',
+      );
     }
     return {'skipped': true, 'reason': 'missing DB env vars'};
   }
@@ -304,8 +306,9 @@ Future<Map<String, dynamic>> _runDatabaseAudit(
 }
 
 Future<int> _countRelation(Connection connection, String relation) async {
-  final result = await connection
-      .execute('SELECT COUNT(*)::int AS c FROM ${_q(relation)}');
+  final result = await connection.execute(
+    'SELECT COUNT(*)::int AS c FROM ${_q(relation)}',
+  );
   return _toInt(result.first.toColumnMap()['c']);
 }
 
@@ -317,7 +320,8 @@ Future<Map<String, dynamic>> _nullOwnerDeckAudit(
     return {'available': false, 'reason': 'decks/deck_cards missing'};
   }
 
-  final result = await connection.execute(Sql.named('''
+  final result = await connection.execute(
+    Sql.named('''
     WITH null_decks AS (
       SELECT d.id::text,
              d.name,
@@ -361,14 +365,16 @@ Future<Map<String, dynamic>> _nullOwnerDeckAudit(
         ORDER BY created_at NULLS LAST, name
       ) FILTER (WHERE id IS NOT NULL) AS examples
     FROM null_decks
-  '''));
+  '''),
+  );
 
   final row = result.first.toColumnMap();
   final total = _toInt(row['null_user_decks']);
   final pgRegistered = _toInt(row['pg_registered_private_commander_count']);
-  final status = total == 0
-      ? 'none'
-      : total == pgRegistered
+  final status =
+      total == 0
+          ? 'none'
+          : total == pgRegistered
           ? 'classified_private_pg_registered_lab_decks'
           : 'unclassified_null_owner_decks_present';
 
@@ -387,7 +393,8 @@ Future<Map<String, dynamic>> _nullOwnerDeckAudit(
 }
 
 Future<Map<String, dynamic>> _validateViewsInRollback(
-    Connection connection) async {
+  Connection connection,
+) async {
   final result = <String, dynamic>{};
   await connection.execute('BEGIN');
   try {
@@ -401,8 +408,9 @@ Future<Map<String, dynamic>> _validateViewsInRollback(
     for (final sql in candidateQualityIndexStatements) {
       await connection.execute(Sql.named(sql));
     }
-    await connection
-        .execute(Sql.named(optimizeCandidateQualitySummaryViewStatement));
+    await connection.execute(
+      Sql.named(optimizeCandidateQualitySummaryViewStatement),
+    );
     await connection.execute(Sql.named(cardIntelligenceSnapshotViewStatement));
     await connection.execute(Sql.named(createCardIdentityBridgeViewSql));
     await connection.execute(Sql.named(commanderLearningSnapshotViewStatement));
@@ -444,16 +452,13 @@ Future<Map<String, dynamic>> _fanoutChecks(
   if (relations.containsKey('deck_cards') &&
       relations.containsKey('card_battle_rules')) {
     checks['direct_deck_cards_to_card_battle_rules_fanout_potential'] =
-        await _rowCompare(
-      connection,
-      '''
+        await _rowCompare(connection, '''
         SELECT
           COUNT(*)::int AS rows,
           COUNT(DISTINCT dc.id)::int AS distinct_deck_card_rows
         FROM deck_cards dc
         JOIN card_battle_rules cbr ON cbr.card_id = dc.card_id
-      ''',
-    );
+      ''');
   }
 
   if (relations.containsKey('cards') &&
@@ -467,8 +472,9 @@ Future<Map<String, dynamic>> _fanoutChecks(
         HAVING COUNT(*) > 1
       ) x
     ''');
-    checks['cards_with_multiple_battle_rules'] =
-        _toInt(result.first.toColumnMap()['c']);
+    checks['cards_with_multiple_battle_rules'] = _toInt(
+      result.first.toColumnMap()['c'],
+    );
   }
 
   if (relations.containsKey('cards') &&
@@ -482,8 +488,9 @@ Future<Map<String, dynamic>> _fanoutChecks(
         HAVING COUNT(*) > 1
       ) x
     ''');
-    checks['cards_with_multiple_function_tags'] =
-        _toInt(result.first.toColumnMap()['c']);
+    checks['cards_with_multiple_function_tags'] = _toInt(
+      result.first.toColumnMap()['c'],
+    );
   }
 
   return checks;
@@ -500,11 +507,13 @@ Future<Map<String, int>> _rowCompare(Connection connection, String sql) async {
 }
 
 List<File> _scanFiles(Directory repoRoot) {
-  final roots = <Directory>[
-    Directory('${repoRoot.path}/server'),
-    Directory(
-        '${repoRoot.path}/docs/hermes-analysis/manaloom-knowledge/scripts'),
-  ].where((d) => d.existsSync()).toList();
+  final roots =
+      <Directory>[
+        Directory('${repoRoot.path}/server'),
+        Directory(
+          '${repoRoot.path}/docs/hermes-analysis/manaloom-knowledge/scripts',
+        ),
+      ].where((d) => d.existsSync()).toList();
   final allowed = {'.dart', '.sql', '.py', '.sh'};
   final files = <File>[];
   for (final root in roots) {
@@ -585,11 +594,14 @@ List<Map<String, String>> _scanStaleDocs(Directory repoRoot) {
 
 Map<String, dynamic> _scanSyncScripts(Directory repoRoot) {
   final scriptsRoot = Directory(
-      '${repoRoot.path}/docs/hermes-analysis/manaloom-knowledge/scripts');
+    '${repoRoot.path}/docs/hermes-analysis/manaloom-knowledge/scripts',
+  );
   if (!scriptsRoot.existsSync()) return {'skipped': true};
   final rows = <Map<String, dynamic>>[];
-  for (final entity
-      in scriptsRoot.listSync(recursive: false, followLinks: false)) {
+  for (final entity in scriptsRoot.listSync(
+    recursive: false,
+    followLinks: false,
+  )) {
     if (entity is! File) continue;
     final name = entity.uri.pathSegments.last;
     if (!name.endsWith('.py') && !name.endsWith('.sh')) continue;
@@ -603,7 +615,8 @@ Map<String, dynamic> _scanSyncScripts(Directory repoRoot) {
     rows.add({
       'file': _relative(repoRoot, entity),
       'direction': _classifySyncDirection(name, text),
-      'mentions_postgres': text.contains('psycopg') ||
+      'mentions_postgres':
+          text.contains('psycopg') ||
           text.contains('DB_HOST') ||
           text.contains('DATABASE_URL') ||
           text.contains('from db_helper import'),
@@ -630,11 +643,13 @@ String _classifySyncDirection(String name, String text) {
 
 String _classifyTable(String table, Set<String> sources) {
   if (table.startsWith('tmp_')) return 'temporary';
-  final hasProduct = sources.any((s) =>
-      s == 'server/database_setup.sql' ||
-      s == 'server/bin/migrate.dart' ||
-      s.startsWith('server/lib/') ||
-      s.startsWith('server/routes/'));
+  final hasProduct = sources.any(
+    (s) =>
+        s == 'server/database_setup.sql' ||
+        s == 'server/bin/migrate.dart' ||
+        s.startsWith('server/lib/') ||
+        s.startsWith('server/routes/'),
+  );
   final hasHermes = sources.any((s) => s.contains('docs/hermes-analysis'));
   if (hasProduct && hasHermes) return 'postgres_product_and_hermes_bridge';
   if (hasProduct) return 'postgres_product';
@@ -689,14 +704,16 @@ List<Map<String, String>> _recommendations(
           snapshot is Map && _toInt(snapshot['extra_rows']) == 0;
       recs.add({
         'priority': 'P0',
-        'title': snapshotIsClean
-            ? 'Maintain card_intelligence_snapshot anti-fanout guardrail'
-            : 'Route battle-rule joins behind card_intelligence_snapshot',
+        'title':
+            snapshotIsClean
+                ? 'Maintain card_intelligence_snapshot anti-fanout guardrail'
+                : 'Route battle-rule joins behind card_intelligence_snapshot',
         'reason':
             'Direct joins from deck_cards to card_battle_rules multiply deck rows.',
-        'action': snapshotIsClean
-            ? 'Keep product consumers on card_intelligence_snapshot or equivalent per-card aggregation; do not replace this with direct deck_cards -> card_battle_rules joins.'
-            : 'Route deck analysis, optimize context, recommendations, weakness analysis, and Hermes syncs through aggregated snapshots.',
+        'action':
+            snapshotIsClean
+                ? 'Keep product consumers on card_intelligence_snapshot or equivalent per-card aggregation; do not replace this with direct deck_cards -> card_battle_rules joins.'
+                : 'Route deck analysis, optimize context, recommendations, weakness analysis, and Hermes syncs through aggregated snapshots.',
       });
     }
 
@@ -774,29 +791,35 @@ String _toMarkdown(Map<String, dynamic> report) {
   final staleDocs = staticAudit['stale_docs'] as List<dynamic>;
   final app = staticAudit['app_endpoints'] as Map<String, dynamic>;
   final sync = staticAudit['sync_scripts'] as Map<String, dynamic>;
-  final generatedAt =
-      DateTime.tryParse(report['generated_at']?.toString() ?? '');
+  final generatedAt = DateTime.tryParse(
+    report['generated_at']?.toString() ?? '',
+  );
   final reportDate =
       generatedAt?.toIso8601String().substring(0, 10) ?? 'unknown-date';
 
-  final b = StringBuffer()
-    ..writeln('# Data Model Final Validation — $reportDate')
-    ..writeln()
-    ..writeln('Generated at: `${report['generated_at']}`')
-    ..writeln()
-    ..writeln('## Executive summary')
-    ..writeln()
-    ..writeln(
-        '- Static inventory found `${staticAudit['table_count']}` tables and `${staticAudit['view_count']}` views across product backend and Hermes scripts.')
-    ..writeln(
-        '- App scan found `${app['endpoint_count'] ?? 0}` API endpoint string references in Flutter code.')
-    ..writeln(
-        '- Hermes sync scan found `${sync['script_count'] ?? 0}` sync/import/export/materialize scripts.')
-    ..writeln(
-        '- PostgreSQL validation was `${database['skipped'] == true ? 'skipped' : 'executed'}`.')
-    ..writeln()
-    ..writeln('## PostgreSQL runtime validation')
-    ..writeln();
+  final b =
+      StringBuffer()
+        ..writeln('# Data Model Final Validation — $reportDate')
+        ..writeln()
+        ..writeln('Generated at: `${report['generated_at']}`')
+        ..writeln()
+        ..writeln('## Executive summary')
+        ..writeln()
+        ..writeln(
+          '- Static inventory found `${staticAudit['table_count']}` tables and `${staticAudit['view_count']}` views across product backend and Hermes scripts.',
+        )
+        ..writeln(
+          '- App scan found `${app['endpoint_count'] ?? 0}` API endpoint string references in Flutter code.',
+        )
+        ..writeln(
+          '- Hermes sync scan found `${sync['script_count'] ?? 0}` sync/import/export/materialize scripts.',
+        )
+        ..writeln(
+          '- PostgreSQL validation was `${database['skipped'] == true ? 'skipped' : 'executed'}`.',
+        )
+        ..writeln()
+        ..writeln('## PostgreSQL runtime validation')
+        ..writeln();
 
   if (database['skipped'] == true) {
     b.writeln('- Skipped: `${database['reason']}`');
@@ -804,26 +827,37 @@ String _toMarkdown(Map<String, dynamic> report) {
     b
       ..writeln('- Public relations found: `${database['relation_count']}`.')
       ..writeln(
-          '- Critical view presence: `${jsonEncode(database['critical_view_presence'])}`.')
+        '- Critical view presence: `${jsonEncode(database['critical_view_presence'])}`.',
+      )
       ..writeln('- Rollback view validation:')
       ..writeln('```json')
-      ..writeln(const JsonEncoder.withIndent('  ')
-          .convert(database['rollback_view_validation']))
+      ..writeln(
+        const JsonEncoder.withIndent(
+          '  ',
+        ).convert(database['rollback_view_validation']),
+      )
       ..writeln('```')
       ..writeln('- Fanout checks:')
       ..writeln('```json')
       ..writeln(
-          const JsonEncoder.withIndent('  ').convert(database['fanout_checks']))
+        const JsonEncoder.withIndent('  ').convert(database['fanout_checks']),
+      )
       ..writeln('```')
       ..writeln('- Null-owner deck audit:')
       ..writeln('```json')
-      ..writeln(const JsonEncoder.withIndent('  ')
-          .convert(database['null_owner_deck_audit']))
+      ..writeln(
+        const JsonEncoder.withIndent(
+          '  ',
+        ).convert(database['null_owner_deck_audit']),
+      )
       ..writeln('```')
       ..writeln('- Critical row counts:')
       ..writeln('```json')
-      ..writeln(const JsonEncoder.withIndent('  ')
-          .convert(database['critical_row_counts']))
+      ..writeln(
+        const JsonEncoder.withIndent(
+          '  ',
+        ).convert(database['critical_row_counts']),
+      )
       ..writeln('```');
   }
 
@@ -832,9 +866,11 @@ String _toMarkdown(Map<String, dynamic> report) {
     ..writeln('## Static linkage validation')
     ..writeln()
     ..writeln(
-        '- Table classification distinguishes `postgres_product`, `postgres_product_and_hermes_bridge`, and `hermes_sqlite_or_lab` to avoid false positives.')
+      '- Table classification distinguishes `postgres_product`, `postgres_product_and_hermes_bridge`, and `hermes_sqlite_or_lab` to avoid false positives.',
+    )
     ..writeln(
-        '- Low-use tables are not automatically bugs; lineage/cache/lab tables are valid when documented and excluded from app-facing assumptions.')
+      '- Low-use tables are not automatically bugs; lineage/cache/lab tables are valid when documented and excluded from app-facing assumptions.',
+    )
     ..writeln()
     ..writeln('### Stale documentation candidates')
     ..writeln();
@@ -854,9 +890,11 @@ String _toMarkdown(Map<String, dynamic> report) {
     ..writeln()
     ..writeln('- PostgreSQL remains the source of truth for product behavior.')
     ..writeln(
-        '- Hermes SQLite tables are classified as cache/lab/report-only unless a backend sync explicitly promotes reviewed data.')
+      '- Hermes SQLite tables are classified as cache/lab/report-only unless a backend sync explicitly promotes reviewed data.',
+    )
     ..writeln(
-        '- Scripts with `--apply` or materialization behavior must remain opt-in and reviewed before promotion.')
+      '- Scripts with `--apply` or materialization behavior must remain opt-in and reviewed before promotion.',
+    )
     ..writeln()
     ..writeln('## External source gap review')
     ..writeln();
@@ -885,8 +923,11 @@ String _toMarkdown(Map<String, dynamic> report) {
 
 Future<Map<String, dynamic>> _gitSummary(Directory repoRoot) async {
   Future<String> run(List<String> args) async {
-    final result =
-        await Process.run('git', args, workingDirectory: repoRoot.path);
+    final result = await Process.run(
+      'git',
+      args,
+      workingDirectory: repoRoot.path,
+    );
     return result.stdout.toString().trim();
   }
 
@@ -934,7 +975,9 @@ String _redactHost(String host) {
   if (parts.length == 4 && parts.every((p) => int.tryParse(p) != null)) {
     return '${parts.first}.x.x.${parts.last}';
   }
-  if (parts.length > 2) return '${parts.first}.….' '${parts.last}';
+  if (parts.length > 2)
+    return '${parts.first}.….'
+        '${parts.last}';
   return '[redacted-host]';
 }
 

@@ -1,5 +1,6 @@
 import '../logger.dart';
 import '../ml_knowledge_service.dart';
+import '../e2e_validation_policy.dart';
 
 class OptimizeMlFeedback {
   const OptimizeMlFeedback({
@@ -95,8 +96,12 @@ OptimizeMlFeedback buildOptimizeMlFeedback({
 Future<void> recordOptimizeMlFeedback({
   required dynamic connection,
   required OptimizeMlFeedback feedback,
+  Map<String, String>? environment,
 }) async {
-  if (!feedback.shouldRecord) return;
+  if (!feedback.shouldRecord ||
+      !shouldWriteProductLearning(environment: environment)) {
+    return;
+  }
 
   try {
     await MLKnowledgeService(connection).recordFeedback(

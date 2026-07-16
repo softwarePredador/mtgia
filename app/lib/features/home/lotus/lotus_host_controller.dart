@@ -17,6 +17,7 @@ import '../life_counter/life_counter_settings.dart';
 import '../life_counter/life_counter_settings_store.dart';
 import '../life_counter/life_counter_session.dart';
 import '../life_counter/life_counter_session_store.dart';
+import '../life_counter/life_counter_tabletop_engine.dart';
 import 'lotus_host.dart';
 import 'lotus_life_counter_game_timer_adapter.dart';
 import 'lotus_js_bridges.dart';
@@ -31,6 +32,26 @@ import 'lotus_ui_snapshot_store.dart';
 import 'lotus_visual_skin.dart';
 import 'lotus_webview_contract.dart';
 
+const Set<String> lotusReloadLifecycleSnapshotReasons = <String>{
+  'document_hidden',
+  'pagehide',
+  'beforeunload',
+};
+
+bool shouldSuppressLotusReloadLifecycleSnapshot({
+  required String? reason,
+  required String? sessionId,
+  required String? suppressedSessionId,
+  required DateTime? suppressUntil,
+  required DateTime now,
+}) {
+  return sessionId != null &&
+      sessionId == suppressedSessionId &&
+      suppressUntil != null &&
+      now.isBefore(suppressUntil) &&
+      lotusReloadLifecycleSnapshotReasons.contains(reason);
+}
+
 Future<Map<String, String>> buildLotusFallbackBootstrapValues({
   required LifeCounterDayNightStateStore dayNightStateStore,
   required LifeCounterGameTimerStateStore gameTimerStateStore,
@@ -40,9 +61,15 @@ Future<Map<String, String>> buildLotusFallbackBootstrapValues({
 }) async {
   final dayNightState = await dayNightStateStore.load();
   final gameTimerState = await gameTimerStateStore.load();
-  final history = await historyStore.load();
+  var history = await historyStore.load();
   final session = await sessionStore.load();
   final settings = await settingsStore.load();
+  if (session != null) {
+    history = await historyStore.ensureCurrentGameMeta(
+      history: history,
+      session: session,
+    );
+  }
   final values = <String, String>{};
   if (dayNightState != null) {
     values['__manaloom_day_night_mode'] = dayNightState.mode;
@@ -79,6 +106,207 @@ Map<String, String> mergeLotusBootstrapValues({
   final mergedValues = <String, String>{...?snapshotValues};
   mergedValues.addAll(fallbackValues);
   return mergedValues;
+}
+
+String lotusStorageValuesFingerprint(Map<String, String> values) {
+  final sortedKeys = values.keys.toList()..sort();
+  return jsonEncode(<String, String>{
+    for (final key in sortedKeys)
+      key: _normalizeLotusStorageFingerprintValue(values[key]!),
+  });
+}
+
+String _normalizeLotusStorageFingerprintValue(String value) {
+  try {
+    return jsonEncode(_sortLotusStorageFingerprintJson(jsonDecode(value)));
+  } catch (_) {
+    return value;
+  }
+}
+
+Object? _sortLotusStorageFingerprintJson(Object? value) {
+  if (value is List) {
+    return value.map(_sortLotusStorageFingerprintJson).toList(growable: false);
+  }
+  if (value is Map) {
+    final keys = value.keys.map((key) => key.toString()).toList()..sort();
+    return <String, Object?>{
+      for (final key in keys) key: _sortLotusStorageFingerprintJson(value[key]),
+    };
+  }
+  return value;
+}
+
+bool isSuccessfulLotusStorageBridgeResult(Object? rawResult) {
+  return _decodeLotusStorageBridgeResult(rawResult)?['ok'] == true;
+}
+
+Map<String, Object?>? _decodeLotusStorageBridgeResult(Object? rawResult) {
+  Object? decoded = rawResult;
+  for (var attempt = 0; attempt < 2 && decoded is String; attempt += 1) {
+    try {
+      decoded = jsonDecode(decoded);
+    } catch (_) {
+      return null;
+    }
+  }
+
+  if (decoded is! Map) {
+    return null;
+  }
+  return decoded.map(
+    (key, value) => MapEntry<String, Object?>(key.toString(), value),
+  );
+}
+
+enum LotusStoragePersistRejection {
+  inactiveSession,
+  invalidEnvelope,
+  staleSequence,
+  staleRevision,
+  authoritativeStateChanged,
+}
+
+@immutable
+class LotusStoragePersistDecision {
+  const LotusStoragePersistDecision.accepted()
+    : rejection = null,
+      wasAlreadyPersisted = false;
+
+  const LotusStoragePersistDecision.alreadyPersisted()
+    : rejection = LotusStoragePersistRejection.staleSequence,
+      wasAlreadyPersisted = true;
+
+  const LotusStoragePersistDecision.rejected(this.rejection)
+    : wasAlreadyPersisted = false;
+
+  final LotusStoragePersistRejection? rejection;
+  final bool wasAlreadyPersisted;
+
+  bool get shouldPersist => rejection == null && !wasAlreadyPersisted;
+
+  bool get shouldRebase =>
+      rejection == LotusStoragePersistRejection.staleRevision ||
+      rejection == LotusStoragePersistRejection.authoritativeStateChanged;
+}
+
+class LotusStorageBridgeState {
+  String? _activeSessionId;
+  String? _bootstrapRequestId;
+  int _revision = 0;
+  int _lastSequence = 0;
+  int? _lastAcceptedSequence;
+  String? _lastAcceptedIncomingFingerprint;
+  String? _authoritativeFingerprint;
+
+  String? get activeSessionId => _activeSessionId;
+  int get revision => _revision;
+
+  bool isActiveSession(String? sessionId) =>
+      sessionId != null && sessionId == _activeSessionId;
+
+  int beginBootstrap({
+    required String sessionId,
+    required String requestId,
+    required String authoritativeFingerprint,
+  }) {
+    final isRetry =
+        sessionId == _activeSessionId && requestId == _bootstrapRequestId;
+    if (!isRetry) {
+      _activeSessionId = sessionId;
+      _bootstrapRequestId = requestId;
+      _lastSequence = 0;
+      _lastAcceptedSequence = null;
+      _lastAcceptedIncomingFingerprint = null;
+      _revision += 1;
+    } else if (_authoritativeFingerprint != authoritativeFingerprint) {
+      _revision += 1;
+    }
+
+    _authoritativeFingerprint = authoritativeFingerprint;
+    return _revision;
+  }
+
+  LotusStoragePersistDecision evaluatePersist({
+    required String? sessionId,
+    required int? sequence,
+    required int? baseRevision,
+    required String currentAuthoritativeFingerprint,
+    required String incomingFingerprint,
+  }) {
+    if (!isActiveSession(sessionId)) {
+      return const LotusStoragePersistDecision.rejected(
+        LotusStoragePersistRejection.inactiveSession,
+      );
+    }
+    if (sequence == null ||
+        sequence <= 0 ||
+        baseRevision == null ||
+        baseRevision < 0) {
+      return const LotusStoragePersistDecision.rejected(
+        LotusStoragePersistRejection.invalidEnvelope,
+      );
+    }
+    if (sequence <= _lastSequence) {
+      if (sequence == _lastAcceptedSequence &&
+          incomingFingerprint == _lastAcceptedIncomingFingerprint) {
+        return const LotusStoragePersistDecision.alreadyPersisted();
+      }
+      return const LotusStoragePersistDecision.rejected(
+        LotusStoragePersistRejection.staleSequence,
+      );
+    }
+
+    _lastSequence = sequence;
+    if (baseRevision != _revision) {
+      return const LotusStoragePersistDecision.rejected(
+        LotusStoragePersistRejection.staleRevision,
+      );
+    }
+
+    final baseline = _authoritativeFingerprint;
+    if (baseline != null &&
+        currentAuthoritativeFingerprint != baseline &&
+        incomingFingerprint != currentAuthoritativeFingerprint) {
+      return const LotusStoragePersistDecision.rejected(
+        LotusStoragePersistRejection.authoritativeStateChanged,
+      );
+    }
+
+    return const LotusStoragePersistDecision.accepted();
+  }
+
+  bool recordNativePatch({
+    required String? sessionId,
+    required int? revision,
+    required String authoritativeFingerprint,
+  }) {
+    if (!isActiveSession(sessionId) ||
+        revision == null ||
+        revision <= _revision) {
+      return false;
+    }
+
+    _revision = revision;
+    _authoritativeFingerprint = authoritativeFingerprint;
+    return true;
+  }
+
+  void recordAcceptedSnapshot(
+    String authoritativeFingerprint, {
+    required int sequence,
+    required String incomingFingerprint,
+  }) {
+    _authoritativeFingerprint = authoritativeFingerprint;
+    _lastAcceptedSequence = sequence;
+    _lastAcceptedIncomingFingerprint = incomingFingerprint;
+  }
+
+  int beginRebase(String authoritativeFingerprint) {
+    _revision += 1;
+    _authoritativeFingerprint = authoritativeFingerprint;
+    return _revision;
+  }
 }
 
 LifeCounterDayNightState? buildLotusDayNightStateFromSnapshot(
@@ -120,22 +348,42 @@ Future<LotusCanonicalMirrorResult> persistCanonicalMirrorFromLotusSnapshot({
   required LifeCounterSettingsStore settingsStore,
   required LotusStorageSnapshot snapshot,
 }) async {
+  final previousSession = await sessionStore.load();
+  final previousHistory = await historyStore.load();
   final historyDomainPresent = LifeCounterHistoryState.hasSnapshotDomain(
     snapshot,
   );
   final derivedDayNight = buildLotusDayNightStateFromSnapshot(snapshot);
-  final derivedSession = LotusLifeCounterSessionAdapter.tryBuildSession(
+  final parsedSession = LotusLifeCounterSessionAdapter.tryBuildSession(
     snapshot,
   );
   final derivedSettings = LotusLifeCounterSettingsAdapter.tryBuildSettings(
     snapshot,
   );
-  final derivedGameTimer = LotusLifeCounterGameTimerAdapter.tryBuildState(
+  final derivedSession =
+      parsedSession == null || derivedSettings == null
+          ? parsedSession
+          : LifeCounterTabletopEngine.normalizeOwnedBoardSession(
+            parsedSession,
+            settings: derivedSettings,
+          );
+  final parsedGameTimer = LotusLifeCounterGameTimerAdapter.tryBuildState(
     snapshot,
   );
-  final derivedHistory = LifeCounterHistoryState.fromSources(
-    session: derivedSession,
-    snapshot: snapshot,
+  // Lotus creates an internal gameTimerState on every boot, even when the
+  // timer feature is disabled. Do not promote that hidden implementation
+  // detail to canonical app state; otherwise merely opening the table starts
+  // a timer and races a native reset/start action.
+  final derivedGameTimer =
+      derivedSettings?.gameTimer == false ? null : parsedGameTimer;
+  final derivedHistory = _reconcilePendingLotusLifeHistory(
+    previousSession: previousSession,
+    derivedSession: derivedSession,
+    previousHistory: previousHistory,
+    derivedHistory: LifeCounterHistoryState.fromSources(
+      session: derivedSession,
+      snapshot: snapshot,
+    ),
   );
 
   if (derivedDayNight != null) {
@@ -174,6 +422,150 @@ Future<LotusCanonicalMirrorResult> persistCanonicalMirrorFromLotusSnapshot({
   );
 }
 
+final RegExp _pendingLotusLifeEventPattern = RegExp(
+  r'^player: (\d+) • change: (-?\d+) • life: (-?\d+)$',
+);
+
+LifeCounterHistoryState _reconcilePendingLotusLifeHistory({
+  required LifeCounterSession? previousSession,
+  required LifeCounterSession? derivedSession,
+  required LifeCounterHistoryState? previousHistory,
+  required LifeCounterHistoryState derivedHistory,
+}) {
+  if (previousSession == null ||
+      derivedSession == null ||
+      previousSession.playerCount != derivedSession.playerCount ||
+      !_isSameCurrentGame(previousHistory, derivedHistory)) {
+    return derivedHistory;
+  }
+
+  final derivedMessages =
+      derivedHistory.currentGameEntries.map((entry) => entry.message).toSet();
+  final pendingEntries = <LifeCounterHistoryEntry>[];
+  for (final entry in previousHistory?.currentGameEntries ?? const []) {
+    if (_tryParsePendingLotusLifeEvent(entry) == null ||
+        derivedMessages.contains(entry.message)) {
+      continue;
+    }
+    pendingEntries.add(entry);
+  }
+
+  for (var index = 0; index < derivedSession.playerCount; index += 1) {
+    final previousLife = previousSession.lives[index];
+    final nextLife = derivedSession.lives[index];
+    if (previousLife == nextLife) {
+      continue;
+    }
+
+    var totalChange = nextLife - previousLife;
+    final priorPendingIndex = pendingEntries.indexWhere((entry) {
+      final parsed = _tryParsePendingLotusLifeEvent(entry);
+      return parsed != null &&
+          parsed.playerIndex == index &&
+          parsed.finalLife == previousLife;
+    });
+    if (priorPendingIndex >= 0) {
+      final priorPending =
+          _tryParsePendingLotusLifeEvent(
+            pendingEntries.removeAt(priorPendingIndex),
+          )!;
+      totalChange += priorPending.change;
+    }
+
+    final message = 'player: $index • change: $totalChange • life: $nextLife';
+    if (!derivedMessages.contains(message)) {
+      pendingEntries.insert(
+        0,
+        LifeCounterHistoryEntry(
+          message: message,
+          source: LifeCounterHistoryEntrySource.fallback,
+        ),
+      );
+    }
+  }
+
+  if (pendingEntries.isEmpty) {
+    return derivedHistory;
+  }
+  return derivedHistory.copyWith(
+    currentGameEntries: <LifeCounterHistoryEntry>[
+      ...pendingEntries,
+      ...derivedHistory.currentGameEntries,
+    ],
+  );
+}
+
+bool _isSameCurrentGame(
+  LifeCounterHistoryState? previous,
+  LifeCounterHistoryState next,
+) {
+  if (previous == null) {
+    return true;
+  }
+
+  String? readId(LifeCounterHistoryState state) {
+    final value = state.currentGameMeta?['id'];
+    if (value is! String || value.trim().isEmpty) {
+      return null;
+    }
+    return value.trim();
+  }
+
+  final previousId = readId(previous);
+  final nextId = readId(next);
+  if (previousId != null || nextId != null) {
+    return previousId != null && previousId == nextId;
+  }
+
+  final previousStartDate = previous.currentGameMeta?['startDate'];
+  final nextStartDate = next.currentGameMeta?['startDate'];
+  if (previousStartDate is num || nextStartDate is num) {
+    return previousStartDate is num &&
+        nextStartDate is num &&
+        previousStartDate.toInt() == nextStartDate.toInt();
+  }
+
+  return previous.gameCounter == next.gameCounter &&
+      previous.currentGameName == next.currentGameName;
+}
+
+_PendingLotusLifeEvent? _tryParsePendingLotusLifeEvent(
+  LifeCounterHistoryEntry entry,
+) {
+  if (entry.source != LifeCounterHistoryEntrySource.fallback) {
+    return null;
+  }
+  final match = _pendingLotusLifeEventPattern.firstMatch(entry.message);
+  if (match == null) {
+    return null;
+  }
+
+  final playerIndex = int.tryParse(match.group(1)!);
+  final change = int.tryParse(match.group(2)!);
+  final finalLife = int.tryParse(match.group(3)!);
+  if (playerIndex == null || change == null || finalLife == null) {
+    return null;
+  }
+  return _PendingLotusLifeEvent(
+    playerIndex: playerIndex,
+    change: change,
+    finalLife: finalLife,
+  );
+}
+
+@immutable
+class _PendingLotusLifeEvent {
+  const _PendingLotusLifeEvent({
+    required this.playerIndex,
+    required this.change,
+    required this.finalLife,
+  });
+
+  final int playerIndex;
+  final int change;
+  final int finalLife;
+}
+
 bool shouldSkipLotusStoragePersistObservability({
   required bool didRecordStoragePersistThisLoad,
   required bool didRecordCanonicalSessionMirrorThisLoad,
@@ -200,10 +592,46 @@ bool shouldSkipLotusStoragePersistObservability({
           didRecordCanonicalHistoryMirrorThisLoad);
 }
 
-class LotusHostController implements LotusHost {
+class _LotusAuthoritativeStorageState {
+  const _LotusAuthoritativeStorageState({
+    required this.snapshot,
+    required this.fallbackValues,
+    required this.values,
+  });
+
+  final LotusStorageSnapshot? snapshot;
+  final Map<String, String> fallbackValues;
+  final Map<String, String> values;
+
+  String get fingerprint => lotusStorageValuesFingerprint(values);
+  String get fallbackFingerprint =>
+      lotusStorageValuesFingerprint(fallbackValues);
+}
+
+enum _LotusStorageMessageOutcome {
+  ignored,
+  accepted,
+  alreadyAccepted,
+  rejected;
+
+  bool get confirmsPersistence =>
+      this == _LotusStorageMessageOutcome.accepted ||
+      this == _LotusStorageMessageOutcome.alreadyAccepted;
+}
+
+class LotusHostController
+    implements
+        LotusHost,
+        LotusCanonicalStorageRebaser,
+        LotusCanonicalStorageMutationCoordinator,
+        LotusLiveStoragePatchCoordinator,
+        LotusStorageFlushBarrier {
   static const String _bundleLoadErrorMessage =
       'ManaLoom could not open the embedded life counter. '
       'Check the local bundle and try again.';
+  static const String _storageBootstrapErrorMessage =
+      'ManaLoom could not safely restore the life counter state. '
+      'Try loading it again.';
 
   LotusHostController({
     required LotusAppReviewCallback onAppReviewRequested,
@@ -235,6 +663,9 @@ class LotusHostController implements LotusHost {
   final LotusStorageSnapshotStore _storageSnapshotStore;
   final LotusUiSnapshotStore _uiSnapshotStore;
   final LotusShellMessageCallback _onShellMessageRequested;
+  final LotusStorageBridgeState _storageBridgeState = LotusStorageBridgeState();
+
+  late final LotusStorageMessageQueue _storageMessageQueue;
 
   bool _didRunBridgeProbe = false;
   bool _isDisposed = false;
@@ -246,7 +677,8 @@ class LotusHostController implements LotusHost {
   bool _didRecordCanonicalDayNightMirrorThisLoad = false;
   bool _didRecordCanonicalHistoryMirrorThisLoad = false;
   Timer? _loadingOverlayFallbackTimer;
-  DateTime? _ignoreBeforeUnloadSnapshotUntil;
+  DateTime? _ignoreReloadLifecycleSnapshotUntil;
+  String? _ignoreReloadLifecycleSnapshotSessionId;
   DateTime? _lastUiSnapshotCapturedAt;
 
   @override
@@ -256,7 +688,9 @@ class LotusHostController implements LotusHost {
 
   @override
   void suppressStaleBeforeUnloadSnapshot() {
-    _ignoreBeforeUnloadSnapshotUntil = DateTime.now().add(
+    _ignoreReloadLifecycleSnapshotSessionId =
+        _storageBridgeState.activeSessionId;
+    _ignoreReloadLifecycleSnapshotUntil = DateTime.now().add(
       const Duration(seconds: 2),
     );
   }
@@ -317,15 +751,158 @@ class LotusHostController implements LotusHost {
   }
 
   @override
+  Future<bool> flushStorageSnapshot({String reason = 'flutter_exit'}) async {
+    if (_isDisposed) {
+      return false;
+    }
+
+    final normalizedReason =
+        reason.trim().isEmpty ? 'flutter_exit' : reason.trim();
+    try {
+      final rawResult = await webViewController.runJavaScriptReturningResult('''
+        (() => {
+          const bridge = window.__ManaloomLotusStorageBridge;
+          if (!bridge || typeof bridge.flushSnapshot !== 'function') {
+            return JSON.stringify({ ok: false, reason: 'bridge_missing' });
+          }
+          const result = bridge.flushSnapshot(${jsonEncode(normalizedReason)});
+          return JSON.stringify(
+            result && typeof result === 'object'
+              ? result
+              : { ok: false, reason: 'invalid_bridge_result' }
+          );
+        })()
+        ''');
+      final result = _decodeLotusStorageBridgeResult(rawResult);
+      final rawPayload = result?['payload'];
+      if (rawPayload is! Map) {
+        return false;
+      }
+
+      final payload = rawPayload.map(
+        (key, value) => MapEntry<String, Object?>(key.toString(), value),
+      );
+      if (payload['type'] != 'persist_snapshot') {
+        return false;
+      }
+
+      // The JavaScript channel callback and this evaluated result can arrive in
+      // either order on different WebView implementations. Enqueue the same
+      // existing persist envelope as an awaited task: whichever copy arrives
+      // first persists, while the sequence guard safely rejects the duplicate.
+      final outcome = await _storageMessageQueue.enqueueTask(
+        () => _processStorageMessage(jsonEncode(payload)),
+      );
+      return !_isDisposed && outcome.confirmsPersistence;
+    } catch (error) {
+      debugPrint('$lotusLogPrefix storage flush barrier error: $error');
+      return false;
+    }
+  }
+
+  @override
+  Future<bool> applyLiveStoragePatch(Map<String, String?> values) async {
+    if (_isDisposed || values.isEmpty) {
+      return false;
+    }
+
+    try {
+      return await _storageMessageQueue.enqueueTask(() async {
+        final sessionId = _storageBridgeState.activeSessionId;
+        if (_isDisposed || sessionId == null) {
+          return false;
+        }
+
+        final rawResult = await webViewController.runJavaScriptReturningResult(
+          '''
+          (() => {
+            const bridge = window.__ManaloomLotusStorageBridge;
+            if (!bridge || typeof bridge.receivePatch !== 'function') {
+              return JSON.stringify({ ok: false, reason: 'bridge_missing' });
+            }
+            const result = bridge.receivePatch(${jsonEncode(<String, Object?>{'values': values})});
+            return JSON.stringify(
+              result && typeof result === 'object'
+                ? result
+                : { ok: false, reason: 'invalid_bridge_result' }
+            );
+          })()
+          ''',
+        );
+        final result = _decodeLotusStorageBridgeResult(rawResult);
+        final revision = result?['revision'];
+        if (result?['ok'] != true || revision is! int || revision <= 0) {
+          return false;
+        }
+
+        final authoritativeState = await _loadAuthoritativeStorageState();
+        return _storageBridgeState.recordNativePatch(
+          sessionId: sessionId,
+          revision: revision,
+          authoritativeFingerprint: authoritativeState.fingerprint,
+        );
+      });
+    } catch (error) {
+      debugPrint('$lotusLogPrefix live storage patch error: $error');
+      return false;
+    }
+  }
+
+  @override
+  Future<bool> rebaseStorageFromCanonical({
+    String reason = 'native_canonical_sync',
+  }) {
+    return mutateCanonicalStorageAndRebase(
+      mutation: () async {},
+      reason: reason,
+      reloadRuntime: true,
+    );
+  }
+
+  @override
+  Future<bool> mutateCanonicalStorageAndRebase({
+    required LotusCanonicalStorageMutation mutation,
+    required String reason,
+    bool reloadRuntime = false,
+  }) async {
+    if (_isDisposed) {
+      // A storage message may already be inside its canonical mirror phase when
+      // the host is disposed. Preserve the same write barrier even though no
+      // runtime rebase can be delivered anymore.
+      await _storageMessageQueue.idle;
+      await mutation();
+      return false;
+    }
+    try {
+      return await _storageMessageQueue.enqueueTask(() async {
+        await mutation();
+        if (_isDisposed || _storageBridgeState.activeSessionId == null) {
+          return false;
+        }
+        return _sendStorageRebaseSnapshot(
+          await _loadAuthoritativeStorageState(),
+          reason:
+              reason.trim().isEmpty ? 'native_canonical_sync' : reason.trim(),
+          reloadRuntime: reloadRuntime,
+        );
+      });
+    } catch (error, stackTrace) {
+      debugPrint('$lotusLogPrefix canonical storage mutation error: $error');
+      Error.throwWithStackTrace(error, stackTrace);
+    }
+  }
+
+  @override
   void dispose() {
     _isDisposed = true;
+    _storageMessageQueue.close();
     _loadingOverlayFallbackTimer?.cancel();
     isLoading.dispose();
     errorMessage.dispose();
   }
 
   void _configure({required LotusAppReviewCallback onAppReviewRequested}) {
-    LotusJavaScriptBridges.register(
+    _storageMessageQueue = LotusJavaScriptBridges.register(
       webViewController,
       onAppReviewRequested: onAppReviewRequested,
       onShellMessageRequested: _handleShellMessage,
@@ -353,35 +930,104 @@ class LotusHostController implements LotusHost {
   }
 
   Future<void> _handleStorageMessage(String message) async {
+    await _processStorageMessage(message);
+  }
+
+  Future<_LotusStorageMessageOutcome> _processStorageMessage(
+    String message,
+  ) async {
+    if (_isDisposed) {
+      return _LotusStorageMessageOutcome.ignored;
+    }
+
     final payload = _tryDecodeShellPayload(message);
     if (payload == null) {
       debugPrint('$lotusLogPrefix storage bridge received invalid payload');
-      return;
+      return _LotusStorageMessageOutcome.ignored;
     }
 
     final type = payload['type'];
     if (type == 'request_bootstrap') {
-      await _sendStorageBootstrapSnapshot();
-      return;
+      await _sendStorageBootstrapSnapshot(payload);
+      return _LotusStorageMessageOutcome.ignored;
+    }
+
+    if (type == 'native_patch_applied') {
+      await _recordNativeStoragePatch(payload);
+      return _LotusStorageMessageOutcome.ignored;
+    }
+
+    if (type == 'bootstrap_failed') {
+      _recordStorageBootstrapFailure(payload);
+      return _LotusStorageMessageOutcome.ignored;
     }
 
     if (type != 'persist_snapshot') {
-      return;
+      return _LotusStorageMessageOutcome.ignored;
     }
 
     final snapshot = LotusStorageSnapshot.tryFromJson(payload);
     if (snapshot == null) {
-      return;
+      return _LotusStorageMessageOutcome.rejected;
     }
 
-    final reason = payload['reason'] as String?;
-    if (reason == 'beforeunload' &&
-        _ignoreBeforeUnloadSnapshotUntil != null &&
-        DateTime.now().isBefore(_ignoreBeforeUnloadSnapshotUntil!)) {
-      return;
+    final reason =
+        payload['reason'] is String ? payload['reason'] as String : null;
+    final sessionId =
+        payload['sessionId'] is String ? payload['sessionId'] as String : null;
+    if (shouldSuppressLotusReloadLifecycleSnapshot(
+      reason: reason,
+      sessionId: sessionId,
+      suppressedSessionId: _ignoreReloadLifecycleSnapshotSessionId,
+      suppressUntil: _ignoreReloadLifecycleSnapshotUntil,
+      now: DateTime.now(),
+    )) {
+      return _LotusStorageMessageOutcome.ignored;
+    }
+
+    final sequence =
+        payload['sequence'] is int ? payload['sequence'] as int : null;
+    final baseRevision =
+        payload['baseRevision'] is int ? payload['baseRevision'] as int : null;
+    final authoritativeBefore = await _loadAuthoritativeStorageState();
+    final persistDecision = _storageBridgeState.evaluatePersist(
+      sessionId: sessionId,
+      sequence: sequence,
+      baseRevision: baseRevision,
+      currentAuthoritativeFingerprint: authoritativeBefore.fingerprint,
+      incomingFingerprint: lotusStorageValuesFingerprint(snapshot.values),
+    );
+    if (persistDecision.wasAlreadyPersisted) {
+      return _LotusStorageMessageOutcome.alreadyAccepted;
+    }
+    if (!persistDecision.shouldPersist) {
+      debugPrint(
+        '$lotusLogPrefix rejected storage snapshot: '
+        '${persistDecision.rejection?.name ?? 'unknown'}',
+      );
+      if (persistDecision.shouldRebase) {
+        await _sendStorageRebaseSnapshot(
+          authoritativeBefore,
+          reason: persistDecision.rejection!.name,
+        );
+      }
+      return _LotusStorageMessageOutcome.rejected;
     }
 
     await _storageSnapshotStore.save(snapshot);
+    final fallbackAfterSnapshotSave = await _buildFallbackBootstrapValues();
+    if (lotusStorageValuesFingerprint(fallbackAfterSnapshotSave) !=
+        authoritativeBefore.fallbackFingerprint) {
+      await _sendStorageRebaseSnapshot(
+        await _loadAuthoritativeStorageState(),
+        reason: 'canonical_state_changed_during_persist',
+      );
+      return _LotusStorageMessageOutcome.rejected;
+    }
+
+    final incomingSession = LotusLifeCounterSessionAdapter.tryBuildSession(
+      snapshot,
+    );
     final mirror = await persistCanonicalMirrorFromLotusSnapshot(
       dayNightStateStore: _dayNightStateStore,
       gameTimerStateStore: _gameTimerStateStore,
@@ -390,12 +1036,27 @@ class LotusHostController implements LotusHost {
       settingsStore: _settingsStore,
       snapshot: snapshot,
     );
+    final committedState = await _loadAuthoritativeStorageState();
+    _storageBridgeState.recordAcceptedSnapshot(
+      committedState.fingerprint,
+      sequence: sequence!,
+      incomingFingerprint: lotusStorageValuesFingerprint(snapshot.values),
+    );
     final derivedDayNight = mirror.dayNightState;
     final derivedGameTimer = mirror.gameTimerState;
     final derivedHistory = mirror.history;
     final historyDomainPresent = mirror.historyDomainPresent;
     final derivedSession = mirror.session;
     final derivedSettings = mirror.settings;
+    if (incomingSession != null &&
+        derivedSession != null &&
+        incomingSession.toJsonString() != derivedSession.toJsonString()) {
+      await _sendStorageRebaseSnapshot(
+        committedState,
+        reason: 'canonical_session_normalized',
+        reloadRuntime: true,
+      );
+    }
 
     if (shouldSkipLotusStoragePersistObservability(
       didRecordStoragePersistThisLoad: _didRecordStoragePersistThisLoad,
@@ -416,7 +1077,7 @@ class LotusHostController implements LotusHost {
       derivedDayNight: derivedDayNight,
       derivedHistory: derivedHistory,
     )) {
-      return;
+      return _LotusStorageMessageOutcome.accepted;
     }
 
     if (!_didRecordStoragePersistThisLoad) {
@@ -506,19 +1167,37 @@ class LotusHostController implements LotusHost {
     }
 
     unawaited(_captureUiSnapshot());
+    return _LotusStorageMessageOutcome.accepted;
   }
 
-  Future<void> _sendStorageBootstrapSnapshot() async {
-    final snapshot = await _storageSnapshotStore.load();
-    final fallbackValues = await _buildFallbackBootstrapValues();
-    final mergedValues = mergeLotusBootstrapValues(
-      snapshotValues: snapshot?.values,
-      fallbackValues: fallbackValues,
+  Future<void> _sendStorageBootstrapSnapshot(
+    Map<String, dynamic> request,
+  ) async {
+    final sessionId =
+        request['sessionId'] is String ? request['sessionId'] as String : null;
+    final requestId =
+        request['requestId'] is String ? request['requestId'] as String : null;
+    if (sessionId == null ||
+        sessionId.isEmpty ||
+        requestId == null ||
+        requestId.isEmpty) {
+      debugPrint('$lotusLogPrefix storage bootstrap envelope is invalid');
+      return;
+    }
+
+    final authoritativeState = await _loadAuthoritativeStorageState();
+    final revision = _storageBridgeState.beginBootstrap(
+      sessionId: sessionId,
+      requestId: requestId,
+      authoritativeFingerprint: authoritativeState.fingerprint,
     );
     final payload = <String, Object?>{
       'type': 'bootstrap_snapshot',
-      'hasSnapshot': mergedValues.isNotEmpty,
-      'values': mergedValues,
+      'sessionId': sessionId,
+      'requestId': requestId,
+      'revision': revision,
+      'hasSnapshot': authoritativeState.values.isNotEmpty,
+      'values': authoritativeState.values,
     };
 
     try {
@@ -532,21 +1211,142 @@ class LotusHostController implements LotusHost {
         ''');
       unawaited(
         AppObservability.instance.recordEvent(
-          mergedValues.isEmpty
+          authoritativeState.values.isEmpty
               ? 'storage_bootstrap_missing'
-              : (snapshot == null
+              : (authoritativeState.snapshot == null
                   ? 'storage_bootstrap_restored_from_canonical'
                   : 'storage_bootstrap_restored'),
           category: 'life_counter.storage',
           data: {
-            'entry_count': mergedValues.length,
-            'used_fallback': fallbackValues.isNotEmpty,
+            'entry_count': authoritativeState.values.length,
+            'used_fallback': authoritativeState.fallbackValues.isNotEmpty,
+            'revision': revision,
           },
         ),
       );
     } catch (error) {
       debugPrint('$lotusLogPrefix storage bootstrap error: $error');
     }
+  }
+
+  Future<void> _recordNativeStoragePatch(Map<String, dynamic> payload) async {
+    final sessionId =
+        payload['sessionId'] is String ? payload['sessionId'] as String : null;
+    final revision =
+        payload['revision'] is int ? payload['revision'] as int : null;
+    if (!_storageBridgeState.isActiveSession(sessionId) ||
+        revision == null ||
+        revision <= 0) {
+      return;
+    }
+
+    final authoritativeState = await _loadAuthoritativeStorageState();
+    final didRecord = _storageBridgeState.recordNativePatch(
+      sessionId: sessionId,
+      revision: revision,
+      authoritativeFingerprint: authoritativeState.fingerprint,
+    );
+    if (!didRecord && revision < _storageBridgeState.revision) {
+      await _sendStorageRebaseSnapshot(
+        authoritativeState,
+        reason: 'stale_native_patch_revision',
+      );
+    }
+  }
+
+  void _recordStorageBootstrapFailure(Map<String, dynamic> payload) {
+    final sessionId =
+        payload['sessionId'] is String ? payload['sessionId'] as String : null;
+    if (!_storageBridgeState.isActiveSession(sessionId) || _isDisposed) {
+      return;
+    }
+
+    errorMessage.value = _storageBootstrapErrorMessage;
+    dismissLoadingOverlay();
+    unawaited(
+      AppObservability.instance.recordEvent(
+        'storage_bootstrap_failed',
+        category: 'life_counter.storage',
+        level: SentryLevel.error,
+        data: {'attempts': payload['attempts'], 'reason': payload['reason']},
+      ),
+    );
+  }
+
+  Future<bool> _sendStorageRebaseSnapshot(
+    _LotusAuthoritativeStorageState authoritativeState, {
+    required String reason,
+    bool reloadRuntime = false,
+  }) async {
+    final sessionId = _storageBridgeState.activeSessionId;
+    if (sessionId == null || _isDisposed) {
+      return false;
+    }
+
+    final revision = _storageBridgeState.beginRebase(
+      authoritativeState.fingerprint,
+    );
+    final payload = <String, Object?>{
+      'type': 'rebase_snapshot',
+      'sessionId': sessionId,
+      'revision': revision,
+      'reason': reason,
+      'reloadRuntime': reloadRuntime,
+      'values': authoritativeState.values,
+    };
+
+    try {
+      if (reloadRuntime) {
+        suppressStaleBeforeUnloadSnapshot();
+      }
+      final rawResult = await webViewController.runJavaScriptReturningResult('''
+        (() => {
+          const bridge = window.__ManaloomLotusStorageBridge;
+          if (!bridge || typeof bridge.receiveRebase !== 'function') {
+            return JSON.stringify({ ok: false, reason: 'bridge_missing' });
+          }
+          const result = bridge.receiveRebase(${jsonEncode(payload)});
+          return JSON.stringify(
+            result && typeof result === 'object'
+              ? result
+              : { ok: false, reason: 'invalid_bridge_result' }
+          );
+        })()
+        ''');
+      if (!isSuccessfulLotusStorageBridgeResult(rawResult)) {
+        debugPrint('$lotusLogPrefix storage rebase was rejected by WebView');
+        return false;
+      }
+      unawaited(
+        AppObservability.instance.recordEvent(
+          'storage_snapshot_rebased',
+          category: 'life_counter.storage',
+          data: {
+            'entry_count': authoritativeState.values.length,
+            'reason': reason,
+            'revision': revision,
+          },
+        ),
+      );
+      return true;
+    } catch (error) {
+      debugPrint('$lotusLogPrefix storage rebase error: $error');
+      return false;
+    }
+  }
+
+  Future<_LotusAuthoritativeStorageState>
+  _loadAuthoritativeStorageState() async {
+    final snapshot = await _storageSnapshotStore.load();
+    final fallbackValues = await _buildFallbackBootstrapValues();
+    return _LotusAuthoritativeStorageState(
+      snapshot: snapshot,
+      fallbackValues: fallbackValues,
+      values: mergeLotusBootstrapValues(
+        snapshotValues: snapshot?.values,
+        fallbackValues: fallbackValues,
+      ),
+    );
   }
 
   Future<Map<String, String>> _buildFallbackBootstrapValues() async {

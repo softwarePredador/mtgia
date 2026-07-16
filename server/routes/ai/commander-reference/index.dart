@@ -16,6 +16,7 @@ import '../../../lib/ai/commander_reference_readiness_support.dart';
 import '../../../lib/ai/commander_learned_deck_support.dart';
 import '../../../lib/ai/deck_learning_event_support.dart';
 import '../../../lib/ai/edhrec_service.dart';
+import '../../../lib/admin_access_support.dart';
 import '../../../lib/basic_land_utils.dart' as basic_lands;
 import '../../../lib/generated_deck_validation_service.dart';
 import '../../../lib/http_responses.dart';
@@ -24,6 +25,7 @@ import '../../../lib/meta/meta_deck_card_list_support.dart';
 import '../../../lib/meta/meta_deck_format_support.dart';
 import '../../../lib/meta/mtgtop8_meta_support.dart';
 import '../../../lib/observability.dart';
+import '../../../lib/runtime_environment.dart';
 
 const _mtgTop8RequestTimeout = Duration(seconds: 5);
 const _mtgTop8RefreshBudget = Duration(seconds: 15);
@@ -63,6 +65,23 @@ Future<Response> onRequest(RequestContext context) async {
     }
 
     final pool = context.read<Pool>();
+    if (shouldRefresh) {
+      final userId = context.read<String>();
+      final env = loadRuntimeEnvironment();
+      final isAdmin = await isConfiguredAdminUser(
+        pool: pool,
+        userId: userId,
+        env: env,
+      );
+      if (!isAdmin) {
+        return Response.json(
+          statusCode: HttpStatus.forbidden,
+          body: {
+            'error': 'Commander reference refresh requires admin privileges.',
+          },
+        );
+      }
+    }
     final cachedProfile = await _loadCommanderProfileCache(
       pool: pool,
       commander: commander,

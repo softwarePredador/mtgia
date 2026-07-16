@@ -77,6 +77,7 @@ from battle_zone_transition_support import (
     finish_countered_spell as _finish_countered_spell,
     finish_resolved_spell as _finish_resolved_spell,
     get_lki,
+    is_token_object as _is_token_object,
     move_creature_from_battlefield as _move_creature_from_battlefield,
     move_permanent_from_battlefield as _move_permanent_from_battlefield,
     move_to_exile,
@@ -2290,7 +2291,7 @@ def _cost_reduction_candidate_rank(permanent):
     score = 0
     if permanent.get("is_commander"):
         score += 1000
-    if permanent.get("tag") == "token" or "token" in type_line:
+    if is_token_permanent(permanent):
         score -= 40
     if "artifact" in type_line and "creature" not in type_line:
         score -= 12
@@ -3632,10 +3633,17 @@ def resolve_specialize_base_etb(
                 or opposing_target.get("deathtouch")
             ) and not own_target.get("indestructible")
             if target_dies and opposing_target in target_owner.battlefield:
-                target_owner.battlefield.remove(opposing_target)
-                move_to_exile(target_owner, opposing_target, reason="gut_fight_replacement", turn=turn)
-                opposing_target["_exiled_by_source"] = permanent.get("name", "?")
-                permanent.setdefault("_cards_exiled_with_source", []).append(opposing_target)
+                token_ceased = is_token_permanent(opposing_target)
+                destination = move_permanent_from_battlefield_to_exile(
+                    target_owner,
+                    opposing_target,
+                    reason="gut_fight_replacement",
+                    source=permanent,
+                    turn=turn,
+                )
+                if destination == "exile" and not token_ceased:
+                    opposing_target["_exiled_by_source"] = permanent.get("name", "?")
+                    permanent.setdefault("_cards_exiled_with_source", []).append(opposing_target)
             if own_dies and own_target in player.battlefield:
                 move_creature_from_battlefield(
                     player,
@@ -3698,12 +3706,19 @@ def resolve_specialize_base_etb(
         )
         if target_entry:
             target_owner, target = target_entry
-            target_owner.battlefield.remove(target)
-            move_to_exile(target_owner, target, reason="rasaad_etb_until_leaves", turn=turn)
-            target["_exiled_by_source"] = permanent.get("name", "?")
-            target["_specialize_exile_owner_ref"] = target_owner
-            target["_specialize_return_when_source_leaves"] = True
-            permanent.setdefault("_cards_exiled_with_source", []).append(target)
+            token_ceased = is_token_permanent(target)
+            destination = move_permanent_from_battlefield_to_exile(
+                target_owner,
+                target,
+                reason="rasaad_etb_until_leaves",
+                source=permanent,
+                turn=turn,
+            )
+            if destination == "exile" and not token_ceased:
+                target["_exiled_by_source"] = permanent.get("name", "?")
+                target["_specialize_exile_owner_ref"] = target_owner
+                target["_specialize_return_when_source_leaves"] = True
+                permanent.setdefault("_cards_exiled_with_source", []).append(target)
             detail["actions"].append({"exiled_until_leaves": target.get("name", "?")})
 
     elif family == "wyll":
@@ -5770,10 +5785,17 @@ def process_warp_end_step(player, turn):
             continue
         if permanent.get("_warp_pending_exile_turn") != turn:
             continue
-        player.battlefield.remove(permanent)
+        destination = move_permanent_from_battlefield_to_exile(
+            player,
+            permanent,
+            reason="warp",
+            source=permanent,
+            turn=turn,
+        )
+        if destination in {"none", "battlefield"}:
+            continue
         permanent["_warped_this_turn"] = False
         permanent["_warp_recast_available"] = True
-        move_to_exile(player, permanent, reason="warp", turn=turn)
         moved.append(permanent.get("name", "?"))
     if moved:
         emit_replay_event("warp_exiled_end_step", player=player.name, cards=moved, turn=turn)
@@ -10315,6 +10337,7 @@ def resolve_gain_control_untap_haste_until_eot_spell(player, opponents, card, ef
 
     original_controller_name = target.get("controller") or getattr(original_owner, "name", None)
     tapped_before = bool(target.get("tapped"))
+    target.setdefault("owner", getattr(original_owner, "name", None))
     remember_until_eot(target, "controller")
     remember_until_eot(target, "keywords")
     remember_until_eot(target, "haste")
@@ -10703,7 +10726,7 @@ def global_stat_modifier_creature_filter_matches(target, creature_filter):
     ]
     if excluded_card_types and any(permanent_has_card_type(target, card_type) for card_type in excluded_card_types):
         return False
-    if creature_filter.get("token") and not (target.get("token") or target.get("is_token")):
+    if creature_filter.get("token") and not is_token_permanent(target):
         return False
     if creature_filter.get("no_counters") and permanent_has_any_counter(target):
         return False
@@ -10791,8 +10814,16 @@ def transform_permanent_to_face(
     transformed_payload.setdefault("effect", transform_to.get("effect") or "creature")
     all_players_for_entry = all_players or [player, *(opponents or [])]
     if permanent in player.battlefield:
-        player.battlefield.remove(permanent)
-        player.exile.append(permanent)
+        token_ceased = is_token_permanent(permanent)
+        destination = move_permanent_from_battlefield_to_exile(
+            player,
+            permanent,
+            reason="transform_to_face",
+            source=permanent,
+            turn=turn,
+        )
+        if destination in {"none", "battlefield"} or token_ceased:
+            return None
     transformed = prepare_entering_permanent(
         transformed_payload,
         controller=player,
@@ -19922,6 +19953,7 @@ def check_illegal_attachments(all_players):
         is_effective_land=is_effective_land,
         is_artifact_permanent=is_artifact_permanent,
         emit_replay_event=emit_replay_event,
+        move_permanent_from_battlefield=move_permanent_from_battlefield,
     )
 
 
@@ -19930,6 +19962,7 @@ def check_saga_final_chapter(all_players):
         all_players,
         numeric_stat=numeric_stat,
         emit_replay_event=emit_replay_event,
+        move_permanent_from_battlefield=move_permanent_from_battlefield,
     )
 
 
@@ -19943,6 +19976,8 @@ def check_sbas(all_players):
         check_saga_final_chapter_func=check_saga_final_chapter,
         check_token_lifecycle_func=check_token_lifecycle,
         move_creature_from_battlefield=move_creature_from_battlefield,
+        move_permanent_from_battlefield=move_permanent_from_battlefield,
+        move_permanent_from_battlefield_to_exile=move_permanent_from_battlefield_to_exile,
         move_to_exile=move_to_exile,
         resolve_battle_back_face=resolve_battle_back_face,
         is_battlefield_creature=is_battlefield_creature,
@@ -19957,6 +19992,7 @@ def check_token_lifecycle(all_players):
     return _check_token_lifecycle(
         all_players,
         emit_replay_event=emit_replay_event,
+        emit_token_ceased_to_exist=emit_token_ceased_to_exist,
     )
 
 def check_sbas_until_stable(all_players):
@@ -21569,9 +21605,35 @@ def is_permanent_card(card):
 
 
 def is_token_permanent(card):
-    if not isinstance(card, dict):
-        return False
-    return bool(card.get("token")) or "token" in str(card.get("type_line") or "").lower()
+    return _is_token_object(card)
+
+
+def emit_token_ceased_to_exist(
+    owner,
+    token,
+    *,
+    zone,
+    from_zone=None,
+    reason=None,
+    source=None,
+    turn=None,
+):
+    """Emit the canonical replay contract for a token lifecycle SBA."""
+    zone_name = str(zone or "unknown")
+    source_name = source.get("name", "?") if isinstance(source, dict) else source
+    emit_replay_event(
+        "token_ceased_to_exist",
+        player=getattr(owner, "name", "?"),
+        token=token.get("name", "?") if isinstance(token, dict) else str(token),
+        from_zone=str(from_zone or zone_name),
+        to_zone=zone_name,
+        zone=zone_name,
+        destination=zone_name,
+        result="ceased_to_exist",
+        reason=reason,
+        source=source_name,
+        turn=turn if turn is not None else CURRENT_REPLAY_TURN,
+    )
 
 
 def move_permanent_to_library_then_reveal(
@@ -21588,6 +21650,7 @@ def move_permanent_to_library_then_reveal(
         return "library"
     library_before = len(getattr(target_controller, "library", []) or [])
     target_name = target.get("name", "?")
+    target_vanished = is_token_permanent(target)
     final_destination = move_permanent_from_battlefield_to_library(
         target_controller,
         target,
@@ -21596,7 +21659,6 @@ def move_permanent_to_library_then_reveal(
         source=source_card,
         turn=turn,
     )
-    target_vanished = final_destination == "vanished_token"
     target_controller.shuffle(rng)
 
     revealed = target_controller.library[0] if target_controller.library else None
@@ -21703,6 +21765,12 @@ def _remove_battlefield_object(owner, permanent):
     for index, candidate in enumerate(battlefield):
         if candidate == permanent:
             return battlefield.pop(index)
+    if (
+        isinstance(permanent, dict)
+        and permanent.get("_last_zone") == "battlefield"
+        and bool(permanent.get("_zone_id"))
+    ):
+        return None
     if isinstance(permanent, dict):
         target_name = permanent.get("name") or permanent.get("card_name")
         if target_name:
@@ -21985,6 +22053,7 @@ def move_permanent_from_battlefield_to_hand(owner, permanent, *, reason=None, so
     moved["_zone_id"] = moved.get("_zone_id", 0) + 1
     moved["_last_zone"] = "battlefield"
     current_turn = turn if turn is not None else CURRENT_REPLAY_TURN
+    token_ceased = is_token_permanent(moved)
     if hasattr(owner, "record_permanent_left_battlefield"):
         owner.record_permanent_left_battlefield(1, current_turn)
     destination = "hand"
@@ -22001,8 +22070,8 @@ def move_permanent_from_battlefield_to_hand(owner, permanent, *, reason=None, so
             )
         )
         destination = event.to_zone
-    if moved.get("tag") == "token" or "token" in str(moved.get("type_line") or "").lower():
-        destination = "vanished_token"
+    if token_ceased:
+        pass
     elif destination == "command_zone":
         owner.command_zone.append(moved)
     else:
@@ -22031,6 +22100,16 @@ def move_permanent_from_battlefield_to_hand(owner, permanent, *, reason=None, so
         source=source.get("name", "?") if isinstance(source, dict) else source,
         turn=current_turn,
     )
+    if token_ceased:
+        emit_token_ceased_to_exist(
+            owner,
+            moved,
+            from_zone="battlefield",
+            zone=destination,
+            reason=reason,
+            source=source,
+            turn=current_turn,
+        )
     resolve_linked_exile_source_leave(
         owner,
         moved,
@@ -22079,7 +22158,7 @@ def move_permanent_from_battlefield_to_hand(owner, permanent, *, reason=None, so
         phase="leave_battlefield",
         emit_events=True,
     )
-    if destination not in {"none", "battlefield", "vanished_token"}:
+    if destination not in {"none", "battlefield"} and not token_ceased:
         restore_modal_dfc_front_face_outside_battlefield(
             moved,
             destination=destination,
@@ -22110,6 +22189,7 @@ def move_permanent_from_battlefield_to_library(owner, permanent, *, destination,
     moved["_zone_id"] = moved.get("_zone_id", 0) + 1
     moved["_last_zone"] = "battlefield"
     current_turn = turn if turn is not None else CURRENT_REPLAY_TURN
+    token_ceased = is_token_permanent(moved)
     if hasattr(owner, "record_permanent_left_battlefield"):
         owner.record_permanent_left_battlefield(1, current_turn)
     final_destination = destination
@@ -22127,8 +22207,8 @@ def move_permanent_from_battlefield_to_library(owner, permanent, *, destination,
         )
         if event.to_zone == "command_zone":
             final_destination = "command_zone"
-    if moved.get("tag") == "token" or "token" in str(moved.get("type_line") or "").lower():
-        final_destination = "vanished_token"
+    if token_ceased:
+        pass
     elif final_destination == "command_zone":
         owner.command_zone.append(moved)
     else:
@@ -22167,9 +22247,20 @@ def move_permanent_from_battlefield_to_library(owner, permanent, *, destination,
         destination=final_destination,
         requested_destination=destination,
         source=source.get("name", "?") if isinstance(source, dict) else source,
-        vanished_token=final_destination == "vanished_token",
+        token_ceased_to_exist=token_ceased,
+        vanished_token=token_ceased,
         turn=turn if turn is not None else CURRENT_REPLAY_TURN,
     )
+    if token_ceased:
+        emit_token_ceased_to_exist(
+            owner,
+            moved,
+            from_zone="battlefield",
+            zone=final_destination,
+            reason=reason,
+            source=source,
+            turn=current_turn,
+        )
     resolve_linked_exile_source_leave(
         owner,
         moved,
@@ -22218,7 +22309,7 @@ def move_permanent_from_battlefield_to_library(owner, permanent, *, destination,
         phase="leave_battlefield",
         emit_events=True,
     )
-    if final_destination not in {"none", "battlefield", "vanished_token"}:
+    if final_destination not in {"none", "battlefield"} and not token_ceased:
         restore_modal_dfc_front_face_outside_battlefield(
             moved,
             destination=final_destination,
@@ -22436,6 +22527,11 @@ def battlefield_object_for_target(player, target):
     for permanent in battlefield:
         if permanent == target:
             return permanent
+    if (
+        target.get("_last_zone") == "battlefield"
+        and bool(target.get("_zone_id"))
+    ):
+        return None
     target_name = target.get("name") or target.get("card_name")
     if target_name:
         name_matches = [
@@ -25409,6 +25505,8 @@ def clear_until_eot(player):
                 **expiring_flashback_rule_fields,
             )
         card.pop("_landfall_triggers_this_turn", None)
+        card.pop("_compact_attack_projected_turn", None)
+        card.pop("_compact_attack_projected_by", None)
         clear_permanent_damage_this_turn_flags(card)
 
     for card in list(player.battlefield):
@@ -26982,10 +27080,14 @@ def activate_pyxis_of_pandemonium(player, permanent, opponents, all_players, tur
         activation_cost_text = _activation_cost_text(activation_cost)
         if not player.spend_mana(activation_cost_text):
             return False
-        if permanent in player.battlefield:
-            player.battlefield.remove(permanent)
-        player.graveyard.append(permanent)
-        player.record_permanent_sacrificed(permanent, turn)
+        if not sacrifice_permanent_for_activation(
+            player,
+            permanent,
+            turn,
+            all_players=players,
+            reason="sacrifice_pyxis_activation_cost",
+        ):
+            return False
         if permanent.get("activation_requires_tap", True):
             permanent["tapped"] = True
         permanent["utility_artifact_used_this_turn"] = True
@@ -28950,7 +29052,7 @@ def _harnessed_blink_target_score(permanent):
     type_line = str(permanent.get("type_line") or "").lower()
     if "land" in type_line:
         return -999
-    if permanent.get("is_token") or permanent.get("tag") == "token" or "token" in type_line:
+    if is_token_permanent(permanent):
         return -999
 
     score = 0
@@ -28994,8 +29096,7 @@ BLINK_TRANSIENT_KEYS = (
 
 
 def _blink_target_is_token(permanent):
-    type_line = str(permanent.get("type_line") or "").lower()
-    return bool(permanent.get("is_token") or permanent.get("tag") == "token" or "token" in type_line)
+    return is_token_permanent(permanent)
 
 
 def blink_target_matches_scope(permanent, source_effect, *, source_permanent=None):
@@ -30768,6 +30869,10 @@ def consume_shield_counter_replacement(
 
 
 def move_creature_from_battlefield(owner, creature, reason=None, source=None, all_players=None):
+    creature = battlefield_object_for_target(owner, creature)
+    if creature is None:
+        return "none"
+    token_object = is_token_permanent(creature)
     if consume_regeneration_shield(owner, creature, reason=reason, source=source):
         return "battlefield"
     if consume_shield_counter_replacement(
@@ -30788,12 +30893,7 @@ def move_creature_from_battlefield(owner, creature, reason=None, source=None, al
         replacement_registry=ReplacementRegistry,
         replacement_event_cls=ReplacementEvent,
     )
-    token_ceased = destination == "vanished_token"
-    if token_ceased:
-        # Tokens do move to the graveyard and die before ceasing to exist as
-        # an SBA. The compact zone helper elides that transient storage, so
-        # expose the rules-correct destination to triggers and replay events.
-        destination = "graveyard"
+    token_ceased = token_object and destination == "graveyard"
     if destination != "none":
         _restore_battlefield_color_changes(creature)
     if isinstance(creature, dict) and destination != "none":
@@ -30814,13 +30914,13 @@ def move_creature_from_battlefield(owner, creature, reason=None, source=None, al
             turn=CURRENT_REPLAY_TURN,
         )
         if token_ceased:
-            emit_replay_event(
-                "token_ceased_to_exist",
-                player=getattr(owner, "name", "?"),
-                token=creature.get("name", "?"),
+            emit_token_ceased_to_exist(
+                owner,
+                creature,
                 from_zone="battlefield",
                 zone="graveyard",
-                destination="graveyard",
+                reason=reason,
+                source=source,
                 turn=CURRENT_REPLAY_TURN,
             )
     if destination != "none":
@@ -30936,7 +31036,10 @@ def move_creature_from_battlefield(owner, creature, reason=None, source=None, al
         source=source,
         all_players=all_players,
     )
-    if "sacrifice" in str(reason or "").lower():
+    if (
+        destination not in {"none", "battlefield"}
+        and "sacrifice" in str(reason or "").lower()
+    ):
         owner.record_permanent_sacrificed(creature, CURRENT_REPLAY_TURN)
     refresh_controlled_static_indestructible(
         owner,
@@ -30963,7 +31066,7 @@ def move_creature_from_battlefield(owner, creature, reason=None, source=None, al
         emit_events=True,
         all_players=all_players or [owner],
     )
-    if destination not in {"none", "battlefield"}:
+    if destination not in {"none", "battlefield"} and not token_ceased:
         restore_modal_dfc_front_face_outside_battlefield(
             creature,
             destination=destination,
@@ -30973,6 +31076,10 @@ def move_creature_from_battlefield(owner, creature, reason=None, source=None, al
 
 
 def move_permanent_from_battlefield(owner, permanent, reason=None, source=None, all_players=None):
+    permanent = battlefield_object_for_target(owner, permanent)
+    if permanent is None:
+        return "none"
+    token_object = is_token_permanent(permanent)
     was_creature = is_battlefield_creature(permanent)
     if is_battlefield_creature(permanent) and consume_regeneration_shield(
         owner,
@@ -30999,11 +31106,7 @@ def move_permanent_from_battlefield(owner, permanent, reason=None, source=None, 
         replacement_registry=ReplacementRegistry,
         replacement_event_cls=ReplacementEvent,
     )
-    token_ceased = destination == "vanished_token"
-    if token_ceased:
-        # Preserve the lightweight no-storage token model while still making
-        # dies triggers and replay evidence observe the real graveyard move.
-        destination = "graveyard"
+    token_ceased = token_object and destination == "graveyard"
     if destination != "none":
         _restore_battlefield_color_changes(permanent)
     if isinstance(permanent, dict) and destination != "none":
@@ -31026,13 +31129,13 @@ def move_permanent_from_battlefield(owner, permanent, reason=None, source=None, 
             turn=CURRENT_REPLAY_TURN,
         )
         if token_ceased:
-            emit_replay_event(
-                "token_ceased_to_exist",
-                player=getattr(owner, "name", "?"),
-                token=permanent.get("name", "?"),
+            emit_token_ceased_to_exist(
+                owner,
+                permanent,
                 from_zone="battlefield",
                 zone="graveyard",
-                destination="graveyard",
+                reason=reason,
+                source=source,
                 turn=CURRENT_REPLAY_TURN,
             )
     if destination != "none":
@@ -31149,9 +31252,16 @@ def move_permanent_from_battlefield(owner, permanent, reason=None, source=None, 
             source=source,
             all_players=all_players,
         )
-    if "sacrifice" in str(reason or "").lower():
+    if (
+        destination not in {"none", "battlefield"}
+        and "sacrifice" in str(reason or "").lower()
+    ):
         owner.record_permanent_sacrificed(permanent, CURRENT_REPLAY_TURN)
-    if destination == "graveyard" and is_effective_land(permanent):
+    if (
+        destination == "graveyard"
+        and is_effective_land(permanent)
+        and not token_ceased
+    ):
         resolve_land_cards_enter_graveyard_triggers(
             owner,
             [permanent],
@@ -31183,7 +31293,7 @@ def move_permanent_from_battlefield(owner, permanent, reason=None, source=None, 
         emit_events=True,
         all_players=all_players or [owner],
     )
-    if destination not in {"none", "battlefield"}:
+    if destination not in {"none", "battlefield"} and not token_ceased:
         restore_modal_dfc_front_face_outside_battlefield(
             permanent,
             destination=destination,
@@ -31450,17 +31560,25 @@ def choose_untapped_artifact_for_additional_cost(player, source):
     return candidates[0] if candidates else None, candidates
 
 
-def sacrifice_permanent_for_activation(player, permanent, turn):
+def sacrifice_permanent_for_activation(
+    player,
+    permanent,
+    turn,
+    *,
+    source=None,
+    all_players=None,
+    reason="sacrifice_activation_cost",
+):
+    """Pay a permanent-sacrifice cost through the canonical zone pipeline."""
     destination = move_permanent_from_battlefield(
         player,
         permanent,
-        reason="sacrifice_activation_cost",
-        source=permanent,
-        all_players=_table_players_for(player),
+        reason=reason,
+        source=source or permanent,
+        all_players=all_players or _table_players_for(player),
     )
     if destination in {"none", "battlefield"}:
         return False
-    player.record_permanent_sacrificed(permanent, turn)
     return True
 
 
@@ -31911,8 +32029,7 @@ def choose_creature_for_sacrificed_power_damage(player):
         return None, [], "no_matching_creature"
 
     def selection_key(permanent):
-        type_line = str(permanent.get("type_line") or "").lower()
-        is_token = permanent.get("tag") == "token" or "token" in type_line
+        is_token = is_token_permanent(permanent)
         return (
             1 if permanent.get("is_commander") else 0,
             -int(float(permanent.get("power") or 0)),
@@ -31925,13 +32042,12 @@ def choose_creature_for_sacrificed_power_damage(player):
     ranked = sorted(candidates, key=selection_key)
     option_rows = []
     for rank, permanent in enumerate(ranked, start=1):
-        type_line = str(permanent.get("type_line") or "").lower()
         option_rows.append(
             {
                 "name": permanent.get("name", "?"),
                 "selection_rank": rank,
                 "is_commander": bool(permanent.get("is_commander")),
-                "is_token": permanent.get("tag") == "token" or "token" in type_line,
+                "is_token": is_token_permanent(permanent),
                 "power": int(float(permanent.get("power") or 0)),
                 "toughness": int(float(permanent.get("toughness") or 0)),
                 "cmc": int(float(permanent.get("cmc") or 0)),
@@ -31950,8 +32066,7 @@ def choose_controlled_creature_for_minus_one_counter_cost(player, source=None):
         return None, [], "no_controlled_creature_for_minus_one_counter_cost"
 
     def selection_key(permanent):
-        type_line = str(permanent.get("type_line") or "").lower()
-        is_token = permanent.get("tag") == "token" or "token" in type_line
+        is_token = is_token_permanent(permanent)
         toughness = _damage_sweep_creature_toughness(permanent)
         survives = toughness > 1
         return (
@@ -31968,13 +32083,12 @@ def choose_controlled_creature_for_minus_one_counter_cost(player, source=None):
     ranked = sorted(candidates, key=selection_key)
     option_rows = []
     for rank, permanent in enumerate(ranked, start=1):
-        type_line = str(permanent.get("type_line") or "").lower()
         option_rows.append(
             {
                 "name": permanent.get("name", "?"),
                 "selection_rank": rank,
                 "is_commander": bool(permanent.get("is_commander")),
-                "is_token": permanent.get("tag") == "token" or "token" in type_line,
+                "is_token": is_token_permanent(permanent),
                 "summoning_sick": bool(permanent.get("summoning_sick")),
                 "power": int(float(permanent.get("power") or 0)),
                 "toughness": _damage_sweep_creature_toughness(permanent),
@@ -32103,8 +32217,7 @@ def choose_untapped_creature_for_resource_cost(player, *, required_color=None):
         return None, [], "no_matching_untapped_creature"
 
     def selection_key(permanent):
-        type_line = str(permanent.get("type_line") or "").lower()
-        is_token = permanent.get("tag") == "token" or "token" in type_line
+        is_token = is_token_permanent(permanent)
         return (
             0 if permanent.get("summoning_sick") else 1,
             0 if is_token else 1,
@@ -32123,6 +32236,7 @@ def choose_untapped_creature_for_resource_cost(player, *, required_color=None):
                 "name": permanent.get("name", "?"),
                 "selection_rank": rank,
                 "is_commander": bool(permanent.get("is_commander")),
+                "is_token": is_token_permanent(permanent),
                 "summoning_sick": bool(permanent.get("summoning_sick")),
                 "tapped": bool(permanent.get("tapped")),
                 "power": int(float(permanent.get("power") or 0)),
@@ -32933,16 +33047,20 @@ def pay_additional_card_costs(
                 strategic_risk_flags=strategic_risk_flags,
             )
             return False
-        if returned_land in player.battlefield:
-            player.battlefield.remove(returned_land)
-        player.hand.append(returned_land)
+        destination = move_permanent_from_battlefield_to_hand(
+            player,
+            returned_land,
+            reason="return_land_to_hand",
+            source=card,
+            turn=turn,
+        )
         emit_replay_event(
             "additional_cost_paid",
             player=player.name,
             card=card.get("name", "?"),
             cost="return_land_to_hand",
             returned=returned_land.get("name", "?"),
-            returned_to="hand",
+            returned_to=destination,
             turn=turn,
             land_options=land_options,
             selection_reason=selection_reason,
@@ -37798,6 +37916,7 @@ def resolve_modal_exile_board_wipe(player, opponents, card, effect_data, turn):
         for permanent in list(getattr(participant, "battlefield", []) or []):
             if not _permanent_matches_modal_exile_modes(permanent, modes):
                 continue
+            token_ceased = is_token_permanent(permanent)
             type_line = _permanent_type_line(permanent)
             if "artifact" in type_line:
                 artifact_exiled += 1
@@ -37812,7 +37931,7 @@ def resolve_modal_exile_board_wipe(player, opponents, card, effect_data, turn):
                 source=card,
                 turn=turn,
             )
-            if destination != "vanished_token":
+            if not token_ceased:
                 battlefield_exiled += 1
             battlefield_names.append(
                 permanent.get("name", "?") if isinstance(permanent, dict) else str(permanent)
@@ -37820,6 +37939,18 @@ def resolve_modal_exile_board_wipe(player, opponents, card, effect_data, turn):
 
         if "graveyards" in modes:
             for grave_card in list(getattr(participant, "graveyard", []) or []):
+                if is_token_permanent(grave_card):
+                    participant.graveyard.remove(grave_card)
+                    emit_token_ceased_to_exist(
+                        participant,
+                        grave_card,
+                        from_zone="graveyard",
+                        zone="graveyard",
+                        reason="state_based_action_before_modal_exile_board_wipe",
+                        source=card,
+                        turn=turn,
+                    )
+                    continue
                 destination = move_zone_object_to_exile(
                     participant,
                     "graveyard",
@@ -37828,7 +37959,7 @@ def resolve_modal_exile_board_wipe(player, opponents, card, effect_data, turn):
                     source=card,
                     turn=turn,
                 )
-                if destination != "vanished_token":
+                if destination == "exile":
                     graveyard_exiled += 1
                 graveyard_names.append(
                     grave_card.get("name", "?") if isinstance(grave_card, dict) else str(grave_card)
@@ -38097,15 +38228,12 @@ def resolve_fated_clash(player, opponents, card, effect_data, turn):
     for controller in players:
         is_self = controller is player
         is_live_opponent = (not is_self) and controller.is_alive()
-        survivors = []
         controller_destroyed = []
         for permanent in list(getattr(controller, "battlefield", []) or []):
             if not is_battlefield_creature(permanent):
-                survivors.append(permanent)
                 continue
             creatures_seen += 1
             if permanent.get("indestructible"):
-                survivors.append(permanent)
                 protected += 1
                 continue
             unprotected_seen += 1
@@ -38117,7 +38245,6 @@ def resolve_fated_clash(player, opponents, card, effect_data, turn):
                 opponent_creatures_destroyed += 1
                 if is_live_opponent:
                     live_opponent_creatures_destroyed += 1
-        controller.battlefield = survivors
         for permanent in controller_destroyed:
             destroyed_cards.append(
                 {
@@ -39978,8 +40105,16 @@ def resolve_modeled_saga_chapter(player, opponents, permanent, chapter, turn, rn
     if effect_kind == "transform":
         transform_to = dict(permanent.get("transform_to") or chapter_effect.get("transform_to") or {})
         if permanent in player.battlefield:
-            player.battlefield.remove(permanent)
-            player.exile.append(permanent)
+            token_ceased = is_token_permanent(permanent)
+            destination = move_permanent_from_battlefield_to_exile(
+                player,
+                permanent,
+                reason="saga_transform",
+                source=permanent,
+                turn=turn,
+            )
+            if destination in {"none", "battlefield"} or token_ceased:
+                return None
         transformed = enrich_card(transform_to)
         transformed.setdefault("effect", transform_to.get("effect") or "creature")
         transformed = prepare_entering_permanent(
@@ -40475,11 +40610,8 @@ def move_zone_object_to_exile(owner, zone_name, card, *, reason=None, source=Non
             owner.command_zone.append(card)
             return "command_zone"
 
-    if zone_name == "battlefield" and (
-        card.get("tag") == "token"
-        or "token" in str(card.get("type_line") or "").lower()
-    ):
-        return "vanished_token"
+    if zone_name == "battlefield" and is_token_permanent(card):
+        return "exile"
 
     move_to_exile(owner, card, reason=reason, turn=turn)
     return "exile"
@@ -40488,7 +40620,10 @@ def move_zone_object_to_exile(owner, zone_name, card, *, reason=None, source=Non
 def move_permanent_from_battlefield_to_exile(owner, permanent, *, reason=None, source=None, turn=None):
     if not isinstance(permanent, dict):
         return "none"
-    moved = battlefield_object_for_target(owner, permanent) or permanent
+    moved = battlefield_object_for_target(owner, permanent)
+    if moved is None:
+        return "none"
+    token_ceased = is_token_permanent(moved)
     destination = move_zone_object_to_exile(
         owner,
         "battlefield",
@@ -40517,6 +40652,16 @@ def move_permanent_from_battlefield_to_exile(owner, permanent, *, reason=None, s
         source=source.get("name", "?") if isinstance(source, dict) else source,
         turn=current_turn,
     )
+    if token_ceased:
+        emit_token_ceased_to_exist(
+            owner,
+            moved,
+            from_zone="battlefield",
+            zone=destination,
+            reason=reason,
+            source=source,
+            turn=current_turn,
+        )
     resolve_linked_exile_source_leave(
         owner,
         moved,
@@ -40557,7 +40702,7 @@ def move_permanent_from_battlefield_to_exile(owner, permanent, *, reason=None, s
         phase="leave_battlefield",
         emit_events=True,
     )
-    if destination not in {"none", "battlefield", "vanished_token"}:
+    if destination not in {"none", "battlefield"} and not token_ceased:
         restore_modal_dfc_front_face_outside_battlefield(
             moved,
             destination=destination,
@@ -41243,9 +41388,13 @@ def activate_untap_land_engines(
         if permanent.get("activation_taps_untapped_creature_you_control") and best_option["creature_cost"] is not None:
             best_option["creature_cost"]["tapped"] = True
         if permanent.get("activation_returns_land_to_hand") and best_option["return_land"] is not None:
-            if best_option["return_land"] in player.battlefield:
-                player.battlefield.remove(best_option["return_land"])
-            player.hand.append(best_option["return_land"])
+            move_permanent_from_battlefield_to_hand(
+                player,
+                best_option["return_land"],
+                reason="return_land_for_untap_engine_cost",
+                source=permanent,
+                turn=turn,
+            )
         mana_added_rows = []
         for row in best_option["selected_rows"]:
             player.mana_pool.add(row["mana_color"], row["mana_amount"])
@@ -41564,8 +41713,7 @@ def _is_expendable_sacrifice_creature(creature):
 
 
 def _sacrifice_damage_creature_score(creature):
-    type_line = str(creature.get("type_line") or "").lower()
-    is_token = bool(creature.get("is_token")) or creature.get("tag") == "token" or "token" in type_line
+    is_token = is_token_permanent(creature)
     power = int(float(creature.get("power") or 0))
     toughness = int(float(creature.get("toughness") or 0))
     cmc = int(float(creature.get("cmc") or 0))
@@ -41595,9 +41743,8 @@ def _is_expendable_counter_growth_fodder(permanent, outlet, *, allow_artifacts):
 def _counter_growth_fodder_score(permanent):
     if is_battlefield_creature(permanent):
         return _sacrifice_damage_creature_score(permanent)
-    type_line = str(permanent.get("type_line") or "").lower()
     normalized_name = normalize_card_name(permanent.get("name", ""))
-    is_token = bool(permanent.get("is_token")) or permanent.get("tag") == "token" or "token" in type_line
+    is_token = is_token_permanent(permanent)
     cmc = int(float(permanent.get("cmc") or 0))
     score = 16
     if normalized_name == "treasure":
@@ -41669,21 +41816,15 @@ def activate_self_counter_sacrifice_outlets(player, opponents, all_players, turn
             continue
 
         sacrificed = chosen["permanent"]
-        if sacrificed in player.battlefield:
-            player.battlefield.remove(sacrificed)
-        type_line = str(sacrificed.get("type_line") or "").lower()
-        is_token = bool(sacrificed.get("is_token")) or sacrificed.get("tag") == "token" or "token" in type_line
-        if is_token:
-            emit_replay_event(
-                "token_ceased_to_exist",
-                player=player.name,
-                token=sacrificed.get("name", "?"),
-                from_zone="battlefield",
-                turn=turn,
-            )
-        else:
-            player.graveyard.append(sacrificed)
-        player.record_permanent_sacrificed(sacrificed, CURRENT_REPLAY_TURN)
+        destination = move_permanent_from_battlefield(
+            player,
+            sacrificed,
+            reason="sacrifice_self_counter_growth",
+            source=outlet,
+            all_players=all_players,
+        )
+        if destination in {"none", "battlefield"}:
+            continue
         add_plus_one_counters(outlet, int(outlet.get("self_add_plus_one_counter") or 1))
         outlet["utility_activation_used_this_turn"] = True
 
@@ -41812,24 +41953,15 @@ def activate_sacrifice_damage_outlets(player, opponents, all_players, turn, rng,
 
         target = min(targets, key=lambda opponent: opponent.life)
         damage = int(outlet.get("damage") or outlet.get("activation_damage") or 1)
-        if chosen_creature in player.battlefield:
-            player.battlefield.remove(chosen_creature)
-        type_line = str(chosen_creature.get("type_line") or "").lower()
-        is_token = (
-            bool(chosen_creature.get("is_token"))
-            or chosen_creature.get("tag") == "token"
-            or "token" in type_line
+        destination = move_creature_from_battlefield(
+            player,
+            chosen_creature,
+            reason="sacrifice_damage_outlet",
+            source=outlet,
+            all_players=all_players,
         )
-        if is_token:
-            emit_replay_event(
-                "token_ceased_to_exist",
-                player=player.name,
-                token=chosen_creature.get("name", "?"),
-                from_zone="battlefield",
-                turn=turn,
-            )
-        else:
-            player.graveyard.append(chosen_creature)
+        if destination in {"none", "battlefield"}:
+            continue
         deal_damage(target, damage)
         outlet["utility_activation_used_this_turn"] = True
 
@@ -42169,7 +42301,7 @@ def _attack_artifact_sacrifice_options(player, source, opponents, turn):
         )
         if not candidates:
             continue
-        is_token = bool(permanent.get("is_token")) or permanent.get("tag") == "token" or "token" in type_line
+        is_token = is_token_permanent(permanent)
         permanent_score = 45
         if is_token:
             permanent_score += 25
@@ -42264,20 +42396,25 @@ def resolve_attack_artifact_tutor_trigger(player, source, opponents, all_players
     else:
         sacrificed = chosen["permanent"]
         sacrificed_name = sacrificed.get("name", "?")
-        if sacrificed in player.battlefield:
-            player.battlefield.remove(sacrificed)
-        type_line = str(sacrificed.get("type_line") or "").lower()
-        is_token = bool(sacrificed.get("is_token")) or sacrificed.get("tag") == "token" or "token" in type_line
-        if is_token:
+        destination = move_permanent_from_battlefield(
+            player,
+            sacrificed,
+            reason="sacrifice_artifact_attack_tutor",
+            source=source,
+            all_players=[player, *(opponents or [])],
+        )
+        if destination in {"none", "battlefield"}:
             emit_replay_event(
-                "token_ceased_to_exist",
+                "trigger_skipped",
                 player=player.name,
-                token=sacrificed_name,
-                from_zone="battlefield",
+                card=source.get("name", "?"),
+                trigger="attack",
+                reason="artifact_sacrifice_failed",
+                phase=phase,
                 turn=turn,
+                **replay_rule_fields(source),
             )
-        else:
-            player.graveyard.append(sacrificed)
+            return {"treasures_created": 1, "artifact_sacrificed": None, "found": None}
 
     player.library.remove(target)
     permanent_effect = get_card_effect(target)
@@ -43472,8 +43609,7 @@ def creature_sacrifice_has_strategic_benefit(player, creature, chosen_unlock):
     power = int(float(creature.get("power") or 0))
     toughness = int(float(creature.get("toughness") or 0))
     cmc = int(float(creature.get("cmc") or 0))
-    type_line = str(creature.get("type_line") or "").lower()
-    is_token = creature.get("tag") == "token" or "token" in type_line
+    is_token = is_token_permanent(creature)
     remaining_creatures = max(
         0,
         len(
@@ -44065,8 +44201,15 @@ def activate_self_sacrifice_mana_sources(
 
         chosen = candidates[0]
         if target_sacrifice_type:
-            sacrifice_permanent_for_activation(player, sacrificed_target, turn)
-            destination = "graveyard" if not is_token_permanent(sacrificed_target) else "ceased_to_exist"
+            destination = move_permanent_from_battlefield(
+                player,
+                sacrificed_target,
+                reason="sacrifice_target_mana_source_cost",
+                source=permanent,
+                all_players=all_players,
+            )
+            if destination in {"none", "battlefield"}:
+                continue
             action = "activate_target_sacrifice_mana_source"
             defer_action = "defer_target_sacrifice_mana_source"
             decision_type = "target_sacrifice_mana_source_activation"
@@ -44830,10 +44973,14 @@ def activate_graveyard_exile_permanents(
             permanent["tapped"] = True
         permanent["utility_artifact_used_this_turn"] = True
         if requires_sacrifice:
-            if permanent in player.battlefield:
-                player.battlefield.remove(permanent)
-            player.graveyard.append(permanent)
-            player.record_permanent_sacrificed(permanent, turn)
+            if not sacrifice_permanent_for_activation(
+                player,
+                permanent,
+                turn,
+                all_players=all_players,
+                reason="sacrifice_graveyard_exile_activation_cost",
+            ):
+                continue
 
         exiled = []
         exiled_pairs = []
@@ -45035,10 +45182,14 @@ def activate_graveyard_to_library_permanents(
             permanent["tapped"] = True
         permanent["utility_artifact_used_this_turn"] = True
         if requires_sacrifice:
-            if permanent in player.battlefield:
-                player.battlefield.remove(permanent)
-            player.graveyard.append(permanent)
-            player.record_permanent_sacrificed(permanent, turn)
+            if not sacrifice_permanent_for_activation(
+                player,
+                permanent,
+                turn,
+                all_players=all_players,
+                reason="sacrifice_graveyard_to_library_activation_cost",
+            ):
+                continue
 
         moved = []
         moved_pairs = []
@@ -45601,10 +45752,14 @@ def activate_permanent_life_gain_sources(
         permanent["tapped"] = True
     permanent["utility_artifact_used_this_turn"] = True
     if selected["requires_sacrifice"]:
-        if permanent in player.battlefield:
-            player.battlefield.remove(permanent)
-        player.graveyard.append(permanent)
-        player.record_permanent_sacrificed(permanent, turn)
+        if not sacrifice_permanent_for_activation(
+            player,
+            permanent,
+            turn,
+            all_players=all_players,
+            reason="sacrifice_life_gain_activation_cost",
+        ):
+            return 0
     sacrificed_target = selected.get("sacrifice_target")
     if sacrificed_target is not None:
         sacrifice_permanent_for_activation(player, sacrificed_target, turn)
@@ -45880,10 +46035,14 @@ def activate_graveyard_recycling_artifacts(
                 if activation_life_cost:
                     change_life(player, -activation_life_cost)
                 if requires_sacrifice:
-                    if permanent in player.battlefield:
-                        player.battlefield.remove(permanent)
-                    player.graveyard.append(permanent)
-                    player.record_permanent_sacrificed(permanent, turn)
+                    if not sacrifice_permanent_for_activation(
+                        player,
+                        permanent,
+                        turn,
+                        all_players=all_players,
+                        reason="sacrifice_graveyard_recycling_activation_cost",
+                    ):
+                        continue
                 sacrificed_target_name = None
                 if sacrifice_target is not None:
                     sacrificed_target_name = sacrifice_target.get("name", "?")
@@ -46173,12 +46332,11 @@ def activate_graveyard_recycling_artifacts(
                     moved.append(moved_card)
                 player.shuffle(rng)
                 if permanent.get("graveyard_shuffle_exiles_self"):
-                    if permanent in player.battlefield:
-                        player.battlefield.remove(permanent)
-                    move_to_exile(
+                    move_permanent_from_battlefield_to_exile(
                         player,
                         permanent,
                         reason="graveyard_shuffle_artifact_activation",
+                        source=permanent,
                         turn=turn,
                     )
                 emit_decision_trace(
@@ -46717,7 +46875,7 @@ def activate_mill_engines(player, opponents, all_players, turn, rng, *, phase="p
         sacrifice_candidates.sort(
             key=lambda candidate: (
                 1 if candidate is permanent else 0,
-                0 if candidate.get("is_token") or candidate.get("tag") == "token" else 1,
+                0 if is_token_permanent(candidate) else 1,
                 int(float(candidate.get("cmc") or candidate.get("mana_value") or 0)),
                 candidate.get("name", "?"),
             )
@@ -46729,11 +46887,15 @@ def activate_mill_engines(player, opponents, all_players, turn, rng, *, phase="p
         library_before = len(getattr(target, "library", []) or [])
         if permanent.get("activation_requires_tap"):
             permanent["tapped"] = True
-        if sacrificed in player.battlefield:
-            player.battlefield.remove(sacrificed)
-        if not sacrificed.get("is_token"):
-            player.graveyard.append(sacrificed)
-        player.record_permanent_sacrificed(sacrificed, turn)
+        if not sacrifice_permanent_for_activation(
+            player,
+            sacrificed,
+            turn,
+            source=permanent,
+            all_players=all_players,
+            reason="sacrifice_mill_engine_activation_cost",
+        ):
+            continue
         milled = []
         for _ in range(min(mill_count, len(target.library))):
             milled_card = target.library.pop(0)
@@ -46960,11 +47122,14 @@ def activate_target_player_shuffle_artifacts(
             permanent["tapped"] = True
         permanent["utility_artifact_used_this_turn"] = True
         if permanent.get("activation_requires_sacrifice", True):
-            if permanent in player.battlefield:
-                player.battlefield.remove(permanent)
-            if not permanent.get("is_token"):
-                player.graveyard.append(permanent)
-            player.record_permanent_sacrificed(permanent, turn)
+            if not sacrifice_permanent_for_activation(
+                player,
+                permanent,
+                turn,
+                all_players=all_players,
+                reason="sacrifice_target_player_shuffle_activation_cost",
+            ):
+                continue
         target.shuffle(rng)
         top_after = (getattr(target, "library", []) or [None])[0]
         top_after_name = top_after.get("name", "?") if isinstance(top_after, dict) else None
@@ -47441,9 +47606,13 @@ def activate_karns_sylex(player, permanent, opponents, all_players, turn, rng, *
     permanent["utility_artifact_used_this_turn"] = True
     if permanent.get("activation_requires_tap"):
         permanent["tapped"] = True
-    if permanent in getattr(player, "battlefield", []):
-        player.battlefield.remove(permanent)
-    move_to_exile(player, permanent, reason="karns_sylex_activation_cost", turn=turn)
+    move_permanent_from_battlefield_to_exile(
+        player,
+        permanent,
+        reason="karns_sylex_activation_cost",
+        source=permanent,
+        turn=turn,
+    )
 
     destroyed_records = []
     for controller, candidate in list(plan["destroyed"]):
@@ -47640,10 +47809,13 @@ def activate_permanent_library_tutor(player, opponents, permanent, turn, rng, *,
         permanent["tapped"] = True
     sacrificed_source = False
     if effect_data.get("activation_requires_sacrifice"):
-        if permanent in player.battlefield:
-            player.battlefield.remove(permanent)
-        player.graveyard.append(permanent)
-        player.record_permanent_sacrificed(permanent, turn)
+        if not sacrifice_permanent_for_activation(
+            player,
+            permanent,
+            turn,
+            reason="sacrifice_library_tutor_activation_cost",
+        ):
+            return False
         sacrificed_source = True
     selected_cards = [
         candidate
@@ -48546,9 +48718,14 @@ def activate_utility_artifacts(player, opponents, all_players, turn, rng, *, pha
             if permanent.get("activation_requires_tap"):
                 permanent["tapped"] = True
             permanent["utility_artifact_used_this_turn"] = True
-            if permanent in player.battlefield:
-                player.battlefield.remove(permanent)
-            player.graveyard.append(permanent)
+            if not sacrifice_permanent_for_activation(
+                player,
+                permanent,
+                turn,
+                all_players=all_players,
+                reason="sacrifice_utility_artifact_tutor_cost",
+            ):
+                continue
             moved_cards, destination = move_library_tutor_selection(
                 player,
                 [candidate for candidate, _score, _reason in selected_candidates],
@@ -48673,9 +48850,14 @@ def activate_utility_artifacts(player, opponents, all_players, turn, rng, *, pha
                     phase=phase,
                 )
                 continue
-            if permanent in player.battlefield:
-                player.battlefield.remove(permanent)
-            player.graveyard.append(permanent)
+            if not sacrifice_permanent_for_activation(
+                player,
+                permanent,
+                turn,
+                all_players=all_players,
+                reason="sacrifice_utility_artifact_filter_cost",
+            ):
+                continue
             player.mana_pool.add(chosen["color"], 1)
             drawn = player.draw(draw_count, rng)
             emit_decision_trace(
@@ -48785,9 +48967,14 @@ def activate_utility_artifacts(player, opponents, all_players, turn, rng, *, pha
                     phase=phase,
                 )
                 continue
-            if permanent in player.battlefield:
-                player.battlefield.remove(permanent)
-            player.graveyard.append(permanent)
+            if not sacrifice_permanent_for_activation(
+                player,
+                permanent,
+                turn,
+                all_players=all_players,
+                reason="sacrifice_utility_artifact_cash_in_cost",
+            ):
+                continue
             drawn = player.draw(draw_count, rng)
             emit_decision_trace(
                 decision_type="utility_artifact_activation",
@@ -49880,9 +50067,14 @@ def activate_utility_artifacts(player, opponents, all_players, turn, rng, *, pha
         if permanent.get("activation_requires_tap"):
             permanent["tapped"] = True
         permanent["utility_artifact_used_this_turn"] = True
-        if permanent in player.battlefield:
-            player.battlefield.remove(permanent)
-        player.graveyard.append(permanent)
+        if not sacrifice_permanent_for_activation(
+            player,
+            permanent,
+            turn,
+            all_players=all_players,
+            reason="sacrifice_utility_artifact_draw_cost",
+        ):
+            continue
         draw_count = int(
             permanent.get("draw_on_self_sacrifice")
             or permanent.get("draw_count")
@@ -51717,11 +51909,16 @@ def activate_lorehold_topdeck_artifacts(
                 )
                 continue
 
-            if permanent in player.battlefield:
-                player.battlefield.remove(permanent)
+            if not sacrifice_permanent_for_activation(
+                player,
+                permanent,
+                turn,
+                all_players=all_players,
+                reason="sacrifice_brainstone_activation_cost",
+            ):
+                continue
             permanent["utility_artifact_used_this_turn"] = True
             permanent["tapped"] = True
-            player.graveyard.append(permanent)
             drawn = player.draw(draw_count, rng)
             if not drawn:
                 continue
@@ -51882,14 +52079,22 @@ def activate_lorehold_topdeck_artifacts(
         )
         if can_draw_put_self_for_miracle:
             drawn = player.draw(1, rng)
-            relocated_permanent = {
-                key: value
-                for key, value in dict(permanent).items()
-                if key not in {"utility_artifact_used_this_turn", "tapped"}
-            }
-            if permanent in player.battlefield:
-                player.battlefield.remove(permanent)
-            player.library.insert(0, relocated_permanent)
+            destination = move_permanent_from_battlefield_to_library(
+                player,
+                permanent,
+                destination="library_top",
+                reason="draw_put_self_on_top_activation",
+                source=permanent,
+                turn=turn,
+            )
+            relocated_permanent = (
+                player.library[0]
+                if destination == "library_top" and player.library and not is_token_permanent(permanent)
+                else permanent
+            )
+            if relocated_permanent is not permanent or not is_token_permanent(permanent):
+                relocated_permanent.pop("utility_artifact_used_this_turn", None)
+                relocated_permanent.pop("tapped", None)
             emit_decision_trace(
                 decision_type="utility_artifact_activation",
                 player=player,
@@ -52756,9 +52961,14 @@ def activate_utility_lands(player, turn, rng, *, phase="postcombat_main", all_pl
                     phase=phase,
                 )
                 continue
-            if permanent in player.battlefield:
-                player.battlefield.remove(permanent)
-            player.graveyard.append(permanent)
+            if not sacrifice_permanent_for_activation(
+                player,
+                permanent,
+                turn,
+                all_players=all_players,
+                reason="sacrifice_utility_land_draw_cost",
+            ):
+                continue
             drawn = player.draw(1, rng)
             emit_decision_trace(
                 decision_type="utility_land_activation",
@@ -52854,9 +53064,14 @@ def activate_utility_lands(player, turn, rng, *, phase="postcombat_main", all_pl
                     phase=phase,
                 )
                 continue
-            if permanent in player.battlefield:
-                player.battlefield.remove(permanent)
-            player.graveyard.append(permanent)
+            if not sacrifice_permanent_for_activation(
+                player,
+                permanent,
+                turn,
+                all_players=all_players,
+                reason="sacrifice_treasure_vault_activation_cost",
+            ):
+                continue
             player.treasures += chosen_x
             activation_score = 22 + chosen_x * 4
             emit_decision_trace(
@@ -52990,9 +53205,14 @@ def activate_utility_lands(player, turn, rng, *, phase="postcombat_main", all_pl
                     phase=phase,
                 )
                 continue
-            if permanent in player.battlefield:
-                player.battlefield.remove(permanent)
-            player.graveyard.append(permanent)
+            if not sacrifice_permanent_for_activation(
+                player,
+                permanent,
+                turn,
+                all_players=all_players,
+                reason="sacrifice_inventors_fair_activation_cost",
+            ):
+                continue
             player.library.remove(found)
             player.hand.append(found)
             emit_decision_trace(
@@ -57432,18 +57652,23 @@ def move_zero_toughness_graveyard_count_creature_to_graveyard(
         return False
     if _static_pt_int(permanent.get("toughness"), default=1) > 0:
         return False
-    battlefield = getattr(player, "battlefield", []) or []
-    if permanent not in battlefield:
+    if permanent not in (getattr(player, "battlefield", []) or []):
         return False
-    battlefield.remove(permanent)
-    getattr(player, "graveyard", []).append(permanent)
+    destination = move_creature_from_battlefield(
+        player,
+        permanent,
+        reason="zero_toughness_static_graveyard_count_sba",
+        all_players=_table_players_for(player),
+    )
+    if destination in {"none", "battlefield"}:
+        return False
     if emit_event:
         emit_replay_event(
             "state_based_action_zero_toughness",
             player=getattr(player, "name", "?"),
             card=permanent.get("name", "?"),
             reason="zero_toughness",
-            destination="graveyard",
+            destination=destination,
             power=permanent.get("power"),
             toughness=permanent.get("toughness"),
             turn=turn,
@@ -58075,18 +58300,23 @@ def move_zero_toughness_static_global_creature_to_graveyard(
         return False
     if _static_pt_int(permanent.get("toughness"), default=1) > 0:
         return False
-    battlefield = getattr(player, "battlefield", []) or []
-    if permanent not in battlefield:
+    if permanent not in (getattr(player, "battlefield", []) or []):
         return False
-    battlefield.remove(permanent)
-    getattr(player, "graveyard", []).append(permanent)
+    destination = move_creature_from_battlefield(
+        player,
+        permanent,
+        reason="zero_toughness_static_global_sba",
+        all_players=_table_players_for(player),
+    )
+    if destination in {"none", "battlefield"}:
+        return False
     if emit_event:
         emit_replay_event(
             "state_based_action_zero_toughness",
             player=getattr(player, "name", "?"),
             card=permanent.get("name", "?"),
             reason="zero_toughness",
-            destination="graveyard",
+            destination=destination,
             power=permanent.get("power"),
             toughness=permanent.get("toughness"),
             turn=turn,
@@ -58990,14 +59220,14 @@ def sacrifice_land_for_effect(player, card, turn, *, required=True, effect_data=
                 strategic_guardrail_reason=benefit_reason,
             )
         return None
-    player.battlefield.remove(land)
-    player.graveyard.append(land)
-    resolve_land_cards_enter_graveyard_triggers(
+    if not sacrifice_permanent_for_activation(
         player,
-        [land],
-        turn=turn,
-        source_event="sacrifice_land_cost",
-    )
+        land,
+        turn,
+        source=card,
+        reason="sacrifice_land_cost",
+    ):
+        return None
     emit_replay_event(
         "additional_cost_paid",
         player=player.name,
@@ -59550,9 +59780,14 @@ def activate_land_tutor_creatures(player, turn, opponents=None):
                 change_life(player, -life_cost)
             if permanent.get("activation_requires_tap"):
                 permanent["tapped"] = True
-            if permanent in player.battlefield:
-                player.battlefield.remove(permanent)
-            player.graveyard.append(permanent)
+            if not sacrifice_permanent_for_activation(
+                player,
+                permanent,
+                turn,
+                all_players=[player, *opponents],
+                reason="sacrifice_land_tutor_source_cost",
+            ):
+                continue
             player.library.remove(land_to_find)
             found_land = enrich_card({**land_to_find, "effect": "land", "tapped": True})
             player.battlefield.append(found_land)
@@ -59920,14 +60155,15 @@ def activate_land_tutor_creatures(player, turn, opponents=None):
                 turn,
                 phase="precombat_main",
             )
-        player.battlefield.remove(land_to_sacrifice)
-        player.graveyard.append(land_to_sacrifice)
-        resolve_land_cards_enter_graveyard_triggers(
+        if not sacrifice_permanent_for_activation(
             player,
-            [land_to_sacrifice],
-            turn=turn,
-            source_event="activated_land_tutor_sacrifice",
-        )
+            land_to_sacrifice,
+            turn,
+            source=permanent,
+            all_players=[player, *opponents],
+            reason="sacrifice_activated_land_tutor_cost",
+        ):
+            continue
         player.library.remove(land_to_find)
         found_land = enrich_card({**land_to_find, "effect": "land", "tapped": True})
         player.battlefield.append(found_land)
@@ -62050,20 +62286,34 @@ def resolve_copy_creature_token(player, card, effect_data, turn, opponents=None,
 def process_end_step_token_sacrifices(player, turn):
     sacrificed = []
     exiled = []
-    death_draw_total = 0
+    all_players = _table_players_for(player)
     for permanent in list(player.battlefield):
         if not isinstance(permanent, dict):
             continue
         if not (permanent.get("sacrifice_at_end_step") or permanent.get("exile_at_end_step")):
             continue
-        player.battlefield.remove(permanent)
         if permanent.get("exile_at_end_step"):
-            player.exile.append(permanent)
+            destination = move_permanent_from_battlefield_to_exile(
+                player,
+                permanent,
+                reason="end_step_exile",
+                source=permanent,
+                turn=turn,
+            )
+            if destination in {"none", "battlefield"}:
+                continue
             exiled.append(permanent)
         else:
-            player.graveyard.append(permanent)
+            destination = move_permanent_from_battlefield(
+                player,
+                permanent,
+                reason="sacrifice_at_end_step",
+                source=permanent,
+                all_players=all_players,
+            )
+            if destination in {"none", "battlefield"}:
+                continue
             sacrificed.append(permanent)
-            death_draw_total += max(0, int(permanent.get("draw_cards_when_this_dies") or 0))
     if sacrificed:
         emit_replay_event(
             "end_step_token_sacrificed",
@@ -62076,15 +62326,6 @@ def process_end_step_token_sacrifices(player, turn):
             "end_step_token_exiled",
             player=player.name,
             tokens=[token.get("name", "?") for token in exiled],
-            turn=turn,
-        )
-    if death_draw_total > 0:
-        drawn = player.draw(death_draw_total)
-        emit_replay_event(
-            "end_step_token_death_draw_resolved",
-            player=player.name,
-            draw_count=death_draw_total,
-            cards_drawn=[card.get("name", "?") for card in drawn if isinstance(card, dict)],
             turn=turn,
         )
     return sacrificed + exiled
@@ -63848,10 +64089,14 @@ def activate_permanent_put_from_hand_to_battlefield(
         permanent["tapped"] = True
     sacrificed_source = False
     if effect_data.get("activation_requires_sacrifice"):
-        if permanent in player.battlefield:
-            player.battlefield.remove(permanent)
-        player.graveyard.append(permanent)
-        player.record_permanent_sacrificed(permanent, turn)
+        if not sacrifice_permanent_for_activation(
+            player,
+            permanent,
+            turn,
+            all_players=all_players,
+            reason="sacrifice_put_from_hand_activation_cost",
+        ):
+            return False
         sacrificed_source = True
 
     participants = list(all_players or [player] + list(opponents or []))
@@ -64573,10 +64818,14 @@ def activate_generic_tap_damage_permanent(player, opponents, permanent, turn, rn
         permanent["tapped"] = True
     sacrificed_source = False
     if effect_data.get("activation_requires_sacrifice"):
-        if permanent in player.battlefield:
-            player.battlefield.remove(permanent)
-        player.graveyard.append(permanent)
-        player.record_permanent_sacrificed(permanent, turn)
+        if not sacrifice_permanent_for_activation(
+            player,
+            permanent,
+            turn,
+            all_players=[player, *(opponents or [])],
+            reason="sacrifice_tap_damage_activation_cost",
+        ):
+            return False
         sacrificed_source = True
     sacrificed_cost_targets = []
     sacrificed_cost_target = None
@@ -64933,10 +65182,14 @@ def activate_generic_token_maker_permanent(player, opponents, all_players, perma
         permanent["tapped"] = True
     sacrificed_source = False
     if effect_data.get("activation_requires_sacrifice"):
-        if permanent in player.battlefield:
-            player.battlefield.remove(permanent)
-        player.graveyard.append(permanent)
-        player.record_permanent_sacrificed(permanent, turn)
+        if not sacrifice_permanent_for_activation(
+            player,
+            permanent,
+            turn,
+            all_players=all_players,
+            reason="sacrifice_token_maker_activation_cost",
+        ):
+            return False
         sacrificed_source = True
     token_count = create_creature_tokens_from_effect(
         player,
@@ -65279,16 +65532,25 @@ def activate_generic_destroy_permanent(player, opponents, all_players, permanent
     sacrificed_source = False
     exiled_source = False
     if effect_data.get("activation_requires_exile_source"):
-        if permanent in player.battlefield:
-            player.battlefield.remove(permanent)
-        if permanent not in player.exile:
-            player.exile.append(permanent)
+        destination = move_permanent_from_battlefield_to_exile(
+            player,
+            permanent,
+            reason="exile_destroy_activation_cost",
+            source=permanent,
+            turn=turn,
+        )
+        if destination in {"none", "battlefield"}:
+            return False
         exiled_source = True
     elif effect_data.get("activation_requires_sacrifice"):
-        if permanent in player.battlefield:
-            player.battlefield.remove(permanent)
-        player.graveyard.append(permanent)
-        player.record_permanent_sacrificed(permanent, turn)
+        if not sacrifice_permanent_for_activation(
+            player,
+            permanent,
+            turn,
+            all_players=all_players,
+            reason="sacrifice_destroy_activation_cost",
+        ):
+            return False
         sacrificed_source = True
     if sacrificed_targets:
         sacrificed_targets = _sacrifice_activation_cost_candidates(player, sacrificed_targets, turn)
@@ -65705,10 +65967,14 @@ def activate_generic_bounce_permanent(player, opponents, all_players, permanent,
         tapped_cost_targets = _tap_activation_cost_candidates(player, tap_candidates, turn)
     sacrificed_source = False
     if effect_data.get("activation_requires_sacrifice"):
-        if permanent in player.battlefield:
-            player.battlefield.remove(permanent)
-        player.graveyard.append(permanent)
-        player.record_permanent_sacrificed(permanent, turn)
+        if not sacrifice_permanent_for_activation(
+            player,
+            permanent,
+            turn,
+            all_players=all_players,
+            reason="sacrifice_bounce_activation_cost",
+        ):
+            return False
         sacrificed_source = True
     if sacrificed_targets:
         sacrificed_targets = _sacrifice_activation_cost_candidates(player, sacrificed_targets, turn)
@@ -67910,10 +68176,14 @@ def activate_generic_target_boost_permanent(
         permanent["tapped"] = True
     sacrificed_source = False
     if effect_data.get("activation_requires_sacrifice"):
-        if permanent in player.battlefield:
-            player.battlefield.remove(permanent)
-        player.graveyard.append(permanent)
-        player.record_permanent_sacrificed(permanent, turn)
+        if not sacrifice_permanent_for_activation(
+            player,
+            permanent,
+            turn,
+            all_players=all_players,
+            reason="sacrifice_target_boost_activation_cost",
+        ):
+            return False
         sacrificed_source = True
     power_delta = int(effect_data.get("power_delta") or effect_data.get("power_boost") or 0)
     toughness_delta = int(effect_data.get("toughness_delta") or effect_data.get("toughness_boost") or 0)
@@ -68305,10 +68575,14 @@ def activate_generic_target_keyword_permanent(
         permanent["tapped"] = True
     sacrificed_source = False
     if effect_data.get("activation_requires_sacrifice"):
-        if permanent in player.battlefield:
-            player.battlefield.remove(permanent)
-        player.graveyard.append(permanent)
-        player.record_permanent_sacrificed(permanent, turn)
+        if not sacrifice_permanent_for_activation(
+            player,
+            permanent,
+            turn,
+            all_players=all_players,
+            reason="sacrifice_target_keyword_activation_cost",
+        ):
+            return False
         sacrificed_source = True
     sacrificed_cost_target = None
     sacrifice_cost_options = []
@@ -68325,10 +68599,15 @@ def activate_generic_target_keyword_permanent(
         )
         if sacrificed_cost_target is None:
             return False
-        if sacrificed_cost_target in player.battlefield:
-            player.battlefield.remove(sacrificed_cost_target)
-        player.graveyard.append(sacrificed_cost_target)
-        player.record_permanent_sacrificed(sacrificed_cost_target, turn)
+        if not sacrifice_permanent_for_activation(
+            player,
+            sacrificed_cost_target,
+            turn,
+            source=permanent,
+            all_players=all_players,
+            reason="sacrifice_target_keyword_additional_cost",
+        ):
+            return False
     keywords = [
         str(keyword or "").strip().lower().replace(" ", "_")
         for keyword in (effect_data.get("granted_keywords_until_eot") or [])
@@ -71727,6 +72006,7 @@ def apply_airbend_other_creatures(player, opponents, card, effect_data, turn):
                 continue
             if id(permanent) == spared_id:
                 continue
+            token_ceased = is_token_permanent(permanent)
             destination = move_permanent_from_battlefield_to_exile(
                 participant,
                 permanent,
@@ -71736,7 +72016,7 @@ def apply_airbend_other_creatures(player, opponents, card, effect_data, turn):
             )
             if destination == "command_zone":
                 commanders_to_command_zone += 1
-            elif destination == "vanished_token":
+            elif token_ceased:
                 tokens_vanished += 1
             elif destination == "exile":
                 permanent["_airbend_available"] = True
@@ -76549,9 +76829,14 @@ def process_precombat_main_phase_engines(player, opponents, all_players, turn, r
         hand_before = len(player.hand)
         if permanent.get("activation_requires_tap"):
             permanent["tapped"] = True
-        if permanent in player.battlefield:
-            player.battlefield.remove(permanent)
-        player.graveyard.append(permanent)
+        if not sacrifice_permanent_for_activation(
+            player,
+            permanent,
+            turn,
+            all_players=all_players,
+            reason="sacrifice_multiplayer_discard_draw_cost",
+        ):
+            continue
         activation_score = max(
             0,
             context["net_cards_for_player"] * 10 - context["total_opponent_net_cards"] * 4,
@@ -83181,6 +83466,7 @@ def apply_effect_immediate(
             }
             for permanent in returned_cards:
                 type_flags = _destroyed_permanent_type_flags(permanent)
+                token_ceased = is_token_permanent(permanent)
                 destination = move_permanent_from_battlefield_to_hand(
                     participant,
                     permanent,
@@ -83190,7 +83476,7 @@ def apply_effect_immediate(
                 )
                 card_name = permanent.get("name", "?") if isinstance(permanent, dict) else str(permanent)
                 player_summary["cards"].append(card_name)
-                if destination == "vanished_token":
+                if token_ceased:
                     vanished_tokens += 1
                     player_summary["vanished_tokens"] += 1
                     continue
@@ -83581,6 +83867,7 @@ def apply_effect_immediate(
                 "life_after": participant.life,
             }
             for permanent in list(participant.battlefield):
+                token_ceased = is_token_permanent(permanent)
                 destination = move_permanent_from_battlefield_to_exile(
                     participant,
                     permanent,
@@ -83590,7 +83877,7 @@ def apply_effect_immediate(
                 )
                 if destination == "command_zone":
                     zone_summary["commanders_to_command_zone"] += 1
-                elif destination == "vanished_token":
+                elif token_ceased:
                     zone_summary["tokens_vanished"] += 1
                 else:
                     zone_summary["battlefield_exiled"] += 1
@@ -83910,24 +84197,92 @@ def apply_effect_immediate(
         else:
             player.library.append(card)
     elif effect == "steal_all_creatures":
+        untap_all_creatures = bool(effect_data.get("untap_stolen_creatures", True))
+        grant_haste = bool(effect_data.get("stolen_creatures_gain_haste", True))
         total_power = 0
         stolen = []
+        stolen_objects = []
+        controlled_creatures = [
+            creature
+            for creature in list(player.battlefield)
+            if is_battlefield_creature(creature)
+        ]
+
+        # Insurrection affects every creature, including creatures the caster
+        # already controls. Untapping is a one-shot action; haste is temporary.
+        for creature in controlled_creatures:
+            creature.setdefault("owner", player.name)
+            tapped_before = bool(creature.get("tapped"))
+            if untap_all_creatures:
+                creature["tapped"] = False
+            if grant_haste:
+                remember_until_eot(creature, "keywords")
+                remember_until_eot(creature, "haste")
+                remember_until_eot(creature, "summoning_sick")
+                creature["keywords"] = sorted(_keyword_values(creature) | {"haste"})
+                creature["haste"] = True
+                creature["summoning_sick"] = False
+            creature["_steal_all_tapped_before"] = tapped_before
+
         for opp in opponents:
-            creatures = [c for c in opp.battlefield if is_battlefield_creature(c)]
+            creatures = [c for c in list(opp.battlefield) if is_battlefield_creature(c)]
             for c in creatures:
-                total_power += c.get("power", 2)
+                original_controller_name = c.get("controller") or opp.name
+                tapped_before = bool(c.get("tapped"))
+                c.setdefault("owner", opp.name)
+                remember_until_eot(c, "controller")
+                remember_until_eot(c, "keywords")
+                remember_until_eot(c, "haste")
+                remember_until_eot(c, "summoning_sick")
+                if c in opp.battlefield:
+                    opp.battlefield.remove(c)
+                c["_until_eot_control_return_player_ref"] = opp
+                c["_until_eot_control_return_player_name"] = original_controller_name
+                c["controller"] = player.name
+                if untap_all_creatures:
+                    c["tapped"] = False
+                if grant_haste:
+                    c["keywords"] = sorted(_keyword_values(c) | {"haste"})
+                    c["haste"] = True
+                    c["summoning_sick"] = False
+                if c not in player.battlefield:
+                    player.battlefield.append(c)
+
+                power = card_power_value(c, default=2)
+                total_power += power
                 stolen.append({
                     "controller": opp.name,
+                    "original_controller": original_controller_name,
+                    "new_controller": player.name,
                     "name": c.get("name", "?"),
-                    "power": c.get("power", 2),
+                    "power": power,
+                    "tapped_before": tapped_before,
+                    "untapped_on_resolution": tapped_before and not bool(c.get("tapped")),
                 })
-            opp.battlefield = [c for c in opp.battlefield if not is_battlefield_creature(c)]
+                stolen_objects.append(c)
+
         alive_opps = [o for o in opponents if o.is_alive()]
         dmg_each = 0
         if alive_opps and total_power > 0:
             dmg_each = total_power // len(alive_opps)
             for opp in alive_opps:
                 deal_damage(opp, dmg_each)
+
+        # The historical compact model projects the stolen army's attack into
+        # damage immediately. Keep the real permanents, but mark that projected
+        # attack as spent so normal combat cannot deal the same damage twice.
+        projected_attack_count = len(stolen_objects) if alive_opps else 0
+        if projected_attack_count:
+            player.record_attacked_this_turn(projected_attack_count, turn)
+            for creature in stolen_objects:
+                creature["tapped"] = True
+                creature["_compact_attack_projected_turn"] = turn
+                creature["_compact_attack_projected_by"] = player.name
+        for detail, creature in zip(stolen, stolen_objects):
+            detail["tapped_after_projection"] = bool(creature.get("tapped"))
+
+        for creature in controlled_creatures:
+            creature.pop("_steal_all_tapped_before", None)
         emit_replay_event(
             "steal_all_creatures_resolved",
             player=player.name,
@@ -83938,7 +84293,12 @@ def apply_effect_immediate(
             damaged_opponents=[opp.name for opp in alive_opps],
             damage_each_opponent=dmg_each,
             control_duration=effect_data.get("control_duration", "until_end_of_turn"),
-            stolen_creatures_gain_haste=bool(effect_data.get("stolen_creatures_gain_haste", True)),
+            stolen_creatures_gain_haste=grant_haste,
+            transferred_count=len(stolen_objects),
+            projected_attack_count=projected_attack_count,
+            transferred_to_battlefield=True,
+            projection_consumed_attack=True,
+            control_change_is_zone_change=False,
             runtime_model=effect_data.get("runtime_model", "compact_damage_projection"),
             turn=turn,
             **replay_rule_fields(effect_data),

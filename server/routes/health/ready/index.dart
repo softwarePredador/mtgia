@@ -3,6 +3,8 @@ import 'package:postgres/postgres.dart';
 
 import '../../../lib/health_readiness_support.dart';
 import '../../../lib/http_responses.dart';
+import '../../../lib/e2e_validation_policy.dart';
+import '../../../lib/runtime_environment.dart';
 
 /// GET /health/ready - Readiness check (verifica dependências)
 ///
@@ -79,9 +81,18 @@ Future<Response> onRequest(RequestContext context) async {
     cardsStopwatch.stop();
   }
 
+  // Check 3: production AI contract is fail-closed and provider-backed.
+  final env = loadRuntimeEnvironment();
+  final aiRuntime = evaluateAiRuntimeReadiness(env);
+  checks['ai_runtime'] = aiRuntime.check;
+  if (!aiRuntime.healthy) {
+    allHealthy = false;
+  }
+
   final response = buildReadinessResponseBody(
     checks: checks,
     allHealthy: allHealthy,
+    e2eIsolatedRuntime: isManaloomE2eIsolatedRuntime(),
   );
 
   return Response.json(

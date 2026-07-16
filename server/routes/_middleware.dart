@@ -19,7 +19,8 @@ const _socialSlowRequestThresholdMs = 1000;
 const _corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Methods': 'GET, POST, PUT, PATCH, DELETE, OPTIONS',
-  'Access-Control-Allow-Headers': 'Content-Type, Authorization, X-Request-Id',
+  'Access-Control-Allow-Headers':
+      'Content-Type, Authorization, X-Request-Id, X-ManaLoom-Ops-Key',
   'Access-Control-Max-Age': '86400',
   'X-Content-Type-Options': 'nosniff',
   'X-Frame-Options': 'SAMEORIGIN',
@@ -106,8 +107,10 @@ Handler middleware(Handler handler) {
         extras: {'endpoint': endpoint},
       );
 
-      print('[ERROR] middleware: $e');
-      print('[ERROR] stack: $st');
+      Log.e(
+        '[root-middleware] unhandled request failure '
+        'endpoint=$endpoint request_id=$requestId type=${e.runtimeType}',
+      );
 
       final latencyMs = DateTime.now().difference(startedAt).inMilliseconds;
       RequestMetricsService.instance.record(

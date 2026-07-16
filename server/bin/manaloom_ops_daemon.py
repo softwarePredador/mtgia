@@ -292,6 +292,23 @@ def _collect_boot_jobs(
 
 JOBS = [
     Job(
+        name="manaloom_ai_runtime_cleanup",
+        schedule=os.environ.get("MANALOOM_AI_RUNTIME_CLEANUP_CRON", "10 4 * * *"),
+        lockfile=LOCK_DIR / "manaloom_ai_runtime_cleanup.lock",
+        command=(
+            'cd "$MTGIA_HOME/server" && '
+            './bin/cron_cleanup_optimize_telemetry.sh '
+            '--retention-days=' '"${TELEMETRY_RETENTION_DAYS:-180}" '
+            '--ai-log-retention-days=' '"${AI_LOG_RETENTION_DAYS:-180}" '
+            '--job-retention-minutes=' '"${AI_JOB_RETENTION_MINUTES:-30}" '
+            '--reservation-ttl-minutes='
+            '"${AI_PLAN_RESERVATION_TTL_MINUTES:-10}" '
+            '--rate-limit-retention-hours='
+            '"${RATE_LIMIT_EVENT_RETENTION_HOURS:-24}"'
+        ),
+        script_name="cron_cleanup_optimize_telemetry.sh",
+    ),
+    Job(
         name="pull_learning_events",
         schedule=os.environ.get("PULL_LEARNING_EVENTS_CRON", "0 * * * *"),
         lockfile=LOCK_DIR / "pull_learning_events.lock",

@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:server/commercial_metrics_service.dart';
 import 'package:test/test.dart';
 
@@ -40,6 +42,58 @@ void main() {
         CommercialMetricsService.normalizeHistoryWindowDays(120, bucket: 'day'),
         90,
       );
+    });
+
+    test('separates provider telemetry from plan quota telemetry', () {
+      expect(
+        CommercialMetricsService.isProviderTelemetryEndpoint(
+          'provider:generate',
+        ),
+        isTrue,
+      );
+      expect(
+        CommercialMetricsService.isProviderTelemetryEndpoint('optimize'),
+        isTrue,
+      );
+      expect(
+        CommercialMetricsService.isProviderTelemetryEndpoint('complete'),
+        isTrue,
+      );
+      expect(
+        CommercialMetricsService.isProviderTelemetryEndpoint(
+          'plan:post:/ai/generate',
+        ),
+        isFalse,
+      );
+      expect(
+        CommercialMetricsService.isProviderTelemetryEndpoint(
+          'plan-reservation:post:/ai/optimize',
+        ),
+        isFalse,
+      );
+      expect(
+        CommercialMetricsService.isPlanActionTelemetryEndpoint(
+          'plan:post:/ai/generate',
+        ),
+        isTrue,
+      );
+    });
+
+    test('dashboard and reports share one provider SQL predicate', () {
+      final source =
+          File('routes/health/dashboard/index.dart').readAsStringSync();
+      final logServiceSource =
+          File('lib/ai_log_service.dart').readAsStringSync();
+
+      expect(
+        CommercialMetricsService.providerTelemetrySqlPredicate,
+        contains("endpoint LIKE 'provider:%'"),
+      );
+      expect(
+        source,
+        contains('CommercialMetricsService.providerTelemetrySqlPredicate'),
+      );
+      expect(logServiceSource, contains('aiProviderTelemetrySqlPredicate'));
     });
   });
 }

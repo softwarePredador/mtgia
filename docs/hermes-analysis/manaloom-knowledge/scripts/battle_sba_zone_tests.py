@@ -54,6 +54,223 @@ def register_tests(battle, player, card):
         event = next(data for event, data in events if event == "player_eliminated")
         assert event["battlefield_removed_from_game"] == 2
         assert event["phased_out_removed_from_game"] == 1
+        assert event["owned_objects_removed_from_game"] == 3
+        assert event["owned_objects_removed_by_zone"]["battlefield"] == 2
+        assert event["owned_objects_removed_by_zone"]["phased_out"] == 1
+        assert event["owned_object_zone_change_events_emitted"] == 0
+        assert event["player_departure_rule"] == "CR 800.4a"
+
+    def test_elimination_ends_temporary_control_without_zone_change_or_dies():
+        events = []
+        previous_handler = battle.REPLAY_EVENT_HANDLER
+        battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+        try:
+            dead = player("Departing Controller")
+            survivor = player("Original Controller")
+            temporarily_stolen = {
+                "name": "Temporarily Stolen Creature",
+                "owner": survivor.name,
+                "controller": dead.name,
+                "effect": "creature",
+                "type_line": "Creature",
+                "power": 3,
+                "toughness": 3,
+                "keywords": ["haste"],
+                "haste": True,
+                "summoning_sick": False,
+                "tapped": True,
+                "_until_eot_originals": {
+                    "controller": survivor.name,
+                    "keywords": None,
+                    "haste": None,
+                    "summoning_sick": True,
+                },
+                "_until_eot_control_return_player_ref": survivor,
+                "_until_eot_control_return_player_name": survivor.name,
+                "_compact_attack_projected_turn": 7,
+                "_compact_attack_projected_by": dead.name,
+            }
+            dead.battlefield = [temporarily_stolen]
+            dead.life = 0
+
+            assert battle.check_sbas([dead, survivor]) is True
+        finally:
+            battle.REPLAY_EVENT_HANDLER = previous_handler
+
+        assert dead.eliminated is True
+        assert dead.battlefield == []
+        assert temporarily_stolen in survivor.battlefield
+        assert temporarily_stolen["controller"] == survivor.name
+        assert temporarily_stolen["haste"] is True
+        assert temporarily_stolen["keywords"] == ["haste"]
+        assert temporarily_stolen["summoning_sick"] is False
+        assert temporarily_stolen["tapped"] is True
+        assert temporarily_stolen["_compact_attack_projected_turn"] == 7
+        assert not any(
+            event in {
+                "permanent_moved_from_battlefield",
+                "token_ceased_to_exist",
+                "dies_draw_resolved",
+                "dies_life_gain_resolved",
+            }
+            for event, _data in events
+        )
+        returned_event = next(
+            data for event, data in events if event == "temporary_control_returned"
+        )
+        assert returned_event["reason"] == "controller_left_game"
+        assert returned_event["zone_changed"] is False
+        eliminated_event = next(
+            data for event, data in events if event == "player_eliminated"
+        )
+        assert eliminated_event["temporary_control_returned_count"] == 1
+        assert eliminated_event["remaining_controlled_objects_exiled_count"] == 0
+
+        battle.clear_until_eot(survivor)
+        assert "haste" not in temporarily_stolen
+        assert "keywords" not in temporarily_stolen
+        assert temporarily_stolen["summoning_sick"] is True
+        assert "_compact_attack_projected_turn" not in temporarily_stolen
+
+    def test_elimination_owned_objects_leave_game_without_zone_or_token_lifecycle():
+        events = []
+        previous_handler = battle.REPLAY_EVENT_HANDLER
+        battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+        try:
+            dead = player("Departing Owner")
+            survivor = player("Surviving Controller")
+            owned_creature = {
+                "name": "Departing Owner Creature",
+                "owner": dead.name,
+                "controller": survivor.name,
+                "effect": "creature",
+                "type_line": "Creature",
+                "power": 2,
+                "toughness": 2,
+            }
+            owned_token = {
+                "name": "Departing Owner Token",
+                "owner": dead.name,
+                "controller": survivor.name,
+                "effect": "creature",
+                "type_line": "Creature Token",
+                "tag": "token",
+                "power": 1,
+                "toughness": 1,
+            }
+            phased_owned = {
+                "name": "Departing Owner Phased Permanent",
+                "owner": dead.name,
+                "controller": dead.name,
+                "effect": "creature",
+                "type_line": "Creature",
+                "power": 4,
+                "toughness": 4,
+            }
+            survivor.battlefield = [owned_creature, owned_token]
+            dead.phased_out = [phased_owned]
+            dead.life = 0
+
+            assert battle.check_sbas([dead, survivor]) is True
+        finally:
+            battle.REPLAY_EVENT_HANDLER = previous_handler
+
+        assert owned_creature not in survivor.battlefield
+        assert owned_token not in survivor.battlefield
+        assert phased_owned not in dead.phased_out
+        assert owned_creature not in survivor.exile
+        assert owned_token not in survivor.exile
+        assert not any(
+            event in {
+                "permanent_moved_from_battlefield",
+                "token_ceased_to_exist",
+                "dies_draw_resolved",
+                "dies_life_gain_resolved",
+            }
+            for event, _data in events
+        )
+        eliminated_event = next(
+            data for event, data in events if event == "player_eliminated"
+        )
+        assert eliminated_event["battlefield_removed_from_game"] == 2
+        assert eliminated_event["phased_out_removed_from_game"] == 1
+        assert eliminated_event["owned_objects_removed_from_game"] == 3
+        assert eliminated_event["owned_object_zone_change_events_emitted"] == 0
+
+    def test_elimination_exiles_only_objects_still_controlled_and_never_marks_dies():
+        events = []
+        previous_handler = battle.REPLAY_EVENT_HANDLER
+        battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+        try:
+            dead = player("Departing Bribery Controller")
+            survivor = player("Object Owner")
+            bribery_creature = {
+                "name": "Bribery Creature",
+                "owner": survivor.name,
+                "controller": dead.name,
+                "effect": "creature",
+                "type_line": "Creature",
+                "power": 5,
+                "toughness": 5,
+                "dies_draw": 3,
+            }
+            survivor_created_token = {
+                "name": "Survivor-Created Gift Token",
+                "owner": survivor.name,
+                "controller": dead.name,
+                "effect": "creature",
+                "type_line": "Creature Token",
+                "tag": "token",
+                "power": 1,
+                "toughness": 1,
+            }
+            phased_bribery_creature = {
+                "name": "Phased Bribery Creature",
+                "owner": survivor.name,
+                "controller": dead.name,
+                "effect": "creature",
+                "type_line": "Creature",
+                "power": 2,
+                "toughness": 2,
+            }
+            dead.battlefield = [bribery_creature, survivor_created_token]
+            dead.phased_out = [phased_bribery_creature]
+            dead.life = 0
+
+            assert battle.check_sbas([dead, survivor]) is True
+        finally:
+            battle.REPLAY_EVENT_HANDLER = previous_handler
+
+        assert dead.battlefield == []
+        assert dead.phased_out == []
+        assert bribery_creature in survivor.exile
+        assert phased_bribery_creature in survivor.exile
+        assert survivor_created_token not in survivor.exile
+        move_events = [
+            data
+            for event, data in events
+            if event == "permanent_moved_from_battlefield"
+        ]
+        assert {data["card"] for data in move_events} == {
+            "Bribery Creature",
+            "Survivor-Created Gift Token",
+        }
+        assert all(data["to_zone"] == "exile" for data in move_events)
+        assert all(data["reason"] == "controller_left_game" for data in move_events)
+        assert not any(event.startswith("dies_") for event, _data in events)
+        token_event = next(
+            data for event, data in events if event == "token_ceased_to_exist"
+        )
+        assert token_event["token"] == "Survivor-Created Gift Token"
+        assert token_event["from_zone"] == "battlefield"
+        assert token_event["to_zone"] == "exile"
+        eliminated_event = next(
+            data for event, data in events if event == "player_eliminated"
+        )
+        assert eliminated_event["battlefield_removed_from_game"] == 0
+        assert eliminated_event["phased_out_removed_from_game"] == 0
+        assert eliminated_event["remaining_controlled_objects_exiled_count"] == 3
+        assert eliminated_event["owned_object_zone_change_events_emitted"] == 0
 
     def test_cleanup_runs_with_previously_eliminated_player():
         active = player("Active", [card("Draw") for _ in range(5)])
@@ -277,6 +494,9 @@ def register_tests(battle, player, card):
     return [
         test_sba_only_reports_new_elimination,
         test_eliminated_player_battlefield_leaves_game,
+        test_elimination_ends_temporary_control_without_zone_change_or_dies,
+        test_elimination_owned_objects_leave_game_without_zone_or_token_lifecycle,
+        test_elimination_exiles_only_objects_still_controlled_and_never_marks_dies,
         test_cleanup_runs_with_previously_eliminated_player,
         test_plus_minus_counters_cancel_as_sba,
         test_zero_or_negative_toughness_dies_even_if_indestructible,

@@ -1,34 +1,27 @@
-import 'dart:io';
-
 import 'package:dart_frog/dart_frog.dart';
 import 'package:dotenv/dotenv.dart';
 import 'package:sentry/sentry.dart';
 
 import 'logger.dart';
 import 'request_trace.dart';
+import 'runtime_environment.dart';
 
-final DotEnv _observabilityEnv =
-    DotEnv(includePlatformEnvironment: true, quiet: true)..load();
+final DotEnv _observabilityEnv = loadRuntimeEnvironment();
 
 Future<void>? _observabilityInit;
 
-String get _sentryDsn => (_observabilityEnv['SENTRY_DSN'] ??
-        Platform.environment['SENTRY_DSN'] ??
-        '')
-    .trim();
+String get _sentryDsn => (_observabilityEnv['SENTRY_DSN'] ?? '').trim();
 
-String get _sentryEnvironment => (_observabilityEnv['SENTRY_ENVIRONMENT'] ??
-        Platform.environment['SENTRY_ENVIRONMENT'] ??
-        _observabilityEnv['ENVIRONMENT'] ??
-        Platform.environment['ENVIRONMENT'] ??
-        'development')
-    .trim();
+String get _sentryEnvironment =>
+    (_observabilityEnv['SENTRY_ENVIRONMENT'] ??
+            _observabilityEnv['ENVIRONMENT'] ??
+            'development')
+        .trim();
 
 String? get _sentryRelease {
-  final value = (_observabilityEnv['SENTRY_RELEASE'] ??
-          Platform.environment['SENTRY_RELEASE'] ??
-          Platform.environment['APP_VERSION'])
-      ?.trim();
+  final value =
+      (_observabilityEnv['SENTRY_RELEASE'] ?? _observabilityEnv['APP_VERSION'])
+          ?.trim();
   if (value == null || value.isEmpty) {
     return null;
   }
@@ -80,8 +73,7 @@ Future<void> _initializeObservability() async {
   }
 
   final tracesSampleRate = resolveSentryTracesSampleRate(
-    _observabilityEnv['SENTRY_TRACES_SAMPLE_RATE'] ??
-        Platform.environment['SENTRY_TRACES_SAMPLE_RATE'],
+    _observabilityEnv['SENTRY_TRACES_SAMPLE_RATE'],
   );
 
   await Sentry.init((options) {
@@ -239,10 +231,7 @@ Future<void> captureRouteException(
     request: context.request,
     trace: trace,
     userId: userId,
-    tags: {
-      'source': source,
-      if (tags != null) ...tags,
-    },
+    tags: {'source': source, if (tags != null) ...tags},
     extras: extras,
   );
 }

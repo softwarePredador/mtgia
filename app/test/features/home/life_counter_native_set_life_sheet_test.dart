@@ -35,15 +35,16 @@ void main() {
     addTearDown(() => tester.binding.setSurfaceSize(null));
 
     await tester.pumpWidget(
-      MaterialApp(
-        home: _SetLifeHost(onResult: (value) => result = value),
-      ),
+      MaterialApp(home: _SetLifeHost(onResult: (value) => result = value)),
     );
 
     await tester.tap(find.text('Open'));
     await tester.pumpAndSettle();
 
-    expect(find.byKey(const Key('life-counter-native-set-life-apply')), findsOneWidget);
+    expect(
+      find.byKey(const Key('life-counter-native-set-life-apply')),
+      findsOneWidget,
+    );
     expect(
       find.byKey(const Key('life-counter-native-set-life-display')),
       findsOneWidget,
@@ -83,18 +84,14 @@ void main() {
     addTearDown(() => tester.binding.setSurfaceSize(null));
 
     await tester.pumpWidget(
-      MaterialApp(
-        home: _SetLifeHost(onResult: (value) => result = value),
-      ),
+      MaterialApp(home: _SetLifeHost(onResult: (value) => result = value)),
     );
 
     await tester.tap(find.text('Open'));
     await tester.pumpAndSettle();
 
     await tester.tap(
-      find.byKey(
-        const Key('life-counter-native-set-life-adjust-minus-10'),
-      ),
+      find.byKey(const Key('life-counter-native-set-life-adjust-minus-10')),
     );
     await tester.pumpAndSettle();
     await tester.tap(
@@ -119,9 +116,7 @@ void main() {
     addTearDown(() => tester.binding.setSurfaceSize(null));
 
     await tester.pumpWidget(
-      MaterialApp(
-        home: _SetLifeHost(onResult: (value) => result = value),
-      ),
+      MaterialApp(home: _SetLifeHost(onResult: (value) => result = value)),
     );
 
     await tester.tap(find.text('Open'));
@@ -134,31 +129,29 @@ void main() {
     expect(find.text('Active player'), findsOneWidget);
 
     await tester.tap(
-      find.byKey(
-        const Key('life-counter-native-set-life-adjust-minus-10'),
-      ),
+      find.byKey(const Key('life-counter-native-set-life-adjust-minus-10')),
     );
     await tester.pumpAndSettle();
     await tester.tap(
-      find.byKey(
-        const Key('life-counter-native-set-life-adjust-minus-10'),
-      ),
+      find.byKey(const Key('life-counter-native-set-life-adjust-minus-10')),
     );
     await tester.pumpAndSettle();
     await tester.tap(
-      find.byKey(
-        const Key('life-counter-native-set-life-adjust-minus-10'),
-      ),
+      find.byKey(const Key('life-counter-native-set-life-adjust-minus-10')),
     );
     await tester.pumpAndSettle();
     await tester.tap(
-      find.byKey(
-        const Key('life-counter-native-set-life-adjust-minus-10'),
-      ),
+      find.byKey(const Key('life-counter-native-set-life-adjust-minus-10')),
     );
     await tester.pumpAndSettle();
 
-    expect(find.text('Knocked out'), findsOneWidget);
+    expect(find.text('Active player'), findsOneWidget);
+    expect(
+      find.text(
+        'Life is zero or less, but this player remains active until Auto-KO or a manual knock out records the defeat.',
+      ),
+      findsOneWidget,
+    );
 
     await tester.tap(
       find.byKey(const Key('life-counter-native-set-life-apply')),

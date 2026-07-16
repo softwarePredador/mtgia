@@ -10,6 +10,7 @@ Run from this directory with:
 
 import importlib.util
 import os
+import unittest
 from pathlib import Path
 
 
@@ -455,5 +456,9 @@ if __name__ == "__main__":
     for test in tests:
         if hasattr(battle, "clear_pending_triggers"):
             battle.clear_pending_triggers()
-        test()
+        try:
+            test()
+        except unittest.SkipTest as exc:
+            print(f"SKIP {test.__name__}: {exc}")
+            continue
         print(f"PASS {test.__name__}")

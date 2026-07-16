@@ -4,12 +4,12 @@
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:dotenv/dotenv.dart';
 import 'package:http/http.dart' as http;
 import 'package:postgres/postgres.dart';
 
 import '../lib/basic_land_utils.dart' as land_utils;
 import '../lib/database.dart';
+import '../lib/runtime_environment.dart';
 
 const _defaultApiBaseUrl = 'http://127.0.0.1:8080';
 const _liveMutationApprovalEnvironment = 'MANALOOM_CONFIRM_LIVE_MUTATIONS';
@@ -202,7 +202,7 @@ Future<void> main(List<String> args) async {
     exitCode = 2;
     return;
   }
-  final env = DotEnv(includePlatformEnvironment: true, quiet: true)..load();
+  final env = loadRuntimeEnvironment();
   final apiBaseUrl = env['TEST_API_BASE_URL'] ?? _defaultApiBaseUrl;
   final artifactDirPath = env['VALIDATION_ARTIFACT_DIR'] ?? _defaultArtifactDir;
   final summaryJsonPath =

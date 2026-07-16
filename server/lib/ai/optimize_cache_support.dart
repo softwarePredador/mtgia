@@ -1,5 +1,7 @@
 import 'package:postgres/postgres.dart';
 
+import '../e2e_validation_policy.dart';
+
 // Bump whenever the player-facing optimize response contract changes. Cached
 // payloads are returned as-is, so reusing an older schema can omit safety fields
 // such as optimization_contract and battle_validation for up to six hours.
@@ -126,8 +128,10 @@ Future<void> saveOptimizeCache({
     },
   );
 
-  await pool.execute('''
-    DELETE FROM ai_optimize_cache
-    WHERE expires_at <= NOW()
-  ''');
+  if (shouldRunGlobalHousekeeping()) {
+    await pool.execute('''
+      DELETE FROM ai_optimize_cache
+      WHERE expires_at <= NOW()
+    ''');
+  }
 }

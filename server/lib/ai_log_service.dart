@@ -1,5 +1,6 @@
 import 'package:postgres/postgres.dart';
 
+import 'ai_telemetry_contract.dart';
 import 'logger.dart';
 
 /// Serviço para logging de chamadas de IA
@@ -167,7 +168,10 @@ class AiLogService {
 
   /// Estatísticas de uso
   Future<Map<String, dynamic>> getStats({DateTime? since}) async {
-    final sinceClause = since != null ? "WHERE created_at >= @since" : "";
+    final sinceClause =
+        since != null
+            ? "WHERE created_at >= @since AND $aiProviderTelemetrySqlPredicate"
+            : "WHERE $aiProviderTelemetrySqlPredicate";
 
     final result = await _db.execute(
       Sql.named('''
@@ -206,7 +210,10 @@ class AiLogService {
   Future<List<Map<String, dynamic>>> getStatsByEndpoint({
     DateTime? since,
   }) async {
-    final sinceClause = since != null ? "WHERE created_at >= @since" : "";
+    final sinceClause =
+        since != null
+            ? "WHERE created_at >= @since AND $aiProviderTelemetrySqlPredicate"
+            : "WHERE $aiProviderTelemetrySqlPredicate";
 
     final result = await _db.execute(
       Sql.named('''

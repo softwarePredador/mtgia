@@ -7,6 +7,7 @@ import '../../../../lib/logger.dart';
 import '../../../../lib/observability.dart';
 import '../../../../lib/openai_runtime_config.dart';
 import '../../../../lib/ai/edhrec_trend_service.dart';
+import '../../../../lib/runtime_environment.dart';
 
 Future<Response> onRequest(RequestContext context, String deckId) async {
   if (context.request.method == HttpMethod.post) {
@@ -172,7 +173,7 @@ DotEnv _recommendationsEnv(RequestContext context) {
   try {
     return context.read<DotEnv>();
   } on StateError {
-    return DotEnv(includePlatformEnvironment: true, quiet: true)..load();
+    return loadRuntimeEnvironment();
   }
 }
 

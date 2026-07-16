@@ -139,7 +139,7 @@ class _LifeCounterNativeGameModesSheet extends StatelessWidget {
                             ),
                             SizedBox(height: 6),
                             Text(
-                              'ManaLoom owns the shell here. The actual gameplay runtime still stays embedded in Lotus for now.',
+                              'Choose a variant or manage an active mode.',
                               style: TextStyle(
                                 color: AppTheme.textSecondary,
                                 fontSize: AppTheme.fontMd,
@@ -198,7 +198,7 @@ class _LifeCounterNativeGameModesSheet extends StatelessWidget {
                         title: 'Planechase',
                         icon: Icons.public_rounded,
                         summary:
-                            'The planar deck and die still run inside Lotus. ManaLoom now owns the launch shell for this mode.',
+                            'Play with a shared planar deck and planar die.',
                         available: availability.planechaseAvailable,
                         active: availability.planechaseActive,
                         preferred:
@@ -231,7 +231,7 @@ class _LifeCounterNativeGameModesSheet extends StatelessWidget {
                         title: 'Archenemy',
                         icon: Icons.shield_moon_outlined,
                         summary:
-                            'Scheme runtime remains embedded for now while the migration contract is prepared.',
+                            'Face one empowered player and their scheme deck.',
                         available: availability.archenemyAvailable,
                         active: availability.archenemyActive,
                         preferred:
@@ -263,7 +263,7 @@ class _LifeCounterNativeGameModesSheet extends StatelessWidget {
                         title: 'Bounty',
                         icon: Icons.workspace_premium_outlined,
                         summary:
-                            'Bounty gameplay still depends on Lotus, but ManaLoom now owns the mode entry shell.',
+                            'Complete rotating objectives to earn escalating rewards.',
                         available: availability.bountyAvailable,
                         active: availability.bountyActive,
                         preferred:
@@ -393,7 +393,7 @@ class _GameModeStatusCard extends StatelessWidget {
                   ),
                 if (preferred)
                   const _GameModeBadge(
-                    label: 'Selected Surface',
+                    label: 'Selected',
                     foregroundColor: AppTheme.backgroundAbyss,
                     backgroundColor: AppTheme.primarySoft,
                   ),
@@ -411,7 +411,7 @@ class _GameModeStatusCard extends StatelessWidget {
             if (active) ...[
               const SizedBox(height: 10),
               const Text(
-                'An embedded overlay for this mode is already open in the current game.',
+                'This mode is already open in the current game.',
                 style: TextStyle(
                   color: AppTheme.textPrimary,
                   fontSize: AppTheme.fontSm,
@@ -423,7 +423,7 @@ class _GameModeStatusCard extends StatelessWidget {
             if (cardPoolActive) ...[
               const SizedBox(height: 10),
               const Text(
-                'The embedded card pool editor for this mode is already open in the current game.',
+                'The card pool editor is already open for this mode.',
                 style: TextStyle(
                   color: AppTheme.textPrimary,
                   fontSize: AppTheme.fontSm,
@@ -436,8 +436,8 @@ class _GameModeStatusCard extends StatelessWidget {
               const SizedBox(height: 10),
               Text(
                 activeModeLabels.isEmpty
-                    ? 'Lotus only allows $maxActiveModes active game modes at once. Close one active mode before starting $title or opening its card pool editor.'
-                    : 'Lotus only allows $maxActiveModes active game modes at once. ${activeModeLabels.join(' and ')} ${activeModeLabels.length == 1 ? 'is' : 'are'} already active, so close one of them before starting $title or opening its card pool editor.',
+                    ? 'Only $maxActiveModes game modes can be active at once. Close one before starting $title or opening its card pool editor.'
+                    : 'Only $maxActiveModes game modes can be active at once. ${activeModeLabels.join(' and ')} ${activeModeLabels.length == 1 ? 'is' : 'are'} already active, so close one before starting $title or opening its card pool editor.',
                 style: const TextStyle(
                   color: AppTheme.textPrimary,
                   fontSize: AppTheme.fontSm,
@@ -451,7 +451,7 @@ class _GameModeStatusCard extends StatelessWidget {
                     LifeCounterGameModesEntryIntent.editCards) ...[
               const SizedBox(height: 10),
               Text(
-                'Continuing will hand off to the embedded $title card pool editor while ManaLoom keeps ownership of the entry shell.',
+                'Continue to the $title card pool editor.',
                 style: const TextStyle(
                   color: AppTheme.textPrimary,
                   fontSize: AppTheme.fontSm,
@@ -479,15 +479,15 @@ class _GameModeStatusCard extends StatelessWidget {
                     : blockedByActiveModeLimit
                     ? 'Close One Active Mode First'
                     : cardPoolActive
-                    ? 'Return To Embedded Card Pool'
+                    ? 'Return To Card Pool'
                     : preferred
                     ? preferredIntent ==
                             LifeCounterGameModesEntryIntent.editCards
-                        ? 'Continue To Embedded Card Pool'
+                        ? 'Continue To Card Pool'
                         : 'Continue With $title'
                     : active
-                    ? 'Return To Embedded Mode'
-                    : 'Open Embedded Mode',
+                    ? 'Return To $title'
+                    : 'Open $title',
               ),
             ),
             if (available &&
@@ -518,7 +518,7 @@ class _GameModeStatusCard extends StatelessWidget {
                   onPressed:
                       () => Navigator.of(context).pop(closeCardPoolAction),
                   icon: const Icon(Icons.close_fullscreen_rounded),
-                  label: const Text('Close Embedded Card Pool'),
+                  label: const Text('Close Card Pool'),
                 ),
               ),
             ],
@@ -532,7 +532,7 @@ class _GameModeStatusCard extends StatelessWidget {
                   ),
                   onPressed: () => Navigator.of(context).pop(closeAction),
                   icon: const Icon(Icons.close_fullscreen_rounded),
-                  label: const Text('Close Embedded Overlay'),
+                  label: const Text('Close Mode'),
                 ),
               ),
             ],
@@ -642,7 +642,7 @@ Future<void> _showGameModeInfoSheet(
                             key: Key(
                               'life-counter-native-game-modes-${info.keyName}-info-close',
                             ),
-                            tooltip: 'Fechar informações',
+                            tooltip: 'Close details',
                             onPressed: () => Navigator.of(context).pop(),
                             icon: const Icon(Icons.close_rounded),
                             color: AppTheme.textSecondary,
@@ -722,8 +722,7 @@ _gameModeInfo(LifeCounterGameModeKind modeKind) {
       return (
         keyName: 'planechase',
         title: 'Planechase',
-        summary:
-            'A shared planar deck changes the battlefield for everyone. The mode still runs inside Lotus, but ManaLoom now owns the help surface.',
+        summary: 'A shared planar deck changes the battlefield for everyone.',
         rules: <String>[
           'During your turn, you may roll the planar die whenever you could cast a sorcery.',
           'Your first roll each turn is free. Every extra roll costs one mana more than the previous roll.',
@@ -736,8 +735,7 @@ _gameModeInfo(LifeCounterGameModeKind modeKind) {
       return (
         keyName: 'archenemy',
         title: 'Archenemy',
-        summary:
-            'The scheme deck powers up one player against the table. ManaLoom now owns the help surface while the scheme runtime stays embedded.',
+        summary: 'The scheme deck powers up one player against the table.',
         rules: <String>[
           'At the start of the archenemy turn, set a scheme in motion.',
           'Ongoing schemes stay in play until abandoned or completed.',
@@ -751,7 +749,7 @@ _gameModeInfo(LifeCounterGameModeKind modeKind) {
         keyName: 'bounty',
         title: 'Bounty',
         summary:
-            'A shared bounty deck gives the table rotating objectives and rewards. ManaLoom now owns the help surface for this mode.',
+            'A shared bounty deck gives the table rotating objectives and rewards.',
         rules: <String>[
           'Starting on turn 3, reveal a bounty card with a condition to complete.',
           'If a player completes the bounty, they claim the reward and a new one appears on the next turn.',

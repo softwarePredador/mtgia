@@ -40,6 +40,21 @@ def _palantir_of_orthanc_rule():
 
 
 def register_tests(battle, player):
+    def assert_token_ceased_to_exist(events, token, zone, *, expected_count=1):
+        token_name = token.get("name", "?")
+        ceased_events = [
+            data
+            for event, data in events
+            if event == "token_ceased_to_exist" and data.get("token") == token_name
+        ]
+        assert len(ceased_events) == expected_count
+        for ceased in ceased_events:
+            assert ceased.get("from_zone") == "battlefield"
+            assert ceased.get("to_zone") == zone
+            assert ceased.get("zone") == zone
+            assert ceased.get("destination") == zone
+            assert ceased.get("result") == "ceased_to_exist"
+
     def test_lorehold_miracle_requires_lorehold_on_battlefield():
         events = []
         battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
@@ -11657,7 +11672,8 @@ def register_tests(battle, player):
         battle.REPLAY_EVENT_HANDLER = None
 
         assert token not in active.battlefield
-        assert any(card.get("name") == token.get("name") for card in active.graveyard)
+        assert token not in active.graveyard
+        assert_token_ceased_to_exist(events, token, "graveyard")
         assert any(
             event == "copy_creature_token_created"
             and data.get("card") == "Electroduplicate"
@@ -11708,7 +11724,8 @@ def register_tests(battle, player):
             battle.REPLAY_EVENT_HANDLER = previous_handler
 
         assert token not in active.battlefield
-        assert token in active.exile
+        assert token not in active.exile
+        assert_token_ceased_to_exist(events, token, "exile")
         created = next(data for event, data in events if event == "copy_creature_token_created")
         assert created["card"] == "Heat Shimmer"
         assert created["target"] == "Large Threat"
@@ -11802,7 +11819,8 @@ def register_tests(battle, player):
         assert token["artifact_token"] is True
         assert "artifact" in token["type_line"].lower()
         assert token not in active.battlefield
-        assert token in active.graveyard
+        assert token not in active.graveyard
+        assert_token_ceased_to_exist(events, token, "graveyard")
         created = next(data for event, data in events if event == "copy_creature_token_created")
         assert created["card"] == "Molten Duplication"
         assert created["target"] == "Sol Ring"
@@ -12247,7 +12265,7 @@ def register_tests(battle, player):
         assert all(token.get("flying") is True for token in dragon_tokens)
         assert all("dragon" in token.get("type_line", "").lower() for token in dragon_tokens)
 
-    def test_jaxis_copies_another_creature_draws_on_token_death_and_excludes_source(self):
+    def test_jaxis_copies_another_creature_draws_on_token_death_and_excludes_source():
         events = []
         previous_handler = battle.REPLAY_EVENT_HANDLER
         battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
@@ -12299,7 +12317,8 @@ def register_tests(battle, player):
             battle.REPLAY_EVENT_HANDLER = previous_handler
 
         assert token not in active.battlefield
-        assert token in active.graveyard
+        assert token not in active.graveyard
+        assert_token_ceased_to_exist(events, token, "graveyard")
         assert len(active.hand) == 1
         assert active.hand[0]["name"] == "Drawn Off Jaxis"
         created = next(data for event, data in events if event == "copy_creature_token_created")
@@ -12308,11 +12327,11 @@ def register_tests(battle, player):
             not (event == "copy_creature_token_created" and data.get("target") == "Jaxis, the Troublemaker")
             for event, data in events
         )
-        draw_event = next(data for event, data in events if event == "end_step_token_death_draw_resolved")
+        draw_event = next(data for event, data in events if event == "dies_draw_resolved")
         assert draw_event["draw_count"] == 1
         assert draw_event["cards_drawn"] == ["Drawn Off Jaxis"]
 
-    def test_rionya_creates_one_plus_instant_and_sorcery_spell_copies_and_exiles_them(self):
+    def test_rionya_creates_one_plus_instant_and_sorcery_spell_copies_and_exiles_them():
         active = player("Active")
         target = {
             "name": "Copied Wizard",
@@ -12357,11 +12376,18 @@ def register_tests(battle, player):
         ]
         assert len(tokens) == 3
         assert all(token.get("haste") is True for token in tokens)
-        battle.process_end_step_token_sacrifices(active, 8)
-        assert all(token in active.exile for token in tokens)
+        events = []
+        previous_handler = battle.REPLAY_EVENT_HANDLER
+        battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+        try:
+            battle.process_end_step_token_sacrifices(active, 8)
+        finally:
+            battle.REPLAY_EVENT_HANDLER = previous_handler
+        assert all(token not in active.exile for token in tokens)
         assert all(token not in active.battlefield for token in tokens)
+        assert_token_ceased_to_exist(events, tokens[0], "exile", expected_count=3)
 
-    def test_jolly_balloon_man_adds_red_balloon_flying_haste_without_losing_other_colors(self):
+    def test_jolly_balloon_man_adds_red_balloon_flying_haste_without_losing_other_colors():
         active = player("Active")
         source = {
             "name": "The Jolly Balloon Man",
@@ -12415,8 +12441,16 @@ def register_tests(battle, player):
         assert token["haste"] is True
         assert token["colors"] == ["U", "R"]
         assert "balloon" in token.get("type_line", "").lower()
-        battle.process_end_step_token_sacrifices(active, 9)
-        assert token in active.graveyard
+        events = []
+        previous_handler = battle.REPLAY_EVENT_HANDLER
+        battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+        try:
+            battle.process_end_step_token_sacrifices(active, 9)
+        finally:
+            battle.REPLAY_EVENT_HANDLER = previous_handler
+        assert token not in active.battlefield
+        assert token not in active.graveyard
+        assert_token_ceased_to_exist(events, token, "graveyard")
 
     def test_valakut_awakening_filters_hand_and_draws_plus_one():
         events = []
@@ -20917,13 +20951,22 @@ def register_tests(battle, player):
             isinstance(permanent, dict) and permanent.get("name") == "Eldrazi Scion Token"
             for permanent in active.battlefield
         )
+        assert not any(
+            isinstance(permanent, dict) and permanent.get("name") == "Eldrazi Scion Token"
+            for permanent in active.graveyard
+        )
         assert active.mana_pool.colorless == 1
         assert any(
             event == "self_sacrifice_mana_source_activated"
             and data.get("card") == "Eldrazi Scion Token"
-            and data.get("destination") == "vanished_token"
+            and data.get("destination") == "graveyard"
             and data.get("produced") == 1
             for event, data in events
+        )
+        assert_token_ceased_to_exist(
+            events,
+            {"name": "Eldrazi Scion Token"},
+            "graveyard",
         )
 
     def test_xmage_creature_etb_fixed_mana_adds_exact_symbols():
@@ -21830,6 +21873,8 @@ def register_tests(battle, player):
                 "power": 2,
                 "toughness": 2,
                 "cmc": 2,
+                "tapped": True,
+                "summoning_sick": True,
             }
             opponent_a_creature = {
                 "name": "Rival Giant",
@@ -21838,6 +21883,8 @@ def register_tests(battle, player):
                 "power": 3,
                 "toughness": 3,
                 "cmc": 4,
+                "tapped": True,
+                "summoning_sick": True,
             }
             opponent_b_creature_1 = {
                 "name": "Rival Dragon",
@@ -21892,9 +21939,27 @@ def register_tests(battle, player):
             battle.REPLAY_EVENT_HANDLER = previous_handler
 
         assert active_creature in active.battlefield
+        assert active_creature["tapped"] is False
+        assert active_creature["haste"] is True
+        assert active_creature["summoning_sick"] is False
         assert opponent_artifact in opponent_a.battlefield
         assert not any(battle.is_battlefield_creature(card) for card in opponent_a.battlefield)
         assert not any(battle.is_battlefield_creature(card) for card in opponent_b.battlefield)
+        assert all(
+            creature in active.battlefield
+            for creature in (opponent_a_creature, opponent_b_creature_1, opponent_b_creature_2)
+        )
+        for creature, owner in (
+            (opponent_a_creature, opponent_a),
+            (opponent_b_creature_1, opponent_b),
+            (opponent_b_creature_2, opponent_b),
+        ):
+            assert creature["owner"] == owner.name
+            assert creature["controller"] == active.name
+            assert creature["haste"] is True
+            assert creature["summoning_sick"] is False
+            assert creature["tapped"] is True
+            assert creature["_compact_attack_projected_turn"] == 6
         assert opponent_a.life == 36
         assert opponent_b.life == 36
         assert any(card.get("name") == "Insurrection" for card in active.graveyard)
@@ -21907,11 +21972,40 @@ def register_tests(battle, player):
             and data.get("damaged_opponents") == ["Opponent A", "Opponent B"]
             and data.get("control_duration") == "until_end_of_turn"
             and data.get("stolen_creatures_gain_haste") is True
+            and data.get("transferred_count") == 3
+            and data.get("projected_attack_count") == 3
+            and data.get("transferred_to_battlefield") is True
+            and data.get("control_change_is_zone_change") is False
             and data.get("runtime_model") == "compact_damage_projection"
             and data.get("rule_logical_key") == "battle_rule_v1:e6b0d9f25aff060aa1f813e43154c954"
             and data.get("rule_oracle_hash") == "a756d0c90be63a18b7eaf97582e75b8e"
             for event, data in events
         )
+        assert not any(
+            event in {"permanent_moved_from_battlefield", "token_ceased_to_exist"}
+            for event, _data in events
+        )
+
+        battle.clear_until_eot(active)
+
+        assert active_creature in active.battlefield
+        assert active_creature["tapped"] is False
+        assert "haste" not in active_creature
+        assert "keywords" not in active_creature
+        assert active_creature["summoning_sick"] is True
+        assert opponent_a_creature in opponent_a.battlefield
+        assert opponent_b_creature_1 in opponent_b.battlefield
+        assert opponent_b_creature_2 in opponent_b.battlefield
+        assert opponent_a_creature not in active.battlefield
+        assert opponent_b_creature_1 not in active.battlefield
+        assert opponent_b_creature_2 not in active.battlefield
+        assert opponent_a_creature["controller"] == opponent_a.name
+        assert opponent_b_creature_1["controller"] == opponent_b.name
+        assert opponent_b_creature_2["controller"] == opponent_b.name
+        assert "haste" not in opponent_a_creature
+        assert "keywords" not in opponent_a_creature
+        assert opponent_a_creature["summoning_sick"] is True
+        assert "_compact_attack_projected_turn" not in opponent_a_creature
 
     def test_pg093_insurrection_rule_resolves_from_sqlite_cache():
         effect_data = battle.get_card_effect({"name": "Insurrection", "type_line": "Sorcery", "cmc": 8})
@@ -24443,6 +24537,9 @@ def register_tests(battle, player):
         test_pg501_token_landwalk_is_unblockable_against_matching_basic_land,
         test_electroduplicate_creates_hasty_copy_and_sacrifices_at_end_step,
         test_heat_shimmer_copies_any_creature_and_exiles_token_at_end_step,
+        test_jaxis_copies_another_creature_draws_on_token_death_and_excludes_source,
+        test_rionya_creates_one_plus_instant_and_sorcery_spell_copies_and_exiles_them,
+        test_jolly_balloon_man_adds_red_balloon_flying_haste_without_losing_other_colors,
         test_twinflame_copies_own_creature_only_and_exiles_token_at_end_step,
         test_molten_duplication_copies_own_artifact_as_artifact_and_sacrifices_token,
         test_flash_photography_copies_target_permanent_without_temporary_cleanup,

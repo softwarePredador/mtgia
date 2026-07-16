@@ -118,14 +118,37 @@ Future<Map<String, dynamic>> _readOverlayState(
     await screenState.debugRunJavaScript('''
 (() => {
   try {
+    const settingsOverlay = document.querySelector('.settings-overlay');
+    const historyOverlay = document.querySelector('.life-history-overlay');
+    const searchOverlay = document.querySelector('.card-search-overlay');
+    const menuOverlay = document.querySelector('.menu-button-overlay');
+    const menuButton = document.querySelector('.menu-button');
     FlutterManaLoomShellBridge.postMessage(JSON.stringify({
       type: 'debug_overlay_probe',
       request_id: $requestId,
       menu_overlay_open: !!document.querySelector('.menu-button-overlay'),
-      settings_overlay_open: !!document.querySelector('.settings-overlay'),
-      history_overlay_open: !!document.querySelector('.life-history-overlay'),
-      search_overlay_open: !!document.querySelector('.card-search-overlay') ||
+      menu_role: menuOverlay?.getAttribute('role') ?? null,
+      menu_aria_modal: menuOverlay?.getAttribute('aria-modal') ?? null,
+      focus_inside_menu: !!menuOverlay && menuOverlay.contains(document.activeElement),
+      focus_on_menu_button: document.activeElement === menuButton,
+      menu_button_present: !!menuButton,
+      menu_button_connected: !!menuButton?.isConnected,
+      menu_button_tabindex: menuButton?.getAttribute('tabindex') ?? null,
+      active_element_tag: document.activeElement?.tagName ?? null,
+      active_element_class: document.activeElement?.className ?? null,
+      settings_overlay_open: !!settingsOverlay,
+      history_overlay_open: !!historyOverlay,
+      search_overlay_open: !!searchOverlay ||
         !!document.querySelector('.search-overlay'),
+      settings_background: settingsOverlay
+        ? window.getComputedStyle(settingsOverlay).backgroundColor
+        : null,
+      history_background: historyOverlay
+        ? window.getComputedStyle(historyOverlay).backgroundColor
+        : null,
+      search_background: searchOverlay
+        ? window.getComputedStyle(searchOverlay).backgroundColor
+        : null,
       native_settings_present: !!document.querySelector('[data-testid="life-counter-settings-overlay"]'),
       native_history_present: !!document.querySelector('[data-testid="life-counter-history-overlay"]'),
       native_card_search_present: !!document.querySelector('[data-testid="life-counter-card-search-overlay"]')
@@ -267,12 +290,37 @@ void main() {
 
       final menuState = await _readOverlayState(tester, screenState);
       expect(menuState['menu_overlay_open'], isTrue);
+      expect(menuState['menu_role'], 'dialog');
+      expect(menuState['menu_aria_modal'], 'true');
+      expect(menuState['focus_inside_menu'], isTrue);
 
       await binding.convertFlutterSurfaceToImage();
       final menuScreenshot = await binding.takeScreenshot(
         'lotus_radial_menu_overlay',
       );
       _emitScreenshot('lotus_radial_menu_overlay', menuScreenshot);
+
+      await _runStep('close_menu_with_escape', () {
+        return screenState.debugRunJavaScript('''
+(() => {
+  document.activeElement?.dispatchEvent(new KeyboardEvent('keydown', {
+    key: 'Escape',
+    bubbles: true,
+    cancelable: true,
+  }));
+})()
+''');
+      });
+      await tester.pump(const Duration(seconds: 1));
+
+      final closedMenuState = await _readOverlayState(tester, screenState);
+      // ignore: avoid_print
+      print('[life_counter_overlays_smoke] closed menu: $closedMenuState');
+      expect(closedMenuState['menu_overlay_open'], isFalse);
+      expect(closedMenuState['focus_on_menu_button'], isTrue);
+
+      await _openLotusMenu(screenState);
+      await tester.pump(const Duration(seconds: 1));
 
       await _clickLotusMenuEntry(screenState, <String>[
         '.menu-button-overlay .life-history-btn',
@@ -282,6 +330,7 @@ void main() {
       final historyState = await _readOverlayState(tester, screenState);
       expect(historyState['history_overlay_open'], isTrue);
       expect(historyState['native_history_present'], isFalse);
+      expect(historyState['history_background'], 'rgb(3, 8, 18)');
 
       final historyScreenshot = await binding.takeScreenshot(
         'lotus_history_overlay',

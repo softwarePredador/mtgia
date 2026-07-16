@@ -121,6 +121,7 @@ def register_tests(battle, player):
                 "cast_announced",
                 "cost_paid",
                 "warp_cast",
+                "permanent_moved_from_battlefield",
                 "warp_exiled_end_step",
                 "cast_announced",
                 "cost_paid",

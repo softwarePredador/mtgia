@@ -8,6 +8,7 @@ import '../../commercial/models/manaloom_plan.dart';
 import '../../commercial/widgets/ai_usage_gate.dart';
 import '../../commercial/widgets/ai_usage_meter.dart';
 import '../providers/deck_provider.dart';
+import '../models/commander_bracket.dart';
 import '../widgets/deck_feedback_dialogs.dart';
 
 /// Tela para gerar decks automaticamente a partir de uma descrição em texto
@@ -241,6 +242,8 @@ class _DeckGenerateScreenState extends State<DeckGenerateScreen> {
           context,
         ).showSnackBar(SnackBar(content: Text(message)));
       }
+    } finally {
+      await refreshAiUsageAfterAction(context);
     }
   }
 
@@ -400,7 +403,7 @@ class _DeckGenerateScreenState extends State<DeckGenerateScreen> {
       final rawBracket = candidate['bracket'];
       final bracket =
           rawBracket is int ? rawBracket : int.tryParse('$rawBracket');
-      if (bracket != null && bracket > 0) {
+      if (isCommanderBracket(bracket)) {
         return bracket;
       }
     }
@@ -640,10 +643,12 @@ class _DeckGenerateScreenState extends State<DeckGenerateScreen> {
               TextField(
                 key: const Key('deck-generate-commander-field'),
                 controller: _commanderController,
+                maxLength: maxAiGenerateCommanderNameLength,
                 decoration: InputDecoration(
                   hintText: 'Ex: Lorehold, the Historian',
                   helperText:
                       'Use quando quiser guiar a geração por um comandante específico.',
+                  counterText: '',
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(AppTheme.radiusMd),
                   ),
@@ -660,10 +665,12 @@ class _DeckGenerateScreenState extends State<DeckGenerateScreen> {
             TextField(
               key: const Key('deck-generate-prompt-field'),
               controller: _promptController,
+              maxLength: maxAiGeneratePromptLength,
               maxLines: 4,
               decoration: InputDecoration(
                 hintText:
                     'Ex: Deck agressivo de goblins vermelhos com muitas criaturas pequenas...',
+                counterText: '',
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(AppTheme.radiusMd),
                 ),
@@ -850,6 +857,10 @@ class _DeckGenerateScreenState extends State<DeckGenerateScreen> {
     final validation = _generatedDeck!['validation'];
     final diagnostics = _generatedDeck!['diagnostics'];
     final learnedDeckPreview = _learnedDeckPreviewParts(diagnostics);
+    final showWarnings = hasMeaningfulGeneratedDeckWarnings(
+      isMock: isMock,
+      warnings: warnings,
+    );
 
     final invalidCards =
         warnings is Map && warnings['invalid_cards'] is List
@@ -979,7 +990,7 @@ class _DeckGenerateScreenState extends State<DeckGenerateScreen> {
               ),
             ),
           ],
-          if (isMock || warnings is Map) ...[
+          if (showWarnings) ...[
             const SizedBox(height: 16),
             DecoratedBox(
               decoration: BoxDecoration(
@@ -1082,6 +1093,26 @@ class _DeckGenerateScreenState extends State<DeckGenerateScreen> {
       if (confidence != null) 'Confiança: $confidence',
     ];
   }
+}
+
+bool hasMeaningfulGeneratedDeckWarnings({
+  required bool isMock,
+  required Object? warnings,
+}) {
+  if (isMock) return true;
+  if (warnings is! Map) return false;
+
+  final message = warnings['message']?.toString().trim() ?? '';
+  if (message.isNotEmpty) return true;
+
+  for (final key in const ['messages', 'invalid_cards']) {
+    final value = warnings[key];
+    if (value is List &&
+        value.any((item) => item.toString().trim().isNotEmpty)) {
+      return true;
+    }
+  }
+  return false;
 }
 
 class _LearnedDeckCallout extends StatelessWidget {

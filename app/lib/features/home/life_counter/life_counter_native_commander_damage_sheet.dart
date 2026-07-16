@@ -125,7 +125,7 @@ class _LifeCounterNativeCommanderDamageSheetState
                             ),
                             const SizedBox(height: 6),
                             Text(
-                              'ManaLoom owns this shell while the Lotus tabletop stays visually identical.',
+                              'Track commander damage from each opponent.',
                               style: const TextStyle(
                                 color: AppTheme.textSecondary,
                                 fontSize: AppTheme.fontMd,
@@ -175,7 +175,7 @@ class _LifeCounterNativeCommanderDamageSheetState
                       const SizedBox(height: 18),
                       if (lethalSources.isNotEmpty) ...[
                         _SectionCard(
-                          title: 'Lethal Summary',
+                          title: 'Commander damage lethal',
                           subtitle: lethalSummary ?? '',
                           child: const SizedBox.shrink(),
                         ),
@@ -184,7 +184,7 @@ class _LifeCounterNativeCommanderDamageSheetState
                       _SectionCard(
                         title: 'Target Status',
                         subtitle:
-                            'The ManaLoom tabletop engine evaluates the target status before you apply the change.',
+                            'Review whether the selected damage is lethal.',
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
@@ -218,7 +218,7 @@ class _LifeCounterNativeCommanderDamageSheetState
                       _SectionCard(
                         title: 'Damage By Source',
                         subtitle:
-                            'Each source keeps the split between commander one and commander two when partner commander is enabled.',
+                            'Track each commander separately when an opponent has a partner.',
                         child: Column(
                           children: [
                             for (

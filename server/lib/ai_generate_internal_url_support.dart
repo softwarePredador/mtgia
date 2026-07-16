@@ -5,28 +5,35 @@ Uri resolveInternalAiRouteUrl({
   String? configuredBaseUrl,
   String? fallbackPort,
 }) {
+  // `headers` and `requestUri` are intentionally not used to select the
+  // destination. Host/proxy headers are client-controlled at this boundary;
+  // reusing them would allow async requests (including their authorization
+  // header) to be redirected outside this process.
   final configured = configuredBaseUrl?.trim();
   if (configured != null && configured.isNotEmpty) {
-    final base = configured.replaceFirst(RegExp(r'/$'), '');
-    return Uri.parse('$base$routePath');
+    final configuredUri = Uri.tryParse(configured);
+    if (_isSafeConfiguredInternalBase(configuredUri)) {
+      return configuredUri!.replace(
+        path: routePath,
+        query: null,
+        fragment: null,
+      );
+    }
   }
 
-  final host = headers['host']?.trim();
-  final resolvedHost = host != null && host.isNotEmpty
-      ? host
-      : '127.0.0.1:${fallbackPort?.isNotEmpty == true ? fallbackPort : '8080'}';
+  final parsedPort = int.tryParse(fallbackPort?.trim() ?? '');
+  final port =
+      parsedPort != null && parsedPort >= 1 && parsedPort <= 65535
+          ? parsedPort
+          : 8080;
+  return Uri(scheme: 'http', host: '127.0.0.1', port: port, path: routePath);
+}
 
-  final forwardedProto =
-      headers['x-forwarded-proto'] ?? headers['X-Forwarded-Proto'];
-  final forwardedScheme = forwardedProto?.split(',').first.trim().toLowerCase();
-  final requestScheme = requestUri.scheme.toLowerCase();
-  final scheme = forwardedScheme == 'https' || forwardedScheme == 'http'
-      ? forwardedScheme
-      : requestScheme == 'https' || requestScheme == 'http'
-          ? requestScheme
-          : 'http';
-
-  return Uri.parse('$scheme://$resolvedHost$routePath');
+bool _isSafeConfiguredInternalBase(Uri? uri) {
+  if (uri == null || !uri.hasScheme || uri.host.isEmpty) return false;
+  if (uri.scheme != 'http' && uri.scheme != 'https') return false;
+  if (uri.userInfo.isNotEmpty || uri.hasQuery || uri.hasFragment) return false;
+  return uri.path.isEmpty || uri.path == '/';
 }
 
 Uri resolveAiGenerateInternalUrl({

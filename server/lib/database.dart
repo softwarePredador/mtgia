@@ -1,8 +1,7 @@
-import 'dart:io';
-
 import 'package:meta/meta.dart' show visibleForTesting;
 import 'package:postgres/postgres.dart';
-import 'package:dotenv/dotenv.dart';
+
+import 'runtime_environment.dart';
 
 /// Classe para gerenciar a conexão com o banco de dados PostgreSQL.
 ///
@@ -45,8 +44,7 @@ class Database {
     if (_connected) return;
 
     // Carrega as variáveis de ambiente do arquivo .env
-    final env = DotEnv(quiet: true)..load();
-    env.addAll(Platform.environment);
+    final env = loadRuntimeEnvironment();
 
     final host = env['DB_HOST'];
     final port = int.tryParse(env['DB_PORT'] ?? '');

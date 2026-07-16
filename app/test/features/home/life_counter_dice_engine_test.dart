@@ -56,6 +56,12 @@ void main() {
     test('runs first player roll only among active players', () {
       final session = LifeCounterSession.initial(playerCount: 4).copyWith(
         lives: const [0, 40, 0, 40],
+        playerEliminationReasons: const [
+          LifeCounterPlayerEliminationReason.life,
+          LifeCounterPlayerEliminationReason.none,
+          LifeCounterPlayerEliminationReason.life,
+          LifeCounterPlayerEliminationReason.none,
+        ],
       );
 
       final updated = LifeCounterDiceEngine.runFirstPlayerRoll(
@@ -70,6 +76,12 @@ void main() {
     test('does not choose a first player when no active players remain', () {
       final session = LifeCounterSession.initial(playerCount: 4).copyWith(
         lives: const [0, 0, 0, 0],
+        playerEliminationReasons: const [
+          LifeCounterPlayerEliminationReason.life,
+          LifeCounterPlayerEliminationReason.life,
+          LifeCounterPlayerEliminationReason.life,
+          LifeCounterPlayerEliminationReason.life,
+        ],
         firstPlayerIndex: 2,
       );
 
@@ -100,6 +112,12 @@ void main() {
     test('runs high roll only for active players', () {
       final session = LifeCounterSession.initial(playerCount: 4).copyWith(
         lives: const [40, 0, 40, 0],
+        playerEliminationReasons: const [
+          LifeCounterPlayerEliminationReason.none,
+          LifeCounterPlayerEliminationReason.life,
+          LifeCounterPlayerEliminationReason.none,
+          LifeCounterPlayerEliminationReason.life,
+        ],
       );
 
       final updated = LifeCounterDiceEngine.runHighRoll(
@@ -114,9 +132,9 @@ void main() {
     });
 
     test('rerolls only tied players when a tie is pending', () {
-      final session = LifeCounterSession.initial(playerCount: 4).copyWith(
-        lastHighRolls: const [19, null, 19, null],
-      );
+      final session = LifeCounterSession.initial(
+        playerCount: 4,
+      ).copyWith(lastHighRolls: const [19, null, 19, null]);
 
       final updated = LifeCounterDiceEngine.runHighRoll(
         session,
@@ -133,6 +151,12 @@ void main() {
     test('drops out players from a pending high roll tiebreak', () {
       final session = LifeCounterSession.initial(playerCount: 4).copyWith(
         lives: const [40, 0, 40, 40],
+        playerEliminationReasons: const [
+          LifeCounterPlayerEliminationReason.none,
+          LifeCounterPlayerEliminationReason.life,
+          LifeCounterPlayerEliminationReason.none,
+          LifeCounterPlayerEliminationReason.none,
+        ],
         lastHighRolls: const [19, 19, 19, null],
       );
 
@@ -149,6 +173,12 @@ void main() {
     test('does not run high roll when no active players remain', () {
       final session = LifeCounterSession.initial(playerCount: 4).copyWith(
         lives: const [0, 0, 0, 0],
+        playerEliminationReasons: const [
+          LifeCounterPlayerEliminationReason.life,
+          LifeCounterPlayerEliminationReason.life,
+          LifeCounterPlayerEliminationReason.life,
+          LifeCounterPlayerEliminationReason.life,
+        ],
         lastHighRolls: const [19, 18, 17, 16],
       );
 

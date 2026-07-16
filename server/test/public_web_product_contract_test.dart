@@ -126,6 +126,13 @@ void main() {
       expect(smoke, contains('ignore_patterns("node_modules", ".next")'));
       expect(smoke, contains(r'cd "$WORK_DIR"'));
       expect(smoke, isNot(contains(r'cd "$WEB_DIR"')));
+      expect(
+        smoke,
+        contains(r'exec env HOSTNAME=127.0.0.1 PORT="$PORT" node server.js'),
+      );
+      expect(smoke, contains(r'kill -TERM "$SERVER_PID"'));
+      expect(smoke, contains(r'kill -KILL "$SERVER_PID"'));
+      expect(smoke, contains('trap cleanup EXIT'));
     });
   });
 }

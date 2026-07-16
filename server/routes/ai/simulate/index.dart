@@ -6,16 +6,16 @@ import 'package:postgres/postgres.dart';
 
 import '../../../lib/ai/battle_engine_config.dart';
 import '../../../lib/ai/battle_learning_evidence_support.dart';
+import '../../../lib/ai/battle_simulation_request_support.dart';
 import '../../../lib/ai/forge_battle_client.dart';
 import '../../../lib/ai/goldfish_simulator.dart';
 import '../../../lib/ai/native_battle_client.dart';
 import '../../../lib/ai/xmage_battle_client.dart';
 import '../../../lib/http_responses.dart';
+import '../../../lib/json_object_support.dart';
 import '../../../lib/logger.dart';
 import '../../../lib/observability.dart';
 
-const _publicBattleDefaultTimeoutMs = 40000;
-const _publicBattleMaximumTimeoutMs = 40000;
 const _externalClientGraceMs = 8000;
 
 /// POST /ai/simulate
@@ -43,18 +43,19 @@ Future<Response> onRequest(RequestContext context) async {
 
   try {
     final body = await context.request.body();
-    final data = jsonDecode(body) as Map<String, dynamic>;
+    final data = requireJsonObject(jsonDecode(body));
 
-    final deckId = data['deck_id'] as String?;
+    final routeRequest = parseBattleSimulationRequest(data);
+    if (routeRequest.validationError != null) {
+      return badRequest(routeRequest.validationError!);
+    }
+    final deckId = routeRequest.deckId;
     if (deckId == null || deckId.isEmpty) {
       return badRequest('deck_id is required');
     }
 
-    final simType = (data['type'] as String?) ?? 'goldfish';
-    final simCount = _normalizedSimulationCount(
-      data['simulations'],
-      defaultValue: 1000,
-    );
+    final simType = routeRequest.type;
+    final simCount = routeRequest.simulations;
 
     // Busca cartas do deck principal sempre dentro do escopo do usuário.
     final deckCards = await _fetchDeckCards(pool, deckId, userId: userId);
@@ -63,7 +64,7 @@ Future<Response> onRequest(RequestContext context) async {
     }
 
     if (simType == 'battle') {
-      final opponentId = data['opponent_deck_id'] as String?;
+      final opponentId = routeRequest.opponentDeckId;
       if (opponentId == null || opponentId.isEmpty) {
         return badRequest('opponent_deck_id is required for battle simulation');
       }
@@ -90,15 +91,14 @@ Future<Response> onRequest(RequestContext context) async {
       final strictXmage = engineConfig.isStrictXmage;
       final strictForge = engineConfig.isStrictForge;
       final seed =
-          data['seed'] is int
-              ? data['seed'] as int
-              : DateTime.now().microsecondsSinceEpoch % 2147483647;
-      final timeoutMs = _normalizedSimulationCount(
-        data['timeout_ms'],
-        defaultValue: _publicBattleDefaultTimeoutMs,
-        min: 1000,
-        max: _publicBattleMaximumTimeoutMs,
-      );
+          routeRequest.seed ??
+          DateTime.now().microsecondsSinceEpoch % 2147483647;
+      final timeoutMs = routeRequest.timeoutMs;
+      data['max_turns'] = routeRequest.maxTurns;
+      data['focus_cards'] = routeRequest.focusCards;
+      data['force_focus_access_mode'] = routeRequest.forceFocusAccessMode;
+      data['same_lane'] = routeRequest.sameLane;
+      data['natural_sample'] = routeRequest.naturalSample;
       final externalRequest = {
         'request_id': 'api-${DateTime.now().microsecondsSinceEpoch}',
         'seed': seed,
@@ -230,7 +230,7 @@ Future<Response> onRequest(RequestContext context) async {
       );
     } else if (simType == 'matchup') {
       // Análise heurística de matchup
-      final opponentId = data['opponent_deck_id'] as String?;
+      final opponentId = routeRequest.opponentDeckId;
       if (opponentId == null || opponentId.isEmpty) {
         return badRequest(
           'opponent_deck_id is required for matchup simulation',
@@ -283,6 +283,9 @@ Future<Response> onRequest(RequestContext context) async {
         body: {'type': 'goldfish', 'deck_id': deckId, ...result.toJson()},
       );
     }
+  } on JsonObjectValidationException catch (e) {
+    Log.w('[ai-simulate] invalid request type=${e.runtimeType}');
+    return badRequest(e.message);
   } on FormatException catch (e) {
     Log.w('[ai-simulate] invalid JSON type=${e.runtimeType}');
     return badRequest('Invalid JSON: ${e.message}');
@@ -296,16 +299,6 @@ Future<Response> onRequest(RequestContext context) async {
     );
     return internalServerError('Internal server error');
   }
-}
-
-int _normalizedSimulationCount(
-  Object? value, {
-  required int defaultValue,
-  int min = 1,
-  int max = 5000,
-}) {
-  final parsed = value is int ? value : defaultValue;
-  return parsed.clamp(min, max);
 }
 
 /// Busca cartas de um deck com todos os dados necessários

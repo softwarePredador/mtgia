@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:postgres/postgres.dart';
 
@@ -29,7 +30,11 @@ Map<String, dynamic> buildOptimizationAnalysisLogEntry({
   required List<Map<String, dynamic>> deterministicSwapCandidates,
   required String cacheKey,
   required int executionTimeMs,
+  String? validationRunToken,
 }) {
+  final normalizedValidationRunToken = _normalizeValidationRunToken(
+    validationRunToken,
+  );
   final beforeTypes =
       (deckAnalysis['type_distribution'] as Map?)?.cast<String, dynamic>() ??
       const <String, dynamic>{};
@@ -97,6 +102,10 @@ Map<String, dynamic> buildOptimizationAnalysisLogEntry({
     'edhrec_not_validated_count': 0,
     'validation_warnings': validationWarnings,
     'decisions_reasoning': {
+      if (normalizedValidationRunToken != null)
+        'validation_run_token': normalizedValidationRunToken,
+      'deck_id': deckId,
+      if (userId != null && userId.trim().isNotEmpty) 'user_id': userId.trim(),
       'status_code': statusCode,
       'requested_mode': requestedMode,
       'response_mode': operationMode,
@@ -170,6 +179,7 @@ Future<void> recordOptimizeAnalysisOutcome({
   required List<Map<String, dynamic>> deterministicSwapCandidates,
   required String cacheKey,
   required int executionTimeMs,
+  String? validationRunToken,
 }) async {
   try {
     final entry = buildOptimizationAnalysisLogEntry(
@@ -196,6 +206,9 @@ Future<void> recordOptimizeAnalysisOutcome({
       deterministicSwapCandidates: deterministicSwapCandidates,
       cacheKey: cacheKey,
       executionTimeMs: executionTimeMs,
+      validationRunToken:
+          validationRunToken ??
+          Platform.environment['MANALOOM_E2E_VALIDATION_RUN_TOKEN'],
     );
 
     await pool.execute(
@@ -264,6 +277,13 @@ Future<void> recordOptimizeAnalysisOutcome({
       'Falha ao persistir optimization_analysis_logs type=${e.runtimeType}',
     );
   }
+}
+
+String? _normalizeValidationRunToken(String? raw) {
+  final normalized = raw?.trim();
+  if (normalized == null || normalized.isEmpty) return null;
+  if (!RegExp(r'^[A-Za-z0-9_-]{1,160}$').hasMatch(normalized)) return null;
+  return normalized;
 }
 
 int? _extractDeckCardCount(Map<String, dynamic>? analysis) {

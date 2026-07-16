@@ -102,7 +102,7 @@ class _LifeCounterNativeSettingsSheetState
                             ),
                             SizedBox(height: 6),
                             Text(
-                              'ManaLoom now owns this shell surface while the Lotus tabletop stays unchanged.',
+                              'Customize rules, counters, and table controls.',
                               style: TextStyle(
                                 color: AppTheme.textSecondary,
                                 fontSize: AppTheme.fontMd,

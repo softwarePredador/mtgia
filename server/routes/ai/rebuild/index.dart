@@ -4,10 +4,12 @@ import 'package:dart_frog/dart_frog.dart';
 import 'package:postgres/postgres.dart';
 
 import '../../../lib/ai/rebuild_guided_service.dart';
+import '../../../lib/ai/rebuild_route_request_support.dart';
 import '../../../lib/ai/deck_state_analysis.dart';
 import '../../../lib/color_identity.dart';
 import '../../../lib/deck_rules_service.dart';
 import '../../../lib/http_responses.dart';
+import '../../../lib/json_object_support.dart';
 import '../../../lib/logger.dart';
 import '../../../lib/observability.dart';
 
@@ -21,35 +23,29 @@ Future<Response> onRequest(RequestContext context) async {
 
   Map<String, dynamic> body;
   try {
-    body = await context.request.json() as Map<String, dynamic>;
+    body = requireJsonObject(await context.request.json());
+  } on JsonObjectValidationException catch (error) {
+    return badRequest('${error.message}.');
   } catch (_) {
     return badRequest('JSON invalido.');
   }
 
-  final deckId = body['deck_id']?.toString().trim() ?? '';
+  final routeRequest = parseRebuildRouteRequest(body);
+  if (routeRequest.validationError != null) {
+    return badRequest(routeRequest.validationError!);
+  }
+  final deckId = routeRequest.deckId ?? '';
   if (deckId.isEmpty) {
     return badRequest('deck_id is required.');
   }
 
-  final requestedTheme = body['theme']?.toString();
-  final requestedArchetype = body['archetype']?.toString();
-  final requestedScope =
-      (body['rebuild_scope']?.toString().trim().toLowerCase() ?? 'auto');
-  final saveMode =
-      (body['save_mode']?.toString().trim().toLowerCase() ?? 'draft_clone');
-  final bracketRaw = body['bracket'];
-  final bracket =
-      bracketRaw is int ? bracketRaw : int.tryParse('${bracketRaw ?? ''}');
-  final mustKeep =
-      (body['must_keep'] as List?)
-          ?.map((entry) => entry.toString())
-          .toList(growable: false) ??
-      const <String>[];
-  final mustAvoid =
-      (body['must_avoid'] as List?)
-          ?.map((entry) => entry.toString())
-          .toList(growable: false) ??
-      const <String>[];
+  final requestedTheme = routeRequest.theme;
+  final requestedArchetype = routeRequest.archetype;
+  final requestedScope = routeRequest.scope;
+  final saveMode = routeRequest.saveMode;
+  final bracket = routeRequest.bracket;
+  final mustKeep = routeRequest.mustKeep;
+  final mustAvoid = routeRequest.mustAvoid;
 
   if (saveMode != 'draft_clone' && saveMode != 'preview_only') {
     return badRequest('save_mode must be draft_clone or preview_only.');

@@ -3,9 +3,10 @@
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:dotenv/dotenv.dart';
 import 'package:http/http.dart' as http;
 import 'package:postgres/postgres.dart';
+
+import '../lib/runtime_environment.dart';
 
 /// Sync de preços via MTGJSON - VERSÃO OTIMIZADA v2
 ///
@@ -50,8 +51,7 @@ Notas:
     return;
   }
 
-  final env = DotEnv(quiet: true)..load();
-  env.addAll(Platform.environment);
+  final env = loadRuntimeEnvironment();
   final connection = await Connection.open(
     Endpoint(
       host: env['DB_HOST'] ?? 'localhost',
@@ -341,8 +341,9 @@ Future<bool> _tryJqParse(
 
     var parsed = 0;
     var matched = 0;
-    final lines =
-        process.stdout.transform(utf8.decoder).transform(const LineSplitter());
+    final lines = process.stdout
+        .transform(utf8.decoder)
+        .transform(const LineSplitter());
 
     await for (final line in lines) {
       parsed++;
@@ -448,8 +449,8 @@ double? _getPriceFrom(Map<String, dynamic> paper, String provider) {
 
 double? _getLatestPrice(Map<String, dynamic> pricesByDate) {
   if (pricesByDate.isEmpty) return null;
-  final sorted = pricesByDate.entries.toList()
-    ..sort((a, b) => b.key.compareTo(a.key));
+  final sorted =
+      pricesByDate.entries.toList()..sort((a, b) => b.key.compareTo(a.key));
   final value = sorted.first.value;
   if (value is num) return value.toDouble();
   if (value is String) return double.tryParse(value);

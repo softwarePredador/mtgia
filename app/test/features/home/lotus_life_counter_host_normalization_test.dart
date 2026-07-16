@@ -113,6 +113,12 @@ void main() {
               LifeCounterPlayerSpecialState.none,
               LifeCounterPlayerSpecialState.none,
             ],
+            playerEliminationReasons: [
+              LifeCounterPlayerEliminationReason.none,
+              LifeCounterPlayerEliminationReason.life,
+              LifeCounterPlayerEliminationReason.none,
+              LifeCounterPlayerEliminationReason.none,
+            ],
             lastPlayerRolls: [null, null, null, null],
             lastHighRolls: [null, null, null, null],
             commanderDamage: [
@@ -275,7 +281,7 @@ void main() {
 
         final session = await LifeCounterSessionStore().load();
         expect(session, isNotNull);
-        expect(session!.lives[1], 0);
+        expect(session!.lives[1], -5);
         expect(session.monarchPlayer, isNull);
         expect(host.loadBundleCallCount, 2);
       },
@@ -367,7 +373,7 @@ void main() {
 
         final session = await LifeCounterSessionStore().load();
         expect(session, isNotNull);
-        expect(session!.lives[2], 0);
+        expect(session!.lives[2], -5);
         expect(session.currentTurnPlayerIndex, 3);
         expect(session.firstPlayerIndex, 3);
         expect(session.currentTurnNumber, 4);

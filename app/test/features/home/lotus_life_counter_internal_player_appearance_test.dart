@@ -253,10 +253,11 @@ void main() {
           logs.any(
             (message) =>
                 message.contains('message=native_player_appearance_applied') &&
-                message.contains('apply_strategy: reload_fallback') &&
+                message.contains('apply_strategy: canonical_reload') &&
                 message.contains('live_patch_eligible: false') &&
                 message.contains('reload_required: true') &&
-                message.contains('sync_blockers: [nickname_changed]'),
+                message.contains('surface_reset_strategy: bundle_reload') &&
+                message.contains('sync_blockers: []'),
           ),
           isTrue,
         );
@@ -348,7 +349,7 @@ void main() {
     });
 
     testWidgets(
-      'keeps solid player appearance live through the player state hub without reloading the Lotus bundle',
+      'reloads canonical solid player appearance applied through the player state hub',
       (tester) async {
         late _FakeLotusHost host;
         await tester.binding.setSurfaceSize(const Size(900, 1200));
@@ -440,15 +441,25 @@ void main() {
           final session = await LifeCounterSessionStore().load();
           expect(session, isNotNull);
           expect(session!.resolvedPlayerAppearances[1].background, '#CF7AEF');
-          expect(host.loadBundleCallCount, 1);
+          expect(host.loadBundleCallCount, 2);
+          expect(
+            host.executedScripts.any(
+              (script) =>
+                  script.contains('receivePatch') ||
+                  script.contains("document.querySelectorAll('.player-card')"),
+            ),
+            isFalse,
+          );
           expect(
             logs.any(
               (message) =>
                   message.contains('message=native_player_state_applied') &&
-                  message.contains('apply_strategy: live_runtime') &&
-                  message.contains('live_patch_eligible: true') &&
-                  message.contains('reload_required: false') &&
-                  message.contains('sync_blockers: []'),
+                  message.contains('apply_strategy: reload_fallback') &&
+                  message.contains('live_patch_eligible: false') &&
+                  message.contains('reload_required: true') &&
+                  message.contains(
+                    'sync_blockers: [runtime_model_reload_required]',
+                  ),
             ),
             isTrue,
           );
@@ -457,7 +468,7 @@ void main() {
     );
 
     testWidgets(
-      'resets the Lotus option-card surface after solid player appearance live apply from player state takeover',
+      'reloads the Lotus option-card surface after solid appearance changes in player state',
       (tester) async {
         late _FakeLotusHost host;
         await tester.binding.setSurfaceSize(const Size(900, 1200));
@@ -549,22 +560,27 @@ void main() {
           final session = await LifeCounterSessionStore().load();
           expect(session, isNotNull);
           expect(session!.resolvedPlayerAppearances[1].background, '#CF7AEF');
-          expect(host.loadBundleCallCount, 1);
+          expect(host.loadBundleCallCount, 2);
           expect(
             host.executedScripts.any(
-              (script) => script.contains('.player-card-inner.option-card'),
+              (script) =>
+                  script.contains('receivePatch') ||
+                  script.contains('.player-card-inner.option-card'),
             ),
-            isTrue,
+            isFalse,
           );
           expect(
             logs.any(
               (message) =>
                   message.contains('message=native_player_state_applied') &&
-                  message.contains('apply_strategy: live_runtime') &&
-                  message.contains('reload_required: false') &&
+                  message.contains('apply_strategy: reload_fallback') &&
+                  message.contains('live_patch_eligible: false') &&
+                  message.contains('reload_required: true') &&
                   message.contains('surface_reset_required: true') &&
-                  message.contains('surface_reset_strategy: live_dom_reset') &&
-                  message.contains('sync_blockers: []'),
+                  message.contains('surface_reset_strategy: bundle_reload') &&
+                  message.contains(
+                    'sync_blockers: [runtime_model_reload_required]',
+                  ),
             ),
             isTrue,
           );
@@ -1240,12 +1256,11 @@ void main() {
           logs.any(
             (message) =>
                 message.contains('message=native_player_appearance_applied') &&
-                message.contains('apply_strategy: reload_fallback') &&
+                message.contains('apply_strategy: canonical_reload') &&
                 message.contains('live_patch_eligible: false') &&
                 message.contains('reload_required: true') &&
-                message.contains(
-                  'sync_blockers: [background_image_present, partner_background_image_present]',
-                ),
+                message.contains('surface_reset_strategy: bundle_reload') &&
+                message.contains('sync_blockers: []'),
           ),
           isTrue,
         );
@@ -1403,7 +1418,7 @@ void main() {
     );
 
     testWidgets(
-      'keeps solid player appearance live when applying from color-card takeover',
+      'reloads canonical solid player appearance from color-card takeover',
       (tester) async {
         late _FakeLotusHost host;
         await tester.binding.setSurfaceSize(const Size(900, 1200));
@@ -1440,20 +1455,20 @@ void main() {
 
           await tester.scrollUntilVisible(
             find.byKey(
-              const Key('life-counter-native-player-appearance-preset-2'),
+              const Key('life-counter-native-player-appearance-preset-3'),
             ),
             250,
             scrollable: find.byType(Scrollable).first,
           );
           await tester.ensureVisible(
             find.byKey(
-              const Key('life-counter-native-player-appearance-preset-2'),
+              const Key('life-counter-native-player-appearance-preset-3'),
             ),
           );
           await tester.pumpAndSettle();
           await tester.tap(
             find.byKey(
-              const Key('life-counter-native-player-appearance-preset-2'),
+              const Key('life-counter-native-player-appearance-preset-3'),
             ),
           );
           await tester.pumpAndSettle();
@@ -1467,11 +1482,27 @@ void main() {
 
           final session = await LifeCounterSessionStore().load();
           expect(session, isNotNull);
-          expect(session!.resolvedPlayerAppearances[2].background, '#CF7AEF');
-          expect(host.loadBundleCallCount, 1);
+          expect(session!.resolvedPlayerAppearances[2].background, '#4B57FF');
+          expect(host.loadBundleCallCount, 2);
           expect(
             host.executedScripts.any(
-              (script) => script.contains('.player-card-inner.option-card'),
+              (script) =>
+                  script.contains('receivePatch') ||
+                  script.contains('.player-card-inner.option-card'),
+            ),
+            isFalse,
+          );
+          expect(
+            logs.any(
+              (message) =>
+                  message.contains(
+                    'message=native_player_appearance_applied',
+                  ) &&
+                  message.contains('apply_strategy: canonical_reload') &&
+                  message.contains('live_patch_eligible: false') &&
+                  message.contains('reload_required: true') &&
+                  message.contains('surface_reset_strategy: bundle_reload') &&
+                  message.contains('sync_blockers: []'),
             ),
             isTrue,
           );

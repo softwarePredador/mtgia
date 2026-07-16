@@ -134,16 +134,22 @@ void main() {
         {},
         {},
       ]);
-      expect(session.resolvedPlayerAppearances[0], const LifeCounterPlayerAppearance(
-        background: '#123456',
-        nickname: 'Archenemy',
-        backgroundImage: 'indexeddb://imageDatabase/images/10',
-      ));
-      expect(session.resolvedPlayerAppearances[1], const LifeCounterPlayerAppearance(
-        background: '#654321',
-        nickname: '',
-        backgroundImagePartner: 'indexeddb://imageDatabase/images/11',
-      ));
+      expect(
+        session.resolvedPlayerAppearances[0],
+        const LifeCounterPlayerAppearance(
+          background: '#123456',
+          nickname: 'Archenemy',
+          backgroundImage: 'indexeddb://imageDatabase/images/10',
+        ),
+      );
+      expect(
+        session.resolvedPlayerAppearances[1],
+        const LifeCounterPlayerAppearance(
+          background: '#654321',
+          nickname: '',
+          backgroundImagePartner: 'indexeddb://imageDatabase/images/11',
+        ),
+      );
       expect(session.partnerCommanders, const [false, true, false, false]);
       expect(session.playerSpecialStates, const [
         LifeCounterPlayerSpecialState.none,
@@ -175,6 +181,73 @@ void main() {
       expect(session.lastHighRolls, const [17, 8, null, 19]);
     });
 
+    test(
+      'prefers current Lotus appearance fields and uses auxiliary state only for missing fields',
+      () {
+        final snapshot = LotusStorageSnapshot(
+          values: {
+            'playerCount': '2',
+            '__manaloom_player_appearances': jsonEncode([
+              {
+                'background': '#111111',
+                'nickname': 'Auxiliary One',
+                'background_image': 'auxiliary-main-one',
+                'background_image_partner': 'auxiliary-partner-one',
+              },
+              {
+                'background': '#222222',
+                'nickname': 'Auxiliary Two',
+                'background_image': 'auxiliary-main-two',
+                'background_image_partner': 'auxiliary-partner-two',
+              },
+            ]),
+            'players': jsonEncode([
+              {
+                'name': 'Player 1',
+                'nickname': 'Current One',
+                'life': 20,
+                'background': '#AAAAAA',
+                'backgroundImage': false,
+                'backgroundImagePartner': 'current-partner-one',
+                'alive': true,
+                'partnerCommander': false,
+                'counters': <String, Object?>{},
+                'commanderDamage': <Object?>[],
+              },
+              {
+                'name': 'Player 2',
+                'life': 20,
+                'background': '#BBBBBB',
+                'alive': true,
+                'partnerCommander': false,
+                'counters': <String, Object?>{},
+                'commanderDamage': <Object?>[],
+              },
+            ]),
+          },
+        );
+
+        final session = LotusLifeCounterSessionAdapter.tryBuildSession(
+          snapshot,
+        );
+
+        expect(session, isNotNull);
+        expect(session!.resolvedPlayerAppearances, const [
+          LifeCounterPlayerAppearance(
+            background: '#AAAAAA',
+            nickname: 'Current One',
+            backgroundImagePartner: 'current-partner-one',
+          ),
+          LifeCounterPlayerAppearance(
+            background: '#BBBBBB',
+            nickname: 'Auxiliary Two',
+            backgroundImage: 'auxiliary-main-two',
+            backgroundImagePartner: 'auxiliary-partner-two',
+          ),
+        ]);
+      },
+    );
+
     test('returns null for snapshots without players payload', () {
       const snapshot = LotusStorageSnapshot(values: {'playerCount': '4'});
 
@@ -182,6 +255,75 @@ void main() {
 
       expect(session, isNull);
     });
+
+    test(
+      'preserves explicitly present zero counters without materializing absent keys',
+      () {
+        final snapshot = LotusStorageSnapshot(
+          values: {
+            'playerCount': '2',
+            'startingLife2P': '20',
+            'startingLifeMP': '40',
+            'players': jsonEncode([
+              {
+                'name': 'Player 1',
+                'life': 20,
+                'alive': true,
+                'partnerCommander': false,
+                'counters': {'energy': 0, 'xp': 0, 'tax-1': 0, 'charge': 0},
+                'commanderDamage': [],
+              },
+              {
+                'name': 'Player 2',
+                'life': 20,
+                'alive': true,
+                'partnerCommander': false,
+                'counters': {'poison': 0, 'tax-2': 0},
+                'commanderDamage': [],
+              },
+            ]),
+          },
+        );
+
+        final session = LotusLifeCounterSessionAdapter.tryBuildSession(
+          snapshot,
+        );
+
+        expect(session, isNotNull);
+        expect(session!.resolvedPlayerCounterPresence, const [
+          ['energy', 'xp', 'tax-1'],
+          ['poison', 'tax-2'],
+        ]);
+
+        for (final values in [
+          LotusLifeCounterSessionAdapter.buildSnapshotValues(session),
+          LotusLifeCounterSessionAdapter.buildPlayerRuntimeSnapshotValues(
+            session,
+          ),
+        ]) {
+          final players = jsonDecode(values['players']!) as List<dynamic>;
+          final firstCounters =
+              (players[0] as Map<String, dynamic>)['counters']
+                  as Map<String, dynamic>;
+          final secondCounters =
+              (players[1] as Map<String, dynamic>)['counters']
+                  as Map<String, dynamic>;
+
+          expect(firstCounters, containsPair('energy', 0));
+          expect(firstCounters, containsPair('xp', 0));
+          expect(firstCounters, containsPair('tax-1', 0));
+          expect(firstCounters, containsPair('charge', 0));
+          expect(firstCounters, isNot(contains('poison')));
+          expect(firstCounters, isNot(contains('tax-2')));
+
+          expect(secondCounters, containsPair('poison', 0));
+          expect(secondCounters, containsPair('tax-2', 0));
+          expect(secondCounters, isNot(contains('energy')));
+          expect(secondCounters, isNot(contains('xp')));
+          expect(secondCounters, isNot(contains('tax-1')));
+        }
+      },
+    );
 
     test('serializes canonical session back into Lotus-compatible storage', () {
       final values = LotusLifeCounterSessionAdapter.buildSnapshotValues(
@@ -400,6 +542,38 @@ void main() {
       );
     });
 
+    test('round-trips the latest native table event through Lotus state', () {
+      final session = LifeCounterSession.initial(
+        playerCount: 4,
+      ).copyWith(lastTableEvent: 'Moeda: Cara');
+
+      final fullValues = LotusLifeCounterSessionAdapter.buildSnapshotValues(
+        session,
+      );
+      final runtimeValues =
+          LotusLifeCounterSessionAdapter.buildPlayerRuntimeSnapshotValues(
+            session,
+          );
+      final rebuiltFromFull = LotusLifeCounterSessionAdapter.tryBuildSession(
+        LotusStorageSnapshot(values: fullValues),
+      );
+      final rebuiltAfterRuntime =
+          LotusLifeCounterSessionAdapter.tryBuildSession(
+            LotusStorageSnapshot(values: {...fullValues, ...runtimeValues}),
+          );
+
+      expect(
+        jsonDecode(fullValues['__manaloom_table_state']!)['lastTableEvent'],
+        'Moeda: Cara',
+      );
+      expect(
+        jsonDecode(runtimeValues['__manaloom_table_state']!)['lastTableEvent'],
+        'Moeda: Cara',
+      );
+      expect(rebuiltFromFull?.lastTableEvent, 'Moeda: Cara');
+      expect(rebuiltAfterRuntime?.lastTableEvent, 'Moeda: Cara');
+    });
+
     test('normalizes turn tracker bootstrap to the next alive player', () {
       final values = LotusLifeCounterSessionAdapter.buildSnapshotValues(
         const LifeCounterSession(
@@ -417,6 +591,12 @@ void main() {
             LifeCounterPlayerSpecialState.deckedOut,
             LifeCounterPlayerSpecialState.answerLeft,
             LifeCounterPlayerSpecialState.none,
+          ],
+          playerEliminationReasons: [
+            LifeCounterPlayerEliminationReason.none,
+            LifeCounterPlayerEliminationReason.none,
+            LifeCounterPlayerEliminationReason.none,
+            LifeCounterPlayerEliminationReason.poison,
           ],
           lastPlayerRolls: [null, null, null, null],
           lastHighRolls: [null, null, null, null],
@@ -449,45 +629,52 @@ void main() {
     });
 
     test('skips lethal players when serializing turn tracker payloads', () {
-      final values = LotusLifeCounterSessionAdapter.buildTurnTrackerSnapshotValues(
-        const LifeCounterSession(
-          playerCount: 4,
-          startingLifeTwoPlayer: 20,
-          startingLifeMultiPlayer: 40,
-          lives: [0, 40, 40, 40],
-          poison: [0, 0, 0, 0],
-          energy: [0, 0, 0, 0],
-          experience: [0, 0, 0, 0],
-          commanderCasts: [0, 0, 0, 0],
-          partnerCommanders: [false, false, false, false],
-          playerSpecialStates: [
-            LifeCounterPlayerSpecialState.none,
-            LifeCounterPlayerSpecialState.none,
-            LifeCounterPlayerSpecialState.none,
-            LifeCounterPlayerSpecialState.none,
-          ],
-          lastPlayerRolls: [null, null, null, null],
-          lastHighRolls: [null, null, null, null],
-          commanderDamage: [
-            [0, 0, 0, 0],
-            [0, 0, 0, 0],
-            [0, 0, 0, 0],
-            [0, 0, 0, 0],
-          ],
-          stormCount: 0,
-          monarchPlayer: null,
-          initiativePlayer: null,
-          firstPlayerIndex: 0,
-          turnTrackerActive: true,
-          turnTrackerOngoingGame: true,
-          turnTrackerAutoHighRoll: false,
-          currentTurnPlayerIndex: 0,
-          currentTurnNumber: 1,
-          turnTimerActive: false,
-          turnTimerSeconds: 0,
-          lastTableEvent: null,
-        ),
-      );
+      final values =
+          LotusLifeCounterSessionAdapter.buildTurnTrackerSnapshotValues(
+            const LifeCounterSession(
+              playerCount: 4,
+              startingLifeTwoPlayer: 20,
+              startingLifeMultiPlayer: 40,
+              lives: [0, 40, 40, 40],
+              poison: [0, 0, 0, 0],
+              energy: [0, 0, 0, 0],
+              experience: [0, 0, 0, 0],
+              commanderCasts: [0, 0, 0, 0],
+              partnerCommanders: [false, false, false, false],
+              playerSpecialStates: [
+                LifeCounterPlayerSpecialState.none,
+                LifeCounterPlayerSpecialState.none,
+                LifeCounterPlayerSpecialState.none,
+                LifeCounterPlayerSpecialState.none,
+              ],
+              playerEliminationReasons: [
+                LifeCounterPlayerEliminationReason.life,
+                LifeCounterPlayerEliminationReason.none,
+                LifeCounterPlayerEliminationReason.none,
+                LifeCounterPlayerEliminationReason.none,
+              ],
+              lastPlayerRolls: [null, null, null, null],
+              lastHighRolls: [null, null, null, null],
+              commanderDamage: [
+                [0, 0, 0, 0],
+                [0, 0, 0, 0],
+                [0, 0, 0, 0],
+                [0, 0, 0, 0],
+              ],
+              stormCount: 0,
+              monarchPlayer: null,
+              initiativePlayer: null,
+              firstPlayerIndex: 0,
+              turnTrackerActive: true,
+              turnTrackerOngoingGame: true,
+              turnTrackerAutoHighRoll: false,
+              currentTurnPlayerIndex: 0,
+              currentTurnNumber: 1,
+              turnTimerActive: false,
+              turnTimerSeconds: 0,
+              lastTableEvent: null,
+            ),
+          );
 
       final turnTracker =
           jsonDecode(values['turnTracker']!) as Map<String, dynamic>;
@@ -497,7 +684,7 @@ void main() {
     });
 
     test(
-      'keeps Lotus-safe tracker indices while preserving null canonical pointers when no players are active',
+      'stops tracker while preserving null canonical pointers when no players are active',
       () {
         final values = LotusLifeCounterSessionAdapter.buildSnapshotValues(
           const LifeCounterSession(
@@ -515,6 +702,12 @@ void main() {
               LifeCounterPlayerSpecialState.none,
               LifeCounterPlayerSpecialState.none,
               LifeCounterPlayerSpecialState.none,
+            ],
+            playerEliminationReasons: [
+              LifeCounterPlayerEliminationReason.life,
+              LifeCounterPlayerEliminationReason.life,
+              LifeCounterPlayerEliminationReason.life,
+              LifeCounterPlayerEliminationReason.life,
             ],
             lastPlayerRolls: [null, null, null, null],
             lastHighRolls: [null, null, null, null],
@@ -548,7 +741,7 @@ void main() {
           LotusStorageSnapshot(values: values),
         );
 
-        expect(turnTracker['isActive'], isTrue);
+        expect(turnTracker['isActive'], isFalse);
         expect(turnTracker['startingPlayerIndex'], 2);
         expect(turnTracker['currentPlayerIndex'], 2);
         expect(tableState['firstPlayerIndex'], isNull);
@@ -558,7 +751,7 @@ void main() {
       },
     );
 
-    test('falls back to answer-left when Lotus only exposes alive false', () {
+    test('derives life elimination when Lotus exposes alive false at zero', () {
       final snapshot = LotusStorageSnapshot(
         values: {
           'playerCount': '2',
@@ -591,8 +784,185 @@ void main() {
       expect(session, isNotNull);
       expect(session!.playerSpecialStates, const [
         LifeCounterPlayerSpecialState.none,
-        LifeCounterPlayerSpecialState.answerLeft,
+        LifeCounterPlayerSpecialState.none,
       ]);
+      expect(session.resolvedPlayerEliminationReasons, const [
+        LifeCounterPlayerEliminationReason.none,
+        LifeCounterPlayerEliminationReason.life,
+      ]);
+    });
+
+    test(
+      'derives poison and individual commander causes before answer-left fallback',
+      () {
+        final snapshot = LotusStorageSnapshot(
+          values: {
+            'playerCount': '4',
+            'startingLife2P': '20',
+            'startingLifeMP': '40',
+            'layoutType': jsonEncode('portrait-portrait-portrait-portrait'),
+            'players': jsonEncode([
+              {
+                'name': 'Player 1',
+                'life': 0,
+                'alive': false,
+                'partnerCommander': false,
+                'counters': <String, Object?>{},
+                'commanderDamage': <Object?>[],
+              },
+              {
+                'name': 'Player 2',
+                'life': 40,
+                'alive': false,
+                'partnerCommander': false,
+                'counters': {'poison': 10},
+                'commanderDamage': <Object?>[],
+              },
+              {
+                'name': 'Player 3',
+                'life': 40,
+                'alive': false,
+                'partnerCommander': false,
+                'counters': <String, Object?>{},
+                'commanderDamage': [
+                  {
+                    'player': 'Player 4',
+                    'damage': {'commander1': 21},
+                  },
+                ],
+              },
+              {
+                'name': 'Player 4',
+                'life': 40,
+                'alive': false,
+                'partnerCommander': false,
+                'counters': <String, Object?>{},
+                'commanderDamage': <Object?>[],
+              },
+            ]),
+          },
+        );
+
+        final session = LotusLifeCounterSessionAdapter.tryBuildSession(
+          snapshot,
+        );
+
+        expect(session, isNotNull);
+        expect(session!.resolvedPlayerEliminationReasons, const [
+          LifeCounterPlayerEliminationReason.life,
+          LifeCounterPlayerEliminationReason.poison,
+          LifeCounterPlayerEliminationReason.commanderDamage,
+          LifeCounterPlayerEliminationReason.none,
+        ]);
+        expect(session.playerSpecialStates, const [
+          LifeCounterPlayerSpecialState.none,
+          LifeCounterPlayerSpecialState.none,
+          LifeCounterPlayerSpecialState.none,
+          LifeCounterPlayerSpecialState.answerLeft,
+        ]);
+      },
+    );
+
+    test('does not infer commander lethal by summing partner commanders', () {
+      final snapshot = LotusStorageSnapshot(
+        values: {
+          'playerCount': '2',
+          'startingLife2P': '20',
+          'startingLifeMP': '40',
+          'layoutType': jsonEncode('portrait-portrait'),
+          'players': jsonEncode([
+            {
+              'name': 'Player 1',
+              'life': 20,
+              'alive': false,
+              'partnerCommander': false,
+              'counters': <String, Object?>{},
+              'commanderDamage': [
+                {
+                  'player': 'Player 2',
+                  'damage': {'commander1': 12, 'commander2': 9},
+                },
+              ],
+            },
+            {
+              'name': 'Player 2',
+              'life': 20,
+              'alive': true,
+              'partnerCommander': true,
+              'counters': <String, Object?>{},
+              'commanderDamage': <Object?>[],
+            },
+          ]),
+        },
+      );
+
+      final session = LotusLifeCounterSessionAdapter.tryBuildSession(snapshot);
+
+      expect(session, isNotNull);
+      expect(
+        session!.resolvedPlayerEliminationReasons[0],
+        LifeCounterPlayerEliminationReason.none,
+      );
+      expect(
+        session.playerSpecialStates[0],
+        LifeCounterPlayerSpecialState.answerLeft,
+      );
+    });
+
+    test('round-trips explicit elimination causes through Lotus storage', () {
+      final initial = LifeCounterSession.initial(playerCount: 4).copyWith(
+        lives: const [40, 40, 40, 40],
+        poison: const [0, 10, 0, 0],
+        commanderDamage: const [
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 21],
+          [0, 0, 0, 0],
+        ],
+        playerSpecialStates: const [
+          LifeCounterPlayerSpecialState.none,
+          LifeCounterPlayerSpecialState.none,
+          LifeCounterPlayerSpecialState.none,
+          LifeCounterPlayerSpecialState.answerLeft,
+        ],
+        playerEliminationReasons: const [
+          LifeCounterPlayerEliminationReason.none,
+          LifeCounterPlayerEliminationReason.poison,
+          LifeCounterPlayerEliminationReason.commanderDamage,
+          LifeCounterPlayerEliminationReason.none,
+        ],
+      );
+
+      final values = LotusLifeCounterSessionAdapter.buildSnapshotValues(
+        initial,
+      );
+      final players = jsonDecode(values['players']!) as List<dynamic>;
+      final encodedReasons =
+          jsonDecode(values['__manaloom_player_elimination_reasons']!)
+              as List<dynamic>;
+      final rebuilt = LotusLifeCounterSessionAdapter.tryBuildSession(
+        LotusStorageSnapshot(values: values),
+      );
+
+      expect((players[0] as Map<String, dynamic>)['alive'], isTrue);
+      expect((players[1] as Map<String, dynamic>)['alive'], isFalse);
+      expect((players[2] as Map<String, dynamic>)['alive'], isFalse);
+      expect((players[3] as Map<String, dynamic>)['alive'], isFalse);
+      expect(encodedReasons, const [
+        'none',
+        'poison',
+        'commander_damage',
+        'none',
+      ]);
+      expect(rebuilt, isNotNull);
+      expect(
+        rebuilt!.resolvedPlayerEliminationReasons,
+        initial.resolvedPlayerEliminationReasons,
+      );
+      expect(rebuilt.playerSpecialStates, initial.playerSpecialStates);
+      expect(rebuilt.lives, initial.lives);
+      expect(rebuilt.poison, initial.poison);
+      expect(rebuilt.commanderDamage, initial.commanderDamage);
     });
   });
 }

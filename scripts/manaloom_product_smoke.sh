@@ -40,7 +40,6 @@ trap cleanup_user EXIT
 
 curl -fsS "$BASE/health" >/tmp/manaloom_product_smoke_health.json
 curl -fsS "$BASE/ready" >/tmp/manaloom_product_smoke_ready.json
-curl -fsS "$BASE/health/commercial" >/tmp/manaloom_product_smoke_commercial.json
 curl -fsS "$WEB/sitemap.xml" >/tmp/manaloom_product_smoke_sitemap.xml
 
 REG="$(jq -n --arg username "$USERNAME" --arg email "$EMAIL" --arg password "$PASSWORD" '{username:$username,email:$email,password:$password}')"

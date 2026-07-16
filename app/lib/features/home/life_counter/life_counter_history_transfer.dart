@@ -11,15 +11,18 @@ class LifeCounterHistoryTransferEntry {
   const LifeCounterHistoryTransferEntry({
     required this.message,
     this.occurredAt,
+    this.rawOccurredAt,
   });
 
   final String message;
   final DateTime? occurredAt;
+  final String? rawOccurredAt;
 
   Map<String, dynamic> toJson() {
     return <String, dynamic>{
       'message': message,
       'occurred_at': occurredAt?.toIso8601String(),
+      'raw_occurred_at': rawOccurredAt,
     };
   }
 
@@ -38,7 +41,16 @@ class LifeCounterHistoryTransferEntry {
       message: message.trim(),
       occurredAt:
           occurredAtRaw is String ? DateTime.tryParse(occurredAtRaw) : null,
+      rawOccurredAt: _readOptionalString(raw['raw_occurred_at']),
     );
+  }
+
+  static String? _readOptionalString(Object? raw) {
+    if (raw is! String) {
+      return null;
+    }
+    final trimmed = raw.trim();
+    return trimmed.isEmpty ? null : trimmed;
   }
 }
 
@@ -49,6 +61,7 @@ class LifeCounterHistoryTransfer {
     required this.exportedAt,
     required this.currentGameEntries,
     required this.archiveEntries,
+    this.archivedGames = const <LifeCounterArchivedGame>[],
     this.archivedGameCount,
     this.currentGameName,
     this.currentGameMeta,
@@ -65,6 +78,7 @@ class LifeCounterHistoryTransfer {
   final String? lastTableEvent;
   final List<LifeCounterHistoryTransferEntry> currentGameEntries;
   final List<LifeCounterHistoryTransferEntry> archiveEntries;
+  final List<LifeCounterArchivedGame> archivedGames;
 
   factory LifeCounterHistoryTransfer.fromSnapshot(
     LifeCounterHistorySnapshot snapshot,
@@ -77,11 +91,13 @@ class LifeCounterHistoryTransfer {
       currentGameMeta: snapshot.currentGameMeta,
       gameCounter: snapshot.gameCounter,
       lastTableEvent: snapshot.lastTableEvent,
+      archivedGames: snapshot.archivedGames,
       currentGameEntries: snapshot.currentGameEntries
           .map(
             (entry) => LifeCounterHistoryTransferEntry(
               message: entry.message,
               occurredAt: entry.occurredAt,
+              rawOccurredAt: entry.rawOccurredAt,
             ),
           )
           .toList(growable: false),
@@ -90,6 +106,7 @@ class LifeCounterHistoryTransfer {
             (entry) => LifeCounterHistoryTransferEntry(
               message: entry.message,
               occurredAt: entry.occurredAt,
+              rawOccurredAt: entry.rawOccurredAt,
             ),
           )
           .toList(growable: false),
@@ -108,6 +125,8 @@ class LifeCounterHistoryTransfer {
       'current_game_entries':
           currentGameEntries.map((e) => e.toJson()).toList(),
       'archive_entries': archiveEntries.map((e) => e.toJson()).toList(),
+      if (archivedGames.isNotEmpty || (archivedGameCount ?? 0) == 0)
+        'archived_games': archivedGames.map((game) => game.toJson()).toList(),
     };
   }
 
@@ -144,22 +163,44 @@ class LifeCounterHistoryTransfer {
 
     final currentGameEntries = _readEntries(raw['current_game_entries']);
     final archiveEntries = _readEntries(raw['archive_entries']);
-    if (currentGameEntries == null || archiveEntries == null) {
+    final hasStructuredArchivedGames = raw.containsKey('archived_games');
+    final archivedGames = _readArchivedGames(raw['archived_games']);
+    if (currentGameEntries == null ||
+        archiveEntries == null ||
+        archivedGames == null) {
       return null;
     }
+
+    final resolvedArchiveEntries =
+        archiveEntries.isNotEmpty
+            ? archiveEntries
+            : archivedGames.reversed
+                .expand(
+                  (game) => game.entries.map(
+                    (entry) => LifeCounterHistoryTransferEntry(
+                      message: entry.message,
+                      occurredAt: entry.occurredAt,
+                      rawOccurredAt: entry.rawOccurredAt,
+                    ),
+                  ),
+                )
+                .toList(growable: false);
+    final archivedGameCount =
+        hasStructuredArchivedGames
+            ? archivedGames.length
+            : _readOptionalArchivedGameCount(raw['archived_game_count']);
 
     return LifeCounterHistoryTransfer(
       version: version,
       exportedAt: exportedAt,
-      archivedGameCount: _readOptionalArchivedGameCount(
-        raw['archived_game_count'],
-      ),
+      archivedGameCount: archivedGameCount,
       currentGameName: _readOptionalString(raw['current_game_name']),
       currentGameMeta: _readCurrentGameMeta(raw['current_game_meta']),
       gameCounter: _readOptionalGameCounter(raw['game_counter']),
       lastTableEvent: _readOptionalString(raw['last_table_event']),
       currentGameEntries: currentGameEntries,
-      archiveEntries: archiveEntries,
+      archiveEntries: resolvedArchiveEntries,
+      archivedGames: archivedGames,
     );
   }
 
@@ -181,6 +222,25 @@ class LifeCounterHistoryTransfer {
     }
 
     return List<LifeCounterHistoryTransferEntry>.unmodifiable(entries);
+  }
+
+  static List<LifeCounterArchivedGame>? _readArchivedGames(Object? raw) {
+    if (raw == null) {
+      return const <LifeCounterArchivedGame>[];
+    }
+    if (raw is! List) {
+      return null;
+    }
+
+    final games = <LifeCounterArchivedGame>[];
+    for (final item in raw) {
+      final game = LifeCounterArchivedGame.tryFromJson(item);
+      if (game == null) {
+        return null;
+      }
+      games.add(game);
+    }
+    return List<LifeCounterArchivedGame>.unmodifiable(games);
   }
 
   static String? _readOptionalString(Object? raw) {

@@ -24,6 +24,8 @@ void main() {
       functional.map((tag) => tag.tag).toSet(),
       equals({
         'artifact_synergy',
+        'engine',
+        'etb',
         'payoff',
         'ramp',
         'sacrifice_outlet',
@@ -41,6 +43,8 @@ void main() {
       candidate.map((tag) => tag.tag).toSet(),
       equals({
         'artifact_synergy',
+        'engine',
+        'etb',
         'payoff',
         'ramp',
         'sacrifice',
@@ -66,12 +70,14 @@ void main() {
         'token': 76,
         'sacrifice': 75,
         'artifact_synergy': 70,
+        'engine': 67,
+        'etb': 67,
         'payoff': 69,
       }),
     );
     expect(
       roles.singleWhere((role) => role.role == 'ramp').bracketScope,
-      'bracket_2_4',
+      'bracket_2_plus',
     );
 
     final semantic = inferSemanticCardAnalysisV2(
@@ -85,6 +91,8 @@ void main() {
       semantic.tags.map((tag) => tag.tag).toSet(),
       equals({
         'artifact_synergy',
+        'engine',
+        'etb',
         'payoff',
         'ramp',
         'sacrifice_outlet',
@@ -95,7 +103,7 @@ void main() {
     expect(semantic.manaEfficiency, 'cheap');
     expect(semantic.cardAdvantageType, 'board_material');
     expect(semantic.interactionScope, 'none');
-    expect(semantic.engine, isFalse);
+    expect(semantic.engine, isTrue);
     expect(semantic.payoff, isTrue);
     expect(semantic.enabler, isTrue);
     expect(semantic.roleConfidence, 0.88);

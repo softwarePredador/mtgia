@@ -918,9 +918,9 @@ String inferCandidateBracketScope({
   if (candidateQualityHighPowerNames.contains(normalizedName) ||
       budgetTier == 'expensive' ||
       role == 'combo_piece' && score >= 60) {
-    return 'bracket_3_4';
+    return 'bracket_3_plus';
   }
-  if (score >= 78) return 'bracket_2_4';
+  if (score >= 78) return 'bracket_2_plus';
   return 'any';
 }
 

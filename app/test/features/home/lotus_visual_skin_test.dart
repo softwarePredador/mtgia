@@ -98,5 +98,119 @@ void main() {
       expect(lotusInjectedVisualSkinScript, contains('white-space: normal'));
       expect(lotusInjectedVisualSkinScript, contains('word-break: break-word'));
     });
+
+    test('keeps the tabletop restrained and touch targets readable', () {
+      expect(lotusInjectedVisualSkinScript, contains('background: #02050b'));
+      expect(lotusInjectedVisualSkinScript, contains('font-size: 11px'));
+      expect(lotusInjectedVisualSkinScript, contains('min-height: 48px'));
+      expect(lotusInjectedVisualSkinScript, contains('height: 64px'));
+      expect(lotusInjectedVisualSkinScript, contains('box-sizing: border-box'));
+      expect(lotusInjectedVisualSkinScript, contains('overflow: hidden'));
+      expect(lotusInjectedVisualSkinScript, contains('box-shadow: none'));
+      expect(lotusInjectedVisualSkinScript, contains('Table preferences'));
+      expect(lotusInjectedVisualSkinScript, contains('Card search'));
+      expect(lotusInjectedVisualSkinScript, contains('label > div'));
+      expect(lotusInjectedVisualSkinScript, contains('72px'));
+      expect(
+        lotusInjectedVisualSkinScript,
+        contains('.game-states-wrapper > *.active'),
+      );
+      expect(
+        RegExp(
+          r':not\(\.background-image\)',
+        ).allMatches(lotusInjectedVisualSkinScript).length,
+        greaterThanOrEqualTo(2),
+      );
+    });
+
+    test('adds live status, dialog metadata and reduced-motion support', () {
+      expect(
+        lotusInjectedVisualSkinScript,
+        contains('__ManaLoomLifeCounterAccessibility'),
+      );
+      expect(lotusInjectedVisualSkinScript, contains("'aria-label'"));
+      expect(lotusInjectedVisualSkinScript, contains("'aria-live', 'polite'"));
+      expect(lotusInjectedVisualSkinScript, contains("'aria-atomic', 'true'"));
+      expect(lotusInjectedVisualSkinScript, contains('decodeVisualNumber'));
+      expect(lotusInjectedVisualSkinScript, contains("startsWith('char-')"));
+      expect(lotusInjectedVisualSkinScript, contains('MutationObserver'));
+      expect(lotusInjectedVisualSkinScript, contains('characterData: true'));
+      expect(lotusInjectedVisualSkinScript, contains("'role', 'dialog'"));
+      expect(lotusInjectedVisualSkinScript, contains("'aria-modal', 'true'"));
+      expect(lotusInjectedVisualSkinScript, contains('.confirm-overlay'));
+      expect(lotusInjectedVisualSkinScript, contains('manaloomKeyboardBound'));
+      expect(lotusInjectedVisualSkinScript, contains('syncDialogFocus'));
+      expect(lotusInjectedVisualSkinScript, contains("'role', 'spinbutton'"));
+      expect(lotusInjectedVisualSkinScript, contains("'aria-valuenow'"));
+      expect(lotusInjectedVisualSkinScript, contains('dispatchAccessibleTap'));
+      expect(
+        lotusInjectedVisualSkinScript,
+        contains("event.key === 'ArrowUp'"),
+      );
+      expect(lotusInjectedVisualSkinScript, contains("event.key === 'Escape'"));
+      expect(lotusInjectedVisualSkinScript, contains(':focus-visible'));
+      expect(
+        lotusInjectedVisualSkinScript,
+        contains('@media (prefers-reduced-motion: reduce)'),
+      );
+    });
+
+    test('keeps life controls legible over custom player artwork', () {
+      expect(
+        lotusInjectedVisualSkinScript,
+        contains('.player-card-inner.background-image .increase-button.life'),
+      );
+      expect(lotusInjectedVisualSkinScript, contains('rgba(1, 4, 10, 0.58)'));
+      expect(lotusInjectedVisualSkinScript, contains('rgba(1, 4, 10, 0.66)'));
+      expect(
+        lotusInjectedVisualSkinScript,
+        contains('rgba(247, 241, 226, 0.78)'),
+      );
+    });
+
+    test('exposes an accessible exit only with the table menu', () {
+      expect(
+        lotusInjectedVisualSkinScript,
+        contains('.manaloom-life-counter-exit.is-visible'),
+      );
+      expect(
+        lotusInjectedVisualSkinScript,
+        contains("['.menu-button-overlay', 'Table controls']"),
+      );
+      expect(
+        lotusInjectedVisualSkinScript,
+        contains("const isMenuDialog = dialog.matches('.menu-button-overlay')"),
+      );
+      expect(
+        lotusInjectedVisualSkinScript,
+        contains('event.stopPropagation()'),
+      );
+      expect(
+        lotusInjectedVisualSkinScript,
+        contains('menuTrigger.focus({ preventScroll: true })'),
+      );
+      expect(
+        lotusInjectedVisualSkinScript,
+        contains("closedDialog.matches('.menu-button-overlay')"),
+      );
+      expect(
+        lotusInjectedVisualSkinScript,
+        contains('activeDialog === null && focusTarget.isConnected'),
+      );
+      expect(
+        lotusInjectedVisualSkinScript,
+        contains('menuOverlay.appendChild(exitButton)'),
+      );
+      expect(lotusInjectedVisualSkinScript, contains('Exit life counter'));
+      expect(
+        lotusInjectedVisualSkinScript,
+        contains("document.createElement('button')"),
+      );
+      expect(
+        lotusInjectedVisualSkinScript,
+        contains(LotusShellMessageTypes.closeLifeCounter),
+      );
+      expect(lotusInjectedVisualSkinScript, contains('table_menu_exit'));
+    });
   });
 }

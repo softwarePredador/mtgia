@@ -11,6 +11,7 @@ API="${MANALOOM_API_BASE_URL:-https://evolution-cartinhas.2ta7qx.easypanel.host}
 WEB="${MANALOOM_WEB_PUBLIC_URL:-https://evolution-manaloom-web-public.2ta7qx.easypanel.host}"
 SSH_HOST="${MANALOOM_EASYPANEL_SSH_HOST:-root@evolution-cartinhas.2ta7qx.easypanel.host}"
 SSH_KEY="${MANALOOM_EASYPANEL_SSH_KEY:-$HOME/.ssh/manaloom_easy_parallel_20260703}"
+BACKEND_SERVICE="${MANALOOM_BACKEND_SERVICE:-evolution_cartinhas}"
 BENCHMARK_RUNS="${MANALOOM_AI_BENCHMARK_RUNS:-3}"
 ALLOW_DEGRADED_AI="${MANALOOM_ALLOW_DEGRADED_AI:-1}"
 
@@ -24,6 +25,16 @@ require_tool() {
 require_tool curl
 require_tool jq
 require_tool ssh
+
+OPS_API_KEY="${MANALOOM_OPS_API_KEY:-}"
+if [ "${#OPS_API_KEY}" -lt 32 ]; then
+  OPS_API_KEY="$(ssh -o BatchMode=yes -o StrictHostKeyChecking=accept-new -i "$SSH_KEY" "$SSH_HOST" \
+    "docker service inspect '$BACKEND_SERVICE' --format '{{range .Spec.TaskTemplate.ContainerSpec.Env}}{{println .}}{{end}}' | sed -n 's/^MANALOOM_OPS_API_KEY=//p' | head -n 1")"
+fi
+if [ "${#OPS_API_KEY}" -lt 32 ]; then
+  echo "MANALOOM_OPS_API_KEY operacional ausente ou invalida" >&2
+  exit 2
+fi
 
 ROOT_DIR="$(CDPATH='' cd -- "$SCRIPT_DIR/.." && pwd)"
 OUT_DIR="${MANALOOM_QUALITY_GATE_OUT_DIR:-$ROOT_DIR/docs/qa/runtime}"
@@ -39,11 +50,17 @@ write_json() {
 fetch_json() {
   local url="$1"
   local file="$2"
+  local ops_key="${3:-}"
   local tmp="$file.tmp"
   local attempt
+  local curl_command=(curl -fsS)
+
+  if [ -n "$ops_key" ]; then
+    curl_command+=(-H "X-ManaLoom-Ops-Key: $ops_key")
+  fi
 
   for attempt in 1 2 3; do
-    if curl -fsS "$url" | jq '.' > "$tmp"; then
+    if "${curl_command[@]}" "$url" | jq '.' > "$tmp"; then
       mv "$tmp" "$file"
       return 0
     fi
@@ -68,8 +85,9 @@ summary_file="$RUN_DIR/summary.json"
 
 fetch_json "$API/health" "$health_file"
 fetch_json "$API/ready" "$ready_file"
-fetch_json "$API/health/commercial" "$commercial_file"
-fetch_json "$API/health/ai-history?days=30&bucket=day" "$ai_history_file"
+fetch_json "$API/health/commercial" "$commercial_file" "$OPS_API_KEY"
+fetch_json "$API/health/ai-history?days=30&bucket=day" "$ai_history_file" "$OPS_API_KEY"
+public_metrics_code="$(curl -sS -o /dev/null -w '%{http_code}' "$API/health/metrics")"
 
 ssh -o BatchMode=yes -o StrictHostKeyChecking=accept-new -i "$SSH_KEY" "$SSH_HOST" \
   'docker service ls --format "{{.Name}} {{.Image}} {{.Replicas}}" | grep evolution_cartinhas' \
@@ -93,6 +111,9 @@ MANALOOM_API_BASE_URL="$API" MANALOOM_AI_BENCHMARK_RUNS="$BENCHMARK_RUNS" \
 
 health_status="$(jq -r '.status' "$health_file")"
 ready_status="$(jq -r '.status' "$ready_file")"
+ai_runtime_status="$(jq -r '.checks.ai_runtime.status // "missing"' "$ready_file")"
+ai_provider_configured="$(jq -r '.checks.ai_runtime.provider_configured // false' "$ready_file")"
+ai_mock_fallbacks="$(jq -r '.checks.ai_runtime.mock_fallbacks_allowed // true' "$ready_file")"
 git_sha="$(jq -r '.git_sha // ""' "$health_file")"
 smoke_status="$(jq -r '.status' "$smoke_file")"
 benchmark_status="$(jq -r '.status' "$benchmark_file")"
@@ -114,6 +135,16 @@ fi
 if [ "$ready_status" != "ready" ]; then
   status="fail"
   issues+=("ready_not_ready")
+fi
+if [ "$ai_runtime_status" != "healthy" ] ||
+   [ "$ai_provider_configured" != "true" ] ||
+   [ "$ai_mock_fallbacks" != "false" ]; then
+  status="fail"
+  issues+=("ai_runtime_not_production_ready")
+fi
+if [ "$public_metrics_code" != "401" ]; then
+  status="fail"
+  issues+=("operational_metrics_not_protected")
 fi
 if [ "$service_replicas" != "1/1" ]; then
   status="fail"
@@ -160,6 +191,8 @@ jq -n \
   --arg service_replicas "$service_replicas" \
   --arg benchmark_status "$benchmark_status" \
   --arg ai_history_status "$ai_history_status" \
+  --arg ai_runtime_status "$ai_runtime_status" \
+  --arg public_metrics_code "$public_metrics_code" \
   --argjson successful_ai_runs "$successful_ai_runs" \
   --argjson mock_count "$mock_count" \
   --argjson ai_history_periods "$ai_history_periods" \
@@ -176,6 +209,10 @@ jq -n \
       status: $benchmark_status,
       successful_runs: $successful_ai_runs,
       mock_response_count: $mock_count
+    },
+    ai_runtime: {
+      status: $ai_runtime_status,
+      unauthenticated_metrics_code: ($public_metrics_code | tonumber)
     },
     ai_history: {
       status: $ai_history_status,

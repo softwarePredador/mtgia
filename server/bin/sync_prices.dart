@@ -1,9 +1,10 @@
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:dotenv/dotenv.dart';
 import 'package:http/http.dart' as http;
 import 'package:postgres/postgres.dart';
+
+import '../lib/runtime_environment.dart';
 
 /// Sincroniza preços USD das cartas via Scryfall e guarda no banco.
 ///
@@ -36,8 +37,7 @@ Opções:
     return;
   }
 
-  final env = DotEnv(quiet: true)..load();
-  env.addAll(Platform.environment);
+  final env = loadRuntimeEnvironment();
   final connection = await Connection.open(
     Endpoint(
       host: env['DB_HOST'] ?? 'localhost',
@@ -75,14 +75,12 @@ Opções:
         ORDER BY c.price_updated_at NULLS FIRST
         LIMIT @limit
       '''),
-      parameters: {
-        'limit': limit,
-        'staleHours': staleHours,
-      },
+      parameters: {'limit': limit, 'staleHours': staleHours},
     );
 
-    final oracleIds =
-        result.map((r) => (r[0] as String).trim()).where((s) => s.isNotEmpty);
+    final oracleIds = result
+        .map((r) => (r[0] as String).trim())
+        .where((s) => s.isNotEmpty);
     final list = oracleIds.toList();
     stdout.writeln('🔎 Cartas selecionadas para atualizar: ${list.length}');
     if (list.isEmpty) return;
@@ -200,7 +198,8 @@ Future<_BatchStats?> _updateBatch({
     final usdFoil = prices?['usd_foil'] as String?;
     final usdEtched = prices?['usd_etched'] as String?;
 
-    final price = double.tryParse(usd ?? '') ??
+    final price =
+        double.tryParse(usd ?? '') ??
         double.tryParse(usdFoil ?? '') ??
         double.tryParse(usdEtched ?? '');
 

@@ -147,7 +147,7 @@ void main() {
       expect(scores.map((score) => score.role), contains('ramp'));
       final ramp = scores.firstWhere((score) => score.role == 'ramp');
       expect(ramp.budgetTier, equals('expensive'));
-      expect(ramp.bracketScope, equals('bracket_3_4'));
+      expect(ramp.bracketScope, equals('bracket_3_plus'));
       expect(ramp.score, greaterThanOrEqualTo(70));
     });
 
@@ -194,7 +194,7 @@ void main() {
           score: 30,
           budgetTier: 'accessible',
         ),
-        equals('bracket_3_4'),
+        equals('bracket_3_plus'),
       );
       expect(isPremiumCommanderCandidateName('Sol Ring'), isTrue);
       expect(isPremiumCommanderCandidateName('Cancel'), isFalse);

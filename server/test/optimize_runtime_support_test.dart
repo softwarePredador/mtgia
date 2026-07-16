@@ -637,7 +637,7 @@ void main() {
             synergyEvidenceCount: 9,
             rejectionPenalty: 0,
             budgetTier: 'accessible',
-            bracketScope: 'bracket_2_4',
+            bracketScope: 'bracket_2_plus',
             sources: const {aggressiveCandidateMetaSignalSource},
           ),
         },

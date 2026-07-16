@@ -35,6 +35,24 @@ void main() {
       expect(source, contains('oracleText = _normalizeOptionalText(row[2])'));
     });
 
+    test(
+      'rejects non-string request fields before provider or database work',
+      () {
+        final source = File('routes/ai/explain/index.dart').readAsStringSync();
+
+        expect(
+          source,
+          contains('requireJsonObject(await context.request.json())'),
+        );
+        expect(source, contains("readOptionalJsonString(body, 'card_id'"));
+        expect(
+          source,
+          contains("'card_name',\n      maxLength: _maxCardNameLength"),
+        );
+        expect(source, contains('on JsonObjectValidationException'));
+      },
+    );
+
     test('invalidates cache when Oracle data or model changes', () {
       final identity = explain_route.buildAiExplainCacheIdentity(
         cardName: 'Lightning Bolt',

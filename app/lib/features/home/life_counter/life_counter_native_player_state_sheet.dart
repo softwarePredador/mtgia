@@ -70,6 +70,7 @@ class _LifeCounterNativePlayerStateSheetState
 
   void _changeTarget(int playerIndex) {
     setState(() {
+      _draftSession = _buildUpdatedSession();
       _targetPlayerIndex = playerIndex;
       _syncFromTarget();
     });
@@ -81,11 +82,14 @@ class _LifeCounterNativePlayerStateSheetState
       playerIndex: _targetPlayerIndex,
       enabled: _partnerCommander,
     );
-    updatedSession = LifeCounterTabletopEngine.setPlayerSpecialState(
-      updatedSession,
-      playerIndex: _targetPlayerIndex,
-      state: _specialState,
-    );
+    if (updatedSession.playerSpecialStates[_targetPlayerIndex] !=
+        _specialState) {
+      updatedSession = LifeCounterTabletopEngine.setPlayerSpecialState(
+        updatedSession,
+        playerIndex: _targetPlayerIndex,
+        state: _specialState,
+      );
+    }
     return updatedSession;
   }
 
@@ -209,7 +213,7 @@ class _LifeCounterNativePlayerStateSheetState
   Widget build(BuildContext context) {
     final playerStatusSummary =
         LifeCounterTabletopEngine.playerBoardSummary(
-          _draftSession,
+          _buildUpdatedSession(),
           playerIndex: _targetPlayerIndex,
         ).statusSummary;
 
@@ -253,7 +257,7 @@ class _LifeCounterNativePlayerStateSheetState
                             ),
                             SizedBox(height: 6),
                             Text(
-                              'ManaLoom owns partner commander and special player states while the tabletop stays visually identical.',
+                              'Manage commander setup, tools, and game status for the selected player.',
                               style: TextStyle(
                                 color: AppTheme.textSecondary,
                                 fontSize: AppTheme.fontMd,
@@ -301,7 +305,7 @@ class _LifeCounterNativePlayerStateSheetState
                       _SectionCard(
                         title: 'Current Status',
                         subtitle:
-                            'Use the canonical tabletop engine to understand why this player is active, lethal or out of the game.',
+                            'See whether this player is active, at risk, or out of the game.',
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
@@ -333,8 +337,7 @@ class _LifeCounterNativePlayerStateSheetState
                       const SizedBox(height: 18),
                       _SectionCard(
                         title: 'Commander Setup',
-                        subtitle:
-                            'Keep partner commander under our canonical player contract.',
+                        subtitle: 'Add a partner commander for this player.',
                         child: SwitchListTile.adaptive(
                           key: const Key(
                             'life-counter-native-player-state-partner-toggle',
@@ -361,7 +364,7 @@ class _LifeCounterNativePlayerStateSheetState
                       _SectionCard(
                         title: 'Player Tools',
                         subtitle:
-                            'Open ManaLoom-owned player tools without depending on Lotus-only chips and gestures.',
+                            'Change life, counters, commander damage, appearance, or roll a D20.',
                         child: Wrap(
                           spacing: 10,
                           runSpacing: 10,
@@ -413,7 +416,7 @@ class _LifeCounterNativePlayerStateSheetState
                       _SectionCard(
                         title: 'Special State',
                         subtitle:
-                            'Preserve the defeat reason separately from the Lotus alive flag.',
+                            'Set why this player left the game, or bring them back.',
                         child: Column(
                           children: [
                             Wrap(

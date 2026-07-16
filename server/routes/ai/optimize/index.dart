@@ -1,8 +1,10 @@
 import 'dart:io';
 import 'package:dart_frog/dart_frog.dart';
-import 'package:dotenv/dotenv.dart';
 import 'package:postgres/postgres.dart';
 import '../../../lib/card_validation_service.dart';
+import '../../../lib/internal_ai_request_token.dart';
+import '../../../lib/runtime_environment.dart';
+import '../../../lib/ai_plan_reservation_handle.dart';
 import '../../../lib/ai/optimize_analysis_support.dart' as optimize_analysis;
 import '../../../lib/ai/optimize_deck_support.dart' as optimize_deck;
 import '../../../lib/ai/optimize_request_support.dart' as optimize_request;
@@ -64,6 +66,7 @@ import '../../../lib/ai/optimization_validator.dart';
 import '../../../lib/ai/edhrec_service.dart';
 import '../../../lib/ai/theme_contextual_rules_service.dart';
 import '../../../lib/http_responses.dart';
+import '../../../lib/json_object_support.dart';
 import '../../../lib/logger.dart';
 import '../../../lib/meta/meta_deck_reference_support.dart';
 import '../../../lib/observability.dart';
@@ -256,6 +259,7 @@ Map<String, dynamic> buildOptimizationAnalysisLogEntry({
   required List<Map<String, dynamic>> deterministicSwapCandidates,
   required String cacheKey,
   required int executionTimeMs,
+  String? validationRunToken,
 }) => optimize_analysis.buildOptimizationAnalysisLogEntry(
   deckId: deckId,
   userId: userId,
@@ -280,6 +284,7 @@ Map<String, dynamic> buildOptimizationAnalysisLogEntry({
   deterministicSwapCandidates: deterministicSwapCandidates,
   cacheKey: cacheKey,
   executionTimeMs: executionTimeMs,
+  validationRunToken: validationRunToken,
 );
 
 List<Map<String, dynamic>> buildOptimizeAdditionEntries({
@@ -392,8 +397,21 @@ Future<Response> onRequest(RequestContext context) async {
       userId = null;
     }
 
-    final body = await context.request.json() as Map<String, dynamic>;
-    final routeRequest = optimize_route_request.parseOptimizeRouteRequest(body);
+    Map<String, dynamic> body;
+    try {
+      body = requireJsonObject(await context.request.json());
+    } on JsonObjectValidationException catch (error) {
+      return badRequest(error.message);
+    } catch (_) {
+      return badRequest('JSON invalido');
+    }
+    final routeRequest = optimize_route_request.parseOptimizeRouteRequest(
+      body,
+      allowForceSync: InternalAiRequestToken.matches(context.request.headers),
+    );
+    if (routeRequest.validationError != null) {
+      return badRequest(routeRequest.validationError!);
+    }
     final deckId = routeRequest.deckId;
     final archetype = routeRequest.archetype;
     final parsedBracket = routeRequest.parsedBracket;
@@ -415,7 +433,7 @@ Future<Response> onRequest(RequestContext context) async {
     );
     final hasBracketOverride = routeRequest.hasBracketOverride;
     final hasKeepThemeOverride = routeRequest.hasKeepThemeOverride;
-    final env = DotEnv(includePlatformEnvironment: true, quiet: true)..load();
+    final env = loadRuntimeEnvironment();
     final semanticV2OptimizeEnforcementMode =
         resolveSemanticV2OptimizeEnforcementMode(
           env['SEMANTIC_LAYER_V2_OPTIMIZE_ENFORCEMENT'],
@@ -479,6 +497,7 @@ Future<Response> onRequest(RequestContext context) async {
         archetype: archetype,
         userId: authenticatedUserId,
       );
+      final planReservation = deferAiPlanReservationIfAvailable(context);
       final syncPayload =
           Map<String, dynamic>.from(body)
             ..['_force_sync'] = true
@@ -492,6 +511,7 @@ Future<Response> onRequest(RequestContext context) async {
         internalOptimizeUrl: internalOptimizeUrl,
         syncPayload: syncPayload,
         authorization: authorization,
+        planReservation: planReservation,
       );
 
       telemetry.logSummary();
@@ -1052,6 +1072,7 @@ Future<Response> onRequest(RequestContext context) async {
         archetype: targetArchetype,
         userId: authenticatedUserId,
       );
+      final planReservation = deferAiPlanReservationIfAvailable(context);
 
       // Fire-and-forget: processamento pesado roda em background.
       // A closure captura todas as variáveis do setup (pool, allCardData, etc.)
@@ -1082,6 +1103,7 @@ Future<Response> onRequest(RequestContext context) async {
         hasBracketOverride: hasBracketOverride,
         hasKeepThemeOverride: hasKeepThemeOverride,
         recommendationContext: recommendationContext,
+        planReservation: planReservation,
       );
 
       final responseBody = optimize_route_async

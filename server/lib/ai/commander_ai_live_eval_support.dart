@@ -9,6 +9,22 @@ import '../../openai_structured_output_support.dart';
 import 'commander_ai_prompt_eval_suite.dart';
 
 String buildCommanderAiLiveEvalPrompt(Map<String, dynamic> testCase) {
+  final recommendationContext =
+      testCase['recommendation_context'] is Map
+          ? (testCase['recommendation_context'] as Map)
+          : const <String, dynamic>{};
+  final expected =
+      testCase['expected'] is Map
+          ? (testCase['expected'] as Map)
+          : const <String, dynamic>{};
+  final sameLaneCandidates = buildCommanderAiLiveEvalSameLaneCandidates(
+    testCase,
+  );
+  final preferCollection = recommendationContext['prefer_collection'] == true;
+  final ownedCandidateAvailable = sameLaneCandidates.any(
+    (candidate) => candidate['collection_match'] == true,
+  );
+
   return jsonEncode({
     'task':
         'Recommend safe one-for-one Commander deck swaps using only the supplied catalog.',
@@ -21,22 +37,125 @@ String buildCommanderAiLiveEvalPrompt(Map<String, dynamic> testCase) {
     'blocked_pairs': testCase['blocked_pairs'],
     'recommendation_context': testCase['recommendation_context'],
     'card_catalog': testCase['card_catalog'],
+    'deterministic_same_lane_candidates': sameLaneCandidates,
     'constraints': {
       'keep_theme': true,
       'preserve_protected_cards': true,
       'never_use_blocked_pairs': true,
       'candidate_cards_must_exist_in_catalog': true,
+      'every_swap_must_share_at_least_one_catalog_role': true,
       'respect_color_identity_budget_collection_and_bracket': true,
-      'prefer_owned_candidates_when_requested':
-          testCase['recommendation_context'] is Map &&
-          (testCase['recommendation_context'] as Map)['prefer_collection'] ==
-              true,
+      'minimum_role_counts_after_swaps':
+          expected['role_count_after_at_least'] ?? const <String, dynamic>{},
+      'prefer_owned_candidates_when_requested': preferCollection,
+      'owned_same_lane_candidate_available': ownedCandidateAvailable,
       'owned_candidate_requirement':
-          'When collection preference is enabled, use an owned same-lane '
-          'candidate whenever the catalog provides a legal option.',
+          preferCollection && ownedCandidateAvailable
+              ? 'At least one addition must have collection_match=true. '
+                  'Choose it from deterministic_same_lane_candidates.'
+              : 'No owned addition is required for this case.',
     },
   });
 }
+
+List<Map<String, dynamic>> buildCommanderAiLiveEvalSameLaneCandidates(
+  Map<String, dynamic> testCase,
+) {
+  final catalog =
+      testCase['card_catalog'] is Map
+          ? (testCase['card_catalog'] as Map).cast<String, dynamic>()
+          : const <String, dynamic>{};
+  final deck =
+      (testCase['deck'] as List?)
+          ?.map((card) => card.toString())
+          .toList(growable: false) ??
+      const <String>[];
+  final deckKeys = deck.map(_normalizeCardName).toSet();
+  final protectedKeys =
+      (testCase['protected_cards'] as List?)
+          ?.map((card) => _normalizeCardName(card.toString()))
+          .toSet() ??
+      const <String>{};
+  final blockedPairs =
+      (testCase['blocked_pairs'] as List?)
+          ?.whereType<Map>()
+          .map(
+            (pair) =>
+                '${_normalizeCardName(pair['out']?.toString() ?? '')}\u0000'
+                '${_normalizeCardName(pair['in']?.toString() ?? '')}',
+          )
+          .toSet() ??
+      const <String>{};
+  final commanderColors =
+      (testCase['color_identity'] as List?)
+          ?.map((color) => color.toString().toUpperCase())
+          .toSet() ??
+      const <String>{};
+  final bracket = (testCase['bracket'] as num?)?.toInt();
+  final candidates = <Map<String, dynamic>>[];
+
+  for (final outName in deck) {
+    final outKey = _normalizeCardName(outName);
+    if (protectedKeys.contains(outKey)) continue;
+    final outData = catalog[outName];
+    if (outData is! Map) continue;
+    final outRoles = _catalogRoles(outData);
+    if (outRoles.isEmpty) continue;
+
+    for (final entry in catalog.entries) {
+      final inName = entry.key;
+      if (deckKeys.contains(_normalizeCardName(inName))) continue;
+      final inData = entry.value;
+      if (inData is! Map) continue;
+      final inRoles = _catalogRoles(inData);
+      final sharedRoles = outRoles.intersection(inRoles).toList()..sort();
+      if (sharedRoles.isEmpty) continue;
+      final pairKey = '$outKey\u0000${_normalizeCardName(inName)}';
+      if (blockedPairs.contains(pairKey)) continue;
+
+      final candidateColors =
+          (inData['color_identity'] as List?)
+              ?.map((color) => color.toString().toUpperCase())
+              .toSet() ??
+          const <String>{};
+      if (!commanderColors.containsAll(candidateColors)) continue;
+      final minimumBracket = (inData['min_bracket'] as num?)?.toInt();
+      if (bracket != null &&
+          minimumBracket != null &&
+          minimumBracket > bracket) {
+        continue;
+      }
+
+      candidates.add({
+        'out': outName,
+        'in': inName,
+        'shared_roles': sharedRoles,
+        'collection_match': inData['owned'] == true,
+        'price_brl': inData['price_brl'],
+      });
+    }
+  }
+
+  candidates.sort((left, right) {
+    final byOwned = (right['collection_match'] == true ? 1 : 0).compareTo(
+      left['collection_match'] == true ? 1 : 0,
+    );
+    if (byOwned != 0) return byOwned;
+    final byOut = left['out'].toString().compareTo(right['out'].toString());
+    if (byOut != 0) return byOut;
+    return left['in'].toString().compareTo(right['in'].toString());
+  });
+  return candidates;
+}
+
+Set<String> _catalogRoles(Map<dynamic, dynamic> cardData) =>
+    (cardData['roles'] as List?)
+        ?.map((role) => role.toString().trim().toLowerCase())
+        .where((role) => role.isNotEmpty && role != 'commander')
+        .toSet() ??
+    const <String>{};
+
+String _normalizeCardName(String value) => value.trim().toLowerCase();
 
 Future<Map<String, dynamic>> runCommanderAiLiveEvalCase({
   required http.Client client,

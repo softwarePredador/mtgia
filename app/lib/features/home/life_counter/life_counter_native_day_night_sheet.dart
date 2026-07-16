@@ -77,7 +77,7 @@ class _LifeCounterNativeDayNightSheetState
                           ),
                           SizedBox(height: 6),
                           Text(
-                            'ManaLoom now owns the tabletop day-night state without changing the Lotus layout.',
+                            'Set the current day or night state.',
                             style: TextStyle(
                               color: AppTheme.textSecondary,
                               fontSize: AppTheme.fontMd,

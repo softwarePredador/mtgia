@@ -1,13 +1,13 @@
 import 'dart:convert';
 import 'dart:math';
 import 'package:http/http.dart' as http;
-import 'package:dotenv/dotenv.dart';
 import '../ai_provider_runtime_support.dart';
 import '../ai_provider_usage_support.dart';
 import '../logger.dart';
 import '../openai_runtime_config.dart';
 import '../basic_land_utils.dart' as land_utils;
 import '../openai_structured_output_support.dart';
+import '../runtime_environment.dart';
 import 'cmc_safety.dart';
 import 'goldfish_simulator.dart';
 import 'optimization_functional_roles.dart';
@@ -450,15 +450,9 @@ class OptimizationValidator {
   }) async {
     if (openAiKey == null || openAiKey!.isEmpty) return null;
 
-    final env = DotEnv(includePlatformEnvironment: true, quiet: true)..load();
+    final env = loadRuntimeEnvironment();
     final aiConfig = OpenAiRuntimeConfig(env);
-    final model = aiConfig.modelFor(
-      key: 'OPENAI_MODEL_OPTIMIZATION_CRITIC',
-      fallback: 'gpt-4o-mini',
-      devFallback: 'gpt-4o-mini',
-      stagingFallback: 'gpt-4o-mini',
-      prodFallback: 'gpt-4o-mini',
-    );
+    final model = aiConfig.optimizationCriticModel;
     final temperature = aiConfig.temperatureFor(
       key: 'OPENAI_TEMP_OPTIMIZATION_CRITIC',
       fallback: 0.2,

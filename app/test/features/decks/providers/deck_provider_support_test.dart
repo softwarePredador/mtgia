@@ -975,6 +975,13 @@ void main() {
     );
   });
 
+  test('normalizeOptimizePollIntervalMs bounds hostile server values', () {
+    expect(normalizeOptimizePollIntervalMs(1), 1000);
+    expect(normalizeOptimizePollIntervalMs('2500'), 2500);
+    expect(normalizeOptimizePollIntervalMs(12000), 10000);
+    expect(normalizeOptimizePollIntervalMs('invalid'), 2000);
+  });
+
   test('response helpers cover options validation pricing and mutations', () {
     final options = parseOptimizationOptionsResponse(
       ApiResponse(200, {
@@ -1020,6 +1027,49 @@ void main() {
         fallbackMessage: 'fallback',
       ),
       throwsA(isA<Exception>()),
+    );
+    expect(
+      () => parseDeckAiAnalysisResponse(ApiResponse(200, '<html>erro</html>')),
+      throwsA(
+        isA<Exception>().having(
+          (error) => error.toString(),
+          'message',
+          contains('formato inválido'),
+        ),
+      ),
+    );
+  });
+
+  test('optimization options failures stay player-facing', () {
+    expect(
+      () => parseOptimizationOptionsResponse(
+        ApiResponse(503, {'error': 'database stack trace'}),
+      ),
+      throwsA(
+        isA<Exception>()
+            .having(
+              (error) => error.toString(),
+              'message',
+              contains('indisponível'),
+            )
+            .having(
+              (error) => error.toString(),
+              'raw status',
+              isNot(contains('503')),
+            ),
+      ),
+    );
+    expect(
+      () => parseOptimizationOptionsResponse(
+        ApiResponse(200, {'unexpected': true}),
+      ),
+      throwsA(
+        isA<Exception>().having(
+          (error) => error.toString(),
+          'message',
+          contains('estratégias válidas'),
+        ),
+      ),
     );
   });
 
@@ -1325,6 +1375,99 @@ void main() {
         format: 'commander',
       ),
       throwsA(isA<Exception>()),
+    );
+  });
+
+  test(
+    'generateDeckFromPrompt rejects invalid input before API work',
+    () async {
+      final apiClient = _FakeApiClient(postHandlers: const {});
+
+      await expectLater(
+        () => generateDeckFromPrompt(
+          apiClient,
+          prompt: '   ',
+          format: 'commander',
+        ),
+        throwsA(
+          isA<Exception>().having(
+            (error) => error.toString(),
+            'message',
+            contains('Descreva o deck'),
+          ),
+        ),
+      );
+      await expectLater(
+        () => generateDeckFromPrompt(
+          apiClient,
+          prompt: 'x' * (maxAiGeneratePromptLength + 1),
+          format: 'commander',
+        ),
+        throwsA(isA<Exception>()),
+      );
+      await expectLater(
+        () => generateDeckFromPrompt(
+          apiClient,
+          prompt: 'artifacts',
+          format: 'commander',
+          commanderName: 'x' * (maxAiGenerateCommanderNameLength + 1),
+        ),
+        throwsA(isA<Exception>()),
+      );
+    },
+  );
+
+  test('generateDeckFromPrompt never accepts a synchronous 422 as a deck', () {
+    final apiClient = _FakeApiClient(
+      postHandlers: {
+        '/ai/generate':
+            (_) => ApiResponse(422, {
+              'error': 'Generated deck failed validation',
+              'generated_deck': {'cards': const <Map<String, dynamic>>[]},
+            }),
+      },
+    );
+
+    expect(
+      () => generateDeckFromPrompt(
+        apiClient,
+        prompt: 'invalid commander list',
+        format: 'commander',
+      ),
+      throwsA(
+        isA<Exception>().having(
+          (error) => error.toString(),
+          'message',
+          contains('Não conseguimos gerar um deck válido'),
+        ),
+      ),
+    );
+  });
+
+  test('generateDeckFromPrompt rejects a malformed synchronous 200', () {
+    final apiClient = _FakeApiClient(
+      postHandlers: {
+        '/ai/generate':
+            (_) => ApiResponse(200, {
+              'generated_deck': {'cards': const <Map<String, dynamic>>[]},
+              'validation': const {'is_valid': true},
+            }),
+      },
+    );
+
+    expect(
+      () => generateDeckFromPrompt(
+        apiClient,
+        prompt: 'empty response fixture',
+        format: 'commander',
+      ),
+      throwsA(
+        isA<Exception>().having(
+          (error) => error.toString(),
+          'message',
+          contains('não devolveu um deck válido para revisão'),
+        ),
+      ),
     );
   });
 

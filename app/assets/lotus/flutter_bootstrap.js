@@ -3,11 +3,20 @@
   var platformId = isAndroid ? 'android' : 'ios';
   var storageBridgeChannelName = 'FlutterManaLoomStorageBridge';
   var storagePersistDelayMs = 250;
-  var storageBootstrapTimeoutMs = 500;
+  var storageBootstrapRetryDelayMs = 500;
+  var storageBootstrapMaxAttempts = 8;
   var storagePersistTimer = null;
+  var storageBootstrapRetryTimer = null;
   var isApplyingStorageBootstrap = false;
   var resolveStorageBootstrap = null;
+  var rejectStorageBootstrap = null;
   var didResolveStorageBootstrap = false;
+  var didFailStorageBootstrap = false;
+  var storageBridgeSessionId = createStorageBridgeId('session');
+  var storageBootstrapRequestId = null;
+  var storageBootstrapAttemptCount = 0;
+  var storageRevision = 0;
+  var storageSnapshotSequence = 0;
   var lotusRuntimeScriptPromise = null;
 
   window.cordova = window.cordova || {
@@ -72,6 +81,36 @@
         get: fallbackGetter,
       });
     } catch (error) {}
+  }
+
+  function removeInactiveGameTimerState() {
+    if (!window.localStorage) {
+      return false;
+    }
+
+    try {
+      var rawSettings = window.localStorage.getItem('gameSettings');
+      if (!rawSettings) {
+        return false;
+      }
+
+      var settings = JSON.parse(rawSettings);
+      if (
+        !settings ||
+        settings.gameTimer !== false ||
+        window.localStorage.getItem('gameTimerState') === null
+      ) {
+        return false;
+      }
+
+      // The preserved Lotus runtime creates gameTimerState unconditionally on
+      // device-ready. Keep its internal boot behavior from leaking a hidden,
+      // running timer when the feature is explicitly disabled.
+      window.localStorage.removeItem('gameTimerState');
+      return true;
+    } catch (error) {
+      return false;
+    }
   }
 
   function readViewportWidth() {
@@ -139,6 +178,8 @@
 
   function fireDeviceReady() {
     document.dispatchEvent(new Event('deviceready'));
+    removeInactiveGameTimerState();
+    setTimeout(removeInactiveGameTimerState, 0);
     setTimeout(function () {
       queueStorageSnapshot('post_deviceready_sync');
     }, 1200);
@@ -173,6 +214,17 @@
     });
 
     return lotusRuntimeScriptPromise;
+  }
+
+  function createStorageBridgeId(prefix) {
+    var randomPart = Math.random().toString(36).slice(2);
+    return (
+      String(prefix || 'bridge') +
+      '-' +
+      Date.now().toString(36) +
+      '-' +
+      randomPart
+    );
   }
 
   function getStorageBridgeChannel() {
@@ -223,18 +275,38 @@
     return values;
   }
 
+  function flushStorageSnapshot(reason) {
+    if (isApplyingStorageBootstrap || !didResolveStorageBootstrap) {
+      return { ok: false, reason: 'bootstrap_pending' };
+    }
+
+    clearTimeout(storagePersistTimer);
+    storagePersistTimer = null;
+    storageSnapshotSequence += 1;
+    var payload = {
+      type: 'persist_snapshot',
+      sessionId: storageBridgeSessionId,
+      sequence: storageSnapshotSequence,
+      baseRevision: storageRevision,
+      reason: reason || 'unknown',
+      values: snapshotLocalStorage(),
+    };
+    var didPost = postStorageBridgeMessage(payload);
+    return {
+      ok: didPost,
+      reason: didPost ? null : 'storage_bridge_unavailable',
+      payload: payload,
+    };
+  }
+
   function queueStorageSnapshot(reason) {
-    if (isApplyingStorageBootstrap) {
+    if (isApplyingStorageBootstrap || !didResolveStorageBootstrap) {
       return;
     }
 
     clearTimeout(storagePersistTimer);
     storagePersistTimer = setTimeout(function () {
-      postStorageBridgeMessage({
-        type: 'persist_snapshot',
-        reason: reason || 'unknown',
-        values: snapshotLocalStorage(),
-      });
+      flushStorageSnapshot(reason);
     }, storagePersistDelayMs);
   }
 
@@ -244,22 +316,60 @@
     }
 
     didResolveStorageBootstrap = true;
+    clearTimeout(storageBootstrapRetryTimer);
+    storageBootstrapRetryTimer = null;
     if (typeof resolveStorageBootstrap === 'function') {
       resolveStorageBootstrap();
       resolveStorageBootstrap = null;
     }
+    rejectStorageBootstrap = null;
+  }
+
+  function failStorageBootstrapHandshake(reason) {
+    if (didResolveStorageBootstrap || didFailStorageBootstrap) {
+      return;
+    }
+
+    didFailStorageBootstrap = true;
+    clearTimeout(storageBootstrapRetryTimer);
+    storageBootstrapRetryTimer = null;
+    postStorageBridgeMessage({
+      type: 'bootstrap_failed',
+      sessionId: storageBridgeSessionId,
+      requestId: storageBootstrapRequestId,
+      attempts: storageBootstrapAttemptCount,
+      reason: reason || 'bootstrap_timeout',
+    });
+    if (typeof rejectStorageBootstrap === 'function') {
+      rejectStorageBootstrap(
+        new Error('Lotus storage bootstrap failed: ' + String(reason))
+      );
+      rejectStorageBootstrap = null;
+    }
+    resolveStorageBootstrap = null;
+  }
+
+  function isStorageRevision(value) {
+    return (
+      typeof value === 'number' &&
+      isFinite(value) &&
+      Math.floor(value) === value &&
+      value >= 0
+    );
   }
 
   function applyStorageBootstrapSnapshot(payload) {
     if (
       !payload ||
-      payload.hasSnapshot !== true ||
       !payload.values ||
+      typeof payload.values !== 'object' ||
       !window.localStorage
     ) {
-      return;
+      return { ok: false, reason: 'missing_values' };
     }
 
+    clearTimeout(storagePersistTimer);
+    storagePersistTimer = null;
     isApplyingStorageBootstrap = true;
     try {
       window.localStorage.clear();
@@ -271,7 +381,13 @@
 
         window.localStorage.setItem(String(key), String(value));
       });
+      return { ok: true, restoredKeys: Object.keys(payload.values).length };
     } catch (error) {
+      return {
+        ok: false,
+        reason:
+          error && error.message ? String(error.message) : 'bootstrap_failed',
+      };
     } finally {
       isApplyingStorageBootstrap = false;
     }
@@ -282,6 +398,8 @@
       return { ok: false, reason: 'missing_values' };
     }
 
+    clearTimeout(storagePersistTimer);
+    storagePersistTimer = null;
     isApplyingStorageBootstrap = true;
     try {
       Object.keys(payload.values).forEach(function (key) {
@@ -305,21 +423,42 @@
     }
   }
 
-  function requestStorageBootstrapSnapshot() {
-    return new Promise(function (resolve) {
-      resolveStorageBootstrap = resolve;
-      didResolveStorageBootstrap = false;
+  function postStorageBootstrapRequest() {
+    storageBootstrapAttemptCount += 1;
+    return postStorageBridgeMessage({
+      type: 'request_bootstrap',
+      sessionId: storageBridgeSessionId,
+      requestId: storageBootstrapRequestId,
+    });
+  }
 
-      if (
-        !postStorageBridgeMessage({
-          type: 'request_bootstrap',
-        })
-      ) {
-        resolveStorageBootstrapHandshake();
+  function scheduleStorageBootstrapRetry() {
+    clearTimeout(storageBootstrapRetryTimer);
+    storageBootstrapRetryTimer = setTimeout(function () {
+      if (didResolveStorageBootstrap || didFailStorageBootstrap) {
+        return;
+      }
+      if (storageBootstrapAttemptCount >= storageBootstrapMaxAttempts) {
+        failStorageBootstrapHandshake('bootstrap_timeout');
         return;
       }
 
-      setTimeout(resolveStorageBootstrapHandshake, storageBootstrapTimeoutMs);
+      postStorageBootstrapRequest();
+      scheduleStorageBootstrapRetry();
+    }, storageBootstrapRetryDelayMs);
+  }
+
+  function requestStorageBootstrapSnapshot() {
+    return new Promise(function (resolve, reject) {
+      resolveStorageBootstrap = resolve;
+      rejectStorageBootstrap = reject;
+      didResolveStorageBootstrap = false;
+      didFailStorageBootstrap = false;
+      storageBootstrapRequestId = createStorageBridgeId('bootstrap');
+      storageBootstrapAttemptCount = 0;
+
+      postStorageBootstrapRequest();
+      scheduleStorageBootstrapRetry();
     });
   }
 
@@ -347,49 +486,114 @@
     });
   }
 
+  function decodeStorageBridgePayload(payload) {
+    var decoded = payload;
+    try {
+      if (typeof payload === 'string') {
+        decoded = JSON.parse(payload);
+      }
+    } catch (error) {
+      decoded = null;
+    }
+    return decoded;
+  }
+
   window.__ManaloomLotusStorageBridge =
     window.__ManaloomLotusStorageBridge || {
       receiveBootstrap: function (payload) {
-        var decoded = payload;
-        try {
-          if (typeof payload === 'string') {
-            decoded = JSON.parse(payload);
-          }
-        } catch (error) {
-          decoded = null;
+        var decoded = decodeStorageBridgePayload(payload);
+        if (
+          !decoded ||
+          didResolveStorageBootstrap ||
+          didFailStorageBootstrap ||
+          decoded.sessionId !== storageBridgeSessionId ||
+          decoded.requestId !== storageBootstrapRequestId ||
+          !isStorageRevision(decoded.revision)
+        ) {
+          return { ok: false, reason: 'stale_bootstrap' };
         }
 
-        applyStorageBootstrapSnapshot(decoded);
+        var result = applyStorageBootstrapSnapshot(decoded);
+        if (!result.ok) {
+          return result;
+        }
+
+        storageRevision = decoded.revision;
         resolveStorageBootstrapHandshake();
+        result.revision = storageRevision;
+        return result;
       },
       receivePatch: function (payload) {
-        var decoded = payload;
-        try {
-          if (typeof payload === 'string') {
-            decoded = JSON.parse(payload);
-          }
-        } catch (error) {
-          decoded = null;
+        if (!didResolveStorageBootstrap) {
+          return { ok: false, reason: 'bootstrap_pending' };
         }
 
-        return applyStoragePatchSnapshot(decoded);
+        var decoded = decodeStorageBridgePayload(payload);
+        var result = applyStoragePatchSnapshot(decoded);
+        if (!result.ok) {
+          return result;
+        }
+
+        storageRevision += 1;
+        result.revision = storageRevision;
+        result.didNotifyHost = postStorageBridgeMessage({
+          type: 'native_patch_applied',
+          sessionId: storageBridgeSessionId,
+          revision: storageRevision,
+        });
+        return result;
+      },
+      receiveRebase: function (payload) {
+        var decoded = decodeStorageBridgePayload(payload);
+        if (
+          !decoded ||
+          decoded.sessionId !== storageBridgeSessionId ||
+          !isStorageRevision(decoded.revision)
+        ) {
+          return { ok: false, reason: 'stale_rebase' };
+        }
+        if (decoded.revision < storageRevision) {
+          return { ok: false, reason: 'stale_rebase' };
+        }
+
+        var result = applyStorageBootstrapSnapshot(decoded);
+        if (!result.ok) {
+          return result;
+        }
+
+        storageRevision = decoded.revision;
+        result.revision = storageRevision;
+        if (decoded.reloadRuntime === true) {
+          result.reloadScheduled = true;
+          setTimeout(function () {
+            window.location.reload();
+          }, 0);
+        }
+        return result;
+      },
+      flushSnapshot: function (reason) {
+        return flushStorageSnapshot(reason || 'host_flush');
       },
     };
 
   function prepareAppBoot() {
     applyEmbeddedViewportFrame();
-    requestStorageBootstrapSnapshot().finally(function () {
-      ensureLotusRuntimeScriptLoaded()
-        .catch(function (error) {
-          console.error('Failed to load Lotus runtime', error);
-        })
-        .finally(function () {
-          requestAnimationFrame(function () {
-            applyEmbeddedViewportFrame();
-            setTimeout(fireDeviceReady, 0);
+    requestStorageBootstrapSnapshot()
+      .then(function () {
+        ensureLotusRuntimeScriptLoaded()
+          .catch(function (error) {
+            console.error('Failed to load Lotus runtime', error);
+          })
+          .finally(function () {
+            requestAnimationFrame(function () {
+              applyEmbeddedViewportFrame();
+              setTimeout(fireDeviceReady, 0);
+            });
           });
-        });
-    });
+      })
+      .catch(function (error) {
+        console.error('Failed to restore Lotus storage', error);
+      });
   }
 
   patchStorageMutationMethods();
@@ -413,14 +617,14 @@
       return;
     }
 
-    queueStorageSnapshot('document_hidden');
+    flushStorageSnapshot('document_hidden');
   });
   window.addEventListener('resize', applyEmbeddedViewportFrame);
   window.addEventListener('orientationchange', applyEmbeddedViewportFrame);
   window.addEventListener('pagehide', function () {
-    queueStorageSnapshot('pagehide');
+    flushStorageSnapshot('pagehide');
   });
   window.addEventListener('beforeunload', function () {
-    queueStorageSnapshot('beforeunload');
+    flushStorageSnapshot('beforeunload');
   });
 })();

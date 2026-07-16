@@ -331,7 +331,7 @@ class _LifeCounterNativePlayerCounterSheetState
                                 ),
                                 const SizedBox(height: 6),
                                 const Text(
-                                  'Create custom counters here so this flow no longer depends on Lotus-only chips.',
+                                  'Add counters for game-specific effects.',
                                   style: TextStyle(
                                     color: AppTheme.textSecondary,
                                     fontSize: AppTheme.fontSm,
@@ -638,15 +638,15 @@ String _counterLabel(String counterKey) {
 String _counterDescription(String counterKey) {
   switch (counterKey) {
     case 'poison':
-      return 'Adjust poison counters without leaving the ManaLoom-owned shell.';
+      return 'Track poison counters for this player.';
     case 'energy':
-      return 'Adjust energy counters while keeping the tabletop layout intact.';
+      return 'Track energy counters for this player.';
     case 'xp':
-      return 'Adjust experience counters from the same player card flow.';
+      return 'Track experience counters for this player.';
     case 'tax-1':
     case 'tax-2':
-      return 'Commander tax stays mapped to the partner-specific commander cast count.';
+      return 'Commander tax increases by 2 after each cast from the command zone.';
     default:
-      return 'Adjust or remove this player-specific counter while the Lotus tabletop remains visually identical.';
+      return 'Adjust or remove this custom counter.';
   }
 }

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../../core/theme/app_theme.dart';
 import 'life_counter_history.dart';
+import 'life_counter_history_store.dart';
 
 Future<void> showLifeCounterNativeHistorySheet(
   BuildContext context, {
@@ -23,7 +24,7 @@ Future<void> showLifeCounterNativeHistorySheet(
   );
 }
 
-class _LifeCounterNativeHistorySheet extends StatelessWidget {
+class _LifeCounterNativeHistorySheet extends StatefulWidget {
   const _LifeCounterNativeHistorySheet({
     required this.history,
     this.onExportPressed,
@@ -33,6 +34,39 @@ class _LifeCounterNativeHistorySheet extends StatelessWidget {
   final LifeCounterHistorySnapshot history;
   final Future<void> Function()? onExportPressed;
   final Future<bool> Function(String rawPayload)? onImportSubmitted;
+
+  @override
+  State<_LifeCounterNativeHistorySheet> createState() =>
+      _LifeCounterNativeHistorySheetState();
+}
+
+class _LifeCounterNativeHistorySheetState
+    extends State<_LifeCounterNativeHistorySheet> {
+  late LifeCounterHistorySnapshot _history;
+
+  LifeCounterHistorySnapshot get history => _history;
+  Future<void> Function()? get onExportPressed => widget.onExportPressed;
+  Future<bool> Function(String rawPayload)? get onImportSubmitted =>
+      widget.onImportSubmitted;
+
+  @override
+  void initState() {
+    super.initState();
+    _history = widget.history;
+  }
+
+  Future<void> _refreshImportedHistory() async {
+    final importedState = await LifeCounterHistoryStore().load();
+    if (!mounted || importedState == null) {
+      return;
+    }
+
+    setState(() {
+      _history = LifeCounterHistorySnapshot.fromSources(
+        historyState: importedState,
+      );
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -76,7 +110,7 @@ class _LifeCounterNativeHistorySheet extends StatelessWidget {
                             const SizedBox(height: 6),
                             Text(
                               history.currentGameName == null
-                                  ? 'ManaLoom now owns this shell surface while the Lotus tabletop stays unchanged.'
+                                  ? 'Review recent events and completed games.'
                                   : 'Current game: ${history.currentGameName}',
                               style: const TextStyle(
                                 color: AppTheme.textSecondary,
@@ -116,9 +150,17 @@ class _LifeCounterNativeHistorySheet extends StatelessWidget {
                             final imported = await _showHistoryImportDialog(
                               context,
                               onImportSubmitted!,
+                              requireReplacementConfirmation:
+                                  history.hasContent,
                             );
                             if (!context.mounted || imported == null) {
                               return;
+                            }
+                            if (imported) {
+                              await _refreshImportedHistory();
+                              if (!context.mounted) {
+                                return;
+                              }
                             }
                             ScaffoldMessenger.maybeOf(context)
                               ?..hideCurrentSnackBar()
@@ -126,8 +168,8 @@ class _LifeCounterNativeHistorySheet extends StatelessWidget {
                                 SnackBar(
                                   content: Text(
                                     imported
-                                        ? 'History imported into ManaLoom.'
-                                        : 'Could not import that history payload.',
+                                        ? 'History imported.'
+                                        : 'Could not import that history.',
                                   ),
                                   behavior: SnackBarBehavior.floating,
                                 ),
@@ -211,8 +253,7 @@ class _LifeCounterNativeHistorySheet extends StatelessWidget {
                         child:
                             history.archiveEntries.isEmpty
                                 ? const _EmptyHistoryState(
-                                  message:
-                                      'No archived games were mirrored yet.',
+                                  message: 'No archived games yet.',
                                 )
                                 : Column(
                                   children: [
@@ -236,13 +277,85 @@ class _LifeCounterNativeHistorySheet extends StatelessWidget {
 
 Future<bool?> _showHistoryImportDialog(
   BuildContext context,
-  Future<bool> Function(String rawPayload) onImportSubmitted,
-) {
-  final controller = TextEditingController();
+  Future<bool> Function(String rawPayload) onImportSubmitted, {
+  required bool requireReplacementConfirmation,
+}) {
   return showDialog<bool>(
     context: context,
-    builder: (dialogContext) {
-      return AlertDialog(
+    builder:
+        (dialogContext) => _HistoryImportDialog(
+          onImportSubmitted: onImportSubmitted,
+          requireReplacementConfirmation: requireReplacementConfirmation,
+        ),
+  );
+}
+
+class _HistoryImportDialog extends StatefulWidget {
+  const _HistoryImportDialog({
+    required this.onImportSubmitted,
+    required this.requireReplacementConfirmation,
+  });
+
+  final Future<bool> Function(String rawPayload) onImportSubmitted;
+  final bool requireReplacementConfirmation;
+
+  @override
+  State<_HistoryImportDialog> createState() => _HistoryImportDialogState();
+}
+
+class _HistoryImportDialogState extends State<_HistoryImportDialog> {
+  final TextEditingController _controller = TextEditingController();
+  bool _isSubmitting = false;
+  bool _isImportInFlight = false;
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  Future<void> _submit() async {
+    if (_isSubmitting) {
+      return;
+    }
+
+    setState(() {
+      _isSubmitting = true;
+      _isImportInFlight = !widget.requireReplacementConfirmation;
+    });
+    var closed = false;
+    try {
+      if (widget.requireReplacementConfirmation) {
+        final confirmed = await _confirmHistoryReplacement(context);
+        if (confirmed != true || !mounted) {
+          return;
+        }
+        setState(() {
+          _isImportInFlight = true;
+        });
+      }
+
+      final result = await widget.onImportSubmitted(_controller.text);
+      if (!mounted) {
+        return;
+      }
+      Navigator.of(context).pop(result);
+      closed = true;
+    } finally {
+      if (mounted && !closed) {
+        setState(() {
+          _isSubmitting = false;
+          _isImportInFlight = false;
+        });
+      }
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return PopScope(
+      canPop: !_isSubmitting,
+      child: AlertDialog(
         backgroundColor: AppTheme.surfaceElevated,
         title: const Text(
           'Import History',
@@ -253,29 +366,65 @@ Future<bool?> _showHistoryImportDialog(
         ),
         content: TextField(
           key: const Key('life-counter-native-history-import-input'),
-          controller: controller,
+          controller: _controller,
+          enabled: !_isSubmitting,
           maxLines: 10,
           minLines: 6,
           style: const TextStyle(color: AppTheme.textPrimary),
           decoration: const InputDecoration(
-            hintText: 'Paste a ManaLoom history export payload',
+            hintText: 'Paste exported history here',
           ),
         ),
         actions: [
           TextButton(
-            onPressed: () => Navigator.of(dialogContext).pop(),
+            onPressed: _isSubmitting ? null : () => Navigator.of(context).pop(),
             child: const Text('Cancel'),
           ),
           FilledButton(
             key: const Key('life-counter-native-history-import-confirm'),
-            onPressed: () async {
-              final result = await onImportSubmitted(controller.text);
-              if (!dialogContext.mounted) {
-                return;
-              }
-              Navigator.of(dialogContext).pop(result);
-            },
-            child: const Text('Import'),
+            onPressed: _isSubmitting ? null : _submit,
+            child:
+                _isImportInFlight
+                    ? const SizedBox.square(
+                      key: Key('life-counter-native-history-import-progress'),
+                      dimension: 18,
+                      child: CircularProgressIndicator(strokeWidth: 2),
+                    )
+                    : const Text('Import'),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+Future<bool?> _confirmHistoryReplacement(BuildContext context) {
+  return showDialog<bool>(
+    context: context,
+    builder: (confirmationContext) {
+      return AlertDialog(
+        backgroundColor: AppTheme.surfaceElevated,
+        title: const Text(
+          'Replace existing history?',
+          style: TextStyle(
+            color: AppTheme.textPrimary,
+            fontWeight: FontWeight.w700,
+          ),
+        ),
+        content: const Text(
+          'Importing this history will replace the current game history and every archived game.',
+          style: TextStyle(color: AppTheme.textSecondary),
+        ),
+        actions: [
+          TextButton(
+            key: const Key('life-counter-native-history-replace-cancel'),
+            onPressed: () => Navigator.of(confirmationContext).pop(false),
+            child: const Text('Keep existing'),
+          ),
+          FilledButton(
+            key: const Key('life-counter-native-history-replace-confirm'),
+            onPressed: () => Navigator.of(confirmationContext).pop(true),
+            child: const Text('Replace history'),
           ),
         ],
       );

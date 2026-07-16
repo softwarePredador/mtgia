@@ -15,6 +15,7 @@ import json
 import os
 import re
 import subprocess
+import sys
 from collections import Counter, defaultdict
 from datetime import datetime, timezone
 from pathlib import Path
@@ -24,6 +25,8 @@ from typing import Iterable
 MAX_SIGNALS_PER_RULE = int(os.environ.get("PREMIUM_VISUAL_MAX_SIGNALS_PER_RULE", "60"))
 DEFAULT_CONFIG = "server/config/premium_visual_qa_surfaces.json"
 DEFAULT_OUTPUT = "docs/qa/manaloom_premium_visual_audit_latest.md"
+CONFIG_ERROR_EXIT_CODE = 2
+AUDITABLE_TEXT_SUFFIXES = frozenset({".css", ".dart", ".html", ".js"})
 
 
 @dataclasses.dataclass(frozen=True)
@@ -35,6 +38,14 @@ class Signal:
     evidence: str
     impact: str
     suggestion: str
+
+
+@dataclasses.dataclass(frozen=True)
+class ConfiguredFileIssue:
+    surface_id: str
+    path: str
+    reason: str
+    blocking: bool
 
 
 def discover_repo() -> Path:
@@ -119,7 +130,7 @@ def add_signal(
 
 
 def audit_dart_file(path: Path, signals: list[Signal], counters: Counter[str]) -> None:
-    if is_test_or_generated(path):
+    if path.suffix.lower() not in AUDITABLE_TEXT_SUFFIXES or is_test_or_generated(path):
         return
     try:
         lines = path.read_text(errors="ignore").splitlines()
@@ -311,16 +322,59 @@ def audit_dart_file(path: Path, signals: list[Signal], counters: Counter[str]) -
                 )
 
 
-def configured_files(config: dict, include_life_counter: bool) -> list[Path]:
+def configured_file_inventory(
+    config: dict,
+    include_life_counter: bool,
+) -> tuple[list[Path], list[ConfiguredFileIssue]]:
     paths: list[Path] = []
+    issues: list[ConfiguredFileIssue] = []
     for surface in config.get("surfaces", []):
         if surface.get("id") == "life_counter" and not include_life_counter:
             continue
+        surface_id = str(surface.get("id", "unknown"))
+        blocking = bool(surface.get("strict_file_inventory", False))
         for raw in surface.get("files", []):
+            if not isinstance(raw, str) or not raw.strip():
+                issues.append(
+                    ConfiguredFileIssue(
+                        surface_id=surface_id,
+                        path=repr(raw),
+                        reason="invalid_path",
+                        blocking=blocking,
+                    )
+                )
+                continue
             path = REPO / raw
-            if path.exists():
+            if path.is_file():
                 paths.append(path)
-    return sorted(set(paths))
+                continue
+            issues.append(
+                ConfiguredFileIssue(
+                    surface_id=surface_id,
+                    path=raw,
+                    reason="missing" if not path.exists() else "not_a_file",
+                    blocking=blocking,
+                )
+            )
+    return (
+        sorted(set(paths)),
+        sorted(
+            set(issues),
+            key=lambda issue: (
+                not issue.blocking,
+                issue.surface_id,
+                issue.path,
+                issue.reason,
+            ),
+        ),
+    )
+
+
+def configured_files(config: dict, include_life_counter: bool) -> list[Path]:
+    """Return existing selected files for callers that only need the scan set."""
+
+    files, _ = configured_file_inventory(config, include_life_counter)
+    return files
 
 
 def surface_for_file(config: dict, path: str) -> str:
@@ -351,7 +405,15 @@ def render_report(
     files_count: int,
     include_life_counter: bool,
     include_git_status: bool,
+    configured_file_issues: list[ConfiguredFileIssue] | None = None,
+    inventory_files_count: int | None = None,
 ) -> str:
+    configured_file_issues = configured_file_issues or []
+    if inventory_files_count is None:
+        inventory_files_count = files_count
+    blocking_file_issues = [
+        issue for issue in configured_file_issues if issue.blocking
+    ]
     now = datetime.now(timezone.utc).isoformat()
     branch = run(["git", "rev-parse", "--abbrev-ref", "HEAD"])
     sha = run(["git", "rev-parse", "--short", "HEAD"])
@@ -373,7 +435,10 @@ def render_report(
         f"- Branch: `{branch}`",
         f"- SHA: `{sha}`",
         f"- Config: `{rel(REPO / DEFAULT_CONFIG)}`",
-        f"- Arquivos auditados: `{files_count}`",
+        f"- Arquivos inventariados: `{inventory_files_count}`",
+        f"- Arquivos textuais auditados: `{files_count}`",
+        f"- Caminhos configurados invalidos: `{len(configured_file_issues)}`",
+        f"- Erros bloqueantes de inventario: `{len(blocking_file_issues)}`",
         f"- Life Counter incluido: `{include_life_counter}`",
         "",
         "## Fontes de verdade",
@@ -384,6 +449,27 @@ def render_report(
     lines.extend(["", "## Regras premium aplicadas", ""])
     for rule in config.get("baseline_rules", []):
         lines.append(f"- {rule}")
+
+    if configured_file_issues:
+        lines.extend(
+            [
+                "",
+                "## Integridade dos caminhos configurados",
+                "",
+                "`CONFIG_INVALID` para surfaces com inventario estrito; "
+                "`CONFIG_WARNING` para surfaces legadas ainda nao bloqueantes.",
+                "",
+                "Caminhos ausentes ou que nao sejam arquivos nao entram silenciosamente "
+                "na contagem auditada.",
+                "",
+            ]
+        )
+        for issue in configured_file_issues:
+            status = "CONFIG_INVALID" if issue.blocking else "CONFIG_WARNING"
+            lines.append(
+                f"- `{status}` surface=`{issue.surface_id}` "
+                f"reason=`{issue.reason}` path=`{issue.path}`"
+            )
 
     lines.extend(
         [
@@ -472,8 +558,11 @@ def render_report(
         status = run(["git", "status", "--short", "--branch"])
         lines.extend(["## Git status", "", "```text", status, "```", ""])
 
+    config_valid = "false" if blocking_file_issues else "true"
     lines.extend(
         [
+            f"VISUAL_PREMIUM_QA_CONFIG_RESULT: issues={len(configured_file_issues)} blocking={len(blocking_file_issues)} valid={config_valid}",
+            "",
             f"VISUAL_PREMIUM_QA_RESULT: signals={len(signals)} P1={by_severity['P1']} P2={by_severity['P2']} visual_pass=false",
             "",
         ]
@@ -504,10 +593,16 @@ def main() -> int:
     output_path = (REPO / args.output).resolve()
     config = load_json(config_path)
 
-    files = configured_files(config, include_life_counter=args.include_life_counter)
+    files, configured_file_issues = configured_file_inventory(
+        config,
+        include_life_counter=args.include_life_counter,
+    )
+    auditable_files = [
+        path for path in files if path.suffix.lower() in AUDITABLE_TEXT_SUFFIXES
+    ]
     signals: list[Signal] = []
     counters: Counter[str] = Counter()
-    for path in files:
+    for path in auditable_files:
         audit_dart_file(path, signals, counters)
 
     signals.sort(
@@ -524,15 +619,35 @@ def main() -> int:
         config,
         signals,
         counters,
-        len(files),
+        len(auditable_files),
         include_life_counter=args.include_life_counter,
         include_git_status=args.include_git_status,
+        configured_file_issues=configured_file_issues,
+        inventory_files_count=len(files),
     )
     output_path.parent.mkdir(parents=True, exist_ok=True)
     output_path.write_text(report)
     marker = report.strip().splitlines()[-1]
+    if configured_file_issues:
+        blocking_count = sum(issue.blocking for issue in configured_file_issues)
+        config_valid = "false" if blocking_count else "true"
+        print(
+            "VISUAL_PREMIUM_QA_CONFIG_RESULT: "
+            f"issues={len(configured_file_issues)} "
+            f"blocking={blocking_count} valid={config_valid}",
+            file=sys.stderr,
+        )
+        for issue in configured_file_issues:
+            status = "ERROR" if issue.blocking else "WARNING"
+            print(
+                f"{status}: surface={issue.surface_id} "
+                f"reason={issue.reason} path={issue.path}",
+                file=sys.stderr,
+            )
     print(marker)
     print(f"Report: {output_path}")
+    if any(issue.blocking for issue in configured_file_issues):
+        return CONFIG_ERROR_EXIT_CODE
     return 0
 
 

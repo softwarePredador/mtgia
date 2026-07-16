@@ -4,12 +4,12 @@
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:dotenv/dotenv.dart';
 import 'package:http/http.dart' as http;
 import 'package:postgres/postgres.dart';
 
 import '../lib/ai/optimization_validator.dart';
 import '../lib/database.dart';
+import '../lib/runtime_environment.dart';
 import '../routes/ai/optimize/index.dart' as optimize_route;
 
 const _defaultApiBaseUrl = 'http://127.0.0.1:8080';
@@ -209,7 +209,7 @@ Future<void> main(List<String> args) async {
     return;
   }
 
-  final env = DotEnv(includePlatformEnvironment: true, quiet: true)..load();
+  final env = loadRuntimeEnvironment();
   final apiBaseUrl = env['TEST_API_BASE_URL'] ?? _defaultApiBaseUrl;
   _corpusPath = _resolveCorpusPath(env['VALIDATION_CORPUS_PATH']);
 
@@ -793,7 +793,7 @@ Future<DeckRunResult> _runOptimizationForDeck({
         candidate.commanderColors,
       ).generateAnalysis();
 
-  final env = DotEnv(includePlatformEnvironment: true, quiet: true)..load();
+  final env = loadRuntimeEnvironment();
   final validator = OptimizationValidator(openAiKey: env['OPENAI_API_KEY']);
   final localValidation = await validator.validate(
     originalDeck: enrichedOriginalCards,

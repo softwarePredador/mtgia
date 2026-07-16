@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../core/api/api_client.dart';
+import '../../../core/utils/friendly_error_mapper.dart';
 import '../../../core/utils/logger.dart';
 import '../../decks/models/deck_card_item.dart';
 
@@ -138,32 +139,49 @@ class CardProvider extends ChangeNotifier {
 
   /// Solicita uma explicação da carta via IA
   Future<String?> explainCard(DeckCardItem card) async {
+    late final ApiResponse response;
     try {
-      final response = await _apiClient.post('/ai/explain', {
+      response = await _apiClient.post('/ai/explain', {
         'card_id': card.id,
         'card_name': card.name,
         'oracle_text': card.oracleText,
         'type_line': card.typeLine,
       });
-
-      if (response.statusCode == 200) {
-        final data = response.data;
-        if (data is Map) {
-          final explanation = data['explanation']?.toString().trim();
-          if (explanation != null && explanation.isNotEmpty) {
-            return explanation;
-          }
-        }
-      }
-      return null;
     } catch (error, stackTrace) {
       AppLogger.error(
-        '[CardProvider] Falha ao obter explicação da carta',
+        '[CardProvider] Falha de transporte ao obter explicação da carta',
         error,
         stackTrace,
       );
-      return null;
+      rethrow;
     }
+
+    if (response.statusCode != 200) {
+      throw Exception(
+        FriendlyErrorMapper.fromApiResponse(
+          response,
+          context: FriendlyErrorContext.deckDetails,
+          fallback:
+              'Não foi possível explicar esta carta agora. Tente novamente em instantes.',
+        ),
+      );
+    }
+
+    final data = response.data;
+    if (data is Map) {
+      final explanation = data['explanation']?.toString().trim();
+      if (explanation != null && explanation.isNotEmpty) {
+        return explanation;
+      }
+    }
+
+    const error = FormatException('Invalid AI explanation response');
+    AppLogger.error(
+      '[CardProvider] Resposta inválida ao explicar carta',
+      error,
+      StackTrace.current,
+    );
+    throw error;
   }
 
   Future<List<Map<String, dynamic>>> fetchPrintingsByName(String name) async {

@@ -3,7 +3,6 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:dart_frog/dart_frog.dart';
-import 'package:dotenv/dotenv.dart';
 import 'package:http/http.dart' as http;
 import 'package:postgres/postgres.dart';
 
@@ -12,10 +11,12 @@ import '../../../lib/ai/commander_reference_profile_support.dart';
 import '../../../lib/ai_provider_runtime_support.dart';
 import '../../../lib/ai_provider_usage_support.dart';
 import '../../../lib/http_responses.dart';
+import '../../../lib/json_object_support.dart';
 import '../../../lib/logger.dart';
 import '../../../lib/observability.dart';
 import '../../../lib/openai_runtime_config.dart';
 import '../../../lib/openai_structured_output_support.dart';
+import '../../../lib/runtime_environment.dart';
 
 Future<Response> onRequest(RequestContext context) async {
   if (context.request.method != HttpMethod.post) {
@@ -28,10 +29,18 @@ Future<Response> onRequest(RequestContext context) async {
   var openAiCallMs = 0;
   var responseParseMs = 0;
 
+  Map<String, dynamic> body;
+  String? deckId;
   try {
-    final body = await context.request.json() as Map<String, dynamic>;
-    final deckId = body['deck_id'] as String?;
+    body = requireJsonObject(await context.request.json());
+    deckId = readOptionalJsonString(body, 'deck_id', maxLength: 128);
+  } on JsonObjectValidationException catch (error) {
+    return badRequest(error.message);
+  } catch (_) {
+    return badRequest('JSON invalido');
+  }
 
+  try {
     if (deckId == null) {
       return badRequest('deck_id is required');
     }
@@ -170,13 +179,7 @@ Future<Response> onRequest(RequestContext context) async {
     }
 
     // 2. Prepare Prompt
-    DotEnv env;
-    try {
-      env = DotEnv(includePlatformEnvironment: true, quiet: true)..load();
-    } catch (_) {
-      // No .env file (production) — rely on platform environment only
-      env = DotEnv(includePlatformEnvironment: true, quiet: true);
-    }
+    final env = loadRuntimeEnvironment();
     final aiConfig = OpenAiRuntimeConfig(env);
     final apiKey = env['OPENAI_API_KEY'];
 
@@ -262,13 +265,7 @@ Formato obrigatório:
       min: const Duration(seconds: 3),
       max: const Duration(seconds: 60),
     );
-    final model = aiConfig.modelFor(
-      key: 'OPENAI_MODEL_ARCHETYPES',
-      fallback: 'gpt-4o-mini',
-      devFallback: 'gpt-4o-mini',
-      stagingFallback: 'gpt-4o-mini',
-      prodFallback: 'gpt-4o-mini',
-    );
+    final model = aiConfig.archetypesModel;
     late final http.Response response;
     try {
       response = await http

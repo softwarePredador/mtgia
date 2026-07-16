@@ -34,6 +34,46 @@ void main() {
       expect(state, isNull);
     });
 
+    test(
+      'normalizes Lotus running timer pausedTime zero to canonical null',
+      () {
+        final snapshot = LotusStorageSnapshot(
+          values: {
+            'gameTimerState': jsonEncode({
+              'startTime': 1711800000000,
+              'isPaused': false,
+              'pausedTime': 0,
+            }),
+          },
+        );
+
+        final state = LotusLifeCounterGameTimerAdapter.tryBuildState(snapshot);
+
+        expect(state, isNotNull);
+        expect(state!.isActive, isTrue);
+        expect(state.isPaused, isFalse);
+        expect(state.pausedTimeEpochMs, isNull);
+        expect(
+          LifeCounterGameTimerState.tryParse(state.toJsonString()),
+          isNotNull,
+        );
+      },
+    );
+
+    test('rejects an invalid paused Lotus timer payload', () {
+      final snapshot = LotusStorageSnapshot(
+        values: {
+          'gameTimerState': jsonEncode({
+            'startTime': 1711800000000,
+            'isPaused': true,
+            'pausedTime': 0,
+          }),
+        },
+      );
+
+      expect(LotusLifeCounterGameTimerAdapter.tryBuildState(snapshot), isNull);
+    });
+
     test('serializes canonical game timer state back into Lotus snapshot', () {
       const state = LifeCounterGameTimerState(
         startTimeEpochMs: 1711800000000,

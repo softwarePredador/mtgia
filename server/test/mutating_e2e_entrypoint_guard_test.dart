@@ -128,6 +128,31 @@ void main() {
       expect(source, contains('"runtime_cleanup"'));
       expect(source, contains(r'assert_loopback_listener "$PORT"'));
       expect(source, isNot(contains('dart_frog dev')));
+      expect(
+        source,
+        contains(r'MANALOOM_E2E_VALIDATION_RUN_TOKEN="$RUN_TOKEN"'),
+      );
+      expect(source, contains('VALIDATION_DEFER_CLEANUP_TO_HARNESS=1'));
+      expect(source, contains('RATE_LIMIT_DISTRIBUTED=false'));
+      expect(source, contains('MANALOOM_E2E_ISOLATED_RUNTIME=1'));
+      expect(source, contains('e2e_isolated_runtime'));
+      expect(source, contains('"telemetry_deleted": cleanup_ok == "1"'));
+      expect(source, contains('manaloom_validation_user_ids'));
+      expect(source, contains('manaloom_validation_deck_ids'));
+      expect(source, contains("decisions_reasoning->>'validation_run_token'"));
+      expect(source, contains('manaloom_validation_context'));
+      expect(source, contains('SELECT run_started_at'));
+      expect(source, contains(r'DO $telemetry_postcheck$'));
+      expect(source, contains("'postcheck_passed', true"));
+      expect(source, contains('RAISE EXCEPTION'));
+      expect(source, contains('deck_learning_events'));
+      expect(source, contains('ai_optimize_jobs'));
+      expect(source, contains('commander_card_usage'));
+      expect(source, contains('manaloom_validation_usage_adjustments'));
+      expect(source, contains('UPDATE commander_card_usage'));
+      expect(source, contains('DELETE FROM commander_card_usage'));
+      expect(source, contains('ml_prompt_feedback_delta'));
+      expect(source, contains('"learning_write_guard"'));
 
       for (final table in const [
         'ai_optimize_cache',
@@ -139,7 +164,7 @@ void main() {
       ]) {
         expect(
           source.toUpperCase(),
-          isNot(contains('DELETE FROM ${table.toUpperCase()}')),
+          contains('DELETE FROM ${table.toUpperCase()}'),
           reason: table,
         );
       }
@@ -473,7 +498,7 @@ void main() {
       );
       expect(commanderGuard, greaterThanOrEqualTo(0));
       for (final firstExternalOperation in const [
-        'DotEnv(',
+        'loadRuntimeEnvironment(',
         'Directory(artifactDirPath)',
         '_validateApiBaseUrl(apiBaseUrl)',
         'Database()',
@@ -496,7 +521,7 @@ void main() {
       );
       expect(threeGuard, greaterThanOrEqualTo(0));
       for (final firstExternalOperation in const [
-        'DotEnv(',
+        'loadRuntimeEnvironment(',
         'Database()',
         '_ensureServerIsReachable(apiBaseUrl)',
         'Directory(_artifactDirPath)',

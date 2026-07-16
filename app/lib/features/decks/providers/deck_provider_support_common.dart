@@ -1,7 +1,3 @@
-import 'dart:convert';
-
-import 'package:shared_preferences/shared_preferences.dart';
-
 import '../../../core/api/api_client.dart';
 import '../../../core/utils/friendly_error_mapper.dart';
 import '../models/deck.dart';
@@ -184,6 +180,7 @@ class OptimizeDeckRequestResult {
     this.result,
     this.jobId,
     this.pollIntervalMs,
+    this.pollTimeoutMs,
     this.totalStages,
   });
 
@@ -193,11 +190,13 @@ class OptimizeDeckRequestResult {
   const OptimizeDeckRequestResult.async({
     required String jobId,
     required int pollIntervalMs,
+    required int pollTimeoutMs,
     required int totalStages,
   }) : this._(
          isAsync: true,
          jobId: jobId,
          pollIntervalMs: pollIntervalMs,
+         pollTimeoutMs: pollTimeoutMs,
          totalStages: totalStages,
        );
 
@@ -205,6 +204,7 @@ class OptimizeDeckRequestResult {
   final Map<String, dynamic>? result;
   final String? jobId;
   final int? pollIntervalMs;
+  final int? pollTimeoutMs;
   final int? totalStages;
 }
 
@@ -348,33 +348,6 @@ DeckAiFlowException buildDeckAiFlowException(
     outcomeCode: outcomeCode,
     payload: payload,
   );
-}
-
-Future<void> saveOptimizeDebugSnapshot({
-  Map<String, dynamic>? request,
-  Map<String, dynamic>? response,
-}) async {
-  try {
-    final prefs = await SharedPreferences.getInstance();
-    if (request != null) {
-      await prefs.setString(
-        'debug_last_ai_optimize_request',
-        jsonEncode(request),
-      );
-    }
-    if (response != null) {
-      await prefs.setString(
-        'debug_last_ai_optimize_response',
-        jsonEncode(response),
-      );
-    }
-    await prefs.setString(
-      'debug_last_ai_optimize_at',
-      DateTime.now().toIso8601String(),
-    );
-  } catch (_) {
-    // Silencioso: não deve quebrar fluxo do app.
-  }
 }
 
 void ensureSuccessfulDeckMutationResponse(

@@ -64,16 +64,46 @@ class LifeCounterGameTimerState {
   }
 
   static LifeCounterGameTimerState? tryFromJson(Map<String, dynamic> payload) {
-    final startTimeEpochMs = (payload['start_time_epoch_ms'] as num?)?.toInt();
+    final startTimeRaw = payload['start_time_epoch_ms'];
     final isPaused = payload['is_paused'];
-    final pausedTimeEpochMs =
-        (payload['paused_time_epoch_ms'] as num?)?.toInt();
+    final pausedTimeRaw = payload['paused_time_epoch_ms'];
 
     if (isPaused is! bool) {
       return null;
     }
 
-    if (startTimeEpochMs == null && pausedTimeEpochMs != null) {
+    if (startTimeRaw != null &&
+        (startTimeRaw is! num || !startTimeRaw.isFinite)) {
+      return null;
+    }
+
+    if (pausedTimeRaw != null &&
+        (pausedTimeRaw is! num || !pausedTimeRaw.isFinite)) {
+      return null;
+    }
+
+    final startTimeEpochMs = (startTimeRaw as num?)?.toInt();
+    final pausedTimeEpochMs = (pausedTimeRaw as num?)?.toInt();
+
+    if (startTimeEpochMs != null && startTimeEpochMs < 0) {
+      return null;
+    }
+
+    if (pausedTimeEpochMs != null && pausedTimeEpochMs < 0) {
+      return null;
+    }
+
+    if (startTimeEpochMs == null && (isPaused || pausedTimeEpochMs != null)) {
+      return null;
+    }
+
+    if (startTimeEpochMs != null && isPaused != (pausedTimeEpochMs != null)) {
+      return null;
+    }
+
+    if (startTimeEpochMs != null &&
+        pausedTimeEpochMs != null &&
+        pausedTimeEpochMs < startTimeEpochMs) {
       return null;
     }
 

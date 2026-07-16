@@ -2,6 +2,7 @@ import 'package:dart_frog/dart_frog.dart';
 import 'package:postgres/postgres.dart';
 import '../../../lib/archetype_counters_service.dart';
 import '../../../lib/http_responses.dart';
+import '../../../lib/json_object_support.dart';
 import '../../../lib/ai/optimization_functional_roles.dart';
 import '../../../lib/ai/optimization_ramp_profile.dart';
 import '../../../lib/ai/commander_spellbook_service.dart';
@@ -21,9 +22,18 @@ Future<Response> onRequest(RequestContext context) async {
     return methodNotAllowed();
   }
 
+  Map<String, dynamic> body;
+  String? deckId;
   try {
-    final body = await context.request.json() as Map<String, dynamic>;
-    final deckId = body['deck_id'] as String?;
+    body = requireJsonObject(await context.request.json());
+    deckId = readOptionalJsonString(body, 'deck_id', maxLength: 128);
+  } on JsonObjectValidationException catch (error) {
+    return badRequest(error.message);
+  } catch (_) {
+    return badRequest('JSON invalido');
+  }
+
+  try {
     final userId = context.read<String>();
 
     if (deckId == null) {

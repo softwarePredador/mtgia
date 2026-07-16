@@ -9,6 +9,68 @@ import 'lotus_runtime_flags.dart';
 typedef LotusAppReviewCallback = void Function(String message);
 typedef LotusShellMessageCallback = void Function(String message);
 typedef LotusStorageMessageCallback = Future<void> Function(String message);
+typedef LotusStorageMessageErrorCallback =
+    void Function(Object error, StackTrace stackTrace);
+
+class LotusStorageMessageQueue {
+  LotusStorageMessageQueue(
+    this._onMessage, {
+    LotusStorageMessageErrorCallback? onError,
+  }) : _onError = onError ?? _logError;
+
+  final LotusStorageMessageCallback _onMessage;
+  final LotusStorageMessageErrorCallback _onError;
+
+  Future<void> _tail = Future<void>.value();
+  bool _isClosed = false;
+
+  void enqueue(String message) {
+    if (_isClosed) {
+      return;
+    }
+
+    _tail = _tail.then((_) => _dispatch(message));
+  }
+
+  Future<T> enqueueTask<T>(Future<T> Function() task) {
+    final completer = Completer<T>();
+    if (_isClosed) {
+      completer.completeError(
+        StateError('Lotus storage message queue is closed'),
+      );
+      return completer.future;
+    }
+
+    _tail = _tail.then((_) async {
+      try {
+        completer.complete(await task());
+      } catch (error, stackTrace) {
+        completer.completeError(error, stackTrace);
+      }
+    });
+    return completer.future;
+  }
+
+  Future<void> get idle => _tail;
+
+  void close() {
+    _isClosed = true;
+  }
+
+  Future<void> _dispatch(String message) async {
+    try {
+      await _onMessage(message);
+    } catch (error, stackTrace) {
+      try {
+        _onError(error, stackTrace);
+      } catch (_) {}
+    }
+  }
+
+  static void _logError(Object error, StackTrace _) {
+    debugPrint('$lotusLogPrefix storage bridge callback error: $error');
+  }
+}
 
 class LotusJavaScriptBridges {
   LotusJavaScriptBridges._();
@@ -18,12 +80,16 @@ class LotusJavaScriptBridges {
   static const String shellChannelName = 'FlutterManaLoomShellBridge';
   static const String storageChannelName = 'FlutterManaLoomStorageBridge';
 
-  static void register(
+  static LotusStorageMessageQueue register(
     WebViewController controller, {
     required LotusAppReviewCallback onAppReviewRequested,
     required LotusShellMessageCallback onShellMessageRequested,
     required LotusStorageMessageCallback onStorageMessageRequested,
   }) {
+    final storageMessageQueue = LotusStorageMessageQueue(
+      onStorageMessageRequested,
+    );
+
     controller
       ..addJavaScriptChannel(
         clipboardChannelName,
@@ -44,9 +110,11 @@ class LotusJavaScriptBridges {
       ..addJavaScriptChannel(
         storageChannelName,
         onMessageReceived: (message) {
-          unawaited(onStorageMessageRequested(message.message));
+          storageMessageQueue.enqueue(message.message);
         },
       );
+
+    return storageMessageQueue;
   }
 
   static Future<void> _handleClipboardMessage(JavaScriptMessage message) async {

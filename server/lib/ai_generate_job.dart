@@ -3,10 +3,15 @@ import 'dart:math';
 
 import 'package:postgres/postgres.dart';
 
+import 'e2e_validation_policy.dart';
+
 class AiGenerateJobStore {
   AiGenerateJobStore._();
 
   static const _jobTtl = Duration(minutes: 30);
+  static const _cleanupInterval = Duration(minutes: 5);
+  static const _executionTimeout = Duration(minutes: 4);
+  static DateTime? _lastCleanupAt;
   static Future<String> create({
     required Pool pool,
     required String cacheKey,
@@ -40,7 +45,22 @@ class AiGenerateJobStore {
   }
 
   static Future<AiGenerateJob?> get(Pool pool, String id) async {
-    await _cleanup(pool);
+    await _cleanupIfDue(pool);
+    await pool.execute(
+      Sql.named('''
+        UPDATE ai_generate_jobs
+        SET
+          status = 'failed',
+          stage = 'Erro',
+          error = 'A geração foi interrompida. Inicie uma nova tentativa.',
+          updated_at = NOW()
+        WHERE id = @id
+          AND status IN ('pending', 'processing')
+          AND updated_at <
+            NOW() - (CAST(@timeout_seconds AS int) * INTERVAL '1 second')
+      '''),
+      parameters: {'id': id, 'timeout_seconds': _executionTimeout.inSeconds},
+    );
     final result = await pool.execute(
       Sql.named('''
         SELECT
@@ -141,6 +161,16 @@ class AiGenerateJobStore {
       '''),
       parameters: {'ttl_seconds': _jobTtl.inSeconds},
     );
+  }
+
+  static Future<void> _cleanupIfDue(Pool pool) async {
+    if (!shouldRunGlobalHousekeeping()) return;
+
+    final now = DateTime.now();
+    final last = _lastCleanupAt;
+    if (last != null && now.difference(last) < _cleanupInterval) return;
+    _lastCleanupAt = now;
+    await _cleanup(pool);
   }
 
   static String _generateId() {

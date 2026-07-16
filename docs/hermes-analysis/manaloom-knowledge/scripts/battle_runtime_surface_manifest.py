@@ -132,6 +132,7 @@ CORE_TEST_BASENAMES = {
     "test_battle_analyst_v10_3.py",
     "test_battle_functional_tags_json.py",
     "test_battle_rule_alternatives.py",
+    "test_battle_token_lifecycle.py",
     "native_battle_sidecar.py",
     "native_battle_worker.py",
     "native_battle_sidecar_test.py",

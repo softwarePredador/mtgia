@@ -393,6 +393,33 @@ void main() {
       },
     );
 
+    test('learned deck failures do not expose raw status codes', () async {
+      final apiClient = _FakeApiClient(
+        getHandlers: {
+          '/ai/commander-learning':
+              () => ApiResponse(503, {'error': 'database stack trace'}),
+        },
+      );
+      final provider = DeckProvider(apiClient: apiClient);
+
+      await expectLater(
+        provider.fetchCommanderLearningDecks(),
+        throwsA(
+          isA<Exception>()
+              .having(
+                (error) => error.toString(),
+                'message',
+                contains('indisponível'),
+              )
+              .having(
+                (error) => error.toString(),
+                'raw status',
+                isNot(contains('503')),
+              ),
+        ),
+      );
+    });
+
     test(
       'generateDeck uses async by default and completes via polling',
       () async {
@@ -437,6 +464,7 @@ void main() {
         );
         final provider = DeckProvider(
           apiClient: apiClient,
+          pollDelay: (_) async {},
           trackActivationEvent: (
             String eventName, {
             String? format,
@@ -495,7 +523,10 @@ void main() {
             },
           },
         );
-        final provider = DeckProvider(apiClient: apiClient);
+        final provider = DeckProvider(
+          apiClient: apiClient,
+          pollDelay: (_) async {},
+        );
 
         final result = await provider.generateDeck(
           prompt: 'Boros miracle big spells',
@@ -559,6 +590,98 @@ void main() {
       expect(progressMessages, contains('Pronto para revisar.'));
     });
 
+    test('generateDeck rejects an async job completed with 422', () async {
+      final progressMessages = <String>[];
+      final apiClient = _FakeApiClient(
+        postHandlers: {
+          '/ai/generate':
+              (_) => ApiResponse(202, {
+                'job_id': 'job-invalid-deck',
+                'status': 'pending',
+                'poll_url': '/ai/generate/jobs/job-invalid-deck',
+                'poll_interval_ms': 1,
+              }),
+        },
+        getHandlers: {
+          '/ai/generate/jobs/job-invalid-deck':
+              () => ApiResponse(200, {
+                'job_id': 'job-invalid-deck',
+                'status': 'completed',
+                'result_status_code': 422,
+                'result': {
+                  'error': 'Generated deck failed validation',
+                  'generated_deck': {'cards': const <Map<String, dynamic>>[]},
+                },
+              }),
+        },
+      );
+      final provider = DeckProvider(apiClient: apiClient);
+
+      await expectLater(
+        provider.generateDeck(
+          prompt: 'invalid commander list',
+          format: 'Commander',
+          pollInterval: Duration.zero,
+          onProgress: (progress) => progressMessages.add(progress.message),
+        ),
+        throwsA(
+          isA<Exception>().having(
+            (error) => error.toString(),
+            'message',
+            contains('Não conseguimos gerar um deck válido'),
+          ),
+        ),
+      );
+      expect(progressMessages, isNot(contains('Pronto para revisar.')));
+    });
+
+    test('generateDeck rejects a malformed async success payload', () async {
+      final progressMessages = <String>[];
+      final apiClient = _FakeApiClient(
+        postHandlers: {
+          '/ai/generate':
+              (_) => ApiResponse(202, {
+                'job_id': 'job-malformed-deck',
+                'status': 'pending',
+                'poll_url': '/ai/generate/jobs/job-malformed-deck',
+                'poll_interval_ms': 1,
+              }),
+        },
+        getHandlers: {
+          '/ai/generate/jobs/job-malformed-deck':
+              () => ApiResponse(200, {
+                'job_id': 'job-malformed-deck',
+                'status': 'completed',
+                'result_status_code': 200,
+                'result': {
+                  'generated_deck': {
+                    'cards': const <Map<String, dynamic>>[],
+                  },
+                  'validation': const {'is_valid': true},
+                },
+              }),
+        },
+      );
+      final provider = DeckProvider(apiClient: apiClient);
+
+      await expectLater(
+        provider.generateDeck(
+          prompt: 'malformed async fixture',
+          format: 'Commander',
+          pollInterval: Duration.zero,
+          onProgress: (progress) => progressMessages.add(progress.message),
+        ),
+        throwsA(
+          isA<Exception>().having(
+            (error) => error.toString(),
+            'message',
+            contains('não devolveu um deck válido para revisão'),
+          ),
+        ),
+      );
+      expect(progressMessages, isNot(contains('Pronto para revisar.')));
+    });
+
     test(
       'generateDeck preserves fallback sync when async is unsupported',
       () async {
@@ -609,6 +732,71 @@ void main() {
         expect(result['generated_deck'], isA<Map>());
         expect(apiClient.postCalls, equals(['/ai/generate']));
         expect(apiClient.getCalls, isEmpty);
+      },
+    );
+
+    test(
+      'generateDeck never submits a second action after invalid 202 contract',
+      () async {
+        final apiClient = _FakeApiClient(
+          postHandlers: {
+            '/ai/generate':
+                (_) => ApiResponse(202, {
+                  'job_id': 'job-without-poll-url',
+                  'status': 'pending',
+                }),
+          },
+        );
+        final provider = DeckProvider(apiClient: apiClient);
+
+        await expectLater(
+          provider.generateDeck(
+            prompt: 'Talrand spellslinger',
+            format: 'Commander',
+          ),
+          throwsA(
+            isA<Exception>().having(
+              (error) => error.toString(),
+              'message',
+              contains('acompanhamento'),
+            ),
+          ),
+        );
+        expect(apiClient.postCalls, equals(['/ai/generate']));
+        expect(apiClient.getCalls, isEmpty);
+      },
+    );
+
+    test(
+      'generateDeck never falls back to a second action after polling starts',
+      () async {
+        final apiClient = _FakeApiClient(
+          postHandlers: {
+            '/ai/generate':
+                (_) => ApiResponse(202, {
+                  'job_id': 'job-expired',
+                  'status': 'pending',
+                  'poll_url': '/ai/generate/jobs/job-expired',
+                  'poll_interval_ms': 1,
+                }),
+          },
+          getHandlers: {
+            '/ai/generate/jobs/job-expired':
+                () => ApiResponse(404, {'error': 'async job not found'}),
+          },
+        );
+        final provider = DeckProvider(apiClient: apiClient);
+
+        await expectLater(
+          provider.generateDeck(
+            prompt: 'Talrand spellslinger',
+            format: 'Commander',
+            pollInterval: Duration.zero,
+          ),
+          throwsA(isA<Exception>()),
+        );
+        expect(apiClient.postCalls, equals(['/ai/generate']));
+        expect(apiClient.getCalls, equals(['/ai/generate/jobs/job-expired']));
       },
     );
 
@@ -823,6 +1011,7 @@ void main() {
         );
         final provider = DeckProvider(
           apiClient: apiClient,
+          pollDelay: (_) async {},
           trackActivationEvent: (
             String eventName, {
             String? format,
@@ -920,7 +1109,10 @@ void main() {
             },
           },
         );
-        final provider = DeckProvider(apiClient: apiClient);
+        final provider = DeckProvider(
+          apiClient: apiClient,
+          pollDelay: (_) async {},
+        );
 
         final result = await provider.optimizeDeck(
           'deck-1',

@@ -120,6 +120,41 @@ void main() {
     });
 
     test(
+      'round-trips explicit player counter presence in session json',
+      () async {
+        final session = LifeCounterSession.initial(playerCount: 4).copyWith(
+          playerCounterPresence: const [
+            ['energy', 'xp', 'tax-1'],
+            ['poison', 'tax-2'],
+            [],
+            ['poison', 'energy', 'xp', 'tax-1', 'tax-2'],
+          ],
+        );
+
+        await store.save(session);
+        final restored = await store.load();
+        final prefs = await SharedPreferences.getInstance();
+        final persistedJson =
+            jsonDecode(prefs.getString(legacyLifeCounterSessionPrefsKey)!)
+                as Map<String, dynamic>;
+
+        expect(persistedJson['player_counter_presence'], const [
+          ['energy', 'xp', 'tax-1'],
+          ['poison', 'tax-2'],
+          [],
+          ['poison', 'energy', 'xp', 'tax-1', 'tax-2'],
+        ]);
+        expect(restored, isNotNull);
+        expect(restored!.resolvedPlayerCounterPresence, const [
+          ['energy', 'xp', 'tax-1'],
+          ['poison', 'tax-2'],
+          [],
+          ['poison', 'energy', 'xp', 'tax-1', 'tax-2'],
+        ]);
+      },
+    );
+
+    test(
       'sanitizes legacy set-life events on load and writes back normalized json',
       () async {
         SharedPreferences.setMockInitialValues({
@@ -227,69 +262,72 @@ void main() {
       expect(restored, isNull);
     });
 
-    test('round-trips player appearances in the canonical session store', () async {
-      const session = LifeCounterSession(
-        playerCount: 4,
-        startingLifeTwoPlayer: 20,
-        startingLifeMultiPlayer: 40,
-        lives: [40, 32, 25, 11],
-        poison: [0, 0, 0, 0],
-        energy: [0, 0, 0, 0],
-        experience: [0, 0, 0, 0],
-        commanderCasts: [0, 0, 0, 0],
-        playerAppearances: [
-          LifeCounterPlayerAppearance(background: '#FFB51E'),
-          LifeCounterPlayerAppearance(
+    test(
+      'round-trips player appearances in the canonical session store',
+      () async {
+        const session = LifeCounterSession(
+          playerCount: 4,
+          startingLifeTwoPlayer: 20,
+          startingLifeMultiPlayer: 40,
+          lives: [40, 32, 25, 11],
+          poison: [0, 0, 0, 0],
+          energy: [0, 0, 0, 0],
+          experience: [0, 0, 0, 0],
+          commanderCasts: [0, 0, 0, 0],
+          playerAppearances: [
+            LifeCounterPlayerAppearance(background: '#FFB51E'),
+            LifeCounterPlayerAppearance(
+              background: '#CF7AEF',
+              nickname: 'Partner Pilot',
+              backgroundImage: 'main-image-ref',
+              backgroundImagePartner: 'partner-image-ref',
+            ),
+            LifeCounterPlayerAppearance(background: '#4B57FF'),
+            LifeCounterPlayerAppearance(background: '#44E063'),
+          ],
+          partnerCommanders: [false, true, false, false],
+          playerSpecialStates: [
+            LifeCounterPlayerSpecialState.none,
+            LifeCounterPlayerSpecialState.none,
+            LifeCounterPlayerSpecialState.none,
+            LifeCounterPlayerSpecialState.none,
+          ],
+          lastPlayerRolls: [null, null, null, null],
+          lastHighRolls: [null, null, null, null],
+          commanderDamage: [
+            [0, 0, 0, 0],
+            [0, 0, 0, 0],
+            [0, 0, 0, 0],
+            [0, 0, 0, 0],
+          ],
+          stormCount: 0,
+          monarchPlayer: null,
+          initiativePlayer: null,
+          firstPlayerIndex: null,
+          turnTrackerActive: false,
+          turnTrackerOngoingGame: false,
+          turnTrackerAutoHighRoll: false,
+          currentTurnPlayerIndex: null,
+          currentTurnNumber: 1,
+          turnTimerActive: false,
+          turnTimerSeconds: 0,
+          lastTableEvent: null,
+        );
+
+        await store.save(session);
+        final restored = await store.load();
+
+        expect(restored, isNotNull);
+        expect(
+          restored!.resolvedPlayerAppearances[1],
+          const LifeCounterPlayerAppearance(
             background: '#CF7AEF',
             nickname: 'Partner Pilot',
             backgroundImage: 'main-image-ref',
             backgroundImagePartner: 'partner-image-ref',
           ),
-          LifeCounterPlayerAppearance(background: '#4B57FF'),
-          LifeCounterPlayerAppearance(background: '#44E063'),
-        ],
-        partnerCommanders: [false, true, false, false],
-        playerSpecialStates: [
-          LifeCounterPlayerSpecialState.none,
-          LifeCounterPlayerSpecialState.none,
-          LifeCounterPlayerSpecialState.none,
-          LifeCounterPlayerSpecialState.none,
-        ],
-        lastPlayerRolls: [null, null, null, null],
-        lastHighRolls: [null, null, null, null],
-        commanderDamage: [
-          [0, 0, 0, 0],
-          [0, 0, 0, 0],
-          [0, 0, 0, 0],
-          [0, 0, 0, 0],
-        ],
-        stormCount: 0,
-        monarchPlayer: null,
-        initiativePlayer: null,
-        firstPlayerIndex: null,
-        turnTrackerActive: false,
-        turnTrackerOngoingGame: false,
-        turnTrackerAutoHighRoll: false,
-        currentTurnPlayerIndex: null,
-        currentTurnNumber: 1,
-        turnTimerActive: false,
-        turnTimerSeconds: 0,
-        lastTableEvent: null,
-      );
-
-      await store.save(session);
-      final restored = await store.load();
-
-      expect(restored, isNotNull);
-      expect(
-        restored!.resolvedPlayerAppearances[1],
-        const LifeCounterPlayerAppearance(
-          background: '#CF7AEF',
-          nickname: 'Partner Pilot',
-          backgroundImage: 'main-image-ref',
-          backgroundImagePartner: 'partner-image-ref',
-        ),
-      );
-    });
+        );
+      },
+    );
   });
 }

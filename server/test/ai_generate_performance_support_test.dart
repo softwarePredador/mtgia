@@ -7,6 +7,86 @@ import '../lib/openai_runtime_config.dart';
 
 void main() {
   group('AI generate performance support', () {
+    group('request input contract', () {
+      test('normalizes valid request fields once for sync and async paths', () {
+        final input = parseAiGenerateRequestInput({
+          'prompt': '  Boros miracle  ',
+          'format': '  Commander ',
+          'commander_name': ' Lorehold, the Historian ',
+          'bracket': ' 4 ',
+          'async': true,
+        });
+
+        expect(input.prompt, equals('Boros miracle'));
+        expect(input.format, equals('Commander'));
+        expect(input.commanderName, equals('Lorehold, the Historian'));
+        expect(input.body['prompt'], equals(input.prompt));
+        expect(input.body['format'], equals(input.format));
+        expect(input.body['commander_name'], equals(input.commanderName));
+        expect(input.body['bracket'], equals(4));
+        expect(isAiGenerateAsyncRequested(input.body), isTrue);
+      });
+
+      test('uses Commander and removes blank optional commander', () {
+        final input = parseAiGenerateRequestInput({
+          'prompt': ' deck de artefatos ',
+          'format': '   ',
+          'commander_name': '   ',
+        });
+
+        expect(input.format, equals('Commander'));
+        expect(input.commanderName, isNull);
+        expect(input.body.containsKey('commander_name'), isFalse);
+      });
+
+      test(
+        'rejects non-object, missing, blank, and incorrectly typed input',
+        () {
+          for (final decoded in <Object?>[
+            null,
+            const ['prompt'],
+            const <String, dynamic>{},
+            const {'prompt': '   '},
+            const {'prompt': 42},
+            const {'prompt': 'valid', 'format': 42},
+            const {'prompt': 'valid', 'commander_name': true},
+            const {'prompt': 'valid', 'bracket': true},
+            const {'prompt': 'valid', 'bracket': 0},
+            const {'prompt': 'valid', 'bracket': 6},
+          ]) {
+            expect(
+              () => parseAiGenerateRequestInput(decoded),
+              throwsA(isA<AiGenerateRequestValidationException>()),
+              reason: 'decoded=$decoded',
+            );
+          }
+        },
+      );
+
+      test('rejects fields beyond provider cost and contract bounds', () {
+        expect(
+          () => parseAiGenerateRequestInput({
+            'prompt': 'p' * (aiGenerateMaxPromptLength + 1),
+          }),
+          throwsA(isA<AiGenerateRequestValidationException>()),
+        );
+        expect(
+          () => parseAiGenerateRequestInput({
+            'prompt': 'valid',
+            'format': 'f' * (aiGenerateMaxFormatLength + 1),
+          }),
+          throwsA(isA<AiGenerateRequestValidationException>()),
+        );
+        expect(
+          () => parseAiGenerateRequestInput({
+            'prompt': 'valid',
+            'commander_name': 'c' * (aiGenerateMaxCommanderNameLength + 1),
+          }),
+          throwsA(isA<AiGenerateRequestValidationException>()),
+        );
+      });
+    });
+
     test(
       'builds stable cache keys from normalized prompt format and bracket',
       () {

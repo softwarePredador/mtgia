@@ -100,6 +100,9 @@ class _DeckAnalysisTabState extends State<DeckAnalysisTab> {
       ).showSnackBar(SnackBar(content: Text(message)));
     } finally {
       if (mounted) {
+        await refreshAiUsageAfterAction(context);
+      }
+      if (mounted) {
         setState(() => _isRefreshingAi = false);
       }
     }

@@ -7,7 +7,9 @@ import 'package:manaloom/features/home/life_counter/life_counter_session.dart';
 
 void main() {
   group('LifeCounterNativeDiceSheet', () {
-    testWidgets('runs high roll and applies the updated session', (tester) async {
+    testWidgets('runs high roll and applies the updated session', (
+      tester,
+    ) async {
       tester.view.physicalSize = const Size(1080, 2400);
       tester.view.devicePixelRatio = 1;
       addTearDown(tester.view.resetPhysicalSize);
@@ -82,7 +84,15 @@ void main() {
                           context,
                           initialSession: LifeCounterSession.initial(
                             playerCount: 4,
-                          ).copyWith(lives: const [0, 0, 0, 0]),
+                          ).copyWith(
+                            lives: const [0, 0, 0, 0],
+                            playerEliminationReasons: const [
+                              LifeCounterPlayerEliminationReason.life,
+                              LifeCounterPlayerEliminationReason.life,
+                              LifeCounterPlayerEliminationReason.life,
+                              LifeCounterPlayerEliminationReason.life,
+                            ],
+                          ),
                           random: Random(7),
                         );
                       },
@@ -98,7 +108,10 @@ void main() {
         await tester.tap(find.text('open'));
         await tester.pumpAndSettle();
 
-        expect(find.textContaining('No active players remain on the table.'), findsOneWidget);
+        expect(
+          find.textContaining('No active players remain on the table.'),
+          findsOneWidget,
+        );
 
         final highRollButton = tester.widget<FilledButton>(
           find.byKey(const Key('life-counter-native-dice-high-roll')),
@@ -109,7 +122,9 @@ void main() {
         expect(highRollButton.onPressed, isNull);
         expect(firstPlayerButton.onPressed, isNull);
 
-        await tester.tap(find.byKey(const Key('life-counter-native-dice-apply')));
+        await tester.tap(
+          find.byKey(const Key('life-counter-native-dice-apply')),
+        );
         await tester.pumpAndSettle();
 
         expect(result, isNotNull);

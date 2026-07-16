@@ -1,3 +1,6 @@
+import 'dart:io';
+
+import 'package:server/ai/optimize_rejection_history_support.dart';
 import 'package:test/test.dart';
 
 import '../lib/ai/otimizacao.dart';
@@ -33,184 +36,209 @@ void main() {
   });
 
   group('buildOptimizationAnalysisLogEntry', () {
-    test('captures rejected optimize outcome with reasons and priority source',
-        () {
-      final entry = optimize_route.buildOptimizationAnalysisLogEntry(
-        deckId: 'deck-1',
-        userId: 'user-1',
-        commanderName: 'Talrand, Sky Summoner',
-        commanderColors: const ['U'],
-        operationMode: 'optimize',
-        requestedMode: 'optimize',
-        targetArchetype: 'control',
-        detectedTheme: 'spellslinger',
-        deckAnalysis: const {
-          'average_cmc': '3.1',
-          'type_distribution': {
-            'lands': 35,
-            'creatures': 9,
-            'instants': 18,
+    test(
+      'captures rejected optimize outcome with reasons and priority source',
+      () {
+        final entry = optimize_route.buildOptimizationAnalysisLogEntry(
+          deckId: 'deck-1',
+          userId: 'user-1',
+          commanderName: 'Talrand, Sky Summoner',
+          commanderColors: const ['U'],
+          operationMode: 'optimize',
+          requestedMode: 'optimize',
+          targetArchetype: 'control',
+          detectedTheme: 'spellslinger',
+          deckAnalysis: const {
+            'average_cmc': '3.1',
+            'type_distribution': {'lands': 35, 'creatures': 9, 'instants': 18},
           },
-        },
-        postAnalysis: const {
-          'average_cmc': '2.8',
-          'type_distribution': {
-            'lands': 35,
-            'creatures': 8,
-            'instants': 20,
+          postAnalysis: const {
+            'average_cmc': '2.8',
+            'type_distribution': {'lands': 35, 'creatures': 8, 'instants': 20},
+            'improvements': ['CMC medio reduzido'],
           },
-          'improvements': ['CMC medio reduzido'],
-        },
-        removals: const ['Cancel', 'Jace\'s Ingenuity'],
-        additions: const ['Force of Will', 'Mystic Remora'],
-        statusCode: 422,
-        qualityError: const {
-          'code': 'OPTIMIZE_QUALITY_REJECTED',
-          'message': 'Trocas degradam funcoes criticas.',
-          'reasons': ['Perde interacao de mesa'],
-          'validation': {
-            'validation_score': 61,
-            'verdict': 'reprovado',
+          removals: const ['Cancel', 'Jace\'s Ingenuity'],
+          additions: const ['Force of Will', 'Mystic Remora'],
+          statusCode: 422,
+          qualityError: const {
+            'code': 'OPTIMIZE_QUALITY_REJECTED',
+            'message': 'Trocas degradam funcoes criticas.',
+            'reasons': ['Perde interacao de mesa'],
+            'validation': {'validation_score': 61, 'verdict': 'reprovado'},
           },
-        },
-        validationReport: null,
-        validationWarnings: const ['warning-1'],
-        blockedByColorIdentity: const ['Off-Color Card'],
-        blockedByBracket: const [
-          {
-            'name': 'Mana Crypt',
-            'reason': 'above_bracket',
-          },
-        ],
-        commanderPriorityNames: const [
-          'Mystic Remora',
-          'Force of Will',
-          'Rhystic Study',
-        ],
-        commanderPrioritySource: 'competitive_meta',
-        deterministicSwapCandidates: const [
-          {
-            'remove': 'Cancel',
-            'add': 'Force of Will',
-          },
-        ],
-        cacheKey: 'cache-key-1',
-        executionTimeMs: 1450,
-      );
+          validationReport: null,
+          validationWarnings: const ['warning-1'],
+          blockedByColorIdentity: const ['Off-Color Card'],
+          blockedByBracket: const [
+            {'name': 'Mana Crypt', 'reason': 'above_bracket'},
+          ],
+          commanderPriorityNames: const [
+            'Mystic Remora',
+            'Force of Will',
+            'Rhystic Study',
+          ],
+          commanderPrioritySource: 'competitive_meta',
+          deterministicSwapCandidates: const [
+            {'remove': 'Cancel', 'add': 'Force of Will'},
+          ],
+          cacheKey: 'cache-key-1',
+          executionTimeMs: 1450,
+          validationRunToken: 'validation_run_123',
+        );
 
-      expect(entry['validation_score'], equals(61));
-      expect(entry['validation_verdict'], equals('reprovado'));
-      expect(entry['color_identity_violations'], equals(1));
-      expect(entry['effectiveness_score'], equals(61.0));
+        expect(entry['validation_score'], equals(61));
+        expect(entry['validation_verdict'], equals('reprovado'));
+        expect(entry['color_identity_violations'], equals(1));
+        expect(entry['effectiveness_score'], equals(61.0));
 
-      final decisions =
-          (entry['decisions_reasoning'] as Map).cast<String, dynamic>();
-      expect(decisions['status_code'], equals(422));
-      expect(
-          decisions['quality_error_code'], equals('OPTIMIZE_QUALITY_REJECTED'));
-      expect(
-          decisions['commander_priority_source'], equals('competitive_meta'));
-      expect(decisions['commander_priority_pool_size'], equals(3));
-      expect(decisions['deterministic_swap_candidate_count'], equals(1));
+        final decisions =
+            (entry['decisions_reasoning'] as Map).cast<String, dynamic>();
+        expect(decisions['validation_run_token'], equals('validation_run_123'));
+        expect(decisions['deck_id'], equals('deck-1'));
+        expect(decisions['user_id'], equals('user-1'));
+        expect(decisions['status_code'], equals(422));
+        expect(
+          decisions['quality_error_code'],
+          equals('OPTIMIZE_QUALITY_REJECTED'),
+        );
+        expect(
+          decisions['commander_priority_source'],
+          equals('competitive_meta'),
+        );
+        expect(decisions['commander_priority_pool_size'], equals(3));
+        expect(decisions['deterministic_swap_candidate_count'], equals(1));
 
-      final swapAnalysis =
-          (entry['swap_analysis'] as Map).cast<String, dynamic>();
-      final acceptedPairs =
-          (swapAnalysis['accepted_pairs'] as List).cast<Map<String, dynamic>>();
-      expect(acceptedPairs, hasLength(2));
-      expect(acceptedPairs.first['remove'], equals('Cancel'));
-      expect(acceptedPairs.first['add'], equals('Force of Will'));
-    });
+        final swapAnalysis =
+            (entry['swap_analysis'] as Map).cast<String, dynamic>();
+        final acceptedPairs =
+            (swapAnalysis['accepted_pairs'] as List)
+                .cast<Map<String, dynamic>>();
+        expect(acceptedPairs, hasLength(2));
+        expect(acceptedPairs.first['remove'], equals('Cancel'));
+        expect(acceptedPairs.first['add'], equals('Force of Will'));
+      },
+    );
   });
+
+  test(
+    'validation telemetry is excluded from learning and product metrics',
+    () {
+      final candidateFoundation =
+          File('bin/candidate_quality_data_foundation.dart').readAsStringSync();
+      final swapCandidates =
+          File(
+            'lib/ai/optimize_swap_candidate_support.dart',
+          ).readAsStringSync();
+      final mlStatus =
+          File('routes/ai/ml-status/index.dart').readAsStringSync();
+
+      expect(mlStatus, contains("? 'validation_run_token'"));
+      expect(
+        candidateFoundation,
+        contains("explicitOptimizeQualityRejectionSql('oal')"),
+      );
+      expect(
+        swapCandidates,
+        contains("explicitOptimizeQualityRejectionSql('oal')"),
+      );
+      expect(
+        explicitOptimizeQualityRejectionCodes,
+        contains('OPTIMIZE_QUALITY_REJECTED'),
+      );
+    },
+  );
 
   group('scoreOptimizeReplacementCandidate', () {
     test(
-        'boosts commander-priority cards and penalizes historically rejected cards',
-        () {
-      final preferredScore = optimize_route.scoreOptimizeReplacementCandidate(
-        functionalNeed: 'draw',
-        cardName: 'Mystic Remora',
-        typeLine: 'Enchantment',
-        oracleText:
-            'Cumulative upkeep {1}. Whenever an opponent casts a noncreature spell, you may draw a card unless that player pays {4}.',
-        manaCost: '{U}',
-        popScore: 420,
-        preferredNames: const {'mystic remora'},
-        rejectedAdditionCounts: const {},
-      );
+      'boosts commander-priority cards and penalizes historically rejected cards',
+      () {
+        final preferredScore = optimize_route.scoreOptimizeReplacementCandidate(
+          functionalNeed: 'draw',
+          cardName: 'Mystic Remora',
+          typeLine: 'Enchantment',
+          oracleText:
+              'Cumulative upkeep {1}. Whenever an opponent casts a noncreature spell, you may draw a card unless that player pays {4}.',
+          manaCost: '{U}',
+          popScore: 420,
+          preferredNames: const {'mystic remora'},
+          rejectedAdditionCounts: const {},
+        );
 
-      final penalizedScore = optimize_route.scoreOptimizeReplacementCandidate(
-        functionalNeed: 'draw',
-        cardName: 'Chart a Course',
-        typeLine: 'Sorcery',
-        oracleText: 'Draw two cards. Then discard a card unless you attacked.',
-        manaCost: '{1}{U}',
-        popScore: 420,
-        preferredNames: const {},
-        rejectedAdditionCounts: const {'chart a course': 3},
-      );
-
-      expect(preferredScore, greaterThan(penalizedScore));
-      expect(
-        optimize_route.matchesFunctionalNeed(
-          'draw',
-          oracleText: 'Draw two cards.',
+        final penalizedScore = optimize_route.scoreOptimizeReplacementCandidate(
+          functionalNeed: 'draw',
+          cardName: 'Chart a Course',
           typeLine: 'Sorcery',
-        ),
-        isTrue,
-      );
-      expect(
-        optimize_route.matchesFunctionalNeed(
-          'protection',
-          oracleText: 'Target permanent phases out.',
-          typeLine: 'Instant',
-        ),
-        isTrue,
-      );
-    });
+          oracleText:
+              'Draw two cards. Then discard a card unless you attacked.',
+          manaCost: '{1}{U}',
+          popScore: 420,
+          preferredNames: const {},
+          rejectedAdditionCounts: const {'chart a course': 3},
+        );
+
+        expect(preferredScore, greaterThan(penalizedScore));
+        expect(
+          optimize_route.matchesFunctionalNeed(
+            'draw',
+            oracleText: 'Draw two cards.',
+            typeLine: 'Sorcery',
+          ),
+          isTrue,
+        );
+        expect(
+          optimize_route.matchesFunctionalNeed(
+            'protection',
+            oracleText: 'Target permanent phases out.',
+            typeLine: 'Instant',
+          ),
+          isTrue,
+        );
+      },
+    );
 
     test(
-        'penalizes temporary rituals and lands in optimize replacement ranking',
-        () {
-      final stableRampScore = optimize_route.scoreOptimizeReplacementCandidate(
-        functionalNeed: 'ramp',
-        cardName: 'Arcane Signet',
-        typeLine: 'Artifact',
-        oracleText:
-            '{T}: Add one mana of any color in your commander\'s color identity.',
-        manaCost: '{2}',
-        popScore: 420,
-        preferredNames: const {},
-        rejectedAdditionCounts: const {},
-      );
+      'penalizes temporary rituals and lands in optimize replacement ranking',
+      () {
+        final stableRampScore = optimize_route.scoreOptimizeReplacementCandidate(
+          functionalNeed: 'ramp',
+          cardName: 'Arcane Signet',
+          typeLine: 'Artifact',
+          oracleText:
+              '{T}: Add one mana of any color in your commander\'s color identity.',
+          manaCost: '{2}',
+          popScore: 420,
+          preferredNames: const {},
+          rejectedAdditionCounts: const {},
+        );
 
-      final ritualScore = optimize_route.scoreOptimizeReplacementCandidate(
-        functionalNeed: 'ramp',
-        cardName: 'Dark Ritual',
-        typeLine: 'Instant',
-        oracleText: 'Add {B}{B}{B}.',
-        manaCost: '{B}',
-        popScore: 420,
-        preferredNames: const {},
-        rejectedAdditionCounts: const {},
-      );
+        final ritualScore = optimize_route.scoreOptimizeReplacementCandidate(
+          functionalNeed: 'ramp',
+          cardName: 'Dark Ritual',
+          typeLine: 'Instant',
+          oracleText: 'Add {B}{B}{B}.',
+          manaCost: '{B}',
+          popScore: 420,
+          preferredNames: const {},
+          rejectedAdditionCounts: const {},
+        );
 
-      final landScore = optimize_route.scoreOptimizeReplacementCandidate(
-        functionalNeed: 'utility',
-        cardName: 'Command Tower',
-        typeLine: 'Land',
-        oracleText:
-            '{T}: Add one mana of any color in your commander\'s color identity.',
-        manaCost: '',
-        popScore: 420,
-        preferredNames: const {},
-        rejectedAdditionCounts: const {},
-      );
+        final landScore = optimize_route.scoreOptimizeReplacementCandidate(
+          functionalNeed: 'utility',
+          cardName: 'Command Tower',
+          typeLine: 'Land',
+          oracleText:
+              '{T}: Add one mana of any color in your commander\'s color identity.',
+          manaCost: '',
+          popScore: 420,
+          preferredNames: const {},
+          rejectedAdditionCounts: const {},
+        );
 
-      expect(stableRampScore, greaterThan(ritualScore));
-      expect(stableRampScore, greaterThan(landScore));
-      expect(landScore, lessThan(50));
-    });
+        expect(stableRampScore, greaterThan(ritualScore));
+        expect(stableRampScore, greaterThan(landScore));
+        expect(landScore, lessThan(50));
+      },
+    );
   });
 
   group('buildDeterministicOptimizeResponse', () {
@@ -222,10 +250,7 @@ void main() {
             'add': 'Force of Will',
             'reason': 'swap deterministico',
           },
-          {
-            'remove': 'Divination',
-            'add': 'Mystic Remora',
-          },
+          {'remove': 'Divination', 'add': 'Mystic Remora'},
         ],
         targetArchetype: 'control',
       );
@@ -256,7 +281,9 @@ void main() {
       final firstSwap = swaps.single as Map;
       expect(payload['intensity'], equals('aggressive'));
       expect(
-          (payload['optimize_intensity'] as Map)['returned_swaps'], equals(1));
+        (payload['optimize_intensity'] as Map)['returned_swaps'],
+        equals(1),
+      );
       expect(firstSwap['role'], equals('interaction'));
       expect(firstSwap['function'], equals('interaction'));
       expect(firstSwap['risk'], equals('medium'));
@@ -335,10 +362,8 @@ void main() {
   });
 
   group('buildDeterministicOptimizeRemovalCandidates', () {
-    test('does not count lands as ramp surplus when ranking nonland removals',
-        () {
-      final removals =
-          optimize_route.buildDeterministicOptimizeRemovalCandidates(
+    test('does not count lands as ramp surplus when ranking nonland removals', () {
+      final removals = optimize_route.buildDeterministicOptimizeRemovalCandidates(
         allCardData: const [
           {
             'name': 'Commander Card',
@@ -389,8 +414,7 @@ void main() {
     });
 
     test('allows land removals when the deck has excessive off-plan lands', () {
-      final removals =
-          optimize_route.buildDeterministicOptimizeRemovalCandidates(
+      final removals = optimize_route.buildDeterministicOptimizeRemovalCandidates(
         allCardData: const [
           {
             'name': 'Talrand, Sky Summoner',
@@ -471,18 +495,18 @@ void main() {
         commanderPriorityNames: const [],
         swapLimit: optimize_route.resolveOptimizeIntensity('light').targetMax,
       );
-      final aggressive =
-          optimize_route.buildDeterministicOptimizeRemovalCandidates(
-        allCardData: cards,
-        commanders: const ['Commander Card'],
-        commanderColorIdentity: const {'U'},
-        targetArchetype: 'midrange',
-        keepTheme: true,
-        coreCards: const [],
-        commanderPriorityNames: const [],
-        swapLimit:
-            optimize_route.resolveOptimizeIntensity('aggressive').targetMax,
-      );
+      final aggressive = optimize_route
+          .buildDeterministicOptimizeRemovalCandidates(
+            allCardData: cards,
+            commanders: const ['Commander Card'],
+            commanderColorIdentity: const {'U'},
+            targetArchetype: 'midrange',
+            keepTheme: true,
+            coreCards: const [],
+            commanderPriorityNames: const [],
+            swapLimit:
+                optimize_route.resolveOptimizeIntensity('aggressive').targetMax,
+          );
 
       expect(light, hasLength(5));
       expect(aggressive.length, greaterThan(light.length));
@@ -519,24 +543,27 @@ void main() {
       );
     });
 
-    test('expands swap target and functional needs for structural recovery',
-        () {
-      final target = optimize_route.computeOptimizeStructuralRecoverySwapTarget(
-        allCardData: talrandDegenerateDeck,
-        commanderColorIdentity: const {'U'},
-        targetArchetype: 'control',
-      );
-      final needs = optimize_route.buildStructuralRecoveryFunctionalNeeds(
-        allCardData: talrandDegenerateDeck,
-        targetArchetype: 'control',
-        limit: target,
-      );
+    test(
+      'expands swap target and functional needs for structural recovery',
+      () {
+        final target = optimize_route
+            .computeOptimizeStructuralRecoverySwapTarget(
+              allCardData: talrandDegenerateDeck,
+              commanderColorIdentity: const {'U'},
+              targetArchetype: 'control',
+            );
+        final needs = optimize_route.buildStructuralRecoveryFunctionalNeeds(
+          allCardData: talrandDegenerateDeck,
+          targetArchetype: 'control',
+          limit: target,
+        );
 
-      expect(target, equals(12));
-      expect(needs, hasLength(12));
-      expect(needs, contains('draw'));
-      expect(needs, contains('ramp'));
-      expect(needs, contains('removal'));
-    });
+        expect(target, equals(12));
+        expect(needs, hasLength(12));
+        expect(needs, contains('draw'));
+        expect(needs, contains('ramp'));
+        expect(needs, contains('removal'));
+      },
+    );
   });
 }

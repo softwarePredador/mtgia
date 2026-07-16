@@ -57,10 +57,9 @@ String _normalizeAggressiveSignalKey(String value) {
 
 int _aggressiveBracketScopePenalty(String bracketScope, int? bracket) {
   if (bracket == null) return 0;
-  final scope = bracketScope.trim().toLowerCase();
-  if (scope == 'bracket_3_4' && bracket < 3) return 140;
-  if (scope == 'bracket_2_4' && bracket < 2) return 80;
-  return 0;
+  final minimumBracket = candidateBracketScopeMinimum(bracketScope);
+  if (minimumBracket == null || bracket >= minimumBracket) return 0;
+  return minimumBracket >= 3 ? 140 : 80;
 }
 
 int _aggressiveBudgetPenalty(String budgetTier, int? bracket) {

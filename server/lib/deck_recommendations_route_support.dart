@@ -198,13 +198,7 @@ Formato obrigatório:
     min: const Duration(seconds: 1),
     max: const Duration(seconds: 60),
   );
-  final model = aiConfig.modelFor(
-    key: 'OPENAI_MODEL_RECOMMENDATIONS',
-    fallback: 'gpt-4o-mini',
-    devFallback: 'gpt-4o-mini',
-    stagingFallback: 'gpt-4o-mini',
-    prodFallback: 'gpt-4o-mini',
-  );
+  final model = aiConfig.recommendationsModel;
   late final http.Response response;
   final providerStopwatch = Stopwatch()..start();
   try {

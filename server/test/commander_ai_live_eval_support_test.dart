@@ -18,11 +18,44 @@ void main() {
 
   test('live eval prompt carries decision constraints and card evidence', () {
     final prompt = buildCommanderAiLiveEvalPrompt(lorehold);
+    final decoded = jsonDecode(prompt) as Map<String, dynamic>;
+    final constraints = (decoded['constraints'] as Map).cast<String, dynamic>();
 
     expect(prompt, contains('Velomachus Lorehold'));
     expect(prompt, contains('protected_cards'));
     expect(prompt, contains('card_catalog'));
     expect(prompt, contains('budget_limit_brl'));
+    expect(decoded['deterministic_same_lane_candidates'], isNotEmpty);
+    expect(
+      constraints['every_swap_must_share_at_least_one_catalog_role'],
+      isTrue,
+    );
+    expect(constraints['minimum_role_counts_after_swaps'], isNotEmpty);
+  });
+
+  test('live eval exposes owned legal same-lane candidates', () {
+    final atraxa = (suite['cases'] as List)
+        .cast<Map<String, dynamic>>()
+        .firstWhere(
+          (testCase) => testCase['id'] == 'atraxa_budget_curve_no_cedh',
+        );
+
+    final candidates = buildCommanderAiLiveEvalSameLaneCandidates(atraxa);
+
+    expect(
+      candidates,
+      contains(
+        allOf(
+          containsPair('out', 'Cultivate'),
+          containsPair('in', "Nature's Lore"),
+          containsPair('collection_match', true),
+        ),
+      ),
+    );
+    expect(
+      candidates.where((candidate) => candidate['collection_match'] == true),
+      isNotEmpty,
+    );
   });
 
   test('live eval runner applies the existing deterministic scorer', () async {

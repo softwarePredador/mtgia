@@ -6,6 +6,7 @@ import 'optimize_candidate_quality_support.dart';
 import 'optimize_filler_loader_support.dart';
 import 'optimize_functional_role_support.dart';
 import 'optimize_removal_candidate_support.dart';
+import 'optimize_rejection_history_support.dart';
 import 'optimize_route_recommendation_context_support.dart';
 import 'optimization_functional_roles.dart';
 import 'optimization_ramp_profile.dart';
@@ -669,6 +670,7 @@ Future<Map<String, int>> _loadRejectedOptimizeAdditionCounts({
 }) async {
   if (commanderName.trim().isEmpty) return const <String, int>{};
 
+  final explicitRejectionPredicate = explicitOptimizeQualityRejectionSql('oal');
   try {
     final result = await pool.execute(
       Sql.named('''
@@ -681,7 +683,7 @@ Future<Map<String, int>> _loadRejectedOptimizeAdditionCounts({
         ) AS value
         WHERE oal.operation_mode = 'optimize'
           AND LOWER(oal.commander_name) = LOWER(@commander_name)
-          AND COALESCE(oal.decisions_reasoning->>'status_code', '0') <> '200'
+          AND $explicitRejectionPredicate
           AND oal.created_at > NOW() - INTERVAL '180 days'
         GROUP BY LOWER(value)
         ORDER BY reject_count DESC, card_name ASC

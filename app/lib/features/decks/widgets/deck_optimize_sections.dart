@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../../core/theme/app_theme.dart';
 import '../../../core/utils/friendly_error_mapper.dart';
+import '../models/commander_bracket.dart';
 import '../providers/deck_provider_support.dart';
 import 'deck_optimize_sheet_widgets.dart';
 import 'deck_ui_components.dart';
@@ -43,12 +44,14 @@ class OptimizationConfigSection extends StatelessWidget {
               child: DropdownButton<int>(
                 value: selectedBracket,
                 isExpanded: true,
-                items: const [
-                  DropdownMenuItem(value: 1, child: Text('1 - Casual')),
-                  DropdownMenuItem(value: 2, child: Text('2 - Mid')),
-                  DropdownMenuItem(value: 3, child: Text('3 - High')),
-                  DropdownMenuItem(value: 4, child: Text('4 - cEDH')),
-                ],
+                items: commanderBracketOptions
+                    .map(
+                      (option) => DropdownMenuItem(
+                        value: option.value,
+                        child: Text(option.menuLabel),
+                      ),
+                    )
+                    .toList(growable: false),
                 onChanged: (v) {
                   if (v == null) return;
                   onBracketChanged(v);
@@ -454,8 +457,8 @@ class _OptimizationModeGuide extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isCompetitive = selectedBracket >= 4;
-    final accent = isCompetitive ? AppTheme.mythicGold : AppTheme.frost400;
+    final isHighPower = selectedBracket >= 4;
+    final accent = isHighPower ? AppTheme.mythicGold : AppTheme.frost400;
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(12),
@@ -468,16 +471,14 @@ class _OptimizationModeGuide extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Icon(
-            isCompetitive ? Icons.emoji_events_outlined : Icons.tune_outlined,
+            isHighPower ? Icons.emoji_events_outlined : Icons.tune_outlined,
             color: accent,
             size: 20,
           ),
           const SizedBox(width: 10),
           Expanded(
             child: Text(
-              isCompetitive
-                  ? 'Competitivo/cEDH: usa referências meta quando existirem, mas ainda filtra por identidade, bracket e segurança.'
-                  : 'Ajuste leve: troca poucas cartas. Se a lista estiver muito fora da faixa, o app oferece rebuild guiado em vez de aplicar mudanças arriscadas.',
+              commanderBracketGuidance(selectedBracket),
               style: Theme.of(context).textTheme.bodySmall?.copyWith(
                 color: AppTheme.textSecondary,
                 height: 1.35,

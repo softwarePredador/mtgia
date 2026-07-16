@@ -106,7 +106,7 @@ class _LifeCounterNativeCardSearchSheetState
                                   ),
                                   SizedBox(height: 6),
                                   Text(
-                                    'ManaLoom now owns this shell surface while the Lotus tabletop stays unchanged.',
+                                    'Find card details without leaving the game.',
                                     style: TextStyle(
                                       color: AppTheme.textSecondary,
                                       fontSize: AppTheme.fontMd,
@@ -172,7 +172,7 @@ class _LifeCounterNativeCardSearchSheetState
                                               key: const Key(
                                                 'life-counter-native-card-search-clear',
                                               ),
-                                              tooltip: 'Limpar busca',
+                                              tooltip: 'Clear search',
                                               onPressed: () {
                                                 _controller.clear();
                                                 provider.clearSearch();

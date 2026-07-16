@@ -44,23 +44,54 @@ void main() {
     expect(await provider.explainCard(_card()), 'Gera duas manas.');
   });
 
-  test('does not expose transport exceptions as card explanations', () async {
-    final provider = CardProvider(
-      apiClient: _FakeApiClient(
-        () => Future<ApiResponse>.error(
-          StateError('Authorization: Bearer sk-test-secret-value'),
+  test(
+    'propagates transport failures instead of hiding them as null',
+    () async {
+      final provider = CardProvider(
+        apiClient: _FakeApiClient(
+          () => Future<ApiResponse>.error(
+            StateError('Authorization: Bearer sk-test-secret-value'),
+          ),
         ),
-      ),
-    );
+      );
 
-    expect(await provider.explainCard(_card()), isNull);
-  });
+      await expectLater(
+        provider.explainCard(_card()),
+        throwsA(isA<StateError>()),
+      );
+    },
+  );
 
   test('rejects malformed successful responses', () async {
     final provider = CardProvider(
       apiClient: _FakeApiClient(() async => ApiResponse(200, const {})),
     );
 
-    expect(await provider.explainCard(_card()), isNull);
+    await expectLater(
+      provider.explainCard(_card()),
+      throwsA(isA<FormatException>()),
+    );
   });
+
+  test(
+    'maps API failures to player-facing errors before propagating',
+    () async {
+      final provider = CardProvider(
+        apiClient: _FakeApiClient(
+          () async => ApiResponse(429, const {'error': 'rate_limited'}),
+        ),
+      );
+
+      await expectLater(
+        provider.explainCard(_card()),
+        throwsA(
+          predicate(
+            (error) =>
+                error.toString().contains('Muitas tentativas em sequência') &&
+                !error.toString().contains('rate_limited'),
+          ),
+        ),
+      );
+    },
+  );
 }

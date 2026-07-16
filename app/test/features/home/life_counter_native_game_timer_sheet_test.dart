@@ -42,6 +42,40 @@ class _Host extends StatelessWidget {
 
 void main() {
   group('LifeCounterNativeGameTimerSheet', () {
+    testWidgets('refreshes elapsed time while the sheet remains open', (
+      tester,
+    ) async {
+      LifeCounterGameTimerState? result;
+      var nowEpochMs = 1_000;
+
+      await tester.pumpWidget(
+        _Host(
+          initialState: const LifeCounterGameTimerState(
+            startTimeEpochMs: 1_000,
+            isPaused: false,
+            pausedTimeEpochMs: null,
+          ),
+          nowProvider: () => DateTime.fromMillisecondsSinceEpoch(nowEpochMs),
+          onResult: (value) => result = value,
+        ),
+      );
+      await tester.tap(find.text('Open'));
+      await tester.pumpAndSettle();
+
+      expect(find.text('0:00'), findsOneWidget);
+
+      nowEpochMs = 3_500;
+      await tester.pump(const Duration(seconds: 1));
+
+      expect(find.text('0:02'), findsOneWidget);
+
+      await tester.tap(
+        find.byKey(const Key('life-counter-native-game-timer-apply')),
+      );
+      await tester.pumpAndSettle();
+      expect(result, isNotNull);
+    });
+
     testWidgets('starts a new timer and returns an active state', (
       tester,
     ) async {

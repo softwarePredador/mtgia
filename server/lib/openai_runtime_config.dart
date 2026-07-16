@@ -6,15 +6,18 @@ class OpenAiRuntimeConfig {
   OpenAiRuntimeConfig(this.env);
 
   String get _profile {
+    final environment = env['ENVIRONMENT']?.trim().toLowerCase();
+    // Production is fail-closed: an accidentally persisted development
+    // profile must never re-enable mock/provider fallbacks in a live runtime.
+    if (environment == 'production' || environment == 'prod') {
+      return 'prod';
+    }
+
     final explicit = env['OPENAI_PROFILE']?.trim().toLowerCase();
     if (explicit == 'dev' || explicit == 'staging' || explicit == 'prod') {
       return explicit!;
     }
 
-    final environment = env['ENVIRONMENT']?.trim().toLowerCase();
-    if (environment == 'production' || environment == 'prod') {
-      return 'prod';
-    }
     if (environment == 'staging' || environment == 'stage') {
       return 'staging';
     }
@@ -26,6 +29,81 @@ class OpenAiRuntimeConfig {
   bool get isProductionLike => _profile == 'prod';
 
   bool get allowsMockFallbacks => !isProductionLike;
+
+  String get generateModel => modelFor(
+    key: 'OPENAI_MODEL_GENERATE',
+    fallback: 'gpt-4o-mini',
+    devFallback: 'gpt-4o-mini',
+    stagingFallback: 'gpt-4o-mini',
+    prodFallback: 'gpt-4o-mini',
+  );
+
+  String get archetypesModel => modelFor(
+    key: 'OPENAI_MODEL_ARCHETYPES',
+    fallback: 'gpt-4o-mini',
+    devFallback: 'gpt-4o-mini',
+    stagingFallback: 'gpt-4o-mini',
+    prodFallback: 'gpt-4o-mini',
+  );
+
+  String get explainModel => modelFor(
+    key: 'OPENAI_MODEL_EXPLAIN',
+    fallback: 'gpt-4o-mini',
+    devFallback: 'gpt-4o-mini',
+    stagingFallback: 'gpt-4o-mini',
+    prodFallback: 'gpt-4o-mini',
+  );
+
+  String get recommendationsModel => modelFor(
+    key: 'OPENAI_MODEL_RECOMMENDATIONS',
+    fallback: 'gpt-4o-mini',
+    devFallback: 'gpt-4o-mini',
+    stagingFallback: 'gpt-4o-mini',
+    prodFallback: 'gpt-4o-mini',
+  );
+
+  String get analysisModel => modelFor(
+    key: 'OPENAI_MODEL_AI_ANALYSIS',
+    fallback: 'gpt-4o-mini',
+    devFallback: 'gpt-4o-mini',
+    stagingFallback: 'gpt-4o-mini',
+    prodFallback: 'gpt-4o-mini',
+  );
+
+  String get optimizeModel => modelFor(
+    key: 'OPENAI_MODEL_OPTIMIZE',
+    fallback: 'gpt-5.4-mini',
+    devFallback: 'gpt-4o-mini',
+    stagingFallback: 'gpt-4o-mini',
+    prodFallback: 'gpt-5.4-mini',
+  );
+
+  String get completeModel => modelFor(
+    key: 'OPENAI_MODEL_COMPLETE',
+    fallback: 'gpt-5.4-mini',
+    devFallback: 'gpt-4o-mini',
+    stagingFallback: 'gpt-4o-mini',
+    prodFallback: 'gpt-5.4-mini',
+  );
+
+  String get optimizationCriticModel => modelFor(
+    key: 'OPENAI_MODEL_OPTIMIZATION_CRITIC',
+    fallback: 'gpt-4o-mini',
+    devFallback: 'gpt-4o-mini',
+    stagingFallback: 'gpt-4o-mini',
+    prodFallback: 'gpt-4o-mini',
+  );
+
+  Map<String, String> get selectedModels => {
+    'generate': generateModel,
+    'archetypes': archetypesModel,
+    'explain': explainModel,
+    'recommendations': recommendationsModel,
+    'analysis': analysisModel,
+    'optimize': optimizeModel,
+    'complete': completeModel,
+    'optimization_critic': optimizationCriticModel,
+  };
 
   bool shouldUseFallbackForInvalidApiKey({
     required int statusCode,
@@ -110,9 +188,10 @@ class OpenAiRuntimeConfig {
 
     final parsedSeconds =
         raw == null || raw.isEmpty ? null : num.tryParse(raw)?.round();
-    final duration = parsedSeconds == null
-        ? selectedFallback
-        : Duration(seconds: parsedSeconds);
+    final duration =
+        parsedSeconds == null
+            ? selectedFallback
+            : Duration(seconds: parsedSeconds);
 
     if (duration < min) return min;
     if (duration > max) return max;

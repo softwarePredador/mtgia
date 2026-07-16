@@ -5149,7 +5149,7 @@ Riscos restantes:
 ### O Como
 - `server/lib/ai/optimize_runtime_support.dart` ganhou `shouldUseAsyncOptimizeExecutor`.
   - `aggressive` + `mode=optimize` usa job async por default.
-  - `light`, `focused`, `rebuild`, `complete`, `_force_sync=true`, `force_sync=true` e `async=false` preservam comportamento sync/legado.
+  - `light`, `focused`, `rebuild`, `complete` e `async=false` preservam comportamento sync/legado para clientes publicos; `_force_sync=true` e exclusivo do executor interno autenticado, e `force_sync` nao e campo publico.
 - `server/routes/ai/optimize/index.dart` agora responde `202 + job_id` para aggressive optimize e dispara `_processOptimizeModeAsync`.
   - O job interno chama o mesmo `/ai/optimize` com Authorization original, `X-Internal-AI-Request-Token`, `_force_sync=true` e `async=false`.
   - Assim, o caminho pesado continua passando por shortlist deterministico, OpenAI, validação de cartas, color identity, bracket, proteção do comandante, quality gate, cache, post-analysis e validação final.

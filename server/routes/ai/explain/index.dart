@@ -4,17 +4,18 @@ import 'dart:io';
 
 import 'package:dart_frog/dart_frog.dart';
 import 'package:crypto/crypto.dart';
-import 'package:dotenv/dotenv.dart';
 import 'package:http/http.dart' as http;
 import 'package:postgres/postgres.dart';
 
 import '../../../lib/ai_provider_runtime_support.dart';
 import '../../../lib/ai_provider_usage_support.dart';
 import '../../../lib/http_responses.dart';
+import '../../../lib/json_object_support.dart';
 import '../../../lib/logger.dart';
 import '../../../lib/observability.dart';
 import '../../../lib/openai_runtime_config.dart';
 import '../../../lib/openai_structured_output_support.dart';
+import '../../../lib/runtime_environment.dart';
 
 const _maxCardNameLength = 300;
 const _maxTypeLineLength = 1000;
@@ -35,28 +36,34 @@ Future<Response> onRequest(RequestContext context) async {
 
   Map<String, dynamic> body;
   try {
-    final decoded = await context.request.json();
-    if (decoded is! Map) return badRequest('JSON inválido');
-    body = decoded.cast<String, dynamic>();
+    body = requireJsonObject(await context.request.json());
+  } on JsonObjectValidationException catch (error) {
+    return badRequest(error.message);
   } catch (_) {
-    return badRequest('JSON inválido');
+    return badRequest('JSON invalido');
   }
 
   try {
-    final cardId = _normalizeOptionalText(body['card_id']);
-    var cardName = _normalizeOptionalText(body['card_name']);
-    var oracleText = _normalizeOptionalText(body['oracle_text']);
-    var typeLine = _normalizeOptionalText(body['type_line']);
-    final pool = context.read<Pool>();
-    final env = DotEnv(includePlatformEnvironment: true, quiet: true)..load();
-    final aiConfig = OpenAiRuntimeConfig(env);
-    final model = aiConfig.modelFor(
-      key: 'OPENAI_MODEL_EXPLAIN',
-      fallback: 'gpt-4o-mini',
-      devFallback: 'gpt-4o-mini',
-      stagingFallback: 'gpt-4o-mini',
-      prodFallback: 'gpt-4o-mini',
+    final cardId = readOptionalJsonString(body, 'card_id', maxLength: 128);
+    var cardName = readOptionalJsonString(
+      body,
+      'card_name',
+      maxLength: _maxCardNameLength,
     );
+    var oracleText = readOptionalJsonString(
+      body,
+      'oracle_text',
+      maxLength: _maxOracleTextLength,
+    );
+    var typeLine = readOptionalJsonString(
+      body,
+      'type_line',
+      maxLength: _maxTypeLineLength,
+    );
+    final pool = context.read<Pool>();
+    final env = loadRuntimeEnvironment();
+    final aiConfig = OpenAiRuntimeConfig(env);
+    final model = aiConfig.explainModel;
 
     if (cardId != null) {
       try {
@@ -315,6 +322,8 @@ Instruções obrigatórias:
         aiProviderUnavailableMessage,
       );
     }
+  } on JsonObjectValidationException catch (error) {
+    return badRequest(error.message);
   } catch (e, stackTrace) {
     Log.e('AI explain internal failure type=${e.runtimeType}');
     await captureRouteException(

@@ -109,7 +109,7 @@ class _LifeCounterNativeTableStateSheetState
                             ),
                             SizedBox(height: 6),
                             Text(
-                              'ManaLoom owns monarch, initiative and storm without changing the Lotus tabletop layout.',
+                              'Assign Monarch and Initiative, and track storm.',
                               style: TextStyle(
                                 color: AppTheme.textSecondary,
                                 fontSize: AppTheme.fontMd,
@@ -171,8 +171,7 @@ class _LifeCounterNativeTableStateSheetState
                       const SizedBox(height: 18),
                       _TableStateCard(
                         title: 'Storm',
-                        subtitle:
-                            'Track the current storm count in our canonical runtime state.',
+                        subtitle: 'Track the current storm count.',
                         child: Row(
                           children: [
                             _StormButton(

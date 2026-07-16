@@ -107,7 +107,7 @@ class _LifeCounterNativeDiceSheetState
                             ),
                             SizedBox(height: 6),
                             Text(
-                              'ManaLoom owns the dice shell while the Lotus tabletop stays visually identical.',
+                              'Roll dice, flip a coin, or choose the starting player.',
                               style: TextStyle(
                                 color: AppTheme.textSecondary,
                                 fontSize: AppTheme.fontMd,
@@ -138,7 +138,7 @@ class _LifeCounterNativeDiceSheetState
                                 ? 'No active players remain on the table. Dice actions that choose a player stay unavailable.'
                                 : _hasPendingTieBreak
                                 ? 'The previous high roll ended in a tie. Running high roll again rerolls only tied players.'
-                                : 'Run the same table tools without leaving the ManaLoom-owned shell.',
+                                : 'Choose a quick action for the table.',
                         child: Wrap(
                           spacing: 10,
                           runSpacing: 10,
@@ -197,7 +197,7 @@ class _LifeCounterNativeDiceSheetState
                       _DiceSectionCard(
                         title: 'Current State',
                         subtitle:
-                            'Preview of what will be pushed back into the live tabletop after applying.',
+                            'Review the latest result before applying changes.',
                         child: Wrap(
                           spacing: 10,
                           runSpacing: 10,

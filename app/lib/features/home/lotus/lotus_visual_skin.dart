@@ -103,7 +103,7 @@ ${LotusDomSelectors.playerCard}:nth-of-type(4n) {
   --manaloom-player-glow: rgba(78, 214, 145, 0.24);
 }
 
-${LotusDomSelectors.playerCard} .player-card-inner:not(.option-card):not(.color-card) {
+${LotusDomSelectors.playerCard} .player-card-inner:not(.option-card):not(.color-card):not(.background-image) {
   border-radius: calc(var(--borderRadius) * 1.15);
   background:
     radial-gradient(circle at 78% 18%, var(--manaloom-player-glow), transparent 35%),
@@ -597,7 +597,7 @@ ${LotusDomSelectors.optionCard} h3 {
   flex: 0 0 62px !important;
   padding: 8px 5px 7px !important;
   font-family: var(--manaloom-ui-font) !important;
-  font-size: 9px !important;
+  font-size: 10.5px !important;
   line-height: 1.12 !important;
   font-weight: 700 !important;
   letter-spacing: 0.02em !important;
@@ -694,11 +694,11 @@ ${LotusDomSelectors.optionCard} h3 {
 }
 
 .settings-overlay::before {
-  content: "Configurações" !important;
+  content: "Settings" !important;
 }
 
 .card-search-overlay::before {
-  content: "Buscar carta" !important;
+  content: "Card search" !important;
   position: absolute !important;
   left: 22px !important;
   top: calc(env(safe-area-inset-top, 0px) + 24px) !important;
@@ -729,7 +729,7 @@ ${LotusDomSelectors.optionCard} h3 {
 }
 
 .settings-overlay .settings-headline::after {
-  content: "Preferências da mesa" !important;
+  content: "Table preferences" !important;
   display: block !important;
   font-family: var(--manaloom-ui-font) !important;
   font-size: 15px !important;
@@ -866,8 +866,8 @@ ${LotusDomSelectors.optionCard} h3 {
   position: absolute !important;
   top: calc(env(safe-area-inset-top, 0px) + 18px) !important;
   right: 18px !important;
-  width: 42px !important;
-  height: 42px !important;
+  width: 44px !important;
+  height: 44px !important;
   border-radius: 15px !important;
   background:
     linear-gradient(180deg, rgba(16, 24, 44, 0.96), rgba(7, 12, 25, 0.94)) !important;
@@ -914,9 +914,9 @@ ${LotusDomSelectors.optionCard} h3 {
 .settings-overlay .set-value-btn,
 .life-history-overlay .all-games-btn,
 .life-history-overlay .set-value-btn,
-.card-search-overlay label,
+.card-search-overlay label > div,
 .card-search-overlay .view-all-prints-btn {
-  min-height: 38px !important;
+  min-height: 44px !important;
   border-radius: 999px !important;
   border: 1px solid var(--manaloom-shell-border-warm) !important;
   background:
@@ -1148,7 +1148,7 @@ ${LotusDomSelectors.optionCard} h3 {
 
 .first-time-user-overlay .commander-card .button {
   height: auto !important;
-  min-height: 38px !important;
+  min-height: 44px !important;
   margin-top: 10px !important;
   padding: 10px 14px !important;
   border-radius: 999px !important;
@@ -1186,14 +1186,14 @@ ${LotusDomSelectors.optionCard} h3 {
 
 .first-time-user-overlay .options-card .option-entry-icon {
   width: 50px !important;
-  height: 42px !important;
+  height: 44px !important;
   border-radius: 12px !important;
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.12) !important;
 }
 
 .first-time-user-overlay .options-card .option-entry-text {
   font-family: var(--manaloom-ui-font) !important;
-  font-size: 8.5px !important;
+  font-size: 10px !important;
   font-weight: 700 !important;
   line-height: 1.05 !important;
   text-align: center !important;
@@ -1338,7 +1338,7 @@ ${LotusDomSelectors.optionCard} h3 {
 .manaloom-show-counters-proof .btn,
 .max-game-modes-warning .close,
 .input-overlay .btn {
-  min-height: 42px;
+  min-height: 44px;
   height: auto;
   padding: 10px 18px;
   font-family: var(--manaloom-ui-font) !important;
@@ -1650,6 +1650,310 @@ ${LotusDomSelectors.turnTracker} .minutes-seconds:before {
 #Content .buildversion {
   font-family: var(--manaloom-ui-font) !important;
 }
+
+/* ManaLoom tabletop restraint and accessibility pass. */
+body {
+  background: #02050b !important;
+}
+
+${LotusDomSelectors.playerCard} {
+  filter: saturate(0.72) brightness(0.86) contrast(1.06);
+  box-shadow:
+    inset 0 0 0 1px var(--manaloom-player-accent-soft),
+    0 4px 14px rgba(0, 0, 0, 0.24);
+}
+
+${LotusDomSelectors.playerCard} .player-card-inner:not(.option-card):not(.color-card):not(.background-image) {
+  background:
+    linear-gradient(145deg, rgba(2, 6, 15, 0.38), rgba(2, 6, 15, 0.7)),
+    var(--bg, rgb(16, 23, 38)) !important;
+  background-blend-mode: multiply, normal !important;
+  box-shadow:
+    inset 0 0 0 1px var(--manaloom-player-accent-soft),
+    inset 0 -22px 34px rgba(1, 5, 13, 0.28) !important;
+}
+
+${LotusDomSelectors.playerCard} .increase-button.life,
+${LotusDomSelectors.playerCard} .decrease-button.life {
+  background: transparent !important;
+  box-shadow: none !important;
+  touch-action: manipulation;
+  transition: background-color 100ms ease-out !important;
+}
+
+${LotusDomSelectors.playerCard} .player-card-inner.background-image .increase-button.life,
+${LotusDomSelectors.playerCard} .player-card-inner.background-image .decrease-button.life {
+  background:
+    linear-gradient(180deg, rgba(1, 4, 10, 0.58), rgba(1, 4, 10, 0.66))
+    !important;
+}
+
+${LotusDomSelectors.playerCard} .increase-button.life:after,
+${LotusDomSelectors.playerCard} .decrease-button.life:after {
+  font-size: clamp(28px, 10vw, 56px);
+  color: rgba(247, 241, 226, 0.38);
+  text-shadow: 0 3px 12px rgba(0, 0, 0, 0.4);
+}
+
+${LotusDomSelectors.playerCard} .increase-button.life,
+${LotusDomSelectors.playerCard} .decrease-button.life,
+${LotusDomSelectors.playerCard} .increase-button.life .font,
+${LotusDomSelectors.playerCard} .decrease-button.life .font,
+${LotusDomSelectors.playerCard} .increase-button.life .char-plus,
+${LotusDomSelectors.playerCard} .decrease-button.life .char-minus {
+  --fontColor: rgba(247, 241, 226, 0.78) !important;
+  color: rgba(247, 241, 226, 0.78) !important;
+  fill: rgba(247, 241, 226, 0.78) !important;
+  stroke: rgba(247, 241, 226, 0.78) !important;
+  -webkit-text-fill-color: rgba(247, 241, 226, 0.78) !important;
+  filter: none !important;
+}
+
+${LotusDomSelectors.playerCard} .increase-button.life:active,
+${LotusDomSelectors.playerCard} .decrease-button.life:active {
+  background: rgba(255, 255, 255, 0.075) !important;
+}
+
+${LotusDomSelectors.playerCard} .player-life-count,
+${LotusDomSelectors.playerCard} .player-life-count .font {
+  filter: none !important;
+  text-shadow: 0 6px 16px rgba(0, 0, 0, 0.46) !important;
+}
+
+.list::before,
+.list::after {
+  display: none !important;
+}
+
+.list > * .btn,
+.list > *.players .btn,
+.list > *.restart .btn,
+.list > *.settings .btn,
+.list > *.more .btn,
+.list > *.high-roll .btn {
+  border-color: rgba(255, 255, 255, 0.14) !important;
+  background: rgb(8, 14, 27) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.08),
+    0 5px 12px rgba(0, 0, 0, 0.26) !important;
+  backdrop-filter: none !important;
+  transition:
+    transform 120ms ease-out,
+    background-color 120ms ease-out !important;
+}
+
+.list > * .btn:active {
+  transform: scale(0.94) !important;
+  background: rgb(14, 23, 41) !important;
+}
+
+.manaloom-life-counter-exit {
+  position: fixed !important;
+  top: calc(env(safe-area-inset-top, 0px) + 12px) !important;
+  left: calc(env(safe-area-inset-left, 0px) + 12px) !important;
+  z-index: 121 !important;
+  width: 48px !important;
+  height: 48px !important;
+  display: none !important;
+  align-items: center !important;
+  justify-content: center !important;
+  padding: 0 !important;
+  border: 1px solid rgba(255, 255, 255, 0.14) !important;
+  border-radius: 12px !important;
+  background: rgba(5, 10, 21, 0.96) !important;
+  color: rgba(247, 241, 226, 0.94) !important;
+  font-family: var(--manaloom-ui-font) !important;
+  font-size: 24px !important;
+  line-height: 1 !important;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.26) !important;
+  touch-action: manipulation !important;
+  appearance: none !important;
+  -webkit-appearance: none !important;
+}
+
+.manaloom-life-counter-exit.is-visible {
+  display: flex !important;
+}
+
+.menu-button-overlay .game-states-wrapper {
+  width: min(390px, calc(100vw - 20px)) !important;
+  gap: 6px !important;
+  padding:
+    9px 10px calc(env(safe-area-inset-bottom, 0px) + 9px) !important;
+  background: rgba(4, 9, 19, 0.97) !important;
+  border-color: rgba(255, 255, 255, 0.1) !important;
+  border-radius: 14px !important;
+  box-shadow: 0 -8px 18px rgba(0, 0, 0, 0.28) !important;
+  backdrop-filter: none !important;
+}
+
+.menu-button-overlay .game-states-wrapper > * {
+  width: 66px !important;
+  min-width: 66px !important;
+  height: 64px !important;
+  min-height: 64px !important;
+  max-height: 64px !important;
+  flex-basis: 66px !important;
+  padding: 8px 5px !important;
+  box-sizing: border-box !important;
+  overflow: hidden !important;
+  font-size: 11px !important;
+  line-height: 1.15 !important;
+  background: rgb(9, 16, 30) !important;
+  border-color: rgba(255, 255, 255, 0.1) !important;
+  border-radius: 10px !important;
+  box-shadow: none !important;
+}
+
+.menu-button-overlay .game-states-wrapper > *.active {
+  color: rgb(255, 239, 199) !important;
+  background: rgb(29, 23, 18) !important;
+  border-color: rgb(224, 165, 51) !important;
+  box-shadow: inset 0 0 0 2px rgba(224, 165, 51, 0.32) !important;
+}
+
+.settings-overlay,
+.life-history-overlay,
+.card-search-overlay {
+  background: rgb(3, 8, 18) !important;
+}
+
+.settings-overlay::before {
+  content: "Settings" !important;
+}
+
+.settings-overlay .settings-headline::after {
+  content: "Table preferences" !important;
+}
+
+.card-search-overlay::before {
+  content: "Card search" !important;
+  top: max(
+    calc(env(safe-area-inset-top, 0px) + 24px),
+    72px
+  ) !important;
+}
+
+.settings-overlay .settings-overlay-list {
+  gap: 0 !important;
+}
+
+.settings-overlay .settings-list-item {
+  padding: 14px 0 !important;
+  border: 0 !important;
+  border-top: 1px solid rgba(255, 255, 255, 0.09) !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+.settings-overlay .settings-select {
+  min-height: 48px !important;
+  border-radius: 10px !important;
+  background: rgb(9, 16, 30) !important;
+  box-shadow: none !important;
+}
+
+.life-history-overlay .life-history-header,
+.life-history-overlay .history-meta-header,
+.life-history-overlay .life-history-timeline,
+.life-history-overlay .life-history-row,
+.life-history-overlay .empty-timeline-overlay {
+  background: rgb(7, 13, 26) !important;
+  border-color: rgba(255, 255, 255, 0.09) !important;
+  box-shadow: none !important;
+}
+
+.settings-overlay .close-settings-overlay-btn,
+.life-history-overlay .close-life-history-overlay-btn,
+.card-search-overlay .close-card-search-overlay {
+  width: 48px !important;
+  height: 48px !important;
+  border-radius: 12px !important;
+  background: rgb(9, 16, 30) !important;
+  box-shadow: none !important;
+}
+
+.settings-overlay .btn,
+.settings-overlay button,
+.settings-overlay .set-value-btn,
+.life-history-overlay .all-games-btn,
+.life-history-overlay .set-value-btn,
+.card-search-overlay label > div,
+.card-search-overlay .view-all-prints-btn {
+  min-height: 48px !important;
+  border-radius: 12px !important;
+  background: rgb(224, 165, 51) !important;
+  box-shadow: none !important;
+}
+
+.first-time-user-overlay .options-card .option-entry-text {
+  font-size: 11px !important;
+  line-height: 1.18 !important;
+}
+
+.first-time-user-overlay > .btn,
+.first-time-user-overlay .commander-card .button,
+.commander-damage-overlay .btn,
+.own-commander-damage-hint-overlay .btn,
+.turn-tracker-hint-overlay .btn,
+.manaloom-turn-tracker-proof .btn,
+.show-counters-hint-overlay .btn,
+.manaloom-show-counters-proof .btn,
+.max-game-modes-warning .close,
+.input-overlay .btn {
+  min-height: 48px !important;
+}
+
+.commander-damage-overlay,
+.own-commander-damage-hint-overlay,
+.turn-tracker-hint-overlay,
+.manaloom-turn-tracker-proof,
+.show-counters-hint-overlay,
+.manaloom-show-counters-proof,
+.max-game-modes-warning,
+.input-overlay {
+  border-radius: 16px !important;
+  background: rgb(7, 13, 26) !important;
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.32) !important;
+}
+
+${LotusDomSelectors.mainGameTimer},
+${LotusDomSelectors.currentTimeClock},
+${LotusDomSelectors.turnTracker} {
+  background: rgba(5, 10, 21, 0.94) !important;
+  border-color: rgba(255, 255, 255, 0.12) !important;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.24) !important;
+  backdrop-filter: none !important;
+}
+
+[role="button"]:focus-visible,
+button:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+  outline: 3px solid var(--manaloom-shell-accent-warm-strong) !important;
+  outline-offset: 3px !important;
+}
+
+@media (orientation: landscape) and (min-width: 640px) {
+  .settings-overlay .settings-overlay-list {
+    display: grid !important;
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    column-gap: 22px !important;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
 ''';
 
   final styleId = jsonEncode(LotusVisualSkinStyleIds.primary);
@@ -1678,6 +1982,432 @@ ${LotusDomSelectors.turnTracker} .minutes-seconds:before {
     fontSet.load('400 16px "Inter"').catch(() => {});
     fontSet.load('650 16px "Fraunces"').catch(() => {});
   }
+
+  const existingAccessibility = window.__ManaLoomLifeCounterAccessibility;
+  if (existingAccessibility && typeof existingAccessibility.sync === 'function') {
+    existingAccessibility.sync();
+    return;
+  }
+
+  const setAttributeIfChanged = (node, name, value) => {
+    if (!(node instanceof HTMLElement) || node.getAttribute(name) === value) {
+      return;
+    }
+    node.setAttribute(name, value);
+  };
+
+  const readableText = (node) => {
+    if (!(node instanceof HTMLElement)) {
+      return '';
+    }
+    const inputValue = node instanceof HTMLInputElement ? node.value : '';
+    return String(inputValue || node.textContent || '').replace(/\\s+/g, ' ').trim();
+  };
+
+  const decodeVisualNumber = (node) => {
+    if (!(node instanceof HTMLElement)) {
+      return '';
+    }
+    return Array.from(node.querySelectorAll('.font')).map((digit) => {
+      const charClass = Array.from(digit.classList).find((className) => {
+        return className.startsWith('char-');
+      });
+      if (!charClass) {
+        return '';
+      }
+      const charName = charClass.substring('char-'.length);
+      if (charName === 'plus') {
+        return '+';
+      }
+      if (charName === 'minus') {
+        return '-';
+      }
+      return charName;
+    }).join('');
+  };
+
+  const dispatchAccessibleTap = (node) => {
+    if (!(node instanceof HTMLElement)) {
+      return;
+    }
+    const bounds = node.getBoundingClientRect();
+    const eventInit = {
+      bubbles: true,
+      cancelable: true,
+      pointerId: 1,
+      pointerType: 'touch',
+      isPrimary: true,
+      button: 0,
+      buttons: 1,
+      clientX: bounds.left + bounds.width / 2,
+      clientY: bounds.top + bounds.height / 2,
+    };
+    const downEvent =
+      typeof PointerEvent === 'function'
+        ? new PointerEvent('pointerdown', eventInit)
+        : new MouseEvent('mousedown', eventInit);
+    const upEvent =
+      typeof PointerEvent === 'function'
+        ? new PointerEvent('pointerup', { ...eventInit, buttons: 0 })
+        : new MouseEvent('mouseup', { ...eventInit, buttons: 0 });
+    node.dispatchEvent(downEvent);
+    node.dispatchEvent(upEvent);
+  };
+
+  const bindKeyboardAction = (node, action) => {
+    if (!(node instanceof HTMLElement) || node.dataset.manaloomKeyboardBound === 'true') {
+      return;
+    }
+    node.dataset.manaloomKeyboardBound = 'true';
+    node.addEventListener('keydown', (event) => {
+      if (event.key !== 'Enter' && event.key !== ' ') {
+        return;
+      }
+      event.preventDefault();
+      action();
+    });
+  };
+
+  let activeDialog = null;
+  let restoreFocusNode = null;
+  const dialogFocusableSelector = [
+    'button:not([disabled])',
+    'input:not([disabled])',
+    'select:not([disabled])',
+    'textarea:not([disabled])',
+    '[role="button"][tabindex="0"]',
+    '[tabindex]:not([tabindex="-1"])',
+  ].join(',');
+
+  const bindDialogKeyboard = (dialog) => {
+    if (!(dialog instanceof HTMLElement) || dialog.dataset.manaloomDialogBound === 'true') {
+      return;
+    }
+    dialog.dataset.manaloomDialogBound = 'true';
+    dialog.addEventListener('keydown', (event) => {
+      if (event.key === 'Escape') {
+        const isMenuDialog = dialog.matches('.menu-button-overlay');
+        let closeButton = dialog.querySelector(
+          '.overlay-close-btn, [class*="close-"], .cancel, .btn.cancel',
+        );
+        if (
+          !(closeButton instanceof HTMLElement) &&
+          isMenuDialog
+        ) {
+          closeButton = document.querySelector(
+            ${jsonEncode(LotusDomSelectors.menuButton)},
+          );
+        }
+        if (closeButton instanceof HTMLElement) {
+          event.preventDefault();
+          event.stopPropagation();
+          closeButton.click();
+          if (isMenuDialog) {
+            const menuTrigger = document.querySelector(
+              ${jsonEncode(LotusDomSelectors.menuButton)},
+            );
+            if (menuTrigger instanceof HTMLElement) {
+              menuTrigger.focus({ preventScroll: true });
+              requestAnimationFrame(() => {
+                if (menuTrigger.isConnected) {
+                  menuTrigger.focus({ preventScroll: true });
+                }
+              });
+            }
+          }
+        }
+        return;
+      }
+      if (event.key !== 'Tab') {
+        return;
+      }
+      const focusable = Array.from(dialog.querySelectorAll(dialogFocusableSelector)).filter(
+        (node) => node instanceof HTMLElement && getComputedStyle(node).display !== 'none',
+      );
+      if (focusable.length === 0) {
+        event.preventDefault();
+        dialog.focus({ preventScroll: true });
+        return;
+      }
+      const first = focusable[0];
+      const last = focusable[focusable.length - 1];
+      if (event.shiftKey && document.activeElement === first) {
+        event.preventDefault();
+        last.focus();
+      } else if (!event.shiftKey && document.activeElement === last) {
+        event.preventDefault();
+        first.focus();
+      }
+    });
+  };
+
+  const syncDialogFocus = (dialogs) => {
+    const visibleDialogs = dialogs.filter((dialog) => {
+      return (
+        dialog instanceof HTMLElement &&
+        !dialog.classList.contains('hidden') &&
+        getComputedStyle(dialog).display !== 'none' &&
+        getComputedStyle(dialog).visibility !== 'hidden'
+      );
+    });
+    const nextDialog = visibleDialogs.length === 0
+      ? null
+      : visibleDialogs[visibleDialogs.length - 1];
+    if (nextDialog === activeDialog) {
+      return;
+    }
+
+    if (nextDialog instanceof HTMLElement) {
+      if (!(activeDialog instanceof HTMLElement)) {
+        const menuTrigger = nextDialog.matches('.menu-button-overlay')
+          ? document.querySelector(${jsonEncode(LotusDomSelectors.menuButton)})
+          : null;
+        if (menuTrigger instanceof HTMLElement) {
+          restoreFocusNode = menuTrigger;
+        } else if (document.activeElement instanceof HTMLElement) {
+          restoreFocusNode = document.activeElement;
+        }
+      }
+      activeDialog = nextDialog;
+      requestAnimationFrame(() => {
+        if (!(activeDialog instanceof HTMLElement) || activeDialog !== nextDialog) {
+          return;
+        }
+        if (nextDialog.contains(document.activeElement)) {
+          return;
+        }
+        const firstFocusable = nextDialog.querySelector(dialogFocusableSelector);
+        (firstFocusable instanceof HTMLElement ? firstFocusable : nextDialog).focus({
+          preventScroll: true,
+        });
+      });
+      return;
+    }
+
+    const closedDialog = activeDialog;
+    activeDialog = null;
+    let focusTarget =
+      restoreFocusNode instanceof HTMLElement && restoreFocusNode.isConnected
+        ? restoreFocusNode
+        : null;
+    if (
+      !(focusTarget instanceof HTMLElement) &&
+      closedDialog instanceof HTMLElement &&
+      closedDialog.matches('.menu-button-overlay')
+    ) {
+      focusTarget = document.querySelector(
+        ${jsonEncode(LotusDomSelectors.menuButton)},
+      );
+    }
+    restoreFocusNode = null;
+    if (focusTarget instanceof HTMLElement) {
+      requestAnimationFrame(() => {
+        if (activeDialog === null && focusTarget.isConnected) {
+          focusTarget.focus({ preventScroll: true });
+        }
+      });
+    }
+  };
+
+  const syncAccessibility = () => {
+    document.documentElement.lang = 'en';
+
+    const playerCards = Array.from(document.querySelectorAll(
+      ${jsonEncode(LotusDomSelectors.playerCard)},
+    ));
+    playerCards.forEach((card, index) => {
+      if (!(card instanceof HTMLElement)) {
+        return;
+      }
+      const fallbackName = 'Player ' + String(index + 1);
+      const nameNode = card.querySelector('.player-name, .player-name-input');
+      const playerName = readableText(nameNode) || fallbackName;
+      setAttributeIfChanged(card, 'role', 'group');
+      setAttributeIfChanged(card, 'aria-label', playerName + ' controls');
+
+      const lifeNode = card.querySelector('.player-life-count');
+      if (lifeNode instanceof HTMLElement) {
+        const lifeValue =
+          decodeVisualNumber(lifeNode) || readableText(lifeNode) || 'unknown';
+        const numericLife = Number.parseInt(lifeValue, 10);
+        setAttributeIfChanged(lifeNode, 'role', 'spinbutton');
+        setAttributeIfChanged(lifeNode, 'tabindex', '0');
+        setAttributeIfChanged(lifeNode, 'aria-live', 'polite');
+        setAttributeIfChanged(lifeNode, 'aria-atomic', 'true');
+        if (Number.isFinite(numericLife)) {
+          setAttributeIfChanged(lifeNode, 'aria-valuenow', String(numericLife));
+        }
+        setAttributeIfChanged(lifeNode, 'aria-valuemin', '-999');
+        setAttributeIfChanged(lifeNode, 'aria-valuemax', '999');
+        setAttributeIfChanged(
+          lifeNode,
+          'aria-label',
+          playerName + ' life: ' + lifeValue,
+        );
+        const increaseButton = card.querySelector('.increase-button.life');
+        const decreaseButton = card.querySelector('.decrease-button.life');
+        if (increaseButton instanceof HTMLElement) {
+          setAttributeIfChanged(increaseButton, 'role', 'button');
+          setAttributeIfChanged(increaseButton, 'tabindex', '0');
+          setAttributeIfChanged(
+            increaseButton,
+            'aria-label',
+            'Increase ' + playerName + ' life',
+          );
+          bindKeyboardAction(increaseButton, () => dispatchAccessibleTap(increaseButton));
+        }
+        if (decreaseButton instanceof HTMLElement) {
+          setAttributeIfChanged(decreaseButton, 'role', 'button');
+          setAttributeIfChanged(decreaseButton, 'tabindex', '0');
+          setAttributeIfChanged(
+            decreaseButton,
+            'aria-label',
+            'Decrease ' + playerName + ' life',
+          );
+          bindKeyboardAction(decreaseButton, () => dispatchAccessibleTap(decreaseButton));
+        }
+        if (lifeNode.dataset.manaloomSpinbuttonBound !== 'true') {
+          lifeNode.dataset.manaloomSpinbuttonBound = 'true';
+          lifeNode.addEventListener('keydown', (event) => {
+            if (event.key === 'ArrowUp' && increaseButton instanceof HTMLElement) {
+              event.preventDefault();
+              dispatchAccessibleTap(increaseButton);
+            } else if (event.key === 'ArrowDown' && decreaseButton instanceof HTMLElement) {
+              event.preventDefault();
+              dispatchAccessibleTap(decreaseButton);
+            } else if (event.key === 'Enter' || event.key === ' ') {
+              event.preventDefault();
+              dispatchAccessibleTap(lifeNode);
+            }
+          });
+        }
+      }
+
+    });
+
+    const menuButton = document.querySelector(
+      ${jsonEncode(LotusDomSelectors.menuButton)},
+    );
+    if (menuButton instanceof HTMLElement) {
+      const isOpen = menuButton.classList.contains('active');
+      setAttributeIfChanged(menuButton, 'role', 'button');
+      setAttributeIfChanged(menuButton, 'tabindex', '0');
+      setAttributeIfChanged(
+        menuButton,
+        'aria-label',
+        isOpen ? 'Close table controls' : 'Open table controls',
+      );
+      setAttributeIfChanged(menuButton, 'aria-expanded', String(isOpen));
+      bindKeyboardAction(menuButton, () => menuButton.click());
+    }
+
+    document.querySelectorAll('.menu-button-overlay .game-states-wrapper > *').forEach((node) => {
+      if (!(node instanceof HTMLElement)) {
+        return;
+      }
+      setAttributeIfChanged(node, 'role', 'button');
+      setAttributeIfChanged(
+        node,
+        'tabindex',
+        menuButton instanceof HTMLElement && menuButton.classList.contains('active') ? '0' : '-1',
+      );
+      const label = readableText(node);
+      if (label) {
+        setAttributeIfChanged(node, 'aria-label', label);
+      }
+      bindKeyboardAction(node, () => node.click());
+    });
+
+    let exitButton = document.querySelector('.manaloom-life-counter-exit');
+    if (!(exitButton instanceof HTMLElement) && document.body) {
+      exitButton = document.createElement('button');
+      exitButton.type = 'button';
+      exitButton.className = 'manaloom-life-counter-exit';
+      exitButton.textContent = '←';
+      exitButton.setAttribute('aria-label', 'Exit life counter');
+      document.body.appendChild(exitButton);
+    }
+    if (exitButton instanceof HTMLElement) {
+      const menuIsOpen =
+        menuButton instanceof HTMLElement && menuButton.classList.contains('active');
+      const menuOverlay = document.querySelector('.menu-button-overlay');
+      if (
+        menuIsOpen &&
+        menuOverlay instanceof HTMLElement &&
+        exitButton.parentElement !== menuOverlay
+      ) {
+        menuOverlay.appendChild(exitButton);
+      }
+      exitButton.classList.toggle('is-visible', menuIsOpen);
+      if (exitButton.dataset.manaloomExitBound !== 'true') {
+        exitButton.dataset.manaloomExitBound = 'true';
+        exitButton.addEventListener('click', () => {
+          const bridge = window.FlutterManaLoomShellBridge;
+          if (bridge && typeof bridge.postMessage === 'function') {
+            bridge.postMessage(JSON.stringify({
+              type: '${LotusShellMessageTypes.closeLifeCounter}',
+              source: 'table_menu_exit',
+            }));
+          }
+        });
+      }
+    }
+
+    const dialogs = [
+      ['.menu-button-overlay', 'Table controls'],
+      ['.settings-overlay', 'Life counter settings'],
+      ['.life-history-overlay', 'Game history'],
+      ['.card-search-overlay', 'Card search'],
+      ['.commander-damage-overlay', 'Commander damage'],
+      ['.first-time-user-overlay', 'Life counter tutorial'],
+      ['.custom-life-overlay', 'Set life'],
+      ['.input-overlay', 'Enter a value'],
+      ['.confirm-overlay', 'Confirm action'],
+    ];
+    const dialogNodes = [];
+    dialogs.forEach((entry) => {
+      document.querySelectorAll(entry[0]).forEach((node) => {
+        if (!(node instanceof HTMLElement)) {
+          return;
+        }
+        setAttributeIfChanged(node, 'role', 'dialog');
+        setAttributeIfChanged(node, 'aria-modal', 'true');
+        setAttributeIfChanged(node, 'aria-label', entry[1]);
+        setAttributeIfChanged(node, 'tabindex', '-1');
+        bindDialogKeyboard(node);
+        dialogNodes.push(node);
+      });
+    });
+    syncDialogFocus(dialogNodes);
+  };
+
+  let accessibilitySyncQueued = false;
+  const queueAccessibilitySync = () => {
+    if (accessibilitySyncQueued) {
+      return;
+    }
+    accessibilitySyncQueued = true;
+    requestAnimationFrame(() => {
+      accessibilitySyncQueued = false;
+      syncAccessibility();
+    });
+  };
+
+  const accessibilityObserver = new MutationObserver(queueAccessibilitySync);
+  if (document.body) {
+    accessibilityObserver.observe(document.body, {
+      childList: true,
+      characterData: true,
+      subtree: true,
+      attributes: true,
+      attributeFilter: ['class'],
+    });
+  }
+  window.__ManaLoomLifeCounterAccessibility = {
+    observer: accessibilityObserver,
+    sync: syncAccessibility,
+  };
+  syncAccessibility();
 })();
 ''';
 }

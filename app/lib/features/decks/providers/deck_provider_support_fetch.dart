@@ -265,6 +265,11 @@ DeckAiAnalysisPayload parseDeckAiAnalysisResponse(ApiResponse response) {
     );
   }
 
+  if (response.data is! Map) {
+    throw Exception(
+      'A análise do deck retornou um formato inválido. Tente novamente em instantes.',
+    );
+  }
   final data = (response.data as Map).cast<String, dynamic>();
   return DeckAiAnalysisPayload(
     raw: data,

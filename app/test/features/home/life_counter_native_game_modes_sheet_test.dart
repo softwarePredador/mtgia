@@ -84,21 +84,19 @@ void main() {
     expect(find.text('Unavailable'), findsOneWidget);
     expect(find.text('Active Now'), findsOneWidget);
     expect(find.text('Card Pool Open'), findsOneWidget);
-    expect(find.text('Selected Surface'), findsOneWidget);
+    expect(find.text('Selected'), findsOneWidget);
     expect(
-      find.text('An embedded overlay for this mode is already open in the current game.'),
+      find.text('This mode is already open in the current game.'),
       findsOneWidget,
     );
     expect(
-      find.text(
-        'The embedded card pool editor for this mode is already open in the current game.',
-      ),
+      find.text('The card pool editor is already open for this mode.'),
       findsOneWidget,
     );
-    expect(find.text('Return To Embedded Card Pool'), findsOneWidget);
+    expect(find.text('Return To Card Pool'), findsOneWidget);
     expect(find.text('Edit Card Pool'), findsNWidgets(2));
-    expect(find.text('Close Embedded Overlay'), findsOneWidget);
-    expect(find.text('Close Embedded Card Pool'), findsOneWidget);
+    expect(find.text('Close Mode'), findsOneWidget);
+    expect(find.text('Close Card Pool'), findsOneWidget);
 
     await tester.ensureVisible(
       find.byKey(const Key('life-counter-native-game-modes-planechase-info')),
@@ -152,9 +150,9 @@ void main() {
     await tester.tap(find.text('Open'));
     await tester.pumpAndSettle();
 
-    expect(find.text('Continue To Embedded Card Pool'), findsOneWidget);
+    expect(find.text('Continue To Card Pool'), findsOneWidget);
     expect(
-      find.textContaining('embedded Planechase card pool editor'),
+      find.textContaining('Continue to the Planechase card pool editor.'),
       findsOneWidget,
     );
 
@@ -176,11 +174,7 @@ void main() {
     LifeCounterGameModesAction? result;
 
     await tester.pumpWidget(
-      MaterialApp(
-        home: _GameModesHost(
-          onResult: (value) => result = value,
-        ),
-      ),
+      MaterialApp(home: _GameModesHost(onResult: (value) => result = value)),
     );
 
     await tester.tap(find.text('Open'));
@@ -202,15 +196,13 @@ void main() {
     expect(result, LifeCounterGameModesAction.editPlanechaseCards);
   });
 
-  testWidgets('offers explicit close action for active overlays', (tester) async {
+  testWidgets('offers explicit close action for active overlays', (
+    tester,
+  ) async {
     LifeCounterGameModesAction? result;
 
     await tester.pumpWidget(
-      MaterialApp(
-        home: _GameModesHost(
-          onResult: (value) => result = value,
-        ),
-      ),
+      MaterialApp(home: _GameModesHost(onResult: (value) => result = value)),
     );
 
     await tester.tap(find.text('Open'));
@@ -296,15 +288,19 @@ void main() {
     await tester.tap(find.text('Open'));
     await tester.pumpAndSettle();
 
-    expect(find.text('Selected Surface'), findsOneWidget);
+    expect(find.text('Selected'), findsOneWidget);
     expect(find.text('Not Available Right Now'), findsOneWidget);
     expect(find.text('Open Settings'), findsOneWidget);
 
     await tester.ensureVisible(
-      find.byKey(const Key('life-counter-native-game-modes-archenemy-settings')),
+      find.byKey(
+        const Key('life-counter-native-game-modes-archenemy-settings'),
+      ),
     );
     await tester.tap(
-      find.byKey(const Key('life-counter-native-game-modes-archenemy-settings')),
+      find.byKey(
+        const Key('life-counter-native-game-modes-archenemy-settings'),
+      ),
       warnIfMissed: false,
     );
     await tester.pumpAndSettle();
@@ -345,7 +341,7 @@ void main() {
       findsNothing,
     );
     expect(
-      find.textContaining('Lotus only allows 2 active game modes at once'),
+      find.textContaining('Only 2 game modes can be active at once'),
       findsOneWidget,
     );
 

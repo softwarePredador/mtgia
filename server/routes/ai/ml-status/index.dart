@@ -1,9 +1,14 @@
 import 'dart:convert';
+import 'dart:io';
+
 import 'package:dart_frog/dart_frog.dart';
-import '../../../lib/database.dart';
+import 'package:postgres/postgres.dart';
+
+import '../../../lib/admin_access_support.dart';
 import '../../../lib/http_responses.dart';
 import '../../../lib/logger.dart';
 import '../../../lib/observability.dart';
+import '../../../lib/runtime_environment.dart';
 
 /// GET /ai/ml-status
 ///
@@ -32,9 +37,20 @@ Future<Response> onRequest(RequestContext context) async {
     return methodNotAllowed();
   }
 
-  final db = Database();
-  await db.connect();
-  final conn = db.connection;
+  final conn = context.read<Pool>();
+  final userId = context.read<String>();
+  final env = loadRuntimeEnvironment();
+  final isAdmin = await isConfiguredAdminUser(
+    pool: conn,
+    userId: userId,
+    env: env,
+  );
+  if (!isAdmin) {
+    return Response.json(
+      statusCode: HttpStatus.forbidden,
+      body: {'error': 'Acesso operacional não autorizado'},
+    );
+  }
 
   try {
     // Verificar se as tabelas existem
@@ -80,8 +96,6 @@ Future<Response> onRequest(RequestContext context) async {
     );
     return internalServerError('Failed to load ML status');
   }
-  // Note: Do not close the connection - Database is a singleton and the pool
-  // should remain open for other requests
 }
 
 Future<bool> _checkTablesExist(dynamic conn) async {
@@ -189,6 +203,10 @@ Future<Map<String, dynamic>> _getPerformanceMetrics(dynamic conn) async {
         AVG(effectiveness_score)::float as avg_effectiveness
       FROM optimization_analysis_logs
       WHERE test_timestamp > NOW() - INTERVAL '30 days'
+        AND NOT (
+          COALESCE(decisions_reasoning, '{}'::jsonb)
+            ? 'validation_run_token'
+        )
     ''');
 
     if (result.isEmpty) {

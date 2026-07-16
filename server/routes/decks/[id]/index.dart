@@ -4,6 +4,7 @@ import 'package:postgres/postgres.dart';
 
 import '../../../lib/deck_rules_service.dart';
 import '../../../lib/deck_card_name_resolution_support.dart';
+import '../../../lib/commander_bracket.dart';
 import '../../../lib/deck_schema_support.dart';
 import '../../../lib/decks/deck_optimization_history_service.dart';
 import '../../../lib/basic_land_utils.dart' as land_utils;
@@ -79,9 +80,11 @@ Future<Response> _updateDeck(RequestContext context, String deckId) async {
   final format = body['format'] as String?;
   final description = body['description'] as String?;
   final archetype = body['archetype'] as String?;
-  final bracketRaw = body['bracket'];
-  final bracket =
-      bracketRaw is int ? bracketRaw : int.tryParse('${bracketRaw ?? ''}');
+  final bracketResult = parseCommanderBracket(body['bracket']);
+  if (bracketResult.error != null) {
+    return badRequest(bracketResult.error!);
+  }
+  final bracket = bracketResult.value;
   final isPublic = body['is_public'] as bool?;
   final cards = body['cards'] as List?; // Lista completa e nova de cartas
   final mutationContext =

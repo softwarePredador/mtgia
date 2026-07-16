@@ -153,7 +153,7 @@ class _LifeCounterNativeSetLifeSheetState
                             ),
                             const SizedBox(height: 6),
                             Text(
-                              'Update Player ${_targetPlayerIndex + 1} directly from the ManaLoom-owned shell.',
+                              'Enter a new life total for Player ${_targetPlayerIndex + 1}.',
                               style: const TextStyle(
                                 color: AppTheme.textSecondary,
                                 fontSize: AppTheme.fontMd,

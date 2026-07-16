@@ -3,12 +3,115 @@ import 'dart:convert';
 import 'package:crypto/crypto.dart';
 
 import 'endpoint_cache.dart';
+import 'commander_bracket.dart';
 import 'openai_runtime_config.dart';
 
 // Bump whenever the player-facing generate response contract changes. Cached
 // payloads are returned as-is, so an older key could omit safety diagnostics
 // such as deckbuilding_contract until its TTL expires.
 const aiGenerateCacheContractVersion = 'v2';
+const aiGenerateMaxPromptLength = 8000;
+const aiGenerateMaxFormatLength = 80;
+const aiGenerateMaxCommanderNameLength = 300;
+
+class AiGenerateRequestValidationException implements Exception {
+  const AiGenerateRequestValidationException(this.message);
+
+  final String message;
+
+  @override
+  String toString() => message;
+}
+
+class AiGenerateRequestInput {
+  const AiGenerateRequestInput({
+    required this.body,
+    required this.prompt,
+    required this.format,
+    required this.commanderName,
+  });
+
+  final Map<String, dynamic> body;
+  final String prompt;
+  final String format;
+  final String? commanderName;
+}
+
+AiGenerateRequestInput parseAiGenerateRequestInput(Object? decoded) {
+  if (decoded is! Map) {
+    throw const AiGenerateRequestValidationException('JSON invalido');
+  }
+
+  late final Map<String, dynamic> body;
+  try {
+    body = Map<String, dynamic>.from(decoded);
+  } catch (_) {
+    throw const AiGenerateRequestValidationException('JSON invalido');
+  }
+
+  final rawPrompt = body['prompt'];
+  if (rawPrompt is! String || rawPrompt.trim().isEmpty) {
+    throw const AiGenerateRequestValidationException('Prompt is required');
+  }
+  final prompt = rawPrompt.trim();
+  if (prompt.length > aiGenerateMaxPromptLength) {
+    throw const AiGenerateRequestValidationException(
+      'Prompt exceeds the allowed size',
+    );
+  }
+
+  final rawFormat = body['format'];
+  if (rawFormat != null && rawFormat is! String) {
+    throw const AiGenerateRequestValidationException('Format must be a string');
+  }
+  final normalizedFormat = (rawFormat as String?)?.trim() ?? '';
+  final format = normalizedFormat.isEmpty ? 'Commander' : normalizedFormat;
+  if (format.length > aiGenerateMaxFormatLength) {
+    throw const AiGenerateRequestValidationException(
+      'Format exceeds the allowed size',
+    );
+  }
+
+  final rawCommanderName = body['commander_name'];
+  if (rawCommanderName != null && rawCommanderName is! String) {
+    throw const AiGenerateRequestValidationException(
+      'Commander name must be a string',
+    );
+  }
+  final normalizedCommanderName = (rawCommanderName as String?)?.trim() ?? '';
+  if (normalizedCommanderName.length > aiGenerateMaxCommanderNameLength) {
+    throw const AiGenerateRequestValidationException(
+      'Commander name exceeds the allowed size',
+    );
+  }
+  final commanderName =
+      normalizedCommanderName.isEmpty ? null : normalizedCommanderName;
+
+  final bracketResult = parseCommanderBracket(body['bracket']);
+  if (bracketResult.error != null) {
+    throw AiGenerateRequestValidationException(bracketResult.error!);
+  }
+
+  body['prompt'] = prompt;
+  body['format'] = format;
+  if (commanderName == null) {
+    body.remove('commander_name');
+  } else {
+    body['commander_name'] = commanderName;
+  }
+  if (bracketResult.value == null) {
+    body.remove('bracket');
+  } else {
+    body['bracket'] = bracketResult.value;
+  }
+
+  return AiGenerateRequestInput(
+    body: body,
+    prompt: prompt,
+    format: format,
+    commanderName: commanderName,
+  );
+}
 
 String normalizeAiGeneratePrompt(String prompt) {
   return prompt.trim().toLowerCase().replaceAll(RegExp(r'\s+'), ' ');

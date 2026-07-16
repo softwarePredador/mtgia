@@ -37,6 +37,49 @@ void main() {
       expect(restored, isNull);
     });
 
+    test('rejects internally inconsistent timer combinations', () {
+      expect(
+        LifeCounterGameTimerState.tryFromJson({
+          'start_time_epoch_ms': null,
+          'is_paused': true,
+          'paused_time_epoch_ms': null,
+        }),
+        isNull,
+      );
+      expect(
+        LifeCounterGameTimerState.tryFromJson({
+          'start_time_epoch_ms': 1000,
+          'is_paused': false,
+          'paused_time_epoch_ms': 2000,
+        }),
+        isNull,
+      );
+      expect(
+        LifeCounterGameTimerState.tryFromJson({
+          'start_time_epoch_ms': 2000,
+          'is_paused': true,
+          'paused_time_epoch_ms': 1000,
+        }),
+        isNull,
+      );
+      expect(
+        LifeCounterGameTimerState.tryFromJson({
+          'start_time_epoch_ms': -1,
+          'is_paused': false,
+          'paused_time_epoch_ms': null,
+        }),
+        isNull,
+      );
+      expect(
+        LifeCounterGameTimerState.tryFromJson({
+          'start_time_epoch_ms': 'invalid',
+          'is_paused': false,
+          'paused_time_epoch_ms': null,
+        }),
+        isNull,
+      );
+    });
+
     test('clears persisted state', () async {
       await store.save(
         const LifeCounterGameTimerState(

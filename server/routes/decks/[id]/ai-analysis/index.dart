@@ -2,7 +2,6 @@ import 'dart:convert';
 import 'dart:io';
 import 'dart:math';
 import 'package:dart_frog/dart_frog.dart';
-import 'package:dotenv/dotenv.dart';
 import 'package:http/http.dart' as http;
 import 'package:postgres/postgres.dart';
 import '../../../../lib/ai/functional_card_tags.dart';
@@ -10,10 +9,13 @@ import '../../../../lib/ai/optimization_ramp_profile.dart';
 import '../../../../lib/basic_land_utils.dart' as land_utils;
 import '../../../../lib/ai_provider_runtime_support.dart';
 import '../../../../lib/ai_provider_usage_support.dart';
+import '../../../../lib/http_responses.dart';
+import '../../../../lib/json_object_support.dart';
 import '../../../../lib/logger.dart';
 import '../../../../lib/observability.dart';
 import '../../../../lib/openai_runtime_config.dart';
 import '../../../../lib/openai_structured_output_support.dart';
+import '../../../../lib/runtime_environment.dart';
 
 /// POST /decks/:id/ai-analysis
 ///
@@ -33,10 +35,8 @@ Future<Response> onRequest(RequestContext context, String deckId) async {
   final pool = context.read<Pool>();
 
   try {
-    final body = await context.request.json().catchError(
-      (_) => const <String, dynamic>{},
-    );
-    final force = body is Map ? (body['force'] == true) : false;
+    final body = decodeOptionalJsonObject(await context.request.body());
+    final force = readOptionalJsonBool(body, 'force');
 
     final deckResult = await pool.execute(
       Sql.named(
@@ -179,7 +179,7 @@ Future<Response> onRequest(RequestContext context, String deckId) async {
 
     final metrics = _computeMetrics(cardsResult, format: format);
 
-    final env = DotEnv(includePlatformEnvironment: true, quiet: true)..load();
+    final env = loadRuntimeEnvironment();
     final aiConfig = OpenAiRuntimeConfig(env);
     final apiKey = env['OPENAI_API_KEY'];
 
@@ -262,6 +262,8 @@ Future<Response> onRequest(RequestContext context, String deckId) async {
         if (isMock) 'is_mock': true,
       },
     );
+  } on JsonObjectValidationException catch (error) {
+    return badRequest(error.message);
   } catch (e, stackTrace) {
     Log.e('[deck-ai-analysis] request failed type=${e.runtimeType}');
     await captureRouteException(
@@ -574,13 +576,7 @@ Regras:
     'max_total_cards': maxTotal,
     'metrics': metrics.toJson(),
   };
-  final model = aiConfig.modelFor(
-    key: 'OPENAI_MODEL_AI_ANALYSIS',
-    fallback: 'gpt-4o-mini',
-    devFallback: 'gpt-4o-mini',
-    stagingFallback: 'gpt-4o-mini',
-    prodFallback: 'gpt-4o-mini',
-  );
+  final model = aiConfig.analysisModel;
 
   final providerStopwatch = Stopwatch()..start();
   late final http.Response response;

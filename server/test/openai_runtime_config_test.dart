@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:dotenv/dotenv.dart';
 import 'package:test/test.dart';
 
@@ -32,6 +34,20 @@ void main() {
       );
     });
 
+    test(
+      'production environment cannot be downgraded by an explicit profile',
+      () {
+        final env =
+            DotEnv()
+              ..addAll({'ENVIRONMENT': 'production', 'OPENAI_PROFILE': 'dev'});
+        final config = OpenAiRuntimeConfig(env);
+
+        expect(config.profile, 'prod');
+        expect(config.isProductionLike, isTrue);
+        expect(config.allowsMockFallbacks, isFalse);
+      },
+    );
+
     test('does not fallback for non-auth errors', () {
       final env = DotEnv()..addAll({'ENVIRONMENT': 'development'});
       final config = OpenAiRuntimeConfig(env);
@@ -46,11 +62,11 @@ void main() {
     });
 
     test('uses bounded generate timeout override', () {
-      final env = DotEnv()
-        ..addAll({
-          'ENVIRONMENT': 'staging',
-          'OPENAI_TIMEOUT_GENERATE_SECONDS': '1',
-        });
+      final env =
+          DotEnv()..addAll({
+            'ENVIRONMENT': 'staging',
+            'OPENAI_TIMEOUT_GENERATE_SECONDS': '1',
+          });
       final config = OpenAiRuntimeConfig(env);
 
       expect(
@@ -81,11 +97,11 @@ void main() {
     });
 
     test('keeps generate model configurable for staging experiments', () {
-      final env = DotEnv()
-        ..addAll({
-          'ENVIRONMENT': 'staging',
-          'OPENAI_MODEL_GENERATE': 'gpt-5.4-mini',
-        });
+      final env =
+          DotEnv()..addAll({
+            'ENVIRONMENT': 'staging',
+            'OPENAI_MODEL_GENERATE': 'gpt-5.4-mini',
+          });
       final config = OpenAiRuntimeConfig(env);
 
       expect(
@@ -96,6 +112,26 @@ void main() {
           prodFallback: 'gpt-4o-mini',
         ),
         equals('gpt-5.4-mini'),
+      );
+    });
+
+    test('production optimize defaults use the validated current model', () {
+      final runtimeSource =
+          File('lib/openai_runtime_config.dart').readAsStringSync();
+      final exampleEnvironment = File('.env.example').readAsStringSync();
+
+      expect(
+        RegExp(r"prodFallback: 'gpt-5\.4-mini'").allMatches(runtimeSource),
+        hasLength(2),
+      );
+      expect(runtimeSource, isNot(contains("prodFallback: 'gpt-4o'")));
+      expect(
+        exampleEnvironment,
+        contains('OPENAI_MODEL_OPTIMIZE=gpt-5.4-mini'),
+      );
+      expect(
+        exampleEnvironment,
+        contains('OPENAI_MODEL_COMPLETE=gpt-5.4-mini'),
       );
     });
   });

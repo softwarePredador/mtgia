@@ -50,9 +50,10 @@ String confidenceLabel({
   if (!commanderIdentityResolved || evidenceCount <= 0) return 'not_proven';
 
   final normalizedSource = source.trim().toLowerCase();
-  final sourceBonus = normalizedSource.contains('external')
-      ? 1
-      : normalizedSource.contains('cedh') ||
+  final sourceBonus =
+      normalizedSource.contains('external')
+          ? 1
+          : normalizedSource.contains('cedh') ||
               normalizedSource.contains('competitive')
           ? 1
           : 0;
@@ -97,12 +98,22 @@ String bracketScopeForMetaSignal({
   required int score,
 }) {
   final normalizedSubformat = subformat.trim().toLowerCase();
-  if (normalizedSubformat == 'competitive_commander') return 'bracket_3_4';
-  if (existingBracketScope == 'bracket_3_4') return existingBracketScope;
-  if (score >= 82 || existingBracketScope == 'bracket_2_4') {
-    return 'bracket_2_4';
+  final existingMinimum = candidateBracketScopeMinimum(existingBracketScope);
+  if (normalizedSubformat == 'competitive_commander' || existingMinimum == 3) {
+    return 'bracket_3_plus';
+  }
+  if (score >= 82 || existingMinimum == 2) {
+    return 'bracket_2_plus';
   }
   return 'any';
+}
+
+int? candidateBracketScopeMinimum(String bracketScope) {
+  return switch (bracketScope.trim().toLowerCase()) {
+    'bracket_2_plus' || 'bracket_2_5' || 'bracket_2_4' => 2,
+    'bracket_3_plus' || 'bracket_3_5' || 'bracket_3_4' => 3,
+    _ => null,
+  };
 }
 
 bool colorIdentityFits({
@@ -141,35 +152,41 @@ List<Map<String, dynamic>> buildRoleReplacementExamples(
   for (final candidate in candidateRows) {
     final role = candidate['role']?.toString() ?? '';
     if (role.isEmpty) continue;
-    candidatesByRole.putIfAbsent(role, () => <Map<String, dynamic>>[]).add(
-          candidate,
-        );
+    candidatesByRole
+        .putIfAbsent(role, () => <Map<String, dynamic>>[])
+        .add(candidate);
   }
 
   for (final rows in candidatesByRole.values) {
     rows.sort((a, b) {
-      final byScore =
-          ((b['score'] as num?) ?? 0).compareTo((a['score'] as num?) ?? 0);
+      final byScore = ((b['score'] as num?) ?? 0).compareTo(
+        (a['score'] as num?) ?? 0,
+      );
       if (byScore != 0) return byScore;
-      final byEvidence = ((b['evidence_count'] as num?) ?? 0)
-          .compareTo((a['evidence_count'] as num?) ?? 0);
+      final byEvidence = ((b['evidence_count'] as num?) ?? 0).compareTo(
+        (a['evidence_count'] as num?) ?? 0,
+      );
       if (byEvidence != 0) return byEvidence;
-      return (a['card_name']?.toString() ?? '')
-          .compareTo(b['card_name']?.toString() ?? '');
+      return (a['card_name']?.toString() ?? '').compareTo(
+        b['card_name']?.toString() ?? '',
+      );
     });
   }
 
   final output = <Map<String, dynamic>>[];
   for (final rejected in rejectedRows) {
     final role = rejected['role']?.toString() ?? '';
-    final rejectedKey =
-        _normalizedReplacementKey(rejected['card_name']?.toString() ?? '');
+    final rejectedKey = _normalizedReplacementKey(
+      rejected['card_name']?.toString() ?? '',
+    );
     final replacements =
         (candidatesByRole[role] ?? const <Map<String, dynamic>>[]).where(
-      (candidate) =>
-          _normalizedReplacementKey(candidate['card_name']?.toString() ?? '') !=
-          rejectedKey,
-    );
+          (candidate) =>
+              _normalizedReplacementKey(
+                candidate['card_name']?.toString() ?? '',
+              ) !=
+              rejectedKey,
+        );
     if (replacements.isEmpty) continue;
     final replacement = replacements.first;
     output.add({

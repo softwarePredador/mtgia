@@ -101,6 +101,32 @@ class _FakeApiClient extends ApiClient {
 }
 
 void main() {
+  test('generated deck warnings panel ignores empty warning payloads', () {
+    expect(
+      hasMeaningfulGeneratedDeckWarnings(
+        isMock: false,
+        warnings: const {'invalid_cards': <String>[]},
+      ),
+      isFalse,
+    );
+    expect(
+      hasMeaningfulGeneratedDeckWarnings(
+        isMock: false,
+        warnings: const {
+          'messages': <String>['Carta substituída durante a validação.'],
+        },
+      ),
+      isTrue,
+    );
+    expect(
+      hasMeaningfulGeneratedDeckWarnings(
+        isMock: true,
+        warnings: const <String, dynamic>{},
+      ),
+      isTrue,
+    );
+  });
+
   Widget wrapSimple(Widget child, {DeckProvider? deckProvider}) {
     final app = MaterialApp(home: child);
     if (deckProvider == null) return app;

@@ -36,6 +36,14 @@ void main() {
         migrate.migrationRollbackPolicy('035'),
         migrate.MigrationRollbackPolicy.emptyOnly,
       );
+      expect(
+        migrate.migrationRollbackPolicy('036'),
+        migrate.MigrationRollbackPolicy.manualOnly,
+      );
+      expect(
+        migrate.migrationRollbackPolicy('037'),
+        migrate.MigrationRollbackPolicy.manualOnly,
+      );
     });
 
     test('migration 014 persists async generation jobs', () {
@@ -381,6 +389,35 @@ void main() {
       expect(down, contains('drop table if exists data_source_snapshots'));
       expect(down, contains('drop column if exists ruling_source'));
       expect(down, contains("alter column source set default 'mtgjson'"));
+    });
+
+    test('migration 036 enforces the five Commander brackets', () {
+      final migration = migrate.migrations.singleWhere(
+        (migration) => migration.version == '036',
+      );
+      final up = migration.up.toLowerCase();
+
+      expect(up, contains('chk_decks_commander_bracket'));
+      expect(up, contains('chk_ai_user_preferences_commander_bracket'));
+      expect(up, contains('set bracket = 5'));
+      expect(up, contains('set preferred_bracket = 5'));
+      expect(up, contains('2026-07-16 16:45:00+00'));
+      expect(up, contains('bracket between 1 and 5'));
+      expect(up, contains('preferred_bracket between 1 and 5'));
+    });
+
+    test('migration 037 replaces capped candidate bracket scopes', () {
+      final migration = migrate.migrations.singleWhere(
+        (migration) => migration.version == '037',
+      );
+      final up = migration.up.toLowerCase();
+
+      expect(migration.name, equals('normalize_candidate_bracket_scopes'));
+      expect(up, contains('delete from card_role_scores legacy'));
+      expect(up, contains("'bracket_2_plus'"));
+      expect(up, contains("'bracket_3_plus'"));
+      expect(up, contains("'bracket_2_4'"));
+      expect(up, contains("'bracket_3_5'"));
     });
   });
 }

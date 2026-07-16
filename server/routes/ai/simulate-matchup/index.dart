@@ -3,6 +3,7 @@ import 'package:dart_frog/dart_frog.dart';
 import 'package:postgres/postgres.dart';
 import '../../../lib/archetype_counters_service.dart';
 import '../../../lib/http_responses.dart';
+import '../../../lib/json_object_support.dart';
 import '../../../lib/ai/optimization_functional_roles.dart';
 import '../../../lib/basic_land_utils.dart' as land_utils;
 import '../../../lib/logger.dart';
@@ -24,10 +25,24 @@ Future<Response> onRequest(RequestContext context) async {
     return methodNotAllowed();
   }
 
+  Map<String, dynamic> body;
+  String? myDeckId;
+  String? opponentDeckId;
   try {
-    final body = await context.request.json() as Map<String, dynamic>;
-    final myDeckId = body['my_deck_id'] as String?;
-    final opponentDeckId = body['opponent_deck_id'] as String?;
+    body = requireJsonObject(await context.request.json());
+    myDeckId = readOptionalJsonString(body, 'my_deck_id', maxLength: 128);
+    opponentDeckId = readOptionalJsonString(
+      body,
+      'opponent_deck_id',
+      maxLength: 128,
+    );
+  } on JsonObjectValidationException catch (error) {
+    return badRequest(error.message);
+  } catch (_) {
+    return badRequest('JSON invalido');
+  }
+
+  try {
     final simulationCount = _normalizedSimulationCount(body['simulations']);
     final simulationSeed = body['seed'] is int ? body['seed'] as int : null;
     final userId = context.read<String>();

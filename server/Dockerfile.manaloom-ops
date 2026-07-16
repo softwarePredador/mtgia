@@ -21,6 +21,7 @@ RUN dart pub get --enforce-lockfile
 COPY . /app
 
 RUN chmod +x \
+  /app/server/bin/cron_cleanup_optimize_telemetry.sh \
   /app/server/bin/auto_promote_learned_decks.sh \
   /app/server/bin/hermes_cron_governor_report.sh \
   /app/server/bin/hermes_mana_base_validator.sh \

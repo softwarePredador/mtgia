@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:crypto/crypto.dart';
 import 'package:postgres/postgres.dart';
 import 'package:server/ai/candidate_quality_data_support.dart';
+import 'package:server/ai/optimize_rejection_history_support.dart';
 import 'package:server/database.dart';
 import 'package:server/meta/meta_deck_card_list_support.dart';
 
@@ -204,7 +205,7 @@ Future<void> main(List<String> args) async {
     var prunedStaleSynergies = 0;
     var prunedStalePenalties = 0;
     var prunedRows = <Map<String, dynamic>>[];
-    final staleGeneratedRowsBeforeApply = await _loadStaleGeneratedRows(
+    final staleGeneratedRowsBeforeApply = await _loadStaleGeneratedRowsSnapshot(
       pool: pool,
       tagRows: tagRows,
       roleRows: roleRows,
@@ -241,6 +242,7 @@ Future<void> main(List<String> args) async {
         await session.execute(
           "SELECT pg_advisory_xact_lock(hashtext('manaloom_candidate_quality_foundation'))",
         );
+        await session.execute('SET LOCAL max_parallel_workers_per_gather = 0');
         final transactionStaleRows = await _loadStaleGeneratedRows(
           pool: session,
           tagRows: tagRows,
@@ -881,9 +883,13 @@ WHERE format IN ('EDH', 'cEDH')
 
 Future<List<Map<String, dynamic>>> _loadRejectionPenaltyRows(Pool pool) async {
   if (!await _hasTable(pool, 'optimization_analysis_logs')) {
-    return const <Map<String, dynamic>>[];
+    throw StateError(
+      'Candidate-quality foundation requires optimization_analysis_logs; '
+      'refusing to interpret a missing source as an empty authoritative set.',
+    );
   }
 
+  final explicitRejectionPredicate = explicitOptimizeQualityRejectionSql('oal');
   final rows = await pool.execute('''
 SELECT
   COALESCE(commander_name, '') AS commander_name,
@@ -894,10 +900,8 @@ FROM optimization_analysis_logs oal
 CROSS JOIN LATERAL jsonb_array_elements_text(oal.additions_list) AS value
 WHERE oal.additions_list IS NOT NULL
   AND jsonb_typeof(oal.additions_list) = 'array'
-  AND (
-    COALESCE(oal.validation_score, 0) < 70
-    OR COALESCE(oal.validation_verdict, '') <> 'aprovado'
-  )
+  AND oal.operation_mode = 'optimize'
+  AND $explicitRejectionPredicate
 GROUP BY commander_name, archetype, value
 ORDER BY reject_count DESC, card_name ASC
 ''');
@@ -1486,6 +1490,28 @@ Future<Map<String, List<Map<String, dynamic>>>> _loadStaleGeneratedRows({
   };
 }
 
+Future<Map<String, List<Map<String, dynamic>>>>
+_loadStaleGeneratedRowsSnapshot({
+  required Pool pool,
+  required List<Map<String, dynamic>> tagRows,
+  required List<Map<String, dynamic>> roleRows,
+  required List<Map<String, dynamic>> synergyRows,
+  required List<Map<String, dynamic>> penaltyRows,
+}) {
+  return pool.runTx((session) async {
+    // The production PostgreSQL container has a bounded /dev/shm. These broad
+    // anti-joins are deterministic and safer as one non-parallel snapshot.
+    await session.execute('SET LOCAL max_parallel_workers_per_gather = 0');
+    return _loadStaleGeneratedRows(
+      pool: session,
+      tagRows: tagRows,
+      roleRows: roleRows,
+      synergyRows: synergyRows,
+      penaltyRows: penaltyRows,
+    );
+  });
+}
+
 List<Map<String, dynamic>> _flattenStaleGeneratedRows(
   Map<String, List<Map<String, dynamic>>> rowsByTable,
 ) {
@@ -1685,8 +1711,7 @@ Future<List<Map<String, dynamic>>> _loadStaleRejectionPenalties(
   Session session,
   List<Map<String, dynamic>> rows,
 ) async {
-  if (rows.isEmpty ||
-      !await _hasTable(session, 'optimize_rejection_penalties')) {
+  if (!await _hasTable(session, 'optimize_rejection_penalties')) {
     return const [];
   }
   final result = await session.execute(
@@ -1924,7 +1949,6 @@ Future<int> _pruneStaleRejectionPenalties(
   Session pool,
   List<Map<String, dynamic>> rows,
 ) async {
-  if (rows.isEmpty) return 0;
   final result = await pool.execute(
     Sql.named('''
 WITH planned AS (

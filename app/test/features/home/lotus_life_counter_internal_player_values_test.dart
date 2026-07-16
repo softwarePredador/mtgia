@@ -11,7 +11,7 @@ import 'package:manaloom/features/home/lotus/lotus_js_bridges.dart';
 import 'package:manaloom/features/home/lotus_life_counter_screen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-class _FakeLotusHost implements LotusHost {
+class _FakeLotusHost implements LotusHost, LotusCanonicalStorageRebaser {
   _FakeLotusHost({required this.onShellMessageRequested});
 
   final LotusShellMessageCallback onShellMessageRequested;
@@ -23,6 +23,7 @@ class _FakeLotusHost implements LotusHost {
   final ValueNotifier<String?> errorMessage = ValueNotifier<String?>(null);
 
   int loadBundleCallCount = 0;
+  int canonicalRebaseCallCount = 0;
 
   @override
   Widget buildView(BuildContext context) {
@@ -57,6 +58,14 @@ class _FakeLotusHost implements LotusHost {
       'bountyCardPoolActive': false,
       'maxActiveModes': 2,
     });
+  }
+
+  @override
+  Future<bool> rebaseStorageFromCanonical({
+    String reason = 'native_canonical_sync',
+  }) async {
+    canonicalRebaseCallCount += 1;
+    return true;
   }
 
   void completeSuccessfulLoad() {
@@ -325,6 +334,7 @@ void main() {
           expect(session, isNotNull);
           expect(session!.commanderDamage[0][1], 1);
           expect(host.loadBundleCallCount, 1);
+          expect(host.canonicalRebaseCallCount, 1);
           expect(
             logs.any(
               (message) =>
@@ -456,7 +466,7 @@ void main() {
     );
 
     testWidgets(
-      'keeps commander damage on reload fallback when life loss on commander damage stays enabled',
+      'applies reverses and clamps commander life loss through reload fallback',
       (tester) async {
         late _FakeLotusHost host;
         await _captureDebugLogs((logs) async {
@@ -557,18 +567,110 @@ void main() {
           final session = await LifeCounterSessionStore().load();
           expect(session, isNotNull);
           expect(session!.commanderDamage[0][1], 1);
+          expect(session.lives[0], 39);
           expect(host.loadBundleCallCount, 2);
           expect(
             logs.any(
               (message) =>
                   message.contains('message=native_commander_damage_applied') &&
                   message.contains('apply_strategy: reload_fallback') &&
-                  message.contains(
-                    'sync_blockers: [life_loss_on_commander_damage_enabled]',
-                  ),
+                  message.contains('life_loss_on_commander_damage_enabled'),
             ),
             isTrue,
           );
+
+          host.emitShellMessage(
+            '{"type":"open-native-commander-damage","source":"commander_damage_surface_pressed","targetPlayerIndex":0}',
+          );
+          await tester.pumpAndSettle();
+
+          await tester.scrollUntilVisible(
+            find.byKey(
+              const Key('life-counter-native-commander-damage-minus-1-c1'),
+            ),
+            250,
+            scrollable: find.byType(Scrollable).first,
+          );
+          await tester.tap(
+            find.byKey(
+              const Key('life-counter-native-commander-damage-minus-1-c1'),
+            ),
+          );
+          await tester.pumpAndSettle();
+          await tester.tap(
+            find.byKey(const Key('life-counter-native-commander-damage-apply')),
+          );
+          await tester.pumpAndSettle();
+
+          final restoredSession = await LifeCounterSessionStore().load();
+          expect(restoredSession, isNotNull);
+          expect(restoredSession!.commanderDamage[0][1], 0);
+          expect(restoredSession.lives[0], 40);
+          expect(host.loadBundleCallCount, 3);
+
+          await LifeCounterSessionStore().save(
+            restoredSession.copyWith(lives: const [-999, 32, 25, 11]),
+          );
+          host.emitShellMessage(
+            '{"type":"open-native-commander-damage","source":"commander_damage_surface_pressed","targetPlayerIndex":0}',
+          );
+          await tester.pumpAndSettle();
+
+          await tester.scrollUntilVisible(
+            find.byKey(
+              const Key('life-counter-native-commander-damage-plus-1-c1'),
+            ),
+            250,
+            scrollable: find.byType(Scrollable).first,
+          );
+          await tester.tap(
+            find.byKey(
+              const Key('life-counter-native-commander-damage-plus-1-c1'),
+            ),
+          );
+          await tester.pumpAndSettle();
+          await tester.tap(
+            find.byKey(const Key('life-counter-native-commander-damage-apply')),
+          );
+          await tester.pumpAndSettle();
+
+          final clampedSession = await LifeCounterSessionStore().load();
+          expect(clampedSession, isNotNull);
+          expect(clampedSession!.commanderDamage[0][1], 1);
+          expect(clampedSession.lives[0], -999);
+          expect(host.loadBundleCallCount, 4);
+
+          await LifeCounterSessionStore().save(
+            clampedSession.copyWith(lives: const [999, 32, 25, 11]),
+          );
+          host.emitShellMessage(
+            '{"type":"open-native-commander-damage","source":"commander_damage_surface_pressed","targetPlayerIndex":0}',
+          );
+          await tester.pumpAndSettle();
+
+          await tester.scrollUntilVisible(
+            find.byKey(
+              const Key('life-counter-native-commander-damage-minus-1-c1'),
+            ),
+            250,
+            scrollable: find.byType(Scrollable).first,
+          );
+          await tester.tap(
+            find.byKey(
+              const Key('life-counter-native-commander-damage-minus-1-c1'),
+            ),
+          );
+          await tester.pumpAndSettle();
+          await tester.tap(
+            find.byKey(const Key('life-counter-native-commander-damage-apply')),
+          );
+          await tester.pumpAndSettle();
+
+          final upperClampedSession = await LifeCounterSessionStore().load();
+          expect(upperClampedSession, isNotNull);
+          expect(upperClampedSession!.commanderDamage[0][1], 0);
+          expect(upperClampedSession.lives[0], 999);
+          expect(host.loadBundleCallCount, 5);
         });
       },
     );

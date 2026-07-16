@@ -89,6 +89,7 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen>
   static const int _maxLiveTurnTrackerBackwardSteps = 3;
   static const int _turnTrackerLongPressDurationMs = 1100;
   static const int _turnTrackerLongPressCycleMs = 1150;
+  static const Duration _exitStorageFlushTimeout = Duration(milliseconds: 900);
   static const MethodChannel _nativeLifecycleChannel = MethodChannel(
     'manaloom/life_counter_lifecycle',
   );
@@ -237,6 +238,7 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen>
   bool _isNativeSetLifeSheetOpen = false;
   bool _isNativeTableStateSheetOpen = false;
   bool _isNativeDayNightSheetOpen = false;
+  bool _isExitInProgress = false;
 
   @override
   void initState() {
@@ -319,13 +321,14 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen>
     }
   }
 
-  void _exitLifeCounter({
+  Future<void> _exitLifeCounter({
     required String source,
     bool requestedFromShell = false,
-  }) {
-    if (!mounted) {
+  }) async {
+    if (!mounted || _isExitInProgress) {
       return;
     }
+    _isExitInProgress = true;
 
     final canPop = canPopLifeCounterRoute(context);
     unawaited(
@@ -341,6 +344,33 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen>
       ),
     );
 
+    var didFlushStorage = false;
+    final hostController = _hostController;
+    if (hostController is LotusStorageFlushBarrier) {
+      try {
+        final storageFlushBarrier = hostController as LotusStorageFlushBarrier;
+        didFlushStorage = await storageFlushBarrier
+            .flushStorageSnapshot(reason: 'flutter_exit_$source')
+            .timeout(_exitStorageFlushTimeout, onTimeout: () => false);
+      } catch (_) {
+        didFlushStorage = false;
+      }
+    }
+    if (!mounted) {
+      return;
+    }
+
+    unawaited(
+      AppObservability.instance.recordEvent(
+        'exit_storage_barrier_settled',
+        category: 'life_counter.storage',
+        data: {
+          'route': lifeCounterRoutePath,
+          'source': source,
+          'storage_flushed': didFlushStorage,
+        },
+      ),
+    );
     closeLifeCounterRoute(context);
   }
 
@@ -349,7 +379,7 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen>
       return;
     }
 
-    _exitLifeCounter(source: 'system_back_fallback');
+    unawaited(_exitLifeCounter(source: 'system_back_fallback'));
   }
 
   void _syncLoadingOverlay() {
@@ -468,12 +498,14 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen>
 
         if (type == LotusShellMessageTypes.closeLifeCounter) {
           final rawSource = (decoded['source'] as String?)?.trim();
-          _exitLifeCounter(
-            source:
-                rawSource != null && rawSource.isNotEmpty
-                    ? rawSource
-                    : 'shell_close_request',
-            requestedFromShell: true,
+          unawaited(
+            _exitLifeCounter(
+              source:
+                  rawSource != null && rawSource.isNotEmpty
+                      ? rawSource
+                      : 'shell_close_request',
+              requestedFromShell: true,
+            ),
           );
           return;
         }
@@ -871,6 +903,16 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen>
   }
 
   Future<bool> _applyLiveLotusStoragePatch(Map<String, String?> values) async {
+    final host = _hostController;
+    if (host is LotusLiveStoragePatchCoordinator) {
+      final coordinator = host as LotusLiveStoragePatchCoordinator;
+      try {
+        return await coordinator.applyLiveStoragePatch(values);
+      } catch (_) {
+        return false;
+      }
+    }
+
     try {
       final rawResult = await _hostController.runJavaScriptReturningResult('''
 (() => {
@@ -899,6 +941,44 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen>
     } catch (_) {
       return false;
     }
+  }
+
+  Future<bool> _rebaseLiveLotusStorageFromCanonical({
+    required String reason,
+  }) async {
+    final host = _hostController;
+    if (host is! LotusCanonicalStorageRebaser) {
+      return false;
+    }
+    final rebaser = host as LotusCanonicalStorageRebaser;
+
+    try {
+      return await rebaser.rebaseStorageFromCanonical(reason: reason);
+    } catch (_) {
+      return false;
+    }
+  }
+
+  Future<bool> _mutateCanonicalStorageAndRebase({
+    required LotusCanonicalStorageMutation mutation,
+    required String reason,
+    bool reloadRuntime = false,
+  }) async {
+    final host = _hostController;
+    if (host is LotusCanonicalStorageMutationCoordinator) {
+      final coordinator = host as LotusCanonicalStorageMutationCoordinator;
+      return coordinator.mutateCanonicalStorageAndRebase(
+        mutation: mutation,
+        reason: reason,
+        reloadRuntime: reloadRuntime,
+      );
+    }
+
+    await mutation();
+    if (reloadRuntime) {
+      return _rebaseLiveLotusStorageFromCanonical(reason: reason);
+    }
+    return true;
   }
 
   void _recordNativeFallbackSurfaceRequested(Map<String, dynamic> decoded) {
@@ -1652,17 +1732,22 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen>
     LifeCounterDayNightState state, {
     required String source,
   }) async {
-    await _dayNightStateStore.save(state);
+    await _mutateCanonicalStorageAndRebase(
+      reason: 'native_day_night',
+      mutation: () async {
+        await _dayNightStateStore.save(state);
 
-    final snapshot = await _snapshotStore.load();
-    final mergedValues = <String, String>{
-      ...?snapshot?.values,
-      '__manaloom_day_night_mode': state.mode,
-    };
-    await _snapshotStore.save(
-      LotusStorageSnapshot(
-        values: Map<String, String>.unmodifiable(mergedValues),
-      ),
+        final snapshot = await _snapshotStore.load();
+        final mergedValues = <String, String>{
+          ...?snapshot?.values,
+          '__manaloom_day_night_mode': state.mode,
+        };
+        await _snapshotStore.save(
+          LotusStorageSnapshot(
+            values: Map<String, String>.unmodifiable(mergedValues),
+          ),
+        );
+      },
     );
 
     const livePatchEligible = true;
@@ -1696,24 +1781,29 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen>
     LifeCounterSettings settings, {
     required String source,
   }) async {
-    await _settingsStore.save(settings);
+    await _mutateCanonicalStorageAndRebase(
+      reason: 'native_settings',
+      mutation: () async {
+        await _settingsStore.save(settings);
+
+        final snapshot = await _snapshotStore.load();
+        if (snapshot != null) {
+          final mergedValues = <String, String>{
+            ...snapshot.values,
+            ...LotusLifeCounterSettingsAdapter.buildSnapshotValues(settings),
+          };
+          await _snapshotStore.save(
+            LotusStorageSnapshot(
+              values: Map<String, String>.unmodifiable(mergedValues),
+            ),
+          );
+        }
+      },
+    );
     const livePatchEligible = false;
     const applyStrategy = 'reload_fallback';
     const reloadRequired = true;
     const syncBlockers = <String>['lotus_settings_runtime_in_memory'];
-
-    final snapshot = await _snapshotStore.load();
-    if (snapshot != null) {
-      final mergedValues = <String, String>{
-        ...snapshot.values,
-        ...LotusLifeCounterSettingsAdapter.buildSnapshotValues(settings),
-      };
-      await _snapshotStore.save(
-        LotusStorageSnapshot(
-          values: Map<String, String>.unmodifiable(mergedValues),
-        ),
-      );
-    }
 
     unawaited(
       AppObservability.instance.recordEvent(
@@ -1779,13 +1869,24 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen>
     await showLifeCounterNativeHistorySheet(
       context,
       history: history,
-      onExportPressed:
-          () => _exportNativeHistory(
-            history,
-            source: source,
-            historyDomainPresent: historyDomainPresent,
-            fallbackClassification: fallbackClassification,
-          ),
+      onExportPressed: () async {
+        final latestHistoryState = await _historyStore.load();
+        final latestSession = await _sessionStore.load();
+        final latestSnapshot = await _snapshotStore.load();
+        final latestHistory = LifeCounterHistorySnapshot.fromSources(
+          historyState: latestHistoryState,
+          session: latestSession,
+          snapshot: latestSnapshot,
+        );
+        await _exportNativeHistory(
+          latestHistory,
+          source: source,
+          historyDomainPresent:
+              latestHistoryState != null ||
+              LifeCounterHistoryState.hasSnapshotDomain(latestSnapshot),
+          fallbackClassification: fallbackClassification,
+        );
+      },
       onImportSubmitted:
           (rawPayload) => _importNativeHistory(
             rawPayload,
@@ -1866,69 +1967,81 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen>
       return false;
     }
 
-    final snapshot = await _snapshotStore.load();
-    final importedHistory = LifeCounterHistoryState(
-      currentGameName: transfer.currentGameName,
-      currentGameMeta: <String, Object?>{
-        ...LifeCounterHistoryState.decodeCurrentGameMeta(
-          snapshot?.values['currentGameMeta'],
-        ),
-        ...?transfer.currentGameMeta,
-        if ((transfer.currentGameName ?? '').trim().isNotEmpty)
-          'name': transfer.currentGameName!.trim(),
-      },
-      currentGameEntries: transfer.currentGameEntries
-          .map(
-            (entry) => LifeCounterHistoryEntry(
-              message: entry.message,
-              occurredAt: entry.occurredAt,
-              source: LifeCounterHistoryEntrySource.currentGame,
-            ),
-          )
-          .toList(growable: false),
-      archiveEntries: transfer.archiveEntries
-          .map(
-            (entry) => LifeCounterHistoryEntry(
-              message: entry.message,
-              occurredAt: entry.occurredAt,
-              source: LifeCounterHistoryEntrySource.archive,
-            ),
-          )
-          .toList(growable: false),
-      archivedGameCount:
-          transfer.archivedGameCount ??
-          (transfer.archiveEntries.isEmpty ? 0 : 1),
-      gameCounter:
-          transfer.gameCounter ??
-          LifeCounterHistoryState.decodeGameCounter(
-            snapshot?.values['gameCounter'],
+    late LifeCounterHistoryState importedHistory;
+    final canonicalRebased = await _mutateCanonicalStorageAndRebase(
+      reason: 'native_history_import',
+      reloadRuntime: true,
+      mutation: () async {
+        final snapshot = await _snapshotStore.load();
+        final session = await _sessionStore.load();
+        importedHistory = LifeCounterHistoryState(
+          currentGameName: transfer.currentGameName,
+          currentGameMeta: <String, Object?>{
+            ...?transfer.currentGameMeta,
+            if ((transfer.currentGameName ?? '').trim().isNotEmpty)
+              'name': transfer.currentGameName!.trim(),
+          },
+          currentGameEntries: transfer.currentGameEntries
+              .map(
+                (entry) => LifeCounterHistoryEntry(
+                  message: entry.message,
+                  occurredAt: entry.occurredAt,
+                  rawOccurredAt: entry.rawOccurredAt,
+                  source: LifeCounterHistoryEntrySource.currentGame,
+                ),
+              )
+              .toList(growable: false),
+          archiveEntries: transfer.archiveEntries
+              .map(
+                (entry) => LifeCounterHistoryEntry(
+                  message: entry.message,
+                  occurredAt: entry.occurredAt,
+                  rawOccurredAt: entry.rawOccurredAt,
+                  source: LifeCounterHistoryEntrySource.archive,
+                ),
+              )
+              .toList(growable: false),
+          archivedGames: transfer.archivedGames,
+          archivedGameCount:
+              transfer.archivedGameCount ??
+              (transfer.archivedGames.isNotEmpty
+                  ? transfer.archivedGames.length
+                  : (transfer.archiveEntries.isEmpty ? 0 : 1)),
+          gameCounter:
+              transfer.gameCounter ??
+              LifeCounterHistoryState.decodeGameCounter(
+                snapshot?.values['gameCounter'],
+              ),
+          lastTableEvent: transfer.lastTableEvent,
+        );
+        await _historyStore.save(importedHistory);
+        importedHistory = await _historyStore.ensureCurrentGameMeta(
+          session: session,
+        );
+
+        final mergedValues = <String, String>{
+          ...?snapshot?.values,
+          ...importedHistory.buildLotusSnapshotValues(),
+        };
+        await _snapshotStore.save(
+          LotusStorageSnapshot(
+            values: Map<String, String>.unmodifiable(mergedValues),
           ),
-      lastTableEvent: transfer.lastTableEvent,
+        );
+
+        if (session != null) {
+          final payload = <String, dynamic>{
+            ...session.toJson(),
+            'last_table_event': transfer.lastTableEvent,
+          };
+          final importedSession = LifeCounterSession.tryFromJson(payload);
+          if (importedSession != null) {
+            await _sessionStore.save(importedSession);
+          }
+        }
+      },
     );
-    await _historyStore.save(importedHistory);
-
-    final mergedValues = <String, String>{
-      ...?snapshot?.values,
-      ...importedHistory.buildLotusSnapshotValues(),
-    };
-
-    await _snapshotStore.save(
-      LotusStorageSnapshot(
-        values: Map<String, String>.unmodifiable(mergedValues),
-      ),
-    );
-
-    final session = await _sessionStore.load();
-    if (session != null) {
-      final payload = <String, dynamic>{
-        ...session.toJson(),
-        'last_table_event': transfer.lastTableEvent,
-      };
-      final importedSession = LifeCounterSession.tryFromJson(payload);
-      if (importedSession != null) {
-        await _sessionStore.save(importedSession);
-      }
-    }
+    final reloadRequired = !canonicalRebased;
 
     unawaited(
       AppObservability.instance.recordEvent(
@@ -1939,8 +2052,9 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen>
           'surface_strategy': surfaceStrategy,
           'fallback_classification': fallbackClassification,
           'transfer_strategy': transferStrategy,
-          'apply_strategy': 'canonical_store_sync',
-          'reload_required': false,
+          'apply_strategy':
+              canonicalRebased ? 'canonical_store_sync' : 'reload_fallback',
+          'reload_required': reloadRequired,
           'history_domain_present': true,
           'archived_games': importedHistory.archivedGameCount,
           'current_game_events': transfer.currentGameEntries.length,
@@ -1948,6 +2062,9 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen>
         },
       ),
     );
+    if (reloadRequired) {
+      unawaited(_reloadLotusBundleFromOwnedSnapshot());
+    }
     return true;
   }
 
@@ -2403,47 +2520,64 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen>
     LifeCounterGameTimerState state, {
     required String source,
   }) async {
-    final previousState =
-        await _gameTimerStateStore.load() ??
-        const LifeCounterGameTimerState(
-          startTimeEpochMs: null,
-          isPaused: false,
-          pausedTimeEpochMs: null,
+    final canonicalRebased = await _mutateCanonicalStorageAndRebase(
+      reason: 'native_game_timer',
+      reloadRuntime: true,
+      mutation: () async {
+        final currentSettings =
+            await _settingsStore.load() ?? LifeCounterSettings.defaults;
+        final timerSettings = currentSettings.copyWith(
+          gameTimer: state.isActive,
+          gameTimerMainScreen: state.isActive,
         );
-    if (state.isActive) {
-      await _gameTimerStateStore.save(state);
-    } else {
-      await _gameTimerStateStore.clear();
-    }
+        await _settingsStore.save(timerSettings);
 
-    final snapshot = await _snapshotStore.load();
-    if (snapshot != null) {
-      final mergedValues = <String, String>{...snapshot.values};
-      mergedValues.remove(LotusLifeCounterGameTimerAdapter.gameTimerStateKey);
-      mergedValues.addAll(
-        LotusLifeCounterGameTimerAdapter.buildSnapshotValues(state),
-      );
-      await _snapshotStore.save(
-        LotusStorageSnapshot(
-          values: Map<String, String>.unmodifiable(mergedValues),
-        ),
-      );
-    } else if (state.isActive) {
-      await _snapshotStore.save(
-        LotusStorageSnapshot(
-          values: Map<String, String>.unmodifiable(
+        if (state.isActive) {
+          await _gameTimerStateStore.save(state);
+        } else {
+          await _gameTimerStateStore.clear();
+        }
+
+        final snapshot = await _snapshotStore.load();
+        if (snapshot != null) {
+          final mergedValues = <String, String>{...snapshot.values};
+          mergedValues.remove(
+            LotusLifeCounterGameTimerAdapter.gameTimerStateKey,
+          );
+          mergedValues.addAll(
             LotusLifeCounterGameTimerAdapter.buildSnapshotValues(state),
-          ),
-        ),
-      );
-    }
+          );
+          mergedValues.addAll(
+            LotusLifeCounterSettingsAdapter.buildSnapshotValues(timerSettings),
+          );
+          await _snapshotStore.save(
+            LotusStorageSnapshot(
+              values: Map<String, String>.unmodifiable(mergedValues),
+            ),
+          );
+        } else if (state.isActive) {
+          await _snapshotStore.save(
+            LotusStorageSnapshot(
+              values: Map<String, String>.unmodifiable(<String, String>{
+                ...LotusLifeCounterGameTimerAdapter.buildSnapshotValues(state),
+                ...LotusLifeCounterSettingsAdapter.buildSnapshotValues(
+                  timerSettings,
+                ),
+              }),
+            ),
+          );
+        }
+      },
+    );
 
-    final syncBlockers = _gameTimerLivePatchBlockers(previousState, state);
-    final livePatchEligible = syncBlockers.isEmpty;
-    final appliedLive =
-        livePatchEligible && await _applyOwnedGameTimerRuntimeState(state);
-    final applyStrategy = appliedLive ? 'live_runtime' : 'reload_fallback';
-    final reloadRequired = !appliedLive;
+    const livePatchEligible = false;
+    final applyStrategy =
+        canonicalRebased ? 'canonical_store_sync' : 'reload_fallback';
+    final reloadRequired = !canonicalRebased;
+    final syncBlockers =
+        canonicalRebased
+            ? const <String>[]
+            : const <String>['canonical_rebase_failed'];
 
     unawaited(
       AppObservability.instance.recordEvent(
@@ -2467,144 +2601,6 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen>
     }
 
     unawaited(_reloadLotusBundleFromOwnedSnapshot());
-  }
-
-  List<String> _gameTimerLivePatchBlockers(
-    LifeCounterGameTimerState _,
-    LifeCounterGameTimerState next,
-  ) {
-    final blockers = <String>[];
-    if (next.isActive && next.startTimeEpochMs == null) {
-      blockers.add('next_start_time_missing');
-    }
-    return blockers;
-  }
-
-  Future<bool> _applyOwnedGameTimerRuntimeState(
-    LifeCounterGameTimerState state,
-  ) async {
-    final patched = await _applyLiveLotusStoragePatch(<String, String?>{
-      LotusLifeCounterGameTimerAdapter.gameTimerStateKey:
-          LotusLifeCounterGameTimerAdapter.buildSnapshotValues(
-            state,
-          )[LotusLifeCounterGameTimerAdapter.gameTimerStateKey],
-    });
-    if (!patched) {
-      return false;
-    }
-
-    try {
-      final rawResult = await _hostController.runJavaScriptReturningResult('''
-(() => {
-  try {
-    const startTime = ${state.startTimeEpochMs ?? 'null'};
-    const pausedTime = ${state.pausedTimeEpochMs ?? 0};
-    const formatElapsed = (effectiveStartTime, effectivePausedTime, isPaused) => {
-      const elapsedSeconds = Math.max(
-        0,
-        Math.floor(((isPaused ? effectivePausedTime : Date.now()) - effectiveStartTime) / 1000)
-      );
-      const hours = Math.floor(elapsedSeconds / 3600);
-      const minutes = Math.floor((elapsedSeconds % 3600) / 60);
-      const seconds = elapsedSeconds % 60;
-      const prefix = hours > 0 ? String(hours).padStart(2, '0') + ':' : '';
-      return (
-        prefix +
-        String(minutes).padStart(2, '0') +
-        ':' +
-        String(seconds).padStart(2, '0')
-      );
-    };
-
-    const applyVisualState = (timer, effectiveStartTime, effectivePausedTime, isPaused) => {
-      timer.textContent = formatElapsed(
-        effectiveStartTime,
-        effectivePausedTime,
-        isPaused,
-      );
-      timer.classList.toggle('paused', isPaused);
-    };
-
-    const clock = document.querySelector('.game-timer.current-time-clock');
-    if (startTime == null) {
-      const existingTimer = document.querySelector('.game-timer:not(.current-time-clock)');
-      if (existingTimer instanceof HTMLElement) {
-        existingTimer.remove();
-      }
-      if (clock instanceof HTMLElement) {
-        clock.classList.remove('with-game-timer');
-      }
-      return JSON.stringify({ ok: true, removed: true });
-    }
-
-    let timer = document.querySelector('.game-timer:not(.current-time-clock)');
-    let created = false;
-    if (!(timer instanceof HTMLElement)) {
-      const parent =
-        document.querySelector('.other-buttons') ??
-        document.querySelector('.current-time-clock')?.parentElement ??
-        document.body;
-      if (!(parent instanceof HTMLElement)) {
-        return JSON.stringify({ ok: false, reason: 'timer_parent_missing' });
-      }
-
-      timer = document.createElement('div');
-      timer.className = 'game-timer';
-      parent.appendChild(timer);
-      created = true;
-    }
-
-    if (timer.dataset.manaloomTimerBound !== 'true') {
-      timer.addEventListener('click', () => {
-        try {
-          const raw = localStorage.getItem('gameTimerState');
-          if (!raw) {
-            return;
-          }
-
-          const payload = JSON.parse(raw);
-          if (!payload || typeof payload.startTime !== 'number') {
-            return;
-          }
-
-          if (payload.isPaused) {
-            const delta = Date.now() - (typeof payload.pausedTime === 'number' ? payload.pausedTime : Date.now());
-            payload.startTime += delta;
-            payload.isPaused = false;
-            payload.pausedTime = 0;
-          } else {
-            payload.isPaused = true;
-            payload.pausedTime = Date.now();
-          }
-
-          localStorage.setItem('gameTimerState', JSON.stringify(payload));
-          applyVisualState(
-            timer,
-            payload.startTime,
-            typeof payload.pausedTime === 'number' ? payload.pausedTime : 0,
-            payload.isPaused === true,
-          );
-        } catch (_) {}
-      });
-      timer.dataset.manaloomTimerBound = 'true';
-    }
-
-    applyVisualState(timer, startTime, pausedTime, ${state.isPaused ? 'true' : 'false'});
-
-    if (clock instanceof HTMLElement) {
-      clock.classList.add('with-game-timer');
-    }
-
-    return JSON.stringify({ ok: true, created });
-  } catch (_) {}
-  return JSON.stringify({ ok: false, reason: 'timer_patch_failed' });
-})();
-''');
-      final decoded = _decodeJavaScriptResult(rawResult);
-      return decoded is Map<String, dynamic> && decoded['ok'] == true;
-    } catch (_) {
-      return false;
-    }
   }
 
   Future<void> _openNativeDiceSheet({required String source}) async {
@@ -2695,10 +2691,19 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen>
       adjustedSession,
     );
     final canonicalSyncEligible = syncBlockers.isEmpty;
+    final canonicalRebased =
+        canonicalSyncEligible &&
+        await _rebaseLiveLotusStorageFromCanonical(
+          reason: 'native_dice_session',
+        );
     const livePatchEligible = false;
     final applyStrategy =
-        canonicalSyncEligible ? 'canonical_store_sync' : 'reload_fallback';
-    final reloadRequired = !canonicalSyncEligible;
+        canonicalRebased ? 'canonical_store_sync' : 'reload_fallback';
+    final reloadRequired = !canonicalRebased;
+    final effectiveSyncBlockers = <String>[
+      ...syncBlockers,
+      if (canonicalSyncEligible && !canonicalRebased) 'canonical_rebase_failed',
+    ];
 
     unawaited(
       AppObservability.instance.recordEvent(
@@ -2713,7 +2718,7 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen>
           'live_patch_eligible': livePatchEligible,
           'apply_strategy': applyStrategy,
           'reload_required': reloadRequired,
-          'sync_blockers': syncBlockers,
+          'sync_blockers': effectiveSyncBlockers,
         },
       ),
     );
@@ -2867,6 +2872,20 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen>
     LifeCounterSession session, {
     bool playerRuntimeOnly = true,
   }) async {
+    await _mutateCanonicalStorageAndRebase(
+      reason: 'native_session_snapshot',
+      mutation:
+          () => _persistOwnedSessionSnapshotUnlocked(
+            session,
+            playerRuntimeOnly: playerRuntimeOnly,
+          ),
+    );
+  }
+
+  Future<void> _persistOwnedSessionSnapshotUnlocked(
+    LifeCounterSession session, {
+    required bool playerRuntimeOnly,
+  }) async {
     await _sessionStore.save(session);
     await _syncOwnedHistoryLastTableEvent(session.lastTableEvent);
 
@@ -2941,19 +2960,34 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen>
     final previousSession =
         await _sessionStore.load() ??
         LifeCounterSession.initial(playerCount: session.playerCount);
-    final adjustedSession = await _normalizeOwnedPlayerRuntimeSession(session);
-    await _persistOwnedSessionSnapshot(adjustedSession);
     final settings = await _loadOwnedLifeCounterSettings();
+    final sessionWithLifeDelta =
+        settings.lifeLossOnCommanderDamage
+            ? _applyCommanderDamageLifeDelta(previousSession, session)
+            : session;
+    final adjustedSession = await _normalizeOwnedPlayerRuntimeSession(
+      sessionWithLifeDelta,
+    );
+    await _persistOwnedSessionSnapshot(adjustedSession);
     final syncBlockers = _commanderDamageCanonicalSyncBlockers(
       previousSession,
       adjustedSession,
       settings: settings,
     );
     final canonicalSyncEligible = syncBlockers.isEmpty;
+    final canonicalRebased =
+        canonicalSyncEligible &&
+        await _rebaseLiveLotusStorageFromCanonical(
+          reason: 'native_commander_damage',
+        );
     const livePatchEligible = false;
     final applyStrategy =
-        canonicalSyncEligible ? 'canonical_store_sync' : 'reload_fallback';
-    final reloadRequired = !canonicalSyncEligible;
+        canonicalRebased ? 'canonical_store_sync' : 'reload_fallback';
+    final reloadRequired = !canonicalRebased;
+    final effectiveSyncBlockers = <String>[
+      ...syncBlockers,
+      if (canonicalSyncEligible && !canonicalRebased) 'canonical_rebase_failed',
+    ];
 
     unawaited(
       AppObservability.instance.recordEvent(
@@ -2965,7 +2999,7 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen>
           'live_patch_eligible': livePatchEligible,
           'apply_strategy': applyStrategy,
           'reload_required': reloadRequired,
-          'sync_blockers': syncBlockers,
+          'sync_blockers': effectiveSyncBlockers,
         },
       ),
     );
@@ -2975,6 +3009,42 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen>
     }
 
     unawaited(_reloadLotusBundleFromOwnedSnapshot());
+  }
+
+  LifeCounterSession _applyCommanderDamageLifeDelta(
+    LifeCounterSession previous,
+    LifeCounterSession next,
+  ) {
+    final lives = List<int>.from(next.lives);
+    final previousDetails = previous.resolvedCommanderDamageDetails;
+    final nextDetails = next.resolvedCommanderDamageDetails;
+    final playerCount =
+        previous.playerCount < next.playerCount
+            ? previous.playerCount
+            : next.playerCount;
+
+    for (
+      var targetPlayerIndex = 0;
+      targetPlayerIndex < playerCount;
+      targetPlayerIndex += 1
+    ) {
+      final previousTotal = previousDetails[targetPlayerIndex].fold<int>(
+        0,
+        (total, detail) => total + detail.totalDamage,
+      );
+      final nextTotal = nextDetails[targetPlayerIndex].fold<int>(
+        0,
+        (total, detail) => total + detail.totalDamage,
+      );
+      final damageDelta = nextTotal - previousTotal;
+      lives[targetPlayerIndex] =
+          LifeCounterTabletopEngine.lifeTotalAfterCommanderDamageDelta(
+            previousLife: previous.lives[targetPlayerIndex],
+            damageDelta: damageDelta,
+          );
+    }
+
+    return next.copyWith(lives: lives);
   }
 
   List<String> _commanderDamageCanonicalSyncBlockers(
@@ -2995,6 +3065,7 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen>
     }
 
     final expected = previous.copyWith(
+      lives: settings.lifeLossOnCommanderDamage ? next.lives : previous.lives,
       commanderDamage: next.commanderDamage,
       commanderDamageDetails: next.resolvedCommanderDamageDetails,
       lastTableEvent: next.lastTableEvent,
@@ -3157,33 +3228,6 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen>
         LifeCounterSession.initial(playerCount: session.playerCount);
     final adjustedSession = await _normalizeOwnedPlayerRuntimeSession(session);
     await _persistOwnedSessionSnapshot(adjustedSession);
-    final livePatchBlockers = _playerAppearanceLivePatchBlockers(
-      previousSession,
-      adjustedSession,
-      source: source,
-    );
-    final livePatchEligible = livePatchBlockers.isEmpty;
-    String? failureReason;
-    final appliedLive =
-        livePatchEligible
-            ? (() async {
-              final targetPlayerIndex = _singleChangedPlayerAppearanceIndex(
-                previousSession,
-                adjustedSession,
-              );
-              if (targetPlayerIndex == null) {
-                failureReason = 'player_appearance_target_missing';
-                return false;
-              }
-              failureReason =
-                  await _applyOwnedPlayerAppearanceRuntimeFailureReason(
-                    adjustedSession,
-                    targetPlayerIndex: targetPlayerIndex,
-                  );
-              return failureReason == null;
-            })()
-            : Future<bool>.value(false);
-    final appliedLiveResolved = await appliedLive;
     final targetPlayerIndex = _singleChangedPlayerAppearanceIndex(
       previousSession,
       adjustedSession,
@@ -3192,20 +3236,8 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen>
         await _applyPlayerAppearanceSurfaceResetStrategy(
           source: source,
           targetPlayerIndex: targetPlayerIndex,
-          allowLiveReset: appliedLiveResolved && shouldResetLotusSurface,
+          allowLiveReset: false,
         );
-    final applyStrategy =
-        appliedLiveResolved ? 'live_runtime' : 'reload_fallback';
-    final reloadRequired =
-        !appliedLiveResolved || surfaceResetStrategy == 'bundle_reload';
-    final syncBlockers =
-        appliedLiveResolved
-            ? const <String>[]
-            : (livePatchBlockers.isNotEmpty
-                ? livePatchBlockers
-                : <String>[
-                  failureReason ?? 'player_appearance_live_runtime_rejected',
-                ]);
 
     unawaited(
       AppObservability.instance.recordEvent(
@@ -3213,19 +3245,15 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen>
         category: 'life_counter.player_appearance',
         data: {
           'source': source,
-          'live_patch_eligible': livePatchEligible,
-          'apply_strategy': applyStrategy,
-          'reload_required': reloadRequired,
+          'live_patch_eligible': false,
+          'apply_strategy': 'canonical_reload',
+          'reload_required': true,
           'surface_reset_required': shouldResetLotusSurface,
           'surface_reset_strategy': surfaceResetStrategy,
-          'sync_blockers': syncBlockers,
+          'sync_blockers': const <String>[],
         },
       ),
     );
-
-    if (!reloadRequired) {
-      return;
-    }
 
     unawaited(_reloadLotusBundleFromOwnedSnapshot());
   }
@@ -3251,45 +3279,6 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen>
     return 'bundle_reload';
   }
 
-  List<String> _playerAppearanceLivePatchBlockers(
-    LifeCounterSession previous,
-    LifeCounterSession next, {
-    required String source,
-  }) {
-    final blockers = <String>[];
-    final targetPlayerIndex = _singleChangedPlayerAppearanceIndex(
-      previous,
-      next,
-    );
-    if (targetPlayerIndex == null) {
-      blockers.add('multiple_player_appearances_changed');
-      return blockers;
-    }
-
-    final previousAppearance =
-        previous.resolvedPlayerAppearances[targetPlayerIndex];
-    final nextAppearance = next.resolvedPlayerAppearances[targetPlayerIndex];
-    if (previousAppearance.nickname != nextAppearance.nickname) {
-      blockers.add('nickname_changed');
-    }
-    if (previousAppearance.backgroundImage != null ||
-        nextAppearance.backgroundImage != null) {
-      blockers.add('background_image_present');
-    }
-    if (previousAppearance.backgroundImagePartner != null ||
-        nextAppearance.backgroundImagePartner != null) {
-      blockers.add('partner_background_image_present');
-    }
-
-    final expected = previous.copyWith(
-      playerAppearances: next.resolvedPlayerAppearances,
-    );
-    if (expected.toJsonString() != next.toJsonString()) {
-      blockers.add('session_change_outside_player_appearance');
-    }
-    return blockers;
-  }
-
   int? _singleChangedPlayerAppearanceIndex(
     LifeCounterSession previous,
     LifeCounterSession next,
@@ -3308,6 +3297,9 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen>
     return targetPlayerIndex;
   }
 
+  // Kept isolated for compatibility with older test hosts; production paths
+  // intentionally reload so Lotus cannot overwrite its in-memory player model.
+  // ignore: unused_element
   Future<String?> _applyOwnedPlayerAppearanceRuntimeFailureReason(
     LifeCounterSession session, {
     required int targetPlayerIndex,
@@ -3688,10 +3680,19 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen>
       settings: settings,
     );
     final canonicalSyncEligible = syncBlockers.isEmpty;
+    final canonicalRebased =
+        canonicalSyncEligible &&
+        await _rebaseLiveLotusStorageFromCanonical(
+          reason: 'native_player_counter',
+        );
     const livePatchEligible = false;
     final applyStrategy =
-        canonicalSyncEligible ? 'canonical_store_sync' : 'reload_fallback';
-    final reloadRequired = !canonicalSyncEligible;
+        canonicalRebased ? 'canonical_store_sync' : 'reload_fallback';
+    final reloadRequired = !canonicalRebased;
+    final effectiveSyncBlockers = <String>[
+      ...syncBlockers,
+      if (canonicalSyncEligible && !canonicalRebased) 'canonical_rebase_failed',
+    ];
 
     unawaited(
       AppObservability.instance.recordEvent(
@@ -3703,7 +3704,7 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen>
           'live_patch_eligible': livePatchEligible,
           'apply_strategy': applyStrategy,
           'reload_required': reloadRequired,
-          'sync_blockers': syncBlockers,
+          'sync_blockers': effectiveSyncBlockers,
         },
       ),
     );
@@ -3737,6 +3738,7 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen>
       commanderCasts: next.commanderCasts,
       commanderCastDetails: next.resolvedCommanderCastDetails,
       playerExtraCounters: next.resolvedPlayerExtraCounters,
+      playerCounterPresence: next.resolvedPlayerCounterPresence,
       lastTableEvent: next.lastTableEvent,
       clearLastTableEvent: next.lastTableEvent == null,
     );
@@ -3815,6 +3817,9 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen>
           },
         ),
       );
+      if (surfaceResetStrategy == 'bundle_reload') {
+        unawaited(_reloadLotusBundleFromOwnedSnapshot());
+      }
       return;
     }
 
@@ -3838,6 +3843,9 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen>
           },
         ),
       );
+      if (surfaceResetStrategy == 'bundle_reload') {
+        unawaited(_reloadLotusBundleFromOwnedSnapshot());
+      }
       return;
     }
 
@@ -3947,61 +3955,53 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen>
               previousSession,
               adjustedSession,
             );
-    String? playerAppearanceFailureReason;
     List<String> playerAppearanceSyncBlockers = const <String>[];
-    var playerAppearanceAppliedLive = false;
+    const playerAppearanceAppliedLive = false;
 
     if (playerAppearanceTargetPlayerIndex != null) {
-      playerAppearanceSyncBlockers = _playerAppearanceLivePatchBlockers(
-        previousSession,
-        adjustedSession,
-        source: source,
-      );
-      if (playerAppearanceSyncBlockers.isEmpty) {
-        livePatchEligible = true;
-        playerAppearanceFailureReason =
-            await _applyOwnedPlayerAppearanceRuntimeFailureReason(
-              adjustedSession,
-              targetPlayerIndex: playerAppearanceTargetPlayerIndex,
-            );
-        playerAppearanceAppliedLive = playerAppearanceFailureReason == null;
-      }
+      playerAppearanceSyncBlockers = const <String>[
+        'runtime_model_reload_required',
+      ];
     }
 
-    final applyStrategy =
+    final canonicalStoreSyncEligible =
         canonicalSyncEligible ||
-                commanderDamageCanonicalSyncEligible ||
-                playerCounterCanonicalSyncEligible ||
-                partnerCommanderCanonicalSyncEligible
+        commanderDamageCanonicalSyncEligible ||
+        playerCounterCanonicalSyncEligible ||
+        partnerCommanderCanonicalSyncEligible;
+    final canonicalRebased =
+        canonicalStoreSyncEligible &&
+        await _rebaseLiveLotusStorageFromCanonical(
+          reason: 'native_player_state',
+        );
+    final applyStrategy =
+        canonicalRebased
             ? 'canonical_store_sync'
             : (appliedLive || playerAppearanceAppliedLive
                 ? 'live_runtime'
                 : 'reload_fallback');
-    final reloadRequired =
-        !canonicalSyncEligible &&
-        !appliedLive &&
-        !playerAppearanceAppliedLive &&
-        !commanderDamageCanonicalSyncEligible &&
-        !playerCounterCanonicalSyncEligible &&
-        !partnerCommanderCanonicalSyncEligible;
+    final baseReloadRequired =
+        playerAppearanceTargetPlayerIndex != null ||
+        (!canonicalRebased && !appliedLive && !playerAppearanceAppliedLive);
     final liveSurfaceResetEligible =
-        shouldResetLotusSurface &&
-        (playerAppearanceAppliedLive ||
-            commanderDamageCanonicalSyncEligible ||
-            partnerCommanderCanonicalSyncEligible ||
-            playerCounterCanonicalSyncEligible);
-    final surfaceResetStrategy = await _applyPlayerStateSurfaceResetStrategy(
-      source: source,
-      targetPlayerIndex: targetPlayerIndex,
-      allowLiveReset: !reloadRequired && liveSurfaceResetEligible,
-    );
+        shouldResetLotusSurface && (playerAppearanceAppliedLive || appliedLive);
+    final surfaceResetStrategy =
+        canonicalRebased && shouldResetLotusSurface
+            ? 'canonical_rebase_reload'
+            : await _applyPlayerStateSurfaceResetStrategy(
+              source: source,
+              targetPlayerIndex: targetPlayerIndex,
+              allowLiveReset: !baseReloadRequired && liveSurfaceResetEligible,
+            );
+    final reloadRequired =
+        baseReloadRequired || surfaceResetStrategy == 'bundle_reload';
     final List<String> syncBlockers;
-    if (canonicalSyncEligible ||
+    if (canonicalStoreSyncEligible && !canonicalRebased) {
+      syncBlockers = const <String>['canonical_rebase_failed'];
+    } else if (canonicalRebased ||
         appliedLive ||
         playerAppearanceAppliedLive ||
-        commanderDamageCanonicalSyncEligible ||
-        playerCounterCanonicalSyncEligible ||
-        partnerCommanderCanonicalSyncEligible) {
+        canonicalStoreSyncEligible) {
       syncBlockers = const <String>[];
     } else if (setLifeTargetPlayerIndex != null) {
       syncBlockers =
@@ -4018,10 +4018,7 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen>
       syncBlockers =
           playerAppearanceSyncBlockers.isNotEmpty
               ? playerAppearanceSyncBlockers
-              : <String>[
-                playerAppearanceFailureReason ??
-                    'player_state_player_appearance_live_rejected',
-              ];
+              : const <String>['runtime_model_reload_required'];
     } else {
       syncBlockers = rollSyncBlockers;
     }
@@ -4070,7 +4067,6 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen>
       }
     }
 
-    unawaited(_hostController.loadBundle());
     return 'bundle_reload';
   }
 
@@ -4804,7 +4800,7 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen>
   @override
   Widget build(BuildContext context) {
     return PopScope<void>(
-      canPop: canPopLifeCounterRoute(context),
+      canPop: false,
       onPopInvokedWithResult: (didPop, _) {
         _handleBackNavigationAttempt(didPop);
       },

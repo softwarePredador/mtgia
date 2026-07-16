@@ -2,7 +2,11 @@ import 'dart:convert';
 
 import 'package:postgres/postgres.dart';
 
+import '../e2e_validation_policy.dart';
 import 'commander_reference_profile_support.dart';
+
+export '../e2e_validation_policy.dart'
+    show shouldRunGlobalHousekeeping, shouldWriteProductLearning;
 
 const loadUsageHotCardsSql = '''
   SELECT
@@ -31,6 +35,22 @@ Future<void> upsertCommanderCardUsage({
   required Pool pool,
   required String commanderName,
   required List<Map<String, dynamic>> cards,
+  Map<String, String>? environment,
+}) async {
+  if (!shouldWriteProductLearning(environment: environment)) return;
+  await _upsertCommanderCardUsage(
+    session: pool,
+    commanderName: commanderName,
+    cards: cards,
+    ignoreRowErrors: true,
+  );
+}
+
+Future<void> _upsertCommanderCardUsage({
+  required Session session,
+  required String commanderName,
+  required List<Map<String, dynamic>> cards,
+  required bool ignoreRowErrors,
 }) async {
   final normalizedCommander = normalizeCommanderReferenceName(commanderName);
   for (final card in learningUsageCardsForCommander(
@@ -40,7 +60,7 @@ Future<void> upsertCommanderCardUsage({
     final cardName = card['name']?.toString().trim() ?? '';
     if (cardName.isEmpty) continue;
     try {
-      await pool.execute(
+      await session.execute(
         Sql.named('''
           INSERT INTO commander_card_usage (
             commander_name_normalized, card_name_normalized, usage_count
@@ -57,8 +77,41 @@ Future<void> upsertCommanderCardUsage({
           'card': normalizeCommanderReferenceName(cardName),
         },
       );
-    } catch (_) {}
+    } catch (_) {
+      if (!ignoreRowErrors) rethrow;
+    }
   }
+}
+
+Future<void> recordUserCreatedDeckLearning({
+  required Pool pool,
+  required String deckId,
+  required String commanderName,
+  required String format,
+  required int cardCount,
+  required List<Map<String, dynamic>> cards,
+  Map<String, dynamic> eventData = const {},
+  Map<String, String>? environment,
+}) async {
+  if (!shouldWriteProductLearning(environment: environment)) return;
+
+  await pool.runTx((session) async {
+    await _upsertCommanderCardUsage(
+      session: session,
+      commanderName: commanderName,
+      cards: cards,
+      ignoreRowErrors: false,
+    );
+    await _insertDeckLearningEvent(
+      session: session,
+      deckId: deckId,
+      commanderName: commanderName,
+      format: format,
+      cardCount: cardCount,
+      source: 'user_created',
+      eventData: eventData,
+    );
+  });
 }
 
 List<Map<String, dynamic>> learningUsageCardsForCommander({
@@ -150,7 +203,9 @@ Future<void> logGeneratedDeckForLearning({
   required Pool pool,
   required Map<String, dynamic> responseBody,
   String source = 'ai_generated',
+  Map<String, String>? environment,
 }) async {
+  if (!shouldWriteProductLearning(environment: environment)) return;
   try {
     final generatedDeck = responseBody['generated_deck'];
     if (generatedDeck is! Map) return;
@@ -216,28 +271,52 @@ Future<void> logDeckLearningEvent({
   required int cardCount,
   String source = 'user_created',
   Map<String, dynamic> eventData = const {},
+  Map<String, String>? environment,
 }) async {
+  if (!shouldWriteProductLearning(environment: environment)) return;
   try {
-    await pool.execute(
-      Sql.named('''
-        INSERT INTO deck_learning_events (
-          deck_id, commander_name, format, card_count, source, event_data
-        ) VALUES (
-          @deckId::uuid, @commanderName, @format, @cardCount, @source, @eventData::jsonb
-        )
-      '''),
-      parameters: {
-        'deckId': deckId,
-        'commanderName': commanderName,
-        'format': format,
-        'cardCount': cardCount,
-        'source': source,
-        'eventData': jsonEncode(eventData),
-      },
+    await _insertDeckLearningEvent(
+      session: pool,
+      deckId: deckId,
+      commanderName: commanderName,
+      format: format,
+      cardCount: cardCount,
+      source: source,
+      eventData: eventData,
     );
   } catch (_) {
     // Non-blocking: falha no log não quebra criação do deck
   }
+}
+
+Future<void> _insertDeckLearningEvent({
+  required Session session,
+  required String deckId,
+  required String? commanderName,
+  required String format,
+  required int cardCount,
+  required String source,
+  required Map<String, dynamic> eventData,
+}) {
+  return session
+      .execute(
+        Sql.named('''
+      INSERT INTO deck_learning_events (
+        deck_id, commander_name, format, card_count, source, event_data
+      ) VALUES (
+        @deckId::uuid, @commanderName, @format, @cardCount, @source, @eventData::jsonb
+      )
+    '''),
+        parameters: {
+          'deckId': deckId,
+          'commanderName': commanderName,
+          'format': format,
+          'cardCount': cardCount,
+          'source': source,
+          'eventData': jsonEncode(eventData),
+        },
+      )
+      .then((_) {});
 }
 
 int _quantityValue(Object? value) {

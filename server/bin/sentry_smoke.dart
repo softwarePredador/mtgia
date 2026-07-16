@@ -1,13 +1,13 @@
 import 'dart:async';
 import 'dart:io';
 
-import 'package:dotenv/dotenv.dart';
 import 'package:sentry/sentry.dart';
 
+import '../lib/runtime_environment.dart';
+
 Future<void> main(List<String> args) async {
-  final env = DotEnv(includePlatformEnvironment: true, quiet: true)..load();
-  final dsn = (env['SENTRY_DSN'] ?? Platform.environment['SENTRY_DSN'] ?? '')
-      .trim();
+  final env = loadRuntimeEnvironment();
+  final dsn = (env['SENTRY_DSN'] ?? '').trim();
 
   if (dsn.isEmpty) {
     stderr.writeln('SENTRY_DSN ausente; smoke cancelado.');
@@ -16,22 +16,9 @@ Future<void> main(List<String> args) async {
   }
 
   final environment =
-      (env['SENTRY_ENVIRONMENT'] ??
-              Platform.environment['SENTRY_ENVIRONMENT'] ??
-              env['ENVIRONMENT'] ??
-              Platform.environment['ENVIRONMENT'] ??
-              'development')
-          .trim();
-  final release =
-      (env['SENTRY_RELEASE'] ??
-              Platform.environment['SENTRY_RELEASE'] ??
-              Platform.environment['APP_VERSION'])
-          ?.trim();
-  final sampleRateRaw =
-      (env['SENTRY_TRACES_SAMPLE_RATE'] ??
-              Platform.environment['SENTRY_TRACES_SAMPLE_RATE'] ??
-              '0')
-          .trim();
+      (env['SENTRY_ENVIRONMENT'] ?? env['ENVIRONMENT'] ?? 'development').trim();
+  final release = (env['SENTRY_RELEASE'] ?? env['APP_VERSION'])?.trim();
+  final sampleRateRaw = (env['SENTRY_TRACES_SAMPLE_RATE'] ?? '0').trim();
   final tracesSampleRate = double.tryParse(sampleRateRaw) ?? 0;
   final smokeId =
       'mtgia-smoke-${DateTime.now().millisecondsSinceEpoch.toRadixString(16)}';

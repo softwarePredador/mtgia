@@ -7,6 +7,13 @@ const int lifeCounterMinPlayers = 2;
 const int lifeCounterMaxPlayers = 6;
 const int lifeCounterDefaultTwoPlayerStartingLife = 20;
 const int lifeCounterDefaultMultiPlayerStartingLife = 40;
+const List<String> lifeCounterKnownPlayerCounterKeys = <String>[
+  'poison',
+  'energy',
+  'xp',
+  'tax-1',
+  'tax-2',
+];
 const List<String> lifeCounterDefaultPlayerBackgrounds = <String>[
   '#FFB51E',
   '#FF0A5B',
@@ -17,6 +24,13 @@ const List<String> lifeCounterDefaultPlayerBackgrounds = <String>[
 ];
 
 enum LifeCounterPlayerSpecialState { none, deckedOut, answerLeft }
+
+/// Why a player was eliminated by game rules.
+///
+/// This is intentionally separate from [LifeCounterPlayerSpecialState]: a
+/// lethal counter must not be represented by rewriting the player's life total
+/// or by pretending that the player conceded.
+enum LifeCounterPlayerEliminationReason { none, life, poison, commanderDamage }
 
 @immutable
 class LifeCounterPlayerAppearance {
@@ -230,9 +244,12 @@ class LifeCounterSession {
     required this.commanderCasts,
     this.commanderCastDetails,
     this.playerExtraCounters = const <Map<String, int>>[],
+    this.playerCounterPresence = const <List<String>>[],
     this.playerAppearances = const <LifeCounterPlayerAppearance>[],
     required this.partnerCommanders,
     required this.playerSpecialStates,
+    this.playerEliminationReasons =
+        const <LifeCounterPlayerEliminationReason>[],
     required this.lastPlayerRolls,
     required this.lastHighRolls,
     required this.commanderDamage,
@@ -278,6 +295,10 @@ class LifeCounterSession {
         normalizedPlayerCount,
         (_) => <String, int>{},
       ),
+      playerCounterPresence: List<List<String>>.generate(
+        normalizedPlayerCount,
+        (_) => <String>[],
+      ),
       playerAppearances: List<LifeCounterPlayerAppearance>.generate(
         normalizedPlayerCount,
         (index) => LifeCounterPlayerAppearance(
@@ -290,6 +311,10 @@ class LifeCounterSession {
       playerSpecialStates: List<LifeCounterPlayerSpecialState>.filled(
         normalizedPlayerCount,
         LifeCounterPlayerSpecialState.none,
+      ),
+      playerEliminationReasons: List<LifeCounterPlayerEliminationReason>.filled(
+        normalizedPlayerCount,
+        LifeCounterPlayerEliminationReason.none,
       ),
       lastPlayerRolls: List<int?>.filled(normalizedPlayerCount, null),
       lastHighRolls: List<int?>.filled(normalizedPlayerCount, null),
@@ -326,9 +351,11 @@ class LifeCounterSession {
   final List<int> commanderCasts;
   final List<LifeCounterCommanderCastDetail>? commanderCastDetails;
   final List<Map<String, int>> playerExtraCounters;
+  final List<List<String>> playerCounterPresence;
   final List<LifeCounterPlayerAppearance> playerAppearances;
   final List<bool> partnerCommanders;
   final List<LifeCounterPlayerSpecialState> playerSpecialStates;
+  final List<LifeCounterPlayerEliminationReason> playerEliminationReasons;
   final List<int?> lastPlayerRolls;
   final List<int?> lastHighRolls;
   final List<List<int>> commanderDamage;
@@ -393,6 +420,14 @@ class LifeCounterSession {
     return List<Map<String, int>>.generate(playerCount, (_) => <String, int>{});
   }
 
+  List<List<String>> get resolvedPlayerCounterPresence {
+    if (playerCounterPresence.length == playerCount) {
+      return playerCounterPresence;
+    }
+
+    return List<List<String>>.generate(playerCount, (_) => <String>[]);
+  }
+
   List<LifeCounterPlayerAppearance> get resolvedPlayerAppearances {
     if (playerAppearances.length == playerCount) {
       return playerAppearances;
@@ -408,6 +443,18 @@ class LifeCounterSession {
     );
   }
 
+  List<LifeCounterPlayerEliminationReason>
+  get resolvedPlayerEliminationReasons {
+    if (playerEliminationReasons.length == playerCount) {
+      return playerEliminationReasons;
+    }
+
+    return List<LifeCounterPlayerEliminationReason>.filled(
+      playerCount,
+      LifeCounterPlayerEliminationReason.none,
+    );
+  }
+
   LifeCounterSession copyWith({
     int? playerCount,
     int? startingLifeTwoPlayer,
@@ -419,9 +466,11 @@ class LifeCounterSession {
     List<int>? commanderCasts,
     List<LifeCounterCommanderCastDetail>? commanderCastDetails,
     List<Map<String, int>>? playerExtraCounters,
+    List<List<String>>? playerCounterPresence,
     List<LifeCounterPlayerAppearance>? playerAppearances,
     List<bool>? partnerCommanders,
     List<LifeCounterPlayerSpecialState>? playerSpecialStates,
+    List<LifeCounterPlayerEliminationReason>? playerEliminationReasons,
     List<int?>? lastPlayerRolls,
     List<int?>? lastHighRolls,
     List<List<int>>? commanderDamage,
@@ -457,9 +506,13 @@ class LifeCounterSession {
       commanderCasts: commanderCasts ?? this.commanderCasts,
       commanderCastDetails: commanderCastDetails ?? this.commanderCastDetails,
       playerExtraCounters: playerExtraCounters ?? this.playerExtraCounters,
+      playerCounterPresence:
+          playerCounterPresence ?? this.playerCounterPresence,
       playerAppearances: playerAppearances ?? this.playerAppearances,
       partnerCommanders: partnerCommanders ?? this.partnerCommanders,
       playerSpecialStates: playerSpecialStates ?? this.playerSpecialStates,
+      playerEliminationReasons:
+          playerEliminationReasons ?? this.playerEliminationReasons,
       lastPlayerRolls: lastPlayerRolls ?? this.lastPlayerRolls,
       lastHighRolls: lastHighRolls ?? this.lastHighRolls,
       commanderDamage: commanderDamage ?? this.commanderDamage,
@@ -507,11 +560,16 @@ class LifeCounterSession {
       'commander_cast_details':
           resolvedCommanderCastDetails.map((entry) => entry.toJson()).toList(),
       'player_extra_counters': resolvedPlayerExtraCounters,
+      'player_counter_presence': resolvedPlayerCounterPresence,
       'player_appearances':
           resolvedPlayerAppearances.map((entry) => entry.toJson()).toList(),
       'partner_commanders': partnerCommanders,
       'player_special_states':
           playerSpecialStates.map(_encodePlayerSpecialState).toList(),
+      'player_elimination_reasons':
+          resolvedPlayerEliminationReasons
+              .map(_encodePlayerEliminationReason)
+              .toList(),
       'last_player_rolls': lastPlayerRolls,
       'last_high_rolls': lastHighRolls,
       'commander_damage': commanderDamage,
@@ -595,6 +653,10 @@ class LifeCounterSession {
       payload['player_extra_counters'],
       playerCount,
     );
+    final playerCounterPresence = _readCounterPresenceList(
+      payload['player_counter_presence'],
+      playerCount,
+    );
     final playerAppearances = _readPlayerAppearanceList(
       payload['player_appearances'],
       playerCount,
@@ -605,6 +667,10 @@ class LifeCounterSession {
     );
     final playerSpecialStates = _readPlayerSpecialStateList(
       payload['player_special_states'],
+      playerCount,
+    );
+    final playerEliminationReasons = _readPlayerEliminationReasonList(
+      payload['player_elimination_reasons'],
       playerCount,
     );
     final lastPlayerRolls = _readNullableIntList(
@@ -675,9 +741,11 @@ class LifeCounterSession {
         commanderCasts == null ||
         commanderCastDetails == null ||
         playerExtraCounters == null ||
+        playerCounterPresence == null ||
         playerAppearances == null ||
         partnerCommanders == null ||
         playerSpecialStates == null ||
+        playerEliminationReasons == null ||
         lastPlayerRolls == null ||
         lastHighRolls == null ||
         commanderDamage == null ||
@@ -696,9 +764,11 @@ class LifeCounterSession {
       commanderCasts: commanderCasts,
       commanderCastDetails: commanderCastDetails,
       playerExtraCounters: playerExtraCounters,
+      playerCounterPresence: playerCounterPresence,
       playerAppearances: playerAppearances,
       partnerCommanders: partnerCommanders,
       playerSpecialStates: playerSpecialStates,
+      playerEliminationReasons: playerEliminationReasons,
       lastPlayerRolls: lastPlayerRolls,
       lastHighRolls: lastHighRolls,
       commanderDamage: commanderDamage,
@@ -737,6 +807,36 @@ class LifeCounterSession {
         return LifeCounterPlayerSpecialState.answerLeft;
       default:
         return LifeCounterPlayerSpecialState.none;
+    }
+  }
+
+  static String _encodePlayerEliminationReason(
+    LifeCounterPlayerEliminationReason reason,
+  ) {
+    switch (reason) {
+      case LifeCounterPlayerEliminationReason.none:
+        return 'none';
+      case LifeCounterPlayerEliminationReason.life:
+        return 'life';
+      case LifeCounterPlayerEliminationReason.poison:
+        return 'poison';
+      case LifeCounterPlayerEliminationReason.commanderDamage:
+        return 'commander_damage';
+    }
+  }
+
+  static LifeCounterPlayerEliminationReason _decodePlayerEliminationReason(
+    String value,
+  ) {
+    switch (value) {
+      case 'life':
+        return LifeCounterPlayerEliminationReason.life;
+      case 'poison':
+        return LifeCounterPlayerEliminationReason.poison;
+      case 'commander_damage':
+        return LifeCounterPlayerEliminationReason.commanderDamage;
+      default:
+        return LifeCounterPlayerEliminationReason.none;
     }
   }
 
@@ -788,6 +888,42 @@ class LifeCounterSession {
         entry[key] = numericValue;
       }
       parsed.add(entry);
+    }
+
+    return parsed;
+  }
+
+  static List<List<String>>? _readCounterPresenceList(
+    dynamic value,
+    int expectedLength,
+  ) {
+    if (value == null) {
+      return List<List<String>>.generate(expectedLength, (_) => <String>[]);
+    }
+
+    if (value is! List || value.length != expectedLength) {
+      return null;
+    }
+
+    final parsed = <List<String>>[];
+    for (final item in value) {
+      if (item is! List) {
+        return null;
+      }
+
+      final presentKeys = <String>{};
+      for (final rawKey in item) {
+        if (rawKey is! String ||
+            !lifeCounterKnownPlayerCounterKeys.contains(rawKey)) {
+          return null;
+        }
+        presentKeys.add(rawKey);
+      }
+      parsed.add(
+        lifeCounterKnownPlayerCounterKeys
+            .where(presentKeys.contains)
+            .toList(growable: false),
+      );
     }
 
     return parsed;
@@ -988,6 +1124,30 @@ class LifeCounterSession {
         return null;
       }
       parsed.add(_decodePlayerSpecialState(item));
+    }
+
+    return parsed;
+  }
+
+  static List<LifeCounterPlayerEliminationReason>?
+  _readPlayerEliminationReasonList(dynamic value, int expectedLength) {
+    if (value == null) {
+      return List<LifeCounterPlayerEliminationReason>.filled(
+        expectedLength,
+        LifeCounterPlayerEliminationReason.none,
+      );
+    }
+
+    if (value is! List || value.length != expectedLength) {
+      return null;
+    }
+
+    final parsed = <LifeCounterPlayerEliminationReason>[];
+    for (final item in value) {
+      if (item is! String) {
+        return null;
+      }
+      parsed.add(_decodePlayerEliminationReason(item));
     }
 
     return parsed;

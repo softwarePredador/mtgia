@@ -1,16 +1,15 @@
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:dotenv/dotenv.dart';
 import 'package:http/http.dart' as http;
 import 'package:server/ai/commander_ai_live_eval_support.dart';
 import 'package:server/ai/commander_ai_prompt_eval_suite.dart';
+import 'package:server/runtime_environment.dart';
 
 Future<void> main(List<String> args) async {
   final options = _parseArgs(args);
   final envPath = options['env'] ?? '.env';
-  final env = DotEnv(includePlatformEnvironment: true, quiet: true)
-    ..load([envPath]);
+  final env = loadRuntimeEnvironment(filenames: [envPath]);
   final apiKey = env['OPENAI_API_KEY']?.trim();
   if (apiKey == null || apiKey.isEmpty) {
     stderr.writeln('OPENAI_API_KEY is required.');

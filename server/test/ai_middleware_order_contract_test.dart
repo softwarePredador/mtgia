@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:test/test.dart';
 
 import '../lib/ai_log_service.dart';
+import '../lib/ai_telemetry_contract.dart';
 import '../lib/plan_middleware.dart';
 import '../routes/ai/_middleware.dart' as ai_middleware;
 
@@ -35,6 +36,7 @@ void main() {
 
   test('meters only player-visible AI actions', () {
     for (final path in [
+      '/ai/archetypes',
       '/ai/generate',
       '/ai/optimize',
       '/ai/explain',
@@ -48,7 +50,6 @@ void main() {
     }
 
     for (final path in [
-      '/ai/archetypes',
       '/ai/simulate',
       '/ai/simulate-matchup',
       '/ai/weakness-analysis',
@@ -58,19 +59,33 @@ void main() {
     ]) {
       expect(
         ai_middleware.aiEndpointAccessPolicyForPath(path),
-        ai_middleware.AiEndpointAccessPolicy.rateLimitedLocal,
+        ai_middleware.AiEndpointAccessPolicy.rateLimitedAuxiliary,
         reason: path,
       );
     }
 
+    for (final path in ['/ai/generate/jobs/job-1', '/ai/optimize/jobs/job-1']) {
+      expect(
+        ai_middleware.aiEndpointAccessPolicyForPath(path),
+        ai_middleware.AiEndpointAccessPolicy.polling,
+        reason: path,
+      );
+    }
+    expect(
+      ai_middleware.aiEndpointAccessPolicyForPath('/ai/commander-learning'),
+      ai_middleware.AiEndpointAccessPolicy.authOnly,
+    );
+  });
+
+  test('new or misspelled AI routes fail closed into plan metering', () {
     for (final path in [
-      '/ai/commander-learning',
-      '/ai/generate/jobs/job-1',
-      '/ai/optimize/jobs/job-1',
+      '/ai/new-provider-action',
+      '/ai/commander-referenc',
+      '/ai/optimize/unknown-subroute',
     ]) {
       expect(
         ai_middleware.aiEndpointAccessPolicyForPath(path),
-        ai_middleware.AiEndpointAccessPolicy.authOnly,
+        ai_middleware.AiEndpointAccessPolicy.meteredAction,
         reason: path,
       );
     }
@@ -89,8 +104,19 @@ void main() {
     final optimizerSource = File('lib/ai/otimizacao.dart').readAsStringSync();
 
     expect(planSource, contains("endpoint LIKE 'plan:%'"));
-    expect(planSource, contains("endpoint LIKE 'provider:%'"));
+    expect(planSource, contains('aiProviderTelemetrySqlPredicate'));
+    expect(
+      aiProviderTelemetrySqlPredicate,
+      contains("endpoint LIKE 'provider:%'"),
+    );
     expect(planSource, contains('success = TRUE'));
+    expect(planSource, contains("date_trunc('month'"));
+    expect(
+      planSource,
+      isNot(contains("created_at >= NOW() - INTERVAL '30 days'")),
+    );
+    expect(planSource, contains("'usage_period_start'"));
+    expect(planSource, contains("'usage_period_end'"));
     expect(optimizerSource, contains("endpoint: 'provider:optimize'"));
     expect(optimizerSource, contains("endpoint: 'provider:complete'"));
   });
@@ -118,7 +144,8 @@ void main() {
     expect(analysisSource, contains('.use(aiRateLimit())'));
     expect(analysisSource, contains('.use(aiPlanLimitMiddleware())'));
     expect(analysisSource, contains('.use(authMiddleware())'));
-    expect(recommendationsSource, contains('handler.use(aiRateLimit())'));
-    expect(recommendationsSource, isNot(contains('aiPlanLimitMiddleware')));
+    expect(recommendationsSource, contains('.use(aiRateLimit())'));
+    expect(recommendationsSource, contains('.use(aiPlanLimitMiddleware())'));
+    expect(recommendationsSource, contains('.use(authMiddleware())'));
   });
 }

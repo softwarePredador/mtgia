@@ -61,8 +61,8 @@ void main() {
     for (final literal in const [
       'A execução da otimização falhou; o deck original foi preservado em estado saudável.',
       'Complete mode não atingiu qualidade mínima para montagem competitiva.',
-      '🔒 Gate de qualidade removeu',
-      '🔒 Escopo aggressive limitado a',
+      'Gate de qualidade removeu',
+      'Escopo aggressive limitado a',
     ]) {
       expect(syncSource, contains(literal));
     }

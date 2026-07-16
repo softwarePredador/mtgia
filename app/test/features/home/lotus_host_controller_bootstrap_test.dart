@@ -19,6 +19,67 @@ import 'package:manaloom/features/home/lotus/lotus_storage_snapshot.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 void main() {
+  group('shouldSuppressLotusReloadLifecycleSnapshot', () {
+    final now = DateTime.utc(2026, 7, 16, 12);
+
+    test(
+      'suppresses immediate lifecycle flushes during a canonical reload',
+      () {
+        final suppressUntil = now.add(const Duration(seconds: 2));
+
+        for (final reason in lotusReloadLifecycleSnapshotReasons) {
+          expect(
+            shouldSuppressLotusReloadLifecycleSnapshot(
+              reason: reason,
+              sessionId: 'old-session',
+              suppressedSessionId: 'old-session',
+              suppressUntil: suppressUntil,
+              now: now,
+            ),
+            isTrue,
+            reason: reason,
+          );
+        }
+      },
+    );
+
+    test('keeps normal snapshots and expired lifecycle flushes', () {
+      expect(
+        shouldSuppressLotusReloadLifecycleSnapshot(
+          reason: 'local_storage_setItem',
+          sessionId: 'old-session',
+          suppressedSessionId: 'old-session',
+          suppressUntil: now.add(const Duration(seconds: 2)),
+          now: now,
+        ),
+        isFalse,
+      );
+      expect(
+        shouldSuppressLotusReloadLifecycleSnapshot(
+          reason: 'pagehide',
+          sessionId: 'old-session',
+          suppressedSessionId: 'old-session',
+          suppressUntil: now,
+          now: now,
+        ),
+        isFalse,
+      );
+    });
+
+    test('keeps lifecycle flushes from the newly bootstrapped session', () {
+      expect(
+        shouldSuppressLotusReloadLifecycleSnapshot(
+          reason: 'pagehide',
+          sessionId: 'new-session',
+          suppressedSessionId: 'old-session',
+          suppressUntil: now.add(const Duration(seconds: 2)),
+          now: now,
+        ),
+        isFalse,
+      );
+    });
+  });
+
   group('mergeLotusBootstrapValues', () {
     test(
       'preserves saved Lotus snapshot domains when canonical fallback is empty',
@@ -100,6 +161,45 @@ void main() {
       sessionStore = LifeCounterSessionStore();
       settingsStore = LifeCounterSettingsStore();
     });
+
+    test(
+      'persists current game metadata once and builds stable fingerprints',
+      () async {
+        await sessionStore.save(LifeCounterSession.initial(playerCount: 4));
+
+        final firstValues = await buildLotusFallbackBootstrapValues(
+          dayNightStateStore: dayNightStateStore,
+          gameTimerStateStore: gameTimerStateStore,
+          historyStore: historyStore,
+          sessionStore: sessionStore,
+          settingsStore: settingsStore,
+        );
+        await Future<void>.delayed(const Duration(milliseconds: 5));
+        final secondValues = await buildLotusFallbackBootstrapValues(
+          dayNightStateStore: dayNightStateStore,
+          gameTimerStateStore: gameTimerStateStore,
+          historyStore: historyStore,
+          sessionStore: sessionStore,
+          settingsStore: settingsStore,
+        );
+
+        expect(secondValues, firstValues);
+        expect(
+          lotusStorageValuesFingerprint(secondValues),
+          lotusStorageValuesFingerprint(firstValues),
+        );
+
+        final storedHistory = await historyStore.load();
+        final storedMeta = storedHistory?.currentGameMeta;
+        final snapshotMeta =
+            jsonDecode(firstValues['currentGameMeta']!) as Map<String, dynamic>;
+        expect(storedHistory, isNotNull);
+        expect(storedHistory!.hasStableCurrentGameMeta, isTrue);
+        expect(storedMeta?['startDate'], isA<int>());
+        expect(snapshotMeta['startDate'], storedMeta?['startDate']);
+        expect(snapshotMeta['id'], storedMeta?['id']);
+      },
+    );
 
     test(
       'builds canonical bootstrap values when Lotus snapshot is missing',
@@ -268,7 +368,7 @@ void main() {
           ),
           isTrue,
         );
-        expect(restoredHistory.lastTableEvent, isNull);
+        expect(restoredHistory.lastTableEvent, 'Player 4 lost 9 life');
       },
     );
 
@@ -645,7 +745,7 @@ void main() {
         expect(restoredSession!.lives, sourceSession.lives);
         expect(restoredSession.currentTurnPlayerIndex, 2);
         expect(restoredSession.currentTurnNumber, 7);
-        expect(restoredSession.lastTableEvent, isNull);
+        expect(restoredSession.lastTableEvent, 'Player 4 lost 11 life');
 
         expect(restoredSettings, isNotNull);
         expect(restoredSettings!.gameTimer, isTrue);

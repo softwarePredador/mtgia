@@ -23,6 +23,8 @@ class LotusLifeCounterSessionAdapter {
   static const String _currentGameMetaKey = 'currentGameMeta';
   static const String _manaloomPlayerSpecialStatesKey =
       '__manaloom_player_special_states';
+  static const String _manaloomPlayerEliminationReasonsKey =
+      '__manaloom_player_elimination_reasons';
   static const String _manaloomPlayerAppearancesKey =
       '__manaloom_player_appearances';
   static const String _manaloomTableStateKey = '__manaloom_table_state';
@@ -79,6 +81,10 @@ class LotusLifeCounterSessionAdapter {
       snapshot.values[_manaloomPlayerSpecialStatesKey],
       playerCount,
     );
+    final persistedPlayerEliminationReasons = _decodePlayerEliminationReasons(
+      snapshot.values[_manaloomPlayerEliminationReasonsKey],
+      playerCount,
+    );
     final persistedPlayerAppearances = _decodePlayerAppearances(
       snapshot.values[_manaloomPlayerAppearancesKey],
       playerCount,
@@ -96,9 +102,12 @@ class LotusLifeCounterSessionAdapter {
     final commanderCasts = <int>[];
     final commanderCastDetails = <LifeCounterCommanderCastDetail>[];
     final playerExtraCounters = <Map<String, int>>[];
+    final playerCounterPresence = <List<String>>[];
     final playerAppearances = <LifeCounterPlayerAppearance>[];
     final partnerCommanders = <bool>[];
     final playerSpecialStates = <LifeCounterPlayerSpecialState>[];
+    final playerEliminationReasons = <LifeCounterPlayerEliminationReason>[];
+    final playerAliveStates = <bool>[];
     final lastPlayerRolls =
         persistedTableState?.lastPlayerRolls ??
         List<int?>.filled(playerCount, null);
@@ -156,28 +165,62 @@ class LotusLifeCounterSessionAdapter {
         ),
       );
       playerExtraCounters.add(_extractExtraCounters(counters));
+      playerCounterPresence.add(_extractKnownCounterPresence(counters));
       partnerCommanders.add(player['partnerCommander'] == true);
       final playerIndex = playerNames.length - 1;
-      final lotusAppearance = LifeCounterPlayerAppearance(
-        background:
-            _readPlayerBackground(playerIndex, player) ??
-            lifeCounterDefaultPlayerBackgrounds[playerIndex %
-                lifeCounterDefaultPlayerBackgrounds.length],
-        nickname: ((player['nickname'] as String?) ?? '').trim(),
-        backgroundImage: _readPlayerImage(player['backgroundImage']),
-        backgroundImagePartner: _readPlayerImage(
-          player['backgroundImagePartner'],
-        ),
+      final persistedAppearance = persistedPlayerAppearances?[playerIndex];
+      final lotusBackground =
+          player['background'] is String
+              ? (player['background'] as String).trim()
+              : '';
+      final hasLotusNickname =
+          player.containsKey('nickname') && player['nickname'] is String;
+      final hasLotusBackgroundImage = player.containsKey('backgroundImage');
+      final hasLotusPartnerBackgroundImage = player.containsKey(
+        'backgroundImagePartner',
       );
       playerAppearances.add(
-        persistedPlayerAppearances?[playerIndex] ?? lotusAppearance,
+        LifeCounterPlayerAppearance(
+          background:
+              lotusBackground.isNotEmpty
+                  ? lotusBackground
+                  : persistedAppearance?.background ??
+                      lifeCounterDefaultPlayerBackgrounds[playerIndex %
+                          lifeCounterDefaultPlayerBackgrounds.length],
+          nickname:
+              hasLotusNickname
+                  ? (player['nickname'] as String).trim()
+                  : persistedAppearance?.nickname ?? '',
+          backgroundImage:
+              hasLotusBackgroundImage
+                  ? _readPlayerImage(player['backgroundImage'])
+                  : persistedAppearance?.backgroundImage,
+          backgroundImagePartner:
+              hasLotusPartnerBackgroundImage
+                  ? _readPlayerImage(player['backgroundImagePartner'])
+                  : persistedAppearance?.backgroundImagePartner,
+        ),
       );
       final isAlive = player['alive'] != false;
+      playerAliveStates.add(isAlive);
+      final persistedSpecialState = persistedPlayerSpecialStates?[playerIndex];
+      final persistedEliminationReason =
+          persistedPlayerEliminationReasons?[playerIndex];
       playerSpecialStates.add(
-        _resolvePlayerSpecialState(
-          isAlive: isAlive,
-          persistedState: persistedPlayerSpecialStates?[playerIndex],
-        ),
+        !isAlive &&
+                persistedSpecialState != null &&
+                persistedSpecialState != LifeCounterPlayerSpecialState.none
+            ? persistedSpecialState
+            : LifeCounterPlayerSpecialState.none,
+      );
+      playerEliminationReasons.add(
+        !isAlive &&
+                (persistedSpecialState == null ||
+                    persistedSpecialState ==
+                        LifeCounterPlayerSpecialState.none) &&
+                persistedEliminationReason != null
+            ? persistedEliminationReason
+            : LifeCounterPlayerEliminationReason.none,
       );
     }
 
@@ -236,8 +279,10 @@ class LotusLifeCounterSessionAdapter {
     }
 
     final turnTracker = _decodeJson(snapshot.values[_turnTrackerKey]);
+    final turnTrackerActive =
+        turnTracker is Map ? turnTracker['isActive'] == true : false;
     final firstPlayerIndex =
-        turnTracker is Map
+        turnTrackerActive
             ? _fromLotusTurnTrackerIndex(
               turnTracker['startingPlayerIndex'],
               playerCount,
@@ -245,7 +290,7 @@ class LotusLifeCounterSessionAdapter {
             )
             : persistedTableState?.firstPlayerIndex;
     final currentTurnPlayerIndex =
-        turnTracker is Map
+        turnTrackerActive
             ? _fromLotusTurnTrackerIndex(
               turnTracker['currentPlayerIndex'],
               playerCount,
@@ -256,8 +301,6 @@ class LotusLifeCounterSessionAdapter {
         turnTracker is Map
             ? (_parseNum(turnTracker['currentTurn']) ?? 1).clamp(1, 9999)
             : 1;
-    final turnTrackerActive =
-        turnTracker is Map ? turnTracker['isActive'] == true : false;
     final turnTrackerOngoingGame =
         turnTracker is Map ? turnTracker['ongoingGame'] == true : false;
     final turnTrackerAutoHighRoll =
@@ -281,9 +324,11 @@ class LotusLifeCounterSessionAdapter {
       commanderCasts: commanderCasts,
       commanderCastDetails: commanderCastDetails,
       playerExtraCounters: playerExtraCounters,
+      playerCounterPresence: playerCounterPresence,
       playerAppearances: playerAppearances,
       partnerCommanders: partnerCommanders,
       playerSpecialStates: playerSpecialStates,
+      playerEliminationReasons: playerEliminationReasons,
       lastPlayerRolls: lastPlayerRolls,
       lastHighRolls: lastHighRolls,
       commanderDamage: commanderDamage,
@@ -299,10 +344,41 @@ class LotusLifeCounterSessionAdapter {
       currentTurnNumber: currentTurnNumber,
       turnTimerActive: turnTimerActive,
       turnTimerSeconds: turnTimerSeconds,
-      lastTableEvent: null,
+      lastTableEvent: persistedTableState?.lastTableEvent,
+    );
+    final resolvedSpecialStates = List<LifeCounterPlayerSpecialState>.from(
+      session.playerSpecialStates,
+    );
+    final resolvedEliminationReasons =
+        List<LifeCounterPlayerEliminationReason>.from(
+          session.resolvedPlayerEliminationReasons,
+        );
+    for (var playerIndex = 0; playerIndex < playerCount; playerIndex += 1) {
+      if (playerAliveStates[playerIndex] ||
+          resolvedSpecialStates[playerIndex] !=
+              LifeCounterPlayerSpecialState.none ||
+          resolvedEliminationReasons[playerIndex] !=
+              LifeCounterPlayerEliminationReason.none) {
+        continue;
+      }
+
+      final lethalReason = LifeCounterTabletopEngine.lethalEliminationReason(
+        session,
+        playerIndex: playerIndex,
+      );
+      if (lethalReason == LifeCounterPlayerEliminationReason.none) {
+        resolvedSpecialStates[playerIndex] =
+            LifeCounterPlayerSpecialState.answerLeft;
+      } else {
+        resolvedEliminationReasons[playerIndex] = lethalReason;
+      }
+    }
+    final resolvedSession = session.copyWith(
+      playerSpecialStates: resolvedSpecialStates,
+      playerEliminationReasons: resolvedEliminationReasons,
     );
     return LifeCounterTurnTrackerEngine.sanitizeTrackerPointersForActivePlayers(
-      session,
+      resolvedSession,
     );
   }
 
@@ -341,28 +417,38 @@ class LotusLifeCounterSessionAdapter {
         trackerSanitizedSession.resolvedCommanderDamageDetails;
     final resolvedPlayerExtraCounters =
         trackerSanitizedSession.resolvedPlayerExtraCounters;
+    final resolvedPlayerCounterPresence =
+        trackerSanitizedSession.resolvedPlayerCounterPresence;
     final resolvedPlayerAppearances =
         trackerSanitizedSession.resolvedPlayerAppearances;
+    final resolvedPlayerEliminationReasons =
+        trackerSanitizedSession.resolvedPlayerEliminationReasons;
     for (
       var index = 0;
       index < trackerSanitizedSession.playerCount;
       index += 1
     ) {
       final counters = <String, int>{...resolvedPlayerExtraCounters[index]};
-      if (trackerSanitizedSession.poison[index] > 0) {
+      final presentCounters = resolvedPlayerCounterPresence[index];
+      if (trackerSanitizedSession.poison[index] > 0 ||
+          presentCounters.contains('poison')) {
         counters['poison'] = trackerSanitizedSession.poison[index];
       }
-      if (trackerSanitizedSession.energy[index] > 0) {
+      if (trackerSanitizedSession.energy[index] > 0 ||
+          presentCounters.contains('energy')) {
         counters['energy'] = trackerSanitizedSession.energy[index];
       }
-      if (trackerSanitizedSession.experience[index] > 0) {
+      if (trackerSanitizedSession.experience[index] > 0 ||
+          presentCounters.contains('xp')) {
         counters['xp'] = trackerSanitizedSession.experience[index];
       }
       final castDetail = resolvedCommanderCastDetails[index];
-      if (castDetail.commanderOneCasts > 0) {
+      if (castDetail.commanderOneCasts > 0 ||
+          presentCounters.contains('tax-1')) {
         counters['tax-1'] = castDetail.commanderOneCasts * 2;
       }
-      if (castDetail.commanderTwoCasts > 0) {
+      if (castDetail.commanderTwoCasts > 0 ||
+          presentCounters.contains('tax-2')) {
         counters['tax-2'] = castDetail.commanderTwoCasts * 2;
       }
       if (counters['tax-1'] == null &&
@@ -408,7 +494,9 @@ class LotusLifeCounterSessionAdapter {
         'backgroundImagePartner': appearance.backgroundImagePartner ?? false,
         'alive':
             trackerSanitizedSession.playerSpecialStates[index] ==
-            LifeCounterPlayerSpecialState.none,
+                LifeCounterPlayerSpecialState.none &&
+            resolvedPlayerEliminationReasons[index] ==
+                LifeCounterPlayerEliminationReason.none,
         'partnerCommander': trackerSanitizedSession.partnerCommanders[index],
         'commanderDamage': commanderDamage,
         'counters': counters,
@@ -425,7 +513,6 @@ class LotusLifeCounterSessionAdapter {
     final currentGameMeta = <String, Object?>{
       'id': 'canonical-bootstrap',
       'name': 'Game #1',
-      'startDate': DateTime.now().millisecondsSinceEpoch,
       'startingLife': trackerSanitizedSession.startingLife,
       'playerCount': trackerSanitizedSession.playerCount,
       'gameMode':
@@ -455,6 +542,11 @@ class LotusLifeCounterSessionAdapter {
             .map(_encodePlayerSpecialState)
             .toList(growable: false),
       ),
+      _manaloomPlayerEliminationReasonsKey: jsonEncode(
+        resolvedPlayerEliminationReasons
+            .map(_encodePlayerEliminationReason)
+            .toList(growable: false),
+      ),
       _manaloomPlayerAppearancesKey: jsonEncode(
         trackerSanitizedSession.resolvedPlayerAppearances
             .map((entry) => entry.toJson())
@@ -468,6 +560,7 @@ class LotusLifeCounterSessionAdapter {
           lastPlayerRolls: trackerSanitizedSession.lastPlayerRolls,
           lastHighRolls: trackerSanitizedSession.lastHighRolls,
           firstPlayerIndex: trackerSanitizedSession.firstPlayerIndex,
+          lastTableEvent: trackerSanitizedSession.lastTableEvent,
         ),
       ),
       if (settings != null)
@@ -536,25 +629,31 @@ class LotusLifeCounterSessionAdapter {
     final resolvedCommanderDamageDetails =
         session.resolvedCommanderDamageDetails;
     final resolvedPlayerExtraCounters = session.resolvedPlayerExtraCounters;
+    final resolvedPlayerCounterPresence = session.resolvedPlayerCounterPresence;
     final resolvedPlayerAppearances = session.resolvedPlayerAppearances;
+    final resolvedPlayerEliminationReasons =
+        session.resolvedPlayerEliminationReasons;
 
     for (var index = 0; index < session.playerCount; index += 1) {
       final counters = <String, int>{...resolvedPlayerExtraCounters[index]};
-      if (session.poison[index] > 0) {
+      final presentCounters = resolvedPlayerCounterPresence[index];
+      if (session.poison[index] > 0 || presentCounters.contains('poison')) {
         counters['poison'] = session.poison[index];
       }
-      if (session.energy[index] > 0) {
+      if (session.energy[index] > 0 || presentCounters.contains('energy')) {
         counters['energy'] = session.energy[index];
       }
-      if (session.experience[index] > 0) {
+      if (session.experience[index] > 0 || presentCounters.contains('xp')) {
         counters['xp'] = session.experience[index];
       }
 
       final castDetail = resolvedCommanderCastDetails[index];
-      if (castDetail.commanderOneCasts > 0) {
+      if (castDetail.commanderOneCasts > 0 ||
+          presentCounters.contains('tax-1')) {
         counters['tax-1'] = castDetail.commanderOneCasts * 2;
       }
-      if (castDetail.commanderTwoCasts > 0) {
+      if (castDetail.commanderTwoCasts > 0 ||
+          presentCounters.contains('tax-2')) {
         counters['tax-2'] = castDetail.commanderTwoCasts * 2;
       }
       if (counters['tax-1'] == null &&
@@ -596,7 +695,9 @@ class LotusLifeCounterSessionAdapter {
         'backgroundImagePartner': appearance.backgroundImagePartner ?? false,
         'alive':
             session.playerSpecialStates[index] ==
-            LifeCounterPlayerSpecialState.none,
+                LifeCounterPlayerSpecialState.none &&
+            resolvedPlayerEliminationReasons[index] ==
+                LifeCounterPlayerEliminationReason.none,
         'partnerCommander': session.partnerCommanders[index],
         'commanderDamage': commanderDamage,
         'counters': counters,
@@ -608,6 +709,11 @@ class LotusLifeCounterSessionAdapter {
       _manaloomPlayerSpecialStatesKey: jsonEncode(
         session.playerSpecialStates
             .map(_encodePlayerSpecialState)
+            .toList(growable: false),
+      ),
+      _manaloomPlayerEliminationReasonsKey: jsonEncode(
+        resolvedPlayerEliminationReasons
+            .map(_encodePlayerEliminationReason)
             .toList(growable: false),
       ),
       _manaloomPlayerAppearancesKey: jsonEncode(
@@ -623,6 +729,7 @@ class LotusLifeCounterSessionAdapter {
           lastPlayerRolls: session.lastPlayerRolls,
           lastHighRolls: session.lastHighRolls,
           firstPlayerIndex: session.firstPlayerIndex,
+          lastTableEvent: session.lastTableEvent,
         ),
       ),
     };
@@ -659,19 +766,6 @@ class LotusLifeCounterSessionAdapter {
     }
 
     return null;
-  }
-
-  static String? _readPlayerBackground(
-    int playerIndex,
-    Map<String, dynamic> player,
-  ) {
-    final background = (player['background'] as String?)?.trim();
-    if (background != null && background.isNotEmpty) {
-      return background;
-    }
-
-    return lifeCounterDefaultPlayerBackgrounds[playerIndex %
-        lifeCounterDefaultPlayerBackgrounds.length];
   }
 
   static String? _readPlayerImage(dynamic value) {
@@ -769,6 +863,23 @@ class LotusLifeCounterSessionAdapter {
     return states;
   }
 
+  static List<LifeCounterPlayerEliminationReason>?
+  _decodePlayerEliminationReasons(String? raw, int playerCount) {
+    final decoded = _decodeJson(raw);
+    if (decoded is! List || decoded.length != playerCount) {
+      return null;
+    }
+
+    final reasons = <LifeCounterPlayerEliminationReason>[];
+    for (final item in decoded) {
+      if (item is! String) {
+        return null;
+      }
+      reasons.add(_decodePlayerEliminationReason(item));
+    }
+    return reasons;
+  }
+
   static List<LifeCounterPlayerAppearance>? _decodePlayerAppearances(
     String? raw,
     int playerCount,
@@ -789,22 +900,6 @@ class LotusLifeCounterSessionAdapter {
     return appearances;
   }
 
-  static LifeCounterPlayerSpecialState _resolvePlayerSpecialState({
-    required bool isAlive,
-    required LifeCounterPlayerSpecialState? persistedState,
-  }) {
-    if (isAlive) {
-      return LifeCounterPlayerSpecialState.none;
-    }
-
-    if (persistedState != null &&
-        persistedState != LifeCounterPlayerSpecialState.none) {
-      return persistedState;
-    }
-
-    return LifeCounterPlayerSpecialState.answerLeft;
-  }
-
   static String _encodePlayerSpecialState(LifeCounterPlayerSpecialState state) {
     switch (state) {
       case LifeCounterPlayerSpecialState.none:
@@ -813,6 +908,36 @@ class LotusLifeCounterSessionAdapter {
         return 'decked_out';
       case LifeCounterPlayerSpecialState.answerLeft:
         return 'answer_left';
+    }
+  }
+
+  static String _encodePlayerEliminationReason(
+    LifeCounterPlayerEliminationReason reason,
+  ) {
+    switch (reason) {
+      case LifeCounterPlayerEliminationReason.none:
+        return 'none';
+      case LifeCounterPlayerEliminationReason.life:
+        return 'life';
+      case LifeCounterPlayerEliminationReason.poison:
+        return 'poison';
+      case LifeCounterPlayerEliminationReason.commanderDamage:
+        return 'commander_damage';
+    }
+  }
+
+  static LifeCounterPlayerEliminationReason _decodePlayerEliminationReason(
+    String value,
+  ) {
+    switch (value) {
+      case 'life':
+        return LifeCounterPlayerEliminationReason.life;
+      case 'poison':
+        return LifeCounterPlayerEliminationReason.poison;
+      case 'commander_damage':
+        return LifeCounterPlayerEliminationReason.commanderDamage;
+      default:
+        return LifeCounterPlayerEliminationReason.none;
     }
   }
 
@@ -859,6 +984,7 @@ class LotusLifeCounterSessionAdapter {
         payload['firstPlayerIndex'],
         playerCount,
       ),
+      lastTableEvent: _readOptionalText(payload['lastTableEvent']),
     );
   }
 
@@ -869,7 +995,9 @@ class LotusLifeCounterSessionAdapter {
     required List<int?> lastPlayerRolls,
     required List<int?> lastHighRolls,
     required int? firstPlayerIndex,
+    required String? lastTableEvent,
   }) {
+    final normalizedLastTableEvent = _readOptionalText(lastTableEvent);
     return <String, Object?>{
       'stormCount': stormCount.clamp(0, 999),
       'monarchPlayer': monarchPlayer,
@@ -877,7 +1005,18 @@ class LotusLifeCounterSessionAdapter {
       'lastPlayerRolls': _normalizeNullableIntList(lastPlayerRolls),
       'lastHighRolls': _normalizeNullableIntList(lastHighRolls),
       'firstPlayerIndex': firstPlayerIndex,
+      if (normalizedLastTableEvent != null)
+        'lastTableEvent': normalizedLastTableEvent,
     };
+  }
+
+  static String? _readOptionalText(Object? value) {
+    if (value is! String) {
+      return null;
+    }
+
+    final normalized = value.trim();
+    return normalized.isEmpty ? null : normalized;
   }
 
   static List<int?> _readNullableIntList(Object? raw, int playerCount) {
@@ -910,12 +1049,19 @@ class LotusLifeCounterSessionAdapter {
     return extras;
   }
 
+  static List<String> _extractKnownCounterPresence(
+    Map<String, dynamic> counters,
+  ) {
+    return lifeCounterKnownPlayerCounterKeys
+        .where(
+          (key) =>
+              counters.containsKey(key) && _parseNum(counters[key]) != null,
+        )
+        .toList(growable: false);
+  }
+
   static bool _isKnownCounterKey(String key) {
-    return key == 'poison' ||
-        key == 'energy' ||
-        key == 'xp' ||
-        key == 'tax-1' ||
-        key == 'tax-2';
+    return lifeCounterKnownPlayerCounterKeys.contains(key);
   }
 
   static int? _normalizeCanonicalTurnTrackerPlayerIndex(
@@ -985,6 +1131,7 @@ class _LotusEmbeddedTableState {
     required this.lastPlayerRolls,
     required this.lastHighRolls,
     required this.firstPlayerIndex,
+    required this.lastTableEvent,
   });
 
   final int stormCount;
@@ -993,4 +1140,5 @@ class _LotusEmbeddedTableState {
   final List<int?> lastPlayerRolls;
   final List<int?> lastHighRolls;
   final int? firstPlayerIndex;
+  final String? lastTableEvent;
 }

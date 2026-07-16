@@ -1,14 +1,12 @@
-import 'dart:io';
-
-import 'package:dotenv/dotenv.dart';
 import 'package:postgres/postgres.dart';
+
+import '../lib/runtime_environment.dart';
 
 /// Salva um snapshot diário dos preços atuais das cartas em price_history.
 ///
 /// Uso: dart run bin/snapshot_price_history.dart
 Future<void> main() async {
-  final env = DotEnv(quiet: true)..load();
-  env.addAll(Platform.environment);
+  final env = loadRuntimeEnvironment();
 
   final connection = await Connection.open(
     Endpoint(

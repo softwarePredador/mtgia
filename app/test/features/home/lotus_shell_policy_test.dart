@@ -194,6 +194,10 @@ void main() {
       );
       expect(
         lotusShellCleanupScript,
+        contains('background: rgb(3, 8, 18) !important;'),
+      );
+      expect(
+        lotusShellCleanupScript,
         contains(
           "observeUiSurface(root, '.planechase-overlay', 'planechase_overlay_opened');",
         ),

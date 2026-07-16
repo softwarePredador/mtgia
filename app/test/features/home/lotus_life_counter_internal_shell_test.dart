@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:manaloom/features/home/life_counter/life_counter_history.dart';
 import 'package:manaloom/features/home/life_counter/life_counter_history_store.dart';
 import 'package:manaloom/features/home/life_counter/life_counter_history_transfer.dart';
 import 'package:manaloom/features/home/life_counter/life_counter_session.dart';
@@ -15,7 +16,7 @@ import 'package:manaloom/features/home/lotus/lotus_storage_snapshot_store.dart';
 import 'package:manaloom/features/home/lotus_life_counter_screen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-class _FakeLotusHost implements LotusHost {
+class _FakeLotusHost implements LotusHost, LotusCanonicalStorageRebaser {
   _FakeLotusHost({required this.onShellMessageRequested});
 
   final LotusShellMessageCallback onShellMessageRequested;
@@ -27,6 +28,7 @@ class _FakeLotusHost implements LotusHost {
   final ValueNotifier<String?> errorMessage = ValueNotifier<String?>(null);
 
   int loadBundleCallCount = 0;
+  int canonicalRebaseCallCount = 0;
   final List<String> executedScripts = <String>[];
 
   @override
@@ -60,6 +62,14 @@ class _FakeLotusHost implements LotusHost {
       'bountyAvailable': true,
       'bountyActive': false,
     });
+  }
+
+  @override
+  Future<bool> rebaseStorageFromCanonical({
+    String reason = 'native_canonical_sync',
+  }) async {
+    canonicalRebaseCallCount += 1;
+    return true;
   }
 
   void completeSuccessfulLoad() {
@@ -167,9 +177,7 @@ void main() {
             (message) =>
                 message.contains('message=native_settings_opened') &&
                 message.contains('surface_strategy: native_fallback') &&
-                message.contains(
-                  'fallback_classification: ownership_bridge',
-                ),
+                message.contains('fallback_classification: ownership_bridge'),
           ),
           isTrue,
         );
@@ -250,14 +258,10 @@ void main() {
         expect(
           logs.any(
             (message) =>
-                message.contains(
-                  'message=native_fallback_surface_requested',
-                ) &&
+                message.contains('message=native_fallback_surface_requested') &&
                 message.contains('message_type: open-native-history') &&
                 message.contains('domain_key: history') &&
-                message.contains(
-                  'fallback_classification: support_utility',
-                ) &&
+                message.contains('fallback_classification: support_utility') &&
                 message.contains('review_status: support_utility'),
           ),
           isTrue,
@@ -267,9 +271,7 @@ void main() {
             (message) =>
                 message.contains('message=native_history_opened') &&
                 message.contains('surface_strategy: native_fallback') &&
-                message.contains(
-                  'fallback_classification: support_utility',
-                ) &&
+                message.contains('fallback_classification: support_utility') &&
                 message.contains('history_domain_present: true'),
           ),
           isTrue,
@@ -307,9 +309,7 @@ void main() {
         expect(
           logs.any(
             (message) =>
-                message.contains(
-                  'message=native_fallback_surface_requested',
-                ) &&
+                message.contains('message=native_fallback_surface_requested') &&
                 message.contains('message_type: open-native-history') &&
                 message.contains('source: shell_shortcut') &&
                 message.contains('used_default_source: true'),
@@ -359,9 +359,7 @@ void main() {
         expect(
           logs.any(
             (message) =>
-                message.contains(
-                  'message=native_fallback_surface_rejected',
-                ) &&
+                message.contains('message=native_fallback_surface_rejected') &&
                 message.contains('message_type: open-native-quick-actions') &&
                 message.contains('reason: unknown_surface_type'),
           ),
@@ -402,9 +400,7 @@ void main() {
         expect(
           logs.any(
             (message) =>
-                message.contains(
-                  'message=native_fallback_surface_rejected',
-                ) &&
+                message.contains('message=native_fallback_surface_rejected') &&
                 message.contains('message_type: open-native-player-counter') &&
                 message.contains('domain_key: player_counter') &&
                 message.contains('target_player_index: 2') &&
@@ -447,9 +443,7 @@ void main() {
         expect(
           logs.any(
             (message) =>
-                message.contains(
-                  'message=native_fallback_surface_rejected',
-                ) &&
+                message.contains('message=native_fallback_surface_rejected') &&
                 message.contains('message_type: open-native-player-state') &&
                 message.contains('domain_key: player_state') &&
                 message.contains('source: player_option_card_presented') &&
@@ -558,6 +552,33 @@ void main() {
                 message: 'Player 3 foi eliminado',
               ),
             ],
+            archivedGames: const [
+              LifeCounterArchivedGame(
+                name: 'Mesa A',
+                metadata: {'id': 'archive-a'},
+                entries: [
+                  LifeCounterHistoryEntry(
+                    message: 'Player 1 venceu',
+                    source: LifeCounterHistoryEntrySource.archive,
+                  ),
+                ],
+              ),
+              LifeCounterArchivedGame(
+                name: 'Mesa B',
+                metadata: {'id': 'archive-b'},
+                entries: [
+                  LifeCounterHistoryEntry(
+                    message: 'Player 2 venceu',
+                    source: LifeCounterHistoryEntrySource.archive,
+                  ),
+                ],
+              ),
+              LifeCounterArchivedGame(
+                name: 'Mesa C',
+                metadata: {'id': 'archive-c'},
+                entries: [],
+              ),
+            ],
           );
 
           await tester.pumpWidget(
@@ -606,6 +627,12 @@ void main() {
           expect(historyState!.currentGameName, 'Imported Game');
           expect(historyState.currentGameMeta?['id'], 'import-42');
           expect(historyState.archivedGameCount, 3);
+          expect(historyState.archivedGames.map((game) => game.name), [
+            'Mesa A',
+            'Mesa B',
+            'Mesa C',
+          ]);
+          expect(historyState.archivedGames[1].metadata['id'], 'archive-b');
           expect(historyState.gameCounter, 42);
           expect(
             historyState.currentGameEntries.single.message,
@@ -617,7 +644,24 @@ void main() {
           );
           expect(session, isNotNull);
           expect(session!.lastTableEvent, 'Player 4 ganhou o monarchy');
+
+          await tester.tap(
+            find.byKey(const Key('life-counter-native-history-export')),
+          );
+          await tester.pumpAndSettle();
+
+          final exportedAfterImport = LifeCounterHistoryTransfer.tryParse(
+            clipboardText,
+          );
+          expect(exportedAfterImport, isNotNull);
+          expect(exportedAfterImport!.currentGameName, 'Imported Game');
+          expect(exportedAfterImport.archivedGames.map((game) => game.name), [
+            'Mesa A',
+            'Mesa B',
+            'Mesa C',
+          ]);
           expect(host.loadBundleCallCount, 1);
+          expect(host.canonicalRebaseCallCount, 1);
           expect(
             logs.any(
               (message) =>
@@ -632,6 +676,104 @@ void main() {
             isTrue,
           );
         });
+      },
+    );
+
+    testWidgets(
+      'replace import without metadata creates a new stable game identity',
+      (tester) async {
+        late _FakeLotusHost host;
+        const previousId = 'previous-game-id';
+        const previousStartDate = 1711800000000;
+        await LifeCounterSessionStore().save(
+          LifeCounterSession.initial(playerCount: 4),
+        );
+        await LotusStorageSnapshotStore().save(
+          const LotusStorageSnapshot(
+            values: {
+              'currentGameMeta':
+                  '{"id":"previous-game-id","name":"Previous Game","startDate":1711800000000}',
+              'gameCounter': '7',
+              'gameHistory': '[]',
+              'allGamesHistory': '[]',
+            },
+          ),
+        );
+        final legacyTransfer = LifeCounterHistoryTransfer(
+          version: lifeCounterHistoryTransferVersion,
+          exportedAt: DateTime.utc(2026, 7, 16, 12),
+          archivedGameCount: 0,
+          currentGameName: 'Legacy Import',
+          gameCounter: 7,
+          lastTableEvent: null,
+          currentGameEntries: const [],
+          archiveEntries: const [],
+        );
+
+        await tester.pumpWidget(
+          MaterialApp(
+            home: LotusLifeCounterScreen(
+              hostFactory: ({
+                required onAppReviewRequested,
+                required onShellMessageRequested,
+              }) {
+                host = _FakeLotusHost(
+                  onShellMessageRequested: onShellMessageRequested,
+                )..completeSuccessfulLoad();
+                return host;
+              },
+            ),
+          ),
+        );
+        await tester.pump();
+        await tester.pump();
+
+        host.emitShellMessage(
+          '{"type":"open-native-history","source":"history_shortcut_pressed"}',
+        );
+        await tester.pumpAndSettle();
+        await tester.tap(
+          find.byKey(const Key('life-counter-native-history-import')),
+        );
+        await tester.pumpAndSettle();
+        await tester.enterText(
+          find.byKey(const Key('life-counter-native-history-import-input')),
+          legacyTransfer.toJsonString(),
+        );
+        await tester.tap(
+          find.byKey(const Key('life-counter-native-history-import-confirm')),
+        );
+        await tester.pumpAndSettle();
+
+        final firstLoad = await LifeCounterHistoryStore().load();
+        final secondLoad = await LifeCounterHistoryStore().load();
+        final snapshot = await LotusStorageSnapshotStore().load();
+        final snapshotMeta = LifeCounterHistoryState.decodeCurrentGameMeta(
+          snapshot?.values['currentGameMeta'],
+        );
+
+        expect(firstLoad, isNotNull);
+        expect(secondLoad, isNotNull);
+        expect(firstLoad!.currentGameName, 'Legacy Import');
+        expect(firstLoad.currentGameMeta?['id'], isNot(previousId));
+        expect(
+          firstLoad.currentGameMeta?['startDate'],
+          isNot(previousStartDate),
+        );
+        expect(
+          secondLoad!.currentGameMeta?['id'],
+          firstLoad.currentGameMeta?['id'],
+        );
+        expect(
+          secondLoad.currentGameMeta?['startDate'],
+          firstLoad.currentGameMeta?['startDate'],
+        );
+        expect(snapshotMeta['id'], firstLoad.currentGameMeta?['id']);
+        expect(
+          snapshotMeta['startDate'],
+          firstLoad.currentGameMeta?['startDate'],
+        );
+        expect(host.canonicalRebaseCallCount, 1);
       },
     );
 
@@ -675,9 +817,7 @@ void main() {
             (message) =>
                 message.contains('message=native_card_search_opened') &&
                 message.contains('surface_strategy: native_fallback') &&
-                message.contains(
-                  'fallback_classification: support_utility',
-                ),
+                message.contains('fallback_classification: support_utility'),
           ),
           isTrue,
         );

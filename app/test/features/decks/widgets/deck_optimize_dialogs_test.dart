@@ -68,6 +68,39 @@ void main() {
     },
   );
 
+  testWidgets('optimization exposes all five Commander brackets', (
+    tester,
+  ) async {
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Scaffold(
+          body: OptimizationConfigSection(
+            selectedBracket: 4,
+            keepTheme: true,
+            selectedIntensity: OptimizeIntensity.focused,
+            onBracketChanged: (_) {},
+            onKeepThemeChanged: (_) {},
+            onIntensityChanged: (_) {},
+            accent: Colors.blue,
+          ),
+        ),
+      ),
+    );
+
+    expect(find.text('4 - Optimized'), findsOneWidget);
+    expect(find.textContaining('sem tratar a mesa como cEDH'), findsOneWidget);
+
+    await tester.tap(find.text('4 - Optimized'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('1 - Exhibition'), findsOneWidget);
+    expect(find.text('2 - Core'), findsOneWidget);
+    expect(find.text('3 - Upgraded'), findsOneWidget);
+    expect(find.text('4 - Optimized'), findsWidgets);
+    expect(find.text('5 - cEDH'), findsOneWidget);
+    expect(find.text('4 - cEDH'), findsNothing);
+  });
+
   testWidgets('apply optimization loading helper opens dialog', (tester) async {
     await tester.pumpWidget(
       MaterialApp(

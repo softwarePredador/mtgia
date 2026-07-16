@@ -45,6 +45,22 @@ void main() {
       );
     });
 
+    test('generate polling honors the backend job timeout with grace', () {
+      expect(
+        pollTimeoutFromGenerateAccepted({'job_timeout_ms': 180000}),
+        const Duration(minutes: 3, seconds: 15),
+      );
+      expect(
+        pollTimeoutFromGenerateAccepted({'job_timeout_ms': '1000'}),
+        const Duration(seconds: 30),
+      );
+      expect(
+        pollTimeoutFromGenerateAccepted({'job_timeout_ms': 600000}),
+        const Duration(minutes: 5),
+      );
+      expect(pollTimeoutFromGenerateAccepted(const {}), isNull);
+    });
+
     test('invalid optimize async contract stays player-facing', () async {
       final client = _FakeApiClient(
         response: ApiResponse(202, {'status': 'pending'}),
@@ -70,6 +86,25 @@ void main() {
                 isNot(contains('job')),
               ),
         ),
+      );
+    });
+
+    test('optimize polling honors backend timeout with a bounded grace', () {
+      expect(
+        normalizeOptimizePollTimeoutMs(360000),
+        const Duration(minutes: 6, seconds: 15).inMilliseconds,
+      );
+      expect(
+        normalizeOptimizePollTimeoutMs(null),
+        const Duration(minutes: 5).inMilliseconds,
+      );
+      expect(
+        normalizeOptimizePollTimeoutMs(1000),
+        const Duration(seconds: 30).inMilliseconds,
+      );
+      expect(
+        normalizeOptimizePollTimeoutMs(900000),
+        const Duration(minutes: 7).inMilliseconds,
       );
     });
 

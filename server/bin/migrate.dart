@@ -1,11 +1,11 @@
 // ignore_for_file: avoid_print
 
 import 'dart:io';
-import 'package:dotenv/dotenv.dart';
 import 'package:postgres/postgres.dart';
 import 'package:server/ai/candidate_quality_data_support.dart';
 import 'package:server/ai/commander_learning_snapshot_support.dart';
 import 'package:server/import_card_lookup_service.dart';
+import 'package:server/runtime_environment.dart';
 
 /// Sistema de Migrações Versionado para MTG IA
 ///
@@ -1224,6 +1224,79 @@ final migrations = <Migration>[
       ALTER COLUMN source SET DEFAULT 'mtgjson';
     ''',
   ),
+  Migration(
+    version: '036',
+    name: 'enforce_commander_bracket_range',
+    up: '''
+      UPDATE decks
+      SET bracket = 5
+      WHERE bracket = 4
+        AND created_at < TIMESTAMPTZ '2026-07-16 16:45:00+00';
+      UPDATE ai_user_preferences
+      SET preferred_bracket = 5
+      WHERE preferred_bracket = 4
+        AND created_at < TIMESTAMPTZ '2026-07-16 16:45:00+00';
+      UPDATE decks
+      SET bracket = NULL
+      WHERE bracket IS NOT NULL AND bracket NOT BETWEEN 1 AND 5;
+      ALTER TABLE decks
+      ADD CONSTRAINT chk_decks_commander_bracket
+      CHECK (bracket IS NULL OR bracket BETWEEN 1 AND 5);
+      UPDATE ai_user_preferences
+      SET preferred_bracket = NULL
+      WHERE preferred_bracket IS NOT NULL
+        AND preferred_bracket NOT BETWEEN 1 AND 5;
+      ALTER TABLE ai_user_preferences
+      ADD CONSTRAINT chk_ai_user_preferences_commander_bracket
+      CHECK (
+        preferred_bracket IS NULL OR preferred_bracket BETWEEN 1 AND 5
+      );
+    ''',
+    down: '''
+      ALTER TABLE ai_user_preferences
+      DROP CONSTRAINT IF EXISTS chk_ai_user_preferences_commander_bracket;
+      ALTER TABLE decks
+      DROP CONSTRAINT IF EXISTS chk_decks_commander_bracket;
+    ''',
+  ),
+  Migration(
+    version: '037',
+    name: 'normalize_candidate_bracket_scopes',
+    up: '''
+      DELETE FROM card_role_scores legacy
+      USING card_role_scores canonical
+      WHERE legacy.card_id = canonical.card_id
+        AND legacy.role = canonical.role
+        AND legacy.format = canonical.format
+        AND legacy.subformat = canonical.subformat
+        AND legacy.source = canonical.source
+        AND legacy.bracket_scope IN (
+          'bracket_2_4', 'bracket_2_5', 'bracket_3_4', 'bracket_3_5'
+        )
+        AND canonical.bracket_scope = CASE
+          WHEN legacy.bracket_scope IN ('bracket_2_4', 'bracket_2_5')
+            THEN 'bracket_2_plus'
+          ELSE 'bracket_3_plus'
+        END;
+      UPDATE card_role_scores
+      SET bracket_scope = CASE
+        WHEN bracket_scope IN ('bracket_2_4', 'bracket_2_5')
+          THEN 'bracket_2_plus'
+        ELSE 'bracket_3_plus'
+      END
+      WHERE bracket_scope IN (
+        'bracket_2_4', 'bracket_2_5', 'bracket_3_4', 'bracket_3_5'
+      );
+    ''',
+    down: '''
+      UPDATE card_role_scores
+      SET bracket_scope = CASE
+        WHEN bracket_scope = 'bracket_2_plus' THEN 'bracket_2_5'
+        ELSE 'bracket_3_5'
+      END
+      WHERE bracket_scope IN ('bracket_2_plus', 'bracket_3_plus');
+    ''',
+  ),
 ];
 
 class Migration {
@@ -1251,9 +1324,9 @@ enum MigrationRollbackPolicy { standard, emptyOnly, manualOnly }
 MigrationRollbackPolicy migrationRollbackPolicy(String version) =>
     switch (version) {
       '033' || '035' => MigrationRollbackPolicy.emptyOnly,
-      // A 034 tornou-se dona de tabelas que já continham dados antes de ser
-      // registrada. O down automático nunca pode distinguir esses dados.
-      '034' => MigrationRollbackPolicy.manualOnly,
+      // Estas migrations alteram ou adotam dados preexistentes. O down
+      // automático não consegue reconstruir o estado anterior com segurança.
+      '034' || '036' || '037' => MigrationRollbackPolicy.manualOnly,
       _ => MigrationRollbackPolicy.standard,
     };
 
@@ -1263,7 +1336,7 @@ Future<void> _assertRollbackSafe(Session tx, Migration migration) async {
   if (policy == MigrationRollbackPolicy.manualOnly) {
     throw StateError(
       'Rollback automático de ${migration.fullName} é bloqueado: a migration '
-      'adotou tabelas com dados preexistentes. Use um plano manual com backup '
+      'alterou ou adotou dados preexistentes. Use um plano manual com backup '
       'e restore validados.',
     );
   }
@@ -1324,7 +1397,7 @@ void main(List<String> args) async {
     return;
   }
 
-  final env = DotEnv(quiet: true)..load();
+  final env = loadRuntimeEnvironment();
   env.addAll(Platform.environment);
 
   final connection = await Connection.open(

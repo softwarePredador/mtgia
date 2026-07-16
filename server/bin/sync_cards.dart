@@ -2,13 +2,13 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:dotenv/dotenv.dart';
 import 'package:http/http.dart' as http;
 import 'package:postgres/postgres.dart';
 
 import '../lib/database.dart';
 import '../lib/card_identity_support.dart';
 import '../lib/mtg_data_integrity_support.dart';
+import '../lib/runtime_environment.dart';
 import '../lib/sync_cards_utils.dart';
 
 /// Sincroniza cartas e legalidades do MTGJSON para o Postgres.
@@ -65,13 +65,11 @@ Opcoes:
   final full = args.contains('--full');
   final sinceDays = parseSinceDays(args) ?? 45;
 
-  final env = DotEnv(includePlatformEnvironment: true, quiet: true)..load();
-  final environment = (env['ENVIRONMENT'] ??
-          Platform.environment['ENVIRONMENT'] ??
-          'development')
-      .toLowerCase();
+  final env = loadRuntimeEnvironment();
+  final environment = (env['ENVIRONMENT'] ?? 'development').toLowerCase();
   print(
-      '🔄 Sync de cartas (ENVIRONMENT=$environment)${full ? ' [FULL]' : ' [INCREMENTAL]'}${force ? ' [FORÇADO]' : ''}');
+    '🔄 Sync de cartas (ENVIRONMENT=$environment)${full ? ' [FULL]' : ' [INCREMENTAL]'}${force ? ' [FORÇADO]' : ''}',
+  );
 
   final db = Database();
   await db.connect();
@@ -99,12 +97,14 @@ Opcoes:
 
     if (!force && lastVersion != null && lastVersion == remoteVersion) {
       print(
-          '✅ MTGJSON ja esta atualizado (version=$remoteVersion). Nada a fazer.');
+        '✅ MTGJSON ja esta atualizado (version=$remoteVersion). Nada a fazer.',
+      );
       return;
     }
 
     print(
-        '📦 MTGJSON remoto: version=$remoteVersion, date=$remoteDate (local=$lastVersion)');
+      '📦 MTGJSON remoto: version=$remoteVersion, date=$remoteDate (local=$lastVersion)',
+    );
 
     final beforeCards = await _count(pool, 'cards');
     final beforeLegalities = await _count(pool, 'card_legalities');
@@ -113,7 +113,8 @@ Opcoes:
     int processedLegalities;
 
     final hasExistingBase = beforeCards > 0;
-    final effectiveLastSyncAt = lastSyncAt ??
+    final effectiveLastSyncAt =
+        lastSyncAt ??
         (hasExistingBase && !full
             ? DateTime.now().subtract(Duration(days: sinceDays))
             : null);
@@ -129,11 +130,14 @@ Opcoes:
       print('🃏 Cards + legalities concluido em ${sw.elapsedMilliseconds}ms');
     } else {
       // INCREMENTAL SYNC
-      final setCodes =
-          getNewSetCodesSinceFromData(setListData, effectiveLastSyncAt);
+      final setCodes = getNewSetCodesSinceFromData(
+        setListData,
+        effectiveLastSyncAt,
+      );
       if (setCodes.isEmpty) {
         print(
-            '✅ Nenhum set novo desde ${effectiveLastSyncAt.toIso8601String()}.');
+          '✅ Nenhum set novo desde ${effectiveLastSyncAt.toIso8601String()}.',
+        );
         processedCards = 0;
         processedLegalities = 0;
       } else {
@@ -145,7 +149,7 @@ Opcoes:
           final setData = await _fetchSetJson(code);
           final cards =
               (setData['cards'] as List?)?.cast<Map<String, dynamic>>() ??
-                  const [];
+              const [];
           if (cards.isEmpty) continue;
 
           processedCards += await _upsertCardsFromSet(pool, cards, code);
@@ -160,43 +164,55 @@ Opcoes:
     await _setSyncState(pool, 'mtgjson_meta_version', remoteVersion);
     await _setSyncState(pool, 'mtgjson_meta_date', remoteDate);
     await _setSyncState(
-        pool, 'cards_last_sync_at', DateTime.now().toIso8601String());
+      pool,
+      'cards_last_sync_at',
+      DateTime.now().toIso8601String(),
+    );
 
-    await _logSync(pool,
-        syncType: 'cards',
-        status: 'success',
-        recordsInserted: (afterCards - beforeCards).clamp(0, 1 << 31),
-        recordsUpdated:
-            (processedCards - (afterCards - beforeCards)).clamp(0, 1 << 31),
-        recordsDeleted: 0,
-        startedAt: startedAt,
-        finishedAt: DateTime.now());
-    await _logSync(pool,
-        syncType: 'card_legalities',
-        status: 'success',
-        recordsInserted: (afterLegalities - beforeLegalities).clamp(0, 1 << 31),
-        recordsUpdated:
-            (processedLegalities - (afterLegalities - beforeLegalities))
-                .clamp(0, 1 << 31),
-        recordsDeleted: 0,
-        startedAt: startedAt,
-        finishedAt: DateTime.now());
+    await _logSync(
+      pool,
+      syncType: 'cards',
+      status: 'success',
+      recordsInserted: (afterCards - beforeCards).clamp(0, 1 << 31),
+      recordsUpdated: (processedCards - (afterCards - beforeCards)).clamp(
+        0,
+        1 << 31,
+      ),
+      recordsDeleted: 0,
+      startedAt: startedAt,
+      finishedAt: DateTime.now(),
+    );
+    await _logSync(
+      pool,
+      syncType: 'card_legalities',
+      status: 'success',
+      recordsInserted: (afterLegalities - beforeLegalities).clamp(0, 1 << 31),
+      recordsUpdated: (processedLegalities -
+              (afterLegalities - beforeLegalities))
+          .clamp(0, 1 << 31),
+      recordsDeleted: 0,
+      startedAt: startedAt,
+      finishedAt: DateTime.now(),
+    );
 
     final elapsed = DateTime.now().difference(startedAt);
     print('✅ Sync concluido em ${elapsed.inSeconds}s.');
     print('  - Cards: $processedCards processadas (total $afterCards)');
     print(
-        '  - Legalities: $processedLegalities processadas (total $afterLegalities)');
+      '  - Legalities: $processedLegalities processadas (total $afterLegalities)',
+    );
   } catch (e) {
-    await _logSync(pool,
-        syncType: 'cards',
-        status: 'failed',
-        recordsInserted: 0,
-        recordsUpdated: 0,
-        recordsDeleted: 0,
-        startedAt: startedAt,
-        finishedAt: DateTime.now(),
-        errorMessage: e.toString());
+    await _logSync(
+      pool,
+      syncType: 'cards',
+      status: 'failed',
+      recordsInserted: 0,
+      recordsUpdated: 0,
+      recordsDeleted: 0,
+      startedAt: startedAt,
+      finishedAt: DateTime.now(),
+      errorMessage: e.toString(),
+    );
     rethrow;
   } finally {
     await db.close();
@@ -208,37 +224,53 @@ Opcoes:
 // ═══════════════════════════════════════════════════════════════════════
 
 Future<void> _ensureSyncStateTable(Pool pool) async {
-  await pool.execute(Sql.named('''
+  await pool.execute(
+    Sql.named('''
     CREATE TABLE IF NOT EXISTS sync_state (
       key TEXT PRIMARY KEY,
       value TEXT,
       updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
     )
-  '''));
+  '''),
+  );
 }
 
 Future<void> _ensureCardsColorIdentity(Pool pool) async {
-  await pool.execute(Sql.named(
-      'ALTER TABLE cards ADD COLUMN IF NOT EXISTS color_identity TEXT[]'));
-  await pool.execute(Sql.named(
-      'CREATE INDEX IF NOT EXISTS idx_cards_color_identity ON cards USING GIN (color_identity)'));
+  await pool.execute(
+    Sql.named(
+      'ALTER TABLE cards ADD COLUMN IF NOT EXISTS color_identity TEXT[]',
+    ),
+  );
+  await pool.execute(
+    Sql.named(
+      'CREATE INDEX IF NOT EXISTS idx_cards_color_identity ON cards USING GIN (color_identity)',
+    ),
+  );
 }
 
 Future<void> _ensureCardsCombatMetadata(Pool pool) async {
   await pool.execute(
-      Sql.named('ALTER TABLE cards ADD COLUMN IF NOT EXISTS power TEXT'));
+    Sql.named('ALTER TABLE cards ADD COLUMN IF NOT EXISTS power TEXT'),
+  );
   await pool.execute(
-      Sql.named('ALTER TABLE cards ADD COLUMN IF NOT EXISTS toughness TEXT'));
+    Sql.named('ALTER TABLE cards ADD COLUMN IF NOT EXISTS toughness TEXT'),
+  );
   await pool.execute(
-      Sql.named('ALTER TABLE cards ADD COLUMN IF NOT EXISTS keywords TEXT[]'));
-  await pool.execute(Sql.named(
-      'ALTER TABLE cards ADD COLUMN IF NOT EXISTS is_reserved BOOLEAN'));
-  await pool.execute(Sql.named(
-      'CREATE INDEX IF NOT EXISTS idx_cards_keywords ON cards USING GIN (keywords)'));
+    Sql.named('ALTER TABLE cards ADD COLUMN IF NOT EXISTS keywords TEXT[]'),
+  );
+  await pool.execute(
+    Sql.named('ALTER TABLE cards ADD COLUMN IF NOT EXISTS is_reserved BOOLEAN'),
+  );
+  await pool.execute(
+    Sql.named(
+      'CREATE INDEX IF NOT EXISTS idx_cards_keywords ON cards USING GIN (keywords)',
+    ),
+  );
 }
 
 Future<void> _ensureSetsTable(Pool pool) async {
-  await pool.execute(Sql.named('''
+  await pool.execute(
+    Sql.named('''
     CREATE TABLE IF NOT EXISTS sets (
       code TEXT PRIMARY KEY,
       name TEXT NOT NULL,
@@ -250,7 +282,8 @@ Future<void> _ensureSetsTable(Pool pool) async {
       created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
       updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
     )
-  '''));
+  '''),
+  );
 }
 
 Future<String?> _getSyncState(Pool pool, String key) async {
@@ -263,10 +296,13 @@ Future<String?> _getSyncState(Pool pool, String key) async {
 }
 
 Future<void> _setSyncState(Pool pool, String key, String value) async {
-  await pool.execute(Sql.named('''
+  await pool.execute(
+    Sql.named('''
     INSERT INTO sync_state (key, value) VALUES (@key, @value)
     ON CONFLICT (key) DO UPDATE SET value = EXCLUDED.value, updated_at = CURRENT_TIMESTAMP
-  '''), parameters: {'key': key, 'value': value});
+  '''),
+    parameters: {'key': key, 'value': value},
+  );
 }
 
 Future<int> _count(Pool pool, String table) async {
@@ -302,19 +338,22 @@ Future<http.Response> _httpGetWithRetry(
       lastError = e;
       if (attempt == _httpMaxRetries) break;
       print(
-          '⚠️  Timeout em $label (tentativa $attempt/$_httpMaxRetries); tentando novamente...');
+        '⚠️  Timeout em $label (tentativa $attempt/$_httpMaxRetries); tentando novamente...',
+      );
       await Future.delayed(Duration(seconds: attempt * 2));
     } on SocketException catch (e) {
       lastError = e;
       if (attempt == _httpMaxRetries) break;
       print(
-          '⚠️  Erro de rede em $label (tentativa $attempt/$_httpMaxRetries); tentando novamente...');
+        '⚠️  Erro de rede em $label (tentativa $attempt/$_httpMaxRetries); tentando novamente...',
+      );
       await Future.delayed(Duration(seconds: attempt * 2));
     }
   }
 
   throw Exception(
-      'Falha ao baixar $label apos $_httpMaxRetries tentativas: $lastError');
+    'Falha ao baixar $label apos $_httpMaxRetries tentativas: $lastError',
+  );
 }
 
 Future<void> _logSync(
@@ -329,7 +368,8 @@ Future<void> _logSync(
   String? errorMessage,
 }) async {
   try {
-    await pool.execute(Sql.named('''
+    await pool.execute(
+      Sql.named('''
       INSERT INTO sync_log (
         sync_type, format, records_updated, records_inserted, records_deleted,
         status, error_message, started_at, finished_at
@@ -337,16 +377,18 @@ Future<void> _logSync(
         @syncType, NULL, @updated, @inserted, @deleted,
         @status, @error, @startedAt, @finishedAt
       )
-    '''), parameters: {
-      'syncType': syncType,
-      'updated': recordsUpdated,
-      'inserted': recordsInserted,
-      'deleted': recordsDeleted,
-      'status': status,
-      'error': errorMessage,
-      'startedAt': startedAt.toIso8601String(),
-      'finishedAt': finishedAt.toIso8601String(),
-    });
+    '''),
+      parameters: {
+        'syncType': syncType,
+        'updated': recordsUpdated,
+        'inserted': recordsInserted,
+        'deleted': recordsDeleted,
+        'status': status,
+        'error': errorMessage,
+        'startedAt': startedAt.toIso8601String(),
+        'finishedAt': finishedAt.toIso8601String(),
+      },
+    );
   } catch (_) {}
 }
 
@@ -355,10 +397,7 @@ Future<void> _logSync(
 // ═══════════════════════════════════════════════════════════════════════
 
 Future<Map<String, dynamic>> _fetchMtgJsonMeta() async {
-  final res = await _httpGetWithRetry(
-    Uri.parse(_metaUrl),
-    label: 'Meta.json',
-  );
+  final res = await _httpGetWithRetry(Uri.parse(_metaUrl), label: 'Meta.json');
   final decoded =
       jsonDecode(utf8.decode(res.bodyBytes)) as Map<String, dynamic>;
   return decoded['data'] as Map<String, dynamic>;
@@ -392,7 +431,8 @@ Future<File> _downloadAtomicCards({required bool force}) async {
   if (!force && await file.exists()) {
     final size = await file.length();
     print(
-        '📁 Usando cache local: $_atomicCardsFileName (${(size / 1024 / 1024).toStringAsFixed(1)}MB)');
+      '📁 Usando cache local: $_atomicCardsFileName (${(size / 1024 / 1024).toStringAsFixed(1)}MB)',
+    );
     return file;
   }
   print('⬇️  Baixando $_atomicCardsUrl (pode demorar ~1min)...');
@@ -402,7 +442,8 @@ Future<File> _downloadAtomicCards({required bool force}) async {
   );
   await file.writeAsBytes(res.bodyBytes);
   print(
-      '✅ Download concluido (${(res.bodyBytes.length / 1024 / 1024).toStringAsFixed(1)}MB)');
+    '✅ Download concluido (${(res.bodyBytes.length / 1024 / 1024).toStringAsFixed(1)}MB)',
+  );
   return file;
 }
 
@@ -522,7 +563,8 @@ Future<void> _upsertSetRowsBatch(Pool pool, List<List<Object?>> rows) async {
     valuesSql.add('(${placeholders.join(', ')}, CURRENT_TIMESTAMP)');
   }
 
-  await pool.execute(Sql.named('''
+  await pool.execute(
+    Sql.named('''
     INSERT INTO sets (${columns.join(', ')}, updated_at)
     VALUES ${valuesSql.join(', ')}
     ON CONFLICT (code) DO UPDATE SET
@@ -533,7 +575,9 @@ Future<void> _upsertSetRowsBatch(Pool pool, List<List<Object?>> rows) async {
       is_online_only = EXCLUDED.is_online_only,
       is_foreign_only = EXCLUDED.is_foreign_only,
       updated_at = CURRENT_TIMESTAMP
-  '''), parameters: parameters);
+  '''),
+    parameters: parameters,
+  );
 }
 
 // ═══════════════════════════════════════════════════════════════════════
@@ -542,7 +586,10 @@ Future<void> _upsertSetRowsBatch(Pool pool, List<List<Object?>> rows) async {
 
 /// Incremental: processa cartas de um set em batch.
 Future<int> _upsertCardsFromSet(
-    Pool pool, List<Map<String, dynamic>> cards, String setCode) async {
+  Pool pool,
+  List<Map<String, dynamic>> cards,
+  String setCode,
+) async {
   final canonicalSetCode = normalizeMtgSetCode(setCode) ?? setCode.trim();
   print('🃏 Upsert de ${cards.length} cards (set=$canonicalSetCode)...');
 
@@ -633,19 +680,21 @@ Future<void> _upsertCardRowsBatch(
     values.add('(${placeholders.join(', ')})');
   }
 
-  final collectorUpdates = includeCollectorFoil
-      ? '''
+  final collectorUpdates =
+      includeCollectorFoil
+          ? '''
       collector_number = COALESCE(EXCLUDED.collector_number, cards.collector_number),
       foil = COALESCE(EXCLUDED.foil, cards.foil),
 '''
-      : '';
-  final identityUpdates = includeIdentityColumns
-      ? '''
+          : '';
+  final identityUpdates =
+      includeIdentityColumns
+          ? '''
       oracle_id = COALESCE(EXCLUDED.oracle_id, cards.oracle_id),
       layout = COALESCE(EXCLUDED.layout, cards.layout),
       card_faces_json = COALESCE(EXCLUDED.card_faces_json, cards.card_faces_json),
 '''
-      : '';
+          : '';
 
   final sql = '''
     INSERT INTO cards (${columns.join(', ')})
@@ -694,7 +743,9 @@ List<List<Object?>> _dedupeRowsByKey(
 /// Incremental: legalidades de um set em batch.
 /// Carrega APENAS os card IDs relevantes (nao todos 33k+).
 Future<int> _upsertLegalitiesFromSet(
-    Pool pool, List<Map<String, dynamic>> cards) async {
+  Pool pool,
+  List<Map<String, dynamic>> cards,
+) async {
   // Coleta oracle IDs deste set
   final oracleIds = <String>{};
   for (final card in cards) {
@@ -723,10 +774,7 @@ Future<int> _upsertLegalitiesFromSet(
       rows.add([internalId, entry.key, entry.value.toString().toLowerCase()]);
     }
   }
-  final dedupedRows = _dedupeRowsByKey(
-    rows,
-    (row) => '${row[0]}|${row[1]}',
-  );
+  final dedupedRows = _dedupeRowsByKey(rows, (row) => '${row[0]}|${row[1]}');
 
   for (var i = 0; i < dedupedRows.length; i += _batchSize) {
     final end = (i + _batchSize).clamp(0, dedupedRows.length);
@@ -739,18 +787,21 @@ Future<int> _upsertLegalitiesFromSet(
 
 /// Carrega APENAS os oracle_id -> internal_id de um conjunto especifico.
 Future<Map<String, String>> _loadCardIdMapForOracleIds(
-    Pool pool, Set<String> oracleIds) async {
+  Pool pool,
+  Set<String> oracleIds,
+) async {
   if (oracleIds.isEmpty) return {};
   final hasIdentityColumns = await hasCardIdentityColumns(pool);
-  final sql = hasIdentityColumns
-      ? '''
+  final sql =
+      hasIdentityColumns
+          ? '''
       SELECT COALESCE(oracle_id, scryfall_id)::text AS oracle_lookup_id,
              id::text
       FROM cards
       WHERE oracle_id = ANY(@ids)
          OR scryfall_id = ANY(@ids)
     '''
-      : '''
+          : '''
       SELECT scryfall_id::text AS oracle_lookup_id,
              id::text
       FROM cards

@@ -104,7 +104,7 @@ class _LifeCounterNativeTurnTrackerSheetState
                             ),
                             SizedBox(height: 6),
                             Text(
-                              'ManaLoom owns the turn tracker shell while the Lotus tabletop stays visually identical.',
+                              'Choose who starts and keep every turn moving.',
                               style: TextStyle(
                                 color: AppTheme.textSecondary,
                                 fontSize: AppTheme.fontMd,
@@ -184,7 +184,7 @@ class _LifeCounterNativeTurnTrackerSheetState
                       _SectionCard(
                         title: 'Tracker Options',
                         subtitle:
-                            'These values are applied when the tabletop is reloaded.',
+                            'Set how turns begin and appear on the table.',
                         child: Column(
                           children: [
                             SwitchListTile.adaptive(
@@ -200,7 +200,7 @@ class _LifeCounterNativeTurnTrackerSheetState
                                 ),
                               ),
                               subtitle: const Text(
-                                'Keep Lotus parity for tables that auto-pick a starting player.',
+                                'Automatically roll to choose the starting player.',
                                 style: TextStyle(color: AppTheme.textSecondary),
                               ),
                               value: _autoHighRoll,
@@ -226,7 +226,7 @@ class _LifeCounterNativeTurnTrackerSheetState
                                 ),
                               ),
                               subtitle: const Text(
-                                'Show the per-turn timer on the tabletop surface.',
+                                'Show the per-turn timer on the table.',
                                 style: TextStyle(color: AppTheme.textSecondary),
                               ),
                               value: _turnTimerActive,
@@ -251,7 +251,7 @@ class _LifeCounterNativeTurnTrackerSheetState
                         title: 'Actions',
                         subtitle:
                             _isTrackerActive
-                                ? 'Advance or rewind the draft state before applying it back to the tabletop.'
+                                ? 'Move through turns or stop the tracker.'
                                 : 'Start a tracked game from the selected player.',
                         child: Wrap(
                           spacing: 10,
@@ -415,10 +415,10 @@ class _SummaryCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return _SectionCard(
-      title: 'Current Draft State',
+      title: 'Turn Status',
       subtitle:
           isTrackerActive
-              ? 'Preview of what will be pushed back into the embedded tabletop.'
+              ? 'Review the current turn before applying changes.'
               : 'Tracker is currently stopped.',
       child: Wrap(
         spacing: 10,

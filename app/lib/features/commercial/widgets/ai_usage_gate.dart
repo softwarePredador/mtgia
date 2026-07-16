@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
+import '../../../core/api/api_client.dart';
 import '../../../core/theme/app_theme.dart';
 import '../models/manaloom_plan.dart';
 import '../providers/commercial_provider.dart';
@@ -18,7 +19,11 @@ Future<bool> reserveAiActionOrShowPaywall(
   }
 
   await provider.load();
-  if (await provider.consumeAiAction(kind)) {
+  final hasQuota =
+      ApiClient.hasAuthenticationToken
+          ? await _checkAuthoritativeQuota(provider)
+          : await provider.consumeAiAction(kind);
+  if (hasQuota) {
     return true;
   }
 
@@ -31,6 +36,25 @@ Future<bool> reserveAiActionOrShowPaywall(
     context.push('/upgrade');
   }
   return false;
+}
+
+Future<bool> _checkAuthoritativeQuota(CommercialProvider provider) async {
+  await provider.refreshFromServer();
+  // The API middleware is the final authority. A transient plan-read failure
+  // must not create a second, divergent quota counter in the app.
+  return !provider.isRemoteSynced || provider.canUseAi;
+}
+
+Future<void> refreshAiUsageAfterAction(BuildContext context) async {
+  if (!ApiClient.hasAuthenticationToken || !context.mounted) return;
+
+  CommercialProvider? provider;
+  try {
+    provider = context.read<CommercialProvider>();
+  } on ProviderNotFoundException {
+    return;
+  }
+  await provider.refreshFromServer();
 }
 
 class AiPaywallDialog extends StatelessWidget {

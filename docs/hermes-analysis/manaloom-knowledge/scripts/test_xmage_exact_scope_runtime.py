@@ -2044,7 +2044,7 @@ class XMageExactScopeRuntimeTest(unittest.TestCase):
         )
 
         self.assertNotIn(token, opponent.battlefield)
-        self.assertIn(token, opponent.graveyard)
+        self.assertNotIn(token, opponent.graveyard)
         self.assertIn(nontoken, opponent.battlefield)
         self.assertEqual(nontoken["power"], 1)
         self.assertTrue(any(row.get("moved_to_graveyard") for row in refreshed))
@@ -2052,6 +2052,14 @@ class XMageExactScopeRuntimeTest(unittest.TestCase):
             any(
                 event == "state_based_action_zero_toughness"
                 and data.get("card") == "Soldier Token"
+                for event, data in self.events
+            )
+        )
+        self.assertTrue(
+            any(
+                event == "token_ceased_to_exist"
+                and data.get("token") == "Soldier Token"
+                and data.get("zone") == "graveyard"
                 for event, data in self.events
             )
         )

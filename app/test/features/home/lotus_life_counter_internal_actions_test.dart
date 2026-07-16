@@ -230,9 +230,7 @@ void main() {
             (message) =>
                 message.contains('message=native_day_night_opened') &&
                 message.contains('surface_strategy: native_fallback') &&
-                message.contains(
-                  'fallback_classification: ownership_bridge',
-                ),
+                message.contains('fallback_classification: ownership_bridge'),
           ),
           isTrue,
         );
@@ -281,9 +279,7 @@ void main() {
         expect(
           logs.any(
             (message) =>
-                message.contains(
-                  'message=native_fallback_surface_requested',
-                ) &&
+                message.contains('message=native_fallback_surface_requested') &&
                 message.contains('message_type: open-native-day-night') &&
                 message.contains('source: day_night_surface') &&
                 message.contains('used_default_source: true'),
@@ -414,15 +410,13 @@ void main() {
         await tester.pumpAndSettle();
 
         expect(find.text('Game Modes'), findsOneWidget);
-        expect(find.text('Selected Surface'), findsOneWidget);
+        expect(find.text('Selected'), findsOneWidget);
         expect(find.text('Continue With Planechase'), findsOneWidget);
 
         expect(
           logs.any(
             (message) =>
-                message.contains(
-                  'message=native_fallback_surface_requested',
-                ) &&
+                message.contains('message=native_fallback_surface_requested') &&
                 message.contains('message_type: open-native-game-modes') &&
                 message.contains('domain_key: game_modes') &&
                 message.contains('used_default_source: false') &&
@@ -430,9 +424,7 @@ void main() {
                   'fallback_classification: excluded_core_support',
                 ) &&
                 message.contains('review_status: excluded_from_core') &&
-                message.contains(
-                  'core_scope: excluded_from_canonical_core',
-                ),
+                message.contains('core_scope: excluded_from_canonical_core'),
           ),
           isTrue,
         );
@@ -459,9 +451,7 @@ void main() {
                 message.contains(
                   'fallback_classification: excluded_core_support',
                 ) &&
-                message.contains(
-                  'core_scope: excluded_from_canonical_core',
-                ),
+                message.contains('core_scope: excluded_from_canonical_core'),
           ),
           isTrue,
         );
@@ -473,9 +463,7 @@ void main() {
                 message.contains(
                   'fallback_classification: excluded_core_support',
                 ) &&
-                message.contains(
-                  'core_scope: excluded_from_canonical_core',
-                ) &&
+                message.contains('core_scope: excluded_from_canonical_core') &&
                 message.contains('action_delivered: true'),
           ),
           isTrue,
@@ -547,7 +535,7 @@ void main() {
         );
         await tester.pumpAndSettle();
 
-        expect(find.text('Continue To Embedded Card Pool'), findsOneWidget);
+        expect(find.text('Continue To Card Pool'), findsOneWidget);
 
         await tester.ensureVisible(
           find.byKey(
@@ -630,7 +618,7 @@ void main() {
         await tester.pumpAndSettle();
 
         expect(find.text('Card Pool Open'), findsOneWidget);
-        expect(find.text('Return To Embedded Card Pool'), findsOneWidget);
+        expect(find.text('Return To Card Pool'), findsOneWidget);
 
         await tester.ensureVisible(
           find.byKey(
@@ -790,9 +778,7 @@ void main() {
               (message) =>
                   message.contains('message=native_game_modes_action_failed') &&
                   message.contains('surface_strategy: native_fallback') &&
-                  message.contains(
-                    'core_scope: excluded_from_canonical_core',
-                  ),
+                  message.contains('core_scope: excluded_from_canonical_core'),
             ),
             isTrue,
           );

@@ -2,10 +2,10 @@
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:dotenv/dotenv.dart';
 import 'package:postgres/postgres.dart';
 
 import '../lib/basic_land_utils.dart' as land_utils;
+import '../lib/runtime_environment.dart';
 
 /// Pipeline de extração de features para Machine Learning.
 ///
@@ -27,8 +27,7 @@ import '../lib/basic_land_utils.dart' as land_utils;
 ///   - Funcional: removal_count, card_draw_count, ramp_count, board_wipe_count
 ///   - Meta: format, num_simulations
 void main(List<String> args) async {
-  final env = DotEnv(quiet: true)..load();
-  env.addAll(Platform.environment);
+  final env = loadRuntimeEnvironment();
 
   final outputFile = _getArg(args, 'output') ?? 'ml_training_data.csv';
   final minSims = int.tryParse(_getArg(args, 'min-simulations') ?? '') ?? 0;
@@ -38,21 +37,15 @@ void main(List<String> args) async {
   print('╚══════════════════════════════════════════════╝');
 
   // ── Conectar ao banco ──
-  final pool = Pool.withEndpoints(
-    [
-      Endpoint(
-        host: env['DB_HOST'] ?? 'localhost',
-        port: int.tryParse(env['DB_PORT'] ?? '') ?? 5432,
-        database: env['DB_NAME'] ?? 'mtg_db',
-        username: env['DB_USER'] ?? 'postgres',
-        password: env['DB_PASS'] ?? 'postgres',
-      ),
-    ],
-    settings: PoolSettings(
-      maxConnectionCount: 3,
-      sslMode: SslMode.disable,
+  final pool = Pool.withEndpoints([
+    Endpoint(
+      host: env['DB_HOST'] ?? 'localhost',
+      port: int.tryParse(env['DB_PORT'] ?? '') ?? 5432,
+      database: env['DB_NAME'] ?? 'mtg_db',
+      username: env['DB_USER'] ?? 'postgres',
+      password: env['DB_PASS'] ?? 'postgres',
     ),
-  );
+  ], settings: PoolSettings(maxConnectionCount: 3, sslMode: SslMode.disable));
 
   try {
     print('\n📡 Conectando ao banco...');
@@ -183,7 +176,9 @@ void main(List<String> args) async {
 
 /// Extrai features de composição do deck.
 Map<String, dynamic> _extractDeckFeatures(
-    List<ResultRow> cards, String format) {
+  List<ResultRow> cards,
+  String format,
+) {
   var totalCards = 0;
   var landCount = 0;
   var creatureCount = 0;
@@ -230,7 +225,7 @@ Map<String, dynamic> _extractDeckFeatures(
     'draw a card',
     'draw two',
     'draw three',
-    'draws a card'
+    'draws a card',
   ];
   const rampKeywords = [
     'add {',
@@ -344,7 +339,9 @@ Map<String, dynamic> _extractDeckFeatures(
 
 /// Extrai features das simulações goldfish (média).
 void _extractSimFeatures(
-    Map<String, dynamic> features, List<Map<String, dynamic>> sims) {
+  Map<String, dynamic> features,
+  List<Map<String, dynamic>> sims,
+) {
   double avgConsistency = 0;
   double avgScrew = 0;
   double avgFlood = 0;
@@ -408,13 +405,17 @@ String _generateCsv(List<Map<String, dynamic>> features) {
 
   // Rows
   for (final row in features) {
-    buf.writeln(row.values.map((v) {
-      if (v is String) {
-        // Escapa strings com aspas duplas
-        return '"${v.replaceAll('"', '""')}"';
-      }
-      return v.toString();
-    }).join(','));
+    buf.writeln(
+      row.values
+          .map((v) {
+            if (v is String) {
+              // Escapa strings com aspas duplas
+              return '"${v.replaceAll('"', '""')}"';
+            }
+            return v.toString();
+          })
+          .join(','),
+    );
   }
 
   return buf.toString();
@@ -433,21 +434,24 @@ void _printSummaryStats(List<Map<String, dynamic>> features) {
   print('   Formatos: $formats');
 
   // Média de cartas
-  final avgCards = features
+  final avgCards =
+      features
           .map((f) => (f['total_cards'] as num).toDouble())
           .reduce((a, b) => a + b) /
       features.length;
   print('   Média de cartas: ${avgCards.toStringAsFixed(1)}');
 
   // Média de cores
-  final avgColors = features
+  final avgColors =
+      features
           .map((f) => (f['num_colors'] as num).toDouble())
           .reduce((a, b) => a + b) /
       features.length;
   print('   Média de cores: ${avgColors.toStringAsFixed(1)}');
 
   // Média CMC
-  final avgCmc = features
+  final avgCmc =
+      features
           .map((f) => (f['avg_cmc'] as num).toDouble())
           .reduce((a, b) => a + b) /
       features.length;
@@ -459,9 +463,11 @@ void _printSummaryStats(List<Map<String, dynamic>> features) {
   print('   Com simulações: $withSim / ${features.length}');
 
   if (withSim > 0) {
-    final simsFeatures =
-        features.where((f) => (f['num_simulations'] as int) > 0);
-    final avgConsistency = simsFeatures
+    final simsFeatures = features.where(
+      (f) => (f['num_simulations'] as int) > 0,
+    );
+    final avgConsistency =
+        simsFeatures
             .map((f) => (f['sim_consistency_score'] as num).toDouble())
             .reduce((a, b) => a + b) /
         withSim;

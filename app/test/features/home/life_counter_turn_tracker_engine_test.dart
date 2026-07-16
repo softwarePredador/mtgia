@@ -24,24 +24,38 @@ void main() {
       expect(next.turnTimerSeconds, 0);
     });
 
-    test('starts a game from the next active player when requested seat is out', () {
-      final session = LifeCounterSession.initial(playerCount: 4).copyWith(
-        lives: const [40, 0, 40, 40],
-      );
+    test(
+      'starts a game from the next active player when requested seat is out',
+      () {
+        final session = LifeCounterSession.initial(playerCount: 4).copyWith(
+          lives: const [40, 0, 40, 40],
+          playerEliminationReasons: const [
+            LifeCounterPlayerEliminationReason.none,
+            LifeCounterPlayerEliminationReason.life,
+            LifeCounterPlayerEliminationReason.none,
+            LifeCounterPlayerEliminationReason.none,
+          ],
+        );
 
-      final next = LifeCounterTurnTrackerEngine.startGame(
-        session,
-        startingPlayerIndex: 1,
-      );
+        final next = LifeCounterTurnTrackerEngine.startGame(
+          session,
+          startingPlayerIndex: 1,
+        );
 
-      expect(next.turnTrackerActive, isTrue);
-      expect(next.firstPlayerIndex, 2);
-      expect(next.currentTurnPlayerIndex, 2);
-    });
+        expect(next.turnTrackerActive, isTrue);
+        expect(next.firstPlayerIndex, 2);
+        expect(next.currentTurnPlayerIndex, 2);
+      },
+    );
 
     test('does not start a tracked game when no active players remain', () {
       final session = LifeCounterSession.initial(playerCount: 4).copyWith(
         lives: const [0, 0, 0, 0],
+        playerEliminationReasons:
+            List<LifeCounterPlayerEliminationReason>.filled(
+              4,
+              LifeCounterPlayerEliminationReason.life,
+            ),
       );
 
       final next = LifeCounterTurnTrackerEngine.startGame(
@@ -98,7 +112,7 @@ void main() {
       expect(next.currentTurnNumber, 1);
     });
 
-    test('skips lethal players even before a manual special state is set', () {
+    test('skips players with canonical elimination reasons', () {
       final session = LifeCounterSession.initial(playerCount: 4).copyWith(
         firstPlayerIndex: 0,
         currentTurnPlayerIndex: 0,
@@ -106,6 +120,12 @@ void main() {
         turnTrackerActive: true,
         turnTrackerOngoingGame: true,
         lives: const [40, 0, 40, 40],
+        playerEliminationReasons: const [
+          LifeCounterPlayerEliminationReason.none,
+          LifeCounterPlayerEliminationReason.life,
+          LifeCounterPlayerEliminationReason.poison,
+          LifeCounterPlayerEliminationReason.none,
+        ],
         poison: const [0, 0, 10, 0],
       );
 
@@ -150,20 +170,29 @@ void main() {
       expect(previous.currentTurnNumber, 1);
     });
 
-    test('setStartingPlayer skips out players and picks the next active one', () {
-      final session = LifeCounterSession.initial(playerCount: 4).copyWith(
-        lives: const [40, 0, 40, 40],
-      );
+    test(
+      'setStartingPlayer skips out players and picks the next active one',
+      () {
+        final session = LifeCounterSession.initial(playerCount: 4).copyWith(
+          lives: const [40, 0, 40, 40],
+          playerEliminationReasons: const [
+            LifeCounterPlayerEliminationReason.none,
+            LifeCounterPlayerEliminationReason.life,
+            LifeCounterPlayerEliminationReason.none,
+            LifeCounterPlayerEliminationReason.none,
+          ],
+        );
 
-      final updated = LifeCounterTurnTrackerEngine.setStartingPlayer(
-        session,
-        playerIndex: 1,
-      );
+        final updated = LifeCounterTurnTrackerEngine.setStartingPlayer(
+          session,
+          playerIndex: 1,
+        );
 
-      expect(updated.turnTrackerActive, isTrue);
-      expect(updated.firstPlayerIndex, 2);
-      expect(updated.currentTurnPlayerIndex, 2);
-    });
+        expect(updated.turnTrackerActive, isTrue);
+        expect(updated.firstPlayerIndex, 2);
+        expect(updated.currentTurnPlayerIndex, 2);
+      },
+    );
 
     test('ticks timer only when tracker and timer are active', () {
       final session = LifeCounterSession.initial(playerCount: 4).copyWith(
@@ -194,33 +223,53 @@ void main() {
         turnTrackerActive: true,
         turnTrackerOngoingGame: true,
         lives: const [40, 0, 0, 40],
+        playerEliminationReasons: const [
+          LifeCounterPlayerEliminationReason.none,
+          LifeCounterPlayerEliminationReason.life,
+          LifeCounterPlayerEliminationReason.life,
+          LifeCounterPlayerEliminationReason.none,
+        ],
       );
 
-      final sanitized = LifeCounterTurnTrackerEngine
-          .sanitizeTrackerPointersForActivePlayers(session);
+      final sanitized =
+          LifeCounterTurnTrackerEngine.sanitizeTrackerPointersForActivePlayers(
+            session,
+          );
 
       expect(sanitized.firstPlayerIndex, 3);
       expect(sanitized.currentTurnPlayerIndex, 3);
       expect(sanitized.currentTurnNumber, 3);
     });
 
-    test('clears tracker pointers when no active players remain', () {
+    test('stops tracker when no active players remain', () {
       final session = LifeCounterSession.initial(playerCount: 4).copyWith(
         firstPlayerIndex: 2,
         currentTurnPlayerIndex: 2,
         currentTurnNumber: 5,
         turnTrackerActive: true,
         turnTrackerOngoingGame: true,
+        turnTimerActive: true,
+        turnTimerSeconds: 45,
         lives: const [0, 0, 0, 0],
+        playerEliminationReasons:
+            List<LifeCounterPlayerEliminationReason>.filled(
+              4,
+              LifeCounterPlayerEliminationReason.life,
+            ),
       );
 
-      final sanitized = LifeCounterTurnTrackerEngine
-          .sanitizeTrackerPointersForActivePlayers(session);
+      final sanitized =
+          LifeCounterTurnTrackerEngine.sanitizeTrackerPointersForActivePlayers(
+            session,
+          );
 
       expect(sanitized.firstPlayerIndex, isNull);
       expect(sanitized.currentTurnPlayerIndex, isNull);
-      expect(sanitized.turnTrackerActive, isTrue);
-      expect(sanitized.currentTurnNumber, 5);
+      expect(sanitized.turnTrackerActive, isFalse);
+      expect(sanitized.turnTrackerOngoingGame, isFalse);
+      expect(sanitized.turnTimerActive, isFalse);
+      expect(sanitized.turnTimerSeconds, 0);
+      expect(sanitized.currentTurnNumber, 1);
     });
 
     test('stops game and clears active turn pointers', () {

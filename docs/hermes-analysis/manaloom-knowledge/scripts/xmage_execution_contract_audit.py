@@ -13,6 +13,7 @@ REPO_ROOT = Path(__file__).resolve().parents[4]
 SIDECAR = REPO_ROOT / "services/xmage-sidecar"
 FORGE_SIDECAR = REPO_ROOT / "services/forge-sidecar"
 SERVER = REPO_ROOT / "server"
+BATTLE_REQUEST_SUPPORT = SERVER / "lib/ai/battle_simulation_request_support.dart"
 CONTRACT = REPO_ROOT / "docs/hermes-analysis/EXTERNAL_BATTLE_EXECUTION_CONTRACT.md"
 CLOSURE = REPO_ROOT / "docs/hermes-analysis/GLOBAL_BATTLE_RULES_AND_LEARNING_CLOSURE_2026-07-15.md"
 RULE_SYNC = REPO_ROOT / "docs/hermes-analysis/manaloom-knowledge/scripts/sync_battle_card_rules_pg.py"
@@ -342,8 +343,6 @@ def build_report() -> dict[str, object]:
                 "requiredRuleCards: _allDeckCardRows(externalRequest)",
                 "_isNaturalBattleResult(data, result)",
                 "return _externalEngineFailure(",
-                "_publicBattleDefaultTimeoutMs = 40000",
-                "_publicBattleMaximumTimeoutMs = 40000",
                 "_externalClientGraceMs = 8000",
                 "upstreamStatusCode == HttpStatus.gatewayTimeout",
                 "'${engine}_timeout'",
@@ -351,6 +350,18 @@ def build_report() -> dict[str, object]:
                 "turns_played",
                 "_simulationMetrics",
                 "buildBattleLearningEvidence(",
+            ],
+        ),
+        source_check(
+            "server.public_battle_request_bounds",
+            BATTLE_REQUEST_SUPPORT,
+            [
+                "parseBattleSimulationRequest",
+                "body['timeout_ms']",
+                "defaultValue: 40000",
+                "min: 1000",
+                "max: 40000",
+                "return value.clamp(min, max)",
             ],
         ),
         source_absence_check(

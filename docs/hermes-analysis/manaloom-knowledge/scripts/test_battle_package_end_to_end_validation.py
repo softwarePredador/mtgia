@@ -5751,7 +5751,7 @@ def test_simple_activated_destroy_runner_executes_token_target_constraint() -> N
     )
 
 
-def test_destroyed_token_observes_dies_before_ceasing_to_exist() -> None:
+def test_destroyed_token_ceases_before_dies_trigger_resolution() -> None:
     battle = validator.load_battle(validator.DEFAULT_BATTLE)
     events = []
     previous_handler = battle.REPLAY_EVENT_HANDLER
@@ -5796,6 +5796,117 @@ def test_destroyed_token_observes_dies_before_ceasing_to_exist() -> None:
         and data.get("zone") == "graveyard"
         for event, data in events
     )
+    moved_event_index = next(
+        index
+        for index, (event, data) in enumerate(events)
+        if event == "permanent_moved_from_battlefield" and data.get("card") == "Dies Trigger Token"
+    )
+    dies_event_index = next(
+        index
+        for index, (event, data) in enumerate(events)
+        if event == "dies_draw_resolved" and data.get("card") == "Dies Trigger Token"
+    )
+    ceased_event_index = next(
+        index
+        for index, (event, data) in enumerate(events)
+        if event == "token_ceased_to_exist" and data.get("token") == "Dies Trigger Token"
+    )
+    assert moved_event_index < ceased_event_index < dies_event_index
+
+
+def test_token_zone_transitions_return_real_destination_without_persisting_token() -> None:
+    battle = validator.load_battle(validator.DEFAULT_BATTLE)
+    events = []
+    previous_handler = battle.REPLAY_EVENT_HANDLER
+    battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+    owner = battle.Player("Token Owner", None, [])
+    source = {"name": "Token Transition Fixture"}
+
+    transitions = [
+        (
+            "hand",
+            {"name": "Hand Token", "type_line": "Creature - Spirit", "is_token": True},
+            lambda token: battle.move_permanent_from_battlefield_to_hand(
+                owner,
+                token,
+                reason="return_to_hand",
+                source=source,
+                turn=4,
+            ),
+        ),
+        (
+            "library_bottom",
+            {"name": "Library Token", "type_line": "Creature - Spirit", "tag": "token"},
+            lambda token: battle.move_permanent_from_battlefield_to_library(
+                owner,
+                token,
+                destination="library_bottom",
+                reason="put_on_library_bottom",
+                source=source,
+                turn=4,
+            ),
+        ),
+        (
+            "exile",
+            {"name": "Exile Token", "type_line": "Token Artifact - Treasure"},
+            lambda token: battle.move_permanent_from_battlefield_to_exile(
+                owner,
+                token,
+                reason="exile",
+                source=source,
+                turn=4,
+            ),
+        ),
+    ]
+
+    try:
+        for expected_destination, token_data, transition in transitions:
+            token = battle.enrich_card(dict(token_data))
+            owner.battlefield = [token]
+            destination = transition(token)
+
+            assert destination == expected_destination
+            assert token not in owner.battlefield
+            assert token not in owner.hand
+            assert token not in owner.library
+            assert token not in owner.exile
+            assert token not in owner.graveyard
+            assert any(
+                event == "token_ceased_to_exist"
+                and data.get("token") == token.get("name")
+                and data.get("zone") == expected_destination
+                and data.get("result") == "ceased_to_exist"
+                for event, data in events
+            )
+
+        legacy_token = battle.enrich_card(
+            {"name": "Legacy Command Token", "type_line": "Creature - Spirit", "token": True}
+        )
+        owner.command_zone = [legacy_token]
+        assert battle.check_token_lifecycle([owner]) is True
+        assert legacy_token not in owner.command_zone
+        assert any(
+            event == "token_ceased_to_exist"
+            and data.get("token") == "Legacy Command Token"
+            and data.get("zone") == "command_zone"
+            and data.get("reason") == "state_based_action"
+            for event, data in events
+        )
+    finally:
+        battle.REPLAY_EVENT_HANDLER = previous_handler
+
+
+def test_permanent_sacrifice_cost_cannot_be_paid_twice() -> None:
+    battle = validator.load_battle(validator.DEFAULT_BATTLE)
+    owner = battle.Player("Sacrifice Owner", None, [])
+    permanent = battle.enrich_card(
+        {"name": "Single Use Artifact", "type_line": "Artifact", "effect": "artifact"}
+    )
+    owner.battlefield = [permanent]
+
+    assert battle.sacrifice_permanent_for_activation(owner, permanent, 4) is True
+    assert battle.sacrifice_permanent_for_activation(owner, permanent, 4) is False
+    assert owner.graveyard.count(permanent) == 1
 
 
 def test_simple_activated_destroy_runner_executes_sacrifice_target_cost() -> None:

@@ -1,9 +1,19 @@
 import 'package:postgres/postgres.dart';
 
+import 'ai_telemetry_contract.dart';
+
 class CommercialMetricsService {
   const CommercialMetricsService(this.pool);
 
   final Pool pool;
+
+  static const providerTelemetrySqlPredicate = aiProviderTelemetrySqlPredicate;
+
+  static bool isProviderTelemetryEndpoint(String endpoint) =>
+      isAiProviderTelemetryEndpoint(endpoint);
+
+  static bool isPlanActionTelemetryEndpoint(String endpoint) =>
+      isAiPlanActionTelemetryEndpoint(endpoint);
 
   Future<Map<String, dynamic>> snapshot({int days = 30}) async {
     final safeDays = normalizeWindowDays(days);
@@ -36,6 +46,8 @@ class CommercialMetricsService {
           hasAiLogs
               ? await aiPerformanceHistory(days: safeDays, bucket: 'day')
               : _missing('ai_logs'),
+      'ai_action_usage':
+          hasAiLogs ? await _aiActionUsage(safeDays) : _missing('ai_logs'),
       'plan_mix': plans,
       'shareable_reports': reports,
       'retention': retention,
@@ -72,7 +84,10 @@ class CommercialMetricsService {
       Sql.named('''
         SELECT
           date_trunc('$normalizedBucket', created_at) AS period_start,
-          endpoint,
+          CASE
+            WHEN endpoint LIKE 'provider:%' THEN endpoint
+            ELSE 'provider:' || endpoint
+          END AS endpoint,
           COUNT(*)::int AS request_count,
           SUM(CASE WHEN success THEN 0 ELSE 1 END)::int AS error_count,
           ROUND(AVG(latency_ms))::int AS avg_latency_ms,
@@ -84,7 +99,13 @@ class CommercialMetricsService {
           COALESCE(SUM(COALESCE(output_tokens, 0)), 0)::int AS output_tokens
         FROM ai_logs
         WHERE created_at >= NOW() - (@days * INTERVAL '1 day')
-        GROUP BY period_start, endpoint
+          AND $providerTelemetrySqlPredicate
+        GROUP BY
+          period_start,
+          CASE
+            WHEN endpoint LIKE 'provider:%' THEN endpoint
+            ELSE 'provider:' || endpoint
+          END
         ORDER BY period_start ASC, endpoint ASC
       '''),
       parameters: {'days': safeDays},
@@ -207,7 +228,10 @@ class CommercialMetricsService {
     final result = await pool.execute(
       Sql.named('''
         SELECT
-          endpoint,
+          CASE
+            WHEN endpoint LIKE 'provider:%' THEN endpoint
+            ELSE 'provider:' || endpoint
+          END AS endpoint,
           COUNT(*)::int AS request_count,
           SUM(CASE WHEN success THEN 0 ELSE 1 END)::int AS error_count,
           ROUND(AVG(latency_ms))::int AS avg_latency_ms,
@@ -219,7 +243,12 @@ class CommercialMetricsService {
           COALESCE(SUM(COALESCE(output_tokens, 0)), 0)::int AS output_tokens
         FROM ai_logs
         WHERE created_at >= NOW() - (@days * INTERVAL '1 day')
-        GROUP BY endpoint
+          AND $providerTelemetrySqlPredicate
+        GROUP BY
+          CASE
+            WHEN endpoint LIKE 'provider:%' THEN endpoint
+            ELSE 'provider:' || endpoint
+          END
         ORDER BY request_count DESC, endpoint ASC
       '''),
       parameters: {'days': days},
@@ -258,6 +287,51 @@ class CommercialMetricsService {
           totalRequests > 0 ? _ratio(totalErrors, totalRequests) : 0.0,
       'total_tokens': totalTokens,
       'endpoints': endpoints,
+    };
+  }
+
+  Future<Map<String, dynamic>> _aiActionUsage(int days) async {
+    final completedResult = await pool.execute(
+      Sql.named('''
+        SELECT
+          SUBSTRING(endpoint FROM 6) AS action,
+          COUNT(*)::int AS completed_count
+        FROM ai_logs
+        WHERE created_at >= NOW() - (@days * INTERVAL '1 day')
+          AND endpoint LIKE 'plan:%'
+          AND success = TRUE
+        GROUP BY action
+        ORDER BY completed_count DESC, action ASC
+      '''),
+      parameters: {'days': days},
+    );
+    final reservationResult = await pool.execute(
+      Sql.named('''
+      SELECT COUNT(*)::int
+      FROM ai_logs
+      WHERE endpoint LIKE 'plan-reservation:%'
+        AND success = FALSE
+        AND created_at >= NOW() - INTERVAL '10 minutes'
+    '''),
+    );
+
+    var completedActionCount = 0;
+    final actions = <Map<String, dynamic>>[];
+    for (final row in completedResult) {
+      final count = (row[1] as int?) ?? 0;
+      completedActionCount += count;
+      actions.add({'action': row[0]?.toString() ?? 'unknown', 'count': count});
+    }
+
+    return {
+      'status': 'ok',
+      'window_days': days,
+      'completed_action_count': completedActionCount,
+      'active_reservation_count':
+          reservationResult.isEmpty
+              ? 0
+              : ((reservationResult.first[0] as int?) ?? 0),
+      'actions': actions,
     };
   }
 

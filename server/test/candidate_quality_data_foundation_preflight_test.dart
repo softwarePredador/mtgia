@@ -1,11 +1,93 @@
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:crypto/crypto.dart';
+import 'package:server/ai/optimize_rejection_history_support.dart';
 import 'package:test/test.dart';
 
 import '../bin/candidate_quality_data_foundation.dart' as foundation;
 
 void main() {
+  group('explicit optimize rejection evidence', () {
+    test('accepts only explicit product quality rejections', () {
+      expect(
+        isExplicitOptimizeQualityRejection(const {
+          'status_code': 422,
+          'quality_error_code': 'OPTIMIZE_QUALITY_REJECTED',
+        }),
+        isTrue,
+      );
+      expect(
+        isExplicitOptimizeQualityRejection(const {'status_code': 200}),
+        isFalse,
+      );
+      expect(isExplicitOptimizeQualityRejection(const {}), isFalse);
+      expect(
+        isExplicitOptimizeQualityRejection(const {
+          'status_code': 422,
+          'quality_error_code': 'OPTIMIZE_QUALITY_REJECTED',
+          'validation_run_token': 'validation_1',
+        }),
+        isFalse,
+      );
+      expect(
+        isExplicitOptimizeQualityRejection(const {
+          'status_code': 500,
+          'quality_error_code': 'OPTIMIZE_EXECUTION_FAILED',
+        }),
+        isFalse,
+      );
+    });
+
+    test('shared SQL predicate is strict and alias-safe', () {
+      final sql = explicitOptimizeQualityRejectionSql('oal');
+      expect(sql, contains("status_code' <> '200"));
+      expect(sql, contains("? 'validation_run_token'"));
+      expect(sql, contains('OPTIMIZE_QUALITY_REJECTED'));
+      expect(
+        () => explicitOptimizeQualityRejectionSql('oal; drop table cards'),
+        throwsArgumentError,
+      );
+    });
+
+    test('foundation prunes an authoritative empty penalty plan', () {
+      final source =
+          File('bin/candidate_quality_data_foundation.dart').readAsStringSync();
+      final staleStart = source.indexOf(
+        'Future<List<Map<String, dynamic>>> _loadStaleRejectionPenalties',
+      );
+      final staleEnd = source.indexOf(
+        'Future<int> _pruneStaleFunctionTags',
+        staleStart,
+      );
+      final pruneStart = source.indexOf(
+        'Future<int> _pruneStaleRejectionPenalties',
+      );
+      final pruneEnd = source.indexOf(
+        'Iterable<List<Map<String, dynamic>>> _batches',
+        pruneStart,
+      );
+      expect(staleStart, greaterThanOrEqualTo(0));
+      expect(staleEnd, greaterThan(staleStart));
+      expect(pruneStart, greaterThanOrEqualTo(0));
+      expect(pruneEnd, greaterThan(pruneStart));
+      expect(
+        source.substring(staleStart, staleEnd),
+        isNot(contains('rows.isEmpty')),
+      );
+      expect(
+        source.substring(pruneStart, pruneEnd),
+        isNot(contains('rows.isEmpty')),
+      );
+      expect(
+        source,
+        contains('refusing to interpret a missing source as an empty'),
+      );
+      expect(source, contains('SET LOCAL max_parallel_workers_per_gather = 0'));
+      expect(source, contains('_loadStaleGeneratedRowsSnapshot('));
+    });
+  });
+
   test('rejection penalties aggregate normalized keys deterministically', () {
     final raw = <Map<String, dynamic>>[
       {
@@ -40,8 +122,9 @@ void main() {
       },
     ];
 
-    final forward =
-        foundation.aggregateCandidateQualityRejectionPenaltyRows(raw);
+    final forward = foundation.aggregateCandidateQualityRejectionPenaltyRows(
+      raw,
+    );
     final reversed = foundation.aggregateCandidateQualityRejectionPenaltyRows(
       raw.reversed,
     );

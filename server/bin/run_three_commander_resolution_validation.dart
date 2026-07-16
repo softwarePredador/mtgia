@@ -4,15 +4,16 @@
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:dotenv/dotenv.dart';
 import 'package:http/http.dart' as http;
 import 'package:postgres/postgres.dart';
 
 import '../lib/ai/deck_state_analysis.dart';
 import '../lib/database.dart';
+import '../lib/runtime_environment.dart';
 
 const _defaultApiBaseUrl = 'http://127.0.0.1:8080';
 const _postgresWriteApprovalEnvironment = 'MANALOOM_CONFIRM_POSTGRES_WRITES';
+const _deferCleanupToHarnessEnvironment = 'VALIDATION_DEFER_CLEANUP_TO_HARNESS';
 const _explicitApprovalPhrase = 'I_HAVE_EXPLICIT_APPROVAL';
 late final String _artifactDirPath;
 late final String _summaryJsonPath;
@@ -630,7 +631,7 @@ Map<String, int> _runtimeOriginCounts(List<ResolutionRunResult> results) {
 }
 
 Future<void> main() async {
-  final env = DotEnv(includePlatformEnvironment: true, quiet: true)..load();
+  final env = loadRuntimeEnvironment();
   final apiBaseUrl = env['TEST_API_BASE_URL'] ?? _defaultApiBaseUrl;
   _artifactDirPath =
       env['VALIDATION_ARTIFACT_DIR'] ??
@@ -658,6 +659,9 @@ Future<void> main() async {
     'true',
     'yes',
   }.contains((env['VALIDATION_PREFLIGHT_ONLY'] ?? '').trim().toLowerCase());
+  final deferCleanupToHarness = const {'1', 'true', 'yes'}.contains(
+    (env[_deferCleanupToHarnessEnvironment] ?? '').trim().toLowerCase(),
+  );
 
   final db = Database();
   await db.connect();
@@ -669,6 +673,7 @@ Future<void> main() async {
 
   final pool = db.connection;
   ValidationIdentity? cleanupIdentity;
+  DateTime? cleanupRunStartedAt;
   var cleanupRequired = false;
 
   try {
@@ -719,10 +724,16 @@ Future<void> main() async {
       return;
     }
 
-    final serverOk = await _ensureServerIsReachable(apiBaseUrl);
+    final serverOk = await _ensureServerIsReachable(
+      apiBaseUrl,
+      requireIsolatedRuntime: true,
+    );
     if (!serverOk) {
-      stderr.writeln('Servidor inacessivel em $apiBaseUrl.');
-      exitCode = 1;
+      stderr.writeln(
+        'BLOCKED: servidor local indisponivel ou sem isolamento E2E '
+        'confirmado em $apiBaseUrl.',
+      );
+      exitCode = 2;
       return;
     }
 
@@ -734,6 +745,7 @@ Future<void> main() async {
     final validationIdentity = _resolveValidationIdentity();
     await _assertValidationIdentityIsUnused(pool, validationIdentity);
     cleanupIdentity = validationIdentity;
+    cleanupRunStartedAt = DateTime.now().toUtc();
     cleanupRequired = true;
     final authSession = await _registerValidationUser(
       apiBaseUrl,
@@ -772,6 +784,8 @@ Future<void> main() async {
       'run_started_at': runStartedAt,
       'api_base_url': apiBaseUrl,
       'artifact_dir': _artifactDirPath,
+      'cleanup_owner': deferCleanupToHarness ? 'harness' : 'runner',
+      'e2e_isolated_runtime': true,
       'selection_mode': usingCorpus ? 'corpus' : _selectionMode,
       if (usingCorpus) 'corpus_offset': _validationCorpusOffset,
       if (_corpusPath != null) 'corpus_path': _corpusPath,
@@ -883,7 +897,24 @@ Future<void> main() async {
   } finally {
     try {
       if (cleanupRequired && cleanupIdentity != null) {
-        await _cleanupValidationUser(pool, cleanupIdentity);
+        if (deferCleanupToHarness) {
+          print(
+            'Cleanup da sessao de validacao delegado ao harness transacional.',
+          );
+        } else {
+          final startedAt = cleanupRunStartedAt;
+          if (startedAt == null) {
+            throw StateError(
+              'Cleanup da validacao sem timestamp de ownership.',
+            );
+          }
+          await _cleanupValidationUser(
+            pool,
+            cleanupIdentity,
+            runStartedAt: startedAt,
+            validationRunToken: _validationRunToken,
+          );
+        }
       }
     } finally {
       await db.close();
@@ -1122,7 +1153,8 @@ Future<ResolutionRunResult> _runResolutionForDeck({
         'persisted_signature_confirmed': optimizePersistedDeckConfirmed,
       },
       'provider_evidence': {
-        'query_scope': 'ai_logs deck_id + endpoint optimize + run window',
+        'query_scope':
+            'ai_logs deck_id + endpoint provider:optimize + run window',
         'call_count': providerCalls.length,
         'successful_calls': providerCalls.where((call) => call.success).length,
         'calls': providerCalls.map((call) => call.toJson()).toList(),
@@ -1279,7 +1311,10 @@ Future<ResolutionRunResult> _runResolutionForDeck({
   );
 }
 
-Future<bool> _ensureServerIsReachable(String apiBaseUrl) async {
+Future<bool> _ensureServerIsReachable(
+  String apiBaseUrl, {
+  bool requireIsolatedRuntime = false,
+}) async {
   final baseUri = Uri.tryParse(apiBaseUrl);
   if (baseUri == null ||
       baseUri.scheme != 'http' ||
@@ -1299,7 +1334,8 @@ Future<bool> _ensureServerIsReachable(String apiBaseUrl) async {
     final payload = jsonDecode(response.body);
     return payload is Map &&
         payload['status'] == 'ready' &&
-        payload['service'] == 'mtgia-server';
+        payload['service'] == 'mtgia-server' &&
+        (!requireIsolatedRuntime || payload['e2e_isolated_runtime'] == true);
   } catch (_) {
     return false;
   }
@@ -1384,18 +1420,303 @@ Future<ValidationAuthSession> _registerValidationUser(
 
 Future<void> _cleanupValidationUser(
   Pool pool,
-  ValidationIdentity identity,
-) async {
-  final result = await pool.execute(
-    Sql.named('''
-      DELETE FROM users
-      WHERE LOWER(email) = @email AND LOWER(username) = @username
-    '''),
-    parameters: {'email': identity.email, 'username': identity.username},
-  );
-  print(
-    'Cleanup da sessao de validacao: ${result.affectedRows} usuario(s) removido(s).',
-  );
+  ValidationIdentity identity, {
+  required DateTime runStartedAt,
+  required String validationRunToken,
+}) async {
+  final deleted = await pool.runTx((session) async {
+    await session.execute(
+      Sql.named('''
+        CREATE TEMP TABLE manaloom_runner_validation_user_ids
+        ON COMMIT DROP AS
+        SELECT id
+        FROM users
+        WHERE LOWER(email) = LOWER(@email)
+          AND LOWER(username) = LOWER(@username)
+      '''),
+      parameters: {'email': identity.email, 'username': identity.username},
+    );
+    await session.execute('''
+      CREATE TEMP TABLE manaloom_runner_validation_deck_ids
+      ON COMMIT DROP AS
+      SELECT id
+      FROM decks
+      WHERE user_id IN (
+        SELECT id FROM manaloom_runner_validation_user_ids
+      )
+    ''');
+
+    final counts = <String, int>{};
+    counts['ai_logs'] =
+        (await session.execute(
+          Sql.named('''
+            DELETE FROM ai_logs
+            WHERE created_at >= @run_started_at
+              AND (
+                user_id IN (
+                  SELECT id FROM manaloom_runner_validation_user_ids
+                )
+                OR deck_id IN (
+                  SELECT id FROM manaloom_runner_validation_deck_ids
+                )
+              )
+          '''),
+          parameters: {'run_started_at': runStartedAt},
+        )).affectedRows;
+    counts['ai_optimize_cache'] =
+        (await session.execute(
+          Sql.named('''
+            DELETE FROM ai_optimize_cache
+            WHERE created_at >= @run_started_at
+              AND (
+                user_id IN (
+                  SELECT id FROM manaloom_runner_validation_user_ids
+                )
+                OR deck_id IN (
+                  SELECT id FROM manaloom_runner_validation_deck_ids
+                )
+              )
+          '''),
+          parameters: {'run_started_at': runStartedAt},
+        )).affectedRows;
+    counts['ai_optimize_fallback_telemetry'] =
+        (await session.execute(
+          Sql.named('''
+            DELETE FROM ai_optimize_fallback_telemetry
+            WHERE created_at >= @run_started_at
+              AND (
+                user_id IN (
+                  SELECT id FROM manaloom_runner_validation_user_ids
+                )
+                OR deck_id IN (
+                  SELECT id FROM manaloom_runner_validation_deck_ids
+                )
+              )
+          '''),
+          parameters: {'run_started_at': runStartedAt},
+        )).affectedRows;
+    counts['ml_prompt_feedback'] =
+        (await session.execute(
+          Sql.named('''
+            DELETE FROM ml_prompt_feedback
+            WHERE created_at >= @run_started_at
+              AND (
+                user_id IN (
+                  SELECT id FROM manaloom_runner_validation_user_ids
+                )
+                OR deck_id IN (
+                  SELECT id FROM manaloom_runner_validation_deck_ids
+                )
+              )
+          '''),
+          parameters: {'run_started_at': runStartedAt},
+        )).affectedRows;
+    counts['optimization_analysis_logs'] =
+        (await session.execute(
+          Sql.named('''
+            DELETE FROM optimization_analysis_logs
+            WHERE created_at >= @run_started_at
+              AND (
+                decisions_reasoning->>'validation_run_token' = @run_token
+                OR decisions_reasoning->>'deck_id' IN (
+                  SELECT id::text
+                  FROM manaloom_runner_validation_deck_ids
+                )
+                OR decisions_reasoning->>'user_id' IN (
+                  SELECT id::text
+                  FROM manaloom_runner_validation_user_ids
+                )
+              )
+          '''),
+          parameters: {
+            'run_started_at': runStartedAt,
+            'run_token': validationRunToken,
+          },
+        )).affectedRows;
+    counts['rate_limit_events'] =
+        (await session.execute(
+          Sql.named('''
+            DELETE FROM rate_limit_events
+            WHERE created_at >= @run_started_at
+              AND identifier IN (
+                SELECT id::text FROM manaloom_runner_validation_user_ids
+              )
+          '''),
+          parameters: {'run_started_at': runStartedAt},
+        )).affectedRows;
+    counts['deck_learning_events'] =
+        (await session.execute(
+          Sql.named('''
+            DELETE FROM deck_learning_events
+            WHERE created_at >= @run_started_at
+              AND deck_id IN (
+                SELECT id FROM manaloom_runner_validation_deck_ids
+              )
+          '''),
+          parameters: {'run_started_at': runStartedAt},
+        )).affectedRows;
+    counts['ai_optimize_jobs'] =
+        (await session.execute(
+          Sql.named('''
+            DELETE FROM ai_optimize_jobs
+            WHERE created_at >= @run_started_at
+              AND deck_id IN (
+                SELECT id FROM manaloom_runner_validation_deck_ids
+              )
+          '''),
+          parameters: {'run_started_at': runStartedAt},
+        )).affectedRows;
+
+    final telemetryRemaining = await session.execute(
+      Sql.named('''
+        SELECT
+          (
+            SELECT COUNT(*)::int
+            FROM ai_logs
+            WHERE created_at >= @run_started_at
+              AND (
+                user_id IN (
+                  SELECT id FROM manaloom_runner_validation_user_ids
+                )
+                OR deck_id IN (
+                  SELECT id FROM manaloom_runner_validation_deck_ids
+                )
+              )
+          ),
+          (
+            SELECT COUNT(*)::int
+            FROM ai_optimize_cache
+            WHERE created_at >= @run_started_at
+              AND (
+                user_id IN (
+                  SELECT id FROM manaloom_runner_validation_user_ids
+                )
+                OR deck_id IN (
+                  SELECT id FROM manaloom_runner_validation_deck_ids
+                )
+              )
+          ),
+          (
+            SELECT COUNT(*)::int
+            FROM ai_optimize_fallback_telemetry
+            WHERE created_at >= @run_started_at
+              AND (
+                user_id IN (
+                  SELECT id FROM manaloom_runner_validation_user_ids
+                )
+                OR deck_id IN (
+                  SELECT id FROM manaloom_runner_validation_deck_ids
+                )
+              )
+          ),
+          (
+            SELECT COUNT(*)::int
+            FROM ml_prompt_feedback
+            WHERE created_at >= @run_started_at
+              AND (
+                user_id IN (
+                  SELECT id FROM manaloom_runner_validation_user_ids
+                )
+                OR deck_id IN (
+                  SELECT id FROM manaloom_runner_validation_deck_ids
+                )
+              )
+          ),
+          (
+            SELECT COUNT(*)::int
+            FROM optimization_analysis_logs
+            WHERE created_at >= @run_started_at
+              AND (
+                decisions_reasoning->>'validation_run_token' = @run_token
+                OR decisions_reasoning->>'deck_id' IN (
+                  SELECT id::text
+                  FROM manaloom_runner_validation_deck_ids
+                )
+                OR decisions_reasoning->>'user_id' IN (
+                  SELECT id::text
+                  FROM manaloom_runner_validation_user_ids
+                )
+              )
+          ),
+          (
+            SELECT COUNT(*)::int
+            FROM rate_limit_events
+            WHERE created_at >= @run_started_at
+              AND identifier IN (
+                SELECT id::text FROM manaloom_runner_validation_user_ids
+              )
+          ),
+          (
+            SELECT COUNT(*)::int
+            FROM deck_learning_events
+            WHERE created_at >= @run_started_at
+              AND deck_id IN (
+                SELECT id FROM manaloom_runner_validation_deck_ids
+              )
+          ),
+          (
+            SELECT COUNT(*)::int
+            FROM ai_optimize_jobs
+            WHERE created_at >= @run_started_at
+              AND deck_id IN (
+                SELECT id FROM manaloom_runner_validation_deck_ids
+              )
+          )
+      '''),
+      parameters: {
+        'run_started_at': runStartedAt,
+        'run_token': validationRunToken,
+      },
+    );
+    final telemetryRow = telemetryRemaining.single;
+    final remainingCounts = <int>[
+      for (var index = 0; index < 8; index += 1)
+        (telemetryRow[index] as int?) ?? 0,
+    ];
+    if (remainingCounts.any((count) => count != 0)) {
+      throw StateError(
+        'Cleanup transacional deixou telemetria de validacao: '
+        '$remainingCounts',
+      );
+    }
+
+    counts['users'] =
+        (await session.execute(
+          Sql.named('''
+            DELETE FROM users
+            WHERE LOWER(email) = LOWER(@email)
+              AND LOWER(username) = LOWER(@username)
+          '''),
+          parameters: {'email': identity.email, 'username': identity.username},
+        )).affectedRows;
+
+    final identityRemaining = await session.execute('''
+      SELECT
+        (
+          SELECT COUNT(*)::int
+          FROM users
+          WHERE id IN (SELECT id FROM manaloom_runner_validation_user_ids)
+        ),
+        (
+          SELECT COUNT(*)::int
+          FROM decks
+          WHERE id IN (SELECT id FROM manaloom_runner_validation_deck_ids)
+        )
+    ''');
+    final identityRow = identityRemaining.single;
+    final identityCounts = <int>[
+      (identityRow[0] as int?) ?? 0,
+      (identityRow[1] as int?) ?? 0,
+    ];
+    if (identityCounts.any((count) => count != 0)) {
+      throw StateError(
+        'Cleanup transacional deixou identidade/decks de validacao: '
+        '$identityCounts',
+      );
+    }
+    return counts;
+  });
+  print('Cleanup transacional da validacao: ${jsonEncode(deleted)}.');
 }
 
 Future<List<SourceDeckCandidate>> _loadSourceCandidates(
@@ -1561,7 +1882,7 @@ Future<List<ProviderCallEvidence>> _loadProviderCallEvidence(
         created_at
       FROM ai_logs
       WHERE deck_id = @deckId::uuid
-        AND endpoint = 'optimize'
+        AND endpoint = 'provider:optimize'
         AND created_at >= @startedAt
       ORDER BY created_at ASC, id ASC
     '''),
@@ -1853,6 +2174,16 @@ Future<String> _createDeckClone({
   }
 
   final body = _decodeJson(response);
+  final e2eValidation =
+      body['e2e_validation'] is Map
+          ? (body['e2e_validation'] as Map).cast<String, dynamic>()
+          : const <String, dynamic>{};
+  if (e2eValidation['isolated_runtime'] != true ||
+      e2eValidation['product_learning_writes_suppressed'] != true) {
+    throw StateError(
+      'Clone criado sem prova de supressao do aprendizado do produto.',
+    );
+  }
   final deckId =
       body['id']?.toString() ?? (body['deck']?['id']?.toString() ?? '');
   if (deckId.isEmpty) {

@@ -4,6 +4,23 @@
 import copy
 
 
+def is_token_object(card):
+    """Return whether an engine object represents a token.
+
+    Historical producers used four different markers.  Zone-transition code
+    must recognize all of them so a token can never become a persistent card
+    merely because it came from a different runtime adapter.
+    """
+    if not isinstance(card, dict):
+        return False
+    return bool(
+        card.get("is_token")
+        or card.get("token")
+        or str(card.get("tag") or "").strip().lower() == "token"
+        or "token" in str(card.get("type_line") or "").lower()
+    )
+
+
 def finish_countered_spell(player, card, *, move_to_exile_func):
     """Move a countered spell to the correct zone object."""
     if isinstance(card, dict) and card.get("is_copy"):
@@ -110,6 +127,12 @@ def _resolve_zone_object(zone, zone_object):
     for candidate in zone:
         if candidate == zone_object:
             return candidate
+    if (
+        isinstance(zone_object, dict)
+        and zone_object.get("_last_zone") == "battlefield"
+        and bool(zone_object.get("_zone_id"))
+    ):
+        return zone_object
     if isinstance(zone_object, dict):
         target_name = zone_object.get("name") or zone_object.get("card_name")
         if target_name:
@@ -153,6 +176,8 @@ def move_permanent_from_battlefield(
         return "none"
 
     permanent = _resolve_zone_object(owner.battlefield, permanent)
+    if not _remove_zone_object(owner.battlefield, permanent):
+        return "none"
     permanent["_lki_snapshot"] = {
         "name": permanent.get("name", permanent.get("card_name", "")),
         "power": permanent.get("power", 0),
@@ -164,7 +189,6 @@ def move_permanent_from_battlefield(
     }
     permanent["_zone_id"] = permanent.get("_zone_id", 0) + 1
     permanent["_last_zone"] = "battlefield"
-    _remove_zone_object(owner.battlefield, permanent)
     if permanent.get("is_commander"):
         event = replacement_registry.process_event(
             replacement_event_cls(
@@ -180,14 +204,8 @@ def move_permanent_from_battlefield(
         if event.to_zone == "command_zone":
             owner.command_zone.append(permanent)
             return "command_zone"
-    if (
-        permanent.get("is_token")
-        or permanent.get("token")
-        or permanent.get("tag") == "token"
-        or "token" in str(permanent.get("type_line") or "").lower()
-    ):
-        return "vanished_token"
-    owner.graveyard.append(permanent)
+    if not is_token_object(permanent):
+        owner.graveyard.append(permanent)
     return "graveyard"
 
 

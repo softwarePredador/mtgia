@@ -3,7 +3,7 @@
 > Fonte de verdade de prioridade do `mtgia`. O método de validação e conclusão
 > fica em `docs/MANALOOM_E2E_RELEASE_CONTRACT.md`.
 
-## Estado operacional vigente — 2026-07-15
+## Estado operacional vigente — 2026-07-16
 
 - produto ativo: app Flutter em `app/`, API Dart Frog em `server/` e serviços
   de battle em `services/`;
@@ -19,9 +19,9 @@
 - a base técnica local e de dados está verde: no perfil mutável isolado, 12
   etapas E2E passaram, 3 perfis live foram pulados e não houve
   falha/bloqueio; qualidade de produto continua aberta nos decks abaixo;
-- as migrations 033, 034 e 035, rulings, Spellbook, famílias funcionais,
+- as migrations 033 a 037, rulings, Spellbook, famílias funcionais,
   cleanup de fixtures e reparo legal do Goblins foram aplicados com backup,
-  rollback e postcheck; o status é 35/35 migrations;
+  rollback e postcheck; o status é 37/37 migrations;
 - PG869, PG870, PG871 e PG872 foram revalidados no PostgreSQL novo; PG873 está
   apenas preparado e não deve ser tratado como aplicado;
 - battle tem 0 residual convencional acionável no snapshot final; produto tem

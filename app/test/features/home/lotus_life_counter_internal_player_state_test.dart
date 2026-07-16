@@ -11,7 +11,7 @@ import 'package:manaloom/features/home/lotus/lotus_js_bridges.dart';
 import 'package:manaloom/features/home/lotus_life_counter_screen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-class _FakeLotusHost implements LotusHost {
+class _FakeLotusHost implements LotusHost, LotusCanonicalStorageRebaser {
   _FakeLotusHost({required this.onShellMessageRequested});
 
   final LotusShellMessageCallback onShellMessageRequested;
@@ -23,6 +23,7 @@ class _FakeLotusHost implements LotusHost {
   final ValueNotifier<String?> errorMessage = ValueNotifier<String?>(null);
 
   int loadBundleCallCount = 0;
+  int canonicalRebaseCallCount = 0;
   final List<String> executedScripts = <String>[];
 
   @override
@@ -69,6 +70,14 @@ class _FakeLotusHost implements LotusHost {
       'bountyCardPoolActive': false,
       'maxActiveModes': 2,
     });
+  }
+
+  @override
+  Future<bool> rebaseStorageFromCanonical({
+    String reason = 'native_canonical_sync',
+  }) async {
+    canonicalRebaseCallCount += 1;
+    return true;
   }
 
   void completeSuccessfulLoad() {
@@ -596,11 +605,12 @@ void main() {
           expect(session, isNotNull);
           expect(session!.partnerCommanders[1], isTrue);
           expect(host.loadBundleCallCount, 1);
+          expect(host.canonicalRebaseCallCount, 1);
           expect(
             host.executedScripts.any(
               (script) => script.contains('.player-card-inner.option-card'),
             ),
-            isTrue,
+            isFalse,
           );
           expect(
             logs.any(
@@ -609,7 +619,9 @@ void main() {
                   message.contains('apply_strategy: canonical_store_sync') &&
                   message.contains('reload_required: false') &&
                   message.contains('surface_reset_required: true') &&
-                  message.contains('surface_reset_strategy: live_dom_reset'),
+                  message.contains(
+                    'surface_reset_strategy: canonical_rebase_reload',
+                  ),
             ),
             isTrue,
           );
@@ -1465,11 +1477,12 @@ void main() {
           expect(session, isNotNull);
           expect(session!.poison[0], 1);
           expect(host.loadBundleCallCount, 1);
+          expect(host.canonicalRebaseCallCount, 1);
           expect(
             host.executedScripts.any(
               (script) => script.contains('.player-card-inner.option-card'),
             ),
-            isTrue,
+            isFalse,
           );
           expect(
             logs.any(
@@ -1478,7 +1491,9 @@ void main() {
                   message.contains('apply_strategy: canonical_store_sync') &&
                   message.contains('reload_required: false') &&
                   message.contains('surface_reset_required: true') &&
-                  message.contains('surface_reset_strategy: live_dom_reset') &&
+                  message.contains(
+                    'surface_reset_strategy: canonical_rebase_reload',
+                  ) &&
                   message.contains('sync_blockers: []'),
             ),
             isTrue,
@@ -1772,11 +1787,12 @@ void main() {
           expect(session, isNotNull);
           expect(session!.commanderDamage[0][1], 1);
           expect(host.loadBundleCallCount, 1);
+          expect(host.canonicalRebaseCallCount, 1);
           expect(
             host.executedScripts.any(
               (script) => script.contains('.player-card-inner.option-card'),
             ),
-            isTrue,
+            isFalse,
           );
           expect(
             logs.any(
@@ -1785,7 +1801,9 @@ void main() {
                   message.contains('apply_strategy: canonical_store_sync') &&
                   message.contains('reload_required: false') &&
                   message.contains('surface_reset_required: true') &&
-                  message.contains('surface_reset_strategy: live_dom_reset') &&
+                  message.contains(
+                    'surface_reset_strategy: canonical_rebase_reload',
+                  ) &&
                   message.contains('sync_blockers: []'),
             ),
             isTrue,

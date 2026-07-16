@@ -253,6 +253,23 @@ class ManaLoomOpsDaemonTest(unittest.TestCase):
         self.assertEqual(job.schedule, "30 */6 * * *")
         self.assertIn("sync_card_legalities_from_scryfall.sh", job.command)
 
+    def test_ai_runtime_cleanup_is_scheduled_with_reservation_ttl(self) -> None:
+        module = _load_module()
+        jobs = {job.name: job for job in module.JOBS}
+
+        job = jobs["manaloom_ai_runtime_cleanup"]
+        self.assertEqual(job.schedule, "10 4 * * *")
+        self.assertIn("cron_cleanup_optimize_telemetry.sh", job.command)
+        self.assertIn("--ai-log-retention-days=", job.command)
+        self.assertIn("AI_LOG_RETENTION_DAYS", job.command)
+        self.assertIn("--job-retention-minutes=", job.command)
+        self.assertIn("AI_JOB_RETENTION_MINUTES", job.command)
+        self.assertIn("--reservation-ttl-minutes=", job.command)
+        self.assertIn("AI_PLAN_RESERVATION_TTL_MINUTES", job.command)
+        self.assertIn("--rate-limit-retention-hours=", job.command)
+        self.assertIn("RATE_LIMIT_EVENT_RETENTION_HOURS", job.command)
+        self.assertFalse(job.background)
+
     def test_battle_strategy_jobs_produce_gate_evidence_in_background(self) -> None:
         module = _load_module()
         jobs = {job.name: job for job in module.JOBS}

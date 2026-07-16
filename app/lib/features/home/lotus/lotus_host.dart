@@ -20,3 +20,27 @@ abstract class LotusHost {
   Future<Object?> runJavaScriptReturningResult(String script);
   void dispose();
 }
+
+abstract interface class LotusCanonicalStorageRebaser {
+  Future<bool> rebaseStorageFromCanonical({
+    String reason = 'native_canonical_sync',
+  });
+}
+
+typedef LotusCanonicalStorageMutation = Future<void> Function();
+
+abstract interface class LotusCanonicalStorageMutationCoordinator {
+  Future<bool> mutateCanonicalStorageAndRebase({
+    required LotusCanonicalStorageMutation mutation,
+    required String reason,
+    bool reloadRuntime = false,
+  });
+}
+
+abstract interface class LotusLiveStoragePatchCoordinator {
+  Future<bool> applyLiveStoragePatch(Map<String, String?> values);
+}
+
+abstract interface class LotusStorageFlushBarrier {
+  Future<bool> flushStorageSnapshot({String reason = 'flutter_exit'});
+}
