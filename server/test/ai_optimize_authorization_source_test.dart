@@ -30,6 +30,18 @@ void main() {
       expect(source, contains('userId: authenticatedUserId'));
     });
 
+    test('provider calls retain owner and deck provenance for E2E evidence', () {
+      final source = File('routes/ai/optimize/index.dart').readAsStringSync();
+      final callStart = source.indexOf('() => optimizer.optimizeDeck(');
+      final callEnd = source.indexOf('\n          ),', callStart);
+
+      expect(callStart, greaterThanOrEqualTo(0));
+      expect(callEnd, greaterThan(callStart));
+      final call = source.substring(callStart, callEnd);
+      expect(call, contains('userId: authenticatedUserId'));
+      expect(call, contains('deckId: deckId'));
+    });
+
     test('optimize jobs without owner are not readable by arbitrary users', () {
       final routeSource =
           File('routes/ai/optimize/jobs/[id].dart').readAsStringSync();

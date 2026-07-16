@@ -1141,6 +1141,8 @@ Future<Response> onRequest(RequestContext context) async {
             detectedTheme: themeProfile.theme,
             coreCards: themeProfile.coreCards,
             metaEvidenceContext: optimizeMetaEvidenceContext,
+            userId: authenticatedUserId,
+            deckId: deckId,
           ),
         );
         return optimize_route_retry.attachAiOptimizeAttemptMetadata(
