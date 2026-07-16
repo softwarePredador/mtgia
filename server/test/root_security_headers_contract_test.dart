@@ -13,4 +13,11 @@ void main() {
     expect(source, contains("'Strict-Transport-Security':"));
     expect(source, contains('..._corsHeaders'));
   });
+
+  test('production entrypoint suppresses framework disclosure', () {
+    final source = File('main.dart').readAsStringSync();
+
+    expect(source, contains('Future<HttpServer> run('));
+    expect(source, contains('poweredByHeader: null'));
+  });
 }
