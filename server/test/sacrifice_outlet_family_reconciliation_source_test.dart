@@ -21,14 +21,22 @@ void main() {
         expect(sql, isNot(contains('DELETE FROM public.')));
         expect(sql, contains('51272701cdb5b277'));
         expect(sql, contains('512cb67eca26b4c8'));
+        expect(sql, contains('573c94fad8b4ba9d'));
       }
 
       expect(precheck, contains('PG873_PRECHECK_ABORT_'));
       expect(precheck, contains('semantic_snapshot_count = 1557'));
-      expect(precheck, contains('expected_semantic_rows_missing = 52'));
+      expect(precheck, contains('deferred_semantic_backfill_count = 52'));
       expect(postcheck, contains('PG873_POSTCHECK_ABORT_'));
+      expect(postcheck, contains('manifest_semantic_count=684'));
+      expect(postcheck, contains('deferred_manifest_count=52'));
+      expect(postcheck, contains('post_semantic_count=1524'));
       expect(postcheck, contains('live_manifest_diff_rows=0'));
       expect(postcheck, contains('tag_order_violations=0'));
+      expect(
+        postcheck,
+        isNot(contains('pg873_sac_outlet_missing_semantic_20260715')),
+      );
     });
 
     test('snapshots every changed lane and has a guarded exact rollback', () {
@@ -44,12 +52,12 @@ void main() {
       expect(apply, contains('pg873_sac_outlet_expected_20260715'));
       expect(apply, contains('pg873_sac_outlet_function_backup_20260715'));
       expect(apply, contains('pg873_sac_outlet_semantic_backup_20260715'));
+      expect(apply, contains('pg873_sac_outlet_deferred_semantic_20260715'));
       expect(apply, contains('pg873_sac_outlet_post_semantic_20260715'));
+      expect(apply, isNot(contains(r'\ir')));
       expect(
         apply,
-        contains(
-          r'\ir pg873_sacrifice_outlet_family_reconciliation_20260715_missing_semantic_manifest.sql',
-        ),
+        isNot(contains('INSERT INTO public.card_semantic_tags_v2')),
       );
       expect(apply, contains("f.tag = 'sacrifice_outlet'"));
       expect(
@@ -65,28 +73,30 @@ void main() {
       expect(rollback, contains('semantic restore differs from snapshot'));
       expect(rollback, contains('v_h_count<>1357'));
       expect(rollback, contains('v_s_count<>1380'));
+      expect(rollback, contains('deferred semantic backlog changed'));
     });
 
-    test('missing semantic manifest is outlet-only and bounded to 52 rows', () {
-      final manifest = _read('_missing_semantic_manifest.sql');
-      final cardIds = RegExp(r'"card_id":"[0-9a-f-]{36}"').allMatches(manifest);
+    test(
+      'defers incomplete semantic snapshots instead of materializing them',
+      () {
+        final apply = _read('_apply.sql');
+        final legacyManifest = File('${_prefix}_missing_semantic_manifest.sql');
 
-      expect(cardIds, hasLength(52));
-      expect(
-        RegExp(r'"tags":\[\{"tag":"sacrifice_outlet"').allMatches(manifest),
-        hasLength(52),
-      );
-      expect(manifest, contains('validated outlet tag'));
-      expect(manifest, isNot(contains('"tag":"ramp"')));
-      expect(manifest, isNot(contains('"tag":"engine"')));
-    });
+        expect(legacyManifest.existsSync(), isFalse);
+        expect(apply, contains('v_count <> 52'));
+        expect(
+          apply,
+          contains(
+            "v_sha <> '4f29cbcbbdaa9a10bf285ff808c40ab8f3026367a2b3bc873fd51424cad5b199'",
+          ),
+        );
+        expect(apply, contains('full semantic'));
+        expect(apply, isNot(contains('no_primary_function_detected')));
+      },
+    );
 
     test('does not prune neighboring generated data families', () {
-      final package = [
-        _read('_apply.sql'),
-        _read('_rollback.sql'),
-        _read('_missing_semantic_manifest.sql'),
-      ].join('\n');
+      final package = [_read('_apply.sql'), _read('_rollback.sql')].join('\n');
 
       expect(package, isNot(contains('card_role_scores')));
       expect(package, isNot(contains('commander_card_synergy')));

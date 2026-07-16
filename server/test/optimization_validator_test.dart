@@ -87,6 +87,116 @@ void main() {
     });
 
     test(
+      'emits additive ramp_floor delta for structural to contextual ramp',
+      () async {
+        final solRing = {
+          'name': 'Sol Ring',
+          'type_line': 'Artifact',
+          'mana_cost': '{1}',
+          'oracle_text': '{T}: Add {C}{C}.',
+          'cmc': 1,
+          'quantity': 1,
+          'functional_tags': const [
+            {'tag': 'ramp', 'confidence': 0.99},
+          ],
+        };
+        final rubyMedallion = {
+          'name': 'Ruby Medallion',
+          'type_line': 'Artifact',
+          'mana_cost': '{2}',
+          'oracle_text': 'Red spells you cast cost {1} less to cast.',
+          'cmc': 2,
+          'quantity': 1,
+          'functional_tags': const [
+            {'tag': 'ramp', 'confidence': 0.99},
+          ],
+        };
+        final originalDeck = [
+          solRing,
+          ..._makeLands(36),
+          ..._makeSpells(63, avgCmc: 3),
+        ];
+        final optimizedDeck = [
+          rubyMedallion,
+          ..._makeLands(36),
+          ..._makeSpells(63, avgCmc: 3),
+        ];
+
+        final report = await validator.validate(
+          originalDeck: originalDeck,
+          optimizedDeck: optimizedDeck,
+          removals: const ['Sol Ring'],
+          additions: const ['Ruby Medallion'],
+          commanders: const ['Test Commander'],
+          archetype: 'midrange',
+        );
+
+        expect(report.functional.roleDelta['ramp'], equals(0));
+        expect(report.functional.roleDelta['ramp_floor'], equals(-1));
+        expect(
+          report.functional.toJson()['role_delta'],
+          containsPair('ramp_floor', -1),
+        );
+        expect(report.verdict, isNot(equals('aprovado')));
+        expect(
+          report.warnings.any((warning) => warning.contains('ramp estrutural')),
+          isTrue,
+        );
+      },
+    );
+
+    test('does not penalize contextual to structural ramp upgrade', () async {
+      final rubyMedallion = {
+        'name': 'Ruby Medallion',
+        'type_line': 'Artifact',
+        'mana_cost': '{2}',
+        'oracle_text': 'Red spells you cast cost {1} less to cast.',
+        'cmc': 2,
+        'quantity': 1,
+        'functional_tags': const [
+          {'tag': 'ramp', 'confidence': 0.99},
+        ],
+      };
+      final solRing = {
+        'name': 'Sol Ring',
+        'type_line': 'Artifact',
+        'mana_cost': '{1}',
+        'oracle_text': '{T}: Add {C}{C}.',
+        'cmc': 1,
+        'quantity': 1,
+        'functional_tags': const [
+          {'tag': 'ramp', 'confidence': 0.99},
+        ],
+      };
+      final originalDeck = [
+        rubyMedallion,
+        ..._makeLands(36),
+        ..._makeSpells(63, avgCmc: 3),
+      ];
+      final optimizedDeck = [
+        solRing,
+        ..._makeLands(36),
+        ..._makeSpells(63, avgCmc: 3),
+      ];
+
+      final report = await validator.validate(
+        originalDeck: originalDeck,
+        optimizedDeck: optimizedDeck,
+        removals: const ['Ruby Medallion'],
+        additions: const ['Sol Ring'],
+        commanders: const ['Test Commander'],
+        archetype: 'midrange',
+      );
+
+      expect(report.functional.roleDelta['ramp'], equals(0));
+      expect(report.functional.roleDelta['ramp_floor'], equals(1));
+      expect(
+        report.warnings.any((warning) => warning.contains('ramp estrutural')),
+        isFalse,
+      );
+    });
+
+    test(
       'rejects 34 to 32 land-to-fast-mana canary despite tag overlap',
       () async {
         final turbulentSteppe = {

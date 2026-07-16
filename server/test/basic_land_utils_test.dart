@@ -30,11 +30,17 @@ void main() {
       expect(isBasicLandTypeLine('Legendary Land'), isFalse);
     });
 
+    test('detects the standalone Land card type without substring leakage', () {
+      expect(isLandTypeLine('Land'), isTrue);
+      expect(isLandTypeLine('Basic Land — Island'), isTrue);
+      expect(isLandTypeLine('Legendary Land Creature — Forest Dryad'), isTrue);
+      expect(isLandTypeLine('Creature — Lander Rogue'), isFalse);
+      expect(isLandTypeLine('Creature — Island Fish'), isFalse);
+      expect(isLandTypeLine('Nonland permanent'), isFalse);
+    });
+
     test('combines name and type line evidence', () {
-      expect(
-        isBasicLandCard(name: 'Wastes', typeLine: ''),
-        isTrue,
-      );
+      expect(isBasicLandCard(name: 'Wastes', typeLine: ''), isTrue);
       expect(
         isBasicLandCard(name: 'Snow-Covered Island', typeLine: ''),
         isTrue,

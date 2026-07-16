@@ -9,6 +9,7 @@ PORT="${PORT:-8080}"
 REQUESTED_API_BASE_URL="${API_BASE_URL:-}"
 API_BASE_URL=""
 SERVER_START_TIMEOUT="${SERVER_START_TIMEOUT:-60}"
+SERVER_BUILD_LOG=""
 VALIDATION_CORPUS_PATH="${VALIDATION_CORPUS_PATH:-test/fixtures/optimization_resolution_corpus.json}"
 VALIDATION_SELECTION_MODE="${VALIDATION_SELECTION_MODE:-corpus}"
 REQUESTED_VALIDATION_LIMIT="${VALIDATION_LIMIT:-}"
@@ -583,7 +584,7 @@ esac
 
 require_postgres_write_approval "Commander resolution corpus mutating E2E"
 
-for required_tool in script lsof pgrep; do
+for required_tool in dart_frog lsof perl pgrep; do
   if ! command -v "$required_tool" >/dev/null 2>&1; then
     echo "BLOCKED: o launcher isolado requer o utilitário '${required_tool}'." >&2
     exit 2
@@ -602,13 +603,8 @@ if [[ -z "$PORT" ]]; then
   exit 1
 fi
 API_BASE_URL="http://127.0.0.1:${PORT}"
-VM_SERVICE_PORT="$(select_free_local_port "$((PORT + 1000))" 30 || true)"
-if [[ -z "$VM_SERVICE_PORT" ]]; then
-  echo "❌ Nenhuma porta loopback livre encontrada para o serviço da VM Dart." >&2
-  exit 1
-fi
-
 mkdir -p "$VALIDATION_RUN_DIR"
+SERVER_BUILD_LOG="${VALIDATION_RUN_DIR}/server_build.log"
 VALIDATION_SUMMARY_JSON_ABS="$(resolve_server_path "$VALIDATION_SUMMARY_JSON_PATH")"
 
 IDENTITY_BEFORE="$(validation_identity_count | tr -d '[:space:]')"
@@ -618,16 +614,28 @@ if [[ "$IDENTITY_BEFORE" != "0" ]]; then
 fi
 GENERATED_DECK_BASELINE="$(generated_deck_count | tr -d '[:space:]')"
 
-echo "ℹ️ Iniciando API isolada em ${API_BASE_URL}..."
+echo "ℹ️ Gerando build imutável do Dart Frog para o E2E..."
+(
+  cd "$SERVER_DIR"
+  dart_frog build
+) >"$SERVER_BUILD_LOG" 2>&1
+perl -0pi -e \
+  's/final address = InternetAddress[.]anyIPv6;/final address = InternetAddress.loopbackIPv4;/' \
+  "$SERVER_DIR/build/bin/server.dart"
+if ! grep -Fq \
+  'final address = InternetAddress.loopbackIPv4;' \
+  "$SERVER_DIR/build/bin/server.dart"; then
+  echo "❌ O build de produção não pôde ser restringido ao loopback IPv4." >&2
+  exit 1
+fi
+
+echo "ℹ️ Iniciando API isolada e sem hot reload em ${API_BASE_URL}..."
 (
   cd "$SERVER_DIR"
   "$ROOT_DIR/server/bin/with_new_server_pg.sh" env \
     PORT="$PORT" \
     JWT_SECRET="$BACKEND_TEST_JWT_SECRET" \
-    script -q /dev/null dart_frog dev \
-      --hostname 127.0.0.1 \
-      --port "$PORT" \
-      --dart-vm-service-port "$VM_SERVICE_PORT"
+    dart run build/bin/server.dart
 ) >"${VALIDATION_RUN_DIR}/server.log" 2>&1 &
 
 SERVER_PID="$!"

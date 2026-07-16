@@ -33,6 +33,13 @@ require_tool() {
 require_tool git
 require_tool ssh
 
+require_clean_worktree() {
+  if [[ -n "$(git status --porcelain --untracked-files=all)" ]]; then
+    echo "deploy recusado: worktree deve estar limpo para o gate e o git archive usarem o mesmo SHA" >&2
+    exit 2
+  fi
+}
+
 for key in SSH_HOST SSH_KEY DB_HOST DB_PORT DB_NAME; do
   if [[ -z "${!key:-}" ]]; then
     echo "variavel obrigatoria ausente: $key" >&2
@@ -48,7 +55,9 @@ if [[ "$DB_HOST" != "$EXPECTED_DB_HOST" ||
 fi
 
 cd "$ROOT_DIR"
+require_clean_worktree
 "$ROOT_DIR/scripts/manaloom_battle_product_gate.sh"
+require_clean_worktree
 git fetch origin master --quiet
 sha="$(git rev-parse HEAD)"
 short_sha="$(git rev-parse --short=12 HEAD)"
@@ -76,7 +85,7 @@ if [[ "$runtime_volume" != "volume | evolution_manaloom-ops-data | /data/manaloo
   exit 2
 fi
 
-git archive HEAD server docs/hermes-analysis/manaloom-knowledge tools/manaloom_lints |
+git archive HEAD server docs/hermes-analysis/manaloom-knowledge scripts/lib tools/manaloom_lints |
   ssh -o BatchMode=yes -o StrictHostKeyChecking=accept-new -i "$SSH_KEY" "$SSH_HOST" \
     "rm -rf '$remote_dir' && mkdir -p '$remote_dir' && tar -x -C '$remote_dir'"
 
@@ -101,6 +110,8 @@ docker service update \
   --env-add MANALOOM_NATIVE_BATTLE_SYNC_ON_BOOT=1 \
   --env-add MANALOOM_NATIVE_BATTLE_HOST=0.0.0.0 \
   --env-add MANALOOM_NATIVE_BATTLE_PORT=8080 \
+  --env-add MANALOOM_CANONICAL_PG_DECK_ID=8938b746-1a9e-46ce-b0d9-c2ec932ddddd \
+  --env-add MANALOOM_TARGET_PG_DECK_ID=8938b746-1a9e-46ce-b0d9-c2ec932ddddd \
   --env-add MANALOOM_LOREHOLD_CANONICAL_OVERRIDE=0 \
   --env-add MANALOOM_BATTLE_GATE_SUMMARY=/data/manaloom-ops/artifacts/battle-strategy-audit/latest/summary.json \
   --env-add MANALOOM_BATTLE_STRATEGY_BASE_DIR=/data/manaloom-ops \
@@ -128,10 +139,29 @@ for attempt in \$(seq 1 60); do
         "def backfill_trusted_oracle_hashes" \
         /app/docs/hermes-analysis/manaloom-knowledge/scripts/sync_battle_card_rules_pg.py
       docker exec "\$container" test -x /app/server/bin/manaloom_battle_strategy_audit.sh
+      docker exec "\$container" test -r /app/scripts/lib/manaloom_mutation_guard.sh
       docker exec "\$container" /app/server/bin/manaloom_battle_strategy_audit.sh \
         --dry-run --seeds 1 >/dev/null
       docker exec "\$container" python3 -c \
         "import json; jobs=json.load(open('/data/manaloom-ops/cron/jobs.json')); names={row['name'] for row in jobs}; assert {'manaloom_battle_strategy_audit','manaloom_battle_strategy_nightly'} <= names"
+      docker exec "\$container" mkdir -p \
+        /data/manaloom-ops/artifacts/target-deck-identity
+      docker exec "\$container" python3 \
+        /app/docs/hermes-analysis/manaloom-knowledge/scripts/sync_pg_target_deck_to_hermes.py \
+        --sqlite-db /data/manaloom-ops/knowledge.db \
+        --pg-deck-id 8938b746-1a9e-46ce-b0d9-c2ec932ddddd \
+        --protected-pg-deck-id 8938b746-1a9e-46ce-b0d9-c2ec932ddddd \
+        --target-deck-id 6 \
+        --apply \
+        --report /data/manaloom-ops/artifacts/target-deck-identity/deploy_sync_$short_sha.json \
+        >/dev/null
+      docker exec "\$container" python3 \
+        /app/docs/hermes-analysis/manaloom-knowledge/scripts/battle_target_deck_identity_guard.py \
+        --sqlite-db /data/manaloom-ops/knowledge.db \
+        --target-deck-id 6 \
+        --expected-pg-deck-id 8938b746-1a9e-46ce-b0d9-c2ec932ddddd \
+        --output /data/manaloom-ops/artifacts/target-deck-identity/deploy_guard_$short_sha.json \
+        >/dev/null
       docker exec "\$container" python3 -c \
         "import json, urllib.request; data=json.load(urllib.request.urlopen('http://127.0.0.1:8080/health', timeout=5)); print(json.dumps(data, sort_keys=True))"
       docker service ls --filter name='$SERVICE' --format '{{.Name}} {{.Image}} {{.Replicas}}'
@@ -148,9 +178,9 @@ REMOTE
 deployed_contract="$(ssh -o BatchMode=yes -i "$SSH_KEY" "$SSH_HOST" "
 container=\$(docker ps --filter label=com.docker.swarm.service.name='$SERVICE' -q | head -1)
 docker inspect \"\$container\" --format '{{range .Config.Env}}{{println .}}{{end}}' |
-  awk -F= '/^GIT_SHA=/{sha=\$2} /^DB_HOST=/{host=\$2} /^DB_PORT=/{port=\$2} /^DB_NAME=/{name=\$2} /^MANALOOM_NATIVE_BATTLE_HTTP_ENABLED=/{http=\$2} /^MANALOOM_NATIVE_BATTLE_SYNC_ON_BOOT=/{sync=\$2} /^MANALOOM_LOREHOLD_CANONICAL_OVERRIDE=/{override=\$2} END{print sha \"|\" host \"|\" port \"|\" name \"|\" http \"|\" sync \"|\" override}'
+  awk -F= '/^GIT_SHA=/{sha=\$2} /^DB_HOST=/{host=\$2} /^DB_PORT=/{port=\$2} /^DB_NAME=/{name=\$2} /^MANALOOM_NATIVE_BATTLE_HTTP_ENABLED=/{http=\$2} /^MANALOOM_NATIVE_BATTLE_SYNC_ON_BOOT=/{sync=\$2} /^MANALOOM_LOREHOLD_CANONICAL_OVERRIDE=/{override=\$2} /^MANALOOM_CANONICAL_PG_DECK_ID=/{canonical=\$2} /^MANALOOM_TARGET_PG_DECK_ID=/{target=\$2} END{print sha \"|\" host \"|\" port \"|\" name \"|\" http \"|\" sync \"|\" override \"|\" canonical \"|\" target}'
 ")"
-if [[ "$deployed_contract" != "$sha|$EXPECTED_DB_HOST|$EXPECTED_DB_PORT|$EXPECTED_DB_NAME|1|1|0" ]]; then
+if [[ "$deployed_contract" != "$sha|$EXPECTED_DB_HOST|$EXPECTED_DB_PORT|$EXPECTED_DB_NAME|1|1|0|8938b746-1a9e-46ce-b0d9-c2ec932ddddd|8938b746-1a9e-46ce-b0d9-c2ec932ddddd" ]]; then
   echo "deploy convergiu com SHA ou alvo PostgreSQL divergente" >&2
   exit 2
 fi

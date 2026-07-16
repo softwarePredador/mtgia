@@ -25,6 +25,14 @@ def test_production_preflight_defaults_to_persistent_data_volume() -> None:
     assert 'cp "$current_report" "$ARTIFACT_DIR/latest_master_optimizer_preflight.md"' in text
     assert 'echo "master_optimizer_preflight=blocked"' in text
     assert 'exit "$preflight_status"' in text
+    metadata_sync = text.index("sync_pg_card_metadata_to_hermes.py")
+    battle_rules_sync = text.index("--apply-sqlite-from-pg")
+    target_sync = text.index("sync_pg_target_deck_to_hermes.py")
+    identity_guard = text.index("battle_target_deck_identity_guard.py")
+    optimizer = text.index("master_optimizer_loop.py")
+    assert metadata_sync < battle_rules_sync < target_sync < identity_guard < optimizer
+    assert '--pg-deck-id "$TARGET_PG_DECK_ID"' in text
+    assert '--protected-pg-deck-id "$CANONICAL_PG_DECK_ID"' in text
 
     optimizer_text = OPTIMIZER_LOOP.read_text(encoding="utf-8")
     assert 'os.environ.get(' in optimizer_text

@@ -1,10 +1,13 @@
 import 'package:postgres/postgres.dart';
+
+import '../basic_land_utils.dart' as basic_lands;
 import '../color_identity.dart';
 import '../edh_bracket_policy.dart';
 import '../logger.dart';
 import 'commander_fallback_policy.dart';
 import 'optimize_filler_candidate_support.dart';
 import 'optimize_functional_role_support.dart';
+import 'optimization_ramp_profile.dart';
 
 export 'optimize_filler_candidate_support.dart';
 
@@ -18,7 +21,8 @@ Future<Map<String, String>> loadBasicLandIds(
       SELECT name, id::text
       FROM cards
       WHERE name = ANY(@names)
-        AND (type_line LIKE 'Basic Land%' OR type_line LIKE 'Basic Snow Land%')
+        AND COALESCE(type_line, '') ~*
+          '(^|[^[:alpha:]])basic[[:space:]]+(snow[[:space:]]+)?land([^[:alpha:]]|\$)'
       ORDER BY name ASC
     '''),
     parameters: {'names': names},
@@ -56,9 +60,8 @@ Future<List<Map<String, dynamic>>> loadIdentitySafeNonBasicLandFillers({
         LEFT JOIN card_legalities cl ON cl.card_id = c.id AND cl.format = 'commander'
         LEFT JOIN card_meta_insights cmi ON LOWER(cmi.card_name) = LOWER(c.name)
         WHERE (cl.status = 'legal' OR cl.status = 'restricted' OR cl.status IS NULL)
-          AND c.type_line ILIKE '%land%'
-          AND c.type_line NOT ILIKE 'Basic Land%'
-          AND c.type_line NOT ILIKE 'Basic Snow Land%'
+          AND COALESCE(c.type_line, '') ~* '(^|[^a-z])land([^a-z]|\$)'
+          AND NOT (COALESCE(c.type_line, '') ~* '(^|[^[:alpha:]])basic[[:space:]]+(snow[[:space:]]+)?land([^[:alpha:]]|\$)')
           AND LOWER(c.name) NOT IN (SELECT LOWER(unnest(@exclude::text[])))
           AND c.name NOT LIKE 'A-%'
           AND c.name NOT LIKE '\\_%' ESCAPE '\\'
@@ -128,7 +131,7 @@ Future<List<Map<String, dynamic>>> loadIdentitySafeNonBasicLandFillers({
         oracle.contains('search your library for a land')) {
       fixingScore += 80;
     }
-    if (typeLine.contains('land')) {
+    if (basic_lands.isLandTypeLine(typeLine)) {
       fixingScore += 30;
     }
     if (oracle.contains('enters tapped')) {
@@ -177,7 +180,7 @@ bool isOptimizeStructuralRecoveryScenario({
     final typeLine = ((card['type_line'] as String?) ?? '').toLowerCase();
     totalCards += qty;
 
-    if (typeLine.contains('land')) {
+    if (basic_lands.isLandTypeLine(typeLine)) {
       landCount += qty;
       if (landProducesCommanderColors(
         card: card,
@@ -216,7 +219,7 @@ int computeOptimizeStructuralRecoverySwapTarget({
   for (final card in allCardData) {
     final qty = (card['quantity'] as int?) ?? 1;
     final typeLine = ((card['type_line'] as String?) ?? '').toLowerCase();
-    if (typeLine.contains('land')) {
+    if (basic_lands.isLandTypeLine(typeLine)) {
       landCount += qty;
     } else {
       nonLandCount += qty;
@@ -282,13 +285,17 @@ List<String> buildStructuralRecoveryFunctionalNeeds({
   for (final card in allCardData) {
     final qty = (card['quantity'] as int?) ?? 1;
     final typeLine = ((card['type_line'] as String?) ?? '').toLowerCase();
-    if (typeLine.contains('land')) continue;
+    if (basic_lands.isLandTypeLine(typeLine)) continue;
 
     final role = inferOptimizeFunctionalNeed(
       name: (card['name'] as String?) ?? '',
       typeLine: (card['type_line'] as String?) ?? '',
       oracleText: (card['oracle_text'] as String?) ?? '',
     );
+    if (role == 'ramp' &&
+        !optimizationRampProfileForCard(card).countsTowardGenericFloor) {
+      continue;
+    }
     currentCounts[role] = (currentCounts[role] ?? 0) + qty;
   }
 
@@ -385,10 +392,15 @@ Map<String, int> buildSlotNeedsForDeck({
   var nonLandTotal = 0;
   for (final c in currentDeckCards) {
     final typeLine = ((c['type_line'] as String?) ?? '').toLowerCase();
-    if (typeLine.contains('land')) continue;
+    if (basic_lands.isLandTypeLine(typeLine)) continue;
 
     final qty = (c['quantity'] as int?) ?? 1;
     final role = inferFunctionalRoleForCard(c);
+    if (role == 'ramp' &&
+        !optimizationRampProfileForCard(c).countsTowardGenericFloor) {
+      nonLandTotal += qty;
+      continue;
+    }
     current[role] = (current[role] ?? 0) + qty;
     nonLandTotal += qty;
   }
@@ -440,7 +452,11 @@ Future<List<Map<String, dynamic>>> loadDeterministicSlotFillers({
         final name = (c['name'] as String?) ?? '';
         final role = inferFunctionalRoleForCard(c);
 
-        final primaryNeed = slotNeeds[role] ?? 0;
+        final countsTowardRequestedRole =
+            role != 'ramp' ||
+            optimizationRampProfileForCard(c).countsTowardGenericFloor;
+        final primaryNeed =
+            countsTowardRequestedRole ? (slotNeeds[role] ?? 0) : 0;
         final utilityNeed = slotNeeds['utility'] ?? 0;
         final fromAiSuggestion = (preferredNames ?? const <String>{}).contains(
           name.toLowerCase(),
@@ -494,7 +510,7 @@ Future<List<Map<String, dynamic>>> loadMetaInsightFillers({
       JOIN cards c ON LOWER(c.name) = LOWER(mi.card_name)
       LEFT JOIN card_legalities cl ON cl.card_id = c.id AND cl.format = 'commander'
       WHERE (cl.status = 'legal' OR cl.status = 'restricted' OR cl.status IS NULL)
-        AND c.type_line NOT ILIKE '%land%'
+        AND NOT (COALESCE(c.type_line, '') ~* '(^|[^a-z])land([^a-z]|\$)')
         AND c.name NOT LIKE 'A-%'
         AND c.name NOT LIKE '\\_%' ESCAPE '\\'
         AND c.name NOT LIKE '%World Champion%'
@@ -602,7 +618,7 @@ Future<List<Map<String, dynamic>>> loadBroadCommanderNonLandFillers({
       LEFT JOIN card_legalities cl ON cl.card_id = c.id AND cl.format = 'commander'
       LEFT JOIN card_meta_insights cmi ON LOWER(cmi.card_name) = LOWER(c.name)
       WHERE (cl.status = 'legal' OR cl.status = 'restricted' OR cl.status IS NULL)
-        AND c.type_line NOT ILIKE '%land%'
+        AND NOT (COALESCE(c.type_line, '') ~* '(^|[^a-z])land([^a-z]|\$)')
         AND c.name NOT LIKE 'A-%'
         AND c.name NOT LIKE '\\_%' ESCAPE '\\'
         AND c.name NOT LIKE '%World Champion%'
@@ -819,7 +835,7 @@ Future<List<Map<String, dynamic>>> loadCompetitiveNonLandFillers({
         LEFT JOIN card_legalities cl ON cl.card_id = c.id AND cl.format = 'commander'
         LEFT JOIN card_meta_insights cmi ON LOWER(cmi.card_name) = LOWER(c.name)
         WHERE (cl.status = 'legal' OR cl.status = 'restricted' OR cl.status IS NULL)
-          AND c.type_line NOT ILIKE '%land%'
+          AND NOT (COALESCE(c.type_line, '') ~* '(^|[^a-z])land([^a-z]|\$)')
           AND c.name NOT LIKE 'A-%'
           AND c.name NOT LIKE '\\_%' ESCAPE '\\'
           AND c.name NOT LIKE '%World Champion%'
@@ -969,7 +985,7 @@ Future<List<Map<String, dynamic>>> loadEmergencyNonBasicFillers({
         LEFT JOIN card_legalities cl ON cl.card_id = c.id AND cl.format = 'commander'
         LEFT JOIN card_meta_insights cmi ON LOWER(cmi.card_name) = LOWER(c.name)
         WHERE (cl.status = 'legal' OR cl.status = 'restricted' OR cl.status IS NULL)
-          AND c.type_line NOT ILIKE '%land%'
+          AND NOT (COALESCE(c.type_line, '') ~* '(^|[^a-z])land([^a-z]|\$)')
           AND c.name NOT LIKE 'A-%'
           AND c.name NOT LIKE '\\_%' ESCAPE '\\'
           AND c.name NOT LIKE '%World Champion%'
@@ -1078,7 +1094,7 @@ Future<List<Map<String, dynamic>>> loadIdentitySafeNonLandFillers({
         LEFT JOIN card_legalities cl ON cl.card_id = c.id AND cl.format = 'commander'
         LEFT JOIN card_meta_insights cmi ON LOWER(cmi.card_name) = LOWER(c.name)
         WHERE (cl.status = 'legal' OR cl.status = 'restricted' OR cl.status IS NULL)
-          AND c.type_line NOT ILIKE '%land%'
+          AND NOT (COALESCE(c.type_line, '') ~* '(^|[^a-z])land([^a-z]|\$)')
           AND c.name NOT LIKE 'A-%'
           AND c.name NOT LIKE '\\_%' ESCAPE '\\'
           AND c.name NOT LIKE '%World Champion%'
@@ -1173,7 +1189,7 @@ Future<List<Map<String, dynamic>>> loadPreferredNameFillers({
       FROM cards c
       LEFT JOIN card_meta_insights cmi ON LOWER(cmi.card_name) = LOWER(c.name)
       WHERE LOWER(name) = ANY(@preferred::text[])
-        AND type_line NOT ILIKE '%land%'
+        AND NOT (COALESCE(type_line, '') ~* '(^|[^a-z])land([^a-z]|\$)')
       ORDER BY COALESCE(cmi.meta_deck_count, 0) DESC,
                COALESCE(cmi.usage_count, 0) DESC,
                c.name ASC

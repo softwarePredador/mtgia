@@ -343,6 +343,421 @@ void main() {
   }
 
   group('DeckDiagnosticPanel', () {
+    testWidgets(
+      'fallback ramp classifier respects beneficiary, quotes and land types',
+      (tester) async {
+        final deck = DeckDetails(
+          id: 'deck-ramp-owner-aware',
+          name: 'Owner-aware Ramp',
+          format: 'commander',
+          commanderName: 'Talrand, Sky Summoner',
+          isPublic: false,
+          createdAt: DateTime(2026, 7, 16),
+          cardCount: 100,
+          stats: const {},
+          commander: [
+            card(
+              id: 'owner-aware-commander',
+              name: 'Talrand, Sky Summoner',
+              typeLine: 'Legendary Creature — Merfolk Wizard',
+              manaCost: '{2}{U}{U}',
+              isCommander: true,
+            ),
+          ],
+          mainBoard: {
+            'Mainboard': [
+              card(
+                id: 'owner-aware-island',
+                name: 'Island',
+                typeLine: 'Basic Land — Island',
+                quantity: 36,
+              ),
+              card(
+                id: 'owner-aware-tomb',
+                name: 'Ancient Tomb',
+                typeLine: 'Land',
+                oracleText: '{T}: Add {C}{C}.',
+              ),
+              card(
+                id: 'owner-aware-signet',
+                name: 'Arcane Signet',
+                typeLine: 'Artifact',
+                oracleText: '{T}: Add one mana of any color.',
+              ),
+              card(
+                id: 'owner-aware-stash',
+                name: "Bootleggers' Stash",
+                typeLine: 'Artifact',
+                oracleText:
+                    'Lands you control have "{T}: Create a Treasure token."',
+              ),
+              card(
+                id: 'owner-aware-prismari',
+                name: 'Prismari Command',
+                typeLine: 'Instant',
+                oracleText: 'Target player creates a Treasure token.',
+              ),
+              card(
+                id: 'owner-aware-lander',
+                name: 'Lander Rizzi',
+                typeLine: 'Legendary Artifact Creature — Lander Rogue',
+                oracleText: '{T}: Add one mana of any color.',
+              ),
+              card(
+                id: 'owner-aware-growth',
+                name: 'Rampant Growth',
+                typeLine: 'Sorcery',
+                oracleText:
+                    'Search your library for a basic land card, put that card '
+                    'onto the battlefield tapped, then shuffle.',
+              ),
+              card(
+                id: 'owner-aware-offer',
+                name: "An Offer You Can't Refuse",
+                typeLine: 'Instant',
+                oracleText:
+                    'Counter target noncreature spell. Its controller creates '
+                    'two Treasure tokens. (They are artifacts with "{T}, '
+                    'Sacrifice this token: Add one mana of any color.")',
+              ),
+              card(
+                id: 'owner-aware-erestor',
+                name: 'Erestor of the Council',
+                typeLine: 'Legendary Creature — Elf Noble',
+                oracleText:
+                    'Each opponent who voted for your choice creates a Treasure '
+                    'token.',
+              ),
+              card(
+                id: 'owner-aware-minimus',
+                name: 'Minimus Containment',
+                typeLine: 'Enchantment — Aura',
+                oracleText:
+                    'Enchanted permanent is a Treasure artifact with "{T}, '
+                    'Sacrifice this artifact: Add one mana of any color" and '
+                    'loses all other abilities.',
+              ),
+              card(
+                id: 'owner-aware-dockbreacher',
+                name: 'Dockbreacher',
+                typeLine: 'Creature — Merfolk Pirate',
+                oracleText:
+                    'If an opponent would create a Treasure token, instead you '
+                    'draw a card.',
+              ),
+              card(
+                id: 'owner-aware-north-pole',
+                name: 'North Pole Research Base',
+                typeLine: 'Plane — Earth',
+                oracleText:
+                    'Target opponent draws a card and creates a Treasure token.',
+              ),
+              card(
+                id: 'owner-aware-to-hand',
+                name: 'Environmental Scientist',
+                typeLine: 'Creature — Human Druid',
+                oracleText:
+                    'Search your library for a basic land card, reveal it, put '
+                    'it into your hand, then shuffle.',
+              ),
+              card(
+                id: 'owner-aware-hoarding-ogre',
+                name: 'Hoarding Ogre',
+                typeLine: 'Creature — Ogre',
+                oracleText:
+                    'Whenever this creature attacks, roll a d20.\n'
+                    '1—9 | Create a Treasure token.\n'
+                    '10—19 | Create two Treasure tokens.',
+              ),
+              card(
+                id: 'owner-aware-powerstone',
+                name: 'Splitting the Powerstone',
+                typeLine: 'Sorcery',
+                oracleText: 'Create a tapped Powerstone token.',
+              ),
+              card(
+                id: 'owner-aware-firebending',
+                name: 'Firebending Adept',
+                typeLine: 'Creature — Human Monk',
+                oracleText: 'Creatures you control have firebending 1.',
+              ),
+              card(
+                id: 'owner-aware-toxicrene',
+                name: 'Toxicrene',
+                typeLine: 'Creature — Tyranid',
+                oracleText:
+                    'Hypertoxic Miasma — All lands have '
+                    '"{T}: Add one mana of any color" and lose all other abilities.',
+              ),
+              card(
+                id: 'owner-aware-spara',
+                name: "Spara's Adjudicators",
+                typeLine: 'Creature — Cat Citizen',
+                oracleText:
+                    '{2}, Exile this card from your hand: Target land gains '
+                    '"{T}: Add {G}, {W}, or {U}" until this card is cast from exile.',
+              ),
+              card(
+                id: 'owner-aware-gold-dragon',
+                name: 'Sword of Dungeons & Dragons',
+                typeLine: 'Artifact — Equipment',
+                oracleText:
+                    'Whenever equipped creature attacks, create a 2/2 gold '
+                    'Dragon creature token with flying.',
+              ),
+              card(
+                id: 'owner-aware-filler',
+                name: 'Pteramander',
+                typeLine: 'Creature — Salamander Drake',
+                oracleText: 'Flying',
+                quantity: 45,
+              ),
+            ],
+          },
+        );
+
+        await tester.pumpWidget(createSubject(deck));
+        await tester.pumpAndSettle();
+
+        await tester.tap(find.byKey(const Key('deck-diagnostic-metric-Ramp')));
+        await tester.pumpAndSettle();
+
+        expect(find.text('Ramp (3)'), findsWidgets);
+        expect(find.text('Arcane Signet'), findsOneWidget);
+        expect(find.text('Lander Rizzi'), findsOneWidget);
+        expect(find.text('Rampant Growth'), findsOneWidget);
+        expect(find.text("Bootleggers' Stash"), findsNothing);
+        expect(find.text('Firebending Adept'), findsNothing);
+        expect(find.text('Hoarding Ogre'), findsNothing);
+      },
+    );
+
+    test('fallback ramp classifier exposes the owner-aware contract', () {
+      final cases = <DeckCardItem, bool>{
+        card(
+              id: 'unit-hoarding',
+              name: 'Hoarding Ogre',
+              typeLine: 'Creature — Ogre',
+              oracleText:
+                  'Whenever this creature attacks, roll a d20.\n'
+                  '1—9 | Create a Treasure token.',
+            ):
+            true,
+        card(
+              id: 'unit-powerstone',
+              name: 'Splitting the Powerstone',
+              typeLine: 'Sorcery',
+              oracleText: 'Create a tapped Powerstone token.',
+            ):
+            true,
+        card(
+              id: 'unit-firebending',
+              name: 'Firebending Adept',
+              typeLine: 'Creature — Human Monk',
+              oracleText: 'Creatures you control have firebending 1.',
+            ):
+            true,
+        card(
+              id: 'unit-lander',
+              name: 'Lander Rizzi',
+              typeLine: 'Legendary Artifact Creature — Lander Rogue',
+              oracleText: '{T}: Add one mana of any color.',
+            ):
+            true,
+        card(
+              id: 'unit-growth',
+              name: 'Rampant Growth',
+              typeLine: 'Sorcery',
+              oracleText:
+                  'Search your library for a basic land card, put that card '
+                  'onto the battlefield tapped, then shuffle.',
+            ):
+            true,
+        card(
+              id: 'unit-glorious-sunrise',
+              name: 'Glorious Sunrise',
+              typeLine: 'Enchantment',
+              oracleText:
+                  'Target land gains "{T}: Add {G}{G}{G}" until end of turn.',
+            ):
+            true,
+        card(
+              id: 'unit-toxicrene',
+              name: 'Toxicrene',
+              typeLine: 'Creature — Tyranid',
+              oracleText:
+                  'All lands have "{T}: Add one mana of any color" and lose '
+                  'all other abilities.',
+            ):
+            false,
+        card(
+              id: 'unit-spara',
+              name: "Spara's Adjudicators",
+              typeLine: 'Creature — Cat Citizen',
+              oracleText:
+                  'Exile this card from your hand: Target land gains '
+                  '"{T}: Add {G}, {W}, or {U}."',
+            ):
+            false,
+        card(
+              id: 'unit-firebending-name',
+              name: 'Firebending Lesson',
+              typeLine: 'Sorcery',
+              oracleText: 'Firebending Lesson deals 3 damage to any target.',
+            ):
+            false,
+        card(
+          id: 'unit-gold-dragon',
+          name: 'Sword of Dungeons & Dragons',
+          typeLine: 'Artifact — Equipment',
+          oracleText: 'Create a 2/2 gold Dragon creature token with flying.',
+        ): false,
+        card(
+          id: 'unit-offer',
+          name: "An Offer You Can't Refuse",
+          typeLine: 'Instant',
+          oracleText:
+              'Counter target noncreature spell. Its controller creates two '
+              'Treasure tokens.',
+        ): false,
+        card(
+          id: 'unit-erestor',
+          name: 'Erestor of the Council',
+          typeLine: 'Legendary Creature — Elf Noble',
+          oracleText:
+              'Each opponent who voted for your choice creates a Treasure token.',
+        ): false,
+        card(
+          id: 'unit-minimus',
+          name: 'Minimus Containment',
+          typeLine: 'Enchantment — Aura',
+          oracleText:
+              'Enchanted permanent is a Treasure artifact with "{T}, '
+              'Sacrifice this artifact: Add one mana of any color" and loses '
+              'all other abilities.',
+        ): false,
+        card(
+          id: 'unit-dockbreacher',
+          name: 'Dockbreacher',
+          typeLine: 'Creature — Merfolk Pirate',
+          oracleText:
+              'If an opponent would create a Treasure token, instead you draw a card.',
+        ): false,
+        card(
+              id: 'unit-north-pole',
+              name: 'North Pole Research Base',
+              typeLine: 'Plane — Earth',
+              oracleText:
+                  'Target opponent draws a card and creates a Treasure token.',
+            ):
+            false,
+        card(
+          id: 'unit-land-to-hand',
+          name: 'Environmental Scientist',
+          typeLine: 'Creature — Human Druid',
+          oracleText:
+              'Search your library for a basic land card, reveal it, put it '
+              'into your hand, then shuffle.',
+        ): false,
+      };
+
+      for (final entry in cases.entries) {
+        expect(
+          isDeckDiagnosticRampCard(entry.key),
+          entry.value,
+          reason: entry.key.name,
+        );
+      }
+    });
+
+    test('fallback ramp floor excludes contextual acceleration', () {
+      final cases = <DeckCardItem, bool>{
+        card(
+              id: 'floor-signet',
+              name: 'Arcane Signet',
+              typeLine: 'Artifact',
+              oracleText: '{T}: Add one mana of any color.',
+            ):
+            true,
+        card(
+              id: 'floor-dork',
+              name: 'Llanowar Elves',
+              typeLine: 'Creature — Elf Druid',
+              oracleText: '{T}: Add {G}.',
+            ):
+            true,
+        card(
+          id: 'floor-growth',
+          name: 'Rampant Growth',
+          typeLine: 'Sorcery',
+          oracleText:
+              'Search your library for a basic land card, put that card onto '
+              'the battlefield tapped, then shuffle.',
+        ): true,
+        card(
+              id: 'floor-azusa',
+              name: 'Azusa, Lost but Seeking',
+              typeLine: 'Legendary Creature — Human Monk',
+              oracleText:
+                  'You may play two additional lands on each of your turns.',
+            ):
+            true,
+        card(
+              id: 'context-ritual',
+              name: 'Dark Ritual',
+              typeLine: 'Instant',
+              oracleText: 'Add {B}{B}{B}.',
+            ):
+            false,
+        card(
+          id: 'context-treasure',
+          name: 'Smothering Tithe',
+          typeLine: 'Enchantment',
+          oracleText:
+              'Whenever an opponent draws a card, that player may pay {2}. If '
+              "the player doesn't, you create a Treasure token.",
+        ): false,
+        card(
+              id: 'context-reducer',
+              name: 'Goblin Electromancer',
+              typeLine: 'Creature — Goblin Wizard',
+              oracleText:
+                  'Instant and sorcery spells you cast cost {1} less to cast.',
+            ):
+            false,
+        card(
+              id: 'context-consumable',
+              name: 'Blood Pet',
+              typeLine: 'Creature — Thrull',
+              oracleText: 'Sacrifice this creature: Add {B}.',
+            ):
+            false,
+        card(
+          id: 'context-to-hand',
+          name: 'Environmental Scientist',
+          typeLine: 'Creature — Human Druid',
+          oracleText:
+              'Search your library for a basic land card, reveal it, put it '
+              'into your hand, then shuffle.',
+        ): false,
+        card(
+              id: 'context-land',
+              name: 'Ancient Tomb',
+              typeLine: 'Land',
+              oracleText: '{T}: Add {C}{C}.',
+            ):
+            false,
+      };
+
+      for (final entry in cases.entries) {
+        expect(
+          isDeckDiagnosticRampFloorCard(entry.key),
+          entry.value,
+          reason: entry.key.name,
+        );
+      }
+    });
+
     testWidgets('shows core metrics and quick insights for a healthy deck', (
       tester,
     ) async {
@@ -891,6 +1306,13 @@ void main() {
               oracleText: 'Red spells you cast cost {1} less to cast.',
             ),
             card(
+              id: 'arcane-signet-backend',
+              name: 'Arcane Signet',
+              typeLine: 'Artifact',
+              manaCost: '{2}',
+              oracleText: '{T}: Add one mana of any color.',
+            ),
+            card(
               id: 'scroll-rack',
               name: 'Scroll Rack',
               typeLine: 'Artifact',
@@ -912,7 +1334,7 @@ void main() {
               typeLine: 'Creature — Human Cleric',
               manaCost: '{1}{R}{W}',
               oracleText: 'Magecraft — Create a 3/2 Spirit creature token.',
-              quantity: 64,
+              quantity: 63,
             ),
           ],
         },
@@ -922,7 +1344,8 @@ void main() {
         'format': 'commander',
         'stats': {
           'composition': {
-            'ramp': 0,
+            'ramp': 2,
+            'ramp_floor': 1,
             'draw': 0,
             'removal': 0,
             'board_wipes': 0,
@@ -934,15 +1357,19 @@ void main() {
           'semantic_schema_version': 'semantic_layer_v2_2026_05_18',
           'source': {
             'priority': 'persisted_then_heuristic',
-            'persisted_rows': 3,
-            'persisted_copies': 3,
+            'persisted_rows': 4,
+            'persisted_copies': 4,
             'heuristic_rows': 0,
             'heuristic_copies': 0,
           },
-          'counts': {'ramp': 1, 'draw': 1, 'removal': 1},
+          'counts': {'ramp': 2, 'ramp_floor': 1, 'draw': 1, 'removal': 1},
           'sample_details': {
             'ramp': [
               {'name': 'Ruby Medallion', 'evidence': 'persisted_semantic_v2'},
+              {'name': 'Arcane Signet', 'evidence': 'persisted_semantic_v2'},
+            ],
+            'ramp_floor': [
+              {'name': 'Arcane Signet', 'evidence': 'ramp_floor_profile_v1'},
             ],
             'draw': [
               {'name': 'Scroll Rack', 'evidence': 'persisted_semantic_v2'},
@@ -952,12 +1379,12 @@ void main() {
             ],
           },
           'coverage': {
-            'card_rows': 5,
+            'card_rows': 6,
             'card_copies': 100,
-            'tagged_rows': 3,
-            'tagged_copies': 3,
+            'tagged_rows': 4,
+            'tagged_copies': 4,
             'other_rows': 2,
-            'other_copies': 97,
+            'other_copies': 96,
           },
         },
       });
@@ -968,7 +1395,8 @@ void main() {
       expect(find.text('Ramp (1)'), findsOneWidget);
       expect(find.text('Compra (1)'), findsOneWidget);
       expect(find.text('Interação (1)'), findsOneWidget);
-      expect(find.text('Ruby Medallion'), findsOneWidget);
+      expect(find.text('Arcane Signet'), findsOneWidget);
+      expect(find.text('Ruby Medallion'), findsNothing);
       expect(find.text('Scroll Rack'), findsOneWidget);
       expect(find.text('Chaos Warp'), findsOneWidget);
 

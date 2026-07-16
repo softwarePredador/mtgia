@@ -10,6 +10,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import re
 import sqlite3
 from collections import Counter
 from datetime import datetime, timezone
@@ -73,6 +74,10 @@ def candidate_keys(card_name: str) -> set[str]:
     return {key for key in keys if key}
 
 
+def is_land_type_line(type_line: object) -> bool:
+    return re.search(r"(?<![a-z])land(?![a-z])", str(type_line or ""), re.IGNORECASE) is not None
+
+
 def candidate_land_rows(conn: sqlite3.Connection) -> list[dict[str, Any]]:
     if not mana_profile.table_exists(conn, "card_oracle_cache"):
         return []
@@ -82,11 +87,10 @@ def candidate_land_rows(conn: sqlite3.Connection) -> list[dict[str, Any]]:
         SELECT name, normalized_name, mana_cost, colors_json, color_identity_json,
                type_line, oracle_text, cmc, scryfall_id, card_id
         FROM card_oracle_cache
-        WHERE lower(type_line) LIKE '%land%'
         ORDER BY name
         """
     ).fetchall()
-    return [dict(row) for row in rows]
+    return [dict(row) for row in rows if is_land_type_line(row["type_line"])]
 
 
 def color_identity_allowed(candidate_colors: list[str], commander_colors: list[str]) -> bool:

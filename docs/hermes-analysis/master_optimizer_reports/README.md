@@ -30,6 +30,42 @@ tracked so audit/package history can be reconstructed without relying on
 local ignored files. This manifest is consumed by
 `report_retention_audit.py`.
 
+The reviewed PG878/PG879 apply, synchronization, contract-audit, and deck-gate
+evidence below is pending Git tracking. Each local file is content-sealed; the
+retention audit accepts it only while its exact path and SHA-256 match this
+manifest. This exception does not cover arbitrary generated JSON/Markdown.
+
+- `docs/hermes-analysis/master_optimizer_reports/lorehold_607_615_exact_gate_protocol_20260716.md` — pending-local-sha256: `5bac6edb8b357cfbb0da374edc484486e283418717b0cd38e7e028c91f5275bb`
+- `docs/hermes-analysis/master_optimizer_reports/lorehold_all_variants_strategy_matrix_20260716_exact_runtime.json` — pending-local-sha256: `9ad785d350ea6dad1b91f5776bb5373aba393234b15dc85b94d51bb18a0cb786`
+- `docs/hermes-analysis/master_optimizer_reports/lorehold_all_variants_strategy_matrix_20260716_exact_runtime.md` — pending-local-sha256: `4b85d907f9e89312c76c1c7c06ac628c3b91a595e86ead156c66ef173fdad215`
+- `docs/hermes-analysis/master_optimizer_reports/lorehold_variant_strategy_matrix_20260716_pg878_exact_runtime.json` — pending-local-sha256: `74c737ba6f962c631d6a4a0b165ecf492a1974faa8a13501814a041efb42323c`
+- `docs/hermes-analysis/master_optimizer_reports/lorehold_variant_strategy_matrix_20260716_pg878_exact_runtime.md` — pending-local-sha256: `6573c9f872d4a56661c1f2015c357d39bfaad21f1b6340501994fa6f76f736a4`
+- `docs/hermes-analysis/master_optimizer_reports/pg878_lorehold_607_615_effect_coverage_20260716.json` — pending-local-sha256: `8392bc538395f707b4057f85217d7dfbbf0b7ca4bf53dd37e4de1e26f03e44f2`
+- `docs/hermes-analysis/master_optimizer_reports/pg878_lorehold_607_615_effect_coverage_20260716.md` — pending-local-sha256: `52f1a1c56684930c92bcc0b46e7164249e4b736b7ee14f2d916b30b49657a0f4`
+- `docs/hermes-analysis/master_optimizer_reports/pg878_lorehold_607_coherence_audit_20260716.json` — pending-local-sha256: `c055b7eb98d12549b33512238045b36651d4ecbd3361266cb2abe972250b6a43`
+- `docs/hermes-analysis/master_optimizer_reports/pg878_lorehold_607_coherence_audit_20260716.md` — pending-local-sha256: `427718f20796e530195d5ad319ca26d918ea1825d9d23fada932319cc989e3ab`
+- `docs/hermes-analysis/master_optimizer_reports/pg878_lorehold_607_effect_coverage_focal_20260716.json` — pending-local-sha256: `720c5ad7b5a3a6fdc204b22d258a4441979343361b9f60c23b790725c7637865`
+- `docs/hermes-analysis/master_optimizer_reports/pg878_lorehold_607_effect_coverage_focal_20260716.md` — pending-local-sha256: `761dd8ac13783a9e80c8e9fa39ad9336de683276d617b282cae9d6d0c170868e`
+- `docs/hermes-analysis/master_optimizer_reports/pg878_lorehold_614_coherence_audit_20260716.json` — pending-local-sha256: `d06f4482c78a29b9c13bd53fe5dd805ac22c0e1e49726c9fdfe2ff1e2def3030`
+- `docs/hermes-analysis/master_optimizer_reports/pg878_lorehold_614_coherence_audit_20260716.md` — pending-local-sha256: `c5ba4d0be8e8ca70f7f8ab37d2282faed943292773edbc72cc97f770d3ba5025`
+- `docs/hermes-analysis/master_optimizer_reports/pg878_lorehold_615_coherence_audit_20260716.json` — pending-local-sha256: `36fcc1b22cdbef1bd4b7a7512c43be6955c3786e4612642eb7aa6fe446114a33`
+- `docs/hermes-analysis/master_optimizer_reports/pg878_lorehold_615_coherence_audit_20260716.md` — pending-local-sha256: `37c0af96c9c76ca3584587caa132fc2bdc3e6c88fe91c710598674a2031737e1`
+- `docs/hermes-analysis/master_optimizer_reports/pg878_lorehold_615_effect_coverage_focal_20260716.json` — pending-local-sha256: `0b31d8d6254f35d5b4ed79d0e5f37b6215ae42aac0d9465e640294620efd52d3`
+- `docs/hermes-analysis/master_optimizer_reports/pg878_lorehold_615_effect_coverage_focal_20260716.md` — pending-local-sha256: `6902bc464c88a75363316c61511724be59075548b6c992467afce8ed44996ae4`
+- `docs/hermes-analysis/master_optimizer_reports/pg878_lorehold_pg_hermes_contract_audit_20260716.json` — pending-local-sha256: `f5f2843229f695693e3eb714c0b4a1a3c8f1bc1ec42f8c740d82508494d977ce`
+- `docs/hermes-analysis/master_optimizer_reports/pg878_lorehold_pg_hermes_contract_audit_20260716.md` — pending-local-sha256: `8331bfe5803894ee934e30b8aa3466df49c3e6069f8d64a85d87d65ef6ff28e1`
+- `docs/hermes-analysis/master_optimizer_reports/pg878_lorehold_runtime_sqlite_sync_20260716.json` — pending-local-sha256: `cdb3fe43d8450008b5e81a9af06e5e4a13b4bd0df4244a0cf48cc249de88bcea`
+- `docs/hermes-analysis/master_optimizer_reports/pg879_flashback_metadata_sqlite_sync_20260716.json` — pending-local-sha256: `47f5961dacbbd4a28ad13c38845d9de008ac626148d3e609dfed5b875789ac9f`
+- `docs/hermes-analysis/master_optimizer_reports/pg879_flashback_rules_sqlite_sync_20260716.json` — pending-local-sha256: `1823aec421188c640ba4315d5c02a2953eb6fd45ea8c0fa18d0492e21715cddb`
+- `docs/hermes-analysis/master_optimizer_reports/pg879_lorehold_deck607_battle_rule_coherence_20260716.json` — pending-local-sha256: `b641a0db2f1adea37b5085d0b8a80df8e35ae40072a4561834c37592604be118`
+- `docs/hermes-analysis/master_optimizer_reports/pg879_lorehold_deck607_battle_rule_coherence_20260716.md` — pending-local-sha256: `47540282213872b7586238f9a417d24c24cbef5993c8e028eb70efa70c7f7e7f`
+- `docs/hermes-analysis/master_optimizer_reports/pg879_lorehold_deck614_battle_rule_coherence_20260716.json` — pending-local-sha256: `e4f5b698c36e0875ec57f405c7b73b000cd31b25f063bfdbaafefcb5fa576a08`
+- `docs/hermes-analysis/master_optimizer_reports/pg879_lorehold_deck614_battle_rule_coherence_20260716.md` — pending-local-sha256: `e52a7e71c7921f9a2cc420e7fd9a5de48ba806491ed735091981b135713411a4`
+- `docs/hermes-analysis/master_optimizer_reports/pg879_lorehold_deck615_battle_rule_coherence_20260716.json` — pending-local-sha256: `542b93aeb9301fb50d4e23a469cd38655523f4bef8489b011abb1588dd0d0250`
+- `docs/hermes-analysis/master_optimizer_reports/pg879_lorehold_deck615_battle_rule_coherence_20260716.md` — pending-local-sha256: `2bf3ebd89c9bc86b66d2912c2dd3342d4891980f2efde3ae0a2879d596f9b265`
+- `docs/hermes-analysis/master_optimizer_reports/pg879_lorehold_pg_hermes_contract_audit_20260716.json` — pending-local-sha256: `f4c9e21f623544fa3337dd8c1b72df4f1c11a5b392e096738affc586436e0144`
+- `docs/hermes-analysis/master_optimizer_reports/pg879_lorehold_pg_hermes_contract_audit_20260716.md` — pending-local-sha256: `509ec072279cd14bcd83430ba456ca0404d73cc8a01018b8180be51178361e21`
+
 - `docs/hermes-analysis/master_optimizer_reports/global_card_oracle_battle_readiness_20260707_post_pg585_attack_self_boost_new_server.json`
 - `docs/hermes-analysis/master_optimizer_reports/global_card_oracle_battle_readiness_20260707_post_pg586_static_controlled_trample_new_server.json`
 - `docs/hermes-analysis/master_optimizer_reports/global_card_oracle_battle_readiness_20260707_post_pg587_becomes_blocked_self_boost_new_server.json`
@@ -297,12 +333,76 @@ these files are the durable operator contract, not runtime truth:
 - `docs/hermes-analysis/master_optimizer_reports/pg872_semantic_tag_false_positive_repair_20260715_precheck.sql`
 - `docs/hermes-analysis/master_optimizer_reports/pg872_semantic_tag_false_positive_repair_20260715_rollback.sql`
 
-PG873 was validated read-only but was not applied. Its package stays retained
-as approval-gated operator evidence and must not be reported as PostgreSQL
-truth until a future apply and postcheck both succeed:
+PG873 was applied with explicit authorization on 2026-07-16 and its guarded
+postcheck passed. The exact precheck, apply, postcheck, and rollback SQL remain
+retained as the durable operator contract; the former standalone missing-row
+manifest was removed after its deferred 52-card scope became an audited table
+inside the final package:
 
 - `docs/hermes-analysis/master_optimizer_reports/pg873_sacrifice_outlet_family_reconciliation_20260715_apply.sql`
-- `docs/hermes-analysis/master_optimizer_reports/pg873_sacrifice_outlet_family_reconciliation_20260715_missing_semantic_manifest.sql`
 - `docs/hermes-analysis/master_optimizer_reports/pg873_sacrifice_outlet_family_reconciliation_20260715_postcheck.sql`
 - `docs/hermes-analysis/master_optimizer_reports/pg873_sacrifice_outlet_family_reconciliation_20260715_precheck.sql`
 - `docs/hermes-analysis/master_optimizer_reports/pg873_sacrifice_outlet_family_reconciliation_20260715_rollback.sql`
+
+PG874 was applied with explicit authorization on 2026-07-16 and its guarded
+postcheck passed. The remove-only family package and exact rollback stay
+retained so the ramp reconciliation can be reconstructed independently of
+PostgreSQL runtime state:
+
+- `docs/hermes-analysis/master_optimizer_reports/pg874_ramp_family_reconciliation_20260716_apply.sql`
+- `docs/hermes-analysis/master_optimizer_reports/pg874_ramp_family_reconciliation_20260716_postcheck.sql`
+- `docs/hermes-analysis/master_optimizer_reports/pg874_ramp_family_reconciliation_20260716_precheck.sql`
+- `docs/hermes-analysis/master_optimizer_reports/pg874_ramp_family_reconciliation_20260716_rollback.sql`
+
+PG875 was applied with explicit authorization on 2026-07-16 and its guarded
+one-card postcheck passed. The full deterministic replacement quartet remains
+retained for exact Lander Rizzi reconstruction and rollback:
+
+- `docs/hermes-analysis/master_optimizer_reports/pg875_lander_rizzi_reconciliation_20260716_apply.sql`
+- `docs/hermes-analysis/master_optimizer_reports/pg875_lander_rizzi_reconciliation_20260716_postcheck.sql`
+- `docs/hermes-analysis/master_optimizer_reports/pg875_lander_rizzi_reconciliation_20260716_precheck.sql`
+- `docs/hermes-analysis/master_optimizer_reports/pg875_lander_rizzi_reconciliation_20260716_rollback.sql`
+
+PG876 was applied with explicit authorization on 2026-07-16 and its guarded
+one-card postcheck passed. The exact Ronin quartet remains retained for
+reconstruction and rollback:
+
+- `docs/hermes-analysis/master_optimizer_reports/pg876_ronin_ramp_reconciliation_20260716_apply.sql`
+- `docs/hermes-analysis/master_optimizer_reports/pg876_ronin_ramp_reconciliation_20260716_postcheck.sql`
+- `docs/hermes-analysis/master_optimizer_reports/pg876_ronin_ramp_reconciliation_20260716_precheck.sql`
+- `docs/hermes-analysis/master_optimizer_reports/pg876_ronin_ramp_reconciliation_20260716_rollback.sql`
+
+PG877 was applied and exact-postchecked on 2026-07-16. The 115-card remove-only
+permission false-positive package removed all persisted false ramp rows while
+preserving the six proven accelerators, every deck/usage reference, and the
+protected Battle deck. The rollback remains exact-poststate-gated:
+
+- `docs/hermes-analysis/master_optimizer_reports/pg877_ramp_permission_false_positive_reconciliation_20260716_apply.sql`
+- `docs/hermes-analysis/master_optimizer_reports/pg877_ramp_permission_false_positive_reconciliation_20260716_postcheck.sql`
+- `docs/hermes-analysis/master_optimizer_reports/pg877_ramp_permission_false_positive_reconciliation_20260716_precheck.sql`
+- `docs/hermes-analysis/master_optimizer_reports/pg877_ramp_permission_false_positive_reconciliation_20260716_rollback.sql`
+
+PG878 was applied, exact-postchecked, synchronized PostgreSQL-to-Hermes, and
+contract-audited on 2026-07-16. It promotes the implemented exact native
+runtime scopes for Birgi/Harnfel, Underworld Breach, and Mana Vault, while
+preserving the residual Birgi boast-twice branch as annotation-only. The apply
+captured the complete 11-row prestate and 14-row poststate; rollback refuses
+any intervening target-row drift:
+
+- `docs/hermes-analysis/master_optimizer_reports/pg878_lorehold_challenger_runtime_completion_20260716_apply.sql`
+- `docs/hermes-analysis/master_optimizer_reports/pg878_lorehold_challenger_runtime_completion_20260716_postcheck.sql`
+- `docs/hermes-analysis/master_optimizer_reports/pg878_lorehold_challenger_runtime_completion_20260716_precheck.sql`
+- `docs/hermes-analysis/master_optimizer_reports/pg878_lorehold_challenger_runtime_completion_20260716_rollback.sql`
+
+PG879 was applied, exact-postchecked, synchronized PostgreSQL-to-Hermes, and
+contract-audited on 2026-07-16. It corrected only Flashback's PostgreSQL CMC
+from `0.0` to `1.0`, disabled exactly two sealed broad live rules, and inserted
+one exact `verified/auto` targeted-flashback rule. Both complete card and rule
+row sets were snapshotted before and after mutation; rollback refuses any
+intervening poststate drift. Both required PostgreSQL-to-Hermes metadata and
+battle-rule syncs completed after postcheck:
+
+- `docs/hermes-analysis/master_optimizer_reports/pg879_flashback_exact_runtime_and_cmc_20260716_apply.sql`
+- `docs/hermes-analysis/master_optimizer_reports/pg879_flashback_exact_runtime_and_cmc_20260716_postcheck.sql`
+- `docs/hermes-analysis/master_optimizer_reports/pg879_flashback_exact_runtime_and_cmc_20260716_precheck.sql`
+- `docs/hermes-analysis/master_optimizer_reports/pg879_flashback_exact_runtime_and_cmc_20260716_rollback.sql`

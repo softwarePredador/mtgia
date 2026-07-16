@@ -1008,7 +1008,7 @@ String classifyCommanderReferenceDeckCardRole(
   final normalized = normalizeCommanderReferenceDeckText(cardName);
   final typeLine = metadata?['type_line']?.toString().toLowerCase() ?? '';
   final oracle = metadata?['oracle_text']?.toString().toLowerCase() ?? '';
-  if (typeLine.contains('land')) return 'lands';
+  if (basic_lands.isLandTypeLine(typeLine)) return 'lands';
   if (_containsAny(normalized, const [
     'deflecting swat',
     'bolt bend',

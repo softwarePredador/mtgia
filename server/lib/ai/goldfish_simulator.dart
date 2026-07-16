@@ -1,5 +1,6 @@
 import 'dart:math';
 
+import '../basic_land_utils.dart' as basic_lands;
 import 'cmc_safety.dart';
 
 /// Resultado da simulação Goldfish (jogar sozinho)
@@ -263,7 +264,7 @@ class GoldfishSimulator {
   /// Verifica se a carta é um terreno
   bool _isLand(Map<String, dynamic> card) {
     final typeLine = (card['type_line'] ?? '').toString().toLowerCase();
-    return typeLine.contains('land');
+    return basic_lands.isLandTypeLine(typeLine);
   }
 
   /// Obtém o CMC de uma carta
@@ -735,7 +736,7 @@ class _DeckStats {
       final oracleText = (card['oracle_text'] ?? '').toString().toLowerCase();
       final cmc = _getCmc(card);
 
-      if (typeLine.contains('land')) {
+      if (basic_lands.isLandTypeLine(typeLine)) {
         lands += qty;
         continue;
       }

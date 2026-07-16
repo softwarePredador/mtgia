@@ -5,6 +5,18 @@ import '../lib/ai/optimize_state_support.dart';
 
 void main() {
   group('deriveOptimizeOutcomeCode', () {
+    Map<String, dynamic> actionableOptimizeBody() => {
+      'mode': 'optimize',
+      'removals': ['Old Card'],
+      'additions': ['New Card'],
+      'removals_detailed': [
+        {'name': 'Old Card', 'card_id': 'old-card-id', 'quantity': 1},
+      ],
+      'additions_detailed': [
+        {'name': 'New Card', 'card_id': 'new-card-id', 'quantity': 1},
+      ],
+    };
+
     const healthyDeckState = DeckOptimizationStateResult(
       status: 'healthy',
       recommendedMode: 'optimize',
@@ -26,7 +38,7 @@ void main() {
       expect(
         deriveOptimizeOutcomeCode(
           statusCode: 200,
-          body: const {'mode': 'optimize'},
+          body: actionableOptimizeBody(),
           deckState: healthyDeckState,
         ),
         equals('optimized'),
@@ -34,7 +46,13 @@ void main() {
       expect(
         deriveOptimizeOutcomeCode(
           statusCode: 200,
-          body: const {'mode': 'complete'},
+          body: const {
+            'mode': 'complete',
+            'additions': ['New Card'],
+            'additions_detailed': [
+              {'name': 'New Card', 'card_id': 'new-card-id', 'quantity': 1},
+            ],
+          },
           deckState: healthyDeckState,
         ),
         equals('deck_completed'),
@@ -49,13 +67,73 @@ void main() {
       );
     });
 
+    test('fails closed for an empty successful optimize body', () {
+      final body = <String, dynamic>{'mode': 'optimize'};
+
+      expect(
+        deriveOptimizeOutcomeCode(
+          statusCode: 200,
+          body: body,
+          deckState: healthyDeckState,
+        ),
+        equals('no_safe_upgrade_found'),
+      );
+
+      enforceSuccessfulOptimizeOutcomeSafety(body);
+      expect(body['outcome_code'], equals('no_safe_upgrade_found'));
+      expect(body['can_apply'], isFalse);
+      expect(body['learning_eligible'], isFalse);
+    });
+
+    test('rejects unbalanced or non-detailed swaps as optimized', () {
+      final unbalanced =
+          actionableOptimizeBody()
+            ..['additions'] = <String>[]
+            ..['additions_detailed'] = <Map<String, dynamic>>[];
+      final missingCardId =
+          actionableOptimizeBody()
+            ..['additions_detailed'] = [
+              {'name': 'New Card', 'quantity': 1},
+            ];
+      final nonUnitQuantity =
+          actionableOptimizeBody()
+            ..['additions_detailed'] = [
+              {'name': 'New Card', 'card_id': 'new-card-id', 'quantity': 2},
+            ];
+      final overlappingCard =
+          actionableOptimizeBody()
+            ..['additions'] = ['Old Card']
+            ..['additions_detailed'] = [
+              {'name': 'Old Card', 'card_id': 'old-card-id', 'quantity': 1},
+            ];
+
+      expect(hasActionableOptimizeSwaps(unbalanced), isFalse);
+      expect(hasActionableOptimizeSwaps(missingCardId), isFalse);
+      expect(hasActionableOptimizeSwaps(nonUnitQuantity), isFalse);
+      expect(hasActionableOptimizeSwaps(overlappingCard), isFalse);
+      expect(
+        deriveOptimizeOutcomeCode(
+          statusCode: 200,
+          body: unbalanced,
+          deckState: healthyDeckState,
+        ),
+        equals('no_safe_upgrade_found'),
+      );
+      expect(
+        deriveOptimizeOutcomeCode(
+          statusCode: 200,
+          body: missingCardId,
+          deckState: healthyDeckState,
+        ),
+        equals('no_safe_upgrade_found'),
+      );
+    });
+
     test('maps healthy no-safe-swap rejection to safe no-op outcome', () {
       final outcome = deriveOptimizeOutcomeCode(
         statusCode: 422,
         body: const {
-          'quality_error': {
-            'code': 'OPTIMIZE_NO_SAFE_SWAPS',
-          },
+          'quality_error': {'code': 'OPTIMIZE_NO_SAFE_SWAPS'},
         },
         deckState: healthyDeckState,
       );
@@ -69,10 +147,7 @@ void main() {
         body: const {
           'quality_error': {
             'code': 'OPTIMIZE_QUALITY_REJECTED',
-            'validation': {
-              'deck_health_score': 84,
-              'improvement_score': 18,
-            },
+            'validation': {'deck_health_score': 84, 'improvement_score': 18},
           },
         },
         deckState: healthyDeckState,
@@ -88,10 +163,7 @@ void main() {
           body: const {
             'quality_error': {
               'code': 'OPTIMIZE_QUALITY_REJECTED',
-              'validation': {
-                'deck_health_score': 22,
-                'improvement_score': 9,
-              },
+              'validation': {'deck_health_score': 22, 'improvement_score': 9},
             },
           },
           deckState: repairDeckState,
@@ -105,10 +177,7 @@ void main() {
           body: const {
             'quality_error': {
               'code': 'OPTIMIZE_SEMANTIC_V2_REJECTED',
-              'validation': {
-                'deck_health_score': 30,
-                'improvement_score': 70,
-              },
+              'validation': {'deck_health_score': 30, 'improvement_score': 70},
             },
           },
           deckState: healthyDeckState,

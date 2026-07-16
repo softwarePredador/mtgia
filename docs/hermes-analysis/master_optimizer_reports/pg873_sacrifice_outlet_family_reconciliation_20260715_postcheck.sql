@@ -151,10 +151,31 @@ expected_cards AS (
       )
     )
 ),
-expected AS (
+global_expected AS (
   SELECT o.lane, o.card_id
   FROM owner_cards o
   JOIN expected_cards e USING (card_id)
+),
+semantic_snapshot_owners AS (
+  SELECT s.card_id
+  FROM public.card_semantic_tags_v2 s
+  WHERE s.source = 'deterministic_semantic_v2'
+    AND s.schema_version = 'semantic_layer_v2_2026_05_18'
+),
+expected AS (
+  SELECT e.lane, e.card_id
+  FROM global_expected e
+  WHERE e.lane = 'deterministic_heuristic_v1'
+     OR EXISTS (
+       SELECT 1 FROM semantic_snapshot_owners s WHERE s.card_id = e.card_id
+     )
+),
+deferred_missing_semantic AS (
+  SELECT e.card_id
+  FROM global_expected e
+  LEFT JOIN semantic_snapshot_owners s ON s.card_id = e.card_id
+  WHERE e.lane = 'deterministic_semantic_v2'
+    AND s.card_id IS NULL
 ),
 current_function AS (
   SELECT source AS lane, card_id, confidence, evidence
@@ -216,13 +237,24 @@ metrics AS (
   SELECT
     (SELECT count(*) FROM expected WHERE lane='deterministic_heuristic_v1') AS live_heuristic_expected_count,
     (SELECT encode(digest(string_agg(card_id::text, E'\n' ORDER BY card_id::text), 'sha256'), 'hex') FROM expected WHERE lane='deterministic_heuristic_v1') AS live_heuristic_expected_sha256,
+    (SELECT count(*) FROM global_expected WHERE lane='deterministic_semantic_v2') AS live_semantic_global_expected_count,
+    (SELECT encode(digest(string_agg(card_id::text, E'\n' ORDER BY card_id::text), 'sha256'), 'hex') FROM global_expected WHERE lane='deterministic_semantic_v2') AS live_semantic_global_expected_sha256,
     (SELECT count(*) FROM expected WHERE lane='deterministic_semantic_v2') AS live_semantic_expected_count,
     (SELECT encode(digest(string_agg(card_id::text, E'\n' ORDER BY card_id::text), 'sha256'), 'hex') FROM expected WHERE lane='deterministic_semantic_v2') AS live_semantic_expected_sha256,
     (SELECT count(*) FROM manaloom_deploy_audit.pg873_sac_outlet_expected_20260715 WHERE source='deterministic_heuristic_v1') AS manifest_heuristic_count,
     (SELECT count(*) FROM manaloom_deploy_audit.pg873_sac_outlet_expected_20260715 WHERE source='deterministic_semantic_v2') AS manifest_semantic_count,
     (SELECT count(*) FROM manaloom_deploy_audit.pg873_sac_outlet_function_backup_20260715) AS function_backup_count,
     (SELECT count(*) FROM manaloom_deploy_audit.pg873_sac_outlet_semantic_backup_20260715) AS semantic_backup_count,
-    (SELECT count(*) FROM manaloom_deploy_audit.pg873_sac_outlet_missing_semantic_20260715) AS missing_manifest_count,
+    (SELECT count(*) FROM manaloom_deploy_audit.pg873_sac_outlet_deferred_semantic_20260715) AS deferred_manifest_count,
+    (SELECT encode(digest(string_agg(card_id::text, E'\n' ORDER BY card_id::text), 'sha256'), 'hex') FROM manaloom_deploy_audit.pg873_sac_outlet_deferred_semantic_20260715) AS deferred_manifest_sha256,
+    (SELECT count(*) FROM deferred_missing_semantic) AS live_deferred_count,
+    (SELECT encode(digest(string_agg(card_id::text, E'\n' ORDER BY card_id::text), 'sha256'), 'hex') FROM deferred_missing_semantic) AS live_deferred_sha256,
+    (SELECT count(*) FROM (
+       (SELECT card_id FROM deferred_missing_semantic EXCEPT SELECT card_id FROM manaloom_deploy_audit.pg873_sac_outlet_deferred_semantic_20260715)
+       UNION ALL
+       (SELECT card_id FROM manaloom_deploy_audit.pg873_sac_outlet_deferred_semantic_20260715 EXCEPT SELECT card_id FROM deferred_missing_semantic)
+     ) d) AS deferred_manifest_diff_rows,
+    (SELECT count(*) FROM manaloom_deploy_audit.pg873_sac_outlet_deferred_semantic_20260715 d JOIN public.card_semantic_tags_v2 s ON s.card_id=d.card_id AND s.source='deterministic_semantic_v2') AS deferred_semantic_source_conflicts,
     (SELECT count(*) FROM manaloom_deploy_audit.pg873_sac_outlet_post_semantic_20260715) AS post_semantic_count,
     (SELECT count(*) FROM current_function WHERE lane='deterministic_heuristic_v1') AS heuristic_function_count,
     (SELECT encode(digest(string_agg(card_id::text, E'\n' ORDER BY card_id::text), 'sha256'), 'hex') FROM current_function WHERE lane='deterministic_heuristic_v1') AS heuristic_function_sha256,
@@ -247,21 +279,28 @@ SELECT
   CASE
     WHEN live_heuristic_expected_count=716
      AND live_heuristic_expected_sha256='51272701cdb5b277a2007de43c418c418fab5380409fc16c08ac527fd1ddacbd'
-     AND live_semantic_expected_count=736
-     AND live_semantic_expected_sha256='512cb67eca26b4c86d4555fcf14cae19e6e9f0a9bd24239db0d4cc6caa49418c'
+     AND live_semantic_global_expected_count=736
+     AND live_semantic_global_expected_sha256='512cb67eca26b4c86d4555fcf14cae19e6e9f0a9bd24239db0d4cc6caa49418c'
+     AND live_semantic_expected_count=684
+     AND live_semantic_expected_sha256='573c94fad8b4ba9d9789daadd506e4ce2b0143dfa0d049eb8687c4c8cd90e8bd'
      AND manifest_heuristic_count=716
-     AND manifest_semantic_count=736
+     AND manifest_semantic_count=684
      AND function_backup_count=2737
      AND semantic_backup_count=1557
-     AND missing_manifest_count=52
-     AND post_semantic_count=1576
+     AND deferred_manifest_count=52
+     AND deferred_manifest_sha256='4f29cbcbbdaa9a10bf285ff808c40ab8f3026367a2b3bc873fd51424cad5b199'
+     AND live_deferred_count=52
+     AND live_deferred_sha256='4f29cbcbbdaa9a10bf285ff808c40ab8f3026367a2b3bc873fd51424cad5b199'
+     AND deferred_manifest_diff_rows=0
+     AND deferred_semantic_source_conflicts=0
+     AND post_semantic_count=1524
      AND heuristic_function_count=716
      AND heuristic_function_sha256='51272701cdb5b277a2007de43c418c418fab5380409fc16c08ac527fd1ddacbd'
-     AND semantic_function_count=736
-     AND semantic_function_sha256='512cb67eca26b4c86d4555fcf14cae19e6e9f0a9bd24239db0d4cc6caa49418c'
+     AND semantic_function_count=684
+     AND semantic_function_sha256='573c94fad8b4ba9d9789daadd506e4ce2b0143dfa0d049eb8687c4c8cd90e8bd'
      AND function_wrong_payload=0
-     AND semantic_json_count=736
-     AND semantic_json_sha256='512cb67eca26b4c86d4555fcf14cae19e6e9f0a9bd24239db0d4cc6caa49418c'
+     AND semantic_json_count=684
+     AND semantic_json_sha256='573c94fad8b4ba9d9789daadd506e4ce2b0143dfa0d049eb8687c4c8cd90e8bd'
      AND semantic_json_wrong_payload=0
      AND post_semantic_diff_rows=0
      AND deleted_semantic_rows_resurrected=0

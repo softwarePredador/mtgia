@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:postgres/postgres.dart';
 import 'package:server/ai/aggressive_candidate_meta_signal_support.dart';
 import 'package:server/ai/candidate_quality_data_support.dart';
+import 'package:server/basic_land_utils.dart' as land_utils;
 import 'package:server/database.dart';
 import 'package:server/meta/meta_deck_analytics_support.dart';
 import 'package:server/meta/meta_deck_card_list_support.dart';
@@ -799,7 +800,7 @@ void _collectDeckSignals({
     if (commanderKeys.contains(normalizedCard)) continue;
     final card = cards[normalizedCard];
     if (card == null) continue;
-    if (card.typeLine.toLowerCase().contains('land')) continue;
+    if (land_utils.isLandTypeLine(card.typeLine)) continue;
     final status = legalStatuses[card.id];
     if (!isCommanderCandidateLegalityAllowed(status)) continue;
     final roleRows = roles[card.id] ?? const <_RoleRow>[];
@@ -1180,7 +1181,7 @@ List<Map<String, dynamic>> _buildRejectedExamples(
   for (final entry in ordered) {
     final card = cards[entry.key];
     if (card == null) continue;
-    if (card.typeLine.toLowerCase().contains('land')) continue;
+    if (land_utils.isLandTypeLine(card.typeLine)) continue;
     final roleRows = roles[card.id] ?? const <_RoleRow>[];
     if (roleRows.isEmpty) continue;
     final bestRole = roleRows.reduce((a, b) => a.score >= b.score ? a : b);

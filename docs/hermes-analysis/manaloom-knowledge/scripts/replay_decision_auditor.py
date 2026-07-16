@@ -183,6 +183,145 @@ def defender_life_gaps(event: dict[str, Any]) -> list[dict[str, Any]]:
     ]
 
 
+def combat_power_assigned_to_target(
+    event: dict[str, Any],
+    target: Any | None = None,
+) -> int:
+    """Return power assigned to one defender, not the table-wide attack total."""
+    target_name = str(target or event.get("target") or "")
+    for group in event.get("attack_groups") or []:
+        if not isinstance(group, dict):
+            continue
+        if str(group.get("target") or "") != target_name:
+            continue
+        return int(group.get("group_power") or 0)
+    if target_name == str(event.get("target") or "") and event.get("target_group_power") is not None:
+        return int(event.get("target_group_power") or 0)
+    return int(event.get("total_power") or 0)
+
+
+def board_wipe_choice_findings(event: dict[str, Any]) -> list[str]:
+    """Validate selective-retention evidence without assuming a wipe ratio."""
+    findings: list[str] = []
+    if "choices" not in event:
+        return findings
+    choices = event.get("choices") or []
+    if not isinstance(choices, list):
+        return findings
+
+    identity_scope = str(event.get("object_identity_scope") or "")
+    strict_object_identity = identity_scope == "tragic_arrogance_resolution_v1"
+    protected_object_ids = event.get("protected_object_ids")
+    if isinstance(protected_object_ids, list):
+        retained_permanents: set[tuple[str, str]] = {
+            ("object_id", str(object_id))
+            for object_id in protected_object_ids
+        }
+        if len(retained_permanents) != len(protected_object_ids):
+            findings.append("Selective wipe emitted duplicate protected object ids.")
+    else:
+        retained_permanents = set()
+        if strict_object_identity:
+            findings.append("Selective wipe omitted protected_object_ids in strict identity scope.")
+
+    seen_slots: set[tuple[str, str]] = set()
+    choice_object_ids: set[tuple[str, str]] = set()
+    for choice in choices:
+        if not isinstance(choice, dict):
+            continue
+        controller = str(choice.get("controller") or "?")
+        choice_type = str(choice.get("choice_type") or "").strip().lower()
+        name = str(choice.get("name") or "?")
+        object_id = choice.get("object_id")
+        if object_id is not None:
+            identity = ("object_id", str(object_id))
+            choice_object_ids.add(identity)
+            if not isinstance(protected_object_ids, list):
+                retained_permanents.add(identity)
+        else:
+            if strict_object_identity:
+                findings.append(
+                    f"Selective wipe retained {name} without an object id in strict identity scope."
+                )
+            if not isinstance(protected_object_ids, list):
+                retained_permanents.add((controller, name))
+        type_line = str(choice.get("type_line") or "").strip().lower()
+        if choice_type in {"artifact", "creature", "enchantment", "planeswalker"}:
+            if type_line and choice_type not in type_line:
+                findings.append(
+                    f"Selective wipe retained {name} as {choice_type}, but its "
+                    f"emitted type line is `{choice.get('type_line')}`."
+                )
+            slot = (controller, choice_type)
+            if slot in seen_slots:
+                findings.append(
+                    f"Selective wipe retained more than one {choice_type} for {controller}."
+                )
+            seen_slots.add(slot)
+
+    if isinstance(protected_object_ids, list):
+        missing_from_protected = choice_object_ids - retained_permanents
+        if missing_from_protected:
+            findings.append(
+                "Selective wipe choices referenced retained object ids absent from protected_object_ids."
+            )
+
+    sacrificed_object_ids = event.get("sacrificed_object_ids")
+    sacrificed_permanents: set[tuple[str, str]] = set()
+    if isinstance(sacrificed_object_ids, list):
+        sacrificed_permanents = {
+            ("object_id", str(object_id))
+            for object_id in sacrificed_object_ids
+        }
+        if len(sacrificed_permanents) != len(sacrificed_object_ids):
+            findings.append("Selective wipe emitted duplicate sacrificed object ids.")
+        overlap = retained_permanents & sacrificed_permanents
+        if overlap:
+            findings.append(
+                "Selective wipe reported the same object as both retained and sacrificed."
+            )
+        emitted_sacrificed_ids = {
+            ("object_id", str(card.get("object_id")))
+            for card in event.get("sacrificed_cards") or []
+            if isinstance(card, dict) and card.get("object_id") is not None
+        }
+        if emitted_sacrificed_ids - sacrificed_permanents:
+            findings.append(
+                "Selective wipe sacrifice details referenced object ids absent from sacrificed_object_ids."
+            )
+    elif strict_object_identity:
+        findings.append("Selective wipe omitted sacrificed_object_ids in strict identity scope.")
+
+    protected = event.get("protected")
+    if protected is not None and int(protected or 0) != len(retained_permanents):
+        findings.append(
+            f"Selective wipe reported {int(protected or 0)} retained "
+            f"permanents but emitted {len(retained_permanents)} unique retained objects."
+        )
+    nonland_seen = event.get("nonland_permanents_seen")
+    destroyed = event.get("destroyed")
+    if destroyed is not None and isinstance(sacrificed_object_ids, list):
+        if int(destroyed or 0) != len(sacrificed_permanents):
+            findings.append(
+                f"Selective wipe reported {int(destroyed or 0)} sacrificed permanents "
+                f"but emitted {len(sacrificed_permanents)} unique sacrificed objects."
+            )
+    if nonland_seen is not None and protected is not None and destroyed is not None:
+        accounted = int(protected or 0) + int(destroyed or 0)
+        if accounted != int(nonland_seen or 0):
+            findings.append(
+                f"Selective wipe accounted for {accounted} of {int(nonland_seen or 0)} nonland permanents."
+            )
+        if isinstance(protected_object_ids, list) and isinstance(sacrificed_object_ids, list):
+            unique_accounted = len(retained_permanents | sacrificed_permanents)
+            if unique_accounted != int(nonland_seen or 0):
+                findings.append(
+                    f"Selective wipe object ids accounted for {unique_accounted} of "
+                    f"{int(nonland_seen or 0)} nonland permanents."
+                )
+    return findings
+
+
 def event_type_line(event: dict[str, Any]) -> str:
     return str(event.get("type_line") or "")
 
@@ -310,17 +449,29 @@ def audit_turn_events(events: list[dict[str, Any]]) -> list[dict[str, Any]]:
         elif kind == "combat":
             attackers = int(event.get("attackers") or 0)
             total_power = int(event.get("total_power") or 0)
+            target_power = combat_power_assigned_to_target(event)
             target_life = int(event.get("target_life_before") or 0)
             target_reason = str(event.get("target_reason") or "")
+            lethal_reason = (
+                target_reason == "lethal" or target_reason.endswith("_lethal")
+            )
             blockers = int(event.get("blockers") or 0)
             if attackers > 0 and total_power <= 0:
                 add_finding(findings, "high", event, "Combat declared attackers with non-positive total power.")
-            if total_power >= target_life > 0 and target_reason != "lethal":
+            if target_power >= target_life > 0 and not lethal_reason:
                 add_finding(
                     findings,
                     "high",
                     event,
-                    f"Potential lethal attack ({total_power} power vs {target_life} life) was not tagged as lethal.",
+                    f"Potential lethal attack ({target_power} assigned power vs {target_life} life) was not tagged as lethal.",
+                )
+            if lethal_reason and 0 <= target_power < target_life:
+                add_finding(
+                    findings,
+                    "high",
+                    event,
+                    f"Attack was tagged as lethal using only {target_power} "
+                    f"assigned power against {target_life} life.",
                 )
             if target_reason == "default_high_life":
                 lower_life_defenders = defender_life_gaps(event)
@@ -373,6 +524,11 @@ def audit_turn_events(events: list[dict[str, Any]]) -> list[dict[str, Any]]:
             latest_combat[
                 (replay_id, event.get("turn"), event.get("attacker"), event.get("target"))
             ] = event
+            for group in event.get("attack_groups") or []:
+                if isinstance(group, dict) and group.get("target"):
+                    latest_combat[
+                        (replay_id, event.get("turn"), event.get("attacker"), group.get("target"))
+                    ] = event
 
         elif kind == "combat_result":
             key = (replay_id, event.get("turn"), event.get("attacker"), event.get("target"))
@@ -380,8 +536,12 @@ def audit_turn_events(events: list[dict[str, Any]]) -> list[dict[str, Any]]:
             if combat:
                 blockers = int(combat.get("blockers") or 0)
                 attackers = int(combat.get("attackers") or 0)
-                target_life = int(combat.get("target_life_before") or 0)
-                total_power = int(combat.get("total_power") or 0)
+                target_life = int(
+                    event.get("target_life_before")
+                    or combat.get("target_life_before")
+                    or 0
+                )
+                target_power = combat_power_assigned_to_target(combat, event.get("target"))
                 damage = int(event.get("damage_to_player") or 0)
                 target_dead = bool(event.get("target_dead"))
                 target_protected = bool(
@@ -392,7 +552,7 @@ def audit_turn_events(events: list[dict[str, Any]]) -> list[dict[str, Any]]:
                 )
                 if attackers > 0 and blockers == 0 and damage == 0 and not target_protected:
                     add_finding(findings, "high", event, "Unblocked combat dealt 0 player damage.")
-                if blockers == 0 and total_power >= target_life > 0 and not target_dead and not target_protected:
+                if blockers == 0 and target_power >= target_life > 0 and not target_dead and not target_protected:
                     add_finding(
                         findings,
                         "high",
@@ -462,7 +622,6 @@ def audit_turn_events(events: list[dict[str, Any]]) -> list[dict[str, Any]]:
 
         elif kind == "board_wipe_resolved":
             destroyed = int(event.get("destroyed") or 0)
-            protected = int(event.get("protected") or 0)
             unprotected_seen = event.get("unprotected_seen")
             if unprotected_seen is None:
                 # Older replay events did not include board state before the wipe.
@@ -471,12 +630,12 @@ def audit_turn_events(events: list[dict[str, Any]]) -> list[dict[str, Any]]:
             unprotected_seen = int(unprotected_seen or 0)
             if destroyed == 0 and unprotected_seen > 0:
                 add_finding(findings, "high", event, "Board wipe resolved without destroying creatures.")
-            if protected > destroyed and destroyed > 0:
+            for choice_finding in board_wipe_choice_findings(event):
                 add_finding(
                     findings,
-                    "low",
+                    "high",
                     event,
-                    f"Board wipe left more protected creatures ({protected}) than destroyed ({destroyed}).",
+                    choice_finding,
                 )
 
         elif kind == "extra_turn_cap_reached":

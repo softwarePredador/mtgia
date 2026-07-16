@@ -99,7 +99,8 @@ Para aprovar uma entrada, o artefato daquele deck deve provar, no mesmo run:
 
 1. resposta de optimize não mock e diferente de `mock_non_actionable`;
 2. o path reconhecido pelo contrato do runner:
-   - `optimized_directly`: optimize 200 e resposta acionável;
+   - `optimized_directly`: optimize 200, `outcome_code=optimized`, nenhum
+     `quality_error` e resposta acionável;
    - `safe_no_change`: optimize 422, outcome `near_peak` ou
      `no_safe_upgrade_found`, e deck fonte saudável;
    - `rebuild_guided`: optimize 422 com `OPTIMIZE_NEEDS_REPAIR`, next action
@@ -110,10 +111,13 @@ Para aprovar uma entrada, o artefato daquele deck deve provar, no mesmo run:
 4. `POST /decks/:id/validate` 200;
 5. proveniência runtime conhecida e explícita no próprio artefato:
    `provider`, `cache`, `deterministic` ou `state_gate`; `unknown` falha;
-6. quando houver chamada ao provedor, metadados seguros encontrados em
+6. flags opcionais de execução (`is_mock`, `can_apply` e
+   `learning_eligible`) ausentes ou booleanas; tipo malformado falha em
+   qualquer status HTTP;
+7. quando houver chamada ao provedor, metadados seguros encontrados em
    `ai_logs` para o clone e a janela da execução, sem prompt, resposta integral,
    erro ou credencial;
-7. cleanup da identidade e dos decks temporários sem resíduo.
+8. cleanup da identidade e dos decks temporários sem resíduo.
 
 No agregado completo, o gate exige ao menos uma proposta acionável realmente
 persistida. Ele não inventa dependência de provedor quando a rota responde de

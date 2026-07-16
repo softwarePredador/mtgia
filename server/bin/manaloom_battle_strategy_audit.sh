@@ -120,6 +120,9 @@ if [[ ! -f "$KNOWLEDGE_DB" ]]; then
   echo "Knowledge DB not found: $KNOWLEDGE_DB"
   exit 1
 fi
+TARGET_DECK_ID="${MANALOOM_BATTLE_TARGET_DECK_ID:-6}"
+EXPECTED_PG_DECK_ID="${MANALOOM_BATTLE_EXPECTED_PG_DECK_ID:-${MANALOOM_CANONICAL_PG_DECK_ID:-8938b746-1a9e-46ce-b0d9-c2ec932ddddd}}"
+EXPECTED_DECK_HASH="${MANALOOM_BATTLE_EXPECTED_DECK_HASH:-}"
 
 required=(
   "$SCRIPTS_DIR/battle_replay_v10_3.py"
@@ -134,6 +137,7 @@ required=(
   "$SCRIPTS_DIR/battle_forensic_audit.py"
   "$SCRIPTS_DIR/battle_runtime_surface_manifest.py"
   "$SCRIPTS_DIR/battle_table_intent_audit.py"
+  "$SCRIPTS_DIR/battle_target_deck_identity_guard.py"
   "$SCRIPTS_DIR/battle_target_pressure_audit.py"
   "$SCRIPTS_DIR/battle_unknown_template_backlog_audit.py"
   "$SCRIPTS_DIR/replay_decision_auditor.py"
@@ -149,11 +153,16 @@ required=(
   "$SCRIPTS_DIR/test_battle_focused_template_dispatch_audit.py"
   "$SCRIPTS_DIR/test_battle_rule_registry_runtime_safe.py"
   "$SCRIPTS_DIR/test_battle_script_entrypoint_symbols.py"
+  "$SCRIPTS_DIR/test_battle_seed_high_regressions.py"
   "$SCRIPTS_DIR/test_battle_forensic_audit_supported_effects.py"
+  "$SCRIPTS_DIR/test_hazels_brewmaster_runtime.py"
+  "$SCRIPTS_DIR/test_priority_lorehold_card_runtime.py"
+  "$SCRIPTS_DIR/test_lorehold_variant_battle_gate.py"
   "$SCRIPTS_DIR/test_battle_pending_runtime_closure.py"
   "$SCRIPTS_DIR/test_replay_decision_auditor_scope.py"
   "$SCRIPTS_DIR/test_battle_runtime_surface_manifest.py"
   "$SCRIPTS_DIR/test_battle_table_intent_audit.py"
+  "$SCRIPTS_DIR/test_battle_target_deck_identity_guard.py"
   "$SCRIPTS_DIR/test_battle_target_pressure_audit.py"
   "$SCRIPTS_DIR/test_battle_unknown_template_backlog_audit.py"
 )
@@ -284,6 +293,7 @@ compile_targets=(
   "$SCRIPTS_DIR/battle_forensic_audit.py"
   "$SCRIPTS_DIR/battle_runtime_surface_manifest.py"
   "$SCRIPTS_DIR/battle_table_intent_audit.py"
+  "$SCRIPTS_DIR/battle_target_deck_identity_guard.py"
   "$SCRIPTS_DIR/battle_target_pressure_audit.py"
   "$SCRIPTS_DIR/battle_unknown_template_backlog_audit.py"
   "$SCRIPTS_DIR/replay_decision_auditor.py"
@@ -298,14 +308,31 @@ compile_targets=(
   "$SCRIPTS_DIR/test_battle_focused_template_dispatch_audit.py"
   "$SCRIPTS_DIR/test_battle_rule_registry_runtime_safe.py"
   "$SCRIPTS_DIR/test_battle_script_entrypoint_symbols.py"
+  "$SCRIPTS_DIR/test_battle_seed_high_regressions.py"
   "$SCRIPTS_DIR/test_battle_forensic_audit_supported_effects.py"
+  "$SCRIPTS_DIR/test_hazels_brewmaster_runtime.py"
+  "$SCRIPTS_DIR/test_priority_lorehold_card_runtime.py"
+  "$SCRIPTS_DIR/test_lorehold_variant_battle_gate.py"
   "$SCRIPTS_DIR/test_battle_pending_runtime_closure.py"
   "$SCRIPTS_DIR/test_replay_decision_auditor_scope.py"
   "$SCRIPTS_DIR/test_battle_runtime_surface_manifest.py"
   "$SCRIPTS_DIR/test_battle_table_intent_audit.py"
+  "$SCRIPTS_DIR/test_battle_target_deck_identity_guard.py"
   "$SCRIPTS_DIR/test_battle_target_pressure_audit.py"
   "$SCRIPTS_DIR/test_battle_unknown_template_backlog_audit.py"
 )
+identity_command=(
+  python3 "$SCRIPTS_DIR/battle_target_deck_identity_guard.py"
+  --sqlite-db "$KNOWLEDGE_DB"
+  --target-deck-id "$TARGET_DECK_ID"
+  --expected-pg-deck-id "$EXPECTED_PG_DECK_ID"
+  --output "$run_dir/target_deck_identity.json"
+)
+if [[ -n "$EXPECTED_DECK_HASH" ]]; then
+  identity_command+=(--expected-deck-hash "$EXPECTED_DECK_HASH")
+fi
+run_logged_check target_deck_identity_guard "${identity_command[@]}"
+
 run_logged_check py_compile python3 -m py_compile "${compile_targets[@]}"
 
 test_scripts=(
@@ -321,11 +348,16 @@ test_scripts=(
   "$SCRIPTS_DIR/test_battle_focused_template_dispatch_audit.py"
   "$SCRIPTS_DIR/test_battle_rule_registry_runtime_safe.py"
   "$SCRIPTS_DIR/test_battle_script_entrypoint_symbols.py"
+  "$SCRIPTS_DIR/test_battle_seed_high_regressions.py"
   "$SCRIPTS_DIR/test_battle_forensic_audit_supported_effects.py"
+  "$SCRIPTS_DIR/test_hazels_brewmaster_runtime.py"
+  "$SCRIPTS_DIR/test_priority_lorehold_card_runtime.py"
+  "$SCRIPTS_DIR/test_lorehold_variant_battle_gate.py"
   "$SCRIPTS_DIR/test_battle_pending_runtime_closure.py"
   "$SCRIPTS_DIR/test_replay_decision_auditor_scope.py"
   "$SCRIPTS_DIR/test_battle_runtime_surface_manifest.py"
   "$SCRIPTS_DIR/test_battle_table_intent_audit.py"
+  "$SCRIPTS_DIR/test_battle_target_deck_identity_guard.py"
   "$SCRIPTS_DIR/test_battle_target_pressure_audit.py"
   "$SCRIPTS_DIR/test_battle_unknown_template_backlog_audit.py"
 )
@@ -338,6 +370,7 @@ for ((i=0; i<SEEDS; i++)); do
   seed_dir="$run_dir/seed_$seed"
   mkdir -p "$seed_dir"
   MANALOOM_KNOWLEDGE_DB="$KNOWLEDGE_DB" \
+  MANALOOM_BATTLE_TARGET_DECK_ID="$TARGET_DECK_ID" \
   MANALOOM_KNOWLEDGE_DIR="$REPO_DIR/docs/hermes-analysis/manaloom-knowledge" \
   MANALOOM_BATTLE_REAL_OPPONENT_SEED="$REAL_OPPONENT_SEED" \
   MANALOOM_BATTLE_EVALUATION_MODE="${MANALOOM_BATTLE_EVALUATION_MODE:-table_intent}" \
@@ -582,6 +615,13 @@ summary = {
     "deck_blocker_domain_policy": None,
     "lorehold_deck_source_kind": None,
     "lorehold_deck_source_ref": None,
+    "lorehold_source_pg_deck_id": None,
+    "lorehold_deck_hash": None,
+    "lorehold_semantics_hash": None,
+    "lorehold_ruleset_hash": None,
+    "lorehold_sync_run_id": None,
+    "lorehold_identity_status": None,
+    "lorehold_identity_errors": [],
     "lorehold_deck_metrics_basis": None,
     "lorehold_deck_cached_metadata_used_for_metrics": None,
     "lorehold_deck_lands": None,
@@ -1049,6 +1089,15 @@ for seed_dir in sorted(run_dir.glob("seed_*")):
                 metrics = deck_item.get("metrics") or {}
                 summary["lorehold_deck_source_kind"] = deck_item.get("source_kind")
                 summary["lorehold_deck_source_ref"] = deck_item.get("source_ref")
+                summary["lorehold_source_pg_deck_id"] = deck_item.get("source_pg_deck_id")
+                summary["lorehold_deck_hash"] = deck_item.get("deck_hash")
+                summary["lorehold_semantics_hash"] = deck_item.get("semantics_hash")
+                summary["lorehold_ruleset_hash"] = deck_item.get("ruleset_hash")
+                summary["lorehold_sync_run_id"] = deck_item.get("sync_run_id")
+                summary["lorehold_identity_status"] = deck_item.get("identity_status")
+                summary["lorehold_identity_errors"] = list(
+                    deck_item.get("identity_errors") or []
+                )
                 summary["lorehold_deck_metrics_basis"] = deck_item.get("metrics_basis")
                 if deck_item.get("cached_metadata_used_for_metrics") is not None:
                     summary["lorehold_deck_cached_metadata_used_for_metrics"] = deck_item.get(
@@ -1282,6 +1331,11 @@ if manifest_path.exists():
     summary["runtime_surface_manifest_outside_recurring_categories"] = list(
         runtime_manifest_summary.get("outside_recurring_categories") or []
     )
+
+target_identity_path = run_dir / "target_deck_identity.json"
+if target_identity_path.exists():
+    summary["target_deck_identity_report"] = str(target_identity_path)
+    summary["target_deck_identity"] = json.loads(target_identity_path.read_text())
 
 action_blocking = bool(summary["seeds_with_high_or_critical_action_findings"])
 strategy_blocking = bool(summary["seeds_with_strategy_blockers"])
@@ -1614,6 +1668,10 @@ lines = [
     f"- Deck cached metadata used for replay metrics: `{summary['deck_cached_metadata_used_for_replay_metrics']}`",
     f"- Deck blocker domain policy: `{summary['deck_blocker_domain_policy']}`",
     f"- Lorehold deck source: `{summary['lorehold_deck_source_kind']} {summary['lorehold_deck_source_ref']}`",
+    f"- Lorehold PostgreSQL deck id: `{summary['lorehold_source_pg_deck_id']}`",
+    f"- Lorehold snapshot hashes deck/semantics/ruleset: `{summary['lorehold_deck_hash']}/{summary['lorehold_semantics_hash']}/{summary['lorehold_ruleset_hash']}`",
+    f"- Lorehold sync run id: `{summary['lorehold_sync_run_id']}`",
+    f"- Lorehold identity status/errors: `{summary['lorehold_identity_status']} {json.dumps(summary['lorehold_identity_errors'], sort_keys=True)}`",
     f"- Lorehold deck metrics basis: `{summary['lorehold_deck_metrics_basis']}`",
     f"- Lorehold deck cached metadata used for metrics: `{summary['lorehold_deck_cached_metadata_used_for_metrics']}`",
     f"- Lorehold deck lands: `{summary['lorehold_deck_lands']}`",

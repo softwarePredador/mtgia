@@ -14,22 +14,30 @@ DECLARE
   v_s_count bigint;
   v_h_sha text;
   v_s_sha text;
+  v_deferred_sha text;
   v_bad bigint;
 BEGIN
   IF to_regclass('manaloom_deploy_audit.pg873_sac_outlet_expected_20260715') IS NULL
      OR to_regclass('manaloom_deploy_audit.pg873_sac_outlet_function_backup_20260715') IS NULL
      OR to_regclass('manaloom_deploy_audit.pg873_sac_outlet_semantic_backup_20260715') IS NULL
-     OR to_regclass('manaloom_deploy_audit.pg873_sac_outlet_missing_semantic_20260715') IS NULL
+     OR to_regclass('manaloom_deploy_audit.pg873_sac_outlet_deferred_semantic_20260715') IS NULL
      OR to_regclass('manaloom_deploy_audit.pg873_sac_outlet_post_semantic_20260715') IS NULL THEN
     RAISE EXCEPTION 'PG873 rollback abort: audit tables are missing';
   END IF;
 
-  IF (SELECT count(*) FROM manaloom_deploy_audit.pg873_sac_outlet_expected_20260715) <> 1452
+  IF (SELECT count(*) FROM manaloom_deploy_audit.pg873_sac_outlet_expected_20260715) <> 1400
      OR (SELECT count(*) FROM manaloom_deploy_audit.pg873_sac_outlet_function_backup_20260715) <> 2737
      OR (SELECT count(*) FROM manaloom_deploy_audit.pg873_sac_outlet_semantic_backup_20260715) <> 1557
-     OR (SELECT count(*) FROM manaloom_deploy_audit.pg873_sac_outlet_missing_semantic_20260715) <> 52
-     OR (SELECT count(*) FROM manaloom_deploy_audit.pg873_sac_outlet_post_semantic_20260715) <> 1576 THEN
+     OR (SELECT count(*) FROM manaloom_deploy_audit.pg873_sac_outlet_deferred_semantic_20260715) <> 52
+     OR (SELECT count(*) FROM manaloom_deploy_audit.pg873_sac_outlet_post_semantic_20260715) <> 1524 THEN
     RAISE EXCEPTION 'PG873 rollback abort: audit table counts drifted';
+  END IF;
+
+  SELECT encode(digest(string_agg(card_id::text, E'\n' ORDER BY card_id::text), 'sha256'), 'hex')
+  INTO v_deferred_sha
+  FROM manaloom_deploy_audit.pg873_sac_outlet_deferred_semantic_20260715;
+  IF v_deferred_sha <> '4f29cbcbbdaa9a10bf285ff808c40ab8f3026367a2b3bc873fd51424cad5b199' THEN
+    RAISE EXCEPTION 'PG873 rollback abort: deferred semantic backlog hash drifted';
   END IF;
 
   SELECT count(*), encode(digest(string_agg(card_id::text, E'\n' ORDER BY card_id::text), 'sha256'), 'hex')
@@ -43,8 +51,8 @@ BEGIN
 
   IF v_h_count<>716
      OR v_h_sha<>'51272701cdb5b277a2007de43c418c418fab5380409fc16c08ac527fd1ddacbd'
-     OR v_s_count<>736
-     OR v_s_sha<>'512cb67eca26b4c86d4555fcf14cae19e6e9f0a9bd24239db0d4cc6caa49418c' THEN
+     OR v_s_count<>684
+     OR v_s_sha<>'573c94fad8b4ba9d9789daadd506e4ce2b0143dfa0d049eb8687c4c8cd90e8bd' THEN
     RAISE EXCEPTION 'PG873 rollback abort: current function state is not the applied package';
   END IF;
 
@@ -89,6 +97,15 @@ BEGIN
   ) THEN
     RAISE EXCEPTION 'PG873 rollback abort: a deliberately deleted semantic row reappeared';
   END IF;
+
+  IF EXISTS (
+    SELECT 1
+    FROM manaloom_deploy_audit.pg873_sac_outlet_deferred_semantic_20260715 d
+    JOIN public.card_semantic_tags_v2 s
+      ON s.card_id=d.card_id AND s.source='deterministic_semantic_v2'
+  ) THEN
+    RAISE EXCEPTION 'PG873 rollback abort: deferred semantic backlog changed';
+  END IF;
 END $$;
 
 DELETE FROM public.card_function_tags f
@@ -102,11 +119,7 @@ SELECT card_id, card_name, tag, confidence, source, evidence, updated_at
 FROM manaloom_deploy_audit.pg873_sac_outlet_function_backup_20260715;
 
 DELETE FROM public.card_semantic_tags_v2 s
-USING (
-  SELECT card_id FROM manaloom_deploy_audit.pg873_sac_outlet_semantic_backup_20260715
-  UNION
-  SELECT card_id FROM manaloom_deploy_audit.pg873_sac_outlet_missing_semantic_20260715
-) target
+USING manaloom_deploy_audit.pg873_sac_outlet_semantic_backup_20260715 target
 WHERE s.card_id=target.card_id
   AND s.source='deterministic_semantic_v2';
 
@@ -167,7 +180,7 @@ BEGIN
   ) OR EXISTS (
     SELECT 1
     FROM public.card_semantic_tags_v2 s
-    JOIN manaloom_deploy_audit.pg873_sac_outlet_missing_semantic_20260715 m
+    JOIN manaloom_deploy_audit.pg873_sac_outlet_deferred_semantic_20260715 m
       ON m.card_id=s.card_id
     WHERE s.source='deterministic_semantic_v2'
   ) THEN

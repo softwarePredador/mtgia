@@ -1,0 +1,51 @@
+{
+  "generated_at": "2026-07-16T09:43:51.087401+00:00",
+  "dry_run": false,
+  "postgres_target": "127.0.0.1:15432/halder",
+  "requested_unique_names": 8897,
+  "postgres_cards_matched": 9053,
+  "sqlite_cache_alias_rows": 8995,
+  "unresolved_count": 1,
+  "unresolved_sample": [
+    "Surgical Suite/Hospital Room"
+  ],
+  "postgres_columns_present": [
+    "cmc",
+    "color_identity",
+    "colors",
+    "id",
+    "keywords",
+    "mana_cost",
+    "oracle_text",
+    "power",
+    "scryfall_id",
+    "toughness",
+    "type_line"
+  ],
+  "field_coverage": {
+    "mana_cost": 7836,
+    "oracle_text": 9050,
+    "colors": 6834,
+    "color_identity": 7795,
+    "power": 3875,
+    "toughness": 3875,
+    "keywords": 3965
+  },
+  "deck_cards_backfill": {
+    "deck_cards_table_present": true,
+    "rows_total": 2693,
+    "matched_cache_rows": 2693,
+    "card_id_rows_to_update": 108,
+    "card_id_rows_updated": 108,
+    "cmc_rows_to_update": 1,
+    "cmc_rows_updated": 1,
+    "suspicious_nonland_zero_cmc_after": 21,
+    "snapshot_hash_columns_present": true,
+    "snapshot_decks_checked": 1,
+    "snapshot_decks_drifted": 1,
+    "snapshot_decks_rehashed": 1,
+    "snapshot_rows_rehashed": 94,
+    "snapshot_decks_authorized_for_rehash": 1,
+    "snapshot_decks_unexplained_drift": 0
+  }
+}

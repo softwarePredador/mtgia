@@ -138,6 +138,233 @@ class SyncPgCardMetadataToHermesTest(unittest.TestCase):
         ).fetchone()[0]
         self.assertEqual(cmc, 0.0)
 
+    def test_suspicious_zero_cmc_treats_lander_as_nonland(self) -> None:
+        self.cur.execute(
+            """
+            INSERT INTO deck_cards (
+                deck_id, card_name, quantity, cmc, type_line, oracle_text
+            ) VALUES (1, 'Lander Rizzi', 1, 0, '', '')
+            """
+        )
+        sync.write_cache(
+            self.cur,
+            sync.cache_rows(
+                [
+                    {
+                        "name": "Lander Rizzi",
+                        "mana_cost": "{3}",
+                        "type_line": "Legendary Artifact Creature — Lander Rogue",
+                        "oracle_text": "{T}: Add one mana of any color.",
+                        "colors": [],
+                        "color_identity": [],
+                        "cmc": 0,
+                        "power": "3",
+                        "toughness": "2",
+                        "keywords": [],
+                        "scryfall_id": None,
+                    }
+                ]
+            ),
+        )
+
+        report = sync.backfill_deck_cards_from_cache(self.cur, dry_run=True)
+
+        self.assertEqual(report["suspicious_nonland_zero_cmc_after"], 1)
+
+    def test_backfill_rehashes_snapshot_after_card_id_canonicalization(self) -> None:
+        conn = sqlite3.connect(":memory:")
+        conn.row_factory = sqlite3.Row
+        try:
+            cur = conn.cursor()
+            sync.ensure_cache_table(cur)
+            cur.executescript(
+                """
+                CREATE TABLE decks (
+                  id INTEGER PRIMARY KEY,
+                  deck_name TEXT,
+                  total_cards INTEGER,
+                  notes TEXT
+                );
+                CREATE TABLE deck_cards (
+                  deck_id INTEGER,
+                  card_id TEXT,
+                  card_name TEXT,
+                  quantity INTEGER,
+                  is_commander INTEGER,
+                  cmc REAL,
+                  type_line TEXT,
+                  oracle_text TEXT,
+                  functional_tags_json TEXT,
+                  semantic_tags_v2_json TEXT,
+                  battle_rules_json TEXT,
+                  deck_hash TEXT,
+                  semantics_hash TEXT,
+                  ruleset_hash TEXT,
+                  sync_run_id TEXT
+                );
+                INSERT INTO decks VALUES (
+                  6,
+                  'Lorehold 607 - Current Champion',
+                  1,
+                  'sync_pg_target_deck_to_hermes.py pg_deck_id=8938b746-1a9e-46ce-b0d9-c2ec932ddddd'
+                );
+                INSERT INTO deck_cards VALUES (
+                  6,
+                  'old-printing-id',
+                  'Sol Ring',
+                  1,
+                  1,
+                  0,
+                  'Artifact',
+                  '{T}: Add {C}{C}.',
+                  '["ramp"]',
+                  '[]',
+                  '[]',
+                  '', '', '', 'sync-before'
+                );
+                """
+            )
+            snapshot_rows = cur.execute(
+                "SELECT * FROM deck_cards WHERE deck_id=6"
+            ).fetchall()
+            old_hashes = sync.compute_snapshot_hashes(snapshot_rows)
+            cur.execute(
+                """
+                UPDATE deck_cards
+                SET deck_hash=?, semantics_hash=?, ruleset_hash=?
+                WHERE deck_id=6
+                """,
+                old_hashes,
+            )
+            cur.execute(
+                """
+                UPDATE decks
+                SET notes = notes || ' deck_hash=' || ? ||
+                            ' semantics_hash=' || ? ||
+                            ' ruleset_hash=' || ?
+                WHERE id=6
+                """,
+                old_hashes,
+            )
+            sync.write_cache(
+                cur,
+                sync.cache_rows(
+                    [
+                        {
+                            "card_id": "11111111-1111-1111-1111-111111111111",
+                            "name": "Sol Ring",
+                            "mana_cost": "{1}",
+                            "type_line": "Artifact",
+                            "oracle_text": "{T}: Add {C}{C}.",
+                            "colors": [],
+                            "color_identity": [],
+                            "cmc": 1,
+                            "power": None,
+                            "toughness": None,
+                            "keywords": [],
+                            "scryfall_id": None,
+                        }
+                    ]
+                ),
+            )
+
+            report = sync.backfill_deck_cards_from_cache(cur, dry_run=False)
+
+            self.assertEqual(report["card_id_rows_updated"], 1)
+            self.assertEqual(report["snapshot_decks_drifted"], 1)
+            self.assertEqual(report["snapshot_decks_rehashed"], 1)
+            self.assertEqual(report["snapshot_rows_rehashed"], 1)
+            row = cur.execute(
+                "SELECT * FROM deck_cards WHERE deck_id=6"
+            ).fetchone()
+            self.assertEqual(
+                row["card_id"], "11111111-1111-1111-1111-111111111111"
+            )
+            recomputed = sync.compute_snapshot_hashes([row])
+            self.assertEqual(row["deck_hash"], recomputed[0])
+            self.assertEqual(row["semantics_hash"], recomputed[1])
+            self.assertEqual(row["ruleset_hash"], recomputed[2])
+            self.assertNotEqual(row["deck_hash"], old_hashes[0])
+            notes = cur.execute(
+                "SELECT notes FROM decks WHERE id=6"
+            ).fetchone()[0]
+            self.assertIn(f"deck_hash={recomputed[0]}", notes)
+            self.assertIn("sync_run_id=metadata_", notes)
+        finally:
+            conn.close()
+
+    def test_rehash_rejects_drift_outside_metadata_changed_decks(self) -> None:
+        conn = sqlite3.connect(":memory:")
+        conn.row_factory = sqlite3.Row
+        try:
+            cur = conn.cursor()
+            cur.executescript(
+                """
+                CREATE TABLE decks (
+                  id INTEGER PRIMARY KEY,
+                  notes TEXT
+                );
+                CREATE TABLE deck_cards (
+                  deck_id INTEGER,
+                  card_id TEXT,
+                  card_name TEXT,
+                  quantity INTEGER,
+                  is_commander INTEGER,
+                  functional_tags_json TEXT,
+                  semantic_tags_v2_json TEXT,
+                  battle_rules_json TEXT,
+                  deck_hash TEXT,
+                  semantics_hash TEXT,
+                  ruleset_hash TEXT,
+                  sync_run_id TEXT
+                );
+                INSERT INTO decks VALUES (
+                  7,
+                  'sync_pg_target_deck_to_hermes.py deck_hash=old semantics_hash=old ruleset_hash=old'
+                );
+                INSERT INTO deck_cards VALUES (
+                  7, 'card-7', 'Original Name', 1, 1,
+                  '[]', '[]', '[]', '', '', '', 'sync-before'
+                );
+                """
+            )
+            rows = cur.execute(
+                "SELECT * FROM deck_cards WHERE deck_id=7"
+            ).fetchall()
+            original_hashes = sync.compute_snapshot_hashes(rows)
+            cur.execute(
+                "UPDATE deck_cards SET deck_hash=?, semantics_hash=?, ruleset_hash=? WHERE deck_id=7",
+                original_hashes,
+            )
+            cur.execute(
+                "UPDATE deck_cards SET card_name='Tampered Name' WHERE deck_id=7"
+            )
+
+            with self.assertRaisesRegex(
+                RuntimeError,
+                "snapshot_hash_drift_outside_metadata_change:7",
+            ):
+                sync.refresh_deck_snapshot_hashes(
+                    cur,
+                    dry_run=False,
+                    allowed_rehash_deck_ids={6},
+                )
+
+            stored_hash = cur.execute(
+                "SELECT deck_hash FROM deck_cards WHERE deck_id=7"
+            ).fetchone()[0]
+            self.assertEqual(stored_hash, original_hashes[0])
+            self.assertNotEqual(
+                stored_hash,
+                sync.compute_snapshot_hashes(
+                    cur.execute(
+                        "SELECT * FROM deck_cards WHERE deck_id=7"
+                    ).fetchall()
+                )[0],
+            )
+        finally:
+            conn.close()
+
     def test_absent_deck_cards_table_reports_explicitly(self) -> None:
         conn = sqlite3.connect(":memory:")
         try:

@@ -1,3 +1,5 @@
+import '../basic_land_utils.dart' as basic_lands;
+
 class OptimizeLandRemovalProtectionResult {
   final List<String> removals;
   final List<String> additions;
@@ -30,7 +32,7 @@ OptimizeLandRemovalProtectionResult applyOptimizeLandRemovalProtection({
 }) {
   final currentLandCount = allCardData.fold<int>(0, (sum, card) {
     final type = (card['type_line']?.toString() ?? '').toLowerCase();
-    if (!type.contains('land')) return sum;
+    if (!basic_lands.isLandTypeLine(type)) return sum;
     final quantity = card['quantity'];
     if (quantity is int) return sum + quantity;
     return sum + (int.tryParse(quantity?.toString() ?? '') ?? 1);
@@ -158,9 +160,8 @@ int resolveOptimizeMinimumLandFloor({
 Set<String> _landNames(List<Map<String, dynamic>> cards) =>
     cards
         .where(
-          (card) => (card['type_line']?.toString() ?? '')
-              .toLowerCase()
-              .contains('land'),
+          (card) =>
+              basic_lands.isLandTypeLine(card['type_line']?.toString() ?? ''),
         )
         .map((card) => _normalizeName(card['name']?.toString() ?? ''))
         .where((name) => name.isNotEmpty)

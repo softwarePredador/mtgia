@@ -1,3 +1,5 @@
+import '../basic_land_utils.dart' as basic_lands;
+
 class EmptySuggestionFallbackApplication {
   final List<String> removals;
   final List<String> additions;
@@ -38,7 +40,7 @@ List<String> selectEmptySuggestionFallbackRemovalCandidates({
       if (coreLower.contains(lower)) continue;
 
       final typeLine = ((card['type_line'] as String?) ?? '').toLowerCase();
-      final isLand = typeLine.contains('land');
+      final isLand = basic_lands.isLandTypeLine(typeLine);
       if (preferNonLand && isLand) continue;
 
       seenLower.add(lower);
@@ -58,14 +60,16 @@ EmptySuggestionFallbackApplication buildEmptySuggestionFallbackApplication({
   required List<String> removalCandidates,
   required List<Map<String, dynamic>> replacements,
 }) {
-  final fallbackAdditions = replacements
-      .map((replacement) => (replacement['name'] as String?)?.trim() ?? '')
-      .where((name) => name.isNotEmpty)
-      .toList();
+  final fallbackAdditions =
+      replacements
+          .map((replacement) => (replacement['name'] as String?)?.trim() ?? '')
+          .where((name) => name.isNotEmpty)
+          .toList();
 
-  final pairCount = removalCandidates.length < fallbackAdditions.length
-      ? removalCandidates.length
-      : fallbackAdditions.length;
+  final pairCount =
+      removalCandidates.length < fallbackAdditions.length
+          ? removalCandidates.length
+          : fallbackAdditions.length;
 
   if (pairCount <= 0) {
     return EmptySuggestionFallbackApplication(

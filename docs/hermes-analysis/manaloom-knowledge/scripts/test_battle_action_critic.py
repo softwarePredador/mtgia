@@ -710,6 +710,56 @@ def test_critic_reports_event_contract_denominators():
     assert contract["event_types_unclassified"] == ["future_new_event"]
 
 
+def test_critic_accepts_mandatory_free_cast_without_decision_trace():
+    result = critic.criticize_actions([
+        {
+            "event": "spell_cast",
+            "replay_id": "r-mandatory-free-cast",
+            "turn": 3,
+            "phase": "resolution",
+            "player": "Caster",
+            "card": "Mandatory Free Cast",
+            "effect": "draw_cards",
+            "type_line": "Sorcery",
+            "source_zone": "exile",
+            "role": "free_cast_from_exile",
+            "cast_without_paying_mana_cost": True,
+            "cast_choice_optional": False,
+            "rule_source": "curated",
+            "rule_review_status": "verified",
+        }
+    ])
+
+    assert "missing_decision_trace" not in {
+        finding["code"] for finding in result["findings"]
+    }
+
+
+def test_critic_still_requires_optional_free_cast_decision_trace():
+    result = critic.criticize_actions([
+        {
+            "event": "spell_cast",
+            "replay_id": "r-optional-free-cast",
+            "turn": 3,
+            "phase": "resolution",
+            "player": "Caster",
+            "card": "Optional Free Cast",
+            "effect": "draw_cards",
+            "type_line": "Sorcery",
+            "source_zone": "exile",
+            "role": "free_cast_from_exile",
+            "cast_without_paying_mana_cost": True,
+            "cast_choice_optional": True,
+            "rule_source": "curated",
+            "rule_review_status": "verified",
+        }
+    ])
+
+    assert "missing_decision_trace" in {
+        finding["code"] for finding in result["findings"]
+    }
+
+
 def test_critic_classifies_flashback_and_land_tax_auxiliary_events():
     result = critic.criticize_actions([
         {"event": "adventure_exiled", "replay_id": "r-contract", "turn": 1, "player": "A", "card": "Adventure Spell"},
@@ -725,6 +775,35 @@ def test_critic_classifies_flashback_and_land_tax_auxiliary_events():
     assert contract["event_class_counts"]["technical"] == 2
     assert contract["event_class_counts"]["strategy_signal"] == 1
     assert contract["event_class_counts"]["ignored_with_reason"] == 1
+
+
+def test_critic_classifies_hazels_food_as_renderer_evidence():
+    result = critic.criticize_actions([
+        {
+            "event": "hazels_brewmaster_food_created",
+            "replay_id": "r-hazel-contract",
+            "turn": 7,
+            "player": "Thrasios",
+            "card": "Hazel's Brewmaster",
+            "token": "Food Token",
+        },
+        {
+            "event": "trigger_resolved",
+            "replay_id": "r-hazel-contract",
+            "turn": 7,
+            "player": "Thrasios",
+            "card": "Hazel's Brewmaster",
+            "trigger": "enters_battlefield_or_attacks",
+            "effect": "exile_graveyard_card_create_food",
+        },
+    ])
+
+    contract = result["summary"]["event_contract"]
+
+    assert contract["events_unclassified"] == 0
+    assert contract["event_types_unclassified"] == []
+    assert contract["event_class_counts"]["renderer_only"] == 1
+    assert contract["event_class_counts"]["action_audited"] == 1
 
 
 if __name__ == "__main__":
@@ -750,7 +829,10 @@ if __name__ == "__main__":
         test_critic_flags_spell_resolved_without_resolution_provenance,
         test_critic_accepts_spell_resolved_with_resolution_provenance,
         test_critic_reports_event_contract_denominators,
+        test_critic_accepts_mandatory_free_cast_without_decision_trace,
+        test_critic_still_requires_optional_free_cast_decision_trace,
         test_critic_classifies_flashback_and_land_tax_auxiliary_events,
+        test_critic_classifies_hazels_food_as_renderer_evidence,
     ]
     for test in tests:
         test()

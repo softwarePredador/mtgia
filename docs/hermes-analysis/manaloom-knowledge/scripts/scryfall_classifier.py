@@ -130,26 +130,342 @@ def looks_like_land_search(oracle: str) -> bool:
     ])
 
 
+def _oracle_direct_effect_text(value: str) -> str:
+    """Strip reminder text and quoted granted abilities from Oracle text."""
+    source = _strip_parenthetical_text(value)
+    output: list[str] = []
+    ascii_quote = False
+    curly_quote = False
+    for char in source:
+        if char == '"':
+            ascii_quote = not ascii_quote
+            output.append(" ")
+        elif char == "“":
+            curly_quote = True
+            output.append(" ")
+        elif char == "”":
+            curly_quote = False
+            output.append(" ")
+        elif not ascii_quote and not curly_quote:
+            output.append(char)
+        else:
+            output.append("\n" if char == "\n" else " ")
+    return "".join(output)
+
+
+def _quoted_oracle_spans(value: str) -> list[tuple[int, str]]:
+    spans: list[tuple[int, str]] = []
+    for match in re.finditer(r'"([^"]*)"|“([^”]*)”', value):
+        spans.append((match.start(1) if match.group(1) is not None else match.start(2),
+                      match.group(1) if match.group(1) is not None else match.group(2)))
+    return spans
+
+
+def _token_object_pattern(treasure_only: bool) -> str:
+    return (r"\btreasure\b[^.\n;]{0,32}\btokens?\b"
+            if treasure_only else r"\btokens?\b")
+
+
+def _has_self_token_production(text: str, treasure_only: bool) -> bool:
+    obj = _token_object_pattern(treasure_only)
+    return bool(re.search(
+        r"\b(?:you|we|your team)\s+(?:(?:may|also|instead)\s+)*creates?\b"
+        r"[^.\n;]{0,120}" + obj, text) or re.search(
+        r"\byou\s+may\b[^.\n;]{0,80}\bor\s+create\b[^.\n;]{0,120}" + obj,
+        text))
+
+
+def _has_shared_token_production(text: str, treasure_only: bool) -> bool:
+    obj = _token_object_pattern(treasure_only)
+    return bool(
+        re.search(r"\byou\s+and\b[^.\n;]{0,96}\beach\s+create\b"
+                  r"[^.\n;]{0,120}" + obj, text)
+        or re.search(r"\b(?:each player|all players|each team)\s+"
+                     r"(?:(?:may|also|instead)\s+)*creates?\b"
+                     r"[^.\n;]{0,120}" + obj, text)
+    )
+
+
+def _has_any_player_token_production(text: str, treasure_only: bool) -> bool:
+    obj = _token_object_pattern(treasure_only)
+    return bool(re.search(
+        r"\bthat player\s+(?:(?:may|also|instead)\s+)*creates?\b"
+        r"[^.\n;]{0,120}" + obj, text) or re.search(
+        r"\b(?:when|whenever)\s+a player\b[^.\n;]{0,160}"
+        r"\bthey\s+create\b[^.\n;]{0,120}" + obj, text))
+
+
+def _has_target_player_token_production(text: str, treasure_only: bool) -> bool:
+    obj = _token_object_pattern(treasure_only)
+    return bool(re.search(
+        r"\btarget player\s+(?:(?:may|also|instead)\s+)*creates?\b"
+        r"[^.\n;]{0,120}" + obj, text) or re.search(
+        r"\btarget player\b[^.\n;]{0,120}\bthey\s+create\b"
+        r"[^.\n;]{0,120}" + obj, text) or re.search(
+        r"\bchoose\s+(?:(?:a|the)\s+)?(?:first|second|third|another)?\s*player\b"
+        r"[^.\n;]{0,120}\bto\s+create\b[^.\n;]{0,120}" + obj, text))
+
+
+def _has_imperative_token_production(text: str, treasure_only: bool) -> bool:
+    return bool(re.search(
+        r"(?:^|[\n.;:•—|]|,\s*|\bthen\s+|\band\s+)\s*"
+        r"(?:(?:if you do|when you do),\s*)?"
+        r"(?:(?:you may|may|also|instead)\s+)*create\b"
+        r"[^.\n;]{0,120}" + _token_object_pattern(treasure_only),
+        text, re.MULTILINE))
+
+
+def _has_positive_token_production(text: str, treasure_only: bool) -> bool:
+    return any((
+        _has_self_token_production(text, treasure_only),
+        _has_shared_token_production(text, treasure_only),
+        _has_any_player_token_production(text, treasure_only),
+        _has_target_player_token_production(text, treasure_only),
+        _has_imperative_token_production(text, treasure_only),
+    ))
+
+
+def _controlled_granted_context(raw_prefix: str) -> bool:
+    prefix = re.sub(r"\s+", " ", raw_prefix).strip()
+    prefix = re.sub(r'["“]\s*$', "", prefix).rstrip()
+    returns_under_your_control = bool(re.search(
+        r"\b(?:return|put)\b[\s\S]{0,180}\bunder your control\b", prefix))
+    if (not returns_under_your_control and re.search(
+            r"\b(?:becomes?|become|is|are)\b[^.]{0,72}"
+            r"\btreasure\s+artifacts?\s+with\s*$", prefix)):
+        return False
+    if re.search(r"\bopponent(?:s)?(?:\s+controls?)?\b[^.]{0,96}"
+                 r"\b(?:has|have|gains?|with)\s*$", prefix):
+        return False
+    if re.search(r"\b(?:enchant|target)\b[^.]{0,96}"
+                 r"\b(?:an?|target) opponent controls\b", prefix):
+        return False
+    patterns = (
+        r"\b(?:creatures?|artifacts?|lands?|permanents?|treasures?|tokens?)\b"
+        r"[^.]{0,96}\byou\s+(?:control|own)\b[^.]{0,96}"
+        r"\b(?:has|have|gains?|with)\s*$",
+        r"\b[a-z][a-z0-9\x27 -]{0,72}\byou\s+(?:control|own)\b"
+        r"[^.]{0,96}\b(?:has|have|gains?)\b[^.]{0,96}$",
+        r"(?:^|[.\n—:])\s*all\s+(?!other\b)[a-z][a-z0-9\x27 -]{0,64}\b"
+        r"[^.]{0,64}\b(?:has|have|gains?)\b[^.]{0,96}$",
+        r"\b(?:equipped|enchanted)\s+(?:creature|land|permanent)\b"
+        r"[^.]{0,96}\b(?:has|gains?)\b[^.]{0,48}$",
+        r"\btarget\s+(?:creature|artifact|land|permanent)\b"
+        r"[^.]{0,120}\b(?:has|gains?)\b[^.]{0,48}$",
+        r"\bgain control of target\b[^.]{0,160}\bit gains?\b[^.]{0,48}$",
+        r"\bcards? in your hand\b[^.]{0,160}\b(?:gain|gains)\b[^.]{0,48}$",
+        r"\bcards? in your hand\b[\s\S]{0,120}\bthey\b"
+        r"[^.]{0,64}\b(?:gain|gains)\b[^.]{0,48}$",
+        r"\bcreates?\b[^.]{0,180}\btokens?\b[^.]{0,96}\b(?:with|and)\s*$",
+        r"\bcreates?\b[^.]{0,180}\btokens?\b"
+        r"(?:\s+that)?\s+(?:has|have)\b[^.]{0,48}$",
+        r"\bcreates?\b[^.]{0,180}\btokens?\.\s*"
+        r"(?:it|they|those tokens?)\s+(?:has|have)\b[^.]{0,48}$",
+        r"\b(?:this (?:creature|artifact|permanent)|it|she|he)\b"
+        r"[^.]{0,96}\b(?:has|gains?)\b[^.]{0,96}$",
+        r"\bthose tokens\b[^.]{0,64}\b(?:has|have|gains?)\b[^.]{0,48}$",
+        r"\bcreates?\b[^.]{0,120}\btoken at random\b[\s\S]{0,180}"
+        r"\b(?:banana|powerstone|gold|lander)\b[^.]{0,48}\bwith\s*$",
+        r"\bcreatures you control gain\b[\s\S]{0,360}"
+        r"\bthe activated ability\s*$",
+        r"\byou get\b[^.]{0,120}\ban? emblem\b[^.]{0,48}\bwith\s*$",
+    )
+    return returns_under_your_control or any(
+        re.search(pattern, prefix) for pattern in patterns)
+
+
+def _controller_owned_mana_statement(text: str) -> bool:
+    return bool(re.search(
+        r"\b(?:[a-z][a-z0-9\x27 -]{0,72}\byou\s+(?:control|own)|"
+        r"enchanted\s+(?:creature|land|forest|permanent)|"
+        r"(?:^|[.\n])\s*all\s+(?!other\b)[a-z][a-z0-9\x27 -]{0,64})\b"
+        r"[^.\n]{0,180}\badds?\b", text))
+
+
+def _target_land_granted_mana_context(raw_prefix: str) -> bool:
+    prefix = re.sub(r"\s+", " ", raw_prefix).strip()
+    return bool(re.search(
+        r"\btarget\s+land\b[^.]{0,120}\b(?:has|gains?)\b[^.]{0,48}$",
+        prefix))
+
+
+def _net_positive_granted_mana_ability(quoted: str) -> bool:
+    ability = quoted.lower()
+    add_index = ability.find("add ")
+    if add_index < 0:
+        return False
+    production = ability[add_index + 4:]
+    if re.search(
+            r"\b(?:two|three|four|five|six|seven|eight|nine|ten|x|"
+            r"that much|an amount of)\s+mana\b", production):
+        return True
+    if " or " in production:
+        return False
+    return bool(re.search(r"\{[^}]+\}\s*\{[^}]+\}", production))
+
+
+def classify_treasure_ramp(oracle: str) -> str:
+    """Owner-aware Treasure production classification mirrored from Dart."""
+    without_reminder = _strip_parenthetical_text(oracle.lower())
+    if "treasure" not in without_reminder:
+        return "none"
+    direct = _oracle_direct_effect_text(without_reminder)
+    if _has_self_token_production(direct, True):
+        return "direct_self"
+    if _has_shared_token_production(direct, True):
+        return "shared_includes_self"
+    if _has_any_player_token_production(direct, True):
+        return "any_player_includes_self"
+    if _has_target_player_token_production(direct, True):
+        return "target_player_selectable"
+    if _has_imperative_token_production(direct, True):
+        return "direct_self"
+    for start, quoted in _quoted_oracle_spans(without_reminder):
+        if (_has_positive_token_production(quoted, True)
+                and _controlled_granted_context(without_reminder[max(0, start - 360):start])):
+            return "controlled_granted_ability"
+    obj = _token_object_pattern(True)
+    if re.search(r"\b(?:return|put)\b[\s\S]{0,180}\bunder your control\b"
+                 r"[\s\S]{0,120}\btreasure\s+artifact\b", direct):
+        return "controlled_granted_ability"
+    if re.search(r"\b(?:becomes?|become|is|are)\b[^.\n;]{0,72}"
+                 r"\btreasure\s+artifacts?\b", direct):
+        return "transformation_only"
+    if re.search(r"\bwould\s+create\b[^.\n;]{0,96}" + obj
+                 + r"[^.\n;]{0,96}\binstead\b", direct):
+        return "replacement_or_prevention_only"
+    if re.search(r"\b(?:its|that (?:spell|permanent|creature|artifact)'s) controller\b"
+                 r"[^.\n;]{0,96}\bcreates?\b[^.\n;]{0,96}" + obj, direct):
+        return "object_controller_compensation"
+    if (re.search(r"\b(?:each|target|an?|your)\s+opponent\b[^.\n;]{0,120}"
+                  r"\b(?:would\s+|may\s+)?creates?\b[^.\n;]{0,96}" + obj,
+                  direct)
+            or re.search(r"^\s*gift\s+(?:an?\s+)?treasure\b", direct,
+                         re.MULTILINE)):
+        return "opponent_only"
+    return "unknown_review"
+
+
+def _controlled_granted_mana_ability(oracle: str, worded_any_only: bool = False) -> bool:
+    if re.search(
+            r'\ball lands have\s*["“][\s\S]{0,180}\badd\b[\s\S]{0,180}["”]'
+            r'\s*and lose all other abilities\b', oracle):
+        return False
+    for start, quoted in _quoted_oracle_spans(oracle):
+        produces = bool(re.search(
+            r"\badds?\b[^.\n]{0,96}\bmana of any(?:\s+one)?\b", quoted
+        )) if worded_any_only else (
+            "add {" in quoted or bool(re.search(
+                r"\badds?\b[^.\n]{0,96}\bmana of any(?:\s+one)?\b", quoted)))
+        prefix = oracle[max(0, start - 360):start]
+        if (_target_land_granted_mana_context(prefix)
+                and not _net_positive_granted_mana_ability(quoted)):
+            continue
+        if (produces and (
+                _controlled_granted_context(prefix)
+                or _controller_owned_mana_statement(quoted))):
+            return True
+    return False
+
+
+def _worded_mana_production(oracle: str) -> bool:
+    direct = _oracle_direct_effect_text(oracle)
+    return bool(re.search(
+        r"\badds?\b[^.\n]{0,96}\b(?:one|two|three|four|five|six|seven|"
+        r"eight|nine|ten|x|that much|an amount of)\s+mana\b", direct
+    )) or _controlled_granted_mana_ability(oracle)
+
+
+def _known_mana_token_production(oracle: str) -> bool:
+    direct = _oracle_direct_effect_text(oracle.lower())
+    normalized = re.sub(
+        r"\b(?:powerstone|gold|lander|banana|vibranium|mutavault)\b"
+        r"(?=\s+tokens?\b)|"
+        r"\beldrazi\s+(?:scion|spawn)\b(?=(?:\s+creature)?\s+tokens?\b)|"
+        r"\b(?:lotus|tulip)\s+petal\b(?=\s+tokens?\b)|"
+        r"\bhuntsman\s+role\b(?=\s+tokens?\b)",
+        "treasure",
+        direct,
+    )
+    normalized = re.sub(
+        r"\b(named|name)\s+(?:mana\s+confluence|mutavault|banana|"
+        r"powerstone|gold|lander)\b",
+        r"\1 treasure",
+        normalized,
+    )
+    return _has_positive_token_production(normalized, True)
+
+
+def _is_land_type_line(type_line: str) -> bool:
+    card_types = re.split(r"\s+[—–-]\s+", type_line.lower(), maxsplit=1)[0]
+    return bool(re.search(r"(?:^|\s)land(?:$|\s)", card_types))
+
+
 def looks_like_ramp(oracle: str, type_line: str) -> bool:
     """Replica looksLikeOptimizationRampText() do Dart."""
-    if "add {" in oracle or "mana of any" in oracle:
+    oracle = _strip_parenthetical_text(oracle.lower()).replace(
+        "search you library", "search your library")
+    direct_oracle = _oracle_direct_effect_text(oracle)
+    worded_any_mana_production = re.search(
+        r"\badds?\b[^.\n]{0,96}\bmana of any(?:\s+one)?\b", direct_oracle
+    )
+    if ("add {" in direct_oracle or worded_any_mana_production
+            or _worded_mana_production(oracle)
+            or _controlled_granted_mana_ability(oracle)):
         return True
-    if "search your library" in oracle and looks_like_land_search(oracle):
+    if (
+        "search your library" in oracle
+        and looks_like_land_search(oracle)
+        and _land_search_puts_land_onto_battlefield(oracle)
+    ):
         return True
     if any(t in oracle for t in [
         "additional land this turn",
         "additional land on each of your turns",
         "put a land card from your hand onto the battlefield",
+        "spells you cast have convoke",
+        "create a birds of paradise token",
+        "has all activated abilities of all lands",
     ]):
+        return True
+    if re.search(r"\bfirebending\s+(?:\d+|x)\b", oracle):
+        return True
+    if "untap up to" in oracle and "lands" in oracle:
+        return True
+    if "taps an island for mana" in oracle and "adds an additional" in oracle:
         return True
     if "put up to" in oracle and "land cards" in oracle:
         return True
-    if re.search(r"create \w+ treasure token", oracle):
+    if classify_treasure_ramp(oracle) in {
+        "direct_self", "shared_includes_self", "any_player_includes_self",
+        "target_player_selectable", "controlled_granted_ability",
+    }:
         return True
-    # Extra: artifact that produces mana
-    if "artifact" in type_line and "add {" in oracle:
+    if _known_mana_token_production(oracle):
+        return True
+    if ("spells you cast cost" in oracle and "less to cast" in oracle) or re.search(
+        r"\bspells you cast\b[^.\n]{0,64}\bcost\b[^.\n]{0,32}\bless to cast\b",
+        oracle,
+    ):
+        return True
+    if "mana counter" in oracle and re.search(
+        r"\b(?:can|may) spend mana of any color\b[^.\n]{0,48}"
+        r"\bequal to the number of mana counters\b",
+        oracle,
+    ):
         return True
     return False
+
+
+def _land_search_puts_land_onto_battlefield(oracle: str) -> bool:
+    search_index = oracle.find("search your library")
+    if search_index < 0:
+        return False
+    battlefield_index = oracle.find("onto the battlefield", search_index)
+    if battlefield_index < 0:
+        return False
+    next_paragraph = oracle.find("\n", search_index)
+    return next_paragraph < 0 or battlefield_index < next_paragraph
 
 
 def classify_card(card_data: dict) -> str:
@@ -164,7 +480,7 @@ def classify_card(card_data: dict) -> str:
     cmc = card_data.get("cmc", 0)
 
     # Land check — also catch basic lands by name heuristic
-    if "land" in type_line:
+    if _is_land_type_line(type_line):
         return "land"
     name_lower = name.lower()
     # Basic lands that might not have correct type_line in partial data
@@ -259,10 +575,21 @@ def _normalize_card_name(name: str) -> str:
 
 def _looks_like_ritual(oracle: str) -> bool:
     """Replica _looksLikeRitual() do Dart (linha 649)."""
-    return ("add {" in oracle and "until end of turn" in oracle) or \
-           ("add {" in oracle and "for each" in oracle) or \
-           ("add {" in oracle and "for every" in oracle) or \
-           ("add {" in oracle and "your mana pool" in oracle)
+    direct = _oracle_direct_effect_text(oracle.lower())
+    for line in re.split(r"[\r\n]+", direct):
+        for match in re.finditer(r"add\s+\{", line):
+            prefix = line[:match.start()]
+            colon = prefix.rfind(":")
+            if colon >= 0 and "{t}" in prefix[:colon]:
+                continue
+            if (any(marker in line for marker in (
+                    "until end of turn", "for each", "for every",
+                    "your mana pool"))
+                    or not any(marker in line for marker in (
+                        "at the beginning", "each upkeep", "each combat",
+                        "whenever", "mana of any color"))):
+                return True
+    return False
 
 def _looks_like_draw(oracle: str) -> bool:
     """Replica _looksLikeDraw() do Dart (linha 643)."""
@@ -349,7 +676,22 @@ def _looks_like_graveyard_synergy(oracle: str) -> bool:
 
 def _looks_like_token_maker(oracle: str) -> bool:
     """Replica _looksLikeTokenMaker() do Dart (linha 740)."""
-    return ("create" in oracle and "token" in oracle) or "populate" in oracle
+    treasure_signal = classify_treasure_ramp(oracle)
+    if treasure_signal in {
+        "direct_self", "shared_includes_self", "any_player_includes_self",
+        "target_player_selectable", "controlled_granted_ability",
+    }:
+        return True
+    without_reminder = _strip_parenthetical_text(oracle.lower())
+    direct = _oracle_direct_effect_text(without_reminder)
+    if _has_positive_token_production(direct, False):
+        return True
+    for start, quoted in _quoted_oracle_spans(without_reminder):
+        if (_has_positive_token_production(quoted, False)
+                and _controlled_granted_context(
+                    without_reminder[max(0, start - 360):start])):
+            return True
+    return "populate" in without_reminder
 
 
 def _strip_parenthetical_text(value: str) -> str:
@@ -739,17 +1081,16 @@ def infer_functional_card_tags(
                 "evidence": evidence,
             }
 
-    is_land = "land" in type_lower
+    is_land = _is_land_type_line(type_lower)
     if is_land:
         add("land", 1.0, "type_line_land")
 
-    is_basic_land = "basic land" in type_lower
-    if not is_basic_land:
+    if not is_land:
         # ramp check: uses original oracle_text for Dart compat
         if (looks_like_ramp(oracle, type_lower)):
             add("ramp", 0.88, "mana_or_land_ramp_text")
 
-    if _looks_like_ritual(oracle):
+    if not is_land and _looks_like_ritual(oracle):
         add("ritual", 0.82, "temporary_mana_burst_text")
 
     if _looks_like_draw(oracle):

@@ -5,6 +5,8 @@ import 'dart:io';
 import 'package:dotenv/dotenv.dart';
 import 'package:postgres/postgres.dart';
 
+import '../lib/basic_land_utils.dart' as land_utils;
+
 /// Pipeline de extração de features para Machine Learning.
 ///
 /// Extrai dados de battle_simulations + decks e gera um CSV
@@ -246,7 +248,7 @@ Map<String, dynamic> _extractDeckFeatures(
   for (final row in cards) {
     final map = row.toColumnMap();
     final qty = (map['quantity'] as int?) ?? 1;
-    final typeLine = (map['type_line'] ?? '').toString().toLowerCase();
+    final typeLine = (map['type_line'] ?? '').toString();
     final oracleText = (map['oracle_text'] ?? '').toString().toLowerCase();
     final cmc = _parseCmc(map['cmc']);
     final colors = (map['colors'] as List?)?.cast<String>() ?? [];
@@ -256,7 +258,7 @@ Map<String, dynamic> _extractDeckFeatures(
 
     if (map['is_commander'] == true) hasCommander = true;
 
-    if (typeLine.contains('land')) {
+    if (land_utils.isLandTypeLine(typeLine)) {
       landCount += qty;
       continue;
     }
@@ -265,12 +267,13 @@ Map<String, dynamic> _extractDeckFeatures(
     totalCmc += cmc * qty;
 
     // Tipo
-    if (typeLine.contains('creature')) creatureCount += qty;
-    if (typeLine.contains('instant')) instantCount += qty;
-    if (typeLine.contains('sorcery')) sorceryCount += qty;
-    if (typeLine.contains('enchantment')) enchantmentCount += qty;
-    if (typeLine.contains('artifact')) artifactCount += qty;
-    if (typeLine.contains('planeswalker')) planeswalkerCount += qty;
+    final typeLineLower = typeLine.toLowerCase();
+    if (typeLineLower.contains('creature')) creatureCount += qty;
+    if (typeLineLower.contains('instant')) instantCount += qty;
+    if (typeLineLower.contains('sorcery')) sorceryCount += qty;
+    if (typeLineLower.contains('enchantment')) enchantmentCount += qty;
+    if (typeLineLower.contains('artifact')) artifactCount += qty;
+    if (typeLineLower.contains('planeswalker')) planeswalkerCount += qty;
 
     // CMC bucket
     if (cmc <= 2) {

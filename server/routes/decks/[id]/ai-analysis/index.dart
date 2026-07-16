@@ -6,6 +6,8 @@ import 'package:dotenv/dotenv.dart';
 import 'package:http/http.dart' as http;
 import 'package:postgres/postgres.dart';
 import '../../../../lib/ai/functional_card_tags.dart';
+import '../../../../lib/ai/optimization_ramp_profile.dart';
+import '../../../../lib/basic_land_utils.dart' as land_utils;
 import '../../../../lib/openai_runtime_config.dart';
 
 /// POST /decks/:id/ai-analysis
@@ -263,7 +265,10 @@ class _DeckMetrics {
   final int commanderCount;
   final List<String> commanders;
   final double averageCmcNonLands;
+  /// Inclusive player-facing ramp role count.
   final int rampCount;
+  final int rampFloorCount;
+  final int rampContextualCount;
   final int drawCount;
   final int removalCount;
   final int boardWipeCount;
@@ -278,6 +283,8 @@ class _DeckMetrics {
     required this.commanders,
     required this.averageCmcNonLands,
     required this.rampCount,
+    required this.rampFloorCount,
+    required this.rampContextualCount,
     required this.drawCount,
     required this.removalCount,
     required this.boardWipeCount,
@@ -295,6 +302,8 @@ class _DeckMetrics {
       'average_cmc_non_lands':
           double.parse(averageCmcNonLands.toStringAsFixed(2)),
       'ramp_count': rampCount,
+      'ramp_floor': rampFloorCount,
+      'ramp_contextual': rampContextualCount,
       'draw_count': drawCount,
       'removal_count': removalCount,
       'board_wipe_count': boardWipeCount,
@@ -347,7 +356,7 @@ _DeckMetrics _computeMetrics(Result cardsResult, {required String format}) {
       if (name.trim().isNotEmpty) commanders.add(name);
     }
 
-    if (typeLine.contains('land')) {
+    if (land_utils.isLandTypeLine(typeLine)) {
       lands += qty;
       continue;
     }
@@ -358,6 +367,7 @@ _DeckMetrics _computeMetrics(Result cardsResult, {required String format}) {
 
   final avgCmc = nonLands > 0 ? (totalCmcNonLands / nonLands) : 0.0;
   final functionalSummary = summarizeFunctionalTagsForDeck(cardRows);
+  final rampProfileSummary = summarizeOptimizationRampProfilesForDeck(cardRows);
   ramp = functionalSummary.count('ramp');
   draw = functionalSummary.count('draw');
   removal = functionalSummary.count('removal');
@@ -372,6 +382,8 @@ _DeckMetrics _computeMetrics(Result cardsResult, {required String format}) {
     commanders: commanders,
     averageCmcNonLands: avgCmc,
     rampCount: ramp,
+    rampFloorCount: rampProfileSummary.rampFloor,
+    rampContextualCount: rampProfileSummary.rampContextual,
     drawCount: draw,
     removalCount: removal,
     boardWipeCount: wipes,
@@ -417,7 +429,7 @@ Map<String, dynamic> _heuristicAnalysis({
   }
 
   // Pacote mínimo (ramp/draw/removal)
-  score += min(10, (metrics.rampCount * 10 / 10).round());
+  score += min(10, (metrics.rampFloorCount * 10 / 10).round());
   score += min(10, (metrics.drawCount * 10 / 10).round());
   score += min(8, (metrics.removalCount * 8 / 8).round());
   score += min(5, (metrics.boardWipeCount * 5 / 2).round());
@@ -436,7 +448,8 @@ Map<String, dynamic> _heuristicAnalysis({
     strengths
         .add('Comandante definido: ${metrics.commanders.take(2).join(', ')}');
   }
-  if (metrics.rampCount >= 8) strengths.add('Ramp OK (${metrics.rampCount})');
+  if (metrics.rampFloorCount >= 8)
+    strengths.add('Ramp estrutural OK (${metrics.rampFloorCount})');
   if (metrics.drawCount >= 8)
     strengths.add('Card draw OK (${metrics.drawCount})');
   if (metrics.removalCount >= 6)
@@ -448,8 +461,11 @@ Map<String, dynamic> _heuristicAnalysis({
   if (format == 'commander' && metrics.landCount < 33) {
     weaknesses.add('Poucos terrenos (${metrics.landCount}) — ideal 33-38');
   }
-  if (metrics.rampCount < 8)
-    weaknesses.add('Falta ramp (${metrics.rampCount}) — ideal 10-12');
+  if (metrics.rampFloorCount < 8)
+    weaknesses.add(
+      'Falta ramp estrutural (${metrics.rampFloorCount}) — ideal 10-12; '
+      'ramp inclusivo ${metrics.rampCount}, contextual ${metrics.rampContextualCount}',
+    );
   if (metrics.drawCount < 8)
     weaknesses.add('Falta card draw (${metrics.drawCount}) — ideal 10-12');
   if (metrics.removalCount < 6)
@@ -492,7 +508,7 @@ Gere uma análise curta e objetiva em JSON, seguindo EXATAMENTE este formato:
 }
 Critérios de pontuação (synergy_score):
 - Completude do deck (Commander=100, Brawl=60): se incompleto, penalize proporcionalmente (ex: 60/100 cartas = máximo 60 pontos).
-- Distribuição funcional (Regra dos 8s): 10-12 ramp, 10+ draw, 8-10 removal, 3-4 board wipes, 33-38 terrenos. Cada categoria abaixo do mínimo = -5 pontos.
+- Distribuição funcional (Regra dos 8s): use exclusivamente metrics.ramp_floor para o piso de 10-12 ramp; metrics.ramp_count e metrics.ramp_contextual são informativos e não satisfazem esse piso. Use 10+ draw, 8-10 removal, 3-4 board wipes e 33-38 terrenos. Cada categoria abaixo do mínimo = -5 pontos.
 - Curva de mana: MV médio > 3.5 para não-control = -10 pontos. MV > 4.0 = -15 pontos.
 - Sinergia com comandante: cartas que ativam/amplificam a habilidade = bônus. Cartas genéricas sem sinergia = penalidade leve.
 - Base de mana: terrenos que entram virados em excesso (>5) = -5 pontos. Falta de color fixing = -5 pontos.

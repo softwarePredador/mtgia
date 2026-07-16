@@ -529,7 +529,7 @@ run_isolated_e2e() {
   fi
 
   local required_tool
-  for required_tool in curl dart dart_frog lsof pgrep psql python3 script; do
+  for required_tool in curl dart dart_frog lsof perl pgrep psql python3; do
     if ! command -v "$required_tool" >/dev/null 2>&1; then
       echo "BLOCKED: required tool is unavailable: $required_tool" >&2
       return 2
@@ -543,7 +543,7 @@ run_isolated_e2e() {
   fi
 
   local stamp nonce run_token run_dir audit_path
-  local api_port native_port vm_port api_url sidecar_url jwt_secret
+  local api_port native_port api_url sidecar_url jwt_secret
   stamp="$(date -u +%Y%m%dT%H%M%SZ)"
   nonce="$(python3 -c 'import secrets; print(secrets.token_hex(6))')"
   run_token="${MANALOOM_BATTLE_E2E_RUN_TOKEN:-${stamp}_$$_${nonce}}"
@@ -561,10 +561,6 @@ run_isolated_e2e() {
   native_port="$(select_free_loopback_port)"
   while [[ "$native_port" == "$api_port" ]]; do
     native_port="$(select_free_loopback_port)"
-  done
-  vm_port="$(select_free_loopback_port)"
-  while [[ "$vm_port" == "$api_port" || "$vm_port" == "$native_port" ]]; do
-    vm_port="$(select_free_loopback_port)"
   done
   api_url="http://127.0.0.1:${api_port}"
   sidecar_url="http://127.0.0.1:${native_port}"
@@ -601,15 +597,26 @@ run_isolated_e2e() {
 
   (
     cd "$SERVER_DIR"
+    dart_frog build
+  ) >"$run_dir/server-build.log" 2>&1
+  perl -0pi -e \
+    's/final address = InternetAddress[.]anyIPv6;/final address = InternetAddress.loopbackIPv4;/' \
+    "$SERVER_DIR/build/bin/server.dart"
+  if ! grep -Fq \
+    'final address = InternetAddress.loopbackIPv4;' \
+    "$SERVER_DIR/build/bin/server.dart"; then
+    echo "FAIL: immutable Battle API build could not be restricted to IPv4 loopback." >&2
+    return 1
+  fi
+
+  (
+    cd "$SERVER_DIR"
     exec "$ROOT_DIR/server/bin/with_new_server_pg.sh" env \
       PORT="$api_port" \
       JWT_SECRET="$jwt_secret" \
       BATTLE_ENGINE=native \
       NATIVE_BATTLE_SIDECAR_URL="$sidecar_url" \
-      script -q /dev/null dart_frog dev \
-        --hostname 127.0.0.1 \
-        --port "$api_port" \
-        --dart-vm-service-port "$vm_port"
+      dart run build/bin/server.dart
   ) >"$run_dir/api.log" 2>&1 &
   API_PID="$!"
   wait_for_json_contract \

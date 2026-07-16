@@ -24,16 +24,30 @@ def looks_like_board_wipe(oracle):
             ('deals' in o and 'damage' in o and 'to each creature' in o))
 
 def looks_like_ramp(oracle):
-    o = oracle.lower()
-    if 'add {' in o or 'mana of any' in o:
+    o = oracle.lower().replace('search you library', 'search your library')
+    if ('add {' in o or
+            re.search(r'\badds?\b[^.\n]{0,96}\bmana of any(?:\s+one)?\b', o)):
         return True
-    if 'search your library' in o and ('land card' in o or 'basic land' in o):
+    search_index = o.find('search your library')
+    battlefield_index = o.find('onto the battlefield', search_index)
+    next_paragraph = o.find('\n', search_index)
+    if (search_index >= 0 and battlefield_index >= 0 and
+            (next_paragraph < 0 or battlefield_index < next_paragraph) and
+            ('land card' in o or 'basic land' in o)):
         return True
     return ('additional land this turn' in o or
             'additional land on each of your turns' in o or
+            (('spells you cast cost' in o and 'less to cast' in o) or
+             re.search(r'\bspells you cast\b[^.\n]{0,64}\bcost\b[^.\n]{0,32}\bless to cast\b', o)) or
             'put a land card from your hand onto the battlefield' in o or
             'create a treasure token' in o or 'create two treasure tokens' in o or
-            'create three treasure tokens' in o)
+            'create three treasure tokens' in o or
+            'creates a treasure token' in o or
+            'spells you cast have convoke' in o or
+            'create a birds of paradise token' in o or
+            'has all activated abilities of all lands' in o or
+            ('mana counter' in o and
+             re.search(r'\b(?:can|may) spend mana of any color\b[^.\n]{0,48}\bequal to the number of mana counters\b', o)))
 
 def classify_role(name, type_line, oracle_text):
     """Simula classifyOptimizationFunctionalRole() fielmente"""

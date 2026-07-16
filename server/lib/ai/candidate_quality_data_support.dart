@@ -1,4 +1,5 @@
 import 'commander_fallback_policy.dart';
+import '../basic_land_utils.dart' as land_utils;
 import 'functional_card_tags.dart';
 import 'optimization_functional_roles.dart';
 import 'optimize_runtime_support.dart';
@@ -577,8 +578,9 @@ List<CandidateFunctionTag> inferCandidateFunctionTags({
   String? manaCost,
 }) {
   final normalizedName = normalizeCandidateQualityKey(name);
-  final type = typeLine.toLowerCase();
+  final isLand = land_utils.isLandTypeLine(typeLine);
   final oracle = oracleText.toLowerCase();
+  final directOracle = optimizationOracleDirectEffectText(oracle);
   final tags = <String, CandidateFunctionTag>{};
 
   void add(String tag, double confidence, String evidence) {
@@ -618,7 +620,9 @@ List<CandidateFunctionTag> inferCandidateFunctionTags({
         add('sacrifice', inferred.confidence, '${inferred.evidence};alias=v1');
         break;
       case 'ritual':
-        add('ramp', 0.72, '${inferred.evidence};alias=v1');
+        if (!isLand) {
+          add('ramp', 0.72, '${inferred.evidence};alias=v1');
+        }
         break;
       case 'blink':
         add('protection', 0.68, '${inferred.evidence};alias=v1');
@@ -629,14 +633,14 @@ List<CandidateFunctionTag> inferCandidateFunctionTags({
     }
   }
 
-  if (type.contains('land') &&
+  if (isLand &&
       (oracle.contains('add ') ||
           oracle.contains('any color') ||
           oracle.contains('mana'))) {
     add('mana_fixing', 0.82, 'land_mana_text');
   }
 
-  if (!type.contains('land') &&
+  if (!isLand &&
       (looksLikeOptimizationRampText(oracleText) ||
           normalizedName.contains('signet') ||
           normalizedName.contains('talisman') ||
@@ -644,11 +648,13 @@ List<CandidateFunctionTag> inferCandidateFunctionTags({
     add('ramp', 0.86, 'mana_or_land_ramp_text');
   }
 
-  if (oracle.contains('add one mana of any color') ||
-      oracle.contains('add one mana of any type') ||
+  final mentionsAnyColorOrCommanderIdentity =
       oracle.contains('mana of any color') ||
+      oracle.contains('mana of any type') ||
       oracle.contains('commander\'s color identity') ||
-      (oracle.contains('commander') && oracle.contains('color identity'))) {
+      (oracle.contains('commander') && oracle.contains('color identity'));
+  if (mentionsAnyColorOrCommanderIdentity &&
+      looksLikeOptimizationWordedAnyManaProductionText(oracleText)) {
     add('mana_fixing', 0.9, 'any_color_or_commander_identity_mana');
   }
 
@@ -725,14 +731,16 @@ List<CandidateFunctionTag> inferCandidateFunctionTags({
     add('recursion', 0.86, 'graveyard_return_text');
   }
 
-  if (oracle.contains('create') && oracle.contains('token') ||
-      oracle.contains('populate')) {
+  if (looksLikeOptimizationControllerTokenCreationText(oracleText)) {
     add('token', 0.82, 'token_creation_text');
   }
 
-  if (oracle.contains('sacrifice') ||
-      oracle.contains('dies') ||
-      oracle.contains('whenever another creature dies')) {
+  if (directOracle.contains('dies') ||
+      directOracle.contains('whenever you sacrifice') ||
+      directOracle.contains('whenever another creature dies') ||
+      RegExp(
+        r'\bsacrifice\s+(?:another|an?|one|two|three|x|any|target|up to|half|all)\b',
+      ).hasMatch(directOracle)) {
     add('sacrifice', 0.72, 'sacrifice_or_death_trigger_text');
   }
 
@@ -796,6 +804,10 @@ List<CandidateRoleScore> buildCandidateRoleScores({
   final roleBest = <String, CandidateRoleScore>{};
   for (final tag in tags) {
     final role = normalizeCandidateQualityRole(tag.tag);
+    // A land may carry mana_fixing metadata, but it must never materialize a
+    // nonland ramp role score. Otherwise candidate quality can treat a land
+    // slot as interchangeable with a rock or ritual.
+    if (land_utils.isLandTypeLine(typeLine) && role == 'ramp') continue;
     final popularityBonus =
         (metaDeckCount * 3 +
                 metaUsageCount ~/ 12 +

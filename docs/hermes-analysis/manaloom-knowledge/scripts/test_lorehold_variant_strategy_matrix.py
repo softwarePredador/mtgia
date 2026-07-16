@@ -1,4 +1,5 @@
 import sqlite3
+import hashlib
 import json
 import tempfile
 import unittest
@@ -50,11 +51,21 @@ class LoreholdVariantStrategyMatrixTest(unittest.TestCase):
         self.addCleanup(conn.close)
         conn.row_factory = sqlite3.Row
 
-        payload = matrix.build_matrix(conn, deck_ids=[6, 606], candidate_path=None)
+        payload = matrix.build_matrix(
+            conn,
+            deck_ids=[6, 606],
+            candidate_path=None,
+            source_db=db,
+        )
 
         self.assertEqual(payload["status"], "ready")
         self.assertEqual([deck["deck_key"] for deck in payload["decks"]], ["deck_6", "deck_606"])
         self.assertTrue(payload["ranked_deck_keys"])
+        self.assertEqual(payload["source_db"], str(db.resolve()))
+        self.assertEqual(
+            payload["source_db_sha256"],
+            hashlib.sha256(db.read_bytes()).hexdigest(),
+        )
         for deck in payload["decks"]:
             self.assertIn("objective", deck)
             self.assertIn("strategy_package_health", deck)

@@ -18,31 +18,35 @@ void main() {
       expect(role, equals('removal'));
     });
 
-    test('maps curated combo role while heuristic combo stays conservative',
-        () {
-      final tags = inferFunctionalCardTags(
-        name: 'Dramatic Reversal',
-        typeLine: 'Instant',
-        oracleText: 'Untap all nonland permanents you control.',
-      );
-      final heuristicCombo = tags.firstWhere((tag) => tag.tag == 'combo_piece');
-      expect(heuristicCombo.confidence, lessThan(0.65));
+    test(
+      'maps curated combo role while heuristic combo stays conservative',
+      () {
+        final tags = inferFunctionalCardTags(
+          name: 'Dramatic Reversal',
+          typeLine: 'Instant',
+          oracleText: 'Untap all nonland permanents you control.',
+        );
+        final heuristicCombo = tags.firstWhere(
+          (tag) => tag.tag == 'combo_piece',
+        );
+        expect(heuristicCombo.confidence, lessThan(0.65));
 
-      final role = inferFunctionalRoleForCard({
-        'name': 'Dramatic Reversal',
-        'type_line': 'Instant',
-        'oracle_text': 'Untap all nonland permanents you control.',
-        'functional_tags': const [
-          {
-            'tag': 'combo_piece',
-            'confidence': 0.96,
-            'source': 'commander_spellbook_combo_v1',
-          },
-        ],
-      });
+        final role = inferFunctionalRoleForCard({
+          'name': 'Dramatic Reversal',
+          'type_line': 'Instant',
+          'oracle_text': 'Untap all nonland permanents you control.',
+          'functional_tags': const [
+            {
+              'tag': 'combo_piece',
+              'confidence': 0.96,
+              'source': 'commander_spellbook_combo_v1',
+            },
+          ],
+        });
 
-      expect(role, equals('wincon'));
-    });
+        expect(role, equals('wincon'));
+      },
+    );
 
     test('keeps land-search out of tutor matching', () {
       expect(
@@ -63,12 +67,77 @@ void main() {
       );
     });
 
+    test('keeps inclusive ramp labels but narrows generic ramp needs', () {
+      const rubyOracle = 'Red spells you cast cost {1} less to cast.';
+      const scoreOracle = 'Draw two cards and create two Treasure tokens.';
+
+      expect(
+        inferFunctionalRoleForCard(const {
+          'name': 'Ruby Medallion',
+          'type_line': 'Artifact',
+          'oracle_text': rubyOracle,
+          'functional_tags': ['ramp'],
+        }),
+        equals('ramp'),
+      );
+      expect(
+        inferOptimizeFunctionalNeed(
+          name: 'Ruby Medallion',
+          typeLine: 'Artifact',
+          oracleText: rubyOracle,
+        ),
+        equals('ramp'),
+      );
+
+      for (final contextual in const [rubyOracle, scoreOracle]) {
+        expect(
+          matchesFunctionalNeed(
+            'ramp',
+            oracleText: contextual,
+            typeLine: contextual == rubyOracle ? 'Artifact' : 'Instant',
+          ),
+          isFalse,
+        );
+      }
+
+      expect(
+        matchesFunctionalNeed(
+          'ramp',
+          name: 'Arcane Signet',
+          oracleText:
+              '{T}: Add one mana of any color in your commander\'s color identity.',
+          typeLine: 'Artifact',
+        ),
+        isTrue,
+      );
+      expect(
+        matchesFunctionalNeed(
+          'ramp',
+          name: "Nature's Lore",
+          oracleText:
+              'Search your library for a Forest card, put that card onto the battlefield, then shuffle.',
+          typeLine: 'Sorcery',
+        ),
+        isTrue,
+      );
+      expect(
+        matchesFunctionalNeed(
+          'ramp',
+          name: 'Sylvan Scrying',
+          oracleText:
+              'Search your library for a land card, reveal it, put it into your hand, then shuffle.',
+          typeLine: 'Sorcery',
+        ),
+        isFalse,
+      );
+    });
+
     test('penalizes temporary mana bursts compared with stable ramp', () {
       final stableRampScore = scoreOptimizeReplacementCandidate(
         functionalNeed: 'ramp',
         cardName: 'Arcane Signet',
         typeLine: 'Artifact',
-        oracleText: 'Add one mana of any color.',
+        oracleText: '{T}: Add one mana of any color.',
         manaCost: '{2}',
         popScore: 100,
         preferredNames: const {},

@@ -10,11 +10,16 @@ void main() {
       rulesText = File('magicrules.txt').readAsStringSync();
     });
 
-    test('uses the current official 2026-04-17 Comprehensive Rules snapshot',
-        () {
+    // Latest-source freshness is additionally proved against the official
+    // Wizards URL and PostgreSQL by `bin/sync_rules.dart --check`.
+    test('pins the reviewed official 2026-06-19 snapshot', () {
       expect(
         rulesText,
-        contains('These rules are effective as of April 17, 2026.'),
+        contains('These rules are effective as of June 19, 2026.'),
+      );
+      expect(
+        rulesText,
+        isNot(contains('These rules are effective as of April 17, 2026.')),
       );
       expect(
         rulesText,
@@ -29,6 +34,9 @@ void main() {
         '722. Preparation Cards',
         '702.184. Station',
         '702.185. Warp',
+        '701.67. Waterbend',
+        '702.187. Mayhem',
+        '702.188. Web-slinging',
         '802. Attack Multiple Players Option',
         '903.3. Each deck has a legendary card designated as its commander.',
         '903.12c Each deck has a legendary card designated as its commander.',

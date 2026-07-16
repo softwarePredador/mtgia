@@ -136,6 +136,13 @@ class GlobalCommanderPayoffSourceLaneExpanderTests(unittest.TestCase):
                 "Magecraft - Whenever you cast or copy an instant or sorcery spell, create a Treasure token.",
                 4,
             ),
+            (
+                "Lander Rizzi",
+                '["R"]',
+                "Legendary Artifact Creature — Lander Rogue",
+                "Magecraft - Whenever you cast or copy an instant or sorcery spell, create a Treasure token.",
+                3,
+            ),
         ]
         for name, colors, type_line, oracle_text, cmc in rows:
             conn.execute(
@@ -224,6 +231,7 @@ class GlobalCommanderPayoffSourceLaneExpanderTests(unittest.TestCase):
         names = {row["card_name"] for row in report["top_payoff_candidates"]}
         self.assertIn("Young Pyromancer", names)
         self.assertIn("Double Vision", names)
+        self.assertIn("Lander Rizzi", names)
         self.assertNotIn("Storm-Kiln Artist", names)
         blocked = {row["card_name"]: row["block_reasons"] for row in report["blocked_payoff_candidate_sample"]}
         self.assertIn("already_in_candidate_deck", blocked["Storm-Kiln Artist"])

@@ -334,6 +334,53 @@ def test_complete_spell_resolved_resolution_contract_is_ready():
     assert summary["observed_missing_required_fields"] == 0
 
 
+def test_new_escape_harnfel_mana_vault_modal_and_trigger_events_have_explicit_contracts():
+    expected = {
+        "escape_additional_cost_paid": "technical",
+        "escape_cast": "strategy_signal",
+        "flashback_permission_expired": "technical",
+        "flashback_target_permission_granted": "strategy_signal",
+        "flashback_target_permission_not_granted": "ignored_with_reason",
+        "harnfel_activated": "strategy_signal",
+        "harnfel_discard_cost_paid": "technical",
+        "harnfel_exile_permission_expired": "technical",
+        "harnfel_exiled_card_played": "strategy_signal",
+        "mana_vault_draw_step_damage": "strategy_signal",
+        "mana_vault_draw_step_damage_skipped": "ignored_with_reason",
+        "mana_vault_mana_activated": "technical",
+        "mana_vault_upkeep_untap": "strategy_signal",
+        "modal_dfc_back_face_cast": "strategy_signal",
+        "modal_dfc_front_face_restored": "technical",
+        "trigger_countered": "action_audited",
+        "underworld_breach_end_step_sacrifice_skipped": "ignored_with_reason",
+        "underworld_breach_end_step_sacrificed": "renderer_only",
+    }
+    with tempfile.TemporaryDirectory() as tmp_name:
+        tmp = Path(tmp_name)
+        engine = tmp / "engine.py"
+        write_engine(engine, list(expected))
+        write_events(
+            tmp / "seed_1/replay.events.jsonl",
+            [
+                {"event": event_name, "turn": 1, "player": "A"}
+                for event_name in expected
+            ],
+        )
+
+        audit = audit_module.build_audit(input_dir=tmp, engine_source=engine)
+        summary = audit["summary"]
+        classifications = {
+            item["event"]: item["classification"]
+            for item in audit["items"]
+        }
+
+    assert classifications == expected
+    assert summary["status"] == "event_contract_static_ready"
+    assert summary["static_unclassified_total"] == 0
+    assert summary["observed_unclassified_total"] == 0
+    assert summary["observed_missing_required_fields"] == 0
+
+
 if __name__ == "__main__":
     tests = [
         test_known_static_and_observed_events_are_classified,
@@ -343,6 +390,7 @@ if __name__ == "__main__":
         test_observed_strategy_signal_missing_turn_is_reported,
         test_spell_resolved_has_event_specific_resolution_contract,
         test_complete_spell_resolved_resolution_contract_is_ready,
+        test_new_escape_harnfel_mana_vault_modal_and_trigger_events_have_explicit_contracts,
     ]
     for test in tests:
         test()

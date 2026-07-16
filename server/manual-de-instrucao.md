@@ -15951,8 +15951,14 @@ Escrita real:
 
 ```bash
 cd server
-TEST_API_BASE_URL=http://127.0.0.1:8081 dart run bin/mana_loom_deck_runtime_e2e.dart --apply
+MANALOOM_CONFIRM_LIVE_MUTATIONS=I_HAVE_EXPLICIT_APPROVAL \
+  TEST_API_BASE_URL=http://127.0.0.1:8081 \
+  dart run bin/mana_loom_deck_runtime_e2e.dart --apply
 ```
+
+O token de aprovacao exato e validado antes de carregar ambiente, acessar o
+banco, chamar a rede ou criar artifacts. Sem ele, o processo encerra com codigo
+`2` e `BLOCKED:`.
 
 Antes do `--apply`, suba a API Dart Frog na porta usada:
 

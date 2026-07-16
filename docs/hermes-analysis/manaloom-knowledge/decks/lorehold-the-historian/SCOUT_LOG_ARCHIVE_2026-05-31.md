@@ -1768,6 +1768,6 @@ Giver of Runes (19.6%), Creative Technique (26.4%), Pinnacle Monk (41.6%).
 
 **Detalhes completos:** `docs/hermes-analysis/manaloom-knowledge/SCOUT_LOG.md`
 
-**Dados brutos:** `scripts/_edhrec_snapshot_20260527_1943.json`
+**Dados brutos:** snapshot removido do repositório em 2026-07-16 por conter metadados sensíveis; somente derivados sanitizados podem ser retidos.
 
 ---

@@ -152,5 +152,72 @@ void main() {
       expect(aggressive.length, greaterThan(light.length));
       expect(aggressive.length, lessThanOrEqualTo(20));
     });
+
+    test('ramp surplus only exposes cards that count toward generic floor', () {
+      final removals = buildDeterministicOptimizeRemovalCandidates(
+        allCardData: const [
+          {
+            'name': 'Commander Card',
+            'type_line': 'Legendary Creature',
+            'oracle_text': 'Flying',
+            'quantity': 1,
+            'cmc': 3.0,
+          },
+          {
+            'name': 'Island',
+            'type_line': 'Basic Land - Island',
+            'oracle_text': '({T}: Add {U}.)',
+            'quantity': 35,
+            'cmc': 0.0,
+          },
+          {
+            'name': 'Arcane Signet',
+            'type_line': 'Artifact',
+            'oracle_text':
+                '{T}: Add one mana of any color in your commander\'s color identity.',
+            'functional_tags': ['ramp'],
+            'quantity': 11,
+            'cmc': 2.0,
+          },
+          {
+            'name': 'Ruby Medallion',
+            'type_line': 'Artifact',
+            'oracle_text': 'Red spells you cast cost {1} less to cast.',
+            'functional_tags': ['ramp'],
+            'quantity': 3,
+            'cmc': 2.0,
+          },
+          {
+            'name': 'Filler Artifact',
+            'type_line': 'Artifact',
+            'oracle_text': 'A slow artifact with no immediate impact.',
+            'quantity': 45,
+            'cmc': 7.0,
+          },
+        ],
+        commanders: const ['Commander Card'],
+        commanderColorIdentity: const {'U'},
+        targetArchetype: 'midrange',
+        keepTheme: false,
+        coreCards: const [],
+        commanderPriorityNames: const [],
+        swapLimit: 60,
+      );
+
+      expect(
+        removals.where((candidate) => candidate['name'] == 'Arcane Signet'),
+        isNotEmpty,
+      );
+      expect(
+        removals.where((candidate) => candidate['name'] == 'Ruby Medallion'),
+        isEmpty,
+      );
+      expect(
+        removals.firstWhere(
+          (candidate) => candidate['name'] == 'Arcane Signet',
+        )['role'],
+        equals('ramp'),
+      );
+    });
   });
 }

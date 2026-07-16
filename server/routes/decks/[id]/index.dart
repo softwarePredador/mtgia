@@ -6,6 +6,7 @@ import '../../../lib/deck_rules_service.dart';
 import '../../../lib/deck_card_name_resolution_support.dart';
 import '../../../lib/deck_schema_support.dart';
 import '../../../lib/decks/deck_optimization_history_service.dart';
+import '../../../lib/basic_land_utils.dart' as land_utils;
 import '../../../lib/http_responses.dart';
 import '../../../lib/scryfall_image_url.dart';
 
@@ -434,7 +435,7 @@ Future<Response> _getDeckById(RequestContext context, String deckId) async {
     // Helper to get main type
     String getMainType(String typeLine) {
       final t = typeLine.toLowerCase();
-      if (t.contains('land')) return 'Land';
+      if (land_utils.isLandTypeLine(typeLine)) return 'Land';
       if (t.contains('creature')) return 'Creature';
       if (t.contains('planeswalker')) return 'Planeswalker';
       if (t.contains('artifact')) return 'Artifact';
@@ -488,9 +489,9 @@ Future<Response> _getDeckById(RequestContext context, String deckId) async {
 
       // Stats Calculation (ignoring lands for curve usually, but let's include everything that has a cost)
       final cost = card['mana_cost'] as String?;
-      final typeLine = (card['type_line'] as String? ?? '').toLowerCase();
+      final typeLine = card['type_line'] as String? ?? '';
 
-      if (!typeLine.contains('land')) {
+      if (!land_utils.isLandTypeLine(typeLine)) {
         final cmc = calculateCmc(cost);
         final cmcKey = cmc >= 7 ? '7+' : cmc.toString();
         manaCurve[cmcKey] =

@@ -1,6 +1,6 @@
 # PG873 — sacrifice_outlet family reconciliation
 
-Status: prepared and validated read-only; PostgreSQL apply not executed.
+Status: applied to PostgreSQL and postchecked successfully on 2026-07-16.
 
 ## Definitive outlet result
 
@@ -11,28 +11,66 @@ rejects self pronouns and card-name aliases (including Alchemy and legendary
 short names), and keeps arbitrary external objects such as land, Food, Clue,
 creature types, multi-types, and `up to N permanents`.
 
-| Lane | Current | Expected | Retained | Add | Remove | Expected UUID SHA-256 |
+| Lane | Current | In-scope expected | Retained | Add | Remove | Expected UUID SHA-256 |
 |---|---:|---:|---:|---:|---:|---|
 | `deterministic_heuristic_v1` function tag | 1,357 | 716 | 491 | 225 | 866 | `51272701cdb5b277a2007de43c418c418fab5380409fc16c08ac527fd1ddacbd` |
-| `deterministic_semantic_v2` function tag | 1,380 | 736 | 507 | 229 | 873 | `512cb67eca26b4c86d4555fcf14cae19e6e9f0a9bd24239db0d4cc6caa49418c` |
-| `deterministic_semantic_v2` JSON tag | 1,380 | 736 | 507 | 229 | 873 | `512cb67eca26b4c86d4555fcf14cae19e6e9f0a9bd24239db0d4cc6caa49418c` |
+| `deterministic_semantic_v2` function tag | 1,380 | 684 | 507 | 177 | 873 | `573c94fad8b4ba9d9789daadd506e4ce2b0143dfa0d049eb8687c4c8cd90e8bd` |
+| `deterministic_semantic_v2` JSON tag | 1,380 | 684 | 507 | 177 | 873 | `573c94fad8b4ba9d9789daadd506e4ce2b0143dfa0d049eb8687c4c8cd90e8bd` |
 
-The expected set is identical between the Dart audit and the independently
-encoded SQL precheck. The SQL precheck returned `guard=ok` over 33,841
-heuristic-owner cards and 33,972 semantic-owner cards.
+The global semantic classifier still recognizes 736 cards with SHA-256
+`512cb67eca26b4c86d4555fcf14cae19e6e9f0a9bd24239db0d4cc6caa49418c`.
+Of those, 684 already own a complete `deterministic_semantic_v2` snapshot and
+are in PG873 scope. The expected global and in-scope sets are identical between
+the Dart audit and the independently encoded SQL precheck. The SQL precheck
+returned `guard=ok` over 33,841 heuristic-owner cards and 33,972 semantic-owner
+cards.
 
-There are 52 expected semantic cards with no current semantic-v2 row. PG873
-materializes an outlet-only semantic row for them. It deliberately does not
-persist unrelated tags suggested by the current broad classifier; those remain
-algorithm drift requiring a separate family review. Thirty-three existing
+Validation was rerun on 2026-07-16 before the guarded PostgreSQL mutation:
+
+- SQL precheck: `/tmp/pg873_precheck_20260716.log`, `guard=ok`;
+- independent Dart family audit:
+  `/tmp/manaloom_sacrifice_outlet_family_audit_pg873_final/summary.json`,
+  `db_mutations=false` and the same counts/hashes;
+- focused classifier/package tests: 14 passed; focused Dart analysis: no issues.
+
+The guarded apply then completed with `ON_ERROR_STOP=1` and an explicit
+PostgreSQL write confirmation. It backed up 2,737 function rows and 1,557
+semantic rows in `manaloom_deploy_audit`, materialized the 1,400-row expected
+function manifest, updated the existing semantic snapshots in scope, and
+committed without a guard failure. Apply log:
+`/tmp/pg873_apply_20260716.log`.
+
+The independent postcheck returned `guard=ok` and verified:
+
+- 716 heuristic outlet rows, UUID SHA-256
+  `51272701cdb5b277a2007de43c418c418fab5380409fc16c08ac527fd1ddacbd`;
+- 736 global semantic candidates, UUID SHA-256
+  `512cb67eca26b4c86d4555fcf14cae19e6e9f0a9bd24239db0d4cc6caa49418c`;
+- 684 in-scope semantic rows, UUID SHA-256
+  `573c94fad8b4ba9d9789daadd506e4ce2b0143dfa0d049eb8687c4c8cd90e8bd`;
+- the unchanged 52-card deferred backlog, UUID SHA-256
+  `4f29cbcbbdaa9a10bf285ff808c40ab8f3026367a2b3bc873fd51424cad5b199`;
+- zero manifest differences, cross-source conflicts, wrong semantic payloads,
+  resurrected false positives, stale role confidence values, or tag-order
+  violations.
+
+Postcheck log: `/tmp/pg873_postcheck_20260716.log`.
+
+There are 52 globally expected cards with no current semantic-v2 row, exact
+UUID SHA-256
+`4f29cbcbbdaa9a10bf285ff808c40ab8f3026367a2b3bc873fd51424cad5b199`.
+PG873 records these cards in the audit schema as a deferred backlog and does
+not create partial outlet-only semantic snapshots. They require the complete
+semantic-v2 backfill contract in a separate package. Thirty-three existing
 semantic rows contain only a false outlet tag and are deleted because their
 reconciled tag array would be empty.
 
 ## Final PG873 dry-run stale decomposition
 
-Source: read-only dry-run `/tmp/manaloom_candidate_quality_pg873_final`, run
-from `2026-07-15T21:33:24.270073` through
-`2026-07-15T21:34:25.227511`; `db_mutations=false`.
+Source: read-only dry-run
+`/tmp/manaloom_candidate_quality_pg873_deferred_final`, run from
+`2026-07-16T01:45:55.542343` through `2026-07-16T01:47:11.719910`;
+`db_mutations=false`.
 
 | Table | Stale rows | Classification for PG873 |
 |---|---:|---|
@@ -113,11 +151,14 @@ PG873 mutates only:
   `deterministic_heuristic_v1` and `deterministic_semantic_v2`;
 - the `sacrifice_outlet` JSON element and aggregate `role_confidence` in
   `card_semantic_tags_v2` for source `deterministic_semantic_v2`;
-- 52 missing semantic rows containing only the validated outlet tag;
+- existing semantic-v2 snapshots; no missing or partial semantic row is
+  inserted;
 - audit snapshots under `manaloom_deploy_audit`.
 
 It does not mutate the generic `sacrifice` alias, role scores, commander
 synergies, rejection penalties, battle runners, corpus, goldfish, or validator.
-The rollback snapshots all 2,737 current function rows and 1,557 current
-semantic target rows, records the exact 1,576-row post state, and aborts if the
-post state drifts before rollback.
+The audit schema records the 52-card deferred backlog independently from the
+1,400-row expected function manifest (716 heuristic plus 684 semantic). The
+rollback snapshots all 2,737 current function rows and 1,557 current semantic
+target rows, records the exact 1,524-row post state, and aborts if the post state
+or deferred backlog drifts before rollback.

@@ -173,13 +173,19 @@ String classifyResolutionRuntimeOrigin({
   required List<ProviderCallEvidence> providerCalls,
 }) {
   if (cacheHit == true) return 'cache';
-  if (providerCalls.any((call) => call.success)) return 'provider';
+  final normalizedStrategy = strategySource?.trim().toLowerCase();
+  if (normalizedStrategy == 'deterministic_first') return 'deterministic';
+  if (normalizedStrategy == 'state_gate') return 'state_gate';
 
-  return switch (strategySource?.trim().toLowerCase()) {
-    'deterministic_first' => 'deterministic',
-    'state_gate' => 'state_gate',
-    _ => 'unknown',
-  };
+  final hasSuccessfulProviderCall = providerCalls.any((call) => call.success);
+  if (const {
+        'ai_primary',
+        'ai_after_deterministic_fallback',
+      }.contains(normalizedStrategy) &&
+      !hasSuccessfulProviderCall) {
+    return 'unknown';
+  }
+  return hasSuccessfulProviderCall ? 'provider' : 'unknown';
 }
 
 bool qualifiesAsSafeNoChangeOutcome({
@@ -235,6 +241,15 @@ class OptimizeOutcomeEvidence {
   int get candidateSwapCount =>
       removalCount < additionCount ? removalCount : additionCount;
 
+  bool get responseFlagsWellTyped =>
+      !rejectionReasons.any(
+        (reason) => const {
+          'is_mock_not_bool',
+          'can_apply_not_bool',
+          'learning_eligible_not_bool',
+        }.contains(reason),
+      );
+
   Map<String, dynamic> toJson() => {
     'http_status': httpStatus,
     'outcome_code': outcomeCode,
@@ -247,6 +262,7 @@ class OptimizeOutcomeEvidence {
     'actionable_addition_count': actionableAdditionCount,
     'actionable_swap_count': actionableSwapCount,
     'candidate_swap_count': candidateSwapCount,
+    'response_flags_well_typed': responseFlagsWellTyped,
     'direct_apply_accepted': directApplyAccepted,
     'rejection_reasons': rejectionReasons,
   };
@@ -275,22 +291,28 @@ OptimizeOutcomeEvidence assessOptimizeOutcomeEvidence({
   final actionableAdditionCount = additionDetails.details.length;
   final rejectionReasons = <String>[];
 
+  if (responseBody.containsKey('is_mock') && responseBody['is_mock'] is! bool) {
+    rejectionReasons.add('is_mock_not_bool');
+  }
+  if (responseBody.containsKey('can_apply') &&
+      responseBody['can_apply'] is! bool) {
+    rejectionReasons.add('can_apply_not_bool');
+  }
+  if (responseBody.containsKey('learning_eligible') &&
+      responseBody['learning_eligible'] is! bool) {
+    rejectionReasons.add('learning_eligible_not_bool');
+  }
+  if (isMock == true) rejectionReasons.add('mock_response');
+
   if (httpStatus != HttpStatus.ok) {
     rejectionReasons.add('http_status_not_200');
   } else {
-    if (responseBody.containsKey('is_mock') &&
-        responseBody['is_mock'] is! bool) {
-      rejectionReasons.add('is_mock_not_bool');
+    if (normalizedOutcomeCode != 'optimized') {
+      rejectionReasons.add('unexpected_success_outcome');
     }
-    if (responseBody.containsKey('can_apply') &&
-        responseBody['can_apply'] is! bool) {
-      rejectionReasons.add('can_apply_not_bool');
+    if (responseBody.containsKey('quality_error')) {
+      rejectionReasons.add('quality_error_present');
     }
-    if (responseBody.containsKey('learning_eligible') &&
-        responseBody['learning_eligible'] is! bool) {
-      rejectionReasons.add('learning_eligible_not_bool');
-    }
-    if (isMock == true) rejectionReasons.add('mock_response');
     if (canApply == false) rejectionReasons.add('can_apply_false');
     if (learningEligible == false) {
       rejectionReasons.add('learning_eligible_false');
@@ -1217,6 +1239,7 @@ Future<ResolutionRunResult> _runResolutionForDeck({
             'rebuild_guided',
           }.contains(flowPath) &&
           optimizeOutcome.isMock != true &&
+          optimizeOutcome.responseFlagsWellTyped &&
           optimizeOutcome.outcomeCode?.toLowerCase() != 'mock_non_actionable' &&
           runtimeOrigin != 'unknown',
     );

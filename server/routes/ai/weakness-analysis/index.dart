@@ -3,8 +3,10 @@ import 'package:postgres/postgres.dart';
 import '../../../lib/archetype_counters_service.dart';
 import '../../../lib/http_responses.dart';
 import '../../../lib/ai/optimization_functional_roles.dart';
+import '../../../lib/ai/optimization_ramp_profile.dart';
 import '../../../lib/ai/commander_spellbook_service.dart';
 import '../../../lib/ai/deck_advanced_analysis.dart';
+import '../../../lib/basic_land_utils.dart' as land_utils;
 
 /// Endpoint para análise de fraquezas do deck
 ///
@@ -157,7 +159,7 @@ Future<Response> onRequest(RequestContext context) async {
         cmc: cmc,
       );
 
-      if (typeLineLower.contains('land')) {
+      if (land_utils.isLandTypeLine(typeLine)) {
         landCount += quantity;
       } else {
         nonLandCards += quantity;
@@ -180,6 +182,9 @@ Future<Response> onRequest(RequestContext context) async {
       if (cardRoles.contains('recursion') || cardRoles.contains('graveyard'))
         graveyardInteractionCount += quantity;
     }
+    final rampProfileSummary = summarizeOptimizationRampProfilesForDeck(cards);
+    final rampFloorCount = rampProfileSummary.rampFloor;
+    final rampContextualCount = rampProfileSummary.rampContextual;
     final recommendationColors =
         commanderColorIdentity.isNotEmpty
             ? commanderColorIdentity
@@ -233,20 +238,22 @@ Future<Response> onRequest(RequestContext context) async {
     }
 
     // Verificar ramp
-    if (rampCount < 8) {
+    if (rampFloorCount < 8) {
       weaknesses.add({
         'type': 'insufficient_ramp',
-        'severity': rampCount < 5 ? 'critical' : 'high',
+        'severity': rampFloorCount < 5 ? 'critical' : 'high',
         'description':
-            'Deck tem apenas $rampCount fontes de ramp. Recomendado: 10-12.',
+            'Deck tem apenas $rampFloorCount fontes de ramp estrutural para o piso genérico de 10-12. Ramp inclusivo: $rampCount; aceleração contextual: $rampContextualCount.',
         'recommendations': await _findWeaknessRecommendations(
           pool: pool,
-          roles: const ['ramp', 'ritual'],
+          roles: const ['ramp'],
           oraclePatterns: const [
-            'add {%',
+            '%add {%',
+            '%add one mana%',
             '%search your library%land%',
             '%put%land%onto the battlefield%',
           ],
+          genericRampFloorOnly: true,
           deckColors: recommendationColors,
           excludeNames: deckCardNames,
           format: deckFormat,
@@ -256,8 +263,11 @@ Future<Response> onRequest(RequestContext context) async {
             'Priorizar rocks, dorks ou ramp de terrenos conforme a identidade',
           ],
         ),
-        'current_value': rampCount,
+        'current_value': rampFloorCount,
         'recommended_value': 10,
+        'ramp_floor': rampFloorCount,
+        'ramp_inclusive': rampCount,
+        'ramp_contextual': rampContextualCount,
       });
     }
 
@@ -666,6 +676,8 @@ Future<Response> onRequest(RequestContext context) async {
           'lands': landCount,
           'creatures': creatureCount,
           'ramp_sources': rampCount,
+          'ramp_floor': rampFloorCount,
+          'ramp_contextual': rampContextualCount,
           'card_draw': drawCount,
           'removal': removalCount,
           'board_wipes': boardWipeCount,
@@ -784,6 +796,7 @@ Future<List<String>> _findWeaknessRecommendations({
   List<String> oraclePatterns = const [],
   List<String> fallback = const [],
   bool instantSpeedOnly = false,
+  bool genericRampFloorOnly = false,
 }) async {
   final normalizedRoles = roles
       .map((role) => role.trim().toLowerCase())
@@ -812,7 +825,11 @@ Future<List<String>> _findWeaknessRecommendations({
           FROM card_semantic_tags_v2 cstv2
           WHERE cstv2.card_id = c.id
             AND cstv2.role_confidence >= 0.65
-            AND cstv2.tags ?| @role_tags
+            AND EXISTS (
+              SELECT 1
+              FROM jsonb_array_elements(cstv2.tags) AS semantic_tag
+              WHERE LOWER(COALESCE(semantic_tag->>'tag', '')) = ANY(@role_tags)
+            )
         )
       ''');
     }
@@ -840,7 +857,15 @@ Future<List<String>> _findWeaknessRecommendations({
 
     final result = await pool.execute(
       Sql.named('''
-        SELECT c.name, MIN(COALESCE(c.cmc, 99)) AS cmc_sort
+        SELECT
+          c.name,
+          MIN(COALESCE(c.cmc, 99)) AS cmc_sort,
+          (ARRAY_AGG(COALESCE(c.type_line, '')
+            ORDER BY COALESCE(c.cmc, 99), c.id))[1] AS type_line,
+          (ARRAY_AGG(COALESCE(c.oracle_text, '')
+            ORDER BY COALESCE(c.cmc, 99), c.id))[1] AS oracle_text,
+          (ARRAY_AGG(COALESCE(c.mana_cost, '')
+            ORDER BY COALESCE(c.cmc, 99), c.id))[1] AS mana_cost
         FROM cards c
         LEFT JOIN card_legalities cl
           ON cl.card_id = c.id
@@ -852,7 +877,7 @@ Future<List<String>> _findWeaknessRecommendations({
             OR COALESCE(c.color_identity, ARRAY[]::text[]) <@ @deck_colors
           )
           AND (cl.id IS NULL OR cl.status = 'legal')
-          AND c.type_line NOT ILIKE '%basic%land%'
+          AND COALESCE(c.type_line, '') !~* '(^|[^[:alpha:]])basic[[:space:]]+(snow[[:space:]]+)?land([^[:alpha:]]|\$)'
           $instantFilter
         GROUP BY c.name
         ORDER BY cmc_sort ASC, c.name ASC
@@ -865,7 +890,7 @@ Future<List<String>> _findWeaknessRecommendations({
                 ? null
                 : TypedValue(Type.textArray, deckColors.toList()..sort()),
         'role_tags': TypedValue(Type.textArray, normalizedRoles),
-        'limit_plus': limit + 20,
+        'limit_plus': genericRampFloorOnly ? limit + 100 : limit + 20,
       },
     );
 
@@ -873,6 +898,16 @@ Future<List<String>> _findWeaknessRecommendations({
     for (final row in result) {
       final name = row[0] as String;
       if (excludeNames.contains(name.toLowerCase())) continue;
+      if (genericRampFloorOnly &&
+          !optimizationRampProfileForCard({
+            'name': name,
+            'type_line': row[2] as String? ?? '',
+            'oracle_text': row[3] as String? ?? '',
+            'mana_cost': row[4] as String? ?? '',
+            'cmc': row[1],
+          }).countsTowardGenericFloor) {
+        continue;
+      }
       recommendations.add(name);
       if (recommendations.length >= limit) break;
     }

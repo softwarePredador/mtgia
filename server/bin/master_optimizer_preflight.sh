@@ -24,6 +24,8 @@ export MANALOOM_MASTER_OPTIMIZER_REPORT_DIR="$REPORT_DIR"
 SECRET_ENV="${MANALOOM_POSTGRES_ENV:-${MTGIA_ENV_FILE:-$REPO_ROOT/server/.env}}"
 SQLITE_DB="${HERMES_KNOWLEDGE_DB:-$SCRIPT_DIR/knowledge.db}"
 DECK_ID="${MANALOOM_OPTIMIZER_DECK_ID:-6}"
+CANONICAL_PG_DECK_ID="${MANALOOM_CANONICAL_PG_DECK_ID:-8938b746-1a9e-46ce-b0d9-c2ec932ddddd}"
+TARGET_PG_DECK_ID="${MANALOOM_TARGET_PG_DECK_ID:-$CANONICAL_PG_DECK_ID}"
 LOREHOLD_CANONICAL_OVERRIDE="${MANALOOM_LOREHOLD_CANONICAL_OVERRIDE:-0}"
 PYTHON_BIN="${PYTHON_BIN:-python3}"
 
@@ -58,12 +60,6 @@ meta_decks_log="$ARTIFACT_DIR/meta_decks_sync_preflight_$(date -u +%Y%m%d_%H%M%S
   --min-cards "${MANALOOM_META_DECK_SYNC_MIN_CARDS:-80}" \
   --apply | tee "$meta_decks_log"
 
-target_deck_log="$ARTIFACT_DIR/target_deck_sync_preflight_$(date -u +%Y%m%d_%H%M%S).log"
-"$PYTHON_BIN" "$SCRIPT_DIR/sync_pg_target_deck_to_hermes.py" \
-  --sqlite-db "$SQLITE_DB" \
-  --target-deck-id "$DECK_ID" \
-  --apply | tee "$target_deck_log"
-
 sync_report="$ARTIFACT_DIR/card_oracle_cache_sync_$(date -u +%Y%m%d_%H%M%S).json"
 "$PYTHON_BIN" "$SCRIPT_DIR/sync_pg_card_metadata_to_hermes.py" \
   --sqlite-db "$SQLITE_DB" \
@@ -86,6 +82,28 @@ battle_rules_report="$ARTIFACT_DIR/battle_card_rules_cache_sync_$(date -u +%Y%m%
   --apply-sqlite-from-pg \
   --include-needs-review \
   --report "$battle_rules_report"
+
+# Target materialization is deliberately last among cache writers. Metadata
+# canonicalization and battle-rule refreshes must not invalidate its hashes.
+target_deck_log="$ARTIFACT_DIR/target_deck_sync_preflight_$(date -u +%Y%m%d_%H%M%S).log"
+"$PYTHON_BIN" "$SCRIPT_DIR/sync_pg_target_deck_to_hermes.py" \
+  --sqlite-db "$SQLITE_DB" \
+  --pg-deck-id "$TARGET_PG_DECK_ID" \
+  --protected-pg-deck-id "$CANONICAL_PG_DECK_ID" \
+  --target-deck-id "$DECK_ID" \
+  --apply | tee "$target_deck_log"
+
+target_identity_report="$ARTIFACT_DIR/target_deck_identity_preflight_$(date -u +%Y%m%d_%H%M%S).json"
+target_identity_command=(
+  "$PYTHON_BIN" "$SCRIPT_DIR/battle_target_deck_identity_guard.py"
+  --sqlite-db "$SQLITE_DB"
+  --target-deck-id "$DECK_ID"
+  --output "$target_identity_report"
+)
+if [[ "$DECK_ID" == "6" ]]; then
+  target_identity_command+=(--expected-pg-deck-id "$CANONICAL_PG_DECK_ID")
+fi
+"${target_identity_command[@]}" >/dev/null
 
 pg_contract_report=""
 if [[ -d /data/manaloom-ops ]]; then
@@ -123,6 +141,7 @@ else
 fi
 echo "meta_decks_log=$meta_decks_log"
 echo "target_deck_log=$target_deck_log"
+echo "target_identity_report=$target_identity_report"
 echo "sync_report=$sync_report"
 echo "battle_rules_pg_report=$battle_rules_pg_report"
 echo "battle_rules_report=$battle_rules_report"

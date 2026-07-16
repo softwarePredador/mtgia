@@ -5,6 +5,8 @@ import 'package:postgres/postgres.dart';
 import '../../../../lib/ai/commander_deckbuilding_contract_support.dart';
 import '../../../../lib/ai/deck_battle_learning_evidence.dart';
 import '../../../../lib/ai/functional_card_tags.dart';
+import '../../../../lib/ai/optimization_ramp_profile.dart';
+import '../../../../lib/basic_land_utils.dart' as land_utils;
 import '../../../../lib/meta/meta_deck_card_list_support.dart';
 import '../../../../lib/meta/meta_deck_format_support.dart';
 
@@ -165,7 +167,7 @@ Future<Response> _analyzeDeck(RequestContext context, String deckId) async {
       totalPrice += price * quantity;
       totalCards += quantity;
 
-      if (typeLine.toLowerCase().contains('land')) {
+      if (land_utils.isLandTypeLine(typeLine)) {
         totalLands += quantity;
         continue; // Terrenos geralmente não têm custo de mana (exceto alguns especiais)
       }
@@ -317,6 +319,9 @@ Future<Response> _analyzeDeck(RequestContext context, String deckId) async {
     // 4.4. Análise de Composição (Ramp, Draw, Removal, Wipes)
     final functionalSummary = summarizeFunctionalTagsForDeck(cards);
     final rampCount = functionalSummary.count('ramp');
+    final rampProfileSummary = summarizeOptimizationRampProfilesForDeck(cards);
+    final rampFloorCount = rampProfileSummary.rampFloor;
+    final rampContextualCount = rampProfileSummary.rampContextual;
     final drawCount = functionalSummary.count('draw');
     final removalCount = functionalSummary.count('removal');
     final boardWipeCount = functionalSummary.count('board_wipe');
@@ -324,11 +329,14 @@ Future<Response> _analyzeDeck(RequestContext context, String deckId) async {
 
     // Recomendações de Composição (Commander)
     if (isCommander) {
-      if (rampCount < 10) {
+      if (rampFloorCount < 10) {
         issues.add({
           'type': 'warning',
           'message':
-              'Ramp Warning: You have $rampCount ramp sources. We recommend at least 10 to ensure you have mana.',
+              'Ramp Warning: You have $rampFloorCount structural ramp sources toward the generic floor of 10. Inclusive ramp: $rampCount; contextual acceleration: $rampContextualCount.',
+          'ramp_floor': rampFloorCount,
+          'ramp_inclusive': rampCount,
+          'ramp_contextual': rampContextualCount,
         });
       }
       if (drawCount < 10) {
@@ -460,12 +468,15 @@ Future<Response> _analyzeDeck(RequestContext context, String deckId) async {
         'avg_cmc': double.parse(avgCmc.toStringAsFixed(2)),
         'composition': {
           'ramp': rampCount,
+          'ramp_floor': rampFloorCount,
+          'ramp_contextual': rampContextualCount,
           'draw': drawCount,
           'removal': removalCount,
           'board_wipes': boardWipeCount,
           'protection': protectionCount,
         }
       },
+      'ramp_profile': rampProfileSummary.toJson(),
       'functional_tags': functionalSummary.toJson(),
       'readiness': _buildDeckReadinessSummary(
         format: format,

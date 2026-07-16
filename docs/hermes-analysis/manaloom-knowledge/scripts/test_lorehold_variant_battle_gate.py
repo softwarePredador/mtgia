@@ -1,4 +1,5 @@
 import os
+import inspect
 import unittest
 from tempfile import TemporaryDirectory
 from pathlib import Path
@@ -7,6 +8,46 @@ import lorehold_variant_battle_gate as gate
 
 
 class LoreholdVariantBattleGateTest(unittest.TestCase):
+    def test_isolated_runner_accepts_paired_game_seed_mode(self):
+        parameters = inspect.signature(gate.run_deck_gate_in_process).parameters
+
+        self.assertIn("paired_game_seeds", parameters)
+
+    def test_paired_game_seed_is_stable_and_opponent_specific(self):
+        profile = {
+            "learned_deck_id": 39,
+            "name": "Winota, Joiner of Forces #39 (real)",
+        }
+
+        first = gate.derive_game_seed(2026071601, profile, 0)
+
+        self.assertEqual(first, gate.derive_game_seed(2026071601, profile, 0))
+        self.assertNotEqual(first, gate.derive_game_seed(2026071601, profile, 1))
+        self.assertNotEqual(
+            first,
+            gate.derive_game_seed(
+                2026071601,
+                {"learned_deck_id": 111, "name": "Najeela"},
+                0,
+            ),
+        )
+
+    def test_paired_game_seed_reproduces_picked_opponent_schedule(self):
+        focal = {"learned_deck_id": 39, "name": "Winota"}
+        others = [
+            {"learned_deck_id": 111, "name": "Najeela"},
+            {"learned_deck_id": 104, "name": "Kinnan"},
+            {"learned_deck_id": 61, "name": "Sisay"},
+        ]
+        seed = gate.derive_game_seed(2026071601, focal, 3)
+
+        import random
+
+        first = [row["name"] for row in random.Random(seed).sample(others, 2)]
+        second = [row["name"] for row in random.Random(seed).sample(others, 2)]
+
+        self.assertEqual(first, second)
+
     def test_gate_defaults_follow_deckbuilding_contract_matrix(self):
         self.assertEqual(
             gate.DEFAULT_MATRIX.name,
@@ -17,6 +58,116 @@ class LoreholdVariantBattleGateTest(unittest.TestCase):
         self.assertIn("Mana Vault", focus)
         self.assertIn("Aetherflux Reservoir", focus)
         self.assertIn("Molecule Man", focus)
+
+    def test_gate_telemetry_attributes_exact_lorehold_runtime_effects(self):
+        telemetry = gate.GateTelemetry()
+        telemetry.begin("runtime-game")
+        telemetry.record(
+            "mana_vault_mana_activated",
+            {
+                "player": "Lorehold",
+                "card": "Mana Vault",
+                "mana_added": 3,
+                "activation_kind": "mana_refresh_auto_activation",
+                "rule_logical_key": "battle_rule_v1:mana-exact",
+                "rule_oracle_hash": "mana-oracle-hash",
+                "battle_model_scope": "mana_vault_exact_untap_draw_damage_mana_v1",
+                "oracle_runtime_scope": "mana-vault-oracle-runtime-exact-v1",
+            },
+        )
+        telemetry.record(
+            "harnfel_activated",
+            {
+                "player": "Lorehold",
+                "card": "Harnfel, Horn of Bounty",
+                "exiled_count": 2,
+            },
+        )
+        telemetry.record(
+            "escape_cast",
+            {
+                "player": "Lorehold",
+                "card": "Faithless Looting",
+                "source": "Underworld Breach",
+                "exiled_count": 3,
+            },
+        )
+        telemetry.record(
+            "flashback_cast",
+            {
+                "player": "Lorehold",
+                "card": "Faithless Looting",
+                "flashback_granted_by": "Flashback",
+                "flashback_permission_kind": "target_grant_exact",
+                "rule_logical_key": "battle_rule_v1:flashback-exact",
+                "rule_oracle_hash": "flashback-oracle-hash",
+                "battle_model_scope": (
+                    "target_instant_sorcery_graveyard_gains_mana_cost_"
+                    "flashback_until_eot_v1"
+                ),
+            },
+        )
+
+        payload = telemetry.as_json(1)
+
+        self.assertEqual(payload["strategic_event_counts"]["mana_vault_mana_activated"], 1)
+        self.assertEqual(payload["strategic_event_counts"]["harnfel_activated"], 1)
+        self.assertEqual(payload["strategic_event_counts"]["escape_cast"], 1)
+        self.assertEqual(payload["strategic_event_counts"]["flashback_cast"], 1)
+        self.assertEqual(
+            payload["card_event_counts"]["harnfel_activated:Birgi, God of Storytelling // Harnfel, Horn of Bounty"],
+            1,
+        )
+        self.assertEqual(
+            payload["card_event_counts"]["escape_cast:Underworld Breach"],
+            1,
+        )
+        self.assertEqual(payload["card_event_counts"]["flashback_cast:Flashback"], 1)
+        focus_counts = payload["focus_card_trace_card_counts_by_game"]["runtime-game"]
+        self.assertEqual(focus_counts["Mana Vault"], 1)
+        self.assertEqual(
+            focus_counts["Birgi, God of Storytelling // Harnfel, Horn of Bounty"],
+            1,
+        )
+        self.assertEqual(focus_counts["Underworld Breach"], 1)
+        self.assertEqual(focus_counts["Flashback"], 1)
+        mana_provenance = next(
+            row
+            for row in payload["runtime_effect_provenance"]
+            if row["event"] == "mana_vault_mana_activated"
+        )
+        self.assertEqual(mana_provenance["rule_logical_key"], "battle_rule_v1:mana-exact")
+        self.assertEqual(mana_provenance["rule_oracle_hash"], "mana-oracle-hash")
+        self.assertEqual(
+            mana_provenance["battle_model_scope"],
+            "mana_vault_exact_untap_draw_damage_mana_v1",
+        )
+        self.assertEqual(mana_provenance["games"], 1)
+
+    def test_exact_runtime_trace_is_not_lost_after_ordinary_trace_cap(self):
+        telemetry = gate.GateTelemetry()
+        telemetry.begin("noisy-game")
+        for index in range(160):
+            telemetry.record(
+                "utility_artifact_activated",
+                {
+                    "player": "Lorehold",
+                    "card": "Mana Vault",
+                    "activation_kind": f"diagnostic-{index}",
+                },
+            )
+        telemetry.record(
+            "mana_vault_mana_activated",
+            {
+                "player": "Lorehold",
+                "card": "Mana Vault",
+                "rule_logical_key": "battle_rule_v1:mana-exact",
+            },
+        )
+
+        traces = telemetry.as_json(1)["focus_card_game_traces"]["noisy-game"]
+        self.assertEqual(len(traces), 161)
+        self.assertEqual(traces[-1]["event"], "mana_vault_mana_activated")
 
     def test_fixed_opponent_deck_id_parser_and_profile_use_real_deck(self):
         self.assertEqual(gate.parse_fixed_opponent_deck_ids("607, 615"), [607, 615])

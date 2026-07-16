@@ -14,7 +14,9 @@ Future<Response> onRequest(RequestContext context, String deckId) async {
 }
 
 Future<Response> _generateRecommendations(
-    RequestContext context, String deckId) async {
+  RequestContext context,
+  String deckId,
+) async {
   final pool = context.read<Pool>();
   final userId = context.read<String>();
   final env = _recommendationsEnv(context);
@@ -27,10 +29,7 @@ Future<Response> _generateRecommendations(
       userId: userId,
       apiKey: apiKey,
       aiConfig: aiConfig,
-      deckLoader: ({
-        required deckId,
-        required userId,
-      }) async {
+      deckLoader: ({required deckId, required userId}) async {
         final deckResult = await pool.execute(
           Sql.named('''
             SELECT name, format, description
@@ -51,17 +50,22 @@ Future<Response> _generateRecommendations(
         );
       },
       deckCardLoader: ({required deckId}) async {
-        final hasCardIntelligenceSnapshot =
-            await _hasTable(pool, 'card_intelligence_snapshot');
-        final cardSourceJoin = hasCardIntelligenceSnapshot
-            ? 'JOIN card_intelligence_snapshot c ON c.card_id = dc.card_id'
-            : 'JOIN cards c ON dc.card_id = c.id';
-        final functionalTagsSelect = hasCardIntelligenceSnapshot
-            ? 'c.function_tag_details AS functional_tags'
-            : await _functionalTagsSelectSql(pool);
-        final semanticV2Select = hasCardIntelligenceSnapshot
-            ? 'c.semantic_tags_v2 AS semantic_tags_v2'
-            : await _semanticV2SelectSql(pool);
+        final hasCardIntelligenceSnapshot = await _hasTable(
+          pool,
+          'card_intelligence_snapshot',
+        );
+        final cardSourceJoin =
+            hasCardIntelligenceSnapshot
+                ? 'JOIN card_intelligence_snapshot c ON c.card_id = dc.card_id'
+                : 'JOIN cards c ON dc.card_id = c.id';
+        final functionalTagsSelect =
+            hasCardIntelligenceSnapshot
+                ? 'c.function_tag_details AS functional_tags'
+                : await _functionalTagsSelectSql(pool);
+        final semanticV2Select =
+            hasCardIntelligenceSnapshot
+                ? 'c.semantic_tags_v2 AS semantic_tags_v2'
+                : await _semanticV2SelectSql(pool);
 
         final cardsResult = await pool.execute(
           Sql.named('''
@@ -234,12 +238,13 @@ Future<List<String>> _findCardsForCategory({
   bool landOnly = false,
 }) async {
   try {
-    final normalizedRoles = roles
-        .map((role) => role.trim().toLowerCase())
-        .where((role) => role.isNotEmpty)
-        .toSet()
-        .toList()
-      ..sort();
+    final normalizedRoles =
+        roles
+            .map((role) => role.trim().toLowerCase())
+            .where((role) => role.isNotEmpty)
+            .toSet()
+            .toList()
+          ..sort();
     final predicates = <String>[];
 
     if (normalizedRoles.isNotEmpty &&
@@ -263,7 +268,11 @@ Future<List<String>> _findCardsForCategory({
           FROM card_semantic_tags_v2 cstv2
           WHERE cstv2.card_id = c.id
             AND cstv2.role_confidence >= 0.65
-            AND cstv2.tags ?| @role_tags
+            AND EXISTS (
+              SELECT 1
+              FROM jsonb_array_elements(cstv2.tags) AS semantic_tag
+              WHERE LOWER(COALESCE(semantic_tag->>'tag', '')) = ANY(@role_tags)
+            )
         )
       ''');
     }
@@ -278,13 +287,14 @@ Future<List<String>> _findCardsForCategory({
 
     if (predicates.isEmpty) return [];
 
-    final landFilter = landOnly
-        ? '''
-          AND c.type_line ILIKE '%land%'
-          AND c.type_line NOT ILIKE '%basic%land%'
+    final landFilter =
+        landOnly
+            ? '''
+          AND COALESCE(c.type_line, '') ~* '(^|[^[:alpha:]])land([^[:alpha:]]|\$)'
+          AND COALESCE(c.type_line, '') !~* '(^|[^[:alpha:]])basic[[:space:]]+(snow[[:space:]]+)?land([^[:alpha:]]|\$)'
         '''
-        : '''
-          AND c.type_line NOT ILIKE '%land%'
+            : '''
+          AND COALESCE(c.type_line, '') !~* '(^|[^[:alpha:]])land([^[:alpha:]]|\$)'
         ''';
 
     final result = await pool.execute(
@@ -308,9 +318,10 @@ Future<List<String>> _findCardsForCategory({
       '''),
       parameters: {
         'format': format.toLowerCase(),
-        'deck_colors': deckColors.isEmpty
-            ? null
-            : TypedValue(Type.textArray, deckColors.toList()..sort()),
+        'deck_colors':
+            deckColors.isEmpty
+                ? null
+                : TypedValue(Type.textArray, deckColors.toList()..sort()),
         'role_tags': TypedValue(Type.textArray, normalizedRoles),
         'limit_plus': limit + 20,
       },

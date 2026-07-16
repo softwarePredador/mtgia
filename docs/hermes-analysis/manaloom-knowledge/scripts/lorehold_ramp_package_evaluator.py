@@ -91,6 +91,13 @@ def numeric(value: object, default: float = 0.0) -> float:
         return default
 
 
+def tapped_draw_step_damage(effect_data: dict[str, Any]) -> float:
+    """Read the exact draw-step field, with a transitional alias for older rules."""
+    if "tapped_draw_step_damage" in effect_data:
+        return numeric(effect_data.get("tapped_draw_step_damage"))
+    return numeric(effect_data.get("tapped_upkeep_damage"))
+
+
 def ramp_profile(conn: sqlite3.Connection, card_name: str) -> dict[str, Any]:
     oracle = load_oracle(conn, card_name)
     rule = load_best_rule(conn, card_name)
@@ -123,8 +130,8 @@ def ramp_profile(conn: sqlite3.Connection, card_name: str) -> dict[str, Any]:
         risk_flags.append("nonstandard_untap")
     if numeric(effect_data.get("upkeep_optional_untap_cost_generic")) > 0:
         risk_flags.append("untap_tax")
-    if numeric(effect_data.get("tapped_upkeep_damage")) > 0:
-        risk_flags.append("upkeep_damage")
+    if tapped_draw_step_damage(effect_data) > 0:
+        risk_flags.append("draw_step_damage")
     if effect not in RAMP_EFFECTS and role_data.get("category") != "ramp":
         risk_flags.append("not_primary_ramp_rule")
     return {

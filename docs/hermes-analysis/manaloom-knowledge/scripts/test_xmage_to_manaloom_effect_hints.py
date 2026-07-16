@@ -8,6 +8,44 @@ import xmage_semantic_family_classifier as classifier
 import xmage_to_manaloom_effect_hints as hints
 
 
+MANA_VAULT_SOURCE = r'''
+public final class ManaVault extends CardImpl {
+    public ManaVault(UUID ownerId, CardSetInfo setInfo) {
+        super(ownerId, setInfo, new CardType[]{CardType.ARTIFACT}, "{1}");
+        this.addAbility(new SimpleStaticAbility(
+                new DontUntapInControllersUntapStepSourceEffect()));
+        this.addAbility(new BeginningOfUpkeepTriggeredAbility(
+                new DoIfCostPaid(new UntapSourceEffect(), new GenericManaCost(4),
+                        "Pay {4} to untap {this}?")
+                        .withChooseHint(new ConditionHint(SourceTappedCondition.UNTAPPED))
+        ));
+        this.addAbility(new BeginningOfDrawTriggeredAbility(
+                new DamageControllerEffect(1, "it"), false)
+                .withInterveningIf(SourceTappedCondition.TAPPED));
+        this.addAbility(new SimpleManaAbility(
+                Zone.BATTLEFIELD, Mana.ColorlessMana(3), new TapSourceCost()));
+    }
+}
+'''
+
+FLASHBACK_SOURCE = r'''
+public final class Flashback extends CardImpl {
+    public Flashback(UUID ownerId, CardSetInfo setInfo) {
+        super(ownerId, setInfo, new CardType[]{CardType.INSTANT}, "{R}");
+        this.getSpellAbility().addEffect(new GainFlashbackTargetEffect());
+        this.getSpellAbility().addTarget(new TargetCardInYourGraveyard(
+                StaticFilters.FILTER_CARD_INSTANT_OR_SORCERY));
+    }
+}
+'''
+
+FLASHBACK_ORACLE_TEXT = (
+    "Target instant or sorcery card in your graveyard gains flashback until end of turn. "
+    "The flashback cost is equal to its mana cost. "
+    "(You may cast that card from your graveyard for its flashback cost. Then exile it.)"
+)
+
+
 class XMageToManaLoomEffectHintsTests(unittest.TestCase):
     def test_colorless_land_with_sacrifice_mana_mode_keeps_modes_separate(self) -> None:
         result = hints.build_effect_hints(
@@ -384,6 +422,188 @@ class XMageToManaLoomEffectHintsTests(unittest.TestCase):
         self.assertEqual(primary["cost_reduction_generic"], 1)
         self.assertEqual(primary["applies_to_spell_colors"], ["W"])
         self.assertEqual(primary["cost_reduction_applies_to"], "spells_you_cast")
+
+    def test_mana_vault_maps_only_complete_xmage_signature_to_exact_runtime_scope(self) -> None:
+        result = hints.build_effect_hints(
+            {
+                "xmage_class_name": "ManaVault",
+                "constructor_metadata": {"card_types": ["ARTIFACT"]},
+                "effect_classes": [
+                    "DamageControllerEffect",
+                    "DontUntapInControllersUntapStepSourceEffect",
+                    "UntapSourceEffect",
+                ],
+                "ability_classes": [
+                    "BeginningOfDrawTriggeredAbility",
+                    "BeginningOfUpkeepTriggeredAbility",
+                    "SimpleManaAbility",
+                    "SimpleStaticAbility",
+                ],
+                "condition_classes": ["SourceTappedCondition"],
+                "cost_classes": ["GenericManaCost", "TapSourceCost"],
+                "target_classes": [],
+                "filter_classes": [],
+                "raw_excerpt": MANA_VAULT_SOURCE,
+            },
+            (
+                "Mana Vault doesn't untap during your untap step. "
+                "At the beginning of your upkeep, you may pay {4}. If you do, untap Mana Vault. "
+                "At the beginning of your draw step, if Mana Vault is tapped, it deals 1 damage to you. "
+                "{T}: Add {C}{C}{C}."
+            ),
+        )
+
+        primary = result["primary_candidate"]["effect_json"]
+        self.assertEqual(primary["effect"], "ramp_permanent")
+        self.assertEqual(
+            primary["battle_model_scope"],
+            "mana_vault_exact_untap_draw_damage_mana_v1",
+        )
+        self.assertEqual(primary["ability_kind"], "static_triggered_and_activated_mana")
+        self.assertTrue(primary["does_not_untap_in_untap_step"])
+        self.assertEqual(primary["upkeep_optional_untap_cost_generic"], 4)
+        self.assertEqual(primary["tapped_draw_step_damage"], 1)
+        self.assertEqual(primary["mana_produced"], 3)
+        self.assertEqual(primary["produced_mana_symbols"], ["C", "C", "C"])
+        self.assertEqual(primary["mana_vault_runtime_status"], "runtime_executor_v1")
+
+    def test_mana_vault_near_miss_upkeep_cost_stays_out_of_exact_runtime_scope(self) -> None:
+        result = hints.build_effect_hints(
+            {
+                "xmage_class_name": "ManaVault",
+                "constructor_metadata": {"card_types": ["ARTIFACT"]},
+                "effect_classes": [
+                    "DamageControllerEffect",
+                    "DontUntapInControllersUntapStepSourceEffect",
+                    "UntapSourceEffect",
+                ],
+                "ability_classes": [
+                    "BeginningOfDrawTriggeredAbility",
+                    "BeginningOfUpkeepTriggeredAbility",
+                    "SimpleManaAbility",
+                    "SimpleStaticAbility",
+                ],
+                "condition_classes": ["SourceTappedCondition"],
+                "cost_classes": ["GenericManaCost", "TapSourceCost"],
+                "target_classes": [],
+                "filter_classes": [],
+                "raw_excerpt": MANA_VAULT_SOURCE.replace(
+                    "new GenericManaCost(4)", "new GenericManaCost(5)"
+                ),
+            }
+        )
+
+        scopes = {
+            candidate["effect_json"]["battle_model_scope"]
+            for candidate in result["candidates"]
+        }
+        self.assertNotIn("mana_vault_exact_untap_draw_damage_mana_v1", scopes)
+        self.assertEqual(
+            result["primary_candidate"]["effect_json"]["battle_model_scope"],
+            "xmage_artifact_mana_source_variant_review_v1",
+        )
+
+    def test_flashback_maps_exact_target_grant_before_generic_recursion(self) -> None:
+        result = hints.build_effect_hints(
+            {
+                "xmage_class_name": "Flashback",
+                "constructor_metadata": {"card_types": ["INSTANT"]},
+                "effect_classes": ["GainFlashbackTargetEffect"],
+                "ability_classes": [],
+                "condition_classes": [],
+                "cost_classes": [],
+                "target_classes": ["TargetCardInYourGraveyard"],
+                "filter_classes": [],
+                "raw_excerpt": FLASHBACK_SOURCE,
+            },
+            FLASHBACK_ORACLE_TEXT,
+        )
+
+        primary = result["primary_candidate"]["effect_json"]
+        self.assertEqual(primary["effect"], "graveyard_flashback_grant")
+        self.assertEqual(
+            primary["battle_model_scope"],
+            "target_instant_sorcery_graveyard_gains_mana_cost_flashback_until_eot_v1",
+        )
+        self.assertEqual(
+            primary["ability_kind"],
+            "one_shot_targeted_continuous_permission",
+        )
+        self.assertTrue(primary["instant"])
+        self.assertFalse(primary["sorcery"])
+        self.assertEqual(primary["target_count"], 1)
+        self.assertEqual(primary["target_count_min"], 1)
+        self.assertEqual(primary["target_count_max"], 1)
+        self.assertEqual(primary["target_controller"], "self")
+        self.assertEqual(primary["target_zone"], "graveyard")
+        self.assertTrue(primary["target_declared_on_cast"])
+        self.assertTrue(primary["target_legality_rechecked_on_resolution"])
+        self.assertTrue(primary["targeted_flashback_grant"])
+        self.assertEqual(primary["flashback_cost_source"], "target_printed_mana_cost")
+        self.assertTrue(primary["flashback_uses_normal_cast_pipeline"])
+        self.assertTrue(primary["flashback_exile_on_leave_stack"])
+        self.assertEqual(primary["duration"], "until_end_of_turn")
+        self.assertEqual(
+            primary["xmage_filter_constants"],
+            ["StaticFilters.FILTER_CARD_INSTANT_OR_SORCERY"],
+        )
+        self.assertEqual(
+            result["candidates"][0]["effect_json"]["battle_model_scope"],
+            primary["battle_model_scope"],
+        )
+
+    def test_flashback_near_misses_stay_out_of_exact_runtime_scope(self) -> None:
+        near_misses = {
+            "wrong_mana_cost": {
+                "source": FLASHBACK_SOURCE.replace('"{R}"', '"{1}{R}"'),
+            },
+            "wrong_static_filter": {
+                "source": FLASHBACK_SOURCE.replace(
+                    "StaticFilters.FILTER_CARD_INSTANT_OR_SORCERY",
+                    "StaticFilters.FILTER_CARD_CREATURE",
+                ),
+            },
+            "extra_effect": {
+                "source": FLASHBACK_SOURCE.replace(
+                    "this.getSpellAbility().addTarget",
+                    "this.getSpellAbility().addEffect(new DrawCardSourceControllerEffect(1));\n"
+                    "        this.getSpellAbility().addTarget",
+                ),
+            },
+            "wrong_effect_class": {
+                "effect_classes": ["GainAbilityTargetEffect"],
+            },
+            "wrong_target_class": {
+                "target_classes": ["TargetCardInGraveyard"],
+            },
+            "unexpected_ability": {
+                "ability_classes": ["FlashbackAbility"],
+            },
+        }
+        exact_scope = (
+            "target_instant_sorcery_graveyard_gains_mana_cost_flashback_until_eot_v1"
+        )
+        for label, changes in near_misses.items():
+            with self.subTest(label=label):
+                entry = {
+                    "xmage_class_name": "Flashback",
+                    "constructor_metadata": {"card_types": ["INSTANT"]},
+                    "effect_classes": ["GainFlashbackTargetEffect"],
+                    "ability_classes": [],
+                    "condition_classes": [],
+                    "cost_classes": [],
+                    "target_classes": ["TargetCardInYourGraveyard"],
+                    "filter_classes": [],
+                    "raw_excerpt": FLASHBACK_SOURCE,
+                }
+                entry.update({key: value for key, value in changes.items() if key != "source"})
+                entry["raw_excerpt"] = changes.get("source", FLASHBACK_SOURCE)
+                result = hints.build_effect_hints(entry, FLASHBACK_ORACLE_TEXT)
+                scopes = {
+                    candidate["effect_json"]["battle_model_scope"]
+                    for candidate in result["candidates"]
+                }
+                self.assertNotIn(exact_scope, scopes)
 
     def test_cloud_key_maps_to_chosen_card_type_cost_reduction(self) -> None:
         entry = {

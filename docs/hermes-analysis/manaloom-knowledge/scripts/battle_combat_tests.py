@@ -356,6 +356,150 @@ def register_tests(battle, player):
             else:
                 battle.os.environ[battle.EVALUATION_TARGET_ENV] = previous_target
 
+    def test_table_intent_multi_defender_lethal_uses_assigned_power():
+        events = []
+        decisions = []
+        previous_handler = battle.REPLAY_EVENT_HANDLER
+        previous_decision_handler = battle.DECISION_TRACE_HANDLER
+        previous_mode = battle.os.environ.get(battle.EVALUATION_MODE_ENV)
+        previous_target = battle.os.environ.get(battle.EVALUATION_TARGET_ENV)
+        battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+        battle.DECISION_TRACE_HANDLER = lambda data: decisions.append(data)
+        battle.os.environ[battle.EVALUATION_MODE_ENV] = "table_intent"
+        battle.os.environ.pop(battle.EVALUATION_TARGET_ENV, None)
+        try:
+            attacker = player("Lorehold")
+            thrasios = player("Thrasios")
+            tayam = player("Tayam")
+            sisay = player("Sisay")
+            thrasios.life = 26
+            tayam.life = 18
+            sisay.life = 33
+            thrasios.threat_level = 5
+            tayam.threat_level = 11
+            sisay.threat_level = 7
+            attacker.table_hostility[thrasios.name] = 25.183
+            attacker.table_hostility[tayam.name] = 36.643
+            attacker.table_hostility[sisay.name] = 20.663
+            attacker.battlefield = [
+                {
+                    "name": "Thrasios Token A",
+                    "effect": "creature",
+                    "type_line": "Creature Token — Elemental",
+                    "power": 3,
+                    "toughness": 3,
+                    "summoning_sick": False,
+                    "tapped": False,
+                    "must_attack_if_able": True,
+                    "must_attack_defender": thrasios.name,
+                },
+                {
+                    "name": "Thrasios Token B",
+                    "effect": "creature",
+                    "type_line": "Creature Token — Elemental",
+                    "power": 3,
+                    "toughness": 3,
+                    "summoning_sick": False,
+                    "tapped": False,
+                    "must_attack_if_able": True,
+                    "must_attack_defender": thrasios.name,
+                },
+                {
+                    "name": "Lorehold, the Historian",
+                    "effect": "creature",
+                    "type_line": "Legendary Creature — Elder Dragon",
+                    "power": 5,
+                    "toughness": 5,
+                    "summoning_sick": False,
+                    "tapped": False,
+                    "is_commander": True,
+                    "owner": attacker.name,
+                },
+                {
+                    "name": "Tayam Token A",
+                    "effect": "creature",
+                    "type_line": "Creature Token — Elemental",
+                    "power": 3,
+                    "toughness": 3,
+                    "summoning_sick": False,
+                    "tapped": False,
+                    "must_attack_if_able": True,
+                    "must_attack_defender": tayam.name,
+                },
+                {
+                    "name": "Tayam Token B",
+                    "effect": "creature",
+                    "type_line": "Creature Token — Elemental",
+                    "power": 3,
+                    "toughness": 3,
+                    "summoning_sick": False,
+                    "tapped": False,
+                    "must_attack_if_able": True,
+                    "must_attack_defender": tayam.name,
+                },
+                {
+                    "name": "Sisay Token A",
+                    "effect": "creature",
+                    "type_line": "Creature Token — Elemental",
+                    "power": 3,
+                    "toughness": 3,
+                    "summoning_sick": False,
+                    "tapped": False,
+                    "must_attack_if_able": True,
+                    "must_attack_defender": sisay.name,
+                },
+                {
+                    "name": "Sisay Token B",
+                    "effect": "creature",
+                    "type_line": "Creature Token — Elemental",
+                    "power": 3,
+                    "toughness": 3,
+                    "summoning_sick": False,
+                    "tapped": False,
+                    "must_attack_if_able": True,
+                    "must_attack_defender": sisay.name,
+                },
+            ]
+
+            battle.combat_phase_v8(
+                attacker,
+                [thrasios, tayam, sisay],
+                [attacker, thrasios, tayam, sisay],
+                turn=7,
+                rng=random.Random(63470518),
+                stack=battle.Stack(),
+            )
+
+            combat = next(data for event, data in events if event == "combat")
+            assert combat["target"] == "Tayam"
+            assert combat["total_power"] == 23
+            assert combat["target_group_power"] == 11
+            assert combat["target_reason"] == "table_intent_nemesis_hostility"
+            tayam_score = next(
+                row for row in combat["table_intent_scores"] if row["target"] == "Tayam"
+            )
+            assert tayam_score["components"]["assigned_power"] == 11
+            assert tayam_score["components"]["lethal"] == 0
+            decision = next(
+                row for row in decisions if row.get("decision_type") == "combat_attack"
+            )
+            assert decision["chosen_option"]["target"] == "Tayam"
+            assert decision["chosen_option"]["assigned_power"] == 11
+            assert decision["chosen_option"]["reason"] == "table_intent_nemesis_hostility"
+            assert decision["score_components"]["target_group_power"] == 11
+            assert tayam.life == 7
+        finally:
+            battle.REPLAY_EVENT_HANDLER = previous_handler
+            battle.DECISION_TRACE_HANDLER = previous_decision_handler
+            if previous_mode is None:
+                battle.os.environ.pop(battle.EVALUATION_MODE_ENV, None)
+            else:
+                battle.os.environ[battle.EVALUATION_MODE_ENV] = previous_mode
+            if previous_target is None:
+                battle.os.environ.pop(battle.EVALUATION_TARGET_ENV, None)
+            else:
+                battle.os.environ[battle.EVALUATION_TARGET_ENV] = previous_target
+
     def test_table_intent_target_reserves_blockers_when_under_pressure():
         events = []
         previous_handler = battle.REPLAY_EVENT_HANDLER
@@ -1348,6 +1492,7 @@ def register_tests(battle, player):
         test_table_intent_uses_nemesis_memory_for_attack_targeting,
         test_table_intent_records_combat_damage_as_future_hostility,
         test_table_intent_lethal_keeps_attackers_on_chosen_target,
+        test_table_intent_multi_defender_lethal_uses_assigned_power,
         test_table_intent_target_reserves_blockers_when_under_pressure,
         test_table_intent_target_can_attack_with_vigilance_while_reserving_blockers,
         test_crawlspace_effect_limits_attackers_against_defender,

@@ -60,7 +60,7 @@ class LoreholdRampPackageEvaluatorTest(unittest.TestCase):
                 "produces": "C",
                 "does_not_untap_normally": True,
                 "upkeep_optional_untap_cost_generic": 4,
-                "tapped_upkeep_damage": 1,
+                "tapped_draw_step_damage": 1,
                 "battle_model_scope": "fast_mana_artifact_partial_v1",
             },
         )
@@ -118,6 +118,27 @@ class LoreholdRampPackageEvaluatorTest(unittest.TestCase):
         self.assertTrue(profile["colorless_only"])
         self.assertIn("nonstandard_untap", profile["risk_flags"])
         self.assertIn("untap_tax", profile["risk_flags"])
+        self.assertIn("draw_step_damage", profile["risk_flags"])
+        self.assertNotIn("upkeep_damage", profile["risk_flags"])
+
+    def test_legacy_upkeep_damage_field_is_a_draw_step_compatibility_alias(self):
+        effect = {
+            "effect": "ramp_permanent",
+            "mana_produced": 3,
+            "produces": "C",
+            "does_not_untap_normally": True,
+            "tapped_upkeep_damage": 1,
+        }
+        self.conn.execute(
+            "UPDATE battle_card_rules SET effect_json=? WHERE normalized_name='mana vault'",
+            (json.dumps(effect),),
+        )
+        self.conn.commit()
+
+        profile = evaluator.ramp_profile(self.conn, "Mana Vault")
+
+        self.assertIn("draw_step_damage", profile["risk_flags"])
+        self.assertNotIn("upkeep_damage", profile["risk_flags"])
 
     def test_mana_vault_over_arcane_is_burst_vs_fixing_tradeoff(self):
         result = evaluator.evaluate_package(

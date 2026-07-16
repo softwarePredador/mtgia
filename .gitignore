@@ -68,6 +68,8 @@ server/test/artifacts/ai_optimize/source_deck_optimize_*.json
 # Accidental local SQLite created outside the canonical Hermes scripts path
 docs/hermes-analysis/manaloom-knowledge/knowledge.db
 docs/hermes-analysis/manaloom-knowledge/backups/*.bak
+docs/hermes-analysis/manaloom-knowledge/scripts/_edhrec_raw_*.json
+docs/hermes-analysis/manaloom-knowledge/scripts/_edhrec_snapshot_*.json
 docs/hermes-analysis/master_optimizer_replays/
 docs/hermes-analysis/master_optimizer_reports/**/knowledge_candidate.db
 docs/hermes-analysis/master_optimizer_reports/**/*.log
@@ -86,6 +88,38 @@ docs/hermes-analysis/master_optimizer_reports/lorehold_*_candidate_*
 docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_*
 docs/hermes-analysis/master_optimizer_reports/battle_forensic_audit_*
 docs/hermes-analysis/master_optimizer_reports/annotation_runtime_batch_probe_*
+# Reviewed PG878/PG879 evidence is content-sealed in the retention manifest and
+# must remain visible to Git until it is tracked.
+!docs/hermes-analysis/master_optimizer_reports/lorehold_607_615_exact_gate_protocol_20260716.md
+!docs/hermes-analysis/master_optimizer_reports/lorehold_all_variants_strategy_matrix_20260716_exact_runtime.json
+!docs/hermes-analysis/master_optimizer_reports/lorehold_all_variants_strategy_matrix_20260716_exact_runtime.md
+!docs/hermes-analysis/master_optimizer_reports/lorehold_variant_strategy_matrix_20260716_pg878_exact_runtime.json
+!docs/hermes-analysis/master_optimizer_reports/lorehold_variant_strategy_matrix_20260716_pg878_exact_runtime.md
+!docs/hermes-analysis/master_optimizer_reports/pg878_lorehold_607_615_effect_coverage_20260716.json
+!docs/hermes-analysis/master_optimizer_reports/pg878_lorehold_607_615_effect_coverage_20260716.md
+!docs/hermes-analysis/master_optimizer_reports/pg878_lorehold_607_coherence_audit_20260716.json
+!docs/hermes-analysis/master_optimizer_reports/pg878_lorehold_607_coherence_audit_20260716.md
+!docs/hermes-analysis/master_optimizer_reports/pg878_lorehold_607_effect_coverage_focal_20260716.json
+!docs/hermes-analysis/master_optimizer_reports/pg878_lorehold_607_effect_coverage_focal_20260716.md
+!docs/hermes-analysis/master_optimizer_reports/pg878_lorehold_614_coherence_audit_20260716.json
+!docs/hermes-analysis/master_optimizer_reports/pg878_lorehold_614_coherence_audit_20260716.md
+!docs/hermes-analysis/master_optimizer_reports/pg878_lorehold_615_coherence_audit_20260716.json
+!docs/hermes-analysis/master_optimizer_reports/pg878_lorehold_615_coherence_audit_20260716.md
+!docs/hermes-analysis/master_optimizer_reports/pg878_lorehold_615_effect_coverage_focal_20260716.json
+!docs/hermes-analysis/master_optimizer_reports/pg878_lorehold_615_effect_coverage_focal_20260716.md
+!docs/hermes-analysis/master_optimizer_reports/pg878_lorehold_pg_hermes_contract_audit_20260716.json
+!docs/hermes-analysis/master_optimizer_reports/pg878_lorehold_pg_hermes_contract_audit_20260716.md
+!docs/hermes-analysis/master_optimizer_reports/pg878_lorehold_runtime_sqlite_sync_20260716.json
+!docs/hermes-analysis/master_optimizer_reports/pg879_flashback_metadata_sqlite_sync_20260716.json
+!docs/hermes-analysis/master_optimizer_reports/pg879_flashback_rules_sqlite_sync_20260716.json
+!docs/hermes-analysis/master_optimizer_reports/pg879_lorehold_deck607_battle_rule_coherence_20260716.json
+!docs/hermes-analysis/master_optimizer_reports/pg879_lorehold_deck607_battle_rule_coherence_20260716.md
+!docs/hermes-analysis/master_optimizer_reports/pg879_lorehold_deck614_battle_rule_coherence_20260716.json
+!docs/hermes-analysis/master_optimizer_reports/pg879_lorehold_deck614_battle_rule_coherence_20260716.md
+!docs/hermes-analysis/master_optimizer_reports/pg879_lorehold_deck615_battle_rule_coherence_20260716.json
+!docs/hermes-analysis/master_optimizer_reports/pg879_lorehold_deck615_battle_rule_coherence_20260716.md
+!docs/hermes-analysis/master_optimizer_reports/pg879_lorehold_pg_hermes_contract_audit_20260716.json
+!docs/hermes-analysis/master_optimizer_reports/pg879_lorehold_pg_hermes_contract_audit_20260716.md
 /xmage_current_replay_batch_pipeline_*
 *.sqlite
 *.pyc

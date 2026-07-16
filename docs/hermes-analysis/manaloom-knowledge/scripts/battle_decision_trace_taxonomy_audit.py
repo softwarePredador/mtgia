@@ -331,6 +331,15 @@ CONTRACTS.update(
                 "toughness_before", "toughness_after",
             },
         ),
+        "cast_selection": deterministic_field_contract(
+            "underworld-breach-escape-cast-selection-field-contract",
+            "Escape cast selection must expose its score, exile payment, and graveyard resource baseline.",
+            required_score_keys={
+                "escape_option_score",
+                "escape_exile_count",
+                "graveyard_cards_before",
+            },
+        ),
         "formidable_life_total_reset_activation": deterministic_field_contract(
             "formidable-life-reset-field-contract",
             "The activation must prove formidable threshold and resulting life total.",
@@ -368,6 +377,17 @@ CONTRACTS.update(
                 "returned", "own_permanents_returned", "opponent_permanents_returned",
             },
         ),
+        "modal_dfc_face_choice": deterministic_field_contract(
+            "modal-dfc-face-choice-field-contract",
+            "Modal DFC face choice must compare both faces and expose the resources supporting the chosen back face.",
+            required_score_keys={
+                "hand_size_after_cast",
+                "library_size",
+                "back_face_mana_value",
+                "front_face_score",
+                "competing_options",
+            },
+        ),
         "modal_exile_board_wipe": deterministic_field_contract(
             "modal-exile-board-wipe-field-contract",
             "The selected exile modes and affected permanent totals must be explicit.",
@@ -389,6 +409,16 @@ CONTRACTS.update(
             "spell-resolution-field-contract",
             "Targeted resolution must expose requested and selected target counts.",
             required_score_keys={"target_type", "requested_target_count", "selected_target_count"},
+        ),
+        "triggered_ability_choice": deterministic_field_contract(
+            "mana-vault-triggered-choice-field-contract",
+            "Optional Mana Vault untap must expose mana, life, and the resulting tapped state.",
+            required_score_keys={
+                "mana_before",
+                "mana_after",
+                "life",
+                "vault_tapped_after",
+            },
         ),
         "unblocked_attack_control_transfer_trigger": deterministic_field_contract(
             "unblocked-control-transfer-field-contract",

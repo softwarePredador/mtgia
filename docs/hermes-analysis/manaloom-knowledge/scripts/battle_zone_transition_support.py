@@ -180,7 +180,12 @@ def move_permanent_from_battlefield(
         if event.to_zone == "command_zone":
             owner.command_zone.append(permanent)
             return "command_zone"
-    if permanent.get("tag") == "token" or "token" in str(permanent.get("type_line") or "").lower():
+    if (
+        permanent.get("is_token")
+        or permanent.get("token")
+        or permanent.get("tag") == "token"
+        or "token" in str(permanent.get("type_line") or "").lower()
+    ):
         return "vanished_token"
     owner.graveyard.append(permanent)
     return "graveyard"

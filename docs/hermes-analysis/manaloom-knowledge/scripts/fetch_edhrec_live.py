@@ -8,6 +8,19 @@ OUTPUT = os.path.join(DB_DIR, "_edhrec_raw_lorehold.json")
 AUTHORIZATION_FLAG = "MANALOOM_EDHREC_AUTOMATED_COLLECTION_AUTHORIZED"
 AUTHORIZED_VALUES = {"1", "true", "yes", "on"}
 
+
+def sanitize_snapshot(value):
+    """Remove response metadata that can contain upstream credentials."""
+    if isinstance(value, dict):
+        return {
+            key: sanitize_snapshot(item)
+            for key, item in value.items()
+            if str(key).strip().lower() != "auth"
+        }
+    if isinstance(value, list):
+        return [sanitize_snapshot(item) for item in value]
+    return value
+
 if os.environ.get(AUTHORIZATION_FLAG, "").strip().lower() not in AUTHORIZED_VALUES:
     print(
         f"EDHREC collection blocked (fail-closed): set {AUTHORIZATION_FLAG} "
@@ -34,7 +47,7 @@ if not match:
     print("__NEXT_DATA__ NOT FOUND")
     exit(1)
 
-data = json.loads(match.group(1))
+data = sanitize_snapshot(json.loads(match.group(1)))
 with open(OUTPUT, 'w') as f:
     json.dump(data, f, indent=2)
 

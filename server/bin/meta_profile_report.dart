@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import '../lib/database.dart';
+import '../lib/basic_land_utils.dart' as land_utils;
 import '../lib/color_identity.dart';
 import '../lib/meta/meta_deck_analytics_support.dart';
 import '../lib/meta/meta_deck_card_list_support.dart';
@@ -455,7 +456,7 @@ ParsedDeck _parseDeck({
     }
 
     final type = info.typeLine.toLowerCase();
-    if (type.contains('land')) lands += qty;
+    if (land_utils.isLandTypeLine(info.typeLine)) lands += qty;
     if (type.contains('creature')) creatures += qty;
     if (type.contains('instant')) instants += qty;
     if (type.contains('sorcery')) sorceries += qty;

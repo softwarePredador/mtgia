@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:crypto/crypto.dart';
 import 'package:postgres/postgres.dart';
 import 'package:server/ai/candidate_quality_data_support.dart';
 import 'package:server/database.dart';
@@ -12,6 +13,10 @@ const _heuristicSource = 'deterministic_heuristic_v1';
 const _metaSynergySource = 'meta_decks_cooccurrence_v1';
 const _rejectionPenaltySource = 'quality_gate_history_v1';
 const _defaultMaxStalePruneOnApply = 100;
+const _postgresWriteApprovalEnv = 'MANALOOM_CONFIRM_POSTGRES_WRITES';
+const _postgresWriteApprovalValue = 'I_HAVE_EXPLICIT_APPROVAL';
+const _failureInjectionEnv = 'MANALOOM_ENABLE_FOUNDATION_FAILURE_INJECTION';
+const _failureInjectionValue = 'I_UNDERSTAND_THIS_MUST_ROLL_BACK';
 const _staleGeneratedRowsCsvHeaders = <String>[
   'table',
   'card_id',
@@ -52,12 +57,29 @@ Future<void> main(List<String> args) async {
       'Use apenas um modo: --dry-run, --apply ou --prune-stale-only.',
     );
   }
+  if ((apply || pruneStaleOnly) &&
+      Platform.environment[_postgresWriteApprovalEnv] !=
+          _postgresWriteApprovalValue) {
+    throw StateError(
+      'PostgreSQL write refused: export '
+      '$_postgresWriteApprovalEnv=$_postgresWriteApprovalValue.',
+    );
+  }
   final pruneTarget = _readArg(args, '--target=');
   final maxPrune = int.tryParse(_readArg(args, '--max-prune=') ?? '') ?? 1;
   final maxStalePruneOnApply =
       int.tryParse(_readArg(args, '--max-stale-prune-on-apply=') ?? '') ??
-          _defaultMaxStalePruneOnApply;
+      _defaultMaxStalePruneOnApply;
   final allowLargeStalePrune = args.contains('--allow-large-stale-prune');
+  final fullArtifacts = args.contains('--full-artifacts');
+  final testFailAfterLane = _readArg(args, '--test-fail-after-lane=');
+  if (testFailAfterLane != null &&
+      Platform.environment[_failureInjectionEnv] != _failureInjectionValue) {
+    throw StateError(
+      'Foundation failure injection refused: export '
+      '$_failureInjectionEnv=$_failureInjectionValue.',
+    );
+  }
   if (maxStalePruneOnApply < 0) {
     throw ArgumentError('--max-stale-prune-on-apply deve ser >= 0.');
   }
@@ -158,6 +180,12 @@ Future<void> main(List<String> args) async {
       maxRows: maxSynergyRows,
     );
     final penaltyRows = await _loadRejectionPenaltyRows(pool);
+    validateCandidateQualityPlannedDatasets(
+      tagRows: tagRows,
+      roleRows: roleRows,
+      synergyRows: synergyRows,
+      penaltyRows: penaltyRows,
+    );
     final samplePools = _buildSampleCandidatePools(
       synergyRows: synergyRows,
       roleRows: roleRows,
@@ -193,8 +221,9 @@ Future<void> main(List<String> args) async {
         allowLargeStalePrune: allowLargeStalePrune,
       );
     }
-    final flattenedStaleRows =
-        _flattenStaleGeneratedRows(staleGeneratedRowsBeforeApply);
+    final flattenedStaleRows = _flattenStaleGeneratedRows(
+      staleGeneratedRowsBeforeApply,
+    );
     await _writeJson(
       '${artifactDir.path}/stale_generated_rows_preview.json',
       staleGeneratedRowsBeforeApply,
@@ -206,20 +235,83 @@ Future<void> main(List<String> args) async {
     );
 
     if (apply) {
-      await _ensureCandidateQualitySchema(pool);
-      upsertedTags = await _upsertFunctionTags(pool, tagRows);
-      upsertedRoleScores = await _upsertRoleScores(pool, roleRows);
-      upsertedSynergies = await _upsertCommanderSynergies(pool, synergyRows);
-      upsertedPenalties = await _upsertRejectionPenalties(pool, penaltyRows);
-      prunedStaleFunctionTags = await _pruneStaleFunctionTags(pool, tagRows);
-      prunedStaleRoleScores = await _pruneStaleRoleScores(pool, roleRows);
-      prunedStaleSynergies =
-          await _pruneStaleCommanderSynergies(pool, synergyRows);
-      prunedStalePenalties =
-          await _pruneStaleRejectionPenalties(pool, penaltyRows);
-      applied = true;
+      final mutationCounts = await pool.runTx<Map<String, int>>((
+        session,
+      ) async {
+        await session.execute(
+          "SELECT pg_advisory_xact_lock(hashtext('manaloom_candidate_quality_foundation'))",
+        );
+        final transactionStaleRows = await _loadStaleGeneratedRows(
+          pool: session,
+          tagRows: tagRows,
+          roleRows: roleRows,
+          synergyRows: synergyRows,
+          penaltyRows: penaltyRows,
+        );
+        _guardStalePreviewUnchanged(
+          preview: staleGeneratedRowsBeforeApply,
+          transactionRows: transactionStaleRows,
+        );
+        await _ensureCandidateQualitySchema(session);
+        final counts = <String, int>{};
+        counts['upserted_function_tags'] = await _upsertFunctionTags(
+          session,
+          tagRows,
+        );
+        _maybeInjectFoundationFailure(
+          configuredLane: testFailAfterLane,
+          completedLane: 'card_function_tags',
+        );
+        counts['upserted_role_scores'] = await _upsertRoleScores(
+          session,
+          roleRows,
+        );
+        _maybeInjectFoundationFailure(
+          configuredLane: testFailAfterLane,
+          completedLane: 'card_role_scores',
+        );
+        counts['upserted_commander_synergies'] =
+            await _upsertCommanderSynergies(session, synergyRows);
+        _maybeInjectFoundationFailure(
+          configuredLane: testFailAfterLane,
+          completedLane: 'commander_card_synergy',
+        );
+        counts['upserted_rejection_penalties'] =
+            await _upsertRejectionPenalties(session, penaltyRows);
+        _maybeInjectFoundationFailure(
+          configuredLane: testFailAfterLane,
+          completedLane: 'optimize_rejection_penalties',
+        );
+        counts['pruned_function_tags'] = await _pruneStaleFunctionTags(
+          session,
+          tagRows,
+        );
+        counts['pruned_role_scores'] = await _pruneStaleRoleScores(
+          session,
+          roleRows,
+        );
+        counts['pruned_commander_synergies'] =
+            await _pruneStaleCommanderSynergies(session, synergyRows);
+        counts['pruned_rejection_penalties'] =
+            await _pruneStaleRejectionPenalties(session, penaltyRows);
+        _maybeInjectFoundationFailure(
+          configuredLane: testFailAfterLane,
+          completedLane: 'prunes',
+        );
+        return counts;
+      });
+      upsertedTags = mutationCounts['upserted_function_tags'] ?? 0;
+      upsertedRoleScores = mutationCounts['upserted_role_scores'] ?? 0;
+      upsertedSynergies = mutationCounts['upserted_commander_synergies'] ?? 0;
+      upsertedPenalties = mutationCounts['upserted_rejection_penalties'] ?? 0;
+      prunedStaleFunctionTags = mutationCounts['pruned_function_tags'] ?? 0;
+      prunedStaleRoleScores = mutationCounts['pruned_role_scores'] ?? 0;
+      prunedStaleSynergies = mutationCounts['pruned_commander_synergies'] ?? 0;
+      prunedStalePenalties = mutationCounts['pruned_rejection_penalties'] ?? 0;
+      applied = mutationCounts.values.any((count) => count > 0);
     } else if (pruneStaleOnly) {
-      final expectedRows = staleGeneratedRowsBeforeApply[pruneTarget] ??
+      final expectedRows =
+          staleGeneratedRowsBeforeApply[pruneTarget] ??
           const <Map<String, dynamic>>[];
       prunedRows = await _pruneStaleRoleScoresWithGuard(
         pool: pool,
@@ -243,9 +335,10 @@ Future<void> main(List<String> args) async {
     final postCounts = await _loadPreCounts(pool);
     final summary = {
       'schema_version': candidateQualitySchemaVersion,
-      'mode': dryRun
-          ? 'dry_run'
-          : pruneStaleOnly
+      'mode':
+          dryRun
+              ? 'dry_run'
+              : pruneStaleOnly
               ? 'prune_stale_only'
               : 'apply',
       'started_at': startedAt.toIso8601String(),
@@ -258,6 +351,7 @@ Future<void> main(List<String> args) async {
         'max_stale_prune_on_apply': maxStalePruneOnApply,
         'allow_large_stale_prune': allowLargeStalePrune,
       },
+      'artifact_scope': fullArtifacts ? 'full' : 'preview_500',
       'pre_counts': preCounts,
       'post_counts': postCounts,
       'cards_scanned': cards.length,
@@ -267,15 +361,31 @@ Future<void> main(List<String> args) async {
       'role_score_rows_planned': roleRows.length,
       'commander_synergy_rows_planned': synergyRows.length,
       'rejection_penalty_rows_planned': penaltyRows.length,
-      'cards_with_edhrec_signal': cards
-          .where((card) =>
-              card.edhrecInclusionRate > 0 || card.edhrecSampleDecks > 0)
-          .length,
-      'function_tag_coverage_pct': cards.isEmpty
-          ? 0
-          : (tagRows.map((r) => r['card_id']).toSet().length /
-              cards.length *
-              100),
+      'planned_dataset_sha256': {
+        'card_function_tags': _rowsDigest(tagRows),
+        'card_role_scores': _rowsDigest(roleRows),
+        'commander_card_synergy': _rowsDigest(synergyRows),
+        'optimize_rejection_penalties': _rowsDigest(penaltyRows),
+      },
+      'planned_dataset_unique_rows': {
+        'card_function_tags': tagRows.length,
+        'card_role_scores': roleRows.length,
+        'commander_card_synergy': synergyRows.length,
+        'optimize_rejection_penalties': penaltyRows.length,
+      },
+      'cards_with_edhrec_signal':
+          cards
+              .where(
+                (card) =>
+                    card.edhrecInclusionRate > 0 || card.edhrecSampleDecks > 0,
+              )
+              .length,
+      'function_tag_coverage_pct':
+          cards.isEmpty
+              ? 0
+              : (tagRows.map((r) => r['card_id']).toSet().length /
+                  cards.length *
+                  100),
       'upserted_function_tags': upsertedTags,
       'upserted_role_scores': upsertedRoleScores,
       'upserted_commander_synergies': upsertedSynergies,
@@ -296,27 +406,56 @@ Future<void> main(List<String> args) async {
       'unresolved': {
         'ai_generated_tags': 'not used',
         'optimizer_runtime_consumption':
-            'not enabled in request path during stage 1',
+            'enabled through persisted functional_tags, semantic_tags_v2, and card_role_scores with deterministic fallback',
         'human_reviewed_tags': 'not proven',
       },
     };
 
     await _writeJson(
-        '${artifactDir.path}/summary_${summary['mode']}.json', summary);
-    await _writeJson('${artifactDir.path}/function_tag_rows_preview.json',
-        tagRows.take(500).toList());
-    await _writeJson('${artifactDir.path}/role_score_rows_preview.json',
-        roleRows.take(500).toList());
-    await _writeJson('${artifactDir.path}/commander_synergy_rows_preview.json',
-        synergyRows.take(500).toList());
-    await _writeJson('${artifactDir.path}/rejection_penalty_rows_preview.json',
-        penaltyRows.take(500).toList());
+      '${artifactDir.path}/summary_${summary['mode']}.json',
+      summary,
+    );
     await _writeJson(
-        '${artifactDir.path}/sample_candidate_pools.json', samplePools);
+      '${artifactDir.path}/function_tag_rows_preview.json',
+      tagRows.take(500).toList(),
+    );
+    await _writeJson(
+      '${artifactDir.path}/role_score_rows_preview.json',
+      roleRows.take(500).toList(),
+    );
+    await _writeJson(
+      '${artifactDir.path}/commander_synergy_rows_preview.json',
+      synergyRows.take(500).toList(),
+    );
+    await _writeJson(
+      '${artifactDir.path}/rejection_penalty_rows_preview.json',
+      penaltyRows.take(500).toList(),
+    );
+    if (fullArtifacts) {
+      await _writeJson(
+        '${artifactDir.path}/function_tag_rows_full.json',
+        tagRows,
+      );
+      await _writeJson(
+        '${artifactDir.path}/role_score_rows_full.json',
+        roleRows,
+      );
+      await _writeJson(
+        '${artifactDir.path}/commander_synergy_rows_full.json',
+        synergyRows,
+      );
+      await _writeJson(
+        '${artifactDir.path}/rejection_penalty_rows_full.json',
+        penaltyRows,
+      );
+    }
+    await _writeJson(
+      '${artifactDir.path}/sample_candidate_pools.json',
+      samplePools,
+    );
     await _writeCsv(
       '${artifactDir.path}/tag_counts.csv',
-      _countBy(tagRows, 'tag')
-          .entries
+      _countBy(tagRows, 'tag').entries
           .map((entry) => {'tag': entry.key, 'count': entry.value})
           .toList(),
       const ['tag', 'count'],
@@ -326,11 +465,13 @@ Future<void> main(List<String> args) async {
       summary,
     );
 
-    stdout.writeln(apply
-        ? '[OK] Candidate quality foundation aplicada.'
-        : pruneStaleOnly
-            ? '[OK] Candidate quality stale prune concluido.'
-            : '[OK] Candidate quality foundation dry-run concluido.');
+    stdout.writeln(
+      apply
+          ? '[OK] Candidate quality foundation aplicada.'
+          : pruneStaleOnly
+          ? '[OK] Candidate quality stale prune concluido.'
+          : '[OK] Candidate quality foundation dry-run concluido.',
+    );
     stdout.writeln('  - Artefatos: ${artifactDir.path}');
     stdout.writeln('  - Cards escaneadas: ${cards.length}');
     stdout.writeln('  - Tags planejadas: ${tagRows.length}');
@@ -361,11 +502,87 @@ Opcoes:
   --max-stale-prune-on-apply=<N>
                                Limite por tabela para prune automatico no --apply (default: $_defaultMaxStalePruneOnApply)
   --allow-large-stale-prune    Permite --apply mesmo quando stale prune passa do limite
+  MANALOOM_CONFIRM_POSTGRES_WRITES=I_HAVE_EXPLICIT_APPROVAL e obrigatorio para qualquer modo mutante
+  --test-fail-after-lane=<lane> Injeta falha transacional somente com $_failureInjectionEnv=$_failureInjectionValue
+  --full-artifacts             Grava datasets planejados completos alem dos previews de 500 rows
   --artifact-dir=<path>        Diretorio de artefatos
   --min-synergy-evidence=<N>   Minimo de ocorrencias por commander/card (default: 2)
   --max-synergy-rows=<N>       Limite de rows de synergy a materializar (default: 5000)
   --help                       Mostra esta ajuda
 ''');
+}
+
+String _rowsDigest(List<Map<String, dynamic>> rows) {
+  final canonical = rows.map(jsonEncode).toList()..sort();
+  return sha256.convert(utf8.encode(canonical.join('\n'))).toString();
+}
+
+void validateCandidateQualityPlannedDatasets({
+  required List<Map<String, dynamic>> tagRows,
+  required List<Map<String, dynamic>> roleRows,
+  required List<Map<String, dynamic>> synergyRows,
+  required List<Map<String, dynamic>> penaltyRows,
+}) {
+  _guardUniquePlannedRows(
+    dataset: 'card_function_tags',
+    rows: tagRows,
+    keyColumns: const ['card_id', 'tag', 'source'],
+  );
+  _guardUniquePlannedRows(
+    dataset: 'card_role_scores',
+    rows: roleRows,
+    keyColumns: const [
+      'card_id',
+      'role',
+      'format',
+      'subformat',
+      'bracket_scope',
+      'source',
+    ],
+  );
+  _guardUniquePlannedRows(
+    dataset: 'commander_card_synergy',
+    rows: synergyRows,
+    keyColumns: const [
+      'commander_name_normalized',
+      'card_id',
+      'role',
+      'source',
+    ],
+  );
+  _guardUniquePlannedRows(
+    dataset: 'optimize_rejection_penalties',
+    rows: penaltyRows,
+    keyColumns: const [
+      'card_name_normalized',
+      'commander_name_normalized',
+      'archetype',
+      'function',
+      'source',
+    ],
+  );
+}
+
+void _guardUniquePlannedRows({
+  required String dataset,
+  required List<Map<String, dynamic>> rows,
+  required List<String> keyColumns,
+}) {
+  final seen = <String>{};
+  final duplicateKeys = <String>{};
+  for (final row in rows) {
+    final key = jsonEncode([
+      for (final column in keyColumns) row[column]?.toString() ?? '',
+    ]);
+    if (!seen.add(key)) duplicateKeys.add(key);
+  }
+  if (duplicateKeys.isEmpty) return;
+  final ordered = duplicateKeys.toList()..sort();
+  throw StateError(
+    'Planned dataset uniqueness preflight failed: $dataset has '
+    '${duplicateKeys.length} duplicate primary/conflict key(s): '
+    '${ordered.take(5).join(', ')}',
+  );
 }
 
 class CandidateQualityCard {
@@ -402,11 +619,11 @@ class CandidateQualityCard {
   final int edhrecSampleDecks;
 
   Set<String> get resolvedIdentity => resolveCandidateQualityIdentity(
-        colorIdentity: colorIdentity,
-        colors: colors,
-        oracleText: oracleText,
-        manaCost: manaCost,
-      );
+    colorIdentity: colorIdentity,
+    colors: colors,
+    oracleText: oracleText,
+    manaCost: manaCost,
+  );
 }
 
 Future<Map<String, int>> _loadPreCounts(Pool pool) async {
@@ -436,8 +653,9 @@ Future<Map<String, int>> _loadPreCounts(Pool pool) async {
 Future<List<CandidateQualityCard>> _loadCandidateCards(Pool pool) async {
   final hasMetaInsights = await _hasTable(pool, 'card_meta_insights');
   final hasEdhrecSnapshots = await _hasTable(pool, 'edhrec_card_snapshots');
-  final edhrecCte = hasEdhrecSnapshots
-      ? '''
+  final edhrecCte =
+      hasEdhrecSnapshots
+          ? '''
 WITH edhrec_insights AS (
   SELECT
     LOWER(card_name) AS normalized_card_name,
@@ -449,35 +667,41 @@ WITH edhrec_insights AS (
   GROUP BY LOWER(card_name)
 )
 '''
-      : '';
-  final metaJoin = hasMetaInsights
-      ? 'LEFT JOIN card_meta_insights cmi ON LOWER(cmi.card_name) = LOWER(c.name)'
-      : '';
-  final edhrecJoin = hasEdhrecSnapshots
-      ? 'LEFT JOIN edhrec_insights ei ON ei.normalized_card_name = LOWER(c.name)'
-      : '';
+          : '';
+  final metaJoin =
+      hasMetaInsights
+          ? 'LEFT JOIN card_meta_insights cmi ON LOWER(cmi.card_name) = LOWER(c.name)'
+          : '';
+  final edhrecJoin =
+      hasEdhrecSnapshots
+          ? 'LEFT JOIN edhrec_insights ei ON ei.normalized_card_name = LOWER(c.name)'
+          : '';
   final metaUsageSelect =
       hasMetaInsights ? 'COALESCE(cmi.usage_count, 0)::int' : '0::int';
   final metaDeckSelect =
       hasMetaInsights ? 'COALESCE(cmi.meta_deck_count, 0)::int' : '0::int';
-  final edhrecRateSelect = hasEdhrecSnapshots
-      ? 'COALESCE(ei.edhrec_inclusion_rate, 0)::double precision'
-      : '0::double precision';
-  final edhrecSampleSelect = hasEdhrecSnapshots
-      ? 'COALESCE(ei.edhrec_sample_decks, 0)::int'
-      : '0::int';
-  final edhrecOrder = hasEdhrecSnapshots
-      ? '''
+  final edhrecRateSelect =
+      hasEdhrecSnapshots
+          ? 'COALESCE(ei.edhrec_inclusion_rate, 0)::double precision'
+          : '0::double precision';
+  final edhrecSampleSelect =
+      hasEdhrecSnapshots
+          ? 'COALESCE(ei.edhrec_sample_decks, 0)::int'
+          : '0::int';
+  final edhrecOrder =
+      hasEdhrecSnapshots
+          ? '''
   COALESCE(ei.edhrec_inclusion_rate, 0) DESC,
   COALESCE(ei.edhrec_sample_decks, 0) DESC,
 '''
-      : '';
-  final metaOrder = hasMetaInsights
-      ? '''
+          : '';
+  final metaOrder =
+      hasMetaInsights
+          ? '''
   COALESCE(cmi.meta_deck_count, 0) DESC,
   COALESCE(cmi.usage_count, 0) DESC,
 '''
-      : '';
+          : '';
   final sql = '''
 $edhrecCte
 SELECT DISTINCT ON (LOWER(c.name))
@@ -510,26 +734,30 @@ $edhrecOrder$metaOrder
 ''';
 
   final rows = await pool.execute(sql);
-  return rows.map((row) {
-    return CandidateQualityCard(
-      id: row[0] as String,
-      name: (row[1] as String?) ?? '',
-      typeLine: (row[2] as String?) ?? '',
-      oracleText: (row[3] as String?) ?? '',
-      manaCost: (row[4] as String?) ?? '',
-      colors: (row[5] as List?)?.map((e) => e.toString()).toList() ??
-          const <String>[],
-      colorIdentity: (row[6] as List?)?.map((e) => e.toString()).toList() ??
-          const <String>[],
-      cmc: row[7],
-      priceUsd: row[8],
-      priceUsdFoil: row[9],
-      metaUsageCount: (row[10] as int?) ?? 0,
-      metaDeckCount: (row[11] as int?) ?? 0,
-      edhrecInclusionRate: (row[12] as num?)?.toDouble() ?? 0,
-      edhrecSampleDecks: (row[13] as int?) ?? 0,
-    );
-  }).toList(growable: false);
+  return rows
+      .map((row) {
+        return CandidateQualityCard(
+          id: row[0] as String,
+          name: (row[1] as String?) ?? '',
+          typeLine: (row[2] as String?) ?? '',
+          oracleText: (row[3] as String?) ?? '',
+          manaCost: (row[4] as String?) ?? '',
+          colors:
+              (row[5] as List?)?.map((e) => e.toString()).toList() ??
+              const <String>[],
+          colorIdentity:
+              (row[6] as List?)?.map((e) => e.toString()).toList() ??
+              const <String>[],
+          cmc: row[7],
+          priceUsd: row[8],
+          priceUsdFoil: row[9],
+          metaUsageCount: (row[10] as int?) ?? 0,
+          metaDeckCount: (row[11] as int?) ?? 0,
+          edhrecInclusionRate: (row[12] as num?)?.toDouble() ?? 0,
+          edhrecSampleDecks: (row[13] as int?) ?? 0,
+        );
+      })
+      .toList(growable: false);
 }
 
 Future<Map<String, String>> _loadCommanderLegalStatuses(Pool pool) async {
@@ -542,7 +770,7 @@ WHERE format = 'commander'
 ''');
   return {
     for (final row in rows)
-      if (row[0] != null) row[0] as String: (row[1] as String?) ?? ''
+      if (row[0] != null) row[0] as String: (row[1] as String?) ?? '',
   };
 }
 
@@ -593,9 +821,10 @@ WHERE format IN ('EDH', 'cEDH')
       final card = cardsByName[normalizedCard];
       if (card == null) continue;
       final roleRow = roleByCardId[card.id];
-      final role = roleRow == null
-          ? 'utility'
-          : (roleRow['role'] as String?) ?? 'utility';
+      final role =
+          roleRow == null
+              ? 'utility'
+              : (roleRow['role'] as String?) ?? 'utility';
       final key = [
         normalizeCandidateQualityKey(commander),
         card.id,
@@ -617,32 +846,35 @@ WHERE format IN ('EDH', 'cEDH')
     }
   }
 
-  final output = counts.values
-      .where((entry) => entry.evidenceCount >= minEvidence)
-      .map((entry) {
-    final score = (50 + entry.evidenceCount * 7 + entry.cardMetaDeckCount * 2)
-        .clamp(1, 100)
-        .toInt();
-    return {
-      'commander_name_normalized': entry.commanderNameNormalized,
-      'commander_name': entry.commanderName,
-      'card_id': entry.cardId,
-      'card_name': entry.cardName,
-      'role': entry.role,
-      'score': score,
-      'source': _metaSynergySource,
-      'evidence_count': entry.evidenceCount,
-      'evidence': 'meta_decks_cooccurrence',
-    };
-  }).toList()
-    ..sort((a, b) {
-      final byScore = (b['score'] as int).compareTo(a['score'] as int);
-      if (byScore != 0) return byScore;
-      final byEvidence =
-          (b['evidence_count'] as int).compareTo(a['evidence_count'] as int);
-      if (byEvidence != 0) return byEvidence;
-      return (a['card_name'] as String).compareTo(b['card_name'] as String);
-    });
+  final output =
+      counts.values.where((entry) => entry.evidenceCount >= minEvidence).map((
+          entry,
+        ) {
+          final score =
+              (50 + entry.evidenceCount * 7 + entry.cardMetaDeckCount * 2)
+                  .clamp(1, 100)
+                  .toInt();
+          return {
+            'commander_name_normalized': entry.commanderNameNormalized,
+            'commander_name': entry.commanderName,
+            'card_id': entry.cardId,
+            'card_name': entry.cardName,
+            'role': entry.role,
+            'score': score,
+            'source': _metaSynergySource,
+            'evidence_count': entry.evidenceCount,
+            'evidence': 'meta_decks_cooccurrence',
+          };
+        }).toList()
+        ..sort((a, b) {
+          final byScore = (b['score'] as int).compareTo(a['score'] as int);
+          if (byScore != 0) return byScore;
+          final byEvidence = (b['evidence_count'] as int).compareTo(
+            a['evidence_count'] as int,
+          );
+          if (byEvidence != 0) return byEvidence;
+          return (a['card_name'] as String).compareTo(b['card_name'] as String);
+        });
 
   return output.take(maxRows).toList(growable: false);
 }
@@ -668,31 +900,137 @@ WHERE oal.additions_list IS NOT NULL
   )
 GROUP BY commander_name, archetype, value
 ORDER BY reject_count DESC, card_name ASC
-LIMIT 2000
 ''');
 
-  return rows.map((row) {
-    final rawCardName = ((row[2] as String?) ?? '').trim();
+  return aggregateCandidateQualityRejectionPenaltyRows(
+    rows.map(
+      (row) => {
+        'commander_name': (row[0] as String?) ?? '',
+        'archetype': (row[1] as String?) ?? '',
+        'card_name': (row[2] as String?) ?? '',
+        'reject_count': (row[3] as int?) ?? 0,
+      },
+    ),
+  ).take(2000).toList(growable: false);
+}
+
+List<Map<String, dynamic>> aggregateCandidateQualityRejectionPenaltyRows(
+  Iterable<Map<String, dynamic>> rawRows,
+) {
+  final aggregates = <String, _RejectionPenaltyAggregate>{};
+  for (final row in rawRows) {
+    final rawCardName = _normalizeDisplayName(
+      row['card_name']?.toString() ?? '',
+    );
     final safeCardName = rawCardName.startsWith('{') ? '' : rawCardName;
-    final commanderName = ((row[0] as String?) ?? '').trim();
-    final archetype = ((row[1] as String?) ?? '').trim().toLowerCase();
-    final rejectCount = (row[3] as int?) ?? 0;
-    return {
-      'card_name_normalized': normalizeCandidateQualityKey(safeCardName),
-      'card_name': safeCardName,
-      'commander_name_normalized': normalizeCandidateQualityKey(commanderName),
-      'commander_name': commanderName,
-      'archetype': archetype,
-      'function': '',
-      'penalty': (rejectCount * 35).clamp(35, 500).toInt(),
-      'reject_count': rejectCount,
-      'source': _rejectionPenaltySource,
-      'evidence': 'aggregated_failed_optimization_additions',
+    final cardNameNormalized = normalizeCandidateQualityKey(safeCardName);
+    if (safeCardName.isEmpty || cardNameNormalized.isEmpty) continue;
+
+    final commanderName = _normalizeDisplayName(
+      row['commander_name']?.toString() ?? '',
+    );
+    final commanderNameNormalized = normalizeCandidateQualityKey(commanderName);
+    final archetype = normalizeCandidateQualityKey(
+      row['archetype']?.toString() ?? '',
+    );
+    final function = normalizeCandidateQualityKey(
+      row['function']?.toString() ?? '',
+    );
+    final rejectCount = switch (row['reject_count']) {
+      final int value => value,
+      final num value => value.toInt(),
+      final Object value => int.tryParse(value.toString()) ?? 0,
+      _ => 0,
     };
-  }).where((row) {
-    return (row['card_name'] as String).isNotEmpty &&
-        (row['card_name_normalized'] as String).isNotEmpty;
-  }).toList(growable: false);
+    if (rejectCount <= 0) continue;
+    final key = jsonEncode([
+      cardNameNormalized,
+      commanderNameNormalized,
+      archetype,
+      function,
+      _rejectionPenaltySource,
+    ]);
+    final aggregate = aggregates.putIfAbsent(
+      key,
+      () => _RejectionPenaltyAggregate(
+        cardNameNormalized: cardNameNormalized,
+        cardName: safeCardName,
+        commanderNameNormalized: commanderNameNormalized,
+        commanderName: commanderName,
+        archetype: archetype,
+        function: function,
+      ),
+    );
+    aggregate
+      ..cardName = _preferredDisplayName(aggregate.cardName, safeCardName)
+      ..commanderName = _preferredDisplayName(
+        aggregate.commanderName,
+        commanderName,
+      )
+      ..rejectCount += rejectCount;
+  }
+
+  final output =
+      aggregates.values.map((aggregate) {
+          return {
+            'card_name_normalized': aggregate.cardNameNormalized,
+            'card_name': aggregate.cardName,
+            'commander_name_normalized': aggregate.commanderNameNormalized,
+            'commander_name': aggregate.commanderName,
+            'archetype': aggregate.archetype,
+            'function': aggregate.function,
+            'penalty': (aggregate.rejectCount * 35).clamp(35, 500).toInt(),
+            'reject_count': aggregate.rejectCount,
+            'source': _rejectionPenaltySource,
+            'evidence': 'aggregated_failed_optimization_additions',
+          };
+        }).toList()
+        ..sort((a, b) {
+          final byReject = (b['reject_count'] as int).compareTo(
+            a['reject_count'] as int,
+          );
+          if (byReject != 0) return byReject;
+          final byCard = (a['card_name_normalized'] as String).compareTo(
+            b['card_name_normalized'] as String,
+          );
+          if (byCard != 0) return byCard;
+          final byCommander = (a['commander_name_normalized'] as String)
+              .compareTo(b['commander_name_normalized'] as String);
+          if (byCommander != 0) return byCommander;
+          return (a['archetype'] as String).compareTo(b['archetype'] as String);
+        });
+  return output;
+}
+
+String _normalizeDisplayName(String value) {
+  return value.trim().replaceAll(RegExp(r'\s+'), ' ');
+}
+
+String _preferredDisplayName(String current, String candidate) {
+  if (current.isEmpty) return candidate;
+  if (candidate.isEmpty) return current;
+  final byLower = current.toLowerCase().compareTo(candidate.toLowerCase());
+  if (byLower != 0) return byLower <= 0 ? current : candidate;
+  return current.compareTo(candidate) <= 0 ? current : candidate;
+}
+
+class _RejectionPenaltyAggregate {
+  _RejectionPenaltyAggregate({
+    required this.cardNameNormalized,
+    required this.cardName,
+    required this.commanderNameNormalized,
+    required this.commanderName,
+    required this.archetype,
+    required this.function,
+  });
+
+  final String cardNameNormalized;
+  String cardName;
+  final String commanderNameNormalized;
+  String commanderName;
+  final String archetype;
+  final String function;
+  int rejectCount = 0;
 }
 
 List<Map<String, dynamic>> _buildSampleCandidatePools({
@@ -738,26 +1076,30 @@ List<Map<String, dynamic>> _buildSampleCandidatePools({
   for (final commanderName in commanderNames) {
     final commander = cardsByName[normalizeCandidateQualityKey(commanderName)];
     if (commander == null) continue;
-    samples.add(_buildOneSamplePool(
-      label: commanderName,
-      commanderIdentity: commander.resolvedIdentity,
-      roles: const ['ramp', 'draw', 'removal', 'protection', 'wipe'],
-      roleRowsByCardId: roleRowsByCardId,
-      cardsById: cardsById,
-      legalStatuses: legalStatuses,
-    ));
+    samples.add(
+      _buildOneSamplePool(
+        label: commanderName,
+        commanderIdentity: commander.resolvedIdentity,
+        roles: const ['ramp', 'draw', 'removal', 'protection', 'wipe'],
+        roleRowsByCardId: roleRowsByCardId,
+        cardsById: cardsById,
+        legalStatuses: legalStatuses,
+      ),
+    );
   }
 
   for (final fallback in fallbackShells) {
     if (samples.length >= 3) break;
-    samples.add(_buildOneSamplePool(
-      label: fallback['label'] as String,
-      commanderIdentity: (fallback['identity'] as Set<String>),
-      roles: (fallback['roles'] as List<String>),
-      roleRowsByCardId: roleRowsByCardId,
-      cardsById: cardsById,
-      legalStatuses: legalStatuses,
-    ));
+    samples.add(
+      _buildOneSamplePool(
+        label: fallback['label'] as String,
+        commanderIdentity: (fallback['identity'] as Set<String>),
+        roles: (fallback['roles'] as List<String>),
+        roleRowsByCardId: roleRowsByCardId,
+        cardsById: cardsById,
+        legalStatuses: legalStatuses,
+      ),
+    );
   }
 
   return samples.take(3).toList(growable: false);
@@ -784,12 +1126,12 @@ Map<String, dynamic> _buildOneSamplePool({
     final best = entry.value
         .where((row) => roles.contains(row['role']))
         .fold<Map<String, dynamic>?>(null, (current, row) {
-      if (current == null ||
-          (row['score'] as int) > (current['score'] as int)) {
-        return row;
-      }
-      return current;
-    });
+          if (current == null ||
+              (row['score'] as int) > (current['score'] as int)) {
+            return row;
+          }
+          return current;
+        });
     if (best == null) continue;
     candidates.add({
       'card_name': card.name,
@@ -822,7 +1164,7 @@ Map<String, dynamic> _buildOneSamplePool({
   };
 }
 
-Future<void> _ensureCandidateQualitySchema(Pool pool) async {
+Future<void> _ensureCandidateQualitySchema(Session pool) async {
   for (final statement in candidateQualitySchemaStatements) {
     await pool.execute(statement);
   }
@@ -834,14 +1176,13 @@ Future<void> _ensureCandidateQualitySchema(Pool pool) async {
 }
 
 Future<int> _upsertFunctionTags(
-  Pool pool,
+  Session session,
   List<Map<String, dynamic>> rows,
 ) async {
   var count = 0;
-  await pool.runTx((session) async {
-    for (final batch in _batches(rows, 1000)) {
-      await session.execute(
-        Sql.named('''
+  for (final batch in _batches(rows, 1000)) {
+    final result = await session.execute(
+      Sql.named('''
 WITH input AS (
   SELECT *
   FROM jsonb_to_recordset(@rows::jsonb) AS x(
@@ -870,24 +1211,32 @@ ON CONFLICT (card_id, tag, source) DO UPDATE SET
   confidence = EXCLUDED.confidence,
   evidence = EXCLUDED.evidence,
   updated_at = CURRENT_TIMESTAMP
+WHERE (
+  card_function_tags.card_name,
+  card_function_tags.confidence,
+  card_function_tags.evidence
+) IS DISTINCT FROM (
+  EXCLUDED.card_name,
+  EXCLUDED.confidence,
+  EXCLUDED.evidence
+)
+RETURNING 1
 '''),
-        parameters: {'rows': jsonEncode(batch)},
-      );
-      count += batch.length;
-    }
-  });
+      parameters: {'rows': jsonEncode(batch)},
+    );
+    count += result.length;
+  }
   return count;
 }
 
 Future<int> _upsertRoleScores(
-  Pool pool,
+  Session session,
   List<Map<String, dynamic>> rows,
 ) async {
   var count = 0;
-  await pool.runTx((session) async {
-    for (final batch in _batches(rows, 1000)) {
-      await session.execute(
-        Sql.named('''
+  for (final batch in _batches(rows, 1000)) {
+    final result = await session.execute(
+      Sql.named('''
 WITH input AS (
   SELECT *
   FROM jsonb_to_recordset(@rows::jsonb) AS x(
@@ -936,24 +1285,34 @@ DO UPDATE SET
   budget_tier = EXCLUDED.budget_tier,
   evidence = EXCLUDED.evidence,
   updated_at = CURRENT_TIMESTAMP
+WHERE (
+  card_role_scores.card_name,
+  card_role_scores.score,
+  card_role_scores.budget_tier,
+  card_role_scores.evidence
+) IS DISTINCT FROM (
+  EXCLUDED.card_name,
+  EXCLUDED.score,
+  EXCLUDED.budget_tier,
+  EXCLUDED.evidence
+)
+RETURNING 1
 '''),
-        parameters: {'rows': jsonEncode(batch)},
-      );
-      count += batch.length;
-    }
-  });
+      parameters: {'rows': jsonEncode(batch)},
+    );
+    count += result.length;
+  }
   return count;
 }
 
 Future<int> _upsertCommanderSynergies(
-  Pool pool,
+  Session session,
   List<Map<String, dynamic>> rows,
 ) async {
   var count = 0;
-  await pool.runTx((session) async {
-    for (final batch in _batches(rows, 1000)) {
-      await session.execute(
-        Sql.named('''
+  for (final batch in _batches(rows, 1000)) {
+    final result = await session.execute(
+      Sql.named('''
 WITH input AS (
   SELECT *
   FROM jsonb_to_recordset(@rows::jsonb) AS x(
@@ -1000,24 +1359,36 @@ DO UPDATE SET
   evidence_count = EXCLUDED.evidence_count,
   evidence = EXCLUDED.evidence,
   updated_at = CURRENT_TIMESTAMP
+WHERE (
+  commander_card_synergy.commander_name,
+  commander_card_synergy.card_name,
+  commander_card_synergy.score,
+  commander_card_synergy.evidence_count,
+  commander_card_synergy.evidence
+) IS DISTINCT FROM (
+  EXCLUDED.commander_name,
+  EXCLUDED.card_name,
+  EXCLUDED.score,
+  EXCLUDED.evidence_count,
+  EXCLUDED.evidence
+)
+RETURNING 1
 '''),
-        parameters: {'rows': jsonEncode(batch)},
-      );
-      count += batch.length;
-    }
-  });
+      parameters: {'rows': jsonEncode(batch)},
+    );
+    count += result.length;
+  }
   return count;
 }
 
 Future<int> _upsertRejectionPenalties(
-  Pool pool,
+  Session session,
   List<Map<String, dynamic>> rows,
 ) async {
   var count = 0;
-  await pool.runTx((session) async {
-    for (final batch in _batches(rows, 1000)) {
-      await session.execute(
-        Sql.named('''
+  for (final batch in _batches(rows, 1000)) {
+    final result = await session.execute(
+      Sql.named('''
 WITH input AS (
   SELECT *
   FROM jsonb_to_recordset(@rows::jsonb) AS x(
@@ -1072,17 +1443,30 @@ ON CONFLICT (
   reject_count = EXCLUDED.reject_count,
   evidence = EXCLUDED.evidence,
   updated_at = CURRENT_TIMESTAMP
+WHERE (
+  optimize_rejection_penalties.card_name,
+  optimize_rejection_penalties.commander_name,
+  optimize_rejection_penalties.penalty,
+  optimize_rejection_penalties.reject_count,
+  optimize_rejection_penalties.evidence
+) IS DISTINCT FROM (
+  EXCLUDED.card_name,
+  EXCLUDED.commander_name,
+  EXCLUDED.penalty,
+  EXCLUDED.reject_count,
+  EXCLUDED.evidence
+)
+RETURNING 1
 '''),
-        parameters: {'rows': jsonEncode(batch)},
-      );
-      count += batch.length;
-    }
-  });
+      parameters: {'rows': jsonEncode(batch)},
+    );
+    count += result.length;
+  }
   return count;
 }
 
 Future<Map<String, List<Map<String, dynamic>>>> _loadStaleGeneratedRows({
-  required Pool pool,
+  required Session pool,
   required List<Map<String, dynamic>> tagRows,
   required List<Map<String, dynamic>> roleRows,
   required List<Map<String, dynamic>> synergyRows,
@@ -1091,10 +1475,14 @@ Future<Map<String, List<Map<String, dynamic>>>> _loadStaleGeneratedRows({
   return {
     'card_function_tags': await _loadStaleFunctionTags(pool, tagRows),
     'card_role_scores': await _loadStaleRoleScores(pool, roleRows),
-    'commander_card_synergy':
-        await _loadStaleCommanderSynergies(pool, synergyRows),
-    'optimize_rejection_penalties':
-        await _loadStaleRejectionPenalties(pool, penaltyRows),
+    'commander_card_synergy': await _loadStaleCommanderSynergies(
+      pool,
+      synergyRows,
+    ),
+    'optimize_rejection_penalties': await _loadStaleRejectionPenalties(
+      pool,
+      penaltyRows,
+    ),
   };
 }
 
@@ -1121,13 +1509,43 @@ void _guardApplyStalePrune({
       .toList(growable: false);
   if (oversized.isEmpty) return;
 
-  final details =
-      oversized.map((entry) => '${entry.key}=${entry.value}').join(', ');
+  final details = oversized
+      .map((entry) => '${entry.key}=${entry.value}')
+      .join(', ');
   throw StateError(
     'Apply abortado: stale prune acima do limite por tabela '
     '($details; limite=$maxRowsPerTable). Revise '
     'stale_generated_rows_preview.* e rerode com '
     '--allow-large-stale-prune apenas em janela controlada.',
+  );
+}
+
+void _guardStalePreviewUnchanged({
+  required Map<String, List<Map<String, dynamic>>> preview,
+  required Map<String, List<Map<String, dynamic>>> transactionRows,
+}) {
+  final datasets = <String>{...preview.keys, ...transactionRows.keys};
+  for (final dataset in datasets) {
+    final expected = preview[dataset] ?? const <Map<String, dynamic>>[];
+    final actual = transactionRows[dataset] ?? const <Map<String, dynamic>>[];
+    if (expected.length != actual.length ||
+        _rowsDigest(expected) != _rowsDigest(actual)) {
+      throw StateError(
+        'Apply abortado antes da primeira escrita: stale preview mudou para '
+        '$dataset (preview=${expected.length}, tx=${actual.length}).',
+      );
+    }
+  }
+}
+
+void _maybeInjectFoundationFailure({
+  required String? configuredLane,
+  required String completedLane,
+}) {
+  if (configuredLane == null || configuredLane != completedLane) return;
+  throw StateError(
+    'Injected candidate-quality foundation failure after $completedLane; '
+    'the global transaction must roll back.',
   );
 }
 
@@ -1165,10 +1583,7 @@ WHERE existing.source = @source
   )
 ORDER BY existing.card_name, existing.tag
 '''),
-    parameters: {
-      'rows': jsonEncode(rows),
-      'source': _heuristicSource,
-    },
+    parameters: {'rows': jsonEncode(rows), 'source': _heuristicSource},
   );
   return result.map((row) => _jsonSafeMap(row.toColumnMap())).toList();
 }
@@ -1217,10 +1632,7 @@ WHERE existing.source = @source
   )
 ORDER BY existing.card_name, existing.role, existing.bracket_scope
 '''),
-    parameters: {
-      'rows': jsonEncode(rows),
-      'source': _heuristicSource,
-    },
+    parameters: {'rows': jsonEncode(rows), 'source': _heuristicSource},
   );
   return result.map((row) => _jsonSafeMap(row.toColumnMap())).toList();
 }
@@ -1264,10 +1676,7 @@ WHERE existing.source = @source
   )
 ORDER BY existing.commander_name, existing.card_name, existing.role
 '''),
-    parameters: {
-      'rows': jsonEncode(rows),
-      'source': _metaSynergySource,
-    },
+    parameters: {'rows': jsonEncode(rows), 'source': _metaSynergySource},
   );
   return result.map((row) => _jsonSafeMap(row.toColumnMap())).toList();
 }
@@ -1315,16 +1724,13 @@ WHERE existing.source = @source
   )
 ORDER BY existing.card_name, existing.commander_name, existing.archetype
 '''),
-    parameters: {
-      'rows': jsonEncode(rows),
-      'source': _rejectionPenaltySource,
-    },
+    parameters: {'rows': jsonEncode(rows), 'source': _rejectionPenaltySource},
   );
   return result.map((row) => _jsonSafeMap(row.toColumnMap())).toList();
 }
 
 Future<int> _pruneStaleFunctionTags(
-  Pool pool,
+  Session pool,
   List<Map<String, dynamic>> rows,
 ) async {
   if (rows.isEmpty) return 0;
@@ -1350,10 +1756,7 @@ deleted AS (
 )
 SELECT COUNT(*)::int FROM deleted
 '''),
-    parameters: {
-      'rows': jsonEncode(rows),
-      'source': _heuristicSource,
-    },
+    parameters: {'rows': jsonEncode(rows), 'source': _heuristicSource},
   );
   return (result.first[0] as int?) ?? 0;
 }
@@ -1365,9 +1768,7 @@ Future<List<Map<String, dynamic>>> _pruneStaleRoleScoresWithGuard({
   required int maxPrune,
 }) async {
   if (!await _hasTable(pool, 'card_role_scores')) {
-    throw StateError(
-      'Prune abortado: tabela card_role_scores nao existe.',
-    );
+    throw StateError('Prune abortado: tabela card_role_scores nao existe.');
   }
   final expectedKeys = _roleScoreKeys(expectedRows);
   if (expectedRows.length > maxPrune) {
@@ -1433,10 +1834,7 @@ deleted AS (
 )
 SELECT * FROM deleted
 '''),
-      parameters: {
-        'rows': jsonEncode(roleRows),
-        'source': _heuristicSource,
-      },
+      parameters: {'rows': jsonEncode(roleRows), 'source': _heuristicSource},
     );
     final deletedRows =
         result.map((row) => _jsonSafeMap(row.toColumnMap())).toList();
@@ -1451,7 +1849,7 @@ SELECT * FROM deleted
 }
 
 Future<int> _pruneStaleRoleScores(
-  Pool pool,
+  Session pool,
   List<Map<String, dynamic>> rows,
 ) async {
   if (rows.isEmpty) return 0;
@@ -1483,16 +1881,13 @@ deleted AS (
 )
 SELECT COUNT(*)::int FROM deleted
 '''),
-    parameters: {
-      'rows': jsonEncode(rows),
-      'source': _heuristicSource,
-    },
+    parameters: {'rows': jsonEncode(rows), 'source': _heuristicSource},
   );
   return (result.first[0] as int?) ?? 0;
 }
 
 Future<int> _pruneStaleCommanderSynergies(
-  Pool pool,
+  Session pool,
   List<Map<String, dynamic>> rows,
 ) async {
   if (rows.isEmpty) return 0;
@@ -1520,16 +1915,13 @@ deleted AS (
 )
 SELECT COUNT(*)::int FROM deleted
 '''),
-    parameters: {
-      'rows': jsonEncode(rows),
-      'source': _metaSynergySource,
-    },
+    parameters: {'rows': jsonEncode(rows), 'source': _metaSynergySource},
   );
   return (result.first[0] as int?) ?? 0;
 }
 
 Future<int> _pruneStaleRejectionPenalties(
-  Pool pool,
+  Session pool,
   List<Map<String, dynamic>> rows,
 ) async {
   if (rows.isEmpty) return 0;
@@ -1559,10 +1951,7 @@ deleted AS (
 )
 SELECT COUNT(*)::int FROM deleted
 '''),
-    parameters: {
-      'rows': jsonEncode(rows),
-      'source': _rejectionPenaltySource,
-    },
+    parameters: {'rows': jsonEncode(rows), 'source': _rejectionPenaltySource},
   );
   return (result.first[0] as int?) ?? 0;
 }
@@ -1599,14 +1988,16 @@ Map<String, int> _countBy(List<Map<String, dynamic>> rows, String key) {
 
 Set<String> _roleScoreKeys(List<Map<String, dynamic>> rows) {
   return rows
-      .map((row) => [
-            row['card_id'],
-            row['role'],
-            row['format'],
-            row['subformat'],
-            row['bracket_scope'],
-            row['source'],
-          ].map((value) => value?.toString() ?? '').join('|'))
+      .map(
+        (row) => [
+          row['card_id'],
+          row['role'],
+          row['format'],
+          row['subformat'],
+          row['bracket_scope'],
+          row['source'],
+        ].map((value) => value?.toString() ?? '').join('|'),
+      )
       .toSet();
 }
 
@@ -1632,9 +2023,9 @@ String? _readArg(List<String> args, String prefix) {
 }
 
 Future<void> _writeJson(String path, Object? payload) async {
-  await File(path).writeAsString(
-    const JsonEncoder.withIndent('  ').convert(payload),
-  );
+  await File(
+    path,
+  ).writeAsString(const JsonEncoder.withIndent('  ').convert(payload));
 }
 
 Future<void> _writeCsv(
@@ -1661,38 +2052,45 @@ Future<void> _writeSummaryMarkdown(
   String path,
   Map<String, dynamic> summary,
 ) async {
-  final buffer = StringBuffer()
-    ..writeln('# Aggressive Candidate Quality v2 - ${summary['mode']}')
-    ..writeln()
-    ..writeln('- Schema version: `${summary['schema_version']}`')
-    ..writeln('- DB mutations: `${summary['db_mutations']}`')
-    ..writeln('- Cards scanned: `${summary['cards_scanned']}`')
-    ..writeln(
-      '- Cards with deterministic tags: `${summary['cards_with_function_tags']}`',
-    )
-    ..writeln(
-        '- Function tag rows planned: `${summary['function_tag_rows_planned']}`')
-    ..writeln(
-        '- Role score rows planned: `${summary['role_score_rows_planned']}`')
-    ..writeln(
-      '- Commander synergy rows planned: `${summary['commander_synergy_rows_planned']}`',
-    )
-    ..writeln(
-      '- Rejection penalty rows planned: `${summary['rejection_penalty_rows_planned']}`',
-    )
-    ..writeln('- Stale generated rows before apply/prune: '
-        '`${summary['stale_generated_rows_before_apply']}`')
-    ..writeln('- Pruned stale role scores: '
-        '`${summary['pruned_stale_role_scores']}`')
-    ..writeln()
-    ..writeln('## Guardrails')
-    ..writeln()
-    ..writeln(summary['legality_color_identity_guard'])
-    ..writeln()
-    ..writeln('## Top tags')
-    ..writeln()
-    ..writeln('| Tag | Count |')
-    ..writeln('|---|---:|');
+  final buffer =
+      StringBuffer()
+        ..writeln('# Aggressive Candidate Quality v2 - ${summary['mode']}')
+        ..writeln()
+        ..writeln('- Schema version: `${summary['schema_version']}`')
+        ..writeln('- DB mutations: `${summary['db_mutations']}`')
+        ..writeln('- Cards scanned: `${summary['cards_scanned']}`')
+        ..writeln(
+          '- Cards with deterministic tags: `${summary['cards_with_function_tags']}`',
+        )
+        ..writeln(
+          '- Function tag rows planned: `${summary['function_tag_rows_planned']}`',
+        )
+        ..writeln(
+          '- Role score rows planned: `${summary['role_score_rows_planned']}`',
+        )
+        ..writeln(
+          '- Commander synergy rows planned: `${summary['commander_synergy_rows_planned']}`',
+        )
+        ..writeln(
+          '- Rejection penalty rows planned: `${summary['rejection_penalty_rows_planned']}`',
+        )
+        ..writeln(
+          '- Stale generated rows before apply/prune: '
+          '`${summary['stale_generated_rows_before_apply']}`',
+        )
+        ..writeln(
+          '- Pruned stale role scores: '
+          '`${summary['pruned_stale_role_scores']}`',
+        )
+        ..writeln()
+        ..writeln('## Guardrails')
+        ..writeln()
+        ..writeln(summary['legality_color_identity_guard'])
+        ..writeln()
+        ..writeln('## Top tags')
+        ..writeln()
+        ..writeln('| Tag | Count |')
+        ..writeln('|---|---:|');
   final tagCounts = summary['tag_counts'] as Map<String, dynamic>;
   for (final entry in tagCounts.entries.take(20)) {
     buffer.writeln('| ${entry.key} | ${entry.value} |');

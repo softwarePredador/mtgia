@@ -8,6 +8,7 @@ import 'optimize_functional_role_support.dart';
 import 'optimize_removal_candidate_support.dart';
 import 'optimize_route_recommendation_context_support.dart';
 import 'optimization_functional_roles.dart';
+import 'optimization_ramp_profile.dart';
 
 Future<List<Map<String, dynamic>>> findSynergyReplacements({
   required Pool pool,
@@ -144,7 +145,7 @@ Future<List<Map<String, dynamic>>> findSynergyReplacements({
         ) owned ON TRUE
         WHERE (cl.status = 'legal' OR cl.status = 'restricted' OR cl.status IS NULL)
           AND LOWER(c.name) NOT IN (SELECT LOWER(unnest(@exclude::text[])))
-          AND c.type_line NOT ILIKE '%land%'
+          AND NOT (COALESCE(c.type_line, '') ~* '(^|[^a-z])land([^a-z]|\$)')
           AND c.name NOT LIKE 'A-%'
           AND c.name NOT LIKE '\\_%' ESCAPE '\\'
           AND c.name NOT LIKE '%World Champion%'
@@ -392,6 +393,10 @@ bool matchesFunctionalNeedForCandidate(
   required Map<String, dynamic> candidate,
 }) {
   final normalizedNeed = _normalizeReplacementNeed(need);
+  if (normalizedNeed == 'ramp' &&
+      !optimizationRampProfileForCard(candidate).countsTowardGenericFloor) {
+    return false;
+  }
   final roles = optimizationFunctionalRolesForCard(candidate);
   if (normalizedNeed == 'utility') return true;
   if (roles.map(_normalizeReplacementNeed).contains(normalizedNeed)) {
@@ -399,8 +404,11 @@ bool matchesFunctionalNeedForCandidate(
   }
   return matchesFunctionalNeed(
     need,
+    name: candidate['name'] as String? ?? '',
     oracleText: candidate['oracle_text'] as String? ?? '',
     typeLine: candidate['type_line'] as String? ?? '',
+    manaCost: candidate['mana_cost']?.toString(),
+    cmc: candidate['cmc'],
   );
 }
 
@@ -409,6 +417,10 @@ int semanticReplacementScoreBoost({
   required Map<String, dynamic> candidate,
 }) {
   final normalizedNeed = _normalizeReplacementNeed(functionalNeed);
+  if (normalizedNeed == 'ramp' &&
+      !optimizationRampProfileForCard(candidate).countsTowardGenericFloor) {
+    return 0;
+  }
   final roles =
       optimizationFunctionalRolesForCard(
         candidate,

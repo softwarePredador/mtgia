@@ -2,6 +2,7 @@ import 'dart:io';
 import 'dart:math';
 import 'package:dart_frog/dart_frog.dart';
 import 'package:postgres/postgres.dart';
+import '../../../../lib/basic_land_utils.dart' as land_utils;
 
 Future<Response> onRequest(RequestContext context, String deckId) async {
   if (context.request.method == HttpMethod.get) {
@@ -69,7 +70,7 @@ Future<Response> _simulateDeck(RequestContext context, String deckId) async {
 
       final card = _SimCard(
         name: name,
-        isLand: typeLine.toLowerCase().contains('land'),
+        isLand: land_utils.isLandTypeLine(typeLine),
         cmc: _calculateCmc(manaCost),
       );
 

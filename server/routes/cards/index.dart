@@ -55,36 +55,40 @@ Future<Response> onRequest(RequestContext context) async {
     );
 
     // Mapeamento do resultado para JSON
-    final cards = queryResult.map((row) {
-      final map = row.toColumnMap();
-      final imageUrl = normalizeScryfallImageUrl(map['image_url']?.toString());
-      return {
-        'id': map['id'],
-        'scryfall_id': map['scryfall_id'],
-        if (map.containsKey('oracle_id')) 'oracle_id': map['oracle_id'],
-        if (map.containsKey('layout')) 'layout': map['layout'],
-        if (map.containsKey('card_faces_json'))
-          'card_faces': map['card_faces_json'],
-        'name': map['name'],
-        'mana_cost': map['mana_cost'],
-        'type_line': map['type_line'],
-        'oracle_text': map['oracle_text'],
-        'colors': map['colors'],
-        'color_identity': map['color_identity'],
-        'image_url': imageUrl,
-        'set_code': map['set_code'],
-        if (hasSets) 'set_name': map['set_name'],
-        if (hasSets)
-          'set_release_date': (map['set_release_date'] as DateTime?)
-              ?.toIso8601String()
-              .split('T')
-              .first,
-        'rarity': map['rarity'],
-        'is_reserved': map['is_reserved'] == true,
-        'collector_number': map['collector_number'],
-        'foil': map['foil'],
-      };
-    }).toList();
+    final cards =
+        queryResult.map((row) {
+          final map = row.toColumnMap();
+          final imageUrl = normalizeScryfallImageUrl(
+            map['image_url']?.toString(),
+          );
+          return {
+            'id': map['id'],
+            'scryfall_id': map['scryfall_id'],
+            if (map.containsKey('oracle_id')) 'oracle_id': map['oracle_id'],
+            if (map.containsKey('layout')) 'layout': map['layout'],
+            if (map.containsKey('card_faces_json'))
+              'card_faces': map['card_faces_json'],
+            'name': map['name'],
+            'mana_cost': map['mana_cost'],
+            'type_line': map['type_line'],
+            'oracle_text': map['oracle_text'],
+            'colors': map['colors'],
+            'color_identity': map['color_identity'],
+            'image_url': imageUrl,
+            'set_code': map['set_code'],
+            if (hasSets) 'set_name': map['set_name'],
+            if (hasSets)
+              'set_release_date':
+                  (map['set_release_date'] as DateTime?)
+                      ?.toIso8601String()
+                      .split('T')
+                      .first,
+            'rarity': map['rarity'],
+            'is_reserved': map['is_reserved'] == true,
+            'collector_number': map['collector_number'],
+            'foil': map['foil'],
+          };
+        }).toList();
 
     final payload = {
       'data': cards,
@@ -93,8 +97,11 @@ Future<Response> onRequest(RequestContext context) async {
       'total_returned': cards.length,
     };
 
-    EndpointCache.instance
-        .set(cacheKey, payload, ttl: const Duration(seconds: 45));
+    EndpointCache.instance.set(
+      cacheKey,
+      payload,
+      ttl: const Duration(seconds: 45),
+    );
     return Response.json(body: payload);
   } catch (e) {
     print('[ERROR] Erro interno ao buscar cartas: $e');
@@ -112,11 +119,15 @@ class _QueryBuilder {
 }
 
 _QueryBuilder _buildQuery(
-    String? nameFilter, String? setFilter, int limit, int offset,
-    {required bool includeSetInfo,
-    required bool includeIdentityColumns,
-    bool deduplicate = false,
-    bool includeTokens = false}) {
+  String? nameFilter,
+  String? setFilter,
+  int limit,
+  int offset, {
+  required bool includeSetInfo,
+  required bool includeIdentityColumns,
+  bool deduplicate = false,
+  bool includeTokens = false,
+}) {
   final params = <String, dynamic>{};
   final conditions = <String>[];
 
@@ -134,8 +145,9 @@ _QueryBuilder _buildQuery(
       CASE 
         $tokenPriority
         WHEN LOWER(c.name) = LOWER(@exact_name) THEN 0
-        WHEN c.type_line ILIKE 'Basic Land%' AND LOWER(c.name) = LOWER(@exact_name) THEN 1
-        WHEN c.type_line ILIKE 'Basic Land%' THEN 2
+        WHEN COALESCE(c.type_line, '') ~* '(^|[^[:alpha:]])basic[[:space:]]+(snow[[:space:]]+)?land([^[:alpha:]]|\$)'
+             AND LOWER(c.name) = LOWER(@exact_name) THEN 1
+        WHEN COALESCE(c.type_line, '') ~* '(^|[^[:alpha:]])basic[[:space:]]+(snow[[:space:]]+)?land([^[:alpha:]]|\$)' THEN 2
         WHEN LOWER(c.name) LIKE LOWER(@exact_name) || '%' THEN 3
         ELSE 4
       END, c.name ASC
@@ -157,8 +169,9 @@ _QueryBuilder _buildQuery(
   if (deduplicate) {
     // Deduplicar por (name, LOWER(set_code)) para evitar variantes e inconsistências de case
     // Nota: para dedup com priorização, fazemos ORDER BY com CASE no select externo
-    sql = includeSetInfo
-        ? '''
+    sql =
+        includeSetInfo
+            ? '''
           SELECT * FROM (
             SELECT DISTINCT ON (c.name, LOWER(c.set_code))
               c.id, c.scryfall_id, c.name, c.mana_cost, c.type_line,
@@ -177,15 +190,16 @@ _QueryBuilder _buildQuery(
             CASE 
               ${includeTokens ? "WHEN type_line ILIKE '%Token%' THEN -1" : ''}
               WHEN LOWER(name) = LOWER(@exact_name) THEN 0
-              WHEN type_line ILIKE 'Basic Land%' AND LOWER(name) = LOWER(@exact_name) THEN 1
-              WHEN type_line ILIKE 'Basic Land%' THEN 2
+              WHEN COALESCE(type_line, '') ~* '(^|[^[:alpha:]])basic[[:space:]]+(snow[[:space:]]+)?land([^[:alpha:]]|\$)'
+                   AND LOWER(name) = LOWER(@exact_name) THEN 1
+              WHEN COALESCE(type_line, '') ~* '(^|[^[:alpha:]])basic[[:space:]]+(snow[[:space:]]+)?land([^[:alpha:]]|\$)' THEN 2
               WHEN LOWER(name) LIKE LOWER(@exact_name) || '%' THEN 3
               ELSE 4
             END, name ASC
           ''' : 'name ASC, set_code ASC'}
           LIMIT @limit OFFSET @offset
         '''
-        : '''
+            : '''
           SELECT * FROM (
             SELECT DISTINCT ON (c.name, LOWER(c.set_code))
               c.id, c.scryfall_id, c.name, c.mana_cost, c.type_line,
@@ -201,8 +215,9 @@ _QueryBuilder _buildQuery(
             CASE 
               ${includeTokens ? "WHEN type_line ILIKE '%Token%' THEN -1" : ''}
               WHEN LOWER(name) = LOWER(@exact_name) THEN 0
-              WHEN type_line ILIKE 'Basic Land%' AND LOWER(name) = LOWER(@exact_name) THEN 1
-              WHEN type_line ILIKE 'Basic Land%' THEN 2
+              WHEN COALESCE(type_line, '') ~* '(^|[^[:alpha:]])basic[[:space:]]+(snow[[:space:]]+)?land([^[:alpha:]]|\$)'
+                   AND LOWER(name) = LOWER(@exact_name) THEN 1
+              WHEN COALESCE(type_line, '') ~* '(^|[^[:alpha:]])basic[[:space:]]+(snow[[:space:]]+)?land([^[:alpha:]]|\$)' THEN 2
               WHEN LOWER(name) LIKE LOWER(@exact_name) || '%' THEN 3
               ELSE 4
             END, name ASC
@@ -211,8 +226,9 @@ _QueryBuilder _buildQuery(
         ''';
   } else {
     // Query normal sem deduplicação
-    sql = includeSetInfo
-        ? '''
+    sql =
+        includeSetInfo
+            ? '''
           SELECT
             c.*,
             s.name AS set_name,
@@ -223,7 +239,7 @@ _QueryBuilder _buildQuery(
           ORDER BY $orderExpression
           LIMIT @limit OFFSET @offset
         '''
-        : '''
+            : '''
           SELECT c.* FROM cards c
           $whereClause
           ORDER BY $orderExpression

@@ -13,12 +13,45 @@ import '../lib/database.dart';
 import '../routes/ai/optimize/index.dart' as optimize_route;
 
 const _defaultApiBaseUrl = 'http://127.0.0.1:8080';
+const _liveMutationApprovalEnvironment = 'MANALOOM_CONFIRM_LIVE_MUTATIONS';
+const _explicitApprovalPhrase = 'I_HAVE_EXPLICIT_APPROVAL';
 const _artifactDirPath = 'test/artifacts/optimization_validation_three_decks';
 const _summaryJsonPath =
     'test/artifacts/optimization_validation_three_decks/latest_summary.json';
 const _summaryMdPath = '../RELATORIO_OTIMIZACAO_3_DECKS_2026-03-16.md';
 const _minimumAcceptedOptimizations = 1;
 late final String? _corpusPath;
+
+class ThreeCommanderRuntimeConfig {
+  const ThreeCommanderRuntimeConfig({required this.apply});
+
+  final bool apply;
+
+  bool get dryRun => !apply;
+
+  factory ThreeCommanderRuntimeConfig.parse(List<String> args) {
+    var apply = false;
+    var explicitDryRun = false;
+    for (final arg in args) {
+      switch (arg) {
+        case '--apply':
+          apply = true;
+        case '--dry-run':
+          explicitDryRun = true;
+        case '--help':
+        case '-h':
+          _printUsage();
+          exit(0);
+        default:
+          throw ArgumentError('Argumento desconhecido: $arg');
+      }
+    }
+    if (apply && explicitDryRun) {
+      throw ArgumentError('Use apenas um modo: --apply ou --dry-run.');
+    }
+    return ThreeCommanderRuntimeConfig(apply: apply);
+  }
+}
 
 class SourceDeckCandidate {
   SourceDeckCandidate({
@@ -45,23 +78,24 @@ class SourceDeckCandidate {
     final detected = _normalizeArchetype(sourceArchetype);
     if (detected != null) return detected;
     final analysis =
-        optimize_route.DeckArchetypeAnalyzer(cards, commanderColors)
-            .generateAnalysis();
-    final byAnalysis =
-        _normalizeArchetype(analysis['detected_archetype']?.toString());
+        optimize_route.DeckArchetypeAnalyzer(
+          cards,
+          commanderColors,
+        ).generateAnalysis();
+    final byAnalysis = _normalizeArchetype(
+      analysis['detected_archetype']?.toString(),
+    );
     return byAnalysis ?? 'midrange';
   }
 
   int get totalCards => cards.fold<int>(
-      0, (sum, card) => sum + ((card['quantity'] as int?) ?? 0));
+    0,
+    (sum, card) => sum + ((card['quantity'] as int?) ?? 0),
+  );
 }
 
 class ValidationCorpusEntry {
-  ValidationCorpusEntry({
-    required this.deckId,
-    this.label,
-    this.note,
-  });
+  ValidationCorpusEntry({required this.deckId, this.label, this.note});
 
   final String deckId;
   final String? label;
@@ -130,52 +164,54 @@ class DeckRunResult {
   bool get passed => failedChecks.isEmpty;
 
   Map<String, dynamic> toJson() => {
-        'result_kind': resultKind,
-        'commander_name': commanderName,
-        'source_deck_id': sourceDeckId,
-        'source_deck_name': sourceDeckName,
-        'clone_deck_id': cloneDeckId,
-        'archetype': archetype,
-        'bracket': bracket,
-        'optimize_status': optimizeStatus,
-        'optimize_mode': optimizeMode,
-        'saved_artifact_path': savedArtifactPath,
-        'saved_deck_valid': savedDeckValid,
-        'local_validation_score': localValidationScore,
-        'local_validation_verdict': localValidationVerdict,
-        'response_validation_score': responseValidationScore,
-        'response_validation_verdict': responseValidationVerdict,
-        'before_average_cmc': beforeAverageCmc,
-        'after_average_cmc': afterAverageCmc,
-        'before_mana_assessment': beforeManaAssessment,
-        'after_mana_assessment': afterManaAssessment,
-        'before_interaction': beforeInteraction,
-        'after_interaction': afterInteraction,
-        'before_consistency': beforeConsistency,
-        'after_consistency': afterConsistency,
-        'expected_checks': expectedChecks,
-        'failed_checks': failedChecks,
-        'warnings': warnings,
-        'passed': passed,
-      };
+    'result_kind': resultKind,
+    'commander_name': commanderName,
+    'source_deck_id': sourceDeckId,
+    'source_deck_name': sourceDeckName,
+    'clone_deck_id': cloneDeckId,
+    'archetype': archetype,
+    'bracket': bracket,
+    'optimize_status': optimizeStatus,
+    'optimize_mode': optimizeMode,
+    'saved_artifact_path': savedArtifactPath,
+    'saved_deck_valid': savedDeckValid,
+    'local_validation_score': localValidationScore,
+    'local_validation_verdict': localValidationVerdict,
+    'response_validation_score': responseValidationScore,
+    'response_validation_verdict': responseValidationVerdict,
+    'before_average_cmc': beforeAverageCmc,
+    'after_average_cmc': afterAverageCmc,
+    'before_mana_assessment': beforeManaAssessment,
+    'after_mana_assessment': afterManaAssessment,
+    'before_interaction': beforeInteraction,
+    'after_interaction': afterInteraction,
+    'before_consistency': beforeConsistency,
+    'after_consistency': afterConsistency,
+    'expected_checks': expectedChecks,
+    'failed_checks': failedChecks,
+    'warnings': warnings,
+    'passed': passed,
+  };
 }
 
-Future<void> main() async {
+Future<void> main(List<String> args) async {
+  final config = ThreeCommanderRuntimeConfig.parse(args);
+  if (config.apply && !_hasLiveMutationApproval()) {
+    stderr.writeln(
+      'BLOCKED: o runtime de tres commanders mutavel exige aprovacao live '
+      'explicita.',
+    );
+    stderr.writeln(
+      'Defina $_liveMutationApprovalEnvironment=$_explicitApprovalPhrase '
+      'somente para a execucao autorizada.',
+    );
+    exitCode = 2;
+    return;
+  }
+
   final env = DotEnv(includePlatformEnvironment: true, quiet: true)..load();
   final apiBaseUrl = env['TEST_API_BASE_URL'] ?? _defaultApiBaseUrl;
   _corpusPath = _resolveCorpusPath(env['VALIDATION_CORPUS_PATH']);
-
-  final artifactsDir = Directory(_artifactDirPath);
-  if (!artifactsDir.existsSync()) {
-    artifactsDir.createSync(recursive: true);
-  }
-
-  final serverOk = await _ensureServerIsReachable(apiBaseUrl);
-  if (!serverOk) {
-    stderr.writeln('Servidor inacessivel em $apiBaseUrl.');
-    exitCode = 1;
-    return;
-  }
 
   final db = Database();
   await db.connect();
@@ -188,13 +224,15 @@ Future<void> main() async {
   final pool = db.connection;
 
   try {
-    final token = await _getOrCreateAuthToken(apiBaseUrl);
     final candidates = await _loadSourceCandidates(pool);
     final corpusEntries =
-        _corpusPath != null ? _loadCorpusEntries(_corpusPath!) : const <ValidationCorpusEntry>[];
-    final selected = corpusEntries.isNotEmpty
-        ? _selectCandidatesFromCorpus(candidates, corpusEntries)
-        : _selectThreeCandidates(candidates);
+        _corpusPath != null
+            ? _loadCorpusEntries(_corpusPath!)
+            : const <ValidationCorpusEntry>[];
+    final selected =
+        corpusEntries.isNotEmpty
+            ? _selectCandidatesFromCorpus(candidates, corpusEntries)
+            : _selectThreeCandidates(candidates);
 
     if (selected.length < 3) {
       stderr.writeln(
@@ -204,13 +242,37 @@ Future<void> main() async {
       return;
     }
 
+    if (config.dryRun) {
+      print(
+        'Dry-run finalizado: ${selected.length} deck(s) Commander seriam '
+        'validados. Nenhuma autenticacao, criacao/alteracao de deck, optimize '
+        'ou validate foi executado.',
+      );
+      return;
+    }
+
+    final serverOk = await _ensureServerIsReachable(apiBaseUrl);
+    if (!serverOk) {
+      stderr.writeln('Servidor inacessivel em $apiBaseUrl.');
+      exitCode = 1;
+      return;
+    }
+
+    final artifactsDir = Directory(_artifactDirPath);
+    if (!artifactsDir.existsSync()) {
+      artifactsDir.createSync(recursive: true);
+    }
+
+    final token = await _getOrCreateAuthToken(apiBaseUrl);
+
     final results = <DeckRunResult>[];
     final runStartedAt = DateTime.now().toIso8601String();
 
     for (final candidate in selected) {
       print('');
       print(
-          '=== ${candidate.commanderName} | ${candidate.resolvedArchetype} ===');
+        '=== ${candidate.commanderName} | ${candidate.resolvedArchetype} ===',
+      );
       final result = await _runOptimizationForDeck(
         apiBaseUrl: apiBaseUrl,
         token: token,
@@ -242,9 +304,9 @@ Future<void> main() async {
       'results': results.map((r) => r.toJson()).toList(),
     };
 
-    await File(_summaryJsonPath).writeAsString(
-      const JsonEncoder.withIndent('  ').convert(summary),
-    );
+    await File(
+      _summaryJsonPath,
+    ).writeAsString(const JsonEncoder.withIndent('  ').convert(summary));
     await File(_summaryMdPath).writeAsString(_buildMarkdownReport(summary));
 
     print('');
@@ -269,6 +331,24 @@ Future<void> main() async {
   }
 }
 
+bool _hasLiveMutationApproval() =>
+    Platform.environment[_liveMutationApprovalEnvironment] ==
+    _explicitApprovalPhrase;
+
+void _printUsage() {
+  print('''
+Uso: dart run bin/run_three_commander_optimization_validation.dart [--dry-run|--apply]
+
+Modo padrao:
+  --dry-run   Faz somente o preflight PostgreSQL read-only dos tres decks.
+
+Escrita real:
+  --apply     Autentica, cria/altera decks pela API, otimiza e valida.
+              Exige $_liveMutationApprovalEnvironment=$_explicitApprovalPhrase
+              antes de carregar ambiente, conectar ao banco ou tocar a API.
+''');
+}
+
 String? _resolveCorpusPath(String? raw) {
   final normalized = raw?.trim() ?? '';
   if (normalized.isEmpty) return null;
@@ -285,7 +365,10 @@ List<ValidationCorpusEntry> _loadCorpusEntries(String path) {
   final rawEntries = switch (decoded) {
     {'decks': final List decks} => decks,
     final List decks => decks,
-    _ => throw StateError('Corpus invalido em $path: esperado lista ou objeto com "decks".'),
+    _ =>
+      throw StateError(
+        'Corpus invalido em $path: esperado lista ou objeto com "decks".',
+      ),
   };
 
   final entries = <ValidationCorpusEntry>[];
@@ -370,10 +453,7 @@ Future<String> _getOrCreateAuthToken(String apiBaseUrl) async {
     return http.post(
       Uri.parse('$apiBaseUrl/auth/login'),
       headers: {'Content-Type': 'application/json'},
-      body: jsonEncode({
-        'email': email,
-        'password': password,
-      }),
+      body: jsonEncode({'email': email, 'password': password}),
     );
   }
 
@@ -485,7 +565,9 @@ Future<List<SourceDeckCandidate>> _loadSourceCandidates(Pool pool) async {
 }
 
 Future<List<Map<String, dynamic>>> _loadDeckCards(
-    Pool pool, String deckId) async {
+  Pool pool,
+  String deckId,
+) async {
   final result = await pool.execute(
     Sql.named('''
       SELECT
@@ -609,7 +691,8 @@ Future<DeckRunResult> _runOptimizationForDeck({
   if (optimizeResponse.statusCode != 200) {
     final qualityError = optimizeBody['quality_error'] as Map<String, dynamic>?;
     final qualityCode = qualityError?['code']?.toString() ?? '';
-    final protectedRejection = optimizeResponse.statusCode == 422 &&
+    final protectedRejection =
+        optimizeResponse.statusCode == 422 &&
         {
           'OPTIMIZE_NEEDS_REPAIR',
           'OPTIMIZE_NO_SAFE_SWAPS',
@@ -642,14 +725,16 @@ Future<DeckRunResult> _runOptimizationForDeck({
       afterInteraction: 0,
       beforeConsistency: 0,
       afterConsistency: 0,
-      expectedChecks: protectedRejection
-          ? const [
-              'o backend recusou a otimizacao insegura em vez de retornar sucesso ruim'
-            ]
-          : const [],
-      failedChecks: protectedRejection
-          ? const []
-          : ['POST /ai/optimize retornou ${optimizeResponse.statusCode}'],
+      expectedChecks:
+          protectedRejection
+              ? const [
+                'o backend recusou a otimizacao insegura em vez de retornar sucesso ruim',
+              ]
+              : const [],
+      failedChecks:
+          protectedRejection
+              ? const []
+              : ['POST /ai/optimize retornou ${optimizeResponse.statusCode}'],
       warnings: [
         if (protectedRejection)
           'Rejeicao protegida pelo gate de qualidade: ${qualityError?['message'] ?? qualityCode}',
@@ -671,15 +756,16 @@ Future<DeckRunResult> _runOptimizationForDeck({
     Uri.parse('$apiBaseUrl/decks/$cloneDeckId'),
     headers: _jsonHeaders(token),
     body: jsonEncode({
-      'cards': optimizedCards
-          .map(
-            (card) => {
-              'card_id': card['card_id'],
-              'quantity': card['quantity'],
-              if (card['is_commander'] == true) 'is_commander': true,
-            },
-          )
-          .toList(),
+      'cards':
+          optimizedCards
+              .map(
+                (card) => {
+                  'card_id': card['card_id'],
+                  'quantity': card['quantity'],
+                  if (card['is_commander'] == true) 'is_commander': true,
+                },
+              )
+              .toList(),
     }),
   );
 
@@ -696,12 +782,16 @@ Future<DeckRunResult> _runOptimizationForDeck({
     responseBody: const <String, dynamic>{},
   );
 
-  final preAnalysis = optimize_route.DeckArchetypeAnalyzer(
-          enrichedOriginalCards, candidate.commanderColors)
-      .generateAnalysis();
-  final postAnalysis = optimize_route.DeckArchetypeAnalyzer(
-          optimizedCards, candidate.commanderColors)
-      .generateAnalysis();
+  final preAnalysis =
+      optimize_route.DeckArchetypeAnalyzer(
+        enrichedOriginalCards,
+        candidate.commanderColors,
+      ).generateAnalysis();
+  final postAnalysis =
+      optimize_route.DeckArchetypeAnalyzer(
+        optimizedCards,
+        candidate.commanderColors,
+      ).generateAnalysis();
 
   final env = DotEnv(includePlatformEnvironment: true, quiet: true)..load();
   final validator = OptimizationValidator(openAiKey: env['OPENAI_API_KEY']);
@@ -714,8 +804,9 @@ Future<DeckRunResult> _runOptimizationForDeck({
     archetype: candidate.resolvedArchetype,
   );
 
-  final responseValidation = (optimizeBody['post_analysis']
-      as Map<String, dynamic>?)?['validation'] as Map<String, dynamic>?;
+  final responseValidation =
+      (optimizeBody['post_analysis'] as Map<String, dynamic>?)?['validation']
+          as Map<String, dynamic>?;
 
   final expectedChecks = <String>[];
   final failedChecks = <String>[];
@@ -745,12 +836,18 @@ Future<DeckRunResult> _runOptimizationForDeck({
 
   expectCheck('deck final mantem 100 cartas', finalCardCount == 100);
   expectCheck('deck final mantem exatamente 1 comandante', commanderCount == 1);
-  expectCheck('PUT /decks/:id para salvar resultado retornou sucesso',
-      putResponse.statusCode == 200);
-  expectCheck('POST /decks/:id/validate aprovou o deck salvo',
-      validateResponse.statusCode == 200);
-  expectCheck('Validation local fechou como aprovado',
-      localValidation.verdict == 'aprovado');
+  expectCheck(
+    'PUT /decks/:id para salvar resultado retornou sucesso',
+    putResponse.statusCode == 200,
+  );
+  expectCheck(
+    'POST /decks/:id/validate aprovou o deck salvo',
+    validateResponse.statusCode == 200,
+  );
+  expectCheck(
+    'Validation local fechou como aprovado',
+    localValidation.verdict == 'aprovado',
+  );
   expectCheck('Validation local score >= 65', localValidation.score >= 65);
   expectCheck(
     'Validation retornada pela rota fechou como aprovado',
@@ -767,8 +864,10 @@ Future<DeckRunResult> _runOptimizationForDeck({
 
   switch (candidate.resolvedArchetype) {
     case 'aggro':
-      expectCheck('Aggro reduz ou mantem a curva media',
-          afterAverageCmc <= beforeAverageCmc);
+      expectCheck(
+        'Aggro reduz ou mantem a curva media',
+        afterAverageCmc <= beforeAverageCmc,
+      );
       expectCheck(
         'Aggro melhora turn2 play rate',
         localValidation.monteCarlo.after.turn2PlayRate >=
@@ -786,8 +885,10 @@ Future<DeckRunResult> _runOptimizationForDeck({
       );
       break;
     case 'midrange':
-      expectCheck('Midrange reduz ou mantem a curva media',
-          afterAverageCmc <= beforeAverageCmc + 0.05);
+      expectCheck(
+        'Midrange reduz ou mantem a curva media',
+        afterAverageCmc <= beforeAverageCmc + 0.05,
+      );
       expectCheck(
         'Midrange preserva ramp/removal',
         (localValidation.functional.roleDelta['ramp'] ?? 0) >= 0 &&
@@ -855,15 +956,16 @@ Future<String> _createDeckClone({
       'format': 'commander',
       'description': 'Deck clone para validacao real de optimize',
       'is_public': false,
-      'cards': candidate.cards
-          .map(
-            (card) => {
-              'card_id': card['card_id'],
-              'quantity': card['quantity'],
-              if (card['is_commander'] == true) 'is_commander': true,
-            },
-          )
-          .toList(),
+      'cards':
+          candidate.cards
+              .map(
+                (card) => {
+                  'card_id': card['card_id'],
+                  'quantity': card['quantity'],
+                  if (card['is_commander'] == true) 'is_commander': true,
+                },
+              )
+              .toList(),
     }),
   );
 
@@ -941,9 +1043,9 @@ Future<String> _writeDeckArtifact({
 }) async {
   final slug = _slugify(commanderName);
   final path = '$_artifactDirPath/$slug.json';
-  await File(path).writeAsString(
-    const JsonEncoder.withIndent('  ').convert(payload),
-  );
+  await File(
+    path,
+  ).writeAsString(const JsonEncoder.withIndent('  ').convert(payload));
   return path;
 }
 
@@ -957,9 +1059,10 @@ Future<List<Map<String, dynamic>>> _applyRecommendations({
 
   final removalsDetailed =
       (responseBody['removals_detailed'] as List?)?.whereType<Map>().toList() ??
-          const <Map>[];
+      const <Map>[];
 
-  final additionsDetailed = (responseBody['additions_detailed'] as List?)
+  final additionsDetailed =
+      (responseBody['additions_detailed'] as List?)
           ?.whereType<Map>()
           .toList() ??
       const <Map>[];
@@ -1013,21 +1116,23 @@ Future<List<Map<String, dynamic>>> _applyRecommendations({
     });
   }
 
-  final missingCardIds = next
-      .where((card) {
-        if (!(card['card_id']?.toString().isNotEmpty ?? false)) return false;
-        final typeLine = (card['type_line'] as String?) ?? '';
-        final oracleText = (card['oracle_text'] as String?) ?? '';
-        final manaCost = (card['mana_cost'] as String?) ?? '';
+  final missingCardIds =
+      next
+          .where((card) {
+            if (!(card['card_id']?.toString().isNotEmpty ?? false))
+              return false;
+            final typeLine = (card['type_line'] as String?) ?? '';
+            final oracleText = (card['oracle_text'] as String?) ?? '';
+            final manaCost = (card['mana_cost'] as String?) ?? '';
 
-        // Para a validação local (Monte Carlo), precisamos de mana_cost/cmc coerentes.
-        // Terrenos podem ter mana_cost vazio sem prejuízo, mas mantemos a consulta
-        // quando algum campo essencial está ausente.
-        return typeLine.isEmpty || oracleText.isEmpty || manaCost.isEmpty;
-      })
-      .map((card) => card['card_id'].toString())
-      .toSet()
-      .toList();
+            // Para a validação local (Monte Carlo), precisamos de mana_cost/cmc coerentes.
+            // Terrenos podem ter mana_cost vazio sem prejuízo, mas mantemos a consulta
+            // quando algum campo essencial está ausente.
+            return typeLine.isEmpty || oracleText.isEmpty || manaCost.isEmpty;
+          })
+          .map((card) => card['card_id'].toString())
+          .toSet()
+          .toList();
 
   if (missingCardIds.isNotEmpty) {
     final result = await pool.execute(
@@ -1130,13 +1235,13 @@ String _slugify(String value) {
 }
 
 Map<String, String> _authHeaders(String token) => {
-      'Authorization': 'Bearer $token',
-    };
+  'Authorization': 'Bearer $token',
+};
 
 Map<String, String> _jsonHeaders(String token) => {
-      'Authorization': 'Bearer $token',
-      'Content-Type': 'application/json',
-    };
+  'Authorization': 'Bearer $token',
+  'Content-Type': 'application/json',
+};
 
 String _extractMessage(Map<String, dynamic> body) {
   return body['error']?.toString() ??
@@ -1164,28 +1269,36 @@ String _buildMarkdownReport(Map<String, dynamic> summary) {
   }
 
   String formatPair(
-      Map<String, dynamic> result, String beforeKey, String afterKey) {
+    Map<String, dynamic> result,
+    String beforeKey,
+    String afterKey,
+  ) {
     final resultKind = result['result_kind']?.toString() ?? '';
     if (resultKind == 'protected_rejection') return 'n/d';
     return '${result[beforeKey]} -> ${result[afterKey]}';
   }
 
-  final buffer = StringBuffer()
-    ..writeln(
-      '# Relatorio de Otimizacao Real - ${summary['total']} Decks Commander',
-    )
-    ..writeln()
-    ..writeln('- Gerado em: `${summary['generated_at']}`')
-    ..writeln('- API: `${summary['api_base_url']}`')
-    ..writeln('- Artefatos: `${summary['artifact_dir']}`')
-    ..writeln('- Total: `${summary['total']}`')
-    ..writeln('- Otimizacoes aceitas: `${summary['accepted_optimizations']}`')
-    ..writeln('- Rejeicoes protegidas: `${summary['protected_rejections']}`')
-    ..writeln('- Passaram: `${summary['passed']}`')
-    ..writeln('- Falharam: `${summary['failed']}`')
-    ..writeln()
-    ..writeln('## Resultado por deck')
-    ..writeln();
+  final buffer =
+      StringBuffer()
+        ..writeln(
+          '# Relatorio de Otimizacao Real - ${summary['total']} Decks Commander',
+        )
+        ..writeln()
+        ..writeln('- Gerado em: `${summary['generated_at']}`')
+        ..writeln('- API: `${summary['api_base_url']}`')
+        ..writeln('- Artefatos: `${summary['artifact_dir']}`')
+        ..writeln('- Total: `${summary['total']}`')
+        ..writeln(
+          '- Otimizacoes aceitas: `${summary['accepted_optimizations']}`',
+        )
+        ..writeln(
+          '- Rejeicoes protegidas: `${summary['protected_rejections']}`',
+        )
+        ..writeln('- Passaram: `${summary['passed']}`')
+        ..writeln('- Falharam: `${summary['failed']}`')
+        ..writeln()
+        ..writeln('## Resultado por deck')
+        ..writeln();
 
   for (final result in results) {
     buffer
@@ -1200,19 +1313,23 @@ String _buildMarkdownReport(Map<String, dynamic> summary) {
       ..writeln('- Validation local: `${formatValidation(result, true)}`')
       ..writeln('- Validation da rota: `${formatValidation(result, false)}`')
       ..writeln(
-          '- CMC medio: `${formatPair(result, 'before_average_cmc', 'after_average_cmc')}`')
+        '- CMC medio: `${formatPair(result, 'before_average_cmc', 'after_average_cmc')}`',
+      )
       ..writeln(
-          '- Interacao: `${formatPair(result, 'before_interaction', 'after_interaction')}`')
+        '- Interacao: `${formatPair(result, 'before_interaction', 'after_interaction')}`',
+      )
       ..writeln(
-          '- Consistencia: `${formatPair(result, 'before_consistency', 'after_consistency')}`')
+        '- Consistencia: `${formatPair(result, 'before_consistency', 'after_consistency')}`',
+      )
       ..writeln('- Artifact: `${result['saved_artifact_path']}`')
       ..writeln(
-          '- Status final: `${result['passed'] == true ? 'PASSOU' : 'FALHOU'}`')
+        '- Status final: `${result['passed'] == true ? 'PASSOU' : 'FALHOU'}`',
+      )
       ..writeln();
 
     final failedChecks =
         (result['failed_checks'] as List?)?.map((item) => '$item').toList() ??
-            const <String>[];
+        const <String>[];
     if (failedChecks.isNotEmpty) {
       buffer.writeln('Falhas:');
       for (final item in failedChecks) {
@@ -1223,7 +1340,7 @@ String _buildMarkdownReport(Map<String, dynamic> summary) {
 
     final warnings =
         (result['warnings'] as List?)?.map((item) => '$item').toList() ??
-            const <String>[];
+        const <String>[];
     if (warnings.isNotEmpty) {
       buffer.writeln('Avisos:');
       for (final item in warnings.take(12)) {

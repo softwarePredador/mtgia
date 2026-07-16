@@ -2,6 +2,9 @@ import 'dart:io';
 
 import 'package:test/test.dart';
 
+import '../bin/run_three_commander_optimization_validation.dart'
+    as three_commander_validation;
+
 void main() {
   final repoRoot = Directory.current.parent.path;
 
@@ -113,16 +116,18 @@ void main() {
       expect(source, contains('LOWER(username) = LOWER'));
       expect(source, contains('"measurement_scope"'));
       expect(source, contains('"limitation"'));
-      expect(source, contains('dart_frog dev'));
-      expect(source, contains('script -q /dev/null dart_frog dev'));
+      expect(source, contains('dart_frog build'));
+      expect(source, contains('dart run build/bin/server.dart'));
+      expect(source, contains('server_build.log'));
+      expect(source, contains('InternetAddress.loopbackIPv4'));
       expect(source, contains(r'assert_listener_closed "$PORT"'));
       expect(source, contains('SERVER_LISTENER_PIDS='));
       expect(source, contains('capture_listener_pids'));
       expect(source, contains('collect_process_tree_pids'));
       expect(source, contains('kill -KILL'));
       expect(source, contains('"runtime_cleanup"'));
-      expect(source, contains('--hostname 127.0.0.1'));
-      expect(source, isNot(contains('dart run build/bin/server.dart')));
+      expect(source, contains(r'assert_loopback_listener "$PORT"'));
+      expect(source, isNot(contains('dart_frog dev')));
 
       for (final table in const [
         'ai_optimize_cache',
@@ -186,8 +191,14 @@ void main() {
         expect(listenerCheck, greaterThan(runnerStatus));
         expect(cleanup, greaterThan(listenerCheck));
         expect(audit, greaterThan(cleanup));
-        expect(isolatedSource, contains('--hostname 127.0.0.1'));
-        expect(isolatedSource, contains('script -q /dev/null dart_frog dev'));
+        expect(isolatedSource, contains('dart_frog build'));
+        expect(isolatedSource, contains('dart run build/bin/server.dart'));
+        expect(
+          isolatedSource,
+          contains('final address = InternetAddress.loopbackIPv4;'),
+        );
+        expect(isolatedSource, isNot(contains('dart_frog dev')));
+        expect(isolatedSource, isNot(contains('--dart-vm-service-port')));
         expect(isolatedSource, contains('assert_loopback_listener'));
         expect(isolatedSource, contains('assert_listener_closed'));
         expect(isolatedSource, contains('API_LISTENER_PIDS='));
@@ -243,6 +254,8 @@ void main() {
     test('E2E suite aggregates Battle isolated execution or a real skip', () {
       final source = scriptSource('scripts/manaloom_e2e_suite.sh');
       final runner = source.indexOf('run_battle_product_e2e()');
+      final functionEnd = source.indexOf('\n}\n', runner);
+      final battleFunction = source.substring(runner, functionEnd);
       final invocation = source.indexOf(
         'manaloom_battle_product_gate.sh\\" --isolated-e2e',
         runner,
@@ -259,6 +272,54 @@ void main() {
       expect(skipLabel, greaterThan(skip));
       expect(source, contains('MANALOOM_RUN_MUTATING_BATTLE_PRODUCT_E2E'));
       expect(source, contains('record_step "SKIP"'));
+      expect(
+        battleFunction,
+        contains(r'${MANALOOM_RUN_MUTATING_BATTLE_PRODUCT_E2E:-0}'),
+      );
+      expect(battleFunction, isNot(contains('E2E_PROFILE')));
+      expect(
+        battleFunction,
+        isNot(contains('MANALOOM_RUN_MUTATING_RESOLUTION_E2E')),
+      );
+    });
+
+    test('E2E suite pins ramp, foundation and rules safety contracts', () {
+      final source = scriptSource('scripts/manaloom_e2e_suite.sh');
+      final runner = source.indexOf('run_ramp_and_data_foundation_contracts()');
+      final functionEnd = source.indexOf('\n}\n', runner);
+      final focusedFunction = source.substring(runner, functionEnd);
+
+      expect(runner, greaterThanOrEqualTo(0));
+      expect(
+        source.indexOf('run_ramp_and_data_foundation_contracts\n', runner),
+        greaterThan(functionEnd),
+      );
+      for (final contract in const [
+        'test/ramp_family_classifier_test.dart',
+        'test/optimization_ramp_profile_test.dart',
+        'test/optimization_quality_gate_test.dart',
+        'test/optimization_validator_test.dart',
+        'test/ramp_floor_consumer_contract_test.dart',
+        'test/functional_card_tags_test.dart',
+        'test/optimize_filler_loader_support_test.dart',
+        'test/optimize_functional_role_support_test.dart',
+        'test/optimize_removal_candidate_support_test.dart',
+        'test/optimize_swap_candidate_support_test.dart',
+        'test/candidate_quality_data_foundation_preflight_test.dart',
+        'test/candidate_quality_data_foundation_source_test.dart',
+        'test/semantic_tag_query_contract_test.dart',
+        'test/sync_rules_safety_test.dart',
+        'test/magic_rules_source_test.dart',
+        'test_scryfall_classifier_multi_tags.py',
+      ]) {
+        expect(focusedFunction, contains(contract), reason: contract);
+      }
+      expect(
+        focusedFunction,
+        contains('semantic_layer_v2_backfill*_test.dart'),
+      );
+      expect(focusedFunction, contains('RUN_INTEGRATION_TESTS=0'));
+      expect(focusedFunction, isNot(contains('--apply')));
     });
 
     test('deterministic full gates cannot auto-enable live tests', () {
@@ -366,5 +427,138 @@ void main() {
         );
       }
     });
+
+    test('three-commander runtime is dry-run by default', () {
+      expect(
+        three_commander_validation.ThreeCommanderRuntimeConfig.parse(
+          const [],
+        ).dryRun,
+        isTrue,
+      );
+      expect(
+        three_commander_validation.ThreeCommanderRuntimeConfig.parse(const [
+          '--dry-run',
+        ]).dryRun,
+        isTrue,
+      );
+      expect(
+        three_commander_validation.ThreeCommanderRuntimeConfig.parse(const [
+          '--apply',
+        ]).apply,
+        isTrue,
+      );
+      expect(
+        () => three_commander_validation.ThreeCommanderRuntimeConfig.parse(
+          const ['--apply', '--dry-run'],
+        ),
+        throwsArgumentError,
+      );
+      expect(
+        () => three_commander_validation.ThreeCommanderRuntimeConfig.parse(
+          const ['--unknown'],
+        ),
+        throwsArgumentError,
+      );
+    });
+
+    test('Dart deck runtime apply guards are before environment and I/O', () {
+      final commanderSource = scriptSource(
+        'server/bin/run_commander_only_optimization_validation.dart',
+      );
+      final commanderMain = commanderSource.substring(
+        commanderSource.indexOf('Future<void> main(List<String> args)'),
+      );
+      final commanderGuard = commanderMain.indexOf(
+        'if (config.apply && !_hasLiveMutationApproval())',
+      );
+      expect(commanderGuard, greaterThanOrEqualTo(0));
+      for (final firstExternalOperation in const [
+        'DotEnv(',
+        'Directory(artifactDirPath)',
+        '_validateApiBaseUrl(apiBaseUrl)',
+        'Database()',
+      ]) {
+        expect(
+          commanderGuard,
+          lessThan(commanderMain.indexOf(firstExternalOperation)),
+          reason: firstExternalOperation,
+        );
+      }
+
+      final threeSource = scriptSource(
+        'server/bin/run_three_commander_optimization_validation.dart',
+      );
+      final threeMain = threeSource.substring(
+        threeSource.indexOf('Future<void> main(List<String> args)'),
+      );
+      final threeGuard = threeMain.indexOf(
+        'if (config.apply && !_hasLiveMutationApproval())',
+      );
+      expect(threeGuard, greaterThanOrEqualTo(0));
+      for (final firstExternalOperation in const [
+        'DotEnv(',
+        'Database()',
+        '_ensureServerIsReachable(apiBaseUrl)',
+        'Directory(_artifactDirPath)',
+      ]) {
+        expect(
+          threeGuard,
+          lessThan(threeMain.indexOf(firstExternalOperation)),
+          reason: firstExternalOperation,
+        );
+      }
+      final dryRunReturn = threeMain.indexOf('if (config.dryRun)');
+      expect(dryRunReturn, greaterThan(threeMain.indexOf('Database()')));
+      expect(
+        dryRunReturn,
+        lessThan(threeMain.indexOf('_ensureServerIsReachable(apiBaseUrl)')),
+      );
+
+      final wrapperSource = scriptSource(
+        'server/bin/mana_loom_deck_runtime_e2e.dart',
+      );
+      final wrapperGuard = wrapperSource.indexOf('if (config.apply &&');
+      final delegation = wrapperSource.indexOf(
+        'commander_only_validation.main(args)',
+      );
+      expect(wrapperGuard, greaterThanOrEqualTo(0));
+      expect(wrapperGuard, lessThan(delegation));
+
+      for (final source in [commanderSource, threeSource, wrapperSource]) {
+        expect(source, contains('MANALOOM_CONFIRM_LIVE_MUTATIONS'));
+        expect(source, contains('I_HAVE_EXPLICIT_APPROVAL'));
+      }
+    });
+
+    test(
+      'Dart deck runtime apply entrypoints fail closed without approval',
+      () async {
+        for (final relativePath in const [
+          'bin/run_commander_only_optimization_validation.dart',
+          'bin/mana_loom_deck_runtime_e2e.dart',
+          'bin/run_three_commander_optimization_validation.dart',
+        ]) {
+          final result = await Process.run(
+            'dart',
+            ['run', relativePath, '--apply'],
+            workingDirectory: '$repoRoot/server',
+            environment: const {'MANALOOM_CONFIRM_LIVE_MUTATIONS': ''},
+            includeParentEnvironment: true,
+          );
+
+          expect(result.exitCode, 2, reason: relativePath);
+          expect(
+            '${result.stderr}',
+            contains('BLOCKED:'),
+            reason: relativePath,
+          );
+          expect(
+            '${result.stdout}${result.stderr}',
+            isNot(contains('Conectando ao banco')),
+            reason: relativePath,
+          );
+        }
+      },
+    );
   });
 }

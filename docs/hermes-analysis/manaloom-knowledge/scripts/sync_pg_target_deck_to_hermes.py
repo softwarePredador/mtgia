@@ -22,6 +22,8 @@ from db_helper import connect, sanitized_database_target
 
 SCRIPT_DIR = Path(__file__).resolve().parent
 DEFAULT_SQLITE_DB = Path(os.environ.get("MANALOOM_KNOWLEDGE_DB", SCRIPT_DIR / "knowledge.db"))
+DEFAULT_CANONICAL_PG_DECK_ID = "8938b746-1a9e-46ce-b0d9-c2ec932ddddd"
+PROTECTED_HERMES_DECK_ID = 6
 
 ROLE_TO_TAG = {
     "board_wipe": "board_wipe",
@@ -94,7 +96,19 @@ def parse_args() -> argparse.Namespace:
         description="Cache one PG deck into Hermes SQLite deck_cards."
     )
     parser.add_argument("--sqlite-db", default=str(DEFAULT_SQLITE_DB))
-    parser.add_argument("--pg-deck-id", default=os.environ.get("MANALOOM_TARGET_PG_DECK_ID", ""))
+    parser.add_argument(
+        "--pg-deck-id",
+        default=(
+            os.environ.get("MANALOOM_TARGET_PG_DECK_ID")
+            or os.environ.get("MANALOOM_CANONICAL_PG_DECK_ID")
+            or DEFAULT_CANONICAL_PG_DECK_ID
+        ),
+        help=(
+            "Exact PostgreSQL deck UUID. Defaults to the protected Lorehold "
+            "champion; pass an explicit empty value only when deliberately "
+            "using the name-selection lane."
+        ),
+    )
     parser.add_argument(
         "--deck-name-like",
         default=os.environ.get("MANALOOM_TARGET_DECK_NAME_LIKE", "%Runtime Lorehold Learned%"),
@@ -105,11 +119,27 @@ def parse_args() -> argparse.Namespace:
         help=(
             "When --pg-deck-id is absent, also allow selecting the newest deck "
             "whose commander name contains Lorehold. Use only for deliberate "
-            "variant imports; the default name filter protects deck_id=6 from "
-            "being overwritten by the newest Lorehold variant."
+            "variant imports; the protected-target binding still prevents an "
+            "implicit replacement of deck_id=6."
         ),
     )
     parser.add_argument("--target-deck-id", type=int, default=6)
+    parser.add_argument(
+        "--protected-pg-deck-id",
+        default=(
+            os.environ.get("MANALOOM_CANONICAL_PG_DECK_ID")
+            or DEFAULT_CANONICAL_PG_DECK_ID
+        ),
+        help="Expected PostgreSQL UUID for protected Hermes deck_id=6.",
+    )
+    parser.add_argument(
+        "--allow-protected-target-override",
+        action="store_true",
+        help=(
+            "Explicitly allow a non-canonical PostgreSQL deck to replace "
+            "protected Hermes deck_id=6. Prefer a separate target deck id."
+        ),
+    )
     parser.add_argument("--min-total-cards", type=int, default=90)
     parser.add_argument("--apply", action="store_true")
     parser.add_argument("--report")
@@ -741,6 +771,36 @@ def selected_deck_sql(args: argparse.Namespace) -> tuple[str, tuple[Any, ...]]:
     )
 
 
+def validate_protected_target_binding(
+    args: argparse.Namespace,
+    deck: dict[str, Any],
+) -> dict[str, Any]:
+    """Fail closed before a mutable sync can replace the protected target."""
+    actual_pg_deck_id = str(deck.get("pg_deck_id") or "").strip().lower()
+    expected_pg_deck_id = str(
+        getattr(args, "protected_pg_deck_id", "") or DEFAULT_CANONICAL_PG_DECK_ID
+    ).strip().lower()
+    target_deck_id = int(getattr(args, "target_deck_id", 0) or 0)
+    override = bool(getattr(args, "allow_protected_target_override", False))
+    protected = target_deck_id == PROTECTED_HERMES_DECK_ID
+    matched = bool(expected_pg_deck_id) and actual_pg_deck_id == expected_pg_deck_id
+    if protected and not matched and not override:
+        raise RuntimeError(
+            "Refusing to replace protected Hermes deck_id=6: "
+            f"expected pg_deck_id={expected_pg_deck_id}, "
+            f"selected pg_deck_id={actual_pg_deck_id or 'missing'}. "
+            "Use a different --target-deck-id, or pass "
+            "--allow-protected-target-override for a deliberate replacement."
+        )
+    return {
+        "protected_target": protected,
+        "expected_pg_deck_id": expected_pg_deck_id,
+        "actual_pg_deck_id": actual_pg_deck_id,
+        "matched": matched,
+        "override": override,
+    }
+
+
 def fetch_target_deck(args: argparse.Namespace) -> tuple[dict[str, Any], list[dict[str, Any]]]:
     where_sql, params = selected_deck_sql(args)
     with connect() as conn:
@@ -945,7 +1005,16 @@ def write_sqlite(
                     deck["name"],
                     deck.get("archetype") or "unknown",
                     deck["total_qty"],
-                    f"sync_pg_target_deck_to_hermes.py pg_deck_id={deck['pg_deck_id']}",
+                    " ".join(
+                        (
+                            "sync_pg_target_deck_to_hermes.py",
+                            f"pg_deck_id={deck['pg_deck_id']}",
+                            f"deck_hash={deck_hash}",
+                            f"semantics_hash={semantics_hash}",
+                            f"ruleset_hash={ruleset_hash}",
+                            f"sync_run_id={sync_run_id}",
+                        )
+                    ),
                 ),
             )
             for card in snapshot_cards:
@@ -1008,6 +1077,7 @@ def main() -> int:
     sqlite_db = Path(args.sqlite_db)
     sqlite_db.parent.mkdir(parents=True, exist_ok=True)
     deck, cards = fetch_target_deck(args)
+    target_binding = validate_protected_target_binding(args, deck)
     stats = write_sqlite(
         str(sqlite_db),
         args.target_deck_id,
@@ -1020,6 +1090,7 @@ def main() -> int:
         "database_target": sanitized_database_target(),
         "sqlite_db": str(sqlite_db),
         "target_deck_id": args.target_deck_id,
+        "target_binding": target_binding,
         "deck": deck,
         "stats": stats,
         "tags": dict(

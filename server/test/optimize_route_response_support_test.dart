@@ -45,8 +45,16 @@ void main() {
     test('adds cache metadata without mutating cached body', () {
       final cached = {
         'mode': 'optimize',
+        'strategy_source': 'deterministic_first',
+        'outcome_code': 'optimized',
         'removals': ['A'],
         'additions': ['B'],
+        'removals_detailed': [
+          {'name': 'A', 'card_id': 'card-a', 'quantity': 1},
+        ],
+        'additions_detailed': [
+          {'name': 'B', 'card_id': 'card-b', 'quantity': 1},
+        ],
       };
 
       final response = buildCachedOptimizeResponse(
@@ -61,17 +69,117 @@ void main() {
         userPreferences: {'preferred_bracket': 3},
       );
 
+      expect(response, isNotNull);
+      final hydrated = response!;
       expect(cached.containsKey('cache'), isFalse);
-      expect(response['cache'], {'hit': true, 'cache_key': 'cache-1'});
-      expect(response['intensity'], 'focused');
-      expect(response['timings'], {'total_ms': 12});
-      expect(response['stage_telemetry'], {'total_ms': 12});
-      expect(response['preferences'], {
+      expect(hydrated['outcome_code'], 'optimized');
+      expect(hydrated['cache'], {'hit': true, 'cache_key': 'cache-1'});
+      expect(hydrated['intensity'], 'focused');
+      expect(hydrated['timings'], {'total_ms': 12});
+      expect(hydrated['stage_telemetry'], {'total_ms': 12});
+      expect(hydrated['preferences'], {
         'memory_applied': true,
         'keep_theme': false,
         'preferred_bracket': 3,
       });
-      expect((response['optimize_intensity'] as Map)['returned_swaps'], 1);
+      expect((hydrated['optimize_intensity'] as Map)['returned_swaps'], 1);
+    });
+
+    test('rejects legacy empty cache without outcome or provenance', () {
+      final response = buildCachedOptimizeResponse(
+        cachedResponse: const {
+          'mode': 'optimize',
+          'removals': <String>[],
+          'additions': <String>[],
+        },
+        cacheKey: 'legacy-empty',
+        intensity: focused,
+        effectiveMode: 'optimize',
+        timings: const {'total_ms': 1},
+        hasBracketOverride: false,
+        hasKeepThemeOverride: false,
+        keepTheme: true,
+        userPreferences: const {'preferred_bracket': null},
+      );
+
+      expect(response, isNull);
+    });
+
+    test('does not trust an explicit optimized outcome with zero swaps', () {
+      final response = buildCachedOptimizeResponse(
+        cachedResponse: const {
+          'mode': 'optimize',
+          'strategy_source': 'ai_primary',
+          'outcome_code': 'optimized',
+          'removals': <String>[],
+          'additions': <String>[],
+          'removals_detailed': <Map<String, dynamic>>[],
+          'additions_detailed': <Map<String, dynamic>>[],
+        },
+        cacheKey: 'unsafe-empty',
+        intensity: focused,
+        effectiveMode: 'optimize',
+        timings: const {'total_ms': 1},
+        hasBracketOverride: false,
+        hasKeepThemeOverride: false,
+        keepTheme: true,
+        userPreferences: const {'preferred_bracket': null},
+      );
+
+      expect(response, isNull);
+    });
+
+    test('preserves an explicit provenance-backed safe no-op cache hit', () {
+      final response = buildCachedOptimizeResponse(
+        cachedResponse: const {
+          'mode': 'optimize',
+          'strategy_source': 'deterministic_first',
+          'outcome_code': 'no_safe_upgrade_found',
+          'can_apply': false,
+          'learning_eligible': false,
+          'removals': <String>[],
+          'additions': <String>[],
+        },
+        cacheKey: 'safe-no-op',
+        intensity: focused,
+        effectiveMode: 'optimize',
+        timings: const {'total_ms': 2},
+        hasBracketOverride: false,
+        hasKeepThemeOverride: false,
+        keepTheme: true,
+        userPreferences: const {'preferred_bracket': null},
+      );
+
+      expect(response, isNotNull);
+      expect(response!['outcome_code'], equals('no_safe_upgrade_found'));
+      expect(response['can_apply'], isFalse);
+      expect(response['learning_eligible'], isFalse);
+      expect(response['cache'], {'hit': true, 'cache_key': 'safe-no-op'});
+    });
+
+    test('does not reuse mock payloads as safe no-op cache hits', () {
+      final response = buildCachedOptimizeResponse(
+        cachedResponse: const {
+          'mode': 'optimize',
+          'strategy_source': 'mock_fallback',
+          'outcome_code': 'mock_non_actionable',
+          'is_mock': true,
+          'can_apply': false,
+          'learning_eligible': false,
+          'removals': <String>[],
+          'additions': <String>[],
+        },
+        cacheKey: 'mock-no-op',
+        intensity: focused,
+        effectiveMode: 'optimize',
+        timings: const {'total_ms': 2},
+        hasBracketOverride: false,
+        hasKeepThemeOverride: false,
+        keepTheme: true,
+        userPreferences: const {'preferred_bracket': null},
+      );
+
+      expect(response, isNull);
     });
   });
 

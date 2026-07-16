@@ -44,8 +44,14 @@ def test_supported_effects_cover_live_engine_handlers():
     assert "damage_any_target" in audit.SUPPORTED_EFFECTS
     assert "damage_player_and_creatures" in audit.SUPPORTED_EFFECTS
     assert "damage_wipe_treasure" in audit.SUPPORTED_EFFECTS
+    assert "discard_trigger_modal_draw_treasure_opponent_life_loss" in audit.SUPPORTED_EFFECTS
+    assert "discard_trigger_modal_draw_treasure_opponent_life_loss" in audit.GAME_IMPACT_EFFECTS
+    assert "gift_destroy_all_creatures_return_own_destroyed_creature" in audit.SUPPORTED_EFFECTS
+    assert "gift_destroy_all_creatures_return_own_destroyed_creature" in audit.GAME_IMPACT_EFFECTS
     assert "graveyard_flashback_grant" in audit.SUPPORTED_EFFECTS
     assert "hand_filter" in audit.SUPPORTED_EFFECTS
+    assert "harnessed_blink" in audit.SUPPORTED_EFFECTS
+    assert "harnessed_blink" in audit.GAME_IMPACT_EFFECTS
     assert "copy_creature_token" in audit.SUPPORTED_EFFECTS
     assert "copy_attached_creature_or_insect" in audit.SUPPORTED_EFFECTS
     assert "copy_permanent_etb" in audit.SUPPORTED_EFFECTS
@@ -57,14 +63,22 @@ def test_supported_effects_cover_live_engine_handlers():
     assert "mill_engine" in audit.SUPPORTED_EFFECTS
     assert "mill_engine" in audit.GAME_IMPACT_EFFECTS
     assert "equipment_static_attachment" in audit.SUPPORTED_EFFECTS
+    assert "exile_graveyard_card_create_food" in audit.SUPPORTED_EFFECTS
+    assert "exile_graveyard_card_create_food" in audit.GAME_IMPACT_EFFECTS
     assert "exile_top_nonland_free_cast" in audit.SUPPORTED_EFFECTS
     assert "planeswalker" in audit.SUPPORTED_EFFECTS
     assert "redistribute_life_totals" in audit.SUPPORTED_EFFECTS
+    assert "rummage" in audit.SUPPORTED_EFFECTS
+    assert "rummage" in audit.GAME_IMPACT_EFFECTS
     assert "removal_exile" in audit.SUPPORTED_EFFECTS
+    assert "selective_nonland_sacrifice" in audit.SUPPORTED_EFFECTS
+    assert "selective_nonland_sacrifice" in audit.GAME_IMPACT_EFFECTS
     assert "pile_selection_draw" in audit.SUPPORTED_EFFECTS
     assert "static_cost_reduction" in audit.SUPPORTED_EFFECTS
     assert "thassa_oracle" in audit.SUPPORTED_EFFECTS
     assert "untap_land_engine" in audit.SUPPORTED_EFFECTS
+    assert "vow_counter_each_player_sacrifice_rest" in audit.SUPPORTED_EFFECTS
+    assert "vow_counter_each_player_sacrifice_rest" in audit.GAME_IMPACT_EFFECTS
 
 
 def test_rise_of_the_eldrazi_uses_composite_oracle_runtime():

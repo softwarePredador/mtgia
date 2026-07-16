@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:http/http.dart' as http;
 import 'package:dotenv/dotenv.dart';
 import '../ai_log_service.dart';
+import '../basic_land_utils.dart' as land_utils;
 import '../logger.dart';
 import '../ml_knowledge_service.dart';
 import '../openai_runtime_config.dart';
@@ -550,7 +551,9 @@ class DeckOptimizerService {
           // Lógica: Rank baixo é bom (ex: Sol Ring é rank 1). CMC baixo é bom.
           // Score Alto = Carta Ruim (Rank alto + Custo alto)
           // Ajuste para terrenos: Terrenos básicos sempre têm score "neutro" para não serem cortados automaticamente
-          if ((card['type_line'] as String).contains('Basic Land')) {
+          if (land_utils.isBasicLandTypeLine(
+            (card['type_line'] as String?) ?? '',
+          )) {
             return {'name': card['name'], 'weakness_score': -1.0};
           }
 
@@ -631,7 +634,9 @@ class DeckOptimizerService {
           final cardName = card['name'] as String;
 
           // Terrenos básicos: sempre protegidos
-          if ((card['type_line'] as String).contains('Basic Land')) {
+          if (land_utils.isBasicLandTypeLine(
+            (card['type_line'] as String?) ?? '',
+          )) {
             return {'name': cardName, 'weakness_score': -1.0};
           }
 

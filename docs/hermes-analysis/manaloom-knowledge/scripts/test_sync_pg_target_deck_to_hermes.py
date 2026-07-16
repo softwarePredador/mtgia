@@ -8,11 +8,68 @@ import tempfile
 import unittest
 from argparse import Namespace
 from pathlib import Path
+from unittest.mock import patch
 
 import sync_pg_target_deck_to_hermes as sync
 
 
 class SyncPgTargetDeckToHermesTests(unittest.TestCase):
+    def test_cli_defaults_to_exact_canonical_postgres_deck(self) -> None:
+        with patch.dict(
+            "os.environ",
+            {
+                "MANALOOM_TARGET_PG_DECK_ID": "",
+                "MANALOOM_CANONICAL_PG_DECK_ID": "",
+            },
+            clear=False,
+        ), patch("sys.argv", ["sync_pg_target_deck_to_hermes.py"]):
+            args = sync.parse_args()
+
+        self.assertEqual(args.pg_deck_id, sync.DEFAULT_CANONICAL_PG_DECK_ID)
+        self.assertEqual(args.protected_pg_deck_id, sync.DEFAULT_CANONICAL_PG_DECK_ID)
+
+    def test_protected_target_binding_accepts_only_canonical_by_default(self) -> None:
+        args = Namespace(
+            target_deck_id=6,
+            protected_pg_deck_id=sync.DEFAULT_CANONICAL_PG_DECK_ID,
+            allow_protected_target_override=False,
+        )
+
+        accepted = sync.validate_protected_target_binding(
+            args,
+            {"pg_deck_id": sync.DEFAULT_CANONICAL_PG_DECK_ID},
+        )
+        self.assertTrue(accepted["matched"])
+
+        with self.assertRaises(RuntimeError) as err:
+            sync.validate_protected_target_binding(
+                args,
+                {"pg_deck_id": "528c877f-f829-4207-95e6-73981776c323"},
+            )
+        self.assertIn("Refusing to replace protected Hermes deck_id=6", str(err.exception))
+
+    def test_protected_target_binding_allows_explicit_override_or_other_slot(self) -> None:
+        runtime_deck = {"pg_deck_id": "528c877f-f829-4207-95e6-73981776c323"}
+        override = Namespace(
+            target_deck_id=6,
+            protected_pg_deck_id=sync.DEFAULT_CANONICAL_PG_DECK_ID,
+            allow_protected_target_override=True,
+        )
+        other_slot = Namespace(
+            target_deck_id=608,
+            protected_pg_deck_id=sync.DEFAULT_CANONICAL_PG_DECK_ID,
+            allow_protected_target_override=False,
+        )
+
+        self.assertTrue(
+            sync.validate_protected_target_binding(override, runtime_deck)["override"]
+        )
+        self.assertFalse(
+            sync.validate_protected_target_binding(other_slot, runtime_deck)[
+                "protected_target"
+            ]
+        )
+
     def test_write_sqlite_persists_card_id_arrays_and_hashes(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
             db_path = Path(tmp) / "knowledge.db"

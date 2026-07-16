@@ -6,6 +6,7 @@ import 'package:http/http.dart' as http;
 import 'package:postgres/postgres.dart';
 import 'optimize_complete_support.dart' as optimize_complete;
 import 'optimize_analysis_support.dart' as optimize_analysis;
+import 'optimize_route_outcome_support.dart' as optimize_route_outcome;
 import 'optimize_job.dart';
 import 'optimize_runtime_support.dart';
 import 'optimize_stage_telemetry.dart';
@@ -97,6 +98,7 @@ Future<void> processOptimizeModeAsync({
   };
 
   if (response.statusCode == HttpStatus.ok) {
+    optimize_route_outcome.enforceSuccessfulOptimizeOutcomeSafety(resultBody);
     await OptimizeJobStore.complete(pool, jobId, result: resultBody);
     return;
   }
@@ -257,7 +259,7 @@ Future<void> recordOptimizeAnalysisOutcome({
 }
 
 /// Processa o modo complete em background (async job).
-/// Chamada via `unawaited()` â€” NÃƒO bloqueia a resposta HTTP.
+/// Chamada via `unawaited()` — NÃO bloqueia a resposta HTTP.
 Future<void> processCompleteModeAsync({
   required String jobId,
   required Pool pool,
@@ -294,7 +296,7 @@ Future<void> processCompleteModeAsync({
     await OptimizeJobStore.progress(
       pool,
       jobId,
-      stage: 'Preparando referÃªncias do commander...',
+      stage: 'Preparando referências do commander...',
       stageNumber: 1,
     );
 
@@ -320,7 +322,7 @@ Future<void> processCompleteModeAsync({
       await OptimizeJobStore.progress(
         pool,
         jobId,
-        stage: 'Consultando IA para sugestÃµes...',
+        stage: 'Consultando IA para sugestões...',
         stageNumber: 2,
       );
       await telemetry.trackAsync(
@@ -345,7 +347,7 @@ Future<void> processCompleteModeAsync({
       await OptimizeJobStore.progress(
         pool,
         jobId,
-        stage: 'Pulando IA (modo determinÃ­stico)...',
+        stage: 'Pulando IA (modo determinístico)...',
         stageNumber: 2,
       );
     }
@@ -361,7 +363,7 @@ Future<void> processCompleteModeAsync({
     await OptimizeJobStore.progress(
       pool,
       jobId,
-      stage: 'Preenchendo com cartas sinÃ©rgicas...',
+      stage: 'Preenchendo com cartas sinérgicas...',
       stageNumber: 3,
     );
     await OptimizeJobStore.progress(
@@ -413,7 +415,7 @@ Future<void> processCompleteModeAsync({
         await OptimizeJobStore.fail(
           pool,
           jobId,
-          error: 'Complete mode nÃ£o atingiu qualidade mÃ­nima.',
+          error: 'Complete mode não atingiu qualidade mínima.',
           qualityError: qualityError.cast<String, dynamic>(),
         );
         return;
@@ -450,6 +452,11 @@ Future<void> processCompleteModeAsync({
       }
       responseBody['timings'] = telemetry.snapshot();
       responseBody['stage_telemetry'] = responseBody['timings'];
+      responseBody['strategy_source'] ??=
+          jsonResponse['strategy_source'] ?? 'complete_pipeline';
+      optimize_route_outcome.enforceSuccessfulOptimizeOutcomeSafety(
+        responseBody,
+      );
       attachRecommendationContextToOptimizeResponse(
         responseBody,
         recommendationContext,
@@ -467,7 +474,11 @@ Future<void> processCompleteModeAsync({
       }
       await OptimizeJobStore.complete(pool, jobId, result: responseBody);
     } else {
-      // Fallback: se por algum motivo nÃ£o veio como complete
+      // Fallback: se por algum motivo não veio como complete
+      jsonResponse['strategy_source'] ??= 'complete_pipeline_fallback';
+      optimize_route_outcome.enforceSuccessfulOptimizeOutcomeSafety(
+        jsonResponse,
+      );
       if (cacheKey != null && cacheKey.isNotEmpty) {
         jsonResponse['cache'] = {'hit': false, 'cache_key': cacheKey};
       }

@@ -3822,7 +3822,7 @@ def register_tests(battle, player):
             == "controller_chooses_artifact_creature_enchantment_planeswalker_per_player_sacrifice_other_nonlands_v1"
         )
 
-    def test_tragic_arrogance_keeps_best_per_type_and_sacrifices_other_nonlands():
+    def test_tragic_arrogance_optimizes_unique_retained_sets_and_sacrifices_others():
         events = []
         previous_handler = battle.REPLAY_EVENT_HANDLER
         battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
@@ -3945,37 +3945,214 @@ def register_tests(battle, player):
 
         assert {card.get("name") for card in active.battlefield} == {
             "Own Artifact Creature",
+            "Own Small",
             "Own Enchantment",
             "Own Walker",
             "Own Plains",
         }
         assert {card.get("name") for card in opponent.battlefield} == {
-            "Opponent Artifact Creature",
+            "Opponent Small",
+            "Opponent Rock",
             "Opponent Enchantment",
             "Opponent Walker",
         }
         assert {card.get("name") for card in active.graveyard} == {
-            "Own Small",
             "Own Rock",
             "Tragic Arrogance",
         }
         assert {card.get("name") for card in opponent.graveyard} == {
-            "Opponent Small",
-            "Opponent Rock",
+            "Opponent Artifact Creature",
         }
         wipe_event = next(data for event, data in events if event == "board_wipe_resolved")
         assert wipe_event["card"] == "Tragic Arrogance"
         assert wipe_event["rule_logical_key"] == "battle_rule_v1:tragic-arrogance-test"
-        assert wipe_event["destroyed"] == 4
-        assert wipe_event["sacrificed"] == 4
+        assert wipe_event["destroyed"] == 2
+        assert wipe_event["sacrificed"] == 2
         assert wipe_event["nonland_permanents_seen"] == 10
-        assert wipe_event["protected"] == 6
+        assert wipe_event["protected"] == 8
+        assert len(wipe_event["protected_object_ids"]) == 8
+        assert len(wipe_event["sacrificed_object_ids"]) == 2
+        assert not (
+            set(wipe_event["protected_object_ids"])
+            & set(wipe_event["sacrificed_object_ids"])
+        )
         assert {entry["name"] for entry in wipe_event["sacrificed_cards"]} == {
-            "Own Small",
             "Own Rock",
-            "Opponent Small",
-            "Opponent Rock",
+            "Opponent Artifact Creature",
         }
+        own_choices = [
+            entry for entry in wipe_event["choices"] if entry["controller"] == "Lorehold"
+        ]
+        opponent_choices = [
+            entry for entry in wipe_event["choices"] if entry["controller"] == "Opponent"
+        ]
+        assert {entry["retention_strategy"] for entry in own_choices} == {
+            "maximize_unique_retained_set_value"
+        }
+        assert {entry["retention_strategy"] for entry in opponent_choices} == {
+            "minimize_unique_retained_set_value"
+        }
+
+    def test_tragic_arrogance_does_not_treat_mana_dork_as_artifact():
+        events = []
+        previous_handler = battle.REPLAY_EVENT_HANDLER
+        battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+        try:
+            active = player("Lorehold")
+            opponent = player("Opponent")
+            delighted_halfling = {
+                "name": "Delighted Halfling",
+                "effect": "ramp_permanent",
+                "type_line": "Creature — Halfling Citizen Bird",
+                "cmc": 1,
+                "power": 1,
+                "toughness": 2,
+            }
+            actual_artifact = {
+                "name": "Fellwar Stone",
+                "effect": "ramp_permanent",
+                "type_line": "Artifact",
+                "cmc": 2,
+            }
+            best_creature = {
+                "name": "Actual Creature Choice",
+                "effect": "creature",
+                "type_line": "Creature — Giant",
+                "cmc": 6,
+                "power": 6,
+                "toughness": 6,
+            }
+            opponent.battlefield = [delighted_halfling, actual_artifact, best_creature]
+
+            battle.apply_effect_immediate(
+                active,
+                [opponent],
+                {
+                    "name": "Tragic Arrogance",
+                    "cmc": 5,
+                    "type_line": "Sorcery",
+                },
+                turn=8,
+                rng=random.Random(11104),
+                effect_data_override={
+                    "effect": "selective_nonland_sacrifice",
+                    "choice_types": ["artifact", "creature", "enchantment", "planeswalker"],
+                    "battle_model_scope": (
+                        "controller_chooses_artifact_creature_enchantment_planeswalker_per_player_sacrifice_other_nonlands_v1"
+                    ),
+                    "_rule_logical_key": "battle_rule_v1:tragic-arrogance-type-test",
+                    "_rule_source": "curated",
+                    "_rule_review_status": "verified",
+                },
+            )
+        finally:
+            battle.REPLAY_EVENT_HANDLER = previous_handler
+
+        assert battle.permanent_matches_tragic_arrogance_choice(
+            delighted_halfling,
+            "creature",
+        )
+        assert not battle.is_artifact_permanent(delighted_halfling)
+        assert not battle.target_matches_type(delighted_halfling, "artifact")
+        assert battle.is_artifact_permanent(actual_artifact)
+        assert not battle.permanent_matches_tragic_arrogance_choice(
+            delighted_halfling,
+            "artifact",
+        )
+        assert {card.get("name") for card in opponent.battlefield} == {
+            "Fellwar Stone",
+            "Delighted Halfling",
+        }
+        assert {card.get("name") for card in opponent.graveyard} == {
+            "Actual Creature Choice",
+        }
+        wipe_event = next(data for event, data in events if event == "board_wipe_resolved")
+        opponent_choices = [
+            choice
+            for choice in wipe_event["choices"]
+            if choice["controller"] == "Opponent"
+        ]
+        assert [
+            (choice["choice_type"], choice["name"])
+            for choice in opponent_choices
+        ] == [
+            ("artifact", "Fellwar Stone"),
+            ("creature", "Delighted Halfling"),
+        ]
+
+    def test_tragic_arrogance_preserves_multitype_and_counts_homonyms_by_object_id():
+        events = []
+        previous_handler = battle.REPLAY_EVENT_HANDLER
+        battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+        try:
+            active = player("Lorehold")
+            opponent = player("Opponent")
+            active.battlefield = [
+                {
+                    "name": "One Multitype Object",
+                    "effect": "finisher",
+                    "type_line": "Artifact Creature — Construct",
+                    "cmc": 6,
+                    "power": 6,
+                    "toughness": 6,
+                }
+            ]
+            opponent.battlefield = [
+                {
+                    "name": "Same Printed Name",
+                    "effect": "ramp_permanent",
+                    "type_line": "Artifact",
+                    "cmc": 2,
+                },
+                {
+                    "name": "Same Printed Name",
+                    "effect": "creature",
+                    "type_line": "Creature — Shapeshifter",
+                    "cmc": 1,
+                    "power": 1,
+                    "toughness": 1,
+                },
+            ]
+
+            battle.apply_effect_immediate(
+                active,
+                [opponent],
+                {"name": "Tragic Arrogance", "cmc": 5, "type_line": "Sorcery"},
+                turn=8,
+                rng=random.Random(11105),
+                effect_data_override={
+                    "effect": "selective_nonland_sacrifice",
+                    "choice_types": ["artifact", "creature", "enchantment", "planeswalker"],
+                    "_rule_logical_key": "battle_rule_v1:tragic-arrogance-object-id-test",
+                    "_rule_source": "curated",
+                    "_rule_review_status": "verified",
+                },
+            )
+        finally:
+            battle.REPLAY_EVENT_HANDLER = previous_handler
+
+        wipe_event = next(data for event, data in events if event == "board_wipe_resolved")
+        assert wipe_event["object_identity_scope"] == "tragic_arrogance_resolution_v1"
+        assert wipe_event["protected"] == 3
+        assert wipe_event["destroyed"] == 0
+        assert wipe_event["nonland_permanents_seen"] == 3
+        assert len(wipe_event["protected_object_ids"]) == 3
+        assert wipe_event["sacrificed_object_ids"] == []
+
+        active_choices = [
+            choice for choice in wipe_event["choices"] if choice["controller"] == "Lorehold"
+        ]
+        assert [choice["choice_type"] for choice in active_choices] == ["artifact", "creature"]
+        assert len({choice["object_id"] for choice in active_choices}) == 1
+
+        opponent_choices = [
+            choice for choice in wipe_event["choices"] if choice["controller"] == "Opponent"
+        ]
+        assert [choice["name"] for choice in opponent_choices] == [
+            "Same Printed Name",
+            "Same Printed Name",
+        ]
+        assert len({choice["object_id"] for choice in opponent_choices}) == 2
 
     def test_austere_command_resolves_two_destroy_modes():
         events = []
@@ -4876,8 +5053,8 @@ def register_tests(battle, player):
             ),
             (
                 {"name": "Mana Vault", "cmc": 1, "type_line": "Artifact"},
-                "fast_mana_artifact_partial_v1",
-                "battle_rule_v1:5a2533694ffd19223d3cde1e25d258ff",
+                "mana_vault_exact_untap_draw_damage_mana_v1",
+                "battle_rule_v1:d43496777c4b1e36b1c9a5111133acf4",
                 "35e3fd94c8453c0e326033af49ae18c8",
                 3,
             ),
@@ -5169,8 +5346,8 @@ def register_tests(battle, player):
             (
                 {"name": "Mana Vault", "cmc": 1, "type_line": "Artifact"},
                 "ramp_permanent",
-                "fast_mana_artifact_partial_v1",
-                "battle_rule_v1:5a2533694ffd19223d3cde1e25d258ff",
+                "mana_vault_exact_untap_draw_damage_mana_v1",
+                "battle_rule_v1:d43496777c4b1e36b1c9a5111133acf4",
                 "35e3fd94c8453c0e326033af49ae18c8",
             ),
             (
@@ -17888,7 +18065,11 @@ def register_tests(battle, player):
 
     def test_pg102_creative_technique_demonstrates_top_nonland_free_casts():
         events = []
+        decisions = []
+        previous_handler = battle.REPLAY_EVENT_HANDLER
+        previous_decision_handler = battle.DECISION_TRACE_HANDLER
         battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+        battle.DECISION_TRACE_HANDLER = lambda data: decisions.append(data)
         try:
             active = player("Lorehold")
             opponent = player("Chosen Opponent")
@@ -17929,7 +18110,8 @@ def register_tests(battle, player):
                 phase="precombat_main",
             )
         finally:
-            battle.REPLAY_EVENT_HANDLER = None
+            battle.REPLAY_EVENT_HANDLER = previous_handler
+            battle.DECISION_TRACE_HANDLER = previous_decision_handler
 
         active_creatures = {
             permanent.get("name")
@@ -17967,6 +18149,25 @@ def register_tests(battle, player):
         ]
         assert len(free_cast_events) == 3
         assert all(data["cast_without_paying_mana_cost"] is True for data in free_cast_events)
+        optional_cast_decisions = [
+            decision
+            for decision in decisions
+            if decision.get("reason") == "optional_exiled_free_cast_selected"
+        ]
+        assert len(optional_cast_decisions) == 3
+        assert {
+            decision["chosen_option"]["card"]
+            for decision in optional_cast_decisions
+        } == {
+            "Free Creature A",
+            "Free Creature B",
+            "Opponent Free Creature",
+        }
+        assert all(
+            decision["rejected_options"][0]["action"]
+            == "decline_optional_exiled_free_cast"
+            for decision in optional_cast_decisions
+        )
         free_creature_resolutions = [
             data
             for event, data in events
@@ -19906,9 +20107,9 @@ def register_tests(battle, player):
                 "creature_etb_exile_nonland_nontoken_mv_lte4_leave_illusion_annotation_v1",
             ),
             "Underworld Breach": (
-                "battle_rule_v1:3f9f5259b05245670ee19b357aa2e999",
+                "battle_rule_v1:a38468ecbf8f6ff1512b3b52674a3d0c",
                 "a98ca5777789e48c44daff97999f2beb",
-                "escape_grant_nonland_graveyard_end_step_sacrifice_annotation_v1",
+                "underworld_breach_escape_and_end_step_sacrifice_exact_v1",
             ),
         }
         for name, (logical_key, oracle_hash, scope) in expected.items():
@@ -19937,8 +20138,8 @@ def register_tests(battle, player):
 
         breach = battle.get_card_effect({"name": "Underworld Breach", "type_line": "Enchantment", "cmc": 2})
         assert breach["effect"] == "passive"
-        assert breach["escape_grant_status"] == "annotation_only"
-        assert breach["end_step_sacrifice_status"] == "annotation_only"
+        assert breach["escape_grant_status"] == "runtime_executor_v1"
+        assert breach["end_step_sacrifice_status"] == "runtime_executor_v1"
 
     def test_pg087_hexing_squelcher_static_counter_shield_uses_sqlite_rule():
         active = player("Lorehold")
@@ -24385,7 +24586,9 @@ def register_tests(battle, player):
         test_surge_to_victory_exiles_best_graveyard_spell_and_copies_it_on_combat_damage,
         test_pg118_surge_to_victory_rule_resolves_from_sqlite_cache,
         test_tragic_arrogance_oracle_normalizes_to_selective_nonland_sacrifice,
-        test_tragic_arrogance_keeps_best_per_type_and_sacrifices_other_nonlands,
+        test_tragic_arrogance_optimizes_unique_retained_sets_and_sacrifices_others,
+        test_tragic_arrogance_does_not_treat_mana_dork_as_artifact,
+        test_tragic_arrogance_preserves_multitype_and_counts_homonyms_by_object_id,
         test_pg079_flare_of_duplication_keeps_copy_spell_as_stack_targeted_instant,
         test_pg079_reforge_the_soul_discards_then_draws_seven_with_scope,
         test_pg079_rise_of_the_eldrazi_resolves_composite_destroy_draw_extra_turn_exile,

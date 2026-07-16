@@ -1,5 +1,7 @@
 import 'dart:convert';
 
+import '../basic_land_utils.dart' as land_utils;
+
 // ============================================================================
 // CARD ROLES ADAPTER — Single source of truth for functional role resolution
 // Used by: Deck Analysis, Optimize, Validator, Quality Gate, Candidate Quality
@@ -168,10 +170,8 @@ Set<String> _resolveHeuristicRoles({
   final estimatedCmc = _safeDouble(cmc, _estimateManaValue(manaCost ?? ''));
   final roles = <String>{};
 
-  if (t.contains('land')) {
-    roles.add('land');
-    return roles;
-  }
+  final isLand = land_utils.isLandTypeLine(typeLine);
+  if (isLand) roles.add('land');
 
   if (_knownWinconNames.contains(n)) roles.add('wincon');
   if (_knownComboPieceNames.contains(n)) roles.add('combo_piece');
@@ -185,8 +185,9 @@ Set<String> _resolveHeuristicRoles({
   if (looksLikeOptimizationTargetedRemovalText(oracleText)) {
     roles.add('removal');
   }
-  if (looksLikeOptimizationRampText(oracleText) ||
-      (t.contains('artifact') && o.contains('add')))
+  if (!isLand &&
+      (looksLikeOptimizationRampText(oracleText) ||
+          (t.contains('artifact') && o.contains('add'))))
     roles.add('ramp');
   if (_looksLikeDraw(o) ||
       o.contains('look at the top') ||
@@ -199,7 +200,7 @@ Set<String> _resolveHeuristicRoles({
   if (_looksLikeComboPiece(o, n)) roles.add('combo_piece');
   if (_looksLikePayoff(o, n)) roles.add('payoff');
   if (_looksLikeEnabler(o, n)) roles.add('enabler');
-  if (_looksLikeEtb(o)) roles.add('etb');
+  if (looksLikeOptimizationEtbTrigger(oracleText, name: n)) roles.add('etb');
   if (_looksLikeBlink(o, n)) {
     roles.add('blink');
     roles.add('protection');
@@ -299,7 +300,7 @@ String _normalizeRoleCardName(String value) => value.trim().toLowerCase();
 String classifyOptimizationFunctionalRole(Map<String, dynamic> card) {
   final oracle = ((card['oracle_text'] as String?) ?? '');
   final typeLine = ((card['type_line'] as String?) ?? '');
-  if (typeLine.toLowerCase().contains('land')) return 'land';
+  if (land_utils.isLandTypeLine(typeLine)) return 'land';
   final name = card['name']?.toString() ?? '';
   final result = resolveCardFunctionalRoles(
     functionalTags: card['functional_tags'],
@@ -336,7 +337,7 @@ Set<String> optimizationFunctionalRolesForCard(
   );
   if (resolved.isNotEmpty) {
     final roles = resolved.roles.toSet();
-    if (((card['type_line'] as String?) ?? '').toLowerCase().contains('land')) {
+    if (land_utils.isLandTypeLine((card['type_line'] as String?) ?? '')) {
       roles.add('land');
     }
     return roles;
@@ -372,24 +373,565 @@ bool looksLikeOptimizationBoardWipeText(String oracleText) {
           oracle.contains('to each creature'));
 }
 
+enum OptimizationTreasureRampSignal {
+  none,
+  directSelf,
+  sharedIncludesSelf,
+  anyPlayerIncludesSelf,
+  targetPlayerSelectable,
+  controlledGrantedAbility,
+  opponentOnly,
+  objectControllerCompensation,
+  transformationOnly,
+  replacementOrPreventionOnly,
+  unknownReview,
+}
+
+extension OptimizationTreasureRampSignalDecision
+    on OptimizationTreasureRampSignal {
+  bool get isRamp =>
+      this == OptimizationTreasureRampSignal.directSelf ||
+      this == OptimizationTreasureRampSignal.sharedIncludesSelf ||
+      this == OptimizationTreasureRampSignal.anyPlayerIncludesSelf ||
+      this == OptimizationTreasureRampSignal.targetPlayerSelectable ||
+      this == OptimizationTreasureRampSignal.controlledGrantedAbility;
+}
+
+/// Removes reminder text while preserving the printed rules outside balanced
+/// parentheses. Mana definitions inside Treasure reminders must not turn the
+/// card that gives an opponent a Treasure into a mana producer.
+String optimizationOracleWithoutReminderText(String value) {
+  final output = StringBuffer();
+  var depth = 0;
+  for (var index = 0; index < value.length; index++) {
+    final char = value[index];
+    if (char == '(') {
+      depth++;
+      continue;
+    }
+    if (char == ')') {
+      if (depth > 0) depth--;
+      continue;
+    }
+    if (depth == 0) output.write(char);
+  }
+  return output.toString();
+}
+
+/// Returns the direct rules text, excluding quoted abilities granted to other
+/// objects. Those abilities are evaluated separately with ownership context.
+String optimizationOracleDirectEffectText(String value) {
+  final source = optimizationOracleWithoutReminderText(value);
+  final output = StringBuffer();
+  var insideAsciiQuote = false;
+  var insideCurlyQuote = false;
+  for (var index = 0; index < source.length; index++) {
+    final char = source[index];
+    if (char == '"') {
+      insideAsciiQuote = !insideAsciiQuote;
+      output.write(' ');
+      continue;
+    }
+    if (char == '“') {
+      insideCurlyQuote = true;
+      output.write(' ');
+      continue;
+    }
+    if (char == '”') {
+      insideCurlyQuote = false;
+      output.write(' ');
+      continue;
+    }
+    if (!insideAsciiQuote && !insideCurlyQuote) {
+      output.write(char);
+    } else if (char == '\n') {
+      output.write('\n');
+    } else {
+      output.write(' ');
+    }
+  }
+  return output.toString();
+}
+
+OptimizationTreasureRampSignal classifyOptimizationTreasureRampText(
+  String oracleText,
+) {
+  final withoutReminder =
+      optimizationOracleWithoutReminderText(oracleText).toLowerCase();
+  if (!withoutReminder.contains('treasure')) {
+    return OptimizationTreasureRampSignal.none;
+  }
+
+  final direct = optimizationOracleDirectEffectText(withoutReminder);
+  if (_hasSelfTokenProduction(direct, treasureOnly: true)) {
+    return OptimizationTreasureRampSignal.directSelf;
+  }
+  if (_hasSharedTokenProduction(direct, treasureOnly: true)) {
+    return OptimizationTreasureRampSignal.sharedIncludesSelf;
+  }
+  if (_hasAnyPlayerTokenProduction(direct, treasureOnly: true)) {
+    return OptimizationTreasureRampSignal.anyPlayerIncludesSelf;
+  }
+  if (_hasTargetPlayerTokenProduction(direct, treasureOnly: true)) {
+    return OptimizationTreasureRampSignal.targetPlayerSelectable;
+  }
+  if (_hasImperativeTokenProduction(direct, treasureOnly: true)) {
+    return OptimizationTreasureRampSignal.directSelf;
+  }
+
+  for (final span in _optimizationQuotedSpans(withoutReminder)) {
+    if (!_hasPositiveTokenProduction(span.text, treasureOnly: true)) continue;
+    final prefixStart = (span.start - 360).clamp(0, span.start).toInt();
+    final prefix = withoutReminder.substring(prefixStart, span.start);
+    if (_looksLikeControllerOwnedGrantedContext(prefix)) {
+      return OptimizationTreasureRampSignal.controlledGrantedAbility;
+    }
+  }
+
+  final treasureObject = _tokenObjectPattern(treasureOnly: true);
+  if (RegExp(
+    r'\b(?:return|put)\b[\s\S]{0,180}\bunder your control\b'
+    r'[\s\S]{0,120}\btreasure\s+artifact\b',
+  ).hasMatch(direct)) {
+    return OptimizationTreasureRampSignal.controlledGrantedAbility;
+  }
+  if (RegExp(
+    r'\b(?:becomes?|become|is|are)\b[^.\n;]{0,72}\btreasure\s+artifacts?\b',
+  ).hasMatch(direct)) {
+    return OptimizationTreasureRampSignal.transformationOnly;
+  }
+  if (RegExp(
+    r'\bwould\s+create\b[^.\n;]{0,96}' +
+        treasureObject +
+        r'[^.\n;]{0,96}\binstead\b',
+  ).hasMatch(direct)) {
+    return OptimizationTreasureRampSignal.replacementOrPreventionOnly;
+  }
+  if (RegExp(
+    r"\b(?:its|that (?:spell|permanent|creature|artifact)'s) controller\b"
+            r'[^.\n;]{0,96}\bcreates?\b[^.\n;]{0,96}' +
+        treasureObject,
+  ).hasMatch(direct)) {
+    return OptimizationTreasureRampSignal.objectControllerCompensation;
+  }
+  if (RegExp(
+        r'\b(?:each|target|an?|your)\s+opponent\b[^.\n;]{0,120}'
+                r'\b(?:would\s+|may\s+)?creates?\b[^.\n;]{0,96}' +
+            treasureObject,
+      ).hasMatch(direct) ||
+      RegExp(
+        r'^\s*gift\s+(?:an?\s+)?treasure\b',
+        multiLine: true,
+      ).hasMatch(direct)) {
+    return OptimizationTreasureRampSignal.opponentOnly;
+  }
+  return OptimizationTreasureRampSignal.unknownReview;
+}
+
+bool looksLikeOptimizationControllerTokenCreationText(String oracleText) {
+  final treasureSignal = classifyOptimizationTreasureRampText(oracleText);
+  if (treasureSignal.isRamp) return true;
+
+  final withoutReminder =
+      optimizationOracleWithoutReminderText(oracleText).toLowerCase();
+  final direct = optimizationOracleDirectEffectText(withoutReminder);
+  if (_hasPositiveTokenProduction(direct, treasureOnly: false)) return true;
+
+  for (final span in _optimizationQuotedSpans(withoutReminder)) {
+    if (!_hasPositiveTokenProduction(span.text, treasureOnly: false)) continue;
+    final prefixStart = (span.start - 360).clamp(0, span.start).toInt();
+    final prefix = withoutReminder.substring(prefixStart, span.start);
+    if (_looksLikeControllerOwnedGrantedContext(prefix)) return true;
+  }
+  return withoutReminder.contains('populate');
+}
+
 bool looksLikeOptimizationRampText(String oracleText) {
-  final oracle = oracleText.toLowerCase();
-  if (oracle.contains('add {') || oracle.contains('mana of any')) return true;
-  if (oracle.contains('search your library') &&
-      looksLikeOptimizationLandSearchText(oracle))
+  // Un-Known Event's printed Lander Rizzi text contains the official typo
+  // "Search you library". Normalize that exact corpus defect so its nonland
+  // land-search ability is classified structurally without broad fuzzy text
+  // matching or changing the stored Oracle text.
+  final oracle = optimizationOracleWithoutReminderText(
+    oracleText,
+  ).toLowerCase().replaceAll('search you library', 'search your library');
+  final directOracle = optimizationOracleDirectEffectText(oracle);
+  if (directOracle.contains('add {') ||
+      looksLikeOptimizationWordedManaProductionText(oracle) ||
+      looksLikeOptimizationWordedAnyManaProductionText(oracle) ||
+      _looksLikeControlledGrantedManaAbility(oracle)) {
     return true;
+  }
+  if (oracle.contains('search your library') &&
+      looksLikeOptimizationLandSearchText(oracle) &&
+      _landSearchPutsLandOntoBattlefield(oracle)) {
+    return true;
+  }
   return oracle.contains('additional land this turn') ||
       oracle.contains('additional land on each of your turns') ||
       (oracle.contains('spells you cast cost') &&
           oracle.contains('less to cast')) ||
+      RegExp(
+        r'\bspells you cast\b[^.\n]{0,64}\bcost\b[^.\n]{0,32}\bless to cast\b',
+      ).hasMatch(oracle) ||
       (oracle.contains('untap up to') && oracle.contains('lands')) ||
       (oracle.contains('taps an island for mana') &&
           oracle.contains('adds an additional')) ||
       oracle.contains('put a land card from your hand onto the battlefield') ||
       (oracle.contains('put up to') && oracle.contains('land cards')) ||
-      oracle.contains('create a treasure token') ||
-      oracle.contains('create two treasure tokens') ||
-      oracle.contains('create three treasure tokens');
+      classifyOptimizationTreasureRampText(oracle).isRamp ||
+      _looksLikeOptimizationKnownManaTokenProductionText(oracle) ||
+      RegExp(r'\bfirebending\s+(?:\d+|x)\b').hasMatch(oracle) ||
+      oracle.contains('spells you cast have convoke') ||
+      oracle.contains('create a birds of paradise token') ||
+      oracle.contains('has all activated abilities of all lands') ||
+      (oracle.contains('mana counter') &&
+          RegExp(
+            r'\b(?:can|may) spend mana of any color\b[^.\n]{0,48}'
+            r'\bequal to the number of mana counters\b',
+          ).hasMatch(oracle));
+}
+
+/// Distinguishes worded mana production from casting/payment permission.
+///
+/// Text such as "mana of any type can be spent" changes how a cost may be
+/// paid; it does not create mana. Requiring an explicit `add` verb before the
+/// phrase preserves real producers such as Arcane Signet and
+/// Ronin, Shadow Stalker without turning permission effects into ramp.
+bool looksLikeOptimizationWordedAnyManaProductionText(String oracleText) {
+  final oracle =
+      optimizationOracleWithoutReminderText(oracleText).toLowerCase();
+  final direct = optimizationOracleDirectEffectText(oracle);
+  return RegExp(
+        r'\badds?\b[^.\n]{0,96}\bmana of any(?:\s+one)?\b',
+      ).hasMatch(direct) ||
+      _looksLikeControlledGrantedManaAbility(oracle, wordedAnyOnly: true);
+}
+
+bool looksLikeOptimizationWordedManaProductionText(String oracleText) {
+  final oracle =
+      optimizationOracleWithoutReminderText(oracleText).toLowerCase();
+  final direct = optimizationOracleDirectEffectText(oracle);
+  return RegExp(
+        r'\badds?\b[^.\n]{0,96}\b(?:one|two|three|four|five|six|seven|eight|nine|ten|x|that much|an amount of)\s+mana\b',
+      ).hasMatch(direct) ||
+      _looksLikeControlledGrantedManaAbility(oracle);
+}
+
+bool _looksLikeControlledGrantedManaAbility(
+  String oracle, {
+  bool wordedAnyOnly = false,
+}) {
+  if (RegExp(
+    r'\ball lands have\s*["“][\s\S]{0,180}\badd\b[\s\S]{0,180}["”]'
+    r'\s*and lose all other abilities\b',
+  ).hasMatch(oracle)) {
+    return false;
+  }
+  for (final span in _optimizationQuotedSpans(oracle)) {
+    final producesMana =
+        wordedAnyOnly
+            ? RegExp(
+              r'\badds?\b[^.\n]{0,96}\bmana of any(?:\s+one)?\b',
+            ).hasMatch(span.text)
+            : span.text.contains('add {') ||
+                RegExp(
+                  r'\badds?\b[^.\n]{0,96}\bmana of any(?:\s+one)?\b',
+                ).hasMatch(span.text);
+    if (!producesMana) continue;
+    final prefixStart = (span.start - 360).clamp(0, span.start).toInt();
+    final prefix = oracle.substring(prefixStart, span.start);
+    if (_looksLikeTargetLandGrantedManaContext(prefix) &&
+        !_looksLikeNetPositiveGrantedManaAbility(span.text)) {
+      continue;
+    }
+    if (_looksLikeControllerOwnedGrantedContext(prefix) ||
+        _looksLikeControllerOwnedManaStatement(span.text)) {
+      return true;
+    }
+  }
+  return false;
+}
+
+bool _looksLikeControllerOwnedGrantedContext(String rawPrefix) {
+  final prefix =
+      rawPrefix
+          .replaceAll(RegExp(r'\s+'), ' ')
+          .trim()
+          .replaceFirst(RegExp(r'["“]\s*$'), '')
+          .trimRight();
+  final returnsUnderYourControl = RegExp(
+    r'\b(?:return|put)\b[\s\S]{0,180}\bunder your control\b',
+  ).hasMatch(prefix);
+  if (!returnsUnderYourControl &&
+      RegExp(
+        r'\b(?:becomes?|become|is|are)\b[^.]{0,72}\btreasure\s+artifacts?\s+with\s*$',
+      ).hasMatch(prefix)) {
+    return false;
+  }
+  if (RegExp(
+    r'\bopponent(?:s)?(?:\s+controls?)?\b[^.]{0,96}\b(?:has|have|gains?|with)\s*$',
+  ).hasMatch(prefix)) {
+    return false;
+  }
+  if (RegExp(
+    r'\b(?:enchant|target)\b[^.]{0,96}\b(?:an?|target) opponent controls\b',
+  ).hasMatch(prefix)) {
+    return false;
+  }
+  return returnsUnderYourControl ||
+      RegExp(
+        r'\b(?:creatures?|artifacts?|lands?|permanents?|treasures?|tokens?)\b'
+        r'[^.]{0,96}\byou\s+(?:control|own)\b[^.]{0,96}'
+        r'\b(?:has|have|gains?|with)\b[^.]{0,96}$',
+      ).hasMatch(prefix) ||
+      RegExp(
+        r'\b[a-z][a-z0-9\x27 -]{0,72}\byou\s+(?:control|own)\b'
+        r'[^.]{0,96}\b(?:has|have|gains?)\b[^.]{0,96}$',
+      ).hasMatch(prefix) ||
+      RegExp(
+        r'(?:^|[.\n—:])\s*all\s+(?!other\b)[a-z][a-z0-9\x27 -]{0,64}\b'
+        r'[^.]{0,64}\b(?:has|have|gains?)\b[^.]{0,96}$',
+      ).hasMatch(prefix) ||
+      RegExp(
+        r'\b(?:equipped|enchanted)\s+(?:creature|land|permanent)\b'
+        r'[^.]{0,96}\b(?:has|gains?)\b[^.]{0,96}$',
+      ).hasMatch(prefix) ||
+      RegExp(
+        r'\btarget\s+(?:creature|artifact|land|permanent)\b'
+        r'[^.]{0,120}\b(?:has|gains?)\b[^.]{0,48}$',
+      ).hasMatch(prefix) ||
+      RegExp(
+        r'\bgain control of target\b[^.]{0,160}\bit gains?\b[^.]{0,48}$',
+      ).hasMatch(prefix) ||
+      RegExp(
+        r'\bcards? in your hand\b[^.]{0,160}\b(?:gain|gains)\b[^.]{0,48}$',
+      ).hasMatch(prefix) ||
+      RegExp(
+        r'\bcards? in your hand\b[\s\S]{0,120}\bthey\b'
+        r'[^.]{0,64}\b(?:gain|gains)\b[^.]{0,48}$',
+      ).hasMatch(prefix) ||
+      RegExp(
+        r'\bcreates?\b[^.]{0,180}\btokens?\b[^.]{0,96}\b(?:with|and)\s*$',
+      ).hasMatch(prefix) ||
+      RegExp(
+        r'\bcreates?\b[^.]{0,180}\btokens?\b'
+        r'(?:\s+that)?\s+(?:has|have)\b[^.]{0,48}$',
+      ).hasMatch(prefix) ||
+      RegExp(
+        r'\bcreates?\b[^.]{0,180}\btokens?\.\s*'
+        r'(?:it|they|those tokens?)\s+(?:has|have)\b[^.]{0,48}$',
+      ).hasMatch(prefix) ||
+      RegExp(
+        r'\b(?:this (?:creature|artifact|permanent)|it|she|he)\b'
+        r'[^.]{0,96}\b(?:has|gains?)\b[^.]{0,96}$',
+      ).hasMatch(prefix) ||
+      RegExp(
+        r'\bthose tokens\b[^.]{0,64}\b(?:has|have|gains?)\b[^.]{0,48}$',
+      ).hasMatch(prefix) ||
+      RegExp(
+        r'\bcreates?\b[^.]{0,120}\btoken at random\b[\s\S]{0,180}'
+        r'\b(?:banana|powerstone|gold|lander)\b[^.]{0,48}\bwith\s*$',
+      ).hasMatch(prefix) ||
+      RegExp(
+        r'\bcreatures you control gain\b[\s\S]{0,360}'
+        r'\bthe activated ability\s*$',
+      ).hasMatch(prefix) ||
+      RegExp(
+        r'\byou get\b[^.]{0,120}\ban? emblem\b[^.]{0,48}\bwith\s*$',
+      ).hasMatch(prefix);
+}
+
+bool _looksLikeTargetLandGrantedManaContext(String rawPrefix) {
+  final prefix = rawPrefix.replaceAll(RegExp(r'\s+'), ' ').trim();
+  return RegExp(
+    r'\btarget\s+land\b[^.]{0,120}\b(?:has|gains?)\b[^.]{0,48}$',
+  ).hasMatch(prefix);
+}
+
+bool _looksLikeNetPositiveGrantedManaAbility(String quotedAbility) {
+  final ability = quotedAbility.toLowerCase();
+  final addIndex = ability.indexOf('add ');
+  if (addIndex < 0) return false;
+  final production = ability.substring(addIndex + 4);
+  if (RegExp(
+    r'\b(?:two|three|four|five|six|seven|eight|nine|ten|x|that much|an amount of)\s+mana\b',
+  ).hasMatch(production)) {
+    return true;
+  }
+  if (production.contains(' or ')) return false;
+  return RegExp(r'\{[^}]+\}\s*\{[^}]+\}').hasMatch(production);
+}
+
+bool _looksLikeControllerOwnedManaStatement(String text) {
+  return RegExp(
+    r'\b(?:[a-z][a-z0-9\x27 -]{0,72}\byou\s+(?:control|own)|'
+    r'enchanted\s+(?:creature|land|forest|permanent)|'
+    r'(?:^|[.\n])\s*all\s+(?!other\b)[a-z][a-z0-9\x27 -]{0,64})\b'
+    r'[^.\n]{0,180}\badds?\b',
+  ).hasMatch(text);
+}
+
+bool _looksLikeOptimizationKnownManaTokenProductionText(String oracle) {
+  final direct = optimizationOracleDirectEffectText(oracle.toLowerCase());
+  var normalized = direct.replaceAll(
+    RegExp(
+      r'\b(?:powerstone|gold|lander|banana|vibranium|mutavault)\b'
+      r'(?=\s+tokens?\b)|'
+      r'\beldrazi\s+(?:scion|spawn)\b(?=(?:\s+creature)?\s+tokens?\b)|'
+      r'\b(?:lotus|tulip)\s+petal\b(?=\s+tokens?\b)|'
+      r'\bhuntsman\s+role\b(?=\s+tokens?\b)',
+    ),
+    'treasure',
+  );
+  normalized = normalized.replaceAllMapped(
+    RegExp(
+      r'\b(named|name)\s+(?:mana\s+confluence|mutavault|banana|'
+      r'powerstone|gold|lander)\b',
+    ),
+    (match) => '${match.group(1)} treasure',
+  );
+  return _hasPositiveTokenProduction(normalized, treasureOnly: true);
+}
+
+bool _hasPositiveTokenProduction(String text, {required bool treasureOnly}) {
+  return _hasSelfTokenProduction(text, treasureOnly: treasureOnly) ||
+      _hasSharedTokenProduction(text, treasureOnly: treasureOnly) ||
+      _hasAnyPlayerTokenProduction(text, treasureOnly: treasureOnly) ||
+      _hasTargetPlayerTokenProduction(text, treasureOnly: treasureOnly) ||
+      _hasImperativeTokenProduction(text, treasureOnly: treasureOnly);
+}
+
+bool _hasSelfTokenProduction(String text, {required bool treasureOnly}) {
+  final object = _tokenObjectPattern(treasureOnly: treasureOnly);
+  return RegExp(
+        r'\b(?:you|we|your team)\s+(?:(?:may|also|instead)\s+)*creates?\b'
+                r'[^.\n;]{0,120}' +
+            object,
+      ).hasMatch(text) ||
+      RegExp(
+        r'\byou\s+may\b[^.\n;]{0,80}\bor\s+create\b[^.\n;]{0,120}' + object,
+      ).hasMatch(text);
+}
+
+bool _hasSharedTokenProduction(String text, {required bool treasureOnly}) {
+  final object = _tokenObjectPattern(treasureOnly: treasureOnly);
+  return RegExp(
+        r'\byou\s+and\b[^.\n;]{0,96}\beach\s+create\b[^.\n;]{0,120}' + object,
+      ).hasMatch(text) ||
+      RegExp(
+        r'\b(?:each player|all players|each team)\s+'
+                r'(?:(?:may|also|instead)\s+)*creates?\b[^.\n;]{0,120}' +
+            object,
+      ).hasMatch(text);
+}
+
+bool _hasAnyPlayerTokenProduction(String text, {required bool treasureOnly}) {
+  final object = _tokenObjectPattern(treasureOnly: treasureOnly);
+  return RegExp(
+        r'\bthat player\s+(?:(?:may|also|instead)\s+)*creates?\b'
+                r'[^.\n;]{0,120}' +
+            object,
+      ).hasMatch(text) ||
+      RegExp(
+        r'\b(?:when|whenever)\s+a player\b[^.\n;]{0,160}'
+                r'\bthey\s+create\b[^.\n;]{0,120}' +
+            object,
+      ).hasMatch(text);
+}
+
+bool _hasTargetPlayerTokenProduction(
+  String text, {
+  required bool treasureOnly,
+}) {
+  final object = _tokenObjectPattern(treasureOnly: treasureOnly);
+  return RegExp(
+        r'\btarget player\s+(?:(?:may|also|instead)\s+)*creates?\b'
+                r'[^.\n;]{0,120}' +
+            object,
+      ).hasMatch(text) ||
+      RegExp(
+        r'\btarget player\b[^.\n;]{0,120}\bthey\s+create\b'
+                r'[^.\n;]{0,120}' +
+            object,
+      ).hasMatch(text) ||
+      RegExp(
+        r'\bchoose\s+(?:(?:a|the)\s+)?(?:first|second|third|another)?\s*player\b'
+                r'[^.\n;]{0,120}\bto\s+create\b[^.\n;]{0,120}' +
+            object,
+      ).hasMatch(text);
+}
+
+bool _hasImperativeTokenProduction(String text, {required bool treasureOnly}) {
+  return RegExp(
+    r'(?:^|[\n.;:•—|]|,\s*|\bthen\s+|\band\s+)\s*'
+            r'(?:(?:if you do|when you do),\s*)?'
+            r'(?:(?:you may|may|also|instead)\s+)*create\b'
+            r'[^.\n;]{0,120}' +
+        _tokenObjectPattern(treasureOnly: treasureOnly),
+    multiLine: true,
+  ).hasMatch(text);
+}
+
+String _tokenObjectPattern({required bool treasureOnly}) {
+  if (!treasureOnly) return r'\btokens?\b';
+  return r'\btreasure\b[^.\n;]{0,32}\btokens?\b';
+}
+
+List<_OptimizationQuotedSpan> _optimizationQuotedSpans(String value) {
+  final spans = <_OptimizationQuotedSpan>[];
+  var start = -1;
+  var ascii = false;
+  var curly = false;
+  for (var index = 0; index < value.length; index++) {
+    final char = value[index];
+    if (char == '"') {
+      if (!curly && !ascii) {
+        ascii = true;
+        start = index + 1;
+      } else if (ascii) {
+        spans.add(
+          _OptimizationQuotedSpan(
+            start: start,
+            text: value.substring(start, index),
+          ),
+        );
+        ascii = false;
+        start = -1;
+      }
+    } else if (char == '“' && !ascii && !curly) {
+      curly = true;
+      start = index + 1;
+    } else if (char == '”' && curly) {
+      spans.add(
+        _OptimizationQuotedSpan(
+          start: start,
+          text: value.substring(start, index),
+        ),
+      );
+      curly = false;
+      start = -1;
+    }
+  }
+  return spans;
+}
+
+class _OptimizationQuotedSpan {
+  const _OptimizationQuotedSpan({required this.start, required this.text});
+
+  final int start;
+  final String text;
+}
+
+bool _landSearchPutsLandOntoBattlefield(String oracle) {
+  final searchIndex = oracle.indexOf('search your library');
+  if (searchIndex < 0) return false;
+  final battlefieldIndex = oracle.indexOf('onto the battlefield', searchIndex);
+  if (battlefieldIndex < 0) return false;
+
+  // Keep the proof tied to the same search instruction. A later, unrelated
+  // paragraph that puts a creature onto the battlefield is not land ramp.
+  final nextParagraph = oracle.indexOf('\n', searchIndex);
+  return nextParagraph < 0 || battlefieldIndex < nextParagraph;
 }
 
 bool looksLikeOptimizationTargetedRemovalText(String oracleText) {
@@ -458,26 +1000,35 @@ bool looksLikeOptimizationLandSearchText(String oracleText) {
       oracle.contains('mountain card');
 }
 
-bool _looksLikeWincon(String oracle, String name) =>
-    name.contains('thassa\'s oracle') ||
-    oracle.contains('you win the game') ||
-    oracle.contains('opponent loses the game') ||
-    oracle.contains('opponents lose the game') ||
-    oracle.contains('each opponent loses') ||
-    oracle.contains('additional combat phase') ||
-    oracle.contains("player's life total becomes 1") ||
-    oracle.contains('life total becomes 1') ||
-    (oracle.contains('damage equal to') && oracle.contains('opponent')) ||
-    oracle.contains('double your life total');
+bool _looksLikeWincon(String oracle, String name) {
+  final direct = optimizationOracleWithoutReminderText(oracle).toLowerCase();
+  return name.contains('thassa\'s oracle') ||
+      direct.contains('you win the game') ||
+      RegExp(
+        r'\b(?:target|that|defending) (?:player|opponent)\b'
+        r'[^.\n]{0,160}\bloses the game\b',
+      ).hasMatch(direct) ||
+      RegExp(
+        r'\beach (?:player|opponent)\b[^.\n]{0,160}\bloses the game\b',
+      ).hasMatch(direct) ||
+      RegExp(
+        r'\bits owner\b[^.\n]{0,120}\bloses the game\b',
+      ).hasMatch(direct) ||
+      direct.contains('additional combat phase') ||
+      direct.contains("player's life total becomes 1") ||
+      direct.contains('life total becomes 1') ||
+      (direct.contains('damage equal to') && direct.contains('opponent')) ||
+      direct.contains('double your life total');
+}
 
 bool _looksLikeEngine(String oracle) =>
     (oracle.contains('at the beginning of your upkeep') &&
-        oracle.contains('you may')) ||
+        (_looksLikeRecurringControllerValue(oracle) ||
+            oracle.contains('you may'))) ||
+    (oracle.contains('at the beginning of your end step') &&
+        _looksLikeRecurringControllerValue(oracle)) ||
     (oracle.contains('whenever') &&
-        oracle.contains('you may') &&
-        (oracle.contains('draw') ||
-            oracle.contains('create') ||
-            oracle.contains('add'))) ||
+        _looksLikeRecurringControllerValue(oracle)) ||
     (oracle.contains('your end step') && oracle.contains('you may')) ||
     oracle.contains('additional combat phase') ||
     oracle.contains('copy target triggered ability') ||
@@ -497,6 +1048,30 @@ bool _looksLikeEngine(String oracle) =>
     (oracle.contains('whenever a creature you control leaves') &&
         oracle.contains('counters')) ||
     oracle.contains('move all counters');
+
+bool _looksLikeRecurringControllerValue(String oracle) {
+  final opponentOnlyDraw = RegExp(
+    r'\b(?:target|that|an|each) opponent\b[^.\n]{0,120}\bdraws?\b',
+  ).hasMatch(oracle);
+  final controllerDraw =
+      oracle.contains('you draw') ||
+      oracle.contains('you may draw') ||
+      (!opponentOnlyDraw &&
+          RegExp(
+            r'(?:^|[,;:]\s*|\bthen\s+)draw (?:a|one|two|three|x|that many) cards?\b',
+          ).hasMatch(oracle));
+  final controllerTokens = looksLikeOptimizationControllerTokenCreationText(
+    oracle,
+  );
+  final controllerImpulse =
+      oracle.contains('exile the top') &&
+      (oracle.contains('you may play') || oracle.contains('you may cast'));
+  return controllerDraw ||
+      controllerTokens ||
+      controllerImpulse ||
+      oracle.contains('you add {') ||
+      oracle.contains('return') && oracle.contains('to your hand');
+}
 
 bool _looksLikeDraw(String oracle) {
   if (oracle.contains('target opponent draws') ||
@@ -597,14 +1172,25 @@ bool _looksLikeSelfMillSetup(String oracle) {
       oracle.contains('dredge');
 }
 
-bool _looksLikeEtb(String oracle) =>
-    oracle.contains('enters the battlefield') ||
-    oracle.contains('when this creature enters') ||
-    oracle.contains('when this permanent enters') ||
-    oracle.contains('whenever a creature enters') ||
-    oracle.contains('whenever an artifact enters') ||
-    oracle.contains('whenever an enchantment enters') ||
-    oracle.contains('whenever a land enters');
+bool looksLikeOptimizationEtbTrigger(String oracleText, {String name = ''}) {
+  final oracle = oracleText.toLowerCase();
+  if (oracle.contains("don't cause abilities to trigger") ||
+      oracle.contains("abilities don't trigger")) {
+    return false;
+  }
+  if (oracle.contains('enters the battlefield') ||
+      oracle.contains('when this creature enters') ||
+      oracle.contains('when this permanent enters') ||
+      oracle.contains('whenever this creature enters') ||
+      oracle.contains('whenever this permanent enters') ||
+      RegExp(r'\bwhen(?:ever)?\s+[^.\n,]{1,96}\benters\b').hasMatch(oracle)) {
+    return true;
+  }
+  final faceName = name.toLowerCase().split('//').first.trim();
+  return faceName.isNotEmpty &&
+      (oracle.contains('when $faceName enters') ||
+          oracle.contains('whenever $faceName enters'));
+}
 
 bool _looksLikeBlink(String oracle, String name) =>
     (oracle.contains('exile') &&
@@ -888,7 +1474,7 @@ CardRoles _diagnosticRoleSignal(Map<String, dynamic>? card) {
   );
   if (resolved.roles.isEmpty) return resolved;
   final roles = resolved.roles.toSet();
-  if (((card['type_line'] as String?) ?? '').toLowerCase().contains('land')) {
+  if (land_utils.isLandTypeLine((card['type_line'] as String?) ?? '')) {
     roles.add('land');
   }
   return CardRoles(

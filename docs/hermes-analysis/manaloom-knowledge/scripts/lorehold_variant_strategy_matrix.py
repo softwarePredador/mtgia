@@ -10,6 +10,7 @@ equal battle gate and which strategy gaps need runtime/rule work first.
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 import re
 import sqlite3
@@ -532,6 +533,7 @@ def build_matrix(
     *,
     deck_ids: list[int],
     candidate_path: Path | None = DEFAULT_CANDIDATE,
+    source_db: Path | str = DEFAULT_DB,
 ) -> dict[str, Any]:
     conn.row_factory = sqlite3.Row
     metadata = load_deck_metadata(conn, deck_ids)
@@ -559,11 +561,18 @@ def build_matrix(
         decks.append(summary)
 
     ranked = sorted(decks, key=lambda deck: (-float(deck["strategy_score"]), str(deck["deck_key"])))
+    source_db_path = Path(source_db).resolve()
+    source_db_sha256 = (
+        hashlib.sha256(source_db_path.read_bytes()).hexdigest()
+        if source_db_path.is_file()
+        else None
+    )
     return {
         "generated_at": utc_now(),
         "status": "ready",
         "strategy_version": STRATEGY_VERSION,
-        "source_db": str(DEFAULT_DB),
+        "source_db": str(source_db_path),
+        "source_db_sha256": source_db_sha256,
         "deck_ids": deck_ids,
         "candidate_path": str(candidate_path) if candidate_path else None,
         "external_method_sources": EXTERNAL_METHOD_SOURCES,
@@ -670,7 +679,12 @@ def main() -> int:
     deck_ids = parse_deck_ids(args.deck_ids)
     conn = sqlite3.connect(args.db)
     conn.row_factory = sqlite3.Row
-    payload = build_matrix(conn, deck_ids=deck_ids, candidate_path=args.candidate)
+    payload = build_matrix(
+        conn,
+        deck_ids=deck_ids,
+        candidate_path=args.candidate,
+        source_db=args.db,
+    )
 
     json_path = args.out_prefix.with_suffix(".json")
     md_path = args.out_prefix.with_suffix(".md")

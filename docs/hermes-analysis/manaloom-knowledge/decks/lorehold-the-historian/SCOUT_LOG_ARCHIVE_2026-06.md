@@ -741,7 +741,7 @@ Todas as 8 alternativas estão na coleção. O custo total das melhorias é zero
 
 ---
 
-**Dados brutos:** `scripts/_edhrec_raw_lorehold.json` (fresco desta execução)
+**Dados brutos:** snapshot removido do repositório em 2026-07-16 por conter metadados sensíveis; somente derivados sanitizados podem ser retidos.
 
 ## [2026-05-28 03:00] Execução #7 — Deep Refresh Pós-Ciclo #2
 

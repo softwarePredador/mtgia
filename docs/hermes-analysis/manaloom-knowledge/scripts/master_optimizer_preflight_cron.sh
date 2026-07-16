@@ -13,6 +13,8 @@ REPORT_DIR="$REPO/docs/hermes-analysis/master_optimizer_reports"
 ARTIFACT_DIR="${MANALOOM_MASTER_OPTIMIZER_ARTIFACT_DIR:-/opt/data/artifacts/hermes_master_optimizer}"
 SECRET_ENV="${MANALOOM_POSTGRES_ENV:-/opt/data/secrets/manaloom-postgres.env}"
 DECK_ID="${MANALOOM_OPTIMIZER_DECK_ID:-6}"
+CANONICAL_PG_DECK_ID="${MANALOOM_CANONICAL_PG_DECK_ID:-8938b746-1a9e-46ce-b0d9-c2ec932ddddd}"
+TARGET_PG_DECK_ID="${MANALOOM_TARGET_PG_DECK_ID:-$CANONICAL_PG_DECK_ID}"
 LOREHOLD_CANONICAL_OVERRIDE="${MANALOOM_LOREHOLD_CANONICAL_OVERRIDE:-0}"
 
 if [[ -z "${HERMES_KNOWLEDGE_BACKUP_DIR:-}" ]]; then
@@ -56,12 +58,6 @@ python3 "$SCRIPT_DIR/sync_pg_meta_decks_to_hermes.py" \
   --min-cards "${MANALOOM_META_DECK_SYNC_MIN_CARDS:-80}" \
   --apply | tee "$meta_decks_log"
 
-target_deck_log="$ARTIFACT_DIR/target_deck_sync_preflight_$(date -u +%Y%m%d_%H%M%S).log"
-python3 "$SCRIPT_DIR/sync_pg_target_deck_to_hermes.py" \
-  --sqlite-db "$MANALOOM_KNOWLEDGE_DB" \
-  --target-deck-id "$DECK_ID" \
-  --apply | tee "$target_deck_log"
-
 legalities_report="$ARTIFACT_DIR/legalities_sync_preflight_$(date -u +%Y%m%d_%H%M%S).json"
 python3 "$SCRIPT_DIR/sync_pg_legalities.py" \
   --sqlite-db "$MANALOOM_KNOWLEDGE_DB" \
@@ -89,6 +85,28 @@ python3 "$SCRIPT_DIR/sync_battle_card_rules_pg.py" \
   --apply-sqlite-from-pg \
   --include-needs-review \
   --report "$battle_rules_report"
+
+# Target materialization is deliberately last among cache writers. Metadata
+# canonicalization and battle-rule refreshes must not invalidate its hashes.
+target_deck_log="$ARTIFACT_DIR/target_deck_sync_preflight_$(date -u +%Y%m%d_%H%M%S).log"
+python3 "$SCRIPT_DIR/sync_pg_target_deck_to_hermes.py" \
+  --sqlite-db "$MANALOOM_KNOWLEDGE_DB" \
+  --pg-deck-id "$TARGET_PG_DECK_ID" \
+  --protected-pg-deck-id "$CANONICAL_PG_DECK_ID" \
+  --target-deck-id "$DECK_ID" \
+  --apply | tee "$target_deck_log"
+
+target_identity_report="$ARTIFACT_DIR/target_deck_identity_preflight_$(date -u +%Y%m%d_%H%M%S).json"
+target_identity_command=(
+  python3 "$SCRIPT_DIR/battle_target_deck_identity_guard.py"
+  --sqlite-db "$MANALOOM_KNOWLEDGE_DB"
+  --target-deck-id "$DECK_ID"
+  --output "$target_identity_report"
+)
+if [[ "$DECK_ID" == "6" ]]; then
+  target_identity_command+=(--expected-pg-deck-id "$CANONICAL_PG_DECK_ID")
+fi
+"${target_identity_command[@]}" >/dev/null
 
 contract_prefix="$ARTIFACT_DIR/pg_hermes_sqlite_contract_audit_preflight_$(date -u +%Y%m%d_%H%M%S)"
 python3 "$SCRIPT_DIR/pg_hermes_sqlite_contract_audit.py" \
@@ -123,6 +141,7 @@ fi
 echo "master_optimizer_preflight=ok"
 echo "meta_decks_log=$meta_decks_log"
 echo "target_deck_log=$target_deck_log"
+echo "target_identity_report=$target_identity_report"
 echo "legalities_report=$legalities_report"
 echo "sync_report=$sync_report"
 echo "battle_rules_pg_report=$battle_rules_pg_report"

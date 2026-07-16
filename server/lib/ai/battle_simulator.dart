@@ -1,5 +1,7 @@
 import 'dart:math';
 
+import '../basic_land_utils.dart' as basic_lands;
+
 /// Simulador de batalha turno-a-turno simplificado.
 ///
 /// Implementa regras básicas de MTG para simular partidas IA vs IA,
@@ -46,7 +48,7 @@ class GameCard {
     this.toughness,
   });
 
-  bool get isLand => typeLine.toLowerCase().contains('land');
+  bool get isLand => basic_lands.isLandTypeLine(typeLine);
   bool get isCreature => typeLine.toLowerCase().contains('creature');
   bool get isInstant => typeLine.toLowerCase().contains('instant');
   bool get isSorcery => typeLine.toLowerCase().contains('sorcery');
@@ -103,28 +105,28 @@ class GameCard {
   }
 
   GameCard copy() => GameCard(
-        id: id,
-        name: name,
-        cmc: cmc,
-        typeLine: typeLine,
-        oracleText: oracleText,
-        imageUrl: imageUrl,
-        colors: colors,
-        power: power,
-        toughness: toughness,
-      );
+    id: id,
+    name: name,
+    cmc: cmc,
+    typeLine: typeLine,
+    oracleText: oracleText,
+    imageUrl: imageUrl,
+    colors: colors,
+    power: power,
+    toughness: toughness,
+  );
 
   Map<String, dynamic> toJson() => {
-        'id': id,
-        'name': name,
-        'cmc': cmc,
-        'type': typeLine,
-        'type_line': typeLine,
-        'image_url': imageUrl,
-        'power': power,
-        'toughness': toughness,
-        'tapped': isTapped,
-      };
+    'id': id,
+    'name': name,
+    'cmc': cmc,
+    'type': typeLine,
+    'type_line': typeLine,
+    'image_url': imageUrl,
+    'power': power,
+    'toughness': toughness,
+    'tapped': isTapped,
+  };
 
   @override
   String toString() => isCreature ? '$name ($power/$toughness)' : name;
@@ -166,18 +168,18 @@ class PlayerState {
   }
 
   Map<String, dynamic> toJson() => {
-        'name': name,
-        'life': life,
-        'mana': manaAvailable,
-        'hand_size': hand.length,
-        'library_size': library.length,
-        'hand': hand.map((c) => c.toJson()).toList(),
-        'battlefield': battlefield.map((c) => c.toJson()).toList(),
-        'creatures': creatures.map((c) => c.toJson()).toList(),
-        'lands': lands.length,
-        'graveyard': graveyard.map((c) => c.toJson()).toList(),
-        'graveyard_size': graveyard.length,
-      };
+    'name': name,
+    'life': life,
+    'mana': manaAvailable,
+    'hand_size': hand.length,
+    'library_size': library.length,
+    'hand': hand.map((c) => c.toJson()).toList(),
+    'battlefield': battlefield.map((c) => c.toJson()).toList(),
+    'creatures': creatures.map((c) => c.toJson()).toList(),
+    'lands': lands.length,
+    'graveyard': graveyard.map((c) => c.toJson()).toList(),
+    'graveyard_size': graveyard.length,
+  };
 }
 
 /// Ação executada durante o jogo (para logging).
@@ -197,12 +199,12 @@ class GameAction {
   });
 
   Map<String, dynamic> toJson() => {
-        'turn': turn,
-        'player': player,
-        'phase': phase,
-        'action': action,
-        if (details != null) ...details!,
-      };
+    'turn': turn,
+    'player': player,
+    'phase': phase,
+    'action': action,
+    if (details != null) ...details!,
+  };
 }
 
 /// Resultado da simulação.
@@ -226,15 +228,15 @@ class BattleResult {
   });
 
   Map<String, dynamic> toJson() => {
-        'winner': winner,
-        'loser': loser,
-        'turns': turns,
-        'win_condition': winCondition,
-        'action_count': actions.length,
-        'final_state': finalState,
-        'visual_snapshots': visualSnapshots,
-        'game_log': actions.map((a) => a.toJson()).toList(),
-      };
+    'winner': winner,
+    'loser': loser,
+    'turns': turns,
+    'win_condition': winCondition,
+    'action_count': actions.length,
+    'final_state': finalState,
+    'visual_snapshots': visualSnapshots,
+    'game_log': actions.map((a) => a.toJson()).toList(),
+  };
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -284,10 +286,7 @@ class BattleSimulator {
       turns: _currentTurn,
       winCondition: _getWinCondition(winner),
       actions: _actions,
-      finalState: {
-        'player_a': playerA.toJson(),
-        'player_b': playerB.toJson(),
-      },
+      finalState: {'player_a': playerA.toJson(), 'player_b': playerB.toJson()},
       visualSnapshots: _visualSnapshots,
     );
   }
@@ -310,10 +309,18 @@ class BattleSimulator {
       playerB.drawCard();
     }
 
-    _log(playerA, 'setup', 'game_start',
-        details: {'hand_size': 7, 'library_size': playerA.library.length});
-    _log(playerB, 'setup', 'game_start',
-        details: {'hand_size': 7, 'library_size': playerB.library.length});
+    _log(
+      playerA,
+      'setup',
+      'game_start',
+      details: {'hand_size': 7, 'library_size': playerA.library.length},
+    );
+    _log(
+      playerB,
+      'setup',
+      'game_start',
+      details: {'hand_size': 7, 'library_size': playerB.library.length},
+    );
   }
 
   List<GameCard> _expandDeck(List<Map<String, dynamic>> cards) {
@@ -334,7 +341,8 @@ class BattleSimulator {
     // Parse P/T para criaturas
     if (typeLine.toLowerCase().contains('creature')) {
       final pt = RegExp(r'(\d+)/(\d+)').firstMatch(
-          card['power']?.toString() ?? card['toughness']?.toString() ?? '');
+        card['power']?.toString() ?? card['toughness']?.toString() ?? '',
+      );
       if (pt != null) {
         power = int.tryParse(pt.group(1) ?? '');
         toughness = int.tryParse(pt.group(2) ?? '');
@@ -405,8 +413,12 @@ class BattleSimulator {
     player.landsPlayedThisTurn = 0;
     player.manaAvailable = player.lands.length;
 
-    _log(player, 'untap', 'untap_all',
-        details: {'mana_available': player.manaAvailable});
+    _log(
+      player,
+      'untap',
+      'untap_all',
+      details: {'mana_available': player.manaAvailable},
+    );
   }
 
   void _drawPhase(PlayerState player) {
@@ -437,8 +449,12 @@ class BattleSimulator {
       return;
     }
 
-    _log(active, 'combat', 'declare_attackers',
-        details: {'attackers': attackers.map((c) => c.name).toList()});
+    _log(
+      active,
+      'combat',
+      'declare_attackers',
+      details: {'attackers': attackers.map((c) => c.name).toList()},
+    );
 
     // Marca atacantes como tapped (exceto vigilance)
     for (final attacker in attackers) {
@@ -451,11 +467,17 @@ class BattleSimulator {
     // IA: bloqueadores
     final blocks = _aiDecideBlockers(opponent, attackers);
 
-    _log(opponent, 'combat', 'declare_blockers', details: {
-      'blocks': blocks.entries
-          .map((e) => {'attacker': e.key.name, 'blocker': e.value.name})
-          .toList()
-    });
+    _log(
+      opponent,
+      'combat',
+      'declare_blockers',
+      details: {
+        'blocks':
+            blocks.entries
+                .map((e) => {'attacker': e.key.name, 'blocker': e.value.name})
+                .toList(),
+      },
+    );
 
     // Resolve combate
     _resolveCombat(active, opponent, attackers, blocks);
@@ -522,24 +544,34 @@ class BattleSimulator {
 
     if (damageToOpponent > 0) {
       opponent.life -= damageToOpponent;
-      _log(active, 'combat', 'deal_damage', details: {
-        'damage': damageToOpponent,
-        'opponent_life': opponent.life
-      });
+      _log(
+        active,
+        'combat',
+        'deal_damage',
+        details: {'damage': damageToOpponent, 'opponent_life': opponent.life},
+      );
     }
 
     if (lifeGained > 0) {
       active.life += lifeGained;
-      _log(active, 'combat', 'gain_life',
-          details: {'life_gained': lifeGained, 'life': active.life});
+      _log(
+        active,
+        'combat',
+        'gain_life',
+        details: {'life_gained': lifeGained, 'life': active.life},
+      );
     }
   }
 
   void _destroyCreature(PlayerState owner, GameCard creature) {
     owner.battlefield.remove(creature);
     owner.graveyard.add(creature);
-    _log(owner, 'combat', 'creature_dies',
-        details: {'creature': creature.name});
+    _log(
+      owner,
+      'combat',
+      'creature_dies',
+      details: {'creature': creature.name},
+    );
   }
 
   void _endPhase(PlayerState player) {
@@ -600,11 +632,13 @@ class BattleSimulator {
     if (threats.isNotEmpty) {
       for (final card in active.hand) {
         if (card.isRemoval && card.cmc <= active.manaAvailable) {
-          decisions.add(_PlayDecision(
-            card: card,
-            type: 'play_removal',
-            target: threats.first,
-          ));
+          decisions.add(
+            _PlayDecision(
+              card: card,
+              type: 'play_removal',
+              target: threats.first,
+            ),
+          );
           break;
         }
       }
@@ -622,10 +656,11 @@ class BattleSimulator {
     }
 
     // 6. Criaturas (curva de mana)
-    final playableCreatures = active.hand
-        .where((c) => c.isCreature && c.cmc <= active.manaAvailable)
-        .toList()
-      ..sort((a, b) => b.cmc.compareTo(a.cmc)); // Maiores primeiro
+    final playableCreatures =
+        active.hand
+            .where((c) => c.isCreature && c.cmc <= active.manaAvailable)
+            .toList()
+          ..sort((a, b) => b.cmc.compareTo(a.cmc)); // Maiores primeiro
 
     for (final creature in playableCreatures) {
       if (creature.cmc <= active.manaAvailable) {
@@ -660,8 +695,12 @@ class BattleSimulator {
           if (!card.hasHaste) {
             card.summoningSickness = true;
           }
-          _log(active, 'main', 'play_creature',
-              details: {'card': card.name, 'cmc': card.cmc});
+          _log(
+            active,
+            'main',
+            'play_creature',
+            details: {'card': card.name, 'cmc': card.cmc},
+          );
         }
 
       case 'play_removal':
@@ -673,8 +712,12 @@ class BattleSimulator {
           final target = decision.target!;
           opponent.battlefield.remove(target);
           opponent.graveyard.add(target);
-          _log(active, 'main', 'cast_removal',
-              details: {'card': card.name, 'target': target.name});
+          _log(
+            active,
+            'main',
+            'cast_removal',
+            details: {'card': card.name, 'target': target.name},
+          );
         }
 
       case 'play_wipe':
@@ -692,11 +735,16 @@ class BattleSimulator {
           active.graveyard.addAll(destroyedA);
           opponent.graveyard.addAll(destroyedB);
 
-          _log(active, 'main', 'cast_wipe', details: {
-            'card': card.name,
-            'destroyed_own': destroyedA.length,
-            'destroyed_opponent': destroyedB.length,
-          });
+          _log(
+            active,
+            'main',
+            'cast_wipe',
+            details: {
+              'card': card.name,
+              'destroyed_own': destroyedA.length,
+              'destroyed_opponent': destroyedB.length,
+            },
+          );
         }
 
       case 'play_ramp':
@@ -719,17 +767,22 @@ class BattleSimulator {
           }
           if (card.isRamp) {
             // Busca terreno básico
-            final basicLand = active.library
-                .where((c) => c.isLand && c.typeLine.contains('Basic'))
-                .firstOrNull;
+            final basicLand =
+                active.library
+                    .where((c) => c.isLand && c.typeLine.contains('Basic'))
+                    .firstOrNull;
             if (basicLand != null) {
               active.library.remove(basicLand);
               active.battlefield.add(basicLand);
             }
           }
 
-          _log(active, 'main', 'cast_spell',
-              details: {'card': card.name, 'type': decision.type});
+          _log(
+            active,
+            'main',
+            'cast_spell',
+            details: {'card': card.name, 'type': decision.type},
+          );
         }
     }
   }
@@ -740,11 +793,15 @@ class BattleSimulator {
     if (potentialAttackers.isEmpty) return [];
 
     final attackers = <GameCard>[];
-    final totalAttackPower =
-        potentialAttackers.fold(0, (sum, c) => sum + (c.power ?? 0));
+    final totalAttackPower = potentialAttackers.fold(
+      0,
+      (sum, c) => sum + (c.power ?? 0),
+    );
     final opponentBlockers = opponent.untappedCreatures;
-    final opponentBlockPower =
-        opponentBlockers.fold(0, (sum, c) => sum + (c.power ?? 0));
+    final opponentBlockPower = opponentBlockers.fold(
+      0,
+      (sum, c) => sum + (c.power ?? 0),
+    );
 
     // Estratégia simplificada:
     // - Ataca com tudo se tem vantagem significativa
@@ -784,16 +841,18 @@ class BattleSimulator {
     final availableBlockers = defender.untappedCreatures.toList();
 
     // Ordena atacantes por ameaça (power)
-    final sortedAttackers = attackers.toList()
-      ..sort((a, b) => (b.power ?? 0).compareTo(a.power ?? 0));
+    final sortedAttackers =
+        attackers.toList()
+          ..sort((a, b) => (b.power ?? 0).compareTo(a.power ?? 0));
 
     for (final attacker in sortedAttackers) {
       if (availableBlockers.isEmpty) break;
 
       // Flyers só podem ser bloqueados por flyers
-      final validBlockers = attacker.hasFlying
-          ? availableBlockers.where((b) => b.hasFlying).toList()
-          : availableBlockers;
+      final validBlockers =
+          attacker.hasFlying
+              ? availableBlockers.where((b) => b.hasFlying).toList()
+              : availableBlockers;
 
       if (validBlockers.isEmpty) continue;
 
@@ -802,10 +861,10 @@ class BattleSimulator {
       for (final blocker in validBlockers) {
         final blockerKillsAttacker =
             (blocker.power ?? 0) >= (attacker.toughness ?? 0) ||
-                blocker.hasDeathtouch;
+            blocker.hasDeathtouch;
         final blockerSurvives =
             (attacker.power ?? 0) < (blocker.toughness ?? 0) &&
-                !attacker.hasDeathtouch;
+            !attacker.hasDeathtouch;
 
         if (blockerKillsAttacker && blockerSurvives) {
           bestBlocker = blocker;
@@ -816,8 +875,9 @@ class BattleSimulator {
       // Se não há bloqueador perfeito, bloqueia se o dano é muito alto
       if (bestBlocker == null && (attacker.power ?? 0) >= 4) {
         // Bloqueia com a menor criatura
-        bestBlocker = validBlockers
-            .reduce((a, b) => (a.power ?? 0) < (b.power ?? 0) ? a : b);
+        bestBlocker = validBlockers.reduce(
+          (a, b) => (a.power ?? 0) < (b.power ?? 0) ? a : b,
+        );
       }
 
       if (bestBlocker != null) {
@@ -844,8 +904,12 @@ class BattleSimulator {
   // UTILS
   // ═══════════════════════════════════════════════════════════════════════════
 
-  void _log(PlayerState player, String phase, String action,
-      {Map<String, dynamic>? details}) {
+  void _log(
+    PlayerState player,
+    String phase,
+    String action, {
+    Map<String, dynamic>? details,
+  }) {
     final loggedAction = GameAction(
       turn: _currentTurn,
       player: player.name,
@@ -858,17 +922,14 @@ class BattleSimulator {
   }
 
   Map<String, dynamic> _snapshotFor(GameAction action) => {
-        'index': _visualSnapshots.length,
-        'turn': action.turn,
-        'phase': action.phase,
-        'action': action.action,
-        'active_player': action.player,
-        'event': action.toJson(),
-        'players': [
-          playerA.toJson(),
-          playerB.toJson(),
-        ],
-      };
+    'index': _visualSnapshots.length,
+    'turn': action.turn,
+    'phase': action.phase,
+    'action': action.action,
+    'active_player': action.player,
+    'event': action.toJson(),
+    'players': [playerA.toJson(), playerB.toJson()],
+  };
 
   String? _checkGameOver() {
     if (playerA.life <= 0) return playerB.name;

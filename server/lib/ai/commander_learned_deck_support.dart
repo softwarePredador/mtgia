@@ -350,7 +350,10 @@ canonicalizeCommanderLearnedDeckMetadataWithStatus(
         card_info AS (
           SELECT
             rc.lowered_name,
-            COALESCE(rc.type_line ILIKE '%Land%', FALSE) AS is_land,
+            COALESCE(
+              rc.type_line ~* '(^|[^a-z])land([^a-z]|\$)',
+              FALSE
+            ) AS is_land,
             COALESCE(
               ARRAY_REMOVE(ARRAY_AGG(DISTINCT LOWER(cft.tag)), NULL),
               ARRAY[]::TEXT[]

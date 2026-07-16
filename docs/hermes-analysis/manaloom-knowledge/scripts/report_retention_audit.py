@@ -11,6 +11,7 @@ artifacts left on disk.
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 import re
 import subprocess
@@ -27,6 +28,11 @@ REPORT_DIR = DOCS_DIR / "master_optimizer_reports"
 
 RAW_REPORT_SUFFIXES = {".json", ".jsonl", ".sql", ".out", ".txt", ".db", ".log", ".tsv", ".err"}
 
+SQL_PACKAGE_ROLES = frozenset({"precheck", "apply", "postcheck", "rollback"})
+SQL_PACKAGE_ROLE_RE = re.compile(
+    r"^(?P<prefix>.+)_(?P<role>precheck|apply|postcheck|rollback)\.sql$"
+)
+
 ACTIVE_REFERENCE_ROOTS = (
     DOCS_DIR / "manaloom-knowledge" / "scripts",
     REPO_ROOT / "scripts",
@@ -42,6 +48,7 @@ ACTIVE_REFERENCE_ROOTS = (
 
 RETENTION_MANIFEST_FILE = REPORT_DIR / "README.md"
 RETENTION_JUSTIFICATION_PREFIX = "Retention justification:"
+PENDING_LOCAL_HASH_LABEL = "pending-local-sha256:"
 
 CURRENT_CONTRACT_FILES = (
     DOCS_DIR / "README.md",
@@ -92,7 +99,7 @@ def tracked_report_raw_files() -> list[Path]:
     return [
         path
         for path in git_ls_files(REPORT_DIR)
-        if path.suffix in RAW_REPORT_SUFFIXES
+        if path.is_file() and path.suffix in RAW_REPORT_SUFFIXES
     ]
 
 
@@ -147,9 +154,49 @@ def retention_manifest_paths() -> set[str]:
     if not RETENTION_MANIFEST_FILE.exists():
         return set()
     text = RETENTION_MANIFEST_FILE.read_text(encoding="utf-8", errors="ignore")
-    suffixes = "|".join(sorted(suffix.removeprefix(".") for suffix in RAW_REPORT_SUFFIXES))
+    suffixes = "|".join(
+        sorted(
+            suffix.removeprefix(".")
+            for suffix in RAW_REPORT_SUFFIXES.union({".md"})
+        )
+    )
     pattern = rf"`(docs/hermes-analysis/master_optimizer_reports/[^`]+\.(?:{suffixes}))`"
     return set(re.findall(pattern, text))
+
+
+def retention_manifest_pending_hashes() -> dict[str, str]:
+    """Return content seals for reviewed evidence that is not tracked yet.
+
+    Ordinary manifest membership is intentionally insufficient for local
+    JSON/Markdown output. A pending evidence file is governed only when the
+    README records its exact repository path and SHA-256. This lets a reviewed
+    apply/sync/audit bundle survive until it is added to Git without turning
+    the manifest into a blanket escape hatch for generated output.
+    """
+
+    if not RETENTION_MANIFEST_FILE.exists():
+        return {}
+    text = RETENTION_MANIFEST_FILE.read_text(encoding="utf-8", errors="ignore")
+    suffixes = "|".join(
+        sorted(
+            suffix.removeprefix(".")
+            for suffix in RAW_REPORT_SUFFIXES.union({".md"})
+        )
+    )
+    pattern = re.compile(
+        rf"`(?P<path>docs/hermes-analysis/master_optimizer_reports/[^`]+\.(?:{suffixes}))`"
+        rf"\s+[—-]\s+{re.escape(PENDING_LOCAL_HASH_LABEL)}\s+"
+        r"`(?P<sha256>[0-9a-f]{64})`"
+    )
+    result: dict[str, str] = {}
+    for match in pattern.finditer(text):
+        path = match.group("path")
+        digest = match.group("sha256")
+        prior = result.get(path)
+        if prior is not None and prior != digest:
+            raise ValueError(f"conflicting pending-local SHA-256 seals for {path}")
+        result[path] = digest
+    return result
 
 
 def classify_paths(
@@ -184,7 +231,7 @@ def classify_raw_files() -> dict[str, list[Path]]:
     )
 
 
-def ignored_local_report_files() -> list[Path]:
+def local_untracked_report_files() -> list[Path]:
     if not REPORT_DIR.exists():
         return []
     tracked = {path.resolve() for path in git_ls_files(REPORT_DIR)}
@@ -195,6 +242,73 @@ def ignored_local_report_files() -> list[Path]:
         and path.resolve() not in tracked
         and path.suffix in RAW_REPORT_SUFFIXES.union({".md"})
     )
+
+
+def classify_local_report_files(
+    paths: list[Path], *, manifest_paths: set[str], pending_hashes: dict[str, str] | None = None
+) -> dict[str, list[Path]]:
+    """Split local raw files into reviewed SQL quartets and actual residue.
+
+    A newly prepared PostgreSQL operator package necessarily exists before it
+    can be tracked. Treating every such file as disposable residue made the
+    local closure gate impossible to run without mutating the Git index.
+
+    The exceptions are deliberately narrow: SQL must be explicitly listed and
+    form a complete precheck/apply/postcheck/rollback quartet; reviewed JSON or
+    Markdown evidence must be explicitly listed and match an exact SHA-256 seal
+    in the manifest. Missing/tampered files, arbitrary generated output, and
+    incomplete SQL packages still fail. In CI, omitted files remain stale
+    manifest entries.
+    """
+
+    pending_hashes = pending_hashes or {}
+
+    package_members: dict[str, dict[str, Path]] = {}
+    for path in paths:
+        if path.suffix != ".sql" or rel(path) not in manifest_paths:
+            continue
+        match = SQL_PACKAGE_ROLE_RE.fullmatch(path.name)
+        if match is None:
+            continue
+        package_members.setdefault(match.group("prefix"), {})[
+            match.group("role")
+        ] = path
+
+    pending_manifest: set[Path] = set()
+    for members in package_members.values():
+        if set(members) == SQL_PACKAGE_ROLES:
+            pending_manifest.update(members.values())
+
+    for path in paths:
+        relative_path = rel(path)
+        expected_hash = pending_hashes.get(relative_path)
+        if (
+            relative_path not in manifest_paths
+            or expected_hash is None
+            or path.suffix not in {".json", ".md"}
+        ):
+            continue
+        try:
+            actual_hash = hashlib.sha256(path.read_bytes()).hexdigest()
+        except OSError:
+            continue
+        if actual_hash == expected_hash:
+            pending_manifest.add(path)
+
+    return {
+        "pending_manifest": sorted(pending_manifest),
+        "ignored": sorted(path for path in paths if path not in pending_manifest),
+    }
+
+
+def ignored_local_report_files() -> list[Path]:
+    """Compatibility helper returning only ungoverned local residue."""
+
+    return classify_local_report_files(
+        local_untracked_report_files(),
+        manifest_paths=retention_manifest_paths(),
+        pending_hashes=retention_manifest_pending_hashes(),
+    )["ignored"]
 
 
 def byte_size(paths: list[Path]) -> int:
@@ -239,11 +353,31 @@ def build_report(*, fail_on_ignored_local: bool) -> dict[str, Any]:
     active_consumer = classified["active_consumer"]
     manifest_only = classified["manifest_only"]
     ungoverned = classified["ungoverned"]
-    ignored = ignored_local_report_files()
     manifest_paths = retention_manifest_paths()
     manifest_justification = retention_manifest_justification()
-    tracked_relative_paths = {rel(path) for path in tracked_report_raw_files()}
-    stale_manifest_entries = sorted(manifest_paths - tracked_relative_paths)
+    pending_hashes = retention_manifest_pending_hashes()
+    local_classified = classify_local_report_files(
+        local_untracked_report_files(),
+        manifest_paths=manifest_paths,
+        pending_hashes=pending_hashes,
+    )
+    pending_manifest_local = local_classified["pending_manifest"]
+    ignored = local_classified["ignored"]
+    # Markdown summaries are not part of the tracked-raw classification, but a
+    # content-sealed pending summary must stop being "stale" once it is tracked.
+    tracked_relative_paths = {
+        rel(path)
+        for path in git_ls_files(REPORT_DIR)
+        if path.exists() and path.is_file()
+    }
+    pending_manifest_relative_paths = {
+        rel(path) for path in pending_manifest_local
+    }
+    stale_manifest_entries = sorted(
+        manifest_paths
+        - tracked_relative_paths
+        - pending_manifest_relative_paths
+    )
     checks = [
         Check(
             "retention_manifest_has_explicit_justification",
@@ -316,6 +450,8 @@ def build_report(*, fail_on_ignored_local: bool) -> dict[str, Any]:
             "tracked_raw_oldest_age_days": max(known_ages) if known_ages else None,
             "retention_manifest_entry_count": len(manifest_paths),
             "retention_manifest_stale_entry_count": len(stale_manifest_entries),
+            "pending_manifest_local_count": len(pending_manifest_local),
+            "pending_manifest_local_bytes": byte_size(pending_manifest_local),
             "ignored_local_count": len(ignored),
             "ignored_local_bytes": byte_size(ignored),
         },
@@ -324,6 +460,8 @@ def build_report(*, fail_on_ignored_local: bool) -> dict[str, Any]:
             "path": rel(RETENTION_MANIFEST_FILE),
             "justification": manifest_justification,
             "entries": sorted(manifest_paths),
+            "pending_local_sha256": dict(sorted(pending_hashes.items())),
+            "pending_local_entries": sorted(pending_manifest_relative_paths),
             "stale_entries": stale_manifest_entries,
         },
         "active_consumer_tracked_raw": [rel(path) for path in active_consumer],
@@ -335,6 +473,7 @@ def build_report(*, fail_on_ignored_local: bool) -> dict[str, Any]:
         # manifest-only retention is reported separately instead of inflating it.
         "referenced_tracked_raw": [rel(path) for path in active_consumer],
         "unreferenced_tracked_raw": [rel(path) for path in ungoverned],
+        "pending_manifest_local_raw": [rel(path) for path in pending_manifest_local],
         "ignored_local_report_artifacts": [rel(path) for path in ignored],
         "mutations_performed": [],
     }
@@ -389,6 +528,15 @@ def write_markdown(report: dict[str, Any], path: Path) -> None:
             lines.append(f"- `{item}`")
         if len(report["ignored_local_report_artifacts"]) > 200:
             lines.append(f"- ... {len(report['ignored_local_report_artifacts']) - 200} more")
+    if report["pending_manifest_local_raw"]:
+        lines.extend(["", "## Pending Manifest SQL Package Files", ""])
+        lines.append(
+            "Complete reviewed SQL quartets present locally and listed in the "
+            "retention manifest; they must be tracked with the related evidence "
+            "before merge."
+        )
+        for item in report["pending_manifest_local_raw"][:200]:
+            lines.append(f"- `{item}`")
     path.write_text("\n".join(lines) + "\n", encoding="utf-8")
 
 

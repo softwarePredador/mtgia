@@ -1,0 +1,1082 @@
+{
+  "best_structural_deck": "deck_607",
+  "candidate_path": "/tmp/manaloom_no_candidate_pg878.json",
+  "deck_ids": [
+    607,
+    615
+  ],
+  "decks": [
+    {
+      "archetype": "battle-variant",
+      "battle_rule_ready_ratio": 0.9787,
+      "battle_rule_ready_unique_cards": 92,
+      "battle_rule_total_unique_cards": 94,
+      "card_rows": 94,
+      "commander_intent_alignment": {
+        "model": {
+          "commander": "Lorehold, the Historian",
+          "objective": "Use topdeck setup, hand filtering, and Lorehold's commander discount to cast high-impact instant/sorcery spells ahead of curve, then convert that window into a deterministic finisher while surviving fast combat pressure.",
+          "plan_a": [
+            "Set up the top of the library and hand before the expensive spell turn.",
+            "Use Lorehold discount/cost reducers to chain impactful instants and sorceries.",
+            "Protect the conversion window instead of filling the deck with generic value pieces."
+          ],
+          "validation_rule": "A candidate is not accepted from structure alone. It must tie or beat the protected deck_607 baseline on the same real-opponent battle gate and must not regress the Winota pressure matchup."
+        },
+        "off_plan_cards": [],
+        "package_ranges": {
+          "deterministic_finisher": {
+            "actual": 9,
+            "gap": 0,
+            "maximum": 12,
+            "minimum": 8,
+            "overage": 0,
+            "score": 10.0,
+            "status": "aligned",
+            "weight": 10.0
+          },
+          "early_plan": {
+            "actual": 36,
+            "gap": 0,
+            "maximum": 45,
+            "minimum": 24,
+            "overage": 0,
+            "score": 9.0,
+            "status": "aligned",
+            "weight": 9.0
+          },
+          "graveyard_recursion": {
+            "actual": 8,
+            "gap": 0,
+            "maximum": 10,
+            "minimum": 5,
+            "overage": 0,
+            "score": 7.0,
+            "status": "aligned",
+            "weight": 7.0
+          },
+          "hand_filter": {
+            "actual": 12,
+            "gap": 0,
+            "maximum": 18,
+            "minimum": 10,
+            "overage": 0,
+            "score": 10.0,
+            "status": "aligned",
+            "weight": 10.0
+          },
+          "pressure_absorber": {
+            "actual": 19,
+            "gap": 0,
+            "maximum": 20,
+            "minimum": 12,
+            "overage": 0,
+            "score": 11.0,
+            "status": "aligned",
+            "weight": 11.0
+          },
+          "protection_window": {
+            "actual": 18,
+            "gap": 0,
+            "maximum": 20,
+            "minimum": 12,
+            "overage": 0,
+            "score": 10.0,
+            "status": "aligned",
+            "weight": 10.0
+          },
+          "spell_chain_conversion": {
+            "actual": 43,
+            "gap": 0,
+            "maximum": 46,
+            "minimum": 32,
+            "overage": 0,
+            "score": 13.0,
+            "status": "aligned",
+            "weight": 13.0
+          },
+          "topdeck_miracle_setup": {
+            "actual": 12,
+            "gap": 0,
+            "maximum": 14,
+            "minimum": 8,
+            "overage": 0,
+            "score": 13.0,
+            "status": "aligned",
+            "weight": 13.0
+          }
+        },
+        "risks": [
+          "role_board_wipe_overfilled"
+        ],
+        "role_ranges": {
+          "board_wipe": {
+            "actual": 8,
+            "gap": 0,
+            "maximum": 7,
+            "minimum": 2,
+            "overage": 1,
+            "score": 3.429,
+            "status": "overfilled",
+            "weight": 4.0
+          },
+          "draw": {
+            "actual": 10,
+            "gap": 0,
+            "maximum": 18,
+            "minimum": 10,
+            "overage": 0,
+            "score": 6.0,
+            "status": "aligned",
+            "weight": 6.0
+          },
+          "land": {
+            "actual": 34,
+            "gap": 0,
+            "maximum": 36,
+            "minimum": 33,
+            "overage": 0,
+            "score": 8.0,
+            "status": "aligned",
+            "weight": 8.0
+          },
+          "protection": {
+            "actual": 13,
+            "gap": 0,
+            "maximum": 14,
+            "minimum": 8,
+            "overage": 0,
+            "score": 5.0,
+            "status": "aligned",
+            "weight": 5.0
+          },
+          "ramp": {
+            "actual": 18,
+            "gap": 0,
+            "maximum": 22,
+            "minimum": 12,
+            "overage": 0,
+            "score": 7.0,
+            "status": "aligned",
+            "weight": 7.0
+          },
+          "removal": {
+            "actual": 11,
+            "gap": 0,
+            "maximum": 14,
+            "minimum": 8,
+            "overage": 0,
+            "score": 5.0,
+            "status": "aligned",
+            "weight": 5.0
+          },
+          "tutor": {
+            "actual": 1,
+            "gap": 0,
+            "maximum": 6,
+            "minimum": 1,
+            "overage": 0,
+            "score": 3.0,
+            "status": "aligned",
+            "weight": 3.0
+          },
+          "wincon": {
+            "actual": 9,
+            "gap": 0,
+            "maximum": 12,
+            "minimum": 7,
+            "overage": 0,
+            "score": 5.0,
+            "status": "aligned",
+            "weight": 5.0
+          }
+        },
+        "score": 99.547,
+        "status": "needs_battle_proof"
+      },
+      "commander_intent_risks": [
+        "role_board_wipe_overfilled"
+      ],
+      "commander_intent_score": 99.547,
+      "commander_intent_status": "needs_battle_proof",
+      "deck_id": 607,
+      "deck_key": "deck_607",
+      "deck_name": "VARIANT Lorehold Variant 02 - Rafael Paste 2026-06-23",
+      "key_cards": [
+        "Flawless Maneuver",
+        "Mother of Runes",
+        "Giver of Runes",
+        "Boros Signet",
+        "Rise of the Eldrazi",
+        "Surge to Victory",
+        "Talisman of Conviction",
+        "Arcane Signet",
+        "Fellwar Stone",
+        "Ruby Medallion"
+      ],
+      "key_cards_by_package": {
+        "deterministic_finisher": [
+          "Rise of the Eldrazi",
+          "Surge to Victory",
+          "Approach of the Second Sun",
+          "Furygale Flocking",
+          "Insurrection",
+          "Mizzix's Mastery",
+          "Prismari Pianist",
+          "Storm Herd",
+          "Tempt with Bunnies"
+        ],
+        "early_plan": [
+          "Mother of Runes",
+          "Giver of Runes",
+          "Boros Signet",
+          "Talisman of Conviction",
+          "Arcane Signet",
+          "Fellwar Stone",
+          "Ruby Medallion",
+          "Tibalt's Trickery",
+          "Hit the Mother Lode",
+          "Improvisation Capstone"
+        ],
+        "graveyard_recursion": [
+          "Surge to Victory",
+          "Furygale Flocking",
+          "Mizzix's Mastery",
+          "Elegant Parlor",
+          "Library of Leng",
+          "Pinnacle Monk // Mystic Peak",
+          "Starfall Invocation",
+          "Thor, God of Thunder"
+        ],
+        "hand_filter": [
+          "Creative Technique",
+          "Hit the Mother Lode",
+          "Improvisation Capstone",
+          "Land Tax",
+          "Molecule Man",
+          "Scroll Rack",
+          "Sensei's Divining Top",
+          "Artist's Talent",
+          "Esper Sentinel",
+          "Glittering Massif"
+        ],
+        "pressure_absorber": [
+          "Flawless Maneuver",
+          "Rise of the Eldrazi",
+          "Surge to Victory",
+          "Call Forth the Tempest",
+          "Blasphemous Act",
+          "Everything Comes to Dust",
+          "Farewell",
+          "Fated Clash",
+          "Generous Gift",
+          "High Noon"
+        ],
+        "protection_window": [
+          "Flawless Maneuver",
+          "Mother of Runes",
+          "Giver of Runes",
+          "Rise of the Eldrazi",
+          "Tibalt's Trickery",
+          "Avatar's Wrath",
+          "Dawn's Truce",
+          "Deflecting Swat",
+          "Emeria's Call // Emeria, Shattered Skyclave",
+          "Fated Clash"
+        ],
+        "spell_chain_conversion": [
+          "Flawless Maneuver",
+          "Rise of the Eldrazi",
+          "Surge to Victory",
+          "Ruby Medallion",
+          "Call Forth the Tempest",
+          "Tibalt's Trickery",
+          "Approach of the Second Sun",
+          "Furygale Flocking",
+          "Insurrection",
+          "Mizzix's Mastery"
+        ],
+        "topdeck_miracle_setup": [
+          "Call Forth the Tempest",
+          "Tibalt's Trickery",
+          "Creative Technique",
+          "Elegant Parlor",
+          "Hit the Mother Lode",
+          "Improvisation Capstone",
+          "Jeska's Will",
+          "Land Tax",
+          "Library of Leng",
+          "Molecule Man"
+        ]
+      },
+      "land_count": 34,
+      "next_validation_steps": [
+        "run equal battle gate against the same opponent set and seed window",
+        "inspect decision trace for whether Lorehold casts discounted miracle spells before falling behind"
+      ],
+      "nonland_count": 66,
+      "notes": "lorehold_variant_hash=a9234fbf61d175e03a731bdb234a0187d7845a58242cd7eebd85003c7f88c306 backup_id=variant_target_607_20260623T012310Z_f5b9951f1f4b pg_deck_id=8938b746-1a9e-46ce-b0d9-c2ec932ddddd",
+      "objective": "Miracle spellslinger shell that uses topdeck setup and hand filtering to turn Lorehold's commander text into discounted spell chains.",
+      "objective_evidence": [
+        "spell_chain_conversion=43",
+        "topdeck_miracle_setup=12",
+        "pressure_absorber=19",
+        "wincon_roles=9",
+        "key_cards=Flawless Maneuver, Mother of Runes, Giver of Runes, Boros Signet"
+      ],
+      "primary_risks": [
+        "draw_role",
+        "recursion_role",
+        "tutor_role"
+      ],
+      "quantity_total": 100,
+      "role_counts": {
+        "approach": 1,
+        "board_development": 1,
+        "board_wipe": 8,
+        "creature": 4,
+        "draw": 10,
+        "engine": 3,
+        "equipment_haste_shroud": 1,
+        "equipment_static_attachment": 1,
+        "exile_value": 1,
+        "interaction": 3,
+        "land": 34,
+        "land_tax": 1,
+        "mana_development": 1,
+        "overload_recursion": 1,
+        "passive": 4,
+        "protection": 13,
+        "pump_all": 1,
+        "ramp": 18,
+        "redirect_removal": 2,
+        "removal": 11,
+        "steal_all_creatures": 1,
+        "token_maker": 5,
+        "tutor": 1,
+        "wincon": 9
+      },
+      "role_health": {
+        "board_wipe": {
+          "actual": 8,
+          "gap": 0,
+          "minimum": 2,
+          "status": "pass"
+        },
+        "draw": {
+          "actual": 10,
+          "gap": 2,
+          "minimum": 12,
+          "status": "shortfall"
+        },
+        "land": {
+          "actual": 34,
+          "gap": 0,
+          "minimum": 33,
+          "status": "pass"
+        },
+        "protection": {
+          "actual": 13,
+          "gap": 0,
+          "minimum": 10,
+          "status": "pass"
+        },
+        "ramp": {
+          "actual": 18,
+          "gap": 0,
+          "minimum": 14,
+          "status": "pass"
+        },
+        "recursion": {
+          "actual": 0,
+          "gap": 4,
+          "minimum": 4,
+          "status": "shortfall"
+        },
+        "removal": {
+          "actual": 11,
+          "gap": 0,
+          "minimum": 8,
+          "status": "pass"
+        },
+        "tutor": {
+          "actual": 1,
+          "gap": 3,
+          "minimum": 4,
+          "status": "shortfall"
+        },
+        "wincon": {
+          "actual": 9,
+          "gap": 0,
+          "minimum": 6,
+          "status": "pass"
+        }
+      },
+      "source": "hermes_decks",
+      "strategy_package_counts": {
+        "deterministic_finisher": 9,
+        "early_plan": 36,
+        "graveyard_recursion": 8,
+        "hand_filter": 12,
+        "pressure_absorber": 19,
+        "protection_window": 18,
+        "spell_chain_conversion": 43,
+        "topdeck_miracle_setup": 12
+      },
+      "strategy_package_health": {
+        "deterministic_finisher": {
+          "actual": 9,
+          "gap": 0,
+          "label": "deterministic finisher",
+          "minimum": 6,
+          "ratio": 1.5,
+          "status": "pass"
+        },
+        "early_plan": {
+          "actual": 36,
+          "gap": 0,
+          "label": "early setup/mana",
+          "minimum": 18,
+          "ratio": 2.0,
+          "status": "pass"
+        },
+        "graveyard_recursion": {
+          "actual": 8,
+          "gap": 0,
+          "label": "graveyard recursion",
+          "minimum": 5,
+          "ratio": 1.6,
+          "status": "pass"
+        },
+        "hand_filter": {
+          "actual": 12,
+          "gap": 0,
+          "label": "hand filtering",
+          "minimum": 7,
+          "ratio": 1.714,
+          "status": "pass"
+        },
+        "pressure_absorber": {
+          "actual": 19,
+          "gap": 0,
+          "label": "combat pressure absorber",
+          "minimum": 4,
+          "ratio": 4.75,
+          "status": "pass"
+        },
+        "protection_window": {
+          "actual": 18,
+          "gap": 0,
+          "label": "protection window",
+          "minimum": 10,
+          "ratio": 1.8,
+          "status": "pass"
+        },
+        "spell_chain_conversion": {
+          "actual": 43,
+          "gap": 0,
+          "label": "spell-chain conversion",
+          "minimum": 12,
+          "ratio": 3.583,
+          "status": "pass"
+        },
+        "topdeck_miracle_setup": {
+          "actual": 12,
+          "gap": 0,
+          "label": "topdeck and miracle setup",
+          "minimum": 6,
+          "ratio": 2.0,
+          "status": "pass"
+        }
+      },
+      "strategy_package_shortfalls": [],
+      "strategy_score": 139.038,
+      "strengths": [
+        "combat pressure absorber passes (19/4)",
+        "spell-chain conversion passes (43/12)",
+        "early setup/mana passes (36/18)",
+        "topdeck and miracle setup passes (12/6)",
+        "ramp density passes (18/14)",
+        "protection density passes (13/10)",
+        "anchors present: Flawless Maneuver, Mother of Runes, Giver of Runes, Boros Signet, Rise of the Eldrazi"
+      ],
+      "total_cards_declared": 100,
+      "unique_cards": 94,
+      "weaknesses": [
+        "recursion role shortfall (0/4)",
+        "tutor role shortfall (1/4)",
+        "draw role shortfall (10/12)"
+      ]
+    },
+    {
+      "archetype": "spell-copy-big-spells-variant",
+      "battle_rule_ready_ratio": 0.9643,
+      "battle_rule_ready_unique_cards": 81,
+      "battle_rule_total_unique_cards": 84,
+      "card_rows": 84,
+      "commander_intent_alignment": {
+        "model": {
+          "commander": "Lorehold, the Historian",
+          "objective": "Use topdeck setup, hand filtering, and Lorehold's commander discount to cast high-impact instant/sorcery spells ahead of curve, then convert that window into a deterministic finisher while surviving fast combat pressure.",
+          "plan_a": [
+            "Set up the top of the library and hand before the expensive spell turn.",
+            "Use Lorehold discount/cost reducers to chain impactful instants and sorceries.",
+            "Protect the conversion window instead of filling the deck with generic value pieces."
+          ],
+          "validation_rule": "A candidate is not accepted from structure alone. It must tie or beat the protected deck_607 baseline on the same real-opponent battle gate and must not regress the Winota pressure matchup."
+        },
+        "off_plan_cards": [],
+        "package_ranges": {
+          "deterministic_finisher": {
+            "actual": 12,
+            "gap": 0,
+            "maximum": 12,
+            "minimum": 8,
+            "overage": 0,
+            "score": 10.0,
+            "status": "aligned",
+            "weight": 10.0
+          },
+          "early_plan": {
+            "actual": 36,
+            "gap": 0,
+            "maximum": 45,
+            "minimum": 24,
+            "overage": 0,
+            "score": 9.0,
+            "status": "aligned",
+            "weight": 9.0
+          },
+          "graveyard_recursion": {
+            "actual": 9,
+            "gap": 0,
+            "maximum": 10,
+            "minimum": 5,
+            "overage": 0,
+            "score": 7.0,
+            "status": "aligned",
+            "weight": 7.0
+          },
+          "hand_filter": {
+            "actual": 18,
+            "gap": 0,
+            "maximum": 18,
+            "minimum": 10,
+            "overage": 0,
+            "score": 10.0,
+            "status": "aligned",
+            "weight": 10.0
+          },
+          "pressure_absorber": {
+            "actual": 10,
+            "gap": 2,
+            "maximum": 20,
+            "minimum": 12,
+            "overage": 0,
+            "score": 9.167,
+            "status": "shortfall",
+            "weight": 11.0
+          },
+          "protection_window": {
+            "actual": 16,
+            "gap": 0,
+            "maximum": 20,
+            "minimum": 12,
+            "overage": 0,
+            "score": 10.0,
+            "status": "aligned",
+            "weight": 10.0
+          },
+          "spell_chain_conversion": {
+            "actual": 50,
+            "gap": 0,
+            "maximum": 46,
+            "minimum": 32,
+            "overage": 4,
+            "score": 11.87,
+            "status": "overfilled",
+            "weight": 13.0
+          },
+          "topdeck_miracle_setup": {
+            "actual": 9,
+            "gap": 0,
+            "maximum": 14,
+            "minimum": 8,
+            "overage": 0,
+            "score": 13.0,
+            "status": "aligned",
+            "weight": 13.0
+          }
+        },
+        "risks": [
+          "package_spell_chain_conversion_overfilled",
+          "package_pressure_absorber_shortfall",
+          "role_removal_shortfall"
+        ],
+        "role_ranges": {
+          "board_wipe": {
+            "actual": 3,
+            "gap": 0,
+            "maximum": 7,
+            "minimum": 2,
+            "overage": 0,
+            "score": 4.0,
+            "status": "aligned",
+            "weight": 4.0
+          },
+          "draw": {
+            "actual": 16,
+            "gap": 0,
+            "maximum": 18,
+            "minimum": 10,
+            "overage": 0,
+            "score": 6.0,
+            "status": "aligned",
+            "weight": 6.0
+          },
+          "land": {
+            "actual": 34,
+            "gap": 0,
+            "maximum": 36,
+            "minimum": 33,
+            "overage": 0,
+            "score": 8.0,
+            "status": "aligned",
+            "weight": 8.0
+          },
+          "protection": {
+            "actual": 12,
+            "gap": 0,
+            "maximum": 14,
+            "minimum": 8,
+            "overage": 0,
+            "score": 5.0,
+            "status": "aligned",
+            "weight": 5.0
+          },
+          "ramp": {
+            "actual": 15,
+            "gap": 0,
+            "maximum": 22,
+            "minimum": 12,
+            "overage": 0,
+            "score": 7.0,
+            "status": "aligned",
+            "weight": 7.0
+          },
+          "removal": {
+            "actual": 7,
+            "gap": 1,
+            "maximum": 14,
+            "minimum": 8,
+            "overage": 0,
+            "score": 4.375,
+            "status": "shortfall",
+            "weight": 5.0
+          },
+          "tutor": {
+            "actual": 3,
+            "gap": 0,
+            "maximum": 6,
+            "minimum": 1,
+            "overage": 0,
+            "score": 3.0,
+            "status": "aligned",
+            "weight": 3.0
+          },
+          "wincon": {
+            "actual": 11,
+            "gap": 0,
+            "maximum": 12,
+            "minimum": 7,
+            "overage": 0,
+            "score": 5.0,
+            "status": "aligned",
+            "weight": 5.0
+          }
+        },
+        "score": 97.152,
+        "status": "needs_battle_proof"
+      },
+      "commander_intent_risks": [
+        "package_spell_chain_conversion_overfilled",
+        "package_pressure_absorber_shortfall",
+        "role_removal_shortfall"
+      ],
+      "commander_intent_score": 97.152,
+      "commander_intent_status": "needs_battle_proof",
+      "deck_id": 615,
+      "deck_key": "deck_615",
+      "deck_name": "VARIANT Lorehold Variant 10 - Rafael Paste 2026-06-24",
+      "key_cards": [
+        "Birgi, God of Storytelling // Harnfel, Horn of Bounty",
+        "Mana Vault",
+        "Perch Protection",
+        "Rise of the Eldrazi",
+        "Arcane Signet",
+        "Seething Song",
+        "Call Forth the Tempest",
+        "Chaos Warp",
+        "Approach of the Second Sun",
+        "Beacon of Immortality"
+      ],
+      "key_cards_by_package": {
+        "deterministic_finisher": [
+          "Perch Protection",
+          "Rise of the Eldrazi",
+          "Approach of the Second Sun",
+          "Beacon of Immortality",
+          "Brass's Bounty",
+          "Guttersnipe",
+          "Insurrection",
+          "Longshot, Rebel Bowman",
+          "Mizzix's Mastery",
+          "Reiterate"
+        ],
+        "early_plan": [
+          "Birgi, God of Storytelling // Harnfel, Horn of Bounty",
+          "Mana Vault",
+          "Arcane Signet",
+          "Seething Song",
+          "Brass's Bounty",
+          "Longshot, Rebel Bowman",
+          "Jeska's Will",
+          "Land Tax",
+          "Library of Leng",
+          "Sensei's Divining Top"
+        ],
+        "graveyard_recursion": [
+          "Mizzix's Mastery",
+          "Library of Leng",
+          "Ol\u00f3rin's Searing Light",
+          "Starfall Invocation",
+          "Faithless Looting",
+          "Flashback",
+          "Goliath Daydreamer",
+          "Invoke Calamity",
+          "Underworld Breach"
+        ],
+        "hand_filter": [
+          "Birgi, God of Storytelling // Harnfel, Horn of Bounty",
+          "Chaos Warp",
+          "Apex of Power",
+          "Galvanoth",
+          "Land Tax",
+          "Sensei's Divining Top",
+          "Velomachus Lorehold",
+          "Deflecting Swat",
+          "Ol\u00f3rin's Searing Light",
+          "The One Ring"
+        ],
+        "pressure_absorber": [
+          "Rise of the Eldrazi",
+          "Call Forth the Tempest",
+          "Chaos Warp",
+          "Erode",
+          "Farewell",
+          "Lightning Bolt",
+          "Ol\u00f3rin's Searing Light",
+          "Starfall Invocation",
+          "Swords to Plowshares",
+          "Vandalblast"
+        ],
+        "protection_window": [
+          "Perch Protection",
+          "Rise of the Eldrazi",
+          "Boros Charm",
+          "Boseiju, Who Shelters All",
+          "Cavern of Souls",
+          "Deflecting Palm",
+          "Deflecting Swat",
+          "Grand Abolisher",
+          "Hexing Squelcher",
+          "Lightning Greaves"
+        ],
+        "spell_chain_conversion": [
+          "Birgi, God of Storytelling // Harnfel, Horn of Bounty",
+          "Mana Vault",
+          "Perch Protection",
+          "Rise of the Eldrazi",
+          "Seething Song",
+          "Call Forth the Tempest",
+          "Chaos Warp",
+          "Approach of the Second Sun",
+          "Beacon of Immortality",
+          "Brass's Bounty"
+        ],
+        "topdeck_miracle_setup": [
+          "Call Forth the Tempest",
+          "Chaos Warp",
+          "Apex of Power",
+          "Galvanoth",
+          "Jeska's Will",
+          "Land Tax",
+          "Library of Leng",
+          "Sensei's Divining Top",
+          "Velomachus Lorehold"
+        ]
+      },
+      "land_count": 34,
+      "next_validation_steps": [
+        "run equal battle gate against the same opponent set and seed window",
+        "inspect decision trace for whether Lorehold casts discounted miracle spells before falling behind"
+      ],
+      "nonland_count": 66,
+      "notes": "lorehold_variant_hash=69fc2e8dfcb40e24137a92b8823677e26538768b21602671f46158f3c303a42c backup_id=variant_target_615_20260624T124206Z_a1b04d90e33e\npg_deck_id=43c026ae-2d92-5049-90fc-1fdad4b04298 pg_learned_id=a77eb26f-4cae-595c-bfd0-55be138a141b pg_source_ref=lorehold_variant10_20260624_69fc2e8dfcb4",
+      "objective": "Big-spells shell that leans on Lorehold's miracle discount to cast expensive effects ahead of curve.",
+      "objective_evidence": [
+        "spell_chain_conversion=50",
+        "topdeck_miracle_setup=9",
+        "pressure_absorber=10",
+        "wincon_roles=11",
+        "key_cards=Birgi, God of Storytelling // Harnfel, Horn of Bounty, Mana Vault, Perch Protection, Rise of the Eldrazi"
+      ],
+      "primary_risks": [
+        "removal_role",
+        "recursion_role",
+        "tutor_role"
+      ],
+      "quantity_total": 100,
+      "role_counts": {
+        "approach": 1,
+        "board_wipe": 3,
+        "composite_resolution": 1,
+        "creature": 5,
+        "direct_damage": 1,
+        "discard_trigger_modal_draw_treasure_opponent_life_loss": 1,
+        "draw": 16,
+        "draw_filter": 1,
+        "dynamic_damage_wipe": 1,
+        "engine": 9,
+        "equipment_haste_shroud": 1,
+        "equipment_static_attachment": 1,
+        "gift_destroy_all_creatures_return_own_destroyed_creature": 1,
+        "interaction": 5,
+        "land": 34,
+        "land_tax": 1,
+        "loot": 1,
+        "mana_development": 1,
+        "manual_review": 2,
+        "modal_boros_charm": 1,
+        "modal_spell": 1,
+        "overload_recursion": 1,
+        "passive": 4,
+        "payoff": 1,
+        "protection": 12,
+        "ramp": 15,
+        "redirect_removal": 1,
+        "removal": 7,
+        "silence_spell": 1,
+        "steal_all_creatures": 1,
+        "token_maker": 2,
+        "tutor": 3,
+        "wincon": 11
+      },
+      "role_health": {
+        "board_wipe": {
+          "actual": 3,
+          "gap": 0,
+          "minimum": 2,
+          "status": "pass"
+        },
+        "draw": {
+          "actual": 16,
+          "gap": 0,
+          "minimum": 12,
+          "status": "pass"
+        },
+        "land": {
+          "actual": 34,
+          "gap": 0,
+          "minimum": 33,
+          "status": "pass"
+        },
+        "protection": {
+          "actual": 12,
+          "gap": 0,
+          "minimum": 10,
+          "status": "pass"
+        },
+        "ramp": {
+          "actual": 15,
+          "gap": 0,
+          "minimum": 14,
+          "status": "pass"
+        },
+        "recursion": {
+          "actual": 0,
+          "gap": 4,
+          "minimum": 4,
+          "status": "shortfall"
+        },
+        "removal": {
+          "actual": 7,
+          "gap": 1,
+          "minimum": 8,
+          "status": "shortfall"
+        },
+        "tutor": {
+          "actual": 3,
+          "gap": 1,
+          "minimum": 4,
+          "status": "shortfall"
+        },
+        "wincon": {
+          "actual": 11,
+          "gap": 0,
+          "minimum": 6,
+          "status": "pass"
+        }
+      },
+      "source": "hermes_decks",
+      "strategy_package_counts": {
+        "deterministic_finisher": 12,
+        "early_plan": 36,
+        "graveyard_recursion": 9,
+        "hand_filter": 18,
+        "pressure_absorber": 10,
+        "protection_window": 16,
+        "spell_chain_conversion": 50,
+        "topdeck_miracle_setup": 9
+      },
+      "strategy_package_health": {
+        "deterministic_finisher": {
+          "actual": 12,
+          "gap": 0,
+          "label": "deterministic finisher",
+          "minimum": 6,
+          "ratio": 2.0,
+          "status": "pass"
+        },
+        "early_plan": {
+          "actual": 36,
+          "gap": 0,
+          "label": "early setup/mana",
+          "minimum": 18,
+          "ratio": 2.0,
+          "status": "pass"
+        },
+        "graveyard_recursion": {
+          "actual": 9,
+          "gap": 0,
+          "label": "graveyard recursion",
+          "minimum": 5,
+          "ratio": 1.8,
+          "status": "pass"
+        },
+        "hand_filter": {
+          "actual": 18,
+          "gap": 0,
+          "label": "hand filtering",
+          "minimum": 7,
+          "ratio": 2.571,
+          "status": "pass"
+        },
+        "pressure_absorber": {
+          "actual": 10,
+          "gap": 0,
+          "label": "combat pressure absorber",
+          "minimum": 4,
+          "ratio": 2.5,
+          "status": "pass"
+        },
+        "protection_window": {
+          "actual": 16,
+          "gap": 0,
+          "label": "protection window",
+          "minimum": 10,
+          "ratio": 1.6,
+          "status": "pass"
+        },
+        "spell_chain_conversion": {
+          "actual": 50,
+          "gap": 0,
+          "label": "spell-chain conversion",
+          "minimum": 12,
+          "ratio": 4.167,
+          "status": "pass"
+        },
+        "topdeck_miracle_setup": {
+          "actual": 9,
+          "gap": 0,
+          "label": "topdeck and miracle setup",
+          "minimum": 6,
+          "ratio": 1.5,
+          "status": "pass"
+        }
+      },
+      "strategy_package_shortfalls": [],
+      "strategy_score": 134.67,
+      "strengths": [
+        "spell-chain conversion passes (50/12)",
+        "hand filtering passes (18/7)",
+        "combat pressure absorber passes (10/4)",
+        "deterministic finisher passes (12/6)",
+        "draw density passes (16/12)",
+        "ramp density passes (15/14)",
+        "anchors present: Birgi, God of Storytelling // Harnfel, Horn of Bounty, Mana Vault, Perch Protection, Rise of the Eldrazi, Arcane Signet"
+      ],
+      "total_cards_declared": 100,
+      "unique_cards": 84,
+      "weaknesses": [
+        "recursion role shortfall (0/4)",
+        "removal role shortfall (7/8)",
+        "tutor role shortfall (3/4)"
+      ]
+    }
+  ],
+  "external_method_sources": [
+    {
+      "label": "EDHREC Lorehold commander page",
+      "url": "https://edhrec.com/commanders/lorehold-the-historian",
+      "use": "commander-specific comparison lane for Lorehold package expectations and recurring card choices"
+    },
+    {
+      "label": "EDHREC spellslinger Commander guide",
+      "url": "https://edhrec.com/guides/edhrec-guide-to-spellslinger-in-commander",
+      "use": "method source for instant/sorcery-heavy shells: card flow, cheap spells, protection, recursion, and payoffs"
+    },
+    {
+      "label": "EDHREC Commander deckbuilding guide",
+      "url": "https://edhrec.com/articles/how-to-build-a-commander-deck",
+      "use": "baseline deck-structure guardrails for lands, ramp, draw, removal, and focused packages"
+    },
+    {
+      "label": "Archidekt Lorehold corpus",
+      "url": "https://archidekt.com/commanders/Lorehold%2C%20the%20Historian",
+      "use": "external corpus lane for comparing user-built Lorehold shells and recurring package choices"
+    }
+  ],
+  "generated_at": "2026-07-16T09:03:38.868705+00:00",
+  "method": {
+    "battle_status": "structural matrix only; equal battle gate is the next validation step",
+    "commander_intent_model": {
+      "commander": "Lorehold, the Historian",
+      "objective": "Use topdeck setup, hand filtering, and Lorehold's commander discount to cast high-impact instant/sorcery spells ahead of curve, then convert that window into a deterministic finisher while surviving fast combat pressure.",
+      "plan_a": [
+        "Set up the top of the library and hand before the expensive spell turn.",
+        "Use Lorehold discount/cost reducers to chain impactful instants and sorceries.",
+        "Protect the conversion window instead of filling the deck with generic value pieces."
+      ],
+      "validation_rule": "A candidate is not accepted from structure alone. It must tie or beat the protected deck_607 baseline on the same real-opponent battle gate and must not regress the Winota pressure matchup."
+    },
+    "primary_question": "Which deck structure best supports Lorehold's commander plan under battle pressure?",
+    "score_components": [
+      "strategy package health against Lorehold-specific minimums",
+      "commander intent package and role ranges with overfill penalties",
+      "functional role health against Commander/Lorehold minimums",
+      "battle-rule readiness ratio",
+      "mana base land-count guardrail",
+      "explicit penalty for strategy package shortfalls"
+    ],
+    "unit_of_analysis": "one registered Lorehold deck or candidate deck"
+  },
+  "ranked_deck_keys": [
+    "deck_607",
+    "deck_615"
+  ],
+  "source_db": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db",
+  "source_db_sha256": "433d0c906a838d569d8fc19b4a4c1d83e0b45de1dba7850a3d54bd11627ab6db",
+  "status": "ready",
+  "strategy_version": "lorehold_strategy_profile_v3_2026_06_26"
+}

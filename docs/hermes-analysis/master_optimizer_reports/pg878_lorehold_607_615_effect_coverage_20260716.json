@@ -1,0 +1,5370 @@
+{
+  "generated_at": "2026-07-16T09:04:23.946433+00:00",
+  "deck_id": 615,
+  "sqlite_db": "docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db",
+  "opponents_loaded": 12,
+  "total_card_instances": 1288,
+  "unique_cards": 595,
+  "runtime_safe_rule_names": 7009,
+  "active_or_review_rule_names": 8073,
+  "non_runtime_safe_rule_names": 1064,
+  "needs_review_rule_names": 1064,
+  "review_only_rule_names": 29,
+  "annotation_only_rule_names": 0,
+  "non_runtime_other_rule_names": 0,
+  "review_status_counts": {
+    "active": 68,
+    "needs_review": 1064,
+    "verified": 6941
+  },
+  "execution_status_counts": {
+    "auto": 8044,
+    "review_only": 29
+  },
+  "source_totals": {
+    "battle_rule_curated": 761,
+    "type_land": 376,
+    "known_cards_canonical_snapshot": 1,
+    "battle_rule_needs_review_generated": 27,
+    "effect_map": 81,
+    "tag": 20,
+    "unknown": 17,
+    "focused_template_ready": 5
+  },
+  "effect_totals": {
+    "passive": 51,
+    "land": 376,
+    "approach": 1,
+    "ramp_permanent": 116,
+    "life_total_change": 2,
+    "treasure_maker": 4,
+    "ramp_engine": 23,
+    "modal_boros_charm": 1,
+    "damage_wipe": 1,
+    "remove_permanent": 18,
+    "damage_prevention_reflect": 1,
+    "redirect_removal": 12,
+    "copy_spell": 6,
+    "tutor": 83,
+    "remove_creature": 21,
+    "draw_engine": 33,
+    "loot": 1,
+    "board_wipe": 1,
+    "recursion": 10,
+    "creature": 211,
+    "free_cast": 2,
+    "silence_opponents": 5,
+    "steal_all_creatures": 1,
+    "ramp_ritual": 48,
+    "land_tax": 1,
+    "direct_damage": 3,
+    "equipment_haste_shroud": 2,
+    "equipment_static_attachment": 1,
+    "overload_recursion": 1,
+    "discard_trigger_modal_draw_treasure_opponent_life_loss": 1,
+    "composite_resolution": 5,
+    "static_cost_reduction": 1,
+    "counter": 95,
+    "draw_cards": 26,
+    "token_maker": 7,
+    "topdeck_manipulation": 1,
+    "silence_spell": 8,
+    "single_combat": 1,
+    "gift_destroy_all_creatures_return_own_destroyed_creature": 1,
+    "goad_opponents_creatures_cant_block": 1,
+    "phase_out": 1,
+    "damage_modifier": 1,
+    "untap_land_engine": 2,
+    "untap_tapped_permanent_etb_engine": 1,
+    "hate_artifact": 5,
+    "life_artifact": 1,
+    "land_ramp": 5,
+    "protect_creature": 3,
+    "additional_land_play_static": 1,
+    "tutor_artifact": 3,
+    "graveyard_to_library_top": 3,
+    "unknown": 21,
+    "indestructible": 4,
+    "removal_exile": 9,
+    "temporary_exile_return_next_end_step": 1,
+    "planeswalker": 1,
+    "thassa_oracle": 3,
+    "ad_nauseam": 2,
+    "brain_freeze": 4,
+    "extra_turn": 1,
+    "opponent_graveyard_betrayal": 1,
+    "cannot_lose_turn": 1,
+    "copy_creature_token": 3,
+    "deal_damage": 1,
+    "copy_permanent_etb": 22,
+    "flash_permission": 2,
+    "hand_filter": 1,
+    "static_cost_increase": 1,
+    "remove_artifact_or_3dmg": 1
+  },
+  "focused_template_effect_scope_totals": {
+    "tap_untap_cipher_trigger": 1,
+    "alternative_cost_library_bounce": 1,
+    "additional_cost_discard_multi_target_damage": 1,
+    "static_tax_opponent_life_loss": 1,
+    "planeswalker_static_activated_graveyard": 1
+  },
+  "flag_totals": {
+    "cast_permission_not_explicit": 79,
+    "temporary_effect_not_explicit": 70,
+    "trigger_not_explicit": 163,
+    "oracle_target_removal_mismatch": 20,
+    "oracle_silence_mismatch": 14,
+    "land_utility_ability_not_modeled": 54,
+    "needs_review_rule": 27,
+    "heuristic_effect": 101,
+    "copy_effect_mismatch": 1,
+    "unknown_effect": 17
+  },
+  "deck_totals": {
+    "Lorehold target deck": {
+      "cards": 100,
+      "battle_rule_curated": 65,
+      "flagged": 31,
+      "type_land": 34,
+      "known_cards_canonical_snapshot": 1
+    },
+    "Lumra, Bellow of the Woods #49 (real)": {
+      "cards": 99,
+      "battle_rule_needs_review_generated": 7,
+      "flagged": 38,
+      "effect_map": 8,
+      "battle_rule_curated": 36,
+      "type_land": 48
+    },
+    "Grist, the Hunger Tide #66 (real)": {
+      "cards": 99,
+      "effect_map": 6,
+      "flagged": 38,
+      "battle_rule_curated": 50,
+      "battle_rule_needs_review_generated": 7,
+      "tag": 3,
+      "unknown": 7,
+      "type_land": 26
+    },
+    "Sisay, Weatherlight Captain #61 (real)": {
+      "cards": 99,
+      "battle_rule_curated": 59,
+      "flagged": 41,
+      "effect_map": 7,
+      "tag": 2,
+      "battle_rule_needs_review_generated": 1,
+      "focused_template_ready": 1,
+      "type_land": 29
+    },
+    "Najeela, the Blade-Blossom #111 (real)": {
+      "cards": 99,
+      "battle_rule_curated": 70,
+      "effect_map": 2,
+      "flagged": 25,
+      "type_land": 27
+    },
+    "Ishai, Ojutai Dragonspeaker #80 (real)": {
+      "cards": 99,
+      "battle_rule_needs_review_generated": 5,
+      "flagged": 39,
+      "battle_rule_curated": 66,
+      "effect_map": 4,
+      "tag": 1,
+      "focused_template_ready": 1,
+      "type_land": 22
+    },
+    "K-9, Mark I #34 (real)": {
+      "cards": 99,
+      "battle_rule_curated": 64,
+      "flagged": 34,
+      "tag": 3,
+      "effect_map": 4,
+      "focused_template_ready": 1,
+      "unknown": 1,
+      "type_land": 26
+    },
+    "Kinnan, Bonder Prodigy #37 (real)": {
+      "cards": 99,
+      "battle_rule_curated": 69,
+      "flagged": 31,
+      "effect_map": 5,
+      "type_land": 25
+    },
+    "Kraum, Ludevic's Opus #86 (real)": {
+      "cards": 99,
+      "battle_rule_curated": 67,
+      "flagged": 29,
+      "tag": 1,
+      "effect_map": 2,
+      "battle_rule_needs_review_generated": 1,
+      "type_land": 28
+    },
+    "Kinnan, Bonder Prodigy #104 (real)": {
+      "cards": 99,
+      "battle_rule_curated": 65,
+      "flagged": 25,
+      "effect_map": 8,
+      "type_land": 26
+    },
+    "Kinnan, Bonder Prodigy #27 (real)": {
+      "cards": 99,
+      "battle_rule_curated": 69,
+      "flagged": 26,
+      "effect_map": 4,
+      "tag": 1,
+      "focused_template_ready": 1,
+      "type_land": 24
+    },
+    "Arcum Dagsson #97 (real)": {
+      "cards": 99,
+      "effect_map": 9,
+      "flagged": 32,
+      "battle_rule_curated": 56,
+      "battle_rule_needs_review_generated": 1,
+      "unknown": 6,
+      "focused_template_ready": 1,
+      "type_land": 26
+    },
+    "Winota, Joiner of Forces #39 (real)": {
+      "cards": 99,
+      "effect_map": 22,
+      "flagged": 44,
+      "tag": 9,
+      "battle_rule_curated": 25,
+      "battle_rule_needs_review_generated": 5,
+      "unknown": 3,
+      "type_land": 35
+    }
+  },
+  "flagged_cards": [
+    {
+      "name": "Valley Floodcaller",
+      "effect": "creature",
+      "source": "effect_map",
+      "decks": [
+        "Ishai, Ojutai Dragonspeaker #80 (real)",
+        "K-9, Mark I #34 (real)",
+        "Kinnan, Bonder Prodigy #104 (real)",
+        "Kinnan, Bonder Prodigy #27 (real)",
+        "Kinnan, Bonder Prodigy #37 (real)",
+        "Kraum, Ludevic's Opus #86 (real)"
+      ],
+      "flags": [
+        "cast_permission_not_explicit",
+        "heuristic_effect",
+        "temporary_effect_not_explicit",
+        "trigger_not_explicit"
+      ],
+      "focused_template_matches": [],
+      "focused_template_effect_scopes": [],
+      "type_line": "Creature \u2014 Otter Wizard",
+      "oracle_sample": "Flash\nYou may cast noncreature spells as though they had flash.\nWhenever you cast a noncreature spell, Birds, Frogs, Otters, and Rats you control get +1/+1 until end of turn. Untap"
+    },
+    {
+      "name": "Ragavan, Nimble Pilferer",
+      "effect": "creature",
+      "source": "battle_rule_curated",
+      "decks": [
+        "K-9, Mark I #34 (real)",
+        "Kraum, Ludevic's Opus #86 (real)",
+        "Najeela, the Blade-Blossom #111 (real)",
+        "Sisay, Weatherlight Captain #61 (real)"
+      ],
+      "flags": [
+        "cast_permission_not_explicit",
+        "temporary_effect_not_explicit",
+        "trigger_not_explicit"
+      ],
+      "focused_template_matches": [],
+      "focused_template_effect_scopes": [],
+      "type_line": "Legendary Creature \u2014 Monkey Pirate",
+      "oracle_sample": "Whenever Ragavan deals combat damage to a player, create a Treasure token and exile the top card of that player's library. Until end of turn, you may cast that card.\nDash {1}{R} (Y"
+    },
+    {
+      "name": "Kutzil, Malamet Exemplar",
+      "effect": "passive",
+      "source": "battle_rule_needs_review_generated",
+      "decks": [
+        "Sisay, Weatherlight Captain #61 (real)"
+      ],
+      "flags": [
+        "needs_review_rule",
+        "oracle_silence_mismatch",
+        "trigger_not_explicit"
+      ],
+      "focused_template_matches": [],
+      "focused_template_effect_scopes": [],
+      "type_line": "Legendary Creature \u2014 Cat Warrior",
+      "oracle_sample": "Your opponents can't cast spells during your turn.\nWhenever one or more creatures you control each with power greater than its base power deals combat damage to a player, draw a ca"
+    },
+    {
+      "name": "Legion Warboss",
+      "effect": "passive",
+      "source": "battle_rule_needs_review_generated",
+      "decks": [
+        "Winota, Joiner of Forces #39 (real)"
+      ],
+      "flags": [
+        "needs_review_rule",
+        "temporary_effect_not_explicit",
+        "trigger_not_explicit"
+      ],
+      "focused_template_matches": [],
+      "focused_template_effect_scopes": [],
+      "type_line": "Creature \u2014 Goblin Soldier",
+      "oracle_sample": "Mentor (Whenever this creature attacks, put a +1/+1 counter on target attacking creature with lesser power.)\nAt the beginning of combat on your turn, create a 1/1 red Goblin creatu"
+    },
+    {
+      "name": "Six",
+      "effect": "passive",
+      "source": "battle_rule_needs_review_generated",
+      "decks": [
+        "Lumra, Bellow of the Woods #49 (real)"
+      ],
+      "flags": [
+        "cast_permission_not_explicit",
+        "needs_review_rule",
+        "trigger_not_explicit"
+      ],
+      "focused_template_matches": [],
+      "focused_template_effect_scopes": [],
+      "type_line": "Legendary Creature \u2014 Treefolk",
+      "oracle_sample": "Reach\nWhenever Six attacks, mill three cards. You may put a land card from among them into your hand.\nDuring your turn, nonland permanent cards in your graveyard have retrace. (You"
+    },
+    {
+      "name": "Veyran, Voice of Duality",
+      "effect": "passive",
+      "source": "battle_rule_needs_review_generated",
+      "decks": [
+        "Ishai, Ojutai Dragonspeaker #80 (real)"
+      ],
+      "flags": [
+        "needs_review_rule",
+        "temporary_effect_not_explicit",
+        "trigger_not_explicit"
+      ],
+      "focused_template_matches": [],
+      "focused_template_effect_scopes": [],
+      "type_line": "Legendary Creature \u2014 Efreet Wizard",
+      "oracle_sample": "Magecraft \u2014 Whenever you cast or copy an instant or sorcery spell, Veyran gets +1/+1 until end of turn.\nIf you casting or copying an instant or sorcery spell causes a triggered abi"
+    },
+    {
+      "name": "Erkenbrand, Lord of Westfold",
+      "effect": "creature",
+      "source": "effect_map",
+      "decks": [
+        "Winota, Joiner of Forces #39 (real)"
+      ],
+      "flags": [
+        "heuristic_effect",
+        "temporary_effect_not_explicit",
+        "trigger_not_explicit"
+      ],
+      "focused_template_matches": [],
+      "focused_template_effect_scopes": [],
+      "type_line": "Legendary Creature \u2014 Human Soldier",
+      "oracle_sample": "Whenever Erkenbrand or another Human you control enters, creatures you control get +1/+0 until end of turn."
+    },
+    {
+      "name": "Goldnight Commander",
+      "effect": "creature",
+      "source": "effect_map",
+      "decks": [
+        "Winota, Joiner of Forces #39 (real)"
+      ],
+      "flags": [
+        "heuristic_effect",
+        "temporary_effect_not_explicit",
+        "trigger_not_explicit"
+      ],
+      "focused_template_matches": [],
+      "focused_template_effect_scopes": [],
+      "type_line": "Creature \u2014 Human Cleric Soldier",
+      "oracle_sample": "Whenever another creature you control enters, creatures you control get +1/+1 until end of turn."
+    },
+    {
+      "name": "Harmonic Prodigy",
+      "effect": "creature",
+      "source": "effect_map",
+      "decks": [
+        "Ishai, Ojutai Dragonspeaker #80 (real)"
+      ],
+      "flags": [
+        "heuristic_effect",
+        "temporary_effect_not_explicit",
+        "trigger_not_explicit"
+      ],
+      "focused_template_matches": [],
+      "focused_template_effect_scopes": [],
+      "type_line": "Creature \u2014 Human Wizard",
+      "oracle_sample": "Prowess (Whenever you cast a noncreature spell, this creature gets +1/+1 until end of turn.)\nIf a triggered ability of a Shaman or another Wizard you control triggers, that ability"
+    },
+    {
+      "name": "Lavinia, Azorius Renegade",
+      "effect": "creature",
+      "source": "effect_map",
+      "decks": [
+        "Sisay, Weatherlight Captain #61 (real)"
+      ],
+      "flags": [
+        "heuristic_effect",
+        "oracle_silence_mismatch",
+        "trigger_not_explicit"
+      ],
+      "focused_template_matches": [],
+      "focused_template_effect_scopes": [],
+      "type_line": "Legendary Creature \u2014 Human Soldier",
+      "oracle_sample": "Each opponent can't cast noncreature spells with mana value greater than the number of lands that player controls.\nWhenever an opponent casts a spell, if no mana was spent to cast "
+    },
+    {
+      "name": "Liberator, Urza's Battlethopter",
+      "effect": "creature",
+      "source": "effect_map",
+      "decks": [
+        "Arcum Dagsson #97 (real)"
+      ],
+      "flags": [
+        "cast_permission_not_explicit",
+        "heuristic_effect",
+        "trigger_not_explicit"
+      ],
+      "focused_template_matches": [],
+      "focused_template_effect_scopes": [],
+      "type_line": "Legendary Artifact Creature \u2014 Thopter",
+      "oracle_sample": "Flash\nFlying\nYou may cast colorless spells and artifact spells as though they had flash.\nWhenever you cast a spell, if the amount of mana spent to cast that spell is greater than L"
+    },
+    {
+      "name": "Signal Pest",
+      "effect": "creature",
+      "source": "effect_map",
+      "decks": [
+        "Winota, Joiner of Forces #39 (real)"
+      ],
+      "flags": [
+        "heuristic_effect",
+        "temporary_effect_not_explicit",
+        "trigger_not_explicit"
+      ],
+      "focused_template_matches": [],
+      "focused_template_effect_scopes": [],
+      "type_line": "Artifact Creature \u2014 Pest",
+      "oracle_sample": "Battle cry (Whenever this creature attacks, each other attacking creature gets +1/+0 until end of turn.)\nThis creature can't be blocked except by creatures with flying or reach."
+    },
+    {
+      "name": "Th\u00e9oden, King of Rohan",
+      "effect": "creature",
+      "source": "effect_map",
+      "decks": [
+        "Winota, Joiner of Forces #39 (real)"
+      ],
+      "flags": [
+        "heuristic_effect",
+        "temporary_effect_not_explicit",
+        "trigger_not_explicit"
+      ],
+      "focused_template_matches": [],
+      "focused_template_effect_scopes": [],
+      "type_line": "Legendary Creature \u2014 Human Noble",
+      "oracle_sample": "Whenever Th\u00e9oden or another Human you control enters, target creature gains double strike until end of turn."
+    },
+    {
+      "name": "Apex of Power",
+      "effect": "passive",
+      "source": "battle_rule_curated",
+      "decks": [
+        "Lorehold target deck"
+      ],
+      "flags": [
+        "cast_permission_not_explicit",
+        "temporary_effect_not_explicit"
+      ],
+      "focused_template_matches": [],
+      "focused_template_effect_scopes": [],
+      "type_line": "Sorcery",
+      "oracle_sample": "Exile the top seven cards of your library. Until end of turn, you may cast spells from among them.\nIf this spell was cast from your hand, add ten mana of any one color."
+    },
+    {
+      "name": "Birgi, God of Storytelling",
+      "effect": "ramp_engine",
+      "source": "battle_rule_curated",
+      "decks": [
+        "Ishai, Ojutai Dragonspeaker #80 (real)",
+        "Kraum, Ludevic's Opus #86 (real)"
+      ],
+      "flags": [
+        "temporary_effect_not_explicit",
+        "trigger_not_explicit"
+      ],
+      "focused_template_matches": [],
+      "focused_template_effect_scopes": [],
+      "type_line": "Legendary Creature \u2014 God",
+      "oracle_sample": "Whenever you cast a spell, add {R}. Until end of turn, you don't lose this mana as steps and phases end.\nCreatures you control can boast twice during each of your turns rather than"
+    },
+    {
+      "name": "Flashback",
+      "effect": "recursion",
+      "source": "battle_rule_curated",
+      "decks": [
+        "Lorehold target deck"
+      ],
+      "flags": [
+        "cast_permission_not_explicit",
+        "temporary_effect_not_explicit"
+      ],
+      "focused_template_matches": [],
+      "focused_template_effect_scopes": [],
+      "type_line": "Instant",
+      "oracle_sample": "Target instant or sorcery card in your graveyard gains flashback until end of turn. The flashback cost is equal to its mana cost. (You may cast that card from your graveyard for it"
+    },
+    {
+      "name": "Goliath Daydreamer",
+      "effect": "free_cast",
+      "source": "battle_rule_curated",
+      "decks": [
+        "Lorehold target deck"
+      ],
+      "flags": [
+        "cast_permission_not_explicit",
+        "trigger_not_explicit"
+      ],
+      "focused_template_matches": [],
+      "focused_template_effect_scopes": [],
+      "type_line": "Creature \u2014 Giant Wizard",
+      "oracle_sample": "Whenever you cast an instant or sorcery spell from your hand, exile that card with a dream counter on it instead of putting it into your graveyard as it resolves.\nWhenever this cre"
+    },
+    {
+      "name": "Ignoble Hierarch",
+      "effect": "creature",
+      "source": "battle_rule_curated",
+      "decks": [
+        "Najeela, the Blade-Blossom #111 (real)",
+        "Sisay, Weatherlight Captain #61 (real)"
+      ],
+      "flags": [
+        "temporary_effect_not_explicit",
+        "trigger_not_explicit"
+      ],
+      "focused_template_matches": [],
+      "focused_template_effect_scopes": [],
+      "type_line": "Creature \u2014 Goblin Shaman",
+      "oracle_sample": "Exalted (Whenever a creature you control attacks alone, that creature gets +1/+1 until end of turn.)\n{T}: Add {B}, {R}, or {G}."
+    },
+    {
+      "name": "Legolas's Quick Reflexes",
+      "effect": "protect_creature",
+      "source": "battle_rule_curated",
+      "decks": [
+        "Lumra, Bellow of the Woods #49 (real)",
+        "Sisay, Weatherlight Captain #61 (real)"
+      ],
+      "flags": [
+        "temporary_effect_not_explicit",
+        "trigger_not_explicit"
+      ],
+      "focused_template_matches": [],
+      "focused_template_effect_scopes": [],
+      "type_line": "Instant",
+      "oracle_sample": "Split second (As long as this spell is on the stack, players can't cast spells or activate abilities that aren't mana abilities.)\nUntap target creature. Until end of turn, it gains"
+    },
+    {
+      "name": "Mizzix's Mastery",
+      "effect": "overload_recursion",
+      "source": "battle_rule_curated",
+      "decks": [
+        "Lorehold target deck"
+      ],
+      "flags": [
+        "cast_permission_not_explicit",
+        "oracle_target_removal_mismatch"
+      ],
+      "focused_template_matches": [],
+      "focused_template_effect_scopes": [],
+      "type_line": "Sorcery",
+      "oracle_sample": "Exile target card that's an instant or sorcery from your graveyard. For each card exiled this way, copy it, and you may cast the copy without paying its mana cost. Exile Mizzix's M"
+    },
+    {
+      "name": "Noble Hierarch",
+      "effect": "creature",
+      "source": "battle_rule_curated",
+      "decks": [
+        "K-9, Mark I #34 (real)",
+        "Najeela, the Blade-Blossom #111 (real)",
+        "Sisay, Weatherlight Captain #61 (real)"
+      ],
+      "flags": [
+        "temporary_effect_not_explicit",
+        "trigger_not_explicit"
+      ],
+      "focused_template_matches": [],
+      "focused_template_effect_scopes": [],
+      "type_line": "Creature \u2014 Human Druid",
+      "oracle_sample": "Exalted (Whenever a creature you control attacks alone, that creature gets +1/+1 until end of turn.)\n{T}: Add {G}, {W}, or {U}."
+    },
+    {
+      "name": "Ruby, Daring Tracker",
+      "effect": "ramp_permanent",
+      "source": "battle_rule_curated",
+      "decks": [
+        "Sisay, Weatherlight Captain #61 (real)"
+      ],
+      "flags": [
+        "temporary_effect_not_explicit",
+        "trigger_not_explicit"
+      ],
+      "focused_template_matches": [],
+      "focused_template_effect_scopes": [],
+      "type_line": "Legendary Creature \u2014 Human Scout",
+      "oracle_sample": "Haste (This creature can attack and {T} as soon as it comes under your control.)\nWhenever Ruby attacks while you control a creature with power 4 or greater, Ruby gets +2/+2 until e"
+    },
+    {
+      "name": "Velomachus Lorehold",
+      "effect": "creature",
+      "source": "battle_rule_curated",
+      "decks": [
+        "Lorehold target deck"
+      ],
+      "flags": [
+        "cast_permission_not_explicit",
+        "trigger_not_explicit"
+      ],
+      "focused_template_matches": [],
+      "focused_template_effect_scopes": [],
+      "type_line": "Legendary Creature \u2014 Elder Dragon",
+      "oracle_sample": "Flying, vigilance, haste\nWhenever Velomachus Lorehold attacks, look at the top seven cards of your library. You may cast an instant or sorcery spell with mana value less than or eq"
+    },
+    {
+      "name": "Archmage Emeritus",
+      "effect": "passive",
+      "source": "battle_rule_needs_review_generated",
+      "decks": [
+        "Ishai, Ojutai Dragonspeaker #80 (real)"
+      ],
+      "flags": [
+        "needs_review_rule",
+        "trigger_not_explicit"
+      ],
+      "focused_template_matches": [],
+      "focused_template_effect_scopes": [],
+      "type_line": "Creature \u2014 Human Wizard",
+      "oracle_sample": "Magecraft \u2014 Whenever you cast or copy an instant or sorcery spell, draw a card."
+    },
+    {
+      "name": "Baral, Chief of Compliance",
+      "effect": "passive",
+      "source": "battle_rule_needs_review_generated",
+      "decks": [
+        "Ishai, Ojutai Dragonspeaker #80 (real)"
+      ],
+      "flags": [
+        "needs_review_rule",
+        "trigger_not_explicit"
+      ],
+      "focused_template_matches": [],
+      "focused_template_effect_scopes": [],
+      "type_line": "Legendary Creature \u2014 Human Wizard",
+      "oracle_sample": "Instant and sorcery spells you cast cost {1} less to cast.\nWhenever a spell or ability you control counters a spell, you may draw a card. If you do, discard a card."
+    },
+    {
+      "name": "Chatterfang, Squirrel General",
+      "effect": "passive",
+      "source": "battle_rule_needs_review_generated",
+      "decks": [
+        "Grist, the Hunger Tide #66 (real)"
+      ],
+      "flags": [
+        "needs_review_rule",
+        "temporary_effect_not_explicit"
+      ],
+      "focused_template_matches": [],
+      "focused_template_effect_scopes": [],
+      "type_line": "Legendary Creature \u2014 Squirrel Warrior",
+      "oracle_sample": "Forestwalk (This creature can't be blocked as long as defending player controls a Forest.)\nIf one or more tokens would be created under your control, those tokens plus that many 1/"
+    },
+    {
+      "name": "Horizon Explorer",
+      "effect": "passive",
+      "source": "battle_rule_needs_review_generated",
+      "decks": [
+        "Lumra, Bellow of the Woods #49 (real)"
+      ],
+      "flags": [
+        "needs_review_rule",
+        "trigger_not_explicit"
+      ],
+      "focused_template_matches": [],
+      "focused_template_effect_scopes": [],
+      "type_line": "Creature \u2014 Insect Scout",
+      "oracle_sample": "Lands you control enter untapped.\nWhenever you attack a player, create a Lander token. (It's an artifact with \"{2}, {T}, Sacrifice this token: Search your library for a basic land "
+    },
+    {
+      "name": "Light Up the Stage",
+      "effect": "passive",
+      "source": "battle_rule_needs_review_generated",
+      "decks": [
+        "Ishai, Ojutai Dragonspeaker #80 (real)"
+      ],
+      "flags": [
+        "cast_permission_not_explicit",
+        "needs_review_rule"
+      ],
+      "focused_template_matches": [],
+      "focused_template_effect_scopes": [],
+      "type_line": "Sorcery",
+      "oracle_sample": "Spectacle {R} (You may cast this spell for its spectacle cost rather than its mana cost if an opponent lost life this turn.)\nExile the top two cards of your library. Until the end "
+    },
+    {
+      "name": "Lotus Cobra",
+      "effect": "passive",
+      "source": "battle_rule_needs_review_generated",
+      "decks": [
+        "Lumra, Bellow of the Woods #49 (real)"
+      ],
+      "flags": [
+        "needs_review_rule",
+        "trigger_not_explicit"
+      ],
+      "focused_template_matches": [],
+      "focused_template_effect_scopes": [],
+      "type_line": "Creature \u2014 Snake",
+      "oracle_sample": "Landfall \u2014 Whenever a land you control enters, add one mana of any color."
+    },
+    {
+      "name": "Loyal Apprentice",
+      "effect": "passive",
+      "source": "battle_rule_needs_review_generated",
+      "decks": [
+        "Winota, Joiner of Forces #39 (real)"
+      ],
+      "flags": [
+        "needs_review_rule",
+        "temporary_effect_not_explicit"
+      ],
+      "focused_template_matches": [],
+      "focused_template_effect_scopes": [],
+      "type_line": "Creature \u2014 Human Artificer",
+      "oracle_sample": "Haste\nLieutenant \u2014 At the beginning of combat on your turn, if you control your commander, create a 1/1 colorless Thopter artifact creature token with flying. That token gains hast"
+    },
+    {
+      "name": "Mentor of the Meek",
+      "effect": "passive",
+      "source": "battle_rule_needs_review_generated",
+      "decks": [
+        "Winota, Joiner of Forces #39 (real)"
+      ],
+      "flags": [
+        "needs_review_rule",
+        "trigger_not_explicit"
+      ],
+      "focused_template_matches": [],
+      "focused_template_effect_scopes": [],
+      "type_line": "Creature \u2014 Human Soldier",
+      "oracle_sample": "Whenever another creature you control with power 2 or less enters, you may pay {1}. If you do, draw a card."
+    },
+    {
+      "name": "Nissa, Resurgent Animist",
+      "effect": "passive",
+      "source": "battle_rule_needs_review_generated",
+      "decks": [
+        "Lumra, Bellow of the Woods #49 (real)"
+      ],
+      "flags": [
+        "needs_review_rule",
+        "trigger_not_explicit"
+      ],
+      "focused_template_matches": [],
+      "focused_template_effect_scopes": [],
+      "type_line": "Legendary Creature \u2014 Elf Scout",
+      "oracle_sample": "Landfall \u2014 Whenever a land you control enters, add one mana of any color. Then if this is the second time this ability has resolved this turn, reveal cards from the top of your lib"
+    },
+    {
+      "name": "Selfless Spirit",
+      "effect": "passive",
+      "source": "battle_rule_needs_review_generated",
+      "decks": [
+        "Winota, Joiner of Forces #39 (real)"
+      ],
+      "flags": [
+        "needs_review_rule",
+        "temporary_effect_not_explicit"
+      ],
+      "focused_template_matches": [],
+      "focused_template_effect_scopes": [],
+      "type_line": "Creature \u2014 Spirit Cleric",
+      "oracle_sample": "Flying\nSacrifice this creature: Creatures you control gain indestructible until end of turn."
+    },
+    {
+      "name": "Tireless Provisioner",
+      "effect": "passive",
+      "source": "battle_rule_needs_review_generated",
+      "decks": [
+        "Lumra, Bellow of the Woods #49 (real)"
+      ],
+      "flags": [
+        "needs_review_rule",
+        "trigger_not_explicit"
+      ],
+      "focused_template_matches": [],
+      "focused_template_effect_scopes": [],
+      "type_line": "Creature \u2014 Elf Scout",
+      "oracle_sample": "Landfall \u2014 Whenever a land you control enters, create a Food token or a Treasure token. (Food is an artifact with \"{2}, {T}, Sacrifice this token: You gain 3 life.\" Treasure is an "
+    },
+    {
+      "name": "Alexios, Deimos of Kosmos",
+      "effect": "creature",
+      "source": "effect_map",
+      "decks": [
+        "Winota, Joiner of Forces #39 (real)"
+      ],
+      "flags": [
+        "heuristic_effect",
+        "temporary_effect_not_explicit"
+      ],
+      "focused_template_matches": [],
+      "focused_template_effect_scopes": [],
+      "type_line": "Legendary Creature \u2014 Human Berserker",
+      "oracle_sample": "Trample\nAlexios attacks each combat if able, can't be sacrificed, and can't attack its owner.\nAt the beginning of each player's upkeep, that player gains control of Alexios, untaps"
+    },
+    {
+      "name": "Arabella, Abandoned Doll",
+      "effect": "creature",
+      "source": "effect_map",
+      "decks": [
+        "Winota, Joiner of Forces #39 (real)"
+      ],
+      "flags": [
+        "heuristic_effect",
+        "trigger_not_explicit"
+      ],
+      "focused_template_matches": [],
+      "focused_template_effect_scopes": [],
+      "type_line": "Legendary Artifact Creature \u2014 Toy",
+      "oracle_sample": "Whenever Arabella attacks, it deals X damage to each opponent and you gain X life, where X is the number of creatures you control with power 2 or less."
+    },
+    {
+      "name": "Blood Artist",
+      "effect": "creature",
+      "source": "effect_map",
+      "decks": [
+        "Grist, the Hunger Tide #66 (real)"
+      ],
+      "flags": [
+        "heuristic_effect",
+        "trigger_not_explicit"
+      ],
+      "focused_template_matches": [],
+      "focused_template_effect_scopes": [],
+      "type_line": "Creature \u2014 Vampire",
+      "oracle_sample": "Whenever this creature or another creature dies, target player loses 1 life and you gain 1 life."
+    },
+    {
+      "name": "Blossoming Tortoise",
+      "effect": "creature",
+      "source": "effect_map",
+      "decks": [
+        "Lumra, Bellow of the Woods #49 (real)"
+      ],
+      "flags": [
+        "heuristic_effect",
+        "trigger_not_explicit"
+      ],
+      "focused_template_matches": [],
+      "focused_template_effect_scopes": [],
+      "type_line": "Creature \u2014 Turtle",
+      "oracle_sample": "Whenever this creature enters or attacks, mill three cards, then return a land card from your graveyard to the battlefield tapped.\nActivated abilities of lands you control cost {1}"
+    },
+    {
+      "name": "Crashing Drawbridge",
+      "effect": "creature",
+      "source": "effect_map",
+      "decks": [
+        "Arcum Dagsson #97 (real)"
+      ],
+      "flags": [
+        "heuristic_effect",
+        "temporary_effect_not_explicit"
+      ],
+      "focused_template_matches": [],
+      "focused_template_effect_scopes": [],
+      "type_line": "Artifact Creature \u2014 Wall",
+      "oracle_sample": "Defender\n{T}: Creatures you control gain haste until end of turn."
+    },
+    {
+      "name": "Derevi, Empyrial Tactician",
+      "effect": "creature",
+      "source": "effect_map",
+      "decks": [
+        "Najeela, the Blade-Blossom #111 (real)",
+        "Sisay, Weatherlight Captain #61 (real)"
+      ],
+      "flags": [
+        "heuristic_effect",
+        "trigger_not_explicit"
+      ],
+      "focused_template_matches": [],
+      "focused_template_effect_scopes": [],
+      "type_line": "Legendary Creature \u2014 Bird Wizard",
+      "oracle_sample": "Flying\nWhen Derevi enters and whenever a creature you control deals combat damage to a player, you may tap or untap target permanent.\n{1}{G}{W}{U}: Put Derevi onto the battlefield "
+    },
+    {
+      "name": "Forsaken Miner",
+      "effect": "creature",
+      "source": "effect_map",
+      "decks": [
+        "Grist, the Hunger Tide #66 (real)"
+      ],
+      "flags": [
+        "heuristic_effect",
+        "trigger_not_explicit"
+      ],
+      "focused_template_matches": [],
+      "focused_template_effect_scopes": [],
+      "type_line": "Creature \u2014 Skeleton Rogue",
+      "oracle_sample": "This creature can't block.\nWhenever you commit a crime, you may pay {B}. If you do, return this card from your graveyard to the battlefield. (Targeting opponents, anything they con"
+    },
+    {
+      "name": "Icetill Explorer",
+      "effect": "creature",
+      "source": "effect_map",
+      "decks": [
+        "Lumra, Bellow of the Woods #49 (real)"
+      ],
+      "flags": [
+        "heuristic_effect",
+        "trigger_not_explicit"
+      ],
+      "focused_template_matches": [],
+      "focused_template_effect_scopes": [],
+      "type_line": "Creature \u2014 Insect Scout",
+      "oracle_sample": "You may play an additional land on each of your turns.\nYou may play lands from your graveyard.\nLandfall \u2014 Whenever a land you control enters, mill a card."
+    },
+    {
+      "name": "Krark, the Thumbless",
+      "effect": "creature",
+      "source": "effect_map",
+      "decks": [
+        "Ishai, Ojutai Dragonspeaker #80 (real)"
+      ],
+      "flags": [
+        "heuristic_effect",
+        "trigger_not_explicit"
+      ],
+      "focused_template_matches": [],
+      "focused_template_effect_scopes": [],
+      "type_line": "Legendary Creature \u2014 Goblin Wizard",
+      "oracle_sample": "Whenever you cast an instant or sorcery spell, flip a coin. If you lose the flip, return that spell to its owner's hand. If you win the flip, copy that spell, and you may choose ne"
+    },
+    {
+      "name": "Phoenix Chick",
+      "effect": "creature",
+      "source": "effect_map",
+      "decks": [
+        "Winota, Joiner of Forces #39 (real)"
+      ],
+      "flags": [
+        "heuristic_effect",
+        "trigger_not_explicit"
+      ],
+      "focused_template_matches": [],
+      "focused_template_effect_scopes": [],
+      "type_line": "Creature \u2014 Phoenix",
+      "oracle_sample": "Flying, haste\nThis creature can't block.\nWhenever you attack with three or more creatures, you may pay {R}{R}. If you do, return this card from your graveyard to the battlefield ta"
+    },
+    {
+      "name": "Shield Sphere",
+      "effect": "creature",
+      "source": "effect_map",
+      "decks": [
+        "Arcum Dagsson #97 (real)"
+      ],
+      "flags": [
+        "heuristic_effect",
+        "trigger_not_explicit"
+      ],
+      "focused_template_matches": [],
+      "focused_template_effect_scopes": [],
+      "type_line": "Artifact Creature \u2014 Wall",
+      "oracle_sample": "Defender\nWhenever this creature blocks, put a -0/-1 counter on it."
+    },
+    {
+      "name": "Silverwing Squadron",
+      "effect": "creature",
+      "source": "effect_map",
+      "decks": [
+        "Winota, Joiner of Forces #39 (real)"
+      ],
+      "flags": [
+        "heuristic_effect",
+        "trigger_not_explicit"
+      ],
+      "focused_template_matches": [],
+      "focused_template_effect_scopes": [],
+      "type_line": "Creature \u2014 Human Knight",
+      "oracle_sample": "Flying, vigilance\nSilverwing Squadron's power and toughness are each equal to the number of creatures you control.\nWhenever this creature attacks, create a number of 2/2 white Knig"
+    },
+    {
+      "name": "Spider-Sense",
+      "effect": "counter",
+      "source": "effect_map",
+      "decks": [
+        "Kraum, Ludevic's Opus #86 (real)"
+      ],
+      "flags": [
+        "cast_permission_not_explicit",
+        "heuristic_effect"
+      ],
+      "focused_template_matches": [],
+      "focused_template_effect_scopes": [],
+      "type_line": "Instant",
+      "oracle_sample": "Web-slinging {U} (You may cast this spell for {U} if you also return a tapped creature you control to its owner's hand.)\nCounter target instant spell, sorcery spell, or triggered a"
+    },
+    {
+      "name": "Tam, Mindful First-Year",
+      "effect": "creature",
+      "source": "effect_map",
+      "decks": [
+        "Sisay, Weatherlight Captain #61 (real)"
+      ],
+      "flags": [
+        "heuristic_effect",
+        "temporary_effect_not_explicit"
+      ],
+      "focused_template_matches": [],
+      "focused_template_effect_scopes": [],
+      "type_line": "Legendary Creature \u2014 Gorgon Wizard",
+      "oracle_sample": "Each other creature you control has hexproof from each of its colors.\n{T}: Target creature you control becomes all colors until end of turn."
+    },
+    {
+      "name": "The Fourteenth Doctor",
+      "effect": "creature",
+      "source": "effect_map",
+      "decks": [
+        "K-9, Mark I #34 (real)"
+      ],
+      "flags": [
+        "heuristic_effect",
+        "temporary_effect_not_explicit"
+      ],
+      "focused_template_matches": [],
+      "focused_template_effect_scopes": [],
+      "type_line": "Legendary Creature \u2014 Time Lord Doctor",
+      "oracle_sample": "When you cast this spell, reveal the top fourteen cards of your library. Put all Doctor cards revealed this way into your graveyard and the rest on the bottom of your library in a "
+    },
+    {
+      "name": "Tiller Engine",
+      "effect": "creature",
+      "source": "effect_map",
+      "decks": [
+        "Lumra, Bellow of the Woods #49 (real)"
+      ],
+      "flags": [
+        "heuristic_effect",
+        "trigger_not_explicit"
+      ],
+      "focused_template_matches": [],
+      "focused_template_effect_scopes": [],
+      "type_line": "Artifact Creature \u2014 Construct",
+      "oracle_sample": "Whenever a land you control enters tapped, choose one \u2014\n\u2022 Untap that land.\n\u2022 Tap target nonland permanent an opponent controls."
+    },
+    {
+      "name": "Vengeful Bloodwitch",
+      "effect": "creature",
+      "source": "effect_map",
+      "decks": [
+        "Grist, the Hunger Tide #66 (real)"
+      ],
+      "flags": [
+        "heuristic_effect",
+        "trigger_not_explicit"
+      ],
+      "focused_template_matches": [],
+      "focused_template_effect_scopes": [],
+      "type_line": "Creature \u2014 Vampire Warlock",
+      "oracle_sample": "Whenever this creature or another creature you control dies, target opponent loses 1 life and you gain 1 life."
+    },
+    {
+      "name": "Void Winnower",
+      "effect": "creature",
+      "source": "effect_map",
+      "decks": [
+        "Kinnan, Bonder Prodigy #104 (real)"
+      ],
+      "flags": [
+        "heuristic_effect",
+        "oracle_silence_mismatch"
+      ],
+      "focused_template_matches": [],
+      "focused_template_effect_scopes": [],
+      "type_line": "Creature \u2014 Eldrazi",
+      "oracle_sample": "Your opponents can't cast spells with even mana values. (Zero is even.)\nYour opponents can't block with creatures with even mana values."
+    },
+    {
+      "name": "Wandering Archaic",
+      "effect": "creature",
+      "source": "effect_map",
+      "decks": [
+        "Kinnan, Bonder Prodigy #104 (real)",
+        "Kinnan, Bonder Prodigy #37 (real)"
+      ],
+      "flags": [
+        "heuristic_effect",
+        "trigger_not_explicit"
+      ],
+      "focused_template_matches": [],
+      "focused_template_effect_scopes": [],
+      "type_line": "Creature \u2014 Avatar",
+      "oracle_sample": "Whenever an opponent casts an instant or sorcery spell, they may pay {2}. If they don't, you may copy that spell. You may choose new targets for the copy."
+    },
+    {
+      "name": "Witherbloom Apprentice",
+      "effect": "creature",
+      "source": "effect_map",
+      "decks": [
+        "Grist, the Hunger Tide #66 (real)"
+      ],
+      "flags": [
+        "heuristic_effect",
+        "trigger_not_explicit"
+      ],
+      "focused_template_matches": [],
+      "focused_template_effect_scopes": [],
+      "type_line": "Creature \u2014 Human Druid",
+      "oracle_sample": "Magecraft \u2014 Whenever you cast or copy an instant or sorcery spell, each opponent loses 1 life and you gain 1 life."
+    },
+    {
+      "name": "Witty Roastmaster",
+      "effect": "creature",
+      "source": "effect_map",
+      "decks": [
+        "Winota, Joiner of Forces #39 (real)"
+      ],
+      "flags": [
+        "heuristic_effect",
+        "trigger_not_explicit"
+      ],
+      "focused_template_matches": [],
+      "focused_template_effect_scopes": [],
+      "type_line": "Creature \u2014 Devil Citizen",
+      "oracle_sample": "Alliance \u2014 Whenever another creature you control enters, this creature deals 1 damage to each opponent."
+    },
+    {
+      "name": "Birgi, God of Storytelling // Harnfel, Horn of Bounty",
+      "effect": "ramp_engine",
+      "source": "known_cards_canonical_snapshot",
+      "decks": [
+        "Lorehold target deck"
+      ],
+      "flags": [
+        "temporary_effect_not_explicit",
+        "trigger_not_explicit"
+      ],
+      "focused_template_matches": [],
+      "focused_template_effect_scopes": [],
+      "type_line": "Legendary Creature \u2014 God",
+      "oracle_sample": "Whenever you cast a spell, add {R}. Until end of turn, you don't lose this mana as steps and phases end.\nCreatures you control can boast twice during each of your turns rather than"
+    },
+    {
+      "name": "Abeyance",
+      "effect": "draw_cards",
+      "source": "tag",
+      "decks": [
+        "Ishai, Ojutai Dragonspeaker #80 (real)"
+      ],
+      "flags": [
+        "heuristic_effect",
+        "temporary_effect_not_explicit"
+      ],
+      "focused_template_matches": [],
+      "focused_template_effect_scopes": [],
+      "type_line": "Instant",
+      "oracle_sample": "Until end of turn, target player can't cast instant or sorcery spells, and that player can't activate abilities that aren't mana abilities.\nDraw a card."
+    },
+    {
+      "name": "Alseid of Life's Bounty",
+      "effect": "indestructible",
+      "source": "tag",
+      "decks": [
+        "Winota, Joiner of Forces #39 (real)"
+      ],
+      "flags": [
+        "heuristic_effect",
+        "temporary_effect_not_explicit"
+      ],
+      "focused_template_matches": [],
+      "focused_template_effect_scopes": [],
+      "type_line": "Enchantment Creature \u2014 Nymph",
+      "oracle_sample": "Lifelink\n{1}, Sacrifice this creature: Target creature or enchantment you control gains protection from the color of your choice until end of turn."
+    },
+    {
+      "name": "Cliffside Rescuer",
+      "effect": "indestructible",
+      "source": "tag",
+      "decks": [
+        "Winota, Joiner of Forces #39 (real)"
+      ],
+      "flags": [
+        "heuristic_effect",
+        "temporary_effect_not_explicit"
+      ],
+      "focused_template_matches": [],
+      "focused_template_effect_scopes": [],
+      "type_line": "Creature \u2014 Kor Soldier",
+      "oracle_sample": "Vigilance\n{T}, Sacrifice this creature: Target permanent you control gains protection from each of your opponents until end of turn. (It can't be blocked, targeted, dealt damage, e"
+    },
+    {
+      "name": "Dizzy Spell",
+      "effect": "tutor",
+      "source": "tag",
+      "decks": [
+        "Kinnan, Bonder Prodigy #27 (real)"
+      ],
+      "flags": [
+        "heuristic_effect",
+        "temporary_effect_not_explicit"
+      ],
+      "focused_template_matches": [],
+      "focused_template_effect_scopes": [],
+      "type_line": "Instant",
+      "oracle_sample": "Target creature gets -3/-0 until end of turn.\nTransmute {1}{U}{U} ({1}{U}{U}, Discard this card: Search your library for a card with the same mana value as this card, reveal it, pu"
+    },
+    {
+      "name": "Eowyn, Fearless Knight",
+      "effect": "remove_creature",
+      "source": "tag",
+      "decks": [
+        "Winota, Joiner of Forces #39 (real)"
+      ],
+      "flags": [
+        "heuristic_effect",
+        "temporary_effect_not_explicit"
+      ],
+      "focused_template_matches": [],
+      "focused_template_effect_scopes": [],
+      "type_line": "Legendary Creature \u2014 Human Knight",
+      "oracle_sample": "Haste\nWhen \u00c9owyn enters, exile target creature an opponent controls with greater power. Legendary creatures you control gain protection from each of that creature's colors until en"
+    },
+    {
+      "name": "Heartwood Storyteller",
+      "effect": "draw_cards",
+      "source": "tag",
+      "decks": [
+        "K-9, Mark I #34 (real)"
+      ],
+      "flags": [
+        "heuristic_effect",
+        "trigger_not_explicit"
+      ],
+      "focused_template_matches": [],
+      "focused_template_effect_scopes": [],
+      "type_line": "Creature \u2014 Treefolk",
+      "oracle_sample": "Whenever a player casts a noncreature spell, each of that player's opponents may draw a card."
+    },
+    {
+      "name": "Katara, Waterbending Master",
+      "effect": "draw_cards",
+      "source": "tag",
+      "decks": [
+        "Kraum, Ludevic's Opus #86 (real)"
+      ],
+      "flags": [
+        "heuristic_effect",
+        "trigger_not_explicit"
+      ],
+      "focused_template_matches": [],
+      "focused_template_effect_scopes": [],
+      "type_line": "Legendary Creature \u2014 Human Warrior Ally",
+      "oracle_sample": "Whenever you cast a spell during an opponent's turn, you get an experience counter.\nWhenever Katara attacks, you may draw a card for each experience counter you have. If you do, di"
+    },
+    {
+      "name": "Lena, Selfless Champion",
+      "effect": "indestructible",
+      "source": "tag",
+      "decks": [
+        "Winota, Joiner of Forces #39 (real)"
+      ],
+      "flags": [
+        "heuristic_effect",
+        "temporary_effect_not_explicit"
+      ],
+      "focused_template_matches": [],
+      "focused_template_effect_scopes": [],
+      "type_line": "Legendary Creature \u2014 Human Knight",
+      "oracle_sample": "When Lena enters, create a 1/1 white Soldier creature token for each nontoken creature you control.\nSacrifice Lena: Creatures you control with power less than Lena's power gain ind"
+    },
+    {
+      "name": "Spider-UK",
+      "effect": "draw_cards",
+      "source": "tag",
+      "decks": [
+        "Winota, Joiner of Forces #39 (real)"
+      ],
+      "flags": [
+        "cast_permission_not_explicit",
+        "heuristic_effect"
+      ],
+      "focused_template_matches": [],
+      "focused_template_effect_scopes": [],
+      "type_line": "Legendary Creature \u2014 Spider Human Hero",
+      "oracle_sample": "Web-slinging {2}{W} (You may cast this spell for {2}{W} if you also return a tapped creature you control to its owner's hand.)\nAt the beginning of your end step, if two or more cre"
+    },
+    {
+      "name": "Mirrorpool",
+      "effect": "land",
+      "source": "type_land",
+      "decks": [
+        "Lumra, Bellow of the Woods #49 (real)"
+      ],
+      "flags": [
+        "copy_effect_mismatch",
+        "land_utility_ability_not_modeled"
+      ],
+      "focused_template_matches": [],
+      "focused_template_effect_scopes": [],
+      "type_line": "Land",
+      "oracle_sample": "This land enters tapped.\n{T}: Add {C}.\n{2}{C}, {T}, Sacrifice this land: Copy target instant or sorcery spell you control. You may choose new targets for the copy.\n{4}{C}, {T}, Sac"
+    },
+    {
+      "name": "Cabal Therapy",
+      "effect": "unknown",
+      "source": "unknown",
+      "decks": [
+        "Grist, the Hunger Tide #66 (real)"
+      ],
+      "flags": [
+        "cast_permission_not_explicit",
+        "unknown_effect"
+      ],
+      "focused_template_matches": [],
+      "focused_template_effect_scopes": [],
+      "type_line": "Sorcery",
+      "oracle_sample": "Choose a nonland card name. Target player reveals their hand and discards all cards with that name.\nFlashback\u2014Sacrifice a creature. (You may cast this card from your graveyard for "
+    },
+    {
+      "name": "Frontline Rush",
+      "effect": "unknown",
+      "source": "unknown",
+      "decks": [
+        "Winota, Joiner of Forces #39 (real)"
+      ],
+      "flags": [
+        "temporary_effect_not_explicit",
+        "unknown_effect"
+      ],
+      "focused_template_matches": [],
+      "focused_template_effect_scopes": [],
+      "type_line": "Instant",
+      "oracle_sample": "Choose one \u2014\n\u2022 Create two 1/1 red Goblin creature tokens.\n\u2022 Target creature gets +X/+X until end of turn, where X is the number of creatures you control."
+    },
+    {
+      "name": "Professor Onyx",
+      "effect": "unknown",
+      "source": "unknown",
+      "decks": [
+        "Grist, the Hunger Tide #66 (real)"
+      ],
+      "flags": [
+        "trigger_not_explicit",
+        "unknown_effect"
+      ],
+      "focused_template_matches": [],
+      "focused_template_effect_scopes": [],
+      "type_line": "Legendary Planeswalker \u2014 Liliana",
+      "oracle_sample": "Magecraft \u2014 Whenever you cast or copy an instant or sorcery spell, each opponent loses 2 life and you gain 2 life.\n[+1]: You lose 1 life. Look at the top three cards of your librar"
+    },
+    {
+      "name": "Shallow Grave",
+      "effect": "unknown",
+      "source": "unknown",
+      "decks": [
+        "Grist, the Hunger Tide #66 (real)"
+      ],
+      "flags": [
+        "temporary_effect_not_explicit",
+        "unknown_effect"
+      ],
+      "focused_template_matches": [],
+      "focused_template_effect_scopes": [],
+      "type_line": "Instant",
+      "oracle_sample": "Return the top creature card of your graveyard to the battlefield. That creature gains haste until end of turn. Exile it at the beginning of the next end step."
+    },
+    {
+      "name": "Yawgmoth's Will",
+      "effect": "unknown",
+      "source": "unknown",
+      "decks": [
+        "Grist, the Hunger Tide #66 (real)"
+      ],
+      "flags": [
+        "temporary_effect_not_explicit",
+        "unknown_effect"
+      ],
+      "focused_template_matches": [],
+      "focused_template_effect_scopes": [],
+      "type_line": "Sorcery",
+      "oracle_sample": "Until end of turn, you may play lands and cast spells from your graveyard.\nIf a card would be put into your graveyard from anywhere this turn, exile that card instead."
+    },
+    {
+      "name": "Agatha's Soul Cauldron",
+      "effect": "passive",
+      "source": "battle_rule_curated",
+      "decks": [
+        "Arcum Dagsson #97 (real)",
+        "Kinnan, Bonder Prodigy #104 (real)",
+        "Kinnan, Bonder Prodigy #37 (real)",
+        "Sisay, Weatherlight Captain #61 (real)"
+      ],
+      "flags": [
+        "oracle_target_removal_mismatch"
+      ],
+      "focused_template_matches": [],
+      "focused_template_effect_scopes": [],
+      "type_line": "Legendary Artifact",
+      "oracle_sample": "You may spend mana as though it were mana of any color to activate abilities of creatures you control.\nCreatures you control with +1/+1 counters on them have all activated abilitie"
+    },
+    {
+      "name": "Amulet of Vigor",
+      "effect": "untap_tapped_permanent_etb_engine",
+      "source": "battle_rule_curated",
+      "decks": [
+        "Lumra, Bellow of the Woods #49 (real)"
+      ],
+      "flags": [
+        "trigger_not_explicit"
+      ],
+      "focused_template_matches": [],
+      "focused_template_effect_scopes": [],
+      "type_line": "Artifact",
+      "oracle_sample": "Whenever a permanent you control enters tapped, untap it."
+    },
+    {
+      "name": "Angel's Grace",
+      "effect": "cannot_lose_turn",
+      "source": "battle_rule_curated",
+      "decks": [
+        "Ishai, Ojutai Dragonspeaker #80 (real)"
+      ],
+      "flags": [
+        "temporary_effect_not_explicit"
+      ],
+      "focused_template_matches": [],
+      "focused_template_effect_scopes": [],
+      "type_line": "Instant",
+      "oracle_sample": "Split second (As long as this spell is on the stack, players can't cast spells or activate abilities that aren't mana abilities.)\nYou can't lose the game this turn and your opponen"
+    },
+    {
+      "name": "Ashling, Flame Dancer",
+      "effect": "creature",
+      "source": "battle_rule_curated",
+      "decks": [
+        "Ishai, Ojutai Dragonspeaker #80 (real)"
+      ],
+      "flags": [
+        "trigger_not_explicit"
+      ],
+      "focused_template_matches": [],
+      "focused_template_effect_scopes": [],
+      "type_line": "Legendary Creature \u2014 Elemental Shaman",
+      "oracle_sample": "You don't lose unspent red mana as steps and phases end.\nMagecraft \u2014 Whenever you cast or copy an instant or sorcery spell, discard a card, then draw a card. If this is the second "
+    },
+    {
+      "name": "Badgermole Cub",
+      "effect": "creature",
+      "source": "battle_rule_curated",
+      "decks": [
+        "Kinnan, Bonder Prodigy #37 (real)",
+        "Lumra, Bellow of the Woods #49 (real)",
+        "Sisay, Weatherlight Captain #61 (real)"
+      ],
+      "flags": [
+        "trigger_not_explicit"
+      ],
+      "focused_template_matches": [],
+      "focused_template_effect_scopes": [],
+      "type_line": "Creature \u2014 Badger Mole",
+      "oracle_sample": "When this creature enters, earthbend 1. (Target land you control becomes a 0/0 creature with haste that's still a land. Put a +1/+1 counter on it. When it dies or is exiled, return"
+    },
+    {
+      "name": "Beseech the Mirror",
+      "effect": "tutor",
+      "source": "battle_rule_curated",
+      "decks": [
+        "Grist, the Hunger Tide #66 (real)"
+      ],
+      "flags": [
+        "cast_permission_not_explicit"
+      ],
+      "focused_template_matches": [],
+      "focused_template_effect_scopes": [],
+      "type_line": "Sorcery",
+      "oracle_sample": "Bargain (You may sacrifice an artifact, enchantment, or token as you cast this spell.)\nSearch your library for a card, exile it face down, then shuffle. If this spell was bargained"
+    },
+    {
+      "name": "Borne Upon a Wind",
+      "effect": "draw_cards",
+      "source": "battle_rule_curated",
+      "decks": [
+        "Ishai, Ojutai Dragonspeaker #80 (real)",
+        "K-9, Mark I #34 (real)",
+        "Kinnan, Bonder Prodigy #27 (real)",
+        "Kinnan, Bonder Prodigy #37 (real)",
+        "Najeela, the Blade-Blossom #111 (real)"
+      ],
+      "flags": [
+        "cast_permission_not_explicit"
+      ],
+      "focused_template_matches": [],
+      "focused_template_effect_scopes": [],
+      "type_line": "Instant",
+      "oracle_sample": "You may cast spells this turn as though they had flash.\nDraw a card."
+    },
+    {
+      "name": "Boros Charm",
+      "effect": "modal_boros_charm",
+      "source": "battle_rule_curated",
+      "decks": [
+        "Lorehold target deck"
+      ],
+      "flags": [
+        "temporary_effect_not_explicit"
+      ],
+      "focused_template_matches": [],
+      "focused_template_effect_scopes": [],
+      "type_line": "Instant",
+      "oracle_sample": "Choose one \u2014\n\u2022 Boros Charm deals 4 damage to target player or planeswalker.\n\u2022 Permanents you control gain indestructible until end of turn.\n\u2022 Target creature gains double strike un"
+    },
+    {
+      "name": "Burgeoning",
+      "effect": "ramp_engine",
+      "source": "battle_rule_curated",
+      "decks": [
+        "Lumra, Bellow of the Woods #49 (real)"
+      ],
+      "flags": [
+        "trigger_not_explicit"
+      ],
+      "focused_template_matches": [],
+      "focused_template_effect_scopes": [],
+      "type_line": "Enchantment",
+      "oracle_sample": "Whenever an opponent plays a land, you may put a land card from your hand onto the battlefield."
+    },
+    {
+      "name": "Call Forth the Tempest",
+      "effect": "damage_wipe",
+      "source": "battle_rule_curated",
+      "decks": [
+        "Lorehold target deck"
+      ],
+      "flags": [
+        "cast_permission_not_explicit"
+      ],
+      "focused_template_matches": [],
+      "focused_template_effect_scopes": [],
+      "type_line": "Sorcery",
+      "oracle_sample": "Cascade, cascade (When you cast this spell, exile cards from the top of your library until you exile a nonland card that costs less. You may cast it without paying its mana cost. P"
+    },
+    {
+      "name": "Cathar Commando",
+      "effect": "creature",
+      "source": "battle_rule_curated",
+      "decks": [
+        "Winota, Joiner of Forces #39 (real)"
+      ],
+      "flags": [
+        "oracle_target_removal_mismatch"
+      ],
+      "focused_template_matches": [],
+      "focused_template_effect_scopes": [],
+      "type_line": "Creature \u2014 Human Soldier",
+      "oracle_sample": "Flash\n{1}, Sacrifice this creature: Destroy target artifact or enchantment."
+    },
+    {
+      "name": "Consecrated Sphinx",
+      "effect": "creature",
+      "source": "battle_rule_curated",
+      "decks": [
+        "Kinnan, Bonder Prodigy #104 (real)",
+        "Kinnan, Bonder Prodigy #27 (real)",
+        "Kinnan, Bonder Prodigy #37 (real)"
+      ],
+      "flags": [
+        "trigger_not_explicit"
+      ],
+      "focused_template_matches": [],
+      "focused_template_effect_scopes": [],
+      "type_line": "Creature \u2014 Sphinx",
+      "oracle_sample": "Flying\nWhenever an opponent draws a card, you may draw two cards."
+    },
+    {
+      "name": "Crimson Wisps",
+      "effect": "draw_cards",
+      "source": "battle_rule_curated",
+      "decks": [
+        "Ishai, Ojutai Dragonspeaker #80 (real)"
+      ],
+      "flags": [
+        "temporary_effect_not_explicit"
+      ],
+      "focused_template_matches": [],
+      "focused_template_effect_scopes": [],
+      "type_line": "Instant",
+      "oracle_sample": "Target creature becomes red and gains haste until end of turn. (It can attack and {T} this turn.)\nDraw a card."
+    },
+    {
+      "name": "Cyclonic Rift",
+      "effect": "remove_permanent",
+      "source": "battle_rule_curated",
+      "decks": [
+        "Kinnan, Bonder Prodigy #104 (real)",
+        "Kinnan, Bonder Prodigy #37 (real)",
+        "Kraum, Ludevic's Opus #86 (real)"
+      ],
+      "flags": [
+        "cast_permission_not_explicit"
+      ],
+      "focused_template_matches": [],
+      "focused_template_effect_scopes": [],
+      "type_line": "Instant",
+      "oracle_sample": "Return target nonland permanent you don't control to its owner's hand.\nOverload {6}{U} (You may cast this spell for its overload cost. If you do, change \"target\" in its text to \"ea"
+    },
+    {
+      "name": "Deadly Rollick",
+      "effect": "remove_creature",
+      "source": "battle_rule_curated",
+      "decks": [
+        "Grist, the Hunger Tide #66 (real)"
+      ],
+      "flags": [
+        "cast_permission_not_explicit"
+      ],
+      "focused_template_matches": [],
+      "focused_template_effect_scopes": [],
+      "type_line": "Instant",
+      "oracle_sample": "If you control a commander, you may cast this spell without paying its mana cost.\nExile target creature."
+    },
+    {
+      "name": "Deathrite Shaman",
+      "effect": "creature",
+      "source": "battle_rule_curated",
+      "decks": [
+        "Grist, the Hunger Tide #66 (real)",
+        "Sisay, Weatherlight Captain #61 (real)"
+      ],
+      "flags": [
+        "oracle_target_removal_mismatch"
+      ],
+      "focused_template_matches": [],
+      "focused_template_effect_scopes": [],
+      "type_line": "Creature \u2014 Elf Shaman",
+      "oracle_sample": "{T}: Exile target land card from a graveyard. Add one mana of any color.\n{B}, {T}: Exile target instant or sorcery card from a graveyard. Each opponent loses 2 life.\n{G}, {T}: Exil"
+    },
+    {
+      "name": "Deflecting Swat",
+      "effect": "redirect_removal",
+      "source": "battle_rule_curated",
+      "decks": [
+        "Ishai, Ojutai Dragonspeaker #80 (real)",
+        "K-9, Mark I #34 (real)",
+        "Kraum, Ludevic's Opus #86 (real)",
+        "Lorehold target deck",
+        "Najeela, the Blade-Blossom #111 (real)",
+        "Sisay, Weatherlight Captain #61 (real)"
+      ],
+      "flags": [
+        "cast_permission_not_explicit"
+      ],
+      "focused_template_matches": [],
+      "focused_template_effect_scopes": [],
+      "type_line": "Instant",
+      "oracle_sample": "If you control a commander, you may cast this spell without paying its mana cost.\nYou may choose new targets for target spell or ability."
+    },
+    {
+      "name": "Dismember",
+      "effect": "remove_creature",
+      "source": "battle_rule_curated",
+      "decks": [
+        "Sisay, Weatherlight Captain #61 (real)"
+      ],
+      "flags": [
+        "temporary_effect_not_explicit"
+      ],
+      "focused_template_matches": [],
+      "focused_template_effect_scopes": [],
+      "type_line": "Instant",
+      "oracle_sample": "({B/P} can be paid with either {B} or 2 life.)\nTarget creature gets -5/-5 until end of turn."
+    },
+    {
+      "name": "Double Vision",
+      "effect": "copy_spell",
+      "source": "battle_rule_curated",
+      "decks": [
+        "Lorehold target deck"
+      ],
+      "flags": [
+        "trigger_not_explicit"
+      ],
+      "focused_template_matches": [],
+      "focused_template_effect_scopes": [],
+      "type_line": "Enchantment",
+      "oracle_sample": "Whenever you cast your first instant or sorcery spell each turn, copy that spell. You may choose new targets for the copy."
+    },
+    {
+      "name": "Dragon's Rage Channeler",
+      "effect": "creature",
+      "source": "battle_rule_curated",
+      "decks": [
+        "Ishai, Ojutai Dragonspeaker #80 (real)"
+      ],
+      "flags": [
+        "trigger_not_explicit"
+      ],
+      "focused_template_matches": [],
+      "focused_template_effect_scopes": [],
+      "type_line": "Creature \u2014 Human Shaman",
+      "oracle_sample": "Whenever you cast a noncreature spell, surveil 1. (Look at the top card of your library. You may put that card into your graveyard.)\nDelirium \u2014 As long as there are four or more ca"
+    },
+    {
+      "name": "Drannith Magistrate",
+      "effect": "passive",
+      "source": "battle_rule_curated",
+      "decks": [
+        "Kraum, Ludevic's Opus #86 (real)"
+      ],
+      "flags": [
+        "oracle_silence_mismatch"
+      ],
+      "focused_template_matches": [],
+      "focused_template_effect_scopes": [],
+      "type_line": "Creature \u2014 Human Wizard",
+      "oracle_sample": "Your opponents can't cast spells from anywhere other than their hands."
+    },
+    {
+      "name": "Eldrazi Confluence",
+      "effect": "remove_permanent",
+      "source": "battle_rule_curated",
+      "decks": [
+        "Lumra, Bellow of the Woods #49 (real)"
+      ],
+      "flags": [
+        "temporary_effect_not_explicit"
+      ],
+      "focused_template_matches": [],
+      "focused_template_effect_scopes": [],
+      "type_line": "Instant",
+      "oracle_sample": "Choose three. You may choose the same mode more than once.\n\u2022 Target creature gets +3/-3 until end of turn.\n\u2022 Exile target nonland permanent, then return it to the battlefield tappe"
+    },
+    {
+      "name": "Emiel the Blessed",
+      "effect": "creature",
+      "source": "battle_rule_curated",
+      "decks": [
+        "Sisay, Weatherlight Captain #61 (real)"
+      ],
+      "flags": [
+        "trigger_not_explicit"
+      ],
+      "focused_template_matches": [],
+      "focused_template_effect_scopes": [],
+      "type_line": "Legendary Creature \u2014 Unicorn",
+      "oracle_sample": "{3}: Exile another target creature you control, then return it to the battlefield under its owner's control.\nWhenever another creature you control enters, you may pay {G/W}. If you"
+    },
+    {
+      "name": "Esper Sentinel",
+      "effect": "draw_engine",
+      "source": "battle_rule_curated",
+      "decks": [
+        "Ishai, Ojutai Dragonspeaker #80 (real)",
+        "K-9, Mark I #34 (real)",
+        "Kraum, Ludevic's Opus #86 (real)",
+        "Lorehold target deck",
+        "Najeela, the Blade-Blossom #111 (real)",
+        "Sisay, Weatherlight Captain #61 (real)"
+      ],
+      "flags": [
+        "trigger_not_explicit"
+      ],
+      "focused_template_matches": [],
+      "focused_template_effect_scopes": [],
+      "type_line": "Artifact Creature \u2014 Human Soldier",
+      "oracle_sample": "Whenever an opponent casts their first noncreature spell each turn, draw a card unless that player pays {X}, where X is this creature's power."
+    },
+    {
+      "name": "Expedite",
+      "effect": "draw_cards",
+      "source": "battle_rule_curated",
+      "decks": [
+        "Ishai, Ojutai Dragonspeaker #80 (real)"
+      ],
+      "flags": [
+        "temporary_effect_not_explicit"
+      ],
+      "focused_template_matches": [],
+      "focused_template_effect_scopes": [],
+      "type_line": "Instant",
+      "oracle_sample": "Target creature gains haste until end of turn.\nDraw a card."
+    },
+    {
+      "name": "Faerie Mastermind",
+      "effect": "creature",
+      "source": "battle_rule_curated",
+      "decks": [
+        "Arcum Dagsson #97 (real)",
+        "Ishai, Ojutai Dragonspeaker #80 (real)",
+        "K-9, Mark I #34 (real)",
+        "Kinnan, Bonder Prodigy #27 (real)",
+        "Kinnan, Bonder Prodigy #37 (real)",
+        "Kraum, Ludevic's Opus #86 (real)"
+      ],
+      "flags": [
+        "trigger_not_explicit"
+      ],
+      "focused_template_matches": [],
+      "focused_template_effect_scopes": [],
+      "type_line": "Creature \u2014 Faerie Rogue",
+      "oracle_sample": "Flash\nFlying\nWhenever an opponent draws their second card each turn, you draw a card.\n{3}{U}: Each player draws a card."
+    },
+    {
+      "name": "Faithless Looting",
+      "effect": "loot",
+      "source": "battle_rule_curated",
+      "decks": [
+        "Lorehold target deck"
+      ],
+      "flags": [
+        "cast_permission_not_explicit"
+      ],
+      "focused_template_matches": [],
+      "focused_template_effect_scopes": [],
+      "type_line": "Sorcery",
+      "oracle_sample": "Draw two cards, then discard two cards.\nFlashback {2}{R} (You may cast this card from your graveyard for its flashback cost. Then exile it.)"
+    },
+    {
+      "name": "Fierce Guardianship",
+      "effect": "counter",
+      "source": "battle_rule_curated",
+      "decks": [
+        "Arcum Dagsson #97 (real)",
+        "Ishai, Ojutai Dragonspeaker #80 (real)",
+        "K-9, Mark I #34 (real)",
+        "Kinnan, Bonder Prodigy #104 (real)",
+        "Kinnan, Bonder Prodigy #27 (real)",
+        "Kinnan, Bonder Prodigy #37 (real)",
+        "Kraum, Ludevic's Opus #86 (real)",
+        "Najeela, the Blade-Blossom #111 (real)",
+        "Sisay, Weatherlight Captain #61 (real)"
+      ],
+      "flags": [
+        "cast_permission_not_explicit"
+      ],
+      "focused_template_matches": [],
+      "focused_template_effect_scopes": [],
+      "type_line": "Instant",
+      "oracle_sample": "If you control a commander, you may cast this spell without paying its mana cost.\nCounter target noncreature spell."
+    },
+    {
+      "name": "Finale of Devastation",
+      "effect": "tutor",
+      "source": "battle_rule_curated",
+      "decks": [
+        "Kinnan, Bonder Prodigy #104 (real)",
+        "Kinnan, Bonder Prodigy #27 (real)",
+        "Kinnan, Bonder Prodigy #37 (real)",
+        "Lumra, Bellow of the Woods #49 (real)"
+      ],
+      "flags": [
+        "temporary_effect_not_explicit"
+      ],
+      "focused_template_matches": [],
+      "focused_template_effect_scopes": [],
+      "type_line": "Sorcery",
+      "oracle_sample": "Search your library and/or graveyard for a creature card with mana value X or less and put it onto the battlefield. If you search your library this way, shuffle. If X is 10 or more"
+    },
+    {
+      "name": "Flash Photography",
+      "effect": "copy_creature_token",
+      "source": "battle_rule_curated",
+      "decks": [
+        "Ishai, Ojutai Dragonspeaker #80 (real)",
+        "K-9, Mark I #34 (real)",
+        "Kinnan, Bonder Prodigy #27 (real)"
+      ],
+      "flags": [
+        "cast_permission_not_explicit"
+      ],
+      "focused_template_matches": [],
+      "focused_template_effect_scopes": [],
+      "type_line": "Sorcery",
+      "oracle_sample": "You may cast this spell as though it had flash if it targets a permanent you control.\nCreate a token that's a copy of target permanent.\nFlashback {4}{U}{U}"
+    },
+    {
+      "name": "Forensic Gadgeteer",
+      "effect": "creature",
+      "source": "battle_rule_curated",
+      "decks": [
+        "Kinnan, Bonder Prodigy #37 (real)"
+      ],
+      "flags": [
+        "trigger_not_explicit"
+      ],
+      "focused_template_matches": [],
+      "focused_template_effect_scopes": [],
+      "type_line": "Creature \u2014 Vedalken Artificer Detective",
+      "oracle_sample": "Whenever you cast an artifact spell, investigate. (Create a Clue token. It's an artifact with \"{2}, Sacrifice this token: Draw a card.\")\nActivated abilities of artifacts you contro"
+    },
+    {
+      "name": "Galvanoth",
+      "effect": "creature",
+      "source": "battle_rule_curated",
+      "decks": [
+        "Lorehold target deck"
+      ],
+      "flags": [
+        "cast_permission_not_explicit"
+      ],
+      "focused_template_matches": [],
+      "focused_template_effect_scopes": [],
+      "type_line": "Creature \u2014 Beast",
+      "oracle_sample": "At the beginning of your upkeep, you may look at the top card of your library. You may cast it without paying its mana cost if it's an instant or sorcery spell."
+    },
+    {
+      "name": "Goldspan Dragon",
+      "effect": "creature",
+      "source": "battle_rule_curated",
+      "decks": [
+        "Lorehold target deck"
+      ],
+      "flags": [
+        "trigger_not_explicit"
+      ],
+      "focused_template_matches": [],
+      "focused_template_effect_scopes": [],
+      "type_line": "Creature \u2014 Dragon",
+      "oracle_sample": "Flying, haste\nWhenever this creature attacks or becomes the target of a spell, create a Treasure token.\nTreasures you control have \"{T}, Sacrifice this artifact: Add two mana of an"
+    },
+    {
+      "name": "Gravecrawler",
+      "effect": "creature",
+      "source": "battle_rule_curated",
+      "decks": [
+        "Grist, the Hunger Tide #66 (real)"
+      ],
+      "flags": [
+        "cast_permission_not_explicit"
+      ],
+      "focused_template_matches": [],
+      "focused_template_effect_scopes": [],
+      "type_line": "Creature \u2014 Zombie",
+      "oracle_sample": "This creature can't block.\nYou may cast this card from your graveyard as long as you control a Zombie."
+    },
+    {
+      "name": "Guttersnipe",
+      "effect": "creature",
+      "source": "battle_rule_curated",
+      "decks": [
+        "Lorehold target deck"
+      ],
+      "flags": [
+        "trigger_not_explicit"
+      ],
+      "focused_template_matches": [],
+      "focused_template_effect_scopes": [],
+      "type_line": "Creature \u2014 Goblin Shaman",
+      "oracle_sample": "Whenever you cast an instant or sorcery spell, this creature deals 2 damage to each opponent."
+    },
+    {
+      "name": "Heroes Remembered",
+      "effect": "life_total_change",
+      "source": "battle_rule_curated",
+      "decks": [
+        "Lorehold target deck"
+      ],
+      "flags": [
+        "cast_permission_not_explicit"
+      ],
+      "focused_template_matches": [],
+      "focused_template_effect_scopes": [],
+      "type_line": "Sorcery",
+      "oracle_sample": "You gain 20 life.\nSuspend 10\u2014{W} (Rather than cast this card from your hand, you may pay {W} and exile it with ten time counters on it. At the beginning of your upkeep, remove a ti"
+    },
+    {
+      "name": "High Fae Trickster",
+      "effect": "flash_permission",
+      "source": "battle_rule_curated",
+      "decks": [
+        "Kinnan, Bonder Prodigy #27 (real)",
+        "Kinnan, Bonder Prodigy #37 (real)"
+      ],
+      "flags": [
+        "cast_permission_not_explicit"
+      ],
+      "focused_template_matches": [],
+      "focused_template_effect_scopes": [],
+      "type_line": "Creature \u2014 Faerie Wizard",
+      "oracle_sample": "Flash (You may cast this spell any time you could cast an instant.)\nFlying\nYou may cast spells as though they had flash."
+    },
+    {
+      "name": "Hullbreaker Horror",
+      "effect": "counter",
+      "source": "battle_rule_curated",
+      "decks": [
+        "K-9, Mark I #34 (real)",
+        "Kinnan, Bonder Prodigy #104 (real)",
+        "Kinnan, Bonder Prodigy #27 (real)",
+        "Kinnan, Bonder Prodigy #37 (real)"
+      ],
+      "flags": [
+        "trigger_not_explicit"
+      ],
+      "focused_template_matches": [],
+      "focused_template_effect_scopes": [],
+      "type_line": "Creature \u2014 Kraken Horror",
+      "oracle_sample": "Flash\nThis spell can't be countered.\nWhenever you cast a spell, choose up to one \u2014\n\u2022 Return target spell you don't control to its owner's hand.\n\u2022 Return target nonland permanent to"
+    },
+    {
+      "name": "Insurrection",
+      "effect": "steal_all_creatures",
+      "source": "battle_rule_curated",
+      "decks": [
+        "Lorehold target deck"
+      ],
+      "flags": [
+        "temporary_effect_not_explicit"
+      ],
+      "focused_template_matches": [],
+      "focused_template_effect_scopes": [],
+      "type_line": "Sorcery",
+      "oracle_sample": "Untap all creatures and gain control of them until end of turn. They gain haste until end of turn."
+    },
+    {
+      "name": "Invoke Calamity",
+      "effect": "free_cast",
+      "source": "battle_rule_curated",
+      "decks": [
+        "Lorehold target deck"
+      ],
+      "flags": [
+        "cast_permission_not_explicit"
+      ],
+      "focused_template_matches": [],
+      "focused_template_effect_scopes": [],
+      "type_line": "Instant",
+      "oracle_sample": "You may cast up to two instant and/or sorcery spells with total mana value 6 or less from your graveyard and/or hand without paying their mana costs. If those spells would be put i"
+    },
+    {
+      "name": "Jin-Gitaxias, Progress Tyrant",
+      "effect": "copy_spell",
+      "source": "battle_rule_curated",
+      "decks": [
+        "Kinnan, Bonder Prodigy #104 (real)"
+      ],
+      "flags": [
+        "trigger_not_explicit"
+      ],
+      "focused_template_matches": [],
+      "focused_template_effect_scopes": [],
+      "type_line": "Legendary Creature \u2014 Phyrexian Praetor",
+      "oracle_sample": "Whenever you cast an artifact, instant, or sorcery spell, copy that spell. You may choose new targets for the copy. This ability triggers only once each turn. (A copy of a permanen"
+    },
+    {
+      "name": "Kinnan, Bonder Prodigy",
+      "effect": "creature",
+      "source": "battle_rule_curated",
+      "decks": [
+        "Sisay, Weatherlight Captain #61 (real)"
+      ],
+      "flags": [
+        "trigger_not_explicit"
+      ],
+      "focused_template_matches": [],
+      "focused_template_effect_scopes": [],
+      "type_line": "Legendary Creature \u2014 Human Druid",
+      "oracle_sample": "Whenever you tap a nonland permanent for mana, add one mana of any type that permanent produced.\n{5}{G}{U}: Look at the top five cards of your library. You may put a non-Human crea"
+    },
+    {
+      "name": "Knuckles the Echidna",
+      "effect": "ramp_engine",
+      "source": "battle_rule_curated",
+      "decks": [
+        "Najeela, the Blade-Blossom #111 (real)"
+      ],
+      "flags": [
+        "trigger_not_explicit"
+      ],
+      "focused_template_matches": [],
+      "focused_template_effect_scopes": [],
+      "type_line": "Legendary Creature \u2014 Echidna Warrior",
+      "oracle_sample": "Double strike, trample, haste\nWhenever one or more creatures you control deal combat damage to a player, create a Treasure token.\nTreasure Hunter \u2014 At the beginning of your upkeep,"
+    },
+    {
+      "name": "Lavaspur Boots",
+      "effect": "equipment_haste_shroud",
+      "source": "battle_rule_curated",
+      "decks": [
+        "Arcum Dagsson #97 (real)"
+      ],
+      "flags": [
+        "trigger_not_explicit"
+      ],
+      "focused_template_matches": [],
+      "focused_template_effect_scopes": [],
+      "type_line": "Artifact \u2014 Equipment",
+      "oracle_sample": "Equipped creature gets +1/+0 and has haste and ward {1}. (Whenever it becomes the target of a spell or ability an opponent controls, counter it unless that player pays {1}.)\nEquip "
+    },
+    {
+      "name": "Longshot, Rebel Bowman",
+      "effect": "creature",
+      "source": "battle_rule_curated",
+      "decks": [
+        "Lorehold target deck"
+      ],
+      "flags": [
+        "trigger_not_explicit"
+      ],
+      "focused_template_matches": [],
+      "focused_template_effect_scopes": [],
+      "type_line": "Legendary Creature \u2014 Human Rebel Ally",
+      "oracle_sample": "Reach (This creature can block creatures with flying.)\nNoncreature spells you cast cost {1} less to cast.\nWhenever you cast a noncreature spell, Longshot deals 2 damage to each opp"
+    },
+    {
+      "name": "Lorehold, the Historian",
+      "effect": "passive",
+      "source": "battle_rule_curated",
+      "decks": [
+        "Lorehold target deck"
+      ],
+      "flags": [
+        "cast_permission_not_explicit"
+      ],
+      "focused_template_matches": [],
+      "focused_template_effect_scopes": [],
+      "type_line": "Legendary Creature \u2014 Elder Dragon",
+      "oracle_sample": "Flying, haste\nEach instant and sorcery card in your hand has miracle {2}. (You may cast a card for its miracle cost when you draw it if it's the first card you drew this turn.)\nAt "
+    },
+    {
+      "name": "Lotho, Corrupt Shirriff",
+      "effect": "ramp_engine",
+      "source": "battle_rule_curated",
+      "decks": [
+        "Kraum, Ludevic's Opus #86 (real)",
+        "Najeela, the Blade-Blossom #111 (real)",
+        "Sisay, Weatherlight Captain #61 (real)"
+      ],
+      "flags": [
+        "trigger_not_explicit"
+      ],
+      "focused_template_matches": [],
+      "focused_template_effect_scopes": [],
+      "type_line": "Legendary Creature \u2014 Halfling Rogue",
+      "oracle_sample": "Whenever a player casts their second spell each turn, you lose 1 life and create a Treasure token. (It's an artifact with \"{T}, Sacrifice this token: Add one mana of any color.\")"
+    },
+    {
+      "name": "Mirage Mirror",
+      "effect": "ramp_engine",
+      "source": "battle_rule_curated",
+      "decks": [
+        "Kinnan, Bonder Prodigy #104 (real)",
+        "Kinnan, Bonder Prodigy #27 (real)",
+        "Kinnan, Bonder Prodigy #37 (real)"
+      ],
+      "flags": [
+        "temporary_effect_not_explicit"
+      ],
+      "focused_template_matches": [],
+      "focused_template_effect_scopes": [],
+      "type_line": "Artifact",
+      "oracle_sample": "{2}: This artifact becomes a copy of target artifact, creature, enchantment, or land until end of turn."
+    },
+    {
+      "name": "Mnemonic Betrayal",
+      "effect": "opponent_graveyard_betrayal",
+      "source": "battle_rule_curated",
+      "decks": [
+        "Najeela, the Blade-Blossom #111 (real)"
+      ],
+      "flags": [
+        "cast_permission_not_explicit"
+      ],
+      "focused_template_matches": [],
+      "focused_template_effect_scopes": [],
+      "type_line": "Sorcery",
+      "oracle_sample": "Exile all opponents' graveyards. You may cast spells from among those cards this turn, and mana of any type can be spent to cast them. At the beginning of the next end step, if any"
+    },
+    {
+      "name": "Mogg Salvage",
+      "effect": "remove_permanent",
+      "source": "battle_rule_curated",
+      "decks": [
+        "Ishai, Ojutai Dragonspeaker #80 (real)"
+      ],
+      "flags": [
+        "cast_permission_not_explicit"
+      ],
+      "focused_template_matches": [],
+      "focused_template_effect_scopes": [],
+      "type_line": "Instant",
+      "oracle_sample": "If an opponent controls an Island and you control a Mountain, you may cast this spell without paying its mana cost.\nDestroy target artifact."
+    },
+    {
+      "name": "Molten Gatekeeper",
+      "effect": "creature",
+      "source": "battle_rule_curated",
+      "decks": [
+        "Winota, Joiner of Forces #39 (real)"
+      ],
+      "flags": [
+        "trigger_not_explicit"
+      ],
+      "focused_template_matches": [],
+      "focused_template_effect_scopes": [],
+      "type_line": "Artifact Creature \u2014 Golem",
+      "oracle_sample": "Whenever another creature you control enters, this creature deals 1 damage to each opponent.\nUnearth {R} ({R}: Return this card from your graveyard to the battlefield. It gains has"
+    },
+    {
+      "name": "Monument to Endurance",
+      "effect": "discard_trigger_modal_draw_treasure_opponent_life_loss",
+      "source": "battle_rule_curated",
+      "decks": [
+        "Lorehold target deck"
+      ],
+      "flags": [
+        "trigger_not_explicit"
+      ],
+      "focused_template_matches": [],
+      "focused_template_effect_scopes": [],
+      "type_line": "Artifact",
+      "oracle_sample": "Whenever you discard a card, choose one that hasn't been chosen this turn \u2014\n\u2022 Draw a card.\n\u2022 Create a Treasure token.\n\u2022 Each opponent loses 3 life."
+    },
+    {
+      "name": "Mystic Remora",
+      "effect": "draw_engine",
+      "source": "battle_rule_curated",
+      "decks": [
+        "Arcum Dagsson #97 (real)",
+        "Ishai, Ojutai Dragonspeaker #80 (real)",
+        "K-9, Mark I #34 (real)",
+        "Kinnan, Bonder Prodigy #27 (real)",
+        "Kinnan, Bonder Prodigy #37 (real)",
+        "Kraum, Ludevic's Opus #86 (real)",
+        "Najeela, the Blade-Blossom #111 (real)",
+        "Sisay, Weatherlight Captain #61 (real)"
+      ],
+      "flags": [
+        "trigger_not_explicit"
+      ],
+      "focused_template_matches": [],
+      "focused_template_effect_scopes": [],
+      "type_line": "Enchantment",
+      "oracle_sample": "Cumulative upkeep {1} (At the beginning of your upkeep, put an age counter on this permanent, then sacrifice it unless you pay its upkeep cost for each age counter on it.)\nWhenever"
+    },
+    {
+      "name": "Nature's Rhythm",
+      "effect": "tutor",
+      "source": "battle_rule_curated",
+      "decks": [
+        "Kinnan, Bonder Prodigy #27 (real)",
+        "Kinnan, Bonder Prodigy #37 (real)",
+        "Lumra, Bellow of the Woods #49 (real)",
+        "Sisay, Weatherlight Captain #61 (real)"
+      ],
+      "flags": [
+        "cast_permission_not_explicit"
+      ],
+      "focused_template_matches": [],
+      "focused_template_effect_scopes": [],
+      "type_line": "Sorcery",
+      "oracle_sample": "Search your library for a creature card with mana value X or less, put it onto the battlefield, then shuffle.\nHarmonize {X}{G}{G}{G}{G} (You may cast this card from your graveyard "
+    },
+    {
+      "name": "Necromancy",
+      "effect": "recursion",
+      "source": "battle_rule_curated",
+      "decks": [
+        "Grist, the Hunger Tide #66 (real)"
+      ],
+      "flags": [
+        "cast_permission_not_explicit"
+      ],
+      "focused_template_matches": [],
+      "focused_template_effect_scopes": [],
+      "type_line": "Enchantment",
+      "oracle_sample": "You may cast this spell as though it had flash. If you cast it any time a sorcery couldn't have been cast, the controller of the permanent it becomes sacrifices it at the beginning"
+    },
+    {
+      "name": "Necropotence",
+      "effect": "draw_engine",
+      "source": "battle_rule_curated",
+      "decks": [
+        "Najeela, the Blade-Blossom #111 (real)"
+      ],
+      "flags": [
+        "trigger_not_explicit"
+      ],
+      "focused_template_matches": [],
+      "focused_template_effect_scopes": [],
+      "type_line": "Enchantment",
+      "oracle_sample": "Skip your draw step.\nWhenever you discard a card, exile that card from your graveyard.\nPay 1 life: Exile the top card of your library face down. Put that card into your hand at the"
+    },
+    {
+      "name": "Nezahal, Primal Tide",
+      "effect": "creature",
+      "source": "battle_rule_curated",
+      "decks": [
+        "Kinnan, Bonder Prodigy #104 (real)",
+        "Kinnan, Bonder Prodigy #27 (real)",
+        "Kinnan, Bonder Prodigy #37 (real)"
+      ],
+      "flags": [
+        "trigger_not_explicit"
+      ],
+      "focused_template_matches": [],
+      "focused_template_effect_scopes": [],
+      "type_line": "Legendary Creature \u2014 Elder Dinosaur",
+      "oracle_sample": "This spell can't be countered.\nYou have no maximum hand size.\nWhenever an opponent casts a noncreature spell, draw a card.\nDiscard three cards: Exile Nezahal. Return it to the batt"
+    },
+    {
+      "name": "Orcish Bowmasters",
+      "effect": "creature",
+      "source": "battle_rule_curated",
+      "decks": [
+        "Grist, the Hunger Tide #66 (real)",
+        "Kraum, Ludevic's Opus #86 (real)",
+        "Najeela, the Blade-Blossom #111 (real)",
+        "Sisay, Weatherlight Captain #61 (real)"
+      ],
+      "flags": [
+        "trigger_not_explicit"
+      ],
+      "focused_template_matches": [],
+      "focused_template_effect_scopes": [],
+      "type_line": "Creature \u2014 Orc Archer",
+      "oracle_sample": "Flash\nWhen this creature enters and whenever an opponent draws a card except the first one they draw in each of their draw steps, this creature deals 1 damage to any target. Then a"
+    },
+    {
+      "name": "Primal Amulet // Primal Wellspring",
+      "effect": "static_cost_reduction",
+      "source": "battle_rule_curated",
+      "decks": [
+        "Lorehold target deck"
+      ],
+      "flags": [
+        "trigger_not_explicit"
+      ],
+      "focused_template_matches": [],
+      "focused_template_effect_scopes": [],
+      "type_line": "Artifact",
+      "oracle_sample": "Instant and sorcery spells you cast cost {1} less to cast.\nWhenever you cast an instant or sorcery spell, put a charge counter on this artifact. Then if there are four or more char"
+    },
+    {
+      "name": "Pyroblast",
+      "effect": "counter",
+      "source": "battle_rule_curated",
+      "decks": [
+        "Ishai, Ojutai Dragonspeaker #80 (real)",
+        "K-9, Mark I #34 (real)",
+        "Kraum, Ludevic's Opus #86 (real)"
+      ],
+      "flags": [
+        "oracle_target_removal_mismatch"
+      ],
+      "focused_template_matches": [],
+      "focused_template_effect_scopes": [],
+      "type_line": "Instant",
+      "oracle_sample": "Choose one \u2014\n\u2022 Counter target spell if it's blue.\n\u2022 Destroy target permanent if it's blue."
+    },
+    {
+      "name": "Ranger-Captain of Eos",
+      "effect": "creature",
+      "source": "battle_rule_curated",
+      "decks": [
+        "Ishai, Ojutai Dragonspeaker #80 (real)",
+        "K-9, Mark I #34 (real)",
+        "Kraum, Ludevic's Opus #86 (real)",
+        "Sisay, Weatherlight Captain #61 (real)"
+      ],
+      "flags": [
+        "oracle_silence_mismatch"
+      ],
+      "focused_template_matches": [],
+      "focused_template_effect_scopes": [],
+      "type_line": "Creature \u2014 Human Soldier Ranger",
+      "oracle_sample": "When this creature enters, you may search your library for a creature card with mana value 1 or less, reveal it, put it into your hand, then shuffle.\nSacrifice this creature: Your "
+    },
+    {
+      "name": "Red Elemental Blast",
+      "effect": "counter",
+      "source": "battle_rule_curated",
+      "decks": [
+        "K-9, Mark I #34 (real)",
+        "Kraum, Ludevic's Opus #86 (real)",
+        "Lorehold target deck",
+        "Najeela, the Blade-Blossom #111 (real)"
+      ],
+      "flags": [
+        "oracle_target_removal_mismatch"
+      ],
+      "focused_template_matches": [],
+      "focused_template_effect_scopes": [],
+      "type_line": "Instant",
+      "oracle_sample": "Choose one \u2014\n\u2022 Counter target blue spell.\n\u2022 Destroy target blue permanent."
+    },
+    {
+      "name": "Reforge the Soul",
+      "effect": "draw_cards",
+      "source": "battle_rule_curated",
+      "decks": [
+        "Lorehold target deck"
+      ],
+      "flags": [
+        "cast_permission_not_explicit"
+      ],
+      "focused_template_matches": [],
+      "focused_template_effect_scopes": [],
+      "type_line": "Sorcery",
+      "oracle_sample": "Each player discards their hand, then draws seven cards.\nMiracle {1}{R} (You may cast this card for its miracle cost when you draw it if it's the first card you drew this turn.)"
+    },
+    {
+      "name": "Rhystic Study",
+      "effect": "draw_engine",
+      "source": "battle_rule_curated",
+      "decks": [
+        "Arcum Dagsson #97 (real)",
+        "Ishai, Ojutai Dragonspeaker #80 (real)",
+        "K-9, Mark I #34 (real)",
+        "Kinnan, Bonder Prodigy #27 (real)",
+        "Kinnan, Bonder Prodigy #37 (real)",
+        "Kraum, Ludevic's Opus #86 (real)",
+        "Najeela, the Blade-Blossom #111 (real)",
+        "Sisay, Weatherlight Captain #61 (real)"
+      ],
+      "flags": [
+        "trigger_not_explicit"
+      ],
+      "focused_template_matches": [],
+      "focused_template_effect_scopes": [],
+      "type_line": "Enchantment",
+      "oracle_sample": "Whenever an opponent casts a spell, you may draw a card unless that player pays {1}."
+    },
+    {
+      "name": "Rings of Brighthearth",
+      "effect": "ramp_permanent",
+      "source": "battle_rule_curated",
+      "decks": [
+        "Arcum Dagsson #97 (real)"
+      ],
+      "flags": [
+        "trigger_not_explicit"
+      ],
+      "focused_template_matches": [],
+      "focused_template_effect_scopes": [],
+      "type_line": "Artifact",
+      "oracle_sample": "Whenever you activate an ability, if it isn't a mana ability, you may pay {2}. If you do, copy that ability. You may choose new targets for the copy."
+    },
+    {
+      "name": "Rise of the Eldrazi",
+      "effect": "composite_resolution",
+      "source": "battle_rule_curated",
+      "decks": [
+        "Lorehold target deck"
+      ],
+      "flags": [
+        "oracle_target_removal_mismatch"
+      ],
+      "focused_template_matches": [],
+      "focused_template_effect_scopes": [],
+      "type_line": "Sorcery",
+      "oracle_sample": "This spell can't be countered.\nDestroy target permanent. Target player draws four cards. Take an extra turn after this one.\nExile Rise of the Eldrazi."
+    },
+    {
+      "name": "Rite of the Dragoncaller",
+      "effect": "token_maker",
+      "source": "battle_rule_curated",
+      "decks": [
+        "Lorehold target deck"
+      ],
+      "flags": [
+        "trigger_not_explicit"
+      ],
+      "focused_template_matches": [],
+      "focused_template_effect_scopes": [],
+      "type_line": "Enchantment",
+      "oracle_sample": "Whenever you cast an instant or sorcery spell, create a 5/5 red Dragon creature token with flying."
+    },
+    {
+      "name": "Selfless Savior",
+      "effect": "creature",
+      "source": "battle_rule_curated",
+      "decks": [
+        "Winota, Joiner of Forces #39 (real)"
+      ],
+      "flags": [
+        "temporary_effect_not_explicit"
+      ],
+      "focused_template_matches": [],
+      "focused_template_effect_scopes": [],
+      "type_line": "Creature \u2014 Dog",
+      "oracle_sample": "Sacrifice this creature: Another target creature you control gains indestructible until end of turn. (Damage and effects that say \"destroy\" don't destroy it.)"
+    },
+    {
+      "name": "Selvala, Heart of the Wilds",
+      "effect": "ramp_permanent",
+      "source": "battle_rule_curated",
+      "decks": [
+        "Sisay, Weatherlight Captain #61 (real)"
+      ],
+      "flags": [
+        "trigger_not_explicit"
+      ],
+      "focused_template_matches": [],
+      "focused_template_effect_scopes": [],
+      "type_line": "Legendary Creature \u2014 Elf Scout",
+      "oracle_sample": "Whenever another creature enters, its controller may draw a card if its power is greater than each other creature's power.\n{G}, {T}: Add X mana in any combination of colors, where "
+    },
+    {
+      "name": "Sevinne's Reclamation",
+      "effect": "recursion",
+      "source": "battle_rule_curated",
+      "decks": [
+        "K-9, Mark I #34 (real)",
+        "Kraum, Ludevic's Opus #86 (real)",
+        "Najeela, the Blade-Blossom #111 (real)"
+      ],
+      "flags": [
+        "cast_permission_not_explicit"
+      ],
+      "focused_template_matches": [],
+      "focused_template_effect_scopes": [],
+      "type_line": "Sorcery",
+      "oracle_sample": "Return target permanent card with mana value 3 or less from your graveyard to the battlefield. If this spell was cast from a graveyard, you may copy this spell and may choose a new"
+    },
+    {
+      "name": "Shore Up",
+      "effect": "protect_creature",
+      "source": "battle_rule_curated",
+      "decks": [
+        "Arcum Dagsson #97 (real)"
+      ],
+      "flags": [
+        "temporary_effect_not_explicit"
+      ],
+      "focused_template_matches": [],
+      "focused_template_effect_scopes": [],
+      "type_line": "Instant",
+      "oracle_sample": "Target creature you control gets +1/+1 and gains hexproof until end of turn. Untap it. (It can't be the target of spells or abilities your opponents control.)"
+    },
+    {
+      "name": "Silence",
+      "effect": "silence_spell",
+      "source": "battle_rule_curated",
+      "decks": [
+        "Ishai, Ojutai Dragonspeaker #80 (real)",
+        "K-9, Mark I #34 (real)",
+        "Kraum, Ludevic's Opus #86 (real)",
+        "Lorehold target deck",
+        "Najeela, the Blade-Blossom #111 (real)",
+        "Sisay, Weatherlight Captain #61 (real)"
+      ],
+      "flags": [
+        "oracle_silence_mismatch"
+      ],
+      "focused_template_matches": [],
+      "focused_template_effect_scopes": [],
+      "type_line": "Instant",
+      "oracle_sample": "Your opponents can't cast spells this turn."
+    },
+    {
+      "name": "Simulacrum Synthesizer",
+      "effect": "passive",
+      "source": "battle_rule_curated",
+      "decks": [
+        "Arcum Dagsson #97 (real)"
+      ],
+      "flags": [
+        "trigger_not_explicit"
+      ],
+      "focused_template_matches": [],
+      "focused_template_effect_scopes": [],
+      "type_line": "Artifact",
+      "oracle_sample": "When this artifact enters, scry 2.\nWhenever another artifact you control with mana value 3 or greater enters, create a 0/0 colorless Construct artifact creature token with \"This to"
+    },
+    {
+      "name": "Skrelv, Defector Mite",
+      "effect": "indestructible",
+      "source": "battle_rule_curated",
+      "decks": [
+        "Sisay, Weatherlight Captain #61 (real)"
+      ],
+      "flags": [
+        "temporary_effect_not_explicit"
+      ],
+      "focused_template_matches": [],
+      "focused_template_effect_scopes": [],
+      "type_line": "Legendary Artifact Creature \u2014 Phyrexian Mite",
+      "oracle_sample": "Toxic 1 (Players dealt combat damage by this creature also get a poison counter.)\nSkrelv can't block.\n{W/P}, {T}: Choose a color. Another target creature you control gains toxic 1 "
+    },
+    {
+      "name": "Skullclamp",
+      "effect": "passive",
+      "source": "battle_rule_curated",
+      "decks": [
+        "Grist, the Hunger Tide #66 (real)"
+      ],
+      "flags": [
+        "trigger_not_explicit"
+      ],
+      "focused_template_matches": [],
+      "focused_template_effect_scopes": [],
+      "type_line": "Artifact \u2014 Equipment",
+      "oracle_sample": "Equipped creature gets +1/-1.\nWhenever equipped creature dies, draw two cards.\nEquip {1}"
+    },
+    {
+      "name": "Smothering Tithe",
+      "effect": "ramp_engine",
+      "source": "battle_rule_curated",
+      "decks": [
+        "Ishai, Ojutai Dragonspeaker #80 (real)",
+        "K-9, Mark I #34 (real)",
+        "Kraum, Ludevic's Opus #86 (real)",
+        "Lorehold target deck",
+        "Najeela, the Blade-Blossom #111 (real)",
+        "Sisay, Weatherlight Captain #61 (real)"
+      ],
+      "flags": [
+        "trigger_not_explicit"
+      ],
+      "focused_template_matches": [],
+      "focused_template_effect_scopes": [],
+      "type_line": "Enchantment",
+      "oracle_sample": "Whenever an opponent draws a card, that player may pay {2}. If the player doesn't, you create a Treasure token. (It's an artifact with \"{T}, Sacrifice this token: Add one mana of a"
+    },
+    {
+      "name": "Soul-Guide Lantern",
+      "effect": "hate_artifact",
+      "source": "battle_rule_curated",
+      "decks": [
+        "Kinnan, Bonder Prodigy #104 (real)"
+      ],
+      "flags": [
+        "oracle_target_removal_mismatch"
+      ],
+      "focused_template_matches": [],
+      "focused_template_effect_scopes": [],
+      "type_line": "Artifact",
+      "oracle_sample": "When this artifact enters, exile target card from a graveyard.\n{T}, Sacrifice this artifact: Exile each opponent's graveyard.\n{1}, {T}, Sacrifice this artifact: Draw a card."
+    },
+    {
+      "name": "Sowing Mycospawn",
+      "effect": "creature",
+      "source": "battle_rule_curated",
+      "decks": [
+        "Kinnan, Bonder Prodigy #37 (real)",
+        "Lumra, Bellow of the Woods #49 (real)"
+      ],
+      "flags": [
+        "oracle_target_removal_mismatch"
+      ],
+      "focused_template_matches": [],
+      "focused_template_effect_scopes": [],
+      "type_line": "Creature \u2014 Eldrazi Fungus",
+      "oracle_sample": "Devoid (This card has no color.)\nKicker {1}{C} (You may pay an additional {1}{C} as you cast this spell.)\nWhen you cast this spell, search your library for a land card, put it onto"
+    },
+    {
+      "name": "Springheart Nantuko",
+      "effect": "creature",
+      "source": "battle_rule_curated",
+      "decks": [
+        "Lumra, Bellow of the Woods #49 (real)"
+      ],
+      "flags": [
+        "trigger_not_explicit"
+      ],
+      "focused_template_matches": [],
+      "focused_template_effect_scopes": [],
+      "type_line": "Enchantment Creature \u2014 Insect Monk",
+      "oracle_sample": "Bestow {1}{G}\nEnchanted creature gets +1/+1.\nLandfall \u2014 Whenever a land you control enters, you may pay {1}{G} if this permanent is attached to a creature you control. If you do, c"
+    },
+    {
+      "name": "Squee, the Immortal",
+      "effect": "creature",
+      "source": "battle_rule_curated",
+      "decks": [
+        "K-9, Mark I #34 (real)"
+      ],
+      "flags": [
+        "cast_permission_not_explicit"
+      ],
+      "focused_template_matches": [],
+      "focused_template_effect_scopes": [],
+      "type_line": "Legendary Creature \u2014 Goblin",
+      "oracle_sample": "You may cast this card from your graveyard or from exile."
+    },
+    {
+      "name": "Storm-Kiln Artist",
+      "effect": "creature",
+      "source": "battle_rule_curated",
+      "decks": [
+        "Ishai, Ojutai Dragonspeaker #80 (real)"
+      ],
+      "flags": [
+        "trigger_not_explicit"
+      ],
+      "focused_template_matches": [],
+      "focused_template_effect_scopes": [],
+      "type_line": "Creature \u2014 Dwarf Shaman",
+      "oracle_sample": "This creature gets +1/+0 for each artifact you control.\nMagecraft \u2014 Whenever you cast or copy an instant or sorcery spell, create a Treasure token. (It's an artifact with \"{T}, Sac"
+    },
+    {
+      "name": "Strike It Rich",
+      "effect": "treasure_maker",
+      "source": "battle_rule_curated",
+      "decks": [
+        "Ishai, Ojutai Dragonspeaker #80 (real)"
+      ],
+      "flags": [
+        "cast_permission_not_explicit"
+      ],
+      "focused_template_matches": [],
+      "focused_template_effect_scopes": [],
+      "type_line": "Sorcery",
+      "oracle_sample": "Create a Treasure token. (It's an artifact with \"{T}, Sacrifice this token: Add one mana of any color.\")\nFlashback {2}{R} (You may cast this card from your graveyard for its flashb"
+    },
+    {
+      "name": "Sylvan Safekeeper",
+      "effect": "creature",
+      "source": "battle_rule_curated",
+      "decks": [
+        "Grist, the Hunger Tide #66 (real)",
+        "Lumra, Bellow of the Woods #49 (real)"
+      ],
+      "flags": [
+        "temporary_effect_not_explicit"
+      ],
+      "focused_template_matches": [],
+      "focused_template_effect_scopes": [],
+      "type_line": "Creature \u2014 Human Wizard",
+      "oracle_sample": "Sacrifice a land: Target creature you control gains shroud until end of turn. (It can't be the target of spells or abilities.)"
+    },
+    {
+      "name": "Tataru Taru",
+      "effect": "ramp_engine",
+      "source": "battle_rule_curated",
+      "decks": [
+        "K-9, Mark I #34 (real)",
+        "Sisay, Weatherlight Captain #61 (real)"
+      ],
+      "flags": [
+        "trigger_not_explicit"
+      ],
+      "focused_template_matches": [],
+      "focused_template_effect_scopes": [],
+      "type_line": "Legendary Creature \u2014 Dwarf Advisor",
+      "oracle_sample": "When Tataru Taru enters, you draw a card and target opponent may draw a card.\nScions' Secretary \u2014 Whenever an opponent draws a card, if it isn't that player's turn, create a tapped"
+    },
+    {
+      "name": "Tavern Scoundrel",
+      "effect": "creature",
+      "source": "battle_rule_curated",
+      "decks": [
+        "Ishai, Ojutai Dragonspeaker #80 (real)"
+      ],
+      "flags": [
+        "trigger_not_explicit"
+      ],
+      "focused_template_matches": [],
+      "focused_template_effect_scopes": [],
+      "type_line": "Creature \u2014 Human Rogue",
+      "oracle_sample": "Whenever you win a coin flip, create two Treasure tokens. (They're artifacts with \"{T}, Sacrifice this token: Add one mana of any color.\")\n{1}, {T}, Sacrifice another permanent: Fl"
+    },
+    {
+      "name": "Teferi, Time Raveler",
+      "effect": "planeswalker",
+      "source": "battle_rule_curated",
+      "decks": [
+        "Sisay, Weatherlight Captain #61 (real)"
+      ],
+      "flags": [
+        "cast_permission_not_explicit"
+      ],
+      "focused_template_matches": [],
+      "focused_template_effect_scopes": [],
+      "type_line": "Legendary Planeswalker \u2014 Teferi",
+      "oracle_sample": "Each opponent can cast spells only any time they could cast a sorcery.\n[+1]: Until your next turn, you may cast sorcery spells as though they had flash.\n[\u22123]: Return up to one targ"
+    },
+    {
+      "name": "Tezzeret the Seeker",
+      "effect": "tutor",
+      "source": "battle_rule_curated",
+      "decks": [
+        "Arcum Dagsson #97 (real)",
+        "Kinnan, Bonder Prodigy #104 (real)",
+        "Kinnan, Bonder Prodigy #37 (real)"
+      ],
+      "flags": [
+        "temporary_effect_not_explicit"
+      ],
+      "focused_template_matches": [],
+      "focused_template_effect_scopes": [],
+      "type_line": "Legendary Planeswalker \u2014 Tezzeret",
+      "oracle_sample": "[+1]: Untap up to two target artifacts.\n[\u2212X]: Search your library for an artifact card with mana value X or less, put it onto the battlefield, then shuffle.\n[\u22125]: Artifacts you con"
+    },
+    {
+      "name": "Tezzeret, Cruel Captain",
+      "effect": "passive",
+      "source": "battle_rule_curated",
+      "decks": [
+        "Arcum Dagsson #97 (real)",
+        "Lumra, Bellow of the Woods #49 (real)"
+      ],
+      "flags": [
+        "trigger_not_explicit"
+      ],
+      "focused_template_matches": [],
+      "focused_template_effect_scopes": [],
+      "type_line": "Legendary Planeswalker \u2014 Tezzeret",
+      "oracle_sample": "Whenever an artifact you control enters, put a loyalty counter on Tezzeret.\n[0]: Untap target artifact or creature. If it's an artifact creature, put a +1/+1 counter on it.\n[\u22123]: S"
+    },
+    {
+      "name": "The Cabbage Merchant",
+      "effect": "creature",
+      "source": "battle_rule_curated",
+      "decks": [
+        "K-9, Mark I #34 (real)",
+        "Kinnan, Bonder Prodigy #27 (real)",
+        "Najeela, the Blade-Blossom #111 (real)"
+      ],
+      "flags": [
+        "trigger_not_explicit"
+      ],
+      "focused_template_matches": [],
+      "focused_template_effect_scopes": [],
+      "type_line": "Legendary Creature \u2014 Human Citizen",
+      "oracle_sample": "Whenever an opponent casts a noncreature spell, create a Food token. (It's an artifact with \"{2}, {T}, Sacrifice this token: You gain 3 life.\")\nWhenever a creature deals combat dam"
+    },
+    {
+      "name": "The Unagi of Kyoshi Island",
+      "effect": "creature",
+      "source": "battle_rule_curated",
+      "decks": [
+        "Kinnan, Bonder Prodigy #27 (real)"
+      ],
+      "flags": [
+        "trigger_not_explicit"
+      ],
+      "focused_template_matches": [],
+      "focused_template_effect_scopes": [],
+      "type_line": "Legendary Creature \u2014 Serpent",
+      "oracle_sample": "Flash\nWard\u2014Waterbend {4}. (Whenever this creature becomes the target of a spell or ability an opponent controls, counter it unless that player pays {4}. They can tap their artifact"
+    },
+    {
+      "name": "Touch the Spirit Realm",
+      "effect": "temporary_exile_return_next_end_step",
+      "source": "battle_rule_curated",
+      "decks": [
+        "Sisay, Weatherlight Captain #61 (real)"
+      ],
+      "flags": [
+        "oracle_target_removal_mismatch"
+      ],
+      "focused_template_matches": [],
+      "focused_template_effect_scopes": [],
+      "type_line": "Enchantment",
+      "oracle_sample": "When this enchantment enters, exile up to one target artifact or creature until this enchantment leaves the battlefield.\nChannel \u2014 {1}{W}, Discard this card: Exile target artifact "
+    },
+    {
+      "name": "Treasonous Ogre",
+      "effect": "creature",
+      "source": "battle_rule_curated",
+      "decks": [
+        "Ishai, Ojutai Dragonspeaker #80 (real)"
+      ],
+      "flags": [
+        "trigger_not_explicit"
+      ],
+      "focused_template_matches": [],
+      "focused_template_effect_scopes": [],
+      "type_line": "Creature \u2014 Ogre Shaman",
+      "oracle_sample": "Dethrone (Whenever this creature attacks the player with the most life or tied for most life, put a +1/+1 counter on it.)\nPay 3 life: Add {R}."
+    },
+    {
+      "name": "Underworld Breach",
+      "effect": "passive",
+      "source": "battle_rule_curated",
+      "decks": [
+        "Ishai, Ojutai Dragonspeaker #80 (real)",
+        "K-9, Mark I #34 (real)",
+        "Kraum, Ludevic's Opus #86 (real)",
+        "Lorehold target deck",
+        "Najeela, the Blade-Blossom #111 (real)"
+      ],
+      "flags": [
+        "cast_permission_not_explicit"
+      ],
+      "focused_template_matches": [],
+      "focused_template_effect_scopes": [],
+      "type_line": "Enchantment",
+      "oracle_sample": "Each nonland card in your graveyard has escape. The escape cost is equal to the card's mana cost plus exile three other cards from your graveyard. (You may cast cards from your gra"
+    },
+    {
+      "name": "Vandalblast",
+      "effect": "remove_permanent",
+      "source": "battle_rule_curated",
+      "decks": [
+        "Lorehold target deck"
+      ],
+      "flags": [
+        "cast_permission_not_explicit"
+      ],
+      "focused_template_matches": [],
+      "focused_template_effect_scopes": [],
+      "type_line": "Sorcery",
+      "oracle_sample": "Destroy target artifact you don't control.\nOverload {4}{R} (You may cast this spell for its overload cost. If you do, change \"target\" in its text to \"each.\")"
+    },
+    {
+      "name": "Veil of Summer",
+      "effect": "draw_cards",
+      "source": "battle_rule_curated",
+      "decks": [
+        "Grist, the Hunger Tide #66 (real)",
+        "Kinnan, Bonder Prodigy #37 (real)"
+      ],
+      "flags": [
+        "temporary_effect_not_explicit"
+      ],
+      "focused_template_matches": [],
+      "focused_template_effect_scopes": [],
+      "type_line": "Instant",
+      "oracle_sample": "Draw a card if an opponent has cast a blue or black spell this turn. Spells you control can't be countered this turn. You and permanents you control gain hexproof from blue and fro"
+    },
+    {
+      "name": "Vexing Bauble",
+      "effect": "hate_artifact",
+      "source": "battle_rule_curated",
+      "decks": [
+        "Grist, the Hunger Tide #66 (real)",
+        "Ishai, Ojutai Dragonspeaker #80 (real)",
+        "Kinnan, Bonder Prodigy #104 (real)",
+        "Lumra, Bellow of the Woods #49 (real)"
+      ],
+      "flags": [
+        "trigger_not_explicit"
+      ],
+      "focused_template_matches": [],
+      "focused_template_effect_scopes": [],
+      "type_line": "Artifact",
+      "oracle_sample": "Whenever a player casts a spell, if no mana was spent to cast it, counter that spell.\n{1}, {T}, Sacrifice this artifact: Draw a card."
+    },
+    {
+      "name": "Vivi Ornitier",
+      "effect": "creature",
+      "source": "battle_rule_curated",
+      "decks": [
+        "Kraum, Ludevic's Opus #86 (real)"
+      ],
+      "flags": [
+        "trigger_not_explicit"
+      ],
+      "focused_template_matches": [],
+      "focused_template_effect_scopes": [],
+      "type_line": "Legendary Creature \u2014 Wizard",
+      "oracle_sample": "{0}: Add X mana in any combination of {U} and/or {R}, where X is Vivi Ornitier's power. Activate only during your turn and only once each turn.\nWhenever you cast a noncreature spel"
+    },
+    {
+      "name": "Voice of Victory",
+      "effect": "silence_opponents",
+      "source": "battle_rule_curated",
+      "decks": [
+        "Kraum, Ludevic's Opus #86 (real)",
+        "Najeela, the Blade-Blossom #111 (real)"
+      ],
+      "flags": [
+        "trigger_not_explicit"
+      ],
+      "focused_template_matches": [],
+      "focused_template_effect_scopes": [],
+      "type_line": "Creature \u2014 Human Bard",
+      "oracle_sample": "Mobilize 2 (Whenever this creature attacks, create two tapped and attacking 1/1 red Warrior creature tokens. Sacrifice them at the beginning of the next end step.)\nYour opponents c"
+    },
+    {
+      "name": "Wan Shi Tong, Librarian",
+      "effect": "creature",
+      "source": "battle_rule_curated",
+      "decks": [
+        "Kinnan, Bonder Prodigy #104 (real)",
+        "Kinnan, Bonder Prodigy #27 (real)",
+        "Kinnan, Bonder Prodigy #37 (real)",
+        "Kraum, Ludevic's Opus #86 (real)"
+      ],
+      "flags": [
+        "trigger_not_explicit"
+      ],
+      "focused_template_matches": [],
+      "focused_template_effect_scopes": [],
+      "type_line": "Legendary Creature \u2014 Bird Spirit",
+      "oracle_sample": "Flash\nFlying, vigilance\nWhen Wan Shi Tong enters, put X +1/+1 counters on him. Then draw half X cards, rounded down.\nWhenever an opponent searches their library, put a +1/+1 counte"
+    },
+    {
+      "name": "Wild Growth",
+      "effect": "ramp_permanent",
+      "source": "battle_rule_curated",
+      "decks": [
+        "Grist, the Hunger Tide #66 (real)"
+      ],
+      "flags": [
+        "trigger_not_explicit"
+      ],
+      "focused_template_matches": [],
+      "focused_template_effect_scopes": [],
+      "type_line": "Enchantment \u2014 Aura",
+      "oracle_sample": "Enchant land\nWhenever enchanted land is tapped for mana, its controller adds an additional {G}."
+    },
+    {
+      "name": "Aftermath Analyst",
+      "effect": "passive",
+      "source": "battle_rule_needs_review_generated",
+      "decks": [
+        "Lumra, Bellow of the Woods #49 (real)"
+      ],
+      "flags": [
+        "needs_review_rule"
+      ],
+      "focused_template_matches": [],
+      "focused_template_effect_scopes": [],
+      "type_line": "Creature \u2014 Elf Detective",
+      "oracle_sample": "When this creature enters, mill three cards. (Put the top three cards of your library into your graveyard.)\n{3}{G}, Sacrifice this creature: Return all land cards from your graveya"
+    },
+    {
+      "name": "Animate Dead",
+      "effect": "passive",
+      "source": "battle_rule_needs_review_generated",
+      "decks": [
+        "Grist, the Hunger Tide #66 (real)"
+      ],
+      "flags": [
+        "needs_review_rule"
+      ],
+      "focused_template_matches": [],
+      "focused_template_effect_scopes": [],
+      "type_line": "Enchantment \u2014 Aura",
+      "oracle_sample": "Enchant creature card in a graveyard\nWhen this Aura enters, if it's on the battlefield, it loses \"enchant creature card in a graveyard\" and gains \"enchant creature put onto the bat"
+    },
+    {
+      "name": "Dance of the Dead",
+      "effect": "passive",
+      "source": "battle_rule_needs_review_generated",
+      "decks": [
+        "Grist, the Hunger Tide #66 (real)"
+      ],
+      "flags": [
+        "needs_review_rule"
+      ],
+      "focused_template_matches": [],
+      "focused_template_effect_scopes": [],
+      "type_line": "Enchantment \u2014 Aura",
+      "oracle_sample": "Enchant creature card in a graveyard\nWhen this Aura enters, if it's on the battlefield, it loses \"enchant creature card in a graveyard\" and gains \"enchant creature put onto the bat"
+    },
+    {
+      "name": "Glimpse the Impossible",
+      "effect": "passive",
+      "source": "battle_rule_needs_review_generated",
+      "decks": [
+        "Winota, Joiner of Forces #39 (real)"
+      ],
+      "flags": [
+        "needs_review_rule"
+      ],
+      "focused_template_matches": [],
+      "focused_template_effect_scopes": [],
+      "type_line": "Sorcery",
+      "oracle_sample": "Exile the top three cards of your library. You may play those cards this turn. At the beginning of the next end step, if any of those cards remain exiled, put them into your gravey"
+    },
+    {
+      "name": "Muddle the Mixture",
+      "effect": "counter",
+      "source": "battle_rule_needs_review_generated",
+      "decks": [
+        "Kraum, Ludevic's Opus #86 (real)"
+      ],
+      "flags": [
+        "needs_review_rule"
+      ],
+      "focused_template_matches": [],
+      "focused_template_effect_scopes": [],
+      "type_line": "Instant",
+      "oracle_sample": "Counter target instant or sorcery spell.\nTransmute {1}{U}{U} ({1}{U}{U}, Discard this card: Search your library for a card with the same mana value as this card, reveal it, put it "
+    },
+    {
+      "name": "Ponder",
+      "effect": "draw_cards",
+      "source": "battle_rule_needs_review_generated",
+      "decks": [
+        "Ishai, Ojutai Dragonspeaker #80 (real)"
+      ],
+      "flags": [
+        "needs_review_rule"
+      ],
+      "focused_template_matches": [],
+      "focused_template_effect_scopes": [],
+      "type_line": "Sorcery",
+      "oracle_sample": "Look at the top three cards of your library, then put them back in any order. You may shuffle.\nDraw a card."
+    },
+    {
+      "name": "Saw in Half",
+      "effect": "remove_creature",
+      "source": "battle_rule_needs_review_generated",
+      "decks": [
+        "Grist, the Hunger Tide #66 (real)"
+      ],
+      "flags": [
+        "needs_review_rule"
+      ],
+      "focused_template_matches": [],
+      "focused_template_effect_scopes": [],
+      "type_line": "Instant",
+      "oracle_sample": "Destroy target creature. If that creature dies this way, its controller creates two tokens that are copies of that creature, except their power is half that creature's power and th"
+    },
+    {
+      "name": "Scheming Symmetry",
+      "effect": "passive",
+      "source": "battle_rule_needs_review_generated",
+      "decks": [
+        "Grist, the Hunger Tide #66 (real)"
+      ],
+      "flags": [
+        "needs_review_rule"
+      ],
+      "focused_template_matches": [],
+      "focused_template_effect_scopes": [],
+      "type_line": "Sorcery",
+      "oracle_sample": "Choose two target players. Each of them searches their library for a card, then shuffles and puts that card on top."
+    },
+    {
+      "name": "Spelunking",
+      "effect": "passive",
+      "source": "battle_rule_needs_review_generated",
+      "decks": [
+        "Lumra, Bellow of the Woods #49 (real)"
+      ],
+      "flags": [
+        "needs_review_rule"
+      ],
+      "focused_template_matches": [],
+      "focused_template_effect_scopes": [],
+      "type_line": "Enchantment",
+      "oracle_sample": "When this enchantment enters, draw a card, then you may put a land card from your hand onto the battlefield. If you put a Cave onto the battlefield this way, you gain 4 life.\nLands"
+    },
+    {
+      "name": "Viscera Seer",
+      "effect": "passive",
+      "source": "battle_rule_needs_review_generated",
+      "decks": [
+        "Grist, the Hunger Tide #66 (real)"
+      ],
+      "flags": [
+        "needs_review_rule"
+      ],
+      "focused_template_matches": [],
+      "focused_template_effect_scopes": [],
+      "type_line": "Creature \u2014 Vampire Wizard",
+      "oracle_sample": "Sacrifice a creature: Scry 1. (Look at the top card of your library. You may put that card on the bottom.)"
+    },
+    {
+      "name": "Voltaic Servant",
+      "effect": "passive",
+      "source": "battle_rule_needs_review_generated",
+      "decks": [
+        "Arcum Dagsson #97 (real)"
+      ],
+      "flags": [
+        "needs_review_rule"
+      ],
+      "focused_template_matches": [],
+      "focused_template_effect_scopes": [],
+      "type_line": "Artifact Creature \u2014 Construct",
+      "oracle_sample": "At the beginning of your end step, untap target artifact."
+    },
+    {
+      "name": "Warren Soultrader",
+      "effect": "passive",
+      "source": "battle_rule_needs_review_generated",
+      "decks": [
+        "Grist, the Hunger Tide #66 (real)"
+      ],
+      "flags": [
+        "needs_review_rule"
+      ],
+      "focused_template_matches": [],
+      "focused_template_effect_scopes": [],
+      "type_line": "Creature \u2014 Zombie Goblin Wizard",
+      "oracle_sample": "Pay 1 life, Sacrifice another creature: Create a Treasure token. (It's an artifact with \"{T}, Sacrifice this token: Add one mana of any color.\")"
+    },
+    {
+      "name": "Activated Sleeper",
+      "effect": "creature",
+      "source": "effect_map",
+      "decks": [
+        "Grist, the Hunger Tide #66 (real)"
+      ],
+      "flags": [
+        "heuristic_effect"
+      ],
+      "focused_template_matches": [],
+      "focused_template_effect_scopes": [],
+      "type_line": "Creature \u2014 Phyrexian Shapeshifter",
+      "oracle_sample": "Flash\nYou may have this creature enter as a copy of any creature card in a graveyard that was put there from the battlefield this turn, except it's a Phyrexian in addition to its o"
+    },
+    {
+      "name": "Angrath's Marauders",
+      "effect": "creature",
+      "source": "effect_map",
+      "decks": [
+        "Winota, Joiner of Forces #39 (real)"
+      ],
+      "flags": [
+        "heuristic_effect"
+      ],
+      "focused_template_matches": [],
+      "focused_template_effect_scopes": [],
+      "type_line": "Creature \u2014 Human Pirate",
+      "oracle_sample": "If a source you control would deal damage to a permanent or player, it deals double that damage to that permanent or player instead."
+    },
+    {
+      "name": "Arboreal Grazer",
+      "effect": "creature",
+      "source": "effect_map",
+      "decks": [
+        "Lumra, Bellow of the Woods #49 (real)"
+      ],
+      "flags": [
+        "heuristic_effect"
+      ],
+      "focused_template_matches": [],
+      "focused_template_effect_scopes": [],
+      "type_line": "Creature \u2014 Sloth Beast",
+      "oracle_sample": "Reach\nWhen this creature enters, you may put a land card from your hand onto the battlefield tapped."
+    },
+    {
+      "name": "Ashaya, Soul of the Wild",
+      "effect": "creature",
+      "source": "effect_map",
+      "decks": [
+        "Lumra, Bellow of the Woods #49 (real)"
+      ],
+      "flags": [
+        "heuristic_effect"
+      ],
+      "focused_template_matches": [],
+      "focused_template_effect_scopes": [],
+      "type_line": "Legendary Creature \u2014 Elemental",
+      "oracle_sample": "Ashaya's power and toughness are each equal to the number of lands you control.\nNontoken creatures you control are Forest lands in addition to their other types. (They're still aff"
+    },
+    {
+      "name": "Captain of the Watch",
+      "effect": "creature",
+      "source": "effect_map",
+      "decks": [
+        "Winota, Joiner of Forces #39 (real)"
+      ],
+      "flags": [
+        "heuristic_effect"
+      ],
+      "focused_template_matches": [],
+      "focused_template_effect_scopes": [],
+      "type_line": "Creature \u2014 Human Soldier",
+      "oracle_sample": "Vigilance (Attacking doesn't cause this creature to tap.)\nOther Soldier creatures you control get +1/+1 and have vigilance.\nWhen this creature enters, create three 1/1 white Soldie"
+    },
+    {
+      "name": "Clockwork Percussionist",
+      "effect": "creature",
+      "source": "effect_map",
+      "decks": [
+        "Winota, Joiner of Forces #39 (real)"
+      ],
+      "flags": [
+        "heuristic_effect"
+      ],
+      "focused_template_matches": [],
+      "focused_template_effect_scopes": [],
+      "type_line": "Artifact Creature \u2014 Monkey Toy",
+      "oracle_sample": "Haste\nWhen this creature dies, exile the top card of your library. You may play it until the end of your next turn."
+    },
+    {
+      "name": "Collector Ouphe",
+      "effect": "creature",
+      "source": "effect_map",
+      "decks": [
+        "Lumra, Bellow of the Woods #49 (real)"
+      ],
+      "flags": [
+        "heuristic_effect"
+      ],
+      "focused_template_matches": [],
+      "focused_template_effect_scopes": [],
+      "type_line": "Creature \u2014 Ouphe",
+      "oracle_sample": "Activated abilities of artifacts can't be activated."
+    },
+    {
+      "name": "Corridor Monitor",
+      "effect": "creature",
+      "source": "effect_map",
+      "decks": [
+        "Arcum Dagsson #97 (real)"
+      ],
+      "flags": [
+        "heuristic_effect"
+      ],
+      "focused_template_matches": [],
+      "focused_template_effect_scopes": [],
+      "type_line": "Artifact Creature \u2014 Construct",
+      "oracle_sample": "When this creature enters, untap target artifact or creature you control."
+    },
+    {
+      "name": "Crawling Chorus",
+      "effect": "creature",
+      "source": "effect_map",
+      "decks": [
+        "Winota, Joiner of Forces #39 (real)"
+      ],
+      "flags": [
+        "heuristic_effect"
+      ],
+      "focused_template_matches": [],
+      "focused_template_effect_scopes": [],
+      "type_line": "Creature \u2014 Phyrexian Horror",
+      "oracle_sample": "Toxic 1 (Players dealt combat damage by this creature also get a poison counter.)\nWhen this creature dies, create a 1/1 colorless Phyrexian Mite artifact creature token with toxic "
+    },
+    {
+      "name": "Dauntless Dismantler",
+      "effect": "creature",
+      "source": "effect_map",
+      "decks": [
+        "Winota, Joiner of Forces #39 (real)"
+      ],
+      "flags": [
+        "heuristic_effect"
+      ],
+      "focused_template_matches": [],
+      "focused_template_effect_scopes": [],
+      "type_line": "Creature \u2014 Human Artificer",
+      "oracle_sample": "Artifacts your opponents control enter tapped.\n{X}{X}{W}, Sacrifice this creature: Destroy each artifact with mana value X."
+    },
+    {
+      "name": "Delney, Streetwise Lookout",
+      "effect": "creature",
+      "source": "effect_map",
+      "decks": [
+        "Ishai, Ojutai Dragonspeaker #80 (real)"
+      ],
+      "flags": [
+        "heuristic_effect"
+      ],
+      "focused_template_matches": [],
+      "focused_template_effect_scopes": [],
+      "type_line": "Legendary Creature \u2014 Human Scout",
+      "oracle_sample": "Creatures you control with power 2 or less can't be blocked by creatures with power 3 or greater.\nIf a triggered ability of a creature you control with power 2 or less triggers, th"
+    },
+    {
+      "name": "Dimensional Infiltrator",
+      "effect": "creature",
+      "source": "effect_map",
+      "decks": [
+        "Kinnan, Bonder Prodigy #104 (real)"
+      ],
+      "flags": [
+        "heuristic_effect"
+      ],
+      "focused_template_matches": [],
+      "focused_template_effect_scopes": [],
+      "type_line": "Creature \u2014 Eldrazi",
+      "oracle_sample": "Devoid (This card has no color.)\nFlash\nFlying\n{1}{C}: Target opponent exiles the top card of their library. If it's a land card, you may return this creature to its owner's hand. ("
+    },
+    {
+      "name": "Dion, Bahamut's Dominant",
+      "effect": "creature",
+      "source": "effect_map",
+      "decks": [
+        "Winota, Joiner of Forces #39 (real)"
+      ],
+      "flags": [
+        "heuristic_effect"
+      ],
+      "focused_template_matches": [],
+      "focused_template_effect_scopes": [],
+      "type_line": "Legendary Creature \u2014 Human Noble Knight",
+      "oracle_sample": "Dragonfire Dive \u2014 During your turn, Dion and other Knights you control have flying.\nWhen Dion enters, create a 2/2 white Knight creature token.\n{4}{W}{W}, {T}: Exile Dion, then ret"
+    },
+    {
+      "name": "Disrupting Shoal",
+      "effect": "counter",
+      "source": "effect_map",
+      "decks": [
+        "K-9, Mark I #34 (real)",
+        "Kinnan, Bonder Prodigy #27 (real)"
+      ],
+      "flags": [
+        "heuristic_effect"
+      ],
+      "focused_template_matches": [],
+      "focused_template_effect_scopes": [],
+      "type_line": "Instant \u2014 Arcane",
+      "oracle_sample": "You may exile a blue card with mana value X from your hand rather than pay this spell's mana cost.\nCounter target spell if its mana value is X."
+    },
+    {
+      "name": "Drana and Linvala",
+      "effect": "creature",
+      "source": "effect_map",
+      "decks": [
+        "Sisay, Weatherlight Captain #61 (real)"
+      ],
+      "flags": [
+        "heuristic_effect"
+      ],
+      "focused_template_matches": [],
+      "focused_template_effect_scopes": [],
+      "type_line": "Legendary Creature \u2014 Vampire Angel",
+      "oracle_sample": "Flying, vigilance\nActivated abilities of creatures your opponents control can't be activated.\nDrana and Linvala has all activated abilities of all creatures your opponents control."
+    },
+    {
+      "name": "Endurance",
+      "effect": "creature",
+      "source": "effect_map",
+      "decks": [
+        "Kinnan, Bonder Prodigy #104 (real)",
+        "Kinnan, Bonder Prodigy #27 (real)",
+        "Kinnan, Bonder Prodigy #37 (real)",
+        "Lumra, Bellow of the Woods #49 (real)"
+      ],
+      "flags": [
+        "heuristic_effect"
+      ],
+      "focused_template_matches": [],
+      "focused_template_effect_scopes": [],
+      "type_line": "Creature \u2014 Elemental Incarnation",
+      "oracle_sample": "Flash\nReach\nWhen this creature enters, up to one target player puts all the cards from their graveyard on the bottom of their library in a random order.\nEvoke\u2014Exile a green card fr"
+    },
+    {
+      "name": "Eomer, King of Rohan",
+      "effect": "creature",
+      "source": "effect_map",
+      "decks": [
+        "Winota, Joiner of Forces #39 (real)"
+      ],
+      "flags": [
+        "heuristic_effect"
+      ],
+      "focused_template_matches": [],
+      "focused_template_effect_scopes": [],
+      "type_line": "Legendary Creature \u2014 Human Noble",
+      "oracle_sample": "Double strike\n\u00c9omer enters with a +1/+1 counter on it for each other Human you control.\nWhen \u00c9omer enters, target player becomes the monarch. \u00c9omer deals damage equal to its power "
+    },
+    {
+      "name": "Ertai Resurrected",
+      "effect": "counter",
+      "source": "effect_map",
+      "decks": [
+        "Sisay, Weatherlight Captain #61 (real)"
+      ],
+      "flags": [
+        "heuristic_effect"
+      ],
+      "focused_template_matches": [],
+      "focused_template_effect_scopes": [],
+      "type_line": "Legendary Creature \u2014 Phyrexian Human Wizard",
+      "oracle_sample": "Flash\nWhen Ertai Resurrected enters, choose up to one \u2014\n\u2022 Counter target spell, activated ability, or triggered ability. Its controller draws a card.\n\u2022 Destroy another target creat"
+    },
+    {
+      "name": "Famished Worldsire",
+      "effect": "creature",
+      "source": "effect_map",
+      "decks": [
+        "Lumra, Bellow of the Woods #49 (real)"
+      ],
+      "flags": [
+        "heuristic_effect"
+      ],
+      "focused_template_matches": [],
+      "focused_template_effect_scopes": [],
+      "type_line": "Creature \u2014 Leviathan",
+      "oracle_sample": "Ward {3}\nDevour land 3 (As this creature enters, you may sacrifice any number of lands. It enters with three times that many +1/+1 counters on it.)\nWhen this creature enters, look "
+    },
+    {
+      "name": "Fiend Hunter",
+      "effect": "creature",
+      "source": "effect_map",
+      "decks": [
+        "Winota, Joiner of Forces #39 (real)"
+      ],
+      "flags": [
+        "heuristic_effect"
+      ],
+      "focused_template_matches": [],
+      "focused_template_effect_scopes": [],
+      "type_line": "Creature \u2014 Human Cleric",
+      "oracle_sample": "When this creature enters, you may exile another target creature.\nWhen this creature leaves the battlefield, return the exiled card to the battlefield under its owner's control."
+    },
+    {
+      "name": "Geist-Honored Monk",
+      "effect": "creature",
+      "source": "effect_map",
+      "decks": [
+        "Winota, Joiner of Forces #39 (real)"
+      ],
+      "flags": [
+        "heuristic_effect"
+      ],
+      "focused_template_matches": [],
+      "focused_template_effect_scopes": [],
+      "type_line": "Creature \u2014 Human Monk",
+      "oracle_sample": "Vigilance\nGeist-Honored Monk's power and toughness are each equal to the number of creatures you control.\nWhen this creature enters, create two 1/1 white Spirit creature tokens wit"
+    },
+    {
+      "name": "Gingerbrute",
+      "effect": "creature",
+      "source": "effect_map",
+      "decks": [
+        "Winota, Joiner of Forces #39 (real)"
+      ],
+      "flags": [
+        "heuristic_effect"
+      ],
+      "focused_template_matches": [],
+      "focused_template_effect_scopes": [],
+      "type_line": "Artifact Creature \u2014 Food Golem",
+      "oracle_sample": "Haste (This creature can attack and {T} as soon as it comes under your control.)\n{1}: This creature can't be blocked this turn except by creatures with haste.\n{2}, {T}, Sacrifice t"
+    },
+    {
+      "name": "K-9, Mark I",
+      "effect": "creature",
+      "source": "effect_map",
+      "decks": [
+        "Arcum Dagsson #97 (real)"
+      ],
+      "flags": [
+        "heuristic_effect"
+      ],
+      "focused_template_matches": [],
+      "focused_template_effect_scopes": [],
+      "type_line": "Legendary Artifact Creature \u2014 Robot Dog",
+      "oracle_sample": "Negative \u2014 As long as K-9 is untapped, other legendary creatures you control have ward {1}.\nAffirmative \u2014 {1}{U}, {T}: Target legendary creature can't be blocked this turn.\nDoctor'"
+    },
+    {
+      "name": "Marvin, Murderous Mimic",
+      "effect": "creature",
+      "source": "effect_map",
+      "decks": [
+        "Arcum Dagsson #97 (real)"
+      ],
+      "flags": [
+        "heuristic_effect"
+      ],
+      "focused_template_matches": [],
+      "focused_template_effect_scopes": [],
+      "type_line": "Legendary Artifact Creature \u2014 Toy",
+      "oracle_sample": "Marvin has all activated abilities of creatures you control that don't have the same name as this creature."
+    },
+    {
+      "name": "Memnite",
+      "effect": "creature",
+      "source": "effect_map",
+      "decks": [
+        "Arcum Dagsson #97 (real)"
+      ],
+      "flags": [
+        "heuristic_effect"
+      ],
+      "focused_template_matches": [],
+      "focused_template_effect_scopes": [],
+      "type_line": "Artifact Creature \u2014 Construct",
+      "oracle_sample": ""
+    },
+    {
+      "name": "Nyxbloom Ancient",
+      "effect": "creature",
+      "source": "effect_map",
+      "decks": [
+        "Kinnan, Bonder Prodigy #104 (real)"
+      ],
+      "flags": [
+        "heuristic_effect"
+      ],
+      "focused_template_matches": [],
+      "focused_template_effect_scopes": [],
+      "type_line": "Enchantment Creature \u2014 Elemental",
+      "oracle_sample": "Trample\nIf you tap a permanent for mana, it produces three times as much of that mana instead."
+    },
+    {
+      "name": "Opposition Agent",
+      "effect": "creature",
+      "source": "effect_map",
+      "decks": [
+        "Grist, the Hunger Tide #66 (real)"
+      ],
+      "flags": [
+        "heuristic_effect"
+      ],
+      "focused_template_matches": [],
+      "focused_template_effect_scopes": [],
+      "type_line": "Creature \u2014 Human Rogue",
+      "oracle_sample": "Flash\nYou control your opponents while they're searching their libraries.\nWhile an opponent is searching their library, they exile each card they find. You may play those cards for"
+    },
+    {
+      "name": "Phyrexian Walker",
+      "effect": "creature",
+      "source": "effect_map",
+      "decks": [
+        "Arcum Dagsson #97 (real)"
+      ],
+      "flags": [
+        "heuristic_effect"
+      ],
+      "focused_template_matches": [],
+      "focused_template_effect_scopes": [],
+      "type_line": "Artifact Creature \u2014 Phyrexian Construct",
+      "oracle_sample": ""
+    },
+    {
+      "name": "Pia and Kiran Nalaar",
+      "effect": "creature",
+      "source": "effect_map",
+      "decks": [
+        "Winota, Joiner of Forces #39 (real)"
+      ],
+      "flags": [
+        "heuristic_effect"
+      ],
+      "focused_template_matches": [],
+      "focused_template_effect_scopes": [],
+      "type_line": "Legendary Creature \u2014 Human Artificer",
+      "oracle_sample": "When Pia and Kiran Nalaar enters, create two 1/1 colorless Thopter artifact creature tokens with flying.\n{2}{R}, Sacrifice an artifact: Pia and Kiran Nalaar deals 2 damage to any t"
+    },
+    {
+      "name": "Rograkh, Son of Rohgahh",
+      "effect": "creature",
+      "source": "effect_map",
+      "decks": [
+        "Najeela, the Blade-Blossom #111 (real)"
+      ],
+      "flags": [
+        "heuristic_effect"
+      ],
+      "focused_template_matches": [],
+      "focused_template_effect_scopes": [],
+      "type_line": "Legendary Creature \u2014 Kobold Warrior",
+      "oracle_sample": "First strike, menace, trample\nPartner (You can have two commanders if both have partner.)"
+    },
+    {
+      "name": "Sakashima the Impostor",
+      "effect": "creature",
+      "source": "effect_map",
+      "decks": [
+        "Sisay, Weatherlight Captain #61 (real)"
+      ],
+      "flags": [
+        "heuristic_effect"
+      ],
+      "focused_template_matches": [],
+      "focused_template_effect_scopes": [],
+      "type_line": "Legendary Creature \u2014 Human Rogue",
+      "oracle_sample": "You may have Sakashima the Impostor enter as a copy of any creature on the battlefield, except its name is Sakashima the Impostor, it's legendary in addition to its other types, an"
+    },
+    {
+      "name": "Seedborn Muse",
+      "effect": "creature",
+      "source": "effect_map",
+      "decks": [
+        "Kinnan, Bonder Prodigy #104 (real)",
+        "Kinnan, Bonder Prodigy #37 (real)"
+      ],
+      "flags": [
+        "heuristic_effect"
+      ],
+      "focused_template_matches": [],
+      "focused_template_effect_scopes": [],
+      "type_line": "Creature \u2014 Spirit",
+      "oracle_sample": "Untap all permanents you control during each other player's untap step."
+    },
+    {
+      "name": "Spellskite",
+      "effect": "creature",
+      "source": "effect_map",
+      "decks": [
+        "Arcum Dagsson #97 (real)",
+        "Kinnan, Bonder Prodigy #104 (real)",
+        "Kinnan, Bonder Prodigy #37 (real)"
+      ],
+      "flags": [
+        "heuristic_effect"
+      ],
+      "focused_template_matches": [],
+      "focused_template_effect_scopes": [],
+      "type_line": "Artifact Creature \u2014 Phyrexian Horror",
+      "oracle_sample": "{U/P}: Change a target of target spell or ability to this creature. ({U/P} can be paid with either {U} or 2 life.)"
+    },
+    {
+      "name": "Spider-Woman, Stunning Savior",
+      "effect": "creature",
+      "source": "effect_map",
+      "decks": [
+        "Sisay, Weatherlight Captain #61 (real)"
+      ],
+      "flags": [
+        "heuristic_effect"
+      ],
+      "focused_template_matches": [],
+      "focused_template_effect_scopes": [],
+      "type_line": "Legendary Creature \u2014 Spider Human Hero",
+      "oracle_sample": "Flying\nVenom Blast \u2014 Artifacts and creatures your opponents control enter tapped."
+    },
+    {
+      "name": "Subtlety",
+      "effect": "creature",
+      "source": "effect_map",
+      "decks": [
+        "Kinnan, Bonder Prodigy #27 (real)"
+      ],
+      "flags": [
+        "heuristic_effect"
+      ],
+      "focused_template_matches": [],
+      "focused_template_effect_scopes": [],
+      "type_line": "Creature \u2014 Elemental Incarnation",
+      "oracle_sample": "Flash\nFlying\nWhen this creature enters, choose up to one target creature spell or planeswalker spell. Its owner puts it on their choice of the top or bottom of their library.\nEvoke"
+    },
+    {
+      "name": "Thalia, Heretic Cathar",
+      "effect": "creature",
+      "source": "effect_map",
+      "decks": [
+        "Winota, Joiner of Forces #39 (real)"
+      ],
+      "flags": [
+        "heuristic_effect"
+      ],
+      "focused_template_matches": [],
+      "focused_template_effect_scopes": [],
+      "type_line": "Legendary Creature \u2014 Human Soldier",
+      "oracle_sample": "First strike\nCreatures and nonbasic lands your opponents control enter tapped."
+    },
+    {
+      "name": "The Eighth Doctor",
+      "effect": "creature",
+      "source": "effect_map",
+      "decks": [
+        "K-9, Mark I #34 (real)"
+      ],
+      "flags": [
+        "heuristic_effect"
+      ],
+      "focused_template_matches": [],
+      "focused_template_effect_scopes": [],
+      "type_line": "Legendary Creature \u2014 Time Lord Doctor",
+      "oracle_sample": "When The Eighth Doctor enters, mill three cards.\nOnce during each of your turns, you may play a historic land or cast a historic permanent spell from your graveyard. If you do, it "
+    },
+    {
+      "name": "Toby, Beastie Befriender",
+      "effect": "creature",
+      "source": "effect_map",
+      "decks": [
+        "Winota, Joiner of Forces #39 (real)"
+      ],
+      "flags": [
+        "heuristic_effect"
+      ],
+      "focused_template_matches": [],
+      "focused_template_effect_scopes": [],
+      "type_line": "Legendary Creature \u2014 Human Wizard",
+      "oracle_sample": "When Toby enters, create a 4/4 white Beast creature token with \"This token can't attack or block alone.\"\nAs long as you control four or more creature tokens, creature tokens you co"
+    },
+    {
+      "name": "Hidden Strings",
+      "effect": "unknown",
+      "source": "focused_template_ready",
+      "decks": [
+        "Kinnan, Bonder Prodigy #27 (real)"
+      ],
+      "flags": [
+        "trigger_not_explicit"
+      ],
+      "focused_template_matches": [
+        "supports_tap_untap_cipher_trigger_template"
+      ],
+      "focused_template_effect_scopes": [
+        "tap_untap_cipher_trigger"
+      ],
+      "type_line": "Sorcery",
+      "oracle_sample": "You may tap or untap target permanent, then you may tap or untap another target permanent.\nCipher (Then you may exile this spell card encoded on a creature you control. Whenever th"
+    },
+    {
+      "name": "Submerge",
+      "effect": "unknown",
+      "source": "focused_template_ready",
+      "decks": [
+        "Ishai, Ojutai Dragonspeaker #80 (real)"
+      ],
+      "flags": [
+        "cast_permission_not_explicit"
+      ],
+      "focused_template_matches": [
+        "supports_alternative_cost_library_bounce_template"
+      ],
+      "focused_template_effect_scopes": [
+        "alternative_cost_library_bounce"
+      ],
+      "type_line": "Instant",
+      "oracle_sample": "If an opponent controls a Forest and you control an Island, you may cast this spell without paying its mana cost.\nPut target creature on top of its owner's library."
+    },
+    {
+      "name": "Banisher Priest",
+      "effect": "remove_creature",
+      "source": "tag",
+      "decks": [
+        "Winota, Joiner of Forces #39 (real)"
+      ],
+      "flags": [
+        "heuristic_effect"
+      ],
+      "focused_template_matches": [],
+      "focused_template_effect_scopes": [],
+      "type_line": "Creature \u2014 Human Cleric",
+      "oracle_sample": "When this creature enters, exile target creature an opponent controls until this creature leaves the battlefield."
+    },
+    {
+      "name": "Citizen's Crowbar",
+      "effect": "remove_permanent",
+      "source": "tag",
+      "decks": [
+        "Winota, Joiner of Forces #39 (real)"
+      ],
+      "flags": [
+        "heuristic_effect"
+      ],
+      "focused_template_matches": [],
+      "focused_template_effect_scopes": [],
+      "type_line": "Artifact \u2014 Equipment",
+      "oracle_sample": "When this Equipment enters, create a 1/1 green and white Citizen creature token, then attach this Equipment to it.\nEquipped creature gets +1/+1 and has \"{W}, {T}, Sacrifice Citizen"
+    },
+    {
+      "name": "Grim Servant",
+      "effect": "tutor",
+      "source": "tag",
+      "decks": [
+        "Grist, the Hunger Tide #66 (real)"
+      ],
+      "flags": [
+        "heuristic_effect"
+      ],
+      "focused_template_matches": [],
+      "focused_template_effect_scopes": [],
+      "type_line": "Creature \u2014 Zombie Warlock",
+      "oracle_sample": "Menace\nWhen this creature enters, search your library for a card with mana value less than or equal to your devotion to black, reveal it, put it into your hand, then shuffle. You l"
+    },
+    {
+      "name": "Hoarding Broodlord",
+      "effect": "tutor",
+      "source": "tag",
+      "decks": [
+        "Grist, the Hunger Tide #66 (real)"
+      ],
+      "flags": [
+        "heuristic_effect"
+      ],
+      "focused_template_matches": [],
+      "focused_template_effect_scopes": [],
+      "type_line": "Creature \u2014 Dragon",
+      "oracle_sample": "Convoke\nFlying\nWhen this creature enters, search your library for a card, exile it face down, then shuffle. For as long as that card remains exiled, you may play it.\nSpells you cas"
+    },
+    {
+      "name": "Kalain, Reclusive Painter",
+      "effect": "ramp_permanent",
+      "source": "tag",
+      "decks": [
+        "Sisay, Weatherlight Captain #61 (real)"
+      ],
+      "flags": [
+        "heuristic_effect"
+      ],
+      "focused_template_matches": [],
+      "focused_template_effect_scopes": [],
+      "type_line": "Legendary Creature \u2014 Human Elf Bard",
+      "oracle_sample": "When Kalain enters, create a Treasure token. (It's an artifact with \"{T}, Sacrifice this token: Add one mana of any color.\")\nOther creatures you control enter with an additional +1"
+    },
+    {
+      "name": "Protean Hulk",
+      "effect": "tutor",
+      "source": "tag",
+      "decks": [
+        "Grist, the Hunger Tide #66 (real)"
+      ],
+      "flags": [
+        "heuristic_effect"
+      ],
+      "focused_template_matches": [],
+      "focused_template_effect_scopes": [],
+      "type_line": "Creature \u2014 Beast",
+      "oracle_sample": "When this creature dies, search your library for any number of creature cards with total mana value 6 or less, put them onto the battlefield, then shuffle."
+    },
+    {
+      "name": "Saheeli Rai",
+      "effect": "tutor",
+      "source": "tag",
+      "decks": [
+        "Sisay, Weatherlight Captain #61 (real)"
+      ],
+      "flags": [
+        "heuristic_effect"
+      ],
+      "focused_template_matches": [],
+      "focused_template_effect_scopes": [],
+      "type_line": "Legendary Planeswalker \u2014 Saheeli",
+      "oracle_sample": "[+1]: Scry 1. Saheeli Rai deals 1 damage to each opponent.\n[\u22122]: Create a token that's a copy of target artifact or creature you control, except it's an artifact in addition to its"
+    },
+    {
+      "name": "Spirit of the Labyrinth",
+      "effect": "draw_cards",
+      "source": "tag",
+      "decks": [
+        "Winota, Joiner of Forces #39 (real)"
+      ],
+      "flags": [
+        "heuristic_effect"
+      ],
+      "focused_template_matches": [],
+      "focused_template_effect_scopes": [],
+      "type_line": "Enchantment Creature \u2014 Spirit",
+      "oracle_sample": "Each player can't draw more than one card each turn."
+    },
+    {
+      "name": "Splitskin Doll",
+      "effect": "draw_cards",
+      "source": "tag",
+      "decks": [
+        "Winota, Joiner of Forces #39 (real)"
+      ],
+      "flags": [
+        "heuristic_effect"
+      ],
+      "focused_template_matches": [],
+      "focused_template_effect_scopes": [],
+      "type_line": "Artifact Creature \u2014 Toy",
+      "oracle_sample": "When this creature enters, draw a card. Then discard a card unless you control another creature with power 2 or less."
+    },
+    {
+      "name": "The Third Doctor",
+      "effect": "ramp_permanent",
+      "source": "tag",
+      "decks": [
+        "K-9, Mark I #34 (real)"
+      ],
+      "flags": [
+        "heuristic_effect"
+      ],
+      "focused_template_matches": [],
+      "focused_template_effect_scopes": [],
+      "type_line": "Legendary Creature \u2014 Time Lord Doctor",
+      "oracle_sample": "Trample\nThe Third Doctor gets +1/+1 for each noncreature token you control.\nWhen The Third Doctor enters, create your choice of a Clue token, a Food token, or a Treasure token."
+    },
+    {
+      "name": "Wargate",
+      "effect": "tutor",
+      "source": "tag",
+      "decks": [
+        "K-9, Mark I #34 (real)"
+      ],
+      "flags": [
+        "heuristic_effect"
+      ],
+      "focused_template_matches": [],
+      "focused_template_effect_scopes": [],
+      "type_line": "Sorcery",
+      "oracle_sample": "Search your library for a permanent card with mana value X or less, put it onto the battlefield, then shuffle."
+    },
+    {
+      "name": "Blinkmoth Nexus",
+      "effect": "land",
+      "source": "type_land",
+      "decks": [
+        "Arcum Dagsson #97 (real)"
+      ],
+      "flags": [
+        "land_utility_ability_not_modeled"
+      ],
+      "focused_template_matches": [],
+      "focused_template_effect_scopes": [],
+      "type_line": "Land",
+      "oracle_sample": "{T}: Add {C}.\n{1}: This land becomes a 1/1 Blinkmoth artifact creature with flying until end of turn. It's still a land.\n{1}, {T}: Target Blinkmoth creature gets +1/+1 until end of"
+    },
+    {
+      "name": "Boseiju, Who Endures",
+      "effect": "land",
+      "source": "type_land",
+      "decks": [
+        "Grist, the Hunger Tide #66 (real)",
+        "K-9, Mark I #34 (real)",
+        "Kinnan, Bonder Prodigy #104 (real)",
+        "Kinnan, Bonder Prodigy #27 (real)",
+        "Kinnan, Bonder Prodigy #37 (real)",
+        "Lumra, Bellow of the Woods #49 (real)",
+        "Sisay, Weatherlight Captain #61 (real)"
+      ],
+      "flags": [
+        "land_utility_ability_not_modeled"
+      ],
+      "focused_template_matches": [],
+      "focused_template_effect_scopes": [],
+      "type_line": "Legendary Land",
+      "oracle_sample": "{T}: Add {G}.\nChannel \u2014 {1}{G}, Discard this card: Destroy target artifact, enchantment, or nonbasic land an opponent controls. That player may search their library for a land card"
+    },
+    {
+      "name": "City of Brass",
+      "effect": "land",
+      "source": "type_land",
+      "decks": [
+        "Grist, the Hunger Tide #66 (real)",
+        "Ishai, Ojutai Dragonspeaker #80 (real)",
+        "K-9, Mark I #34 (real)",
+        "Kinnan, Bonder Prodigy #104 (real)",
+        "Kinnan, Bonder Prodigy #27 (real)",
+        "Kinnan, Bonder Prodigy #37 (real)",
+        "Kraum, Ludevic's Opus #86 (real)",
+        "Najeela, the Blade-Blossom #111 (real)",
+        "Sisay, Weatherlight Captain #61 (real)"
+      ],
+      "flags": [
+        "land_utility_ability_not_modeled"
+      ],
+      "focused_template_matches": [],
+      "focused_template_effect_scopes": [],
+      "type_line": "Land",
+      "oracle_sample": "Whenever this land becomes tapped, it deals 1 damage to you.\n{T}: Add one mana of any color."
+    },
+    {
+      "name": "Field of the Dead",
+      "effect": "land",
+      "source": "type_land",
+      "decks": [
+        "Lumra, Bellow of the Woods #49 (real)"
+      ],
+      "flags": [
+        "land_utility_ability_not_modeled"
+      ],
+      "focused_template_matches": [],
+      "focused_template_effect_scopes": [],
+      "type_line": "Land",
+      "oracle_sample": "This land enters tapped.\n{T}: Add {C}.\nWhenever this land or another land you control enters, if you control seven or more lands with different names, create a 2/2 black Zombie cre"
+    },
+    {
+      "name": "Forbidden Orchard",
+      "effect": "land",
+      "source": "type_land",
+      "decks": [
+        "Ishai, Ojutai Dragonspeaker #80 (real)",
+        "K-9, Mark I #34 (real)",
+        "Sisay, Weatherlight Captain #61 (real)"
+      ],
+      "flags": [
+        "land_utility_ability_not_modeled"
+      ],
+      "focused_template_matches": [],
+      "focused_template_effect_scopes": [],
+      "type_line": "Land",
+      "oracle_sample": "{T}: Add one mana of any color.\nWhenever you tap this land for mana, target opponent creates a 1/1 colorless Spirit creature token."
+    },
+    {
+      "name": "Ghost Quarter",
+      "effect": "land",
+      "source": "type_land",
+      "decks": [
+        "Lumra, Bellow of the Woods #49 (real)"
+      ],
+      "flags": [
+        "land_utility_ability_not_modeled"
+      ],
+      "focused_template_matches": [],
+      "focused_template_effect_scopes": [],
+      "type_line": "Land",
+      "oracle_sample": "{T}: Add {C}.\n{T}, Sacrifice this land: Destroy target land. Its controller may search their library for a basic land card, put it onto the battlefield, then shuffle."
+    },
+    {
+      "name": "Horizon of Progress",
+      "effect": "land",
+      "source": "type_land",
+      "decks": [
+        "Lumra, Bellow of the Woods #49 (real)"
+      ],
+      "flags": [
+        "land_utility_ability_not_modeled"
+      ],
+      "focused_template_matches": [],
+      "focused_template_effect_scopes": [],
+      "type_line": "Land",
+      "oracle_sample": "{T}, Pay 1 life: Add one mana of any type that a land you control could produce.\n{3}, {T}: You may put a land card from your hand onto the battlefield tapped.\n{1}, {T}, Sacrifice t"
+    },
+    {
+      "name": "Inkmoth Nexus",
+      "effect": "land",
+      "source": "type_land",
+      "decks": [
+        "Arcum Dagsson #97 (real)"
+      ],
+      "flags": [
+        "land_utility_ability_not_modeled"
+      ],
+      "focused_template_matches": [],
+      "focused_template_effect_scopes": [],
+      "type_line": "Land",
+      "oracle_sample": "{T}: Add {C}.\n{1}: This land becomes a 1/1 Phyrexian Blinkmoth artifact creature with flying and infect until end of turn. It's still a land. (It deals damage to creatures in the f"
+    },
+    {
+      "name": "Kher Keep",
+      "effect": "land",
+      "source": "type_land",
+      "decks": [
+        "Winota, Joiner of Forces #39 (real)"
+      ],
+      "flags": [
+        "land_utility_ability_not_modeled"
+      ],
+      "focused_template_matches": [],
+      "focused_template_effect_scopes": [],
+      "type_line": "Legendary Land",
+      "oracle_sample": "{T}: Add {C}.\n{1}{R}, {T}: Create a 0/1 red Kobold creature token named Kobolds of Kher Keep."
+    },
+    {
+      "name": "Lazotep Quarry",
+      "effect": "land",
+      "source": "type_land",
+      "decks": [
+        "Lumra, Bellow of the Woods #49 (real)"
+      ],
+      "flags": [
+        "land_utility_ability_not_modeled"
+      ],
+      "focused_template_matches": [],
+      "focused_template_effect_scopes": [],
+      "type_line": "Land \u2014 Desert",
+      "oracle_sample": "{T}: Add {C}.\n{T}, Sacrifice a creature: Add one mana of any color.\n{X}{2}, {T}, Sacrifice a Desert: Exile target creature card with mana value X from your graveyard. Create a toke"
+    },
+    {
+      "name": "Mishra's Factory",
+      "effect": "land",
+      "source": "type_land",
+      "decks": [
+        "Arcum Dagsson #97 (real)",
+        "Winota, Joiner of Forces #39 (real)"
+      ],
+      "flags": [
+        "land_utility_ability_not_modeled"
+      ],
+      "focused_template_matches": [],
+      "focused_template_effect_scopes": [],
+      "type_line": "Land",
+      "oracle_sample": "{T}: Add {C}.\n{1}: This land becomes a 2/2 Assembly-Worker artifact creature until end of turn. It's still a land.\n{T}: Target Assembly-Worker creature gets +1/+1 until end of turn"
+    },
+    {
+      "name": "Nurturing Peatland",
+      "effect": "land",
+      "source": "type_land",
+      "decks": [
+        "Grist, the Hunger Tide #66 (real)"
+      ],
+      "flags": [
+        "land_utility_ability_not_modeled"
+      ],
+      "focused_template_matches": [],
+      "focused_template_effect_scopes": [],
+      "type_line": "Land",
+      "oracle_sample": "{T}, Pay 1 life: Add {B} or {G}.\n{1}, {T}, Sacrifice this land: Draw a card."
+    },
+    {
+      "name": "Otawara, Soaring City",
+      "effect": "land",
+      "source": "type_land",
+      "decks": [
+        "Arcum Dagsson #97 (real)",
+        "Ishai, Ojutai Dragonspeaker #80 (real)",
+        "K-9, Mark I #34 (real)",
+        "Kinnan, Bonder Prodigy #104 (real)",
+        "Kinnan, Bonder Prodigy #27 (real)",
+        "Kinnan, Bonder Prodigy #37 (real)",
+        "Kraum, Ludevic's Opus #86 (real)",
+        "Sisay, Weatherlight Captain #61 (real)"
+      ],
+      "flags": [
+        "land_utility_ability_not_modeled"
+      ],
+      "focused_template_matches": [],
+      "focused_template_effect_scopes": [],
+      "type_line": "Legendary Land",
+      "oracle_sample": "{T}: Add {U}.\nChannel \u2014 {3}{U}, Discard this card: Return target artifact, creature, enchantment, or planeswalker to its owner's hand. This ability costs {1} less to activate for e"
+    },
+    {
+      "name": "Sanctum of Eternity",
+      "effect": "land",
+      "source": "type_land",
+      "decks": [
+        "Lumra, Bellow of the Woods #49 (real)"
+      ],
+      "flags": [
+        "land_utility_ability_not_modeled"
+      ],
+      "focused_template_matches": [],
+      "focused_template_effect_scopes": [],
+      "type_line": "Land",
+      "oracle_sample": "{T}: Add {C}.\n{2}, {T}: Return target commander you own from the battlefield to your hand. Activate only during your turn."
+    },
+    {
+      "name": "Shifting Woodland",
+      "effect": "land",
+      "source": "type_land",
+      "decks": [
+        "Grist, the Hunger Tide #66 (real)",
+        "K-9, Mark I #34 (real)",
+        "Kinnan, Bonder Prodigy #37 (real)",
+        "Lumra, Bellow of the Woods #49 (real)",
+        "Najeela, the Blade-Blossom #111 (real)"
+      ],
+      "flags": [
+        "land_utility_ability_not_modeled"
+      ],
+      "focused_template_matches": [],
+      "focused_template_effect_scopes": [],
+      "type_line": "Land",
+      "oracle_sample": "This land enters tapped unless you control a Forest.\n{T}: Add {G}.\nDelirium \u2014 {2}{G}{G}: This land becomes a copy of target permanent card in your graveyard until end of turn. Acti"
+    },
+    {
+      "name": "Strip Mine",
+      "effect": "land",
+      "source": "type_land",
+      "decks": [
+        "Lumra, Bellow of the Woods #49 (real)"
+      ],
+      "flags": [
+        "land_utility_ability_not_modeled"
+      ],
+      "focused_template_matches": [],
+      "focused_template_effect_scopes": [],
+      "type_line": "Land",
+      "oracle_sample": "{T}: Add {C}.\n{T}, Sacrifice this land: Destroy target land."
+    },
+    {
+      "name": "Treasure Vault",
+      "effect": "land",
+      "source": "type_land",
+      "decks": [
+        "Kinnan, Bonder Prodigy #104 (real)",
+        "Kinnan, Bonder Prodigy #37 (real)"
+      ],
+      "flags": [
+        "land_utility_ability_not_modeled"
+      ],
+      "focused_template_matches": [],
+      "focused_template_effect_scopes": [],
+      "type_line": "Artifact Land",
+      "oracle_sample": "{T}: Add {C}.\n{X}{X}, {T}, Sacrifice this land: Create X Treasure tokens."
+    },
+    {
+      "name": "Urza's Saga",
+      "effect": "land",
+      "source": "type_land",
+      "decks": [
+        "Arcum Dagsson #97 (real)",
+        "Kraum, Ludevic's Opus #86 (real)",
+        "Lorehold target deck",
+        "Lumra, Bellow of the Woods #49 (real)"
+      ],
+      "flags": [
+        "land_utility_ability_not_modeled"
+      ],
+      "focused_template_matches": [],
+      "focused_template_effect_scopes": [],
+      "type_line": "Enchantment Land \u2014 Urza's Saga",
+      "oracle_sample": "(As this Saga enters and after your draw step, add a lore counter. Sacrifice after III.)\nI \u2014 This Saga gains \"{T}: Add {C}.\"\nII \u2014 This Saga gains \"{2}, {T}: Create a 0/0 colorless "
+    },
+    {
+      "name": "Wasteland",
+      "effect": "land",
+      "source": "type_land",
+      "decks": [
+        "Lumra, Bellow of the Woods #49 (real)"
+      ],
+      "flags": [
+        "land_utility_ability_not_modeled"
+      ],
+      "focused_template_matches": [],
+      "focused_template_effect_scopes": [],
+      "type_line": "Land",
+      "oracle_sample": "{T}: Add {C}.\n{T}, Sacrifice this land: Destroy target nonbasic land."
+    },
+    {
+      "name": "Waterlogged Grove",
+      "effect": "land",
+      "source": "type_land",
+      "decks": [
+        "Kinnan, Bonder Prodigy #27 (real)",
+        "Kinnan, Bonder Prodigy #37 (real)"
+      ],
+      "flags": [
+        "land_utility_ability_not_modeled"
+      ],
+      "focused_template_matches": [],
+      "focused_template_effect_scopes": [],
+      "type_line": "Land",
+      "oracle_sample": "{T}, Pay 1 life: Add {G} or {U}.\n{1}, {T}, Sacrifice this land: Draw a card."
+    },
+    {
+      "name": "Chain of Smog",
+      "effect": "unknown",
+      "source": "unknown",
+      "decks": [
+        "Grist, the Hunger Tide #66 (real)"
+      ],
+      "flags": [
+        "unknown_effect"
+      ],
+      "focused_template_matches": [],
+      "focused_template_effect_scopes": [],
+      "type_line": "Sorcery",
+      "oracle_sample": "Target player discards two cards. That player may copy this spell and may choose a new target for that copy."
+    },
+    {
+      "name": "Charge of the Mites",
+      "effect": "unknown",
+      "source": "unknown",
+      "decks": [
+        "Winota, Joiner of Forces #39 (real)"
+      ],
+      "flags": [
+        "unknown_effect"
+      ],
+      "focused_template_matches": [],
+      "focused_template_effect_scopes": [],
+      "type_line": "Instant",
+      "oracle_sample": "Choose one \u2014\n\u2022 Charge of the Mites deals damage equal to the number of creatures you control to target creature or planeswalker.\n\u2022 Create two 1/1 colorless Phyrexian Mite artifact "
+    },
+    {
+      "name": "Clowning Around",
+      "effect": "unknown",
+      "source": "unknown",
+      "decks": [
+        "Winota, Joiner of Forces #39 (real)"
+      ],
+      "flags": [
+        "unknown_effect"
+      ],
+      "focused_template_matches": [],
+      "focused_template_effect_scopes": [],
+      "type_line": "Sorcery",
+      "oracle_sample": "Create two 1/1 white Clown Robot artifact creature tokens, then roll a six-sided die. If the result is equal to or less than the number of Robots you control, create a 1/1 white Cl"
+    },
+    {
+      "name": "Damping Sphere",
+      "effect": "unknown",
+      "source": "unknown",
+      "decks": [
+        "Arcum Dagsson #97 (real)"
+      ],
+      "flags": [
+        "unknown_effect"
+      ],
+      "focused_template_matches": [],
+      "focused_template_effect_scopes": [],
+      "type_line": "Artifact",
+      "oracle_sample": "If a land is tapped for two or more mana, it produces {C} instead of any other type and amount.\nEach spell a player casts costs {1} more to cast for each other spell that player ha"
+    },
+    {
+      "name": "Encroaching Mycosynth",
+      "effect": "unknown",
+      "source": "unknown",
+      "decks": [
+        "Arcum Dagsson #97 (real)"
+      ],
+      "flags": [
+        "unknown_effect"
+      ],
+      "focused_template_matches": [],
+      "focused_template_effect_scopes": [],
+      "type_line": "Artifact",
+      "oracle_sample": "Nonland permanents you control are artifacts in addition to their other types. The same is true for permanent spells you control and nonland permanent cards you own that aren't on "
+    },
+    {
+      "name": "Footsteps of the Goryo",
+      "effect": "recursion",
+      "source": "unknown",
+      "decks": [
+        "Grist, the Hunger Tide #66 (real)"
+      ],
+      "flags": [
+        "unknown_effect"
+      ],
+      "focused_template_matches": [],
+      "focused_template_effect_scopes": [],
+      "type_line": "Sorcery \u2014 Arcane",
+      "oracle_sample": "Return target creature card from your graveyard to the battlefield. Sacrifice that creature at the beginning of the next end step."
+    },
+    {
+      "name": "Mind Over Matter",
+      "effect": "unknown",
+      "source": "unknown",
+      "decks": [
+        "Arcum Dagsson #97 (real)"
+      ],
+      "flags": [
+        "unknown_effect"
+      ],
+      "focused_template_matches": [],
+      "focused_template_effect_scopes": [],
+      "type_line": "Enchantment",
+      "oracle_sample": "Discard a card: You may tap or untap target artifact, creature, or land."
+    },
+    {
+      "name": "Mythos of Illuna",
+      "effect": "unknown",
+      "source": "unknown",
+      "decks": [
+        "K-9, Mark I #34 (real)"
+      ],
+      "flags": [
+        "unknown_effect"
+      ],
+      "focused_template_matches": [],
+      "focused_template_effect_scopes": [],
+      "type_line": "Sorcery",
+      "oracle_sample": "Create a token that's a copy of target permanent. If {R}{G} was spent to cast this spell, instead create a token that's a copy of that permanent, except the token has \"When this to"
+    },
+    {
+      "name": "Pattern of Rebirth",
+      "effect": "unknown",
+      "source": "unknown",
+      "decks": [
+        "Grist, the Hunger Tide #66 (real)"
+      ],
+      "flags": [
+        "unknown_effect"
+      ],
+      "focused_template_matches": [],
+      "focused_template_effect_scopes": [],
+      "type_line": "Enchantment \u2014 Aura",
+      "oracle_sample": "Enchant creature\nWhen enchanted creature dies, that creature's controller may search their library for a creature card, put that card onto the battlefield, then shuffle."
+    },
+    {
+      "name": "Portal to Phyrexia",
+      "effect": "unknown",
+      "source": "unknown",
+      "decks": [
+        "Arcum Dagsson #97 (real)"
+      ],
+      "flags": [
+        "unknown_effect"
+      ],
+      "focused_template_matches": [],
+      "focused_template_effect_scopes": [],
+      "type_line": "Artifact",
+      "oracle_sample": "When this artifact enters, each opponent sacrifices three creatures of their choice.\nAt the beginning of your upkeep, put target creature card from a graveyard onto the battlefield"
+    },
+    {
+      "name": "Skateboard",
+      "effect": "unknown",
+      "source": "unknown",
+      "decks": [
+        "Arcum Dagsson #97 (real)"
+      ],
+      "flags": [
+        "unknown_effect"
+      ],
+      "focused_template_matches": [],
+      "focused_template_effect_scopes": [],
+      "type_line": "Artifact \u2014 Equipment",
+      "oracle_sample": "When this Equipment enters, tap target permanent.\nEquipped creature gets +1/+0 and has haste.\nEquip {1} ({1}: Attach to target creature you control. Equip only as a sorcery.)"
+    },
+    {
+      "name": "Twiddle",
+      "effect": "unknown",
+      "source": "unknown",
+      "decks": [
+        "Arcum Dagsson #97 (real)"
+      ],
+      "flags": [
+        "unknown_effect"
+      ],
+      "focused_template_matches": [],
+      "focused_template_effect_scopes": [],
+      "type_line": "Instant",
+      "oracle_sample": "You may tap or untap target artifact, creature, or land."
+    }
+  ],
+  "unknown_cards": [
+    {
+      "name": "Cabal Therapy",
+      "effect": "unknown",
+      "source": "unknown",
+      "decks": [
+        "Grist, the Hunger Tide #66 (real)"
+      ],
+      "flags": [
+        "cast_permission_not_explicit",
+        "unknown_effect"
+      ],
+      "focused_template_matches": [],
+      "focused_template_effect_scopes": [],
+      "type_line": "Sorcery",
+      "oracle_sample": "Choose a nonland card name. Target player reveals their hand and discards all cards with that name.\nFlashback\u2014Sacrifice a creature. (You may cast this card from your graveyard for "
+    },
+    {
+      "name": "Frontline Rush",
+      "effect": "unknown",
+      "source": "unknown",
+      "decks": [
+        "Winota, Joiner of Forces #39 (real)"
+      ],
+      "flags": [
+        "temporary_effect_not_explicit",
+        "unknown_effect"
+      ],
+      "focused_template_matches": [],
+      "focused_template_effect_scopes": [],
+      "type_line": "Instant",
+      "oracle_sample": "Choose one \u2014\n\u2022 Create two 1/1 red Goblin creature tokens.\n\u2022 Target creature gets +X/+X until end of turn, where X is the number of creatures you control."
+    },
+    {
+      "name": "Professor Onyx",
+      "effect": "unknown",
+      "source": "unknown",
+      "decks": [
+        "Grist, the Hunger Tide #66 (real)"
+      ],
+      "flags": [
+        "trigger_not_explicit",
+        "unknown_effect"
+      ],
+      "focused_template_matches": [],
+      "focused_template_effect_scopes": [],
+      "type_line": "Legendary Planeswalker \u2014 Liliana",
+      "oracle_sample": "Magecraft \u2014 Whenever you cast or copy an instant or sorcery spell, each opponent loses 2 life and you gain 2 life.\n[+1]: You lose 1 life. Look at the top three cards of your librar"
+    },
+    {
+      "name": "Shallow Grave",
+      "effect": "unknown",
+      "source": "unknown",
+      "decks": [
+        "Grist, the Hunger Tide #66 (real)"
+      ],
+      "flags": [
+        "temporary_effect_not_explicit",
+        "unknown_effect"
+      ],
+      "focused_template_matches": [],
+      "focused_template_effect_scopes": [],
+      "type_line": "Instant",
+      "oracle_sample": "Return the top creature card of your graveyard to the battlefield. That creature gains haste until end of turn. Exile it at the beginning of the next end step."
+    },
+    {
+      "name": "Yawgmoth's Will",
+      "effect": "unknown",
+      "source": "unknown",
+      "decks": [
+        "Grist, the Hunger Tide #66 (real)"
+      ],
+      "flags": [
+        "temporary_effect_not_explicit",
+        "unknown_effect"
+      ],
+      "focused_template_matches": [],
+      "focused_template_effect_scopes": [],
+      "type_line": "Sorcery",
+      "oracle_sample": "Until end of turn, you may play lands and cast spells from your graveyard.\nIf a card would be put into your graveyard from anywhere this turn, exile that card instead."
+    },
+    {
+      "name": "Chain of Smog",
+      "effect": "unknown",
+      "source": "unknown",
+      "decks": [
+        "Grist, the Hunger Tide #66 (real)"
+      ],
+      "flags": [
+        "unknown_effect"
+      ],
+      "focused_template_matches": [],
+      "focused_template_effect_scopes": [],
+      "type_line": "Sorcery",
+      "oracle_sample": "Target player discards two cards. That player may copy this spell and may choose a new target for that copy."
+    },
+    {
+      "name": "Charge of the Mites",
+      "effect": "unknown",
+      "source": "unknown",
+      "decks": [
+        "Winota, Joiner of Forces #39 (real)"
+      ],
+      "flags": [
+        "unknown_effect"
+      ],
+      "focused_template_matches": [],
+      "focused_template_effect_scopes": [],
+      "type_line": "Instant",
+      "oracle_sample": "Choose one \u2014\n\u2022 Charge of the Mites deals damage equal to the number of creatures you control to target creature or planeswalker.\n\u2022 Create two 1/1 colorless Phyrexian Mite artifact "
+    },
+    {
+      "name": "Clowning Around",
+      "effect": "unknown",
+      "source": "unknown",
+      "decks": [
+        "Winota, Joiner of Forces #39 (real)"
+      ],
+      "flags": [
+        "unknown_effect"
+      ],
+      "focused_template_matches": [],
+      "focused_template_effect_scopes": [],
+      "type_line": "Sorcery",
+      "oracle_sample": "Create two 1/1 white Clown Robot artifact creature tokens, then roll a six-sided die. If the result is equal to or less than the number of Robots you control, create a 1/1 white Cl"
+    },
+    {
+      "name": "Damping Sphere",
+      "effect": "unknown",
+      "source": "unknown",
+      "decks": [
+        "Arcum Dagsson #97 (real)"
+      ],
+      "flags": [
+        "unknown_effect"
+      ],
+      "focused_template_matches": [],
+      "focused_template_effect_scopes": [],
+      "type_line": "Artifact",
+      "oracle_sample": "If a land is tapped for two or more mana, it produces {C} instead of any other type and amount.\nEach spell a player casts costs {1} more to cast for each other spell that player ha"
+    },
+    {
+      "name": "Encroaching Mycosynth",
+      "effect": "unknown",
+      "source": "unknown",
+      "decks": [
+        "Arcum Dagsson #97 (real)"
+      ],
+      "flags": [
+        "unknown_effect"
+      ],
+      "focused_template_matches": [],
+      "focused_template_effect_scopes": [],
+      "type_line": "Artifact",
+      "oracle_sample": "Nonland permanents you control are artifacts in addition to their other types. The same is true for permanent spells you control and nonland permanent cards you own that aren't on "
+    },
+    {
+      "name": "Footsteps of the Goryo",
+      "effect": "recursion",
+      "source": "unknown",
+      "decks": [
+        "Grist, the Hunger Tide #66 (real)"
+      ],
+      "flags": [
+        "unknown_effect"
+      ],
+      "focused_template_matches": [],
+      "focused_template_effect_scopes": [],
+      "type_line": "Sorcery \u2014 Arcane",
+      "oracle_sample": "Return target creature card from your graveyard to the battlefield. Sacrifice that creature at the beginning of the next end step."
+    },
+    {
+      "name": "Mind Over Matter",
+      "effect": "unknown",
+      "source": "unknown",
+      "decks": [
+        "Arcum Dagsson #97 (real)"
+      ],
+      "flags": [
+        "unknown_effect"
+      ],
+      "focused_template_matches": [],
+      "focused_template_effect_scopes": [],
+      "type_line": "Enchantment",
+      "oracle_sample": "Discard a card: You may tap or untap target artifact, creature, or land."
+    },
+    {
+      "name": "Mythos of Illuna",
+      "effect": "unknown",
+      "source": "unknown",
+      "decks": [
+        "K-9, Mark I #34 (real)"
+      ],
+      "flags": [
+        "unknown_effect"
+      ],
+      "focused_template_matches": [],
+      "focused_template_effect_scopes": [],
+      "type_line": "Sorcery",
+      "oracle_sample": "Create a token that's a copy of target permanent. If {R}{G} was spent to cast this spell, instead create a token that's a copy of that permanent, except the token has \"When this to"
+    },
+    {
+      "name": "Pattern of Rebirth",
+      "effect": "unknown",
+      "source": "unknown",
+      "decks": [
+        "Grist, the Hunger Tide #66 (real)"
+      ],
+      "flags": [
+        "unknown_effect"
+      ],
+      "focused_template_matches": [],
+      "focused_template_effect_scopes": [],
+      "type_line": "Enchantment \u2014 Aura",
+      "oracle_sample": "Enchant creature\nWhen enchanted creature dies, that creature's controller may search their library for a creature card, put that card onto the battlefield, then shuffle."
+    },
+    {
+      "name": "Portal to Phyrexia",
+      "effect": "unknown",
+      "source": "unknown",
+      "decks": [
+        "Arcum Dagsson #97 (real)"
+      ],
+      "flags": [
+        "unknown_effect"
+      ],
+      "focused_template_matches": [],
+      "focused_template_effect_scopes": [],
+      "type_line": "Artifact",
+      "oracle_sample": "When this artifact enters, each opponent sacrifices three creatures of their choice.\nAt the beginning of your upkeep, put target creature card from a graveyard onto the battlefield"
+    },
+    {
+      "name": "Skateboard",
+      "effect": "unknown",
+      "source": "unknown",
+      "decks": [
+        "Arcum Dagsson #97 (real)"
+      ],
+      "flags": [
+        "unknown_effect"
+      ],
+      "focused_template_matches": [],
+      "focused_template_effect_scopes": [],
+      "type_line": "Artifact \u2014 Equipment",
+      "oracle_sample": "When this Equipment enters, tap target permanent.\nEquipped creature gets +1/+0 and has haste.\nEquip {1} ({1}: Attach to target creature you control. Equip only as a sorcery.)"
+    },
+    {
+      "name": "Twiddle",
+      "effect": "unknown",
+      "source": "unknown",
+      "decks": [
+        "Arcum Dagsson #97 (real)"
+      ],
+      "flags": [
+        "unknown_effect"
+      ],
+      "focused_template_matches": [],
+      "focused_template_effect_scopes": [],
+      "type_line": "Instant",
+      "oracle_sample": "You may tap or untap target artifact, creature, or land."
+    }
+  ],
+  "unknown_effect_cards": [
+    {
+      "name": "Cabal Therapy",
+      "effect": "unknown",
+      "source": "unknown",
+      "status": "source_unknown",
+      "owner": "battle-unknown-template-backlog",
+      "flags": [
+        "cast_permission_not_explicit",
+        "unknown_effect"
+      ],
+      "decks": [
+        "Grist, the Hunger Tide #66 (real)"
+      ],
+      "focused_template_matches": [],
+      "focused_template_effect_scopes": [],
+      "type_line": "Sorcery",
+      "waiver_reason": null
+    },
+    {
+      "name": "Frontline Rush",
+      "effect": "unknown",
+      "source": "unknown",
+      "status": "source_unknown",
+      "owner": "battle-unknown-template-backlog",
+      "flags": [
+        "temporary_effect_not_explicit",
+        "unknown_effect"
+      ],
+      "decks": [
+        "Winota, Joiner of Forces #39 (real)"
+      ],
+      "focused_template_matches": [],
+      "focused_template_effect_scopes": [],
+      "type_line": "Instant",
+      "waiver_reason": null
+    },
+    {
+      "name": "Professor Onyx",
+      "effect": "unknown",
+      "source": "unknown",
+      "status": "source_unknown",
+      "owner": "battle-unknown-template-backlog",
+      "flags": [
+        "trigger_not_explicit",
+        "unknown_effect"
+      ],
+      "decks": [
+        "Grist, the Hunger Tide #66 (real)"
+      ],
+      "focused_template_matches": [],
+      "focused_template_effect_scopes": [],
+      "type_line": "Legendary Planeswalker \u2014 Liliana",
+      "waiver_reason": null
+    },
+    {
+      "name": "Shallow Grave",
+      "effect": "unknown",
+      "source": "unknown",
+      "status": "source_unknown",
+      "owner": "battle-unknown-template-backlog",
+      "flags": [
+        "temporary_effect_not_explicit",
+        "unknown_effect"
+      ],
+      "decks": [
+        "Grist, the Hunger Tide #66 (real)"
+      ],
+      "focused_template_matches": [],
+      "focused_template_effect_scopes": [],
+      "type_line": "Instant",
+      "waiver_reason": null
+    },
+    {
+      "name": "Yawgmoth's Will",
+      "effect": "unknown",
+      "source": "unknown",
+      "status": "source_unknown",
+      "owner": "battle-unknown-template-backlog",
+      "flags": [
+        "temporary_effect_not_explicit",
+        "unknown_effect"
+      ],
+      "decks": [
+        "Grist, the Hunger Tide #66 (real)"
+      ],
+      "focused_template_matches": [],
+      "focused_template_effect_scopes": [],
+      "type_line": "Sorcery",
+      "waiver_reason": null
+    },
+    {
+      "name": "Hidden Strings",
+      "effect": "unknown",
+      "source": "focused_template_ready",
+      "status": "focused_template_ready",
+      "owner": "battle-focused-template-contract",
+      "flags": [
+        "trigger_not_explicit"
+      ],
+      "decks": [
+        "Kinnan, Bonder Prodigy #27 (real)"
+      ],
+      "focused_template_matches": [
+        "supports_tap_untap_cipher_trigger_template"
+      ],
+      "focused_template_effect_scopes": [
+        "tap_untap_cipher_trigger"
+      ],
+      "type_line": "Sorcery",
+      "waiver_reason": null
+    },
+    {
+      "name": "Submerge",
+      "effect": "unknown",
+      "source": "focused_template_ready",
+      "status": "focused_template_ready",
+      "owner": "battle-focused-template-contract",
+      "flags": [
+        "cast_permission_not_explicit"
+      ],
+      "decks": [
+        "Ishai, Ojutai Dragonspeaker #80 (real)"
+      ],
+      "focused_template_matches": [
+        "supports_alternative_cost_library_bounce_template"
+      ],
+      "focused_template_effect_scopes": [
+        "alternative_cost_library_bounce"
+      ],
+      "type_line": "Instant",
+      "waiver_reason": null
+    },
+    {
+      "name": "Chain of Smog",
+      "effect": "unknown",
+      "source": "unknown",
+      "status": "source_unknown",
+      "owner": "battle-unknown-template-backlog",
+      "flags": [
+        "unknown_effect"
+      ],
+      "decks": [
+        "Grist, the Hunger Tide #66 (real)"
+      ],
+      "focused_template_matches": [],
+      "focused_template_effect_scopes": [],
+      "type_line": "Sorcery",
+      "waiver_reason": null
+    },
+    {
+      "name": "Charge of the Mites",
+      "effect": "unknown",
+      "source": "unknown",
+      "status": "source_unknown",
+      "owner": "battle-unknown-template-backlog",
+      "flags": [
+        "unknown_effect"
+      ],
+      "decks": [
+        "Winota, Joiner of Forces #39 (real)"
+      ],
+      "focused_template_matches": [],
+      "focused_template_effect_scopes": [],
+      "type_line": "Instant",
+      "waiver_reason": null
+    },
+    {
+      "name": "Clowning Around",
+      "effect": "unknown",
+      "source": "unknown",
+      "status": "source_unknown",
+      "owner": "battle-unknown-template-backlog",
+      "flags": [
+        "unknown_effect"
+      ],
+      "decks": [
+        "Winota, Joiner of Forces #39 (real)"
+      ],
+      "focused_template_matches": [],
+      "focused_template_effect_scopes": [],
+      "type_line": "Sorcery",
+      "waiver_reason": null
+    },
+    {
+      "name": "Damping Sphere",
+      "effect": "unknown",
+      "source": "unknown",
+      "status": "source_unknown",
+      "owner": "battle-unknown-template-backlog",
+      "flags": [
+        "unknown_effect"
+      ],
+      "decks": [
+        "Arcum Dagsson #97 (real)"
+      ],
+      "focused_template_matches": [],
+      "focused_template_effect_scopes": [],
+      "type_line": "Artifact",
+      "waiver_reason": null
+    },
+    {
+      "name": "Encroaching Mycosynth",
+      "effect": "unknown",
+      "source": "unknown",
+      "status": "source_unknown",
+      "owner": "battle-unknown-template-backlog",
+      "flags": [
+        "unknown_effect"
+      ],
+      "decks": [
+        "Arcum Dagsson #97 (real)"
+      ],
+      "focused_template_matches": [],
+      "focused_template_effect_scopes": [],
+      "type_line": "Artifact",
+      "waiver_reason": null
+    },
+    {
+      "name": "Mind Over Matter",
+      "effect": "unknown",
+      "source": "unknown",
+      "status": "source_unknown",
+      "owner": "battle-unknown-template-backlog",
+      "flags": [
+        "unknown_effect"
+      ],
+      "decks": [
+        "Arcum Dagsson #97 (real)"
+      ],
+      "focused_template_matches": [],
+      "focused_template_effect_scopes": [],
+      "type_line": "Enchantment",
+      "waiver_reason": null
+    },
+    {
+      "name": "Mythos of Illuna",
+      "effect": "unknown",
+      "source": "unknown",
+      "status": "source_unknown",
+      "owner": "battle-unknown-template-backlog",
+      "flags": [
+        "unknown_effect"
+      ],
+      "decks": [
+        "K-9, Mark I #34 (real)"
+      ],
+      "focused_template_matches": [],
+      "focused_template_effect_scopes": [],
+      "type_line": "Sorcery",
+      "waiver_reason": null
+    },
+    {
+      "name": "Pattern of Rebirth",
+      "effect": "unknown",
+      "source": "unknown",
+      "status": "source_unknown",
+      "owner": "battle-unknown-template-backlog",
+      "flags": [
+        "unknown_effect"
+      ],
+      "decks": [
+        "Grist, the Hunger Tide #66 (real)"
+      ],
+      "focused_template_matches": [],
+      "focused_template_effect_scopes": [],
+      "type_line": "Enchantment \u2014 Aura",
+      "waiver_reason": null
+    },
+    {
+      "name": "Portal to Phyrexia",
+      "effect": "unknown",
+      "source": "unknown",
+      "status": "source_unknown",
+      "owner": "battle-unknown-template-backlog",
+      "flags": [
+        "unknown_effect"
+      ],
+      "decks": [
+        "Arcum Dagsson #97 (real)"
+      ],
+      "focused_template_matches": [],
+      "focused_template_effect_scopes": [],
+      "type_line": "Artifact",
+      "waiver_reason": null
+    },
+    {
+      "name": "Skateboard",
+      "effect": "unknown",
+      "source": "unknown",
+      "status": "source_unknown",
+      "owner": "battle-unknown-template-backlog",
+      "flags": [
+        "unknown_effect"
+      ],
+      "decks": [
+        "Arcum Dagsson #97 (real)"
+      ],
+      "focused_template_matches": [],
+      "focused_template_effect_scopes": [],
+      "type_line": "Artifact \u2014 Equipment",
+      "waiver_reason": null
+    },
+    {
+      "name": "Twiddle",
+      "effect": "unknown",
+      "source": "unknown",
+      "status": "source_unknown",
+      "owner": "battle-unknown-template-backlog",
+      "flags": [
+        "unknown_effect"
+      ],
+      "decks": [
+        "Arcum Dagsson #97 (real)"
+      ],
+      "focused_template_matches": [],
+      "focused_template_effect_scopes": [],
+      "type_line": "Instant",
+      "waiver_reason": null
+    },
+    {
+      "name": "Firestorm",
+      "effect": "unknown",
+      "source": "focused_template_ready",
+      "status": "focused_template_ready",
+      "owner": "battle-focused-template-contract",
+      "flags": [],
+      "decks": [
+        "K-9, Mark I #34 (real)"
+      ],
+      "focused_template_matches": [
+        "supports_additional_cost_discard_multi_target_damage_template"
+      ],
+      "focused_template_effect_scopes": [
+        "additional_cost_discard_multi_target_damage"
+      ],
+      "type_line": "Instant",
+      "waiver_reason": null
+    },
+    {
+      "name": "God-Pharaoh's Statue",
+      "effect": "unknown",
+      "source": "focused_template_ready",
+      "status": "focused_template_ready",
+      "owner": "battle-focused-template-contract",
+      "flags": [],
+      "decks": [
+        "Arcum Dagsson #97 (real)"
+      ],
+      "focused_template_matches": [
+        "supports_static_tax_opponent_life_loss_template"
+      ],
+      "focused_template_effect_scopes": [
+        "static_tax_opponent_life_loss"
+      ],
+      "type_line": "Legendary Artifact",
+      "waiver_reason": null
+    },
+    {
+      "name": "Tyvar, Jubilant Brawler",
+      "effect": "unknown",
+      "source": "focused_template_ready",
+      "status": "focused_template_ready",
+      "owner": "battle-focused-template-contract",
+      "flags": [],
+      "decks": [
+        "Sisay, Weatherlight Captain #61 (real)"
+      ],
+      "focused_template_matches": [
+        "supports_planeswalker_static_activated_graveyard_template"
+      ],
+      "focused_template_effect_scopes": [
+        "planeswalker_static_activated_graveyard"
+      ],
+      "type_line": "Legendary Planeswalker \u2014 Tyvar",
+      "waiver_reason": null
+    }
+  ],
+  "unknown_effect_source_counts": {
+    "focused_template_ready": 5,
+    "unknown": 16
+  },
+  "unknown_effect_status_counts": {
+    "focused_template_ready": 5,
+    "source_unknown": 16
+  },
+  "focused_template_ready_unknown_effect_cards": [
+    {
+      "name": "Hidden Strings",
+      "effect": "unknown",
+      "source": "focused_template_ready",
+      "status": "focused_template_ready",
+      "owner": "battle-focused-template-contract",
+      "flags": [
+        "trigger_not_explicit"
+      ],
+      "decks": [
+        "Kinnan, Bonder Prodigy #27 (real)"
+      ],
+      "focused_template_matches": [
+        "supports_tap_untap_cipher_trigger_template"
+      ],
+      "focused_template_effect_scopes": [
+        "tap_untap_cipher_trigger"
+      ],
+      "type_line": "Sorcery",
+      "waiver_reason": null
+    },
+    {
+      "name": "Submerge",
+      "effect": "unknown",
+      "source": "focused_template_ready",
+      "status": "focused_template_ready",
+      "owner": "battle-focused-template-contract",
+      "flags": [
+        "cast_permission_not_explicit"
+      ],
+      "decks": [
+        "Ishai, Ojutai Dragonspeaker #80 (real)"
+      ],
+      "focused_template_matches": [
+        "supports_alternative_cost_library_bounce_template"
+      ],
+      "focused_template_effect_scopes": [
+        "alternative_cost_library_bounce"
+      ],
+      "type_line": "Instant",
+      "waiver_reason": null
+    },
+    {
+      "name": "Firestorm",
+      "effect": "unknown",
+      "source": "focused_template_ready",
+      "status": "focused_template_ready",
+      "owner": "battle-focused-template-contract",
+      "flags": [],
+      "decks": [
+        "K-9, Mark I #34 (real)"
+      ],
+      "focused_template_matches": [
+        "supports_additional_cost_discard_multi_target_damage_template"
+      ],
+      "focused_template_effect_scopes": [
+        "additional_cost_discard_multi_target_damage"
+      ],
+      "type_line": "Instant",
+      "waiver_reason": null
+    },
+    {
+      "name": "God-Pharaoh's Statue",
+      "effect": "unknown",
+      "source": "focused_template_ready",
+      "status": "focused_template_ready",
+      "owner": "battle-focused-template-contract",
+      "flags": [],
+      "decks": [
+        "Arcum Dagsson #97 (real)"
+      ],
+      "focused_template_matches": [
+        "supports_static_tax_opponent_life_loss_template"
+      ],
+      "focused_template_effect_scopes": [
+        "static_tax_opponent_life_loss"
+      ],
+      "type_line": "Legendary Artifact",
+      "waiver_reason": null
+    },
+    {
+      "name": "Tyvar, Jubilant Brawler",
+      "effect": "unknown",
+      "source": "focused_template_ready",
+      "status": "focused_template_ready",
+      "owner": "battle-focused-template-contract",
+      "flags": [],
+      "decks": [
+        "Sisay, Weatherlight Captain #61 (real)"
+      ],
+      "focused_template_matches": [
+        "supports_planeswalker_static_activated_graveyard_template"
+      ],
+      "focused_template_effect_scopes": [
+        "planeswalker_static_activated_graveyard"
+      ],
+      "type_line": "Legendary Planeswalker \u2014 Tyvar",
+      "waiver_reason": null
+    }
+  ],
+  "needs_review_unknown_effect_cards": [],
+  "focused_template_cards": [
+    {
+      "name": "Hidden Strings",
+      "effect": "unknown",
+      "source": "focused_template_ready",
+      "decks": [
+        "Kinnan, Bonder Prodigy #27 (real)"
+      ],
+      "flags": [
+        "trigger_not_explicit"
+      ],
+      "focused_template_matches": [
+        "supports_tap_untap_cipher_trigger_template"
+      ],
+      "focused_template_effect_scopes": [
+        "tap_untap_cipher_trigger"
+      ],
+      "type_line": "Sorcery",
+      "oracle_sample": "You may tap or untap target permanent, then you may tap or untap another target permanent.\nCipher (Then you may exile this spell card encoded on a creature you control. Whenever th"
+    },
+    {
+      "name": "Submerge",
+      "effect": "unknown",
+      "source": "focused_template_ready",
+      "decks": [
+        "Ishai, Ojutai Dragonspeaker #80 (real)"
+      ],
+      "flags": [
+        "cast_permission_not_explicit"
+      ],
+      "focused_template_matches": [
+        "supports_alternative_cost_library_bounce_template"
+      ],
+      "focused_template_effect_scopes": [
+        "alternative_cost_library_bounce"
+      ],
+      "type_line": "Instant",
+      "oracle_sample": "If an opponent controls a Forest and you control an Island, you may cast this spell without paying its mana cost.\nPut target creature on top of its owner's library."
+    },
+    {
+      "name": "Firestorm",
+      "effect": "unknown",
+      "source": "focused_template_ready",
+      "decks": [
+        "K-9, Mark I #34 (real)"
+      ],
+      "flags": [],
+      "focused_template_matches": [
+        "supports_additional_cost_discard_multi_target_damage_template"
+      ],
+      "focused_template_effect_scopes": [
+        "additional_cost_discard_multi_target_damage"
+      ],
+      "type_line": "Instant",
+      "oracle_sample": "As an additional cost to cast this spell, discard X cards.\nFirestorm deals X damage to each of X targets."
+    },
+    {
+      "name": "God-Pharaoh's Statue",
+      "effect": "unknown",
+      "source": "focused_template_ready",
+      "decks": [
+        "Arcum Dagsson #97 (real)"
+      ],
+      "flags": [],
+      "focused_template_matches": [
+        "supports_static_tax_opponent_life_loss_template"
+      ],
+      "focused_template_effect_scopes": [
+        "static_tax_opponent_life_loss"
+      ],
+      "type_line": "Legendary Artifact",
+      "oracle_sample": "Spells your opponents cast cost {2} more to cast.\nAt the beginning of your end step, each opponent loses 1 life."
+    },
+    {
+      "name": "Tyvar, Jubilant Brawler",
+      "effect": "unknown",
+      "source": "focused_template_ready",
+      "decks": [
+        "Sisay, Weatherlight Captain #61 (real)"
+      ],
+      "flags": [],
+      "focused_template_matches": [
+        "supports_planeswalker_static_activated_graveyard_template"
+      ],
+      "focused_template_effect_scopes": [
+        "planeswalker_static_activated_graveyard"
+      ],
+      "type_line": "Legendary Planeswalker \u2014 Tyvar",
+      "oracle_sample": "You may activate abilities of creatures you control as though those creatures had haste.\n[+1]: Untap up to one target creature.\n[\u22122]: Mill three cards, then you may return a creatu"
+    }
+  ],
+  "focused_template_unknown_effect_scope_cards": [
+    {
+      "name": "Hidden Strings",
+      "effect": "unknown",
+      "focused_template_effect_scopes": [
+        "tap_untap_cipher_trigger"
+      ]
+    },
+    {
+      "name": "Submerge",
+      "effect": "unknown",
+      "focused_template_effect_scopes": [
+        "alternative_cost_library_bounce"
+      ]
+    },
+    {
+      "name": "Firestorm",
+      "effect": "unknown",
+      "focused_template_effect_scopes": [
+        "additional_cost_discard_multi_target_damage"
+      ]
+    },
+    {
+      "name": "God-Pharaoh's Statue",
+      "effect": "unknown",
+      "focused_template_effect_scopes": [
+        "static_tax_opponent_life_loss"
+      ]
+    },
+    {
+      "name": "Tyvar, Jubilant Brawler",
+      "effect": "unknown",
+      "focused_template_effect_scopes": [
+        "planeswalker_static_activated_graveyard"
+      ]
+    }
+  ]
+}

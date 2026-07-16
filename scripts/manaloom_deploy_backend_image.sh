@@ -41,6 +41,13 @@ require_tool curl
 require_tool jq
 require_tool ssh
 
+require_clean_worktree() {
+  if [[ -n "$(git status --porcelain --untracked-files=all)" ]]; then
+    echo "deploy recusado: worktree deve estar limpo para o gate e o git archive usarem o mesmo SHA" >&2
+    exit 2
+  fi
+}
+
 for key in SSH_HOST SSH_KEY EASYPANEL_BASE_URL EASYPANEL_API_TOKEN DB_HOST DB_PORT DB_NAME DB_USER DB_PASS DB_SSL_MODE DATABASE_URL; do
   if [[ -z "${!key:-}" ]]; then
     echo "variavel obrigatoria ausente: $key" >&2
@@ -75,8 +82,9 @@ trpc_post() {
 }
 
 cd "$ROOT_DIR"
-
+require_clean_worktree
 "$ROOT_DIR/scripts/manaloom_battle_product_gate.sh"
+require_clean_worktree
 
 git fetch origin master --quiet
 sha="$(git rev-parse HEAD)"

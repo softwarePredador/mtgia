@@ -7,6 +7,14 @@ import '../models/deck_analysis.dart';
 import '../models/deck_card_item.dart';
 import '../models/deck_details.dart';
 
+@visibleForTesting
+bool isDeckDiagnosticRampCard(DeckCardItem card) =>
+    _DeckDiagnosticSnapshot._isRamp(card);
+
+@visibleForTesting
+bool isDeckDiagnosticRampFloorCard(DeckCardItem card) =>
+    _DeckDiagnosticSnapshot._isRampFloor(card);
+
 class DeckDiagnosticPanel extends StatelessWidget {
   final DeckDetails deck;
   final DeckAnalysisData? analysis;
@@ -1045,9 +1053,17 @@ class _DeckDiagnosticSnapshot {
     final targets = _DeckDiagnosticTargets.fromDeck(deck);
 
     final landCards = _collectWhere(cards, (card) => _isLand(card));
-    final rampCards = _collectWhere(
+    final inclusiveRampCards = _collectWhere(
       cards,
       (card) => !_isLand(card) && _isRamp(card),
+    );
+    final rampCards = _collectWhere(
+      inclusiveRampCards,
+      (card) => _isRampFloor(card),
+    );
+    final contextualRampCards = _collectWhere(
+      inclusiveRampCards,
+      (card) => !_isRampFloor(card),
     );
     final drawCards = _collectWhere(
       cards,
@@ -1063,8 +1079,8 @@ class _DeckDiagnosticSnapshot {
     );
     final rampAnalysis = _analysisBucket(
       analysis,
-      tagKey: 'ramp',
-      compositionKey: 'ramp',
+      tagKey: 'ramp_floor',
+      compositionKey: 'ramp_floor',
     );
     final drawAnalysis = _analysisBucket(
       analysis,
@@ -1083,6 +1099,7 @@ class _DeckDiagnosticSnapshot {
     );
     final landCount = _sumQuantities(landCards);
     final rampCount = rampAnalysis?.count ?? _sumQuantities(rampCards);
+    final contextualRampCount = _sumQuantities(contextualRampCards);
     final drawCount = drawAnalysis?.count ?? _sumQuantities(drawCards);
     final interactionCount =
         interactionAnalysis?.count ?? _sumQuantities(interactionCards);
@@ -1115,9 +1132,10 @@ class _DeckDiagnosticSnapshot {
         rampAnalysis,
         rampCards,
         cards,
-        tagKey: 'ramp',
+        tagKey: 'ramp_floor',
       ),
-      description: 'Pedras, redução de custo e efeitos que aceleram seu jogo.',
+      description:
+          'Fontes estáveis: rocks, dorks e efeitos que desenvolvem terrenos.',
     );
     final drawEvidence = _DiagnosticEvidence(
       label: 'Compra',
@@ -1267,6 +1285,7 @@ class _DeckDiagnosticSnapshot {
       cards: cards,
       landCount: landCount,
       rampCount: rampCount,
+      contextualRampCount: contextualRampCount,
       drawCount: drawCount,
       interactionCount: interactionCount,
       wipeCount: wipeCount,
@@ -1292,6 +1311,7 @@ class _DeckDiagnosticSnapshot {
     required List<DeckCardItem> cards,
     required int landCount,
     required int rampCount,
+    required int contextualRampCount,
     required int drawCount,
     required int interactionCount,
     required int wipeCount,
@@ -1354,6 +1374,20 @@ class _DeckDiagnosticSnapshot {
             text: 'Ramp curto; o deck tende a acelerar menos do que o ideal.',
             icon: Icons.bolt_rounded,
             tone: _DiagnosticTone.warn,
+          ),
+        ),
+      );
+    }
+
+    if (contextualRampCount > 0) {
+      insights.add(
+        _PrioritizedInsight(
+          priority: 3,
+          insight: _DiagnosticInsight(
+            text:
+                '$contextualRampCount acelerações contextuais complementam o deck, mas não substituem fontes estáveis de mana.',
+            icon: Icons.bolt_outlined,
+            tone: _DiagnosticTone.neutral,
           ),
         ),
       );
@@ -1556,6 +1590,7 @@ class _DeckDiagnosticSnapshot {
   static String _friendlyEvidenceReasonForKey(String key) {
     switch (key) {
       case 'ramp':
+      case 'ramp_floor':
         return _friendlyEvidenceReason('Ramp');
       case 'draw':
         return _friendlyEvidenceReason('Compra');
@@ -1568,29 +1603,353 @@ class _DeckDiagnosticSnapshot {
     }
   }
 
-  static bool _isLand(DeckCardItem card) =>
-      card.typeLine.toLowerCase().contains('land');
+  static bool _isLand(DeckCardItem card) {
+    final cardTypes =
+        card.typeLine.toLowerCase().split(RegExp(r'\s+[—–-]\s+')).first;
+    return RegExp(r'(?:^|\s)land(?:$|\s)').hasMatch(cardTypes);
+  }
 
   static bool _isRamp(DeckCardItem card) {
-    final type = card.typeLine.toLowerCase();
-    final text = (card.oracleText ?? '').toLowerCase();
-    final manaCost = ManaHelper.calculateCMC(card.manaCost);
+    if (_isLand(card)) return false;
+    final name = card.name.trim().toLowerCase();
+    final withoutReminder =
+        _oracleWithoutReminderText(card.oracleText ?? '').toLowerCase();
+    final direct = _oracleDirectEffectText(withoutReminder);
 
     final createsMana =
-        text.contains('add {') ||
-        text.contains('add one mana of any color') ||
-        text.contains('create a treasure token') ||
-        text.contains('create a tapped treasure token');
+        direct.contains('add {') ||
+        RegExp(
+          r'\badds?\b[^.\n]{0,96}\bmana of any(?:\s+one)?\b',
+        ).hasMatch(direct) ||
+        RegExp(
+          r'\badds?\b[^.\n]{0,96}\b(?:one|two|three|four|five|six|seven|eight|nine|ten|x|that much|an amount of)\s+mana\b',
+        ).hasMatch(direct) ||
+        _hasControlledGrantedManaAbility(withoutReminder) ||
+        _hasBeneficialTreasureProduction(withoutReminder) ||
+        _hasBeneficialKnownManaTokenProduction(withoutReminder);
     final fetchesLand =
-        text.contains('search your library for a basic land') ||
-        text.contains('search your library for up to two basic land cards') ||
-        (text.contains('search your library') && text.contains('land card'));
+        withoutReminder.contains('search your library') &&
+        RegExp(
+          r'\b(?:land card|basic land|forest card|plains card|island card|swamp card|mountain card)\b',
+        ).hasMatch(withoutReminder) &&
+        _landSearchPutsLandOntoBattlefield(withoutReminder);
+    final costReduction =
+        withoutReminder.contains('spells you cast cost') &&
+            withoutReminder.contains('less to cast') ||
+        RegExp(
+          r'\bspells you cast\b[^.\n]{0,64}\bcost\b[^.\n]{0,32}\bless to cast\b',
+        ).hasMatch(withoutReminder);
+    final alternateAcceleration =
+        withoutReminder.contains('additional land this turn') ||
+        withoutReminder.contains('additional land on each of your turns') ||
+        withoutReminder.contains(
+          'put a land card from your hand onto the battlefield',
+        ) ||
+        withoutReminder.contains('untap up to') &&
+            withoutReminder.contains('lands') ||
+        withoutReminder.contains('spells you cast have convoke') ||
+        RegExp(r'\bfirebending\s+(?:\d+|x)\b').hasMatch(withoutReminder) ||
+        withoutReminder.contains('create a birds of paradise token') ||
+        withoutReminder.contains('has all activated abilities of all lands') ||
+        withoutReminder.contains('taps an island for mana') &&
+            withoutReminder.contains('adds an additional') ||
+        withoutReminder.contains('put up to') &&
+            withoutReminder.contains('land cards') ||
+        withoutReminder.contains('mana counter') &&
+            RegExp(
+              r'\b(?:can|may) spend mana of any color\b[^.\n]{0,48}'
+              r'\bequal to the number of mana counters\b',
+            ).hasMatch(withoutReminder);
 
-    return createsMana &&
-            (type.contains('artifact') ||
-                type.contains('creature') ||
-                manaCost <= 3) ||
-        fetchesLand;
+    return createsMana ||
+        fetchesLand ||
+        costReduction ||
+        alternateAcceleration ||
+        name.contains('signet') ||
+        name.contains('talisman') ||
+        name == 'sol ring';
+  }
+
+  static bool _isRampFloor(DeckCardItem card) {
+    if (_isLand(card)) return false;
+    final typeLine = card.typeLine.toLowerCase();
+    final withoutReminder =
+        _oracleWithoutReminderText(card.oracleText ?? '').toLowerCase();
+    final direct = _oracleDirectEffectText(withoutReminder);
+
+    if (_putsOwnedLandOntoBattlefield(withoutReminder) ||
+        _allowsAdditionalLandPlay(withoutReminder)) {
+      return true;
+    }
+
+    final reusableType =
+        typeLine.contains('artifact') || typeLine.contains('creature');
+    if (!reusableType) return false;
+
+    for (final line in direct.split(RegExp(r'[\r\n]+'))) {
+      final colon = line.indexOf(':');
+      if (colon < 0) continue;
+      final effect = line.substring(colon + 1);
+      if (!_directlyProducesMana(effect)) continue;
+      final cost = line.substring(0, colon);
+      if (RegExp(
+        r'\b(?:sacrifice|exile) (?:this|~|[a-z][a-z0-9\x27 -]{0,80})\b',
+      ).hasMatch(cost)) {
+        continue;
+      }
+      return true;
+    }
+    return false;
+  }
+
+  static bool _directlyProducesMana(String text) {
+    return text.contains('add {') ||
+        RegExp(
+          r'\badds?\b[^.\n;]{0,96}\bmana of any(?:\s+one)?\b',
+        ).hasMatch(text) ||
+        RegExp(
+          r'\badds?\b[^.\n;]{0,96}'
+          r'\b(?:one|two|three|four|five|six|seven|eight|nine|ten|x|'
+          r'that much|an amount of)\s+mana\b',
+        ).hasMatch(text);
+  }
+
+  static bool _putsOwnedLandOntoBattlefield(String text) {
+    if (_landSearchPutsLandOntoBattlefield(text)) return true;
+    return RegExp(
+          r'\bput\b[^.\n;]{0,96}\bland cards?\b[^.\n;]{0,96}'
+          r'\bfrom your hand onto the battlefield\b',
+        ).hasMatch(text) ||
+        RegExp(
+          r'\bput (?:up to |one |two |three |x )?[^.\n;]{0,48}'
+          r'\bland cards?\b[^.\n;]{0,96}\bonto the battlefield\b',
+        ).hasMatch(text);
+  }
+
+  static bool _allowsAdditionalLandPlay(String text) {
+    return RegExp(
+          r'\byou may play (?:an?|one|two|three) additional lands?\b',
+        ).hasMatch(text) ||
+        RegExp(
+          r'\byou can play (?:an?|one|two|three) additional lands?\b',
+        ).hasMatch(text) ||
+        text.contains('additional land this turn') ||
+        text.contains('additional land on each of your turns');
+  }
+
+  static String _oracleWithoutReminderText(String value) {
+    final output = StringBuffer();
+    var depth = 0;
+    for (var index = 0; index < value.length; index++) {
+      final char = value[index];
+      if (char == '(') {
+        depth++;
+      } else if (char == ')') {
+        if (depth > 0) depth--;
+      } else if (depth == 0) {
+        output.write(char);
+      }
+    }
+    return output.toString();
+  }
+
+  static String _oracleDirectEffectText(String value) {
+    final output = StringBuffer();
+    var asciiQuote = false;
+    var curlyQuote = false;
+    for (var index = 0; index < value.length; index++) {
+      final char = value[index];
+      if (char == '"') {
+        asciiQuote = !asciiQuote;
+        output.write(' ');
+      } else if (char == '“') {
+        curlyQuote = true;
+        output.write(' ');
+      } else if (char == '”') {
+        curlyQuote = false;
+        output.write(' ');
+      } else if (!asciiQuote && !curlyQuote) {
+        output.write(char);
+      } else {
+        output.write(char == '\n' ? '\n' : ' ');
+      }
+    }
+    return output.toString();
+  }
+
+  static bool _hasBeneficialTreasureProduction(String text) {
+    final direct = _oracleDirectEffectText(text);
+    if (_hasPositiveTreasureAction(direct)) return true;
+    for (final match in RegExp(r'"([^"\n]*)"|“([^”\n]*)”').allMatches(text)) {
+      final quoted = match.group(1) ?? match.group(2) ?? '';
+      if (!_hasPositiveTreasureAction(quoted)) continue;
+      final prefix = text.substring(
+        (match.start - 360).clamp(0, match.start),
+        match.start,
+      );
+      if (_hasControllerOwnedGrantedContext(prefix)) return true;
+    }
+    return false;
+  }
+
+  static bool _hasBeneficialKnownManaTokenProduction(String text) {
+    final direct = _oracleDirectEffectText(text);
+    var normalized = direct.replaceAll(
+      RegExp(
+        r'\b(?:powerstone|gold|lander|banana|vibranium|mutavault)\b'
+        r'(?=\s+tokens?\b)|'
+        r'\beldrazi\s+(?:scion|spawn)\b(?=(?:\s+creature)?\s+tokens?\b)|'
+        r'\b(?:lotus|tulip)\s+petal\b(?=\s+tokens?\b)|'
+        r'\bhuntsman\s+role\b(?=\s+tokens?\b)',
+      ),
+      'treasure',
+    );
+    normalized = normalized.replaceAllMapped(
+      RegExp(
+        r'\b(named|name)\s+(?:mana\s+confluence|mutavault|banana|'
+        r'powerstone|gold|lander)\b',
+      ),
+      (match) => '${match.group(1)} treasure',
+    );
+    return _hasPositiveTreasureAction(normalized);
+  }
+
+  static bool _hasPositiveTreasureAction(String text) {
+    return RegExp(
+          r'\b(?:you|we|your team)\s+(?:(?:may|also|instead)\s+)*creates?\b'
+          r'[^.\n;]{0,120}\btreasure\b[^.\n;]{0,32}\btokens?\b',
+        ).hasMatch(text) ||
+        RegExp(
+          r'\byou\s+and\b[^.\n;]{0,96}\beach\s+create\b'
+          r'[^.\n;]{0,120}\btreasure\b[^.\n;]{0,32}\btokens?\b',
+        ).hasMatch(text) ||
+        RegExp(
+          r'\b(?:each player|all players|each team|that player|target player)\s+'
+          r'(?:(?:may|also|instead)\s+)*creates?\b[^.\n;]{0,120}'
+          r'\btreasure\b[^.\n;]{0,32}\btokens?\b',
+        ).hasMatch(text) ||
+        RegExp(
+          r'\b(?:when|whenever)\s+a player\b[^.\n;]{0,160}'
+          r'\bthey\s+create\b[^.\n;]{0,120}'
+          r'\btreasure\b[^.\n;]{0,32}\btokens?\b',
+        ).hasMatch(text) ||
+        RegExp(
+          r'\btarget player\b[^.\n;]{0,120}\bthey\s+create\b'
+          r'[^.\n;]{0,120}\btreasure\b[^.\n;]{0,32}\btokens?\b',
+        ).hasMatch(text) ||
+        RegExp(
+          r'\bchoose\s+(?:(?:a|the)\s+)?(?:first|second|third|another)?\s*player\b'
+          r'[^.\n;]{0,120}\bto\s+create\b[^.\n;]{0,120}'
+          r'\btreasure\b[^.\n;]{0,32}\btokens?\b',
+        ).hasMatch(text) ||
+        RegExp(
+          r'(?:^|[\n.;:•—|]|,\s*|\bthen\s+|\band\s+)\s*'
+          r'(?:(?:if you do|when you do),\s*)?'
+          r'(?:(?:you may|may|also|instead)\s+)*create\b'
+          r'[^.\n;]{0,120}\btreasure\b[^.\n;]{0,32}\btokens?\b',
+          multiLine: true,
+        ).hasMatch(text);
+  }
+
+  static bool _hasControlledGrantedManaAbility(String text) {
+    if (RegExp(
+      r'\ball lands have\s*["“][\s\S]{0,180}\badd\b[\s\S]{0,180}["”]'
+      r'\s*and lose all other abilities\b',
+    ).hasMatch(text)) {
+      return false;
+    }
+    for (final match in RegExp(r'"([^"\n]*)"|“([^”\n]*)”').allMatches(text)) {
+      final quoted = match.group(1) ?? match.group(2) ?? '';
+      final producesMana =
+          quoted.contains('add {') ||
+          RegExp(
+            r'\badds?\b[^.\n]{0,96}\bmana of any(?:\s+one)?\b',
+          ).hasMatch(quoted);
+      if (!producesMana) continue;
+      final prefix = text.substring(
+        (match.start - 360).clamp(0, match.start),
+        match.start,
+      );
+      if (_hasTargetLandGrantedManaContext(prefix) &&
+          !_hasNetPositiveGrantedManaAbility(quoted)) {
+        continue;
+      }
+      if (_hasControllerOwnedGrantedContext(prefix)) return true;
+    }
+    return false;
+  }
+
+  static bool _hasControllerOwnedGrantedContext(String rawPrefix) {
+    final prefix = rawPrefix.replaceAll(RegExp(r'\s+'), ' ').trim();
+    if (RegExp(
+      r'\b(?:becomes?|become|is|are)\b[^.]{0,72}\btreasure\s+artifacts?\s+with\s*$',
+    ).hasMatch(prefix)) {
+      return false;
+    }
+    if (RegExp(
+      r'\bopponent(?:s)?(?:\s+controls?)?\b[^.]{0,96}\b(?:has|have|gains?|with)\s*$',
+    ).hasMatch(prefix)) {
+      return false;
+    }
+    return RegExp(
+          r'\b(?:creatures?|artifacts?|lands?|permanents?|treasures?|tokens?)\b'
+          r'[^.]{0,96}\byou\s+(?:control|own)\b[^.]{0,96}'
+          r'\b(?:has|have|gains?|with)\s*$',
+        ).hasMatch(prefix) ||
+        RegExp(
+          r'(?:^|[.\n—:])\s*all\s+(?!other\b)[a-z][a-z0-9\x27 -]{0,64}\b'
+          r'[^.]{0,64}\b(?:has|have|gains?)\b[^.]{0,96}$',
+        ).hasMatch(prefix) ||
+        RegExp(
+          r'\b(?:equipped|enchanted)\s+(?:creature|land|permanent)\b'
+          r'[^.]{0,96}\b(?:has|gains?)\b[^.]{0,48}$',
+        ).hasMatch(prefix) ||
+        RegExp(
+          r'\btarget\s+(?:creature|artifact|land|permanent)\b'
+          r'[^.]{0,120}\b(?:has|gains?)\b[^.]{0,48}$',
+        ).hasMatch(prefix) ||
+        RegExp(
+          r'\bgain control of target\b[^.]{0,160}\bit gains?\b[^.]{0,48}$',
+        ).hasMatch(prefix) ||
+        RegExp(
+          r'\bcards? in your hand\b[^.]{0,160}\b(?:gain|gains)\b[^.]{0,48}$',
+        ).hasMatch(prefix) ||
+        RegExp(
+          r'\bcreate\b[^.]{0,180}\btokens?\b[^.]{0,64}\bwith\s*$',
+        ).hasMatch(prefix) ||
+        RegExp(
+          r'\bthose tokens\b[^.]{0,64}\b(?:has|have|gains?)\b[^.]{0,48}$',
+        ).hasMatch(prefix);
+  }
+
+  static bool _hasTargetLandGrantedManaContext(String rawPrefix) {
+    final prefix = rawPrefix.replaceAll(RegExp(r'\s+'), ' ').trim();
+    return RegExp(
+      r'\btarget\s+land\b[^.]{0,120}\b(?:has|gains?)\b[^.]{0,48}$',
+    ).hasMatch(prefix);
+  }
+
+  static bool _hasNetPositiveGrantedManaAbility(String quotedAbility) {
+    final ability = quotedAbility.toLowerCase();
+    final addIndex = ability.indexOf('add ');
+    if (addIndex < 0) return false;
+    final production = ability.substring(addIndex + 4);
+    if (RegExp(
+      r'\b(?:two|three|four|five|six|seven|eight|nine|ten|x|that much|an amount of)\s+mana\b',
+    ).hasMatch(production)) {
+      return true;
+    }
+    if (production.contains(' or ')) return false;
+    return RegExp(r'\{[^}]+\}\s*\{[^}]+\}').hasMatch(production);
+  }
+
+  static bool _landSearchPutsLandOntoBattlefield(String text) {
+    final searchIndex = text.indexOf('search your library');
+    if (searchIndex < 0) return false;
+    final battlefieldIndex = text.indexOf('onto the battlefield', searchIndex);
+    if (battlefieldIndex < 0) return false;
+    final nextParagraph = text.indexOf('\n', searchIndex);
+    return nextParagraph < 0 || battlefieldIndex < nextParagraph;
   }
 
   static bool _isDraw(DeckCardItem card) {

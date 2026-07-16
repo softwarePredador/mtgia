@@ -3,6 +3,7 @@ import 'package:dart_frog/dart_frog.dart';
 import 'package:postgres/postgres.dart';
 
 import '../../../../lib/auth_service.dart';
+import '../../../../lib/basic_land_utils.dart' as land_utils;
 import '../../../../lib/logger.dart';
 import '../../../../lib/observability.dart';
 import '../../../../lib/scryfall_image_url.dart';
@@ -97,7 +98,7 @@ Future<Response> _getPublicDeck(RequestContext context, String deckId) async {
 
     String getMainType(String typeLine) {
       final t = typeLine.toLowerCase();
-      if (t.contains('land')) return 'Land';
+      if (land_utils.isLandTypeLine(typeLine)) return 'Land';
       if (t.contains('creature')) return 'Creature';
       if (t.contains('planeswalker')) return 'Planeswalker';
       if (t.contains('artifact')) return 'Artifact';
@@ -145,9 +146,9 @@ Future<Response> _getPublicDeck(RequestContext context, String deckId) async {
       }
 
       final cost = card['mana_cost'] as String?;
-      final typeLine = (card['type_line'] as String? ?? '').toLowerCase();
+      final typeLine = card['type_line'] as String? ?? '';
 
-      if (!typeLine.contains('land')) {
+      if (!land_utils.isLandTypeLine(typeLine)) {
         final cmc = calculateCmc(cost);
         final cmcKey = cmc >= 7 ? '7+' : cmc.toString();
         manaCurve[cmcKey] =

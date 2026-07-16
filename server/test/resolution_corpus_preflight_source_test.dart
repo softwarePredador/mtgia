@@ -96,7 +96,15 @@ void main() {
         source,
         contains(r'"$ROOT_DIR/server/bin/with_new_server_pg.sh" env'),
       );
-      expect(source, contains('for required_tool in script lsof'));
+      expect(
+        source,
+        contains('for required_tool in dart_frog lsof perl pgrep'),
+      );
+      expect(source, contains('dart_frog build'));
+      expect(source, contains('dart run build/bin/server.dart'));
+      expect(source, contains('SERVER_BUILD_LOG='));
+      expect(source, isNot(contains('dart_frog dev')));
+      expect(source, isNot(contains('--dart-vm-service-port')));
       expect(source, contains('payload.get("status") != "ready"'));
       expect(source, contains('payload.get("service") != "mtgia-server"'));
       expect(source, contains('VALIDATION_SUMMARY_JSON_ABS='));
@@ -358,8 +366,52 @@ void main() {
 
         expect(evidence.directApplyAccepted, isFalse);
         expect(evidence.rejectionReasons, contains('${flag}_not_bool'));
+        expect(evidence.responseFlagsWellTyped, isFalse);
       });
     }
+
+    test('rejects malformed mock marker independently of HTTP status', () {
+      final evidence = resolution_runner.assessOptimizeOutcomeEvidence(
+        httpStatus: HttpStatus.unprocessableEntity,
+        responseBody: const {
+          'outcome_code': 'no_safe_upgrade_found',
+          'is_mock': 'true',
+          'quality_error': {'code': 'OPTIMIZE_QUALITY_REJECTED'},
+          'deck_state': {'status': 'healthy'},
+        },
+      );
+
+      expect(evidence.isMock, isNull);
+      expect(evidence.responseFlagsWellTyped, isFalse);
+      expect(evidence.rejectionReasons, contains('is_mock_not_bool'));
+    });
+
+    test('rejects HTTP 200 with non-success outcome or quality error', () {
+      final failedOutcome =
+          actionableResponse()..['outcome_code'] = 'execution_failed';
+      final failedEvidence = resolution_runner.assessOptimizeOutcomeEvidence(
+        httpStatus: HttpStatus.ok,
+        responseBody: failedOutcome,
+      );
+      expect(failedEvidence.directApplyAccepted, isFalse);
+      expect(
+        failedEvidence.rejectionReasons,
+        contains('unexpected_success_outcome'),
+      );
+
+      final qualityError =
+          actionableResponse()
+            ..['quality_error'] = const {'code': 'OPTIMIZE_QUALITY_REJECTED'};
+      final qualityEvidence = resolution_runner.assessOptimizeOutcomeEvidence(
+        httpStatus: HttpStatus.ok,
+        responseBody: qualityError,
+      );
+      expect(qualityEvidence.directApplyAccepted, isFalse);
+      expect(
+        qualityEvidence.rejectionReasons,
+        contains('quality_error_present'),
+      );
+    });
 
     test('rejects mock and explicitly non-actionable HTTP 200 response', () {
       final evidence = resolution_runner.assessOptimizeOutcomeEvidence(
@@ -652,62 +704,61 @@ void main() {
       expect(runSource, contains("runtimeOrigin != 'unknown'"));
     });
 
-    test(
-      'runtime origin is explicit and does not invent provider evidence',
-      () {
-        final providerCall = resolution_runner.ProviderCallEvidence(
-          id: 'log-1',
-          endpoint: 'optimize',
-          model: 'gpt-test',
-          success: true,
-          inputTokens: 10,
-          outputTokens: 5,
-          latencyMs: 20,
-          createdAt: DateTime.utc(2026, 7, 15),
-        );
+    test('runtime origin is explicit and does not invent provider evidence', () {
+      final providerCall = resolution_runner.ProviderCallEvidence(
+        id: 'log-1',
+        endpoint: 'optimize',
+        model: 'gpt-test',
+        success: true,
+        inputTokens: 10,
+        outputTokens: 5,
+        latencyMs: 20,
+        createdAt: DateTime.utc(2026, 7, 15),
+      );
 
-        expect(
-          resolution_runner.classifyResolutionRuntimeOrigin(
-            strategySource: 'ai_primary',
-            cacheHit: false,
-            providerCalls: [providerCall],
-          ),
-          'provider',
-        );
-        expect(
-          resolution_runner.classifyResolutionRuntimeOrigin(
-            strategySource: 'deterministic_first',
-            cacheHit: false,
-            providerCalls: const [],
-          ),
-          'deterministic',
-        );
-        expect(
-          resolution_runner.classifyResolutionRuntimeOrigin(
-            strategySource: 'state_gate',
-            cacheHit: false,
-            providerCalls: const [],
-          ),
-          'state_gate',
-        );
-        expect(
-          resolution_runner.classifyResolutionRuntimeOrigin(
-            strategySource: 'ai_primary',
-            cacheHit: true,
-            providerCalls: [providerCall],
-          ),
-          'cache',
-        );
-        expect(
-          resolution_runner.classifyResolutionRuntimeOrigin(
-            strategySource: 'ai_primary',
-            cacheHit: false,
-            providerCalls: const [],
-          ),
-          'unknown',
-        );
-      },
-    );
+      expect(
+        resolution_runner.classifyResolutionRuntimeOrigin(
+          strategySource: 'ai_primary',
+          cacheHit: false,
+          providerCalls: [providerCall],
+        ),
+        'provider',
+      );
+      expect(
+        resolution_runner.classifyResolutionRuntimeOrigin(
+          strategySource: 'deterministic_first',
+          cacheHit: false,
+          providerCalls: [providerCall],
+        ),
+        'deterministic',
+        reason:
+            'provider critic telemetry must not overwrite the proposal strategy source',
+      );
+      expect(
+        resolution_runner.classifyResolutionRuntimeOrigin(
+          strategySource: 'state_gate',
+          cacheHit: false,
+          providerCalls: const [],
+        ),
+        'state_gate',
+      );
+      expect(
+        resolution_runner.classifyResolutionRuntimeOrigin(
+          strategySource: 'ai_primary',
+          cacheHit: true,
+          providerCalls: [providerCall],
+        ),
+        'cache',
+      );
+      expect(
+        resolution_runner.classifyResolutionRuntimeOrigin(
+          strategySource: 'ai_primary',
+          cacheHit: false,
+          providerCalls: const [],
+        ),
+        'unknown',
+      );
+    });
 
     test(
       'safe no-change accepts quality rejections, not execution failures',

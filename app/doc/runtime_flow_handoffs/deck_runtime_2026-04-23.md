@@ -138,7 +138,7 @@ Smallest next action: add one integration test on `macos` or `chrome` that logs 
 Shortest backend reproduction:
 
 1. Start local backend on `:8081`.
-2. Run `server/bin/mana_loom_deck_runtime_e2e.dart --dry-run` first, then use `--apply` against `TEST_API_BASE_URL=http://127.0.0.1:8081` only when real backend writes are intended.
+2. Run `server/bin/mana_loom_deck_runtime_e2e.dart --dry-run` first, then use `MANALOOM_CONFIRM_LIVE_MUTATIONS=I_HAVE_EXPLICIT_APPROVAL TEST_API_BASE_URL=http://127.0.0.1:8081 dart run bin/mana_loom_deck_runtime_e2e.dart --apply` only when real backend writes are intended and explicitly authorized.
 3. Inspect `Kozilek`, `Sword Coast Sailor + Wilson`, and any mana-alert commanders in the fresh summary artifact.
 
 Shortest app reproduction:

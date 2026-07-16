@@ -147,8 +147,7 @@ def all_oracle_payoff_rows(conn: sqlite3.Connection, *, add_role: str) -> list[d
             SELECT name, normalized_name, mana_cost, colors_json, color_identity_json,
                    type_line, oracle_text, cmc, scryfall_id, card_id
             FROM card_oracle_cache
-            WHERE lower(type_line) NOT LIKE '%land%'
-              AND (
+            WHERE (
                 lower(oracle_text) LIKE '%copy target instant%'
                 OR lower(oracle_text) LIKE '%copy target sorcery%'
                 OR lower(oracle_text) LIKE '%copy that spell%'
@@ -163,7 +162,11 @@ def all_oracle_payoff_rows(conn: sqlite3.Connection, *, add_role: str) -> list[d
             ORDER BY name
             """
         ).fetchall()
-        return [dict(row) for row in rows]
+        return [
+            dict(row)
+            for row in rows
+            if not land_pool.is_land_type_line(row["type_line"])
+        ]
     rows = conn.execute(
         """
         SELECT name, normalized_name, mana_cost, colors_json, color_identity_json,

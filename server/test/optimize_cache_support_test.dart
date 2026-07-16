@@ -37,7 +37,7 @@ void main() {
         intensity: 'aggressive',
       );
 
-      expect(focused, startsWith('v8:'));
+      expect(focused, startsWith('v9:'));
       expect(focused, equals(focusedAgain));
       expect(aggressive, isNot(equals(focused)));
     });

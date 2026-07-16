@@ -30,6 +30,7 @@ from typing import Any
 from urllib.parse import urlparse
 
 from known_cards_fallback_snapshot import load_layered_known_cards
+from battle_target_deck_identity_guard import compute_snapshot_hashes
 
 try:
     from db_helper import connect, sanitized_database_target
@@ -286,6 +287,194 @@ def table_exists(cur: sqlite3.Cursor, table: str) -> bool:
     return row is not None
 
 
+def _replace_note_token(notes: str, key: str, value: str) -> str:
+    token = f"{key}={value}"
+    pattern = re.compile(rf"(?:^|\s){re.escape(key)}=\S+")
+    if pattern.search(notes):
+        return pattern.sub(lambda match: (" " if match.group(0).startswith(" ") else "") + token, notes)
+    return f"{notes.strip()} {token}".strip()
+
+
+def refresh_deck_snapshot_hashes(
+    cur: sqlite3.Cursor,
+    *,
+    dry_run: bool,
+    allowed_rehash_deck_ids: set[int],
+) -> dict[str, Any]:
+    """Rehash only snapshots whose card ids this sync actually changed."""
+    allowed_rehash_deck_ids = {int(value) for value in allowed_rehash_deck_ids}
+    columns = column_names(cur, "deck_cards")
+    required = {
+        "deck_id",
+        "card_id",
+        "card_name",
+        "quantity",
+        "is_commander",
+        "functional_tags_json",
+        "semantic_tags_v2_json",
+        "battle_rules_json",
+        "deck_hash",
+        "semantics_hash",
+        "ruleset_hash",
+        "sync_run_id",
+    }
+    if not required.issubset(columns):
+        return {
+            "snapshot_hash_columns_present": False,
+            "snapshot_decks_checked": 0,
+            "snapshot_decks_drifted": 0,
+            "snapshot_decks_rehashed": 0,
+            "snapshot_rows_rehashed": 0,
+            "snapshot_decks_authorized_for_rehash": 0,
+            "snapshot_decks_unexplained_drift": 0,
+        }
+
+    has_snapshot_provenance = table_exists(cur, "decks") and {
+        "id",
+        "notes",
+    }.issubset(column_names(cur, "decks"))
+    if not has_snapshot_provenance:
+        return {
+            "snapshot_hash_columns_present": True,
+            "snapshot_decks_checked": 0,
+            "snapshot_decks_drifted": 0,
+            "snapshot_decks_rehashed": 0,
+            "snapshot_rows_rehashed": 0,
+            "snapshot_decks_authorized_for_rehash": 0,
+            "snapshot_decks_unexplained_drift": 0,
+        }
+
+    # Other Hermes variant producers also use these generic hash columns, but
+    # with their own algorithms. Only target snapshots carrying this explicit
+    # provenance are governed by compute_snapshot_hashes().
+    deck_ids = [
+        int(row[0])
+        for row in cur.execute(
+            """
+            SELECT DISTINCT dc.deck_id
+            FROM deck_cards dc
+            JOIN decks d ON d.id = dc.deck_id
+            WHERE d.notes LIKE '%sync_pg_target_deck_to_hermes.py%'
+              AND d.notes LIKE '%deck_hash=%'
+              AND d.notes LIKE '%semantics_hash=%'
+              AND d.notes LIKE '%ruleset_hash=%'
+              AND (
+                COALESCE(dc.deck_hash, '') != ''
+                OR COALESCE(dc.semantics_hash, '') != ''
+                OR COALESCE(dc.ruleset_hash, '') != ''
+              )
+            ORDER BY dc.deck_id
+            """
+        )
+    ]
+    drifted_snapshots: list[tuple[int, list[Any], tuple[str, str, str]]] = []
+    for deck_id in deck_ids:
+        raw_rows = cur.execute(
+            """
+            SELECT card_id, card_name, quantity, is_commander,
+                   functional_tags_json, semantic_tags_v2_json,
+                   battle_rules_json, deck_hash, semantics_hash,
+                   ruleset_hash, sync_run_id
+            FROM deck_cards
+            WHERE deck_id=?
+            """,
+            (deck_id,),
+        ).fetchall()
+        selected_columns = (
+            "card_id",
+            "card_name",
+            "quantity",
+            "is_commander",
+            "functional_tags_json",
+            "semantic_tags_v2_json",
+            "battle_rules_json",
+            "deck_hash",
+            "semantics_hash",
+            "ruleset_hash",
+            "sync_run_id",
+        )
+        rows = [
+            row
+            if isinstance(row, sqlite3.Row)
+            else dict(zip(selected_columns, row, strict=True))
+            for row in raw_rows
+        ]
+        if not rows:
+            continue
+        hashes = compute_snapshot_hashes(rows)
+        deck_hash, semantics_hash, ruleset_hash = hashes
+        stored_deck = {str(row["deck_hash"] or "") for row in rows}
+        stored_semantics = {str(row["semantics_hash"] or "") for row in rows}
+        stored_ruleset = {str(row["ruleset_hash"] or "") for row in rows}
+        if (
+            stored_deck != {deck_hash}
+            or stored_semantics != {semantics_hash}
+            or stored_ruleset != {ruleset_hash}
+        ):
+            drifted_snapshots.append((deck_id, rows, hashes))
+
+    unexplained_drift = sorted(
+        deck_id
+        for deck_id, _rows, _hashes in drifted_snapshots
+        if deck_id not in allowed_rehash_deck_ids
+    )
+    if unexplained_drift:
+        raise RuntimeError(
+            "snapshot_hash_drift_outside_metadata_change:"
+            + ",".join(str(deck_id) for deck_id in unexplained_drift)
+        )
+
+    rehashed = 0
+    rows_rehashed = 0
+    for deck_id, rows, hashes in drifted_snapshots:
+        if dry_run:
+            continue
+        deck_hash, semantics_hash, ruleset_hash = hashes
+        sync_run_id = datetime.now(timezone.utc).strftime(
+            "metadata_%Y%m%dT%H%M%S%fZ"
+        )
+        cur.execute(
+            """
+            UPDATE deck_cards
+            SET deck_hash=?, semantics_hash=?, ruleset_hash=?, sync_run_id=?
+            WHERE deck_id=?
+            """,
+            (deck_hash, semantics_hash, ruleset_hash, sync_run_id, deck_id),
+        )
+        rehashed += 1
+        rows_rehashed += int(cur.rowcount or 0)
+        if table_exists(cur, "decks") and {"id", "notes"}.issubset(
+            column_names(cur, "decks")
+        ):
+            deck_row = cur.execute(
+                "SELECT notes FROM decks WHERE id=?", (deck_id,)
+            ).fetchone()
+            if deck_row is not None:
+                notes = str(deck_row[0] or "")
+                for key, value in (
+                    ("deck_hash", deck_hash),
+                    ("semantics_hash", semantics_hash),
+                    ("ruleset_hash", ruleset_hash),
+                    ("sync_run_id", sync_run_id),
+                ):
+                    notes = _replace_note_token(notes, key, value)
+                cur.execute(
+                    "UPDATE decks SET notes=? WHERE id=?", (notes, deck_id)
+                )
+
+    return {
+        "snapshot_hash_columns_present": True,
+        "snapshot_decks_checked": len(deck_ids),
+        "snapshot_decks_drifted": len(drifted_snapshots),
+        "snapshot_decks_rehashed": rehashed,
+        "snapshot_rows_rehashed": rows_rehashed,
+        "snapshot_decks_authorized_for_rehash": len(
+            allowed_rehash_deck_ids.intersection(deck_ids)
+        ),
+        "snapshot_decks_unexplained_drift": 0,
+    }
+
+
 def backfill_deck_cards_from_cache(
     cur: sqlite3.Cursor,
     *,
@@ -308,6 +497,13 @@ def backfill_deck_cards_from_cache(
             "cmc_rows_to_update": 0,
             "cmc_rows_updated": 0,
             "suspicious_nonland_zero_cmc_after": 0,
+            "snapshot_hash_columns_present": False,
+            "snapshot_decks_checked": 0,
+            "snapshot_decks_drifted": 0,
+            "snapshot_decks_rehashed": 0,
+            "snapshot_rows_rehashed": 0,
+            "snapshot_decks_authorized_for_rehash": 0,
+            "snapshot_decks_unexplained_drift": 0,
         }
 
     ensure_deck_cards_metadata_columns(cur)
@@ -341,6 +537,29 @@ def backfill_deck_cards_from_cache(
         ).fetchone()[0]
         if has_card_id_column and "card_id" in column_names(cur, "deck_cards")
         else 0
+    )
+    card_id_deck_ids_to_update = (
+        {
+            int(row[0])
+            for row in cur.execute(
+                """
+                SELECT DISTINCT dc.deck_id
+                FROM deck_cards dc
+                JOIN card_oracle_cache coc
+                  ON coc.normalized_name = lower(trim(dc.card_name))
+                WHERE COALESCE(coc.card_id, '') != ''
+                  AND (
+                    dc.card_id IS NULL
+                    OR dc.card_id = ''
+                    OR lower(dc.card_id) != lower(coc.card_id)
+                  )
+                """
+            )
+            if row[0] is not None
+        }
+        if has_card_id_column
+        and {"deck_id", "card_id"}.issubset(column_names(cur, "deck_cards"))
+        else set()
     )
     cmc_to_update = cur.execute(
         """
@@ -406,13 +625,24 @@ def backfill_deck_cards_from_cache(
             """
         )
 
+    snapshot_hashes = refresh_deck_snapshot_hashes(
+        cur,
+        dry_run=dry_run,
+        allowed_rehash_deck_ids=card_id_deck_ids_to_update,
+    )
+
     suspicious_after = cur.execute(
         """
         SELECT COUNT(*)
         FROM deck_cards dc
         LEFT JOIN card_oracle_cache coc
           ON coc.normalized_name = lower(trim(dc.card_name))
-        WHERE COALESCE(lower(COALESCE(coc.type_line, dc.type_line, '')), '') NOT LIKE '%land%'
+        WHERE NOT (
+            lower(COALESCE(coc.type_line, dc.type_line, '')) = 'land'
+            OR lower(COALESCE(coc.type_line, dc.type_line, '')) GLOB 'land[^a-z]*'
+            OR lower(COALESCE(coc.type_line, dc.type_line, '')) GLOB '*[^a-z]land'
+            OR lower(COALESCE(coc.type_line, dc.type_line, '')) GLOB '*[^a-z]land[^a-z]*'
+          )
           AND COALESCE(CAST(COALESCE(coc.cmc, dc.cmc, 0) AS REAL), 0) = 0
           AND COALESCE(coc.mana_cost, '') NOT IN ('', '{0}')
         """
@@ -427,6 +657,7 @@ def backfill_deck_cards_from_cache(
         "cmc_rows_to_update": int(cmc_to_update or 0),
         "cmc_rows_updated": 0 if dry_run else int(cmc_to_update or 0),
         "suspicious_nonland_zero_cmc_after": int(suspicious_after or 0),
+        **snapshot_hashes,
     }
 
 
@@ -789,6 +1020,8 @@ def main() -> None:
         f"{deck_cards_backfill['rows_total']} "
         f"card_id_updates={deck_cards_backfill['card_id_rows_updated']} "
         f"cmc_updates={deck_cards_backfill['cmc_rows_updated']} "
+        f"snapshot_decks_rehashed={deck_cards_backfill['snapshot_decks_rehashed']} "
+        f"snapshot_rows_rehashed={deck_cards_backfill['snapshot_rows_rehashed']} "
         "suspicious_nonland_zero_cmc_after="
         f"{deck_cards_backfill['suspicious_nonland_zero_cmc_after']}"
     )

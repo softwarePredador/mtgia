@@ -1,3 +1,4 @@
+import '../basic_land_utils.dart' as basic_lands;
 import 'optimize_archetype_support.dart' as archetype_support;
 
 class DeckArchetypeAnalyzer {
@@ -14,7 +15,7 @@ class DeckArchetypeAnalyzer {
 
     for (final card in cards) {
       final typeLine = (card['type_line'] as String?) ?? '';
-      if (typeLine.toLowerCase().contains('land')) continue;
+      if (basic_lands.isLandTypeLine(typeLine)) continue;
       final qty = (card['quantity'] as int?) ?? 1;
       totalCMC += ((card['cmc'] as num?)?.toDouble() ?? 0.0) * qty;
       totalNonLandCopies += qty;
@@ -40,7 +41,9 @@ class DeckArchetypeAnalyzer {
       final typeLine = ((card['type_line'] as String?) ?? '').toLowerCase();
       final qty = (card['quantity'] as int?) ?? 1;
 
-      if (typeLine.contains('land')) counts['lands'] = counts['lands']! + qty;
+      if (basic_lands.isLandTypeLine(typeLine)) {
+        counts['lands'] = counts['lands']! + qty;
+      }
       if (typeLine.contains('creature')) {
         counts['creatures'] = counts['creatures']! + qty;
       }
@@ -116,7 +119,7 @@ class DeckArchetypeAnalyzer {
     for (final card in cards) {
       final typeLine = ((card['type_line'] as String?) ?? '').toLowerCase();
       final qty = (card['quantity'] as int?) ?? 1;
-      if (!typeLine.contains('land')) continue;
+      if (!basic_lands.isLandTypeLine(typeLine)) continue;
 
       landCount += qty;
       final cardColors = (card['colors'] as List?)?.cast<String>() ?? [];

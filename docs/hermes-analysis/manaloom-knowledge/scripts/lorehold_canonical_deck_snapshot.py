@@ -17,6 +17,7 @@ from __future__ import annotations
 import argparse
 import json
 import os
+import re
 import shutil
 import sqlite3
 from collections import Counter
@@ -214,25 +215,33 @@ def apply_documented_swap(
 
 
 def deck_rows(conn: sqlite3.Connection, deck_id: int) -> list[sqlite3.Row]:
-    return conn.execute(
+    rows = conn.execute(
         """
         SELECT card_name, quantity, functional_tag, is_commander, cmc, type_line
         FROM deck_cards
         WHERE deck_id=?
-        ORDER BY
-          is_commander DESC,
-          CASE WHEN lower(COALESCE(type_line, '')) LIKE '%land%' THEN 0 ELSE 1 END,
-          COALESCE(cmc, 999),
-          card_name
         """,
         (deck_id,),
     ).fetchall()
+    return sorted(
+        rows,
+        key=lambda row: (
+            -int(row["is_commander"] or 0),
+            0 if is_land_type_line(row["type_line"]) else 1,
+            float(row["cmc"] if row["cmc"] is not None else 999),
+            str(row["card_name"] or "").casefold(),
+        ),
+    )
+
+
+def is_land_type_line(type_line: object) -> bool:
+    return re.search(r"(?<![a-z])land(?![a-z])", str(type_line or ""), re.IGNORECASE) is not None
 
 
 def classify(row: sqlite3.Row) -> str:
     if int(row["is_commander"] or 0):
         return "commander"
-    if "land" in str(row["type_line"] or "").lower():
+    if is_land_type_line(row["type_line"]):
         return "land"
     return str(row["functional_tag"] or "unknown")
 
@@ -245,7 +254,7 @@ def validate(conn: sqlite3.Connection, deck_id: int) -> list[str]:
     lands = sum(
         int(row["quantity"] or 0)
         for row in rows
-        if "land" in str(row["type_line"] or "").lower()
+        if is_land_type_line(row["type_line"])
     )
 
     if total != 100:

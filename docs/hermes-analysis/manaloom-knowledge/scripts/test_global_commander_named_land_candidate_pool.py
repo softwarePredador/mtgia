@@ -165,6 +165,19 @@ class GlobalCommanderNamedLandCandidatePoolTests(unittest.TestCase):
     def test_candidate_pool_filters_current_cards_and_off_color_lands(self) -> None:
         tmp, path = self._db()
         self.addCleanup(tmp.cleanup)
+        conn = sqlite3.connect(path)
+        conn.execute(
+            "INSERT INTO card_oracle_cache VALUES (?, ?, '', '[]', '[\"R\",\"W\"]', ?, ?, 3, '', ?)",
+            (
+                "Lander Rizzi",
+                "lander rizzi",
+                "Legendary Artifact Creature — Lander Rogue",
+                "{T}: Add one mana of any color.",
+                "lander-rizzi",
+            ),
+        )
+        conn.commit()
+        conn.close()
 
         payload = audit.build_report(
             mana_payload={"profiles": [ready_profile()]},
@@ -179,6 +192,7 @@ class GlobalCommanderNamedLandCandidatePoolTests(unittest.TestCase):
         self.assertIn("Boros Garrison", names)
         self.assertNotIn("Command Tower", names)
         self.assertNotIn("Breeding Pool", names)
+        self.assertNotIn("Lander Rizzi", names)
         self.assertGreater(names.index("Boros Garrison"), names.index("Battlefield Forge"))
 
     def test_missing_legality_is_kept_as_review_required(self) -> None:

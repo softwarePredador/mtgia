@@ -1,5 +1,6 @@
 import 'package:postgres/postgres.dart';
 
+import '../basic_land_utils.dart' as basic_lands;
 import '../color_identity.dart';
 import '../card_validation_service.dart';
 import '../edh_bracket_policy.dart';
@@ -656,7 +657,7 @@ void rebalanceCompleteDeckForLandDeficit({
   var currentLands = 0;
   for (final card in state.virtualDeck) {
     final typeLine = ((card['type_line'] as String?) ?? '').toLowerCase();
-    if (typeLine.contains('land')) {
+    if (basic_lands.isLandTypeLine(typeLine)) {
       currentLands += (card['quantity'] as int?) ?? 1;
     }
   }
@@ -664,7 +665,7 @@ void rebalanceCompleteDeckForLandDeficit({
   final nonLandCards =
       state.virtualDeck.where((card) {
         final typeLine = ((card['type_line'] as String?) ?? '').toLowerCase();
-        return !typeLine.contains('land');
+        return !basic_lands.isLandTypeLine(typeLine);
       }).toList();
 
   var avgCmc = 0.0;
@@ -703,7 +704,7 @@ void rebalanceCompleteDeckForLandDeficit({
     if (!state.addedCountsById.containsKey(cardId)) continue;
 
     final typeLine = ((card['type_line'] as String?) ?? '').toLowerCase();
-    if (typeLine.contains('land')) continue;
+    if (basic_lands.isLandTypeLine(typeLine)) continue;
     if (card['is_commander'] == true) continue;
 
     final qty = (card['quantity'] as int?) ?? 1;
@@ -1132,7 +1133,7 @@ void _addCardToVirtualDeck({
 int _countCurrentLands(List<Map<String, dynamic>> cards) {
   return cards.fold<int>(0, (sum, card) {
     final typeLine = ((card['type_line'] as String?) ?? '').toLowerCase();
-    if (typeLine.contains('land')) {
+    if (basic_lands.isLandTypeLine(typeLine)) {
       return sum + ((card['quantity'] as int?) ?? 1);
     }
     return sum;
@@ -1143,7 +1144,7 @@ double _calculateAverageNonLandCmc(List<Map<String, dynamic>> cards) {
   final nonLandCards =
       cards.where((card) {
         final typeLine = ((card['type_line'] as String?) ?? '').toLowerCase();
-        return !typeLine.contains('land');
+        return !basic_lands.isLandTypeLine(typeLine);
       }).toList();
 
   if (nonLandCards.isEmpty) return 0.0;

@@ -55,6 +55,7 @@ válidos são:
 | Jornadas Patrol locais | `./scripts/quality_gate.sh patrol-smoke` | não |
 | Battle nativo/Forge/XMage | `./scripts/quality_gate.sh battle` | não |
 | Ponte app/IA | `./scripts/quality_gate.sh ai-bridge` | não |
+| Ramp, optimizer, fundação de dados e regras | etapa `Ramp classifiers and data-foundation safety contracts` de `./scripts/quality_gate.sh e2e` | não; somente testes locais, preflight e injeção simulada de falha |
 | Contrato PG/Hermes/SQLite | `./scripts/quality_gate.sh pg-contract` | leitura de PG; relatórios em `/tmp` |
 | IA/deckbuilder profundo | `./scripts/quality_gate.sh deep-ai` | leitura de PG; não aplica migração |
 | Retenção de relatórios | `./scripts/quality_gate.sh report-retention` | não |
@@ -64,6 +65,12 @@ O gate de battle deve ser reprodutível sem o `~/.m2` da máquina. O bootstrap
 `services/xmage-sidecar/bin/bootstrap_pinned_xmage_maven.sh` instala os módulos
 XMage ausentes do Maven Central a partir do SHA de `XMAGE_COMMIT`; o CI executa
 esse bootstrap antes do gate.
+
+A etapa focada da suíte E2E executa explicitamente os classificadores de ramp
+em Dart e Python, o piso estrutural do optimizer, os contratos de segurança da
+fundação de qualidade de candidatos e da sincronização das Comprehensive Rules.
+Testes de segurança do backfill `semantic_layer_v2` entram automaticamente
+quando existem no repositório; a etapa nunca chama `--apply`.
 
 ## Camadas que exigem autorização
 

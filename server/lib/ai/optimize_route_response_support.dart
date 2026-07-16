@@ -1,4 +1,5 @@
 import 'optimize_runtime_support.dart';
+import 'optimize_route_outcome_support.dart';
 import 'optimize_state_support.dart';
 
 int countOptimizeResponseSwaps({
@@ -16,7 +17,7 @@ int countOptimizeResponseSwaps({
   return removalsCount < additionsCount ? removalsCount : additionsCount;
 }
 
-Map<String, dynamic> buildCachedOptimizeResponse({
+Map<String, dynamic>? buildCachedOptimizeResponse({
   required Map<String, dynamic> cachedResponse,
   required String cacheKey,
   required OptimizeIntensityConfig intensity,
@@ -27,6 +28,12 @@ Map<String, dynamic> buildCachedOptimizeResponse({
   required bool keepTheme,
   required Map<String, dynamic> userPreferences,
 }) {
+  if (!isReusableCachedOptimizeResponse(
+    cachedResponse,
+    effectiveMode: effectiveMode,
+  )) {
+    return null;
+  }
   final response = Map<String, dynamic>.from(cachedResponse);
   response['cache'] = {'hit': true, 'cache_key': cacheKey};
   response['intensity'] ??= intensity.selected;

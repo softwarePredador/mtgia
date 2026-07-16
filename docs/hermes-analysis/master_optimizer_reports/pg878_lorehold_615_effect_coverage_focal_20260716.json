@@ -1,0 +1,572 @@
+{
+  "generated_at": "2026-07-16T09:06:55.683625+00:00",
+  "deck_id": 615,
+  "sqlite_db": "docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db",
+  "opponents_loaded": 0,
+  "total_card_instances": 100,
+  "unique_cards": 84,
+  "runtime_safe_rule_names": 7009,
+  "active_or_review_rule_names": 8073,
+  "non_runtime_safe_rule_names": 1064,
+  "needs_review_rule_names": 1064,
+  "review_only_rule_names": 29,
+  "annotation_only_rule_names": 0,
+  "non_runtime_other_rule_names": 0,
+  "review_status_counts": {
+    "active": 68,
+    "needs_review": 1064,
+    "verified": 6941
+  },
+  "execution_status_counts": {
+    "auto": 8044,
+    "review_only": 29
+  },
+  "source_totals": {
+    "battle_rule_curated": 65,
+    "type_land": 34,
+    "known_cards_canonical_snapshot": 1
+  },
+  "effect_totals": {
+    "passive": 4,
+    "land": 34,
+    "approach": 1,
+    "ramp_permanent": 3,
+    "life_total_change": 2,
+    "treasure_maker": 3,
+    "ramp_engine": 2,
+    "modal_boros_charm": 1,
+    "damage_wipe": 1,
+    "remove_permanent": 2,
+    "damage_prevention_reflect": 1,
+    "redirect_removal": 1,
+    "copy_spell": 3,
+    "tutor": 2,
+    "remove_creature": 3,
+    "draw_engine": 2,
+    "loot": 1,
+    "board_wipe": 1,
+    "recursion": 1,
+    "creature": 6,
+    "free_cast": 2,
+    "silence_opponents": 1,
+    "steal_all_creatures": 1,
+    "ramp_ritual": 2,
+    "land_tax": 1,
+    "direct_damage": 1,
+    "equipment_haste_shroud": 1,
+    "equipment_static_attachment": 1,
+    "overload_recursion": 1,
+    "discard_trigger_modal_draw_treasure_opponent_life_loss": 1,
+    "composite_resolution": 2,
+    "static_cost_reduction": 1,
+    "counter": 2,
+    "draw_cards": 1,
+    "token_maker": 1,
+    "topdeck_manipulation": 1,
+    "silence_spell": 1,
+    "single_combat": 1,
+    "gift_destroy_all_creatures_return_own_destroyed_creature": 1,
+    "goad_opponents_creatures_cant_block": 1,
+    "phase_out": 1,
+    "damage_modifier": 1
+  },
+  "focused_template_effect_scope_totals": {},
+  "flag_totals": {
+    "cast_permission_not_explicit": 15,
+    "temporary_effect_not_explicit": 5,
+    "trigger_not_explicit": 12,
+    "oracle_target_removal_mismatch": 3,
+    "oracle_silence_mismatch": 1,
+    "land_utility_ability_not_modeled": 1
+  },
+  "deck_totals": {
+    "Lorehold target deck": {
+      "cards": 100,
+      "battle_rule_curated": 65,
+      "flagged": 31,
+      "type_land": 34,
+      "known_cards_canonical_snapshot": 1
+    }
+  },
+  "flagged_cards": [
+    {
+      "name": "Apex of Power",
+      "effect": "passive",
+      "source": "battle_rule_curated",
+      "decks": [
+        "Lorehold target deck"
+      ],
+      "flags": [
+        "cast_permission_not_explicit",
+        "temporary_effect_not_explicit"
+      ],
+      "focused_template_matches": [],
+      "focused_template_effect_scopes": [],
+      "type_line": "Sorcery",
+      "oracle_sample": "Exile the top seven cards of your library. Until end of turn, you may cast spells from among them.\nIf this spell was cast from your hand, add ten mana of any one color."
+    },
+    {
+      "name": "Flashback",
+      "effect": "recursion",
+      "source": "battle_rule_curated",
+      "decks": [
+        "Lorehold target deck"
+      ],
+      "flags": [
+        "cast_permission_not_explicit",
+        "temporary_effect_not_explicit"
+      ],
+      "focused_template_matches": [],
+      "focused_template_effect_scopes": [],
+      "type_line": "Instant",
+      "oracle_sample": "Target instant or sorcery card in your graveyard gains flashback until end of turn. The flashback cost is equal to its mana cost. (You may cast that card from your graveyard for it"
+    },
+    {
+      "name": "Goliath Daydreamer",
+      "effect": "free_cast",
+      "source": "battle_rule_curated",
+      "decks": [
+        "Lorehold target deck"
+      ],
+      "flags": [
+        "cast_permission_not_explicit",
+        "trigger_not_explicit"
+      ],
+      "focused_template_matches": [],
+      "focused_template_effect_scopes": [],
+      "type_line": "Creature \u2014 Giant Wizard",
+      "oracle_sample": "Whenever you cast an instant or sorcery spell from your hand, exile that card with a dream counter on it instead of putting it into your graveyard as it resolves.\nWhenever this cre"
+    },
+    {
+      "name": "Mizzix's Mastery",
+      "effect": "overload_recursion",
+      "source": "battle_rule_curated",
+      "decks": [
+        "Lorehold target deck"
+      ],
+      "flags": [
+        "cast_permission_not_explicit",
+        "oracle_target_removal_mismatch"
+      ],
+      "focused_template_matches": [],
+      "focused_template_effect_scopes": [],
+      "type_line": "Sorcery",
+      "oracle_sample": "Exile target card that's an instant or sorcery from your graveyard. For each card exiled this way, copy it, and you may cast the copy without paying its mana cost. Exile Mizzix's M"
+    },
+    {
+      "name": "Velomachus Lorehold",
+      "effect": "creature",
+      "source": "battle_rule_curated",
+      "decks": [
+        "Lorehold target deck"
+      ],
+      "flags": [
+        "cast_permission_not_explicit",
+        "trigger_not_explicit"
+      ],
+      "focused_template_matches": [],
+      "focused_template_effect_scopes": [],
+      "type_line": "Legendary Creature \u2014 Elder Dragon",
+      "oracle_sample": "Flying, vigilance, haste\nWhenever Velomachus Lorehold attacks, look at the top seven cards of your library. You may cast an instant or sorcery spell with mana value less than or eq"
+    },
+    {
+      "name": "Birgi, God of Storytelling // Harnfel, Horn of Bounty",
+      "effect": "ramp_engine",
+      "source": "known_cards_canonical_snapshot",
+      "decks": [
+        "Lorehold target deck"
+      ],
+      "flags": [
+        "temporary_effect_not_explicit",
+        "trigger_not_explicit"
+      ],
+      "focused_template_matches": [],
+      "focused_template_effect_scopes": [],
+      "type_line": "Legendary Creature \u2014 God",
+      "oracle_sample": "Whenever you cast a spell, add {R}. Until end of turn, you don't lose this mana as steps and phases end.\nCreatures you control can boast twice during each of your turns rather than"
+    },
+    {
+      "name": "Boros Charm",
+      "effect": "modal_boros_charm",
+      "source": "battle_rule_curated",
+      "decks": [
+        "Lorehold target deck"
+      ],
+      "flags": [
+        "temporary_effect_not_explicit"
+      ],
+      "focused_template_matches": [],
+      "focused_template_effect_scopes": [],
+      "type_line": "Instant",
+      "oracle_sample": "Choose one \u2014\n\u2022 Boros Charm deals 4 damage to target player or planeswalker.\n\u2022 Permanents you control gain indestructible until end of turn.\n\u2022 Target creature gains double strike un"
+    },
+    {
+      "name": "Call Forth the Tempest",
+      "effect": "damage_wipe",
+      "source": "battle_rule_curated",
+      "decks": [
+        "Lorehold target deck"
+      ],
+      "flags": [
+        "cast_permission_not_explicit"
+      ],
+      "focused_template_matches": [],
+      "focused_template_effect_scopes": [],
+      "type_line": "Sorcery",
+      "oracle_sample": "Cascade, cascade (When you cast this spell, exile cards from the top of your library until you exile a nonland card that costs less. You may cast it without paying its mana cost. P"
+    },
+    {
+      "name": "Deflecting Swat",
+      "effect": "redirect_removal",
+      "source": "battle_rule_curated",
+      "decks": [
+        "Lorehold target deck"
+      ],
+      "flags": [
+        "cast_permission_not_explicit"
+      ],
+      "focused_template_matches": [],
+      "focused_template_effect_scopes": [],
+      "type_line": "Instant",
+      "oracle_sample": "If you control a commander, you may cast this spell without paying its mana cost.\nYou may choose new targets for target spell or ability."
+    },
+    {
+      "name": "Double Vision",
+      "effect": "copy_spell",
+      "source": "battle_rule_curated",
+      "decks": [
+        "Lorehold target deck"
+      ],
+      "flags": [
+        "trigger_not_explicit"
+      ],
+      "focused_template_matches": [],
+      "focused_template_effect_scopes": [],
+      "type_line": "Enchantment",
+      "oracle_sample": "Whenever you cast your first instant or sorcery spell each turn, copy that spell. You may choose new targets for the copy."
+    },
+    {
+      "name": "Esper Sentinel",
+      "effect": "draw_engine",
+      "source": "battle_rule_curated",
+      "decks": [
+        "Lorehold target deck"
+      ],
+      "flags": [
+        "trigger_not_explicit"
+      ],
+      "focused_template_matches": [],
+      "focused_template_effect_scopes": [],
+      "type_line": "Artifact Creature \u2014 Human Soldier",
+      "oracle_sample": "Whenever an opponent casts their first noncreature spell each turn, draw a card unless that player pays {X}, where X is this creature's power."
+    },
+    {
+      "name": "Faithless Looting",
+      "effect": "loot",
+      "source": "battle_rule_curated",
+      "decks": [
+        "Lorehold target deck"
+      ],
+      "flags": [
+        "cast_permission_not_explicit"
+      ],
+      "focused_template_matches": [],
+      "focused_template_effect_scopes": [],
+      "type_line": "Sorcery",
+      "oracle_sample": "Draw two cards, then discard two cards.\nFlashback {2}{R} (You may cast this card from your graveyard for its flashback cost. Then exile it.)"
+    },
+    {
+      "name": "Galvanoth",
+      "effect": "creature",
+      "source": "battle_rule_curated",
+      "decks": [
+        "Lorehold target deck"
+      ],
+      "flags": [
+        "cast_permission_not_explicit"
+      ],
+      "focused_template_matches": [],
+      "focused_template_effect_scopes": [],
+      "type_line": "Creature \u2014 Beast",
+      "oracle_sample": "At the beginning of your upkeep, you may look at the top card of your library. You may cast it without paying its mana cost if it's an instant or sorcery spell."
+    },
+    {
+      "name": "Goldspan Dragon",
+      "effect": "creature",
+      "source": "battle_rule_curated",
+      "decks": [
+        "Lorehold target deck"
+      ],
+      "flags": [
+        "trigger_not_explicit"
+      ],
+      "focused_template_matches": [],
+      "focused_template_effect_scopes": [],
+      "type_line": "Creature \u2014 Dragon",
+      "oracle_sample": "Flying, haste\nWhenever this creature attacks or becomes the target of a spell, create a Treasure token.\nTreasures you control have \"{T}, Sacrifice this artifact: Add two mana of an"
+    },
+    {
+      "name": "Guttersnipe",
+      "effect": "creature",
+      "source": "battle_rule_curated",
+      "decks": [
+        "Lorehold target deck"
+      ],
+      "flags": [
+        "trigger_not_explicit"
+      ],
+      "focused_template_matches": [],
+      "focused_template_effect_scopes": [],
+      "type_line": "Creature \u2014 Goblin Shaman",
+      "oracle_sample": "Whenever you cast an instant or sorcery spell, this creature deals 2 damage to each opponent."
+    },
+    {
+      "name": "Heroes Remembered",
+      "effect": "life_total_change",
+      "source": "battle_rule_curated",
+      "decks": [
+        "Lorehold target deck"
+      ],
+      "flags": [
+        "cast_permission_not_explicit"
+      ],
+      "focused_template_matches": [],
+      "focused_template_effect_scopes": [],
+      "type_line": "Sorcery",
+      "oracle_sample": "You gain 20 life.\nSuspend 10\u2014{W} (Rather than cast this card from your hand, you may pay {W} and exile it with ten time counters on it. At the beginning of your upkeep, remove a ti"
+    },
+    {
+      "name": "Insurrection",
+      "effect": "steal_all_creatures",
+      "source": "battle_rule_curated",
+      "decks": [
+        "Lorehold target deck"
+      ],
+      "flags": [
+        "temporary_effect_not_explicit"
+      ],
+      "focused_template_matches": [],
+      "focused_template_effect_scopes": [],
+      "type_line": "Sorcery",
+      "oracle_sample": "Untap all creatures and gain control of them until end of turn. They gain haste until end of turn."
+    },
+    {
+      "name": "Invoke Calamity",
+      "effect": "free_cast",
+      "source": "battle_rule_curated",
+      "decks": [
+        "Lorehold target deck"
+      ],
+      "flags": [
+        "cast_permission_not_explicit"
+      ],
+      "focused_template_matches": [],
+      "focused_template_effect_scopes": [],
+      "type_line": "Instant",
+      "oracle_sample": "You may cast up to two instant and/or sorcery spells with total mana value 6 or less from your graveyard and/or hand without paying their mana costs. If those spells would be put i"
+    },
+    {
+      "name": "Longshot, Rebel Bowman",
+      "effect": "creature",
+      "source": "battle_rule_curated",
+      "decks": [
+        "Lorehold target deck"
+      ],
+      "flags": [
+        "trigger_not_explicit"
+      ],
+      "focused_template_matches": [],
+      "focused_template_effect_scopes": [],
+      "type_line": "Legendary Creature \u2014 Human Rebel Ally",
+      "oracle_sample": "Reach (This creature can block creatures with flying.)\nNoncreature spells you cast cost {1} less to cast.\nWhenever you cast a noncreature spell, Longshot deals 2 damage to each opp"
+    },
+    {
+      "name": "Lorehold, the Historian",
+      "effect": "passive",
+      "source": "battle_rule_curated",
+      "decks": [
+        "Lorehold target deck"
+      ],
+      "flags": [
+        "cast_permission_not_explicit"
+      ],
+      "focused_template_matches": [],
+      "focused_template_effect_scopes": [],
+      "type_line": "Legendary Creature \u2014 Elder Dragon",
+      "oracle_sample": "Flying, haste\nEach instant and sorcery card in your hand has miracle {2}. (You may cast a card for its miracle cost when you draw it if it's the first card you drew this turn.)\nAt "
+    },
+    {
+      "name": "Monument to Endurance",
+      "effect": "discard_trigger_modal_draw_treasure_opponent_life_loss",
+      "source": "battle_rule_curated",
+      "decks": [
+        "Lorehold target deck"
+      ],
+      "flags": [
+        "trigger_not_explicit"
+      ],
+      "focused_template_matches": [],
+      "focused_template_effect_scopes": [],
+      "type_line": "Artifact",
+      "oracle_sample": "Whenever you discard a card, choose one that hasn't been chosen this turn \u2014\n\u2022 Draw a card.\n\u2022 Create a Treasure token.\n\u2022 Each opponent loses 3 life."
+    },
+    {
+      "name": "Primal Amulet // Primal Wellspring",
+      "effect": "static_cost_reduction",
+      "source": "battle_rule_curated",
+      "decks": [
+        "Lorehold target deck"
+      ],
+      "flags": [
+        "trigger_not_explicit"
+      ],
+      "focused_template_matches": [],
+      "focused_template_effect_scopes": [],
+      "type_line": "Artifact",
+      "oracle_sample": "Instant and sorcery spells you cast cost {1} less to cast.\nWhenever you cast an instant or sorcery spell, put a charge counter on this artifact. Then if there are four or more char"
+    },
+    {
+      "name": "Red Elemental Blast",
+      "effect": "counter",
+      "source": "battle_rule_curated",
+      "decks": [
+        "Lorehold target deck"
+      ],
+      "flags": [
+        "oracle_target_removal_mismatch"
+      ],
+      "focused_template_matches": [],
+      "focused_template_effect_scopes": [],
+      "type_line": "Instant",
+      "oracle_sample": "Choose one \u2014\n\u2022 Counter target blue spell.\n\u2022 Destroy target blue permanent."
+    },
+    {
+      "name": "Reforge the Soul",
+      "effect": "draw_cards",
+      "source": "battle_rule_curated",
+      "decks": [
+        "Lorehold target deck"
+      ],
+      "flags": [
+        "cast_permission_not_explicit"
+      ],
+      "focused_template_matches": [],
+      "focused_template_effect_scopes": [],
+      "type_line": "Sorcery",
+      "oracle_sample": "Each player discards their hand, then draws seven cards.\nMiracle {1}{R} (You may cast this card for its miracle cost when you draw it if it's the first card you drew this turn.)"
+    },
+    {
+      "name": "Rise of the Eldrazi",
+      "effect": "composite_resolution",
+      "source": "battle_rule_curated",
+      "decks": [
+        "Lorehold target deck"
+      ],
+      "flags": [
+        "oracle_target_removal_mismatch"
+      ],
+      "focused_template_matches": [],
+      "focused_template_effect_scopes": [],
+      "type_line": "Sorcery",
+      "oracle_sample": "This spell can't be countered.\nDestroy target permanent. Target player draws four cards. Take an extra turn after this one.\nExile Rise of the Eldrazi."
+    },
+    {
+      "name": "Rite of the Dragoncaller",
+      "effect": "token_maker",
+      "source": "battle_rule_curated",
+      "decks": [
+        "Lorehold target deck"
+      ],
+      "flags": [
+        "trigger_not_explicit"
+      ],
+      "focused_template_matches": [],
+      "focused_template_effect_scopes": [],
+      "type_line": "Enchantment",
+      "oracle_sample": "Whenever you cast an instant or sorcery spell, create a 5/5 red Dragon creature token with flying."
+    },
+    {
+      "name": "Silence",
+      "effect": "silence_spell",
+      "source": "battle_rule_curated",
+      "decks": [
+        "Lorehold target deck"
+      ],
+      "flags": [
+        "oracle_silence_mismatch"
+      ],
+      "focused_template_matches": [],
+      "focused_template_effect_scopes": [],
+      "type_line": "Instant",
+      "oracle_sample": "Your opponents can't cast spells this turn."
+    },
+    {
+      "name": "Smothering Tithe",
+      "effect": "ramp_engine",
+      "source": "battle_rule_curated",
+      "decks": [
+        "Lorehold target deck"
+      ],
+      "flags": [
+        "trigger_not_explicit"
+      ],
+      "focused_template_matches": [],
+      "focused_template_effect_scopes": [],
+      "type_line": "Enchantment",
+      "oracle_sample": "Whenever an opponent draws a card, that player may pay {2}. If the player doesn't, you create a Treasure token. (It's an artifact with \"{T}, Sacrifice this token: Add one mana of a"
+    },
+    {
+      "name": "Underworld Breach",
+      "effect": "passive",
+      "source": "battle_rule_curated",
+      "decks": [
+        "Lorehold target deck"
+      ],
+      "flags": [
+        "cast_permission_not_explicit"
+      ],
+      "focused_template_matches": [],
+      "focused_template_effect_scopes": [],
+      "type_line": "Enchantment",
+      "oracle_sample": "Each nonland card in your graveyard has escape. The escape cost is equal to the card's mana cost plus exile three other cards from your graveyard. (You may cast cards from your gra"
+    },
+    {
+      "name": "Vandalblast",
+      "effect": "remove_permanent",
+      "source": "battle_rule_curated",
+      "decks": [
+        "Lorehold target deck"
+      ],
+      "flags": [
+        "cast_permission_not_explicit"
+      ],
+      "focused_template_matches": [],
+      "focused_template_effect_scopes": [],
+      "type_line": "Sorcery",
+      "oracle_sample": "Destroy target artifact you don't control.\nOverload {4}{R} (You may cast this spell for its overload cost. If you do, change \"target\" in its text to \"each.\")"
+    },
+    {
+      "name": "Urza's Saga",
+      "effect": "land",
+      "source": "type_land",
+      "decks": [
+        "Lorehold target deck"
+      ],
+      "flags": [
+        "land_utility_ability_not_modeled"
+      ],
+      "focused_template_matches": [],
+      "focused_template_effect_scopes": [],
+      "type_line": "Enchantment Land \u2014 Urza's Saga",
+      "oracle_sample": "(As this Saga enters and after your draw step, add a lore counter. Sacrifice after III.)\nI \u2014 This Saga gains \"{T}: Add {C}.\"\nII \u2014 This Saga gains \"{2}, {T}: Create a 0/0 colorless "
+    }
+  ],
+  "unknown_cards": [],
+  "unknown_effect_cards": [],
+  "unknown_effect_source_counts": {},
+  "unknown_effect_status_counts": {},
+  "focused_template_ready_unknown_effect_cards": [],
+  "needs_review_unknown_effect_cards": [],
+  "focused_template_cards": [],
+  "focused_template_unknown_effect_scope_cards": []
+}

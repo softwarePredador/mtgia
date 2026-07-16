@@ -78,6 +78,55 @@ EXILE_UNIT = "removal_exile::targeted_exile_variant_v1"
 RAMP_ARTIFACT_UNIT = "ramp_permanent::xmage_artifact_mana_source_variant_review_v1"
 RAMP_CREATURE_UNIT = "ramp_permanent::xmage_creature_mana_source_variant_review_v1"
 RAMP_ANY_COLOR_MANA_ROCK_UNIT = "ramp_permanent::one_any_color_mana_rock_v1"
+MANA_VAULT_SCOPE = "mana_vault_exact_untap_draw_damage_mana_v1"
+MANA_VAULT_UNIT = f"ramp_permanent::{MANA_VAULT_SCOPE}"
+MANA_VAULT_ABILITY_CLASSES = {
+    "BeginningOfDrawTriggeredAbility",
+    "BeginningOfUpkeepTriggeredAbility",
+    "SimpleManaAbility",
+    "SimpleStaticAbility",
+}
+MANA_VAULT_EFFECT_CLASSES = {
+    "DamageControllerEffect",
+    "DontUntapInControllersUntapStepSourceEffect",
+    "UntapSourceEffect",
+}
+MANA_VAULT_ORACLE_TEXT = (
+    "Mana Vault doesn't untap during your untap step. "
+    "At the beginning of your upkeep, you may pay {4}. If you do, untap Mana Vault. "
+    "At the beginning of your draw step, if Mana Vault is tapped, it deals 1 damage to you. "
+    "{T}: Add {C}{C}{C}."
+)
+MANA_VAULT_SOURCE_FRAGMENTS = (
+    "classManaVaultextendsCardImpl",
+    'super(ownerId,setInfo,newCardType[]{CardType.ARTIFACT},"{1}");',
+    "newSimpleStaticAbility(newDontUntapInControllersUntapStepSourceEffect())",
+    "newBeginningOfUpkeepTriggeredAbility(newDoIfCostPaid(newUntapSourceEffect(),newGenericManaCost(4),",
+    ".withChooseHint(newConditionHint(SourceTappedCondition.UNTAPPED))",
+    'newBeginningOfDrawTriggeredAbility(newDamageControllerEffect(1,"it"),false)'
+    ".withInterveningIf(SourceTappedCondition.TAPPED)",
+    "newSimpleManaAbility(Zone.BATTLEFIELD,Mana.ColorlessMana(3),newTapSourceCost())",
+)
+FLASHBACK_GRANT_SCOPE = (
+    "target_instant_sorcery_graveyard_gains_mana_cost_flashback_until_eot_v1"
+)
+FLASHBACK_GRANT_UNIT = f"graveyard_flashback_grant::{FLASHBACK_GRANT_SCOPE}"
+FLASHBACK_GRANT_SIGNATURE_UNIT = (
+    "xmage_signature::GainFlashbackTargetEffect::no_ability_class::"
+    "TargetCardInYourGraveyard::no_condition_class::targeting"
+)
+FLASHBACK_GRANT_ORACLE_TEXT = (
+    "Target instant or sorcery card in your graveyard gains flashback until end of turn. "
+    "The flashback cost is equal to its mana cost. "
+    "(You may cast that card from your graveyard for its flashback cost. Then exile it.)"
+)
+FLASHBACK_GRANT_SOURCE_FRAGMENTS = (
+    "classFlashbackextendsCardImpl",
+    'super(ownerId,setInfo,newCardType[]{CardType.INSTANT},"{R}");',
+    "this.getSpellAbility().addEffect(newGainFlashbackTargetEffect());",
+    "this.getSpellAbility().addTarget(newTargetCardInYourGraveyard("
+    "StaticFilters.FILTER_CARD_INSTANT_OR_SORCERY));",
+)
 RAMP_RITUAL_UNIT = "ramp_ritual::xmage_spell_mana_ritual_variant_review_v1"
 PAIN_TALISMAN_UNIT = "ramp_permanent::pain_talisman_color_pair_partial_v1"
 COUNTER_UNIT = "counter_spell::counter_target_stack_object_variant_v1"
@@ -244,6 +293,9 @@ SUPPORTED_UNITS = {
     RAMP_ARTIFACT_UNIT,
     RAMP_CREATURE_UNIT,
     RAMP_ANY_COLOR_MANA_ROCK_UNIT,
+    MANA_VAULT_UNIT,
+    FLASHBACK_GRANT_UNIT,
+    FLASHBACK_GRANT_SIGNATURE_UNIT,
     RAMP_RITUAL_UNIT,
     PAIN_TALISMAN_UNIT,
     COUNTER_UNIT,
@@ -696,6 +748,7 @@ RAMP_UNITS = {
     RAMP_ARTIFACT_UNIT,
     RAMP_CREATURE_UNIT,
     RAMP_ANY_COLOR_MANA_ROCK_UNIT,
+    MANA_VAULT_UNIT,
     PAIN_TALISMAN_UNIT,
 }
 
@@ -3457,6 +3510,66 @@ def ability_kind(row: dict[str, Any]) -> str:
 
 def ability_classes(row: dict[str, Any]) -> set[str]:
     return {str(value) for value in (row.get("xmage_ability_classes") or []) if str(value)}
+
+
+def mana_vault_source_signature_blocker(source_text: str) -> str | None:
+    compact = re.sub(r"\s+", "", str(source_text or ""))
+    if not compact:
+        return "mana_vault_source_missing"
+    if compact.count("this.addAbility(") != 4:
+        return "mana_vault_source_ability_count_mismatch"
+    for fragment in MANA_VAULT_SOURCE_FRAGMENTS:
+        if fragment not in compact:
+            return "mana_vault_source_signature_mismatch"
+    exact_constructor_counts = {
+        "newSimpleStaticAbility(": 1,
+        "newBeginningOfUpkeepTriggeredAbility(": 1,
+        "newBeginningOfDrawTriggeredAbility(": 1,
+        "newSimpleManaAbility(": 1,
+        "newDoIfCostPaid(": 1,
+        "newGenericManaCost(": 1,
+        "newDamageControllerEffect(": 1,
+        "newUntapSourceEffect(": 1,
+        "newTapSourceCost(": 1,
+    }
+    if any(compact.count(token) != count for token, count in exact_constructor_counts.items()):
+        return "mana_vault_source_component_count_mismatch"
+    if any(token in compact for token in (".addEffect(", ".addCost(", ".addTarget(")):
+        return "mana_vault_source_extra_component_detected"
+    return None
+
+
+def flashback_grant_source_signature_blocker(source_text: str) -> str | None:
+    compact = re.sub(r"\s+", "", str(source_text or ""))
+    if not compact:
+        return "flashback_grant_source_missing"
+    if compact.count("this.getSpellAbility().addEffect(") != 1:
+        return "flashback_grant_source_effect_count_mismatch"
+    if compact.count("this.getSpellAbility().addTarget(") != 1:
+        return "flashback_grant_source_target_count_mismatch"
+    for fragment in FLASHBACK_GRANT_SOURCE_FRAGMENTS:
+        if fragment not in compact:
+            return "flashback_grant_source_signature_mismatch"
+    exact_component_counts = {
+        "newGainFlashbackTargetEffect(": 1,
+        "newTargetCardInYourGraveyard(": 1,
+        "StaticFilters.FILTER_CARD_INSTANT_OR_SORCERY": 1,
+    }
+    if any(compact.count(token) != count for token, count in exact_component_counts.items()):
+        return "flashback_grant_source_component_count_mismatch"
+    if compact.count(".addEffect(") != 1 or compact.count(".addTarget(") != 1:
+        return "flashback_grant_source_extra_component_detected"
+    if any(
+        token in compact
+        for token in (
+            "this.addAbility(",
+            ".addCost(",
+            ".addMode(",
+            "newFlashbackAbility(",
+        )
+    ):
+        return "flashback_grant_source_extra_component_detected"
+    return None
 
 
 def oracle_text(metadata: dict[str, Any]) -> str:
@@ -34355,7 +34468,17 @@ def prevent_damage_by_creature_sources_from_source(source_text: str) -> dict[str
 
 def proposal_notes(row: dict[str, Any], scope: str) -> str:
     scope_kind = "runtime-backed exact-scope adapter"
-    if scope == MANA_WITH_ACTIVATED_DRAW_SCOPE:
+    if scope == MANA_VAULT_SCOPE:
+        scope_kind = (
+            "Mana Vault's exact no-normal-untap, optional upkeep untap, tapped draw-step "
+            "damage, and tap-for-three-colorless runtime"
+        )
+    elif scope == FLASHBACK_GRANT_SCOPE:
+        scope_kind = (
+            "one-target own-graveyard instant-or-sorcery flashback grant at the target's "
+            "printed mana cost until end of turn"
+        )
+    elif scope == MANA_WITH_ACTIVATED_DRAW_SCOPE:
         scope_kind = "activated mana-source permanent with separate activated draw ability"
     elif scope == MANA_WITH_ACTIVATION_LIFE_GAIN_SCOPE:
         scope_kind = "mana-source permanent with fixed life gain on mana activation"
@@ -35058,6 +35181,114 @@ def split_row(
         return None, "postgres_card_metadata_missing"
     if not str(metadata.get("oracle_text") or "").strip():
         return None, "oracle_text_missing"
+
+    flashback_grant_candidate_unit = unit in {
+        FLASHBACK_GRANT_UNIT,
+        FLASHBACK_GRANT_SIGNATURE_UNIT,
+    } or (
+        unit == RECURSION_UNIT
+        and str(row.get("xmage_class") or "") == "Flashback"
+    )
+    if flashback_grant_candidate_unit:
+        if str(row.get("xmage_class") or "") != "Flashback":
+            return None, "flashback_grant_xmage_class_mismatch"
+        if effect_classes(row) != {"GainFlashbackTargetEffect"}:
+            return None, "flashback_grant_effect_classes_mismatch"
+        if ability_classes(row):
+            return None, "flashback_grant_ability_classes_mismatch"
+        expected_input_ability_kind = (
+            "one_shot_targeted_continuous_permission"
+            if unit == FLASHBACK_GRANT_UNIT
+            else "one_shot"
+        )
+        if ability_kind(row) != expected_input_ability_kind:
+            return None, "flashback_grant_ability_kind_mismatch"
+        if set(row.get("xmage_signals") or []) != {"targeting"}:
+            return None, "flashback_grant_signals_mismatch"
+
+        expected_component_classes = {
+            "xmage_target_classes": {"TargetCardInYourGraveyard"},
+            "xmage_condition_classes": set(),
+            "xmage_cost_classes": set(),
+            "xmage_filter_classes": set(),
+        }
+        effect_payload = row.get("effect_json") or {}
+        for key, expected in expected_component_classes.items():
+            if key in row and {str(value) for value in (row.get(key) or [])} != expected:
+                return None, f"flashback_grant_{key.removeprefix('xmage_')}_mismatch"
+            if key in effect_payload and {
+                str(value) for value in (effect_payload.get(key) or [])
+            } != expected:
+                return None, f"flashback_grant_{key.removeprefix('xmage_')}_mismatch"
+        expected_filter_constants = ["StaticFilters.FILTER_CARD_INSTANT_OR_SORCERY"]
+        if (
+            "xmage_filter_constants" in effect_payload
+            and effect_payload.get("xmage_filter_constants") != expected_filter_constants
+        ):
+            return None, "flashback_grant_filter_constants_mismatch"
+        if normalize_name(str(metadata.get("name") or "")) != "flashback":
+            return None, "flashback_grant_card_name_mismatch"
+        if str(metadata.get("type_line") or "").strip().lower() != "instant":
+            return None, "flashback_grant_type_line_mismatch"
+        if str(metadata.get("mana_cost") or "").strip() != "{R}":
+            return None, "flashback_grant_mana_cost_mismatch"
+        expected_oracle = re.sub(r"\s+", " ", FLASHBACK_GRANT_ORACLE_TEXT).strip().lower()
+        if oracle_text(metadata) != expected_oracle:
+            return None, "flashback_grant_oracle_text_mismatch"
+        source_blocker = flashback_grant_source_signature_blocker(source_text)
+        if source_blocker:
+            return None, source_blocker
+        effect_json = {
+            "effect": "graveyard_flashback_grant",
+            "battle_model_scope": FLASHBACK_GRANT_SCOPE,
+            "ability_kind": "one_shot_targeted_continuous_permission",
+            "instant": True,
+            "sorcery": False,
+            "target": "instant_or_sorcery_card_in_your_graveyard",
+            "target_constraints": {
+                "zone": "graveyard",
+                "controller_scope": "self",
+                "card_types": ["instant", "sorcery"],
+            },
+            "target_controller": "self",
+            "target_zone": "graveyard",
+            "target_count": 1,
+            "target_count_min": 1,
+            "target_count_max": 1,
+            "target_declared_on_cast": True,
+            "target_legality_rechecked_on_resolution": True,
+            "targeted_flashback_grant": True,
+            "grants_flashback_to": "target_instant_or_sorcery",
+            "flashback_cost_source": "target_printed_mana_cost",
+            "duration": "until_end_of_turn",
+            "flashback_grant_status": "runtime_executor_v1",
+            "flashback_cast_status": "runtime_executor_v1",
+            "flashback_uses_normal_cast_pipeline": True,
+            "flashback_exile_on_leave_stack": True,
+            "flashback_exile_status": "runtime_executor_v1",
+            "oracle_runtime_scope": (
+                "target_one_own_graveyard_instant_sorcery_grant_printed_cost_"
+                "flashback_until_eot_exile_after_stack_exact_v1"
+            ),
+            "source_type_line": str(metadata.get("type_line") or ""),
+            "source_mana_cost": str(metadata.get("mana_cost") or ""),
+            "xmage_ability_classes": [],
+            "xmage_effect_classes": ["GainFlashbackTargetEffect"],
+            "xmage_condition_classes": [],
+            "xmage_cost_classes": [],
+            "xmage_target_classes": ["TargetCardInYourGraveyard"],
+            "xmage_filter_classes": [],
+            "xmage_duration": "EndOfTurn",
+            "xmage_filter_constants": expected_filter_constants,
+            "xmage_granted_ability_class": "FlashbackAbility",
+            "xmage_granted_ability_cost_source": "card.getManaCost()",
+        }
+        return build_proposal(
+            row,
+            metadata,
+            effect_json,
+            family_id="xmage_flashback_target_grant_exact_runtime",
+        ), "selected_exact_scope"
 
     if cycling_only_unit:
         cycling_spec = cycling_only_from_oracle_and_source(metadata, source_text, row)
@@ -49329,6 +49560,60 @@ def split_row(
         if is_spell(metadata):
             return None, "mana_source_spell_not_supported"
         mana_ability_classes = ability_classes(row)
+        if unit == MANA_VAULT_UNIT:
+            if str(row.get("xmage_class") or "") != "ManaVault":
+                return None, "mana_vault_xmage_class_mismatch"
+            if mana_ability_classes != MANA_VAULT_ABILITY_CLASSES:
+                return None, "mana_vault_ability_classes_mismatch"
+            if classes != MANA_VAULT_EFFECT_CLASSES:
+                return None, "mana_vault_effect_classes_mismatch"
+            if normalize_name(str(metadata.get("name") or "")) != "mana vault":
+                return None, "mana_vault_card_name_mismatch"
+            if str(metadata.get("type_line") or "").strip().lower() != "artifact":
+                return None, "mana_vault_type_line_mismatch"
+            if str(metadata.get("mana_cost") or "").strip() != "{1}":
+                return None, "mana_vault_mana_cost_mismatch"
+            expected_oracle = re.sub(r"\s+", " ", MANA_VAULT_ORACLE_TEXT).strip().lower()
+            if oracle_text(metadata) != expected_oracle:
+                return None, "mana_vault_oracle_text_mismatch"
+            source_blocker = mana_vault_source_signature_blocker(source_text)
+            if source_blocker:
+                return None, source_blocker
+            effect_json = {
+                "effect": "ramp_permanent",
+                "battle_model_scope": MANA_VAULT_SCOPE,
+                "ability_kind": "static_triggered_and_activated_mana",
+                "permanent_type": "artifact",
+                "is_mana_source": True,
+                "mana_produced": 3,
+                "produces": "C",
+                "produced_mana_symbols": ["C", "C", "C"],
+                "activation_requires_tap": True,
+                "mana_activation_requires_tap": True,
+                "does_not_untap_normally": True,
+                "does_not_untap_in_untap_step": True,
+                "untap_step_restriction_status": "runtime_executor_v1",
+                "mana_vault_runtime_status": "runtime_executor_v1",
+                "upkeep_optional_untap_cost_generic": 4,
+                "upkeep_optional_untap_status": "runtime_executor_v1",
+                "tapped_draw_step_damage": 1,
+                "draw_step_damage_status": "runtime_executor_v1",
+                "source_type_line": str(metadata.get("type_line") or ""),
+                "source_mana_cost": str(metadata.get("mana_cost") or ""),
+                "xmage_mana_ability_classes": ["SimpleManaAbility"],
+                "xmage_ability_classes": sorted(MANA_VAULT_ABILITY_CLASSES),
+                "xmage_effect_classes": sorted(MANA_VAULT_EFFECT_CLASSES),
+                "xmage_condition_classes": ["SourceTappedCondition"],
+                "xmage_cost_classes": ["GenericManaCost", "TapSourceCost"],
+                "xmage_target_classes": [],
+                "xmage_filter_classes": [],
+            }
+            return build_proposal(
+                row,
+                metadata,
+                effect_json,
+                family_id="xmage_mana_vault_exact_runtime",
+            ), "selected_exact_scope"
         restricted_mana_source = restricted_mana_source_detail_from_oracle(metadata)
         if restricted_mana_source is not None:
             source_restricted_mana = restricted_mana_source_detail_from_source(

@@ -1846,6 +1846,7 @@ def _build_exact_runtime_variant_fields(
     card_types: set[str],
     effect_classes: set[str],
     ability_classes: set[str],
+    condition_classes: set[str],
     target_classes: set[str],
     filter_classes: set[str],
     cost_classes: set[str],
@@ -1853,6 +1854,204 @@ def _build_exact_runtime_variant_fields(
     rules_text: str,
 ) -> dict[str, Any] | None:
     normalized = _normalized_rules_text(rules_text)
+    compact_java = re.sub(r"\s+", "", str(rules_text or ""))
+
+    flashback_scope = (
+        "target_instant_sorcery_graveyard_gains_mana_cost_flashback_until_eot_v1"
+    )
+    flashback_source_fragments = (
+        "classFlashbackextendsCardImpl",
+        'super(ownerId,setInfo,newCardType[]{CardType.INSTANT},"{R}");',
+        "this.getSpellAbility().addEffect(newGainFlashbackTargetEffect());",
+        "this.getSpellAbility().addTarget(newTargetCardInYourGraveyard("
+        "StaticFilters.FILTER_CARD_INSTANT_OR_SORCERY));",
+    )
+    flashback_component_counts = {
+        "this.getSpellAbility().addEffect(": 1,
+        "this.getSpellAbility().addTarget(": 1,
+        "newGainFlashbackTargetEffect(": 1,
+        "newTargetCardInYourGraveyard(": 1,
+        "StaticFilters.FILTER_CARD_INSTANT_OR_SORCERY": 1,
+    }
+    if (
+        xmage_class_name == "Flashback"
+        and card_types == {"INSTANT"}
+        and effect_classes == {"GainFlashbackTargetEffect"}
+        and not ability_classes
+        and not condition_classes
+        and target_classes == {"TargetCardInYourGraveyard"}
+        and not filter_classes
+        and not cost_classes
+        and all(fragment in compact_java for fragment in flashback_source_fragments)
+        and all(
+            compact_java.count(token) == count
+            for token, count in flashback_component_counts.items()
+        )
+        and compact_java.count(".addEffect(") == 1
+        and compact_java.count(".addTarget(") == 1
+        and not any(
+            token in compact_java
+            for token in (
+                "this.addAbility(",
+                ".addCost(",
+                ".addMode(",
+                "newFlashbackAbility(",
+            )
+        )
+    ):
+        return {
+            "effect": "graveyard_flashback_grant",
+            "scope": flashback_scope,
+            "target_constraints": {
+                "zone": "graveyard",
+                "controller_scope": "self",
+                "card_types": ["instant", "sorcery"],
+            },
+            "fields": {
+                "ability_kind": "one_shot_targeted_continuous_permission",
+                "instant": True,
+                "sorcery": False,
+                "target": "instant_or_sorcery_card_in_your_graveyard",
+                "target_controller": "self",
+                "target_zone": "graveyard",
+                "target_count": 1,
+                "target_count_min": 1,
+                "target_count_max": 1,
+                "target_declared_on_cast": True,
+                "target_legality_rechecked_on_resolution": True,
+                "targeted_flashback_grant": True,
+                "grants_flashback_to": "target_instant_or_sorcery",
+                "flashback_cost_source": "target_printed_mana_cost",
+                "duration": "until_end_of_turn",
+                "flashback_grant_status": "runtime_executor_v1",
+                "flashback_cast_status": "runtime_executor_v1",
+                "flashback_uses_normal_cast_pipeline": True,
+                "flashback_exile_on_leave_stack": True,
+                "flashback_exile_status": "runtime_executor_v1",
+                "oracle_runtime_scope": (
+                    "target_one_own_graveyard_instant_sorcery_grant_printed_cost_"
+                    "flashback_until_eot_exile_after_stack_exact_v1"
+                ),
+                "source_type_line": "Instant",
+                "source_mana_cost": "{R}",
+                "xmage_ability_classes": [],
+                "xmage_effect_classes": ["GainFlashbackTargetEffect"],
+                "xmage_condition_classes": [],
+                "xmage_cost_classes": [],
+                "xmage_target_classes": ["TargetCardInYourGraveyard"],
+                "xmage_filter_classes": [],
+                "xmage_duration": "EndOfTurn",
+                "xmage_filter_constants": [
+                    "StaticFilters.FILTER_CARD_INSTANT_OR_SORCERY"
+                ],
+                "xmage_granted_ability_class": "FlashbackAbility",
+                "xmage_granted_ability_cost_source": "card.getManaCost()",
+            },
+            "reason": (
+                "XMage's Flashback class exactly targets one instant or sorcery card in its "
+                "controller's graveyard and grants flashback at that card's printed mana cost "
+                "until end of turn."
+            ),
+            "signals": [
+                "Flashback",
+                "GainFlashbackTargetEffect",
+                "TargetCardInYourGraveyard",
+                "StaticFilters.FILTER_CARD_INSTANT_OR_SORCERY",
+            ],
+        }
+
+    mana_vault_ability_classes = {
+        "BeginningOfDrawTriggeredAbility",
+        "BeginningOfUpkeepTriggeredAbility",
+        "SimpleManaAbility",
+        "SimpleStaticAbility",
+    }
+    mana_vault_effect_classes = {
+        "DamageControllerEffect",
+        "DontUntapInControllersUntapStepSourceEffect",
+        "UntapSourceEffect",
+    }
+    mana_vault_source_fragments = (
+        'classManaVaultextendsCardImpl',
+        'super(ownerId,setInfo,newCardType[]{CardType.ARTIFACT},"{1}");',
+        'newSimpleStaticAbility(newDontUntapInControllersUntapStepSourceEffect())',
+        'newBeginningOfUpkeepTriggeredAbility(newDoIfCostPaid(newUntapSourceEffect(),newGenericManaCost(4),',
+        '.withChooseHint(newConditionHint(SourceTappedCondition.UNTAPPED))',
+        'newBeginningOfDrawTriggeredAbility(newDamageControllerEffect(1,"it"),false)'
+        '.withInterveningIf(SourceTappedCondition.TAPPED)',
+        'newSimpleManaAbility(Zone.BATTLEFIELD,Mana.ColorlessMana(3),newTapSourceCost())',
+    )
+    mana_vault_component_counts = {
+        "newSimpleStaticAbility(": 1,
+        "newBeginningOfUpkeepTriggeredAbility(": 1,
+        "newBeginningOfDrawTriggeredAbility(": 1,
+        "newSimpleManaAbility(": 1,
+        "newDoIfCostPaid(": 1,
+        "newGenericManaCost(": 1,
+        "newDamageControllerEffect(": 1,
+        "newUntapSourceEffect(": 1,
+        "newTapSourceCost(": 1,
+    }
+    if (
+        xmage_class_name == "ManaVault"
+        and card_types == {"ARTIFACT"}
+        and ability_classes == mana_vault_ability_classes
+        and effect_classes == mana_vault_effect_classes
+        and condition_classes == {"SourceTappedCondition"}
+        and cost_classes == {"GenericManaCost", "TapSourceCost"}
+        and not target_classes
+        and not filter_classes
+        and compact_java.count("this.addAbility(") == 4
+        and all(fragment in compact_java for fragment in mana_vault_source_fragments)
+        and all(
+            compact_java.count(token) == count
+            for token, count in mana_vault_component_counts.items()
+        )
+        and not any(
+            token in compact_java
+            for token in (".addEffect(", ".addCost(", ".addTarget(")
+        )
+    ):
+        return {
+            "effect": "ramp_permanent",
+            "scope": "mana_vault_exact_untap_draw_damage_mana_v1",
+            "fields": {
+                "ability_kind": "static_triggered_and_activated_mana",
+                "permanent_type": "artifact",
+                "is_mana_source": True,
+                "mana_produced": 3,
+                "produces": "C",
+                "produced_mana_symbols": ["C", "C", "C"],
+                "activation_requires_tap": True,
+                "mana_activation_requires_tap": True,
+                "does_not_untap_normally": True,
+                "does_not_untap_in_untap_step": True,
+                "untap_step_restriction_status": "runtime_executor_v1",
+                "mana_vault_runtime_status": "runtime_executor_v1",
+                "upkeep_optional_untap_cost_generic": 4,
+                "upkeep_optional_untap_status": "runtime_executor_v1",
+                "tapped_draw_step_damage": 1,
+                "draw_step_damage_status": "runtime_executor_v1",
+                "xmage_ability_classes": sorted(mana_vault_ability_classes),
+                "xmage_effect_classes": sorted(mana_vault_effect_classes),
+                "xmage_condition_classes": ["SourceTappedCondition"],
+                "xmage_cost_classes": ["GenericManaCost", "TapSourceCost"],
+                "xmage_target_classes": [],
+                "xmage_filter_classes": [],
+            },
+            "reason": (
+                "XMage's ManaVault class exactly matches the four-part runtime contract: no normal "
+                "untap, optional {4} upkeep untap, intervening-if tapped draw-step damage, and "
+                "a tap ability that adds {C}{C}{C}."
+            ),
+            "signals": [
+                "ManaVault",
+                "DontUntapInControllersUntapStepSourceEffect",
+                "BeginningOfUpkeepTriggeredAbility",
+                "BeginningOfDrawTriggeredAbility",
+                "SimpleManaAbility",
+            ],
+        }
 
     if (
         xmage_class_name == "CloudKey"
@@ -8969,6 +9168,7 @@ def build_effect_hints(index_entry: dict[str, Any], oracle_text: str = "") -> di
         card_types=card_types,
         effect_classes=effect_classes,
         ability_classes=ability_classes,
+        condition_classes=condition_classes,
         target_classes=target_classes,
         filter_classes=filter_classes,
         cost_classes=cost_classes,

@@ -98,11 +98,12 @@ Atalhos diretos equivalentes:
 
 `e2e` roda a varredura local de produto/lógica: Patrol, deckbuilder Flutter,
 contratos comerciais/retencao/trade, logs/observabilidade, testes server de
-IA/deckbuilder/battle, pytest de battle runtime, corpus Commander, app/IA,
-PG-Hermes-SQLite e deep-ai. Os logs ficam em `/tmp/manaloom_e2e_suite_reports`
-por padrão. A execução determinística retorna `PARTIAL` quando as camadas live
-opcionais são puladas; isso é diferente de falha e também não equivale a uma
-validação de produção.
+IA/deckbuilder/battle, classificadores de ramp, piso estrutural do optimizer,
+segurança da fundação de dados/regras, pytest de battle runtime, corpus
+Commander, app/IA, PG-Hermes-SQLite e deep-ai. Os logs ficam em
+`/tmp/manaloom_e2e_suite_reports` por padrão. A execução determinística retorna
+`PARTIAL` quando as camadas live opcionais são puladas; isso é diferente de
+falha e também não equivale a uma validação de produção.
 
 O CI roda `dart run melos run quality` no workflow `ManaLoom Guardrails` para
 PR/push que altera app, backend, scripts, lints ou pubspecs.

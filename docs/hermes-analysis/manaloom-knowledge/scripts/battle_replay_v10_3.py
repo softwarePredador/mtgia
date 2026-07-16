@@ -7,6 +7,8 @@ import os
 import random
 from pathlib import Path
 
+import battle_target_deck_identity_guard
+
 
 BATTLE_PATH = os.environ.get(
     "BATTLE_ANALYST_PATH",
@@ -78,11 +80,15 @@ def write_provenance_line(replay, item):
     metrics = item["metrics"]
     replay.write(
         "  {name}: source={source_kind} metrics={metrics_basis} "
+        "pg_deck_id={pg_deck_id} deck_hash={deck_hash} sync_run_id={sync_run_id} "
         "cards={card_count} lands={lands} avg_nonland_cmc={avg_cmc:.2f} "
         "curve={curve} blockers={blockers}\n".format(
             name=item["name"],
             source_kind=item["source_kind"],
             metrics_basis=item["metrics_basis"],
+            pg_deck_id=item.get("source_pg_deck_id") or "-",
+            deck_hash=item.get("deck_hash") or "-",
+            sync_run_id=item.get("sync_run_id") or "-",
             card_count=metrics["card_count"],
             lands=metrics["lands"],
             avg_cmc=metrics["avg_cmc_nonlands"],
@@ -502,6 +508,27 @@ def main():
         battle.REPLAY_EVENT_HANDLER = log
         battle.DECISION_TRACE_HANDLER = log_decision
         target_deck_id = target_deck_id_from_env()
+        target_identity_report = battle_target_deck_identity_guard.inspect_target_identity(
+            Path(
+                os.environ.get("MANALOOM_KNOWLEDGE_DB")
+                or os.environ.get("HERMES_KNOWLEDGE_DB")
+                or battle_target_deck_identity_guard.DEFAULT_DB
+            ),
+            target_deck_id=target_deck_id,
+            expected_pg_deck_id=(
+                os.environ.get("MANALOOM_BATTLE_EXPECTED_PG_DECK_ID")
+                or os.environ.get("MANALOOM_CANONICAL_PG_DECK_ID")
+                or (
+                    battle_target_deck_identity_guard.DEFAULT_EXPECTED_PG_DECK_ID
+                    if target_deck_id == battle_target_deck_identity_guard.PROTECTED_HERMES_DECK_ID
+                    else ""
+                )
+            ),
+            expected_deck_hash=os.environ.get(
+                "MANALOOM_BATTLE_EXPECTED_DECK_HASH", ""
+            ),
+        )
+        target_identity = target_identity_report.get("actual") or {}
         if hasattr(battle, "load_deck_with_construction_report"):
             commander, deck, construction_report = battle.load_deck_with_construction_report(target_deck_id)
         else:
@@ -554,6 +581,13 @@ def main():
                 "name": target_player_name,
                 "source_kind": "sqlite_deck_cards",
                 "source_ref": f"deck_id:{target_deck_id}",
+                "source_pg_deck_id": target_identity.get("pg_deck_id"),
+                "deck_hash": target_identity.get("deck_hash"),
+                "semantics_hash": target_identity.get("semantics_hash"),
+                "ruleset_hash": target_identity.get("ruleset_hash"),
+                "sync_run_id": target_identity.get("sync_run_id"),
+                "identity_status": target_identity_report.get("status"),
+                "identity_errors": target_identity_report.get("errors") or [],
                 "target_deck_id": target_deck_id,
                 "metrics_basis": "runtime_derived_from_resolved_card_list",
                 "cached_metadata_used_for_metrics": False,
@@ -561,7 +595,11 @@ def main():
                 "construction_report": construction_report,
                 "blocker_domain": (
                     "deck_source"
-                    if construction_report and not construction_report.get("is_valid", True)
+                    if target_identity_report.get("status") != "pass"
+                    or (
+                        construction_report
+                        and not construction_report.get("is_valid", True)
+                    )
                     else "none"
                 ),
             }

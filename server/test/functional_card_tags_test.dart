@@ -448,6 +448,153 @@ void main() {
       expect(impactTremorsTags, contains('payoff'));
     });
 
+    test(
+      'preserves explicit alternate wins and recurring engines without reminder collisions',
+      () {
+        Set<String> tags({
+          required String name,
+          required String typeLine,
+          required String oracleText,
+        }) =>
+            inferFunctionalCardTags(
+              name: name,
+              typeLine: typeLine,
+              oracleText: oracleText,
+            ).map((tag) => tag.tag).toSet();
+
+        expect(
+          tags(
+            name: 'Door to Nothingness',
+            typeLine: 'Artifact',
+            oracleText:
+                '{W}{W}{U}{U}{B}{B}{R}{R}{G}{G}, {T}, Sacrifice this artifact: Target player loses the game.',
+          ),
+          contains('wincon'),
+        );
+        expect(
+          tags(
+            name: "Maze's End",
+            typeLine: 'Land',
+            oracleText:
+                'If you control ten or more Gates with different names, you win the game.',
+          ),
+          contains('wincon'),
+        );
+        expect(
+          tags(
+            name: 'Angel of Destiny',
+            typeLine: 'Creature — Angel Cleric',
+            oracleText:
+                'At the beginning of your end step, if you have at least 15 life more than your starting life total, each player this creature attacked this turn loses the game.',
+          ),
+          contains('wincon'),
+        );
+        expect(
+          tags(
+            name: 'Vraska the Unseen',
+            typeLine: 'Legendary Planeswalker — Vraska',
+            oracleText:
+                'Create three Assassin tokens with "Whenever this token deals combat damage to a player, that player loses the game."',
+          ),
+          contains('wincon'),
+        );
+
+        expect(
+          tags(
+            name: 'Fynn, the Fangbearer',
+            typeLine: 'Legendary Creature — Human Warrior',
+            oracleText:
+                'Deathtouch. Whenever a creature you control with deathtouch deals combat damage to a player, that player gets two poison counters. (A player with ten or more poison counters loses the game.)',
+          ),
+          isNot(contains('wincon')),
+        );
+        expect(
+          tags(
+            name: 'Blood Artist',
+            typeLine: 'Creature — Vampire',
+            oracleText:
+                'Whenever another creature dies, target opponent loses 1 life and you gain 1 life.',
+          ),
+          isNot(contains('wincon')),
+        );
+        expect(
+          tags(
+            name: 'Curse of Vengeance',
+            typeLine: 'Enchantment — Aura Curse',
+            oracleText:
+                'When enchanted player loses the game, you gain X life and draw X cards.',
+          ),
+          isNot(contains('wincon')),
+        );
+
+        expect(
+          tags(
+            name: 'Cosmos Elixir',
+            typeLine: 'Artifact',
+            oracleText:
+                'At the beginning of your end step, if your life total is greater than your starting life total, draw a card. Otherwise, you gain 2 life.',
+          ),
+          contains('engine'),
+        );
+        expect(
+          tags(
+            name: 'Adeline, Resplendent Cathar',
+            typeLine: 'Legendary Creature — Human Knight',
+            oracleText:
+                'Whenever you attack, for each opponent, create a 1/1 white Human creature token that is tapped and attacking that player or a planeswalker they control.',
+          ),
+          contains('engine'),
+        );
+        expect(
+          tags(
+            name: 'A-Celebrity Fencer',
+            typeLine: 'Creature — Elf Druid',
+            oracleText:
+                'Whenever another creature enters under your control, put a +1/+1 counter on this creature.',
+          ),
+          isNot(contains('engine')),
+        );
+      },
+    );
+
+    test('recognizes direct ETB triggers without cast-trigger spillover', () {
+      Set<String> tags(String name, String oracleText) =>
+          inferFunctionalCardTags(
+            name: name,
+            typeLine: 'Creature',
+            oracleText: oracleText,
+          ).map((tag) => tag.tag).toSet();
+
+      expect(
+        tags(
+          'Angel of Unity',
+          'Whenever this creature enters and whenever you cast a party spell, choose a party creature card in your hand.',
+        ),
+        contains('etb'),
+      );
+      expect(
+        tags(
+          'Malik, Grim Manipulator',
+          'When Malik, Grim Manipulator enters, target opponent sacrifices a creature.',
+        ),
+        contains('etb'),
+      );
+      expect(
+        tags(
+          'Junkyard Scrapper',
+          'Whenever a nontoken artifact you control enters, exile a card from your library.',
+        ),
+        contains('etb'),
+      );
+      expect(
+        tags(
+          'Arcane Archery',
+          'When you cast a creature spell, that creature enters with an additional +1/+1 counter on it.',
+        ),
+        isNot(contains('etb')),
+      );
+    });
+
     test('shares strategic heuristic roles with optimize role adapter', () {
       final samples = <String, Map<String, Object>>{
         'Impact Tremors': {

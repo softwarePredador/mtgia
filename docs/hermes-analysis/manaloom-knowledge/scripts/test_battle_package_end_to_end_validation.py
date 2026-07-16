@@ -5751,6 +5751,53 @@ def test_simple_activated_destroy_runner_executes_token_target_constraint() -> N
     )
 
 
+def test_destroyed_token_observes_dies_before_ceasing_to_exist() -> None:
+    battle = validator.load_battle(validator.DEFAULT_BATTLE)
+    events = []
+    previous_handler = battle.REPLAY_EVENT_HANDLER
+    battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+    owner = battle.Player("Token Owner", None, [{"name": "Drawn Card"}])
+    token = battle.enrich_card(
+        {
+            "name": "Dies Trigger Token",
+            "type_line": "Token Creature - Spirit",
+            "effect": "creature",
+            "token": True,
+            "is_token": True,
+            "power": 1,
+            "toughness": 1,
+            "draw_cards_when_this_dies": 1,
+        }
+    )
+    owner.battlefield = [token]
+    try:
+        destination = battle.move_permanent_from_battlefield(
+            owner,
+            token,
+            reason="destroy",
+            all_players=[owner],
+        )
+    finally:
+        battle.REPLAY_EVENT_HANDLER = previous_handler
+
+    assert destination == "graveyard"
+    assert token not in owner.battlefield
+    assert token not in owner.graveyard
+    assert [card["name"] for card in owner.hand] == ["Drawn Card"]
+    assert any(
+        event == "dies_draw_resolved"
+        and data.get("card") == "Dies Trigger Token"
+        and data.get("draw_count") == 1
+        for event, data in events
+    )
+    assert any(
+        event == "token_ceased_to_exist"
+        and data.get("token") == "Dies Trigger Token"
+        and data.get("zone") == "graveyard"
+        for event, data in events
+    )
+
+
 def test_simple_activated_destroy_runner_executes_sacrifice_target_cost() -> None:
     battle = validator.load_battle(validator.DEFAULT_BATTLE)
     events = []

@@ -1,5 +1,6 @@
 import 'package:postgres/postgres.dart';
 
+import '../basic_land_utils.dart' as basic_lands;
 import '../logger.dart';
 import 'optimize_deck_support.dart';
 
@@ -17,7 +18,7 @@ class DeckArchetypeAnalyzerCore {
 
     for (final card in cards) {
       final typeLine = (card['type_line'] as String?) ?? '';
-      if (typeLine.toLowerCase().contains('land')) continue;
+      if (basic_lands.isLandTypeLine(typeLine)) continue;
       final qty = (card['quantity'] as int?) ?? 1;
       totalCMC += ((card['cmc'] as num?)?.toDouble() ?? 0.0) * qty;
       totalNonLandCopies += qty;
@@ -43,7 +44,9 @@ class DeckArchetypeAnalyzerCore {
       final typeLine = ((card['type_line'] as String?) ?? '').toLowerCase();
       final qty = (card['quantity'] as int?) ?? 1;
 
-      if (typeLine.contains('land')) counts['lands'] = counts['lands']! + qty;
+      if (basic_lands.isLandTypeLine(typeLine)) {
+        counts['lands'] = counts['lands']! + qty;
+      }
       if (typeLine.contains('creature')) {
         counts['creatures'] = counts['creatures']! + qty;
       }
@@ -119,7 +122,7 @@ class DeckArchetypeAnalyzerCore {
     for (final card in cards) {
       final typeLine = ((card['type_line'] as String?) ?? '').toLowerCase();
       final qty = (card['quantity'] as int?) ?? 1;
-      if (typeLine.contains('land')) {
+      if (basic_lands.isLandTypeLine(typeLine)) {
         landCount += qty;
         final cardColors = (card['colors'] as List?)?.cast<String>() ?? [];
         final oracleText =
@@ -598,7 +601,7 @@ Future<DeckThemeProfileResult> detectThemeProfile(
     final oracle = ((c['oracle_text'] as String?) ?? '').toLowerCase();
     final q = qty(c);
 
-    final isLand = typeLine.contains('land');
+    final isLand = basic_lands.isLandTypeLine(typeLine);
     if (!isLand) totalNonLands += q;
 
     cardData.add({

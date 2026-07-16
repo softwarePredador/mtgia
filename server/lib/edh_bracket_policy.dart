@@ -5,6 +5,8 @@
 /// Brackets são sinal de intenção/pregame; não provam qualidade estratégica.
 library;
 
+import 'basic_land_utils.dart' as land_utils;
+
 enum BracketCategory {
   fastMana,
   tutor,
@@ -75,7 +77,6 @@ BracketTagResult tagCardForBracket({
 }) {
   final categories = <BracketCategory>{};
   final n = name.toLowerCase().trim();
-  final t = typeLine.toLowerCase();
   final o = oracleText.toLowerCase();
 
   if (_isOfficialGameChangerName(n)) {
@@ -87,7 +88,7 @@ BracketTagResult tagCardForBracket({
   }
 
   // Alguns terrenos “fast mana”
-  if (t.contains('land') && _fastManaLandNames.contains(n)) {
+  if (land_utils.isLandTypeLine(typeLine) && _fastManaLandNames.contains(n)) {
     categories.add(BracketCategory.fastMana);
   }
 

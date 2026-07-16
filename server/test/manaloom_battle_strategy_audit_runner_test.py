@@ -13,6 +13,10 @@ def test_runner_is_server_portable_and_persistent() -> None:
     assert 'MANALOOM_OPS_DATA_DIR:-/data/manaloom-ops' in text
     assert "MANALOOM_BATTLE_STRATEGY_ARTIFACT_ROOT" in text
     assert "MANALOOM_KNOWLEDGE_DB" in text
+    assert "battle_target_deck_identity_guard.py" in text
+    assert "MANALOOM_BATTLE_EXPECTED_PG_DECK_ID" in text
+    assert "target_deck_identity.json" in text
+    assert 'MANALOOM_BATTLE_TARGET_DECK_ID="$TARGET_DECK_ID"' in text
     assert '[[ ! -d "$REPO_DIR/.git" ]]' not in text
     assert "flock -n 9" in text
     assert "MANALOOM_BATTLE_STRATEGY_DESKTOP_NOTIFICATIONS" in text

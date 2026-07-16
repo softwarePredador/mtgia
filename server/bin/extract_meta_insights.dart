@@ -2,6 +2,7 @@ import 'dart:io';
 import 'dart:convert';
 import 'dart:math';
 import 'package:postgres/postgres.dart';
+import '../lib/ai/meta_insight_role_support.dart';
 import '../lib/database.dart';
 import '../lib/meta/meta_deck_analytics_support.dart';
 import '../lib/meta/meta_deck_card_list_support.dart';
@@ -67,7 +68,8 @@ void main(List<String> args) async {
 
     // 3. Extrair insights de cartas individuais
     print('📊 Extraindo insights de cartas...');
-    final cardInsights = _extractCardInsights(parsedDecks, metaDecks);
+    final cardRoleMetadata = await _loadCardRoleMetadata(conn);
+    final cardInsights = _extractCardInsights(parsedDecks, cardRoleMetadata);
     print('   ${cardInsights.length} cartas analisadas\n');
 
     // 4. Detectar sinergias (co-ocorrências frequentes)
@@ -514,7 +516,7 @@ String _inferArchetypeFromCards(List<String> cardNames) {
 /// Extrai insights de cartas individuais
 Map<String, Map<String, dynamic>> _extractCardInsights(
   List<Map<String, dynamic>> parsedDecks,
-  List<Map<String, dynamic>> rawDecks,
+  Map<String, _CardRoleMetadata> cardRoleMetadata,
 ) {
   final insights = <String, Map<String, dynamic>>{};
 
@@ -578,49 +580,54 @@ Map<String, Map<String, dynamic>> _extractCardInsights(
     insight['versatility_score'] =
         (archetypeCount * 0.6 + formatCount * 0.4).clamp(0.0, 10.0);
 
-    // Inferir role/categoria com base no nome
-    insight['learned_role'] = _inferCardRole(insight['card_name'] as String);
+    final normalizedName = (insight['card_name'] as String).toLowerCase();
+    final metadata = cardRoleMetadata[normalizedName];
+    insight['learned_role'] = metadata == null
+        ? 'unknown'
+        : inferMetaInsightRole(
+            typeLine: metadata.typeLine,
+            oracleText: metadata.oracleText,
+            manaCost: metadata.manaCost,
+            cmc: metadata.cmc,
+          );
   }
 
   return insights;
 }
 
-/// Infere o papel de uma carta pelo nome (heurística simples)
-String _inferCardRole(String cardName) {
-  final lower = cardName.toLowerCase();
+class _CardRoleMetadata {
+  const _CardRoleMetadata({
+    required this.typeLine,
+    required this.oracleText,
+    required this.manaCost,
+    required this.cmc,
+  });
 
-  if (lower.contains('land') ||
-      lower.contains('plains') ||
-      lower.contains('island') ||
-      lower.contains('swamp') ||
-      lower.contains('mountain') ||
-      lower.contains('forest')) {
-    return 'mana_base';
-  }
-  if (lower.contains('bolt') ||
-      lower.contains('path') ||
-      lower.contains('push') ||
-      lower.contains('doom') ||
-      lower.contains('murder') ||
-      lower.contains('wrath')) {
-    return 'removal';
-  }
-  if (lower.contains('signet') ||
-      lower.contains('mana') ||
-      lower.contains('sol ring') ||
-      lower.contains('ramp') ||
-      lower.contains('cultivate')) {
-    return 'ramp';
-  }
-  if (lower.contains('draw') ||
-      lower.contains('vision') ||
-      lower.contains('ponder') ||
-      lower.contains('brainstorm') ||
-      lower.contains('divination')) {
-    return 'card_advantage';
-  }
+  final String typeLine;
+  final String oracleText;
+  final String? manaCost;
+  final Object? cmc;
+}
 
-  return 'unknown';
+Future<Map<String, _CardRoleMetadata>> _loadCardRoleMetadata(
+  dynamic conn,
+) async {
+  final rows = await conn.execute('''
+    SELECT LOWER(name), type_line, oracle_text, mana_cost, cmc
+    FROM cards
+  ''');
+  final metadata = <String, _CardRoleMetadata>{};
+  for (final row in rows) {
+    final normalizedName = row[0]?.toString().trim() ?? '';
+    if (normalizedName.isEmpty) continue;
+    metadata[normalizedName] = _CardRoleMetadata(
+      typeLine: row[1]?.toString() ?? '',
+      oracleText: row[2]?.toString() ?? '',
+      manaCost: row[3]?.toString(),
+      cmc: row[4],
+    );
+  }
+  return metadata;
 }
 
 /// Detecta pacotes de sinergia (cartas que frequentemente aparecem juntas)

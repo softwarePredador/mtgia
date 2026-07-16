@@ -54,6 +54,7 @@ ACTIVE_FILES = [
     SCRIPT_DIR / "pg_hermes_sqlite_contract_audit.py",
     SCRIPT_DIR / "xmage_current_replay_batch_pipeline.py",
     SCRIPT_DIR / "battle_package_end_to_end_validation.py",
+    SCRIPT_DIR / "battle_target_deck_identity_guard.py",
     SCRIPT_DIR / "pgc060_end_to_end_validation.py",
     SCRIPT_DIR / "master_optimizer_loop.py",
     REPO_ROOT / "server" / "bin" / "sync_hermes_learned_deck.sh",
@@ -98,6 +99,7 @@ PATH_CONTRACT_SNIPPETS = {
     "register_commanders.py": ["MANALOOM_KNOWLEDGE_DB", "DEFAULT_KNOWLEDGE_DB"],
     "xmage_current_replay_batch_pipeline.py": ["resolve_default_knowledge_db", "--sqlite-db"],
     "battle_package_end_to_end_validation.py": ["resolve_default_knowledge_db", "--sqlite-db"],
+    "battle_target_deck_identity_guard.py": ["MANALOOM_KNOWLEDGE_DB", "--sqlite-db"],
     "pgc060_end_to_end_validation.py": ["resolve_default_knowledge_db", "--sqlite-db"],
     "master_optimizer_loop.py": ["resolve_default_knowledge_db", "--db"],
 }
@@ -122,10 +124,11 @@ CRON_SEQUENCE_SNIPPETS = {
     "master_optimizer_preflight_cron.sh": [
         "MANALOOM_KNOWLEDGE_DB",
         "sync_pg_meta_decks_to_hermes.py",
-        "sync_pg_target_deck_to_hermes.py",
         "sync_pg_legalities.py",
         "sync_pg_card_metadata_to_hermes.py",
         "sync_battle_card_rules_pg.py",
+        "sync_pg_target_deck_to_hermes.py",
+        "battle_target_deck_identity_guard.py",
         "pg_hermes_sqlite_contract_audit.py",
         "master_optimizer_loop.py",
     ],

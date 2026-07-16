@@ -2,14 +2,16 @@ import 'dart:math' as math;
 
 import 'package:postgres/postgres.dart';
 
-import 'deck_state_analysis.dart';
-import 'rebuild_guided_land_support.dart';
+import '../basic_land_utils.dart' as basic_lands;
 import '../color_identity.dart';
 import '../deck_rules_service.dart';
 import '../deck_schema_support.dart';
 import '../edh_bracket_policy.dart';
 import '../logger.dart';
+import 'deck_state_analysis.dart';
+import 'rebuild_guided_land_support.dart';
 import 'edhrec_service.dart';
+import 'optimization_ramp_profile.dart';
 
 class RebuildTargetProfile {
   const RebuildTargetProfile({
@@ -38,6 +40,7 @@ class RebuildTargetProfile {
     'total_cards': totalCards,
     'land_count': landCount,
     'ramp': ramp,
+    'ramp_floor': ramp,
     'draw_selection': drawSelection,
     'interaction': interaction,
     'wipes': wipes,
@@ -297,6 +300,12 @@ class RebuildGuidedService {
       currentTotalCards: _totalCards(rebuiltCards),
       commanderColorIdentity: commanderColorIdentity,
     );
+    final rampProfileBefore = summarizeOptimizationRampProfilesForDeck(
+      originalDeck,
+    );
+    final rampProfileAfter = summarizeOptimizationRampProfilesForDeck(
+      rebuiltCards,
+    );
 
     final warnings = <String>[];
     if (deckStateAfter.status == 'needs_repair') {
@@ -312,6 +321,11 @@ class RebuildGuidedService {
     if (averageDeckData == null) {
       warnings.add(
         'Average deck do EDHREC indisponivel; a reconstrução usou top cards e estrutura heurística.',
+      );
+    }
+    if (rampProfileAfter.rampFloor < targetProfile.ramp) {
+      warnings.add(
+        'O rebuild ficou com ${rampProfileAfter.rampFloor} fontes de ramp estrutural; o piso alvo e ${targetProfile.ramp}. Aceleracao contextual (${rampProfileAfter.rampContextual}) nao completa esse piso.',
       );
     }
 
@@ -336,6 +350,8 @@ class RebuildGuidedService {
         'used_edhrec_top_cards': commanderData != null,
         'used_cached_commander_profile': cachedProfile != null,
         'candidate_pool_size': weightedCandidates.length,
+        'ramp_profile_before': rampProfileBefore.toJson(),
+        'ramp_profile_after': rampProfileAfter.toJson(),
       },
     );
   }
@@ -688,11 +704,12 @@ class RebuildGuidedService {
         resolvedArchetype: resolvedArchetype,
         resolvedTheme: resolvedTheme,
       );
+      final rampProfile = optimizationRampProfileForCard(card);
       final typeLine = (card['type_line'] as String?)?.toLowerCase() ?? '';
       final oracle = (card['oracle_text'] as String?)?.toLowerCase() ?? '';
       final colors = _extractIdentity(card);
 
-      if (typeLine.contains('land')) {
+      if (basic_lands.isLandTypeLine(typeLine)) {
         if (_landProducesCommanderColor(oracle, commanderColorIdentity) ||
             _isAnyColorLand(oracle)) {
           score += 55;
@@ -713,7 +730,11 @@ class RebuildGuidedService {
             colors.difference(commanderColorIdentity).isNotEmpty) {
           score -= 100;
         }
-        if (role == 'ramp') score += 20;
+        if (rampProfile.countsTowardGenericFloor) {
+          score += 20;
+        } else if (rampProfile.requiresContextualPolicy) {
+          score += 8;
+        }
         if (role == 'draw') score += 20;
         if (role == 'interaction') score += 20;
         if (role == 'wipe') score += 12;
@@ -891,7 +912,13 @@ class RebuildGuidedService {
         resolvedArchetype: resolvedArchetype,
         resolvedTheme: resolvedTheme,
       );
-      if (role == 'ramp' || role == 'draw' || role == 'interaction') {
+      final rampProfile = optimizationRampProfileForCard(card);
+      if (rampProfile.countsTowardGenericFloor) {
+        weight += 12;
+      } else if (rampProfile.requiresContextualPolicy) {
+        weight += 6;
+      }
+      if (role == 'draw' || role == 'interaction') {
         weight += 12;
       } else if (role == 'payoff' || role == 'engine') {
         weight += 18;
@@ -1024,6 +1051,7 @@ class RebuildGuidedService {
       final role = candidate.role;
       final shouldAdd = _shouldAddByRole(
         role: role,
+        card: candidate.card,
         roleCounts: roleCounts,
         targetProfile: targetProfile,
         selectedTotal: _totalNonCommanderNonLand(selected.values.toList()),
@@ -1031,7 +1059,7 @@ class RebuildGuidedService {
       );
       if (!shouldAdd) continue;
       _addCardToSelection(selected, candidate.card);
-      _incrementRole(roleCounts, role);
+      _incrementRoleForCard(roleCounts, role, candidate.card);
     }
 
     for (final candidate in nonLandCandidates) {
@@ -1042,7 +1070,7 @@ class RebuildGuidedService {
       final lower = ((candidate.card['name'] as String?) ?? '').toLowerCase();
       if (selected.containsKey(lower)) continue;
       _addCardToSelection(selected, candidate.card);
-      _incrementRole(roleCounts, candidate.role);
+      _incrementRoleForCard(roleCounts, candidate.role, candidate.card);
     }
 
     final monoColorUtilityLimit = _maxUtilityColorlessLands(
@@ -1199,15 +1227,21 @@ class RebuildGuidedService {
 
   bool _shouldAddByRole({
     required String role,
+    required Map<String, dynamic> card,
     required Map<String, int> roleCounts,
     required RebuildTargetProfile targetProfile,
     required int selectedTotal,
     required int nonLandTarget,
   }) {
     if (selectedTotal >= nonLandTarget) return false;
+    final rampProfile = optimizationRampProfileForCard(card);
+    if (rampProfile.countsTowardGenericFloor &&
+        (roleCounts['ramp_floor'] ?? 0) < targetProfile.ramp) {
+      return true;
+    }
     switch (role) {
       case 'ramp':
-        return (roleCounts['ramp'] ?? 0) < targetProfile.ramp;
+        return false;
       case 'draw':
         return (roleCounts['draw'] ?? 0) < targetProfile.drawSelection;
       case 'interaction':
@@ -1239,7 +1273,14 @@ class RebuildGuidedService {
         resolvedArchetype: resolvedArchetype,
         resolvedTheme: resolvedTheme,
       );
-      counts[role] = (counts[role] ?? 0) + ((card['quantity'] as int?) ?? 1);
+      final quantity = (card['quantity'] as int?) ?? 1;
+      counts[role] = (counts[role] ?? 0) + quantity;
+      final rampProfile = optimizationRampProfileForCard(card);
+      if (rampProfile.countsTowardGenericFloor) {
+        counts['ramp_floor'] = (counts['ramp_floor'] ?? 0) + quantity;
+      } else if (rampProfile.requiresContextualPolicy) {
+        counts['ramp_contextual'] = (counts['ramp_contextual'] ?? 0) + quantity;
+      }
     }
     return counts;
   }
@@ -1253,8 +1294,9 @@ class RebuildGuidedService {
     final oracle = (card['oracle_text'] as String?)?.toLowerCase() ?? '';
     final name = (card['name'] as String?)?.toLowerCase() ?? '';
     final cmc = (card['cmc'] as num?)?.toDouble() ?? 0.0;
+    final rampProfile = optimizationRampProfileForCard(card);
 
-    if (typeLine.contains('land')) return 'land';
+    if (basic_lands.isLandTypeLine(typeLine)) return 'land';
     if (oracle.contains('destroy all') ||
         oracle.contains('each creature') ||
         oracle.contains('all creatures')) {
@@ -1272,12 +1314,7 @@ class RebuildGuidedService {
         oracle.contains('scry') && oracle.contains('draw')) {
       return 'draw';
     }
-    if (oracle.contains('add {') ||
-        oracle.contains('add one mana') ||
-        oracle.contains('search your library for a land') ||
-        name.contains('signet') ||
-        name.contains('sol ring') ||
-        name.contains('talisman')) {
+    if (rampProfile.isAcceleration) {
       return 'ramp';
     }
     if (oracle.contains('you win the game') ||
@@ -1463,11 +1500,25 @@ class RebuildGuidedService {
 
   bool _isLandCard(Map<String, dynamic> card) {
     final typeLine = (card['type_line'] as String?)?.toLowerCase() ?? '';
-    return typeLine.contains('land');
+    return basic_lands.isLandTypeLine(typeLine);
   }
 
   void _incrementRole(Map<String, int> roleCounts, String role) {
     roleCounts[role] = (roleCounts[role] ?? 0) + 1;
+  }
+
+  void _incrementRoleForCard(
+    Map<String, int> roleCounts,
+    String role,
+    Map<String, dynamic> card,
+  ) {
+    _incrementRole(roleCounts, role);
+    final rampProfile = optimizationRampProfileForCard(card);
+    if (rampProfile.countsTowardGenericFloor) {
+      _incrementRole(roleCounts, 'ramp_floor');
+    } else if (rampProfile.requiresContextualPolicy) {
+      _incrementRole(roleCounts, 'ramp_contextual');
+    }
   }
 
   void _addCardToSelection(
@@ -1757,18 +1808,18 @@ class RebuildGuidedService {
           SELECT
             c.*,
             CASE
-              WHEN LOWER(COALESCE(c.type_line, '')) LIKE '%basic land%'
+              WHEN COALESCE(c.type_line, '') ~* '(^|[^[:alpha:]])basic[[:space:]]+(snow[[:space:]]+)?land([^[:alpha:]]|$)'
                    AND LOWER(COALESCE(c.type_line, '')) LIKE '%plains%' THEN 'plains'
-              WHEN LOWER(COALESCE(c.type_line, '')) LIKE '%basic land%'
+              WHEN COALESCE(c.type_line, '') ~* '(^|[^[:alpha:]])basic[[:space:]]+(snow[[:space:]]+)?land([^[:alpha:]]|$)'
                    AND LOWER(COALESCE(c.type_line, '')) LIKE '%island%' THEN 'island'
-              WHEN LOWER(COALESCE(c.type_line, '')) LIKE '%basic land%'
+              WHEN COALESCE(c.type_line, '') ~* '(^|[^[:alpha:]])basic[[:space:]]+(snow[[:space:]]+)?land([^[:alpha:]]|$)'
                    AND LOWER(COALESCE(c.type_line, '')) LIKE '%swamp%' THEN 'swamp'
-              WHEN LOWER(COALESCE(c.type_line, '')) LIKE '%basic land%'
+              WHEN COALESCE(c.type_line, '') ~* '(^|[^[:alpha:]])basic[[:space:]]+(snow[[:space:]]+)?land([^[:alpha:]]|$)'
                    AND LOWER(COALESCE(c.type_line, '')) LIKE '%mountain%' THEN 'mountain'
-              WHEN LOWER(COALESCE(c.type_line, '')) LIKE '%basic land%'
+              WHEN COALESCE(c.type_line, '') ~* '(^|[^[:alpha:]])basic[[:space:]]+(snow[[:space:]]+)?land([^[:alpha:]]|$)'
                    AND LOWER(COALESCE(c.type_line, '')) LIKE '%forest%' THEN 'forest'
               WHEN LOWER(c.name) = 'wastes'
-                   AND LOWER(COALESCE(c.type_line, '')) LIKE '%basic land%' THEN 'wastes'
+                   AND COALESCE(c.type_line, '') ~* '(^|[^[:alpha:]])basic[[:space:]]+(snow[[:space:]]+)?land([^[:alpha:]]|$)' THEN 'wastes'
               ELSE NULL
             END AS basic_key,
             CASE
@@ -1776,7 +1827,7 @@ class RebuildGuidedService {
               ELSE 1
             END AS basic_priority
           FROM cards c
-          WHERE LOWER(COALESCE(c.type_line, '')) LIKE '%basic land%'
+          WHERE COALESCE(c.type_line, '') ~* '(^|[^[:alpha:]])basic[[:space:]]+(snow[[:space:]]+)?land([^[:alpha:]]|$)'
         ) basics
         WHERE basic_key IS NOT NULL
         ORDER BY basic_key, basic_priority, id

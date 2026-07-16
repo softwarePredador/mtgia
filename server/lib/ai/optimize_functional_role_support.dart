@@ -1,4 +1,6 @@
+import '../basic_land_utils.dart' as basic_lands;
 import 'optimization_functional_roles.dart';
+import 'optimization_ramp_profile.dart';
 
 String inferFunctionalRole({
   required String name,
@@ -27,8 +29,16 @@ String inferFunctionalRole({
   final n = name.toLowerCase();
   final t = typeLine.toLowerCase();
   final o = oracleText.toLowerCase();
+  final rampProfile = classifyOptimizationRampProfile(
+    name: name,
+    typeLine: typeLine,
+    oracleText: oracleText,
+    manaCost: manaCost,
+    cmc: cmc,
+  );
 
-  final isRampByText = o.contains('add {') ||
+  final isRampByText =
+      o.contains('add {') ||
       o.contains('add one mana') ||
       o.contains('search your library for a basic land') ||
       o.contains('search your library for a land');
@@ -58,6 +68,11 @@ String inferFunctionalRole({
     return 'wincon';
   }
 
+  // Keep the player-facing role inclusive without changing the legacy
+  // priority of explicit draw/removal/interaction labels. Generic floor
+  // decisions use the narrower profile explicitly at their call sites.
+  if (rampProfile.isAcceleration) return 'ramp';
+
   if (o.contains('whenever') ||
       o.contains('at the beginning of') ||
       o.contains('sacrifice')) {
@@ -84,16 +99,20 @@ String _legacyOptimizeRoleForResolvedRoles(Set<String> roles) {
   if (roles.contains('ramp') || roles.contains('ritual')) return 'ramp';
   if (roles.contains('draw') ||
       roles.contains('loot') ||
-      roles.contains('exile_value')) return 'draw';
+      roles.contains('exile_value'))
+    return 'draw';
   if (roles.contains('removal') ||
       roles.contains('wipe') ||
-      roles.contains('board_wipe')) return 'removal';
+      roles.contains('board_wipe'))
+    return 'removal';
   if (roles.contains('interaction') ||
       roles.contains('counterspell') ||
-      roles.contains('protection')) return 'interaction';
+      roles.contains('protection'))
+    return 'interaction';
   if (roles.contains('wincon') ||
       roles.contains('combo_piece') ||
-      roles.contains('alt_win')) return 'wincon';
+      roles.contains('alt_win'))
+    return 'wincon';
   if (roles.contains('engine') ||
       roles.contains('payoff') ||
       roles.contains('enabler') ||
@@ -106,7 +125,8 @@ String _legacyOptimizeRoleForResolvedRoles(Set<String> roles) {
       roles.contains('enchantment_synergy') ||
       roles.contains('spellslinger') ||
       roles.contains('aristocrat_payoff') ||
-      roles.contains('creature')) return 'engine';
+      roles.contains('creature'))
+    return 'engine';
   return 'utility';
 }
 
@@ -171,6 +191,11 @@ String inferOptimizeFunctionalNeed({
 }) {
   final normalizedType = typeLine.toLowerCase();
   final oracle = oracleText.toLowerCase();
+  final rampProfile = classifyOptimizationRampProfile(
+    name: name,
+    typeLine: typeLine,
+    oracleText: oracleText,
+  );
 
   if (looksLikeProtectionEffect(
     name: name,
@@ -195,18 +220,19 @@ String inferOptimizeFunctionalNeed({
   }
 
   if (oracle.contains('search your library') &&
-      !normalizedType.contains('land')) {
+      !basic_lands.isLandTypeLine(normalizedType)) {
     return oracle.contains('land') ? 'ramp' : 'tutor';
   }
 
-  if ((looksLikeTemporaryManaBurst(
+  if ((rampProfile.isAcceleration ||
+          looksLikeTemporaryManaBurst(
             name: name,
             typeLine: typeLine,
             oracleText: oracleText,
           ) ||
           oracle.contains('add {') ||
           oracle.contains('add one mana')) &&
-      !normalizedType.contains('land')) {
+      !basic_lands.isLandTypeLine(normalizedType)) {
     return 'ramp';
   }
 
@@ -220,25 +246,36 @@ bool matchesFunctionalNeed(
   String need, {
   required String oracleText,
   required String typeLine,
+  String name = '',
+  String? manaCost,
+  Object? cmc,
 }) {
   final oracle = oracleText.toLowerCase();
   final type = typeLine.toLowerCase();
 
   return switch (need) {
     'draw' => oracle.contains('draw') || oracle.contains('cards'),
-    'removal' => oracle.contains('destroy') ||
-        oracle.contains('exile') ||
-        oracle.contains('counter'),
+    'removal' =>
+      oracle.contains('destroy') ||
+          oracle.contains('exile') ||
+          oracle.contains('counter'),
     'wipe' => looksLikeBoardWipe(oracleText),
-    'ramp' => (oracle.contains('add') && oracle.contains('mana')) ||
-        oracle.contains('search your library for a land'),
+    'ramp' =>
+      classifyOptimizationRampProfile(
+        name: name,
+        typeLine: typeLine,
+        oracleText: oracleText,
+        manaCost: manaCost,
+        cmc: cmc,
+      ).countsTowardGenericFloor,
     'tutor' =>
       oracle.contains('search your library') && !oracle.contains('land'),
-    'protection' => oracle.contains('hexproof') ||
-        oracle.contains('indestructible') ||
-        oracle.contains('ward') ||
-        oracle.contains('phase out') ||
-        oracle.contains('phases out'),
+    'protection' =>
+      oracle.contains('hexproof') ||
+          oracle.contains('indestructible') ||
+          oracle.contains('ward') ||
+          oracle.contains('phase out') ||
+          oracle.contains('phases out'),
     'creature' => type.contains('creature'),
     'artifact' => type.contains('artifact'),
     _ => true,
@@ -262,33 +299,39 @@ int scoreOptimizeReplacementCandidate({
   final estimatedCmc = _estimateManaCostCmc(manaCost);
   final matchesNeed = matchesFunctionalNeed(
     functionalNeed,
+    name: cardName,
     oracleText: oracleText,
     typeLine: typeLine,
+    manaCost: manaCost,
+    cmc: estimatedCmc,
   );
   final needScore = matchesNeed ? 160 : (functionalNeed == 'utility' ? 40 : 0);
   final preferredScore = preferredNames.contains(normalizedName) ? 120 : 0;
   final popularityScore = (popScore ~/ 10).clamp(0, 90);
-  final rejectionPenalty =
-      ((rejectedAdditionCounts[normalizedName] ?? 0) * 35).clamp(0, 175);
+  final rejectionPenalty = ((rejectedAdditionCounts[normalizedName] ?? 0) * 35)
+      .clamp(0, 175);
   final protectionBonus =
       functionalNeed == 'protection' && normalizedOracle.contains('free')
           ? 15
           : 0;
   final offNeedPenalty = !matchesNeed && functionalNeed != 'utility' ? 90 : 0;
-  final landPenalty = normalizedType.contains('land') ? 220 : 0;
-  final temporaryManaPenalty = looksLikeTemporaryManaBurst(
-    name: cardName,
-    typeLine: typeLine,
-    oracleText: oracleText,
-  )
-      ? (functionalNeed == 'ramp' ? 70 : 160)
-      : 0;
-  final lowCurveBonus = preferLowCurve
-      ? ((4 - estimatedCmc).clamp(0, 4) * 18).round()
-      : ((3 - estimatedCmc).clamp(0, 3) * 6).round();
-  final expensiveSpellPenalty = preferLowCurve && estimatedCmc > 4
-      ? ((estimatedCmc - 4) * 20).round()
-      : 0;
+  final landPenalty = basic_lands.isLandTypeLine(normalizedType) ? 220 : 0;
+  final temporaryManaPenalty =
+      looksLikeTemporaryManaBurst(
+            name: cardName,
+            typeLine: typeLine,
+            oracleText: oracleText,
+          )
+          ? (functionalNeed == 'ramp' ? 70 : 160)
+          : 0;
+  final lowCurveBonus =
+      preferLowCurve
+          ? ((4 - estimatedCmc).clamp(0, 4) * 18).round()
+          : ((3 - estimatedCmc).clamp(0, 3) * 6).round();
+  final expensiveSpellPenalty =
+      preferLowCurve && estimatedCmc > 4
+          ? ((estimatedCmc - 4) * 20).round()
+          : 0;
 
   return needScore +
       preferredScore +

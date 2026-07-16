@@ -1,6 +1,7 @@
 import '../basic_land_utils.dart' as basic_lands;
 import 'optimize_filler_loader_support.dart';
 import 'optimize_functional_role_support.dart';
+import 'optimization_ramp_profile.dart';
 
 List<Map<String, dynamic>> buildDeterministicOptimizeRemovalCandidates({
   required List<Map<String, dynamic>> allCardData,
@@ -21,9 +22,10 @@ List<Map<String, dynamic>> buildDeterministicOptimizeRemovalCandidates({
 
     final commanderLower =
         commanders.map((name) => name.trim().toLowerCase()).toSet();
-    final coreLower = (coreCards ?? const <String>[])
-        .map((name) => name.trim().toLowerCase())
-        .toSet();
+    final coreLower =
+        (coreCards ?? const <String>[])
+            .map((name) => name.trim().toLowerCase())
+            .toSet();
     final preferredNames =
         commanderPriorityNames.map((name) => name.toLowerCase()).toSet();
     final currentRoleCounts = <String, int>{};
@@ -34,21 +36,25 @@ List<Map<String, dynamic>> buildDeterministicOptimizeRemovalCandidates({
     );
     final structuralRecoverySwapTarget =
         computeOptimizeStructuralRecoverySwapTarget(
-      allCardData: allCardData,
-      commanderColorIdentity: commanderColorIdentity,
-      targetArchetype: targetArchetype,
-    );
+          allCardData: allCardData,
+          commanderColorIdentity: commanderColorIdentity,
+          targetArchetype: targetArchetype,
+        );
     var landCount = 0;
 
     for (final card in allCardData) {
       final qty = (card['quantity'] as int?) ?? 1;
       final typeLine = ((card['type_line'] as String?) ?? '').toLowerCase();
-      if (typeLine.contains('land')) {
+      if (basic_lands.isLandTypeLine(typeLine)) {
         landCount += qty;
         continue;
       }
 
       final role = inferFunctionalRoleForCard(card);
+      if (role == 'ramp' &&
+          !optimizationRampProfileForCard(card).countsTowardGenericFloor) {
+        continue;
+      }
       currentRoleCounts[role] = (currentRoleCounts[role] ?? 0) + qty;
     }
 
@@ -63,10 +69,14 @@ List<Map<String, dynamic>> buildDeterministicOptimizeRemovalCandidates({
       if (isCore && !allowCoreTradeoffs) continue;
 
       final typeLine = (card['type_line'] as String?) ?? '';
-      final isLand = typeLine.toLowerCase().contains('land');
+      final isLand = basic_lands.isLandTypeLine(typeLine);
       if (isLand) continue;
 
       final role = inferFunctionalRoleForCard(card);
+      if (role == 'ramp' &&
+          !optimizationRampProfileForCard(card).countsTowardGenericFloor) {
+        continue;
+      }
       final currentRole = currentRoleCounts[role] ?? 0;
       final targetRole = roleTargets[role] ?? 0;
       final surplus = (currentRole - targetRole).clamp(0, 99);
@@ -88,8 +98,9 @@ List<Map<String, dynamic>> buildDeterministicOptimizeRemovalCandidates({
       });
     }
 
-    final recommendedLandCount =
-        recommendedLandCountForOptimizeArchetype(targetArchetype);
+    final recommendedLandCount = recommendedLandCountForOptimizeArchetype(
+      targetArchetype,
+    );
     final excessLands = landCount - recommendedLandCount;
 
     // Avoid cutting lands just because a healthy list is slightly above target.
@@ -99,7 +110,7 @@ List<Map<String, dynamic>> buildDeterministicOptimizeRemovalCandidates({
         if (name.isEmpty) continue;
 
         final typeLine = ((card['type_line'] as String?) ?? '').toLowerCase();
-        if (!typeLine.contains('land')) continue;
+        if (!basic_lands.isLandTypeLine(typeLine)) continue;
 
         final lower = name.toLowerCase();
         final isBasic = basic_lands.isBasicLandName(lower);
@@ -107,11 +118,12 @@ List<Map<String, dynamic>> buildDeterministicOptimizeRemovalCandidates({
           card: card,
           commanderColorIdentity: commanderColorIdentity,
         );
-        final tappedPenalty = (((card['oracle_text'] as String?) ?? '')
-                .toLowerCase()
-                .contains('enters the battlefield tapped'))
-            ? 20
-            : 0;
+        final tappedPenalty =
+            (((card['oracle_text'] as String?) ?? '').toLowerCase().contains(
+                  'enters the battlefield tapped',
+                ))
+                ? 20
+                : 0;
         final colorlessPenalty =
             supportsColors ? 0 : (commanderColorIdentity.isEmpty ? 0 : 70);
         final basicPenalty = isBasic ? 30 : 0;
@@ -151,10 +163,11 @@ List<Map<String, dynamic>> buildDeterministicOptimizeRemovalCandidates({
         _ => {'removal', 'ramp'},
       };
 
-      final existing = removalCandidates
-          .map((c) => ((c['name'] as String?) ?? '').trim().toLowerCase())
-          .where((n) => n.isNotEmpty)
-          .toSet();
+      final existing =
+          removalCandidates
+              .map((c) => ((c['name'] as String?) ?? '').trim().toLowerCase())
+              .where((n) => n.isNotEmpty)
+              .toSet();
 
       final extra = <Map<String, dynamic>>[];
       for (final card in allCardData) {
@@ -168,7 +181,7 @@ List<Map<String, dynamic>> buildDeterministicOptimizeRemovalCandidates({
         if (isCore && !allowCoreTradeoffs) continue;
 
         final typeLine = (card['type_line'] as String?) ?? '';
-        if (typeLine.toLowerCase().contains('land')) continue;
+        if (basic_lands.isLandTypeLine(typeLine)) continue;
 
         final cmc = (card['cmc'] as num?)?.toDouble() ?? 0.0;
         if (cmc < 6) continue;
@@ -218,11 +231,12 @@ List<Map<String, dynamic>> buildDeterministicOptimizeRemovalCandidates({
       return ((a['name'] as String)).compareTo(b['name'] as String);
     });
 
-    final takeLimit = structuralRecoveryScenario
-        ? (structuralRecoverySwapTarget < effectiveSwapLimit
-            ? structuralRecoverySwapTarget
-            : effectiveSwapLimit)
-        : effectiveSwapLimit;
+    final takeLimit =
+        structuralRecoveryScenario
+            ? (structuralRecoverySwapTarget < effectiveSwapLimit
+                ? structuralRecoverySwapTarget
+                : effectiveSwapLimit)
+            : effectiveSwapLimit;
     return removalCandidates
         .where((candidate) => (candidate['score'] as int) > 0)
         .take(takeLimit)
@@ -237,11 +251,14 @@ List<Map<String, dynamic>> buildDeterministicOptimizeRemovalCandidates({
 
   final merged = <Map<String, dynamic>>[...strictCandidates];
   final relaxedCandidates = buildCandidates(allowCoreTradeoffs: true);
-  final seenNonLandNames = strictCandidates
-      .where((candidate) => candidate['role'] != 'land')
-      .map((candidate) => ((candidate['name'] as String?) ?? '').toLowerCase())
-      .where((name) => name.isNotEmpty)
-      .toSet();
+  final seenNonLandNames =
+      strictCandidates
+          .where((candidate) => candidate['role'] != 'land')
+          .map(
+            (candidate) => ((candidate['name'] as String?) ?? '').toLowerCase(),
+          )
+          .where((name) => name.isNotEmpty)
+          .toSet();
 
   for (final candidate in relaxedCandidates) {
     final role = (candidate['role'] as String?) ?? 'utility';
@@ -260,15 +277,17 @@ List<Map<String, dynamic>> buildDeterministicOptimizeRemovalCandidates({
     allCardData: allCardData,
     commanderColorIdentity: commanderColorIdentity,
   );
-  final structuralTakeCount = structuralRecoveryScenario
-      ? computeOptimizeStructuralRecoverySwapTarget(
-          allCardData: allCardData,
-          commanderColorIdentity: commanderColorIdentity,
-          targetArchetype: targetArchetype,
-        )
-      : effectiveSwapLimit;
-  final takeCount = structuralTakeCount < effectiveSwapLimit
-      ? structuralTakeCount
-      : effectiveSwapLimit;
+  final structuralTakeCount =
+      structuralRecoveryScenario
+          ? computeOptimizeStructuralRecoverySwapTarget(
+            allCardData: allCardData,
+            commanderColorIdentity: commanderColorIdentity,
+            targetArchetype: targetArchetype,
+          )
+          : effectiveSwapLimit;
+  final takeCount =
+      structuralTakeCount < effectiveSwapLimit
+          ? structuralTakeCount
+          : effectiveSwapLimit;
   return merged.take(takeCount).toList();
 }

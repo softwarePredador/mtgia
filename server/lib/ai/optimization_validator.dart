@@ -4,9 +4,11 @@ import 'package:http/http.dart' as http;
 import 'package:dotenv/dotenv.dart';
 import '../logger.dart';
 import '../openai_runtime_config.dart';
+import '../basic_land_utils.dart' as land_utils;
 import 'cmc_safety.dart';
 import 'goldfish_simulator.dart';
 import 'optimization_functional_roles.dart';
+import 'optimization_ramp_profile.dart';
 import 'theme_contextual_rules_service.dart';
 
 typedef ThemeDeckValidationCallback =
@@ -350,6 +352,7 @@ class OptimizationValidator {
       'draw',
       'removal',
       'ramp',
+      'ramp_floor',
       'creature',
       'artifact',
       'enchantment',
@@ -374,16 +377,26 @@ class OptimizationValidator {
             _findCardByName(optimizedDeck, swap.added) ?? <String, dynamic>{};
         final removedHasRole =
             removedCard.isNotEmpty &&
-            (role == 'land'
-                ? _isLand(removedCard)
-                : optimizationFunctionalRolesForCard(
+            switch (role) {
+              'land' => _isLand(removedCard),
+              'ramp_floor' =>
+                optimizationRampProfileForCard(
                   removedCard,
-                ).contains(role));
+                ).countsTowardGenericFloor,
+              _ => optimizationFunctionalRolesForCard(
+                removedCard,
+              ).contains(role),
+            };
         final addedHasRole =
             addedCard.isNotEmpty &&
-            (role == 'land'
-                ? _isLand(addedCard)
-                : optimizationFunctionalRolesForCard(addedCard).contains(role));
+            switch (role) {
+              'land' => _isLand(addedCard),
+              'ramp_floor' =>
+                optimizationRampProfileForCard(
+                  addedCard,
+                ).countsTowardGenericFloor,
+              _ => optimizationFunctionalRolesForCard(addedCard).contains(role),
+            };
         if (removedHasRole) {
           lost++;
         }
@@ -542,15 +555,15 @@ SUA TAREFA: Avaliar se as trocas são REALMENTE boas. Retorne apenas JSON:
       critic: critic,
     );
 
-    // Role preservation: perder removal, draw, wipe ou ramp é muito ruim.
+    // Role preservation: perder removal, draw, wipe ou ramp estrutural é muito ruim.
     // Essas perdas impactam tanto o score final quanto o veredito.
     final lostRemoval = (functional.roleDelta['removal'] ?? 0) < 0;
     final lostDraw = (functional.roleDelta['draw'] ?? 0) < 0;
     final lostWipe = (functional.roleDelta['wipe'] ?? 0) < 0;
-    final lostRamp = (functional.roleDelta['ramp'] ?? 0) < 0;
+    final lostRampFloor = (functional.roleDelta['ramp_floor'] ?? 0) < 0;
     final lostLand = (functional.roleDelta['land'] ?? 0) < 0;
     final hasCriticalRoleLoss =
-        lostRemoval || lostDraw || lostWipe || lostRamp || lostLand;
+        lostRemoval || lostDraw || lostWipe || lostRampFloor || lostLand;
     final hasCriticalThemeViolation =
         themeValidation?.hasCriticalViolation == true;
     final consistencyDelta =
@@ -625,9 +638,9 @@ SUA TAREFA: Avaliar se as trocas são REALMENTE boas. Retorne apenas JSON:
         'O deck perdeu board wipe(s). Pode ter dificuldade contra ameaças múltiplas.',
       );
     }
-    if (lostRamp) {
+    if (lostRampFloor) {
       warnings.add(
-        'O deck perdeu cartas de ramp. Pode ficar lento no early game.',
+        'O deck perdeu ramp estrutural. Pode ficar lento no early game.',
       );
     }
     if (lostLand) {
@@ -748,7 +761,7 @@ SUA TAREFA: Avaliar se as trocas são REALMENTE boas. Retorne apenas JSON:
     if ((functional.roleDelta['removal'] ?? 0) < 0) score -= 12.0;
     if ((functional.roleDelta['draw'] ?? 0) < 0) score -= 10.0;
     if ((functional.roleDelta['wipe'] ?? 0) < 0) score -= 8.0;
-    if ((functional.roleDelta['ramp'] ?? 0) < 0) score -= 8.0;
+    if ((functional.roleDelta['ramp_floor'] ?? 0) < 0) score -= 8.0;
     final landLoss = -(functional.roleDelta['land'] ?? 0);
     if (landLoss > 0) score -= landLoss * 12.0;
     if ((functional.roleDelta['protection'] ?? 0) < 0) score -= 6.0;
@@ -786,9 +799,7 @@ SUA TAREFA: Avaliar se as trocas são REALMENTE boas. Retorne apenas JSON:
   // ═══════════════════════════════════════════════════════════════
 
   bool _isLand(Map<String, dynamic> card) {
-    return ((card['type_line'] as String?) ?? '').toLowerCase().contains(
-      'land',
-    );
+    return land_utils.isLandTypeLine((card['type_line'] as String?) ?? '');
   }
 
   Map<String, dynamic>? _findCardByName(

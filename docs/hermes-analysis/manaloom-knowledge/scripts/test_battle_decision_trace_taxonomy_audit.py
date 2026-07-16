@@ -182,6 +182,82 @@ def test_utility_permanent_activation_has_a_concrete_observed_contract():
     assert audit["summary"]["decision_trace_contract_findings"] == 0
 
 
+def test_cast_and_trigger_choice_contracts_match_runtime_score_shapes():
+    with tempfile.TemporaryDirectory() as tmp_name:
+        tmp = Path(tmp_name)
+        engine = tmp / "engine.py"
+        write_engine(
+            engine,
+            [
+                "cast_selection",
+                "modal_dfc_face_choice",
+                "triggered_ability_choice",
+            ],
+        )
+        write_trace(
+            tmp / "seed_1/replay.decision_trace.jsonl",
+            [
+                base_decision(
+                    "cast_selection",
+                    {
+                        "escape_option_score": 32,
+                        "escape_exile_count": 3,
+                        "graveyard_cards_before": 8,
+                    },
+                ),
+                base_decision(
+                    "modal_dfc_face_choice",
+                    {
+                        "hand_size_after_cast": 3,
+                        "library_size": 80,
+                        "back_face_mana_value": 5,
+                        "front_face_score": 12,
+                        "competing_options": [[10, "Birgi, God of Storytelling"]],
+                    },
+                ),
+                base_decision(
+                    "triggered_ability_choice",
+                    {
+                        "mana_before": 4,
+                        "mana_after": 0,
+                        "life": 8,
+                        "vault_tapped_after": False,
+                    },
+                ),
+            ],
+        )
+
+        audit = audit_module.build_audit(input_dir=tmp, engine_source=engine)
+
+    assert audit["summary"]["status"] == "decision_trace_taxonomy_ready"
+    assert audit["summary"]["decision_trace_static_without_contract"] == 0
+    assert audit["summary"]["decision_trace_contract_findings"] == 0
+
+
+def test_triggered_choice_contract_rejects_missing_resulting_state():
+    with tempfile.TemporaryDirectory() as tmp_name:
+        tmp = Path(tmp_name)
+        engine = tmp / "engine.py"
+        write_engine(engine, ["triggered_ability_choice"])
+        write_trace(
+            tmp / "seed_1/replay.decision_trace.jsonl",
+            [
+                base_decision(
+                    "triggered_ability_choice",
+                    {"mana_before": 4, "mana_after": 0, "life": 8},
+                ),
+            ],
+        )
+
+        audit = audit_module.build_audit(input_dir=tmp, engine_source=engine)
+
+    assert audit["summary"]["status"] == "review_required"
+    assert audit["summary"]["decision_trace_contract_findings"] == 1
+    assert audit["findings"][0]["missing"] == [
+        "score_components.vault_tapped_after"
+    ]
+
+
 def test_real_engine_has_an_explicit_contract_for_every_static_decision_type():
     with tempfile.TemporaryDirectory() as tmp_name:
         audit = audit_module.build_audit(input_dir=Path(tmp_name))
@@ -197,6 +273,8 @@ if __name__ == "__main__":
         test_observed_unknown_decision_type_is_reported,
         test_missing_type_specific_score_key_is_reported,
         test_utility_permanent_activation_has_a_concrete_observed_contract,
+        test_cast_and_trigger_choice_contracts_match_runtime_score_shapes,
+        test_triggered_choice_contract_rejects_missing_resulting_state,
         test_real_engine_has_an_explicit_contract_for_every_static_decision_type,
     ]
     for test in tests:

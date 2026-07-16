@@ -223,7 +223,7 @@ run_resolution_corpus_e2e() {
 }
 
 run_battle_product_e2e() {
-  if [[ "$E2E_PROFILE" == *"isolated-mutating"* ]]; then
+  if [[ "${MANALOOM_RUN_MUTATING_BATTLE_PRODUCT_E2E:-0}" == "1" ]]; then
     if ! manaloom_has_postgres_write_approval; then
       block_step \
         "Battle product isolated mutating E2E" \
@@ -238,6 +238,36 @@ run_battle_product_e2e() {
   skip_step \
     "Battle product isolated mutating E2E" \
     "set MANALOOM_RUN_MUTATING_BATTLE_PRODUCT_E2E=1 plus the textual PostgreSQL approval token to run against a harness-owned IPv4-loopback API"
+}
+
+run_ramp_and_data_foundation_contracts() {
+  local dart_tests=(
+    test/ramp_family_classifier_test.dart
+    test/optimization_ramp_profile_test.dart
+    test/ramp_floor_consumer_contract_test.dart
+    test/functional_card_tags_test.dart
+    test/optimization_quality_gate_test.dart
+    test/optimization_validator_test.dart
+    test/optimize_filler_loader_support_test.dart
+    test/optimize_functional_role_support_test.dart
+    test/optimize_removal_candidate_support_test.dart
+    test/optimize_swap_candidate_support_test.dart
+    test/candidate_quality_data_foundation_preflight_test.dart
+    test/candidate_quality_data_foundation_source_test.dart
+    test/semantic_tag_query_contract_test.dart
+    test/sync_rules_safety_test.dart
+    test/magic_rules_source_test.dart
+  )
+  local optional_test
+  for optional_test in \
+    "$ROOT_DIR"/server/test/semantic_layer_v2_backfill*_test.dart; do
+    if [[ -f "$optional_test" ]]; then
+      dart_tests+=("test/$(basename "$optional_test")")
+    fi
+  done
+
+  run_step "Ramp classifiers and data-foundation safety contracts" \
+    "cd \"$ROOT_DIR/server\" && RUN_INTEGRATION_TESTS=0 JWT_SECRET=local_manaloom_foundation_$STAMP dart test ${dart_tests[*]} && cd \"$ROOT_DIR\" && PYTHONPATH=\"$ROOT_DIR/docs/hermes-analysis/manaloom-knowledge/scripts:\${PYTHONPATH:-}\" python3 -m pytest docs/hermes-analysis/manaloom-knowledge/scripts/test_scryfall_classifier_multi_tags.py"
 }
 
 write_final_summary() {
@@ -358,6 +388,8 @@ main() {
 
   run_step "Server AI deckbuilder battle route contracts" \
     "cd \"$ROOT_DIR/server\" && RUN_INTEGRATION_TESTS=0 JWT_SECRET=local_manaloom_e2e_$STAMP dart test test/ai_generate_learning_boundary_test.dart test/deck_simulate_route_adapter_test.dart test/deck_recommendations_route_adapter_test.dart test/deck_recommendations_route_support_test.dart test/deck_recommendations_power_level_support_test.dart test/commander_deckbuilding_contract_support_test.dart test/commander_ai_prompt_eval_suite_test.dart test/commander_learned_deck_support_test.dart test/deck_learning_event_support_test.dart test/ai_generate_performance_support_test.dart test/generated_deck_validation_service_test.dart test/production_ai_mock_fallback_policy_test.dart"
+
+  run_ramp_and_data_foundation_contracts
 
   run_step "Canonical battle product gate" \
     "\"$ROOT_DIR/scripts/quality_gate.sh\" battle"

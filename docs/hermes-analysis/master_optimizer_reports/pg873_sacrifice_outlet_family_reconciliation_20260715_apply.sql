@@ -16,7 +16,7 @@ BEGIN
   IF to_regclass('manaloom_deploy_audit.pg873_sac_outlet_expected_20260715') IS NOT NULL
      OR to_regclass('manaloom_deploy_audit.pg873_sac_outlet_function_backup_20260715') IS NOT NULL
      OR to_regclass('manaloom_deploy_audit.pg873_sac_outlet_semantic_backup_20260715') IS NOT NULL
-     OR to_regclass('manaloom_deploy_audit.pg873_sac_outlet_missing_semantic_20260715') IS NOT NULL
+     OR to_regclass('manaloom_deploy_audit.pg873_sac_outlet_deferred_semantic_20260715') IS NOT NULL
      OR to_regclass('manaloom_deploy_audit.pg873_sac_outlet_post_semantic_20260715') IS NOT NULL THEN
     RAISE EXCEPTION 'PG873 abort: an audit table already exists';
   END IF;
@@ -171,10 +171,22 @@ expected_cards AS (
       )
     )
 ),
-expected AS (
+global_expected AS (
   SELECT o.lane, o.card_id
   FROM owner_cards o
   JOIN expected_cards e USING (card_id)
+),
+expected AS (
+  SELECT e.lane, e.card_id
+  FROM global_expected e
+  WHERE e.lane = 'deterministic_heuristic_v1'
+     OR EXISTS (
+       SELECT 1
+       FROM public.card_semantic_tags_v2 s
+       WHERE s.card_id = e.card_id
+         AND s.source = 'deterministic_semantic_v2'
+         AND s.schema_version = 'semantic_layer_v2_2026_05_18'
+     )
 )
 SELECT e.card_id, e.lane AS source, c.name AS card_name
 FROM expected e
@@ -202,14 +214,115 @@ BEGIN
 
   IF v_heuristic_count <> 716
      OR v_heuristic_sha <> '51272701cdb5b277a2007de43c418c418fab5380409fc16c08ac527fd1ddacbd'
-     OR v_semantic_count <> 736
-     OR v_semantic_sha <> '512cb67eca26b4c86d4555fcf14cae19e6e9f0a9bd24239db0d4cc6caa49418c' THEN
+     OR v_semantic_count <> 684
+     OR v_semantic_sha <> '573c94fad8b4ba9d9789daadd506e4ce2b0143dfa0d049eb8687c4c8cd90e8bd' THEN
     RAISE EXCEPTION 'PG873 abort: expected manifest drift h=%/% s=%/%',
       v_heuristic_count, v_heuristic_sha, v_semantic_count, v_semantic_sha;
   END IF;
 END $$;
 
-\ir pg873_sacrifice_outlet_family_reconciliation_20260715_missing_semantic_manifest.sql
+-- These cards have no existing deterministic semantic snapshot. PG873 records
+-- them for a later full semantic backfill and never creates an outlet-only row.
+CREATE TABLE manaloom_deploy_audit.pg873_sac_outlet_deferred_semantic_20260715 AS
+WITH RECURSIVE
+semantic_owner AS (
+  SELECT c.id AS card_id, c.name, lower(c.oracle_text) AS oracle_text
+  FROM public.cards c
+  WHERE coalesce(c.type_line, '') <> ''
+    AND coalesce(c.oracle_text, '') <> ''
+),
+stripped_parenthetical(card_id, name, oracle_text, depth) AS (
+  SELECT card_id, name, oracle_text, 0 FROM semantic_owner
+  UNION ALL
+  SELECT card_id, name, regexp_replace(oracle_text, '\([^()]*\)', '', 'g'), depth + 1
+  FROM stripped_parenthetical
+  WHERE depth < 20 AND oracle_text ~ '\([^()]*\)'
+),
+clean_cards AS (
+  SELECT DISTINCT ON (card_id)
+    card_id, name, regexp_replace(oracle_text, '\([^)]*$', '', 'g') AS oracle_text
+  FROM stripped_parenthetical
+  ORDER BY card_id, depth DESC
+),
+name_faces AS (
+  SELECT
+    c.card_id,
+    regexp_replace(
+      replace(replace(lower(trim(face)), '‘', ''''), '’', ''''),
+      '\s+', ' ', 'g'
+    ) AS face
+  FROM clean_cards c
+  CROSS JOIN LATERAL regexp_split_to_table(c.name, '\s*//\s*') AS face
+),
+name_aliases AS (
+  SELECT card_id, face AS self_name FROM name_faces WHERE face <> ''
+  UNION
+  SELECT card_id, CASE WHEN face LIKE 'a-%' THEN trim(substr(face, 3)) ELSE face END
+  FROM name_faces WHERE face <> ''
+  UNION
+  SELECT card_id, trim(split_part(
+    CASE WHEN face LIKE 'a-%' THEN trim(substr(face, 3)) ELSE face END, ',', 1
+  ))
+  FROM name_faces
+  WHERE strpos(CASE WHEN face LIKE 'a-%' THEN trim(substr(face, 3)) ELSE face END, ',') > 0
+    AND length(trim(split_part(
+      CASE WHEN face LIKE 'a-%' THEN trim(substr(face, 3)) ELSE face END, ',', 1
+    ))) >= 3
+),
+oracle_lines AS (
+  SELECT c.card_id, line_no, line
+  FROM clean_cards c
+  CROSS JOIN LATERAL regexp_split_to_table(c.oracle_text, E'[\\r\\n]+')
+    WITH ORDINALITY AS lines(line, line_no)
+),
+colon_segments AS (
+  SELECT
+    l.card_id,
+    segment_no,
+    regexp_replace(trim(segment), '\s+', ' ', 'g') AS cost_segment,
+    count(*) OVER (PARTITION BY l.card_id, l.line_no) AS segment_count
+  FROM oracle_lines l
+  CROSS JOIN LATERAL regexp_split_to_table(l.line, ':')
+    WITH ORDINALITY AS segments(segment, segment_no)
+),
+sacrifice_objects AS (
+  SELECT s.card_id, trim(matches[1]) AS object_phrase
+  FROM colon_segments s
+  CROSS JOIN LATERAL regexp_matches(s.cost_segment, '\msacrifice\s+(.+)$', 'g') AS matches
+  WHERE s.segment_no < s.segment_count
+),
+expected_cards AS (
+  SELECT DISTINCT o.card_id
+  FROM sacrifice_objects o
+  WHERE o.object_phrase ~ '^[a-z0-9~]'
+    AND (
+      o.object_phrase ~ '\mor\s+(another|other|an?|one|two|three|four|five|six|seven|eight|nine|ten|x|any|up to|all|half|[0-9]+)\M'
+      OR (
+        o.object_phrase !~ '^(this|it|that|itself|the source|~)(\M|$)'
+        AND NOT EXISTS (
+          SELECT 1 FROM name_aliases a
+          WHERE a.card_id = o.card_id
+            AND (
+              o.object_phrase = a.self_name
+              OR left(o.object_phrase, length(a.self_name) + 1) = a.self_name || ','
+              OR left(o.object_phrase, length(a.self_name) + 5) = a.self_name || ' and '
+              OR left(o.object_phrase, length(a.self_name) + 4) = a.self_name || ' or '
+            )
+        )
+      )
+    )
+)
+SELECT o.card_id, o.name AS card_name
+FROM semantic_owner o
+JOIN expected_cards e USING (card_id)
+LEFT JOIN public.card_semantic_tags_v2 s
+  ON s.card_id = o.card_id
+ AND s.source = 'deterministic_semantic_v2'
+ AND s.schema_version = 'semantic_layer_v2_2026_05_18'
+WHERE s.card_id IS NULL;
+
+ALTER TABLE manaloom_deploy_audit.pg873_sac_outlet_deferred_semantic_20260715
+  ADD PRIMARY KEY (card_id);
 
 DO $$
 DECLARE
@@ -218,67 +331,31 @@ DECLARE
 BEGIN
   SELECT count(*), encode(digest(string_agg(card_id::text, E'\n' ORDER BY card_id::text), 'sha256'), 'hex')
   INTO v_count, v_sha
-  FROM manaloom_deploy_audit.pg873_sac_outlet_missing_semantic_20260715;
+  FROM manaloom_deploy_audit.pg873_sac_outlet_deferred_semantic_20260715;
 
   IF v_count <> 52
      OR v_sha <> '4f29cbcbbdaa9a10bf285ff808c40ab8f3026367a2b3bc873fd51424cad5b199' THEN
-    RAISE EXCEPTION 'PG873 abort: missing semantic manifest drift count=% sha=%', v_count, v_sha;
+    RAISE EXCEPTION 'PG873 abort: deferred semantic backlog drift count=% sha=%', v_count, v_sha;
   END IF;
 
   IF EXISTS (
     SELECT 1
-    FROM manaloom_deploy_audit.pg873_sac_outlet_missing_semantic_20260715 m
+    FROM manaloom_deploy_audit.pg873_sac_outlet_deferred_semantic_20260715 m
     LEFT JOIN public.cards c ON c.id = m.card_id
     WHERE c.id IS NULL
        OR c.name IS DISTINCT FROM m.card_name
-       OR m.source <> 'deterministic_semantic_v2'
-       OR m.schema_version <> 'semantic_layer_v2_2026_05_18'
-       OR m.tags <> '[{"tag":"sacrifice_outlet","confidence":0.8,"evidence":"external_activated_sacrifice_outlet_cost"}]'::jsonb
-       OR m.role_confidence <> 0.8
-       OR m.card_advantage_type <> 'none'
-       OR m.interaction_scope <> 'none'
-       OR m.combo_piece OR m.wincon OR m.engine OR m.payoff OR m.enabler
-       OR m.protection_type <> 'none'
-       OR m.recursion_type <> 'none'
-       OR m.explanation_reason <> 'no_primary_function_detected'
   ) THEN
-    RAISE EXCEPTION 'PG873 abort: invalid missing semantic payload';
-  END IF;
-
-  IF EXISTS (
-    SELECT m.card_id
-    FROM manaloom_deploy_audit.pg873_sac_outlet_missing_semantic_20260715 m
-    EXCEPT
-    SELECT e.card_id
-    FROM manaloom_deploy_audit.pg873_sac_outlet_expected_20260715 e
-    LEFT JOIN public.card_semantic_tags_v2 s
-      ON s.card_id = e.card_id
-     AND s.source = 'deterministic_semantic_v2'
-     AND s.schema_version = 'semantic_layer_v2_2026_05_18'
-    WHERE e.source = 'deterministic_semantic_v2' AND s.card_id IS NULL
-  ) OR EXISTS (
-    SELECT e.card_id
-    FROM manaloom_deploy_audit.pg873_sac_outlet_expected_20260715 e
-    LEFT JOIN public.card_semantic_tags_v2 s
-      ON s.card_id = e.card_id
-     AND s.source = 'deterministic_semantic_v2'
-     AND s.schema_version = 'semantic_layer_v2_2026_05_18'
-    WHERE e.source = 'deterministic_semantic_v2' AND s.card_id IS NULL
-    EXCEPT
-    SELECT m.card_id
-    FROM manaloom_deploy_audit.pg873_sac_outlet_missing_semantic_20260715 m
-  ) THEN
-    RAISE EXCEPTION 'PG873 abort: missing semantic IDs diverge from live state';
+    RAISE EXCEPTION 'PG873 abort: invalid deferred semantic backlog payload';
   END IF;
 
   IF EXISTS (
     SELECT 1
-    FROM manaloom_deploy_audit.pg873_sac_outlet_missing_semantic_20260715 m
+    FROM manaloom_deploy_audit.pg873_sac_outlet_deferred_semantic_20260715 m
     JOIN public.card_semantic_tags_v2 s
       ON s.card_id = m.card_id
      AND s.source = 'deterministic_semantic_v2'
   ) THEN
-    RAISE EXCEPTION 'PG873 abort: a missing semantic ID has a conflicting source row';
+    RAISE EXCEPTION 'PG873 abort: a deferred semantic card already has a source row';
   END IF;
 END $$;
 
@@ -405,19 +482,6 @@ WHERE s.card_id = b.card_id
     WHERE element->>'tag' <> 'sacrifice_outlet'
   );
 
-INSERT INTO public.card_semantic_tags_v2 (
-  card_id, card_name, schema_version, speed, mana_efficiency,
-  card_advantage_type, interaction_scope, combo_piece, wincon, engine,
-  payoff, enabler, protection_type, recursion_type, role_confidence,
-  explanation_reason, tags, source, updated_at
-)
-SELECT
-  card_id, card_name, schema_version, speed, mana_efficiency,
-  card_advantage_type, interaction_scope, combo_piece, wincon, engine,
-  payoff, enabler, protection_type, recursion_type, role_confidence,
-  explanation_reason, tags, source, CURRENT_TIMESTAMP
-FROM manaloom_deploy_audit.pg873_sac_outlet_missing_semantic_20260715;
-
 CREATE TABLE manaloom_deploy_audit.pg873_sac_outlet_post_semantic_20260715 AS
 SELECT s.*
 FROM public.card_semantic_tags_v2 s
@@ -427,11 +491,6 @@ WHERE s.source = 'deterministic_semantic_v2'
       SELECT 1
       FROM manaloom_deploy_audit.pg873_sac_outlet_semantic_backup_20260715 b
       WHERE b.card_id = s.card_id
-    )
-    OR EXISTS (
-      SELECT 1
-      FROM manaloom_deploy_audit.pg873_sac_outlet_missing_semantic_20260715 m
-      WHERE m.card_id = s.card_id
     )
   );
 
@@ -456,8 +515,8 @@ BEGIN
 
   IF v_h_count <> 716
      OR v_h_sha <> '51272701cdb5b277a2007de43c418c418fab5380409fc16c08ac527fd1ddacbd'
-     OR v_s_count <> 736
-     OR v_s_sha <> '512cb67eca26b4c86d4555fcf14cae19e6e9f0a9bd24239db0d4cc6caa49418c' THEN
+     OR v_s_count <> 684
+     OR v_s_sha <> '573c94fad8b4ba9d9789daadd506e4ce2b0143dfa0d049eb8687c4c8cd90e8bd' THEN
     RAISE EXCEPTION 'PG873 abort: post function sets diverged h=%/% s=%/%',
       v_h_count, v_h_sha, v_s_count, v_s_sha;
   END IF;
@@ -469,9 +528,9 @@ BEGIN
     AND s.schema_version = 'semantic_layer_v2_2026_05_18'
     AND s.tags @> '[{"tag":"sacrifice_outlet"}]'::jsonb;
 
-  IF v_json_count <> 736
-     OR v_json_sha <> '512cb67eca26b4c86d4555fcf14cae19e6e9f0a9bd24239db0d4cc6caa49418c'
-     OR (SELECT count(*) FROM manaloom_deploy_audit.pg873_sac_outlet_post_semantic_20260715) <> 1576 THEN
+  IF v_json_count <> 684
+     OR v_json_sha <> '573c94fad8b4ba9d9789daadd506e4ce2b0143dfa0d049eb8687c4c8cd90e8bd'
+     OR (SELECT count(*) FROM manaloom_deploy_audit.pg873_sac_outlet_post_semantic_20260715) <> 1524 THEN
     RAISE EXCEPTION 'PG873 abort: post semantic set diverged count=% sha=% post_snapshot=%',
       v_json_count, v_json_sha,
       (SELECT count(*) FROM manaloom_deploy_audit.pg873_sac_outlet_post_semantic_20260715);

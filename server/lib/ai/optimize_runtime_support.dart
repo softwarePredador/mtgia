@@ -1,4 +1,4 @@
-﻿import 'package:postgres/postgres.dart';
+import 'package:postgres/postgres.dart';
 import '../basic_land_utils.dart' as basic_lands;
 import '../meta/meta_deck_reference_support.dart';
 import '../meta/meta_deck_format_support.dart';
@@ -113,11 +113,10 @@ List<String> extractAverageDeckSeedNamesFromProfile(
 String resolveOptimizeArchetype({
   required String requestedArchetype,
   required String? detectedArchetype,
-}) =>
-    archetype_support.resolveEffectiveOptimizeArchetype(
-      requestedArchetype: requestedArchetype,
-      detectedArchetype: detectedArchetype,
-    );
+}) => archetype_support.resolveEffectiveOptimizeArchetype(
+  requestedArchetype: requestedArchetype,
+  detectedArchetype: detectedArchetype,
+);
 
 String buildOptimizeDeckSignature(List<ResultRow> cardsResult) {
   return optimize_cache.buildOptimizeDeckSignature(cardsResult);
@@ -145,18 +144,14 @@ String buildOptimizeCacheKey({
   );
 }
 
-String stableOptimizeHash(String value) => optimize_cache.stableOptimizeHash(
-      value,
-    );
+String stableOptimizeHash(String value) =>
+    optimize_cache.stableOptimizeHash(value);
 
 Future<Map<String, dynamic>?> loadOptimizeCache({
   required Pool pool,
   required String cacheKey,
 }) async {
-  return optimize_cache.loadOptimizeCache(
-    pool: pool,
-    cacheKey: cacheKey,
-  );
+  return optimize_cache.loadOptimizeCache(pool: pool, cacheKey: cacheKey);
 }
 
 Future<List<Map<String, dynamic>>> loadUniversalCommanderFallbacks({
@@ -167,9 +162,10 @@ Future<List<Map<String, dynamic>>> loadUniversalCommanderFallbacks({
 }) async {
   if (limit <= 0) return const [];
 
-  final filteredPreferred = universalCommanderFallbackNames
-      .where((name) => !excludeNames.contains(name.toLowerCase()))
-      .toList();
+  final filteredPreferred =
+      universalCommanderFallbackNames
+          .where((name) => !excludeNames.contains(name.toLowerCase()))
+          .toList();
   if (filteredPreferred.isEmpty) return const [];
 
   final result = await pool.execute(
@@ -180,32 +176,32 @@ Future<List<Map<String, dynamic>>> loadUniversalCommanderFallbacks({
       ORDER BY name ASC
       LIMIT @limit
     '''),
-    parameters: {
-      'names': filteredPreferred,
-      'limit': limit,
-    },
+    parameters: {'names': filteredPreferred, 'limit': limit},
   );
 
-  final mapped = result
-      .map((row) => {
-            'id': row[0] as String,
-            'name': row[1] as String,
-            'type_line': (row[2] as String?) ?? '',
-            'oracle_text': (row[3] as String?) ?? '',
-            'mana_cost': (row[4] as String?) ?? '',
-            'colors': (row[5] as List?)?.cast<String>() ?? const <String>[],
-            'color_identity':
-                (row[6] as List?)?.cast<String>() ?? const <String>[],
-          })
-      .where(
-        (candidate) => shouldKeepCommanderFillerCandidate(
-          candidate: candidate,
-          excludeNames: excludeNames,
-          commanderColorIdentity: commanderColorIdentity,
-          enforceCommanderIdentity: true,
-        ),
-      )
-      .toList();
+  final mapped =
+      result
+          .map(
+            (row) => {
+              'id': row[0] as String,
+              'name': row[1] as String,
+              'type_line': (row[2] as String?) ?? '',
+              'oracle_text': (row[3] as String?) ?? '',
+              'mana_cost': (row[4] as String?) ?? '',
+              'colors': (row[5] as List?)?.cast<String>() ?? const <String>[],
+              'color_identity':
+                  (row[6] as List?)?.cast<String>() ?? const <String>[],
+            },
+          )
+          .where(
+            (candidate) => shouldKeepCommanderFillerCandidate(
+              candidate: candidate,
+              excludeNames: excludeNames,
+              commanderColorIdentity: commanderColorIdentity,
+              enforceCommanderIdentity: true,
+            ),
+          )
+          .toList();
 
   return dedupeCandidatesByName(mapped).take(limit).toList();
 }
@@ -226,9 +222,10 @@ Future<List<Map<String, dynamic>>> loadArchetypeCommanderFoundationFillers({
     detectedTheme: detectedTheme,
   );
 
-  final filteredNames = names
-      .where((name) => !excludeNames.contains(name.toLowerCase()))
-      .toList();
+  final filteredNames =
+      names
+          .where((name) => !excludeNames.contains(name.toLowerCase()))
+          .toList();
   if (filteredNames.isEmpty) return const [];
 
   final result = await pool.execute(
@@ -241,49 +238,51 @@ Future<List<Map<String, dynamic>>> loadArchetypeCommanderFoundationFillers({
       LEFT JOIN card_legalities cl ON cl.card_id = c.id AND cl.format = 'commander'
       WHERE (cl.status = 'legal' OR cl.status = 'restricted' OR cl.status IS NULL)
         AND LOWER(c.name) IN (SELECT LOWER(unnest(@names::text[])))
-        AND c.type_line NOT ILIKE '%land%'
+        AND NOT (COALESCE(c.type_line, '') ~* '(^|[^a-z])land([^a-z]|\$)')
       ORDER BY COALESCE(cmi.meta_deck_count, 0) DESC,
                COALESCE(cmi.usage_count, 0) DESC,
                c.name ASC
       LIMIT @limit
     '''),
-    parameters: {
-      'names': filteredNames,
-      'limit': limit * 2,
-    },
+    parameters: {'names': filteredNames, 'limit': limit * 2},
   );
 
-  final mapped = result
-      .map((row) => {
-            'id': row[0] as String,
-            'name': row[1] as String,
-            'type_line': (row[2] as String?) ?? '',
-            'oracle_text': (row[3] as String?) ?? '',
-            'mana_cost': (row[4] as String?) ?? '',
-            'colors': (row[5] as List?)?.cast<String>() ?? const <String>[],
-            'color_identity':
-                (row[6] as List?)?.cast<String>() ?? const <String>[],
-            'cmc': safeToDouble(row[7]),
-            'meta_deck_count': (row[8] as num?)?.toInt() ?? 0,
-            'usage_count': (row[9] as num?)?.toInt() ?? 0,
-          })
-      .where(
-        (candidate) => shouldKeepCommanderFillerCandidate(
-          candidate: candidate,
-          excludeNames: excludeNames,
-          commanderColorIdentity: commanderColorIdentity,
-          enforceCommanderIdentity: true,
-        ),
-      )
-      .toList();
+  final mapped =
+      result
+          .map(
+            (row) => {
+              'id': row[0] as String,
+              'name': row[1] as String,
+              'type_line': (row[2] as String?) ?? '',
+              'oracle_text': (row[3] as String?) ?? '',
+              'mana_cost': (row[4] as String?) ?? '',
+              'colors': (row[5] as List?)?.cast<String>() ?? const <String>[],
+              'color_identity':
+                  (row[6] as List?)?.cast<String>() ?? const <String>[],
+              'cmc': safeToDouble(row[7]),
+              'meta_deck_count': (row[8] as num?)?.toInt() ?? 0,
+              'usage_count': (row[9] as num?)?.toInt() ?? 0,
+            },
+          )
+          .where(
+            (candidate) => shouldKeepCommanderFillerCandidate(
+              candidate: candidate,
+              excludeNames: excludeNames,
+              commanderColorIdentity: commanderColorIdentity,
+              enforceCommanderIdentity: true,
+            ),
+          )
+          .toList();
 
   final deduped = dedupeCandidatesByName(mapped);
   deduped.sort((a, b) {
-    final byQuality = commanderFillerQualityScore(b)
-        .compareTo(commanderFillerQualityScore(a));
+    final byQuality = commanderFillerQualityScore(
+      b,
+    ).compareTo(commanderFillerQualityScore(a));
     if (byQuality != 0) return byQuality;
-    return ((a['name'] as String?) ?? '')
-        .compareTo((b['name'] as String?) ?? '');
+    return ((a['name'] as String?) ?? '').compareTo(
+      (b['name'] as String?) ?? '',
+    );
   });
   return deduped.take(limit).toList();
 }
@@ -328,10 +327,7 @@ Future<List<String>> loadCommanderCompetitivePriorities({
         ORDER BY meta_deck_count DESC, usage_count DESC, card_name ASC
         LIMIT @limit
       '''),
-      parameters: {
-        'commander': commanderName,
-        'limit': limit,
-      },
+      parameters: {'commander': commanderName, 'limit': limit},
     );
   } catch (_) {
     fallback = const [];
@@ -478,10 +474,7 @@ Future<Map<String, dynamic>> loadUserAiPreferences({
   required String? userId,
 }) async {
   if (userId == null || userId.isEmpty) {
-    return const {
-      'preferred_bracket': null,
-      'keep_theme_default': true,
-    };
+    return const {'preferred_bracket': null, 'keep_theme_default': true};
   }
 
   final result = await pool.execute(
@@ -491,16 +484,11 @@ Future<Map<String, dynamic>> loadUserAiPreferences({
       WHERE user_id = CAST(@user_id AS uuid)
       LIMIT 1
     '''),
-    parameters: {
-      'user_id': userId,
-    },
+    parameters: {'user_id': userId},
   );
 
   if (result.isEmpty) {
-    return const {
-      'preferred_bracket': null,
-      'keep_theme_default': true,
-    };
+    return const {'preferred_bracket': null, 'keep_theme_default': true};
   }
 
   final row = result.first;

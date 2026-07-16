@@ -10,6 +10,7 @@ from __future__ import annotations
 
 import argparse
 import copy
+import hashlib
 import json
 import multiprocessing as mp
 import os
@@ -55,9 +56,26 @@ CARD_EXPOSURE_EVENTS = {
     "utility_artifact_activated",
     "utility_land_activated",
 }
+LOREHOLD_RUNTIME_EFFECT_EVENTS = {
+    "escape_additional_cost_paid",
+    "escape_cast",
+    "flashback_cast",
+    "flashback_exiled",
+    "flashback_permission_expired",
+    "flashback_target_permission_granted",
+    "flashback_target_permission_not_granted",
+    "harnfel_activated",
+    "harnfel_discard_cost_paid",
+    "harnfel_exiled_card_played",
+    "mana_vault_draw_step_damage",
+    "mana_vault_mana_activated",
+    "mana_vault_upkeep_untap",
+    "underworld_breach_end_step_sacrificed",
+}
 BASE_FOCUS_TRACE_CARDS = {
     "Aetherflux Reservoir",
     "Birgi, God of Storytelling // Harnfel, Horn of Bounty",
+    "Flashback",
     "Urza's Saga",
     "Library of Leng",
     "Mana Vault",
@@ -68,6 +86,7 @@ BASE_FOCUS_TRACE_CARDS = {
     "The Mind Stone",
     "Land Tax",
     "Lorehold, the Historian",
+    "Underworld Breach",
 }
 FOCUS_TRACE_EVENTS = {
     "activated_ability",
@@ -85,7 +104,7 @@ FOCUS_TRACE_EVENTS = {
     "trigger_resolved",
     "trigger_skipped",
     "utility_artifact_activated",
-}
+} | LOREHOLD_RUNTIME_EFFECT_EVENTS
 FOCUS_ACCESS_ZONES = {"hand", "battlefield", "graveyard", "exile", "stack"}
 
 
@@ -355,6 +374,31 @@ def parse_fixed_opponent_deck_ids(raw: str | None) -> list[int]:
     return [int(part.strip()) for part in str(raw).split(",") if part.strip()]
 
 
+def opponent_seed_key(profile: Mapping[str, Any]) -> str:
+    """Return a stable opponent identifier for paired per-game seeds."""
+
+    return str(
+        profile.get("learned_deck_id")
+        or profile.get("fixed_opponent_deck_id")
+        or profile.get("name")
+        or "unknown-opponent"
+    )
+
+
+def derive_game_seed(
+    simulation_seed: int,
+    profile: Mapping[str, Any],
+    game_index: int,
+) -> int:
+    """Derive a process-independent seed shared by every compared deck."""
+
+    material = (
+        "manaloom-lorehold-paired-game-seed-v1|"
+        f"{int(simulation_seed)}|{opponent_seed_key(profile)}|{int(game_index)}"
+    ).encode("utf-8")
+    return int.from_bytes(hashlib.sha256(material).digest()[:8], "big")
+
+
 def fixed_opponent_profile_from_deck(db: Path, deck_id: int) -> dict[str, Any]:
     previous_db = Path(str(getattr(battle, "DB", DEFAULT_DB)))
     set_battle_db(db)
@@ -488,6 +532,8 @@ class GateTelemetry:
         self.cards: Counter[str] = Counter()
         self.card_event_counts: Counter[str] = Counter()
         self.card_event_counts_by_game: dict[str, Counter[str]] = defaultdict(Counter)
+        self.runtime_effect_provenance: Counter[tuple[str, ...]] = Counter()
+        self.runtime_effect_provenance_games: dict[tuple[str, ...], set[str]] = defaultdict(set)
         self.event_counts_by_game: dict[str, Counter[str]] = defaultdict(Counter)
         self.strategic_event_counts_by_game: dict[str, Counter[str]] = defaultdict(Counter)
         self.lorehold_attack_restriction_totals: Counter[str] = Counter()
@@ -765,7 +811,27 @@ class GateTelemetry:
             matches.add("The Mind Stone")
         if "Squee, Goblin Nabob" in raw:
             matches.add("Squee, Goblin Nabob")
+        if "Harnfel, Horn of Bounty" in raw:
+            matches.add("Birgi, God of Storytelling // Harnfel, Horn of Bounty")
         return sorted(matches)
+
+    @staticmethod
+    def _runtime_effect_card(event: str, data: Mapping[str, Any]) -> str | None:
+        if event not in LOREHOLD_RUNTIME_EFFECT_EVENTS:
+            return None
+        raw = json.dumps(data, sort_keys=True, default=str)
+        if "Harnfel, Horn of Bounty" in raw:
+            return "Birgi, God of Storytelling // Harnfel, Horn of Bounty"
+        if "Underworld Breach" in raw or event.startswith("underworld_breach_"):
+            return "Underworld Breach"
+        if "Mana Vault" in raw or event.startswith("mana_vault_"):
+            return "Mana Vault"
+        if event.startswith("flashback_") and (
+            "Flashback" in raw
+            or data.get("flashback_permission_kind") == "target_grant_exact"
+        ):
+            return "Flashback"
+        return str(data.get("card") or "").strip() or None
 
     def _focus_trace_payload(
         self,
@@ -780,10 +846,14 @@ class GateTelemetry:
             "effect",
             "trigger",
             "activation_kind",
+            "activation_after_upkeep_untap",
             "phase",
             "turn",
             "chapter",
             "target_type",
+            "target",
+            "target_controller",
+            "target_legal",
             "found",
             "found_cards",
             "found_count",
@@ -843,10 +913,32 @@ class GateTelemetry:
             "rule_oracle_hash",
             "rule_review_status",
             "battle_model_scope",
+            "oracle_runtime_scope",
+            "flashback_cost",
+            "flashback_cost_source",
+            "flashback_granted_by",
+            "flashback_permission_kind",
+            "permission_turn",
+            "permission_consumed",
+            "granted_count",
+            "duration",
+            "stack_outcome",
+            "replacement_reason",
+            "result",
             "forced_access_mode",
             "mode",
             "source_zone",
             "destination_zone",
+            "played_card",
+            "played_kind",
+            "response_to",
+            "mana_added",
+            "mana_color",
+            "paid",
+            "damage_dealt",
+            "final_damage",
+            "exiled_cards",
+            "exiled_count",
             "replaced_card",
             "test_only",
         )
@@ -866,7 +958,9 @@ class GateTelemetry:
             return
         trace = self._focus_trace_payload(event, data, cards=cards)
         traces = self.focus_card_game_traces.setdefault(self.current_game, [])
-        if len(traces) < 160:
+        # Exact runtime events are promotion evidence. Preserve them even when a
+        # noisy game has already filled the ordinary diagnostic trace budget.
+        if len(traces) < 160 or event in LOREHOLD_RUNTIME_EFFECT_EVENTS:
             traces.append(trace)
         for card in cards:
             self.focus_card_trace_card_counts_by_game[self.current_game][card] += 1
@@ -885,6 +979,24 @@ class GateTelemetry:
             card_event_key = f"{event}:{card}"
             self.card_event_counts[card_event_key] += 1
             self.card_event_counts_by_game[self.current_game][card_event_key] += 1
+        runtime_effect_card = self._runtime_effect_card(event, data) if player == "Lorehold" else None
+        if runtime_effect_card:
+            card_event_key = f"{event}:{runtime_effect_card}"
+            self.card_event_counts[card_event_key] += 1
+            self.card_event_counts_by_game[self.current_game][card_event_key] += 1
+            provenance_key = (
+                event,
+                runtime_effect_card,
+                str(data.get("rule_logical_key") or ""),
+                str(data.get("rule_oracle_hash") or ""),
+                str(data.get("battle_model_scope") or ""),
+                str(data.get("oracle_runtime_scope") or ""),
+            )
+            self.runtime_effect_provenance[provenance_key] += 1
+            self.runtime_effect_provenance_games[provenance_key].add(self.current_game)
+            self.strategic_events[event] += 1
+            self.games_with.setdefault(event, set()).add(self.current_game)
+            self.cards[card_event_key] += 1
         squee_mentioned = "Squee, Goblin Nabob" in json.dumps(data, sort_keys=True, default=str)
         squee_entry = self._squee_in_graveyard_payload(event, data)
         squee_return = (
@@ -1088,6 +1200,19 @@ class GateTelemetry:
                 key: dict(value)
                 for key, value in sorted(self.card_event_counts_by_game.items())
             },
+            "runtime_effect_provenance": [
+                {
+                    "event": key[0],
+                    "card": key[1],
+                    "rule_logical_key": key[2] or None,
+                    "rule_oracle_hash": key[3] or None,
+                    "battle_model_scope": key[4] or None,
+                    "oracle_runtime_scope": key[5] or None,
+                    "count": count,
+                    "games": len(self.runtime_effect_provenance_games.get(key, set())),
+                }
+                for key, count in sorted(self.runtime_effect_provenance.items())
+            ],
             "lorehold_attack_restrictions": dict(self.lorehold_attack_restriction_totals),
             "lorehold_attack_restrictions_by_game": {
                 key: dict(value)
@@ -1147,6 +1272,7 @@ def run_deck_gate(
     simulation_seed: int,
     game_timeout_seconds: float = 0,
     forced_access_mode: str = "none",
+    paired_game_seeds: bool = False,
     progress_callback: Callable[[dict[str, Any]], None] | None = None,
 ) -> dict[str, Any]:
     source_db = Path(str(spec["source_db"]))
@@ -1187,14 +1313,20 @@ def run_deck_gate(
                 game_id = f"{spec['deck_key']}:{profile.get('name', '?')}:{game_index}"
                 telemetry.begin(game_id)
                 reset_battle_runtime_state()
+                game_seed = (
+                    derive_game_seed(simulation_seed, profile, game_index)
+                    if paired_game_seeds
+                    else None
+                )
+                game_rng = random.Random(game_seed) if game_seed is not None else rng
                 others = [item for item in opponents if item is not profile]
-                picked = [profile] + rng.sample(others, min(2, len(others)))
+                picked = [profile] + game_rng.sample(others, min(2, len(others)))
                 try:
                     result, turns, reason = simulate_game_with_timeout(
                         copy.deepcopy(commander),
                         copy.deepcopy(deck),
                         copy.deepcopy(picked),
-                        rng,
+                        game_rng,
                         game_index,
                         timeout_seconds=game_timeout_seconds,
                     )
@@ -1222,6 +1354,8 @@ def run_deck_gate(
                     {
                         "game_id": game_id,
                         "game_index": game_index,
+                        "game_seed": game_seed,
+                        "seed_mode": "paired_per_game_v1" if paired_game_seeds else "stream_v1",
                         "opponent": profile.get("name", "?"),
                         "opponent_archetype": profile.get("archetype", "?"),
                         "picked_opponents": [item.get("name", "?") for item in picked],
@@ -1240,6 +1374,8 @@ def run_deck_gate(
                             "opponent": profile.get("name", "?"),
                             "game_id": game_id,
                             "game_index": game_index,
+                            "game_seed": game_seed,
+                            "seed_mode": "paired_per_game_v1" if paired_game_seeds else "stream_v1",
                             "completed_games": completed_games,
                             "total_games": total_games,
                             "last_result": result,
@@ -1294,6 +1430,7 @@ def run_deck_gate(
         "win_reasons": dict(win_reasons),
         "opponents": opponent_rows,
         "game_results": game_rows,
+        "seed_mode": "paired_per_game_v1" if paired_game_seeds else "stream_v1",
         "forced_access_mode": forced_access_mode,
         "telemetry": telemetry.as_json(total_games),
     }
@@ -1336,6 +1473,7 @@ def run_deck_gate_in_process(
     simulation_seed: int,
     game_timeout_seconds: float,
     forced_access_mode: str = "none",
+    paired_game_seeds: bool = False,
     progress_callback: Callable[[dict[str, Any]], None] | None = None,
     process_timeout_seconds: float = 0,
 ) -> dict[str, Any]:
@@ -1355,6 +1493,7 @@ def run_deck_gate_in_process(
         "simulation_seed": simulation_seed,
         "game_timeout_seconds": game_timeout_seconds,
         "forced_access_mode": forced_access_mode,
+        "paired_game_seeds": paired_game_seeds,
         "progress_callback": None,
         "_queue_progress": progress_callback is not None,
         "_result_path": str(result_path),
@@ -1657,6 +1796,14 @@ def main() -> int:
         ),
     )
     parser.add_argument("--simulation-seed", type=int, default=42)
+    parser.add_argument(
+        "--paired-game-seeds",
+        action="store_true",
+        help=(
+            "Derive an independent deterministic seed for each opponent/game index. "
+            "Compared decks then receive the same seed and picked-opponent schedule."
+        ),
+    )
     parser.add_argument("--game-timeout-seconds", type=float, default=0.0)
     parser.add_argument(
         "--deck-process-timeout-seconds",
@@ -1729,6 +1876,7 @@ def main() -> int:
             "opponent_seed": args.opponent_seed,
             "fixed_opponent_deck_ids": fixed_opponent_deck_ids,
             "simulation_seed": args.simulation_seed,
+            "seed_mode": "paired_per_game_v1" if args.paired_game_seeds else "stream_v1",
             "python_hash_seed": os.environ.get("PYTHONHASHSEED", "unset"),
             "game_timeout_seconds": float(args.game_timeout_seconds or 0),
             "forced_access_mode": args.force_focus_access,
@@ -1750,6 +1898,7 @@ def main() -> int:
                     simulation_seed=args.simulation_seed,
                     game_timeout_seconds=max(0.0, float(args.game_timeout_seconds or 0)),
                     forced_access_mode=args.force_focus_access,
+                    paired_game_seeds=bool(args.paired_game_seeds),
                     progress_callback=progress_callback,
                     process_timeout_seconds=max(0.0, float(args.deck_process_timeout_seconds or 0)),
                 )
@@ -1761,6 +1910,7 @@ def main() -> int:
                     simulation_seed=args.simulation_seed,
                     game_timeout_seconds=max(0.0, float(args.game_timeout_seconds or 0)),
                     forced_access_mode=args.force_focus_access,
+                    paired_game_seeds=bool(args.paired_game_seeds),
                     progress_callback=progress_callback,
                 )
         except Exception as exc:
@@ -1789,6 +1939,7 @@ def main() -> int:
             "opponent_seed": args.opponent_seed,
             "fixed_opponent_deck_ids": fixed_opponent_deck_ids,
             "simulation_seed": args.simulation_seed,
+            "seed_mode": "paired_per_game_v1" if args.paired_game_seeds else "stream_v1",
             "python_hash_seed": os.environ.get("PYTHONHASHSEED", "unset"),
             "deck_process_isolation": bool(args.isolate_deck_process),
             "game_timeout_seconds": float(args.game_timeout_seconds or 0),
@@ -1811,6 +1962,7 @@ def main() -> int:
         "opponent_seed": args.opponent_seed,
         "fixed_opponent_deck_ids": fixed_opponent_deck_ids,
         "simulation_seed": args.simulation_seed,
+        "seed_mode": "paired_per_game_v1" if args.paired_game_seeds else "stream_v1",
         "python_hash_seed": os.environ.get("PYTHONHASHSEED", "unset"),
         "deck_process_isolation": bool(args.isolate_deck_process),
         "game_timeout_seconds": float(args.game_timeout_seconds or 0),
@@ -1835,6 +1987,7 @@ def main() -> int:
                 "opponent_seed": args.opponent_seed,
                 "fixed_opponent_deck_ids": fixed_opponent_deck_ids,
                 "simulation_seed": args.simulation_seed,
+                "seed_mode": "paired_per_game_v1" if args.paired_game_seeds else "stream_v1",
                 "python_hash_seed": os.environ.get("PYTHONHASHSEED", "unset"),
                 "deck_process_isolation": bool(args.isolate_deck_process),
                 "game_timeout_seconds": float(args.game_timeout_seconds or 0),

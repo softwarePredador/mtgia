@@ -73,6 +73,85 @@ void main() {
       expect(result.droppedReasons, hasLength(2));
     });
 
+    test(
+      'blocks structural ramp to contextual ramp despite inclusive role parity',
+      () {
+        final solRing = _card(
+          name: 'Sol Ring',
+          typeLine: 'Artifact',
+          manaCost: '{1}',
+          cmc: 1,
+          oracleText: '{T}: Add {C}{C}.',
+          functionalTags: const [
+            {'tag': 'ramp', 'confidence': 0.99},
+          ],
+        );
+        final rubyMedallion = _card(
+          name: 'Ruby Medallion',
+          typeLine: 'Artifact',
+          manaCost: '{2}',
+          cmc: 2,
+          oracleText: 'Red spells you cast cost {1} less to cast.',
+          functionalTags: const [
+            {'tag': 'ramp', 'confidence': 0.99},
+          ],
+        );
+
+        expect(optimizationFunctionalRolesForCard(solRing), contains('ramp'));
+        expect(
+          optimizationFunctionalRolesForCard(rubyMedallion),
+          contains('ramp'),
+        );
+
+        final result = filterUnsafeOptimizeSwapsByCardData(
+          removals: const ['Sol Ring'],
+          additions: const ['Ruby Medallion'],
+          originalDeck: [solRing],
+          additionsData: [rubyMedallion],
+          archetype: 'midrange',
+        );
+
+        expect(result.removals, isEmpty);
+        expect(result.additions, isEmpty);
+        expect(result.droppedReasons.single, contains('ramp_floor'));
+      },
+    );
+
+    test('allows contextual ramp to structural ramp as a relative upgrade', () {
+      final rubyMedallion = _card(
+        name: 'Ruby Medallion',
+        typeLine: 'Artifact',
+        manaCost: '{2}',
+        cmc: 2,
+        oracleText: 'Red spells you cast cost {1} less to cast.',
+        functionalTags: const [
+          {'tag': 'ramp', 'confidence': 0.99},
+        ],
+      );
+      final solRing = _card(
+        name: 'Sol Ring',
+        typeLine: 'Artifact',
+        manaCost: '{1}',
+        cmc: 1,
+        oracleText: '{T}: Add {C}{C}.',
+        functionalTags: const [
+          {'tag': 'ramp', 'confidence': 0.99},
+        ],
+      );
+
+      final result = filterUnsafeOptimizeSwapsByCardData(
+        removals: const ['Ruby Medallion'],
+        additions: const ['Sol Ring'],
+        originalDeck: [rubyMedallion],
+        additionsData: [solRing],
+        archetype: 'midrange',
+      );
+
+      expect(result.removals, equals(const ['Ruby Medallion']));
+      expect(result.additions, equals(const ['Sol Ring']));
+      expect(result.droppedReasons, isEmpty);
+    });
+
     test('blocks 34 to 32 land-to-fast-mana swaps despite shared tags', () {
       final originalDeck = [
         _card(
@@ -318,7 +397,7 @@ void main() {
           sidegrades: 0,
           tradeoffs: 1,
           questionable: 3,
-          roleDelta: const {'removal': -1, 'ramp': -1},
+          roleDelta: const {'removal': -1, 'ramp': -1, 'ramp_floor': -1},
         ),
         warnings: const [],
       );
@@ -336,6 +415,51 @@ void main() {
       expect(reasons.any((reason) => reason.contains('reprovou')), isTrue);
       expect(reasons.any((reason) => reason.contains('"removal"')), isTrue);
       expect(reasons.any((reason) => reason.contains('"ramp"')), isTrue);
+    });
+
+    test('uses ramp_floor, not inclusive ramp, in final rejection reasons', () {
+      ValidationReport reportWith(Map<String, int> roleDelta) =>
+          ValidationReport(
+            score: 80,
+            verdict: 'aprovado',
+            monteCarlo: MonteCarloComparison(
+              before: _goldfish(keepableRate: 0.9, turn2PlayRate: 0.9),
+              after: _goldfish(keepableRate: 0.9, turn2PlayRate: 0.9),
+              beforeMulligan: _mulligan(),
+              afterMulligan: _mulligan(),
+            ),
+            functional: FunctionalReport(
+              swaps: const [],
+              upgrades: 1,
+              sidegrades: 0,
+              tradeoffs: 0,
+              questionable: 0,
+              roleDelta: roleDelta,
+            ),
+            warnings: const [],
+          );
+
+      List<String> reasonsFor(Map<String, int> roleDelta) =>
+          buildOptimizationRejectionReasons(
+            validationReport: reportWith(roleDelta),
+            archetype: 'midrange',
+            preCurve: 3,
+            postCurve: 3,
+            preManaAssessment: 'Base de mana equilibrada',
+            postManaAssessment: 'Base de mana equilibrada',
+          );
+
+      final inclusiveOnlyLoss = reasonsFor(const {'ramp': -1, 'ramp_floor': 0});
+      final structuralLoss = reasonsFor(const {'ramp': 0, 'ramp_floor': -1});
+
+      expect(
+        inclusiveOnlyLoss.any((reason) => reason.contains('ramp_floor')),
+        isFalse,
+      );
+      expect(
+        structuralLoss.any((reason) => reason.contains('ramp_floor')),
+        isTrue,
+      );
     });
 
     test(

@@ -8,6 +8,38 @@ import unittest
 import xmage_authoritative_exact_scope_split as split
 
 
+MANA_VAULT_SOURCE = r'''
+public final class ManaVault extends CardImpl {
+    public ManaVault(UUID ownerId, CardSetInfo setInfo) {
+        super(ownerId, setInfo, new CardType[]{CardType.ARTIFACT}, "{1}");
+        this.addAbility(new SimpleStaticAbility(
+                new DontUntapInControllersUntapStepSourceEffect()));
+        this.addAbility(new BeginningOfUpkeepTriggeredAbility(
+                new DoIfCostPaid(new UntapSourceEffect(), new GenericManaCost(4),
+                        "Pay {4} to untap {this}?")
+                        .withChooseHint(new ConditionHint(SourceTappedCondition.UNTAPPED))
+        ));
+        this.addAbility(new BeginningOfDrawTriggeredAbility(
+                new DamageControllerEffect(1, "it"), false)
+                .withInterveningIf(SourceTappedCondition.TAPPED));
+        this.addAbility(new SimpleManaAbility(
+                Zone.BATTLEFIELD, Mana.ColorlessMana(3), new TapSourceCost()));
+    }
+}
+'''
+
+FLASHBACK_SOURCE = r'''
+public final class Flashback extends CardImpl {
+    public Flashback(UUID ownerId, CardSetInfo setInfo) {
+        super(ownerId, setInfo, new CardType[]{CardType.INSTANT}, "{R}");
+        this.getSpellAbility().addEffect(new GainFlashbackTargetEffect());
+        this.getSpellAbility().addTarget(new TargetCardInYourGraveyard(
+                StaticFilters.FILTER_CARD_INSTANT_OR_SORCERY));
+    }
+}
+'''
+
+
 def queue_row(
     unit: str,
     *,
@@ -1490,6 +1522,292 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
             report["summary"]["proposal_status_counts"],
             {"runtime_partial_batch_pg_candidate_after_precheck": 1},
         )
+
+    def test_mana_vault_complete_xmage_signature_maps_before_generic_mana_source(self) -> None:
+        row = queue_row(
+            split.MANA_VAULT_UNIT,
+            effect_classes=[
+                "DamageControllerEffect",
+                "DontUntapInControllersUntapStepSourceEffect",
+                "UntapSourceEffect",
+            ],
+            ability_kind="static_triggered_and_activated_mana",
+            ability_classes=[
+                "BeginningOfDrawTriggeredAbility",
+                "BeginningOfUpkeepTriggeredAbility",
+                "SimpleManaAbility",
+                "SimpleStaticAbility",
+            ],
+            xmage_signals=["condition", "mana", "static_ability", "triggered_ability"],
+        )
+        row.update(
+            {
+                "card_name": "Mana Vault",
+                "normalized_name": "mana vault",
+                "xmage_class": "ManaVault",
+                "xmage_path": "/tmp/ManaVault.java",
+            }
+        )
+
+        self.assertIn(split.MANA_VAULT_UNIT, split.SUPPORTED_UNITS)
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Mana Vault",
+                type_line="Artifact",
+                oracle_text=split.MANA_VAULT_ORACLE_TEXT,
+                mana_cost="{1}",
+            ),
+            source_text=MANA_VAULT_SOURCE,
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        self.assertIsNotNone(proposal)
+        self.assertEqual(proposal["family_id"], "xmage_mana_vault_exact_runtime")
+        self.assertTrue(proposal["safe_for_batch_pg_package"])
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.MANA_VAULT_SCOPE)
+        self.assertEqual(effect["ability_kind"], "static_triggered_and_activated_mana")
+        self.assertTrue(effect["does_not_untap_in_untap_step"])
+        self.assertEqual(effect["upkeep_optional_untap_cost_generic"], 4)
+        self.assertEqual(effect["tapped_draw_step_damage"], 1)
+        self.assertEqual(effect["mana_produced"], 3)
+        self.assertEqual(effect["produced_mana_symbols"], ["C", "C", "C"])
+
+    def test_mana_vault_near_miss_upkeep_cost_is_blocked_from_exact_split(self) -> None:
+        row = queue_row(
+            split.MANA_VAULT_UNIT,
+            effect_classes=[
+                "DamageControllerEffect",
+                "DontUntapInControllersUntapStepSourceEffect",
+                "UntapSourceEffect",
+            ],
+            ability_kind="static_triggered_and_activated_mana",
+            ability_classes=[
+                "BeginningOfDrawTriggeredAbility",
+                "BeginningOfUpkeepTriggeredAbility",
+                "SimpleManaAbility",
+                "SimpleStaticAbility",
+            ],
+        )
+        row.update(
+            {
+                "card_name": "Mana Vault",
+                "normalized_name": "mana vault",
+                "xmage_class": "ManaVault",
+                "xmage_path": "/tmp/ManaVault.java",
+            }
+        )
+
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Mana Vault",
+                type_line="Artifact",
+                oracle_text=split.MANA_VAULT_ORACLE_TEXT,
+                mana_cost="{1}",
+            ),
+            source_text=MANA_VAULT_SOURCE.replace(
+                "new GenericManaCost(4)", "new GenericManaCost(5)"
+            ),
+        )
+
+        self.assertIsNone(proposal)
+        self.assertEqual(reason, "mana_vault_source_signature_mismatch")
+
+    def test_flashback_complete_xmage_signature_maps_before_generic_recursion(self) -> None:
+        row = queue_row(
+            split.FLASHBACK_GRANT_UNIT,
+            effect_classes=["GainFlashbackTargetEffect"],
+            ability_kind="one_shot_targeted_continuous_permission",
+            xmage_signals=["targeting"],
+        )
+        row.update(
+            {
+                "card_name": "Flashback",
+                "normalized_name": "flashback",
+                "xmage_class": "Flashback",
+                "xmage_path": "/tmp/Flashback.java",
+                "xmage_target_classes": ["TargetCardInYourGraveyard"],
+                "xmage_condition_classes": [],
+                "xmage_cost_classes": [],
+                "xmage_filter_classes": [],
+            }
+        )
+
+        self.assertIn(split.FLASHBACK_GRANT_UNIT, split.SUPPORTED_UNITS)
+        self.assertIn(split.FLASHBACK_GRANT_SIGNATURE_UNIT, split.SUPPORTED_UNITS)
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Flashback",
+                type_line="Instant",
+                oracle_text=split.FLASHBACK_GRANT_ORACLE_TEXT,
+                mana_cost="{R}",
+            ),
+            source_text=FLASHBACK_SOURCE,
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        self.assertIsNotNone(proposal)
+        self.assertEqual(
+            proposal["family_id"],
+            "xmage_flashback_target_grant_exact_runtime",
+        )
+        self.assertTrue(proposal["safe_for_batch_pg_package"])
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["effect"], "graveyard_flashback_grant")
+        self.assertEqual(effect["battle_model_scope"], split.FLASHBACK_GRANT_SCOPE)
+        self.assertEqual(effect["target_count"], 1)
+        self.assertEqual(effect["target_count_min"], 1)
+        self.assertEqual(effect["target_count_max"], 1)
+        self.assertEqual(effect["target_controller"], "self")
+        self.assertEqual(effect["target_zone"], "graveyard")
+        self.assertTrue(effect["target_declared_on_cast"])
+        self.assertTrue(effect["target_legality_rechecked_on_resolution"])
+        self.assertTrue(effect["targeted_flashback_grant"])
+        self.assertEqual(effect["flashback_cost_source"], "target_printed_mana_cost")
+        self.assertTrue(effect["flashback_uses_normal_cast_pipeline"])
+        self.assertTrue(effect["flashback_exile_on_leave_stack"])
+        self.assertEqual(effect["duration"], "until_end_of_turn")
+        self.assertEqual(
+            effect["xmage_filter_constants"],
+            ["StaticFilters.FILTER_CARD_INSTANT_OR_SORCERY"],
+        )
+
+    def test_flashback_legacy_signature_unit_reaches_same_exact_split(self) -> None:
+        row = queue_row(
+            split.FLASHBACK_GRANT_SIGNATURE_UNIT,
+            effect_classes=["GainFlashbackTargetEffect"],
+            xmage_signals=["targeting"],
+        )
+        row.update(
+            {
+                "card_name": "Flashback",
+                "normalized_name": "flashback",
+                "xmage_class": "Flashback",
+                "xmage_path": "/tmp/Flashback.java",
+            }
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Flashback",
+                type_line="Instant",
+                oracle_text=split.FLASHBACK_GRANT_ORACLE_TEXT,
+                mana_cost="{R}",
+            ),
+            source_text=FLASHBACK_SOURCE,
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        self.assertEqual(proposal["effect_json"]["battle_model_scope"], split.FLASHBACK_GRANT_SCOPE)
+
+    def test_flashback_legacy_generic_recursion_unit_is_intercepted_before_generic_split(self) -> None:
+        row = queue_row(
+            split.RECURSION_UNIT,
+            effect_classes=["GainFlashbackTargetEffect"],
+            xmage_signals=["targeting"],
+        )
+        row.update(
+            {
+                "card_name": "Flashback",
+                "normalized_name": "flashback",
+                "xmage_class": "Flashback",
+                "xmage_path": "/tmp/Flashback.java",
+            }
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Flashback",
+                type_line="Instant",
+                oracle_text=split.FLASHBACK_GRANT_ORACLE_TEXT,
+                mana_cost="{R}",
+            ),
+            source_text=FLASHBACK_SOURCE,
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        self.assertEqual(proposal["effect"], "graveyard_flashback_grant")
+        self.assertEqual(proposal["battle_model_scope"], split.FLASHBACK_GRANT_SCOPE)
+        self.assertNotEqual(
+            proposal["battle_model_scope"],
+            "xmage_graveyard_return_variant_review_v1",
+        )
+
+    def test_flashback_near_misses_are_blocked_from_exact_split(self) -> None:
+        base_metadata = metadata(
+            name="Flashback",
+            type_line="Instant",
+            oracle_text=split.FLASHBACK_GRANT_ORACLE_TEXT,
+            mana_cost="{R}",
+        )
+        near_misses = {
+            "wrong_mana_cost": {
+                "metadata": {**base_metadata, "mana_cost": "{1}{R}"},
+                "reason": "flashback_grant_mana_cost_mismatch",
+            },
+            "wrong_oracle": {
+                "metadata": {
+                    **base_metadata,
+                    "oracle_text": "Target card in your graveyard gains flashback until end of turn.",
+                },
+                "reason": "flashback_grant_oracle_text_mismatch",
+            },
+            "wrong_filter": {
+                "source": FLASHBACK_SOURCE.replace(
+                    "StaticFilters.FILTER_CARD_INSTANT_OR_SORCERY",
+                    "StaticFilters.FILTER_CARD_CREATURE",
+                ),
+                "reason": "flashback_grant_source_signature_mismatch",
+            },
+            "extra_effect": {
+                "source": FLASHBACK_SOURCE.replace(
+                    "this.getSpellAbility().addTarget",
+                    "this.getSpellAbility().addEffect(new DrawCardSourceControllerEffect(1));\n"
+                    "        this.getSpellAbility().addTarget",
+                ),
+                "reason": "flashback_grant_source_effect_count_mismatch",
+            },
+            "wrong_effect_class": {
+                "effect_classes": ["GainAbilityTargetEffect"],
+                "reason": "flashback_grant_effect_classes_mismatch",
+            },
+            "wrong_target_class": {
+                "xmage_target_classes": ["TargetCardInGraveyard"],
+                "reason": "flashback_grant_target_classes_mismatch",
+            },
+        }
+
+        for label, changes in near_misses.items():
+            with self.subTest(label=label):
+                row = queue_row(
+                    split.FLASHBACK_GRANT_UNIT,
+                    effect_classes=changes.get(
+                        "effect_classes", ["GainFlashbackTargetEffect"]
+                    ),
+                    ability_kind="one_shot_targeted_continuous_permission",
+                    xmage_signals=["targeting"],
+                )
+                row.update(
+                    {
+                        "card_name": "Flashback",
+                        "normalized_name": "flashback",
+                        "xmage_class": "Flashback",
+                        "xmage_path": "/tmp/Flashback.java",
+                        "xmage_target_classes": changes.get(
+                            "xmage_target_classes", ["TargetCardInYourGraveyard"]
+                        ),
+                    }
+                )
+                proposal, reason = split.split_row(
+                    row,
+                    changes.get("metadata", base_metadata),
+                    source_text=changes.get("source", FLASHBACK_SOURCE),
+                )
+                self.assertIsNone(proposal)
+                self.assertEqual(reason, changes["reason"])
 
     def test_static_cast_as_flash_permission_maps_artifact_filter(self) -> None:
         row = queue_row(

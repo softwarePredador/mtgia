@@ -1,8 +1,10 @@
 import 'dart:convert';
 
+import '../basic_land_utils.dart' as basic_lands;
 import 'cmc_safety.dart';
 import 'functional_card_tags.dart';
 import 'optimization_functional_roles.dart';
+import 'optimization_ramp_profile.dart';
 import 'optimization_validator.dart';
 
 class OptimizationSwapGateResult {
@@ -73,13 +75,18 @@ OptimizationSwapGateResult filterUnsafeOptimizeSwapsByCardData({
     final addedRole = classifyOptimizationFunctionalRole(addedCard);
     final removedRoles = _functionalRolesForGate(removedCard);
     final addedRoles = _functionalRolesForGate(addedCard);
+    final removedRampProfile = optimizationRampProfileForCard(removedCard);
+    final addedRampProfile = optimizationRampProfileForCard(addedCard);
+    final losesGenericRampFloor =
+        removedRampProfile.countsTowardGenericFloor &&
+        !addedRampProfile.countsTowardGenericFloor;
     final cmcDelta = _getCmc(addedCard) - _getCmc(removedCard);
-    final removedIsLand = ((removedCard['type_line'] as String?) ?? '')
-        .toLowerCase()
-        .contains('land');
-    final addedIsLand = ((addedCard['type_line'] as String?) ?? '')
-        .toLowerCase()
-        .contains('land');
+    final removedIsLand = basic_lands.isLandTypeLine(
+      (removedCard['type_line'] as String?) ?? '',
+    );
+    final addedIsLand = basic_lands.isLandTypeLine(
+      (addedCard['type_line'] as String?) ?? '',
+    );
     final rolePreserved =
         removedIsLand == addedIsLand &&
         (removedRole == addedRole ||
@@ -148,6 +155,7 @@ OptimizationSwapGateResult filterUnsafeOptimizeSwapsByCardData({
 
     final shouldDrop =
         unsafeLandToNonLand ||
+        losesGenericRampFloor ||
         losingCriticalRole ||
         (!rolePreserved && cmcDelta > 1) ||
         (archetype.toLowerCase() == 'aggro' && cmcDelta > 0) ||
@@ -160,11 +168,15 @@ OptimizationSwapGateResult filterUnsafeOptimizeSwapsByCardData({
         );
 
     if (shouldDrop && !structuralRecoveryUpgrade && !landTrimUpgrade) {
+      final rampFloorDetail =
+          losesGenericRampFloor
+              ? ', perda relativa de ramp estrutural (ramp_floor)'
+              : '';
       droppedReasons.add(
         '$removalName -> $additionName removida pelo gate: '
         'papel $removedRole -> $addedRole, '
         'funções ${_formatRoles(removedRoles)} -> ${_formatRoles(addedRoles)}, '
-        'delta CMC ${cmcDelta >= 0 ? '+' : ''}$cmcDelta.',
+        'delta CMC ${cmcDelta >= 0 ? '+' : ''}$cmcDelta$rampFloorDetail.',
       );
       continue;
     }
@@ -177,14 +189,12 @@ OptimizationSwapGateResult filterUnsafeOptimizeSwapsByCardData({
   for (var i = 0; i < safeRemovals.length; i++) {
     final removedCard = _findCardByName(originalDeck, safeRemovals[i]);
     final addedCard = _findCardByName(additionsData, safeAdditions[i]);
-    if (((removedCard['type_line'] as String?) ?? '').toLowerCase().contains(
-      'land',
+    if (basic_lands.isLandTypeLine(
+      (removedCard['type_line'] as String?) ?? '',
     )) {
       projectedLandCount--;
     }
-    if (((addedCard['type_line'] as String?) ?? '').toLowerCase().contains(
-      'land',
-    )) {
+    if (basic_lands.isLandTypeLine((addedCard['type_line'] as String?) ?? '')) {
       projectedLandCount++;
     }
   }
@@ -196,12 +206,12 @@ OptimizationSwapGateResult filterUnsafeOptimizeSwapsByCardData({
   ) {
     final removedCard = _findCardByName(originalDeck, safeRemovals[i]);
     final addedCard = _findCardByName(additionsData, safeAdditions[i]);
-    final removesLand = ((removedCard['type_line'] as String?) ?? '')
-        .toLowerCase()
-        .contains('land');
-    final addsLand = ((addedCard['type_line'] as String?) ?? '')
-        .toLowerCase()
-        .contains('land');
+    final removesLand = basic_lands.isLandTypeLine(
+      (removedCard['type_line'] as String?) ?? '',
+    );
+    final addsLand = basic_lands.isLandTypeLine(
+      (addedCard['type_line'] as String?) ?? '',
+    );
     if (!removesLand || addsLand) continue;
     droppedReasons.add(
       '${safeRemovals[i]} -> ${safeAdditions[i]} removida pelo gate: '
@@ -285,7 +295,7 @@ Set<String> _functionalRolesForGate(Map<String, dynamic> card) {
       !{'draw', 'removal', 'ramp', 'wipe'}.contains(mappedPrimaryRole)) {
     roles.add(mappedPrimaryRole);
   }
-  if (typeLine.toLowerCase().contains('land')) roles.add('land');
+  if (basic_lands.isLandTypeLine(typeLine)) roles.add('land');
   return roles;
 }
 
@@ -371,7 +381,7 @@ bool _isStructuralRecoveryScenario(List<Map<String, dynamic>> originalDeck) {
     final typeLine = ((card['type_line'] as String?) ?? '').toLowerCase();
     totalCards += qty;
 
-    if (typeLine.contains('land')) {
+    if (basic_lands.isLandTypeLine(typeLine)) {
       landCount += qty;
       if (_landLooksColorProducing(card)) {
         colorProducingLandCount += qty;
@@ -545,7 +555,7 @@ _LandTrimContext _computeLandTrimContext(
     totalCards += qty;
 
     final typeLine = ((card['type_line'] as String?) ?? '').toLowerCase();
-    if (typeLine.contains('land')) {
+    if (basic_lands.isLandTypeLine(typeLine)) {
       landCount += qty;
     }
   }
@@ -581,9 +591,9 @@ bool _isStructuralRecoveryUpgrade({
   required String archetype,
   required int cmcDelta,
 }) {
-  final removedIsLand = ((removedCard['type_line'] as String?) ?? '')
-      .toLowerCase()
-      .contains('land');
+  final removedIsLand = basic_lands.isLandTypeLine(
+    (removedCard['type_line'] as String?) ?? '',
+  );
   if (!removedIsLand || removedRole != 'land') return false;
 
   final addedAllowedRoles = switch (archetype.trim().toLowerCase()) {
@@ -601,13 +611,17 @@ bool _isStructuralRecoveryUpgrade({
   };
 
   if (!addedAllowedRoles.contains(addedRole)) return false;
+  if (addedRole == 'ramp' &&
+      !optimizationRampProfileForCard(addedCard).countsTowardGenericFloor) {
+    return false;
+  }
   if (cmcDelta > 3) return false;
 
   final addedOracle =
       ((addedCard['oracle_text'] as String?) ?? '').toLowerCase();
   final addedTypeLine =
       ((addedCard['type_line'] as String?) ?? '').toLowerCase();
-  if (addedTypeLine.contains('land')) return true;
+  if (basic_lands.isLandTypeLine(addedTypeLine)) return true;
 
   return addedOracle.contains('draw') ||
       addedOracle.contains('counter target') ||
@@ -653,8 +667,13 @@ List<String> buildOptimizationRejectionReasons({
     profileGatePolicy: _resolveProfileGatePolicy(profileRoleTargets),
   );
   for (final role in criticalRoles) {
-    if ((validationReport.functional.roleDelta[role] ?? 0) < 0) {
-      reasons.add('A otimização piorou a categoria crítica "$role".');
+    final deltaKey = role == 'ramp' ? 'ramp_floor' : role;
+    if ((validationReport.functional.roleDelta[deltaKey] ?? 0) < 0) {
+      reasons.add(
+        role == 'ramp'
+            ? 'A otimização piorou a categoria crítica "ramp" estrutural (ramp_floor).'
+            : 'A otimização piorou a categoria crítica "$role".',
+      );
     }
   }
 
@@ -908,7 +927,7 @@ int _getCmc(Map<String, dynamic> card) {
 
 bool _landLooksColorProducing(Map<String, dynamic> card) {
   final typeLine = ((card['type_line'] as String?) ?? '').toLowerCase();
-  if (!typeLine.contains('land')) return false;
+  if (!basic_lands.isLandTypeLine(typeLine)) return false;
 
   final oracle = ((card['oracle_text'] as String?) ?? '').toLowerCase();
   final colors = (card['colors'] as List?)?.cast<String>() ?? const <String>[];

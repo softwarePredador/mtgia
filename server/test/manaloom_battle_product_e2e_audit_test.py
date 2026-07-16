@@ -73,7 +73,10 @@ class ManaLoomBattleProductE2EAuditTest(unittest.TestCase):
         isolated_source = gate_source[isolated_start:]
         self.assertNotIn("test/battle_product_e2e_test.dart", static_source)
         self.assertIn("test/battle_product_e2e_test.dart", isolated_source)
-        self.assertIn("--hostname 127.0.0.1", isolated_source)
+        self.assertIn("dart_frog build", isolated_source)
+        self.assertIn("dart run build/bin/server.dart", isolated_source)
+        self.assertIn("InternetAddress.loopbackIPv4", isolated_source)
+        self.assertNotIn("dart_frog dev", isolated_source)
         self.assertIn("mutation_audit.json", isolated_source)
 
         test_source = (
@@ -131,12 +134,43 @@ class ManaLoomBattleProductE2EAuditTest(unittest.TestCase):
             "git archive HEAD server tools/manaloom_lints",
             backend_deploy,
         )
+        self.assertIn("require_clean_worktree", backend_deploy)
+        self.assertGreaterEqual(
+            backend_deploy.count("require_clean_worktree"),
+            3,
+        )
         self.assertIn("-f server/Dockerfile", backend_deploy)
         self.assertIn(
             "git archive HEAD server docs/hermes-analysis/manaloom-knowledge "
-            "tools/manaloom_lints",
+            "scripts/lib tools/manaloom_lints",
             ops_deploy,
         )
+        self.assertIn("require_clean_worktree", ops_deploy)
+        self.assertGreaterEqual(ops_deploy.count("require_clean_worktree"), 3)
+        self.assertIn(
+            "MANALOOM_CANONICAL_PG_DECK_ID=8938b746-1a9e-46ce-b0d9-c2ec932ddddd",
+            ops_deploy,
+        )
+        self.assertIn(
+            "MANALOOM_TARGET_PG_DECK_ID=8938b746-1a9e-46ce-b0d9-c2ec932ddddd",
+            ops_deploy,
+        )
+        self.assertIn(
+            "test -r /app/scripts/lib/manaloom_mutation_guard.sh",
+            ops_deploy,
+        )
+        self.assertIn(
+            "/app/docs/hermes-analysis/manaloom-knowledge/scripts/"
+            "sync_pg_target_deck_to_hermes.py",
+            ops_deploy,
+        )
+        self.assertIn(
+            "/app/docs/hermes-analysis/manaloom-knowledge/scripts/"
+            "battle_target_deck_identity_guard.py",
+            ops_deploy,
+        )
+        self.assertIn("--protected-pg-deck-id", ops_deploy)
+        self.assertIn("deploy_guard_$short_sha.json", ops_deploy)
 
 
 if __name__ == "__main__":

@@ -41,7 +41,7 @@ Usage:
     final heuristicCards = await _loadHeuristicOwnerCards(pool);
     final semanticCards = await _loadSemanticOwnerCards(pool);
     final expectedHeuristic = _expectedOutletIds(heuristicCards);
-    final expectedSemantic = _expectedOutletIds(semanticCards);
+    final globalExpectedSemantic = _expectedOutletIds(semanticCards);
     final functionRows = await _loadFunctionRows(pool);
     final semanticRows = await _loadSemanticRows(pool);
 
@@ -61,11 +61,16 @@ Usage:
             .map((row) => row.cardId)
             .toSet();
     final existingSemanticIds = semanticRows.map((row) => row.cardId).toSet();
-    final missingSemanticIds = expectedSemantic.difference(existingSemanticIds);
-    final missingSemanticRows = <Map<String, dynamic>>[
+    final expectedSemantic = globalExpectedSemantic.intersection(
+      existingSemanticIds,
+    );
+    final deferredMissingSemanticIds = globalExpectedSemantic.difference(
+      existingSemanticIds,
+    );
+    final deferredMissingSemanticCards = <Map<String, dynamic>>[
       for (final card in semanticCards)
-        if (missingSemanticIds.contains(card.id))
-          _missingSemanticOutletRow(card),
+        if (deferredMissingSemanticIds.contains(card.id))
+          {'card_id': card.id, 'card_name': card.name},
     ]..sort(
       (a, b) => (a['card_name'] as String).compareTo(b['card_name'] as String),
     );
@@ -75,7 +80,7 @@ Usage:
     };
 
     final summary = <String, dynamic>{
-      'schema_version': 'pg873_sacrifice_outlet_family_audit_v1',
+      'schema_version': 'pg873_sacrifice_outlet_family_audit_v2',
       'generated_at_utc': DateTime.now().toUtc().toIso8601String(),
       'db_mutations': false,
       'classifier': {
@@ -85,11 +90,14 @@ Usage:
         'contract':
             'external activated sacrifice cost; self, named-self, trigger, additional-cost and parenthetical reminder text excluded',
       },
-      'missing_semantic_rows': {
-        'count': missingSemanticRows.length,
-        'artifact': 'missing_semantic_outlet_rows.json',
+      'deferred_missing_semantic_snapshots': {
+        'count': deferredMissingSemanticCards.length,
+        'card_id_sha256': _digest(deferredMissingSemanticIds),
+        'artifact': 'deferred_missing_semantic_cards.json',
         'contains_raw_oracle_text': false,
-        'scope': 'validated_sacrifice_outlet_only',
+        'scope': 'full_semantic_backfill_required',
+        'reason':
+            'PG873 never creates partial card_semantic_tags_v2 snapshots; these cards require the complete deterministic semantic backfill contract.',
       },
       'owner_scopes': {
         _heuristicSource: {
@@ -112,6 +120,9 @@ Usage:
         },
         '${_semanticSource}_function': {
           'cards_scanned': semanticCards.length,
+          'existing_semantic_snapshot_cards': existingSemanticIds.length,
+          'global_expected_count': globalExpectedSemantic.length,
+          'global_expected_card_id_sha256': _digest(globalExpectedSemantic),
           ..._laneSummary(
             expected: expectedSemantic,
             current: currentSemanticFunction,
@@ -130,6 +141,9 @@ Usage:
         },
         '${_semanticSource}_json': {
           'cards_scanned': semanticCards.length,
+          'existing_semantic_snapshot_cards': existingSemanticIds.length,
+          'global_expected_count': globalExpectedSemantic.length,
+          'global_expected_card_id_sha256': _digest(globalExpectedSemantic),
           ..._laneSummary(
             expected: expectedSemantic,
             current: currentSemanticTags,
@@ -152,9 +166,9 @@ Usage:
     final output = const JsonEncoder.withIndent('  ').convert(summary);
     await File('${artifactDir.path}/summary.json').writeAsString('$output\n');
     await File(
-      '${artifactDir.path}/missing_semantic_outlet_rows.json',
+      '${artifactDir.path}/deferred_missing_semantic_cards.json',
     ).writeAsString(
-      '${const JsonEncoder.withIndent('  ').convert(missingSemanticRows)}\n',
+      '${const JsonEncoder.withIndent('  ').convert(deferredMissingSemanticCards)}\n',
     );
     print(output);
   } finally {
@@ -206,38 +220,6 @@ Set<String> _expectedOutletIds(List<_AuditCard> cards) {
         oracleText: card.oracleText,
       ))
         card.id,
-  };
-}
-
-Map<String, dynamic> _missingSemanticOutletRow(_AuditCard card) {
-  final semantic = inferSemanticCardAnalysisV2(
-    name: card.name,
-    typeLine: card.typeLine,
-    oracleText: card.oracleText,
-    manaCost: card.manaCost,
-    cmc: card.cmc,
-  );
-  return {
-    'card_id': card.id,
-    'card_name': card.name,
-    'schema_version': semanticLayerV2SchemaVersion,
-    'source': semanticLayerV2Source,
-    'tags': const [
-      {'tag': _outletTag, 'confidence': 0.8, 'evidence': _outletEvidence},
-    ],
-    'speed': semantic.speed,
-    'mana_efficiency': semantic.manaEfficiency,
-    'card_advantage_type': 'none',
-    'interaction_scope': 'none',
-    'combo_piece': false,
-    'wincon': false,
-    'engine': false,
-    'payoff': false,
-    'enabler': false,
-    'protection_type': 'none',
-    'recursion_type': 'none',
-    'role_confidence': 0.8,
-    'explanation_reason': 'no_primary_function_detected',
   };
 }
 

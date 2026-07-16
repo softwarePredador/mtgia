@@ -1,3 +1,4 @@
+import '../basic_land_utils.dart' as land_utils;
 import 'optimization_functional_roles.dart';
 
 const functionalCardTagsSchemaVersion = 'functional_card_tags_v1_2026_05_18';
@@ -194,7 +195,6 @@ List<FunctionalCardTag> inferFunctionalCardTags({
   Object? cmc,
 }) {
   final normalizedName = normalizeFunctionalCardName(name);
-  final type = typeLine.toLowerCase();
   final oracle = oracleText.toLowerCase();
   final estimatedCmc = _safeDouble(cmc, _estimateManaValue(manaCost ?? ''));
   final strategicRoles =
@@ -219,12 +219,12 @@ List<FunctionalCardTag> inferFunctionalCardTags({
     }
   }
 
-  final isLand = type.contains('land');
+  final isLand = land_utils.isLandTypeLine(typeLine);
   if (isLand) {
     add('land', 1, 'type_line_land');
   }
 
-  final isBasicLand = type.contains('basic land');
+  final isBasicLand = land_utils.isBasicLandTypeLine(typeLine);
   if (!isLand &&
       !isBasicLand &&
       (looksLikeOptimizationRampText(oracleText) ||
@@ -235,7 +235,10 @@ List<FunctionalCardTag> inferFunctionalCardTags({
     add('ramp', 0.88, 'mana_or_land_ramp_text');
   }
 
-  if (_looksLikeRitual(oracle, normalizedName)) {
+  // Lands are structural mana sources, even when one activation produces
+  // multiple mana. Treating Coffers/Tomb-style text as a ritual lets a land
+  // satisfy a nonland ramp slot and can authorize an unsafe land cut.
+  if (!isLand && _looksLikeRitual(oracle, normalizedName)) {
     add('ritual', 0.82, 'temporary_mana_burst_text');
   }
 
@@ -308,7 +311,7 @@ List<FunctionalCardTag> inferFunctionalCardTags({
     add('enchantment_synergy', 0.74, 'enchantment_payoff_text');
   }
 
-  if (_looksLikeEtb(oracle)) {
+  if (looksLikeOptimizationEtbTrigger(oracleText, name: normalizedName)) {
     add('etb', 0.7, 'enters_the_battlefield_text');
   }
 
@@ -756,8 +759,7 @@ bool _looksLikeGraveyardSynergy(String oracle) {
 }
 
 bool _looksLikeTokenMaker(String oracle) {
-  return oracle.contains('create') && oracle.contains('token') ||
-      oracle.contains('populate');
+  return looksLikeOptimizationControllerTokenCreationText(oracle);
 }
 
 /// Detects an activated ability whose cost can sacrifice an object other than
@@ -914,26 +916,6 @@ bool _looksLikeEnchantmentSynergy(String oracle) {
       oracle.contains('enchantment enters');
 }
 
-bool _looksLikeEtb(String oracle) {
-  final hasEnterTrigger =
-      oracle.contains('enters the battlefield') ||
-      oracle.contains('when this creature enters') ||
-      oracle.contains('when this permanent enters') ||
-      oracle.contains('whenever a creature enters') ||
-      oracle.contains('whenever an artifact enters') ||
-      oracle.contains('whenever an enchantment enters') ||
-      oracle.contains('whenever a land enters');
-  if (!hasEnterTrigger) return false;
-  if (oracle.contains("don't cause abilities to trigger") ||
-      oracle.contains('abilities don\'t trigger')) {
-    return false;
-  }
-  return oracle.contains('when ') ||
-      oracle.contains('whenever ') ||
-      oracle.contains('as ') ||
-      oracle.contains('enters the battlefield,');
-}
-
 bool _looksLikeBlink(String oracle, String normalizedName) {
   return normalizedName == 'ephemerate' ||
       oracle.contains('exile target') &&
@@ -962,25 +944,38 @@ bool _looksLikeExileValue(String oracle) {
 }
 
 bool _looksLikeRitual(String oracle, String normalizedName) {
-  return normalizedName == 'jeska\'s will' ||
-      oracle.contains('add {') &&
-          (oracle.contains('until end of turn') ||
-              oracle.contains('for each') ||
-              oracle.contains('for every') ||
-              oracle.contains('your mana pool') ||
-              (!oracle.contains('{t}:') &&
-                  !oracle.contains('at the beginning') &&
-                  !oracle.contains('each upkeep') &&
-                  !oracle.contains('each combat') &&
-                  !oracle.contains('whenever') &&
-                  !oracle.contains('mana of any color')));
+  if (normalizedName == 'jeska\'s will') return true;
+  final direct = optimizationOracleDirectEffectText(oracle.toLowerCase());
+  for (final line in direct.split(RegExp(r'[\r\n]+'))) {
+    for (final match in RegExp(r'add\s+\{').allMatches(line)) {
+      final prefix = line.substring(0, match.start);
+      final colon = prefix.lastIndexOf(':');
+      if (colon >= 0 && prefix.substring(0, colon).contains('{t}')) {
+        // Repeatable mana abilities such as "{T}, Exile ...: Add {R}" are
+        // ramp, but not one-shot rituals.
+        continue;
+      }
+      if (line.contains('until end of turn') ||
+          line.contains('for each') ||
+          line.contains('for every') ||
+          line.contains('your mana pool') ||
+          (!line.contains('at the beginning') &&
+              !line.contains('each upkeep') &&
+              !line.contains('each combat') &&
+              !line.contains('whenever') &&
+              !line.contains('mana of any color'))) {
+        return true;
+      }
+    }
+  }
+  return false;
 }
 
 String _inferSpeed(String typeLine, String oracle) {
   if (typeLine.contains('instant') || oracle.contains('flash')) {
     return 'instant_speed';
   }
-  if (typeLine.contains('land')) return 'land_drop';
+  if (land_utils.isLandTypeLine(typeLine)) return 'land_drop';
   if (typeLine.contains('sorcery')) return 'sorcery_speed';
   if (oracle.contains('whenever') || oracle.contains('at the beginning')) {
     return 'triggered_engine';

@@ -13,6 +13,14 @@ SPEC.loader.exec_module(snapshot)
 
 
 class LoreholdCanonicalDeckSnapshotTests(unittest.TestCase):
+    def test_land_type_boundary_rejects_lander_and_island_subtypes(self) -> None:
+        self.assertTrue(snapshot.is_land_type_line("Basic Land — Island"))
+        self.assertTrue(snapshot.is_land_type_line("Legendary Land"))
+        self.assertFalse(
+            snapshot.is_land_type_line("Legendary Artifact Creature — Lander Rogue")
+        )
+        self.assertFalse(snapshot.is_land_type_line("Creature — Island Fish"))
+
     def test_backup_db_keeps_newest_backups_and_prunes_oldest(self) -> None:
         with tempfile.TemporaryDirectory() as tmpdir:
             root = Path(tmpdir)

@@ -89,6 +89,53 @@ class EdhrecCollectionGateTest(unittest.TestCase):
         self.assertEqual(result["stdout"], "authorized")
         runner.assert_called_once()
 
+    def test_authorized_snapshot_strips_nested_auth_metadata(self) -> None:
+        os.environ[AUTHORIZATION_FLAG] = "true"
+        raw_payload = {
+            "props": {
+                "pageProps": {
+                    "data": {
+                        "site": {"auth": "sensitive-placeholder", "name": "EDHREC"},
+                        "container": {
+                            "json_dict": {
+                                "cardlists": [
+                                    {
+                                        "cardviews": [
+                                            {"name": "Arcane Signet", "auth": "nested-placeholder"}
+                                        ]
+                                    }
+                                ]
+                            }
+                        },
+                    }
+                }
+            }
+        }
+        html = (
+            '<script id="__NEXT_DATA__" type="application/json">'
+            + __import__("json").dumps(raw_payload)
+            + "</script>"
+        ).encode()
+        response = mock.MagicMock()
+        response.__enter__.return_value.read.return_value = html
+        opened = mock.mock_open()
+
+        with mock.patch("urllib.request.urlopen", return_value=response):
+            with mock.patch("builtins.open", opened):
+                with redirect_stdout(io.StringIO()):
+                    runpy.run_path(str(FETCH_SCRIPT), run_name="__main__")
+
+        written = "".join(
+            call.args[0]
+            for call in opened().write.call_args_list
+            if call.args and isinstance(call.args[0], str)
+        )
+        sanitized = __import__("json").loads(written)
+        self.assertNotIn("auth", sanitized["props"]["pageProps"]["data"]["site"])
+        card = sanitized["props"]["pageProps"]["data"]["container"]["json_dict"]["cardlists"][0]["cardviews"][0]
+        self.assertEqual(card["name"], "Arcane Signet")
+        self.assertNotIn("auth", card)
+
 
 if __name__ == "__main__":
     unittest.main()

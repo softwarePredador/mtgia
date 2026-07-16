@@ -1,3 +1,4 @@
+import '../basic_land_utils.dart' as basic_lands;
 import 'optimize_filler_candidate_support.dart' show resolvedCardIdentity;
 import 'optimize_runtime_support.dart' show basicLandNameForColor;
 import 'optimize_state_support.dart';
@@ -19,16 +20,17 @@ Map<String, int> buildCompleteColorDemandMap({
 
   for (final card in currentDeck) {
     final typeLine = ((card['type_line'] as String?) ?? '').toLowerCase();
-    if (typeLine.contains('land')) continue;
+    if (basic_lands.isLandTypeLine(typeLine)) continue;
 
     final quantity = (card['quantity'] as int?) ?? 1;
     final manaCost = (card['mana_cost'] as String?) ?? '';
     final explicitSymbols = <String, int>{};
     for (final color in commanderColorIdentity) {
-      final symbolCount = RegExp(
-        '\\{${color.toLowerCase()}\\}',
-        caseSensitive: false,
-      ).allMatches(manaCost).length;
+      final symbolCount =
+          RegExp(
+            '\\{${color.toLowerCase()}\\}',
+            caseSensitive: false,
+          ).allMatches(manaCost).length;
       if (symbolCount > 0) {
         explicitSymbols[color] = symbolCount * quantity;
       }
@@ -41,9 +43,10 @@ Map<String, int> buildCompleteColorDemandMap({
       continue;
     }
 
-    final fallbackIdentity = resolvedCardIdentity(card)
-        .where(commanderColorIdentity.contains)
-        .toSet();
+    final fallbackIdentity =
+        resolvedCardIdentity(
+          card,
+        ).where(commanderColorIdentity.contains).toSet();
     if (fallbackIdentity.isEmpty) continue;
 
     final fallbackWeight =
@@ -73,7 +76,8 @@ List<String> buildWeightedBasicLandPlan({
     currentDeck: currentDeck,
     commanderColorIdentity: commanderColorIdentity,
   );
-  final rawSources = (manaBase['sources'] as Map?)?.cast<String, int>() ??
+  final rawSources =
+      (manaBase['sources'] as Map?)?.cast<String, int>() ??
       const <String, int>{};
   final projectedSources = <String, int>{};
   for (final color in colors) {
@@ -94,13 +98,14 @@ List<String> buildWeightedBasicLandPlan({
       final symbolCount = rawSymbols[color] ?? 0;
       final sourceCount = (projectedSources[color] ?? 0) + anySource;
       final percent = totalSymbols > 0 ? symbolCount / totalSymbols : 0.0;
-      final targetSources = symbolCount <= 0
-          ? 6
-          : percent > 0.30
+      final targetSources =
+          symbolCount <= 0
+              ? 6
+              : percent > 0.30
               ? 15
               : percent > 0.10
-                  ? 10
-                  : 8;
+              ? 10
+              : 8;
       final deficit = targetSources - sourceCount;
       final score = (deficit * 100) + (symbolCount * 3) - sourceCount;
       if (bestColor == null || score > bestScore) {

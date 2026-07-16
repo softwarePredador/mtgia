@@ -7,19 +7,19 @@ const heuristicRecommendationsSource = 'heuristic';
 const recommendationCommanderFallbackLandFloor = 33;
 const recommendationCommanderLandTargetBand = '33-38';
 
-typedef RecommendationCandidateFinder = Future<List<String>> Function({
-  required List<String> roles,
-  required List<String> oraclePatterns,
-  required Set<String> deckColors,
-  required Set<String> excludeNames,
-  required int limit,
-  required String format,
-  bool landOnly,
-});
+typedef RecommendationCandidateFinder =
+    Future<List<String>> Function({
+      required List<String> roles,
+      required List<String> oraclePatterns,
+      required Set<String> deckColors,
+      required Set<String> excludeNames,
+      required int limit,
+      required String format,
+      bool landOnly,
+    });
 
-typedef RecommendationTrendFinder = Future<List<EdhrecCardTrend>> Function(
-  String commanderName,
-);
+typedef RecommendationTrendFinder =
+    Future<List<EdhrecCardTrend>> Function(String commanderName);
 
 class RecommendationDeckSummary {
   const RecommendationDeckSummary({
@@ -97,15 +97,16 @@ RecommendationDeckSummary summarizeRecommendationDeck({
     final quantity = (card['quantity'] as int?) ?? 0;
     final isCommander = card['is_commander'] == true;
     final cmc = (card['cmc'] as num?)?.toDouble() ?? 0;
-    final resolvedRoles = resolveCardFunctionalRoles(
-      functionalTags: card['functional_tags'],
-      semanticTagsV2: card['semantic_tags_v2'],
-      oracleText: oracleText,
-      typeLine: typeLine,
-      name: name,
-      manaCost: manaCost,
-      cmc: cmc,
-    ).roles;
+    final resolvedRoles =
+        resolveCardFunctionalRoles(
+          functionalTags: card['functional_tags'],
+          semanticTagsV2: card['semantic_tags_v2'],
+          oracleText: oracleText,
+          typeLine: typeLine,
+          name: name,
+          manaCost: manaCost,
+          cmc: cmc,
+        ).roles;
 
     deckColors.addAll(colorIdentity.isNotEmpty ? colorIdentity : colors);
     if (name.isNotEmpty) deckCardNames.add(name.toLowerCase());
@@ -118,7 +119,7 @@ RecommendationDeckSummary summarizeRecommendationDeck({
     }
 
     final tl = typeLine.toLowerCase();
-    if (tl.contains('land')) {
+    if (basic_lands.isLandTypeLine(tl)) {
       landCount += quantity;
     } else {
       nonLandCards += quantity;
@@ -126,19 +127,22 @@ RecommendationDeckSummary summarizeRecommendationDeck({
     }
     if (tl.contains('creature')) creatureCount += quantity;
 
-    final heuristicRamp = oracleText.contains('add {') ||
+    final heuristicRamp =
+        oracleText.contains('add {') ||
         (oracleText.contains('search your library for a') &&
             oracleText.contains('land')) ||
         oracleText.contains('put a land card');
     final heuristicDraw =
         oracleText.contains('draw') && oracleText.contains('card');
-    final heuristicRemoval = oracleText.contains('destroy target') ||
+    final heuristicRemoval =
+        oracleText.contains('destroy target') ||
         oracleText.contains('exile target') ||
         (oracleText.contains('deal') &&
             oracleText.contains('damage to target'));
     final heuristicBoardWipe =
         oracleText.contains('destroy all') || oracleText.contains('exile all');
-    final heuristicProtection = oracleText.contains('hexproof') ||
+    final heuristicProtection =
+        oracleText.contains('hexproof') ||
         oracleText.contains('indestructible') ||
         oracleText.contains('protection from');
 
@@ -168,9 +172,10 @@ RecommendationDeckSummary summarizeRecommendationDeck({
       isCommander && commanderColorIdentity.isNotEmpty
           ? commanderColorIdentity
           : deckColors;
-  final colorIdentitySource = isCommander && commanderColorIdentity.isNotEmpty
-      ? 'commander_color_identity'
-      : 'observed_deck_colors';
+  final colorIdentitySource =
+      isCommander && commanderColorIdentity.isNotEmpty
+          ? 'commander_color_identity'
+          : 'observed_deck_colors';
 
   var archetype = 'midrange';
   if (averageCmc < 2.5 && creatureRatio > 0.4) {
@@ -286,8 +291,9 @@ Future<Map<String, dynamic>> buildHeuristicRecommendationsForDeck({
         '%put%land%onto the battlefield%',
       ],
       limit: (10 - summary.rampCount).clamp(1, 5),
-      reasonFor: (_) =>
-          'Ramp — deck tem apenas ${summary.rampCount} fontes (recomendado: 10+)',
+      reasonFor:
+          (_) =>
+              'Ramp — deck tem apenas ${summary.rampCount} fontes (recomendado: 10+)',
     );
   }
 
@@ -296,8 +302,9 @@ Future<Map<String, dynamic>> buildHeuristicRecommendationsForDeck({
       roles: const ['draw', 'card_selection'],
       oraclePatterns: const ['%draw%card%'],
       limit: (8 - summary.drawCount).clamp(1, 4),
-      reasonFor: (_) =>
-          'Card draw — deck tem apenas ${summary.drawCount} fontes (recomendado: 8+)',
+      reasonFor:
+          (_) =>
+              'Card draw — deck tem apenas ${summary.drawCount} fontes (recomendado: 8+)',
     );
   }
 
@@ -310,8 +317,9 @@ Future<Map<String, dynamic>> buildHeuristicRecommendationsForDeck({
         '%damage%target%',
       ],
       limit: (6 - summary.removalCount).clamp(1, 4),
-      reasonFor: (_) =>
-          'Remoção — deck tem apenas ${summary.removalCount} (recomendado: 6+)',
+      reasonFor:
+          (_) =>
+              'Remoção — deck tem apenas ${summary.removalCount} (recomendado: 6+)',
     );
   }
 
@@ -324,8 +332,9 @@ Future<Map<String, dynamic>> buildHeuristicRecommendationsForDeck({
         '%each creature%',
       ],
       limit: (3 - summary.boardWipeCount).clamp(1, 2),
-      reasonFor: (_) =>
-          'Board wipe — deck tem apenas ${summary.boardWipeCount} (recomendado: 2-3)',
+      reasonFor:
+          (_) =>
+              'Board wipe — deck tem apenas ${summary.boardWipeCount} (recomendado: 2-3)',
     );
   }
 
@@ -339,8 +348,8 @@ Future<Map<String, dynamic>> buildHeuristicRecommendationsForDeck({
         '%ward%',
       ],
       limit: (3 - summary.protectionCount).clamp(1, 2),
-      reasonFor: (_) =>
-          'Proteção — deck tem apenas ${summary.protectionCount} fontes',
+      reasonFor:
+          (_) => 'Proteção — deck tem apenas ${summary.protectionCount} fontes',
     );
   }
 
@@ -357,8 +366,9 @@ Future<Map<String, dynamic>> buildHeuristicRecommendationsForDeck({
       limit: (recommendationCommanderFallbackLandFloor - summary.landCount)
           .clamp(1, 3),
       landOnly: true,
-      reasonFor: (_) =>
-          'Terreno/fixing — deck tem apenas ${summary.landCount} terrenos (recomendado: $recommendationCommanderLandTargetBand)',
+      reasonFor:
+          (_) =>
+              'Terreno/fixing — deck tem apenas ${summary.landCount} terrenos (recomendado: $recommendationCommanderLandTargetBand)',
     );
   }
 
@@ -388,7 +398,9 @@ Future<Map<String, dynamic>> buildHeuristicRecommendationsForDeck({
   for (final card in summary.deckCards) {
     if (removeRecommendations.length >= 3) break;
     final typeLine = (card['type_line'] as String? ?? '').toLowerCase();
-    if (typeLine.contains('land') || card['is_commander'] == true) continue;
+    if (basic_lands.isLandTypeLine(typeLine) || card['is_commander'] == true) {
+      continue;
+    }
     final cmc = (card['cmc'] as num?)?.toDouble() ?? 0;
 
     if (summary.archetype == 'aggro' && cmc > 5) {
@@ -414,12 +426,13 @@ Future<Map<String, dynamic>> buildHeuristicRecommendationsForDeck({
   }
 
   if (summary.deckColors.length >= 3 && summary.landCount > 38) {
-    final basicLands = summary.deckCards.where((card) {
-      return basic_lands.isBasicLandCard(
-        name: card['name'] as String? ?? '',
-        typeLine: card['type_line'] as String? ?? '',
-      );
-    }).toList();
+    final basicLands =
+        summary.deckCards.where((card) {
+          return basic_lands.isBasicLandCard(
+            name: card['name'] as String? ?? '',
+            typeLine: card['type_line'] as String? ?? '',
+          );
+        }).toList();
     if (basicLands.isNotEmpty && removeRecommendations.length < 5) {
       removeRecommendations.add({
         'card_name': basicLands.last['name'] as String? ?? '',
@@ -440,10 +453,7 @@ Future<Map<String, dynamic>> buildHeuristicRecommendationsForDeck({
           final lower = trend.cardName.toLowerCase();
           if (summary.deckCardNames.contains(lower)) continue;
           if (!seen.add(lower)) continue;
-          trendingCards.add({
-            ...trend.toJson(),
-            'commander': commander,
-          });
+          trendingCards.add({...trend.toJson(), 'commander': commander});
           if (trendingCards.length >= 8) break;
         }
       } catch (_) {
@@ -529,10 +539,7 @@ Map<String, dynamic> buildHeuristicRecommendationsBody({
       removalCount: removalCount,
       averageCmc: averageCmc,
     ),
-    'recommendations': {
-      'add': add,
-      'remove': remove,
-    },
+    'recommendations': {'add': add, 'remove': remove},
     'statistics': buildRecommendationStatistics(
       totalCards: totalCards,
       landCount: landCount,

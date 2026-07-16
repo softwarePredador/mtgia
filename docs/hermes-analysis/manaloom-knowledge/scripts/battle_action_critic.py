@@ -42,6 +42,7 @@ ACTION_EVENTS = {
     "spell_exiled_from_stack",
     "spell_resolved",
     "trigger_put_on_stack",
+    "trigger_countered",
     "trigger_resolved",
     "tutor_resolved",
     "turn_end",
@@ -340,6 +341,14 @@ EVENT_CONTRACT_OVERRIDES = {
         "strategy_signal",
         "replacement effect skipped an extra turn and affects turn sequencing strategy.",
     ),
+    "escape_additional_cost_paid": (
+        "technical",
+        "escape exile payment is additional-cost ledger detail; the resulting spell_cast is audited separately.",
+    ),
+    "escape_cast": (
+        "strategy_signal",
+        "Underworld Breach alternate graveyard cast is represented by the primary spell_cast and resolution ledger.",
+    ),
     "flashback_cast": (
         "strategy_signal",
         "alternate graveyard cast mode represented in stack/cast context and human replay.",
@@ -347,6 +356,18 @@ EVENT_CONTRACT_OVERRIDES = {
     "flashback_exiled": (
         "technical",
         "flashback replacement-zone ledger after a tracked graveyard cast resolves.",
+    ),
+    "flashback_permission_expired": (
+        "technical",
+        "end-of-turn cleanup of a temporary targeted flashback permission.",
+    ),
+    "flashback_target_permission_granted": (
+        "strategy_signal",
+        "targeted flashback grant records the chosen graveyard card and permission window.",
+    ),
+    "flashback_target_permission_not_granted": (
+        "ignored_with_reason",
+        "targeted flashback grant was considered but no legal or useful graveyard target existed.",
     ),
     "game_lost": (
         "strategy_signal",
@@ -359,6 +380,26 @@ EVENT_CONTRACT_OVERRIDES = {
     "graveyard_flashback_granted": (
         "strategy_signal",
         "Past in Flames style permission grant is card-flow evidence for later flashback casts.",
+    ),
+    "hazels_brewmaster_food_created": (
+        "renderer_only",
+        "Food token creation is replay state evidence; the parent trigger_resolved event is audited separately.",
+    ),
+    "harnfel_activated": (
+        "strategy_signal",
+        "Harnfel activation records the optional discard-for-exile card-selection action.",
+    ),
+    "harnfel_discard_cost_paid": (
+        "technical",
+        "Harnfel discard payment is activation-cost ledger detail.",
+    ),
+    "harnfel_exile_permission_expired": (
+        "technical",
+        "end-of-turn cleanup of Harnfel's temporary exile play permission.",
+    ),
+    "harnfel_exiled_card_played": (
+        "strategy_signal",
+        "play from Harnfel exile permission is represented by the primary land or spell event and replay context.",
     ),
     "hand_filter_resolved": (
         "strategy_signal",
@@ -419,6 +460,30 @@ EVENT_CONTRACT_OVERRIDES = {
     "life_totals_redistributed": (
         "strategy_signal",
         "life-total redistribution result is consumed by replay and strategy checks.",
+    ),
+    "mana_vault_draw_step_damage": (
+        "strategy_signal",
+        "Mana Vault draw-step damage is resource-risk state evidence consumed by replay checks.",
+    ),
+    "mana_vault_draw_step_damage_skipped": (
+        "ignored_with_reason",
+        "Mana Vault damage trigger was checked but its tapped-state condition was false.",
+    ),
+    "mana_vault_mana_activated": (
+        "technical",
+        "Mana Vault mana activation is resource-payment ledger detail.",
+    ),
+    "mana_vault_upkeep_untap": (
+        "strategy_signal",
+        "Mana Vault optional upkeep untap records the paid resource choice and resulting state.",
+    ),
+    "modal_dfc_back_face_cast": (
+        "strategy_signal",
+        "modal double-faced back-face cast records a strategic face choice represented by the primary spell ledger.",
+    ),
+    "modal_dfc_front_face_restored": (
+        "technical",
+        "zone transition restored the canonical front-face identity after a back-face spell left the stack or battlefield.",
     ),
     "one_ring_burden_life_loss": (
         "strategy_signal",
@@ -631,6 +696,14 @@ EVENT_CONTRACT_OVERRIDES = {
     "trigger_skipped": (
         "ignored_with_reason",
         "trigger path was checked and skipped with reason metadata.",
+    ),
+    "underworld_breach_end_step_sacrifice_skipped": (
+        "ignored_with_reason",
+        "Underworld Breach end-step cleanup was checked after the source had already left the battlefield.",
+    ),
+    "underworld_breach_end_step_sacrificed": (
+        "renderer_only",
+        "scheduled Underworld Breach sacrifice is end-step zone-state evidence.",
     ),
     "utility_artifact_activated": (
         "strategy_signal",
@@ -1535,7 +1608,10 @@ def criticize_actions(
                         "Matching decision trace has empty score_components.",
                         "Populate score_components for auditability.",
                     ))
-            elif kind in {"spell_cast", "creature_cast", "commander_cast"}:
+            elif (
+                kind in {"spell_cast", "creature_cast", "commander_cast"}
+                and event.get("cast_choice_optional") is not False
+            ):
                 findings.append(action_finding(
                     "low",
                     "missing_decision_trace",

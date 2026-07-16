@@ -1,0 +1,818 @@
+{
+  "schema_version": "pg877_ramp_permission_false_positive_manifest_v1",
+  "generated_at_utc": "2026-07-16T06:55:49.394059Z",
+  "status": "applied_postchecked",
+  "applied_at_utc": "2026-07-16T07:30:00Z",
+  "postgres_truth": true,
+  "post_pg876_truth": true,
+  "postgresql_writes_executed": true,
+  "precheck_status": "PG877_PRECHECK_PASS",
+  "apply_status": "PG877_APPLY_COMMITTED",
+  "postcheck_status": "PG877_POSTCHECK_PASS",
+  "scope": {
+    "action": "remove_only",
+    "target_card_count": 115,
+    "target_card_id_sha256": "b8e4fa337a747efadfd6cb1ab57ed5796e75de7387f3c85fd39cb3f4e742cc98",
+    "target_reason_sha256": "592c05966f7d8555543b4207c2ba38d423479db9e5812f9a0f7be4ed3c635ded",
+    "target_input_sha256": "ffda83a778b6668059fa1fd983d56e591e5f3c2a1daa044216b8c08d379838a2",
+    "classification_counts": {
+      "payment_permission_as_though_any": 71,
+      "payment_permission_any_type_can_be_spent": 32,
+      "payment_permission_spend_any_type": 2,
+      "commander_color_identity_phrase_collision": 10
+    }
+  },
+  "lane_prestate": {
+    "heuristic_function_rows": 105,
+    "heuristic_function_card_id_sha256": "57d6d74ea3cdf21ed4b3190ef3309616a885d377e85935a7b5f779adba3e446c",
+    "semantic_function_rows": 105,
+    "semantic_function_card_id_sha256": "57d6d74ea3cdf21ed4b3190ef3309616a885d377e85935a7b5f779adba3e446c",
+    "heuristic_role_rows": 115,
+    "heuristic_role_row_key_sha256": "2457d7e9893b1bb942b3f8aa152e9ae601695e89af354cb0a7bfdfe82853767d",
+    "semantic_json_rows": 105,
+    "semantic_json_card_id_sha256": "57d6d74ea3cdf21ed4b3190ef3309616a885d377e85935a7b5f779adba3e446c"
+  },
+  "semantic_transform": {
+    "rows_with_only_ramp_deleted": 22,
+    "rows_rebuilt_without_ramp": 83,
+    "rebuilt_content_sha256": "d06f7f53ec19b866e6b9e9160af69ca6b977ef623bf72eaf7d0c4926c236d4fa",
+    "role_confidence_storage_type": "numeric(4,3)",
+    "role_confidence_typmod_rows": 83
+  },
+  "persisted_surface_impact": {
+    "postgresql": {
+      "deck_cards_rows": 28,
+      "deck_count": 24,
+      "target_card_count": 11,
+      "deck_card_id_sha256": "4539610c0a0c1d5b6ec42d92a28afc149ea2f6f208e01d0e005561f9f46a71df",
+      "deck_rows_sha256": "8183fd629f26d7030f1ee5b0b3f9b95516f70a4829838290ec6f37a8d4534dce",
+      "commander_card_usage_rows": 8,
+      "commander_card_usage_target_count": 8,
+      "commander_card_usage_total": 54,
+      "usage_card_name_sha256": "5bfdf040e76b7909be466ce923fad32fe54b01e4247fe0418657e8f440d3585a",
+      "usage_rows_sha256": "42aa361635ba609e18b987a924bf350fbd828c6c0b1ad51821592a4a764413a1",
+      "semantic_columns_present": false,
+      "sync_required": false,
+      "guard": "exact audit snapshots and byte-for-byte postcheck/rollback diffs"
+    },
+    "hermes_sqlite": {
+      "deck_cards_rows": 12,
+      "deck_count": 9,
+      "target_card_count": 6,
+      "ramp_rows": 0,
+      "deck_tag_surface_sha256": "e859a54145ba15384a5be5607feece42a0a06fb4bddf55d6fa9880d0bc9c1058",
+      "lorehold_variant_rows": 1,
+      "lorehold_variant_ramp_rows": 0,
+      "lorehold_variant_surface_sha256": "95c8cb598cf179666428e9542558b6ff63f6b8a2cfca9d5d0713bd74d8d85a03",
+      "protected_deck_id": 6,
+      "protected_deck_target_rows": 0,
+      "protected_deck_hash": "a83b580d42e20ef7fdf285e6498fb3972ce07b54fa6b7359abac8717476014b4",
+      "sync_required": false,
+      "guard_path": "docs/hermes-analysis/manaloom-knowledge/scripts/pg877_ramp_permission_surface_guard.py"
+    }
+  },
+  "preserved_scope": {
+    "card_count": 6,
+    "card_id_sha256": "02338acac46be3814fcbbb2e33de82b25ee078f6eea56daa3c0bd87376030e6e",
+    "heuristic_function_rows": 4,
+    "semantic_function_rows": 4,
+    "heuristic_role_rows": 6,
+    "semantic_json_rows": 4,
+    "cards": [
+      {
+        "card_id": "00461ce4-a65e-4da2-8a33-7785711b344c",
+        "card_name": "Fallaji Wayfarer",
+        "preservation_reason": "granted_convoke",
+        "ramp_signal": "Multicolored spells you cast have convoke."
+      },
+      {
+        "card_id": "37a71d19-965e-4cba-949d-5b64d2200f57",
+        "card_name": "Gonti, Canny Acquisitor",
+        "preservation_reason": "qualified_cost_reduction",
+        "ramp_signal": "Spells you cast but don't own cost {1} less to cast."
+      },
+      {
+        "card_id": "59098116-a749-4c42-887e-73e89a7ced1a",
+        "card_name": "The Paradise Bird",
+        "preservation_reason": "mana_dork_token",
+        "ramp_signal": "Create a Birds of Paradise token."
+      },
+      {
+        "card_id": "7fd85cb4-4026-4130-bc23-25024ea7b653",
+        "card_name": "Gonti, Night Minister",
+        "preservation_reason": "treasure_production",
+        "ramp_signal": "That player creates a Treasure token."
+      },
+      {
+        "card_id": "a7ae6e85-3821-468b-8873-68cd8147d5dd",
+        "card_name": "The Snapstone Wielder",
+        "preservation_reason": "mana_counter_virtual_mana",
+        "ramp_signal": "Spend mana of any color equal to the number of mana counters."
+      },
+      {
+        "card_id": "cff0f184-02d7-4c9d-8499-6ba6889b9002",
+        "card_name": "Manascape Refractor",
+        "preservation_reason": "copied_land_mana_abilities",
+        "ramp_signal": "Has all activated abilities of all lands on the battlefield."
+      }
+    ]
+  },
+  "target_cards": [
+    {
+      "card_id": "0081920d-2cef-47b5-bbba-a62111a90e13",
+      "card_name": "Mycosynth Lattice",
+      "type_line": "Artifact",
+      "classification": "payment_permission_as_though_any"
+    },
+    {
+      "card_id": "05a823af-8616-4336-86d6-8b7eacfea643",
+      "card_name": "Unexpected Potential",
+      "type_line": "Conspiracy",
+      "classification": "payment_permission_as_though_any"
+    },
+    {
+      "card_id": "05cae2c8-b7a1-490c-b951-bf064e959637",
+      "card_name": "Brainstealer Dragon",
+      "type_line": "Creature — Dragon Horror",
+      "classification": "payment_permission_as_though_any"
+    },
+    {
+      "card_id": "0b8dcfd5-9162-49e5-aeb2-4e1d6b2c3681",
+      "card_name": "Curse of Hospitality",
+      "type_line": "Enchantment — Aura Curse",
+      "classification": "payment_permission_as_though_any"
+    },
+    {
+      "card_id": "0d25856e-62e4-4887-b7e4-2c3f1bcfb21e",
+      "card_name": "Outrageous Robbery",
+      "type_line": "Instant",
+      "classification": "payment_permission_as_though_any"
+    },
+    {
+      "card_id": "100d22df-ee31-4b1b-857e-925d5c66ff0d",
+      "card_name": "Heartless Conscription",
+      "type_line": "Sorcery",
+      "classification": "payment_permission_any_type_can_be_spent"
+    },
+    {
+      "card_id": "10422bbe-1ebc-4c9d-b82a-2458b61b6296",
+      "card_name": "King Narfi's Betrayal",
+      "type_line": "Enchantment — Saga",
+      "classification": "payment_permission_as_though_any"
+    },
+    {
+      "card_id": "13f2ee9c-d0e3-41f2-8a58-449644dcd2f7",
+      "card_name": "Dead Man's Chest",
+      "type_line": "Enchantment — Aura",
+      "classification": "payment_permission_any_type_can_be_spent"
+    },
+    {
+      "card_id": "1a0ba281-f8f2-4d46-8df6-be1f36670122",
+      "card_name": "Psychic Intrusion",
+      "type_line": "Sorcery",
+      "classification": "payment_permission_as_though_any"
+    },
+    {
+      "card_id": "1af513c4-f9e8-45ca-b8b7-90694f2bf315",
+      "card_name": "Viconia, Disciple of Arcana",
+      "type_line": "Legendary Creature — Elf Cleric",
+      "classification": "payment_permission_as_though_any"
+    },
+    {
+      "card_id": "1bbc97cb-5580-43e2-a2cb-ece46befff89",
+      "card_name": "Cunning Rhetoric",
+      "type_line": "Enchantment",
+      "classification": "payment_permission_as_though_any"
+    },
+    {
+      "card_id": "1f4f3600-1e8e-4cd8-aac3-2db1ee78d526",
+      "card_name": "Grenzo, Havoc Raiser",
+      "type_line": "Legendary Creature — Goblin Rogue",
+      "classification": "payment_permission_as_though_any"
+    },
+    {
+      "card_id": "1f5f6383-80e8-42ff-84fb-4a7d804f672d",
+      "card_name": "Mzed, Mercenary Leader",
+      "type_line": "Legendary Creature — Human Mercenary",
+      "classification": "commander_color_identity_phrase_collision"
+    },
+    {
+      "card_id": "1fe61c3d-dee1-4b28-b56e-d5db24f6de8a",
+      "card_name": "Grave Choice",
+      "type_line": "Instant",
+      "classification": "payment_permission_as_though_any"
+    },
+    {
+      "card_id": "20591092-86d4-4816-9525-0f5ff1381588",
+      "card_name": "Haldan, Avid Arcanist",
+      "type_line": "Legendary Creature — Human Wizard",
+      "classification": "payment_permission_as_though_any"
+    },
+    {
+      "card_id": "22024f5c-f1f0-4197-a64d-2d6a43f75179",
+      "card_name": "Tinybones, Bauble Burglar",
+      "type_line": "Legendary Creature — Skeleton Rogue",
+      "classification": "payment_permission_any_type_can_be_spent"
+    },
+    {
+      "card_id": "226b2a84-dcf7-4846-bb4c-2a89cd4780f5",
+      "card_name": "Byode, Inverse Sun",
+      "type_line": "Legendary Universewalker — Byode",
+      "classification": "commander_color_identity_phrase_collision"
+    },
+    {
+      "card_id": "265d2a18-085f-419a-ab8e-0a56501f5e9f",
+      "card_name": "Auntie Flint",
+      "type_line": "Legendary Creature — Goblin",
+      "classification": "commander_color_identity_phrase_collision"
+    },
+    {
+      "card_id": "30c3a084-1606-43a3-add0-7ce977a8e119",
+      "card_name": "Opposition Agent",
+      "type_line": "Creature — Human Rogue",
+      "classification": "payment_permission_as_though_any"
+    },
+    {
+      "card_id": "30f12182-8d31-427b-b7ba-c1dc365e79b5",
+      "card_name": "Vesuvan Mist",
+      "type_line": "Instant",
+      "classification": "payment_permission_as_though_any"
+    },
+    {
+      "card_id": "32883290-4d41-4c29-b3dd-b4f909a41f8d",
+      "card_name": "Stolen Strategy",
+      "type_line": "Enchantment",
+      "classification": "payment_permission_as_though_any"
+    },
+    {
+      "card_id": "36b2718a-ae00-40ba-9d7e-33c0ddd9f6d6",
+      "card_name": "Breeches, Brazen Plunderer",
+      "type_line": "Legendary Creature — Goblin Pirate",
+      "classification": "payment_permission_as_though_any"
+    },
+    {
+      "card_id": "36feab40-368f-4f8a-a25b-538f1225cb26",
+      "card_name": "Snowborn Simulacra",
+      "type_line": "Sorcery",
+      "classification": "payment_permission_as_though_any"
+    },
+    {
+      "card_id": "3a4a3c37-c4b9-42df-9a65-456eed7facec",
+      "card_name": "Warzone Duplicator",
+      "type_line": "Artifact Creature — Construct",
+      "classification": "payment_permission_as_though_any"
+    },
+    {
+      "card_id": "3cf27bfd-8c91-4553-a7e5-fa7d7f2bcac8",
+      "card_name": "Apple of Eden, Isu Relic",
+      "type_line": "Legendary Artifact",
+      "classification": "payment_permission_any_type_can_be_spent"
+    },
+    {
+      "card_id": "3f5062a5-82bc-46db-80a5-96822235a9b0",
+      "card_name": "Mezzio Mugger",
+      "type_line": "Creature — Lizard Rogue",
+      "classification": "payment_permission_as_though_any"
+    },
+    {
+      "card_id": "4017629d-6a62-4623-b1f1-27b6ea23ca7a",
+      "card_name": "Reno and Rude",
+      "type_line": "Legendary Creature — Human Assassin",
+      "classification": "payment_permission_any_type_can_be_spent"
+    },
+    {
+      "card_id": "42f418c4-2014-4cfd-980c-627e6a7f6d1a",
+      "card_name": "Tinybones, the Pickpocket",
+      "type_line": "Legendary Creature — Skeleton Rogue",
+      "classification": "payment_permission_any_type_can_be_spent"
+    },
+    {
+      "card_id": "4430f5d5-b033-4c25-ab21-33c86db3db99",
+      "card_name": "Viconia, Disciple of Blood",
+      "type_line": "Legendary Creature — Elf Cleric",
+      "classification": "payment_permission_as_though_any"
+    },
+    {
+      "card_id": "44e93f79-a4c1-4675-a86c-17bd8dd7bea1",
+      "card_name": "Predators' Hour",
+      "type_line": "Sorcery",
+      "classification": "payment_permission_as_though_any"
+    },
+    {
+      "card_id": "44f47ebd-0df5-48a7-98d1-9e70cc7cd4fd",
+      "card_name": "Black Cat, Cunning Thief",
+      "type_line": "Legendary Creature — Human Rogue Villain",
+      "classification": "payment_permission_any_type_can_be_spent"
+    },
+    {
+      "card_id": "476637c9-1e2f-496c-94ca-080f1d0128fc",
+      "card_name": "Gonti, Lord of Luxury",
+      "type_line": "Legendary Creature — Aetherborn Rogue",
+      "classification": "payment_permission_any_type_can_be_spent"
+    },
+    {
+      "card_id": "48863140-65dd-4f29-8bcc-77da98009d70",
+      "card_name": "Mycosynthwave",
+      "type_line": "Plane — Secret Lair",
+      "classification": "payment_permission_as_though_any"
+    },
+    {
+      "card_id": "48963ade-4fe9-4a9e-8144-43e8fe0d097c",
+      "card_name": "Laughing Jasper Flint",
+      "type_line": "Legendary Creature — Lizard Rogue",
+      "classification": "payment_permission_any_type_can_be_spent"
+    },
+    {
+      "card_id": "4c210532-8d2a-42bb-96d5-929dc1d44202",
+      "card_name": "Lidless Gaze",
+      "type_line": "Sorcery",
+      "classification": "payment_permission_any_type_can_be_spent"
+    },
+    {
+      "card_id": "4e88ae54-cbb2-48a8-8685-baf1cef0b66e",
+      "card_name": "Hurl Through Hell",
+      "type_line": "Instant",
+      "classification": "payment_permission_as_though_any"
+    },
+    {
+      "card_id": "4edafdbd-98f6-41ed-8e35-43ae85919a2d",
+      "card_name": "Undercity Plunder",
+      "type_line": "Sorcery",
+      "classification": "payment_permission_as_though_any"
+    },
+    {
+      "card_id": "5079aa6c-a388-42ec-944f-1ac0d1a6890d",
+      "card_name": "Hostage Taker",
+      "type_line": "Creature — Human Pirate",
+      "classification": "payment_permission_any_type_can_be_spent"
+    },
+    {
+      "card_id": "51cdbed4-af3d-4eb0-bb4f-3acf7249d6af",
+      "card_name": "Lorthos, Tentacled Terror",
+      "type_line": "Legendary Creature — Octopus",
+      "classification": "commander_color_identity_phrase_collision"
+    },
+    {
+      "card_id": "54756c19-80ab-4b98-bb2a-fb1c9f9a3939",
+      "card_name": "Clone Crafter",
+      "type_line": "Creature — Human Wizard",
+      "classification": "payment_permission_as_though_any"
+    },
+    {
+      "card_id": "562aaf2d-953b-4e4e-af8d-fbf065913065",
+      "card_name": "Drana and Linvala",
+      "type_line": "Legendary Creature — Vampire Angel",
+      "classification": "payment_permission_as_though_any"
+    },
+    {
+      "card_id": "5ba89b02-b2df-4aaf-945d-9f9b046153c2",
+      "card_name": "Whispersteel Dagger",
+      "type_line": "Artifact — Equipment",
+      "classification": "payment_permission_as_though_any"
+    },
+    {
+      "card_id": "5dfa391d-c253-43ab-bdf6-434be41418a4",
+      "card_name": "Case File Auditor",
+      "type_line": "Creature — Human Detective",
+      "classification": "payment_permission_as_though_any"
+    },
+    {
+      "card_id": "5f37e27f-1cf1-482f-a598-e611f8232342",
+      "card_name": "Rakdos, the Muscle",
+      "type_line": "Legendary Creature — Demon Mercenary",
+      "classification": "payment_permission_any_type_can_be_spent"
+    },
+    {
+      "card_id": "62824b5d-dbee-4a41-b64a-e0a82b048479",
+      "card_name": "Royal Booster",
+      "type_line": "Phenomenon",
+      "classification": "payment_permission_spend_any_type"
+    },
+    {
+      "card_id": "62bfcb16-6411-456c-8069-40c096345887",
+      "card_name": "Taster of Wares",
+      "type_line": "Creature — Goblin Warlock",
+      "classification": "payment_permission_any_type_can_be_spent"
+    },
+    {
+      "card_id": "64712177-9c42-4789-a16f-9b8409a17f2b",
+      "card_name": "Quicksilver Elemental",
+      "type_line": "Creature — Elemental",
+      "classification": "payment_permission_as_though_any"
+    },
+    {
+      "card_id": "64eb1114-b077-404a-b87a-acdabe53b4db",
+      "card_name": "Intellect Devourer",
+      "type_line": "Creature — Horror",
+      "classification": "payment_permission_as_though_any"
+    },
+    {
+      "card_id": "66aadeaa-2fc2-4ea7-abd2-061477b7804c",
+      "card_name": "Agent of Raffine",
+      "type_line": "Creature — Human Rogue",
+      "classification": "payment_permission_as_though_any"
+    },
+    {
+      "card_id": "67116daa-5295-432a-8950-0d12d2e99207",
+      "card_name": "Viconia, Disciple of Rebirth",
+      "type_line": "Legendary Creature — Elf Cleric",
+      "classification": "payment_permission_as_though_any"
+    },
+    {
+      "card_id": "689c6457-a8ef-4671-b674-ea1b9c12b08a",
+      "card_name": "Shadow of the Enemy",
+      "type_line": "Sorcery",
+      "classification": "payment_permission_any_type_can_be_spent"
+    },
+    {
+      "card_id": "6b75da38-5553-4bbf-be37-5cfed2d7181b",
+      "card_name": "Discord, Lord of Disharmony",
+      "type_line": "Legendary Creature — Chimera",
+      "classification": "payment_permission_any_type_can_be_spent"
+    },
+    {
+      "card_id": "6ba8092e-d625-4c95-95e6-2d6396e17472",
+      "card_name": "Elder Brain",
+      "type_line": "Creature — Horror",
+      "classification": "payment_permission_as_though_any"
+    },
+    {
+      "card_id": "6c4856b3-d77f-4dc5-bba3-f01fead57abd",
+      "card_name": "Five-Finger Discount",
+      "type_line": "Sorcery",
+      "classification": "payment_permission_as_though_any"
+    },
+    {
+      "card_id": "6e840afa-2d94-451a-99b9-9ec348552200",
+      "card_name": "Fear of the Unknown",
+      "type_line": "Enchantment Creature — Nightmare",
+      "classification": "payment_permission_any_type_can_be_spent"
+    },
+    {
+      "card_id": "6fe4f32e-3b60-4b94-bde9-9c39e64ca64b",
+      "card_name": "Thief of Sanity",
+      "type_line": "Creature — Specter",
+      "classification": "payment_permission_any_type_can_be_spent"
+    },
+    {
+      "card_id": "7227892f-0ff0-4d41-a3f4-8afdacfbf0d6",
+      "card_name": "Bloodsoaked Insight // Sanguine Morass",
+      "type_line": "Sorcery",
+      "classification": "payment_permission_any_type_can_be_spent"
+    },
+    {
+      "card_id": "779fd6c0-d896-4cd8-8367-ba43b4cfe0ff",
+      "card_name": "Gale's Redirection",
+      "type_line": "Instant",
+      "classification": "payment_permission_as_though_any"
+    },
+    {
+      "card_id": "7877a75e-e2fb-4b08-8582-70ee237b823d",
+      "card_name": "Theopholos, Order Acolyte",
+      "type_line": "Legendary Creature — Dwarf Cleric",
+      "classification": "commander_color_identity_phrase_collision"
+    },
+    {
+      "card_id": "79b1656d-0368-42f0-a4a6-11cf944cd3c1",
+      "card_name": "Bind to Secrecy",
+      "type_line": "Instant",
+      "classification": "payment_permission_as_though_any"
+    },
+    {
+      "card_id": "7a1177a0-b77c-4ec1-8692-263cc33367f5",
+      "card_name": "Celestial Dawn",
+      "type_line": "Enchantment",
+      "classification": "payment_permission_as_though_any"
+    },
+    {
+      "card_id": "7a3ec965-150b-4150-b871-f37f5cf4beca",
+      "card_name": "The Convention Enthusiast",
+      "type_line": "Legendary Creature — Human Gamer",
+      "classification": "commander_color_identity_phrase_collision"
+    },
+    {
+      "card_id": "7b0f0bb7-42e7-482d-8a0d-d964e592d3b2",
+      "card_name": "Quistis Trepe",
+      "type_line": "Legendary Creature — Human Wizard",
+      "classification": "payment_permission_any_type_can_be_spent"
+    },
+    {
+      "card_id": "81c60941-3308-4c29-b13a-d9e0dcc6ce2e",
+      "card_name": "Emissary's Ploy",
+      "type_line": "Conspiracy",
+      "classification": "payment_permission_as_though_any"
+    },
+    {
+      "card_id": "84a4fde5-4829-4038-9ed0-aab734796c26",
+      "card_name": "Vona de Iedo, the Antifex",
+      "type_line": "Legendary Creature — Vampire Cleric Knight",
+      "classification": "payment_permission_any_type_can_be_spent"
+    },
+    {
+      "card_id": "86d223c3-ec5c-4ef4-83a0-16fb190563f6",
+      "card_name": "Arvad of the Weatherlight",
+      "type_line": "Legendary Creature — Human Knight",
+      "classification": "commander_color_identity_phrase_collision"
+    },
+    {
+      "card_id": "8854c511-2adf-45de-84dc-6a840e713eb3",
+      "card_name": "Kotose, the Silent Spider",
+      "type_line": "Legendary Creature — Human Ninja",
+      "classification": "payment_permission_as_though_any"
+    },
+    {
+      "card_id": "8a11c89c-f6f6-4a7f-856c-b7f31a0dea10",
+      "card_name": "Oath of Nissa",
+      "type_line": "Legendary Enchantment",
+      "classification": "payment_permission_as_though_any"
+    },
+    {
+      "card_id": "8bb622c3-05e4-4b64-9424-accb267118b9",
+      "card_name": "Xanathar, Guild Kingpin",
+      "type_line": "Legendary Creature — Beholder",
+      "classification": "payment_permission_as_though_any"
+    },
+    {
+      "card_id": "8c0a3181-0210-4126-919f-7da18cd8f331",
+      "card_name": "Daxos of Meletis",
+      "type_line": "Legendary Creature — Human Soldier",
+      "classification": "payment_permission_as_though_any"
+    },
+    {
+      "card_id": "8c2daabf-fc51-435c-9968-2fac30c17bf8",
+      "card_name": "Tome of the Infinite",
+      "type_line": "Legendary Artifact — Book",
+      "classification": "payment_permission_as_though_any"
+    },
+    {
+      "card_id": "8d99d704-8701-4da9-8857-57b86a2ef69a",
+      "card_name": "Futurist Spellthief",
+      "type_line": "Creature — Moonfolk Wizard",
+      "classification": "payment_permission_as_though_any"
+    },
+    {
+      "card_id": "8d99fd35-5369-4dde-94d4-56143d27c37f",
+      "card_name": "Gutmorn, Pactbound Servant",
+      "type_line": "Legendary Creature — Demon",
+      "classification": "payment_permission_as_though_any"
+    },
+    {
+      "card_id": "8e6585d4-c6ad-463f-a5a9-03e683dcb1ca",
+      "card_name": "Dire Fleet Daredevil",
+      "type_line": "Creature — Human Pirate",
+      "classification": "payment_permission_any_type_can_be_spent"
+    },
+    {
+      "card_id": "8eb3ed7f-30ce-42ea-9376-d2b836dba6c6",
+      "card_name": "Rahilda, Wanted Cutthroat // Rahilda, Feral Outlaw",
+      "type_line": "Legendary Creature — Human Werewolf",
+      "classification": "payment_permission_as_though_any"
+    },
+    {
+      "card_id": "8edea8f6-5ae6-4d46-9ded-390c6afeda73",
+      "card_name": "Barce, Friend Finder",
+      "type_line": "Legendary Creature — Human Wizard",
+      "classification": "commander_color_identity_phrase_collision"
+    },
+    {
+      "card_id": "91cbfaea-0279-4de2-a13d-4a680152454c",
+      "card_name": "Author of Shadows",
+      "type_line": "Creature — Shade Warlock",
+      "classification": "payment_permission_as_though_any"
+    },
+    {
+      "card_id": "92283fcd-e2ad-4a94-8636-4bf9e839e5ee",
+      "card_name": "Grell Philosopher",
+      "type_line": "Creature — Horror Wizard",
+      "classification": "payment_permission_as_though_any"
+    },
+    {
+      "card_id": "92d46561-c723-4042-a923-04f1cb08cc39",
+      "card_name": "Ian Malcolm, Chaotician",
+      "type_line": "Legendary Creature — Human Scientist",
+      "classification": "payment_permission_any_type_can_be_spent"
+    },
+    {
+      "card_id": "958e8c84-4b06-4cab-b488-e84bd102ed30",
+      "card_name": "Cruelclaw's Heist",
+      "type_line": "Sorcery",
+      "classification": "payment_permission_any_type_can_be_spent"
+    },
+    {
+      "card_id": "95e13e63-c7f4-40d3-a3c4-82fb35c4124a",
+      "card_name": "Abstruse Appropriation",
+      "type_line": "Instant",
+      "classification": "payment_permission_as_though_any"
+    },
+    {
+      "card_id": "9876ca60-ba0d-4aba-af80-391b80514cd7",
+      "card_name": "Draugr Necromancer",
+      "type_line": "Snow Creature — Zombie Cleric",
+      "classification": "payment_permission_as_though_any"
+    },
+    {
+      "card_id": "99c75488-c483-471b-b460-dac7b1165f32",
+      "card_name": "Ixhel, Scion of Atraxa",
+      "type_line": "Legendary Creature — Phyrexian Angel",
+      "classification": "payment_permission_as_though_any"
+    },
+    {
+      "card_id": "9e98d418-c8d8-441f-a6c1-83a1b8c22eb7",
+      "card_name": "False Dawn",
+      "type_line": "Sorcery",
+      "classification": "payment_permission_as_though_any"
+    },
+    {
+      "card_id": "a195e2cd-ac16-4891-a5b8-49185cdb64d0",
+      "card_name": "Viconia, Disciple of Violence",
+      "type_line": "Legendary Creature — Elf Cleric",
+      "classification": "payment_permission_as_though_any"
+    },
+    {
+      "card_id": "a3d8a8f2-082e-403d-9d76-543563f83c40",
+      "card_name": "Court of Locthwain",
+      "type_line": "Enchantment",
+      "classification": "payment_permission_any_type_can_be_spent"
+    },
+    {
+      "card_id": "a609cfcf-ff5d-4ad8-b913-40c969c07dfa",
+      "card_name": "Thought-String Analyst",
+      "type_line": "Creature — Human Wizard",
+      "classification": "payment_permission_any_type_can_be_spent"
+    },
+    {
+      "card_id": "ab229c0f-def2-4e04-97e6-b1e585270d41",
+      "card_name": "Covetous Urge",
+      "type_line": "Sorcery",
+      "classification": "payment_permission_as_though_any"
+    },
+    {
+      "card_id": "ad01ba4b-469d-44f2-a955-17f1e267760e",
+      "card_name": "Commander's Plate",
+      "type_line": "Artifact — Equipment",
+      "classification": "commander_color_identity_phrase_collision"
+    },
+    {
+      "card_id": "b0d53a8c-922f-4c50-b376-3d23f0388588",
+      "card_name": "Vizier of the Menagerie",
+      "type_line": "Creature — Snake Cleric",
+      "classification": "payment_permission_spend_any_type"
+    },
+    {
+      "card_id": "b3871635-4370-45de-beaa-957a579aedce",
+      "card_name": "Juggle the Performance",
+      "type_line": "Sorcery",
+      "classification": "payment_permission_any_type_can_be_spent"
+    },
+    {
+      "card_id": "bc9244fa-4e7c-4a13-8b76-7473d7e11a03",
+      "card_name": "Siphon Insight",
+      "type_line": "Instant",
+      "classification": "payment_permission_as_though_any"
+    },
+    {
+      "card_id": "be699e8e-bf52-445c-8166-77975c02722a",
+      "card_name": "Dream-Thief's Bandana",
+      "type_line": "Artifact — Equipment",
+      "classification": "payment_permission_any_type_can_be_spent"
+    },
+    {
+      "card_id": "bf4194da-06d2-4581-a9bd-dc2da7c40fed",
+      "card_name": "Valko Indorian, Researcher",
+      "type_line": "Legendary Creature — Human Wizard",
+      "classification": "commander_color_identity_phrase_collision"
+    },
+    {
+      "card_id": "bf87b955-e319-425a-9ce1-760f7c35d137",
+      "card_name": "Agatha's Soul Cauldron",
+      "type_line": "Legendary Artifact",
+      "classification": "payment_permission_as_though_any"
+    },
+    {
+      "card_id": "c13a9149-8f66-4586-af6d-dbdc87fc2b97",
+      "card_name": "Blightwing Bandit",
+      "type_line": "Creature — Faerie Rogue",
+      "classification": "payment_permission_any_type_can_be_spent"
+    },
+    {
+      "card_id": "c28d3ff2-d2d5-44ee-aabb-d3773fce4772",
+      "card_name": "Viconia, Disciple of Strength",
+      "type_line": "Legendary Creature — Elf Cleric",
+      "classification": "payment_permission_as_though_any"
+    },
+    {
+      "card_id": "c39cade1-85f0-41c1-9089-c352278b8ab6",
+      "card_name": "Playtest Wish",
+      "type_line": "Sorcery",
+      "classification": "payment_permission_any_type_can_be_spent"
+    },
+    {
+      "card_id": "cf91d372-6e5d-45d1-9778-e8eeeef1d39e",
+      "card_name": "Nathan Drake, Treasure Hunter",
+      "type_line": "Legendary Creature — Human Rogue",
+      "classification": "payment_permission_as_though_any"
+    },
+    {
+      "card_id": "d06285a7-9d94-44f8-a093-e005d5386ca9",
+      "card_name": "The Magic Bandit",
+      "type_line": "Legendary Creature — Human Rogue",
+      "classification": "payment_permission_any_type_can_be_spent"
+    },
+    {
+      "card_id": "d5875336-2139-44bf-9042-35a4bd0d8955",
+      "card_name": "North Star",
+      "type_line": "Artifact",
+      "classification": "payment_permission_as_though_any"
+    },
+    {
+      "card_id": "db40d874-fa92-4734-a794-26c71b715ab8",
+      "card_name": "Robber of the Rich",
+      "type_line": "Creature — Human Archer Rogue",
+      "classification": "payment_permission_as_though_any"
+    },
+    {
+      "card_id": "dc84ea14-280f-4d1e-8fe7-261fabf74149",
+      "card_name": "Scheming Fence",
+      "type_line": "Creature — Human Citizen",
+      "classification": "payment_permission_as_though_any"
+    },
+    {
+      "card_id": "dd98a05e-66e7-474b-a8f8-3f2c39f16159",
+      "card_name": "Ominous Traveler",
+      "type_line": "Creature — Human",
+      "classification": "payment_permission_as_though_any"
+    },
+    {
+      "card_id": "e4fd01bb-9746-4097-a116-722c4ca78eff",
+      "card_name": "You Find Some Prisoners",
+      "type_line": "Instant",
+      "classification": "payment_permission_as_though_any"
+    },
+    {
+      "card_id": "e9dcdc55-bb66-4a6d-bce8-fe212286d892",
+      "card_name": "Arvinox, the Mind Flail",
+      "type_line": "Legendary Enchantment Creature — Horror",
+      "classification": "payment_permission_as_though_any"
+    },
+    {
+      "card_id": "ebbfe3ad-1343-4fde-8780-32bc7e4b6280",
+      "card_name": "Soul Servitude",
+      "type_line": "Instant",
+      "classification": "payment_permission_as_though_any"
+    },
+    {
+      "card_id": "ed95137d-cbd4-4741-b7ec-1d31c7022294",
+      "card_name": "Sharkey, Tyrant of the Shire",
+      "type_line": "Legendary Creature — Avatar Rogue",
+      "classification": "payment_permission_any_type_can_be_spent"
+    },
+    {
+      "card_id": "efae4886-87a4-4cbe-adc3-8dca6bd02b6b",
+      "card_name": "Share the Spoils",
+      "type_line": "Enchantment",
+      "classification": "payment_permission_as_though_any"
+    },
+    {
+      "card_id": "f528a1ea-4c3d-4d33-ae11-aeac59af2773",
+      "card_name": "Rogue Class",
+      "type_line": "Enchantment — Class",
+      "classification": "payment_permission_as_though_any"
+    },
+    {
+      "card_id": "f5d8d5a9-a65f-43e3-a9d0-12e1089c5fc2",
+      "card_name": "Nantuko Slicer",
+      "type_line": "Creature — Insect",
+      "classification": "payment_permission_as_though_any"
+    },
+    {
+      "card_id": "f6d414fa-4b57-4345-aee7-2f520c9d8bc5",
+      "card_name": "Lae'zel, Illithid Thrall",
+      "type_line": "Legendary Creature — Gith Horror Warrior",
+      "classification": "payment_permission_as_though_any"
+    },
+    {
+      "card_id": "fc9fb2c7-881b-4d76-b55c-221bf0b30b7e",
+      "card_name": "The Ruinous Powers",
+      "type_line": "Enchantment",
+      "classification": "payment_permission_as_though_any"
+    },
+    {
+      "card_id": "ff0a3e3f-ea3d-45a0-b502-5ba0435001c2",
+      "card_name": "Mnemonic Betrayal",
+      "type_line": "Sorcery",
+      "classification": "payment_permission_any_type_can_be_spent"
+    },
+    {
+      "card_id": "ff9d7f21-1837-406b-91bd-ca68ca0fbe44",
+      "card_name": "Evelyn, the Covetous",
+      "type_line": "Legendary Creature — Vampire Rogue",
+      "classification": "payment_permission_as_though_any"
+    }
+  ],
+  "package": {
+    "precheck": "pg877_ramp_permission_false_positive_reconciliation_20260716_precheck.sql",
+    "apply": "pg877_ramp_permission_false_positive_reconciliation_20260716_apply.sql",
+    "postcheck": "pg877_ramp_permission_false_positive_reconciliation_20260716_postcheck.sql",
+    "rollback": "pg877_ramp_permission_false_positive_reconciliation_20260716_rollback.sql"
+  }
+}

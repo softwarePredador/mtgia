@@ -1,6 +1,8 @@
+import '../basic_land_utils.dart' as basic_lands;
+
 bool isLikelyLandCard(Map<String, dynamic> card) {
   final typeLine = card['type_line']?.toString().toLowerCase() ?? '';
-  return typeLine.contains('land');
+  return basic_lands.isLandTypeLine(typeLine);
 }
 
 int? parseManaCostCmc(String? manaCost) {

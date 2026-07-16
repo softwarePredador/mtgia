@@ -4,6 +4,7 @@ import 'package:postgres/postgres.dart';
 import '../../../lib/archetype_counters_service.dart';
 import '../../../lib/http_responses.dart';
 import '../../../lib/ai/optimization_functional_roles.dart';
+import '../../../lib/basic_land_utils.dart' as land_utils;
 import '../../../lib/meta/meta_deck_card_list_support.dart';
 
 /// Endpoint para simular matchup entre dois decks
@@ -206,7 +207,7 @@ Future<Map<String, dynamic>?> _getDeckData(
         cmc: cmc,
       );
 
-      if (typeLineLower.contains('land')) {
+      if (land_utils.isLandTypeLine(typeLine)) {
         landCount += quantity;
       } else {
         nonLandCards += quantity;
