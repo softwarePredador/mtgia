@@ -50,6 +50,22 @@ function bypassImageOptimizer(imageUrl: string) {
   }
 }
 
+function normalizeCardImageUrl(imageUrl: string) {
+  try {
+    const url = new URL(imageUrl);
+    if (
+      url.hostname === "api.scryfall.com" &&
+      url.searchParams.get("format") === "image" &&
+      !url.searchParams.has("version")
+    ) {
+      url.searchParams.set("version", "normal");
+    }
+    return url.toString();
+  } catch {
+    return imageUrl;
+  }
+}
+
 export default async function HomePage() {
   const siteFeed = await loadPublicSiteFeed();
   const marketplaceItems = siteFeed.marketplace.cards.slice(0, 3);
@@ -141,7 +157,7 @@ export default async function HomePage() {
                   {deck.commanderImageUrl ? (
                     <div className="relative aspect-[5/7] w-32 overflow-hidden rounded-lg border border-mist-700 bg-obsidian-950 shadow-panel">
                       <Image
-                        src={deck.commanderImageUrl}
+                        src={normalizeCardImageUrl(deck.commanderImageUrl)}
                         alt={deck.commanderName ?? deck.name}
                         fill
                         sizes="128px"
@@ -198,7 +214,7 @@ export default async function HomePage() {
                   {item.imageUrl ? (
                     <div className="relative aspect-[5/7] w-28 overflow-hidden rounded-lg border border-mist-700 bg-obsidian-950 shadow-panel">
                       <Image
-                        src={item.imageUrl}
+                        src={normalizeCardImageUrl(item.imageUrl)}
                         alt={item.cardName}
                         fill
                         sizes="112px"

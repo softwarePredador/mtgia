@@ -76,9 +76,15 @@ void main() {
       final home = File('../web-public/src/app/page.tsx').readAsStringSync();
 
       expect(home, contains('function bypassImageOptimizer'));
+      expect(home, contains('function normalizeCardImageUrl'));
       expect(home, contains('hostname === "api.scryfall.com"'));
+      expect(home, contains('url.searchParams.set("version", "normal")'));
       expect(
         RegExp(r'unoptimized=\{bypassImageOptimizer\(').allMatches(home),
+        hasLength(2),
+      );
+      expect(
+        RegExp(r'src=\{normalizeCardImageUrl\(').allMatches(home),
         hasLength(2),
       );
     });
