@@ -1,4 +1,4 @@
-/// Smoke tests para o app Flutter MTG Deck Builder
+/// Smoke tests para o app Flutter ManaLoom.
 /// Estes testes validam que os widgets principais renderizam corretamente.
 library;
 
@@ -12,13 +12,13 @@ void main() {
         const MaterialApp(
           home: Scaffold(
             body: Center(
-              child: Text('MTG Deck Builder'),
+              child: Text('ManaLoom'),
             ),
           ),
         ),
       );
 
-      expect(find.text('MTG Deck Builder'), findsOneWidget);
+      expect(find.text('ManaLoom'), findsOneWidget);
     });
   });
 }
