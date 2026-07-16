@@ -101,8 +101,11 @@ fi
 )
 
 grep -Fq '<base href="/app/">' "$WORKTREE_DIR/app/build/web/index.html"
+if command -v xattr >/dev/null 2>&1; then
+  xattr -cr "$WORKTREE_DIR/app/Dockerfile.web" "$WORKTREE_DIR/app/web/nginx.conf" "$WORKTREE_DIR/app/build/web"
+fi
 
-tar -C "$WORKTREE_DIR/app" -czf - Dockerfile.web web/nginx.conf build/web | \
+COPYFILE_DISABLE=1 tar --no-mac-metadata -C "$WORKTREE_DIR/app" -czf - Dockerfile.web web/nginx.conf build/web | \
   ssh -o BatchMode=yes -o StrictHostKeyChecking=accept-new -i "$SSH_KEY" "$SSH_HOST" \
     "rm -rf '$REMOTE_DIR' && mkdir -p '$REMOTE_DIR' && tar -xzf - -C '$REMOTE_DIR'"
 

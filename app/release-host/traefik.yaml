@@ -1,0 +1,29 @@
+http:
+  routers:
+    http-evolution-manaloom-releases-path:
+      middlewares:
+        - redirect-to-https
+        - bad-gateway-error-page
+      priority: 230
+      rule: Host(`evolution-manaloom-web-public.2ta7qx.easypanel.host`) && (Path(`/downloads`) || PathPrefix(`/downloads/`))
+      service: evolution-manaloom-releases-path
+      entryPoints:
+        - http
+    https-evolution-manaloom-releases-path:
+      middlewares:
+        - bad-gateway-error-page
+      priority: 230
+      rule: Host(`evolution-manaloom-web-public.2ta7qx.easypanel.host`) && (Path(`/downloads`) || PathPrefix(`/downloads/`))
+      service: evolution-manaloom-releases-path
+      tls:
+        certResolver: letsencrypt
+        domains:
+          - main: evolution-manaloom-web-public.2ta7qx.easypanel.host
+      entryPoints:
+        - https
+  services:
+    evolution-manaloom-releases-path:
+      loadBalancer:
+        passHostHeader: true
+        servers:
+          - url: http://evolution_manaloom-releases:80/

@@ -35,6 +35,7 @@ NEXT_PUBLIC_MANALOOM_API_BASE_URL=https://seu-backend.example.com npm run dev
 
 - Public web: `https://evolution-manaloom-web-public.2ta7qx.easypanel.host`
 - Flutter autenticado: `https://evolution-manaloom-web-public.2ta7qx.easypanel.host/app/`
+- Android: `https://evolution-manaloom-web-public.2ta7qx.easypanel.host/downloads/manaloom-android.apk`
 - API ManaLoom: `https://evolution-cartinhas.2ta7qx.easypanel.host`
 - Serviço EasyPanel/Swarm: `evolution_manaloom-web-public`
 - Serviço Flutter EasyPanel/Swarm: `evolution_manaloom-app`
