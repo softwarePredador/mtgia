@@ -70,6 +70,23 @@ void main() {
       expect(e2eSuite, contains('Public web product E2E'));
     });
 
+    test('public deploy is pinned to master SHA and verifies production', () {
+      final deploy =
+          File('../scripts/manaloom_deploy_public_web.sh').readAsStringSync();
+
+      expect(deploy, contains(r'git -C "$ROOT_DIR" fetch origin master'));
+      expect(
+        deploy,
+        contains('HEAD local nao esta alinhado com origin/master'),
+      );
+      expect(deploy, contains(r'IMAGE="$IMAGE_REPO:$SHORT_SHA"'));
+      expect(deploy, contains("docker service update"));
+      expect(deploy, contains(r"--image '$IMAGE'"));
+      expect(deploy, contains(r'running_image" == "$IMAGE"'));
+      expect(deploy, contains('/legal/disclaimer /robots.txt /sitemap.xml'));
+      expect(deploy, contains("'^x-powered-by:'"));
+    });
+
     test('web smoke isolates build dependencies for concurrent gates', () {
       final smoke =
           File('../scripts/manaloom_public_web_smoke.sh').readAsStringSync();
