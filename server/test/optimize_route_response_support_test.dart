@@ -66,18 +66,12 @@ void main() {
       expect(response['intensity'], 'focused');
       expect(response['timings'], {'total_ms': 12});
       expect(response['stage_telemetry'], {'total_ms': 12});
-      expect(
-        response['preferences'],
-        {
-          'memory_applied': true,
-          'keep_theme': false,
-          'preferred_bracket': 3,
-        },
-      );
-      expect(
-        (response['optimize_intensity'] as Map)['returned_swaps'],
-        1,
-      );
+      expect(response['preferences'], {
+        'memory_applied': true,
+        'keep_theme': false,
+        'preferred_bracket': 3,
+      });
+      expect((response['optimize_intensity'] as Map)['returned_swaps'], 1);
     });
   });
 
@@ -142,9 +136,12 @@ void main() {
       );
 
       expect(outcome['mode'], 'rebuild_guided');
+      expect(outcome['strategy_source'], 'state_gate');
       expect(outcome['outcome_code'], 'rebuild_guided');
       expect(
-          (outcome['quality_error'] as Map)['code'], 'OPTIMIZE_NEEDS_REPAIR');
+        (outcome['quality_error'] as Map)['code'],
+        'OPTIMIZE_NEEDS_REPAIR',
+      );
       expect((outcome['next_action'] as Map)['endpoint'], '/ai/rebuild');
       expect(
         ((outcome['next_action'] as Map)['payload'] as Map)['theme'],

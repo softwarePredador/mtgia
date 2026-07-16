@@ -28,9 +28,9 @@ class NativeBattleClient {
     required String baseUrl,
     http.Client? client,
     Duration timeout = const Duration(seconds: 50),
-  })  : _baseUri = Uri.parse(baseUrl.replaceFirst(RegExp(r'/+$'), '')),
-        _client = client ?? http.Client(),
-        _timeout = timeout;
+  }) : _baseUri = Uri.parse(baseUrl.replaceFirst(RegExp(r'/+$'), '')),
+       _client = client ?? http.Client(),
+       _timeout = timeout;
 
   final Uri _baseUri;
   final http.Client _client;
@@ -66,6 +66,16 @@ class NativeBattleClient {
         throw NativeBattleServiceException(
           'Native battle returned an untrusted engine contract',
           statusCode: response.statusCode,
+        );
+      }
+      final turns = body['turns'];
+      if (body['status'] != 'completed' ||
+          body['error'] != null ||
+          turns is! int ||
+          turns <= 0) {
+        throw NativeBattleServiceException(
+          'Native battle returned an invalid completed battle payload',
+          statusCode: 502,
         );
       }
       return body;

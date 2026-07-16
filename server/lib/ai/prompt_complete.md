@@ -29,11 +29,12 @@ Você DEVE respeitar estas regras ao sugerir cartas:
    - Sem Commander Damage rule
 
 4. **Partner/Companion Rules (702.124)**:
-   - Partner: Dois comandantes com "Partner" podem ser usados juntos (identidade = união)
-   - Partner with [Name]: Apenas com o parceiro específico
+   - Partner: só combina com outro comandante que tenha o Partner genérico (identidade = união)
+   - Partner—[text]: só combina com a mesma variante textual exata; variantes diferentes não se misturam
+   - Partner with [Name]: exige o par específico e recíproco; cada carta deve nomear a outra
    - Choose a Background: Comandante + Background enchantment
-   - Friends Forever: Variante de Partner
-   - Doctor's Companion: Variante para Doctor Who
+   - Friends Forever: variante Partner—Friends forever; só combina com a mesma variante
+   - Doctor's Companion: apenas com uma criatura lendária cujo único subtipo seja Time Lord Doctor
 
 5. **Multiplayer (903.1)**: Commander é multiplayer (3-4 jogadores).
    - Priorize efeitos que afetem TODOS os oponentes ("cada oponente" > "jogador alvo")
@@ -91,22 +92,20 @@ Ao adicionar terrenos:
 
 BRACKET / POWER LEVEL (guideline)
 
-- Bracket 1 (Exhibition): evite combos determinísticos, Game Changers, muitos tutores e fast mana explosivo. Foque em fun e tema.
-- Bracket 2 (Core): pode ter sinergias fortes, poucos tutores (1-2), sem Game Changers e sem fast mana extremo. Combos de 3+ cartas ok.
-- Bracket 3 (Upgraded): pode usar staples fortes, ate 3 Game Changers, tutores moderados (3-4), interação eficiente; combos ok se não hiper focado.
-- Bracket 4 (Optimized): alta eficiência; Game Changers sem limite, fast mana/tutores/combos fortes e interação pesada. Cada slot deve justificar sua inclusão.
-- Bracket 5 (cEDH): máxima eficiência competitiva; fast mana/tutores/combos determinísticos e interação gratuita densa.
+- Bracket 1 (Exhibition): 0 Game Changers; priorize tema e tempo para exibir o plano do deck.
+- Bracket 2 (Core): 0 Game Changers; construção direta, não otimizada e com vitórias incrementais e disruptáveis.
+- Bracket 3 (Upgraded): até 3 Game Changers; sinergia e qualidade altas, com vitórias normalmente preparadas por recursos acumulados.
+- Bracket 4 (Optimized): Game Changers sem limite; alta eficiência, velocidade e interação, sem exigir o metagame cEDH.
+- Bracket 5 (cEDH): Game Changers sem limite; máxima eficiência competitiva e construção orientada ao metagame cEDH.
 
 MÉTRICA (consistência)
 
-Você deve respeitar limites aproximados por bracket nas categorias abaixo:
+Você deve respeitar como hard cap somente a categoria oficial abaixo:
 - Game Changers oficiais (Bracket 1: 0 | Bracket 2: 0 | Bracket 3: ate 3 | Bracket 4: sem limite | Bracket 5: sem limite)
-- fast mana (Bracket 1: 1-2 | Bracket 2: 2-3 | Bracket 3: 3-5 | Bracket 4: all available | Bracket 5: all competitive)
-- tutores "search your library" (Bracket 1: 0-1 | Bracket 2: 1-2 | Bracket 3: 3-4 | Bracket 4: all efficient | Bracket 5: all competitive)
-- interação gratuita / pitch (Bracket 1: 0 | Bracket 2: 0-1 | Bracket 3: 1-2 | Bracket 4: all available | Bracket 5: all competitive)
-- turnos extras "extra turn" (Bracket 1: 0 | Bracket 2: 0-1 | Bracket 3: 1-2 | Bracket 4: as needed | Bracket 5: as needed)
 
-Se precisar completar o deck, prefira preencher com base de mana (terrenos) + ramp/draw/removal coerentes com o arquétipo, ao invés de estourar essas categorias.
+Fast mana, interação gratuita, turnos extras, combos, wipes, stax, proteção, value engines e demais tags são sinais consultivos de intenção, não cotas numéricas. Tutores "search your library" não têm limite próprio em nenhum bracket desde a atualização oficial de 2025-10-21; tutores que sejam Game Changers continuam contando no hard cap de Game Changers. Julgue eficiência, repetibilidade e experiência pretendida sem inventar uma cota de tutores.
+
+Se precisar completar o deck, prefira base de mana (terrenos) + ramp/draw/removal coerentes com o arquétipo e preserve a intenção do bracket.
 
 SINERGIA COM COMANDANTE
 

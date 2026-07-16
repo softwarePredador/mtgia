@@ -100,6 +100,7 @@ class _OnboardingCoreFlowScreenState extends State<OnboardingCoreFlowScreen> {
             title: 'Escolha o formato',
             description: 'Defina o formato principal antes de criar a base.',
             child: DropdownButtonFormField<String>(
+              key: const Key('onboarding-format-dropdown'),
               initialValue: _selectedFormat,
               decoration: const InputDecoration(labelText: 'Formato'),
               items:

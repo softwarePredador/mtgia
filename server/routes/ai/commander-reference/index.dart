@@ -39,7 +39,8 @@ Future<Response> onRequest(RequestContext context) async {
       uri.queryParameters['learning'] ??
           uri.queryParameters['include_learning'],
     );
-    final includeLearningDeck = includeLearning ||
+    final includeLearningDeck =
+        includeLearning ||
         _truthyQueryFlag(
           uri.queryParameters['include_deck'] ??
               uri.queryParameters['learning_deck'],
@@ -47,27 +48,28 @@ Future<Response> onRequest(RequestContext context) async {
     final requestedMetaScope = normalizeCommanderMetaScope(
       uri.queryParameters['subformat'] ?? uri.queryParameters['scope'],
     );
-    final commanderFormats =
-        metaDeckFormatCodesForCommanderScope(requestedMetaScope);
+    final commanderFormats = metaDeckFormatCodesForCommanderScope(
+      requestedMetaScope,
+    );
 
     if (commander.isEmpty) {
       return badRequest('Query parameter commander is required.');
     }
 
     final pool = context.read<Pool>();
-    await _ensureCommanderProfileCacheTable(pool);
     final cachedProfile = await _loadCommanderProfileCache(
       pool: pool,
       commander: commander,
     );
-    final commanderLearning = includeLearning
-        ? await _buildCommanderLearningPayload(
-            pool: pool,
-            commander: commander,
-            limit: limit,
-            includeDeck: includeLearningDeck,
-          )
-        : null;
+    final commanderLearning =
+        includeLearning
+            ? await _buildCommanderLearningPayload(
+              pool: pool,
+              commander: commander,
+              limit: limit,
+              includeDeck: includeLearningDeck,
+            )
+            : null;
 
     Map<String, dynamic>? refreshSummary;
     if (shouldRefresh) {
@@ -142,57 +144,65 @@ Future<Response> onRequest(RequestContext context) async {
     }
 
     if (decks.isEmpty) {
-      final needsCacheUpgrade = cachedProfile != null &&
+      final needsCacheUpgrade =
+          cachedProfile != null &&
           !_hasExtendedCommanderReferenceBase(cachedProfile);
 
       final edhrecProfile =
           (shouldRefresh || cachedProfile == null || needsCacheUpgrade)
               ? await _buildAndPersistEdhrecProfile(
-                  pool: pool,
-                  commander: commander,
-                )
+                pool: pool,
+                commander: commander,
+              )
               : cachedProfile;
 
       if (edhrecProfile != null) {
-        final edhrecCards = (edhrecProfile['top_cards'] as List?)
+        final edhrecCards =
+            (edhrecProfile['top_cards'] as List?)
                 ?.whereType<Map>()
                 .map((e) => e.cast<String, dynamic>())
                 .toList() ??
             const <Map<String, dynamic>>[];
 
-        return Response.json(body: {
-          'commander': commander,
-          'meta_decks_found': 0,
-          'reference_cards': edhrecCards
-              .take(limit)
-              .map((c) => {
-                    'name': c['name'],
-                    'total_copies': 0,
-                    'appears_in_decks': c['num_decks'] ?? 0,
-                    'usage_rate': c['inclusion'] ?? 0.0,
-                    'synergy': c['synergy'] ?? 0.0,
-                    'category': c['category'] ?? 'other',
-                  })
-              .toList(),
-          'sample_decks': const <Map<String, dynamic>>[],
-          'model': {
-            'type': 'commander_reference_profile',
-            'source': 'edhrec',
-            'generated_from_meta_decks': 0,
-            'generated_from_edhrec': true,
-            'meta_scope': requestedMetaScope,
-            'top_non_basic_cards': edhrecCards
-                .map((e) => e['name'])
-                .whereType<String>()
-                .take(limit)
-                .toList(),
+        return Response.json(
+          body: {
+            'commander': commander,
+            'meta_decks_found': 0,
+            'reference_cards':
+                edhrecCards
+                    .take(limit)
+                    .map(
+                      (c) => {
+                        'name': c['name'],
+                        'total_copies': 0,
+                        'appears_in_decks': c['num_decks'] ?? 0,
+                        'usage_rate': c['inclusion'] ?? 0.0,
+                        'synergy': c['synergy'] ?? 0.0,
+                        'category': c['category'] ?? 'other',
+                      },
+                    )
+                    .toList(),
+            'sample_decks': const <Map<String, dynamic>>[],
+            'model': {
+              'type': 'commander_reference_profile',
+              'source': 'edhrec',
+              'generated_from_meta_decks': 0,
+              'generated_from_edhrec': true,
+              'meta_scope': requestedMetaScope,
+              'top_non_basic_cards':
+                  edhrecCards
+                      .map((e) => e['name'])
+                      .whereType<String>()
+                      .take(limit)
+                      .toList(),
+            },
+            'meta_scope': _buildMetaScopePayload(requestedMetaScope),
+            'commander_profile': edhrecProfile,
+            if (commanderLearning != null)
+              'commander_learning': commanderLearning,
+            if (refreshSummary != null) 'refresh': refreshSummary,
           },
-          'meta_scope': _buildMetaScopePayload(requestedMetaScope),
-          'commander_profile': edhrecProfile,
-          if (commanderLearning != null)
-            'commander_learning': commanderLearning,
-          if (refreshSummary != null) 'refresh': refreshSummary,
-        });
+        );
       }
 
       List<dynamic> fallback = const [];
@@ -205,59 +215,62 @@ Future<Response> onRequest(RequestContext context) async {
             ORDER BY meta_deck_count DESC, usage_count DESC, card_name ASC
             LIMIT @limit
           '''),
-          parameters: {
-            'commander': commander,
-            'limit': limit,
-          },
+          parameters: {'commander': commander, 'limit': limit},
         );
       } catch (_) {
         fallback = const [];
       }
 
       if (fallback.isEmpty) {
-        return Response.json(body: {
+        return Response.json(
+          body: {
+            'commander': commander,
+            'meta_decks_found': 0,
+            'reference_cards': <Map<String, dynamic>>[],
+            'sample_decks': <Map<String, dynamic>>[],
+            'message':
+                'Nenhum deck competitivo encontrado para esse comandante no acervo atual.',
+            'meta_scope': _buildMetaScopePayload(requestedMetaScope),
+            if (cachedProfile != null) 'commander_profile': cachedProfile,
+            if (commanderLearning != null)
+              'commander_learning': commanderLearning,
+          },
+        );
+      }
+
+      final cards =
+          fallback.map((row) {
+            final name = (row[0] as String?) ?? '';
+            final usage = (row[1] as int?) ?? 0;
+            final metaCount = (row[2] as int?) ?? 0;
+            return {
+              'name': name,
+              'total_copies': usage,
+              'appears_in_decks': metaCount,
+              'usage_rate': 0.0,
+            };
+          }).toList();
+
+      return Response.json(
+        body: {
           'commander': commander,
           'meta_decks_found': 0,
-          'reference_cards': <Map<String, dynamic>>[],
+          'reference_cards': cards,
           'sample_decks': <Map<String, dynamic>>[],
-          'message':
-              'Nenhum deck competitivo encontrado para esse comandante no acervo atual.',
+          'model': {
+            'type': 'commander_competitive_reference',
+            'generated_from_meta_decks': 0,
+            'generated_from_card_meta_insights': true,
+            'meta_scope': requestedMetaScope,
+            'top_non_basic_cards': cards.map((e) => e['name']).toList(),
+          },
           'meta_scope': _buildMetaScopePayload(requestedMetaScope),
           if (cachedProfile != null) 'commander_profile': cachedProfile,
           if (commanderLearning != null)
             'commander_learning': commanderLearning,
-        });
-      }
-
-      final cards = fallback.map((row) {
-        final name = (row[0] as String?) ?? '';
-        final usage = (row[1] as int?) ?? 0;
-        final metaCount = (row[2] as int?) ?? 0;
-        return {
-          'name': name,
-          'total_copies': usage,
-          'appears_in_decks': metaCount,
-          'usage_rate': 0.0,
-        };
-      }).toList();
-
-      return Response.json(body: {
-        'commander': commander,
-        'meta_decks_found': 0,
-        'reference_cards': cards,
-        'sample_decks': <Map<String, dynamic>>[],
-        'model': {
-          'type': 'commander_competitive_reference',
-          'generated_from_meta_decks': 0,
-          'generated_from_card_meta_insights': true,
-          'meta_scope': requestedMetaScope,
-          'top_non_basic_cards': cards.map((e) => e['name']).toList(),
+          if (refreshSummary != null) 'refresh': refreshSummary,
         },
-        'meta_scope': _buildMetaScopePayload(requestedMetaScope),
-        if (cachedProfile != null) 'commander_profile': cachedProfile,
-        if (commanderLearning != null) 'commander_learning': commanderLearning,
-        if (refreshSummary != null) 'refresh': refreshSummary,
-      });
+      );
     }
 
     final commanderLower = commander.toLowerCase();
@@ -278,7 +291,8 @@ Future<Response> onRequest(RequestContext context) async {
       final placement = (row[8] as String?) ?? '';
       final rawList = (row[9] as String?) ?? '';
       final formatDescriptor = describeMetaDeckFormat(storedFormat);
-      final subformatKey = formatDescriptor.commanderSubformat ??
+      final subformatKey =
+          formatDescriptor.commanderSubformat ??
           formatDescriptor.storedFormatCode;
       metaScopeBreakdown[subformatKey] =
           (metaScopeBreakdown[subformatKey] ?? 0) + 1;
@@ -323,41 +337,44 @@ Future<Response> onRequest(RequestContext context) async {
     }
 
     final totalDecks = decks.length;
-    final sorted = counts.entries.toList()
-      ..sort((a, b) {
-        final byCount = b.value.compareTo(a.value);
-        if (byCount != 0) return byCount;
-        return a.key.compareTo(b.key);
-      });
+    final sorted =
+        counts.entries.toList()..sort((a, b) {
+          final byCount = b.value.compareTo(a.value);
+          if (byCount != 0) return byCount;
+          return a.key.compareTo(b.key);
+        });
 
-    final references = sorted.take(limit).map((e) {
-      final appearances = deckAppearances[e.key] ?? 0;
-      final usageRate = totalDecks > 0 ? appearances / totalDecks : 0.0;
-      return {
-        'name': e.key,
-        'total_copies': e.value,
-        'appears_in_decks': appearances,
-        'usage_rate': double.parse(usageRate.toStringAsFixed(3)),
-      };
-    }).toList();
+    final references =
+        sorted.take(limit).map((e) {
+          final appearances = deckAppearances[e.key] ?? 0;
+          final usageRate = totalDecks > 0 ? appearances / totalDecks : 0.0;
+          return {
+            'name': e.key,
+            'total_copies': e.value,
+            'appears_in_decks': appearances,
+            'usage_rate': double.parse(usageRate.toStringAsFixed(3)),
+          };
+        }).toList();
 
-    return Response.json(body: {
-      'commander': commander,
-      'meta_decks_found': totalDecks,
-      'reference_cards': references,
-      'sample_decks': sampleDecks,
-      'model': {
-        'type': 'commander_competitive_reference',
-        'generated_from_meta_decks': totalDecks,
-        'meta_scope': requestedMetaScope,
-        'top_non_basic_cards': references.map((e) => e['name']).toList(),
+    return Response.json(
+      body: {
+        'commander': commander,
+        'meta_decks_found': totalDecks,
+        'reference_cards': references,
+        'sample_decks': sampleDecks,
+        'model': {
+          'type': 'commander_competitive_reference',
+          'generated_from_meta_decks': totalDecks,
+          'meta_scope': requestedMetaScope,
+          'top_non_basic_cards': references.map((e) => e['name']).toList(),
+        },
+        'meta_scope': _buildMetaScopePayload(requestedMetaScope),
+        'meta_scope_breakdown': metaScopeBreakdown,
+        if (cachedProfile != null) 'commander_profile': cachedProfile,
+        if (commanderLearning != null) 'commander_learning': commanderLearning,
+        if (refreshSummary != null) 'refresh': refreshSummary,
       },
-      'meta_scope': _buildMetaScopePayload(requestedMetaScope),
-      'meta_scope_breakdown': metaScopeBreakdown,
-      if (cachedProfile != null) 'commander_profile': cachedProfile,
-      if (commanderLearning != null) 'commander_learning': commanderLearning,
-      if (refreshSummary != null) 'refresh': refreshSummary,
-    });
+    );
   } catch (e) {
     return Response.json(
       statusCode: HttpStatus.internalServerError,
@@ -406,11 +423,11 @@ Future<Map<String, dynamic>?> _buildCommanderLearningPayload({
 
   Map<String, dynamic>? readiness;
   try {
-    readiness = (await buildCommanderReferenceReadinessScorecard(
-      pool: pool,
-      commanderName: commander,
-    ))
-        .toJson();
+    readiness =
+        (await buildCommanderReferenceReadinessScorecard(
+          pool: pool,
+          commanderName: commander,
+        )).toJson();
   } catch (error) {
     readiness = {
       'status': 'unavailable',
@@ -418,23 +435,24 @@ Future<Map<String, dynamic>?> _buildCommanderLearningPayload({
     };
   }
 
-  final learningDeck = includeDeck
-      ? promotedLearnedDeck != null
-          ? await _buildPromotedCommanderLearningDeck(
-              pool: pool,
-              learnedDeck: promotedLearnedDeck,
-              stats: statsLoad.stats,
-              corpus: corpus,
-            )
-          : profile != null
+  final learningDeck =
+      includeDeck
+          ? promotedLearnedDeck != null
+              ? await _buildPromotedCommanderLearningDeck(
+                pool: pool,
+                learnedDeck: promotedLearnedDeck,
+                stats: statsLoad.stats,
+                corpus: corpus,
+              )
+              : profile != null
               ? await _buildReferenceLearningDeck(
-                  pool: pool,
-                  profile: profile,
-                  stats: statsLoad.stats,
-                  corpus: corpus,
-                )
+                pool: pool,
+                profile: profile,
+                stats: statsLoad.stats,
+                corpus: corpus,
+              )
               : null
-      : null;
+          : null;
 
   final winConditions = _buildCommanderLearningWinConditions(
     stats: statsLoad.stats,
@@ -498,8 +516,10 @@ Future<Map<String, dynamic>> _loadUsageStatsSafe({
     return {
       'available': true,
       'hot_cards': hotCards,
-      'total_users':
-          hotCards.fold<int>(0, (sum, c) => sum + intValue(c['usage_count'])),
+      'total_users': hotCards.fold<int>(
+        0,
+        (sum, c) => sum + intValue(c['usage_count']),
+      ),
     };
   } catch (_) {
     return {'available': false, 'hot_cards': const <Map<String, dynamic>>[]};
@@ -538,9 +558,7 @@ Future<Map<String, dynamic>?> _loadPromotedCommanderLearnedDeck({
         ORDER BY promoted_at DESC NULLS LAST, updated_at DESC
         LIMIT 10
       '''),
-      parameters: {
-        'commander': normalizeCommanderReferenceName(commanderName),
-      },
+      parameters: {'commander': normalizeCommanderReferenceName(commanderName)},
     );
     if (result.isEmpty) return null;
     for (final row in result) {
@@ -605,52 +623,60 @@ Future<Map<String, dynamic>> _buildPromotedCommanderLearningDeck({
   final deckEntries = _parseLearnedDeckCardList(
     learnedDeck['card_list']?.toString() ?? '',
   );
-  final normalizedCommander =
-      normalizeCommanderReferenceCardName(commanderName);
+  final normalizedCommander = normalizeCommanderReferenceCardName(
+    commanderName,
+  );
   final mainCards = deckEntries
-      .where((card) =>
-          normalizeCommanderReferenceCardName(card['name']?.toString() ?? '') !=
-          normalizedCommander)
+      .where(
+        (card) =>
+            normalizeCommanderReferenceCardName(
+              card['name']?.toString() ?? '',
+            ) !=
+            normalizedCommander,
+      )
       .toList(growable: false);
 
   final metadataByName = await loadCardMetadataByName(
     pool: pool,
     names: deckEntries.map((card) => card['name']?.toString() ?? ''),
   );
-  final statsByName = {
-    for (final stat in stats) stat.cardNameNormalized: stat,
-  };
+  final statsByName = {for (final stat in stats) stat.cardNameNormalized: stat};
   final corpusRoleByName = _corpusRoleByName(corpus);
-  final decklist = deckEntries.map((card) {
-    final name = card['name']?.toString().trim() ?? '';
-    final normalized = normalizeCommanderReferenceCardName(name);
-    final stat = statsByName[normalized];
-    final metadata = metadataByName[normalized];
-    final corpusRole = corpusRoleByName[normalized];
-    final isCommander = normalized == normalizedCommander;
-    return {
-      'name': name,
-      'quantity': intValue(card['quantity']).clamp(1, 99),
-      'is_commander': isCommander,
-      if (metadata?['id'] != null) 'card_id': metadata!['id'],
-      if (metadata?['name'] != null && metadata!['name'] != name)
-        'canonical_name': metadata['name'],
-      if (metadata?['type_line'] != null) 'type_line': metadata!['type_line'],
-      'commander_legal_status': metadata?['commander_legal_status'],
-      'role': isCommander
-          ? 'commander'
-          : stat?.role ?? corpusRole ?? _fallbackRoleForCardName(name),
-      'rationale': isCommander
-          ? 'Commander of the promoted learned deck.'
-          : _cardRationale(
-              name: name,
-              stat: stat,
-              corpusRole: corpusRole,
-            ),
-      if (stat != null) 'reference_score': stat.score,
-      if (stat != null) 'reference_package': stat.packageKey,
-    };
-  }).toList(growable: false);
+  final decklist = deckEntries
+      .map((card) {
+        final name = card['name']?.toString().trim() ?? '';
+        final normalized = normalizeCommanderReferenceCardName(name);
+        final stat = statsByName[normalized];
+        final metadata = metadataByName[normalized];
+        final corpusRole = corpusRoleByName[normalized];
+        final isCommander = normalized == normalizedCommander;
+        return {
+          'name': name,
+          'quantity': intValue(card['quantity']).clamp(1, 99),
+          'is_commander': isCommander,
+          if (metadata?['id'] != null) 'card_id': metadata!['id'],
+          if (metadata?['name'] != null && metadata!['name'] != name)
+            'canonical_name': metadata['name'],
+          if (metadata?['type_line'] != null)
+            'type_line': metadata!['type_line'],
+          'commander_legal_status': metadata?['commander_legal_status'],
+          'role':
+              isCommander
+                  ? 'commander'
+                  : stat?.role ?? corpusRole ?? _fallbackRoleForCardName(name),
+          'rationale':
+              isCommander
+                  ? 'Commander of the promoted learned deck.'
+                  : _cardRationale(
+                    name: name,
+                    stat: stat,
+                    corpusRole: corpusRole,
+                  ),
+          if (stat != null) 'reference_score': stat.score,
+          if (stat != null) 'reference_package': stat.packageKey,
+        };
+      })
+      .toList(growable: false);
 
   final validation = await GeneratedDeckValidationService(
     PostgresGeneratedDeckRepository(pool, preferredFormat: 'commander'),
@@ -676,8 +702,8 @@ Future<Map<String, dynamic>> _buildPromotedCommanderLearningDeck({
     'score': learnedDeck['score'],
     'commander': {
       'name': commanderName,
-      'commander_legal_status': metadataByName[normalizedCommander]
-          ?['commander_legal_status'],
+      'commander_legal_status':
+          metadataByName[normalizedCommander]?['commander_legal_status'],
     },
     'total_cards_including_commander': decklist.fold<int>(
       0,
@@ -724,10 +750,12 @@ Future<Map<String, dynamic>> _buildReferenceLearningDeck({
     referenceDeckCorpusGuidance: corpus,
   );
   final commander = rawDeck['commander'];
-  final commanderName = commander is Map
-      ? commander['name']?.toString().trim()
-      : commander?.toString().trim();
-  final cards = (rawDeck['cards'] as List?)
+  final commanderName =
+      commander is Map
+          ? commander['name']?.toString().trim()
+          : commander?.toString().trim();
+  final cards =
+      (rawDeck['cards'] as List?)
           ?.whereType<Map>()
           .map((card) => card.cast<String, dynamic>())
           .toList(growable: false) ??
@@ -740,34 +768,35 @@ Future<Map<String, dynamic>> _buildReferenceLearningDeck({
       ...cards.map((card) => card['name']?.toString() ?? ''),
     ],
   );
-  final statsByName = {
-    for (final stat in stats) stat.cardNameNormalized: stat,
-  };
+  final statsByName = {for (final stat in stats) stat.cardNameNormalized: stat};
   final corpusRoleByName = _corpusRoleByName(corpus);
-  final enrichedCards = cards.map((card) {
-    final name = card['name']?.toString().trim() ?? '';
-    final normalized = normalizeCommanderReferenceCardName(name);
-    final stat = statsByName[normalized];
-    final metadata = metadataByName[normalized];
-    final corpusRole = corpusRoleByName[normalized];
-    return {
-      'name': name,
-      'quantity': intValue(card['quantity']).clamp(1, 99),
-      if (metadata?['id'] != null) 'card_id': metadata!['id'],
-      if (metadata?['name'] != null && metadata!['name'] != name)
-        'canonical_name': metadata['name'],
-      if (metadata?['type_line'] != null) 'type_line': metadata!['type_line'],
-      'commander_legal_status': metadata?['commander_legal_status'],
-      'role': stat?.role ?? corpusRole ?? _fallbackRoleForCardName(name),
-      'rationale': _cardRationale(
-        name: name,
-        stat: stat,
-        corpusRole: corpusRole,
-      ),
-      if (stat != null) 'reference_score': stat.score,
-      if (stat != null) 'reference_package': stat.packageKey,
-    };
-  }).toList(growable: false);
+  final enrichedCards = cards
+      .map((card) {
+        final name = card['name']?.toString().trim() ?? '';
+        final normalized = normalizeCommanderReferenceCardName(name);
+        final stat = statsByName[normalized];
+        final metadata = metadataByName[normalized];
+        final corpusRole = corpusRoleByName[normalized];
+        return {
+          'name': name,
+          'quantity': intValue(card['quantity']).clamp(1, 99),
+          if (metadata?['id'] != null) 'card_id': metadata!['id'],
+          if (metadata?['name'] != null && metadata!['name'] != name)
+            'canonical_name': metadata['name'],
+          if (metadata?['type_line'] != null)
+            'type_line': metadata!['type_line'],
+          'commander_legal_status': metadata?['commander_legal_status'],
+          'role': stat?.role ?? corpusRole ?? _fallbackRoleForCardName(name),
+          'rationale': _cardRationale(
+            name: name,
+            stat: stat,
+            corpusRole: corpusRole,
+          ),
+          if (stat != null) 'reference_score': stat.score,
+          if (stat != null) 'reference_package': stat.packageKey,
+        };
+      })
+      .toList(growable: false);
 
   final validation = await GeneratedDeckValidationService(
     PostgresGeneratedDeckRepository(pool, preferredFormat: 'commander'),
@@ -787,14 +816,20 @@ Future<Map<String, dynamic>> _buildReferenceLearningDeck({
       'name': commanderName,
       if (commanderName != null)
         'commander_legal_status':
-            metadataByName[normalizeCommanderReferenceCardName(commanderName)]
-                ?['commander_legal_status'],
+            metadataByName[normalizeCommanderReferenceCardName(
+              commanderName,
+            )]?['commander_legal_status'],
     },
-    'total_cards_including_commander': 1 +
+    'total_cards_including_commander':
+        1 +
         enrichedCards.fold<int>(
-            0, (sum, card) => sum + intValue(card['quantity'])),
+          0,
+          (sum, card) => sum + intValue(card['quantity']),
+        ),
     'main_quantity': enrichedCards.fold<int>(
-        0, (sum, card) => sum + intValue(card['quantity'])),
+      0,
+      (sum, card) => sum + intValue(card['quantity']),
+    ),
     'cards': enrichedCards,
     'legality': legality,
     'validation': validation.validationSummary(),
@@ -817,11 +852,14 @@ List<Map<String, dynamic>> _buildCommanderLearningWinConditions({
   required CommanderReferenceDeckCorpusGuidance? corpus,
   required List? deckCards,
 }) {
-  final deckNames = deckCards
+  final deckNames =
+      deckCards
           ?.whereType<Map>()
-          .map((card) => normalizeCommanderReferenceCardName(
-                card['name']?.toString() ?? '',
-              ))
+          .map(
+            (card) => normalizeCommanderReferenceCardName(
+              card['name']?.toString() ?? '',
+            ),
+          )
           .toSet() ??
       const <String>{};
   final candidates = <String, Map<String, dynamic>>{};
@@ -835,7 +873,8 @@ List<Map<String, dynamic>> _buildCommanderLearningWinConditions({
     final normalized = normalizeCommanderReferenceCardName(name);
     if (normalized.isEmpty) return;
     final text = '$name $role'.toLowerCase();
-    final looksLikeWincon = text.contains('win') ||
+    final looksLikeWincon =
+        text.contains('win') ||
         text.contains('haymaker') ||
         text.contains('payoff') ||
         text.contains('damage') ||
@@ -869,9 +908,9 @@ List<Map<String, dynamic>> _buildCommanderLearningWinConditions({
     );
   }
 
-  final values = candidates.values.toList(growable: false)
-    ..sort(
-        (a, b) => _doubleValue(b['score']).compareTo(_doubleValue(a['score'])));
+  final values = candidates.values.toList(growable: false)..sort(
+    (a, b) => _doubleValue(b['score']).compareTo(_doubleValue(a['score'])),
+  );
   return values.take(16).toList(growable: false);
 }
 
@@ -916,18 +955,6 @@ double _doubleValue(Object? value) {
   if (value is double) return value;
   if (value is num) return value.toDouble();
   return double.tryParse(value?.toString() ?? '') ?? 0;
-}
-
-Future<void> _ensureCommanderProfileCacheTable(Pool pool) async {
-  await pool.execute('''
-    CREATE TABLE IF NOT EXISTS commander_reference_profiles (
-      commander_name TEXT PRIMARY KEY,
-      source TEXT NOT NULL,
-      deck_count INTEGER NOT NULL DEFAULT 0,
-      profile_json JSONB NOT NULL,
-      updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
-    )
-  ''');
 }
 
 Future<Map<String, dynamic>?> _loadCommanderProfileCache({
@@ -991,10 +1018,7 @@ Future<Map<String, dynamic>?> _buildAndPersistEdhrecProfile({
       if (basic_lands.isBasicLandName(card.name)) continue;
       final cardName = card.name.trim();
       if (cardName.isEmpty) continue;
-      averageDeckSeed.add({
-        'name': cardName,
-        'quantity': card.quantity,
-      });
+      averageDeckSeed.add({'name': cardName, 'quantity': card.quantity});
     }
   }
 
@@ -1009,9 +1033,12 @@ Future<Map<String, dynamic>?> _buildAndPersistEdhrecProfile({
 
   var sumTargets = categoryTargets.values.fold<int>(0, (a, b) => a + b);
   if (sumTargets < nonLandTarget && categoryTargets.isNotEmpty) {
-    final ordered = categoryTargets.entries.toList()
-      ..sort((a, b) => (nonLandCategories[b.key] ?? 0)
-          .compareTo(nonLandCategories[a.key] ?? 0));
+    final ordered =
+        categoryTargets.entries.toList()..sort(
+          (a, b) => (nonLandCategories[b.key] ?? 0).compareTo(
+            nonLandCategories[a.key] ?? 0,
+          ),
+        );
     var i = 0;
     while (sumTargets < nonLandTarget) {
       final key = ordered[i % ordered.length].key;

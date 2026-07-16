@@ -70,8 +70,10 @@ class DeckArchetypeAnalyzer {
   String detectArchetype() {
     final avgCMC = calculateAverageCMC();
     final typeCounts = countCardTypes();
-    final totalCards =
-        cards.fold<int>(0, (s, c) => s + ((c['quantity'] as int?) ?? 1));
+    final totalCards = cards.fold<int>(
+      0,
+      (s, c) => s + ((c['quantity'] as int?) ?? 1),
+    );
     final totalNonLands = totalCards - (typeCounts['lands'] ?? 0);
 
     if (totalNonLands == 0) return 'unknown';
@@ -79,7 +81,7 @@ class DeckArchetypeAnalyzer {
     final creatureRatio = (typeCounts['creatures'] ?? 0) / totalNonLands;
     final instantSorceryRatio =
         ((typeCounts['instants'] ?? 0) + (typeCounts['sorceries'] ?? 0)) /
-            totalNonLands;
+        totalNonLands;
     final enchantmentRatio = (typeCounts['enchantments'] ?? 0) / totalNonLands;
 
     if (avgCMC < 2.5 && creatureRatio > 0.4) return 'aggro';
@@ -158,13 +160,7 @@ class DeckArchetypeAnalyzer {
 
   static Set<String> _detectManaColorsFromOracleText(String oracleText) {
     final colors = <String>{};
-    final colorMap = {
-      'w': 'W',
-      'u': 'U',
-      'b': 'B',
-      'r': 'R',
-      'g': 'G',
-    };
+    final colorMap = {'w': 'W', 'u': 'U', 'b': 'B', 'r': 'R', 'g': 'G'};
     final manaSymbolPattern = RegExp(r'\{([wubrgWUBRG])\}');
     for (final match in manaSymbolPattern.allMatches(oracleText)) {
       final symbol = match.group(1)!.toLowerCase();
@@ -186,9 +182,10 @@ class DeckArchetypeAnalyzer {
 
     final issues = <String>[];
 
-    if (landCount < 26) {
-      issues
-          .add('Poucos terrenos para Commander (Tem $landCount, ideal >= 34)');
+    if (landCount < 34) {
+      issues.add(
+        'Poucos terrenos para Commander (Tem $landCount, mínimo seguro 34)',
+      );
     } else if (landCount > 45) {
       issues.add('Terrenos em excesso (Tem $landCount, ideal <= 40)');
     }
@@ -227,8 +224,11 @@ class DeckArchetypeAnalyzer {
       'total_cards': totalCards,
       'mana_curve_assessment': _assessManaCurve(avgCMC, detectedArchetype),
       'mana_base_assessment': manaAnalysis['assessment'],
-      'archetype_confidence':
-          _calculateConfidence(avgCMC, typeCounts, detectedArchetype),
+      'archetype_confidence': _calculateConfidence(
+        avgCMC,
+        typeCounts,
+        detectedArchetype,
+      ),
     };
   }
 
@@ -260,8 +260,10 @@ class DeckArchetypeAnalyzer {
     Map<String, int> counts,
     String archetype,
   ) {
-    final totalCards =
-        cards.fold<int>(0, (s, c) => s + ((c['quantity'] as int?) ?? 1));
+    final totalCards = cards.fold<int>(
+      0,
+      (s, c) => s + ((c['quantity'] as int?) ?? 1),
+    );
     final totalNonLands = totalCards - (counts['lands'] ?? 0);
     if (totalNonLands < 20) return 'baixa';
 
@@ -299,13 +301,13 @@ class DeckOptimizationState {
   final Map<String, dynamic> repairPlan;
 
   Map<String, dynamic> toJson() => {
-        'status': status,
-        'recommended_mode': recommendedMode,
-        'suggested_scope': suggestedScope,
-        'severity_score': severityScore,
-        'reasons': reasons,
-        if (repairPlan.isNotEmpty) 'repair_plan': repairPlan,
-      };
+    'status': status,
+    'recommended_mode': recommendedMode,
+    'suggested_scope': suggestedScope,
+    'severity_score': severityScore,
+    'reasons': reasons,
+    if (repairPlan.isNotEmpty) 'repair_plan': repairPlan,
+  };
 }
 
 DeckOptimizationState assessDeckOptimizationState({
@@ -353,15 +355,16 @@ DeckOptimizationState assessDeckOptimizationState({
   final manaBase = analyzer.analyzeManaBase();
   final typeDistribution =
       (deckAnalysis['type_distribution'] as Map?)?.cast<String, dynamic>() ??
-          const <String, dynamic>{};
+      const <String, dynamic>{};
 
   final commanders = cards
       .where((card) => card['is_commander'] == true)
       .toList(growable: false);
-  final commanderText = commanders
-      .map((card) => (card['oracle_text'] as String?) ?? '')
-      .join(' ')
-      .toLowerCase();
+  final commanderText =
+      commanders
+          .map((card) => (card['oracle_text'] as String?) ?? '')
+          .join(' ')
+          .toLowerCase();
 
   final landCount = (typeDistribution['lands'] as int?) ?? 0;
   final instantCount = (typeDistribution['instants'] as int?) ?? 0;
@@ -375,7 +378,8 @@ DeckOptimizationState assessDeckOptimizationState({
   final manaAssessmentLower = manaAssessment.toLowerCase();
   final archetypeConfidence =
       (deckAnalysis['archetype_confidence']?.toString() ?? '').toLowerCase();
-  final sources = (manaBase['sources'] as Map?)?.cast<String, int>() ??
+  final sources =
+      (manaBase['sources'] as Map?)?.cast<String, int>() ??
       const <String, int>{};
   final anySource = sources['Any'] ?? 0;
 
@@ -580,8 +584,7 @@ bool _commanderSignalsEnchantments(String commanderText) {
 String resolveOptimizeArchetype({
   required String? requestedArchetype,
   required String? detectedArchetype,
-}) =>
-    archetype_support.resolveEffectiveOptimizeArchetype(
-      requestedArchetype: requestedArchetype,
-      detectedArchetype: detectedArchetype,
-    );
+}) => archetype_support.resolveEffectiveOptimizeArchetype(
+  requestedArchetype: requestedArchetype,
+  detectedArchetype: detectedArchetype,
+);

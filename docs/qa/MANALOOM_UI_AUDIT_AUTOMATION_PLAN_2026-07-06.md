@@ -23,6 +23,9 @@ Pacotes avaliados e deixados para depois:
 Base inicial em:
 
 - `app/test/ui/manaloom_commercial_ui_audit_test.dart`
+- `app/test/ui/manaloom_auth_ui_audit_test.dart`
+- `app/test/ui/support/manaloom_ui_audit_harness.dart`
+- `app/lib/core/widgets/debug_accessibility_tools.dart`
 
 Ela cobre:
 
@@ -31,10 +34,14 @@ Ela cobre:
 - estado Pro com uso ativo;
 - smoke de acessibilidade com `accessibility_tools`;
 - guidelines Flutter de tap target Android e labels de alvo clicavel.
+- login e cadastro como superficie critica de entrada;
+- wrapper debug ligado por `--dart-define=MANALOOM_ENABLE_ACCESSIBILITY_TOOLS=true`.
 
 Baseline gerada em:
 
 - `app/test/ui/goldens/ci/manaloom_commercial_ai_usage_states.png`
+- `app/test/ui/goldens/ci/manaloom_auth_login.png`
+- `app/test/ui/goldens/ci/manaloom_auth_register.png`
 
 ## Comandos
 
@@ -42,14 +49,14 @@ Gerar ou atualizar baseline visual:
 
 ```bash
 cd app
-flutter test test/ui/manaloom_commercial_ui_audit_test.dart --update-goldens --no-version-check
+flutter test test/ui --update-goldens --no-version-check
 ```
 
 Validar a baseline e acessibilidade:
 
 ```bash
 cd app
-flutter test test/ui/manaloom_commercial_ui_audit_test.dart --no-version-check
+flutter test test/ui --no-version-check
 ```
 
 Validar app depois de mudancas:
@@ -57,7 +64,13 @@ Validar app depois de mudancas:
 ```bash
 cd app
 flutter analyze lib test --no-version-check
-flutter test test/ui/manaloom_commercial_ui_audit_test.dart test/features/commercial --no-version-check
+flutter test test/ui test/core/widgets/debug_accessibility_tools_test.dart --no-version-check
+```
+
+Gate raiz:
+
+```bash
+./scripts/quality_gate.sh ui-audit
 ```
 
 ## Plano por etapas

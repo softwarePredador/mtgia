@@ -1,8 +1,14 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-SERVER_BIN_DIR="$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)"
-REPO_ROOT="${MANALOOM_REPO:-$(CDPATH= cd -- "$SERVER_BIN_DIR/../.." && pwd)}"
+SERVER_BIN_DIR="$(CDPATH='' cd -- "$(dirname -- "$0")" && pwd)"
+REPO_ROOT="${MANALOOM_REPO:-$(CDPATH='' cd -- "$SERVER_BIN_DIR/../.." && pwd)}"
+# shellcheck source=scripts/lib/manaloom_mutation_guard.sh
+source "$REPO_ROOT/scripts/lib/manaloom_mutation_guard.sh"
+BATTLE_RULES_APPLY_PG_REQUESTED="${MANALOOM_BATTLE_RULES_APPLY_PG:-0}"
+if [[ "$BATTLE_RULES_APPLY_PG_REQUESTED" == "1" ]]; then
+  require_postgres_write_approval "master optimizer battle-rule PostgreSQL sync"
+fi
 SCRIPT_DIR="${MANALOOM_HERMES_SCRIPT_DIR:-$REPO_ROOT/docs/hermes-analysis/manaloom-knowledge/scripts}"
 DEFAULT_ARTIFACT_DIR="$REPO_ROOT/server/test/artifacts/master_optimizer_preflight"
 if [[ -d /data/manaloom-ops ]]; then
@@ -64,7 +70,7 @@ sync_report="$ARTIFACT_DIR/card_oracle_cache_sync_$(date -u +%Y%m%d_%H%M%S).json
   --report "$sync_report"
 
 battle_rules_pg_report="$ARTIFACT_DIR/card_battle_rules_pg_sync_$(date -u +%Y%m%d_%H%M%S).json"
-if [[ "${MANALOOM_BATTLE_RULES_APPLY_PG:-0}" == "1" ]]; then
+if [[ "$BATTLE_RULES_APPLY_PG_REQUESTED" == "1" ]]; then
   "$PYTHON_BIN" "$SCRIPT_DIR/sync_battle_card_rules_pg.py" \
     --sqlite-db "$SQLITE_DB" \
     --apply-pg \
@@ -97,17 +103,24 @@ if [[ "$DECK_ID" == "6" && "$LOREHOLD_CANONICAL_OVERRIDE" == "1" ]]; then
 fi
 
 preflight_log="$ARTIFACT_DIR/master_optimizer_preflight_$(date -u +%Y%m%d_%H%M%S).log"
+set +e
 "$PYTHON_BIN" "$SCRIPT_DIR/master_optimizer_loop.py" \
   --db "$SQLITE_DB" \
   --preflight \
   --report | tee "$preflight_log"
+preflight_status="${PIPESTATUS[0]}"
+set -e
 
-latest_report="$(ls -1t "$REPORT_DIR"/master_optimizer_preflight_*.md 2>/dev/null | head -1 || true)"
-if [[ -n "$latest_report" ]]; then
-  cp "$latest_report" "$ARTIFACT_DIR/latest_master_optimizer_preflight.md"
+current_report="$(sed -n 's/^Report written: //p' "$preflight_log" | tail -1)"
+if [[ -n "$current_report" && -f "$current_report" ]]; then
+  cp "$current_report" "$ARTIFACT_DIR/latest_master_optimizer_preflight.md"
 fi
 
-echo "master_optimizer_preflight=ok"
+if [[ "$preflight_status" == "0" ]]; then
+  echo "master_optimizer_preflight=ok"
+else
+  echo "master_optimizer_preflight=blocked"
+fi
 echo "meta_decks_log=$meta_decks_log"
 echo "target_deck_log=$target_deck_log"
 echo "sync_report=$sync_report"
@@ -115,3 +128,6 @@ echo "battle_rules_pg_report=$battle_rules_pg_report"
 echo "battle_rules_report=$battle_rules_report"
 echo "pg_contract_report=${pg_contract_report:-skipped_outside_manaloom_ops}"
 echo "preflight_log=$preflight_log"
+echo "preflight_report=${current_report:-not_written}"
+
+exit "$preflight_status"

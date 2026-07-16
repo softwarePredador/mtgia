@@ -179,6 +179,7 @@ final class XmageBattleService {
             }
 
             boolean watching = false;
+            boolean gameObserved = false;
             while (true) {
                 Optional<TableView> current = session.getTable(roomId, tableId);
                 TableState state = current.map(TableView::getTableState).orElse(null);
@@ -187,7 +188,15 @@ final class XmageBattleService {
                     session.watchGame(current.get().getGames().get(0));
                     watching = true;
                 }
-                if (state == TableState.FINISHED || client.isGameOver()) {
+                GameView lastView = client.getLastView();
+                if (lastView != null && lastView.getTurn() > 0) {
+                    gameObserved = true;
+                }
+                if (shouldFinishBattle(
+                        client.isGameOver(),
+                        state == TableState.FINISHED,
+                        gameObserved
+                )) {
                     break;
                 }
                 if (System.currentTimeMillis() - startedAt >= timeoutMs) {
@@ -240,6 +249,11 @@ final class XmageBattleService {
         List<Map<String, Object>> snapshots = ReplayNormalizer.snapshots(views);
         List<Map<String, Object>> events = ReplayNormalizer.events(client.copyMessages(), snapshots);
         GameView finalView = views.isEmpty() ? null : views.get(views.size() - 1);
+        requireCompletedBattleEvidence(
+                finalView == null ? 0 : finalView.getTurn(),
+                views.size(),
+                snapshots.size()
+        );
         PlayerView winner = winner(finalView);
         if (finalView != null && finalView.getTotalErrorsCount() > 0) {
             throw new IllegalStateException(
@@ -297,6 +311,21 @@ final class XmageBattleService {
         metrics.put("decision_trace_count", 0);
         result.put("metrics", metrics);
         return result;
+    }
+
+    static void requireCompletedBattleEvidence(int turns, int viewCount, int snapshotCount) {
+        if (turns <= 0 || viewCount <= 0 || snapshotCount <= 0) {
+            throw new IllegalStateException(
+                    "XMage ended without an observed completed game "
+                            + "(turns=" + turns
+                            + ", views=" + viewCount
+                            + ", snapshots=" + snapshotCount + ")"
+            );
+        }
+    }
+
+    static boolean shouldFinishBattle(boolean gameOver, boolean tableFinished, boolean gameViewObserved) {
+        return gameViewObserved && (gameOver || tableFinished);
     }
 
     private int countEvents(List<Map<String, Object>> events, String action) {

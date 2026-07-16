@@ -73,8 +73,10 @@ class DeckArchetypeAnalyzerCore {
   String detectArchetype() {
     final avgCMC = calculateAverageCMC();
     final typeCounts = countCardTypes();
-    final totalCards =
-        cards.fold<int>(0, (s, c) => s + ((c['quantity'] as int?) ?? 1));
+    final totalCards = cards.fold<int>(
+      0,
+      (s, c) => s + ((c['quantity'] as int?) ?? 1),
+    );
     final totalNonLands = totalCards - (typeCounts['lands'] ?? 0);
 
     if (totalNonLands == 0) return 'unknown';
@@ -82,7 +84,7 @@ class DeckArchetypeAnalyzerCore {
     final creatureRatio = (typeCounts['creatures'] ?? 0) / totalNonLands;
     final instantSorceryRatio =
         ((typeCounts['instants'] ?? 0) + (typeCounts['sorceries'] ?? 0)) /
-            totalNonLands;
+        totalNonLands;
     final enchantmentRatio = (typeCounts['enchantments'] ?? 0) / totalNonLands;
 
     if (avgCMC < 2.5 && creatureRatio > 0.4) return 'aggro';
@@ -178,20 +180,17 @@ class DeckArchetypeAnalyzerCore {
       'total_cards': totalCards,
       'mana_curve_assessment': assessManaCurve(avgCMC, detectedArchetype),
       'mana_base_assessment': manaAnalysis['assessment'],
-      'archetype_confidence':
-          calculateConfidence(avgCMC, typeCounts, detectedArchetype),
+      'archetype_confidence': calculateConfidence(
+        avgCMC,
+        typeCounts,
+        detectedArchetype,
+      ),
     };
   }
 
   static Set<String> detectManaColorsFromOracleText(String oracleText) {
     final colors = <String>{};
-    final colorMap = {
-      'w': 'W',
-      'u': 'U',
-      'b': 'B',
-      'r': 'R',
-      'g': 'G',
-    };
+    final colorMap = {'w': 'W', 'u': 'U', 'b': 'B', 'r': 'R', 'g': 'G'};
     final manaSymbolPattern = RegExp(r'\{([wubrgWUBRG])\}');
     for (final match in manaSymbolPattern.allMatches(oracleText)) {
       final symbol = match.group(1)!.toLowerCase();
@@ -213,9 +212,10 @@ class DeckArchetypeAnalyzerCore {
 
     final issues = <String>[];
 
-    if (landCount < 26) {
-      issues
-          .add('Poucos terrenos para Commander (Tem $landCount, ideal >= 34)');
+    if (landCount < 34) {
+      issues.add(
+        'Poucos terrenos para Commander (Tem $landCount, mínimo seguro 34)',
+      );
     } else if (landCount > 45) {
       issues.add('Terrenos em excesso (Tem $landCount, ideal <= 40)');
     }
@@ -265,8 +265,10 @@ class DeckArchetypeAnalyzerCore {
     Map<String, int> counts,
     String archetype,
   ) {
-    final totalCards =
-        cards.fold<int>(0, (s, c) => s + ((c['quantity'] as int?) ?? 1));
+    final totalCards = cards.fold<int>(
+      0,
+      (s, c) => s + ((c['quantity'] as int?) ?? 1),
+    );
     final totalNonLands = totalCards - (counts['lands'] ?? 0);
     if (totalNonLands < 20) return 'baixa';
 
@@ -300,11 +302,11 @@ class DeckThemeProfileResult {
   });
 
   Map<String, dynamic> toJson() => {
-        'theme': theme,
-        'confidence': confidence,
-        'match_score': matchScore,
-        'core_cards': coreCards,
-      };
+    'theme': theme,
+    'confidence': confidence,
+    'match_score': matchScore,
+    'core_cards': coreCards,
+  };
 }
 
 class DeckOptimizationStateResult {
@@ -325,13 +327,13 @@ class DeckOptimizationStateResult {
   final Map<String, dynamic> repairPlan;
 
   Map<String, dynamic> toJson() => {
-        'status': status,
-        'recommended_mode': recommendedMode,
-        'suggested_scope': suggestedScope,
-        'severity_score': severityScore,
-        'reasons': reasons,
-        if (repairPlan.isNotEmpty) 'repair_plan': repairPlan,
-      };
+    'status': status,
+    'recommended_mode': recommendedMode,
+    'suggested_scope': suggestedScope,
+    'severity_score': severityScore,
+    'reasons': reasons,
+    if (repairPlan.isNotEmpty) 'repair_plan': repairPlan,
+  };
 }
 
 DeckOptimizationStateResult assessDeckOptimizationStateCore({
@@ -379,15 +381,16 @@ DeckOptimizationStateResult assessDeckOptimizationStateCore({
   final manaBase = analyzer.analyzeManaBase();
   final typeDistribution =
       (deckAnalysis['type_distribution'] as Map?)?.cast<String, dynamic>() ??
-          const <String, dynamic>{};
+      const <String, dynamic>{};
 
   final commanders = cards
       .where((card) => card['is_commander'] == true)
       .toList(growable: false);
-  final commanderText = commanders
-      .map((card) => (card['oracle_text'] as String?) ?? '')
-      .join(' ')
-      .toLowerCase();
+  final commanderText =
+      commanders
+          .map((card) => (card['oracle_text'] as String?) ?? '')
+          .join(' ')
+          .toLowerCase();
 
   final landCount = (typeDistribution['lands'] as int?) ?? 0;
   final instantCount = (typeDistribution['instants'] as int?) ?? 0;
@@ -401,7 +404,8 @@ DeckOptimizationStateResult assessDeckOptimizationStateCore({
   final manaAssessmentLower = manaAssessment.toLowerCase();
   final archetypeConfidence =
       (deckAnalysis['archetype_confidence']?.toString() ?? '').toLowerCase();
-  final sources = (manaBase['sources'] as Map?)?.cast<String, int>() ??
+  final sources =
+      (manaBase['sources'] as Map?)?.cast<String, int>() ??
       const <String, int>{};
   final anySource = sources['Any'] ?? 0;
 
@@ -534,19 +538,21 @@ Future<DeckThemeProfileResult> detectThemeProfile(
 }) async {
   int qty(Map<String, dynamic> c) => (c['quantity'] as int?) ?? 1;
 
-  final cardNames = cards
-      .map((c) => c['name'] as String? ?? '')
-      .where((n) => n.isNotEmpty)
-      .toList();
+  final cardNames =
+      cards
+          .map((c) => c['name'] as String? ?? '')
+          .where((n) => n.isNotEmpty)
+          .toList();
   final metaInsights = <String, Map<String, dynamic>>{};
 
   if (cardNames.isNotEmpty) {
     try {
       final result = await pool.execute(
         Sql.named(
-            'SELECT card_name, usage_count, common_archetypes, learned_role FROM card_meta_insights WHERE LOWER(card_name) IN (${List.generate(cardNames.length, (i) => 'LOWER(@name$i)').join(', ')})'),
+          'SELECT card_name, usage_count, common_archetypes, learned_role FROM card_meta_insights WHERE LOWER(card_name) IN (${List.generate(cardNames.length, (i) => 'LOWER(@name$i)').join(', ')})',
+        ),
         parameters: {
-          for (var i = 0; i < cardNames.length; i++) 'name$i': cardNames[i]
+          for (var i = 0; i < cardNames.length; i++) 'name$i': cardNames[i],
         },
       );
       for (final row in result) {
@@ -682,8 +688,10 @@ Future<DeckThemeProfileResult> detectThemeProfile(
     if (typeLine.contains('creature')) {
       final dashIndex = typeLine.indexOf('—');
       if (dashIndex != -1) {
-        final subtypes =
-            typeLine.substring(dashIndex + 1).trim().split(RegExp(r'\s+'));
+        final subtypes = typeLine
+            .substring(dashIndex + 1)
+            .trim()
+            .split(RegExp(r'\s+'));
         for (final st in subtypes) {
           if (st.isNotEmpty && st != 'creature') {
             creatureSubtypes[st] = (creatureSubtypes[st] ?? 0) + q;
@@ -696,8 +704,9 @@ Future<DeckThemeProfileResult> detectThemeProfile(
   String? dominantTribe;
   int tribalCount = 0;
   if (creatureSubtypes.isNotEmpty) {
-    final sorted = creatureSubtypes.entries.toList()
-      ..sort((a, b) => b.value.compareTo(a.value));
+    final sorted =
+        creatureSubtypes.entries.toList()
+          ..sort((a, b) => b.value.compareTo(a.value));
     dominantTribe = sorted.first.key;
     tribalCount = sorted.first.value;
   }
@@ -710,42 +719,54 @@ Future<DeckThemeProfileResult> detectThemeProfile(
     score = 0.0;
   } else {
     final themeScores = <String, double>{
-      'artifacts': artifactCount / totalNonLands >= 0.30
-          ? artifactCount / totalNonLands
-          : 0.0,
-      'enchantments': enchantmentCount / totalNonLands >= 0.30
-          ? enchantmentCount / totalNonLands
-          : 0.0,
-      'spellslinger': instantSorceryCount / totalNonLands >= 0.35
-          ? instantSorceryCount / totalNonLands
-          : 0.0,
-      'tokens': tokenReferences / totalNonLands >= 0.15
-          ? tokenReferences / totalNonLands
-          : 0.0,
-      'reanimator': reanimatorReferences / totalNonLands >= 0.12
-          ? reanimatorReferences / totalNonLands
-          : 0.0,
-      'aristocrats': aristocratReferences / totalNonLands >= 0.12
-          ? aristocratReferences / totalNonLands
-          : 0.0,
-      'voltron': voltronReferences / totalNonLands >= 0.15
-          ? voltronReferences / totalNonLands
-          : 0.0,
-      'landfall': landfallReferences / totalNonLands >= 0.10
-          ? landfallReferences / totalNonLands
-          : 0.0,
-      'wheels': wheelReferences / totalNonLands >= 0.10
-          ? wheelReferences / totalNonLands
-          : 0.0,
-      'stax': staxReferences / totalNonLands >= 0.10
-          ? staxReferences / totalNonLands
-          : 0.0,
-      'counters': counterReferences / totalNonLands >= 0.12
-          ? counterReferences / totalNonLands
-          : 0.0,
-      'tribal': tribalCount / totalNonLands >= 0.25
-          ? tribalCount / totalNonLands
-          : 0.0,
+      'artifacts':
+          artifactCount / totalNonLands >= 0.30
+              ? artifactCount / totalNonLands
+              : 0.0,
+      'enchantments':
+          enchantmentCount / totalNonLands >= 0.30
+              ? enchantmentCount / totalNonLands
+              : 0.0,
+      'spellslinger':
+          instantSorceryCount / totalNonLands >= 0.35
+              ? instantSorceryCount / totalNonLands
+              : 0.0,
+      'tokens':
+          tokenReferences / totalNonLands >= 0.15
+              ? tokenReferences / totalNonLands
+              : 0.0,
+      'reanimator':
+          reanimatorReferences / totalNonLands >= 0.12
+              ? reanimatorReferences / totalNonLands
+              : 0.0,
+      'aristocrats':
+          aristocratReferences / totalNonLands >= 0.12
+              ? aristocratReferences / totalNonLands
+              : 0.0,
+      'voltron':
+          voltronReferences / totalNonLands >= 0.15
+              ? voltronReferences / totalNonLands
+              : 0.0,
+      'landfall':
+          landfallReferences / totalNonLands >= 0.10
+              ? landfallReferences / totalNonLands
+              : 0.0,
+      'wheels':
+          wheelReferences / totalNonLands >= 0.10
+              ? wheelReferences / totalNonLands
+              : 0.0,
+      'stax':
+          staxReferences / totalNonLands >= 0.10
+              ? staxReferences / totalNonLands
+              : 0.0,
+      'counters':
+          counterReferences / totalNonLands >= 0.12
+              ? counterReferences / totalNonLands
+              : 0.0,
+      'tribal':
+          tribalCount / totalNonLands >= 0.25
+              ? tribalCount / totalNonLands
+              : 0.0,
     };
 
     if (commanderOracle.contains('-1/-1 counter') ||
@@ -778,9 +799,10 @@ Future<DeckThemeProfileResult> detectThemeProfile(
     }
 
     if (best != null && best.value > 0.0) {
-      theme = best.key == 'tribal' && dominantTribe != null
-          ? 'tribal-$dominantTribe'
-          : best.key;
+      theme =
+          best.key == 'tribal' && dominantTribe != null
+              ? 'tribal-$dominantTribe'
+              : best.key;
       score = best.value;
     } else {
       theme = 'generic';
@@ -788,9 +810,10 @@ Future<DeckThemeProfileResult> detectThemeProfile(
     }
   }
 
-  final confidence = score >= 0.35
-      ? 'alta'
-      : (score >= 0.20 ? 'média' : (score >= 0.10 ? 'baixa' : 'baixa'));
+  final confidence =
+      score >= 0.35
+          ? 'alta'
+          : (score >= 0.20 ? 'média' : (score >= 0.10 ? 'baixa' : 'baixa'));
 
   final core = <String, int>{};
 
@@ -967,8 +990,8 @@ Future<DeckThemeProfileResult> detectThemeProfile(
     }
   }
 
-  final sortedCore = core.entries.toList()
-    ..sort((a, b) => b.value.compareTo(a.value));
+  final sortedCore =
+      core.entries.toList()..sort((a, b) => b.value.compareTo(a.value));
 
   final coreCards = sortedCore.take(10).map((e) => e.key).toList();
 

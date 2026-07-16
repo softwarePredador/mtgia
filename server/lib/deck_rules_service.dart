@@ -19,7 +19,7 @@ class DeckRulesService {
   Future<void> validateAndThrow({
     required String format,
     required List<Map<String, dynamic>>
-        cards, // {card_id, quantity, is_commander}
+    cards, // {card_id, quantity, is_commander}
     bool strict = false,
   }) async {
     final normalizedFormat = format.toLowerCase();
@@ -116,26 +116,30 @@ class DeckRulesService {
 
       if (isCommander && quantity != 1) {
         throw DeckRulesException(
-            'Regra violada: comandante deve ter quantidade 1 ("${info.name}").',
-            cardName: info.name);
+          'Regra violada: comandante deve ter quantidade 1 ("${info.name}").',
+          cardName: info.name,
+        );
       }
 
       final status = legalities[cardId];
       if (status == null) continue;
       if (status == 'banned') {
         throw DeckRulesException(
-            'Regra violada: "${info.name}" é BANIDA no formato $normalizedFormat.',
-            cardName: info.name);
+          'Regra violada: "${info.name}" é BANIDA no formato $normalizedFormat.',
+          cardName: info.name,
+        );
       }
       if (status == 'not_legal') {
         throw DeckRulesException(
-            'Regra violada: "${info.name}" não é válida no formato $normalizedFormat.',
-            cardName: info.name);
+          'Regra violada: "${info.name}" não é válida no formato $normalizedFormat.',
+          cardName: info.name,
+        );
       }
       if (status == 'restricted' && quantity > 1) {
         throw DeckRulesException(
-            'Regra violada: "${info.name}" é RESTRITA no formato $normalizedFormat (máx. 1).',
-            cardName: info.name);
+          'Regra violada: "${info.name}" é RESTRITA no formato $normalizedFormat (máx. 1).',
+          cardName: info.name,
+        );
       }
     }
 
@@ -150,12 +154,15 @@ class DeckRulesService {
     } else {
       // Formatos não-Commander (Standard, Modern, Pioneer, Legacy, Vintage, Pauper...)
       // Mínimo de 60 cartas no main deck
-      final total =
-          cards.fold<int>(0, (sum, c) => sum + ((c['quantity'] as int?) ?? 1));
+      final total = cards.fold<int>(
+        0,
+        (sum, c) => sum + ((c['quantity'] as int?) ?? 1),
+      );
       const minDeckSize = 60;
       if (strict && total < minDeckSize) {
         throw DeckRulesException(
-            'Regra violada: deck $normalizedFormat precisa de pelo menos $minDeckSize cartas (atual: $total).');
+          'Regra violada: deck $normalizedFormat precisa de pelo menos $minDeckSize cartas (atual: $total).',
+        );
       }
     }
   }
@@ -172,14 +179,18 @@ class DeckRulesService {
     if (commanders.isEmpty) {
       if (strict) {
         throw DeckRulesException(
-            'Regra violada: deck $format precisa de 1 comandante selecionado.');
+          'Regra violada: deck $format precisa de 1 comandante selecionado.',
+        );
       }
-      final total =
-          cards.fold<int>(0, (sum, c) => sum + ((c['quantity'] as int?) ?? 1));
+      final total = cards.fold<int>(
+        0,
+        (sum, c) => sum + ((c['quantity'] as int?) ?? 1),
+      );
       final maxTotal = format == 'commander' ? 100 : 60;
       if (total > maxTotal) {
         throw DeckRulesException(
-            'Regra violada: deck $format não pode exceder $maxTotal cartas (atual: $total).');
+          'Regra violada: deck $format não pode exceder $maxTotal cartas (atual: $total).',
+        );
       }
       return;
     }
@@ -276,16 +287,20 @@ class DeckRulesService {
       }
     }
 
-    final total =
-        cards.fold<int>(0, (sum, c) => sum + ((c['quantity'] as int?) ?? 1));
+    final total = cards.fold<int>(
+      0,
+      (sum, c) => sum + ((c['quantity'] as int?) ?? 1),
+    );
     final maxTotal = format == 'commander' ? 100 : 60;
     if (strict && total != maxTotal) {
       throw DeckRulesException(
-          'Regra violada: deck $format deve ter exatamente $maxTotal cartas (atual: $total).');
+        'Regra violada: deck $format deve ter exatamente $maxTotal cartas (atual: $total).',
+      );
     }
     if (total > maxTotal) {
       throw DeckRulesException(
-          'Regra violada: deck $format não pode exceder $maxTotal cartas (atual: $total).');
+        'Regra violada: deck $format não pode exceder $maxTotal cartas (atual: $total).',
+      );
     }
   }
 
@@ -307,8 +322,9 @@ class DeckRulesService {
 
   /// Verifica se a carta é um Background (encantamento lendário com subtipo Background)
   bool _isBackground(_CardData card) {
-    return commander_pairing
-        .isBackgroundCommanderPairCard(card.toCommanderPairingCard());
+    return commander_pairing.isBackgroundCommanderPairCard(
+      card.toCommanderPairingCard(),
+    );
   }
 
   /// Valida se dois comandantes podem ser usados juntos
@@ -331,9 +347,10 @@ class DeckRulesService {
 
   Future<Map<String, _CardData>> _loadCardsData(List<String> cardIds) async {
     final hasIdentityColumns = await hasCardIdentityColumns(_session);
-    final identitySelect = hasIdentityColumns
-        ? 'oracle_id::text AS oracle_id'
-        : 'NULL::text AS oracle_id';
+    final identitySelect =
+        hasIdentityColumns
+            ? 'oracle_id::text AS oracle_id'
+            : 'NULL::text AS oracle_id';
     final result = await _session.execute(
       Sql.named('''
         SELECT id::text, name, type_line, oracle_text, colors, color_identity, mana_cost, cmc, power, toughness, $identitySelect
@@ -349,11 +366,11 @@ class DeckRulesService {
       final name = row[1] as String;
       final typeLine = row[2] as String? ?? '';
       final oracleText = row[3] as String?;
-      final colors = (row[4] as List?)?.map((e) => e.toString()).toList() ??
+      final colors =
+          (row[4] as List?)?.map((e) => e.toString()).toList() ??
           const <String>[];
       final colorIdentity =
-          (row[5] as List?)?.map((e) => e.toString()).toList() ??
-              const <String>[];
+          (row[5] as List?)?.map((e) => e.toString()).toList();
       final manaCost = row[6] as String?;
       final cmc = parseDeckRulesCmcValue(row[7]);
       final power = row[8] as String?;
@@ -379,7 +396,9 @@ class DeckRulesService {
   }
 
   Future<Map<String, String>> _loadLegalities(
-      List<String> cardIds, String format) async {
+    List<String> cardIds,
+    String format,
+  ) async {
     final result = await _session.execute(
       Sql.named('''
         SELECT card_id::text, status
@@ -391,7 +410,7 @@ class DeckRulesService {
 
     return {
       for (final row in result)
-        row[0] as String: (row[1] as String).toLowerCase()
+        row[0] as String: (row[1] as String).toLowerCase(),
     };
   }
 
@@ -410,8 +429,9 @@ void validateCommanderSlotAllowedForFormat({
   required List<Map<String, dynamic>> cards,
 }) {
   if (isCommanderStyleFormat(format)) return;
-  final hasCommanderSlot =
-      cards.any((card) => card['is_commander'] as bool? ?? false);
+  final hasCommanderSlot = cards.any(
+    (card) => card['is_commander'] as bool? ?? false,
+  );
   if (!hasCommanderSlot) return;
   throw DeckRulesException(
     'Regra violada: is_commander só é permitido em Commander/Brawl.',
@@ -493,12 +513,13 @@ void validateNoUnsupportedDeckSections({
 }
 
 String unsupportedDeckSectionsMessage(Iterable<String> labels) {
-  final uniqueLabels = labels
-      .map((label) => label.trim())
-      .where((label) => label.isNotEmpty)
-      .toSet()
-      .toList()
-    ..sort();
+  final uniqueLabels =
+      labels
+          .map((label) => label.trim())
+          .where((label) => label.isNotEmpty)
+          .toSet()
+          .toList()
+        ..sort();
   final suffix = uniqueLabels.isEmpty ? '' : ' (${uniqueLabels.join(', ')}).';
   return 'Regra violada: ManaLoom ainda não suporta sideboard, wishboard, maybeboard ou cartas "outside the game" em decks salvos$suffix '
       'Importe apenas o deck principal e marque comandante pelo campo/tag de comandante.';
@@ -521,8 +542,8 @@ double? parseDeckRulesCmcValue(Object? value) {
 
 class _CopyCounter {
   _CopyCounter(String displayName, this.quantity)
-      : displayName = displayName,
-        sourceNames = {displayName};
+    : displayName = displayName,
+      sourceNames = {displayName};
 
   final String displayName;
   int quantity;
@@ -550,7 +571,7 @@ class _CardData {
   final String typeLine;
   final String? oracleText;
   final List<String> colors;
-  final List<String> colorIdentity;
+  final List<String>? colorIdentity;
   final String? manaCost;
   final double? cmc;
   final String? power;

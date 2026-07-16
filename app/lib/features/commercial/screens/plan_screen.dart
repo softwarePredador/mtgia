@@ -72,6 +72,7 @@ class _PlanComparisonCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final accent = featured ? AppTheme.brass400 : AppTheme.frost400;
+    final theme = Theme.of(context);
     return Container(
       key: Key('plan-card-${plan.tier.id}'),
       padding: const EdgeInsets.all(16),
@@ -90,7 +91,7 @@ class _PlanComparisonCard extends StatelessWidget {
               Expanded(
                 child: Text(
                   plan.tier.label,
-                  style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                  style: theme.textTheme.titleLarge?.copyWith(
                     color: AppTheme.textPrimary,
                     fontWeight: FontWeight.w800,
                   ),
@@ -104,7 +105,7 @@ class _PlanComparisonCard extends StatelessWidget {
               else
                 Text(
                   plan.priceLabel,
-                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                  style: theme.textTheme.titleMedium?.copyWith(
                     color: accent,
                     fontWeight: FontWeight.w800,
                   ),
@@ -114,7 +115,10 @@ class _PlanComparisonCard extends StatelessWidget {
           const SizedBox(height: 8),
           Text(
             plan.description,
-            style: const TextStyle(color: AppTheme.textSecondary, height: 1.4),
+            style: theme.textTheme.bodyMedium?.copyWith(
+              color: AppTheme.textSecondary,
+              height: 1.4,
+            ),
           ),
           const SizedBox(height: 12),
           ...plan.features.map(
@@ -154,6 +158,7 @@ class _RemotePlanStatusPanel extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final synced = provider.isRemoteSynced;
+    final theme = Theme.of(context);
     return Container(
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
@@ -173,7 +178,7 @@ class _RemotePlanStatusPanel extends StatelessWidget {
               synced
                   ? 'Plano sincronizado com o backend. O limite exibido é o que bloqueia os endpoints de IA.'
                   : provider.lastRemoteError ?? 'Plano remoto indisponível.',
-              style: const TextStyle(
+              style: theme.textTheme.bodyMedium?.copyWith(
                 color: AppTheme.textSecondary,
                 height: 1.35,
               ),
@@ -194,6 +199,7 @@ class _PlanLine extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return Padding(
       padding: const EdgeInsets.only(bottom: 7),
       child: Row(
@@ -208,7 +214,7 @@ class _PlanLine extends StatelessWidget {
           Expanded(
             child: Text(
               text,
-              style: TextStyle(
+              style: theme.textTheme.bodyMedium?.copyWith(
                 color: muted ? AppTheme.textSecondary : AppTheme.textPrimary,
                 height: 1.35,
               ),
@@ -223,6 +229,7 @@ class _PlanLine extends StatelessWidget {
 class _LegalShortcutPanel extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return Container(
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
@@ -234,10 +241,13 @@ class _LegalShortcutPanel extends StatelessWidget {
         children: [
           const Icon(Icons.policy_outlined, color: AppTheme.frost400),
           const SizedBox(width: 10),
-          const Expanded(
+          Expanded(
             child: Text(
               'Termos, privacidade, IP e disclaimer ficam disponíveis antes do upgrade.',
-              style: TextStyle(color: AppTheme.textSecondary, height: 1.35),
+              style: theme.textTheme.bodyMedium?.copyWith(
+                color: AppTheme.textSecondary,
+                height: 1.35,
+              ),
             ),
           ),
           TextButton(

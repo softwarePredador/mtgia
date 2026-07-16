@@ -25,31 +25,32 @@ void main() {
     });
 
     test(
-        'real combo tag maps to wincon while heuristic tag stays low confidence',
-        () {
-      final tags = inferFunctionalCardTags(
-        name: 'Dramatic Reversal',
-        typeLine: 'Instant',
-        oracleText: 'Untap all nonland permanents you control.',
-      );
-      final heuristicCombo = tags.firstWhere((t) => t.tag == 'combo_piece');
-      expect(heuristicCombo.confidence, lessThan(0.65));
+      'real combo tag maps to wincon while heuristic tag stays low confidence',
+      () {
+        final tags = inferFunctionalCardTags(
+          name: 'Dramatic Reversal',
+          typeLine: 'Instant',
+          oracleText: 'Untap all nonland permanents you control.',
+        );
+        final heuristicCombo = tags.firstWhere((t) => t.tag == 'combo_piece');
+        expect(heuristicCombo.confidence, lessThan(0.65));
 
-      final role = inferFunctionalRoleForCard({
-        'name': 'Dramatic Reversal',
-        'type_line': 'Instant',
-        'oracle_text': 'Untap all nonland permanents you control.',
-        'functional_tags': const [
-          {
-            'tag': 'combo_piece',
-            'confidence': 0.96,
-            'source': 'commander_spellbook_combo_v1',
-          },
-        ],
-      });
+        final role = inferFunctionalRoleForCard({
+          'name': 'Dramatic Reversal',
+          'type_line': 'Instant',
+          'oracle_text': 'Untap all nonland permanents you control.',
+          'functional_tags': const [
+            {
+              'tag': 'combo_piece',
+              'confidence': 0.96,
+              'source': 'commander_spellbook_combo_v1',
+            },
+          ],
+        });
 
-      expect(role, equals('wincon'));
-    });
+        expect(role, equals('wincon'));
+      },
+    );
   });
 
   group('resolveOptimizeIntensity', () {
@@ -179,8 +180,8 @@ void main() {
       );
 
       expect(light, isNot(equals(aggressive)));
-      expect(light, startsWith('v7:'));
-      expect(aggressive, startsWith('v7:'));
+      expect(light, startsWith('v8:'));
+      expect(aggressive, startsWith('v8:'));
     });
   });
 
@@ -318,25 +319,25 @@ void main() {
     });
 
     test(
-        'rejects colored spell inferred only from mana cost for colorless commander',
-        () {
-      expect(
-        shouldKeepCommanderFillerCandidate(
-          candidate: {
-            'name': 'Swan Song',
-            'mana_cost': '{U}',
-            'oracle_text':
-                'Counter target enchantment, instant, or sorcery spell.',
-            'colors': const <String>[],
-            'color_identity': const <String>[],
-          },
-          excludeNames: const <String>{},
-          commanderColorIdentity: const <String>{},
-          enforceCommanderIdentity: true,
-        ),
-        isFalse,
-      );
-    });
+      'rejects colored spell inferred only from mana cost for colorless commander',
+      () {
+        expect(
+          shouldKeepCommanderFillerCandidate(
+            candidate: {
+              'name': 'Swan Song',
+              'mana_cost': '{U}',
+              'oracle_text':
+                  'Counter target enchantment, instant, or sorcery spell.',
+              'colors': const <String>[],
+            },
+            excludeNames: const <String>{},
+            commanderColorIdentity: const <String>{},
+            enforceCommanderIdentity: true,
+          ),
+          isFalse,
+        );
+      },
+    );
 
     test('rejects additions outside commander color identity', () {
       expect(
@@ -431,30 +432,32 @@ void main() {
       expect(counts[BracketCategory.fastMana], equals(1));
     });
 
-    test('official game changer list stays complete and handles MDFC names',
-        () {
-      expect(officialGameChangerNamesForBracketPolicy, hasLength(53));
-      expect(
-        officialGameChangerNamesForBracketPolicy,
-        contains('tergrid, god of fright // tergrid\'s lantern'),
-      );
-
-      for (final name in const [
-        'Tergrid, God of Fright // Tergrid\'s Lantern',
-        'Tergrid, God of Fright',
-      ]) {
-        final tags = tagCardForBracket(
-          name: name,
-          typeLine: 'Legendary Creature — God',
-          oracleText: '',
-        );
-
+    test(
+      'official game changer list stays complete and handles MDFC names',
+      () {
+        expect(officialGameChangerNamesForBracketPolicy, hasLength(53));
         expect(
-          tags.categories,
-          equals({BracketCategory.gameChanger, BracketCategory.valueEngine}),
+          officialGameChangerNamesForBracketPolicy,
+          contains('tergrid, god of fright // tergrid\'s lantern'),
         );
-      }
-    });
+
+        for (final name in const [
+          'Tergrid, God of Fright // Tergrid\'s Lantern',
+          'Tergrid, God of Fright',
+        ]) {
+          final tags = tagCardForBracket(
+            name: name,
+            typeLine: 'Legendary Creature — God',
+            oracleText: '',
+          );
+
+          expect(
+            tags.categories,
+            equals({BracketCategory.gameChanger, BracketCategory.valueEngine}),
+          );
+        }
+      },
+    );
 
     test('detects commander free-cast interaction as free interaction', () {
       final tags = tagCardForBracket(
@@ -467,7 +470,7 @@ void main() {
       expect(tags.categories, contains(BracketCategory.freeInteraction));
     });
 
-    test('blocks power additions above low bracket budgets', () {
+    test('blocks official Game Changers in low brackets', () {
       final decision = applyBracketPolicyToAdditions(
         bracket: 1,
         currentDeckCards: const [
@@ -476,92 +479,96 @@ void main() {
             'type_line': 'Artifact',
             'oracle_text': '{T}: Add {C}{C}.',
             'quantity': 1,
-          }
+          },
         ],
         additionsCardsData: const [
           {
-            'name': 'Mana Crypt',
+            'name': 'Mana Vault',
             'type_line': 'Artifact',
             'oracle_text': '{T}: Add {C}{C}.',
             'quantity': 1,
-          }
+          },
         ],
       );
 
       expect(decision.allowed, isEmpty);
-      expect(decision.blocked.single['name'], equals('Mana Crypt'));
+      expect(decision.blocked.single['name'], equals('Mana Vault'));
     });
 
-    test('supports cEDH bracket 5 without collapsing diagnostics to bracket 4',
-        () {
-      final decision = applyBracketPolicyToAdditions(
-        bracket: 5,
-        currentDeckCards: const [],
-        additionsCardsData: const [
-          {
-            'name': 'Mana Crypt',
-            'type_line': 'Artifact',
-            'oracle_text': '{T}: Add {C}{C}.',
-            'quantity': 1,
-          }
-        ],
-      );
+    test(
+      'supports cEDH bracket 5 without collapsing diagnostics to bracket 4',
+      () {
+        final decision = applyBracketPolicyToAdditions(
+          bracket: 5,
+          currentDeckCards: const [],
+          additionsCardsData: const [
+            {
+              'name': 'Mana Vault',
+              'type_line': 'Artifact',
+              'oracle_text': '{T}: Add {C}{C}.',
+              'quantity': 1,
+            },
+          ],
+        );
 
-      expect(decision.policy.bracket, equals(5));
-      expect(decision.allowed, ['Mana Crypt']);
-      expect(decision.blocked, isEmpty);
-    });
+        expect(decision.policy.bracket, equals(5));
+        expect(decision.allowed, ['Mana Vault']);
+        expect(decision.blocked, isEmpty);
+      },
+    );
 
     test('filler loaders use current deck state for bracket policy', () {
-      final source = File(
-        'lib/ai/optimize_filler_loader_support.dart',
-      ).readAsStringSync();
-      final completeSource = File(
-        'lib/ai/optimize_complete_support.dart',
-      ).readAsStringSync();
+      final source =
+          File('lib/ai/optimize_filler_loader_support.dart').readAsStringSync();
+      final completeSource =
+          File('lib/ai/optimize_complete_support.dart').readAsStringSync();
 
       expect(source, isNot(contains('currentDeckCards: const []')));
       expect(source, isNot(contains('if (filtered.isNotEmpty)')));
       expect(source, contains('currentDeckCards: currentDeckCards'));
       expect(completeSource, contains('currentDeckCards: state.virtualDeck'));
+      expect(source, contains('aggregated.length < limit && bracket == null'));
+    });
+
+    test('complete responses expose the decision and battle contracts', () {
+      final completeSource =
+          File('lib/ai/optimize_complete_support.dart').readAsStringSync();
+      final syncRoute =
+          File('routes/ai/optimize/index.dart').readAsStringSync();
+      final asyncRoute =
+          File('lib/ai/optimize_route_internal.dart').readAsStringSync();
+
       expect(
-        source,
-        contains('aggregated.length < limit && bracket == null'),
+        completeSource,
+        contains("responseBody['optimization_contract'] ="),
       );
+      expect(completeSource, contains("responseBody['battle_validation'] ="));
+      for (final caller in [syncRoute, asyncRoute]) {
+        expect(caller, contains('targetArchetype: targetArchetype'));
+        expect(caller, contains('intensity: intensity.selected'));
+      }
     });
   });
 
   group('resolveCommanderOptimizeMetaScope', () {
     test('uses competitive commander references only for bracket 3+', () {
       expect(
-        resolveCommanderOptimizeMetaScope(
-          deckFormat: 'commander',
-          bracket: 3,
-        ),
+        resolveCommanderOptimizeMetaScope(deckFormat: 'commander', bracket: 3),
         equals('competitive_commander'),
       );
       expect(
-        resolveCommanderOptimizeMetaScope(
-          deckFormat: 'commander',
-          bracket: 4,
-        ),
+        resolveCommanderOptimizeMetaScope(deckFormat: 'commander', bracket: 4),
         equals('competitive_commander'),
       );
     });
 
     test('keeps casual commander out of competitive commander meta', () {
       expect(
-        resolveCommanderOptimizeMetaScope(
-          deckFormat: 'commander',
-          bracket: 2,
-        ),
+        resolveCommanderOptimizeMetaScope(deckFormat: 'commander', bracket: 2),
         isNull,
       );
       expect(
-        resolveCommanderOptimizeMetaScope(
-          deckFormat: 'modern',
-          bracket: 4,
-        ),
+        resolveCommanderOptimizeMetaScope(deckFormat: 'modern', bracket: 4),
         isNull,
       );
     });
@@ -578,25 +585,27 @@ void main() {
       expect(commanderPremiumFixingLandNames, contains('command tower'));
     });
 
-    test('adds mono-blue contextual foundation names without runtime hardcode',
-        () {
-      final base = commanderFoundationNamesFor(
-        commanderColorIdentity: const {'W', 'U'},
-        targetArchetype: 'midrange',
-        detectedTheme: null,
-      );
-      final monoBlueCombo = commanderFoundationNamesFor(
-        commanderColorIdentity: const {'U'},
-        targetArchetype: 'combo control',
-        detectedTheme: 'proliferate',
-      );
+    test(
+      'adds mono-blue contextual foundation names without runtime hardcode',
+      () {
+        final base = commanderFoundationNamesFor(
+          commanderColorIdentity: const {'W', 'U'},
+          targetArchetype: 'midrange',
+          detectedTheme: null,
+        );
+        final monoBlueCombo = commanderFoundationNamesFor(
+          commanderColorIdentity: const {'U'},
+          targetArchetype: 'combo control',
+          detectedTheme: 'proliferate',
+        );
 
-      expect(base, contains('The One Ring'));
-      expect(base, isNot(contains('High Tide')));
-      expect(monoBlueCombo, contains('High Tide'));
-      expect(monoBlueCombo, contains('Thrummingbird'));
-      expect(monoBlueCombo, contains('Pongify'));
-    });
+        expect(base, contains('The One Ring'));
+        expect(base, isNot(contains('High Tide')));
+        expect(monoBlueCombo, contains('High Tide'));
+        expect(monoBlueCombo, contains('Thrummingbird'));
+        expect(monoBlueCombo, contains('Pongify'));
+      },
+    );
   });
 
   group('aggressive candidate quality ranking', () {
@@ -645,99 +654,109 @@ void main() {
       );
     });
 
-    test('aggressive can expose more safe approved swaps than focused scope',
-        () {
-      final removals = List.generate(12, (i) => 'Slow Ramp Rock $i');
-      final additions = List.generate(12, (i) => 'Efficient Ramp Rock $i');
-      final originalDeck = [
-        for (final name in removals)
-          _qualityCard(
-            name: name,
-            typeLine: 'Artifact',
-            manaCost: '{3}',
-            cmc: 3,
-            oracleText: '{T}: Add one mana of any color.',
-          ),
-      ];
-      final additionsData = [
-        for (final name in additions)
-          _qualityCard(
-            name: name,
-            typeLine: 'Artifact',
-            manaCost: '{2}',
-            cmc: 2,
-            oracleText: '{T}: Add one mana of any color.',
-          ),
-      ];
+    test(
+      'aggressive can expose more safe approved swaps than focused scope',
+      () {
+        final removals = List.generate(12, (i) => 'Slow Ramp Rock $i');
+        final additions = List.generate(12, (i) => 'Efficient Ramp Rock $i');
+        final originalDeck = [
+          for (final name in removals)
+            _qualityCard(
+              name: name,
+              typeLine: 'Artifact',
+              manaCost: '{3}',
+              cmc: 3,
+              oracleText: '{T}: Add one mana of any color.',
+            ),
+        ];
+        final additionsData = [
+          for (final name in additions)
+            _qualityCard(
+              name: name,
+              typeLine: 'Artifact',
+              manaCost: '{2}',
+              cmc: 2,
+              oracleText: '{T}: Add one mana of any color.',
+            ),
+        ];
 
-      final focused = filterUnsafeOptimizeSwapsByCardData(
-        removals: removals.take(5).toList(),
-        additions: additions.take(5).toList(),
-        originalDeck: originalDeck,
-        additionsData: additionsData,
-        archetype: 'midrange',
-      );
-      final aggressive = filterUnsafeOptimizeSwapsByCardData(
-        removals: removals,
-        additions: additions,
-        originalDeck: originalDeck,
-        additionsData: additionsData,
-        archetype: 'midrange',
-      );
+        final focused = filterUnsafeOptimizeSwapsByCardData(
+          removals: removals.take(5).toList(),
+          additions: additions.take(5).toList(),
+          originalDeck: originalDeck,
+          additionsData: additionsData,
+          archetype: 'midrange',
+        );
+        final aggressive = filterUnsafeOptimizeSwapsByCardData(
+          removals: removals,
+          additions: additions,
+          originalDeck: originalDeck,
+          additionsData: additionsData,
+          archetype: 'midrange',
+        );
 
-      expect(focused.removals, hasLength(5));
-      expect(aggressive.removals, hasLength(12));
-      expect(aggressive.removals.length, greaterThan(focused.removals.length));
-    });
+        expect(focused.removals, hasLength(5));
+        expect(aggressive.removals, hasLength(12));
+        expect(
+          aggressive.removals.length,
+          greaterThan(focused.removals.length),
+        );
+      },
+    );
 
-    test('exposes safe no-op diagnostics when quality gate rejects all pairs',
-        () {
-      final result = filterUnsafeOptimizeSwapsByCardData(
-        removals: const ['Aggro Creature A', 'Aggro Creature B'],
-        additions: const ['Slow Engine A', 'Slow Engine B'],
-        originalDeck: [
-          _qualityCard(
-            name: 'Aggro Creature A',
-            typeLine: 'Creature - Goblin',
-            manaCost: '{1}{R}',
-            cmc: 2,
-            oracleText: 'Haste.',
-          ),
-          _qualityCard(
-            name: 'Aggro Creature B',
-            typeLine: 'Creature - Goblin',
-            manaCost: '{1}{R}',
-            cmc: 2,
-            oracleText: 'Haste.',
-          ),
-        ],
-        additionsData: [
-          _qualityCard(
-            name: 'Slow Engine A',
-            typeLine: 'Artifact',
-            manaCost: '{6}',
-            cmc: 6,
-            oracleText: 'At the beginning of your upkeep, draw a card.',
-          ),
-          _qualityCard(
-            name: 'Slow Engine B',
-            typeLine: 'Artifact',
-            manaCost: '{6}',
-            cmc: 6,
-            oracleText: 'At the beginning of your upkeep, draw a card.',
-          ),
-        ],
-        archetype: 'aggro',
-      );
-      final buckets =
-          bucketOptimizeQualityGateDroppedReasons(result.droppedReasons);
+    test(
+      'exposes safe no-op diagnostics when quality gate rejects all pairs',
+      () {
+        final result = filterUnsafeOptimizeSwapsByCardData(
+          removals: const ['Aggro Creature A', 'Aggro Creature B'],
+          additions: const ['Slow Engine A', 'Slow Engine B'],
+          originalDeck: [
+            _qualityCard(
+              name: 'Aggro Creature A',
+              typeLine: 'Creature - Goblin',
+              manaCost: '{1}{R}',
+              cmc: 2,
+              oracleText: 'Haste.',
+            ),
+            _qualityCard(
+              name: 'Aggro Creature B',
+              typeLine: 'Creature - Goblin',
+              manaCost: '{1}{R}',
+              cmc: 2,
+              oracleText: 'Haste.',
+            ),
+          ],
+          additionsData: [
+            _qualityCard(
+              name: 'Slow Engine A',
+              typeLine: 'Artifact',
+              manaCost: '{6}',
+              cmc: 6,
+              oracleText: 'At the beginning of your upkeep, draw a card.',
+            ),
+            _qualityCard(
+              name: 'Slow Engine B',
+              typeLine: 'Artifact',
+              manaCost: '{6}',
+              cmc: 6,
+              oracleText: 'At the beginning of your upkeep, draw a card.',
+            ),
+          ],
+          archetype: 'aggro',
+        );
+        final buckets = bucketOptimizeQualityGateDroppedReasons(
+          result.droppedReasons,
+        );
 
-      expect(result.removals, isEmpty);
-      expect(result.additions, isEmpty);
-      expect(
-          buckets.values.fold<int>(0, (sum, count) => sum + count), equals(2));
-      expect(buckets, contains('curve_or_role_mismatch'));
-    });
+        expect(result.removals, isEmpty);
+        expect(result.additions, isEmpty);
+        expect(
+          buckets.values.fold<int>(0, (sum, count) => sum + count),
+          equals(2),
+        );
+        expect(buckets, contains('curve_or_role_mismatch'));
+      },
+    );
   });
 }
 

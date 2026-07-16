@@ -22,6 +22,8 @@ For the current XMage to ManaLoom flow, use
 
 ## Retained Raw Evidence Manifest
 
+Retention justification: reviewed package and audit evidence retained so historical PostgreSQL/Hermes changes can be reconstructed without treating these files as runtime truth.
+
 The files below are intentionally retained raw evidence artifacts. They are
 not product truth and must not be used as runtime inputs, but they remain
 tracked so audit/package history can be reconstructed without relying on
@@ -248,3 +250,59 @@ local ignored files. This manifest is consumed by
 - `docs/hermes-analysis/master_optimizer_reports/pg599_static_count_pt_new_server_rollback.sql`
 - `docs/hermes-analysis/master_optimizer_reports/pg_hermes_sqlite_contract_audit_20260707_post_pg598_dynamic_counter_unless_new_server_final.json`
 - `docs/hermes-analysis/master_optimizer_reports/pg_hermes_sqlite_contract_audit_20260707_post_pg599_static_count_pt_new_server.json`
+
+Prepared read-only PostgreSQL packages from the 2026-07-15 runtime closure
+remain approval-gated. These entries retain the package evidence without
+implying that any apply SQL was executed:
+
+- `docs/hermes-analysis/master_optimizer_reports/pg599_runtime_closure_new_server_package_apply.sql`
+- `docs/hermes-analysis/master_optimizer_reports/pg599_runtime_closure_new_server_package_manifest.json`
+- `docs/hermes-analysis/master_optimizer_reports/pg599_runtime_closure_new_server_package_postcheck.sql`
+- `docs/hermes-analysis/master_optimizer_reports/pg599_runtime_closure_new_server_package_precheck.sql`
+- `docs/hermes-analysis/master_optimizer_reports/pg599_runtime_closure_new_server_package_rollback.sql`
+- `docs/hermes-analysis/master_optimizer_reports/pg867_birgi_registry_alignment_new_server_package_apply.sql`
+- `docs/hermes-analysis/master_optimizer_reports/pg867_birgi_registry_alignment_new_server_package_manifest.json`
+- `docs/hermes-analysis/master_optimizer_reports/pg867_birgi_registry_alignment_new_server_package_postcheck.sql`
+- `docs/hermes-analysis/master_optimizer_reports/pg867_birgi_registry_alignment_new_server_package_precheck.sql`
+- `docs/hermes-analysis/master_optimizer_reports/pg867_birgi_registry_alignment_new_server_package_rollback.sql`
+- `docs/hermes-analysis/master_optimizer_reports/pg868_grinding_station_runtime_new_server_package_apply.sql`
+- `docs/hermes-analysis/master_optimizer_reports/pg868_grinding_station_runtime_new_server_package_manifest.json`
+- `docs/hermes-analysis/master_optimizer_reports/pg868_grinding_station_runtime_new_server_package_postcheck.sql`
+- `docs/hermes-analysis/master_optimizer_reports/pg868_grinding_station_runtime_new_server_package_precheck.sql`
+- `docs/hermes-analysis/master_optimizer_reports/pg868_grinding_station_runtime_new_server_package_rollback.sql`
+
+Reviewed PostgreSQL packages applied with explicit authorization on 2026-07-15
+are retained with their exact precheck, apply, postcheck, and rollback SQL. The
+database-side snapshots in `manaloom_deploy_audit` remain the rollback source;
+these files are the durable operator contract, not runtime truth:
+
+- `docs/hermes-analysis/master_optimizer_reports/global_commander_fixture_cleanup_20260715_apply.sql`
+- `docs/hermes-analysis/master_optimizer_reports/global_commander_fixture_cleanup_20260715_postcheck.sql`
+- `docs/hermes-analysis/master_optimizer_reports/global_commander_fixture_cleanup_20260715_precheck.sql`
+- `docs/hermes-analysis/master_optimizer_reports/global_commander_fixture_cleanup_20260715_rollback.sql`
+- `docs/hermes-analysis/master_optimizer_reports/pg869_product_deck_function_tags_new_server_package_apply.sql`
+- `docs/hermes-analysis/master_optimizer_reports/pg869_product_deck_function_tags_new_server_package_postcheck.sql`
+- `docs/hermes-analysis/master_optimizer_reports/pg869_product_deck_function_tags_new_server_package_precheck.sql`
+- `docs/hermes-analysis/master_optimizer_reports/pg869_product_deck_function_tags_new_server_package_rollback.sql`
+- `docs/hermes-analysis/master_optimizer_reports/pg870_goblins_illegal_card_repair_20260715_apply.sql`
+- `docs/hermes-analysis/master_optimizer_reports/pg870_goblins_illegal_card_repair_20260715_postcheck.sql`
+- `docs/hermes-analysis/master_optimizer_reports/pg870_goblins_illegal_card_repair_20260715_precheck.sql`
+- `docs/hermes-analysis/master_optimizer_reports/pg870_goblins_illegal_card_repair_20260715_rollback.sql`
+- `docs/hermes-analysis/master_optimizer_reports/pg871_function_tag_false_positive_repair_20260715_apply.sql`
+- `docs/hermes-analysis/master_optimizer_reports/pg871_function_tag_false_positive_repair_20260715_postcheck.sql`
+- `docs/hermes-analysis/master_optimizer_reports/pg871_function_tag_false_positive_repair_20260715_precheck.sql`
+- `docs/hermes-analysis/master_optimizer_reports/pg871_function_tag_false_positive_repair_20260715_rollback.sql`
+- `docs/hermes-analysis/master_optimizer_reports/pg872_semantic_tag_false_positive_repair_20260715_apply.sql`
+- `docs/hermes-analysis/master_optimizer_reports/pg872_semantic_tag_false_positive_repair_20260715_postcheck.sql`
+- `docs/hermes-analysis/master_optimizer_reports/pg872_semantic_tag_false_positive_repair_20260715_precheck.sql`
+- `docs/hermes-analysis/master_optimizer_reports/pg872_semantic_tag_false_positive_repair_20260715_rollback.sql`
+
+PG873 was validated read-only but was not applied. Its package stays retained
+as approval-gated operator evidence and must not be reported as PostgreSQL
+truth until a future apply and postcheck both succeed:
+
+- `docs/hermes-analysis/master_optimizer_reports/pg873_sacrifice_outlet_family_reconciliation_20260715_apply.sql`
+- `docs/hermes-analysis/master_optimizer_reports/pg873_sacrifice_outlet_family_reconciliation_20260715_missing_semantic_manifest.sql`
+- `docs/hermes-analysis/master_optimizer_reports/pg873_sacrifice_outlet_family_reconciliation_20260715_postcheck.sql`
+- `docs/hermes-analysis/master_optimizer_reports/pg873_sacrifice_outlet_family_reconciliation_20260715_precheck.sql`
+- `docs/hermes-analysis/master_optimizer_reports/pg873_sacrifice_outlet_family_reconciliation_20260715_rollback.sql`

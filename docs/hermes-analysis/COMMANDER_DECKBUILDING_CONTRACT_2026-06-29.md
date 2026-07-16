@@ -17,6 +17,33 @@ Card-rule work answers: "can the battle runtime execute this card correctly?"
 Deckbuilding work answers: "does this commander deck have the right plan,
 package density, legality, source provenance, and battle proof?"
 
+## Operational Refresh - 2026-07-15
+
+The current PostgreSQL product truth contains 16 Commander decks: 7 are
+structurally ready and 9 require owner-directed repair. The global audit spans
+310 surfaces (277 retained fixtures, 16 product decks, and 17 Hermes lab
+decks). Among the 33 product/lab decks eligible for core-role review, 9 are
+`core_review_ready`, 15 have core-floor gaps, and 9 are structure-blocked.
+
+The Goblins product deck `8c22deb9-80bd-489f-8e87-1344eabac698` is now exactly
+100 cards with one Commander and no illegal or off-color rows. Its strategy is
+not yet promotion-ready: the current role model reports 25 lands against the
+34-card diagnostic floor, 2 win conditions against the 3-card floor, and 10
+card quantities without a mapped core role. Those are review signals, not
+authorization for an automatic rebuild.
+
+The remaining 9 incomplete product decks are preserved. They are ambiguous
+user skeletons (zero to two cards), not proven disposable fixtures; therefore
+they must not be deleted, filled, or rebuilt without owner intent. A separate
+cleanup removed 396 proven legacy fixture decks and 4,774 `deck_cards` rows
+with prestate backups and rollback packages. The post-cleanup classifier found
+no additional safe automatic deletion subset.
+
+Current promotion guardrails remain closed where evidence is incomplete. Four
+existing Commander candidate packages require changed-card natural exposure
+replay before they may re-enter promotion evaluation. Structural readiness,
+combo presence, or aggregate battle results alone do not satisfy that gate.
+
 ## Research-Backed Deck Planning Flow
 
 External research was reviewed on 2026-06-29 and folded into the current

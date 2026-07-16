@@ -340,6 +340,7 @@ OPTIMIZER_BASENAMES = {
     "test_master_optimizer_common.py",
     "test_master_optimizer_gate_baseline.py",
     "test_slot_optimizer_real_roles.py",
+    "master_optimizer_preflight_artifact_contract_test.py",
     "test_universal_optimizer_known_cards.py",
     "lorehold_optimizer_equal_gate.py",
     "test_lorehold_optimizer_equal_gate.py",
@@ -389,6 +390,7 @@ FOCUSED_EVIDENCE_BASENAMES = {
     "lorehold_entreat_rule_package_preapply.py",
     "test_lorehold_entreat_rule_package_preapply.py",
     "manaloom_battle_product_e2e_audit.py",
+    "manaloom_battle_product_e2e_audit_test.py",
 }
 
 

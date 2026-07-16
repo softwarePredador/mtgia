@@ -7,6 +7,7 @@ import unittest
 
 from global_commander_strategy_matrix import (
     build_matrix,
+    commander_intent_lane_count,
     empty_source_signals,
     normalize_commander,
     readiness_status,
@@ -26,6 +27,7 @@ class GlobalCommanderStrategyMatrixTests(unittest.TestCase):
                 ready_count=1,
                 product_ready_count=1,
                 source_lanes=1,
+                commander_intent_lanes=1,
                 blocked_count=0,
             ),
             "ready_for_strategy_matrix",
@@ -35,6 +37,7 @@ class GlobalCommanderStrategyMatrixTests(unittest.TestCase):
                 ready_count=1,
                 product_ready_count=1,
                 source_lanes=0,
+                commander_intent_lanes=0,
                 blocked_count=0,
             ),
             "structure_ready_source_missing",
@@ -44,6 +47,7 @@ class GlobalCommanderStrategyMatrixTests(unittest.TestCase):
                 ready_count=0,
                 product_ready_count=0,
                 source_lanes=0,
+                commander_intent_lanes=0,
                 blocked_count=1,
             ),
             "blocked_before_global_promotion",
@@ -92,6 +96,37 @@ class GlobalCommanderStrategyMatrixTests(unittest.TestCase):
         self.assertEqual(row["lab_ready_deck_count"], 1)
         self.assertEqual(row["blocked_product_deck_count"], 1)
         self.assertEqual(row["blocked_issue_counts"], {"quantity_not_100": 1})
+
+    def test_usage_or_learned_lane_does_not_replace_commander_intent_profile(self) -> None:
+        signals = {
+            **empty_source_signals(),
+            "learned_deck_count": 1,
+            "card_usage_count": 90,
+        }
+        payload = build_matrix(
+            [
+                {
+                    "source": "postgres",
+                    "scope": "user_product",
+                    "status": "structure_ready",
+                    "issues": [],
+                    "deck_id": "animar",
+                    "deck_name": "Animar",
+                    "commander": "Animar, Soul of Elements",
+                    "commander_key": "animar, soul of elements",
+                    "quantity": 100,
+                    "commander_count": 1,
+                }
+            ],
+            {"animar, soul of elements": signals},
+        )
+
+        row = payload["commanders"][0]
+        self.assertEqual(row["source_lane_count"], 2)
+        self.assertEqual(row["commander_intent_lane_count"], 0)
+        self.assertEqual(row["status"], "structure_ready_intent_profile_missing")
+        self.assertIn("commander_intent_profile", row["next_gate"])
+        self.assertEqual(commander_intent_lane_count(signals), 0)
 
     def test_build_matrix_records_skipped_source_lane_mode_for_commander_without_local_profile(self) -> None:
         payload = build_matrix(

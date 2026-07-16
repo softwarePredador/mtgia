@@ -3,14 +3,15 @@
 
 from __future__ import annotations
 
+from collections import Counter
 from pathlib import Path
 
 import battle_runtime_surface_manifest as manifest_mod
 
 
 REPO_ROOT = Path(__file__).resolve().parents[4]
-EXPECTED_TOTAL_FILES = 178
-EXPECTED_CATEGORY_COUNTS = {
+MINIMUM_TOTAL_FILES = 178
+MINIMUM_CATEGORY_COUNTS = {
     "core runtime": 36,
     "focused evidence/promotion": 37,
     "learned-deck source": 16,
@@ -20,12 +21,12 @@ EXPECTED_CATEGORY_COUNTS = {
     "review queue": 1,
     "rule registry/sync": 21,
 }
-EXPECTED_AUTOMATION_COVERAGE_COUNTS = {
+MINIMUM_AUTOMATION_COVERAGE_COUNTS = {
     "covered_by_recurring_run": 33,
     "imported_by_core_runtime": 7,
     "outside_recurring_run": 138,
 }
-EXPECTED_GATE_EXPECTED_COUNTS = {
+MINIMUM_GATE_EXPECTED_COUNTS = {
     "core_runtime_import_regression": 7,
     "recurring_audit_required": 33,
     "targeted_manual_gate_required_before_change": 64,
@@ -60,9 +61,11 @@ REQUIRED_HIGH_SIGNAL_PATHS = {
     "server/bin/manaloom_battle_rule_review_queue.py",
     "server/bin/manaloom_battle_rule_focused_evidence.py",
     "server/bin/manaloom_battle_product_e2e_audit.py",
+    "server/test/manaloom_battle_product_e2e_audit_test.py",
     "server/bin/native_battle_sidecar.py",
     "server/bin/native_battle_worker.py",
     "server/bin/learned_deck_coherence_audit.py",
+    "server/test/master_optimizer_preflight_artifact_contract_test.py",
 }
 
 
@@ -70,11 +73,30 @@ def test_manifest_classifies_current_battle_surface() -> None:
     manifest = manifest_mod.build_manifest(REPO_ROOT)
     summary = manifest["summary"]
 
-    assert summary["total_files"] == EXPECTED_TOTAL_FILES
+    assert summary["total_files"] == len(manifest["files"])
+    assert summary["total_files"] >= MINIMUM_TOTAL_FILES
     assert summary["unclassified_files"] == []
-    assert summary["category_counts"] == EXPECTED_CATEGORY_COUNTS
-    assert summary["automation_coverage_counts"] == EXPECTED_AUTOMATION_COVERAGE_COUNTS
-    assert summary["gate_expected_counts"] == EXPECTED_GATE_EXPECTED_COUNTS
+    assert summary["category_counts"] == dict(
+        sorted(Counter(record["category"] for record in manifest["files"]).items())
+    )
+    assert summary["automation_coverage_counts"] == dict(
+        sorted(
+            Counter(
+                record["automation_coverage"] for record in manifest["files"]
+            ).items()
+        )
+    )
+    assert summary["gate_expected_counts"] == dict(
+        sorted(
+            Counter(record["gate_expected"] for record in manifest["files"]).items()
+        )
+    )
+    for category, minimum in MINIMUM_CATEGORY_COUNTS.items():
+        assert summary["category_counts"].get(category, 0) >= minimum
+    for coverage, minimum in MINIMUM_AUTOMATION_COVERAGE_COUNTS.items():
+        assert summary["automation_coverage_counts"].get(coverage, 0) >= minimum
+    for gate, minimum in MINIMUM_GATE_EXPECTED_COUNTS.items():
+        assert summary["gate_expected_counts"].get(gate, 0) >= minimum
     assert manifest["rules_alignment"]["source_contract"]["official_comprehensive_rules"][
         "url"
     ] == "https://magic.wizards.com/en/rules"

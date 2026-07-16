@@ -8740,24 +8740,44 @@ def dynamic_damage_all_source_matches_spec(source: str, oracle_spec: dict[str, A
 
 def damage_all_source_matches_spec(source: str, spec: dict[str, Any]) -> bool:
     damage_scope = str(spec.get("damage_scope") or "")
+    text = source or ""
     if damage_scope == "each_creature_and_planeswalker_opponents_control":
-        text = source or ""
         if "FilterCreatureOrPlaneswalkerPermanent" not in text or "TargetController.NOT_YOU" not in text:
             return False
-    if damage_scope == "each_flying_creature" and "FILTER_CREATURE_FLYING" not in (source or ""):
+    if damage_scope == "each_flying_creature" and "FILTER_CREATURE_FLYING" not in text:
         return False
-    if damage_scope == "each_creature" and "FILTER_CREATURE_FLYING" in (source or ""):
+    if damage_scope == "each_creature" and "FILTER_CREATURE_FLYING" in text:
+        return False
+    if damage_scope in {"each_nonflying_creature", "each_creature_without_flying"} and not re.search(
+        r"Predicates\.not\s*\(\s*new\s+AbilityPredicate\s*\(\s*FlyingAbility\.class\s*\)\s*\)",
+        text,
+        flags=re.DOTALL,
+    ):
+        return False
+    if damage_scope == "each_attacking_creature" and not (
+        "FilterAttackingCreature" in text or "AttackingPredicate.instance" in text
+    ):
+        return False
+    if damage_scope == "each_tapped_creature" and "TappedPredicate.TAPPED" not in text:
+        return False
+    if damage_scope == "each_untapped_creature" and "TappedPredicate.UNTAPPED" not in text:
+        return False
+    if damage_scope == "each_nonartifact_creature" and not re.search(
+        r"Predicates\.not\s*\(\s*CardType\.ARTIFACT\.getPredicate\s*\(\s*\)\s*\)",
+        text,
+        flags=re.DOTALL,
+    ):
         return False
     if (
         damage_scope == "each_creature_dealt_damage_this_turn"
-        and "WasDealtDamageThisTurnPredicate.instance" not in (source or "")
+        and "WasDealtDamageThisTurnPredicate.instance" not in text
     ):
         return False
     if damage_scope == "each_blocking_or_blocked_creature":
         text = source or ""
         if "BlockingPredicate.instance" not in text or "BlockedPredicate.instance" not in text:
             return False
-    if spec.get("damage_exclude_tokens") and "TokenPredicate.FALSE" not in (source or ""):
+    if spec.get("damage_exclude_tokens") and "TokenPredicate.FALSE" not in text:
         return False
     required_colors = ordered_color_symbols(
         [
@@ -48350,6 +48370,85 @@ def split_row(
                 effect_json,
                 family_id="xmage_creature_dies_each_player_sacrifice_fixed_permanents",
             ), "selected_exact_scope"
+        if classes == {"DamageAllEffect"} and is_spell(metadata):
+            unsupported_abilities = ability_classes(row) - (
+                ALLOWED_AUXILIARY_RESOLUTION_ABILITY_CLASSES | {"FlyingAbility"}
+            )
+            if unsupported_abilities:
+                return None, "board_wipe_ability_class_not_simple"
+            resolution_metadata = {
+                **metadata,
+                "oracle_text": oracle_resolution_text_without_neutral_auxiliary(metadata),
+            }
+            if has_oracle_complexity(resolution_metadata):
+                return None, "board_wipe_oracle_not_simple"
+            source_blocker = board_wipe_source_blocker(source_text, classes)
+            if source_blocker:
+                return None, source_blocker
+            x_damage_spec = x_damage_all_spec_from_oracle(resolution_metadata)
+            if x_damage_spec is not None:
+                x_source_blocker = x_damage_all_source_blocker(source_text, x_damage_spec)
+                if x_source_blocker is not None:
+                    return None, x_source_blocker
+                effect_json = {
+                    "effect": "damage_wipe",
+                    "battle_model_scope": DAMAGE_WIPE_SCOPE,
+                    "amount": 0,
+                    "damage": 0,
+                    "damage_amount_source": "x_value",
+                    **x_damage_spec,
+                    "xmage_effect_class": "DamageAllEffect",
+                    **flags,
+                }
+                return build_proposal(row, metadata, effect_json, family_id="xmage_x_damage_all_spell"), "selected_exact_scope"
+            dynamic_damage_spec = dynamic_damage_all_spec_from_oracle(resolution_metadata)
+            if isinstance(dynamic_damage_spec, str):
+                return None, dynamic_damage_spec
+            if dynamic_damage_spec is not None:
+                source_dynamic_spec = dynamic_damage_all_source_spec_from_source(source_text)
+                if isinstance(source_dynamic_spec, str):
+                    return None, source_dynamic_spec
+                if source_dynamic_spec is None:
+                    return None, "board_wipe_dynamic_damage_source_not_supported"
+                if not dynamic_damage_all_source_matches_spec(
+                    source_text,
+                    dynamic_damage_spec,
+                    source_dynamic_spec,
+                ):
+                    return None, "board_wipe_dynamic_damage_source_oracle_mismatch"
+                effect_json = {
+                    "effect": "damage_wipe",
+                    "battle_model_scope": DAMAGE_WIPE_SCOPE,
+                    "amount": 0,
+                    "damage": 0,
+                    **dynamic_damage_spec,
+                    "xmage_effect_class": "DamageAllEffect",
+                    **flags,
+                }
+                return build_proposal(
+                    row,
+                    metadata,
+                    effect_json,
+                    family_id="xmage_dynamic_damage_all_spell",
+                ), "selected_exact_scope"
+            amount = java_constructor_int(source_text, "DamageAllEffect")
+            if amount is None or amount <= 0:
+                return None, "board_wipe_damage_amount_not_fixed"
+            damage_spec = damage_all_spec_from_oracle(resolution_metadata)
+            if damage_spec is None:
+                return None, "board_wipe_damage_scope_not_supported"
+            if not damage_all_source_matches_spec(source_text, damage_spec):
+                return None, "board_wipe_damage_source_scope_mismatch"
+            effect_json = {
+                "effect": "damage_wipe",
+                "battle_model_scope": DAMAGE_WIPE_SCOPE,
+                "amount": amount,
+                "damage": amount,
+                **damage_spec,
+                "xmage_effect_class": "DamageAllEffect",
+                **flags,
+            }
+            return build_proposal(row, metadata, effect_json, family_id="xmage_damage_all_spell"), "selected_exact_scope"
         unsupported_abilities = ability_classes(row) - ALLOWED_AUXILIARY_RESOLUTION_ABILITY_CLASSES
         if unsupported_abilities:
             return None, "board_wipe_ability_class_not_simple"

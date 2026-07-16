@@ -2,37 +2,25 @@ import 'package:accessibility_tools/accessibility_tools.dart';
 import 'package:alchemist/alchemist.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:manaloom/core/theme/app_theme.dart';
 import 'package:manaloom/features/commercial/models/manaloom_plan.dart';
 import 'package:manaloom/features/commercial/providers/commercial_provider.dart';
 import 'package:manaloom/features/commercial/widgets/ai_usage_gate.dart';
 import 'package:manaloom/features/commercial/widgets/ai_usage_meter.dart';
 import 'package:provider/provider.dart';
 
-void main() {
-  final goldenConfig = AlchemistConfig.current().merge(
-    AlchemistConfig(
-      theme: AppTheme.darkTheme,
-      platformGoldensConfig: const PlatformGoldensConfig(enabled: false),
-      ciGoldensConfig: const CiGoldensConfig(
-        obscureText: true,
-        renderShadows: false,
-        diffThreshold: 0.001,
-      ),
-    ),
-  );
+import 'support/manaloom_ui_audit_harness.dart';
 
-  AlchemistConfig.runWithConfig(
-    config: goldenConfig,
+void main() {
+  runManaLoomUiGoldenConfig(
     run: () {
       goldenTest(
         'commercial AI usage states keep the ManaLoom visual contract',
         fileName: 'manaloom_commercial_ai_usage_states',
-        constraints: const BoxConstraints(maxWidth: 430),
+        constraints: manaloomGoldenViewport,
         builder:
             () => GoldenTestGroup(
               columns: 1,
-              scenarioConstraints: const BoxConstraints(maxWidth: 390),
+              scenarioConstraints: manaloomGoldenScenarioConstraints,
               children: [
                 GoldenTestScenario(
                   name: 'Free near limit',
@@ -60,13 +48,10 @@ void main() {
     AccessibilityTools.debugRunCheckersInTests = true;
 
     try {
-      tester.view.physicalSize = const Size(390, 844);
-      tester.view.devicePixelRatio = 1;
-      addTearDown(tester.view.resetPhysicalSize);
-      addTearDown(tester.view.resetDevicePixelRatio);
+      setManaLoomMobileViewport(tester);
 
       await tester.pumpWidget(
-        _accessibilityShell(
+        manaloomAccessibilityShell(
           child: ListView(
             padding: const EdgeInsets.all(16),
             children: [
@@ -81,10 +66,7 @@ void main() {
 
       expect(find.byKey(const Key('ai-usage-meter')), findsOneWidget);
       expect(find.byKey(const Key('ai-paywall-dialog')), findsOneWidget);
-      expect(find.byIcon(Icons.accessibility_new), findsNothing);
-      expect(find.byIcon(Icons.build), findsNothing);
-      await expectLater(tester, meetsGuideline(androidTapTargetGuideline));
-      await expectLater(tester, meetsGuideline(labeledTapTargetGuideline));
+      await expectManaLoomBaselineAccessibility(tester);
     } finally {
       semantics.dispose();
     }
@@ -111,32 +93,8 @@ Widget _commercialShell({
 }) {
   return ChangeNotifierProvider<CommercialProvider>.value(
     value: provider,
-    child: DecoratedBox(
-      decoration: const BoxDecoration(gradient: AppTheme.scaffoldGradient),
+    child: manaloomDecoratedAuditSurface(
       child: Padding(padding: const EdgeInsets.all(16), child: child),
-    ),
-  );
-}
-
-Widget _accessibilityShell({required Widget child}) {
-  return MaterialApp(
-    debugShowCheckedModeBanner: false,
-    theme: AppTheme.darkTheme,
-    builder:
-        (context, appChild) => AccessibilityTools(
-          logLevel: LogLevel.none,
-          checkFontOverflows: true,
-          enableButtonsDrag: false,
-          testingToolsConfiguration: const TestingToolsConfiguration(
-            enabled: false,
-          ),
-          child: appChild,
-        ),
-    home: Scaffold(
-      body: DecoratedBox(
-        decoration: const BoxDecoration(gradient: AppTheme.scaffoldGradient),
-        child: child,
-      ),
     ),
   );
 }

@@ -1,0 +1,15 @@
+name: manaloom_lints
+description: Custom lint rules for ManaLoom production guardrails.
+publish_to: none
+
+environment:
+  sdk: ">=3.7.2 <4.0.0"
+
+dependencies:
+  analyzer: ^8.4.0
+  custom_lint_builder: ^0.8.1
+
+dev_dependencies:
+  dependency_validator: ^5.0.5
+  lints: ^5.1.1
+  test: ^1.25.15

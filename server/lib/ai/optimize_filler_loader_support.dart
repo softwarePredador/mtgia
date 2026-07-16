@@ -50,7 +50,7 @@ Future<List<Map<String, dynamic>>> loadIdentitySafeNonBasicLandFillers({
           c.type_line,
           COALESCE(c.oracle_text, '') AS oracle_text,
           COALESCE(c.colors, ARRAY[]::text[]) AS colors,
-          COALESCE(c.color_identity, ARRAY[]::text[]) AS color_identity,
+          c.color_identity AS color_identity,
           COALESCE(cmi.usage_count, 0) AS pop_score
         FROM cards c
         LEFT JOIN card_legalities cl ON cl.card_id = c.id AND cl.format = 'commander'
@@ -69,9 +69,7 @@ Future<List<Map<String, dynamic>>> loadIdentitySafeNonBasicLandFillers({
       ORDER BY sub.pop_score DESC, LOWER(sub.name) ASC
       LIMIT 600
     '''),
-    parameters: {
-      'exclude': excludeNames.toList(),
-    },
+    parameters: {'exclude': excludeNames.toList()},
   );
 
   final candidates = <Map<String, dynamic>>[];
@@ -82,7 +80,7 @@ Future<List<Map<String, dynamic>>> loadIdentitySafeNonBasicLandFillers({
       'type_line': (row[2] as String?) ?? '',
       'oracle_text': (row[3] as String?) ?? '',
       'colors': (row[4] as List?)?.cast<String>() ?? const <String>[],
-      'color_identity': (row[5] as List?)?.cast<String>() ?? const <String>[],
+      'color_identity': (row[5] as List?)?.cast<String>(),
       'pop_score': (row[6] as num?)?.toInt() ?? 0,
     };
 
@@ -104,13 +102,14 @@ Future<List<Map<String, dynamic>>> loadIdentitySafeNonBasicLandFillers({
     final name = ((candidate['name'] as String?) ?? '').trim().toLowerCase();
     final oracle = ((candidate['oracle_text'] as String?) ?? '').toLowerCase();
     final typeLine = ((candidate['type_line'] as String?) ?? '').toLowerCase();
-    final identityCount = resolvedCardIdentityFromParts(
-      colorIdentity: (candidate['color_identity'] as List?)?.cast<String>() ??
-          const <String>[],
-      colors:
-          (candidate['colors'] as List?)?.cast<String>() ?? const <String>[],
-      oracleText: candidate['oracle_text'] as String?,
-    ).length;
+    final identityCount =
+        resolvedCardIdentityFromParts(
+          colorIdentity: (candidate['color_identity'] as List?)?.cast<String>(),
+          colors:
+              (candidate['colors'] as List?)?.cast<String>() ??
+              const <String>[],
+          oracleText: candidate['oracle_text'] as String?,
+        ).length;
 
     var fixingScore = (candidate['pop_score'] as int?) ?? 0;
     if (commanderPremiumFixingLandNames.contains(name)) fixingScore += 250;
@@ -136,10 +135,7 @@ Future<List<Map<String, dynamic>>> loadIdentitySafeNonBasicLandFillers({
       fixingScore -= 20;
     }
 
-    candidates.add({
-      ...candidate,
-      'fixing_score': fixingScore,
-    });
+    candidates.add({...candidate, 'fixing_score': fixingScore});
   }
 
   candidates.sort((a, b) {
@@ -151,8 +147,9 @@ Future<List<Map<String, dynamic>>> loadIdentitySafeNonBasicLandFillers({
       (a['pop_score'] as int?) ?? 0,
     );
     if (byPop != 0) return byPop;
-    return ((a['name'] as String?) ?? '')
-        .compareTo((b['name'] as String?) ?? '');
+    return ((a['name'] as String?) ?? '').compareTo(
+      (b['name'] as String?) ?? '',
+    );
   });
 
   return dedupeCandidatesByName(candidates).take(limit).toList();
@@ -226,14 +223,17 @@ int computeOptimizeStructuralRecoverySwapTarget({
     }
   }
 
-  final recommendedLandCount =
-      recommendedLandCountForOptimizeArchetype(targetArchetype);
+  final recommendedLandCount = recommendedLandCountForOptimizeArchetype(
+    targetArchetype,
+  );
   final excessLands = (landCount - recommendedLandCount).clamp(0, 99);
   final missingNonLands = (58 - nonLandCount).clamp(0, 99);
 
-  return [12, excessLands, missingNonLands]
-      .reduce((a, b) => a < b ? a : b)
-      .clamp(6, 12);
+  return [
+    12,
+    excessLands,
+    missingNonLands,
+  ].reduce((a, b) => a < b ? a : b).clamp(6, 12);
 }
 
 List<String> buildStructuralRecoveryFunctionalNeeds({
@@ -246,36 +246,36 @@ List<String> buildStructuralRecoveryFunctionalNeeds({
   final archetype = targetArchetype.trim().toLowerCase();
   final targetProfile = switch (archetype) {
     'control' => const <String, int>{
-        'draw': 14,
-        'ramp': 12,
-        'removal': 10,
-        'wipe': 4,
-        'protection': 4,
-        'utility': 14,
-      },
+      'draw': 14,
+      'ramp': 12,
+      'removal': 10,
+      'wipe': 4,
+      'protection': 4,
+      'utility': 14,
+    },
     'combo' => const <String, int>{
-        'draw': 14,
-        'ramp': 12,
-        'tutor': 8,
-        'protection': 6,
-        'utility': 18,
-      },
+      'draw': 14,
+      'ramp': 12,
+      'tutor': 8,
+      'protection': 6,
+      'utility': 18,
+    },
     'aggro' => const <String, int>{
-        'creature': 18,
-        'ramp': 8,
-        'draw': 8,
-        'removal': 8,
-        'protection': 4,
-        'utility': 14,
-      },
+      'creature': 18,
+      'ramp': 8,
+      'draw': 8,
+      'removal': 8,
+      'protection': 4,
+      'utility': 14,
+    },
     _ => const <String, int>{
-        'draw': 12,
-        'ramp': 10,
-        'removal': 8,
-        'creature': 8,
-        'protection': 4,
-        'utility': 16,
-      },
+      'draw': 12,
+      'ramp': 10,
+      'removal': 8,
+      'creature': 8,
+      'protection': 4,
+      'utility': 16,
+    },
   };
 
   final currentCounts = <String, int>{};
@@ -435,25 +435,24 @@ Future<List<Map<String, dynamic>>> loadDeterministicSlotFillers({
 
   if (candidates.isEmpty) return const [];
 
-  final scored = candidates.map((c) {
-    final name = (c['name'] as String?) ?? '';
-    final role = inferFunctionalRoleForCard(c);
+  final scored =
+      candidates.map((c) {
+        final name = (c['name'] as String?) ?? '';
+        final role = inferFunctionalRoleForCard(c);
 
-    final primaryNeed = slotNeeds[role] ?? 0;
-    final utilityNeed = slotNeeds['utility'] ?? 0;
-    final fromAiSuggestion =
-        (preferredNames ?? const <String>{}).contains(name.toLowerCase());
-    final aiBoost = fromAiSuggestion ? 35 : 0;
-    final score = primaryNeed * 100 +
-        (role == 'utility' ? utilityNeed * 10 : 0) +
-        aiBoost;
+        final primaryNeed = slotNeeds[role] ?? 0;
+        final utilityNeed = slotNeeds['utility'] ?? 0;
+        final fromAiSuggestion = (preferredNames ?? const <String>{}).contains(
+          name.toLowerCase(),
+        );
+        final aiBoost = fromAiSuggestion ? 35 : 0;
+        final score =
+            primaryNeed * 100 +
+            (role == 'utility' ? utilityNeed * 10 : 0) +
+            aiBoost;
 
-    return {
-      ...c,
-      '_role': role,
-      '_score': score,
-    };
-  }).toList();
+        return {...c, '_role': role, '_score': score};
+      }).toList();
 
   scored.sort((a, b) {
     final scoreA = (a['_score'] as int?) ?? 0;
@@ -533,43 +532,45 @@ Future<List<Map<String, dynamic>>> loadMetaInsightFillers({
       ORDER BY mi.meta_deck_count DESC, mi.usage_count DESC, c.name ASC
       LIMIT @limit
     '''),
-    parameters: {
-      'identity': identity,
-      'limit': limit,
-    },
+    parameters: {'identity': identity, 'limit': limit},
   );
 
-  final mapped = result
-      .map((row) => {
-            'id': row[0] as String,
-            'name': row[1] as String,
-            'type_line': (row[2] as String?) ?? '',
-            'oracle_text': (row[3] as String?) ?? '',
-            'mana_cost': (row[4] as String?) ?? '',
-            'colors': (row[5] as List?)?.cast<String>() ?? const <String>[],
-            'color_identity':
-                (row[6] as List?)?.cast<String>() ?? const <String>[],
-            'cmc': safeToDouble(row[7]),
-            'meta_deck_count': (row[8] as num?)?.toInt() ?? 0,
-            'usage_count': (row[9] as num?)?.toInt() ?? 0,
-          })
-      .where(
-        (candidate) => shouldKeepCommanderFillerCandidate(
-          candidate: candidate,
-          excludeNames: excludeNames,
-          commanderColorIdentity: commanderColorIdentity,
-          enforceCommanderIdentity: true,
-        ),
-      )
-      .toList();
+  final mapped =
+      result
+          .map(
+            (row) => {
+              'id': row[0] as String,
+              'name': row[1] as String,
+              'type_line': (row[2] as String?) ?? '',
+              'oracle_text': (row[3] as String?) ?? '',
+              'mana_cost': (row[4] as String?) ?? '',
+              'colors': (row[5] as List?)?.cast<String>() ?? const <String>[],
+              'color_identity':
+                  (row[6] as List?)?.cast<String>() ?? const <String>[],
+              'cmc': safeToDouble(row[7]),
+              'meta_deck_count': (row[8] as num?)?.toInt() ?? 0,
+              'usage_count': (row[9] as num?)?.toInt() ?? 0,
+            },
+          )
+          .where(
+            (candidate) => shouldKeepCommanderFillerCandidate(
+              candidate: candidate,
+              excludeNames: excludeNames,
+              commanderColorIdentity: commanderColorIdentity,
+              enforceCommanderIdentity: true,
+            ),
+          )
+          .toList();
 
   final deduped = dedupeCandidatesByName(mapped);
   deduped.sort((a, b) {
-    final byQuality = commanderFillerQualityScore(b)
-        .compareTo(commanderFillerQualityScore(a));
+    final byQuality = commanderFillerQualityScore(
+      b,
+    ).compareTo(commanderFillerQualityScore(a));
     if (byQuality != 0) return byQuality;
-    return ((a['name'] as String?) ?? '')
-        .compareTo((b['name'] as String?) ?? '');
+    return ((a['name'] as String?) ?? '').compareTo(
+      (b['name'] as String?) ?? '',
+    );
   });
   return deduped.take(limit).toList();
 }
@@ -586,7 +587,8 @@ Future<List<Map<String, dynamic>>> loadBroadCommanderNonLandFillers({
 
   final identity = commanderColorIdentity.toList();
   Log.d(
-      '  [broad] start limit=$limit identity=${identity.join(',')} exclude=${excludeNames.length}');
+    '  [broad] start limit=$limit identity=${identity.join(',')} exclude=${excludeNames.length}',
+  );
   final result = await pool.execute(
     Sql.named('''
       SELECT sub.id, sub.name, sub.type_line, sub.oracle_text, sub.mana_cost, sub.colors, sub.color_identity, sub.cmc, sub.meta_deck_count, sub.usage_count
@@ -628,44 +630,46 @@ Future<List<Map<String, dynamic>>> loadBroadCommanderNonLandFillers({
       ORDER BY sub.pop_score DESC, RANDOM()
       LIMIT @limit
     '''),
-    parameters: {
-      'identity': identity,
-      'limit': limit,
-    },
+    parameters: {'identity': identity, 'limit': limit},
   );
 
   Log.d('  [broad] sql rows=${result.length}');
 
-  var candidates = result
-      .map((row) => {
-            'id': row[0] as String,
-            'name': row[1] as String,
-            'type_line': (row[2] as String?) ?? '',
-            'oracle_text': (row[3] as String?) ?? '',
-            'mana_cost': (row[4] as String?) ?? '',
-            'colors': (row[5] as List?)?.cast<String>() ?? const <String>[],
-            'color_identity':
-                (row[6] as List?)?.cast<String>() ?? const <String>[],
-            'cmc': safeToDouble(row[7]),
-            'meta_deck_count': (row[8] as num?)?.toInt() ?? 0,
-            'usage_count': (row[9] as num?)?.toInt() ?? 0,
-          })
-      .where(
-        (candidate) => shouldKeepCommanderFillerCandidate(
-          candidate: candidate,
-          excludeNames: excludeNames,
-          commanderColorIdentity: commanderColorIdentity,
-          enforceCommanderIdentity: true,
-        ),
-      )
-      .toList();
+  var candidates =
+      result
+          .map(
+            (row) => {
+              'id': row[0] as String,
+              'name': row[1] as String,
+              'type_line': (row[2] as String?) ?? '',
+              'oracle_text': (row[3] as String?) ?? '',
+              'mana_cost': (row[4] as String?) ?? '',
+              'colors': (row[5] as List?)?.cast<String>() ?? const <String>[],
+              'color_identity':
+                  (row[6] as List?)?.cast<String>() ?? const <String>[],
+              'cmc': safeToDouble(row[7]),
+              'meta_deck_count': (row[8] as num?)?.toInt() ?? 0,
+              'usage_count': (row[9] as num?)?.toInt() ?? 0,
+            },
+          )
+          .where(
+            (candidate) => shouldKeepCommanderFillerCandidate(
+              candidate: candidate,
+              excludeNames: excludeNames,
+              commanderColorIdentity: commanderColorIdentity,
+              enforceCommanderIdentity: true,
+            ),
+          )
+          .toList();
   candidates = dedupeCandidatesByName(candidates);
   candidates.sort((a, b) {
-    final byQuality = commanderFillerQualityScore(b)
-        .compareTo(commanderFillerQualityScore(a));
+    final byQuality = commanderFillerQualityScore(
+      b,
+    ).compareTo(commanderFillerQualityScore(a));
     if (byQuality != 0) return byQuality;
-    return ((a['name'] as String?) ?? '')
-        .compareTo((b['name'] as String?) ?? '');
+    return ((a['name'] as String?) ?? '').compareTo(
+      (b['name'] as String?) ?? '',
+    );
   });
   Log.d('  [broad] dedup rows=${candidates.length}');
 
@@ -683,11 +687,15 @@ Future<List<Map<String, dynamic>>> loadBroadCommanderNonLandFillers({
       }),
     );
     final allowedSet = decision.allowed.map((e) => e.toLowerCase()).toSet();
-    final filtered = candidates
-        .where((c) => allowedSet.contains((c['name'] as String).toLowerCase()))
-        .toList();
+    final filtered =
+        candidates
+            .where(
+              (c) => allowedSet.contains((c['name'] as String).toLowerCase()),
+            )
+            .toList();
     Log.d(
-        '  [broad] bracket=$bracket allowed=${allowedSet.length} filtered=${filtered.length}');
+      '  [broad] bracket=$bracket allowed=${allowedSet.length} filtered=${filtered.length}',
+    );
     candidates = filtered;
   }
 
@@ -753,11 +761,13 @@ Future<List<Map<String, dynamic>>> loadGuaranteedNonBasicFillers({
       excludeNames: excludeNames.union(seen),
       limit: limit - aggregated.length,
     );
-    addUnique(_filterCandidatesByBracketPolicy(
-      candidates: metaFillers,
-      bracket: bracket,
-      currentDeckCards: currentDeckCards,
-    ));
+    addUnique(
+      _filterCandidatesByBracketPolicy(
+        candidates: metaFillers,
+        bracket: bracket,
+        currentDeckCards: currentDeckCards,
+      ),
+    );
   }
 
   if (aggregated.length < limit) {
@@ -837,31 +847,32 @@ Future<List<Map<String, dynamic>>> loadCompetitiveNonLandFillers({
       ORDER BY sub.pop_score DESC, RANDOM()
       LIMIT 600
     '''),
-    parameters: {
-      'identity': identity,
-    },
+    parameters: {'identity': identity},
   );
 
-  var candidates = result
-      .map((row) => {
-            'id': row[0] as String,
-            'name': row[1] as String,
-            'type_line': (row[2] as String?) ?? '',
-            'oracle_text': (row[3] as String?) ?? '',
-            'mana_cost': (row[4] as String?) ?? '',
-            'colors': (row[5] as List?)?.cast<String>() ?? const <String>[],
-            'color_identity':
-                (row[6] as List?)?.cast<String>() ?? const <String>[],
-          })
-      .where(
-        (candidate) => shouldKeepCommanderFillerCandidate(
-          candidate: candidate,
-          excludeNames: excludeNames,
-          commanderColorIdentity: commanderColorIdentity,
-          enforceCommanderIdentity: true,
-        ),
-      )
-      .toList();
+  var candidates =
+      result
+          .map(
+            (row) => {
+              'id': row[0] as String,
+              'name': row[1] as String,
+              'type_line': (row[2] as String?) ?? '',
+              'oracle_text': (row[3] as String?) ?? '',
+              'mana_cost': (row[4] as String?) ?? '',
+              'colors': (row[5] as List?)?.cast<String>() ?? const <String>[],
+              'color_identity':
+                  (row[6] as List?)?.cast<String>() ?? const <String>[],
+            },
+          )
+          .where(
+            (candidate) => shouldKeepCommanderFillerCandidate(
+              candidate: candidate,
+              excludeNames: excludeNames,
+              commanderColorIdentity: commanderColorIdentity,
+              enforceCommanderIdentity: true,
+            ),
+          )
+          .toList();
   candidates = dedupeCandidatesByName(candidates);
 
   if (candidates.length < limit) {
@@ -882,26 +893,32 @@ Future<List<Map<String, dynamic>>> loadCompetitiveNonLandFillers({
         'identity': identity,
       },
     );
-    final stapleCandidates = stapleResult
-        .map((row) => {
-              'id': row[0] as String,
-              'name': row[1] as String,
-              'type_line': (row[2] as String?) ?? '',
-              'oracle_text': (row[3] as String?) ?? '',
-              'colors': (row[4] as List?)?.cast<String>() ?? const <String>[],
-              'color_identity':
-                  (row[5] as List?)?.cast<String>() ?? const <String>[],
-            })
-        .where(
-            (c) => !excludeNames.contains((c['name'] as String).toLowerCase()))
-        .toList();
+    final stapleCandidates =
+        stapleResult
+            .map(
+              (row) => {
+                'id': row[0] as String,
+                'name': row[1] as String,
+                'type_line': (row[2] as String?) ?? '',
+                'oracle_text': (row[3] as String?) ?? '',
+                'colors': (row[4] as List?)?.cast<String>() ?? const <String>[],
+                'color_identity':
+                    (row[5] as List?)?.cast<String>() ?? const <String>[],
+              },
+            )
+            .where(
+              (c) =>
+                  !excludeNames.contains((c['name'] as String).toLowerCase()),
+            )
+            .toList();
     candidates.addAll(stapleCandidates);
     candidates = dedupeCandidatesByName(candidates);
     if (candidates.isEmpty) {
       print('[COMPLETE FILLER] Pool vazio, fallback para staples universais.');
     } else if (stapleCandidates.isNotEmpty) {
       print(
-          '[COMPLETE FILLER] Pool expandido com staples universais: ${stapleCandidates.length}');
+        '[COMPLETE FILLER] Pool expandido com staples universais: ${stapleCandidates.length}',
+      );
     }
   }
 
@@ -919,9 +936,12 @@ Future<List<Map<String, dynamic>>> loadCompetitiveNonLandFillers({
       }),
     );
     final allowedSet = decision.allowed.map((e) => e.toLowerCase()).toSet();
-    final filtered = candidates
-        .where((c) => allowedSet.contains((c['name'] as String).toLowerCase()))
-        .toList();
+    final filtered =
+        candidates
+            .where(
+              (c) => allowedSet.contains((c['name'] as String).toLowerCase()),
+            )
+            .toList();
 
     candidates = filtered;
   }
@@ -959,28 +979,29 @@ Future<List<Map<String, dynamic>>> loadEmergencyNonBasicFillers({
       ORDER BY sub.pop_score DESC, RANDOM()
       LIMIT @limit
     '''),
-    parameters: {
-      'limit': limit * 3,
-    },
+    parameters: {'limit': limit * 3},
   );
 
-  var candidates = result
-      .map((row) => {
-            'id': row[0] as String,
-            'name': row[1] as String,
-            'type_line': (row[2] as String?) ?? '',
-            'oracle_text': (row[3] as String?) ?? '',
-            'colors': (row[4] as List?)?.cast<String>() ?? const <String>[],
-            'color_identity':
-                (row[5] as List?)?.cast<String>() ?? const <String>[],
-          })
-      .where(
-        (candidate) => shouldKeepCommanderFillerCandidate(
-          candidate: candidate,
-          excludeNames: excludeNames,
-        ),
-      )
-      .toList();
+  var candidates =
+      result
+          .map(
+            (row) => {
+              'id': row[0] as String,
+              'name': row[1] as String,
+              'type_line': (row[2] as String?) ?? '',
+              'oracle_text': (row[3] as String?) ?? '',
+              'colors': (row[4] as List?)?.cast<String>() ?? const <String>[],
+              'color_identity':
+                  (row[5] as List?)?.cast<String>() ?? const <String>[],
+            },
+          )
+          .where(
+            (candidate) => shouldKeepCommanderFillerCandidate(
+              candidate: candidate,
+              excludeNames: excludeNames,
+            ),
+          )
+          .toList();
   candidates = dedupeCandidatesByName(candidates);
 
   if (bracket != null && candidates.isNotEmpty) {
@@ -997,9 +1018,12 @@ Future<List<Map<String, dynamic>>> loadEmergencyNonBasicFillers({
       }),
     );
     final allowedSet = decision.allowed.map((e) => e.toLowerCase()).toSet();
-    final filtered = candidates
-        .where((c) => allowedSet.contains((c['name'] as String).toLowerCase()))
-        .toList();
+    final filtered =
+        candidates
+            .where(
+              (c) => allowedSet.contains((c['name'] as String).toLowerCase()),
+            )
+            .toList();
     candidates = filtered;
   }
 
@@ -1040,7 +1064,8 @@ Future<List<Map<String, dynamic>>> loadIdentitySafeNonLandFillers({
   if (limit <= 0) return const [];
 
   Log.d(
-      '  [identity-safe] start limit=$limit identity=${commanderColorIdentity.join(',')} exclude=${excludeNames.length}');
+    '  [identity-safe] start limit=$limit identity=${commanderColorIdentity.join(',')} exclude=${excludeNames.length}',
+  );
 
   final result = await pool.execute(
     Sql.named('''
@@ -1078,7 +1103,7 @@ Future<List<Map<String, dynamic>>> loadIdentitySafeNonLandFillers({
     final oracleText = (row[3] as String?) ?? '';
     final manaCost = (row[4] as String?) ?? '';
     final colors = (row[5] as List?)?.cast<String>() ?? const <String>[];
-    final colorIdentity = (row[6] as List?)?.cast<String>() ?? const <String>[];
+    final colorIdentity = (row[6] as List?)?.cast<String>();
 
     final withinIdentity = isWithinCommanderIdentity(
       cardIdentity: resolvedCardIdentityFromParts(
@@ -1125,10 +1150,11 @@ Future<List<Map<String, dynamic>>> loadPreferredNameFillers({
 }) async {
   if (limit <= 0 || preferredNames.isEmpty) return const [];
 
-  final normalizedPreferred = preferredNames
-      .map((name) => name.trim().toLowerCase())
-      .where((name) => name.isNotEmpty)
-      .toSet();
+  final normalizedPreferred =
+      preferredNames
+          .map((name) => name.trim().toLowerCase())
+          .where((name) => name.isNotEmpty)
+          .toSet();
   if (normalizedPreferred.isEmpty) return const [];
 
   final result = await pool.execute(
@@ -1152,9 +1178,7 @@ Future<List<Map<String, dynamic>>> loadPreferredNameFillers({
                COALESCE(cmi.usage_count, 0) DESC,
                c.name ASC
     '''),
-    parameters: {
-      'preferred': normalizedPreferred.toList(),
-    },
+    parameters: {'preferred': normalizedPreferred.toList()},
   );
 
   final filtered = <Map<String, dynamic>>[];
@@ -1168,7 +1192,7 @@ Future<List<Map<String, dynamic>>> loadPreferredNameFillers({
     final oracleText = (row[3] as String?) ?? '';
     final manaCost = (row[4] as String?) ?? '';
     final colors = (row[5] as List?)?.cast<String>() ?? const <String>[];
-    final colorIdentity = (row[6] as List?)?.cast<String>() ?? const <String>[];
+    final colorIdentity = (row[6] as List?)?.cast<String>();
 
     final withinIdentity = isWithinCommanderIdentity(
       cardIdentity: resolvedCardIdentityFromParts(
@@ -1205,17 +1229,20 @@ Future<List<Map<String, dynamic>>> loadPreferredNameFillers({
   }
 
   filtered.sort((a, b) {
-    final byQuality = commanderFillerQualityScore(b)
-        .compareTo(commanderFillerQualityScore(a));
+    final byQuality = commanderFillerQualityScore(
+      b,
+    ).compareTo(commanderFillerQualityScore(a));
     if (byQuality != 0) return byQuality;
-    return ((a['name'] as String?) ?? '')
-        .compareTo((b['name'] as String?) ?? '');
+    return ((a['name'] as String?) ?? '').compareTo(
+      (b['name'] as String?) ?? '',
+    );
   });
 
   final floor = filtered.length > limit ? 25 : -999;
-  final qualityFiltered = filtered
-      .where((candidate) => commanderFillerQualityScore(candidate) >= floor)
-      .toList();
+  final qualityFiltered =
+      filtered
+          .where((candidate) => commanderFillerQualityScore(candidate) >= floor)
+          .toList();
   final source = qualityFiltered.isNotEmpty ? qualityFiltered : filtered;
 
   return dedupeCandidatesByName(source).take(limit).toList();

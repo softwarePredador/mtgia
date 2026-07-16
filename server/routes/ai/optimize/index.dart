@@ -85,12 +85,11 @@ Map<String, dynamic> buildDeterministicOptimizeResponse({
   required List<Map<String, dynamic>> deterministicSwapCandidates,
   required String targetArchetype,
   OptimizeIntensityConfig? intensity,
-}) =>
-    optimize_support.buildDeterministicOptimizeResponse(
-      deterministicSwapCandidates: deterministicSwapCandidates,
-      targetArchetype: targetArchetype,
-      intensity: intensity,
-    );
+}) => optimize_support.buildDeterministicOptimizeResponse(
+  deterministicSwapCandidates: deterministicSwapCandidates,
+  targetArchetype: targetArchetype,
+  intensity: intensity,
+);
 
 OptimizeIntensityConfig resolveOptimizeIntensity(dynamic raw) =>
     optimize_support.resolveOptimizeIntensity(raw);
@@ -98,11 +97,10 @@ OptimizeIntensityConfig resolveOptimizeIntensity(dynamic raw) =>
 String resolveOptimizeArchetype({
   required String requestedArchetype,
   required String? detectedArchetype,
-}) =>
-    optimize_support.resolveOptimizeArchetype(
-      requestedArchetype: requestedArchetype,
-      detectedArchetype: detectedArchetype,
-    );
+}) => optimize_support.resolveOptimizeArchetype(
+  requestedArchetype: requestedArchetype,
+  detectedArchetype: detectedArchetype,
+);
 
 bool shouldRetryOptimizeWithAiFallback({
   required bool deterministicFirstEnabled,
@@ -110,25 +108,23 @@ bool shouldRetryOptimizeWithAiFallback({
   required String? strategySource,
   required String? qualityErrorCode,
   required bool isComplete,
-}) =>
-    optimize_support.shouldRetryOptimizeWithAiFallback(
-      deterministicFirstEnabled: deterministicFirstEnabled,
-      fallbackAlreadyAttempted: fallbackAlreadyAttempted,
-      strategySource: strategySource,
-      qualityErrorCode: qualityErrorCode,
-      isComplete: isComplete,
-    );
+}) => optimize_support.shouldRetryOptimizeWithAiFallback(
+  deterministicFirstEnabled: deterministicFirstEnabled,
+  fallbackAlreadyAttempted: fallbackAlreadyAttempted,
+  strategySource: strategySource,
+  qualityErrorCode: qualityErrorCode,
+  isComplete: isComplete,
+);
 
 bool matchesFunctionalNeed(
   String need, {
   required String oracleText,
   required String typeLine,
-}) =>
-    optimize_support.matchesFunctionalNeed(
-      need,
-      oracleText: oracleText,
-      typeLine: typeLine,
-    );
+}) => optimize_support.matchesFunctionalNeed(
+  need,
+  oracleText: oracleText,
+  typeLine: typeLine,
+);
 
 int scoreOptimizeReplacementCandidate({
   required String functionalNeed,
@@ -140,49 +136,45 @@ int scoreOptimizeReplacementCandidate({
   required Set<String> preferredNames,
   required Map<String, int> rejectedAdditionCounts,
   bool preferLowCurve = false,
-}) =>
-    optimize_support.scoreOptimizeReplacementCandidate(
-      functionalNeed: functionalNeed,
-      cardName: cardName,
-      typeLine: typeLine,
-      oracleText: oracleText,
-      manaCost: manaCost,
-      popScore: popScore,
-      preferredNames: preferredNames,
-      rejectedAdditionCounts: rejectedAdditionCounts,
-      preferLowCurve: preferLowCurve,
-    );
+}) => optimize_support.scoreOptimizeReplacementCandidate(
+  functionalNeed: functionalNeed,
+  cardName: cardName,
+  typeLine: typeLine,
+  oracleText: oracleText,
+  manaCost: manaCost,
+  popScore: popScore,
+  preferredNames: preferredNames,
+  rejectedAdditionCounts: rejectedAdditionCounts,
+  preferLowCurve: preferLowCurve,
+);
 
 bool isOptimizeStructuralRecoveryScenario({
   required List<Map<String, dynamic>> allCardData,
   required Set<String> commanderColorIdentity,
-}) =>
-    optimize_support.isOptimizeStructuralRecoveryScenario(
-      allCardData: allCardData,
-      commanderColorIdentity: commanderColorIdentity,
-    );
+}) => optimize_support.isOptimizeStructuralRecoveryScenario(
+  allCardData: allCardData,
+  commanderColorIdentity: commanderColorIdentity,
+);
 
 int computeOptimizeStructuralRecoverySwapTarget({
   required List<Map<String, dynamic>> allCardData,
   required Set<String> commanderColorIdentity,
   required String targetArchetype,
-}) =>
-    optimize_support.computeOptimizeStructuralRecoverySwapTarget(
-      allCardData: allCardData,
-      commanderColorIdentity: commanderColorIdentity,
-      targetArchetype: targetArchetype,
-    );
+}) => optimize_support.computeOptimizeStructuralRecoverySwapTarget(
+  allCardData: allCardData,
+  commanderColorIdentity: commanderColorIdentity,
+  targetArchetype: targetArchetype,
+);
 
 List<String> buildStructuralRecoveryFunctionalNeeds({
   required List<Map<String, dynamic>> allCardData,
   required String targetArchetype,
   required int limit,
-}) =>
-    optimize_support.buildStructuralRecoveryFunctionalNeeds(
-      allCardData: allCardData,
-      targetArchetype: targetArchetype,
-      limit: limit,
-    );
+}) => optimize_support.buildStructuralRecoveryFunctionalNeeds(
+  allCardData: allCardData,
+  targetArchetype: targetArchetype,
+  limit: limit,
+);
 
 List<Map<String, dynamic>> buildDeterministicOptimizeRemovalCandidates({
   required List<Map<String, dynamic>> allCardData,
@@ -193,17 +185,16 @@ List<Map<String, dynamic>> buildDeterministicOptimizeRemovalCandidates({
   required List<String>? coreCards,
   required List<String> commanderPriorityNames,
   int swapLimit = 6,
-}) =>
-    optimize_support.buildDeterministicOptimizeRemovalCandidates(
-      allCardData: allCardData,
-      commanders: commanders,
-      commanderColorIdentity: commanderColorIdentity,
-      targetArchetype: targetArchetype,
-      keepTheme: keepTheme,
-      coreCards: coreCards,
-      commanderPriorityNames: commanderPriorityNames,
-      swapLimit: swapLimit,
-    );
+}) => optimize_support.buildDeterministicOptimizeRemovalCandidates(
+  allCardData: allCardData,
+  commanders: commanders,
+  commanderColorIdentity: commanderColorIdentity,
+  targetArchetype: targetArchetype,
+  keepTheme: keepTheme,
+  coreCards: coreCards,
+  commanderPriorityNames: commanderPriorityNames,
+  swapLimit: swapLimit,
+);
 
 Future<List<Map<String, dynamic>>> buildDeterministicOptimizeSwapCandidates({
   required Pool pool,
@@ -222,25 +213,24 @@ Future<List<Map<String, dynamic>>> buildDeterministicOptimizeSwapCandidates({
   String? userId,
   bool preferCollection = false,
   int? budgetLimitBrl,
-}) =>
-    optimize_support.buildDeterministicOptimizeSwapCandidates(
-      pool: pool,
-      allCardData: allCardData,
-      commanders: commanders,
-      commanderColorIdentity: commanderColorIdentity,
-      targetArchetype: targetArchetype,
-      bracket: bracket,
-      keepTheme: keepTheme,
-      detectedTheme: detectedTheme,
-      coreCards: coreCards,
-      commanderPriorityNames: commanderPriorityNames,
-      swapLimit: swapLimit,
-      intensity: intensity,
-      diagnosticsOut: diagnosticsOut,
-      userId: userId,
-      preferCollection: preferCollection,
-      budgetLimitBrl: budgetLimitBrl,
-    );
+}) => optimize_support.buildDeterministicOptimizeSwapCandidates(
+  pool: pool,
+  allCardData: allCardData,
+  commanders: commanders,
+  commanderColorIdentity: commanderColorIdentity,
+  targetArchetype: targetArchetype,
+  bracket: bracket,
+  keepTheme: keepTheme,
+  detectedTheme: detectedTheme,
+  coreCards: coreCards,
+  commanderPriorityNames: commanderPriorityNames,
+  swapLimit: swapLimit,
+  intensity: intensity,
+  diagnosticsOut: diagnosticsOut,
+  userId: userId,
+  preferCollection: preferCollection,
+  budgetLimitBrl: budgetLimitBrl,
+);
 
 Map<String, dynamic> buildOptimizationAnalysisLogEntry({
   required String deckId,
@@ -266,52 +256,49 @@ Map<String, dynamic> buildOptimizationAnalysisLogEntry({
   required List<Map<String, dynamic>> deterministicSwapCandidates,
   required String cacheKey,
   required int executionTimeMs,
-}) =>
-    optimize_analysis.buildOptimizationAnalysisLogEntry(
-      deckId: deckId,
-      userId: userId,
-      commanderName: commanderName,
-      commanderColors: commanderColors,
-      operationMode: operationMode,
-      requestedMode: requestedMode,
-      targetArchetype: targetArchetype,
-      detectedTheme: detectedTheme,
-      deckAnalysis: deckAnalysis,
-      postAnalysis: postAnalysis,
-      removals: removals,
-      additions: additions,
-      statusCode: statusCode,
-      qualityError: qualityError,
-      validationReport: validationReport,
-      validationWarnings: validationWarnings,
-      blockedByColorIdentity: blockedByColorIdentity,
-      blockedByBracket: blockedByBracket,
-      commanderPriorityNames: commanderPriorityNames,
-      commanderPrioritySource: commanderPrioritySource,
-      deterministicSwapCandidates: deterministicSwapCandidates,
-      cacheKey: cacheKey,
-      executionTimeMs: executionTimeMs,
-    );
+}) => optimize_analysis.buildOptimizationAnalysisLogEntry(
+  deckId: deckId,
+  userId: userId,
+  commanderName: commanderName,
+  commanderColors: commanderColors,
+  operationMode: operationMode,
+  requestedMode: requestedMode,
+  targetArchetype: targetArchetype,
+  detectedTheme: detectedTheme,
+  deckAnalysis: deckAnalysis,
+  postAnalysis: postAnalysis,
+  removals: removals,
+  additions: additions,
+  statusCode: statusCode,
+  qualityError: qualityError,
+  validationReport: validationReport,
+  validationWarnings: validationWarnings,
+  blockedByColorIdentity: blockedByColorIdentity,
+  blockedByBracket: blockedByBracket,
+  commanderPriorityNames: commanderPriorityNames,
+  commanderPrioritySource: commanderPrioritySource,
+  deterministicSwapCandidates: deterministicSwapCandidates,
+  cacheKey: cacheKey,
+  executionTimeMs: executionTimeMs,
+);
 
 List<Map<String, dynamic>> buildOptimizeAdditionEntries({
   required List<String> requestedAdditions,
   required List<Map<String, dynamic>> additionsData,
-}) =>
-    optimize_deck.buildOptimizeAdditionEntries(
-      requestedAdditions: requestedAdditions,
-      additionsData: additionsData,
-    );
+}) => optimize_deck.buildOptimizeAdditionEntries(
+  requestedAdditions: requestedAdditions,
+  additionsData: additionsData,
+);
 
 List<Map<String, dynamic>> buildVirtualDeckForAnalysis({
   required List<Map<String, dynamic>> originalDeck,
   List<String> removals = const [],
   List<Map<String, dynamic>> additions = const [],
-}) =>
-    optimize_deck.buildVirtualDeckForAnalysis(
-      originalDeck: originalDeck,
-      removals: removals,
-      additions: additions,
-    );
+}) => optimize_deck.buildVirtualDeckForAnalysis(
+  originalDeck: originalDeck,
+  removals: removals,
+  additions: additions,
+);
 
 Map<String, dynamic> _buildEmptyFallbackAggregate() {
   final triggered = _emptySuggestionFallbackTriggeredCount;
@@ -385,13 +372,12 @@ String deriveOptimizeOutcomeCode({
   required Map<String, dynamic> body,
   required DeckOptimizationState deckState,
   ValidationReport? validationReport,
-}) =>
-    optimize_route_outcome.deriveOptimizeOutcomeCode(
-      statusCode: statusCode,
-      body: body,
-      deckState: deckState,
-      validationReport: validationReport,
-    );
+}) => optimize_route_outcome.deriveOptimizeOutcomeCode(
+  statusCode: statusCode,
+  body: body,
+  deckState: deckState,
+  validationReport: validationReport,
+);
 
 Future<Response> onRequest(RequestContext context) async {
   if (context.request.method != HttpMethod.post) {
@@ -432,12 +418,12 @@ Future<Response> onRequest(RequestContext context) async {
     final env = DotEnv(includePlatformEnvironment: true, quiet: true)..load();
     final semanticV2OptimizeEnforcementMode =
         resolveSemanticV2OptimizeEnforcementMode(
-      env['SEMANTIC_LAYER_V2_OPTIMIZE_ENFORCEMENT'],
-    );
+          env['SEMANTIC_LAYER_V2_OPTIMIZE_ENFORCEMENT'],
+        );
     final semanticV2ExpandedCriticalRoles =
         resolveSemanticV2ExpandedCriticalRoles(
-      env['SEMANTIC_LAYER_V2_EXPANDED_CRITICAL_ROLES'],
-    );
+          env['SEMANTIC_LAYER_V2_EXPANDED_CRITICAL_ROLES'],
+        );
     final aiConfig = OpenAiRuntimeConfig(env);
     final apiKey = env['OPENAI_API_KEY'];
     final aiProviderMissingInProduction =
@@ -493,9 +479,10 @@ Future<Response> onRequest(RequestContext context) async {
         archetype: archetype,
         userId: authenticatedUserId,
       );
-      final syncPayload = Map<String, dynamic>.from(body)
-        ..['_force_sync'] = true
-        ..['async'] = false;
+      final syncPayload =
+          Map<String, dynamic>.from(body)
+            ..['_force_sync'] = true
+            ..['async'] = false;
       final authorization = context.request.headers['Authorization'];
       final internalOptimizeUrl = resolveInternalOptimizeUrl(context.request);
 
@@ -508,40 +495,36 @@ Future<Response> onRequest(RequestContext context) async {
       );
 
       telemetry.logSummary();
-      final responseBody =
-          optimize_route_async.buildOptimizeModeAsyncAcceptedBody(
-        deckId: deckId,
-        requestMode: requestMode,
-        jobId: jobId,
-        elapsedMs: requestStopwatch.elapsedMilliseconds,
-        telemetrySnapshot: telemetry.snapshot(),
-        intensity: intensity,
-      );
+      final responseBody = optimize_route_async
+          .buildOptimizeModeAsyncAcceptedBody(
+            deckId: deckId,
+            requestMode: requestMode,
+            jobId: jobId,
+            elapsedMs: requestStopwatch.elapsedMilliseconds,
+            telemetrySnapshot: telemetry.snapshot(),
+            intensity: intensity,
+          );
       optimize_route_request.attachRecommendationContextToOptimizeResponse(
         responseBody,
         recommendationContext,
       );
-      return Response.json(
-        statusCode: HttpStatus.accepted,
-        body: responseBody,
-      );
+      return Response.json(statusCode: HttpStatus.accepted, body: responseBody);
     }
 
     // MemÃ³ria de preferÃªncias do usuÃ¡rio (se autenticado):
     // aplica default somente quando o request nÃ£o enviar override explÃ­cito.
     final userPreferences = await telemetry.trackAsync(
       'request.user_preferences',
-      () => loadUserAiPreferences(
-        pool: pool,
-        userId: userId,
-      ),
+      () => loadUserAiPreferences(pool: pool, userId: userId),
     );
-    final bracket = hasBracketOverride
-        ? parsedBracket
-        : (userPreferences['preferred_bracket'] as int? ?? parsedBracket);
-    final keepTheme = hasKeepThemeOverride
-        ? (parsedKeepTheme ?? true)
-        : (userPreferences['keep_theme_default'] as bool? ?? true);
+    final bracket =
+        hasBracketOverride
+            ? parsedBracket
+            : (userPreferences['preferred_bracket'] as int? ?? parsedBracket);
+    final keepTheme =
+        hasKeepThemeOverride
+            ? (parsedKeepTheme ?? true)
+            : (userPreferences['keep_theme_default'] as bool? ?? true);
 
     late final optimize_request.OptimizeDeckContextData deckContext;
     try {
@@ -575,16 +558,14 @@ Future<Response> onRequest(RequestContext context) async {
     final deckSignature = deckContext.deckSignature;
     final cacheKey = deckContext.cacheKey;
 
-    final cachedResponse = semanticV2OptimizeEnforcementMode ==
-            SemanticV2OptimizeEnforcementMode.disabled
-        ? await telemetry.trackAsync(
-            'request.cache_lookup',
-            () => loadOptimizeCache(
-              pool: pool,
-              cacheKey: cacheKey,
-            ),
-          )
-        : null;
+    final cachedResponse =
+        semanticV2OptimizeEnforcementMode ==
+                SemanticV2OptimizeEnforcementMode.disabled
+            ? await telemetry.trackAsync(
+              'request.cache_lookup',
+              () => loadOptimizeCache(pool: pool, cacheKey: cacheKey),
+            )
+            : null;
     if (cachedResponse != null) {
       final responseBody = optimize_route_response.buildCachedOptimizeResponse(
         cachedResponse: cachedResponse,
@@ -688,6 +669,7 @@ Future<Response> onRequest(RequestContext context) async {
       List<String> validationWarningsOverride = const [],
       List<String> blockedByColorIdentityOverride = const [],
       List<Map<String, dynamic>> blockedByBracketOverride = const [],
+      bool persistOutcome = true,
     }) async {
       final responseBody = Map<String, dynamic>.from(body);
       optimize_route_request.attachRecommendationContextToOptimizeResponse(
@@ -704,26 +686,29 @@ Future<Response> onRequest(RequestContext context) async {
         ),
       );
       if (intensity.selected == 'aggressive') {
-        final existingDiagnostics = responseBody['optimize_diagnostics'] is Map
-            ? (responseBody['optimize_diagnostics'] as Map)
-                .cast<String, dynamic>()
-            : <String, dynamic>{};
+        final existingDiagnostics =
+            responseBody['optimize_diagnostics'] is Map
+                ? (responseBody['optimize_diagnostics'] as Map)
+                    .cast<String, dynamic>()
+                : <String, dynamic>{};
         responseBody['optimize_diagnostics'] = {
           ...existingDiagnostics,
           'aggressive_candidate_quality':
               buildAggressiveCandidateQualityDiagnostics(
-            returnedSwaps: optimize_route_response.countOptimizeResponseSwaps(
-              responseBody: responseBody,
-              effectiveMode: effectiveMode,
-            ),
-          ),
+                returnedSwaps: optimize_route_response
+                    .countOptimizeResponseSwaps(
+                      responseBody: responseBody,
+                      effectiveMode: effectiveMode,
+                    ),
+              ),
         };
       }
       if (validationReport?.functional.semanticLayerV2.isNotEmpty == true) {
-        final existingDiagnostics = responseBody['optimize_diagnostics'] is Map
-            ? (responseBody['optimize_diagnostics'] as Map)
-                .cast<String, dynamic>()
-            : <String, dynamic>{};
+        final existingDiagnostics =
+            responseBody['optimize_diagnostics'] is Map
+                ? (responseBody['optimize_diagnostics'] as Map)
+                    .cast<String, dynamic>()
+                : <String, dynamic>{};
         responseBody['optimize_diagnostics'] = {
           ...existingDiagnostics,
           'semantic_layer_v2': withOptimizationSemanticV2EnforcementDiagnostics(
@@ -741,21 +726,25 @@ Future<Response> onRequest(RequestContext context) async {
       );
       responseBody['timings'] ??= telemetry.snapshot();
       responseBody['stage_telemetry'] ??= responseBody['timings'];
-      final resolvedRemovals = removalsOverride ??
+      final resolvedRemovals =
+          removalsOverride ??
           ((responseBody['removals'] as List?)?.map((e) => '$e').toList() ??
               const <String>[]);
-      final resolvedAdditions = additionsOverride ??
+      final resolvedAdditions =
+          additionsOverride ??
           ((responseBody['additions'] as List?)?.map((e) => '$e').toList() ??
               const <String>[]);
-      final resolvedQualityError = responseBody['quality_error'] is Map
-          ? (responseBody['quality_error'] as Map).cast<String, dynamic>()
-          : null;
-      final resolvedValidationWarnings = validationWarningsOverride.isNotEmpty
-          ? validationWarningsOverride
-          : ((responseBody['validation_warnings'] as List?)
-                  ?.map((e) => '$e')
-                  .toList() ??
-              const <String>[]);
+      final resolvedQualityError =
+          responseBody['quality_error'] is Map
+              ? (responseBody['quality_error'] as Map).cast<String, dynamic>()
+              : null;
+      final resolvedValidationWarnings =
+          validationWarningsOverride.isNotEmpty
+              ? validationWarningsOverride
+              : ((responseBody['validation_warnings'] as List?)
+                      ?.map((e) => '$e')
+                      .toList() ??
+                  const <String>[]);
 
       // Integridade dos swaps: liga o conjunto remove/add ao estado do deck
       // (deck_signature) via SHA-256, para o caminho de aplicação verificar
@@ -769,50 +758,52 @@ Future<Response> onRequest(RequestContext context) async {
         if (integrity != null) responseBody['swap_integrity'] = integrity;
       }
 
-      await recordOptimizeAnalysisOutcome(
-        pool: pool,
-        deckId: deckId,
-        userId: userId,
-        commanderName: commanderNameForLogs,
-        commanderColors: commanderColorIdentity.toList(),
-        operationMode: responseBody['mode']?.toString() ?? effectiveMode,
-        requestedMode: requestMode,
-        targetArchetype: targetArchetype,
-        detectedTheme: themeProfile.theme,
-        deckAnalysis: deckAnalysis,
-        postAnalysis: postAnalysisOverride,
-        removals: resolvedRemovals,
-        additions: resolvedAdditions,
-        statusCode: statusCode,
-        qualityError: resolvedQualityError,
-        validationReport: validationReport,
-        validationWarnings: resolvedValidationWarnings,
-        blockedByColorIdentity: blockedByColorIdentityOverride,
-        blockedByBracket: blockedByBracketOverride,
-        commanderPriorityNames: optimizeCommanderPriorityNames,
-        commanderPrioritySource: optimizeCommanderPrioritySource,
-        deterministicSwapCandidates: deterministicSwapCandidates,
-        cacheKey: cacheKey,
-        executionTimeMs: requestStopwatch.elapsedMilliseconds,
-      );
-      await optimize_feedback.recordOptimizeMlFeedback(
-        connection: pool,
-        feedback: optimize_feedback.buildOptimizeMlFeedback(
+      if (persistOutcome) {
+        await recordOptimizeAnalysisOutcome(
+          pool: pool,
           deckId: deckId,
           userId: userId,
-          archetype: targetArchetype,
           commanderName: commanderNameForLogs,
+          commanderColors: commanderColorIdentity.toList(),
           operationMode: responseBody['mode']?.toString() ?? effectiveMode,
-          outcomeCode: responseBody['outcome_code']?.toString() ?? 'unknown',
-          statusCode: statusCode,
+          requestedMode: requestMode,
+          targetArchetype: targetArchetype,
+          detectedTheme: themeProfile.theme,
+          deckAnalysis: deckAnalysis,
+          postAnalysis: postAnalysisOverride,
           removals: resolvedRemovals,
           additions: resolvedAdditions,
+          statusCode: statusCode,
           qualityError: resolvedQualityError,
+          validationReport: validationReport,
           validationWarnings: resolvedValidationWarnings,
           blockedByColorIdentity: blockedByColorIdentityOverride,
           blockedByBracket: blockedByBracketOverride,
-        ),
-      );
+          commanderPriorityNames: optimizeCommanderPriorityNames,
+          commanderPrioritySource: optimizeCommanderPrioritySource,
+          deterministicSwapCandidates: deterministicSwapCandidates,
+          cacheKey: cacheKey,
+          executionTimeMs: requestStopwatch.elapsedMilliseconds,
+        );
+        await optimize_feedback.recordOptimizeMlFeedback(
+          connection: pool,
+          feedback: optimize_feedback.buildOptimizeMlFeedback(
+            deckId: deckId,
+            userId: userId,
+            archetype: targetArchetype,
+            commanderName: commanderNameForLogs,
+            operationMode: responseBody['mode']?.toString() ?? effectiveMode,
+            outcomeCode: responseBody['outcome_code']?.toString() ?? 'unknown',
+            statusCode: statusCode,
+            removals: resolvedRemovals,
+            additions: resolvedAdditions,
+            qualityError: resolvedQualityError,
+            validationWarnings: resolvedValidationWarnings,
+            blockedByColorIdentity: blockedByColorIdentityOverride,
+            blockedByBracket: blockedByBracketOverride,
+          ),
+        );
+      }
 
       telemetry.logSummary();
       return Response.json(statusCode: statusCode, body: responseBody);
@@ -841,6 +832,7 @@ Future<Response> onRequest(RequestContext context) async {
             trigger: 'deck_state_needs_repair',
             qualityCode: 'OPTIMIZE_NEEDS_REPAIR',
           ),
+          'cache': {'hit': false, 'cache_key': cacheKey},
         },
       );
     }
@@ -848,15 +840,13 @@ Future<Response> onRequest(RequestContext context) async {
     // 2. OtimizaÃ§Ã£o via DeckOptimizerService (IA + RAG)
     final disableCompleteAi = env['OPTIMIZE_COMPLETE_DISABLE_OPENAI'] == '1';
 
-    final deckOptimizer = (apiKey != null && apiKey.isNotEmpty)
-        ? DeckOptimizerService(apiKey, db: pool)
-        : null;
+    final deckOptimizer =
+        (apiKey != null && apiKey.isNotEmpty)
+            ? DeckOptimizerService(apiKey, db: pool)
+            : null;
 
     // Preparar dados para o otimizador
-    final deckData = {
-      'cards': allCardData,
-      'colors': deckColors.toList(),
-    };
+    final deckData = {'cards': allCardData, 'colors': deckColors.toList()};
 
     if (commanders.isNotEmpty) {
       try {
@@ -873,23 +863,24 @@ Future<Response> onRequest(RequestContext context) async {
               commanderName: commanderName,
             ),
           );
-          final metaSelectionFuture = commanderMetaScope == null
-              ? Future.value(
-                  emptyCommanderMetaReferenceSelection(
-                    commanderScope: commanderMetaScope,
-                  ),
-                )
-              : telemetry.trackAsync(
-                  'request.commander_priority_query',
-                  () => loadCommanderMetaReferenceSelection(
-                    pool: pool,
-                    commanderNames: commanders,
-                    limitDecks: 4,
-                    priorityCardLimit: 120,
-                    metaScope: commanderMetaScope,
-                    preferExternalCompetitive: true,
-                  ),
-                );
+          final metaSelectionFuture =
+              commanderMetaScope == null
+                  ? Future.value(
+                    emptyCommanderMetaReferenceSelection(
+                      commanderScope: commanderMetaScope,
+                    ),
+                  )
+                  : telemetry.trackAsync(
+                    'request.commander_priority_query',
+                    () => loadCommanderMetaReferenceSelection(
+                      pool: pool,
+                      commanderNames: commanders,
+                      limitDecks: 4,
+                      priorityCardLimit: 120,
+                      metaScope: commanderMetaScope,
+                      preferExternalCompetitive: true,
+                    ),
+                  );
           final results = await Future.wait<dynamic>([
             commanderReferenceFuture,
             metaSelectionFuture,
@@ -905,8 +896,9 @@ Future<Response> onRequest(RequestContext context) async {
           if (metaSelection.priorityCardNames.isNotEmpty) {
             optimizeCommanderPrioritySource =
                 metaSelection.optimizePrioritySource;
-            optimizeCommanderPriorityNames
-                .addAll(metaSelection.priorityCardNames);
+            optimizeCommanderPriorityNames.addAll(
+              metaSelection.priorityCardNames,
+            );
           }
           if (metaSelection.hasReferences) {
             optimizeMetaEvidenceContext = buildMetaDeckEvidenceText(
@@ -983,27 +975,29 @@ Future<Response> onRequest(RequestContext context) async {
     }
 
     try {
-      deterministicSwapCandidates.addAll(await telemetry.trackAsync(
-        'request.deterministic_shortlist',
-        () => buildDeterministicOptimizeSwapCandidates(
-          pool: pool,
-          allCardData: allCardData,
-          commanders: commanders,
-          commanderColorIdentity: commanderColorIdentity,
-          targetArchetype: effectiveOptimizeArchetype,
-          bracket: bracket,
-          keepTheme: keepTheme,
-          detectedTheme: themeProfile.theme,
-          coreCards: themeProfile.coreCards,
-          commanderPriorityNames: optimizeCommanderPriorityNames,
-          swapLimit: intensity.targetMax,
-          intensity: intensity.selected,
-          diagnosticsOut: aggressiveCandidateQualityDiagnostics,
-          userId: authenticatedUserId,
-          preferCollection: recommendationContext.preferCollection == true,
-          budgetLimitBrl: recommendationContext.budgetLimitBrl,
+      deterministicSwapCandidates.addAll(
+        await telemetry.trackAsync(
+          'request.deterministic_shortlist',
+          () => buildDeterministicOptimizeSwapCandidates(
+            pool: pool,
+            allCardData: allCardData,
+            commanders: commanders,
+            commanderColorIdentity: commanderColorIdentity,
+            targetArchetype: effectiveOptimizeArchetype,
+            bracket: bracket,
+            keepTheme: keepTheme,
+            detectedTheme: themeProfile.theme,
+            coreCards: themeProfile.coreCards,
+            commanderPriorityNames: optimizeCommanderPriorityNames,
+            swapLimit: intensity.targetMax,
+            intensity: intensity.selected,
+            diagnosticsOut: aggressiveCandidateQualityDiagnostics,
+            userId: authenticatedUserId,
+            preferCollection: recommendationContext.preferCollection == true,
+            budgetLimitBrl: recommendationContext.budgetLimitBrl,
+          ),
         ),
-      ));
+      );
       if (deterministicSwapCandidates.isNotEmpty) {
         Log.d(
           'Optimize deterministic shortlist carregado: ${deterministicSwapCandidates.length} swap(s)',
@@ -1029,7 +1023,7 @@ Future<Response> onRequest(RequestContext context) async {
           statusCode: HttpStatus.badRequest,
           body: {
             'error':
-                'Selecione um comandante antes de completar um deck $deckFormat.'
+                'Selecione um comandante antes de completar um deck $deckFormat.',
           },
         );
       }
@@ -1073,44 +1067,43 @@ Future<Response> onRequest(RequestContext context) async {
         recommendationContext: recommendationContext,
       );
 
-      final responseBody =
-          optimize_route_async.buildCompleteModeAsyncAcceptedBody(
-        jobId: jobId,
-        telemetrySnapshot: telemetry.snapshot(),
-        intensity: intensity,
-      );
+      final responseBody = optimize_route_async
+          .buildCompleteModeAsyncAcceptedBody(
+            jobId: jobId,
+            telemetrySnapshot: telemetry.snapshot(),
+            intensity: intensity,
+          );
       optimize_route_request.attachRecommendationContextToOptimizeResponse(
         responseBody,
         recommendationContext,
       );
-      return Response.json(
-        statusCode: HttpStatus.accepted,
-        body: responseBody,
-      );
+      return Response.json(statusCode: HttpStatus.accepted, body: responseBody);
     }
 
     // ================================================================
     //  SYNC MODE: optimize simples (troca de cartas) â€” roda inline
     // ================================================================
     if (deckOptimizer == null) {
-      // Mock response for development (optimize-only).
+      // Mock response for development (optimize-only). It is deliberately
+      // non-actionable and excluded from telemetry/ML learning so a local
+      // environment connected to shared data cannot promote fabricated swaps.
       return respondWithOptimizeTelemetry(
         statusCode: HttpStatus.ok,
         body: {
-          'removals':
-              ['Basic Land', 'Weak Card'].take(intensity.targetMax).toList(),
-          'additions':
-              ['Sol Ring', 'Arcane Signet'].take(intensity.targetMax).toList(),
+          'removals': const <String>[],
+          'additions': const <String>[],
           'reasoning':
-              'Mock optimization (No API Key): Adicionando staples recomendados.',
+              'Mock optimization (No API Key): preview nao acionavel; configure o provedor para receber trocas reais.',
           'deck_analysis': deckAnalysis,
-          'constraints': {
-            'keep_theme': keepTheme,
-          },
+          'constraints': {'keep_theme': keepTheme},
           'theme': themeProfile.toJson(),
           'mode': 'optimize',
-          'is_mock': true
+          'outcome_code': 'mock_non_actionable',
+          'can_apply': false,
+          'learning_eligible': false,
+          'is_mock': true,
         },
+        persistOutcome: false,
       );
     }
 
@@ -1162,21 +1155,25 @@ Future<Response> onRequest(RequestContext context) async {
     } else {
       final aiResponse = await runAiOptimizeAttempt(trigger: 'primary');
       if (aiResponse == null) {
-        final executionFailedButPreserved = deckState.status == 'healthy' &&
+        final executionFailedButPreserved =
+            deckState.status == 'healthy' &&
             deckState.recommendedMode == 'optimize';
         return respondWithOptimizeTelemetry(
-          statusCode: executionFailedButPreserved
-              ? HttpStatus.unprocessableEntity
-              : HttpStatus.internalServerError,
+          statusCode:
+              executionFailedButPreserved
+                  ? HttpStatus.unprocessableEntity
+                  : HttpStatus.internalServerError,
           body: {
-            'error': executionFailedButPreserved
-                ? 'Nenhuma otimizacao segura foi produzida; deck original preservado.'
-                : 'Optimization failed',
+            'error':
+                executionFailedButPreserved
+                    ? 'Nenhuma otimizacao segura foi produzida; deck original preservado.'
+                    : 'Optimization failed',
             'quality_error': {
               'code': 'OPTIMIZE_EXECUTION_FAILED',
-              'message': executionFailedButPreserved
-                  ? 'A execucao da otimizacao falhou; o deck original foi preservado em estado saudÃ¡vel.'
-                  : 'A execucao da otimizacao falhou antes da validacao final.',
+              'message':
+                  executionFailedButPreserved
+                      ? 'A execucao da otimizacao falhou; o deck original foi preservado em estado saudÃ¡vel.'
+                      : 'A execucao da otimizacao falhou antes da validacao final.',
               'details':
                   'Falha ao executar optimizeDeck na tentativa primaria.',
             },
@@ -1191,10 +1188,7 @@ Future<Response> onRequest(RequestContext context) async {
     while (true) {
       jsonResponse = telemetry.trackSync(
         'request.normalize_payload',
-        () => normalizeOptimizePayload(
-          jsonResponse,
-          defaultMode: 'optimize',
-        ),
+        () => normalizeOptimizePayload(jsonResponse, defaultMode: 'optimize'),
       );
 
       // Se o modo complete jÃ¡ veio â€œdeterminÃ­sticoâ€ (com card_id/quantity),
@@ -1225,6 +1219,8 @@ Future<Response> onRequest(RequestContext context) async {
           bracket: bracket,
           deckAnalysis: deckAnalysis,
           jsonResponse: jsonResponse,
+          targetArchetype: targetArchetype,
+          intensity: intensity.selected,
         );
         responseBody['intensity'] = intensity.selected;
         responseBody['optimize_intensity'] = intensity.toJson(
@@ -1257,10 +1253,11 @@ Future<Response> onRequest(RequestContext context) async {
       final recognizedSuggestionFormat =
           parsedSuggestions['recognized_format'] as bool? ?? false;
 
-      final deckNamesLower = allCardData
-          .map((c) => ((c['name'] as String?) ?? '').toLowerCase())
-          .where((n) => n.isNotEmpty)
-          .toSet();
+      final deckNamesLower =
+          allCardData
+              .map((c) => ((c['name'] as String?) ?? '').toLowerCase())
+              .where((n) => n.isNotEmpty)
+              .toSet();
       final commanderLower = commanders.map((c) => c.toLowerCase()).toSet();
       final coreLower =
           themeProfile.coreCards.map((c) => c.toLowerCase()).toSet();
@@ -1276,10 +1273,10 @@ Future<Response> onRequest(RequestContext context) async {
         _emptySuggestionFallbackTriggeredCount++;
         final fallbackRemovalCandidates = optimize_route_empty_fallback
             .selectEmptySuggestionFallbackRemovalCandidates(
-          allCardData: allCardData,
-          commanderLower: commanderLower,
-          coreLower: coreLower,
-        );
+              allCardData: allCardData,
+              commanderLower: commanderLower,
+              coreLower: coreLower,
+            );
         emptySuggestionFallbackCandidateCount =
             fallbackRemovalCandidates.length;
 
@@ -1297,18 +1294,19 @@ Future<Response> onRequest(RequestContext context) async {
             removedCards: fallbackRemovalCandidates,
             excludeNames: deckNamesLower,
             allCardData: allCardData,
-            preferredNames: optimizeCommanderPriorityNames
-                .map((name) => name.toLowerCase())
-                .toSet(),
+            preferredNames:
+                optimizeCommanderPriorityNames
+                    .map((name) => name.toLowerCase())
+                    .toSet(),
             userId: authenticatedUserId,
             preferCollection: recommendationContext.preferCollection == true,
             budgetLimitBrl: recommendationContext.budgetLimitBrl,
           );
           final fallbackApplication = optimize_route_empty_fallback
               .buildEmptySuggestionFallbackApplication(
-            removalCandidates: fallbackRemovalCandidates,
-            replacements: replacements,
-          );
+                removalCandidates: fallbackRemovalCandidates,
+                replacements: replacements,
+              );
           emptySuggestionFallbackReplacementCount =
               fallbackApplication.replacementCount;
           emptySuggestionFallbackPairCount = fallbackApplication.pairCount;
@@ -1320,16 +1318,17 @@ Future<Response> onRequest(RequestContext context) async {
             _emptySuggestionFallbackAppliedCount++;
             emptySuggestionFallbackReason = fallbackApplication.successReason;
             Log.i(
-                'âœ… [AI Optimize] Fallback aplicado com ${fallbackApplication.pairCount} swap(s) apÃ³s retorno vazio da IA.');
+              'âœ… [AI Optimize] Fallback aplicado com ${fallbackApplication.pairCount} swap(s) apÃ³s retorno vazio da IA.',
+            );
           }
         }
 
         if (!emptySuggestionFallbackApplied) {
           emptySuggestionFallbackReason = optimize_route_empty_fallback
               .buildEmptySuggestionFallbackFailureReason(
-            hasRemovalCandidates: fallbackRemovalCandidates.isNotEmpty,
-            replacementCount: emptySuggestionFallbackReplacementCount,
-          );
+                hasRemovalCandidates: fallbackRemovalCandidates.isNotEmpty,
+                replacementCount: emptySuggestionFallbackReplacementCount,
+              );
           if (fallbackRemovalCandidates.isEmpty) {
             _emptySuggestionFallbackNoCandidateCount++;
           } else if (emptySuggestionFallbackReplacementCount == 0) {
@@ -1342,10 +1341,12 @@ Future<Response> onRequest(RequestContext context) async {
       if (removals.isEmpty && additions.isEmpty && !isComplete) {
         if (recognizedSuggestionFormat) {
           Log.d(
-              'â„¹ï¸ [AI Optimize] Payload reconhecido, mas sem sugestÃµes Ãºteis (provÃ¡vel filtro/retorno vazio). Keys: ${jsonResponse.keys.toList()}');
+            'â„¹ï¸ [AI Optimize] Payload reconhecido, mas sem sugestÃµes Ãºteis (provÃ¡vel filtro/retorno vazio). Keys: ${jsonResponse.keys.toList()}',
+          );
         } else {
           Log.w(
-              'âš ï¸ [AI Optimize] IA retornou formato nÃ£o reconhecido. Keys: ${jsonResponse.keys.toList()}');
+            'âš ï¸ [AI Optimize] IA retornou formato nÃ£o reconhecido. Keys: ${jsonResponse.keys.toList()}',
+          );
         }
       }
 
@@ -1353,14 +1354,16 @@ Future<Response> onRequest(RequestContext context) async {
       if (isComplete) {
         removals = [];
         // Quando veio do loop, preferimos additions_detailed.
-        final fromDetailed = (jsonResponse['additions_detailed'] as List?)
-            ?.whereType<Map>()
-            .toList();
+        final fromDetailed =
+            (jsonResponse['additions_detailed'] as List?)
+                ?.whereType<Map>()
+                .toList();
         if (fromDetailed != null && fromDetailed.isNotEmpty) {
-          additions = fromDetailed
-              .map((m) => (m['name'] ?? '').toString())
-              .where((s) => s.trim().isNotEmpty)
-              .toList();
+          additions =
+              fromDetailed
+                  .map((m) => (m['name'] ?? '').toString())
+                  .where((s) => s.trim().isNotEmpty)
+                  .toList();
         } else {
           additions =
               (jsonResponse['additions'] as List?)?.cast<String>() ?? [];
@@ -1369,22 +1372,23 @@ Future<Response> onRequest(RequestContext context) async {
 
       final initialSuggestionFilters = optimize_route_suggestion_filter
           .buildInitialOptimizeSuggestionFilters(
-        removals: removals,
-        additions: additions,
-        deckNamesLower: deckNamesLower,
-        commanderLower: commanderLower,
-        coreLower: coreLower,
-        keepTheme: keepTheme,
-        isComplete: isComplete,
-      );
+            removals: removals,
+            additions: additions,
+            deckNamesLower: deckNamesLower,
+            commanderLower: commanderLower,
+            coreLower: coreLower,
+            keepTheme: keepTheme,
+            isComplete: isComplete,
+          );
       var sanitizedRemovals = initialSuggestionFilters.removals;
       var sanitizedAdditions = initialSuggestionFilters.additions;
       blockedByTheme.addAll(initialSuggestionFilters.blockedByTheme);
 
       // Validar todas as cartas sugeridas
       final allSuggestions = [...sanitizedRemovals, ...sanitizedAdditions];
-      final validation =
-          await validationService.validateCardNames(allSuggestions);
+      final validation = await validationService.validateCardNames(
+        allSuggestions,
+      );
       final validList =
           (validation['valid'] as List).cast<Map<String, dynamic>>();
       final validByNameLower = <String, Map<String, dynamic>>{};
@@ -1394,20 +1398,27 @@ Future<Response> onRequest(RequestContext context) async {
       }
 
       // Filtrar apenas cartas vÃ¡lidas e remover duplicatas
-      var validRemovals = sanitizedRemovals
-          .where((name) {
-            return (validation['valid'] as List).any((card) =>
-                (card['name'] as String).toLowerCase() == name.toLowerCase());
-          })
-          .toSet()
-          .toList();
+      var validRemovals =
+          sanitizedRemovals
+              .where((name) {
+                return (validation['valid'] as List).any(
+                  (card) =>
+                      (card['name'] as String).toLowerCase() ==
+                      name.toLowerCase(),
+                );
+              })
+              .toSet()
+              .toList();
 
       // No modo complete, preservamos repetiÃ§Ã£o (para bÃ¡sicos) e ordem.
       // No modo optimize (swaps), mantemos set para evitar duplicatas.
-      var validAdditions = sanitizedAdditions.where((name) {
-        return (validation['valid'] as List).any((card) =>
-            (card['name'] as String).toLowerCase() == name.toLowerCase());
-      }).toList();
+      var validAdditions =
+          sanitizedAdditions.where((name) {
+            return (validation['valid'] as List).any(
+              (card) =>
+                  (card['name'] as String).toLowerCase() == name.toLowerCase(),
+            );
+          }).toList();
       if (!isComplete) {
         validAdditions = validAdditions.toSet().toList();
       }
@@ -1435,15 +1446,14 @@ Future<Response> onRequest(RequestContext context) async {
         for (final row in additionsIdentityResult) {
           final name = (row[0] as String).toLowerCase();
           final rawColorIdentity = row[1] as List?;
-          final colorIdentity =
-              rawColorIdentity?.cast<String>() ?? const <String>[];
           final colors = (row[2] as List?)?.cast<String>() ?? const <String>[];
           final oracleText = row[3] as String? ?? '';
-          final resolvedIdentity = resolvedCardIdentityFromParts(
-            colorIdentity: colorIdentity,
-            colors: colors,
-            oracleText: oracleText,
-          ).toList();
+          final resolvedIdentity =
+              resolvedCardIdentityFromParts(
+                colorIdentity: rawColorIdentity?.cast<String>(),
+                colors: colors,
+                oracleText: oracleText,
+              ).toList();
           if (rawColorIdentity != null || resolvedIdentity.isNotEmpty) {
             identityByName[name] = resolvedIdentity;
           }
@@ -1451,15 +1461,17 @@ Future<Response> onRequest(RequestContext context) async {
 
         final colorIdentityFilter = optimize_route_color_identity_filter
             .filterOptimizeAdditionsByCommanderIdentity(
-          validAdditions: validAdditions,
-          identityByName: identityByName,
-          commanderColorIdentity: commanderColorIdentity,
-        );
+              validAdditions: validAdditions,
+              identityByName: identityByName,
+              commanderColorIdentity: commanderColorIdentity,
+            );
         validAdditions = colorIdentityFilter.additions;
-        filteredByColorIdentity
-            .addAll(colorIdentityFilter.filteredByColorIdentity);
-        filteredByMissingIdentity
-            .addAll(colorIdentityFilter.filteredByMissingIdentity);
+        filteredByColorIdentity.addAll(
+          colorIdentityFilter.filteredByColorIdentity,
+        );
+        filteredByMissingIdentity.addAll(
+          colorIdentityFilter.filteredByMissingIdentity,
+        );
       }
 
       // Bracket policy (intermediÃ¡rio): bloqueia cartas "acima do bracket" baseado no deck atual.
@@ -1477,24 +1489,25 @@ Future<Response> onRequest(RequestContext context) async {
           '''),
           parameters: {'names': validAdditions},
         );
-        final additionsInfo = additionsInfoResult
-            .map(
-              (row) => optimize_route_bracket_policy_filter
-                  .buildOptimizeBracketAdditionCardData(
-                name: row[0],
-                typeLine: row[1],
-                oracleText: row[2],
-              ),
-            )
-            .toList();
+        final additionsInfo =
+            additionsInfoResult
+                .map(
+                  (row) => optimize_route_bracket_policy_filter
+                      .buildOptimizeBracketAdditionCardData(
+                        name: row[0],
+                        typeLine: row[1],
+                        oracleText: row[2],
+                      ),
+                )
+                .toList();
 
         final bracketFilter = optimize_route_bracket_policy_filter
             .filterOptimizeAdditionsByBracketPolicy(
-          bracket: bracket,
-          currentDeckCards: allCardData,
-          additionsCardsData: additionsInfo,
-          validAdditions: validAdditions,
-        );
+              bracket: bracket,
+              currentDeckCards: allCardData,
+              additionsCardsData: additionsInfo,
+              validAdditions: validAdditions,
+            );
 
         blockedByBracket.addAll(bracketFilter.blockedByBracket);
         validAdditions = bracketFilter.additions;
@@ -1508,25 +1521,25 @@ Future<Response> onRequest(RequestContext context) async {
         final desired =
             targetAdditions > 0 ? targetAdditions : validAdditions.length;
         final basicNames = basicLandNamesForIdentity(commanderColorIdentity);
-        final topUpSeed =
-            optimize_route_complete_top_up.buildOptimizeCompleteTopUpSeed(
-          validAdditions: validAdditions,
-          desired: desired,
-          basicNames: basicNames,
-          deckFormat: deckFormat,
-        );
+        final topUpSeed = optimize_route_complete_top_up
+            .buildOptimizeCompleteTopUpSeed(
+              validAdditions: validAdditions,
+              desired: desired,
+              basicNames: basicNames,
+              deckFormat: deckFormat,
+            );
 
         Map<String, String> basicsWithIds = const {};
         if (topUpSeed.missing > 0) {
           basicsWithIds = await loadBasicLandIds(pool, basicNames);
         }
 
-        final topUpResult =
-            optimize_route_complete_top_up.buildOptimizeCompleteTopUpResult(
-          seed: topUpSeed,
-          basicIdsByName: basicsWithIds,
-          validByNameLower: validByNameLower,
-        );
+        final topUpResult = optimize_route_complete_top_up
+            .buildOptimizeCompleteTopUpResult(
+              seed: topUpSeed,
+              basicIdsByName: basicsWithIds,
+              validByNameLower: validByNameLower,
+            );
         additionsDetailed.addAll(topUpResult.additionsDetailed);
 
         // MantÃ©m additions como lista simples (Ãºnica) para UI; o app aplica via additions_detailed.
@@ -1538,38 +1551,71 @@ Future<Response> onRequest(RequestContext context) async {
       // de sinergia â€” NÃƒO preencher com lands genÃ©ricos. O propÃ³sito Ã© OTIMIZAR.
 
       if (!isComplete) {
+        final landProtectionAdditionData = <Map<String, dynamic>>[];
+        if (validAdditions.isNotEmpty) {
+          final rows = await pool.execute(
+            Sql.named('''
+              SELECT name, type_line
+              FROM cards
+              WHERE name = ANY(@names)
+            '''),
+            parameters: {'names': validAdditions},
+          );
+          landProtectionAdditionData.addAll(
+            rows.map(
+              (row) => <String, dynamic>{'name': row[0], 'type_line': row[1]},
+            ),
+          );
+        }
         final landProtectionResult = optimize_route_land_removal_protection
             .applyOptimizeLandRemovalProtection(
-          removals: validRemovals,
-          allCardData: allCardData,
-        );
+              removals: validRemovals,
+              allCardData: allCardData,
+              additions: validAdditions,
+              additionsCardData: landProtectionAdditionData,
+              profileRoleTargets: optimizeCommanderRoleTargets,
+            );
         validRemovals = landProtectionResult.removals;
+        validAdditions = landProtectionResult.additions;
 
         if (landProtectionResult.blockedCount > 0) {
           Log.d(
-              'Land protection: blocked ${landProtectionResult.blockedCount} land removals (deck has ${landProtectionResult.currentLandCount} lands, safe minimum=${landProtectionResult.minSafeLands})');
+            'Land protection: blocked ${landProtectionResult.blockedCount} '
+            'land removals (current=${landProtectionResult.currentLandCount}, '
+            'projected=${landProtectionResult.projectedLandCount}, '
+            'safe minimum=${landProtectionResult.minSafeLands})',
+          );
+        }
+        if (!landProtectionResult.floorSatisfied) {
+          Log.w(
+            'Land protection: proposta descartada porque o deck atual tem '
+            '${landProtectionResult.currentLandCount} terrenos, abaixo do '
+            'piso ${landProtectionResult.minSafeLands}.',
+          );
         }
       }
 
       if (!isComplete && validRemovals.length != validAdditions.length) {
         Log.d('Re-balanceamento pÃ³s-filtros:');
         Log.d(
-            '  Antes: removals=${validRemovals.length}, additions=${validAdditions.length}');
-        final rebalancePlan =
-            optimize_route_rebalance.buildOptimizeRebalancePlan(
-          removals: validRemovals,
-          additions: validAdditions,
-          deckNamesLower: deckNamesLower,
-          filteredByColorIdentity: [
-            ...filteredByColorIdentity,
-            ...filteredByMissingIdentity,
-          ],
+          '  Antes: removals=${validRemovals.length}, additions=${validAdditions.length}',
         );
+        final rebalancePlan = optimize_route_rebalance
+            .buildOptimizeRebalancePlan(
+              removals: validRemovals,
+              additions: validAdditions,
+              deckNamesLower: deckNamesLower,
+              filteredByColorIdentity: [
+                ...filteredByColorIdentity,
+                ...filteredByMissingIdentity,
+              ],
+            );
 
         if (rebalancePlan.needsReplacements) {
           // CORREÃ‡ÃƒO REAL: Re-consultar a IA para cartas substitutas
           Log.d(
-              '  Faltam ${rebalancePlan.missingCount} adiÃ§Ãµes - consultando IA para substitutas sinÃ©rgicas');
+            '  Faltam ${rebalancePlan.missingCount} adiÃ§Ãµes - consultando IA para substitutas sinÃ©rgicas',
+          );
 
           try {
             final replacementResult = await findSynergyReplacements(
@@ -1585,25 +1631,28 @@ Future<Response> onRequest(RequestContext context) async {
               removedCards: rebalancePlan.removedButUnmatched,
               excludeNames: rebalancePlan.excludeNames,
               allCardData: allCardData,
-              preferredNames: optimizeCommanderPriorityNames
-                  .map((name) => name.toLowerCase())
-                  .toSet(),
+              preferredNames:
+                  optimizeCommanderPriorityNames
+                      .map((name) => name.toLowerCase())
+                      .toSet(),
               userId: authenticatedUserId,
               preferCollection: recommendationContext.preferCollection == true,
               budgetLimitBrl: recommendationContext.budgetLimitBrl,
             );
 
             if (replacementResult.isNotEmpty) {
-              final replacementApplication =
-                  optimize_route_rebalance.applyOptimizeRebalanceReplacements(
-                additions: validAdditions,
-                replacements: replacementResult,
-              );
+              final replacementApplication = optimize_route_rebalance
+                  .applyOptimizeRebalanceReplacements(
+                    additions: validAdditions,
+                    replacements: replacementResult,
+                  );
               validAdditions = replacementApplication.additions;
-              validByNameLower
-                  .addAll(replacementApplication.validByNameLowerUpdates);
+              validByNameLower.addAll(
+                replacementApplication.validByNameLowerUpdates,
+              );
               Log.d(
-                  '  IA sugeriu ${replacementApplication.addedCount} substitutas sinÃ©rgicas');
+                '  IA sugeriu ${replacementApplication.addedCount} substitutas sinÃ©rgicas',
+              );
             }
 
             // Se AINDA faltar (IA nÃ£o conseguiu preencher tudo), TRUNCAR remoÃ§Ãµes
@@ -1612,39 +1661,41 @@ Future<Response> onRequest(RequestContext context) async {
             if (validAdditions.length < validRemovals.length) {
               final stillMissing = validRemovals.length - validAdditions.length;
               Log.d(
-                  '  Ainda faltam $stillMissing - truncando remoÃ§Ãµes (nÃ£o preencher com bÃ¡sicos em optimize)');
-              final trimResult =
-                  optimize_route_rebalance.trimOptimizeRebalanceToPairs(
-                removals: validRemovals,
-                additions: validAdditions,
+                '  Ainda faltam $stillMissing - truncando remoÃ§Ãµes (nÃ£o preencher com bÃ¡sicos em optimize)',
               );
+              final trimResult = optimize_route_rebalance
+                  .trimOptimizeRebalanceToPairs(
+                    removals: validRemovals,
+                    additions: validAdditions,
+                  );
               validRemovals = trimResult.removals;
               validAdditions = trimResult.additions;
             }
           } catch (e) {
             Log.w('Falha ao buscar substitutas IA: $e - usando fallback');
             // Fallback: truncar remoÃ§Ãµes para nÃ£o perder cartas
-            final trimResult =
-                optimize_route_rebalance.trimOptimizeRebalanceToPairs(
-              removals: validRemovals,
-              additions: validAdditions,
-            );
+            final trimResult = optimize_route_rebalance
+                .trimOptimizeRebalanceToPairs(
+                  removals: validRemovals,
+                  additions: validAdditions,
+                );
             validRemovals = trimResult.removals;
             validAdditions = trimResult.additions;
           }
         } else {
           // Mais adiÃ§Ãµes que remoÃ§Ãµes: truncar adiÃ§Ãµes
-          final trimResult =
-              optimize_route_rebalance.trimOptimizeRebalanceToPairs(
-            removals: validRemovals,
-            additions: validAdditions,
-          );
+          final trimResult = optimize_route_rebalance
+              .trimOptimizeRebalanceToPairs(
+                removals: validRemovals,
+                additions: validAdditions,
+              );
           validRemovals = trimResult.removals;
           validAdditions = trimResult.additions;
         }
 
         Log.d(
-            '  Depois: removals=${validRemovals.length}, additions=${validAdditions.length}');
+          '  Depois: removals=${validRemovals.length}, additions=${validAdditions.length}',
+        );
       }
 
       if (!isComplete &&
@@ -1654,11 +1705,11 @@ Future<Response> onRequest(RequestContext context) async {
         final recommendationConstraintResult =
             await optimize_route_recommendation_context
                 .applyOptimizeRecommendationConstraints(
-          pool: pool,
-          userId: authenticatedUserId,
-          validAdditions: validAdditions,
-          context: recommendationContext,
-        );
+                  pool: pool,
+                  userId: authenticatedUserId,
+                  validAdditions: validAdditions,
+                  context: recommendationContext,
+                );
         recommendationDetailsByName
           ..clear()
           ..addAll(recommendationConstraintResult.detailsByNameLower);
@@ -1671,11 +1722,11 @@ Future<Response> onRequest(RequestContext context) async {
         }
         validAdditions = recommendationConstraintResult.additions;
         if (validAdditions.length < validRemovals.length) {
-          final trimResult =
-              optimize_route_rebalance.trimOptimizeRebalanceToPairs(
-            removals: validRemovals,
-            additions: validAdditions,
-          );
+          final trimResult = optimize_route_rebalance
+              .trimOptimizeRebalanceToPairs(
+                removals: validRemovals,
+                additions: validAdditions,
+              );
           validRemovals = trimResult.removals;
           validAdditions = trimResult.additions;
         }
@@ -1695,6 +1746,14 @@ Future<Response> onRequest(RequestContext context) async {
               'blocked_by_bracket': blockedByBracket,
             },
             'mode': 'optimize',
+            'strategy_source':
+                jsonResponse['strategy_source'] ??
+                (deterministicFirstEnabled
+                    ? 'deterministic_first'
+                    : 'ai_primary'),
+            if (jsonResponse['fallback_trigger'] != null)
+              'fallback_trigger': jsonResponse['fallback_trigger'],
+            'cache': {'hit': false, 'cache_key': cacheKey},
             'removals': validRemovals,
             'additions': validAdditions,
             'deck_analysis': deckAnalysis,
@@ -1729,17 +1788,19 @@ Future<Response> onRequest(RequestContext context) async {
       if (commanders.isNotEmpty && validAdditions.isNotEmpty) {
         try {
           final edhrecService = optimizer.edhrecService;
-          edhrecValidationData = await edhrecService
-              .fetchCommanderData(commanders.firstOrNull ?? "");
+          edhrecValidationData = await edhrecService.fetchCommanderData(
+            commanders.firstOrNull ?? "",
+          );
 
           if (edhrecValidationData != null &&
               edhrecValidationData.topCards.isNotEmpty) {
-            additionsNotInEdhrec =
-                optimize_route_post_validation.collectAdditionsNotInEdhrec(
-              validAdditions: validAdditions,
-              containsCard: (addition) =>
-                  edhrecValidationData!.findCard(addition) != null,
-            );
+            additionsNotInEdhrec = optimize_route_post_validation
+                .collectAdditionsNotInEdhrec(
+                  validAdditions: validAdditions,
+                  containsCard:
+                      (addition) =>
+                          edhrecValidationData!.findCard(addition) != null,
+                );
 
             if (additionsNotInEdhrec.isNotEmpty) {
               validationWarnings.addAll(
@@ -1759,11 +1820,11 @@ Future<Response> onRequest(RequestContext context) async {
       // 3. ComparaÃ§Ã£o de Tema: verificar se tema detectado corresponde aos temas EDHREC
       if (edhrecValidationData != null &&
           edhrecValidationData.themes.isNotEmpty) {
-        final themeWarning =
-            optimize_route_post_validation.buildThemeMismatchWarning(
-          targetArchetype: targetArchetype,
-          edhrecThemes: edhrecValidationData.themes,
-        );
+        final themeWarning = optimize_route_post_validation
+            .buildThemeMismatchWarning(
+              targetArchetype: targetArchetype,
+              edhrecThemes: edhrecValidationData.themes,
+            );
         if (themeWarning != null) {
           validationWarnings.add(themeWarning);
         }
@@ -1777,10 +1838,10 @@ Future<Response> onRequest(RequestContext context) async {
         try {
           var additionsData = await optimize_route_addition_data
               .fetchOptimizeAdditionDataForQualityGate(
-            pool,
-            validAdditions: validAdditions,
-            validByNameLower: validByNameLower,
-          );
+                pool,
+                validAdditions: validAdditions,
+                validByNameLower: validByNameLower,
+              );
 
           if (!isComplete) {
             final gateResult = filterUnsafeOptimizeSwapsByCardData(
@@ -1812,10 +1873,11 @@ Future<Response> onRequest(RequestContext context) async {
 
               final safeAdditionNames =
                   validAdditions.map((name) => name.toLowerCase()).toSet();
-              additionsData = additionsData.where((card) {
-                final name = (card['name'] as String?)?.toLowerCase() ?? '';
-                return safeAdditionNames.contains(name);
-              }).toList();
+              additionsData =
+                  additionsData.where((card) {
+                    final name = (card['name'] as String?)?.toLowerCase() ?? '';
+                    return safeAdditionNames.contains(name);
+                  }).toList();
             }
 
             if (intensity.selected == 'aggressive' &&
@@ -1830,21 +1892,22 @@ Future<Response> onRequest(RequestContext context) async {
               );
               final safeAdditionNames =
                   validAdditions.map((name) => name.toLowerCase()).toSet();
-              additionsData = additionsData.where((card) {
-                final name = (card['name'] as String?)?.toLowerCase() ?? '';
-                return safeAdditionNames.contains(name);
-              }).toList();
+              additionsData =
+                  additionsData.where((card) {
+                    final name = (card['name'] as String?)?.toLowerCase() ?? '';
+                    return safeAdditionNames.contains(name);
+                  }).toList();
             }
 
             if (validRemovals.isEmpty || validAdditions.isEmpty) {
-              final retryPlan =
-                  optimize_route_retry.buildOptimizeAiFallbackRetryPlan(
-                deterministicFirstEnabled: deterministicFirstEnabled,
-                fallbackAlreadyAttempted: optimizeFallbackAttempted,
-                strategySource: jsonResponse['strategy_source']?.toString(),
-                qualityErrorCode: 'OPTIMIZE_NO_SAFE_SWAPS',
-                isComplete: isComplete,
-              );
+              final retryPlan = optimize_route_retry
+                  .buildOptimizeAiFallbackRetryPlan(
+                    deterministicFirstEnabled: deterministicFirstEnabled,
+                    fallbackAlreadyAttempted: optimizeFallbackAttempted,
+                    strategySource: jsonResponse['strategy_source']?.toString(),
+                    qualityErrorCode: 'OPTIMIZE_NO_SAFE_SWAPS',
+                    isComplete: isComplete,
+                  );
               if (retryPlan.shouldRetry && retryPlan.trigger != null) {
                 optimizeFallbackAttempted = true;
                 final aiFallbackResponse = await runAiOptimizeAttempt(
@@ -1861,15 +1924,23 @@ Future<Response> onRequest(RequestContext context) async {
                 statusCode: HttpStatus.unprocessableEntity,
                 body: optimize_route_quality_rejection
                     .buildNoSafeSwapsRejectedBody(
-                  optimizeIntensity: intensity.toJson(
-                    candidateSwaps: deterministicSwapCandidates.length,
-                    returnedSwaps: 0,
-                    qualityGateDropped: qualityGateDroppedCount,
-                  ),
-                  droppedSwaps: qualityGateWarnings,
-                  removals: validRemovals,
-                  additions: validAdditions,
-                ),
+                      strategySource:
+                          jsonResponse['strategy_source']?.toString() ??
+                          (deterministicFirstEnabled
+                              ? 'deterministic_first'
+                              : 'ai_primary'),
+                      cacheKey: cacheKey,
+                      fallbackTrigger:
+                          jsonResponse['fallback_trigger']?.toString(),
+                      optimizeIntensity: intensity.toJson(
+                        candidateSwaps: deterministicSwapCandidates.length,
+                        returnedSwaps: 0,
+                        qualityGateDropped: qualityGateDroppedCount,
+                      ),
+                      droppedSwaps: qualityGateWarnings,
+                      removals: validRemovals,
+                      additions: validAdditions,
+                    ),
                 removalsOverride: validRemovals,
                 additionsOverride: validAdditions,
                 validationWarningsOverride: qualityGateWarnings,
@@ -1879,16 +1950,16 @@ Future<Response> onRequest(RequestContext context) async {
             }
           }
 
-          final virtualPostAnalysis =
-              optimize_route_virtual_analysis.buildOptimizeVirtualPostAnalysis(
-            originalDeck: allCardData,
-            validRemovals: validRemovals,
-            validAdditions: validAdditions,
-            additionsData: additionsData,
-            deckColors: deckColors,
-            deckAnalysis: deckAnalysis,
-            effectiveOptimizeArchetype: effectiveOptimizeArchetype,
-          );
+          final virtualPostAnalysis = optimize_route_virtual_analysis
+              .buildOptimizeVirtualPostAnalysis(
+                originalDeck: allCardData,
+                validRemovals: validRemovals,
+                validAdditions: validAdditions,
+                additionsData: additionsData,
+                deckColors: deckColors,
+                deckAnalysis: deckAnalysis,
+                effectiveOptimizeArchetype: effectiveOptimizeArchetype,
+              );
           final virtualDeck = virtualPostAnalysis.virtualDeck;
           postAnalysis = virtualPostAnalysis.postAnalysis;
           validationWarnings.addAll(virtualPostAnalysis.validationWarnings);
@@ -1899,34 +1970,36 @@ Future<Response> onRequest(RequestContext context) async {
           try {
             final themeService = ThemeContextualRulesService(pool);
             final validator = OptimizationValidator(
-                openAiKey: apiKey, themeService: themeService);
-            final validationResult =
-                await optimize_route_validator.runOptimizeRouteValidation(
-              validate: ({
-                required originalDeck,
-                required optimizedDeck,
-                required removals,
-                required additions,
-                required commanders,
-                required archetype,
-              }) =>
-                  validator.validate(
-                originalDeck: originalDeck,
-                optimizedDeck: optimizedDeck,
-                removals: removals,
-                additions: additions,
-                commanders: commanders,
-                archetype: archetype,
-              ),
-              originalDeck: allCardData,
-              optimizedDeck: virtualDeck,
-              removals: validRemovals,
-              additions: validAdditions,
-              commanders: commanders,
-              archetype: effectiveOptimizeArchetype,
-              postAnalysis: postAnalysis,
-              existingValidationWarnings: validationWarnings,
+              openAiKey: apiKey,
+              themeService: themeService,
             );
+            final validationResult = await optimize_route_validator
+                .runOptimizeRouteValidation(
+                  validate:
+                      ({
+                        required originalDeck,
+                        required optimizedDeck,
+                        required removals,
+                        required additions,
+                        required commanders,
+                        required archetype,
+                      }) => validator.validate(
+                        originalDeck: originalDeck,
+                        optimizedDeck: optimizedDeck,
+                        removals: removals,
+                        additions: additions,
+                        commanders: commanders,
+                        archetype: archetype,
+                      ),
+                  originalDeck: allCardData,
+                  optimizedDeck: virtualDeck,
+                  removals: validRemovals,
+                  additions: validAdditions,
+                  commanders: commanders,
+                  archetype: effectiveOptimizeArchetype,
+                  postAnalysis: postAnalysis,
+                  existingValidationWarnings: validationWarnings,
+                );
             postAnalysis = validationResult.postAnalysis;
             validationWarnings = validationResult.validationWarnings;
             optimizationValidationReport = validationResult.validationReport;
@@ -1994,7 +2067,8 @@ Future<Response> onRequest(RequestContext context) async {
 
       final preCurve =
           double.tryParse('${deckAnalysis['average_cmc'] ?? '0'}') ?? 0.0;
-      final postCurve = double.tryParse(
+      final postCurve =
+          double.tryParse(
             '${(postAnalysis ?? const <String, dynamic>{})['average_cmc'] ?? '0'}',
           ) ??
           0.0;
@@ -2003,17 +2077,17 @@ Future<Response> onRequest(RequestContext context) async {
       final postManaAssessment =
           (postAnalysis?['mana_base_assessment']?.toString()) ?? '';
 
-      final finalQualityGateDecision =
-          optimize_route_final_gate.evaluateOptimizeRouteQualityGate(
-        isComplete: isComplete,
-        validationReport: optimizationValidationReport,
-        archetype: effectiveOptimizeArchetype,
-        preCurve: preCurve,
-        postCurve: postCurve,
-        preManaAssessment: preManaAssessment,
-        postManaAssessment: postManaAssessment,
-        profileRoleTargets: optimizeCommanderRoleTargets,
-      );
+      final finalQualityGateDecision = optimize_route_final_gate
+          .evaluateOptimizeRouteQualityGate(
+            isComplete: isComplete,
+            validationReport: optimizationValidationReport,
+            archetype: effectiveOptimizeArchetype,
+            preCurve: preCurve,
+            postCurve: postCurve,
+            preManaAssessment: preManaAssessment,
+            postManaAssessment: postManaAssessment,
+            profileRoleTargets: optimizeCommanderRoleTargets,
+          );
 
       if (finalQualityGateDecision.rejected) {
         final retryPlan = optimize_route_retry.buildOptimizeAiFallbackRetryPlan(
@@ -2038,6 +2112,13 @@ Future<Response> onRequest(RequestContext context) async {
         return respondWithOptimizeTelemetry(
           statusCode: HttpStatus.unprocessableEntity,
           body: optimize_route_quality_rejection.buildQualityRejectedBody(
+            strategySource:
+                jsonResponse['strategy_source']?.toString() ??
+                (deterministicFirstEnabled
+                    ? 'deterministic_first'
+                    : 'ai_primary'),
+            cacheKey: cacheKey,
+            fallbackTrigger: jsonResponse['fallback_trigger']?.toString(),
             reasons: finalQualityGateDecision.reasons,
             validation: finalQualityGateDecision.validation,
             removals: validRemovals,
@@ -2058,22 +2139,29 @@ Future<Response> onRequest(RequestContext context) async {
 
       final responseValidationJson =
           (postAnalysis?['validation'] as Map?)?.cast<String, dynamic>();
-      final serializedValidationDecision =
-          optimize_route_final_gate.evaluateSerializedOptimizeValidation(
-        isComplete: isComplete,
-        serializedValidation: responseValidationJson,
-        validationReport: optimizationValidationReport,
-        archetype: effectiveOptimizeArchetype,
-        preCurve: preCurve,
-        postCurve: postCurve,
-        preManaAssessment: preManaAssessment,
-        postManaAssessment: postManaAssessment,
-        profileRoleTargets: optimizeCommanderRoleTargets,
-      );
+      final serializedValidationDecision = optimize_route_final_gate
+          .evaluateSerializedOptimizeValidation(
+            isComplete: isComplete,
+            serializedValidation: responseValidationJson,
+            validationReport: optimizationValidationReport,
+            archetype: effectiveOptimizeArchetype,
+            preCurve: preCurve,
+            postCurve: postCurve,
+            preManaAssessment: preManaAssessment,
+            postManaAssessment: postManaAssessment,
+            profileRoleTargets: optimizeCommanderRoleTargets,
+          );
       if (serializedValidationDecision.rejected) {
         return respondWithOptimizeTelemetry(
           statusCode: HttpStatus.unprocessableEntity,
           body: optimize_route_quality_rejection.buildQualityRejectedBody(
+            strategySource:
+                jsonResponse['strategy_source']?.toString() ??
+                (deterministicFirstEnabled
+                    ? 'deterministic_first'
+                    : 'ai_primary'),
+            cacheKey: cacheKey,
+            fallbackTrigger: jsonResponse['fallback_trigger']?.toString(),
             reasons: serializedValidationDecision.reasons,
             validation: serializedValidationDecision.validation,
             removals: validRemovals,
@@ -2092,13 +2180,13 @@ Future<Response> onRequest(RequestContext context) async {
         );
       }
 
-      final semanticV2GateDecision =
-          optimize_route_final_gate.evaluateOptimizeRouteSemanticV2Gate(
-        isComplete: isComplete,
-        validationReport: optimizationValidationReport,
-        enforcementMode: semanticV2OptimizeEnforcementMode,
-        expandedCriticalRoles: semanticV2ExpandedCriticalRoles,
-      );
+      final semanticV2GateDecision = optimize_route_final_gate
+          .evaluateOptimizeRouteSemanticV2Gate(
+            isComplete: isComplete,
+            validationReport: optimizationValidationReport,
+            enforcementMode: semanticV2OptimizeEnforcementMode,
+            expandedCriticalRoles: semanticV2ExpandedCriticalRoles,
+          );
       if (semanticV2GateDecision.rejected) {
         final semanticRejectionBody = buildSemanticV2OptimizeRejectedBody(
           semanticLayerV2: semanticV2GateDecision.semanticLayerV2,
@@ -2111,6 +2199,14 @@ Future<Response> onRequest(RequestContext context) async {
           postAnalysis: postAnalysis,
           validationWarnings: validationWarnings,
         );
+        semanticRejectionBody['strategy_source'] =
+            jsonResponse['strategy_source'] ??
+            (deterministicFirstEnabled ? 'deterministic_first' : 'ai_primary');
+        if (jsonResponse['fallback_trigger'] != null) {
+          semanticRejectionBody['fallback_trigger'] =
+              jsonResponse['fallback_trigger'];
+        }
+        semanticRejectionBody['cache'] = {'hit': false, 'cache_key': cacheKey};
 
         return respondWithOptimizeTelemetry(
           statusCode: HttpStatus.unprocessableEntity,
@@ -2140,27 +2236,31 @@ Future<Response> onRequest(RequestContext context) async {
           recognizedFormat: recognizedSuggestionFormat,
           triggered: emptySuggestionFallbackTriggered,
           applied: emptySuggestionFallbackApplied,
-          noCandidate: emptySuggestionFallbackTriggered &&
+          noCandidate:
+              emptySuggestionFallbackTriggered &&
               emptySuggestionFallbackCandidateCount == 0,
-          noReplacement: emptySuggestionFallbackTriggered &&
+          noReplacement:
+              emptySuggestionFallbackTriggered &&
               emptySuggestionFallbackCandidateCount > 0 &&
               emptySuggestionFallbackReplacementCount == 0,
           candidateCount: emptySuggestionFallbackCandidateCount,
           replacementCount: emptySuggestionFallbackReplacementCount,
           pairCount: emptySuggestionFallbackPairCount,
         );
-        persistedFallbackAggregate =
-            await loadPersistedEmptyFallbackAggregate(pool);
+        persistedFallbackAggregate = await loadPersistedEmptyFallbackAggregate(
+          pool,
+        );
       } catch (e) {
         Log.w('Persisted fallback telemetry unavailable: $e');
       }
 
       final preCmc =
           double.tryParse('${deckAnalysis['average_cmc'] ?? '0'}') ?? 0.0;
-      final postCmc = postAnalysis == null
-          ? preCmc
-          : (double.tryParse('${postAnalysis['average_cmc'] ?? preCmc}') ??
-              preCmc);
+      final postCmc =
+          postAnalysis == null
+              ? preCmc
+              : (double.tryParse('${postAnalysis['average_cmc'] ?? preCmc}') ??
+                  preCmc);
       final originalCardByName = <String, Map<String, dynamic>>{
         for (final card in allCardData)
           (((card['name'] as String?) ?? '').trim().toLowerCase()): card,
@@ -2170,17 +2270,13 @@ Future<Response> onRequest(RequestContext context) async {
 
       final responseBody = {
         'mode': jsonResponse['mode'],
-        'strategy_source': jsonResponse['strategy_source'] ??
+        'strategy_source':
+            jsonResponse['strategy_source'] ??
             (deterministicFirstEnabled ? 'deterministic_first' : 'ai_primary'),
         if (jsonResponse['fallback_trigger'] != null)
           'fallback_trigger': jsonResponse['fallback_trigger'],
-        'constraints': {
-          'keep_theme': keepTheme,
-        },
-        'cache': {
-          'hit': false,
-          'cache_key': cacheKey,
-        },
+        'constraints': {'keep_theme': keepTheme},
+        'cache': {'hit': false, 'cache_key': cacheKey},
         'preferences': {
           'memory_applied': !hasBracketOverride || !hasKeepThemeOverride,
           'keep_theme': keepTheme,
@@ -2196,16 +2292,16 @@ Future<Response> onRequest(RequestContext context) async {
         'validation_warnings': validationWarnings,
         'bracket': bracket,
         'target_additions': jsonResponse['target_additions'],
-        'optimize_diagnostics':
-            optimize_route_diagnostics.buildEmptySuggestionFallbackDiagnostics(
-          triggered: emptySuggestionFallbackTriggered,
-          applied: emptySuggestionFallbackApplied,
-          candidateCount: emptySuggestionFallbackCandidateCount,
-          replacementCount: emptySuggestionFallbackReplacementCount,
-          pairCount: emptySuggestionFallbackPairCount,
-          aggregate: _buildEmptyFallbackAggregate(),
-          persistedAggregate: persistedFallbackAggregate,
-        ),
+        'optimize_diagnostics': optimize_route_diagnostics
+            .buildEmptySuggestionFallbackDiagnostics(
+              triggered: emptySuggestionFallbackTriggered,
+              applied: emptySuggestionFallbackApplied,
+              candidateCount: emptySuggestionFallbackCandidateCount,
+              replacementCount: emptySuggestionFallbackReplacementCount,
+              pairCount: emptySuggestionFallbackPairCount,
+              aggregate: _buildEmptyFallbackAggregate(),
+              persistedAggregate: persistedFallbackAggregate,
+            ),
         // ValidaÃ§Ã£o EDHREC
         if (edhrecValidationData != null)
           'edhrec_validation': {
@@ -2219,38 +2315,73 @@ Future<Response> onRequest(RequestContext context) async {
       };
 
       // Gerar additions_detailed apenas para cartas com card_id vÃ¡lido
-      responseBody['additions_detailed'] = isComplete
-          ? additionsDetailed
-              .whereType<Map<String, dynamic>>()
-              .map((entry) {
-                final name = entry['name']?.toString() ?? '';
-                final cardId = entry['card_id']?.toString() ?? '';
-                if (name.isEmpty || cardId.isEmpty) return null;
-                return buildOptimizeRecommendationDetail(
-                  type: 'add',
-                  name: name,
-                  cardId: cardId,
-                  quantity: (entry['quantity'] as int?) ?? 1,
-                  targetArchetype: targetArchetype,
-                  confidenceLevel: themeProfile.confidence,
-                  cmcBefore: preCmc,
-                  cmcAfter: postCmc,
-                  keepTheme: keepTheme,
-                  priority: detailPriority,
-                  risk: detailRisk,
-                )..addAll(
-                    recommendationDetailsByName[name.toLowerCase()] ??
-                        const <String, dynamic>{},
-                  );
-              })
-              .where((e) => e != null)
-              .toList()
-          : validAdditions
+      responseBody['additions_detailed'] =
+          isComplete
+              ? additionsDetailed
+                  .whereType<Map<String, dynamic>>()
+                  .map((entry) {
+                    final name = entry['name']?.toString() ?? '';
+                    final cardId = entry['card_id']?.toString() ?? '';
+                    if (name.isEmpty || cardId.isEmpty) return null;
+                    return buildOptimizeRecommendationDetail(
+                      type: 'add',
+                      name: name,
+                      cardId: cardId,
+                      quantity: (entry['quantity'] as int?) ?? 1,
+                      targetArchetype: targetArchetype,
+                      confidenceLevel: themeProfile.confidence,
+                      cmcBefore: preCmc,
+                      cmcAfter: postCmc,
+                      keepTheme: keepTheme,
+                      priority: detailPriority,
+                      risk: detailRisk,
+                    )..addAll(
+                      recommendationDetailsByName[name.toLowerCase()] ??
+                          const <String, dynamic>{},
+                    );
+                  })
+                  .where((e) => e != null)
+                  .toList()
+              : validAdditions
+                  .map((name) {
+                    final v = validByNameLower[name.toLowerCase()];
+                    if (v == null || v['id'] == null) return null;
+                    return buildOptimizeRecommendationDetail(
+                      type: 'add',
+                      name: '${v['name']}',
+                      cardId: '${v['id']}',
+                      quantity: 1,
+                      targetArchetype: targetArchetype,
+                      confidenceLevel: themeProfile.confidence,
+                      cmcBefore: preCmc,
+                      cmcAfter: postCmc,
+                      keepTheme: keepTheme,
+                      priority: detailPriority,
+                      risk: detailRisk,
+                    )..addAll(
+                      recommendationDetailsByName[name.toLowerCase()] ??
+                          const <String, dynamic>{},
+                    );
+                  })
+                  .where((e) => e != null)
+                  .toList();
+
+      // Gerar removals_detailed apenas para cartas com card_id vÃ¡lido
+      responseBody['removals_detailed'] =
+          validRemovals
               .map((name) {
                 final v = validByNameLower[name.toLowerCase()];
                 if (v == null || v['id'] == null) return null;
+                final originalCard = originalCardByName[name.toLowerCase()];
+                final resolvedRoles =
+                    originalCard == null
+                        ? const <String>[]
+                        : (optimizationFunctionalRolesForCard(
+                            originalCard,
+                          ).toList()
+                          ..sort());
                 return buildOptimizeRecommendationDetail(
-                  type: 'add',
+                  type: 'remove',
                   name: '${v['name']}',
                   cardId: '${v['id']}',
                   quantity: 1,
@@ -2259,48 +2390,18 @@ Future<Response> onRequest(RequestContext context) async {
                   cmcBefore: preCmc,
                   cmcAfter: postCmc,
                   keepTheme: keepTheme,
+                  functionalRole: inferFunctionalRole(
+                    name: name,
+                    typeLine: originalCard?['type_line']?.toString() ?? '',
+                    oracleText: originalCard?['oracle_text']?.toString() ?? '',
+                  ),
+                  functionalRoles: resolvedRoles,
                   priority: detailPriority,
                   risk: detailRisk,
-                )..addAll(
-                    recommendationDetailsByName[name.toLowerCase()] ??
-                        const <String, dynamic>{},
-                  );
+                );
               })
               .where((e) => e != null)
               .toList();
-
-      // Gerar removals_detailed apenas para cartas com card_id vÃ¡lido
-      responseBody['removals_detailed'] = validRemovals
-          .map((name) {
-            final v = validByNameLower[name.toLowerCase()];
-            if (v == null || v['id'] == null) return null;
-            final originalCard = originalCardByName[name.toLowerCase()];
-            final resolvedRoles = originalCard == null
-                ? const <String>[]
-                : (optimizationFunctionalRolesForCard(originalCard).toList()
-                  ..sort());
-            return buildOptimizeRecommendationDetail(
-              type: 'remove',
-              name: '${v['name']}',
-              cardId: '${v['id']}',
-              quantity: 1,
-              targetArchetype: targetArchetype,
-              confidenceLevel: themeProfile.confidence,
-              cmcBefore: preCmc,
-              cmcAfter: postCmc,
-              keepTheme: keepTheme,
-              functionalRole: inferFunctionalRole(
-                name: name,
-                typeLine: originalCard?['type_line']?.toString() ?? '',
-                oracleText: originalCard?['oracle_text']?.toString() ?? '',
-              ),
-              functionalRoles: resolvedRoles,
-              priority: detailPriority,
-              risk: detailRisk,
-            );
-          })
-          .where((e) => e != null)
-          .toList();
 
       optimize_route_payload.balanceOptimizeDetailedPayload(
         responseBody: responseBody,
@@ -2315,6 +2416,21 @@ Future<Response> onRequest(RequestContext context) async {
         deckFormat: deckFormat,
         isComplete: isComplete,
       );
+
+      responseBody['optimization_contract'] = buildOptimizeDecisionContract(
+        mode: effectiveMode,
+        targetArchetype: targetArchetype,
+        intensity: intensity.selected,
+        keepTheme: keepTheme,
+        additionCount:
+            (responseBody['additions_detailed'] as List?)?.length ??
+            validAdditions.length,
+        removalCount:
+            (responseBody['removals_detailed'] as List?)?.length ??
+            validRemovals.length,
+      );
+      responseBody['battle_validation'] =
+          (responseBody['optimization_contract'] as Map)['battle_validation'];
 
       responseBody['intensity'] = intensity.selected;
       responseBody['optimize_intensity'] = intensity.toJson(
@@ -2387,10 +2503,11 @@ Future<Response> onRequest(RequestContext context) async {
           optimizeMetaReferenceContext.isNotEmpty) {
         responseBody['meta_reference_context'] =
             augmentMetaDeckEvidencePayloadWithOutputMatches(
-          optimizeMetaReferenceContext,
-          outputCardNames:
-              (responseBody['additions'] as List).map((entry) => '$entry'),
-        );
+              optimizeMetaReferenceContext,
+              outputCardNames: (responseBody['additions'] as List).map(
+                (entry) => '$entry',
+              ),
+            );
       }
       optimize_route_request.attachRecommendationContextToOptimizeResponse(
         responseBody,

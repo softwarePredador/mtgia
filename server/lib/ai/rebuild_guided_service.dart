@@ -35,16 +35,16 @@ class RebuildTargetProfile {
   final Map<String, int> rawCategoryTargets;
 
   Map<String, dynamic> toJson() => {
-        'total_cards': totalCards,
-        'land_count': landCount,
-        'ramp': ramp,
-        'draw_selection': drawSelection,
-        'interaction': interaction,
-        'wipes': wipes,
-        'payoffs': payoffs,
-        'wincons': wincons,
-        'raw_category_targets': rawCategoryTargets,
-      };
+    'total_cards': totalCards,
+    'land_count': landCount,
+    'ramp': ramp,
+    'draw_selection': drawSelection,
+    'interaction': interaction,
+    'wipes': wipes,
+    'payoffs': payoffs,
+    'wincons': wincons,
+    'raw_category_targets': rawCategoryTargets,
+  };
 }
 
 class RebuildScopeDecision {
@@ -65,11 +65,11 @@ class RebuildScopeDecision {
   final List<String> reasons;
 
   Map<String, dynamic> toJson() => {
-        'requested_scope': requestedScope,
-        'selected_scope': selectedScope,
-        'keep_rate': keepRate,
-        'reasons': reasons,
-      };
+    'requested_scope': requestedScope,
+    'selected_scope': selectedScope,
+    'keep_rate': keepRate,
+    'reasons': reasons,
+  };
 }
 
 class RebuildResult {
@@ -102,7 +102,9 @@ class RebuildResult {
   final Map<String, dynamic> sourceSummary;
 
   int get totalCards => rebuiltCards.fold<int>(
-      0, (sum, card) => sum + ((card['quantity'] as int?) ?? 0));
+    0,
+    (sum, card) => sum + ((card['quantity'] as int?) ?? 0),
+  );
 
   int get replacedSlots {
     final kept = keptCards.fold<int>(
@@ -122,7 +124,7 @@ int rebuildGuidedEdhrecTopCardWeight(EdhrecCard card, int index) {
 
 class RebuildGuidedService {
   RebuildGuidedService(this._pool, {EdhrecService? edhrecService})
-      : _edhrecService = edhrecService ?? EdhrecService();
+    : _edhrecService = edhrecService ?? EdhrecService();
 
   final Pool _pool;
   final EdhrecService _edhrecService;
@@ -145,8 +147,10 @@ class RebuildGuidedService {
     }
 
     final deckAnalysisBefore =
-        DeckArchetypeAnalyzer(originalDeck, deckColors.toList())
-            .generateAnalysis();
+        DeckArchetypeAnalyzer(
+          originalDeck,
+          deckColors.toList(),
+        ).generateAnalysis();
     final deckStateBefore = assessDeckOptimizationState(
       cards: originalDeck,
       deckAnalysis: deckAnalysisBefore,
@@ -165,12 +169,15 @@ class RebuildGuidedService {
       );
     }
 
-    final commanderData =
-        await _edhrecService.fetchCommanderData(commanderName);
-    final averageDeckData =
-        await _edhrecService.fetchAverageDeckData(commanderName);
-    final cachedProfile =
-        await _loadCommanderReferenceProfileFromCache(commanderName);
+    final commanderData = await _edhrecService.fetchCommanderData(
+      commanderName,
+    );
+    final averageDeckData = await _edhrecService.fetchAverageDeckData(
+      commanderName,
+    );
+    final cachedProfile = await _loadCommanderReferenceProfileFromCache(
+      commanderName,
+    );
 
     final resolvedTheme = _resolveTheme(
       requestedTheme: requestedTheme,
@@ -199,14 +206,16 @@ class RebuildGuidedService {
       commanderData: commanderData,
       cachedProfile: cachedProfile,
     );
-    final mustKeepLower = mustKeep
-        .map((name) => name.trim().toLowerCase())
-        .where((e) => e.isNotEmpty)
-        .toSet();
-    final mustAvoidLower = mustAvoid
-        .map((name) => name.trim().toLowerCase())
-        .where((e) => e.isNotEmpty)
-        .toSet();
+    final mustKeepLower =
+        mustKeep
+            .map((name) => name.trim().toLowerCase())
+            .where((e) => e.isNotEmpty)
+            .toSet();
+    final mustAvoidLower =
+        mustAvoid
+            .map((name) => name.trim().toLowerCase())
+            .where((e) => e.isNotEmpty)
+            .toSet();
 
     final currentCardScores = _scoreCurrentDeckCards(
       originalDeck: originalDeck,
@@ -256,26 +265,31 @@ class RebuildGuidedService {
     await _pool.runTx(
       (session) => DeckRulesService(session).validateAndThrow(
         format: deckFormat,
-        cards: rebuiltCards
-            .map((card) => {
-                  'card_id': card['card_id'],
-                  'quantity': card['quantity'],
-                  'is_commander': card['is_commander'] ?? false,
-                })
-            .toList(),
+        cards:
+            rebuiltCards
+                .map(
+                  (card) => {
+                    'card_id': card['card_id'],
+                    'quantity': card['quantity'],
+                    'is_commander': card['is_commander'] ?? false,
+                  },
+                )
+                .toList(),
         strict: true,
       ),
     );
 
     final rebuiltDeckColors = <String>{};
     for (final card in rebuiltCards) {
-      rebuiltDeckColors
-          .addAll((card['colors'] as List?)?.cast<String>() ?? const []);
+      rebuiltDeckColors.addAll(
+        (card['colors'] as List?)?.cast<String>() ?? const [],
+      );
     }
-    final deckAnalysisAfter = DeckArchetypeAnalyzer(
-      rebuiltCards,
-      rebuiltDeckColors.toList(),
-    ).generateAnalysis();
+    final deckAnalysisAfter =
+        DeckArchetypeAnalyzer(
+          rebuiltCards,
+          rebuiltDeckColors.toList(),
+        ).generateAnalysis();
     final deckStateAfter = assessDeckOptimizationState(
       cards: rebuiltCards,
       deckAnalysis: deckAnalysisAfter,
@@ -398,18 +412,21 @@ class RebuildGuidedService {
     required EdhrecCommanderData? commanderData,
     required Map<String, dynamic>? cachedProfile,
   }) {
-    final recommendedStructure = cachedProfile?['recommended_structure'] is Map
-        ? (cachedProfile!['recommended_structure'] as Map)
-            .cast<String, dynamic>()
-        : const <String, dynamic>{};
-    final categoryTargetsRaw = recommendedStructure['category_targets'] is Map
-        ? (recommendedStructure['category_targets'] as Map)
-            .cast<String, dynamic>()
-            .map((key, value) => MapEntry(key, _toInt(value) ?? 0))
-        : const <String, int>{};
+    final recommendedStructure =
+        cachedProfile?['recommended_structure'] is Map
+            ? (cachedProfile!['recommended_structure'] as Map)
+                .cast<String, dynamic>()
+            : const <String, dynamic>{};
+    final categoryTargetsRaw =
+        recommendedStructure['category_targets'] is Map
+            ? (recommendedStructure['category_targets'] as Map)
+                .cast<String, dynamic>()
+                .map((key, value) => MapEntry(key, _toInt(value) ?? 0))
+            : const <String, int>{};
 
     final totalCards = deckFormat == 'brawl' ? 60 : 100;
-    final recommendedLands = _toInt(recommendedStructure['lands']) ??
+    final recommendedLands =
+        _toInt(recommendedStructure['lands']) ??
         _deriveRecommendedLands(
           deckFormat: deckFormat,
           requestedArchetype: requestedArchetype,
@@ -494,8 +511,10 @@ class RebuildGuidedService {
       totalCards: totalCards,
       landCount: recommendedLands,
       ramp: math.max(ramp, categoryTargetsRaw['ramp'] ?? 0),
-      drawSelection:
-          math.max(drawSelection, categoryTargetsRaw['card_draw'] ?? 0),
+      drawSelection: math.max(
+        drawSelection,
+        categoryTargetsRaw['card_draw'] ?? 0,
+      ),
       interaction: interaction,
       wipes: wipes,
       payoffs: payoffs,
@@ -535,11 +554,12 @@ class RebuildGuidedService {
     final normalizedRequested = _normalizeTheme(requestedTheme);
     if (normalizedRequested != null) return normalizedRequested;
 
-    final commanderText = originalDeck
-        .where((card) => card['is_commander'] == true)
-        .map((card) => (card['oracle_text'] as String?) ?? '')
-        .join(' ')
-        .toLowerCase();
+    final commanderText =
+        originalDeck
+            .where((card) => card['is_commander'] == true)
+            .map((card) => (card['oracle_text'] as String?) ?? '')
+            .join(' ')
+            .toLowerCase();
 
     if (commanderText.contains('instant or sorcery')) return 'spellslinger';
     if (commanderText.contains('artifact')) return 'artifacts';
@@ -746,15 +766,17 @@ class RebuildGuidedService {
       }
     }
 
-    final keepRate = totalNonCommanderQty == 0
-        ? 1.0
-        : keepNonCommanderQty / totalNonCommanderQty;
+    final keepRate =
+        totalNonCommanderQty == 0
+            ? 1.0
+            : keepNonCommanderQty / totalNonCommanderQty;
 
     var selectedScope = normalizedRequested;
     if (selectedScope.isEmpty || selectedScope == 'auto') {
-      selectedScope = keepRate < 0.25 || deckStateBefore.severityScore >= 70
-          ? 'full_non_commander_rebuild'
-          : 'repair_partial';
+      selectedScope =
+          keepRate < 0.25 || deckStateBefore.severityScore >= 70
+              ? 'full_non_commander_rebuild'
+              : 'repair_partial';
     }
     if (selectedScope != 'repair_partial' &&
         selectedScope != 'full_non_commander_rebuild') {
@@ -788,7 +810,8 @@ class RebuildGuidedService {
   }
 
   Future<List<Map<String, dynamic>>> _loadCardsByNames(
-      List<String> names) async {
+    List<String> names,
+  ) async {
     if (names.isEmpty) return const [];
     final normalized = names.map((name) => name.toLowerCase()).toSet().toList();
 
@@ -800,7 +823,7 @@ class RebuildGuidedService {
                type_line,
                COALESCE(mana_cost, '') AS mana_cost,
                COALESCE(colors, ARRAY[]::text[]) AS colors,
-               COALESCE(color_identity, ARRAY[]::text[]) AS color_identity,
+               color_identity,
                COALESCE(
                  (
                    SELECT SUM(
@@ -831,8 +854,7 @@ class RebuildGuidedService {
             'type_line': row[2] as String? ?? '',
             'mana_cost': row[3] as String? ?? '',
             'colors': (row[4] as List?)?.cast<String>() ?? const <String>[],
-            'color_identity':
-                (row[5] as List?)?.cast<String>() ?? const <String>[],
+            'color_identity': (row[5] as List?)?.cast<String>(),
             'cmc': (row[6] as num?)?.toDouble() ?? 0.0,
             'oracle_text': row[7] as String? ?? '',
             'quantity': 1,
@@ -928,7 +950,8 @@ class RebuildGuidedService {
           resolvedTheme: resolvedTheme,
         );
         final mustPreserve = mustKeep.contains(name);
-        final highPriorityLand = score == 'land' &&
+        final highPriorityLand =
+            score == 'land' &&
             (_landProducesCommanderColor(
                   (card['oracle_text'] as String?) ?? '',
                   commanderColorIdentity,
@@ -957,8 +980,9 @@ class RebuildGuidedService {
       );
     } else {
       bracketAllowedNames.addAll(
-        candidateCardsOrdered
-            .map((card) => (card['name'] as String?)?.toLowerCase() ?? ''),
+        candidateCardsOrdered.map(
+          (card) => (card['name'] as String?)?.toLowerCase() ?? '',
+        ),
       );
     }
 
@@ -1021,8 +1045,9 @@ class RebuildGuidedService {
       _incrementRole(roleCounts, candidate.role);
     }
 
-    final monoColorUtilityLimit =
-        _maxUtilityColorlessLands(commanderColorIdentity);
+    final monoColorUtilityLimit = _maxUtilityColorlessLands(
+      commanderColorIdentity,
+    );
     var utilityLandCount = _countUtilityColorlessLands(
       selected.values.toList(),
       commanderColorIdentity: commanderColorIdentity,
@@ -1117,8 +1142,9 @@ class RebuildGuidedService {
       final commanderB = b['is_commander'] == true ? 0 : 1;
       final byCommander = commanderA.compareTo(commanderB);
       if (byCommander != 0) return byCommander;
-      return ((a['name'] as String?) ?? '')
-          .compareTo((b['name'] as String?) ?? '');
+      return ((a['name'] as String?) ?? '').compareTo(
+        (b['name'] as String?) ?? '',
+      );
     });
     return assembled;
   }
@@ -1525,9 +1551,10 @@ class RebuildGuidedService {
     required Map<String, Map<String, dynamic>> basicLandCatalog,
   }) {
     if (missing <= 0) return const [];
-    final colors = commanderColorIdentity.isEmpty
-        ? const ['C']
-        : commanderColorIdentity.toList();
+    final colors =
+        commanderColorIdentity.isEmpty
+            ? const ['C']
+            : commanderColorIdentity.toList();
     final basics = <Map<String, dynamic>>[];
     for (var i = 0; i < missing; i++) {
       final color = colors[i % colors.length];
@@ -1587,11 +1614,7 @@ class RebuildGuidedService {
   }) {
     final cached = basicLandCatalog[name.toLowerCase()];
     if (cached != null) {
-      return {
-        ...cached,
-        'quantity': 1,
-        'is_commander': false,
-      };
+      return {...cached, 'quantity': 1, 'is_commander': false};
     }
     throw RebuildException(
       'Basic land "$name" was not found in the card database; rebuild cannot produce a strict-valid deck.',
@@ -1644,8 +1667,9 @@ class RebuildGuidedService {
       final removableB = roleB == 'land' ? 0 : 1;
       final byRole = removableA.compareTo(removableB);
       if (byRole != 0) return byRole;
-      return ((a['name'] as String?) ?? '')
-          .compareTo((b['name'] as String?) ?? '');
+      return ((a['name'] as String?) ?? '').compareTo(
+        (b['name'] as String?) ?? '',
+      );
     });
 
     while (_totalCards(mutable) > targetTotal) {
@@ -1699,8 +1723,7 @@ class RebuildGuidedService {
 
   Set<String> _extractIdentity(Map<String, dynamic> card) {
     return resolveCardColorIdentity(
-      colorIdentity:
-          (card['color_identity'] as List?)?.cast<String>() ?? const [],
+      colorIdentity: (card['color_identity'] as List?)?.cast<String>(),
       colors: (card['colors'] as List?)?.cast<String>() ?? const [],
       manaCost: card['mana_cost']?.toString(),
       oracleText: card['oracle_text']?.toString(),
@@ -1727,7 +1750,7 @@ class RebuildGuidedService {
                type_line,
                COALESCE(mana_cost, '') AS mana_cost,
                COALESCE(colors, ARRAY[]::text[]) AS colors,
-               COALESCE(color_identity, ARRAY[]::text[]) AS color_identity,
+               color_identity,
                COALESCE(oracle_text, '') AS oracle_text,
                basic_key
         FROM (
@@ -1769,7 +1792,7 @@ class RebuildGuidedService {
         'type_line': row[2] as String? ?? '',
         'mana_cost': row[3] as String? ?? '',
         'colors': (row[4] as List?)?.cast<String>() ?? const <String>[],
-        'color_identity': (row[5] as List?)?.cast<String>() ?? const <String>[],
+        'color_identity': (row[5] as List?)?.cast<String>(),
         'cmc': 0.0,
         'oracle_text': row[6] as String? ?? '',
         'quantity': 1,

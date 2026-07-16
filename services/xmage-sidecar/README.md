@@ -47,12 +47,30 @@ options or rationale. The response therefore carries
 ## Build and test
 
 Java 17 and Maven are required. XMage artifacts for the pinned commit must be
-installed in the local Maven repository before a host build.
+installed in the local Maven repository before a host build. They are not
+published to Maven Central; use the pinned bootstrap instead of relying on a
+developer cache.
 
 ```bash
+services/xmage-sidecar/bin/bootstrap_pinned_xmage_maven.sh
+cd services/xmage-sidecar
 mvn test -B
 mvn package -DskipTests -B
 ```
+
+CI runs the same bootstrap before the canonical battle gate. Set
+`MAVEN_REPO_LOCAL` to an absolute path to prove a clean repository or to
+isolate the cache; the canonical gate honors the same variable:
+
+```bash
+export MAVEN_REPO_LOCAL=/tmp/manaloom-xmage-m2
+services/xmage-sidecar/bin/bootstrap_pinned_xmage_maven.sh
+./scripts/manaloom_battle_product_gate.sh
+```
+
+The bootstrap records a fingerprint containing `XMAGE_COMMIT`, the XMage
+version, and the patched SQLite JDBC version. Cached jars without the matching
+fingerprint are rebuilt. CI also includes `XMAGE_COMMIT` in its Maven cache key.
 
 The Docker image clones and verifies the pinned XMage commit, upgrades only the
 SQLite JDBC runtime for arm64 compatibility, builds the XMage server, and runs

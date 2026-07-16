@@ -55,6 +55,34 @@ All three battle deploy scripts execute
 proof is `server/test/battle_product_e2e_test.dart`; it must be run after deploy
 with `RUN_BATTLE_PRODUCT_E2E=1` against the public API.
 
+## Gate Hierarchy
+
+The supported quality hierarchy has one battle product gate:
+
+| Surface | Classification | Boundary |
+| --- | --- | --- |
+| `scripts/quality_gate.sh battle` / `dart run melos run battle` | canonical dispatcher | discoverable local and CI aliases |
+| `scripts/manaloom_battle_product_gate.sh` | canonical battle product gate | native, Forge, XMage, manifest, static product contract, and focused Dart checks; no live service or database writes |
+| `scripts/manaloom_e2e_suite.sh` | broader E2E orchestrator | calls the canonical battle gate plus app, server, deckbuilder, and optional live layers |
+| `server/bin/manaloom_battle_product_e2e_audit.py` | component static audit | verifies app-to-engine-to-persistence wiring and this topology; it is not a second E2E runner |
+| `server/test/battle_product_e2e_test.dart` | opt-in live contract | post-deploy proof; creates temporary database rows and cleans them up |
+| `scripts/manaloom_global_battle_closure.sh` | operational, not a quality gate | remote coverage closure and resumable external battle queues |
+
+XMage host tests require artifacts that are not published to Maven Central.
+CI and clean hosts must run
+`services/xmage-sidecar/bin/bootstrap_pinned_xmage_maven.sh`, which fetches the
+exact `services/xmage-sidecar/XMAGE_COMMIT` and installs its modules before the
+canonical gate. A pre-populated developer Maven cache is not CI evidence.
+
+The retained `server/test/e2e_general_tests.py`, `e2e_ml_tests.py`, and
+`e2e_trade_tests.py` scripts are legacy manual live suites. They remain for
+historical endpoint coverage but are not canonical gates or CI entrypoints.
+They have no default API target and fail before the first request unless the
+caller provides an explicit local or staging URL and the canonical live-mutation
+approval `MANALOOM_CONFIRM_LIVE_MUTATIONS=I_HAVE_EXPLICIT_APPROVAL`, enforced by
+`server/test/legacy_live_e2e_guard.py`. The known production endpoints are
+blocked even when that token is present; these suites are staging/local-only.
+
 The PostgreSQL-writing scheduler is deployed separately with
 `scripts/manaloom_deploy_ops_image.sh`. That deploy is SHA-pinned, preserves
 the existing `/data/manaloom-ops` volume, refuses an old or external database

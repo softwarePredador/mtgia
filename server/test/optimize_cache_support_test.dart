@@ -37,49 +37,51 @@ void main() {
         intensity: 'aggressive',
       );
 
-      expect(focused, startsWith('v7:'));
+      expect(focused, startsWith('v8:'));
       expect(focused, equals(focusedAgain));
       expect(aggressive, isNot(equals(focused)));
     });
 
-    test('buildOptimizeCacheKey keeps legacy key unless context is present',
-        () {
-      final withoutContext = cache_support.buildOptimizeCacheKey(
-        deckId: 'deck-1',
-        archetype: 'control',
-        mode: 'optimize',
-        bracket: 2,
-        keepTheme: true,
-        deckSignature: 'a:1',
-        intensity: 'focused',
-      );
+    test(
+      'buildOptimizeCacheKey keeps legacy key unless context is present',
+      () {
+        final withoutContext = cache_support.buildOptimizeCacheKey(
+          deckId: 'deck-1',
+          archetype: 'control',
+          mode: 'optimize',
+          bracket: 2,
+          keepTheme: true,
+          deckSignature: 'a:1',
+          intensity: 'focused',
+        );
 
-      final explicitEmptyContext = cache_support.buildOptimizeCacheKey(
-        deckId: 'deck-1',
-        archetype: 'control',
-        mode: 'optimize',
-        bracket: 2,
-        keepTheme: true,
-        deckSignature: 'a:1',
-        intensity: 'focused',
-        recommendationContextSignature: '',
-      );
+        final explicitEmptyContext = cache_support.buildOptimizeCacheKey(
+          deckId: 'deck-1',
+          archetype: 'control',
+          mode: 'optimize',
+          bracket: 2,
+          keepTheme: true,
+          deckSignature: 'a:1',
+          intensity: 'focused',
+          recommendationContextSignature: '',
+        );
 
-      final withContext = cache_support.buildOptimizeCacheKey(
-        deckId: 'deck-1',
-        archetype: 'control',
-        mode: 'optimize',
-        bracket: 2,
-        keepTheme: true,
-        deckSignature: 'a:1',
-        intensity: 'focused',
-        recommendationContextSignature:
-            'budget_limit_brl=100|rebuild_intent=upgraded',
-      );
+        final withContext = cache_support.buildOptimizeCacheKey(
+          deckId: 'deck-1',
+          archetype: 'control',
+          mode: 'optimize',
+          bracket: 2,
+          keepTheme: true,
+          deckSignature: 'a:1',
+          intensity: 'focused',
+          recommendationContextSignature:
+              'budget_limit_brl=100|rebuild_intent=upgraded',
+        );
 
-      expect(explicitEmptyContext, equals(withoutContext));
-      expect(withContext, isNot(withoutContext));
-    });
+        expect(explicitEmptyContext, equals(withoutContext));
+        expect(withContext, isNot(withoutContext));
+      },
+    );
 
     test('runtime wrapper delegates to extracted cache key implementation', () {
       final direct = cache_support.buildOptimizeCacheKey(

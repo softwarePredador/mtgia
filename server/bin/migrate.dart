@@ -16,7 +16,10 @@ import 'package:server/import_card_lookup_service.dart';
 ///
 /// Opções:
 ///   --status    Mostra o status das migrações
-///   --rollback N  Reverte as últimas N migrações (não implementado - apenas placeholder)
+///   --rollback N  Reverte, em transação, as últimas N migrações conhecidas
+
+const migrationWriteApprovalEnvironment = 'MANALOOM_CONFIRM_POSTGRES_WRITES';
+const migrationWriteApprovalPhrase = 'I_HAVE_EXPLICIT_APPROVAL';
 
 // Lista de migrações em ordem cronológica
 // Cada migração tem: versão, nome, SQL de up e SQL de down (opcional)
@@ -1013,6 +1016,214 @@ final migrations = <Migration>[
       DROP VIEW IF EXISTS card_intelligence_snapshot;
     ''',
   ),
+  Migration(
+    version: '033',
+    name: 'create_deck_optimization_events',
+    up: '''
+      CREATE TABLE IF NOT EXISTS deck_optimization_events (
+        id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+        user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+        deck_id UUID NOT NULL REFERENCES decks(id) ON DELETE CASCADE,
+        event_type TEXT NOT NULL DEFAULT 'optimize_apply',
+        mode TEXT NOT NULL DEFAULT '',
+        intensity TEXT NOT NULL DEFAULT '',
+        archetype TEXT NOT NULL DEFAULT '',
+        bracket INT,
+        selected_change_count INT NOT NULL DEFAULT 0,
+        removals JSONB NOT NULL DEFAULT '[]'::jsonb,
+        additions JSONB NOT NULL DEFAULT '[]'::jsonb,
+        before_snapshot JSONB NOT NULL DEFAULT '{}'::jsonb,
+        after_snapshot JSONB NOT NULL DEFAULT '{}'::jsonb,
+        recommendation_context JSONB NOT NULL DEFAULT '{}'::jsonb,
+        validation_status TEXT NOT NULL DEFAULT 'preview_applied',
+        battle_status TEXT NOT NULL DEFAULT 'pending_after_apply',
+        battle_message TEXT NOT NULL DEFAULT '',
+        report_payload JSONB NOT NULL DEFAULT '{}'::jsonb,
+        created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP
+      );
+
+      CREATE INDEX IF NOT EXISTS idx_deck_optimization_events_deck_created
+      ON deck_optimization_events (deck_id, created_at DESC);
+
+      CREATE INDEX IF NOT EXISTS idx_deck_optimization_events_user_created
+      ON deck_optimization_events (user_id, created_at DESC);
+    ''',
+    down: '''
+      DROP INDEX IF EXISTS idx_deck_optimization_events_user_created;
+      DROP INDEX IF EXISTS idx_deck_optimization_events_deck_created;
+      DROP TABLE IF EXISTS deck_optimization_events CASCADE;
+    ''',
+  ),
+  Migration(
+    version: '034',
+    name: 'create_commander_reference_tables',
+    up: '''
+      CREATE TABLE IF NOT EXISTS commander_reference_profiles (
+        commander_name TEXT PRIMARY KEY,
+        source TEXT NOT NULL,
+        deck_count INTEGER NOT NULL DEFAULT 0,
+        profile_json JSONB NOT NULL,
+        updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+      );
+
+      CREATE TABLE IF NOT EXISTS commander_reference_card_stats (
+        commander_name TEXT NOT NULL,
+        commander_name_normalized TEXT NOT NULL,
+        card_name TEXT NOT NULL,
+        card_name_normalized TEXT NOT NULL,
+        card_id UUID REFERENCES cards(id) ON DELETE SET NULL,
+        package_key TEXT NOT NULL,
+        role TEXT NOT NULL,
+        score NUMERIC NOT NULL,
+        confidence TEXT NOT NULL,
+        confidence_rank SMALLINT NOT NULL,
+        source TEXT NOT NULL,
+        evidence_count INTEGER NOT NULL DEFAULT 1,
+        unresolved BOOLEAN NOT NULL DEFAULT FALSE,
+        updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+        PRIMARY KEY (
+          commander_name_normalized,
+          card_name_normalized,
+          package_key
+        )
+      );
+
+      CREATE INDEX IF NOT EXISTS idx_commander_reference_card_stats_hot
+      ON commander_reference_card_stats (
+        commander_name_normalized,
+        confidence_rank DESC,
+        score DESC
+      )
+      WHERE unresolved = FALSE;
+
+      CREATE INDEX IF NOT EXISTS idx_commander_reference_card_stats_unresolved
+      ON commander_reference_card_stats (
+        commander_name_normalized,
+        unresolved,
+        card_name_normalized
+      );
+
+      CREATE TABLE IF NOT EXISTS commander_reference_decks (
+        source_deck_key TEXT PRIMARY KEY,
+        commander_name TEXT NOT NULL,
+        commander_name_normalized TEXT NOT NULL,
+        source TEXT NOT NULL,
+        source_url TEXT,
+        power_lane TEXT,
+        theme TEXT,
+        deck_hash TEXT NOT NULL,
+        main_quantity INTEGER NOT NULL,
+        commander_quantity INTEGER NOT NULL,
+        resolved_count INTEGER NOT NULL,
+        unresolved_count INTEGER NOT NULL,
+        off_color_count INTEGER NOT NULL,
+        singleton_violations JSONB NOT NULL DEFAULT '{}'::jsonb,
+        role_summary JSONB NOT NULL DEFAULT '{}'::jsonb,
+        accepted BOOLEAN NOT NULL DEFAULT FALSE,
+        rejection_reasons JSONB NOT NULL DEFAULT '[]'::jsonb,
+        created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+        updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+      );
+
+      CREATE TABLE IF NOT EXISTS commander_reference_deck_cards (
+        source_deck_key TEXT NOT NULL
+          REFERENCES commander_reference_decks(source_deck_key)
+          ON DELETE CASCADE,
+        board TEXT NOT NULL,
+        card_name TEXT NOT NULL,
+        card_name_normalized TEXT NOT NULL,
+        card_id UUID REFERENCES cards(id) ON DELETE SET NULL,
+        quantity INTEGER NOT NULL,
+        role TEXT NOT NULL,
+        unresolved BOOLEAN NOT NULL DEFAULT FALSE,
+        off_color BOOLEAN NOT NULL DEFAULT FALSE,
+        updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+        PRIMARY KEY (source_deck_key, board, card_name_normalized)
+      );
+
+      CREATE TABLE IF NOT EXISTS commander_reference_deck_analysis (
+        commander_name_normalized TEXT NOT NULL,
+        source TEXT NOT NULL,
+        commander_name TEXT NOT NULL,
+        deck_count INTEGER NOT NULL,
+        accepted_deck_count INTEGER NOT NULL,
+        average_role_counts JSONB NOT NULL DEFAULT '{}'::jsonb,
+        top_cards JSONB NOT NULL DEFAULT '[]'::jsonb,
+        theme_counts JSONB NOT NULL DEFAULT '{}'::jsonb,
+        updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+        PRIMARY KEY (commander_name_normalized, source)
+      );
+
+      CREATE INDEX IF NOT EXISTS idx_commander_reference_decks_lookup
+      ON commander_reference_decks (
+        commander_name_normalized,
+        accepted,
+        updated_at DESC
+      );
+
+      CREATE INDEX IF NOT EXISTS idx_commander_reference_deck_cards_hot
+      ON commander_reference_deck_cards (
+        card_name_normalized,
+        role,
+        unresolved,
+        off_color
+      );
+    ''',
+    down: '''
+      DROP INDEX IF EXISTS idx_commander_reference_deck_cards_hot;
+      DROP INDEX IF EXISTS idx_commander_reference_decks_lookup;
+      DROP TABLE IF EXISTS commander_reference_deck_analysis CASCADE;
+      DROP TABLE IF EXISTS commander_reference_deck_cards CASCADE;
+      DROP TABLE IF EXISTS commander_reference_decks CASCADE;
+      DROP INDEX IF EXISTS idx_commander_reference_card_stats_unresolved;
+      DROP INDEX IF EXISTS idx_commander_reference_card_stats_hot;
+      DROP TABLE IF EXISTS commander_reference_card_stats CASCADE;
+      DROP TABLE IF EXISTS commander_reference_profiles CASCADE;
+    ''',
+  ),
+  Migration(
+    version: '035',
+    name: 'create_data_source_snapshots',
+    up: '''
+      ALTER TABLE IF EXISTS card_rulings
+      ALTER COLUMN source SET DEFAULT 'scryfall';
+      ALTER TABLE IF EXISTS card_rulings
+      ADD COLUMN IF NOT EXISTS ruling_source TEXT NOT NULL DEFAULT '';
+
+      CREATE TABLE IF NOT EXISTS data_source_snapshots (
+        id BIGSERIAL PRIMARY KEY,
+        dataset TEXT NOT NULL,
+        provider TEXT NOT NULL,
+        source_uri TEXT NOT NULL,
+        source_version TEXT NOT NULL DEFAULT '',
+        source_updated_at TIMESTAMPTZ NOT NULL,
+        source_etag TEXT NOT NULL DEFAULT '',
+        content_sha256 TEXT NOT NULL,
+        row_count BIGINT NOT NULL,
+        distinct_identity_count BIGINT NOT NULL,
+        latest_published_at DATE,
+        status TEXT NOT NULL,
+        metadata JSONB NOT NULL DEFAULT '{}'::jsonb,
+        started_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+        completed_at TIMESTAMPTZ
+      );
+
+      CREATE UNIQUE INDEX IF NOT EXISTS uniq_data_source_snapshots_content
+      ON data_source_snapshots (dataset, provider, content_sha256);
+
+      CREATE INDEX IF NOT EXISTS idx_data_source_snapshots_latest
+      ON data_source_snapshots (dataset, provider, completed_at DESC);
+    ''',
+    down: '''
+      DROP INDEX IF EXISTS idx_data_source_snapshots_latest;
+      DROP INDEX IF EXISTS uniq_data_source_snapshots_content;
+      DROP TABLE IF EXISTS data_source_snapshots CASCADE;
+      ALTER TABLE IF EXISTS card_rulings
+      DROP COLUMN IF EXISTS ruling_source;
+      ALTER TABLE IF EXISTS card_rulings
+      ALTER COLUMN source SET DEFAULT 'mtgjson';
+    ''',
+  ),
 ];
 
 class Migration {
@@ -1031,8 +1242,87 @@ class Migration {
   String get fullName => '${version}_$name';
 }
 
+bool hasMigrationWriteApproval(Map<String, String> environment) =>
+    environment[migrationWriteApprovalEnvironment] ==
+    migrationWriteApprovalPhrase;
+
+enum MigrationRollbackPolicy { standard, emptyOnly, manualOnly }
+
+MigrationRollbackPolicy migrationRollbackPolicy(String version) =>
+    switch (version) {
+      '033' || '035' => MigrationRollbackPolicy.emptyOnly,
+      // A 034 tornou-se dona de tabelas que já continham dados antes de ser
+      // registrada. O down automático nunca pode distinguir esses dados.
+      '034' => MigrationRollbackPolicy.manualOnly,
+      _ => MigrationRollbackPolicy.standard,
+    };
+
+Future<void> _assertRollbackSafe(Session tx, Migration migration) async {
+  final policy = migrationRollbackPolicy(migration.version);
+  if (policy == MigrationRollbackPolicy.standard) return;
+  if (policy == MigrationRollbackPolicy.manualOnly) {
+    throw StateError(
+      'Rollback automático de ${migration.fullName} é bloqueado: a migration '
+      'adotou tabelas com dados preexistentes. Use um plano manual com backup '
+      'e restore validados.',
+    );
+  }
+
+  final unsafe = switch (migration.version) {
+    '033' =>
+      (await tx.execute(
+            'SELECT EXISTS (SELECT 1 FROM deck_optimization_events)',
+          )).first[0] ==
+          true,
+    '035' =>
+      (await tx.execute('''
+        SELECT
+          EXISTS (SELECT 1 FROM data_source_snapshots)
+          OR EXISTS (
+            SELECT 1
+            FROM card_rulings
+            WHERE source = 'scryfall' OR ruling_source <> ''
+          )
+      ''')).first[0] ==
+          true,
+    _ => false,
+  };
+  if (unsafe) {
+    throw StateError(
+      'Rollback automático de ${migration.fullName} é bloqueado porque a '
+      'tabela já contém dados de produto ou lineage. Use rollback seletivo '
+      'com snapshot validado.',
+    );
+  }
+}
+
 void main(List<String> args) async {
   final showStatus = args.contains('--status');
+  final rollbackRequested = args.contains('--rollback');
+  int? rollbackCount;
+  if (rollbackRequested) {
+    final rollbackIndex = args.indexOf('--rollback');
+    final rawCount =
+        rollbackIndex + 1 < args.length ? args[rollbackIndex + 1] : null;
+    rollbackCount = rawCount == null ? null : int.tryParse(rawCount);
+    if (rollbackCount == null || rollbackCount <= 0) {
+      stderr.writeln(
+        'Uso inválido: --rollback exige um inteiro positivo. Nenhuma conexão foi aberta.',
+      );
+      exitCode = 2;
+      return;
+    }
+  }
+
+  if (!showStatus && !hasMigrationWriteApproval(Platform.environment)) {
+    stderr.writeln(
+      'BLOCKED: aplicar migrações altera PostgreSQL. Defina '
+      '$migrationWriteApprovalEnvironment=$migrationWriteApprovalPhrase '
+      'somente após aprovação explícita para esta execução.',
+    );
+    exitCode = 2;
+    return;
+  }
 
   final env = DotEnv(quiet: true)..load();
   env.addAll(Platform.environment);
@@ -1049,22 +1339,22 @@ void main(List<String> args) async {
   );
 
   try {
-    // Criar tabela de controle de migrações
-    await connection.execute('''
-      CREATE TABLE IF NOT EXISTS schema_migrations (
-        version TEXT PRIMARY KEY,
-        name TEXT NOT NULL,
-        executed_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
-      )
-    ''');
-
-    // Buscar migrações já executadas
-    final executedResult = await connection.execute(
-      'SELECT version FROM schema_migrations ORDER BY version',
-    );
-    final executedVersions = executedResult.map((r) => r[0] as String).toSet();
-
     if (showStatus) {
+      Set<String> executedVersions;
+      try {
+        final executedResult = await connection.execute(
+          'SELECT version FROM schema_migrations ORDER BY version',
+        );
+        executedVersions = executedResult.map((r) => r[0] as String).toSet();
+      } on ServerException catch (error) {
+        if (error.code != '42P01') rethrow;
+        executedVersions = <String>{};
+        print(
+          'ℹ️ schema_migrations ainda não existe; status tratado como '
+          'banco sem migrações registradas (nenhuma DDL executada).',
+        );
+      }
+
       print('📊 Status das Migrações\n');
       print('${'Versão'.padRight(10)} ${'Nome'.padRight(30)} Status');
       print('-' * 60);
@@ -1081,6 +1371,79 @@ void main(List<String> args) async {
       return;
     }
 
+    if (rollbackRequested) {
+      final executedResult = await connection.execute(
+        Sql.named('''
+          SELECT version, name
+          FROM schema_migrations
+          ORDER BY version DESC
+          LIMIT @limit
+        '''),
+        parameters: {'limit': rollbackCount},
+      );
+      if (executedResult.length != rollbackCount) {
+        throw StateError(
+          'Rollback solicitou $rollbackCount migração(ões), mas apenas '
+          '${executedResult.length} estão registradas.',
+        );
+      }
+
+      final rollbackMigrations = <Migration>[];
+      for (final row in executedResult) {
+        final version = row[0] as String;
+        final matches = migrations.where((item) => item.version == version);
+        if (matches.isEmpty) {
+          throw StateError(
+            'Migração executada $version não existe neste código; rollback abortado antes de escrever.',
+          );
+        }
+        final migration = matches.single;
+        if (migration.down == null || migration.down!.trim().isEmpty) {
+          throw StateError(
+            'Migração ${migration.fullName} não possui rollback; operação abortada antes de escrever.',
+          );
+        }
+        rollbackMigrations.add(migration);
+      }
+
+      print('↩️  Revertendo ${rollbackMigrations.length} migração(ões)...\n');
+      await connection.runTx((tx) async {
+        for (final migration in rollbackMigrations) {
+          print('◀️  Revertendo ${migration.fullName}...');
+          await _assertRollbackSafe(tx, migration);
+          final statements = migration.down!
+              .split(';')
+              .map((statement) => statement.trim())
+              .where((statement) => statement.isNotEmpty);
+          for (final statement in statements) {
+            await tx.execute(statement);
+          }
+          await tx.execute(
+            Sql.named('DELETE FROM schema_migrations WHERE version = @version'),
+            parameters: {'version': migration.version},
+          );
+          print('   ✅ Revertida');
+        }
+      });
+      print('\n✅ Rollback transacional concluído.');
+      return;
+    }
+
+    // Apply mode only. Reaching this branch requires the explicit textual
+    // PostgreSQL approval check above, before Connection.open.
+    await connection.execute('''
+      CREATE TABLE IF NOT EXISTS schema_migrations (
+        version TEXT PRIMARY KEY,
+        name TEXT NOT NULL,
+        executed_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+      )
+    ''');
+
+    final executedResult = await connection.execute(
+      'SELECT version FROM schema_migrations ORDER BY version',
+    );
+    final executedVersions = executedResult.map((r) => r[0] as String).toSet();
+
     // Executar migrações pendentes
     print('🔄 Executando migrações...\n');
     var migratedCount = 0;
@@ -1094,36 +1457,35 @@ void main(List<String> args) async {
       print('▶️  Executando ${migration.fullName}...');
 
       try {
-        // Executar cada statement da migração separadamente
-        final statements = migration.up
-            .split(';')
-            .map((s) => s.trim())
-            .where((s) => s.isNotEmpty)
-            .toList();
+        await connection.runTx((tx) async {
+          // Cada migração e seu registro são atômicos: em caso de falha, nenhum
+          // statement parcial fica aplicado.
+          final statements = migration.up
+              .split(';')
+              .map((statement) => statement.trim())
+              .where((statement) => statement.isNotEmpty);
 
-        for (final statement in statements) {
-          await connection.execute(statement);
-        }
+          for (final statement in statements) {
+            await tx.execute(statement);
+          }
 
-        // Registrar como executada
-        await connection.execute(
-          Sql.named('''
-            INSERT INTO schema_migrations (version, name)
-            VALUES (@version, @name)
-            ON CONFLICT (version) DO NOTHING
-          '''),
-          parameters: {
-            'version': migration.version,
-            'name': migration.name,
-          },
-        );
+          await tx.execute(
+            Sql.named('''
+              INSERT INTO schema_migrations (version, name)
+              VALUES (@version, @name)
+              ON CONFLICT (version) DO NOTHING
+            '''),
+            parameters: {'version': migration.version, 'name': migration.name},
+          );
+        });
 
         print('   ✅ Sucesso');
         migratedCount++;
       } catch (e) {
         print('   ❌ Erro: $e');
         print(
-            '\n⚠️  Migração interrompida. Corrija o erro e execute novamente.');
+          '\n⚠️  Migração interrompida. Corrija o erro e execute novamente.',
+        );
         exit(1);
       }
     }

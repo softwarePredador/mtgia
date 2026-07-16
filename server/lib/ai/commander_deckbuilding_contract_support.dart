@@ -7,7 +7,7 @@ import 'commander_staple_impact_policy.dart';
 import 'deck_learning_event_support.dart';
 
 const commanderDeckbuildingContractVersion =
-    'commander_deckbuilding_contract_v3_2026-06-30';
+    'commander_deckbuilding_contract_v4_2026-07-15';
 
 const commanderDeckPlanningFlowVersion =
     'commander_deck_planning_flow_v2_2026-06-30';
@@ -141,9 +141,8 @@ Map<String, dynamic> buildCommanderDeckbuildingContractDiagnostics({
   final referenceProfileUsable =
       referenceProfile != null &&
       isReferenceProfileConfidenceUsable(referenceProfile['confidence']);
-  final statsResolvedCount = referenceCardStats
-      .where((stat) => !stat.unresolved)
-      .length;
+  final statsResolvedCount =
+      referenceCardStats.where((stat) => !stat.unresolved).length;
   final corpusUsable =
       referenceDeckCorpusGuidance != null &&
       referenceDeckCorpusGuidance.isUsable;
@@ -161,9 +160,16 @@ Map<String, dynamic> buildCommanderDeckbuildingContractDiagnostics({
     referenceDeterministicDeckDiagnostics,
     const ['distinct_card_count'],
   );
+  final deterministicValidationValid =
+      referenceDeterministicDeckDiagnostics?['validation_valid'] == true;
+  final deterministicUnresolvedCardsZero =
+      referenceDeterministicDeckDiagnostics?['unresolved_cards_zero'] == true;
   final deterministicFallbackReady =
-      referenceDeterministicDeckDiagnostics == null ||
-      (deterministicMainQuantity == 99 && deterministicDistinctCount >= 90);
+      referenceDeterministicDeckDiagnostics != null &&
+      deterministicMainQuantity == 99 &&
+      deterministicDistinctCount >= 90 &&
+      deterministicValidationValid &&
+      deterministicUnresolvedCardsZero;
   final coreCoverageRatio = _doubleFromPath(
     referenceDeckCorpusDiagnostics,
     const ['reference_deck_corpus_evaluation', 'core_package_coverage_ratio'],
@@ -175,13 +181,14 @@ Map<String, dynamic> buildCommanderDeckbuildingContractDiagnostics({
           'external_battle_comparison_gate_v1' &&
       battleComparisonGate?['comparison_input_ready'] == true &&
       battleComparisonGate?['promotion_allowed'] == false;
-  final battleGateStatus = !battleGateRequired
-      ? 'not_required'
-      : comparisonInputReady
+  final battleGateStatus =
+      !battleGateRequired
+          ? 'not_required'
+          : comparisonInputReady
           ? 'comparison_input_ready'
           : positiveBattleExposure
-              ? 'positive_exposure_recorded'
-              : 'pending';
+          ? 'positive_exposure_recorded'
+          : 'pending';
 
   final gates = <String, dynamic>{
     'commander_present': commanderName.isNotEmpty,
@@ -194,6 +201,9 @@ Map<String, dynamic> buildCommanderDeckbuildingContractDiagnostics({
     'active_learned_deck_available': activeLearnedDeck != null,
     'usage_hot_cards_available': usageHotCards.isNotEmpty,
     'has_any_reference_lane': hasReferenceLane,
+    'deterministic_reference_validation_valid': deterministicValidationValid,
+    'deterministic_reference_unresolved_cards_zero':
+        deterministicUnresolvedCardsZero,
     'deterministic_reference_ready': deterministicFallbackReady,
     'battle_gate_required': battleGateRequired,
     'battle_gate_status': battleGateStatus,
@@ -259,11 +269,12 @@ Map<String, dynamic> buildCommanderDeckbuildingContractDiagnostics({
     );
   }
 
-  final status = blockers.isNotEmpty
-      ? 'blocked'
-      : battleGateRequired
-      ? 'ready_for_battle_gate'
-      : 'ready';
+  final status =
+      blockers.isNotEmpty
+          ? 'blocked'
+          : battleGateRequired
+          ? 'ready_for_battle_gate'
+          : 'ready';
 
   return {
     'version': commanderDeckbuildingContractVersion,
@@ -336,8 +347,9 @@ Map<String, dynamic> buildCommanderDeckbuildingAppSummary(
   final gates = _mapValue(diagnostics['gates']);
   final sourceLanes = _mapValue(diagnostics['source_lanes']);
   final planningFlow = _stringList(diagnostics['planning_flow']);
-  final overviewFields =
-      _stringList(diagnostics['deck_overview_required_fields']);
+  final overviewFields = _stringList(
+    diagnostics['deck_overview_required_fields'],
+  );
   final blockers = _stringList(diagnostics['blockers']);
   final warnings = _stringList(diagnostics['warnings']);
   final nextActions = _stringList(diagnostics['next_actions']);
@@ -369,10 +381,7 @@ Map<String, dynamic> buildCommanderDeckbuildingAppSummary(
     'source_lanes': _sourceLaneSummaries(sourceLanes),
     'planning_flow': planningFlow
         .map(
-          (step) => {
-            'key': step,
-            'label': _planningFlowLabels[step] ?? step,
-          },
+          (step) => {'key': step, 'label': _planningFlowLabels[step] ?? step},
         )
         .toList(growable: false),
     'overview_fields': overviewFields
@@ -401,32 +410,35 @@ Map<String, Set<String>> _buildSourceSets({
 }) {
   final sets = <String, Set<String>>{
     'profile_expected_packages': _profileExpectedPackageNames(referenceProfile),
-    'reference_card_stats': referenceCardStats
-        .where((stat) => !stat.unresolved)
-        .map((stat) => stat.cardName)
-        .map(_normalize)
-        .where((name) => name.isNotEmpty)
-        .toSet(),
+    'reference_card_stats':
+        referenceCardStats
+            .where((stat) => !stat.unresolved)
+            .map((stat) => stat.cardName)
+            .map(_normalize)
+            .where((name) => name.isNotEmpty)
+            .toSet(),
     'reference_corpus_packages': _referenceCorpusPackageNames(
       referenceDeckCorpusGuidance,
     ),
-    'active_learned_deck': activeLearnedDeck == null
-        ? <String>{}
-        : activeLearnedDeck.cards
-              .map((card) => card.name)
-              .map(_normalize)
-              .where((name) => name.isNotEmpty)
-              .toSet(),
-    'usage_hot_cards': usageHotCardCanonicalNames(
-      usageHotCards,
-    ).map(_normalize).where((name) => name.isNotEmpty).toSet(),
+    'active_learned_deck':
+        activeLearnedDeck == null
+            ? <String>{}
+            : activeLearnedDeck.cards
+                .map((card) => card.name)
+                .map(_normalize)
+                .where((name) => name.isNotEmpty)
+                .toSet(),
+    'usage_hot_cards':
+        usageHotCardCanonicalNames(
+          usageHotCards,
+        ).map(_normalize).where((name) => name.isNotEmpty).toSet(),
     'deterministic_fallback':
         isLoreholdCommanderReferenceCandidate(commanderName)
-        ? loreholdDeterministicReferenceFallbackCards
-              .map(_normalize)
-              .where((name) => name.isNotEmpty)
-              .toSet()
-        : <String>{},
+            ? loreholdDeterministicReferenceFallbackCards
+                .map(_normalize)
+                .where((name) => name.isNotEmpty)
+                .toSet()
+            : <String>{},
   };
   return sets;
 }
@@ -584,6 +596,10 @@ String _battleGateLabel(String? status) {
   switch (status) {
     case 'pending':
       return 'Pendente';
+    case 'comparison_input_ready':
+      return 'Comparação pronta para avaliação';
+    case 'positive_exposure_recorded':
+      return 'Exposição positiva registrada';
     case 'not_required':
       return 'Não requerido';
     case 'passed':

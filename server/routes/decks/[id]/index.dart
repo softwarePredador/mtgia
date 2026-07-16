@@ -5,6 +5,7 @@ import 'package:postgres/postgres.dart';
 import '../../../lib/deck_rules_service.dart';
 import '../../../lib/deck_card_name_resolution_support.dart';
 import '../../../lib/deck_schema_support.dart';
+import '../../../lib/decks/deck_optimization_history_service.dart';
 import '../../../lib/http_responses.dart';
 import '../../../lib/scryfall_image_url.dart';
 
@@ -36,7 +37,8 @@ Future<Response> _deleteDeck(RequestContext context, String deckId) async {
       // 1. Verifica se o deck existe e pertence ao usuário antes de deletar
       final result = await session.execute(
         Sql.named(
-            'DELETE FROM decks WHERE id = @deckId AND user_id = @userId RETURNING id'),
+          'DELETE FROM decks WHERE id = @deckId AND user_id = @userId RETURNING id',
+        ),
         parameters: {'deckId': deckId, 'userId': userId},
       );
 
@@ -54,8 +56,8 @@ Future<Response> _deleteDeck(RequestContext context, String deckId) async {
     });
 
     return Response(
-        statusCode: HttpStatus
-            .noContent); // 204 No Content é a resposta padrão para sucesso em DELETE
+      statusCode: HttpStatus.noContent,
+    ); // 204 No Content é a resposta padrão para sucesso em DELETE
   } on Exception catch (e) {
     print('[ERROR] Failed to delete deck: $e');
     if (e.toString().contains('permission denied')) {
@@ -81,14 +83,20 @@ Future<Response> _updateDeck(RequestContext context, String deckId) async {
       bracketRaw is int ? bracketRaw : int.tryParse('${bracketRaw ?? ''}');
   final isPublic = body['is_public'] as bool?;
   final cards = body['cards'] as List?; // Lista completa e nova de cartas
+  final mutationContext =
+      body['mutation_context'] is Map
+          ? (body['mutation_context'] as Map).cast<String, dynamic>()
+          : const <String, dynamic>{};
 
   try {
     final updatedDeck = await conn.runTx((session) async {
       // 1. Verifica se o deck existe e pertence ao usuário
       final deckCheck = await session.execute(
-        Sql.named(hasMeta
-            ? 'SELECT id, name, format, description, archetype, bracket, is_public FROM decks WHERE id = @deckId AND user_id = @userId'
-            : 'SELECT id, name, format, description, NULL::text as archetype, NULL::int as bracket, is_public FROM decks WHERE id = @deckId AND user_id = @userId'),
+        Sql.named(
+          hasMeta
+              ? 'SELECT id, name, format, description, archetype, bracket, is_public FROM decks WHERE id = @deckId AND user_id = @userId'
+              : 'SELECT id, name, format, description, NULL::text as archetype, NULL::int as bracket, is_public FROM decks WHERE id = @deckId AND user_id = @userId',
+        ),
         parameters: {'deckId': deckId, 'userId': userId},
       );
 
@@ -140,9 +148,9 @@ Future<Response> _updateDeck(RequestContext context, String deckId) async {
       // 3. Se uma nova lista de cartas for enviada, substitui a antiga
       if (cards != null) {
         validateNoUnsupportedDeckSections(
-          cards: cards
-              .whereType<Map>()
-              .map((card) => card.cast<String, dynamic>()),
+          cards: cards.whereType<Map>().map(
+            (card) => card.cast<String, dynamic>(),
+          ),
         );
 
         final normalized = <Map<String, dynamic>>[];
@@ -152,9 +160,10 @@ Future<Response> _updateDeck(RequestContext context, String deckId) async {
           var cardId = (card['card_id'] as String?)?.trim();
           final cardName = (card['name'] as String?)?.trim();
           final quantityRaw = card['quantity'];
-          final quantity = quantityRaw is int
-              ? quantityRaw
-              : int.tryParse('${quantityRaw ?? ''}');
+          final quantity =
+              quantityRaw is int
+                  ? quantityRaw
+                  : int.tryParse('${quantityRaw ?? ''}');
           final isCommander = card['is_commander'] as bool? ?? false;
 
           if ((cardId == null || cardId.isEmpty) &&
@@ -255,10 +264,7 @@ Future<Response> _updateDeck(RequestContext context, String deckId) async {
           final batchInsertSql =
               'INSERT INTO deck_cards (deck_id, card_id, quantity, is_commander, condition) VALUES ${values.join(', ')}';
 
-          await session.execute(
-            Sql.named(batchInsertSql),
-            parameters: params,
-          );
+          await session.execute(Sql.named(batchInsertSql), parameters: params);
         }
       }
 
@@ -276,6 +282,22 @@ Future<Response> _updateDeck(RequestContext context, String deckId) async {
       }
       return deckMap;
     });
+
+    if (cards != null && mutationContext.isNotEmpty) {
+      try {
+        await DeckOptimizationHistoryService(conn).recordAppliedOptimization(
+          userId: userId,
+          deckId: deckId,
+          context: mutationContext,
+          afterCardsPayload: cards
+              .whereType<Map>()
+              .map((card) => card.cast<String, dynamic>())
+              .toList(growable: false),
+        );
+      } catch (e) {
+        print('[WARN] Failed to record deck optimization event: $e');
+      }
+    }
 
     return Response.json(body: {'success': true, 'deck': updatedDeck});
   } on DeckRulesException catch (e) {
@@ -316,15 +338,13 @@ Future<Response> _getDeckById(RequestContext context, String deckId) async {
           'FROM decks WHERE id = @deckId AND user_id = @userId',
         ].join(' '),
       ),
-      parameters: {
-        'deckId': deckId,
-        'userId': userId,
-      },
+      parameters: {'deckId': deckId, 'userId': userId},
     );
 
     if (deckResult.isEmpty) {
       return notFound(
-          'Deck not found or you do not have permission to view it.');
+        'Deck not found or you do not have permission to view it.',
+      );
     }
 
     final deckInfo = deckResult.first.toColumnMap();
@@ -383,17 +403,21 @@ Future<Response> _getDeckById(RequestContext context, String deckId) async {
       parameters: {'deckId': deckId},
     );
 
-    final cardsList = cardsResult.map((row) {
-      final m = row.toColumnMap();
-      m['image_url'] = normalizeScryfallImageUrl(m['image_url']?.toString());
-      if (m['set_release_date'] is DateTime) {
-        m['set_release_date'] = (m['set_release_date'] as DateTime)
-            .toIso8601String()
-            .split('T')
-            .first;
-      }
-      return m;
-    }).toList();
+    final cardsList =
+        cardsResult.map((row) {
+          final m = row.toColumnMap();
+          m['image_url'] = normalizeScryfallImageUrl(
+            m['image_url']?.toString(),
+          );
+          if (m['set_release_date'] is DateTime) {
+            m['set_release_date'] =
+                (m['set_release_date'] as DateTime)
+                    .toIso8601String()
+                    .split('T')
+                    .first;
+          }
+          return m;
+        }).toList();
 
     // 3. Organizar para visualização (Separar Comandante e Agrupar por Tipo)
     final commander = <Map<String, dynamic>>[];
@@ -449,7 +473,7 @@ Future<Response> _getDeckById(RequestContext context, String deckId) async {
       'B': 0,
       'R': 0,
       'G': 0,
-      'C': 0
+      'C': 0,
     };
 
     for (final card in cardsList) {
@@ -504,7 +528,9 @@ Future<Response> _getDeckById(RequestContext context, String deckId) async {
       'color_identity': deckColorIdentity.toList(),
       'stats': {
         'total_cards': cardsList.fold<int>(
-            0, (sum, item) => sum + (item['quantity'] as int)),
+          0,
+          (sum, item) => sum + (item['quantity'] as int),
+        ),
         'unique_cards': cardsList.length,
         'mana_curve': manaCurve,
         'color_distribution': colorDistribution,

@@ -28,10 +28,10 @@ class CommanderReferenceDeckCardInput {
   final String board;
 
   Map<String, dynamic> toJson() => {
-        'name': name,
-        'quantity': quantity,
-        'board': board,
-      };
+    'name': name,
+    'quantity': quantity,
+    'board': board,
+  };
 }
 
 class CommanderReferenceDeckInput {
@@ -54,14 +54,14 @@ class CommanderReferenceDeckInput {
   final List<CommanderReferenceDeckCardInput> cards;
 
   Map<String, dynamic> toJson() => {
-        'commander_name': commanderName,
-        'source_deck_key': sourceDeckKey,
-        'source': source,
-        'source_url': sourceUrl,
-        'power_lane': powerLane,
-        'theme': theme,
-        'cards': cards.map((card) => card.toJson()).toList(),
-      };
+    'commander_name': commanderName,
+    'source_deck_key': sourceDeckKey,
+    'source': source,
+    'source_url': sourceUrl,
+    'power_lane': powerLane,
+    'theme': theme,
+    'cards': cards.map((card) => card.toJson()).toList(),
+  };
 }
 
 class CommanderReferenceDeckAnalysis {
@@ -98,29 +98,29 @@ class CommanderReferenceDeckAnalysis {
   final List<Map<String, dynamic>> cardRows;
 
   Map<String, dynamic> toJson() => {
-        'source_deck_key': deck.sourceDeckKey,
-        'commander_name': deck.commanderName,
-        'source': deck.source,
-        'source_url': deck.sourceUrl,
-        'power_lane': deck.powerLane,
-        'theme': deck.theme,
-        'commander_card_resolution': {
-          'resolved': commanderResolved,
-          if (commanderCardId != null) 'card_id': commanderCardId,
-          if (commanderCardName != null) 'card_name': commanderCardName,
-        },
-        'main_quantity': mainQuantity,
-        'commander_quantity': commanderQuantity,
-        'resolved_count': resolvedCount,
-        'unresolved_count': unresolvedCardNames.length,
-        'unresolved_card_names': unresolvedCardNames,
-        'off_color_count': offColorCardNames.length,
-        'off_color_card_names': offColorCardNames,
-        'singleton_violations': singletonViolations,
-        'role_summary': roleSummary,
-        'accepted': accepted,
-        'rejection_reasons': rejectionReasons,
-      };
+    'source_deck_key': deck.sourceDeckKey,
+    'commander_name': deck.commanderName,
+    'source': deck.source,
+    'source_url': deck.sourceUrl,
+    'power_lane': deck.powerLane,
+    'theme': deck.theme,
+    'commander_card_resolution': {
+      'resolved': commanderResolved,
+      if (commanderCardId != null) 'card_id': commanderCardId,
+      if (commanderCardName != null) 'card_name': commanderCardName,
+    },
+    'main_quantity': mainQuantity,
+    'commander_quantity': commanderQuantity,
+    'resolved_count': resolvedCount,
+    'unresolved_count': unresolvedCardNames.length,
+    'unresolved_card_names': unresolvedCardNames,
+    'off_color_count': offColorCardNames.length,
+    'off_color_card_names': offColorCardNames,
+    'singleton_violations': singletonViolations,
+    'role_summary': roleSummary,
+    'accepted': accepted,
+    'rejection_reasons': rejectionReasons,
+  };
 }
 
 class CommanderReferenceCorpusSummary {
@@ -141,13 +141,13 @@ class CommanderReferenceCorpusSummary {
   final Map<String, int> themeCounts;
 
   Map<String, dynamic> toJson() => {
-        'commander_name': commanderName,
-        'deck_count': deckCount,
-        'accepted_deck_count': acceptedDeckCount,
-        'average_role_counts': averageRoleCounts,
-        'top_cards': topCards,
-        'theme_counts': themeCounts,
-      };
+    'commander_name': commanderName,
+    'deck_count': deckCount,
+    'accepted_deck_count': acceptedDeckCount,
+    'average_role_counts': averageRoleCounts,
+    'top_cards': topCards,
+    'theme_counts': themeCounts,
+  };
 }
 
 class CommanderReferenceDeckCorpusGuidance {
@@ -174,26 +174,26 @@ class CommanderReferenceDeckCorpusGuidance {
       buildCommanderReferenceCorpusPackages(this);
 
   Map<String, dynamic> toDiagnostics() => {
-        'reference_deck_corpus_used': isUsable,
-        'reference_deck_corpus_source': source,
-        'reference_deck_count': deckCount,
-        'accepted_reference_deck_count': acceptedDeckCount,
-        'average_role_counts': averageRoleCounts,
-        'top_card_count': topCards.length,
-        'top_cards': topCards
-            .take(16)
-            .map(
-              (card) => {
-                'card_name': card['card_name']?.toString(),
-                'deck_count': _intValue(card['deck_count']),
-                'role': card['role']?.toString(),
-              },
-            )
-            .toList(growable: false),
-        'theme_counts': themeCounts,
-        'corpus_package_counts': packages.counts,
-        'corpus_packages': packages.toDiagnostics(),
-      };
+    'reference_deck_corpus_used': isUsable,
+    'reference_deck_corpus_source': source,
+    'reference_deck_count': deckCount,
+    'accepted_reference_deck_count': acceptedDeckCount,
+    'average_role_counts': averageRoleCounts,
+    'top_card_count': topCards.length,
+    'top_cards': topCards
+        .take(16)
+        .map(
+          (card) => {
+            'card_name': card['card_name']?.toString(),
+            'deck_count': _intValue(card['deck_count']),
+            'role': card['role']?.toString(),
+          },
+        )
+        .toList(growable: false),
+    'theme_counts': themeCounts,
+    'corpus_package_counts': packages.counts,
+    'corpus_packages': packages.toDiagnostics(),
+  };
 }
 
 class CommanderReferenceCorpusPackages {
@@ -210,31 +210,25 @@ class CommanderReferenceCorpusPackages {
   final List<Map<String, dynamic>> optionalContextual;
 
   Map<String, int> get counts => {
-        'core_package': corePackage.length,
-        'theme_package': themePackage.length,
-        'support_package': supportPackage.length,
-        'optional_contextual': optionalContextual.length,
-      };
+    'core_package': corePackage.length,
+    'theme_package': themePackage.length,
+    'support_package': supportPackage.length,
+    'optional_contextual': optionalContextual.length,
+  };
 
   Map<String, dynamic> toDiagnostics() => {
-        'core_package': _packageDiagnostics(corePackage, limit: 12),
-        'theme_package': _packageDiagnostics(themePackage, limit: 12),
-        'support_package': _packageDiagnostics(supportPackage, limit: 12),
-        'optional_contextual': _packageDiagnostics(
-          optionalContextual,
-          limit: 8,
-        ),
-      };
+    'core_package': _packageDiagnostics(corePackage, limit: 12),
+    'theme_package': _packageDiagnostics(themePackage, limit: 12),
+    'support_package': _packageDiagnostics(supportPackage, limit: 12),
+    'optional_contextual': _packageDiagnostics(optionalContextual, limit: 8),
+  };
 
   Map<String, dynamic> toCacheMaterial() => {
-        'core_package': _packageDiagnostics(corePackage, limit: 24),
-        'theme_package': _packageDiagnostics(themePackage, limit: 24),
-        'support_package': _packageDiagnostics(supportPackage, limit: 24),
-        'optional_contextual': _packageDiagnostics(
-          optionalContextual,
-          limit: 24,
-        ),
-      };
+    'core_package': _packageDiagnostics(corePackage, limit: 24),
+    'theme_package': _packageDiagnostics(themePackage, limit: 24),
+    'support_package': _packageDiagnostics(supportPackage, limit: 24),
+    'optional_contextual': _packageDiagnostics(optionalContextual, limit: 24),
+  };
 }
 
 String normalizeCommanderReferenceDeckText(String value) =>
@@ -268,45 +262,49 @@ CommanderReferenceDeckInput parseCommanderReferenceDeckInput(
       (payload['source'] ?? 'manual_reference_deck_v1').toString().trim();
   final sourceUrl =
       (payload['source_url'] ?? payload['url'] ?? '').toString().trim();
-  final key = (payload['source_deck_key'] ?? payload['deck_key'] ?? '')
-      .toString()
-      .trim();
+  final key =
+      (payload['source_deck_key'] ?? payload['deck_key'] ?? '')
+          .toString()
+          .trim();
   final rawCards = payload['cards'];
   if (rawCards is! List) {
     throw ArgumentError('reference deck precisa conter cards[].');
   }
 
-  final cards = rawCards.map((raw) {
-    if (raw is! Map) {
-      throw ArgumentError('cada card precisa ser objeto JSON.');
-    }
-    final name = raw['name']?.toString().trim() ?? '';
-    if (name.isEmpty) throw ArgumentError('card sem name.');
-    final quantity = int.tryParse('${raw['quantity'] ?? 1}') ?? 1;
-    if (quantity < 1) {
-      throw ArgumentError('quantity invalida para $name.');
-    }
-    final board = normalizeCommanderReferenceDeckText(
-      raw['board']?.toString().trim().isNotEmpty == true
-          ? raw['board'].toString()
-          : (raw['is_commander'] == true ? 'commander' : 'main'),
-    );
-    return CommanderReferenceDeckCardInput(
-      name: name,
-      quantity: quantity,
-      board: board == 'command zone' ? 'commander' : board,
-    );
-  }).toList(growable: false);
+  final cards = rawCards
+      .map((raw) {
+        if (raw is! Map) {
+          throw ArgumentError('cada card precisa ser objeto JSON.');
+        }
+        final name = raw['name']?.toString().trim() ?? '';
+        if (name.isEmpty) throw ArgumentError('card sem name.');
+        final quantity = int.tryParse('${raw['quantity'] ?? 1}') ?? 1;
+        if (quantity < 1) {
+          throw ArgumentError('quantity invalida para $name.');
+        }
+        final board = normalizeCommanderReferenceDeckText(
+          raw['board']?.toString().trim().isNotEmpty == true
+              ? raw['board'].toString()
+              : (raw['is_commander'] == true ? 'commander' : 'main'),
+        );
+        return CommanderReferenceDeckCardInput(
+          name: name,
+          quantity: quantity,
+          board: board == 'command zone' ? 'commander' : board,
+        );
+      })
+      .toList(growable: false);
 
   return CommanderReferenceDeckInput(
     commanderName: commanderName,
-    sourceDeckKey: key.isNotEmpty
-        ? key
-        : buildReferenceDeckKey(
-            commanderName: commanderName,
-            source: source,
-            sourceUrl: sourceUrl,
-          ),
+    sourceDeckKey:
+        key.isNotEmpty
+            ? key
+            : buildReferenceDeckKey(
+              commanderName: commanderName,
+              source: source,
+              sourceUrl: sourceUrl,
+            ),
     source: source.isEmpty ? 'manual_reference_deck_v1' : source,
     sourceUrl: sourceUrl,
     powerLane: (payload['power_lane'] ?? 'unknown').toString().trim(),
@@ -318,17 +316,21 @@ CommanderReferenceDeckInput parseCommanderReferenceDeckInput(
 List<CommanderReferenceDeckInput> parseCommanderReferenceDeckCorpus(
   Map<String, dynamic> payload,
 ) {
-  final commander = (payload['commander'] ?? payload['commander_name'] ?? '')
-      .toString()
-      .trim();
+  final commander =
+      (payload['commander'] ?? payload['commander_name'] ?? '')
+          .toString()
+          .trim();
   final decks = payload['decks'];
   if (decks is List) {
-    return decks.map((raw) {
-      if (raw is! Map) throw ArgumentError('decks[] precisa ser objeto JSON.');
-      final copy = raw.cast<String, dynamic>();
-      copy.putIfAbsent('commander', () => commander);
-      return parseCommanderReferenceDeckInput(copy);
-    }).toList(growable: false);
+    return decks
+        .map((raw) {
+          if (raw is! Map)
+            throw ArgumentError('decks[] precisa ser objeto JSON.');
+          final copy = raw.cast<String, dynamic>();
+          copy.putIfAbsent('commander', () => commander);
+          return parseCommanderReferenceDeckInput(copy);
+        })
+        .toList(growable: false);
   }
   return [parseCommanderReferenceDeckInput(payload)];
 }
@@ -350,15 +352,17 @@ Future<List<CommanderReferenceDeckAnalysis>> analyzeCommanderReferenceDecks({
     preferredFormat: 'commander',
   );
   return decks
-      .map((deck) => analyzeCommanderReferenceDeck(
-            deck: deck,
-            resolvedCardsByName: resolved,
-          ))
+      .map(
+        (deck) => analyzeCommanderReferenceDeck(
+          deck: deck,
+          resolvedCardsByName: resolved,
+        ),
+      )
       .toList(growable: false);
 }
 
 Future<CommanderReferenceDeckCorpusGuidance?>
-    loadCommanderReferenceDeckCorpusGuidance({
+loadCommanderReferenceDeckCorpusGuidance({
   required Pool pool,
   required String? commanderName,
 }) async {
@@ -381,9 +385,7 @@ Future<CommanderReferenceDeckCorpusGuidance?>
       ORDER BY accepted_deck_count DESC, updated_at DESC
       LIMIT 1
     '''),
-    parameters: {
-      'commander': normalizeCommanderReferenceDeckText(commander),
-    },
+    parameters: {'commander': normalizeCommanderReferenceDeckText(commander)},
   );
   if (result.isEmpty) return null;
 
@@ -398,13 +400,13 @@ Future<CommanderReferenceDeckCorpusGuidance?>
     source: row[1]?.toString() ?? 'commander_reference_deck_corpus_v1',
     deckCount: _intValue(row[2]),
     acceptedDeckCount: _intValue(row[3]),
-    averageRoleCounts: _jsonMap(row[4]).map(
-      (key, value) => MapEntry(key, _doubleValue(value)),
-    ),
+    averageRoleCounts: _jsonMap(
+      row[4],
+    ).map((key, value) => MapEntry(key, _doubleValue(value))),
     topCards: topCards,
-    themeCounts: _jsonMap(row[6]).map(
-      (key, value) => MapEntry(key, _intValue(value)),
-    ),
+    themeCounts: _jsonMap(
+      row[6],
+    ).map((key, value) => MapEntry(key, _intValue(value))),
   );
   return guidance.isUsable ? guidance : null;
 }
@@ -442,8 +444,9 @@ String buildCommanderReferenceDeckCorpusPrompt(
   if (guidance == null || !guidance.isUsable) return '';
   final packages = guidance.packages;
   final compact = shouldUseCompactCommanderReferenceCorpusPrompt(guidance);
-  final roleLines = guidance.averageRoleCounts.entries.toList()
-    ..sort((a, b) => b.value.compareTo(a.value));
+  final roleLines =
+      guidance.averageRoleCounts.entries.toList()
+        ..sort((a, b) => b.value.compareTo(a.value));
   final roles = roleLines
       .where((entry) => entry.key != 'lands')
       .take(compact ? 4 : 6)
@@ -470,9 +473,10 @@ String buildCommanderReferenceDeckCorpusPrompt(
     limit: compact ? 3 : 5,
     maxLands: 0,
   );
-  final compactLine = compact
-      ? '- Compact prompt mode active: core_package is complete enough; do not request optional_contextual or broad top-card bulk.'
-      : '- Standard prompt mode active: use compact aggregate package lists only.';
+  final compactLine =
+      compact
+          ? '- Compact prompt mode active: core_package is complete enough; do not request optional_contextual or broad top-card bulk.'
+          : '- Standard prompt mode active: use compact aggregate package lists only.';
 
   return '''
 Reference deck corpus v4 active for ${guidance.commanderName}:
@@ -520,18 +524,17 @@ CommanderReferenceCorpusPackages buildCommanderReferenceCorpusPackages(
   final optional = <Map<String, dynamic>>[];
   final seen = <String>{};
   final sorted = guidance.topCards
-      .map((card) => Map<String, dynamic>.from(card))
-      .where(
-          (card) => (card['card_name']?.toString().trim().isNotEmpty ?? false))
-      .toList(growable: false)
-    ..sort(_compareCorpusCards);
+    .map((card) => Map<String, dynamic>.from(card))
+    .where((card) => (card['card_name']?.toString().trim().isNotEmpty ?? false))
+    .toList(growable: false)..sort(_compareCorpusCards);
   final coreThreshold = _corePackageDeckCountThreshold(
     guidance.acceptedDeckCount,
   );
 
   for (final card in sorted) {
     final normalized = normalizeCommanderReferenceDeckText(
-        card['card_name']?.toString() ?? '');
+      card['card_name']?.toString() ?? '',
+    );
     if (normalized.isEmpty || !seen.add(normalized)) continue;
 
     final role = card['role']?.toString().trim().toLowerCase() ?? '';
@@ -583,14 +586,17 @@ int _corePackageDeckCountThreshold(int acceptedDeckCount) {
 }
 
 int _compareCorpusCards(Map<String, dynamic> a, Map<String, dynamic> b) {
-  final deckCountCompare =
-      _intValue(b['deck_count']).compareTo(_intValue(a['deck_count']));
+  final deckCountCompare = _intValue(
+    b['deck_count'],
+  ).compareTo(_intValue(a['deck_count']));
   if (deckCountCompare != 0) return deckCountCompare;
-  final quantityCompare =
-      _intValue(b['total_quantity']).compareTo(_intValue(a['total_quantity']));
+  final quantityCompare = _intValue(
+    b['total_quantity'],
+  ).compareTo(_intValue(a['total_quantity']));
   if (quantityCompare != 0) return quantityCompare;
-  return (a['card_name']?.toString() ?? '')
-      .compareTo(b['card_name']?.toString() ?? '');
+  return (a['card_name']?.toString() ?? '').compareTo(
+    b['card_name']?.toString() ?? '',
+  );
 }
 
 List<Map<String, dynamic>> _packageDiagnostics(
@@ -618,10 +624,10 @@ String _formatCorpusPackagePromptLine(
 }) {
   if (cards.isEmpty) return '- $label: not_proven';
   final formatted = _promptOrderedCorpusCards(
-    cards,
-    limit: limit,
-    maxLands: maxLands,
-  )
+        cards,
+        limit: limit,
+        maxLands: maxLands,
+      )
       .take(limit)
       .map((card) {
         final name = card['card_name']?.toString().trim();
@@ -642,8 +648,9 @@ List<Map<String, dynamic>> _promptOrderedCorpusCards(
   required int maxLands,
 }) {
   if (limit <= 0) return const [];
-  final sorted = cards.map((card) => Map<String, dynamic>.from(card)).toList()
-    ..sort(_compareCorpusCardsForPrompt);
+  final sorted =
+      cards.map((card) => Map<String, dynamic>.from(card)).toList()
+        ..sort(_compareCorpusCardsForPrompt);
   final nonLands = sorted
       .where((card) => card['role']?.toString().toLowerCase() != 'lands')
       .toList(growable: false);
@@ -658,35 +665,47 @@ List<Map<String, dynamic>> _promptOrderedCorpusCards(
     ...lands.take(limit - nonLandBudget),
   ];
   if (selected.length < limit) {
-    final selectedNames = selected
-        .map((card) => normalizeCommanderReferenceDeckText(
-            card['card_name']?.toString() ?? ''))
-        .toSet();
+    final selectedNames =
+        selected
+            .map(
+              (card) => normalizeCommanderReferenceDeckText(
+                card['card_name']?.toString() ?? '',
+              ),
+            )
+            .toSet();
     selected.addAll(
-      nonLands.where((card) {
-        final name = normalizeCommanderReferenceDeckText(
-          card['card_name']?.toString() ?? '',
-        );
-        return name.isNotEmpty && !selectedNames.contains(name);
-      }).take(limit - selected.length),
+      nonLands
+          .where((card) {
+            final name = normalizeCommanderReferenceDeckText(
+              card['card_name']?.toString() ?? '',
+            );
+            return name.isNotEmpty && !selectedNames.contains(name);
+          })
+          .take(limit - selected.length),
     );
   }
   return selected.take(limit).toList(growable: false);
 }
 
 int _compareCorpusCardsForPrompt(
-    Map<String, dynamic> a, Map<String, dynamic> b) {
-  final roleCompare = _corpusPromptRolePriority(a['role']?.toString() ?? '')
-      .compareTo(_corpusPromptRolePriority(b['role']?.toString() ?? ''));
+  Map<String, dynamic> a,
+  Map<String, dynamic> b,
+) {
+  final roleCompare = _corpusPromptRolePriority(
+    a['role']?.toString() ?? '',
+  ).compareTo(_corpusPromptRolePriority(b['role']?.toString() ?? ''));
   if (roleCompare != 0) return roleCompare;
-  final deckCountCompare =
-      _intValue(b['deck_count']).compareTo(_intValue(a['deck_count']));
+  final deckCountCompare = _intValue(
+    b['deck_count'],
+  ).compareTo(_intValue(a['deck_count']));
   if (deckCountCompare != 0) return deckCountCompare;
-  final quantityCompare =
-      _intValue(b['total_quantity']).compareTo(_intValue(a['total_quantity']));
+  final quantityCompare = _intValue(
+    b['total_quantity'],
+  ).compareTo(_intValue(a['total_quantity']));
   if (quantityCompare != 0) return quantityCompare;
-  return (a['card_name']?.toString() ?? '')
-      .compareTo(b['card_name']?.toString() ?? '');
+  return (a['card_name']?.toString() ?? '').compareTo(
+    b['card_name']?.toString() ?? '',
+  );
 }
 
 int _corpusPromptRolePriority(String role) {
@@ -699,8 +718,7 @@ int _corpusPromptRolePriority(String role) {
     'interaction' ||
     'interaction_and_resets' ||
     'board_wipe' ||
-    'protection' =>
-      5,
+    'protection' => 5,
     'recursion' => 6,
     'win_condition' || 'creature' => 7,
     'lands' => 9,
@@ -715,17 +733,19 @@ Map<String, dynamic>? evaluateGeneratedDeckAgainstReferenceCorpusPackages({
   if (guidance == null || !guidance.isUsable) return null;
   final packages = guidance.packages;
   final generatedNames = <String, int>{};
-  final cards = generatedDeck['cards'] is List
-      ? (generatedDeck['cards'] as List)
-      : const <dynamic>[];
+  final cards =
+      generatedDeck['cards'] is List
+          ? (generatedDeck['cards'] as List)
+          : const <dynamic>[];
   for (final rawCard in cards) {
     if (rawCard is! Map) continue;
     final name = rawCard['name']?.toString().trim() ?? '';
     if (name.isEmpty) continue;
     final quantityRaw = rawCard['quantity'];
-    final quantity = quantityRaw is int
-        ? quantityRaw
-        : int.tryParse(quantityRaw?.toString() ?? '') ?? 1;
+    final quantity =
+        quantityRaw is int
+            ? quantityRaw
+            : int.tryParse(quantityRaw?.toString() ?? '') ?? 1;
     final normalized = normalizeCommanderReferenceDeckText(name);
     if (normalized.isEmpty) continue;
     generatedNames[normalized] = (generatedNames[normalized] ?? 0) + quantity;
@@ -758,7 +778,8 @@ Map<String, dynamic>? evaluateGeneratedDeckAgainstReferenceCorpusPackages({
       if (rawCard is! Map) continue;
       final role = rawCard['role']?.toString().trim();
       if (role == null || role.isEmpty) continue;
-      roleCoverage[role] = (roleCoverage[role] ?? 0) +
+      roleCoverage[role] =
+          (roleCoverage[role] ?? 0) +
           (rawCard['quantity'] is int ? rawCard['quantity'] as int : 1);
     }
   }
@@ -801,9 +822,10 @@ Map<String, dynamic> _evaluateCorpusPackageCoverage(
   return {
     'available': available,
     'matched': matchedCount,
-    'coverage_ratio': available == 0
-        ? 0.0
-        : double.parse((matchedCount / available).toStringAsFixed(4)),
+    'coverage_ratio':
+        available == 0
+            ? 0.0
+            : double.parse((matchedCount / available).toStringAsFixed(4)),
     'matched_cards': matched.take(12).toList(growable: false),
     'missed_top_cards': missed.take(12).toList(growable: false),
   };
@@ -818,8 +840,9 @@ CommanderReferenceDeckAnalysis analyzeCommanderReferenceDeck({
     resolvedCardsByName: resolvedCardsByName,
   );
   final commanderIdentity = _cardIdentity(
-    resolvedCardsByName[
-        normalizeCommanderReferenceDeckText(deck.commanderName)],
+    resolvedCardsByName[normalizeCommanderReferenceDeckText(
+      deck.commanderName,
+    )],
   );
   final mainCards = deck.cards
       .where((card) => card.board != 'commander')
@@ -840,7 +863,8 @@ CommanderReferenceDeckAnalysis analyzeCommanderReferenceDeck({
     final metadata = resolvedCardsByName[normalized];
     final unresolvedCard = metadata == null;
     final identity = _cardIdentity(metadata);
-    final offColorCard = !unresolvedCard &&
+    final offColorCard =
+        !unresolvedCard &&
         !isWithinCommanderIdentity(
           cardIdentity: identity,
           commanderIdentity: commanderIdentity,
@@ -936,26 +960,30 @@ CommanderReferenceCorpusSummary summarizeCommanderReferenceDeckCorpus(
       final key = row['card_name_normalized']?.toString() ?? '';
       if (key.isEmpty || basicLandNames.contains(key)) continue;
       final item = cardTotals.putIfAbsent(
-          key,
-          () => {
-                'card_name': row['card_name'],
-                'deck_count': 0,
-                'total_quantity': 0,
-                'role': row['role'],
-              });
+        key,
+        () => {
+          'card_name': row['card_name'],
+          'deck_count': 0,
+          'total_quantity': 0,
+          'role': row['role'],
+        },
+      );
       item['deck_count'] = (item['deck_count'] as int) + 1;
       item['total_quantity'] =
           (item['total_quantity'] as int) + (row['quantity'] as int);
     }
   }
   final denominator = accepted.isEmpty ? 1 : accepted.length;
-  final topCards = cardTotals.values.toList()
-    ..sort((a, b) {
-      final deckCountCompare =
-          (b['deck_count'] as int).compareTo(a['deck_count'] as int);
-      if (deckCountCompare != 0) return deckCountCompare;
-      return (b['total_quantity'] as int).compareTo(a['total_quantity'] as int);
-    });
+  final topCards =
+      cardTotals.values.toList()..sort((a, b) {
+        final deckCountCompare = (b['deck_count'] as int).compareTo(
+          a['deck_count'] as int,
+        );
+        if (deckCountCompare != 0) return deckCountCompare;
+        return (b['total_quantity'] as int).compareTo(
+          a['total_quantity'] as int,
+        );
+      });
   return CommanderReferenceCorpusSummary(
     commanderName: commander,
     deckCount: analyses.length,
@@ -964,10 +992,11 @@ CommanderReferenceCorpusSummary summarizeCommanderReferenceDeckCorpus(
       for (final entry in roleTotals.entries)
         entry.key: double.parse((entry.value / denominator).toStringAsFixed(2)),
     },
-    topCards: topCards
-        .take(40)
-        .map((item) => Map<String, dynamic>.from(item))
-        .toList(),
+    topCards:
+        topCards
+            .take(40)
+            .map((item) => Map<String, dynamic>.from(item))
+            .toList(),
     themeCounts: themeCounts,
   );
 }
@@ -1293,15 +1322,17 @@ Future<void> upsertCommanderReferenceDeckCorpus(
       parameters: {
         'source_deck_key': analysis.deck.sourceDeckKey,
         'commander_name': analysis.deck.commanderName,
-        'commander_name_normalized':
-            normalizeCommanderReferenceDeckText(analysis.deck.commanderName),
+        'commander_name_normalized': normalizeCommanderReferenceDeckText(
+          analysis.deck.commanderName,
+        ),
         'source': analysis.deck.source,
         'source_url': analysis.deck.sourceUrl,
         'power_lane': analysis.deck.powerLane,
         'theme': analysis.deck.theme,
-        'deck_hash': sha256
-            .convert(utf8.encode(jsonEncode(analysis.deck.toJson())))
-            .toString(),
+        'deck_hash':
+            sha256
+                .convert(utf8.encode(jsonEncode(analysis.deck.toJson())))
+                .toString(),
         'main_quantity': analysis.mainQuantity,
         'commander_quantity': analysis.commanderQuantity,
         'resolved_count': analysis.resolvedCount,
@@ -1315,19 +1346,15 @@ Future<void> upsertCommanderReferenceDeckCorpus(
     );
     await pool.execute(
       Sql.named(
-          'DELETE FROM commander_reference_deck_cards WHERE source_deck_key = @source_deck_key'),
+        'DELETE FROM commander_reference_deck_cards WHERE source_deck_key = @source_deck_key',
+      ),
       parameters: {'source_deck_key': analysis.deck.sourceDeckKey},
     );
     if (analysis.cardRows.isEmpty) {
       continue;
     }
     final rowsPayload = analysis.cardRows
-        .map(
-          (row) => {
-            ...row,
-            'card_id': row['card_id']?.toString() ?? '',
-          },
-        )
+        .map((row) => {...row, 'card_id': row['card_id']?.toString() ?? ''})
         .toList(growable: false);
     await pool.execute(
       Sql.named('''
@@ -1412,8 +1439,9 @@ Future<void> upsertCommanderReferenceDeckCorpus(
           updated_at = NOW()
       '''),
       parameters: {
-        'commander_name_normalized':
-            normalizeCommanderReferenceDeckText(summary.commanderName),
+        'commander_name_normalized': normalizeCommanderReferenceDeckText(
+          summary.commanderName,
+        ),
         'source': 'commander_reference_deck_corpus_v1',
         'commander_name': summary.commanderName,
         'deck_count': summary.deckCount,
@@ -1461,7 +1489,10 @@ double _doubleValue(Object? raw) {
 Set<String> _cardIdentity(Map<String, dynamic>? metadata) {
   if (metadata == null) return <String>{};
   return resolveCardColorIdentity(
-    colorIdentity: _metadataStringIterable(metadata['color_identity']),
+    colorIdentity:
+        metadata['color_identity'] == null
+            ? null
+            : _metadataStringIterable(metadata['color_identity']),
     colors: _metadataStringIterable(metadata['colors']),
     oracleText: metadata['oracle_text']?.toString(),
     manaCost: metadata['mana_cost']?.toString(),

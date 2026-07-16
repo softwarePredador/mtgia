@@ -48,7 +48,14 @@ class XmageSourceCatalogReconciliationTest(unittest.TestCase):
             "ledger": [
                 {"card_id": "1", "lane": "xmage_exact"},
                 {"card_id": "2", "lane": "forge_exact"},
-                {"card_id": "3", "lane": "unresolved"},
+                {
+                    "card_id": "3",
+                    "lane": "unresolved",
+                    "engine_name_candidate": None,
+                    "residual_family": "engine_catalog_gap::normal",
+                    "residual_semantic_family": "other_long_tail",
+                    "residual_execution_scope": "nonstandard_or_playtest_ruleset",
+                },
             ],
         }
         payload = reconciliation.build_reconciliation(queue, coverage)
@@ -62,6 +69,19 @@ class XmageSourceCatalogReconciliationTest(unittest.TestCase):
                 "local_source_candidate_not_executable": 1,
                 "xmage_catalog_confirmed": 1,
             },
+        )
+        residual = next(
+            row
+            for row in payload["rows"]
+            if row["status"] == "local_source_candidate_not_executable"
+        )
+        self.assertEqual(
+            residual["residual_execution_scope"],
+            "nonstandard_or_playtest_ruleset",
+        )
+        self.assertEqual(
+            residual["residual_family"],
+            "engine_catalog_gap::normal",
         )
 
     def test_missing_coverage_row_fails_closed(self):

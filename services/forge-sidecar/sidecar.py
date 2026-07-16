@@ -38,6 +38,7 @@ GAME_RESULT_DRAW = re.compile(
 )
 FORGE_TIMEOUT_MARKER = "Stopping slow match as draw"
 TURN_RESULT = re.compile(r"Game Outcome: Turn (?P<turn>\d+)")
+TURN_EVENT = re.compile(r"^Turn: Turn (?P<turn>\d+)\b", re.MULTILINE)
 UNSUPPORTED_CARD = re.compile(r'An unsupported card was requested: "(?P<name>.+?)"')
 LIFE_CHANGE = re.compile(
     r"Life: Life: Ai\((?P<slot>[12])\)-.+? (?P<before>-?\d+) > (?P<after>-?\d+)$"
@@ -456,7 +457,13 @@ def parse_simulation_output(
         engine_duration_ms = int(draw_match.group("duration"))
 
     turn_matches = list(TURN_RESULT.finditer(output))
+    if not turn_matches:
+        turn_matches = list(TURN_EVENT.finditer(output))
     turns = int(turn_matches[-1].group("turn")) if turn_matches else 0
+    if turns <= 0:
+        raise SimulationFailed(
+            "Forge returned a completed result without positive turn evidence"
+        )
     events = _events_from_output(output)
     snapshots = _snapshots(events)
     errors = sum(

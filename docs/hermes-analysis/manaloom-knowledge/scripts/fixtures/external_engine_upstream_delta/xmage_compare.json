@@ -1,0 +1,67 @@
+{
+  "status": "ahead",
+  "ahead_by": 3,
+  "behind_by": 0,
+  "total_commits": 3,
+  "base_commit": {
+    "sha": "__CANONICAL_PIN__"
+  },
+  "head_commit": {
+    "sha": "1111111111111111111111111111111111111111"
+  },
+  "commits": [
+    {
+      "sha": "1111111111111111111111111111111111111111",
+      "html_url": "https://github.com/magefree/mage/commit/1111111111111111111111111111111111111111",
+      "commit": {
+        "message": "Add Arcane Example card",
+        "author": {"date": "2026-07-14T10:00:00Z"}
+      }
+    },
+    {
+      "sha": "2222222222222222222222222222222222222222",
+      "html_url": "https://github.com/magefree/mage/commit/2222222222222222222222222222222222222222",
+      "commit": {
+        "message": "Fix replacement effect ordering",
+        "author": {"date": "2026-07-14T11:00:00Z"}
+      }
+    },
+    {
+      "sha": "3333333333333333333333333333333333333333",
+      "html_url": "https://github.com/magefree/mage/commit/3333333333333333333333333333333333333333",
+      "commit": {
+        "message": "Refactor server startup",
+        "author": {"date": "2026-07-14T12:00:00Z"}
+      }
+    }
+  ],
+  "files": [
+    {
+      "filename": "Mage.Sets/src/mage/cards/a/ArcaneExample.java",
+      "status": "added",
+      "additions": 48,
+      "deletions": 0,
+      "changes": 48,
+      "blob_url": "https://github.com/magefree/mage/blob/1111111111111111111111111111111111111111/Mage.Sets/src/mage/cards/a/ArcaneExample.java",
+      "patch": "@@ -0,0 +1,3 @@\n+public final class ArcaneExample extends CardImpl {\n+  public ArcaneExample(UUID ownerId, CardSetInfo setInfo) {\n+    super(ownerId, setInfo, new CardType[]{CardType.INSTANT}, \"{1}{U}\");"
+    },
+    {
+      "filename": "Mage/src/main/java/mage/abilities/effects/ReplacementEffectImpl.java",
+      "status": "modified",
+      "additions": 5,
+      "deletions": 2,
+      "changes": 7,
+      "blob_url": "https://github.com/magefree/mage/blob/2222222222222222222222222222222222222222/Mage/src/main/java/mage/abilities/effects/ReplacementEffectImpl.java",
+      "patch": "@@ -20,2 +20,5 @@\n+// deterministic replacement ordering"
+    },
+    {
+      "filename": "Mage.Tests/src/test/java/org/mage/test/cards/ArcaneExampleTest.java",
+      "status": "added",
+      "additions": 32,
+      "deletions": 0,
+      "changes": 32,
+      "blob_url": "https://github.com/magefree/mage/blob/3333333333333333333333333333333333333333/Mage.Tests/src/test/java/org/mage/test/cards/ArcaneExampleTest.java",
+      "patch": "@@ -0,0 +1,2 @@\n+public final class ArcaneExampleTest {\n+}"
+    }
+  ]
+}

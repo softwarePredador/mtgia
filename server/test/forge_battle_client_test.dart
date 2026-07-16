@@ -18,6 +18,7 @@ void main() {
             'status': 'completed',
             'engine': 'forge',
             'winner_deck_id': 'deck-a',
+            'turns': 7,
           }),
           200,
         );
@@ -30,19 +31,76 @@ void main() {
     expect(result['winner_deck_id'], 'deck-a');
   });
 
+  test('rejects a zero-turn completed Forge payload', () async {
+    final client = ForgeBattleClient(
+      baseUrl: 'http://forge.internal:8080',
+      client: MockClient(
+        (_) async => http.Response(
+          jsonEncode({'status': 'completed', 'engine': 'forge', 'turns': 0}),
+          200,
+        ),
+      ),
+    );
+
+    await expectLater(
+      client.simulate({'seed': 42}),
+      throwsA(
+        isA<ForgeServiceException>().having(
+          (error) => error.statusCode,
+          'status',
+          502,
+        ),
+      ),
+    );
+  });
+
+  test('rejects mismatched-engine and error-bearing Forge payloads', () async {
+    final invalidPayloads = [
+      {'status': 'completed', 'engine': 'xmage', 'turns': 7},
+      {
+        'status': 'completed',
+        'engine': 'forge',
+        'turns': 7,
+        'error': 'engine_failed',
+      },
+    ];
+
+    for (final payload in invalidPayloads) {
+      final client = ForgeBattleClient(
+        baseUrl: 'http://forge.internal:8080',
+        client: MockClient(
+          (_) async => http.Response(jsonEncode(payload), 200),
+        ),
+      );
+      await expectLater(
+        client.simulate({'seed': 42}),
+        throwsA(
+          isA<ForgeServiceException>().having(
+            (error) => error.statusCode,
+            'status',
+            502,
+          ),
+        ),
+      );
+      client.close();
+    }
+  });
+
   test('exposes unsupported cards from the strict Forge contract', () async {
     final client = ForgeBattleClient(
       baseUrl: 'http://forge.internal:8080',
-      client: MockClient((_) async => http.Response(
-            jsonEncode({
-              'error': 'forge_coverage_incomplete',
-              'message': 'Forge could not resolve one card',
-              'unsupported_cards': [
-                {'deck': 'deck_a', 'name': 'Unknown Card'},
-              ],
-            }),
-            422,
-          )),
+      client: MockClient(
+        (_) async => http.Response(
+          jsonEncode({
+            'error': 'forge_coverage_incomplete',
+            'message': 'Forge could not resolve one card',
+            'unsupported_cards': [
+              {'deck': 'deck_a', 'name': 'Unknown Card'},
+            ],
+          }),
+          422,
+        ),
+      ),
     );
 
     await expectLater(
@@ -60,20 +118,25 @@ void main() {
   test('does not reinterpret Forge process failures as battles', () async {
     final client = ForgeBattleClient(
       baseUrl: 'http://forge.internal:8080',
-      client: MockClient((_) async => http.Response(
-            jsonEncode({
-              'error': 'simulation_failed',
-              'message': 'Forge returned no completed game result',
-            }),
-            500,
-          )),
+      client: MockClient(
+        (_) async => http.Response(
+          jsonEncode({
+            'error': 'simulation_failed',
+            'message': 'Forge returned no completed game result',
+          }),
+          500,
+        ),
+      ),
     );
 
     await expectLater(
       client.simulate({'seed': 42}),
       throwsA(
-        isA<ForgeServiceException>()
-            .having((error) => error.statusCode, 'status', 500),
+        isA<ForgeServiceException>().having(
+          (error) => error.statusCode,
+          'status',
+          500,
+        ),
       ),
     );
   });
@@ -91,8 +154,11 @@ void main() {
     await expectLater(
       client.simulate({'seed': 42}),
       throwsA(
-        isA<ForgeServiceException>()
-            .having((error) => error.statusCode, 'status', 504),
+        isA<ForgeServiceException>().having(
+          (error) => error.statusCode,
+          'status',
+          504,
+        ),
       ),
     );
   });

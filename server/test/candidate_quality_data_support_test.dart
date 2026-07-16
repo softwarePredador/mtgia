@@ -83,22 +83,52 @@ void main() {
           manaCost: entry.value['mana_cost'] as String,
         ).map((tag) => tag.tag);
 
-        expect(tags, contains(entry.key),
-            reason: entry.value['name'] as String);
+        expect(
+          tags,
+          contains(entry.key),
+          reason: entry.value['name'] as String,
+        );
       }
     });
 
     test('does not duplicate land ramp searches as generic tutors', () {
-      final tags = inferCandidateFunctionTags(
-        name: 'Nature\'s Lore',
-        typeLine: 'Sorcery',
-        oracleText:
-            'Search your library for a Forest card, put that card onto the battlefield, then shuffle.',
-        manaCost: '{1}{G}',
-      ).map((tag) => tag.tag).toSet();
+      final tags =
+          inferCandidateFunctionTags(
+            name: 'Nature\'s Lore',
+            typeLine: 'Sorcery',
+            oracleText:
+                'Search your library for a Forest card, put that card onto the battlefield, then shuffle.',
+            manaCost: '{1}{G}',
+          ).map((tag) => tag.tag).toSet();
 
       expect(tags, contains('ramp'));
       expect(tags, isNot(contains('tutor')));
+    });
+
+    test('does not classify fetch lands as net mana acceleration', () {
+      final tags =
+          inferCandidateFunctionTags(
+            name: 'Bloodstained Mire',
+            typeLine: 'Land',
+            oracleText:
+                '{T}, Pay 1 life, Sacrifice this land: Search your library for a Swamp or Mountain card, put it onto the battlefield, then shuffle.',
+          ).map((tag) => tag.tag).toSet();
+
+      expect(tags, contains('land'));
+      expect(tags, isNot(contains('ramp')));
+    });
+
+    test('routes nonbasic land locks as stax and protection evidence', () {
+      final tags =
+          inferCandidateFunctionTags(
+            name: 'Back to Basics',
+            typeLine: 'Enchantment',
+            oracleText:
+                "Nonbasic lands don't untap during their controllers' untap steps.",
+            manaCost: '{2}{U}',
+          ).map((tag) => tag.tag).toSet();
+
+      expect(tags, containsAll({'stax', 'protection'}));
     });
 
     test('role scores carry budget and bracket suitability metadata', () {
@@ -122,36 +152,37 @@ void main() {
     });
 
     test(
-        'role scores use bounded EDHREC inclusion evidence as a ranking signal',
-        () {
-      final baseline = buildCandidateRoleScores(
-        name: 'Arcane Signet',
-        typeLine: 'Artifact',
-        oracleText:
-            '{T}: Add one mana of any color in your commander\'s color identity.',
-        manaCost: '{2}',
-        priceUsd: 1.5,
-        priceUsdFoil: null,
-        cmc: 2,
-      ).firstWhere((score) => score.role == 'ramp');
+      'role scores use bounded EDHREC inclusion evidence as a ranking signal',
+      () {
+        final baseline = buildCandidateRoleScores(
+          name: 'Arcane Signet',
+          typeLine: 'Artifact',
+          oracleText:
+              '{T}: Add one mana of any color in your commander\'s color identity.',
+          manaCost: '{2}',
+          priceUsd: 1.5,
+          priceUsdFoil: null,
+          cmc: 2,
+        ).firstWhere((score) => score.role == 'ramp');
 
-      final withEdhrec = buildCandidateRoleScores(
-        name: 'Arcane Signet',
-        typeLine: 'Artifact',
-        oracleText:
-            '{T}: Add one mana of any color in your commander\'s color identity.',
-        manaCost: '{2}',
-        priceUsd: 1.5,
-        priceUsdFoil: null,
-        cmc: 2,
-        edhrecInclusionRate: 0.42,
-        edhrecSampleDecks: 4200,
-      ).firstWhere((score) => score.role == 'ramp');
+        final withEdhrec = buildCandidateRoleScores(
+          name: 'Arcane Signet',
+          typeLine: 'Artifact',
+          oracleText:
+              '{T}: Add one mana of any color in your commander\'s color identity.',
+          manaCost: '{2}',
+          priceUsd: 1.5,
+          priceUsdFoil: null,
+          cmc: 2,
+          edhrecInclusionRate: 0.42,
+          edhrecSampleDecks: 4200,
+        ).firstWhere((score) => score.role == 'ramp');
 
-      expect(withEdhrec.score, greaterThan(baseline.score));
-      expect(withEdhrec.evidence, contains('edhrec_inclusion_rate=0.420'));
-      expect(withEdhrec.evidence, contains('edhrec_sample_decks=4200'));
-    });
+        expect(withEdhrec.score, greaterThan(baseline.score));
+        expect(withEdhrec.evidence, contains('edhrec_inclusion_rate=0.420'));
+        expect(withEdhrec.evidence, contains('edhrec_sample_decks=4200'));
+      },
+    );
 
     test('uses versioned high-power and premium name policy', () {
       expect(candidateQualityHighPowerNames, contains('thassa\'s oracle'));
@@ -170,19 +201,24 @@ void main() {
     });
 
     test('schema is additive and targets metadata tables only', () {
-      final schema = [
-        ...candidateQualitySchemaStatements,
-        ...candidateQualityIndexStatements,
-        optimizeCandidateQualitySummaryViewStatement,
-        cardIntelligenceSnapshotViewStatement,
-      ].join('\n').toLowerCase();
+      final schema =
+          [
+            ...candidateQualitySchemaStatements,
+            ...candidateQualityIndexStatements,
+            optimizeCandidateQualitySummaryViewStatement,
+            cardIntelligenceSnapshotViewStatement,
+          ].join('\n').toLowerCase();
 
       expect(schema, contains('create table if not exists card_function_tags'));
       expect(
-          schema, contains('create table if not exists card_semantic_tags_v2'));
+        schema,
+        contains('create table if not exists card_semantic_tags_v2'),
+      );
       expect(schema, contains('create table if not exists card_role_scores'));
-      expect(schema,
-          contains('create table if not exists commander_card_synergy'));
+      expect(
+        schema,
+        contains('create table if not exists commander_card_synergy'),
+      );
       expect(
         schema,
         contains('create table if not exists optimize_rejection_penalties'),
@@ -198,7 +234,9 @@ void main() {
       final view = cardIntelligenceSnapshotViewStatement.toLowerCase();
 
       expect(
-          view, contains('create or replace view card_intelligence_snapshot'));
+        view,
+        contains('create or replace view card_intelligence_snapshot'),
+      );
       expect(view, contains('c.id as id'));
       expect(view, contains('c.id as card_id'));
       expect(view, contains('c.name as name'));
@@ -274,7 +312,9 @@ void main() {
       final view = commanderLearningSnapshotViewStatement.toLowerCase();
 
       expect(
-          view, contains('create or replace view commander_learning_snapshot'));
+        view,
+        contains('create or replace view commander_learning_snapshot'),
+      );
       expect(view, contains('active_learned_decks as'));
       expect(view, contains('usage_summary as'));
       expect(view, contains('synergy_summary as'));

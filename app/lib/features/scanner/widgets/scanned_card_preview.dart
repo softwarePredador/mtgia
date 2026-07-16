@@ -725,6 +725,7 @@ class _CardNotFoundWidgetState extends State<CardNotFoundWidget> {
           ],
           const SizedBox(height: 16),
           TextField(
+            key: const Key('scanner-manual-card-search-field'),
             controller: _searchController,
             style: const TextStyle(color: AppTheme.textPrimary),
             decoration: InputDecoration(

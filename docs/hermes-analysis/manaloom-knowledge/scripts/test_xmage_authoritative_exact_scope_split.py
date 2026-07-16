@@ -27644,6 +27644,67 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertIsNone(proposal)
         self.assertEqual(reason, "board_wipe_oracle_not_simple")
 
+    def test_damage_wipe_selective_scopes_require_matching_xmage_filters(self) -> None:
+        cases = (
+            (
+                "Fixture deals 3 damage to each attacking creature.",
+                "each_attacking_creature",
+                "new FilterAttackingCreature()",
+                [],
+            ),
+            (
+                "Fixture deals 3 damage to each creature without flying.",
+                "each_creature_without_flying",
+                "new FilterCreaturePermanent(); "
+                "filter.add(Predicates.not(new AbilityPredicate(FlyingAbility.class)))",
+                ["FlyingAbility"],
+            ),
+            (
+                "Fixture deals 3 damage to each tapped creature.",
+                "each_tapped_creature",
+                "new FilterCreaturePermanent(); filter.add(TappedPredicate.TAPPED)",
+                [],
+            ),
+            (
+                "Fixture deals 3 damage to each untapped creature.",
+                "each_untapped_creature",
+                "new FilterCreaturePermanent(); filter.add(TappedPredicate.UNTAPPED)",
+                [],
+            ),
+            (
+                "Fixture deals 3 damage to each nonartifact creature.",
+                "each_nonartifact_creature",
+                "new FilterCreaturePermanent(); "
+                "filter.add(Predicates.not(CardType.ARTIFACT.getPredicate()))",
+                [],
+            ),
+        )
+        for oracle, expected_scope, filter_source, ability_classes in cases:
+            with self.subTest(expected_scope=expected_scope):
+                row = queue_row(
+                    split.BOARD_WIPE_UNIT,
+                    effect_classes=["DamageAllEffect"],
+                    ability_classes=ability_classes,
+                )
+                proposal, reason = split.split_row(
+                    row,
+                    metadata(oracle_text=oracle),
+                    source_text="this.getSpellAbility().addEffect(new DamageAllEffect(3));",
+                )
+                self.assertIsNone(proposal)
+                self.assertEqual(reason, "board_wipe_damage_source_scope_mismatch")
+
+                proposal, reason = split.split_row(
+                    row,
+                    metadata(oracle_text=oracle),
+                    source_text=(
+                        f"{filter_source}; "
+                        "this.getSpellAbility().addEffect(new DamageAllEffect(3, filter));"
+                    ),
+                )
+                self.assertEqual(reason, "selected_exact_scope")
+                self.assertEqual(proposal["effect_json"]["damage_scope"], expected_scope)
+
     def test_board_wipe_selective_toughness_scope_maps_to_constraints(self) -> None:
         row = queue_row(split.BOARD_WIPE_UNIT, effect_classes=["DestroyAllEffect"])
         proposal, reason = split.split_row(

@@ -95,11 +95,12 @@ Future<void> prepareCompleteCommanderSeed({
 
   final commanderReferenceProfile =
       await loadCommanderReferenceProfileFromCache(
-    pool: pool,
-    commanderName: commanderName,
+        pool: pool,
+        commanderName: commanderName,
+      );
+  state.commanderRecommendedLands = extractRecommendedLandsFromProfile(
+    commanderReferenceProfile,
   );
-  state.commanderRecommendedLands =
-      extractRecommendedLandsFromProfile(commanderReferenceProfile);
 
   if (targetAdditionsForComplete >= 40) {
     state.maxBasicAdditions = calculateCompleteMaxBasicAdditions(
@@ -113,8 +114,9 @@ Future<void> prepareCompleteCommanderSeed({
   );
   if (averageDeckSeedNames.isNotEmpty) {
     state.averageDeckSeedStageUsed = true;
-    state.aiSuggestedNames
-        .addAll(averageDeckSeedNames.map((e) => e.toLowerCase()));
+    state.aiSuggestedNames.addAll(
+      averageDeckSeedNames.map((e) => e.toLowerCase()),
+    );
   }
 
   final commanderMetaScope = resolveCommanderOptimizeMetaScope(
@@ -142,16 +144,17 @@ Future<void> prepareCompleteCommanderSeed({
         maxReferences: 3,
       );
     }
-    final priorityNames = metaReferenceSelection.priorityCardNames.isNotEmpty
-        ? const <String>[]
-        : await loadCommanderCompetitivePriorities(
-            pool: pool,
-            commanderName: commanderName,
-            commanderNames: commanders.skip(1).toList(growable: false),
-            limit: 120,
-            metaScope: commanderMetaScope,
-            preferExternalCompetitive: true,
-          );
+    final priorityNames =
+        metaReferenceSelection.priorityCardNames.isNotEmpty
+            ? const <String>[]
+            : await loadCommanderCompetitivePriorities(
+              pool: pool,
+              commanderName: commanderName,
+              commanderNames: commanders.skip(1).toList(growable: false),
+              limit: 120,
+              metaScope: commanderMetaScope,
+              preferExternalCompetitive: true,
+            );
     final competitivePriorityNames =
         metaReferenceSelection.priorityCardNames.isNotEmpty
             ? metaReferenceSelection.priorityCardNames
@@ -159,8 +162,9 @@ Future<void> prepareCompleteCommanderSeed({
     if (competitivePriorityNames.isNotEmpty) {
       state.competitiveModelStageUsed = true;
       state.commanderMetaPriorityNames.addAll(competitivePriorityNames);
-      state.aiSuggestedNames
-          .addAll(competitivePriorityNames.map((e) => e.toLowerCase()));
+      state.aiSuggestedNames.addAll(
+        competitivePriorityNames.map((e) => e.toLowerCase()),
+      );
     }
   }
 
@@ -170,22 +174,25 @@ Future<void> prepareCompleteCommanderSeed({
       limit: 80,
     );
     if (profileTopNames.isNotEmpty) {
-      state.aiSuggestedNames
-          .addAll(profileTopNames.map((e) => e.toLowerCase()));
+      state.aiSuggestedNames.addAll(
+        profileTopNames.map((e) => e.toLowerCase()),
+      );
       state.competitiveModelStageUsed = true;
     }
   }
 
   if (state.aiSuggestedNames.isEmpty) {
     try {
-      final liveEdhrec =
-          await EdhrecService().fetchCommanderData(commanderName);
+      final liveEdhrec = await EdhrecService().fetchCommanderData(
+        commanderName,
+      );
       if (liveEdhrec != null && liveEdhrec.topCards.isNotEmpty) {
-        final liveNames = liveEdhrec.topCards
-            .map((card) => card.name.trim().toLowerCase())
-            .where((name) => name.isNotEmpty)
-            .take(180)
-            .toList();
+        final liveNames =
+            liveEdhrec.topCards
+                .map((card) => card.name.trim().toLowerCase())
+                .where((name) => name.isNotEmpty)
+                .take(180)
+                .toList();
         if (liveNames.isNotEmpty) {
           state.aiSuggestedNames.addAll(liveNames);
           state.averageDeckSeedStageUsed = true;
@@ -206,8 +213,10 @@ Future<void> _addBasicLandPlanToVirtualDeck({
   required List<String> basicPlan,
 }) async {
   if (basicPlan.isEmpty) return;
-  final basicsWithIds =
-      await loadBasicLandIds(pool, basicPlan.toSet().toList());
+  final basicsWithIds = await loadBasicLandIds(
+    pool,
+    basicPlan.toSet().toList(),
+  );
   if (basicsWithIds.isEmpty) return;
 
   for (final name in basicPlan) {
@@ -235,10 +244,11 @@ Future<void> _addIdentitySafeNonBasicLands({
 }) async {
   if (limit <= 0) return;
 
-  final excludeNames = state.virtualDeck
-      .map((c) => ((c['name'] as String?) ?? '').trim().toLowerCase())
-      .where((name) => name.isNotEmpty)
-      .toSet();
+  final excludeNames =
+      state.virtualDeck
+          .map((c) => ((c['name'] as String?) ?? '').trim().toLowerCase())
+          .where((name) => name.isNotEmpty)
+          .toSet();
   final fillers = await loadIdentitySafeNonBasicLandFillers(
     pool: pool,
     commanderColorIdentity: commanderColorIdentity,
@@ -266,8 +276,7 @@ Future<void> _addIdentitySafeNonBasicLands({
       typeLine: filler['type_line'] as String? ?? '',
       oracleText: filler['oracle_text'] as String? ?? '',
       colors: (filler['colors'] as List?)?.cast<String>() ?? const [],
-      colorIdentity:
-          (filler['color_identity'] as List?)?.cast<String>() ?? const [],
+      colorIdentity: (filler['color_identity'] as List?)?.cast<String>(),
     );
     added += 1;
   }
@@ -345,20 +354,22 @@ Future<void> runCompleteAiSuggestionLoop({
 
     Map<String, dynamic> iterResponse;
     try {
-      iterResponse = await optimizer.completeDeck(
-        deckData: {
-          'cards': state.virtualDeck,
-          'colors': deckColors.toList(),
-        },
-        commanders: commanders,
-        targetArchetype: targetArchetype,
-        targetAdditions: requestedAdditions,
-        bracket: bracket,
-        keepTheme: keepTheme,
-        detectedTheme: detectedTheme,
-        coreCards: coreCards,
-        metaEvidenceContext: state.commanderMetaEvidenceText,
-      ).timeout(aiTimeout);
+      iterResponse = await optimizer
+          .completeDeck(
+            deckData: {
+              'cards': state.virtualDeck,
+              'colors': deckColors.toList(),
+            },
+            commanders: commanders,
+            targetArchetype: targetArchetype,
+            targetAdditions: requestedAdditions,
+            bracket: bracket,
+            keepTheme: keepTheme,
+            detectedTheme: detectedTheme,
+            coreCards: coreCards,
+            metaEvidenceContext: state.commanderMetaEvidenceText,
+          )
+          .timeout(aiTimeout);
     } catch (e) {
       Log.w(
         'Falha no completeDeck da IA; aplicando fallback determinístico. '
@@ -383,8 +394,9 @@ Future<void> runCompleteAiSuggestionLoop({
 
     final validationService = CardValidationService(pool);
     final validation = await validationService.validateCardNames(sanitized);
-    state.invalidAll
-        .addAll((validation['invalid'] as List?)?.cast<String>() ?? const []);
+    state.invalidAll.addAll(
+      (validation['invalid'] as List?)?.cast<String>() ?? const [],
+    );
 
     final validList =
         (validation['valid'] as List).cast<Map<String, dynamic>>();
@@ -401,22 +413,23 @@ Future<void> runCompleteAiSuggestionLoop({
     );
     if (additionsInfoResult.isEmpty) break;
 
-    final candidates = additionsInfoResult.map((r) {
-      final id = r[0] as String;
-      final name = r[1] as String;
-      final typeLine = r[2] as String? ?? '';
-      final oracle = r[3] as String? ?? '';
-      final colors = (r[4] as List?)?.cast<String>() ?? const <String>[];
-      final identity = (r[5] as List?)?.cast<String>() ?? const <String>[];
-      return {
-        'card_id': id,
-        'name': name,
-        'type_line': typeLine,
-        'oracle_text': oracle,
-        'colors': colors,
-        'color_identity': identity,
-      };
-    }).toList();
+    final candidates =
+        additionsInfoResult.map((r) {
+          final id = r[0] as String;
+          final name = r[1] as String;
+          final typeLine = r[2] as String? ?? '';
+          final oracle = r[3] as String? ?? '';
+          final colors = (r[4] as List?)?.cast<String>() ?? const <String>[];
+          final identity = (r[5] as List?)?.cast<String>() ?? const <String>[];
+          return {
+            'card_id': id,
+            'name': name,
+            'type_line': typeLine,
+            'oracle_text': oracle,
+            'colors': colors,
+            'color_identity': identity,
+          };
+        }).toList();
 
     final identityAllowed = <Map<String, dynamic>>[];
     for (final candidate in candidates) {
@@ -489,8 +502,7 @@ Future<void> runCompleteAiSuggestionLoop({
         typeLine: candidate['type_line'] as String? ?? '',
         oracleText: candidate['oracle_text'] as String? ?? '',
         colors: (candidate['colors'] as List?)?.cast<String>() ?? const [],
-        colorIdentity:
-            (candidate['color_identity'] as List?)?.cast<String>() ?? const [],
+        colorIdentity: (candidate['color_identity'] as List?)?.cast<String>(),
         isBasic: isBasic,
       );
       addedThisIter += 1;
@@ -512,15 +524,18 @@ Future<int> _bootstrapSparseCompleteInput({
 }) async {
   final currentLands = _countCurrentLands(state.virtualDeck);
   final targetLands = (state.commanderRecommendedLands ?? 36).clamp(32, 40);
-  final targetSpells =
-      (maxTotal - targetLands).clamp(state.virtualTotal, maxTotal);
+  final targetSpells = (maxTotal - targetLands).clamp(
+    state.virtualTotal,
+    maxTotal,
+  );
   final spellSlotsToFill = (targetSpells - state.virtualTotal).clamp(0, 48);
   if (spellSlotsToFill <= 0) return 0;
 
-  final existingNames = state.virtualDeck
-      .map((c) => ((c['name'] as String?) ?? '').toLowerCase())
-      .where((name) => name.isNotEmpty)
-      .toSet();
+  final existingNames =
+      state.virtualDeck
+          .map((c) => ((c['name'] as String?) ?? '').toLowerCase())
+          .where((name) => name.isNotEmpty)
+          .toSet();
 
   final selected = <Map<String, dynamic>>[];
   final selectedNames = <String>{};
@@ -601,7 +616,7 @@ Future<int> _bootstrapSparseCompleteInput({
     final oracleText = candidate['oracle_text'] as String? ?? '';
     final colors = (candidate['colors'] as List?)?.cast<String>() ?? const [];
     final colorIdentity =
-        (candidate['color_identity'] as List?)?.cast<String>() ?? const [];
+        (candidate['color_identity'] as List?)?.cast<String>();
     final nameLower = name.toLowerCase();
     final maxCopies = maxCopiesForFormat(
       deckFormat: deckFormat,
@@ -646,14 +661,16 @@ void rebalanceCompleteDeckForLandDeficit({
     }
   }
 
-  final nonLandCards = state.virtualDeck.where((card) {
-    final typeLine = ((card['type_line'] as String?) ?? '').toLowerCase();
-    return !typeLine.contains('land');
-  }).toList();
+  final nonLandCards =
+      state.virtualDeck.where((card) {
+        final typeLine = ((card['type_line'] as String?) ?? '').toLowerCase();
+        return !typeLine.contains('land');
+      }).toList();
 
   var avgCmc = 0.0;
   if (nonLandCards.isNotEmpty) {
-    avgCmc = nonLandCards.fold<double>(0, (sum, card) {
+    avgCmc =
+        nonLandCards.fold<double>(0, (sum, card) {
           return sum + ((card['cmc'] as num?)?.toDouble() ?? 0.0);
         }) /
         nonLandCards.length;
@@ -675,9 +692,11 @@ void rebalanceCompleteDeckForLandDeficit({
   );
 
   var freed = 0;
-  for (var i = state.virtualDeck.length - 1;
-      i >= 0 && freed < slotsToFree;
-      i--) {
+  for (
+    var i = state.virtualDeck.length - 1;
+    i >= 0 && freed < slotsToFree;
+    i--
+  ) {
     final card = state.virtualDeck[i];
     final cardId = card['card_id'] as String?;
     if (cardId == null) continue;
@@ -743,13 +762,15 @@ Future<void> fillCompleteDeckRemainder({
     '  Cartas faltando: $missing | Lands atuais: $currentLands | Ideal: $idealLands',
   );
   Log.d(
-      '  Lands a adicionar: $landsNeeded | Spells a adicionar: $spellsNeeded');
+    '  Lands a adicionar: $landsNeeded | Spells a adicionar: $spellsNeeded',
+  );
 
   if (spellsNeeded > 0) {
     try {
-      final existingNames = state.virtualDeck
-          .map((c) => ((c['name'] as String?) ?? '').toLowerCase())
-          .toSet();
+      final existingNames =
+          state.virtualDeck
+              .map((c) => ((c['name'] as String?) ?? '').toLowerCase())
+              .toSet();
       final selectedSpells = <Map<String, dynamic>>[];
       final selectedSpellNames = <String>{};
       void mergeUniqueSpells(List<Map<String, dynamic>> incoming) {
@@ -804,13 +825,13 @@ Future<void> fillCompleteDeckRemainder({
       if (selectedSpells.length < spellsNeeded) {
         final foundationFallback =
             await loadArchetypeCommanderFoundationFillers(
-          pool: pool,
-          commanderColorIdentity: commanderColorIdentity,
-          targetArchetype: targetArchetype,
-          detectedTheme: detectedTheme,
-          excludeNames: existingNames.union(selectedSpellNames),
-          limit: spellsNeeded - selectedSpells.length,
-        );
+              pool: pool,
+              commanderColorIdentity: commanderColorIdentity,
+              targetArchetype: targetArchetype,
+              detectedTheme: detectedTheme,
+              excludeNames: existingNames.union(selectedSpellNames),
+              limit: spellsNeeded - selectedSpells.length,
+            );
         if (foundationFallback.isNotEmpty) {
           Log.d(
             '  Fallback foundation aplicado (+${foundationFallback.length} cartas).',
@@ -894,10 +915,10 @@ Future<void> fillCompleteDeckRemainder({
           state: state,
           id: id,
           name: name,
-          typeLine: '',
-          oracleText: '',
-          colors: const <String>[],
-          colorIdentity: const <String>[],
+          typeLine: spell['type_line'] as String? ?? '',
+          oracleText: spell['oracle_text'] as String? ?? '',
+          colors: (spell['colors'] as List?)?.cast<String>() ?? const [],
+          colorIdentity: (spell['color_identity'] as List?)?.cast<String>(),
         );
         actuallyAddedSpells += 1;
       }
@@ -910,8 +931,10 @@ Future<void> fillCompleteDeckRemainder({
 
   if (state.virtualTotal < maxTotal) {
     currentLands = _countCurrentLands(state.virtualDeck);
-    var landsToAdd =
-        (idealLands - currentLands).clamp(0, maxTotal - state.virtualTotal);
+    var landsToAdd = (idealLands - currentLands).clamp(
+      0,
+      maxTotal - state.virtualTotal,
+    );
     final remainingBasicBudget =
         (state.maxBasicAdditions - state.basicAddedDuringBuild).clamp(0, 999);
     if (landsToAdd > 0) {
@@ -945,9 +968,10 @@ Future<void> fillCompleteDeckRemainder({
 
   if (state.virtualTotal < maxTotal) {
     final remaining = maxTotal - state.virtualTotal;
-    final existingNames = state.virtualDeck
-        .map((c) => ((c['name'] as String?) ?? '').toLowerCase())
-        .toSet();
+    final existingNames =
+        state.virtualDeck
+            .map((c) => ((c['name'] as String?) ?? '').toLowerCase())
+            .toSet();
 
     final fillers = await loadGuaranteedNonBasicFillers(
       pool: pool,
@@ -980,8 +1004,7 @@ Future<void> fillCompleteDeckRemainder({
         typeLine: filler['type_line'] as String? ?? '',
         oracleText: filler['oracle_text'] as String? ?? '',
         colors: (filler['colors'] as List?)?.cast<String>() ?? const [],
-        colorIdentity:
-            (filler['color_identity'] as List?)?.cast<String>() ?? const [],
+        colorIdentity: (filler['color_identity'] as List?)?.cast<String>(),
       );
     }
 
@@ -990,10 +1013,11 @@ Future<void> fillCompleteDeckRemainder({
       final emergencyFillers = await loadEmergencyNonBasicFillers(
         pool: pool,
         currentDeckCards: state.virtualDeck,
-        excludeNames: state.virtualDeck
-            .map((c) => ((c['name'] as String?) ?? '').toLowerCase())
-            .where((n) => n.isNotEmpty)
-            .toSet(),
+        excludeNames:
+            state.virtualDeck
+                .map((c) => ((c['name'] as String?) ?? '').toLowerCase())
+                .where((n) => n.isNotEmpty)
+                .toSet(),
         bracket: bracket,
         limit: emergencyRemaining,
       );
@@ -1018,8 +1042,7 @@ Future<void> fillCompleteDeckRemainder({
           typeLine: filler['type_line'] as String? ?? '',
           oracleText: filler['oracle_text'] as String? ?? '',
           colors: (filler['colors'] as List?)?.cast<String>() ?? const [],
-          colorIdentity:
-              (filler['color_identity'] as List?)?.cast<String>() ?? const [],
+          colorIdentity: (filler['color_identity'] as List?)?.cast<String>(),
         );
       }
     }
@@ -1068,7 +1091,7 @@ void _addCardToVirtualDeck({
   required String typeLine,
   required String oracleText,
   required List<String> colors,
-  required List<String> colorIdentity,
+  required List<String>? colorIdentity,
   bool isBasic = false,
 }) {
   final nameLower = name.toLowerCase();
@@ -1081,8 +1104,9 @@ void _addCardToVirtualDeck({
     state.basicAddedDuringBuild += 1;
   }
 
-  final existingIndex =
-      state.virtualDeck.indexWhere((e) => (e['card_id'] as String?) == id);
+  final existingIndex = state.virtualDeck.indexWhere(
+    (e) => (e['card_id'] as String?) == id,
+  );
   if (existingIndex == -1) {
     state.virtualDeck.add({
       'card_id': id,
@@ -1116,10 +1140,11 @@ int _countCurrentLands(List<Map<String, dynamic>> cards) {
 }
 
 double _calculateAverageNonLandCmc(List<Map<String, dynamic>> cards) {
-  final nonLandCards = cards.where((card) {
-    final typeLine = ((card['type_line'] as String?) ?? '').toLowerCase();
-    return !typeLine.contains('land');
-  }).toList();
+  final nonLandCards =
+      cards.where((card) {
+        final typeLine = ((card['type_line'] as String?) ?? '').toLowerCase();
+        return !typeLine.contains('land');
+      }).toList();
 
   if (nonLandCards.isEmpty) return 0.0;
 
@@ -1137,10 +1162,7 @@ Map<String, dynamic> buildCompleteIntermediatePayload({
 }) {
   final additionsDetailed = <Map<String, dynamic>>[];
   for (final entry in state.addedCountsById.entries) {
-    additionsDetailed.add({
-      'card_id': entry.key,
-      'quantity': entry.value,
-    });
+    additionsDetailed.add({'card_id': entry.key, 'quantity': entry.value});
   }
 
   final addedTotal = additionsDetailed.fold<int>(
@@ -1203,9 +1225,10 @@ Map<String, dynamic> buildCompleteIntermediatePayload({
     'target_additions': targetTotal,
     'iterations': state.iterations,
     'additions_detailed': additionsDetailed,
-    'reasoning': (state.virtualTotal >= maxTotal)
-        ? 'Deck completado com cartas sinérgicas ao arquétipo $targetArchetype, priorizando sinergia com o Commander e a proporção ideal de terrenos/spells.'
-        : 'Deck parcialmente completado; algumas sugestões foram bloqueadas/filtradas.',
+    'reasoning':
+        (state.virtualTotal >= maxTotal)
+            ? 'Deck completado com cartas sinérgicas ao arquétipo $targetArchetype, priorizando sinergia com o Commander e a proporção ideal de terrenos/spells.'
+            : 'Deck parcialmente completado; algumas sugestões foram bloqueadas/filtradas.',
     'warnings': {
       if (state.invalidAll.isNotEmpty) 'invalid_cards': state.invalidAll,
       if (state.filteredByIdentityAll.isNotEmpty)
@@ -1213,9 +1236,7 @@ Map<String, dynamic> buildCompleteIntermediatePayload({
           'removed_additions': state.filteredByIdentityAll,
         },
       if (state.blockedByBracketAll.isNotEmpty)
-        'blocked_by_bracket': {
-          'blocked_additions': state.blockedByBracketAll,
-        },
+        'blocked_by_bracket': {'blocked_additions': state.blockedByBracketAll},
     },
     'consistency_slo': {
       'completed_target': addedTotal >= targetTotal,
@@ -1246,18 +1267,21 @@ Future<Map<String, dynamic>> buildCompleteFinalResponse({
   required int? bracket,
   required Map<String, dynamic> deckAnalysis,
   required Map<String, dynamic> jsonResponse,
+  required String targetArchetype,
+  required String intensity,
 }) async {
-  final rawAdditionsDetailed = (jsonResponse['additions_detailed'] as List)
-      .whereType<Map>()
-      .map((m) {
-        final mm = m.cast<String, dynamic>();
-        return {
-          'card_id': mm['card_id']?.toString(),
-          'quantity': mm['quantity'] as int? ?? 1,
-        };
-      })
-      .where((m) => (m['card_id'] as String?)?.isNotEmpty ?? false)
-      .toList();
+  final rawAdditionsDetailed =
+      (jsonResponse['additions_detailed'] as List)
+          .whereType<Map>()
+          .map((m) {
+            final mm = m.cast<String, dynamic>();
+            return {
+              'card_id': mm['card_id']?.toString(),
+              'quantity': mm['quantity'] as int? ?? 1,
+            };
+          })
+          .where((m) => (m['card_id'] as String?)?.isNotEmpty ?? false)
+          .toList();
 
   final ids = rawAdditionsDetailed.map((e) => e['card_id'] as String).toList();
   final cardInfoById = <String, Map<String, String>>{};
@@ -1267,7 +1291,8 @@ Future<Map<String, dynamic>> buildCompleteFinalResponse({
   if (ids.isNotEmpty) {
     final namesAndTypes = await pool.execute(
       Sql.named(
-          'SELECT id::text, name, type_line FROM cards WHERE id = ANY(@ids)'),
+        'SELECT id::text, name, type_line FROM cards WHERE id = ANY(@ids)',
+      ),
       parameters: {'ids': ids},
     );
     for (final row in namesAndTypes) {
@@ -1314,15 +1339,19 @@ Future<Map<String, dynamic>> buildCompleteFinalResponse({
       }
     }
 
-    additionsDetailed = aggregatedByName.values
-        .map((e) => {
-              'card_id': e['card_id'],
-              'quantity': e['quantity'],
-              'name': e['name'],
-              'is_basic_land':
-                  isBasicLandName(((e['name'] as String?) ?? '').trim()),
-            })
-        .toList();
+    additionsDetailed =
+        aggregatedByName.values
+            .map(
+              (e) => {
+                'card_id': e['card_id'],
+                'quantity': e['quantity'],
+                'name': e['name'],
+                'is_basic_land': isBasicLandName(
+                  ((e['name'] as String?) ?? '').trim(),
+                ),
+              },
+            )
+            .toList();
 
     try {
       final additionsDataResult = await pool.execute(
@@ -1346,36 +1375,38 @@ Future<Map<String, dynamic>> buildCompleteFinalResponse({
         parameters: {'ids': ids},
       );
 
-      final additionsData = additionsDataResult
-          .map((row) => {
-                'name': (row[0] as String?) ?? '',
-                'type_line': (row[1] as String?) ?? '',
-                'mana_cost': (row[2] as String?) ?? '',
-                'colors': (row[3] as List?)?.cast<String>() ?? [],
-                'cmc': (row[4] as num?)?.toDouble() ?? 0.0,
-                'oracle_text': (row[5] as String?) ?? '',
-              })
-          .toList();
+      final additionsData =
+          additionsDataResult
+              .map(
+                (row) => {
+                  'name': (row[0] as String?) ?? '',
+                  'type_line': (row[1] as String?) ?? '',
+                  'mana_cost': (row[2] as String?) ?? '',
+                  'colors': (row[3] as List?)?.cast<String>() ?? [],
+                  'cmc': (row[4] as num?)?.toDouble() ?? 0.0,
+                  'oracle_text': (row[5] as String?) ?? '',
+                },
+              )
+              .toList();
 
-      final additionsForAnalysis = additionsDetailed.map((add) {
-        final data = additionsData.firstWhere(
-          (d) =>
-              (d['name'] as String).toLowerCase() ==
-              ((add['name'] as String?) ?? '').toLowerCase(),
-          orElse: () => {
-            'name': add['name'] ?? '',
-            'type_line': '',
-            'mana_cost': '',
-            'colors': <String>[],
-            'cmc': 0.0,
-            'oracle_text': '',
-          },
-        );
-        return {
-          ...data,
-          'quantity': (add['quantity'] as int?) ?? 1,
-        };
-      }).toList();
+      final additionsForAnalysis =
+          additionsDetailed.map((add) {
+            final data = additionsData.firstWhere(
+              (d) =>
+                  (d['name'] as String).toLowerCase() ==
+                  ((add['name'] as String?) ?? '').toLowerCase(),
+              orElse:
+                  () => {
+                    'name': add['name'] ?? '',
+                    'type_line': '',
+                    'mana_cost': '',
+                    'colors': <String>[],
+                    'cmc': 0.0,
+                    'oracle_text': '',
+                  },
+            );
+            return {...data, 'quantity': (add['quantity'] as int?) ?? 1};
+          }).toList();
 
       final virtualDeck = buildVirtualDeckForAnalysis(
         originalDeck: originalDeck,
@@ -1393,24 +1424,26 @@ Future<Map<String, dynamic>> buildCompleteFinalResponse({
 
   final responseBody = <String, dynamic>{
     'mode': 'complete',
-    'constraints': {
-      'keep_theme': keepTheme,
-    },
+    'constraints': {'keep_theme': keepTheme},
     'theme': theme,
     'bracket': bracket,
     'target_additions': jsonResponse['target_additions'],
     'iterations': jsonResponse['iterations'],
     'additions':
         additionsDetailed.map((e) => e['name'] ?? e['card_id']).toList(),
-    'additions_detailed': additionsDetailed
-        .map((e) => {
-              'card_id': e['card_id'],
-              'quantity': e['quantity'],
-              'name': e['name'],
-              'is_basic_land': e['is_basic_land'] ??
-                  isBasicLandName(((e['name'] as String?) ?? '').trim()),
-            })
-        .toList(),
+    'additions_detailed':
+        additionsDetailed
+            .map(
+              (e) => {
+                'card_id': e['card_id'],
+                'quantity': e['quantity'],
+                'name': e['name'],
+                'is_basic_land':
+                    e['is_basic_land'] ??
+                    isBasicLandName(((e['name'] as String?) ?? '').trim()),
+              },
+            )
+            .toList(),
     'removals': const <String>[],
     'removals_detailed': const <Map<String, dynamic>>[],
     'reasoning': jsonResponse['reasoning'] ?? '',
@@ -1419,9 +1452,21 @@ Future<Map<String, dynamic>> buildCompleteFinalResponse({
     'validation_warnings': const <String>[],
   };
 
-  final warnings = (jsonResponse['warnings'] is Map)
-      ? (jsonResponse['warnings'] as Map).cast<String, dynamic>()
-      : const <String, dynamic>{};
+  responseBody['optimization_contract'] = buildOptimizeDecisionContract(
+    mode: 'complete',
+    targetArchetype: targetArchetype,
+    intensity: intensity,
+    keepTheme: keepTheme,
+    additionCount: additionsDetailed.length,
+    removalCount: 0,
+  );
+  responseBody['battle_validation'] =
+      (responseBody['optimization_contract'] as Map)['battle_validation'];
+
+  final warnings =
+      (jsonResponse['warnings'] is Map)
+          ? (jsonResponse['warnings'] as Map).cast<String, dynamic>()
+          : const <String, dynamic>{};
   if (warnings.isNotEmpty) {
     responseBody['warnings'] = warnings;
   }
@@ -1440,10 +1485,11 @@ Future<Map<String, dynamic>> buildCompleteFinalResponse({
   if (metaReferenceContext is Map) {
     responseBody['meta_reference_context'] =
         augmentMetaDeckEvidencePayloadWithOutputMatches(
-      metaReferenceContext.cast<String, dynamic>(),
-      outputCardNames:
-          additionsDetailed.map((entry) => '${entry['name'] ?? ''}'),
-    );
+          metaReferenceContext.cast<String, dynamic>(),
+          outputCardNames: additionsDetailed.map(
+            (entry) => '${entry['name'] ?? ''}',
+          ),
+        );
   }
 
   return responseBody;

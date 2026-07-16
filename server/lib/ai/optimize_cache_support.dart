@@ -1,14 +1,20 @@
 import 'package:postgres/postgres.dart';
 
+// Bump whenever the player-facing optimize response contract changes. Cached
+// payloads are returned as-is, so reusing an older schema can omit safety fields
+// such as optimization_contract and battle_validation for up to six hours.
+const optimizeCacheContractVersion = 'v8';
+
 String buildOptimizeDeckSignature(List<ResultRow> cardsResult) {
   final entries = <String>[];
   for (final row in cardsResult) {
     final cardId = row[9].toString();
     final quantity = (row[2] as int?) ?? 1;
     final condition = row.length > 12 ? row[12]?.toString() : null;
-    final normalizedCondition = (condition == null || condition.trim().isEmpty)
-        ? 'NM'
-        : condition.trim().toUpperCase();
+    final normalizedCondition =
+        (condition == null || condition.trim().isEmpty)
+            ? 'NM'
+            : condition.trim().toUpperCase();
     entries.add('$cardId:$quantity:$normalizedCondition');
   }
   entries.sort();
@@ -40,7 +46,7 @@ String buildOptimizeCacheKey({
     parts.add('rc:$contextSignature');
   }
   final base = parts.join('::');
-  return 'v7:${stableOptimizeHash(base)}';
+  return '$optimizeCacheContractVersion:${stableOptimizeHash(base)}';
 }
 
 String stableOptimizeHash(String value) {
@@ -65,9 +71,7 @@ Future<Map<String, dynamic>?> loadOptimizeCache({
       ORDER BY created_at DESC
       LIMIT 1
     '''),
-    parameters: {
-      'cache_key': cacheKey,
-    },
+    parameters: {'cache_key': cacheKey},
   );
 
   if (result.isEmpty) return null;

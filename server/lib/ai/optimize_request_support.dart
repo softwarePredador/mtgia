@@ -62,27 +62,28 @@ Future<OptimizeDeckContextData> loadOptimizeDeckContext({
   String recommendationContextSignature = '',
   OptimizeStageTelemetry? telemetry,
 }) async {
-  final deckResult = await (telemetry?.trackAsync(
-        'deck_context.deck_query',
-        () => pool.execute(
-          Sql.named('''
+  final deckResult =
+      await (telemetry?.trackAsync(
+            'deck_context.deck_query',
+            () => pool.execute(
+              Sql.named('''
             SELECT name, format
             FROM decks
             WHERE id = CAST(@id AS uuid)
               AND user_id = CAST(@user_id AS uuid)
           '''),
-          parameters: {'id': deckId, 'user_id': userId},
-        ),
-      ) ??
-      pool.execute(
-        Sql.named('''
+              parameters: {'id': deckId, 'user_id': userId},
+            ),
+          ) ??
+          pool.execute(
+            Sql.named('''
           SELECT name, format
           FROM decks
           WHERE id = CAST(@id AS uuid)
             AND user_id = CAST(@user_id AS uuid)
         '''),
-        parameters: {'id': deckId, 'user_id': userId},
-      ));
+            parameters: {'id': deckId, 'user_id': userId},
+          ));
 
   if (deckResult.isEmpty) {
     throw const OptimizeDeckContextException('DECK_NOT_FOUND');
@@ -95,21 +96,27 @@ Future<OptimizeDeckContextData> loadOptimizeDeckContext({
     throw const OptimizeDeckContextException('DECK_FORMAT_MISSING');
   }
 
-  final hasCardIntelligenceSnapshot =
-      await _hasTable(pool, 'card_intelligence_snapshot');
-  final cardSourceJoin = hasCardIntelligenceSnapshot
-      ? 'JOIN card_intelligence_snapshot c ON c.card_id = dc.card_id'
-      : 'JOIN cards c ON c.id = dc.card_id';
-  final semanticV2Select = hasCardIntelligenceSnapshot
-      ? 'c.semantic_tags_v2 AS semantic_tags_v2'
-      : await _semanticV2SelectSql(pool);
-  final functionalTagsSelect = hasCardIntelligenceSnapshot
-      ? 'c.function_tag_details AS functional_tags'
-      : await _functionalTagsSelectSql(pool);
-  final cardsResult = await (telemetry?.trackAsync(
-        'deck_context.cards_query',
-        () => pool.execute(
-          Sql.named('''
+  final hasCardIntelligenceSnapshot = await _hasTable(
+    pool,
+    'card_intelligence_snapshot',
+  );
+  final cardSourceJoin =
+      hasCardIntelligenceSnapshot
+          ? 'JOIN card_intelligence_snapshot c ON c.card_id = dc.card_id'
+          : 'JOIN cards c ON c.id = dc.card_id';
+  final semanticV2Select =
+      hasCardIntelligenceSnapshot
+          ? 'c.semantic_tags_v2 AS semantic_tags_v2'
+          : await _semanticV2SelectSql(pool);
+  final functionalTagsSelect =
+      hasCardIntelligenceSnapshot
+          ? 'c.function_tag_details AS functional_tags'
+          : await _functionalTagsSelectSql(pool);
+  final cardsResult =
+      await (telemetry?.trackAsync(
+            'deck_context.cards_query',
+            () => pool.execute(
+              Sql.named('''
       SELECT c.name, dc.is_commander, dc.quantity, c.type_line, c.mana_cost, c.colors,
              COALESCE(
                (SELECT SUM(
@@ -132,11 +139,11 @@ Future<OptimizeDeckContextData> loadOptimizeDeckContext({
       $cardSourceJoin
       WHERE dc.deck_id = @id
     '''),
-          parameters: {'id': deckId},
-        ),
-      ) ??
-      pool.execute(
-        Sql.named('''
+              parameters: {'id': deckId},
+            ),
+          ) ??
+          pool.execute(
+            Sql.named('''
       SELECT c.name, dc.is_commander, dc.quantity, c.type_line, c.mana_cost, c.colors,
              COALESCE(
                (SELECT SUM(
@@ -159,8 +166,8 @@ Future<OptimizeDeckContextData> loadOptimizeDeckContext({
       $cardSourceJoin
       WHERE dc.deck_id = @id
     '''),
-        parameters: {'id': deckId},
-      ));
+            parameters: {'id': deckId},
+          ));
 
   final currentTotalBeforeMode = cardsResult.fold<int>(
     0,
@@ -190,6 +197,7 @@ Future<OptimizeDeckContextData> loadOptimizeDeckContext({
   final allCardData = <Map<String, dynamic>>[];
   final deckColors = <String>{};
   final commanderColorIdentity = <String>{};
+  var commanderCanonicalIdentityPresent = false;
   var currentTotalCards = 0;
   final originalCountsById = <String, int>{};
 
@@ -202,7 +210,7 @@ Future<OptimizeDeckContextData> loadOptimizeDeckContext({
     final colors = (row[5] as List?)?.cast<String>() ?? [];
     final cmc = (row[6] as num?)?.toDouble() ?? 0.0;
     final oracleText = (row[7] as String?) ?? '';
-    final colorIdentity = (row[8] as List?)?.cast<String>() ?? const <String>[];
+    final colorIdentity = (row[8] as List?)?.cast<String>();
     final cardId = row[9] as String;
     final semanticTagsV2 = row.length > 10 ? row[10] : null;
     final functionalTags = row.length > 11 ? row[11] : null;
@@ -231,6 +239,7 @@ Future<OptimizeDeckContextData> loadOptimizeDeckContext({
 
     if (isCmdr) {
       commanders.add(name);
+      commanderCanonicalIdentityPresent |= colorIdentity != null;
       commanderColorIdentity.addAll(
         resolveCardColorIdentity(
           colorIdentity: colorIdentity,
@@ -241,9 +250,10 @@ Future<OptimizeDeckContextData> loadOptimizeDeckContext({
       );
     } else {
       final cleanText = oracleText.replaceAll('\n', ' ').trim();
-      final truncatedText = cleanText.length > 150
-          ? '${cleanText.substring(0, 147)}...'
-          : cleanText;
+      final truncatedText =
+          cleanText.length > 150
+              ? '${cleanText.substring(0, 147)}...'
+              : cleanText;
 
       if (truncatedText.isNotEmpty) {
         otherCards.add('$name (Type: $typeLine, Text: $truncatedText)');
@@ -255,7 +265,7 @@ Future<OptimizeDeckContextData> loadOptimizeDeckContext({
 
   if (commanderColorIdentity.isEmpty) {
     final inferredFromDeck = normalizeColorIdentity(deckColors.toList());
-    if (inferredFromDeck.isNotEmpty) {
+    if (!commanderCanonicalIdentityPresent && inferredFromDeck.isNotEmpty) {
       commanderColorIdentity.addAll(inferredFromDeck);
     } else if (commanders.isEmpty) {
       commanderColorIdentity.addAll(const {'W', 'U', 'B', 'R', 'G'});
@@ -266,9 +276,10 @@ Future<OptimizeDeckContextData> loadOptimizeDeckContext({
       );
     }
 
-    final reason = commanders.isNotEmpty
-        ? 'commander sem color_identity detectável'
-        : 'deck sem is_commander marcado';
+    final reason =
+        commanders.isNotEmpty
+            ? 'commander sem color_identity detectável'
+            : 'deck sem is_commander marcado';
     if (commanders.isEmpty) {
       Log.w(
         'Color identity fallback aplicado ($reason) para evitar complete degradado. '
@@ -278,27 +289,23 @@ Future<OptimizeDeckContextData> loadOptimizeDeckContext({
     }
   }
 
-  final themeProfileFuture = telemetry?.trackAsync(
+  final themeProfileFuture =
+      telemetry?.trackAsync(
         'deck_context.theme_profile',
-        () => detectThemeProfile(
-          allCardData,
-          commanders: commanders,
-          pool: pool,
-        ),
+        () =>
+            detectThemeProfile(allCardData, commanders: commanders, pool: pool),
       ) ??
-      detectThemeProfile(
-        allCardData,
-        commanders: commanders,
-        pool: pool,
-      );
+      detectThemeProfile(allCardData, commanders: commanders, pool: pool);
 
   final analyzer = DeckArchetypeAnalyzerCore(allCardData, deckColors.toList());
-  final deckAnalysis = telemetry?.trackSync(
+  final deckAnalysis =
+      telemetry?.trackSync(
         'deck_context.analysis',
         analyzer.generateAnalysis,
       ) ??
       analyzer.generateAnalysis();
-  final deckState = telemetry?.trackSync(
+  final deckState =
+      telemetry?.trackSync(
         'deck_context.state_assessment',
         () => assessDeckOptimizationStateCore(
           cards: allCardData,
@@ -315,7 +322,8 @@ Future<OptimizeDeckContextData> loadOptimizeDeckContext({
         currentTotalCards: currentTotalCards,
         commanderColorIdentity: commanderColorIdentity,
       );
-  final effectiveOptimizeArchetype = telemetry?.trackSync(
+  final effectiveOptimizeArchetype =
+      telemetry?.trackSync(
         'deck_context.resolve_archetype',
         () => resolveOptimizeArchetype(
           requestedArchetype: targetArchetype,

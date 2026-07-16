@@ -528,14 +528,16 @@ def add_lookup_alias(
 
 
 def load_card_lookup(conn: psycopg2.extensions.connection) -> dict[str, CardIdentity]:
+    # Keep the one-row-per-card intelligence payload separate from the alias
+    # bridge. `card_identity_bridge` currently has several aliases per card;
+    # joining the full Oracle/legality/tag payload to every alias transfers and
+    # materializes that same large payload hundreds of thousands of times.
     with conn.cursor(cursor_factory=RealDictCursor) as cur:
         cur.execute(
             """
             SELECT
-                cib.card_id,
-                cib.canonical_name,
-                cib.lookup_name,
-                cib.printed_name,
+                cis.card_id,
+                cis.card_name AS canonical_name,
                 cis.oracle_id,
                 cis.oracle_text,
                 cis.type_line,
@@ -545,25 +547,19 @@ def load_card_lookup(conn: psycopg2.extensions.connection) -> dict[str, CardIden
                 cis.function_tags,
                 cis.battle_rule_count,
                 cis.verified_battle_rule_count,
-                cis.source_coverage,
-                COALESCE(cib.match_priority, 999) AS match_priority
-            FROM card_identity_bridge cib
-            LEFT JOIN card_intelligence_snapshot cis ON cis.card_id = cib.card_id
-            ORDER BY
-                cib.normalized_lookup_name,
-                COALESCE(cib.match_priority, 999),
-                cib.normalized_canonical_name,
-                cib.card_id
+                cis.source_coverage
+            FROM card_intelligence_snapshot cis
+            ORDER BY cis.card_id
             """
         )
-        rows = cur.fetchall()
+        snapshot_rows = cur.fetchall()
 
-    lookup: dict[str, CardIdentity] = {}
-    lookup_rank: dict[str, tuple[int, str, str]] = {}
-    for row in rows:
-        identity = CardIdentity(
-            card_id=str(row["card_id"]),
-            canonical_name=str(row["canonical_name"] or row["lookup_name"] or ""),
+    identities_by_card_id: dict[str, CardIdentity] = {}
+    for row in snapshot_rows:
+        card_id = str(row["card_id"])
+        identities_by_card_id[card_id] = CardIdentity(
+            card_id=card_id,
+            canonical_name=str(row["canonical_name"] or ""),
             type_line=str(row["type_line"] or ""),
             cmc=decimal_to_float(row["cmc"]),
             oracle_id=str(row["oracle_id"]) if row["oracle_id"] else None,
@@ -575,6 +571,50 @@ def load_card_lookup(conn: psycopg2.extensions.connection) -> dict[str, CardIden
             verified_battle_rule_count=int(row["verified_battle_rule_count"] or 0),
             source_coverage=json_value(row["source_coverage"], {}),
         )
+
+    with conn.cursor(cursor_factory=RealDictCursor) as cur:
+        cur.execute(
+            """
+            SELECT
+                cib.card_id,
+                cib.canonical_name,
+                cib.lookup_name,
+                cib.printed_name,
+                COALESCE(cib.match_priority, 999) AS match_priority
+            FROM card_identity_bridge cib
+            ORDER BY
+                cib.normalized_lookup_name,
+                COALESCE(cib.match_priority, 999),
+                cib.normalized_canonical_name,
+                cib.card_id
+            """
+        )
+        alias_rows = cur.fetchall()
+
+    lookup: dict[str, CardIdentity] = {}
+    lookup_rank: dict[str, tuple[int, str, str]] = {}
+    for row in alias_rows:
+        card_id = str(row["card_id"])
+        identity = identities_by_card_id.get(card_id)
+        if identity is None:
+            # Preserve the old LEFT JOIN behavior for aliases whose card has no
+            # current intelligence snapshot. Resolution remains possible and
+            # the downstream audit will surface the missing metadata.
+            identity = CardIdentity(
+                card_id=card_id,
+                canonical_name=str(row["canonical_name"] or row["lookup_name"] or ""),
+                type_line="",
+                cmc=None,
+                oracle_id=None,
+                oracle_text="",
+                color_identity=[],
+                legalities={},
+                function_tags=[],
+                battle_rule_count=0,
+                verified_battle_rule_count=0,
+                source_coverage={},
+            )
+            identities_by_card_id[card_id] = identity
         match_priority = int(row["match_priority"] or 999)
         add_lookup_alias(lookup, lookup_rank, row["canonical_name"], identity)
         add_lookup_alias(

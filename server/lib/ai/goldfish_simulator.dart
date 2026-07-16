@@ -34,7 +34,8 @@ class GoldfishResult {
 
   /// Score de consistência (0-100)
   int get consistencyScore {
-    final score = (keepableRate * 40) + // 40% peso em mãos jogáveis
+    final score =
+        (keepableRate * 40) + // 40% peso em mãos jogáveis
         (turn2PlayRate * 25) + // 25% em ter jogada no T2
         (turn3PlayRate * 20) + // 20% em ter jogada no T3
         ((1 - screwRate) * 10) + // 10% em evitar screw
@@ -50,41 +51,50 @@ class GoldfishResult {
     // Análise de terrenos
     if (screwRate > 0.15) {
       recs.add(
-          'Alta taxa de mana screw (${(screwRate * 100).toStringAsFixed(1)}%). Considere adicionar 2-4 terrenos.');
+        'Alta taxa de mana screw (${(screwRate * 100).toStringAsFixed(1)}%). Considere adicionar 2-4 terrenos.',
+      );
     }
     if (floodRate > 0.12) {
       recs.add(
-          'Alta taxa de mana flood (${(floodRate * 100).toStringAsFixed(1)}%). Considere remover 2-3 terrenos ou adicionar card draw.');
+        'Alta taxa de mana flood (${(floodRate * 100).toStringAsFixed(1)}%). Considere remover 2-3 terrenos ou adicionar card draw.',
+      );
     }
     if (landCount < 33) {
       recs.add(
-          'Apenas $landCount terrenos. Commander geralmente precisa de 35-38.');
+        'Apenas $landCount terrenos. Commander geralmente precisa de 35-38.',
+      );
     }
     if (landCount > 40) {
       recs.add(
-          '$landCount terrenos é acima do ideal. Considere trocar alguns por mana rocks.');
+        '$landCount terrenos é acima do ideal. Considere trocar alguns por mana rocks.',
+      );
     }
 
     // Análise de curva
     if (turn1PlayRate < 0.20) {
       recs.add(
-          'Poucas jogadas de 1 mana (${(turn1PlayRate * 100).toStringAsFixed(0)}%). Adicione mana rocks ou cantrips de 1 CMC.');
+        'Poucas jogadas de 1 mana (${(turn1PlayRate * 100).toStringAsFixed(0)}%). Adicione mana rocks ou cantrips de 1 CMC.',
+      );
     }
     if (turn2PlayRate < 0.60) {
       recs.add(
-          'Curva de 2 mana fraca (${(turn2PlayRate * 100).toStringAsFixed(0)}%). Adicione mais cartas de 2 CMC.');
+        'Curva de 2 mana fraca (${(turn2PlayRate * 100).toStringAsFixed(0)}%). Adicione mais cartas de 2 CMC.',
+      );
     }
     if (noPlayTurn3Rate > 0.12) {
       recs.add(
-          'Alta taxa sem jogada até o turno 3 (${(noPlayTurn3Rate * 100).toStringAsFixed(0)}%). Priorize ramp, compra ou interação barata.');
+        'Alta taxa sem jogada até o turno 3 (${(noPlayTurn3Rate * 100).toStringAsFixed(0)}%). Priorize ramp, compra ou interação barata.',
+      );
     }
     if (avgCmc > 3.5) {
       recs.add(
-          'CMC médio alto (${avgCmc.toStringAsFixed(2)}). Deck pode ser lento; adicione mais cartas baratas.');
+        'CMC médio alto (${avgCmc.toStringAsFixed(2)}). Deck pode ser lento; adicione mais cartas baratas.',
+      );
     }
 
     // Distribuição de CMC
-    final lowCmc = (cmcDistribution[0] ?? 0) +
+    final lowCmc =
+        (cmcDistribution[0] ?? 0) +
         (cmcDistribution[1] ?? 0) +
         (cmcDistribution[2] ?? 0);
     if (lowCmc < 20) {
@@ -99,26 +109,27 @@ class GoldfishResult {
   }
 
   Map<String, dynamic> toJson() => {
-        'simulations': simulations,
-        'consistency_score': consistencyScore,
-        'mana_analysis': {
-          'land_count': landCount,
-          'screw_rate': double.parse(screwRate.toStringAsFixed(3)),
-          'flood_rate': double.parse(floodRate.toStringAsFixed(3)),
-          'keepable_rate': double.parse(keepableRate.toStringAsFixed(3)),
-        },
-        'curve_analysis': {
-          'avg_cmc': double.parse(avgCmc.toStringAsFixed(2)),
-          'turn_1_play': double.parse(turn1PlayRate.toStringAsFixed(3)),
-          'turn_2_play': double.parse(turn2PlayRate.toStringAsFixed(3)),
-          'turn_3_play': double.parse(turn3PlayRate.toStringAsFixed(3)),
-          'turn_4_play': double.parse(turn4PlayRate.toStringAsFixed(3)),
-          'no_play_turn_3': double.parse(noPlayTurn3Rate.toStringAsFixed(3)),
-          'cmc_distribution':
-              cmcDistribution.map((k, v) => MapEntry(k.toString(), v)),
-        },
-        'recommendations': recommendations,
-      };
+    'simulations': simulations,
+    'consistency_score': consistencyScore,
+    'mana_analysis': {
+      'land_count': landCount,
+      'screw_rate': double.parse(screwRate.toStringAsFixed(3)),
+      'flood_rate': double.parse(floodRate.toStringAsFixed(3)),
+      'keepable_rate': double.parse(keepableRate.toStringAsFixed(3)),
+    },
+    'curve_analysis': {
+      'avg_cmc': double.parse(avgCmc.toStringAsFixed(2)),
+      'turn_1_play': double.parse(turn1PlayRate.toStringAsFixed(3)),
+      'turn_2_play': double.parse(turn2PlayRate.toStringAsFixed(3)),
+      'turn_3_play': double.parse(turn3PlayRate.toStringAsFixed(3)),
+      'turn_4_play': double.parse(turn4PlayRate.toStringAsFixed(3)),
+      'no_play_turn_3': double.parse(noPlayTurn3Rate.toStringAsFixed(3)),
+      'cmc_distribution': cmcDistribution.map(
+        (k, v) => MapEntry(k.toString(), v),
+      ),
+    },
+    'recommendations': recommendations,
+  };
 }
 
 /// Simulador Monte Carlo para análise de consistência de decks
@@ -127,11 +138,8 @@ class GoldfishSimulator {
   final int simulations;
   final Random _random;
 
-  GoldfishSimulator(
-    this.cards, {
-    this.simulations = 1000,
-    Random? random,
-  }) : _random = random ?? Random(_stableDeckSeed(cards, simulations));
+  GoldfishSimulator(this.cards, {this.simulations = 1000, Random? random})
+    : _random = random ?? Random(_stableDeckSeed(cards, simulations));
 
   /// Executa a simulação e retorna métricas
   GoldfishResult simulate() {
@@ -171,11 +179,7 @@ class GoldfishSimulator {
 
       // Turno 1
       _playLandIfPossible(cardsAvailable, manaState);
-      if (_canPlayOnTurn(
-        cardsAvailable,
-        manaState.availableSources,
-        colorSources: manaState.availableColorSources,
-      )) {
+      if (_hasPlayOnTurn(cardsAvailable, manaState)) {
         turn1Plays++;
       }
 
@@ -183,11 +187,7 @@ class GoldfishSimulator {
       manaState.untapDelayedSources();
       if (draws.isNotEmpty) cardsAvailable.add(draws[0]);
       _playLandIfPossible(cardsAvailable, manaState);
-      if (_canPlayOnTurn(
-        cardsAvailable,
-        manaState.availableSources,
-        colorSources: manaState.availableColorSources,
-      )) {
+      if (_hasPlayOnTurn(cardsAvailable, manaState)) {
         turn2Plays++;
       }
 
@@ -195,11 +195,7 @@ class GoldfishSimulator {
       manaState.untapDelayedSources();
       if (draws.length > 1) cardsAvailable.add(draws[1]);
       _playLandIfPossible(cardsAvailable, manaState);
-      final hasTurn3Play = _canPlayOnTurn(
-        cardsAvailable,
-        manaState.availableSources,
-        colorSources: manaState.availableColorSources,
-      );
+      final hasTurn3Play = _hasPlayOnTurn(cardsAvailable, manaState);
       if (hasTurn3Play) {
         turn3Plays++;
       } else {
@@ -210,11 +206,7 @@ class GoldfishSimulator {
       manaState.untapDelayedSources();
       if (draws.length > 2) cardsAvailable.add(draws[2]);
       _playLandIfPossible(cardsAvailable, manaState);
-      if (_canPlayOnTurn(
-        cardsAvailable,
-        manaState.availableSources,
-        colorSources: manaState.availableColorSources,
-      )) {
+      if (_hasPlayOnTurn(cardsAvailable, manaState)) {
         turn4Plays++;
       }
     }
@@ -333,20 +325,31 @@ class GoldfishSimulator {
       producedColors.addAll(['W', 'U', 'B', 'R', 'G']);
     }
 
+    // A zero-mana fetchland is still exactly one land/mana source. Model the
+    // colors its fetched land can produce without counting the search as ramp.
+    producedColors.addAll(_getZeroManaFetchLandColors(card));
+
     // Wastes / colorless lands: produce no color (just generic mana)
     // If we couldn't detect any color, it's a colorless source
     return producedColors;
   }
 
   /// Verifica se há jogada válida no turno, considerando mana colorida
-  bool _canPlayOnTurn(List<Map<String, dynamic>> cards, int availableSources,
-      {Map<String, int> colorSources = const {}}) {
+  bool _canPlayOnTurn(
+    List<Map<String, dynamic>> cards,
+    int availableSources, {
+    Map<String, int> colorSources = const {},
+  }) {
     // Mana total disponível = fontes que já podem gerar mana neste turno.
     final manaAvailable = availableSources;
 
     return cards.any((c) {
       if (_isLand(c)) return false;
       final cmc = _getCmc(c);
+      // CMC-zero cards must not become a permanent "has a play" signal when
+      // this lightweight simulator does not execute them. Supported fast mana
+      // is handled explicitly by _hasPlayOnTurn below.
+      if (cmc <= 0) return false;
       if (cmc > manaAvailable) return false;
 
       // Verificar requisitos de mana colorida
@@ -359,6 +362,136 @@ class GoldfishSimulator {
       }
       return true;
     });
+  }
+
+  /// Returns whether the hand has a relevant cast this turn.
+  ///
+  /// Lotus Petal and Mox Diamond are executed only when they unlock another
+  /// positive-mana-value spell immediately. Petal is consumed once; Diamond
+  /// requires and discards a land, then remains as one any-color source.
+  bool _hasPlayOnTurn(
+    List<Map<String, dynamic>> cards,
+    _GoldfishManaState manaState,
+  ) {
+    if (_canPlayOnTurn(
+      cards,
+      manaState.availableSources,
+      colorSources: manaState.availableColorSources,
+    )) {
+      return true;
+    }
+
+    final plan = _findFastManaPlan(cards, manaState);
+    if (plan == null) return false;
+
+    for (var i = 0; i < plan.lotusPetals; i++) {
+      _removeFirst(cards, _isLotusPetal);
+    }
+    for (var i = 0; i < plan.moxDiamonds; i++) {
+      _removeFirst(cards, _isMoxDiamond);
+      _removeFirst(cards, _isLand);
+      manaState.addAvailableAnyColorSource();
+    }
+
+    return true;
+  }
+
+  _FastManaPlan? _findFastManaPlan(
+    List<Map<String, dynamic>> cards,
+    _GoldfishManaState manaState,
+  ) {
+    final lotusPetals = cards.where(_isLotusPetal).length;
+    final moxDiamonds = min(
+      cards.where(_isMoxDiamond).length,
+      cards.where(_isLand).length,
+    );
+    _FastManaPlan? best;
+
+    for (var petals = 0; petals <= lotusPetals; petals++) {
+      for (var diamonds = 0; diamonds <= moxDiamonds; diamonds++) {
+        if (petals == 0 && diamonds == 0) continue;
+
+        final addedSources = petals + diamonds;
+        final hypotheticalColors = Map<String, int>.from(
+          manaState.availableColorSources,
+        );
+        for (final color in const ['W', 'U', 'B', 'R', 'G']) {
+          hypotheticalColors[color] =
+              (hypotheticalColors[color] ?? 0) + addedSources;
+        }
+        final unlocksSpell = _canPlayOnTurn(
+          cards,
+          manaState.availableSources + addedSources,
+          colorSources: hypotheticalColors,
+        );
+        if (!unlocksSpell) continue;
+
+        final candidate = _FastManaPlan(
+          lotusPetals: petals,
+          moxDiamonds: diamonds,
+        );
+        if (best == null || candidate.resourceScore < best.resourceScore) {
+          best = candidate;
+        }
+      }
+    }
+
+    return best;
+  }
+
+  bool _isLotusPetal(Map<String, dynamic> card) =>
+      (card['name'] ?? '').toString().trim().toLowerCase() == 'lotus petal';
+
+  bool _isMoxDiamond(Map<String, dynamic> card) =>
+      (card['name'] ?? '').toString().trim().toLowerCase() == 'mox diamond';
+
+  void _removeFirst(
+    List<Map<String, dynamic>> cards,
+    bool Function(Map<String, dynamic>) predicate,
+  ) {
+    final index = cards.indexWhere(predicate);
+    if (index != -1) cards.removeAt(index);
+  }
+
+  Set<String> _getZeroManaFetchLandColors(Map<String, dynamic> card) {
+    if (!_isLand(card)) return const {};
+    final name = (card['name'] ?? '').toString().trim();
+    final oracle = (card['oracle_text'] ?? '').toString();
+    if (name.isEmpty || oracle.isEmpty) return const {};
+
+    final activation = RegExp(
+      '(?:^|[.\\n])([^:]*sacrifice\\s+(?:${RegExp.escape(name)}|this land))'
+      ':\\s*search your library for ([^.]+)',
+      caseSensitive: false,
+    ).firstMatch(oracle);
+    if (activation == null) return const {};
+
+    // Panoramas and similar lands pay mana to fetch and cannot be treated as
+    // immediate color access from the land alone.
+    final activationCost = activation.group(1) ?? '';
+    final requiresMana = RegExp(r'\{([^}]+)\}')
+        .allMatches(activationCost)
+        .any(
+          (match) =>
+              !const {'T', 'Q'}.contains((match.group(1) ?? '').toUpperCase()),
+        );
+    if (requiresMana) return const {};
+
+    final target = (activation.group(2) ?? '').toLowerCase();
+    if (RegExp(r'\b(?:up to )?two\b').hasMatch(target)) return const {};
+
+    if (target.contains('basic land card') ||
+        target.contains('land card with a basic land type')) {
+      return const {'W', 'U', 'B', 'R', 'G'};
+    }
+
+    final colors = <String>{};
+    if (target.contains('plains')) colors.add('W');
+    if (target.contains('island')) colors.add('U');
+    if (target.contains('swamp')) colors.add('B');
+    if (target.contains('mountain')) colors.add('R');
+    if (target.contains('forest')) colors.add('G');
+    return colors;
   }
 
   /// Simula jogar um terreno se possível, rastreando cores produzidas
@@ -381,7 +514,11 @@ class GoldfishSimulator {
   bool _landEntersTapped(Map<String, dynamic> card) {
     final oracle = (card['oracle_text'] ?? '').toString().toLowerCase();
     return oracle.contains('enters the battlefield tapped') ||
-        oracle.contains('enters tapped');
+        oracle.contains('enters tapped') ||
+        (_getZeroManaFetchLandColors(card).isNotEmpty &&
+            RegExp(
+              r'put (?:it|that card) onto the battlefield tapped',
+            ).hasMatch(oracle));
   }
 
   /// Calcula CMC médio (excluindo terrenos)
@@ -425,6 +562,17 @@ class GoldfishSimulator {
   }
 }
 
+class _FastManaPlan {
+  final int lotusPetals;
+  final int moxDiamonds;
+
+  const _FastManaPlan({required this.lotusPetals, required this.moxDiamonds});
+
+  // Prefer the smallest acceleration package and, on ties, avoid discarding a
+  // land to Mox Diamond when a one-shot Petal is sufficient.
+  int get resourceScore => ((lotusPetals + moxDiamonds) * 100) + moxDiamonds;
+}
+
 class _GoldfishManaState {
   int availableSources = 0;
   int _delayedSources = 0;
@@ -434,6 +582,11 @@ class _GoldfishManaState {
   void addAvailableLand(Set<String> colors) {
     availableSources++;
     _addColors(availableColorSources, colors);
+  }
+
+  void addAvailableAnyColorSource() {
+    availableSources++;
+    _addColors(availableColorSources, const {'W', 'U', 'B', 'R', 'G'});
   }
 
   void addDelayedLand(Set<String> colors) {
@@ -570,7 +723,7 @@ class _DeckStats {
       'exile',
       'sacrifice',
       '-x/-x',
-      'damage'
+      'damage',
     ];
     const wipeKeywords = ['destroy all', 'exile all', 'all creatures'];
     const drawKeywords = ['draw', 'scry', 'look at'];
@@ -630,14 +783,14 @@ class _DeckStats {
   }
 
   Map<String, dynamic> toJson() => {
-        'avg_cmc': double.parse(avgCmc.toStringAsFixed(2)),
-        'creature_count': creatureCount,
-        'removal_count': removalCount,
-        'board_wipe_count': boardWipeCount,
-        'card_draw_count': cardDrawCount,
-        'ramp_count': rampCount,
-        'land_count': landCount,
-      };
+    'avg_cmc': double.parse(avgCmc.toStringAsFixed(2)),
+    'creature_count': creatureCount,
+    'removal_count': removalCount,
+    'board_wipe_count': boardWipeCount,
+    'card_draw_count': cardDrawCount,
+    'ramp_count': rampCount,
+    'land_count': landCount,
+  };
 }
 
 class MatchupResult {
@@ -656,10 +809,10 @@ class MatchupResult {
   });
 
   Map<String, dynamic> toJson() => {
-        'win_rate_deck_a': double.parse(winRateA.toStringAsFixed(3)),
-        'win_rate_deck_b': double.parse(winRateB.toStringAsFixed(3)),
-        'deck_a_stats': statsA,
-        'deck_b_stats': statsB,
-        'notes': notes,
-      };
+    'win_rate_deck_a': double.parse(winRateA.toStringAsFixed(3)),
+    'win_rate_deck_b': double.parse(winRateB.toStringAsFixed(3)),
+    'deck_a_stats': statsA,
+    'deck_b_stats': statsB,
+    'notes': notes,
+  };
 }

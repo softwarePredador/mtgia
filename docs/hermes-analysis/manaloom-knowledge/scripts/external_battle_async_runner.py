@@ -52,6 +52,9 @@ NAME_FIELDS = (
     "permanent_name",
     "attacker_name",
     "blocker_name",
+    "card",
+    "source",
+    "target_card",
 )
 
 
@@ -158,17 +161,38 @@ def _learning_contract(result: Mapping[str, Any]) -> dict[str, Any]:
     return {}
 
 
-def _completed(result: Mapping[str, Any]) -> bool:
+def completed_result_error(
+    result: Mapping[str, Any],
+    *,
+    expected_engine: str | None = None,
+) -> str | None:
     status = normalize_name(result.get("status"))
-    if status in {"completed", "complete", "ok", "success"}:
-        return True
-    return bool(result.get("winner")) and not result.get("error")
+    if status != "completed":
+        return "engine_result_not_completed"
+    if result.get("error") is not None:
+        return "engine_result_contains_error"
+    if (
+        expected_engine is not None
+        and normalize_name(result.get("engine")) != normalize_name(expected_engine)
+    ):
+        return "engine_result_mismatch"
+    turns = result.get("turns")
+    if not isinstance(turns, int) or isinstance(turns, bool) or turns <= 0:
+        return "engine_result_missing_positive_turn_count"
+    return None
+
+
+def _completed(result: Mapping[str, Any], *, expected_engine: str | None = None) -> bool:
+    return completed_result_error(result, expected_engine=expected_engine) is None
 
 
 def extract_positive_evidence(
     result: Mapping[str, Any],
     *,
     focus_cards: Sequence[str] = (),
+    expected_engine: str | None = None,
+    same_lane: bool = False,
+    natural_sample: bool = True,
 ) -> dict[str, Any]:
     contract = _learning_contract(result)
     contract_valid = (
@@ -202,19 +226,28 @@ def extract_positive_evidence(
                 "event_types": types,
             }
         )
-    completed = _completed(result)
+    completed = _completed(result, expected_engine=expected_engine)
     all_focus_exposed = bool(focus_rows) and all(row["positive_exposure"] for row in focus_rows)
+    requested_exposure_ready = all_focus_exposed if focus_rows else bool(exposed)
+    positive_exposure_ready = completed and contract_valid and requested_exposure_ready
+    natural_same_lane_exposure = positive_exposure_ready and same_lane and natural_sample
     return {
         "schema_version": "battle_positive_evidence_v1",
         "completed": completed,
         "learning_contract_valid": contract_valid,
+        "learning_contract_schema": contract.get("schema_version"),
         "absence_proves_nonuse": False,
         "event_stream_is_lower_bound": True,
         "event_counts": dict(sorted(event_counts.items())),
         "exposed_card_names": sorted(display_names.values(), key=normalize_name),
+        "exposed_card_names_normalized": sorted(exposed),
         "focus_cards": focus_rows,
         "all_focus_cards_exposed": all_focus_exposed,
-        "positive_exposure_ready": completed and contract_valid and all_focus_exposed,
+        "positive_exposure_ready": positive_exposure_ready,
+        "same_lane": same_lane,
+        "natural_sample": natural_sample,
+        "natural_same_lane_exposure": natural_same_lane_exposure,
+        "comparison_input_ready": False,
         "strategy_proof": False,
         "swap_superiority_proven": False,
         "promotion_allowed": False,
@@ -545,7 +578,29 @@ class BattleQueueRunner:
                 evidence = extract_positive_evidence(
                     response.body,
                     focus_cards=[str(card) for card in job.get("focus_cards") or []],
+                    expected_engine=engine,
+                    same_lane=job.get("same_lane") is True,
+                    natural_sample=job.get("forced_access") is not True,
                 )
+                completion_error = completed_result_error(
+                    response.body,
+                    expected_engine=engine,
+                )
+                if completion_error is not None:
+                    attempt["status"] = "invalid_completed_result"
+                    attempt["error"] = completion_error
+                    state.update(
+                        {
+                            "status": "failed",
+                            "engine": engine,
+                            "result_path": str(result_path),
+                            "evidence": evidence,
+                            "error": completion_error,
+                            "completed_at": utc_now(),
+                        }
+                    )
+                    self._save()
+                    return state
                 state.update(
                     {
                         "status": "completed",
@@ -568,7 +623,12 @@ class BattleQueueRunner:
                 continue
             if response.status == 504:
                 attempt["status"] = "timeout"
-                if engine == "xmage" and response.body.get("restart_required") is True:
+                if engine == "xmage":
+                    if response.body.get("restart_required") is not True:
+                        state["status"] = "timeout"
+                        state["error"] = "xmage_timeout_restart_not_declared"
+                        self._save()
+                        return state
                     previous = str(response.body.get("sidecar_process_id") or "")
                     recovered = bool(previous) and self._wait_for_xmage_recovery(previous)
                     attempt["recovery_observed"] = recovered

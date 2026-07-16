@@ -377,6 +377,42 @@ def _ensure_columns(
             cur.execute(f"ALTER TABLE {table_name} ADD COLUMN {column} {definition}")
 
 
+def canonicalize_snapshot_card_ids(
+    cur: sqlite3.Cursor,
+    cards: list[dict[str, Any]],
+) -> tuple[list[dict[str, Any]], int]:
+    """Resolve PG printing ids to the canonical ids already owned by Hermes."""
+    cache_columns = {
+        row[1] for row in cur.execute("PRAGMA table_info(card_oracle_cache)")
+    }
+    if not {"normalized_name", "card_id"}.issubset(cache_columns):
+        return [dict(card) for card in cards], 0
+
+    canonicalized: list[dict[str, Any]] = []
+    replacements = 0
+    for card in cards:
+        resolved = dict(card)
+        incoming_card_id = str(card.get("card_id") or "").strip()
+        card_name = str(card.get("name") or "").strip()
+        if incoming_card_id and card_name:
+            cache_row = cur.execute(
+                """
+                SELECT card_id
+                FROM card_oracle_cache
+                WHERE normalized_name = lower(trim(?))
+                  AND COALESCE(card_id, '') != ''
+                """,
+                (card_name,),
+            ).fetchone()
+            if cache_row:
+                canonical_card_id = str(cache_row[0]).strip()
+                if canonical_card_id.lower() != incoming_card_id.lower():
+                    resolved["card_id"] = canonical_card_id
+                    replacements += 1
+        canonicalized.append(resolved)
+    return canonicalized, replacements
+
+
 def normalize_snapshot_cards(cards: list[dict[str, Any]]) -> list[dict[str, Any]]:
     """Validate and normalize a one-row-per-card semantic snapshot."""
     aggregated: dict[str, dict[str, Any]] = {}
@@ -841,46 +877,58 @@ def write_sqlite(
     cards: list[dict[str, Any]],
     *,
     apply: bool,
-) -> dict[str, int]:
-    snapshot_cards = normalize_snapshot_cards(cards)
-    deck_hash, semantics_hash, ruleset_hash = snapshot_hashes(snapshot_cards)
-    sync_run_id = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")
-    deck_total_qty = int(deck.get("total_qty") or 0)
-    stats = {
-        "cards_seen": len(cards),
-        "quantity_seen": sum(int(card["quantity"]) for card in cards),
-        "duplicate_rows_collapsed": 0,
-        "battle_rules_seen": sum(
-            len(parse_json_value(card.get("battle_rules_json"), []))
-            for card in cards
-            if isinstance(parse_json_value(card.get("battle_rules_json"), []), list)
-        ),
-        "battle_rules_written": sum(
-            len(parse_json_value(card.get("battle_rules_json"), []))
-            for card in snapshot_cards
-            if isinstance(parse_json_value(card.get("battle_rules_json"), []), list)
-        ),
-        "cards_written": 0,
-        "quantity_written": 0,
-        "commanders": sum(1 for card in snapshot_cards if card["is_commander"]),
-        "deck_hash": deck_hash,
-        "semantics_hash": semantics_hash,
-        "ruleset_hash": ruleset_hash,
-        "sync_run_id": sync_run_id,
-    }
-    stats["battle_rules_deduped"] = (
-        stats["battle_rules_seen"] - stats["battle_rules_written"]
-    )
-    if deck_total_qty and stats["quantity_seen"] != deck_total_qty:
-        raise RuntimeError(
-            "Fetched deck quantity mismatch before SQLite write: "
-            f"deck_total_qty={deck_total_qty}, fetched_quantity={stats['quantity_seen']}. "
-            "This usually means a join multiplied deck card rows."
-        )
+) -> dict[str, Any]:
     conn = sqlite3.connect(sqlite_db)
     try:
         cur = conn.cursor()
         ensure_sqlite_schema(cur)
+        canonical_cards, canonicalized_count = canonicalize_snapshot_card_ids(
+            cur,
+            cards,
+        )
+        snapshot_cards = normalize_snapshot_cards(canonical_cards)
+        deck_hash, semantics_hash, ruleset_hash = snapshot_hashes(snapshot_cards)
+        sync_run_id = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")
+        deck_total_qty = int(deck.get("total_qty") or 0)
+        stats = {
+            "cards_seen": len(cards),
+            "quantity_seen": sum(int(card["quantity"]) for card in cards),
+            "card_ids_canonicalized": canonicalized_count,
+            "duplicate_rows_collapsed": 0,
+            "battle_rules_seen": sum(
+                len(parse_json_value(card.get("battle_rules_json"), []))
+                for card in cards
+                if isinstance(
+                    parse_json_value(card.get("battle_rules_json"), []), list
+                )
+            ),
+            "battle_rules_written": sum(
+                len(parse_json_value(card.get("battle_rules_json"), []))
+                for card in snapshot_cards
+                if isinstance(
+                    parse_json_value(card.get("battle_rules_json"), []), list
+                )
+            ),
+            "cards_written": 0,
+            "quantity_written": 0,
+            "commanders": sum(
+                1 for card in snapshot_cards if card["is_commander"]
+            ),
+            "deck_hash": deck_hash,
+            "semantics_hash": semantics_hash,
+            "ruleset_hash": ruleset_hash,
+            "sync_run_id": sync_run_id,
+        }
+        stats["battle_rules_deduped"] = (
+            stats["battle_rules_seen"] - stats["battle_rules_written"]
+        )
+        if deck_total_qty and stats["quantity_seen"] != deck_total_qty:
+            raise RuntimeError(
+                "Fetched deck quantity mismatch before SQLite write: "
+                f"deck_total_qty={deck_total_qty}, "
+                f"fetched_quantity={stats['quantity_seen']}. "
+                "This usually means a join multiplied deck card rows."
+            )
         if apply:
             cur.execute("DELETE FROM deck_cards WHERE deck_id=?", (target_deck_id,))
             cur.execute("DELETE FROM decks WHERE id=?", (target_deck_id,))

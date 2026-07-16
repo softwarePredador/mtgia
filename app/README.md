@@ -160,7 +160,8 @@ Estado vivo do contador hoje:
   - `app/lib/features/home/life_counter/life_counter_player_appearance_transfer.dart`
   - export/import de perfil de aparencia via clipboard pela shell nativa
   - perfis salvos de aparencia em `app/lib/features/home/life_counter/life_counter_player_appearance_profile_store.dart`
-- o espelho local em `app/android/app/src/main/assets/lotus/` nao e contrato ativo de runtime
+- o antigo espelho Android de Lotus foi removido; o unico source-of-truth de
+  runtime permanece `app/assets/lotus/`, empacotado pelo `pubspec.yaml`
 - `Sprint 3` de `timer + clock` esta fechado
 - `Sprint 4` esta em andamento, focado em `commander damage`, counters e runtime de jogador
 - `Player State` agora funciona como hub ManaLoom para `counters`, `commander damage` e `player appearance`

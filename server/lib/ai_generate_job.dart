@@ -1,27 +1,18 @@
 import 'dart:convert';
 import 'dart:math';
 
-import 'package:meta/meta.dart' show visibleForTesting;
 import 'package:postgres/postgres.dart';
 
 class AiGenerateJobStore {
   AiGenerateJobStore._();
 
   static const _jobTtl = Duration(minutes: 30);
-  static bool _schemaReady = false;
-
-  @visibleForTesting
-  static void resetSchemaFlag() {
-    _schemaReady = false;
-  }
-
   static Future<String> create({
     required Pool pool,
     required String cacheKey,
     required String format,
     required String userId,
   }) async {
-    await _ensureSchema(pool);
     final id = _generateId();
     await pool.execute(
       Sql.named('''
@@ -49,7 +40,6 @@ class AiGenerateJobStore {
   }
 
   static Future<AiGenerateJob?> get(Pool pool, String id) async {
-    await _ensureSchema(pool);
     await _cleanup(pool);
     final result = await pool.execute(
       Sql.named('''
@@ -83,7 +73,6 @@ class AiGenerateJobStore {
     required String stage,
     required int stageNumber,
   }) async {
-    await _ensureSchema(pool);
     await pool.execute(
       Sql.named('''
         UPDATE ai_generate_jobs
@@ -94,11 +83,7 @@ class AiGenerateJobStore {
           updated_at = NOW()
         WHERE id = @id
       '''),
-      parameters: {
-        'id': id,
-        'stage': stage,
-        'stage_number': stageNumber,
-      },
+      parameters: {'id': id, 'stage': stage, 'stage_number': stageNumber},
     );
   }
 
@@ -108,7 +93,6 @@ class AiGenerateJobStore {
     required int statusCode,
     required Map<String, dynamic> result,
   }) async {
-    await _ensureSchema(pool);
     await pool.execute(
       Sql.named('''
         UPDATE ai_generate_jobs
@@ -135,7 +119,6 @@ class AiGenerateJobStore {
     String id, {
     required String error,
   }) async {
-    await _ensureSchema(pool);
     await pool.execute(
       Sql.named('''
         UPDATE ai_generate_jobs
@@ -146,10 +129,7 @@ class AiGenerateJobStore {
           updated_at = NOW()
         WHERE id = @id
       '''),
-      parameters: {
-        'id': id,
-        'error': error,
-      },
+      parameters: {'id': id, 'error': error},
     );
   }
 
@@ -161,44 +141,6 @@ class AiGenerateJobStore {
       '''),
       parameters: {'ttl_seconds': _jobTtl.inSeconds},
     );
-  }
-
-  static Future<void> _ensureSchema(Pool pool) async {
-    if (_schemaReady) return;
-    await pool.execute(
-      Sql.named('''
-        CREATE TABLE IF NOT EXISTS ai_generate_jobs (
-          id TEXT PRIMARY KEY,
-          user_id UUID REFERENCES users(id) ON DELETE SET NULL,
-          cache_key TEXT NOT NULL,
-          format TEXT NOT NULL,
-          status TEXT NOT NULL DEFAULT 'pending',
-          stage TEXT NOT NULL DEFAULT 'Iniciando...',
-          stage_number INTEGER NOT NULL DEFAULT 0,
-          total_stages INTEGER NOT NULL DEFAULT 4,
-          result_status_code INTEGER,
-          result JSONB,
-          error TEXT,
-          created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
-          updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
-          CONSTRAINT chk_ai_generate_jobs_status
-            CHECK (status IN ('pending', 'processing', 'completed', 'failed'))
-        )
-      '''),
-    );
-    await pool.execute(
-      Sql.named('''
-        CREATE INDEX IF NOT EXISTS idx_ai_generate_jobs_user_updated
-        ON ai_generate_jobs (user_id, updated_at DESC)
-      '''),
-    );
-    await pool.execute(
-      Sql.named('''
-        CREATE INDEX IF NOT EXISTS idx_ai_generate_jobs_created
-        ON ai_generate_jobs (created_at DESC)
-      '''),
-    );
-    _schemaReady = true;
   }
 
   static String _generateId() {
@@ -225,8 +167,8 @@ class AiGenerateJob {
     this.error,
     DateTime? createdAt,
     DateTime? updatedAt,
-  })  : createdAt = createdAt ?? DateTime.now(),
-        updatedAt = updatedAt ?? DateTime.now();
+  }) : createdAt = createdAt ?? DateTime.now(),
+       updatedAt = updatedAt ?? DateTime.now();
 
   final String id;
   final String userId;
@@ -261,19 +203,19 @@ class AiGenerateJob {
   }
 
   Map<String, dynamic> toJson() => {
-        'job_id': id,
-        'status': status,
-        'stage': stage,
-        'stage_number': stageNumber,
-        'total_stages': totalStages,
-        'format': format,
-        'cache_key': cacheKey,
-        if (resultStatusCode != null) 'result_status_code': resultStatusCode,
-        if (result != null) 'result': result,
-        if (error != null) 'error': error,
-        'created_at': createdAt.toIso8601String(),
-        'updated_at': updatedAt.toIso8601String(),
-      };
+    'job_id': id,
+    'status': status,
+    'stage': stage,
+    'stage_number': stageNumber,
+    'total_stages': totalStages,
+    'format': format,
+    'cache_key': cacheKey,
+    if (resultStatusCode != null) 'result_status_code': resultStatusCode,
+    if (result != null) 'result': result,
+    if (error != null) 'error': error,
+    'created_at': createdAt.toIso8601String(),
+    'updated_at': updatedAt.toIso8601String(),
+  };
 }
 
 Map<String, dynamic>? _decodeJsonMap(dynamic value) {

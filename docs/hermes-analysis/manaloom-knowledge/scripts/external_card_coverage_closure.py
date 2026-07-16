@@ -23,6 +23,12 @@ from typing import Any, Iterable, Mapping, Sequence
 
 SCHEMA_VERSION = "external_card_coverage_closure_v1"
 ENGINE_ORDER = ("xmage", "forge", "native")
+TERMINAL_EXECUTION_SCOPES = {
+    "auxiliary_game_object",
+    "nonstandard_or_playtest_ruleset",
+    "physical_or_external_interaction",
+    "scenario_or_challenge_deck_ruleset",
+}
 
 
 def utc_now() -> str:
@@ -521,16 +527,33 @@ def build_closure(
         any(states) and not all(states) for states in identities.values()
     )
     residual_identities = len(identities) - fully_covered_identities
-    family_gates = [
-        {
-            "family": family,
-            "card_count": count,
-            "status": "action_required",
-            "next_gate": residual_family_next_gate(family),
-            "promotion_allowed": False,
-        }
-        for family, count in sorted(semantic_family_counts.items())
-    ]
+    family_gates = []
+    for family, count in sorted(semantic_family_counts.items()):
+        family_rows = [
+            row
+            for row in ledger
+            if row.get("residual_semantic_family") == family
+        ]
+        actionable_count = sum(
+            row.get("residual_execution_scope") not in TERMINAL_EXECUTION_SCOPES
+            for row in family_rows
+        )
+        terminal_count = count - actionable_count
+        family_gates.append(
+            {
+                "family": family,
+                "card_count": count,
+                "actionable_card_count": actionable_count,
+                "technical_terminal_card_count": terminal_count,
+                "status": "action_required"
+                if actionable_count
+                else "terminal_disposition_required",
+                "next_gate": residual_family_next_gate(family)
+                if actionable_count
+                else "global_residual_terminal_disposition",
+                "promotion_allowed": False,
+            }
+        )
     return {
         "schema_version": SCHEMA_VERSION,
         "generated_at": utc_now(),
@@ -615,9 +638,22 @@ def write_markdown(payload: Mapping[str, Any], path: Path) -> None:
     )
     for scope, count in summary["residual_execution_scope_counts"].items():
         lines.append(f"| `{scope}` | {count} |")
-    lines.extend(["", "## Family Gates", "", "| Family | Next gate |", "| --- | --- |"])
+    lines.extend(
+        [
+            "",
+            "## Family Gates",
+            "",
+            "| Family | Status | Actionable | Technical terminal | Next gate |",
+            "| --- | --- | ---: | ---: | --- |",
+        ]
+    )
     for gate in payload.get("family_gates") or []:
-        lines.append(f"| `{gate['family']}` | `{gate['next_gate']}` |")
+        lines.append(
+            f"| `{gate['family']}` | `{gate['status']}` | "
+            f"{gate['actionable_card_count']} | "
+            f"{gate['technical_terminal_card_count']} | "
+            f"`{gate['next_gate']}` |"
+        )
     lines.extend(
         [
             "",

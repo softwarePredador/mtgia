@@ -5,6 +5,7 @@ import 'package:postgres/postgres.dart';
 
 import '../../../../../lib/deck_cards_bulk_support.dart';
 import '../../../../../lib/deck_rules_service.dart';
+import '../../../../../lib/decks/deck_optimization_history_service.dart';
 
 Future<Response> onRequest(RequestContext context, String deckId) async {
   if (context.request.method != HttpMethod.post) {
@@ -25,6 +26,10 @@ Future<Response> onRequest(RequestContext context, String deckId) async {
   }
 
   final items = (body['cards'] as List?)?.whereType<Map>().toList() ?? const [];
+  final mutationContext =
+      body['mutation_context'] is Map
+          ? (body['mutation_context'] as Map).cast<String, dynamic>()
+          : const <String, dynamic>{};
   if (items.isEmpty) {
     return Response.json(
       statusCode: HttpStatus.badRequest,
@@ -42,20 +47,22 @@ Future<Response> onRequest(RequestContext context, String deckId) async {
     );
   }
 
-  final parsed = items.map((m) => m.cast<String, dynamic>()).map((m) {
-    final cardId = m['card_id']?.toString();
-    final qtyRaw = m['quantity'];
-    final qty = qtyRaw is int ? qtyRaw : int.tryParse('${qtyRaw ?? ''}');
-    final isCommander = m['is_commander'] == true;
-    return {
-      'card_id': cardId,
-      'quantity': qty,
-      'is_commander': isCommander,
-    };
-  }).toList();
+  final parsed =
+      items.map((m) => m.cast<String, dynamic>()).map((m) {
+        final cardId = m['card_id']?.toString();
+        final qtyRaw = m['quantity'];
+        final qty = qtyRaw is int ? qtyRaw : int.tryParse('${qtyRaw ?? ''}');
+        final isCommander = m['is_commander'] == true;
+        return {
+          'card_id': cardId,
+          'quantity': qty,
+          'is_commander': isCommander,
+        };
+      }).toList();
 
-  if (parsed
-      .any((e) => e['card_id'] == null || (e['card_id'] as String).isEmpty)) {
+  if (parsed.any(
+    (e) => e['card_id'] == null || (e['card_id'] as String).isEmpty,
+  )) {
     return Response.json(
       statusCode: HttpStatus.badRequest,
       body: {'error': 'Todos os itens precisam de card_id válido'},
@@ -71,12 +78,13 @@ Future<Response> onRequest(RequestContext context, String deckId) async {
     return Response.json(
       statusCode: HttpStatus.badRequest,
       body: {
-        'error': 'bulk não aceita is_commander=true (use o endpoint single)'
+        'error': 'bulk não aceita is_commander=true (use o endpoint single)',
       },
     );
   }
 
   try {
+    late final List<Map<String, dynamic>> normalizedAfterCards;
     final result = await pool.runTx((session) async {
       final deckResult = await session.execute(
         Sql.named(
@@ -112,13 +120,14 @@ Future<Response> onRequest(RequestContext context, String deckId) async {
         currentCards: current,
         increments: parsed,
       );
+      normalizedAfterCards = normalized
+          .map((card) => Map<String, dynamic>.from(card))
+          .toList(growable: false);
 
       // Valida regras (inclui identidade/banlist/limites)
-      await DeckRulesService(session).validateAndThrow(
-        format: format,
-        cards: normalized,
-        strict: false,
-      );
+      await DeckRulesService(
+        session,
+      ).validateAndThrow(format: format, cards: normalized, strict: false);
 
       // Substitui o deck (em lote) – ok para bulk pois é uma operação rara.
       await session.execute(
@@ -148,10 +157,25 @@ Future<Response> onRequest(RequestContext context, String deckId) async {
         await session.execute(Sql.named(sql), parameters: params);
       }
 
-      final total =
-          normalized.fold<int>(0, (sum, c) => sum + (c['quantity'] as int));
+      final total = normalized.fold<int>(
+        0,
+        (sum, c) => sum + (c['quantity'] as int),
+      );
       return {'total_cards': total};
     });
+
+    if (mutationContext.isNotEmpty) {
+      try {
+        await DeckOptimizationHistoryService(pool).recordAppliedOptimization(
+          userId: userId,
+          deckId: deckId,
+          context: mutationContext,
+          afterCardsPayload: normalizedAfterCards,
+        );
+      } catch (e) {
+        print('[WARN] Failed to record deck optimization event: $e');
+      }
+    }
 
     return Response.json(body: {'ok': true, ...result});
   } on DeckRulesException catch (e) {

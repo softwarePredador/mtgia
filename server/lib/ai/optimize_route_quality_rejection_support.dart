@@ -1,4 +1,7 @@
 Map<String, dynamic> buildNoSafeSwapsRejectedBody({
+  required String strategySource,
+  required String cacheKey,
+  String? fallbackTrigger,
   required Map<String, dynamic> optimizeIntensity,
   required List<String> droppedSwaps,
   required List<String> removals,
@@ -14,6 +17,9 @@ Map<String, dynamic> buildNoSafeSwapsRejectedBody({
       'dropped_swaps': droppedSwaps,
     },
     'mode': 'optimize',
+    'strategy_source': strategySource,
+    if (fallbackTrigger != null) 'fallback_trigger': fallbackTrigger,
+    'cache': {'hit': false, 'cache_key': cacheKey},
     'optimize_intensity': optimizeIntensity,
     'removals': removals,
     'additions': additions,
@@ -21,6 +27,9 @@ Map<String, dynamic> buildNoSafeSwapsRejectedBody({
 }
 
 Map<String, dynamic> buildQualityRejectedBody({
+  required String strategySource,
+  required String cacheKey,
+  String? fallbackTrigger,
   required List<String> reasons,
   required Map<String, dynamic> validation,
   required List<String> removals,
@@ -39,6 +48,9 @@ Map<String, dynamic> buildQualityRejectedBody({
       'validation': validation,
     },
     'mode': 'optimize',
+    'strategy_source': strategySource,
+    if (fallbackTrigger != null) 'fallback_trigger': fallbackTrigger,
+    'cache': {'hit': false, 'cache_key': cacheKey},
     'removals': removals,
     'additions': additions,
     'deck_analysis': deckAnalysis,

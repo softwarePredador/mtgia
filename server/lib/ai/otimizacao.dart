@@ -99,9 +99,8 @@ class DeckOptimizerService {
 
     if (edhrecData != null && edhrecData.topCards.isNotEmpty) {
       // Verificar se tema detectado corresponde aos temas EDHREC
-      final edhrecThemesLower = edhrecData.themes
-          .map((t) => t.toLowerCase())
-          .toList();
+      final edhrecThemesLower =
+          edhrecData.themes.map((t) => t.toLowerCase()).toList();
       final targetLower = targetArchetype.toLowerCase();
 
       for (final edhrecTheme in edhrecThemesLower) {
@@ -114,19 +113,21 @@ class DeckOptimizerService {
 
       if (themeMatchesEdhrec) {
         // Tema bate: usar 100% EDHREC
-        synergyCards = edhrecService
-            .getHighSynergyCards(edhrecData, minSynergy: 0.15, limit: 40)
-            .map((c) => c.name)
-            .toList();
+        synergyCards =
+            edhrecService
+                .getHighSynergyCards(edhrecData, minSynergy: 0.15, limit: 40)
+                .map((c) => c.name)
+                .toList();
         Log.i(
           'EDHREC synergy pool (theme match): ${synergyCards.length} cartas',
         );
       } else {
         // Tema NÃO bate: HÍBRIDO 70% EDHREC + 30% tema do usuário
-        final edhrecCards = edhrecService
-            .getHighSynergyCards(edhrecData, minSynergy: 0.1, limit: 30)
-            .map((c) => c.name)
-            .toList();
+        final edhrecCards =
+            edhrecService
+                .getHighSynergyCards(edhrecData, minSynergy: 0.1, limit: 30)
+                .map((c) => c.name)
+                .toList();
 
         // Buscar cartas do tema do usuário (Scryfall/archetype)
         final themeCards = await synergyEngine.fetchCommanderSynergies(
@@ -173,13 +174,13 @@ class DeckOptimizerService {
     String? mlContext;
     if (_mlService != null) {
       try {
-        final mlData = await _mlService!.getContextForDeck(
+        final mlData = await _mlService.getContextForDeck(
           archetype: targetArchetype,
           format: 'commander',
           commanderName: commanders.firstOrNull,
           currentCards: currentCards.map((c) => c['name'].toString()).toList(),
         );
-        mlContext = _mlService!.generatePromptContext(mlData);
+        mlContext = _mlService.generatePromptContext(mlData);
         Log.i(
           'ML Knowledge: ${mlData.recommendations.length} recomendações, ${mlData.relevantSynergies.length} sinergias (${mlData.queryTimeMs}ms)',
         );
@@ -193,12 +194,12 @@ class DeckOptimizerService {
     String? hateContext;
     if (_hateService != null) {
       try {
-        final hateCards = await _hateService!.getRelevantHateCards(
+        final hateCards = await _hateService.getRelevantHateCards(
           deckColors: colors,
           detectedThemes: [targetArchetype], // Não sugerir hate do próprio tema
         );
         if (hateCards.isNotEmpty) {
-          hateContext = _hateService!.generatePromptContext(hateCards);
+          hateContext = _hateService.generatePromptContext(hateCards);
           Log.i(
             'Hate Cards: ${hateCards.length} categorias de hate disponíveis',
           );
@@ -239,7 +240,7 @@ class DeckOptimizerService {
     Map<String, dynamic>? themeRules;
     if (_themeRulesService != null) {
       try {
-        final rules = await _themeRulesService!.getRulesForArchetype(
+        final rules = await _themeRulesService.getRulesForArchetype(
           targetArchetype,
         );
         if (rules.isNotEmpty) {
@@ -247,16 +248,17 @@ class DeckOptimizerService {
             'theme': ThemeContextualRulesService.archetypeToTheme(
               targetArchetype,
             ),
-            'rules': rules
-                .map(
-                  (r) => {
-                    'function': r.function,
-                    'min': r.minCount,
-                    'max': r.maxCount,
-                    'priority': r.priority,
-                  },
-                )
-                .toList(),
+            'rules':
+                rules
+                    .map(
+                      (r) => {
+                        'function': r.function,
+                        'min': r.minCount,
+                        'max': r.maxCount,
+                        'priority': r.priority,
+                      },
+                    )
+                    .toList(),
           };
           Log.i('Theme rules loaded: ${rules.length} rules');
         }
@@ -317,9 +319,8 @@ class DeckOptimizerService {
 
     if (edhrecData != null && edhrecData.topCards.isNotEmpty) {
       // Verificar se tema detectado corresponde aos temas EDHREC
-      final edhrecThemesLower = edhrecData.themes
-          .map((t) => t.toLowerCase())
-          .toList();
+      final edhrecThemesLower =
+          edhrecData.themes.map((t) => t.toLowerCase()).toList();
       final targetLower = targetArchetype.toLowerCase();
 
       for (final edhrecTheme in edhrecThemesLower) {
@@ -332,19 +333,21 @@ class DeckOptimizerService {
 
       if (themeMatchesEdhrec) {
         // Tema bate: usar 100% EDHREC
-        synergyCards = edhrecService
-            .getHighSynergyCards(edhrecData, minSynergy: 0.1, limit: 60)
-            .map((c) => c.name)
-            .toList();
+        synergyCards =
+            edhrecService
+                .getHighSynergyCards(edhrecData, minSynergy: 0.1, limit: 60)
+                .map((c) => c.name)
+                .toList();
         Log.i(
           'EDHREC complete pool (theme match): ${synergyCards.length} cartas',
         );
       } else {
         // Tema NÃO bate: HÍBRIDO 70% EDHREC + 30% tema do usuário
-        final edhrecCards = edhrecService
-            .getHighSynergyCards(edhrecData, minSynergy: 0.08, limit: 45)
-            .map((c) => c.name)
-            .toList();
+        final edhrecCards =
+            edhrecService
+                .getHighSynergyCards(edhrecData, minSynergy: 0.08, limit: 45)
+                .map((c) => c.name)
+                .toList();
 
         // Buscar cartas do tema do usuário (Scryfall/archetype)
         final themeCards = await synergyEngine.fetchCommanderSynergies(
@@ -383,13 +386,13 @@ class DeckOptimizerService {
     String? mlContext;
     if (_mlService != null) {
       try {
-        final mlData = await _mlService!.getContextForDeck(
+        final mlData = await _mlService.getContextForDeck(
           archetype: targetArchetype,
           format: 'commander',
           commanderName: commanders.firstOrNull,
           currentCards: currentCards.map((c) => c['name'].toString()).toList(),
         );
-        mlContext = _mlService!.generatePromptContext(mlData);
+        mlContext = _mlService.generatePromptContext(mlData);
         Log.i(
           'ML Knowledge (complete): ${mlData.recommendations.length} recomendações (${mlData.queryTimeMs}ms)',
         );
@@ -402,12 +405,12 @@ class DeckOptimizerService {
     String? hateContext;
     if (_hateService != null) {
       try {
-        final hateCards = await _hateService!.getRelevantHateCards(
+        final hateCards = await _hateService.getRelevantHateCards(
           deckColors: colors,
           detectedThemes: [targetArchetype],
         );
         if (hateCards.isNotEmpty) {
-          hateContext = _hateService!.generatePromptContext(hateCards);
+          hateContext = _hateService.generatePromptContext(hateCards);
           Log.i('Hate Cards (complete): ${hateCards.length} categorias');
         }
       } catch (e) {
@@ -518,10 +521,11 @@ class DeckOptimizerService {
     Set<String> commanderKeywords,
   ) {
     // Primeiro, calcula a mediana do EDHREC rank das cartas que têm rank
-    final ranksWithValue = cards
-        .where((c) => c['edhrec_rank'] != null)
-        .map((c) => c['edhrec_rank'] as int)
-        .toList();
+    final ranksWithValue =
+        cards
+            .where((c) => c['edhrec_rank'] != null)
+            .map((c) => c['edhrec_rank'] as int)
+            .toList();
 
     // Calcula a mediana do deck (ou usa 5000 como fallback razoável)
     // Nota: Usamos divisão inteira (~/) pois ranks são inteiros e a precisão
@@ -530,45 +534,49 @@ class DeckOptimizerService {
     if (ranksWithValue.isNotEmpty) {
       ranksWithValue.sort();
       final mid = ranksWithValue.length ~/ 2;
-      medianRank = ranksWithValue.length.isOdd
-          ? ranksWithValue[mid]
-          : ((ranksWithValue[mid - 1] + ranksWithValue[mid]) ~/ 2);
+      medianRank =
+          ranksWithValue.length.isOdd
+              ? ranksWithValue[mid]
+              : ((ranksWithValue[mid - 1] + ranksWithValue[mid]) ~/ 2);
     }
 
-    var scored = cards.map((card) {
-      // Para cartas sem rank (novas ou de nicho), usa a mediana do deck
-      // Isso evita penalizar injustamente cartas recém-lançadas
-      final rank = (card['edhrec_rank'] as int?) ?? medianRank;
-      final cmc = (card['cmc'] as num?)?.toDouble() ?? 0.0;
+    var scored =
+        cards.map((card) {
+          // Para cartas sem rank (novas ou de nicho), usa a mediana do deck
+          // Isso evita penalizar injustamente cartas recém-lançadas
+          final rank = (card['edhrec_rank'] as int?) ?? medianRank;
+          final cmc = (card['cmc'] as num?)?.toDouble() ?? 0.0;
 
-      // Lógica: Rank baixo é bom (ex: Sol Ring é rank 1). CMC baixo é bom.
-      // Score Alto = Carta Ruim (Rank alto + Custo alto)
-      // Ajuste para terrenos: Terrenos básicos sempre têm score "neutro" para não serem cortados automaticamente
-      if ((card['type_line'] as String).contains('Basic Land')) {
-        return {'name': card['name'], 'weakness_score': -1.0};
-      }
+          // Lógica: Rank baixo é bom (ex: Sol Ring é rank 1). CMC baixo é bom.
+          // Score Alto = Carta Ruim (Rank alto + Custo alto)
+          // Ajuste para terrenos: Terrenos básicos sempre têm score "neutro" para não serem cortados automaticamente
+          if ((card['type_line'] as String).contains('Basic Land')) {
+            return {'name': card['name'], 'weakness_score': -1.0};
+          }
 
-      final score =
-          rank * (cmc > 4 ? 1.5 : 1.0); // Penaliza cartas caras impopulares
+          final score =
+              rank * (cmc > 4 ? 1.5 : 1.0); // Penaliza cartas caras impopulares
 
-      // BÔNUS DE SINERGIA: se a carta compartilha keywords com o commander,
-      // ela provavelmente está no deck por uma razão — reduz o score de fraqueza.
-      final oracle = ((card['oracle_text'] as String?) ?? '').toLowerCase();
-      final typeLine2 = ((card['type_line'] as String?) ?? '').toLowerCase();
-      var synergyHits = 0;
-      for (final kw in commanderKeywords) {
-        if (oracle.contains(kw) || typeLine2.contains(kw)) synergyHits++;
-      }
-      // 2+ keywords em comum → score ÷2 (forte sinergia)
-      // 1 keyword → score ×0.7
-      final adjustedScore = synergyHits >= 2
-          ? score / 2
-          : synergyHits == 1
-          ? score * 0.7
-          : score;
+          // BÔNUS DE SINERGIA: se a carta compartilha keywords com o commander,
+          // ela provavelmente está no deck por uma razão — reduz o score de fraqueza.
+          final oracle = ((card['oracle_text'] as String?) ?? '').toLowerCase();
+          final typeLine2 =
+              ((card['type_line'] as String?) ?? '').toLowerCase();
+          var synergyHits = 0;
+          for (final kw in commanderKeywords) {
+            if (oracle.contains(kw) || typeLine2.contains(kw)) synergyHits++;
+          }
+          // 2+ keywords em comum → score ÷2 (forte sinergia)
+          // 1 keyword → score ×0.7
+          final adjustedScore =
+              synergyHits >= 2
+                  ? score / 2
+                  : synergyHits == 1
+                  ? score * 0.7
+                  : score;
 
-      return {'name': card['name'], 'weakness_score': adjustedScore};
-    }).toList();
+          return {'name': card['name'], 'weakness_score': adjustedScore};
+        }).toList();
 
     // Ordena do maior score (pior carta) para o menor
     scored.sort(
@@ -602,67 +610,72 @@ class DeckOptimizerService {
     }
 
     // Primeiro, calcula a mediana do EDHREC rank das cartas que têm rank
-    final ranksWithValue = cards
-        .where((c) => c['edhrec_rank'] != null)
-        .map((c) => c['edhrec_rank'] as int)
-        .toList();
+    final ranksWithValue =
+        cards
+            .where((c) => c['edhrec_rank'] != null)
+            .map((c) => c['edhrec_rank'] as int)
+            .toList();
 
     int medianRank = 5000;
     if (ranksWithValue.isNotEmpty) {
       ranksWithValue.sort();
       final mid = ranksWithValue.length ~/ 2;
-      medianRank = ranksWithValue.length.isOdd
-          ? ranksWithValue[mid]
-          : ((ranksWithValue[mid - 1] + ranksWithValue[mid]) ~/ 2);
+      medianRank =
+          ranksWithValue.length.isOdd
+              ? ranksWithValue[mid]
+              : ((ranksWithValue[mid - 1] + ranksWithValue[mid]) ~/ 2);
     }
 
-    var scored = cards.map((card) {
-      final cardName = card['name'] as String;
+    var scored =
+        cards.map((card) {
+          final cardName = card['name'] as String;
 
-      // Terrenos básicos: sempre protegidos
-      if ((card['type_line'] as String).contains('Basic Land')) {
-        return {'name': cardName, 'weakness_score': -1.0};
-      }
+          // Terrenos básicos: sempre protegidos
+          if ((card['type_line'] as String).contains('Basic Land')) {
+            return {'name': cardName, 'weakness_score': -1.0};
+          }
 
-      final rank = (card['edhrec_rank'] as int?) ?? medianRank;
-      final cmc = (card['cmc'] as num?)?.toDouble() ?? 0.0;
+          final rank = (card['edhrec_rank'] as int?) ?? medianRank;
+          final cmc = (card['cmc'] as num?)?.toDouble() ?? 0.0;
 
-      // Score base: rank alto + CMC alto = ruim
-      var score = rank * (cmc > 4 ? 1.5 : 1.0);
+          // Score base: rank alto + CMC alto = ruim
+          var score = rank * (cmc > 4 ? 1.5 : 1.0);
 
-      // VERIFICAÇÃO EDHREC: se a carta está nas top do commander, protege ela
-      // por sinergia e por adoção contextual. Staples são proteção de piso,
-      // não carta livre para corte só porque a sinergia específica é baixa.
-      final edhrecCard = edhrecData.findCard(cardName);
-      if (edhrecCard != null) {
-        final tier = commanderStapleImpactTier(edhrecCard);
-        final multiplier = commanderStapleWeaknessMultiplier(edhrecCard);
-        score *= multiplier;
-        if (tier == 'structural_foundation' ||
-            tier == 'commander_contextual_staple') {
-          Log.d(
-            'EDHREC: $cardName tier=$tier synergy=${edhrecCard.synergy.toStringAsFixed(2)} inclusionRate=${edhrecCard.inclusionRate.toStringAsFixed(2)} - protected floor/context',
-          );
-        }
-      } else {
-        // Carta NÃO está no EDHREC para este commander
-        // Pode ser carta nova, ou carta que não comba bem
-        // Usa o método de keywords como fallback
-        final oracle = ((card['oracle_text'] as String?) ?? '').toLowerCase();
-        final typeLine2 = ((card['type_line'] as String?) ?? '').toLowerCase();
-        var synergyHits = 0;
-        for (final kw in commanderKeywords) {
-          if (oracle.contains(kw) || typeLine2.contains(kw)) synergyHits++;
-        }
-        if (synergyHits >= 2) {
-          score /= 2;
-        } else if (synergyHits == 1) {
-          score *= 0.7;
-        }
-      }
+          // VERIFICAÇÃO EDHREC: se a carta está nas top do commander, protege ela
+          // por sinergia e por adoção contextual. Staples são proteção de piso,
+          // não carta livre para corte só porque a sinergia específica é baixa.
+          final edhrecCard = edhrecData.findCard(cardName);
+          if (edhrecCard != null) {
+            final tier = commanderStapleImpactTier(edhrecCard);
+            final multiplier = commanderStapleWeaknessMultiplier(edhrecCard);
+            score *= multiplier;
+            if (tier == 'structural_foundation' ||
+                tier == 'commander_contextual_staple') {
+              Log.d(
+                'EDHREC: $cardName tier=$tier synergy=${edhrecCard.synergy.toStringAsFixed(2)} inclusionRate=${edhrecCard.inclusionRate.toStringAsFixed(2)} - protected floor/context',
+              );
+            }
+          } else {
+            // Carta NÃO está no EDHREC para este commander
+            // Pode ser carta nova, ou carta que não comba bem
+            // Usa o método de keywords como fallback
+            final oracle =
+                ((card['oracle_text'] as String?) ?? '').toLowerCase();
+            final typeLine2 =
+                ((card['type_line'] as String?) ?? '').toLowerCase();
+            var synergyHits = 0;
+            for (final kw in commanderKeywords) {
+              if (oracle.contains(kw) || typeLine2.contains(kw)) synergyHits++;
+            }
+            if (synergyHits >= 2) {
+              score /= 2;
+            } else if (synergyHits == 1) {
+              score *= 0.7;
+            }
+          }
 
-      return {'name': cardName, 'weakness_score': score};
-    }).toList();
+          return {'name': cardName, 'weakness_score': score};
+        }).toList();
 
     // Ordena do maior score (pior carta) para o menor
     scored.sort(
@@ -685,15 +698,15 @@ class DeckOptimizerService {
   ) async {
     // 1. Tentar buscar do banco local (format_staples) - ~10x mais rápido
     if (_staplesService != null) {
-      final hasData = await _staplesService!.hasData();
+      final hasData = await _staplesService.hasData();
       if (hasData) {
         // Busca staples do arquétipo + genéricos
-        final archetypeStaples = await _staplesService!.getStaples(
+        final archetypeStaples = await _staplesService.getStaples(
           colors: colors,
           archetype: archetype,
           limit: 25,
         );
-        final genericStaples = await _staplesService!.getGenericStaples(
+        final genericStaples = await _staplesService.getGenericStaples(
           colors: colors,
           limit: 25,
         );
@@ -760,11 +773,12 @@ class DeckOptimizerService {
     // Calcular número dinâmico de trocas baseado na qualidade do deck
     // Mais cartas fracas = mais trocas sugeridas
     final weakCount = weakCandidates.length;
-    final suggestedSwaps = weakCount <= 5
-        ? weakCount.clamp(2, 5)
-        : weakCount <= 10
-        ? (weakCount * 0.7).round().clamp(4, 8)
-        : (weakCount * 0.5).round().clamp(6, 12);
+    final suggestedSwaps =
+        weakCount <= 5
+            ? weakCount.clamp(2, 5)
+            : weakCount <= 10
+            ? (weakCount * 0.7).round().clamp(4, 8)
+            : (weakCount * 0.5).round().clamp(6, 12);
 
     Log.d(
       'Trocas dinâmicas: $suggestedSwaps (baseado em $weakCount cartas fracas)',

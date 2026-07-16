@@ -28,10 +28,7 @@ Map<String, dynamic> buildCachedOptimizeResponse({
   required Map<String, dynamic> userPreferences,
 }) {
   final response = Map<String, dynamic>.from(cachedResponse);
-  response['cache'] = {
-    'hit': true,
-    'cache_key': cacheKey,
-  };
+  response['cache'] = {'hit': true, 'cache_key': cacheKey};
   response['intensity'] ??= intensity.selected;
   response['optimize_intensity'] ??= intensity.toJson(
     returnedSwaps: countOptimizeResponseSwaps(
@@ -104,6 +101,7 @@ Map<String, dynamic> buildOptimizeRebuildGuidedOutcome({
 }) {
   return {
     'mode': 'rebuild_guided',
+    'strategy_source': 'state_gate',
     'outcome_code': 'rebuild_guided',
     'intensity': intensity.selected,
     'optimize_intensity': intensity.toJson(returnedSwaps: 0),

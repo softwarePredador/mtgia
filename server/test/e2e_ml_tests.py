@@ -13,10 +13,12 @@ Este arquivo testa toda a pipeline de IA/ML:
 - POST /ai/explain - Explicação de carta
 
 Uso:
-    python3 e2e_ml_tests.py [--base-url URL] [--verbose]
+    MANALOOM_CONFIRM_LIVE_MUTATIONS=I_HAVE_EXPLICIT_APPROVAL \
+      python3 e2e_ml_tests.py --base-url URL [--verbose]
 
 Exemplo:
-    python3 e2e_ml_tests.py --base-url http://localhost:8080 --verbose
+    MANALOOM_CONFIRM_LIVE_MUTATIONS=I_HAVE_EXPLICIT_APPROVAL \
+      python3 e2e_ml_tests.py --base-url http://localhost:8080 --verbose
 """
 
 import requests
@@ -27,11 +29,15 @@ from typing import Optional, Tuple, Dict, Any, List
 from dataclasses import dataclass
 from datetime import datetime
 
+try:
+    from .legacy_live_e2e_guard import require_legacy_live_e2e_approval
+except ImportError:  # Direct script execution.
+    from legacy_live_e2e_guard import require_legacy_live_e2e_approval
+
 # ═══════════════════════════════════════════════════════════════════════════════
 # CONFIGURAÇÃO
 # ═══════════════════════════════════════════════════════════════════════════════
 
-DEFAULT_BASE_URL = "http://localhost:8080"
 TIMEOUT = 60  # segundos
 
 # Credenciais de teste
@@ -685,13 +691,14 @@ class MLTestSuite:
 
 def main():
     parser = argparse.ArgumentParser(description="Testes E2E para sistema ML")
-    parser.add_argument("--base-url", default=DEFAULT_BASE_URL, 
-                        help=f"URL base da API (default: {DEFAULT_BASE_URL})")
+    parser.add_argument("--base-url", required=True,
+                        help="URL base explícita da API")
     parser.add_argument("--verbose", "-v", action="store_true",
                         help="Modo verbose")
     args = parser.parse_args()
     
-    suite = MLTestSuite(args.base_url, verbose=args.verbose)
+    approved_base_url = require_legacy_live_e2e_approval(args.base_url)
+    suite = MLTestSuite(approved_base_url, verbose=args.verbose)
     success = suite.run()
     
     sys.exit(0 if success else 1)

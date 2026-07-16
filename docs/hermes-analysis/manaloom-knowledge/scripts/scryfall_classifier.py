@@ -352,12 +352,70 @@ def _looks_like_token_maker(oracle: str) -> bool:
     return ("create" in oracle and "token" in oracle) or "populate" in oracle
 
 
-def _looks_like_sacrifice_outlet(oracle: str) -> bool:
-    """Replica _looksLikeSacrificeOutlet() do Dart (linha 745)."""
-    return any(t in oracle for t in [
-        "sacrifice another", "sacrifice a creature:", "sacrifice a permanent:",
-        "sacrifice an artifact:", "sacrifice a token:", "{t}, sacrifice",
-    ])
+def _strip_parenthetical_text(value: str) -> str:
+    """Remove reminder text, including nested parenthetical clauses."""
+    output: list[str] = []
+    depth = 0
+    for char in value:
+        if char == "(":
+            depth += 1
+            continue
+        if char == ")":
+            depth = max(0, depth - 1)
+            continue
+        if depth == 0:
+            output.append(char)
+    return "".join(output)
+
+
+def _looks_like_sacrifice_outlet(name: str, oracle: str) -> bool:
+    """Mirror the Dart external activated-sacrifice cost classifier."""
+    oracle_without_reminder = _strip_parenthetical_text(oracle.lower())
+    self_names: set[str] = set()
+    for raw_face in re.split(r"\s*//\s*", name):
+        face = _normalize_card_name(raw_face)
+        if not face:
+            continue
+        self_names.add(face)
+        without_alchemy_prefix = face[2:].strip() if face.startswith("a-") else face
+        if without_alchemy_prefix:
+            self_names.add(without_alchemy_prefix)
+        if "," in without_alchemy_prefix:
+            short_name = without_alchemy_prefix.split(",", 1)[0].strip()
+            if len(short_name) >= 3:
+                self_names.add(short_name)
+    external_alternative = re.compile(
+        r"\bor\s+(?:another|other|an?|one|two|three|four|five|six|seven|"
+        r"eight|nine|ten|x|any|up to|all|half|\d+)\b"
+    )
+    self_pronoun = re.compile(
+        r"^(?:this\b|it\b|that\b|itself\b|the source\b|~(?:\b|$))"
+    )
+
+    for line in re.split(r"[\r\n]+", oracle_without_reminder):
+        segments = line.split(":")
+        for cost_segment in segments[:-1]:
+            normalized = re.sub(r"\s+", " ", cost_segment).strip()
+            for match in re.finditer(r"\bsacrifice\s+", normalized):
+                sacrificed_object = normalized[match.end():].strip()
+                if (not sacrificed_object
+                        or not re.match(r"^[a-z0-9~]", sacrificed_object)):
+                    continue
+                has_external_alternative = bool(
+                    external_alternative.search(sacrificed_object)
+                )
+                is_named_self = any(
+                    sacrificed_object == self_name
+                    or sacrificed_object.startswith(f"{self_name},")
+                    or sacrificed_object.startswith(f"{self_name} and ")
+                    or sacrificed_object.startswith(f"{self_name} or ")
+                    for self_name in self_names
+                )
+                if ((self_pronoun.match(sacrificed_object) or is_named_self)
+                        and not has_external_alternative):
+                    continue
+                return True
+    return False
 
 
 def _looks_like_aristocrat_payoff(oracle: str) -> bool:
@@ -725,8 +783,12 @@ def infer_functional_card_tags(
     if _looks_like_token_maker(oracle):
         add("token_maker", 0.82, "token_creation_text")
 
-    if _looks_like_sacrifice_outlet(oracle):
-        add("sacrifice_outlet", 0.80, "repeatable_sacrifice_outlet_text")
+    if _looks_like_sacrifice_outlet(name, oracle):
+        add(
+            "sacrifice_outlet",
+            0.80,
+            "external_activated_sacrifice_outlet_cost",
+        )
 
     if _looks_like_aristocrat_payoff(oracle):
         add("aristocrat_payoff", 0.84, "death_trigger_payoff_text")

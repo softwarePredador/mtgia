@@ -177,6 +177,20 @@ class ExternalCardCoverageClosureTest(unittest.TestCase):
             payload["ledger"][0]["residual_execution_scope"],
             "auxiliary_game_object",
         )
+        self.assertEqual(
+            payload["family_gates"],
+            [
+                {
+                    "family": "product_identity_or_nonstandard_object",
+                    "card_count": 1,
+                    "actionable_card_count": 0,
+                    "technical_terminal_card_count": 1,
+                    "status": "terminal_disposition_required",
+                    "next_gate": "global_residual_terminal_disposition",
+                    "promotion_allowed": False,
+                }
+            ],
+        )
 
     def test_residual_keeps_routing_metadata_and_execution_scope(self):
         client = FakeClient({"xmage": set(), "forge": set()})
@@ -206,6 +220,8 @@ class ExternalCardCoverageClosureTest(unittest.TestCase):
             payload["summary"]["residual_execution_scope_counts"],
             {"digital_only_ruleset": 1},
         )
+        self.assertEqual(payload["family_gates"][0]["status"], "action_required")
+        self.assertEqual(payload["family_gates"][0]["actionable_card_count"], 1)
 
     def test_challenge_deck_and_playtest_products_are_not_conventional(self):
         self.assertEqual(

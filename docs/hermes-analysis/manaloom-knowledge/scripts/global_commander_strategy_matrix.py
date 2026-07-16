@@ -51,6 +51,10 @@ SOURCE_LANE_FIELDS = (
     "card_usage_count",
     "local_runtime_profile_count",
 )
+COMMANDER_INTENT_LANE_FIELDS = (
+    "reference_profile_count",
+    "local_runtime_profile_count",
+)
 LOCAL_RUNTIME_REFERENCE_PROFILE_KEYS = {
     "kaalia of the vast": "server/lib/ai/commander_reference_profile_support.dart",
     "lorehold, the historian": "server/lib/ai/commander_reference_profile_support.dart",
@@ -73,6 +77,14 @@ def source_lane_count(signals: dict[str, int]) -> int:
     return sum(1 for field in SOURCE_LANE_FIELDS if int(signals.get(field) or 0) > 0)
 
 
+def commander_intent_lane_count(signals: dict[str, int]) -> int:
+    return sum(
+        1
+        for field in COMMANDER_INTENT_LANE_FIELDS
+        if int(signals.get(field) or 0) > 0
+    )
+
+
 def merge_local_runtime_source_signal(commander_key: str, signals: dict[str, int]) -> dict[str, int]:
     merged = {**empty_source_signals(), **signals}
     if commander_key in LOCAL_RUNTIME_REFERENCE_PROFILE_KEYS:
@@ -80,9 +92,18 @@ def merge_local_runtime_source_signal(commander_key: str, signals: dict[str, int
     return merged
 
 
-def readiness_status(*, ready_count: int, product_ready_count: int, source_lanes: int, blocked_count: int) -> str:
-    if ready_count > 0 and source_lanes > 0:
+def readiness_status(
+    *,
+    ready_count: int,
+    product_ready_count: int,
+    source_lanes: int,
+    commander_intent_lanes: int = 0,
+    blocked_count: int,
+) -> str:
+    if ready_count > 0 and source_lanes > 0 and commander_intent_lanes > 0:
         return "ready_for_strategy_matrix"
+    if ready_count > 0 and source_lanes > 0:
+        return "structure_ready_intent_profile_missing"
     if ready_count > 0:
         return "structure_ready_source_missing"
     if blocked_count > 0:
@@ -247,12 +268,14 @@ def build_matrix(
             source_signals.get(commander_key, empty_source_signals()),
         )
         lanes = source_lane_count(signals)
+        intent_lanes = commander_intent_lane_count(signals)
         product_ready_count = sum(1 for row in ready_rows if row["scope"] in PRODUCT_SCOPES)
         lab_ready_count = sum(1 for row in ready_rows if row["scope"] in LAB_SCOPES)
         status = readiness_status(
             ready_count=len(ready_rows),
             product_ready_count=product_ready_count,
             source_lanes=lanes,
+            commander_intent_lanes=intent_lanes,
             blocked_count=len(blocked_rows),
         )
         totals[status] += 1
@@ -269,6 +292,7 @@ def build_matrix(
                 "ready_scope_counts": dict(sorted(ready_scope_counts.items())),
                 "blocked_issue_counts": dict(sorted(issue_counts.items())),
                 "source_lane_count": lanes,
+                "commander_intent_lane_count": intent_lanes,
                 "source_signals": signals,
                 "ready_decks": [
                     {
@@ -335,7 +359,9 @@ def next_gate(status: str) -> str:
     if status == "ready_for_strategy_matrix":
         return "run_commander_specific_strategy_matrix_before_battle_gate"
     if status == "structure_ready_source_missing":
-        return "add_reference_profile_or_learned_source_lane_before_strategy_matrix"
+        return "add_commander_intent_profile_and_commander_specific_evidence_before_strategy_matrix"
+    if status == "structure_ready_intent_profile_missing":
+        return "add_commander_intent_profile_or_documented_fallback_before_strategy_matrix"
     if status == "blocked_before_global_promotion":
         return "repair_or_exclude_product_deck_before_strategy_matrix"
     return "no_global_action_until_structure_ready_deck_exists"
@@ -367,19 +393,20 @@ def write_markdown(payload: dict[str, Any], path: Path) -> None:
             "",
             "## Commander Matrix",
             "",
-            "| Commander | Status | Ready | Product Ready | Lab Ready | Source Lanes | Blocked Product | Next Gate |",
-            "| --- | --- | ---: | ---: | ---: | ---: | ---: | --- |",
+            "| Commander | Status | Ready | Product Ready | Lab Ready | Source Lanes | Intent Lanes | Blocked Product | Next Gate |",
+            "| --- | --- | ---: | ---: | ---: | ---: | ---: | ---: | --- |",
         ]
     )
     for row in payload["commanders"]:
         lines.append(
-            "| `{commander}` | `{status}` | {ready} | {product_ready} | {lab_ready} | {lanes} | {blocked} | `{next_gate}` |".format(
+            "| `{commander}` | `{status}` | {ready} | {product_ready} | {lab_ready} | {lanes} | {intent_lanes} | {blocked} | `{next_gate}` |".format(
                 commander=row["commander"].replace("|", "/"),
                 status=row["status"],
                 ready=row["ready_deck_count"],
                 product_ready=row["product_ready_deck_count"],
                 lab_ready=row["lab_ready_deck_count"],
                 lanes=row["source_lane_count"],
+                intent_lanes=row["commander_intent_lane_count"],
                 blocked=row["blocked_product_deck_count"],
                 next_gate=row["next_gate"],
             )
@@ -420,6 +447,7 @@ def write_markdown(payload: dict[str, Any], path: Path) -> None:
             "- Hermes rows are included only as lab/cache candidates.",
             "- This matrix does not run battles, generate cards, or promote any deck.",
             "- A commander can move to battle only after a commander-specific strategy matrix and equal-gate evidence.",
+            "- Usage rows and learned decks are evidence lanes, not replacements for an explicit commander-intent profile or documented fallback.",
             "",
         ]
     )

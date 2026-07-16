@@ -13,7 +13,7 @@ try {
 }
 
 $RootDir = (Resolve-Path (Join-Path $PSScriptRoot "..")).Path
-$ApiBaseUrl = if ($env:API_BASE_URL) { $env:API_BASE_URL.TrimEnd('/') } else { "http://localhost:8080" }
+$BackendTestJwtSecret = if ($env:JWT_SECRET) { $env:JWT_SECRET } else { "local_quality_gate_jwt_secret_not_for_production_20260706" }
 
 function Write-Header([string]$Title) {
   Write-Host ""
@@ -28,83 +28,26 @@ function Ensure-Command([string]$Name) {
   }
 }
 
-function Invoke-ProbeRequest {
-  param(
-    [Parameter(Mandatory = $true)][string]$Url,
-    [Parameter(Mandatory = $true)][ValidateSet("GET", "POST")][string]$Method,
-    [string]$Body
-  )
-
-  try {
-    if ($Method -eq "POST") {
-      $response = Invoke-WebRequest -Uri $Url -Method Post -UseBasicParsing -TimeoutSec 5 -ContentType "application/json" -Body $Body
-    } else {
-      $response = Invoke-WebRequest -Uri $Url -Method Get -UseBasicParsing -TimeoutSec 5
-    }
-
-    return @{
-      StatusCode = [int]$response.StatusCode
-      ContentType = [string]$response.Headers["Content-Type"]
-      Body = [string]$response.Content
-    }
-  }
-  catch {
-    $resp = $_.Exception.Response
-    if (-not $resp) {
-      return $null
-    }
-
-    $body = ""
+function Ensure-PackageResolved([string]$PackageDir, [string]$Resolver) {
+  $packageConfig = Join-Path (Join-Path $PackageDir ".dart_tool") "package_config.json"
+  if (-not (Test-Path $packageConfig)) {
+    Write-Header "Resolving dependencies: $PackageDir"
+    Push-Location $PackageDir
     try {
-      $stream = $resp.GetResponseStream()
-      if ($stream) {
-        $reader = New-Object System.IO.StreamReader($stream)
-        $body = $reader.ReadToEnd()
-        $reader.Close()
-      }
+      & $Resolver pub get
     }
-    catch {
-      $body = ""
-    }
-
-    return @{
-      StatusCode = [int]$resp.StatusCode
-      ContentType = [string]$resp.Headers["Content-Type"]
-      Body = [string]$body
+    finally {
+      Pop-Location
     }
   }
-}
-
-function Test-ApiProbeResponse([hashtable]$Probe) {
-  if (-not $Probe) { return $false }
-
-  $statusOk = @(200, 400, 401, 403, 405, 503) -contains $Probe.StatusCode
-  if (-not $statusOk) { return $false }
-
-  $contentTypeRaw = if ($null -ne $Probe.ContentType) { [string]$Probe.ContentType } else { "" }
-  $contentType = $contentTypeRaw.ToLowerInvariant()
-  if (-not $contentType.StartsWith("application/json")) { return $false }
-
-  $body = if ($null -ne $Probe.Body) { [string]$Probe.Body } else { "" }
-  if ($body -notmatch "status|error|token|user|message") { return $false }
-
-  return $true
-}
-
-function Test-BackendApiReady {
-  $healthProbe = Invoke-ProbeRequest -Url "$ApiBaseUrl/health/ready" -Method "GET"
-  if (Test-ApiProbeResponse -Probe $healthProbe) {
-    return $true
-  }
-
-  $authProbe = Invoke-ProbeRequest -Url "$ApiBaseUrl/auth/login" -Method "POST" -Body "{}"
-  return (Test-ApiProbeResponse -Probe $authProbe)
 }
 
 function Run-BackendQuick {
   Write-Header "Backend quick checks"
   Push-Location (Join-Path $RootDir "server")
   try {
+    $env:JWT_SECRET = $BackendTestJwtSecret
+    $env:RUN_INTEGRATION_TESTS = "0"
     dart test
   }
   finally {
@@ -116,18 +59,10 @@ function Run-BackendFull {
   Write-Header "Backend full checks"
   Push-Location (Join-Path $RootDir "server")
   try {
-    if (Test-BackendApiReady) {
-      Write-Host "ℹ️ API detectada em $ApiBaseUrl — habilitando testes de integração backend."
-      $env:RUN_INTEGRATION_TESTS = "1"
-      $env:TEST_API_BASE_URL = $ApiBaseUrl
-      dart test -j 1
-    }
-    else {
-      Write-Host "⚠️ API não detectada (ou resposta JSON esperada ausente) em $ApiBaseUrl."
-      Write-Host "   Rodando suíte backend sem integração."
-      Write-Host "   Dica: inicie 'cd server; dart_frog dev' ou defina API_BASE_URL para sua URL de API."
-      dart test
-    }
+    Write-Host "ℹ️ Perfil determinístico: tags live/live_backend/live_db_write/live_external ficam excluídas."
+    $env:RUN_INTEGRATION_TESTS = "0"
+    $env:JWT_SECRET = $BackendTestJwtSecret
+    dart test -P all-local
   }
   finally {
     Pop-Location
@@ -150,11 +85,130 @@ function Run-FrontendFull {
   Push-Location (Join-Path $RootDir "app")
   try {
     flutter analyze --no-fatal-infos
-    flutter test
+    flutter test --no-version-check --reporter compact
   }
   finally {
     Pop-Location
   }
+}
+
+function Run-UiAudit {
+  Write-Header "ManaLoom Flutter UI audit"
+  Push-Location (Join-Path $RootDir "app")
+  try {
+    flutter analyze lib test --no-version-check --no-fatal-infos
+    flutter test test/ui test/core/widgets/debug_accessibility_tools_test.dart --no-version-check
+  }
+  finally {
+    Pop-Location
+  }
+}
+
+function Run-DependencyValidator([string]$PackageDir, [string]$Label) {
+  Write-Header "Dependency validator: $Label"
+  $fullPackageDir = Join-Path $RootDir $PackageDir
+  $resolver = if ($PackageDir -eq "app") { "flutter" } else { "dart" }
+  Ensure-PackageResolved $fullPackageDir $resolver
+  Push-Location $fullPackageDir
+  try {
+    dart run dependency_validator
+  }
+  finally {
+    Pop-Location
+  }
+}
+
+function Run-DependencyAudit {
+  Remove-Item -Recurse -Force -ErrorAction SilentlyContinue `
+    (Join-Path $RootDir "app/playwright-report"), `
+    (Join-Path $RootDir "app/test-results"), `
+    (Join-Path $RootDir "app/test_bundle.dart")
+
+  Run-DependencyValidator "app" "Flutter app"
+  Run-DependencyValidator "server" "Dart Frog server"
+  Run-DependencyValidator "tools/manaloom_lints" "ManaLoom custom lint package"
+}
+
+function Run-CustomLint {
+  Ensure-PackageResolved (Join-Path $RootDir "tools/manaloom_lints") "dart"
+  Ensure-PackageResolved (Join-Path $RootDir "app") "flutter"
+  Ensure-PackageResolved (Join-Path $RootDir "server") "dart"
+
+  Write-Header "ManaLoom custom lint package"
+  Push-Location (Join-Path $RootDir "tools/manaloom_lints")
+  try {
+    dart analyze
+    dart test
+  }
+  finally {
+    Pop-Location
+  }
+
+  Write-Header "ManaLoom Flutter custom_lint"
+  Push-Location (Join-Path $RootDir "app")
+  try {
+    dart run custom_lint
+  }
+  finally {
+    Pop-Location
+  }
+
+  Write-Header "ManaLoom backend custom_lint"
+  Push-Location (Join-Path $RootDir "server")
+  try {
+    dart run custom_lint
+  }
+  finally {
+    Pop-Location
+  }
+}
+
+function Run-PatrolSmoke {
+  Write-Header "ManaLoom Patrol critical E2E"
+  $appDir = Join-Path $RootDir "app"
+  Ensure-PackageResolved $appDir "flutter"
+  Push-Location $appDir
+  try {
+    flutter test patrol_test/manaloom_patrol_smoke_test.dart --no-version-check --dart-define=PATROL_HOT_RESTART=true
+
+    if ($env:MANALOOM_RUN_PATROL_DEVICE_TESTS -eq "1") {
+      Write-Header "ManaLoom Patrol device/web CLI run"
+      $patrolArgs = @(
+        "test",
+        "--target",
+        "patrol_test/manaloom_patrol_smoke_test.dart",
+        "--dart-define=DISABLE_FIREBASE_STARTUP=true",
+        "--dart-define=DISABLE_PUSH_INIT=true",
+        "--dart-define=DISABLE_FIREBASE_PERFORMANCE_INIT=true"
+      )
+
+      if ($env:MANALOOM_PATROL_DEVICE) {
+        $patrolArgs += @("--device", $env:MANALOOM_PATROL_DEVICE)
+      }
+
+      if ($env:MANALOOM_PATROL_WEB_HEADLESS) {
+        $patrolArgs += "--web-headless=$($env:MANALOOM_PATROL_WEB_HEADLESS)"
+      }
+
+      $env:PATROL_ANALYTICS_ENABLED = "false"
+      dart run patrol_cli:main @patrolArgs
+    }
+    else {
+      Write-Host ""
+      Write-Host "Patrol CLI real nao foi executado porque MANALOOM_RUN_PATROL_DEVICE_TESTS=1 nao foi definido."
+      Write-Host "Para rodar em device/emulador: `$env:MANALOOM_RUN_PATROL_DEVICE_TESTS='1'; .\scripts\quality_gate.ps1 patrol-smoke"
+      Write-Host "Para rodar no Chrome headless: `$env:MANALOOM_RUN_PATROL_DEVICE_TESTS='1'; `$env:MANALOOM_PATROL_DEVICE='chrome'; `$env:MANALOOM_PATROL_WEB_HEADLESS='true'; .\scripts\quality_gate.ps1 patrol-smoke"
+    }
+  }
+  finally {
+    Pop-Location
+  }
+}
+
+function Run-E2ESuite {
+  Write-Header "ManaLoom E2E suite"
+  Ensure-Command "bash"
+  bash (Join-Path $RootDir "scripts/manaloom_e2e_suite.sh")
 }
 
 function Show-Usage {
@@ -162,16 +216,25 @@ function Show-Usage {
 Uso:
   .\scripts\quality_gate.ps1 quick   # validação rápida (dart test + flutter analyze)
   .\scripts\quality_gate.ps1 full    # validação completa (dart test + flutter analyze + flutter test)
+  .\scripts\quality_gate.ps1 ui-audit # golden/accessibility audit das telas críticas Flutter
+  .\scripts\quality_gate.ps1 deps # valida dependências declaradas no app/server/lints
+  .\scripts\quality_gate.ps1 custom-lint # roda regras customizadas ManaLoom no app/server
+  .\scripts\quality_gate.ps1 patrol-smoke # valida fluxos E2E criticos do Patrol
+  .\scripts\quality_gate.ps1 e2e # suite E2E local: app, deckbuilder, battle, IA, contratos e logs
 
 Dica:
   Use 'quick' durante implementação e 'full' antes de concluir item/sprint.
-  No modo 'full', se a API responder corretamente em API_BASE_URL
-  (default: http://localhost:8080), os testes de integração backend
-  são habilitados automaticamente.
+  O modo 'full' é determinístico e exclui tags live/live_backend/live_db_write/live_external.
+  Use o perfil E2E live guardado para chamadas contra uma API real.
+  Use 'e2e' para varredura completa local; exporte MANALOOM_RUN_FLUTTER_RUNTIME_E2E=1 ou MANALOOM_RUN_LIVE_PRODUCT_E2E=1 para camadas vivas opcionais.
 
 Exemplos:
   .\scripts\quality_gate.ps1 full
-  `$env:API_BASE_URL='https://sua-api.host'; .\scripts\quality_gate.ps1 full
+  .\scripts\quality_gate.ps1 ui-audit
+  .\scripts\quality_gate.ps1 deps
+  .\scripts\quality_gate.ps1 custom-lint
+  .\scripts\quality_gate.ps1 patrol-smoke
+  .\scripts\quality_gate.ps1 e2e
 "@
 }
 
@@ -188,6 +251,26 @@ try {
     "full" {
       Run-BackendFull
       Run-FrontendFull
+      break
+    }
+    "ui-audit" {
+      Run-UiAudit
+      break
+    }
+    "deps" {
+      Run-DependencyAudit
+      break
+    }
+    "custom-lint" {
+      Run-CustomLint
+      break
+    }
+    "patrol-smoke" {
+      Run-PatrolSmoke
+      break
+    }
+    "e2e" {
+      Run-E2ESuite
       break
     }
     "help" {

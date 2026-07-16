@@ -328,7 +328,9 @@ def build_checks() -> list[Check]:
             [
                 "RAW_REPORT_SUFFIXES",
                 "ACTIVE_REFERENCE_ROOTS",
-                "tracked_raw_report_files_are_referenced_by_current_surfaces",
+                "retention_manifest_has_explicit_justification",
+                "tracked_raw_report_files_have_consumer_or_retention_justification",
+                "retention_manifest_has_no_stale_raw_entries",
                 "ignored_local_report_artifacts_absent",
             ],
             "scripts.report_retention_audit_blocks_unused_report_data",

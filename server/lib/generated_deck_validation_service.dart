@@ -22,8 +22,8 @@ abstract class GeneratedDeckRepository {
 
 class PostgresGeneratedDeckRepository implements GeneratedDeckRepository {
   PostgresGeneratedDeckRepository(this._pool, {String? preferredFormat})
-      : _preferredFormat = preferredFormat?.trim().toLowerCase(),
-        _cardValidationService = CardValidationService(_pool);
+    : _preferredFormat = preferredFormat?.trim().toLowerCase(),
+      _cardValidationService = CardValidationService(_pool);
 
   final Pool _pool;
   final CardValidationService _cardValidationService;
@@ -52,11 +52,9 @@ class PostgresGeneratedDeckRepository implements GeneratedDeckRepository {
     required List<Map<String, dynamic>> cards,
   }) async {
     await _pool.runTx(
-      (session) => DeckRulesService(session).validateAndThrow(
-        format: format,
-        cards: cards,
-        strict: true,
-      ),
+      (session) => DeckRulesService(
+        session,
+      ).validateAndThrow(format: format, cards: cards, strict: true),
     );
   }
 }
@@ -87,8 +85,9 @@ class GeneratedDeckValidationResult {
   bool get isValid => errors.isEmpty;
 
   Map<String, dynamic> qualityEvidenceSummary() {
-    final repairWarnings =
-        warnings.where(_isGeneratedDeckRepairWarning).toList(growable: false);
+    final repairWarnings = warnings
+        .where(_isGeneratedDeckRepairWarning)
+        .toList(growable: false);
     final cmcIntegrityWarnings = warnings
         .where(_isGeneratedDeckCmcIntegrityWarning)
         .toList(growable: false);
@@ -180,24 +179,23 @@ class GeneratedDeckValidationService {
       }
 
       final rawQuantity = rawCard['quantity'];
-      final quantity = rawQuantity is int
-          ? rawQuantity
-          : int.tryParse(rawQuantity?.toString() ?? '') ?? 1;
+      final quantity =
+          rawQuantity is int
+              ? rawQuantity
+              : int.tryParse(rawQuantity?.toString() ?? '') ?? 1;
 
       if (quantity <= 0) {
         warnings.add('A carta "$name" foi descartada por quantidade invalida.');
         continue;
       }
 
-      sanitizedCards.add({
-        'name': name,
-        'quantity': quantity,
-      });
+      sanitizedCards.add({'name': name, 'quantity': quantity});
     }
 
-    final sanitizedCommander = commanderName == null
-        ? null
-        : CardValidationService.sanitizeCardName(commanderName);
+    final sanitizedCommander =
+        commanderName == null
+            ? null
+            : CardValidationService.sanitizeCardName(commanderName);
 
     final seenLookupNames = <String>{};
     final parsedItems = <Map<String, dynamic>>[];
@@ -266,9 +264,7 @@ class GeneratedDeckValidationService {
 
     if (resolvedCommander != null) {
       final commanderCardId = resolvedCommander['card_id'] as String;
-      resolvedCards.removeWhere(
-        (card) => card['card_id'] == commanderCardId,
-      );
+      resolvedCards.removeWhere((card) => card['card_id'] == commanderCardId);
     }
 
     var consolidatedCards = _consolidateResolvedCards([
@@ -368,9 +364,10 @@ class GeneratedDeckValidationService {
       );
     }
 
-    final suggestions = suggestionCandidates.isEmpty
-        ? const <String, List<String>>{}
-        : await _repository.findSuggestions(suggestionCandidates);
+    final suggestions =
+        suggestionCandidates.isEmpty
+            ? const <String, List<String>>{}
+            : await _repository.findSuggestions(suggestionCandidates);
 
     final generatedDeck = <String, dynamic>{
       if (resolvedCommander != null)
@@ -378,10 +375,7 @@ class GeneratedDeckValidationService {
       'cards': [
         for (final card in consolidatedCards)
           if (card['is_commander'] != true)
-            {
-              'name': card['name'],
-              'quantity': card['quantity'],
-            },
+            {'name': card['name'], 'quantity': card['quantity']},
       ],
     };
 
@@ -432,9 +426,13 @@ class GeneratedDeckValidationService {
     Set<String> identityOf(Map<String, dynamic> card) {
       final oracleText = card['oracle_text'];
       return resolveCardColorIdentity(
-        colorIdentity: toStrings(card['color_identity']),
+        colorIdentity:
+            card['color_identity'] == null
+                ? null
+                : toStrings(card['color_identity']),
         colors: toStrings(card['colors']),
         oracleText: oracleText == null ? null : oracleText.toString(),
+        manaCost: card['mana_cost']?.toString(),
       );
     }
 
@@ -443,11 +441,7 @@ class GeneratedDeckValidationService {
     final targetNonCommander = normalized == 'brawl' ? 59 : 99;
 
     final repaired = <Map<String, dynamic>>[
-      {
-        ...commander,
-        'quantity': 1,
-        'is_commander': true,
-      },
+      {...commander, 'quantity': 1, 'is_commander': true},
     ];
 
     var removedOffColor = 0;
@@ -488,11 +482,7 @@ class GeneratedDeckValidationService {
         finalQty = 1;
       }
 
-      repaired.add({
-        ...card,
-        'quantity': finalQty,
-        'is_commander': false,
-      });
+      repaired.add({...card, 'quantity': finalQty, 'is_commander': false});
     }
 
     var consolidated = _consolidateResolvedCards(repaired);
@@ -535,7 +525,7 @@ class GeneratedDeckValidationService {
       }
 
       final lookupItems = [
-        for (final name in basicNames) {'name': name}
+        for (final name in basicNames) {'name': name},
       ];
       final resolvedBasics = await _repository.resolveCardNames(lookupItems);
 
@@ -716,7 +706,7 @@ class GeneratedDeckValidationService {
     final toAdd = minTotal - currentTotal;
     final basicNames = _basicLandNamesForConstructedDeck(cards);
     final resolvedBasics = await _repository.resolveCardNames([
-      for (final name in basicNames) {'name': name}
+      for (final name in basicNames) {'name': name},
     ]);
 
     final quantitiesByName = <String, int>{};
@@ -770,12 +760,14 @@ class GeneratedDeckValidationService {
 
       final manaCost = (card['mana_cost'] ?? '').toString();
       for (final color in colorOrder) {
-        final symbolCount = RegExp(
-          '\\{${color.toLowerCase()}\\}',
-          caseSensitive: false,
-        ).allMatches(manaCost).length;
+        final symbolCount =
+            RegExp(
+              '\\{${color.toLowerCase()}\\}',
+              caseSensitive: false,
+            ).allMatches(manaCost).length;
         if (symbolCount > 0) {
-          demand[color] = demand[color]! +
+          demand[color] =
+              demand[color]! +
               (symbolCount * ((card['quantity'] as int?) ?? 1));
         }
       }
@@ -794,9 +786,7 @@ class GeneratedDeckValidationService {
       'G': 'Forest',
     };
 
-    final names = [
-      for (final color in selectedColors) colorToBasic[color]!,
-    ];
+    final names = [for (final color in selectedColors) colorToBasic[color]!];
     return names.isEmpty ? const ['Wastes'] : names;
   }
 
@@ -815,9 +805,13 @@ class GeneratedDeckValidationService {
 
     final oracleText = card['oracle_text'];
     return resolveCardColorIdentity(
-      colorIdentity: toStrings(card['color_identity']),
+      colorIdentity:
+          card['color_identity'] == null
+              ? null
+              : toStrings(card['color_identity']),
       colors: toStrings(card['colors']),
       oracleText: oracleText == null ? null : oracleText.toString(),
+      manaCost: card['mana_cost']?.toString(),
     );
   }
 
@@ -859,9 +853,10 @@ class GeneratedDeckValidationService {
 
     const maxNames = 8;
     final shown = suspiciousNames.take(maxNames).join(', ');
-    final hidden = suspiciousNames.length > maxNames
-        ? suspiciousNames.length - maxNames
-        : 0;
+    final hidden =
+        suspiciousNames.length > maxNames
+            ? suspiciousNames.length - maxNames
+            : 0;
     warnings.add(
       hidden > 0
           ? 'Integridade CMC: ${suspiciousNames.length} carta(s) não-terreno têm CMC ausente/zerado suspeito contra mana_cost; exemplos: $shown; +$hidden.'

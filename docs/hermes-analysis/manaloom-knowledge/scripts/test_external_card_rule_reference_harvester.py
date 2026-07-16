@@ -8,6 +8,39 @@ import external_card_rule_reference_harvester as harvester
 
 
 class ExternalCardRuleReferenceHarvesterTests(unittest.TestCase):
+    def test_runtime_engine_references_are_bound_to_canonical_pins(self) -> None:
+        self.assertRegex(harvester.XMAGE_PIN, r"^[0-9a-f]{40}$")
+        self.assertRegex(harvester.FORGE_PIN, r"^[0-9a-f]{40}$")
+        self.assertIn(f"/{harvester.XMAGE_PIN}/", harvester.XMAGE_RAW_BASE)
+        self.assertIn(f"/{harvester.FORGE_PIN}/", harvester.FORGE_RAW_BASE)
+        self.assertNotIn("/master/", harvester.XMAGE_RAW_BASE)
+        self.assertNotIn("/master/", harvester.FORGE_RAW_BASE)
+
+        report = harvester.build_harvest_report(
+            {"cards": []},
+            limit=1,
+            offline=True,
+        )
+        self.assertEqual(
+            report["external_sources"]["xmage_runtime_pin"],
+            harvester.XMAGE_PIN,
+        )
+        self.assertFalse(report["external_sources"]["upstream_head_allowed"])
+
+    def test_unverifiable_local_xmage_tree_is_rejected_from_operational_lane(self) -> None:
+        with tempfile.TemporaryDirectory() as tmpdir:
+            root = Path(tmpdir)
+            contract = harvester.validate_xmage_local_root_pin(root)
+            with self.assertRaisesRegex(ValueError, "canonical XMage pin"):
+                harvester.build_harvest_report(
+                    {"cards": []},
+                    limit=1,
+                    offline=True,
+                    xmage_root=root,
+                )
+
+        self.assertEqual(contract["status"], "fail")
+
     def test_xmage_candidates_use_first_face_and_strip_punctuation(self) -> None:
         candidates = harvester.xmage_class_candidates(
             "Emeria's Call // Emeria, Shattered Skyclave"

@@ -12,6 +12,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import re
 from dataclasses import dataclass
 from datetime import datetime, timezone
 from pathlib import Path
@@ -276,6 +277,10 @@ def read_text(path: Path) -> str:
     return path.read_text(encoding="utf-8") if path.exists() else ""
 
 
+def compact_contract_source(value: str) -> str:
+    return re.sub(r"\s+", "", value).replace(",)", ")")
+
+
 def check_active_files_exist(files: Iterable[Path] = ACTIVE_FILES) -> Check:
     file_list = list(files)
     missing = [rel(path) for path in file_list if not path.exists()]
@@ -288,7 +293,13 @@ def check_contains(path: Path, snippets: Iterable[str], name: str) -> Check:
     if not path.exists():
         return Check(name, "fail", f"missing_file:{rel(path)}")
     text = read_text(path)
-    missing = [snippet for snippet in snippets if snippet not in text]
+    compact_text = compact_contract_source(text)
+    missing = [
+        snippet
+        for snippet in snippets
+        if snippet not in text
+        and compact_contract_source(snippet) not in compact_text
+    ]
     if missing:
         return Check(
             name,

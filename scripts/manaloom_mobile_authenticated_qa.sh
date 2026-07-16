@@ -1,7 +1,11 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-ROOT_DIR="$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)"
+ROOT_DIR="$(CDPATH='' cd -- "$(dirname -- "$0")/.." && pwd)"
+# shellcheck source=scripts/lib/manaloom_mutation_guard.sh
+source "$ROOT_DIR/scripts/lib/manaloom_mutation_guard.sh"
+require_live_mutation_approval "ManaLoom authenticated mobile QA"
+require_postgres_write_approval "ManaLoom authenticated mobile QA direct cleanup"
 API="${MANALOOM_API_BASE_URL:-https://evolution-cartinhas.2ta7qx.easypanel.host}"
 SSH_HOST="${MANALOOM_EASYPANEL_SSH_HOST:-root@evolution-cartinhas.2ta7qx.easypanel.host}"
 SSH_KEY="${MANALOOM_EASYPANEL_SSH_KEY:-$HOME/.ssh/manaloom_easy_parallel_20260703}"
@@ -46,10 +50,14 @@ cleanup_user() {
   if [ -z "$email" ]; then
     return 0
   fi
+  if [[ ! "$email" =~ ^[A-Za-z0-9._+@-]+$ ]]; then
+    echo "email de QA invalido; cleanup remoto recusado" >&2
+    return 1
+  fi
   ssh -o BatchMode=yes -o StrictHostKeyChecking=accept-new -i "$SSH_KEY" "$SSH_HOST" \
-    "cid=\$(docker ps --filter label=com.docker.swarm.service.name=$POSTGRES_SERVICE --format '{{.ID}}' | head -n 1); test -n \"\$cid\"; docker exec -i \"\$cid\" psql -U '$POSTGRES_USER' -d '$POSTGRES_DB' -v ON_ERROR_STOP=1" <<SQL >/dev/null
+    "cid=\$(docker ps --filter label=com.docker.swarm.service.name=$POSTGRES_SERVICE --format '{{.ID}}' | head -n 1); test -n \"\$cid\"; docker exec -i \"\$cid\" psql -U '$POSTGRES_USER' -d '$POSTGRES_DB' -v ON_ERROR_STOP=1 -v qa_email='$email'" <<'SQL' >/dev/null
 WITH target AS (
-  SELECT id FROM users WHERE email = '$email'
+  SELECT id FROM users WHERE email = :'qa_email'
 ),
 deleted_ai AS (
   DELETE FROM ai_logs USING target WHERE ai_logs.user_id = target.id RETURNING 1

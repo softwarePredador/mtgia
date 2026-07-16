@@ -34,7 +34,8 @@ const externalCommanderMetaPromotionLegalStatuses = <String>{
 
 abstract class ExternalCommanderMetaCandidateLegalityRepository {
   Future<Map<String, Map<String, dynamic>>> resolveCardNames(
-      List<String> names);
+    List<String> names,
+  );
 
   Future<Map<String, String>> lookupCommanderLegalities(Set<String> cardIds);
 }
@@ -50,17 +51,15 @@ class PostgresExternalCommanderMetaCandidateLegalityRepository
     List<String> names,
   ) async {
     if (names.isEmpty) return const <String, Map<String, dynamic>>{};
-    return resolveImportCardNames(
-      _pool,
-      [
-        for (final name in names) <String, dynamic>{'name': name},
-      ],
-    );
+    return resolveImportCardNames(_pool, [
+      for (final name in names) <String, dynamic>{'name': name},
+    ]);
   }
 
   @override
   Future<Map<String, String>> lookupCommanderLegalities(
-      Set<String> cardIds) async {
+    Set<String> cardIds,
+  ) async {
     if (cardIds.isEmpty) return const <String, String>{};
 
     final result = await _pool.execute(
@@ -109,21 +108,21 @@ class ExternalCommanderMetaControlledSourcePolicy {
 
 const externalCommanderMetaControlledSourcePolicies =
     <ExternalCommanderMetaControlledSourcePolicy>[
-  ExternalCommanderMetaControlledSourcePolicy(
-    canonicalSourceName: 'TopDeck.gg',
-    aliases: <String>{'topdeck.gg', 'topdeck', 'topdeckgg'},
-    allowedHosts: <String>{'topdeck.gg', 'www.topdeck.gg'},
-    requiredPathPrefix: '/event/',
-    allowedSubformats: <String>{'competitive_commander'},
-  ),
-  ExternalCommanderMetaControlledSourcePolicy(
-    canonicalSourceName: 'EDHTop16',
-    aliases: <String>{'edhtop16', 'edhtop16.com'},
-    allowedHosts: <String>{'edhtop16.com', 'www.edhtop16.com'},
-    requiredPathPrefix: '/tournament/',
-    allowedSubformats: <String>{'competitive_commander'},
-  ),
-];
+      ExternalCommanderMetaControlledSourcePolicy(
+        canonicalSourceName: 'TopDeck.gg',
+        aliases: <String>{'topdeck.gg', 'topdeck', 'topdeckgg'},
+        allowedHosts: <String>{'topdeck.gg', 'www.topdeck.gg'},
+        requiredPathPrefix: '/event/',
+        allowedSubformats: <String>{'competitive_commander'},
+      ),
+      ExternalCommanderMetaControlledSourcePolicy(
+        canonicalSourceName: 'EDHTop16',
+        aliases: <String>{'edhtop16', 'edhtop16.com'},
+        allowedHosts: <String>{'edhtop16.com', 'www.edhtop16.com'},
+        requiredPathPrefix: '/tournament/',
+        allowedSubformats: <String>{'competitive_commander'},
+      ),
+    ];
 
 class ExternalCommanderMetaValidationIssue {
   const ExternalCommanderMetaValidationIssue({
@@ -157,11 +156,7 @@ class ExternalCommanderMetaCandidateUnresolvedCard {
   final String role;
 
   Map<String, dynamic> toJson() {
-    return <String, dynamic>{
-      'name': name,
-      'quantity': quantity,
-      'role': role,
-    };
+    return <String, dynamic>{'name': name, 'quantity': quantity, 'role': role};
   }
 }
 
@@ -227,8 +222,8 @@ class ExternalCommanderMetaCandidateValidationResult {
   bool get accepted => !issues.any((issue) => issue.severity == 'error');
 
   ExternalCommanderMetaCandidateLegalityEvidence
-      get effectiveLegalityEvidence =>
-          _effectiveCandidateLegalityEvidence(candidate, legalityEvidence);
+  get effectiveLegalityEvidence =>
+      _effectiveCandidateLegalityEvidence(candidate, legalityEvidence);
 
   Map<String, dynamic> toJson() {
     final evidence = effectiveLegalityEvidence;
@@ -237,8 +232,8 @@ class ExternalCommanderMetaCandidateValidationResult {
       'profile': profile,
       'candidate': candidate.toJson(),
       'card_count': candidate.cardCount,
-      'commander_color_identity': evidence.commanderColorIdentity.toList()
-        ..sort(),
+      'commander_color_identity':
+          evidence.commanderColorIdentity.toList()..sort(),
       'unresolved_cards': evidence.unresolvedCards
           .map((card) => card.toJson())
           .toList(growable: false),
@@ -271,8 +266,8 @@ class ExternalCommanderMetaCandidate {
     this.legalStatus,
     this.validationNotes,
     Map<String, dynamic>? researchPayload,
-  })  : colorIdentity = colorIdentity ?? <String>{},
-        researchPayload = researchPayload ?? <String, dynamic>{};
+  }) : colorIdentity = colorIdentity ?? <String>{},
+       researchPayload = researchPayload ?? <String, dynamic>{};
 
   final String sourceName;
   final String? sourceHost;
@@ -334,8 +329,9 @@ class ExternalCommanderMetaCandidate {
     } else {
       addName(normalizedCommander);
     }
-    for (final name
-        in (partnerCommanderName ?? '').split(RegExp(r'\s*\+\s*'))) {
+    for (final name in (partnerCommanderName ?? '').split(
+      RegExp(r'\s*\+\s*'),
+    )) {
       addName(name);
     }
 
@@ -384,36 +380,30 @@ class ExternalCommanderMetaCandidate {
     Map<String, dynamic> json, {
     String importedBy = 'copilot_cli_web_agent',
   }) {
-    final sourceUrl = _requireString(
-      json,
-      const ['source_url', 'url'],
-      fieldName: 'source_url',
-    );
-    final sourceName = _firstNonEmptyString(
-          json,
-          const ['source_name', 'source'],
-        ) ??
+    final sourceUrl = _requireString(json, const [
+      'source_url',
+      'url',
+    ], fieldName: 'source_url');
+    final sourceName =
+        _firstNonEmptyString(json, const ['source_name', 'source']) ??
         Uri.tryParse(sourceUrl)?.host ??
         'unknown';
-    final commanderName = _firstNonEmptyString(
-      json,
-      const ['commander_name', 'commander'],
-    );
-    final deckName = _firstNonEmptyString(
-          json,
-          const ['deck_name', 'name', 'title'],
-        ) ??
+    final commanderName = _firstNonEmptyString(json, const [
+      'commander_name',
+      'commander',
+    ]);
+    final deckName =
+        _firstNonEmptyString(json, const ['deck_name', 'name', 'title']) ??
         commanderName ??
         sourceName;
-    final rawFormat = _firstNonEmptyString(
-          json,
-          const ['format'],
-        ) ??
-        'commander';
-    final rawSubformat = _firstNonEmptyString(
-          json,
-          const ['subformat', 'queue', 'meta_format'],
-        ) ??
+    final rawFormat =
+        _firstNonEmptyString(json, const ['format']) ?? 'commander';
+    final rawSubformat =
+        _firstNonEmptyString(json, const [
+          'subformat',
+          'queue',
+          'meta_format',
+        ]) ??
         rawFormat;
     final researchPayload = _normalizeResearchPayload(json);
 
@@ -423,14 +413,11 @@ class ExternalCommanderMetaCandidate {
       sourceUrl: sourceUrl,
       deckName: deckName,
       commanderName: commanderName,
-      partnerCommanderName: _firstNonEmptyString(
-        json,
-        const [
-          'partner_commander_name',
-          'secondary_commander_name',
-          'partner_commander',
-        ],
-      ),
+      partnerCommanderName: _firstNonEmptyString(json, const [
+        'partner_commander_name',
+        'secondary_commander_name',
+        'partner_commander',
+      ]),
       format: normalizeCommanderMetaFormat(rawFormat),
       subformat: normalizeCommanderMetaSubformat(rawSubformat),
       archetype: _firstNonEmptyString(json, const ['archetype']),
@@ -441,26 +428,23 @@ class ExternalCommanderMetaCandidate {
         json['is_commander_legal'] ?? json['commander_legal'],
       ),
       validationStatus: normalizeExternalCommanderMetaValidationStatus(
-        _firstNonEmptyString(
-              json,
-              const ['validation_status', 'status'],
-            ) ??
+        _firstNonEmptyString(json, const ['validation_status', 'status']) ??
             'candidate',
       ),
       legalStatus: normalizeExternalCommanderMetaPromotionLegalStatus(
-        _firstNonEmptyString(
-              json,
-              const ['legal_status', 'promotion_legal_status'],
-            ) ??
-            _firstNonEmptyString(
-              researchPayload,
-              const ['legal_status', 'promotion_legal_status'],
-            ),
+        _firstNonEmptyString(json, const [
+              'legal_status',
+              'promotion_legal_status',
+            ]) ??
+            _firstNonEmptyString(researchPayload, const [
+              'legal_status',
+              'promotion_legal_status',
+            ]),
       ),
-      validationNotes: _firstNonEmptyString(
-        json,
-        const ['validation_notes', 'notes'],
-      ),
+      validationNotes: _firstNonEmptyString(json, const [
+        'validation_notes',
+        'notes',
+      ]),
       researchPayload: researchPayload,
       importedBy: importedBy,
     );
@@ -477,7 +461,8 @@ List<ExternalCommanderMetaCandidate> parseExternalCommanderMetaCandidates(
     Map<String, dynamic> _ when decoded['candidates'] is List<dynamic> =>
       decoded['candidates'] as List<dynamic>,
     Map<String, dynamic> _ => <dynamic>[decoded],
-    _ => throw FormatException(
+    _ =>
+      throw FormatException(
         'Payload deve ser objeto JSON, lista JSON, ou { "candidates": [...] }.',
       ),
   };
@@ -511,13 +496,11 @@ String? normalizeCommanderMetaSubformat(String? raw) {
     'cedh' ||
     'competitive edh' ||
     'competitive commander' ||
-    'competitive_commander' =>
-      'competitive_commander',
+    'competitive_commander' => 'competitive_commander',
     'commander' ||
     'edh' ||
     'multiplayer commander' ||
-    'casual commander' =>
-      'commander',
+    'casual commander' => 'commander',
     _ => normalized,
   };
 }
@@ -536,19 +519,17 @@ String? normalizeExternalCommanderMetaPromotionLegalStatus(String? raw) {
 
   return switch (normalized) {
     'valid' || 'validated' => externalCommanderMetaPromotionLegalStatusValid,
-    'warning_reviewed' ||
-    'warning reviewed' ||
-    'reviewed_warning' =>
+    'warning_reviewed' || 'warning reviewed' || 'reviewed_warning' =>
       externalCommanderMetaPromotionLegalStatusWarningReviewed,
     'warning_pending' ||
     'warning pending' ||
     'warning' ||
-    'review_needed' =>
-      'warning_pending',
+    'review_needed' => 'warning_pending',
     'rejected' || 'invalid' => 'rejected',
-    _ => externalCommanderMetaPromotionLegalStatuses.contains(normalized)
-        ? normalized
-        : null,
+    _ =>
+      externalCommanderMetaPromotionLegalStatuses.contains(normalized)
+          ? normalized
+          : null,
   };
 }
 
@@ -579,11 +560,12 @@ String canonicalizeExternalCommanderMetaSourceName(
 }
 
 List<ExternalCommanderMetaCandidateValidationResult>
-    validateExternalCommanderMetaCandidates(
+validateExternalCommanderMetaCandidates(
   List<ExternalCommanderMetaCandidate> candidates, {
   String profile = genericExternalCommanderMetaValidationProfile,
   bool dryRun = false,
-  Map<String, ExternalCommanderMetaCandidateLegalityEvidence> legalityBySourceUrl =
+  Map<String, ExternalCommanderMetaCandidateLegalityEvidence>
+      legalityBySourceUrl =
       const <String, ExternalCommanderMetaCandidateLegalityEvidence>{},
 }) {
   return candidates
@@ -599,14 +581,14 @@ List<ExternalCommanderMetaCandidateValidationResult>
 }
 
 Future<Map<String, ExternalCommanderMetaCandidateLegalityEvidence>>
-    evaluateExternalCommanderMetaCandidatesLegality(
+evaluateExternalCommanderMetaCandidatesLegality(
   List<ExternalCommanderMetaCandidate> candidates, {
   required ExternalCommanderMetaCandidateLegalityRepository repository,
 }) async {
   final results = <String, ExternalCommanderMetaCandidateLegalityEvidence>{};
   for (final candidate in candidates) {
-    results[candidate.sourceUrl] =
-        await evaluateExternalCommanderMetaCandidateLegality(
+    results[candidate
+        .sourceUrl] = await evaluateExternalCommanderMetaCandidateLegality(
       candidate,
       repository: repository,
     );
@@ -615,15 +597,16 @@ Future<Map<String, ExternalCommanderMetaCandidateLegalityEvidence>>
 }
 
 Future<ExternalCommanderMetaCandidateLegalityEvidence>
-    evaluateExternalCommanderMetaCandidateLegality(
+evaluateExternalCommanderMetaCandidateLegality(
   ExternalCommanderMetaCandidate candidate, {
   required ExternalCommanderMetaCandidateLegalityRepository repository,
 }) async {
   final deckEntries = _parseCandidateCardList(candidate.cardList);
-  final explicitDeckNames = deckEntries
-      .map((entry) => entry.name.trim().toLowerCase())
-      .where((name) => name.isNotEmpty)
-      .toSet();
+  final explicitDeckNames =
+      deckEntries
+          .map((entry) => entry.name.trim().toLowerCase())
+          .where((name) => name.isNotEmpty)
+          .toSet();
   final syntheticCommanderEntries = [
     for (final commanderName in candidate.commanderNames)
       if (!explicitDeckNames.contains(commanderName.trim().toLowerCase()))
@@ -640,9 +623,10 @@ Future<ExternalCommanderMetaCandidateLegalityEvidence>
     for (final entry in syntheticCommanderEntries) entry.name,
   }.where((name) => name.trim().isNotEmpty).toList(growable: false);
 
-  final resolvedCards = lookupNames.isEmpty
-      ? const <String, Map<String, dynamic>>{}
-      : await repository.resolveCardNames(lookupNames);
+  final resolvedCards =
+      lookupNames.isEmpty
+          ? const <String, Map<String, dynamic>>{}
+          : await repository.resolveCardNames(lookupNames);
 
   final unresolvedByKey = <String, _ExternalCommanderMetaParsedCardEntry>{};
   final commanderColorIdentity = <String>{};
@@ -693,8 +677,9 @@ Future<ExternalCommanderMetaCandidateLegalityEvidence>
     );
   }
 
-  final legalities =
-      await repository.lookupCommanderLegalities(resolvedCardIds);
+  final legalities = await repository.lookupCommanderLegalities(
+    resolvedCardIds,
+  );
   final illegalCards = <ExternalCommanderMetaCandidateIllegalCard>[];
 
   for (final resolvedEntry in resolvedEntries) {
@@ -746,11 +731,11 @@ Future<ExternalCommanderMetaCandidateLegalityEvidence>
       candidate.isCommanderLegal == false || illegalCards.isNotEmpty
           ? externalCommanderMetaLegalStatusIllegal
           : unresolvedCards.isNotEmpty ||
-                  (candidate.commanderNames.isNotEmpty &&
-                      resolvedCommanderCount == 0 &&
-                      candidate.colorIdentity.isEmpty)
-              ? externalCommanderMetaLegalStatusNotProven
-              : externalCommanderMetaLegalStatusLegal;
+              (candidate.commanderNames.isNotEmpty &&
+                  resolvedCommanderCount == 0 &&
+                  candidate.colorIdentity.isEmpty)
+          ? externalCommanderMetaLegalStatusNotProven
+          : externalCommanderMetaLegalStatusLegal;
 
   return ExternalCommanderMetaCandidateLegalityEvidence(
     commanderColorIdentity: commanderColorIdentity,
@@ -761,7 +746,7 @@ Future<ExternalCommanderMetaCandidateLegalityEvidence>
 }
 
 ExternalCommanderMetaCandidateValidationResult
-    validateExternalCommanderMetaCandidate(
+validateExternalCommanderMetaCandidate(
   ExternalCommanderMetaCandidate candidate, {
   String profile = genericExternalCommanderMetaValidationProfile,
   bool dryRun = false,
@@ -901,7 +886,9 @@ void _applyTopDeckEdhTop16Stage1Validation(
   }
 
   if (!_hasResearchPayloadValue(
-      candidate.researchPayload, 'collection_method')) {
+    candidate.researchPayload,
+    'collection_method',
+  )) {
     issues.add(
       const ExternalCommanderMetaValidationIssue(
         severity: 'error',
@@ -952,8 +939,10 @@ void _applyTopDeckEdhTop16Stage2Validation(
     );
   }
 
-  final totalCards =
-      _readResearchPayloadInt(candidate.researchPayload, 'total_cards');
+  final totalCards = _readResearchPayloadInt(
+    candidate.researchPayload,
+    'total_cards',
+  );
   if (candidate.researchPayload.containsKey('total_cards') &&
       totalCards != 100) {
     issues.add(
@@ -1017,7 +1006,8 @@ ExternalCommanderMetaControlledSourcePolicy? _policyForCandidate(
 }
 
 Set<String> _normalizeCandidateColorIdentity(Map<String, dynamic> json) {
-  final raw = json['color_identity'] ??
+  final raw =
+      json['color_identity'] ??
       json['commander_color_identity'] ??
       json['colors'];
   if (raw is Iterable) {
@@ -1148,7 +1138,7 @@ int? _readResearchPayloadInt(Map<String, dynamic> payload, String key) {
 }
 
 ExternalCommanderMetaCandidateLegalityEvidence
-    _effectiveCandidateLegalityEvidence(
+_effectiveCandidateLegalityEvidence(
   ExternalCommanderMetaCandidate candidate,
   ExternalCommanderMetaCandidateLegalityEvidence? legalityEvidence,
 ) {
@@ -1174,8 +1164,10 @@ void _applyCommanderLegalityEvidence(
   required bool dryRun,
   ExternalCommanderMetaCandidateLegalityEvidence? legalityEvidence,
 }) {
-  final evidence =
-      _effectiveCandidateLegalityEvidence(candidate, legalityEvidence);
+  final evidence = _effectiveCandidateLegalityEvidence(
+    candidate,
+    legalityEvidence,
+  );
 
   if (candidate.isCommanderLegal == false &&
       !_hasValidationIssueCode(issues, 'commander_illegal')) {
@@ -1208,8 +1200,10 @@ void _applyCommanderLegalityEvidence(
 
   if (evidence.unresolvedCards.isNotEmpty &&
       !_hasValidationIssueCode(issues, 'unresolved_cards')) {
-    final sample =
-        evidence.unresolvedCards.take(3).map((card) => card.name).join(', ');
+    final sample = evidence.unresolvedCards
+        .take(3)
+        .map((card) => card.name)
+        .join(', ');
     issues.add(
       ExternalCommanderMetaValidationIssue(
         severity: dryRun ? 'warning' : 'error',
@@ -1269,7 +1263,10 @@ Map<String, dynamic>? _resolvedCardForName(
 
 Set<String> _resolveIdentityFromCardRecord(Map<String, dynamic> card) {
   return resolveCardColorIdentity(
-    colorIdentity: _iterableOfStrings(card['color_identity']),
+    colorIdentity:
+        card['color_identity'] == null
+            ? null
+            : _iterableOfStrings(card['color_identity']),
     colors: _iterableOfStrings(card['colors']),
     oracleText: card['oracle_text']?.toString(),
     manaCost: card['mana_cost']?.toString(),

@@ -1,4 +1,7 @@
+import 'dart:convert';
+
 import 'package:postgres/postgres.dart';
+
 import '../logger.dart';
 
 class ThemeContextualRule {
@@ -11,9 +14,12 @@ class ThemeContextualRule {
   final String description;
 
   const ThemeContextualRule({
-    required this.theme, required this.function,
-    required this.minCount, required this.maxCount,
-    required this.idealCount, required this.priority,
+    required this.theme,
+    required this.function,
+    required this.minCount,
+    required this.maxCount,
+    required this.idealCount,
+    required this.priority,
     required this.description,
   });
 
@@ -37,15 +43,135 @@ class ThemeValidationResult {
   final String theme;
   final List<ThemeCheck> checks;
   final bool hasCriticalViolation;
-  const ThemeValidationResult({required this.theme, required this.checks, required this.hasCriticalViolation});
+  const ThemeValidationResult({
+    required this.theme,
+    required this.checks,
+    required this.hasCriticalViolation,
+  });
+
+  Map<String, dynamic> toJson() => {
+    'theme': theme,
+    'checks': checks.map((check) => check.toJson()).toList(),
+    'has_critical_violation': hasCriticalViolation,
+  };
 }
 
 class ThemeCheck {
-  final String function; final int current; final int min; final int max;
-  final String priority; final String status; final String description;
-  const ThemeCheck({required this.function, required this.current, required this.min, required this.max, required this.priority, required this.status, required this.description});
+  final String function;
+  final int current;
+  final int min;
+  final int max;
+  final String priority;
+  final String status;
+  final String description;
+
+  const ThemeCheck({
+    required this.function,
+    required this.current,
+    required this.min,
+    required this.max,
+    required this.priority,
+    required this.status,
+    required this.description,
+  });
+
   bool get isOk => status == 'ok';
+
+  Map<String, dynamic> toJson() => {
+    'function': function,
+    'current': current,
+    'min': min,
+    'max': max,
+    'priority': priority,
+    'status': status,
+    'description': description,
+  };
 }
+
+/// Counts persisted functional roles for theme validation.
+///
+/// PostgreSQL card rows expose the reviewed payload as `functional_tags`
+/// (plural). Each role is counted at most once per card and respects quantity.
+/// The legacy singular field is only used as a compatibility fallback.
+Map<String, int> countThemeFunctionsFromCards(
+  List<Map<String, dynamic>> cards,
+) {
+  final counts = <String, int>{};
+  for (final card in cards) {
+    final functions = <String>{};
+    _collectThemeFunctions(card['functional_tags'], functions);
+    if (functions.isEmpty) {
+      _collectThemeFunctions(card['functional_tag'], functions);
+    }
+
+    final rawQuantity = card['quantity'];
+    final parsedQuantity =
+        rawQuantity is num
+            ? rawQuantity.toInt()
+            : int.tryParse(rawQuantity?.toString() ?? '');
+    final quantity =
+        parsedQuantity != null && parsedQuantity > 0 ? parsedQuantity : 1;
+    for (final function in functions) {
+      counts[function] = (counts[function] ?? 0) + quantity;
+    }
+  }
+  return counts;
+}
+
+void _collectThemeFunctions(Object? value, Set<String> output) {
+  if (value == null) return;
+
+  if (value is String) {
+    final trimmed = value.trim();
+    if (trimmed.isEmpty) return;
+    if (trimmed.startsWith('[') || trimmed.startsWith('{')) {
+      try {
+        _collectThemeFunctions(jsonDecode(trimmed), output);
+        return;
+      } catch (_) {
+        // A malformed legacy value is treated as a plain tag below.
+      }
+    }
+    final normalized = _normalizeThemeFunction(trimmed);
+    if (normalized.isNotEmpty) output.add(normalized);
+    return;
+  }
+
+  if (value is Iterable) {
+    for (final entry in value) {
+      _collectThemeFunctions(entry, output);
+    }
+    return;
+  }
+
+  if (value is Map) {
+    final confidence = _themeTagConfidence(value);
+    final directTag =
+        value['tag'] ?? value['function'] ?? value['role'] ?? value['name'];
+    if (directTag != null && confidence >= 0.65) {
+      final normalized = _normalizeThemeFunction(directTag.toString());
+      if (normalized.isNotEmpty) output.add(normalized);
+    }
+
+    final nestedTags = value['tags'] ?? value['functional_tags'];
+    if (nestedTags != null && confidence >= 0.65) {
+      _collectThemeFunctions(nestedTags, output);
+    }
+  }
+}
+
+double _themeTagConfidence(Map value) {
+  final raw =
+      value['confidence'] ?? value['role_confidence'] ?? value['score'] ?? 1.0;
+  if (raw is num) return raw.toDouble();
+  return double.tryParse(raw.toString()) ?? 1.0;
+}
+
+String _normalizeThemeFunction(String value) => value
+    .trim()
+    .toLowerCase()
+    .replaceAll(RegExp(r'[^a-z0-9]+'), '_')
+    .replaceAll(RegExp(r'^_+|_+$'), '');
 
 class ThemeContextualRulesService {
   final Pool pool;
@@ -53,7 +179,8 @@ class ThemeContextualRulesService {
 
   static String archetypeToTheme(String archetype) {
     final a = archetype.trim().toLowerCase();
-    if (a.contains('spellslinger') || a.contains('spells')) return 'spellslinger';
+    if (a.contains('spellslinger') || a.contains('spells'))
+      return 'spellslinger';
     if (a.contains('goblin')) return 'tribal_goblins';
     if (a.contains('elf')) return 'elfball';
     if (a.contains('vampire')) return 'vampires';
@@ -67,14 +194,19 @@ class ThemeContextualRulesService {
     return a.replaceAll(' ', '_');
   }
 
-  Future<List<ThemeContextualRule>> getRulesForArchetype(String archetype) async {
+  Future<List<ThemeContextualRule>> getRulesForArchetype(
+    String archetype,
+  ) async {
     final theme = archetypeToTheme(archetype);
     if (theme.isEmpty) return [];
     try {
-      final result = await pool.execute(Sql.named('''
+      final result = await pool.execute(
+        Sql.named('''
         SELECT theme, function, min_count, max_count, ideal_count, priority, description
         FROM theme_contextual_rules WHERE theme = @theme ORDER BY priority DESC, function
-      '''), parameters: {'theme': theme});
+      '''),
+        parameters: {'theme': theme},
+      );
       return result.map((row) => ThemeContextualRule.fromRow(row)).toList();
     } catch (e) {
       Log.w('ThemeContextualRules: erro: $e');
@@ -83,26 +215,49 @@ class ThemeContextualRulesService {
   }
 
   Map<String, int> countCardsByFunction(List<Map<String, dynamic>> cards) {
-    final counts = <String, int>{};
-    for (final card in cards) {
-      final tag = card['functional_tag'] as String?;
-      if (tag != null && tag.isNotEmpty) counts[tag] = (counts[tag] ?? 0) + 1;
-    }
-    return counts;
+    return countThemeFunctionsFromCards(cards);
   }
 
-  Future<ThemeValidationResult> validateDeck({required String archetype, required List<Map<String, dynamic>> cards}) async {
+  Future<ThemeValidationResult> validateDeck({
+    required String archetype,
+    required List<Map<String, dynamic>> cards,
+  }) async {
     final rules = await getRulesForArchetype(archetype);
-    if (rules.isEmpty) return ThemeValidationResult(theme: archetypeToTheme(archetype), checks: [], hasCriticalViolation: false);
+    if (rules.isEmpty)
+      return ThemeValidationResult(
+        theme: archetypeToTheme(archetype),
+        checks: [],
+        hasCriticalViolation: false,
+      );
     final counts = countCardsByFunction(cards);
     final checks = <ThemeCheck>[];
     bool hasCritical = false;
     for (final rule in rules) {
-      final current = counts[rule.function] ?? 0;
-      final status = current < rule.minCount ? 'below_min' : current > rule.maxCount ? 'above_max' : 'ok';
-      if ((rule.isEssential || rule.isHigh) && status != 'ok') hasCritical = true;
-      checks.add(ThemeCheck(function: rule.function, current: current, min: rule.minCount, max: rule.maxCount, priority: rule.priority, status: status, description: rule.description));
+      final current = counts[_normalizeThemeFunction(rule.function)] ?? 0;
+      final status =
+          current < rule.minCount
+              ? 'below_min'
+              : current > rule.maxCount
+              ? 'above_max'
+              : 'ok';
+      if ((rule.isEssential || rule.isHigh) && status != 'ok')
+        hasCritical = true;
+      checks.add(
+        ThemeCheck(
+          function: rule.function,
+          current: current,
+          min: rule.minCount,
+          max: rule.maxCount,
+          priority: rule.priority,
+          status: status,
+          description: rule.description,
+        ),
+      );
     }
-    return ThemeValidationResult(theme: archetypeToTheme(archetype), checks: checks, hasCriticalViolation: hasCritical);
+    return ThemeValidationResult(
+      theme: archetypeToTheme(archetype),
+      checks: checks,
+      hasCriticalViolation: hasCritical,
+    );
   }
 }

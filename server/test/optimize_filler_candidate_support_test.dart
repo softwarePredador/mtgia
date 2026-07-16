@@ -82,6 +82,43 @@ void main() {
     });
   });
 
+  group('resolvedCardIdentity', () {
+    test('preserves explicit canonical colorless identity', () {
+      expect(
+        resolvedCardIdentity({
+          'color_identity': const <String>[],
+          'colors': const <String>['W'],
+          'mana_cost': '{U}',
+          'oracle_text': '{T}: Add {B}.',
+        }),
+        isEmpty,
+      );
+    });
+
+    test('uses fallback only when canonical identity is absent', () {
+      expect(
+        resolvedCardIdentity({
+          'colors': const <String>['W'],
+          'mana_cost': '{U}',
+          'oracle_text': '{T}: Add {B}.',
+        }),
+        equals({'W', 'U', 'B'}),
+      );
+    });
+
+    test('uses non-empty canonical identity without merging fallback', () {
+      expect(
+        resolvedCardIdentity({
+          'color_identity': const <String>['G'],
+          'colors': const <String>['W'],
+          'mana_cost': '{U}',
+          'oracle_text': '{T}: Add {B}.',
+        }),
+        equals({'G'}),
+      );
+    });
+  });
+
   group('commanderFillerQualityScore', () {
     test('rewards premium fillers and penalizes group draw traps', () {
       final solRingScore = commanderFillerQualityScore({
@@ -162,10 +199,7 @@ void main() {
         'color_identity': const <String>[],
       };
 
-      expect(
-        resolvedCardIdentity(fetch),
-        isEmpty,
-      );
+      expect(resolvedCardIdentity(fetch), isEmpty);
       expect(
         landFixesCommanderColors(
           card: fetch,

@@ -28,9 +28,9 @@ class XmageBattleClient {
     required String baseUrl,
     http.Client? client,
     Duration timeout = const Duration(seconds: 130),
-  })  : _baseUri = Uri.parse(baseUrl.replaceFirst(RegExp(r'/+$'), '')),
-        _client = client ?? http.Client(),
-        _timeout = timeout;
+  }) : _baseUri = Uri.parse(baseUrl.replaceFirst(RegExp(r'/+$'), '')),
+       _client = client ?? http.Client(),
+       _timeout = timeout;
 
   final Uri _baseUri;
   final http.Client _client;
@@ -59,6 +59,7 @@ class XmageBattleClient {
 
     final body = _decodeBody(response);
     if (response.statusCode >= 200 && response.statusCode < 300) {
+      _validateCompletedBattle(body);
       return body;
     }
     if (response.statusCode == 422 &&
@@ -78,6 +79,20 @@ class XmageBattleClient {
           'XMage returned an invalid response',
       statusCode: response.statusCode,
     );
+  }
+
+  void _validateCompletedBattle(Map<String, dynamic> body) {
+    final turns = body['turns'];
+    if (body['status'] != 'completed' ||
+        body['engine'] != 'xmage' ||
+        body['error'] != null ||
+        turns is! int ||
+        turns <= 0) {
+      throw XmageServiceException(
+        'XMage returned an invalid completed battle payload',
+        statusCode: 502,
+      );
+    }
   }
 
   Map<String, dynamic> _decodeBody(http.Response response) {

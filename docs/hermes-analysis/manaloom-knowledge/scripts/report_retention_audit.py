@@ -40,8 +40,10 @@ ACTIVE_REFERENCE_ROOTS = (
     REPO_ROOT / ".github",
 )
 
+RETENTION_MANIFEST_FILE = REPORT_DIR / "README.md"
+RETENTION_JUSTIFICATION_PREFIX = "Retention justification:"
+
 CURRENT_CONTRACT_FILES = (
-    REPORT_DIR / "README.md",
     DOCS_DIR / "README.md",
     DOCS_DIR / "MANALOOM_OPERATIONAL_LOOKUP_GUIDE_2026-06-30.md",
     DOCS_DIR / "MANALOOM_FAILURE_MODE_VALIDATION_MATRIX_2026-06-30.md",
@@ -118,23 +120,68 @@ def read_active_reference_text() -> str:
     return "\n".join(chunks)
 
 
-def classify_raw_files() -> tuple[list[Path], list[Path]]:
-    haystack = read_active_reference_text()
+def extract_raw_reference_tokens(text: str) -> set[str]:
     referenced_tokens = set(
         re.findall(
             r"[\w./-]+\.(?:json|jsonl|sql|out|txt|db|log|tsv|err)",
-            haystack,
+            text,
         )
     )
     referenced_tokens.update(Path(token).name for token in list(referenced_tokens))
-    referenced: list[Path] = []
-    unreferenced: list[Path] = []
-    for path in tracked_report_raw_files():
-        if path.name in referenced_tokens or rel(path) in referenced_tokens:
-            referenced.append(path)
+    return referenced_tokens
+
+
+def retention_manifest_justification() -> str | None:
+    if not RETENTION_MANIFEST_FILE.exists():
+        return None
+    for line in RETENTION_MANIFEST_FILE.read_text(
+        encoding="utf-8", errors="ignore"
+    ).splitlines():
+        if line.startswith(RETENTION_JUSTIFICATION_PREFIX):
+            justification = line.removeprefix(RETENTION_JUSTIFICATION_PREFIX).strip()
+            return justification or None
+    return None
+
+
+def retention_manifest_paths() -> set[str]:
+    if not RETENTION_MANIFEST_FILE.exists():
+        return set()
+    text = RETENTION_MANIFEST_FILE.read_text(encoding="utf-8", errors="ignore")
+    suffixes = "|".join(sorted(suffix.removeprefix(".") for suffix in RAW_REPORT_SUFFIXES))
+    pattern = rf"`(docs/hermes-analysis/master_optimizer_reports/[^`]+\.(?:{suffixes}))`"
+    return set(re.findall(pattern, text))
+
+
+def classify_paths(
+    paths: list[Path],
+    *,
+    active_tokens: set[str],
+    manifest_paths: set[str],
+    manifest_has_justification: bool,
+) -> dict[str, list[Path]]:
+    classified: dict[str, list[Path]] = {
+        "active_consumer": [],
+        "manifest_only": [],
+        "ungoverned": [],
+    }
+    for path in paths:
+        relative_path = rel(path)
+        if path.name in active_tokens or relative_path in active_tokens:
+            classified["active_consumer"].append(path)
+        elif manifest_has_justification and relative_path in manifest_paths:
+            classified["manifest_only"].append(path)
         else:
-            unreferenced.append(path)
-    return referenced, unreferenced
+            classified["ungoverned"].append(path)
+    return classified
+
+
+def classify_raw_files() -> dict[str, list[Path]]:
+    return classify_paths(
+        tracked_report_raw_files(),
+        active_tokens=extract_raw_reference_tokens(read_active_reference_text()),
+        manifest_paths=retention_manifest_paths(),
+        manifest_has_justification=retention_manifest_justification() is not None,
+    )
 
 
 def ignored_local_report_files() -> list[Path]:
@@ -160,14 +207,64 @@ def byte_size(paths: list[Path]) -> int:
     return total
 
 
+def artifact_metadata(
+    path: Path,
+    *,
+    classification: str,
+    justification: str | None = None,
+    now: datetime | None = None,
+) -> dict[str, Any]:
+    now = now or datetime.now(timezone.utc)
+    try:
+        stat = path.stat()
+        modified_at = datetime.fromtimestamp(stat.st_mtime, tz=timezone.utc)
+        size_bytes = stat.st_size
+        age_days = max(0.0, (now - modified_at).total_seconds() / 86400)
+    except OSError:
+        modified_at = None
+        size_bytes = 0
+        age_days = None
+    return {
+        "path": rel(path),
+        "classification": classification,
+        "justification": justification,
+        "size_bytes": size_bytes,
+        "modified_at": modified_at.isoformat() if modified_at else None,
+        "age_days": round(age_days, 2) if age_days is not None else None,
+    }
+
+
 def build_report(*, fail_on_ignored_local: bool) -> dict[str, Any]:
-    referenced, unreferenced = classify_raw_files()
+    classified = classify_raw_files()
+    active_consumer = classified["active_consumer"]
+    manifest_only = classified["manifest_only"]
+    ungoverned = classified["ungoverned"]
     ignored = ignored_local_report_files()
+    manifest_paths = retention_manifest_paths()
+    manifest_justification = retention_manifest_justification()
+    tracked_relative_paths = {rel(path) for path in tracked_report_raw_files()}
+    stale_manifest_entries = sorted(manifest_paths - tracked_relative_paths)
     checks = [
         Check(
-            "tracked_raw_report_files_are_referenced_by_current_surfaces",
-            "pass" if not unreferenced else "fail",
-            f"referenced={len(referenced)} unreferenced={len(unreferenced)}",
+            "retention_manifest_has_explicit_justification",
+            "pass" if manifest_justification else "fail",
+            f"manifest={rel(RETENTION_MANIFEST_FILE)} justification_present={manifest_justification is not None}",
+        ),
+        Check(
+            "tracked_raw_report_files_have_consumer_or_retention_justification",
+            "pass" if not ungoverned else "fail",
+            " ".join(
+                [
+                    f"active_consumer={len(active_consumer)}",
+                    f"manifest_only={len(manifest_only)}",
+                    f"ungoverned={len(ungoverned)}",
+                ]
+            ),
+        ),
+        Check(
+            "retention_manifest_has_no_stale_raw_entries",
+            "pass" if not stale_manifest_entries else "fail",
+            f"manifest_entries={len(manifest_paths)} stale_entries={len(stale_manifest_entries)}",
         ),
         Check(
             "ignored_local_report_artifacts_absent",
@@ -178,22 +275,66 @@ def build_report(*, fail_on_ignored_local: bool) -> dict[str, Any]:
     status_counts: dict[str, int] = {}
     for check in checks:
         status_counts[check.status] = status_counts.get(check.status, 0) + 1
+    now = datetime.now(timezone.utc)
+    tracked_artifacts = [
+        artifact_metadata(path, classification="active_consumer", now=now)
+        for path in active_consumer
+    ] + [
+        artifact_metadata(
+            path,
+            classification="manifest_only",
+            justification=manifest_justification,
+            now=now,
+        )
+        for path in manifest_only
+    ] + [
+        artifact_metadata(path, classification="ungoverned", now=now)
+        for path in ungoverned
+    ]
+    ignored_artifacts = [
+        artifact_metadata(path, classification="ignored_local", now=now)
+        for path in ignored
+    ]
+    known_ages = [
+        float(item["age_days"])
+        for item in tracked_artifacts
+        if item["age_days"] is not None
+    ]
     return {
         "generated_at": utc_now(),
         "status": "pass" if status_counts.get("fail", 0) == 0 else "fail",
         "summary": {
             "check_count": len(checks),
             "status_counts": status_counts,
-            "tracked_raw_count": len(referenced) + len(unreferenced),
-            "referenced_tracked_raw_count": len(referenced),
-            "unreferenced_tracked_raw_count": len(unreferenced),
-            "unreferenced_tracked_raw_bytes": byte_size(unreferenced),
+            "tracked_raw_count": len(active_consumer) + len(manifest_only) + len(ungoverned),
+            "active_consumer_tracked_raw_count": len(active_consumer),
+            "active_consumer_tracked_raw_bytes": byte_size(active_consumer),
+            "manifest_only_tracked_raw_count": len(manifest_only),
+            "manifest_only_tracked_raw_bytes": byte_size(manifest_only),
+            "ungoverned_tracked_raw_count": len(ungoverned),
+            "ungoverned_tracked_raw_bytes": byte_size(ungoverned),
+            "tracked_raw_oldest_age_days": max(known_ages) if known_ages else None,
+            "retention_manifest_entry_count": len(manifest_paths),
+            "retention_manifest_stale_entry_count": len(stale_manifest_entries),
             "ignored_local_count": len(ignored),
             "ignored_local_bytes": byte_size(ignored),
         },
         "checks": [check.as_dict() for check in checks],
-        "referenced_tracked_raw": [rel(path) for path in referenced],
-        "unreferenced_tracked_raw": [rel(path) for path in unreferenced],
+        "retention_manifest": {
+            "path": rel(RETENTION_MANIFEST_FILE),
+            "justification": manifest_justification,
+            "entries": sorted(manifest_paths),
+            "stale_entries": stale_manifest_entries,
+        },
+        "active_consumer_tracked_raw": [rel(path) for path in active_consumer],
+        "manifest_only_tracked_raw": [rel(path) for path in manifest_only],
+        "ungoverned_tracked_raw": [rel(path) for path in ungoverned],
+        "tracked_raw_artifacts": sorted(tracked_artifacts, key=lambda item: item["path"]),
+        "ignored_local_artifact_metadata": ignored_artifacts,
+        # Compatibility aliases. "referenced" now means a real active surface;
+        # manifest-only retention is reported separately instead of inflating it.
+        "referenced_tracked_raw": [rel(path) for path in active_consumer],
+        "unreferenced_tracked_raw": [rel(path) for path in ungoverned],
         "ignored_local_report_artifacts": [rel(path) for path in ignored],
         "mutations_performed": [],
     }
@@ -213,12 +354,35 @@ def write_markdown(report: dict[str, Any], path: Path) -> None:
     for check in report["checks"]:
         detail = str(check.get("detail") or "").replace("|", "\\|")
         lines.append(f"| `{check['name']}` | `{check['status']}` | {detail} |")
-    if report["unreferenced_tracked_raw"]:
-        lines.extend(["", "## Unreferenced Tracked Raw Files", ""])
-        for item in report["unreferenced_tracked_raw"][:200]:
+    if report["ungoverned_tracked_raw"]:
+        lines.extend(["", "## Ungoverned Tracked Raw Files", ""])
+        for item in report["ungoverned_tracked_raw"][:200]:
             lines.append(f"- `{item}`")
-        if len(report["unreferenced_tracked_raw"]) > 200:
-            lines.append(f"- ... {len(report['unreferenced_tracked_raw']) - 200} more")
+        if len(report["ungoverned_tracked_raw"]) > 200:
+            lines.append(f"- ... {len(report['ungoverned_tracked_raw']) - 200} more")
+    if report["manifest_only_tracked_raw"]:
+        lines.extend(
+            [
+                "",
+                "## Manifest-only Retained Raw Files",
+                "",
+                (
+                    f"Count: `{len(report['manifest_only_tracked_raw'])}`. "
+                    "These files have retention justification but no active consumer reference."
+                ),
+            ]
+        )
+        metadata_by_path = {
+            item["path"]: item for item in report["tracked_raw_artifacts"]
+        }
+        for item in report["manifest_only_tracked_raw"][:200]:
+            metadata = metadata_by_path.get(item, {})
+            lines.append(
+                f"- `{item}` - bytes={metadata.get('size_bytes', 0)} "
+                f"age_days={metadata.get('age_days')}"
+            )
+        if len(report["manifest_only_tracked_raw"]) > 200:
+            lines.append(f"- ... {len(report['manifest_only_tracked_raw']) - 200} more")
     if report["ignored_local_report_artifacts"]:
         lines.extend(["", "## Ignored Local Report Artifacts", ""])
         for item in report["ignored_local_report_artifacts"][:200]:

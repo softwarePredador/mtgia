@@ -49,12 +49,12 @@ remote() {
 }
 
 copy_to_remote() {
-  scp -i "$EASYPANEL_SSH_KEY" -o BatchMode=yes "$@" \
+  scp -C -i "$EASYPANEL_SSH_KEY" -o BatchMode=yes "$@" \
     "$EASYPANEL_SSH_USER@$EASYPANEL_SERVER_IP:$REMOTE_DIR/"
 }
 
 copy_from_remote() {
-  scp -i "$EASYPANEL_SSH_KEY" -o BatchMode=yes \
+  scp -C -i "$EASYPANEL_SSH_KEY" -o BatchMode=yes \
     "$EASYPANEL_SSH_USER@$EASYPANEL_SERVER_IP:$REMOTE_DIR/$1" "$2"
 }
 
@@ -94,8 +94,9 @@ run_remote_python() {
 
 run_coverage() {
   local output_root="${1:-/tmp/manaloom-global-closure-output}"
-  local run_id="coverage_$(date -u +%Y%m%d_%H%M%S)"
-  local output_dir="$output_root/$run_id"
+  local run_id output_dir
+  run_id="coverage_$(date -u +%Y%m%d_%H%M%S)"
+  output_dir="$output_root/$run_id"
   mkdir -p "$output_dir"
 
   "$ROOT_DIR/server/bin/with_new_server_pg.sh" psql -X -A -t \
@@ -144,9 +145,28 @@ run_coverage() {
     --scope all_battle_gap \
     --out-prefix "$WORK_DIR/xmage_source_queue"
 
-  jq '{cards: [.queue[]
-    | select(.source_resolution_status == "local_source_candidate")
-    | {card_id, oracle_id, name: .card_name}]}' \
+  jq --slurpfile cards "$WORK_DIR/cards.json" '
+    ($cards[0]
+      | map({key: (.card_id | tostring), value: .})
+      | from_entries) as $metadata_by_id
+    | {cards: [.queue[]
+        | select(.source_resolution_status == "local_source_candidate")
+        | (.card_id | tostring) as $card_id
+        | ($metadata_by_id[$card_id] // {}) as $metadata
+        | {
+            card_id: $card_id,
+            oracle_id: (.oracle_id // $metadata.oracle_id),
+            name: .card_name,
+            type_line: $metadata.type_line,
+            set_code: $metadata.set_code,
+            collector_number: $metadata.collector_number,
+            layout: $metadata.layout,
+            oracle_text: $metadata.oracle_text,
+            card_faces_json: $metadata.card_faces_json,
+            set_type: $metadata.set_type,
+            is_online_only: $metadata.is_online_only,
+            commander_legality: $metadata.commander_legality
+          }]}' \
     "$WORK_DIR/xmage_source_queue.json" >"$WORK_DIR/xmage_source_cards.json"
 
   copy_to_remote \
@@ -242,7 +262,7 @@ run_battle() {
     --max-attempts 3
 
   copy_from_remote checkpoint.json "$state_dir/checkpoint.json"
-  scp -r -i "$EASYPANEL_SSH_KEY" -o BatchMode=yes \
+  scp -C -r -i "$EASYPANEL_SSH_KEY" -o BatchMode=yes \
     "$EASYPANEL_SSH_USER@$EASYPANEL_SERVER_IP:$REMOTE_DIR/results/." \
     "$state_dir/results/"
   echo "Battle state: $state_dir"
@@ -252,8 +272,8 @@ run_battle() {
 }
 
 main() {
-  local command="${1:-}"
-  case "$command" in
+  local action="${1:-}"
+  case "$action" in
     coverage)
       load_server_env
       trap cleanup EXIT INT TERM

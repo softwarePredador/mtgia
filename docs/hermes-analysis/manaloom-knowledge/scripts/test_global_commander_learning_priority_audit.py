@@ -55,6 +55,22 @@ class GlobalCommanderLearningPriorityAuditTests(unittest.TestCase):
         self.assertEqual(stage, "core_floor_repair")
         self.assertGreater(audit.priority_score(core_row, stage), 90)
 
+    def test_missing_role_data_is_loaded_before_role_gap_inference(self) -> None:
+        core_row = {
+            "deck_id": "product-deck",
+            "commander": "Example Commander",
+            "shape_status": "structure_ready",
+            "core_status": "role_data_unavailable",
+            "role_bands": [],
+        }
+
+        stage = audit.stage_for_deck(core_row, None)
+
+        self.assertEqual(stage, "role_data_load")
+        self.assertEqual(audit.STAGE_RANK[stage], 97)
+        self.assertEqual(audit.priority_score(core_row, stage), 102)
+        self.assertIn("load_product_role_data", audit.next_action_for_stage(stage))
+
     def test_607_is_benchmark_not_global_template(self) -> None:
         core_row = {
             "deck_id": "607",

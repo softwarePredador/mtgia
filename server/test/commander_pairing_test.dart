@@ -28,27 +28,80 @@ void main() {
       expect(areCommanderPairingCompatible(first, second), isTrue);
     });
 
-    test('accepts exact partner-with pairs and rejects mismatched partners',
-        () {
-      final captain = CommanderPairingCard(
-        name: 'Blaring Captain',
-        typeLine: 'Legendary Creature — Azra Warrior',
-        oracleText: 'Partner with Blaring Recruiter',
-      );
-      final recruiter = CommanderPairingCard(
-        name: 'Blaring Recruiter',
-        typeLine: 'Legendary Creature — Elf Warrior',
-        oracleText: 'Partner with Blaring Captain',
-      );
-      final imposter = CommanderPairingCard(
-        name: 'Blaring Recruiter Adept',
-        typeLine: 'Legendary Creature — Elf Warrior',
+    test('does not mix generic Partner with partner-text variants', () {
+      final generic = CommanderPairingCard(
+        name: 'Tymna the Weaver',
+        typeLine: 'Legendary Creature — Human Cleric',
         oracleText: 'Partner',
       );
+      final friendsForever = CommanderPairingCard(
+        name: 'Cecily, Haunted Mage',
+        typeLine: 'Legendary Creature — Human Wizard',
+        oracleText: 'Partner — Friends forever',
+      );
 
-      expect(areCommanderPairingCompatible(captain, recruiter), isTrue);
-      expect(areCommanderPairingCompatible(captain, imposter), isFalse);
+      expect(hasGenericPartnerCommanderPairAbility(generic), isTrue);
+      expect(hasGenericPartnerCommanderPairAbility(friendsForever), isFalse);
+      expect(areCommanderPairingCompatible(generic, friendsForever), isFalse);
     });
+
+    test('requires an exact matching partner-text variant', () {
+      final friendsForever = CommanderPairingCard(
+        name: 'Cecily, Haunted Mage',
+        typeLine: 'Legendary Creature — Human Wizard',
+        oracleText: 'Partner—Friends forever',
+      );
+      final legacyFriendsForever = CommanderPairingCard(
+        name: 'Sophina, Spearsage Deserter',
+        typeLine: 'Legendary Creature — Human Soldier',
+        oracleText: 'Friends forever',
+      );
+      final survivors = CommanderPairingCard(
+        name: 'Rick, Steadfast Leader',
+        typeLine: 'Legendary Creature — Human Soldier',
+        oracleText: 'Partner—Survivors',
+      );
+
+      expect(
+        areCommanderPairingCompatible(friendsForever, legacyFriendsForever),
+        isTrue,
+      );
+      expect(areCommanderPairingCompatible(friendsForever, survivors), isFalse);
+    });
+
+    test(
+      'accepts exact partner-with pairs and rejects mismatched partners',
+      () {
+        final captain = CommanderPairingCard(
+          name: 'Blaring Captain',
+          typeLine: 'Legendary Creature — Azra Warrior',
+          oracleText: 'Partner with Blaring Recruiter',
+        );
+        final recruiter = CommanderPairingCard(
+          name: 'Blaring Recruiter',
+          typeLine: 'Legendary Creature — Elf Warrior',
+          oracleText: 'Partner with Blaring Captain',
+        );
+        final imposter = CommanderPairingCard(
+          name: 'Blaring Recruiter Adept',
+          typeLine: 'Legendary Creature — Elf Warrior',
+          oracleText: 'Partner',
+        );
+        final oneSidedRecruiter = CommanderPairingCard(
+          name: 'Blaring Recruiter',
+          typeLine: 'Legendary Creature — Elf Warrior',
+          oracleText: 'Partner',
+        );
+
+        expect(areCommanderPairingCompatible(captain, recruiter), isTrue);
+        expect(areCommanderPairingCompatible(captain, imposter), isFalse);
+        expect(
+          areCommanderPairingCompatible(captain, oneSidedRecruiter),
+          isFalse,
+          reason: 'CR 702.124j requires each card to name the other.',
+        );
+      },
+    );
 
     test('accepts choose-a-background plus a legendary Background', () {
       final commander = CommanderPairingCard(
@@ -96,9 +149,29 @@ void main() {
         typeLine: 'Legendary Creature — Human Time Lord',
         oracleText: "Doctor's companion",
       );
+      final doctorWithExtraType = CommanderPairingCard(
+        name: 'The Human Doctor',
+        typeLine: 'Legendary Creature — Human Time Lord Doctor',
+        oracleText: 'Allons-y!',
+      );
+      final nonLegendaryCompanion = CommanderPairingCard(
+        name: 'A Passing Companion',
+        typeLine: 'Creature — Human',
+        oracleText: "Doctor's companion",
+      );
 
       expect(areCommanderPairingCompatible(doctor, companion), isTrue);
       expect(areCommanderPairingCompatible(nonDoctor, companion), isFalse);
+      expect(
+        areCommanderPairingCompatible(doctorWithExtraType, companion),
+        isFalse,
+        reason: 'CR 702.124m forbids other creature types on the Doctor.',
+      );
+      expect(
+        areCommanderPairingCompatible(doctor, nonLegendaryCompanion),
+        isFalse,
+        reason: 'Doctor\'s companion must itself be a legendary creature.',
+      );
     });
   });
 }

@@ -26,10 +26,10 @@ class CardRoles {
   bool contains(String role) => roles.contains(role);
 
   Map<String, dynamic> toJson() => {
-        'roles': roles.toList(),
-        'primary_role': primaryRole,
-        'source': source,
-      };
+    'roles': roles.toList(),
+    'primary_role': primaryRole,
+    'source': source,
+  };
 }
 
 /// Resolve card functional roles from all available sources.
@@ -179,25 +179,19 @@ Set<String> _resolveHeuristicRoles({
   if (_knownProtectionNames.contains(n)) roles.add('protection');
 
   if (looksLikeOptimizationBoardWipeText(oracleText)) roles.add('wipe');
-  if (o.contains('hexproof') ||
-      o.contains('indestructible') ||
-      o.contains('shroud') ||
-      o.contains('ward') ||
-      o.contains('protection from')) roles.add('protection');
-  if (o.contains('destroy target') ||
-      o.contains('exile target') ||
-      o.contains('counter target') ||
-      (o.contains('return target') && o.contains('to its owner')) ||
-      (o.contains('deals') &&
-          o.contains('damage') &&
-          (o.contains('target creature') ||
-              o.contains('target planeswalker') ||
-              o.contains('any target')))) roles.add('removal');
+  if (looksLikeOptimizationProtectionText(oracleText, name: n)) {
+    roles.add('protection');
+  }
+  if (looksLikeOptimizationTargetedRemovalText(oracleText)) {
+    roles.add('removal');
+  }
   if (looksLikeOptimizationRampText(oracleText) ||
-      (t.contains('artifact') && o.contains('add'))) roles.add('ramp');
+      (t.contains('artifact') && o.contains('add')))
+    roles.add('ramp');
   if (_looksLikeDraw(o) ||
       o.contains('look at the top') ||
-      (o.contains('scry') && o.contains('draw'))) roles.add('draw');
+      (o.contains('scry') && o.contains('draw')))
+    roles.add('draw');
   if (o.contains('search your library') && !o.contains('land'))
     roles.add('tutor');
   if (_looksLikeWincon(o, n)) roles.add('wincon');
@@ -220,7 +214,8 @@ Set<String> _resolveHeuristicRoles({
       roles.add('artifact');
     else if (t.contains('enchantment'))
       roles.add('enchantment');
-    else if (t.contains('planeswalker')) roles.add('planeswalker');
+    else if (t.contains('planeswalker'))
+      roles.add('planeswalker');
   }
   return roles;
 }
@@ -273,7 +268,9 @@ double _estimateManaValue(String manaCost) {
   if (manaCost.isEmpty) return 0;
   final matches = RegExp(r'\{(\d+)\}').allMatches(manaCost);
   return matches.fold<double>(
-      0, (sum, m) => sum + (double.tryParse(m.group(1)!) ?? 0));
+    0,
+    (sum, m) => sum + (double.tryParse(m.group(1)!) ?? 0),
+  );
 }
 
 double _safeSemanticConfidence(Object? value) {
@@ -283,7 +280,8 @@ double _safeSemanticConfidence(Object? value) {
 }
 
 Map<String, Map<String, dynamic>> _cardsByNormalizedName(
-    List<Map<String, dynamic>> cards) {
+  List<Map<String, dynamic>> cards,
+) {
   final byName = <String, Map<String, dynamic>>{};
   for (final card in cards) {
     final key = (card['name']?.toString() ?? '').trim().toLowerCase();
@@ -301,6 +299,7 @@ String _normalizeRoleCardName(String value) => value.trim().toLowerCase();
 String classifyOptimizationFunctionalRole(Map<String, dynamic> card) {
   final oracle = ((card['oracle_text'] as String?) ?? '');
   final typeLine = ((card['type_line'] as String?) ?? '');
+  if (typeLine.toLowerCase().contains('land')) return 'land';
   final name = card['name']?.toString() ?? '';
   final result = resolveCardFunctionalRoles(
     functionalTags: card['functional_tags'],
@@ -314,8 +313,10 @@ String classifyOptimizationFunctionalRole(Map<String, dynamic> card) {
   return result.primaryRole;
 }
 
-Set<String> optimizationFunctionalRolesForCard(Map<String, dynamic> card,
-    {bool semanticOnly = false}) {
+Set<String> optimizationFunctionalRolesForCard(
+  Map<String, dynamic> card, {
+  bool semanticOnly = false,
+}) {
   if (semanticOnly) {
     return _parseSemanticV2Roles(card['semantic_tags_v2']).toSet();
   }
@@ -333,7 +334,13 @@ Set<String> optimizationFunctionalRolesForCard(Map<String, dynamic> card,
     manaCost: card['mana_cost']?.toString(),
     cmc: card['cmc'],
   );
-  if (resolved.isNotEmpty) return resolved.roles.toSet();
+  if (resolved.isNotEmpty) {
+    final roles = resolved.roles.toSet();
+    if (((card['type_line'] as String?) ?? '').toLowerCase().contains('land')) {
+      roles.add('land');
+    }
+    return roles;
+  }
   // Último recurso: nunca devolver vazio para não quebrar interseções de role.
   return {classifyOptimizationFunctionalRole(card)};
 }
@@ -345,10 +352,16 @@ Set<String> optimizationFunctionalRolesForCard(Map<String, dynamic> card,
 bool looksLikeOptimizationBoardWipeText(String oracleText) {
   final oracle = oracleText.toLowerCase();
   if (oracle.contains('all creatures you control') ||
-      oracle.contains('each creature you control')) return false;
+      oracle.contains('each creature you control'))
+    return false;
   if (oracle.contains('assigns combat damage')) return false;
   return oracle.contains('destroy all') ||
       oracle.contains('exile all') ||
+      oracle.contains('return all nonland permanents') ||
+      oracle.contains('return all creatures') ||
+      (oracle.contains("return to their owners' hands all") &&
+          (oracle.contains('creatures') ||
+              oracle.contains('nonland permanents'))) ||
       oracle.contains('all creatures get -') ||
       oracle.contains('all colored permanents') ||
       oracle.contains('each player sacrifices all') ||
@@ -363,14 +376,75 @@ bool looksLikeOptimizationRampText(String oracleText) {
   final oracle = oracleText.toLowerCase();
   if (oracle.contains('add {') || oracle.contains('mana of any')) return true;
   if (oracle.contains('search your library') &&
-      looksLikeOptimizationLandSearchText(oracle)) return true;
+      looksLikeOptimizationLandSearchText(oracle))
+    return true;
   return oracle.contains('additional land this turn') ||
       oracle.contains('additional land on each of your turns') ||
+      (oracle.contains('spells you cast cost') &&
+          oracle.contains('less to cast')) ||
+      (oracle.contains('untap up to') && oracle.contains('lands')) ||
+      (oracle.contains('taps an island for mana') &&
+          oracle.contains('adds an additional')) ||
       oracle.contains('put a land card from your hand onto the battlefield') ||
       (oracle.contains('put up to') && oracle.contains('land cards')) ||
       oracle.contains('create a treasure token') ||
       oracle.contains('create two treasure tokens') ||
       oracle.contains('create three treasure tokens');
+}
+
+bool looksLikeOptimizationTargetedRemovalText(String oracleText) {
+  final oracle = oracleText.toLowerCase();
+  final targetsOwnPermanent =
+      oracle.contains('target creature you control') ||
+      oracle.contains('target permanent you control') ||
+      oracle.contains('target artifact you control') ||
+      oracle.contains('target enchantment you control');
+  if (targetsOwnPermanent) return false;
+
+  return oracle.contains('destroy target') ||
+      oracle.contains('exile target') ||
+      oracle.contains('counter target') ||
+      (oracle.contains('return target') && oracle.contains('to its owner')) ||
+      (oracle.contains('target permanent') &&
+          oracle.contains('shuffles it into their library')) ||
+      (oracle.contains('target') &&
+          oracle.contains('gets -') &&
+          oracle.contains('/-')) ||
+      (oracle.contains('deals') &&
+          oracle.contains('damage') &&
+          (oracle.contains('target creature') ||
+              oracle.contains('target planeswalker') ||
+              oracle.contains('any target') ||
+              oracle.contains('damage to target')));
+}
+
+bool looksLikeOptimizationProtectionText(
+  String oracleText, {
+  String name = '',
+}) {
+  final oracle = oracleText.toLowerCase();
+  final normalizedName = name.toLowerCase().trim();
+  return oracle.contains('hexproof') ||
+      oracle.contains('indestructible') ||
+      oracle.contains('protection from') ||
+      oracle.contains('shroud') ||
+      oracle.contains('ward') ||
+      oracle.contains('phase out') ||
+      oracle.contains('gain protection') ||
+      oracle.contains("can't be the target") ||
+      oracle.contains('cannot be the target') ||
+      oracle.contains('prevent all damage') ||
+      oracle.contains('regenerate target') ||
+      oracle.contains('gains hexproof') ||
+      oracle.contains('gains indestructible') ||
+      ((oracle.contains('spells you control') ||
+              oracle.contains('creature spells you control')) &&
+          oracle.contains("can't be countered")) ||
+      oracle.contains("nonbasic lands don't untap") ||
+      normalizedName.contains("teferi's protection") ||
+      normalizedName.contains('heroic intervention') ||
+      normalizedName.contains('swiftfoot boots') ||
+      normalizedName.contains('lightning greaves');
 }
 
 bool looksLikeOptimizationLandSearchText(String oracleText) {
@@ -390,6 +464,9 @@ bool _looksLikeWincon(String oracle, String name) =>
     oracle.contains('opponent loses the game') ||
     oracle.contains('opponents lose the game') ||
     oracle.contains('each opponent loses') ||
+    oracle.contains('additional combat phase') ||
+    oracle.contains("player's life total becomes 1") ||
+    oracle.contains('life total becomes 1') ||
     (oracle.contains('damage equal to') && oracle.contains('opponent')) ||
     oracle.contains('double your life total');
 
@@ -401,7 +478,25 @@ bool _looksLikeEngine(String oracle) =>
         (oracle.contains('draw') ||
             oracle.contains('create') ||
             oracle.contains('add'))) ||
-    (oracle.contains('your end step') && oracle.contains('you may'));
+    (oracle.contains('your end step') && oracle.contains('you may')) ||
+    oracle.contains('additional combat phase') ||
+    oracle.contains('copy target triggered ability') ||
+    oracle.contains('copy that ability') ||
+    oracle.contains('triggers an additional time') ||
+    oracle.contains('twice that many +1/+1 counters') ||
+    oracle.contains('that many plus one +1/+1 counters') ||
+    (oracle.contains('creature card from your hand') &&
+        oracle.contains('onto the battlefield')) ||
+    oracle.contains('untap another target artifact') ||
+    oracle.contains('enter as a copy of any artifact or creature') ||
+    (oracle.contains('when this creature enters') &&
+        oracle.contains('return') &&
+        oracle.contains('you control')) ||
+    (oracle.contains('creature you control with a +1/+1 counter') &&
+        oracle.contains('has ')) ||
+    (oracle.contains('whenever a creature you control leaves') &&
+        oracle.contains('counters')) ||
+    oracle.contains('move all counters');
 
 bool _looksLikeDraw(String oracle) {
   if (oracle.contains('target opponent draws') ||
@@ -443,9 +538,11 @@ bool _looksLikeComboPiece(String oracle, String name) =>
 bool _looksLikePayoff(String oracle, String name) {
   if (name == 'blood artist') return true;
 
-  final isCostReductionText =
-      RegExp(r'\bcosts?\s+\{[^}]+\}\s+less').hasMatch(oracle);
-  final isDrawScalingText = oracle.contains('draw a card for each') ||
+  final isCostReductionText = RegExp(
+    r'\bcosts?\s+\{[^}]+\}\s+less',
+  ).hasMatch(oracle);
+  final isDrawScalingText =
+      oracle.contains('draw a card for each') ||
       oracle.contains('draw cards equal to');
   if (oracle.contains('for each') &&
       !isCostReductionText &&
@@ -500,7 +597,14 @@ bool _looksLikeSelfMillSetup(String oracle) {
       oracle.contains('dredge');
 }
 
-bool _looksLikeEtb(String oracle) => oracle.contains('enters the battlefield');
+bool _looksLikeEtb(String oracle) =>
+    oracle.contains('enters the battlefield') ||
+    oracle.contains('when this creature enters') ||
+    oracle.contains('when this permanent enters') ||
+    oracle.contains('whenever a creature enters') ||
+    oracle.contains('whenever an artifact enters') ||
+    oracle.contains('whenever an enchantment enters') ||
+    oracle.contains('whenever a land enters');
 
 bool _looksLikeBlink(String oracle, String name) =>
     (oracle.contains('exile') &&
@@ -569,13 +673,14 @@ enum SemanticV2OptimizeEnforcementMode { disabled, partial }
 extension SemanticV2OptimizeEnforcementModeWire
     on SemanticV2OptimizeEnforcementMode {
   String get wireValue => switch (this) {
-        SemanticV2OptimizeEnforcementMode.disabled => 'disabled',
-        SemanticV2OptimizeEnforcementMode.partial => 'partial',
-      };
+    SemanticV2OptimizeEnforcementMode.disabled => 'disabled',
+    SemanticV2OptimizeEnforcementMode.partial => 'partial',
+  };
 }
 
 SemanticV2OptimizeEnforcementMode resolveSemanticV2OptimizeEnforcementMode(
-    String? rawValue) {
+  String? rawValue,
+) {
   return switch (rawValue?.trim().toLowerCase()) {
     'partial' => SemanticV2OptimizeEnforcementMode.partial,
     _ => SemanticV2OptimizeEnforcementMode.disabled,
@@ -608,29 +713,24 @@ class OptimizationSemanticV2EnforcementDecision {
       criticalLossRoles.isNotEmpty;
 
   Map<String, dynamic> toDiagnostics() => {
-        'enforcement_mode': mode.wireValue,
-        'expanded_critical_roles': expandedCriticalRoles,
-        'critical_loss_roles': criticalLossRoles,
-        'review_loss_roles': reviewLossRoles,
-        'blocked_by_semantic_v2': blockedBySemanticV2,
-        'enforcement_signal': 'role_delta_negative',
-      };
+    'enforcement_mode': mode.wireValue,
+    'expanded_critical_roles': expandedCriticalRoles,
+    'critical_loss_roles': criticalLossRoles,
+    'review_loss_roles': reviewLossRoles,
+    'blocked_by_semantic_v2': blockedBySemanticV2,
+    'enforcement_signal': 'role_delta_negative',
+  };
 }
 
 OptimizationSemanticV2EnforcementDecision
-    evaluateOptimizationSemanticV2Enforcement({
+evaluateOptimizationSemanticV2Enforcement({
   required Map<String, dynamic> semanticLayerV2,
   required SemanticV2OptimizeEnforcementMode mode,
   bool expandedCriticalRoles = false,
 }) {
   final roleDelta = _readSemanticRoleDelta(semanticLayerV2['role_delta']);
   final criticalLossRoles = <String>[
-    for (final role in const [
-      'draw',
-      'removal',
-      'ramp',
-      'wipe',
-    ])
+    for (final role in const ['land', 'draw', 'removal', 'ramp', 'wipe'])
       if ((roleDelta[role] ?? 0) < 0) role,
     if (expandedCriticalRoles)
       for (final role in const [
@@ -677,7 +777,7 @@ Map<String, dynamic> withOptimizationSemanticV2EnforcementDiagnostics({
     ...semanticLayerV2,
     ...decision.toDiagnostics(),
     'enforcement': mode.wireValue,
-    'expanded_critical_roles': expandedCriticalRoles
+    'expanded_critical_roles': expandedCriticalRoles,
   };
 }
 
@@ -787,8 +887,12 @@ CardRoles _diagnosticRoleSignal(Map<String, dynamic>? card) {
     cmc: card['cmc'],
   );
   if (resolved.roles.isEmpty) return resolved;
+  final roles = resolved.roles.toSet();
+  if (((card['type_line'] as String?) ?? '').toLowerCase().contains('land')) {
+    roles.add('land');
+  }
   return CardRoles(
-    roles: resolved.roles.map(_normalizeDiagnosticRole).toSet(),
+    roles: roles.map(_normalizeDiagnosticRole).toSet(),
     primaryRole: _normalizeDiagnosticRole(resolved.primaryRole),
     source: resolved.source,
   );

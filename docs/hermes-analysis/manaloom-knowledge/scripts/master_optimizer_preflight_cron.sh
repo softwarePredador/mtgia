@@ -2,6 +2,12 @@
 set -euo pipefail
 
 REPO="${MANALOOM_REPO:-/opt/data/workspace/mtgia}"
+# shellcheck source=scripts/lib/manaloom_mutation_guard.sh
+source "$REPO/scripts/lib/manaloom_mutation_guard.sh"
+BATTLE_RULES_APPLY_PG_REQUESTED="${MANALOOM_BATTLE_RULES_APPLY_PG:-0}"
+if [[ "$BATTLE_RULES_APPLY_PG_REQUESTED" == "1" ]]; then
+  require_postgres_write_approval "master optimizer preflight cron battle-rule PostgreSQL sync"
+fi
 SCRIPT_DIR="$REPO/docs/hermes-analysis/manaloom-knowledge/scripts"
 REPORT_DIR="$REPO/docs/hermes-analysis/master_optimizer_reports"
 ARTIFACT_DIR="${MANALOOM_MASTER_OPTIMIZER_ARTIFACT_DIR:-/opt/data/artifacts/hermes_master_optimizer}"
@@ -67,7 +73,7 @@ python3 "$SCRIPT_DIR/sync_pg_card_metadata_to_hermes.py" \
   --report "$sync_report"
 
 battle_rules_pg_report="$ARTIFACT_DIR/card_battle_rules_pg_sync_$(date -u +%Y%m%d_%H%M%S).json"
-if [[ "${MANALOOM_BATTLE_RULES_APPLY_PG:-0}" == "1" ]]; then
+if [[ "$BATTLE_RULES_APPLY_PG_REQUESTED" == "1" ]]; then
   python3 "$SCRIPT_DIR/sync_battle_card_rules_pg.py" \
     --sqlite-db "$MANALOOM_KNOWLEDGE_DB" \
     --apply-pg \
@@ -102,7 +108,14 @@ python3 "$SCRIPT_DIR/master_optimizer_loop.py" \
   --preflight \
   --report | tee "$preflight_log"
 
-latest_report="$(ls -1t "$REPORT_DIR"/master_optimizer_preflight_*.md 2>/dev/null | head -1 || true)"
+latest_report=""
+shopt -s nullglob
+for candidate in "$REPORT_DIR"/master_optimizer_preflight_*.md; do
+  if [[ -z "$latest_report" || "$candidate" -nt "$latest_report" ]]; then
+    latest_report="$candidate"
+  fi
+done
+shopt -u nullglob
 if [[ -n "$latest_report" ]]; then
   cp "$latest_report" "$ARTIFACT_DIR/latest_master_optimizer_preflight.md"
 fi

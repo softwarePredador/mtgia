@@ -250,6 +250,13 @@ def infer_roles_from_text(row: Mapping[str, Any]) -> set[str]:
 def card_roles(row: Mapping[str, Any]) -> tuple[set[str], str]:
     roles = role_from_raw_tags(row)
     inferred = infer_roles_from_text(row)
+    # Mana-producing lands belong to the mana-base lane, not the nonland ramp
+    # floor. Persisted legacy tags currently mark many ordinary lands as ramp;
+    # allowing that tag through makes a 34-land deck look like it has 50+ ramp
+    # pieces and destroys same-lane cut pressure.
+    if "land" in str(row.get("type_line") or "").lower():
+        roles.discard("ramp")
+        inferred.discard("ramp")
     if roles:
         return roles | inferred, "tag_plus_text" if inferred - roles else "tag"
     if inferred:
@@ -272,6 +279,46 @@ def load_role_rows(conn: sqlite3.Connection) -> list[dict[str, Any]]:
         """
     ):
         rows.append(dict(row))
+    return rows
+
+
+def load_postgres_role_rows(deck_ids: list[str]) -> list[dict[str, Any]]:
+    """Load product-deck roles from the one-row-per-card PG snapshot.
+
+    PostgreSQL deck UUIDs are not present in the Hermes SQLite lab database.
+    Reading product decks from PG while looking up their roles only in SQLite
+    used to turn missing cross-store data into a deck full of zero role counts.
+    Keep the product lane on PostgreSQL and use the canonical intelligence
+    snapshot so multi-row function/rule tables cannot fan out deck quantities.
+    """
+    if not deck_ids:
+        return []
+
+    from db_helper import connect
+
+    rows: list[dict[str, Any]] = []
+    with connect() as conn:
+        with conn.cursor() as cur:
+            cur.execute(
+                """
+                SELECT
+                  dc.deck_id::text AS deck_id,
+                  COALESCE(cis.card_name, c.name, '') AS card_name,
+                  COALESCE(dc.quantity, 1) AS quantity,
+                  ''::text AS functional_tag,
+                  COALESCE(cis.function_tags, ARRAY[]::text[]) AS functional_tags_json,
+                  COALESCE(cis.type_line, c.type_line, '') AS type_line,
+                  COALESCE(cis.oracle_text, c.oracle_text, '') AS oracle_text
+                FROM deck_cards dc
+                LEFT JOIN cards c ON c.id = dc.card_id
+                LEFT JOIN card_intelligence_snapshot cis ON cis.card_id = dc.card_id
+                WHERE dc.deck_id = ANY(%s::uuid[])
+                ORDER BY dc.deck_id, COALESCE(cis.card_name, c.name, '')
+                """,
+                (deck_ids,),
+            )
+            columns = [description[0] for description in cur.description]
+            rows.extend(dict(zip(columns, raw)) for raw in cur.fetchall())
     return rows
 
 
@@ -374,7 +421,15 @@ def core_repair_plan(role_rows: list[dict[str, Any]], unknown_count: int) -> dic
     }
 
 
-def deck_core_status(*, shape_status: str, total_cards: int, role_rows: list[dict[str, Any]], unknown_count: int) -> str:
+def deck_core_status(
+    *,
+    shape_status: str,
+    total_cards: int,
+    role_rows: list[dict[str, Any]],
+    unknown_count: int,
+    role_data_available: bool = True,
+    role_data_quantity_matches: bool = True,
+) -> str:
     critical_gaps = [
         row for row in role_rows if row["status"] == "below_floor" and row["severity"] == "critical"
     ]
@@ -382,6 +437,10 @@ def deck_core_status(*, shape_status: str, total_cards: int, role_rows: list[dic
         return "structure_blocked"
     if total_cards != 100:
         return "quantity_blocked"
+    if not role_data_available:
+        return "role_data_unavailable"
+    if not role_data_quantity_matches:
+        return "role_data_incomplete"
     if unknown_count > 15:
         return "role_data_incomplete"
     if critical_gaps:
@@ -389,6 +448,16 @@ def deck_core_status(*, shape_status: str, total_cards: int, role_rows: list[dic
     if any(row["status"] != "in_range" for row in role_rows):
         return "core_review_ready"
     return "core_ready_for_commander_profile"
+
+
+def deferred_repair_plan(first_action: str, reason: str) -> dict[str, Any]:
+    return {
+        "first_action": first_action,
+        "missing_role_slots": [],
+        "excess_role_slots": [],
+        "unknown_count": 0,
+        "mutation_policy": reason,
+    }
 
 
 def build_report(
@@ -403,29 +472,72 @@ def build_report(
         skip_hermes=skip_hermes,
     )
     matrix_by_deck = {str(row["deck_id"]): row for row in deck_rows}
-    with sqlite3.connect(sqlite_db) as conn:
-        conn.row_factory = sqlite3.Row
-        role_by_deck = role_counts_by_deck(load_role_rows(conn))
+    role_rows: list[dict[str, Any]] = []
+    if not skip_hermes and sqlite_db.exists():
+        conn = sqlite3.connect(sqlite_db)
+        try:
+            conn.row_factory = sqlite3.Row
+            role_rows.extend(load_role_rows(conn))
+        finally:
+            conn.close()
+    if not skip_postgres:
+        postgres_deck_ids = sorted(
+            str(row["deck_id"])
+            for row in deck_rows
+            if row.get("source") == "postgres"
+        )
+        role_rows.extend(load_postgres_role_rows(postgres_deck_ids))
+    role_by_deck = role_counts_by_deck(role_rows)
 
     audited_rows: list[dict[str, Any]] = []
     for deck_id, matrix in sorted(
         matrix_by_deck.items(),
         key=lambda item: (0, int(item[0])) if item[0].isdigit() else (1, item[0]),
     ):
+        role_data_available = deck_id in role_by_deck
         role_data = role_by_deck.get(deck_id, {})
         counts = Counter(role_data.get("role_counts") or {})
-        total_cards = int(role_data.get("total_cards") or matrix.get("quantity") or 0)
-        role_band_rows = [band_status(role, int(counts.get(role) or 0)) for role in ROLE_ORDER]
-        repair_plan = core_repair_plan(
-            role_band_rows,
-            unknown_count=int(counts.get("unknown") or 0),
+        expected_quantity = int(matrix.get("quantity") or 0)
+        measured_quantity = int(role_data.get("total_cards") or 0)
+        total_cards = measured_quantity if role_data_available else expected_quantity
+        role_data_quantity_matches = role_data_available and measured_quantity == expected_quantity
+        role_band_rows = (
+            [band_status(role, int(counts.get(role) or 0)) for role in ROLE_ORDER]
+            if role_data_available
+            else []
         )
         status = deck_core_status(
             shape_status=str(matrix.get("status") or ""),
             total_cards=total_cards,
             role_rows=role_band_rows,
             unknown_count=int(counts.get("unknown") or 0),
+            role_data_available=role_data_available,
+            role_data_quantity_matches=role_data_quantity_matches,
         )
+        if status in {
+            "core_role_gap",
+            "core_review_ready",
+            "core_ready_for_commander_profile",
+        }:
+            repair_plan = core_repair_plan(
+                role_band_rows,
+                unknown_count=int(counts.get("unknown") or 0),
+            )
+        elif status == "role_data_unavailable":
+            repair_plan = deferred_repair_plan(
+                "load_product_role_data_from_postgres",
+                "missing_role_data_is_not_zero;load_product_truth_before_role_hypotheses",
+            )
+        elif status == "role_data_incomplete":
+            repair_plan = deferred_repair_plan(
+                "complete_role_data_before_role_hypotheses",
+                "incomplete_role_data_must_not_create_missing_or_excess_slot_hypotheses",
+            )
+        else:
+            repair_plan = deferred_repair_plan(
+                "repair_structure_before_core_role_hypotheses",
+                "structure_blockers_must_not_inflate_core_role_gap_totals",
+            )
         audited_rows.append(
             {
                 "deck_id": deck_id,
@@ -435,7 +547,21 @@ def build_report(
                 "shape_status": matrix.get("status"),
                 "core_status": status,
                 "total_cards": total_cards,
-                "role_counts": {role: int(counts.get(role) or 0) for role in [*ROLE_ORDER, "unknown"]},
+                "expected_quantity": expected_quantity,
+                "role_data_quantity": measured_quantity if role_data_available else None,
+                "role_data_available": role_data_available,
+                "role_data_quantity_matches": role_data_quantity_matches,
+                "role_data_source": (
+                    "postgres_card_intelligence_snapshot"
+                    if role_data_available and matrix.get("source") == "postgres"
+                    else "hermes_sqlite_deck_cards"
+                    if role_data_available
+                    else "unavailable"
+                ),
+                "role_counts": {
+                    role: int(counts.get(role) or 0) if role_data_available else None
+                    for role in [*ROLE_ORDER, "unknown"]
+                },
                 "role_bands": role_band_rows,
                 "core_repair_plan": repair_plan,
                 "classification_source_counts": dict(role_data.get("classification_source_counts") or {}),
@@ -445,6 +571,14 @@ def build_report(
         )
 
     status_counts = Counter(row["core_status"] for row in audited_rows)
+    role_data_unavailable_count = sum(
+        1 for row in audited_rows if not row["role_data_available"]
+    )
+    role_data_quantity_mismatch_count = sum(
+        1
+        for row in audited_rows
+        if row["role_data_available"] and not row["role_data_quantity_matches"]
+    )
     commander_counts = Counter(row["commander"] for row in audited_rows if row.get("commander"))
     missing_role_slot_totals: Counter[str] = Counter()
     excess_role_slot_totals: Counter[str] = Counter()
@@ -472,6 +606,7 @@ def build_report(
             "skip_hermes": skip_hermes,
             "role_bands": CORE_ROLE_BANDS,
             "role_source_policy": "structured_tags_first_then_oracle_text_diagnostic_fallback",
+            "land_ramp_policy": "lands_count_in_mana_base_not_nonland_ramp_even_when_legacy_tags_include_ramp",
             "lorehold_607_role": "benchmark_regression_only_not_global_template",
         },
         "summary": {
@@ -480,6 +615,8 @@ def build_report(
             "status_counts": dict(sorted(status_counts.items())),
             "core_ready_count": status_counts.get("core_ready_for_commander_profile", 0),
             "role_data_incomplete_count": status_counts.get("role_data_incomplete", 0),
+            "role_data_unavailable_count": role_data_unavailable_count,
+            "role_data_quantity_mismatch_count": role_data_quantity_mismatch_count,
             "core_role_gap_count": status_counts.get("core_role_gap", 0),
             "structure_blocked_count": status_counts.get("structure_blocked", 0),
             "missing_role_slot_totals": dict(sorted(missing_role_slot_totals.items())),
@@ -500,6 +637,8 @@ def next_gate(status: str) -> str:
         return "repair_core_role_floor_before_strategy_matrix"
     if status == "role_data_incomplete":
         return "backfill_functional_roles_or_verify_oracle_text_inference"
+    if status == "role_data_unavailable":
+        return "load_product_role_data_from_postgres_before_core_quality"
     if status == "quantity_blocked":
         return "repair_deck_quantity_before_core_quality"
     return "repair_structure_before_core_quality"
@@ -570,20 +709,21 @@ def write_markdown(payload: dict[str, Any], path: Path) -> None:
     )
     for row in payload["decks"]:
         counts = row["role_counts"]
+        display_count = lambda role: counts[role] if counts[role] is not None else "-"
         lines.append(
             "| `{deck}` | `{commander}` | `{scope}` | `{status}` | {land} | {ramp} | {draw} | {removal} | {wipe} | {protection} | {wincon} | {unknown} | `{next_gate}` |".format(
                 deck=f"{row['deck_name']} ({row['deck_id']})".replace("|", "/"),
                 commander=str(row.get("commander") or "").replace("|", "/"),
                 scope=row["scope"],
                 status=row["core_status"],
-                land=counts["land"],
-                ramp=counts["ramp"],
-                draw=counts["draw"],
-                removal=counts["removal"],
-                wipe=counts["board_wipe"],
-                protection=counts["protection"],
-                wincon=counts["wincon"],
-                unknown=counts["unknown"],
+                land=display_count("land"),
+                ramp=display_count("ramp"),
+                draw=display_count("draw"),
+                removal=display_count("removal"),
+                wipe=display_count("board_wipe"),
+                protection=display_count("protection"),
+                wincon=display_count("wincon"),
+                unknown=display_count("unknown"),
                 next_gate=row["next_gate"],
             )
         )
@@ -595,6 +735,8 @@ def write_markdown(payload: dict[str, Any], path: Path) -> None:
             "- This report is read-only and does not promote decks.",
             "- Role bands are generic Commander floors; commander-specific profiles may adjust them later.",
             "- Structured tags win; Oracle text inference is diagnostic fallback for untagged lab decks.",
+            "- Product-deck roles come from PostgreSQL `deck_cards -> card_intelligence_snapshot`; Hermes roles are used only for Hermes deck IDs.",
+            "- Missing role data is reported as unavailable, never converted into zero role counts or repair pressure.",
             "- Core repair plans are not mutation permits; missing critical floors come before source lanes, while excess roles are review signals.",
             "- Deck 607 is treated as a benchmark/regression deck, not a global template.",
             "",

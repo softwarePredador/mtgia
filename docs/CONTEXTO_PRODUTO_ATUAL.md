@@ -1,8 +1,56 @@
 # Contexto Produto Atual
 
-> Fonte de verdade operacional para os proximos pedidos do `mtgia`.
-> Sempre consultar este arquivo antes de ampliar escopo, mudar fluxo core ou reorganizar prioridades.
-> Se alguma decisao estrutural mudar, este documento deve ser atualizado primeiro.
+> Fonte de verdade de prioridade do `mtgia`. O método de validação e conclusão
+> fica em `docs/MANALOOM_E2E_RELEASE_CONTRACT.md`.
+
+## Estado operacional vigente — 2026-07-15
+
+- produto ativo: app Flutter em `app/`, API Dart Frog em `server/` e serviços
+  de battle em `services/`;
+- foco dominante: jornada Commander
+  `generate/import -> analyze -> optimize/rebuild -> apply -> validate`, com
+  battle e aprendizado como evidência tipada, não como atalho de promoção;
+- PostgreSQL é a verdade de produto; Hermes/SQLite é cache operacional;
+- o gate `full` é determinístico e exclui tags live;
+- o gate integrado é `./scripts/quality_gate.sh e2e`, com resumo Markdown e
+  JSON por etapa;
+- live, device e corpus mutante são perfis separados e exigem pré-requisitos e
+  confirmação textual; não entram automaticamente em um `PASS` local;
+- a base técnica local e de dados está verde: no perfil mutável isolado, 12
+  etapas E2E passaram, 3 perfis live foram pulados e não houve
+  falha/bloqueio; qualidade de produto continua aberta nos decks abaixo;
+- as migrations 033, 034 e 035, rulings, Spellbook, famílias funcionais,
+  cleanup de fixtures e reparo legal do Goblins foram aplicados com backup,
+  rollback e postcheck; o status é 35/35 migrations;
+- PG869, PG870, PG871 e PG872 foram revalidados no PostgreSQL novo; PG873 está
+  apenas preparado e não deve ser tratado como aplicado;
+- battle tem 0 residual convencional acionável no snapshot final; produto tem
+  7/16 decks estruturalmente prontos e 9 skeletons aguardando intenção do dono;
+- a API e o app web autenticado em `/app` estão publicados no servidor novo;
+  o APK Android assinado está publicado com checksum validado e foi executado
+  em aparelho físico;
+- a distribuição iOS nativa continua bloqueada exclusivamente pela ausência de
+  uma equipe Apple Developer/App Store Connect da ManaLoom para
+  `com.mtgia.mtgApp`;
+- o fechamento e a evidência ficam em
+  `docs/qa/MANALOOM_E2E_PROJECT_CLOSURE_2026-07-15.md` e
+  `docs/qa/MANALOOM_BATTLE_DECKBUILDER_DEFINITIVE_2026-07-15.md`.
+
+## Próxima ação oficial
+
+1. decidir excluir ou reconstruir os 9 skeletons de produto;
+2. obter replay de exposição natural para os 4 pacotes candidatos bloqueados;
+3. revisar os 37 deltas upstream de XMage/Forge antes de mover pins;
+4. repetir os gates live sobre cada novo SHA candidato antes de promovê-lo;
+5. configurar a equipe Apple da ManaLoom e assinar/publicar o build iOS.
+
+## Histórico acumulado anterior
+
+O conteúdo abaixo preserva decisões e andamento de março a junho de 2026. Ele
+é evidência histórica e não redefine prioridade, status ou próximo passo acima.
+
+<details>
+<summary>Abrir histórico acumulado</summary>
 
 ## Regra de precedencia documental
 
@@ -73,7 +121,9 @@ Progresso atual documentado da Sprint 1:
 - `server/lib/ai/optimize_request_support.dart`: novo modulo com `245` linhas
 - gate recorrente do corpus estavel criado em `scripts/quality_gate_resolution_corpus.sh`
 - wrapper geral adicionado em `scripts/quality_gate.sh resolution`
-- `server/bin/bootstrap_resolution_corpus_decks.dart` agora aceita seeds pareados via `A + B`
+- o bootstrap legado do corpus de resolução passou a aceitar seeds pareados via
+  `A + B`; esse entrypoint foi posteriormente aposentado e não faz parte da
+  superfície ativa atual
 - casos dirigidos estabilizados e promovidos ao corpus estavel:
   - `Jodah, the Unifier` -> `safe_no_change`
   - `Kozilek, the Great Distortion` -> `rebuild_guided`
@@ -580,3 +630,5 @@ Auditoria visual complementar:
 - conclusao principal: a paleta base é boa, mas algumas telas ainda gastam cor demais
 - o primeiro alvo recomendado de limpeza visual continua sendo o core de deck, especialmente o estado vazio/inicial de `deck_details`
 - regra oficial nova: tela deve ser aceita como composição de produto em viewport real, não apenas como soma de componentes corretos em isolamento
+
+</details>

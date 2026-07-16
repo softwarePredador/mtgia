@@ -1,20 +1,36 @@
 import 'dart:convert';
+import 'dart:io';
+
 import 'package:http/http.dart' as http;
 import 'package:meta/meta.dart' show visibleForTesting;
+
 import '../logger.dart';
 
 /// Serviço para integração com EDHREC JSON API
 ///
-/// EDHREC é a maior base de dados de Commander, com estatísticas reais
-/// de milhões de decklists. Usar esses dados garante que as sugestões
-/// sejam baseadas em cartas que REALMENTE funcionam juntas.
+/// EDHREC fornece evidência agregada de decklists públicas. Esses sinais podem
+/// priorizar hipóteses de Commander, mas não provam qualidade, sinergia
+/// executável, legalidade ou que uma carta pertença a um deck específico.
+///
+/// A coleta de rede é fail-closed e só pode ser habilitada por uma flag de
+/// autorização explícita. Sem a flag, nem resultados previamente em cache são
+/// expostos por este serviço.
 ///
 /// Endpoint principal: https://json.edhrec.com/pages/commanders/{slug}.json
 class EdhrecService {
+  static const automatedCollectionAuthorizationFlag =
+      'MANALOOM_EDHREC_AUTOMATED_COLLECTION_AUTHORIZED';
   static const _baseUrl = 'https://json.edhrec.com';
   static const _cacheTimeout = Duration(
     hours: 6,
   ); // Cache para evitar requests excessivos
+
+  EdhrecService({Map<String, String>? environment, http.Client? client})
+    : _environment = environment ?? Platform.environment,
+      _client = client;
+
+  final Map<String, String> _environment;
+  final http.Client? _client;
 
   // Cache em memória para evitar requests repetidos no mesmo ciclo de vida do server
   static final Map<String, _CachedResult> _cache = {};
@@ -26,15 +42,30 @@ class EdhrecService {
     _averageDeckCache.clear();
   }
 
+  /// Indica se a coleta automatizada foi explicitamente autorizada.
+  ///
+  /// Ausência, valor vazio ou qualquer valor diferente dos truthy suportados
+  /// mantém o serviço desabilitado.
+  bool get automatedCollectionAuthorized {
+    final value =
+        _environment[automatedCollectionAuthorizationFlag]
+            ?.trim()
+            .toLowerCase();
+    return value == '1' || value == 'true' || value == 'yes' || value == 'on';
+  }
+
   /// Busca os dados de co-ocorrência para um comandante específico.
   ///
   /// Retorna uma lista de cartas ordenadas por synergy score do EDHREC.
   /// Cada carta inclui:
   /// - name: Nome da carta
   /// - synergy: Score de sinergia (-1.0 a 1.0, onde 1.0 = só aparece neste deck)
-  /// - inclusion: % de decks com este commander que usam esta carta
+  /// - inclusion: contagem absoluta de decks com esta carta
+  /// - inclusionRate: fração de decks elegíveis que incluem esta carta
   /// - label: Categoria da carta (ramp, draw, removal, etc)
   Future<EdhrecCommanderData?> fetchCommanderData(String commanderName) async {
+    if (!_canCollect('commander data')) return null;
+
     final slug = _toSlug(commanderName);
 
     // Check cache primeiro
@@ -48,18 +79,16 @@ class EdhrecService {
     Log.i('EDHREC fetch: $url');
 
     try {
-      final response = await http
-          .get(
-            Uri.parse(url),
-            headers: {
-              'User-Agent':
-                  'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36',
-              'Accept': 'application/json, text/plain, */*',
-              'Accept-Language': 'en-US,en;q=0.9',
-              'Referer': 'https://edhrec.com/',
-            },
-          )
-          .timeout(const Duration(seconds: 10));
+      final response = await _get(
+        Uri.parse(url),
+        headers: {
+          'User-Agent':
+              'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36',
+          'Accept': 'application/json, text/plain, */*',
+          'Accept-Language': 'en-US,en;q=0.9',
+          'Referer': 'https://edhrec.com/',
+        },
+      ).timeout(const Duration(seconds: 10));
 
       if (response.statusCode == 200) {
         final json = jsonDecode(response.body) as Map<String, dynamic>;
@@ -89,6 +118,8 @@ class EdhrecService {
   Future<EdhrecAverageDeckData?> fetchAverageDeckData(
     String commanderName,
   ) async {
+    if (!_canCollect('average-deck data')) return null;
+
     final slug = _toSlug(commanderName);
 
     final cached = _averageDeckCache[slug];
@@ -101,18 +132,16 @@ class EdhrecService {
     Log.i('EDHREC average-deck fetch: $url');
 
     try {
-      final response = await http
-          .get(
-            Uri.parse(url),
-            headers: {
-              'User-Agent':
-                  'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36',
-              'Accept': 'application/json, text/plain, */*',
-              'Accept-Language': 'en-US,en;q=0.9',
-              'Referer': 'https://edhrec.com/',
-            },
-          )
-          .timeout(const Duration(seconds: 10));
+      final response = await _get(
+        Uri.parse(url),
+        headers: {
+          'User-Agent':
+              'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36',
+          'Accept': 'application/json, text/plain, */*',
+          'Accept-Language': 'en-US,en;q=0.9',
+          'Referer': 'https://edhrec.com/',
+        },
+      ).timeout(const Duration(seconds: 10));
 
       if (response.statusCode == 200) {
         final json = jsonDecode(response.body) as Map<String, dynamic>;
@@ -138,6 +167,21 @@ class EdhrecService {
       Log.e('EDHREC average-deck request failed: $e');
       return null;
     }
+  }
+
+  bool _canCollect(String operation) {
+    if (automatedCollectionAuthorized) return true;
+    Log.w(
+      'EDHREC $operation blocked (fail-closed): set '
+      '$automatedCollectionAuthorizationFlag only after explicit authorization.',
+    );
+    return false;
+  }
+
+  Future<http.Response> _get(Uri uri, {Map<String, String>? headers}) {
+    final client = _client;
+    if (client != null) return client.get(uri, headers: headers);
+    return http.get(uri, headers: headers);
   }
 
   /// Converte nome do commander para slug do EDHREC
@@ -264,9 +308,10 @@ class EdhrecService {
     final articles = <Map<String, dynamic>>[];
     for (final article in articlesRaw.take(30)) {
       if (article is! Map) continue;
-      final authorMap = article['author'] is Map
-          ? (article['author'] as Map).cast<String, dynamic>()
-          : const <String, dynamic>{};
+      final authorMap =
+          article['author'] is Map
+              ? (article['author'] as Map).cast<String, dynamic>()
+              : const <String, dynamic>{};
       articles.add({
         'title': article['value']?.toString() ?? '',
         'date': article['date']?.toString() ?? '',
@@ -397,17 +442,20 @@ class EdhrecService {
         .toList();
   }
 
-  /// Score de "encaixe" de uma carta no deck.
+  /// Heurística ManaLoom de "encaixe" de uma carta no deck.
   /// Retorna um valor 0.0-1.0 baseado em:
   /// - synergy: Quanto maior, mais específico para este commander
-  /// - inclusionRate: Quanto maior, mais "provada" a carta é neste commander
+  /// - inclusionRate: Quanto maior, mais adotada a carta é neste commander
   ///
-  /// Fórmula: (synergy + 1) / 2 * 0.6 + inclusionRate * 0.4
-  /// Isso equilibra cartas "sinérgicas mas nichadas" com "staples universais"
+  /// Fórmula interna 60/40:
+  /// `(synergy + 1) / 2 * 0.6 + inclusionRate * 0.4`.
+  ///
+  /// Este valor não é um score oficial do EDHREC nem prova de qualidade ou de
+  /// sinergia executável; serve apenas para ordenar evidência para revisão.
   double calculateFitScore(EdhrecCard card) {
     // Synergy vai de -1 a 1, normalizamos para 0-1
     final normalizedSynergy = (card.synergy + 1) / 2;
-    // Combinamos 60% synergy, 40% popularidade
+    // Heurística ManaLoom: 60% synergy e 40% taxa de inclusão.
     return normalizedSynergy * 0.6 + card.inclusionRate * 0.4;
   }
 

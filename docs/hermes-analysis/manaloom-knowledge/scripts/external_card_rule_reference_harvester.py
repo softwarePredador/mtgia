@@ -28,11 +28,69 @@ import xmage_to_manaloom_effect_hints
 
 
 SCRIPT_DIR = Path(__file__).resolve().parent
+REPO_ROOT = SCRIPT_DIR.parents[3]
 DEFAULT_DB = SCRIPT_DIR / "knowledge.db"
 DEFAULT_REPORT_DIR = SCRIPT_DIR.parent.parent / "master_optimizer_reports"
 SCRYFALL_NAMED_URL = "https://api.scryfall.com/cards/named"
-XMAGE_RAW_BASE = "https://raw.githubusercontent.com/magefree/mage/master/Mage.Sets/src/mage/cards"
-FORGE_RAW_BASE = "https://raw.githubusercontent.com/Card-Forge/forge/master/forge-gui/res/cardsfolder"
+
+
+def canonical_engine_pin(relative_path: str) -> str:
+    """Read a runtime engine pin without falling back to an upstream branch."""
+
+    pin_path = REPO_ROOT / relative_path
+    try:
+        value = pin_path.read_text(encoding="utf-8").strip()
+    except OSError as exc:
+        raise RuntimeError(f"cannot read canonical engine pin: {relative_path}") from exc
+    if not re.fullmatch(r"[0-9a-f]{40}", value):
+        raise RuntimeError(f"invalid canonical engine pin: {relative_path}")
+    return value
+
+
+XMAGE_PIN = canonical_engine_pin("services/xmage-sidecar/XMAGE_COMMIT")
+FORGE_PIN = canonical_engine_pin("services/forge-sidecar/FORGE_COMMIT")
+XMAGE_RAW_BASE = (
+    f"https://raw.githubusercontent.com/magefree/mage/{XMAGE_PIN}/"
+    "Mage.Sets/src/mage/cards"
+)
+FORGE_RAW_BASE = (
+    f"https://raw.githubusercontent.com/Card-Forge/forge/{FORGE_PIN}/"
+    "forge-gui/res/cardsfolder"
+)
+
+
+def validate_xmage_local_root_pin(xmage_root: Path) -> dict[str, Any]:
+    """Reject local source trees that cannot prove the canonical runtime SHA."""
+
+    try:
+        completed = subprocess.run(
+            ["git", "-C", str(xmage_root), "rev-parse", "HEAD"],
+            check=False,
+            capture_output=True,
+            text=True,
+            timeout=10,
+        )
+    except (OSError, subprocess.SubprocessError) as exc:
+        return {
+            "status": "fail",
+            "expected_pin": XMAGE_PIN,
+            "observed_pin": None,
+            "error": f"git_revision_check_failed: {exc.__class__.__name__}",
+        }
+    observed = completed.stdout.strip() if completed.returncode == 0 else ""
+    if observed != XMAGE_PIN:
+        return {
+            "status": "fail",
+            "expected_pin": XMAGE_PIN,
+            "observed_pin": observed or None,
+            "error": "local_xmage_root_is_unpinned_or_not_at_runtime_pin",
+        }
+    return {
+        "status": "pass",
+        "expected_pin": XMAGE_PIN,
+        "observed_pin": observed,
+        "error": None,
+    }
 
 
 def utc_now() -> str:
@@ -497,6 +555,16 @@ def build_harvest_report(
     xmage_root: Path | None = None,
     card_names: set[str] | None = None,
 ) -> dict[str, Any]:
+    local_root_pin_contract = (
+        validate_xmage_local_root_pin(xmage_root)
+        if xmage_root
+        else {"status": "not_requested", "expected_pin": XMAGE_PIN}
+    )
+    if local_root_pin_contract["status"] == "fail":
+        raise ValueError(
+            "--xmage-root must be a Git checkout at canonical XMage pin "
+            f"{XMAGE_PIN}; omit it to use the pinned official raw source"
+        )
     xmage_class_index = xmage_local_rule_indexer.build_card_class_index(xmage_root) if xmage_root else None
     cards = [
         build_packet_for_card(
@@ -521,8 +589,12 @@ def build_harvest_report(
         "external_sources": {
             "scryfall": SCRYFALL_NAMED_URL,
             "xmage": XMAGE_RAW_BASE,
+            "xmage_runtime_pin": XMAGE_PIN,
             "xmage_local_root": str(xmage_root) if xmage_root else None,
+            "xmage_local_root_pin_contract": local_root_pin_contract,
             "forge": FORGE_RAW_BASE,
+            "forge_runtime_pin": FORGE_PIN,
+            "upstream_head_allowed": False,
         },
         "cards": cards,
     }
@@ -621,13 +693,16 @@ def main() -> int:
     else:
         source_report = load_report_from_sqlite(Path(args.sqlite_db), args.deck_id)
     xmage_root = Path(args.xmage_root) if args.xmage_root else None
-    report = build_harvest_report(
-        source_report,
-        limit=args.limit,
-        offline=args.offline,
-        xmage_root=xmage_root,
-        card_names=set(args.card_name or []),
-    )
+    try:
+        report = build_harvest_report(
+            source_report,
+            limit=args.limit,
+            offline=args.offline,
+            xmage_root=xmage_root,
+            card_names=set(args.card_name or []),
+        )
+    except ValueError as exc:
+        raise SystemExit(str(exc)) from exc
     timestamp = datetime.now(timezone.utc).strftime("%Y%m%d_%H%M%S")
     deck_part = f"_deck{source_report.get('deck_id')}" if source_report.get("deck_id") is not None else ""
     stem = f"external_card_rule_reference_harvest{deck_part}_{timestamp}"

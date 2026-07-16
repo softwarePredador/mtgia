@@ -1,0 +1,8 @@
+exclude:
+  # Patrol creates these entrypoints during device/web runs. They import
+  # package:test_api as generated implementation detail, not an app contract.
+  - test_bundle.dart
+  - patrol_test/test_bundle.dart
+
+ignore:
+  - manaloom_lints

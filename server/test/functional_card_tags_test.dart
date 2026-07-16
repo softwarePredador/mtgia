@@ -115,12 +115,13 @@ void main() {
       };
 
       for (final entry in cases.entries) {
-        final tags = inferFunctionalCardTags(
-          name: entry.key,
-          typeLine: entry.value['type_line']! as String,
-          oracleText: entry.value['oracle_text']! as String,
-          manaCost: entry.value['mana_cost']! as String,
-        ).map((tag) => tag.tag).toSet();
+        final tags =
+            inferFunctionalCardTags(
+              name: entry.key,
+              typeLine: entry.value['type_line']! as String,
+              oracleText: entry.value['oracle_text']! as String,
+              manaCost: entry.value['mana_cost']! as String,
+            ).map((tag) => tag.tag).toSet();
 
         expect(
           tags,
@@ -131,147 +132,318 @@ void main() {
     });
 
     test('avoids known false positives for owner-target and ETB hate text', () {
-      final ephemerateTags = inferFunctionalCardTags(
-        name: 'Ephemerate',
-        typeLine: 'Instant',
-        oracleText:
-            'Exile target creature you control, then return it to the battlefield under its owner\'s control.',
-        manaCost: '{W}',
-      ).map((tag) => tag.tag).toSet();
+      final ephemerateTags =
+          inferFunctionalCardTags(
+            name: 'Ephemerate',
+            typeLine: 'Instant',
+            oracleText:
+                'Exile target creature you control, then return it to the battlefield under its owner\'s control.',
+            manaCost: '{W}',
+          ).map((tag) => tag.tag).toSet();
 
       expect(ephemerateTags, isNot(contains('removal')));
 
-      final hushwingTags = inferFunctionalCardTags(
-        name: 'Hushwing Gryff',
-        typeLine: 'Creature - Hippogriff',
-        oracleText:
-            'Creatures entering the battlefield don\'t cause abilities to trigger.',
-        manaCost: '{2}{W}',
-      ).map((tag) => tag.tag).toSet();
+      final hushwingTags =
+          inferFunctionalCardTags(
+            name: 'Hushwing Gryff',
+            typeLine: 'Creature - Hippogriff',
+            oracleText:
+                'Creatures entering the battlefield don\'t cause abilities to trigger.',
+            manaCost: '{2}{W}',
+          ).map((tag) => tag.tag).toSet();
 
       expect(hushwingTags, isNot(contains('etb')));
 
-      final natureLoreTags = inferFunctionalCardTags(
-        name: 'Nature\'s Lore',
-        typeLine: 'Sorcery',
-        oracleText:
-            'Search your library for a Forest card, put that card onto the battlefield, then shuffle.',
-        manaCost: '{1}{G}',
-      ).map((tag) => tag.tag).toSet();
+      final natureLoreTags =
+          inferFunctionalCardTags(
+            name: 'Nature\'s Lore',
+            typeLine: 'Sorcery',
+            oracleText:
+                'Search your library for a Forest card, put that card onto the battlefield, then shuffle.',
+            manaCost: '{1}{G}',
+          ).map((tag) => tag.tag).toSet();
 
       expect(natureLoreTags, contains('ramp'));
       expect(natureLoreTags, isNot(contains('tutor')));
       expect(natureLoreTags, isNot(contains('enabler')));
 
-      final erebosTags = inferFunctionalCardTags(
-        name: 'Erebos, God of the Dead',
-        typeLine: 'Legendary Enchantment Creature - God',
+      final bloodstainedMireTags =
+          inferFunctionalCardTags(
+            name: 'Bloodstained Mire',
+            typeLine: 'Land',
+            oracleText:
+                '{T}, Pay 1 life, Sacrifice this land: Search your library for a Swamp or Mountain card, put it onto the battlefield, then shuffle.',
+          ).map((tag) => tag.tag).toSet();
+
+      expect(bloodstainedMireTags, contains('land'));
+      expect(bloodstainedMireTags, isNot(contains('ramp')));
+
+      final lotusPetalTags =
+          inferFunctionalCardTags(
+            name: 'Lotus Petal',
+            typeLine: 'Artifact',
+            oracleText:
+                '{T}, Sacrifice this artifact: Add one mana of any color.',
+            manaCost: '{0}',
+          ).map((tag) => tag.tag).toSet();
+
+      expect(lotusPetalTags, contains('ramp'));
+      expect(lotusPetalTags, isNot(contains('sacrifice_outlet')));
+
+      final bloodstainedSemantic = inferSemanticCardAnalysisV2(
+        name: 'Bloodstained Mire',
+        typeLine: 'Land',
         oracleText:
-            'Indestructible. Your opponents can\'t gain life. Pay 2 life: Draw a card.',
-        manaCost: '{3}{B}',
-      ).map((tag) => tag.tag).toSet();
+            '{T}, Pay 1 life, Sacrifice this land: Search your library for a Swamp or Mountain card, put it onto the battlefield, then shuffle.',
+      );
+      expect(bloodstainedSemantic.tags.map((tag) => tag.tag), equals(['land']));
+      expect(bloodstainedSemantic.enabler, isFalse);
+      expect(bloodstainedSemantic.explanationReason, 'land_or_mana_source');
+
+      final lotusPetalSemantic = inferSemanticCardAnalysisV2(
+        name: 'Lotus Petal',
+        typeLine: 'Artifact',
+        oracleText: '{T}, Sacrifice this artifact: Add one mana of any color.',
+        manaCost: '{0}',
+      );
+      expect(lotusPetalSemantic.tags.map((tag) => tag.tag), equals(['ramp']));
+      expect(lotusPetalSemantic.enabler, isTrue);
+
+      final erebosTags =
+          inferFunctionalCardTags(
+            name: 'Erebos, God of the Dead',
+            typeLine: 'Legendary Enchantment Creature - God',
+            oracleText:
+                'Indestructible. Your opponents can\'t gain life. Pay 2 life: Draw a card.',
+            manaCost: '{3}{B}',
+          ).map((tag) => tag.tag).toSet();
 
       expect(erebosTags, isNot(contains('lifegain')));
 
-      final arcadesTags = inferFunctionalCardTags(
-        name: 'Arcades, the Strategist',
-        typeLine: 'Legendary Creature - Elder Dragon',
-        oracleText:
-            'Each creature you control with defender assigns combat damage equal to its toughness rather than its power.',
-        manaCost: '{1}{G}{W}{U}',
-      ).map((tag) => tag.tag).toSet();
+      final arcadesTags =
+          inferFunctionalCardTags(
+            name: 'Arcades, the Strategist',
+            typeLine: 'Legendary Creature - Elder Dragon',
+            oracleText:
+                'Each creature you control with defender assigns combat damage equal to its toughness rather than its power.',
+            manaCost: '{1}{G}{W}{U}',
+          ).map((tag) => tag.tag).toSet();
 
       expect(arcadesTags, isNot(contains('board_wipe')));
 
-      final anthemTags = inferFunctionalCardTags(
-        name: 'Glorious Anthem',
-        typeLine: 'Enchantment',
-        oracleText: 'Creatures you control get +1/+1.',
-        manaCost: '{1}{W}{W}',
-      ).map((tag) => tag.tag).toSet();
+      final anthemTags =
+          inferFunctionalCardTags(
+            name: 'Glorious Anthem',
+            typeLine: 'Enchantment',
+            oracleText: 'Creatures you control get +1/+1.',
+            manaCost: '{1}{W}{W}',
+          ).map((tag) => tag.tag).toSet();
 
       expect(anthemTags, isNot(contains('board_wipe')));
     });
 
-    test('keeps protection and wipe positives after mass-audit refinements',
-        () {
-      final wardTags = inferFunctionalCardTags(
-        name: 'Coppercoat Vanguard',
-        typeLine: 'Creature - Human Soldier',
-        oracleText: 'Each other Human you control has ward {1}.',
-        manaCost: '{1}{W}',
-      ).map((tag) => tag.tag).toSet();
+    test('detects external activated sacrifice costs without self/reminder noise', () {
+      final cases = <String, ({String oracle, bool expected})>{
+        'Altar of Dementia': (
+          oracle:
+              'Sacrifice a creature: Target player mills cards equal to the sacrificed creature\'s power.',
+          expected: true,
+        ),
+        'Army Ants': (
+          oracle: '{T}, Sacrifice a land: Destroy target land.',
+          expected: true,
+        ),
+        'Alquist Proft, Master Sleuth': (
+          oracle:
+              'When Alquist Proft enters, investigate. (Create a Clue token. It\'s an artifact with "{2}, Sacrifice this token: Draw a card.")\n{X}{W}{U}{U}, {T}, Sacrifice a Clue: You draw X cards and gain X life.',
+          expected: true,
+        ),
+        'Angel\'s Herald': (
+          oracle:
+              '{2}{W}, {T}, Sacrifice a green creature, a white creature, and a blue creature: Search your library for a card named Empyrial Archangel.',
+          expected: true,
+        ),
+        'Baba Lysaga, Night Witch': (
+          oracle:
+              '{T}, Sacrifice up to three permanents: If there were three or more card types among them, draw three cards.',
+          expected: true,
+        ),
+        'Animal Boneyard': (
+          oracle:
+              'Enchant land\nEnchanted land has "{T}, Sacrifice a creature: You gain life equal to its toughness."',
+          expected: true,
+        ),
+        'Choice Vessel': (
+          oracle: 'Sacrifice this artifact or another artifact: Add {C}{C}.',
+          expected: true,
+        ),
+        'Lotus Petal': (
+          oracle: '{T}, Sacrifice this artifact: Add one mana of any color.',
+          expected: false,
+        ),
+        'Abandoned Outpost': (
+          oracle:
+              '{T}: Add {W}.\n{T}, Sacrifice this land: Add one mana of any color.',
+          expected: false,
+        ),
+        'Arek, False Goldwarden': (
+          oracle:
+              '{3}{W}{B}, {T}, Sacrifice Arek, False Goldwarden: Target opponent loses X life.',
+          expected: false,
+        ),
+        'Adric, Mathematical Genius': (
+          oracle:
+              'Ultimate Sacrifice — {1}{U}, Sacrifice Adric: Counter target activated or triggered ability.',
+          expected: false,
+        ),
+        'A-Haywire Mite': (
+          oracle:
+              '{G}, Sacrifice Haywire Mite: Exile target noncreature artifact or enchantment.',
+          expected: false,
+        ),
+        'Placeholder Vessel': (
+          oracle: '{1}, Sacrifice ~: Draw a card.',
+          expected: false,
+        ),
+        'Ancestors\' Aid': (
+          oracle:
+              'Create a Treasure token. (It\'s an artifact with "{T}, Sacrifice this token: Add one mana of any color.")',
+          expected: false,
+        ),
+        'Apocalypse Demon': (
+          oracle:
+              'At the beginning of your upkeep, tap this creature unless you sacrifice another creature.',
+          expected: false,
+        ),
+        'Ashad, the Lone Cyberman': (
+          oracle:
+              'The first artifact spell you cast each turn has casualty 2. (As you cast it, you may sacrifice a creature with power 2 or greater. When you do, copy it.)',
+          expected: false,
+        ),
+        'Village Rites': (
+          oracle:
+              'As an additional cost to cast this spell, sacrifice a creature. Draw two cards.',
+          expected: false,
+        ),
+        'Alchemist\'s Talent': (
+          oracle:
+              'Treasures you control have "{T}, Sacrifice this artifact: Add two mana of any one color."',
+          expected: false,
+        ),
+      };
+
+      for (final entry in cases.entries) {
+        expect(
+          looksLikeExternalSacrificeOutlet(
+            name: entry.key,
+            oracleText: entry.value.oracle,
+          ),
+          entry.value.expected,
+          reason: entry.key,
+        );
+        final inferred = inferFunctionalCardTags(
+          name: entry.key,
+          typeLine: 'Artifact Creature — Test',
+          oracleText: entry.value.oracle,
+        );
+        final outlet = inferred.where((tag) => tag.tag == 'sacrifice_outlet');
+        expect(outlet.isNotEmpty, entry.value.expected, reason: entry.key);
+        if (entry.value.expected) {
+          expect(
+            outlet.single.evidence,
+            'external_activated_sacrifice_outlet_cost',
+            reason: entry.key,
+          );
+        }
+      }
+    });
+
+    test('keeps protection and wipe positives after mass-audit refinements', () {
+      final wardTags =
+          inferFunctionalCardTags(
+            name: 'Coppercoat Vanguard',
+            typeLine: 'Creature - Human Soldier',
+            oracleText: 'Each other Human you control has ward {1}.',
+            manaCost: '{1}{W}',
+          ).map((tag) => tag.tag).toSet();
 
       expect(wardTags, contains('protection'));
 
-      final blasphemousActTags = inferFunctionalCardTags(
-        name: 'Blasphemous Act',
-        typeLine: 'Sorcery',
-        oracleText:
-            'This spell costs {1} less to cast for each creature on the battlefield. Blasphemous Act deals 13 damage to each creature.',
-        manaCost: '{8}{R}',
-      ).map((tag) => tag.tag).toSet();
+      final blasphemousActTags =
+          inferFunctionalCardTags(
+            name: 'Blasphemous Act',
+            typeLine: 'Sorcery',
+            oracleText:
+                'This spell costs {1} less to cast for each creature on the battlefield. Blasphemous Act deals 13 damage to each creature.',
+            manaCost: '{8}{R}',
+          ).map((tag) => tag.tag).toSet();
 
       expect(blasphemousActTags, contains('board_wipe'));
 
-      final drownTags = inferFunctionalCardTags(
-        name: 'Drown in Sorrow',
-        typeLine: 'Sorcery',
-        oracleText: 'All creatures get -2/-2 until end of turn. Scry 1.',
-        manaCost: '{1}{B}{B}',
-      ).map((tag) => tag.tag).toSet();
+      final drownTags =
+          inferFunctionalCardTags(
+            name: 'Drown in Sorrow',
+            typeLine: 'Sorcery',
+            oracleText: 'All creatures get -2/-2 until end of turn. Scry 1.',
+            manaCost: '{1}{B}{B}',
+          ).map((tag) => tag.tag).toSet();
 
       expect(drownTags, contains('board_wipe'));
     });
 
     test('reduces generic payoff and enabler false positives', () {
-      final blasphemousActTags = inferFunctionalCardTags(
-        name: 'Blasphemous Act',
-        typeLine: 'Sorcery',
-        oracleText:
-            'This spell costs {1} less to cast for each creature on the battlefield. Blasphemous Act deals 13 damage to each creature.',
-        manaCost: '{8}{R}',
-      ).map((tag) => tag.tag).toSet();
+      final blasphemousActTags =
+          inferFunctionalCardTags(
+            name: 'Blasphemous Act',
+            typeLine: 'Sorcery',
+            oracleText:
+                'This spell costs {1} less to cast for each creature on the battlefield. Blasphemous Act deals 13 damage to each creature.',
+            manaCost: '{8}{R}',
+          ).map((tag) => tag.tag).toSet();
 
       expect(blasphemousActTags, contains('board_wipe'));
       expect(blasphemousActTags, isNot(contains('payoff')));
 
-      final glimpseTags = inferFunctionalCardTags(
-        name: 'Glimpse the Unthinkable',
-        typeLine: 'Sorcery',
-        oracleText: 'Target player mills ten cards.',
-        manaCost: '{U}{B}',
-      ).map((tag) => tag.tag).toSet();
+      final glimpseTags =
+          inferFunctionalCardTags(
+            name: 'Glimpse the Unthinkable',
+            typeLine: 'Sorcery',
+            oracleText: 'Target player mills ten cards.',
+            manaCost: '{U}{B}',
+          ).map((tag) => tag.tag).toSet();
 
       expect(glimpseTags, isNot(contains('enabler')));
 
-      final greavesTags = inferFunctionalCardTags(
-        name: 'Lightning Greaves',
-        typeLine: 'Artifact - Equipment',
-        oracleText: 'Equipped creature has haste and shroud. Equip {0}.',
-        manaCost: '{2}',
-      ).map((tag) => tag.tag).toSet();
+      final greavesTags =
+          inferFunctionalCardTags(
+            name: 'Lightning Greaves',
+            typeLine: 'Artifact - Equipment',
+            oracleText: 'Equipped creature has haste and shroud. Equip {0}.',
+            manaCost: '{2}',
+          ).map((tag) => tag.tag).toSet();
 
       expect(greavesTags, containsAll({'enabler', 'protection'}));
 
-      final oneRingTags = inferFunctionalCardTags(
-        name: 'The One Ring',
-        typeLine: 'Legendary Artifact',
-        oracleText:
-            'When The One Ring enters, if you cast it, you gain protection from everything until your next turn. {T}: Put a burden counter on The One Ring, then draw a card for each burden counter on it.',
-        manaCost: '{4}',
-      ).map((tag) => tag.tag).toSet();
+      final oneRingTags =
+          inferFunctionalCardTags(
+            name: 'The One Ring',
+            typeLine: 'Legendary Artifact',
+            oracleText:
+                'When The One Ring enters, if you cast it, you gain protection from everything until your next turn. {T}: Put a burden counter on The One Ring, then draw a card for each burden counter on it.',
+            manaCost: '{4}',
+          ).map((tag) => tag.tag).toSet();
 
       expect(oneRingTags, containsAll({'draw', 'protection'}));
       expect(oneRingTags, isNot(contains('payoff')));
 
-      final impactTremorsTags = inferFunctionalCardTags(
-        name: 'Impact Tremors',
-        typeLine: 'Enchantment',
-        oracleText:
-            'Whenever a creature enters the battlefield under your control, Impact Tremors deals 1 damage to each opponent.',
-        manaCost: '{1}{R}',
-      ).map((tag) => tag.tag).toSet();
+      final impactTremorsTags =
+          inferFunctionalCardTags(
+            name: 'Impact Tremors',
+            typeLine: 'Enchantment',
+            oracleText:
+                'Whenever a creature enters the battlefield under your control, Impact Tremors deals 1 damage to each opponent.',
+            manaCost: '{1}{R}',
+          ).map((tag) => tag.tag).toSet();
 
       expect(impactTremorsTags, contains('payoff'));
     });
@@ -317,15 +489,233 @@ void main() {
           'oracle_text': entry.value['oracle_text']! as String,
         };
         final optimizeRoles = optimizationFunctionalRolesForCard(card);
-        final tagRoles = inferFunctionalCardTags(
-          name: entry.key,
-          typeLine: card['type_line']!,
-          oracleText: card['oracle_text']!,
-        ).map((tag) => tag.tag).toSet();
+        final tagRoles =
+            inferFunctionalCardTags(
+              name: entry.key,
+              typeLine: card['type_line']!,
+              oracleText: card['oracle_text']!,
+            ).map((tag) => tag.tag).toSet();
         final expectedRoles = entry.value['expected_roles']! as Set<String>;
 
         expect(optimizeRoles, containsAll(expectedRoles), reason: entry.key);
         expect(tagRoles, containsAll(expectedRoles), reason: entry.key);
+      }
+    });
+
+    test('covers current Oracle families used by product Commander decks', () {
+      final cases = <String, Map<String, Object>>{
+        'Chaos Warp': _card(
+          typeLine: 'Instant',
+          manaCost: '{2}{R}',
+          oracleText:
+              'The owner of target permanent shuffles it into their library, then reveals the top card of their library.',
+          expected: const {'removal'},
+        ),
+        'Back to Basics': _card(
+          typeLine: 'Enchantment',
+          manaCost: '{2}{U}',
+          oracleText:
+              "Nonbasic lands don't untap during their controllers' untap steps.",
+          expected: const {'protection'},
+        ),
+        'Displacement Wave': _card(
+          typeLine: 'Sorcery',
+          manaCost: '{X}{U}{U}',
+          oracleText:
+              'Return all nonland permanents with mana value X or less to their owners\' hands.',
+          expected: const {'board_wipe'},
+        ),
+        'Engulf the Shore': _card(
+          typeLine: 'Instant',
+          manaCost: '{3}{U}',
+          oracleText:
+              "Return to their owners' hands all creatures with toughness less than or equal to the number of Islands you control.",
+          expected: const {'board_wipe'},
+        ),
+        'High Tide': _card(
+          typeLine: 'Instant',
+          manaCost: '{U}',
+          oracleText:
+              'Until end of turn, whenever a player taps an Island for mana, that player adds an additional {U}.',
+          expected: const {'ramp'},
+        ),
+        'Sapphire Medallion': _card(
+          typeLine: 'Artifact',
+          manaCost: '{2}',
+          oracleText: 'Blue spells you cast cost {1} less to cast.',
+          expected: const {'ramp', 'enabler'},
+        ),
+        'Aggravated Assault': _card(
+          typeLine: 'Enchantment',
+          manaCost: '{2}{R}',
+          oracleText:
+              'Untap all creatures you control. After this main phase, there is an additional combat phase followed by an additional main phase.',
+          expected: const {'wincon', 'engine'},
+        ),
+        'Manifold Key': _card(
+          typeLine: 'Artifact',
+          manaCost: '{1}',
+          oracleText:
+              "{1}, {T}: Untap another target artifact. {3}, {T}: Target creature can't be blocked this turn.",
+          expected: const {'engine'},
+        ),
+        'Phyrexian Metamorph': _card(
+          typeLine: 'Artifact Creature — Phyrexian Shapeshifter',
+          manaCost: '{3}{U/P}',
+          oracleText:
+              "You may have this creature enter as a copy of any artifact or creature on the battlefield, except it's an artifact in addition to its other types.",
+          expected: const {'engine'},
+        ),
+        'Rings of Brighthearth': _card(
+          typeLine: 'Artifact',
+          manaCost: '{3}',
+          oracleText:
+              "Whenever you activate an ability, if it isn't a mana ability, you may pay {2}. If you do, copy that ability.",
+          expected: const {'engine'},
+        ),
+        'Strionic Resonator': _card(
+          typeLine: 'Artifact',
+          manaCost: '{2}',
+          oracleText:
+              '{2}, {T}: Copy target triggered ability you control. You may choose new targets for the copy.',
+          expected: const {'engine'},
+        ),
+        'Branching Evolution': _card(
+          typeLine: 'Enchantment',
+          manaCost: '{2}{G}',
+          oracleText:
+              'If one or more +1/+1 counters would be put on a creature you control, twice that many +1/+1 counters are put on that creature instead.',
+          expected: const {'engine'},
+        ),
+        'Hardened Scales': _card(
+          typeLine: 'Enchantment',
+          manaCost: '{G}',
+          oracleText:
+              'If one or more +1/+1 counters would be put on a creature you control, that many plus one +1/+1 counters are put on it instead.',
+          expected: const {'engine'},
+        ),
+        'Duskshell Crawler': _card(
+          typeLine: 'Creature — Insect',
+          manaCost: '{1}{G}',
+          oracleText:
+              'When this creature enters, put a +1/+1 counter on target creature. Each creature you control with a +1/+1 counter on it has trample.',
+          expected: const {'engine', 'etb'},
+        ),
+        'Kaalia of the Vast': _card(
+          typeLine: 'Legendary Creature — Human Cleric',
+          manaCost: '{1}{R}{W}{B}',
+          oracleText:
+              'Flying. Whenever Kaalia attacks an opponent, you may put an Angel, Demon, or Dragon creature card from your hand onto the battlefield tapped and attacking that opponent.',
+          expected: const {'engine'},
+        ),
+        'Isshin, Two Heavens as One': _card(
+          typeLine: 'Legendary Creature — Human Samurai',
+          manaCost: '{R}{W}{B}',
+          oracleText:
+              'If a creature attacking causes a triggered ability of a permanent you control to trigger, that ability triggers an additional time.',
+          expected: const {'engine'},
+        ),
+        'Karlach, Fury of Avernus': _card(
+          typeLine: 'Legendary Creature — Tiefling Barbarian',
+          manaCost: '{4}{R}',
+          oracleText:
+              "Whenever you attack, if it's the first combat phase of the turn, untap all attacking creatures. After this phase, there is an additional combat phase.",
+          expected: const {'wincon', 'engine'},
+        ),
+        'Master of Cruelties': _card(
+          typeLine: 'Creature — Demon',
+          manaCost: '{3}{B}{R}',
+          oracleText:
+              "Whenever this creature attacks a player and isn't blocked, that player's life total becomes 1.",
+          expected: const {'wincon'},
+        ),
+        'Quicksilver Amulet': _card(
+          typeLine: 'Artifact',
+          manaCost: '{4}',
+          oracleText:
+              '{4}, {T}: You may put a creature card from your hand onto the battlefield.',
+          expected: const {'engine'},
+        ),
+        'Relentless Assault': _card(
+          typeLine: 'Sorcery',
+          manaCost: '{2}{R}{R}',
+          oracleText:
+              'Untap all creatures that attacked this turn. After this main phase, there is an additional combat phase followed by an additional main phase.',
+          expected: const {'wincon', 'engine'},
+        ),
+        'Peregrine Drake': _card(
+          typeLine: 'Creature — Drake',
+          manaCost: '{4}{U}',
+          oracleText:
+              'Flying. When this creature enters, untap up to five lands.',
+          expected: const {'ramp', 'etb'},
+        ),
+        'Ancestral Statue': _card(
+          typeLine: 'Artifact Creature — Golem',
+          manaCost: '{4}',
+          oracleText:
+              "When this creature enters, return a nonland permanent you control to its owner's hand.",
+          expected: const {'engine', 'etb'},
+        ),
+        'Shrieking Drake': _card(
+          typeLine: 'Creature — Drake',
+          manaCost: '{U}',
+          oracleText:
+              "Flying. When this creature enters, return a creature you control to its owner's hand.",
+          expected: const {'engine', 'etb'},
+        ),
+        'Surrak Dragonclaw': _card(
+          typeLine: 'Legendary Creature — Human Warrior',
+          manaCost: '{2}{G}{U}{R}',
+          oracleText:
+              "Flash. This spell can't be countered. Creature spells you control can't be countered. Other creatures you control have trample.",
+          expected: const {'protection'},
+        ),
+        'The Earth Crystal': _card(
+          typeLine: 'Legendary Artifact',
+          manaCost: '{2}{G}',
+          oracleText:
+              'Green spells you cast cost {1} less to cast. If one or more +1/+1 counters would be put on a creature you control, twice that many +1/+1 counters are put on that creature instead.',
+          expected: const {'ramp', 'engine', 'enabler'},
+        ),
+        'The Ozolith': _card(
+          typeLine: 'Legendary Artifact',
+          manaCost: '{1}',
+          oracleText:
+              'Whenever a creature you control leaves the battlefield, if it had counters on it, put those counters on The Ozolith. At the beginning of combat on your turn, you may move all counters from The Ozolith onto target creature.',
+          expected: const {'engine'},
+        ),
+      };
+
+      for (final entry in cases.entries) {
+        final tags =
+            inferFunctionalCardTags(
+              name: entry.key,
+              typeLine: entry.value['type_line']! as String,
+              oracleText: entry.value['oracle_text']! as String,
+              manaCost: entry.value['mana_cost']! as String,
+            ).map((tag) => tag.tag).toSet();
+        final optimizeRoles = optimizationFunctionalRolesForCard({
+          'name': entry.key,
+          'type_line': entry.value['type_line']! as String,
+          'oracle_text': entry.value['oracle_text']! as String,
+          'mana_cost': entry.value['mana_cost']! as String,
+        });
+
+        expect(
+          tags,
+          containsAll(entry.value['expected']! as Set<String>),
+          reason: 'functional tags: ${entry.key}',
+        );
+        expect(
+          optimizeRoles,
+          containsAll(
+            (entry.value['expected']! as Set<String>).map(
+              (role) => role == 'board_wipe' ? 'wipe' : role,
+            ),
+          ),
+          reason: 'optimizer roles: ${entry.key}',
+        );
       }
     });
 
@@ -360,82 +750,121 @@ void main() {
       expect(summary.samples['ramp'], equals(const ['Sol Ring']));
       expect(summary.sampleDetails['ramp']?.first['reason'], contains('ramp'));
       expect(
-          summary.toJson()['schema_version'], functionalCardTagsSchemaVersion);
-      expect(summary.toJson()['semantic_schema_version'],
-          equals(semanticLayerV2SchemaVersion));
+        summary.toJson()['schema_version'],
+        functionalCardTagsSchemaVersion,
+      );
+      expect(
+        summary.toJson()['semantic_schema_version'],
+        equals(semanticLayerV2SchemaVersion),
+      );
     });
 
-    test('prefers persisted tags, semantic v2 and then heuristic tags per row',
-        () {
-      final summary = summarizeFunctionalTagsForDeck([
-        {
-          'name': 'Semantic Cache Hit',
-          'type_line': 'Creature',
-          'oracle_text': '',
-          'quantity': 2,
-          'functional_tags': [
-            {'tag': 'draw', 'confidence': 0.9, 'source': 'test'},
-          ],
-        },
-        {
-          'name': 'Sol Ring',
-          'type_line': 'Artifact',
-          'oracle_text': '{T}: Add {C}{C}.',
-          'mana_cost': '{1}',
-          'quantity': 1,
-          'functional_tags': const [],
-        },
-        {
-          'name': 'Semantic V2 Only',
-          'type_line': 'Instant',
-          'oracle_text': '',
-          'quantity': 4,
-          'functional_tags': const [],
-          'semantic_tags_v2': [
-            {
-              'tags': [
-                {'tag': 'removal', 'confidence': 0.91},
-              ],
-              'role_confidence': 0.91,
-              'speed': 'instant_speed',
-              'interaction_scope': 'single_target',
-              'explanation_reason': 'persisted semantic v2 fixture',
-              'source': 'test_semantic_v2',
-            },
-          ],
-        },
-        {
-          'name': 'Low Confidence Persisted',
-          'type_line': 'Creature',
-          'oracle_text': '',
-          'quantity': 3,
-          'functional_tags': [
-            {'tag': 'removal', 'confidence': 0.2, 'source': 'test'},
-          ],
-        },
-      ]);
+    test(
+      'prefers persisted tags, semantic v2 and then heuristic tags per row',
+      () {
+        final summary = summarizeFunctionalTagsForDeck([
+          {
+            'name': 'Semantic Cache Hit',
+            'type_line': 'Creature',
+            'oracle_text': '',
+            'quantity': 2,
+            'functional_tags': [
+              {'tag': 'draw', 'confidence': 0.9, 'source': 'test'},
+            ],
+          },
+          {
+            'name': 'Sol Ring',
+            'type_line': 'Artifact',
+            'oracle_text': '{T}: Add {C}{C}.',
+            'mana_cost': '{1}',
+            'quantity': 1,
+            'functional_tags': const [],
+          },
+          {
+            'name': 'Semantic V2 Only',
+            'type_line': 'Instant',
+            'oracle_text': '',
+            'quantity': 4,
+            'functional_tags': const [],
+            'semantic_tags_v2': [
+              {
+                'tags': [
+                  {'tag': 'removal', 'confidence': 0.91},
+                ],
+                'role_confidence': 0.91,
+                'speed': 'instant_speed',
+                'interaction_scope': 'single_target',
+                'explanation_reason': 'persisted semantic v2 fixture',
+                'source': 'test_semantic_v2',
+              },
+            ],
+          },
+          {
+            'name': 'Low Confidence Persisted',
+            'type_line': 'Creature',
+            'oracle_text': '',
+            'quantity': 3,
+            'functional_tags': [
+              {'tag': 'removal', 'confidence': 0.2, 'source': 'test'},
+            ],
+          },
+        ]);
 
-      expect(summary.count('draw'), equals(2));
-      expect(summary.count('ramp'), equals(1));
-      expect(summary.count('removal'), equals(4));
-      expect(summary.persistedRows, equals(2));
-      expect(summary.persistedCopies, equals(6));
-      expect(summary.heuristicRows, equals(2));
-      expect(summary.heuristicCopies, equals(4));
-      expect(summary.otherCopies, equals(3));
-      expect(summary.samples['removal'], equals(const ['Semantic V2 Only']));
-      expect(
-        summary.sampleDetails['removal']?.first['evidence'],
-        equals('persisted semantic v2 fixture'),
-      );
+        expect(summary.count('draw'), equals(2));
+        expect(summary.count('ramp'), equals(1));
+        expect(summary.count('removal'), equals(4));
+        expect(summary.persistedRows, equals(2));
+        expect(summary.persistedCopies, equals(6));
+        expect(summary.heuristicRows, equals(2));
+        expect(summary.heuristicCopies, equals(4));
+        expect(summary.otherCopies, equals(3));
+        expect(summary.samples['removal'], equals(const ['Semantic V2 Only']));
+        expect(
+          summary.sampleDetails['removal']?.first['evidence'],
+          equals('persisted semantic v2 fixture'),
+        );
 
-      final source = summary.toJson()['source'] as Map<String, dynamic>;
-      expect(
-        source['priority'],
-        equals('functional_tags_then_semantic_v2_then_heuristic'),
-      );
-      expect(source['persisted_rows'], equals(2));
-    });
+        final source = summary.toJson()['source'] as Map<String, dynamic>;
+        expect(
+          source['priority'],
+          equals('functional_tags_then_semantic_v2_then_heuristic'),
+        );
+        expect(source['persisted_rows'], equals(2));
+      },
+    );
+
+    test(
+      'keeps legacy samples bounded but exposes complete sample details',
+      () {
+        final cards = List.generate(
+          7,
+          (index) => {
+            'name': 'Draw Fixture ${index + 1}',
+            'type_line': 'Instant',
+            'oracle_text': 'Draw a card.',
+            'mana_cost': '{1}{U}',
+            'quantity': 1,
+          },
+        );
+
+        final summary = summarizeFunctionalTagsForDeck(
+          cards,
+          sampleLimit: 2,
+          countedTags: const {'draw'},
+        );
+
+        expect(summary.count('draw'), equals(7));
+        expect(
+          summary.samples['draw'],
+          equals(const ['Draw Fixture 1', 'Draw Fixture 2']),
+        );
+        expect(summary.sampleDetails['draw'], hasLength(7));
+        expect(
+          summary.sampleDetails['draw']?.last['name'],
+          equals('Draw Fixture 7'),
+        );
+      },
+    );
   });
 }
 

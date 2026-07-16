@@ -2,6 +2,14 @@
 
 Data: 2026-04-23
 
+> Status em 2026-07-15: este documento preserva o workflow histórico. As três
+> snapshots TopDeck/EDHTop16 citadas abaixo foram removidas no cleanup de
+> 2026-06-29 e não integram mais a cobertura local ativa. Os asserts
+> data-specific usam a tag `historical_external_snapshot`; a lógica pura de
+> staging e parsing continua coberta com payloads contratuais locais. Regenerar
+> as snapshots exige rede externa e, para a validação de legalidade stage 2,
+> pode exigir PostgreSQL read-only. Ausência das snapshots não prova o dataset.
+
 ## Objetivo
 
 Separar pesquisa web multi-fonte de `Commander/cEDH` do corpus principal `meta_decks`.

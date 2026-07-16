@@ -17,6 +17,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 final class XmageBattleServiceTest {
@@ -41,6 +42,27 @@ final class XmageBattleServiceTest {
 
         request.addProperty("timeout_ms", 1000000L);
         assertEquals(900000L, SidecarMain.simulationTimeoutMillis(request));
+    }
+
+    @Test
+    void completedBattleRequiresAnObservedPositiveTurnAndSnapshot() {
+        assertThrows(
+                IllegalStateException.class,
+                () -> XmageBattleService.requireCompletedBattleEvidence(0, 0, 0)
+        );
+        assertThrows(
+                IllegalStateException.class,
+                () -> XmageBattleService.requireCompletedBattleEvidence(1, 1, 0)
+        );
+        XmageBattleService.requireCompletedBattleEvidence(1, 1, 1);
+    }
+
+    @Test
+    void terminalSignalsWaitForAnActualGameView() {
+        assertFalse(XmageBattleService.shouldFinishBattle(false, true, false));
+        assertFalse(XmageBattleService.shouldFinishBattle(true, false, false));
+        assertTrue(XmageBattleService.shouldFinishBattle(false, true, true));
+        assertTrue(XmageBattleService.shouldFinishBattle(true, false, true));
     }
 
     @Test

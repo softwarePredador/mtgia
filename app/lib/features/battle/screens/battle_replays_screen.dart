@@ -523,7 +523,7 @@ class _BattleReplayDetailPane extends StatelessWidget {
                   ButtonSegment(
                     value: _ReplayDetailView.raw,
                     icon: Icon(Icons.data_object_rounded),
-                    label: Text('Raw'),
+                    label: Text('Dados'),
                   ),
                 ],
                 selected: {view},
@@ -564,8 +564,8 @@ class _ReplayTimeline extends StatelessWidget {
       return const _InlineEmptyPanel(
         key: Key('battle-replay-no-events-state'),
         icon: Icons.timeline_outlined,
-        title: 'Replay sem eventos estruturados',
-        message: 'O backend ainda nao retornou timeline ou texto de replay.',
+        title: 'Replay sem jogadas registradas',
+        message: 'Ainda nao ha relato suficiente para exibir esta partida.',
       );
     }
 
@@ -588,8 +588,9 @@ class _ReplayDecisions extends StatelessWidget {
       return const _InlineEmptyPanel(
         key: Key('battle-replay-no-decisions-state'),
         icon: Icons.account_tree_outlined,
-        title: 'Sem decision trace',
-        message: 'Quando o runner expuser decisoes, elas aparecem aqui.',
+        title: 'Sem decisoes registradas',
+        message:
+            'Quando a simulacao explicar escolhas importantes, elas aparecem aqui.',
       );
     }
 
@@ -724,6 +725,9 @@ class _ReplayVisualViewerState extends State<_ReplayVisualViewer> {
               max: (snapshots.length - 1).toDouble(),
               divisions: snapshots.length - 1,
               label: '${_index + 1}/${snapshots.length}',
+              semanticFormatterCallback:
+                  (value) =>
+                      'Jogada ${value.round() + 1} de ${snapshots.length}',
               onChanged: (value) => setState(() => _index = value.round()),
             ),
           ...snapshot.players.map(
@@ -889,20 +893,143 @@ class _VisualCardZone extends StatelessWidget {
             ),
           )
         else
-          SingleChildScrollView(
-            scrollDirection: Axis.horizontal,
-            child: Row(
-              children: cards
-                  .map(
-                    (card) => Padding(
-                      padding: const EdgeInsets.only(right: 8),
-                      child: _VisualCardTile(card: card, compact: compact),
-                    ),
-                  )
-                  .toList(growable: false),
-            ),
+          _BattleVisualCardCarousel(
+            key: Key('battle-visual-card-carousel-${_safeReplayKey(title)}'),
+            cards: cards,
+            compact: compact,
           ),
       ],
+    );
+  }
+}
+
+class _BattleVisualCardCarousel extends StatefulWidget {
+  const _BattleVisualCardCarousel({
+    super.key,
+    required this.cards,
+    required this.compact,
+  });
+
+  final List<BattleReplayVisualCard> cards;
+  final bool compact;
+
+  @override
+  State<_BattleVisualCardCarousel> createState() =>
+      _BattleVisualCardCarouselState();
+}
+
+class _BattleVisualCardCarouselState extends State<_BattleVisualCardCarousel> {
+  PageController? _controller;
+  double? _viewportFraction;
+  int _index = 0;
+
+  @override
+  void dispose() {
+    _controller?.dispose();
+    super.dispose();
+  }
+
+  PageController _ensureController(double viewportFraction) {
+    if (_controller == null || _viewportFraction != viewportFraction) {
+      _controller?.dispose();
+      _viewportFraction = viewportFraction;
+      _controller = PageController(
+        viewportFraction: viewportFraction,
+        initialPage: _index.clamp(0, widget.cards.length - 1).toInt(),
+      );
+    }
+    return _controller!;
+  }
+
+  void _move(int delta) {
+    if (widget.cards.isEmpty) return;
+    final next = (_index + delta).clamp(0, widget.cards.length - 1);
+    if (next == _index) return;
+    _controller?.animateToPage(
+      next,
+      duration: const Duration(milliseconds: 220),
+      curve: Curves.easeOutCubic,
+    );
+    setState(() => _index = next);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final height = widget.compact ? 112.0 : 132.0;
+    final cardExtent = widget.compact ? 76.0 : 92.0;
+
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final width =
+            constraints.maxWidth.isFinite
+                ? constraints.maxWidth
+                : MediaQuery.sizeOf(context).width;
+        final viewportFraction =
+            (cardExtent / width).clamp(0.16, 0.44).toDouble();
+        final controller = _ensureController(viewportFraction);
+
+        return SizedBox(
+          height: height,
+          child: Stack(
+            children: [
+              PageView.builder(
+                key: const Key('battle-visual-card-carousel'),
+                controller: controller,
+                padEnds: false,
+                physics: const BouncingScrollPhysics(),
+                itemCount: widget.cards.length,
+                onPageChanged: (value) => setState(() => _index = value),
+                itemBuilder: (context, index) {
+                  final card = widget.cards[index];
+                  final isActive = index == _index;
+                  return AnimatedScale(
+                    duration: const Duration(milliseconds: 180),
+                    curve: Curves.easeOutCubic,
+                    scale: isActive ? 1 : 0.94,
+                    child: AnimatedOpacity(
+                      duration: const Duration(milliseconds: 180),
+                      opacity: isActive ? 1 : 0.78,
+                      child: Align(
+                        alignment: Alignment.centerLeft,
+                        child: Padding(
+                          padding: const EdgeInsets.only(right: 8),
+                          child: _VisualCardTile(
+                            card: card,
+                            compact: widget.compact,
+                          ),
+                        ),
+                      ),
+                    ),
+                  );
+                },
+              ),
+              if (widget.cards.length > 1) ...[
+                Positioned(
+                  left: 0,
+                  top: 18,
+                  child: _BattleCarouselNavButton(
+                    tooltip: 'Carta anterior',
+                    icon: Icons.chevron_left_rounded,
+                    onPressed: _index > 0 ? () => _move(-1) : null,
+                  ),
+                ),
+                Positioned(
+                  right: 0,
+                  top: 18,
+                  child: _BattleCarouselNavButton(
+                    tooltip: 'Proxima carta',
+                    icon: Icons.chevron_right_rounded,
+                    onPressed:
+                        _index < widget.cards.length - 1
+                            ? () => _move(1)
+                            : null,
+                  ),
+                ),
+              ],
+            ],
+          ),
+        );
+      },
     );
   }
 }
@@ -918,62 +1045,180 @@ class _VisualCardTile extends StatelessWidget {
     final width = compact ? 54.0 : 66.0;
     final height = compact ? 76.0 : 92.0;
     final theme = Theme.of(context);
+    final imageUrl = _battleCardImageUrl(card);
 
-    return SizedBox(
+    return Semantics(
       key: Key('battle-visual-card-${card.name}'),
-      width: width,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Stack(
-            children: [
-              CachedCardImage(
-                imageUrl: card.imageUrl,
-                width: width,
-                height: height,
-                borderRadius: BorderRadius.circular(AppTheme.radiusXs),
-              ),
-              if (card.isTapped)
-                Positioned.fill(
-                  child: DecoratedBox(
-                    decoration: BoxDecoration(
-                      color: AppTheme.overlayBlack40,
+      button: true,
+      label: 'Ver ${card.name}',
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          borderRadius: BorderRadius.circular(AppTheme.radiusSm),
+          onTap: () => _showReplayCardPreview(context, card),
+          child: SizedBox(
+            width: width,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Stack(
+                  children: [
+                    CachedCardImage(
+                      imageUrl: imageUrl,
+                      width: width,
+                      height: height,
                       borderRadius: BorderRadius.circular(AppTheme.radiusXs),
                     ),
-                    child: const Center(
-                      child: Icon(
-                        Icons.rotate_90_degrees_ccw_rounded,
-                        color: AppTheme.textPrimary,
-                        size: 18,
+                    if (card.isTapped)
+                      Positioned.fill(
+                        child: DecoratedBox(
+                          decoration: BoxDecoration(
+                            color: AppTheme.overlayBlack40,
+                            borderRadius: BorderRadius.circular(
+                              AppTheme.radiusXs,
+                            ),
+                          ),
+                          child: const Center(
+                            child: Icon(
+                              Icons.rotate_90_degrees_ccw_rounded,
+                              color: AppTheme.textPrimary,
+                              size: 18,
+                            ),
+                          ),
+                        ),
                       ),
-                    ),
+                  ],
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  card.name,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  style: theme.textTheme.labelSmall?.copyWith(
+                    color: AppTheme.textPrimary,
+                    height: 1.08,
+                    fontWeight: FontWeight.w800,
                   ),
                 ),
-            ],
-          ),
-          const SizedBox(height: 4),
-          Text(
-            card.name,
-            maxLines: 2,
-            overflow: TextOverflow.ellipsis,
-            style: theme.textTheme.labelSmall?.copyWith(
-              color: AppTheme.textPrimary,
-              height: 1.08,
-              fontWeight: FontWeight.w800,
+                if (card.powerToughnessLabel != null)
+                  Text(
+                    card.powerToughnessLabel!,
+                    style: theme.textTheme.labelSmall?.copyWith(
+                      color: AppTheme.textHint,
+                      height: 1.08,
+                    ),
+                  ),
+              ],
             ),
           ),
-          if (card.powerToughnessLabel != null)
-            Text(
-              card.powerToughnessLabel!,
-              style: theme.textTheme.labelSmall?.copyWith(
-                color: AppTheme.textHint,
-                height: 1.08,
-              ),
-            ),
-        ],
+        ),
       ),
     );
   }
+}
+
+class _BattleCarouselNavButton extends StatelessWidget {
+  const _BattleCarouselNavButton({
+    required this.tooltip,
+    required this.icon,
+    required this.onPressed,
+  });
+
+  final String tooltip;
+  final IconData icon;
+  final VoidCallback? onPressed;
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      color: AppTheme.surfaceElevated.withValues(alpha: 0.86),
+      shape: const CircleBorder(),
+      child: IconButton(
+        tooltip: tooltip,
+        visualDensity: VisualDensity.compact,
+        onPressed: onPressed,
+        icon: Icon(icon, size: 20),
+      ),
+    );
+  }
+}
+
+void _showReplayCardPreview(BuildContext context, BattleReplayVisualCard card) {
+  showDialog<void>(
+    context: context,
+    builder: (context) {
+      final theme = Theme.of(context);
+      final imageUrl = _battleCardImageUrl(card);
+      return Dialog(
+        insetPadding: const EdgeInsets.all(20),
+        backgroundColor: AppTheme.surfaceElevated,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(AppTheme.radiusLg),
+        ),
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 420),
+          child: Padding(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Expanded(
+                      child: Text(
+                        card.name,
+                        style: theme.textTheme.titleMedium?.copyWith(
+                          color: AppTheme.textPrimary,
+                          fontWeight: FontWeight.w900,
+                        ),
+                      ),
+                    ),
+                    IconButton(
+                      tooltip: 'Fechar',
+                      onPressed: () => Navigator.of(context).pop(),
+                      icon: const Icon(Icons.close_rounded),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 12),
+                Center(
+                  child: CachedCardImage(
+                    imageUrl: imageUrl,
+                    width: 220,
+                    height: 306,
+                    borderRadius: BorderRadius.circular(AppTheme.radiusSm),
+                  ),
+                ),
+                const SizedBox(height: 12),
+                if (card.typeLine != null && card.typeLine!.trim().isNotEmpty)
+                  Text(
+                    card.typeLine!,
+                    style: theme.textTheme.bodyMedium?.copyWith(
+                      color: AppTheme.textSecondary,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                const SizedBox(height: 8),
+                Wrap(
+                  spacing: 8,
+                  runSpacing: 8,
+                  children: [
+                    if (card.manaCost != null &&
+                        card.manaCost!.trim().isNotEmpty)
+                      _ReplayMetaChip(label: card.manaCost!),
+                    if (card.powerToughnessLabel != null)
+                      _ReplayMetaChip(label: card.powerToughnessLabel!),
+                    if (card.isTapped) const _ReplayMetaChip(label: 'Virada'),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        ),
+      );
+    },
+  );
 }
 
 class _ReplayEventTile extends StatelessWidget {
@@ -1072,7 +1317,7 @@ class _ReplayDecisionTile extends StatelessWidget {
                 if (decision.score != null) ...[
                   const SizedBox(height: 6),
                   Text(
-                    'Score ${decision.score!.toStringAsFixed(2)}',
+                    'Avaliacao ${decision.score!.toStringAsFixed(2)}',
                     style: theme.textTheme.labelSmall?.copyWith(
                       color: AppTheme.textHint,
                     ),
@@ -1164,13 +1409,27 @@ class _ReplayTextBlock extends StatelessWidget {
         text,
         style: const TextStyle(
           color: AppTheme.textSecondary,
-          fontFamily: 'monospace',
           fontSize: AppTheme.fontSm,
           height: 1.38,
         ),
       ),
     );
   }
+}
+
+String _battleCardImageUrl(BattleReplayVisualCard card) {
+  final provided = card.imageUrl?.trim();
+  if (provided != null && provided.isNotEmpty) return provided;
+  final encoded = Uri.encodeComponent(card.name.trim());
+  return 'https://api.scryfall.com/cards/named?exact=$encoded&format=image&version=normal';
+}
+
+String _safeReplayKey(String value) {
+  final sanitized = value
+      .replaceAll(RegExp(r'[^A-Za-z0-9]+'), '-')
+      .replaceAll(RegExp(r'-+'), '-')
+      .replaceAll(RegExp(r'^-|-$'), '');
+  return sanitized.isEmpty ? 'cards' : sanitized;
 }
 
 class _InlineEmptyPanel extends StatelessWidget {

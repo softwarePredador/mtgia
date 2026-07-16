@@ -71,6 +71,8 @@ SOURCE_PRIORITY = {
 }
 
 DEFAULT_SQLITE_DB = Path(os.environ.get("MANALOOM_KNOWLEDGE_DB", DEFAULT_DB))
+PG_WRITE_APPROVAL_ENV = "MANALOOM_CONFIRM_POSTGRES_WRITES"
+PG_WRITE_APPROVAL_PHRASE = "I_HAVE_EXPLICIT_APPROVAL"
 
 PG_SCHEMA = """
 CREATE TABLE IF NOT EXISTS card_battle_rules (
@@ -195,6 +197,16 @@ def require_pg() -> None:
         )
 
 
+def require_pg_write_approval() -> None:
+    if os.environ.get(PG_WRITE_APPROVAL_ENV) == PG_WRITE_APPROVAL_PHRASE:
+        return
+    raise SystemExit(
+        "PostgreSQL apply is blocked without explicit approval. Set "
+        f"{PG_WRITE_APPROVAL_ENV}={PG_WRITE_APPROVAL_PHRASE} only for an "
+        "approved run."
+    )
+
+
 def safe_database_target() -> str:
     try:
         return sanitized_database_target()
@@ -276,6 +288,7 @@ def row_normalized_name(row: dict[str, Any]) -> str:
 
 
 def ensure_pg_table(cur: Any) -> None:
+    require_pg_write_approval()
     for statement in [part.strip() for part in PG_SCHEMA.split(";") if part.strip()]:
         cur.execute(statement)
     cur.execute("ALTER TABLE card_battle_rules ADD COLUMN IF NOT EXISTS logical_rule_key TEXT")
@@ -1227,6 +1240,8 @@ def export_canonical_snapshot(
 
 def main() -> int:
     args = parse_args()
+    if args.apply_pg:
+        require_pg_write_approval()
     seed_rows = build_rows(
         include_generated=not args.skip_generated,
         sqlite_db=args.sqlite_db,
@@ -1281,7 +1296,6 @@ def main() -> int:
     if args.apply_sqlite_from_pg:
         with connect() as conn:
             with conn.cursor() as cur:
-                ensure_pg_table(cur)
                 rows = load_pg_rules(cur, include_needs_review=args.include_needs_review)
         rows = filter_rows_by_card_names(rows, selected_card_names)
         report["pg_rows_loaded"] = len(rows)

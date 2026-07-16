@@ -9,6 +9,12 @@ import 'goldfish_simulator.dart';
 import 'optimization_functional_roles.dart';
 import 'theme_contextual_rules_service.dart';
 
+typedef ThemeDeckValidationCallback =
+    Future<ThemeValidationResult> Function({
+      required String archetype,
+      required List<Map<String, dynamic>> cards,
+    });
+
 /// Motor de Validação Pós-Otimização
 ///
 /// FILOSOFIA: A IA sugere trocas, mas elas precisam ser PROVADAS boas.
@@ -22,8 +28,13 @@ import 'theme_contextual_rules_service.dart';
 class OptimizationValidator {
   final String? openAiKey;
   final ThemeContextualRulesService? themeService;
+  final ThemeDeckValidationCallback? themeValidator;
 
-  OptimizationValidator({this.openAiKey, this.themeService});
+  OptimizationValidator({
+    this.openAiKey,
+    this.themeService,
+    this.themeValidator,
+  });
 
   /// Executa TODAS as camadas de validação e retorna um veredito unificado
   Future<ValidationReport> validate({
@@ -50,15 +61,23 @@ class OptimizationValidator {
 
     // 2.5 VALIDAÇÃO TEMÁTICA (theme_contextual_rules do PostgreSQL)
     ThemeValidationResult? themeValidation;
-    if (themeService != null) {
+    if (themeValidator != null || themeService != null) {
       try {
-        themeValidation = await themeService!.validateDeck(
-          archetype: archetype,
-          cards: originalDeck,
+        themeValidation =
+            themeValidator != null
+                ? await themeValidator!(
+                  archetype: archetype,
+                  cards: optimizedDeck,
+                )
+                : await themeService!.validateDeck(
+                  archetype: archetype,
+                  cards: optimizedDeck,
+                );
+        Log.i(
+          'ThemeValidation: ${themeValidation.theme}, '
+          '${themeValidation.checks.length} checks, '
+          'critical=${themeValidation.hasCriticalViolation}',
         );
-        Log.i('ThemeValidation: ${themeValidation.theme}, '
-            '${themeValidation.checks.length} checks, '
-            'critical=${themeValidation.hasCriticalViolation}');
       } catch (e) {
         Log.w('ThemeValidation error: $e');
       }
@@ -83,6 +102,7 @@ class OptimizationValidator {
       functional: functionalReport,
       archetype: archetype,
       critic: criticReport,
+      themeValidation: themeValidation,
     );
   }
 
@@ -116,8 +136,8 @@ class OptimizationValidator {
 
   /// Simula London Mulligan (Commander: free first mulligan)
   ///
-  /// Regra: Compra 7, decide keep/mull. Se mull, compra 7 de novo e coloca
-  /// 1 no fundo. Repete até manter ou chegar a 4 cartas.
+  /// Regra: compra 7 em toda tentativa. O primeiro mulligan de multiplayer é
+  /// grátis; somente a partir do segundo uma carta adicional vai ao fundo.
   ///
   /// Heurística de keep: 2-5 lands + pelo menos 1 carta jogável nos turnos 1-3
   MulliganReport _simulateLondonMulligan(
@@ -149,38 +169,40 @@ class OptimizationValidator {
         final shuffled = List<Map<String, dynamic>>.from(expandedDeck)
           ..shuffle(random);
         final hand = shuffled.take(7).toList();
-        final handSize = 7 - attempt; // Commander: free first, then -1 each
+        final bottomCount = max(0, attempt - 1);
+        final handSize = 7 - bottomCount;
 
         // Heurística de keep melhorada:
         // Mana rocks contam como "meios terrenos" para avaliar keepability
         final landsInHand = hand.where(_isLand).length;
-        final manaRocksInHand = hand.where((c) {
-          if (_isLand(c)) return false;
-          final t = ((c['type_line'] as String?) ?? '').toLowerCase();
-          final o = ((c['oracle_text'] as String?) ?? '').toLowerCase();
-          return t.contains('artifact') && o.contains('add') && _getCmc(c) <= 2;
-        }).length;
+        final manaRocksInHand =
+            hand.where((c) {
+              if (_isLand(c)) return false;
+              final t = ((c['type_line'] as String?) ?? '').toLowerCase();
+              final o = ((c['oracle_text'] as String?) ?? '').toLowerCase();
+              return t.contains('artifact') &&
+                  o.contains('add') &&
+                  _getCmc(c) <= 2;
+            }).length;
         // effectiveLands = terras reais + (mana rocks × 0.5)
         final effectiveLands = landsInHand + (manaRocksInHand * 0.5);
-        final hasEarlyPlay = hand.any(
-          (c) => !_isLand(c) && _getCmc(c) <= 3,
-        );
+        final hasEarlyPlay = hand.any((c) => !_isLand(c) && _getCmc(c) <= 3);
 
         // Keep se: 2-5 effective lands E tem jogada early (ou hand size <= 5)
         final shouldKeep =
             (effectiveLands >= 1.5 && effectiveLands <= 5.5 && hasEarlyPlay) ||
-                handSize <= 5; // Keep at 5 cards regardless
+            handSize <= 5; // Keep at 5 cards regardless
 
         if (shouldKeep || attempt == 3) {
           // Kept
           kept = true;
           mulligans = attempt;
 
-          if (attempt == 0) {
+          if (handSize == 7) {
             keptAt7++;
-          } else if (attempt == 1) {
+          } else if (handSize == 6) {
             keptAt6++;
-          } else if (attempt == 2) {
+          } else if (handSize == 5) {
             keptAt5++;
           } else {
             keptAt4OrLess++;
@@ -191,9 +213,9 @@ class OptimizationValidator {
             totalKeepableAfterMull++;
           }
         }
-
-        totalMulligans += mulligans;
       }
+
+      totalMulligans += mulligans;
     }
 
     return MulliganReport(
@@ -251,15 +273,17 @@ class OptimizationValidator {
           _findCardByName(optimizedDeck, addedName) ?? <String, dynamic>{};
 
       if (removedCard.isEmpty || addedCard.isEmpty) {
-        swapAnalysis.add(SwapFunctionalAnalysis(
-          removed: removedName,
-          added: addedName,
-          removedRole: 'unknown',
-          addedRole: 'unknown',
-          rolePreserved: false,
-          cmcDelta: 0,
-          verdict: 'indeterminado',
-        ));
+        swapAnalysis.add(
+          SwapFunctionalAnalysis(
+            removed: removedName,
+            added: addedName,
+            removedRole: 'unknown',
+            addedRole: 'unknown',
+            rolePreserved: false,
+            cmcDelta: 0,
+            verdict: 'indeterminado',
+          ),
+        );
         continue;
       }
 
@@ -268,6 +292,8 @@ class OptimizationValidator {
       final addedRole = classifyOptimizationFunctionalRole(addedCard);
       final removedRoles = optimizationFunctionalRolesForCard(removedCard);
       final addedRoles = optimizationFunctionalRolesForCard(addedCard);
+      final removedIsLand = _isLand(removedCard);
+      final addedIsLand = _isLand(addedCard);
 
       // CMC comparison
       final removedCmc = _getCmc(removedCard);
@@ -279,9 +305,11 @@ class OptimizationValidator {
       // (que representa cartas sem papel funcional claro).
       // ATENÇÃO: a condição anterior era `(removedRole == 'utility' || addedRole == 'utility')`,
       // o que avaliava como verdadeiro sempre que QUALQUER card fosse 'utility' — bug de precedência.
-      final rolePreserved = removedRole == addedRole ||
-          (removedRole == 'utility' && addedRole == 'utility') ||
-          removedRoles.intersection(addedRoles).isNotEmpty;
+      final rolePreserved =
+          removedIsLand == addedIsLand &&
+          (removedRole == addedRole ||
+              (removedRole == 'utility' && addedRole == 'utility') ||
+              removedRoles.intersection(addedRoles).isNotEmpty);
 
       // Gerar veredito
       String verdict;
@@ -295,15 +323,17 @@ class OptimizationValidator {
         verdict = 'questionável'; // Mudou função E ficou mais caro
       }
 
-      swapAnalysis.add(SwapFunctionalAnalysis(
-        removed: removedName,
-        added: addedName,
-        removedRole: removedRole,
-        addedRole: addedRole,
-        rolePreserved: rolePreserved,
-        cmcDelta: cmcDelta,
-        verdict: verdict,
-      ));
+      swapAnalysis.add(
+        SwapFunctionalAnalysis(
+          removed: removedName,
+          added: addedName,
+          removedRole: removedRole,
+          addedRole: addedRole,
+          rolePreserved: rolePreserved,
+          cmcDelta: cmcDelta,
+          verdict: verdict,
+        ),
+      );
     }
 
     // Contagem global
@@ -333,7 +363,7 @@ class OptimizationValidator {
       'combo_piece',
       'engine',
       'payoff',
-      'enabler'
+      'enabler',
     ]) {
       var lost = 0;
       var gained = 0;
@@ -342,12 +372,22 @@ class OptimizationValidator {
             _findCardByName(originalDeck, swap.removed) ?? <String, dynamic>{};
         final addedCard =
             _findCardByName(optimizedDeck, swap.added) ?? <String, dynamic>{};
-        if (removedCard.isNotEmpty &&
-            optimizationFunctionalRolesForCard(removedCard).contains(role)) {
+        final removedHasRole =
+            removedCard.isNotEmpty &&
+            (role == 'land'
+                ? _isLand(removedCard)
+                : optimizationFunctionalRolesForCard(
+                  removedCard,
+                ).contains(role));
+        final addedHasRole =
+            addedCard.isNotEmpty &&
+            (role == 'land'
+                ? _isLand(addedCard)
+                : optimizationFunctionalRolesForCard(addedCard).contains(role));
+        if (removedHasRole) {
           lost++;
         }
-        if (addedCard.isNotEmpty &&
-            optimizationFunctionalRolesForCard(addedCard).contains(role)) {
+        if (addedHasRole) {
           gained++;
         }
       }
@@ -413,7 +453,7 @@ ${_formatSwapsForCritic(removals, additions, functionalReport)}
 
 DADOS DE SIMULAÇÃO (Monte Carlo, 1000 mãos):
 - Score de Consistência: ${monteCarloReport.before.consistencyScore} → ${monteCarloReport.after.consistencyScore} ${monteCarloReport.after.consistencyScore > monteCarloReport.before.consistencyScore ? '✅ (melhorou)' : (monteCarloReport.after.consistencyScore < monteCarloReport.before.consistencyScore ? '❌ (piorou)' : '➡️ (igual)')}
-- Taxa de Mull-free keep: ${(monteCarloReport.beforeMulligan.keepAt7Rate * 100).toStringAsFixed(1)}% → ${(monteCarloReport.afterMulligan.keepAt7Rate * 100).toStringAsFixed(1)}%
+- Taxa de keep com 7 cartas: ${(monteCarloReport.beforeMulligan.keepAt7Rate * 100).toStringAsFixed(1)}% → ${(monteCarloReport.afterMulligan.keepAt7Rate * 100).toStringAsFixed(1)}%
 - Mana Screw: ${(monteCarloReport.before.screwRate * 100).toStringAsFixed(1)}% → ${(monteCarloReport.after.screwRate * 100).toStringAsFixed(1)}%
 - Mana Flood: ${(monteCarloReport.before.floodRate * 100).toStringAsFixed(1)}% → ${(monteCarloReport.after.floodRate * 100).toStringAsFixed(1)}%
 - Jogada no T2: ${(monteCarloReport.before.turn2PlayRate * 100).toStringAsFixed(1)}% → ${(monteCarloReport.after.turn2PlayRate * 100).toStringAsFixed(1)}%
@@ -508,7 +548,11 @@ SUA TAREFA: Avaliar se as trocas são REALMENTE boas. Retorne apenas JSON:
     final lostDraw = (functional.roleDelta['draw'] ?? 0) < 0;
     final lostWipe = (functional.roleDelta['wipe'] ?? 0) < 0;
     final lostRamp = (functional.roleDelta['ramp'] ?? 0) < 0;
-    final hasCriticalRoleLoss = lostRemoval || lostDraw || lostWipe || lostRamp;
+    final lostLand = (functional.roleDelta['land'] ?? 0) < 0;
+    final hasCriticalRoleLoss =
+        lostRemoval || lostDraw || lostWipe || lostRamp || lostLand;
+    final hasCriticalThemeViolation =
+        themeValidation?.hasCriticalViolation == true;
     final consistencyDelta =
         monteCarlo.after.consistencyScore - monteCarlo.before.consistencyScore;
 
@@ -517,13 +561,15 @@ SUA TAREFA: Avaliar se as trocas são REALMENTE boas. Retorne apenas JSON:
       score -= 6;
     }
     // Penalidade por violação temática crítica
-    if (themeValidation != null && themeValidation.hasCriticalViolation) {
+    if (hasCriticalThemeViolation) {
       score -= 8;
     }
-    final cleanUpgradeBonus = healthScore >= 70 &&
+    final cleanUpgradeBonus =
+        healthScore >= 70 &&
         improvementScore >= 55 &&
         functional.questionable == 0 &&
-        !hasCriticalRoleLoss;
+        !hasCriticalRoleLoss &&
+        !hasCriticalThemeViolation;
     if (cleanUpgradeBonus) {
       score += 3;
     }
@@ -531,24 +577,27 @@ SUA TAREFA: Avaliar se as trocas são REALMENTE boas. Retorne apenas JSON:
 
     // Veredito
     String verdict;
-    if (healthScore < 45) {
+    if (healthScore < 45 || lostLand || hasCriticalThemeViolation) {
       verdict = 'reprovado';
     } else if (score >= 70 &&
         healthScore >= 70 &&
         improvementScore >= 55 &&
-        !hasCriticalRoleLoss) {
+        !hasCriticalRoleLoss &&
+        !hasCriticalThemeViolation) {
       verdict = 'aprovado';
     } else if (score >= 70 &&
         healthScore >= 80 &&
         functional.questionable <= 1 &&
-        !hasCriticalRoleLoss) {
+        !hasCriticalRoleLoss &&
+        !hasCriticalThemeViolation) {
       // Para decks já saudáveis, um score >= 70 geralmente indica melhora real.
       // Permitimos até 1 swap "questionável" desde que não haja perda crítica.
       verdict = 'aprovado';
     } else if (score >= 65 &&
         healthScore >= 80 &&
         functional.questionable <= 1 &&
-        !hasCriticalRoleLoss) {
+        !hasCriticalRoleLoss &&
+        !hasCriticalThemeViolation) {
       // Para decks já saudáveis, score >= 65 é um threshold aceitável para
       // micro-upgrades (evita bloquear melhorias pequenas mas seguras).
       verdict = 'aprovado';
@@ -562,7 +611,8 @@ SUA TAREFA: Avaliar se as trocas são REALMENTE boas. Retorne apenas JSON:
     final warnings = <String>[];
     if (consistencyDelta < -3) {
       warnings.add(
-          'Consistência do deck diminuiu (${monteCarlo.before.consistencyScore} → ${monteCarlo.after.consistencyScore})');
+        'Consistência do deck diminuiu (${monteCarlo.before.consistencyScore} → ${monteCarlo.after.consistencyScore})',
+      );
     }
     if (lostRemoval) {
       warnings.add('O deck perdeu cartas de remoção. Pode ficar vulnerável.');
@@ -572,26 +622,36 @@ SUA TAREFA: Avaliar se as trocas são REALMENTE boas. Retorne apenas JSON:
     }
     if (lostWipe) {
       warnings.add(
-          'O deck perdeu board wipe(s). Pode ter dificuldade contra ameaças múltiplas.');
+        'O deck perdeu board wipe(s). Pode ter dificuldade contra ameaças múltiplas.',
+      );
     }
     if (lostRamp) {
-      warnings
-          .add('O deck perdeu cartas de ramp. Pode ficar lento no early game.');
+      warnings.add(
+        'O deck perdeu cartas de ramp. Pode ficar lento no early game.',
+      );
+    }
+    if (lostLand) {
+      warnings.add(
+        'O deck perdeu terrenos e degradou a estrutura mínima da base de mana.',
+      );
     }
     if (functional.questionable > 0) {
       warnings.add(
-          '${functional.questionable} troca(s) questionável(is) — mudou função E ficou mais cara.');
+        '${functional.questionable} troca(s) questionável(is) — mudou função E ficou mais cara.',
+      );
     }
     if (monteCarlo.after.screwRate > monteCarlo.before.screwRate + 0.03) {
       warnings.add('Risco de mana screw aumentou significativamente.');
     }
     if (healthScore < 60) {
       warnings.add(
-          'Saúde absoluta do deck final ainda está baixa (${healthScore.round()}/100).');
+        'Saúde absoluta do deck final ainda está baixa (${healthScore.round()}/100).',
+      );
     }
     if (improvementScore < 50) {
       warnings.add(
-          'A melhoria incremental foi pequena (${improvementScore.round()}/100).');
+        'A melhoria incremental foi pequena (${improvementScore.round()}/100).',
+      );
     }
 
     // Adicionar warnings de validação temática
@@ -601,12 +661,14 @@ SUA TAREFA: Avaliar se as trocas são REALMENTE boas. Retorne apenas JSON:
             (check.priority == 'essential' || check.priority == 'high')) {
           if (check.status == 'below_min') {
             warnings.add(
-                'Tema ${themeValidation.theme}: ${check.function} abaixo do mínimo '
-                '(${check.current}/${check.min}). ${check.description}');
+              'Tema ${themeValidation.theme}: ${check.function} abaixo do mínimo '
+              '(${check.current}/${check.min}). ${check.description}',
+            );
           } else if (check.status == 'above_max') {
             warnings.add(
-                'Tema ${themeValidation.theme}: ${check.function} acima do máximo '
-                '(${check.current}/${check.max}). ${check.description}');
+              'Tema ${themeValidation.theme}: ${check.function} acima do máximo '
+              '(${check.current}/${check.max}). ${check.description}',
+            );
           }
         }
       }
@@ -621,6 +683,7 @@ SUA TAREFA: Avaliar se as trocas são REALMENTE boas. Retorne apenas JSON:
       functional: functional,
       critic: critic,
       warnings: warnings,
+      themeValidation: themeValidation,
     );
   }
 
@@ -631,8 +694,10 @@ SUA TAREFA: Avaliar se as trocas são REALMENTE boas. Retorne apenas JSON:
     final after = monteCarlo.after;
     final afterMulligan = monteCarlo.afterMulligan;
     final pressureRate = _pressureRateForArchetype(after, archetype);
-    final stableManaRate =
-        (1 - after.screwRate - after.floodRate).clamp(0.0, 1.0);
+    final stableManaRate = (1 - after.screwRate - after.floodRate).clamp(
+      0.0,
+      1.0,
+    );
 
     var score = 0.0;
     score += after.consistencyScore * 0.35;
@@ -656,12 +721,14 @@ SUA TAREFA: Avaliar se as trocas são REALMENTE boas. Retorne apenas JSON:
 
     final consistencyDelta = after.consistencyScore - before.consistencyScore;
     final keepableDelta = after.keepableRate - before.keepableRate;
-    final keepAfterMullDelta = afterMulligan.keepableAfterMullRate -
+    final keepAfterMullDelta =
+        afterMulligan.keepableAfterMullRate -
         beforeMulligan.keepableAfterMullRate;
     final keepAt7Delta = afterMulligan.keepAt7Rate - beforeMulligan.keepAt7Rate;
     final screwDelta = before.screwRate - after.screwRate;
     final floodDelta = before.floodRate - after.floodRate;
-    final pressureDelta = _pressureRateForArchetype(after, archetype) -
+    final pressureDelta =
+        _pressureRateForArchetype(after, archetype) -
         _pressureRateForArchetype(before, archetype);
 
     var score = 40.0;
@@ -682,9 +749,12 @@ SUA TAREFA: Avaliar se as trocas são REALMENTE boas. Retorne apenas JSON:
     if ((functional.roleDelta['draw'] ?? 0) < 0) score -= 10.0;
     if ((functional.roleDelta['wipe'] ?? 0) < 0) score -= 8.0;
     if ((functional.roleDelta['ramp'] ?? 0) < 0) score -= 8.0;
+    final landLoss = -(functional.roleDelta['land'] ?? 0);
+    if (landLoss > 0) score -= landLoss * 12.0;
     if ((functional.roleDelta['protection'] ?? 0) < 0) score -= 6.0;
 
-    final cleanIncrementalUpgrade = functional.upgrades >= 1 &&
+    final cleanIncrementalUpgrade =
+        functional.upgrades >= 1 &&
         functional.questionable == 0 &&
         consistencyDelta >= 0 &&
         keepAfterMullDelta >= -0.01 &&
@@ -716,9 +786,9 @@ SUA TAREFA: Avaliar se as trocas são REALMENTE boas. Retorne apenas JSON:
   // ═══════════════════════════════════════════════════════════════
 
   bool _isLand(Map<String, dynamic> card) {
-    return ((card['type_line'] as String?) ?? '')
-        .toLowerCase()
-        .contains('land');
+    return ((card['type_line'] as String?) ?? '').toLowerCase().contains(
+      'land',
+    );
   }
 
   Map<String, dynamic>? _findCardByName(
@@ -756,25 +826,30 @@ class MonteCarloComparison {
   });
 
   Map<String, dynamic> toJson() => {
-        'before': before.toJson(),
-        'after': after.toJson(),
-        'mulligan_before': beforeMulligan.toJson(),
-        'mulligan_after': afterMulligan.toJson(),
-        'deltas': {
-          'consistency_score': after.consistencyScore - before.consistencyScore,
-          'screw_rate_delta': double.parse(
-              (after.screwRate - before.screwRate).toStringAsFixed(3)),
-          'flood_rate_delta': double.parse(
-              (after.floodRate - before.floodRate).toStringAsFixed(3)),
-          'keepable_rate_delta': double.parse(
-              (after.keepableRate - before.keepableRate).toStringAsFixed(3)),
-          'turn2_play_delta': double.parse(
-              (after.turn2PlayRate - before.turn2PlayRate).toStringAsFixed(3)),
-          'mulligan_keep7_delta': double.parse(
-              (afterMulligan.keepAt7Rate - beforeMulligan.keepAt7Rate)
-                  .toStringAsFixed(3)),
-        },
-      };
+    'before': before.toJson(),
+    'after': after.toJson(),
+    'mulligan_before': beforeMulligan.toJson(),
+    'mulligan_after': afterMulligan.toJson(),
+    'deltas': {
+      'consistency_score': after.consistencyScore - before.consistencyScore,
+      'screw_rate_delta': double.parse(
+        (after.screwRate - before.screwRate).toStringAsFixed(3),
+      ),
+      'flood_rate_delta': double.parse(
+        (after.floodRate - before.floodRate).toStringAsFixed(3),
+      ),
+      'keepable_rate_delta': double.parse(
+        (after.keepableRate - before.keepableRate).toStringAsFixed(3),
+      ),
+      'turn2_play_delta': double.parse(
+        (after.turn2PlayRate - before.turn2PlayRate).toStringAsFixed(3),
+      ),
+      'mulligan_keep7_delta': double.parse(
+        (afterMulligan.keepAt7Rate - beforeMulligan.keepAt7Rate)
+            .toStringAsFixed(3),
+      ),
+    },
+  };
 }
 
 class MulliganReport {
@@ -797,15 +872,16 @@ class MulliganReport {
   });
 
   Map<String, dynamic> toJson() => {
-        'runs': runs,
-        'avg_mulligans': double.parse(avgMulligans.toStringAsFixed(2)),
-        'keep_at_7': double.parse(keepAt7Rate.toStringAsFixed(3)),
-        'keep_at_6': double.parse(keepAt6Rate.toStringAsFixed(3)),
-        'keep_at_5': double.parse(keepAt5Rate.toStringAsFixed(3)),
-        'keep_at_4_or_less': double.parse(keepAt4OrLessRate.toStringAsFixed(3)),
-        'keepable_after_mull':
-            double.parse(keepableAfterMullRate.toStringAsFixed(3)),
-      };
+    'runs': runs,
+    'avg_mulligans': double.parse(avgMulligans.toStringAsFixed(2)),
+    'keep_at_7': double.parse(keepAt7Rate.toStringAsFixed(3)),
+    'keep_at_6': double.parse(keepAt6Rate.toStringAsFixed(3)),
+    'keep_at_5': double.parse(keepAt5Rate.toStringAsFixed(3)),
+    'keep_at_4_or_less': double.parse(keepAt4OrLessRate.toStringAsFixed(3)),
+    'keepable_after_mull': double.parse(
+      keepableAfterMullRate.toStringAsFixed(3),
+    ),
+  };
 }
 
 class SwapFunctionalAnalysis {
@@ -828,14 +904,14 @@ class SwapFunctionalAnalysis {
   });
 
   Map<String, dynamic> toJson() => {
-        'removed': removed,
-        'added': added,
-        'removed_role': removedRole,
-        'added_role': addedRole,
-        'role_preserved': rolePreserved,
-        'cmc_delta': cmcDelta,
-        'verdict': verdict,
-      };
+    'removed': removed,
+    'added': added,
+    'removed_role': removedRole,
+    'added_role': addedRole,
+    'role_preserved': rolePreserved,
+    'cmc_delta': cmcDelta,
+    'verdict': verdict,
+  };
 }
 
 class FunctionalReport {
@@ -858,16 +934,16 @@ class FunctionalReport {
   });
 
   Map<String, dynamic> toJson() => {
-        'swaps': swaps.map((s) => s.toJson()).toList(),
-        'summary': {
-          'upgrades': upgrades,
-          'sidegrades': sidegrades,
-          'tradeoffs': tradeoffs,
-          'questionable': questionable,
-        },
-        'role_delta': roleDelta,
-        if (semanticLayerV2.isNotEmpty) 'semantic_layer_v2': semanticLayerV2,
-      };
+    'swaps': swaps.map((s) => s.toJson()).toList(),
+    'summary': {
+      'upgrades': upgrades,
+      'sidegrades': sidegrades,
+      'tradeoffs': tradeoffs,
+      'questionable': questionable,
+    },
+    'role_delta': roleDelta,
+    if (semanticLayerV2.isNotEmpty) 'semantic_layer_v2': semanticLayerV2,
+  };
 }
 
 class ValidationReport {
@@ -879,6 +955,7 @@ class ValidationReport {
   final FunctionalReport functional;
   final Map<String, dynamic>? critic;
   final List<String> warnings;
+  final ThemeValidationResult? themeValidation;
 
   ValidationReport({
     required this.score,
@@ -889,16 +966,18 @@ class ValidationReport {
     required this.functional,
     this.critic,
     required this.warnings,
+    this.themeValidation,
   });
 
   Map<String, dynamic> toJson() => {
-        'validation_score': score,
-        'deck_health_score': healthScore,
-        'improvement_score': improvementScore,
-        'verdict': verdict,
-        'monte_carlo': monteCarlo.toJson(),
-        'functional_analysis': functional.toJson(),
-        if (critic != null) 'critic_ai': critic,
-        'warnings': warnings,
-      };
+    'validation_score': score,
+    'deck_health_score': healthScore,
+    'improvement_score': improvementScore,
+    'verdict': verdict,
+    'monte_carlo': monteCarlo.toJson(),
+    'functional_analysis': functional.toJson(),
+    if (critic != null) 'critic_ai': critic,
+    if (themeValidation != null) 'theme_validation': themeValidation!.toJson(),
+    'warnings': warnings,
+  };
 }

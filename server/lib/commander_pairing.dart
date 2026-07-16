@@ -33,30 +33,51 @@ bool hasChooseBackgroundCommanderPairAbility(CommanderPairingCard card) {
 }
 
 bool hasFriendsForeverCommanderPairAbility(CommanderPairingCard card) {
-  return (card.oracleText ?? '').toLowerCase().contains('friends forever');
+  return partnerTextCommanderPairVariant(card) == 'friends forever';
 }
 
 bool hasDoctorsCompanionCommanderPairAbility(CommanderPairingCard card) {
-  return (card.oracleText ?? '').toLowerCase().contains("doctor's companion");
+  return _commanderPairKeywordLines(card).contains("doctor's companion");
 }
 
 bool isTimeLordDoctorCommander(CommanderPairingCard card) {
-  final typeLine = card.typeLine.toLowerCase();
-  return typeLine.contains('time lord') && typeLine.contains('doctor');
+  final parts = _normalizedTypeLineParts(card.typeLine);
+  if (parts.length != 2 || !_isLegendaryCreatureTypeHeader(parts.first)) {
+    return false;
+  }
+  return parts.last == 'time lord doctor';
 }
 
 String? partnerWithCommanderPairTargetName(CommanderPairingCard card) {
-  final oracle = (card.oracleText ?? '').toLowerCase();
-  final match = RegExp(r'\bpartner with\s+([^\n(]+)').firstMatch(oracle);
-  final value = match?.group(1)?.trim();
-  if (value == null || value.isEmpty) return null;
-  return value.replaceAll(RegExp(r'[.;:]+$'), '').trim();
+  for (final line in _commanderPairKeywordLines(card)) {
+    final match = RegExp(r'^partner with\s+(.+)$').firstMatch(line);
+    final value = match?.group(1)?.trim();
+    if (value != null && value.isNotEmpty) return value;
+  }
+  return null;
+}
+
+/// Returns the exact CR 702.124i `partner—[text]` variant, when present.
+///
+/// Some Oracle payloads expose the named ability without the `partner—`
+/// prefix (for example, `Friends forever`), so both representations normalize
+/// to the same variant key.
+String? partnerTextCommanderPairVariant(CommanderPairingCard card) {
+  for (final line in _commanderPairKeywordLines(card)) {
+    final match = RegExp(r'^partner\s*[—–-]\s*(.+)$').firstMatch(line);
+    final explicitVariant = match?.group(1)?.trim();
+    if (explicitVariant != null && explicitVariant.isNotEmpty) {
+      return explicitVariant;
+    }
+    if (_standalonePartnerTextVariants.contains(line)) return line;
+  }
+  return null;
 }
 
 bool hasGenericPartnerCommanderPairAbility(CommanderPairingCard card) {
-  final oracle = (card.oracleText ?? '').toLowerCase();
   if (partnerWithCommanderPairTargetName(card) != null) return false;
-  return RegExp(r'\bpartner\b').hasMatch(oracle);
+  if (partnerTextCommanderPairVariant(card) != null) return false;
+  return _commanderPairKeywordLines(card).contains('partner');
 }
 
 bool areCommanderPairingCompatible(
@@ -65,19 +86,23 @@ bool areCommanderPairingCompatible(
 ) {
   final firstPartnerWith = partnerWithCommanderPairTargetName(first);
   final secondPartnerWith = partnerWithCommanderPairTargetName(second);
+  final firstPartnerText = partnerTextCommanderPairVariant(first);
+  final secondPartnerText = partnerTextCommanderPairVariant(second);
 
   if (hasGenericPartnerCommanderPairAbility(first) &&
       hasGenericPartnerCommanderPairAbility(second)) {
     return true;
   }
 
+  if (firstPartnerText != null && firstPartnerText == secondPartnerText) {
+    return true;
+  }
+
   final firstName = normalizePhysicalCardCopyName(first.name);
   final secondName = normalizePhysicalCardCopyName(second.name);
   if (firstPartnerWith != null &&
-      normalizePhysicalCardCopyName(firstPartnerWith) == secondName) {
-    return true;
-  }
-  if (secondPartnerWith != null &&
+      secondPartnerWith != null &&
+      normalizePhysicalCardCopyName(firstPartnerWith) == secondName &&
       normalizePhysicalCardCopyName(secondPartnerWith) == firstName) {
     return true;
   }
@@ -89,17 +114,55 @@ bool areCommanderPairingCompatible(
     return true;
   }
 
-  if (hasFriendsForeverCommanderPairAbility(first) &&
-      hasFriendsForeverCommanderPairAbility(second)) {
-    return true;
-  }
-
   if ((hasDoctorsCompanionCommanderPairAbility(first) &&
+          _isLegendaryCreatureCard(first) &&
           isTimeLordDoctorCommander(second)) ||
       (hasDoctorsCompanionCommanderPairAbility(second) &&
+          _isLegendaryCreatureCard(second) &&
           isTimeLordDoctorCommander(first))) {
     return true;
   }
 
   return false;
+}
+
+const _standalonePartnerTextVariants = <String>{
+  'character select',
+  'father & son',
+  'friends forever',
+  'survivors',
+};
+
+List<String> _commanderPairKeywordLines(CommanderPairingCard card) {
+  final oracle = (card.oracleText ?? '')
+      .toLowerCase()
+      .replaceAll('’', "'")
+      .replaceAll('\r\n', '\n');
+  return oracle
+      .split('\n')
+      .map((rawLine) {
+        final beforeReminder = rawLine.split('(').first;
+        return beforeReminder
+            .replaceAll(RegExp(r'\s+'), ' ')
+            .replaceAll(RegExp(r'[.;:]+$'), '')
+            .trim();
+      })
+      .where((line) => line.isNotEmpty)
+      .toList(growable: false);
+}
+
+List<String> _normalizedTypeLineParts(String typeLine) {
+  final normalized =
+      typeLine.toLowerCase().replaceAll(RegExp(r'\s+'), ' ').trim();
+  return normalized.split(RegExp(r'\s+[—–-]\s+'));
+}
+
+bool _isLegendaryCreatureTypeHeader(String typeHeader) {
+  return RegExp(r'\blegendary\b').hasMatch(typeHeader) &&
+      RegExp(r'\bcreature\b').hasMatch(typeHeader);
+}
+
+bool _isLegendaryCreatureCard(CommanderPairingCard card) {
+  final parts = _normalizedTypeLineParts(card.typeLine);
+  return parts.isNotEmpty && _isLegendaryCreatureTypeHeader(parts.first);
 }

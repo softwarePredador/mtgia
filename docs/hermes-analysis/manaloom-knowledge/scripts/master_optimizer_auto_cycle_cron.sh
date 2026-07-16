@@ -2,6 +2,11 @@
 set -euo pipefail
 
 REPO="${MANALOOM_REPO:-/opt/data/workspace/mtgia}"
+source "$REPO/scripts/lib/manaloom_mutation_guard.sh"
+BATTLE_RULES_APPLY_PG_REQUESTED="${MANALOOM_BATTLE_RULES_APPLY_PG:-0}"
+if [[ "$BATTLE_RULES_APPLY_PG_REQUESTED" == "1" ]]; then
+  require_postgres_write_approval "master optimizer auto-cycle battle-rule PostgreSQL sync"
+fi
 SCRIPT_DIR="$REPO/docs/hermes-analysis/manaloom-knowledge/scripts"
 REPORT_DIR="$REPO/docs/hermes-analysis/master_optimizer_reports"
 ARTIFACT_DIR="${MANALOOM_MASTER_OPTIMIZER_ARTIFACT_DIR:-/opt/data/artifacts/hermes_master_optimizer}"
@@ -114,7 +119,7 @@ apply_out="$(mktemp)"
 
   echo "== battle card rules sync =="
   battle_rules_pg_report="$ARTIFACT_DIR/card_battle_rules_pg_sync_auto_cycle_$(date -u +%Y%m%d_%H%M%S).json"
-  if [[ "${MANALOOM_BATTLE_RULES_APPLY_PG:-0}" == "1" ]]; then
+  if [[ "$BATTLE_RULES_APPLY_PG_REQUESTED" == "1" ]]; then
     python3 "$SCRIPT_DIR/sync_battle_card_rules_pg.py" \
       --sqlite-db "$MANALOOM_KNOWLEDGE_DB" \
       --apply-pg \

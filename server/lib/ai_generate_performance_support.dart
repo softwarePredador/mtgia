@@ -5,6 +5,11 @@ import 'package:crypto/crypto.dart';
 import 'endpoint_cache.dart';
 import 'openai_runtime_config.dart';
 
+// Bump whenever the player-facing generate response contract changes. Cached
+// payloads are returned as-is, so an older key could omit safety diagnostics
+// such as deckbuilding_contract until its TTL expires.
+const aiGenerateCacheContractVersion = 'v2';
+
 String normalizeAiGeneratePrompt(String prompt) {
   return prompt.trim().toLowerCase().replaceAll(RegExp(r'\s+'), ' ');
 }
@@ -35,7 +40,7 @@ String buildAiGenerateCacheKey({
   final normalizedCommander = normalizeAiGenerateCommanderName(commanderName);
   final normalizedProfileVersion = referenceProfileVersion?.trim() ?? '';
   final payload = {
-    'version': 1,
+    'version': 2,
     'prompt': normalizeAiGeneratePrompt(prompt),
     'format': normalizeAiGenerateFormat(format),
     'bracket': normalizeAiGenerateBracket(bracket),
@@ -45,7 +50,7 @@ String buildAiGenerateCacheKey({
   };
   final material = jsonEncode(payload);
   final digest = sha256.convert(utf8.encode(material)).toString();
-  return 'ai_generate:v1:$digest';
+  return 'ai_generate:$aiGenerateCacheContractVersion:$digest';
 }
 
 bool isAiGenerateAsyncRequested(Map<String, dynamic> body) {
@@ -188,9 +193,6 @@ Map<String, dynamic> withAiGenerateRuntimeMetadata({
       'hit': cacheHit,
       'cache_key': cacheKey,
     },
-    'timings': {
-      ...(payload['timings'] as Map? ?? const {}),
-      ...timings,
-    },
+    'timings': {...(payload['timings'] as Map? ?? const {}), ...timings},
   };
 }

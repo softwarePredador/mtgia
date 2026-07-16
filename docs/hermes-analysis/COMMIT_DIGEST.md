@@ -541,7 +541,11 @@ Commits anteriores mantidos como referência:
 ### Assets novos
 - `app/assets/branding/app_logo.png` (1.7MB)
 - `app/assets/branding/home_hero_banner.png` (252KB)
-- `nrelogo.png`, `nrelogos.png`, `slasharat.png` na raiz (arquivos fonte)
+- fontes preservadas nas cópias canônicas
+  `docs/qa/manaloom_app_icon_source_2026-05-21.png`,
+  `app/assets/branding/home_hero.png` e
+  `docs/qa/manaloom_splash_art_source_2026-05-21.png`; os aliases binários
+  idênticos da raiz foram removidos em 2026-07-15
 
 ## Analise do commit 9a2bb38b — Lotus
 

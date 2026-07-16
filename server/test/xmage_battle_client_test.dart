@@ -19,6 +19,7 @@ void main() {
             'status': 'completed',
             'engine': 'xmage',
             'winner_deck_id': 'deck-a',
+            'turns': 7,
           }),
           200,
         );
@@ -31,19 +32,82 @@ void main() {
     expect(result['winner_deck_id'], 'deck-a');
   });
 
+  test('rejects a zero-turn completed XMage payload', () async {
+    final client = XmageBattleClient(
+      baseUrl: 'http://xmage.internal:8080',
+      client: MockClient(
+        (_) async => http.Response(
+          jsonEncode({
+            'status': 'completed',
+            'engine': 'xmage',
+            'turns': 0,
+            'events': <dynamic>[],
+            'visual_snapshots': <dynamic>[],
+          }),
+          200,
+        ),
+      ),
+    );
+
+    await expectLater(
+      client.simulate({'seed': 42}),
+      throwsA(
+        isA<XmageServiceException>().having(
+          (error) => error.statusCode,
+          'status',
+          502,
+        ),
+      ),
+    );
+  });
+
+  test('rejects mismatched-engine and error-bearing XMage payloads', () async {
+    final invalidPayloads = [
+      {'status': 'completed', 'engine': 'forge', 'turns': 7},
+      {
+        'status': 'completed',
+        'engine': 'xmage',
+        'turns': 7,
+        'error': 'engine_failed',
+      },
+    ];
+
+    for (final payload in invalidPayloads) {
+      final client = XmageBattleClient(
+        baseUrl: 'http://xmage.internal:8080',
+        client: MockClient(
+          (_) async => http.Response(jsonEncode(payload), 200),
+        ),
+      );
+      await expectLater(
+        client.simulate({'seed': 42}),
+        throwsA(
+          isA<XmageServiceException>().having(
+            (error) => error.statusCode,
+            'status',
+            502,
+          ),
+        ),
+      );
+      client.close();
+    }
+  });
+
   test('exposes unsupported cards from the strict sidecar contract', () async {
     final client = XmageBattleClient(
       baseUrl: 'http://xmage.internal:8080',
-      client: MockClient((_) async => http.Response(
-            jsonEncode({
-              'error': 'xmage_coverage_incomplete',
-              'message': 'XMage could not resolve 1 card entries',
-              'unsupported_cards': [
-                {'deck_key': 'deck_a', 'name': 'Molecule Man'},
-              ],
-            }),
-            422,
-          )),
+      client: MockClient(
+        (_) async => http.Response(
+          jsonEncode({
+            'error': 'xmage_coverage_incomplete',
+            'message': 'XMage could not resolve 1 card entries',
+            'unsupported_cards': [
+              {'deck_key': 'deck_a', 'name': 'Molecule Man'},
+            ],
+          }),
+          422,
+        ),
+      ),
     );
 
     await expectLater(
@@ -61,17 +125,22 @@ void main() {
   test('does not reinterpret sidecar failures as valid battles', () async {
     final client = XmageBattleClient(
       baseUrl: 'http://xmage.internal:8080',
-      client: MockClient((_) async => http.Response(
-            jsonEncode({'error': 'simulation_failed', 'message': 'offline'}),
-            500,
-          )),
+      client: MockClient(
+        (_) async => http.Response(
+          jsonEncode({'error': 'simulation_failed', 'message': 'offline'}),
+          500,
+        ),
+      ),
     );
 
     await expectLater(
       client.simulate({'seed': 42}),
       throwsA(
-        isA<XmageServiceException>()
-            .having((error) => error.statusCode, 'status', 500),
+        isA<XmageServiceException>().having(
+          (error) => error.statusCode,
+          'status',
+          500,
+        ),
       ),
     );
   });
@@ -89,8 +158,11 @@ void main() {
     await expectLater(
       client.simulate({'seed': 42}),
       throwsA(
-        isA<XmageServiceException>()
-            .having((error) => error.statusCode, 'status', 504),
+        isA<XmageServiceException>().having(
+          (error) => error.statusCode,
+          'status',
+          504,
+        ),
       ),
     );
   });

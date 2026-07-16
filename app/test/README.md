@@ -1,156 +1,122 @@
-# Flutter Test Suite - MTGIA
+# Testes do app ManaLoom
 
-> Guia ativo de testes do app.
-> A prioridade funcional dessas suites deve seguir `docs/CONTEXTO_PRODUTO_ATUAL.md`.
+Este diretório contém unit, widget, golden e auditorias de acessibilidade do
+Flutter. O contrato vigente de perfis, autorizações e conclusão fica em
+`docs/MANALOOM_E2E_RELEASE_CONTRACT.md`; testes runtime/Patrol são inventariados
+em `app/integration_test/README.md`.
 
-Esta pasta cobre o comportamento do app que sustenta o fluxo principal de decks.
+## Jornada protegida
 
-O backend carrega a maior parte da logica de otimizacao, mas o app precisa preservar contexto, interpretar contratos corretamente e nao degradar a confianca percebida do usuario.
+Em 2026-07-15, a prioridade continua sendo a jornada Commander:
 
-## Foco atual
+`onboarding -> generate/import -> details -> analyze -> optimize/rebuild -> apply -> validate`
 
-Em `2026-03-23`, a prioridade oficial do projeto passou a ser proteger a jornada:
+O app deve preservar IDs, commander, formato, legalidade e pareamento atômico
+de swaps ao interpretar o backend. UI verde sem contrato de aplicação verde não
+é aprovação do fluxo.
 
-- onboarding
-- gerar ou importar deck
-- abrir details
-- otimizar
-- aplicar e validar
+## Entradas canônicas
 
-## Estrutura relevante hoje
+| Objetivo | Comando na raiz | Rede/escrita |
+| --- | --- | --- |
+| app + server completos | `./scripts/quality_gate.sh full` | não |
+| deckbuilder integrado | `./scripts/quality_gate.sh e2e` | não por padrão |
+| UI/goldens/acessibilidade | `./scripts/quality_gate.sh ui-audit` | não |
+| jornadas críticas Patrol | `./scripts/quality_gate.sh patrol-smoke` | fake/local por padrão |
+| dependências | `./scripts/quality_gate.sh deps` | não |
+| regras customizadas | `./scripts/quality_gate.sh custom-lint` | não |
 
-- `test/features/decks/models/`
-- `test/features/decks/providers/`
-- `test/features/decks/screens/`
-- `test/features/decks/widgets/`
-
-## Suites relevantes do core
-
-### Models
-
-- `deck_card_item_test.dart`
-- `deck_details_test.dart`
-- `deck_test.dart`
-
-Cobrem:
-
-- parsing de contratos JSON
-- defaults e fallbacks
-- serializacao
-- preservacao de cores e dados de carta
-
-### Provider
-
-- `deck_provider_test.dart`
-
-Cobertura principal:
-
-- falha quando o batch resolve quebra
-- falha quando ha nomes nao resolvidos
-- falha quando ha nomes ambiguos
-- preserva ids diretos e nomes resolvidos na criacao
-- interpreta corretamente payload estruturado de `needs_repair`
-- preserva contrato de `rebuild` em sucesso
-
-### Screens
-
-- `deck_flow_entry_screens_test.dart`
-
-Cobertura principal:
-
-- o formato escolhido no onboarding chega intacto em generate
-- o formato escolhido no onboarding chega intacto em import
-
-### Widgets
-
-- `deck_diagnostic_panel_test.dart`
-- `sample_hand_widget_test.dart`
-
-Cobrem:
-
-- exibicao de metricas e insights do deck
-- comportamento de sample hand
-- robustez visual em larguras pequenas e nomes longos
-
-## Resultado da auditoria de 2026-03-23
-
-Validado nesta rodada:
-
-- suites de models ligadas a deck
-- `deck_provider_test.dart`
-- widgets que sustentam diagnostico, sample hand e robustez visual
-- entrada do fluxo de onboarding para generate e import
-
-Status:
-
-- camada Flutter relevante auditada nesta rodada: verde
-
-Leitura operacional:
-
-- o app esta protegendo melhor os contratos do backend
-- ja existe smoke funcional do provider para `deck details -> optimize -> apply -> validate`
-- a maior fragilidade continua sendo cobertura insuficiente de jornadas completas, nao de widgets isolados
-
-## Comandos recomendados
-
-### Validacao Flutter do core
+Comandos focados dentro de `app/`:
 
 ```bash
-flutter test test/features/decks/models/deck_card_item_test.dart \
-  test/features/decks/models/deck_details_test.dart \
-  test/features/decks/models/deck_test.dart \
-  test/features/decks/providers/deck_provider_test.dart \
-  test/features/decks/screens/deck_flow_entry_screens_test.dart \
-  test/features/decks/widgets/deck_diagnostic_panel_test.dart \
-  test/features/decks/widgets/sample_hand_widget_test.dart
+flutter analyze --no-fatal-infos
+flutter test --no-version-check
+flutter test test/features/decks --no-version-check
+flutter test test/ui test/core/widgets/debug_accessibility_tools_test.dart \
+  --no-version-check
 ```
 
-### Validacao completa do app
+## Organização da cobertura
+
+- `test/features/decks/models/`: parsing, defaults e serialização;
+- `test/features/decks/providers/`: requests, resolução de cartas, mutações e
+  interpretação dos contratos de IA;
+- `test/features/decks/screens/`: entrada e jornada de telas;
+- `test/features/decks/widgets/`: análise, diagnóstico, optimize, sample hand e
+  robustez de layout;
+- `test/ui/`: goldens e contratos de campo/acessibilidade;
+- `test/core/`: API client, observabilidade, logging e widgets compartilhados;
+- `integration_test/`: runtime em device/simulador, sempre opt-in;
+- `patrol_test/`: jornadas Patrol determinísticas e runner real opt-in.
+
+## Goldens e artefatos
+
+Baselines revisadas ficam em `test/**/goldens/`. Atualize uma baseline somente
+depois de inspecionar visualmente a mudança:
 
 ```bash
-flutter test
+flutter test <arquivo> --update-goldens --no-version-check
 ```
 
-### Prova visual do hero da Home
+`test/**/failures/`, `test_bundle.dart`, `playwright-report/`, `test-results/` e
+`*.xcresult` são saídas geradas e ficam ignorados. Não mova um diff de falha
+para `goldens/` para fazer o gate passar.
+
+## Patrol
+
+O smoke local cobre login, cadastro/validação, paywall de IA, planos, legal,
+upgrade e checkout com serviços controlados:
 
 ```bash
-flutter test test/features/home/home_screen_test.dart --no-version-check
+./scripts/quality_gate.sh patrol-smoke
 ```
 
-O teste `matches the SM A135M hero visual baseline` compara o frame vivo do hero
-com `test/features/home/goldens/home_hero_sma135m.png` em viewport de telefone.
-Ele complementa o runtime no simulador: smoke/runtime provam o fluxo; o golden
-falha se arte, background, tipografia ou espacamento do hero mudarem sem revisao.
-
-Atualize a baseline somente depois de comparar o PNG gerado com a referencia:
+Chrome headless, quando solicitado, continua sem escrever em produto:
 
 ```bash
-flutter test test/features/home/home_screen_test.dart --update-goldens --no-version-check
+MANALOOM_RUN_PATROL_DEVICE_TESTS=1 \
+MANALOOM_PATROL_DEVICE=chrome \
+MANALOOM_PATROL_WEB_HEADLESS=true \
+./scripts/quality_gate.sh patrol-smoke
 ```
 
-## Life counter vivo
+O bridge iOS ativo fica em `ios/RunnerUITests/`. A ausência desse target em
+`xcodebuild -list` é falha de harness, não motivo para pular silenciosamente.
 
-O caminho oficial do contador hoje nao e mais `LifeCounterScreen`.
+## Runtime live
 
-Cobertura principal atual:
+Arquivos em `integration_test/` variam: alguns são visuais/offline; outros
+registram usuário, criam deck ou chamam API/IA. Não rode o diretório inteiro
+contra uma URL pública.
 
-- `test/features/home/lotus_life_counter_screen_test.dart`
-- `integration_test/life_counter_webview_smoke_test.dart`
+O perfil integrado guardado exige seleção e tokens textuais:
 
-Escopo:
+```bash
+MANALOOM_RUN_FLUTTER_RUNTIME_E2E=1 \
+MANALOOM_CONFIRM_LIVE_MUTATIONS=I_HAVE_EXPLICIT_APPROVAL \
+MANALOOM_CONFIRM_POSTGRES_WRITES=I_HAVE_EXPLICIT_APPROVAL \
+MANALOOM_API_BASE_URL=https://alvo-aprovado.example \
+./scripts/quality_gate.sh e2e
+```
 
-- boot do host
-- erro de bundle e `Retry`
-- feedback do shell
-- rota viva `/life-counter`
+Uma flag `MANALOOM_RUN_*` não é autorização. Não persista tokens em `.env` ou
+CI.
 
-As suites de paridade do clone nativo antigo foram removidas em 2026-07-01.
-O aceite atual fica no host Lotus e nos fluxos internos/fallbacks vivos.
+## Life counter
 
-## Proximo salto de cobertura
+O caminho vivo é o host Lotus. A única fonte empacotada do bundle é
+`app/assets/lotus/`; o antigo espelho em
+`app/android/app/src/main/assets/lotus/` foi removido. A cobertura principal
+fica no host, nas rotas e nos cenários runtime descritos em
+`app/integration_test/README.md`.
 
-Para colocar o app no mesmo nivel de exigencia do backend, as proximas suites devem cobrir:
+## Critério de aceite
 
-1. `deck list -> deck details`
-2. elevar o smoke funcional atual para smoke de tela completa em `deck details -> optimize -> apply -> validate`
-3. erros de loading, timeout e `needs_repair` na tela de details
+- teste focado para a regra alterada;
+- suíte completa do app verde;
+- gate UI quando houver mudança visual/interativa;
+- Patrol quando houver login, cadastro, paywall, planos, legal, checkout ou
+  bridge nativo;
+- E2E integrado para deckbuilder/IA/battle;
+- qualquer runtime/device/live não executado registrado como `SKIP` ou
+  pendência, nunca contado como `PASS` de produção.

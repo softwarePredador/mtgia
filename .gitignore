@@ -38,13 +38,28 @@ app/doc/current_screen_proofs_*/
 app/doc/live_menu_proofs_*/
 app/doc/menu_audit_iteration_*/
 app/doc/menu_icon_iteration_*/
-app/test/features/home/failures/
+
+# Generated Flutter/Patrol/Playwright test artifacts. Golden baselines under
+# app/test/**/goldens stay versioned; only failure output is disposable.
+app/test/**/failures/
+app/test_bundle.dart
+app/patrol_test/test_bundle.dart
+app/playwright-report/
+app/test-results/
+*.xcresult/
+
+# Package lockfiles are versioned for deployable apps (root/app/server), but
+# custom lint packages are reusable libraries and keep local resolution only.
+tools/*/pubspec.lock
 
 # Local server test artifacts
 server/test/artifacts/*
 !server/test/artifacts/ai_optimize/
 server/test/artifacts/*.pid
 server/test/artifacts/*.port
+
+# Legacy root-level Commander resolution reports (generated test output)
+/RELATORIO_RESOLUCAO_SUITE_COMMANDER_*.md
 
 # AI optimize debug artifacts (generated during HTTP optimize flow tests)
 server/test/artifacts/ai_optimize/source_deck_optimize_*.json

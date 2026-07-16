@@ -58,6 +58,47 @@ class ForgeSidecarTest(unittest.TestCase):
                 forge_commit="abc",
             )
 
+    def test_parse_rejects_completed_result_without_positive_turn_evidence(self):
+        with self.assertRaisesRegex(
+            forge_sidecar.SimulationFailed, "without positive turn evidence"
+        ):
+            forge_sidecar.parse_simulation_output(
+                "\n".join(
+                    [
+                        "Ai(1)-Deck A vs Ai(2)-Deck B - one game of Commander",
+                        "Game Result: Game 1 ended in 1000 ms. Ai(1)-Deck A has won!",
+                    ]
+                ),
+                request_id="test",
+                seed=1,
+                deck_a=_deck("deck-a", "Deck A"),
+                deck_b=_deck("deck-b", "Deck B"),
+                duration_ms=1200,
+                started_at="2026-07-14T00:00:00Z",
+                forge_commit="abc",
+            )
+
+    def test_parse_uses_last_turn_event_when_outcome_turn_marker_is_absent(self):
+        result = forge_sidecar.parse_simulation_output(
+            "\n".join(
+                [
+                    "Ai(1)-Deck A vs Ai(2)-Deck B - one game of Commander",
+                    "Turn: Turn 1 (Ai(1)-Deck A)",
+                    "Turn: Turn 2 (Ai(2)-Deck B)",
+                    "Game Result: Game 1 ended in 1000 ms. Ai(1)-Deck A has won!",
+                ]
+            ),
+            request_id="test",
+            seed=1,
+            deck_a=_deck("deck-a", "Deck A"),
+            deck_b=_deck("deck-b", "Deck B"),
+            duration_ms=1200,
+            started_at="2026-07-14T00:00:00Z",
+            forge_commit="abc",
+        )
+
+        self.assertEqual(2, result["turns"])
+
     def test_parse_rejects_completed_game_with_engine_error(self):
         with self.assertRaisesRegex(forge_sidecar.SimulationFailed, "engine errors"):
             forge_sidecar.parse_simulation_output(

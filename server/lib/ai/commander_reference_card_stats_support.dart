@@ -43,18 +43,18 @@ class CommanderReferenceCardStat {
   final DateTime? updatedAt;
 
   Map<String, dynamic> toJson() => {
-        'commander_name': commanderName,
-        'card_name': cardName,
-        if (cardId != null) 'card_id': cardId,
-        'package_key': packageKey,
-        'role': role,
-        'score': score,
-        'confidence': confidence,
-        'source': source,
-        'evidence_count': evidenceCount,
-        'unresolved': unresolved,
-        if (updatedAt != null) 'updated_at': updatedAt!.toIso8601String(),
-      };
+    'commander_name': commanderName,
+    'card_name': cardName,
+    if (cardId != null) 'card_id': cardId,
+    'package_key': packageKey,
+    'role': role,
+    'score': score,
+    'confidence': confidence,
+    'source': source,
+    'evidence_count': evidenceCount,
+    'unresolved': unresolved,
+    if (updatedAt != null) 'updated_at': updatedAt!.toIso8601String(),
+  };
 }
 
 class CommanderReferenceCardStatsResolution {
@@ -71,13 +71,13 @@ class CommanderReferenceCardStatsResolution {
   int get resolvedCount => stats.where((stat) => !stat.unresolved).length;
 
   Map<String, dynamic> toJson() => {
-        'resolved_count': resolvedCount,
-        'unresolved_count': unresolvedCardNames.length,
-        'unresolved_reference_cards': unresolvedCardNames,
-        'off_color_count': offColorCardNames.length,
-        'off_color_reference_cards': offColorCardNames,
-        'package_coverage': packageCoverage,
-      };
+    'resolved_count': resolvedCount,
+    'unresolved_count': unresolvedCardNames.length,
+    'unresolved_reference_cards': unresolvedCardNames,
+    'off_color_count': offColorCardNames.length,
+    'off_color_reference_cards': offColorCardNames,
+    'package_coverage': packageCoverage,
+  };
 
   Map<String, Map<String, int>> get packageCoverage {
     final coverage = <String, Map<String, int>>{};
@@ -107,11 +107,11 @@ class CommanderReferenceCommanderCardResolution {
   final String? cardName;
 
   Map<String, dynamic> toJson() => {
-        'commander_name': commanderName,
-        'resolved': resolved,
-        if (cardId != null) 'card_id': cardId,
-        if (cardName != null) 'card_name': cardName,
-      };
+    'commander_name': commanderName,
+    'resolved': resolved,
+    if (cardId != null) 'card_id': cardId,
+    if (cardName != null) 'card_name': cardName,
+  };
 }
 
 class CommanderReferenceCardStatsLoadResult {
@@ -154,20 +154,18 @@ class ReferenceGeneratedDeckEvaluation {
   final List<Map<String, dynamic>> cards;
 
   Map<String, dynamic> toJson() => {
-        'classification': classification,
-        'counts': counts,
-        'role_coverage': roleCoverage,
-        'cards': cards,
-      };
+    'classification': classification,
+    'counts': counts,
+    'role_coverage': roleCoverage,
+    'cards': cards,
+  };
 }
 
 String normalizeCommanderReferenceCardName(String value) =>
     normalizeCommanderReferenceName(value);
 
 List<String> commanderReferenceCardLookupAliases(String cardName) {
-  final aliases = <String>{
-    normalizeCommanderReferenceCardName(cardName),
-  };
+  final aliases = <String>{normalizeCommanderReferenceCardName(cardName)};
   final parts = cardName.split(RegExp(r'\s*//\s*'));
   if (parts.length > 1) {
     aliases.add(normalizeCommanderReferenceCardName(parts.first));
@@ -176,7 +174,7 @@ List<String> commanderReferenceCardLookupAliases(String cardName) {
 }
 
 CommanderReferenceCommanderCardResolution
-    findResolvedCommanderReferenceCommanderCard({
+findResolvedCommanderReferenceCommanderCard({
   required String commanderName,
   required Map<String, Map<String, dynamic>> resolvedCardsByName,
 }) {
@@ -192,8 +190,9 @@ CommanderReferenceCommanderCardResolution
   for (final entry in resolvedCardsByName.entries) {
     final key = normalizeCommanderReferenceCardName(entry.key);
     final resolvedName = entry.value['name']?.toString().trim() ?? '';
-    final resolvedNameNormalized =
-        normalizeCommanderReferenceCardName(resolvedName);
+    final resolvedNameNormalized = normalizeCommanderReferenceCardName(
+      resolvedName,
+    );
     if (key != target && resolvedNameNormalized != target) continue;
 
     final cardId = entry.value['id']?.toString().trim();
@@ -220,7 +219,7 @@ CommanderReferenceCommanderCardResolution
 }
 
 Future<CommanderReferenceCommanderCardResolution>
-    resolveCommanderReferenceCommanderCard(
+resolveCommanderReferenceCommanderCard(
   Pool pool,
   Map<String, dynamic> profile,
 ) async {
@@ -235,13 +234,9 @@ Future<CommanderReferenceCommanderCardResolution>
     );
   }
 
-  final resolved = await resolveImportCardNames(
-    pool,
-    [
-      {'name': commanderName}
-    ],
-    preferredFormat: 'commander',
-  );
+  final resolved = await resolveImportCardNames(pool, [
+    {'name': commanderName},
+  ], preferredFormat: 'commander');
 
   return findResolvedCommanderReferenceCommanderCard(
     commanderName: commanderName,
@@ -272,14 +267,16 @@ List<CommanderReferenceCardStat> buildCommanderReferenceCardStatsFromProfile({
           .trim();
   if (commanderName.isEmpty) return const [];
 
-  final source = profile['source']?.toString().trim().isNotEmpty == true
-      ? profile['source'].toString().trim()
-      : loreholdReferenceProfileSource;
+  final source =
+      profile['source']?.toString().trim().isNotEmpty == true
+          ? profile['source'].toString().trim()
+          : loreholdReferenceProfileSource;
   final evidenceCount = _sourceCount(profile).clamp(1, 999);
   final stats = <CommanderReferenceCardStat>[];
 
-  final entries = expectedPackages.entries.toList()
-    ..sort((a, b) => a.key.toString().compareTo(b.key.toString()));
+  final entries =
+      expectedPackages.entries.toList()
+        ..sort((a, b) => a.key.toString().compareTo(b.key.toString()));
   for (final entry in entries) {
     final packageKey = entry.key.toString().trim();
     final role = _roleForPackage(packageKey);
@@ -330,7 +327,7 @@ Future<CommanderReferenceCardStatsResolution> resolveLoreholdReferenceCardStats(
 }
 
 Future<CommanderReferenceCardStatsResolution>
-    resolveCommanderReferenceCardStats(
+resolveCommanderReferenceCardStats(
   Pool pool,
   Map<String, dynamic> profile,
 ) async {
@@ -350,15 +347,12 @@ Future<CommanderReferenceCardStatsResolution>
     }
   }
 
-  final resolved = names.isEmpty
-      ? <String, Map<String, dynamic>>{}
-      : await resolveImportCardNames(
-          pool,
-          [
-            for (final name in names) {'name': name}
-          ],
-          preferredFormat: 'commander',
-        );
+  final resolved =
+      names.isEmpty
+          ? <String, Map<String, dynamic>>{}
+          : await resolveImportCardNames(pool, [
+            for (final name in names) {'name': name},
+          ], preferredFormat: 'commander');
 
   final stats = buildCommanderReferenceCardStatsFromProfile(
     profile: profile,
@@ -366,12 +360,13 @@ Future<CommanderReferenceCardStatsResolution>
       (key, value) => MapEntry(normalizeCommanderReferenceCardName(key), value),
     ),
   );
-  final unresolved = stats
-      .where((stat) => stat.unresolved)
-      .map((stat) => stat.cardName)
-      .toSet()
-      .toList()
-    ..sort();
+  final unresolved =
+      stats
+          .where((stat) => stat.unresolved)
+          .map((stat) => stat.cardName)
+          .toSet()
+          .toList()
+        ..sort();
   final offColor = findOffColorCommanderReferenceCards(
     profile: profile,
     stats: stats,
@@ -401,7 +396,10 @@ List<String> findOffColorCommanderReferenceCards({
       resolvedCardsByName: resolvedCardsByName,
     );
     final identity = resolveCardColorIdentity(
-      colorIdentity: _metadataStringIterable(resolved?['color_identity']),
+      colorIdentity:
+          resolved?['color_identity'] == null
+              ? null
+              : _metadataStringIterable(resolved?['color_identity']),
       colors: _metadataStringIterable(resolved?['colors']),
       oracleText: resolved?['oracle_text']?.toString(),
       manaCost: resolved?['mana_cost']?.toString(),
@@ -535,7 +533,7 @@ Future<void> upsertCommanderReferenceCardStats(
 }
 
 Future<CommanderReferenceCardStatsLoadResult>
-    loadUsableCommanderReferenceCardStats({
+loadUsableCommanderReferenceCardStats({
   required Pool pool,
   required String? commanderName,
   String minimumConfidence = 'medium',
@@ -551,9 +549,7 @@ Future<CommanderReferenceCardStatsLoadResult>
 
   try {
     final minRank = commanderReferenceConfidenceRank(minimumConfidence);
-    final commanderNormalized = normalizeCommanderReferenceName(
-      commander,
-    );
+    final commanderNormalized = normalizeCommanderReferenceName(commander);
     final result = await pool.execute(
       Sql.named('''
         SELECT
@@ -576,23 +572,22 @@ Future<CommanderReferenceCardStatsLoadResult>
           AND confidence_rank >= @minimum_rank
         ORDER BY unresolved ASC, score DESC, package_key ASC, card_name ASC
       '''),
-      parameters: {
-        'commander': commanderNormalized,
-        'minimum_rank': minRank,
-      },
+      parameters: {'commander': commanderNormalized, 'minimum_rank': minRank},
     );
 
     final allStats = result
         .map((row) => _cardStatFromRow(row.toColumnMap()))
         .toList(growable: false);
-    final usableStats =
-        allStats.where((stat) => !stat.unresolved).toList(growable: false);
-    final unresolved = allStats
-        .where((stat) => stat.unresolved)
-        .map((stat) => stat.cardName)
-        .toSet()
-        .toList()
-      ..sort();
+    final usableStats = allStats
+        .where((stat) => !stat.unresolved)
+        .toList(growable: false);
+    final unresolved =
+        allStats
+            .where((stat) => stat.unresolved)
+            .map((stat) => stat.cardName)
+            .toSet()
+            .toList()
+          ..sort();
 
     return CommanderReferenceCardStatsLoadResult(
       tableAvailable: true,
@@ -612,7 +607,7 @@ Future<CommanderReferenceCardStatsLoadResult>
 }
 
 Future<CommanderReferenceArchetypeStatsLoadResult>
-    loadCompatibleCommanderReferenceArchetypeStats({
+loadCompatibleCommanderReferenceArchetypeStats({
   required Pool pool,
   required String? commanderName,
   required String prompt,
@@ -751,12 +746,12 @@ Future<CommanderReferenceArchetypeStatsLoadResult>
 String? commanderReferenceCardStatsCacheVersion(
   List<CommanderReferenceCardStat> stats,
 ) {
-  final usable = stats.where((stat) => !stat.unresolved).toList()
-    ..sort((a, b) {
-      final packageCompare = a.packageKey.compareTo(b.packageKey);
-      if (packageCompare != 0) return packageCompare;
-      return a.cardNameNormalized.compareTo(b.cardNameNormalized);
-    });
+  final usable =
+      stats.where((stat) => !stat.unresolved).toList()..sort((a, b) {
+        final packageCompare = a.packageKey.compareTo(b.packageKey);
+        if (packageCompare != 0) return packageCompare;
+        return a.cardNameNormalized.compareTo(b.cardNameNormalized);
+      });
   if (usable.isEmpty) return null;
 
   final material = jsonEncode([
@@ -770,7 +765,7 @@ String? commanderReferenceCardStatsCacheVersion(
         'confidence': stat.confidence,
         'source': stat.source,
         'evidence_count': stat.evidenceCount,
-      }
+      },
   ]);
   return 'reference_card_stats_v1:${sha256.convert(utf8.encode(material)).toString().substring(0, 12)}';
 }
@@ -780,22 +775,23 @@ String buildCommanderReferenceCardStatsPrompt(
   bool compact = false,
   Set<String> priorityCardNames = const {},
 }) {
-  final priorityNames = priorityCardNames
-      .map(normalizeCommanderReferenceCardName)
-      .where((name) => name.isNotEmpty)
-      .toSet();
-  final usable = stats.where((stat) => !stat.unresolved).toList()
-    ..sort((a, b) {
-      final packageCompare = a.packageKey.compareTo(b.packageKey);
-      if (packageCompare != 0) return packageCompare;
-      final aPriority = priorityNames.contains(a.cardNameNormalized) ? 0 : 1;
-      final bPriority = priorityNames.contains(b.cardNameNormalized) ? 0 : 1;
-      final priorityCompare = aPriority.compareTo(bPriority);
-      if (priorityCompare != 0) return priorityCompare;
-      final scoreCompare = b.score.compareTo(a.score);
-      if (scoreCompare != 0) return scoreCompare;
-      return a.cardName.compareTo(b.cardName);
-    });
+  final priorityNames =
+      priorityCardNames
+          .map(normalizeCommanderReferenceCardName)
+          .where((name) => name.isNotEmpty)
+          .toSet();
+  final usable =
+      stats.where((stat) => !stat.unresolved).toList()..sort((a, b) {
+        final packageCompare = a.packageKey.compareTo(b.packageKey);
+        if (packageCompare != 0) return packageCompare;
+        final aPriority = priorityNames.contains(a.cardNameNormalized) ? 0 : 1;
+        final bPriority = priorityNames.contains(b.cardNameNormalized) ? 0 : 1;
+        final priorityCompare = aPriority.compareTo(bPriority);
+        if (priorityCompare != 0) return priorityCompare;
+        final scoreCompare = b.score.compareTo(a.score);
+        if (scoreCompare != 0) return scoreCompare;
+        return a.cardName.compareTo(b.cardName);
+      });
   if (usable.isEmpty) return '';
 
   final byPackage = <String, List<CommanderReferenceCardStat>>{};
@@ -804,19 +800,24 @@ String buildCommanderReferenceCardStatsPrompt(
   }
 
   final maxCardsPerPackage = compact ? 6 : 12;
-  final packageLines = byPackage.entries.map((entry) {
-    final cards = entry.value
-        .take(maxCardsPerPackage)
-        .map((stat) =>
-            '${stat.cardName} [${stat.role}, score ${stat.score.toStringAsFixed(0)}]')
-        .join(', ');
-    return '- ${entry.key}: $cards';
-  }).join('\n');
+  final packageLines = byPackage.entries
+      .map((entry) {
+        final cards = entry.value
+            .take(maxCardsPerPackage)
+            .map(
+              (stat) =>
+                  '${stat.cardName} [${stat.role}, score ${stat.score.toStringAsFixed(0)}]',
+            )
+            .join(', ');
+        return '- ${entry.key}: $cards';
+      })
+      .join('\n');
 
   final commanderName = usable.first.commanderName;
-  final modeLine = compact
-      ? 'Compact mode: package lists are capped because corpus core_package is strong; corpus core cards remain the primary signal.'
-      : 'Full mode: package lists provide expanded candidate guidance.';
+  final modeLine =
+      compact
+          ? 'Compact mode: package lists are capped because corpus core_package is strong; corpus core cards remain the primary signal.'
+          : 'Full mode: package lists provide expanded candidate guidance.';
   return '''
 Reference card stats v1 active for $commanderName:
 $packageLines
@@ -830,14 +831,14 @@ String buildCommanderReferenceArchetypeStatsPrompt({
   required List<CommanderReferenceCardStat> stats,
   required List<String> sourceCommanderNames,
 }) {
-  final usable = stats.where((stat) => !stat.unresolved).toList()
-    ..sort((a, b) {
-      final packageCompare = a.packageKey.compareTo(b.packageKey);
-      if (packageCompare != 0) return packageCompare;
-      final scoreCompare = b.score.compareTo(a.score);
-      if (scoreCompare != 0) return scoreCompare;
-      return a.cardName.compareTo(b.cardName);
-    });
+  final usable =
+      stats.where((stat) => !stat.unresolved).toList()..sort((a, b) {
+        final packageCompare = a.packageKey.compareTo(b.packageKey);
+        if (packageCompare != 0) return packageCompare;
+        final scoreCompare = b.score.compareTo(a.score);
+        if (scoreCompare != 0) return scoreCompare;
+        return a.cardName.compareTo(b.cardName);
+      });
   if (usable.isEmpty) return '';
 
   final byPackage = <String, List<CommanderReferenceCardStat>>{};
@@ -845,13 +846,15 @@ String buildCommanderReferenceArchetypeStatsPrompt({
     byPackage.putIfAbsent(stat.packageKey, () => []).add(stat);
   }
 
-  final packageLines = byPackage.entries.map((entry) {
-    final cards = entry.value
-        .take(10)
-        .map((stat) => '${stat.cardName} [${stat.role}]')
-        .join(', ');
-    return '- ${entry.key}: $cards';
-  }).join('\n');
+  final packageLines = byPackage.entries
+      .map((entry) {
+        final cards = entry.value
+            .take(10)
+            .map((stat) => '${stat.cardName} [${stat.role}]')
+            .join(', ');
+        return '- ${entry.key}: $cards';
+      })
+      .join('\n');
   final sources = sourceCommanderNames.take(5).join(', ');
 
   return '''
@@ -867,8 +870,8 @@ Map<String, dynamic> buildCommanderReferenceCardStatsDiagnostics({
   required List<CommanderReferenceCardStat> stats,
   required List<String> unresolvedCardNames,
 }) {
-  final packageKeys = stats.map((stat) => stat.packageKey).toSet().toList()
-    ..sort();
+  final packageKeys =
+      stats.map((stat) => stat.packageKey).toSet().toList()..sort();
   return {
     'reference_card_stats_used': stats.isNotEmpty,
     'on_theme_candidate_count': stats.length,
@@ -882,8 +885,8 @@ Map<String, dynamic> buildCommanderReferenceArchetypeStatsDiagnostics({
   required List<String> sourceCommanderNames,
   required List<String> commanderColorIdentity,
 }) {
-  final packageKeys = stats.map((stat) => stat.packageKey).toSet().toList()
-    ..sort();
+  final packageKeys =
+      stats.map((stat) => stat.packageKey).toSet().toList()..sort();
   return {
     'reference_profile_used': false,
     'reference_card_stats_used': false,
@@ -900,18 +903,15 @@ Future<Map<String, Map<String, dynamic>>> loadReferenceEvaluationCardMetadata({
   required Pool pool,
   required Iterable<String> cardNames,
 }) async {
-  final names = cardNames
-      .map((name) => name.trim())
-      .where((name) => name.isNotEmpty)
-      .toSet();
+  final names =
+      cardNames
+          .map((name) => name.trim())
+          .where((name) => name.isNotEmpty)
+          .toSet();
   if (names.isEmpty) return const {};
-  final resolved = await resolveImportCardNames(
-    pool,
-    [
-      for (final name in names) {'name': name}
-    ],
-    preferredFormat: 'commander',
-  );
+  final resolved = await resolveImportCardNames(pool, [
+    for (final name in names) {'name': name},
+  ], preferredFormat: 'commander');
   return resolved.map(
     (key, value) => MapEntry(normalizeCommanderReferenceCardName(key), value),
   );
@@ -938,18 +938,20 @@ ReferenceGeneratedDeckEvaluation evaluateGeneratedDeckAgainstReferenceStats({
   final roleCoverage = <String, int>{};
   final classifiedCards = <Map<String, dynamic>>[];
 
-  final cards = generatedDeck['cards'] is List
-      ? (generatedDeck['cards'] as List)
-      : const <dynamic>[];
+  final cards =
+      generatedDeck['cards'] is List
+          ? (generatedDeck['cards'] as List)
+          : const <dynamic>[];
 
   for (final rawCard in cards) {
     if (rawCard is! Map) continue;
     final name = rawCard['name']?.toString().trim() ?? '';
     if (name.isEmpty) continue;
     final quantityRaw = rawCard['quantity'];
-    final quantity = quantityRaw is int
-        ? quantityRaw
-        : int.tryParse(quantityRaw?.toString() ?? '') ?? 1;
+    final quantity =
+        quantityRaw is int
+            ? quantityRaw
+            : int.tryParse(quantityRaw?.toString() ?? '') ?? 1;
     final normalized = normalizeCommanderReferenceCardName(name);
     final stat = statsByName[normalized];
     final metadata = cardMetadataByName[normalized];
@@ -971,9 +973,10 @@ ReferenceGeneratedDeckEvaluation evaluateGeneratedDeckAgainstReferenceStats({
       'quantity': quantity,
       'classification': classification,
       if (role != null) 'role': role,
-      'reason': stat != null
-          ? 'matched_reference_card_stats'
-          : _referenceClassificationReason(classification),
+      'reason':
+          stat != null
+              ? 'matched_reference_card_stats'
+              : _referenceClassificationReason(classification),
     });
   }
 
@@ -1008,17 +1011,20 @@ CommanderReferenceCardStat _cardStatFromRow(Map<String, dynamic> row) {
     cardId: row['card_id']?.toString(),
     packageKey: row['package_key']?.toString() ?? '',
     role: row['role']?.toString() ?? '',
-    score: scoreRaw is num
-        ? scoreRaw.toDouble()
-        : double.tryParse(scoreRaw?.toString() ?? '') ?? 0,
+    score:
+        scoreRaw is num
+            ? scoreRaw.toDouble()
+            : double.tryParse(scoreRaw?.toString() ?? '') ?? 0,
     confidence: row['confidence']?.toString() ?? 'not_proven',
-    confidenceRank: row['confidence_rank'] is int
-        ? row['confidence_rank'] as int
-        : int.tryParse(row['confidence_rank']?.toString() ?? '') ?? 0,
+    confidenceRank:
+        row['confidence_rank'] is int
+            ? row['confidence_rank'] as int
+            : int.tryParse(row['confidence_rank']?.toString() ?? '') ?? 0,
     source: row['source']?.toString() ?? '',
-    evidenceCount: row['evidence_count'] is int
-        ? row['evidence_count'] as int
-        : int.tryParse(row['evidence_count']?.toString() ?? '') ?? 1,
+    evidenceCount:
+        row['evidence_count'] is int
+            ? row['evidence_count'] as int
+            : int.tryParse(row['evidence_count']?.toString() ?? '') ?? 1,
     unresolved: row['unresolved'] == true,
     updatedAt: updatedAtRaw is DateTime ? updatedAtRaw : null,
   );
@@ -1208,8 +1214,9 @@ String? _genericRoleForCard(String name, Map<String, dynamic>? metadata) {
       normalized == 'wastes') {
     return 'lands';
   }
-  if (RegExp(r'(signet|talisman|stone|diamond|sphere|bauble|vessel|sol ring)')
-      .hasMatch(normalized)) {
+  if (RegExp(
+    r'(signet|talisman|stone|diamond|sphere|bauble|vessel|sol ring)',
+  ).hasMatch(normalized)) {
     return 'mana_rocks_treasure_ramp';
   }
   final oracle = metadata?['oracle_text']?.toString().toLowerCase() ?? '';
@@ -1226,13 +1233,9 @@ Future<Set<String>?> _resolveCommanderReferenceTargetIdentity({
   required Pool pool,
   required String commanderName,
 }) async {
-  final resolved = await resolveImportCardNames(
-    pool,
-    [
-      {'name': commanderName}
-    ],
-    preferredFormat: 'commander',
-  );
+  final resolved = await resolveImportCardNames(pool, [
+    {'name': commanderName},
+  ], preferredFormat: 'commander');
   Map<String, dynamic>? card;
   for (final entry in resolved.entries) {
     if (normalizeCommanderReferenceCardName(entry.key) ==
@@ -1247,7 +1250,10 @@ Future<Set<String>?> _resolveCommanderReferenceTargetIdentity({
   if (card == null) return null;
 
   return resolveCardColorIdentity(
-    colorIdentity: _metadataStringIterable(card['color_identity']),
+    colorIdentity:
+        card['color_identity'] == null
+            ? null
+            : _metadataStringIterable(card['color_identity']),
     colors: _metadataStringIterable(card['colors']),
     oracleText: card['oracle_text']?.toString(),
     manaCost: card['mana_cost']?.toString(),
@@ -1256,11 +1262,12 @@ Future<Set<String>?> _resolveCommanderReferenceTargetIdentity({
 
 Set<String> _referenceArchetypePromptTokens(String prompt) {
   final normalized = prompt.toLowerCase();
-  final tokens = normalized
-      .split(RegExp(r'[^a-z0-9]+'))
-      .map((token) => token.trim())
-      .where((token) => token.length >= 4)
-      .toSet();
+  final tokens =
+      normalized
+          .split(RegExp(r'[^a-z0-9]+'))
+          .map((token) => token.trim())
+          .where((token) => token.length >= 4)
+          .toSet();
   if (normalized.contains('big spell')) tokens.add('big_spells');
   if (normalized.contains('magia grande') ||
       normalized.contains('magias grandes')) {
@@ -1346,7 +1353,9 @@ String _referenceClassificationReason(String classification) {
 }
 
 String _overallReferenceClassification(
-    Map<String, int> counts, int statsCount) {
+  Map<String, int> counts,
+  int statsCount,
+) {
   final offTheme = counts['off_theme'] ?? 0;
   if (offTheme > 0) return 'off_theme';
   final onTheme = counts['on_theme'] ?? 0;

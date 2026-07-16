@@ -46,6 +46,7 @@ class AiPaywallDialog extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final snapshot = provider.usageSnapshot;
+    final theme = Theme.of(context);
     return AlertDialog(
       key: const Key('ai-paywall-dialog'),
       title: Row(
@@ -61,12 +62,18 @@ class AiPaywallDialog extends StatelessWidget {
         children: [
           Text(
             'Você usou ${snapshot.used}/${snapshot.limit} ações de IA no plano ${snapshot.plan.tier.label}.',
-            style: const TextStyle(color: AppTheme.textSecondary, height: 1.4),
+            style: theme.textTheme.bodyMedium?.copyWith(
+              color: AppTheme.textSecondary,
+              height: 1.4,
+            ),
           ),
           const SizedBox(height: 12),
-          const Text(
+          Text(
             'No Pro, o ManaLoom libera mais uso mensal, otimização por coleção/orçamento, relatório antes/depois e acompanhamento pós-jogo.',
-            style: TextStyle(color: AppTheme.textSecondary, height: 1.4),
+            style: theme.textTheme.bodyMedium?.copyWith(
+              color: AppTheme.textSecondary,
+              height: 1.4,
+            ),
           ),
         ],
       ),

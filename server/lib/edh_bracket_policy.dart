@@ -20,84 +20,33 @@ enum BracketCategory {
 }
 
 class BracketPolicy {
-  BracketPolicy({
-    required this.bracket,
-    required this.maxCounts,
-  });
+  BracketPolicy({required this.bracket, required this.maxCounts});
 
   final int bracket;
   final Map<BracketCategory, int> maxCounts;
 
   static BracketPolicy forBracket(int bracket) {
     final b = bracket.clamp(1, 5);
-    switch (b) {
-      case 1:
-        return BracketPolicy(
-          bracket: 1,
-          maxCounts: const {
-            BracketCategory.fastMana: 1,
-            BracketCategory.tutor: 1,
-            BracketCategory.freeInteraction: 0,
-            BracketCategory.extraTurns: 0,
-            BracketCategory.infiniteCombo: 0,
-            BracketCategory.boardWipe: 1,
-            BracketCategory.cardAdvantage: 1,
-            BracketCategory.stax: 0,
-            BracketCategory.protection: 1,
-            BracketCategory.valueEngine: 1,
-            BracketCategory.gameChanger: 0,
-          },
-        );
-      case 2:
-        return BracketPolicy(
-          bracket: 2,
-          maxCounts: const {
-            BracketCategory.fastMana: 3,
-            BracketCategory.tutor: 3,
-            BracketCategory.freeInteraction: 2,
-            BracketCategory.extraTurns: 1,
-            BracketCategory.infiniteCombo: 0,
-            BracketCategory.boardWipe: 2,
-            BracketCategory.cardAdvantage: 2,
-            BracketCategory.stax: 1,
-            BracketCategory.protection: 2,
-            BracketCategory.valueEngine: 2,
-            BracketCategory.gameChanger: 0,
-          },
-        );
-      case 3:
-        return BracketPolicy(
-          bracket: 3,
-          maxCounts: const {
-            BracketCategory.fastMana: 6,
-            BracketCategory.tutor: 6,
-            BracketCategory.freeInteraction: 6,
-            BracketCategory.extraTurns: 2,
-            BracketCategory.infiniteCombo: 2,
-            BracketCategory.boardWipe: 4,
-            BracketCategory.cardAdvantage: 6,
-            BracketCategory.stax: 3,
-            BracketCategory.protection: 4,
-            BracketCategory.valueEngine: 6,
-            BracketCategory.gameChanger: 3,
-          },
-        );
-      case 4:
-        return BracketPolicy(
-          bracket: 4,
-          maxCounts: _unlimitedBracketCounts,
-        );
-      case 5:
-      default:
-        return BracketPolicy(
-          bracket: 5,
-          maxCounts: _unlimitedBracketCounts,
-        );
-    }
+    final gameChangerCap = switch (b) {
+      1 || 2 => 0,
+      3 => 3,
+      _ => 99,
+    };
+    return BracketPolicy(
+      bracket: b,
+      maxCounts: {
+        ..._advisoryBracketCounts,
+        BracketCategory.gameChanger: gameChangerCap,
+      },
+    );
   }
 }
 
-const _unlimitedBracketCounts = <BracketCategory, int>{
+/// Bracket tags other than Game Changers are advisory signals, not hard caps.
+///
+/// Wizards removed tutor restrictions from Commander Brackets on 2025-10-21.
+/// `99` is effectively uncapped for the noncommander portion of a legal deck.
+const _advisoryBracketCounts = <BracketCategory, int>{
   BracketCategory.fastMana: 99,
   BracketCategory.tutor: 99,
   BracketCategory.freeInteraction: 99,
@@ -108,7 +57,6 @@ const _unlimitedBracketCounts = <BracketCategory, int>{
   BracketCategory.stax: 99,
   BracketCategory.protection: 99,
   BracketCategory.valueEngine: 99,
-  BracketCategory.gameChanger: 99,
 };
 
 class BracketTagResult {
@@ -155,7 +103,8 @@ BracketTagResult tagCardForBracket({
 
   // Free interaction / custo alternativo (heurística)
   final hasRather = o.contains('rather than pay');
-  final hasExile = o.contains('exile a') ||
+  final hasExile =
+      o.contains('exile a') ||
       o.contains('exile two') ||
       o.contains('exile one');
   final hasPayLife = o.contains('pay') && o.contains('life') && hasRather;
@@ -262,8 +211,10 @@ BracketFilterDecision applyBracketPolicyToAdditions({
 
   final remaining = <BracketCategory, int>{};
   for (final entry in policy.maxCounts.entries) {
-    remaining[entry.key] =
-        (entry.value - (counts[entry.key] ?? 0)).clamp(0, 999);
+    remaining[entry.key] = (entry.value - (counts[entry.key] ?? 0)).clamp(
+      0,
+      999,
+    );
   }
 
   final allowed = <String>[];
@@ -471,17 +422,22 @@ bool _looksLikeGameChangerBoardWipe(String normalizedName, String oracleLower) {
     return true;
   // Board wipes that are asymmetric (only opponents) or mass exile
   if (oracleLower.contains('exile all') &&
-      oracleLower.contains('opponents control')) return true;
+      oracleLower.contains('opponents control'))
+    return true;
   if (oracleLower.contains('destroy all') &&
-      oracleLower.contains('opponents control')) return true;
+      oracleLower.contains('opponents control'))
+    return true;
   if (oracleLower.contains('return all') &&
       oracleLower.contains('opponents control') &&
-      oracleLower.contains('hand')) return true;
+      oracleLower.contains('hand'))
+    return true;
   return false;
 }
 
 bool _looksLikeGameChangerCardAdvantage(
-    String normalizedName, String oracleLower) {
+  String normalizedName,
+  String oracleLower,
+) {
   // Curated GC card advantage engines
   if (normalizedName == 'rhystic study' ||
       normalizedName == 'mystic remora' ||
@@ -489,7 +445,8 @@ bool _looksLikeGameChangerCardAdvantage(
       normalizedName == 'smothering tithe' ||
       normalizedName == 'necropotence' ||
       normalizedName == 'ad nauseam' ||
-      normalizedName == 'consecrated sphinx') return true;
+      normalizedName == 'consecrated sphinx')
+    return true;
   // Tax-based draw: "unless that player pays"
   if (oracleLower.contains('unless') &&
       oracleLower.contains('pays') &&
@@ -500,7 +457,8 @@ bool _looksLikeGameChangerCardAdvantage(
       oracleLower.contains('life') &&
       oracleLower.contains('draw') &&
       oracleLower.contains('card') &&
-      oracleLower.contains('skip your draw step')) return true;
+      oracleLower.contains('skip your draw step'))
+    return true;
   return false;
 }
 
@@ -515,45 +473,55 @@ bool _looksLikeGameChangerStax(String normalizedName, String oracleLower) {
       normalizedName == 'static orb' ||
       normalizedName == 'torpor orb' ||
       normalizedName == 'rule of law' ||
-      normalizedName == 'deafening silence') return true;
+      normalizedName == 'deafening silence')
+    return true;
   if (normalizedName == 'eidolon of rhetoric' ||
       normalizedName == 'ethersworn canonist' ||
-      normalizedName == 'archon of emeria') return true;
+      normalizedName == 'archon of emeria')
+    return true;
   // Spells-per-turn restrictions
   if (oracleLower.contains('cast') &&
           oracleLower.contains('more than one spell') ||
-      oracleLower.contains('can\'t cast more than one spell')) return true;
+      oracleLower.contains('can\'t cast more than one spell'))
+    return true;
   // Draw and tax restrictions.
   if (oracleLower.contains('can\'t draw more than one card')) return true;
   if (oracleLower.contains('spells your opponents cast cost')) return true;
   // ETB hate
   if (oracleLower.contains('creatures entering') &&
-      oracleLower.contains('don\'t cause')) return true;
+      oracleLower.contains('don\'t cause'))
+    return true;
   // Search hate
   if (oracleLower.contains('search') &&
       oracleLower.contains('library') &&
-      oracleLower.contains('control')) return true;
+      oracleLower.contains('control'))
+    return true;
   return false;
 }
 
 bool _looksLikeGameChangerProtection(
-    String normalizedName, String oracleLower) {
+  String normalizedName,
+  String oracleLower,
+) {
   // Curated GC protection
   if (normalizedName == 'teferi\'s protection' ||
       normalizedName == 'deflecting swat' ||
       normalizedName == 'fierce guardianship' ||
       normalizedName == 'heroic intervention' ||
       normalizedName == 'flawless maneuver' ||
-      normalizedName == 'deadly rollick') return true;
+      normalizedName == 'deadly rollick')
+    return true;
   // Free protection spells
   if (oracleLower.contains('rather than pay') &&
       (oracleLower.contains('indestructible') ||
           oracleLower.contains('hexproof') ||
           oracleLower.contains('phase out') ||
-          oracleLower.contains('protection from'))) return true;
+          oracleLower.contains('protection from')))
+    return true;
   // Teferi's Protection pattern: phase out + protection from everything
   if (oracleLower.contains('phase out') &&
-      oracleLower.contains('protection from everything')) return true;
+      oracleLower.contains('protection from everything'))
+    return true;
   return false;
 }
 

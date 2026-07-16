@@ -1,0 +1,62 @@
+name: manaloom_workspace
+
+packages:
+  - app
+  - server
+  - tools/*
+
+ignore:
+  - server/build
+
+scripts:
+  bootstrap:
+    description: Resolve app/server workspace dependencies.
+    run: melos bootstrap
+
+  app:analyze:
+    description: Analyze the Flutter app.
+    run: melos exec --scope=manaloom -- flutter analyze --no-fatal-infos
+
+  app:test:
+    description: Run the Flutter app test suite.
+    run: melos exec --scope=manaloom -- flutter test --no-version-check
+
+  server:test:
+    description: Run the Dart Frog backend test suite.
+    run: melos exec --scope=server -- dart test
+
+  deps:
+    description: Validate declared dependencies in app and server.
+    run: ./scripts/manaloom_dependency_audit.sh
+
+  custom-lint:
+    description: Run ManaLoom custom lint rules.
+    run: ./scripts/quality_gate.sh custom-lint
+
+  patrol-smoke:
+    description: Run the ManaLoom Patrol critical E2E suite.
+    run: ./scripts/quality_gate.sh patrol-smoke
+
+  ui-audit:
+    description: Run ManaLoom Flutter golden/accessibility checks.
+    run: ./scripts/quality_gate.sh ui-audit
+
+  ai-bridge:
+    description: Run app/AI bridge checks and Commander prompt eval.
+    run: ./scripts/quality_gate.sh ai-bridge
+
+  deep-ai:
+    description: Run deep AI, battle, and deckbuilder alignment checks.
+    run: ./scripts/quality_gate.sh deep-ai
+
+  battle:
+    description: Run the canonical native, Forge, XMage, Python, and Dart battle product gate.
+    run: ./scripts/quality_gate.sh battle
+
+  e2e:
+    description: Run ManaLoom local E2E suite for app, deckbuilder, battle, AI, contracts, and logs.
+    run: ./scripts/quality_gate.sh e2e
+
+  quality:
+    description: Run the main local quality gate set.
+    run: ./scripts/quality_gate.sh full && ./scripts/quality_gate.sh ui-audit && ./scripts/quality_gate.sh custom-lint && ./scripts/quality_gate.sh patrol-smoke && ./scripts/manaloom_dependency_audit.sh

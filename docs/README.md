@@ -4,7 +4,25 @@ Este diretorio agora serve como indice curto. Relatorios antigos continuam no
 repositorio como historico/prova, mas nao devem guiar implementacao sem checar
 as fontes canônicas abaixo.
 
-## Fontes canônicas atuais
+## Entrada canônica atual
+
+1. `docs/MANALOOM_E2E_RELEASE_CONTRACT.md`
+   - perfis de execução, autorização de mutações, matriz de gates e critérios
+     separados de conclusão local e de release.
+2. `docs/CONTEXTO_PRODUTO_ATUAL.md`
+   - prioridade operacional vigente e ponte para a evidência mais recente.
+3. `docs/qa/MANALOOM_E2E_PROJECT_CLOSURE_2026-07-15.md`
+   - evidência fechada, remoções, resultados, resíduos e bloqueadores de release
+     da rodada corrente.
+4. `docs/qa/MANALOOM_BATTLE_DECKBUILDER_DEFINITIVE_2026-07-15.md`
+   - auditoria final de battle, deckbuilder, famílias, cargas PostgreSQL,
+     cobertura externa e pendências de produto.
+
+## Referências técnicas e históricas
+
+Os documentos abaixo preservam decisões e provas de suas datas. Consulte-os
+quando a área exigir profundidade, mas não use um status antigo para substituir
+o contrato ou a evidência corrente.
 
 1. `docs/PROJECT_LOGIC_FULL_REPORT_2026-06-11.md`
    - relatório mestre de lógica atual do produto, app, backend, banco, IA,
@@ -90,6 +108,10 @@ as fontes canônicas abaixo.
 - Uniformidade de layout iPhone: `docs/qa/manaloom_layout_uniformity_audit_iphone15_2026-05-22.md`
 - Gate visual premium: `docs/qa/MANALOOM_PREMIUM_VISUAL_QA_RUBRIC_2026-06-04.md` e
   baseline gerada em `docs/qa/manaloom_premium_visual_audit_latest.md`
+- Tooling, custom_lint, Patrol e quality gates locais: `docs/qa/MANALOOM_TOOLING_VALIDATION_RUNBOOK_2026-07-06.md`
+- Contrato E2E e de conclusão vigente: `docs/MANALOOM_E2E_RELEASE_CONTRACT.md`
+- Encerramento E2E corrente: `docs/qa/MANALOOM_E2E_PROJECT_CLOSURE_2026-07-15.md`
+- Battle/deckbuilder definitivo: `docs/qa/MANALOOM_BATTLE_DECKBUILDER_DEFINITIVE_2026-07-15.md`
 - Prova runtime visual premium: `docs/qa/MANALOOM_PREMIUM_VISUAL_RUNTIME_PROOF_2026-06-04.md`
 - Battle/generator truth (2026-06-17):
   `docs/hermes-analysis/BATTLE_GENERATOR_TRUTH_STUDY_2026-06-17.md`,

@@ -20,10 +20,14 @@ void main() {
       final invalidBranchIndex = source.indexOf(
         'if (!validation.isValid || validation.invalidCards.isNotEmpty)',
       );
-      final fallbackMarkerIndex =
-          source.indexOf('final fallbackWarningCode', invalidBranchIndex);
-      final guardIndex =
-          source.indexOf('!aiConfig.allowsMockFallbacks', invalidBranchIndex);
+      final fallbackMarkerIndex = source.indexOf(
+        'final fallbackWarningCode',
+        invalidBranchIndex,
+      );
+      final guardIndex = source.indexOf(
+        '!aiConfig.allowsMockFallbacks',
+        invalidBranchIndex,
+      );
 
       expect(invalidBranchIndex, isNonNegative);
       expect(fallbackMarkerIndex, isNonNegative);
@@ -64,6 +68,21 @@ void main() {
         fallback: 'Mock response for development',
       );
       expect(source, contains('HttpStatus.serviceUnavailable'));
+
+      final mockBranchIndex = source.indexOf('Mock response for development');
+      final nextOptimizerBranchIndex = source.indexOf(
+        'final optimizer = deckOptimizer',
+        mockBranchIndex,
+      );
+      final mockBranch = source.substring(
+        mockBranchIndex,
+        nextOptimizerBranchIndex,
+      );
+      expect(mockBranch, contains("'removals': const <String>[]"));
+      expect(mockBranch, contains("'additions': const <String>[]"));
+      expect(mockBranch, contains("'can_apply': false"));
+      expect(mockBranch, contains("'learning_eligible': false"));
+      expect(mockBranch, contains('persistOutcome: false'));
     });
 
     test('deck AI analysis blocks missing provider before heuristic mock', () {

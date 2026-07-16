@@ -1,6 +1,12 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+SCRIPT_DIR="$(CDPATH='' cd -- "$(dirname -- "$0")" && pwd)"
+# shellcheck source=scripts/lib/manaloom_mutation_guard.sh
+source "$SCRIPT_DIR/lib/manaloom_mutation_guard.sh"
+require_live_mutation_approval "ManaLoom commercial quality gate"
+require_postgres_write_approval "ManaLoom commercial quality gate cleanup"
+
 API="${MANALOOM_API_BASE_URL:-https://evolution-cartinhas.2ta7qx.easypanel.host}"
 WEB="${MANALOOM_WEB_PUBLIC_URL:-https://evolution-manaloom-web-public.2ta7qx.easypanel.host}"
 SSH_HOST="${MANALOOM_EASYPANEL_SSH_HOST:-root@evolution-cartinhas.2ta7qx.easypanel.host}"
@@ -19,7 +25,7 @@ require_tool curl
 require_tool jq
 require_tool ssh
 
-ROOT_DIR="$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)"
+ROOT_DIR="$(CDPATH='' cd -- "$SCRIPT_DIR/.." && pwd)"
 OUT_DIR="${MANALOOM_QUALITY_GATE_OUT_DIR:-$ROOT_DIR/docs/qa/runtime}"
 STAMP="$(date -u +%Y%m%dT%H%M%SZ)"
 RUN_DIR="$OUT_DIR/manaloom-commercial-quality-gate-$STAMP"

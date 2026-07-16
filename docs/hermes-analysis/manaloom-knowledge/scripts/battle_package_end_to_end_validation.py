@@ -5467,6 +5467,66 @@ def run_damage_wipe(
     }
     active.battlefield.append(active_creature)
     opponent.battlefield.append(opponent_creature)
+    expected_destroyed_names = {active_creature["name"], opponent_creature["name"]}
+    expected_surviving_names: set[str] = set()
+    if expected_scope == "each_attacking_creature":
+        active_creature["attacking"] = True
+        opponent_creature["attacking"] = True
+        active_nonattacking_creature = {
+            "name": "E2E Active Nonattacking Creature",
+            "type_line": "Creature - Fixture",
+            "effect": "creature",
+            "power": 1,
+            "toughness": max(1, expected_damage),
+        }
+        opponent_nonattacking_creature = {
+            "name": "E2E Opponent Nonattacking Creature",
+            "type_line": "Creature - Fixture",
+            "effect": "creature",
+            "power": 1,
+            "toughness": max(1, expected_damage),
+        }
+        active.battlefield.append(active_nonattacking_creature)
+        opponent.battlefield.append(opponent_nonattacking_creature)
+        expected_surviving_names = {
+            active_nonattacking_creature["name"],
+            opponent_nonattacking_creature["name"],
+        }
+    if expected_scope in {"each_creature_without_flying", "each_nonflying_creature", "each_flying_creature"}:
+        active_flying_creature = {
+            "name": "E2E Active Flying Creature",
+            "type_line": "Creature - Bird",
+            "effect": "creature",
+            "power": 1,
+            "toughness": max(1, expected_damage),
+            "flying": True,
+            "keywords": ["flying"],
+        }
+        opponent_flying_creature = {
+            "name": "E2E Opponent Flying Creature",
+            "type_line": "Creature - Bird",
+            "effect": "creature",
+            "power": 1,
+            "toughness": max(1, expected_damage),
+            "flying": True,
+            "keywords": ["flying"],
+        }
+        active.battlefield.append(active_flying_creature)
+        opponent.battlefield.append(opponent_flying_creature)
+        if expected_scope == "each_flying_creature":
+            expected_destroyed_names = {
+                active_flying_creature["name"],
+                opponent_flying_creature["name"],
+            }
+            expected_surviving_names = {
+                active_creature["name"],
+                opponent_creature["name"],
+            }
+        else:
+            expected_surviving_names = {
+                active_flying_creature["name"],
+                opponent_flying_creature["name"],
+            }
     starting_life = {active.name: active.life, opponent.name: opponent.life}
     before_events = len(events)
 
@@ -5486,10 +5546,18 @@ def run_damage_wipe(
     else:
         if active.life != starting_life[active.name] or opponent.life != starting_life[opponent.name]:
             fail("battle_execution", f"{card['name']} damaged players unexpectedly")
-    if active.battlefield or opponent.battlefield:
+    battlefield_names = {
+        str(item.get("name") or "")
+        for owner in (active, opponent)
+        for item in owner.battlefield
+        if isinstance(item, dict)
+    }
+    unexpected_battlefield_names = battlefield_names - expected_surviving_names
+    missing_surviving_names = expected_surviving_names - battlefield_names
+    if unexpected_battlefield_names or missing_surviving_names:
         fail(
             "battle_execution",
-            f"{card['name']} left creatures active={active.battlefield} opponent={opponent.battlefield}",
+            f"{card['name']} battlefield mismatch left={sorted(battlefield_names)} expected={sorted(expected_surviving_names)}",
         )
     graveyard_names = {
         str(item.get("name") or "")
@@ -5497,7 +5565,7 @@ def run_damage_wipe(
         for item in owner.graveyard
         if isinstance(item, dict)
     }
-    if {active_creature["name"], opponent_creature["name"]} - graveyard_names:
+    if expected_destroyed_names - graveyard_names:
         fail("battle_execution", f"{card['name']} missing destroyed creatures in graveyard")
     wipe_event = next(
         (
@@ -5520,6 +5588,11 @@ def run_damage_wipe(
         fail(
             "battle_events",
             f"{card['name']} damage={wipe_event.get('damage') or wipe_event.get('amount')}, expected {expected_damage}",
+        )
+    if int(wipe_event.get("creatures_destroyed") or 0) != len(expected_destroyed_names):
+        fail(
+            "battle_events",
+            f"{card['name']} creatures_destroyed={wipe_event.get('creatures_destroyed')}, expected {len(expected_destroyed_names)}",
         )
     if scenario.get("expected_x_value") is not None and int(wipe_event.get("x_value") or 0) != int(
         scenario.get("expected_x_value") or 0

@@ -605,8 +605,11 @@ List<CandidateFunctionTag> inferCandidateFunctionTags({
         add('token', inferred.confidence, '${inferred.evidence};alias=v1');
         break;
       case 'aristocrat_payoff':
-        add('aristocrats', inferred.confidence,
-            '${inferred.evidence};alias=v1');
+        add(
+          'aristocrats',
+          inferred.confidence,
+          '${inferred.evidence};alias=v1',
+        );
         break;
       case 'graveyard_synergy':
         add('graveyard', inferred.confidence, '${inferred.evidence};alias=v1');
@@ -633,10 +636,11 @@ List<CandidateFunctionTag> inferCandidateFunctionTags({
     add('mana_fixing', 0.82, 'land_mana_text');
   }
 
-  if (looksLikeOptimizationRampText(oracleText) ||
-      normalizedName.contains('signet') ||
-      normalizedName.contains('talisman') ||
-      normalizedName == 'sol ring') {
+  if (!type.contains('land') &&
+      (looksLikeOptimizationRampText(oracleText) ||
+          normalizedName.contains('signet') ||
+          normalizedName.contains('talisman') ||
+          normalizedName == 'sol ring')) {
     add('ramp', 0.86, 'mana_or_land_ramp_text');
   }
 
@@ -743,16 +747,17 @@ List<CandidateFunctionTag> inferCandidateFunctionTags({
 
   if (oracle.contains('players can\'t') ||
       oracle.contains('opponents can\'t') ||
-      oracle.contains('spells cost') && oracle.contains('more to cast')) {
+      oracle.contains('spells cost') && oracle.contains('more to cast') ||
+      oracle.contains("nonbasic lands don't untap")) {
     add('stax', 0.74, 'restriction_or_tax_text');
   }
 
-  final ordered = tags.values.toList()
-    ..sort((a, b) {
-      final byConfidence = b.confidence.compareTo(a.confidence);
-      if (byConfidence != 0) return byConfidence;
-      return a.tag.compareTo(b.tag);
-    });
+  final ordered =
+      tags.values.toList()..sort((a, b) {
+        final byConfidence = b.confidence.compareTo(a.confidence);
+        if (byConfidence != 0) return byConfidence;
+        return a.tag.compareTo(b.tag);
+      });
   return ordered;
 }
 
@@ -782,31 +787,35 @@ List<CandidateRoleScore> buildCandidateRoleScores({
     priceUsdFoil: priceUsdFoil,
   );
   final estimatedCmc = safeToDouble(cmc, _estimateManaCostCmc(manaCost ?? ''));
-  final normalizedEdhrecRate =
-      _normalizeEdhrecInclusionRate(edhrecInclusionRate);
+  final normalizedEdhrecRate = _normalizeEdhrecInclusionRate(
+    edhrecInclusionRate,
+  );
   final edhrecInclusionBonus =
       (normalizedEdhrecRate * 18).round().clamp(0, 18).toInt();
   final edhrecSampleBonus = _edhrecSampleBonus(edhrecSampleDecks);
   final roleBest = <String, CandidateRoleScore>{};
   for (final tag in tags) {
     final role = normalizeCandidateQualityRole(tag.tag);
-    final popularityBonus = (metaDeckCount * 3 +
-            metaUsageCount ~/ 12 +
-            edhrecInclusionBonus +
-            edhrecSampleBonus)
-        .clamp(0, 30)
-        .toInt();
-    final curvePenalty = estimatedCmc >= 7
-        ? 16
-        : estimatedCmc >= 6
+    final popularityBonus =
+        (metaDeckCount * 3 +
+                metaUsageCount ~/ 12 +
+                edhrecInclusionBonus +
+                edhrecSampleBonus)
+            .clamp(0, 30)
+            .toInt();
+    final curvePenalty =
+        estimatedCmc >= 7
+            ? 16
+            : estimatedCmc >= 6
             ? 9
             : 0;
     final confidenceScore = (tag.confidence * 72).round();
-    final premiumBonus = isPremiumCommanderCandidateName(name) ||
-            metaDeckCount >= 12 ||
-            (normalizedEdhrecRate >= 0.35 && edhrecSampleDecks >= 1000)
-        ? 8
-        : 0;
+    final premiumBonus =
+        isPremiumCommanderCandidateName(name) ||
+                metaDeckCount >= 12 ||
+                (normalizedEdhrecRate >= 0.35 && edhrecSampleDecks >= 1000)
+            ? 8
+            : 0;
     final score =
         (confidenceScore + popularityBonus + premiumBonus - curvePenalty)
             .clamp(1, 100)
@@ -834,12 +843,12 @@ List<CandidateRoleScore> buildCandidateRoleScores({
     }
   }
 
-  final output = roleBest.values.toList()
-    ..sort((a, b) {
-      final byScore = b.score.compareTo(a.score);
-      if (byScore != 0) return byScore;
-      return a.role.compareTo(b.role);
-    });
+  final output =
+      roleBest.values.toList()..sort((a, b) {
+        final byScore = b.score.compareTo(a.score);
+        if (byScore != 0) return byScore;
+        return a.role.compareTo(b.role);
+      });
   return output;
 }
 
@@ -877,10 +886,7 @@ String inferCandidateBudgetTier({
 }) {
   final regular = safeToDouble(priceUsd, -1);
   final foil = safeToDouble(priceUsdFoil, -1);
-  final knownPrices = [
-    if (regular >= 0) regular,
-    if (foil >= 0) foil,
-  ];
+  final knownPrices = [if (regular >= 0) regular, if (foil >= 0) foil];
   if (knownPrices.isEmpty) return 'unknown';
   final price = knownPrices.reduce((a, b) => a < b ? a : b);
   if (price <= 1) return 'budget';
@@ -907,8 +913,9 @@ String inferCandidateBracketScope({
 }
 
 bool isPremiumCommanderCandidateName(String name) {
-  return candidateQualityPremiumNames
-      .contains(normalizeCandidateQualityKey(name));
+  return candidateQualityPremiumNames.contains(
+    normalizeCandidateQualityKey(name),
+  );
 }
 
 double _estimateManaCostCmc(String manaCost) {
@@ -930,12 +937,14 @@ Set<String> resolveCandidateQualityIdentity({
   required String manaCost,
 }) {
   return resolvedCardIdentityFromParts(
-    colorIdentity: colorIdentity is List
-        ? colorIdentity.map((e) => e.toString()).toList(growable: false)
-        : const <String>[],
-    colors: colors is List
-        ? colors.map((e) => e.toString()).toList(growable: false)
-        : const <String>[],
+    colorIdentity:
+        colorIdentity is List
+            ? colorIdentity.map((e) => e.toString()).toList(growable: false)
+            : null,
+    colors:
+        colors is List
+            ? colors.map((e) => e.toString()).toList(growable: false)
+            : const <String>[],
     oracleText: oracleText,
     manaCost: manaCost,
   );

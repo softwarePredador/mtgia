@@ -28,32 +28,35 @@ void main() {
       expect(input.isActive, isTrue);
     });
 
-    test('parses bullets, comments, collection suffixes and duplicate names',
-        () {
-      final cards = parseCommanderLearnedDeckCards('''
+    test(
+      'parses bullets, comments, collection suffixes and duplicate names',
+      () {
+        final cards = parseCommanderLearnedDeckCards('''
 1 Korvold, Fae-Cursed King
 2 Forest
 - 1 Sol Ring # ramp
 1 Command Tower (CMM) 123
 ''');
 
-      expect(
-        cards.map((card) => (card.name, card.quantity)).toList(),
-        containsAll([
-          ('Korvold, Fae-Cursed King', 1),
-          ('Forest', 2),
-          ('Sol Ring', 1),
-          ('Command Tower', 1),
-        ]),
-      );
-    });
+        expect(
+          cards.map((card) => (card.name, card.quantity)).toList(),
+          containsAll([
+            ('Korvold, Fae-Cursed King', 1),
+            ('Forest', 2),
+            ('Sol Ring', 1),
+            ('Command Tower', 1),
+          ]),
+        );
+      },
+    );
 
-    test('parses JSON-array card lists used by learned-deck metadata audits',
-        () {
-      final input = parseCommanderLearnedDeckInput({
-        'id': 82,
-        'commander': 'Lorehold, the Historian',
-        'card_list': '''
+    test(
+      'parses JSON-array card lists used by learned-deck metadata audits',
+      () {
+        final input = parseCommanderLearnedDeckInput({
+          'id': 82,
+          'commander': 'Lorehold, the Historian',
+          'card_list': '''
 [
   {"name": "Lorehold, the Historian", "quantity": 1},
   {"name": "Lim-Dûl’s Vault", "quantity": 1},
@@ -62,20 +65,21 @@ void main() {
   "1 Sol Ring"
 ]
 ''',
-      });
+        });
 
-      expect(input.cardCount, equals(6));
-      expect(
-        input.cards.map((card) => (card.name, card.quantity)).toList(),
-        containsAll([
-          ('Lorehold, the Historian', 1),
-          ('Lim-Dûl’s Vault', 1),
-          ('Troll of Khazad-dûm', 2),
-          ('Command Tower', 1),
-          ('Sol Ring', 1),
-        ]),
-      );
-    });
+        expect(input.cardCount, equals(6));
+        expect(
+          input.cards.map((card) => (card.name, card.quantity)).toList(),
+          containsAll([
+            ('Lorehold, the Historian', 1),
+            ('Lim-Dûl’s Vault', 1),
+            ('Troll of Khazad-dûm', 2),
+            ('Command Tower', 1),
+            ('Sol Ring', 1),
+          ]),
+        );
+      },
+    );
 
     test('validates Commander 100-card learned deck gate', () {
       final main = List.generate(99, (index) => '1 Learned Card $index');
@@ -84,6 +88,7 @@ void main() {
         'commander': 'Lorehold, the Historian',
         'card_list': ['1 Lorehold, the Historian', ...main].join('\n'),
         'card_count': 100,
+        'legal_status': 'commander_legal',
       });
 
       final validation = validateCommanderLearnedDeckInput(input);
@@ -95,45 +100,92 @@ void main() {
       expect(validation.blockers, isEmpty);
     });
 
-    test('blocks learned deck import when count or commander slot is invalid',
-        () {
+    test(
+      'blocks learned deck import when count or commander slot is invalid',
+      () {
+        final input = parseCommanderLearnedDeckInput({
+          'id': 83,
+          'commander': 'Lorehold, the Historian',
+          'card_list': '1 Sol Ring\n1 Mountain',
+          'card_count': 100,
+        });
+
+        final validation = validateCommanderLearnedDeckInput(input);
+
+        expect(validation.ok, isFalse);
+        expect(
+          validation.blockers.join('\n'),
+          contains('card_count declarado (100) difere do total parseado (2)'),
+        );
+        expect(
+          validation.blockers.join('\n'),
+          contains('exatamente 1 comandante'),
+        );
+      },
+    );
+
+    test(
+      'runtime completeness helper rejects partial active learned decks',
+      () {
+        final input = parseCommanderLearnedDeckInput({
+          'source_system': 'edhrec',
+          'source_ref': 'learned_deck:7',
+          'commander_name': 'Korvold, Fae-Cursed King',
+          'deck_name': 'EDHREC Average - Korvold, Fae-Cursed King',
+          'card_list': List.generate(
+            90,
+            (index) => '1 Korvold Card $index',
+          ).join('\n'),
+          'card_count': 90,
+        });
+
+        expect(isCompleteCommanderLearnedDeckInput(input), isFalse);
+        expect(
+          validateCommanderLearnedDeckInput(input).blockers.join('\n'),
+          contains('deck Commander aprendido precisa ter 100 cartas'),
+        );
+      },
+    );
+
+    test(
+      'runtime completeness rejects learned decks without confirmed legality',
+      () {
+        final main = List.generate(99, (index) => '1 Learned Card $index');
+        final input = parseCommanderLearnedDeckInput({
+          'id': 84,
+          'commander': 'Lorehold, the Historian',
+          'card_list': ['1 Lorehold, the Historian', ...main].join('\n'),
+          'card_count': 100,
+          'legal_status': 'registered_pending_card_rule_validation',
+        });
+
+        final validation = validateCommanderLearnedDeckInput(input);
+
+        expect(validation.ok, isFalse);
+        expect(isCompleteCommanderLearnedDeckInput(input), isFalse);
+        expect(
+          validation.blockers.join('\n'),
+          contains(
+            'legal_status precisa estar confirmado como legal ou commander_legal',
+          ),
+        );
+      },
+    );
+
+    test('runtime completeness rejects a missing legal status', () {
+      final main = List.generate(99, (index) => '1 Learned Card $index');
       final input = parseCommanderLearnedDeckInput({
-        'id': 83,
+        'id': 85,
         'commander': 'Lorehold, the Historian',
-        'card_list': '1 Sol Ring\n1 Mountain',
+        'card_list': ['1 Lorehold, the Historian', ...main].join('\n'),
         'card_count': 100,
       });
 
       final validation = validateCommanderLearnedDeckInput(input);
 
+      expect(input.legalStatus, isNull);
       expect(validation.ok, isFalse);
-      expect(
-        validation.blockers.join('\n'),
-        contains('card_count declarado (100) difere do total parseado (2)'),
-      );
-      expect(
-        validation.blockers.join('\n'),
-        contains('exatamente 1 comandante'),
-      );
-    });
-
-    test('runtime completeness helper rejects partial active learned decks',
-        () {
-      final input = parseCommanderLearnedDeckInput({
-        'source_system': 'edhrec',
-        'source_ref': 'learned_deck:7',
-        'commander_name': 'Korvold, Fae-Cursed King',
-        'deck_name': 'EDHREC Average - Korvold, Fae-Cursed King',
-        'card_list':
-            List.generate(90, (index) => '1 Korvold Card $index').join('\n'),
-        'card_count': 90,
-      });
-
-      expect(isCompleteCommanderLearnedDeckInput(input), isFalse);
-      expect(
-        validateCommanderLearnedDeckInput(input).blockers.join('\n'),
-        contains('deck Commander aprendido precisa ter 100 cartas'),
-      );
+      expect(validation.blockers.join('\n'), contains('recebeu vazio'));
     });
 
     test('computes canonical learned deck role summary from multi-tags', () {
@@ -196,46 +248,49 @@ void main() {
       );
 
       expect(
-          cards.fold<int>(0, (sum, card) => sum + card.quantity), equals(100));
+        cards.fold<int>(0, (sum, card) => sum + card.quantity),
+        equals(100),
+      );
       expect(summary['total_lands'], equals(33));
     });
 
-    test('canonical learned deck metadata covers Lorehold critical role gaps',
-        () {
-      final summary = computeCommanderLearnedDeckRoleSummary(
-        cards: const [
-          CommanderLearnedDeckCardLine(
-            name: 'Lorehold, the Historian',
-            quantity: 1,
-          ),
-          CommanderLearnedDeckCardLine(name: "Orim's Chant", quantity: 1),
-          CommanderLearnedDeckCardLine(name: 'Ruby Medallion', quantity: 1),
-          CommanderLearnedDeckCardLine(name: 'Scroll Rack', quantity: 1),
-          CommanderLearnedDeckCardLine(name: 'Victory Chimes', quantity: 1),
-          CommanderLearnedDeckCardLine(name: 'Land Tax', quantity: 1),
-          CommanderLearnedDeckCardLine(name: 'Plains', quantity: 1),
-        ],
-        commanderNameNormalized: 'lorehold, the historian',
-        tagsByName: const {},
-        landNames: const {'plains'},
-      );
+    test(
+      'canonical learned deck metadata covers Lorehold critical role gaps',
+      () {
+        final summary = computeCommanderLearnedDeckRoleSummary(
+          cards: const [
+            CommanderLearnedDeckCardLine(
+              name: 'Lorehold, the Historian',
+              quantity: 1,
+            ),
+            CommanderLearnedDeckCardLine(name: "Orim's Chant", quantity: 1),
+            CommanderLearnedDeckCardLine(name: 'Ruby Medallion', quantity: 1),
+            CommanderLearnedDeckCardLine(name: 'Scroll Rack', quantity: 1),
+            CommanderLearnedDeckCardLine(name: 'Victory Chimes', quantity: 1),
+            CommanderLearnedDeckCardLine(name: 'Land Tax', quantity: 1),
+            CommanderLearnedDeckCardLine(name: 'Plains', quantity: 1),
+          ],
+          commanderNameNormalized: 'lorehold, the historian',
+          tagsByName: const {},
+          landNames: const {'plains'},
+        );
 
-      expect(summary['total_lands'], equals(1));
-      expect(summary['protection_count'], equals(1));
-      expect(summary['ramp_count'], equals(3));
-      expect(summary['draw_count'], equals(1));
-      expect(summary['engine_count'], equals(2));
-      expect(summary['tutor_count'], equals(1));
-    });
+        expect(summary['total_lands'], equals(1));
+        expect(summary['protection_count'], equals(1));
+        expect(summary['ramp_count'], equals(3));
+        expect(summary['draw_count'], equals(1));
+        expect(summary['engine_count'], equals(2));
+        expect(summary['tutor_count'], equals(1));
+      },
+    );
 
-    test('metadata canonicalization result exposes safe fallback diagnostics',
-        () {
+    test('metadata canonicalization result exposes safe fallback diagnostics', () {
       final result =
           CommanderLearnedDeckMetadataCanonicalizationResult.persistedFallback(
-        const {'total_lands': 30},
-        reason:
-            commanderLearnedDeckRoleSummaryFallbackReasonCanonicalizationFailed,
-      );
+            const {'total_lands': 30},
+            reason:
+                commanderLearnedDeckRoleSummaryFallbackReasonCanonicalizationFailed,
+          );
 
       expect(result.metadata['total_lands'], equals(30));
       expect(
@@ -245,24 +300,28 @@ void main() {
       expect(
         result.fallbackReason,
         equals(
-            commanderLearnedDeckRoleSummaryFallbackReasonCanonicalizationFailed),
+          commanderLearnedDeckRoleSummaryFallbackReasonCanonicalizationFailed,
+        ),
       );
       expect(result.usedFallback, isTrue);
     });
 
-    test('route prefers promoted learned deck before deterministic fallback',
-        () {
-      final route =
-          File('routes/ai/commander-reference/index.dart').readAsStringSync();
-      final promotedIndex =
-          route.indexOf('_buildPromotedCommanderLearningDeck');
-      final fallbackIndex = route.indexOf('_buildReferenceLearningDeck');
+    test(
+      'route prefers promoted learned deck before deterministic fallback',
+      () {
+        final route =
+            File('routes/ai/commander-reference/index.dart').readAsStringSync();
+        final promotedIndex = route.indexOf(
+          '_buildPromotedCommanderLearningDeck',
+        );
+        final fallbackIndex = route.indexOf('_buildReferenceLearningDeck');
 
-      expect(promotedIndex, greaterThanOrEqualTo(0));
-      expect(fallbackIndex, greaterThanOrEqualTo(0));
-      expect(promotedIndex, lessThan(fallbackIndex));
-      expect(route, contains("'source': 'promoted_learned_deck_pg'"));
-    });
+        expect(promotedIndex, greaterThanOrEqualTo(0));
+        expect(fallbackIndex, greaterThanOrEqualTo(0));
+        expect(promotedIndex, lessThan(fallbackIndex));
+        expect(route, contains("'source': 'promoted_learned_deck_pg'"));
+      },
+    );
 
     test('dedicated route exposes promoted learned deck payload', () {
       final route =
@@ -275,7 +334,9 @@ void main() {
       expect(route, contains('WITH active AS'));
       expect(route, contains('AND card_count = 100'));
       expect(
-          route, contains("AND card_list ILIKE '%' || commander_name || '%'"));
+        route,
+        contains("AND card_list ILIKE '%' || commander_name || '%'"),
+      );
       expect(route, isNot(contains('FROM commander_learning_snapshot')));
       expect(route, contains("'recommended_deck': recommendedDeck"));
       expect(route, contains("'source': 'promoted_learned_deck_pg'"));
@@ -294,7 +355,9 @@ void main() {
       expect(route, isNot(contains("'metadata': learnedDeck.metadata")));
       expect(route, isNot(contains("'metadata': deck.metadata")));
       expect(
-          route, isNot(contains("'role_summary': _roleSummary(learnedDeck)")));
+        route,
+        isNot(contains("'role_summary': _roleSummary(learnedDeck)")),
+      );
       expect(route, isNot(contains("'role_summary': _roleSummary(deck)")));
     });
 
@@ -338,9 +401,8 @@ void main() {
     });
 
     test('Commander Learning API doc separates list and detail contracts', () {
-      final doc = File(
-        'doc/COMMANDER_LEARNING_API_2026-06-03.md',
-      ).readAsStringSync();
+      final doc =
+          File('doc/COMMANDER_LEARNING_API_2026-06-03.md').readAsStringSync();
       final listSection = _sectionBetween(
         doc,
         '## Listar Decks Aprendidos Ativos',
@@ -357,7 +419,9 @@ void main() {
       expect(listSection, isNot(contains('"win_conditions"')));
       expect(listSection, isNot(contains('"role_summary"')));
       expect(
-          sourceSection, contains('canonicalizeCommanderLearnedDeckMetadata'));
+        sourceSection,
+        contains('canonicalizeCommanderLearnedDeckMetadata'),
+      );
       expect(sourceSection, contains('role_summary_source'));
       expect(sourceSection, contains('persisted_metadata_fallback'));
       expect(sourceSection, contains('recomputados em tempo de leitura'));
@@ -398,36 +462,34 @@ void main() {
     });
 
     test(
-        'canonical learned deck metadata uses card identity bridge for split and alias resolution',
-        () {
-      final source = File(
-        'lib/ai/commander_learned_deck_support.dart',
-      ).readAsStringSync();
+      'canonical learned deck metadata uses card identity bridge for split and alias resolution',
+      () {
+        final source =
+            File(
+              'lib/ai/commander_learned_deck_support.dart',
+            ).readAsStringSync();
 
-      expect(source, contains('LEFT JOIN card_identity_bridge cib'));
-      expect(source, contains("cib.normalized_lookup_name = w.lowered_name"));
-      expect(
-        source,
-        contains(
-          "cib.normalized_canonical_name LIKE w.lowered_name || ' // %'",
-        ),
-      );
-      expect(
-        source,
-        contains('CommanderLearnedDeckMetadataCanonicalizationResult'),
-      );
-      expect(
-        source,
-        contains('metadata_canonicalization_failed'),
-      );
-      expect(
-        source,
-        isNot(contains('catch (_) {\n    return input.metadata;\n  }')),
-      );
-    });
+        expect(source, contains('LEFT JOIN card_identity_bridge cib'));
+        expect(source, contains("cib.normalized_lookup_name = w.lowered_name"));
+        expect(
+          source,
+          contains(
+            "cib.normalized_canonical_name LIKE w.lowered_name || ' // %'",
+          ),
+        );
+        expect(
+          source,
+          contains('CommanderLearnedDeckMetadataCanonicalizationResult'),
+        );
+        expect(source, contains('metadata_canonicalization_failed'));
+        expect(
+          source,
+          isNot(contains('catch (_) {\n    return input.metadata;\n  }')),
+        );
+      },
+    );
 
-    test('commander learning card ids resolve through card identity bridge',
-        () {
+    test('commander learning card ids resolve through card identity bridge', () {
       final route =
           File('routes/ai/commander-learning/index.dart').readAsStringSync();
       final helpers =
@@ -455,9 +517,7 @@ void main() {
 
       expect(
         route,
-        contains(
-          'await canonicalizeCommanderLearnedDeckMetadataWithStatus',
-        ),
+        contains('await canonicalizeCommanderLearnedDeckMetadataWithStatus'),
       );
       expect(route, contains('roleMetadata: roleMetadata'));
       expect(route, contains('roleSummarySource: roleMetadataResult.source'));
@@ -466,86 +526,96 @@ void main() {
       expect(route, isNot(contains('_roleSummary(deck)')));
     });
 
-    test('commander learning snapshot excludes partial active learned decks',
-        () {
-      final support = File(
-        'lib/ai/commander_learning_snapshot_support.dart',
-      ).readAsStringSync();
+    test(
+      'commander learning snapshot excludes partial active learned decks',
+      () {
+        final support =
+            File(
+              'lib/ai/commander_learning_snapshot_support.dart',
+            ).readAsStringSync();
 
-      expect(support, contains('WHERE is_active = TRUE'));
-      expect(support, contains('AND card_count = 100'));
-      expect(
-        support,
-        contains("AND card_list ILIKE '%' || commander_name || '%'"),
-      );
-    });
+        expect(support, contains('WHERE is_active = TRUE'));
+        expect(support, contains('AND card_count = 100'));
+        expect(
+          support,
+          contains("AND card_list ILIKE '%' || commander_name || '%'"),
+        );
+      },
+    );
 
     test(
-        'learned Lorehold response normalizes to POST /decks Commander payload',
-        () {
-      final lands = List.generate(33, (index) => '1 Lorehold Land $index');
-      final spells = List.generate(66, (index) => '1 Lorehold Spell $index');
-      final learnedDeck = parseCommanderLearnedDeckInput({
-        'id': 82,
-        'commander': 'Lorehold, the Historian',
-        'deck_name': 'Lorehold Best-of Learned No Premium Mox 2026-06-02',
-        'card_list': [
-          '1 Lorehold, the Historian',
-          ...lands,
-          ...spells,
-        ].join('\n'),
-        'card_count': 100,
-      });
-      final metadataByName = {
-        for (final entry in learnedDeck.cards.indexed)
-          normalizeCommanderReferenceName(entry.$2.name): {
-            'id': 'card-${entry.$1}',
-            'name': entry.$2.name,
-            'type_line': entry.$2.name.contains('Land')
-                ? 'Basic Land - Plains'
-                : 'Sorcery',
-            'commander_legal_status': 'legal',
-          },
-      };
+      'learned Lorehold response normalizes to POST /decks Commander payload',
+      () {
+        final lands = List.generate(33, (index) => '1 Lorehold Land $index');
+        final spells = List.generate(66, (index) => '1 Lorehold Spell $index');
+        final learnedDeck = parseCommanderLearnedDeckInput({
+          'id': 82,
+          'commander': 'Lorehold, the Historian',
+          'deck_name': 'Lorehold Best-of Learned No Premium Mox 2026-06-02',
+          'card_list': [
+            '1 Lorehold, the Historian',
+            ...lands,
+            ...spells,
+          ].join('\n'),
+          'card_count': 100,
+          'legal_status': 'commander_legal',
+        });
+        final metadataByName = {
+          for (final entry in learnedDeck.cards.indexed)
+            normalizeCommanderReferenceName(entry.$2.name): {
+              'id': 'card-${entry.$1}',
+              'name': entry.$2.name,
+              'type_line':
+                  entry.$2.name.contains('Land')
+                      ? 'Basic Land - Plains'
+                      : 'Sorcery',
+              'commander_legal_status': 'legal',
+            },
+        };
 
-      final decklist = buildCommanderLearnedDeckResponseDecklist(
-        learnedDeck: learnedDeck,
-        metadataByName: metadataByName,
-      );
-      final postCards =
-          normalizeCommanderLearnedDecklistForDeckCreate(decklist);
-      final commanderCardId =
-          metadataByName[learnedDeck.commanderNameNormalized]!['id'];
-      final commanderRows =
-          postCards.where((card) => card['is_commander'] == true).toList();
-      final commanderQuantity = commanderRows.fold<int>(
-        0,
-        (sum, card) => sum + (card['quantity'] as int),
-      );
-      final totalQuantity = postCards.fold<int>(
-        0,
-        (sum, card) => sum + (card['quantity'] as int),
-      );
-      final mainCommanderDuplicates = postCards.where(
-        (card) =>
-            card['is_commander'] != true && card['card_id'] == commanderCardId,
-      );
+        final decklist = buildCommanderLearnedDeckResponseDecklist(
+          learnedDeck: learnedDeck,
+          metadataByName: metadataByName,
+        );
+        final postCards = normalizeCommanderLearnedDecklistForDeckCreate(
+          decklist,
+        );
+        final commanderCardId =
+            metadataByName[learnedDeck.commanderNameNormalized]!['id'];
+        final commanderRows =
+            postCards.where((card) => card['is_commander'] == true).toList();
+        final commanderQuantity = commanderRows.fold<int>(
+          0,
+          (sum, card) => sum + (card['quantity'] as int),
+        );
+        final totalQuantity = postCards.fold<int>(
+          0,
+          (sum, card) => sum + (card['quantity'] as int),
+        );
+        final mainCommanderDuplicates = postCards.where(
+          (card) =>
+              card['is_commander'] != true &&
+              card['card_id'] == commanderCardId,
+        );
 
-      expect(validateCommanderLearnedDeckInput(learnedDeck).ok, isTrue);
-      expect(decklist, hasLength(100));
-      expect(postCards, hasLength(100));
-      expect(totalQuantity, equals(100));
-      expect(commanderRows, hasLength(1));
-      expect(commanderQuantity, equals(1));
-      expect(mainCommanderDuplicates, isEmpty);
-      expect(
-        postCards.every((card) =>
-            card['card_id'] is String &&
-            (card['card_id'] as String).isNotEmpty),
-        isTrue,
-      );
-      expect(postCards.any((card) => card.containsKey('name')), isFalse);
-    });
+        expect(validateCommanderLearnedDeckInput(learnedDeck).ok, isTrue);
+        expect(decklist, hasLength(100));
+        expect(postCards, hasLength(100));
+        expect(totalQuantity, equals(100));
+        expect(commanderRows, hasLength(1));
+        expect(commanderQuantity, equals(1));
+        expect(mainCommanderDuplicates, isEmpty);
+        expect(
+          postCards.every(
+            (card) =>
+                card['card_id'] is String &&
+                (card['card_id'] as String).isNotEmpty,
+          ),
+          isTrue,
+        );
+        expect(postCards.any((card) => card.containsKey('name')), isFalse);
+      },
+    );
   });
 }
 

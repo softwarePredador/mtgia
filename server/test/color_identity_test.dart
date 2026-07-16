@@ -4,16 +4,42 @@ import '../lib/color_identity.dart';
 
 void main() {
   group('resolveCardColorIdentity', () {
-    test('infers colored land identity from oracle text when db field is empty',
-        () {
+    test(
+      'canonical empty identity stays colorless despite colored fallback',
+      () {
+        expect(
+          resolveCardColorIdentity(
+            colorIdentity: const <String>[],
+            colors: const <String>['W'],
+            manaCost: '{U}',
+            oracleText: '{T}: Add {B}.',
+          ),
+          isEmpty,
+        );
+      },
+    );
+
+    test('null canonical identity uses fallback evidence', () {
       expect(
         resolveCardColorIdentity(
-          colorIdentity: const <String>[],
-          colors: const <String>[],
-          oracleText:
-              '({T}: Add {W} or {B}.)\nAs this land enters, you may pay 2 life.',
+          colorIdentity: null,
+          colors: const <String>['W'],
+          manaCost: '{U}',
+          oracleText: '{T}: Add {B}.',
         ),
-        equals({'W', 'B'}),
+        equals({'W', 'U', 'B'}),
+      );
+    });
+
+    test('uses canonical identity without merging fallback evidence', () {
+      expect(
+        resolveCardColorIdentity(
+          colorIdentity: const <String>['W'],
+          colors: const <String>['U'],
+          manaCost: '{B}',
+          oracleText: '{T}: Add {R} or {G}.',
+        ),
+        equals({'W'}),
       );
     });
 
@@ -32,7 +58,7 @@ void main() {
     test('infers colored identity from mana cost when db fields are empty', () {
       expect(
         resolveCardColorIdentity(
-          colorIdentity: const <String>[],
+          colorIdentity: null,
           colors: const <String>[],
           manaCost: '{U}',
           oracleText: 'Counter target enchantment, instant, or sorcery spell.',
@@ -44,7 +70,7 @@ void main() {
     test('infers all hybrid mana colors from mana cost', () {
       expect(
         resolveCardColorIdentity(
-          colorIdentity: const <String>[],
+          colorIdentity: null,
           colors: const <String>[],
           manaCost: '{W/U}',
         ),
@@ -52,7 +78,7 @@ void main() {
       );
       expect(
         resolveCardColorIdentity(
-          colorIdentity: const <String>[],
+          colorIdentity: null,
           colors: const <String>[],
           manaCost: '{2/B}{R/G}',
         ),
@@ -60,22 +86,24 @@ void main() {
       );
     });
 
-    test('infers all hybrid mana colors from rules text outside reminder text',
-        () {
-      expect(
-        resolveCardColorIdentity(
-          colorIdentity: const <String>[],
-          colors: const <String>[],
-          oracleText: 'Activate only if you spent {W/U} to cast this spell.',
-        ),
-        equals({'W', 'U'}),
-      );
-    });
+    test(
+      'infers all hybrid mana colors from rules text outside reminder text',
+      () {
+        expect(
+          resolveCardColorIdentity(
+            colorIdentity: null,
+            colors: const <String>[],
+            oracleText: 'Activate only if you spent {W/U} to cast this spell.',
+          ),
+          equals({'W', 'U'}),
+        );
+      },
+    );
 
     test('treats {C} as colorless identity, not as a commander color', () {
       expect(
         resolveCardColorIdentity(
-          colorIdentity: const <String>[],
+          colorIdentity: null,
           colors: const <String>[],
           oracleText: '{T}: Add {C}{C}.',
         ),
@@ -83,16 +111,38 @@ void main() {
       );
     });
 
-    test('ignores mana symbols that appear only inside inline reminder text',
-        () {
+    test('ignores mana symbols that appear only inside inline reminder text', () {
       expect(
         resolveCardColorIdentity(
-          colorIdentity: const <String>[],
+          colorIdentity: null,
           colors: const <String>['W'],
           oracleText:
               'Extort (Whenever you cast a spell, you may pay {W/B}. If you do, each opponent loses 1 life and you gain that much life.)',
         ),
         equals({'W'}),
+      );
+    });
+
+    test('ignores mana symbols in a full-line reminder block', () {
+      expect(
+        resolveCardColorIdentity(
+          colorIdentity: null,
+          colors: const <String>[],
+          oracleText: '({T}: Add {W} or {B}.)',
+        ),
+        isEmpty,
+      );
+    });
+
+    test('ignores nested reminder text while keeping rules text symbols', () {
+      expect(
+        resolveCardColorIdentity(
+          colorIdentity: null,
+          colors: const <String>[],
+          oracleText:
+              'Ability (Reminder (you may pay {W/B}) text.)\n{T}: Add {U}.',
+        ),
+        equals({'U'}),
       );
     });
   });
@@ -209,27 +259,28 @@ void main() {
     });
 
     test(
-        'devoid - colorless card but with colored mana symbols still has identity',
-        () {
-      // Devoid remove a cor da carta, mas a identidade vem dos símbolos de mana no custo/texto
-      // Ex: Eldrazi como "Thought-Knot Seer" tem devoid mas custo {3}{C} (sem identidade de cor)
-      // Ex: "Kozilek's Return" tem devoid mas {2}{R} (identidade vermelha)
-      expect(
-        isWithinCommanderIdentity(
-          cardIdentity: const <String>['R'], // Devoid, mas tem R no custo
-          commanderIdentity: {'R', 'G'},
-        ),
-        isTrue,
-      );
+      'devoid - colorless card but with colored mana symbols still has identity',
+      () {
+        // Devoid remove a cor da carta, mas a identidade vem dos símbolos de mana no custo/texto
+        // Ex: Eldrazi como "Thought-Knot Seer" tem devoid mas custo {3}{C} (sem identidade de cor)
+        // Ex: "Kozilek's Return" tem devoid mas {2}{R} (identidade vermelha)
+        expect(
+          isWithinCommanderIdentity(
+            cardIdentity: const <String>['R'], // Devoid, mas tem R no custo
+            commanderIdentity: {'R', 'G'},
+          ),
+          isTrue,
+        );
 
-      expect(
-        isWithinCommanderIdentity(
-          cardIdentity: const <String>['R'],
-          commanderIdentity: {'W', 'U'},
-        ),
-        isFalse,
-      );
-    });
+        expect(
+          isWithinCommanderIdentity(
+            cardIdentity: const <String>['R'],
+            commanderIdentity: {'W', 'U'},
+          ),
+          isFalse,
+        );
+      },
+    );
 
     test('MDFC - both faces contribute to identity', () {
       // Modal double-faced cards usam AMBAS as faces para calcular identidade
@@ -238,7 +289,7 @@ void main() {
         isWithinCommanderIdentity(
           cardIdentity: const <String>[
             'W',
-            'B'
+            'B',
           ], // MDFC com W na frente, B no verso
           commanderIdentity: {'W', 'B'},
         ),

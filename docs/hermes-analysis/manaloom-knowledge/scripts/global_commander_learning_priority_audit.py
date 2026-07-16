@@ -68,6 +68,7 @@ EXTERNAL_RESEARCH_SNAPSHOT = [
 
 STAGE_RANK = {
     "structure_repair": 100,
+    "role_data_load": 97,
     "role_data_backfill": 95,
     "core_floor_repair": 90,
     "role_extreme_review_then_source_lane": 75,
@@ -149,6 +150,8 @@ def stage_for_deck(core_row: dict[str, Any], commander_row: dict[str, Any] | Non
     commander_status = str((commander_row or {}).get("status") or "")
     if shape_status != "structure_ready":
         return "structure_repair"
+    if core_status == "role_data_unavailable":
+        return "role_data_load"
     if core_status == "role_data_incomplete":
         return "role_data_backfill"
     if core_status == "core_role_gap":
@@ -169,6 +172,7 @@ def stage_for_deck(core_row: dict[str, Any], commander_row: dict[str, Any] | Non
 def next_action_for_stage(stage: str) -> str:
     return {
         "structure_repair": "repair_shape_legality_or_scope_before_deckbuilding_learning",
+        "role_data_load": "load_product_role_data_from_postgres_before_strategy_matrix",
         "role_data_backfill": "backfill_functional_roles_or_verify_oracle_text_before_strategy_matrix",
         "core_floor_repair": "repair_core_role_floor_before_reference_or_strategy_matrix",
         "role_extreme_review_then_source_lane": "review_role_extremes_then_add_commander_profile_or_source_lane",

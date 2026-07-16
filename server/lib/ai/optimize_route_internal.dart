@@ -74,9 +74,10 @@ Future<void> processOptimizeModeAsync({
   Map<String, dynamic> resultBody;
   try {
     final decoded = jsonDecode(utf8.decode(response.bodyBytes));
-    resultBody = decoded is Map<String, dynamic>
-        ? decoded
-        : decoded is Map
+    resultBody =
+        decoded is Map<String, dynamic>
+            ? decoded
+            : decoded is Map
             ? decoded.cast<String, dynamic>()
             : <String, dynamic>{'value': decoded};
   } catch (_) {
@@ -101,17 +102,22 @@ Future<void> processOptimizeModeAsync({
   }
 
   if (response.statusCode == HttpStatus.unprocessableEntity) {
-    final qualityError = resultBody['quality_error'] is Map
-        ? (resultBody['quality_error'] as Map).cast<String, dynamic>()
-        : <String, dynamic>{
-            'code': resultBody['outcome_code']?.toString() ??
-                'OPTIMIZE_ASYNC_QUALITY_REJECTED',
-            'message': resultBody['error']?.toString() ??
-                'Optimize async foi bloqueado pelo gate de qualidade.',
-          };
-    final optimizeDiagnostics = resultBody['optimize_diagnostics'] is Map
-        ? (resultBody['optimize_diagnostics'] as Map).cast<String, dynamic>()
-        : const <String, dynamic>{};
+    final qualityError =
+        resultBody['quality_error'] is Map
+            ? (resultBody['quality_error'] as Map).cast<String, dynamic>()
+            : <String, dynamic>{
+              'code':
+                  resultBody['outcome_code']?.toString() ??
+                  'OPTIMIZE_ASYNC_QUALITY_REJECTED',
+              'message':
+                  resultBody['error']?.toString() ??
+                  'Optimize async foi bloqueado pelo gate de qualidade.',
+            };
+    final optimizeDiagnostics =
+        resultBody['optimize_diagnostics'] is Map
+            ? (resultBody['optimize_diagnostics'] as Map)
+                .cast<String, dynamic>()
+            : const <String, dynamic>{};
     final asyncQualityError = <String, dynamic>{
       ...qualityError,
       if (resultBody['outcome_code'] != null)
@@ -122,7 +128,8 @@ Future<void> processOptimizeModeAsync({
     await OptimizeJobStore.fail(
       pool,
       jobId,
-      error: resultBody['error']?.toString() ??
+      error:
+          resultBody['error']?.toString() ??
           'Optimize async nao produziu preview seguro.',
       qualityError: asyncQualityError,
     );
@@ -284,8 +291,12 @@ Future<void> processCompleteModeAsync({
       requestMode: 'complete_async',
       jobId: jobId,
     );
-    await OptimizeJobStore.progress(pool, jobId,
-        stage: 'Preparando referÃªncias do commander...', stageNumber: 1);
+    await OptimizeJobStore.progress(
+      pool,
+      jobId,
+      stage: 'Preparando referÃªncias do commander...',
+      stageNumber: 1,
+    );
 
     Map<String, dynamic> jsonResponse;
     final state = optimize_complete.CompleteBuildAccumulator.fromDeck(
@@ -306,8 +317,12 @@ Future<void> processCompleteModeAsync({
     );
 
     if (optimizer != null) {
-      await OptimizeJobStore.progress(pool, jobId,
-          stage: 'Consultando IA para sugestÃµes...', stageNumber: 2);
+      await OptimizeJobStore.progress(
+        pool,
+        jobId,
+        stage: 'Consultando IA para sugestÃµes...',
+        stageNumber: 2,
+      );
       await telemetry.trackAsync(
         'complete.ai_suggestion_loop',
         () => optimize_complete.runCompleteAiSuggestionLoop(
@@ -327,8 +342,12 @@ Future<void> processCompleteModeAsync({
         ),
       );
     } else {
-      await OptimizeJobStore.progress(pool, jobId,
-          stage: 'Pulando IA (modo determinÃ­stico)...', stageNumber: 2);
+      await OptimizeJobStore.progress(
+        pool,
+        jobId,
+        stage: 'Pulando IA (modo determinÃ­stico)...',
+        stageNumber: 2,
+      );
     }
 
     telemetry.trackSync(
@@ -339,10 +358,18 @@ Future<void> processCompleteModeAsync({
       ),
     );
 
-    await OptimizeJobStore.progress(pool, jobId,
-        stage: 'Preenchendo com cartas sinÃ©rgicas...', stageNumber: 3);
-    await OptimizeJobStore.progress(pool, jobId,
-        stage: 'Ajustando base de mana...', stageNumber: 4);
+    await OptimizeJobStore.progress(
+      pool,
+      jobId,
+      stage: 'Preenchendo com cartas sinÃ©rgicas...',
+      stageNumber: 3,
+    );
+    await OptimizeJobStore.progress(
+      pool,
+      jobId,
+      stage: 'Ajustando base de mana...',
+      stageNumber: 4,
+    );
 
     await telemetry.trackAsync(
       'complete.fill_remainder',
@@ -371,8 +398,12 @@ Future<void> processCompleteModeAsync({
       ),
     );
 
-    await OptimizeJobStore.progress(pool, jobId,
-        stage: 'Processando resultado final...', stageNumber: 6);
+    await OptimizeJobStore.progress(
+      pool,
+      jobId,
+      stage: 'Processando resultado final...',
+      stageNumber: 6,
+    );
 
     // Post-processing: validar qualidade e construir resposta
     if (jsonResponse['mode'] == 'complete' &&
@@ -400,13 +431,12 @@ Future<void> processCompleteModeAsync({
           bracket: bracket,
           deckAnalysis: deckAnalysis,
           jsonResponse: jsonResponse,
+          targetArchetype: targetArchetype,
+          intensity: intensity.selected,
         ),
       );
       if (cacheKey != null && cacheKey.isNotEmpty) {
-        responseBody['cache'] = {
-          'hit': false,
-          'cache_key': cacheKey,
-        };
+        responseBody['cache'] = {'hit': false, 'cache_key': cacheKey};
         responseBody['intensity'] = intensity.selected;
         responseBody['optimize_intensity'] = intensity.toJson(
           returnedSwaps:
@@ -439,14 +469,12 @@ Future<void> processCompleteModeAsync({
     } else {
       // Fallback: se por algum motivo nÃ£o veio como complete
       if (cacheKey != null && cacheKey.isNotEmpty) {
-        jsonResponse['cache'] = {
-          'hit': false,
-          'cache_key': cacheKey,
-        };
+        jsonResponse['cache'] = {'hit': false, 'cache_key': cacheKey};
       }
       jsonResponse['intensity'] = intensity.selected;
       jsonResponse['optimize_intensity'] = intensity.toJson(
-        returnedSwaps: (jsonResponse['additions_detailed'] as List?)?.length ??
+        returnedSwaps:
+            (jsonResponse['additions_detailed'] as List?)?.length ??
             (jsonResponse['additions'] as List?)?.length ??
             0,
       );

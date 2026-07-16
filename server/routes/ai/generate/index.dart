@@ -83,16 +83,16 @@ Future<Response> onRequest(RequestContext context) async {
         unresolvedReferenceCards = statsLoad.unresolvedCardNames;
         referenceDeckCorpusGuidance =
             await loadCommanderReferenceDeckCorpusGuidance(
-          pool: pool,
-          commanderName: requestedCommanderName,
-        );
+              pool: pool,
+              commanderName: requestedCommanderName,
+            );
       } else {
         final archetypeStatsLoad =
             await loadCompatibleCommanderReferenceArchetypeStats(
-          pool: pool,
-          commanderName: requestedCommanderName,
-          prompt: prompt,
-        );
+              pool: pool,
+              commanderName: requestedCommanderName,
+              prompt: prompt,
+            );
         archetypeReferenceStats = archetypeStatsLoad.stats;
         archetypeSourceCommanderNames = archetypeStatsLoad.sourceCommanderNames;
         archetypeCommanderColorIdentity =
@@ -123,8 +123,9 @@ Future<Response> onRequest(RequestContext context) async {
           pool: pool,
           commanderName: requestedCommanderName,
         );
-        promotedLearnedCardNames =
-            activeCommanderLearnedDeckCardNames(activeLearnedDeck);
+        promotedLearnedCardNames = activeCommanderLearnedDeckCardNames(
+          activeLearnedDeck,
+        );
       } catch (_) {}
     }
     timings['reference_profile_ms'] =
@@ -219,6 +220,7 @@ Future<Response> onRequest(RequestContext context) async {
       return Response.json(body: responseBody);
     }
 
+    Map<String, dynamic>? validatedReferenceDeterministicDeckDiagnostics;
     if (_shouldUseReferenceGuidedDeterministicFastPath(
       format: format,
       referenceProfile: referenceProfile,
@@ -243,6 +245,8 @@ Future<Response> onRequest(RequestContext context) async {
         isMock: false,
         generationMode: 'reference_deterministic',
       );
+      validatedReferenceDeterministicDeckDiagnostics =
+          _extractReferenceDeterministicDeckDiagnostics(deterministicBody);
       timings['reference_deterministic_ms'] =
           fastPathStopwatch.elapsedMilliseconds;
       timings['total_ms'] = totalStopwatch.elapsedMilliseconds;
@@ -267,29 +271,33 @@ Future<Response> onRequest(RequestContext context) async {
 
     final metaStopwatch = Stopwatch()..start();
     try {
-      final metaKeywordPatterns = prompt
-          .split(' ')
-          .where((word) => word.length > 3)
-          .map((word) => word.replaceAll(RegExp(r'[^a-zA-Z0-9]'), ''))
-          .where((word) => word.isNotEmpty)
-          .map((word) => '%$word%')
-          .toSet()
-          .toList();
+      final metaKeywordPatterns =
+          prompt
+              .split(' ')
+              .where((word) => word.length > 3)
+              .map((word) => word.replaceAll(RegExp(r'[^a-zA-Z0-9]'), ''))
+              .where((word) => word.isNotEmpty)
+              .map((word) => '%$word%')
+              .toSet()
+              .toList();
 
       final normalizedFormat = format.trim().toLowerCase();
       final isCommanderFormat =
           normalizedFormat == 'commander' || normalizedFormat == 'edh';
-      final commanderMetaScope = isCommanderFormat
-          ? resolveCommanderMetaScopeFromPromptText(prompt)
-          : null;
-      final shouldUseMeta = metaKeywordPatterns.isNotEmpty &&
+      final commanderMetaScope =
+          isCommanderFormat
+              ? resolveCommanderMetaScopeFromPromptText(prompt)
+              : null;
+      final shouldUseMeta =
+          metaKeywordPatterns.isNotEmpty &&
           (!isCommanderFormat || commanderMetaScope != null);
-      final metaFormats = shouldUseMeta
-          ? metaDeckFormatCodesForDeckFormat(
-              format,
-              commanderScope: commanderMetaScope ?? 'competitive_commander',
-            )
-          : const <String>[];
+      final metaFormats =
+          shouldUseMeta
+              ? metaDeckFormatCodesForDeckFormat(
+                format,
+                commanderScope: commanderMetaScope ?? 'competitive_commander',
+              )
+              : const <String>[];
 
       if (metaFormats.isNotEmpty) {
         final metaCandidates = await queryMetaDeckReferenceCandidates(
@@ -382,29 +390,30 @@ Deck construction guidelines:
 - Use exact real card names in English.
 ''';
 
-    final referenceProfilePrompt = referenceProfile != null
-        ? [
-            buildCommanderReferenceProfilePrompt(referenceProfile),
-            buildCommanderReferenceCardStatsPrompt(
-              referenceCardStats,
-              compact: shouldUseCompactCommanderReferenceCorpusPrompt(
+    final referenceProfilePrompt =
+        referenceProfile != null
+            ? [
+              buildCommanderReferenceProfilePrompt(referenceProfile),
+              buildCommanderReferenceCardStatsPrompt(
+                referenceCardStats,
+                compact: shouldUseCompactCommanderReferenceCorpusPrompt(
+                  referenceDeckCorpusGuidance,
+                ),
+                priorityCardNames: commanderReferenceCorpusCoreCardNames(
+                  referenceDeckCorpusGuidance,
+                ),
+              ),
+              buildCommanderReferenceDeckCorpusPrompt(
                 referenceDeckCorpusGuidance,
               ),
-              priorityCardNames: commanderReferenceCorpusCoreCardNames(
-                referenceDeckCorpusGuidance,
-              ),
-            ),
-            buildCommanderReferenceDeckCorpusPrompt(
-              referenceDeckCorpusGuidance,
-            ),
-            if (usageHotCardsPrompt.isNotEmpty) usageHotCardsPrompt,
-          ].where((line) => line.trim().isNotEmpty).join('\n')
-        : archetypeReferenceStats.isNotEmpty
+              if (usageHotCardsPrompt.isNotEmpty) usageHotCardsPrompt,
+            ].where((line) => line.trim().isNotEmpty).join('\n')
+            : archetypeReferenceStats.isNotEmpty
             ? buildCommanderReferenceArchetypeStatsPrompt(
-                commanderName: requestedCommanderName ?? '',
-                stats: archetypeReferenceStats,
-                sourceCommanderNames: archetypeSourceCommanderNames,
-              )
+              commanderName: requestedCommanderName ?? '',
+              stats: archetypeReferenceStats,
+              sourceCommanderNames: archetypeSourceCommanderNames,
+            )
             : '';
 
     final userMessage = '''
@@ -501,10 +510,7 @@ $metaContext
       );
       timings['total_ms'] = totalStopwatch.elapsedMilliseconds;
       final responseBody = withAiGenerateRuntimeMetadata(
-        payload: {
-          ...fallbackBody,
-          'ai_generation_timed_out': true,
-        },
+        payload: {...fallbackBody, 'ai_generation_timed_out': true},
         cacheKey: cacheKey,
         cacheHit: false,
         timings: timings,
@@ -670,7 +676,8 @@ $metaContext
     Map<String, dynamic>? referenceDeckEvaluation;
     if (referenceProfile != null) {
       final generatedDeckForEvaluation = validation.generatedDeck;
-      final evaluationCards = (generatedDeckForEvaluation['cards'] as List?)
+      final evaluationCards =
+          (generatedDeckForEvaluation['cards'] as List?)
               ?.whereType<Map>()
               .map((card) => card['name']?.toString().trim() ?? '')
               .where((name) => name.isNotEmpty)
@@ -680,45 +687,47 @@ $metaContext
         pool: pool,
         cardNames: evaluationCards,
       );
-      referenceDeckEvaluation = evaluateGeneratedDeckAgainstReferenceStats(
-        generatedDeck: generatedDeckForEvaluation,
-        profile: referenceProfile,
-        stats: referenceCardStats,
-        cardMetadataByName: evaluationMetadata,
-      ).toJson();
+      referenceDeckEvaluation =
+          evaluateGeneratedDeckAgainstReferenceStats(
+            generatedDeck: generatedDeckForEvaluation,
+            profile: referenceProfile,
+            stats: referenceCardStats,
+            cardMetadataByName: evaluationMetadata,
+          ).toJson();
     }
     final referenceDeckCorpusDiagnostics = _buildReferenceDeckCorpusDiagnostics(
       generatedDeck: validation.generatedDeck,
       guidance: referenceDeckCorpusGuidance,
     );
-    final referenceDeterministicDeckDiagnostics = referenceProfile == null
-        ? null
-        : buildDeterministicReferenceDeckResult(
-            profile: referenceProfile,
-            referenceCardStats: referenceCardStats,
-            referenceDeckCorpusGuidance: referenceDeckCorpusGuidance,
-            activeLearnedDeck: activeLearnedDeck,
-            promotedLearnedCardNames: promotedLearnedCardNames,
-            usageHotCardNames: usageHotCardCanonicalNames(usageHotCards),
-          ).toDiagnosticsJson();
-    final deckbuildingContractDiagnostics = referenceProfile == null
-        ? null
-        : buildCommanderDeckbuildingContractDiagnostics(
-            format: format,
-            generatedDeck: validation.generatedDeck,
-            validationSummary: validation.validationSummary(),
-            referenceProfile: referenceProfile,
-            referenceCardStats: referenceCardStats,
-            unresolvedReferenceCards: unresolvedReferenceCards,
-            referenceDeckCorpusGuidance: referenceDeckCorpusGuidance,
-            activeLearnedDeck: activeLearnedDeck,
-            usageHotCards: usageHotCards,
-            referenceDeckEvaluation: referenceDeckEvaluation,
-            referenceDeckCorpusDiagnostics: referenceDeckCorpusDiagnostics,
-            referenceDeterministicDeckDiagnostics:
-                referenceDeterministicDeckDiagnostics,
-            generationMode: 'ai_generate',
-          );
+    final referenceDeterministicDeckDiagnostics =
+        referenceProfile == null
+            ? null
+            : validatedReferenceDeterministicDeckDiagnostics ??
+                buildDeterministicReferenceDeckResult(
+                  profile: referenceProfile,
+                  referenceCardStats: referenceCardStats,
+                  referenceDeckCorpusGuidance: referenceDeckCorpusGuidance,
+                  activeLearnedDeck: activeLearnedDeck,
+                  promotedLearnedCardNames: promotedLearnedCardNames,
+                  usageHotCardNames: usageHotCardCanonicalNames(usageHotCards),
+                ).toDiagnosticsJson();
+    final deckbuildingContractDiagnostics =
+        buildCommanderDeckbuildingContractDiagnostics(
+          format: format,
+          generatedDeck: validation.generatedDeck,
+          validationSummary: validation.validationSummary(),
+          referenceProfile: referenceProfile,
+          referenceCardStats: referenceCardStats,
+          unresolvedReferenceCards: unresolvedReferenceCards,
+          referenceDeckCorpusGuidance: referenceDeckCorpusGuidance,
+          activeLearnedDeck: activeLearnedDeck,
+          usageHotCards: usageHotCards,
+          referenceDeckEvaluation: referenceDeckEvaluation,
+          referenceDeckCorpusDiagnostics: referenceDeckCorpusDiagnostics,
+          referenceDeterministicDeckDiagnostics:
+              referenceDeterministicDeckDiagnostics,
+          generationMode: 'ai_generate',
+        );
 
     final responseBody = <String, dynamic>{
       'prompt': prompt,
@@ -748,8 +757,7 @@ $metaContext
           referenceDeterministicDeckDiagnostics:
               referenceDeterministicDeckDiagnostics,
         ),
-      if (deckbuildingContractDiagnostics != null)
-        'deckbuilding_contract': deckbuildingContractDiagnostics,
+      'deckbuilding_contract': deckbuildingContractDiagnostics,
       if (referenceProfile == null && archetypeReferenceStats.isNotEmpty)
         'diagnostics': buildCommanderReferenceArchetypeStatsDiagnostics(
           stats: archetypeReferenceStats,
@@ -759,9 +767,9 @@ $metaContext
       if (metaReferenceContext != null && metaReferenceContext.isNotEmpty)
         'meta_reference_context':
             augmentMetaDeckEvidencePayloadWithOutputMatches(
-          metaReferenceContext,
-          outputCardNames: generatedCardNames,
-        ),
+              metaReferenceContext,
+              outputCardNames: generatedCardNames,
+            ),
     };
 
     // Fire-and-forget: loga deck gerado para aprendizado (mesmo nao salvo)
@@ -808,12 +816,14 @@ $metaContext
         );
       }
 
-      final fallbackWarningCode = validation.isValid
-          ? 'ai_generate_invalid_card_fallback'
-          : 'ai_generate_validation_fallback';
-      final fallbackWarningMessage = validation.isValid
-          ? 'A geracao principal retornou cartas nao resolvidas. Retornando fallback deterministico valido para manter o fluxo create/validate/optimize.'
-          : 'A geracao principal retornou um deck invalido. Retornando fallback deterministico valido para manter o fluxo create/validate/optimize.';
+      final fallbackWarningCode =
+          validation.isValid
+              ? 'ai_generate_invalid_card_fallback'
+              : 'ai_generate_validation_fallback';
+      final fallbackWarningMessage =
+          validation.isValid
+              ? 'A geracao principal retornou cartas nao resolvidas. Retornando fallback deterministico valido para manter o fluxo create/validate/optimize.'
+              : 'A geracao principal retornou um deck invalido. Retornando fallback deterministico valido para manter o fluxo create/validate/optimize.';
       final fallbackBody = await _buildMockGenerateResponse(
         pool: pool,
         prompt: prompt,
@@ -858,10 +868,7 @@ $metaContext
 
       return Response.json(
         statusCode: 422,
-        body: {
-          'error': 'Generated deck failed validation',
-          ...responseBody,
-        },
+        body: {'error': 'Generated deck failed validation', ...responseBody},
       );
     }
 
@@ -872,11 +879,7 @@ $metaContext
       cacheHit: false,
       timings: timings,
     );
-    writeAiGenerateCache(
-      cacheKey: cacheKey,
-      payload: finalBody,
-      ttl: cacheTtl,
-    );
+    writeAiGenerateCache(cacheKey: cacheKey, payload: finalBody, ttl: cacheTtl);
     return Response.json(body: finalBody);
   } catch (error, stackTrace) {
     print('[ERROR] Failed to generate deck: $error');
@@ -918,9 +921,10 @@ Future<Response> _startAiGenerateAsyncJob({
     prompt: prompt,
     format: format,
     bracket: body['bracket'],
-    commanderName: referenceCacheVersion == null
-        ? null
-        : body['commander_name']?.toString(),
+    commanderName:
+        referenceCacheVersion == null
+            ? null
+            : body['commander_name']?.toString(),
     referenceProfileVersion: referenceCacheVersion,
   );
   final jobId = await AiGenerateJobStore.create(
@@ -966,13 +970,8 @@ Future<Response> _startAiGenerateAsyncJob({
       'poll_url': '/ai/generate/jobs/$jobId',
       'poll_interval_ms': 1000,
       'total_stages': 4,
-      'cache': {
-        'hit': false,
-        'cache_key': cacheKey,
-      },
-      'timings': {
-        'accepted_ms': requestStopwatch.elapsedMilliseconds,
-      },
+      'cache': {'hit': false, 'cache_key': cacheKey},
+      'timings': {'accepted_ms': requestStopwatch.elapsedMilliseconds},
     },
   );
 }
@@ -992,8 +991,9 @@ String? _buildReferenceGenerateCacheVersion({
       'archetype_reference_v1:',
     );
   }
-  final profileVersion =
-      commanderReferenceProfileCacheVersion(referenceProfile);
+  final profileVersion = commanderReferenceProfileCacheVersion(
+    referenceProfile,
+  );
   final statsVersion = commanderReferenceCardStatsCacheVersion(
     referenceCardStats,
   );
@@ -1021,10 +1021,10 @@ Future<String?> _resolveReferenceGenerateCacheVersion({
     if (profile == null) {
       final archetypeStatsLoad =
           await loadCompatibleCommanderReferenceArchetypeStats(
-        pool: pool,
-        commanderName: commanderName,
-        prompt: prompt,
-      );
+            pool: pool,
+            commanderName: commanderName,
+            prompt: prompt,
+          );
       return _buildReferenceGenerateCacheVersion(
         referenceProfile: null,
         referenceCardStats: const [],
@@ -1110,9 +1110,10 @@ Future<void> _processAiGenerateAsyncJob({
   Map<String, dynamic> resultBody;
   try {
     final decoded = jsonDecode(utf8.decode(response.bodyBytes));
-    resultBody = decoded is Map<String, dynamic>
-        ? decoded
-        : decoded is Map
+    resultBody =
+        decoded is Map<String, dynamic>
+            ? decoded
+            : decoded is Map
             ? decoded.cast<String, dynamic>()
             : <String, dynamic>{'value': decoded};
   } catch (_) {
@@ -1159,10 +1160,7 @@ Map<String, dynamic>? _buildReferenceDeckCorpusDiagnostics({
     guidance: guidance,
   );
   if (evaluation == null) return diagnostics;
-  return {
-    ...diagnostics,
-    'reference_deck_corpus_evaluation': evaluation,
-  };
+  return {...diagnostics, 'reference_deck_corpus_evaluation': evaluation};
 }
 
 Uri _resolveInternalGenerateUrl(Request request) {
@@ -1217,6 +1215,36 @@ bool _aiGenerateBodyIsValidWithoutInvalidCards(Map<String, dynamic> body) {
   return true;
 }
 
+Map<String, dynamic>? _extractReferenceDeterministicDeckDiagnostics(
+  Map<String, dynamic> body,
+) {
+  final contract = body['deckbuilding_contract'];
+  if (contract is! Map) return null;
+  final diagnostics = contract['deterministic_reference_diagnostics'];
+  if (diagnostics is Map<String, dynamic>) {
+    return Map<String, dynamic>.from(diagnostics);
+  }
+  if (diagnostics is Map) return diagnostics.cast<String, dynamic>();
+  return null;
+}
+
+Map<String, dynamic>? _withReferenceDeterministicValidationEvidence({
+  required DeterministicReferenceDeckBuildResult? result,
+  required bool validationValid,
+  required bool unresolvedCardsZero,
+  int validationErrorCount = 0,
+  int invalidCardCount = 0,
+}) {
+  if (result == null) return null;
+  return {
+    ...result.toDiagnosticsJson(),
+    'validation_valid': validationValid,
+    'unresolved_cards_zero': unresolvedCardsZero,
+    'validation_error_count': validationErrorCount,
+    'invalid_card_count': invalidCardCount,
+  };
+}
+
 int _aiGenerateIntValue(Object? value) {
   if (value is int) return value;
   if (value is num) return value.round();
@@ -1247,25 +1275,23 @@ Future<List<Map<String, dynamic>>> _filterAndRefillReferenceGeneratedCards({
     lookupNames.add(name);
     lookupNames.addAll(commanderReferenceCardLookupAliases(name));
   }
-  final resolvedCardsByName = lookupNames.isEmpty
-      ? <String, Map<String, dynamic>>{}
-      : await resolveImportCardNames(
-          pool,
-          [
-            for (final name in lookupNames) {'name': name}
-          ],
-          preferredFormat: format,
-        );
+  final resolvedCardsByName =
+      lookupNames.isEmpty
+          ? <String, Map<String, dynamic>>{}
+          : await resolveImportCardNames(pool, [
+            for (final name in lookupNames) {'name': name},
+          ], preferredFormat: format);
   final normalizedResolvedCardsByName = resolvedCardsByName.map(
     (key, value) => MapEntry(normalizeCommanderReferenceCardName(key), value),
   );
 
-  final filtered = filterReferenceGeneratedCardsByCommanderIdentity(
-    profile: referenceProfile,
-    commanderName: commanderName,
-    cards: cards,
-    resolvedCardsByName: normalizedResolvedCardsByName,
-  ).cards;
+  final filtered =
+      filterReferenceGeneratedCardsByCommanderIdentity(
+        profile: referenceProfile,
+        commanderName: commanderName,
+        cards: cards,
+        resolvedCardsByName: normalizedResolvedCardsByName,
+      ).cards;
 
   final targetMainQuantity = normalizedFormat == 'brawl' ? 59 : 99;
   final currentQuantity = _generatedMainQuantity(filtered);
@@ -1283,12 +1309,15 @@ Future<List<Map<String, dynamic>>> _filterAndRefillReferenceGeneratedCards({
     targetMainQuantity: targetMainQuantity,
   );
   final filled = filtered.map(Map<String, dynamic>.from).toList();
-  final seen = filled
-      .map((card) => normalizeCommanderReferenceCardName(
-            card['name']?.toString() ?? '',
-          ))
-      .where((name) => name.isNotEmpty)
-      .toSet();
+  final seen =
+      filled
+          .map(
+            (card) => normalizeCommanderReferenceCardName(
+              card['name']?.toString() ?? '',
+            ),
+          )
+          .where((name) => name.isNotEmpty)
+          .toSet();
   var missing = targetMainQuantity - currentQuantity;
   final fillerCards =
       (fillerDeck['cards'] as List?)?.whereType<Map>() ?? const <Map>[];
@@ -1303,9 +1332,10 @@ Future<List<Map<String, dynamic>>> _filterAndRefillReferenceGeneratedCards({
     final isBasic = basicLandNames.contains(normalizedName);
     if (!isBasic && !seen.add(normalizedName)) continue;
     final quantityRaw = rawCard['quantity'];
-    final quantity = quantityRaw is int
-        ? quantityRaw
-        : int.tryParse(quantityRaw?.toString() ?? '') ?? 1;
+    final quantity =
+        quantityRaw is int
+            ? quantityRaw
+            : int.tryParse(quantityRaw?.toString() ?? '') ?? 1;
     if (quantity <= 0) continue;
     final addQuantity = quantity > missing ? missing : quantity;
     filled.add({'name': name, 'quantity': addQuantity});
@@ -1318,9 +1348,10 @@ int _generatedMainQuantity(List<Map<String, dynamic>> cards) {
   var total = 0;
   for (final card in cards) {
     final quantityRaw = card['quantity'];
-    final quantity = quantityRaw is int
-        ? quantityRaw
-        : int.tryParse(quantityRaw?.toString() ?? '') ?? 1;
+    final quantity =
+        quantityRaw is int
+            ? quantityRaw
+            : int.tryParse(quantityRaw?.toString() ?? '') ?? 1;
     if (quantity > 0) total += quantity;
   }
   return total;
@@ -1347,16 +1378,17 @@ Future<Map<String, dynamic>> _buildMockGenerateResponse({
   String generationMode = 'mock_fallback',
 }) async {
   final usageHotCardNames = usageHotCardCanonicalNames(usageHotCards);
-  final referenceDeterministicDeck = referenceProfile == null
-      ? null
-      : buildDeterministicReferenceDeckResult(
-          profile: referenceProfile,
-          referenceCardStats: referenceCardStats,
-          referenceDeckCorpusGuidance: referenceDeckCorpusGuidance,
-          activeLearnedDeck: activeLearnedDeck,
-          promotedLearnedCardNames: promotedLearnedCardNames,
-          usageHotCardNames: usageHotCardNames,
-        );
+  final referenceDeterministicDeck =
+      referenceProfile == null
+          ? null
+          : buildDeterministicReferenceDeckResult(
+            profile: referenceProfile,
+            referenceCardStats: referenceCardStats,
+            referenceDeckCorpusGuidance: referenceDeckCorpusGuidance,
+            activeLearnedDeck: activeLearnedDeck,
+            promotedLearnedCardNames: promotedLearnedCardNames,
+            usageHotCardNames: usageHotCardNames,
+          );
   final mockDeck = await _mockGeneratedDeck(
     pool,
     format,
@@ -1406,7 +1438,8 @@ Future<Map<String, dynamic>> _buildMockGenerateResponse({
 
     Map<String, dynamic>? referenceDeckEvaluation;
     if (referenceProfile != null) {
-      final evaluationCards = (validation.generatedDeck['cards'] as List?)
+      final evaluationCards =
+          (validation.generatedDeck['cards'] as List?)
               ?.whereType<Map>()
               .map((card) => card['name']?.toString().trim() ?? '')
               .where((name) => name.isNotEmpty)
@@ -1416,36 +1449,44 @@ Future<Map<String, dynamic>> _buildMockGenerateResponse({
         pool: pool,
         cardNames: evaluationCards,
       );
-      referenceDeckEvaluation = evaluateGeneratedDeckAgainstReferenceStats(
-        generatedDeck: validation.generatedDeck,
-        profile: referenceProfile,
-        stats: referenceCardStats,
-        cardMetadataByName: evaluationMetadata,
-      ).toJson();
+      referenceDeckEvaluation =
+          evaluateGeneratedDeckAgainstReferenceStats(
+            generatedDeck: validation.generatedDeck,
+            profile: referenceProfile,
+            stats: referenceCardStats,
+            cardMetadataByName: evaluationMetadata,
+          ).toJson();
     }
     final referenceDeckCorpusDiagnostics = _buildReferenceDeckCorpusDiagnostics(
       generatedDeck: validation.generatedDeck,
       guidance: referenceDeckCorpusGuidance,
     );
     final validationSummary = validation.validationSummary();
-    final deckbuildingContractDiagnostics = referenceProfile == null
-        ? null
-        : buildCommanderDeckbuildingContractDiagnostics(
-            format: format,
-            generatedDeck: validation.generatedDeck,
-            validationSummary: validationSummary,
-            referenceProfile: referenceProfile,
-            referenceCardStats: referenceCardStats,
-            unresolvedReferenceCards: unresolvedReferenceCards,
-            referenceDeckCorpusGuidance: referenceDeckCorpusGuidance,
-            activeLearnedDeck: activeLearnedDeck,
-            usageHotCards: usageHotCards,
-            referenceDeckEvaluation: referenceDeckEvaluation,
-            referenceDeckCorpusDiagnostics: referenceDeckCorpusDiagnostics,
-            referenceDeterministicDeckDiagnostics:
-                referenceDeterministicDeck?.toDiagnosticsJson(),
-            generationMode: generationMode,
-          );
+    final referenceDeterministicDeckDiagnostics =
+        _withReferenceDeterministicValidationEvidence(
+          result: referenceDeterministicDeck,
+          validationValid: validation.isValid,
+          unresolvedCardsZero: validation.invalidCards.isEmpty,
+          validationErrorCount: validation.errors.length,
+          invalidCardCount: validation.invalidCards.length,
+        );
+    final deckbuildingContractDiagnostics =
+        buildCommanderDeckbuildingContractDiagnostics(
+          format: format,
+          generatedDeck: validation.generatedDeck,
+          validationSummary: validationSummary,
+          referenceProfile: referenceProfile,
+          referenceCardStats: referenceCardStats,
+          unresolvedReferenceCards: unresolvedReferenceCards,
+          referenceDeckCorpusGuidance: referenceDeckCorpusGuidance,
+          activeLearnedDeck: activeLearnedDeck,
+          usageHotCards: usageHotCards,
+          referenceDeckEvaluation: referenceDeckEvaluation,
+          referenceDeckCorpusDiagnostics: referenceDeckCorpusDiagnostics,
+          referenceDeterministicDeckDiagnostics:
+              referenceDeterministicDeckDiagnostics,
+          generationMode: generationMode,
+        );
 
     return {
       'prompt': prompt,
@@ -1475,10 +1516,9 @@ Future<Map<String, dynamic>> _buildMockGenerateResponse({
           referenceDeckCorpusDiagnostics: referenceDeckCorpusDiagnostics,
           referenceDeckEvaluation: referenceDeckEvaluation,
           referenceDeterministicDeckDiagnostics:
-              referenceDeterministicDeck?.toDiagnosticsJson(),
+              referenceDeterministicDeckDiagnostics,
         ),
-      if (deckbuildingContractDiagnostics != null)
-        'deckbuilding_contract': deckbuildingContractDiagnostics,
+      'deckbuilding_contract': deckbuildingContractDiagnostics,
       if (referenceProfile == null && archetypeReferenceStats.isNotEmpty)
         'diagnostics': buildCommanderReferenceArchetypeStatsDiagnostics(
           stats: archetypeReferenceStats,
@@ -1495,27 +1535,32 @@ Future<Map<String, dynamic>> _buildMockGenerateResponse({
       'suggestions': const <String, List<String>>{},
       'warnings': const <String>[],
     };
-    final deckbuildingContractDiagnostics = referenceProfile == null
-        ? null
-        : buildCommanderDeckbuildingContractDiagnostics(
-            format: format,
+    final referenceDeterministicDeckDiagnostics =
+        _withReferenceDeterministicValidationEvidence(
+          result: referenceDeterministicDeck,
+          validationValid: false,
+          unresolvedCardsZero: false,
+          validationErrorCount: 1,
+        );
+    final deckbuildingContractDiagnostics =
+        buildCommanderDeckbuildingContractDiagnostics(
+          format: format,
+          generatedDeck: mockDeck,
+          validationSummary: fallbackValidationSummary,
+          referenceProfile: referenceProfile,
+          referenceCardStats: referenceCardStats,
+          unresolvedReferenceCards: unresolvedReferenceCards,
+          referenceDeckCorpusGuidance: referenceDeckCorpusGuidance,
+          activeLearnedDeck: activeLearnedDeck,
+          usageHotCards: usageHotCards,
+          referenceDeckCorpusDiagnostics: _buildReferenceDeckCorpusDiagnostics(
             generatedDeck: mockDeck,
-            validationSummary: fallbackValidationSummary,
-            referenceProfile: referenceProfile,
-            referenceCardStats: referenceCardStats,
-            unresolvedReferenceCards: unresolvedReferenceCards,
-            referenceDeckCorpusGuidance: referenceDeckCorpusGuidance,
-            activeLearnedDeck: activeLearnedDeck,
-            usageHotCards: usageHotCards,
-            referenceDeckCorpusDiagnostics:
-                _buildReferenceDeckCorpusDiagnostics(
-              generatedDeck: mockDeck,
-              guidance: referenceDeckCorpusGuidance,
-            ),
-            referenceDeterministicDeckDiagnostics:
-                referenceDeterministicDeck?.toDiagnosticsJson(),
-            generationMode: generationMode,
-          );
+            guidance: referenceDeckCorpusGuidance,
+          ),
+          referenceDeterministicDeckDiagnostics:
+              referenceDeterministicDeckDiagnostics,
+          generationMode: generationMode,
+        );
     return {
       'prompt': prompt,
       'format': format,
@@ -1541,10 +1586,9 @@ Future<Map<String, dynamic>> _buildMockGenerateResponse({
             guidance: referenceDeckCorpusGuidance,
           ),
           referenceDeterministicDeckDiagnostics:
-              referenceDeterministicDeck?.toDiagnosticsJson(),
+              referenceDeterministicDeckDiagnostics,
         ),
-      if (deckbuildingContractDiagnostics != null)
-        'deckbuilding_contract': deckbuildingContractDiagnostics,
+      'deckbuilding_contract': deckbuildingContractDiagnostics,
       if (referenceProfile == null && archetypeReferenceStats.isNotEmpty)
         'diagnostics': buildCommanderReferenceArchetypeStatsDiagnostics(
           stats: archetypeReferenceStats,
@@ -1563,7 +1607,8 @@ Future<Map<String, dynamic>> _buildMockGenerateResponse({
 Map<String, dynamic> _buildSemanticLayerV2GenerateSummary(
   Map<String, dynamic> generatedDeck,
 ) {
-  final cards = (generatedDeck['cards'] as List?)
+  final cards =
+      (generatedDeck['cards'] as List?)
           ?.whereType<Map>()
           .map((card) => card.cast<String, dynamic>())
           .toList(growable: false) ??
@@ -1572,11 +1617,7 @@ Map<String, dynamic> _buildSemanticLayerV2GenerateSummary(
     return {
       'schema_version': semanticLayerV2SchemaVersion,
       'mode': 'shadow',
-      'coverage': {
-        'card_rows': 0,
-        'tagged_rows': 0,
-        'unknown_rows': 0,
-      },
+      'coverage': {'card_rows': 0, 'tagged_rows': 0, 'unknown_rows': 0},
       'role_counts': const <String, int>{},
       'note':
           'Semantic v2 is additive and does not replace Commander Reference validation.',
@@ -1640,25 +1681,25 @@ Future<Map<String, dynamic>> _mockGeneratedDeck(
     }
     final requestedCommander = requestedCommanderName?.trim();
     if (requestedCommander != null && requestedCommander.isNotEmpty) {
-      final resolved = await resolveImportCardNames(
-        pool,
-        [
-          {'name': requestedCommander}
-        ],
-        preferredFormat: 'commander',
-      );
+      final resolved = await resolveImportCardNames(pool, [
+        {'name': requestedCommander},
+      ], preferredFormat: 'commander');
       final card = _bestResolvedCommanderCard(
         requestedCommander: requestedCommander,
         resolved: resolved,
       );
       if (card != null) {
-        final colors = resolveCardColorIdentity(
-          colorIdentity: _stringIterable(card['color_identity']),
-          colors: _stringIterable(card['colors']),
-          oracleText: card['oracle_text']?.toString(),
-          manaCost: card['mana_cost']?.toString(),
-        ).toList()
-          ..sort();
+        final colors =
+            resolveCardColorIdentity(
+                colorIdentity:
+                    card['color_identity'] == null
+                        ? null
+                        : _stringIterable(card['color_identity']),
+                colors: _stringIterable(card['colors']),
+                oracleText: card['oracle_text']?.toString(),
+                manaCost: card['mana_cost']?.toString(),
+              ).toList()
+              ..sort();
         return {
           'commander': {'name': card['name']?.toString() ?? requestedCommander},
           'cards': _buildBasicLandMockCards(
@@ -1680,7 +1721,8 @@ Future<Map<String, dynamic>> _mockGeneratedDeck(
   if (normalized == 'brawl') {
     final resolved = await _pickMockBrawlCommander(pool);
     final commanderName = resolved?['name'] as String?;
-    final colors = (resolved?['colors'] as List?)
+    final colors =
+        (resolved?['colors'] as List?)
             ?.map((e) => e.toString().trim().toUpperCase())
             .where((e) => e.isNotEmpty)
             .toSet()
@@ -1821,7 +1863,8 @@ Future<Map<String, dynamic>?> _pickMockBrawlCommander(Pool pool) async {
       if (name != null && name.trim().isNotEmpty) {
         return {
           'name': name.trim(),
-          'colors': colorIdentityRaw?.map((e) => e.toString()).toList() ??
+          'colors':
+              colorIdentityRaw?.map((e) => e.toString()).toList() ??
               const <String>[],
         };
       }
@@ -1848,7 +1891,8 @@ Future<Map<String, dynamic>?> _pickMockBrawlCommander(Pool pool) async {
       if (name != null && name.trim().isNotEmpty) {
         return {
           'name': name.trim(),
-          'colors': colorIdentityRaw?.map((e) => e.toString()).toList() ??
+          'colors':
+              colorIdentityRaw?.map((e) => e.toString()).toList() ??
               const <String>[],
         };
       }

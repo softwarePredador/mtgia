@@ -28,17 +28,22 @@ Future<Response> onRequest(RequestContext context) async {
 
     final pool = context.read<Pool>();
     final countersService = ArchetypeCountersService(pool);
-    final hasCardIntelligenceSnapshot =
-        await _hasTable(pool, 'card_intelligence_snapshot');
-    final cardSourceJoin = hasCardIntelligenceSnapshot
-        ? 'JOIN card_intelligence_snapshot c ON c.card_id = dc.card_id'
-        : 'JOIN cards c ON c.id = dc.card_id';
-    final functionalTagsSelect = hasCardIntelligenceSnapshot
-        ? 'c.function_tag_details AS functional_tags'
-        : await _functionalTagsSelectSql(pool);
-    final semanticV2Select = hasCardIntelligenceSnapshot
-        ? 'c.semantic_tags_v2 AS semantic_tags_v2'
-        : await _semanticV2SelectSql(pool);
+    final hasCardIntelligenceSnapshot = await _hasTable(
+      pool,
+      'card_intelligence_snapshot',
+    );
+    final cardSourceJoin =
+        hasCardIntelligenceSnapshot
+            ? 'JOIN card_intelligence_snapshot c ON c.card_id = dc.card_id'
+            : 'JOIN cards c ON c.id = dc.card_id';
+    final functionalTagsSelect =
+        hasCardIntelligenceSnapshot
+            ? 'c.function_tag_details AS functional_tags'
+            : await _functionalTagsSelectSql(pool);
+    final semanticV2Select =
+        hasCardIntelligenceSnapshot
+            ? 'c.semantic_tags_v2 AS semantic_tags_v2'
+            : await _semanticV2SelectSql(pool);
 
     // 1. Buscar informações do deck
     final deckResult = await pool.execute(
@@ -73,7 +78,7 @@ Future<Response> onRequest(RequestContext context) async {
                  ) FROM regexp_matches(c.mana_cost, '\\{([^}]+)\\}', 'g') AS m(m)),
                  0
                ) as cmc,
-               COALESCE(c.oracle_id::text, c.scryfall_id::text) as oracle_id,
+               c.oracle_id::text as oracle_id,
                c.color_identity,
                dc.is_commander,
                $functionalTagsSelect,
@@ -89,6 +94,7 @@ Future<Response> onRequest(RequestContext context) async {
     final observedDeckColors = <String>{};
     final commanderColorIdentity = <String>{};
     final deckOracleIds = <String>{};
+    final commanderOracleIds = <String>{};
     final deckCardNames = <String>{};
 
     int totalCards = 0;
@@ -120,6 +126,7 @@ Future<Response> onRequest(RequestContext context) async {
       observedDeckColors.addAll(colors);
       if (isCommanderCard) {
         commanderColorIdentity.addAll(colorIdentity);
+        if (oracleId.isNotEmpty) commanderOracleIds.add(oracleId);
       }
       if (oracleId.isNotEmpty) deckOracleIds.add(oracleId);
       deckCardNames.add(name.toLowerCase());
@@ -173,16 +180,19 @@ Future<Response> onRequest(RequestContext context) async {
       if (cardRoles.contains('recursion') || cardRoles.contains('graveyard'))
         graveyardInteractionCount += quantity;
     }
-    final recommendationColors = commanderColorIdentity.isNotEmpty
-        ? commanderColorIdentity
-        : observedDeckColors;
-    final colorIdentitySource = commanderColorIdentity.isNotEmpty
-        ? 'commander_color_identity'
-        : 'observed_card_colors';
+    final recommendationColors =
+        commanderColorIdentity.isNotEmpty
+            ? commanderColorIdentity
+            : observedDeckColors;
+    final colorIdentitySource =
+        commanderColorIdentity.isNotEmpty
+            ? 'commander_color_identity'
+            : 'observed_card_colors';
 
     // 3. Detectar arquétipo do deck
-    final archetypeAnalysis =
-        await countersService.detectDeckArchetype(cards: cards);
+    final archetypeAnalysis = await countersService.detectDeckArchetype(
+      cards: cards,
+    );
     final detectedArchetype = archetypeAnalysis['archetype'] as String;
 
     // 4. Calcular métricas
@@ -202,7 +212,7 @@ Future<Response> onRequest(RequestContext context) async {
               'Deck tem apenas $landCount terrenos. Commander decks geralmente precisam de 33-38 conforme perfil, curva e ramp.',
           'recommendations': [
             'Adicionar ${33 - landCount} terrenos',
-            'Considerar terrenos que produzem múltiplas cores'
+            'Considerar terrenos que produzem múltiplas cores',
           ],
           'current_value': landCount,
           'recommended_value': 33,
@@ -214,7 +224,7 @@ Future<Response> onRequest(RequestContext context) async {
           'description':
               'Deck tem $landCount terrenos. Pode ser excessivo para alguns arquétipos.',
           'recommendations': [
-            'Considerar reduzir terrenos se tiver muito ramp'
+            'Considerar reduzir terrenos se tiver muito ramp',
           ],
           'current_value': landCount,
           'recommended_value': 37,
@@ -343,7 +353,7 @@ Future<Response> onRequest(RequestContext context) async {
             'CMC médio de ${avgCMC.toStringAsFixed(2)} é alto para $detectedArchetype.',
         'recommendations': [
           'Reduzir cartas com CMC > 5',
-          'Adicionar mais cartas de custo 1-3'
+          'Adicionar mais cartas de custo 1-3',
         ],
         'current_value': avgCMC,
         'recommended_value': 2.5,
@@ -480,12 +490,15 @@ Future<Response> onRequest(RequestContext context) async {
     // Detectar combos reais (Commander Spellbook) presentes/próximos no deck.
     // Combos completos contam como caminhos de vitória adicionais; combos a 1
     // carta viram oportunidades acionáveis.
-    DeckCombosResult comboResult =
-        const DeckCombosResult(complete: [], nearMisses: []);
+    DeckCombosResult comboResult = const DeckCombosResult(
+      complete: [],
+      nearMisses: [],
+    );
     try {
       comboResult = await CommanderSpellbookService().findDeckCombos(
         pool: pool,
         deckOracleIds: deckOracleIds,
+        commanderOracleIds: commanderOracleIds,
         commanderColorIdentity: recommendationColors,
       );
     } catch (e) {
@@ -511,10 +524,11 @@ Future<Response> onRequest(RequestContext context) async {
         'severity': 'low',
         'description':
             'Deck está a 1 carta de completar ${nearMissCombos.length} combo(s) conhecido(s). '
-                'Adicionar a peça que falta pode criar um caminho de vitória direto.',
-        'recommendations': missingCardSuggestions.isNotEmpty
-            ? missingCardSuggestions
-            : ['Revisar combos próximos na seção "combos"'],
+            'Adicionar a peça que falta pode criar um caminho de vitória direto.',
+        'recommendations':
+            missingCardSuggestions.isNotEmpty
+                ? missingCardSuggestions
+                : ['Revisar combos próximos na seção "combos"'],
         'current_value': completeCombos.length,
         'recommended_value': completeCombos.length + 1,
       });
@@ -529,7 +543,7 @@ Future<Response> onRequest(RequestContext context) async {
         'recommendations': [
           'Adicionar finalizadores que fechem o jogo',
           'Considerar combos de 2-3 cartas',
-          'Incluir dano direto ou drain effects'
+          'Incluir dano direto ou drain effects',
         ],
         'current_value': effectiveWinConditions,
         'recommended_value': 3,
@@ -625,7 +639,9 @@ Future<Response> onRequest(RequestContext context) async {
             'severity': weakness['severity'],
             'description': weakness['description'],
             'recommendations': TypedValue(
-                Type.textArray, weakness['recommendations'] as List<String>),
+              Type.textArray,
+              weakness['recommendations'] as List<String>,
+            ),
           },
         );
       }
@@ -638,59 +654,67 @@ Future<Response> onRequest(RequestContext context) async {
     final weaknessHistory = await _loadWeaknessHistory(pool, deckId);
 
     // 8. Retornar análise completa
-    return Response.json(body: {
-      'deck_id': deckId,
-      'deck_name': deckName,
-      'format': deckFormat,
-      'detected_archetype': detectedArchetype,
-      'archetype_confidence': archetypeAnalysis['confidence'],
-      'statistics': {
-        'total_cards': totalCards,
-        'lands': landCount,
-        'creatures': creatureCount,
-        'ramp_sources': rampCount,
-        'card_draw': drawCount,
-        'removal': removalCount,
-        'board_wipes': boardWipeCount,
-        'protection': protectionCount,
-        'average_cmc': avgCMC.toStringAsFixed(2),
+    return Response.json(
+      body: {
+        'deck_id': deckId,
+        'deck_name': deckName,
+        'format': deckFormat,
+        'detected_archetype': detectedArchetype,
+        'archetype_confidence': archetypeAnalysis['confidence'],
+        'statistics': {
+          'total_cards': totalCards,
+          'lands': landCount,
+          'creatures': creatureCount,
+          'ramp_sources': rampCount,
+          'card_draw': drawCount,
+          'removal': removalCount,
+          'board_wipes': boardWipeCount,
+          'protection': protectionCount,
+          'average_cmc': avgCMC.toStringAsFixed(2),
+        },
+        'weaknesses': weaknesses,
+        'weakness_count': weaknesses.length,
+        'critical_count':
+            weaknesses.where((w) => w['severity'] == 'critical').length,
+        'combos': {
+          'complete_count': completeCombos.length,
+          'near_miss_count': nearMissCombos.length,
+          'complete':
+              completeCombos
+                  .map(
+                    (m) => {
+                      'id': m.combo.id,
+                      'cards': m.combo.cardNames,
+                      'produces': m.combo.produces,
+                      'color_identity': m.combo.colorIdentity,
+                    },
+                  )
+                  .toList(),
+          'near_misses':
+              nearMissCombos
+                  .map(
+                    (m) => {
+                      'id': m.combo.id,
+                      'cards': m.combo.cardNames,
+                      'missing': m.missingCardNames,
+                      'produces': m.combo.produces,
+                      'color_identity': m.combo.colorIdentity,
+                    },
+                  )
+                  .toList(),
+        },
+        'hate_cards_for_archetype': hateCards,
+        'colors': recommendationColors.toList()..sort(),
+        'color_identity_source': colorIdentitySource,
+        'advanced': {
+          'wincon_diversity': winconDiversity.data,
+          'removal_to_threat': removalToThreat.data,
+          'draw_completeness': drawCompleteness.data,
+          'post_resolution_viability': postResolution.data,
+        },
+        'history': weaknessHistory,
       },
-      'weaknesses': weaknesses,
-      'weakness_count': weaknesses.length,
-      'critical_count':
-          weaknesses.where((w) => w['severity'] == 'critical').length,
-      'combos': {
-        'complete_count': completeCombos.length,
-        'near_miss_count': nearMissCombos.length,
-        'complete': completeCombos
-            .map((m) => {
-                  'id': m.combo.id,
-                  'cards': m.combo.cardNames,
-                  'produces': m.combo.produces,
-                  'color_identity': m.combo.colorIdentity,
-                })
-            .toList(),
-        'near_misses': nearMissCombos
-            .map((m) => {
-                  'id': m.combo.id,
-                  'cards': m.combo.cardNames,
-                  'missing': m.missingCardNames,
-                  'produces': m.combo.produces,
-                  'color_identity': m.combo.colorIdentity,
-                })
-            .toList(),
-      },
-      'hate_cards_for_archetype': hateCards,
-      'colors': recommendationColors.toList()..sort(),
-      'color_identity_source': colorIdentitySource,
-      'advanced': {
-        'wincon_diversity': winconDiversity.data,
-        'removal_to_threat': removalToThreat.data,
-        'draw_completeness': drawCompleteness.data,
-        'post_resolution_viability': postResolution.data,
-      },
-      'history': weaknessHistory,
-    });
+    );
   } catch (e, stack) {
     print('Erro em weakness-analysis: $e\n$stack');
     return internalServerError('Failed to analyze deck weaknesses');
@@ -732,16 +756,17 @@ Future<Map<String, dynamic>> _loadWeaknessHistory(
     return {
       'stored_reports': bySeverity.values.fold<int>(0, (a, b) => a + b),
       'by_severity': bySeverity,
-      'recent': recentRows.map((row) {
-        final m = row.toColumnMap();
-        return {
-          'type': m['weakness_type'],
-          'severity': m['severity'],
-          'description': m['description'],
-          'addressed': m['addressed'],
-          'created_at': m['created_at']?.toString(),
-        };
-      }).toList(),
+      'recent':
+          recentRows.map((row) {
+            final m = row.toColumnMap();
+            return {
+              'type': m['weakness_type'],
+              'severity': m['severity'],
+              'description': m['description'],
+              'addressed': m['addressed'],
+              'created_at': m['created_at']?.toString(),
+            };
+          }).toList(),
     };
   } catch (e) {
     print('[weakness-analysis] weakness history unavailable: $e');
@@ -802,15 +827,16 @@ Future<List<String>> _findWeaknessRecommendations({
 
     if (predicates.isEmpty) return fallback.take(limit).toList();
 
-    final instantFilter = instantSpeedOnly
-        ? '''
+    final instantFilter =
+        instantSpeedOnly
+            ? '''
           AND (
             c.type_line ILIKE '%instant%'
             OR LOWER(COALESCE(c.oracle_text, '')) LIKE '%flash%'
             OR LOWER(COALESCE(c.oracle_text, '')) LIKE '%as though it had flash%'
           )
         '''
-        : '';
+            : '';
 
     final result = await pool.execute(
       Sql.named('''
@@ -834,9 +860,10 @@ Future<List<String>> _findWeaknessRecommendations({
       '''),
       parameters: {
         'format': format.toLowerCase(),
-        'deck_colors': deckColors.isEmpty
-            ? null
-            : TypedValue(Type.textArray, deckColors.toList()..sort()),
+        'deck_colors':
+            deckColors.isEmpty
+                ? null
+                : TypedValue(Type.textArray, deckColors.toList()..sort()),
         'role_tags': TypedValue(Type.textArray, normalizedRoles),
         'limit_plus': limit + 20,
       },

@@ -12,148 +12,144 @@ void main() {
     });
 
     test(
-        'aggro optimization closes with lower curve and stronger early pressure',
-        () async {
-      final originalDeck = _buildAggroOriginalDeck();
-      final optimizedDeck = _buildAggroOptimizedDeck();
-      final report = await validator.validate(
-        originalDeck: originalDeck,
-        optimizedDeck: optimizedDeck,
-        removals: const [
-          'Slow Titan Alpha',
-          'Slow Titan Beta',
-          'Slow Titan Gamma',
-          'Slow Titan Delta',
-        ],
-        additions: const [
-          'One-Drop Scout Alpha',
-          'One-Drop Scout Beta',
-          'One-Drop Scout Gamma',
-          'One-Drop Scout Delta',
-        ],
-        commanders: const ['Aggro Test Commander'],
-        archetype: 'aggro',
-      );
+      'aggro optimization closes with lower curve and stronger early pressure',
+      () async {
+        final originalDeck = _buildAggroOriginalDeck();
+        final optimizedDeck = _buildAggroOptimizedDeck();
+        final report = await validator.validate(
+          originalDeck: originalDeck,
+          optimizedDeck: optimizedDeck,
+          removals: const [
+            'Slow Titan Alpha',
+            'Slow Titan Beta',
+            'Slow Titan Gamma',
+            'Slow Titan Delta',
+          ],
+          additions: const [
+            'One-Drop Scout Alpha',
+            'One-Drop Scout Beta',
+            'One-Drop Scout Gamma',
+            'One-Drop Scout Delta',
+          ],
+          commanders: const ['Aggro Test Commander'],
+          archetype: 'aggro',
+        );
 
-      final pre = _analyzeDeck(originalDeck, const ['R']);
-      final post = _analyzeDeck(optimizedDeck, const ['R']);
-      final preAvg = _avgCmc(pre);
-      final postAvg = _avgCmc(post);
+        final pre = _analyzeDeck(originalDeck, const ['R']);
+        final post = _analyzeDeck(optimizedDeck, const ['R']);
+        final preAvg = _avgCmc(pre);
+        final postAvg = _avgCmc(post);
 
-      expect(post['detected_archetype'], equals('aggro'));
-      expect(postAvg, lessThan(preAvg));
-      expect(
-        report.monteCarlo.after.turn2PlayRate,
-        greaterThan(report.monteCarlo.before.turn2PlayRate),
-      );
-      expect(
-        report.monteCarlo.after.consistencyScore,
-        greaterThan(report.monteCarlo.before.consistencyScore),
-      );
-      expect(report.functional.questionable, equals(0));
-      expect(report.verdict, isNot(equals('reprovado')));
-    });
+        expect(post['detected_archetype'], equals('aggro'));
+        expect(postAvg, lessThan(preAvg));
+        expect(
+          report.monteCarlo.after.turn2PlayRate,
+          greaterThan(report.monteCarlo.before.turn2PlayRate),
+        );
+        expect(
+          report.monteCarlo.after.consistencyScore,
+          greaterThan(report.monteCarlo.before.consistencyScore),
+        );
+        expect(report.functional.questionable, equals(0));
+        expect(report.verdict, isNot(equals('reprovado')));
+      },
+    );
 
-    test('control optimization fixes mana and preserves interaction density',
-        () async {
-      final originalDeck = _buildControlOriginalDeck();
-      final optimizedDeck = _buildControlOptimizedDeck();
-      final report = await validator.validate(
-        originalDeck: originalDeck,
-        optimizedDeck: optimizedDeck,
-        removals: const [
-          'Expensive Counter Alpha',
-          'Expensive Counter Beta',
-          'Expensive Removal Alpha',
-          'Expensive Removal Beta',
-          'Clunky Insight Alpha',
-          'Clunky Insight Beta',
-        ],
-        additions: const [
-          'Efficient Counter Alpha',
-          'Efficient Counter Beta',
-          'Efficient Removal Alpha',
-          'Efficient Removal Beta',
-          'Strategic Insight Alpha',
-          'Strategic Insight Beta',
-        ],
-        commanders: const ['Control Test Commander'],
-        archetype: 'control',
-      );
+    test(
+      'control optimization fixes mana and preserves interaction density',
+      () async {
+        final originalDeck = _buildControlOriginalDeck();
+        final optimizedDeck = _buildControlOptimizedDeck();
+        final report = await validator.validate(
+          originalDeck: originalDeck,
+          optimizedDeck: optimizedDeck,
+          removals: const [
+            'Expensive Counter Alpha',
+            'Expensive Counter Beta',
+            'Expensive Removal Alpha',
+            'Expensive Removal Beta',
+            'Clunky Insight Alpha',
+            'Clunky Insight Beta',
+          ],
+          additions: const [
+            'Efficient Counter Alpha',
+            'Efficient Counter Beta',
+            'Efficient Removal Alpha',
+            'Efficient Removal Beta',
+            'Strategic Insight Alpha',
+            'Strategic Insight Beta',
+          ],
+          commanders: const ['Control Test Commander'],
+          archetype: 'control',
+        );
 
-      final pre = _analyzeDeck(originalDeck, const ['U', 'B']);
-      final post = _analyzeDeck(optimizedDeck, const ['U', 'B']);
-      final preTypes = _typeDistribution(pre);
-      final postTypes = _typeDistribution(post);
-      final preInteraction =
-          (preTypes['instants'] ?? 0) + (preTypes['sorceries'] ?? 0);
-      final postInteraction =
-          (postTypes['instants'] ?? 0) + (postTypes['sorceries'] ?? 0);
+        final pre = _analyzeDeck(originalDeck, const ['U', 'B']);
+        final post = _analyzeDeck(optimizedDeck, const ['U', 'B']);
+        final preTypes = _typeDistribution(pre);
+        final postTypes = _typeDistribution(post);
+        final preInteraction =
+            (preTypes['instants'] ?? 0) + (preTypes['sorceries'] ?? 0);
+        final postInteraction =
+            (postTypes['instants'] ?? 0) + (postTypes['sorceries'] ?? 0);
 
-      expect(pre['mana_base_assessment'], contains('Falta mana'));
-      expect(post['mana_base_assessment'], equals('Base de mana equilibrada'));
-      expect(post['detected_archetype'], equals('control'));
-      expect(postInteraction, greaterThan(preInteraction));
-      expect(
-        report.functional.roleDelta['removal']! >= 0,
-        isTrue,
-      );
-      expect(
-        report.functional.roleDelta['draw']! >= 0,
-        isTrue,
-      );
-      expect(report.verdict, isNot(equals('reprovado')));
-    });
+        expect(pre['mana_base_assessment'], contains('Falta mana'));
+        expect(
+          post['mana_base_assessment'],
+          equals('Base de mana equilibrada'),
+        );
+        expect(post['detected_archetype'], equals('control'));
+        expect(postInteraction, greaterThan(preInteraction));
+        expect(report.functional.roleDelta['removal']! >= 0, isTrue);
+        expect(report.functional.roleDelta['draw']! >= 0, isTrue);
+        expect(report.verdict, isNot(equals('reprovado')));
+      },
+    );
 
-    test('midrange optimization reaches balanced curve and better consistency',
-        () async {
-      final originalDeck = _buildMidrangeOriginalDeck();
-      final optimizedDeck = _buildMidrangeOptimizedDeck();
-      final report = await validator.validate(
-        originalDeck: originalDeck,
-        optimizedDeck: optimizedDeck,
-        removals: const [
-          'Overcosted Removal Alpha',
-          'Overcosted Removal Beta',
-          'Slow Relic Alpha',
-          'Slow Relic Beta',
-          'Clunky Beast Alpha',
-          'Clunky Beast Beta',
-        ],
-        additions: const [
-          'Efficient Removal Alpha',
-          'Efficient Removal Beta',
-          'Ramp Growth Alpha',
-          'Ramp Growth Beta',
-          'Value Draw Alpha',
-          'Value Draw Beta',
-        ],
-        commanders: const ['Midrange Test Commander'],
-        archetype: 'midrange',
-      );
+    test(
+      'midrange optimization reaches balanced curve and better consistency',
+      () async {
+        final originalDeck = _buildMidrangeOriginalDeck();
+        final optimizedDeck = _buildMidrangeOptimizedDeck();
+        final report = await validator.validate(
+          originalDeck: originalDeck,
+          optimizedDeck: optimizedDeck,
+          removals: const [
+            'Overcosted Removal Alpha',
+            'Overcosted Removal Beta',
+            'Slow Relic Alpha',
+            'Slow Relic Beta',
+            'Clunky Beast Alpha',
+            'Clunky Beast Beta',
+          ],
+          additions: const [
+            'Efficient Removal Alpha',
+            'Efficient Removal Beta',
+            'Ramp Growth Alpha',
+            'Ramp Growth Beta',
+            'Value Draw Alpha',
+            'Value Draw Beta',
+          ],
+          commanders: const ['Midrange Test Commander'],
+          archetype: 'midrange',
+        );
 
-      final pre = _analyzeDeck(originalDeck, const ['B', 'G']);
-      final post = _analyzeDeck(optimizedDeck, const ['B', 'G']);
-      final preAvg = _avgCmc(pre);
-      final postAvg = _avgCmc(post);
+        final pre = _analyzeDeck(originalDeck, const ['B', 'G']);
+        final post = _analyzeDeck(optimizedDeck, const ['B', 'G']);
+        final preAvg = _avgCmc(pre);
+        final postAvg = _avgCmc(post);
 
-      expect(post['detected_archetype'], equals('midrange'));
-      expect(postAvg, inInclusiveRange(2.5, 3.5));
-      expect(postAvg, lessThan(preAvg));
-      expect(
-        report.monteCarlo.after.consistencyScore,
-        greaterThan(report.monteCarlo.before.consistencyScore),
-      );
-      expect(
-        report.functional.roleDelta['removal']! >= 0,
-        isTrue,
-      );
-      expect(
-        report.functional.roleDelta['ramp']! >= 0,
-        isTrue,
-      );
-      expect(report.verdict, isNot(equals('reprovado')));
-    });
+        expect(post['detected_archetype'], equals('midrange'));
+        expect(postAvg, inInclusiveRange(2.5, 3.5));
+        expect(postAvg, lessThan(preAvg));
+        expect(
+          report.monteCarlo.after.consistencyScore,
+          greaterThan(report.monteCarlo.before.consistencyScore),
+        );
+        expect(report.functional.roleDelta['removal']! >= 0, isTrue);
+        expect(report.functional.roleDelta['ramp']! >= 0, isTrue);
+        expect(report.verdict, isNot(equals('reprovado')));
+      },
+    );
   });
 }
 
@@ -466,12 +462,8 @@ List<Map<String, dynamic>> _buildControlOriginalDeck() {
 
 List<Map<String, dynamic>> _buildControlOptimizedDeck() {
   return [
-    _basicLand(name: 'Island', symbol: 'U', quantity: 14),
-    _dualLand(
-      name: 'Sunken Archive',
-      symbols: const ['U', 'B'],
-      quantity: 14,
-    ),
+    _basicLand(name: 'Island', symbol: 'U', quantity: 17),
+    _dualLand(name: 'Sunken Archive', symbols: const ['U', 'B'], quantity: 17),
     _card(
       name: 'Efficient Counter',
       typeLine: 'Instant',
@@ -479,7 +471,7 @@ List<Map<String, dynamic>> _buildControlOptimizedDeck() {
       cmc: 2,
       oracleText: 'Counter target spell.',
       colors: const ['U'],
-      quantity: 6,
+      quantity: 5,
     ),
     _card(
       name: 'Efficient Removal',
@@ -488,7 +480,7 @@ List<Map<String, dynamic>> _buildControlOptimizedDeck() {
       cmc: 2,
       oracleText: 'Destroy target creature.',
       colors: const ['B'],
-      quantity: 6,
+      quantity: 4,
     ),
     _card(
       name: 'Strategic Insight',
@@ -497,7 +489,7 @@ List<Map<String, dynamic>> _buildControlOptimizedDeck() {
       cmc: 4,
       oracleText: 'Draw two cards.',
       colors: const ['U'],
-      quantity: 8,
+      quantity: 6,
     ),
     _card(
       name: 'Control Finisher',
@@ -506,7 +498,7 @@ List<Map<String, dynamic>> _buildControlOptimizedDeck() {
       cmc: 5,
       oracleText: 'Flying.',
       colors: const ['U'],
-      quantity: 6,
+      quantity: 5,
     ),
     _card(
       name: 'Efficient Counter Alpha',

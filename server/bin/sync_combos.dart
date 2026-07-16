@@ -4,6 +4,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:crypto/crypto.dart';
 import 'package:http/http.dart' as http;
 import 'package:postgres/postgres.dart';
 
@@ -11,6 +12,13 @@ import '../lib/ai/commander_spellbook_service.dart';
 import '../lib/database.dart';
 
 const _comboFunctionTagSource = 'commander_spellbook_combo_v1';
+const comboSyncWriteApprovalEnvironment = 'MANALOOM_CONFIRM_POSTGRES_WRITES';
+const comboSyncWriteApprovalPhrase = 'I_HAVE_EXPLICIT_APPROVAL';
+const minimumExpectedCommanderSpellbookCombos = 50000;
+
+bool hasComboSyncWriteApproval(Map<String, String> environment) =>
+    environment[comboSyncWriteApprovalEnvironment] ==
+    comboSyncWriteApprovalPhrase;
 
 /// Sincroniza a base de combos do Commander Spellbook.
 ///
@@ -19,67 +27,103 @@ const _comboFunctionTagSource = 'commander_spellbook_combo_v1';
 /// e `combo_cards`. Combos cujo `oracleId` não esteja presente em nenhuma carta
 /// são mantidos mesmo assim — o match em runtime é por oracle_id.
 ///
-/// Uso: dart run bin/sync_combos.dart [--force] [--keep-file]
+/// Uso: dart run bin/sync_combos.dart [--dry-run] [--force] [--keep-file]
 ///
 /// Opções:
+///   --dry-run    Baixa, parseia e valida sem conectar ao PostgreSQL.
 ///   --force      Re-baixa o bulk mesmo se o cache local for recente (<24h).
 ///   --keep-file  Não apaga o arquivo temporário ao final.
 Future<void> main(List<String> args) async {
+  final dryRun = args.contains('--dry-run');
   final force = args.contains('--force');
   final keepFile = args.contains('--keep-file');
 
-  print('🔄 Sync de combos (Commander Spellbook)');
+  if (!dryRun && !hasComboSyncWriteApproval(Platform.environment)) {
+    stderr.writeln(
+      'BLOCKED: sincronizar Commander Spellbook altera PostgreSQL. Defina '
+      '$comboSyncWriteApprovalEnvironment=$comboSyncWriteApprovalPhrase '
+      'somente apos aprovacao explicita para esta execucao.',
+    );
+    exitCode = 2;
+    return;
+  }
+
+  print('🔄 Sync de combos (Commander Spellbook)${dryRun ? ' [DRY-RUN]' : ''}');
 
   final tmpDir = Directory.systemTemp;
   final cacheFile = File('${tmpDir.path}/csb_variants.json');
 
-  final db = Database();
-  await db.connect();
-  if (!db.isConnected) {
-    print('❌ Sem conexão com o banco. Abortando.');
-    exit(1);
-  }
-  final pool = db.connection;
+  Database? db;
 
   try {
-    await _ensureCombosTables(pool);
-
-    final needsDownload = force ||
+    final needsDownload =
+        force ||
         !cacheFile.existsSync() ||
-        DateTime.now()
-                .difference(cacheFile.lastModifiedSync())
-                .inHours >=
-            24;
+        DateTime.now().difference(cacheFile.lastModifiedSync()).inHours >= 24;
 
     if (needsDownload) {
       await _downloadBulk(cacheFile);
     } else {
-      final sizeMb =
-          (cacheFile.lengthSync() / (1024 * 1024)).toStringAsFixed(1);
+      final sizeMb = (cacheFile.lengthSync() / (1024 * 1024)).toStringAsFixed(
+        1,
+      );
       print('📦 Reutilizando cache local (${sizeMb}MB, <24h).');
     }
 
-    print('📖 Lendo e decodificando bulk...');
-    final raw = await cacheFile.readAsString();
-    final decoded = jsonDecode(raw) as Map<String, dynamic>;
-    final version = (decoded['version'] ?? '?').toString();
-    final variants = (decoded['variants'] as List?) ?? const [];
-    print('   version=$version, variants=${variants.length}');
-
-    final combos = <_ParsedCombo>[];
-    var skipped = 0;
-    for (final v in variants) {
-      final parsed = _parseVariant(v as Map<String, dynamic>);
-      if (parsed == null) {
-        skipped++;
-        continue;
-      }
-      combos.add(parsed);
-    }
+    print('📖 Parse incremental do bulk...');
+    final snapshot = await parseCommanderSpellbookBulk(cacheFile);
+    final version = snapshot.version;
+    final sourceUpdatedAt =
+        snapshot.sourceUpdatedAt ?? cacheFile.lastModifiedSync().toUtc();
+    final combos = snapshot.combos;
+    final skipped = snapshot.skippedVariantCount;
+    print('   version=$version, variants=${snapshot.rawVariantCount}');
+    validateCommanderSpellbookSnapshot(combos);
     print('   válidos=${combos.length}, ignorados=$skipped');
+    final compositionVerifiable =
+        combos
+            .where(
+              (combo) =>
+                  combo.prerequisites ==
+                  commanderSpellbookVerifiedNoPrerequisitesMarker,
+            )
+            .length;
+    final commanderConstrained =
+        combos
+            .where((combo) => combo.commanderFlags.any((required) => required))
+            .length;
+    print(
+      '   composition_verifiable=$compositionVerifiable, '
+      'requirements_fail_closed=${combos.length - compositionVerifiable}, '
+      'must_be_commander=$commanderConstrained',
+    );
 
-    await _upsertCombos(pool, combos);
-    await _syncComboFunctionTags(pool);
+    final contentHash =
+        (await sha256.bind(cacheFile.openRead()).first).toString();
+    print('   sha256=$contentHash');
+    if (dryRun) {
+      print('✅ DRY-RUN concluído: nenhuma conexão ou escrita PostgreSQL.');
+      return;
+    }
+
+    db = Database();
+    await db.connect();
+    if (!db.isConnected) {
+      throw StateError('Sem conexão com PostgreSQL.');
+    }
+    final pool = db.connection;
+    await _ensureCombosTables(pool);
+    await _reconcileCombos(
+      pool,
+      combos,
+      metadata: ComboSnapshotMetadata(
+        version: version,
+        sourceUpdatedAt: sourceUpdatedAt,
+        contentSha256: contentHash,
+        rawVariantCount: snapshot.rawVariantCount,
+        skippedVariantCount: skipped,
+      ),
+    );
 
     final total = await _count(pool, 'card_combos');
     print('✅ Sync concluído. card_combos=$total');
@@ -93,7 +137,7 @@ Future<void> main(List<String> args) async {
         cacheFile.deleteSync();
       } catch (_) {}
     }
-    await db.close();
+    await db?.close();
   }
 }
 
@@ -138,20 +182,169 @@ Future<void> _downloadBulk(File target) async {
   }
 }
 
+/// Parses the large Commander Spellbook bulk one variant at a time.
+///
+/// The previous implementation materialized both the ~579MB JSON string and
+/// its full decoded object graph. This scanner only retains the metadata
+/// prefix, one variant object, and the compact parsed combo rows.
+Future<ParsedCommanderSpellbookSnapshot> parseCommanderSpellbookBulk(
+  File file,
+) async {
+  if (!file.existsSync()) {
+    throw ArgumentError('Bulk Commander Spellbook inexistente: ${file.path}');
+  }
+
+  var prefix = '';
+  var variantsStarted = false;
+  var variantsFinished = false;
+  String? version;
+  DateTime? sourceUpdatedAt;
+  StringBuffer? objectBuffer;
+  var objectDepth = 0;
+  var inString = false;
+  var escaped = false;
+  var rawVariantCount = 0;
+  var skippedVariantCount = 0;
+  final combos = <ParsedCommanderSpellbookCombo>[];
+
+  void processVariantArrayText(String text) {
+    for (final rune in text.runes) {
+      if (variantsFinished) continue;
+      final character = String.fromCharCode(rune);
+      final buffer = objectBuffer;
+      if (buffer == null) {
+        if (character.trim().isEmpty || character == ',') continue;
+        if (character == ']') {
+          variantsFinished = true;
+          continue;
+        }
+        if (character != '{') {
+          throw FormatException(
+            'Token inesperado no array variants: $character',
+          );
+        }
+        objectBuffer = StringBuffer()..write(character);
+        objectDepth = 1;
+        inString = false;
+        escaped = false;
+        continue;
+      }
+
+      buffer.write(character);
+      if (inString) {
+        if (escaped) {
+          escaped = false;
+        } else if (character == '\\') {
+          escaped = true;
+        } else if (character == '"') {
+          inString = false;
+        }
+        continue;
+      }
+      if (character == '"') {
+        inString = true;
+      } else if (character == '{') {
+        objectDepth++;
+      } else if (character == '}') {
+        objectDepth--;
+        if (objectDepth == 0) {
+          final decoded = jsonDecode(buffer.toString());
+          if (decoded is! Map) {
+            throw const FormatException('Variant deve ser um objeto JSON.');
+          }
+          rawVariantCount++;
+          final parsed = parseCommanderSpellbookVariant(
+            Map<String, dynamic>.from(decoded),
+          );
+          if (parsed == null) {
+            skippedVariantCount++;
+          } else {
+            combos.add(parsed);
+          }
+          objectBuffer = null;
+        }
+      }
+    }
+  }
+
+  await for (final chunk in file.openRead().transform(utf8.decoder)) {
+    if (variantsStarted) {
+      processVariantArrayText(chunk);
+      continue;
+    }
+
+    prefix += chunk;
+    if (prefix.length > 5 * 1024 * 1024) {
+      throw const FormatException(
+        'Chave variants ausente nos primeiros 5MB do bulk.',
+      );
+    }
+    final keyIndex = prefix.indexOf('"variants"');
+    if (keyIndex < 0) continue;
+    final arrayIndex = prefix.indexOf('[', keyIndex + '"variants"'.length);
+    if (arrayIndex < 0) continue;
+
+    version = _extractJsonStringField(
+      prefix.substring(0, arrayIndex),
+      'version',
+    );
+    final timestamp = _extractJsonStringField(
+      prefix.substring(0, arrayIndex),
+      'timestamp',
+    );
+    sourceUpdatedAt = DateTime.tryParse(timestamp ?? '')?.toUtc();
+    variantsStarted = true;
+    final remainder = prefix.substring(arrayIndex + 1);
+    prefix = '';
+    processVariantArrayText(remainder);
+  }
+
+  if (!variantsStarted || !variantsFinished || objectBuffer != null) {
+    throw const FormatException('Bulk Commander Spellbook truncado.');
+  }
+  if (version == null || version.trim().isEmpty) {
+    throw const FormatException('Bulk Commander Spellbook sem version.');
+  }
+
+  return ParsedCommanderSpellbookSnapshot(
+    version: version,
+    sourceUpdatedAt: sourceUpdatedAt,
+    rawVariantCount: rawVariantCount,
+    skippedVariantCount: skippedVariantCount,
+    combos: combos,
+  );
+}
+
+String? _extractJsonStringField(String prefix, String field) {
+  final match = RegExp(
+    '"${RegExp.escape(field)}"\\s*:\\s*("(?:\\\\.|[^"\\\\])*")',
+  ).firstMatch(prefix);
+  final encoded = match?.group(1);
+  if (encoded == null) return null;
+  final decoded = jsonDecode(encoded);
+  return decoded is String ? decoded : null;
+}
+
 /// Extrai um combo de uma variant do bulk. Retorna null se inválido.
-_ParsedCombo? _parseVariant(Map<String, dynamic> v) {
+ParsedCommanderSpellbookCombo? parseCommanderSpellbookVariant(
+  Map<String, dynamic> v,
+) {
   final id = v['id']?.toString();
   if (id == null || id.isEmpty) return null;
 
   final status = (v['status'] ?? 'OK').toString();
   // Apenas combos OK (exclui rascunhos / removidos).
   if (status != 'OK') return null;
+  final legalities = v['legalities'];
+  if (legalities is! Map || legalities['commander'] != true) return null;
 
   final uses = (v['uses'] as List?) ?? const [];
   final oracleIds = <String>[];
   final names = <String>[];
   final commanderFlags = <bool>[];
-  final seenOracle = <String>{};
+  final oracleIndex = <String, int>{};
+  var hasUnverifiedCardMultiplicity = false;
+  var hasUnverifiedUseState = false;
   for (final u in uses) {
     if (u is! Map) continue;
     final card = u['card'];
@@ -159,11 +352,39 @@ _ParsedCombo? _parseVariant(Map<String, dynamic> v) {
     final oracleId = card['oracleId']?.toString();
     final name = card['name']?.toString();
     if (oracleId == null || oracleId.isEmpty || name == null) continue;
-    // Dedupe por oracle_id (uma carta listada 2x por quantidade não duplica PK).
-    if (!seenOracle.add(oracleId)) continue;
+    final mustBeCommander = u['mustBeCommander'] == true;
+    final quantity = int.tryParse((u['quantity'] ?? '').toString());
+    if (quantity != 1) hasUnverifiedCardMultiplicity = true;
+    final zones = ((u['zoneLocations'] as List?) ?? const [])
+        .map((zone) => zone.toString())
+        .toList(growable: false);
+    if (zones.length != 1 || zones.single != 'B') {
+      hasUnverifiedUseState = true;
+    }
+    for (final stateKey in const [
+      'exileCardState',
+      'libraryCardState',
+      'graveyardCardState',
+      'battlefieldCardState',
+    ]) {
+      if ((u[stateKey] ?? '').toString().trim().isNotEmpty) {
+        hasUnverifiedUseState = true;
+      }
+    }
+    // Dedupe por oracle_id (uma carta listada 2x por quantidade não duplica
+    // PK), preservando a restrição mais forte se qualquer ocorrência exigir
+    // que a carta seja o comandante.
+    final existingIndex = oracleIndex[oracleId];
+    if (existingIndex != null) {
+      hasUnverifiedCardMultiplicity = true;
+      commanderFlags[existingIndex] =
+          commanderFlags[existingIndex] || mustBeCommander;
+      continue;
+    }
+    oracleIndex[oracleId] = oracleIds.length;
     oracleIds.add(oracleId);
     names.add(name);
-    commanderFlags.add(u['mustBeCommander'] == true);
+    commanderFlags.add(mustBeCommander);
   }
   if (oracleIds.length < 2) return null;
 
@@ -178,10 +399,29 @@ _ParsedCombo? _parseVariant(Map<String, dynamic> v) {
 
   final easy = (v['easyPrerequisites'] ?? '').toString().trim();
   final notable = (v['notablePrerequisites'] ?? '').toString().trim();
+  final templateRequirements = (v['requires'] as List?) ?? const [];
+  final unverifiedTemplateRequirement =
+      templateRequirements.isEmpty
+          ? ''
+          : '[unverified_template_requirements:${templateRequirements.length}]';
+  final unverifiedMultiplicity =
+      hasUnverifiedCardMultiplicity ? '[unverified_card_multiplicity]' : '';
+  final unverifiedUseState =
+      hasUnverifiedUseState ? '[unverified_use_state_requirements]' : '';
+  final unverifiedPrerequisites =
+      [
+        easy,
+        notable,
+        unverifiedTemplateRequirement,
+        unverifiedMultiplicity,
+        unverifiedUseState,
+      ].where((e) => e.isNotEmpty).join('\n').trim();
   final prerequisites =
-      [easy, notable].where((e) => e.isNotEmpty).join('\n').trim();
+      unverifiedPrerequisites.isEmpty
+          ? commanderSpellbookVerifiedNoPrerequisitesMarker
+          : unverifiedPrerequisites;
 
-  return _ParsedCombo(
+  return ParsedCommanderSpellbookCombo(
     id: id,
     status: status,
     colorIdentity: (v['identity'] ?? '').toString().toUpperCase(),
@@ -195,7 +435,30 @@ _ParsedCombo? _parseVariant(Map<String, dynamic> v) {
   );
 }
 
-Future<void> _upsertCombos(Pool pool, List<_ParsedCombo> combos) async {
+void validateCommanderSpellbookSnapshot(
+  List<ParsedCommanderSpellbookCombo> combos, {
+  int minimumCombos = minimumExpectedCommanderSpellbookCombos,
+}) {
+  if (combos.length < minimumCombos) {
+    throw StateError(
+      'Snapshot Commander Spellbook incompleto: ${combos.length} combos; '
+      'minimo=$minimumCombos.',
+    );
+  }
+  final distinctIds = combos.map((combo) => combo.id).toSet();
+  if (distinctIds.length != combos.length) {
+    throw StateError(
+      'Snapshot Commander Spellbook contem IDs duplicados: '
+      'rows=${combos.length}, distinct=${distinctIds.length}.',
+    );
+  }
+}
+
+Future<void> _reconcileCombos(
+  Pool pool,
+  List<ParsedCommanderSpellbookCombo> combos, {
+  required ComboSnapshotMetadata metadata,
+}) async {
   if (combos.isEmpty) {
     print('⚠️  Nenhum combo para inserir.');
     return;
@@ -203,36 +466,137 @@ Future<void> _upsertCombos(Pool pool, List<_ParsedCombo> combos) async {
 
   // Lotes grandes com INSERT multi-linha para minimizar round-trips ao DB
   // (crítico quando o banco é remoto).
-  const batchSize = 200;
+  // Cada statement permanece bem abaixo do limite de 65.535 parâmetros do
+  // PostgreSQL, enquanto 1.000 reduz em 5x os round-trips pelo túnel remoto.
+  const batchSize = 1000;
   var done = 0;
 
-  for (var start = 0; start < combos.length; start += batchSize) {
-    final end = (start + batchSize).clamp(0, combos.length);
-    final batch = combos.sublist(start, end);
+  await pool.runTx((tx) async {
+    await tx.execute('''
+      CREATE TEMP TABLE incoming_commander_spellbook_combo_ids (
+        id TEXT PRIMARY KEY
+      ) ON COMMIT DROP
+    ''');
 
-    await pool.runTx((tx) async {
-      // 1) Upsert de card_combos em uma única instrução multi-linha.
-      final comboRows = <String>[];
-      final comboParams = <String, dynamic>{};
-      for (var i = 0; i < batch.length; i++) {
-        final c = batch[i];
-        comboRows.add(
-          '(@id$i, \'commander_spellbook\', @st$i, @ci$i, @mn$i, @pr$i, '
-          '@de$i, @po$i, @oi$i, @nm$i, @cc$i, CURRENT_TIMESTAMP)',
-        );
-        comboParams['id$i'] = c.id;
-        comboParams['st$i'] = c.status;
-        comboParams['ci$i'] = c.colorIdentity;
-        comboParams['mn$i'] = c.manaNeeded;
-        comboParams['pr$i'] = c.prerequisites;
-        comboParams['de$i'] = c.description;
-        comboParams['po$i'] = c.produces;
-        comboParams['oi$i'] = c.oracleIds;
-        comboParams['nm$i'] = c.names;
-        comboParams['cc$i'] = c.oracleIds.length;
-      }
-      await tx.execute(
-        Sql.named('''
+    for (var start = 0; start < combos.length; start += batchSize) {
+      final end = (start + batchSize).clamp(0, combos.length);
+      final batch = combos.sublist(start, end);
+      await _upsertComboBatch(tx, batch);
+      done += batch.length;
+      print('   staging/upsert $done/${combos.length}');
+    }
+
+    final staged = await tx.execute(
+      'SELECT count(*)::int FROM incoming_commander_spellbook_combo_ids',
+    );
+    final stagedCount = staged.first[0] as int? ?? 0;
+    if (stagedCount != combos.length) {
+      throw StateError(
+        'Staging Spellbook divergente: esperado=${combos.length}, '
+        'obtido=$stagedCount.',
+      );
+    }
+
+    // Snapshot-replace: variantes removidas ou que deixaram de ser OK saem
+    // somente depois do staging integral, dentro da mesma transacao.
+    await tx.execute('''
+      DELETE FROM card_combos c
+      WHERE c.source = 'commander_spellbook'
+        AND NOT EXISTS (
+          SELECT 1
+          FROM incoming_commander_spellbook_combo_ids incoming
+          WHERE incoming.id = c.id
+        )
+    ''');
+
+    await _syncComboFunctionTags(tx);
+    await tx.execute(
+      Sql.named('''
+        INSERT INTO data_source_snapshots (
+          dataset, provider, source_uri, source_version, source_updated_at,
+          source_etag, content_sha256, row_count, distinct_identity_count,
+          status, metadata, completed_at
+        ) VALUES (
+          'commander_spellbook_combos', 'commander_spellbook', @uri, @version,
+          @updated, '', @hash, @rows, @rows, 'succeeded', @metadata::jsonb,
+          NOW()
+        )
+        ON CONFLICT (dataset, provider, content_sha256) DO UPDATE SET
+          source_version = EXCLUDED.source_version,
+          source_updated_at = EXCLUDED.source_updated_at,
+          row_count = EXCLUDED.row_count,
+          distinct_identity_count = EXCLUDED.distinct_identity_count,
+          status = EXCLUDED.status,
+          metadata = EXCLUDED.metadata,
+          completed_at = EXCLUDED.completed_at
+      '''),
+      parameters: {
+        'uri': CommanderSpellbookService.bulkUrl,
+        'version': metadata.version,
+        'updated': metadata.sourceUpdatedAt,
+        'hash': metadata.contentSha256,
+        'rows': combos.length,
+        'metadata': jsonEncode({
+          'raw_variant_count': metadata.rawVariantCount,
+          'skipped_variant_count': metadata.skippedVariantCount,
+          'composition_verifiable_count':
+              combos
+                  .where(
+                    (combo) =>
+                        combo.prerequisites ==
+                        commanderSpellbookVerifiedNoPrerequisitesMarker,
+                  )
+                  .length,
+          'requirements_fail_closed_count':
+              combos
+                  .where(
+                    (combo) =>
+                        combo.prerequisites !=
+                        commanderSpellbookVerifiedNoPrerequisitesMarker,
+                  )
+                  .length,
+          'must_be_commander_combo_count':
+              combos
+                  .where(
+                    (combo) => combo.commanderFlags.any((required) => required),
+                  )
+                  .length,
+          'requirements_contract': 'manaloom_requirements_v1_fail_closed',
+        }),
+      },
+    );
+  });
+}
+
+Future<void> _upsertComboBatch(
+  Session tx,
+  List<ParsedCommanderSpellbookCombo> batch,
+) async {
+  final comboRows = <String>[];
+  final comboParams = <String, dynamic>{};
+  final incomingRows = <String>[];
+  final incomingParams = <String, dynamic>{};
+  for (var i = 0; i < batch.length; i++) {
+    final c = batch[i];
+    comboRows.add(
+      '(@id$i, \'commander_spellbook\', @st$i, @ci$i, @mn$i, @pr$i, '
+      '@de$i, @po$i, @oi$i, @nm$i, @cc$i, CURRENT_TIMESTAMP)',
+    );
+    incomingRows.add('(@id$i)');
+    incomingParams['id$i'] = c.id;
+    comboParams['id$i'] = c.id;
+    comboParams['st$i'] = c.status;
+    comboParams['ci$i'] = c.colorIdentity;
+    comboParams['mn$i'] = c.manaNeeded;
+    comboParams['pr$i'] = c.prerequisites;
+    comboParams['de$i'] = c.description;
+    comboParams['po$i'] = c.produces;
+    comboParams['oi$i'] = c.oracleIds;
+    comboParams['nm$i'] = c.names;
+    comboParams['cc$i'] = c.oracleIds.length;
+  }
+  await tx.execute(
+    Sql.named('''
           INSERT INTO card_combos (
             id, source, status, color_identity, mana_needed, prerequisites,
             description, produces, card_oracle_ids, card_names, card_count,
@@ -250,43 +614,45 @@ Future<void> _upsertCombos(Pool pool, List<_ParsedCombo> combos) async {
             card_count = EXCLUDED.card_count,
             updated_at = CURRENT_TIMESTAMP
         '''),
-        parameters: comboParams,
-      );
+    parameters: comboParams,
+  );
+  await tx.execute(
+    Sql.named('''
+      INSERT INTO incoming_commander_spellbook_combo_ids (id)
+      VALUES ${incomingRows.join(', ')}
+      ON CONFLICT (id) DO NOTHING
+    '''),
+    parameters: incomingParams,
+  );
 
-      // 2) Reescreve combo_cards do lote: um DELETE + um INSERT multi-linha.
-      final ids = batch.map((c) => c.id).toList();
-      await tx.execute(
-        Sql.named('DELETE FROM combo_cards WHERE combo_id = ANY(@ids)'),
-        parameters: {'ids': ids},
-      );
+  final ids = batch.map((c) => c.id).toList();
+  await tx.execute(
+    Sql.named('DELETE FROM combo_cards WHERE combo_id = ANY(@ids)'),
+    parameters: {'ids': ids},
+  );
 
-      final cardRows = <String>[];
-      final cardParams = <String, dynamic>{};
-      var k = 0;
-      for (final c in batch) {
-        for (var j = 0; j < c.oracleIds.length; j++) {
-          cardRows.add('(@cb$k, @or$k, @cn$k, @cm$k)');
-          cardParams['cb$k'] = c.id;
-          cardParams['or$k'] = c.oracleIds[j];
-          cardParams['cn$k'] = c.names[j];
-          cardParams['cm$k'] = c.commanderFlags[j];
-          k++;
-        }
-      }
-      if (cardRows.isNotEmpty) {
-        await tx.execute(
-          Sql.named('''
-            INSERT INTO combo_cards (combo_id, oracle_id, card_name, must_be_commander)
-            VALUES ${cardRows.join(', ')}
-            ON CONFLICT (combo_id, oracle_id) DO NOTHING
-          '''),
-          parameters: cardParams,
-        );
-      }
-    });
-
-    done += batch.length;
-    print('   upsert $done/${combos.length}');
+  final cardRows = <String>[];
+  final cardParams = <String, dynamic>{};
+  var k = 0;
+  for (final c in batch) {
+    for (var j = 0; j < c.oracleIds.length; j++) {
+      cardRows.add('(@cb$k, @or$k, @cn$k, @cm$k)');
+      cardParams['cb$k'] = c.id;
+      cardParams['or$k'] = c.oracleIds[j];
+      cardParams['cn$k'] = c.names[j];
+      cardParams['cm$k'] = c.commanderFlags[j];
+      k++;
+    }
+  }
+  if (cardRows.isNotEmpty) {
+    await tx.execute(
+      Sql.named('''
+        INSERT INTO combo_cards (combo_id, oracle_id, card_name, must_be_commander)
+        VALUES ${cardRows.join(', ')}
+        ON CONFLICT (combo_id, oracle_id) DO NOTHING
+      '''),
+      parameters: cardParams,
+    );
   }
 }
 
@@ -296,43 +662,49 @@ Future<void> _ensureCombosTables(Pool pool) async {
   final res = await pool.execute(
     Sql.named('''
       SELECT to_regclass('public.card_combos') IS NOT NULL AS has_combos,
-             to_regclass('public.combo_cards') IS NOT NULL AS has_cards
+             to_regclass('public.combo_cards') IS NOT NULL AS has_cards,
+             to_regclass('public.data_source_snapshots') IS NOT NULL
+               AS has_snapshots
     '''),
   );
   final row = res.first.toColumnMap();
-  if (row['has_combos'] != true || row['has_cards'] != true) {
+  if (row['has_combos'] != true ||
+      row['has_cards'] != true ||
+      row['has_snapshots'] != true) {
     throw Exception(
-      'Tabelas card_combos/combo_cards ausentes. '
+      'Schema Spellbook incompleto (card_combos/combo_cards/'
+      'data_source_snapshots). '
       'Rode `dart run bin/migrate.dart` antes do sync.',
     );
   }
 }
 
-Future<void> _syncComboFunctionTags(Pool pool) async {
-  final hasTags = await _hasTable(pool, 'card_function_tags');
+Future<void> _syncComboFunctionTags(Session tx) async {
+  final hasTags = await _hasTable(tx, 'card_function_tags');
   if (!hasTags) {
-    print('⚠️  card_function_tags ausente; combo_piece persistido não atualizado.');
+    print(
+      '⚠️  card_function_tags ausente; combo_piece persistido não atualizado.',
+    );
     return;
   }
 
   print('🏷️  Reconciliando combo_piece com combo_cards...');
-  await pool.runTx((tx) async {
-    await tx.execute(
-      Sql.named('''
+  await tx.execute(
+    Sql.named('''
         DELETE FROM card_function_tags cft
         WHERE cft.source = @source
           AND NOT EXISTS (
             SELECT 1
             FROM cards c
-            JOIN combo_cards cc ON cc.oracle_id = c.scryfall_id::text
+            JOIN combo_cards cc ON cc.oracle_id = c.oracle_id::text
             WHERE c.id = cft.card_id
           )
       '''),
-      parameters: {'source': _comboFunctionTagSource},
-    );
+    parameters: {'source': _comboFunctionTagSource},
+  );
 
-    await tx.execute(
-      Sql.named('''
+  await tx.execute(
+    Sql.named('''
         INSERT INTO card_function_tags (
           card_id, card_name, tag, confidence, source, evidence, updated_at
         )
@@ -345,7 +717,7 @@ Future<void> _syncComboFunctionTags(Pool pool) async {
           'present_in_commander_spellbook_combos:' || COUNT(DISTINCT cc.combo_id)::text,
           CURRENT_TIMESTAMP
         FROM cards c
-        JOIN combo_cards cc ON cc.oracle_id = c.scryfall_id::text
+        JOIN combo_cards cc ON cc.oracle_id = c.oracle_id::text
         GROUP BY c.id, c.name
         ON CONFLICT (card_id, tag, source) DO UPDATE SET
           card_name = EXCLUDED.card_name,
@@ -353,11 +725,10 @@ Future<void> _syncComboFunctionTags(Pool pool) async {
           evidence = EXCLUDED.evidence,
           updated_at = CURRENT_TIMESTAMP
       '''),
-      parameters: {'source': _comboFunctionTagSource},
-    );
-  });
+    parameters: {'source': _comboFunctionTagSource},
+  );
 
-  final tagged = await pool.execute(
+  final tagged = await tx.execute(
     Sql.named('''
       SELECT COUNT(*)::int
       FROM card_function_tags
@@ -368,9 +739,9 @@ Future<void> _syncComboFunctionTags(Pool pool) async {
   print('   combo_piece persistido: ${tagged.first[0]} cartas');
 }
 
-Future<bool> _hasTable(Pool pool, String tableName) async {
+Future<bool> _hasTable(Session session, String tableName) async {
   try {
-    final result = await pool.execute(
+    final result = await session.execute(
       Sql.named('SELECT to_regclass(@name) IS NOT NULL'),
       parameters: {'name': tableName},
     );
@@ -385,7 +756,7 @@ Future<int> _count(Pool pool, String table) async {
   return (res.first[0] as int?) ?? 0;
 }
 
-class _ParsedCombo {
+class ParsedCommanderSpellbookCombo {
   final String id;
   final String status;
   final String colorIdentity;
@@ -397,7 +768,7 @@ class _ParsedCombo {
   final List<String> names;
   final List<bool> commanderFlags;
 
-  _ParsedCombo({
+  ParsedCommanderSpellbookCombo({
     required this.id,
     required this.status,
     required this.colorIdentity,
@@ -408,5 +779,37 @@ class _ParsedCombo {
     required this.oracleIds,
     required this.names,
     required this.commanderFlags,
+  });
+}
+
+class ParsedCommanderSpellbookSnapshot {
+  final String version;
+  final DateTime? sourceUpdatedAt;
+  final int rawVariantCount;
+  final int skippedVariantCount;
+  final List<ParsedCommanderSpellbookCombo> combos;
+
+  const ParsedCommanderSpellbookSnapshot({
+    required this.version,
+    required this.sourceUpdatedAt,
+    required this.rawVariantCount,
+    required this.skippedVariantCount,
+    required this.combos,
+  });
+}
+
+class ComboSnapshotMetadata {
+  final String version;
+  final DateTime sourceUpdatedAt;
+  final String contentSha256;
+  final int rawVariantCount;
+  final int skippedVariantCount;
+
+  const ComboSnapshotMetadata({
+    required this.version,
+    required this.sourceUpdatedAt,
+    required this.contentSha256,
+    required this.rawVariantCount,
+    required this.skippedVariantCount,
   });
 }

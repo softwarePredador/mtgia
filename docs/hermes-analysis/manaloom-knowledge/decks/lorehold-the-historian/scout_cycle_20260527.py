@@ -23,6 +23,8 @@ DB_PATH = BASE / 'scripts/knowledge.db'
 SCOUT_LOG = DECK_DIR / 'SCOUT_LOG.md'
 EDHREC_HTML = Path('/tmp/edhrec_lorehold.html')
 UA = 'Mozilla/5.0 ManaLoom-Hermes/1.0 scheduled-lorehold-scout'
+EDHREC_AUTHORIZATION_FLAG = 'MANALOOM_EDHREC_AUTOMATED_COLLECTION_AUTHORIZED'
+AUTHORIZED_FLAG_VALUES = {'1', 'true', 'yes', 'on'}
 
 MOXFIELD_IDS = [
     'a2lPkndjlkSgCg_HAC1tfA',
@@ -43,7 +45,21 @@ def run(args, timeout=60):
     return subprocess.run(args, capture_output=True, text=True, timeout=timeout)
 
 
+def edhrec_collection_authorized():
+    return os.environ.get(EDHREC_AUTHORIZATION_FLAG, '').strip().lower() in AUTHORIZED_FLAG_VALUES
+
+
+def is_edhrec_url(url):
+    hostname = (urllib.parse.urlparse(url).hostname or '').lower()
+    return hostname == 'edhrec.com' or hostname.endswith('.edhrec.com')
+
+
 def curl_text(url, timeout=60):
+    if is_edhrec_url(url) and not edhrec_collection_authorized():
+        raise RuntimeError(
+            f'EDHREC collection blocked (fail-closed): set {EDHREC_AUTHORIZATION_FLAG} '
+            'only after explicit authorization.'
+        )
     r = run(['curl', '-sS', '-L', '-A', UA, url], timeout=timeout)
     if r.returncode != 0:
         raise RuntimeError(f'curl failed {url}: {r.stderr[:300]}')

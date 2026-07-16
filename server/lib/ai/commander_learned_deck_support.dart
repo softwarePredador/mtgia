@@ -26,10 +26,7 @@ class CommanderLearnedDeckCardLine {
   final String name;
   final int quantity;
 
-  Map<String, dynamic> toJson() => {
-        'name': name,
-        'quantity': quantity,
-      };
+  Map<String, dynamic> toJson() => {'name': name, 'quantity': quantity};
 }
 
 class CommanderLearnedDeckInput {
@@ -78,25 +75,25 @@ class CommanderLearnedDeckInput {
       parseCommanderLearnedDeckCardList(cardList);
 
   Map<String, dynamic> toJson() => {
-        'commander_name': commanderName,
-        'commander_name_normalized': commanderNameNormalized,
-        'deck_name': deckName,
-        'source_system': sourceSystem,
-        'source_ref': sourceRef,
-        if (sourceUrl != null) 'source_url': sourceUrl,
-        if (archetype != null) 'archetype': archetype,
-        'card_count': cardCount,
-        if (score != null) 'score': score,
-        if (winconPrimary != null) 'wincon_primary': winconPrimary,
-        if (winconBackup != null) 'wincon_backup': winconBackup,
-        if (legalStatus != null) 'legal_status': legalStatus,
-        if (notes != null) 'notes': notes,
-        'metadata': metadata,
-        'is_active': isActive,
-        if (promotedAt != null) 'promoted_at': promotedAt!.toIso8601String(),
-        if (updatedAt != null) 'updated_at': updatedAt!.toIso8601String(),
-        'cards': cards.map((card) => card.toJson()).toList(growable: false),
-      };
+    'commander_name': commanderName,
+    'commander_name_normalized': commanderNameNormalized,
+    'deck_name': deckName,
+    'source_system': sourceSystem,
+    'source_ref': sourceRef,
+    if (sourceUrl != null) 'source_url': sourceUrl,
+    if (archetype != null) 'archetype': archetype,
+    'card_count': cardCount,
+    if (score != null) 'score': score,
+    if (winconPrimary != null) 'wincon_primary': winconPrimary,
+    if (winconBackup != null) 'wincon_backup': winconBackup,
+    if (legalStatus != null) 'legal_status': legalStatus,
+    if (notes != null) 'notes': notes,
+    'metadata': metadata,
+    'is_active': isActive,
+    if (promotedAt != null) 'promoted_at': promotedAt!.toIso8601String(),
+    if (updatedAt != null) 'updated_at': updatedAt!.toIso8601String(),
+    'cards': cards.map((card) => card.toJson()).toList(growable: false),
+  };
 }
 
 class CommanderLearnedDeckValidationResult {
@@ -119,27 +116,27 @@ class CommanderLearnedDeckValidationResult {
   bool get ok => blockers.isEmpty;
 
   Map<String, dynamic> toJson() => {
-        'ok': ok,
-        'parsed_card_count': parsedCardCount,
-        'declared_card_count': declaredCardCount,
-        'commander_quantity': commanderQuantity,
-        'main_quantity': mainQuantity,
-        'blockers': blockers,
-        'warnings': warnings,
-      };
+    'ok': ok,
+    'parsed_card_count': parsedCardCount,
+    'declared_card_count': declaredCardCount,
+    'commander_quantity': commanderQuantity,
+    'main_quantity': mainQuantity,
+    'blockers': blockers,
+    'warnings': warnings,
+  };
 }
 
 class CommanderLearnedDeckMetadataCanonicalizationResult {
   const CommanderLearnedDeckMetadataCanonicalizationResult.canonicalized(
     this.metadata,
-  )   : source = commanderLearnedDeckRoleSummarySourceCanonical,
-        fallbackReason = null;
+  ) : source = commanderLearnedDeckRoleSummarySourceCanonical,
+      fallbackReason = null;
 
   const CommanderLearnedDeckMetadataCanonicalizationResult.persistedFallback(
     this.metadata, {
     required String reason,
-  })  : source = commanderLearnedDeckRoleSummarySourcePersistedFallback,
-        fallbackReason = reason;
+  }) : source = commanderLearnedDeckRoleSummarySourcePersistedFallback,
+       fallbackReason = reason;
 
   final Map<String, dynamic> metadata;
   final String source;
@@ -185,36 +182,12 @@ const Map<String, String> _learnedDeckSummaryTagToRole = {
 };
 
 const Map<String, Set<String>> _learnedDeckCanonicalRoleTagOverrides = {
-  "orim's chant": {
-    'protection',
-    'stax',
-    'combo_protection',
-  },
-  'ruby medallion': {
-    'ramp',
-    'cost_reduction',
-    'spellslinger',
-  },
-  'scroll rack': {
-    'draw',
-    'topdeck_setup',
-    'miracle_setup',
-  },
-  'victory chimes': {
-    'ramp',
-    'political_mana',
-  },
-  'lorehold, the historian': {
-    'draw',
-    'enabler',
-    'engine',
-    'loot',
-  },
-  'land tax': {
-    'tutor',
-    'ramp',
-    'mana_fixing',
-  },
+  "orim's chant": {'protection', 'stax', 'combo_protection'},
+  'ruby medallion': {'ramp', 'cost_reduction', 'spellslinger'},
+  'scroll rack': {'draw', 'topdeck_setup', 'miracle_setup'},
+  'victory chimes': {'ramp', 'political_mana'},
+  'lorehold, the historian': {'draw', 'enabler', 'engine', 'loot'},
+  'land tax': {'tutor', 'ramp', 'mana_fixing'},
 };
 
 Map<String, int> computeCommanderLearnedDeckRoleSummary({
@@ -247,18 +220,20 @@ Map<String, int> computeCommanderLearnedDeckRoleSummary({
     final tags = tagsByName[normalizedName] ?? const <String>{};
     final canonicalOverrides =
         _learnedDeckCanonicalRoleTagOverrides[normalizedName];
-    final effectiveTags = canonicalOverrides == null
-        ? tags
-        : <String>{...tags, ...canonicalOverrides};
+    final effectiveTags =
+        canonicalOverrides == null
+            ? tags
+            : <String>{...tags, ...canonicalOverrides};
     if (landNames.contains(normalizedName) || effectiveTags.contains('land')) {
       summary['total_lands'] = summary['total_lands']! + quantity;
       continue;
     }
 
-    final roles = effectiveTags
-        .map((tag) => _learnedDeckSummaryTagToRole[tag])
-        .whereType<String>()
-        .toSet();
+    final roles =
+        effectiveTags
+            .map((tag) => _learnedDeckSummaryTagToRole[tag])
+            .whereType<String>()
+            .toSet();
     for (final role in roles) {
       switch (role) {
         case 'ramp':
@@ -299,13 +274,15 @@ Future<Map<String, dynamic>> canonicalizeCommanderLearnedDeckMetadata(
   Pool pool,
   CommanderLearnedDeckInput input,
 ) async {
-  final result =
-      await canonicalizeCommanderLearnedDeckMetadataWithStatus(pool, input);
+  final result = await canonicalizeCommanderLearnedDeckMetadataWithStatus(
+    pool,
+    input,
+  );
   return result.metadata;
 }
 
 Future<CommanderLearnedDeckMetadataCanonicalizationResult>
-    canonicalizeCommanderLearnedDeckMetadataWithStatus(
+canonicalizeCommanderLearnedDeckMetadataWithStatus(
   Pool pool,
   CommanderLearnedDeckInput input,
 ) async {
@@ -435,20 +412,21 @@ Future<CommanderLearnedDeckMetadataCanonicalizationResult>
 CommanderLearnedDeckInput parseCommanderLearnedDeckInput(
   Map<String, dynamic> payload,
 ) {
-  final hermesId =
-      _intValue(payload['hermes_learned_deck_id'] ?? payload['id']);
+  final hermesId = _intValue(
+    payload['hermes_learned_deck_id'] ?? payload['id'],
+  );
   final sourceSystem = _stringValue(payload['source_system']) ?? 'hermes';
-  final sourceRef = _stringValue(payload['source_ref']) ??
+  final sourceRef =
+      _stringValue(payload['source_ref']) ??
       (hermesId > 0 ? 'learned_deck:$hermesId' : null);
   if (sourceRef == null || sourceRef.isEmpty) {
     throw ArgumentError(
-        'source_ref ou id/hermes_learned_deck_id e obrigatorio.');
+      'source_ref ou id/hermes_learned_deck_id e obrigatorio.',
+    );
   }
 
-  final commanderName = _stringValue(
-        payload['commander_name'] ?? payload['commander'],
-      ) ??
-      '';
+  final commanderName =
+      _stringValue(payload['commander_name'] ?? payload['commander']) ?? '';
   if (commanderName.isEmpty) {
     throw ArgumentError('commander_name/commander e obrigatorio.');
   }
@@ -460,9 +438,10 @@ CommanderLearnedDeckInput parseCommanderLearnedDeckInput(
 
   final parsedCards = parseCommanderLearnedDeckCardList(cardList);
   final explicitCardCount = _intValue(payload['card_count']);
-  final cardCount = explicitCardCount > 0
-      ? explicitCardCount
-      : parsedCards.fold<int>(0, (sum, card) => sum + card.quantity);
+  final cardCount =
+      explicitCardCount > 0
+          ? explicitCardCount
+          : parsedCards.fold<int>(0, (sum, card) => sum + card.quantity);
 
   final metadata = _jsonObject(payload['metadata']);
   if (hermesId > 0)
@@ -484,7 +463,9 @@ CommanderLearnedDeckInput parseCommanderLearnedDeckInput(
     score: _nullableDouble(payload['score']),
     winconPrimary: _stringValue(payload['wincon_primary']),
     winconBackup: _stringValue(payload['wincon_backup']),
-    legalStatus: _stringValue(payload['legal_status']) ?? 'commander_legal',
+    // Legality is evidence, not a parser default. Missing status must remain
+    // missing so runtime completeness cannot promote an unverified deck.
+    legalStatus: _stringValue(payload['legal_status']),
     notes: _stringValue(payload['notes']),
     metadata: metadata,
     isActive: _boolValue(payload['is_active'], defaultValue: true),
@@ -519,7 +500,8 @@ CommanderLearnedDeckValidationResult validateCommanderLearnedDeckInput(
   }
   if (parsedCardCount != 100) {
     blockers.add(
-        'deck Commander aprendido precisa ter 100 cartas; recebeu $parsedCardCount.');
+      'deck Commander aprendido precisa ter 100 cartas; recebeu $parsedCardCount.',
+    );
   }
   if (commanderQuantity != 1) {
     blockers.add(
@@ -527,15 +509,15 @@ CommanderLearnedDeckValidationResult validateCommanderLearnedDeckInput(
     );
   }
   if (mainQuantity != 99) {
-    blockers
-        .add('deck principal precisa ter 99 cartas; recebeu $mainQuantity.');
+    blockers.add(
+      'deck principal precisa ter 99 cartas; recebeu $mainQuantity.',
+    );
   }
-  final legalStatus = input.legalStatus?.trim().toLowerCase();
-  if (legalStatus != null &&
-      legalStatus.isNotEmpty &&
-      legalStatus != 'commander_legal') {
-    warnings.add(
-        'legal_status nao confirmado como commander_legal: ${input.legalStatus}.');
+  final legalStatus = input.legalStatus?.trim().toLowerCase() ?? '';
+  if (!const {'legal', 'commander_legal'}.contains(legalStatus)) {
+    blockers.add(
+      'legal_status precisa estar confirmado como legal ou commander_legal; recebeu ${input.legalStatus ?? "vazio"}.',
+    );
   }
   return CommanderLearnedDeckValidationResult(
     parsedCardCount: parsedCardCount,
@@ -555,39 +537,46 @@ List<Map<String, dynamic>> buildCommanderLearnedDeckResponseDecklist({
   required Map<String, Map<String, dynamic>> metadataByName,
 }) {
   final normalizedCommander = learnedDeck.commanderNameNormalized;
-  return learnedDeck.cards.map((card) {
-    final normalizedName = normalizeCommanderReferenceName(card.name);
-    final metadata = metadataByName[normalizedName];
-    final canonicalName = metadata?['name']?.toString();
-    return {
-      'name': card.name,
-      'quantity': card.quantity,
-      'is_commander': normalizedName == normalizedCommander,
-      if (metadata?['id'] != null) 'card_id': metadata!['id'],
-      if (canonicalName != null &&
-          canonicalName.isNotEmpty &&
-          canonicalName != card.name)
-        'canonical_name': canonicalName,
-      if (metadata?['type_line'] != null) 'type_line': metadata!['type_line'],
-      'commander_legal_status': metadata?['commander_legal_status'],
-    };
-  }).toList(growable: false);
+  return learnedDeck.cards
+      .map((card) {
+        final normalizedName = normalizeCommanderReferenceName(card.name);
+        final metadata = metadataByName[normalizedName];
+        final canonicalName = metadata?['name']?.toString();
+        return {
+          'name': card.name,
+          'quantity': card.quantity,
+          'is_commander': normalizedName == normalizedCommander,
+          if (metadata?['id'] != null) 'card_id': metadata!['id'],
+          if (canonicalName != null &&
+              canonicalName.isNotEmpty &&
+              canonicalName != card.name)
+            'canonical_name': canonicalName,
+          if (metadata?['type_line'] != null)
+            'type_line': metadata!['type_line'],
+          'commander_legal_status': metadata?['commander_legal_status'],
+        };
+      })
+      .toList(growable: false);
 }
 
 List<Map<String, dynamic>> normalizeCommanderLearnedDecklistForDeckCreate(
   Iterable<Map<String, dynamic>> decklist,
 ) {
-  return decklist.map((card) {
-    final cardId = card['card_id']?.toString().trim();
-    final name = card['name']?.toString().trim();
-    return {
-      if (cardId != null && cardId.isNotEmpty) 'card_id': cardId,
-      if ((cardId == null || cardId.isEmpty) && name != null && name.isNotEmpty)
-        'name': name,
-      'quantity': intValue(card['quantity']),
-      'is_commander': card['is_commander'] == true,
-    };
-  }).toList(growable: false);
+  return decklist
+      .map((card) {
+        final cardId = card['card_id']?.toString().trim();
+        final name = card['name']?.toString().trim();
+        return {
+          if (cardId != null && cardId.isNotEmpty) 'card_id': cardId,
+          if ((cardId == null || cardId.isEmpty) &&
+              name != null &&
+              name.isNotEmpty)
+            'name': name,
+          'quantity': intValue(card['quantity']),
+          'is_commander': card['is_commander'] == true,
+        };
+      })
+      .toList(growable: false);
 }
 
 List<CommanderLearnedDeckCardLine> parseCommanderLearnedDeckCardList(
@@ -627,8 +616,7 @@ List<CommanderLearnedDeckCardLine> _mergeCommanderLearnedDeckCards(
 
 List<CommanderLearnedDeckCardLine> parseCommanderLearnedDeckCards(
   String cardList,
-) =>
-    parseCommanderLearnedDeckCardList(cardList);
+) => parseCommanderLearnedDeckCardList(cardList);
 
 List<CommanderLearnedDeckCardLine>? _tryParseCommanderLearnedDeckJsonCards(
   String cardList,
@@ -660,10 +648,7 @@ List<CommanderLearnedDeckCardLine>? _tryParseCommanderLearnedDeckJsonCards(
     if (quantity <= 0 || cleanedName.isEmpty) continue;
 
     cards.add(
-      CommanderLearnedDeckCardLine(
-        name: cleanedName,
-        quantity: quantity,
-      ),
+      CommanderLearnedDeckCardLine(name: cleanedName, quantity: quantity),
     );
   }
   return cards;
@@ -702,9 +687,7 @@ Future<CommanderLearnedDeckInput?> loadActiveCommanderLearnedDeck({
         ORDER BY promoted_at DESC NULLS LAST, updated_at DESC
         LIMIT 10
       '''),
-      parameters: {
-        'commander': normalizeCommanderReferenceName(commander),
-      },
+      parameters: {'commander': normalizeCommanderReferenceName(commander)},
     );
     for (final row in result) {
       final candidate = CommanderLearnedDeckInput(

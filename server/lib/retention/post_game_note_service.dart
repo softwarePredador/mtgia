@@ -7,38 +7,6 @@ class PostGameNoteService {
 
   final Pool pool;
 
-  Future<void> ensureSchema() async {
-    await pool.execute(
-      Sql.named('''
-        CREATE TABLE IF NOT EXISTS post_game_notes (
-          id TEXT PRIMARY KEY,
-          user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-          deck_id UUID NOT NULL REFERENCES decks(id) ON DELETE CASCADE,
-          created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
-          result TEXT NOT NULL DEFAULT '',
-          table_level TEXT NOT NULL DEFAULT '',
-          notes TEXT NOT NULL DEFAULT '',
-          performed_well JSONB NOT NULL DEFAULT '[]'::jsonb,
-          underperformed JSONB NOT NULL DEFAULT '[]'::jsonb,
-          issues JSONB NOT NULL DEFAULT '[]'::jsonb,
-          updated_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP
-        )
-      '''),
-    );
-    await pool.execute(
-      Sql.named('''
-        CREATE INDEX IF NOT EXISTS idx_post_game_notes_deck_created
-        ON post_game_notes (deck_id, created_at DESC)
-      '''),
-    );
-    await pool.execute(
-      Sql.named('''
-        CREATE INDEX IF NOT EXISTS idx_post_game_notes_user_updated
-        ON post_game_notes (user_id, updated_at DESC)
-      '''),
-    );
-  }
-
   Future<bool> ownsDeck({
     required String userId,
     required String deckId,
@@ -60,7 +28,6 @@ class PostGameNoteService {
     required String userId,
     required String deckId,
   }) async {
-    await ensureSchema();
     final result = await pool.execute(
       Sql.named('''
         SELECT id, deck_id, created_at, result, table_level, notes,
@@ -126,8 +93,6 @@ class PostGameNoteService {
     required String deckId,
     required Map<String, dynamic> note,
   }) async {
-    await ensureSchema();
-
     final id = _cleanString(note['id']);
     final createdAt = _cleanString(note['created_at']);
     final result = _cleanString(note['result']);
@@ -205,7 +170,6 @@ class PostGameNoteService {
     required String deckId,
     required String noteId,
   }) async {
-    await ensureSchema();
     final result = await pool.execute(
       Sql.named('''
         DELETE FROM post_game_notes
@@ -262,12 +226,12 @@ class PostGameNoteService {
   }
 
   static List<String> _top(Map<String, int> counts) {
-    final entries = counts.entries.toList()
-      ..sort((a, b) {
-        final byCount = b.value.compareTo(a.value);
-        if (byCount != 0) return byCount;
-        return a.key.compareTo(b.key);
-      });
+    final entries =
+        counts.entries.toList()..sort((a, b) {
+          final byCount = b.value.compareTo(a.value);
+          if (byCount != 0) return byCount;
+          return a.key.compareTo(b.key);
+        });
     return entries.take(5).map((entry) => entry.key).toList(growable: false);
   }
 
@@ -306,43 +270,41 @@ class PostGameNoteService {
   }
 
   static String _issueLabel(String issue) => switch (issue) {
-        'mana' => 'Mana',
-        'draw' => 'Compra',
-        'removal' => 'Remocao',
-        'win_condition' => 'Win condition',
-        'speed' => 'Velocidade',
-        'protection' => 'Protecao',
-        _ => issue,
-      };
+    'mana' => 'Mana',
+    'draw' => 'Compra',
+    'removal' => 'Remocao',
+    'win_condition' => 'Win condition',
+    'speed' => 'Velocidade',
+    'protection' => 'Protecao',
+    _ => issue,
+  };
 
   static String _issueDiagnostic(String issue) => switch (issue) {
-        'mana' =>
-          'O deck esta registrando problema de mana. Priorize base, ramp e curva antes de adicionar novas pecas de valor.',
-        'draw' =>
-          'A partida indicou falta de compra ou selecao. Procure fontes repetiveis e cartas que nao quebrem o plano do comandante.',
-        'removal' =>
-          'A mesa exigiu mais interacao. Compare removals pontuais, wipes e respostas flexiveis por bracket.',
-        'win_condition' =>
-          'O deck gerou jogo mas nao encerrou. Revise finalizadores, redundancia e linhas reais de vitoria.',
-        'speed' =>
-          'O deck pareceu atrasado no ritmo da mesa. Baixe curva ou aumente aceleracao sem sacrificar consistencia.',
-        'protection' =>
-          'Pecas-chave ficaram vulneraveis. Inclua protecao adequada ao bracket e ao tipo de remocao esperado.',
-        _ => 'Sinal recorrente registrado no historico pos-jogo.',
-      };
+    'mana' =>
+      'O deck esta registrando problema de mana. Priorize base, ramp e curva antes de adicionar novas pecas de valor.',
+    'draw' =>
+      'A partida indicou falta de compra ou selecao. Procure fontes repetiveis e cartas que nao quebrem o plano do comandante.',
+    'removal' =>
+      'A mesa exigiu mais interacao. Compare removals pontuais, wipes e respostas flexiveis por bracket.',
+    'win_condition' =>
+      'O deck gerou jogo mas nao encerrou. Revise finalizadores, redundancia e linhas reais de vitoria.',
+    'speed' =>
+      'O deck pareceu atrasado no ritmo da mesa. Baixe curva ou aumente aceleracao sem sacrificar consistencia.',
+    'protection' =>
+      'Pecas-chave ficaram vulneraveis. Inclua protecao adequada ao bracket e ao tipo de remocao esperado.',
+    _ => 'Sinal recorrente registrado no historico pos-jogo.',
+  };
 
   static String _issueAction(String issue) => switch (issue) {
-        'mana' => 'Rodar otimizacao por mana/curva antes de trocar payoff.',
-        'draw' =>
-          'Priorizar 2-4 fontes de compra ou selecao no proximo ajuste.',
-        'removal' => 'Comparar pacote de remocao com o nivel da mesa.',
-        'win_condition' =>
-          'Definir finalizadores e redundancia antes do proximo teste.',
-        'speed' => 'Revisar curva inicial e ramp de baixo custo.',
-        'protection' =>
-          'Adicionar protecao para comandante ou motor principal.',
-        _ => 'Revisar notas recentes antes de aplicar upgrade.',
-      };
+    'mana' => 'Rodar otimizacao por mana/curva antes de trocar payoff.',
+    'draw' => 'Priorizar 2-4 fontes de compra ou selecao no proximo ajuste.',
+    'removal' => 'Comparar pacote de remocao com o nivel da mesa.',
+    'win_condition' =>
+      'Definir finalizadores e redundancia antes do proximo teste.',
+    'speed' => 'Revisar curva inicial e ramp de baixo custo.',
+    'protection' => 'Adicionar protecao para comandante ou motor principal.',
+    _ => 'Revisar notas recentes antes de aplicar upgrade.',
+  };
 
   static String _weekKey(DateTime date) {
     final monday = date.subtract(Duration(days: date.weekday - 1));

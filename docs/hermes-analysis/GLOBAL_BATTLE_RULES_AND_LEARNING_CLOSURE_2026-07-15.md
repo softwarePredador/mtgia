@@ -229,10 +229,10 @@ Local-source/catalog reconciliation:
 
 | Status | Cards |
 | --- | ---: |
-| XMage catalog confirmed | 23,890 |
+| XMage catalog confirmed | 23,886 |
 | Forge catalog fallback | 56 |
 | Local source candidate not executable | 9 |
-| Total local source candidates | 23,955 |
+| Total local source candidates | 23,951 |
 
 The 9 rejected local candidates are:
 
@@ -245,6 +245,37 @@ The 9 rejected local candidates are:
 - `The Archenemy's Charm`;
 - `The Horizon Seeker`;
 - `The Warmonger`.
+
+The refreshed ledger classifies the first eight as nonstandard/playtest product
+objects and `The Warmonger` as a scenario/challenge-deck object. None is a
+conventional-rules residual. The source-candidate report now preserves the
+PostgreSQL product, Oracle, layout, and legality metadata used to prove that
+classification instead of presenting those rows as if their Oracle data were
+missing.
+
+Current native review debt is separate from that external coverage result. A
+SELECT-only PostgreSQL recheck found `83` `active/auto` rows, and a live catalog
+probe confirmed all `83` are already `xmage_exact`. They therefore do not block
+the primary external execution lane, but they still require native focused
+verification before being treated as fully closed native behavior:
+
+| Native scope label | Rows |
+| --- | ---: |
+| Exact scope awaiting verification | 43 |
+| Explicit runtime scope awaiting verification | 3 |
+| Annotation-bearing scope | 21 |
+| Partial scope | 9 |
+| Explicitly unexecuted scope | 6 |
+| Baseline scope | 1 |
+
+The first native triage batch is the six explicitly unexecuted cards:
+`Ashnod's Altar`, `Basking Broodscale`, `Drown in Dreams`, `Formidable Speaker`,
+`Scavenging Ooze`, and `The Emperor of Palamecia`. The next batch is the nine
+partial scopes: `Gemstone Caverns`, `Leyline of Abundance`, `Machine God's
+Effigy`, `Mana Vault`, `Mystical Tutor`, `Skullclamp`, `Staff of Compleation`,
+`Talisman of Conviction`, and `Urza's Saga`. Scope names are triage signals, not
+permission to rewrite PostgreSQL statuses: each row still needs its focused
+positive/negative runtime proof and exact package gate.
 
 Production async-runner proof:
 

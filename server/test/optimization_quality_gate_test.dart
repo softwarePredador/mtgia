@@ -4,11 +4,11 @@ import '../lib/ai/goldfish_simulator.dart';
 import '../lib/ai/optimization_functional_roles.dart';
 import '../lib/ai/optimization_quality_gate.dart';
 import '../lib/ai/optimization_validator.dart';
+import '../lib/ai/theme_contextual_rules_service.dart';
 
 void main() {
   group('Optimization quality gate', () {
-    test('drops unsafe off-role swaps for aggro and keeps safe ramp upgrade',
-        () {
+    test('drops unsafe off-role swaps for aggro and keeps safe ramp upgrade', () {
       final originalDeck = [
         _card(
           name: 'Chaos Warp',
@@ -71,6 +71,106 @@ void main() {
       expect(result.removals, equals(const ['Rakdos Signet']));
       expect(result.additions, equals(const ['Devoted Druid']));
       expect(result.droppedReasons, hasLength(2));
+    });
+
+    test('blocks 34 to 32 land-to-fast-mana swaps despite shared tags', () {
+      final originalDeck = [
+        _card(
+          name: 'Plains',
+          typeLine: 'Basic Land — Plains',
+          manaCost: '',
+          cmc: 0,
+          oracleText: '{T}: Add {W}.',
+          quantity: 32,
+        ),
+        for (final name in const ['Turbulent Steppe', 'Bloodstained Mire'])
+          _card(
+            name: name,
+            typeLine: 'Land',
+            manaCost: '',
+            cmc: 0,
+            oracleText: '{T}: Add {W}.',
+            functionalTags: const [
+              {'tag': 'land', 'confidence': 0.99},
+              {'tag': 'ramp', 'confidence': 0.95},
+              {'tag': 'combo_piece', 'confidence': 0.90},
+            ],
+          ),
+      ];
+      final additions = [
+        for (final name in const ['Lotus Petal', 'Chrome Mox'])
+          _card(
+            name: name,
+            typeLine: 'Artifact',
+            manaCost: '{0}',
+            cmc: 0,
+            oracleText: '{T}, Sacrifice: Add one mana of any color.',
+            functionalTags: const [
+              {'tag': 'ramp', 'confidence': 0.99},
+              {'tag': 'combo_piece', 'confidence': 0.90},
+            ],
+          ),
+      ];
+
+      final result = filterUnsafeOptimizeSwapsByCardData(
+        removals: const ['Turbulent Steppe', 'Bloodstained Mire'],
+        additions: const ['Lotus Petal', 'Chrome Mox'],
+        originalDeck: originalDeck,
+        additionsData: additions,
+        archetype: 'midrange',
+        profileRoleTargets: const {
+          'lands': {'min': 36, 'max': 38},
+        },
+      );
+
+      expect(result.removals, isEmpty);
+      expect(result.additions, isEmpty);
+      expect(result.droppedReasons, hasLength(2));
+      expect(
+        result.droppedReasons.every((reason) => reason.contains('land')),
+        isTrue,
+      );
+    });
+
+    test('rejects nonland proposal that stays below profile land floor', () {
+      final result = filterUnsafeOptimizeSwapsByCardData(
+        removals: const ['Weak Spell'],
+        additions: const ['Better Spell'],
+        originalDeck: [
+          _card(
+            name: 'Plains',
+            typeLine: 'Basic Land — Plains',
+            manaCost: '',
+            cmc: 0,
+            oracleText: '{T}: Add {W}.',
+            quantity: 34,
+          ),
+          _card(
+            name: 'Weak Spell',
+            typeLine: 'Sorcery',
+            manaCost: '{2}',
+            cmc: 2,
+            oracleText: 'Scry 1.',
+          ),
+        ],
+        additionsData: [
+          _card(
+            name: 'Better Spell',
+            typeLine: 'Instant',
+            manaCost: '{1}',
+            cmc: 1,
+            oracleText: 'Scry 2.',
+          ),
+        ],
+        archetype: 'midrange',
+        profileRoleTargets: const {
+          'lands': {'min': 36, 'max': 38},
+        },
+      );
+
+      expect(result.removals, isEmpty);
+      expect(result.additions, isEmpty);
+      expect(result.droppedReasons.single, contains('piso seguro 36'));
     });
 
     test('uses persisted functional_tags to protect critical roles (P1.a)', () {
@@ -218,10 +318,7 @@ void main() {
           sidegrades: 0,
           tradeoffs: 1,
           questionable: 3,
-          roleDelta: const {
-            'removal': -1,
-            'ramp': -1,
-          },
+          roleDelta: const {'removal': -1, 'ramp': -1},
         ),
         warnings: const [],
       );
@@ -236,126 +333,228 @@ void main() {
       );
 
       expect(reasons, isNotEmpty);
-      expect(
-        reasons.any((reason) => reason.contains('reprovou')),
-        isTrue,
-      );
-      expect(
-        reasons.any((reason) => reason.contains('"removal"')),
-        isTrue,
-      );
-      expect(
-        reasons.any((reason) => reason.contains('"ramp"')),
-        isTrue,
-      );
+      expect(reasons.any((reason) => reason.contains('reprovou')), isTrue);
+      expect(reasons.any((reason) => reason.contains('"removal"')), isTrue);
+      expect(reasons.any((reason) => reason.contains('"ramp"')), isTrue);
     });
 
     test(
-        'rejects optimize success when validation still has warnings and no material gain',
-        () {
-      final validation = ValidationReport(
-        score: 63,
-        verdict: 'aprovado_com_ressalvas',
-        monteCarlo: MonteCarloComparison(
-          before: _goldfish(
-            keepableRate: 0.84,
-            turn2PlayRate: 0.20,
-            screwRate: 0.30,
+      'rejects optimize success when validation still has warnings and no material gain',
+      () {
+        final validation = ValidationReport(
+          score: 63,
+          verdict: 'aprovado_com_ressalvas',
+          monteCarlo: MonteCarloComparison(
+            before: _goldfish(
+              keepableRate: 0.84,
+              turn2PlayRate: 0.20,
+              screwRate: 0.30,
+            ),
+            after: _goldfish(
+              keepableRate: 0.84,
+              turn2PlayRate: 0.20,
+              screwRate: 0.30,
+            ),
+            beforeMulligan: _mulligan(keepAt7Rate: 0.10),
+            afterMulligan: _mulligan(keepAt7Rate: 0.10),
           ),
-          after: _goldfish(
-            keepableRate: 0.84,
-            turn2PlayRate: 0.20,
-            screwRate: 0.30,
+          functional: FunctionalReport(
+            swaps: const [],
+            upgrades: 1,
+            sidegrades: 0,
+            tradeoffs: 0,
+            questionable: 0,
+            roleDelta: const {'removal': 0, 'ramp': 0, 'draw': 0},
           ),
-          beforeMulligan: _mulligan(keepAt7Rate: 0.10),
-          afterMulligan: _mulligan(keepAt7Rate: 0.10),
-        ),
-        functional: FunctionalReport(
-          swaps: const [],
-          upgrades: 1,
-          sidegrades: 0,
-          tradeoffs: 0,
-          questionable: 0,
-          roleDelta: const {'removal': 0, 'ramp': 0, 'draw': 0},
-        ),
-        critic: const {
-          'approval_score': 55,
-          'verdict': 'aprovado_com_ressalvas',
-        },
-        warnings: const [],
-      );
+          critic: const {
+            'approval_score': 55,
+            'verdict': 'aprovado_com_ressalvas',
+          },
+          warnings: const [],
+        );
 
-      final reasons = buildOptimizationRejectionReasons(
-        validationReport: validation,
-        archetype: 'midrange',
-        preCurve: 3.0,
-        postCurve: 3.0,
-        preManaAssessment: 'Falta mana U (Tem 0 fontes, ideal > 15)',
-        postManaAssessment: 'Falta mana U (Tem 1 fontes, ideal > 15)',
-      );
-      final normalizedReasons =
-          reasons.map((reason) => reason.toLowerCase()).toList();
+        final reasons = buildOptimizationRejectionReasons(
+          validationReport: validation,
+          archetype: 'midrange',
+          preCurve: 3.0,
+          postCurve: 3.0,
+          preManaAssessment: 'Falta mana U (Tem 0 fontes, ideal > 15)',
+          postManaAssessment: 'Falta mana U (Tem 1 fontes, ideal > 15)',
+        );
+        final normalizedReasons =
+            reasons.map((reason) => reason.toLowerCase()).toList();
 
-      expect(
-        normalizedReasons.any((reason) => reason.contains('fechou como')),
-        isTrue,
-      );
-      expect(
-        normalizedReasons
-            .any((reason) => reason.contains('base de mana continua')),
-        isTrue,
-      );
-      expect(
-        normalizedReasons.any((reason) => reason.contains('approval_score')),
-        isTrue,
-      );
-    });
-
-    test('does not reject when validation is approved with clear improvement',
-        () {
-      final validation = ValidationReport(
-        score: 78,
-        verdict: 'aprovado',
-        monteCarlo: MonteCarloComparison(
-          before: _goldfish(
-            keepableRate: 0.72,
-            turn2PlayRate: 0.58,
-            screwRate: 0.18,
+        expect(
+          normalizedReasons.any((reason) => reason.contains('fechou como')),
+          isTrue,
+        );
+        expect(
+          normalizedReasons.any(
+            (reason) => reason.contains('base de mana continua'),
           ),
-          after: _goldfish(
-            keepableRate: 0.78,
-            turn2PlayRate: 0.66,
-            screwRate: 0.12,
+          isTrue,
+        );
+        expect(
+          normalizedReasons.any((reason) => reason.contains('approval_score')),
+          isTrue,
+        );
+      },
+    );
+
+    test(
+      'does not reject when validation is approved with clear improvement',
+      () {
+        final validation = ValidationReport(
+          score: 78,
+          verdict: 'aprovado',
+          monteCarlo: MonteCarloComparison(
+            before: _goldfish(
+              keepableRate: 0.72,
+              turn2PlayRate: 0.58,
+              screwRate: 0.18,
+            ),
+            after: _goldfish(
+              keepableRate: 0.78,
+              turn2PlayRate: 0.66,
+              screwRate: 0.12,
+            ),
+            beforeMulligan: _mulligan(keepAt7Rate: 0.68),
+            afterMulligan: _mulligan(keepAt7Rate: 0.74),
           ),
-          beforeMulligan: _mulligan(keepAt7Rate: 0.68),
-          afterMulligan: _mulligan(keepAt7Rate: 0.74),
-        ),
-        functional: FunctionalReport(
-          swaps: const [],
-          upgrades: 2,
-          sidegrades: 0,
-          tradeoffs: 0,
-          questionable: 0,
-          roleDelta: const {'removal': 0, 'ramp': 0, 'draw': 1},
-        ),
-        critic: const {
-          'approval_score': 82,
-          'verdict': 'aprovado',
-        },
-        warnings: const [],
-      );
+          functional: FunctionalReport(
+            swaps: const [],
+            upgrades: 2,
+            sidegrades: 0,
+            tradeoffs: 0,
+            questionable: 0,
+            roleDelta: const {'removal': 0, 'ramp': 0, 'draw': 1},
+          ),
+          critic: const {'approval_score': 82, 'verdict': 'aprovado'},
+          warnings: const [],
+        );
 
-      final reasons = buildOptimizationRejectionReasons(
-        validationReport: validation,
-        archetype: 'midrange',
-        preCurve: 3.4,
-        postCurve: 3.1,
-        preManaAssessment: 'Base de mana equilibrada',
-        postManaAssessment: 'Base de mana equilibrada',
-      );
+        final reasons = buildOptimizationRejectionReasons(
+          validationReport: validation,
+          archetype: 'midrange',
+          preCurve: 3.4,
+          postCurve: 3.1,
+          preManaAssessment: 'Base de mana equilibrada',
+          postManaAssessment: 'Base de mana equilibrada',
+        );
 
-      expect(reasons, isEmpty);
-    });
+        expect(reasons, isEmpty);
+      },
+    );
+
+    test(
+      'does not accept isolated keep-at-7 gain over material regressions',
+      () {
+        final validation = ValidationReport(
+          score: 67,
+          verdict: 'aprovado_com_ressalvas',
+          monteCarlo: MonteCarloComparison(
+            before: _goldfish(
+              keepableRate: 0.778,
+              turn2PlayRate: 0.80,
+              screwRate: 0.213,
+            ),
+            after: _goldfish(
+              keepableRate: 0.731,
+              turn2PlayRate: 0.80,
+              screwRate: 0.265,
+            ),
+            beforeMulligan: _mulligan(
+              keepAt7Rate: 0.500,
+              keepableAfterMullRate: 0.778,
+            ),
+            afterMulligan: _mulligan(
+              keepAt7Rate: 0.526,
+              keepableAfterMullRate: 0.731,
+            ),
+          ),
+          functional: FunctionalReport(
+            swaps: const [],
+            upgrades: 1,
+            sidegrades: 0,
+            tradeoffs: 0,
+            questionable: 0,
+            roleDelta: const {'land': 0, 'ramp': 0, 'draw': 0},
+          ),
+          warnings: const [],
+        );
+
+        final reasons = buildOptimizationRejectionReasons(
+          validationReport: validation,
+          archetype: 'midrange',
+          preCurve: 3.0,
+          postCurve: 2.9,
+          preManaAssessment: 'Base de mana equilibrada',
+          postManaAssessment: 'Base de mana equilibrada',
+        );
+
+        expect(
+          reasons.any(
+            (reason) => reason.contains('ganho mensurável suficiente'),
+          ),
+          isTrue,
+        );
+      },
+    );
+
+    test(
+      'land loss and critical theme violation enter final rejection gate',
+      () {
+        final validation = ValidationReport(
+          score: 78,
+          verdict: 'aprovado',
+          monteCarlo: MonteCarloComparison(
+            before: _goldfish(keepableRate: 0.80, turn2PlayRate: 0.70),
+            after: _goldfish(keepableRate: 0.82, turn2PlayRate: 0.72),
+            beforeMulligan: _mulligan(),
+            afterMulligan: _mulligan(),
+          ),
+          functional: FunctionalReport(
+            swaps: const [],
+            upgrades: 2,
+            sidegrades: 0,
+            tradeoffs: 0,
+            questionable: 0,
+            roleDelta: const {'land': -2},
+          ),
+          themeValidation: const ThemeValidationResult(
+            theme: 'spellslinger',
+            hasCriticalViolation: true,
+            checks: [
+              ThemeCheck(
+                function: 'spell_payoff',
+                current: 2,
+                min: 5,
+                max: 9,
+                priority: 'essential',
+                status: 'below_min',
+                description: 'Preservar payoffs do plano.',
+              ),
+            ],
+          ),
+          warnings: const [],
+        );
+
+        final reasons = buildOptimizationRejectionReasons(
+          validationReport: validation,
+          archetype: 'midrange',
+          preCurve: 3.0,
+          postCurve: 2.8,
+          preManaAssessment: 'Base de mana equilibrada',
+          postManaAssessment: 'Base de mana equilibrada',
+        );
+
+        expect(reasons.any((reason) => reason.contains('"land"')), isTrue);
+        expect(
+          reasons.any((reason) => reason.contains('spell_payoff')),
+          isTrue,
+        );
+      },
+    );
 
     test('rejects approved verdict when score is below success threshold', () {
       final validation = ValidationReport(
@@ -383,10 +582,7 @@ void main() {
           questionable: 0,
           roleDelta: const {'removal': -1, 'ramp': 1, 'draw': 0},
         ),
-        critic: const {
-          'approval_score': 60,
-          'verdict': 'reprovado',
-        },
+        critic: const {'approval_score': 60, 'verdict': 'reprovado'},
         warnings: const [],
       );
 
@@ -399,10 +595,7 @@ void main() {
         postManaAssessment: 'Base de mana equilibrada',
       );
 
-      expect(
-        reasons.any((reason) => reason.contains('mínimo 70')),
-        isTrue,
-      );
+      expect(reasons.any((reason) => reason.contains('mínimo 70')), isTrue);
     });
 
     test('keeps structural recovery swaps for degenerate mana bases', () {
@@ -461,29 +654,32 @@ void main() {
       expect(role, equals('ramp'));
     });
 
-    test('falls back to oracle heuristics when semantic v2 confidence is low',
-        () {
-      final card = {
-        'name': 'Low Confidence Study',
-        'type_line': 'Enchantment',
-        'mana_cost': '{2}{U}',
-        'oracle_text':
-            'Whenever an opponent casts a spell, you may draw a card.',
-        'semantic_tags_v2': const [
-          {
-            'role_confidence': 0.42,
-            'tags': ['removal'],
-          },
-        ],
-      };
+    test(
+      'falls back to oracle heuristics when semantic v2 confidence is low',
+      () {
+        final card = {
+          'name': 'Low Confidence Study',
+          'type_line': 'Enchantment',
+          'mana_cost': '{2}{U}',
+          'oracle_text':
+              'Whenever an opponent casts a spell, you may draw a card.',
+          'semantic_tags_v2': const [
+            {
+              'role_confidence': 0.42,
+              'tags': ['removal'],
+            },
+          ],
+        };
 
-      expect(optimizationFunctionalRolesForCard(card, semanticOnly: true),
-          isEmpty);
-      expect(classifyOptimizationFunctionalRole(card), equals('engine'));
-    });
+        expect(
+          optimizationFunctionalRolesForCard(card, semanticOnly: true),
+          isEmpty,
+        );
+        expect(classifyOptimizationFunctionalRole(card), equals('engine'));
+      },
+    );
 
-    test('classifies curated semantic staples before oracle fallback roles',
-        () {
+    test('classifies curated semantic staples before oracle fallback roles', () {
       final samples = {
         'Walking Ballista': [
           'Artifact Creature — Construct',
@@ -554,8 +750,7 @@ void main() {
       expect(classifyOptimizationFunctionalRole(card), equals('protection'));
     });
 
-    test('keeps strategic heuristic roles aligned with multi-tag classifier',
-        () {
+    test('keeps strategic heuristic roles aligned with multi-tag classifier', () {
       final samples = {
         'Blood Artist': [
           'Creature — Vampire',
@@ -616,8 +811,7 @@ void main() {
       }
     });
 
-    test('treats all is dust as wipe and blocks wipe to creature downgrade',
-        () {
+    test('treats all is dust as wipe and blocks wipe to creature downgrade', () {
       final originalDeck = [
         _card(
           name: 'All Is Dust',
@@ -653,8 +847,7 @@ void main() {
       expect(result.droppedReasons.single, contains('papel wipe ->'));
     });
 
-    test('drops temporary ritual swaps and non-structural land swaps in aggro',
-        () {
+    test('drops temporary ritual swaps and non-structural land swaps in aggro', () {
       final originalDeck = [
         _card(
           name: 'Goblin Ringleader',
@@ -736,8 +929,7 @@ void main() {
       expect(result.droppedReasons.single, contains('ramp'));
     });
 
-    test('preserves critical ramp when a card has multiple functional tags',
-        () {
+    test('preserves critical ramp when a card has multiple functional tags', () {
       final originalDeck = [
         _card(
           name: 'Smothering Tithe',
@@ -936,8 +1128,7 @@ void main() {
       expect(profileAware.droppedReasons.single, contains('engine'));
     });
 
-    test('uses profile land targets before generic archetype land trimming',
-        () {
+    test('uses profile land targets before generic archetype land trimming', () {
       final originalDeck = [
         _card(
           name: 'Wastes',
@@ -1025,7 +1216,9 @@ void main() {
         postManaAssessment: 'Base de mana equilibrada',
       );
       expect(
-          genericReasons.any((reason) => reason.contains('"engine"')), isFalse);
+        genericReasons.any((reason) => reason.contains('"engine"')),
+        isFalse,
+      );
 
       final profileReasons = buildOptimizationRejectionReasons(
         validationReport: validation,
@@ -1040,7 +1233,9 @@ void main() {
       );
 
       expect(
-          profileReasons.any((reason) => reason.contains('"engine"')), isTrue);
+        profileReasons.any((reason) => reason.contains('"engine"')),
+        isTrue,
+      );
     });
   });
 }
@@ -1088,7 +1283,10 @@ GoldfishResult _goldfish({
   );
 }
 
-MulliganReport _mulligan({double keepAt7Rate = 0.8}) {
+MulliganReport _mulligan({
+  double keepAt7Rate = 0.8,
+  double keepableAfterMullRate = 0.85,
+}) {
   return MulliganReport(
     runs: 500,
     avgMulligans: 0.2,
@@ -1096,6 +1294,6 @@ MulliganReport _mulligan({double keepAt7Rate = 0.8}) {
     keepAt6Rate: 0.15,
     keepAt5Rate: 0.05,
     keepAt4OrLessRate: 0,
-    keepableAfterMullRate: 0.85,
+    keepableAfterMullRate: keepableAfterMullRate,
   );
 }

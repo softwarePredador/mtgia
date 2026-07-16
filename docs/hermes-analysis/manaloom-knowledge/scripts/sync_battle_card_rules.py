@@ -291,7 +291,7 @@ def cleanup_stale_reviewed_rows(
 
 def load_active_snapshot_rows(sqlite_db: str | Path) -> list[dict]:
     """Load SQLite rules with the metadata required by canonical snapshots."""
-    with sqlite3.connect(sqlite_db) as conn:
+    with closing(sqlite3.connect(sqlite_db)) as conn:
         conn.row_factory = sqlite3.Row
         ensure_battle_card_rules(conn)
         active_rows = []

@@ -37,10 +37,7 @@ class DeterministicReferenceDeckCardProvenance {
   final String cardName;
   final List<String> sources;
 
-  Map<String, dynamic> toJson() => {
-        'card_name': cardName,
-        'sources': sources,
-      };
+  Map<String, dynamic> toJson() => {'card_name': cardName, 'sources': sources};
 }
 
 class DeterministicReferenceDeckBuildResult {
@@ -71,26 +68,27 @@ class DeterministicReferenceDeckBuildResult {
   final List<String> builtInFallbackOnlySample;
 
   Map<String, dynamic> toDiagnosticsJson({int sampleLimit = 10}) => {
-        'source_precedence': deterministicReferenceDeckSourcePrecedence,
-        'main_deck_quantity': mainDeckQuantity,
-        'distinct_card_count': distinctCardCount,
-        'basic_land_quantity': basicLandQuantity,
-        'built_in_fallback_enabled': builtInFallbackEnabled,
-        'built_in_fallback_used_count': builtInFallbackUsedCount,
-        'built_in_fallback_only_count': builtInFallbackOnlyCount,
-        'built_in_fallback_only_sample':
-            builtInFallbackOnlySample.take(sampleLimit).toList(growable: false),
-        'source_mix_counts': sourceMixCounts,
-        'source_usage_counts': sourceUsageCounts,
-        'card_provenance_sample': cardProvenance
-            .take(sampleLimit)
-            .map((entry) => entry.toJson())
-            .toList(growable: false),
-      };
+    'source_precedence': deterministicReferenceDeckSourcePrecedence,
+    'main_deck_quantity': mainDeckQuantity,
+    'distinct_card_count': distinctCardCount,
+    'basic_land_quantity': basicLandQuantity,
+    'built_in_fallback_enabled': builtInFallbackEnabled,
+    'built_in_fallback_used_count': builtInFallbackUsedCount,
+    'built_in_fallback_only_count': builtInFallbackOnlyCount,
+    'built_in_fallback_only_sample': builtInFallbackOnlySample
+        .take(sampleLimit)
+        .toList(growable: false),
+    'source_mix_counts': sourceMixCounts,
+    'source_usage_counts': sourceUsageCounts,
+    'card_provenance_sample': cardProvenance
+        .take(sampleLimit)
+        .map((entry) => entry.toJson())
+        .toList(growable: false),
+  };
 }
 
 ReferenceGeneratedCardsIdentityFilterResult
-    filterReferenceGeneratedCardsByCommanderIdentity({
+filterReferenceGeneratedCardsByCommanderIdentity({
   required Map<String, dynamic> profile,
   required String commanderName,
   required List<Map<String, dynamic>> cards,
@@ -108,8 +106,9 @@ ReferenceGeneratedCardsIdentityFilterResult
   final filtered = <Map<String, dynamic>>[];
   final removedOffColor = <String>{};
   final removedUnresolved = <String>{};
-  final normalizedCommander =
-      normalizeCommanderReferenceCardName(commanderName);
+  final normalizedCommander = normalizeCommanderReferenceCardName(
+    commanderName,
+  );
 
   for (final card in cards) {
     final name = card['name']?.toString().trim() ?? '';
@@ -125,7 +124,10 @@ ReferenceGeneratedCardsIdentityFilterResult
     }
 
     final identity = resolveCardColorIdentity(
-      colorIdentity: _metadataStringIterable(resolved['color_identity']),
+      colorIdentity:
+          resolved['color_identity'] == null
+              ? null
+              : _metadataStringIterable(resolved['color_identity']),
       colors: _metadataStringIterable(resolved['colors']),
       oracleText: resolved['oracle_text']?.toString(),
       manaCost: resolved['mana_cost']?.toString(),
@@ -185,8 +187,9 @@ DeterministicReferenceDeckBuildResult buildDeterministicReferenceDeckResult({
   final displayNameByName = <String, String>{};
   final sourceLabelsByName = <String, Set<String>>{};
   final avoidedExampleNames = _profileAvoidExampleNames(profile);
-  final builtInFallbackEnabled =
-      isLoreholdCommanderReferenceCandidate(commanderName);
+  final builtInFallbackEnabled = isLoreholdCommanderReferenceCandidate(
+    commanderName,
+  );
 
   void addCard(
     String? rawName,
@@ -240,15 +243,18 @@ DeterministicReferenceDeckBuildResult buildDeterministicReferenceDeckResult({
     }
   }
 
-  final stats = referenceCardStats.where((stat) => !stat.unresolved).toList()
-    ..sort((a, b) {
-      final packageCompare = _fallbackPackagePriority(a.packageKey, a.role)
-          .compareTo(_fallbackPackagePriority(b.packageKey, b.role));
-      if (packageCompare != 0) return packageCompare;
-      final scoreCompare = b.score.compareTo(a.score);
-      if (scoreCompare != 0) return scoreCompare;
-      return a.cardName.compareTo(b.cardName);
-    });
+  final stats =
+      referenceCardStats.where((stat) => !stat.unresolved).toList()
+        ..sort((a, b) {
+          final packageCompare = _fallbackPackagePriority(
+            a.packageKey,
+            a.role,
+          ).compareTo(_fallbackPackagePriority(b.packageKey, b.role));
+          if (packageCompare != 0) return packageCompare;
+          final scoreCompare = b.score.compareTo(a.score);
+          if (scoreCompare != 0) return scoreCompare;
+          return a.cardName.compareTo(b.cardName);
+        });
   for (final stat in stats) {
     addCard(stat.cardName, 'reference_card_stats');
   }
@@ -266,20 +272,17 @@ DeterministicReferenceDeckBuildResult buildDeterministicReferenceDeckResult({
 
   final expectedPackages = profile['expected_packages'];
   if (expectedPackages is Map) {
-    final entries = expectedPackages.entries.toList()
-      ..sort((a, b) {
-        final priorityCompare = _fallbackPackagePriority(
-          a.key.toString(),
-          a.key.toString(),
-        ).compareTo(
-          _fallbackPackagePriority(
-            b.key.toString(),
-            b.key.toString(),
-          ),
-        );
-        if (priorityCompare != 0) return priorityCompare;
-        return a.key.toString().compareTo(b.key.toString());
-      });
+    final entries =
+        expectedPackages.entries.toList()..sort((a, b) {
+          final priorityCompare = _fallbackPackagePriority(
+            a.key.toString(),
+            a.key.toString(),
+          ).compareTo(
+            _fallbackPackagePriority(b.key.toString(), b.key.toString()),
+          );
+          if (priorityCompare != 0) return priorityCompare;
+          return a.key.toString().compareTo(b.key.toString());
+        });
     for (final entry in entries) {
       if (entry.value is! List) continue;
       for (final rawCard in entry.value as List) {
@@ -330,8 +333,7 @@ DeterministicReferenceDeckBuildResult buildDeterministicReferenceDeckResult({
     final name = card['name']?.toString() ?? '';
     final normalizedName = normalizeCommanderReferenceCardName(name);
     final sources = (sourceLabelsByName[normalizedName] ?? const <String>{})
-        .toList(growable: false)
-      ..sort();
+      .toList(growable: false)..sort();
     provenance.add(
       DeterministicReferenceDeckCardProvenance(
         cardName: name,
@@ -354,12 +356,9 @@ DeterministicReferenceDeckBuildResult buildDeterministicReferenceDeckResult({
   );
   final deck = {
     'commander': {
-      'name': commanderName.isEmpty ? 'Isamaru, Hound of Konda' : commanderName
+      'name': commanderName.isEmpty ? 'Isamaru, Hound of Konda' : commanderName,
     },
-    'cards': [
-      ...cappedCards,
-      ...basics,
-    ],
+    'cards': [...cappedCards, ...basics],
   };
 
   return DeterministicReferenceDeckBuildResult(
@@ -371,12 +370,14 @@ DeterministicReferenceDeckBuildResult buildDeterministicReferenceDeckResult({
     distinctCardCount: cappedCards.length + basics.length,
     basicLandQuantity: basicLandQuantity,
     builtInFallbackEnabled: builtInFallbackEnabled,
-    builtInFallbackUsedCount: provenance
-        .where((entry) => entry.sources.contains('deterministic_fallback'))
-        .length,
+    builtInFallbackUsedCount:
+        provenance
+            .where((entry) => entry.sources.contains('deterministic_fallback'))
+            .length,
     builtInFallbackOnlyCount: builtInFallbackOnlyNames.length,
-    builtInFallbackOnlySample:
-        builtInFallbackOnlyNames.take(12).toList(growable: false),
+    builtInFallbackOnlySample: builtInFallbackOnlyNames
+        .take(12)
+        .toList(growable: false),
   );
 }
 
@@ -475,12 +476,13 @@ int _fallbackPackagePriority(String packageKey, String role) {
 List<String> _profileColorIdentity(Map<String, dynamic> profile) {
   final raw = profile['color_identity'];
   if (raw is! Iterable) return const [];
-  final colors = raw
-      .map((color) => color.toString().trim().toUpperCase())
-      .where((color) => color.isNotEmpty)
-      .toSet()
-      .toList()
-    ..sort();
+  final colors =
+      raw
+          .map((color) => color.toString().trim().toUpperCase())
+          .where((color) => color.isNotEmpty)
+          .toSet()
+          .toList()
+        ..sort();
   return colors;
 }
 
@@ -511,8 +513,10 @@ List<Map<String, dynamic>> _buildBasicLandFallbackCards({
     cards.add({'name': land, 'quantity': per});
   }
 
-  var current =
-      cards.fold<int>(0, (sum, card) => sum + (card['quantity'] as int));
+  var current = cards.fold<int>(
+    0,
+    (sum, card) => sum + (card['quantity'] as int),
+  );
   var i = 0;
   while (current < total) {
     cards[i % basics.length]['quantity'] =

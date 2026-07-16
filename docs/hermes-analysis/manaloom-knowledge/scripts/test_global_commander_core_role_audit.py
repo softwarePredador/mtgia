@@ -4,8 +4,10 @@
 from __future__ import annotations
 
 import sqlite3
+import tempfile
 import unittest
 from pathlib import Path
+from unittest.mock import patch
 
 import global_commander_core_role_audit as audit
 
@@ -50,6 +52,19 @@ class GlobalCommanderCoreRoleAuditTests(unittest.TestCase):
         roles, source = audit.card_roles(row)
 
         self.assertEqual(source, "text_inferred")
+        self.assertEqual(roles, {"land"})
+
+    def test_legacy_ramp_tag_does_not_turn_land_into_nonland_ramp(self) -> None:
+        row = {
+            "functional_tag": "ramp",
+            "functional_tags_json": '["land", "mana_fixing", "ramp"]',
+            "type_line": "Land - Mountain Plains",
+            "oracle_text": "{T}: Add {R} or {W}.",
+        }
+
+        roles, source = audit.card_roles(row)
+
+        self.assertEqual(source, "tag")
         self.assertEqual(roles, {"land"})
 
     def test_numeric_damage_to_each_infers_board_wipe(self) -> None:
@@ -282,6 +297,112 @@ class GlobalCommanderCoreRoleAuditTests(unittest.TestCase):
         self.assertEqual(status, "core_role_gap")
         self.assertIn("repair_core_role_floor", audit.next_gate(status))
         conn.close()
+
+    def test_product_roles_are_loaded_from_postgres_snapshot(self) -> None:
+        postgres_rows = []
+        for index in range(35):
+            postgres_rows.append(
+                {
+                    "deck_id": "00000000-0000-0000-0000-000000000607",
+                    "card_name": f"Land {index}",
+                    "quantity": 1,
+                    "functional_tag": "",
+                    "functional_tags_json": ["land"],
+                    "type_line": "Land",
+                    "oracle_text": "{T}: Add {R}.",
+                }
+            )
+        for index in range(65):
+            postgres_rows.append(
+                {
+                    "deck_id": "00000000-0000-0000-0000-000000000607",
+                    "card_name": f"Spell {index}",
+                    "quantity": 1,
+                    "functional_tag": "",
+                    "functional_tags_json": ["draw", "engine", "wincon"],
+                    "type_line": "Sorcery",
+                    "oracle_text": "Draw a card.",
+                }
+            )
+
+        matrix_rows = [
+            {
+                "source": "postgres",
+                "scope": "user_product",
+                "status": "structure_ready",
+                "deck_id": "00000000-0000-0000-0000-000000000607",
+                "deck_name": "Product Deck",
+                "commander": "Example Commander",
+                "quantity": 100,
+            }
+        ]
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            sqlite_path = Path(tmp_dir) / "knowledge.db"
+            conn = sqlite3.connect(sqlite_path)
+            try:
+                conn.execute(
+                    "CREATE TABLE deck_cards (deck_id INTEGER, card_name TEXT, quantity INTEGER, functional_tag TEXT)"
+                )
+                conn.commit()
+            finally:
+                conn.close()
+            with (
+                patch.object(audit, "collect_deck_matrix_rows", return_value=matrix_rows),
+                patch.object(audit, "load_postgres_role_rows", return_value=postgres_rows) as loader,
+            ):
+                report = audit.build_report(
+                    sqlite_db=sqlite_path,
+                    skip_postgres=False,
+                    skip_hermes=True,
+                )
+
+        row = report["decks"][0]
+        self.assertTrue(row["role_data_available"])
+        self.assertEqual(row["role_data_source"], "postgres_card_intelligence_snapshot")
+        self.assertEqual(row["role_counts"]["land"], 35)
+        self.assertEqual(row["role_data_quantity"], 100)
+        self.assertEqual(report["summary"]["role_data_unavailable_count"], 0)
+        loader.assert_called_once_with(["00000000-0000-0000-0000-000000000607"])
+
+    def test_missing_product_role_data_is_unavailable_not_zero_gap(self) -> None:
+        matrix_rows = [
+            {
+                "source": "postgres",
+                "scope": "user_product",
+                "status": "structure_ready",
+                "deck_id": "00000000-0000-0000-0000-000000000001",
+                "deck_name": "Product Deck",
+                "commander": "Example Commander",
+                "quantity": 100,
+            }
+        ]
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            sqlite_path = Path(tmp_dir) / "knowledge.db"
+            conn = sqlite3.connect(sqlite_path)
+            try:
+                conn.execute(
+                    "CREATE TABLE deck_cards (deck_id INTEGER, card_name TEXT, quantity INTEGER, functional_tag TEXT)"
+                )
+                conn.commit()
+            finally:
+                conn.close()
+            with (
+                patch.object(audit, "collect_deck_matrix_rows", return_value=matrix_rows),
+                patch.object(audit, "load_postgres_role_rows", return_value=[]),
+            ):
+                report = audit.build_report(
+                    sqlite_db=sqlite_path,
+                    skip_postgres=False,
+                    skip_hermes=True,
+                )
+
+        row = report["decks"][0]
+        self.assertEqual(row["core_status"], "role_data_unavailable")
+        self.assertFalse(row["role_data_available"])
+        self.assertIsNone(row["role_counts"]["land"])
+        self.assertEqual(row["core_repair_plan"]["missing_role_slots"], [])
+        self.assertEqual(report["summary"]["missing_role_slot_totals"], {})
+        self.assertEqual(report["summary"]["role_data_unavailable_count"], 1)
 
 
 if __name__ == "__main__":

@@ -150,6 +150,82 @@ class LearnedDeckCoherenceAuditTest(unittest.TestCase):
             ["G"],
         )
 
+    def test_card_lookup_loads_intelligence_once_per_card_then_lightweight_aliases(
+        self,
+    ) -> None:
+        snapshot_rows = [
+            {
+                "card_id": "card-1",
+                "canonical_name": "Lightning Bolt",
+                "oracle_id": "oracle-1",
+                "oracle_text": "Lightning Bolt deals 3 damage to any target.",
+                "type_line": "Instant",
+                "cmc": 1,
+                "color_identity": ["R"],
+                "legalities": {"commander": "legal"},
+                "function_tags": ["removal"],
+                "battle_rule_count": 1,
+                "verified_battle_rule_count": 1,
+                "source_coverage": {"oracle": True},
+            }
+        ]
+        alias_rows = [
+            {
+                "card_id": "card-1",
+                "canonical_name": "Lightning Bolt",
+                "lookup_name": "Lightning Bolt",
+                "printed_name": "Relampago",
+                "match_priority": 0,
+            },
+            {
+                "card_id": "card-1",
+                "canonical_name": "Lightning Bolt",
+                "lookup_name": "Bolt",
+                "printed_name": None,
+                "match_priority": 1,
+            },
+        ]
+
+        class FakeCursor:
+            def __init__(self, rows):
+                self.rows = rows
+                self.query = ""
+
+            def __enter__(self):
+                return self
+
+            def __exit__(self, *_args):
+                return False
+
+            def execute(self, query):
+                self.query = query
+
+            def fetchall(self):
+                return self.rows
+
+        class FakeConnection:
+            def __init__(self):
+                self.calls = 0
+                self.cursors = []
+
+            def cursor(self, **_kwargs):
+                rows = snapshot_rows if self.calls == 0 else alias_rows
+                self.calls += 1
+                cursor = FakeCursor(rows)
+                self.cursors.append(cursor)
+                return cursor
+
+        conn = FakeConnection()
+        lookup = audit.load_card_lookup(conn)
+
+        canonical = lookup[audit.normalize_name("Lightning Bolt")]
+        self.assertIs(canonical, lookup[audit.normalize_name("Relampago")])
+        self.assertIs(canonical, lookup[audit.normalize_name("Bolt")])
+        self.assertEqual(canonical.oracle_id, "oracle-1")
+        self.assertEqual(conn.calls, 2)
+        self.assertIn("FROM card_intelligence_snapshot", conn.cursors[0].query)
+        self.assertNotIn("card_intelligence_snapshot", conn.cursors[1].query)
+
     def test_lorehold_strategy_checks_package_minimums_and_forbidden_mox(self) -> None:
         cards = [
             "Lorehold, the Historian",

@@ -13,10 +13,12 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 import external_battle_async_runner as runner
 
 
-def completed_result(card_name: str) -> dict:
+def completed_result(card_name: str, *, engine: str = "xmage") -> dict:
     return {
         "status": "completed",
+        "engine": engine,
         "winner": "deck_a",
+        "turns": 7,
         "learning_contract": {
             "schema_version": runner.LEARNING_SCHEMA,
             "absence_proves_nonuse": False,
@@ -53,6 +55,85 @@ def registry_for(job: dict, *, minimum=1) -> dict:
 
 
 class ExternalBattleAsyncRunnerTest(unittest.TestCase):
+    def test_zero_turn_completed_payload_fails_closed(self):
+        invalid_result = completed_result("Candidate")
+        invalid_result.update(
+            {
+                "winner": None,
+                "turns": 0,
+                "events": [],
+                "visual_snapshots": [],
+                "game_log": [],
+            }
+        )
+        client = FakeClient([runner.HttpResult(200, invalid_result)])
+        job = {
+            "job_id": "zero-turn-completion",
+            "request": {"seed": 1, "deck_a": {}, "deck_b": {}},
+            "focus_cards": ["Candidate"],
+        }
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            state = runner.BattleQueueRunner(
+                registry=registry_for(job),
+                checkpoint_path=root / "checkpoint.json",
+                result_dir=root / "results",
+                xmage_url="http://xmage",
+                forge_url="http://forge",
+                request_timeout=5,
+                recovery_timeout=5,
+                max_attempts=3,
+                client=client,
+            ).run()["jobs"]["zero-turn-completion"]
+
+        self.assertEqual(state["status"], "failed")
+        self.assertEqual(state["error"], "engine_result_missing_positive_turn_count")
+        self.assertEqual(state["attempts"][0]["status"], "invalid_completed_result")
+        self.assertFalse(state["evidence"]["completed"])
+        self.assertFalse(state["evidence"]["positive_exposure_ready"])
+        self.assertEqual(client.post_calls, ["http://xmage/simulate"])
+
+    def test_mismatched_engine_and_embedded_error_fail_closed(self):
+        cases = (
+            (completed_result("Candidate", engine="forge"), "engine_result_mismatch"),
+            (
+                {**completed_result("Candidate"), "error": "engine_failed"},
+                "engine_result_contains_error",
+            ),
+            (
+                {**completed_result("Candidate"), "error": ""},
+                "engine_result_contains_error",
+            ),
+        )
+        for index, (invalid_result, expected_error) in enumerate(cases):
+            with (
+                self.subTest(expected_error=expected_error),
+                tempfile.TemporaryDirectory() as temporary,
+            ):
+                client = FakeClient([runner.HttpResult(200, invalid_result)])
+                job = {
+                    "job_id": f"invalid-completion-{index}",
+                    "request": {"seed": index + 1, "deck_a": {}, "deck_b": {}},
+                    "focus_cards": ["Candidate"],
+                }
+                root = Path(temporary)
+                state = runner.BattleQueueRunner(
+                    registry=registry_for(job),
+                    checkpoint_path=root / "checkpoint.json",
+                    result_dir=root / "results",
+                    xmage_url="http://xmage",
+                    forge_url="http://forge",
+                    request_timeout=5,
+                    recovery_timeout=5,
+                    max_attempts=3,
+                    client=client,
+                ).run()["jobs"][job["job_id"]]
+
+            self.assertEqual(state["status"], "failed")
+            self.assertEqual(state["error"], expected_error)
+            self.assertFalse(state["evidence"]["completed"])
+            self.assertFalse(state["evidence"]["positive_exposure_ready"])
+
     def test_positive_evidence_rejects_generic_named_events(self):
         evidence = runner.extract_positive_evidence(
             completed_result("Krenko, Mob Boss"),
@@ -65,11 +146,48 @@ class ExternalBattleAsyncRunnerTest(unittest.TestCase):
         self.assertFalse(evidence["swap_superiority_proven"])
         self.assertFalse(evidence["promotion_allowed"])
 
+    def test_natural_same_lane_evidence_matches_backend_contract_without_focus(self):
+        result = completed_result("Aerialephant")
+        result["events"] = [
+            {"event_type": "spell_cast", "card": "Aerialephant"},
+            {"event_type": "ability_resolved", "source": "Aerialephant"},
+            {"event_type": "damage", "target_card": "Target Creature"},
+        ]
+
+        evidence = runner.extract_positive_evidence(
+            result,
+            expected_engine="xmage",
+            same_lane=True,
+            natural_sample=True,
+        )
+
+        self.assertTrue(evidence["positive_exposure_ready"])
+        self.assertTrue(evidence["natural_same_lane_exposure"])
+        self.assertEqual(evidence["learning_contract_schema"], runner.LEARNING_SCHEMA)
+        self.assertEqual(
+            evidence["exposed_card_names_normalized"],
+            ["aerialephant", "target creature"],
+        )
+        self.assertFalse(evidence["comparison_input_ready"])
+        self.assertFalse(evidence["promotion_allowed"])
+
+    def test_forced_access_remains_diagnostic_only_in_positive_evidence(self):
+        evidence = runner.extract_positive_evidence(
+            completed_result("Candidate"),
+            focus_cards=["Candidate"],
+            same_lane=True,
+            natural_sample=False,
+        )
+
+        self.assertTrue(evidence["positive_exposure_ready"])
+        self.assertFalse(evidence["natural_same_lane_exposure"])
+        self.assertFalse(evidence["comparison_input_ready"])
+
     def test_forge_is_used_only_for_structured_xmage_coverage_gap(self):
         client = FakeClient(
             [
                 runner.HttpResult(422, {"error": "xmage_coverage_incomplete"}),
-                runner.HttpResult(200, completed_result("Candidate")),
+                runner.HttpResult(200, completed_result("Candidate", engine="forge")),
             ]
         )
         job = {
@@ -155,6 +273,30 @@ class ExternalBattleAsyncRunnerTest(unittest.TestCase):
         self.assertEqual(state["status"], "completed")
         self.assertTrue(state["attempts"][0]["recovery_observed"])
         self.assertEqual(len(client.get_calls), 2)
+
+    def test_xmage_timeout_without_restart_contract_is_not_retried(self):
+        client = FakeClient(
+            [runner.HttpResult(504, {"error": "simulation_timeout"})]
+        )
+        job = {"job_id": "unsafe-timeout", "request": {"seed": 1}}
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            state = runner.BattleQueueRunner(
+                registry=registry_for(job),
+                checkpoint_path=root / "checkpoint.json",
+                result_dir=root / "results",
+                xmage_url="http://xmage",
+                forge_url="http://forge",
+                request_timeout=5,
+                recovery_timeout=5,
+                max_attempts=3,
+                client=client,
+            ).run()["jobs"]["unsafe-timeout"]
+
+        self.assertEqual(state["status"], "timeout")
+        self.assertEqual(state["error"], "xmage_timeout_restart_not_declared")
+        self.assertEqual(client.post_calls, ["http://xmage/simulate"])
+        self.assertEqual(client.get_calls, [])
 
     def test_completed_job_is_not_reexecuted_on_resume(self):
         client = FakeClient([runner.HttpResult(200, completed_result("Candidate"))])

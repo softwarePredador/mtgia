@@ -1,0 +1,8 @@
+name: manaloom_workspace
+publish_to: none
+
+environment:
+  sdk: ">=3.7.2 <4.0.0"
+dev_dependencies:
+  melos: ^6.3.3
+  patrol_cli: ^4.4.0

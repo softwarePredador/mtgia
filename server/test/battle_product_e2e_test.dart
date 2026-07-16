@@ -11,189 +11,191 @@ void main() {
   final enabled = Platform.environment['RUN_BATTLE_PRODUCT_E2E'] == '1';
   final runForcedDiagnostic =
       Platform.environment['BATTLE_E2E_RUN_FORCED_DIAGNOSTIC'] == '1';
-  final baseUrl =
-      Platform.environment['TEST_API_BASE_URL'] ?? 'http://127.0.0.1:8082';
-  const user = {
-    'email': 'test_battle_product_e2e_v1@example.com',
-    'password': 'TestPassword123!',
-    'username': 'test_battle_product_e2e_v1_user',
-  };
+  final baseUrl = Platform.environment['TEST_API_BASE_URL'] ?? '';
+  final runToken = Platform.environment['BATTLE_E2E_RUN_TOKEN'] ?? '';
+  final harnessOwnsCleanup =
+      Platform.environment['BATTLE_E2E_DEFER_CLEANUP_TO_HARNESS'] == '1';
 
   test(
     'app API persists reviewed execution and deck analysis consumes natural evidence',
     () async {
-      final token = await _loginOrRegister(baseUrl, user);
+      final uri = Uri.tryParse(baseUrl);
+      if (uri == null) {
+        fail('TEST_API_BASE_URL must be a valid URL.');
+      }
+      expect(uri.scheme, 'http');
+      expect(
+        uri.host,
+        '127.0.0.1',
+        reason: 'Mutable E2E must use IPv4 loopback.',
+      );
+      expect(uri.hasPort, isTrue);
+      expect(
+        RegExp(r'^[A-Za-z0-9_-]{12,96}$').hasMatch(runToken),
+        isTrue,
+        reason: 'BATTLE_E2E_RUN_TOKEN must be unique and harness-generated.',
+      );
+      expect(
+        harnessOwnsCleanup,
+        isTrue,
+        reason: 'The isolated shell harness must own database cleanup.',
+      );
+
+      final user = {
+        'email': 'battle.product.e2e.$runToken@example.invalid',
+        'password': 'BattleProductE2E123!${runToken.substring(0, 12)}',
+        'username': 'battle_product_e2e_$runToken',
+      };
+      final token = await _registerUniqueIdentity(baseUrl, user);
       final headers = {
         'authorization': 'Bearer $token',
         'content-type': 'application/json',
       };
-      final created = <String>[];
-      try {
-        final baseline = _loadLoreholdDeck();
-        final candidate = baseline
-            .map((card) => Map<String, dynamic>.from(card))
-            .toList(growable: false);
-        final replaced = candidate.firstWhere(
-          (card) => card['name'] == 'Aetherflux Reservoir',
-        );
-        replaced['name'] = 'A Good Day to Pie';
+      final baseline = _loadLoreholdDeck();
+      final candidate = baseline
+          .map((card) => Map<String, dynamic>.from(card))
+          .toList(growable: false);
+      final replaced = candidate.firstWhere(
+        (card) => card['name'] == 'Aetherflux Reservoir',
+      );
+      replaced['name'] = 'A Good Day to Pie';
 
-        final deckA = await _createDeck(
-          baseUrl,
-          headers,
-          'Battle Product E2E Candidate',
-          candidate,
-        );
-        created.add(deckA);
-        final deckB = await _createDeck(
-          baseUrl,
-          headers,
-          'Battle Product E2E Baseline',
-          baseline,
-        );
-        created.add(deckB);
+      final deckA = await _createDeck(
+        baseUrl,
+        headers,
+        'Battle Product E2E Candidate $runToken',
+        candidate,
+      );
+      final deckB = await _createDeck(
+        baseUrl,
+        headers,
+        'Battle Product E2E Baseline $runToken',
+        baseline,
+      );
 
-        if (runForcedDiagnostic) {
-          final diagnostic = await _simulate(
-            baseUrl,
-            headers,
-            deckA,
-            deckB,
-            {
-              'seed': 0,
-              'focus_cards': ['A Good Day to Pie'],
-              'force_focus_access_mode': 'opening_hand',
-            },
-          );
-          expect(diagnostic['engine'], 'manaloom_native_reviewed');
-          expect(
-            diagnostic['engine_contract'],
-            'native_reviewed_rules_execution',
-          );
-          expect(diagnostic['forced_access_mode'], 'opening_hand');
-          final diagnosticEvidence =
-              (diagnostic['battle_learning_evidence'] as Map)
-                  .cast<String, dynamic>();
-          expect(diagnosticEvidence['natural_sample'], isFalse);
-          expect(diagnosticEvidence['positive_exposure_ready'], isTrue);
-          _expectReviewedAction(diagnostic);
-        }
-
-        final natural = await _simulate(
-          baseUrl,
-          headers,
-          deckA,
-          deckB,
-          const {
-            'seed': 2,
-            'max_turns': 12,
-            'focus_cards': ['A Good Day to Pie'],
-          },
-        );
-        final naturalEvidence = (natural['battle_learning_evidence'] as Map)
-            .cast<String, dynamic>();
-        expect(natural['engine'], 'manaloom_native_reviewed');
+      if (runForcedDiagnostic) {
+        final diagnostic = await _simulate(baseUrl, headers, deckA, deckB, {
+          'seed': 0,
+          'focus_cards': ['A Good Day to Pie'],
+          'force_focus_access_mode': 'opening_hand',
+        });
+        expect(diagnostic['engine'], 'manaloom_native_reviewed');
         expect(
-          natural['engine_contract'],
+          diagnostic['engine_contract'],
           'native_reviewed_rules_execution',
         );
-        expect(natural['forced_access_mode'], 'none');
-        expect(natural['max_turns'], 12);
-        expect(natural['turns'], lessThanOrEqualTo(12));
-        expect(naturalEvidence['natural_sample'], isTrue);
-        expect(naturalEvidence['positive_exposure_ready'], isTrue);
-        _expectReviewedAction(natural);
-
-        final replayListResponse = await http.get(
-          Uri.parse('$baseUrl/decks/$deckA/battle-replays?limit=5'),
-          headers: headers,
-        );
-        expect(
-          replayListResponse.statusCode,
-          200,
-          reason: replayListResponse.body,
-        );
-        final replayList = _json(replayListResponse);
-        final replays = (replayList['data'] as List).whereType<Map>().toList();
-        expect(replays, isNotEmpty);
-        expect(
-          (replayList['simulation_contract'] as Map)['status'],
-          'per_replay_engine_contract',
-        );
-        expect(replayList['advisory'], isFalse);
-        final latestReplay = replays.first.cast<String, dynamic>();
-        expect((latestReplay['metrics'] as Map)['engine'],
-            'manaloom_native_reviewed');
-        expect(
-          (latestReplay['simulation_contract']
-              as Map)['reviewed_native_rules_execution'],
-          isTrue,
-        );
-        final replayId = latestReplay['id'].toString();
-        final replayDetailResponse = await http.get(
-          Uri.parse('$baseUrl/decks/$deckA/battle-replays/$replayId'),
-          headers: headers,
-        );
-        expect(
-          replayDetailResponse.statusCode,
-          200,
-          reason: replayDetailResponse.body,
-        );
-        final replay = (_json(replayDetailResponse)['replay'] as Map)
-            .cast<String, dynamic>();
-        expect(replay['engine'], 'manaloom_native_reviewed');
-        final replayContract =
-            (replay['simulation_contract'] as Map).cast<String, dynamic>();
-        expect(replayContract['rules_execution'], isTrue);
-        expect(replayContract['reviewed_native_rules_execution'], isTrue);
-        expect(replayContract['rules_engine_priority'], 'native_residual');
-        _expectReviewedAction(replay);
-
-        final analysisResponse = await http.get(
-          Uri.parse('$baseUrl/decks/$deckA/analysis'),
-          headers: headers,
-        );
-        expect(analysisResponse.statusCode, 200, reason: analysisResponse.body);
-        final analysis = _json(analysisResponse);
-        final aggregate = (analysis['battle_learning_evidence'] as Map)
-            .cast<String, dynamic>();
-        expect(aggregate['source'], 'battle_simulations');
-        expect(
-          aggregate['trusted_battle_count'],
-          greaterThanOrEqualTo(runForcedDiagnostic ? 2 : 1),
-        );
-        expect(
-          aggregate['positive_exposure_battle_count'],
-          greaterThanOrEqualTo(1),
-        );
-        expect(aggregate['positive_exposure_ready'], isTrue);
-        expect(aggregate['exposed_card_names_normalized'], isNotEmpty);
-        expect(aggregate['promotion_allowed'], isFalse);
-      } finally {
-        for (final deckId in created.reversed) {
-          final response = await http.delete(
-            Uri.parse('$baseUrl/decks/$deckId'),
-            headers: headers,
-          );
-          expect(
-            response.statusCode,
-            anyOf(200, 204),
-            reason: 'Failed to clean E2E deck $deckId: ${response.body}',
-          );
-        }
+        expect(diagnostic['forced_access_mode'], 'opening_hand');
+        final diagnosticEvidence =
+            (diagnostic['battle_learning_evidence'] as Map)
+                .cast<String, dynamic>();
+        expect(diagnosticEvidence['natural_sample'], isFalse);
+        expect(diagnosticEvidence['positive_exposure_ready'], isTrue);
+        _expectReviewedAction(diagnostic);
       }
+
+      final natural = await _simulate(baseUrl, headers, deckA, deckB, const {
+        'seed': 2,
+        'max_turns': 12,
+        'focus_cards': ['A Good Day to Pie'],
+      });
+      final naturalEvidence =
+          (natural['battle_learning_evidence'] as Map).cast<String, dynamic>();
+      expect(natural['engine'], 'manaloom_native_reviewed');
+      expect(natural['engine_contract'], 'native_reviewed_rules_execution');
+      expect(natural['forced_access_mode'], 'none');
+      expect(natural['max_turns'], 12);
+      expect(natural['turns'], lessThanOrEqualTo(12));
+      expect(naturalEvidence['natural_sample'], isTrue);
+      expect(naturalEvidence['positive_exposure_ready'], isTrue);
+      _expectReviewedAction(natural);
+
+      final replayListResponse = await http.get(
+        Uri.parse('$baseUrl/decks/$deckA/battle-replays?limit=5'),
+        headers: headers,
+      );
+      expect(
+        replayListResponse.statusCode,
+        200,
+        reason: replayListResponse.body,
+      );
+      final replayList = _json(replayListResponse);
+      final replays = (replayList['data'] as List).whereType<Map>().toList();
+      expect(replays, isNotEmpty);
+      expect(
+        (replayList['simulation_contract'] as Map)['status'],
+        'per_replay_engine_contract',
+      );
+      expect(replayList['advisory'], isFalse);
+      final latestReplay = replays.first.cast<String, dynamic>();
+      expect(
+        (latestReplay['metrics'] as Map)['engine'],
+        'manaloom_native_reviewed',
+      );
+      expect(
+        (latestReplay['simulation_contract']
+            as Map)['reviewed_native_rules_execution'],
+        isTrue,
+      );
+      final replayId = latestReplay['id'].toString();
+      final replayDetailResponse = await http.get(
+        Uri.parse('$baseUrl/decks/$deckA/battle-replays/$replayId'),
+        headers: headers,
+      );
+      expect(
+        replayDetailResponse.statusCode,
+        200,
+        reason: replayDetailResponse.body,
+      );
+      final replay =
+          (_json(replayDetailResponse)['replay'] as Map)
+              .cast<String, dynamic>();
+      expect(replay['engine'], 'manaloom_native_reviewed');
+      final replayContract =
+          (replay['simulation_contract'] as Map).cast<String, dynamic>();
+      expect(replayContract['rules_execution'], isTrue);
+      expect(replayContract['reviewed_native_rules_execution'], isTrue);
+      expect(replayContract['rules_engine_priority'], 'native_residual');
+      _expectReviewedAction(replay);
+
+      final analysisResponse = await http.get(
+        Uri.parse('$baseUrl/decks/$deckA/analysis'),
+        headers: headers,
+      );
+      expect(analysisResponse.statusCode, 200, reason: analysisResponse.body);
+      final analysis = _json(analysisResponse);
+      final aggregate =
+          (analysis['battle_learning_evidence'] as Map).cast<String, dynamic>();
+      expect(aggregate['source'], 'battle_simulations');
+      expect(
+        aggregate['trusted_battle_count'],
+        greaterThanOrEqualTo(runForcedDiagnostic ? 2 : 1),
+      );
+      expect(
+        aggregate['positive_exposure_battle_count'],
+        greaterThanOrEqualTo(1),
+      );
+      expect(aggregate['positive_exposure_ready'], isTrue);
+      expect(aggregate['exposed_card_names_normalized'], isNotEmpty);
+      expect(aggregate['promotion_allowed'], isFalse);
     },
-    skip: enabled ? null : 'Set RUN_BATTLE_PRODUCT_E2E=1 to run live E2E.',
+    skip:
+        enabled
+            ? null
+            : 'Run scripts/manaloom_battle_product_gate.sh --isolated-e2e.',
     timeout: const Timeout(Duration(minutes: 3)),
   );
 }
 
 List<Map<String, dynamic>> _loadLoreholdDeck() {
   final candidates = [
-    File('../docs/hermes-analysis/manaloom-knowledge/import_queue/lorehold/'
-        'lorehold_best_of_learned_no_premium_mox_20260602.txt'),
-    File('docs/hermes-analysis/manaloom-knowledge/import_queue/lorehold/'
-        'lorehold_best_of_learned_no_premium_mox_20260602.txt'),
+    File(
+      '../docs/hermes-analysis/manaloom-knowledge/import_queue/lorehold/'
+      'lorehold_best_of_learned_no_premium_mox_20260602.txt',
+    ),
+    File(
+      'docs/hermes-analysis/manaloom-knowledge/import_queue/lorehold/'
+      'lorehold_best_of_learned_no_premium_mox_20260602.txt',
+    ),
   ];
   final file = candidates.firstWhere((candidate) => candidate.existsSync());
   final cards = <Map<String, dynamic>>[];
@@ -214,29 +216,23 @@ List<Map<String, dynamic>> _loadLoreholdDeck() {
   return cards;
 }
 
-Future<String> _loginOrRegister(
+Future<String> _registerUniqueIdentity(
   String baseUrl,
   Map<String, String> user,
 ) async {
   Future<http.Response> login() => http.post(
-        Uri.parse('$baseUrl/auth/login'),
-        headers: const {'content-type': 'application/json'},
-        body: jsonEncode({
-          'email': user['email'],
-          'password': user['password'],
-        }),
-      );
+    Uri.parse('$baseUrl/auth/login'),
+    headers: const {'content-type': 'application/json'},
+    body: jsonEncode({'email': user['email'], 'password': user['password']}),
+  );
 
-  var response = await login();
-  if (response.statusCode != 200) {
-    response = await http.post(
-      Uri.parse('$baseUrl/auth/register'),
-      headers: const {'content-type': 'application/json'},
-      body: jsonEncode(user),
-    );
-    expect(response.statusCode, anyOf(200, 201), reason: response.body);
-    response = await login();
-  }
+  var response = await http.post(
+    Uri.parse('$baseUrl/auth/register'),
+    headers: const {'content-type': 'application/json'},
+    body: jsonEncode(user),
+  );
+  expect(response.statusCode, anyOf(200, 201), reason: response.body);
+  response = await login();
   expect(response.statusCode, 200, reason: response.body);
   return _json(response)['token'] as String;
 }
@@ -251,7 +247,7 @@ Future<String> _createDeck(
     Uri.parse('$baseUrl/decks'),
     headers: headers,
     body: jsonEncode({
-      'name': '$name ${DateTime.now().microsecondsSinceEpoch}',
+      'name': name,
       'format': 'commander',
       'is_public': false,
       'cards': cards,

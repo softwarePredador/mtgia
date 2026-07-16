@@ -1,121 +1,127 @@
 {
-  "name": "optimization-resolution-corpus-new-easypanel-2026-07-06",
-  "generated_at": "2026-07-06",
-  "source": "new EasyPanel PostgreSQL halder; decks filtered to 100 cards and 34-40 lands",
+  "name": "optimization-resolution-corpus-new-easypanel-2026-07-15",
+  "generated_at": "2026-07-15",
+  "source": "new EasyPanel PostgreSQL halder; structural/representative corpus verified read-only on 2026-07-15",
+  "flow_path_contract": {
+    "status": "runtime_terminal_non_mock",
+    "allowed_terminal_paths": ["optimized_directly", "safe_no_change", "rebuild_guided"],
+    "evidence_basis": "The same healthy source deck produced safe_no_change and optimized_directly in consecutive real-provider canaries; the contract validates each terminal path without pretending provider output is deterministic.",
+    "required_before_release": "Run the complete isolated mutating corpus with zero mock, rejected HTTP 200, unresolved result, unknown runtime origin, invalid final deck, or cleanup residue; require at least one directly persisted actionable proposal across the aggregate and report provider, deterministic, cache, and state-gate provenance separately."
+  },
   "decks": [
     {
       "deck_id": "8938b746-1a9e-46ce-b0d9-c2ec932ddddd",
       "label": "Lorehold 607 - Current Champion",
-      "expected_flow_paths": ["optimized_directly", "safe_no_change", "rebuild_guided"],
+      "expected_flow_contract": "runtime_terminal_non_mock",
       "note": "Protected Lorehold baseline; 34 lands in the new server."
     },
     {
       "deck_id": "d26a20bb-0331-4971-ab44-0d405fff7bcd",
       "label": "Dina, Essence Brewer",
-      "expected_flow_paths": ["optimized_directly", "safe_no_change", "rebuild_guided"],
+      "expected_flow_contract": "runtime_terminal_non_mock",
       "note": "Current Strixhaven QA Commander seed; 38 lands."
     },
     {
       "deck_id": "25d34306-c696-4bf6-8263-61554abaf81c",
       "label": "Urza, Lord High Artificer",
-      "expected_flow_paths": ["optimized_directly", "safe_no_change", "rebuild_guided"],
+      "expected_flow_contract": "runtime_terminal_non_mock",
       "note": "Current LotB Commander seed; 40 lands."
     },
     {
       "deck_id": "4027884b-3dc7-42b1-8ca3-9bdbb18adf3c",
       "label": "Niv-Mizzet, Parun scorecard fixture",
-      "expected_flow_paths": ["optimized_directly", "safe_no_change", "rebuild_guided"],
+      "expected_flow_contract": "runtime_terminal_non_mock",
       "note": "Semantic v2 scorecard fixture; 35 lands."
     },
     {
       "deck_id": "400ca9e5-1b7e-4664-beea-f05def319b72",
       "label": "Niv-Mizzet, Parun scorecard fixture alt",
-      "expected_flow_paths": ["optimized_directly", "safe_no_change", "rebuild_guided"],
+      "expected_flow_contract": "runtime_terminal_non_mock",
       "note": "Semantic v2 scorecard fixture; 35 lands."
     },
     {
       "deck_id": "1ed0d8a3-6b5a-40ba-8432-cb3fc7869763",
       "label": "Krenko, Mob Boss scorecard fixture",
-      "expected_flow_paths": ["optimized_directly", "safe_no_change", "rebuild_guided"],
+      "expected_flow_contract": "runtime_terminal_non_mock",
       "note": "Semantic v2 scorecard fixture; 34 lands."
     },
     {
       "deck_id": "e0da6e91-0bf1-49e5-b651-5eab6735e88c",
       "label": "Brago, King Eternal scorecard fixture",
-      "expected_flow_paths": ["optimized_directly", "safe_no_change", "rebuild_guided"],
+      "expected_flow_contract": "runtime_terminal_non_mock",
       "note": "Semantic v2 scorecard fixture; 34 lands."
     },
     {
       "deck_id": "38500285-3a1e-4872-a60f-c33b41309681",
       "label": "Teysa Karlov scorecard fixture",
-      "expected_flow_paths": ["optimized_directly", "safe_no_change", "rebuild_guided"],
+      "expected_flow_contract": "runtime_terminal_non_mock",
       "note": "Semantic v2 scorecard fixture; 35 lands."
     },
     {
       "deck_id": "13b58b67-5e72-4584-9841-a859241a906a",
       "label": "Animar, Soul of Elements",
-      "expected_flow_paths": ["optimized_directly", "safe_no_change", "rebuild_guided"],
+      "expected_flow_contract": "runtime_terminal_non_mock",
       "note": "Current user Commander deck; 34 lands."
     },
     {
       "deck_id": "220a9e4a-3a1f-4f91-b5ca-cf0bbf54028d",
       "label": "Kaalia of the Vast",
-      "expected_flow_paths": ["optimized_directly", "safe_no_change", "rebuild_guided"],
+      "expected_flow_contract": "runtime_terminal_non_mock",
       "note": "Current user Commander deck; 35 lands."
     },
     {
-      "deck_id": "9eec03d2-b5fd-41d3-b987-482a3b69f07d",
-      "label": "Urza, Lord High Artificer alt",
-      "expected_flow_paths": ["optimized_directly", "safe_no_change", "rebuild_guided"],
-      "note": "Current LotB Commander seed; 40 lands."
+      "deck_id": "4a2e3a8f-32a3-4298-8309-a693b8e0f996",
+      "label": "Wilson, Refined Grizzly + Sword Coast Sailor corpus seed",
+      "expected_flow_contract": "runtime_terminal_non_mock",
+      "note": "Structural partner/background seed: 100 cards, 2 legal commanders and 36 lands; flow path is not yet proven with a real provider."
     },
     {
       "deck_id": "8457a713-f861-4477-a21d-0e3315da5fc6",
       "label": "Lorehold Reference Stats",
-      "expected_flow_paths": ["optimized_directly", "safe_no_change", "rebuild_guided"],
+      "expected_flow_contract": "runtime_terminal_non_mock",
       "note": "Current Lorehold reference stats seed; 37 lands."
     },
     {
       "deck_id": "4636850d-887e-430e-8d83-94b6d4314acd",
       "label": "Lorehold Strixhaven QA",
-      "expected_flow_paths": ["optimized_directly", "safe_no_change", "rebuild_guided"],
+      "expected_flow_contract": "runtime_terminal_non_mock",
       "note": "Current Strixhaven QA Commander seed; 37 lands."
     },
     {
-      "deck_id": "cc984556-d83b-43ec-9b38-ae7ba3e632e7",
-      "label": "Atraxa, Praetors' Voice validation",
-      "expected_flow_paths": ["optimized_directly", "safe_no_change", "rebuild_guided"],
-      "note": "Commander-only validation seed; 36 lands."
+      "deck_id": "104cbd8c-6877-4551-9c4f-c0742f1760ad",
+      "label": "Atraxa, Praetors' Voice corpus seed",
+      "expected_flow_contract": "runtime_terminal_non_mock",
+      "note": "Stable Commander corpus seed; 36 lands."
     },
     {
-      "deck_id": "5bedf511-2694-41b2-b457-ba5b9e02e34b",
-      "label": "Kozilek, the Great Distortion validation",
-      "expected_flow_paths": ["optimized_directly", "safe_no_change", "rebuild_guided"],
-      "note": "Commander-only validation seed; 36 lands."
+      "deck_id": "458a8df7-afde-4232-b4da-e1ce8e9fbb0c",
+      "label": "Kozilek, the Great Distortion corpus seed",
+      "expected_flow_contract": "runtime_terminal_non_mock",
+      "note": "Stable Commander corpus seed; 36 lands."
     },
     {
-      "deck_id": "d44a8622-f71d-4602-bc63-e1d67f880d49",
-      "label": "Jodah, the Unifier validation",
-      "expected_flow_paths": ["optimized_directly", "safe_no_change", "rebuild_guided"],
-      "note": "Commander-only validation seed; 36 lands."
+      "deck_id": "2070158d-5aa0-4918-9325-5f1eff41d359",
+      "label": "Jodah, the Unifier corpus seed",
+      "expected_flow_contract": "runtime_terminal_non_mock",
+      "note": "Stable Commander corpus seed; 36 lands."
     },
     {
-      "deck_id": "3d60c143-e1da-4bbe-8033-62fef0102d1a",
-      "label": "Prosper, Tome-Bound validation",
-      "expected_flow_paths": ["optimized_directly", "safe_no_change", "rebuild_guided"],
-      "note": "Commander-only validation seed; 36 lands."
+      "deck_id": "86cfa127-c737-43d7-aec9-b41d1668880e",
+      "label": "Prosper, Tome-Bound corpus seed",
+      "expected_flow_contract": "runtime_terminal_non_mock",
+      "note": "Stable Commander corpus seed; 36 lands."
     },
     {
-      "deck_id": "f77de4dc-6c6a-497e-94db-cdd58e2302c9",
-      "label": "Wilhelt, the Rotcleaver validation",
-      "expected_flow_paths": ["optimized_directly", "safe_no_change", "rebuild_guided"],
-      "note": "Commander-only validation seed; 36 lands."
+      "deck_id": "6cfa4644-16a6-4070-9e73-619acc5e77e3",
+      "label": "Wilhelt, the Rotcleaver corpus seed",
+      "expected_flow_contract": "runtime_terminal_non_mock",
+      "note": "Stable Commander corpus seed; 36 lands."
     },
     {
-      "deck_id": "a22048e2-0dca-46ef-b0e9-14e6a9b4abfb",
-      "label": "Korvold, Fae-Cursed King validation",
-      "expected_flow_paths": ["optimized_directly", "safe_no_change", "rebuild_guided"],
-      "note": "Commander-only validation seed; 36 lands."
+      "deck_id": "764ce781-7fd9-44b2-839e-8ea563f0006f",
+      "label": "Korvold, Fae-Cursed King corpus seed",
+      "expected_flow_contract": "runtime_terminal_non_mock",
+      "note": "Stable Commander corpus seed; 36 lands."
     }
   ]
 }

@@ -20,6 +20,11 @@ def test_production_preflight_defaults_to_persistent_data_volume() -> None:
     assert 'DEFAULT_ARTIFACT_DIR="/data/manaloom-ops/artifacts/master-optimizer-preflight"' in text
     assert 'ARTIFACT_DIR="${MANALOOM_MASTER_OPTIMIZER_ARTIFACT_DIR:-$DEFAULT_ARTIFACT_DIR}"' in text
     assert 'export MANALOOM_MASTER_OPTIMIZER_REPORT_DIR="$REPORT_DIR"' in text
+    assert 'preflight_status="${PIPESTATUS[0]}"' in text
+    assert "sed -n 's/^Report written: //p'" in text
+    assert 'cp "$current_report" "$ARTIFACT_DIR/latest_master_optimizer_preflight.md"' in text
+    assert 'echo "master_optimizer_preflight=blocked"' in text
+    assert 'exit "$preflight_status"' in text
 
     optimizer_text = OPTIMIZER_LOOP.read_text(encoding="utf-8")
     assert 'os.environ.get(' in optimizer_text

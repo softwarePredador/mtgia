@@ -5,24 +5,6 @@ class CommunityEngagementService {
 
   final Pool pool;
 
-  Future<void> ensureSchema() async {
-    await pool.execute(Sql.named(_deckCommentsTableSql));
-    await pool.execute(Sql.named(_contentReportsTableSql));
-    await pool.execute(Sql.named('''
-      CREATE INDEX IF NOT EXISTS idx_deck_comments_deck_created
-      ON deck_comments (deck_id, created_at DESC)
-      WHERE status = 'visible'
-    '''));
-    await pool.execute(Sql.named('''
-      CREATE INDEX IF NOT EXISTS idx_deck_comments_user_created
-      ON deck_comments (user_id, created_at DESC)
-    '''));
-    await pool.execute(Sql.named('''
-      CREATE INDEX IF NOT EXISTS idx_content_reports_target_status
-      ON content_reports (target_type, target_id, status, created_at DESC)
-    '''));
-  }
-
   Future<bool> publicDeckExists(String deckId) async {
     final result = await pool.execute(
       Sql.named('''
@@ -42,7 +24,6 @@ class CommunityEngagementService {
     int limit = 50,
     int offset = 0,
   }) async {
-    await ensureSchema();
     final result = await pool.execute(
       Sql.named('''
         SELECT
@@ -76,7 +57,6 @@ class CommunityEngagementService {
     required String userId,
     required String body,
   }) async {
-    await ensureSchema();
     final cleanBody = body.trim();
     if (cleanBody.length < 3) {
       throw const FormatException('Comentario muito curto.');
@@ -91,11 +71,7 @@ class CommunityEngagementService {
         VALUES (CAST(@deckId AS uuid), CAST(@userId AS uuid), @body)
         RETURNING id, deck_id, user_id, body, created_at, updated_at
       '''),
-      parameters: {
-        'deckId': deckId,
-        'userId': userId,
-        'body': cleanBody,
-      },
+      parameters: {'deckId': deckId, 'userId': userId, 'body': cleanBody},
     );
     return _commentRowToJson(result.first);
   }
@@ -107,11 +83,14 @@ class CommunityEngagementService {
     required String reason,
     String details = '',
   }) async {
-    await ensureSchema();
     final normalizedTargetType = targetType.trim().toLowerCase();
     final normalizedReason = reason.trim().toLowerCase();
-    if (!{'deck', 'comment', 'profile', 'binder_item'}
-        .contains(normalizedTargetType)) {
+    if (!{
+      'deck',
+      'comment',
+      'profile',
+      'binder_item',
+    }.contains(normalizedTargetType)) {
       throw const FormatException('Tipo de alvo invalido.');
     }
     if (!_allowedReportReasons.contains(normalizedReason)) {
@@ -172,8 +151,9 @@ class CommunityEngagementService {
       };
     }
 
-    final wantedSql = includeDeckMissing
-        ? '''
+    final wantedSql =
+        includeDeckMissing
+            ? '''
           WITH owned AS (
             SELECT card_id, COALESCE(SUM(quantity), 0)::int AS owned_quantity
             FROM user_binder_items
@@ -205,7 +185,7 @@ class CommunityEngagementService {
               AND bi.list_type = 'want'
           )
         '''
-        : '''
+            : '''
           WITH wanted AS (
             SELECT
               bi.card_id,
@@ -267,36 +247,35 @@ class CommunityEngagementService {
       },
     );
 
-    final matches = result.map((row) {
-      final m = row.toColumnMap();
-      return {
-        'card': {
-          'id': m['card_id']?.toString(),
-          'name': m['card_name'],
-        },
-        'wanted_quantity': m['wanted_quantity'],
-        'sources': _stringList(m['sources']),
-        'offer': {
-          'binder_item_id': m['binder_item_id']?.toString(),
-          'quantity': m['available_quantity'],
-          'condition': m['condition'],
-          'is_foil': m['is_foil'],
-          'for_trade': m['for_trade'],
-          'for_sale': m['for_sale'],
-          'price': _toDouble(m['price']),
-          'currency': m['currency'],
-          'notes': m['notes'],
-        },
-        'owner': {
-          'id': m['owner_id']?.toString(),
-          'username': m['owner_username'],
-          'display_name': m['owner_display_name'],
-          'avatar_url': m['owner_avatar_url'],
-          'location_city': m['owner_location_city'],
-          'location_state': m['owner_location_state'],
-        },
-      };
-    }).toList(growable: false);
+    final matches = result
+        .map((row) {
+          final m = row.toColumnMap();
+          return {
+            'card': {'id': m['card_id']?.toString(), 'name': m['card_name']},
+            'wanted_quantity': m['wanted_quantity'],
+            'sources': _stringList(m['sources']),
+            'offer': {
+              'binder_item_id': m['binder_item_id']?.toString(),
+              'quantity': m['available_quantity'],
+              'condition': m['condition'],
+              'is_foil': m['is_foil'],
+              'for_trade': m['for_trade'],
+              'for_sale': m['for_sale'],
+              'price': _toDouble(m['price']),
+              'currency': m['currency'],
+              'notes': m['notes'],
+            },
+            'owner': {
+              'id': m['owner_id']?.toString(),
+              'username': m['owner_username'],
+              'display_name': m['owner_display_name'],
+              'avatar_url': m['owner_avatar_url'],
+              'location_city': m['owner_location_city'],
+              'location_state': m['owner_location_state'],
+            },
+          };
+        })
+        .toList(growable: false);
 
     return {
       'source': includeDeckMissing ? 'deck_missing_and_wishlist' : 'wishlist',
@@ -373,45 +352,3 @@ const _allowedReportReasons = <String>{
   'copyright',
   'other',
 };
-
-const _deckCommentsTableSql = '''
-  CREATE TABLE IF NOT EXISTS deck_comments (
-    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    deck_id UUID NOT NULL REFERENCES decks(id) ON DELETE CASCADE,
-    user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-    body TEXT NOT NULL,
-    status TEXT NOT NULL DEFAULT 'visible',
-    created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    CONSTRAINT chk_deck_comments_status CHECK (
-      status IN ('visible', 'hidden', 'deleted')
-    ),
-    CONSTRAINT chk_deck_comments_body_length CHECK (
-      char_length(body) BETWEEN 3 AND 1200
-    )
-  )
-''';
-
-const _contentReportsTableSql = '''
-  CREATE TABLE IF NOT EXISTS content_reports (
-    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    reporter_user_id UUID REFERENCES users(id) ON DELETE SET NULL,
-    target_type TEXT NOT NULL,
-    target_id TEXT NOT NULL,
-    reason TEXT NOT NULL,
-    details TEXT NOT NULL DEFAULT '',
-    status TEXT NOT NULL DEFAULT 'open',
-    created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    reviewed_at TIMESTAMP WITH TIME ZONE,
-    reviewed_by UUID REFERENCES users(id) ON DELETE SET NULL,
-    CONSTRAINT chk_content_reports_target_type CHECK (
-      target_type IN ('deck', 'comment', 'profile', 'binder_item')
-    ),
-    CONSTRAINT chk_content_reports_reason CHECK (
-      reason IN ('spam', 'abuse', 'scam', 'inappropriate', 'copyright', 'other')
-    ),
-    CONSTRAINT chk_content_reports_status CHECK (
-      status IN ('open', 'reviewing', 'resolved', 'dismissed')
-    )
-  )
-''';

@@ -1,0 +1,59 @@
+{
+  "status": "ahead",
+  "ahead_by": 2,
+  "behind_by": 0,
+  "total_commits": 2,
+  "base_commit": {
+    "sha": "__CANONICAL_PIN__"
+  },
+  "head_commit": {
+    "sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+  },
+  "commits": [
+    {
+      "sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "html_url": "https://github.com/Card-Forge/forge/commit/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "commit": {
+        "message": "Implement Clockwork Example card",
+        "author": {"date": "2026-07-14T13:00:00Z"}
+      }
+    },
+    {
+      "sha": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+      "html_url": "https://github.com/Card-Forge/forge/commit/bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+      "commit": {
+        "message": "Fix combat damage trigger",
+        "author": {"date": "2026-07-14T14:00:00Z"}
+      }
+    }
+  ],
+  "files": [
+    {
+      "filename": "forge-gui/res/cardsfolder/c/clockwork_example.txt",
+      "status": "added",
+      "additions": 12,
+      "deletions": 0,
+      "changes": 12,
+      "blob_url": "https://github.com/Card-Forge/forge/blob/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa/forge-gui/res/cardsfolder/c/clockwork_example.txt",
+      "patch": "@@ -0,0 +1,3 @@\n+Name:Clockwork Example\n+ManaCost:3\n+Types:Artifact Creature"
+    },
+    {
+      "filename": "forge-game/src/main/java/forge/game/combat/CombatUtil.java",
+      "status": "modified",
+      "additions": 4,
+      "deletions": 1,
+      "changes": 5,
+      "blob_url": "https://github.com/Card-Forge/forge/blob/bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb/forge-game/src/main/java/forge/game/combat/CombatUtil.java",
+      "patch": "@@ -10,1 +10,4 @@\n+// resolve damage triggers in APNAP order"
+    },
+    {
+      "filename": "forge-game/src/test/java/forge/game/combat/CombatUtilTest.java",
+      "status": "added",
+      "additions": 25,
+      "deletions": 0,
+      "changes": 25,
+      "blob_url": "https://github.com/Card-Forge/forge/blob/bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb/forge-game/src/test/java/forge/game/combat/CombatUtilTest.java",
+      "patch": "@@ -0,0 +1,2 @@\n+public final class CombatUtilTest {\n+}"
+    }
+  ]
+}

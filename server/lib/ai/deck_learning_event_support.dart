@@ -27,43 +27,6 @@ const loadUsageHotCardsSql = '''
 
 const usageHotCardsGenerationCandidateLimit = 50;
 
-Future<void> ensureDeckLearningEventsTable(Pool pool) async {
-  await pool.execute('''
-    CREATE TABLE IF NOT EXISTS deck_learning_events (
-      id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-      deck_id UUID NOT NULL,
-      commander_name TEXT,
-      format TEXT NOT NULL,
-      card_count INTEGER NOT NULL DEFAULT 0,
-      source TEXT NOT NULL DEFAULT 'user_created',
-      event_data JSONB DEFAULT '{}'::jsonb,
-      synced_to_hermes BOOLEAN NOT NULL DEFAULT FALSE,
-      synced_at TIMESTAMPTZ,
-      created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
-    )
-  ''');
-  await pool.execute('''
-    CREATE INDEX IF NOT EXISTS idx_deck_learning_events_synced
-    ON deck_learning_events (synced_to_hermes, created_at)
-  ''');
-}
-
-Future<void> ensureCommanderCardUsageTable(Pool pool) async {
-  await pool.execute('''
-    CREATE TABLE IF NOT EXISTS commander_card_usage (
-      commander_name_normalized TEXT NOT NULL,
-      card_name_normalized TEXT NOT NULL,
-      usage_count INTEGER NOT NULL DEFAULT 1,
-      last_used_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-      PRIMARY KEY (commander_name_normalized, card_name_normalized)
-    )
-  ''');
-  await pool.execute('''
-    CREATE INDEX IF NOT EXISTS idx_commander_card_usage_commander
-    ON commander_card_usage (commander_name_normalized, usage_count DESC)
-  ''');
-}
-
 Future<void> upsertCommanderCardUsage({
   required Pool pool,
   required String commanderName,
@@ -137,18 +100,17 @@ Future<List<Map<String, dynamic>>> loadUsageHotCards({
   try {
     final result = await pool.execute(
       Sql.named(loadUsageHotCardsSql),
-      parameters: {
-        'commander': normalized,
-        'limit': limit,
-      },
+      parameters: {'commander': normalized, 'limit': limit},
     );
     return result
-        .map((row) => {
-              'card_name_normalized': row[0]?.toString(),
-              'canonical_name': row[1]?.toString(),
-              'usage_count': int.tryParse(row[2]?.toString() ?? '') ?? 0,
-              'last_used_at': row[3]?.toString(),
-            })
+        .map(
+          (row) => {
+            'card_name_normalized': row[0]?.toString(),
+            'canonical_name': row[1]?.toString(),
+            'usage_count': int.tryParse(row[2]?.toString() ?? '') ?? 0,
+            'last_used_at': row[3]?.toString(),
+          },
+        )
         .where((card) => (card['usage_count'] as int) > 0)
         .toList(growable: false);
   } catch (_) {
@@ -175,9 +137,10 @@ List<String> usageHotCardCanonicalNames(
   return hotCards
       .take(limit)
       .map(
-        (card) => card['canonical_name']?.toString().trim().isNotEmpty == true
-            ? card['canonical_name']!.toString().trim()
-            : (card['card_name_normalized']?.toString().trim() ?? ''),
+        (card) =>
+            card['canonical_name']?.toString().trim().isNotEmpty == true
+                ? card['canonical_name']!.toString().trim()
+                : (card['card_name_normalized']?.toString().trim() ?? ''),
       )
       .where((name) => name.isNotEmpty)
       .toList(growable: false);
@@ -193,10 +156,12 @@ Future<void> logGeneratedDeckForLearning({
     if (generatedDeck is! Map) return;
 
     final commander = generatedDeck['commander'];
-    final commanderName = commander is Map
-        ? commander['name']?.toString()
-        : commander?.toString();
-    final cards = (generatedDeck['cards'] as List?)
+    final commanderName =
+        commander is Map
+            ? commander['name']?.toString()
+            : commander?.toString();
+    final cards =
+        (generatedDeck['cards'] as List?)
             ?.whereType<Map>()
             .map((c) => c.cast<String, dynamic>())
             .toList() ??
@@ -205,20 +170,24 @@ Future<void> logGeneratedDeckForLearning({
     if (commanderName == null || commanderName.isEmpty) return;
     if (cards.isEmpty) return;
 
-    final cardCount = cards.fold<int>(0, (sum, c) {
+    final cardCount =
+        cards.fold<int>(0, (sum, c) {
           return sum + _quantityValue(c['quantity']);
         }) +
         (commanderName.isNotEmpty ? 1 : 0);
 
     final eventData = <String, dynamic>{
       'generation_mode': source,
-      'cards': cards
-          .map((c) => {
-                'name': c['name']?.toString() ?? '',
-                'quantity': c['quantity'],
-              })
-          .take(200)
-          .toList(),
+      'cards':
+          cards
+              .map(
+                (c) => {
+                  'name': c['name']?.toString() ?? '',
+                  'quantity': c['quantity'],
+                },
+              )
+              .take(200)
+              .toList(),
     };
 
     await pool.execute(

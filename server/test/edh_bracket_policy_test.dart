@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:server/edh_bracket_policy.dart';
 import 'package:test/test.dart';
 
@@ -41,6 +43,83 @@ void main() {
       );
     });
 
+    test('hard-caps only Game Changers and keeps every other tag advisory', () {
+      const expectedGameChangerCaps = <int, int>{
+        1: 0,
+        2: 0,
+        3: 3,
+        4: 99,
+        5: 99,
+      };
+
+      for (final entry in expectedGameChangerCaps.entries) {
+        final policy = BracketPolicy.forBracket(entry.key);
+        for (final category in BracketCategory.values) {
+          expect(
+            policy.maxCounts[category],
+            category == BracketCategory.gameChanger ? entry.value : 99,
+            reason: 'bracket=${entry.key} category=${category.name}',
+          );
+        }
+      }
+    });
+
+    test('does not impose a tutor quota but still blocks GC tutors', () {
+      final decision = applyBracketPolicyToAdditions(
+        bracket: 1,
+        currentDeckCards: const [],
+        additionsCardsData: const [
+          {
+            'name': 'Diabolic Tutor',
+            'type_line': 'Sorcery',
+            'oracle_text':
+                'Search your library for a card, put that card into your hand, then shuffle.',
+          },
+          {
+            'name': 'Fabricate',
+            'type_line': 'Sorcery',
+            'oracle_text':
+                'Search your library for an artifact card, reveal it, put it into your hand, then shuffle.',
+          },
+          {
+            'name': 'Demonic Tutor',
+            'type_line': 'Sorcery',
+            'oracle_text':
+                'Search your library for a card, put that card into your hand, then shuffle.',
+          },
+        ],
+      );
+
+      expect(decision.allowed, ['Diabolic Tutor', 'Fabricate']);
+      expect(decision.blocked.single['name'], 'Demonic Tutor');
+      expect(
+        decision.blocked.single['categories'],
+        contains(BracketCategory.gameChanger.name),
+      );
+    });
+
+    test('keeps both AI prompts aligned with the no-tutor-cap policy', () {
+      for (final path in const [
+        'lib/ai/prompt.md',
+        'lib/ai/prompt_complete.md',
+      ]) {
+        final prompt = File(path).readAsStringSync();
+        expect(prompt, contains('2025-10-21'), reason: path);
+        expect(prompt, contains('não têm limite próprio'), reason: path);
+        expect(
+          prompt,
+          isNot(contains('tutores moderados (3-4)')),
+          reason: path,
+        );
+        expect(prompt, isNot(contains('poucos tutores (1-2)')), reason: path);
+        expect(
+          prompt,
+          isNot(contains('tutores "search your library" (Bracket 1:')),
+          reason: path,
+        );
+      }
+    });
+
     test('allows game changers in cEDH bracket 5', () {
       final decision = applyBracketPolicyToAdditions(
         bracket: 5,
@@ -51,7 +130,7 @@ void main() {
             'type_line': 'Artifact',
             'oracle_text': '{T}: Add {C}{C}{C}.',
             'quantity': 1,
-          }
+          },
         ],
       );
 
@@ -76,13 +155,14 @@ void main() {
 
       expect(cultivate.categories, isNot(contains(BracketCategory.tutor)));
       expect(
-          cultivate.categories, isNot(contains(BracketCategory.gameChanger)));
+        cultivate.categories,
+        isNot(contains(BracketCategory.gameChanger)),
+      );
       expect(demonicTutor.categories, contains(BracketCategory.tutor));
       expect(demonicTutor.categories, contains(BracketCategory.gameChanger));
     });
 
-    test('keeps official gamechanger names tagged without suppressing roles',
-        () {
+    test('keeps official gamechanger names tagged without suppressing roles', () {
       final field = tagCardForBracket(
         name: 'Field of the Dead',
         typeLine: 'Land',
@@ -128,18 +208,20 @@ void main() {
       }
     });
 
-    test('detects curated free interaction even when oracle text is missing',
-        () {
-      final tags = tagCardForBracket(
-        name: 'Fierce Guardianship',
-        typeLine: 'Instant',
-        oracleText: '',
-      );
+    test(
+      'detects curated free interaction even when oracle text is missing',
+      () {
+        final tags = tagCardForBracket(
+          name: 'Fierce Guardianship',
+          typeLine: 'Instant',
+          oracleText: '',
+        );
 
-      expect(tags.categories, contains(BracketCategory.freeInteraction));
-      expect(tags.categories, contains(BracketCategory.protection));
-      expect(tags.categories, contains(BracketCategory.gameChanger));
-    });
+        expect(tags.categories, contains(BracketCategory.freeInteraction));
+        expect(tags.categories, contains(BracketCategory.protection));
+        expect(tags.categories, contains(BracketCategory.gameChanger));
+      },
+    );
 
     test('detects curated fast mana lands', () {
       for (final name in const [

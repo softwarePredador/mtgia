@@ -92,17 +92,19 @@ Future<List<Map<String, dynamic>>> findSynergyReplacements({
   }
 
   final colorIdentityArr = commanderColorIdentity.toList();
-  final normalizedPreferredNames = preferredNames
-      .map((name) => name.trim().toLowerCase())
-      .where((name) => name.isNotEmpty)
-      .toSet();
+  final normalizedPreferredNames =
+      preferredNames
+          .map((name) => name.trim().toLowerCase())
+          .where((name) => name.isNotEmpty)
+          .toSet();
   final commanderName = commanders.isNotEmpty ? commanders.first.trim() : '';
-  final rejectedAdditionCounts = commanderName.isEmpty
-      ? const <String, int>{}
-      : await _loadRejectedOptimizeAdditionCounts(
-          pool: pool,
-          commanderName: commanderName,
-        );
+  final rejectedAdditionCounts =
+      commanderName.isEmpty
+          ? const <String, int>{}
+          : await _loadRejectedOptimizeAdditionCounts(
+            pool: pool,
+            commanderName: commanderName,
+          );
 
   final candidatesResult = await pool.execute(
     Sql.named('''
@@ -181,11 +183,11 @@ Future<List<Map<String, dynamic>>> findSynergyReplacements({
     final oracle = ((row[3] as String?) ?? '').toLowerCase();
     final manaCost = (row[4] as String?) ?? '';
     final colors = (row[5] as List?)?.cast<String>() ?? const <String>[];
-    final identity = (row[6] as List?)?.cast<String>() ?? const <String>[];
+    final identity = (row[6] as List?)?.cast<String>();
     final popScore = (row[7] as num?)?.toInt() ?? 0;
     final functionalTags =
         (row[8] as List?)?.map((entry) => entry.toString()).toList() ??
-            const <String>[];
+        const <String>[];
     final semanticTagsV2 = row[9];
     final bestRoleScore = (row[10] as num?)?.toInt() ?? 0;
     final priceUsd = row[11];
@@ -211,7 +213,8 @@ Future<List<Map<String, dynamic>>> findSynergyReplacements({
         manaCost: manaCost,
       ),
       commanderIdentity: commanderColorIdentity,
-    )) continue;
+    ))
+      continue;
 
     candidatePool.add({
       'id': id,
@@ -259,8 +262,8 @@ Future<List<Map<String, dynamic>>> findSynergyReplacements({
       (functionalNeedsOverride != null && functionalNeedsOverride.isNotEmpty)
           ? functionalNeedsOverride
           : functionalNeeds.isNotEmpty
-              ? functionalNeeds
-              : defaultNeedsForArchetype(targetArchetype);
+          ? functionalNeeds
+          : defaultNeedsForArchetype(targetArchetype);
 
   for (var i = 0; i < missingCount && i < needs.length; i++) {
     final need = needs[i];
@@ -271,7 +274,8 @@ Future<List<Map<String, dynamic>>> findSynergyReplacements({
       final name = (candidate['name'] as String).toLowerCase();
       if (usedNames.contains(name)) continue;
       if (!canUseCandidate(candidate)) continue;
-      final score = scoreOptimizeReplacementCandidate(
+      final score =
+          scoreOptimizeReplacementCandidate(
             functionalNeed: need,
             cardName: candidate['name'] as String? ?? '',
             typeLine: candidate['type_line'] as String? ?? '',
@@ -309,43 +313,50 @@ Future<List<Map<String, dynamic>>> findSynergyReplacements({
   }
 
   if (results.length < missingCount) {
-    final rankedRemaining = candidatePool.where((candidate) {
-      final name = (candidate['name'] as String).toLowerCase();
-      return !usedNames.contains(name);
-    }).toList()
-      ..sort((a, b) {
-        final scoreA = scoreOptimizeReplacementCandidate(
-              functionalNeed: 'utility',
-              cardName: a['name'] as String? ?? '',
-              typeLine: a['type_line'] as String? ?? '',
-              oracleText: a['oracle_text'] as String? ?? '',
-              manaCost: a['mana_cost'] as String? ?? '',
-              popScore: (a['pop_score'] as int?) ?? 0,
-              preferredNames: normalizedPreferredNames,
-              rejectedAdditionCounts: rejectedAdditionCounts,
-              preferLowCurve: preferLowCurve,
-            ) +
-            semanticReplacementScoreBoost(
-                functionalNeed: 'utility', candidate: a);
-        final scoreB = scoreOptimizeReplacementCandidate(
-              functionalNeed: 'utility',
-              cardName: b['name'] as String? ?? '',
-              typeLine: b['type_line'] as String? ?? '',
-              oracleText: b['oracle_text'] as String? ?? '',
-              manaCost: b['mana_cost'] as String? ?? '',
-              popScore: (b['pop_score'] as int?) ?? 0,
-              preferredNames: normalizedPreferredNames,
-              rejectedAdditionCounts: rejectedAdditionCounts,
-              preferLowCurve: preferLowCurve,
-            ) +
-            semanticReplacementScoreBoost(
-                functionalNeed: 'utility', candidate: b);
-        final byScore = scoreB.compareTo(scoreA);
-        if (byScore != 0) return byScore;
-        final nameA = (a['name'] as String? ?? '').toLowerCase();
-        final nameB = (b['name'] as String? ?? '').toLowerCase();
-        return nameA.compareTo(nameB);
-      });
+    final rankedRemaining =
+        candidatePool.where((candidate) {
+            final name = (candidate['name'] as String).toLowerCase();
+            return !usedNames.contains(name);
+          }).toList()
+          ..sort((a, b) {
+            final scoreA =
+                scoreOptimizeReplacementCandidate(
+                  functionalNeed: 'utility',
+                  cardName: a['name'] as String? ?? '',
+                  typeLine: a['type_line'] as String? ?? '',
+                  oracleText: a['oracle_text'] as String? ?? '',
+                  manaCost: a['mana_cost'] as String? ?? '',
+                  popScore: (a['pop_score'] as int?) ?? 0,
+                  preferredNames: normalizedPreferredNames,
+                  rejectedAdditionCounts: rejectedAdditionCounts,
+                  preferLowCurve: preferLowCurve,
+                ) +
+                semanticReplacementScoreBoost(
+                  functionalNeed: 'utility',
+                  candidate: a,
+                );
+            final scoreB =
+                scoreOptimizeReplacementCandidate(
+                  functionalNeed: 'utility',
+                  cardName: b['name'] as String? ?? '',
+                  typeLine: b['type_line'] as String? ?? '',
+                  oracleText: b['oracle_text'] as String? ?? '',
+                  manaCost: b['mana_cost'] as String? ?? '',
+                  popScore: (b['pop_score'] as int?) ?? 0,
+                  preferredNames: normalizedPreferredNames,
+                  rejectedAdditionCounts: rejectedAdditionCounts,
+                  preferLowCurve: preferLowCurve,
+                ) +
+                semanticReplacementScoreBoost(
+                  functionalNeed: 'utility',
+                  candidate: b,
+                );
+            final byScore = scoreB.compareTo(scoreA);
+            if (byScore != 0) return byScore;
+            final nameA = (a['name'] as String? ?? '').toLowerCase();
+            final nameB = (b['name'] as String? ?? '').toLowerCase();
+            return nameA.compareTo(nameB);
+          });
 
     for (final candidate in rankedRemaining) {
       if (results.length >= missingCount) break;
@@ -398,12 +409,14 @@ int semanticReplacementScoreBoost({
   required Map<String, dynamic> candidate,
 }) {
   final normalizedNeed = _normalizeReplacementNeed(functionalNeed);
-  final roles = optimizationFunctionalRolesForCard(candidate)
-      .map(_normalizeReplacementNeed)
-      .toSet();
-  final roleScore = ((candidate['best_role_score'] as num?)?.toInt() ?? 0)
-      .clamp(0, 100)
-      .toInt();
+  final roles =
+      optimizationFunctionalRolesForCard(
+        candidate,
+      ).map(_normalizeReplacementNeed).toSet();
+  final roleScore =
+      ((candidate['best_role_score'] as num?)?.toInt() ?? 0)
+          .clamp(0, 100)
+          .toInt();
   if (normalizedNeed == 'utility') {
     return roleScore ~/ 4;
   }
@@ -446,9 +459,10 @@ Future<List<Map<String, dynamic>>> buildDeterministicOptimizeSwapCandidates({
   if (allCardData.isEmpty) return const [];
   final effectiveSwapLimit = swapLimit.clamp(1, 20).toInt();
   final isAggressive = intensity.trim().toLowerCase() == 'aggressive';
-  final candidateSearchLimit = isAggressive
-      ? (effectiveSwapLimit * 3).clamp(effectiveSwapLimit, 60).toInt()
-      : effectiveSwapLimit;
+  final candidateSearchLimit =
+      isAggressive
+          ? (effectiveSwapLimit * 3).clamp(effectiveSwapLimit, 60).toInt()
+          : effectiveSwapLimit;
 
   final preferredNames =
       commanderPriorityNames.map((name) => name.toLowerCase()).toSet();
@@ -466,9 +480,10 @@ Future<List<Map<String, dynamic>>> buildDeterministicOptimizeSwapCandidates({
     commanderPriorityNames: commanderPriorityNames,
     swapLimit: candidateSearchLimit,
   );
-  final removalList = removalCandidates
-      .map((candidate) => candidate['name'] as String)
-      .toList();
+  final removalList =
+      removalCandidates
+          .map((candidate) => candidate['name'] as String)
+          .toList();
   if (removalList.isEmpty) {
     if (isAggressive && diagnosticsOut != null) {
       diagnosticsOut
@@ -481,18 +496,20 @@ Future<List<Map<String, dynamic>>> buildDeterministicOptimizeSwapCandidates({
     }
     return const [];
   }
-  final functionalNeedsOverride = structuralRecoveryScenario
-      ? buildStructuralRecoveryFunctionalNeeds(
-          allCardData: allCardData,
-          targetArchetype: targetArchetype,
-          limit: removalList.length,
-        )
-      : null;
+  final functionalNeedsOverride =
+      structuralRecoveryScenario
+          ? buildStructuralRecoveryFunctionalNeeds(
+            allCardData: allCardData,
+            targetArchetype: targetArchetype,
+            limit: removalList.length,
+          )
+          : null;
 
-  final deckNamesLower = allCardData
-      .map((c) => ((c['name'] as String?) ?? '').toLowerCase())
-      .where((n) => n.isNotEmpty)
-      .toSet();
+  final deckNamesLower =
+      allCardData
+          .map((c) => ((c['name'] as String?) ?? '').toLowerCase())
+          .where((n) => n.isNotEmpty)
+          .toSet();
   final replacements = await findSynergyReplacements(
     pool: pool,
     commanders: commanders,
@@ -515,11 +532,14 @@ Future<List<Map<String, dynamic>>> buildDeterministicOptimizeSwapCandidates({
     usdToBrlRate: usdToBrlRate,
   );
   if (replacements.length < removalList.length) {
-    final usedReplacementNames = replacements
-        .map((replacement) =>
-            ((replacement['name'] as String?) ?? '').trim().toLowerCase())
-        .where((name) => name.isNotEmpty)
-        .toSet();
+    final usedReplacementNames =
+        replacements
+            .map(
+              (replacement) =>
+                  ((replacement['name'] as String?) ?? '').trim().toLowerCase(),
+            )
+            .where((name) => name.isNotEmpty)
+            .toSet();
     final fillerPool = await loadDeterministicSlotFillers(
       pool: pool,
       currentDeckCards: allCardData,
@@ -548,9 +568,10 @@ Future<List<Map<String, dynamic>>> buildDeterministicOptimizeSwapCandidates({
     }
   }
 
-  final pairCount = removalList.length < replacements.length
-      ? removalList.length
-      : replacements.length;
+  final pairCount =
+      removalList.length < replacements.length
+          ? removalList.length
+          : replacements.length;
   final pairs = <Map<String, dynamic>>[];
   for (var i = 0; i < pairCount; i++) {
     final removalName = removalList[i];
@@ -592,11 +613,9 @@ Future<List<Map<String, dynamic>>> buildDeterministicOptimizeSwapCandidates({
       ..clear()
       ..addAll(ranked);
     if (diagnosticsOut != null) {
-      final candidateSources = signals.values
-          .expand((signal) => signal.sources)
-          .toSet()
-          .toList()
-        ..sort();
+      final candidateSources =
+          signals.values.expand((signal) => signal.sources).toSet().toList()
+            ..sort();
       diagnosticsOut
         ..['requested_target_swaps'] = effectiveSwapLimit
         ..['removal_candidates'] = removalCandidates.length
@@ -618,13 +637,14 @@ Future<List<Map<String, dynamic>>> buildDeterministicOptimizeSwapCandidates({
   }
 
   // Em decks ja saudaveis, reduzir o numero de swaps diminui risco de regressao.
-  final maxPairs = structuralRecoveryScenario
-      ? computeOptimizeStructuralRecoverySwapTarget(
-          allCardData: allCardData,
-          commanderColorIdentity: commanderColorIdentity,
-          targetArchetype: targetArchetype,
-        ).clamp(1, effectiveSwapLimit).toInt()
-      : effectiveSwapLimit;
+  final maxPairs =
+      structuralRecoveryScenario
+          ? computeOptimizeStructuralRecoverySwapTarget(
+            allCardData: allCardData,
+            commanderColorIdentity: commanderColorIdentity,
+            targetArchetype: targetArchetype,
+          ).clamp(1, effectiveSwapLimit).toInt()
+          : effectiveSwapLimit;
 
   final responsePairLimit =
       isAggressive ? (maxPairs * 2).clamp(maxPairs, 40).toInt() : maxPairs;
@@ -655,9 +675,7 @@ Future<Map<String, int>> _loadRejectedOptimizeAdditionCounts({
         ORDER BY reject_count DESC, card_name ASC
         LIMIT 200
       '''),
-      parameters: {
-        'commander_name': commanderName,
-      },
+      parameters: {'commander_name': commanderName},
     );
 
     return {

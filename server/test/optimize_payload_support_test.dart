@@ -5,13 +5,10 @@ import 'package:server/ai/optimize_runtime_support.dart' as runtime;
 void main() {
   group('optimize payload support', () {
     test('normalizes mode aliases and reasoning values', () {
-      final normalized = payload.normalizeOptimizePayload(
-        {
-          'modde': 'complete deck',
-          'reasoning': 42,
-        },
-        defaultMode: 'optimize',
-      );
+      final normalized = payload.normalizeOptimizePayload({
+        'modde': 'complete deck',
+        'reasoning': 42,
+      }, defaultMode: 'optimize');
 
       expect(normalized['mode'], 'complete');
       expect(normalized['reasoning'], '42');
@@ -95,15 +92,71 @@ void main() {
       expect(explanation['decision'], 'remove');
       expect(explanation['target_archetype'], 'Spellslinger');
       expect(explanation['why'], contains('Função principal: ramp.'));
-      expect(
-        explanation['why'],
-        contains('Funções consideradas: draw, ramp.'),
-      );
+      expect(explanation['why'], contains('Funções consideradas: draw, ramp.'));
       expect((explanation['safety'] as Map)['preview_required'], isTrue);
       expect((explanation['safety'] as Map)['theme_preserved'], isTrue);
       expect(detail['impact_estimate']['curve'], 'ΔCMC -0.30');
       expect(detail['impact_estimate']['consistency'], 'alta');
+      expect((detail['player_facing'] as Map)['title'], 'Remover Mind Stone');
+      expect(
+        (detail['player_facing'] as Map)['theme_label'],
+        'Preserva o plano atual',
+      );
+      expect(
+        (detail['battle_validation'] as Map)['status'],
+        'pending_after_apply',
+      );
     });
+
+    test('decision contract keeps optimize preview non-automatic', () {
+      final contract = payload.buildOptimizeDecisionContract(
+        mode: 'optimize',
+        targetArchetype: 'Spellslinger',
+        intensity: 'focused',
+        keepTheme: true,
+        additionCount: 3,
+        removalCount: 3,
+      );
+
+      expect(
+        contract['schema_version'],
+        'optimize_decision_contract_v1_2026-07-07',
+      );
+      expect(
+        (contract['deckbuilder_validation'] as Map)['status'],
+        'passed_preview_gate',
+      );
+      expect(
+        (contract['battle_validation'] as Map)['status'],
+        'pending_after_apply',
+      );
+      final decision = contract['user_decision'] as Map;
+      expect(decision['preview_required'], isTrue);
+      expect(decision['can_select_individual_changes'], isTrue);
+      expect(decision['selection_unit'], 'paired_swap');
+      expect(decision['paired_selection_required'], isTrue);
+      expect(decision['changes_are_not_applied_automatically'], isTrue);
+      expect(decision['addition_count'], 3);
+      expect(decision['removal_count'], 3);
+    });
+
+    test(
+      'complete decision contract keeps additions independently selectable',
+      () {
+        final contract = payload.buildOptimizeDecisionContract(
+          mode: 'complete',
+          targetArchetype: 'Spellslinger',
+          intensity: 'focused',
+          keepTheme: true,
+          additionCount: 8,
+          removalCount: 0,
+        );
+
+        final decision = contract['user_decision'] as Map;
+        expect(decision['selection_unit'], 'individual_addition');
+        expect(decision['paired_selection_required'], isFalse);
+      },
+    );
 
     test('runtime export remains compatible', () {
       expect(runtime.resolveOptimizeIntensity('focused').targetMax, 10);

@@ -82,6 +82,14 @@ def build_reconciliation(
                 "card_name": source.get("card_name"),
                 "status": status,
                 "coverage_lane": lane,
+                "engine_name_candidate": coverage.get("engine_name_candidate"),
+                "residual_family": coverage.get("residual_family"),
+                "residual_semantic_family": coverage.get(
+                    "residual_semantic_family"
+                ),
+                "residual_execution_scope": coverage.get(
+                    "residual_execution_scope"
+                ),
                 "xmage_class": source.get("xmage_class"),
                 "xmage_path": source.get("xmage_path"),
                 "xmage_resolution": source.get("xmage_resolution"),
@@ -144,10 +152,16 @@ def write_markdown(payload: Mapping[str, Any], path: Path) -> None:
     residual = [row for row in payload["rows"] if not row["operationally_covered"]]
     lines.extend(["", "## Residual source candidates", ""])
     if residual:
-        lines.extend(["| Card | Candidate class | Resolution |", "| --- | --- | --- |"])
+        lines.extend(
+            [
+                "| Card | Candidate class | Execution scope | Resolution |",
+                "| --- | --- | --- | --- |",
+            ]
+        )
         for row in residual:
             lines.append(
                 f"| `{row['card_name']}` | `{row.get('xmage_class') or ''}` | "
+                f"`{row.get('residual_execution_scope') or ''}` | "
                 f"`{row.get('xmage_resolution') or ''}` |"
             )
     else:

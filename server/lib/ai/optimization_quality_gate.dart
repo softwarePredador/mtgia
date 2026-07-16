@@ -38,14 +38,22 @@ OptimizationSwapGateResult filterUnsafeOptimizeSwapsByCardData({
   final safeAdditions = <String>[];
   final droppedReasons = <String>[];
 
-  final structuralRecoveryScenario =
-      _isStructuralRecoveryScenario(originalDeck);
+  final structuralRecoveryScenario = _isStructuralRecoveryScenario(
+    originalDeck,
+  );
   final profileGatePolicy = _resolveProfileGatePolicy(profileRoleTargets);
   final landTrimContext = _computeLandTrimContext(
     originalDeck,
     archetype,
     profileGatePolicy: profileGatePolicy,
   );
+  final profileMinimumLandCount = profileGatePolicy?.minimumLandCount;
+  final minimumLandFloor =
+      profileMinimumLandCount != null && profileMinimumLandCount > 34
+          ? profileMinimumLandCount
+          : 34;
+  final enforceAggregateLandFloor =
+      landTrimContext.totalCards >= 90 || profileMinimumLandCount != null;
 
   for (var i = 0; i < pairCount; i++) {
     final removalName = removals[i];
@@ -66,9 +74,17 @@ OptimizationSwapGateResult filterUnsafeOptimizeSwapsByCardData({
     final removedRoles = _functionalRolesForGate(removedCard);
     final addedRoles = _functionalRolesForGate(addedCard);
     final cmcDelta = _getCmc(addedCard) - _getCmc(removedCard);
-    final rolePreserved = removedRole == addedRole ||
-        (removedRole == 'utility' && addedRole == 'utility') ||
-        removedRoles.intersection(addedRoles).isNotEmpty;
+    final removedIsLand = ((removedCard['type_line'] as String?) ?? '')
+        .toLowerCase()
+        .contains('land');
+    final addedIsLand = ((addedCard['type_line'] as String?) ?? '')
+        .toLowerCase()
+        .contains('land');
+    final rolePreserved =
+        removedIsLand == addedIsLand &&
+        (removedRole == addedRole ||
+            (removedRole == 'utility' && addedRole == 'utility') ||
+            removedRoles.intersection(addedRoles).isNotEmpty);
 
     final criticalRoles = _criticalRolesForArchetype(
       archetype,
@@ -77,7 +93,8 @@ OptimizationSwapGateResult filterUnsafeOptimizeSwapsByCardData({
     final removedCriticalRoles = removedRoles.intersection(criticalRoles);
     final losingCriticalRole =
         removedCriticalRoles.difference(addedRoles).isNotEmpty;
-    final structuralRecoveryUpgrade = structuralRecoveryScenario &&
+    final structuralRecoveryUpgrade =
+        structuralRecoveryScenario &&
         _isStructuralRecoveryUpgrade(
           removedCard: removedCard,
           addedCard: addedCard,
@@ -86,10 +103,6 @@ OptimizationSwapGateResult filterUnsafeOptimizeSwapsByCardData({
           archetype: archetype,
           cmcDelta: cmcDelta,
         );
-
-    final addedIsLand = ((addedCard['type_line'] as String?) ?? '')
-        .toLowerCase()
-        .contains('land');
 
     // ── Card deck profiles: protect core cards, prioritize filler removals ──
     if (cardDeckProfiles != null && cardDeckProfiles.isNotEmpty) {
@@ -112,16 +125,13 @@ OptimizationSwapGateResult filterUnsafeOptimizeSwapsByCardData({
       }
     }
 
-    final removedIsLand = removedRole == 'land' ||
-        (((removedCard['type_line'] as String?) ?? '')
-            .toLowerCase()
-            .contains('land'));
     final removedLandColorProducing =
         removedIsLand && _landLooksColorProducing(removedCard);
 
     // Permitir swaps "land -> spell" quando o deck está claramente acima do alvo de terrenos.
     // Isso evita o gate bloquear ajustes reais de flood/mana base em decks saudáveis.
-    final landTrimUpgrade = landTrimContext.excessLands >= 2 &&
+    final landTrimUpgrade =
+        landTrimContext.excessLands >= 2 &&
         removedIsLand &&
         !addedIsLand &&
         cmcDelta <= 3 &&
@@ -129,11 +139,16 @@ OptimizationSwapGateResult filterUnsafeOptimizeSwapsByCardData({
 
     final nonStructuralLandSwap = addedIsLand && removedRole != 'land';
     final temporaryManaBurst = _isTemporaryManaBurstCard(addedCard);
-    final riskyTemporaryRampSwap = temporaryManaBurst &&
+    final riskyTemporaryRampSwap =
+        temporaryManaBurst &&
         archetype.trim().toLowerCase() != 'combo' &&
         removedRole != 'ramp';
+    final unsafeLandToNonLand =
+        removedIsLand && !addedIsLand && !landTrimUpgrade;
 
-    final shouldDrop = losingCriticalRole ||
+    final shouldDrop =
+        unsafeLandToNonLand ||
+        losingCriticalRole ||
         (!rolePreserved && cmcDelta > 1) ||
         (archetype.toLowerCase() == 'aggro' && cmcDelta > 0) ||
         nonStructuralLandSwap ||
@@ -156,6 +171,57 @@ OptimizationSwapGateResult filterUnsafeOptimizeSwapsByCardData({
 
     safeRemovals.add(removalName);
     safeAdditions.add(additionName);
+  }
+
+  var projectedLandCount = landTrimContext.landCount;
+  for (var i = 0; i < safeRemovals.length; i++) {
+    final removedCard = _findCardByName(originalDeck, safeRemovals[i]);
+    final addedCard = _findCardByName(additionsData, safeAdditions[i]);
+    if (((removedCard['type_line'] as String?) ?? '').toLowerCase().contains(
+      'land',
+    )) {
+      projectedLandCount--;
+    }
+    if (((addedCard['type_line'] as String?) ?? '').toLowerCase().contains(
+      'land',
+    )) {
+      projectedLandCount++;
+    }
+  }
+
+  for (
+    var i = safeRemovals.length - 1;
+    i >= 0 && projectedLandCount < minimumLandFloor;
+    i--
+  ) {
+    final removedCard = _findCardByName(originalDeck, safeRemovals[i]);
+    final addedCard = _findCardByName(additionsData, safeAdditions[i]);
+    final removesLand = ((removedCard['type_line'] as String?) ?? '')
+        .toLowerCase()
+        .contains('land');
+    final addsLand = ((addedCard['type_line'] as String?) ?? '')
+        .toLowerCase()
+        .contains('land');
+    if (!removesLand || addsLand) continue;
+    droppedReasons.add(
+      '${safeRemovals[i]} -> ${safeAdditions[i]} removida pelo gate: '
+      'projecao de $projectedLandCount terrenos abaixo do piso seguro '
+      '$minimumLandFloor.',
+    );
+    safeRemovals.removeAt(i);
+    safeAdditions.removeAt(i);
+    projectedLandCount++;
+  }
+
+  if (enforceAggregateLandFloor &&
+      projectedLandCount < minimumLandFloor &&
+      safeRemovals.isNotEmpty) {
+    droppedReasons.add(
+      'Proposta descartada pelo gate: projeção de $projectedLandCount terrenos '
+      'permanece abaixo do piso seguro $minimumLandFloor.',
+    );
+    safeRemovals.clear();
+    safeAdditions.clear();
   }
 
   return OptimizationSwapGateResult(
@@ -183,8 +249,10 @@ Set<String> _functionalRolesForGate(Map<String, dynamic> card) {
     }
   }
 
-  final semanticRoles =
-      optimizationFunctionalRolesForCard(card, semanticOnly: true);
+  final semanticRoles = optimizationFunctionalRolesForCard(
+    card,
+    semanticOnly: true,
+  );
   for (final role in semanticRoles) {
     final mapped = _gateRoleForFunctionalTag(role);
     if (mapped != null) inferredRoles.add(mapped);
@@ -226,7 +294,8 @@ typedef _PersistedFunctionalTag = ({String tag, double confidence});
 /// Lê os functional_tags PERSISTIDOS (card_function_tags) do mapa da carta,
 /// já decodificados (jsonb -> List/Map) ou em string JSON.
 List<_PersistedFunctionalTag> _persistedFunctionalTagsForGate(
-    Map<String, dynamic> card) {
+  Map<String, dynamic> card,
+) {
   var raw = card['functional_tags'];
   if (raw is String) {
     if (raw.trim().isEmpty) return const [];
@@ -281,8 +350,7 @@ String? _gateRoleForFunctionalTag(String tag) {
     'recursion' ||
     'wincon' ||
     'combo_piece' ||
-    'engine' =>
-      tag,
+    'engine' => tag,
     _ => null,
   };
 }
@@ -340,10 +408,12 @@ class _ProfileGatePolicy {
   const _ProfileGatePolicy({
     required this.criticalRoles,
     required this.recommendedLandCount,
+    required this.minimumLandCount,
   });
 
   final Set<String> criticalRoles;
   final int? recommendedLandCount;
+  final int? minimumLandCount;
 }
 
 _ProfileGatePolicy? _resolveProfileGatePolicy(
@@ -353,6 +423,7 @@ _ProfileGatePolicy? _resolveProfileGatePolicy(
 
   final criticalRoles = <String>{};
   int? recommendedLandCount;
+  int? minimumLandCount;
 
   for (final entry in roleTargets.entries) {
     final key = entry.key.toString().trim().toLowerCase();
@@ -366,6 +437,7 @@ _ProfileGatePolicy? _resolveProfileGatePolicy(
     final normalizedKey = key.replaceAll(RegExp(r'[^a-z0-9]+'), '_');
     if (normalizedKey == 'lands' || normalizedKey == 'land') {
       recommendedLandCount = targetMax ?? targetMin;
+      minimumLandCount = targetMin ?? targetMax;
       continue;
     }
 
@@ -376,6 +448,7 @@ _ProfileGatePolicy? _resolveProfileGatePolicy(
   return _ProfileGatePolicy(
     criticalRoles: criticalRoles,
     recommendedLandCount: recommendedLandCount,
+    minimumLandCount: minimumLandCount,
   );
 }
 
@@ -480,7 +553,8 @@ _LandTrimContext _computeLandTrimContext(
   return _LandTrimContext(
     totalCards: totalCards,
     landCount: landCount,
-    recommendedLandCount: profileGatePolicy?.recommendedLandCount ??
+    recommendedLandCount:
+        profileGatePolicy?.recommendedLandCount ??
         _recommendedLandCountForArchetype(archetype),
   );
 }
@@ -515,13 +589,13 @@ bool _isStructuralRecoveryUpgrade({
   final addedAllowedRoles = switch (archetype.trim().toLowerCase()) {
     'control' => {'ramp', 'draw', 'removal', 'wipe', 'protection', 'utility'},
     'midrange' => {
-        'ramp',
-        'draw',
-        'removal',
-        'creature',
-        'protection',
-        'utility'
-      },
+      'ramp',
+      'draw',
+      'removal',
+      'creature',
+      'protection',
+      'utility',
+    },
     'aggro' => {'ramp', 'removal', 'creature', 'protection', 'utility'},
     _ => {'ramp', 'draw', 'removal', 'protection', 'utility'},
   };
@@ -612,6 +686,24 @@ List<String> buildOptimizationRejectionReasons({
     );
   }
 
+  final themeValidation = validationReport.themeValidation;
+  if (themeValidation?.hasCriticalViolation == true) {
+    final criticalChecks = themeValidation!.checks.where(
+      (check) =>
+          check.status != 'ok' &&
+          (check.priority == 'essential' || check.priority == 'high'),
+    );
+    for (final check in criticalChecks) {
+      reasons.add(
+        'A proposta final viola o piso temático crítico '
+        '"${check.function}" (${check.current}; esperado ${check.min}-${check.max}).',
+      );
+    }
+    if (criticalChecks.isEmpty) {
+      reasons.add('A proposta final viola uma regra temática crítica.');
+    }
+  }
+
   // Se a validação já fechou como "aprovado", não exigimos um delta mínimo
   // adicional aqui — evita o gate bloquear micro-upgrades que passaram no score.
   final demandMaterialImprovement = validationReport.verdict != 'aprovado';
@@ -638,18 +730,11 @@ Set<String> _criticalRolesForArchetype(
     'aggro' => {'creature', 'ramp', 'removal', 'protection', 'wipe', 'wincon'},
     'control' => {'removal', 'draw', 'wipe', 'ramp', 'protection', 'wincon'},
     'midrange' => {'removal', 'ramp', 'draw', 'wipe', 'wincon'},
-    'combo' => {
-        'tutor',
-        'engine',
-        'wincon',
-        'protection',
-        'combo_piece',
-      },
+    'combo' => {'tutor', 'engine', 'wincon', 'protection', 'combo_piece'},
     _ => {'removal', 'ramp', 'wipe', 'wincon'},
   };
   final profileRoles = profileGatePolicy?.criticalRoles ?? const <String>{};
-  if (profileRoles.isEmpty) return baseline;
-  return {...baseline, ...profileRoles};
+  return {'land', ...baseline, ...profileRoles};
 }
 
 bool _looksLikeOffThemeRoleSwap({
@@ -660,10 +745,20 @@ bool _looksLikeOffThemeRoleSwap({
   final normalized = archetype.trim().toLowerCase();
 
   if (normalized == 'aggro' &&
-      {'creature', 'ramp', 'removal', 'protection', 'wipe'}
-          .contains(removedRole) &&
-      !{'creature', 'ramp', 'removal', 'protection', 'wipe'}
-          .contains(addedRole)) {
+      {
+        'creature',
+        'ramp',
+        'removal',
+        'protection',
+        'wipe',
+      }.contains(removedRole) &&
+      !{
+        'creature',
+        'ramp',
+        'removal',
+        'protection',
+        'wipe',
+      }.contains(addedRole)) {
     return true;
   }
 
@@ -675,8 +770,14 @@ bool _looksLikeOffThemeRoleSwap({
 
   if (normalized == 'midrange' &&
       {'removal', 'ramp', 'draw', 'wipe'}.contains(removedRole) &&
-      !{'removal', 'ramp', 'draw', 'wipe', 'creature', 'protection'}
-          .contains(addedRole)) {
+      !{
+        'removal',
+        'ramp',
+        'draw',
+        'wipe',
+        'creature',
+        'protection',
+      }.contains(addedRole)) {
     return true;
   }
 
@@ -710,13 +811,19 @@ bool _looksLikeOffThemeRoleSwap({
 bool _isManaAssessmentWorse(String before, String after) {
   final beforeLower = before.toLowerCase();
   final afterLower = after.toLowerCase();
-  final beforeHasIssue = beforeLower.contains('falta mana');
-  final afterHasIssue = afterLower.contains('falta mana');
+  final beforeHasIssue =
+      beforeLower.contains('falta mana') ||
+      beforeLower.contains('poucos terrenos');
+  final afterHasIssue =
+      afterLower.contains('falta mana') ||
+      afterLower.contains('poucos terrenos');
   return !beforeHasIssue && afterHasIssue;
 }
 
 bool _manaAssessmentStillBroken(String assessment) {
-  return assessment.toLowerCase().contains('falta mana');
+  final normalized = assessment.toLowerCase();
+  return normalized.contains('falta mana') ||
+      normalized.contains('poucos terrenos');
 }
 
 bool _criticRejected(ValidationReport validationReport) {
@@ -739,11 +846,16 @@ bool _hasMaterialImprovement({
       monteCarlo.after.consistencyScore - monteCarlo.before.consistencyScore;
   final keepableDelta =
       monteCarlo.after.keepableRate - monteCarlo.before.keepableRate;
-  final keep7Delta = monteCarlo.afterMulligan.keepAt7Rate -
+  final keep7Delta =
+      monteCarlo.afterMulligan.keepAt7Rate -
       monteCarlo.beforeMulligan.keepAt7Rate;
+  final keepAfterMullDelta =
+      monteCarlo.afterMulligan.keepableAfterMullRate -
+      monteCarlo.beforeMulligan.keepableAfterMullRate;
   final screwImprovement =
       monteCarlo.before.screwRate - monteCarlo.after.screwRate;
-  final manaImproved = _manaAssessmentStillBroken(preManaAssessment) &&
+  final manaImproved =
+      _manaAssessmentStillBroken(preManaAssessment) &&
       !_manaAssessmentStillBroken(postManaAssessment);
 
   var pressureDelta = 0.0;
@@ -763,9 +875,17 @@ bool _hasMaterialImprovement({
       break;
   }
 
-  final functionalClearlyPositive = validationReport.functional.upgrades > 0 &&
+  final functionalClearlyPositive =
+      validationReport.functional.upgrades > 0 &&
       validationReport.functional.tradeoffs == 0 &&
       validationReport.functional.questionable == 0;
+
+  final hasMaterialRegression =
+      consistencyDelta < 0 ||
+      keepableDelta < -0.01 ||
+      keepAfterMullDelta < -0.01 ||
+      screwImprovement < -0.01;
+  if (hasMaterialRegression) return false;
 
   if (manaImproved) return true;
   if (consistencyDelta > 0) return true;

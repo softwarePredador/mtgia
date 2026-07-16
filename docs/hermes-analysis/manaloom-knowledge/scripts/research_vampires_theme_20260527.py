@@ -20,12 +20,33 @@ PROFILE = ART / 'commander_reference_profile_anchor30_batch_b_2026-05-12/profile
 CORPUS = ART / 'commander_reference_deck_corpus_edgar_2026-05-13/edgar_edhrec_average_corpus.json'
 OUT = Path('/tmp/vampires_theme_research.json')
 EDHREC_URL = 'https://edhrec.com/commanders/edgar-markov'
+EDHREC_AUTHORIZATION_FLAG = 'MANALOOM_EDHREC_AUTOMATED_COLLECTION_AUTHORIZED'
+AUTHORIZED_FLAG_VALUES = {'1', 'true', 'yes', 'on'}
 MOXFIELD_ID = 'fpa2N8MU_UyU2tqrCXWdLg'
 MOXFIELD_URL = f'https://www.moxfield.com/decks/{MOXFIELD_ID}'
 MOXFIELD_API = f'https://api.moxfield.com/v2/decks/all/{MOXFIELD_ID}'
 
 
+def edhrec_collection_authorized():
+    return os.environ.get(EDHREC_AUTHORIZATION_FLAG, '').strip().lower() in AUTHORIZED_FLAG_VALUES
+
+
+def is_edhrec_url(url):
+    hostname = (urllib.parse.urlparse(url).hostname or '').lower()
+    return hostname == 'edhrec.com' or hostname.endswith('.edhrec.com')
+
+
 def curl(url, timeout=30):
+    if is_edhrec_url(url) and not edhrec_collection_authorized():
+        return {
+            'url': url,
+            'exit_code': 78,
+            'stdout': '',
+            'stderr': (
+                f'EDHREC collection blocked (fail-closed): set '
+                f'{EDHREC_AUTHORIZATION_FLAG} only after explicit authorization.'
+            ),
+        }
     r = subprocess.run(
         ['curl', '-sL', '--max-time', str(timeout), '-A', 'Mozilla/5.0 Hermes ManaLoom research', url],
         capture_output=True,

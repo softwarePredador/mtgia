@@ -55,7 +55,7 @@ void main() {
       expect(commanderStapleWeaknessMultiplier(stormKilnArtist), lessThan(0.5));
     });
 
-    test('fit score uses inclusion rate instead of absolute deck count', () {
+    test('ManaLoom 60/40 heuristic uses rate, not absolute deck count', () {
       final service = EdhrecService();
       final card = EdhrecCard(
         name: 'Popular Card',

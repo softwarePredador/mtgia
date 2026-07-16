@@ -4,9 +4,8 @@
 ║  MTG Trade System — Suíte Completa de Testes E2E               ║
 ║  Cobre: Auth, Binder, Trade CRUD, Status, Chat, Permissões     ║
 ║                                                                  ║
-║  Uso:  python3 server/test/e2e_trade_tests.py                   ║
-║  Uso:  python3 server/test/e2e_trade_tests.py --api URL         ║
-║  Uso:  python3 server/test/e2e_trade_tests.py --verbose         ║
+║  Uso: MANALOOM_CONFIRM_LIVE_MUTATIONS=I_HAVE_EXPLICIT_APPROVAL ║
+║       python3 server/test/e2e_trade_tests.py --api URL          ║
 ╚══════════════════════════════════════════════════════════════════╝
 """
 
@@ -19,8 +18,12 @@ import argparse
 from dataclasses import dataclass, field
 from typing import Optional
 
+try:
+    from .legacy_live_e2e_guard import require_legacy_live_e2e_approval
+except ImportError:  # Direct script execution.
+    from legacy_live_e2e_guard import require_legacy_live_e2e_approval
+
 # ─── Config ────────────────────────────────────────────────────────
-DEFAULT_API = "https://evolution-cartinhas.2ta7qx.easypanel.host"
 VERBOSE = False
 
 # ─── Resultado de teste ────────────────────────────────────────────
@@ -1180,11 +1183,12 @@ class TestRunner:
 # ─── Main ──────────────────────────────────────────────────────────
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="MTG Trade E2E Test Suite")
-    parser.add_argument("--api", default=DEFAULT_API, help="API base URL")
+    parser.add_argument("--api", required=True, help="Explicit API base URL")
     parser.add_argument("--verbose", "-v", action="store_true", help="Show all requests")
     args = parser.parse_args()
 
     VERBOSE = args.verbose
-    runner = TestRunner(args.api)
+    approved_api = require_legacy_live_e2e_approval(args.api)
+    runner = TestRunner(approved_api)
     success = runner.run_all()
     sys.exit(0 if success else 1)

@@ -5,6 +5,7 @@ Este documento é **estratégico**, não operacional.
 Para prioridade diária, sequência de execução e decisões de escopo, usar:
 
 - [docs/CONTEXTO_PRODUTO_ATUAL.md](docs/CONTEXTO_PRODUTO_ATUAL.md)
+- [docs/MANALOOM_E2E_RELEASE_CONTRACT.md](docs/MANALOOM_E2E_RELEASE_CONTRACT.md)
 
 ## Posição atual
 
@@ -69,7 +70,10 @@ Até o fluxo principal atingir confiança de release, ficam fora da frente domin
 
 - índice da documentação ativa: [docs/README.md](docs/README.md)
 - contexto operacional: [docs/CONTEXTO_PRODUTO_ATUAL.md](docs/CONTEXTO_PRODUTO_ATUAL.md)
-- matriz de testes: [docs/MATRIZ_TESTES_OTIMIZACAO_2026-03-23.md](docs/MATRIZ_TESTES_OTIMIZACAO_2026-03-23.md)
+- contrato E2E e de conclusão: [docs/MANALOOM_E2E_RELEASE_CONTRACT.md](docs/MANALOOM_E2E_RELEASE_CONTRACT.md)
+- encerramento E2E corrente: [docs/qa/MANALOOM_E2E_PROJECT_CLOSURE_2026-07-15.md](docs/qa/MANALOOM_E2E_PROJECT_CLOSURE_2026-07-15.md)
+- battle/deckbuilder definitivo: [docs/qa/MANALOOM_BATTLE_DECKBUILDER_DEFINITIVE_2026-07-15.md](docs/qa/MANALOOM_BATTLE_DECKBUILDER_DEFINITIVE_2026-07-15.md)
+- matriz histórica de testes: [docs/MATRIZ_TESTES_OTIMIZACAO_2026-03-23.md](docs/MATRIZ_TESTES_OTIMIZACAO_2026-03-23.md)
 
 ## Nota importante
 

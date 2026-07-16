@@ -38,6 +38,25 @@ class AppAiKnowledgeBridgeAuditTests(unittest.TestCase):
         self.assertEqual(check.status, "fail")
         self.assertIn("buildCommanderDeckbuildingContractDiagnostics", check.detail)
 
+    def test_contract_snippet_allows_formatter_whitespace(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            path = Path(tmp) / "generate.dart"
+            path.write_text(
+                """
+                final cards = activeCommanderLearnedDeckCardNames(
+                  activeLearnedDeck,
+                );
+                """,
+                encoding="utf-8",
+            )
+            check = audit.check_contains(
+                path,
+                ["activeCommanderLearnedDeckCardNames(activeLearnedDeck)"],
+                "test.formatted_contract",
+            )
+
+        self.assertEqual(check.status, "pass")
+
     def test_raw_app_metadata_string_fails(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
             path = Path(tmp) / "screen.dart"

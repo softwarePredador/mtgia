@@ -2,9 +2,7 @@ import '../color_identity.dart';
 import 'commander_fallback_policy.dart';
 import 'optimize_functional_role_support.dart';
 
-List<T> dedupeCandidatesByName<T extends Map<String, Object?>>(
-  List<T> input,
-) {
+List<T> dedupeCandidatesByName<T extends Map<String, Object?>>(List<T> input) {
   final seen = <String>{};
   final output = <T>[];
   for (final item in input) {
@@ -32,8 +30,7 @@ bool shouldKeepCommanderFillerCandidate({
   if (enforceCommanderIdentity || commanderColorIdentity.isNotEmpty) {
     final withinIdentity = isWithinCommanderIdentity(
       cardIdentity: resolvedCardIdentityFromParts(
-        colorIdentity: (candidate['color_identity'] as List?)?.cast<String>() ??
-            const <String>[],
+        colorIdentity: (candidate['color_identity'] as List?)?.cast<String>(),
         colors:
             (candidate['colors'] as List?)?.cast<String>() ?? const <String>[],
         oracleText: candidate['oracle_text'] as String?,
@@ -116,8 +113,7 @@ int commanderFillerQualityScore(Map<String, dynamic> candidate) {
 
 Set<String> resolvedCardIdentity(Map<String, dynamic> card) {
   return resolvedCardIdentityFromParts(
-    colorIdentity:
-        (card['color_identity'] as List?)?.cast<String>() ?? const <String>[],
+    colorIdentity: (card['color_identity'] as List?)?.cast<String>(),
     colors: (card['colors'] as List?)?.cast<String>() ?? const <String>[],
     oracleText: card['oracle_text']?.toString(),
     manaCost: card['mana_cost']?.toString(),
@@ -125,7 +121,7 @@ Set<String> resolvedCardIdentity(Map<String, dynamic> card) {
 }
 
 Set<String> resolvedCardIdentityFromParts({
-  List<String> colorIdentity = const <String>[],
+  List<String>? colorIdentity,
   List<String> colors = const <String>[],
   String? oracleText,
   String? manaCost,

@@ -8,10 +8,7 @@ void main() {
   group('GoldfishSimulator', () {
     test('detects mana screw with few lands', () {
       // Deck com apenas 15 terrenos (muito poucos para Commander)
-      final cards = [
-        ..._generateLands(15),
-        ..._generateSpells(85, avgCmc: 3),
-      ];
+      final cards = [..._generateLands(15), ..._generateSpells(85, avgCmc: 3)];
 
       final simulator = GoldfishSimulator(cards, simulations: 500);
       final result = simulator.simulate();
@@ -25,10 +22,7 @@ void main() {
 
     test('detects mana flood with too many lands', () {
       // Deck com 50 terrenos (excessivo)
-      final cards = [
-        ..._generateLands(50),
-        ..._generateSpells(50, avgCmc: 3),
-      ];
+      final cards = [..._generateLands(50), ..._generateSpells(50, avgCmc: 3)];
 
       final simulator = GoldfishSimulator(cards, simulations: 500);
       final result = simulator.simulate();
@@ -65,13 +59,13 @@ void main() {
           'name': 'Arcane Signet',
           'cmc': 2,
           'type_line': 'Artifact',
-          'quantity': 1
+          'quantity': 1,
         },
         {
           'name': 'Commander',
           'cmc': 5,
           'type_line': 'Legendary Creature',
-          'quantity': 1
+          'quantity': 1,
         },
       ];
 
@@ -118,7 +112,7 @@ void main() {
           'cmc': 2,
           'type_line': 'Instant',
           'oracle_text': 'Counter spell',
-          'quantity': 4
+          'quantity': 4,
         },
       ];
 
@@ -140,16 +134,15 @@ void main() {
 
       expect(result.avgCmc, greaterThan(4.0));
       expect(
-          result.recommendations
-              .any((r) => r.contains('CMC') || r.contains('lento')),
-          isTrue);
+        result.recommendations.any(
+          (r) => r.contains('CMC') || r.contains('lento'),
+        ),
+        isTrue,
+      );
     });
 
     test('turn play rates increase with turns', () {
-      final cards = [
-        ..._generateLands(36),
-        ..._generateSpells(64, avgCmc: 3),
-      ];
+      final cards = [..._generateLands(36), ..._generateSpells(64, avgCmc: 3)];
 
       final simulator = GoldfishSimulator(cards, simulations: 1000);
       final result = simulator.simulate();
@@ -161,31 +154,28 @@ void main() {
     });
 
     test('reports no-play turn 3 risk for decks without early plays', () {
-      final cards = [
-        ..._generateLands(36),
-        ..._generateSpells(64, avgCmc: 4),
-      ];
+      final cards = [..._generateLands(36), ..._generateSpells(64, avgCmc: 4)];
 
       final simulator = GoldfishSimulator(cards, simulations: 200);
       final result = simulator.simulate();
 
       expect(result.noPlayTurn3Rate, greaterThan(0.90));
-      expect(
-        result.recommendations.any((r) => r.contains('turno 3')),
-        isTrue,
-      );
+      expect(result.recommendations.any((r) => r.contains('turno 3')), isTrue);
     });
 
     test('deterministic with fixed seed', () {
-      final cards = [
-        ..._generateLands(36),
-        ..._generateSpells(64, avgCmc: 3),
-      ];
+      final cards = [..._generateLands(36), ..._generateSpells(64, avgCmc: 3)];
 
-      final sim1 =
-          GoldfishSimulator(cards, simulations: 100, random: Random(42));
-      final sim2 =
-          GoldfishSimulator(cards, simulations: 100, random: Random(42));
+      final sim1 = GoldfishSimulator(
+        cards,
+        simulations: 100,
+        random: Random(42),
+      );
+      final sim2 = GoldfishSimulator(
+        cards,
+        simulations: 100,
+        random: Random(42),
+      );
 
       final result1 = sim1.simulate();
       final result2 = sim2.simulate();
@@ -215,6 +205,257 @@ void main() {
 
       final simulator = GoldfishSimulator(cards, simulations: 1);
       final result = simulator.simulate();
+
+      expect(result.turn1PlayRate, equals(0));
+      expect(result.turn2PlayRate, equals(1));
+    });
+
+    test('does not count an unexecuted CMC-zero card as a turn play', () {
+      final cards = [
+        {
+          'name': 'Ornamental Zero',
+          'type_line': 'Artifact',
+          'mana_cost': '{0}',
+          'cmc': 0,
+          'oracle_text': 'No mana ability.',
+          'quantity': 1,
+        },
+        ..._generateSpells(6, avgCmc: 4),
+      ];
+
+      final result =
+          GoldfishSimulator(
+            cards,
+            simulations: 1,
+            random: Random(42),
+          ).simulate();
+
+      expect(result.turn1PlayRate, equals(0));
+      expect(result.turn2PlayRate, equals(0));
+      expect(result.turn3PlayRate, equals(0));
+      expect(result.turn4PlayRate, equals(0));
+    });
+
+    test('executes Lotus Petal once only when it unlocks a spell', () {
+      final noPayoffResult =
+          GoldfishSimulator(
+            [
+              {
+                'name': 'Island',
+                'type_line': 'Basic Land — Island',
+                'quantity': 1,
+              },
+              {
+                'name': 'Lotus Petal',
+                'type_line': 'Artifact',
+                'mana_cost': '{0}',
+                'cmc': 0,
+                'oracle_text':
+                    '{T}, Sacrifice Lotus Petal: Add one mana of any color.',
+                'quantity': 1,
+              },
+              ..._generateSpells(5, avgCmc: 5),
+            ],
+            simulations: 1,
+            random: Random(42),
+          ).simulate();
+      expect(noPayoffResult.turn1PlayRate, equals(0));
+
+      final cards = [
+        {'name': 'Island', 'type_line': 'Basic Land — Island', 'quantity': 1},
+        {
+          'name': 'Lotus Petal',
+          'type_line': 'Artifact',
+          'mana_cost': '{0}',
+          'cmc': 0,
+          'oracle_text':
+              '{T}, Sacrifice Lotus Petal: Add one mana of any color.',
+          'quantity': 1,
+        },
+        {
+          'name': 'Two Mana Payoff',
+          'type_line': 'Sorcery',
+          'mana_cost': '{1}{U}',
+          'cmc': 2,
+          'quantity': 1,
+        },
+        ..._generateSpells(4, avgCmc: 5),
+      ];
+
+      final result =
+          GoldfishSimulator(
+            cards,
+            simulations: 1,
+            random: Random(42),
+          ).simulate();
+
+      expect(result.turn1PlayRate, equals(1));
+      expect(result.turn2PlayRate, equals(0));
+    });
+
+    test('Mox Diamond requires a land discard and remains a mana source', () {
+      final noLandCards = [
+        {
+          'name': 'Mox Diamond',
+          'type_line': 'Artifact',
+          'mana_cost': '{0}',
+          'cmc': 0,
+          'quantity': 1,
+        },
+        {
+          'name': 'One Mana Payoff',
+          'type_line': 'Sorcery',
+          'mana_cost': '{W}',
+          'cmc': 1,
+          'quantity': 1,
+        },
+        ..._generateSpells(5, avgCmc: 5),
+      ];
+      final noLandResult =
+          GoldfishSimulator(
+            noLandCards,
+            simulations: 1,
+            random: Random(42),
+          ).simulate();
+      expect(noLandResult.turn1PlayRate, equals(0));
+
+      final noPayoffResult =
+          GoldfishSimulator(
+            [
+              {
+                'name': 'Plains A',
+                'type_line': 'Basic Land — Plains',
+                'quantity': 1,
+              },
+              {
+                'name': 'Plains B',
+                'type_line': 'Basic Land — Plains',
+                'quantity': 1,
+              },
+              {
+                'name': 'Mox Diamond',
+                'type_line': 'Artifact',
+                'mana_cost': '{0}',
+                'cmc': 0,
+                'quantity': 1,
+              },
+              ..._generateSpells(4, avgCmc: 5),
+            ],
+            simulations: 1,
+            random: Random(42),
+          ).simulate();
+      expect(noPayoffResult.turn1PlayRate, equals(0));
+
+      final acceleratedCards = [
+        {'name': 'Plains A', 'type_line': 'Basic Land — Plains', 'quantity': 1},
+        {'name': 'Plains B', 'type_line': 'Basic Land — Plains', 'quantity': 1},
+        {
+          'name': 'Mox Diamond',
+          'type_line': 'Artifact',
+          'mana_cost': '{0}',
+          'cmc': 0,
+          'oracle_text':
+              'If Mox Diamond would enter the battlefield, discard a land card instead.',
+          'quantity': 1,
+        },
+        {
+          'name': 'Two Mana Payoff',
+          'type_line': 'Sorcery',
+          'mana_cost': '{W}{W}',
+          'cmc': 2,
+          'quantity': 1,
+        },
+        ..._generateSpells(3, avgCmc: 5),
+      ];
+      final acceleratedResult =
+          GoldfishSimulator(
+            acceleratedCards,
+            simulations: 1,
+            random: Random(42),
+          ).simulate();
+
+      expect(acceleratedResult.turn1PlayRate, equals(1));
+      expect(acceleratedResult.turn2PlayRate, equals(1));
+    });
+
+    test('models a fetchland as one colored land source, never generic ramp', () {
+      final pollutedDelta = {
+        'name': 'Polluted Delta',
+        'type_line': 'Land',
+        'oracle_text':
+            '{T}, Pay 1 life, Sacrifice this land: Search your library for an Island or Swamp card, put it onto the battlefield, then shuffle.',
+        'quantity': 1,
+      };
+      final colorAccessDeck = [
+        pollutedDelta,
+        {
+          'name': 'Blue One Drop',
+          'type_line': 'Sorcery',
+          'mana_cost': '{U}',
+          'cmc': 1,
+          'quantity': 1,
+        },
+        ..._generateSpells(5, avgCmc: 5),
+      ];
+      final colorAccessResult =
+          GoldfishSimulator(
+            colorAccessDeck,
+            simulations: 1,
+            random: Random(42),
+          ).simulate();
+      expect(colorAccessResult.turn1PlayRate, equals(1));
+      expect(colorAccessResult.landCount, equals(1));
+
+      final noRampDeck = [
+        pollutedDelta,
+        {
+          'name': 'Two Mana Blue Spell',
+          'type_line': 'Sorcery',
+          'mana_cost': '{1}{U}',
+          'cmc': 2,
+          'quantity': 1,
+        },
+        ..._generateSpells(5, avgCmc: 5),
+      ];
+      final noRampResult =
+          GoldfishSimulator(
+            noRampDeck,
+            simulations: 1,
+            random: Random(42),
+          ).simulate();
+      expect(noRampResult.turn1PlayRate, equals(0));
+      expect(noRampResult.turn2PlayRate, equals(0));
+
+      final matchup = MatchupAnalyzer.analyze(noRampDeck, const []);
+      expect(matchup.statsA['land_count'], equals(1));
+      expect(matchup.statsA['ramp_count'], equals(0));
+    });
+
+    test('delays color access when the fetched land enters tapped', () {
+      final cards = [
+        {
+          'name': 'Evolving Wilds',
+          'type_line': 'Land',
+          'oracle_text':
+              '{T}, Sacrifice this land: Search your library for a basic land card, put it onto the battlefield tapped, then shuffle.',
+          'quantity': 1,
+        },
+        {
+          'name': 'Blue One Drop',
+          'type_line': 'Sorcery',
+          'mana_cost': '{U}',
+          'cmc': 1,
+          'quantity': 1,
+        },
+        ..._generateSpells(5, avgCmc: 5),
+      ];
+
+      final result =
+          GoldfishSimulator(
+            cards,
+            simulations: 1,
+            random: Random(42),
+          ).simulate();
 
       expect(result.turn1PlayRate, equals(0));
       expect(result.turn2PlayRate, equals(1));
@@ -277,15 +518,9 @@ void main() {
     });
 
     test('returns stats for both decks', () {
-      final deckA = [
-        ..._generateLands(36),
-        ..._generateSpells(64, avgCmc: 3),
-      ];
+      final deckA = [..._generateLands(36), ..._generateSpells(64, avgCmc: 3)];
 
-      final deckB = [
-        ..._generateLands(36),
-        ..._generateSpells(64, avgCmc: 3),
-      ];
+      final deckB = [..._generateLands(36), ..._generateSpells(64, avgCmc: 3)];
 
       final result = MatchupAnalyzer.analyze(deckA, deckB);
 
@@ -337,49 +572,53 @@ void main() {
 
 List<Map<String, dynamic>> _generateLands(int count) {
   return List.generate(
-      count,
-      (i) => {
-            'name': 'Land $i',
-            'type_line': 'Basic Land',
-            'cmc': 0,
-            'quantity': 1,
-          });
+    count,
+    (i) => {
+      'name': 'Land $i',
+      'type_line': 'Basic Land',
+      'cmc': 0,
+      'quantity': 1,
+    },
+  );
 }
 
 List<Map<String, dynamic>> _generateSpells(int count, {required int avgCmc}) {
   return List.generate(
-      count,
-      (i) => {
-            'name': 'Spell $i',
-            'type_line': 'Instant',
-            'cmc': avgCmc,
-            'oracle_text': 'Do something.',
-            'quantity': 1,
-          });
+    count,
+    (i) => {
+      'name': 'Spell $i',
+      'type_line': 'Instant',
+      'cmc': avgCmc,
+      'oracle_text': 'Do something.',
+      'quantity': 1,
+    },
+  );
 }
 
 List<Map<String, dynamic>> _generateCreatures(int count) {
   return List.generate(
-      count,
-      (i) => {
-            'name': 'Creature $i',
-            'type_line': 'Creature — Human',
-            'cmc': 3,
-            'oracle_text': '',
-            'quantity': 1,
-          });
+    count,
+    (i) => {
+      'name': 'Creature $i',
+      'type_line': 'Creature — Human',
+      'cmc': 3,
+      'oracle_text': '',
+      'quantity': 1,
+    },
+  );
 }
 
 List<Map<String, dynamic>> _generateCardsWithText(int count, String text) {
   return List.generate(
-      count,
-      (i) => {
-            'name': 'Card $i',
-            'type_line': 'Instant',
-            'cmc': 3,
-            'oracle_text': text,
-            'quantity': 1,
-          });
+    count,
+    (i) => {
+      'name': 'Card $i',
+      'type_line': 'Instant',
+      'cmc': 3,
+      'oracle_text': text,
+      'quantity': 1,
+    },
+  );
 }
 
 List<Map<String, dynamic>> _generateTypicalDeck() {

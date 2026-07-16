@@ -9,6 +9,102 @@ import scryfall_classifier
 
 
 class ScryfallClassifierMultiTagTests(unittest.TestCase):
+    def test_external_sacrifice_outlet_classifier_matches_dart_contract(self) -> None:
+        cases = {
+            "Altar of Dementia": (
+                "Sacrifice a creature: Target player mills cards equal to its power.",
+                True,
+            ),
+            "Army Ants": ("{T}, Sacrifice a land: Destroy target land.", True),
+            "Alquist Proft, Master Sleuth": (
+                "When Alquist Proft enters, investigate. (Create a Clue token. "
+                "It's an artifact with \"{2}, Sacrifice this token: Draw a card.\")\n"
+                "{X}{W}{U}{U}, {T}, Sacrifice a Clue: Draw X cards.",
+                True,
+            ),
+            "Angel's Herald": (
+                "{2}{W}, {T}, Sacrifice a green creature, a white creature, and "
+                "a blue creature: Search your library for a card.",
+                True,
+            ),
+            "Baba Lysaga, Night Witch": (
+                "{T}, Sacrifice up to three permanents: Draw three cards.",
+                True,
+            ),
+            "Animal Boneyard": (
+                "Enchant land\nEnchanted land has \"{T}, Sacrifice a creature: "
+                "You gain life equal to its toughness.\"",
+                True,
+            ),
+            "Choice Vessel": (
+                "Sacrifice this artifact or another artifact: Add {C}{C}.",
+                True,
+            ),
+            "Lotus Petal": (
+                "{T}, Sacrifice this artifact: Add one mana of any color.",
+                False,
+            ),
+            "Abandoned Outpost": (
+                "{T}: Add {W}.\n{T}, Sacrifice this land: Add one mana of any color.",
+                False,
+            ),
+            "Arek, False Goldwarden": (
+                "{3}{W}{B}, {T}, Sacrifice Arek, False Goldwarden: Drain X.",
+                False,
+            ),
+            "Adric, Mathematical Genius": (
+                "Ultimate Sacrifice — {1}{U}, Sacrifice Adric: Counter target ability.",
+                False,
+            ),
+            "A-Haywire Mite": (
+                "{G}, Sacrifice Haywire Mite: Exile target artifact.",
+                False,
+            ),
+            "Placeholder Vessel": ("{1}, Sacrifice ~: Draw a card.", False),
+            "Ancestors' Aid": (
+                "Create a Treasure token. (It's an artifact with \"{T}, "
+                "Sacrifice this token: Add one mana of any color.\")",
+                False,
+            ),
+            "Apocalypse Demon": (
+                "At the beginning of your upkeep, tap this creature unless you "
+                "sacrifice another creature.",
+                False,
+            ),
+            "Ashad, the Lone Cyberman": (
+                "This spell has casualty 2. (As you cast it, you may sacrifice a "
+                "creature with power 2 or greater. When you do, copy it.)",
+                False,
+            ),
+            "Village Rites": (
+                "As an additional cost to cast this spell, sacrifice a creature. "
+                "Draw two cards.",
+                False,
+            ),
+            "Alchemist's Talent": (
+                "Treasures you control have \"{T}, Sacrifice this artifact: Add "
+                "two mana of any one color.\"",
+                False,
+            ),
+        }
+
+        for name, (oracle, expected) in cases.items():
+            with self.subTest(name=name):
+                tags = scryfall_classifier.infer_functional_card_tags(
+                    name=name,
+                    type_line="Artifact Creature — Test",
+                    oracle_text=oracle,
+                )
+                outlet_tags = [
+                    tag for tag in tags if tag["tag"] == "sacrifice_outlet"
+                ]
+                self.assertEqual(bool(outlet_tags), expected)
+                if expected:
+                    self.assertEqual(
+                        outlet_tags[0]["evidence"],
+                        "external_activated_sacrifice_outlet_cost",
+                    )
+
     def test_classify_deck_emits_tags_and_functional_tags_json(self) -> None:
         old_fetch_cards = scryfall_classifier.fetch_cards
         try:

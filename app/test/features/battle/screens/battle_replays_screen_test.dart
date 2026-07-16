@@ -155,12 +155,33 @@ void main() {
       find.byKey(const Key('battle-visual-zone-hand-Player A')),
       findsOneWidget,
     );
+    expect(find.byKey(const Key('battle-visual-card-carousel')), findsWidgets);
     expect(
       find.byKey(const Key('battle-visual-card-Arcane Signet')),
       findsOneWidget,
     );
 
-    await tester.tap(find.text('Decisoes'));
+    final arcaneSignetCard = find.byKey(
+      const Key('battle-visual-card-Arcane Signet'),
+    );
+    await tester.ensureVisible(arcaneSignetCard);
+    await tester.pumpAndSettle();
+    await tester.tap(arcaneSignetCard);
+    await tester.pumpAndSettle();
+
+    expect(find.byType(Dialog), findsOneWidget);
+    expect(find.text('Artifact'), findsOneWidget);
+    await tester.tap(find.byTooltip('Fechar'));
+    await tester.pumpAndSettle();
+
+    final decisionsTab = find.text('Decisoes');
+    final detailPane = find.byKey(const Key('battle-replay-detail-pane'));
+    for (var i = 0; i < 4 && decisionsTab.evaluate().isEmpty; i += 1) {
+      await tester.drag(detailPane, const Offset(0, 300));
+      await tester.pumpAndSettle();
+    }
+    expect(decisionsTab, findsOneWidget);
+    await tester.tap(decisionsTab);
     await tester.pumpAndSettle();
 
     expect(find.text('Cast Arcane Signet'), findsOneWidget);

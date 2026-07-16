@@ -42,7 +42,8 @@ Map<String, dynamic> buildBattleLearningEvidence(
 }) {
   final contract = _learningContract(result);
   final learningSchema = contract['schema_version']?.toString();
-  final contractValid = const {
+  final contractValid =
+      const {
         externalBattleLearningSchema,
         nativeBattleLearningSchema,
       }.contains(learningSchema) &&
@@ -66,18 +67,21 @@ Map<String, dynamic> buildBattleLearningEvidence(
       .map((name) => name.trim())
       .where((name) => name.isNotEmpty)
       .toList(growable: false);
-  final focusRows = focus.map((name) {
-    final normalized = _normalizeName(name);
-    final eventTypes = (exposed[normalized] ?? const <String>{}).toList()
-      ..sort();
-    return <String, dynamic>{
-      'card_name': name,
-      'normalized_name': normalized,
-      'positive_exposure': eventTypes.isNotEmpty,
-      'event_types': eventTypes,
-    };
-  }).toList(growable: false);
-  final allFocusExposed = focusRows.isNotEmpty &&
+  final focusRows = focus
+      .map((name) {
+        final normalized = _normalizeName(name);
+        final eventTypes =
+            (exposed[normalized] ?? const <String>{}).toList()..sort();
+        return <String, dynamic>{
+          'card_name': name,
+          'normalized_name': normalized,
+          'positive_exposure': eventTypes.isNotEmpty,
+          'event_types': eventTypes,
+        };
+      })
+      .toList(growable: false);
+  final allFocusExposed =
+      focusRows.isNotEmpty &&
       focusRows.every((row) => row['positive_exposure'] == true);
   final completed = _isCompleted(result);
   final requestedExposureReady =
@@ -153,10 +157,11 @@ bool _isPositiveAction(String eventType) =>
 
 bool _isCompleted(Map<String, dynamic> result) {
   final status = _normalizeName(result['status']);
-  if (const {'completed', 'complete', 'ok', 'success'}.contains(status)) {
-    return true;
-  }
-  return result['winner'] != null && result['error'] == null;
+  final turns = result['turns'];
+  return status == 'completed' &&
+      result['error'] == null &&
+      turns is int &&
+      turns > 0;
 }
 
 String _normalizeName(Object? value) =>

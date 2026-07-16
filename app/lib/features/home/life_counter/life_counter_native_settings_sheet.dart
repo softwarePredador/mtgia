@@ -345,6 +345,7 @@ class _SettingEntryTile extends StatelessWidget {
     switch (entry.kind) {
       case LifeCounterSettingValueKind.toggle:
         return SwitchListTile.adaptive(
+          key: Key('life-counter-setting-${entry.id.name}'),
           contentPadding: EdgeInsets.zero,
           title: Text(
             entry.label,

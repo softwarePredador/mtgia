@@ -2,8 +2,10 @@
 from __future__ import annotations
 
 import argparse
+from contextlib import closing
 import importlib.util
 import json
+import os
 import sqlite3
 import tempfile
 import unittest
@@ -26,6 +28,40 @@ sync_pg = load_module()
 
 
 class SyncBattleCardRulesPgSelectionTests(unittest.TestCase):
+    def test_apply_pg_requires_exact_textual_approval(self) -> None:
+        with mock.patch.dict(os.environ, {}, clear=True):
+            with self.assertRaisesRegex(SystemExit, "explicit approval"):
+                sync_pg.require_pg_write_approval()
+
+        with mock.patch.dict(
+            os.environ,
+            {
+                sync_pg.PG_WRITE_APPROVAL_ENV: sync_pg.PG_WRITE_APPROVAL_PHRASE,
+            },
+            clear=True,
+        ):
+            sync_pg.require_pg_write_approval()
+
+    def test_pg_to_sqlite_branch_does_not_issue_schema_ddl(self) -> None:
+        source = MODULE_PATH.read_text(encoding="utf-8")
+        read_branch = source[
+            source.index("if args.apply_sqlite_from_pg:") : source.index(
+                "output = json.dumps", source.index("if args.apply_sqlite_from_pg:")
+            )
+        ]
+
+        self.assertIn("load_pg_rules", read_branch)
+        self.assertNotIn("ensure_pg_table", read_branch)
+
+    def test_schema_ddl_guard_fails_before_touching_the_cursor(self) -> None:
+        class RejectingCursor:
+            def execute(self, *_args: object, **_kwargs: object) -> None:
+                raise AssertionError("cursor must not be touched without approval")
+
+        with mock.patch.dict(os.environ, {}, clear=True):
+            with self.assertRaisesRegex(SystemExit, "explicit approval"):
+                sync_pg.ensure_pg_table(RejectingCursor())
+
     def test_load_pg_rules_uses_oracle_hash_fallback_for_runtime_overlay(self) -> None:
         class FakeCursor:
             def __init__(self) -> None:
@@ -982,7 +1018,7 @@ class SyncBattleCardRulesPgSelectionTests(unittest.TestCase):
     def test_pg_mirror_preserves_pg_logical_key_and_removes_shadow_rows(self) -> None:
         with tempfile.TemporaryDirectory() as tmpdir:
             sqlite_db = Path(tmpdir) / "knowledge.db"
-            with sqlite3.connect(sqlite_db) as conn:
+            with closing(sqlite3.connect(sqlite_db)) as conn:
                 sync_pg.battle_rule_registry.ensure_battle_card_rules(conn)
                 sync_pg.battle_rule_registry.upsert_battle_card_rule(
                     conn,
@@ -1025,7 +1061,7 @@ class SyncBattleCardRulesPgSelectionTests(unittest.TestCase):
             )
 
             self.assertGreaterEqual(changed, 1)
-            with sqlite3.connect(sqlite_db) as conn:
+            with closing(sqlite3.connect(sqlite_db)) as conn:
                 rows = conn.execute(
                     """
                     SELECT logical_rule_key, source, rule_version
@@ -1041,7 +1077,7 @@ class SyncBattleCardRulesPgSelectionTests(unittest.TestCase):
     def test_pg_mirror_uses_pg_normalized_name_and_removes_split_card_alias_rows(self) -> None:
         with tempfile.TemporaryDirectory() as tmpdir:
             sqlite_db = Path(tmpdir) / "knowledge.db"
-            with sqlite3.connect(sqlite_db) as conn:
+            with closing(sqlite3.connect(sqlite_db)) as conn:
                 sync_pg.battle_rule_registry.ensure_battle_card_rules(conn)
                 sync_pg.battle_rule_registry.upsert_battle_card_rule(
                     conn,
@@ -1082,7 +1118,7 @@ class SyncBattleCardRulesPgSelectionTests(unittest.TestCase):
                 ],
             )
 
-            with sqlite3.connect(sqlite_db) as conn:
+            with closing(sqlite3.connect(sqlite_db)) as conn:
                 rows = conn.execute(
                     """
                     SELECT normalized_name, logical_rule_key
@@ -1152,7 +1188,7 @@ class SyncBattleCardRulesPgSelectionTests(unittest.TestCase):
             )
             payload = json.loads(snapshot_path.read_text(encoding="utf-8"))
 
-            with sqlite3.connect(sqlite_db) as conn:
+            with closing(sqlite3.connect(sqlite_db)) as conn:
                 rows = conn.execute(
                     """
                     SELECT source, review_status, execution_status, effect_json
@@ -1233,7 +1269,7 @@ class SyncBattleCardRulesPgSelectionTests(unittest.TestCase):
     def test_pg_mirror_preserves_existing_sqlite_hash_when_pg_hash_is_missing(self) -> None:
         with tempfile.TemporaryDirectory() as tmpdir:
             sqlite_db = Path(tmpdir) / "knowledge.db"
-            with sqlite3.connect(sqlite_db) as conn:
+            with closing(sqlite3.connect(sqlite_db)) as conn:
                 sync_pg.battle_rule_registry.ensure_battle_card_rules(conn)
                 sync_pg.battle_rule_registry.upsert_battle_card_rule(
                     conn,
@@ -1279,7 +1315,7 @@ class SyncBattleCardRulesPgSelectionTests(unittest.TestCase):
                 ],
             )
 
-            with sqlite3.connect(sqlite_db) as conn:
+            with closing(sqlite3.connect(sqlite_db)) as conn:
                 row = conn.execute(
                     """
                     SELECT oracle_hash
@@ -1294,7 +1330,7 @@ class SyncBattleCardRulesPgSelectionTests(unittest.TestCase):
     def test_lower_priority_pg_row_only_backfills_missing_sqlite_hash(self) -> None:
         with tempfile.TemporaryDirectory() as tmpdir:
             sqlite_db = Path(tmpdir) / "knowledge.db"
-            with sqlite3.connect(sqlite_db) as conn:
+            with closing(sqlite3.connect(sqlite_db)) as conn:
                 sync_pg.battle_rule_registry.ensure_battle_card_rules(conn)
                 sync_pg.battle_rule_registry.upsert_battle_card_rule(
                     conn,
@@ -1340,7 +1376,7 @@ class SyncBattleCardRulesPgSelectionTests(unittest.TestCase):
     def test_pg_mirror_removes_curated_shadow_after_rule_leaves_reviewed_set(self) -> None:
         with tempfile.TemporaryDirectory() as tmpdir:
             sqlite_db = Path(tmpdir) / "knowledge.db"
-            with sqlite3.connect(sqlite_db) as conn:
+            with closing(sqlite3.connect(sqlite_db)) as conn:
                 sync_pg.battle_rule_registry.ensure_battle_card_rules(conn)
                 sync_pg.battle_rule_registry.upsert_battle_card_rule(
                     conn,
@@ -1377,7 +1413,7 @@ class SyncBattleCardRulesPgSelectionTests(unittest.TestCase):
                 reviewed_rows=[],
             )
 
-            with sqlite3.connect(sqlite_db) as conn:
+            with closing(sqlite3.connect(sqlite_db)) as conn:
                 row = conn.execute(
                     """
                     SELECT effect_json, source, confidence, review_status, rule_version, oracle_hash

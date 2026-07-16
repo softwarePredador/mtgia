@@ -1167,7 +1167,8 @@ Riscos restantes:
 ## 2026-05-21 — ManaLoom app icon nrelogo PASS
 
 ### O Porquê
-- O icone oficial do app passou a ser o arquivo fornecido em `nrelogo.png`,
+- O icone oficial do app passou a usar a fonte preservada em
+  `docs/qa/manaloom_app_icon_source_2026-05-21.png`,
   substituindo a marca anterior sem alterar nome exibido, bundle id ou contrato
   app-facing.
 
@@ -1189,8 +1190,8 @@ Riscos restantes:
 
 ### O Porquê
 - A splash oficial do app passou a usar a arte vertical fornecida em
-  `slasharat.png`, garantindo consistencia entre a splash nativa e a primeira
-  tela Flutter.
+  `docs/qa/manaloom_splash_art_source_2026-05-21.png`, garantindo consistencia
+  entre a splash nativa e a primeira tela Flutter.
 
 ### O Como
 - O source foi preservado em

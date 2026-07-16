@@ -188,6 +188,9 @@ class _LifeCounterNativeTurnTrackerSheetState
                         child: Column(
                           children: [
                             SwitchListTile.adaptive(
+                              key: const Key(
+                                'life-counter-native-turn-tracker-auto-high-roll',
+                              ),
                               contentPadding: EdgeInsets.zero,
                               title: const Text(
                                 'Auto high roll',
@@ -211,6 +214,9 @@ class _LifeCounterNativeTurnTrackerSheetState
                               },
                             ),
                             SwitchListTile.adaptive(
+                              key: const Key(
+                                'life-counter-native-turn-tracker-turn-timer',
+                              ),
                               contentPadding: EdgeInsets.zero,
                               title: const Text(
                                 'Turn timer',

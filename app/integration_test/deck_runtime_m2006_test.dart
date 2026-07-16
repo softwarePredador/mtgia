@@ -398,7 +398,11 @@ void main() {
       await tester.tap(registerLink);
       await tester.pump();
 
-      await pumpUntilFound(tester, find.text('Criar Conta'), attempts: 60);
+      await pumpUntilFound(
+        tester,
+        find.byKey(const Key('register-username-field')),
+        attempts: 60,
+      );
 
       final unique = DateTime.now().millisecondsSinceEpoch.toRadixString(16);
       final username = 'iphone15_$unique';

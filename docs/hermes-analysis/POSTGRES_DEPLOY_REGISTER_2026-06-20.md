@@ -15675,3 +15675,24 @@ Register decision:
   exact-scope supported for the seven promoted cards.
 - The next wave must start from the rebuilt post-PG515 queue and choose a new
   exact subpattern; do not reuse the pre-PG515 candidate queue.
+
+## 2026-07-15 - PG869 to PG873 product-data reconciliation
+
+These packages belong to the product-data/deckbuilder stream and do not change
+the XMage exact-scope sequence above. Their state was rechecked directly on the
+new PostgreSQL server on 2026-07-15.
+
+| Package | State | Current postcheck |
+| --- | --- | --- |
+| PG869 product deck function tags | applied | 46 tags, 35 card IDs, 26 normalized names, 0 confidence/tag mismatches |
+| PG870 Goblins legality repair | applied | 100 cards, 1 Commander, 0 illegal/off-color cards |
+| PG871 function-tag false positives | applied | postcheck completed with only the two explicitly retained comparison rows |
+| PG872 semantic-tag false positives | applied | postcheck completed with the expected Bloodstained Mire and Lotus Petal semantic rows |
+| PG873 sacrifice-outlet reconciliation | prepared, not applied | audit tables absent; package remains approval-gated |
+
+Register decision:
+
+- PG869 through PG872 are applied on the new server and must not be rebuilt or
+  replayed.
+- PG873 is not PostgreSQL truth. Its precheck/apply/postcheck/rollback package
+  is retained for a separately approved execution.

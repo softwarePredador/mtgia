@@ -77,10 +77,7 @@ class OptimizeIntensityConfig {
       'selected': selected,
       'requested': requested,
       'source': source,
-      'target_swaps': {
-        'min': targetMin,
-        'max': targetMax,
-      },
+      'target_swaps': {'min': targetMin, 'max': targetMax},
       'quality_gate': {
         'can_reduce_scope': true,
         if (dropped > 0) 'dropped_swaps': dropped,
@@ -214,13 +211,15 @@ Map<String, dynamic> parseOptimizeSuggestions(Map<String, dynamic> payload) {
       final nested = map['swap'] ?? map['change'] ?? map['suggestion'];
       final sourceMap = nested is Map ? nested.cast<dynamic, dynamic>() : map;
 
-      final outRaw = sourceMap['out'] ??
+      final outRaw =
+          sourceMap['out'] ??
           sourceMap['remove'] ??
           sourceMap['from'] ??
           map['out'] ??
           map['remove'] ??
           map['from'];
-      final inRaw = sourceMap['in'] ??
+      final inRaw =
+          sourceMap['in'] ??
           sourceMap['add'] ??
           sourceMap['to'] ??
           map['in'] ??
@@ -249,7 +248,8 @@ Map<String, dynamic> parseOptimizeSuggestions(Map<String, dynamic> payload) {
   if (rawRemovals is List) {
     recognizedFormat = true;
     removals.addAll(
-        rawRemovals.map((e) => e.toString().trim()).where((e) => e.isNotEmpty));
+      rawRemovals.map((e) => e.toString().trim()).where((e) => e.isNotEmpty),
+    );
   } else if (rawRemovals is String && rawRemovals.trim().isNotEmpty) {
     recognizedFormat = true;
     removals.add(rawRemovals.trim());
@@ -259,9 +259,9 @@ Map<String, dynamic> parseOptimizeSuggestions(Map<String, dynamic> payload) {
 
   if (rawAdditions is List) {
     recognizedFormat = true;
-    additions.addAll(rawAdditions
-        .map((e) => e.toString().trim())
-        .where((e) => e.isNotEmpty));
+    additions.addAll(
+      rawAdditions.map((e) => e.toString().trim()).where((e) => e.isNotEmpty),
+    );
   } else if (rawAdditions is String && rawAdditions.trim().isNotEmpty) {
     recognizedFormat = true;
     additions.add(rawAdditions.trim());
@@ -281,47 +281,58 @@ Map<String, dynamic> buildDeterministicOptimizeResponse({
   required String targetArchetype,
   OptimizeIntensityConfig? intensity,
 }) {
-  final swaps = deterministicSwapCandidates
-      .where((candidate) =>
-          (candidate['remove']?.toString().trim().isNotEmpty ?? false) &&
-          (candidate['add']?.toString().trim().isNotEmpty ?? false))
-      .map((candidate) {
-    final sources = candidate['candidate_quality_sources'] is List
-        ? (candidate['candidate_quality_sources'] as List)
-            .map((source) => source.toString())
-            .toSet()
-        : const <String>{};
-    final semanticNote = sources.contains(semanticLayerV2Source)
-        ? ' Sinal semântico v2 em shadow mode ajudou o ranking; gates legados continuam valendo.'
-        : '';
-    return {
-      'out': candidate['remove'],
-      'in': candidate['add'],
-      'reason':
-          '${candidate['reason'] ?? 'swap deterministico por funcao'}$semanticNote',
-      'role': candidate['remove_role'] ?? candidate['role'] ?? 'utility',
-      'function': candidate['remove_role'] ?? candidate['role'] ?? 'utility',
-      'priority': intensity?.selected == 'light' ? 'Medium' : 'High',
-      'impact': intensity?.selected == 'aggressive'
-          ? 'maior escopo de melhoria preservando gates'
-          : 'melhoria segura de consistencia',
-      'risk': intensity?.selected == 'aggressive' ? 'medium' : 'low',
-      if (candidate['candidate_quality_score'] != null)
-        'candidate_quality_score': candidate['candidate_quality_score'],
-      if (candidate['candidate_quality_signal'] != null)
-        'candidate_quality_signal': candidate['candidate_quality_signal'],
-      if (candidate['candidate_quality_sources'] != null)
-        'candidate_quality_sources': candidate['candidate_quality_sources'],
-      if (candidate['collection_match'] != null)
-        'collection_match': candidate['collection_match'],
-      if (candidate['owned_quantity'] != null)
-        'owned_quantity': candidate['owned_quantity'],
-      if (candidate['purchase_required'] != null)
-        'purchase_required': candidate['purchase_required'],
-      if (candidate['estimated_price_brl'] != null)
-        'estimated_price_brl': candidate['estimated_price_brl'],
-    };
-  }).toList();
+  final swaps =
+      deterministicSwapCandidates
+          .where(
+            (candidate) =>
+                (candidate['remove']?.toString().trim().isNotEmpty ?? false) &&
+                (candidate['add']?.toString().trim().isNotEmpty ?? false),
+          )
+          .map((candidate) {
+            final sources =
+                candidate['candidate_quality_sources'] is List
+                    ? (candidate['candidate_quality_sources'] as List)
+                        .map((source) => source.toString())
+                        .toSet()
+                    : const <String>{};
+            final semanticNote =
+                sources.contains(semanticLayerV2Source)
+                    ? ' Sinal semântico v2 em shadow mode ajudou o ranking; gates legados continuam valendo.'
+                    : '';
+            return {
+              'out': candidate['remove'],
+              'in': candidate['add'],
+              'reason':
+                  '${candidate['reason'] ?? 'swap deterministico por funcao'}$semanticNote',
+              'role':
+                  candidate['remove_role'] ?? candidate['role'] ?? 'utility',
+              'function':
+                  candidate['remove_role'] ?? candidate['role'] ?? 'utility',
+              'priority': intensity?.selected == 'light' ? 'Medium' : 'High',
+              'impact':
+                  intensity?.selected == 'aggressive'
+                      ? 'maior escopo de melhoria preservando gates'
+                      : 'melhoria segura de consistencia',
+              'risk': intensity?.selected == 'aggressive' ? 'medium' : 'low',
+              if (candidate['candidate_quality_score'] != null)
+                'candidate_quality_score': candidate['candidate_quality_score'],
+              if (candidate['candidate_quality_signal'] != null)
+                'candidate_quality_signal':
+                    candidate['candidate_quality_signal'],
+              if (candidate['candidate_quality_sources'] != null)
+                'candidate_quality_sources':
+                    candidate['candidate_quality_sources'],
+              if (candidate['collection_match'] != null)
+                'collection_match': candidate['collection_match'],
+              if (candidate['owned_quantity'] != null)
+                'owned_quantity': candidate['owned_quantity'],
+              if (candidate['purchase_required'] != null)
+                'purchase_required': candidate['purchase_required'],
+              if (candidate['estimated_price_brl'] != null)
+                'estimated_price_brl': candidate['estimated_price_brl'],
+            };
+          })
+          .toList();
 
   return {
     'mode': 'optimize',
@@ -382,29 +393,31 @@ Map<String, dynamic> summarizeAggressiveOptimizeUtilitySamples({
       .where((sample) => sample['eligible'] != false)
       .toList(growable: false);
   final total = eligible.length;
-  final applicable = eligible.where((sample) {
-    final swaps = sample['returned_swaps'];
-    if (swaps is int) return swaps > 0;
-    final diagnostics = sample['aggressive_candidate_quality'];
-    if (diagnostics is Map) {
-      final returned = diagnostics['returned_swaps'];
-      return returned is int && returned > 0;
-    }
-    final rawSwaps = sample['swaps'];
-    return rawSwaps is List && rawSwaps.isNotEmpty;
-  }).length;
+  final applicable =
+      eligible.where((sample) {
+        final swaps = sample['returned_swaps'];
+        if (swaps is int) return swaps > 0;
+        final diagnostics = sample['aggressive_candidate_quality'];
+        if (diagnostics is Map) {
+          final returned = diagnostics['returned_swaps'];
+          return returned is int && returned > 0;
+        }
+        final rawSwaps = sample['swaps'];
+        return rawSwaps is List && rawSwaps.isNotEmpty;
+      }).length;
   final noOp = total - applicable;
   final rate = total == 0 ? 0 : ((applicable * 100) / total).round();
 
-  final latencies = eligible
-      .map((sample) => sample['latency_ms'])
-      .whereType<int>()
-      .toList()
-    ..sort();
-  final p95 = latencies.isEmpty
-      ? null
-      : latencies[((latencies.length * 0.95).ceil() - 1)
-          .clamp(0, latencies.length - 1)];
+  final latencies =
+      eligible.map((sample) => sample['latency_ms']).whereType<int>().toList()
+        ..sort();
+  final p95 =
+      latencies.isEmpty
+          ? null
+          : latencies[((latencies.length * 0.95).ceil() - 1).clamp(
+            0,
+            latencies.length - 1,
+          )];
 
   return {
     'eligible_samples': total,
@@ -455,20 +468,36 @@ Map<String, dynamic> buildOptimizeRecommendationDetail({
   final isBasicLand = basic_lands.isBasicLandName(name);
   final resolvedPriority = priority ?? (type == 'add' ? 'High' : 'Medium');
   final resolvedRisk = risk ?? (keepTheme ? 'low' : 'medium');
-  final resolvedRole = (functionalRole == null || functionalRole.trim().isEmpty)
-      ? 'utility'
-      : functionalRole.trim();
-  final resolvedRoles = (functionalRoles == null || functionalRoles.isEmpty)
-      ? <String>[resolvedRole]
-      : (functionalRoles
-          .map((role) => role.trim())
-          .where((role) => role.isNotEmpty)
-          .toSet()
-          .toList()
-        ..sort());
+  final resolvedRole =
+      (functionalRole == null || functionalRole.trim().isEmpty)
+          ? 'utility'
+          : functionalRole.trim();
+  final resolvedRoles =
+      (functionalRoles == null || functionalRoles.isEmpty)
+          ? <String>[resolvedRole]
+          : (functionalRoles
+              .map((role) => role.trim())
+              .where((role) => role.isNotEmpty)
+              .toSet()
+              .toList()
+            ..sort());
   final explanation = _buildOptimizeRecommendationExplanation(
     type: type,
     action: action,
+    name: name,
+    targetArchetype: targetArchetype,
+    confidenceLevel: confidenceLevel,
+    confidenceScore: confidenceScore,
+    curveDelta: curveDelta,
+    keepTheme: keepTheme,
+    role: resolvedRole,
+    roles: resolvedRoles,
+    priority: resolvedPriority,
+    risk: resolvedRisk,
+    isBasicLand: isBasicLand,
+  );
+  final playerFacing = _buildPlayerFacingOptimizeDecision(
+    type: type,
     name: name,
     targetArchetype: targetArchetype,
     confidenceLevel: confidenceLevel,
@@ -496,10 +525,9 @@ Map<String, dynamic> buildOptimizeRecommendationDetail({
     'risk': resolvedRisk,
     'reason': explanation['summary'],
     'explanation': explanation,
-    'confidence': {
-      'level': confidenceLevel,
-      'score': confidenceScore,
-    },
+    'player_facing': playerFacing,
+    'battle_validation': _pendingBattleValidation(),
+    'confidence': {'level': confidenceLevel, 'score': confidenceScore},
     'impact_estimate': {
       'curve': 'ΔCMC $curveDelta',
       'consistency': keepTheme ? 'alta' : 'média',
@@ -508,6 +536,176 @@ Map<String, dynamic> buildOptimizeRecommendationDetail({
       'risk': resolvedRisk,
     },
   };
+}
+
+Map<String, dynamic> buildOptimizeDecisionContract({
+  required String mode,
+  required String targetArchetype,
+  required String intensity,
+  required bool keepTheme,
+  required int additionCount,
+  required int removalCount,
+}) {
+  final archetype =
+      targetArchetype.trim().isEmpty
+          ? 'plano escolhido'
+          : targetArchetype.trim();
+  final pairedSelectionRequired = mode.trim().toLowerCase() == 'optimize';
+  return {
+    'schema_version': 'optimize_decision_contract_v1_2026-07-07',
+    'mode': mode,
+    'target_archetype': archetype,
+    'intensity': intensity,
+    'deckbuilder_validation': {
+      'status': 'passed_preview_gate',
+      'label': 'Preview seguro',
+      'message':
+          'As trocas passaram por identidade de cor, limite de cópias, curva e função antes de aparecerem aqui.',
+    },
+    'battle_validation': _pendingBattleValidation(),
+    'user_decision': {
+      'preview_required': true,
+      'can_select_individual_changes': true,
+      'selection_unit':
+          pairedSelectionRequired ? 'paired_swap' : 'individual_addition',
+      'paired_selection_required': pairedSelectionRequired,
+      'changes_are_not_applied_automatically': true,
+      'addition_count': additionCount,
+      'removal_count': removalCount,
+      'theme_preserved': keepTheme,
+    },
+  };
+}
+
+Map<String, dynamic> _pendingBattleValidation() {
+  return {
+    'status': 'pending_after_apply',
+    'label': 'Battle pendente',
+    'message':
+        'A troca foi aprovada pelo deckbuilder. Rode playtest, battle ou replay depois de aplicar para validar desempenho real em mesa.',
+  };
+}
+
+Map<String, dynamic> _buildPlayerFacingOptimizeDecision({
+  required String type,
+  required String name,
+  required String targetArchetype,
+  required String confidenceLevel,
+  required double confidenceScore,
+  required String curveDelta,
+  required bool keepTheme,
+  required String role,
+  required List<String> roles,
+  required String priority,
+  required String risk,
+  required bool isBasicLand,
+}) {
+  final archetype =
+      targetArchetype.trim().isEmpty
+          ? 'plano escolhido'
+          : targetArchetype.trim();
+  final action = type == 'add' ? 'Adicionar' : 'Remover';
+  final roleLabel = _playerFacingRoleLabel(role);
+  final riskLabel = _playerFacingRiskLabel(risk);
+  final priorityLabel = _playerFacingPriorityLabel(priority);
+  final confidencePercent = (confidenceScore * 100).round();
+  final summary =
+      type == 'add'
+          ? '$action $name para reforçar $roleLabel no plano $archetype.'
+          : '$action $name para abrir espaço sem perder o plano $archetype.';
+
+  return {
+    'schema_version': 'player_facing_optimize_decision_v1_2026-07-07',
+    'title': '$action $name',
+    'summary': summary,
+    'primary_role_label': roleLabel,
+    'decision_label': type == 'add' ? 'Entrada sugerida' : 'Saída sugerida',
+    'confidence_label': '$confidenceLevel ($confidencePercent%)',
+    'priority_label': priorityLabel,
+    'risk_label': riskLabel,
+    'curve_label': 'Curva ${curveDelta.startsWith('-') ? '' : '+'}$curveDelta',
+    'theme_label':
+        keepTheme ? 'Preserva o plano atual' : 'Pode mudar o plano do deck',
+    'why': [
+      type == 'add'
+          ? 'Ajuda o deck a executar melhor a função $roleLabel.'
+          : 'Tem menor prioridade para o plano atual e pode virar espaço de upgrade.',
+      'Impacto estimado na curva: ${curveDelta.startsWith('-') ? '' : '+'}$curveDelta de CMC médio.',
+      keepTheme
+          ? 'Mantém a direção estratégica escolhida.'
+          : 'Precisa de revisão porque pode alterar o estilo de jogo.',
+      if (roles.length > 1)
+        'Também conversa com: ${roles.map(_playerFacingRoleLabel).toSet().join(', ')}.',
+      if (isBasicLand) 'Respeita regra especial de terreno básico.',
+    ],
+  };
+}
+
+String _playerFacingRoleLabel(String role) {
+  switch (role.trim().toLowerCase()) {
+    case 'ramp':
+    case 'mana':
+    case 'mana_ramp':
+      return 'aceleração de mana';
+    case 'draw':
+    case 'card_draw':
+    case 'card_advantage':
+      return 'compra e vantagem de cartas';
+    case 'interaction':
+    case 'removal':
+    case 'spot_removal':
+      return 'interação';
+    case 'wipe':
+    case 'board_wipe':
+    case 'sweeper':
+      return 'limpeza de mesa';
+    case 'protection':
+      return 'proteção';
+    case 'win_condition':
+    case 'finisher':
+      return 'condição de vitória';
+    case 'land':
+    case 'lands':
+      return 'base de mana';
+    case 'tutor':
+      return 'busca de peças';
+    default:
+      return role.trim().isEmpty ? 'consistência do deck' : role.trim();
+  }
+}
+
+String _playerFacingRiskLabel(String risk) {
+  switch (risk.trim().toLowerCase()) {
+    case 'low':
+    case 'baixo':
+      return 'baixo risco';
+    case 'medium':
+    case 'medio':
+    case 'médio':
+      return 'risco moderado';
+    case 'high':
+    case 'alto':
+      return 'alto risco';
+    default:
+      return risk.trim().isEmpty ? 'risco revisável' : risk.trim();
+  }
+}
+
+String _playerFacingPriorityLabel(String priority) {
+  switch (priority.trim().toLowerCase()) {
+    case 'high':
+    case 'alta':
+      return 'prioridade alta';
+    case 'medium':
+    case 'media':
+    case 'média':
+      return 'prioridade média';
+    case 'low':
+    case 'baixa':
+      return 'prioridade baixa';
+    default:
+      return priority.trim().isEmpty ? 'prioridade sugerida' : priority.trim();
+  }
 }
 
 Map<String, dynamic> _buildOptimizeRecommendationExplanation({
@@ -525,9 +723,10 @@ Map<String, dynamic> _buildOptimizeRecommendationExplanation({
   required String risk,
   required bool isBasicLand,
 }) {
-  final archetype = targetArchetype.trim().isEmpty
-      ? 'plano escolhido'
-      : targetArchetype.trim();
+  final archetype =
+      targetArchetype.trim().isEmpty
+          ? 'plano escolhido'
+          : targetArchetype.trim();
   final summary =
       'Sugestão de $action para $archetype: ${_actionReason(type, role)}';
   final evidence = <String>[
@@ -547,10 +746,7 @@ Map<String, dynamic> _buildOptimizeRecommendationExplanation({
     'card_name': name,
     'target_archetype': archetype,
     'why': evidence,
-    'confidence': {
-      'level': confidenceLevel,
-      'score': confidenceScore,
-    },
+    'confidence': {'level': confidenceLevel, 'score': confidenceScore},
     'safety': {
       'priority': priority,
       'risk': risk,

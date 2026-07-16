@@ -111,6 +111,14 @@ class MasterOptimizerHashTests(unittest.TestCase):
         self.assertIn("baseline_semantics_hash", slot_columns)
         self.assertIn("baseline_ruleset_hash", slot_columns)
 
+    def test_shared_connect_context_closes_sqlite_handle(self) -> None:
+        db_path = Path(self.tmpdir.name) / "closing-context.db"
+        with optimizer.connect(db_path) as conn:
+            conn.execute("CREATE TABLE close_probe (id INTEGER)")
+
+        with self.assertRaisesRegex(sqlite3.ProgrammingError, "closed database"):
+            conn.execute("SELECT 1")
+
     def test_semantic_only_change_invalidates_semantic_baseline_not_deck_hash(self) -> None:
         baseline = self._insert_baseline()
         before_deck_hash = optimizer.deck_hash(self.conn, 6)
@@ -395,6 +403,57 @@ class MasterOptimizerHashTests(unittest.TestCase):
                 self.assertTrue(any("mandatory_divergences" in blocker for blocker in blockers))
                 with self.assertRaisesRegex(RuntimeError, "Optimizer battle gate blocked"):
                     optimizer.require_battle_gate_for_optimizer(summary)
+
+    def test_optimizer_battle_gate_fails_closed_for_explicit_malformed_summary(self) -> None:
+        with mock.patch.object(
+            optimizer,
+            "load_battle_gate_summary",
+            return_value={
+                "battle_replay_final_status": "trusted_for_strategy_learning",
+                "mandatory_gate_divergences": [],
+            },
+        ) as fallback_loader:
+            empty_blockers = optimizer.battle_gate_optimizer_blockers({})
+
+        fallback_loader.assert_not_called()
+        self.assertIn(
+            "battle_gate_not_trusted_for_strategy_learning:unknown",
+            empty_blockers,
+        )
+        self.assertIn(
+            "battle_gate_mandatory_divergences_missing",
+            empty_blockers,
+        )
+
+        missing_divergences = {
+            "battle_replay_final_status": "trusted_for_strategy_learning",
+        }
+        invalid_divergences = {
+            "battle_replay_final_status": "trusted_for_strategy_learning",
+            "mandatory_gate_divergences": "none",
+        }
+        self.assertIn(
+            "battle_gate_mandatory_divergences_missing",
+            optimizer.battle_gate_optimizer_blockers(missing_divergences),
+        )
+        self.assertIn(
+            "battle_gate_mandatory_divergences_invalid",
+            optimizer.battle_gate_optimizer_blockers(invalid_divergences),
+        )
+        with self.assertRaisesRegex(RuntimeError, "Optimizer battle gate blocked"):
+            optimizer.require_battle_gate_for_optimizer(missing_divergences)
+
+    def test_explicit_empty_summary_is_rendered_without_latest_fallback(self) -> None:
+        with mock.patch.object(
+            optimizer,
+            "load_battle_gate_summary",
+            side_effect=AssertionError("explicit summary must not load latest"),
+        ):
+            report = "\n".join(optimizer.battle_gate_report_lines({}))
+            cli = "\n".join(optimizer.battle_gate_cli_lines({}))
+
+        self.assertIn("battle_replay_final_status: `unknown`", report)
+        self.assertIn("battle_replay_final_status=unknown", cli)
 
     def test_optimizer_operational_surfaces_publish_battle_gate(self) -> None:
         report_scripts = [

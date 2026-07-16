@@ -7,29 +7,31 @@ import '../lib/openai_runtime_config.dart';
 
 void main() {
   group('AI generate performance support', () {
-    test('builds stable cache keys from normalized prompt format and bracket',
-        () {
-      final first = buildAiGenerateCacheKey(
-        prompt: '  Mono   Red Aggro  ',
-        format: 'STANDARD',
-        bracket: 2,
-      );
-      final second = buildAiGenerateCacheKey(
-        prompt: 'mono red aggro',
-        format: 'standard',
-        bracket: '2',
-      );
-      final differentBracket = buildAiGenerateCacheKey(
-        prompt: 'mono red aggro',
-        format: 'standard',
-        bracket: 3,
-      );
+    test(
+      'builds stable cache keys from normalized prompt format and bracket',
+      () {
+        final first = buildAiGenerateCacheKey(
+          prompt: '  Mono   Red Aggro  ',
+          format: 'STANDARD',
+          bracket: 2,
+        );
+        final second = buildAiGenerateCacheKey(
+          prompt: 'mono red aggro',
+          format: 'standard',
+          bracket: '2',
+        );
+        final differentBracket = buildAiGenerateCacheKey(
+          prompt: 'mono red aggro',
+          format: 'standard',
+          bracket: 3,
+        );
 
-      expect(first, equals(second));
-      expect(first, isNot(equals(differentBracket)));
-      expect(first, startsWith('ai_generate:v1:'));
-      expect(first, isNot(contains('mono red')));
-    });
+        expect(first, equals(second));
+        expect(first, isNot(equals(differentBracket)));
+        expect(first, startsWith('ai_generate:v2:'));
+        expect(first, isNot(contains('mono red')));
+      },
+    );
 
     test('omits commander profile material unless explicitly supplied', () {
       final legacy = buildAiGenerateCacheKey(
@@ -78,7 +80,7 @@ void main() {
       );
 
       expect(v5, isNot(equals(v4)));
-      expect(v5, startsWith('ai_generate:v1:'));
+      expect(v5, startsWith('ai_generate:v2:'));
     });
 
     test('returns cache hits as cloned payloads with cache metadata', () {
@@ -125,7 +127,9 @@ void main() {
       expect(isAiGenerateAsyncRequested({'async': 'true'}), isTrue);
       expect(isAiGenerateAsyncRequested({'profile': 'async'}), isTrue);
       expect(
-          isAiGenerateAsyncRequested({'response_mode': 'background'}), isTrue);
+        isAiGenerateAsyncRequested({'response_mode': 'background'}),
+        isTrue,
+      );
     });
 
     test('strips async-only flags before background sync execution', () {
@@ -146,22 +150,24 @@ void main() {
       expect(payload.containsKey('response_mode'), isFalse);
     });
 
-    test('keeps legacy generate timeout when reference guidance is inactive',
-        () {
-      final config = OpenAiRuntimeConfig(
-        DotEnv()..addAll({'ENVIRONMENT': 'staging'}),
-      );
+    test(
+      'keeps legacy generate timeout when reference guidance is inactive',
+      () {
+        final config = OpenAiRuntimeConfig(
+          DotEnv()..addAll({'ENVIRONMENT': 'staging'}),
+        );
 
-      final selection = selectAiGenerateOpenAiTimeout(
-        config: config,
-        normalizedFormat: 'commander',
-        referenceGuidanceEnabled: false,
-      );
+        final selection = selectAiGenerateOpenAiTimeout(
+          config: config,
+          normalizedFormat: 'commander',
+          referenceGuidanceEnabled: false,
+        );
 
-      expect(selection.timeout, equals(const Duration(seconds: 8)));
-      expect(selection.envKey, equals('OPENAI_TIMEOUT_GENERATE_SECONDS'));
-      expect(selection.referenceGuidanceBudget, isFalse);
-    });
+        expect(selection.timeout, equals(const Duration(seconds: 8)));
+        expect(selection.envKey, equals('OPENAI_TIMEOUT_GENERATE_SECONDS'));
+        expect(selection.referenceGuidanceBudget, isFalse);
+      },
+    );
 
     test('uses larger default timeout for Commander reference guidance', () {
       final config = OpenAiRuntimeConfig(
@@ -184,11 +190,10 @@ void main() {
 
     test('does not use reference timeout outside Commander or Brawl', () {
       final config = OpenAiRuntimeConfig(
-        DotEnv()
-          ..addAll({
-            'ENVIRONMENT': 'staging',
-            'OPENAI_TIMEOUT_GENERATE_REFERENCE_SECONDS': '20',
-          }),
+        DotEnv()..addAll({
+          'ENVIRONMENT': 'staging',
+          'OPENAI_TIMEOUT_GENERATE_REFERENCE_SECONDS': '20',
+        }),
       );
 
       final selection = selectAiGenerateOpenAiTimeout(
@@ -203,18 +208,16 @@ void main() {
 
     test('honors bounded explicit reference timeout override', () {
       final lowConfig = OpenAiRuntimeConfig(
-        DotEnv()
-          ..addAll({
-            'ENVIRONMENT': 'production',
-            'OPENAI_TIMEOUT_GENERATE_REFERENCE_SECONDS': '2',
-          }),
+        DotEnv()..addAll({
+          'ENVIRONMENT': 'production',
+          'OPENAI_TIMEOUT_GENERATE_REFERENCE_SECONDS': '2',
+        }),
       );
       final highConfig = OpenAiRuntimeConfig(
-        DotEnv()
-          ..addAll({
-            'ENVIRONMENT': 'production',
-            'OPENAI_TIMEOUT_GENERATE_REFERENCE_SECONDS': '120',
-          }),
+        DotEnv()..addAll({
+          'ENVIRONMENT': 'production',
+          'OPENAI_TIMEOUT_GENERATE_REFERENCE_SECONDS': '120',
+        }),
       );
 
       expect(
@@ -263,10 +266,11 @@ void main() {
       expect(json['cache_key'], equals('ai_generate:v1:hash'));
       expect(json['result_status_code'], equals(200));
       expect(
-          json['result'],
-          equals({
-            'validation': {'is_valid': true}
-          }));
+        json['result'],
+        equals({
+          'validation': {'is_valid': true},
+        }),
+      );
     });
   });
 }

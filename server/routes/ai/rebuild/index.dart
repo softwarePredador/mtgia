@@ -38,11 +38,13 @@ Future<Response> onRequest(RequestContext context) async {
   final bracketRaw = body['bracket'];
   final bracket =
       bracketRaw is int ? bracketRaw : int.tryParse('${bracketRaw ?? ''}');
-  final mustKeep = (body['must_keep'] as List?)
+  final mustKeep =
+      (body['must_keep'] as List?)
           ?.map((entry) => entry.toString())
           .toList(growable: false) ??
       const <String>[];
-  final mustAvoid = (body['must_avoid'] as List?)
+  final mustAvoid =
+      (body['must_avoid'] as List?)
           ?.map((entry) => entry.toString())
           .toList(growable: false) ??
       const <String>[];
@@ -72,10 +74,7 @@ Future<Response> onRequest(RequestContext context) async {
         WHERE d.id = @deckId AND d.user_id = @userId
         LIMIT 1
       '''),
-      parameters: {
-        'deckId': deckId,
-        'userId': userId,
-      },
+      parameters: {'deckId': deckId, 'userId': userId},
     );
 
     if (deckResult.isEmpty) {
@@ -119,7 +118,7 @@ Future<Response> onRequest(RequestContext context) async {
             0
           )::double precision AS cmc,
           COALESCE(c.oracle_text, '') AS oracle_text,
-          COALESCE(c.color_identity, ARRAY[]::text[]) AS color_identity
+          c.color_identity AS color_identity
         FROM deck_cards dc
         JOIN cards c ON c.id = dc.card_id
         WHERE dc.deck_id = @deckId
@@ -132,40 +131,41 @@ Future<Response> onRequest(RequestContext context) async {
       return badRequest('Deck has no cards to rebuild.');
     }
 
-    final originalDeck = cardsResult
-        .map(
-          (row) => <String, dynamic>{
-            'card_id': row[0] as String,
-            'quantity': row[1] as int,
-            'is_commander': row[2] as bool? ?? false,
-            'name': row[3] as String? ?? '',
-            'type_line': row[4] as String? ?? '',
-            'mana_cost': row[5] as String? ?? '',
-            'colors': (row[6] as List?)?.cast<String>() ?? const <String>[],
-            'cmc': (row[7] as num?)?.toDouble() ?? 0.0,
-            'oracle_text': row[8] as String? ?? '',
-            'color_identity':
-                (row[9] as List?)?.cast<String>() ?? const <String>[],
-          },
-        )
-        .toList();
+    final originalDeck =
+        cardsResult
+            .map(
+              (row) => <String, dynamic>{
+                'card_id': row[0] as String,
+                'quantity': row[1] as int,
+                'is_commander': row[2] as bool? ?? false,
+                'name': row[3] as String? ?? '',
+                'type_line': row[4] as String? ?? '',
+                'mana_cost': row[5] as String? ?? '',
+                'colors': (row[6] as List?)?.cast<String>() ?? const <String>[],
+                'cmc': (row[7] as num?)?.toDouble() ?? 0.0,
+                'oracle_text': row[8] as String? ?? '',
+                'color_identity': (row[9] as List?)?.cast<String>(),
+              },
+            )
+            .toList();
 
-    final commanders = originalDeck
-        .where((card) => card['is_commander'] == true)
-        .map((card) => card['name']?.toString() ?? '')
-        .where((name) => name.trim().isNotEmpty)
-        .toList();
+    final commanders =
+        originalDeck
+            .where((card) => card['is_commander'] == true)
+            .map((card) => card['name']?.toString() ?? '')
+            .where((name) => name.trim().isNotEmpty)
+            .toList();
     if (commanders.isEmpty) {
       return badRequest('Deck commander is required for rebuild_guided.');
     }
 
     final commanderColorIdentity = <String>{};
-    for (final card
-        in originalDeck.where((card) => card['is_commander'] == true)) {
+    for (final card in originalDeck.where(
+      (card) => card['is_commander'] == true,
+    )) {
       commanderColorIdentity.addAll(
         resolveCardColorIdentity(
-          colorIdentity:
-              (card['color_identity'] as List?)?.cast<String>() ?? const [],
+          colorIdentity: (card['color_identity'] as List?)?.cast<String>(),
           colors: (card['colors'] as List?)?.cast<String>() ?? const [],
           manaCost: card['mana_cost']?.toString(),
           oracleText: card['oracle_text']?.toString(),
@@ -216,10 +216,11 @@ Future<Response> onRequest(RequestContext context) async {
             (card['colors'] as List?)?.cast<String>() ?? const <String>[],
           );
         }
-        responseDeckAnalysis = DeckArchetypeAnalyzer(
-          persistedCards,
-          deckColors.toList(),
-        ).generateAnalysis();
+        responseDeckAnalysis =
+            DeckArchetypeAnalyzer(
+              persistedCards,
+              deckColors.toList(),
+            ).generateAnalysis();
         responseDeckState = assessDeckOptimizationState(
           cards: persistedCards,
           deckAnalysis: responseDeckAnalysis,
@@ -281,16 +282,17 @@ Future<Response> onRequest(RequestContext context) async {
         },
         'warnings': rebuildResult.warnings,
         'source_summary': rebuildResult.sourceSummary,
-        'rebuilt_cards': rebuildResult.rebuiltCards
-            .map(
-              (card) => {
-                'card_id': card['card_id'],
-                'name': card['name'],
-                'quantity': card['quantity'],
-                'is_commander': card['is_commander'] ?? false,
-              },
-            )
-            .toList(),
+        'rebuilt_cards':
+            rebuildResult.rebuiltCards
+                .map(
+                  (card) => {
+                    'card_id': card['card_id'],
+                    'name': card['name'],
+                    'quantity': card['quantity'],
+                    'is_commander': card['is_commander'] ?? false,
+                  },
+                )
+                .toList(),
         'next_action': {
           'type': 'review_rebuild_draft',
           'applied_to_original': false,
@@ -301,10 +303,7 @@ Future<Response> onRequest(RequestContext context) async {
   } on RebuildException catch (e) {
     return Response.json(
       statusCode: HttpStatus.unprocessableEntity,
-      body: {
-        'error': e.message,
-        'outcome_code': 'rebuild_failed',
-      },
+      body: {'error': e.message, 'outcome_code': 'rebuild_failed'},
     );
   } on DeckRulesException catch (e) {
     return Response.json(
@@ -349,7 +348,7 @@ Future<List<Map<String, dynamic>>> _loadDeckCards({
           0
         )::double precision AS cmc,
         COALESCE(c.oracle_text, '') AS oracle_text,
-        COALESCE(c.color_identity, ARRAY[]::text[]) AS color_identity
+        c.color_identity AS color_identity
       FROM deck_cards dc
       JOIN cards c ON c.id = dc.card_id
       WHERE dc.deck_id = @deckId
@@ -370,8 +369,7 @@ Future<List<Map<String, dynamic>>> _loadDeckCards({
           'colors': (row[6] as List?)?.cast<String>() ?? const <String>[],
           'cmc': (row[7] as num?)?.toDouble() ?? 0.0,
           'oracle_text': row[8] as String? ?? '',
-          'color_identity':
-              (row[9] as List?)?.cast<String>() ?? const <String>[],
+          'color_identity': (row[9] as List?)?.cast<String>(),
         },
       )
       .toList();

@@ -20,32 +20,51 @@ Set<String> normalizeColorIdentity(Iterable<String> identity) {
 
 Set<String> extractColorIdentityFromText(String? text) {
   if (text == null || text.trim().isEmpty) return <String>{};
-  final sanitized = text.split('\n').map((line) {
-    final trimmed = line.trim();
-    if (trimmed.startsWith('(') && trimmed.endsWith(')')) {
-      return trimmed;
-    }
-    return line.replaceAll(RegExp(r'\([^)]*\)'), '');
-  }).join('\n');
-  final symbols = RegExp(r'\{([^}]+)\}')
-      .allMatches(sanitized)
-      .map((match) => match.group(1) ?? '')
-      .toList();
+  final sanitized = _removeParentheticalText(text);
+  final symbols =
+      RegExp(
+        r'\{([^}]+)\}',
+      ).allMatches(sanitized).map((match) => match.group(1) ?? '').toList();
   return normalizeColorIdentity(symbols);
 }
 
 Set<String> resolveCardColorIdentity({
-  Iterable<String> colorIdentity = const <String>[],
+  Iterable<String>? colorIdentity,
   Iterable<String> colors = const <String>[],
   String? oracleText,
   String? manaCost,
 }) {
-  final resolved = <String>{};
-  resolved.addAll(normalizeColorIdentity(colorIdentity));
-  resolved.addAll(normalizeColorIdentity(colors));
-  resolved.addAll(extractColorIdentityFromText(manaCost));
-  resolved.addAll(extractColorIdentityFromText(oracleText));
-  return resolved;
+  if (colorIdentity != null) {
+    return normalizeColorIdentity(colorIdentity);
+  }
+
+  final fallbackIdentity = <String>{};
+  fallbackIdentity.addAll(normalizeColorIdentity(colors));
+  fallbackIdentity.addAll(extractColorIdentityFromText(manaCost));
+  fallbackIdentity.addAll(extractColorIdentityFromText(oracleText));
+  return fallbackIdentity;
+}
+
+/// Remove reminder text, inclusive blocos que ocupam a linha inteira e
+/// parênteses aninhados. Símbolos de mana em reminder text não compõem a
+/// identidade de cor de uma carta.
+String _removeParentheticalText(String text) {
+  final sanitized = StringBuffer();
+  var depth = 0;
+
+  for (final rune in text.runes) {
+    if (rune == 0x28) {
+      depth++;
+      continue;
+    }
+    if (rune == 0x29 && depth > 0) {
+      depth--;
+      continue;
+    }
+    if (depth == 0) sanitized.writeCharCode(rune);
+  }
+
+  return sanitized.toString();
 }
 
 /// Retorna `true` quando a identidade de cor da carta é um subconjunto da

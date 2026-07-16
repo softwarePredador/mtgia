@@ -40,9 +40,10 @@ Future<Response> _listDecks(RequestContext context) async {
     Log.d('🔍 Executando query SELECT...');
     final hasMeta = await hasDeckMetaColumns(conn);
     final hasPricing = await hasDeckPricingColumns(conn);
-    final sql = hasMeta
-        ? (hasPricing
-            ? '''
+    final sql =
+        hasMeta
+            ? (hasPricing
+                ? '''
         SELECT 
           d.id, 
           d.name, 
@@ -76,7 +77,7 @@ Future<Response> _listDecks(RequestContext context) async {
         GROUP BY d.id, cmd.commander_name, cmd.commander_image_url
         ORDER BY d.created_at DESC
       '''
-            : '''
+                : '''
         SELECT 
           d.id, 
           d.name, 
@@ -110,8 +111,8 @@ Future<Response> _listDecks(RequestContext context) async {
         GROUP BY d.id, cmd.commander_name, cmd.commander_image_url
         ORDER BY d.created_at DESC
       ''')
-        : (hasPricing
-            ? '''
+            : (hasPricing
+                ? '''
         SELECT 
           d.id, 
           d.name, 
@@ -145,7 +146,7 @@ Future<Response> _listDecks(RequestContext context) async {
         GROUP BY d.id, cmd.commander_name, cmd.commander_image_url
         ORDER BY d.created_at DESC
       '''
-            : '''
+                : '''
         SELECT 
           d.id, 
           d.name, 
@@ -186,27 +187,29 @@ Future<Response> _listDecks(RequestContext context) async {
     );
     Log.d('✅ Query executada. Encontrados ${result.length} decks.');
 
-    final decks = result.map((row) {
-      final map = row.toColumnMap();
-      if (map['created_at'] is DateTime) {
-        map['created_at'] = (map['created_at'] as DateTime).toIso8601String();
-      }
-      if (map['pricing_updated_at'] is DateTime) {
-        map['pricing_updated_at'] =
-            (map['pricing_updated_at'] as DateTime).toIso8601String();
-      }
-      map['commander_image_url'] = normalizeScryfallImageUrl(
-        map['commander_image_url']?.toString(),
-      );
-      // PostgreSQL DECIMAL retorna String, converter para double
-      final rawPricingTotal = map['pricing_total'];
-      if (rawPricingTotal is String) {
-        map['pricing_total'] = double.tryParse(rawPricingTotal);
-      } else if (rawPricingTotal is num) {
-        map['pricing_total'] = rawPricingTotal.toDouble();
-      }
-      return map;
-    }).toList();
+    final decks =
+        result.map((row) {
+          final map = row.toColumnMap();
+          if (map['created_at'] is DateTime) {
+            map['created_at'] =
+                (map['created_at'] as DateTime).toIso8601String();
+          }
+          if (map['pricing_updated_at'] is DateTime) {
+            map['pricing_updated_at'] =
+                (map['pricing_updated_at'] as DateTime).toIso8601String();
+          }
+          map['commander_image_url'] = normalizeScryfallImageUrl(
+            map['commander_image_url']?.toString(),
+          );
+          // PostgreSQL DECIMAL retorna String, converter para double
+          final rawPricingTotal = map['pricing_total'];
+          if (rawPricingTotal is String) {
+            map['pricing_total'] = double.tryParse(rawPricingTotal);
+          } else if (rawPricingTotal is num) {
+            map['pricing_total'] = rawPricingTotal.toDouble();
+          }
+          return map;
+        }).toList();
 
     // ── Fetch color identity for each deck (batch) ──────────────
     if (decks.isNotEmpty) {
@@ -278,17 +281,19 @@ Future<Response> _createDeck(RequestContext context) async {
   final bracket =
       bracketRaw is int ? bracketRaw : int.tryParse('${bracketRaw ?? ''}');
   final isPublic = body['is_public'] == true;
-  final cards = body['cards'] as List? ??
+  final cards =
+      body['cards'] as List? ??
       []; // Ex: [{'card_id': 'uuid', 'quantity': 2, 'is_commander': false}]
 
   if (name == null || format == null) {
     return badRequest('Fields name and format are required.');
   }
 
-  final rawCardObjects = cards
-      .whereType<Map>()
-      .map((card) => card.cast<String, dynamic>())
-      .toList();
+  final rawCardObjects =
+      cards
+          .whereType<Map>()
+          .map((card) => card.cast<String, dynamic>())
+          .toList();
   try {
     validateNoUnsupportedDeckSections(cards: rawCardObjects);
   } on DeckRulesException catch (e) {
@@ -333,12 +338,15 @@ Future<Response> _createDeck(RequestContext context) async {
 
       // Resolver card_id quando veio "name" e agregar num formato único
       final normalizedCards = <Map<String, dynamic>>[];
-      final unresolvedNames = cards
-          .whereType<Map>()
-          .where((card) => (card['card_id']?.toString().trim() ?? '').isEmpty)
-          .map((card) => card['name']?.toString().trim() ?? '')
-          .where((name) => name.isNotEmpty)
-          .toSet();
+      final unresolvedNames =
+          cards
+              .whereType<Map>()
+              .where(
+                (card) => (card['card_id']?.toString().trim() ?? '').isEmpty,
+              )
+              .map((card) => card['name']?.toString().trim() ?? '')
+              .where((name) => name.isNotEmpty)
+              .toSet();
       final resolvedCardIds = await resolveDeckCardIdsByName(
         session: session,
         names: unresolvedNames,
@@ -420,13 +428,15 @@ Future<Response> _createDeck(RequestContext context) async {
       return deckMap;
     });
 
-    unawaited(_logDeckCreateLearning(
-      pool: conn,
-      deckId: newDeck['id'].toString(),
-      deckName: name,
-      format: format,
-      rawCards: cards,
-    ));
+    unawaited(
+      _logDeckCreateLearning(
+        pool: conn,
+        deckId: newDeck['id'].toString(),
+        deckName: name,
+        format: format,
+        rawCards: cards,
+      ),
+    );
 
     return Response.json(body: newDeck);
   } on DeckRulesException catch (e) {
@@ -465,7 +475,6 @@ Future<void> _logDeckCreateLearning({
         .fold<int>(0, (sum, card) => sum + learningCardQuantityTotal([card]));
 
     if (commanderName != null && commanderName.isNotEmpty) {
-      await ensureCommanderCardUsageTable(pool);
       await upsertCommanderCardUsage(
         pool: pool,
         commanderName: commanderName,
@@ -473,7 +482,6 @@ Future<void> _logDeckCreateLearning({
       );
     }
 
-    await ensureDeckLearningEventsTable(pool);
     await logDeckLearningEvent(
       pool: pool,
       deckId: deckId,
@@ -486,14 +494,17 @@ Future<void> _logDeckCreateLearning({
         'cards_quantity_total': cardQuantityTotal,
         'commander_quantity': commanderQuantity,
         'main_quantity': cardQuantityTotal - commanderQuantity,
-        'cards': learningCards
-            .map((card) => {
-                  'name':
-                      card['name']?.toString() ?? card['card_id']?.toString(),
-                  'quantity': card['quantity'],
-                  'is_commander': card['is_commander'] == true,
-                })
-            .toList(),
+        'cards':
+            learningCards
+                .map(
+                  (card) => {
+                    'name':
+                        card['name']?.toString() ?? card['card_id']?.toString(),
+                    'quantity': card['quantity'],
+                    'is_commander': card['is_commander'] == true,
+                  },
+                )
+                .toList(),
       },
     );
   } catch (error) {

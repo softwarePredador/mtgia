@@ -1,3 +1,10 @@
 analyzer:
+  plugins:
+    - custom_lint
   exclude:
     - build/**
+
+custom_lint:
+  rules:
+    - avoid_legacy_manaloom_endpoint_literal
+    - avoid_manaloom_secret_literal

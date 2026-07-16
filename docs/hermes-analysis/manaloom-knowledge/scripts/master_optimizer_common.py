@@ -27,7 +27,12 @@ import battle_rule_registry
 SCRIPT_DIR = Path(__file__).resolve().parent
 REPO_ROOT = SCRIPT_DIR.parents[3]
 DOCS_DIR = REPO_ROOT / "docs" / "hermes-analysis"
-REPORT_DIR = DOCS_DIR / "master_optimizer_reports"
+REPORT_DIR = Path(
+    os.environ.get(
+        "MANALOOM_MASTER_OPTIMIZER_REPORT_DIR",
+        str(DOCS_DIR / "master_optimizer_reports"),
+    )
+)
 KNOWLEDGE_DIR = DOCS_DIR / "manaloom-knowledge"
 
 
@@ -175,6 +180,16 @@ class BattleRunTimeout(RuntimeError):
         super().__init__(detail)
 
 
+class ClosingSqliteConnection(sqlite3.Connection):
+    """SQLite connection whose context manager also releases the handle."""
+
+    def __exit__(self, exc_type, exc_value, traceback) -> bool:
+        try:
+            return bool(super().__exit__(exc_type, exc_value, traceback))
+        finally:
+            self.close()
+
+
 def utc_now() -> str:
     return datetime.now(timezone.utc).isoformat()
 
@@ -267,7 +282,7 @@ def effective_protected_cards() -> set[str]:
 
 
 def connect(db_path: Path = DEFAULT_DB) -> sqlite3.Connection:
-    conn = sqlite3.connect(db_path)
+    conn = sqlite3.connect(db_path, factory=ClosingSqliteConnection)
     conn.row_factory = sqlite3.Row
     return conn
 
@@ -743,14 +758,26 @@ def load_battle_gate_summary(summary_path: Path | None = None) -> dict[str, Any]
 
 
 def battle_gate_optimizer_blockers(summary: dict[str, Any] | None = None) -> list[str]:
-    data = summary or load_battle_gate_summary()
+    # An explicitly supplied (even empty) summary is evidence in its own right.
+    # Falling back on false-y input could silently replace a malformed/current
+    # run with an older trusted `latest` file and open the optimizer gate.
+    data = summary if summary is not None else load_battle_gate_summary()
     status = str(data.get("battle_replay_final_status") or "unknown")
-    divergences = [str(item) for item in data.get("mandatory_gate_divergences") or []]
     blockers: list[str] = []
     if status != "trusted_for_strategy_learning":
         blockers.append(f"battle_gate_not_trusted_for_strategy_learning:{status}")
-    if divergences:
-        blockers.append("battle_gate_mandatory_divergences:" + ",".join(divergences))
+    if "mandatory_gate_divergences" not in data:
+        blockers.append("battle_gate_mandatory_divergences_missing")
+    else:
+        raw_divergences = data.get("mandatory_gate_divergences")
+        if not isinstance(raw_divergences, list):
+            blockers.append("battle_gate_mandatory_divergences_invalid")
+        else:
+            divergences = [str(item) for item in raw_divergences]
+            if divergences:
+                blockers.append(
+                    "battle_gate_mandatory_divergences:" + ",".join(divergences)
+                )
     return blockers
 
 
@@ -767,7 +794,7 @@ def _sample(values: object, limit: int = 8) -> list[object]:
 
 
 def battle_gate_report_lines(summary: dict[str, Any] | None = None) -> list[str]:
-    data = summary or load_battle_gate_summary()
+    data = summary if summary is not None else load_battle_gate_summary()
     summary_path = str(data.get("_summary_path") or DEFAULT_BATTLE_GATE_SUMMARY)
     gate_statuses = data.get("mandatory_gate_statuses") or {}
     gate_rollup = {
@@ -816,7 +843,7 @@ def battle_gate_report_lines(summary: dict[str, Any] | None = None) -> list[str]
 
 
 def battle_gate_cli_lines(summary: dict[str, Any] | None = None) -> list[str]:
-    data = summary or load_battle_gate_summary()
+    data = summary if summary is not None else load_battle_gate_summary()
     return [
         f"battle_replay_final_status={data.get('battle_replay_final_status') or 'unknown'}",
         f"battle_replay_final_status_reason={data.get('battle_replay_final_status_reason') or 'unknown'}",

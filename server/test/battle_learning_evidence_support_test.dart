@@ -3,14 +3,15 @@ import 'package:test/test.dart';
 import '../lib/ai/battle_learning_evidence_support.dart';
 
 Map<String, dynamic> completedResult(List<Map<String, dynamic>> events) => {
-      'status': 'completed',
-      'winner': 'deck_a',
-      'learning_contract': {
-        'schema_version': externalBattleLearningSchema,
-        'absence_proves_nonuse': false,
-      },
-      'events': events,
-    };
+  'status': 'completed',
+  'winner': 'deck_a',
+  'turns': 7,
+  'learning_contract': {
+    'schema_version': externalBattleLearningSchema,
+    'absence_proves_nonuse': false,
+  },
+  'events': events,
+};
 
 void main() {
   test('generic waiting rows do not prove named card exposure', () {
@@ -62,6 +63,23 @@ void main() {
     expect(evidence['positive_exposure_ready'], isFalse);
   });
 
+  test('zero-turn payload cannot become completed learning evidence', () {
+    final result = completedResult([
+      {'event_type': 'spell_cast', 'card_name': 'Candidate'},
+    ]);
+    result['turns'] = 0;
+
+    final evidence = buildBattleLearningEvidence(
+      result,
+      focusCards: const ['Candidate'],
+      sameLane: true,
+    );
+
+    expect(evidence['completed'], isFalse);
+    expect(evidence['all_focus_cards_exposed'], isTrue);
+    expect(evidence['positive_exposure_ready'], isFalse);
+  });
+
   test('forced access diagnostic is not natural comparison input', () {
     final evidence = buildBattleLearningEvidence(
       completedResult([
@@ -76,20 +94,22 @@ void main() {
     expect(evidence['comparison_input_ready'], isFalse);
   });
 
-  test('completed battle records generic named exposure without focus cards',
-      () {
-    final evidence = buildBattleLearningEvidence(
-      completedResult([
-        {'event_type': 'spell_cast', 'card': 'Aerialephant'},
-      ]),
-    );
+  test(
+    'completed battle records generic named exposure without focus cards',
+    () {
+      final evidence = buildBattleLearningEvidence(
+        completedResult([
+          {'event_type': 'spell_cast', 'card': 'Aerialephant'},
+        ]),
+      );
 
-    expect(evidence['positive_exposure_ready'], isTrue);
-    expect(
-      evidence['exposed_card_names_normalized'],
-      contains('aerialephant'),
-    );
-  });
+      expect(evidence['positive_exposure_ready'], isTrue);
+      expect(
+        evidence['exposed_card_names_normalized'],
+        contains('aerialephant'),
+      );
+    },
+  );
 
   test('reviewed native learning contract is accepted', () {
     final result = completedResult([

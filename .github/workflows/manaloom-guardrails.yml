@@ -4,22 +4,40 @@ on:
   pull_request:
     paths:
       - ".github/workflows/manaloom-guardrails.yml"
+      - "app/**"
       - "docs/hermes-analysis/**"
+      - "melos.yaml"
+      - "pubspec.yaml"
+      - "pubspec.lock"
+      - "scripts/**"
       - "server/bin/**"
       - "server/lib/**"
       - "server/routes/**"
       - "server/test/**"
+      - "server/pubspec.yaml"
+      - "server/pubspec.lock"
+      - "services/**"
+      - "tools/**"
   push:
     branches:
       - master
       - "codex/**"
     paths:
       - ".github/workflows/manaloom-guardrails.yml"
+      - "app/**"
       - "docs/hermes-analysis/**"
+      - "melos.yaml"
+      - "pubspec.yaml"
+      - "pubspec.lock"
+      - "scripts/**"
       - "server/bin/**"
       - "server/lib/**"
       - "server/routes/**"
       - "server/test/**"
+      - "server/pubspec.yaml"
+      - "server/pubspec.lock"
+      - "services/**"
+      - "tools/**"
 
 jobs:
   manaloom-guardrails:
@@ -34,22 +52,84 @@ jobs:
       - name: Compile guardrail scripts
         run: |
           python3 -m py_compile \
+            docs/hermes-analysis/manaloom-knowledge/scripts/external_card_rule_reference_harvester.py \
+            docs/hermes-analysis/manaloom-knowledge/scripts/external_engine_upstream_delta_audit.py \
             docs/hermes-analysis/manaloom-knowledge/scripts/legacy_contamination_audit.py \
-            docs/hermes-analysis/manaloom-knowledge/scripts/operational_surface_alignment_audit.py
+            docs/hermes-analysis/manaloom-knowledge/scripts/operational_surface_alignment_audit.py \
+            docs/hermes-analysis/manaloom-knowledge/scripts/report_retention_audit.py
 
       - name: Run focused guardrail tests
         working-directory: docs/hermes-analysis/manaloom-knowledge/scripts
         run: |
           python3 -m unittest \
+            test_external_card_rule_reference_harvester.py \
+            test_external_engine_upstream_delta_audit.py \
             test_legacy_contamination_audit.py \
-            test_operational_surface_alignment_audit.py
+            test_operational_surface_alignment_audit.py \
+            test_report_retention_audit.py
 
       - name: Audit legacy contamination baseline
         run: |
           python3 docs/hermes-analysis/manaloom-knowledge/scripts/legacy_contamination_audit.py \
             --out-prefix /tmp/manaloom_legacy_contamination_ci
 
+      - name: Audit external engine pin contract (offline)
+        run: |
+          python3 docs/hermes-analysis/manaloom-knowledge/scripts/external_engine_upstream_delta_audit.py \
+            --local-only \
+            --json-output /tmp/manaloom_external_engine_pin_contract_ci.json
+
       - name: Audit operational surface alignment
         run: |
           python3 docs/hermes-analysis/manaloom-knowledge/scripts/operational_surface_alignment_audit.py \
             --out-prefix /tmp/manaloom_operational_surface_ci
+
+      - name: Audit report retention governance
+        run: |
+          python3 docs/hermes-analysis/manaloom-knowledge/scripts/report_retention_audit.py \
+            --fail-on-ignored-local \
+            --out-prefix /tmp/manaloom_report_retention_ci
+
+  manaloom-product-tooling:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+          cache: maven
+          cache-dependency-path: |
+            services/xmage-sidecar/pom.xml
+            services/xmage-sidecar/XMAGE_COMMIT
+
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+
+      - name: Resolve workspace dependencies
+        run: |
+          dart pub get
+          dart run melos bootstrap
+
+      - name: Run ManaLoom product quality gate
+        env:
+          JWT_SECRET: local_quality_gate_jwt_secret_not_for_production_20260706
+          DISABLE_FIREBASE_STARTUP: "true"
+          DISABLE_PUSH_INIT: "true"
+          DISABLE_FIREBASE_PERFORMANCE_INIT: "true"
+        run: dart run melos run quality
+
+      - name: Bootstrap pinned XMage Maven artifacts
+        run: services/xmage-sidecar/bin/bootstrap_pinned_xmage_maven.sh
+
+      - name: Run canonical battle product gate
+        env:
+          JWT_SECRET: local_battle_product_gate_jwt_secret_not_for_production_20260715
+        run: dart run melos run battle

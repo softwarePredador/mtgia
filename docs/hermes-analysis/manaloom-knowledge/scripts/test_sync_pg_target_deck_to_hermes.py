@@ -114,6 +114,7 @@ class SyncPgTargetDeckToHermesTests(unittest.TestCase):
 
             self.assertEqual(stats["cards_seen"], 3)
             self.assertEqual(stats["cards_written"], 3)
+            self.assertEqual(stats["card_ids_canonicalized"], 0)
             self.assertEqual(stats["duplicate_rows_collapsed"], 0)
             self.assertEqual(stats["quantity_written"], 3)
             self.assertEqual(stats["commanders"], 1)
@@ -168,6 +169,71 @@ class SyncPgTargetDeckToHermesTests(unittest.TestCase):
             self.assertEqual(rows[1]["semantics_hash"], stats["semantics_hash"])
             self.assertEqual(rows[1]["ruleset_hash"], stats["ruleset_hash"])
             self.assertTrue(rows[1]["sync_run_id"])
+
+    def test_write_sqlite_uses_canonical_card_id_from_oracle_cache(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            db_path = Path(tmp) / "knowledge.db"
+            printing_id = "00000000-0000-0000-0000-000000000002"
+            canonical_id = "10000000-0000-0000-0000-000000000002"
+            conn = sqlite3.connect(db_path)
+            try:
+                conn.execute(
+                    """
+                    CREATE TABLE card_oracle_cache (
+                        normalized_name TEXT PRIMARY KEY,
+                        name TEXT NOT NULL,
+                        card_id TEXT
+                    )
+                    """
+                )
+                conn.execute(
+                    """
+                    INSERT INTO card_oracle_cache (normalized_name, name, card_id)
+                    VALUES ('sol ring', 'Sol Ring', ?)
+                    """,
+                    (canonical_id,),
+                )
+                conn.commit()
+            finally:
+                conn.close()
+
+            stats = sync.write_sqlite(
+                str(db_path),
+                6,
+                {
+                    "name": "Runtime Lorehold Learned",
+                    "archetype": "midrange",
+                    "total_qty": 1,
+                    "pg_deck_id": "pg-deck-1",
+                },
+                [
+                    {
+                        "card_id": printing_id,
+                        "name": " Sol Ring ",
+                        "quantity": 1,
+                        "is_commander": False,
+                        "functional_tag": "ramp",
+                        "functional_tags_json": ["ramp"],
+                        "semantic_tags_v2_json": [],
+                        "battle_rules_json": [],
+                        "cmc": 1,
+                        "type_line": "Artifact",
+                        "oracle_text": "{T}: Add {C}{C}.",
+                    }
+                ],
+                apply=True,
+            )
+
+            conn = sqlite3.connect(db_path)
+            try:
+                stored_card_id = conn.execute(
+                    "SELECT card_id FROM deck_cards WHERE deck_id = 6"
+                ).fetchone()[0]
+            finally:
+                conn.close()
+
+            self.assertEqual(stats["card_ids_canonicalized"], 1)
+            self.assertEqual(stored_card_id, canonical_id)
 
     def test_write_sqlite_rejects_duplicate_card_id_rows(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:

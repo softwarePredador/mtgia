@@ -1,7 +1,6 @@
 # Dart/Frog build outputs
 .dart_tool/
 build/
-pubspec.lock
 
 # Environment files
 .env

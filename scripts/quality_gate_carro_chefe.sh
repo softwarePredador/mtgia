@@ -3,6 +3,9 @@ set -euo pipefail
 
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 SERVER_DIR="$ROOT_DIR/server"
+source "$ROOT_DIR/scripts/lib/manaloom_mutation_guard.sh"
+require_live_mutation_approval "Carro-Chefe optimize/complete integration gate"
+require_postgres_write_approval "Carro-Chefe resolution flow"
 
 SOURCE_DECK_ID="${SOURCE_DECK_ID:-0b163477-2e8a-488a-8883-774fcd05281f}"
 TEST_NAME="source deck regression uses fixed sourceDeckId and persists full return for validation"
@@ -187,7 +190,7 @@ if [[ "$RUN_RESOLUTION_FLOW" == "1" ]]; then
     VALIDATION_SUMMARY_JSON_PATH="test/artifacts/optimization_resolution_suite/latest_summary.json"
   fi
   if [[ -z "$VALIDATION_SUMMARY_MD_PATH" && "$RESOLUTION_VALIDATION_LIMIT" -gt 3 ]]; then
-    VALIDATION_SUMMARY_MD_PATH="../RELATORIO_RESOLUCAO_SUITE_COMMANDER_$(date +%Y-%m-%d).md"
+    VALIDATION_SUMMARY_MD_PATH="test/artifacts/optimization_resolution_suite/latest_summary.md"
   fi
 
   echo

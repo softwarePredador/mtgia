@@ -96,7 +96,14 @@ class RuntimePgRuleFallbackForPromotedHotfixesTests(unittest.TestCase):
             raise
         with pg_conn:
             with pg_conn.cursor() as cur:
-                sync_pg.ensure_pg_table(cur)
+                cur.execute("SELECT to_regclass('public.card_battle_rules')::text")
+                table_row = cur.fetchone()
+                if not table_row or not table_row[0]:
+                    self._tmp.cleanup()
+                    raise unittest.SkipTest(
+                        "card_battle_rules is unavailable; apply the canonical "
+                        "migration before running the read-only fallback guardrail"
+                    )
                 rows = sync_pg.load_pg_rules(cur, include_needs_review=True)
         rows = sync_pg.filter_rows_by_card_names(rows, PROMOTED_CANONICAL_NAMES)
         sync_pg.mirror_pg_rules_to_sqlite(str(self.sqlite_db), rows)

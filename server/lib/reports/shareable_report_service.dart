@@ -14,63 +14,33 @@ class ShareableReportService {
   static final _random = Random.secure();
   static const _alphabet = 'abcdefghijklmnopqrstuvwxyz0123456789';
 
-  Future<void> ensureSchema() async {
-    await pool.execute(
-      Sql.named('''
-        CREATE TABLE IF NOT EXISTS shared_deck_reports (
-          id TEXT PRIMARY KEY,
-          user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-          deck_id UUID REFERENCES decks(id) ON DELETE SET NULL,
-          title TEXT NOT NULL,
-          description TEXT NOT NULL DEFAULT '',
-          payload JSONB NOT NULL,
-          is_public BOOLEAN NOT NULL DEFAULT TRUE,
-          created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
-          updated_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
-          expires_at TIMESTAMP WITH TIME ZONE
-        )
-      '''),
-    );
-    await pool.execute(
-      Sql.named('''
-        CREATE INDEX IF NOT EXISTS idx_shared_deck_reports_deck_created
-        ON shared_deck_reports (deck_id, created_at DESC)
-      '''),
-    );
-    await pool.execute(
-      Sql.named('''
-        CREATE INDEX IF NOT EXISTS idx_shared_deck_reports_public_updated
-        ON shared_deck_reports (is_public, updated_at DESC)
-      '''),
-    );
-  }
-
   Future<Map<String, dynamic>?> createForDeck({
     required String userId,
     required String deckId,
     required Map<String, dynamic> body,
   }) async {
-    await ensureSchema();
-
     final deck = await _loadOwnedDeck(userId: userId, deckId: deckId);
     if (deck == null) return null;
 
     final payloadBody = body['payload'];
-    final payload = payloadBody is Map
-        ? Map<String, dynamic>.from(payloadBody)
-        : await _buildDeckSnapshotPayload(deckId: deckId, deck: deck);
+    final payload =
+        payloadBody is Map
+            ? Map<String, dynamic>.from(payloadBody)
+            : await _buildDeckSnapshotPayload(deckId: deckId, deck: deck);
 
     payload.putIfAbsent('deck_id', () => deckId);
     payload.putIfAbsent('deck_name', () => deck['name']?.toString() ?? '');
     payload.putIfAbsent('format', () => deck['format']?.toString() ?? '');
 
     final id = _newReportId();
-    final title = _cleanString(body['title']).isNotEmpty
-        ? _cleanString(body['title'])
-        : 'Relatorio ManaLoom - ${deck['name']}';
-    final description = _cleanString(body['description']).isNotEmpty
-        ? _cleanString(body['description'])
-        : _defaultDescription(payload, deck);
+    final title =
+        _cleanString(body['title']).isNotEmpty
+            ? _cleanString(body['title'])
+            : 'Relatorio ManaLoom - ${deck['name']}';
+    final description =
+        _cleanString(body['description']).isNotEmpty
+            ? _cleanString(body['description'])
+            : _defaultDescription(payload, deck);
 
     final result = await pool.execute(
       Sql.named('''
@@ -113,7 +83,6 @@ class ShareableReportService {
   }
 
   Future<Map<String, dynamic>?> getPublicReport(String reportId) async {
-    await ensureSchema();
     final result = await pool.execute(
       Sql.named('''
         SELECT id, deck_id, title, description, payload, is_public,
@@ -137,21 +106,23 @@ class ShareableReportService {
   }) async {
     final hasMeta = await hasDeckMetaColumns(pool);
     final result = await pool.execute(
-      Sql.named(hasMeta
-          ? '''
+      Sql.named(
+        hasMeta
+            ? '''
         SELECT id, name, format, description, bracket, archetype
         FROM decks
         WHERE id = CAST(@deckId AS uuid)
           AND user_id = CAST(@userId AS uuid)
         LIMIT 1
       '''
-          : '''
+            : '''
         SELECT id, name, format, description, NULL::int AS bracket, NULL::text AS archetype
         FROM decks
         WHERE id = CAST(@deckId AS uuid)
           AND user_id = CAST(@userId AS uuid)
         LIMIT 1
-      '''),
+      ''',
+      ),
       parameters: {'deckId': deckId, 'userId': userId},
     );
     return result.isEmpty ? null : result.first.toColumnMap();
@@ -181,20 +152,24 @@ class ShareableReportService {
       parameters: {'deckId': deckId},
     );
 
-    final cards = cardsResult.map((row) {
-      final map = row.toColumnMap();
-      return {
-        'id': map['id']?.toString(),
-        'name': map['name']?.toString() ?? '',
-        'quantity': map['quantity'] as int? ?? 1,
-        'is_commander': map['is_commander'] == true,
-        'mana_cost': map['mana_cost']?.toString(),
-        'type_line': map['type_line']?.toString(),
-        'image_url': normalizeScryfallImageUrl(map['image_url']?.toString()),
-        'set_code': map['set_code']?.toString(),
-        'rarity': map['rarity']?.toString(),
-      };
-    }).toList(growable: false);
+    final cards = cardsResult
+        .map((row) {
+          final map = row.toColumnMap();
+          return {
+            'id': map['id']?.toString(),
+            'name': map['name']?.toString() ?? '',
+            'quantity': map['quantity'] as int? ?? 1,
+            'is_commander': map['is_commander'] == true,
+            'mana_cost': map['mana_cost']?.toString(),
+            'type_line': map['type_line']?.toString(),
+            'image_url': normalizeScryfallImageUrl(
+              map['image_url']?.toString(),
+            ),
+            'set_code': map['set_code']?.toString(),
+            'rarity': map['rarity']?.toString(),
+          };
+        })
+        .toList(growable: false);
 
     final commander = cards.where((card) => card['is_commander'] == true);
     return {
@@ -265,10 +240,11 @@ class ShareableReportService {
   static String _cleanString(Object? value) => value?.toString().trim() ?? '';
 
   static String _newReportId() {
-    final suffix = List.generate(
-      14,
-      (_) => _alphabet[_random.nextInt(_alphabet.length)],
-    ).join();
+    final suffix =
+        List.generate(
+          14,
+          (_) => _alphabet[_random.nextInt(_alphabet.length)],
+        ).join();
     return 'rpt_${DateTime.now().microsecondsSinceEpoch}_$suffix';
   }
 }

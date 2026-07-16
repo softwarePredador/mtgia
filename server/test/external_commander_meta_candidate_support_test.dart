@@ -11,6 +11,7 @@ const _stage2ExpansionArtifactPath =
     'test/artifacts/topdeck_edhtop16_expansion_dry_run_latest.json';
 const _stage2ValidationArtifactPath =
     'test/artifacts/topdeck_edhtop16_expansion_dry_run_latest.validation.json';
+const _historicalExternalSnapshotTag = 'historical_external_snapshot';
 
 void main() {
   group('ExternalCommanderMetaCandidate.fromJson', () {
@@ -48,16 +49,15 @@ void main() {
     });
 
     test('usa fallbacks de format/source e aceita card_list string direta', () {
-      final candidate = ExternalCommanderMetaCandidate.fromJson(
-        <String, dynamic>{
-          'source': 'Archidekt',
-          'url': 'https://archidekt.com/decks/example',
-          'name': 'Casual Krenko',
-          'commander': 'Krenko, Mob Boss',
-          'format': 'Commander',
-          'card_list': '1 Sol Ring\n1 Goblin Matron',
-        },
-      );
+      final candidate =
+          ExternalCommanderMetaCandidate.fromJson(<String, dynamic>{
+            'source': 'Archidekt',
+            'url': 'https://archidekt.com/decks/example',
+            'name': 'Casual Krenko',
+            'commander': 'Krenko, Mob Boss',
+            'format': 'Commander',
+            'card_list': '1 Sol Ring\n1 Goblin Matron',
+          });
 
       expect(candidate.sourceName, 'Archidekt');
       expect(candidate.persistedFormat, 'commander');
@@ -68,16 +68,15 @@ void main() {
     });
 
     test('so promove duel commander quando o subformato e explicito', () {
-      final candidate = ExternalCommanderMetaCandidate.fromJson(
-        <String, dynamic>{
-          'source_name': 'MTGTop8',
-          'source_url': 'https://www.mtgtop8.com/event?e=1&d=2&f=EDH',
-          'deck_name': 'Raffine Duel',
-          'subformat': 'duel_commander',
-          'card_list': '1 Swords to Plowshares',
-          'validation_status': 'validated',
-        },
-      );
+      final candidate =
+          ExternalCommanderMetaCandidate.fromJson(<String, dynamic>{
+            'source_name': 'MTGTop8',
+            'source_url': 'https://www.mtgtop8.com/event?e=1&d=2&f=EDH',
+            'deck_name': 'Raffine Duel',
+            'subformat': 'duel_commander',
+            'card_list': '1 Swords to Plowshares',
+            'validation_status': 'validated',
+          });
 
       expect(candidate.normalizedSubformat, 'duel_commander');
       expect(candidate.metaDeckFormatCode, 'EDH');
@@ -85,16 +84,15 @@ void main() {
     });
 
     test('mantem status rejeitado fora da promocao', () {
-      final candidate = ExternalCommanderMetaCandidate.fromJson(
-        <String, dynamic>{
-          'source_name': 'EDHREC',
-          'source_url': 'https://edhrec.com/deckpreview/example',
-          'deck_name': 'Rejected Example',
-          'card_list': '1 Command Tower',
-          'subformat': 'EDH',
-          'validation_status': 'rejected',
-        },
-      );
+      final candidate =
+          ExternalCommanderMetaCandidate.fromJson(<String, dynamic>{
+            'source_name': 'EDHREC',
+            'source_url': 'https://edhrec.com/deckpreview/example',
+            'deck_name': 'Rejected Example',
+            'card_list': '1 Command Tower',
+            'subformat': 'EDH',
+            'validation_status': 'rejected',
+          });
 
       expect(candidate.validationStatus, 'rejected');
       expect(candidate.isPromotionEligible, isFalse);
@@ -103,8 +101,7 @@ void main() {
 
   group('parseExternalCommanderMetaCandidates', () {
     test('aceita envelope candidates', () {
-      final candidates = parseExternalCommanderMetaCandidates(
-        '''
+      final candidates = parseExternalCommanderMetaCandidates('''
         {
           "candidates": [
             {
@@ -123,8 +120,7 @@ void main() {
             }
           ]
         }
-        ''',
-      );
+        ''');
 
       expect(candidates, hasLength(2));
       expect(candidates.first.metaDeckFormatCode, isNull);
@@ -133,13 +129,11 @@ void main() {
 
     test('falha sem card_list e sem cards', () {
       expect(
-        () => ExternalCommanderMetaCandidate.fromJson(
-          <String, dynamic>{
-            'source_name': 'Broken',
-            'source_url': 'https://example.com/deck',
-            'deck_name': 'Broken Deck',
-          },
-        ),
+        () => ExternalCommanderMetaCandidate.fromJson(<String, dynamic>{
+          'source_name': 'Broken',
+          'source_url': 'https://example.com/deck',
+          'deck_name': 'Broken Deck',
+        }),
         throwsFormatException,
       );
     });
@@ -268,21 +262,21 @@ void main() {
       );
     });
 
-    test('rejeita promoted, commander ilegal e research payload incompleto',
-        () {
-      final candidate = ExternalCommanderMetaCandidate.fromJson(
-        <String, dynamic>{
-          'source_name': 'TopDeck.gg',
-          'source_url': 'https://topdeck.gg/event/the-quest-part-1#bad-status',
-          'deck_name': 'Rejected Status Example',
-          'subformat': 'competitive_commander',
-          'card_list':
-              '1 Rograkh, Son of Rohgahh\n1 Silas Renn, Seeker Adept\n1 Mana Crypt',
-          'validation_status': 'promoted',
-          'is_commander_legal': false,
-          'research_payload': <String, dynamic>{},
-        },
-      );
+    test('rejeita promoted, commander ilegal e research payload incompleto', () {
+      final candidate = ExternalCommanderMetaCandidate.fromJson(<
+        String,
+        dynamic
+      >{
+        'source_name': 'TopDeck.gg',
+        'source_url': 'https://topdeck.gg/event/the-quest-part-1#bad-status',
+        'deck_name': 'Rejected Status Example',
+        'subformat': 'competitive_commander',
+        'card_list':
+            '1 Rograkh, Son of Rohgahh\n1 Silas Renn, Seeker Adept\n1 Mana Crypt',
+        'validation_status': 'promoted',
+        'is_commander_legal': false,
+        'research_payload': <String, dynamic>{},
+      });
 
       final result = validateExternalCommanderMetaCandidate(
         candidate,
@@ -301,128 +295,147 @@ void main() {
       );
     });
 
-    test('fixture stage 1 mantem contrato 2 accepted e 2 rejected', () {
-      final raw = File(_stage1ArtifactPath).readAsStringSync();
-      final candidates = parseExternalCommanderMetaCandidates(raw);
+    test(
+      'fixture stage 1 mantem contrato 2 accepted e 2 rejected',
+      () {
+        final raw = File(_stage1ArtifactPath).readAsStringSync();
+        final candidates = parseExternalCommanderMetaCandidates(raw);
 
-      final results = validateExternalCommanderMetaCandidates(
-        candidates,
-        profile: topDeckEdhTop16Stage1ValidationProfile,
-      );
+        final results = validateExternalCommanderMetaCandidates(
+          candidates,
+          profile: topDeckEdhTop16Stage1ValidationProfile,
+        );
 
-      expect(results.where((result) => result.accepted), hasLength(2));
-      expect(results.where((result) => !result.accepted), hasLength(2));
-      expect(
-        results.where((result) => result.accepted).map(
-              (result) => result.candidate.normalizedSourceName,
-            ),
-        everyElement(anyOf('TopDeck.gg', 'EDHTop16')),
-      );
-      expect(
-        results.expand((result) => result.issues).map((issue) => issue.code),
-        containsAll(<String>{'invalid_subformat', 'invalid_source_path'}),
-      );
-    }, skip: _missingArtifactsSkip(const <String>[_stage1ArtifactPath]));
+        expect(results.where((result) => result.accepted), hasLength(2));
+        expect(results.where((result) => !result.accepted), hasLength(2));
+        expect(
+          results
+              .where((result) => result.accepted)
+              .map((result) => result.candidate.normalizedSourceName),
+          everyElement(anyOf('TopDeck.gg', 'EDHTop16')),
+        );
+        expect(
+          results.expand((result) => result.issues).map((issue) => issue.code),
+          containsAll(<String>{'invalid_subformat', 'invalid_source_path'}),
+        );
+      },
+      tags: const <String>[_historicalExternalSnapshotTag],
+      skip: _historicalSnapshotUnavailable(const <String>[_stage1ArtifactPath]),
+    );
 
-    test('stage 2 aceita fixture expandida com decklists completas', () {
-      final raw = File(_stage2ExpansionArtifactPath).readAsStringSync();
-      final artifact = jsonDecode(raw) as Map<String, dynamic>;
-      final candidates = parseExternalCommanderMetaCandidates(raw);
+    test(
+      'stage 2 aceita fixture expandida com decklists completas',
+      () {
+        final raw = File(_stage2ExpansionArtifactPath).readAsStringSync();
+        final artifact = jsonDecode(raw) as Map<String, dynamic>;
+        final candidates = parseExternalCommanderMetaCandidates(raw);
 
-      final results = validateExternalCommanderMetaCandidates(
-        candidates,
-        profile: topDeckEdhTop16Stage2ValidationProfile,
-      );
+        final results = validateExternalCommanderMetaCandidates(
+          candidates,
+          profile: topDeckEdhTop16Stage2ValidationProfile,
+        );
 
-      expect(results, hasLength(candidates.length));
-      expect(
-        results.where((result) => result.accepted),
-        hasLength(artifact['expanded_count'] as int),
-      );
-      expect(results.where((result) => !result.accepted), isEmpty);
-      expect(
-        results.expand((result) => result.issues).map((issue) => issue.code),
-        isNot(contains('card_count_below_stage2_minimum')),
-      );
-    },
-        skip: _missingArtifactsSkip(
-          const <String>[_stage2ExpansionArtifactPath],
-        ));
+        expect(results, hasLength(candidates.length));
+        expect(
+          results.where((result) => result.accepted),
+          hasLength(artifact['expanded_count'] as int),
+        );
+        expect(results.where((result) => !result.accepted), isEmpty);
+        expect(
+          results.expand((result) => result.issues).map((issue) => issue.code),
+          isNot(contains('card_count_below_stage2_minimum')),
+        );
+      },
+      tags: const <String>[_historicalExternalSnapshotTag],
+      skip: _historicalSnapshotUnavailable(const <String>[
+        _stage2ExpansionArtifactPath,
+      ]),
+    );
 
-    test('stage 2 reaplica stage 1 e rejeita source fora do path controlado',
-        () {
-      final candidate = ExternalCommanderMetaCandidate.fromJson(
-        <String, dynamic>{
-          'source_name': 'EDHTop16',
-          'source_url': 'https://edhtop16.com/about#standing-1',
-          'deck_name': 'Wrong Stage 2 Source',
-          'commander_name': 'Tymna the Weaver',
-          'format': 'commander',
-          'subformat': 'competitive_commander',
-          'card_list':
-              List<String>.generate(100, (index) => '1 Card ${index + 1}')
-                  .join('\n'),
-          'research_payload': <String, dynamic>{
-            'collection_method': 'edhtop16_graphql_topdeck_deck_page_dry_run',
-            'source_context': 'edhtop16_tournament_entry',
-            'total_cards': 100,
+    test(
+      'stage 2 reaplica stage 1 e rejeita source fora do path controlado',
+      () {
+        final candidate = ExternalCommanderMetaCandidate.fromJson(
+          <String, dynamic>{
+            'source_name': 'EDHTop16',
+            'source_url': 'https://edhtop16.com/about#standing-1',
+            'deck_name': 'Wrong Stage 2 Source',
+            'commander_name': 'Tymna the Weaver',
+            'format': 'commander',
+            'subformat': 'competitive_commander',
+            'card_list': List<String>.generate(
+              100,
+              (index) => '1 Card ${index + 1}',
+            ).join('\n'),
+            'research_payload': <String, dynamic>{
+              'collection_method': 'edhtop16_graphql_topdeck_deck_page_dry_run',
+              'source_context': 'edhtop16_tournament_entry',
+              'total_cards': 100,
+            },
           },
-        },
-      );
+        );
 
-      final result = validateExternalCommanderMetaCandidate(
-        candidate,
-        profile: topDeckEdhTop16Stage2ValidationProfile,
-      );
+        final result = validateExternalCommanderMetaCandidate(
+          candidate,
+          profile: topDeckEdhTop16Stage2ValidationProfile,
+        );
 
-      expect(result.accepted, isFalse);
-      expect(
-        result.issues.map((issue) => issue.code),
-        contains('invalid_source_path'),
-      );
-    });
+        expect(result.accepted, isFalse);
+        expect(
+          result.issues.map((issue) => issue.code),
+          contains('invalid_source_path'),
+        );
+      },
+    );
 
-    test('stage 2 rejeita decklist curta, sem commander e total_cards invalido',
-        () {
-      final candidate = ExternalCommanderMetaCandidate.fromJson(
-        <String, dynamic>{
+    test(
+      'stage 2 rejeita decklist curta, sem commander e total_cards invalido',
+      () {
+        final candidate = ExternalCommanderMetaCandidate.fromJson(<
+          String,
+          dynamic
+        >{
           'source_name': 'EDHTop16',
           'source_url':
               'https://edhtop16.com/tournament/cedh-arcanum-sanctorum-57#standing-9',
           'deck_name': 'Broken Expansion',
           'format': 'commander',
           'subformat': 'competitive_commander',
-          'card_list':
-              List<String>.generate(97, (index) => '1 Card ${index + 1}')
-                  .join('\n'),
+          'card_list': List<String>.generate(
+            97,
+            (index) => '1 Card ${index + 1}',
+          ).join('\n'),
           'research_payload': <String, dynamic>{
             'collection_method': 'edhtop16_graphql_topdeck_deck_page_dry_run',
             'source_context': 'edhtop16_tournament_entry',
             'total_cards': 99,
           },
-        },
-      );
+        });
 
-      final result = validateExternalCommanderMetaCandidate(
-        candidate,
-        profile: topDeckEdhTop16Stage2ValidationProfile,
-      );
+        final result = validateExternalCommanderMetaCandidate(
+          candidate,
+          profile: topDeckEdhTop16Stage2ValidationProfile,
+        );
 
-      expect(result.accepted, isFalse);
-      expect(
-        result.issues.map((issue) => issue.code),
-        containsAll(<String>{
-          'card_count_below_stage2_minimum',
-          'invalid_total_cards',
-          'missing_commander_name',
-        }),
-      );
-    });
+        expect(result.accepted, isFalse);
+        expect(
+          result.issues.map((issue) => issue.code),
+          containsAll(<String>{
+            'card_count_below_stage2_minimum',
+            'invalid_total_cards',
+            'missing_commander_name',
+          }),
+        );
+      },
+    );
 
-    test('stage 2 marca illegal_cards quando carta resolvida sai da identidade',
-        () async {
-      final candidate = ExternalCommanderMetaCandidate.fromJson(
-        <String, dynamic>{
+    test(
+      'stage 2 marca illegal_cards quando carta resolvida sai da identidade',
+      () async {
+        final candidate = ExternalCommanderMetaCandidate.fromJson(<
+          String,
+          dynamic
+        >{
           'source_name': 'EDHTop16',
           'source_url':
               'https://edhtop16.com/tournament/cedh-arcanum-sanctorum-57#standing-10',
@@ -440,83 +453,83 @@ void main() {
             'source_context': 'edhtop16_tournament_entry',
             'total_cards': 100,
           },
-        },
-      );
+        });
 
-      final evidence = await evaluateExternalCommanderMetaCandidateLegality(
-        candidate,
-        repository: _FakeLegalityRepository(
-          resolvedByName: <String, Map<String, dynamic>>{
-            'atraxa, praetors\' voice': _cardRecord(
-              id: 'cmd-1',
-              name: 'Atraxa, Praetors\' Voice',
-              colorIdentity: <String>['W', 'U', 'B', 'G'],
-              colors: <String>['W', 'U', 'B', 'G'],
-            ),
-            'sol ring': _cardRecord(
-              id: 'deck-1',
-              name: 'Sol Ring',
-            ),
-            'lightning bolt': _cardRecord(
-              id: 'deck-2',
-              name: 'Lightning Bolt',
-              colorIdentity: <String>['R'],
-              colors: <String>['R'],
-            ),
-          },
-          commanderLegalityById: const <String, String>{
-            'cmd-1': 'legal',
-            'deck-1': 'legal',
-            'deck-2': 'legal',
-          },
-        ),
-      );
+        final evidence = await evaluateExternalCommanderMetaCandidateLegality(
+          candidate,
+          repository: _FakeLegalityRepository(
+            resolvedByName: <String, Map<String, dynamic>>{
+              'atraxa, praetors\' voice': _cardRecord(
+                id: 'cmd-1',
+                name: 'Atraxa, Praetors\' Voice',
+                colorIdentity: <String>['W', 'U', 'B', 'G'],
+                colors: <String>['W', 'U', 'B', 'G'],
+              ),
+              'sol ring': _cardRecord(id: 'deck-1', name: 'Sol Ring'),
+              'lightning bolt': _cardRecord(
+                id: 'deck-2',
+                name: 'Lightning Bolt',
+                colorIdentity: <String>['R'],
+                colors: <String>['R'],
+              ),
+            },
+            commanderLegalityById: const <String, String>{
+              'cmd-1': 'legal',
+              'deck-1': 'legal',
+              'deck-2': 'legal',
+            },
+          ),
+        );
 
-      final result = validateExternalCommanderMetaCandidate(
-        candidate,
-        profile: topDeckEdhTop16Stage2ValidationProfile,
-        dryRun: true,
-        legalityEvidence: evidence,
-      );
+        final result = validateExternalCommanderMetaCandidate(
+          candidate,
+          profile: topDeckEdhTop16Stage2ValidationProfile,
+          dryRun: true,
+          legalityEvidence: evidence,
+        );
 
-      expect(result.accepted, isFalse);
-      expect(evidence.commanderColorIdentity, <String>{'W', 'U', 'B', 'G'});
-      expect(evidence.legalStatus, externalCommanderMetaLegalStatusIllegal);
-      expect(evidence.illegalCards, hasLength(1));
-      expect(evidence.illegalCards.single.name, 'Lightning Bolt');
-      expect(
-        evidence.illegalCards.single.reasons,
-        contains('outside_commander_identity'),
-      );
-      expect(
-          result.issues.map((issue) => issue.code), contains('illegal_cards'));
-    });
+        expect(result.accepted, isFalse);
+        expect(evidence.commanderColorIdentity, <String>{'W', 'U', 'B', 'G'});
+        expect(evidence.legalStatus, externalCommanderMetaLegalStatusIllegal);
+        expect(evidence.illegalCards, hasLength(1));
+        expect(evidence.illegalCards.single.name, 'Lightning Bolt');
+        expect(
+          evidence.illegalCards.single.reasons,
+          contains('outside_commander_identity'),
+        );
+        expect(
+          result.issues.map((issue) => issue.code),
+          contains('illegal_cards'),
+        );
+      },
+    );
 
     test('stage 2 mantem unresolved_cards como warning em dry-run', () async {
-      final candidate = ExternalCommanderMetaCandidate.fromJson(
-        <String, dynamic>{
-          'source_name': 'EDHTop16',
-          'source_url':
-              'https://edhtop16.com/tournament/cedh-arcanum-sanctorum-57#standing-11',
-          'deck_name': 'Kraum Tymna With Gap',
-          'commander_name': 'Kraum, Ludevic\'s Opus',
-          'partner_commander_name': 'Tymna the Weaver',
-          'format': 'commander',
-          'subformat': 'competitive_commander',
-          'card_list': [
-            '1 Kraum, Ludevic\'s Opus',
-            '1 Tymna the Weaver',
-            '1 Sol Ring',
-            '1 Missing Card',
-            ...List<String>.generate(94, (index) => '1 Island ${index + 1}'),
-          ].join('\n'),
-          'research_payload': <String, dynamic>{
-            'collection_method': 'edhtop16_graphql_topdeck_deck_page_dry_run',
-            'source_context': 'edhtop16_tournament_entry',
-            'total_cards': 100,
-          },
+      final candidate = ExternalCommanderMetaCandidate.fromJson(<
+        String,
+        dynamic
+      >{
+        'source_name': 'EDHTop16',
+        'source_url':
+            'https://edhtop16.com/tournament/cedh-arcanum-sanctorum-57#standing-11',
+        'deck_name': 'Kraum Tymna With Gap',
+        'commander_name': 'Kraum, Ludevic\'s Opus',
+        'partner_commander_name': 'Tymna the Weaver',
+        'format': 'commander',
+        'subformat': 'competitive_commander',
+        'card_list': [
+          '1 Kraum, Ludevic\'s Opus',
+          '1 Tymna the Weaver',
+          '1 Sol Ring',
+          '1 Missing Card',
+          ...List<String>.generate(94, (index) => '1 Island ${index + 1}'),
+        ].join('\n'),
+        'research_payload': <String, dynamic>{
+          'collection_method': 'edhtop16_graphql_topdeck_deck_page_dry_run',
+          'source_context': 'edhtop16_tournament_entry',
+          'total_cards': 100,
         },
-      );
+      });
 
       final evidence = await evaluateExternalCommanderMetaCandidateLegality(
         candidate,
@@ -569,14 +582,19 @@ void main() {
             .severity,
         'warning',
       );
-      expect(result.toJson()['legal_status'],
-          externalCommanderMetaLegalStatusNotProven);
+      expect(
+        result.toJson()['legal_status'],
+        externalCommanderMetaLegalStatusNotProven,
+      );
     });
 
-    test('stage 2 splits single-slash commander labels for partner pairs',
-        () async {
-      final candidate = ExternalCommanderMetaCandidate.fromJson(
-        <String, dynamic>{
+    test(
+      'stage 2 splits single-slash commander labels for partner pairs',
+      () async {
+        final candidate = ExternalCommanderMetaCandidate.fromJson(<
+          String,
+          dynamic
+        >{
           'source_name': 'EDHTop16',
           'source_url':
               'https://edhtop16.com/tournament/cedh-arcanum-sanctorum-57#standing-12',
@@ -595,49 +613,52 @@ void main() {
             'source_context': 'edhtop16_tournament_entry',
             'total_cards': 100,
           },
-        },
-      );
+        });
 
-      final evidence = await evaluateExternalCommanderMetaCandidateLegality(
-        candidate,
-        repository: _FakeLegalityRepository(
-          resolvedByName: <String, Map<String, dynamic>>{
-            'malcolm, keen-eyed navigator': _cardRecord(
-              id: 'cmd-malcolm',
-              name: 'Malcolm, Keen-Eyed Navigator',
-              colors: <String>['U'],
-            ),
-            'vial smasher the fierce': _cardRecord(
-              id: 'cmd-vial',
-              name: 'Vial Smasher the Fierce',
-              colors: <String>['B', 'R'],
-            ),
-            'island': _cardRecord(
-              id: 'deck-island',
-              name: 'Island',
-              typeLine: 'Basic Land — Island',
-            ),
-          },
-          commanderLegalityById: const <String, String>{
-            'cmd-malcolm': 'legal',
-            'cmd-vial': 'legal',
-            'deck-island': 'legal',
-          },
-        ),
-      );
+        final evidence = await evaluateExternalCommanderMetaCandidateLegality(
+          candidate,
+          repository: _FakeLegalityRepository(
+            resolvedByName: <String, Map<String, dynamic>>{
+              'malcolm, keen-eyed navigator': _cardRecord(
+                id: 'cmd-malcolm',
+                name: 'Malcolm, Keen-Eyed Navigator',
+                colors: <String>['U'],
+              ),
+              'vial smasher the fierce': _cardRecord(
+                id: 'cmd-vial',
+                name: 'Vial Smasher the Fierce',
+                colors: <String>['B', 'R'],
+              ),
+              'island': _cardRecord(
+                id: 'deck-island',
+                name: 'Island',
+                typeLine: 'Basic Land — Island',
+              ),
+            },
+            commanderLegalityById: const <String, String>{
+              'cmd-malcolm': 'legal',
+              'cmd-vial': 'legal',
+              'deck-island': 'legal',
+            },
+          ),
+        );
 
-      expect(candidate.commanderNames, <String>[
-        'Malcolm, Keen-Eyed Navigator',
-        'Vial Smasher the Fierce',
-      ]);
-      expect(evidence.commanderColorIdentity, <String>{'U', 'B', 'R'});
-      expect(evidence.legalStatus, externalCommanderMetaLegalStatusLegal);
-    });
+        expect(candidate.commanderNames, <String>[
+          'Malcolm, Keen-Eyed Navigator',
+          'Vial Smasher the Fierce',
+        ]);
+        expect(evidence.commanderColorIdentity, <String>{'U', 'B', 'R'});
+        expect(evidence.legalStatus, externalCommanderMetaLegalStatusLegal);
+      },
+    );
 
-    test('stage 2 derives commander identity from colors and oracle text',
-        () async {
-      final candidate = ExternalCommanderMetaCandidate.fromJson(
-        <String, dynamic>{
+    test(
+      'stage 2 derives commander identity from colors and oracle text',
+      () async {
+        final candidate = ExternalCommanderMetaCandidate.fromJson(<
+          String,
+          dynamic
+        >{
           'source_name': 'EDHTop16',
           'source_url':
               'https://edhtop16.com/tournament/cedh-arcanum-sanctorum-57#standing-13',
@@ -654,63 +675,66 @@ void main() {
             'source_context': 'edhtop16_tournament_entry',
             'total_cards': 100,
           },
-        },
-      );
+        });
 
-      final evidence = await evaluateExternalCommanderMetaCandidateLegality(
-        candidate,
-        repository: _FakeLegalityRepository(
-          resolvedByName: <String, Map<String, dynamic>>{
-            'norman osborn // green goblin': _cardRecord(
-              id: 'cmd-norman',
-              name: 'Norman Osborn // Green Goblin',
-              colors: <String>['U'],
-              oracleText:
-                  '{1}{U}{B}{R}: Transform Norman Osborn. Activate only as a sorcery.',
-            ),
-            'island': _cardRecord(
-              id: 'deck-island',
-              name: 'Island',
-              typeLine: 'Basic Land — Island',
-            ),
-          },
-          commanderLegalityById: const <String, String>{
-            'cmd-norman': 'legal',
-            'deck-island': 'legal',
-          },
-        ),
-      );
+        final evidence = await evaluateExternalCommanderMetaCandidateLegality(
+          candidate,
+          repository: _FakeLegalityRepository(
+            resolvedByName: <String, Map<String, dynamic>>{
+              'norman osborn // green goblin': _cardRecord(
+                id: 'cmd-norman',
+                name: 'Norman Osborn // Green Goblin',
+                colors: <String>['U'],
+                oracleText:
+                    '{1}{U}{B}{R}: Transform Norman Osborn. Activate only as a sorcery.',
+              ),
+              'island': _cardRecord(
+                id: 'deck-island',
+                name: 'Island',
+                typeLine: 'Basic Land — Island',
+              ),
+            },
+            commanderLegalityById: const <String, String>{
+              'cmd-norman': 'legal',
+              'deck-island': 'legal',
+            },
+          ),
+        );
 
-      expect(evidence.commanderColorIdentity, <String>{'U', 'B', 'R'});
-      expect(evidence.legalStatus, externalCommanderMetaLegalStatusLegal);
-    });
+        expect(evidence.commanderColorIdentity, <String>{'U', 'B', 'R'});
+        expect(evidence.legalStatus, externalCommanderMetaLegalStatusLegal);
+      },
+    );
 
     test(
-        'artifact de validacao stage 2 expoe commander_color_identity e status',
-        () {
-      final raw = File(_stage2ValidationArtifactPath).readAsStringSync();
-      final decoded = jsonDecode(raw) as Map<String, dynamic>;
-      final results =
-          (decoded['results'] as List<dynamic>).cast<Map<String, dynamic>>();
+      'artifact de validacao stage 2 expoe commander_color_identity e status',
+      () {
+        final raw = File(_stage2ValidationArtifactPath).readAsStringSync();
+        final decoded = jsonDecode(raw) as Map<String, dynamic>;
+        final results =
+            (decoded['results'] as List<dynamic>).cast<Map<String, dynamic>>();
 
-      expect(results, isNotEmpty);
-      for (final result in results) {
-        expect(result, contains('commander_color_identity'));
-        expect(result, contains('unresolved_cards'));
-        expect(result, contains('illegal_cards'));
-        expect(result, contains('legal_status'));
-      }
-    },
-        skip: _missingArtifactsSkip(
-          const <String>[_stage2ValidationArtifactPath],
-        ));
+        expect(results, isNotEmpty);
+        for (final result in results) {
+          expect(result, contains('commander_color_identity'));
+          expect(result, contains('unresolved_cards'));
+          expect(result, contains('illegal_cards'));
+          expect(result, contains('legal_status'));
+        }
+      },
+      tags: const <String>[_historicalExternalSnapshotTag],
+      skip: _historicalSnapshotUnavailable(const <String>[
+        _stage2ValidationArtifactPath,
+      ]),
+    );
   });
 }
 
-String? _missingArtifactsSkip(List<String> paths) {
+String? _historicalSnapshotUnavailable(List<String> paths) {
   final missing = paths.where((path) => !File(path).existsSync()).toList();
   if (missing.isEmpty) return null;
-  return 'Fixture artifact absent: ${missing.join(', ')}';
+  return 'Historical external snapshot unavailable; not active coverage: '
+      '${missing.join(', ')}';
 }
 
 class _FakeLegalityRepository
@@ -725,10 +749,12 @@ class _FakeLegalityRepository
 
   @override
   Future<Map<String, String>> lookupCommanderLegalities(
-      Set<String> cardIds) async {
+    Set<String> cardIds,
+  ) async {
     return Map<String, String>.fromEntries(
-      commanderLegalityById.entries
-          .where((entry) => cardIds.contains(entry.key)),
+      commanderLegalityById.entries.where(
+        (entry) => cardIds.contains(entry.key),
+      ),
     );
   }
 
@@ -756,7 +782,7 @@ String _cleanLookupKey(String value) =>
 Map<String, dynamic> _cardRecord({
   required String id,
   required String name,
-  List<String> colorIdentity = const <String>[],
+  List<String>? colorIdentity,
   List<String> colors = const <String>[],
   String typeLine = 'Artifact',
   String? oracleText,
