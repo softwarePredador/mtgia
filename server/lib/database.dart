@@ -30,7 +30,8 @@ class Database {
   Pool get connection {
     if (!_connected) {
       throw Exception(
-          'A conexão com o banco de dados não foi inicializada. Chame connect() primeiro.');
+        'A conexão com o banco de dados não foi inicializada. Chame connect() primeiro.',
+      );
     }
     return _pool;
   }
@@ -53,6 +54,16 @@ class Database {
     final username = env['DB_USER'];
     final password = env['DB_PASS'];
     final environment = (env['ENVIRONMENT'] ?? 'development').toLowerCase();
+    final poolEnv = <String, String>{};
+    for (final key in const [
+      'DB_POOL_MAX_CONNECTIONS',
+      'DB_POOL_MAX_AGE_SECONDS',
+      'DB_CONNECT_TIMEOUT_SECONDS',
+      'DB_QUERY_TIMEOUT_SECONDS',
+    ]) {
+      final value = env[key];
+      if (value != null) poolEnv[key] = value;
+    }
 
     if (host == null ||
         port == null ||
@@ -79,7 +90,7 @@ class Database {
 
     if (explicitSsl != null) {
       // Modo SSL explícito — usa direto sem fallback.
-      final ok = await _tryConnect(endpoint, explicitSsl);
+      final ok = await _tryConnect(endpoint, explicitSsl, poolEnv);
       if (!ok) {
         print('❌ Falha ao conectar com SSL: ${explicitSsl.name}');
       }
@@ -90,7 +101,7 @@ class Database {
     // depois require se falhar.
     final modes = [SslMode.disable, SslMode.require];
     for (final mode in modes) {
-      final ok = await _tryConnect(endpoint, mode);
+      final ok = await _tryConnect(endpoint, mode, poolEnv);
       if (ok) return;
       print('⚠️  SSL ${mode.name} falhou, tentando próximo...');
     }
@@ -99,16 +110,16 @@ class Database {
   }
 
   /// Tenta criar o pool e validar com `SELECT 1`.
-  Future<bool> _tryConnect(Endpoint endpoint, SslMode sslMode) async {
+  Future<bool> _tryConnect(
+    Endpoint endpoint,
+    SslMode sslMode,
+    Map<String, String> env,
+  ) async {
     Pool? pool;
     try {
-      pool = Pool.withEndpoints(
-        [endpoint],
-        settings: PoolSettings(
-          maxConnectionCount: 10,
-          sslMode: sslMode,
-        ),
-      );
+      pool = Pool.withEndpoints([
+        endpoint,
+      ], settings: databasePoolSettings(env, sslMode: sslMode));
 
       // Testa a conexão real (o Pool é lazy, sem isso não sabemos se funciona).
       await pool.execute(Sql.named('SELECT 1'));
@@ -133,6 +144,38 @@ class Database {
     _connected = false;
     print('Conexão com o PostgreSQL fechada.');
   }
+}
+
+@visibleForTesting
+PoolSettings databasePoolSettings(
+  Map<String, String> env, {
+  required SslMode sslMode,
+}) {
+  return PoolSettings(
+    maxConnectionCount: _positiveInt(
+      env['DB_POOL_MAX_CONNECTIONS'],
+      fallback: 10,
+    ),
+    // Docker/VPS networking may invalidate idle sockets before postgres's
+    // 12-hour pool default. Rotating them prevents the next request from
+    // inheriting a dead connection.
+    maxConnectionAge: Duration(
+      seconds: _positiveInt(env['DB_POOL_MAX_AGE_SECONDS'], fallback: 300),
+    ),
+    connectTimeout: Duration(
+      seconds: _positiveInt(env['DB_CONNECT_TIMEOUT_SECONDS'], fallback: 8),
+    ),
+    queryTimeout: Duration(
+      seconds: _positiveInt(env['DB_QUERY_TIMEOUT_SECONDS'], fallback: 60),
+    ),
+    applicationName: 'manaloom-api',
+    sslMode: sslMode,
+  );
+}
+
+int _positiveInt(String? raw, {required int fallback}) {
+  final value = int.tryParse(raw?.trim() ?? '');
+  return value != null && value > 0 ? value : fallback;
 }
 
 SslMode? _parseSslMode(String? raw) {

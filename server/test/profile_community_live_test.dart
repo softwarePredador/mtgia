@@ -2,24 +2,25 @@
 library;
 
 import 'dart:convert';
-import 'dart:io' show Platform;
+import 'dart:io' show HttpStatus, Platform;
 
 import 'package:http/http.dart' as http;
 import 'package:test/test.dart';
 
 void main() {
-  final skipIntegration = Platform.environment['RUN_INTEGRATION_TESTS'] == '0'
-      ? 'Teste live desativado por RUN_INTEGRATION_TESTS=0.'
-      : null;
+  final skipIntegration =
+      Platform.environment['RUN_INTEGRATION_TESTS'] == '0'
+          ? 'Teste live desativado por RUN_INTEGRATION_TESTS=0.'
+          : null;
   final baseUrl =
       Platform.environment['TEST_API_BASE_URL'] ?? 'http://127.0.0.1:8082';
 
   Map<String, String> jsonHeaders([String? token]) => {
-        'Content-Type': 'application/json',
-        'X-Request-Id':
-            'profile-community-live-${DateTime.now().microsecondsSinceEpoch}',
-        if (token != null) 'Authorization': 'Bearer $token',
-      };
+    'Content-Type': 'application/json',
+    'X-Request-Id':
+        'profile-community-live-${DateTime.now().microsecondsSinceEpoch}',
+    if (token != null) 'Authorization': 'Bearer $token',
+  };
 
   Future<Map<String, dynamic>> jsonRequest(
     String method,
@@ -32,15 +33,15 @@ void main() {
     final response = switch (method) {
       'GET' => await http.get(uri, headers: jsonHeaders(token)),
       'POST' => await http.post(
-          uri,
-          headers: jsonHeaders(token),
-          body: jsonEncode(body ?? const {}),
-        ),
+        uri,
+        headers: jsonHeaders(token),
+        body: jsonEncode(body ?? const {}),
+      ),
       'PATCH' => await http.patch(
-          uri,
-          headers: jsonHeaders(token),
-          body: jsonEncode(body ?? const {}),
-        ),
+        uri,
+        headers: jsonHeaders(token),
+        body: jsonEncode(body ?? const {}),
+      ),
       'DELETE' => await http.delete(uri, headers: jsonHeaders(token)),
       _ => throw ArgumentError('Unsupported method $method'),
     };
@@ -126,15 +127,22 @@ void main() {
             'description': 'Public community deck for runtime proof $suffix',
             'is_public': true,
             'cards': [
-              {
-                'card_id': cardId,
-                'quantity': 1,
-                'is_commander': false,
-              },
+              {'card_id': cardId, 'quantity': 1, 'is_commander': false},
             ],
           },
         );
         final deckId = deck['id'] as String;
+        addTearDown(() async {
+          final response = await http.delete(
+            Uri.parse('$baseUrl/decks/$deckId'),
+            headers: jsonHeaders(creatorToken),
+          );
+          expect(
+            response.statusCode,
+            anyOf(HttpStatus.noContent, HttpStatus.notFound),
+            reason: 'Live community fixture cleanup failed: ${response.body}',
+          );
+        });
 
         final search = await jsonRequest(
           'GET',
@@ -186,9 +194,9 @@ void main() {
           token: viewerToken,
         );
         expect(
-          (followers['data'] as List<dynamic>)
-              .cast<Map<String, dynamic>>()
-              .any((u) => u['id'] == (viewer['user'] as Map)['id']),
+          (followers['data'] as List<dynamic>).cast<Map<String, dynamic>>().any(
+            (u) => u['id'] == (viewer['user'] as Map)['id'],
+          ),
           isTrue,
         );
 
@@ -198,9 +206,9 @@ void main() {
           token: viewerToken,
         );
         expect(
-          (following['data'] as List<dynamic>)
-              .cast<Map<String, dynamic>>()
-              .any((u) => u['id'] == creatorId),
+          (following['data'] as List<dynamic>).cast<Map<String, dynamic>>().any(
+            (u) => u['id'] == creatorId,
+          ),
           isTrue,
         );
 
