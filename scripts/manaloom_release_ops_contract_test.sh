@@ -41,6 +41,12 @@ grep -Fq 'flutter_web_release_marker()' \
   "$ROOT_DIR/scripts/manaloom_deploy_flutter_web.sh"
 grep -Fq 'printf '\''flutter_bootstrap.js:%s'\''' \
   "$ROOT_DIR/scripts/manaloom_deploy_flutter_web.sh"
+grep -Fq 'public_web_release_marker()' \
+  "$ROOT_DIR/scripts/manaloom_deploy_public_web.sh"
+grep -Fq 'EASYPANEL_SOURCE_MANAGED=0' \
+  "$ROOT_DIR/scripts/manaloom_deploy_public_web.sh"
+grep -Fq 'HEALTH_BODY="$(curl -fsS --max-time 20 "$PUBLIC_BASE_URL/healthz")"' \
+  "$ROOT_DIR/scripts/manaloom_deploy_public_web.sh"
 
 MOTD_DIGEST="$TMP_DIR/repo-digest-output"
 printf '%s\n' \

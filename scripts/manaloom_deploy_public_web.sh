@@ -42,11 +42,13 @@ HEADERS_FILE=""
 DEPLOY_MUTATION_STARTED=0
 DEPLOY_COMMITTED=0
 SOURCE_MUTATED=0
+EASYPANEL_SOURCE_MANAGED=0
 PREVIOUS_SOURCE_IMAGE=""
 ROLLBACK_SOURCE_IMAGE=""
 PREVIOUS_SPEC_IMAGE=""
 PREVIOUS_RUNNING_IMAGE=""
 PREVIOUS_UPDATE_STATE=""
+PREVIOUS_RELEASE_MARKER=""
 
 trpc_post() {
   local procedure="$1"
@@ -58,12 +60,37 @@ trpc_post() {
     "$EASYPANEL_BASE_URL/api/trpc/$procedure"
 }
 
+public_web_release_marker() {
+  local root_html asset_path marker_hash health_state
+  root_html="$(curl -fsS --max-time 20 "$PUBLIC_BASE_URL/")"
+  asset_path=""
+  if [[ "$root_html" =~ (/_next/static/chunks/webpack-[^\"]+\.js) ]]; then
+    asset_path="${BASH_REMATCH[1]}"
+  fi
+  if [[ -n "$asset_path" ]]; then
+    marker_hash="$(
+      curl -fsS --max-time 20 "$PUBLIC_BASE_URL$asset_path" |
+        shasum -a 256 | awk '{print $1}'
+    )"
+  else
+    asset_path="root"
+    marker_hash="$(printf '%s' "$root_html" | shasum -a 256 | awk '{print $1}')"
+  fi
+  health_state="legacy"
+  if [[ "$(curl -sS --max-time 20 -o /dev/null -w '%{http_code}' \
+        "$PUBLIC_BASE_URL/healthz" 2>/dev/null || true)" == "200" ]]; then
+    health_state="healthz"
+  fi
+  printf '%s|%s|%s' "$health_state" "$asset_path" "$marker_hash"
+}
+
 rollback_public_web() {
   local source_status=1 runtime_status=1 configured_status=1 health_status=1
   local services_json configured_image status
 
   echo "deploy web-public falhou; restaurando origem e digest anteriores" >&2
-  if [[ "$SOURCE_MUTATED" == "1" && -n "$ROLLBACK_SOURCE_IMAGE" ]]; then
+  if [[ "$EASYPANEL_SOURCE_MANAGED" == "1" &&
+        "$SOURCE_MUTATED" == "1" && -n "$ROLLBACK_SOURCE_IMAGE" ]]; then
     trpc_post services.app.updateSourceImage "$(jq -cn \
       --arg project "$EASYPANEL_PROJECT" \
       --arg service "$EASYPANEL_SERVICE" \
@@ -107,7 +134,8 @@ exit 1
     fi
   fi
 
-  if [[ "$SOURCE_MUTATED" == "1" ]]; then
+  if [[ "$EASYPANEL_SOURCE_MANAGED" == "1" &&
+        "$SOURCE_MUTATED" == "1" ]]; then
     if services_json="$(trpc_post projects.listProjectsAndServices null)" &&
        configured_image="$(jq -er \
          --arg project "$EASYPANEL_PROJECT" \
@@ -122,9 +150,8 @@ exit 1
   fi
 
   for _ in $(seq 1 30); do
-    status="$(curl -sS --max-time 20 -o /dev/null -w '%{http_code}' \
-      "$PUBLIC_BASE_URL/healthz" 2>/dev/null || true)"
-    if [[ "$status" == "200" ]]; then
+    status="$(public_web_release_marker 2>/dev/null || true)"
+    if [[ "$status" == "$PREVIOUS_RELEASE_MARKER" ]]; then
       health_status=0
       break
     fi
@@ -133,7 +160,7 @@ exit 1
 
   if [[ "$source_status" == "0" && "$runtime_status" == "0" &&
         "$configured_status" == "0" && "$health_status" == "0" ]]; then
-    echo "rollback web-public comprovado: origem, digest e /healthz restaurados" >&2
+    echo "rollback web-public comprovado: origem, digest e marcador externo restaurados" >&2
     return 0
   fi
   echo "CRITICAL: rollback web-public nao foi comprovado (source=$source_status runtime=$runtime_status configured=$configured_status health=$health_status)" >&2
@@ -210,11 +237,29 @@ ssh -o BatchMode=yes -i "$SSH_KEY" \
   "$SSH_HOST" "docker service inspect '$SERVICE' >/dev/null"
 
 SERVICES_BEFORE="$(trpc_post projects.listProjectsAndServices null)"
-PREVIOUS_SOURCE_IMAGE="$(jq -er \
+easypanel_service_count="$(jq -er \
   --arg project "$EASYPANEL_PROJECT" \
   --arg service "$EASYPANEL_SERVICE" \
-  '.json.services[] | select(.projectName == $project and .name == $service and .type == "app") | .source.image' \
+  '[.json.services[] | select(.projectName == $project and .name == $service and .type == "app")] | length' \
   <<<"$SERVICES_BEFORE")"
+case "$easypanel_service_count" in
+  0)
+    EASYPANEL_SOURCE_MANAGED=0
+    echo "web-public usa contrato Swarm direto; origem EasyPanel nao se aplica" >&2
+    ;;
+  1)
+    EASYPANEL_SOURCE_MANAGED=1
+    PREVIOUS_SOURCE_IMAGE="$(jq -er \
+      --arg project "$EASYPANEL_PROJECT" \
+      --arg service "$EASYPANEL_SERVICE" \
+      '.json.services[] | select(.projectName == $project and .name == $service and .type == "app") | .source.image' \
+      <<<"$SERVICES_BEFORE")"
+    ;;
+  *)
+    echo "deploy recusado: inventario EasyPanel duplicou web-public" >&2
+    exit 2
+    ;;
+esac
 PREVIOUS_RUNTIME_STATE="$(ssh -o BatchMode=yes -i "$SSH_KEY" "$SSH_HOST" "
 replicas=\$(docker service ls --filter name='$SERVICE' --format '{{.Replicas}}' | head -1)
 spec=\$(docker service inspect '$SERVICE' --format '{{.Spec.TaskTemplate.ContainerSpec.Image}}')
@@ -235,9 +280,11 @@ if [[ "$previous_replicas" != "1/1" ||
   exit 2
 fi
 ROLLBACK_SOURCE_IMAGE="$PREVIOUS_SPEC_IMAGE"
-if [[ "$PREVIOUS_SOURCE_IMAGE" != "$ROLLBACK_SOURCE_IMAGE" ]]; then
+if [[ "$EASYPANEL_SOURCE_MANAGED" == "1" &&
+      "$PREVIOUS_SOURCE_IMAGE" != "$ROLLBACK_SOURCE_IMAGE" ]]; then
   echo "origem EasyPanel anterior sera normalizada para o digest imutavel da spec durante eventual rollback" >&2
 fi
+PREVIOUS_RELEASE_MARKER="$(public_web_release_marker)"
 
 git -C "$ROOT_DIR" archive "$SHA" web-public | \
   ssh -o BatchMode=yes -i "$SSH_KEY" \
@@ -333,23 +380,27 @@ if [[ "$replicas" != "1/1" || "$spec_image" != "$IMAGE_DIGEST_REF" ||
   exit 1
 fi
 
-SOURCE_MUTATED=1
-trpc_post services.app.updateSourceImage "$(jq -cn \
-  --arg project "$EASYPANEL_PROJECT" \
-  --arg service "$EASYPANEL_SERVICE" \
-  --arg image "$IMAGE_DIGEST_REF" \
-  '{projectName:$project,serviceName:$service,image:$image}')" >/dev/null
-SERVICES_AFTER="$(trpc_post projects.listProjectsAndServices null)"
-CONFIGURED_IMAGE="$(jq -er \
-  --arg project "$EASYPANEL_PROJECT" \
-  --arg service "$EASYPANEL_SERVICE" \
-  '.json.services[] | select(.projectName == $project and .name == $service and .type == "app") | .source.image' \
-  <<<"$SERVICES_AFTER")"
-if [[ "$CONFIGURED_IMAGE" != "$IMAGE_DIGEST_REF" ]]; then
-  echo "web-public convergiu sem o digest exato na origem EasyPanel: $CONFIGURED_IMAGE" >&2
-  exit 2
+if [[ "$EASYPANEL_SOURCE_MANAGED" == "1" ]]; then
+  SOURCE_MUTATED=1
+  trpc_post services.app.updateSourceImage "$(jq -cn \
+    --arg project "$EASYPANEL_PROJECT" \
+    --arg service "$EASYPANEL_SERVICE" \
+    --arg image "$IMAGE_DIGEST_REF" \
+    '{projectName:$project,serviceName:$service,image:$image}')" >/dev/null
+  SERVICES_AFTER="$(trpc_post projects.listProjectsAndServices null)"
+  CONFIGURED_IMAGE="$(jq -er \
+    --arg project "$EASYPANEL_PROJECT" \
+    --arg service "$EASYPANEL_SERVICE" \
+    '.json.services[] | select(.projectName == $project and .name == $service and .type == "app") | .source.image' \
+    <<<"$SERVICES_AFTER")"
+  if [[ "$CONFIGURED_IMAGE" != "$IMAGE_DIGEST_REF" ]]; then
+    echo "web-public convergiu sem o digest exato na origem EasyPanel: $CONFIGURED_IMAGE" >&2
+    exit 2
+  fi
 fi
 
+HEALTH_BODY="$(curl -fsS --max-time 20 "$PUBLIC_BASE_URL/healthz")"
+[[ "$HEALTH_BODY" == "ok" ]]
 for route in / /pricing /marketplace /blog /legal/privacy /legal/terms /legal/disclaimer /robots.txt /sitemap.xml; do
   status="$(curl -sS --max-time 20 -o /dev/null -w '%{http_code}' "$PUBLIC_BASE_URL$route")"
   if [[ "$status" != "200" ]]; then
@@ -372,5 +423,6 @@ fi
 
 DEPLOY_COMMITTED=1
 
-printf '{"status":"deployed","service":"%s","image":"%s","image_digest_ref":"%s","git_sha":"%s","public_url":"%s"}\n' \
-  "$SERVICE" "$IMAGE" "$IMAGE_DIGEST_REF" "$SHA" "$PUBLIC_BASE_URL"
+printf '{"status":"deployed","service":"%s","image":"%s","image_digest_ref":"%s","git_sha":"%s","public_url":"%s","source_management":"%s","healthz":"ok"}\n' \
+  "$SERVICE" "$IMAGE" "$IMAGE_DIGEST_REF" "$SHA" "$PUBLIC_BASE_URL" \
+  "$([[ "$EASYPANEL_SOURCE_MANAGED" == "1" ]] && printf easypanel || printf swarm)"
