@@ -10,6 +10,7 @@ import 'package:manaloom/features/home/lotus/lotus_default_host_web.dart';
 import 'package:manaloom/features/home/lotus/lotus_host_controller.dart'
     show lotusStorageValuesFingerprint;
 import 'package:manaloom/features/home/lotus/lotus_life_counter_session_adapter.dart';
+import 'package:manaloom/features/home/lotus/lotus_native_surface_bridge.dart';
 import 'package:manaloom/features/home/lotus/lotus_shell_policy.dart';
 import 'package:manaloom/features/home/lotus/lotus_storage_snapshot.dart';
 import 'package:manaloom/features/home/lotus/lotus_storage_snapshot_store.dart';
@@ -32,6 +33,7 @@ void main() {
           );
       final ready = Completer<Map<String, Object?>>();
       final evaluation = Completer<Object?>();
+      final shellMessages = <Map<String, dynamic>>[];
       Map<String, String>? persistedValues;
       final subscription = web.window.onMessage.listen((event) {
         final rawData = event.data?.dartify();
@@ -58,6 +60,15 @@ void main() {
                   if (entry.key is String && entry.value is String)
                     entry.key as String: entry.value as String,
               };
+            }
+            return;
+          case 'shell':
+            final rawMessage = data['message'];
+            if (rawMessage is String) {
+              final decoded = jsonDecode(rawMessage);
+              if (decoded is Map<String, dynamic>) {
+                shellMessages.add(decoded);
+              }
             }
             return;
           case 'eval-result':
@@ -112,6 +123,7 @@ void main() {
               lotusInjectedContractScript,
               lotusInjectedVisualSkinScript,
               lotusShellCleanupScript,
+              lotusInjectedNativeSurfaceBridgeScript,
             ],
           ).toJS;
       web.document.body!.appendChild(frame);
@@ -182,6 +194,152 @@ void main() {
   horizontalPreview.style.aspectRatio = 'var(--aspect-ratio-card)';
   horizontalCard.appendChild(horizontalPreview);
   const horizontalPreviewStyle = getComputedStyle(horizontalPreview);
+  const bridgeBoard = document.createElement('section');
+  bridgeBoard.dataset.manaloomNativeBridgeTest = 'true';
+  bridgeBoard.style.display = 'none';
+  const bridgeCards = Array.from({ length: 4 }, (_, index) => {
+    const card = document.createElement('article');
+    card.className = 'player-card';
+    const inner = document.createElement('div');
+    inner.className = 'player-card-inner';
+    const life = document.createElement('div');
+    life.className = 'player-life-count';
+    life.textContent = '40';
+    inner.appendChild(life);
+    if (index === 1) {
+      const counters = document.createElement('div');
+      counters.className = 'counters-on-card';
+      const poison = document.createElement('div');
+      poison.className = 'counter poison';
+      poison.textContent = '2';
+      counters.appendChild(poison);
+      inner.appendChild(counters);
+
+      const commanderCounters = document.createElement('div');
+      commanderCounters.className =
+        'counters-on-card commander-damage-counters';
+      const commanderCounter = document.createElement('div');
+      commanderCounter.className = 'counter commander-damage-counter';
+      commanderCounter.textContent = '7';
+      commanderCounters.appendChild(commanderCounter);
+      inner.appendChild(commanderCounters);
+    }
+    card.appendChild(inner);
+    bridgeBoard.appendChild(card);
+    return card;
+  });
+  const turnTracker = document.createElement('div');
+  turnTracker.className = 'turn-time-tracker';
+  turnTracker.textContent = '00:42';
+  bridgeCards[0].appendChild(turnTracker);
+  const gameTimer = document.createElement('div');
+  gameTimer.className = 'game-timer';
+  gameTimer.textContent = '05:00';
+  bridgeBoard.appendChild(gameTimer);
+  document.body.appendChild(bridgeBoard);
+
+  const shortcutList = document.createElement('div');
+  shortcutList.className = 'list';
+  const settingsEntry = document.createElement('div');
+  settingsEntry.className = 'settings';
+  const settingsShortcut = document.createElement('div');
+  settingsShortcut.className = 'btn';
+  settingsEntry.appendChild(settingsShortcut);
+  const highRollEntry = document.createElement('div');
+  highRollEntry.className = 'high-roll';
+  const highRollShortcut = document.createElement('div');
+  highRollShortcut.className = 'btn';
+  highRollEntry.appendChild(highRollShortcut);
+  shortcutList.append(settingsEntry, highRollEntry);
+  document.body.appendChild(shortcutList);
+
+  const shortcutOverlay = document.createElement('div');
+  shortcutOverlay.className = 'menu-button-overlay';
+  shortcutOverlay.style.display = 'none';
+  const shortcutWrapper = document.createElement('div');
+  shortcutWrapper.className = 'game-states-wrapper';
+  const shortcutClasses = [
+    'dice-btn',
+    'life-history-btn',
+    'card-search-btn',
+    'monarch-btn',
+    'initiative-btn',
+    'day-night-btn',
+    'planechase-gamemode-btn',
+    'archenemy-gamemode-btn',
+    'bounty-gamemode-btn',
+  ];
+  const shortcutNodes = Object.fromEntries(shortcutClasses.map((className) => {
+    const node = document.createElement('div');
+    node.className = className;
+    shortcutWrapper.appendChild(node);
+    return [className, node];
+  }));
+  shortcutOverlay.appendChild(shortcutWrapper);
+  document.body.appendChild(shortcutOverlay);
+
+  const dispatchNativeClick = (node) => !node.dispatchEvent(
+    new MouseEvent('click', { bubbles: true, cancelable: true })
+  );
+  const nativeClickCancellation = {
+    poison: dispatchNativeClick(
+      bridgeCards[1].querySelector('.counter.poison')
+    ),
+    commanderDamage: dispatchNativeClick(
+      bridgeCards[1].querySelector('.commander-damage-counter')
+    ),
+    life: dispatchNativeClick(
+      bridgeCards[1].querySelector('.player-life-count')
+    ),
+    turnTracker: dispatchNativeClick(turnTracker),
+    gameTimer: dispatchNativeClick(gameTimer),
+    settings: dispatchNativeClick(settingsShortcut),
+    highRoll: dispatchNativeClick(highRollShortcut),
+    dice: dispatchNativeClick(shortcutNodes['dice-btn']),
+    history: dispatchNativeClick(shortcutNodes['life-history-btn']),
+    cardSearch: dispatchNativeClick(shortcutNodes['card-search-btn']),
+    monarch: dispatchNativeClick(shortcutNodes['monarch-btn']),
+    initiative: dispatchNativeClick(shortcutNodes['initiative-btn']),
+    dayNight: dispatchNativeClick(shortcutNodes['day-night-btn']),
+    planechase: dispatchNativeClick(
+      shortcutNodes['planechase-gamemode-btn']
+    ),
+    archenemy: dispatchNativeClick(
+      shortcutNodes['archenemy-gamemode-btn']
+    ),
+    bounty: dispatchNativeClick(shortcutNodes['bounty-gamemode-btn']),
+  };
+
+  const optionCard = document.createElement('div');
+  optionCard.className = 'player-card-inner option-card';
+  bridgeCards[2].appendChild(optionCard);
+  const infoCard = document.createElement('div');
+  infoCard.className = 'info-card';
+  bridgeCards[3].appendChild(infoCard);
+
+  const proof = document.createElement('div');
+  proof.dataset.manaloomVisualProof = 'true';
+  const proofCard = document.createElement('article');
+  proofCard.className = 'player-card';
+  const proofOptionCard = document.createElement('div');
+  proofOptionCard.className = 'player-card-inner option-card';
+  proofCard.appendChild(proofOptionCard);
+  proof.appendChild(proofCard);
+  document.body.appendChild(proof);
+
+  await new Promise((resolve) => setTimeout(resolve, 180));
+  const nativeBridgeProbe = {
+    available: !!window.__ManaLoomNativeSurfaceBridge,
+    snapshot: window.__ManaLoomNativeSurfaceBridge.snapshot(),
+    optionCardRemoved: !optionCard.isConnected,
+    infoCardRemoved: !infoCard.isConnected,
+    proofSurfacePreserved: proofOptionCard.isConnected,
+    clickCancellation: nativeClickCancellation,
+  };
+  bridgeBoard.remove();
+  shortcutList.remove();
+  shortcutOverlay.remove();
+  proof.remove();
   const tabletopLayouts = {
     2: 'landscape-landscape',
     3: 'portrait-portrait-landscape',
@@ -293,6 +451,7 @@ void main() {
     horizontalPreviewAspectRatio: horizontalPreviewStyle.aspectRatio,
     horizontalPreviewWidth: horizontalPreviewStyle.width,
     horizontalPreviewHeight: horizontalPreviewStyle.height,
+    nativeBridge: nativeBridgeProbe,
     tabletopLayouts: tabletopLayoutsProbe,
   });
 })()
@@ -332,6 +491,81 @@ void main() {
       expect(probe['horizontalPreviewAspectRatio'], '2 / 1');
       expect(probe['horizontalPreviewWidth'], '100px');
       expect(probe['horizontalPreviewHeight'], '50px');
+      final nativeBridge = probe['nativeBridge'] as Map<String, dynamic>;
+      expect(nativeBridge['available'], isTrue);
+      expect(nativeBridge['optionCardRemoved'], isTrue);
+      expect(nativeBridge['infoCardRemoved'], isTrue);
+      expect(nativeBridge['proofSurfacePreserved'], isTrue);
+      final clickCancellation =
+          nativeBridge['clickCancellation'] as Map<String, dynamic>;
+      expect(clickCancellation.values.every((value) => value == true), isTrue);
+      final bridgeSnapshot = nativeBridge['snapshot'] as Map<String, dynamic>;
+      expect(bridgeSnapshot['regularCounters'], greaterThanOrEqualTo(2));
+      expect(
+        bridgeSnapshot['commanderDamageCounters'],
+        greaterThanOrEqualTo(1),
+      );
+      expect(bridgeSnapshot['nativeActions'], greaterThanOrEqualTo(16));
+
+      final openNativeMessages = shellMessages
+          .where((message) {
+            return (message['type'] as String?)?.startsWith('open-native-') ??
+                false;
+          })
+          .toList(growable: false);
+      final openNativeBySource = <String, Map<String, dynamic>>{
+        for (final message in openNativeMessages)
+          if (message['source'] is String) message['source'] as String: message,
+      };
+      const expectedNativeSources = <String>{
+        'player_counter_surface_pressed',
+        'commander_damage_counter_pressed',
+        'player_life_total_surface_pressed',
+        'turn_tracker_surface_pressed',
+        'game_timer_surface_pressed',
+        'settings_shortcut_pressed',
+        'high_roll_shortcut_pressed',
+        'dice_shortcut_pressed',
+        'history_shortcut_pressed',
+        'card_search_shortcut_pressed',
+        'monarch_shortcut_pressed',
+        'initiative_shortcut_pressed',
+        'day_night_shortcut_pressed',
+        'planechase_shortcut_pressed',
+        'archenemy_shortcut_pressed',
+        'bounty_shortcut_pressed',
+        'player_option_card_presented',
+        'commander_damage_info_card_presented',
+      };
+      expect(openNativeBySource.keys, containsAll(expectedNativeSources));
+      expect(
+        openNativeBySource['player_counter_surface_pressed']?['counterKey'],
+        'poison',
+      );
+      expect(
+        openNativeBySource['player_counter_surface_pressed']?['targetPlayerIndex'],
+        1,
+      );
+      expect(
+        openNativeBySource['commander_damage_counter_pressed']?['targetPlayerIndex'],
+        1,
+      );
+      expect(
+        openNativeBySource['player_life_total_surface_pressed']?['targetPlayerIndex'],
+        1,
+      );
+      expect(
+        openNativeBySource['player_option_card_presented']?['targetPlayerIndex'],
+        2,
+      );
+      expect(
+        openNativeBySource['commander_damage_info_card_presented']?['targetPlayerIndex'],
+        3,
+      );
+      expect(
+        openNativeBySource['planechase_shortcut_pressed']?['preferredMode'],
+        'planechase',
+      );
       final tabletopLayouts =
           (probe['tabletopLayouts'] as List<dynamic>)
               .cast<Map<String, dynamic>>();

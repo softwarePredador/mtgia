@@ -21,6 +21,7 @@ import 'lotus_host_controller.dart'
         mergeLotusBootstrapValues,
         persistCanonicalMirrorFromLotusSnapshot;
 import 'lotus_js_bridges.dart';
+import 'lotus_native_surface_bridge.dart';
 import 'lotus_runtime_flags.dart';
 import 'lotus_shell_policy.dart';
 import 'lotus_storage_snapshot.dart';
@@ -175,6 +176,7 @@ class LotusWebHostController
           lotusInjectedContractScript,
           lotusInjectedVisualSkinScript,
           lotusShellCleanupScript,
+          lotusInjectedNativeSurfaceBridgeScript,
         ],
       );
       _frame.srcdoc = document.toJS;

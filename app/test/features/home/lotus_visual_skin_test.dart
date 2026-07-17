@@ -140,6 +140,24 @@ void main() {
       );
     });
 
+    test('separates table management from readable landscape shortcuts', () {
+      expect(
+        lotusInjectedVisualSkinScript,
+        contains('.menu-button.active .list'),
+      );
+      expect(lotusInjectedVisualSkinScript, contains('left: -80px'));
+      expect(lotusInjectedVisualSkinScript, contains('top: -168px'));
+      expect(
+        lotusInjectedVisualSkinScript,
+        contains('grid-template-columns: repeat(5, minmax(0, 1fr))'),
+      );
+      expect(lotusInjectedVisualSkinScript, contains('width: min(620px'));
+      expect(lotusInjectedVisualSkinScript, contains('hyphens: none'));
+      expect(lotusInjectedVisualSkinScript, contains('Desempate por dados'));
+      expect(lotusInjectedVisualSkinScript, contains('Reiniciar partida'));
+      expect(lotusInjectedVisualSkinScript, contains("'title', entry[1]"));
+    });
+
     test('faces every player card toward its physical table seat', () {
       expect(
         lotusInjectedVisualSkinScript,
@@ -199,7 +217,7 @@ void main() {
       expect(lotusInjectedVisualSkinScript, contains('transform: none'));
       expect(
         RegExp(
-          r'\.player-card\.rotate-right.*?transform: none !important',
+          r'\.player-card\.rotate-right[^\{]*\{[^\}]*transform: none !important',
           dotAll: true,
         ).hasMatch(lotusInjectedVisualSkinScript),
         isFalse,

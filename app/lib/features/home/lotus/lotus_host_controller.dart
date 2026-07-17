@@ -24,6 +24,7 @@ import 'lotus_life_counter_game_timer_adapter.dart';
 import 'lotus_js_bridges.dart';
 import 'lotus_life_counter_settings_adapter.dart';
 import 'lotus_life_counter_session_adapter.dart';
+import 'lotus_native_surface_bridge.dart';
 import 'lotus_runtime_flags.dart';
 import 'lotus_shell_policy.dart';
 import 'lotus_storage_snapshot.dart';
@@ -1456,6 +1457,9 @@ class LotusHostController
       await webViewController.runJavaScript(lotusInjectedContractScript);
       await webViewController.runJavaScript(lotusInjectedVisualSkinScript);
       await webViewController.runJavaScript(lotusShellCleanupScript);
+      await webViewController.runJavaScript(
+        lotusInjectedNativeSurfaceBridgeScript,
+      );
       if (lotusHasVisualProof) {
         final proofScript = lotusInjectedVisualProofScript;
         if (proofScript != null) {

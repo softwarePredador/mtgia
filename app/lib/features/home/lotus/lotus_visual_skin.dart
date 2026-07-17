@@ -1851,6 +1851,42 @@ ${LotusDomSelectors.playerCard} .player-life-count .font {
   display: flex !important;
 }
 
+/* Keep table management separate from the game-state shortcut deck. */
+.menu-button.active .list {
+  position: fixed !important;
+  inset: auto !important;
+  left: -80px !important;
+  top: -168px !important;
+  width: 320px !important;
+  height: 58px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 8px !important;
+  transform: none !important;
+  z-index: 122 !important;
+}
+
+.menu-button.active .list > * {
+  position: relative !important;
+  inset: auto !important;
+  width: 56px !important;
+  height: 56px !important;
+  transform: none !important;
+  animation: none !important;
+}
+
+.menu-button.active .list > * .btn {
+  width: 56px !important;
+  height: 56px !important;
+  min-width: 56px !important;
+  min-height: 56px !important;
+  transform: none !important;
+  border-radius: 10px !important;
+  background-color: rgb(9, 16, 30) !important;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.12) !important;
+}
+
 .menu-button-overlay .game-states-wrapper {
   width: min(390px, calc(100vw - 20px)) !important;
   gap: 6px !important;
@@ -1886,6 +1922,27 @@ ${LotusDomSelectors.playerCard} .player-life-count .font {
   background: rgb(29, 23, 18) !important;
   border-color: rgb(224, 165, 51) !important;
   box-shadow: inset 0 0 0 2px rgba(224, 165, 51, 0.32) !important;
+}
+
+@media (min-width: 600px) and (orientation: landscape) {
+  .menu-button-overlay .game-states-wrapper {
+    width: min(620px, calc(100vw - 32px)) !important;
+    display: grid !important;
+    grid-template-columns: repeat(5, minmax(0, 1fr)) !important;
+    grid-auto-rows: 64px !important;
+  }
+
+  .menu-button-overlay .game-states-wrapper > * {
+    width: auto !important;
+    min-width: 0 !important;
+    max-width: none !important;
+    height: 64px !important;
+    min-height: 64px !important;
+    max-height: 64px !important;
+    overflow-wrap: normal !important;
+    word-break: normal !important;
+    hyphens: none !important;
+  }
 }
 
 @media (max-width: 480px) {
@@ -2831,6 +2888,32 @@ textarea:focus-visible {
       setAttributeIfChanged(menuButton, 'aria-expanded', String(isOpen));
       bindKeyboardAction(menuButton, () => menuButton.click());
     }
+
+    const tableManagementTools = [
+      ['.list > .high-roll .btn', 'Desempate por dados'],
+      ['.list > .settings .btn', 'Configurações'],
+      ['.list > .more .btn', 'Ajuda'],
+      ['.list > .players .btn', 'Jogadores'],
+      ['.list > .restart .btn', 'Reiniciar partida'],
+    ];
+    tableManagementTools.forEach((entry) => {
+      document.querySelectorAll(entry[0]).forEach((node) => {
+        if (!(node instanceof HTMLElement)) {
+          return;
+        }
+        setAttributeIfChanged(node, 'role', 'button');
+        setAttributeIfChanged(
+          node,
+          'tabindex',
+          menuButton instanceof HTMLElement && menuButton.classList.contains('active')
+            ? '0'
+            : '-1',
+        );
+        setAttributeIfChanged(node, 'aria-label', entry[1]);
+        setAttributeIfChanged(node, 'title', entry[1]);
+        bindKeyboardAction(node, () => node.click());
+      });
+    });
 
     document.querySelectorAll('.menu-button-overlay .game-states-wrapper > *').forEach((node) => {
       if (!(node instanceof HTMLElement)) {

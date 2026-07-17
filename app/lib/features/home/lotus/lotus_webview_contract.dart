@@ -16,11 +16,34 @@ abstract final class LotusDomSelectors {
   static const String turnTracker = '.turn-time-tracker';
   static const String menuButton = '.menu-button';
   static const String optionCard = '.player-card-inner.option-card';
+  static const String infoCard = '.player-card > .info-card';
   static const String closeControlsBackdrop = '.close-controls-backdrop';
   static const String regularCounters =
       '.player-card .counters-on-card:not(.commander-damage-counters) .counter';
   static const String commanderDamageCounters =
       '.player-card .commander-damage-counters .commander-damage-counter';
+  static const String lifeTotal = '.player-card .player-life-count';
+  static const String settingsShortcut = '.list > .settings .btn';
+  static const String highRollShortcut = '.list > .high-roll .btn';
+  static const String diceShortcut = '.menu-button-overlay .dice-btn';
+  static const String historyShortcut =
+      '.menu-button-overlay .life-history-btn';
+  static const String cardSearchShortcut =
+      '.menu-button-overlay .card-search-btn';
+  static const String monarchShortcut = '.menu-button-overlay .monarch-btn';
+  static const String initiativeShortcut =
+      '.menu-button-overlay .initiative-btn';
+  static const String dayNightShortcut = '.menu-button-overlay .day-night-btn';
+  static const String dayNightSurface = '.day-night-switcher';
+  static const String planechaseShortcut =
+      '.menu-button-overlay .planechase-gamemode-btn';
+  static const String planechaseSurface = '.planechase-btn';
+  static const String archenemyShortcut =
+      '.menu-button-overlay .archenemy-gamemode-btn';
+  static const String archenemySurface = '.archenemy-btn';
+  static const String bountyShortcut =
+      '.menu-button-overlay .bounty-gamemode-btn';
+  static const String bountySurface = '.bounty-btn';
 }
 
 String get lotusInjectedContractScript {
@@ -32,13 +55,17 @@ String get lotusInjectedContractScript {
     'turnTracker': LotusDomSelectors.turnTracker,
     'menuButton': LotusDomSelectors.menuButton,
     'optionCard': LotusDomSelectors.optionCard,
+    'infoCard': LotusDomSelectors.infoCard,
     'closeControlsBackdrop': LotusDomSelectors.closeControlsBackdrop,
+    'regularCounters': LotusDomSelectors.regularCounters,
+    'commanderDamageCounters': LotusDomSelectors.commanderDamageCounters,
+    'lifeTotal': LotusDomSelectors.lifeTotal,
   });
 
   return '''
 (() => {
   window.__ManaLoomLotusContract = Object.freeze({
-    version: '2026-04-03',
+    version: '2026-07-17',
     selectors: Object.freeze($selectors),
     messages: Object.freeze({
       analytics: '${LotusShellMessageTypes.analytics}',
