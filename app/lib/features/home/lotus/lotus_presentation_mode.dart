@@ -14,7 +14,8 @@ class LotusPresentationMode {
 
   static Future<void> enter() async {
     await SystemChrome.setPreferredOrientations([
-      DeviceOrientation.portraitUp,
+      DeviceOrientation.landscapeLeft,
+      DeviceOrientation.landscapeRight,
     ]);
     await SystemChrome.setEnabledSystemUIMode(
       SystemUiMode.manual,
