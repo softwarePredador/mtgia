@@ -246,7 +246,9 @@ git -C "$ROOT_DIR" archive "$SHA" web-public | \
 api_arg="$(printf '%q' "$API_BASE_URL")"
 site_arg="$(printf '%q' "$SITE_URL")"
 # shellcheck disable=SC2087
-IMAGE_DIGEST_REF="$(ssh -o BatchMode=yes -i "$SSH_KEY" "$SSH_HOST" <<REMOTE
+IMAGE_DIGEST_REF="$(
+  ssh -o BatchMode=yes -i "$SSH_KEY" "$SSH_HOST" <<REMOTE |
+    extract_manaloom_repo_digest_ref "$IMAGE_REPO"
 set -euo pipefail
 cd '$REMOTE_DIR/web-public'
 docker build \

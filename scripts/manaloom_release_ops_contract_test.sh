@@ -28,6 +28,15 @@ if grep -Fq 'expected_proxy_ip="${MANALOOM_PRODUCTION_TRUSTED_PROXY_PEERS%/32}"'
   echo "deploy voltou a derivar o IP logico da allowlist de transporte" >&2
   exit 1
 fi
+for web_deploy in \
+  scripts/manaloom_deploy_flutter_web.sh \
+  scripts/manaloom_deploy_public_web.sh; do
+  if ! grep -Fq 'extract_manaloom_repo_digest_ref "$IMAGE_REPO"' \
+    "$ROOT_DIR/$web_deploy"; then
+    echo "deploy web nao filtra o MOTD antes de validar RepoDigest: $web_deploy" >&2
+    exit 1
+  fi
+done
 
 MOTD_DIGEST="$TMP_DIR/repo-digest-output"
 printf '%s\n' \

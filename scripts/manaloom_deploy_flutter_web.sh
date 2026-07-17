@@ -415,7 +415,8 @@ COPYFILE_DISABLE=1 tar --no-mac-metadata -C "$WORKTREE_DIR/app" -czf - Dockerfil
 # deployment/configuration calls below use only this immutable reference.
 # shellcheck disable=SC2087
 IMAGE_DIGEST_REF="$(
-  ssh -o BatchMode=yes -i "$SSH_KEY" "$SSH_HOST" <<REMOTE
+  ssh -o BatchMode=yes -i "$SSH_KEY" "$SSH_HOST" <<REMOTE |
+    extract_manaloom_repo_digest_ref "$IMAGE_REPO"
 set -euo pipefail
 cd '$REMOTE_DIR'
 docker build -f Dockerfile.web -t '$IMAGE' -t '$IMAGE_REPO:latest' . >&2
