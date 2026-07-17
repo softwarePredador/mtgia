@@ -45,6 +45,24 @@ read_manaloom_keychain_secret() {
   security find-generic-password -a "$account" -s "$service" -w 2>/dev/null
 }
 
+extract_manaloom_repo_digest_ref() {
+  local expected_repo="${1:-}"
+  if [[ -z "$expected_repo" || "$expected_repo" == *[[:space:]]* ||
+        "$expected_repo" == *@* ]]; then
+    return 2
+  fi
+  awk -v expected_repo="$expected_repo" '
+    index($0, expected_repo "@sha256:") == 1 &&
+    $0 ~ /@sha256:[0-9a-f]{64}$/ {
+      digest = $0
+    }
+    END {
+      if (digest == "") exit 1
+      print digest
+    }
+  '
+}
+
 validate_manaloom_easypanel_base_url() {
   local candidate="${1:-}"
   local expected_hash="${MANALOOM_EXPECTED_EASYPANEL_BASE_URL_SHA256:-}"

@@ -13,6 +13,30 @@ trap cleanup EXIT
 # shellcheck source=scripts/lib/manaloom_flutter_release_sdk.sh
 source "$ROOT_DIR/scripts/lib/manaloom_flutter_release_sdk.sh"
 resolve_manaloom_release_flutter
+# shellcheck source=scripts/lib/manaloom_release_runtime_contract.sh
+source "$ROOT_DIR/scripts/lib/manaloom_release_runtime_contract.sh"
+
+MOTD_DIGEST="$TMP_DIR/repo-digest-output"
+printf '%s\n' \
+  'Welcome to Ubuntu' \
+  'System restart required' \
+  'localhost:5000/manaloom/cartinhas@sha256:e439d218bc603cc766388634d2d51de4430938573f483f3326df7f385ba0fd3a' \
+  >"$MOTD_DIGEST"
+PARSED_DIGEST="$(
+  extract_manaloom_repo_digest_ref \
+    'localhost:5000/manaloom/cartinhas' <"$MOTD_DIGEST"
+)"
+if [[ "$PARSED_DIGEST" != \
+      'localhost:5000/manaloom/cartinhas@sha256:e439d218bc603cc766388634d2d51de4430938573f483f3326df7f385ba0fd3a' ]]; then
+  echo "parser de RepoDigest nao filtrou o MOTD SSH" >&2
+  exit 1
+fi
+if printf '%s\n' 'Welcome to Ubuntu' |
+   extract_manaloom_repo_digest_ref \
+     'localhost:5000/manaloom/cartinhas' >/dev/null 2>&1; then
+  echo "parser de RepoDigest aceitou saida sem digest" >&2
+  exit 1
+fi
 
 SHELL_SCRIPTS=(
   scripts/lib/manaloom_flutter_release_sdk.sh

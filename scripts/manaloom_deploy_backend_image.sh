@@ -952,7 +952,7 @@ git archive HEAD server tools/manaloom_lints | ssh -o BatchMode=yes -i "$SSH_KEY
 # remote registry. The mutable SHA/latest tags are never used as a deploy
 # source after this point.
 # shellcheck disable=SC2087
-image_digest_ref="$(
+raw_image_digest_output="$(
   ssh -o BatchMode=yes -i "$SSH_KEY" "$SSH_HOST" <<REMOTE
 set -euo pipefail
 cd '$remote_dir'
@@ -978,10 +978,18 @@ fi
 printf '%s\n' "\$image_digest_ref"
 REMOTE
 )"
+if ! image_digest_ref="$(
+  printf '%s\n' "$raw_image_digest_output" |
+    extract_manaloom_repo_digest_ref "$IMAGE_REPO"
+)"; then
+  echo "push remoto nao retornou RepoDigest SHA-256 valido para o backend" >&2
+  exit 2
+fi
+unset raw_image_digest_output
 image_digest="${image_digest_ref#"$IMAGE_REPO@sha256:"}"
 if [[ "$image_digest_ref" != "$IMAGE_REPO@sha256:$image_digest" ||
       ! "$image_digest" =~ ^[0-9a-f]{64}$ ]]; then
-  echo "push remoto retornou RepoDigest invalido para o backend: $image_digest_ref" >&2
+  echo "push remoto retornou RepoDigest invalido para o backend" >&2
   exit 2
 fi
 readonly image_digest_ref
