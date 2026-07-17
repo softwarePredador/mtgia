@@ -187,7 +187,7 @@ require_auth_runtime_contract() {
 }
 
 require_trusted_proxy_topology() {
-  local topology proxy_ip backend_ip proxy_subnet expected_proxy_ip
+  local topology proxy_ip backend_ip proxy_subnet transport_peer_ip
   topology="$(ssh -o BatchMode=yes -i "$SSH_KEY" "$SSH_HOST" "
 set -euo pipefail
 proxy_cid=\$(docker ps --filter label=com.docker.swarm.service.name=easypanel-traefik -q | head -1)
@@ -196,11 +196,14 @@ test -n \"\$proxy_cid\" && test -n \"\$backend_cid\"
 proxy_ip=\$(docker inspect \"\$proxy_cid\" --format '{{.NetworkSettings.Networks.easypanel.IPAddress}}')
 backend_ip=\$(docker inspect \"\$backend_cid\" --format '{{.NetworkSettings.Networks.easypanel.IPAddress}}')
 proxy_subnet=\$(docker network inspect '$MANALOOM_PRODUCTION_TRUSTED_PROXY_NETWORK' --format '{{range .IPAM.Config}}{{.Subnet}}{{end}}')
-printf '%s|%s|%s' \"\$proxy_ip\" \"\$backend_ip\" \"\$proxy_subnet\"
+transport_peer_ip=\$(docker network inspect '$MANALOOM_PRODUCTION_TRUSTED_PROXY_NETWORK' --format '{{range \$id, \$container := .Containers}}{{if eq \$id \"lb-easypanel\"}}{{\$container.IPv4Address}}{{end}}{{end}}')
+transport_peer_ip=\${transport_peer_ip%/*}
+printf '%s|%s|%s|%s' \"\$proxy_ip\" \"\$backend_ip\" \"\$proxy_subnet\" \"\$transport_peer_ip\"
 ")"
-  IFS='|' read -r proxy_ip backend_ip proxy_subnet <<<"$topology"
-  expected_proxy_ip="${MANALOOM_PRODUCTION_TRUSTED_PROXY_PEERS%/32}"
-  if [[ "$proxy_ip" != "$expected_proxy_ip" ||
+  IFS='|' read -r proxy_ip backend_ip proxy_subnet transport_peer_ip <<<"$topology"
+  if [[ "$proxy_ip" != "$MANALOOM_PRODUCTION_TRAEFIK_LOGICAL_IP" ||
+        "$transport_peer_ip" != "$MANALOOM_PRODUCTION_PROXY_TRANSPORT_PEER_IPV4" ||
+        "$MANALOOM_PRODUCTION_TRUSTED_PROXY_PEERS" != "${transport_peer_ip}/32" ||
         "$proxy_subnet" != "$MANALOOM_PRODUCTION_TRUSTED_PROXY_SUBNET" ]] ||
      ! python3 - "$backend_ip" "$proxy_subnet" <<'PY'
 import ipaddress
@@ -213,7 +216,7 @@ except ValueError:
 raise SystemExit(0 if valid else 1)
 PY
   then
-    echo "deploy recusado: topologia Traefik/backend diverge do peer de proxy aprovado" >&2
+    echo "deploy recusado: topologia Traefik/backend diverge dos enderecos logico ou de transporte aprovados" >&2
     exit 2
   fi
 }

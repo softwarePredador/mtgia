@@ -16,6 +16,19 @@ resolve_manaloom_release_flutter
 # shellcheck source=scripts/lib/manaloom_release_runtime_contract.sh
 source "$ROOT_DIR/scripts/lib/manaloom_release_runtime_contract.sh"
 
+if [[ "$MANALOOM_PRODUCTION_TRAEFIK_LOGICAL_IP" != "10.11.0.202" ||
+      "$MANALOOM_PRODUCTION_PROXY_TRANSPORT_PEER_IPV4" != "10.11.0.4" ||
+      "$MANALOOM_PRODUCTION_TRUSTED_PROXY_PEERS" != "10.11.0.4/32" ]]; then
+  echo "contrato de proxy de producao misturou IP logico e peer de transporte" >&2
+  exit 1
+fi
+grep -Fq 'lb-easypanel' "$ROOT_DIR/scripts/manaloom_deploy_backend_image.sh"
+if grep -Fq 'expected_proxy_ip="${MANALOOM_PRODUCTION_TRUSTED_PROXY_PEERS%/32}"' \
+  "$ROOT_DIR/scripts/manaloom_deploy_backend_image.sh"; then
+  echo "deploy voltou a derivar o IP logico da allowlist de transporte" >&2
+  exit 1
+fi
+
 MOTD_DIGEST="$TMP_DIR/repo-digest-output"
 printf '%s\n' \
   'Welcome to Ubuntu' \

@@ -150,6 +150,30 @@ void main() {
       expect(identity.failureCode, 'untrusted_proxy_peer');
     });
 
+    test('separates the production overlay peer from the Traefik task IP', () {
+      const environment = {
+        'ENVIRONMENT': 'production',
+        'MANALOOM_TRUSTED_PROXY_HOPS': '1',
+        'MANALOOM_TRUSTED_PROXY_PEERS': '10.11.0.4/32',
+      };
+
+      final transportPeer = resolveRateLimitClientIdentity(
+        headers: const {'X-Forwarded-For': '203.0.113.10'},
+        environment: environment,
+        remoteAddress: '::ffff:10.11.0.4',
+      );
+      final logicalTraefikAddress = resolveRateLimitClientIdentity(
+        headers: const {'X-Forwarded-For': '203.0.113.10'},
+        environment: environment,
+        remoteAddress: '::ffff:10.11.0.202',
+      );
+
+      expect(transportPeer.isValid, isTrue);
+      expect(transportPeer.identifier, '203.0.113.10');
+      expect(logicalTraefikAddress.isValid, isFalse);
+      expect(logicalTraefikAddress.failureCode, 'untrusted_proxy_peer');
+    });
+
     test('rejects missing, short or malformed trusted proxy chains', () {
       const environment = {
         'ENVIRONMENT': 'production',

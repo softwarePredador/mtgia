@@ -28,16 +28,34 @@ void main() {
     expect(deploy, contains('jwt_secret_configured'));
     expect(deploy, contains('MANALOOM_JWT_SECRET_KEYCHAIN_SERVICE'));
     expect(deploy, contains('MANALOOM_JWT_SECRET_KEYCHAIN_ACCOUNT'));
-    expect(
-      deploy,
-      contains('read_manaloom_keychain_secret'),
-    );
+    expect(deploy, contains('read_manaloom_keychain_secret'));
     expect(deploy, isNot(contains('echo \"\$JWT_SECRET\"')));
     expect(preflight, contains('jwt_secret=validated'));
     expect(preflight, isNot(contains("Platform.environment['JWT_SECRET']")));
     expect(
       releaseContract,
-      contains('MANALOOM_PRODUCTION_TRUSTED_PROXY_PEERS="10.11.0.202/32"'),
+      contains('MANALOOM_PRODUCTION_TRAEFIK_LOGICAL_IP="10.11.0.202"'),
+    );
+    expect(
+      releaseContract,
+      contains('MANALOOM_PRODUCTION_PROXY_TRANSPORT_PEER_IPV4="10.11.0.4"'),
+    );
+    expect(
+      releaseContract,
+      contains(
+        'MANALOOM_PRODUCTION_TRUSTED_PROXY_PEERS=' +
+            '"\${MANALOOM_PRODUCTION_PROXY_TRANSPORT_PEER_IPV4}/32"',
+      ),
+    );
+    expect(deploy, contains('lb-easypanel'));
+    expect(
+      deploy,
+      isNot(
+        contains(
+          'expected_proxy_ip=' +
+              '"\${MANALOOM_PRODUCTION_TRUSTED_PROXY_PEERS%/32}"',
+        ),
+      ),
     );
     expect(
       releaseContract,
