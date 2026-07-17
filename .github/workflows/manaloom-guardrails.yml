@@ -75,8 +75,20 @@ jobs:
 
       - name: Audit legacy contamination baseline
         run: |
-          python3 docs/hermes-analysis/manaloom-knowledge/scripts/legacy_contamination_audit.py \
-            --out-prefix /tmp/manaloom_legacy_contamination_ci
+          python3 - <<'PY'
+          import sqlite3
+          from pathlib import Path
+
+          fixture = Path('/tmp/manaloom_ci_knowledge.db')
+          with sqlite3.connect(fixture) as connection:
+              connection.execute(
+                  'CREATE TABLE battle_card_rules ('
+                  'id INTEGER PRIMARY KEY, card_id TEXT NOT NULL)'
+              )
+          PY
+          MANALOOM_KNOWLEDGE_DB=/tmp/manaloom_ci_knowledge.db \
+            python3 docs/hermes-analysis/manaloom-knowledge/scripts/legacy_contamination_audit.py \
+              --out-prefix /tmp/manaloom_legacy_contamination_ci
 
       - name: Audit external engine pin contract (offline)
         run: |
