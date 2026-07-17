@@ -59,4 +59,31 @@ void main() {
       throwsFormatException,
     );
   });
+
+  test('only clears a pending mirror after that exact state completes', () {
+    expect(
+      shouldClearLotusWebStoragePendingFingerprint(
+        pendingFingerprint: 'new-state',
+        completedFingerprint: 'old-state',
+        currentStorageFingerprint: 'new-state',
+      ),
+      isFalse,
+    );
+    expect(
+      shouldClearLotusWebStoragePendingFingerprint(
+        pendingFingerprint: 'new-state',
+        completedFingerprint: 'new-state',
+        currentStorageFingerprint: 'new-state',
+      ),
+      isTrue,
+    );
+    expect(
+      shouldClearLotusWebStoragePendingFingerprint(
+        pendingFingerprint: null,
+        completedFingerprint: 'new-state',
+        currentStorageFingerprint: 'new-state',
+      ),
+      isFalse,
+    );
+  });
 }

@@ -2,11 +2,17 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:js_interop';
 
+import 'package:crypto/crypto.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:manaloom/features/home/life_counter/life_counter_session.dart';
 import 'package:manaloom/features/home/life_counter/life_counter_session_store.dart';
 import 'package:manaloom/features/home/lotus/lotus_default_host_web.dart';
+import 'package:manaloom/features/home/lotus/lotus_host_controller.dart'
+    show lotusStorageValuesFingerprint;
+import 'package:manaloom/features/home/lotus/lotus_life_counter_session_adapter.dart';
 import 'package:manaloom/features/home/lotus/lotus_shell_policy.dart';
+import 'package:manaloom/features/home/lotus/lotus_storage_snapshot.dart';
+import 'package:manaloom/features/home/lotus/lotus_storage_snapshot_store.dart';
 import 'package:manaloom/features/home/lotus/lotus_visual_skin.dart';
 import 'package:manaloom/features/home/lotus/lotus_web_document.dart';
 import 'package:manaloom/features/home/lotus/lotus_webview_contract.dart';
@@ -144,6 +150,38 @@ void main() {
   document.body.appendChild(dice);
   await new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)));
   const customDiceInput = dice.querySelector('.roller.custom input');
+  const horizontalCard = document.createElement('section');
+  horizontalCard.className = 'player-card rotate-left';
+  horizontalCard.style.setProperty('--width', '200px');
+  horizontalCard.style.setProperty('--height', '100px');
+  horizontalCard.style.setProperty('--aspect-ratio-card', '0.5');
+  const horizontalInner = document.createElement('div');
+  horizontalInner.className = 'player-card-inner';
+  horizontalInner.innerHTML = `
+    <div class="decrease-button life">−</div>
+    <div class="player-life-count">40</div>
+    <div class="increase-button life">+</div>
+    <div class="counters-on-card"><div class="counter poison">2</div></div>
+  `;
+  horizontalCard.appendChild(horizontalInner);
+  document.body.appendChild(horizontalCard);
+  await new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)));
+  const horizontalInnerStyle = getComputedStyle(horizontalInner);
+  const horizontalLifeStyle = getComputedStyle(
+    horizontalInner.querySelector('.player-life-count'),
+  );
+  const horizontalCardTransform = horizontalInnerStyle.transform;
+  horizontalInner.style.transform = 'translateY(25px)';
+  const horizontalSwipeTransform = getComputedStyle(horizontalInner).transform;
+  horizontalInner.style.removeProperty('transform');
+  const horizontalResetTransform = getComputedStyle(horizontalInner).transform;
+  const horizontalPreview = document.createElement('div');
+  horizontalPreview.style.position = 'absolute';
+  horizontalPreview.style.height = '50px';
+  horizontalPreview.style.width = 'auto';
+  horizontalPreview.style.aspectRatio = 'var(--aspect-ratio-card)';
+  horizontalCard.appendChild(horizontalPreview);
+  const horizontalPreviewStyle = getComputedStyle(horizontalPreview);
   return JSON.stringify({
     playerCards: document.querySelectorAll('.player-card').length,
     visualSkin: !!document.getElementById('manaloom-lotus-visual-skin'),
@@ -156,6 +194,17 @@ void main() {
     customDiceValue: customDiceInput?.value,
     customDiceMin: customDiceInput?.getAttribute('min'),
     customDiceMax: customDiceInput?.getAttribute('max'),
+    horizontalCardTransform,
+    horizontalSwipeTransform,
+    horizontalResetTransform,
+    horizontalCardWidth: horizontalInnerStyle.width,
+    horizontalCardHeight: horizontalInnerStyle.height,
+    horizontalLifeWritingMode: horizontalLifeStyle.writingMode,
+    horizontalCardAspectRatio: getComputedStyle(horizontalCard)
+      .getPropertyValue('--aspect-ratio-card').trim(),
+    horizontalPreviewAspectRatio: horizontalPreviewStyle.aspectRatio,
+    horizontalPreviewWidth: horizontalPreviewStyle.width,
+    horizontalPreviewHeight: horizontalPreviewStyle.height,
   });
 })()
 ''',
@@ -184,6 +233,16 @@ void main() {
       expect(probe['customDiceValue'], '999');
       expect(probe['customDiceMin'], '2');
       expect(probe['customDiceMax'], '999');
+      expect(probe['horizontalCardTransform'], 'none');
+      expect(probe['horizontalSwipeTransform'], isNot('none'));
+      expect(probe['horizontalResetTransform'], 'none');
+      expect(probe['horizontalCardWidth'], '200px');
+      expect(probe['horizontalCardHeight'], '100px');
+      expect(probe['horizontalLifeWritingMode'], 'horizontal-tb');
+      expect(probe['horizontalCardAspectRatio'], '2');
+      expect(probe['horizontalPreviewAspectRatio'], '2 / 1');
+      expect(probe['horizontalPreviewWidth'], '100px');
+      expect(probe['horizontalPreviewHeight'], '50px');
       expect(web.window.localStorage.getItem(hostSentinelKey), 'keep');
       expect(persistedValues?['lotusOnly'], 'yes');
       expect(persistedValues, isNot(contains(hostSentinelKey)));
@@ -194,6 +253,7 @@ void main() {
   test(
     'web host mirrors the Lotus board into canonical app state',
     () async {
+      _clearLotusHostStorage();
       SharedPreferences.setMockInitialValues(<String, Object>{});
       await LifeCounterSessionStore().save(
         LifeCounterSession.initial(playerCount: 4),
@@ -237,7 +297,10 @@ void main() {
 </html>
 ''',
       );
-      addTearDown(controller.dispose);
+      addTearDown(() {
+        controller.dispose();
+        _clearLotusHostStorage();
+      });
       controller.mountFrameForTesting();
 
       await controller.loadBundle();
@@ -262,4 +325,502 @@ void main() {
     },
     timeout: const Timeout(Duration(seconds: 25)),
   );
+
+  test(
+    'pending browser mirror survives immediate reload and repairs canonical state',
+    () async {
+      _clearLotusHostStorage();
+      SharedPreferences.setMockInitialValues(<String, Object>{});
+      final canonicalSession = LifeCounterSession.initial(playerCount: 4);
+      final pendingSession = canonicalSession.copyWith(
+        lives: const <int>[41, 40, 40, 40],
+      );
+      final canonicalValues =
+          LotusLifeCounterSessionAdapter.buildSnapshotValues(canonicalSession);
+      final pendingValues = LotusLifeCounterSessionAdapter.buildSnapshotValues(
+        pendingSession,
+      );
+      await LifeCounterSessionStore().save(canonicalSession);
+      await LotusStorageSnapshotStore().save(
+        LotusStorageSnapshot(values: canonicalValues),
+      );
+      web.window.localStorage
+        ..setItem(lotusWebStorageKey, jsonEncode(pendingValues))
+        ..setItem(
+          lotusWebStoragePendingFingerprintKey,
+          _lotusWebStorageFingerprint(pendingValues),
+        );
+
+      final controller = _createLotusRuntimeController();
+      addTearDown(() {
+        controller.dispose();
+        _clearLotusHostStorage();
+      });
+      controller.mountFrameForTesting();
+
+      await controller.loadBundle();
+
+      expect(controller.errorMessage.value, isNull);
+      expect(await _readFirstPlayerLife(controller), 41);
+      final repairedSession = await LifeCounterSessionStore().load();
+      final repairedSnapshot = await LotusStorageSnapshotStore().load();
+      expect(repairedSession?.lives.first, 41);
+      expect(repairedSnapshot!.values['players'], pendingValues['players']);
+      expect(
+        web.window.localStorage.getItem(lotusWebStoragePendingFingerprintKey),
+        isNull,
+      );
+    },
+    timeout: const Timeout(Duration(seconds: 25)),
+  );
+
+  test(
+    'browser mirror without a pending journal cannot override canonical state',
+    () async {
+      _clearLotusHostStorage();
+      SharedPreferences.setMockInitialValues(<String, Object>{});
+      final canonicalSession = LifeCounterSession.initial(playerCount: 4);
+      final staleBrowserSession = canonicalSession.copyWith(
+        lives: const <int>[41, 40, 40, 40],
+      );
+      final canonicalValues =
+          LotusLifeCounterSessionAdapter.buildSnapshotValues(canonicalSession);
+      final staleBrowserValues =
+          LotusLifeCounterSessionAdapter.buildSnapshotValues(
+            staleBrowserSession,
+          );
+      await LifeCounterSessionStore().save(canonicalSession);
+      await LotusStorageSnapshotStore().save(
+        LotusStorageSnapshot(values: canonicalValues),
+      );
+      web.window.localStorage.setItem(
+        lotusWebStorageKey,
+        jsonEncode(staleBrowserValues),
+      );
+
+      final controller = _createLotusRuntimeController();
+      addTearDown(() {
+        controller.dispose();
+        _clearLotusHostStorage();
+      });
+      controller.mountFrameForTesting();
+
+      await controller.loadBundle();
+
+      expect(controller.errorMessage.value, isNull);
+      expect(await _readFirstPlayerLife(controller), 40);
+      expect((await LifeCounterSessionStore().load())?.lives.first, 40);
+    },
+    timeout: const Timeout(Duration(seconds: 25)),
+  );
+
+  test(
+    'real host journal recovers a life change before its mirror completes',
+    () async {
+      _clearLotusHostStorage();
+      SharedPreferences.setMockInitialValues(<String, Object>{});
+      final canonicalSession = LifeCounterSession.initial(playerCount: 4);
+      await LifeCounterSessionStore().save(canonicalSession);
+      await LotusStorageSnapshotStore().save(
+        LotusStorageSnapshot(
+          values: LotusLifeCounterSessionAdapter.buildSnapshotValues(
+            canonicalSession,
+          ),
+        ),
+      );
+      final mirrorBlocked = Completer<void>();
+      final releaseMirror = Completer<void>();
+      final firstController = _createLotusRuntimeController(
+        canonicalMirrorBarrierForTesting: (values) async {
+          final session = LotusLifeCounterSessionAdapter.tryBuildSession(
+            LotusStorageSnapshot(values: values),
+          );
+          if (session?.lives.first != 41) {
+            return;
+          }
+          if (!mirrorBlocked.isCompleted) {
+            mirrorBlocked.complete();
+          }
+          await releaseMirror.future;
+        },
+      );
+      LotusWebHostController? recoveryController;
+      addTearDown(() {
+        if (!releaseMirror.isCompleted) {
+          releaseMirror.complete();
+        }
+        firstController.dispose();
+        recoveryController?.dispose();
+        _clearLotusHostStorage();
+      });
+      firstController.mountFrameForTesting();
+      await firstController.loadBundle();
+
+      expect(
+        await firstController.runJavaScriptReturningResult('''
+(() => {
+  const players = JSON.parse(localStorage.getItem('players') || '[]');
+  players[0].life = 41;
+  localStorage.setItem('players', JSON.stringify(players));
+  return players[0].life;
+})()
+'''),
+        41,
+      );
+      await mirrorBlocked.future.timeout(const Duration(seconds: 3));
+      final pendingValues = _readLotusHostStorage();
+      expect(
+        web.window.localStorage.getItem(lotusWebStoragePendingFingerprintKey),
+        _lotusWebStorageFingerprint(pendingValues),
+      );
+      expect(
+        LotusLifeCounterSessionAdapter.tryBuildSession(
+          LotusStorageSnapshot(values: pendingValues),
+        )?.lives.first,
+        41,
+      );
+
+      firstController.dispose();
+      recoveryController = _createLotusRuntimeController();
+      recoveryController.mountFrameForTesting();
+      await recoveryController.loadBundle();
+
+      expect(recoveryController.errorMessage.value, isNull);
+      expect(await _readFirstPlayerLife(recoveryController), 41);
+      expect(
+        await recoveryController.flushStorageSnapshot(
+          reason: 'immediate_reload_recovery_test',
+        ),
+        isTrue,
+      );
+      expect((await LifeCounterSessionStore().load())?.lives.first, 41);
+      expect(
+        web.window.localStorage.getItem(lotusWebStoragePendingFingerprintKey),
+        isNull,
+      );
+      releaseMirror.complete();
+      await firstController.settleStorageMirrorForTesting();
+    },
+    timeout: const Timeout(Duration(seconds: 30)),
+  );
+
+  test(
+    'intentional canonical mutation invalidates an older pending journal',
+    () async {
+      _clearLotusHostStorage();
+      SharedPreferences.setMockInitialValues(<String, Object>{});
+      final canonicalSession = LifeCounterSession.initial(playerCount: 4);
+      await LifeCounterSessionStore().save(canonicalSession);
+      await LotusStorageSnapshotStore().save(
+        LotusStorageSnapshot(
+          values: LotusLifeCounterSessionAdapter.buildSnapshotValues(
+            canonicalSession,
+          ),
+        ),
+      );
+      final controller = _createLotusRuntimeController();
+      addTearDown(() {
+        controller.dispose();
+        _clearLotusHostStorage();
+      });
+      controller.mountFrameForTesting();
+      await controller.loadBundle();
+      await controller.flushStorageSnapshot(reason: 'mutation_test_boot');
+
+      final staleBrowserValues =
+          LotusLifeCounterSessionAdapter.buildSnapshotValues(
+            canonicalSession.copyWith(lives: const <int>[41, 40, 40, 40]),
+          );
+      web.window.localStorage
+        ..setItem(lotusWebStorageKey, jsonEncode(staleBrowserValues))
+        ..setItem(
+          lotusWebStoragePendingFingerprintKey,
+          _lotusWebStorageFingerprint(staleBrowserValues),
+        );
+
+      final updated = await controller.mutateCanonicalStorageAndRebase(
+        mutation: () {
+          return LifeCounterSessionStore().save(
+            canonicalSession.copyWith(lives: const <int>[42, 40, 40, 40]),
+          );
+        },
+        reason: 'canonical_mutation_wins_test',
+      );
+
+      expect(updated, isTrue);
+      expect(await _readFirstPlayerLife(controller), 42);
+      expect((await LifeCounterSessionStore().load())?.lives.first, 42);
+      expect(
+        web.window.localStorage.getItem(lotusWebStoragePendingFingerprintKey),
+        isNull,
+      );
+    },
+    timeout: const Timeout(Duration(seconds: 30)),
+  );
+
+  test(
+    'stale iframe storage cannot overwrite an in-flight canonical mutation',
+    () async {
+      _clearLotusHostStorage();
+      SharedPreferences.setMockInitialValues(<String, Object>{});
+      final canonicalSession = LifeCounterSession.initial(playerCount: 4);
+      await LifeCounterSessionStore().save(canonicalSession);
+      await LotusStorageSnapshotStore().save(
+        LotusStorageSnapshot(
+          values: LotusLifeCounterSessionAdapter.buildSnapshotValues(
+            canonicalSession,
+          ),
+        ),
+      );
+      final mutationSaved = Completer<void>();
+      final releaseCanonicalRebase = Completer<void>();
+      final controller = _createLotusRuntimeController(
+        canonicalMutationAfterMutationBarrierForTesting: () async {
+          mutationSaved.complete();
+          await releaseCanonicalRebase.future;
+        },
+      );
+      addTearDown(() {
+        if (!releaseCanonicalRebase.isCompleted) {
+          releaseCanonicalRebase.complete();
+        }
+        controller.dispose();
+        _clearLotusHostStorage();
+      });
+      controller.mountFrameForTesting();
+      await controller.loadBundle();
+
+      final mutationFuture = controller.mutateCanonicalStorageAndRebase(
+        mutation: () {
+          return LifeCounterSessionStore().save(
+            canonicalSession.copyWith(lives: const <int>[42, 40, 40, 40]),
+          );
+        },
+        reason: 'stale_iframe_race_test',
+      );
+      await mutationSaved.future.timeout(const Duration(seconds: 3));
+
+      expect(
+        await controller.runJavaScriptReturningResult('''
+(() => {
+  const players = JSON.parse(localStorage.getItem('players') || '[]');
+  players[0].life = 41;
+  localStorage.setItem('players', JSON.stringify(players));
+  return players[0].life;
+})()
+'''),
+        41,
+      );
+      releaseCanonicalRebase.complete();
+
+      expect(await mutationFuture, isTrue);
+      expect(await _readFirstPlayerLife(controller), 42);
+      expect((await LifeCounterSessionStore().load())?.lives.first, 42);
+      expect(
+        LotusLifeCounterSessionAdapter.tryBuildSession(
+          LotusStorageSnapshot(values: _readLotusHostStorage()),
+        )?.lives.first,
+        42,
+      );
+      expect(
+        web.window.localStorage.getItem(lotusWebStoragePendingFingerprintKey),
+        isNull,
+      );
+    },
+    timeout: const Timeout(Duration(seconds: 30)),
+  );
+
+  test(
+    'failed live patch reloads from canonical state before accepting storage',
+    () async {
+      _clearLotusHostStorage();
+      SharedPreferences.setMockInitialValues(<String, Object>{});
+      final canonicalSession = LifeCounterSession.initial(playerCount: 4);
+      await LifeCounterSessionStore().save(canonicalSession);
+      await LotusStorageSnapshotStore().save(
+        LotusStorageSnapshot(
+          values: LotusLifeCounterSessionAdapter.buildSnapshotValues(
+            canonicalSession,
+          ),
+        ),
+      );
+      final controller = _createLotusRuntimeController(
+        sourceHtml: _lotusRuntimeSourceHtml.replaceFirst(
+          'return { ok: true };',
+          'return { ok: false };',
+        ),
+      );
+      addTearDown(() {
+        controller.dispose();
+        _clearLotusHostStorage();
+      });
+      controller.mountFrameForTesting();
+      await controller.loadBundle();
+
+      final updated = await controller.mutateCanonicalStorageAndRebase(
+        mutation: () {
+          return LifeCounterSessionStore().save(
+            canonicalSession.copyWith(lives: const <int>[42, 40, 40, 40]),
+          );
+        },
+        reason: 'failed_patch_reload_test',
+      );
+
+      expect(updated, isFalse);
+      expect(controller.errorMessage.value, isNull);
+      expect(await _readFirstPlayerLife(controller), 42);
+      expect((await LifeCounterSessionStore().load())?.lives.first, 42);
+      expect(
+        LotusLifeCounterSessionAdapter.tryBuildSession(
+          LotusStorageSnapshot(values: _readLotusHostStorage()),
+        )?.lives.first,
+        42,
+      );
+    },
+    timeout: const Timeout(Duration(seconds: 30)),
+  );
+
+  test(
+    'early fallback load failure rejects delayed storage from stale iframe',
+    () async {
+      _clearLotusHostStorage();
+      SharedPreferences.setMockInitialValues(<String, Object>{});
+      final canonicalSession = LifeCounterSession.initial(playerCount: 4);
+      await LifeCounterSessionStore().save(canonicalSession);
+      await LotusStorageSnapshotStore().save(
+        LotusStorageSnapshot(
+          values: LotusLifeCounterSessionAdapter.buildSnapshotValues(
+            canonicalSession,
+          ),
+        ),
+      );
+      final staleStorageSource = _lotusRuntimeSourceHtml.replaceFirst(
+        'return { ok: true };',
+        '''
+          setTimeout(() => {
+            const stalePlayers = JSON.parse(localStorage.getItem('players') || '[]');
+            stalePlayers[0].life = 41;
+            localStorage.setItem('players', JSON.stringify(stalePlayers));
+          }, 100);
+          return { ok: false };
+        ''',
+      );
+      var sourceLoadCount = 0;
+      final controller = _createLotusRuntimeController(
+        sourceHtmlLoader: () async {
+          sourceLoadCount += 1;
+          if (sourceLoadCount == 1) {
+            return staleStorageSource;
+          }
+          throw StateError('forced early fallback load failure');
+        },
+      );
+      addTearDown(() {
+        controller.dispose();
+        _clearLotusHostStorage();
+      });
+      controller.mountFrameForTesting();
+      await controller.loadBundle();
+
+      final updated = await controller.mutateCanonicalStorageAndRebase(
+        mutation: () {
+          return LifeCounterSessionStore().save(
+            canonicalSession.copyWith(lives: const <int>[42, 40, 40, 40]),
+          );
+        },
+        reason: 'failed_early_fallback_load_test',
+      );
+      await Future<void>.delayed(const Duration(milliseconds: 300));
+
+      expect(updated, isFalse);
+      expect(controller.errorMessage.value, isNotNull);
+      expect((await LifeCounterSessionStore().load())?.lives.first, 42);
+      expect(
+        LotusLifeCounterSessionAdapter.tryBuildSession(
+          LotusStorageSnapshot(values: _readLotusHostStorage()),
+        )?.lives.first,
+        42,
+      );
+    },
+    timeout: const Timeout(Duration(seconds: 30)),
+  );
 }
+
+LotusWebHostController _createLotusRuntimeController({
+  Future<void> Function(Map<String, String>)? canonicalMirrorBarrierForTesting,
+  Future<void> Function()? canonicalMutationAfterMutationBarrierForTesting,
+  String sourceHtml = _lotusRuntimeSourceHtml,
+  Future<String> Function()? sourceHtmlLoader,
+}) {
+  return LotusWebHostController(
+    onAppReviewRequested: (_) {},
+    onShellMessageRequested: (_) {},
+    sourceHtmlLoader: sourceHtmlLoader ?? () async => sourceHtml,
+    canonicalMirrorBarrierForTesting: canonicalMirrorBarrierForTesting,
+    canonicalMutationAfterMutationBarrierForTesting:
+        canonicalMutationAfterMutationBarrierForTesting,
+  );
+}
+
+Future<int> _readFirstPlayerLife(LotusWebHostController controller) async {
+  final rawLife = await controller.runJavaScriptReturningResult('''
+(() => {
+  const players = JSON.parse(localStorage.getItem('players') || '[]');
+  return players.length ? players[0].life : -1;
+})()
+''');
+  return (rawLife as num).toInt();
+}
+
+String _lotusWebStorageFingerprint(Map<String, String> values) {
+  return sha256
+      .convert(utf8.encode(lotusStorageValuesFingerprint(values)))
+      .toString();
+}
+
+void _clearLotusHostStorage() {
+  web.window.localStorage
+    ..removeItem(lotusWebStorageKey)
+    ..removeItem(lotusWebStoragePendingFingerprintKey);
+}
+
+Map<String, String> _readLotusHostStorage() {
+  final raw = web.window.localStorage.getItem(lotusWebStorageKey);
+  final decoded = jsonDecode(raw!) as Map<String, dynamic>;
+  return decoded.map((key, value) => MapEntry(key, value as String));
+}
+
+const String _lotusRuntimeSourceHtml = '''
+<!doctype html>
+<html lang="en" style="background:#000">
+  <head>
+    <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+    <meta charset="utf-8">
+    <title>ManaLoom Life Counter</title>
+    <script>
+      window.__ManaloomLotusStorageBridge = {
+        flushSnapshot: () => ({ ok: true }),
+        receivePatch: (payload) => {
+          const values = payload && payload.values ? payload.values : {};
+          Object.entries(values).forEach(([key, value]) => {
+            if (value === null) localStorage.removeItem(key);
+            else localStorage.setItem(key, value);
+          });
+          return { ok: true };
+        },
+      };
+      document.addEventListener('DOMContentLoaded', () => {
+        for (let index = 0; index < 4; index += 1) {
+          const player = document.createElement('section');
+          player.className = 'player-card';
+          player.dataset.playerId = String(index);
+          document.body.appendChild(player);
+        }
+      });
+    </script>
+  </head>
+  <body>
+    <div id="Content" style="display:none" aria-hidden="true"></div>
+  </body>
+</html>
+''';

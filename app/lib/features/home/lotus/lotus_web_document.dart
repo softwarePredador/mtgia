@@ -1,6 +1,28 @@
 import 'dart:convert';
 
 const String lotusWebStorageKey = 'manaloom_lotus_web_storage_v1';
+const String lotusWebStoragePendingFingerprintKey =
+    'manaloom_lotus_web_storage_pending_fingerprint_v1';
+
+bool isLotusWebStoragePendingFingerprintCurrent({
+  required String? pendingFingerprint,
+  required String currentStorageFingerprint,
+}) {
+  return pendingFingerprint != null &&
+      pendingFingerprint == currentStorageFingerprint;
+}
+
+bool shouldClearLotusWebStoragePendingFingerprint({
+  required String? pendingFingerprint,
+  required String completedFingerprint,
+  required String currentStorageFingerprint,
+}) {
+  return completedFingerprint == currentStorageFingerprint &&
+      isLotusWebStoragePendingFingerprintCurrent(
+        pendingFingerprint: pendingFingerprint,
+        currentStorageFingerprint: currentStorageFingerprint,
+      );
+}
 
 String buildLotusWebDocument({
   required String sourceHtml,

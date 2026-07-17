@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'dart:js_interop';
 import 'dart:ui_web' as ui_web;
 
+import 'package:crypto/crypto.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:web/web.dart' as web;
@@ -16,6 +17,7 @@ import 'lotus_host.dart';
 import 'lotus_host_controller.dart'
     show
         buildLotusFallbackBootstrapValues,
+        lotusStorageValuesFingerprint,
         mergeLotusBootstrapValues,
         persistCanonicalMirrorFromLotusSnapshot;
 import 'lotus_js_bridges.dart';
@@ -48,12 +50,17 @@ class LotusWebHostController
     required LotusAppReviewCallback onAppReviewRequested,
     required LotusShellMessageCallback onShellMessageRequested,
     Future<String> Function()? sourceHtmlLoader,
+    Future<void> Function(Map<String, String>)?
+    canonicalMirrorBarrierForTesting,
+    Future<void> Function()? canonicalMutationAfterMutationBarrierForTesting,
   }) : _onAppReviewRequested = onAppReviewRequested,
        _onShellMessageRequested = onShellMessageRequested,
        _sourceHtmlLoader = sourceHtmlLoader,
+       _canonicalMirrorBarrierForTesting = canonicalMirrorBarrierForTesting,
+       _canonicalMutationAfterMutationBarrierForTesting =
+           canonicalMutationAfterMutationBarrierForTesting,
        _viewType = 'manaloom-lotus-web-${_nextViewId++}',
-       _bridgeToken =
-           'lotus-${DateTime.now().microsecondsSinceEpoch}-$_nextViewId' {
+       _bridgeToken = _createBridgeToken() {
     _frame
       // Lotus is a trusted, bundled runtime and requires IndexedDB. Keeping a
       // same-origin sandbox enables that API; localStorage remains replaced by
@@ -75,18 +82,27 @@ class LotusWebHostController
   }
 
   static int _nextViewId = 0;
+  static int _nextBridgeTokenId = 0;
   static const Duration _loadTimeout = Duration(seconds: 9);
   static const Duration _evaluationTimeout = Duration(seconds: 6);
+  static const int _storageReadStabilityAttempts = 8;
 
   static const String _loadErrorMessage =
       'O ManaLoom não conseguiu abrir o contador de vida neste navegador. '
       'Recarregue a página e tente novamente.';
 
+  static String _createBridgeToken() =>
+      'lotus-${DateTime.now().microsecondsSinceEpoch}-${_nextBridgeTokenId++}';
+
   final LotusAppReviewCallback _onAppReviewRequested;
   final LotusShellMessageCallback _onShellMessageRequested;
   final Future<String> Function()? _sourceHtmlLoader;
+  final Future<void> Function(Map<String, String>)?
+  _canonicalMirrorBarrierForTesting;
+  final Future<void> Function()?
+  _canonicalMutationAfterMutationBarrierForTesting;
   final String _viewType;
-  final String _bridgeToken;
+  String _bridgeToken;
   final web.HTMLIFrameElement _frame = web.HTMLIFrameElement();
   final Map<int, Completer<Object?>> _pendingEvaluations =
       <int, Completer<Object?>>{};
@@ -103,7 +119,9 @@ class LotusWebHostController
   late final StreamSubscription<web.MessageEvent> _messageSubscription;
   Completer<void>? _readyCompleter;
   Future<void> _storageMirrorQueue = Future<void>.value();
+  Future<void> _canonicalMutationQueue = Future<void>.value();
   int _nextEvaluationId = 0;
+  bool _isCanonicalMutationInProgress = false;
   bool _isDisposed = false;
 
   @override
@@ -124,12 +142,19 @@ class LotusWebHostController
     }
   }
 
+  @visibleForTesting
+  Future<void> settleStorageMirrorForTesting() => _storageMirrorQueue;
+
   @override
   Future<void> loadBundle() async {
     if (_isDisposed) {
       return;
     }
 
+    // Invalidate the active document before the first await. If loading the
+    // replacement fails early, delayed messages from the stale iframe still
+    // cannot cross back into canonical storage.
+    _bridgeToken = _createBridgeToken();
     isLoading.value = true;
     errorMessage.value = null;
     final readyCompleter = Completer<void>();
@@ -220,28 +245,72 @@ class LotusWebHostController
     required LotusCanonicalStorageMutation mutation,
     required String reason,
     bool reloadRuntime = false,
+  }) {
+    final result = Completer<bool>();
+    final previousMutation = _canonicalMutationQueue;
+    _canonicalMutationQueue = () async {
+      await previousMutation;
+      try {
+        result.complete(
+          await _performCanonicalStorageMutation(
+            mutation: mutation,
+            reason: reason,
+            reloadRuntime: reloadRuntime,
+          ),
+        );
+      } catch (error, stackTrace) {
+        result.completeError(error, stackTrace);
+      }
+    }();
+    return result.future;
+  }
+
+  Future<bool> _performCanonicalStorageMutation({
+    required LotusCanonicalStorageMutation mutation,
+    required String reason,
+    required bool reloadRuntime,
   }) async {
+    await _storageMirrorQueue;
     if (_isDisposed) {
-      await _storageMirrorQueue;
       await mutation();
       return false;
     }
-    await _storageMirrorQueue;
-    await mutation();
-    if (_isDisposed) return false;
 
-    final authoritativeValues = await _loadCanonicalStorageValues();
-    final currentValues = _loadPersistedStorage();
-    final patch = <String, String?>{
-      for (final key in currentValues.keys)
-        if (!authoritativeValues.containsKey(key)) key: null,
-      ...authoritativeValues,
-    };
-    final patched = await applyLiveStoragePatch(patch);
-    if (!patched || !reloadRuntime || _isDisposed) return patched;
+    _isCanonicalMutationInProgress = true;
+    _invalidatePendingStorageFingerprint();
+    try {
+      await mutation();
+      if (_isDisposed) return false;
+      await _canonicalMutationAfterMutationBarrierForTesting?.call();
+      if (_isDisposed) return false;
 
-    await loadBundle();
-    return !_isDisposed && errorMessage.value == null;
+      final currentValues = _loadPersistedStorage();
+      final authoritativeValues = await _loadCanonicalStorageValues();
+      final patch = <String, String?>{
+        for (final key in currentValues.keys)
+          if (!authoritativeValues.containsKey(key)) key: null,
+        ...authoritativeValues,
+      };
+      await _commitAuthoritativeStorageValues(authoritativeValues);
+      final patched = await applyLiveStoragePatch(patch);
+      if (!patched) {
+        // Do not reactivate persistence from an iframe that could not accept
+        // the authoritative patch. Reloading rotates its bridge token, so any
+        // delayed messages from that stale document remain rejected even when
+        // the fallback load itself fails.
+        if (!_isDisposed) {
+          await loadBundle();
+        }
+        return false;
+      }
+      if (!reloadRuntime || _isDisposed) return true;
+
+      await loadBundle();
+      return !_isDisposed && errorMessage.value == null;
+    } finally {
+      _invalidatePendingStorageFingerprint();
+      _isCanonicalMutationInProgress = false;
+    }
   }
 
   @override
@@ -433,20 +502,69 @@ class LotusWebHostController
   }
 
   Future<Map<String, String>> _loadCanonicalStorageValues() async {
-    final canonicalSnapshot = await _storageSnapshotStore.load();
-    final fallbackValues = await buildLotusFallbackBootstrapValues(
-      dayNightStateStore: _dayNightStateStore,
-      gameTimerStateStore: _gameTimerStateStore,
-      historyStore: _historyStore,
-      sessionStore: _sessionStore,
-      settingsStore: _settingsStore,
-    );
-    return mergeLotusBootstrapValues(
-      snapshotValues: <String, String>{
-        ..._loadPersistedStorage(),
-        ...?canonicalSnapshot?.values,
-      },
-      fallbackValues: fallbackValues,
+    for (
+      var attempt = 0;
+      attempt < _storageReadStabilityAttempts;
+      attempt += 1
+    ) {
+      final observedMirrorQueue = _storageMirrorQueue;
+      await observedMirrorQueue;
+      if (!identical(observedMirrorQueue, _storageMirrorQueue)) {
+        continue;
+      }
+
+      final browserStateBefore = _readStorageJournalState();
+      final canonicalSnapshot = await _storageSnapshotStore.load();
+      final fallbackValues = await buildLotusFallbackBootstrapValues(
+        dayNightStateStore: _dayNightStateStore,
+        gameTimerStateStore: _gameTimerStateStore,
+        historyStore: _historyStore,
+        sessionStore: _sessionStore,
+        settingsStore: _settingsStore,
+      );
+      final browserStateAfter = _readStorageJournalState();
+      if (!identical(observedMirrorQueue, _storageMirrorQueue) ||
+          !browserStateBefore.hasSameJournalAs(browserStateAfter)) {
+        continue;
+      }
+
+      if (!browserStateAfter.hasCurrentPendingMirror) {
+        if (!_removeStalePendingStorageFingerprint(browserStateAfter)) {
+          continue;
+        }
+        return mergeLotusBootstrapValues(
+          snapshotValues: <String, String>{
+            ...browserStateAfter.values,
+            ...?canonicalSnapshot?.values,
+          },
+          fallbackValues: fallbackValues,
+        );
+      }
+
+      // The browser mirror is a complete Lotus snapshot. A matching pending
+      // fingerprint means the app was reloaded before its canonical mirror
+      // finished, so repair every canonical store from that exact snapshot
+      // before booting the board. Keeping the normal precedence otherwise
+      // prevents an old browser mirror from reviving a superseded game.
+      await _enqueueCanonicalStorageMirror(
+        browserStateAfter.values,
+        fingerprint: browserStateAfter.valuesFingerprint,
+      );
+      final repairedBrowserState = _readStorageJournalState();
+      if (repairedBrowserState.valuesFingerprint !=
+          browserStateAfter.valuesFingerprint) {
+        continue;
+      }
+      if (repairedBrowserState.pendingFingerprint != null &&
+          repairedBrowserState.pendingFingerprint !=
+              browserStateAfter.pendingFingerprint) {
+        continue;
+      }
+      return browserStateAfter.values;
+    }
+
+    throw StateError(
+      'Lotus browser storage did not stabilize during bootstrap.',
     );
   }
 
@@ -463,6 +581,9 @@ class LotusWebHostController
   }
 
   void _persistStorage(Object? rawValues) {
+    if (_isCanonicalMutationInProgress) {
+      return;
+    }
     if (rawValues is! Map) {
       return;
     }
@@ -471,15 +592,103 @@ class LotusWebHostController
         if (entry.key is String && entry.value is String)
           entry.key as String: entry.value as String,
     };
+    final fingerprint = _storageFingerprint(values);
     try {
+      web.window.localStorage.setItem(
+        lotusWebStoragePendingFingerprintKey,
+        fingerprint,
+      );
       web.window.localStorage.setItem(lotusWebStorageKey, jsonEncode(values));
     } catch (error) {
       debugPrint('$lotusLogPrefix web storage persist error: $error');
     }
+    unawaited(_enqueueCanonicalStorageMirror(values, fingerprint: fingerprint));
+  }
+
+  String _storageFingerprint(Map<String, String> values) {
+    return sha256
+        .convert(utf8.encode(lotusStorageValuesFingerprint(values)))
+        .toString();
+  }
+
+  String? _loadPendingStorageFingerprint() {
+    try {
+      return web.window.localStorage.getItem(
+        lotusWebStoragePendingFingerprintKey,
+      );
+    } catch (_) {
+      return null;
+    }
+  }
+
+  _LotusWebStorageJournalState _readStorageJournalState() {
+    final values = Map<String, String>.unmodifiable(_loadPersistedStorage());
+    return _LotusWebStorageJournalState(
+      values: values,
+      valuesFingerprint: _storageFingerprint(values),
+      pendingFingerprint: _loadPendingStorageFingerprint(),
+    );
+  }
+
+  bool _removeStalePendingStorageFingerprint(
+    _LotusWebStorageJournalState observedState,
+  ) {
+    if (observedState.pendingFingerprint == null) {
+      return true;
+    }
+    try {
+      final currentState = _readStorageJournalState();
+      if (!observedState.hasSameJournalAs(currentState)) {
+        return false;
+      }
+      web.window.localStorage.removeItem(lotusWebStoragePendingFingerprintKey);
+      return true;
+    } catch (error) {
+      debugPrint('$lotusLogPrefix web storage journal cleanup error: $error');
+      return true;
+    }
+  }
+
+  void _invalidatePendingStorageFingerprint() {
+    try {
+      web.window.localStorage.removeItem(lotusWebStoragePendingFingerprintKey);
+    } catch (error) {
+      debugPrint('$lotusLogPrefix web storage journal cleanup error: $error');
+    }
+  }
+
+  Future<void> _commitAuthoritativeStorageValues(
+    Map<String, String> rawValues,
+  ) async {
+    final values = Map<String, String>.unmodifiable(rawValues);
+    final snapshot = LotusStorageSnapshot(values: values);
+    await _storageSnapshotStore.save(snapshot);
+    await persistCanonicalMirrorFromLotusSnapshot(
+      dayNightStateStore: _dayNightStateStore,
+      gameTimerStateStore: _gameTimerStateStore,
+      historyStore: _historyStore,
+      sessionStore: _sessionStore,
+      settingsStore: _settingsStore,
+      snapshot: snapshot,
+    );
+    try {
+      web.window.localStorage.setItem(lotusWebStorageKey, jsonEncode(values));
+      web.window.localStorage.removeItem(lotusWebStoragePendingFingerprintKey);
+    } catch (error) {
+      debugPrint('$lotusLogPrefix web storage commit error: $error');
+    }
+  }
+
+  Future<void> _enqueueCanonicalStorageMirror(
+    Map<String, String> rawValues, {
+    required String fingerprint,
+  }) {
+    final values = Map<String, String>.unmodifiable(rawValues);
     final previousMirror = _storageMirrorQueue;
-    _storageMirrorQueue = () async {
+    final mirror = () async {
       try {
         await previousMirror;
+        await _canonicalMirrorBarrierForTesting?.call(values);
         final snapshot = LotusStorageSnapshot(values: values);
         await _storageSnapshotStore.save(snapshot);
         await persistCanonicalMirrorFromLotusSnapshot(
@@ -490,9 +699,52 @@ class LotusWebHostController
           settingsStore: _settingsStore,
           snapshot: snapshot,
         );
+        _clearPendingStorageFingerprintIfCurrent(fingerprint);
       } catch (error) {
         debugPrint('$lotusLogPrefix web canonical mirror error: $error');
       }
     }();
+    _storageMirrorQueue = mirror;
+    return mirror;
+  }
+
+  void _clearPendingStorageFingerprintIfCurrent(String fingerprint) {
+    try {
+      final pendingFingerprint = _loadPendingStorageFingerprint();
+      final currentFingerprint = _storageFingerprint(_loadPersistedStorage());
+      if (!shouldClearLotusWebStoragePendingFingerprint(
+        pendingFingerprint: pendingFingerprint,
+        completedFingerprint: fingerprint,
+        currentStorageFingerprint: currentFingerprint,
+      )) {
+        return;
+      }
+      web.window.localStorage.removeItem(lotusWebStoragePendingFingerprintKey);
+    } catch (error) {
+      debugPrint('$lotusLogPrefix web storage journal cleanup error: $error');
+    }
+  }
+}
+
+class _LotusWebStorageJournalState {
+  const _LotusWebStorageJournalState({
+    required this.values,
+    required this.valuesFingerprint,
+    required this.pendingFingerprint,
+  });
+
+  final Map<String, String> values;
+  final String valuesFingerprint;
+  final String? pendingFingerprint;
+
+  bool get hasCurrentPendingMirror =>
+      isLotusWebStoragePendingFingerprintCurrent(
+        pendingFingerprint: pendingFingerprint,
+        currentStorageFingerprint: valuesFingerprint,
+      );
+
+  bool hasSameJournalAs(_LotusWebStorageJournalState other) {
+    return valuesFingerprint == other.valuesFingerprint &&
+        pendingFingerprint == other.pendingFingerprint;
   }
 }

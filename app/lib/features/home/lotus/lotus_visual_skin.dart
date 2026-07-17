@@ -1672,6 +1672,32 @@ body {
   background: #02050b !important;
 }
 
+/*
+ * Keep every tabletop value on the device's horizontal reading axis. Lotus
+ * rotates portrait player cards by 90 degrees for a round-table layout; in
+ * ManaLoom the device is shared in landscape, so that treatment makes life,
+ * +/- controls and counters read vertically. Restoring the card's own width
+ * and height also keeps its visual and touch regions aligned after rotation
+ * is removed.
+ */
+${LotusDomSelectors.playerCard}.rotate-left .player-card-inner,
+${LotusDomSelectors.playerCard}.rotate-right .player-card-inner {
+  --sizeWidth: var(--width) !important;
+  --sizeHeight: var(--height) !important;
+  width: var(--width) !important;
+  height: var(--height) !important;
+  transform: none;
+}
+
+${LotusDomSelectors.playerCard} .player-life-count,
+${LotusDomSelectors.playerCard} .increase-button.life,
+${LotusDomSelectors.playerCard} .decrease-button.life,
+${LotusDomSelectors.playerCard} .counters-on-card .counter,
+${LotusDomSelectors.playerCard} .counter-controls {
+  writing-mode: horizontal-tb !important;
+  text-orientation: mixed !important;
+}
+
 ${LotusDomSelectors.playerCard} {
   filter: saturate(0.72) brightness(0.86) contrast(1.06);
   box-shadow:
@@ -2347,6 +2373,7 @@ textarea:focus-visible {
 
   let activeDialog = null;
   let restoreFocusNode = null;
+  let playerLayoutObserver = null;
   const dialogFocusableSelector = [
     'button:not([disabled])',
     'input:not([disabled])',
@@ -2495,6 +2522,30 @@ textarea:focus-visible {
     playerCards.forEach((card, index) => {
       if (!(card instanceof HTMLElement)) {
         return;
+      }
+      playerLayoutObserver?.observe(card);
+      const panel = card.querySelector('.player-card-inner');
+      if (panel instanceof HTMLElement) {
+        playerLayoutObserver?.observe(panel);
+      }
+      const panelWidth = panel instanceof HTMLElement ? panel.clientWidth : 0;
+      const panelHeight = panel instanceof HTMLElement ? panel.clientHeight : 0;
+      if (panelWidth > 0 && panelHeight > 0) {
+        const panelAspectRatio = String(panelWidth / panelHeight);
+        if (
+          card.style.getPropertyValue('--aspect-ratio-card') !== panelAspectRatio ||
+          card.style.getPropertyPriority('--aspect-ratio-card') !== 'important'
+        ) {
+          // Lotus stores the reciprocal ratio for 90-degree cards because its
+          // stock inner panel is rotated. ManaLoom keeps that panel horizontal,
+          // so previews must use the visible panel ratio as a unitless number.
+          // Avoid typed CSS division here to retain WKWebView/iOS 15.5 support.
+          card.style.setProperty(
+            '--aspect-ratio-card',
+            panelAspectRatio,
+            'important',
+          );
+        }
       }
       const fallbackName = 'Jogador ' + String(index + 1);
       const nameNode = card.querySelector('.player-name, .player-name-input');
@@ -2733,6 +2784,10 @@ textarea:focus-visible {
   };
 
   const accessibilityObserver = new MutationObserver(queueAccessibilitySync);
+  if (typeof ResizeObserver === 'function') {
+    playerLayoutObserver = new ResizeObserver(queueAccessibilitySync);
+  }
+  window.addEventListener('resize', queueAccessibilitySync);
   if (document.body) {
     accessibilityObserver.observe(document.body, {
       childList: true,

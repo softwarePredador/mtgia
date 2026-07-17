@@ -140,6 +140,53 @@ void main() {
       );
     });
 
+    test('keeps life and counters on the horizontal reading axis', () {
+      expect(
+        lotusInjectedVisualSkinScript,
+        contains('.player-card.rotate-left .player-card-inner'),
+      );
+      expect(
+        lotusInjectedVisualSkinScript,
+        contains('.player-card.rotate-right .player-card-inner'),
+      );
+      expect(
+        lotusInjectedVisualSkinScript,
+        contains('--sizeWidth: var(--width) !important'),
+      );
+      expect(
+        lotusInjectedVisualSkinScript,
+        contains('--sizeHeight: var(--height) !important'),
+      );
+      expect(
+        lotusInjectedVisualSkinScript,
+        contains("card.style.setProperty(\n            '--aspect-ratio-card'"),
+      );
+      expect(
+        lotusInjectedVisualSkinScript,
+        contains('const panelAspectRatio = String(panelWidth / panelHeight)'),
+      );
+      expect(
+        lotusInjectedVisualSkinScript,
+        isNot(contains('calc(var(--width) / var(--height))')),
+      );
+      expect(lotusInjectedVisualSkinScript, contains('transform: none'));
+      expect(
+        RegExp(
+          r'\.player-card\.rotate-right.*?transform: none !important',
+          dotAll: true,
+        ).hasMatch(lotusInjectedVisualSkinScript),
+        isFalse,
+      );
+      expect(
+        lotusInjectedVisualSkinScript,
+        contains('writing-mode: horizontal-tb'),
+      );
+      expect(
+        lotusInjectedVisualSkinScript,
+        contains('text-orientation: mixed'),
+      );
+    });
+
     test(
       'keeps history actions clear of the close control on narrow screens',
       () {
