@@ -1,6 +1,12 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+ROOT_DIR="$(CDPATH='' cd -- "$(dirname -- "$0")/.." && pwd)"
+# shellcheck source=scripts/lib/manaloom_mutation_guard.sh
+source "$ROOT_DIR/scripts/lib/manaloom_mutation_guard.sh"
+require_live_mutation_approval "instalacao do backup remoto ManaLoom"
+readonly LIVE_MUTATION_APPROVED=1
+
 SSH_HOST="${MANALOOM_EASYPANEL_SSH_HOST:-root@evolution-cartinhas.2ta7qx.easypanel.host}"
 SSH_KEY="${MANALOOM_EASYPANEL_SSH_KEY:-$HOME/.ssh/manaloom_easy_parallel_20260703}"
 POSTGRES_SERVICE="${MANALOOM_POSTGRES_SERVICE:-evolution_manaloom-postgres}"
@@ -23,10 +29,32 @@ require_tool() {
 
 require_tool ssh
 
+# shellcheck source=scripts/lib/manaloom_release_runtime_contract.sh
+source "$ROOT_DIR/scripts/lib/manaloom_release_runtime_contract.sh"
+validate_manaloom_exact_coordinate postgres_service "$POSTGRES_SERVICE" \
+  evolution_manaloom-postgres
+validate_manaloom_exact_coordinate postgres_user "$POSTGRES_USER" postgres
+validate_manaloom_exact_coordinate postgres_db "$POSTGRES_DB" halder
+validate_manaloom_exact_coordinate remote_backup_root "$REMOTE_ROOT" \
+  /opt/manaloom
+validate_manaloom_exact_coordinate remote_backup_dir "$REMOTE_BACKUP_DIR" \
+  /opt/manaloom/backups/postgres
+validate_manaloom_exact_coordinate remote_log_dir "$REMOTE_LOG_DIR" \
+  /opt/manaloom/logs
+initialize_manaloom_secure_ssh "$SSH_HOST"
+cleanup() {
+  cleanup_manaloom_secure_ssh
+}
+trap cleanup EXIT
+
+if [[ "$LIVE_MUTATION_APPROVED" != "1" ]]; then
+  echo "instalacao recusada: aprovacao live nao foi preservada" >&2
+  exit 2
+fi
+
 ssh_base=(
   ssh
   -o BatchMode=yes
-  -o StrictHostKeyChecking=accept-new
   -i "$SSH_KEY"
   "$SSH_HOST"
 )
@@ -44,7 +72,6 @@ POSTGRES_USER="${MANALOOM_POSTGRES_USER:-postgres}"
 POSTGRES_DB="${MANALOOM_POSTGRES_DB:-halder}"
 BACKUP_DIR="${MANALOOM_BACKUP_DIR:-/opt/manaloom/backups/postgres}"
 RETENTION_DAYS="${MANALOOM_BACKUP_RETENTION_DAYS:-14}"
-RESTORE_IMAGE="${MANALOOM_RESTORE_POSTGRES_IMAGE:-postgres:17}"
 LOCK_FILE="${MANALOOM_BACKUP_LOCK_FILE:-/tmp/manaloom-postgres-backup.lock}"
 
 mkdir -p "$BACKUP_DIR"
@@ -95,11 +122,17 @@ REMOTE_BACKUP_SCRIPT
 set -euo pipefail
 
 BACKUP_DIR="${MANALOOM_BACKUP_DIR:-/opt/manaloom/backups/postgres}"
-RESTORE_IMAGE="${MANALOOM_RESTORE_POSTGRES_IMAGE:-postgres:17}"
+RESTORE_IMAGE="${MANALOOM_RESTORE_POSTGRES_IMAGE:-postgres:17.10-alpine3.23@sha256:8189a1f6e40904781fc9e2612687877791d21679866db58b1de996b31fc312e4}"
+APPROVED_RESTORE_IMAGE="postgres:17.10-alpine3.23@sha256:8189a1f6e40904781fc9e2612687877791d21679866db58b1de996b31fc312e4"
 RESTORE_MODE="${MANALOOM_RESTORE_VALIDATE_MODE:-schema}"
 DB_NAME="${MANALOOM_RESTORE_DB:-manaloom_restore_check}"
 LOCK_FILE="${MANALOOM_RESTORE_LOCK_FILE:-/tmp/manaloom-postgres-restore-check.lock}"
 container="manaloom-restore-check-$(date -u +%Y%m%d%H%M%S)"
+
+if [ "$RESTORE_IMAGE" != "$APPROVED_RESTORE_IMAGE" ]; then
+  echo '{"status":"error","reason":"restore_image_not_approved"}' >&2
+  exit 2
+fi
 
 exec 9>"$LOCK_FILE"
 if ! flock -n 9; then
@@ -158,12 +191,12 @@ restore_cron="$RESTORE_SCHEDULE MANALOOM_BACKUP_DIR=$REMOTE_BACKUP_DIR MANALOOM_
 
 "${ssh_base[@]}" "tmp=\$(mktemp); (crontab -l 2>/dev/null | grep -v '# manaloom-postgres-backup' | grep -v '# manaloom-postgres-restore-check' || true; printf '%s\n' '$backup_cron'; printf '%s\n' '$restore_cron') > \"\$tmp\"; crontab \"\$tmp\"; rm -f \"\$tmp\""
 
-if [ "${MANALOOM_RUN_BACKUP_NOW:-1}" = "1" ]; then
+if [ "${MANALOOM_RUN_BACKUP_NOW:-0}" = "1" ]; then
   echo "[install] running first backup now"
   "${ssh_base[@]}" "MANALOOM_POSTGRES_SERVICE='$POSTGRES_SERVICE' MANALOOM_POSTGRES_USER='$POSTGRES_USER' MANALOOM_POSTGRES_DB='$POSTGRES_DB' MANALOOM_BACKUP_DIR='$REMOTE_BACKUP_DIR' MANALOOM_BACKUP_RETENTION_DAYS='$RETENTION_DAYS' '$REMOTE_ROOT/scripts/postgres_backup.sh'"
 fi
 
-if [ "${MANALOOM_RUN_RESTORE_CHECK_NOW:-1}" = "1" ]; then
+if [ "${MANALOOM_RUN_RESTORE_CHECK_NOW:-0}" = "1" ]; then
   echo "[install] running first restore check now"
   "${ssh_base[@]}" "MANALOOM_BACKUP_DIR='$REMOTE_BACKUP_DIR' MANALOOM_RESTORE_VALIDATE_MODE='$RESTORE_MODE' '$REMOTE_ROOT/scripts/postgres_restore_validate_latest.sh'"
 fi

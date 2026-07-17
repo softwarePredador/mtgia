@@ -19,9 +19,10 @@ import 'package:http/http.dart' as http;
 /// e um banco de dados configurado. Veja `test/README.md`.
 
 void main() {
-  final skipIntegration = Platform.environment['RUN_INTEGRATION_TESTS'] == '0'
-      ? 'Teste live desativado por RUN_INTEGRATION_TESTS=0.'
-      : null;
+  final skipIntegration =
+      Platform.environment['RUN_INTEGRATION_TESTS'] == '0'
+          ? 'Teste live desativado por RUN_INTEGRATION_TESTS=0.'
+          : null;
 
   // URL base do servidor (ajustável via TEST_API_BASE_URL)
   final baseUrl =
@@ -30,8 +31,8 @@ void main() {
   // Credenciais de teste - devem existir no banco ou serem criadas no setup
   const testUser = {
     'email': 'test_deck_crud@example.com',
-    'password': 'TestPassword123!',
-    'username': 'test_deck_user'
+    'password': 'BetaQa!2026-Deck',
+    'username': 'test_deck_user',
   };
 
   String? authToken;
@@ -77,8 +78,10 @@ void main() {
   }
 
   /// Helper: Cria um deck de teste
-  Future<String> createTestDeck(String token,
-      {String name = 'Test Deck'}) async {
+  Future<String> createTestDeck(
+    String token, {
+    String name = 'Test Deck',
+  }) async {
     final response = await http.post(
       Uri.parse('$baseUrl/decks'),
       headers: {
@@ -121,7 +124,8 @@ void main() {
   setUpAll(() async {
     print('\n🔧 Configurando testes de CRUD de Decks...');
     print(
-        '⚠️  IMPORTANTE: Certifique-se que o servidor está rodando em $baseUrl');
+      '⚠️  IMPORTANTE: Certifique-se que o servidor está rodando em $baseUrl',
+    );
     print('   Execute: cd server && dart_frog dev\n');
 
     // Aguarda um pouco para garantir que o servidor está pronto
@@ -202,9 +206,7 @@ void main() {
           'Content-Type': 'application/json',
           'Authorization': 'Bearer $authToken',
         },
-        body: jsonEncode({
-          'name': 'Updated Deck Name',
-        }),
+        body: jsonEncode({'name': 'Updated Deck Name'}),
       );
 
       // Assert
@@ -225,9 +227,7 @@ void main() {
           'Content-Type': 'application/json',
           'Authorization': 'Bearer $authToken',
         },
-        body: jsonEncode({
-          'format': 'standard',
-        }),
+        body: jsonEncode({'format': 'standard'}),
       );
 
       // Assert
@@ -248,17 +248,17 @@ void main() {
           'Content-Type': 'application/json',
           'Authorization': 'Bearer $authToken',
         },
-        body: jsonEncode({
-          'description': 'Nova descrição do deck atualizado',
-        }),
+        body: jsonEncode({'description': 'Nova descrição do deck atualizado'}),
       );
 
       // Assert
       expect(response.statusCode, equals(200));
       final data = jsonDecode(response.body);
       expect(data['success'], isTrue);
-      expect(data['deck']['description'],
-          equals('Nova descrição do deck atualizado'));
+      expect(
+        data['deck']['description'],
+        equals('Nova descrição do deck atualizado'),
+      );
     });
 
     test('should update multiple fields at once', () async {
@@ -296,9 +296,7 @@ void main() {
           'Content-Type': 'application/json',
           'Authorization': 'Bearer $authToken',
         },
-        body: jsonEncode({
-          'name': 'Will Fail',
-        }),
+        body: jsonEncode({'name': 'Will Fail'}),
       );
 
       // Assert
@@ -315,9 +313,7 @@ void main() {
       final response = await http.put(
         Uri.parse('$baseUrl/decks/$testDeckId'),
         headers: {'Content-Type': 'application/json'},
-        body: jsonEncode({
-          'name': 'Should Fail',
-        }),
+        body: jsonEncode({'name': 'Should Fail'}),
       );
 
       // Assert
@@ -348,7 +344,7 @@ void main() {
               'card_id': validCard['id'],
               'quantity': 4, // ❌ Viola regra do Commander
               'is_commander': false,
-            }
+            },
           ],
         }),
       );
@@ -359,16 +355,20 @@ void main() {
       expect(data['error'], contains('limite'));
     });
 
-    test('should allow basic lands in unlimited quantity', () async {
-      // NOTA: Este teste só funciona se houver um terreno básico no banco
-      // Para simplificar, apenas documenta a lógica esperada
+    test(
+      'should allow basic lands in unlimited quantity',
+      () async {
+        // NOTA: Este teste só funciona se houver um terreno básico no banco
+        // Para simplificar, apenas documenta a lógica esperada
 
-      // A lógica está implementada em routes/decks/[id]/index.dart linha 122:
-      // final isBasicLand = typeLine.contains('basic land');
-      // if (!isBasicLand && quantity > limit) { throw Exception(...); }
+        // A lógica está implementada em routes/decks/[id]/index.dart linha 122:
+        // final isBasicLand = typeLine.contains('basic land');
+        // if (!isBasicLand && quantity > limit) { throw Exception(...); }
 
-      expect(true, isTrue); // Placeholder - teste manual necessário
-    }, skip: 'Requer terreno básico específico no banco');
+        expect(true, isTrue); // Placeholder - teste manual necessário
+      },
+      skip: 'Requer terreno básico específico no banco',
+    );
   }, skip: skipIntegration);
 
   group('DELETE /decks/:id - Delete Deck', () {
@@ -440,7 +440,7 @@ void main() {
                 'card_id': validCard['id'],
                 'quantity': 1,
                 'is_commander': false,
-              }
+              },
             ],
           }),
         );
@@ -462,13 +462,17 @@ void main() {
       testDeckId = null;
     });
 
-    test('should not delete deck owned by another user', () async {
-      // Este teste requer criar um segundo usuário, o que é complexo
-      // A lógica está implementada: WHERE user_id = @userId
-      // Documenta o comportamento esperado
+    test(
+      'should not delete deck owned by another user',
+      () async {
+        // Este teste requer criar um segundo usuário, o que é complexo
+        // A lógica está implementada: WHERE user_id = @userId
+        // Documenta o comportamento esperado
 
-      expect(true, isTrue); // Placeholder
-    }, skip: 'Requer setup de múltiplos usuários');
+        expect(true, isTrue); // Placeholder
+      },
+      skip: 'Requer setup de múltiplos usuários',
+    );
   }, skip: skipIntegration);
 
   group('PUT /decks/:id - Update Cards with Validation', () {
@@ -491,11 +495,7 @@ void main() {
         },
         body: jsonEncode({
           'cards': [
-            {
-              'card_id': validCard['id'],
-              'quantity': 1,
-              'is_commander': false,
-            }
+            {'card_id': validCard['id'], 'quantity': 1, 'is_commander': false},
           ],
         }),
       );
@@ -536,9 +536,7 @@ void main() {
           'Content-Type': 'application/json',
           'Authorization': 'Bearer $authToken',
         },
-        body: jsonEncode({
-          'name': 'Name Only Update',
-        }),
+        body: jsonEncode({'name': 'Name Only Update'}),
       );
 
       // Assert: Deve funcionar (cards não são alteradas)
@@ -570,11 +568,7 @@ void main() {
         },
         body: jsonEncode({
           'cards': [
-            {
-              'name': cardName,
-              'quantity': 1,
-              'is_commander': false,
-            }
+            {'name': cardName, 'quantity': 1, 'is_commander': false},
           ],
         }),
       );

@@ -4,6 +4,8 @@ import 'package:manaloom/features/home/life_counter/life_counter_native_commande
 import 'package:manaloom/features/home/life_counter/life_counter_native_player_state_sheet.dart';
 import 'package:manaloom/features/home/life_counter/life_counter_session.dart';
 
+import '../../support/list_tile_material_test_support.dart';
+
 class _Host extends StatelessWidget {
   const _Host({required this.initialSession, required this.onResult});
 
@@ -88,6 +90,8 @@ void main() {
       );
       await tester.tap(find.text('Open'));
       await tester.pumpAndSettle();
+
+      expectListTileInkIsUnobscured(tester);
 
       final deckedOut = find.byKey(
         const Key('life-counter-native-player-state-deckedOut'),

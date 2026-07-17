@@ -8,16 +8,17 @@ import 'package:http/http.dart' as http;
 import 'package:test/test.dart';
 
 void main() {
-  final skipIntegration = Platform.environment['RUN_INTEGRATION_TESTS'] == '0'
-      ? 'Teste live desativado por RUN_INTEGRATION_TESTS=0.'
-      : null;
+  final skipIntegration =
+      Platform.environment['RUN_INTEGRATION_TESTS'] == '0'
+          ? 'Teste live desativado por RUN_INTEGRATION_TESTS=0.'
+          : null;
 
   final baseUrl =
       Platform.environment['TEST_API_BASE_URL'] ?? 'http://127.0.0.1:8082';
 
   const testUser = {
     'email': 'test_error_contract@example.com',
-    'password': 'TestPassword123!',
+    'password': 'BetaQa!2026-Deck',
     'username': 'test_error_contract_user',
   };
 
@@ -213,95 +214,64 @@ void main() {
       skip: skipIntegration,
     );
 
-    test(
-      'GET /auth/me without token returns 401 with error',
-      () async {
-        final response = await http.get(Uri.parse('$baseUrl/auth/me'));
+    test('GET /auth/me without token returns 401 with error', () async {
+      final response = await http.get(Uri.parse('$baseUrl/auth/me'));
 
-        expectJsonErrorContract(response, 401);
-      },
-      skip: skipIntegration,
-    );
+      expectJsonErrorContract(response, 401);
+    }, skip: skipIntegration);
 
-    test(
-      'POST /auth/me returns 405 with error',
-      () async {
-        final response = await http.post(
-          Uri.parse('$baseUrl/auth/me'),
-          headers: {'Content-Type': 'application/json'},
-          body: jsonEncode({}),
-        );
+    test('POST /auth/me returns 405 with error', () async {
+      final response = await http.post(
+        Uri.parse('$baseUrl/auth/me'),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({}),
+      );
 
-        expect405Contract(response);
-      },
-      skip: skipIntegration,
-    );
+      expect405Contract(response);
+    }, skip: skipIntegration);
 
-    test(
-      'GET /decks without token returns 401 with error',
-      () async {
-        final response = await http.get(Uri.parse('$baseUrl/decks'));
+    test('GET /decks without token returns 401 with error', () async {
+      final response = await http.get(Uri.parse('$baseUrl/decks'));
 
-        expectJsonErrorContract(response, 401);
-      },
-      skip: skipIntegration,
-    );
+      expectJsonErrorContract(response, 401);
+    }, skip: skipIntegration);
 
-    test(
-      'POST /decks without token returns 401 with error',
-      () async {
-        final response = await http.post(
-          Uri.parse('$baseUrl/decks'),
-          headers: {'Content-Type': 'application/json'},
-          body: jsonEncode({
-            'name': 'Unauthorized Deck',
-            'format': 'commander',
-          }),
-        );
+    test('POST /decks without token returns 401 with error', () async {
+      final response = await http.post(
+        Uri.parse('$baseUrl/decks'),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({'name': 'Unauthorized Deck', 'format': 'commander'}),
+      );
 
-        expectJsonErrorContract(response, 401);
-      },
-      skip: skipIntegration,
-    );
+      expectJsonErrorContract(response, 401);
+    }, skip: skipIntegration);
 
-    test(
-      'DELETE /decks returns 405 with error',
-      () async {
-        final response = await http.delete(
-          Uri.parse('$baseUrl/decks'),
-          headers: authHeaders(),
-        );
+    test('DELETE /decks returns 405 with error', () async {
+      final response = await http.delete(
+        Uri.parse('$baseUrl/decks'),
+        headers: authHeaders(),
+      );
 
-        expect405Contract(response);
-      },
-      skip: skipIntegration,
-    );
+      expect405Contract(response);
+    }, skip: skipIntegration);
 
-    test(
-      'PUT /decks returns 405 with error',
-      () async {
-        final response = await http.put(
-          Uri.parse('$baseUrl/decks'),
-          headers: authHeaders(true),
-          body: jsonEncode({}),
-        );
+    test('PUT /decks returns 405 with error', () async {
+      final response = await http.put(
+        Uri.parse('$baseUrl/decks'),
+        headers: authHeaders(true),
+        body: jsonEncode({}),
+      );
 
-        expect405Contract(response);
-      },
-      skip: skipIntegration,
-    );
+      expect405Contract(response);
+    }, skip: skipIntegration);
 
-    test(
-      'GET /decks/:id without token returns 401 with error',
-      () async {
-        final response = await http.get(
-          Uri.parse('$baseUrl/decks/$missingDeckId'),
-        );
+    test('GET /decks/:id without token returns 401 with error', () async {
+      final response = await http.get(
+        Uri.parse('$baseUrl/decks/$missingDeckId'),
+      );
 
-        expectJsonErrorContract(response, 401);
-      },
-      skip: skipIntegration,
-    );
+      expectJsonErrorContract(response, 401);
+    }, skip: skipIntegration);
 
     test(
       'GET /decks/:id with missing deck returns 404 with error',
@@ -316,19 +286,15 @@ void main() {
       skip: skipIntegration,
     );
 
-    test(
-      'PUT /decks/:id without token returns 401 with error',
-      () async {
-        final response = await http.put(
-          Uri.parse('$baseUrl/decks/$missingDeckId'),
-          headers: {'Content-Type': 'application/json'},
-          body: jsonEncode({'name': 'x'}),
-        );
+    test('PUT /decks/:id without token returns 401 with error', () async {
+      final response = await http.put(
+        Uri.parse('$baseUrl/decks/$missingDeckId'),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({'name': 'x'}),
+      );
 
-        expectJsonErrorContract(response, 401);
-      },
-      skip: skipIntegration,
-    );
+      expectJsonErrorContract(response, 401);
+    }, skip: skipIntegration);
 
     test(
       'PUT /decks/:id with missing deck returns 404 with error',
@@ -383,18 +349,14 @@ void main() {
       skip: skipIntegration,
     );
 
-    test(
-      'GET /decks/:id/validate returns 405 with error',
-      () async {
-        final response = await http.get(
-          Uri.parse('$baseUrl/decks/$missingDeckId/validate'),
-          headers: authHeaders(),
-        );
+    test('GET /decks/:id/validate returns 405 with error', () async {
+      final response = await http.get(
+        Uri.parse('$baseUrl/decks/$missingDeckId/validate'),
+        headers: authHeaders(),
+      );
 
-        expect405Contract(response);
-      },
-      skip: skipIntegration,
-    );
+      expect405Contract(response);
+    }, skip: skipIntegration);
 
     test(
       'POST /decks/:id/pricing without token returns 401 with error',
@@ -410,18 +372,14 @@ void main() {
       skip: skipIntegration,
     );
 
-    test(
-      'GET /decks/:id/pricing returns 405 with error',
-      () async {
-        final response = await http.get(
-          Uri.parse('$baseUrl/decks/$missingDeckId/pricing'),
-          headers: authHeaders(),
-        );
+    test('GET /decks/:id/pricing returns 405 with error', () async {
+      final response = await http.get(
+        Uri.parse('$baseUrl/decks/$missingDeckId/pricing'),
+        headers: authHeaders(),
+      );
 
-        expect405Contract(response);
-      },
-      skip: skipIntegration,
-    );
+      expect405Contract(response);
+    }, skip: skipIntegration);
 
     test(
       'POST /decks/:id/pricing with missing deck returns 404 with error',
@@ -449,24 +407,20 @@ void main() {
       skip: skipIntegration,
     );
 
-    test(
-      'POST /decks/:id/export returns 405 (or 404 compat)',
-      () async {
-        final response = await http.post(
-          Uri.parse('$baseUrl/decks/$missingDeckId/export'),
-          headers: authHeaders(true),
-          body: jsonEncode({}),
-        );
+    test('POST /decks/:id/export returns 405 (or 404 compat)', () async {
+      final response = await http.post(
+        Uri.parse('$baseUrl/decks/$missingDeckId/export'),
+        headers: authHeaders(true),
+        body: jsonEncode({}),
+      );
 
-        expect(response.statusCode, anyOf(404, 405));
-        if (response.statusCode == 405) {
-          expect405Contract(response);
-        } else {
-          expect404Contract(response);
-        }
-      },
-      skip: skipIntegration,
-    );
+      expect(response.statusCode, anyOf(404, 405));
+      if (response.statusCode == 405) {
+        expect405Contract(response);
+      } else {
+        expect404Contract(response);
+      }
+    }, skip: skipIntegration);
 
     test(
       'GET /decks/:id/export with missing deck returns 404 with error',
@@ -487,9 +441,7 @@ void main() {
         final response = await http.post(
           Uri.parse('$baseUrl/decks'),
           headers: authHeaders(true),
-          body: jsonEncode({
-            'description': 'missing name/format',
-          }),
+          body: jsonEncode({'description': 'missing name/format'}),
         );
 
         expectJsonErrorContract(response, 400);
@@ -626,42 +578,34 @@ void main() {
       skip: skipIntegration,
     );
 
-    test(
-      'POST /ai/ml-status returns 405 (or 404 compat)',
-      () async {
-        final response = await http.post(
-          Uri.parse('$baseUrl/ai/ml-status'),
-          headers: authHeaders(true),
-          body: jsonEncode({}),
-        );
+    test('POST /ai/ml-status returns 405 (or 404 compat)', () async {
+      final response = await http.post(
+        Uri.parse('$baseUrl/ai/ml-status'),
+        headers: authHeaders(true),
+        body: jsonEncode({}),
+      );
 
-        expect(response.statusCode, anyOf(404, 405));
-        if (response.statusCode == 405) {
-          expect405Contract(response);
-        } else {
-          expect404Contract(response);
-        }
-      },
-      skip: skipIntegration,
-    );
+      expect(response.statusCode, anyOf(404, 405));
+      if (response.statusCode == 405) {
+        expect405Contract(response);
+      } else {
+        expect404Contract(response);
+      }
+    }, skip: skipIntegration);
 
-    test(
-      'POST /import without token returns 401 with error',
-      () async {
-        final response = await http.post(
-          Uri.parse('$baseUrl/import'),
-          headers: {'Content-Type': 'application/json'},
-          body: jsonEncode({
-            'name': 'Import Unauthorized',
-            'format': 'commander',
-            'list': '1 Sol Ring',
-          }),
-        );
+    test('POST /import without token returns 401 with error', () async {
+      final response = await http.post(
+        Uri.parse('$baseUrl/import'),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({
+          'name': 'Import Unauthorized',
+          'format': 'commander',
+          'list': '1 Sol Ring',
+        }),
+      );
 
-        expectJsonErrorContract(response, 401);
-      },
-      skip: skipIntegration,
-    );
+      expectJsonErrorContract(response, 401);
+    }, skip: skipIntegration);
 
     test(
       'POST /import with invalid payload returns 400 with error',
@@ -681,33 +625,25 @@ void main() {
       skip: skipIntegration,
     );
 
-    test(
-      'POST /cards returns 405 with error',
-      () async {
-        final response = await http.post(
-          Uri.parse('$baseUrl/cards'),
-          headers: {'Content-Type': 'application/json'},
-          body: jsonEncode({}),
-        );
+    test('POST /cards returns 405 with error', () async {
+      final response = await http.post(
+        Uri.parse('$baseUrl/cards'),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({}),
+      );
 
-        expect405Contract(response);
-      },
-      skip: skipIntegration,
-    );
+      expect405Contract(response);
+    }, skip: skipIntegration);
 
-    test(
-      'POST /cards/printings returns 405 with error',
-      () async {
-        final response = await http.post(
-          Uri.parse('$baseUrl/cards/printings'),
-          headers: {'Content-Type': 'application/json'},
-          body: jsonEncode({}),
-        );
+    test('POST /cards/printings returns 405 with error', () async {
+      final response = await http.post(
+        Uri.parse('$baseUrl/cards/printings'),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({}),
+      );
 
-        expect405Contract(response);
-      },
-      skip: skipIntegration,
-    );
+      expect405Contract(response);
+    }, skip: skipIntegration);
 
     test(
       'GET /cards/printings without name returns 400 with error',
@@ -719,15 +655,11 @@ void main() {
       skip: skipIntegration,
     );
 
-    test(
-      'GET /cards/resolve returns 405 with error',
-      () async {
-        final response = await http.get(Uri.parse('$baseUrl/cards/resolve'));
+    test('GET /cards/resolve returns 405 with error', () async {
+      final response = await http.get(Uri.parse('$baseUrl/cards/resolve'));
 
-        expect405Contract(response);
-      },
-      skip: skipIntegration,
-    );
+      expect405Contract(response);
+    }, skip: skipIntegration);
 
     test(
       'POST /cards/resolve with empty body returns 400 with error',
@@ -864,32 +796,24 @@ void main() {
       skip: skipIntegration,
     );
 
-    test(
-      'POST /rules returns 405 with error',
-      () async {
-        final response = await http.post(
-          Uri.parse('$baseUrl/rules'),
-          headers: {'Content-Type': 'application/json'},
-          body: jsonEncode({}),
-        );
+    test('POST /rules returns 405 with error', () async {
+      final response = await http.post(
+        Uri.parse('$baseUrl/rules'),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({}),
+      );
 
-        expect405Contract(response);
-      },
-      skip: skipIntegration,
-    );
+      expect405Contract(response);
+    }, skip: skipIntegration);
 
-    test(
-      'GET /import returns 405 with error',
-      () async {
-        final response = await http.get(
-          Uri.parse('$baseUrl/import'),
-          headers: authHeaders(),
-        );
+    test('GET /import returns 405 with error', () async {
+      final response = await http.get(
+        Uri.parse('$baseUrl/import'),
+        headers: authHeaders(),
+      );
 
-        expect405Contract(response);
-      },
-      skip: skipIntegration,
-    );
+      expect405Contract(response);
+    }, skip: skipIntegration);
 
     test(
       'POST /ai/archetypes without deck_id returns 400 with error',
@@ -905,19 +829,15 @@ void main() {
       skip: skipIntegration,
     );
 
-    test(
-      'POST /decks/:id returns 405 with error',
-      () async {
-        final response = await http.post(
-          Uri.parse('$baseUrl/decks/$missingDeckId'),
-          headers: authHeaders(true),
-          body: jsonEncode({}),
-        );
+    test('POST /decks/:id returns 405 with error', () async {
+      final response = await http.post(
+        Uri.parse('$baseUrl/decks/$missingDeckId'),
+        headers: authHeaders(true),
+        body: jsonEncode({}),
+      );
 
-        expect405Contract(response);
-      },
-      skip: skipIntegration,
-    );
+      expect405Contract(response);
+    }, skip: skipIntegration);
 
     test(
       'POST /ai/archetypes with missing deck returns 404 with error',
@@ -1070,19 +990,15 @@ void main() {
       skip: skipIntegration,
     );
 
-    test(
-      'POST /community/users returns 405 (or 404 compat)',
-      () async {
-        final response = await http.post(
-          Uri.parse('$baseUrl/community/users?q=test'),
-          headers: {'Content-Type': 'application/json'},
-          body: jsonEncode({}),
-        );
+    test('POST /community/users returns 405 (or 404 compat)', () async {
+      final response = await http.post(
+        Uri.parse('$baseUrl/community/users?q=test'),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({}),
+      );
 
-        expectOptional405Or404(response);
-      },
-      skip: skipIntegration,
-    );
+      expectOptional405Or404(response);
+    }, skip: skipIntegration);
 
     test(
       'GET /community/users/:id with missing user returns 404 with error',
@@ -1266,19 +1182,15 @@ void main() {
       skip: skipIntegration,
     );
 
-    test(
-      'POST /notifications returns 405 (or 404 compat)',
-      () async {
-        final response = await http.post(
-          Uri.parse('$baseUrl/notifications'),
-          headers: authHeaders(true),
-          body: jsonEncode({}),
-        );
+    test('POST /notifications returns 405 (or 404 compat)', () async {
+      final response = await http.post(
+        Uri.parse('$baseUrl/notifications'),
+        headers: authHeaders(true),
+        body: jsonEncode({}),
+      );
 
-        expectOptional405Or404(response);
-      },
-      skip: skipIntegration,
-    );
+      expectOptional405Or404(response);
+    }, skip: skipIntegration);
 
     test(
       'GET /notifications/count without token returns 401 (or 404 compat)',
@@ -1384,19 +1296,15 @@ void main() {
       skip: skipIntegration,
     );
 
-    test(
-      'PUT /trades returns 405 (or 404 compat)',
-      () async {
-        final response = await http.put(
-          Uri.parse('$baseUrl/trades'),
-          headers: authHeaders(true),
-          body: jsonEncode({}),
-        );
+    test('PUT /trades returns 405 (or 404 compat)', () async {
+      final response = await http.put(
+        Uri.parse('$baseUrl/trades'),
+        headers: authHeaders(true),
+        body: jsonEncode({}),
+      );
 
-        expectOptional405Or404(response);
-      },
-      skip: skipIntegration,
-    );
+      expectOptional405Or404(response);
+    }, skip: skipIntegration);
 
     test(
       'POST /trades without token returns 401 (or 404 compat)',
@@ -1491,19 +1399,15 @@ void main() {
       skip: skipIntegration,
     );
 
-    test(
-      'POST /trades/:id returns 405 (or 404 compat)',
-      () async {
-        final response = await http.post(
-          Uri.parse('$baseUrl/trades/$missingTradeId'),
-          headers: authHeaders(true),
-          body: jsonEncode({}),
-        );
+    test('POST /trades/:id returns 405 (or 404 compat)', () async {
+      final response = await http.post(
+        Uri.parse('$baseUrl/trades/$missingTradeId'),
+        headers: authHeaders(true),
+        body: jsonEncode({}),
+      );
 
-        expectOptional405Or404(response);
-      },
-      skip: skipIntegration,
-    );
+      expectOptional405Or404(response);
+    }, skip: skipIntegration);
 
     test(
       'PUT /trades/:id/respond without token returns 401 (or 404 compat)',
@@ -1567,10 +1471,7 @@ void main() {
         final response = await http.put(
           Uri.parse('$baseUrl/trades/$missingTradeId/status'),
           headers: authHeaders(true),
-          body: jsonEncode({
-            'status': 'shipped',
-            'delivery_method': 'mail',
-          }),
+          body: jsonEncode({'status': 'shipped', 'delivery_method': 'mail'}),
         );
 
         expectOptional400Or404(response);
@@ -1641,19 +1542,15 @@ void main() {
       skip: skipIntegration,
     );
 
-    test(
-      'PUT /conversations returns 405 (or 404 compat)',
-      () async {
-        final response = await http.put(
-          Uri.parse('$baseUrl/conversations'),
-          headers: authHeaders(true),
-          body: jsonEncode({}),
-        );
+    test('PUT /conversations returns 405 (or 404 compat)', () async {
+      final response = await http.put(
+        Uri.parse('$baseUrl/conversations'),
+        headers: authHeaders(true),
+        body: jsonEncode({}),
+      );
 
-        expectOptional405Or404(response);
-      },
-      skip: skipIntegration,
-    );
+      expectOptional405Or404(response);
+    }, skip: skipIntegration);
 
     test(
       'POST /conversations without token returns 401 (or 404 compat)',

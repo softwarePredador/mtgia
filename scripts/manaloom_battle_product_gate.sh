@@ -61,7 +61,7 @@ stop_isolated_processes() {
 }
 
 database_snapshot() {
-  "$ROOT_DIR/server/bin/with_new_server_pg.sh" \
+  "$ROOT_DIR/server/bin/with_new_server_pg.sh" --read-only \
     psql -X -qAt -v ON_ERROR_STOP=1 \
       -v validation_email="$VALIDATION_EMAIL" \
       -v validation_username="$VALIDATION_USERNAME" <<'SQL'
@@ -93,7 +93,7 @@ SQL
 }
 
 identity_collision_count() {
-  "$ROOT_DIR/server/bin/with_new_server_pg.sh" \
+  "$ROOT_DIR/server/bin/with_new_server_pg.sh" --read-only \
     psql -X -qAt -v ON_ERROR_STOP=1 \
       -v validation_email="$VALIDATION_EMAIL" \
       -v validation_username="$VALIDATION_USERNAME" <<'SQL'
@@ -105,7 +105,7 @@ SQL
 }
 
 cleanup_battle_identity() {
-  "$ROOT_DIR/server/bin/with_new_server_pg.sh" \
+  "$ROOT_DIR/server/bin/with_new_server_pg.sh" --write-approved \
     psql -X -qAt -v ON_ERROR_STOP=1 \
       -v validation_email="$VALIDATION_EMAIL" \
       -v validation_username="$VALIDATION_USERNAME" <<'SQL'
@@ -481,6 +481,7 @@ run_static_gate() {
       lib/ai/native_battle_client.dart \
       lib/ai/xmage_battle_client.dart \
       lib/battle/battle_replay_read_service.dart \
+      lib/battle/battle_simulation_persistence_service.dart \
       lib/deck_card_name_resolution_support.dart \
       routes/ai/simulate/index.dart \
       'routes/decks/[id]/analysis/index.dart' \
@@ -495,7 +496,9 @@ run_static_gate() {
       test/battle_learning_evidence_support_test.dart \
       test/deck_battle_learning_evidence_test.dart \
       test/card_resolution_support_test.dart \
+      test/ai_simulate_persistence_service_test.dart \
       test/battle_replay_read_service_test.dart \
+      test/battle_replay_routes_security_test.dart \
       test/experimental_deck_ai_authorization_source_test.dart
   )
 
@@ -521,6 +524,7 @@ PY
 }
 
 run_isolated_e2e() {
+  require_live_mutation_approval "Battle product isolated mutating E2E"
   require_postgres_write_approval "Battle product isolated mutating E2E"
 
   if [[ -n "${TEST_API_BASE_URL:-}" || -n "${API_BASE_URL:-}" ]]; then
@@ -611,7 +615,7 @@ run_isolated_e2e() {
 
   (
     cd "$SERVER_DIR"
-    exec "$ROOT_DIR/server/bin/with_new_server_pg.sh" env \
+    exec "$ROOT_DIR/server/bin/with_new_server_pg.sh" --write-approved env \
       PORT="$api_port" \
       JWT_SECRET="$jwt_secret" \
       BATTLE_ENGINE=native \

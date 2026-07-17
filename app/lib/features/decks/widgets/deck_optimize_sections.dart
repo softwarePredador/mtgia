@@ -65,15 +65,16 @@ class OptimizationConfigSection extends StatelessWidget {
             onChanged: onIntensityChanged,
           ),
           const SizedBox(height: 12),
-          Container(
-            decoration: BoxDecoration(
-              color: AppTheme.surfaceSlate,
+          Material(
+            color: AppTheme.surfaceSlate,
+            shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(AppTheme.radiusMd),
-              border: Border.all(
+              side: BorderSide(
                 color: AppTheme.outlineMuted.withValues(alpha: 0.6),
                 width: 0.8,
               ),
             ),
+            clipBehavior: Clip.antiAlias,
             child: SwitchListTile.adaptive(
               key: const Key('optimize-keep-theme-switch'),
               contentPadding: const EdgeInsets.symmetric(

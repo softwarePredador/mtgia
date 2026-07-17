@@ -23,7 +23,6 @@ class BattleReplaysScreen extends StatefulWidget {
 
 class _BattleReplaysScreenState extends State<BattleReplaysScreen> {
   late final BattleReplayGateway _gateway;
-  final TextEditingController _opponentController = TextEditingController();
 
   bool _isLoading = true;
   bool _isRunning = false;
@@ -37,12 +36,6 @@ class _BattleReplaysScreenState extends State<BattleReplaysScreen> {
     super.initState();
     _gateway = widget.gateway ?? BattleReplayService();
     WidgetsBinding.instance.addPostFrameCallback((_) => _loadReplays());
-  }
-
-  @override
-  void dispose() {
-    _opponentController.dispose();
-    super.dispose();
   }
 
   Future<void> _loadReplays({bool quiet = false}) async {
@@ -63,6 +56,20 @@ class _BattleReplaysScreenState extends State<BattleReplaysScreen> {
       });
     } catch (error) {
       if (!mounted) return;
+      if (quiet) {
+        setState(() {
+          _isLoading = false;
+        });
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text(
+              'Replay salvo, mas o historico nao foi atualizado. '
+              'Tente atualizar novamente.',
+            ),
+          ),
+        );
+        return;
+      }
       setState(() {
         _isLoading = false;
         _error = _friendlyError(error);
@@ -146,37 +153,13 @@ class _BattleReplaysScreenState extends State<BattleReplaysScreen> {
   }
 
   Future<String?> _askOpponentDeckId() async {
-    _opponentController.clear();
     return showDialog<String>(
       context: context,
-      builder: (context) {
-        return AlertDialog(
-          title: const Text('Battle experimental'),
-          content: TextField(
-            key: const Key('battle-opponent-deck-id-field'),
-            controller: _opponentController,
-            autofocus: true,
-            decoration: const InputDecoration(
-              labelText: 'Deck adversario',
-              hintText: 'Cole o opponent_deck_id',
-            ),
-            textInputAction: TextInputAction.done,
-            onSubmitted: (value) => Navigator.of(context).pop(value),
+      builder:
+          (context) => _BattleOpponentPickerDialog(
+            gateway: _gateway,
+            currentDeckId: widget.deckId,
           ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(context).pop(),
-              child: const Text('Cancelar'),
-            ),
-            FilledButton.icon(
-              onPressed:
-                  () => Navigator.of(context).pop(_opponentController.text),
-              icon: const Icon(Icons.play_arrow_rounded),
-              label: const Text('Rodar'),
-            ),
-          ],
-        );
-      },
     );
   }
 
@@ -190,7 +173,7 @@ class _BattleReplaysScreenState extends State<BattleReplaysScreen> {
     return Scaffold(
       key: const Key('battle-replays-screen'),
       appBar: AppBar(
-        title: const Text('Battle & replays'),
+        title: const Text('Battle e replays'),
         actions: [
           IconButton(
             key: const Key('battle-replays-refresh-button'),
@@ -342,6 +325,343 @@ class _BattleReplaysScreenState extends State<BattleReplaysScreen> {
   }
 }
 
+class _BattleOpponentPickerDialog extends StatefulWidget {
+  const _BattleOpponentPickerDialog({
+    required this.gateway,
+    required this.currentDeckId,
+  });
+
+  final BattleReplayGateway gateway;
+  final String currentDeckId;
+
+  @override
+  State<_BattleOpponentPickerDialog> createState() =>
+      _BattleOpponentPickerDialogState();
+}
+
+class _BattleOpponentPickerDialogState
+    extends State<_BattleOpponentPickerDialog> {
+  final TextEditingController _searchController = TextEditingController();
+  final TextEditingController _technicalIdController = TextEditingController();
+
+  bool _isLoading = true;
+  bool _showTechnicalId = false;
+  String? _error;
+  String? _manualError;
+  String? _selectedDeckId;
+  List<BattleOpponentDeck> _decks = const <BattleOpponentDeck>[];
+
+  @override
+  void initState() {
+    super.initState();
+    _loadDecks();
+  }
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    _technicalIdController.dispose();
+    super.dispose();
+  }
+
+  Future<void> _loadDecks() async {
+    setState(() {
+      _isLoading = true;
+      _error = null;
+    });
+    try {
+      final decks = await widget.gateway.listOpponentDecks(
+        currentDeckId: widget.currentDeckId,
+      );
+      if (!mounted) return;
+      setState(() {
+        _decks = decks;
+        _isLoading = false;
+      });
+    } catch (error) {
+      if (!mounted) return;
+      setState(() {
+        _isLoading = false;
+        _error =
+            error is BattleReplayException
+                ? error.message
+                : 'Nao foi possivel carregar os decks adversarios.';
+      });
+    }
+  }
+
+  void _submit() {
+    if (_showTechnicalId) {
+      final technicalId = _technicalIdController.text.trim();
+      if (!_isUuid(technicalId)) {
+        setState(() {
+          _manualError = 'Informe um UUID de deck valido.';
+        });
+        return;
+      }
+      Navigator.of(context).pop(technicalId);
+      return;
+    }
+    final selected = _selectedDeckId;
+    if (selected != null) Navigator.of(context).pop(selected);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final query = _searchController.text;
+    final visibleDecks = _decks
+        .where((deck) => deck.matches(query))
+        .toList(growable: false);
+    final ownCount = _decks.where((deck) => deck.isOwn).length;
+    final publicCount = _decks.length - ownCount;
+    final mediaQuery = MediaQuery.of(context);
+    final availableHeight =
+        mediaQuery.size.height - mediaQuery.viewInsets.bottom;
+    final contentHeight = (availableHeight - 220).clamp(220.0, 560.0);
+    final canSubmit =
+        _showTechnicalId
+            ? _technicalIdController.text.trim().isNotEmpty
+            : _selectedDeckId != null;
+
+    return AlertDialog(
+      key: const Key('battle-opponent-picker-dialog'),
+      title: const Text('Escolha o deck adversario'),
+      content: SizedBox(
+        width: 560,
+        height: contentHeight,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Selecione um deck seu ou publico. O replay sera salvo no historico ao concluir.',
+              style: theme.textTheme.bodySmall?.copyWith(
+                color: AppTheme.textSecondary,
+                height: 1.35,
+              ),
+            ),
+            const SizedBox(height: 14),
+            if (!_isLoading && _error == null && _decks.isNotEmpty) ...[
+              TextField(
+                key: const Key('battle-opponent-search-field'),
+                controller: _searchController,
+                autofocus: true,
+                decoration: const InputDecoration(
+                  labelText: 'Buscar adversario',
+                  hintText: 'Nome, comandante ou formato',
+                  prefixIcon: Icon(Icons.search_rounded),
+                ),
+                onChanged: (_) => setState(() {}),
+              ),
+              const SizedBox(height: 10),
+              Text(
+                '$ownCount meus · $publicCount publicos',
+                style: theme.textTheme.labelSmall?.copyWith(
+                  color: AppTheme.textHint,
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+              const SizedBox(height: 8),
+            ],
+            Expanded(
+              child: _buildDeckBody(
+                context,
+                visibleDecks: visibleDecks,
+                query: query,
+              ),
+            ),
+            const SizedBox(height: 8),
+            TextButton.icon(
+              key: const Key('battle-opponent-technical-toggle'),
+              onPressed: () {
+                setState(() {
+                  _showTechnicalId = !_showTechnicalId;
+                  _manualError = null;
+                });
+              },
+              icon: Icon(
+                _showTechnicalId
+                    ? Icons.expand_less_rounded
+                    : Icons.data_object_rounded,
+              ),
+              label: Text(
+                _showTechnicalId ? 'Ocultar ID tecnico' : 'Usar ID tecnico',
+              ),
+            ),
+            if (_showTechnicalId) ...[
+              const SizedBox(height: 6),
+              TextField(
+                key: const Key('battle-opponent-deck-id-field'),
+                controller: _technicalIdController,
+                decoration: InputDecoration(
+                  labelText: 'UUID do deck adversario',
+                  hintText: '00000000-0000-0000-0000-000000000000',
+                  errorText: _manualError,
+                ),
+                autocorrect: false,
+                enableSuggestions: false,
+                textInputAction: TextInputAction.done,
+                onChanged: (_) {
+                  if (_manualError != null) {
+                    setState(() => _manualError = null);
+                  } else {
+                    setState(() {});
+                  }
+                },
+                onSubmitted: (_) => _submit(),
+              ),
+            ],
+          ],
+        ),
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.of(context).pop(),
+          child: const Text('Cancelar'),
+        ),
+        FilledButton.icon(
+          key: const Key('battle-opponent-submit-button'),
+          onPressed: canSubmit ? _submit : null,
+          icon: const Icon(Icons.play_arrow_rounded),
+          label: const Text('Simular Battle'),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildDeckBody(
+    BuildContext context, {
+    required List<BattleOpponentDeck> visibleDecks,
+    required String query,
+  }) {
+    if (_isLoading) {
+      return const Center(
+        key: Key('battle-opponent-loading-state'),
+        child: CircularProgressIndicator(),
+      );
+    }
+    if (_error != null) {
+      return Center(
+        key: const Key('battle-opponent-error-state'),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Icon(
+              Icons.cloud_off_outlined,
+              color: AppTheme.error,
+              size: 30,
+            ),
+            const SizedBox(height: 10),
+            Text(
+              _error!,
+              textAlign: TextAlign.center,
+              style: Theme.of(
+                context,
+              ).textTheme.bodyMedium?.copyWith(color: AppTheme.textSecondary),
+            ),
+            const SizedBox(height: 10),
+            OutlinedButton.icon(
+              key: const Key('battle-opponent-retry-button'),
+              onPressed: _loadDecks,
+              icon: const Icon(Icons.refresh_rounded),
+              label: const Text('Tentar novamente'),
+            ),
+          ],
+        ),
+      );
+    }
+    if (_decks.isEmpty) {
+      return const Center(
+        key: Key('battle-opponent-empty-state'),
+        child: Text(
+          'Nenhum outro deck com cartas foi encontrado.\nVoce ainda pode usar um ID tecnico.',
+          textAlign: TextAlign.center,
+          style: TextStyle(color: AppTheme.textSecondary),
+        ),
+      );
+    }
+    if (visibleDecks.isEmpty) {
+      return Center(
+        key: const Key('battle-opponent-search-empty-state'),
+        child: Text(
+          'Nenhum deck encontrado para “${query.trim()}”.',
+          textAlign: TextAlign.center,
+          style: const TextStyle(color: AppTheme.textSecondary),
+        ),
+      );
+    }
+
+    return ListView.separated(
+      key: const Key('battle-opponent-deck-list'),
+      itemCount: visibleDecks.length,
+      separatorBuilder: (_, __) => const Divider(height: 1),
+      itemBuilder: (context, index) {
+        final deck = visibleDecks[index];
+        final selected = deck.id == _selectedDeckId;
+        final beginsSection =
+            index == 0 || visibleDecks[index - 1].isOwn != deck.isOwn;
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            if (beginsSection)
+              Padding(
+                padding: EdgeInsets.fromLTRB(4, index == 0 ? 4 : 14, 4, 6),
+                child: Text(
+                  deck.isOwn ? 'MEUS DECKS' : 'DECKS PUBLICOS',
+                  style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                    color: AppTheme.frost400,
+                    fontWeight: FontWeight.w900,
+                    letterSpacing: 0.8,
+                  ),
+                ),
+              ),
+            Semantics(
+              selected: selected,
+              button: true,
+              label: '${deck.name}, ${deck.supportingLabel}',
+              child: ListTile(
+                key: Key('battle-opponent-deck-${deck.id}'),
+                selected: selected,
+                contentPadding: const EdgeInsets.symmetric(horizontal: 8),
+                leading: Icon(
+                  deck.isOwn ? Icons.style_outlined : Icons.public_rounded,
+                  color: selected ? AppTheme.brass400 : AppTheme.frost400,
+                ),
+                title: Text(
+                  deck.name,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+                subtitle: Text(
+                  '${deck.supportingLabel}\n${deck.metadataLabel}',
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                ),
+                trailing: Icon(
+                  selected
+                      ? Icons.check_circle_rounded
+                      : Icons.radio_button_unchecked_rounded,
+                  color: selected ? AppTheme.brass400 : AppTheme.textHint,
+                ),
+                onTap: () {
+                  setState(() {
+                    _selectedDeckId = deck.id;
+                    _showTechnicalId = false;
+                  });
+                },
+              ),
+            ),
+          ],
+        );
+      },
+    );
+  }
+}
+
+bool _isUuid(String value) => RegExp(
+  r'^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$',
+).hasMatch(value);
+
 class _BattleReplayActions extends StatelessWidget {
   const _BattleReplayActions({
     required this.isRunning,
@@ -391,7 +711,7 @@ class _BattleReplayActions extends StatelessWidget {
           ),
           const SizedBox(height: 6),
           Text(
-            'Use como leitura experimental: nao substitui regra oficial, legalidade ou validacao de troca.',
+            'Confira o motor e o contrato de cada replay. A simulacao nao substitui regra oficial, legalidade ou validacao de troca.',
             style: theme.textTheme.bodySmall?.copyWith(
               color: AppTheme.textSecondary,
               height: 1.32,

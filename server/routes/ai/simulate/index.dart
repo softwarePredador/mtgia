@@ -11,12 +11,16 @@ import '../../../lib/ai/forge_battle_client.dart';
 import '../../../lib/ai/goldfish_simulator.dart';
 import '../../../lib/ai/native_battle_client.dart';
 import '../../../lib/ai/xmage_battle_client.dart';
+import '../../../lib/battle/battle_simulation_persistence_service.dart';
 import '../../../lib/http_responses.dart';
 import '../../../lib/json_object_support.dart';
 import '../../../lib/logger.dart';
 import '../../../lib/observability.dart';
 
 const _externalClientGraceMs = 8000;
+final _uuidPattern = RegExp(
+  r'^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$',
+);
 
 /// POST /ai/simulate
 /// Simula performance de um deck
@@ -53,6 +57,9 @@ Future<Response> onRequest(RequestContext context) async {
     if (deckId == null || deckId.isEmpty) {
       return badRequest('deck_id is required');
     }
+    if (!_uuidPattern.hasMatch(deckId)) {
+      return badRequest('deck_id must be a valid UUID');
+    }
 
     final simType = routeRequest.type;
     final simCount = routeRequest.simulations;
@@ -67,6 +74,9 @@ Future<Response> onRequest(RequestContext context) async {
       final opponentId = routeRequest.opponentDeckId;
       if (opponentId == null || opponentId.isEmpty) {
         return badRequest('opponent_deck_id is required for battle simulation');
+      }
+      if (!_uuidPattern.hasMatch(opponentId)) {
+        return badRequest('opponent_deck_id must be a valid UUID');
       }
 
       final opponentCards = await _fetchDeckCards(
@@ -211,21 +221,31 @@ Future<Response> onRequest(RequestContext context) async {
         sameLane: data['same_lane'] == true,
         naturalSample: _isNaturalBattleResult(data, result),
       );
+      final winnerDeckId = canonicalBattleWinnerDeckId(
+        result: result,
+        deckAId: deckId,
+        deckBId: opponentId,
+      );
 
-      await _saveSimulation(
-        pool: pool,
+      final persistence = await BattleSimulationPersistenceService(pool).save(
         deckAId: deckId,
         deckBId: opponentId,
         type: 'battle',
         result: result,
       );
+      if (!persistence.isSaved) {
+        return _simulationPersistenceFailure(persistence);
+      }
 
       return Response.json(
         body: {
+          ...result,
           'type': 'battle',
           'deck_a_id': deckId,
           'deck_b_id': opponentId,
-          ...result,
+          'winner_deck_id': winnerDeckId,
+          'replay_id': persistence.replayId,
+          'persistence': persistence.toJson(),
         },
       );
     } else if (simType == 'matchup') {
@@ -235,6 +255,9 @@ Future<Response> onRequest(RequestContext context) async {
         return badRequest(
           'opponent_deck_id is required for matchup simulation',
         );
+      }
+      if (!_uuidPattern.hasMatch(opponentId)) {
+        return badRequest('opponent_deck_id must be a valid UUID');
       }
 
       final opponentCards = await _fetchDeckCards(
@@ -250,20 +273,24 @@ Future<Response> onRequest(RequestContext context) async {
       final result = MatchupAnalyzer.analyze(deckCards, opponentCards);
 
       // Salva resultado para treinamento futuro
-      await _saveSimulation(
-        pool: pool,
+      final persistence = await BattleSimulationPersistenceService(pool).save(
         deckAId: deckId,
         deckBId: opponentId,
         type: 'matchup',
         result: result.toJson(),
       );
+      if (!persistence.isSaved) {
+        return _simulationPersistenceFailure(persistence);
+      }
 
       return Response.json(
         body: {
+          ...result.toJson(),
           'type': 'matchup',
           'deck_a_id': deckId,
           'deck_b_id': opponentId,
-          ...result.toJson(),
+          'replay_id': persistence.replayId,
+          'persistence': persistence.toJson(),
         },
       );
     } else {
@@ -272,15 +299,21 @@ Future<Response> onRequest(RequestContext context) async {
       final result = simulator.simulate();
 
       // Salva resultado para treinamento futuro
-      await _saveSimulation(
-        pool: pool,
-        deckAId: deckId,
-        type: 'goldfish',
-        result: result.toJson(),
-      );
+      final persistence = await BattleSimulationPersistenceService(
+        pool,
+      ).save(deckAId: deckId, type: 'goldfish', result: result.toJson());
+      if (!persistence.isSaved) {
+        return _simulationPersistenceFailure(persistence);
+      }
 
       return Response.json(
-        body: {'type': 'goldfish', 'deck_id': deckId, ...result.toJson()},
+        body: {
+          ...result.toJson(),
+          'type': 'goldfish',
+          'deck_id': deckId,
+          'replay_id': persistence.replayId,
+          'persistence': persistence.toJson(),
+        },
       );
     }
   } on JsonObjectValidationException catch (e) {
@@ -335,6 +368,12 @@ Future<List<Map<String, dynamic>>> _fetchDeckCards(
           d.user_id = CAST(@userId AS uuid)
           OR (CAST(@allowPublic AS boolean) AND d.is_public = true)
         )
+      ORDER BY
+        dc.is_commander DESC,
+        LOWER(c.name) ASC,
+        COALESCE(c.oracle_id::text, '') ASC,
+        COALESCE(c.scryfall_id::text, '') ASC,
+        c.id::text ASC
     '''),
     parameters: {
       'deckId': deckId,
@@ -363,83 +402,6 @@ Future<List<Map<String, dynamic>>> _fetchDeckCards(
       'deck_name': row[15],
     };
   }).toList();
-}
-
-/// Salva resultado da simulação para treinamento de ML
-Future<void> _saveSimulation({
-  required Pool pool,
-  required String deckAId,
-  String? deckBId,
-  required String type,
-  required Map<String, dynamic> result,
-}) async {
-  try {
-    // Verifica se a tabela existe
-    final tableExists = await pool.execute('''
-      SELECT EXISTS (
-        SELECT FROM information_schema.tables 
-        WHERE table_name = 'battle_simulations'
-      )
-    ''');
-
-    if (tableExists.isNotEmpty && tableExists.first[0] == true) {
-      final columns = await pool.execute('''
-        SELECT column_name
-        FROM information_schema.columns
-        WHERE table_name = 'battle_simulations'
-          AND column_name IN (
-            'simulation_type',
-            'metrics',
-            'winner_deck_id',
-            'turns_played'
-          )
-      ''');
-      final availableColumns =
-          columns.map((row) => row[0]?.toString()).whereType<String>().toSet();
-      final hasSimulationType = availableColumns.contains('simulation_type');
-      final hasMetrics = availableColumns.contains('metrics');
-      final hasWinnerDeckId = availableColumns.contains('winner_deck_id');
-      final hasTurnsPlayed = availableColumns.contains('turns_played');
-      final payload = {'type': type, ...result};
-      final winnerDeckId = _winnerDeckId(result, deckAId, deckBId);
-      final turnsPlayed = (result['turns'] as num?)?.toInt();
-
-      await pool.execute(
-        Sql.named('''
-          INSERT INTO battle_simulations (
-            deck_a_id,
-            deck_b_id,
-            game_log
-            ${hasSimulationType ? ', simulation_type' : ''}
-            ${hasMetrics ? ', metrics' : ''}
-            ${hasWinnerDeckId ? ', winner_deck_id' : ''}
-            ${hasTurnsPlayed ? ', turns_played' : ''}
-          )
-          VALUES (
-            @deckAId,
-            @deckBId,
-            @gameLog::jsonb
-            ${hasSimulationType ? ', @simulationType' : ''}
-            ${hasMetrics ? ', @metrics::jsonb' : ''}
-            ${hasWinnerDeckId ? ', @winnerDeckId' : ''}
-            ${hasTurnsPlayed ? ', @turnsPlayed' : ''}
-          )
-          '''),
-        parameters: {
-          'deckAId': deckAId,
-          'deckBId': deckBId,
-          'gameLog': jsonEncode(payload),
-          if (hasSimulationType) 'simulationType': type,
-          if (hasMetrics) 'metrics': jsonEncode(_simulationMetrics(result)),
-          if (hasWinnerDeckId) 'winnerDeckId': winnerDeckId,
-          if (hasTurnsPlayed) 'turnsPlayed': turnsPlayed,
-        },
-      );
-    }
-  } catch (e) {
-    // Não falha a request se não conseguir salvar
-    Log.w('[ai-simulate] persistence unavailable type=${e.runtimeType}');
-  }
 }
 
 Map<String, dynamic> _externalDeckPayload(
@@ -630,32 +592,19 @@ Response _nativeCoverageFailure(NativeBattleCoverageIncomplete error) =>
       },
     );
 
-String? _winnerDeckId(
-  Map<String, dynamic> result,
-  String deckAId,
-  String? deckBId,
+Response _simulationPersistenceFailure(
+  BattleSimulationPersistenceOutcome persistence,
 ) {
-  final explicit = result['winner_deck_id']?.toString();
-  if (explicit != null && explicit.isNotEmpty) return explicit;
-  return switch (result['winner']?.toString()) {
-    'Deck A' => deckAId,
-    'Deck B' => deckBId,
-    _ => null,
-  };
-}
-
-Map<String, dynamic> _simulationMetrics(Map<String, dynamic> result) {
-  final nested = result['metrics'];
-  return {
-    if (nested is Map) ...nested.cast<String, dynamic>(),
-    'engine': result['engine'],
-    'engine_contract': result['engine_contract'],
-    'duration_ms': result['duration_ms'],
-    'turns': result['turns'],
-    'winner_deck_id': result['winner_deck_id'],
-    'event_count':
-        (result['events'] as List?)?.length ??
-        (result['game_log'] as List?)?.length,
-    'snapshot_count': (result['visual_snapshots'] as List?)?.length,
-  }..removeWhere((_, value) => value == null);
+  Log.w(
+    '[ai-simulate] replay persistence failed code=${persistence.errorCode}',
+  );
+  return Response.json(
+    statusCode: HttpStatus.serviceUnavailable,
+    body: {
+      'error': 'simulation_persistence_failed',
+      'message':
+          'A simulacao terminou, mas o replay nao pode ser salvo. Tente novamente.',
+      'persistence': persistence.toJson(),
+    },
+  );
 }

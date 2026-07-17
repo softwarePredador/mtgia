@@ -14,16 +14,23 @@ class AiGenerationInfraSkip implements Exception {
 }
 
 void main() {
-  final skipIntegration = Platform.environment['RUN_INTEGRATION_TESTS'] == '0'
-      ? 'Teste live desativado por RUN_INTEGRATION_TESTS=0.'
-      : null;
+  final liveRequested = Platform.environment['RUN_INTEGRATION_TESTS'] == '1';
+  final liveMutationApproved =
+      Platform.environment['MANALOOM_CONFIRM_LIVE_MUTATIONS'] ==
+      'I_HAVE_EXPLICIT_APPROVAL';
+  final skipIntegration =
+      !liveRequested
+          ? 'Teste live requer RUN_INTEGRATION_TESTS=1.'
+          : !liveMutationApproved
+          ? 'Teste mutante requer MANALOOM_CONFIRM_LIVE_MUTATIONS=I_HAVE_EXPLICIT_APPROVAL.'
+          : null;
 
   final baseUrl =
       Platform.environment['TEST_API_BASE_URL'] ?? 'http://127.0.0.1:8082';
 
   const testUser = {
     'email': 'test_ai_generate_flow@example.com',
-    'password': 'TestPassword123!',
+    'password': 'BetaQa!2026-Deck',
     'username': 'test_ai_generate_flow_user',
   };
 
@@ -96,9 +103,9 @@ void main() {
   }
 
   Map<String, String> authHeaders({bool withContentType = false}) => {
-        if (withContentType) 'Content-Type': 'application/json',
-        if (authToken != null) 'Authorization': 'Bearer $authToken',
-      };
+    if (withContentType) 'Content-Type': 'application/json',
+    if (authToken != null) 'Authorization': 'Bearer $authToken',
+  };
 
   bool isTransientClientException(Object error) {
     if (error is! http.ClientException) return false;
@@ -192,7 +199,7 @@ void main() {
     final commander = generatedDeck['commander'] as Map<String, dynamic>?;
     final cards =
         (generatedDeck['cards'] as List?)?.whereType<Map>().toList() ??
-            const <Map>[];
+        const <Map>[];
 
     final cardCount = cards.fold<int>(
       0,
@@ -208,7 +215,7 @@ void main() {
     final commander = generatedDeck['commander'] as Map<String, dynamic>?;
     final cards =
         (generatedDeck['cards'] as List?)?.whereType<Map>().toList() ??
-            const <Map>[];
+        const <Map>[];
 
     if (commander != null && commander['name'] is String) {
       payload.add({
@@ -305,14 +312,10 @@ void main() {
     required String deckId,
     required String archetype,
   }) async {
-    final response = await postJson(
-      '/ai/optimize',
-      {
-        'deck_id': deckId,
-        'archetype': archetype,
-      },
-      timeout: const Duration(minutes: 3),
-    );
+    final response = await postJson('/ai/optimize', {
+      'deck_id': deckId,
+      'archetype': archetype,
+    }, timeout: const Duration(minutes: 3));
 
     if (response.statusCode == 202) {
       final body = decodeJson(response);

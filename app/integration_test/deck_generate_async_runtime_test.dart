@@ -105,7 +105,7 @@ void main() {
       final unique = DateTime.now().millisecondsSinceEpoch.toRadixString(16);
       final username = 'iphone15_async_$unique';
       final email = 'iphone15_async_$unique@example.com';
-      const password = 'Qa123456!';
+      const password = 'BetaQa!2026-Deck';
 
       await tester.enterText(
         find.byKey(const Key('register-username-field')),

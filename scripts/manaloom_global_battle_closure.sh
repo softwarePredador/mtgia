@@ -2,6 +2,8 @@
 set -euo pipefail
 
 ROOT_DIR="$(cd "$(dirname "$0")/.." && pwd)"
+# shellcheck source=scripts/lib/manaloom_mutation_guard.sh
+source "$ROOT_DIR/scripts/lib/manaloom_mutation_guard.sh"
 KNOWLEDGE_SCRIPTS="$ROOT_DIR/docs/hermes-analysis/manaloom-knowledge/scripts"
 SERVER_ENV="$ROOT_DIR/server/.env"
 NETWORK="${MANALOOM_EASYPANEL_NETWORK:-easypanel-evolution}"
@@ -99,7 +101,7 @@ run_coverage() {
   output_dir="$output_root/$run_id"
   mkdir -p "$output_dir"
 
-  "$ROOT_DIR/server/bin/with_new_server_pg.sh" psql -X -A -t \
+  "$ROOT_DIR/server/bin/with_new_server_pg.sh" --read-only psql -X -A -t \
     -o "$WORK_DIR/cards.json" -c \
     "SELECT COALESCE(json_agg(json_build_object(
       'card_id', c.id::text,
@@ -132,7 +134,7 @@ run_coverage() {
         AND lower(candidate.format) = 'commander'
     ) commander_legality ON true"
 
-  "$ROOT_DIR/server/bin/with_new_server_pg.sh" psql -X -A -t \
+  "$ROOT_DIR/server/bin/with_new_server_pg.sh" --read-only psql -X -A -t \
     -o "$WORK_DIR/native.json" -c \
     "SELECT COALESCE(json_agg(DISTINCT card_name ORDER BY card_name), '[]'::json)
      FROM card_battle_rules
@@ -140,7 +142,7 @@ run_coverage() {
        AND execution_status IN ('auto','executable')
        AND COALESCE(effect_json, '{}'::jsonb) <> '{}'::jsonb"
 
-  "$ROOT_DIR/server/bin/with_new_server_pg.sh" python3 \
+  "$ROOT_DIR/server/bin/with_new_server_pg.sh" --write-approved python3 \
     "$KNOWLEDGE_SCRIPTS/xmage_authoritative_adaptation_queue.py" \
     --scope all_battle_gap \
     --out-prefix "$WORK_DIR/xmage_source_queue"
@@ -275,6 +277,8 @@ main() {
   local action="${1:-}"
   case "$action" in
     coverage)
+      require_live_mutation_approval "ManaLoom global battle closure PostgreSQL runner"
+      require_postgres_write_approval "ManaLoom global battle closure PostgreSQL runner"
       load_server_env
       trap cleanup EXIT INT TERM
       prepare_workdirs

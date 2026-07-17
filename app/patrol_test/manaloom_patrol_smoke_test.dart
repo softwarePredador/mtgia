@@ -830,6 +830,23 @@ class _PaywallProbeScreen extends StatelessWidget {
 
 class _PatrolBattleReplayGateway implements BattleReplayGateway {
   @override
+  Future<List<BattleOpponentDeck>> listOpponentDecks({
+    required String currentDeckId,
+  }) async {
+    return const [
+      BattleOpponentDeck(
+        id: 'patrol-opponent-1',
+        name: 'Atraxa Superfriends',
+        format: 'commander',
+        source: BattleOpponentDeckSource.community,
+        commanderName: 'Atraxa, Praetors Voice',
+        ownerUsername: 'patrol-opponent',
+        cardCount: 100,
+      ),
+    ];
+  }
+
+  @override
   Future<List<BattleReplaySummary>> listReplays(String deckId) async {
     return [
       BattleReplaySummary.fromJson(const {

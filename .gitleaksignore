@@ -1,0 +1,7 @@
+# Documented examples in the generated server manual; values are fixtures,
+# not deployable credentials. Keep the path/rule/line fingerprint exact.
+server/manual-de-instrucao.md:generic-api-key:3669
+server/manual-de-instrucao.md:generic-api-key:9556
+server/manual-de-instrucao.md:generic-api-key:9588
+# SHA-256 allowlist anchor for the approved Sentry DSN; not a Sentry token.
+scripts/lib/manaloom_release_runtime_contract.sh:sentry-access-token:14

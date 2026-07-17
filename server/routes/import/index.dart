@@ -3,6 +3,8 @@ import 'package:dart_frog/dart_frog.dart';
 import 'package:postgres/postgres.dart';
 
 import '../../lib/deck_rules_service.dart';
+import '../../lib/deck_import_review_contract.dart';
+import '../../lib/deck_validation_state_support.dart';
 import '../../lib/http_responses.dart';
 import '../../lib/import_card_lookup_service.dart';
 import '../../lib/import_list_service.dart';
@@ -103,14 +105,17 @@ Future<Response> _importDeck(RequestContext context) async {
       }
       final dbName = cardData['name'] as String;
       final normalizedCommanderName = commanderName?.trim().toLowerCase();
-      final canonicalCommanderName = normalizedCommanderName == null
-          ? null
-          : canonicalizeImportLookupName(normalizedCommanderName);
-      final localizedCommanderName = normalizedCommanderName == null
-          ? null
-          : normalizeLocalizedImportName(normalizedCommanderName);
+      final canonicalCommanderName =
+          normalizedCommanderName == null
+              ? null
+              : canonicalizeImportLookupName(normalizedCommanderName);
+      final localizedCommanderName =
+          normalizedCommanderName == null
+              ? null
+              : normalizeLocalizedImportName(normalizedCommanderName);
 
-      final isCommander = item['isCommanderTag'] ||
+      final isCommander =
+          item['isCommanderTag'] ||
           (commanderName != null &&
               (dbName.toLowerCase() == normalizedCommanderName ||
                   dbName.toLowerCase() == canonicalCommanderName ||
@@ -146,24 +151,21 @@ Future<Response> _importDeck(RequestContext context) async {
       trimmedCommanderName != null &&
       trimmedCommanderName.isNotEmpty &&
       !cardsToInsert.any((card) => card['is_commander'] == true)) {
-    final commanderLookup = await resolveImportCardNames(
-      pool,
-      [
-        {
-          'line': 'commander: $trimmedCommanderName',
-          'name': trimmedCommanderName,
-          'quantity': 1,
-          'isCommanderTag': true,
-        },
-      ],
-      preferredFormat: normalizedFormat,
-    );
+    final commanderLookup = await resolveImportCardNames(pool, [
+      {
+        'line': 'commander: $trimmedCommanderName',
+        'name': trimmedCommanderName,
+        'quantity': 1,
+        'isCommanderTag': true,
+      },
+    ], preferredFormat: normalizedFormat);
     final commanderKey = trimmedCommanderName.toLowerCase();
     final cleanCommanderKey = cleanImportLookupKey(commanderKey);
     final canonicalCommanderKey = canonicalizeImportLookupName(
       cleanCommanderKey,
     );
-    final commanderData = commanderLookup[commanderKey] ??
+    final commanderData =
+        commanderLookup[commanderKey] ??
         commanderLookup[cleanCommanderKey] ??
         commanderLookup[canonicalCommanderKey];
 
@@ -195,8 +197,9 @@ Future<Response> _importDeck(RequestContext context) async {
   final consolidatedCards = _consolidateCardsById(cardsToInsert);
 
   if (requiresCommander) {
-    final hasCommander =
-        consolidatedCards.any((c) => c['is_commander'] == true);
+    final hasCommander = consolidatedCards.any(
+      (c) => c['is_commander'] == true,
+    );
     if (!hasCommander) {
       warnings.add(
         'Nenhum comandante foi detectado. Marque um comandante (tag na lista ou campo "commander") para validar identidade de cor.',
@@ -208,12 +211,10 @@ Future<Response> _importDeck(RequestContext context) async {
       final canonicalCommander = canonicalizeImportLookupName(
         normalizedCommander,
       );
-      final matched = consolidatedCards.any(
-        (c) {
-          final name = (c['name'] as String?)?.toLowerCase();
-          return name == normalizedCommander || name == canonicalCommander;
-        },
-      );
+      final matched = consolidatedCards.any((c) {
+        final name = (c['name'] as String?)?.toLowerCase();
+        return name == normalizedCommander || name == canonicalCommander;
+      });
       if (!matched) {
         warnings.add(
           'Comandante informado ("$trimmedCommanderName") não foi encontrado no banco. O deck foi salvo como rascunho sem comandante.',
@@ -235,7 +236,15 @@ Future<Response> _importDeck(RequestContext context) async {
     }
   }
 
+  final hasCommander = consolidatedCards.any(
+    (card) => card['is_commander'] == true,
+  );
+  final cardsImported = _sumQuantities(consolidatedCards);
+
   try {
+    String? strictValidationError;
+    var strictValidationPassed = false;
+    late Map<String, dynamic> validation;
     final newDeck = await pool.runTx((session) async {
       final validatedCards = <Map<String, dynamic>>[
         for (final card in consolidatedCards)
@@ -249,8 +258,22 @@ Future<Response> _importDeck(RequestContext context) async {
       await DeckRulesService(session).validateAndThrow(
         format: normalizedFormat,
         cards: validatedCards,
-        strict: requiresCommander,
+        strict: false,
       );
+
+      // Import can preserve a safe but incomplete user skeleton as a draft.
+      // Strict validation is a distinct readiness signal; it must never be
+      // inferred only from the number of parsed or resolved cards.
+      try {
+        await DeckRulesService(session).validateAndThrow(
+          format: normalizedFormat,
+          cards: validatedCards,
+          strict: true,
+        );
+        strictValidationPassed = true;
+      } on DeckRulesException catch (error) {
+        strictValidationError = error.message;
+      }
 
       // 1. Criar o Deck
       final deckResult = await session.execute(
@@ -270,9 +293,7 @@ Future<Response> _importDeck(RequestContext context) async {
       // 2. Inserir as Cartas (Bulk Insert)
       if (validatedCards.isNotEmpty) {
         final valueStrings = <String>[];
-        final params = <String, dynamic>{
-          'deckId': newDeckId,
-        };
+        final params = <String, dynamic>{'deckId': newDeckId};
 
         for (var i = 0; i < validatedCards.length; i++) {
           final card = validatedCards[i];
@@ -292,25 +313,63 @@ Future<Response> _importDeck(RequestContext context) async {
         await session.execute(Sql.named(sql), parameters: params);
       }
 
+      validation = buildDeckImportReviewContract(
+        format: normalizedFormat,
+        cardCount: cardsImported,
+        hasCommander: hasCommander,
+        strictValidationPassed: strictValidationPassed,
+        notFoundLines: notFoundCards,
+        warnings: warnings,
+        strictValidationError: strictValidationError,
+      );
+      final validationState = normalizeDeckValidationState(validation['state']);
+      final validationReasons = normalizeDeckValidationReasons(
+        validation['review_reasons'],
+      );
+      final stateResult = await session.execute(
+        Sql.named('''
+          UPDATE decks
+          SET validation_state = @validationState,
+              validation_reasons = CAST(@validationReasons AS jsonb),
+              validation_updated_at = CURRENT_TIMESTAMP
+          WHERE id = @deckId
+          RETURNING validation_state, validation_reasons, validation_updated_at
+        '''),
+        parameters: {
+          'deckId': newDeckId,
+          'validationState': validationState,
+          'validationReasons': encodeDeckValidationReasons(validationReasons),
+        },
+      );
+
       final deckMap = deckResult.first.toColumnMap();
+      final stateMap = stateResult.first.toColumnMap();
+      deckMap.addAll(stateMap);
       if (deckMap['created_at'] is DateTime) {
         deckMap['created_at'] =
             (deckMap['created_at'] as DateTime).toIso8601String();
       }
-      return deckMap;
+      if (deckMap['validation_updated_at'] is DateTime) {
+        deckMap['validation_updated_at'] =
+            (deckMap['validation_updated_at'] as DateTime).toIso8601String();
+      }
+      return exposeDeckValidationState(deckMap);
     });
+
+    final requiresReview = validation['requires_review'] == true;
 
     final responseBody = {
       'deck': newDeck,
-      'cards_imported': _sumQuantities(consolidatedCards),
+      'cards_imported': cardsImported,
       'not_found_lines': notFoundCards,
       'localized_matches': localizedMatches,
       'localized_matches_count': localizedMatches.length,
-      'is_partial': notFoundCards.isNotEmpty || warnings.isNotEmpty,
-      'commander_detected':
-          consolidatedCards.any((c) => c['is_commander'] == true),
-      'missing_commander': requiresCommander &&
-          !consolidatedCards.any((c) => c['is_commander'] == true),
+      'is_partial': requiresReview,
+      'deck_state': validation['state'],
+      'requires_review': requiresReview,
+      'validation': validation,
+      'commander_detected': hasCommander,
+      'missing_commander': requiresCommander && !hasCommander,
     };
 
     if (warnings.isNotEmpty) {

@@ -3,6 +3,8 @@ import 'dart:convert';
 import 'package:flutter/foundation.dart';
 
 const String lifeCounterSettingsPrefsKey = 'life_counter_settings_v1';
+const int lifeCounterMinCustomLongTapValue = 1;
+const int lifeCounterMaxCustomLongTapValue = 999;
 
 @immutable
 class LifeCounterSettings {
@@ -270,6 +272,9 @@ class LifeCounterSettings {
       customLongTapValue: readInt(
         'custom_long_tap_value',
         defaults.customLongTapValue,
+      ).clamp(
+        lifeCounterMinCustomLongTapValue,
+        lifeCounterMaxCustomLongTapValue,
       ),
       whitelabelIcon: whitelabelIcon is String ? whitelabelIcon : null,
     );

@@ -49,6 +49,8 @@ class _PartialSuccessDeckProvider extends DeckProvider {
         'Comandante informado ("Kaalia of the Vast") foi adicionado ao slot de comandante.',
       ],
       'is_partial': true,
+      'deck_state': 'draft',
+      'requires_review': true,
       'commander_detected': true,
       'missing_commander': false,
     };
@@ -66,6 +68,13 @@ Widget _buildSubject({DeckProvider? provider}) {
 }
 
 void main() {
+  test('detected count sums quantities and ignores invalid lines', () {
+    expect(
+      detectedImportCardCount('1 Sol Ring\n4 Island\n2x Mountain\nSideboard'),
+      7,
+    );
+  });
+
   testWidgets('uses a padded single-column layout at 390px', (tester) async {
     tester.view.devicePixelRatio = 1;
     tester.view.physicalSize = const Size(390, 844);
@@ -138,7 +147,7 @@ void main() {
     await tester.tap(find.text('Exemplo'));
     await tester.pumpAndSettle();
 
-    expect(find.text('7 cartas detectadas'), findsOneWidget);
+    expect(find.text('13 cartas detectadas'), findsOneWidget);
   });
 
   testWidgets('shows softer inline error presentation after failed import', (

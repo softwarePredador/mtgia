@@ -5,7 +5,7 @@ import '../models/deck_details.dart';
 /// Enum para representar o status de completude do deck
 enum DeckStatus {
   incomplete, // Faltam cartas
-  complete, // Número correto de cartas
+  complete, // Contagem correta; legalidade ainda é uma validação separada
   invalid, // Problema de validação (sem comandante, identidade, etc)
   unknown, // Formato sem limite definido
 }
@@ -62,7 +62,7 @@ class DeckProgressIndicator extends StatelessWidget {
     final theme = Theme.of(context);
     switch (status) {
       case DeckStatus.complete:
-        return AppTheme.success;
+        return AppTheme.brass400;
       case DeckStatus.incomplete:
         return theme.colorScheme.primary;
       case DeckStatus.invalid:
@@ -75,7 +75,7 @@ class DeckProgressIndicator extends StatelessWidget {
   IconData _getStatusIcon() {
     switch (status) {
       case DeckStatus.complete:
-        return Icons.check_circle;
+        return Icons.checklist_rounded;
       case DeckStatus.incomplete:
         return Icons.pending;
       case DeckStatus.invalid:
@@ -91,7 +91,7 @@ class DeckProgressIndicator extends StatelessWidget {
 
     switch (status) {
       case DeckStatus.complete:
-        return 'Deck completo!';
+        return 'Contagem completa — valide a legalidade';
       case DeckStatus.incomplete:
         final missing = maxCards! - totalCards;
         return 'Faltam $missing carta${missing > 1 ? 's' : ''}';
@@ -205,9 +205,9 @@ class DeckProgressIndicator extends StatelessWidget {
                         borderRadius: BorderRadius.circular(AppTheme.radiusMd),
                       ),
                       child: const Text(
-                        'Pronto',
+                        'Contagem OK',
                         style: TextStyle(
-                          color: AppTheme.textPrimary,
+                          color: AppTheme.backgroundAbyss,
                           fontSize: AppTheme.fontSm,
                           fontWeight: FontWeight.bold,
                         ),

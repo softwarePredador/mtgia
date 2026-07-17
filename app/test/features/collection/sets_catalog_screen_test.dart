@@ -7,6 +7,8 @@ import 'package:manaloom/features/collection/models/mtg_set.dart';
 import 'package:manaloom/features/collection/screens/set_cards_screen.dart';
 import 'package:manaloom/features/collection/screens/sets_catalog_screen.dart';
 
+import '../../support/list_tile_material_test_support.dart';
+
 class _FakeApiClient extends ApiClient {
   final List<String> requests = [];
 
@@ -251,6 +253,7 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.byKey(const Key('setsCatalogGrid')), findsOneWidget);
+    expectListTileInkIsUnobscured(tester);
     expect(find.byKey(const Key('setsCatalogList')), findsNothing);
     expect(
       tester.getSize(find.byKey(const Key('sets-catalog-hero'))).width,
@@ -289,6 +292,7 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.byKey(const Key('setCardsGrid')), findsOneWidget);
+    expectListTileInkIsUnobscured(tester);
     expect(find.byKey(const Key('setCardsList')), findsNothing);
     final thumbnailSize = tester.getSize(
       find.byKey(const Key('set-card-thumbnail-card-1')),

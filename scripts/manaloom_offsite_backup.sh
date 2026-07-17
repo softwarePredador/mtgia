@@ -59,8 +59,27 @@ if [[ "$EXECUTE" == "0" ]]; then
   exit 0
 fi
 
+# shellcheck source=scripts/lib/manaloom_mutation_guard.sh
+ROOT_DIR="$(CDPATH='' cd -- "$(dirname -- "$0")/.." && pwd)"
+source "$ROOT_DIR/scripts/lib/manaloom_mutation_guard.sh"
+require_live_mutation_approval "backup off-site criptografado ManaLoom"
+readonly LIVE_MUTATION_APPROVED=1
+: "$LIVE_MUTATION_APPROVED"
+
 if [[ "${MANALOOM_OFFSITE_BACKUP_EXECUTE:-0}" != "1" ]]; then
   echo "execucao recusada: defina MANALOOM_OFFSITE_BACKUP_EXECUTE=1 junto com --execute" >&2
+  exit 2
+fi
+APPROVED_DESTINATION="${MANALOOM_APPROVED_OFFSITE_BACKUP_DESTINATION:-}"
+APPROVED_RECIPIENT_SHA256="${MANALOOM_APPROVED_BACKUP_RECIPIENT_SHA256:-}"
+if [[ "$APPROVED_DESTINATION" != s3://* ||
+      ! "$APPROVED_RECIPIENT_SHA256" =~ ^[0-9a-f]{64}$ ]]; then
+  echo "execucao recusada: destino e fingerprint age aprovados devem vir do ambiente protegido" >&2
+  exit 2
+fi
+if [[ "${DESTINATION%/}" != "${APPROVED_DESTINATION%/}" ||
+      "$RECIPIENT_FINGERPRINT" != "$APPROVED_RECIPIENT_SHA256" ]]; then
+  echo "destino ou recipient do backup diverge da allowlist aprovada" >&2
   exit 2
 fi
 if [[ ! -f "$SOURCE" ]]; then
@@ -188,5 +207,7 @@ jq -n \
     encrypted_bytes: $encrypted_bytes,
     remote_size_verified: true,
     remote_metadata_verified: true,
+    destination_allowlist_verified: true,
+    recipient_allowlist_verified: true,
     server_side_encryption: $server_side_encryption
   }'

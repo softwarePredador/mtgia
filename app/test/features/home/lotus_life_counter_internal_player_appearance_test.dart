@@ -12,6 +12,8 @@ import 'package:manaloom/features/home/lotus/lotus_js_bridges.dart';
 import 'package:manaloom/features/home/lotus_life_counter_screen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../../support/list_tile_material_test_support.dart';
+
 class _FakeLotusHost implements LotusHost {
   _FakeLotusHost({required this.onShellMessageRequested});
 
@@ -909,6 +911,7 @@ void main() {
         );
         await tester.pumpAndSettle();
 
+        expectListTileInkIsUnobscured(tester);
         await tester.scrollUntilVisible(
           find.byKey(
             const Key('life-counter-native-player-appearance-profile-name'),

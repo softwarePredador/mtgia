@@ -48,7 +48,7 @@ class _RuntimeApi {
   Future<_RuntimeUser> registerUser(String prefix) async {
     final unique = DateTime.now().microsecondsSinceEpoch.toRadixString(16);
     final username = '${prefix}_$unique';
-    const password = 'Qa123456!';
+    const password = 'BetaQa!2026-Deck';
     final data = await postJson(
       '/auth/register',
       {

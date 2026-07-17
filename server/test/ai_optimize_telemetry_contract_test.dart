@@ -8,16 +8,23 @@ import 'package:http/http.dart' as http;
 import 'package:test/test.dart';
 
 void main() {
-  final skipIntegration = Platform.environment['RUN_INTEGRATION_TESTS'] == '0'
-      ? 'Teste live desativado por RUN_INTEGRATION_TESTS=0.'
-      : null;
+  final liveRequested = Platform.environment['RUN_INTEGRATION_TESTS'] == '1';
+  final liveMutationApproved =
+      Platform.environment['MANALOOM_CONFIRM_LIVE_MUTATIONS'] ==
+      'I_HAVE_EXPLICIT_APPROVAL';
+  final skipIntegration =
+      !liveRequested
+          ? 'Teste live requer RUN_INTEGRATION_TESTS=1.'
+          : !liveMutationApproved
+          ? 'Teste mutante requer MANALOOM_CONFIRM_LIVE_MUTATIONS=I_HAVE_EXPLICIT_APPROVAL.'
+          : null;
 
   final baseUrl =
       Platform.environment['TEST_API_BASE_URL'] ?? 'http://127.0.0.1:8082';
 
   const testUser = {
     'email': 'test_optimize_telemetry@example.com',
-    'password': 'TestPassword123!',
+    'password': 'BetaQa!2026-Deck',
     'username': 'test_optimize_telemetry_user',
   };
 
@@ -69,65 +76,53 @@ void main() {
   }
 
   group('AI optimize telemetry contract | /ai/optimize/telemetry', () {
-    test(
-      'returns 401 without token',
-      () async {
-        final response =
-            await http.get(Uri.parse('$baseUrl/ai/optimize/telemetry'));
+    test('returns 401 without token', () async {
+      final response = await http.get(
+        Uri.parse('$baseUrl/ai/optimize/telemetry'),
+      );
 
-        expect(response.statusCode, equals(401), reason: response.body);
-        final body = decodeJson(response);
-        expect(body['error'], isA<String>());
-      },
-      skip: skipIntegration,
-    );
+      expect(response.statusCode, equals(401), reason: response.body);
+      final body = decodeJson(response);
+      expect(body['error'], isA<String>());
+    }, skip: skipIntegration);
 
-    test(
-      'returns persisted telemetry aggregate with auth',
-      () async {
-        final token = await getAuthToken();
+    test('returns persisted telemetry aggregate with auth', () async {
+      final token = await getAuthToken();
 
-        final response = await http.get(
-          Uri.parse('$baseUrl/ai/optimize/telemetry?days=7'),
-          headers: {
-            'Authorization': 'Bearer $token',
-          },
-        );
+      final response = await http.get(
+        Uri.parse('$baseUrl/ai/optimize/telemetry?days=7'),
+        headers: {'Authorization': 'Bearer $token'},
+      );
 
-        expect(response.statusCode, equals(200), reason: response.body);
+      expect(response.statusCode, equals(200), reason: response.body);
 
-        final body = decodeJson(response);
-        expect(body['status'], anyOf(equals('ok'), equals('not_initialized')),
-            reason: response.body);
+      final body = decodeJson(response);
+      expect(
+        body['status'],
+        anyOf(equals('ok'), equals('not_initialized')),
+        reason: response.body,
+      );
 
-        if (body['status'] == 'ok') {
-          expect(body['window_days'], equals(7));
-          expect(body['current_user_window'], isA<Map<String, dynamic>>());
-          expect(body['current_user_by_day'], isA<List>());
-          expect(body['scope'], isA<Map<String, dynamic>>());
-        }
-      },
-      skip: skipIntegration,
-    );
+      if (body['status'] == 'ok') {
+        expect(body['window_days'], equals(7));
+        expect(body['current_user_window'], isA<Map<String, dynamic>>());
+        expect(body['current_user_by_day'], isA<List>());
+        expect(body['scope'], isA<Map<String, dynamic>>());
+      }
+    }, skip: skipIntegration);
 
-    test(
-      'returns 400 for invalid days',
-      () async {
-        final token = await getAuthToken();
+    test('returns 400 for invalid days', () async {
+      final token = await getAuthToken();
 
-        final response = await http.get(
-          Uri.parse('$baseUrl/ai/optimize/telemetry?days=abc'),
-          headers: {
-            'Authorization': 'Bearer $token',
-          },
-        );
+      final response = await http.get(
+        Uri.parse('$baseUrl/ai/optimize/telemetry?days=abc'),
+        headers: {'Authorization': 'Bearer $token'},
+      );
 
-        expect(response.statusCode, equals(400), reason: response.body);
-        final body = decodeJson(response);
-        expect(body['error'], isA<String>());
-      },
-      skip: skipIntegration,
-    );
+      expect(response.statusCode, equals(400), reason: response.body);
+      final body = decodeJson(response);
+      expect(body['error'], isA<String>());
+    }, skip: skipIntegration);
 
     test(
       'returns 403 for global scope without admin privileges',
@@ -136,9 +131,7 @@ void main() {
 
         final response = await http.get(
           Uri.parse('$baseUrl/ai/optimize/telemetry?include_global=true'),
-          headers: {
-            'Authorization': 'Bearer $token',
-          },
+          headers: {'Authorization': 'Bearer $token'},
         );
 
         expect(response.statusCode, equals(403), reason: response.body);

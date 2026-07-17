@@ -66,7 +66,7 @@ class _RuntimeApi {
     final unique = DateTime.now().microsecondsSinceEpoch.toRadixString(16);
     final username = '${prefix}_$unique';
     final email = '$username@example.com';
-    const password = 'Qa123456!';
+    const password = 'BetaQa!2026-Deck';
     final data = await postJson(
       '/auth/register',
       {'username': username, 'email': email, 'password': password},

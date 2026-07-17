@@ -91,7 +91,7 @@ dependencies {
 // In some setups it may include a hard reference to `integration_test` which is
 // not on the release classpath, breaking release compilation.
 //
-// We patch the generated file to register `integration_test` via reflection so:
+// We patch the generated file to register test-only plugins via reflection so:
 // - release builds compile (no compile-time dependency on IntegrationTestPlugin)
 // - debug / integration builds can still register the plugin when present
 val patchGeneratedPluginRegistrant by tasks.registering {
@@ -101,25 +101,26 @@ val patchGeneratedPluginRegistrant by tasks.registering {
         if (!registrant.exists()) return@doLast
 
         val original = registrant.readText()
-        if (!original.contains("dev.flutter.plugins.integration_test.IntegrationTestPlugin")) {
-            return@doLast
-        }
-
-        val target =
-            "flutterEngine.getPlugins().add(new dev.flutter.plugins.integration_test.IntegrationTestPlugin());"
-
-        val replacement =
-            """
+        val optionalPluginClasses =
+            listOf(
+                "dev.flutter.plugins.integration_test.IntegrationTestPlugin",
+                "pl.leancode.patrol.PatrolPlugin",
+            )
+        var patched = original
+        for (className in optionalPluginClasses) {
+            val target = "flutterEngine.getPlugins().add(new $className());"
+            val replacement =
+                """
 try {
-  final Class<?> clazz = Class.forName("dev.flutter.plugins.integration_test.IntegrationTestPlugin");
+  final Class<?> clazz = Class.forName("$className");
   final Object plugin = clazz.getDeclaredConstructor().newInstance();
   flutterEngine.getPlugins().add((io.flutter.embedding.engine.plugins.FlutterPlugin) plugin);
 } catch (ClassNotFoundException e) {
-  // integration_test is not available on some build variants (e.g. release).
+  // Test-only plugin is not available on some build variants (e.g. release).
 }
 """.trimIndent()
-
-        val patched = original.replace(target, replacement)
+            patched = patched.replace(target, replacement)
+        }
 
         if (patched != original) {
             registrant.writeText(patched)

@@ -1303,15 +1303,16 @@ class _FunctionalBucketTile extends StatelessWidget {
             ? 'Sem amostras nesta resposta.'
             : samples.take(2).map((sample) => sample.name).join(', ');
 
-    return Container(
-      decoration: BoxDecoration(
-        color: AppTheme.surfaceSlate2.withValues(alpha: 0.68),
+    return Material(
+      color: AppTheme.surfaceSlate2.withValues(alpha: 0.68),
+      shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(AppTheme.radiusMd),
-        border: Border.all(
+        side: BorderSide(
           color: bucket.color.withValues(alpha: 0.2),
           width: AppTheme.strokeThin,
         ),
       ),
+      clipBehavior: Clip.antiAlias,
       child: ExpansionTile(
         key: Key('deck-analysis-functional-bucket-${deck.id}-${bucket.key}'),
         tilePadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 2),

@@ -1,0 +1,8 @@
+title = "ManaLoom secret scanning"
+
+[extend]
+useDefault = true
+
+[[allowlists]]
+description = "Scanner configuration is policy, not a credential"
+paths = ['''(^|/)\.gitleaks\.toml$''']

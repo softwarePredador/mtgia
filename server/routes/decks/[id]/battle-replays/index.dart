@@ -3,6 +3,8 @@ import 'package:postgres/postgres.dart';
 
 import '../../../../lib/battle/battle_replay_read_service.dart';
 import '../../../../lib/http_responses.dart';
+import '../../../../lib/logger.dart';
+import '../../../../lib/observability.dart';
 
 Future<Response> onRequest(RequestContext context, String deckId) async {
   if (context.request.method != HttpMethod.get) {
@@ -43,11 +45,15 @@ Future<Response> onRequest(RequestContext context, String deckId) async {
         },
       },
     );
-  } catch (error) {
-    return internalServerError(
-      'Falha ao carregar replays de battle',
-      details: error,
+  } catch (error, stackTrace) {
+    Log.e('[battle-replays] list failed type=${error.runtimeType}');
+    await captureRouteException(
+      context,
+      error,
+      stackTrace: stackTrace,
+      tags: const {'route': 'battle_replays_list'},
     );
+    return internalServerError('Falha ao carregar replays de battle');
   }
 }
 

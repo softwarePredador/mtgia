@@ -21,7 +21,11 @@ class LotusLifeCounterSettingsAdapter {
       }
       final settings = decoded.cast<String, dynamic>();
       return LifeCounterSettings(
-        autoKill: _readBool(settings, 'autoKO', LifeCounterSettings.defaults.autoKill),
+        autoKill: _readBool(
+          settings,
+          'autoKO',
+          LifeCounterSettings.defaults.autoKill,
+        ),
         lifeLossOnCommanderDamage: _readBool(
           settings,
           'lifeLossOnCommanderDamage',
@@ -116,10 +120,14 @@ class LotusLifeCounterSettingsAdapter {
           settings,
           'customLongTapValue',
           LifeCounterSettings.defaults.customLongTapValue,
+        ).clamp(
+          lifeCounterMinCustomLongTapValue,
+          lifeCounterMaxCustomLongTapValue,
         ),
-        whitelabelIcon: settings['whitelabelIcon'] is String
-            ? settings['whitelabelIcon'] as String
-            : null,
+        whitelabelIcon:
+            settings['whitelabelIcon'] is String
+                ? settings['whitelabelIcon'] as String
+                : null,
       );
     } catch (_) {
       return null;
@@ -165,11 +173,7 @@ class LotusLifeCounterSettingsAdapter {
     return value is bool ? value : fallback;
   }
 
-  static int _readInt(
-    Map<String, dynamic> settings,
-    String key,
-    int fallback,
-  ) {
+  static int _readInt(Map<String, dynamic> settings, String key, int fallback) {
     final value = settings[key];
     return value is num ? value.toInt() : fallback;
   }

@@ -9,6 +9,8 @@ import 'package:manaloom/features/decks/providers/deck_provider.dart';
 import 'package:manaloom/features/decks/widgets/deck_analysis_tab.dart';
 import 'package:provider/provider.dart';
 
+import '../../../support/list_tile_material_test_support.dart';
+
 class _FakeApiClient extends ApiClient {
   _FakeApiClient(
     this.analysisPayload, {
@@ -378,6 +380,7 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.text('Funções do deck'), findsOneWidget);
+    expectListTileInkIsUnobscured(tester);
     expect(
       find.byKey(
         const Key('deck-analysis-functional-bucket-deck-functional-ramp'),

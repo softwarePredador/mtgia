@@ -1,5 +1,11 @@
 # ManaLoom Battle e Deckbuilder — varredura definitiva de 2026-07-15
 
+> **Documento histórico.** O status operacional atual de Battle, Deckbuilder e
+> Life Counter está em
+> `docs/qa/MANALOOM_BATTLE_DECKBUILDER_LIFE_COUNTER_RELEASE_2026-07-17.md`.
+> As contagens, migrations e bloqueios abaixo descrevem o corte de 2026-07-15 e
+> não devem ser usados para decidir a promoção atual.
+
 Status: `REOPENED_PROVIDER_AND_MUTATING_E2E_VALIDATION`
 
 > Correção posterior à primeira consolidação: o run

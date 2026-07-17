@@ -10,18 +10,22 @@ Read-only audit:
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 import os
+import re
 import shlex
 import ssl
 import subprocess
 import sys
+import tempfile
 import urllib.error
 import urllib.request
 from dataclasses import asdict, dataclass
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
+from urllib.parse import parse_qsl, urlsplit
 
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
@@ -29,7 +33,15 @@ SERVER_DIR = REPO_ROOT / "server"
 DEFAULT_ARTIFACT_DIR = REPO_ROOT / "server" / "test" / "artifacts" / "easypanel_runtime_alignment"
 DEFAULT_HEALTH_URL = "https://evolution-cartinhas.2ta7qx.easypanel.host/health"
 DEFAULT_SERVICES = ("manaloom-ops",)
+DEFAULT_PROJECT = "evolution"
+EXPECTED_POSTGRES_HOST = "evolution_manaloom-postgres"
+EXPECTED_POSTGRES_DB = "halder"
+EXPECTED_POSTGRES_USER = "postgres"
+APPROVED_SWARM_SERVICES = frozenset({"evolution_manaloom-ops"})
 NEW_SERVER_PG_WRAPPER = SERVER_DIR / "bin" / "with_new_server_pg.sh"
+EXPLICIT_APPROVAL_PHRASE = "I_HAVE_EXPLICIT_APPROVAL"
+LIVE_MUTATION_APPROVAL_ENV = "MANALOOM_CONFIRM_LIVE_MUTATIONS"
+POSTGRES_WRITE_APPROVAL_ENV = "MANALOOM_CONFIRM_POSTGRES_WRITES"
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import reconcile_easypanel_services as reconcile  # noqa: E402
@@ -78,9 +90,7 @@ def _pg_connection_kwargs(runtime_env: dict[str, str]) -> dict[str, Any]:
     }
 
 
-def _health_ssl_context(*, insecure: bool) -> ssl.SSLContext:
-    if insecure:
-        return ssl._create_unverified_context()
+def _health_ssl_context() -> ssl.SSLContext:
     try:
         import certifi  # type: ignore
 
@@ -89,12 +99,12 @@ def _health_ssl_context(*, insecure: bool) -> ssl.SSLContext:
         return ssl.create_default_context()
 
 
-def _fetch_public_health(url: str, *, insecure: bool) -> dict[str, Any]:
+def _fetch_public_health(url: str) -> dict[str, Any]:
     request = urllib.request.Request(url, method="GET")
     with urllib.request.urlopen(
         request,
         timeout=15,
-        context=_health_ssl_context(insecure=insecure),
+        context=_health_ssl_context(),
     ) as response:
         return json.loads(response.read().decode("utf-8", "replace"))
 
@@ -159,34 +169,142 @@ def _snapshot_from_swarm_inspect(service: dict[str, Any]) -> dict[str, Any]:
     }
 
 
+def _validated_easypanel_base_url(candidate: str) -> str:
+    expected_hash = os.environ.get(
+        "MANALOOM_EXPECTED_EASYPANEL_BASE_URL_SHA256",
+        "",
+    )
+    if not re.fullmatch(r"[0-9a-f]{64}", expected_hash):
+        raise RuntimeError(
+            "MANALOOM_EXPECTED_EASYPANEL_BASE_URL_SHA256 must pin the approved EasyPanel origin"
+        )
+    parsed = urlsplit(candidate)
+    if not (
+        parsed.scheme == "https"
+        and parsed.hostname
+        and parsed.username is None
+        and parsed.password is None
+        and parsed.path in {"", "/"}
+        and not parsed.query
+        and not parsed.fragment
+    ):
+        raise RuntimeError(
+            "EASYPANEL_BASE_URL must be an HTTPS origin without credentials, path, query, or fragment"
+        )
+    normalized = candidate.rstrip("/")
+    actual_hash = hashlib.sha256(normalized.encode("utf-8")).hexdigest()
+    if actual_hash != expected_hash:
+        raise RuntimeError("EASYPANEL_BASE_URL differs from the caller-approved fingerprint")
+    return normalized
+
+
+def _validated_ssh_coordinate(
+    runtime_env: dict[str, str],
+) -> tuple[str, Path, str, str]:
+    target = runtime_env.get("MANALOOM_EASYPANEL_SSH_HOST") or (
+        f"{runtime_env.get('EASYPANEL_SSH_USER', 'root')}@"
+        f"{runtime_env.get('EASYPANEL_SERVER_IP', '')}"
+    )
+    key_value = runtime_env.get("MANALOOM_EASYPANEL_SSH_KEY") or runtime_env.get(
+        "EASYPANEL_SSH_KEY"
+    )
+    expected_target = os.environ.get("MANALOOM_EXPECTED_SSH_TARGET", "")
+    expected_fingerprint = os.environ.get(
+        "MANALOOM_EXPECTED_SSH_HOST_KEY_SHA256",
+        "",
+    )
+    target_match = re.fullmatch(
+        r"([A-Za-z_][A-Za-z0-9._-]{0,31})@([A-Za-z0-9][A-Za-z0-9.-]{0,252})",
+        target,
+    )
+    if target != expected_target or target_match is None or ".." in target_match.group(2):
+        raise RuntimeError("SSH target differs from the exact caller-approved destination")
+    if not re.fullmatch(r"SHA256:[A-Za-z0-9+/]{43}", expected_fingerprint):
+        raise RuntimeError(
+            "MANALOOM_EXPECTED_SSH_HOST_KEY_SHA256 must pin the approved SSH host key"
+        )
+    if not key_value:
+        raise RuntimeError("SSH key for the direct Swarm audit is not configured")
+    key = Path(key_value).expanduser().resolve()
+    if not key.is_file():
+        raise RuntimeError(f"SSH key does not exist: {key}")
+    return target, key, target_match.group(2), expected_fingerprint
+
+
+def _write_verified_known_hosts(
+    *,
+    hostname: str,
+    expected_fingerprint: str,
+    destination: Path,
+) -> None:
+    scan = subprocess.run(
+        ["ssh-keyscan", "-T", "10", hostname],
+        check=False,
+        capture_output=True,
+        text=True,
+        timeout=15,
+    )
+    matched_lines: list[str] = []
+    for line in scan.stdout.splitlines():
+        line = line.strip()
+        if not line or line.startswith("#"):
+            continue
+        fingerprint = subprocess.run(
+            ["ssh-keygen", "-lf", "-", "-E", "sha256"],
+            check=False,
+            capture_output=True,
+            input=f"{line}\n",
+            text=True,
+            timeout=10,
+        )
+        fields = fingerprint.stdout.split()
+        if len(fields) >= 2 and fields[1] == expected_fingerprint:
+            matched_lines.append(line)
+    if not matched_lines:
+        raise RuntimeError("SSH host key differs from the caller-approved fingerprint")
+    destination.write_text("\n".join(matched_lines) + "\n", encoding="utf-8")
+    destination.chmod(0o600)
+
+
 def _fetch_swarm_service_snapshot(
     runtime_env: dict[str, str],
     *,
     swarm_service_name: str,
 ) -> dict[str, Any]:
-    host = runtime_env.get("MANALOOM_EASYPANEL_SSH_HOST") or (
-        f"{runtime_env.get('EASYPANEL_SSH_USER', 'root')}@{runtime_env.get('EASYPANEL_SERVER_IP', '')}"
-    )
-    key = runtime_env.get("MANALOOM_EASYPANEL_SSH_KEY") or runtime_env.get("EASYPANEL_SSH_KEY")
-    if not host or host.endswith("@") or not key:
+    if swarm_service_name not in APPROVED_SWARM_SERVICES:
         raise reconcile.EasyPanelError(
-            f"service {swarm_service_name} is absent from EasyPanel and SSH fallback is not configured"
+            f"unapproved Swarm service destination: {swarm_service_name}"
         )
-    output = subprocess.check_output(
-        [
-            "ssh",
-            "-o",
-            "BatchMode=yes",
-            "-o",
-            "StrictHostKeyChecking=accept-new",
-            "-i",
-            key,
-            host,
-            f"docker service inspect {shlex.quote(swarm_service_name)}",
-        ],
-        text=True,
-        timeout=30,
-    )
+    try:
+        host, key, hostname, expected_fingerprint = _validated_ssh_coordinate(
+            runtime_env
+        )
+        with tempfile.TemporaryDirectory(prefix="manaloom-ssh-") as temp_dir:
+            known_hosts = Path(temp_dir) / "known_hosts"
+            _write_verified_known_hosts(
+                hostname=hostname,
+                expected_fingerprint=expected_fingerprint,
+                destination=known_hosts,
+            )
+            output = subprocess.check_output(
+                [
+                    "ssh",
+                    "-o",
+                    "BatchMode=yes",
+                    "-o",
+                    "StrictHostKeyChecking=yes",
+                    "-o",
+                    f"UserKnownHostsFile={known_hosts}",
+                    "-i",
+                    str(key),
+                    host,
+                    f"docker service inspect {shlex.quote(swarm_service_name)}",
+                ],
+                text=True,
+                timeout=30,
+            )
+    except RuntimeError as error:
+        raise reconcile.EasyPanelError(str(error)) from error
     services = json.loads(output)
     if len(services) != 1:
         raise reconcile.EasyPanelError(f"unexpected Swarm inspect result for {swarm_service_name}")
@@ -286,16 +404,61 @@ def _query_pg_metrics_direct(runtime_env: dict[str, str]) -> dict[str, Any]:
     }
 
 
+def _require_pg_runner_approvals() -> None:
+    missing = [
+        name
+        for name in (LIVE_MUTATION_APPROVAL_ENV, POSTGRES_WRITE_APPROVAL_ENV)
+        if os.environ.get(name) != EXPLICIT_APPROVAL_PHRASE
+    ]
+    if missing:
+        raise RuntimeError(
+            "PostgreSQL runner blocked before wrapper; missing explicit caller "
+            f"approval: {', '.join(missing)}"
+        )
+
+
+def _validate_pg_metrics_only_runtime(runtime_env: dict[str, str]) -> None:
+    database_url = runtime_env.get("DATABASE_URL", "")
+    if database_url:
+        parsed = urlsplit(database_url)
+        if not (
+            parsed.scheme in {"postgres", "postgresql"}
+            and parsed.hostname in {"127.0.0.1", "localhost"}
+            and parsed.path == f"/{EXPECTED_POSTGRES_DB}"
+            and parsed.username == EXPECTED_POSTGRES_USER
+            and parse_qsl(parsed.query, keep_blank_values=True)
+            == [("sslmode", "disable")]
+            and not parsed.fragment
+        ):
+            raise RuntimeError(
+                "--pg-metrics-only is restricted to the approved loopback PostgreSQL tunnel"
+            )
+        return
+    if not (
+        runtime_env.get("DB_HOST") in {"127.0.0.1", "localhost"}
+        and runtime_env.get("DB_NAME") == EXPECTED_POSTGRES_DB
+        and runtime_env.get("DB_USER") == EXPECTED_POSTGRES_USER
+        and str(runtime_env.get("DB_PORT", "")).isdigit()
+    ):
+        raise RuntimeError(
+            "--pg-metrics-only is restricted to the approved loopback PostgreSQL tunnel"
+        )
+
+
 def _query_pg_metrics(runtime_env: dict[str, str]) -> dict[str, Any]:
     expected_internal_host = runtime_env.get(
         "MANALOOM_EXPECTED_DB_HOST",
-        "evolution_manaloom-postgres",
+        EXPECTED_POSTGRES_HOST,
     )
-    if runtime_env.get("DB_HOST") != expected_internal_host:
-        return _query_pg_metrics_direct(runtime_env)
+    if expected_internal_host != EXPECTED_POSTGRES_HOST:
+        raise RuntimeError("expected PostgreSQL host differs from the approved service")
+    if runtime_env.get("DB_HOST") != EXPECTED_POSTGRES_HOST:
+        raise RuntimeError("runtime PostgreSQL host differs from the approved service")
+    _require_pg_runner_approvals()
     output = subprocess.check_output(
         [
             str(NEW_SERVER_PG_WRAPPER),
+            "--write-approved",
             sys.executable,
             str(Path(__file__).resolve()),
             "--pg-metrics-only",
@@ -443,26 +606,35 @@ def _build_report(payload: dict[str, Any]) -> str:
 
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--project", default=os.environ.get("EASYPANEL_PROJECT", "evolution"))
+    parser.add_argument("--project", default=os.environ.get("EASYPANEL_PROJECT", DEFAULT_PROJECT))
     parser.add_argument("--health-url", default=os.environ.get("MANALOOM_PUBLIC_HEALTH_URL", DEFAULT_HEALTH_URL))
     parser.add_argument("--artifact-dir", default=str(DEFAULT_ARTIFACT_DIR))
-    parser.add_argument("--insecure-health", action="store_true")
     parser.add_argument("--stdout-only", action="store_true")
     parser.add_argument("--pg-metrics-only", action="store_true", help=argparse.SUPPRESS)
     args = parser.parse_args(argv)
 
     if args.pg_metrics_only:
-        print(json.dumps(_query_pg_metrics_direct(dict(os.environ)), sort_keys=True))
+        pg_runtime = dict(os.environ)
+        _validate_pg_metrics_only_runtime(pg_runtime)
+        print(json.dumps(_query_pg_metrics_direct(pg_runtime), sort_keys=True))
         return 0
 
+    if args.project != DEFAULT_PROJECT:
+        raise SystemExit("EasyPanel project differs from the approved production project")
+    if args.health_url != DEFAULT_HEALTH_URL:
+        raise SystemExit("public health URL differs from the approved production endpoint")
+
     runtime_env = reconcile.load_runtime_env()
+    runtime_env["EASYPANEL_BASE_URL"] = _validated_easypanel_base_url(
+        runtime_env["EASYPANEL_BASE_URL"]
+    )
     client = reconcile.EasyPanelClient(
         runtime_env["EASYPANEL_BASE_URL"],
         runtime_env["EASYPANEL_API_TOKEN"],
     )
 
     local_head = reconcile._local_head_sha()
-    public_health = _fetch_public_health(args.health_url, insecure=args.insecure_health)
+    public_health = _fetch_public_health(args.health_url)
     services = _fetch_service_env_snapshot(
         client,
         project_name=args.project,

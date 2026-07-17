@@ -74,6 +74,29 @@ class DeckDetailsOverviewTab extends StatelessWidget {
 
   bool get _isEmptyDeck => totalCards == 0;
 
+  String get _effectiveValidationState {
+    final liveState = validationResult?['deck_state']?.toString();
+    if (liveState == 'validated' || liveState == 'draft') return liveState!;
+    return deck.validationState;
+  }
+
+  String get _validationStateLabel {
+    if (_effectiveValidationState == 'validated') return 'Validado';
+    if (_effectiveValidationState == 'draft') return 'Rascunho';
+    return 'A validar';
+  }
+
+  Color get _validationStateColor {
+    if (_effectiveValidationState == 'validated') return AppTheme.success;
+    if (_effectiveValidationState == 'draft') return AppTheme.warning;
+    return AppTheme.brass400;
+  }
+
+  IconData get _validationStateIcon =>
+      _effectiveValidationState == 'validated'
+          ? Icons.verified_outlined
+          : Icons.rule_outlined;
+
   DeckCardItem? get _heroCommander =>
       deck.commander.isNotEmpty ? deck.commander.first : null;
 
@@ -246,6 +269,13 @@ class DeckDetailsOverviewTab extends StatelessWidget {
                             dimension: 18,
                             child: CircularProgressIndicator(strokeWidth: 2),
                           ),
+                        DeckMetaChip(
+                          key: const Key('deck-review-state-chip'),
+                          label: _validationStateLabel,
+                          color: _validationStateColor,
+                          icon: _validationStateIcon,
+                          prominent: true,
+                        ),
                         DeckMetaChip(
                           onTap: onTogglePublic,
                           label: deck.isPublic ? 'Público' : 'Privado',

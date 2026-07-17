@@ -3,6 +3,8 @@ import 'package:postgres/postgres.dart';
 
 import '../../../../../lib/battle/battle_replay_read_service.dart';
 import '../../../../../lib/http_responses.dart';
+import '../../../../../lib/logger.dart';
+import '../../../../../lib/observability.dart';
 
 Future<Response> onRequest(
   RequestContext context,
@@ -30,10 +32,14 @@ Future<Response> onRequest(
       return notFound('Replay nao encontrado.');
     }
     return Response.json(body: {'replay': replay});
-  } catch (error) {
-    return internalServerError(
-      'Falha ao carregar replay de battle',
-      details: error,
+  } catch (error, stackTrace) {
+    Log.e('[battle-replays] detail failed type=${error.runtimeType}');
+    await captureRouteException(
+      context,
+      error,
+      stackTrace: stackTrace,
+      tags: const {'route': 'battle_replay_detail'},
     );
+    return internalServerError('Falha ao carregar replay de battle');
   }
 }

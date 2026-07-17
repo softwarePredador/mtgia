@@ -264,7 +264,7 @@ cleanup_validation_identity() {
   fi
 
   local cleanup_result
-  if cleanup_result="$("$ROOT_DIR/server/bin/with_new_server_pg.sh" \
+  if cleanup_result="$("$ROOT_DIR/server/bin/with_new_server_pg.sh" --write-approved \
     psql -X -q -t -A -v ON_ERROR_STOP=1 \
       -v validation_email="$VALIDATION_USER_EMAIL" \
       -v validation_username="$VALIDATION_USERNAME" \
@@ -708,7 +708,7 @@ resolve_server_path() {
 }
 
 validation_identity_count() {
-  "$ROOT_DIR/server/bin/with_new_server_pg.sh" \
+  "$ROOT_DIR/server/bin/with_new_server_pg.sh" --read-only \
     psql -X -q -t -A -v ON_ERROR_STOP=1 \
       -v validation_email="$VALIDATION_USER_EMAIL" \
       -v validation_username="$VALIDATION_USERNAME" <<'SQL'
@@ -720,7 +720,7 @@ SQL
 }
 
 generated_deck_count() {
-  "$ROOT_DIR/server/bin/with_new_server_pg.sh" \
+  "$ROOT_DIR/server/bin/with_new_server_pg.sh" --read-only \
     psql -X -q -t -A -v ON_ERROR_STOP=1 \
       -v validation_run_token="$RUN_TOKEN" <<'SQL'
 SELECT COUNT(*)
@@ -736,14 +736,14 @@ SQL
 }
 
 database_clock() {
-  "$ROOT_DIR/server/bin/with_new_server_pg.sh" \
+  "$ROOT_DIR/server/bin/with_new_server_pg.sh" --read-only \
     psql -X -q -t -A -v ON_ERROR_STOP=1 \
       -c "SELECT clock_timestamp()::text;"
 }
 
 persistent_telemetry_snapshot() {
   local started_at="$1"
-  "$ROOT_DIR/server/bin/with_new_server_pg.sh" \
+  "$ROOT_DIR/server/bin/with_new_server_pg.sh" --read-only \
     psql -X -q -t -A -v ON_ERROR_STOP=1 \
       -v run_started_at="$started_at" <<'SQL'
 WITH params AS (
@@ -1036,6 +1036,8 @@ echo "VALIDATION_CORPUS_OFFSET=${VALIDATION_CORPUS_OFFSET}"
 echo "VALIDATION_ARTIFACT_DIR=${VALIDATION_ARTIFACT_DIR}"
 
 print_header "Preflight read-only do corpus"
+require_live_mutation_approval "Commander resolution corpus PostgreSQL runner"
+require_postgres_write_approval "Commander resolution corpus PostgreSQL runner"
 (
   cd "$SERVER_DIR"
   VALIDATION_PREFLIGHT_ONLY=1 \
@@ -1043,7 +1045,7 @@ print_header "Preflight read-only do corpus"
   VALIDATION_CORPUS_OFFSET="$VALIDATION_CORPUS_OFFSET" \
   VALIDATION_SELECTION_MODE="$VALIDATION_SELECTION_MODE" \
   VALIDATION_CORPUS_PATH="$VALIDATION_CORPUS_PATH" \
-  "$ROOT_DIR/server/bin/with_new_server_pg.sh" \
+  "$ROOT_DIR/server/bin/with_new_server_pg.sh" --write-approved \
     dart run bin/run_three_commander_resolution_validation.dart
 )
 
@@ -1054,8 +1056,6 @@ case "${VALIDATION_PREFLIGHT_ONLY:-0}" in
     exit 0
     ;;
 esac
-
-require_postgres_write_approval "Commander resolution corpus mutating E2E"
 
 for required_tool in dart_frog lsof perl pgrep; do
   if ! command -v "$required_tool" >/dev/null 2>&1; then
@@ -1105,7 +1105,7 @@ fi
 echo "ℹ️ Iniciando API isolada e sem hot reload em ${API_BASE_URL}..."
 (
   cd "$SERVER_DIR"
-  "$ROOT_DIR/server/bin/with_new_server_pg.sh" env \
+  "$ROOT_DIR/server/bin/with_new_server_pg.sh" --write-approved env \
     PORT="$PORT" \
     JWT_SECRET="$BACKEND_TEST_JWT_SECRET" \
     RATE_LIMIT_DISTRIBUTED=false \
@@ -1166,7 +1166,7 @@ set +e
   VALIDATION_RUN_TOKEN="$RUN_TOKEN" \
   VALIDATION_DEFER_CLEANUP_TO_HARNESS=1 \
   JWT_SECRET="$BACKEND_TEST_JWT_SECRET" \
-  "$ROOT_DIR/server/bin/with_new_server_pg.sh" \
+  "$ROOT_DIR/server/bin/with_new_server_pg.sh" --write-approved \
     dart run bin/run_three_commander_resolution_validation.dart
 )
 RUNNER_STATUS="$?"

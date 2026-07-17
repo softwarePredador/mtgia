@@ -8,9 +8,10 @@ import 'package:http/http.dart' as http;
 import 'package:test/test.dart';
 
 void main() {
-  final skipIntegration = Platform.environment['RUN_INTEGRATION_TESTS'] == '0'
-      ? 'Teste live desativado por RUN_INTEGRATION_TESTS=0.'
-      : null;
+  final skipIntegration =
+      Platform.environment['RUN_INTEGRATION_TESTS'] == '0'
+          ? 'Teste live desativado por RUN_INTEGRATION_TESTS=0.'
+          : null;
 
   final baseUrl =
       Platform.environment['TEST_API_BASE_URL'] ?? 'http://127.0.0.1:8082';
@@ -18,7 +19,7 @@ void main() {
   final runSuffix = DateTime.now().millisecondsSinceEpoch;
   late final Map<String, String> testUser = {
     'email': 'test_core_flow_smoke_$runSuffix@example.com',
-    'password': 'TestPassword123!',
+    'password': 'BetaQa!2026-Deck',
     'username': 'test_core_flow_smoke_$runSuffix',
   };
 
@@ -61,9 +62,9 @@ void main() {
   }
 
   Map<String, String> authHeaders({bool withContentType = false}) => {
-        if (withContentType) 'Content-Type': 'application/json',
-        if (authToken != null) 'Authorization': 'Bearer $authToken',
-      };
+    if (withContentType) 'Content-Type': 'application/json',
+    if (authToken != null) 'Authorization': 'Bearer $authToken',
+  };
 
   Future<String> createDeck({
     required String name,
@@ -121,10 +122,7 @@ void main() {
     final response = await http.post(
       Uri.parse('$baseUrl/ai/optimize'),
       headers: authHeaders(withContentType: true),
-      body: jsonEncode({
-        'deck_id': deckId,
-        'archetype': 'midrange',
-      }),
+      body: jsonEncode({'deck_id': deckId, 'archetype': 'midrange'}),
     );
 
     expect(response.statusCode, anyOf(200, 422, 500), reason: response.body);
@@ -203,8 +201,11 @@ void main() {
           }),
         );
 
-        expect(invalidImport.statusCode, equals(400),
-            reason: invalidImport.body);
+        expect(
+          invalidImport.statusCode,
+          equals(400),
+          reason: invalidImport.body,
+        );
         expect(decodeJson(invalidImport)['error'], isA<String>());
 
         final deckId = await createDeck(

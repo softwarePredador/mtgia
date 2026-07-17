@@ -2,6 +2,7 @@ import 'dart:io';
 import 'package:dart_frog/dart_frog.dart';
 import 'package:postgres/postgres.dart';
 
+import 'auth_runtime_policy.dart';
 import 'distributed_rate_limiter.dart';
 import 'internal_ai_request_token.dart';
 import 'runtime_environment.dart';
@@ -46,42 +47,18 @@ class RateLimiter {
   }) : identifier = identifier ?? _defaultIdentifier;
 
   static String _defaultIdentifier(RequestContext context) {
-    return buildClientIdentifierFromHeaders(context.request.headers);
+    return resolveRateLimitClientIdentity(
+      headers: context.request.headers,
+      environment: const {'ENVIRONMENT': 'development'},
+      remoteAddress: _requestRemoteAddress(context),
+    ).identifier!;
   }
 
   static String buildClientIdentifierFromHeaders(Map<String, String> headers) {
-    const ipHeaders = [
-      'X-Forwarded-For',
-      'X-Real-IP',
-      'CF-Connecting-IP',
-      'Fly-Client-IP',
-      'True-Client-IP',
-    ];
-
-    for (final header in ipHeaders) {
-      final value = headers[header];
-      if (value == null || value.trim().isEmpty) continue;
-      if (header == 'X-Forwarded-For') {
-        final firstIp = value.split(',').first.trim();
-        if (firstIp.isNotEmpty) return firstIp;
-        continue;
-      }
-      return value.trim();
-    }
-
-    final fingerprintParts =
-        [
-          headers['User-Agent']?.trim() ?? '',
-          headers['Accept-Language']?.trim() ?? '',
-          headers['Sec-CH-UA']?.trim() ?? '',
-          headers['Host']?.trim() ?? '',
-        ].where((value) => value.isNotEmpty).toList();
-
-    if (fingerprintParts.isEmpty) {
-      return 'anonymous';
-    }
-
-    return 'fingerprint:${Object.hashAll(fingerprintParts)}';
+    return resolveRateLimitClientIdentity(
+      headers: headers,
+      environment: const {'ENVIRONMENT': 'development'},
+    ).identifier!;
   }
 
   bool isAllowed(String clientId) {
@@ -194,9 +171,30 @@ final _aiPollingRateLimiterDev = RateLimiter(
 );
 
 bool _isProduction() {
+  return _isProductionEnvironment(_rateLimitRuntimeEnvironment());
+}
+
+bool _isProductionEnvironment(Map<String, String> environment) =>
+    (environment['ENVIRONMENT'] ?? 'development').trim().toLowerCase() ==
+    'production';
+
+Map<String, String> _rateLimitRuntimeEnvironment() {
   final env = loadRuntimeEnvironment();
-  final mode = (env['ENVIRONMENT'] ?? 'development').toLowerCase();
-  return mode == 'production';
+  return {
+    'ENVIRONMENT': env['ENVIRONMENT'] ?? 'development',
+    if (env[trustedProxyHopsEnvironmentKey] case final String value)
+      trustedProxyHopsEnvironmentKey: value,
+    if (env[trustedProxyPeersEnvironmentKey] case final String value)
+      trustedProxyPeersEnvironmentKey: value,
+  };
+}
+
+String? _requestRemoteAddress(RequestContext context) {
+  try {
+    return context.request.connectionInfo.remoteAddress.address;
+  } on Object {
+    return null;
+  }
 }
 
 bool _useDistributedRateLimitInProd() {
@@ -228,6 +226,19 @@ Future<bool?> _isAllowedDistributedIfAvailable(
   } catch (_) {
     return null;
   }
+}
+
+Response _rateLimitIdentityUnavailable() {
+  return Response.json(
+    statusCode: HttpStatus.serviceUnavailable,
+    body: {
+      'error': 'rate_limit_identity_unavailable',
+      'message':
+          'Não foi possível validar a origem da requisição. Tente novamente mais tarde.',
+      'rate_limit_backend': 'fail_closed',
+    },
+    headers: const {'Retry-After': '60'},
+  );
 }
 
 /// Middleware factory para diferentes níveis de rate limiting
@@ -287,9 +298,18 @@ Middleware rateLimitMiddleware({
 Middleware authRateLimit() {
   return (handler) {
     return (context) async {
-      final isProd = _isProduction();
+      final environment = _rateLimitRuntimeEnvironment();
+      final isProd = _isProductionEnvironment(environment);
       final limiter = isProd ? _authRateLimiter : _authRateLimiterDev;
-      final clientId = RateLimiter._defaultIdentifier(context);
+      final identity = resolveRateLimitClientIdentity(
+        headers: context.request.headers,
+        environment: environment,
+        remoteAddress: _requestRemoteAddress(context),
+      );
+      if (!identity.isValid) {
+        return _rateLimitIdentityUnavailable();
+      }
+      final clientId = identity.identifier!;
 
       if (!isProd && clientId == 'anonymous') {
         return handler(context);
@@ -376,17 +396,32 @@ Middleware _aiRateLimit({
         return handler(context);
       }
 
-      final limiter = _isProduction() ? productionLimiter : developmentLimiter;
+      final environment = _rateLimitRuntimeEnvironment();
+      final limiter =
+          _isProductionEnvironment(environment)
+              ? productionLimiter
+              : developmentLimiter;
       String? userId;
       try {
         userId = context.read<String>();
       } catch (_) {
         userId = null;
       }
-      final clientId = buildAiRateLimitIdentifier(
-        userId: userId,
-        headers: context.request.headers,
-      );
+      final normalizedUserId = userId?.trim();
+      late final String clientId;
+      if (normalizedUserId != null && normalizedUserId.isNotEmpty) {
+        clientId = 'user:$normalizedUserId';
+      } else {
+        final identity = resolveRateLimitClientIdentity(
+          headers: context.request.headers,
+          environment: environment,
+          remoteAddress: _requestRemoteAddress(context),
+        );
+        if (!identity.isValid) {
+          return _rateLimitIdentityUnavailable();
+        }
+        clientId = identity.identifier!;
+      }
       final rateLimitScope = clientId.startsWith('user:') ? 'user' : 'client';
 
       final distributedAllowed = await _isAllowedDistributedIfAvailable(

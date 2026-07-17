@@ -18,6 +18,56 @@ void main() {
         }),
         isTrue,
       );
+      expect(migrate.hasMigrationLiveApproval(const {}), isFalse);
+      expect(
+        migrate.hasMigrationLiveApproval(const {
+          'MANALOOM_CONFIRM_LIVE_MUTATIONS': 'I_HAVE_EXPLICIT_APPROVAL',
+        }),
+        isTrue,
+      );
+    });
+
+    test('protected migration destinations require independent anchors', () {
+      expect(
+        migrate.migrationDestinationViolation(
+          environment: const {
+            'ENVIRONMENT': 'production',
+            'DB_HOST': 'db.internal',
+            'DB_NAME': 'halder',
+            'DB_PORT': '5432',
+          },
+          callerEnvironment: const {},
+          writeRequested: true,
+        ),
+        isNotNull,
+      );
+      expect(
+        migrate.migrationDestinationViolation(
+          environment: const {
+            'ENVIRONMENT': 'production',
+            'DB_HOST': '127.0.0.1',
+            'DB_NAME': 'halder',
+            'DB_PORT': '49152',
+          },
+          callerEnvironment: const {
+            'MANALOOM_PG_WRAPPER_MODE': 'write-approved',
+          },
+          writeRequested: true,
+        ),
+        isNull,
+      );
+      expect(
+        migrate.migrationDestinationViolation(
+          environment: const {
+            'DB_HOST': '127.0.0.1',
+            'DB_NAME': 'local_dev',
+            'DB_PORT': '5432',
+          },
+          callerEnvironment: const {},
+          writeRequested: true,
+        ),
+        isNull,
+      );
     });
 
     test('destructive migration rollback policies fail closed', () {
@@ -43,6 +93,18 @@ void main() {
       );
       expect(
         migrate.migrationRollbackPolicy('037'),
+        migrate.MigrationRollbackPolicy.manualOnly,
+      );
+      expect(
+        migrate.migrationRollbackPolicy('038'),
+        migrate.MigrationRollbackPolicy.manualOnly,
+      );
+      expect(
+        migrate.migrationRollbackPolicy('039'),
+        migrate.MigrationRollbackPolicy.manualOnly,
+      );
+      expect(
+        migrate.migrationRollbackPolicy('040'),
         migrate.MigrationRollbackPolicy.manualOnly,
       );
     });
@@ -395,6 +457,82 @@ void main() {
       expect(
         migrate.migrationRollbackPolicy('038'),
         equals(migrate.MigrationRollbackPolicy.manualOnly),
+      );
+    });
+
+    test('migration 039 persists deck review state and invalidates safely', () {
+      final migration = migrate.migrations.singleWhere(
+        (migration) => migration.version == '039',
+      );
+      final up = migration.up.toLowerCase();
+      final down = migration.down!.toLowerCase();
+
+      expect(migration.name, equals('persist_deck_validation_review_state'));
+      expect(up, contains('add column if not exists validation_state text'));
+      expect(up, contains('add column if not exists validation_reasons jsonb'));
+      expect(
+        up,
+        contains(
+          'add column if not exists validation_updated_at timestamp with time zone',
+        ),
+      );
+      expect(up, contains('chk_decks_validation_state'));
+      expect(up, contains('chk_decks_validation_reasons_array'));
+      expect(up, contains('idx_decks_user_validation_state'));
+      expect(up, contains('manaloom_mark_deck_cards_changed'));
+      expect(up, contains('manaloom_mark_deck_format_changed'));
+      expect(up, contains('new.deck_id is distinct from old.deck_id'));
+      expect(up, contains('array[old.deck_id, new.deck_id]'));
+      expect(up, contains('where id = any(affected_deck_ids)'));
+      expect(
+        RegExp(
+          r'update of\s+deck_id,\s*card_id,\s*quantity,\s*is_commander',
+        ).hasMatch(up),
+        isTrue,
+      );
+      expect(
+        splitPostgresStatements(migration.up).any(
+          (statement) =>
+              statement.contains('CREATE OR REPLACE FUNCTION') &&
+              statement.contains('manaloom_mark_deck_cards_changed') &&
+              statement.contains('RETURN NEW;'),
+        ),
+        isTrue,
+      );
+      expect(
+        migrate.migrationRollbackPolicy('039'),
+        migrate.MigrationRollbackPolicy.manualOnly,
+      );
+      expect(
+        down,
+        contains('drop trigger if exists manaloom_deck_cards_require_review'),
+      );
+      expect(down, contains('drop column if exists validation_state'));
+    });
+
+    test('migration 040 aligns cards reserved runtime schema safely', () {
+      final migration = migrate.migrations.singleWhere(
+        (migration) => migration.version == '040',
+      );
+      final up = migration.up.toLowerCase();
+      final down = migration.down!.toLowerCase();
+
+      expect(migration.name, equals('align_cards_reserved_runtime_schema'));
+      expect(
+        up,
+        contains(
+          'add column if not exists is_reserved boolean not null default false',
+        ),
+      );
+      expect(up, contains('set is_reserved = false'));
+      expect(up, contains('where is_reserved is null'));
+      expect(up, contains('alter column is_reserved set default false'));
+      expect(up, contains('alter column is_reserved set not null'));
+      expect(down, contains('alter column is_reserved drop not null'));
+      expect(down, isNot(contains('drop column')));
+      expect(
+        migrate.migrationRollbackPolicy('040'),
+        migrate.MigrationRollbackPolicy.manualOnly,
       );
     });
 

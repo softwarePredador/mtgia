@@ -911,14 +911,20 @@ String _deckCountLabel(Deck deck) {
 String _deckStatusLabel(Deck deck) {
   final maxCards = _maxCardsForFormat(deck.format);
   if (deck.cardCount == 0) return 'Vazio';
+  if (deck.isValidated) return 'Validado';
+  if (deck.validationState == Deck.validationStateDraft) return 'Rascunho';
   if (maxCards == null) return 'Em construção';
-  if (deck.cardCount >= maxCards) return 'Completo';
+  if (deck.cardCount == maxCards) return 'A validar';
+  if (deck.cardCount > maxCards) return 'Excede limite';
   return 'Incompleto';
 }
 
 Color _deckStatusColor(Deck deck) {
   final status = _deckStatusLabel(deck);
-  if (status == 'Completo') return AppTheme.success;
+  if (status == 'Validado') return AppTheme.success;
+  if (status == 'Rascunho') return AppTheme.warning;
+  if (status == 'A validar') return AppTheme.brass400;
+  if (status == 'Excede limite') return AppTheme.error;
   if (status == 'Vazio') return AppTheme.textHint;
   return AppTheme.warning;
 }
@@ -1092,7 +1098,7 @@ class _DeckSpotlightCard extends StatelessWidget {
         onTap: onTap,
         borderRadius: BorderRadius.circular(AppTheme.radiusLg),
         child: Container(
-          height: 168,
+          height: 184,
           decoration: BoxDecoration(
             color: AppTheme.surfaceSlate,
             borderRadius: BorderRadius.circular(AppTheme.radiusLg),
@@ -1510,8 +1516,7 @@ class _DeckGalleryCard extends StatelessWidget {
       deck.commanderName,
       version: 'normal',
     );
-    final maxCards = _maxCardsForFormat(deck.format);
-    final isComplete = maxCards != null && deck.cardCount >= maxCards;
+    final isComplete = deck.isValidated;
     final accent = _accentColor(deck.format);
 
     return Material(

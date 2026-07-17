@@ -561,6 +561,12 @@ void main() {
         'not_found_lines': ['1 Missing Card'],
         'localized_matches_count': 4,
         'warnings': ['warning'],
+        'deck_state': 'draft',
+        'requires_review': true,
+        'validation': {
+          'schema_version': 'deck_import_validation_v1',
+          'state': 'draft',
+        },
       }),
     );
 
@@ -569,6 +575,45 @@ void main() {
     expect(result['not_found_lines'], ['1 Missing Card']);
     expect(result['localized_matches_count'], 4);
     expect(result['warnings'], ['warning']);
+    expect(result['deck_state'], 'draft');
+    expect(result['requires_review'], isTrue);
+    expect(
+      (result['validation'] as Map)['schema_version'],
+      'deck_import_validation_v1',
+    );
+  });
+
+  test('generated deck review fails closed without validation evidence', () {
+    expect(
+      isReviewableGeneratedDeckResult({
+        'generated_deck': {
+          'cards': const [
+            {'name': 'Island', 'quantity': 60},
+          ],
+        },
+      }),
+      isFalse,
+    );
+  });
+
+  test('generated deck review rejects unresolved cards without repair', () {
+    final payload = <String, dynamic>{
+      'generated_deck': {
+        'cards': const [
+          {'name': 'Island', 'quantity': 60},
+        ],
+      },
+      'validation': {
+        'is_valid': true,
+        'errors': const <String>[],
+        'invalid_cards': const ['Carta inventada'],
+      },
+      'stats': {'invalid_cards': 1},
+    };
+
+    expect(isReviewableGeneratedDeckResult(payload), isFalse);
+    payload['provider_repair'] = {'eligible': true};
+    expect(isReviewableGeneratedDeckResult(payload), isTrue);
   });
 
   test('parseImportToDeckResponse maps failure payload', () {

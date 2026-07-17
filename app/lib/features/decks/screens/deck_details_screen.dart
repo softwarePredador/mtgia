@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart' show ScrollCacheExtent;
 import 'package:flutter/services.dart';
 import 'package:flutter/foundation.dart' show kDebugMode;
 import 'package:provider/provider.dart';
@@ -505,7 +506,7 @@ class _DeckDetailsScreenState extends State<DeckDetailsScreen>
                     maxWidth: AppTheme.contentMaxWidth,
                   ),
                   child: CustomScrollView(
-                    cacheExtent: 180,
+                    scrollCacheExtent: const ScrollCacheExtent.pixels(180),
                     slivers: [
                       SliverPadding(
                         padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
@@ -644,7 +645,7 @@ class _DeckDetailsScreenState extends State<DeckDetailsScreen>
     if (_lastValidationDeckSignature == signature) return;
     _lastValidationDeckSignature = signature;
     _validationAutoLoaded = false;
-    _validationResult = null;
+    _validationResult = _persistedDeckValidationResult(deck);
     _invalidCardNames = {};
   }
 
@@ -1596,6 +1597,7 @@ String _deckValidationSignature(DeckDetails deck) {
   final parts = <String>[
     deck.id,
     deck.format,
+    'validation:${deck.validationState}:${deck.reviewReasons.join(',')}:${deck.validationUpdatedAt?.toIso8601String() ?? ''}',
     for (final c in deck.commander)
       'cmd:${c.id}:${c.quantity}:${c.isCommander}:${c.name}',
     for (final entry in deck.mainBoard.entries)
@@ -1604,6 +1606,50 @@ String _deckValidationSignature(DeckDetails deck) {
   ];
   parts.sort();
   return parts.join('|');
+}
+
+Map<String, dynamic> _persistedDeckValidationResult(DeckDetails deck) {
+  if (deck.isValidated) {
+    return {
+      'ok': true,
+      'deck_state': 'validated',
+      'requires_review': false,
+      'review_reasons': const <String>[],
+    };
+  }
+
+  final reasons =
+      deck.reviewReasons.isEmpty
+          ? const ['validation_not_recorded']
+          : deck.reviewReasons;
+  final messages = reasons.map(_deckReviewReasonMessage).toSet().toList();
+  return {
+    'ok': false,
+    'deck_state': deck.validationState,
+    'requires_review': true,
+    'review_reasons': reasons,
+    'error': messages.join(' '),
+  };
+}
+
+String _deckReviewReasonMessage(String reason) {
+  return switch (reason) {
+    'unresolved_import_lines' =>
+      'Há linhas da importação que ainda não foram reconhecidas.',
+    'import_warnings' => 'A importação foi salva com avisos pendentes.',
+    'missing_commander' => 'Selecione um comandante para concluir a revisão.',
+    'incomplete_deck_size' =>
+      'Complete a quantidade de cartas exigida pelo formato.',
+    'strict_validation_pending' =>
+      'Execute a validação completa antes de usar este deck.',
+    'deck_cards_changed_since_validation' =>
+      'As cartas mudaram desde a última validação.',
+    'deck_format_changed_since_validation' =>
+      'O formato mudou desde a última validação.',
+    'strict_validation_failed' =>
+      'A última validação completa encontrou uma regra pendente.',
+    _ => 'A validação completa deste deck ainda não foi registrada.',
+  };
 }
 
 String _bracketLabel(int bracket) {

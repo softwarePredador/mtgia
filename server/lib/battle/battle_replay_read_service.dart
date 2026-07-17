@@ -75,8 +75,11 @@ class BattleReplayReadService {
         FROM battle_simulations bs
         LEFT JOIN decks da ON da.id = bs.deck_a_id
         LEFT JOIN decks db ON db.id = bs.deck_b_id
-        WHERE bs.deck_a_id = CAST(@deckId AS uuid)
-           OR bs.deck_b_id = CAST(@deckId AS uuid)
+        WHERE da.user_id = CAST(@userId AS uuid)
+          AND (
+            bs.deck_a_id = CAST(@deckId AS uuid)
+            OR bs.deck_b_id = CAST(@deckId AS uuid)
+          )
         ORDER BY bs.created_at DESC
         LIMIT @limit
       '''),
@@ -127,17 +130,14 @@ class BattleReplayReadService {
         LEFT JOIN decks da ON da.id = bs.deck_a_id
         LEFT JOIN decks db ON db.id = bs.deck_b_id
         WHERE bs.id = CAST(@replayId AS uuid)
+          AND da.user_id = CAST(@userId AS uuid)
           AND (
             bs.deck_a_id = CAST(@deckId AS uuid)
             OR bs.deck_b_id = CAST(@deckId AS uuid)
           )
         LIMIT 1
       '''),
-      parameters: {
-        'deckId': deckId,
-        'replayId': replayId,
-        'userId': userId,
-      },
+      parameters: {'deckId': deckId, 'replayId': replayId, 'userId': userId},
     );
 
     if (result.isEmpty) return null;
@@ -162,13 +162,15 @@ class BattleReplayReadService {
     final deckBId = row['deck_b_id']?.toString();
     final isDeckA = deckAId == deckId;
     final opponentDeckId = isDeckA ? deckBId : deckAId;
-    final opponentName = isDeckA
-        ? row['deck_b_name']?.toString()
-        : row['deck_a_name']?.toString();
+    final opponentName =
+        isDeckA
+            ? row['deck_b_name']?.toString()
+            : row['deck_a_name']?.toString();
     final winnerDeckId = row['winner_deck_id']?.toString();
-    final winnerName = winnerDeckId == null
-        ? row['winner_label']?.toString()
-        : _winnerNameForRow(row, winnerDeckId);
+    final winnerName =
+        winnerDeckId == null
+            ? row['winner_label']?.toString()
+            : _winnerNameForRow(row, winnerDeckId);
     final metrics = _jsonValue(row['metrics']);
     final metricsMap = metrics is Map ? metrics : const <String, dynamic>{};
     final engine = metricsMap['engine']?.toString();
@@ -182,7 +184,8 @@ class BattleReplayReadService {
       'opponent_deck_id': opponentDeckId,
       if (opponentName != null && opponentName.trim().isNotEmpty)
         'opponent_name': opponentName,
-      'type': row['game_log_type']?.toString() ??
+      'type':
+          row['game_log_type']?.toString() ??
           row['simulation_type']?.toString(),
       'simulation_type': row['simulation_type']?.toString(),
       'winner_deck_id': winnerDeckId,
@@ -218,9 +221,10 @@ class BattleReplayReadService {
     final engine = gameLogMap['engine']?.toString();
     final engineContract = gameLogMap['engine_contract']?.toString();
     final rawLearningContract = gameLogMap['learning_contract'];
-    final learningContract = rawLearningContract is Map
-        ? Map<String, dynamic>.from(rawLearningContract)
-        : const <String, dynamic>{};
+    final learningContract =
+        rawLearningContract is Map
+            ? Map<String, dynamic>.from(rawLearningContract)
+            : const <String, dynamic>{};
 
     return {
       ...summary,
@@ -257,9 +261,10 @@ class BattleReplayReadService {
   }) {
     final isExternalCanonicalExecution =
         (engine == 'xmage' && engineContract == 'canonical_rules_execution') ||
-            (engine == 'forge' &&
-                engineContract == 'canonical_rules_execution_secondary');
-    final isReviewedNativeExecution = engine == 'manaloom_native_reviewed' &&
+        (engine == 'forge' &&
+            engineContract == 'canonical_rules_execution_secondary');
+    final isReviewedNativeExecution =
+        engine == 'manaloom_native_reviewed' &&
         engineContract == 'native_reviewed_rules_execution';
     final isRulesExecution =
         isExternalCanonicalExecution || isReviewedNativeExecution;
@@ -270,9 +275,10 @@ class BattleReplayReadService {
       'canonical_rules_execution': isExternalCanonicalExecution,
       'reviewed_native_rules_execution': isReviewedNativeExecution,
       if (isRulesExecution)
-        'rules_engine_priority': engine == 'xmage'
-            ? 'primary'
-            : engine == 'forge'
+        'rules_engine_priority':
+            engine == 'xmage'
+                ? 'primary'
+                : engine == 'forge'
                 ? 'secondary'
                 : 'native_residual',
       'canonical_legality_source': false,

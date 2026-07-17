@@ -20,6 +20,7 @@ import 'package:server/sql_statement_splitter.dart';
 ///   --rollback N  Reverte, em transação, as últimas N migrações conhecidas
 
 const migrationWriteApprovalEnvironment = 'MANALOOM_CONFIRM_POSTGRES_WRITES';
+const migrationLiveApprovalEnvironment = 'MANALOOM_CONFIRM_LIVE_MUTATIONS';
 const migrationWriteApprovalPhrase = 'I_HAVE_EXPLICIT_APPROVAL';
 
 // Lista de migrações em ordem cronológica
@@ -1696,6 +1697,166 @@ final migrations = <Migration>[
       ALTER TABLE users DROP COLUMN IF EXISTS deleted_at;
     ''',
   ),
+  Migration(
+    version: '039',
+    name: 'persist_deck_validation_review_state',
+    up: '''
+      ALTER TABLE decks
+      ADD COLUMN IF NOT EXISTS validation_state TEXT;
+      ALTER TABLE decks
+      ADD COLUMN IF NOT EXISTS validation_reasons JSONB;
+      ALTER TABLE decks
+      ADD COLUMN IF NOT EXISTS validation_updated_at TIMESTAMP WITH TIME ZONE;
+
+      UPDATE decks
+      SET validation_state = COALESCE(validation_state, 'unknown'),
+          validation_reasons = COALESCE(
+            validation_reasons,
+            '["validation_not_recorded"]'::jsonb
+          );
+
+      ALTER TABLE decks
+      ALTER COLUMN validation_state SET DEFAULT 'unknown';
+      ALTER TABLE decks
+      ALTER COLUMN validation_state SET NOT NULL;
+      ALTER TABLE decks
+      ALTER COLUMN validation_reasons
+      SET DEFAULT '["validation_not_recorded"]'::jsonb;
+      ALTER TABLE decks
+      ALTER COLUMN validation_reasons SET NOT NULL;
+
+      ALTER TABLE decks
+      DROP CONSTRAINT IF EXISTS chk_decks_validation_state;
+      ALTER TABLE decks
+      ADD CONSTRAINT chk_decks_validation_state CHECK (
+        validation_state IN ('unknown', 'draft', 'validated')
+      );
+
+      ALTER TABLE decks
+      DROP CONSTRAINT IF EXISTS chk_decks_validation_reasons_array;
+      ALTER TABLE decks
+      ADD CONSTRAINT chk_decks_validation_reasons_array CHECK (
+        jsonb_typeof(validation_reasons) = 'array'
+      );
+
+      CREATE INDEX IF NOT EXISTS idx_decks_user_validation_state
+      ON decks (user_id, validation_state, created_at DESC)
+      WHERE deleted_at IS NULL;
+
+      CREATE OR REPLACE FUNCTION manaloom_mark_deck_cards_changed()
+      RETURNS trigger
+      LANGUAGE plpgsql
+      AS \$deck_cards_changed\$
+      DECLARE
+        affected_deck_ids UUID[];
+      BEGIN
+        IF TG_OP = 'DELETE' THEN
+          affected_deck_ids := ARRAY[OLD.deck_id];
+        ELSIF TG_OP = 'UPDATE'
+              AND NEW.deck_id IS DISTINCT FROM OLD.deck_id THEN
+          affected_deck_ids := ARRAY[OLD.deck_id, NEW.deck_id];
+        ELSE
+          affected_deck_ids := ARRAY[NEW.deck_id];
+        END IF;
+
+        UPDATE decks
+        SET validation_state = 'draft',
+            validation_reasons = CASE
+              WHEN validation_state = 'validated' THEN
+                '["deck_cards_changed_since_validation"]'::jsonb
+              WHEN validation_reasons @>
+                   '["deck_cards_changed_since_validation"]'::jsonb THEN
+                validation_reasons
+              ELSE validation_reasons ||
+                   '["deck_cards_changed_since_validation"]'::jsonb
+            END,
+            validation_updated_at = CURRENT_TIMESTAMP
+        WHERE id = ANY(affected_deck_ids);
+
+        IF TG_OP = 'DELETE' THEN
+          RETURN OLD;
+        END IF;
+        RETURN NEW;
+      END;
+      \$deck_cards_changed\$;
+
+      DROP TRIGGER IF EXISTS manaloom_deck_cards_require_review
+      ON deck_cards;
+      CREATE TRIGGER manaloom_deck_cards_require_review
+      AFTER INSERT OR DELETE OR UPDATE OF
+        deck_id, card_id, quantity, is_commander
+      ON deck_cards
+      FOR EACH ROW
+      EXECUTE FUNCTION manaloom_mark_deck_cards_changed();
+
+      CREATE OR REPLACE FUNCTION manaloom_mark_deck_format_changed()
+      RETURNS trigger
+      LANGUAGE plpgsql
+      AS \$deck_format_changed\$
+      BEGIN
+        IF NEW.format IS DISTINCT FROM OLD.format THEN
+          NEW.validation_state := 'draft';
+          NEW.validation_reasons := CASE
+            WHEN OLD.validation_state = 'validated' THEN
+              '["deck_format_changed_since_validation"]'::jsonb
+            WHEN OLD.validation_reasons @>
+                 '["deck_format_changed_since_validation"]'::jsonb THEN
+              OLD.validation_reasons
+            ELSE OLD.validation_reasons ||
+                 '["deck_format_changed_since_validation"]'::jsonb
+          END;
+          NEW.validation_updated_at := CURRENT_TIMESTAMP;
+        END IF;
+        RETURN NEW;
+      END;
+      \$deck_format_changed\$;
+
+      DROP TRIGGER IF EXISTS manaloom_deck_format_require_review
+      ON decks;
+      CREATE TRIGGER manaloom_deck_format_require_review
+      BEFORE UPDATE OF format
+      ON decks
+      FOR EACH ROW
+      EXECUTE FUNCTION manaloom_mark_deck_format_changed();
+    ''',
+    down: '''
+      DROP TRIGGER IF EXISTS manaloom_deck_format_require_review ON decks;
+      DROP FUNCTION IF EXISTS manaloom_mark_deck_format_changed();
+      DROP TRIGGER IF EXISTS manaloom_deck_cards_require_review ON deck_cards;
+      DROP FUNCTION IF EXISTS manaloom_mark_deck_cards_changed();
+      DROP INDEX IF EXISTS idx_decks_user_validation_state;
+      ALTER TABLE decks
+      DROP CONSTRAINT IF EXISTS chk_decks_validation_reasons_array;
+      ALTER TABLE decks
+      DROP CONSTRAINT IF EXISTS chk_decks_validation_state;
+      ALTER TABLE decks DROP COLUMN IF EXISTS validation_updated_at;
+      ALTER TABLE decks DROP COLUMN IF EXISTS validation_reasons;
+      ALTER TABLE decks DROP COLUMN IF EXISTS validation_state;
+    ''',
+  ),
+  Migration(
+    version: '040',
+    name: 'align_cards_reserved_runtime_schema',
+    up: '''
+      ALTER TABLE cards
+      ADD COLUMN IF NOT EXISTS is_reserved BOOLEAN NOT NULL DEFAULT FALSE;
+
+      UPDATE cards
+      SET is_reserved = FALSE
+      WHERE is_reserved IS NULL;
+
+      ALTER TABLE cards
+      ALTER COLUMN is_reserved SET DEFAULT FALSE;
+      ALTER TABLE cards
+      ALTER COLUMN is_reserved SET NOT NULL;
+    ''',
+    // The column may predate this migration from an operational sync. Keep
+    // product data and restore only the prior nullable shape on manual rollback.
+    down: '''
+      ALTER TABLE cards
+      ALTER COLUMN is_reserved DROP NOT NULL;
+    ''',
+  ),
 ];
 
 class Migration {
@@ -1718,6 +1879,50 @@ bool hasMigrationWriteApproval(Map<String, String> environment) =>
     environment[migrationWriteApprovalEnvironment] ==
     migrationWriteApprovalPhrase;
 
+bool hasMigrationLiveApproval(Map<String, String> environment) =>
+    environment[migrationLiveApprovalEnvironment] ==
+    migrationWriteApprovalPhrase;
+
+bool isLoopbackMigrationHost(String host) {
+  final normalized = host.trim().toLowerCase();
+  return normalized == 'localhost' ||
+      normalized == '127.0.0.1' ||
+      normalized == '::1';
+}
+
+String? migrationDestinationViolation({
+  required Map<String, String> environment,
+  required Map<String, String> callerEnvironment,
+  required bool writeRequested,
+}) {
+  final host = environment['DB_HOST'] ?? 'localhost';
+  final database = environment['DB_NAME'] ?? 'mtg_db';
+  final port = environment['DB_PORT'] ?? '5432';
+  final wrapperMode = callerEnvironment['MANALOOM_PG_WRAPPER_MODE'];
+  if (wrapperMode == 'read-only' && !writeRequested) return null;
+  if (wrapperMode == 'write-approved' && writeRequested) return null;
+
+  final productionLike =
+      environment['ENVIRONMENT']?.toLowerCase() == 'production' ||
+      !isLoopbackMigrationHost(host);
+  if (!productionLike) return null;
+
+  final expectedHost = callerEnvironment['MANALOOM_EXPECTED_DB_HOST'];
+  final expectedDatabase = callerEnvironment['MANALOOM_EXPECTED_DB_NAME'];
+  final expectedPort = callerEnvironment['MANALOOM_EXPECTED_DB_PORT'];
+  if (expectedHost == null ||
+      expectedDatabase == null ||
+      expectedPort == null) {
+    return 'destino PostgreSQL protegido exige anchors do processo chamador';
+  }
+  if (host != expectedHost ||
+      database != expectedDatabase ||
+      port != expectedPort) {
+    return 'destino PostgreSQL diverge dos anchors aprovados';
+  }
+  return null;
+}
+
 enum MigrationRollbackPolicy { standard, emptyOnly, manualOnly }
 
 MigrationRollbackPolicy migrationRollbackPolicy(String version) =>
@@ -1725,7 +1930,12 @@ MigrationRollbackPolicy migrationRollbackPolicy(String version) =>
       '033' || '035' => MigrationRollbackPolicy.emptyOnly,
       // Estas migrations alteram ou adotam dados preexistentes. O down
       // automático não consegue reconstruir o estado anterior com segurança.
-      '034' || '036' || '037' || '038' => MigrationRollbackPolicy.manualOnly,
+      '034' ||
+      '036' ||
+      '037' ||
+      '038' ||
+      '039' ||
+      '040' => MigrationRollbackPolicy.manualOnly,
       _ => MigrationRollbackPolicy.standard,
     };
 
@@ -1786,10 +1996,13 @@ void main(List<String> args) async {
     }
   }
 
-  if (!showStatus && !hasMigrationWriteApproval(Platform.environment)) {
+  if (!showStatus &&
+      (!hasMigrationWriteApproval(Platform.environment) ||
+          !hasMigrationLiveApproval(Platform.environment))) {
     stderr.writeln(
       'BLOCKED: aplicar migrações altera PostgreSQL. Defina '
-      '$migrationWriteApprovalEnvironment=$migrationWriteApprovalPhrase '
+      '$migrationWriteApprovalEnvironment=$migrationWriteApprovalPhrase e '
+      '$migrationLiveApprovalEnvironment=$migrationWriteApprovalPhrase '
       'somente após aprovação explícita para esta execução.',
     );
     exitCode = 2;
@@ -1798,6 +2011,22 @@ void main(List<String> args) async {
 
   final env = loadRuntimeEnvironment();
   env.addAll(Platform.environment);
+
+  final destinationViolation = migrationDestinationViolation(
+    environment: {
+      for (final key in const ['DB_HOST', 'DB_NAME', 'DB_PORT', 'ENVIRONMENT'])
+        if (env[key] case final value?) key: value,
+    },
+    callerEnvironment: Platform.environment,
+    writeRequested: !showStatus,
+  );
+  if (destinationViolation != null) {
+    stderr.writeln(
+      'BLOCKED: $destinationViolation. Nenhuma conexão foi aberta.',
+    );
+    exitCode = 2;
+    return;
+  }
 
   final connection = await Connection.open(
     Endpoint(

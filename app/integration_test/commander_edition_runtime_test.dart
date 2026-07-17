@@ -71,7 +71,7 @@ void main() {
       final api = ApiClient();
       final unique = DateTime.now().millisecondsSinceEpoch.toRadixString(16);
       final email = 'iphone15_commander_edition_$unique@example.com';
-      const password = 'Qa123456!';
+      const password = 'BetaQa!2026-Deck';
       final username = 'iphone15_commander_edition_$unique';
 
       final registerResponse = await api.post('/auth/register', {

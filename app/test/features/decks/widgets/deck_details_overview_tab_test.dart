@@ -419,4 +419,34 @@ void main() {
     expect(find.byType(SvgPicture), findsWidgets);
     expect(tester.takeException(), isNull);
   });
+
+  testWidgets('hero reabre exibindo estado draft persistido', (tester) async {
+    await tester.pumpWidget(
+      createSubject(
+        deck: makeCommanderDeck().copyWith(
+          validationState: 'draft',
+          reviewReasons: const ['unresolved_import_lines'],
+        ),
+        validationResult: const {
+          'ok': false,
+          'deck_state': 'draft',
+          'requires_review': true,
+          'review_reasons': ['unresolved_import_lines'],
+        },
+        onValidationTap: () {},
+        onOpenCards: () {},
+        onForcePricingRefresh: () {},
+        onShowPricingDetails: () {},
+        onTogglePublic: () {},
+        onShowOptimizationOptions: () {},
+        onSelectCommander: () {},
+        onImportList: () {},
+        onEditDescription: (_) {},
+      ),
+    );
+    await tester.pump();
+
+    expect(find.byKey(const Key('deck-review-state-chip')), findsOneWidget);
+    expect(find.text('Rascunho'), findsOneWidget);
+  });
 }

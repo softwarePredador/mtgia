@@ -14,3 +14,4 @@ def test_current_xmage_execution_contract_is_aligned():
     assert checks["coverage.source_catalog_reconciliation"]["status"] == "pass"
     assert checks["server.positive_battle_evidence"]["status"] == "pass"
     assert checks["server.public_battle_request_bounds"]["status"] == "pass"
+    assert checks["server.battle_persistence"]["status"] == "pass"

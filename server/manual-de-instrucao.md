@@ -9564,7 +9564,7 @@ Future<Response> onRequest(RequestContext context) async {
 
 **Validações:**
 - Username: mínimo 3 caracteres
-- Password: mínimo 6 caracteres
+- Password de novos cadastros: mínimo 12 e máximo 256 caracteres, sem padrões comuns, sequências previsíveis ou dados da conta
 - Email: não pode estar vazio
 
 **Erros Possíveis:**

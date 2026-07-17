@@ -18,6 +18,11 @@ void main() {
       'API_BASE_URL',
       defaultValue: 'http://127.0.0.1:8082',
     );
+    const installSessionId = String.fromEnvironment(
+      'MANALOOM_OBSERVABILITY_SESSION_ID',
+      defaultValue: '',
+    );
+    expect(installSessionId, isNotEmpty);
     final marker =
         'qa_fcm_${DateTime.now().microsecondsSinceEpoch.toRadixString(16)}';
 
@@ -61,7 +66,7 @@ void main() {
         body: jsonEncode({
           'username': marker,
           'email': '$marker@example.invalid',
-          'password': 'TestPassword123!',
+          'password': 'BetaQa!2026-Deck',
         }),
       );
       expect(auth.statusCode, anyOf(200, 201), reason: auth.body);
@@ -78,7 +83,10 @@ void main() {
       );
       expect(registerToken.statusCode, 200, reason: registerToken.body);
       // ignore: avoid_print
-      print('FCM_SMOKE_RESULT=token_registered token_present=true');
+      print(
+        'FCM_SMOKE_RESULT=token_registered token_present=true '
+        'install_session_id=$installSessionId',
+      );
     } catch (error) {
       // ignore: avoid_print
       print('FCM_SMOKE_RESULT=not_proven error_type=${error.runtimeType}');

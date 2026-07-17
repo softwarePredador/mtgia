@@ -6,7 +6,7 @@
 
 **Inventário auditado:** 33 `GoRoute`s, 1 `ShellRoute` e 37 arquivos de tela
 
-**Estado deste documento:** auditoria e remediações consolidadas no checkout; gate `full` final aprovado, com P0 de promoção e externos ainda abertos e sem promoção para produção
+**Estado deste documento:** auditoria e remediações consolidadas no checkout; suítes finais locais aprovadas, com P0 de promoção e externos ainda abertos e sem promoção para produção
 
 Este é o documento canônico para compreender a proposta do aplicativo, a relação entre suas áreas, a qualidade de cada superfície e o que ainda impede uma afirmação de release completa. Ele não substitui o contrato E2E, os contratos de API nem a verdade de dados PostgreSQL. Resultados históricos são evidência de fase, não autorização para declarar o estado atual como aprovado.
 
@@ -20,11 +20,12 @@ As correções desta rodada atacam esses pontos: continuidade de autenticação,
 
 Ainda não é rigoroso afirmar que “tudo está 100% pronto”. O código do candidato foi ampliado, mas as seguintes provas permanecem abertas:
 
-1. **Migração de privacidade/sync:** exportação, exclusão/anonimização de conta, revisões e tombstones estão implementados, mas a migration 038 ainda precisa de precheck e aplicação autorizada no PostgreSQL antes do novo backend.
+1. **Migrations live:** privacidade/sync (038), estado de validação e triggers do Deckbuilder (039) e normalização de `cards.is_reserved` (040) passaram em PostgreSQL isolado, mas o banco live ainda está na 037 e exige backup fresco, apply autorizado e postcheck antes do novo backend.
 2. **Trocas:** o produto da beta é coordenação entre usuários, sem custódia ou garantia do ManaLoom. A interface agora informa que pagamento e entrega são combinados diretamente; confirmação de pagamento, mediação e disputa não podem ser prometidas.
-3. **Operação e observabilidade:** restore isolado local passou e `age`/Docker estão prontos, mas Sentry, prova FCM, CORS exato de produção e backup off-site criptografado ainda exigem credenciais/destino/evidência externa.
-4. **Distribuição:** APK/AAB finais foram inspecionados e o APK instalou/abriu no emulador Android 36, mas falta exercitar o APK assinado exato em aparelho físico. iOS segue sem cadeia Apple para distribuição; scanner permanece desabilitado por padrão até prova física fresca.
+3. **Operação e observabilidade:** restore isolado local passou e `age`/Docker estão prontos, mas Sentry, prova FCM, CORS/proxies exatos de produção e backup off-site criptografado ainda exigem credenciais/destino/evidência externa.
+4. **Distribuição:** probes locais de APK/AAB foram inspecionados e o APK instalou/abriu no emulador Android 36, mas não são artefatos publicáveis de mesma SHA; ainda faltam compatibilidade com Play App Signing e exercício do APK assinado exato em aparelho físico. iOS segue sem cadeia Apple para distribuição; scanner permanece desabilitado por padrão até prova física fresca.
 5. **Prova visual autenticada completa:** a captura automática anterior parou em `/auth/register`; uma nova passagem autenticada mobile/desktop ainda é necessária para o SHA final.
+6. **Credencial/JWT:** a credencial da conta existia no snapshot predecessor de `origin/master` e permanece no histórico, mas já foi rotacionada; a senha antiga retorna HTTP 401 e a nova HTTP 200. Ainda falta publicar o candidato sem o literal, promover o novo JWT e provar a recusa de token assinado pelo segredo anterior.
 
 ### Decisão de produto
 
@@ -48,7 +49,7 @@ A auditoria combinou cinco lentes:
 
 - A rodada final inclui mudanças de app, servidor e operação, mas este relatório não autoriza aplicação automática de migrations nem outras mutações live.
 - Nenhuma mudança transforma trocas em checkout, escrow, proteção de pagamento ou entrega garantida.
-- Remoção destrutiva de artefatos históricos ou provas de QA.
+- Esta rodada não autorizou remoção destrutiva de artefatos históricos ou provas de QA.
 - Declaração de distribuição iOS sem evidência da cadeia de assinatura/distribuição.
 
 ## 3. Tese de experiência e sistema visual
@@ -171,13 +172,15 @@ O produto não precisa vencer por quantidade de módulos. Deve vencer por **cont
 | Acesso e onboarding | Visual premium já consistente, mas deep links perdiam intenção entre login e cadastro | Redirect seguro preservado e normalizado; destino restaurado após autenticação | Prova autenticada completa bloqueada pelo timeout do ambiente |
 | Home e navegação | Boa identidade, porém CTAs e destino de Trocas não eram coerentes em todos os tamanhos | Destino correto, CTA mínimo de 48 px, navegação lateral alinhada a Brass/Frost, acesso web à mesa | Goldens e testes responsivos passaram; jornada autenticada completa continua condicionada ao ambiente |
 | Deck lifecycle | Núcleo estratégico forte, mas analyze/optimize/play/pós-jogo pareciam áreas paralelas | Erros separados de vazio, retries, copy de cliente, remoção de filtros falsos; deck, mesa e pós-jogo conectados por sessão explícita | Proveniência de IA e versão do deck seguem abertas; sync cross-device implementado aguarda migration/prova E2E |
-| Mesa/Life Counter | Superfície mais distinta visualmente, porém web e entrada manual usavam caminhos diferentes; linguagem misturada | Host web isolado, mesma skin/contratos e estado canônico, regra London Mulligan corrigida, PT-BR, saída tipada, troca de deck segura e correção de overlap no histórico | Runtime web e host nativo isolado no Android 36 passaram; retomada em aparelho físico e distribuição iOS ainda exigem evidência |
+| Mesa/Life Counter | Superfície mais distinta visualmente, porém web e entrada manual usavam caminhos diferentes; linguagem misturada | Entrada manual e rota direta agora usam a mesma `LotusLifeCounterScreen`; host web isolado, estado canônico, regra London Mulligan corrigida, PT-BR, dados/moeda/rolagem personalizada acessíveis, saída tipada, troca de deck segura e correção de overlap/clipping | Runtime web e host nativo isolado no Android 36 passaram; retomada em aparelho físico e distribuição iOS ainda exigem evidência |
 | Coleção e catálogo | Área útil, mas densa; termos de abas e falhas podiam confundir | Abas renomeadas, alvos ampliados, erro diferente de vazio, rotas de set canônicas, copy técnica removida | Modelo “livre/alocado” ainda não está provado ponta a ponta; exportação de conta foi implementada |
 | Comunidade e mercado | Conteúdo relevante, mas tabs/rotas duplicadas e falhas silenciosas reduziam confiança | `/market` virou compatibilidade para aba canônica, perfil/deck/chat por URL, retries e feedbacks | Moderation/trust e disponibilidade de dados devem ser monitorados |
 | Trocas | Interface ampla para coordenação entre usuários | Modalidades normalizadas; campos incompatíveis são limpos/validados; aviso informa que ManaLoom não processa, protege ou garante pagamento e entrega | Provar estados bilaterais e concorrência; não oferecer expectativa de escrow, mediação ou disputa |
 | Retenção e mensagens | Pós-jogo, chat e notificações existiam, mas perda silenciosa era possível | Rascunho preservado, chat sinaliza falha, pós-jogo ganhou fila por deck, revisão/cursor/tombstone e suporte de servidor; polls antigos são invalidados | Migration 038 e prova multi-device/idempotente ainda são obrigatórias |
 | Comercial | Rotas existem, mas cobrança não pertence à beta atual | Beta gratuita comunicada; checkout e chamada paga desabilitados/não anunciados; backend de billing falha fechado | Reabrir somente com decisão comercial e prova sandbox/end-to-end futura |
 | Perfil | Entrada estável para identidade e preferências | Exportação de dados e exclusão com confirmação exata + senha foram implementadas; sessão só é limpa após confirmação `account_deleted: true` | Validar contra backend migrado e registrar prova autenticada final |
+
+A diferença observada anteriormente no Life Counter vinha do contexto de entrada — atalho/debug versus rota, autenticação e estado restaurado — e não de uma segunda tela de produto. As duas entradas agora resolvem para `LotusLifeCounterScreen`. O ajuste final de largura do botão `ROLAR` passou no contrato estático e na recaptura visual desktop, sem corte no texto.
 
 ## 8. Registro tela a tela
 
@@ -188,7 +191,7 @@ Há **37 arquivos de tela** sob `app/lib/features`. Conteúdos embutidos contam 
 | 1 | `SplashScreen` | `/` | Preserva redirect normalizado; não deve virar uma segunda home. Ajustado e validado por contratos automatizados de redirect. |
 | 2 | `LoginScreen` | `/login` | Visual forte; continuidade do deep link foi corrigida. Erros devem permanecer acionáveis e não técnicos. |
 | 3 | `RegisterScreen` | `/register` | Mantém o destino desejado ao alternar com login. A prova runtime parou aqui por timeout do backend. |
-| 4 | `BattleReplaysScreen` | Deck details, rota transitória | Integração inventariada; nenhuma mutação de Battle nesta rodada. Exige evidência própria antes de afirmar coerência estratégica. |
+| 4 | `BattleReplaysScreen` | Deck details, rota transitória | Lista e detalhe exigem o proprietário do deck iniciador. O app valida o `replay_id` canônico; o servidor sanitiza erros e não permite que o proprietário apenas do deck oponente leia o replay. Gate estático e E2E descartável passaram; falta a jornada publicada. |
 | 5 | `BinderTabContent` | `/collection?tab=0` | Área densa; abas, alvos e estados foram tornados mais claros. Exclusão com falha agora precisa informar o usuário. |
 | 6 | `MarketplaceTabContent` | `/collection?tab=1` | Busca/oferta úteis; CTA e navegação para troca foram alinhados. Segurança transacional continua externa ao widget. |
 | 7 | `CardDetailScreen` | Push transitório a partir de listas | Reuso consistente de arte e metadados. Candidata a GoRoute somente se compartilhamento/restauração virar requisito. |
@@ -204,11 +207,11 @@ Há **37 arquivos de tela** sob `app/lib/features`. Conteúdos embutidos contam 
 | 17 | `CommunityDeckDetailScreen` | `/community/decks/:deckId` | Ao copiar deck, o feedback passa a oferecer abertura direta quando há ID retornado. |
 | 18 | `CommunityScreen` | `/community?tab=N` | Aba agora é endereçável; mercado carrega o provider correto e falhas ganham recuperação. |
 | 19 | `DeckDetailsScreen` | `/decks/:id` | É o hub do ciclo: abre a mesa com `deckId`/nome, interpreta a saída tipada, só oferece pós-jogo quando houve atividade e encaminha o contexto temporal da sessão. |
-| 20 | `DeckGenerateScreen` | `/decks/generate` | Parte do fluxo canônico. Sugestões precisam explicar premissas, fontes e limites antes de criar/aplicar. |
-| 21 | `DeckImportScreen` | `/decks/import` | Parte do fluxo canônico. Formato e erros de parsing devem ser apresentados como correção orientada, sem perder input. |
+| 20 | `DeckGenerateScreen` | `/decks/generate` | Geração falha fechado se a validação não retornar `valid`; o deck criado exibe estado de revisão/validação. Prova live após migration 039 ainda é obrigatória. |
+| 21 | `DeckImportScreen` | `/decks/import` | Importação é atômica; formato entra no lookup e importação incompleta pode ser salva como rascunho seguro, com motivos revisáveis e erros sanitizados. |
 | 22 | `DeckListScreen` | `/decks` | Falha de carregamento foi separada de lista vazia, com retry; melhora confiança e evita CTA incorreto. |
 | 23 | `HomeScreen` | `/home` | Trocas aponta para a aba correta; CTAs foram ampliados e Life Counter deixa de ser artificialmente indisponível na web. |
-| 24 | `LotusLifeCounterScreen` | `/life-counter` | Host web e host móvel representam a mesma experiência Lotus e espelham o estado canônico. PT-BR, armazenamento isolado, saída com/sem atividade, vínculo de deck e troca segura de sessão têm testes dedicados. No web, o iframe confiável permite IndexedDB e a ponte local mantém o estado canônico escopado. No host Android, o botão “Todas as partidas” foi reposicionado para não sobrepor fechar/header e revalidado visualmente e por teste estático. |
+| 24 | `LotusLifeCounterScreen` | `/life-counter` | Host web e host móvel representam a mesma experiência Lotus e espelham o estado canônico. PT-BR, armazenamento isolado, saída com/sem atividade, vínculo de deck e troca segura de sessão têm testes dedicados. No Web, IndexedDB/reload passou. No Android 36, a matriz de 2 a 6 jogadores e 40→41 após fechar/reabrir passou, com captura final idêntica byte a byte. |
 | 25 | `OnboardingCoreFlowScreen` | `/onboarding/core-flow` | Deve ensinar a jornada completa, não uma lista de recursos. Revisar após fechar deck → mesa → pós-jogo. |
 | 26 | `MarketScreen` | Sem GoRoute ativo | Superfície standalone aparenta ser legado; manter como candidata de limpeza somente após confirmar ausência de entradas externas e substituir seus testes. |
 | 27 | `ChatScreen` | `/messages/:conversationId` | Abertura por URL e dados opcionais; falhas de criação/envio não devem mais ser silenciosas. |
@@ -292,13 +295,18 @@ Se a tela precisa de vários destaques simultâneos para responder, a hierarquia
 
 | Risco | Critério de fechamento | Dependência |
 |---|---|---|
-| Migration 038 não aplicada | Precheck read-only, backup, autorização literal, apply, postcheck e rollback documentado antes de subir o novo backend | PostgreSQL/autoridade live |
+| Migrations 038–040 não aplicadas | Backup fresco pós-rotação, precheck read-only, autorização literal, apply em ordem, postcheck e rollback documentado antes de subir o novo backend | PostgreSQL/autoridade live |
 | Identidade de release ainda não congelada | Checkout limpo, `HEAD == origin/master` e manifests Web/APK/AAB com a mesma SHA e versão | Git/build |
-| Prova runtime autenticada incompleta | Candidato final percorre Home, Decks, Coleção, Comunidade, Perfil, privacidade e Life Counter em mobile/desktop | Ambiente/backend |
-| Runtime físico Android | APK assinado exato é instalado e exercitado no aparelho, incluindo retomada do Life Counter; scanner continua fora do escopo com flag desligada | Dispositivo/build assinado |
-| Observabilidade e recuperação parcialmente provadas | Restore isolado local passou; ainda faltam Sentry/FCM do SHA final, CORS exato e backup off-site criptografado | Credenciais/infraestrutura |
+| Prova runtime autenticada incompleta | Candidato final percorre Home, Deckbuilder, Battle persistida/replay, Coleção, Comunidade, Perfil, privacidade e Life Counter em mobile/desktop | Ambiente/backend |
+| Runtime físico Android | Upload key é confirmado no Play App Signing; APK assinado exato é instalado e exercitado no aparelho, incluindo retomada do Life Counter; scanner continua fora do escopo com flag desligada | Play Console/dispositivo/build assinado |
+| Observabilidade e recuperação parcialmente provadas | Restore isolado local passou; ainda faltam Sentry/FCM do SHA final, CORS e trusted proxy peers/hops exatos e backup off-site criptografado | Credenciais/infraestrutura |
+| Novo JWT ainda não promovido | Backend usa o segredo novo e um token assinado pelo segredo anterior é rejeitado; remoção do literal está publicada | Deploy/backend |
 
-O gate `full` final passou com exit 0. Isso fecha a pendência local integrada, mas não substitui os P0 externos e de promoção listados acima.
+As suítes integradas do cliente e servidor, os gates focados de Battle,
+Deckbuilder e Life Counter, Web pública, builds de plataforma e 25 contratos
+operacionais passaram. Isso fecha os gates funcionais locais principais, mas
+não substitui os P0 live/de promoção nem os residuais P1 de containers listados
+abaixo.
 
 ### P1 — confiança e retenção
 
@@ -311,6 +319,7 @@ O gate `full` final passou com exit 0. Isso fecha a pendência local integrada, 
 - Completar testes de concorrência dos estados bilaterais de troca, preservando o posicionamento de coordenação P2P sem garantia financeira.
 - Migração seletiva de pushes transitórios para GoRouter quando deep link/retomada for valor real.
 - Prova física do scanner no build em que a feature estiver habilitada.
+- manaloom-ops, XMage e Forge ainda executam como root e não têm `Dockerfile HEALTHCHECK`, e o master do Nginx do app Web também inicia como root. O `/health` final do Forge já passou; tratar o hardening de usuário/healthcheck como mudança controlada, com nova prova de runtime.
 
 ### P2 — refinamento e expansão controlada
 
@@ -330,7 +339,7 @@ Estas execuções serviram como baseline e não substituem o gate final:
 |---|---|---|
 | `flutter analyze` | Sem issues no baseline | Rodar novamente após todas as integrações |
 | `flutter test` | `+829 All tests passed` no baseline | Não cobre mudanças posteriores |
-| `flutter build web` | Build concluído; havia warning de fonte CupertinoIcons | Dependência foi ajustada; evidência foi substituída pelo rebuild final abaixo |
+| `flutter build web` | Build concluído; warning de fonte CupertinoIcons persistiu | Não há uso direto encontrado no código e o build passou; manter como warning conhecido, não como correção comprovada |
 | Auditoria visual estática | 23 sinais P2 inicialmente; 0 após limpeza de tokens do Life Counter | O relatório conserva `visual_pass=false` por contrato; não equivale a runtime |
 | Navegador | Login e cadastro inspecionados em desktop/mobile | Fluxo autenticado interrompido pelo timeout de `/auth/register` |
 | Captura visual integrada | Parou após 15 s aguardando resposta de cadastro | Bloqueio de ambiente/backend, não aprovação das telas seguintes |
@@ -341,27 +350,32 @@ Saídas confirmadas até este ponto, sempre com o limite explícito da evidênci
 
 | Gate | Estado observado | Evidência e limite |
 |---|---|---|
-| Dependências Flutter | **PASS** | `flutter pub get` concluiu após o bump para `1.0.0+2`. |
-| Cliente — análise e suíte completa | **PASS** | Análise com 0 issues; 909 testes passaram e 1 teste web-only foi pulado, confirmados também pelo `full` final. |
+| Dependências Flutter | **PASS** | `flutter pub get --enforce-lockfile` concluiu com Flutter `3.44.6` após resolver o lock de `1.0.0+2`. |
+| Cliente — análise e suíte completa | **PASS** | Análise com 0 issues; **948 testes passaram e 1 teste web-only foi pulado**, com Flutter `3.44.6`. |
 | Privacidade no perfil | **PASS FOCADO** | 6/6 testes de exportação, exclusão, responsividade e ciclo de sessão passaram; runtime autenticado contra backend migrado continua pendente. |
-| Servidor all-local | **PASS** | `RUN_INTEGRATION_TESTS=0 ... dart test -P all-local --reporter compact`: 1494 testes passaram. Inclui regressão SQL da migration de privacidade; não aplica PostgreSQL live. |
+| Servidor all-local | **PASS** | `RUN_INTEGRATION_TESTS=0 ... dart test -P all-local --reporter compact`: **1.583 testes passaram**. Inclui regressões das migrations 038–040; não aplica PostgreSQL live. |
 | Sets/Basic Land | **PASS FOCADO** | 12/12 testes passaram após correção de fronteira de tipo; coberto também pelo all-local. |
-| Contratos de release/DR | **PASS** | `scripts/manaloom_release_ops_contract_test.sh`: 10/10 contratos passaram; testes Dart focados de operação: 9/9. Não prova credenciais, uploads, restore real ou device. |
+| Contratos de release/DR | **PASS** | `scripts/manaloom_release_ops_contract_test.sh`: **25/25 contratos passaram**. Os 35 arquivos shell presentes no diff final passaram `bash -n` e `shellcheck -S warning -x`. Não prova credenciais, uploads, device ou deploy live. |
 | Quality gate `deps` | **PASS** | Concluiu com exit 0; apontamentos são pressupostos executáveis/custom lint/Patrol e possibilidade de asset, não falha do gate. |
 | Quality gate `custom-lint` | **PASS** | Pacote de lint: 5/5 testes. |
 | Quality gate `ui-audit` | **PASS** | Análise com 0 issues e 13 testes de UI passaram. |
-| `quality_gate.sh full` integrado | **PASS** | Exit 0: backend 1494/1494, Flutter analyze com 0 issues, Flutter 909 pass + 1 skip, Web ESLint/build de 12 páginas/smoke aprovados e npm com 0 vulnerabilidades. Smoke: `/tmp/manaloom_public_web_smoke/20260717T005350Z_97473_2517619098`. |
+| Web pública | **PASS** | `npm ci`, audit de produção com 0 vulnerabilidades, lint e build Next.js de **13 rotas** passaram. |
+| Host Web do app | **PASS** | Build release passou; contexto Docker caiu de 4,4 GB para 51,10 MB; imagem Nginx ficou healthy, com `/healthz` 200, `/` 404, `/app/` 200 e headers de cache/segurança validados. |
 | `quality_gate.sh e2e` | **PASS** | 14 etapas executadas; 5 perfis opt-in ficaram em SKIP. Revalidação pós-correções: `/tmp/manaloom_e2e_suite_reports/manaloom_e2e_suite_20260717T005439Z/summary.md`. |
 | Resolution preflight | **PASS SEM WRITES** | 19/19 casos Commander passaram com `VALIDATION_PREFLIGHT_ONLY=1`; nenhuma promoção ou mutação live. |
 | Patrol smoke | **PASS** | 9/9 testes passaram. |
-| Build Web/Android/iOS | **PASS LOCAL** | Web release, Android APK/AAB `1.0.0+2` e iOS release sem codesign concluíram. Publicação e mesma SHA congelada continuam pendentes. |
-| Artefatos Android | **PASS DE ARTEFATO LOCAL** | AAB 75,1 MB, SHA-256 `3b501a0f6656c7f85ef6928326a73290dc6fe4f8218605ec74b606aacb02046a`; APK 114,4 MB, SHA-256 `6eba1ea198e8e0d264bdbdcb69a4af5d37a065bbee641629eaa4e2c0152bb752`; package `com.mtgia.mtg_app`, versão `1.0.0+2`, assinatura igual ao upload keystore e permissões mínimas. |
-| Life Counter web, storage e responsividade | **PASS WEB LOCAL** | Desktop e 390 × 844: vida 40→41, valor persistido após reload, menu, histórico e rota direta validados; console com 0 erros e 0 warnings. |
-| Runtime Android em emulador | **PASS PARCIAL** | Android 36: instalação/cold launch sem fatal nem `MissingPlugin`; no debug host nativo, quatro jogadores, vida 40→41, menu, histórico e evento persistido passaram. O overlap de “Todas as partidas” com fechar/header foi corrigido e revalidado visualmente + teste estático. Não substitui aparelho físico nem execução do APK release assinado. |
+| Build Web/Android/iOS | **PASS LOCAL** | Web release, Android APK/AAB `1.0.0+2` e iOS sem codesign concluíram. Publicação e mesma SHA congelada continuam pendentes. |
+| Artefatos Android | **PASS DE ARTEFATO LOCAL** | AAB 93,7 MB, SHA-256 `3f9b55d216646797e757f61d6a8ba963151948e77dd7e79db3936dcb4c5b9fd4`; APK 115,6 MB, SHA-256 `f8cc6a5b74c24ccb601e5577053d59439121f60f06f8b52c82fac27c94b395b4`; package `com.mtgia.mtg_app`, versão `1.0.0+2`, certificado/assinatura aprovados e cold launch no emulador Android 36. |
+| SBOM/OSV Android | **PASS LOCAL** | O OSV consultou 936/936 componentes: 226 ficaram excluídos, 60 vulnerabilidades pertencem somente a dependências excluídas/não-release e 0 vulnerabilidade pertence à release. |
+| Life Counter web, storage e responsividade | **PASS WEB LOCAL** | Desktop e 390 × 844: vida 40→41→40, menu, histórico, rota direta e localização validados; dados D4/D6/D8/D10/D12/D20, moeda, personalizado e fechar têm semântica de botão/teclado/ARIA. A recaptura desktop final confirmou o botão `ROLAR` integralmente visível. |
+| Runtime Android em emulador | **PASS PARCIAL** | O APK release assinado local foi instalado e abriu no Android 36 sem fatal. O Life Counter provou 2–6 jogadores e vida 40→41 persistida após fechar/reabrir. Isso não substitui aparelho físico. |
 | Runtime Android físico | **NÃO PROVADO** | O APK assinado exato ainda não foi instalado/exercitado em aparelho físico. |
-| Runtime/distribuição iOS | **BUILD NO-CODESIGN PASS; DISTRIBUIÇÃO BLOQUEADA** | Build local `1.0.0+2` sem assinatura passou; falta equipe/cadeia Apple e runtime instalável. Isso não bloqueia o escopo Web+Android da beta. |
+| Runtime/distribuição iOS | **BUILD SEM CODESIGN PASS; DISTRIBUIÇÃO BLOQUEADA** | Build sem codesign passou após alinhar iOS mínimo 15.5 e dependências CocoaPods/SwiftPM; falta equipe/cadeia Apple e runtime instalável. Isso não bloqueia o escopo Web+Android da beta. |
+| Containers operacionais | **PASS LOCAL DE BUILD/RUNTIME** | manaloom-ops e XMage construíram/rodaram com health 200; o Forge compilou seis módulos e respondeu `/health` 200 com o commit fixado e 33.288 cartas indexadas. Promoção live não foi executada; usuário não-root/`Dockerfile HEALTHCHECK` continuam P1. |
 | Fluxo deck → mesa → pós-jogo | **PASS NO CLIENTE; SERVIDOR CONDICIONAL** | Vínculo do cliente tem testes; revisão/tombstone no servidor estão implementados, mas dependem da migration 038 e prova multi-device. |
-| Restore PostgreSQL isolado | **PASS LOCAL** | Dump `/tmp/manaloom-final-backup-20260716/manaloom-postgres-20260717T001442Z.dump`, SHA-256 `d45b6ef30e974a4f01035f18804e605da0ce29c2ace782e17ad0833a4603c470`; `postgres:17`, `--network none`, 83 tabelas, 63 FKs, `users=1133`, `cards=34331`, `decks=311`, `deck_cards=8579`, constraints válidas e `remote_writes=false`. A cadeia usada não foi criptografada. |
+| Battle | **PASS LOCAL FOCADO** | Gate estático 46/46; PostgreSQL descartável + sidecar nativo persistiu quatro replays com IDs duráveis, repetiu seed deterministicamente e provou autorização. Backend live ainda não foi promovido. |
+| Deckbuilder | **PASS LOCAL FOCADO** | 56 testes de servidor, 6 de documentação e 73 Flutter; migrations 039/040 passaram fresh schema, upgrade e idempotência em PostgreSQL 16 isolado. |
+| Restore PostgreSQL isolado | **PASS LOCAL, NÃO FINAL** | O dump pré-migration de 300.692.505 bytes, modo `0600`, teve checksum validado e restore de schema em PostgreSQL 17 com 87 tabelas. Como antecede a rotação da senha, um backup fresco é obrigatório antes do apply live. |
 | Backup off-site criptografado | **PENDENTE** | `age 1.3.1` e Docker 28.1.1 estão prontos; faltam destino e recipient para upload/verificação off-site. |
 
 ### Regra de interpretação
@@ -440,6 +454,7 @@ Saídas confirmadas até este ponto, sempre com o limite explícito da evidênci
 - `docs/MANALOOM_E2E_RELEASE_CONTRACT.md` — critérios de execução e release.
 - `docs/qa/MANALOOM_E2E_PROJECT_CLOSURE_2026-07-15.md` — evidência da rodada E2E anterior.
 - `docs/qa/MANALOOM_BATTLE_DECKBUILDER_DEFINITIVE_2026-07-15.md` — fronteira e pendências de Battle/deckbuilder.
+- `docs/qa/MANALOOM_BATTLE_DECKBUILDER_LIFE_COUNTER_RELEASE_2026-07-17.md` — fechamento local atual dos três módulos e provas live ainda abertas.
 - `docs/qa/MANALOOM_DESIGN_USABILITY_AUDIT_2026-07-01.md` — baseline de usabilidade.
 - `docs/qa/manaloom_ux_psychology_design_audit_2026-04-30.md` — baseline de psicologia/design.
 - `docs/qa/MANALOOM_PREMIUM_VISUAL_RUNTIME_PROOF_2026-06-04.md` — prova visual histórica.

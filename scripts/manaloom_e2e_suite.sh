@@ -44,6 +44,11 @@ derive_profile() {
 
 E2E_PROFILE="$(derive_profile)"
 
+has_postgres_runner_approvals() {
+  manaloom_has_live_mutation_approval &&
+    manaloom_has_postgres_write_approval
+}
+
 slugify() {
   printf '%s' "$1" \
     | tr '[:upper:]' '[:lower:]' \
@@ -111,6 +116,18 @@ run_step() {
     FAILED_STEPS+=("$label")
     record_step "FAIL" "$label" "$status" "$(basename "$log_file")" "command_failed"
   fi
+}
+
+run_postgres_runner_step() {
+  local label="$1"
+  local command="$2"
+  if ! has_postgres_runner_approvals; then
+    skip_step \
+      "$label" \
+      "runner PostgreSQL requer os tokens canonicos de mutacao live e escrita PostgreSQL"
+    return
+  fi
+  run_step "$label" "$command"
 }
 
 skip_step() {
@@ -203,13 +220,23 @@ run_optional_live_product_e2e() {
 }
 
 run_resolution_corpus_e2e() {
-  if [[ "${MANALOOM_RUN_MUTATING_RESOLUTION_E2E:-0}" == "1" ]]; then
-    if ! manaloom_has_postgres_write_approval; then
+  if ! has_postgres_runner_approvals; then
+    if [[ "${MANALOOM_RUN_MUTATING_RESOLUTION_E2E:-0}" == "1" ]]; then
       block_step \
         "Commander resolution corpus mutating E2E" \
-        "requested flow creates validation users/decks; set MANALOOM_CONFIRM_POSTGRES_WRITES=$MANALOOM_EXPLICIT_APPROVAL_PHRASE only after explicit PostgreSQL approval"
-      return
+        "requested runner requires MANALOOM_CONFIRM_LIVE_MUTATIONS and MANALOOM_CONFIRM_POSTGRES_WRITES with the explicit approval phrase"
+    else
+      skip_step \
+        "Commander resolution corpus read-only preflight" \
+        "the Dart runner is capability-gated and requires both canonical PostgreSQL runner approvals"
+      skip_step \
+        "Commander resolution corpus mutating E2E" \
+        "set MANALOOM_RUN_MUTATING_RESOLUTION_E2E=1 plus both canonical approval tokens only after explicit approval"
     fi
+    return
+  fi
+
+  if [[ "${MANALOOM_RUN_MUTATING_RESOLUTION_E2E:-0}" == "1" ]]; then
     run_step "Commander resolution corpus E2E" \
       "\"$ROOT_DIR/scripts/quality_gate.sh\" resolution"
     return
@@ -224,10 +251,10 @@ run_resolution_corpus_e2e() {
 
 run_battle_product_e2e() {
   if [[ "${MANALOOM_RUN_MUTATING_BATTLE_PRODUCT_E2E:-0}" == "1" ]]; then
-    if ! manaloom_has_postgres_write_approval; then
+    if ! has_postgres_runner_approvals; then
       block_step \
         "Battle product isolated mutating E2E" \
-        "requested flow creates a unique validation user, decks and battle replay; set MANALOOM_CONFIRM_POSTGRES_WRITES=$MANALOOM_EXPLICIT_APPROVAL_PHRASE only after explicit PostgreSQL approval"
+        "requested runner requires MANALOOM_CONFIRM_LIVE_MUTATIONS and MANALOOM_CONFIRM_POSTGRES_WRITES with the explicit approval phrase"
       return
     fi
     run_step "Battle product isolated mutating E2E" \
@@ -396,8 +423,8 @@ main() {
 
   run_battle_product_e2e
 
-  run_step "Battle runtime pytest suite" \
-    "cd \"$ROOT_DIR\" && \"$ROOT_DIR/server/bin/with_new_server_pg.sh\" env PYTHONPATH=\"$ROOT_DIR/docs/hermes-analysis/manaloom-knowledge/scripts:\${PYTHONPATH:-}\" python3 -m pytest docs/hermes-analysis/manaloom-knowledge/scripts/test_battle_*.py"
+  run_postgres_runner_step "Battle runtime pytest suite" \
+    "cd \"$ROOT_DIR\" && \"$ROOT_DIR/server/bin/with_new_server_pg.sh\" --write-approved env PYTHONPATH=\"$ROOT_DIR/docs/hermes-analysis/manaloom-knowledge/scripts:\${PYTHONPATH:-}\" python3 -m pytest docs/hermes-analysis/manaloom-knowledge/scripts/test_battle_*.py"
 
   run_step "Report retention governance" \
     "\"$ROOT_DIR/scripts/quality_gate.sh\" report-retention"
@@ -407,10 +434,10 @@ main() {
   run_step "App AI bridge and Commander prompt eval" \
     "\"$ROOT_DIR/scripts/quality_gate.sh\" ai-bridge"
 
-  run_step "PostgreSQL Hermes SQLite contract" \
+  run_postgres_runner_step "PostgreSQL Hermes SQLite contract" \
     "\"$ROOT_DIR/scripts/quality_gate.sh\" pg-contract"
 
-  run_step "Deep AI alignment with deckbuilder battle logs" \
+  run_postgres_runner_step "Deep AI alignment with deckbuilder battle logs" \
     "\"$ROOT_DIR/scripts/quality_gate.sh\" deep-ai"
 
   run_optional_flutter_runtime_e2e

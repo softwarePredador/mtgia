@@ -178,10 +178,10 @@ class LifeCounterTurnTrackerEngine {
     final firstPlayerIndex = session.firstPlayerIndex;
 
     final currentNeedsReset =
-        currentTurnPlayerIndex != null &&
+        currentTurnPlayerIndex == null ||
         !_isAlive(session, currentTurnPlayerIndex);
     final firstNeedsReset =
-        firstPlayerIndex != null && !_isAlive(session, firstPlayerIndex);
+        firstPlayerIndex == null || !_isAlive(session, firstPlayerIndex);
 
     if (!currentNeedsReset && !firstNeedsReset) {
       return session;

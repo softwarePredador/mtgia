@@ -3,18 +3,39 @@ library;
 
 import 'dart:convert';
 import 'dart:io' show Platform;
+import 'dart:math';
 
 import 'package:http/http.dart' as http;
 import 'package:test/test.dart';
 
+const _approvalPhrase = 'I_HAVE_EXPLICIT_APPROVAL';
+const _productionBaseUrl = 'https://evolution-cartinhas.2ta7qx.easypanel.host';
+
+String _secureProbePassword() {
+  const alphabet =
+      'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz23456789!@#%_-';
+  final random = Random.secure();
+  return List<String>.generate(
+    32,
+    (_) => alphabet[random.nextInt(alphabet.length)],
+    growable: false,
+  ).join();
+}
+
 void main() {
   final enabled =
-      Platform.environment['RUN_LOREHOLD_REFERENCE_PROFILE_LIVE'] == '1';
-  final skipReason = enabled
-      ? null
-      : 'Defina RUN_LOREHOLD_REFERENCE_PROFILE_LIVE=1 para provar /ai/generate live.';
-  final baseUrl = Platform.environment['TEST_API_BASE_URL'] ??
-      'https://evolution-cartinhas.2ta7qx.easypanel.host';
+      Platform.environment['RUN_LOREHOLD_REFERENCE_PROFILE_LIVE'] == '1' &&
+      Platform.environment['MANALOOM_CONFIRM_LIVE_MUTATIONS'] ==
+          _approvalPhrase &&
+      Platform.environment['MANALOOM_CONFIRM_POSTGRES_WRITES'] ==
+          _approvalPhrase;
+  final skipReason =
+      enabled
+          ? null
+          : 'Defina RUN_LOREHOLD_REFERENCE_PROFILE_LIVE=1 e as duas '
+              'aprovacoes canonicas para provar /ai/generate live.';
+  final baseUrl =
+      Platform.environment['TEST_API_BASE_URL'] ?? _productionBaseUrl;
   final expectCardStats =
       Platform.environment['LIVE_REFERENCE_CARD_STATS'] == '1';
 
@@ -28,11 +49,14 @@ void main() {
   }
 
   Future<String> authToken() async {
+    if (baseUrl != _productionBaseUrl) {
+      throw StateError('TEST_API_BASE_URL diverge do destino live aprovado.');
+    }
     final suffix = DateTime.now().millisecondsSinceEpoch;
     final user = {
       'username': 'lorehold_profile_live_$suffix',
       'email': 'lorehold_profile_live_$suffix@example.invalid',
-      'password': 'TestPassword123!',
+      'password': _secureProbePassword(),
     };
 
     final register = await http.post(
@@ -112,8 +136,11 @@ void main() {
             )
             .timeout(const Duration(seconds: 120));
 
-        expect(otherResponse.statusCode, anyOf(200, 422),
-            reason: otherResponse.body);
+        expect(
+          otherResponse.statusCode,
+          anyOf(200, 422),
+          reason: otherResponse.body,
+        );
         final otherBody = decodeJson(otherResponse);
         final otherDiagnostics =
             (otherBody['diagnostics'] as Map?)?.cast<String, dynamic>();

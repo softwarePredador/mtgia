@@ -562,12 +562,13 @@ class _SectionCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return DecoratedBox(
-      decoration: BoxDecoration(
-        color: AppTheme.surfaceElevated,
+    return Material(
+      color: AppTheme.surfaceElevated,
+      shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(AppTheme.radiusMd),
-        border: Border.all(color: AppTheme.outlineMuted),
+        side: const BorderSide(color: AppTheme.outlineMuted),
       ),
+      clipBehavior: Clip.antiAlias,
       child: Padding(
         padding: const EdgeInsets.all(14),
         child: Column(

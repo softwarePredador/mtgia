@@ -8,18 +8,21 @@ import 'package:http/http.dart' as http;
 import 'package:test/test.dart';
 
 void main() {
-  final skipIntegration = Platform.environment['RUN_INTEGRATION_TESTS'] == '0'
-      ? 'Teste live desativado por RUN_INTEGRATION_TESTS=0.'
-      : null;
+  final skipIntegration =
+      Platform.environment['RUN_INTEGRATION_TESTS'] == '0'
+          ? 'Teste live desativado por RUN_INTEGRATION_TESTS=0.'
+          : null;
 
   final baseUrl =
       Platform.environment['TEST_API_BASE_URL'] ?? 'http://127.0.0.1:8082';
 
-  final testUserEmail = Platform.environment['TEST_USER_EMAIL'] ??
+  final testUserEmail =
+      Platform.environment['TEST_USER_EMAIL'] ??
       'test_archetypes_flow@example.com';
   final testUserPassword =
-      Platform.environment['TEST_USER_PASSWORD'] ?? 'TestPassword123!';
-  final testUserUsername = Platform.environment['TEST_USER_USERNAME'] ??
+      Platform.environment['TEST_USER_PASSWORD'] ?? 'BetaQa!2026-Deck';
+  final testUserUsername =
+      Platform.environment['TEST_USER_USERNAME'] ??
       '${testUserEmail.split('@').first}_archetypes_flow_user';
   final testUser = {
     'email': testUserEmail,
@@ -43,10 +46,7 @@ void main() {
     var response = await http.post(
       Uri.parse('$baseUrl/auth/login'),
       headers: {'Content-Type': 'application/json'},
-      body: jsonEncode({
-        'email': user['email'],
-        'password': user['password'],
-      }),
+      body: jsonEncode({'email': user['email'], 'password': user['password']}),
     );
 
     if (response.statusCode != 200) {
@@ -82,12 +82,11 @@ void main() {
   Map<String, String> authHeaders({
     bool withContentType = false,
     String? token,
-  }) =>
-      {
-        if (withContentType) 'Content-Type': 'application/json',
-        if ((token ?? authToken) != null)
-          'Authorization': 'Bearer ${token ?? authToken}',
-      };
+  }) => {
+    if (withContentType) 'Content-Type': 'application/json',
+    if ((token ?? authToken) != null)
+      'Authorization': 'Bearer ${token ?? authToken}',
+  };
 
   Future<Map<String, dynamic>> findCardByName(String name) async {
     final uri = Uri.parse(
@@ -97,7 +96,8 @@ void main() {
     expect(response.statusCode, equals(200), reason: response.body);
 
     final body = decodeJson(response);
-    final data = (body['data'] as List?)
+    final data =
+        (body['data'] as List?)
             ?.whereType<Map>()
             .map((e) => e.cast<String, dynamic>())
             .toList() ??
@@ -168,22 +168,19 @@ void main() {
       final deckId = await createDeck(
         format: 'commander',
         cards: [
-          {
-            'card_id': talrand['id'],
-            'quantity': 1,
-            'is_commander': true,
-          },
+          {'card_id': talrand['id'], 'quantity': 1, 'is_commander': true},
         ],
       );
       createdDeckIds.add(deckId);
 
-      final firstResponse =
-          await postJson('/ai/archetypes', {'deck_id': deckId});
+      final firstResponse = await postJson('/ai/archetypes', {
+        'deck_id': deckId,
+      });
       expect(firstResponse.statusCode, equals(200), reason: firstResponse.body);
       final firstBody = decodeJson(firstResponse);
       final firstOptions =
           (firstBody['options'] as List?)?.cast<Map<String, dynamic>>() ??
-              const [];
+          const [];
       expect(firstOptions, isNotEmpty);
       expect(firstBody['cache'], isA<Map>());
       expect(
@@ -209,8 +206,9 @@ void main() {
         isNonNegative,
       );
 
-      final secondResponse =
-          await postJson('/ai/archetypes', {'deck_id': deckId});
+      final secondResponse = await postJson('/ai/archetypes', {
+        'deck_id': deckId,
+      });
       expect(
         secondResponse.statusCode,
         equals(200),
@@ -219,7 +217,7 @@ void main() {
       final secondBody = decodeJson(secondResponse);
       final secondOptions =
           (secondBody['options'] as List?)?.cast<Map<String, dynamic>>() ??
-              const [];
+          const [];
       expect(secondOptions.length, equals(firstOptions.length));
       expect(secondBody['cache'], isA<Map>());
       expect(
@@ -248,11 +246,7 @@ void main() {
       final deckId = await createDeck(
         format: 'commander',
         cards: [
-          {
-            'card_id': lorehold['id'],
-            'quantity': 1,
-            'is_commander': true,
-          },
+          {'card_id': lorehold['id'], 'quantity': 1, 'is_commander': true},
         ],
       );
       createdDeckIds.add(deckId);
@@ -273,9 +267,10 @@ void main() {
           (body['options'] as List?)?.cast<Map<String, dynamic>>() ?? const [];
       expect(options, hasLength(greaterThanOrEqualTo(3)));
 
-      final titles = options
-          .map((option) => option['title']?.toString().toLowerCase() ?? '')
-          .toList();
+      final titles =
+          options
+              .map((option) => option['title']?.toString().toLowerCase() ?? '')
+              .toList();
       expect(titles, contains('miracle big spells'));
       expect(titles, contains('topdeck / discard value'));
       expect(titles, contains('spellslinger burn finishers'));
@@ -295,11 +290,7 @@ void main() {
       final deckId = await createDeck(
         format: 'commander',
         cards: [
-          {
-            'card_id': talrand['id'],
-            'quantity': 1,
-            'is_commander': true,
-          },
+          {'card_id': talrand['id'], 'quantity': 1, 'is_commander': true},
         ],
       );
       createdDeckIds.add(deckId);

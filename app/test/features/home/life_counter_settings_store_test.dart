@@ -50,5 +50,24 @@ void main() {
 
       expect(await store.load(), isNull);
     });
+
+    test('normalizes an unsafe persisted custom long-tap value', () async {
+      SharedPreferences.setMockInitialValues({
+        lifeCounterSettingsPrefsKey:
+            LifeCounterSettings.defaults
+                .copyWith(customLongTapValue: -25)
+                .toJsonString(),
+      });
+      store = LifeCounterSettingsStore();
+
+      final restored = await store.load();
+      final preferences = await SharedPreferences.getInstance();
+
+      expect(restored?.customLongTapValue, lifeCounterMinCustomLongTapValue);
+      expect(
+        preferences.getString(lifeCounterSettingsPrefsKey),
+        contains('"custom_long_tap_value":$lifeCounterMinCustomLongTapValue'),
+      );
+    });
   });
 }

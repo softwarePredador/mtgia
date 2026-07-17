@@ -241,6 +241,56 @@ void main() {
       expect(sanitized.currentTurnNumber, 3);
     });
 
+    test('restores missing active tracker pointers to an active player', () {
+      final session = LifeCounterSession.initial(playerCount: 6).copyWith(
+        currentTurnNumber: 3,
+        turnTrackerActive: true,
+        turnTrackerOngoingGame: true,
+        lives: const [0, 40, 40, 40, 40, 40],
+        playerEliminationReasons: const [
+          LifeCounterPlayerEliminationReason.life,
+          LifeCounterPlayerEliminationReason.none,
+          LifeCounterPlayerEliminationReason.none,
+          LifeCounterPlayerEliminationReason.none,
+          LifeCounterPlayerEliminationReason.none,
+          LifeCounterPlayerEliminationReason.none,
+        ],
+      );
+
+      final sanitized =
+          LifeCounterTurnTrackerEngine.sanitizeTrackerPointersForActivePlayers(
+            session,
+          );
+
+      expect(sanitized.firstPlayerIndex, 1);
+      expect(sanitized.currentTurnPlayerIndex, 1);
+      expect(sanitized.currentTurnNumber, 3);
+      expect(sanitized.turnTrackerActive, isTrue);
+    });
+
+    for (var playerCount = 2; playerCount <= 6; playerCount += 1) {
+      test('cycles every seat for a $playerCount-player table', () {
+        var session = LifeCounterTurnTrackerEngine.startGame(
+          LifeCounterSession.initial(playerCount: playerCount),
+          startingPlayerIndex: 0,
+        );
+
+        for (
+          var expectedPlayer = 1;
+          expectedPlayer < playerCount;
+          expectedPlayer += 1
+        ) {
+          session = LifeCounterTurnTrackerEngine.nextTurn(session);
+          expect(session.currentTurnPlayerIndex, expectedPlayer);
+          expect(session.currentTurnNumber, 1);
+        }
+
+        session = LifeCounterTurnTrackerEngine.nextTurn(session);
+        expect(session.currentTurnPlayerIndex, 0);
+        expect(session.currentTurnNumber, 2);
+      });
+    }
+
     test('stops tracker when no active players remain', () {
       final session = LifeCounterSession.initial(playerCount: 4).copyWith(
         firstPlayerIndex: 2,

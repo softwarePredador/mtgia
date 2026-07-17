@@ -52,6 +52,9 @@ Handler middleware(Handler handler) {
       ..._securityHeaders,
       ..._corsPolicy.headersFor(origin),
     };
+    final processLiveness = isDatabaseIndependentHealthPath(
+      context.request.uri.path,
+    );
 
     if (!_corsPolicy.isAllowed(origin)) {
       return Response.json(
@@ -88,23 +91,28 @@ Handler middleware(Handler handler) {
     }
 
     try {
-      await ensureObservabilityInitialized();
+      if (!processLiveness) {
+        await ensureObservabilityInitialized();
 
-      if (!_connected) {
-        await _db.connect();
-        if (!_db.isConnected) {
-          return Response.json(
-            statusCode: HttpStatus.serviceUnavailable,
-            body: {'error': 'Serviço temporariamente indisponível (DB)'},
-            headers: {...responseHeaders, 'x-request-id': requestId},
-          );
+        if (!_connected) {
+          await _db.connect();
+          if (!_db.isConnected) {
+            return Response.json(
+              statusCode: HttpStatus.serviceUnavailable,
+              body: {'error': 'Serviço temporariamente indisponível (DB)'},
+              headers: {...responseHeaders, 'x-request-id': requestId},
+            );
+          }
+          _connected = true;
         }
-        _connected = true;
       }
 
-      var response = await handler
-          .use(provider<Pool>((_) => _db.connection))
-          .use(provider<RequestTrace>((_) => trace))(context);
+      var response =
+          processLiveness
+              ? await handler.use(provider<RequestTrace>((_) => trace))(context)
+              : await handler
+                  .use(provider<Pool>((_) => _db.connection))
+                  .use(provider<RequestTrace>((_) => trace))(context);
 
       final contentLength = int.tryParse(
         response.headers['content-length'] ?? '',
@@ -169,6 +177,15 @@ Handler middleware(Handler handler) {
       );
     }
   };
+}
+
+/// Process liveness must stay independent from PostgreSQL and telemetry.
+/// Readiness remains dependency-aware at `/health/ready` and `/ready`.
+bool isDatabaseIndependentHealthPath(String path) {
+  return path == '/health' ||
+      path == '/health/' ||
+      path == '/health/live' ||
+      path == '/health/live/';
 }
 
 String? _header(Map<String, String> headers, String name) {

@@ -8,9 +8,10 @@ import 'package:http/http.dart' as http;
 import 'package:test/test.dart';
 
 void main() {
-  final skipIntegration = Platform.environment['RUN_INTEGRATION_TESTS'] == '0'
-      ? 'Teste live desativado por RUN_INTEGRATION_TESTS=0.'
-      : null;
+  final skipIntegration =
+      Platform.environment['RUN_INTEGRATION_TESTS'] == '0'
+          ? 'Teste live desativado por RUN_INTEGRATION_TESTS=0.'
+          : null;
 
   final baseUrl =
       Platform.environment['TEST_API_BASE_URL'] ?? 'http://127.0.0.1:8082';
@@ -25,9 +26,9 @@ void main() {
   }
 
   Map<String, String> headers(String token) => {
-        'Content-Type': 'application/json',
-        'Authorization': 'Bearer $token',
-      };
+    'Content-Type': 'application/json',
+    'Authorization': 'Bearer $token',
+  };
 
   Future<String> registerUser(String suffix) async {
     final response = await http.post(
@@ -36,7 +37,7 @@ void main() {
       body: jsonEncode({
         'username': 'ai_sim_${suffix}_$runId',
         'email': 'ai_sim_${suffix}_$runId@example.com',
-        'password': 'TestPassword123!',
+        'password': 'BetaQa!2026-Deck',
       }),
     );
 
@@ -60,7 +61,8 @@ void main() {
     for (final name in preferredNames) {
       final response = await http.get(
         Uri.parse(
-            '$baseUrl/cards?name=${Uri.encodeQueryComponent(name)}&limit=10'),
+          '$baseUrl/cards?name=${Uri.encodeQueryComponent(name)}&limit=10',
+        ),
         headers: {'Content-Type': 'application/json'},
       );
       expect(response.statusCode, 200, reason: response.body);
@@ -69,15 +71,16 @@ void main() {
       if (rawCards is! List || rawCards.isEmpty) continue;
 
       final card = rawCards.whereType<Map>().firstWhere(
-            (candidate) => candidate['id']?.toString().isNotEmpty == true,
-            orElse: () => <String, dynamic>{},
-          );
+        (candidate) => candidate['id']?.toString().isNotEmpty == true,
+        orElse: () => <String, dynamic>{},
+      );
       final cardId = card['id']?.toString();
       if (cardId != null && cardId.isNotEmpty) return cardId;
     }
 
     markTestSkipped(
-        'Nenhuma carta preferencial encontrada no backend testado.');
+      'Nenhuma carta preferencial encontrada no backend testado.',
+    );
     return '';
   }
 
@@ -96,11 +99,7 @@ void main() {
         'description': 'AI simulate authorization live test',
         'is_public': isPublic,
         'cards': [
-          {
-            'card_id': cardId,
-            'quantity': 1,
-            'is_commander': false,
-          }
+          {'card_id': cardId, 'quantity': 1, 'is_commander': false},
         ],
       }),
     );
@@ -154,6 +153,14 @@ void main() {
         );
         createdDecks.add((token: userBToken, id: userBPublicDeck));
 
+        final userASecondDeck = await createDeck(
+          token: userAToken,
+          cardId: cardId,
+          name: 'AI Sim A Second $runId',
+          isPublic: false,
+        );
+        createdDecks.add((token: userAToken, id: userASecondDeck));
+
         final privatePrimary = await http.post(
           Uri.parse('$baseUrl/ai/simulate'),
           headers: headers(userAToken),
@@ -186,7 +193,90 @@ void main() {
           }),
         );
         expect(publicOpponent.statusCode, 200, reason: publicOpponent.body);
-        expect(decodeJson(publicOpponent)['type'], 'matchup');
+        final publicOpponentPayload = decodeJson(publicOpponent);
+        expect(publicOpponentPayload['type'], 'matchup');
+        final crossUserReplayId =
+            publicOpponentPayload['replay_id']?.toString();
+        expect(crossUserReplayId, isNotNull);
+
+        final publicOwnerReplayList = await http.get(
+          Uri.parse('$baseUrl/decks/$userBPublicDeck/battle-replays'),
+          headers: headers(userBToken),
+        );
+        expect(
+          publicOwnerReplayList.statusCode,
+          200,
+          reason: publicOwnerReplayList.body,
+        );
+        final publicOwnerReplays =
+            (decodeJson(publicOwnerReplayList)['data'] as List? ?? const []);
+        expect(
+          publicOwnerReplays.whereType<Map>().map((row) => row['id']),
+          isNot(contains(crossUserReplayId)),
+          reason:
+              'The owner of a public opponent deck must not see the private '
+              'initiator replay.',
+        );
+
+        final publicOwnerReplayDetail = await http.get(
+          Uri.parse(
+            '$baseUrl/decks/$userBPublicDeck/battle-replays/'
+            '$crossUserReplayId',
+          ),
+          headers: headers(userBToken),
+        );
+        expect(
+          publicOwnerReplayDetail.statusCode,
+          404,
+          reason: publicOwnerReplayDetail.body,
+        );
+
+        final sameOwnerOpponent = await http.post(
+          Uri.parse('$baseUrl/ai/simulate'),
+          headers: headers(userAToken),
+          body: jsonEncode({
+            'deck_id': userADeck,
+            'opponent_deck_id': userASecondDeck,
+            'type': 'matchup',
+          }),
+        );
+        expect(
+          sameOwnerOpponent.statusCode,
+          200,
+          reason: sameOwnerOpponent.body,
+        );
+        final sameOwnerReplayId =
+            decodeJson(sameOwnerOpponent)['replay_id']?.toString();
+        expect(sameOwnerReplayId, isNotNull);
+
+        final sameOwnerReplayList = await http.get(
+          Uri.parse('$baseUrl/decks/$userASecondDeck/battle-replays'),
+          headers: headers(userAToken),
+        );
+        expect(
+          sameOwnerReplayList.statusCode,
+          200,
+          reason: sameOwnerReplayList.body,
+        );
+        final sameOwnerReplays =
+            (decodeJson(sameOwnerReplayList)['data'] as List? ?? const []);
+        expect(
+          sameOwnerReplays.whereType<Map>().map((row) => row['id']),
+          contains(sameOwnerReplayId),
+        );
+
+        final sameOwnerReplayDetail = await http.get(
+          Uri.parse(
+            '$baseUrl/decks/$userASecondDeck/battle-replays/'
+            '$sameOwnerReplayId',
+          ),
+          headers: headers(userAToken),
+        );
+        expect(
+          sameOwnerReplayDetail.statusCode,
+          200,
+          reason: sameOwnerReplayDetail.body,
+        );
       } finally {
         for (final deck in createdDecks.reversed) {
           await deleteDeck(deck.token, deck.id);

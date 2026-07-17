@@ -10,6 +10,11 @@
 include: package:flutter_lints/flutter.yaml
 
 analyzer:
+  # Flutter 3.44 materializes Swift Package Manager sources under build/ during
+  # dependency resolution. They are third-party source, not part of this app,
+  # and must not contaminate the product analyzer gate.
+  exclude:
+    - build/**
   plugins:
     - custom_lint
 

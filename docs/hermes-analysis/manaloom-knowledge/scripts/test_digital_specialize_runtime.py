@@ -312,7 +312,11 @@ def test_laezel_cast_granted_blink_invalidates_opponent_target_and_expires():
     )
     returned = next(card for card in controller.battlefield if card.get("name") == laezel["name"])
     assert returned is not laezel
-    assert returned["_zone_id"] == 8
+    # A blink is two distinct zone changes.  The old battlefield object moves
+    # to exile first (7 -> 8), then the returning permanent gets a fresh zone
+    # identity when it enters the battlefield (8 -> 9).
+    assert laezel["_zone_id"] == 8
+    assert returned["_zone_id"] == 9
     assert not returned.get("_opponent_target_blink_active")
     assert not returned.get("was_cast")
     assert "_cast_context" not in returned

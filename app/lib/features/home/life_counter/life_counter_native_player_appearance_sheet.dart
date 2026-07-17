@@ -985,12 +985,13 @@ class _AppearanceProfileTile extends StatelessWidget {
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 10),
-      child: DecoratedBox(
-        decoration: BoxDecoration(
-          color: AppTheme.surfaceSlate,
+      child: Material(
+        color: AppTheme.surfaceSlate,
+        shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(AppTheme.radiusMd),
-          border: Border.all(color: AppTheme.outlineMuted),
+          side: const BorderSide(color: AppTheme.outlineMuted),
         ),
+        clipBehavior: Clip.antiAlias,
         child: ListTile(
           key: Key(
             'life-counter-native-player-appearance-profile-${profile.id}',

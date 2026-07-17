@@ -127,25 +127,25 @@ class _ConversationTile extends StatelessWidget {
     final hasUnread = conversation.unreadCount > 0;
 
     return Material(
-      color: AppTheme.transparent,
+      color:
+          hasUnread
+              ? AppTheme.brass500.withValues(alpha: 0.08)
+              : AppTheme.surfaceSlate,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(AppTheme.radiusMd),
+        side: BorderSide(
+          color:
+              hasUnread
+                  ? AppTheme.brass400.withValues(alpha: 0.3)
+                  : AppTheme.outlineMuted,
+          width: AppTheme.strokeMedium,
+        ),
+      ),
+      clipBehavior: Clip.antiAlias,
       child: InkWell(
         onTap: onTap,
         borderRadius: BorderRadius.circular(AppTheme.radiusMd),
-        child: Container(
-          decoration: BoxDecoration(
-            color:
-                hasUnread
-                    ? AppTheme.brass500.withValues(alpha: 0.08)
-                    : AppTheme.surfaceSlate,
-            borderRadius: BorderRadius.circular(AppTheme.radiusMd),
-            border: Border.all(
-              color:
-                  hasUnread
-                      ? AppTheme.brass400.withValues(alpha: 0.3)
-                      : AppTheme.outlineMuted,
-              width: AppTheme.strokeMedium,
-            ),
-          ),
+        child: Padding(
           padding: const EdgeInsets.fromLTRB(0, 8, 10, 8),
           child: Row(
             children: [

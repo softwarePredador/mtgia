@@ -292,7 +292,10 @@ class _DeckGenerateScreenState extends State<DeckGenerateScreen> {
           'validation':
               recommendedDeck['validation'] ??
               recommendedDeck['legality'] ??
-              const {'is_valid': true},
+              const {
+                'is_valid': false,
+                'errors': ['Legalidade não confirmada pelo servidor.'],
+              },
           'diagnostics': {
             'source': 'commander_learning',
             'promoted_deck': learning['promoted_deck'],
@@ -361,11 +364,7 @@ class _DeckGenerateScreenState extends State<DeckGenerateScreen> {
   }
 
   bool _isGeneratedDeckValid() {
-    final validation = _generatedDeck?['validation'];
-    if (validation is Map) {
-      return validation['is_valid'] == true;
-    }
-    return true;
+    return isReviewableGeneratedDeckResult(_generatedDeck);
   }
 
   String? _generatedDeckArchetype() {
@@ -945,7 +944,8 @@ class _DeckGenerateScreenState extends State<DeckGenerateScreen> {
         validation is Map && validation['errors'] is List
             ? (validation['errors'] as List)
             : const <dynamic>[];
-    final isValid = validation is Map ? validation['is_valid'] == true : true;
+    final blockingReasons = generatedDeckReviewBlockingReasons(_generatedDeck);
+    final isValid = blockingReasons.isEmpty;
 
     return Container(
       decoration: BoxDecoration(
@@ -976,6 +976,46 @@ class _DeckGenerateScreenState extends State<DeckGenerateScreen> {
                 ),
               ),
             ],
+          ),
+          const SizedBox(height: 10),
+          Container(
+            width: double.infinity,
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+            decoration: BoxDecoration(
+              color: (isValid ? AppTheme.success : AppTheme.warning).withValues(
+                alpha: 0.1,
+              ),
+              borderRadius: BorderRadius.circular(AppTheme.radiusSm),
+              border: Border.all(
+                color: (isValid ? AppTheme.success : AppTheme.warning)
+                    .withValues(alpha: 0.3),
+              ),
+            ),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Icon(
+                  isValid
+                      ? Icons.verified_outlined
+                      : Icons.warning_amber_rounded,
+                  color: isValid ? AppTheme.success : AppTheme.warning,
+                  size: 18,
+                ),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: Text(
+                    isValid
+                        ? 'Legalidade validada pelo servidor. Revise a proposta antes de salvar.'
+                        : blockingReasons.first,
+                    style: theme.textTheme.bodySmall?.copyWith(
+                      color: AppTheme.textPrimary,
+                      height: 1.35,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ),
+              ],
+            ),
           ),
           const SizedBox(height: 14),
           if (learnedDeckPreview.isNotEmpty) ...[

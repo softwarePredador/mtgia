@@ -24,6 +24,9 @@ class DeckDetails extends Deck {
     super.pricingUpdatedAt,
     super.colorIdentity,
     super.colorIdentityKnown,
+    super.validationState,
+    super.reviewReasons,
+    super.validationUpdatedAt,
     required super.isPublic,
     required super.createdAt,
     super.cardCount,
@@ -107,6 +110,9 @@ class DeckDetails extends Deck {
       colorIdentityKnown:
           json['color_identity_known'] as bool? ??
           json['color_identity'] is List || allCards.isNotEmpty,
+      validationState: _validationStateFromJson(json['deck_state']),
+      reviewReasons: _reviewReasonsFromJson(json['review_reasons']),
+      validationUpdatedAt: _dateTimeFromJson(json['validation_updated_at']),
       isPublic: json['is_public'] as bool? ?? false,
       createdAt: DateTime.parse(json['created_at'] as String),
       cardCount: json['stats']?['total_cards'] as int? ?? 0,
@@ -135,6 +141,9 @@ class DeckDetails extends Deck {
     DateTime? pricingUpdatedAt,
     List<String>? colorIdentity,
     bool? colorIdentityKnown,
+    String? validationState,
+    List<String>? reviewReasons,
+    DateTime? validationUpdatedAt,
     bool? isPublic,
     DateTime? createdAt,
     int? cardCount,
@@ -160,6 +169,9 @@ class DeckDetails extends Deck {
       pricingUpdatedAt: pricingUpdatedAt ?? this.pricingUpdatedAt,
       colorIdentity: colorIdentity ?? this.colorIdentity,
       colorIdentityKnown: colorIdentityKnown ?? this.colorIdentityKnown,
+      validationState: validationState ?? this.validationState,
+      reviewReasons: reviewReasons ?? this.reviewReasons,
+      validationUpdatedAt: validationUpdatedAt ?? this.validationUpdatedAt,
       isPublic: isPublic ?? this.isPublic,
       createdAt: createdAt ?? this.createdAt,
       cardCount: cardCount ?? this.cardCount,
@@ -168,4 +180,29 @@ class DeckDetails extends Deck {
       mainBoard: mainBoard ?? this.mainBoard,
     );
   }
+}
+
+String _validationStateFromJson(Object? value) {
+  return switch (value?.toString().trim().toLowerCase()) {
+    Deck.validationStateDraft => Deck.validationStateDraft,
+    Deck.validationStateValidated => Deck.validationStateValidated,
+    _ => Deck.validationStateUnknown,
+  };
+}
+
+List<String> _reviewReasonsFromJson(Object? value) {
+  if (value is! List) return const ['validation_not_recorded'];
+  final reasons = <String>[];
+  for (final entry in value) {
+    final reason = entry?.toString().trim() ?? '';
+    if (reason.isNotEmpty && !reasons.contains(reason)) {
+      reasons.add(reason);
+    }
+  }
+  return List<String>.unmodifiable(reasons);
+}
+
+DateTime? _dateTimeFromJson(Object? value) {
+  if (value is DateTime) return value;
+  return value == null ? null : DateTime.tryParse(value.toString());
 }

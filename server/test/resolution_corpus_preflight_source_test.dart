@@ -42,7 +42,7 @@ void main() {
     );
 
     test(
-      'quality gate executes preflight before probing or starting the API',
+      'quality gate capability-gates its preflight runner before API startup',
       () {
         final source =
             File(
@@ -53,12 +53,22 @@ void main() {
         final externalPreflightGate = source.indexOf(
           'case "\${VALIDATION_PREFLIGHT_ONLY:-0}" in',
         );
+        final liveApprovalGate = source.indexOf(
+          'require_live_mutation_approval "Commander resolution corpus PostgreSQL runner"',
+        );
         final writeApprovalGate = source.indexOf(
-          'require_postgres_write_approval "Commander resolution corpus mutating E2E"',
+          'require_postgres_write_approval "Commander resolution corpus PostgreSQL runner"',
+        );
+        final preflightRunner = source.indexOf(
+          'with_new_server_pg.sh" --write-approved',
+          liveApprovalGate,
         );
         final apiReadyBranch = source.indexOf('if api_ready; then');
         expect(externalPreflightGate, greaterThanOrEqualTo(0));
-        expect(writeApprovalGate, greaterThan(externalPreflightGate));
+        expect(liveApprovalGate, greaterThanOrEqualTo(0));
+        expect(writeApprovalGate, greaterThan(liveApprovalGate));
+        expect(preflightRunner, greaterThan(writeApprovalGate));
+        expect(externalPreflightGate, greaterThan(preflightRunner));
         expect(apiReadyBranch, greaterThan(externalPreflightGate));
         expect(
           source.substring(externalPreflightGate, apiReadyBranch),
@@ -96,7 +106,9 @@ void main() {
       expect(source, contains('Iniciando API isolada'));
       expect(
         source,
-        contains(r'"$ROOT_DIR/server/bin/with_new_server_pg.sh" env'),
+        contains(
+          r'"$ROOT_DIR/server/bin/with_new_server_pg.sh" --write-approved env',
+        ),
       );
       expect(
         source,

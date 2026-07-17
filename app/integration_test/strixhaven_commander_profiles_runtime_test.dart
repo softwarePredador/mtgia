@@ -130,7 +130,7 @@ Future<_RuntimeCredentials> _registerByUi(
     attempts: 60,
   );
   final unique = DateTime.now().millisecondsSinceEpoch.toRadixString(16);
-  const password = 'Qa123456!';
+  const password = 'BetaQa!2026-Deck';
   final username = 'qa_strixhaven_runtime_$unique';
   final email = '$username@example.invalid';
 

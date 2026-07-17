@@ -8,9 +8,10 @@ import 'package:http/http.dart' as http;
 import 'package:test/test.dart';
 
 void main() {
-  final skipIntegration = Platform.environment['RUN_INTEGRATION_TESTS'] == '0'
-      ? 'Teste live desativado por RUN_INTEGRATION_TESTS=0.'
-      : null;
+  final skipIntegration =
+      Platform.environment['RUN_INTEGRATION_TESTS'] == '0'
+          ? 'Teste live desativado por RUN_INTEGRATION_TESTS=0.'
+          : null;
 
   final baseUrl =
       Platform.environment['TEST_API_BASE_URL'] ?? 'http://127.0.0.1:8082';
@@ -25,9 +26,9 @@ void main() {
   }
 
   Map<String, String> headers(String token) => {
-        'Content-Type': 'application/json',
-        'Authorization': 'Bearer $token',
-      };
+    'Content-Type': 'application/json',
+    'Authorization': 'Bearer $token',
+  };
 
   Future<String> registerUser() async {
     final response = await http.post(
@@ -36,7 +37,7 @@ void main() {
       body: jsonEncode({
         'username': 'weakness_live_$runId',
         'email': 'weakness_live_$runId@example.com',
-        'password': 'TestPassword123!',
+        'password': 'BetaQa!2026-Deck',
       }),
     );
 

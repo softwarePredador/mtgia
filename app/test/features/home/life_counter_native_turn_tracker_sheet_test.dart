@@ -3,6 +3,8 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:manaloom/features/home/life_counter/life_counter_native_turn_tracker_sheet.dart';
 import 'package:manaloom/features/home/life_counter/life_counter_session.dart';
 
+import '../../support/list_tile_material_test_support.dart';
+
 void main() {
   group('LifeCounterNativeTurnTrackerSheet', () {
     testWidgets('starts a tracked game and advances the draft turn', (
@@ -43,6 +45,7 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(find.text('Controle de turnos'), findsOneWidget);
+      expectListTileInkIsUnobscured(tester);
       expect(find.text('O controle de turnos está parado.'), findsOneWidget);
 
       await tester.scrollUntilVisible(

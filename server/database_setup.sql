@@ -63,6 +63,7 @@ CREATE INDEX IF NOT EXISTS idx_users_active_identity
 	    image_url TEXT, -- URL da imagem na Scryfall
 	    set_code TEXT,
 	    rarity TEXT,
+	    is_reserved BOOLEAN NOT NULL DEFAULT FALSE,
 	    layout TEXT,
 	    card_faces_json JSONB,
 	    ai_description TEXT, -- Cache de explicações da IA
@@ -85,6 +86,10 @@ ALTER TABLE cards ADD COLUMN IF NOT EXISTS keywords TEXT[];
 ALTER TABLE cards ADD COLUMN IF NOT EXISTS oracle_id UUID;
 ALTER TABLE cards ADD COLUMN IF NOT EXISTS layout TEXT;
 ALTER TABLE cards ADD COLUMN IF NOT EXISTS card_faces_json JSONB;
+ALTER TABLE cards ADD COLUMN IF NOT EXISTS is_reserved BOOLEAN DEFAULT FALSE;
+UPDATE cards SET is_reserved = FALSE WHERE is_reserved IS NULL;
+ALTER TABLE cards ALTER COLUMN is_reserved SET DEFAULT FALSE;
+ALTER TABLE cards ALTER COLUMN is_reserved SET NOT NULL;
 
 -- Índice para busca rápida por nome
 CREATE INDEX IF NOT EXISTS idx_cards_name ON cards (name);
@@ -209,6 +214,9 @@ CREATE INDEX IF NOT EXISTS idx_rules_category ON rules (category);
 	    format TEXT NOT NULL,
 	    description TEXT,
 	    is_public BOOLEAN DEFAULT FALSE,
+	    validation_state TEXT NOT NULL DEFAULT 'unknown',
+	    validation_reasons JSONB NOT NULL DEFAULT '["validation_not_recorded"]'::jsonb,
+	    validation_updated_at TIMESTAMP WITH TIME ZONE,
 
     -- Preferências do usuário (UX)
     archetype TEXT, -- Ex: "Goblin Tribal", "Voltron", etc.
@@ -236,6 +244,25 @@ CREATE INDEX IF NOT EXISTS idx_rules_category ON rules (category);
 	ALTER TABLE decks ADD COLUMN IF NOT EXISTS pricing_total NUMERIC(10,2);
 	ALTER TABLE decks ADD COLUMN IF NOT EXISTS pricing_missing_cards INTEGER DEFAULT 0;
 	ALTER TABLE decks ADD COLUMN IF NOT EXISTS pricing_updated_at TIMESTAMP WITH TIME ZONE;
+	ALTER TABLE decks ADD COLUMN IF NOT EXISTS validation_state TEXT NOT NULL DEFAULT 'unknown';
+	ALTER TABLE decks ADD COLUMN IF NOT EXISTS validation_reasons JSONB NOT NULL DEFAULT '["validation_not_recorded"]'::jsonb;
+	ALTER TABLE decks ADD COLUMN IF NOT EXISTS validation_updated_at TIMESTAMP WITH TIME ZONE;
+	UPDATE decks
+	SET validation_state = COALESCE(validation_state, 'unknown'),
+	    validation_reasons = COALESCE(validation_reasons, '["validation_not_recorded"]'::jsonb);
+	ALTER TABLE decks ALTER COLUMN validation_state SET DEFAULT 'unknown';
+	ALTER TABLE decks ALTER COLUMN validation_state SET NOT NULL;
+	ALTER TABLE decks ALTER COLUMN validation_reasons SET DEFAULT '["validation_not_recorded"]'::jsonb;
+	ALTER TABLE decks ALTER COLUMN validation_reasons SET NOT NULL;
+	ALTER TABLE decks DROP CONSTRAINT IF EXISTS chk_decks_validation_state;
+	ALTER TABLE decks ADD CONSTRAINT chk_decks_validation_state
+	CHECK (validation_state IN ('unknown', 'draft', 'validated'));
+	ALTER TABLE decks DROP CONSTRAINT IF EXISTS chk_decks_validation_reasons_array;
+	ALTER TABLE decks ADD CONSTRAINT chk_decks_validation_reasons_array
+	CHECK (jsonb_typeof(validation_reasons) = 'array');
+	CREATE INDEX IF NOT EXISTS idx_decks_user_validation_state
+	ON decks (user_id, validation_state, created_at DESC)
+	WHERE deleted_at IS NULL;
 
 -- 6. Tabela de Itens do Deck (Relacionamento N:N entre Deck e Cartas)
 CREATE TABLE IF NOT EXISTS deck_cards (
@@ -251,6 +278,77 @@ CREATE TABLE IF NOT EXISTS deck_cards (
 
 -- Para bancos existentes (idempotente)
 ALTER TABLE deck_cards ADD COLUMN IF NOT EXISTS condition TEXT DEFAULT 'NM';
+
+CREATE OR REPLACE FUNCTION manaloom_mark_deck_cards_changed()
+RETURNS trigger
+LANGUAGE plpgsql
+AS $deck_cards_changed$
+DECLARE
+    affected_deck_ids UUID[];
+BEGIN
+    IF TG_OP = 'DELETE' THEN
+        affected_deck_ids := ARRAY[OLD.deck_id];
+    ELSIF TG_OP = 'UPDATE' AND NEW.deck_id IS DISTINCT FROM OLD.deck_id THEN
+        affected_deck_ids := ARRAY[OLD.deck_id, NEW.deck_id];
+    ELSE
+        affected_deck_ids := ARRAY[NEW.deck_id];
+    END IF;
+
+    UPDATE decks
+    SET validation_state = 'draft',
+        validation_reasons = CASE
+            WHEN validation_state = 'validated' THEN
+                '["deck_cards_changed_since_validation"]'::jsonb
+            WHEN validation_reasons @>
+                 '["deck_cards_changed_since_validation"]'::jsonb THEN
+                validation_reasons
+            ELSE validation_reasons ||
+                 '["deck_cards_changed_since_validation"]'::jsonb
+        END,
+        validation_updated_at = CURRENT_TIMESTAMP
+    WHERE id = ANY(affected_deck_ids);
+
+    IF TG_OP = 'DELETE' THEN
+        RETURN OLD;
+    END IF;
+    RETURN NEW;
+END;
+$deck_cards_changed$;
+
+DROP TRIGGER IF EXISTS manaloom_deck_cards_require_review ON deck_cards;
+CREATE TRIGGER manaloom_deck_cards_require_review
+AFTER INSERT OR DELETE OR UPDATE OF deck_id, card_id, quantity, is_commander
+ON deck_cards
+FOR EACH ROW
+EXECUTE FUNCTION manaloom_mark_deck_cards_changed();
+
+CREATE OR REPLACE FUNCTION manaloom_mark_deck_format_changed()
+RETURNS trigger
+LANGUAGE plpgsql
+AS $deck_format_changed$
+BEGIN
+    IF NEW.format IS DISTINCT FROM OLD.format THEN
+        NEW.validation_state := 'draft';
+        NEW.validation_reasons := CASE
+            WHEN OLD.validation_state = 'validated' THEN
+                '["deck_format_changed_since_validation"]'::jsonb
+            WHEN OLD.validation_reasons @>
+                 '["deck_format_changed_since_validation"]'::jsonb THEN
+                OLD.validation_reasons
+            ELSE OLD.validation_reasons ||
+                 '["deck_format_changed_since_validation"]'::jsonb
+        END;
+        NEW.validation_updated_at := CURRENT_TIMESTAMP;
+    END IF;
+    RETURN NEW;
+END;
+$deck_format_changed$;
+
+DROP TRIGGER IF EXISTS manaloom_deck_format_require_review ON decks;
+CREATE TRIGGER manaloom_deck_format_require_review
+BEFORE UPDATE OF format ON decks
+FOR EACH ROW
+EXECUTE FUNCTION manaloom_mark_deck_format_changed();
 
 -- 7. Tabela de Matchups (Counters e Estatísticas)
 -- Armazena a vantagem estatística de um deck sobre outro

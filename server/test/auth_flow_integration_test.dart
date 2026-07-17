@@ -8,9 +8,10 @@ import 'package:http/http.dart' as http;
 import 'package:test/test.dart';
 
 void main() {
-  final skipIntegration = Platform.environment['RUN_INTEGRATION_TESTS'] == '0'
-      ? 'Teste live desativado por RUN_INTEGRATION_TESTS=0.'
-      : null;
+  final skipIntegration =
+      Platform.environment['RUN_INTEGRATION_TESTS'] == '0'
+          ? 'Teste live desativado por RUN_INTEGRATION_TESTS=0.'
+          : null;
 
   final baseUrl =
       Platform.environment['TEST_API_BASE_URL'] ?? 'http://127.0.0.1:8082';
@@ -28,7 +29,7 @@ void main() {
         final suffix = DateTime.now().millisecondsSinceEpoch;
         final rawUsername = '  MixedCaseUser$suffix  ';
         final rawEmail = '  Mixed.User.$suffix@Example.COM  ';
-        const password = 'TestPassword123!';
+        const password = 'BetaQa!2026-Deck';
 
         final registerResponse = await http.post(
           Uri.parse('$baseUrl/auth/register'),
@@ -60,8 +61,11 @@ void main() {
           }),
         );
 
-        expect(loginResponse.statusCode, equals(200),
-            reason: loginResponse.body);
+        expect(
+          loginResponse.statusCode,
+          equals(200),
+          reason: loginResponse.body,
+        );
         final loginData = decodeJson(loginResponse);
         final loginUser = loginData['user'] as Map<String, dynamic>;
         expect(loginUser['username'], equals('mixedcaseuser$suffix'));
@@ -80,12 +84,15 @@ void main() {
           body: jsonEncode({
             'username': 'duplicateuser$suffix',
             'email': 'duplicate.$suffix@example.com',
-            'password': 'TestPassword123!',
+            'password': 'BetaQa!2026-Deck',
           }),
         );
 
-        expect(firstResponse.statusCode, anyOf(200, 201),
-            reason: firstResponse.body);
+        expect(
+          firstResponse.statusCode,
+          anyOf(200, 201),
+          reason: firstResponse.body,
+        );
 
         final duplicateResponse = await http.post(
           Uri.parse('$baseUrl/auth/register'),
@@ -93,12 +100,15 @@ void main() {
           body: jsonEncode({
             'username': 'DuplicateUser$suffix',
             'email': 'DUPLICATE.$suffix@EXAMPLE.COM',
-            'password': 'TestPassword123!',
+            'password': 'BetaQa!2026-Deck',
           }),
         );
 
-        expect(duplicateResponse.statusCode, equals(400),
-            reason: duplicateResponse.body);
+        expect(
+          duplicateResponse.statusCode,
+          equals(400),
+          reason: duplicateResponse.body,
+        );
       },
       skip: skipIntegration,
     );

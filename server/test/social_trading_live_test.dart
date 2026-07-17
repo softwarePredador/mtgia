@@ -25,7 +25,7 @@ void main() {
     final body = {
       'username': 'social_live_$suffix',
       'email': 'social_live_$suffix@example.com',
-      'password': 'TestPassword123!',
+      'password': 'BetaQa!2026-Deck',
     };
     var response = await http.post(
       Uri.parse('$baseUrl/auth/register'),

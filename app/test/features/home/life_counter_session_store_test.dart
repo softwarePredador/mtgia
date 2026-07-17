@@ -270,6 +270,28 @@ void main() {
       expect(restored, isNull);
     });
 
+    for (var playerCount = 2; playerCount <= 6; playerCount += 1) {
+      test('round-trips a $playerCount-player table', () async {
+        final session = LifeCounterSession.initial(
+          playerCount: playerCount,
+        ).copyWith(
+          lives: List<int>.generate(
+            playerCount,
+            (index) => (playerCount == 2 ? 20 : 40) - index,
+          ),
+        );
+
+        await store.save(session);
+        final restored = await store.load();
+
+        expect(restored, isNotNull);
+        expect(restored!.playerCount, playerCount);
+        expect(restored.lives, session.lives);
+        expect(restored.commanderDamage, hasLength(playerCount));
+        expect(restored.commanderDamage, everyElement(hasLength(playerCount)));
+      });
+    }
+
     test(
       'round-trips player appearances in the canonical session store',
       () async {

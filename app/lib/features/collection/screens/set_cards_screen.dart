@@ -417,15 +417,16 @@ class _SetCardTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        color: AppTheme.surfaceSlate,
+    return Material(
+      color: AppTheme.surfaceSlate,
+      shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(AppTheme.radiusMd),
-        border: Border.all(
+        side: const BorderSide(
           color: AppTheme.outlineMuted,
           width: AppTheme.strokeHairline,
         ),
       ),
+      clipBehavior: Clip.antiAlias,
       child: ListTile(
         key: Key('set-card-${card.name}'),
         contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),

@@ -5,7 +5,8 @@ BACKUP="${MANALOOM_RESTORE_DRILL_BACKUP:-}"
 IDENTITY="${MANALOOM_RESTORE_DRILL_AGE_IDENTITY:-}"
 MANIFEST="${MANALOOM_RESTORE_DRILL_MANIFEST:-}"
 EVIDENCE_DIR="${MANALOOM_RESTORE_DRILL_EVIDENCE_DIR:-}"
-IMAGE="${MANALOOM_RESTORE_POSTGRES_IMAGE:-postgres:17}"
+readonly APPROVED_POSTGRES_IMAGE="postgres:17.10-alpine3.23@sha256:8189a1f6e40904781fc9e2612687877791d21679866db58b1de996b31fc312e4"
+IMAGE="${MANALOOM_RESTORE_POSTGRES_IMAGE:-$APPROVED_POSTGRES_IMAGE}"
 MIN_TABLES="${MANALOOM_RESTORE_MIN_TABLES:-80}"
 EXECUTE=0
 
@@ -47,6 +48,10 @@ if [[ -z "$BACKUP" ]]; then
 fi
 if [[ ! "$MIN_TABLES" =~ ^[1-9][0-9]*$ ]]; then
   echo "min-tables deve ser inteiro positivo" >&2
+  exit 2
+fi
+if [[ "$IMAGE" != "$APPROVED_POSTGRES_IMAGE" ]]; then
+  echo "imagem do restore deve usar o digest PostgreSQL 17 aprovado" >&2
   exit 2
 fi
 

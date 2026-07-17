@@ -52,6 +52,15 @@ Future<Response> onRequest(RequestContext context) async {
     databaseStopwatch.stop();
   }
 
+  // Schema required to preserve Deckbuilder draft/review state across reloads.
+  final deckValidationSchema = await evaluateDeckValidationSchemaReadiness(
+    context.read<Pool>(),
+  );
+  checks['deck_validation_schema'] = deckValidationSchema.check;
+  if (!deckValidationSchema.healthy) {
+    allHealthy = false;
+  }
+
   // Check 2: Cards table has data
   final cardsStopwatch = Stopwatch()..start();
   try {
@@ -86,6 +95,13 @@ Future<Response> onRequest(RequestContext context) async {
   final aiRuntime = evaluateAiRuntimeReadiness(env);
   checks['ai_runtime'] = aiRuntime.check;
   if (!aiRuntime.healthy) {
+    allHealthy = false;
+  }
+
+  // Check 4: every engine required by the configured Battle mode responds.
+  final battleRuntime = await evaluateBattleRuntimeReadiness(env);
+  checks['battle_runtime'] = battleRuntime.check;
+  if (!battleRuntime.healthy) {
     allHealthy = false;
   }
 

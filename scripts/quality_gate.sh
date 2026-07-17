@@ -5,6 +5,24 @@ ROOT_DIR="$(cd "$(dirname "$0")/.." && pwd)"
 MODE="${1:-quick}"
 FLUTTER_TEST_TIMEOUT_SECONDS="${FLUTTER_TEST_TIMEOUT_SECONDS:-1200}"
 BACKEND_TEST_JWT_SECRET="${JWT_SECRET:-local_quality_gate_jwt_secret_not_for_production_20260706}"
+FLUTTER_BIN="${MANALOOM_FLUTTER_BIN:-flutter}"
+
+if [[ "$FLUTTER_BIN" == */* ]]; then
+  if [[ ! -x "$FLUTTER_BIN" ]]; then
+    echo "❌ Flutter configurado não é executável: $FLUTTER_BIN" >&2
+    exit 2
+  fi
+  FLUTTER_BIN="$(cd "$(dirname "$FLUTTER_BIN")" && pwd)/$(basename "$FLUTTER_BIN")"
+fi
+readonly FLUTTER_BIN
+
+# Nested app gates that still resolve `flutter` from PATH must inherit the
+# explicitly selected SDK. This prevents `pub get` from rewriting SDK-owned
+# lock entries with a different local Flutter installation.
+if [[ -n "${MANALOOM_FLUTTER_BIN:-}" ]]; then
+  flutter_bin_dir="$(dirname "$FLUTTER_BIN")"
+  export PATH="$flutter_bin_dir:$PATH"
+fi
 
 trap 'echo "❌ Quality gate interrompido." >&2; exit 130' INT
 trap 'echo "❌ Quality gate encerrado." >&2; exit 143' TERM
@@ -32,7 +50,7 @@ run_backend_full() {
 run_frontend_quick() {
   print_header "Frontend quick checks"
   cd "$ROOT_DIR/app"
-  flutter analyze --no-fatal-infos
+  "$FLUTTER_BIN" analyze --no-fatal-infos
 }
 
 run_flutter_tests_with_proof() {
@@ -46,7 +64,7 @@ run_flutter_tests_with_proof() {
   set +e
   perl -e 'alarm shift; exec @ARGV' \
     "$FLUTTER_TEST_TIMEOUT_SECONDS" \
-    flutter test --no-version-check --reporter compact --timeout 2m \
+    "$FLUTTER_BIN" test --no-version-check --reporter compact --timeout 2m \
     2>&1 | tee "$output_file"
   local pipeline_status=("${PIPESTATUS[@]}")
   status="${pipeline_status[0]}"
@@ -75,7 +93,7 @@ run_flutter_tests_with_proof() {
 run_frontend_full() {
   print_header "Frontend full checks"
   cd "$ROOT_DIR/app"
-  flutter analyze --no-fatal-infos
+  "$FLUTTER_BIN" analyze --no-fatal-infos
   run_flutter_tests_with_proof
 }
 
@@ -87,8 +105,8 @@ run_public_web_full() {
 run_ui_audit() {
   print_header "ManaLoom Flutter UI audit"
   cd "$ROOT_DIR/app"
-  flutter analyze lib test --no-version-check --no-fatal-infos
-  flutter test test/ui test/core/widgets/debug_accessibility_tools_test.dart --no-version-check
+  "$FLUTTER_BIN" analyze lib test --no-version-check --no-fatal-infos
+  "$FLUTTER_BIN" test test/ui test/core/widgets/debug_accessibility_tools_test.dart --no-version-check
 }
 
 run_dependency_audit() {
@@ -167,7 +185,7 @@ ensure_cmd() {
 
 ensure_prerequisites() {
   ensure_cmd dart
-  ensure_cmd flutter
+  ensure_cmd "$FLUTTER_BIN"
   ensure_cmd perl
 }
 

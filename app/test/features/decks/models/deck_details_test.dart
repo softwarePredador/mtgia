@@ -259,5 +259,37 @@ void main() {
       expect(details.colorIdentity, isEmpty);
       expect(details.colorIdentityKnown, isTrue);
     });
+
+    test('reabre detalhe preservando draft e motivos de revisão', () {
+      final details = DeckDetails.fromJson({
+        'id': 'deck-draft',
+        'name': 'Import incompleto',
+        'format': 'commander',
+        'is_public': false,
+        'created_at': '2026-07-17T11:00:00Z',
+        'deck_state': 'draft',
+        'requires_review': true,
+        'review_reasons': const [
+          'unresolved_import_lines',
+          'incomplete_deck_size',
+        ],
+        'validation_updated_at': '2026-07-17T12:00:00Z',
+        'commander': const <dynamic>[],
+        'main_board': const <String, dynamic>{},
+        'stats': const <String, dynamic>{},
+      });
+
+      expect(details.validationState, 'draft');
+      expect(details.requiresReview, isTrue);
+      expect(details.reviewReasons, [
+        'unresolved_import_lines',
+        'incomplete_deck_size',
+      ]);
+
+      final copied = details.copyWith(name: 'Renomeado');
+      expect(copied.validationState, 'draft');
+      expect(copied.reviewReasons, details.reviewReasons);
+      expect(copied.validationUpdatedAt, details.validationUpdatedAt);
+    });
   });
 }

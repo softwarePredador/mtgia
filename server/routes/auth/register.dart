@@ -2,6 +2,7 @@ import 'dart:io';
 import 'package:dart_frog/dart_frog.dart';
 import '../../lib/auth_service.dart';
 import '../../lib/observability.dart';
+import '../../lib/password_policy.dart';
 
 /// Registro de novo usuário com gravação no banco de dados
 ///
@@ -52,10 +53,18 @@ Future<Response> onRequest(RequestContext context) async {
       );
     }
 
-    if (password.length < 6) {
+    final passwordValidation = PasswordPolicy.validate(
+      password,
+      username: username,
+      email: email,
+    );
+    if (!passwordValidation.isValid) {
       return Response.json(
         statusCode: HttpStatus.badRequest,
-        body: {'message': 'Senha deve ter no mínimo 6 caracteres'},
+        body: {
+          'error': passwordValidation.code,
+          'message': passwordValidation.message,
+        },
       );
     }
 

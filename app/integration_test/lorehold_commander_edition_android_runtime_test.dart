@@ -142,7 +142,7 @@ void main() {
       final api = ApiClient();
       final unique = DateTime.now().millisecondsSinceEpoch.toRadixString(16);
       final email = 'sm_a135m_lorehold_$unique@example.com';
-      const password = 'Qa123456!';
+      const password = 'BetaQa!2026-Deck';
       final username = 'sm_a135m_lorehold_$unique';
 
       final registerResponse = await api.post('/auth/register', {

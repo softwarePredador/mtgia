@@ -80,13 +80,16 @@ Future<void> showDeckImportListDialog({
                         mainAxisSize: MainAxisSize.min,
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Container(
-                            decoration: BoxDecoration(
-                              color:
-                                  replaceAll
-                                      ? AppTheme.warning.withValues(alpha: 0.1)
-                                      : theme.colorScheme.surface,
-                              border: Border.all(
+                          Material(
+                            color:
+                                replaceAll
+                                    ? AppTheme.warning.withValues(alpha: 0.1)
+                                    : theme.colorScheme.surface,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(
+                                AppTheme.radiusSm,
+                              ),
+                              side: BorderSide(
                                 color:
                                     replaceAll
                                         ? AppTheme.warning.withValues(
@@ -96,10 +99,8 @@ Future<void> showDeckImportListDialog({
                                           alpha: 0.3,
                                         ),
                               ),
-                              borderRadius: BorderRadius.circular(
-                                AppTheme.radiusSm,
-                              ),
                             ),
+                            clipBehavior: Clip.antiAlias,
                             child: CheckboxListTile(
                               key: const Key(
                                 'deck-import-list-dialog-replace-switch',

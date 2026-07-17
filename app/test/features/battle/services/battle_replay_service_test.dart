@@ -43,6 +43,94 @@ class _FakeApiClient extends ApiClient {
 
 void main() {
   group('BattleReplayService', () {
+    test(
+      'lists usable own and public opponent decks without duplicates',
+      () async {
+        final apiClient = _FakeApiClient(
+          getResponses: {
+            '/decks': ApiResponse(200, const [
+              {
+                'id': 'current-deck',
+                'name': 'Deck atual',
+                'format': 'commander',
+                'card_count': 100,
+              },
+              {
+                'id': 'own-deck',
+                'name': 'Meu Korvold',
+                'format': 'commander',
+                'commander_name': 'Korvold, Fae-Cursed King',
+                'card_count': 100,
+              },
+              {
+                'id': 'empty-deck',
+                'name': 'Rascunho vazio',
+                'format': 'commander',
+                'card_count': 0,
+              },
+            ]),
+            '/community/decks?page=1&limit=50': ApiResponse(200, {
+              'data': const [
+                {
+                  'id': 'own-deck',
+                  'name': 'Copia publica',
+                  'format': 'commander',
+                  'owner_username': 'me',
+                  'card_count': 100,
+                },
+                {
+                  'id': 'public-deck',
+                  'name': 'Atraxa publica',
+                  'format': 'commander',
+                  'owner_username': 'planeswalker',
+                  'card_count': 100,
+                },
+              ],
+            }),
+          },
+        );
+        final service = BattleReplayService(apiClient: apiClient);
+
+        final decks = await service.listOpponentDecks(
+          currentDeckId: 'current-deck',
+        );
+
+        expect(
+          apiClient.getCalls,
+          containsAll(['/decks', '/community/decks?page=1&limit=50']),
+        );
+        expect(decks.map((deck) => deck.id), ['own-deck', 'public-deck']);
+        expect(decks.first.isOwn, isTrue);
+        expect(decks.last.metadataLabel, contains('@planeswalker'));
+        expect(decks.last.matches('atraxa'), isTrue);
+      },
+    );
+
+    test('keeps available own decks when community listing fails', () async {
+      final apiClient = _FakeApiClient(
+        getResponses: {
+          '/decks': ApiResponse(200, const [
+            {
+              'id': 'own-deck',
+              'name': 'Meu deck',
+              'format': 'commander',
+              'card_count': 100,
+            },
+          ]),
+          '/community/decks?page=1&limit=50': ApiResponse(503, const {
+            'error': 'unavailable',
+          }),
+        },
+      );
+
+      final decks = await BattleReplayService(
+        apiClient: apiClient,
+      ).listOpponentDecks(currentDeckId: 'current-deck');
+
+      expect(decks, hasLength(1));
+      expect(decks.single.id, 'own-deck');
+    });
+
     test('lists saved battle replays from deck route', () async {
       final apiClient = _FakeApiClient(
         getResponses: {
@@ -108,6 +196,12 @@ void main() {
             'type': 'battle',
             'deck_a_id': 'deck-1',
             'deck_b_id': 'deck-2',
+            'replay_id': 'sim-saved-1',
+            'persistence': const {
+              'status': 'saved',
+              'required': true,
+              'replay_id': 'sim-saved-1',
+            },
             'winner': 'Player A',
             'turns': 4,
             'game_log': const [
@@ -131,8 +225,98 @@ void main() {
         'max_turns': 30,
       });
       expect(replay.summary.typeLabel, 'Battle');
-      expect(replay.summary.sourceLabel, 'Simulacao recem-gerada');
+      expect(replay.summary.id, 'sim-saved-1');
+      expect(replay.summary.sourceLabel, 'Historico salvo');
       expect(replay.events, hasLength(1));
     });
+
+    test(
+      'rejects a success response that does not confirm replay persistence',
+      () async {
+        final apiClient = _FakeApiClient(
+          postResponses: {
+            '/ai/simulate': ApiResponse(200, const {
+              'type': 'battle',
+              'deck_a_id': 'deck-1',
+              'deck_b_id': 'deck-2',
+            }),
+          },
+        );
+
+        expect(
+          () => BattleReplayService(
+            apiClient: apiClient,
+          ).runBattleSimulation(deckId: 'deck-1', opponentDeckId: 'deck-2'),
+          throwsA(
+            isA<BattleReplayException>().having(
+              (error) => error.message,
+              'message',
+              contains('nao confirmou o salvamento'),
+            ),
+          ),
+        );
+      },
+    );
+
+    test(
+      'rejects a success response with inconsistent replay identifiers',
+      () async {
+        final apiClient = _FakeApiClient(
+          postResponses: {
+            '/ai/simulate': ApiResponse(200, const {
+              'type': 'battle',
+              'deck_a_id': 'deck-1',
+              'deck_b_id': 'deck-2',
+              'replay_id': 'sim-response',
+              'persistence': {
+                'status': 'saved',
+                'required': true,
+                'replay_id': 'sim-persisted',
+              },
+            }),
+          },
+        );
+
+        expect(
+          () => BattleReplayService(
+            apiClient: apiClient,
+          ).runBattleSimulation(deckId: 'deck-1', opponentDeckId: 'deck-2'),
+          throwsA(
+            isA<BattleReplayException>().having(
+              (error) => error.message,
+              'message',
+              contains('nao confirmou o salvamento'),
+            ),
+          ),
+        );
+      },
+    );
+
+    test(
+      'prefers the backend user message over a persistence error code',
+      () async {
+        final apiClient = _FakeApiClient(
+          postResponses: {
+            '/ai/simulate': ApiResponse(503, const {
+              'error': 'simulation_persistence_failed',
+              'message': 'O replay nao pode ser salvo agora.',
+            }),
+          },
+        );
+
+        expect(
+          () => BattleReplayService(
+            apiClient: apiClient,
+          ).runBattleSimulation(deckId: 'deck-1', opponentDeckId: 'deck-2'),
+          throwsA(
+            isA<BattleReplayException>().having(
+              (error) => error.message,
+              'message',
+              'O replay nao pode ser salvo agora.',
+            ),
+          ),
+        );
+      },
+    );
   });
 }

@@ -515,12 +515,13 @@ class _SetCatalogTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        color: AppTheme.surfaceSlate,
+    return Material(
+      color: AppTheme.surfaceSlate,
+      shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(AppTheme.radiusMd),
-        border: Border.all(color: AppTheme.outlineMuted, width: 0.5),
+        side: const BorderSide(color: AppTheme.outlineMuted, width: 0.5),
       ),
+      clipBehavior: Clip.antiAlias,
       child: ListTile(
         key: Key('set-tile-${set.code}'),
         onTap: onTap,

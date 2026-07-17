@@ -524,13 +524,7 @@ Future<Map<String, dynamic>> _pollGeneratedDeckJob(
 Map<String, dynamic> _requireReviewableGenerateResult(
   Map<String, dynamic> result,
 ) {
-  final generatedDeck = _asStringMap(result['generated_deck']);
-  final cards = generatedDeck['cards'];
-  final validation = _asStringMap(result['validation']);
-  if (generatedDeck.isEmpty ||
-      cards is! List ||
-      cards.isEmpty ||
-      validation['is_valid'] != true) {
+  if (!isReviewableGeneratedDeckResult(result)) {
     throw Exception(
       'A IA concluiu a geração, mas não devolveu um deck válido para revisão. '
       'Tente novamente em instantes.',
@@ -538,6 +532,53 @@ Map<String, dynamic> _requireReviewableGenerateResult(
   }
   return result;
 }
+
+List<String> generatedDeckReviewBlockingReasons(Map<String, dynamic>? result) {
+  if (result == null || result.isEmpty) {
+    return const ['Nenhum deck foi gerado para revisão.'];
+  }
+
+  final generatedDeck = _asStringMap(result['generated_deck']);
+  final cards = generatedDeck['cards'];
+  if (generatedDeck.isEmpty || cards is! List || cards.isEmpty) {
+    return const ['A resposta não contém uma lista de cartas revisável.'];
+  }
+
+  final validation = _asStringMap(result['validation']);
+  if (validation['is_valid'] != true) {
+    return const ['A legalidade do deck não foi confirmada pelo servidor.'];
+  }
+
+  final validationErrors = validation['errors'];
+  if (validationErrors is List && validationErrors.isNotEmpty) {
+    return const ['A validação do servidor ainda contém erros.'];
+  }
+
+  final providerRepair = _asStringMap(result['provider_repair']);
+  final hasValidatedRepair = providerRepair['eligible'] == true;
+  final warnings = _asStringMap(result['warnings']);
+  final stats = _asStringMap(result['stats']);
+  final validationInvalidCards = validation['invalid_cards'];
+  final warningInvalidCards = warnings['invalid_cards'];
+  final statsInvalidCards =
+      stats['invalid_cards'] is num
+          ? (stats['invalid_cards'] as num).toInt()
+          : int.tryParse(stats['invalid_cards']?.toString() ?? '') ?? 0;
+  final hasUnresolvedEvidence =
+      (validationInvalidCards is List && validationInvalidCards.isNotEmpty) ||
+      (warningInvalidCards is List && warningInvalidCards.isNotEmpty) ||
+      statsInvalidCards > 0;
+  if (hasUnresolvedEvidence && !hasValidatedRepair) {
+    return const [
+      'Há cartas não resolvidas sem um reparo validado pelo servidor.',
+    ];
+  }
+
+  return const [];
+}
+
+bool isReviewableGeneratedDeckResult(Map<String, dynamic>? result) =>
+    generatedDeckReviewBlockingReasons(result).isEmpty;
 
 String? _normalizeGenerateCommanderName(String? commanderName) {
   final trimmed = commanderName?.trim();

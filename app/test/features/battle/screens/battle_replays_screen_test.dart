@@ -7,12 +7,50 @@ import 'package:manaloom/features/battle/screens/battle_replays_screen.dart';
 import 'package:manaloom/features/battle/services/battle_replay_service.dart';
 
 class _FakeBattleReplayGateway implements BattleReplayGateway {
+  _FakeBattleReplayGateway({
+    this.battleError,
+    this.replayListErrorAfterFirstCall,
+  });
+
+  final Object? battleError;
+  final Object? replayListErrorAfterFirstCall;
   int listCalls = 0;
   int fetchCalls = 0;
+  int opponentListCalls = 0;
+  int runBattleCalls = 0;
+  String? lastOpponentDeckId;
+
+  @override
+  Future<List<BattleOpponentDeck>> listOpponentDecks({
+    required String currentDeckId,
+  }) async {
+    opponentListCalls += 1;
+    return const [
+      BattleOpponentDeck(
+        id: '11111111-1111-4111-8111-111111111111',
+        name: 'Meu Korvold',
+        format: 'commander',
+        source: BattleOpponentDeckSource.own,
+        commanderName: 'Korvold, Fae-Cursed King',
+        cardCount: 100,
+      ),
+      BattleOpponentDeck(
+        id: '22222222-2222-4222-8222-222222222222',
+        name: 'Atraxa da comunidade',
+        format: 'commander',
+        source: BattleOpponentDeckSource.community,
+        commanderName: "Atraxa, Praetors' Voice",
+        ownerUsername: 'planeswalker',
+        cardCount: 100,
+      ),
+    ];
+  }
 
   @override
   Future<List<BattleReplaySummary>> listReplays(String deckId) async {
     listCalls += 1;
+    final refreshError = replayListErrorAfterFirstCall;
+    if (listCalls > 1 && refreshError != null) throw refreshError;
     return [
       BattleReplaySummary.fromJson(const {
         'id': 'sim-1',
@@ -119,8 +157,28 @@ class _FakeBattleReplayGateway implements BattleReplayGateway {
     required String deckId,
     required String opponentDeckId,
     int maxTurns = 30,
-  }) {
-    throw UnimplementedError();
+  }) async {
+    runBattleCalls += 1;
+    lastOpponentDeckId = opponentDeckId;
+    final error = battleError;
+    if (error != null) throw error;
+    return BattleReplayDetail.fromJson(
+      {
+        'replay_id': 'sim-new',
+        'type': 'battle',
+        'deck_a_id': deckId,
+        'deck_b_id': opponentDeckId,
+        'opponent_name': 'Meu Korvold',
+        'winner_name': 'Player A',
+        'turns': 6,
+        'events': const [
+          {'turn': 1, 'player': 'Player A', 'action': 'draws'},
+        ],
+      },
+      fallbackDeckId: deckId,
+      fallbackId: 'sim-new',
+      source: 'battle_simulations',
+    );
   }
 
   @override
@@ -308,4 +366,196 @@ void main() {
       expect(tester.takeException(), isNull);
     },
   );
+
+  testWidgets(
+    'runs Battle from opponent selection through saved replay success',
+    (tester) async {
+      final gateway = _FakeBattleReplayGateway();
+      await tester.pumpWidget(
+        MaterialApp(
+          theme: AppTheme.darkTheme,
+          home: BattleReplaysScreen(deckId: 'deck-1', gateway: gateway),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.byKey(const Key('battle-run-battle-button')));
+      await tester.pumpAndSettle();
+
+      expect(gateway.opponentListCalls, 1);
+      expect(
+        find.byKey(const Key('battle-opponent-picker-dialog')),
+        findsOneWidget,
+      );
+      expect(find.text('Meu Korvold'), findsOneWidget);
+      expect(find.text('Atraxa da comunidade'), findsOneWidget);
+
+      await tester.tap(
+        find.byKey(
+          const Key(
+            'battle-opponent-deck-11111111-1111-4111-8111-111111111111',
+          ),
+        ),
+      );
+      await tester.pump();
+      await tester.tap(find.byKey(const Key('battle-opponent-submit-button')));
+      await tester.pumpAndSettle();
+
+      expect(gateway.runBattleCalls, 1);
+      expect(
+        gateway.lastOpponentDeckId,
+        '11111111-1111-4111-8111-111111111111',
+      );
+      expect(
+        find.byKey(const Key('battle-replay-detail-pane')),
+        findsOneWidget,
+      );
+      expect(find.text('Battle contra Meu Korvold'), findsOneWidget);
+      expect(find.textContaining('Historico salvo'), findsOneWidget);
+      expect(tester.takeException(), isNull);
+    },
+  );
+
+  testWidgets(
+    'keeps saved replay visible when the immediate history refresh fails',
+    (tester) async {
+      final gateway = _FakeBattleReplayGateway(
+        replayListErrorAfterFirstCall: const BattleReplayException(
+          'Falha ao atualizar o historico.',
+        ),
+      );
+      await tester.pumpWidget(
+        MaterialApp(
+          theme: AppTheme.darkTheme,
+          home: BattleReplaysScreen(deckId: 'deck-1', gateway: gateway),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.byKey(const Key('battle-run-battle-button')));
+      await tester.pumpAndSettle();
+      await tester.tap(
+        find.byKey(
+          const Key(
+            'battle-opponent-deck-11111111-1111-4111-8111-111111111111',
+          ),
+        ),
+      );
+      await tester.pump();
+      await tester.tap(find.byKey(const Key('battle-opponent-submit-button')));
+      await tester.pumpAndSettle();
+
+      expect(gateway.runBattleCalls, 1);
+      expect(gateway.listCalls, 2);
+      expect(
+        find.byKey(const Key('battle-replay-detail-pane')),
+        findsOneWidget,
+      );
+      expect(find.text('Battle contra Meu Korvold'), findsOneWidget);
+      expect(find.byKey(const Key('battle-replays-error-state')), findsNothing);
+      expect(
+        find.text(
+          'Replay salvo, mas o historico nao foi atualizado. '
+          'Tente atualizar novamente.',
+        ),
+        findsOneWidget,
+      );
+      expect(tester.takeException(), isNull);
+    },
+  );
+
+  testWidgets('surfaces Battle execution error after opponent selection', (
+    tester,
+  ) async {
+    final gateway = _FakeBattleReplayGateway(
+      battleError: const BattleReplayException(
+        'O motor de Battle esta temporariamente indisponivel.',
+      ),
+    );
+    await tester.pumpWidget(
+      MaterialApp(
+        theme: AppTheme.darkTheme,
+        home: BattleReplaysScreen(deckId: 'deck-1', gateway: gateway),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.byKey(const Key('battle-run-battle-button')));
+    await tester.pumpAndSettle();
+    await tester.tap(
+      find.byKey(
+        const Key('battle-opponent-deck-22222222-2222-4222-8222-222222222222'),
+      ),
+    );
+    await tester.pump();
+    await tester.tap(find.byKey(const Key('battle-opponent-submit-button')));
+    await tester.pumpAndSettle();
+
+    expect(gateway.runBattleCalls, 1);
+    expect(
+      find.text('O motor de Battle esta temporariamente indisponivel.'),
+      findsWidgets,
+    );
+    expect(find.byKey(const Key('battle-replays-error-state')), findsOneWidget);
+  });
+
+  testWidgets('keeps validated UUID entry behind technical mode', (
+    tester,
+  ) async {
+    final gateway = _FakeBattleReplayGateway();
+    await tester.pumpWidget(
+      MaterialApp(
+        theme: AppTheme.darkTheme,
+        home: BattleReplaysScreen(deckId: 'deck-1', gateway: gateway),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.byKey(const Key('battle-run-battle-button')));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const Key('battle-opponent-technical-toggle')));
+    await tester.pump();
+    await tester.enterText(
+      find.byKey(const Key('battle-opponent-deck-id-field')),
+      'id-invalido',
+    );
+    await tester.pump();
+    await tester.tap(find.byKey(const Key('battle-opponent-submit-button')));
+    await tester.pump();
+    expect(find.text('Informe um UUID de deck valido.'), findsOneWidget);
+
+    await tester.enterText(
+      find.byKey(const Key('battle-opponent-deck-id-field')),
+      '33333333-3333-4333-8333-333333333333',
+    );
+    await tester.pump();
+    await tester.tap(find.byKey(const Key('battle-opponent-submit-button')));
+    await tester.pumpAndSettle();
+
+    expect(gateway.lastOpponentDeckId, '33333333-3333-4333-8333-333333333333');
+  });
+
+  testWidgets('keeps opponent selection usable at 390px without overflow', (
+    tester,
+  ) async {
+    await tester.binding.setSurfaceSize(const Size(390, 844));
+    addTearDown(() => tester.binding.setSurfaceSize(null));
+    final gateway = _FakeBattleReplayGateway();
+    await tester.pumpWidget(
+      MaterialApp(
+        theme: AppTheme.darkTheme,
+        home: BattleReplaysScreen(deckId: 'deck-1', gateway: gateway),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.byKey(const Key('battle-run-battle-button')));
+    await tester.pumpAndSettle();
+
+    final dialog = find.byKey(const Key('battle-opponent-picker-dialog'));
+    expect(dialog, findsOneWidget);
+    expect(find.byKey(const Key('battle-opponent-deck-list')), findsOneWidget);
+    expect(tester.getSize(dialog).width, lessThanOrEqualTo(390));
+    expect(tester.takeException(), isNull);
+  });
 }

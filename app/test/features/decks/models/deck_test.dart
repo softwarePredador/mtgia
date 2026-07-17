@@ -100,5 +100,49 @@ void main() {
       expect(pending.colorIdentity, isEmpty);
       expect(pending.colorIdentityKnown, isFalse);
     });
+
+    test('preserva estado draft e motivos de revisão da API', () {
+      final updatedAt = DateTime.parse('2026-07-17T12:00:00Z');
+      final deck = Deck.fromJson({
+        'id': 'draft-1',
+        'name': 'Esqueleto importado',
+        'format': 'commander',
+        'is_public': false,
+        'created_at': '2026-07-17T11:00:00Z',
+        'deck_state': 'draft',
+        'requires_review': true,
+        'review_reasons': ['unresolved_import_lines', 'missing_commander'],
+        'validation_updated_at': updatedAt.toIso8601String(),
+      });
+
+      expect(deck.validationState, Deck.validationStateDraft);
+      expect(deck.requiresReview, isTrue);
+      expect(deck.reviewReasons, [
+        'unresolved_import_lines',
+        'missing_commander',
+      ]);
+      expect(deck.validationUpdatedAt, updatedAt);
+      expect(deck.toJson()['deck_state'], 'draft');
+      expect(deck.toJson()['requires_review'], isTrue);
+    });
+
+    test(
+      'normaliza estado desconhecido sem confiar no requires_review legado',
+      () {
+        final deck = Deck.fromJson({
+          'id': 'legacy',
+          'name': 'Legacy',
+          'format': 'standard',
+          'is_public': false,
+          'created_at': '2026-07-17T11:00:00Z',
+          'deck_state': 'invented',
+          'requires_review': false,
+        });
+
+        expect(deck.validationState, Deck.validationStateUnknown);
+        expect(deck.requiresReview, isTrue);
+        expect(deck.reviewReasons, ['validation_not_recorded']);
+      },
+    );
   });
 }

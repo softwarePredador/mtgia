@@ -42,8 +42,9 @@ command -v jq >/dev/null 2>&1 || {
 }
 
 ANDROID_SDK_ROOT="${ANDROID_SDK_ROOT:-${ANDROID_HOME:-$HOME/Library/Android/sdk}}"
-APKSIGNER="${MANALOOM_APKSIGNER:-$(find "$ANDROID_SDK_ROOT/build-tools" -type f -name apksigner 2>/dev/null | sort -V | tail -1)}"
-AAPT="${MANALOOM_AAPT:-$(find "$ANDROID_SDK_ROOT/build-tools" -type f \( -name aapt -o -name aapt2 \) 2>/dev/null | sort -V | tail -1)}"
+ANDROID_BUILD_TOOLS_VERSION="${MANALOOM_ANDROID_BUILD_TOOLS_VERSION:-35.0.0}"
+APKSIGNER="${MANALOOM_APKSIGNER:-$ANDROID_SDK_ROOT/build-tools/$ANDROID_BUILD_TOOLS_VERSION/apksigner}"
+AAPT="${MANALOOM_AAPT:-$ANDROID_SDK_ROOT/build-tools/$ANDROID_BUILD_TOOLS_VERSION/aapt}"
 if [[ -z "$APKSIGNER" || -z "$AAPT" ]]; then
   echo "apksigner/aapt ausente no Android SDK" >&2
   exit 2

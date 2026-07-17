@@ -13,13 +13,18 @@ EasyPanel, containers, PostgreSQL, or SQLite.
 from __future__ import annotations
 
 import argparse
+import atexit
 import base64
+import hashlib
 import json
 import os
+import re
 import shlex
+import shutil
 import ssl
 import subprocess
 import sys
+import tempfile
 import time
 from dataclasses import dataclass
 from datetime import datetime, timezone
@@ -36,6 +41,7 @@ DEFAULT_ARTIFACT_DIR = (
     REPO_ROOT / "server" / "test" / "artifacts" / "easypanel_cron_runtime"
 )
 DEFAULT_PROJECT = "evolution"
+PRODUCTION_API_BASE_URL = "https://evolution-cartinhas.2ta7qx.easypanel.host"
 DEFAULT_SERVICES = {
     "manaloom-ops": "evolution_manaloom-ops",
     "hermes-lab": "evolution_hermes-lab",
@@ -44,6 +50,9 @@ SERVICE_OUTPUT_ROOTS = {
     "manaloom-ops": "/data/manaloom-ops/cron/output",
     "hermes-lab": "/opt/data/cron/output",
 }
+APPROVED_SWARM_SERVICES = frozenset(DEFAULT_SERVICES.values())
+_SSH_KNOWN_HOSTS_CACHE: dict[tuple[str, str], Path] = {}
+_SSH_TEMP_DIRS: list[Path] = []
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import reconcile_easypanel_services as reconcile  # noqa: E402
@@ -94,6 +103,36 @@ def _health_ssl_context() -> ssl.SSLContext:
         return ssl.create_default_context()
 
 
+def _validated_easypanel_base_url(candidate: str) -> str:
+    expected_hash = os.environ.get(
+        "MANALOOM_EXPECTED_EASYPANEL_BASE_URL_SHA256",
+        "",
+    )
+    if not re.fullmatch(r"[0-9a-f]{64}", expected_hash):
+        raise RuntimeError(
+            "MANALOOM_EXPECTED_EASYPANEL_BASE_URL_SHA256 must pin the approved EasyPanel origin"
+        )
+    parsed = urlparse(candidate)
+    if not (
+        parsed.scheme == "https"
+        and parsed.hostname
+        and parsed.username is None
+        and parsed.password is None
+        and parsed.path in {"", "/"}
+        and not parsed.params
+        and not parsed.query
+        and not parsed.fragment
+    ):
+        raise RuntimeError(
+            "EASYPANEL_BASE_URL must be an HTTPS origin without credentials, path, query, or fragment"
+        )
+    normalized = candidate.rstrip("/")
+    actual_hash = hashlib.sha256(normalized.encode("utf-8")).hexdigest()
+    if actual_hash != expected_hash:
+        raise RuntimeError("EASYPANEL_BASE_URL differs from the caller-approved fingerprint")
+    return normalized
+
+
 def _ws_base(base_url: str) -> str:
     parsed = urlparse(base_url)
     scheme = "wss" if parsed.scheme == "https" else "ws"
@@ -102,10 +141,10 @@ def _ws_base(base_url: str) -> str:
 
 
 def _sslopt(ws_url: str, *, insecure: bool) -> dict[str, Any]:
+    if insecure:
+        raise RuntimeError("insecure TLS is forbidden for the production audit")
     if not ws_url.startswith("wss://"):
         return {}
-    if insecure:
-        return {"cert_reqs": ssl.CERT_NONE}
     return {}
 
 
@@ -251,24 +290,104 @@ def _run_container_shell(
     )
 
 
-def _ssh_target(runtime_env: dict[str, str]) -> tuple[list[str], str]:
-    host = runtime_env.get("MANALOOM_EASYPANEL_SSH_HOST") or (
+def _cleanup_secure_ssh_files() -> None:
+    for directory in _SSH_TEMP_DIRS:
+        shutil.rmtree(directory, ignore_errors=True)
+    _SSH_TEMP_DIRS.clear()
+    _SSH_KNOWN_HOSTS_CACHE.clear()
+
+
+atexit.register(_cleanup_secure_ssh_files)
+
+
+def _validated_ssh_coordinate(
+    runtime_env: dict[str, str],
+) -> tuple[str, Path, str, str]:
+    target = runtime_env.get("MANALOOM_EASYPANEL_SSH_HOST") or (
         f"{runtime_env.get('EASYPANEL_SSH_USER', 'root')}@"
         f"{runtime_env.get('EASYPANEL_SERVER_IP', '')}"
     )
-    key = runtime_env.get("MANALOOM_EASYPANEL_SSH_KEY") or runtime_env.get(
+    key_value = runtime_env.get("MANALOOM_EASYPANEL_SSH_KEY") or runtime_env.get(
         "EASYPANEL_SSH_KEY"
     )
-    if not host or host.endswith("@") or not key:
-        raise RuntimeError("SSH target for direct Swarm audit is not configured")
+    expected_target = os.environ.get("MANALOOM_EXPECTED_SSH_TARGET", "")
+    expected_fingerprint = os.environ.get(
+        "MANALOOM_EXPECTED_SSH_HOST_KEY_SHA256",
+        "",
+    )
+    target_match = re.fullmatch(
+        r"([A-Za-z_][A-Za-z0-9._-]{0,31})@([A-Za-z0-9][A-Za-z0-9.-]{0,252})",
+        target,
+    )
+    if target != expected_target or target_match is None or ".." in target_match.group(2):
+        raise RuntimeError("SSH target differs from the exact caller-approved destination")
+    if not re.fullmatch(r"SHA256:[A-Za-z0-9+/]{43}", expected_fingerprint):
+        raise RuntimeError(
+            "MANALOOM_EXPECTED_SSH_HOST_KEY_SHA256 must pin the approved SSH host key"
+        )
+    if not key_value:
+        raise RuntimeError("SSH key for the direct Swarm audit is not configured")
+    key = Path(key_value).expanduser().resolve()
+    if not key.is_file():
+        raise RuntimeError(f"SSH key does not exist: {key}")
+    return target, key, target_match.group(2), expected_fingerprint
+
+
+def _secure_known_hosts(hostname: str, expected_fingerprint: str) -> Path:
+    cache_key = (hostname, expected_fingerprint)
+    cached = _SSH_KNOWN_HOSTS_CACHE.get(cache_key)
+    if cached is not None and cached.is_file():
+        return cached
+
+    directory = Path(tempfile.mkdtemp(prefix="manaloom-ssh-"))
+    _SSH_TEMP_DIRS.append(directory)
+    destination = directory / "known_hosts"
+    scan = subprocess.run(
+        ["ssh-keyscan", "-T", "10", hostname],
+        check=False,
+        capture_output=True,
+        text=True,
+        timeout=15,
+    )
+    matched_lines: list[str] = []
+    for line in scan.stdout.splitlines():
+        line = line.strip()
+        if not line or line.startswith("#"):
+            continue
+        fingerprint = subprocess.run(
+            ["ssh-keygen", "-lf", "-", "-E", "sha256"],
+            check=False,
+            capture_output=True,
+            input=f"{line}\n",
+            text=True,
+            timeout=10,
+        )
+        fields = fingerprint.stdout.split()
+        if len(fields) >= 2 and fields[1] == expected_fingerprint:
+            matched_lines.append(line)
+    if not matched_lines:
+        shutil.rmtree(directory, ignore_errors=True)
+        _SSH_TEMP_DIRS.remove(directory)
+        raise RuntimeError("SSH host key differs from the caller-approved fingerprint")
+    destination.write_text("\n".join(matched_lines) + "\n", encoding="utf-8")
+    destination.chmod(0o600)
+    _SSH_KNOWN_HOSTS_CACHE[cache_key] = destination
+    return destination
+
+
+def _ssh_target(runtime_env: dict[str, str]) -> tuple[list[str], str]:
+    host, key, hostname, expected_fingerprint = _validated_ssh_coordinate(runtime_env)
+    known_hosts = _secure_known_hosts(hostname, expected_fingerprint)
     return [
         "ssh",
         "-o",
         "BatchMode=yes",
         "-o",
-        "StrictHostKeyChecking=accept-new",
+        "StrictHostKeyChecking=yes",
+        "-o",
+        f"UserKnownHostsFile={known_hosts}",
         "-i",
-        key,
+        str(key),
         host,
     ], host
 
@@ -292,6 +411,8 @@ def _swarm_service_inspect(
     runtime_env: dict[str, str],
     service_name: str,
 ) -> dict[str, Any] | None:
+    if service_name not in APPROVED_SWARM_SERVICES:
+        raise RuntimeError(f"unapproved Swarm service destination: {service_name}")
     try:
         output = _ssh_exec(
             runtime_env,
@@ -378,6 +499,8 @@ def _swarm_service_logs(
     *,
     tail: int = 120,
 ) -> list[str]:
+    if service_name not in APPROVED_SWARM_SERVICES:
+        raise RuntimeError(f"unapproved Swarm service destination: {service_name}")
     output = _ssh_exec(
         runtime_env,
         f"docker service logs --raw --tail {int(tail)} {shlex.quote(service_name)}",
@@ -942,7 +1065,6 @@ def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--artifact-dir", type=str, default=None)
     parser.add_argument("--project", type=str, default=DEFAULT_PROJECT)
-    parser.add_argument("--insecure-health", action="store_true")
     parser.add_argument(
         "--require-hermes-lab",
         action="store_true",
@@ -950,12 +1072,17 @@ def main() -> int:
     )
     args = parser.parse_args()
 
+    if args.project != DEFAULT_PROJECT:
+        raise SystemExit("EasyPanel project differs from the approved production project")
+
     artifact_dir = _artifact_dir(args.artifact_dir)
     runtime_env = reconcile.load_runtime_env()
     base_url = runtime_env.get("EASYPANEL_BASE_URL")
     token = runtime_env.get("EASYPANEL_API_TOKEN")
     if not base_url or not token:
         raise SystemExit("missing EASYPANEL_BASE_URL or EASYPANEL_API_TOKEN")
+    base_url = _validated_easypanel_base_url(base_url)
+    runtime_env["EASYPANEL_BASE_URL"] = base_url
 
     client = reconcile.EasyPanelClient(base_url, token)
     ws_base = _ws_base(base_url)
@@ -967,22 +1094,23 @@ def main() -> int:
         or runtime_env.get("API_BASE_URL")
         or ""
     ).rstrip("/")
-    if public_url:
-        try:
-            public_health = json.loads(
-                urllib.request.urlopen(
-                    urllib.request.Request(
-                        urljoin(public_url + "/", "health"),
-                        method="GET",
-                    ),
-                    timeout=15,
-                    context=_health_ssl_context(),
-                )
-                .read()
-                .decode("utf-8", "replace")
+    if public_url != PRODUCTION_API_BASE_URL:
+        raise SystemExit("public API URL differs from the approved production endpoint")
+    try:
+        public_health = json.loads(
+            urllib.request.urlopen(
+                urllib.request.Request(
+                    urljoin(public_url + "/", "health"),
+                    method="GET",
+                ),
+                timeout=15,
+                context=_health_ssl_context(),
             )
-        except Exception:
-            public_health = None
+            .read()
+            .decode("utf-8", "replace")
+        )
+    except Exception:
+        public_health = None
 
     services_payload = client.list_projects_and_services()
     service_envs: dict[str, dict[str, Any]] = {}
@@ -1037,7 +1165,7 @@ def main() -> int:
             ws_base,
             token,
             containers[short_name].container_id,
-            insecure=args.insecure_health,
+            insecure=False,
             shell_runner=shell_runners[short_name],
         )
 
@@ -1051,7 +1179,7 @@ def main() -> int:
             ws_base,
             token,
             service_name,
-            insecure=args.insecure_health,
+            insecure=False,
         )
 
     ops_logs = collect_logs("manaloom-ops")
@@ -1068,7 +1196,7 @@ def main() -> int:
             token,
             containers[short_name].container_id,
             path,
-            insecure=args.insecure_health,
+            insecure=False,
             shell_runner=shell_runners[short_name],
         )
 
@@ -1097,7 +1225,7 @@ def main() -> int:
         "manaloom-ops",
         containers["manaloom-ops"].container_id,
         ops_jobs,
-        insecure=args.insecure_health,
+        insecure=False,
         shell_runner=shell_runners["manaloom-ops"],
     )
     if "hermes-lab" in containers:
@@ -1107,7 +1235,7 @@ def main() -> int:
             "hermes-lab",
             containers["hermes-lab"].container_id,
             lab_jobs,
-            insecure=args.insecure_health,
+            insecure=False,
             shell_runner=shell_runners["hermes-lab"],
         )
     findings = _extract_runtime_findings(

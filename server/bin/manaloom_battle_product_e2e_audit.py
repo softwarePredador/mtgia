@@ -5,6 +5,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import re
 from collections import Counter
 from pathlib import Path
 
@@ -192,11 +193,47 @@ def _check_absent(
     }
 
 
+def _check_pinned_action(path: str, *, action: str) -> dict[str, object]:
+    target = ROOT / path
+    source = target.read_text(encoding="utf-8") if target.is_file() else ""
+    pinned_pattern = re.compile(
+        rf"uses:\s*{re.escape(action)}@([0-9a-f]{{40}})\s+#\s+v\d+\.\d+\.\d+"
+    )
+    floating_pattern = re.compile(
+        rf"uses:\s*{re.escape(action)}@(?![0-9a-f]{{40}}(?:\s|$))\S+"
+    )
+    pinned = pinned_pattern.findall(source)
+    floating = floating_pattern.findall(source)
+    return {
+        "path": path,
+        "status": "pass" if target.is_file() and pinned and not floating else "fail",
+        "missing": [] if pinned else [f"pinned {action} SHA with version comment"],
+        "forbidden": floating,
+    }
+
+
 def build_report() -> dict[str, object]:
     checks = [
         _check(
             "app/lib/features/battle/services/battle_replay_service.dart",
-            contains=("'/ai/simulate'", "'type': 'battle'", "opponent_deck_id"),
+            contains=(
+                "'/ai/simulate'",
+                "'type': 'battle'",
+                "opponent_deck_id",
+                "listOpponentDecks(",
+                "'/decks'",
+                "'/community/decks?page=1&limit=50'",
+                "persistenceMap['status'] != 'saved'",
+            ),
+        ),
+        _check(
+            "app/lib/features/battle/screens/battle_replays_screen.dart",
+            contains=(
+                "_BattleOpponentPickerDialog",
+                "battle-opponent-deck-list",
+                "battle-opponent-technical-toggle",
+                "battle-opponent-submit-button",
+            ),
         ),
         _check(
             "server/routes/ai/simulate/index.dart",
@@ -205,10 +242,27 @@ def build_report() -> dict[str, object]:
                 "engineConfig.nativeSidecarUrl",
                 "'required_rule_cards'",
                 "buildBattleLearningEvidence(",
-                "_saveSimulation(",
-                "battle_simulations",
+                "BattleSimulationPersistenceService(pool).save(",
+                "_simulationPersistenceFailure(",
+                "'replay_id': persistence.replayId",
+                "'persistence': persistence.toJson()",
             ),
-            absent=("BattleSimulator(", "manaloom_native_legacy", "experimental_advisory"),
+            absent=(
+                "BattleSimulator(",
+                "manaloom_native_legacy",
+                "experimental_advisory",
+                "Não falha a request se não conseguir salvar",
+            ),
+        ),
+        _check(
+            "server/lib/battle/battle_simulation_persistence_service.dart",
+            contains=(
+                "battle_simulations",
+                "RETURNING id::text",
+                "BattleSimulationPersistenceOutcome.saved",
+                "BattleSimulationPersistenceOutcome.failed",
+                "'required': true",
+            ),
         ),
         _check(
             "server/lib/ai/battle_engine_config.dart",
@@ -344,11 +398,14 @@ def build_report() -> dict[str, object]:
             ".github/workflows/manaloom-guardrails.yml",
             contains=(
                 '- "services/**"',
-                "actions/setup-java@v4",
                 "services/xmage-sidecar/XMAGE_COMMIT",
                 "bootstrap_pinned_xmage_maven.sh",
                 "dart run melos run battle",
             ),
+        ),
+        _check_pinned_action(
+            ".github/workflows/manaloom-guardrails.yml",
+            action="actions/setup-java",
         ),
         _check(
             "scripts/quality_gate.sh",
@@ -437,8 +494,10 @@ def build_report() -> dict[str, object]:
         "status": "pass" if not failed else "fail",
         "contract": [
             "app_submits_battle",
+            "app_selects_owned_or_public_opponent_with_technical_uuid_fallback",
             "backend_routes_xmage_then_forge_then_reviewed_native",
             "native_requires_verified_rule_provenance",
+            "battle_success_requires_persisted_replay_id",
             "battle_persists_typed_positive_evidence",
             "deck_analysis_consumes_evidence_without_auto_promotion",
             "battle_gate_topology_is_explicit_and_ci_enforced",

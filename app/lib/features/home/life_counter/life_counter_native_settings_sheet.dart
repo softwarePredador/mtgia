@@ -286,12 +286,13 @@ class _SettingsSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return DecoratedBox(
-      decoration: BoxDecoration(
-        color: AppTheme.surfaceElevated,
+    return Material(
+      color: AppTheme.surfaceElevated,
+      shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(AppTheme.radiusMd),
-        border: Border.all(color: AppTheme.outlineMuted),
+        side: const BorderSide(color: AppTheme.outlineMuted),
       ),
+      clipBehavior: Clip.antiAlias,
       child: Padding(
         padding: const EdgeInsets.fromLTRB(14, 14, 14, 6),
         child: Column(

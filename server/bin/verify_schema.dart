@@ -23,7 +23,7 @@ void main() async {
         'display_name',
         'avatar_url',
         'created_at',
-        'updated_at'
+        'updated_at',
       ],
       'user_plans': [
         'user_id',
@@ -31,7 +31,7 @@ void main() async {
         'status',
         'started_at',
         'renews_at',
-        'updated_at'
+        'updated_at',
       ],
       'cards': [
         'id',
@@ -47,9 +47,10 @@ void main() async {
         'image_url',
         'set_code',
         'rarity',
+        'is_reserved',
         'ai_description',
         'price',
-        'created_at'
+        'created_at',
       ],
       'sets': [
         'code',
@@ -60,7 +61,7 @@ void main() async {
         'is_online_only',
         'is_foreign_only',
         'created_at',
-        'updated_at'
+        'updated_at',
       ],
       'card_legalities': ['id', 'card_id', 'format', 'status'],
       'rules': ['id', 'title', 'description', 'category', 'created_at'],
@@ -71,11 +72,14 @@ void main() async {
         'format',
         'description',
         'is_public',
+        'validation_state',
+        'validation_reasons',
+        'validation_updated_at',
         'synergy_score',
         'strengths',
         'weaknesses',
         'created_at',
-        'deleted_at'
+        'deleted_at',
       ],
       'deck_cards': ['id', 'deck_id', 'card_id', 'quantity', 'is_commander'],
       'deck_matchups': [
@@ -84,7 +88,7 @@ void main() async {
         'opponent_deck_id',
         'win_rate',
         'notes',
-        'updated_at'
+        'updated_at',
       ],
       'battle_simulations': [
         'id',
@@ -93,7 +97,7 @@ void main() async {
         'winner_deck_id',
         'turns_played',
         'game_log',
-        'created_at'
+        'created_at',
       ],
       'meta_decks': [
         'id',
@@ -102,7 +106,7 @@ void main() async {
         'source_url',
         'card_list',
         'placement',
-        'created_at'
+        'created_at',
       ],
       'format_staples': [
         'id',
@@ -115,7 +119,7 @@ void main() async {
         'scryfall_id',
         'is_banned',
         'last_synced_at',
-        'created_at'
+        'created_at',
       ],
       'sync_log': [
         'id',
@@ -127,7 +131,7 @@ void main() async {
         'status',
         'error_message',
         'started_at',
-        'finished_at'
+        'finished_at',
       ],
       'sync_state': ['key', 'value', 'updated_at'],
       'archetype_counters': [
@@ -141,7 +145,7 @@ void main() async {
         'notes',
         'effectiveness_score',
         'last_synced_at',
-        'created_at'
+        'created_at',
       ],
       'deck_weakness_reports': [
         'id',
@@ -152,7 +156,7 @@ void main() async {
         'recommendations',
         'auto_detected',
         'addressed',
-        'created_at'
+        'created_at',
       ],
       'ml_prompt_feedback': [
         'id',
@@ -165,7 +169,7 @@ void main() async {
         'effectiveness_score',
         'user_comment',
         'prompt_version',
-        'created_at'
+        'created_at',
       ],
       'ai_optimize_fallback_telemetry': [
         'id',
@@ -180,7 +184,7 @@ void main() async {
         'candidate_count',
         'replacement_count',
         'pair_count',
-        'created_at'
+        'created_at',
       ],
       'ai_optimize_jobs': [
         'id',
@@ -195,7 +199,7 @@ void main() async {
         'error',
         'quality_error',
         'created_at',
-        'updated_at'
+        'updated_at',
       ],
       'ai_generate_jobs': [
         'id',
@@ -210,7 +214,7 @@ void main() async {
         'result',
         'error',
         'created_at',
-        'updated_at'
+        'updated_at',
       ],
       'ai_user_preferences': [
         'user_id',
@@ -221,7 +225,7 @@ void main() async {
         'budget_tier',
         'playstyle',
         'created_at',
-        'updated_at'
+        'updated_at',
       ],
       'ai_optimize_cache': [
         'id',
@@ -231,7 +235,7 @@ void main() async {
         'deck_signature',
         'payload',
         'created_at',
-        'expires_at'
+        'expires_at',
       ],
       'rate_limit_events': ['id', 'bucket', 'identifier', 'created_at'],
       'activation_funnel_events': [
@@ -242,13 +246,16 @@ void main() async {
         'deck_id',
         'source',
         'metadata',
-        'created_at'
+        'created_at',
       ],
     };
 
     // Busca todas as colunas do banco
-    final result = await conn.execute(Sql.named(
-        "SELECT table_name, column_name FROM information_schema.columns WHERE table_schema = 'public'"));
+    final result = await conn.execute(
+      Sql.named(
+        "SELECT table_name, column_name FROM information_schema.columns WHERE table_schema = 'public'",
+      ),
+    );
 
     final currentSchema = <String, Set<String>>{};
 

@@ -122,7 +122,7 @@ void main() {
     );
     await tester.enterText(
       find.byKey(const Key('login-password-field')),
-      'Qa123456!',
+      'BetaQa!2026-Deck',
     );
     await tester.tap(find.byKey(const Key('login-submit-button')));
     await tester.pumpAndSettle();
@@ -176,11 +176,11 @@ void main() {
     );
     await tester.enterText(
       find.byKey(const Key('register-password-field')),
-      'Qa123456!',
+      'BetaQa!2026-Deck',
     );
     await tester.enterText(
       find.byKey(const Key('register-confirm-password-field')),
-      'Qa123456!',
+      'BetaQa!2026-Deck',
     );
     final submit = find.byKey(const Key('register-submit-button'));
     await tester.ensureVisible(submit);

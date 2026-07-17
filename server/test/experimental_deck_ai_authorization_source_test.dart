@@ -88,6 +88,10 @@ void main() {
       () {
         final simulate =
             File('routes/ai/simulate/index.dart').readAsStringSync();
+        final simulationPersistence =
+            File(
+              'lib/battle/battle_simulation_persistence_service.dart',
+            ).readAsStringSync();
         final matchup =
             File('routes/ai/simulate-matchup/index.dart').readAsStringSync();
         final weakness =
@@ -100,15 +104,36 @@ void main() {
           simulate,
           contains('OR (CAST(@allowPublic AS boolean) AND d.is_public = true)'),
         );
-        expect(simulate, contains('AND column_name IN ('));
-        expect(simulate, contains("'simulation_type',"));
-        expect(simulate, contains("'metrics',"));
-        expect(simulate, contains("'winner_deck_id',"));
-        expect(simulate, contains("'turns_played'"));
-        expect(simulate, contains("contains('simulation_type')"));
-        expect(simulate, contains("contains('metrics')"));
-        expect(simulate, contains('@simulationType'));
-        expect(simulate, contains('@metrics::jsonb'));
+        expect(simulate, contains('dc.is_commander DESC'));
+        expect(simulate, contains('LOWER(c.name) ASC'));
+        expect(simulate, contains("COALESCE(c.oracle_id::text, '') ASC"));
+        expect(simulate, contains("COALESCE(c.scryfall_id::text, '') ASC"));
+        expect(simulate, contains('c.id::text ASC'));
+        expect(simulationPersistence, contains('AND column_name IN ('));
+        expect(simulationPersistence, contains("'simulation_type',"));
+        expect(simulationPersistence, contains("'metrics',"));
+        expect(simulationPersistence, contains("'winner_deck_id',"));
+        expect(simulationPersistence, contains("'turns_played'"));
+        expect(simulationPersistence, contains("contains('simulation_type')"));
+        expect(simulationPersistence, contains("contains('metrics')"));
+        expect(simulationPersistence, contains('@simulationType'));
+        expect(simulationPersistence, contains('@metrics::jsonb'));
+        expect(simulationPersistence, contains('RETURNING id::text'));
+        expect(
+          simulationPersistence,
+          contains('BattleSimulationPersistenceOutcome.failed'),
+        );
+        expect(
+          simulate,
+          contains('BattleSimulationPersistenceService(pool).save('),
+        );
+        expect(simulate, contains('if (!persistence.isSaved)'));
+        expect(
+          simulate,
+          contains('_simulationPersistenceFailure(persistence)'),
+        );
+        expect(simulate, contains('canonicalBattleWinnerDeckId('));
+        expect(simulate, contains("'winner_deck_id': winnerDeckId"));
         expect(simulate, contains('NativeBattleClient'));
         expect(simulate, contains('engineConfig.nativeSidecarUrl'));
         expect(simulate, contains("'required_rule_cards'"));
@@ -272,6 +297,10 @@ void main() {
       () {
         final simulate =
             File('routes/ai/simulate/index.dart').readAsStringSync();
+        final simulationPersistence =
+            File(
+              'lib/battle/battle_simulation_persistence_service.dart',
+            ).readAsStringSync();
         final matchup =
             File('routes/ai/simulate-matchup/index.dart').readAsStringSync();
         final simulationRequestSupport =
@@ -286,7 +315,9 @@ void main() {
         expect(simulate, contains("'type': 'goldfish'"));
         expect(simulate, contains("'type': 'battle'"));
         expect(simulate, contains("'type': 'matchup'"));
-        expect(simulate, contains('battle_simulations'));
+        expect(simulationPersistence, contains('battle_simulations'));
+        expect(simulate, contains("'replay_id': persistence.replayId"));
+        expect(simulate, contains("'persistence': persistence.toJson()"));
 
         expect(matchup, contains('_normalizedSimulationCount('));
         expect(matchup, contains('parsed.clamp(1, 5000)'));

@@ -25,7 +25,8 @@ Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
 /// 2. `registerToken()` → envia FCM token pro server
 /// 3. Escuta mensagens foreground/background/terminated
 class PushNotificationService {
-  static PushNotificationService _instance = PushNotificationService._internal();
+  static PushNotificationService _instance =
+      PushNotificationService._internal();
   factory PushNotificationService() => _instance;
   PushNotificationService._internal();
 
@@ -111,6 +112,17 @@ class PushNotificationService {
     } catch (e) {
       debugPrint('[Push] Erro ao inicializar Firebase: $e');
     }
+  }
+
+  bool get isFirebaseInitialized => !kIsWeb && _messaging != null;
+
+  /// Prova apenas a disponibilidade do token no artefato final. O valor nunca
+  /// é persistido, enviado ao backend ou escrito em log por este método.
+  Future<bool> probeReleaseFcmTokenAvailability() async {
+    if (kIsWeb) return false;
+    await init();
+    final token = await _messaging?.getToken();
+    return token?.trim().isNotEmpty == true;
   }
 
   /// Solicita permissão e registra FCM token no server.

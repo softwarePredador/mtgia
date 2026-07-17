@@ -1,5 +1,9 @@
 /// Deck Model - Representa um deck do usuário
 class Deck {
+  static const validationStateUnknown = 'unknown';
+  static const validationStateDraft = 'draft';
+  static const validationStateValidated = 'validated';
+
   final String id;
   final String name;
   final String format;
@@ -21,6 +25,12 @@ class Deck {
   final int cardCount;
   final List<String> colorIdentity;
   final bool colorIdentityKnown;
+  final String validationState;
+  final List<String> reviewReasons;
+  final DateTime? validationUpdatedAt;
+
+  bool get requiresReview => validationState != validationStateValidated;
+  bool get isValidated => validationState == validationStateValidated;
 
   Deck({
     required this.id,
@@ -43,6 +53,9 @@ class Deck {
     this.cardCount = 0,
     this.colorIdentity = const [],
     bool? colorIdentityKnown,
+    this.validationState = validationStateUnknown,
+    this.reviewReasons = const ['validation_not_recorded'],
+    this.validationUpdatedAt,
   }) : colorIdentityKnown = colorIdentityKnown ?? colorIdentity.isNotEmpty;
 
   /// Factory para criar Deck a partir de JSON (API response)
@@ -77,6 +90,9 @@ class Deck {
       colorIdentityKnown:
           json['color_identity_known'] as bool? ??
           json['color_identity'] is List,
+      validationState: _normalizeValidationState(json['deck_state']),
+      reviewReasons: _normalizeReviewReasons(json['review_reasons']),
+      validationUpdatedAt: _parseDateTime(json['validation_updated_at']),
     );
   }
 
@@ -102,6 +118,10 @@ class Deck {
       'created_at': createdAt.toIso8601String(),
       'card_count': cardCount,
       'color_identity': colorIdentity,
+      'deck_state': validationState,
+      'requires_review': requiresReview,
+      'review_reasons': reviewReasons,
+      'validation_updated_at': validationUpdatedAt?.toIso8601String(),
     };
   }
 
@@ -127,6 +147,9 @@ class Deck {
     int? cardCount,
     List<String>? colorIdentity,
     bool? colorIdentityKnown,
+    String? validationState,
+    List<String>? reviewReasons,
+    DateTime? validationUpdatedAt,
   }) {
     return Deck(
       id: id ?? this.id,
@@ -149,6 +172,36 @@ class Deck {
       cardCount: cardCount ?? this.cardCount,
       colorIdentity: colorIdentity ?? this.colorIdentity,
       colorIdentityKnown: colorIdentityKnown ?? this.colorIdentityKnown,
+      validationState: validationState ?? this.validationState,
+      reviewReasons: reviewReasons ?? this.reviewReasons,
+      validationUpdatedAt: validationUpdatedAt ?? this.validationUpdatedAt,
     );
   }
+}
+
+String _normalizeValidationState(Object? value) {
+  return switch (value?.toString().trim().toLowerCase()) {
+    Deck.validationStateDraft => Deck.validationStateDraft,
+    Deck.validationStateValidated => Deck.validationStateValidated,
+    _ => Deck.validationStateUnknown,
+  };
+}
+
+List<String> _normalizeReviewReasons(Object? value) {
+  if (value is! List) {
+    return const ['validation_not_recorded'];
+  }
+  final reasons = <String>[];
+  for (final entry in value) {
+    final reason = entry?.toString().trim() ?? '';
+    if (reason.isNotEmpty && !reasons.contains(reason)) {
+      reasons.add(reason);
+    }
+  }
+  return List<String>.unmodifiable(reasons);
+}
+
+DateTime? _parseDateTime(Object? value) {
+  if (value is DateTime) return value;
+  return value == null ? null : DateTime.tryParse(value.toString());
 }

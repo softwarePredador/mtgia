@@ -6,6 +6,8 @@ import 'package:manaloom/features/decks/widgets/deck_optimize_flow_support.dart'
 import 'package:manaloom/features/decks/widgets/deck_optimize_sections.dart';
 import 'package:manaloom/features/decks/widgets/deck_optimize_ui_support.dart';
 
+import '../../../support/list_tile_material_test_support.dart';
+
 void main() {
   testWidgets('guided rebuild dialog renders expected copy', (tester) async {
     await tester.pumpWidget(
@@ -56,6 +58,8 @@ void main() {
         ),
       );
 
+      expectListTileInkIsUnobscured(tester);
+
       expect(
         find.byKey(const Key('optimize-recommendation-context-summary')),
         findsOneWidget,
@@ -86,6 +90,8 @@ void main() {
         ),
       ),
     );
+
+    expectListTileInkIsUnobscured(tester);
 
     expect(find.text('4 - Optimized'), findsOneWidget);
     expect(find.textContaining('sem tratar a mesa como cEDH'), findsOneWidget);

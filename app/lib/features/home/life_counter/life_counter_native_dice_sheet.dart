@@ -44,7 +44,14 @@ class _LifeCounterNativeDiceSheetState
   late LifeCounterSession _draftSession;
 
   Set<int> get _highRollWinners =>
-      LifeCounterDiceEngine.deriveHighRollWinners(_draftSession.lastHighRolls);
+      LifeCounterDiceEngine.deriveHighRollWinners(
+        _draftSession.lastHighRolls,
+      ).where((playerIndex) {
+        return LifeCounterTabletopEngine.isPlayerActiveOnTable(
+          _draftSession,
+          playerIndex: playerIndex,
+        );
+      }).toSet();
 
   bool get _hasPendingTieBreak => _highRollWinners.length > 1;
   bool get _hasAnyActivePlayers =>

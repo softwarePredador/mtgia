@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import importlib.util
+import re
 import unittest
 from pathlib import Path
 
@@ -49,6 +50,33 @@ class ManaLoomBattleProductE2EAuditTest(unittest.TestCase):
                 all(check["status"] == "pass" for check in checks_by_path[path]),
                 path,
             )
+
+    def test_setup_java_uses_a_sha_pin_with_a_version_comment(self) -> None:
+        report = AUDIT.build_report()
+        workflow_checks = [
+            check
+            for check in report["checks"]
+            if check["path"] == ".github/workflows/manaloom-guardrails.yml"
+        ]
+        self.assertGreaterEqual(len(workflow_checks), 2)
+        self.assertTrue(
+            all(check["status"] == "pass" for check in workflow_checks),
+            workflow_checks,
+        )
+
+        workflow = (
+            REPO_ROOT / ".github" / "workflows" / "manaloom-guardrails.yml"
+        ).read_text(encoding="utf-8")
+        self.assertRegex(
+            workflow,
+            re.compile(
+                r"uses:\s*actions/setup-java@[0-9a-f]{40}\s+#\s+v\d+\.\d+\.\d+"
+            ),
+        )
+        self.assertNotRegex(
+            workflow,
+            re.compile(r"uses:\s*actions/setup-java@v\d+"),
+        )
 
     def test_mutating_battle_contract_is_isolated_and_not_a_static_skip(self) -> None:
         report = AUDIT.build_report()

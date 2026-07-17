@@ -14,6 +14,9 @@ SIDECAR = REPO_ROOT / "services/xmage-sidecar"
 FORGE_SIDECAR = REPO_ROOT / "services/forge-sidecar"
 SERVER = REPO_ROOT / "server"
 BATTLE_REQUEST_SUPPORT = SERVER / "lib/ai/battle_simulation_request_support.dart"
+BATTLE_PERSISTENCE_SERVICE = (
+    SERVER / "lib/battle/battle_simulation_persistence_service.dart"
+)
 CONTRACT = REPO_ROOT / "docs/hermes-analysis/EXTERNAL_BATTLE_EXECUTION_CONTRACT.md"
 CLOSURE = REPO_ROOT / "docs/hermes-analysis/GLOBAL_BATTLE_RULES_AND_LEARNING_CLOSURE_2026-07-15.md"
 RULE_SYNC = REPO_ROOT / "docs/hermes-analysis/manaloom-knowledge/scripts/sync_battle_card_rules_pg.py"
@@ -218,11 +221,12 @@ def build_report() -> dict[str, object]:
             REPO_ROOT / "scripts/manaloom_deploy_battle_sidecars.sh",
             [
                 "HEAD must match origin/master before sidecar deploy",
-                "services.app.createService",
+                "deploy recusado: sidecar EasyPanel existente e obrigatorio",
+                "validate_sidecar_baseline",
                 "services.app.updateSourceImage",
                 "wait_for_sidecar_health()",
-                'wait_for_sidecar_health "${PROJECT}_${XMAGE_SERVICE}" "$XMAGE_SERVICE"',
-                'wait_for_sidecar_health "${PROJECT}_${FORGE_SERVICE}" "$FORGE_SERVICE"',
+                '"${PROJECT}_${XMAGE_SERVICE}" "$XMAGE_SERVICE" catalog_ready',
+                '"${PROJECT}_${FORGE_SERVICE}" "$FORGE_SERVICE"',
                 '"${PROJECT}_${NATIVE_SERVICE}"',
                 "native_reviewed_rules_execution",
                 '"$XMAGE_SERVICE" catalog_ready',
@@ -250,7 +254,7 @@ def build_report() -> dict[str, object]:
                 "--detach=true",
                 "running_image=",
                 "update_state=",
-                "deploy convergiu com imagem mutavel ou SHA divergente",
+                "deploy convergiu sem o digest exato na spec/tarefa",
             ],
         ),
         source_check(
@@ -347,9 +351,23 @@ def build_report() -> dict[str, object]:
                 "upstreamStatusCode == HttpStatus.gatewayTimeout",
                 "'${engine}_timeout'",
                 "winner_deck_id",
-                "turns_played",
-                "_simulationMetrics",
+                "BattleSimulationPersistenceService(pool).save",
+                "canonicalBattleWinnerDeckId(",
+                "'replay_id': persistence.replayId",
+                "_simulationPersistenceFailure(",
                 "buildBattleLearningEvidence(",
+            ],
+        ),
+        source_check(
+            "server.battle_persistence",
+            BATTLE_PERSISTENCE_SERVICE,
+            [
+                "class BattleSimulationPersistenceService",
+                "RETURNING id::text",
+                "'turns_played'",
+                "_simulationMetrics(",
+                "canonicalBattleWinnerDeckId(",
+                "BattleSimulationPersistenceOutcome.failed(",
             ],
         ),
         source_check(

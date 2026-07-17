@@ -1,8 +1,11 @@
 import 'dart:async';
+import 'dart:convert';
+import 'dart:math';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:sentry_flutter/sentry_flutter.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../features/auth/models/user.dart';
 
@@ -27,6 +30,18 @@ class AppObservability {
     'SENTRY_TRACES_SAMPLE_RATE',
     defaultValue: '0',
   );
+  static const bool _releaseStartupProofEnabled = bool.fromEnvironment(
+    'RELEASE_STARTUP_PROOF',
+    defaultValue: false,
+  );
+  static const String _releaseGitSha = String.fromEnvironment(
+    'RELEASE_GIT_SHA',
+    defaultValue: '',
+  );
+  static const String _releaseIdentitySha256 = String.fromEnvironment(
+    'RELEASE_IDENTITY_SHA256',
+    defaultValue: '',
+  );
   static const Duration _sentryStartupTimeout = Duration(seconds: 5);
 
   bool _globalHandlersAttached = false;
@@ -34,6 +49,8 @@ class AppObservability {
   bool _sentryReady = false;
 
   bool get isEnabled => _dsn.trim().isNotEmpty;
+
+  bool get releaseStartupProofEnabled => _releaseStartupProofEnabled;
 
   @visibleForTesting
   bool get isReadyForTesting => _sentryReady;
@@ -120,6 +137,87 @@ class AppObservability {
     } catch (error) {
       debugPrint('[Observability] Sentry indisponivel no boot: $error');
     }
+  }
+
+  /// Emite uma prova black-box, uma vez por instalação e por identidade de
+  /// release. O evento não inclui token FCM nem identificador de usuário.
+  /// O gate externo cruza o event id visto no log do APK exato com a API Sentry.
+  Future<SentryId?> captureReleaseStartupProof({
+    required bool fcmInitialized,
+    required bool fcmTokenPresent,
+  }) async {
+    if (!_releaseStartupProofEnabled || kIsWeb) {
+      return null;
+    }
+    if (!RegExp(r'^[0-9a-f]{40}$').hasMatch(_releaseGitSha) ||
+        !RegExp(r'^[0-9a-f]{64}$').hasMatch(_releaseIdentitySha256)) {
+      debugPrint(
+        'MANALOOM_RELEASE_STARTUP_PROOF status=invalid_release_identity',
+      );
+      return null;
+    }
+
+    for (var attempt = 0; attempt < 100 && !_sentryReady; attempt++) {
+      await Future<void>.delayed(const Duration(milliseconds: 100));
+    }
+    if (!_sentryReady) {
+      debugPrint('MANALOOM_RELEASE_STARTUP_PROOF status=sentry_not_ready');
+      return null;
+    }
+
+    final preferences = await SharedPreferences.getInstance();
+    final sentKey =
+        'manaloom.release_startup_proof.$_releaseIdentitySha256.sent';
+    if (preferences.getBool(sentKey) == true) {
+      debugPrint('MANALOOM_RELEASE_STARTUP_PROOF status=already_sent');
+      return null;
+    }
+
+    final secureRandom = Random.secure();
+    final randomBytes = List<int>.generate(
+      18,
+      (_) => secureRandom.nextInt(256),
+      growable: false,
+    );
+    final installSessionId = base64UrlEncode(randomBytes).replaceAll('=', '');
+    final eventId = await Sentry.captureMessage(
+      'manaloom_release_startup_proof',
+      level: SentryLevel.info,
+      withScope: (scope) {
+        scope.setTag('proof_type', 'release_startup');
+        scope.setTag('git_sha', _releaseGitSha);
+        scope.setTag('release_identity_sha256', _releaseIdentitySha256);
+        scope.setTag('install_session_id', installSessionId);
+        scope.setTag('package_name', 'com.mtgia.mtg_app');
+        scope.setTag('fcm_initialized', fcmInitialized.toString());
+        scope.setTag('fcm_token_present', fcmTokenPresent.toString());
+        scope.setContexts('release_startup_proof', {
+          'git_sha': _releaseGitSha,
+          'release_identity_sha256': _releaseIdentitySha256,
+          'install_session_id': installSessionId,
+          'fcm_initialized': fcmInitialized,
+          'fcm_token_present': fcmTokenPresent,
+        });
+      },
+    );
+    // O SDK não expõe flush público nesta versão; damos uma janela curta
+    // ao transporte e o gate confirma a ingestão pela API antes de aprovar.
+    await Future<void>.delayed(const Duration(seconds: 2));
+
+    final eventIdText = eventId.toString();
+    if (!RegExp(r'^[0-9a-f]{32}$').hasMatch(eventIdText)) {
+      debugPrint('MANALOOM_RELEASE_STARTUP_PROOF status=invalid_event_id');
+      return null;
+    }
+    await preferences.setBool(sentKey, true);
+    debugPrint(
+      'MANALOOM_RELEASE_STARTUP_PROOF status=captured '
+      'event_id=$eventIdText install_session_id=$installSessionId '
+      'git_sha=$_releaseGitSha '
+      'release_identity_sha256=$_releaseIdentitySha256 '
+      'fcm_initialized=$fcmInitialized fcm_token_present=$fcmTokenPresent',
+    );
+    return eventId;
   }
 
   Future<void> setCurrentRoute(String route) async {

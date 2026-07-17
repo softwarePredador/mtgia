@@ -78,40 +78,45 @@ class DialogSectionCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(14),
-      decoration: BoxDecoration(
-        color: AppTheme.surfaceSlate,
+    return Material(
+      color: AppTheme.surfaceSlate,
+      shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(AppTheme.radiusMd),
-        border: Border.all(
+        side: BorderSide(
           color: accent.withValues(alpha: 0.2),
           width: AppTheme.strokeMedium,
         ),
       ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
+      clipBehavior: Clip.antiAlias,
+      child: SizedBox(
+        width: double.infinity,
+        child: Padding(
+          padding: const EdgeInsets.all(14),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              if (icon != null) ...[
-                Icon(icon, size: 16, color: accent),
-                const SizedBox(width: 8),
-              ],
-              Expanded(
-                child: Text(
-                  title,
-                  style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                    color: AppTheme.textPrimary,
-                    fontWeight: FontWeight.w700,
+              Row(
+                children: [
+                  if (icon != null) ...[
+                    Icon(icon, size: 16, color: accent),
+                    const SizedBox(width: 8),
+                  ],
+                  Expanded(
+                    child: Text(
+                      title,
+                      style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                        color: AppTheme.textPrimary,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
                   ),
-                ),
+                ],
               ),
+              const SizedBox(height: 10),
+              child,
             ],
           ),
-          const SizedBox(height: 10),
-          child,
-        ],
+        ),
       ),
     );
   }

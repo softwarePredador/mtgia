@@ -101,7 +101,7 @@ Future<void> clearRuntimeAuth() async {
 Future<RuntimeAuthSession> seedAuthenticatedSession(
   ApiClient api, {
   String usernamePrefix = 'runtime_qa',
-  String password = 'Qa123456!',
+  String password = 'BetaQa!2026-Deck',
 }) async {
   final unique = DateTime.now().millisecondsSinceEpoch.toRadixString(16);
   final username = '${usernamePrefix}_$unique';

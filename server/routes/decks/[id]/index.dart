@@ -6,6 +6,7 @@ import '../../../lib/deck_rules_service.dart';
 import '../../../lib/deck_card_name_resolution_support.dart';
 import '../../../lib/commander_bracket.dart';
 import '../../../lib/deck_schema_support.dart';
+import '../../../lib/deck_validation_state_support.dart';
 import '../../../lib/decks/deck_optimization_history_service.dart';
 import '../../../lib/basic_land_utils.dart' as land_utils;
 import '../../../lib/http_responses.dart';
@@ -74,6 +75,7 @@ Future<Response> _updateDeck(RequestContext context, String deckId) async {
   final userId = context.read<String>();
   final conn = context.read<Pool>();
   final hasMeta = await hasDeckMetaColumns(conn);
+  final hasValidationState = await hasDeckValidationStateColumns(conn);
 
   final body = await context.request.json();
   final name = body['name'] as String?;
@@ -284,7 +286,12 @@ Future<Response> _updateDeck(RequestContext context, String deckId) async {
           deckMap[key] = (deckMap[key] as DateTime).toIso8601String();
         }
       }
-      return deckMap;
+      if (!hasValidationState) {
+        deckMap
+          ..['validation_state'] = deckValidationStateUnknown
+          ..['validation_reasons'] = const [deckValidationReasonNotRecorded];
+      }
+      return exposeDeckValidationState(deckMap);
     });
 
     if (cards != null && mutationContext.isNotEmpty) {
@@ -322,6 +329,7 @@ Future<Response> _getDeckById(RequestContext context, String deckId) async {
   final conn = context.read<Pool>();
   final hasMeta = await hasDeckMetaColumns(conn);
   final hasPricing = await hasDeckPricingColumns(conn);
+  final hasValidationState = await hasDeckValidationStateColumns(conn);
   final hasSets = await _hasTable(conn, 'sets');
 
   try {
@@ -335,6 +343,9 @@ Future<Response> _getDeckById(RequestContext context, String deckId) async {
               : 'NULL::text as archetype, NULL::int as bracket,',
           'synergy_score, strengths, weaknesses,',
           'is_public,',
+          hasValidationState
+              ? 'validation_state, validation_reasons, validation_updated_at,'
+              : "'unknown'::text as validation_state, '[\"validation_not_recorded\"]'::jsonb as validation_reasons, NULL::timestamptz as validation_updated_at,",
           hasPricing
               ? 'pricing_currency, pricing_total, pricing_missing_cards, pricing_updated_at,'
               : "NULL::text as pricing_currency, NULL::numeric as pricing_total, 0::int as pricing_missing_cards, NULL::timestamptz as pricing_updated_at,",
@@ -360,6 +371,11 @@ Future<Response> _getDeckById(RequestContext context, String deckId) async {
       deckInfo['pricing_updated_at'] =
           (deckInfo['pricing_updated_at'] as DateTime).toIso8601String();
     }
+    if (deckInfo['validation_updated_at'] is DateTime) {
+      deckInfo['validation_updated_at'] =
+          (deckInfo['validation_updated_at'] as DateTime).toIso8601String();
+    }
+    exposeDeckValidationState(deckInfo);
     // PostgreSQL DECIMAL retorna String, converter para double
     final rawPricingTotal = deckInfo['pricing_total'];
     if (rawPricingTotal is String) {

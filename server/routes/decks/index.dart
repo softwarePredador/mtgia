@@ -4,6 +4,7 @@ import 'package:dart_frog/dart_frog.dart';
 import 'package:postgres/postgres.dart';
 
 import '../../lib/deck_schema_support.dart';
+import '../../lib/deck_validation_state_support.dart';
 import '../../lib/deck_card_name_resolution_support.dart';
 import '../../lib/commander_bracket.dart';
 import '../../lib/deck_rules_service.dart';
@@ -41,7 +42,8 @@ Future<Response> _listDecks(RequestContext context) async {
     Log.d('🔍 Executando query SELECT...');
     final hasMeta = await hasDeckMetaColumns(conn);
     final hasPricing = await hasDeckPricingColumns(conn);
-    final sql =
+    final hasValidationState = await hasDeckValidationStateColumns(conn);
+    final baseSql =
         hasMeta
             ? (hasPricing
                 ? '''
@@ -181,6 +183,22 @@ Future<Response> _listDecks(RequestContext context) async {
         GROUP BY d.id, cmd.commander_name, cmd.commander_image_url
         ORDER BY d.created_at DESC
       ''');
+    final validationColumns =
+        hasValidationState
+            ? '''
+          d.validation_state,
+          d.validation_reasons,
+          d.validation_updated_at,
+        '''
+            : '''
+          'unknown'::text AS validation_state,
+          '["validation_not_recorded"]'::jsonb AS validation_reasons,
+          NULL::timestamptz AS validation_updated_at,
+        ''';
+    final sql = baseSql.replaceAll(
+      'd.is_public,',
+      'd.is_public,$validationColumns',
+    );
 
     final result = await conn.execute(
       Sql.named(sql),
@@ -199,6 +217,10 @@ Future<Response> _listDecks(RequestContext context) async {
             map['pricing_updated_at'] =
                 (map['pricing_updated_at'] as DateTime).toIso8601String();
           }
+          if (map['validation_updated_at'] is DateTime) {
+            map['validation_updated_at'] =
+                (map['validation_updated_at'] as DateTime).toIso8601String();
+          }
           map['commander_image_url'] = normalizeScryfallImageUrl(
             map['commander_image_url']?.toString(),
           );
@@ -209,7 +231,7 @@ Future<Response> _listDecks(RequestContext context) async {
           } else if (rawPricingTotal is num) {
             map['pricing_total'] = rawPricingTotal.toDouble();
           }
-          return map;
+          return exposeDeckValidationState(map);
         }).toList();
 
     // ── Fetch color identity for each deck (batch) ──────────────
@@ -307,6 +329,7 @@ Future<Response> _createDeck(RequestContext context) async {
 
   final conn = context.read<Pool>();
   final hasMeta = await hasDeckMetaColumns(conn);
+  final hasValidationState = await hasDeckValidationStateColumns(conn);
 
   // 3. Usar uma transação para garantir a consistência dos dados
   try {
@@ -430,7 +453,29 @@ Future<Response> _createDeck(RequestContext context) async {
         '[DECK_CREATE_TIMING] insert_cards_done elapsed_ms=${stopwatch.elapsedMilliseconds}',
       );
 
-      return deckMap;
+      if (hasValidationState) {
+        final validationResult = await session.execute(
+          Sql.named('''
+            SELECT validation_state,
+                   validation_reasons,
+                   validation_updated_at
+            FROM decks
+            WHERE id = @deckId
+          '''),
+          parameters: {'deckId': newDeckId},
+        );
+        deckMap.addAll(validationResult.first.toColumnMap());
+        if (deckMap['validation_updated_at'] is DateTime) {
+          deckMap['validation_updated_at'] =
+              (deckMap['validation_updated_at'] as DateTime).toIso8601String();
+        }
+      } else {
+        deckMap
+          ..['validation_state'] = deckValidationStateUnknown
+          ..['validation_reasons'] = const [deckValidationReasonNotRecorded];
+      }
+
+      return exposeDeckValidationState(deckMap);
     });
 
     final productLearningEnabled = shouldWriteProductLearning();

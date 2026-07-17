@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import '../../../core/theme/app_theme.dart';
 import '../auth_redirect.dart';
+import '../password_policy.dart';
 import '../providers/auth_provider.dart';
 import '../widgets/auth_visual_shell.dart';
 
@@ -175,6 +176,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     decoration: InputDecoration(
                       labelText: 'Senha',
                       hintText: '••••••••',
+                      helperText:
+                          'Use 12+ caracteres e evite sequências, seu nome ou email.',
                       prefixIcon: const Icon(Icons.lock_outline),
                       suffixIcon: IconButton(
                         tooltip:
@@ -198,15 +201,12 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       filled: true,
                       fillColor: theme.colorScheme.surface,
                     ),
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Digite uma senha';
-                      }
-                      if (value.length < 6) {
-                        return 'Senha deve ter no mínimo 6 caracteres';
-                      }
-                      return null;
-                    },
+                    validator:
+                        (value) => validateRegistrationPassword(
+                          value,
+                          username: _usernameController.text,
+                          email: _emailController.text,
+                        ),
                   ),
                   const SizedBox(height: 16),
 

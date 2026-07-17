@@ -16,6 +16,8 @@ import 'package:manaloom/features/home/lotus/lotus_storage_snapshot_store.dart';
 import 'package:manaloom/features/home/lotus_life_counter_screen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../../support/list_tile_material_test_support.dart';
+
 class _FakeLotusHost implements LotusHost, LotusCanonicalStorageRebaser {
   _FakeLotusHost({required this.onShellMessageRequested});
 
@@ -159,6 +161,7 @@ void main() {
         await tester.pumpAndSettle();
 
         expect(find.text('Configurações do contador de vida'), findsOneWidget);
+        expectListTileInkIsUnobscured(tester);
 
         await tester.tap(find.text('Nocaute automático'));
         await tester.pumpAndSettle();
@@ -855,9 +858,48 @@ void main() {
 
       expect(
         find.text(
-          'External shortcut disabled while ManaLoom owns the life counter shell.',
+          'Este atalho externo não está disponível dentro do contador de vida.',
         ),
         findsOneWidget,
+      );
+    });
+
+    testWidgets('does not expose analytics messages as customer feedback', (
+      tester,
+    ) async {
+      late _FakeLotusHost host;
+
+      await tester.pumpWidget(
+        MaterialApp(
+          home: LotusLifeCounterScreen(
+            hostFactory: ({
+              required onAppReviewRequested,
+              required onShellMessageRequested,
+            }) {
+              host = _FakeLotusHost(
+                onShellMessageRequested: onShellMessageRequested,
+              )..completeSuccessfulLoad();
+              return host;
+            },
+          ),
+        ),
+      );
+
+      await tester.pump();
+      await tester.pump();
+
+      host.emitShellMessage(
+        '{"type":"analytics","name":"menu_overlay_opened",'
+        '"category":"life_counter.shell","data":{"selector":"menu"}}',
+      );
+      await tester.pump();
+
+      expect(find.byType(SnackBar), findsNothing);
+      expect(
+        find.text(
+          'Este atalho externo não está disponível dentro do contador de vida.',
+        ),
+        findsNothing,
       );
     });
   });

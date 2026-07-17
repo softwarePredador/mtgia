@@ -32,6 +32,9 @@ Map<String, dynamic> parseImportDeckResponse(ApiResponse response) {
       'localized_matches_count': data['localized_matches_count'] ?? 0,
       'warnings': data['warnings'] ?? const <String>[],
       'is_partial': data['is_partial'] == true,
+      'deck_state': data['deck_state']?.toString(),
+      'requires_review': data['requires_review'] == true,
+      'validation': data['validation'] ?? const <String, dynamic>{},
       'commander_detected': data['commander_detected'] == true,
       'missing_commander': data['missing_commander'] == true,
     };

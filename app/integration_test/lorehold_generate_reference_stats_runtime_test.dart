@@ -206,7 +206,7 @@ void main() {
         attempts: 60,
       );
       final unique = DateTime.now().millisecondsSinceEpoch.toRadixString(16);
-      const password = 'Qa123456!';
+      const password = 'BetaQa!2026-Deck';
       final username = 'qa_lorehold_runtime_$unique';
       final email = '$username@example.invalid';
 

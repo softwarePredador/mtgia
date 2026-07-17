@@ -590,6 +590,10 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen>
       _diagnosticPayloadForShellMessage(message),
     );
 
+    var shouldShowBlockedExternalFeedback = message.startsWith(
+      'ManaLoom blocked an external link:',
+    );
+
     try {
       final decoded = jsonDecode(message);
       if (decoded is Map<String, dynamic>) {
@@ -599,6 +603,36 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen>
           // Integration tests use debug_* shell messages to fetch DOM state.
           // Avoid snackbars / native fallbacks.
           return;
+        }
+
+        if (type == LotusShellMessageTypes.analytics) {
+          final name = decoded['name'];
+          final category = decoded['category'];
+          if (name is String && category is String) {
+            final data = <String, Object?>{};
+            final rawData = decoded['data'];
+            if (rawData is Map) {
+              for (final entry in rawData.entries) {
+                final key = entry.key;
+                if (key is String) {
+                  data[key] = entry.value;
+                }
+              }
+            }
+            unawaited(
+              AppObservability.instance.recordEvent(
+                name,
+                category: category,
+                data: data,
+              ),
+            );
+          }
+          return;
+        }
+
+        if (type == LotusShellMessageTypes.blockedWindowOpen ||
+            type == LotusShellMessageTypes.blockedLink) {
+          shouldShowBlockedExternalFeedback = true;
         }
 
         if (type == LotusShellMessageTypes.closeLifeCounter) {
@@ -772,8 +806,16 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen>
           );
           return;
         }
+
+        if (!shouldShowBlockedExternalFeedback) {
+          return;
+        }
       }
     } catch (_) {}
+
+    if (!shouldShowBlockedExternalFeedback) {
+      return;
+    }
 
     final now = DateTime.now();
     if (_lastShellMessageAt != null &&
@@ -783,35 +825,15 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen>
 
     _lastShellMessageAt = now;
 
-    var displayMessage =
-        'External shortcut disabled while ManaLoom owns the life counter shell.';
-    try {
-      final decoded = jsonDecode(message);
-      if (decoded is Map<String, dynamic>) {
-        final type = decoded['type'];
-        if (type == LotusShellMessageTypes.blockedWindowOpen ||
-            type == LotusShellMessageTypes.blockedLink) {
-          displayMessage =
-              'External shortcut disabled while ManaLoom owns the life counter shell.';
-        }
-      } else if (message.startsWith('ManaLoom blocked an external link:')) {
-        displayMessage =
-            'External shortcut disabled while ManaLoom owns the life counter shell.';
-      }
-    } catch (_) {
-      if (message.startsWith('ManaLoom blocked an external link:')) {
-        displayMessage =
-            'External shortcut disabled while ManaLoom owns the life counter shell.';
-      }
-    }
-
     ScaffoldMessenger.maybeOf(context)
       ?..hideCurrentSnackBar()
       ..showSnackBar(
-        SnackBar(
-          content: Text(displayMessage),
+        const SnackBar(
+          content: Text(
+            'Este atalho externo não está disponível dentro do contador de vida.',
+          ),
           behavior: SnackBarBehavior.floating,
-          duration: const Duration(seconds: 3),
+          duration: Duration(seconds: 3),
         ),
       );
   }

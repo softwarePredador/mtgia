@@ -2,6 +2,8 @@
 set -u -o pipefail
 
 ROOT_DIR="$(cd "$(dirname "$0")/.." && pwd)"
+# shellcheck source=scripts/lib/manaloom_mutation_guard.sh
+source "$ROOT_DIR/scripts/lib/manaloom_mutation_guard.sh"
 REPORT_DIR="${MANALOOM_DEEP_AI_REPORT_DIR:-/tmp/manaloom_deep_ai_alignment_reports}"
 TS="$(date -u +%Y%m%d_%H%M%S)"
 RUN_ID="deep_ai_alignment_${TS}"
@@ -52,7 +54,7 @@ run_step() {
 run_pg_counts() {
   local sql
   sql="SELECT 'cards', count(*) FROM cards UNION ALL SELECT 'card_intelligence_snapshot', count(*) FROM card_intelligence_snapshot UNION ALL SELECT 'card_function_tags', count(*) FROM card_function_tags UNION ALL SELECT 'card_semantic_tags_v2', count(*) FROM card_semantic_tags_v2 UNION ALL SELECT 'card_battle_rules', count(*) FROM card_battle_rules UNION ALL SELECT 'commander_learned_decks', count(*) FROM commander_learned_decks UNION ALL SELECT 'commander_learning_snapshot', count(*) FROM commander_learning_snapshot ORDER BY 1;"
-  run_step "New PostgreSQL data counts" "\"$ROOT_DIR/server/bin/with_new_server_pg.sh\" psql -X -A -t -F '|' -c \"$sql\""
+  run_step "New PostgreSQL data counts" "\"$ROOT_DIR/server/bin/with_new_server_pg.sh\" --read-only psql -X -A -t -F '|' -c \"$sql\""
 }
 
 run_auditors() {
@@ -72,7 +74,7 @@ run_auditors() {
     "python3 \"$ROOT_DIR/docs/hermes-analysis/manaloom-knowledge/scripts/legacy_contamination_audit.py\" --out-prefix \"$REPORT_DIR/legacy_contamination_audit_${TS}_deep_ai_tester\""
 
   run_step "PG Hermes SQLite contract audit through new PostgreSQL" \
-    "\"$ROOT_DIR/server/bin/with_new_server_pg.sh\" python3 \"$ROOT_DIR/docs/hermes-analysis/manaloom-knowledge/scripts/pg_hermes_sqlite_contract_audit.py\" --out-prefix \"$REPORT_DIR/pg_hermes_sqlite_contract_audit_${TS}_deep_ai_tester\""
+    "\"$ROOT_DIR/server/bin/with_new_server_pg.sh\" --write-approved python3 \"$ROOT_DIR/docs/hermes-analysis/manaloom-knowledge/scripts/pg_hermes_sqlite_contract_audit.py\" --out-prefix \"$REPORT_DIR/pg_hermes_sqlite_contract_audit_${TS}_deep_ai_tester\""
 }
 
 write_final_summary() {
@@ -105,7 +107,9 @@ main() {
   if [[ -x "$ROOT_DIR/scripts/manaloom_old_server_reference_audit.sh" ]]; then
     run_step "ManaLoom server target audit" "\"$ROOT_DIR/scripts/manaloom_old_server_reference_audit.sh\""
   fi
-  run_step "New PostgreSQL migration status" "\"$ROOT_DIR/server/bin/with_new_server_pg.sh\" bash -lc 'cd \"$ROOT_DIR/server\" && dart run bin/migrate.dart --status'"
+  require_live_mutation_approval "ManaLoom deep AI PostgreSQL runners" || exit $?
+  require_postgres_write_approval "ManaLoom deep AI PostgreSQL runners" || exit $?
+  run_step "New PostgreSQL migration status" "\"$ROOT_DIR/server/bin/with_new_server_pg.sh\" --write-approved bash -lc 'cd \"$ROOT_DIR/server\" && dart run bin/migrate.dart --status'"
   run_pg_counts
   run_auditors
 

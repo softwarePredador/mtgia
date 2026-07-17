@@ -1,9 +1,11 @@
 import 'dart:convert';
 import 'dart:io';
+import 'dart:math';
 
 import 'package:http/http.dart' as http;
 
-const _defaultBaseUrl = 'https://evolution-cartinhas.2ta7qx.easypanel.host';
+const _defaultBaseUrl = 'http://127.0.0.1:8080';
+const _explicitApprovalPhrase = 'I_HAVE_EXPLICIT_APPROVAL';
 const _defaultCommander = 'Lorehold, the Historian';
 const _defaultPrompt =
     'Boros miracle big spells with topdeck setup and interaction';
@@ -15,7 +17,8 @@ Future<void> main(List<String> args) async {
     stdout.writeln('''
 Uso:
   dart run bin/lorehold_public_generator_parity_audit.dart \\
-    [--base-url=https://evolution-cartinhas.2ta7qx.easypanel.host] \\
+    --execute-stateful \\
+    [--base-url=http://127.0.0.1:8080] \\
     [--commander=Lorehold, the Historian] \\
     [--prompt=Boros miracle big spells with topdeck setup and interaction] \\
     [--artifact-dir=test/artifacts/lorehold_public_generator_parity_2026-06-16]
@@ -24,10 +27,33 @@ Uso:
   }
 
   final baseUrl = _readArg(args, '--base-url=') ?? _defaultBaseUrl;
+  if (!args.contains('--execute-stateful')) {
+    stderr.writeln(
+      'BLOCKED: o audit registra usuario e gera deck; use '
+      '--execute-stateful conscientemente.',
+    );
+    exitCode = 2;
+    return;
+  }
+  final target = Uri.parse(baseUrl);
+  final isLocalTarget =
+      target.scheme == 'http' &&
+      (target.host == '127.0.0.1' || target.host == 'localhost');
+  if (!isLocalTarget &&
+      Platform.environment['MANALOOM_CONFIRM_LIVE_MUTATIONS'] !=
+          _explicitApprovalPhrase) {
+    stderr.writeln(
+      'BLOCKED: destino nao local exige '
+      'MANALOOM_CONFIRM_LIVE_MUTATIONS=$_explicitApprovalPhrase.',
+    );
+    exitCode = 2;
+    return;
+  }
   final commander = _readArg(args, '--commander=') ?? _defaultCommander;
   final prompt = _readArg(args, '--prompt=') ?? _defaultPrompt;
-  final artifactDir =
-      Directory(_readArg(args, '--artifact-dir=') ?? _defaultArtifactDir);
+  final artifactDir = Directory(
+    _readArg(args, '--artifact-dir=') ?? _defaultArtifactDir,
+  );
   await artifactDir.create(recursive: true);
 
   final startedAt = DateTime.now().toUtc();
@@ -87,8 +113,8 @@ Uso:
       'generated_commander':
           generateMap(generate['body']['generated_deck'])['commander'] is Map
               ? (generateMap(
-                  generateMap(generate['body']['generated_deck'])['commander'],
-                ))['name']
+                generateMap(generate['body']['generated_deck'])['commander'],
+              ))['name']
               : null,
       'generated_cards_preview':
           (generateMap(generate['body']['generated_deck'])['cards'] as List?)
@@ -123,15 +149,17 @@ Uso:
     const JsonEncoder.withIndent('  ').convert(summary),
   );
 
-  stdout.writeln(jsonEncode({
-    'status': summary['status'],
-    'artifact': reportFile.path,
-    'generate_reference_profile_used': summary['generate']
-        ['reference_profile_used'],
-    'learning_profile_present': summary['commander_learning']
-        ['profile_present'],
-    'reference_model_source': summary['commander_reference']['model_source'],
-  }));
+  stdout.writeln(
+    jsonEncode({
+      'status': summary['status'],
+      'artifact': reportFile.path,
+      'generate_reference_profile_used':
+          summary['generate']['reference_profile_used'],
+      'learning_profile_present':
+          summary['commander_learning']['profile_present'],
+      'reference_model_source': summary['commander_reference']['model_source'],
+    }),
+  );
 }
 
 String? _readArg(List<String> args, String prefix) {
@@ -146,13 +174,19 @@ String? _readArg(List<String> args, String prefix) {
 
 Future<String> _registerProbeUser(String baseUrl) async {
   final suffix = DateTime.now().millisecondsSinceEpoch;
+  final random = Random.secure();
+  final password =
+      List<int>.generate(
+        32,
+        (_) => random.nextInt(94) + 33,
+      ).map(String.fromCharCode).join();
   final response = await http.post(
     Uri.parse('$baseUrl/auth/register'),
     headers: {'Content-Type': 'application/json'},
     body: jsonEncode({
       'username': 'lorehold_public_audit_$suffix',
       'email': 'lorehold_public_audit_$suffix@example.invalid',
-      'password': 'TestPassword123!',
+      'password': password,
     }),
   );
   final body = _decodeJson(response.body);

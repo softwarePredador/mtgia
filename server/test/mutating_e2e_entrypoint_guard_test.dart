@@ -68,13 +68,20 @@ void main() {
       },
     );
 
-    test('resolution corpus arms mutation only after preflight and approval', () {
+    test('resolution corpus gates every runner before mutation', () {
       final source = scriptSource('scripts/quality_gate_resolution_corpus.sh');
       final preflight = source.indexOf(
         'print_header "Preflight read-only do corpus"',
       );
-      final approval = source.indexOf(
-        'require_postgres_write_approval "Commander resolution corpus mutating E2E"',
+      final liveApproval = source.indexOf(
+        'require_live_mutation_approval "Commander resolution corpus PostgreSQL runner"',
+      );
+      final postgresApproval = source.indexOf(
+        'require_postgres_write_approval "Commander resolution corpus PostgreSQL runner"',
+      );
+      final preflightRunner = source.indexOf(
+        'with_new_server_pg.sh" --write-approved',
+        postgresApproval,
       );
       final identityPrecheck = source.indexOf('IDENTITY_BEFORE=');
       final serverStart = source.indexOf(r'SERVER_PID="$!"');
@@ -100,8 +107,10 @@ void main() {
       );
 
       expect(preflight, greaterThanOrEqualTo(0));
-      expect(approval, greaterThan(preflight));
-      expect(identityPrecheck, greaterThan(approval));
+      expect(liveApproval, greaterThan(preflight));
+      expect(postgresApproval, greaterThan(liveApproval));
+      expect(preflightRunner, greaterThan(postgresApproval));
+      expect(identityPrecheck, greaterThan(preflightRunner));
       expect(serverStart, greaterThan(identityPrecheck));
       expect(mutationArmed, greaterThan(serverStart));
       expect(runner, greaterThan(mutationArmed));
@@ -170,111 +179,116 @@ void main() {
       }
     });
 
-    test(
-      'Battle product E2E has an honest isolated mutating entrypoint',
-      () async {
-        final source = scriptSource('scripts/manaloom_battle_product_gate.sh');
-        final exactCleanup = source.substring(
-          source.indexOf('cleanup_battle_identity()'),
-          source.indexOf('cleanup_on_exit()'),
-        );
-        final staticStart = source.indexOf('run_static_gate()');
-        final isolatedStart = source.indexOf('run_isolated_e2e()');
-        final staticSource = source.substring(staticStart, isolatedStart);
-        final isolatedSource = source.substring(isolatedStart);
-        final approval = isolatedSource.indexOf(
-          'require_postgres_write_approval "Battle product isolated mutating E2E"',
-        );
-        final mutationArmed = isolatedSource.indexOf('MUTATION_ARMED=1');
-        final runner = isolatedSource.indexOf(
-          'dart test --reporter compact -j 1 test/battle_product_e2e_test.dart',
-        );
-        final runnerStatus = isolatedSource.indexOf(
-          r'runner_status="${PIPESTATUS[0]}"',
-          runner,
-        );
-        final listenerCheck = isolatedSource.indexOf(
-          'if ! assert_listener_closed',
-          runnerStatus,
-        );
-        final cleanup = isolatedSource.indexOf(
-          r'deleted="$(cleanup_battle_identity',
-          runnerStatus,
-        );
-        final audit = isolatedSource.indexOf('write_mutation_audit', cleanup);
+    test('Battle product E2E has an honest isolated mutating entrypoint', () async {
+      final source = scriptSource('scripts/manaloom_battle_product_gate.sh');
+      final exactCleanup = source.substring(
+        source.indexOf('cleanup_battle_identity()'),
+        source.indexOf('cleanup_on_exit()'),
+      );
+      final staticStart = source.indexOf('run_static_gate()');
+      final isolatedStart = source.indexOf('run_isolated_e2e()');
+      final staticSource = source.substring(staticStart, isolatedStart);
+      final isolatedSource = source.substring(isolatedStart);
+      final approval = isolatedSource.indexOf(
+        'require_postgres_write_approval "Battle product isolated mutating E2E"',
+      );
+      final liveApproval = isolatedSource.indexOf(
+        'require_live_mutation_approval "Battle product isolated mutating E2E"',
+      );
+      final mutationArmed = isolatedSource.indexOf('MUTATION_ARMED=1');
+      final runner = isolatedSource.indexOf(
+        'dart test --reporter compact -j 1 test/battle_product_e2e_test.dart',
+      );
+      final runnerStatus = isolatedSource.indexOf(
+        r'runner_status="${PIPESTATUS[0]}"',
+        runner,
+      );
+      final listenerCheck = isolatedSource.indexOf(
+        'if ! assert_listener_closed',
+        runnerStatus,
+      );
+      final cleanup = isolatedSource.indexOf(
+        r'deleted="$(cleanup_battle_identity',
+        runnerStatus,
+      );
+      final audit = isolatedSource.indexOf('write_mutation_audit', cleanup);
 
-        expect(staticStart, greaterThanOrEqualTo(0));
-        expect(isolatedStart, greaterThan(staticStart));
-        expect(
-          staticSource,
-          isNot(contains('test/battle_product_e2e_test.dart')),
-        );
-        expect(approval, greaterThanOrEqualTo(0));
-        expect(mutationArmed, greaterThan(approval));
-        expect(runner, greaterThan(mutationArmed));
-        expect(runnerStatus, greaterThan(runner));
-        expect(listenerCheck, greaterThan(runnerStatus));
-        expect(cleanup, greaterThan(listenerCheck));
-        expect(audit, greaterThan(cleanup));
-        expect(isolatedSource, contains('dart_frog build'));
-        expect(isolatedSource, contains('dart run build/bin/server.dart'));
-        expect(
-          isolatedSource,
-          contains('final address = InternetAddress.loopbackIPv4;'),
-        );
-        expect(isolatedSource, isNot(contains('dart_frog dev')));
-        expect(isolatedSource, isNot(contains('--dart-vm-service-port')));
-        expect(isolatedSource, contains('assert_loopback_listener'));
-        expect(isolatedSource, contains('assert_listener_closed'));
-        expect(isolatedSource, contains('API_LISTENER_PIDS='));
-        expect(isolatedSource, contains('NATIVE_LISTENER_PIDS='));
-        expect(source, contains('collect_process_tree_pids'));
-        expect(source, contains('kill -KILL'));
-        expect(source, contains('"runtime_cleanup"'));
-        expect(isolatedSource, contains('BATTLE_E2E_RUN_TOKEN'));
-        expect(isolatedSource, contains('BATTLE_E2E_DEFER_CLEANUP_TO_HARNESS'));
-        expect(source, contains('mutation_audit.json'));
-        expect(source, contains('"telemetry_deleted": False'));
-        expect(source, contains('DELETE FROM battle_simulations'));
-        expect(source, contains('DELETE FROM users'));
-        expect(source, contains('identity_collision_count()'));
-        expect(
-          exactCleanup,
-          contains("AND LOWER(username) = LOWER(:'validation_username')"),
-        );
-        expect(
-          exactCleanup,
-          isNot(contains("OR LOWER(username) = LOWER(:'validation_username')")),
-        );
+      expect(staticStart, greaterThanOrEqualTo(0));
+      expect(isolatedStart, greaterThan(staticStart));
+      expect(
+        staticSource,
+        isNot(contains('test/battle_product_e2e_test.dart')),
+      );
+      expect(liveApproval, greaterThanOrEqualTo(0));
+      expect(approval, greaterThan(liveApproval));
+      expect(mutationArmed, greaterThan(approval));
+      expect(
+        isolatedSource,
+        contains('with_new_server_pg.sh" --write-approved env'),
+      );
+      expect(runner, greaterThan(mutationArmed));
+      expect(runnerStatus, greaterThan(runner));
+      expect(listenerCheck, greaterThan(runnerStatus));
+      expect(cleanup, greaterThan(listenerCheck));
+      expect(audit, greaterThan(cleanup));
+      expect(isolatedSource, contains('dart_frog build'));
+      expect(isolatedSource, contains('dart run build/bin/server.dart'));
+      expect(
+        isolatedSource,
+        contains('final address = InternetAddress.loopbackIPv4;'),
+      );
+      expect(isolatedSource, isNot(contains('dart_frog dev')));
+      expect(isolatedSource, isNot(contains('--dart-vm-service-port')));
+      expect(isolatedSource, contains('assert_loopback_listener'));
+      expect(isolatedSource, contains('assert_listener_closed'));
+      expect(isolatedSource, contains('API_LISTENER_PIDS='));
+      expect(isolatedSource, contains('NATIVE_LISTENER_PIDS='));
+      expect(source, contains('collect_process_tree_pids'));
+      expect(source, contains('kill -KILL'));
+      expect(source, contains('"runtime_cleanup"'));
+      expect(isolatedSource, contains('BATTLE_E2E_RUN_TOKEN'));
+      expect(isolatedSource, contains('BATTLE_E2E_DEFER_CLEANUP_TO_HARNESS'));
+      expect(source, contains('mutation_audit.json'));
+      expect(source, contains('"telemetry_deleted": False'));
+      expect(source, contains('DELETE FROM battle_simulations'));
+      expect(source, contains('DELETE FROM users'));
+      expect(source, contains('identity_collision_count()'));
+      expect(
+        exactCleanup,
+        contains("AND LOWER(username) = LOWER(:'validation_username')"),
+      );
+      expect(
+        exactCleanup,
+        isNot(contains("OR LOWER(username) = LOWER(:'validation_username')")),
+      );
 
-        for (final table in const [
-          'ai_optimize_cache',
-          'ai_optimize_fallback_telemetry',
-          'ml_prompt_feedback',
-          'optimization_analysis_logs',
-          'ai_logs',
-          'rate_limit_events',
-        ]) {
-          expect(
-            source.toUpperCase(),
-            isNot(contains('DELETE FROM ${table.toUpperCase()}')),
-            reason: table,
-          );
-        }
-
-        final blocked = await Process.run(
-          'bash',
-          [
-            '$repoRoot/scripts/manaloom_battle_product_gate.sh',
-            '--isolated-e2e',
-          ],
-          environment: const {'MANALOOM_CONFIRM_POSTGRES_WRITES': ''},
-          includeParentEnvironment: true,
+      for (final table in const [
+        'ai_optimize_cache',
+        'ai_optimize_fallback_telemetry',
+        'ml_prompt_feedback',
+        'optimization_analysis_logs',
+        'ai_logs',
+        'rate_limit_events',
+      ]) {
+        expect(
+          source.toUpperCase(),
+          isNot(contains('DELETE FROM ${table.toUpperCase()}')),
+          reason: table,
         );
-        expect(blocked.exitCode, 2);
-        expect('${blocked.stderr}', contains('BLOCKED:'));
-      },
-    );
+      }
+
+      final blocked = await Process.run(
+        'bash',
+        ['$repoRoot/scripts/manaloom_battle_product_gate.sh', '--isolated-e2e'],
+        environment: const {
+          'MANALOOM_CONFIRM_LIVE_MUTATIONS': '',
+          'MANALOOM_CONFIRM_POSTGRES_WRITES': '',
+        },
+        includeParentEnvironment: true,
+      );
+      expect(blocked.exitCode, 2);
+      expect('${blocked.stderr}', contains('BLOCKED:'));
+    });
 
     test('E2E suite aggregates Battle isolated execution or a real skip', () {
       final source = scriptSource('scripts/manaloom_e2e_suite.sh');

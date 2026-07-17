@@ -104,9 +104,14 @@ Future<void> _initializePostFirstFramePlatformServices() async {
     debugPrint(
       '[Main] Firebase startup desabilitado por DISABLE_FIREBASE_STARTUP.',
     );
+    await AppObservability.instance.captureReleaseStartupProof(
+      fcmInitialized: false,
+      fcmTokenPresent: false,
+    );
     return;
   }
 
+  var fcmTokenPresent = false;
   if (_disablePushInit) {
     debugPrint('[Main] Firebase push desabilitado por DISABLE_PUSH_INIT.');
   } else {
@@ -115,7 +120,22 @@ Future<void> _initializePostFirstFramePlatformServices() async {
       timeout: const Duration(seconds: 8),
       task: () => PushNotificationService().init(),
     );
+    if (AppObservability.instance.releaseStartupProofEnabled &&
+        PushNotificationService().isFirebaseInitialized) {
+      try {
+        fcmTokenPresent = await PushNotificationService()
+            .probeReleaseFcmTokenAvailability()
+            .timeout(const Duration(seconds: 8));
+      } catch (error) {
+        debugPrint('[Main] Prova FCM da release indisponivel: $error');
+      }
+    }
   }
+
+  await AppObservability.instance.captureReleaseStartupProof(
+    fcmInitialized: PushNotificationService().isFirebaseInitialized,
+    fcmTokenPresent: fcmTokenPresent,
+  );
 
   if (_disableFirebasePerformanceInit) {
     debugPrint(

@@ -22,6 +22,8 @@ export 'deck_provider_support.dart'
         GenerateDeckProgressCallback,
         GenerateDeckProgressSnapshot,
         GenerateDeckTimeoutException,
+        generatedDeckReviewBlockingReasons,
+        isReviewableGeneratedDeckResult,
         maxAiGenerateCommanderNameLength,
         maxAiGeneratePromptLength;
 

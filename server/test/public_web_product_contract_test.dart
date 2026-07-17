@@ -99,19 +99,31 @@ void main() {
       expect(e2eSuite, contains('Public web product E2E'));
     });
 
+    test('public runtime exposes an uncached container health probe', () {
+      final dockerfile = File('../web-public/Dockerfile').readAsStringSync();
+      final health =
+          File('../web-public/src/app/healthz/route.ts').readAsStringSync();
+
+      expect(dockerfile, contains('/healthz'));
+      expect(health, contains('new Response("ok\\n"'));
+      expect(health, contains('no-cache, no-store, must-revalidate'));
+    });
+
     test('public deploy is pinned to master SHA and verifies production', () {
       final deploy =
           File('../scripts/manaloom_deploy_public_web.sh').readAsStringSync();
 
-      expect(deploy, contains(r'git -C "$ROOT_DIR" fetch origin master'));
       expect(
         deploy,
-        contains('HEAD local nao esta alinhado com origin/master'),
+        contains(r'"$ROOT_DIR/scripts/manaloom_release_identity.sh"'),
       );
+      expect(deploy, contains(r'MANALOOM_RELEASE_SOURCE_SHA='));
       expect(deploy, contains(r'IMAGE="$IMAGE_REPO:$SHORT_SHA"'));
       expect(deploy, contains("docker service update"));
-      expect(deploy, contains(r"--image '$IMAGE'"));
-      expect(deploy, contains(r'running_image" == "$IMAGE"'));
+      expect(deploy, contains(r"--image '$IMAGE_DIGEST_REF'"));
+      expect(deploy, contains(r'running_image" == "$IMAGE_DIGEST_REF"'));
+      expect(deploy, contains(r'"image_digest_ref":"%s"'));
+      expect(deploy, isNot(contains('StrictHostKeyChecking=accept-new')));
       expect(deploy, contains('/legal/disclaimer /robots.txt /sitemap.xml'));
       expect(deploy, contains("'^x-powered-by:'"));
     });

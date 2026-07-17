@@ -3,15 +3,44 @@ set -euo pipefail
 
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 ENV_FILE="${MTGIA_ENV_FILE:-$ROOT_DIR/server/.env}"
+# shellcheck source=scripts/lib/manaloom_mutation_guard.sh
+source "$ROOT_DIR/scripts/lib/manaloom_mutation_guard.sh"
+require_live_mutation_approval "smoke Sentry mobile em device"
+readonly LIVE_MUTATION_APPROVED=1
+: "$LIVE_MUTATION_APPROVED"
 
 if [[ ! -f "$ENV_FILE" ]]; then
   echo "Arquivo de ambiente nao encontrado: $ENV_FILE" >&2
   exit 1
 fi
 
-set -a
-source "$ENV_FILE"
-set +a
+CALLER_FLUTTER_BIN="${MANALOOM_FLUTTER_BIN_RESOLVED:-}"
+CALLER_EXPECTED_RELEASE="${MANALOOM_EXPECTED_SENTRY_RELEASE:-}"
+CALLER_INSTALL_SESSION="${MANALOOM_OBSERVABILITY_SESSION_ID:-}"
+
+# shellcheck source=scripts/lib/manaloom_safe_env.sh
+source "$ROOT_DIR/scripts/lib/manaloom_safe_env.sh"
+load_manaloom_env_keys "$ENV_FILE" \
+  API_BASE_URL SENTRY_DSN SENTRY_ENVIRONMENT SENTRY_MOBILE_DSN \
+  SENTRY_TRACES_SAMPLE_RATE
+
+MANALOOM_FLUTTER_BIN_RESOLVED="$CALLER_FLUTTER_BIN"
+MANALOOM_EXPECTED_SENTRY_RELEASE="$CALLER_EXPECTED_RELEASE"
+MANALOOM_OBSERVABILITY_SESSION_ID="$CALLER_INSTALL_SESSION"
+readonly MANALOOM_FLUTTER_BIN_RESOLVED
+readonly MANALOOM_EXPECTED_SENTRY_RELEASE
+readonly MANALOOM_OBSERVABILITY_SESSION_ID
+export MANALOOM_FLUTTER_BIN_RESOLVED
+export MANALOOM_EXPECTED_SENTRY_RELEASE
+export MANALOOM_OBSERVABILITY_SESSION_ID
+
+: "${MANALOOM_FLUTTER_BIN_RESOLVED:?MANALOOM_FLUTTER_BIN_RESOLVED ausente}"
+: "${MANALOOM_EXPECTED_SENTRY_RELEASE:?MANALOOM_EXPECTED_SENTRY_RELEASE ausente}"
+: "${MANALOOM_OBSERVABILITY_SESSION_ID:?MANALOOM_OBSERVABILITY_SESSION_ID ausente}"
+if [[ ! -f "$MANALOOM_FLUTTER_BIN_RESOLVED" || ! -x "$MANALOOM_FLUTTER_BIN_RESOLVED" ]]; then
+  echo "Flutter validado ausente: $MANALOOM_FLUTTER_BIN_RESOLVED" >&2
+  exit 2
+fi
 
 timeout_seconds="${MOBILE_SENTRY_BUILD_TIMEOUT_SECONDS:-120}"
 tmp_output="$(mktemp)"
@@ -19,12 +48,14 @@ trap 'rm -f "$tmp_output"' EXIT
 
 cd "$ROOT_DIR/app"
 
-flutter test integration_test/mobile_sentry_smoke_test.dart \
+"$MANALOOM_FLUTTER_BIN_RESOLVED" test integration_test/mobile_sentry_smoke_test.dart \
   --dart-define=API_BASE_URL="${API_BASE_URL:-http://127.0.0.1:8080}" \
   --dart-define=SENTRY_DSN="${SENTRY_MOBILE_DSN:-${SENTRY_DSN:-}}" \
   --dart-define=SENTRY_ENVIRONMENT="${SENTRY_ENVIRONMENT:-development}" \
-  --dart-define=SENTRY_RELEASE="${SENTRY_RELEASE:-manaloom@local}" \
+  --dart-define=SENTRY_RELEASE="$MANALOOM_EXPECTED_SENTRY_RELEASE" \
+  --dart-define=MANALOOM_OBSERVABILITY_SESSION_ID="$MANALOOM_OBSERVABILITY_SESSION_ID" \
   --dart-define=SENTRY_TRACES_SAMPLE_RATE="${SENTRY_TRACES_SAMPLE_RATE:-0.0}" \
+  --no-pub \
   "$@" \
   >"$tmp_output" 2>&1 &
 

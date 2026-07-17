@@ -50,11 +50,11 @@ dependencies:
   image: ^4.2.0
 
   # Push Notifications
-  firebase_core: ^3.12.1
-  firebase_messaging: ^15.2.5
+  firebase_core: ^4.12.1
+  firebase_messaging: ^16.4.3
 
   # Performance Monitoring
-  firebase_performance: ^0.10.0+10
+  firebase_performance: ^0.11.4+5
   sentry_flutter: ^9.15.0
   flutter_secure_storage: ^10.3.1
   web: ^1.1.1
@@ -101,6 +101,7 @@ flutter:
   assets:
     - assets/fonts/
     - assets/branding/
+    - assets/release/
     - assets/symbols/
     - assets/lotus/
     - assets/lotus/cordova-js-src/
@@ -159,3 +160,11 @@ patrol:
     bundle_id: com.mtgia.mtgApp
   macos:
     bundle_id: com.mtgia.mtgApp
+
+dependency_validator:
+  exclude:
+    - 'build/**'
+    - 'ios/Flutter/ephemeral/**'
+    - 'linux/flutter/ephemeral/**'
+    - 'macos/Flutter/ephemeral/**'
+    - 'windows/flutter/ephemeral/**'

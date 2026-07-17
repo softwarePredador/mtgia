@@ -129,12 +129,33 @@ void main() {
   settings.className = 'settings-overlay';
   settings.innerHTML = '<h1>Settings</h1><button>Restart Game</button><button>Cancel</button>';
   document.body.appendChild(settings);
+  const dice = document.createElement('section');
+  dice.className = 'dice-overlay';
+  dice.innerHTML = `
+    <div class="rng-list">
+      <div class="roller d20"></div>
+      <div class="roller custom">
+        <input value="5000">
+        <div class="roll-btn">Roll</div>
+      </div>
+    </div>
+    <button class="close-dice-overlay-btn"></button>
+  `;
+  document.body.appendChild(dice);
   await new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)));
+  const customDiceInput = dice.querySelector('.roller.custom input');
   return JSON.stringify({
     playerCards: document.querySelectorAll('.player-card').length,
     visualSkin: !!document.getElementById('manaloom-lotus-visual-skin'),
     contract: !!window.__ManaLoomLotusContract,
     localizedControls: Array.from(settings.querySelectorAll('h1, button')).map((node) => node.textContent.trim()),
+    diceDialogLabel: dice.getAttribute('aria-label'),
+    d20Label: dice.querySelector('.roller.d20')?.getAttribute('aria-label'),
+    customRollLabel: dice.querySelector('.roll-btn')?.getAttribute('aria-label'),
+    customDiceInputLabel: customDiceInput?.getAttribute('aria-label'),
+    customDiceValue: customDiceInput?.value,
+    customDiceMin: customDiceInput?.getAttribute('min'),
+    customDiceMax: customDiceInput?.getAttribute('max'),
   });
 })()
 ''',
@@ -153,6 +174,16 @@ void main() {
         'Reiniciar partida',
         'Cancelar',
       ]);
+      expect(probe['diceDialogLabel'], 'Dados');
+      expect(probe['d20Label'], 'Rolar dado de 20 lados');
+      expect(probe['customRollLabel'], 'Rolar dado personalizado');
+      expect(
+        probe['customDiceInputLabel'],
+        'Número de lados do dado personalizado',
+      );
+      expect(probe['customDiceValue'], '999');
+      expect(probe['customDiceMin'], '2');
+      expect(probe['customDiceMax'], '999');
       expect(web.window.localStorage.getItem(hostSentinelKey), 'keep');
       expect(persistedValues?['lotusOnly'], 'yes');
       expect(persistedValues, isNot(contains(hostSentinelKey)));

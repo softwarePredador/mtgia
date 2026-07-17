@@ -132,5 +132,58 @@ void main() {
         expect(result!.lastHighRolls.whereType<int>(), isEmpty);
       },
     );
+
+    testWidgets('does not advertise a stale tie with an eliminated player', (
+      tester,
+    ) async {
+      tester.view.physicalSize = const Size(1080, 2400);
+      tester.view.devicePixelRatio = 1;
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
+
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Builder(
+            builder: (context) {
+              return Scaffold(
+                body: Center(
+                  child: ElevatedButton(
+                    onPressed: () {
+                      showLifeCounterNativeDiceSheet(
+                        context,
+                        initialSession: LifeCounterSession.initial(
+                          playerCount: 4,
+                        ).copyWith(
+                          lives: const [40, 0, 40, 40],
+                          playerEliminationReasons: const [
+                            LifeCounterPlayerEliminationReason.none,
+                            LifeCounterPlayerEliminationReason.life,
+                            LifeCounterPlayerEliminationReason.none,
+                            LifeCounterPlayerEliminationReason.none,
+                          ],
+                          lastHighRolls: const [19, 19, 4, 3],
+                        ),
+                        random: Random(7),
+                      );
+                    },
+                    child: const Text('open'),
+                  ),
+                ),
+              );
+            },
+          ),
+        ),
+      );
+
+      await tester.tap(find.text('open'));
+      await tester.pumpAndSettle();
+
+      expect(find.text('Desempatar'), findsNothing);
+      expect(find.text('Maior rolagem'), findsOneWidget);
+      expect(
+        find.text('O jogador vencedor está destacado abaixo.'),
+        findsOneWidget,
+      );
+    });
   });
 }

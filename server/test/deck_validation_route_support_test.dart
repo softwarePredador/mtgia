@@ -15,14 +15,14 @@ void main() {
 
     test('success body matches validate endpoint contract', () {
       expect(
-        buildDeckValidationSuccessBody(
-          deckId: 'deck-1',
-          format: 'commander',
-        ),
+        buildDeckValidationSuccessBody(deckId: 'deck-1', format: 'commander'),
         {
           'ok': true,
           'format': 'commander',
           'deck_id': 'deck-1',
+          'deck_state': 'validated',
+          'requires_review': false,
+          'review_reasons': const <String>[],
         },
       );
     });
@@ -44,6 +44,20 @@ void main() {
       expect(body['ok'], isFalse);
       expect(body['error'], 'Carta ilegal.');
       expect(body['card_name'], 'Vendetta');
+      expect(body['deck_state'], 'draft');
+      expect(body['requires_review'], isTrue);
+      expect(body['review_reasons'], ['strict_validation_failed']);
+    });
+
+    test('internal error body never leaks exception or SQL details', () {
+      const secret = 'password=prod-secret SELECT * FROM users';
+      final body = buildDeckValidationHandlerErrorBody(Exception(secret));
+
+      expect(body['ok'], isFalse);
+      expect(body['error'], 'Unable to validate deck right now.');
+      expect(body['error_code'], 'deck_validation_internal_error');
+      expect(body.toString(), isNot(contains('prod-secret')));
+      expect(body.toString(), isNot(contains('SELECT * FROM users')));
     });
 
     test('route source uses JSON method-not-allowed and helper bodies', () {
@@ -55,6 +69,8 @@ void main() {
       expect(source, contains('buildDeckValidationSuccessBody'));
       expect(source, contains('buildDeckValidationNotFoundBody'));
       expect(source, contains('buildDeckValidationRuleErrorBody'));
+      expect(source, contains('deckValidationMarkSuccessSql'));
+      expect(source, contains('deckValidationMarkFailureSql'));
     });
   });
 }

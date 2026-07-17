@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:postgres/postgres.dart';
 import 'package:test/test.dart';
 
@@ -5,12 +7,30 @@ import '../lib/battle/battle_replay_read_service.dart';
 
 void main() {
   group('BattleReplayReadService', () {
+    test('list and detail stay scoped to the initiating deck owner', () {
+      final source =
+          File('lib/battle/battle_replay_read_service.dart').readAsStringSync();
+
+      expect(
+        RegExp(
+          r'WHERE da\.user_id = CAST\(@userId AS uuid\)',
+        ).allMatches(source),
+        hasLength(1),
+      );
+      expect(
+        RegExp(r'AND da\.user_id = CAST\(@userId AS uuid\)').allMatches(source),
+        hasLength(1),
+      );
+    });
+
     test('maps saved replay summaries from battle_simulations', () async {
       final createdAt = DateTime.utc(2026, 7, 6, 12);
       final pool = _ScriptedPool([
-        _result(rows: const [
-          [true],
-        ]),
+        _result(
+          rows: const [
+            [true],
+          ],
+        ),
         _result(
           columns: const [
             'id',
@@ -72,9 +92,11 @@ void main() {
 
     test('maps replay detail with events and decision trace', () async {
       final pool = _ScriptedPool([
-        _result(rows: const [
-          [true],
-        ]),
+        _result(
+          rows: const [
+            [true],
+          ],
+        ),
         _result(
           columns: const [
             'id',
@@ -155,14 +177,18 @@ void main() {
       expect(replay['decision_trace'], hasLength(1));
       expect(replay['visual_snapshots'], hasLength(1));
       expect(
-          replay['simulation_contract'], containsPair('advisory_only', true));
+        replay['simulation_contract'],
+        containsPair('advisory_only', true),
+      );
     });
 
     test('marks pinned XMage execution as canonical rules evidence', () async {
       final pool = _ScriptedPool([
-        _result(rows: const [
-          [true],
-        ]),
+        _result(
+          rows: const [
+            [true],
+          ],
+        ),
         _result(
           columns: const [
             'id',
@@ -259,151 +285,159 @@ void main() {
       );
     });
 
-    test('marks pinned Forge execution as secondary canonical rules evidence',
-        () async {
-      final pool = _ScriptedPool([
-        _result(rows: const [
-          [true],
-        ]),
-        _result(
-          columns: const [
-            'id',
-            'deck_a_id',
-            'deck_b_id',
-            'simulation_type',
-            'winner_deck_id',
-            'turns_played',
-            'game_log',
-            'metrics',
-            'created_at',
-            'deck_a_name',
-            'deck_b_name',
-          ],
-          rows: [
-            [
-              'sim-forge',
-              'deck-1',
-              'deck-2',
-              'battle',
-              'deck-2',
-              10,
-              {
-                'type': 'battle',
-                'engine': 'forge',
-                'engine_version': '2.0.14-SNAPSHOT',
-                'engine_commit': 'pinned-forge-commit',
-                'engine_contract': 'canonical_rules_execution_secondary',
-                'game_log': const [],
-              },
-              const {'engine': 'forge'},
-              DateTime.utc(2026, 7, 14, 12),
-              'Lorehold',
-              'Korvold',
+    test(
+      'marks pinned Forge execution as secondary canonical rules evidence',
+      () async {
+        final pool = _ScriptedPool([
+          _result(
+            rows: const [
+              [true],
             ],
-          ],
-        ),
-      ]);
-      final service = BattleReplayReadService(pool);
-
-      final replay = await service.fetchReplay(
-        userId: 'user-1',
-        deckId: 'deck-1',
-        replayId: 'sim-forge',
-      );
-
-      expect(replay!['engine'], 'forge');
-      expect(
-        replay['simulation_contract'],
-        containsPair('canonical_rules_execution', true),
-      );
-      expect(
-        replay['simulation_contract'],
-        containsPair('rules_engine_priority', 'secondary'),
-      );
-      expect(
-        replay['simulation_contract'],
-        containsPair('strategy_or_swap_proof', false),
-      );
-    });
-
-    test('marks reviewed native execution as residual rules evidence',
-        () async {
-      final pool = _ScriptedPool([
-        _result(rows: const [
-          [true],
-        ]),
-        _result(
-          columns: const [
-            'id',
-            'deck_a_id',
-            'deck_b_id',
-            'simulation_type',
-            'winner_deck_id',
-            'turns_played',
-            'game_log',
-            'metrics',
-            'created_at',
-            'deck_a_name',
-            'deck_b_name',
-          ],
-          rows: [
-            [
-              'sim-native',
-              'deck-1',
-              'deck-2',
-              'battle',
-              'deck-1',
-              9,
-              {
-                'type': 'battle',
-                'engine': 'manaloom_native_reviewed',
-                'engine_commit': 'native-commit',
-                'engine_contract': 'native_reviewed_rules_execution',
-                'learning_contract': const {
-                  'schema_version': 'native_battle_learning_v1',
-                  'absence_proves_nonuse': false,
+          ),
+          _result(
+            columns: const [
+              'id',
+              'deck_a_id',
+              'deck_b_id',
+              'simulation_type',
+              'winner_deck_id',
+              'turns_played',
+              'game_log',
+              'metrics',
+              'created_at',
+              'deck_a_name',
+              'deck_b_name',
+            ],
+            rows: [
+              [
+                'sim-forge',
+                'deck-1',
+                'deck-2',
+                'battle',
+                'deck-2',
+                10,
+                {
+                  'type': 'battle',
+                  'engine': 'forge',
+                  'engine_version': '2.0.14-SNAPSHOT',
+                  'engine_commit': 'pinned-forge-commit',
+                  'engine_contract': 'canonical_rules_execution_secondary',
+                  'game_log': const [],
                 },
-                'game_log': const [],
-              },
-              const {'engine': 'manaloom_native_reviewed'},
-              DateTime.utc(2026, 7, 15, 12),
-              'Lorehold',
-              'Korvold',
+                const {'engine': 'forge'},
+                DateTime.utc(2026, 7, 14, 12),
+                'Lorehold',
+                'Korvold',
+              ],
             ],
-          ],
-        ),
-      ]);
-      final replay = await BattleReplayReadService(pool).fetchReplay(
-        userId: 'user-1',
-        deckId: 'deck-1',
-        replayId: 'sim-native',
-      );
+          ),
+        ]);
+        final service = BattleReplayReadService(pool);
 
-      expect(
-        replay!['simulation_contract'],
-        containsPair('status', 'native_reviewed_rules_execution'),
-      );
-      expect(
-        replay['simulation_contract'],
-        containsPair('rules_execution', true),
-      );
-      expect(
-        replay['simulation_contract'],
-        containsPair('canonical_rules_execution', false),
-      );
-      expect(
-        replay['simulation_contract'],
-        containsPair('reviewed_native_rules_execution', true),
-      );
-      expect(
-        replay['simulation_contract'],
-        containsPair('rules_engine_priority', 'native_residual'),
-      );
-      expect(
-        replay['simulation_contract'],
-        containsPair('advisory_only', false),
-      );
-    });
+        final replay = await service.fetchReplay(
+          userId: 'user-1',
+          deckId: 'deck-1',
+          replayId: 'sim-forge',
+        );
+
+        expect(replay!['engine'], 'forge');
+        expect(
+          replay['simulation_contract'],
+          containsPair('canonical_rules_execution', true),
+        );
+        expect(
+          replay['simulation_contract'],
+          containsPair('rules_engine_priority', 'secondary'),
+        );
+        expect(
+          replay['simulation_contract'],
+          containsPair('strategy_or_swap_proof', false),
+        );
+      },
+    );
+
+    test(
+      'marks reviewed native execution as residual rules evidence',
+      () async {
+        final pool = _ScriptedPool([
+          _result(
+            rows: const [
+              [true],
+            ],
+          ),
+          _result(
+            columns: const [
+              'id',
+              'deck_a_id',
+              'deck_b_id',
+              'simulation_type',
+              'winner_deck_id',
+              'turns_played',
+              'game_log',
+              'metrics',
+              'created_at',
+              'deck_a_name',
+              'deck_b_name',
+            ],
+            rows: [
+              [
+                'sim-native',
+                'deck-1',
+                'deck-2',
+                'battle',
+                'deck-1',
+                9,
+                {
+                  'type': 'battle',
+                  'engine': 'manaloom_native_reviewed',
+                  'engine_commit': 'native-commit',
+                  'engine_contract': 'native_reviewed_rules_execution',
+                  'learning_contract': const {
+                    'schema_version': 'native_battle_learning_v1',
+                    'absence_proves_nonuse': false,
+                  },
+                  'game_log': const [],
+                },
+                const {'engine': 'manaloom_native_reviewed'},
+                DateTime.utc(2026, 7, 15, 12),
+                'Lorehold',
+                'Korvold',
+              ],
+            ],
+          ),
+        ]);
+        final replay = await BattleReplayReadService(pool).fetchReplay(
+          userId: 'user-1',
+          deckId: 'deck-1',
+          replayId: 'sim-native',
+        );
+
+        expect(
+          replay!['simulation_contract'],
+          containsPair('status', 'native_reviewed_rules_execution'),
+        );
+        expect(
+          replay['simulation_contract'],
+          containsPair('rules_execution', true),
+        );
+        expect(
+          replay['simulation_contract'],
+          containsPair('canonical_rules_execution', false),
+        );
+        expect(
+          replay['simulation_contract'],
+          containsPair('reviewed_native_rules_execution', true),
+        );
+        expect(
+          replay['simulation_contract'],
+          containsPair('rules_engine_priority', 'native_residual'),
+        );
+        expect(
+          replay['simulation_contract'],
+          containsPair('advisory_only', false),
+        );
+      },
+    );
   });
 }
 
@@ -482,9 +516,7 @@ Result _result({
       ),
   ]);
   return Result(
-    rows: [
-      for (final row in rows) ResultRow(values: row, schema: schema),
-    ],
+    rows: [for (final row in rows) ResultRow(values: row, schema: schema)],
     affectedRows: rows.length,
     schema: schema,
   );

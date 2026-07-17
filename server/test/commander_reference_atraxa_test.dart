@@ -8,16 +8,17 @@ import 'package:http/http.dart' as http;
 import 'package:test/test.dart';
 
 void main() {
-  final skipIntegration = Platform.environment['RUN_INTEGRATION_TESTS'] == '0'
-      ? 'Teste live desativado por RUN_INTEGRATION_TESTS=0.'
-      : null;
+  final skipIntegration =
+      Platform.environment['RUN_INTEGRATION_TESTS'] == '0'
+          ? 'Teste live desativado por RUN_INTEGRATION_TESTS=0.'
+          : null;
 
   final baseUrl =
       Platform.environment['TEST_API_BASE_URL'] ?? 'http://127.0.0.1:8082';
 
   const testUser = {
     'email': 'test_error_contract@example.com',
-    'password': 'TestPassword123!',
+    'password': 'BetaQa!2026-Deck',
     'username': 'test_error_contract_user',
   };
 
@@ -48,7 +49,8 @@ void main() {
       );
       if (register.statusCode != 200 && register.statusCode != 201) {
         throw Exception(
-            'Falha ao registrar usuário de teste: ${register.body}');
+          'Falha ao registrar usuário de teste: ${register.body}',
+        );
       }
 
       response = await http.post(
@@ -93,15 +95,21 @@ void main() {
         expect(source, equals('edhrec'));
 
         final refs = (body['reference_cards'] as List?) ?? const [];
-        expect(refs.isNotEmpty, isTrue,
-            reason: 'reference_cards vazio para fallback de Atraxa');
+        expect(
+          refs.isNotEmpty,
+          isTrue,
+          reason: 'reference_cards vazio para fallback de Atraxa',
+        );
 
         final structure = profileMap['recommended_structure'];
         expect(structure, isA<Map>(), reason: 'recommended_structure ausente');
         final lands = ((structure as Map)['lands'] as num?)?.toInt();
         expect(lands, isNotNull);
-        expect(lands! >= 28 && lands <= 42, isTrue,
-            reason: 'lands recomendado fora de faixa razoável: $lands');
+        expect(
+          lands! >= 28 && lands <= 42,
+          isTrue,
+          reason: 'lands recomendado fora de faixa razoável: $lands',
+        );
 
         final referenceBases = profileMap['reference_bases'];
         expect(referenceBases, isA<Map>(), reason: 'reference_bases ausente');
@@ -109,8 +117,11 @@ void main() {
         expect(category, equals('commander_only'));
 
         final averageTypeDistribution = profileMap['average_type_distribution'];
-        expect(averageTypeDistribution, isA<Map>(),
-            reason: 'average_type_distribution ausente');
+        expect(
+          averageTypeDistribution,
+          isA<Map>(),
+          reason: 'average_type_distribution ausente',
+        );
         final avgLand =
             ((averageTypeDistribution as Map)['land'] as num?)?.toInt();
         expect(avgLand, isNotNull);
@@ -120,14 +131,21 @@ void main() {
         expect((manaCurve as Map).isNotEmpty, isTrue);
 
         final averageDeckSeed = profileMap['average_deck_seed'];
-        expect(averageDeckSeed, isA<List>(),
-            reason: 'average_deck_seed ausente');
-        final averageDeckSeedList = (averageDeckSeed as List)
-            .whereType<Map>()
-            .map((e) => e.cast<String, dynamic>())
-            .toList();
-        expect(averageDeckSeedList.isNotEmpty, isTrue,
-            reason: 'average_deck_seed vazio');
+        expect(
+          averageDeckSeed,
+          isA<List>(),
+          reason: 'average_deck_seed ausente',
+        );
+        final averageDeckSeedList =
+            (averageDeckSeed as List)
+                .whereType<Map>()
+                .map((e) => e.cast<String, dynamic>())
+                .toList();
+        expect(
+          averageDeckSeedList.isNotEmpty,
+          isTrue,
+          reason: 'average_deck_seed vazio',
+        );
         expect(averageDeckSeedList.first['name'], isA<String>());
       },
       skip: skipIntegration,

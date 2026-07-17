@@ -60,6 +60,7 @@ class LifeCounterDiceEngine {
     LifeCounterSession session, {
     Random? random,
   }) {
+    final isTieBreaker = _hasPendingHighRollTie(session);
     final participants = _resolveHighRollParticipants(session);
     if (participants.isEmpty) {
       return session.copyWith(
@@ -76,7 +77,6 @@ class LifeCounterDiceEngine {
     }
 
     final winners = deriveHighRollWinners(nextHighRolls);
-    final isTieBreaker = participants.length != session.playerCount;
 
     if (winners.length == 1) {
       final winner = winners.first;
@@ -123,6 +123,12 @@ class LifeCounterDiceEngine {
     }
 
     return activePlayers;
+  }
+
+  static bool _hasPendingHighRollTie(LifeCounterSession session) {
+    final activePlayers = _activePlayerIndexes(session).toSet();
+    final persistedWinners = deriveHighRollWinners(session.lastHighRolls);
+    return persistedWinners.where(activePlayers.contains).length > 1;
   }
 
   static String _playerLabel(int playerIndex) => 'Jogador ${playerIndex + 1}';

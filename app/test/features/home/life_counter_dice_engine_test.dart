@@ -129,6 +129,8 @@ void main() {
       expect(updated.lastHighRolls[2], isNotNull);
       expect(updated.lastHighRolls[1], isNull);
       expect(updated.lastHighRolls[3], isNull);
+      expect(updated.lastTableEvent, startsWith('Maior rolagem'));
+      expect(updated.lastTableEvent, isNot(contains('Desempate')));
     });
 
     test('rerolls only tied players when a tie is pending', () {

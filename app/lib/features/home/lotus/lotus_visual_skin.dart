@@ -1963,6 +1963,18 @@ ${LotusDomSelectors.turnTracker} {
   backdrop-filter: none !important;
 }
 
+.dice-overlay .rng-list .roller.custom .roll-btn {
+  width: 84px !important;
+  min-width: 84px !important;
+  font-size: 18px !important;
+  line-height: 1 !important;
+  white-space: nowrap !important;
+}
+
+.dice-overlay .rng-list .roller.custom .roll-btn::after {
+  width: 94px !important;
+}
+
 [role="button"]:focus-visible,
 button:focus-visible,
 input:focus-visible,
@@ -2583,6 +2595,67 @@ textarea:focus-visible {
       bindKeyboardAction(node, () => node.click());
     });
 
+    const diceButtonLabels = [
+      ['.dice-overlay .roller.d4', 'Rolar dado de 4 lados'],
+      ['.dice-overlay .roller.d6', 'Rolar dado de 6 lados'],
+      ['.dice-overlay .roller.d8', 'Rolar dado de 8 lados'],
+      ['.dice-overlay .roller.d10', 'Rolar dado de 10 lados'],
+      ['.dice-overlay .roller.d12', 'Rolar dado de 12 lados'],
+      ['.dice-overlay .roller.d20', 'Rolar dado de 20 lados'],
+      ['.dice-overlay .roller.coin', 'Lançar moeda'],
+      ['.dice-overlay .roll-btn', 'Rolar dado personalizado'],
+      ['.dice-overlay .close-dice-overlay-btn', 'Fechar dados'],
+    ];
+    diceButtonLabels.forEach((entry) => {
+      document.querySelectorAll(entry[0]).forEach((node) => {
+        if (!(node instanceof HTMLElement)) {
+          return;
+        }
+        setAttributeIfChanged(node, 'role', 'button');
+        setAttributeIfChanged(node, 'tabindex', '0');
+        setAttributeIfChanged(node, 'aria-label', entry[1]);
+        bindKeyboardAction(node, () => node.click());
+      });
+    });
+    document.querySelectorAll('.dice-overlay .roller.custom input').forEach((input) => {
+      if (!(input instanceof HTMLElement)) {
+        return;
+      }
+      setAttributeIfChanged(
+        input,
+        'aria-label',
+        'Número de lados do dado personalizado',
+      );
+      setAttributeIfChanged(input, 'inputmode', 'numeric');
+      setAttributeIfChanged(input, 'min', '2');
+      setAttributeIfChanged(input, 'max', '999');
+      setAttributeIfChanged(input, 'step', '1');
+
+      const normalizeCustomDiceSides = () => {
+        const parsed = Number.parseInt(input.value, 10);
+        const normalized = Number.isFinite(parsed)
+          ? Math.min(999, Math.max(2, parsed))
+          : 100;
+        const normalizedValue = String(normalized);
+        if (input.value !== normalizedValue) {
+          input.value = normalizedValue;
+          input.dispatchEvent(new Event('input', { bubbles: true }));
+        }
+      };
+      if (input.dataset.manaloomCustomDiceBound !== 'true') {
+        input.dataset.manaloomCustomDiceBound = 'true';
+        input.addEventListener('change', normalizeCustomDiceSides);
+        input.addEventListener('blur', normalizeCustomDiceSides);
+        const rollButton = input
+          .closest('.roller.custom')
+          ?.querySelector('.roll-btn');
+        if (rollButton instanceof HTMLElement) {
+          rollButton.addEventListener('click', normalizeCustomDiceSides, true);
+        }
+      }
+      normalizeCustomDiceSides();
+    });
+
     let exitButton = document.querySelector('.manaloom-life-counter-exit');
     if (!(exitButton instanceof HTMLElement) && document.body) {
       exitButton = document.createElement('button');
@@ -2626,6 +2699,7 @@ textarea:focus-visible {
       ['.commander-damage-overlay', 'Dano de comandante'],
       ['.first-time-user-overlay', 'Tutorial do contador de vida'],
       ['.custom-life-overlay', 'Definir vida'],
+      ['.dice-overlay', 'Dados'],
       ['.input-overlay', 'Informar um valor'],
       ['.confirm-overlay', 'Confirmar ação'],
     ];

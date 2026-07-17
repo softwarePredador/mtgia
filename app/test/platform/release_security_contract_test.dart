@@ -41,4 +41,20 @@ void main() {
     expect(entitlements, isNot(contains('keychain-access-groups')));
     expect(project, isNot(contains('DEVELOPMENT_TEAM')));
   });
+
+  test('iOS deployment target stays aligned across CocoaPods and Xcode', () {
+    final podfile = File('ios/Podfile').readAsStringSync();
+    final project =
+        File('ios/Runner.xcodeproj/project.pbxproj').readAsStringSync();
+    final deploymentTargetMatches =
+        RegExp(
+          r'IPHONEOS_DEPLOYMENT_TARGET = ([0-9.]+);',
+        ).allMatches(project).toList();
+    final deploymentTargets =
+        deploymentTargetMatches.map((match) => match.group(1)).toSet();
+
+    expect(podfile, contains("platform :ios, '15.5'"));
+    expect(deploymentTargetMatches, hasLength(6));
+    expect(deploymentTargets, {'15.5'});
+  });
 }

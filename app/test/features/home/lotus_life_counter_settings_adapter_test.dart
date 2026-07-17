@@ -36,8 +36,9 @@ void main() {
         },
       );
 
-      final settings =
-          LotusLifeCounterSettingsAdapter.tryBuildSettings(snapshot);
+      final settings = LotusLifeCounterSettingsAdapter.tryBuildSettings(
+        snapshot,
+      );
 
       expect(settings, isNotNull);
       expect(settings!.autoKill, isFalse);
@@ -59,40 +60,59 @@ void main() {
       );
     });
 
-    test('serializes canonical settings back into Lotus-compatible storage', () {
-      final values = LotusLifeCounterSettingsAdapter.buildSnapshotValues(
-        const LifeCounterSettings(
-          autoKill: false,
-          lifeLossOnCommanderDamage: false,
-          showCountersOnPlayerCard: true,
-          showRegularCounters: false,
-          showCommanderDamageCounters: true,
-          clickableCommanderDamageCounters: true,
-          keepZeroCountersOnPlayerCard: true,
-          saltyDefeatMessages: false,
-          cycleSaltyDefeatMessages: false,
-          gameTimer: true,
-          gameTimerMainScreen: true,
-          showClockOnMainScreen: true,
-          randomPlayerColors: true,
-          preserveBackgroundImagesOnShuffle: false,
-          setLifeByTappingNumber: false,
-          verticalTapAreas: true,
-          cleanLook: true,
-          criticalDamageWarning: false,
-          customLongTapEnabled: true,
-          customLongTapValue: 25,
-          whitelabelIcon: 'mana',
-        ),
+    test('clamps an unsafe custom long-tap value from Lotus storage', () {
+      final snapshot = LotusStorageSnapshot(
+        values: {
+          'gameSettings': jsonEncode({'customLongTapValue': 5000}),
+        },
       );
 
-      final decoded = jsonDecode(values['gameSettings']!) as Map<String, dynamic>;
+      final settings = LotusLifeCounterSettingsAdapter.tryBuildSettings(
+        snapshot,
+      );
 
-      expect(decoded['autoKO'], isFalse);
-      expect(decoded['showCountersOnPlayerCard'], isTrue);
-      expect(decoded['gameTimer'], isTrue);
-      expect(decoded['customLongTapValue'], 25);
-      expect(decoded['whitelabelIcon'], 'mana');
+      expect(settings, isNotNull);
+      expect(settings!.customLongTapValue, lifeCounterMaxCustomLongTapValue);
     });
+
+    test(
+      'serializes canonical settings back into Lotus-compatible storage',
+      () {
+        final values = LotusLifeCounterSettingsAdapter.buildSnapshotValues(
+          const LifeCounterSettings(
+            autoKill: false,
+            lifeLossOnCommanderDamage: false,
+            showCountersOnPlayerCard: true,
+            showRegularCounters: false,
+            showCommanderDamageCounters: true,
+            clickableCommanderDamageCounters: true,
+            keepZeroCountersOnPlayerCard: true,
+            saltyDefeatMessages: false,
+            cycleSaltyDefeatMessages: false,
+            gameTimer: true,
+            gameTimerMainScreen: true,
+            showClockOnMainScreen: true,
+            randomPlayerColors: true,
+            preserveBackgroundImagesOnShuffle: false,
+            setLifeByTappingNumber: false,
+            verticalTapAreas: true,
+            cleanLook: true,
+            criticalDamageWarning: false,
+            customLongTapEnabled: true,
+            customLongTapValue: 25,
+            whitelabelIcon: 'mana',
+          ),
+        );
+
+        final decoded =
+            jsonDecode(values['gameSettings']!) as Map<String, dynamic>;
+
+        expect(decoded['autoKO'], isFalse);
+        expect(decoded['showCountersOnPlayerCard'], isTrue);
+        expect(decoded['gameTimer'], isTrue);
+        expect(decoded['customLongTapValue'], 25);
+        expect(decoded['whitelabelIcon'], 'mana');
+      },
+    );
   });
 }

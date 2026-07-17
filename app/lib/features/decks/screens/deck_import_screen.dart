@@ -5,6 +5,19 @@ import '../../../core/theme/app_theme.dart';
 import '../providers/deck_provider.dart';
 import '../widgets/deck_feedback_dialogs.dart';
 
+int detectedImportCardCount(String rawList) {
+  final quantityPrefix = RegExp(r'^(\d+)x?\s+');
+  var total = 0;
+  for (final rawLine in rawList.split('\n')) {
+    final line = rawLine.trim();
+    if (line.isEmpty) continue;
+    final match = quantityPrefix.firstMatch(line);
+    if (match == null) continue;
+    total += int.tryParse(match.group(1) ?? '') ?? 0;
+  }
+  return total;
+}
+
 class DeckImportScreen extends StatefulWidget {
   const DeckImportScreen({super.key, this.initialFormat});
 
@@ -72,11 +85,7 @@ class _DeckImportScreenState extends State<DeckImportScreen> {
   bool get _isCommanderFormat =>
       _selectedFormat == 'commander' || _selectedFormat == 'brawl';
 
-  int get _detectedCount =>
-      _listController.text
-          .split('\n')
-          .where((line) => line.trim().isNotEmpty)
-          .length;
+  int get _detectedCount => detectedImportCardCount(_listController.text);
 
   Future<void> _importDeck() async {
     if (_nameController.text.isEmpty) {
@@ -129,6 +138,8 @@ class _DeckImportScreenState extends State<DeckImportScreen> {
     if (result['success'] == true) {
       final deck = result['deck'];
       final isPartial =
+          result['requires_review'] == true ||
+          result['deck_state'] == 'draft' ||
           result['is_partial'] == true ||
           _notFoundLines.isNotEmpty ||
           _warnings.isNotEmpty;
@@ -142,12 +153,15 @@ class _DeckImportScreenState extends State<DeckImportScreen> {
           notFound: _notFoundLines,
           warnings: _warnings,
           localizedMatchesCount: _localizedMatchesCount,
+          requiresReview: true,
         );
       } else {
-        // Tudo ok, vai direto pro deck
+        // A API só usa o fluxo direto quando a validação estrita passou.
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Deck importado com $_cardsImported cartas!'),
+            content: Text(
+              'Deck importado e validado com $_cardsImported cartas!',
+            ),
             backgroundColor: Theme.of(context).colorScheme.primary,
           ),
         );
@@ -182,9 +196,12 @@ class _DeckImportScreenState extends State<DeckImportScreen> {
     List<String> warnings = const [],
     int localizedMatchesCount = 0,
     String? error,
+    bool requiresReview = false,
   }) {
     final theme = Theme.of(context);
-    final isPartial = success && (notFound.isNotEmpty || warnings.isNotEmpty);
+    final isPartial =
+        success &&
+        (requiresReview || notFound.isNotEmpty || warnings.isNotEmpty);
 
     showDialog(
       context: context,

@@ -2,16 +2,31 @@ import 'dart:async';
 
 import 'package:test/test.dart';
 
+import '../lib/auth_runtime_policy.dart';
 import '../lib/rate_limit_middleware.dart';
 
 void main() {
   group('RateLimiter', () {
-    test('extracts first forwarded IP when proxy header is present', () {
+    test('does not trust forwarded IP without an explicit proxy contract', () {
       final clientId = RateLimiter.buildClientIdentifierFromHeaders({
         'X-Forwarded-For': '203.0.113.10, 10.0.0.1',
       });
 
-      expect(clientId, equals('203.0.113.10'));
+      expect(clientId, equals('anonymous'));
+    });
+
+    test('trusted proxy identity is selected from the right', () {
+      final resolution = resolveRateLimitClientIdentity(
+        headers: const {'X-Forwarded-For': 'spoofed, 203.0.113.10, 10.0.0.1'},
+        environment: const {
+          'ENVIRONMENT': 'production',
+          'MANALOOM_TRUSTED_PROXY_HOPS': '2',
+          'MANALOOM_TRUSTED_PROXY_PEERS': '10.0.0.0/8',
+        },
+        remoteAddress: '10.0.0.42',
+      );
+
+      expect(resolution.identifier, equals('203.0.113.10'));
     });
 
     test(
@@ -46,7 +61,7 @@ void main() {
           userId: null,
           headers: const {'X-Forwarded-For': '203.0.113.10'},
         ),
-        '203.0.113.10',
+        'anonymous',
       );
     });
 

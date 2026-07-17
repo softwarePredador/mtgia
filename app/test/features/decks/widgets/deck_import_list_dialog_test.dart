@@ -3,6 +3,8 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:manaloom/core/theme/app_theme.dart';
 import 'package:manaloom/features/decks/widgets/deck_import_list_dialog.dart';
 
+import '../../../support/list_tile_material_test_support.dart';
+
 void main() {
   testWidgets('showDeckImportListDialog imports list and refreshes deck', (
     tester,
@@ -65,6 +67,7 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.byKey(const Key('deck-import-list-dialog')), findsOneWidget);
+    expectListTileInkIsUnobscured(tester);
     await tester.enterText(
       find.byKey(const Key('deck-import-list-dialog-field')),
       '1 Sol Ring\n1 Arcane Signet',

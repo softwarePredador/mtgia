@@ -99,6 +99,14 @@ def test_build_findings_flags_missing_openai_and_sha_drift() -> None:
 
 def test_internal_postgres_metrics_use_new_server_tunnel(monkeypatch) -> None:
     calls = []
+    monkeypatch.setenv(
+        "MANALOOM_CONFIRM_LIVE_MUTATIONS",
+        "I_HAVE_EXPLICIT_APPROVAL",
+    )
+    monkeypatch.setenv(
+        "MANALOOM_CONFIRM_POSTGRES_WRITES",
+        "I_HAVE_EXPLICIT_APPROVAL",
+    )
 
     def fake_check_output(command, **kwargs):
         calls.append((command, kwargs))
@@ -124,5 +132,36 @@ def test_internal_postgres_metrics_use_new_server_tunnel(monkeypatch) -> None:
 
     assert payload["deck_learning_events"]["pending"] == 0
     assert calls[0][0][0] == str(MODULE.NEW_SERVER_PG_WRAPPER)
+    assert calls[0][0][1] == "--write-approved"
     assert calls[0][0][-1] == "--pg-metrics-only"
     assert calls[0][1]["timeout"] == 60
+
+
+def test_internal_postgres_runner_blocks_before_wrapper_without_both_tokens(
+    monkeypatch,
+) -> None:
+    calls = []
+    monkeypatch.setenv(
+        "MANALOOM_CONFIRM_LIVE_MUTATIONS",
+        "I_HAVE_EXPLICIT_APPROVAL",
+    )
+    monkeypatch.delenv("MANALOOM_CONFIRM_POSTGRES_WRITES", raising=False)
+    monkeypatch.setattr(
+        MODULE.subprocess,
+        "check_output",
+        lambda *args, **kwargs: calls.append((args, kwargs)),
+    )
+
+    try:
+        MODULE._query_pg_metrics(
+            {
+                "DB_HOST": "evolution_manaloom-postgres",
+                "MANALOOM_EXPECTED_DB_HOST": "evolution_manaloom-postgres",
+            }
+        )
+    except RuntimeError as error:
+        assert "MANALOOM_CONFIRM_POSTGRES_WRITES" in str(error)
+    else:
+        raise AssertionError("missing PostgreSQL approval was accepted")
+
+    assert calls == []

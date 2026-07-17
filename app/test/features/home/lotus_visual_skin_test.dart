@@ -178,6 +178,33 @@ void main() {
       expect(lotusInjectedVisualSkinScript, contains("'role', 'dialog'"));
       expect(lotusInjectedVisualSkinScript, contains("'aria-modal', 'true'"));
       expect(lotusInjectedVisualSkinScript, contains('.confirm-overlay'));
+      expect(
+        lotusInjectedVisualSkinScript,
+        contains("['.dice-overlay', 'Dados']"),
+      );
+      expect(lotusInjectedVisualSkinScript, contains('Rolar dado de 20 lados'));
+      expect(
+        lotusInjectedVisualSkinScript,
+        contains('Número de lados do dado personalizado'),
+      );
+      expect(
+        lotusInjectedVisualSkinScript,
+        contains("setAttributeIfChanged(input, 'min', '2')"),
+      );
+      expect(
+        lotusInjectedVisualSkinScript,
+        contains("setAttributeIfChanged(input, 'max', '999')"),
+      );
+      expect(
+        lotusInjectedVisualSkinScript,
+        contains('Math.min(999, Math.max(2, parsed))'),
+      );
+      expect(lotusInjectedVisualSkinScript, contains('Fechar dados'));
+      expect(
+        lotusInjectedVisualSkinScript,
+        contains('.dice-overlay .rng-list .roller.custom .roll-btn'),
+      );
+      expect(lotusInjectedVisualSkinScript, contains('min-width: 84px'));
       expect(lotusInjectedVisualSkinScript, contains('manaloomKeyboardBound'));
       expect(lotusInjectedVisualSkinScript, contains('syncDialogFocus'));
       expect(lotusInjectedVisualSkinScript, contains("'role', 'spinbutton'"));

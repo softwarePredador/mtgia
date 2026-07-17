@@ -8,16 +8,23 @@ import 'package:http/http.dart' as http;
 import 'package:test/test.dart';
 
 void main() {
-  final skipIntegration = Platform.environment['RUN_INTEGRATION_TESTS'] == '0'
-      ? 'Teste live desativado por RUN_INTEGRATION_TESTS=0.'
-      : null;
+  final liveRequested = Platform.environment['RUN_INTEGRATION_TESTS'] == '1';
+  final liveMutationApproved =
+      Platform.environment['MANALOOM_CONFIRM_LIVE_MUTATIONS'] ==
+      'I_HAVE_EXPLICIT_APPROVAL';
+  final skipIntegration =
+      !liveRequested
+          ? 'Teste live requer RUN_INTEGRATION_TESTS=1.'
+          : !liveMutationApproved
+          ? 'Teste mutante requer MANALOOM_CONFIRM_LIVE_MUTATIONS=I_HAVE_EXPLICIT_APPROVAL.'
+          : null;
 
   final baseUrl =
       Platform.environment['TEST_API_BASE_URL'] ?? 'http://127.0.0.1:8082';
 
   const testUser = {
     'email': 'test_analysis_contract@example.com',
-    'password': 'TestPassword123!',
+    'password': 'BetaQa!2026-Deck',
     'username': 'test_analysis_contract_user',
   };
 
@@ -72,9 +79,9 @@ void main() {
   }
 
   Map<String, String> authHeaders({bool withContentType = false}) => {
-        if (withContentType) 'Content-Type': 'application/json',
-        if (authToken != null) 'Authorization': 'Bearer $authToken',
-      };
+    if (withContentType) 'Content-Type': 'application/json',
+    if (authToken != null) 'Authorization': 'Bearer $authToken',
+  };
 
   Future<String> createStandardDeckForAnalysis() async {
     final response = await http.post(
@@ -112,123 +119,109 @@ void main() {
   });
 
   group('Deck analysis contract | /decks/:id/analysis', () {
-    test(
-      'returns 200 with expected payload shape',
-      () async {
-        final deckId = await createStandardDeckForAnalysis();
-        createdDeckIds.add(deckId);
+    test('returns 200 with expected payload shape', () async {
+      final deckId = await createStandardDeckForAnalysis();
+      createdDeckIds.add(deckId);
 
-        final response = await http.get(
-          Uri.parse('$baseUrl/decks/$deckId/analysis'),
-          headers: authHeaders(),
-        );
+      final response = await http.get(
+        Uri.parse('$baseUrl/decks/$deckId/analysis'),
+        headers: authHeaders(),
+      );
 
-        expect(response.statusCode, equals(200), reason: response.body);
-        final body = decodeJson(response);
+      expect(response.statusCode, equals(200), reason: response.body);
+      final body = decodeJson(response);
 
-        expect(body['deck_id'], equals(deckId));
-        expect(body['stats'], isA<Map<String, dynamic>>());
-        expect(body['functional_tags'], isA<Map<String, dynamic>>());
-        expect(body['readiness'], isA<Map<String, dynamic>>());
-        expect(body['battle_readiness'], isA<Map<String, dynamic>>());
-        expect(
-          body['battle_learning_evidence'],
-          isA<Map<String, dynamic>>(),
-        );
-        expect(body['card_battle_readiness'], isA<List>());
-        expect(body['understanding_summary'], isA<Map<String, dynamic>>());
-        expect(body['commander_contract'], isA<Map<String, dynamic>>());
-        expect(body['launch_capabilities'], isA<Map<String, dynamic>>());
-        expect(body['mana_curve'], isA<Map<String, dynamic>>());
-        expect(body['color_distribution'], isA<Map<String, dynamic>>());
-        expect(body['legality'], isA<Map<String, dynamic>>());
+      expect(body['deck_id'], equals(deckId));
+      expect(body['stats'], isA<Map<String, dynamic>>());
+      expect(body['functional_tags'], isA<Map<String, dynamic>>());
+      expect(body['readiness'], isA<Map<String, dynamic>>());
+      expect(body['battle_readiness'], isA<Map<String, dynamic>>());
+      expect(body['battle_learning_evidence'], isA<Map<String, dynamic>>());
+      expect(body['card_battle_readiness'], isA<List>());
+      expect(body['understanding_summary'], isA<Map<String, dynamic>>());
+      expect(body['commander_contract'], isA<Map<String, dynamic>>());
+      expect(body['launch_capabilities'], isA<Map<String, dynamic>>());
+      expect(body['mana_curve'], isA<Map<String, dynamic>>());
+      expect(body['color_distribution'], isA<Map<String, dynamic>>());
+      expect(body['legality'], isA<Map<String, dynamic>>());
 
-        final readiness = body['readiness'] as Map<String, dynamic>;
-        final battleReadiness =
-            body['battle_readiness'] as Map<String, dynamic>;
-        final battleLearningEvidence =
-            body['battle_learning_evidence'] as Map<String, dynamic>;
-        final cardBattleReadiness = body['card_battle_readiness'] as List;
-        final understanding =
-            body['understanding_summary'] as Map<String, dynamic>;
-        final commanderContract =
-            body['commander_contract'] as Map<String, dynamic>;
-        final launchCapabilities =
-            body['launch_capabilities'] as Map<String, dynamic>;
+      final readiness = body['readiness'] as Map<String, dynamic>;
+      final battleReadiness = body['battle_readiness'] as Map<String, dynamic>;
+      final battleLearningEvidence =
+          body['battle_learning_evidence'] as Map<String, dynamic>;
+      final cardBattleReadiness = body['card_battle_readiness'] as List;
+      final understanding =
+          body['understanding_summary'] as Map<String, dynamic>;
+      final commanderContract =
+          body['commander_contract'] as Map<String, dynamic>;
+      final launchCapabilities =
+          body['launch_capabilities'] as Map<String, dynamic>;
 
-        expect(readiness['schema_version'], isA<String>());
-        expect(readiness['status'], isA<String>());
-        expect(readiness['advanced_intelligence_enabled'], isA<bool>());
-        expect(battleReadiness['schema_version'], isA<String>());
-        expect(battleReadiness['status'], isA<String>());
-        expect(battleReadiness['samples'], isA<Map<String, dynamic>>());
-        expect(
-          battleLearningEvidence['aggregate_schema_version'],
-          'deck_battle_learning_evidence_v1',
-        );
-        expect(battleLearningEvidence['promotion_allowed'], isFalse);
-        for (final item in cardBattleReadiness) {
-          expect(item, isA<Map<String, dynamic>>());
-          final cardReadiness = item as Map<String, dynamic>;
-          expect(cardReadiness['schema_version'], isA<String>());
-          expect(cardReadiness['status'], isA<String>());
-          expect(cardReadiness['status_label'], isA<String>());
-          expect(cardReadiness['battle_rule_count'], isA<int>());
-          expect(cardReadiness['verified_battle_rule_count'], isA<int>());
-          expect(cardReadiness['detail'], isA<String>());
-        }
-        expect(understanding['schema_version'], isA<String>());
-        expect(understanding['source'], isA<String>());
-        expect(understanding['total_copies'], isA<int>());
-        expect(commanderContract['schema_version'], isA<String>());
-        expect(commanderContract['status'], isA<String>());
-        expect(commanderContract['is_commander_applicable'], isA<bool>());
-        expect(commanderContract['battle_gate'], isA<Map<String, dynamic>>());
-        expect(commanderContract['planning_flow'], isA<List>());
-        expect(launchCapabilities['schema_version'], isA<String>());
-        expect(launchCapabilities['release_channel'], isA<String>());
-        expect(launchCapabilities['flags'], isA<Map<String, dynamic>>());
-        expect(launchCapabilities['surfaces'], isA<List>());
-        for (final item in launchCapabilities['surfaces'] as List) {
-          expect(item, isA<Map<String, dynamic>>());
-          final surface = item as Map<String, dynamic>;
-          expect(surface['key'], isA<String>());
-          expect(surface['enabled'], isA<bool>());
-          expect(surface['stage'], isA<String>());
-          expect(surface['requires_review'], isA<bool>());
-        }
-      },
-      skip: skipIntegration,
-    );
+      expect(readiness['schema_version'], isA<String>());
+      expect(readiness['status'], isA<String>());
+      expect(readiness['advanced_intelligence_enabled'], isA<bool>());
+      expect(battleReadiness['schema_version'], isA<String>());
+      expect(battleReadiness['status'], isA<String>());
+      expect(battleReadiness['samples'], isA<Map<String, dynamic>>());
+      expect(
+        battleLearningEvidence['aggregate_schema_version'],
+        'deck_battle_learning_evidence_v1',
+      );
+      expect(battleLearningEvidence['promotion_allowed'], isFalse);
+      for (final item in cardBattleReadiness) {
+        expect(item, isA<Map<String, dynamic>>());
+        final cardReadiness = item as Map<String, dynamic>;
+        expect(cardReadiness['schema_version'], isA<String>());
+        expect(cardReadiness['status'], isA<String>());
+        expect(cardReadiness['status_label'], isA<String>());
+        expect(cardReadiness['battle_rule_count'], isA<int>());
+        expect(cardReadiness['verified_battle_rule_count'], isA<int>());
+        expect(cardReadiness['detail'], isA<String>());
+      }
+      expect(understanding['schema_version'], isA<String>());
+      expect(understanding['source'], isA<String>());
+      expect(understanding['total_copies'], isA<int>());
+      expect(commanderContract['schema_version'], isA<String>());
+      expect(commanderContract['status'], isA<String>());
+      expect(commanderContract['is_commander_applicable'], isA<bool>());
+      expect(commanderContract['battle_gate'], isA<Map<String, dynamic>>());
+      expect(commanderContract['planning_flow'], isA<List>());
+      expect(launchCapabilities['schema_version'], isA<String>());
+      expect(launchCapabilities['release_channel'], isA<String>());
+      expect(launchCapabilities['flags'], isA<Map<String, dynamic>>());
+      expect(launchCapabilities['surfaces'], isA<List>());
+      for (final item in launchCapabilities['surfaces'] as List) {
+        expect(item, isA<Map<String, dynamic>>());
+        final surface = item as Map<String, dynamic>;
+        expect(surface['key'], isA<String>());
+        expect(surface['enabled'], isA<bool>());
+        expect(surface['stage'], isA<String>());
+        expect(surface['requires_review'], isA<bool>());
+      }
+    }, skip: skipIntegration);
 
-    test(
-      'returns 404 for missing deck',
-      () async {
-        final response = await http.get(
-          Uri.parse(
-              '$baseUrl/decks/00000000-0000-0000-0000-000000000098/analysis'),
-          headers: authHeaders(),
-        );
+    test('returns 404 for missing deck', () async {
+      final response = await http.get(
+        Uri.parse(
+          '$baseUrl/decks/00000000-0000-0000-0000-000000000098/analysis',
+        ),
+        headers: authHeaders(),
+      );
 
-        expect(response.statusCode, equals(404), reason: response.body);
-        expect(decodeJson(response)['error'], isA<String>());
-      },
-      skip: skipIntegration,
-    );
+      expect(response.statusCode, equals(404), reason: response.body);
+      expect(decodeJson(response)['error'], isA<String>());
+    }, skip: skipIntegration);
 
-    test(
-      'returns 405 for invalid method',
-      () async {
-        final response = await http.post(
-          Uri.parse(
-              '$baseUrl/decks/00000000-0000-0000-0000-000000000098/analysis'),
-          headers: authHeaders(withContentType: true),
-          body: jsonEncode({}),
-        );
+    test('returns 405 for invalid method', () async {
+      final response = await http.post(
+        Uri.parse(
+          '$baseUrl/decks/00000000-0000-0000-0000-000000000098/analysis',
+        ),
+        headers: authHeaders(withContentType: true),
+        body: jsonEncode({}),
+      );
 
-        expect(response.statusCode, equals(405), reason: response.body);
-      },
-      skip: skipIntegration,
-    );
+      expect(response.statusCode, equals(405), reason: response.body);
+    }, skip: skipIntegration);
   });
 }

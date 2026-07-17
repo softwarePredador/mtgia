@@ -108,6 +108,32 @@ void main() {
       expect(naturalEvidence['natural_sample'], isTrue);
       expect(naturalEvidence['positive_exposure_ready'], isTrue);
       _expectReviewedAction(natural);
+      _expectSavedReplayContract(natural);
+
+      final repeatedNatural = await _simulate(
+        baseUrl,
+        headers,
+        deckA,
+        deckB,
+        const {
+          'seed': 2,
+          'max_turns': 12,
+          'focus_cards': ['A Good Day to Pie'],
+        },
+      );
+      _expectSavedReplayContract(repeatedNatural);
+      expect(
+        repeatedNatural['replay_id'],
+        isNot(natural['replay_id']),
+        reason: 'Each durable execution must receive its own replay id.',
+      );
+      expect(
+        _deterministicBattleProjection(repeatedNatural),
+        _deterministicBattleProjection(natural),
+        reason:
+            'The same canonical deck order and seed must reproduce the '
+            'observable Battle contract.',
+      );
 
       final replayListResponse = await http.get(
         Uri.parse('$baseUrl/decks/$deckA/battle-replays?limit=5'),
@@ -168,7 +194,7 @@ void main() {
       expect(aggregate['source'], 'battle_simulations');
       expect(
         aggregate['trusted_battle_count'],
-        greaterThanOrEqualTo(runForcedDiagnostic ? 2 : 1),
+        greaterThanOrEqualTo(runForcedDiagnostic ? 3 : 2),
       );
       expect(
         aggregate['positive_exposure_battle_count'],
@@ -302,3 +328,39 @@ void _expectReviewedAction(Map<String, dynamic> battle) {
     '2be3fd92e4894d72dc08a6564f332157',
   );
 }
+
+void _expectSavedReplayContract(Map<String, dynamic> battle) {
+  final replayId = battle['replay_id']?.toString() ?? '';
+  final persistence =
+      (battle['persistence'] as Map?)?.cast<String, dynamic>() ?? const {};
+  expect(
+    RegExp(
+      r'^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$',
+    ).hasMatch(replayId),
+    isTrue,
+  );
+  expect(persistence['status'], 'saved');
+  expect(persistence['required'], isTrue);
+  expect(persistence['replay_id'], replayId);
+}
+
+Map<String, dynamic> _deterministicBattleProjection(
+  Map<String, dynamic> battle,
+) => {
+  'status': battle['status'],
+  'engine': battle['engine'],
+  'engine_contract': battle['engine_contract'],
+  'seed': battle['seed'],
+  'winner': battle['winner'],
+  'winner_deck_id': battle['winner_deck_id'],
+  'turns': battle['turns'],
+  'max_turns': battle['max_turns'],
+  'win_condition': battle['win_condition'],
+  'forced_access_mode': battle['forced_access_mode'],
+  'events': battle['events'],
+  'decision_trace': battle['decision_trace'],
+  'visual_snapshots': battle['visual_snapshots'],
+  'deck_construction': battle['deck_construction'],
+  'learning_contract': battle['learning_contract'],
+  'battle_learning_evidence': battle['battle_learning_evidence'],
+};

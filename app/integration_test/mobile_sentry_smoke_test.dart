@@ -7,6 +7,16 @@ void main() {
   IntegrationTestWidgetsFlutterBinding.ensureInitialized();
 
   testWidgets('captures a controlled Sentry smoke event', (tester) async {
+    const expectedRelease = String.fromEnvironment(
+      'SENTRY_RELEASE',
+      defaultValue: '',
+    );
+    const installSessionId = String.fromEnvironment(
+      'MANALOOM_OBSERVABILITY_SESSION_ID',
+      defaultValue: '',
+    );
+    expect(expectedRelease, isNotEmpty);
+    expect(installSessionId, isNotEmpty);
     final smokeId =
         'mtgia-mobile-smoke-${DateTime.now().millisecondsSinceEpoch.toRadixString(16)}';
 
@@ -25,9 +35,15 @@ void main() {
 
     final eventId = await AppObservability.instance.captureException(
       Exception('MTGIA mobile sentry smoke'),
-      tags: {'source': 'mobile_smoke', 'smoke_id': smokeId},
+      tags: {
+        'source': 'mobile_smoke',
+        'smoke_id': smokeId,
+        'install_session_id': installSessionId,
+      },
       extras: {
         'smoke_id': smokeId,
+        'install_session_id': installSessionId,
+        'expected_release': expectedRelease,
         'runner': 'app/integration_test/mobile_sentry_smoke_test.dart',
       },
     );
@@ -42,6 +58,10 @@ void main() {
     print('SENTRY_MOBILE_EVENT_ID=$eventId');
     // ignore: avoid_print
     print('SENTRY_MOBILE_SMOKE_TAG=smoke_id:$smokeId');
+    // ignore: avoid_print
+    print('SENTRY_MOBILE_RELEASE=$expectedRelease');
+    // ignore: avoid_print
+    print('SENTRY_MOBILE_INSTALL_SESSION=$installSessionId');
   });
 }
 

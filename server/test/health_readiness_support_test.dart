@@ -30,6 +30,19 @@ void main() {
       expect(readinessStatusCode(true), equals(200));
     });
 
+    test('Deckbuilder schema readiness requires migrations 039 and 040', () {
+      expect(deckValidationSchemaReadinessSql, contains("version = '039'"));
+      expect(deckValidationSchemaReadinessSql, contains("version = '040'"));
+      expect(
+        deckValidationSchemaReadinessSql,
+        contains("column_name = 'is_reserved'"),
+      );
+      expect(
+        deckValidationSchemaReadinessSql,
+        contains('manaloom_deck_cards_require_review'),
+      );
+    });
+
     test('production AI readiness requires a configured provider', () {
       final missingProvider = evaluateAiRuntimeReadiness(
         DotEnv()..addAll({'ENVIRONMENT': 'production'}),
@@ -53,6 +66,66 @@ void main() {
         'gpt-5.4-mini',
       );
     });
+
+    test(
+      'auto Battle readiness requires all three configured engines',
+      () async {
+        final probed = <String>[];
+        final readiness = await evaluateBattleRuntimeReadiness(
+          DotEnv()..addAll({
+            'BATTLE_ENGINE': 'auto',
+            'XMAGE_SIDECAR_URL': 'http://xmage:8080',
+            'FORGE_SIDECAR_URL': 'http://forge:8080',
+            'NATIVE_BATTLE_SIDECAR_URL': 'http://native:8080',
+          }),
+          probe: (engine, uri) async {
+            probed.add('$engine:${uri.path}');
+            return true;
+          },
+        );
+
+        expect(readiness.healthy, isTrue);
+        expect(readiness.check['mode'], 'auto');
+        expect(
+          probed,
+          containsAll(<String>[
+            'xmage:/health',
+            'forge:/health',
+            'native:/health',
+          ]),
+        );
+      },
+    );
+
+    test('Battle readiness fails closed on an unavailable engine', () async {
+      final readiness = await evaluateBattleRuntimeReadiness(
+        DotEnv()..addAll({
+          'BATTLE_ENGINE': 'auto',
+          'XMAGE_SIDECAR_URL': 'http://xmage:8080',
+          'FORGE_SIDECAR_URL': 'http://forge:8080',
+          'NATIVE_BATTLE_SIDECAR_URL': 'http://native:8080',
+        }),
+        probe: (engine, uri) async => engine != 'forge',
+      );
+
+      expect(readiness.healthy, isFalse);
+      expect(readiness.check['error_code'], 'battle_runtime_not_ready');
+      expect(
+        (readiness.check['engines'] as Map)['forge'],
+        containsPair('status', 'unhealthy'),
+      );
+    });
+
+    test(
+      'Battle readiness does not leak invalid configuration details',
+      () async {
+        final readiness = await evaluateBattleRuntimeReadiness(DotEnv());
+
+        expect(readiness.healthy, isFalse);
+        expect(readiness.check['error_code'], 'auto_not_configured');
+        expect(readiness.check, isNot(contains('XMAGE_SIDECAR_URL')));
+      },
+    );
   });
 
   group('ready route contract', () {
@@ -84,6 +157,13 @@ void main() {
       expect(route, isNot(contains("'latency_ms': null")));
       expect(route, contains('isManaloomE2eIsolatedRuntime()'));
       expect(route, contains("checks['ai_runtime'] = aiRuntime.check"));
+      expect(route, contains("checks['battle_runtime'] = battleRuntime.check"));
+      expect(
+        route,
+        contains(
+          "checks['deck_validation_schema'] = deckValidationSchema.check",
+        ),
+      );
     });
   });
 }

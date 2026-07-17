@@ -314,7 +314,7 @@ void main() {
           '/auth/register': (body) {
             expect(body['username'], 'runtime_user');
             expect(body['email'], 'runtime.widget@example.com');
-            expect(body['password'], '123456');
+            expect(body['password'], 'BetaQa!2026-Deck');
             return ApiResponse(201, {
               'token': 'runtime-token',
               'user': {
@@ -519,11 +519,11 @@ void main() {
       );
       await tester.enterText(
         find.widgetWithText(TextFormField, 'Senha').first,
-        '123456',
+        'BetaQa!2026-Deck',
       );
       await tester.enterText(
         find.widgetWithText(TextFormField, 'Confirmar senha'),
-        '123456',
+        'BetaQa!2026-Deck',
       );
       final registerSubmit = find.widgetWithText(InkWell, 'Criar conta');
       await tester.ensureVisible(registerSubmit);

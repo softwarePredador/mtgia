@@ -3,45 +3,72 @@
 > Fonte de verdade de prioridade do `mtgia`. O método de validação e conclusão
 > fica em `docs/MANALOOM_E2E_RELEASE_CONTRACT.md`.
 
-## Estado operacional vigente — candidato de beta gratuita, 2026-07-16
+## Estado operacional vigente — candidato de beta gratuita, atualizado em 2026-07-17
 
 - alvo da rodada final: beta gratuita para Web + Android; checkout pago fica
   desabilitado/não anunciado e billing falha fechado;
-- decisão atual: **NO-GO para publicação** até fechar os P0 do documento de
-  candidato; implementação no checkout não equivale a produção;
+- estado local: **Battle, Deckbuilder e Life Counter fechados nos gates locais**;
+  a promoção live ainda não foi executada nem validada e, portanto, não há GO
+  de produção emitido;
 - versão selecionada: `1.0.0+2`; a SHA final ainda precisa ser congelada em
   checkout limpo com `HEAD == origin/master`;
-- o gate `full` integrado final passou com exit 0: backend 1494/1494, Flutter
-  analyze com 0 issues, Flutter 909 testes + 1 skip web-only, Web
-  ESLint/build de 12 páginas/smoke aprovados e npm com 0 vulnerabilidades;
-- a prova do smoke público fica em
-  `/tmp/manaloom_public_web_smoke/20260717T005350Z_97473_2517619098`;
+- as suítes integradas passaram com servidor all-local 1.583/1.583, Flutter
+  analyze com 0 issues e Flutter 948 testes + 1 skip web-only; o gate
+  operacional passou 25/25 contratos;
+- a Web pública passou `npm ci`, audit de produção com 0 vulnerabilidades,
+  lint e build Next.js de 13 rotas; o host Web do app passou build/runtime
+  Docker, `/healthz` 200, `/app/` 200 e validação de headers/cache;
 - o E2E passou com 14 etapas executadas e 5 perfis opt-in em SKIP; resolution
   preflight passou 19/19 sem writes e o Patrol smoke passou 9/9;
-- builds locais Web, Android e iOS passaram para `1.0.0+2`; APK/AAB Android
+- builds locais Web, Android e iOS sem codesign passaram para `1.0.0+2`;
+  APK/AAB Android
   tiveram package, versão, assinatura e permissões validados, e o APK instalou
-  e abriu no emulador Android 36 sem fatal/`MissingPlugin`;
+  e abriu no emulador Android 36 sem fatal; o APK tem SHA-256
+  `f8cc6a5b74c24ccb601e5577053d59439121f60f06f8b52c82fac27c94b395b4`
+  e o AAB `3f9b55d216646797e757f61d6a8ba963151948e77dd7e79db3936dcb4c5b9fd4`;
+- o SBOM Android provou paridade bidirecional de 158/158 dependências entre
+  `releaseRuntimeClasspath` e o `dependencies.pb` do AAB; o OSV consultou os
+  936 componentes, preservou 60 vulnerabilidades apenas em dependências
+  excluídas/não-release e encontrou 0 vulnerabilidade no artefato de release;
 - o Life Counter web passou em desktop e 390 × 844, com vida 40→41 persistida
-  após reload, menu/histórico/rota direta e console sem erros ou warnings;
-- no Android 36 debug host, o Life Counter nativo passou com quatro jogadores,
-  vida 40→41, menu e histórico/evento persistido; o overlap de “Todas as
-  partidas” com fechar/header foi corrigido e revalidado visualmente + teste
-  estático;
-- restore PostgreSQL local isolado passou em `postgres:17` sem rede, com 83
-  tabelas, 63 FKs, constraints válidas e zero writes remotos. `age 1.3.1` e
-  Docker 28.1.1 estão prontos, mas a cadeia off-site criptografada continua
-  pendente por falta de destino/recipient;
+  após reload, menu/histórico/rota direta e console sem erros ou warnings; a
+  recaptura desktop final confirmou dados, personalizado, moeda, fechar e
+  `ROLAR` sem corte;
+- no Android 36, o Life Counter passou na matriz de 2 a 6 jogadores e na
+  persistência 40→41 após fechar e reabrir; a captura antes/depois da
+  reabertura foi idêntica byte a byte. Isso continua sendo prova de emulador,
+  não de aparelho físico;
+- o backup PostgreSQL pré-migration tem 300.692.505 bytes, modo `0600`, SHA-256
+  validado e restaurou o schema em PostgreSQL 17 com 87 tabelas. Como ele
+  antecede a rotação da credencial, um dump fresco ainda é obrigatório antes
+  das migrations live. A cadeia off-site criptografada permanece pendente;
 - exportação/exclusão de conta e sync pós-jogo com revisão/cursor/tombstones
   estão implementados no cliente/servidor; dependem da migration 038 e de prova
   autenticada/multi-device;
-- a migration 038 está preparada e não deve ser tratada como aplicada. O fluxo
-  live continua exigindo precheck, backup, autorização literal, apply,
-  postcheck e rollback;
+- as migrations 038–040 estão preparadas e não devem ser tratadas como
+  aplicadas: 038 cobre privacidade/sync; 039 persiste o ciclo
+  `unknown/draft/validated` do deck e seus triggers de invalidação; 040
+  normaliza `cards.is_reserved` para `BOOLEAN NOT NULL DEFAULT FALSE`. O banco
+  live ainda reporta migration máxima 037;
 - trocas são coordenação P2P: ManaLoom não processa, protege nem garante
   pagamento ou entrega; o aviso de segurança foi incorporado à interface;
 - scanner permanece desabilitado por padrão até prova física fresca;
-- build iOS sem codesign passou como probe, mas publicação iOS segue fora do
-  alvo e bloqueada pela cadeia Apple;
+- build iOS sem codesign passou com baseline mínimo 15.5 e dependências
+  CocoaPods/SwiftPM fixadas, mas publicação iOS segue fora do alvo e bloqueada
+  pela cadeia Apple;
+- auth de produção agora rejeita JWT fraco/placeholder, senha fraca e proxy
+  confiável incompleto; backend/Web/host de distribuição Android e sidecars
+  convergem por digest imutável e health em deploy/rollback, cobertos por
+  contratos locais;
+- residual P1 local: o master Nginx do app Web inicia como root;
+  manaloom-ops, XMage e Forge rodam como root sem `Dockerfile HEALTHCHECK`, e
+  o Forge já passou build dos seis módulos e `/health` 200 com 33.288 cartas
+  indexadas;
+- uma credencial de conta ficou exposta no snapshot predecessor de
+  `origin/master` e permanece no histórico Git, mas a senha da conta já foi rotacionada:
+  a senha antiga retornou HTTP 401 e a nova HTTP 200. O candidato remove o
+  literal e o novo segredo permanece fora do repositório; a rotação do JWT e a
+  revogação prática dos tokens antigos dependem do deploy do backend;
 - a API/Web/APK já existentes em produção pertencem à versão anterior. Nenhum
   artefato deste candidato deve ser descrito como publicado;
 - PostgreSQL continua como verdade de produto; Hermes/SQLite é cache
@@ -49,17 +76,26 @@
 - os documentos canônicos desta decisão são:
   `docs/qa/MANALOOM_FREE_BETA_RELEASE_CANDIDATE_2026-07-16.md`,
   `docs/qa/MANALOOM_PRODUCT_EXPERIENCE_AUDIT_2026-07-16.md` e
-  `docs/qa/MANALOOM_FREE_BETA_RELEASE_OPS_GATE_2026-07-16.md`.
+  `docs/qa/MANALOOM_FREE_BETA_RELEASE_OPS_GATE_2026-07-16.md`; o fechamento
+  específico dos três módulos fica em
+  `docs/qa/MANALOOM_BATTLE_DECKBUILDER_LIFE_COUNTER_RELEASE_2026-07-17.md`.
 
 ## Próxima ação oficial
 
-1. revisar, commitar e publicar a SHA candidata sem misturar artefatos; o
-   `full`, E2E, resolution preflight e Patrol já têm evidência verde;
-2. executar o precheck read-only da migration 038 e preparar backup/rollback;
-3. obter autorização literal antes de migration ou deploy live;
-4. provar Web autenticada, APK assinado exato em Android físico, Sentry/FCM e
-   backup off-site criptografado; o restore local isolado já passou;
-5. somente então decidir **GO Web + Android** e promover de forma controlada.
+1. fazer staging explícito, commitar e publicar a branch candidata sem misturar
+   artefatos; as suítes integradas e os gates de Battle, Deckbuilder e Life
+   Counter já têm evidência local verde;
+2. congelar `origin/master` e reconstruir Web/APK/AAB/SBOM/provenance a partir
+   da mesma SHA limpa;
+3. gerar backup fresco pós-rotação, executar o precheck read-only das migrations
+   038–040 e preparar rollback;
+4. aplicar as migrations 038–040 e promover backend/Web somente com as
+   autorizações literais já definidas, registrando postcheck e identidade;
+5. provar revogação dos JWTs antigos, login novo, Battle persistida,
+   Deckbuilder validado e Life Counter com persistência no runtime publicado;
+6. provar compatibilidade Play App Signing, APK assinado exato em Android
+   físico, Sentry/FCM e backup off-site criptografado;
+7. somente então registrar o fechamento de produção Web + Android.
 
 ## Histórico acumulado anterior
 

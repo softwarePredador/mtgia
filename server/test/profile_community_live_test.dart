@@ -60,7 +60,7 @@ void main() {
       body: {
         'username': 'profile_community_$suffix',
         'email': 'profile_community_$suffix@example.com',
-        'password': 'TestPassword123!',
+        'password': 'BetaQa!2026-Deck',
       },
     );
   }

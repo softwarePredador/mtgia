@@ -4,7 +4,9 @@ import 'package:crypto/crypto.dart';
 import 'package:dart_jsonwebtoken/dart_jsonwebtoken.dart';
 import 'package:meta/meta.dart' show visibleForTesting;
 import 'package:postgres/postgres.dart';
+import 'auth_runtime_policy.dart';
 import 'database.dart';
+import 'password_policy.dart';
 import 'plan_service.dart';
 import 'runtime_environment.dart';
 
@@ -29,16 +31,12 @@ class AuthService {
     final env = loadRuntimeEnvironment();
     final secret = env['JWT_SECRET'];
 
-    if (secret == null || secret.isEmpty) {
-      throw StateError(
-        'ERRO CRÍTICO: JWT_SECRET não configurado!\n'
-        'Adicione no arquivo .env:\n'
-        'JWT_SECRET=sua_chave_secreta_aleatoria_aqui\n\n'
-        'Gere uma chave segura com: openssl rand -base64 48',
-      );
-    }
+    final production =
+        (env['ENVIRONMENT'] ?? 'development').trim().toLowerCase() ==
+        'production';
+    JwtSecretPolicy.validate(secret, production: production);
 
-    _jwtSecret = secret;
+    _jwtSecret = secret!;
   }
 
   @visibleForTesting
@@ -140,6 +138,14 @@ class AuthService {
 
     final normalizedUsername = normalizeUsername(username);
     final normalizedEmail = normalizeEmail(email);
+    final passwordValidation = PasswordPolicy.validate(
+      password,
+      username: normalizedUsername,
+      email: normalizedEmail,
+    );
+    if (!passwordValidation.isValid) {
+      throw Exception(passwordValidation.message);
+    }
 
     // Verificar se username já existe
     final usernameCheck = await conn.execute(

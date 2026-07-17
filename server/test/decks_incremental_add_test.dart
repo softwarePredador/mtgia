@@ -13,17 +13,18 @@ import 'package:test/test.dart';
 ///
 /// Requer servidor live-backend. Veja `test/README.md`.
 void main() {
-  final skipIntegration = Platform.environment['RUN_INTEGRATION_TESTS'] == '0'
-      ? 'Teste live desativado por RUN_INTEGRATION_TESTS=0.'
-      : null;
+  final skipIntegration =
+      Platform.environment['RUN_INTEGRATION_TESTS'] == '0'
+          ? 'Teste live desativado por RUN_INTEGRATION_TESTS=0.'
+          : null;
 
   final baseUrl =
       Platform.environment['TEST_API_BASE_URL'] ?? 'http://127.0.0.1:8082';
 
   const testUser = {
     'email': 'test_deck_incremental@example.com',
-    'password': 'TestPassword123!',
-    'username': 'test_deck_incremental_user'
+    'password': 'BetaQa!2026-Deck',
+    'username': 'test_deck_incremental_user',
   };
 
   Future<String> getAuthToken() async {
@@ -90,11 +91,7 @@ void main() {
   }
 
   Future<String> createDeck(String token, {String format = 'commander'}) async {
-    return createDeckWithCards(
-      token,
-      format: format,
-      cards: const [],
-    );
+    return createDeckWithCards(token, format: format, cards: const []);
   }
 
   Future<Map<String, dynamic>?> findCardByNames(
@@ -104,7 +101,8 @@ void main() {
     for (final name in names) {
       final response = await http.get(
         Uri.parse(
-            '$baseUrl/cards?name=${Uri.encodeQueryComponent(name)}&limit=10'),
+          '$baseUrl/cards?name=${Uri.encodeQueryComponent(name)}&limit=10',
+        ),
         headers: {'Authorization': 'Bearer $token'},
       );
       if (response.statusCode != 200) continue;
@@ -120,7 +118,7 @@ void main() {
     final oracle = (card['oracle_text'] as String? ?? '').toLowerCase();
     final hasPowerToughnessBox =
         (card['power']?.toString().trim().isNotEmpty ?? false) &&
-            (card['toughness']?.toString().trim().isNotEmpty ?? false);
+        (card['toughness']?.toString().trim().isNotEmpty ?? false);
     return (typeLine.contains('legendary') && typeLine.contains('creature')) ||
         (typeLine.contains('legendary') &&
             (typeLine.contains('vehicle') || typeLine.contains('spacecraft')) &&
@@ -252,95 +250,122 @@ void main() {
     await Future.delayed(const Duration(milliseconds: 200));
   });
 
-  test('POST /decks/:id/cards should add commander and block outside identity',
-      () async {
-    final token = await getAuthToken();
-    final deckId = await createDeck(token, format: 'commander');
+  test(
+    'POST /decks/:id/cards should add commander and block outside identity',
+    () async {
+      final token = await getAuthToken();
+      final deckId = await createDeck(token, format: 'commander');
 
-    final commander = await findCardByNames(token, names: [
-      'Talrand, Sky Summoner',
-      'Krenko, Mob Boss',
-      'Lathril, Blade of the Elves',
-      'Niv-Mizzet, Parun',
-    ]);
-    if (commander == null || !isCommanderEligible(commander)) {
-      return;
-    }
+      final commander = await findCardByNames(
+        token,
+        names: [
+          'Talrand, Sky Summoner',
+          'Krenko, Mob Boss',
+          'Lathril, Blade of the Elves',
+          'Niv-Mizzet, Parun',
+        ],
+      );
+      if (commander == null || !isCommanderEligible(commander)) {
+        return;
+      }
 
-    final commanderId = commander['id'] as String;
-    final commanderIdentity =
-        identityOf(commander).map((e) => e.toUpperCase()).toSet();
-    if (commanderIdentity.isEmpty) {
-      return;
-    }
+      final commanderId = commander['id'] as String;
+      final commanderIdentity =
+          identityOf(commander).map((e) => e.toUpperCase()).toSet();
+      if (commanderIdentity.isEmpty) {
+        return;
+      }
 
-    final addCommanderRes = await addCard(
-      token,
-      deckId: deckId,
-      cardId: commanderId,
-      quantity: 1,
-      isCommander: true,
-    );
-    expect(addCommanderRes.statusCode, equals(200),
-        reason: addCommanderRes.body);
+      final addCommanderRes = await addCard(
+        token,
+        deckId: deckId,
+        cardId: commanderId,
+        quantity: 1,
+        isCommander: true,
+      );
+      expect(
+        addCommanderRes.statusCode,
+        equals(200),
+        reason: addCommanderRes.body,
+      );
 
-    final outside =
-        await findCardByNames(token, names: ['Lightning Bolt', 'Shock']);
-    if (outside == null) return;
+      final outside = await findCardByNames(
+        token,
+        names: ['Lightning Bolt', 'Shock'],
+      );
+      if (outside == null) return;
 
-    final outsideId = outside['id'] as String;
-    final outsideIdentity =
-        identityOf(outside).map((e) => e.toUpperCase()).toSet();
-    final outsideIsOutside =
-        outsideIdentity.any((c) => !commanderIdentity.contains(c));
-    if (!outsideIsOutside) return;
+      final outsideId = outside['id'] as String;
+      final outsideIdentity =
+          identityOf(outside).map((e) => e.toUpperCase()).toSet();
+      final outsideIsOutside = outsideIdentity.any(
+        (c) => !commanderIdentity.contains(c),
+      );
+      if (!outsideIsOutside) return;
 
-    final addOutsideRes =
-        await addCard(token, deckId: deckId, cardId: outsideId, quantity: 1);
-    expect(addOutsideRes.statusCode, equals(400), reason: addOutsideRes.body);
-  }, skip: skipIntegration);
+      final addOutsideRes = await addCard(
+        token,
+        deckId: deckId,
+        cardId: outsideId,
+        quantity: 1,
+      );
+      expect(addOutsideRes.statusCode, equals(400), reason: addOutsideRes.body);
+    },
+    skip: skipIntegration,
+  );
 
   test(
-      'POST /decks/:id/validate should fail when deck is not complete (Commander=100)',
-      () async {
-    final token = await getAuthToken();
-    final deckId = await createDeck(token, format: 'commander');
+    'POST /decks/:id/validate should fail when deck is not complete (Commander=100)',
+    () async {
+      final token = await getAuthToken();
+      final deckId = await createDeck(token, format: 'commander');
 
-    final commander = await findCardByNames(token, names: [
-      'Talrand, Sky Summoner',
-      'Krenko, Mob Boss',
-      'Lathril, Blade of the Elves',
-      'Niv-Mizzet, Parun',
-    ]);
-    if (commander == null || !isCommanderEligible(commander)) {
-      return;
-    }
+      final commander = await findCardByNames(
+        token,
+        names: [
+          'Talrand, Sky Summoner',
+          'Krenko, Mob Boss',
+          'Lathril, Blade of the Elves',
+          'Niv-Mizzet, Parun',
+        ],
+      );
+      if (commander == null || !isCommanderEligible(commander)) {
+        return;
+      }
 
-    final commanderId = commander['id'] as String;
-    final addCommanderRes = await addCard(
-      token,
-      deckId: deckId,
-      cardId: commanderId,
-      quantity: 1,
-      isCommander: true,
-    );
-    expect(addCommanderRes.statusCode, equals(200),
-        reason: addCommanderRes.body);
+      final commanderId = commander['id'] as String;
+      final addCommanderRes = await addCard(
+        token,
+        deckId: deckId,
+        cardId: commanderId,
+        quantity: 1,
+        isCommander: true,
+      );
+      expect(
+        addCommanderRes.statusCode,
+        equals(200),
+        reason: addCommanderRes.body,
+      );
 
-    final validateRes = await validateDeck(token, deckId);
-    expect(validateRes.statusCode, equals(400), reason: validateRes.body);
-  }, skip: skipIntegration);
+      final validateRes = await validateDeck(token, deckId);
+      expect(validateRes.statusCode, equals(400), reason: validateRes.body);
+    },
+    skip: skipIntegration,
+  );
 
   test(
     'POST /decks/:id/cards/set should reject update that exceeds Commander deck size',
     () async {
       final token = await getAuthToken();
-      final commander = await findCardByNames(token, names: [
-        'Talrand, Sky Summoner',
-        'Krenko, Mob Boss',
-        'Lathril, Blade of the Elves',
-        'Niv-Mizzet, Parun',
-      ]);
+      final commander = await findCardByNames(
+        token,
+        names: [
+          'Talrand, Sky Summoner',
+          'Krenko, Mob Boss',
+          'Lathril, Blade of the Elves',
+          'Niv-Mizzet, Parun',
+        ],
+      );
       final wastes = await findCardByNames(token, names: ['Wastes']);
 
       if (commander == null ||
@@ -353,16 +378,8 @@ void main() {
         token,
         format: 'commander',
         cards: [
-          {
-            'card_id': commander['id'],
-            'quantity': 1,
-            'is_commander': true,
-          },
-          {
-            'card_id': wastes['id'],
-            'quantity': 99,
-            'is_commander': false,
-          },
+          {'card_id': commander['id'], 'quantity': 1, 'is_commander': true},
+          {'card_id': wastes['id'], 'quantity': 99, 'is_commander': false},
         ],
       );
 
@@ -382,27 +399,34 @@ void main() {
     'POST /decks/:id/cards/set should preserve commander slot when changing edition',
     () async {
       final token = await getAuthToken();
-      final commander = await findCardByNames(token, names: [
-        'Talrand, Sky Summoner',
-        'Krenko, Mob Boss',
-        'Lathril, Blade of the Elves',
-        'Niv-Mizzet, Parun',
-      ]);
+      final commander = await findCardByNames(
+        token,
+        names: [
+          'Talrand, Sky Summoner',
+          'Krenko, Mob Boss',
+          'Lathril, Blade of the Elves',
+          'Niv-Mizzet, Parun',
+        ],
+      );
       if (commander == null || !isCommanderEligible(commander)) {
         return;
       }
 
-      final printings =
-          await fetchPrintings(token, commander['name'] as String);
+      final printings = await fetchPrintings(
+        token,
+        commander['name'] as String,
+      );
       if (printings.length < 2) {
         return;
       }
 
       final firstId = printings.first['id'] as String;
-      final secondId = printings.firstWhere(
-        (p) => p['id'] != firstId,
-        orElse: () => printings.last,
-      )['id'] as String;
+      final secondId =
+          printings.firstWhere(
+                (p) => p['id'] != firstId,
+                orElse: () => printings.last,
+              )['id']
+              as String;
       if (firstId == secondId) return;
 
       final deckId = await createDeck(token, format: 'commander');
@@ -413,8 +437,11 @@ void main() {
         quantity: 1,
         isCommander: true,
       );
-      expect(addCommanderRes.statusCode, equals(200),
-          reason: addCommanderRes.body);
+      expect(
+        addCommanderRes.statusCode,
+        equals(200),
+        reason: addCommanderRes.body,
+      );
 
       final setRes = await setCardQuantity(
         token,
@@ -433,10 +460,11 @@ void main() {
       expect(commanderCards.single['id'], secondId);
 
       final mainBoard = (deck['main_board'] as Map?) ?? const {};
-      final flattenedMain = mainBoard.values
-          .whereType<List>()
-          .expand((items) => items)
-          .whereType<Map>();
+      final flattenedMain =
+          mainBoard.values
+              .whereType<List>()
+              .expand((items) => items)
+              .whereType<Map>();
       expect(flattenedMain.any((card) => card['id'] == secondId), isFalse);
       expect(flattenedMain.any((card) => card['id'] == firstId), isFalse);
     },
@@ -447,27 +475,34 @@ void main() {
     'POST /decks/:id/cards should replace single commander slot without demoting old commander',
     () async {
       final token = await getAuthToken();
-      final commander = await findCardByNames(token, names: [
-        'Talrand, Sky Summoner',
-        'Krenko, Mob Boss',
-        'Lathril, Blade of the Elves',
-        'Niv-Mizzet, Parun',
-      ]);
+      final commander = await findCardByNames(
+        token,
+        names: [
+          'Talrand, Sky Summoner',
+          'Krenko, Mob Boss',
+          'Lathril, Blade of the Elves',
+          'Niv-Mizzet, Parun',
+        ],
+      );
       if (commander == null || !isCommanderEligible(commander)) {
         return;
       }
 
-      final printings =
-          await fetchPrintings(token, commander['name'] as String);
+      final printings = await fetchPrintings(
+        token,
+        commander['name'] as String,
+      );
       if (printings.length < 2) {
         return;
       }
 
       final firstId = printings.first['id'] as String;
-      final secondId = printings.firstWhere(
-        (p) => p['id'] != firstId,
-        orElse: () => printings.last,
-      )['id'] as String;
+      final secondId =
+          printings.firstWhere(
+                (p) => p['id'] != firstId,
+                orElse: () => printings.last,
+              )['id']
+              as String;
       if (firstId == secondId) return;
 
       final deckId = await createDeck(token, format: 'commander');
@@ -496,10 +531,11 @@ void main() {
       expect(commanderCards.single['id'], secondId);
 
       final mainBoard = (deck['main_board'] as Map?) ?? const {};
-      final flattenedMain = mainBoard.values
-          .whereType<List>()
-          .expand((items) => items)
-          .whereType<Map>();
+      final flattenedMain =
+          mainBoard.values
+              .whereType<List>()
+              .expand((items) => items)
+              .whereType<Map>();
       expect(flattenedMain.any((card) => card['id'] == firstId), isFalse);
       expect(flattenedMain.any((card) => card['id'] == secondId), isFalse);
     },
@@ -510,12 +546,15 @@ void main() {
     'POST /decks/:id/cards should reject adding the commander to the 99',
     () async {
       final token = await getAuthToken();
-      final commander = await findCardByNames(token, names: [
-        'Talrand, Sky Summoner',
-        'Krenko, Mob Boss',
-        'Lathril, Blade of the Elves',
-        'Niv-Mizzet, Parun',
-      ]);
+      final commander = await findCardByNames(
+        token,
+        names: [
+          'Talrand, Sky Summoner',
+          'Krenko, Mob Boss',
+          'Lathril, Blade of the Elves',
+          'Niv-Mizzet, Parun',
+        ],
+      );
       if (commander == null || !isCommanderEligible(commander)) {
         return;
       }
@@ -529,8 +568,11 @@ void main() {
         quantity: 1,
         isCommander: true,
       );
-      expect(addCommanderRes.statusCode, equals(200),
-          reason: addCommanderRes.body);
+      expect(
+        addCommanderRes.statusCode,
+        equals(200),
+        reason: addCommanderRes.body,
+      );
 
       final addMainRes = await addCard(
         token,
@@ -545,8 +587,10 @@ void main() {
           ((deck['commander'] as List?) ?? const []).cast<Map>();
       expect(commanderCards, hasLength(1));
       expect(commanderCards.single['id'], commanderId);
-      expect(flattenMainBoard(deck).any((card) => card['id'] == commanderId),
-          isFalse);
+      expect(
+        flattenMainBoard(deck).any((card) => card['id'] == commanderId),
+        isFalse,
+      );
     },
     skip: skipIntegration,
   );
@@ -556,18 +600,19 @@ void main() {
     () async {
       final token = await getAuthToken();
       const commanderName = 'Lorehold, the Historian';
-      final printings = (await fetchPickerPrintings(token, commanderName))
-          .where(
-            (printing) =>
-                (printing['id'] ?? '').toString().trim().isNotEmpty &&
-                (printing['set_code'] ?? '').toString().trim().isNotEmpty &&
-                (printing['collector_number'] ?? '')
-                    .toString()
-                    .trim()
-                    .isNotEmpty &&
-                (printing['rarity'] ?? '').toString().trim().isNotEmpty,
-          )
-          .toList();
+      final printings =
+          (await fetchPickerPrintings(token, commanderName))
+              .where(
+                (printing) =>
+                    (printing['id'] ?? '').toString().trim().isNotEmpty &&
+                    (printing['set_code'] ?? '').toString().trim().isNotEmpty &&
+                    (printing['collector_number'] ?? '')
+                        .toString()
+                        .trim()
+                        .isNotEmpty &&
+                    (printing['rarity'] ?? '').toString().trim().isNotEmpty,
+              )
+              .toList();
 
       if (printings.length < 2) {
         return;
@@ -598,8 +643,11 @@ void main() {
         quantity: 1,
         isCommander: true,
       );
-      expect(addCommanderRes.statusCode, equals(200),
-          reason: addCommanderRes.body);
+      expect(
+        addCommanderRes.statusCode,
+        equals(200),
+        reason: addCommanderRes.body,
+      );
 
       for (final option in printings) {
         final optionId = option['id'] as String;
