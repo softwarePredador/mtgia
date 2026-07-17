@@ -7,6 +7,17 @@ import '../lib/rate_limit_middleware.dart';
 
 void main() {
   group('RateLimiter', () {
+    test('classifies transport peers without exposing address values', () {
+      expect(classifyRateLimitTransportPeer(null), 'missing');
+      expect(classifyRateLimitTransportPeer('not-an-ip'), 'invalid');
+      expect(classifyRateLimitTransportPeer('10.0.0.42'), 'ipv4');
+      expect(classifyRateLimitTransportPeer('2001:db8::1'), 'ipv6');
+      expect(
+        classifyRateLimitTransportPeer('::ffff:10.0.0.42'),
+        'ipv4_mapped_ipv6',
+      );
+    });
+
     test('does not trust forwarded IP without an explicit proxy contract', () {
       final clientId = RateLimiter.buildClientIdentifierFromHeaders({
         'X-Forwarded-For': '203.0.113.10, 10.0.0.1',

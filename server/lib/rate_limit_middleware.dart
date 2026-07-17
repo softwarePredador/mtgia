@@ -5,6 +5,7 @@ import 'package:postgres/postgres.dart';
 import 'auth_runtime_policy.dart';
 import 'distributed_rate_limiter.dart';
 import 'internal_ai_request_token.dart';
+import 'logger.dart';
 import 'runtime_environment.dart';
 
 /// Rate Limiter Middleware para prevenir abuso de endpoints
@@ -197,6 +198,43 @@ String? _requestRemoteAddress(RequestContext context) {
   }
 }
 
+String classifyRateLimitTransportPeer(String? remoteAddress) {
+  final parsed = InternetAddress.tryParse(remoteAddress?.trim() ?? '');
+  if (parsed == null) {
+    return remoteAddress == null || remoteAddress.trim().isEmpty
+        ? 'missing'
+        : 'invalid';
+  }
+  final bytes = parsed.rawAddress;
+  if (bytes.length == 16 &&
+      bytes.take(10).every((byte) => byte == 0) &&
+      bytes[10] == 0xff &&
+      bytes[11] == 0xff) {
+    return 'ipv4_mapped_ipv6';
+  }
+  return bytes.length == 4 ? 'ipv4' : 'ipv6';
+}
+
+bool _hasForwardedFor(Map<String, String> headers) => headers.entries.any(
+  (entry) =>
+      entry.key.toLowerCase() == 'x-forwarded-for' &&
+      entry.value.trim().isNotEmpty,
+);
+
+void _logIdentityFailure({
+  required String bucket,
+  required ClientIdentityResolution identity,
+  required Map<String, String> headers,
+  required String? remoteAddress,
+}) {
+  Log.w(
+    '[rate-limit] identity_unavailable bucket=$bucket '
+    'code=${identity.failureCode ?? 'unknown'} '
+    'peer_kind=${classifyRateLimitTransportPeer(remoteAddress)} '
+    'forwarded_for_present=${_hasForwardedFor(headers)}',
+  );
+}
+
 bool _useDistributedRateLimitInProd() {
   final env = loadRuntimeEnvironment();
   final raw = (env['RATE_LIMIT_DISTRIBUTED'] ?? 'true').toLowerCase().trim();
@@ -301,12 +339,19 @@ Middleware authRateLimit() {
       final environment = _rateLimitRuntimeEnvironment();
       final isProd = _isProductionEnvironment(environment);
       final limiter = isProd ? _authRateLimiter : _authRateLimiterDev;
+      final remoteAddress = _requestRemoteAddress(context);
       final identity = resolveRateLimitClientIdentity(
         headers: context.request.headers,
         environment: environment,
-        remoteAddress: _requestRemoteAddress(context),
+        remoteAddress: remoteAddress,
       );
       if (!identity.isValid) {
+        _logIdentityFailure(
+          bucket: 'auth',
+          identity: identity,
+          headers: context.request.headers,
+          remoteAddress: remoteAddress,
+        );
         return _rateLimitIdentityUnavailable();
       }
       final clientId = identity.identifier!;
@@ -412,12 +457,19 @@ Middleware _aiRateLimit({
       if (normalizedUserId != null && normalizedUserId.isNotEmpty) {
         clientId = 'user:$normalizedUserId';
       } else {
+        final remoteAddress = _requestRemoteAddress(context);
         final identity = resolveRateLimitClientIdentity(
           headers: context.request.headers,
           environment: environment,
-          remoteAddress: _requestRemoteAddress(context),
+          remoteAddress: remoteAddress,
         );
         if (!identity.isValid) {
+          _logIdentityFailure(
+            bucket: bucket,
+            identity: identity,
+            headers: context.request.headers,
+            remoteAddress: remoteAddress,
+          );
           return _rateLimitIdentityUnavailable();
         }
         clientId = identity.identifier!;
