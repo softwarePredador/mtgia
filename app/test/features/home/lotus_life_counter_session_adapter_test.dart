@@ -531,7 +531,7 @@ void main() {
             LifeCounterSession.initial(playerCount: 6),
           );
 
-      expect(jsonDecode(twoPlayerValues['layoutType']!), 'portrait-portrait');
+      expect(jsonDecode(twoPlayerValues['layoutType']!), 'landscape-landscape');
       expect(
         jsonDecode(fivePlayerValues['layoutType']!),
         'portrait-portrait-portrait-portrait-landscape',

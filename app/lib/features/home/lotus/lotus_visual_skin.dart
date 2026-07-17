@@ -1673,12 +1673,10 @@ body {
 }
 
 /*
- * Keep every tabletop value on the device's horizontal reading axis. Lotus
- * rotates portrait player cards by 90 degrees for a round-table layout; in
- * ManaLoom the device is shared in landscape, so that treatment makes life,
- * +/- controls and counters read vertically. Restoring the card's own width
- * and height also keeps its visual and touch regions aligned after rotation
- * is removed.
+ * Lotus encodes rotation in the selected layout, but ManaLoom runs the table
+ * in landscape and must face each card toward its physical seat. Normalize
+ * the stock transform first; the seat synchronizer below then assigns a
+ * direction from the card's rendered row and column.
  */
 ${LotusDomSelectors.playerCard}.rotate-left .player-card-inner,
 ${LotusDomSelectors.playerCard}.rotate-right .player-card-inner {
@@ -1687,6 +1685,42 @@ ${LotusDomSelectors.playerCard}.rotate-right .player-card-inner {
   width: var(--width) !important;
   height: var(--height) !important;
   transform: none;
+}
+
+${LotusDomSelectors.playerCard}[data-manaloom-seat-facing="opposite"] .player-card-inner,
+${LotusDomSelectors.playerCard}[data-manaloom-seat-facing="near"] .player-card-inner {
+  --sizeWidth: var(--width) !important;
+  --sizeHeight: var(--height) !important;
+  width: var(--width) !important;
+  height: var(--height) !important;
+  transform: none;
+  transform-origin: center !important;
+}
+
+${LotusDomSelectors.playerCard}[data-manaloom-seat-facing="opposite"] .player-card-inner {
+  rotate: 180deg !important;
+}
+
+${LotusDomSelectors.playerCard}[data-manaloom-seat-facing="near"] .player-card-inner {
+  rotate: 0deg !important;
+}
+
+${LotusDomSelectors.playerCard}[data-manaloom-seat-facing="left"] .player-card-inner,
+${LotusDomSelectors.playerCard}[data-manaloom-seat-facing="right"] .player-card-inner {
+  --sizeWidth: var(--height) !important;
+  --sizeHeight: var(--width) !important;
+  width: var(--height) !important;
+  height: var(--width) !important;
+  transform: none;
+  transform-origin: center !important;
+}
+
+${LotusDomSelectors.playerCard}[data-manaloom-seat-facing="left"] .player-card-inner {
+  rotate: 90deg !important;
+}
+
+${LotusDomSelectors.playerCard}[data-manaloom-seat-facing="right"] .player-card-inner {
+  rotate: -90deg !important;
 }
 
 ${LotusDomSelectors.playerCard} .player-life-count,
@@ -2374,6 +2408,14 @@ textarea:focus-visible {
   let activeDialog = null;
   let restoreFocusNode = null;
   let playerLayoutObserver = null;
+  const tabletopSeatFacing = Object.freeze({
+    opposite: 'opposite',
+    near: 'near',
+    left: 'left',
+    right: 'right',
+  });
+  const tabletopPlayerCountMin = 2;
+  const tabletopPlayerCountMax = 6;
   const dialogFocusableSelector = [
     'button:not([disabled])',
     'input:not([disabled])',
@@ -2513,12 +2555,173 @@ textarea:focus-visible {
     }
   };
 
+  const clearTabletopSeat = (card) => {
+    if (!(card instanceof HTMLElement)) {
+      return;
+    }
+    delete card.dataset.manaloomSeatFacing;
+    delete card.dataset.manaloomSeatRow;
+    delete card.dataset.manaloomSeatPosition;
+  };
+
+  const findTabletopPlayerCards = (playerCards) => {
+    const groups = new Map();
+    playerCards.forEach((card) => {
+      if (
+        !(card instanceof HTMLElement) ||
+        !(card.parentElement instanceof HTMLElement) ||
+        card.closest('[class*="overlay"], [data-manaloom-visual-proof="true"]') !== null
+      ) {
+        return;
+      }
+      const siblings = groups.get(card.parentElement) || [];
+      siblings.push(card);
+      groups.set(card.parentElement, siblings);
+    });
+
+    return Array.from(groups.values())
+      .filter((cards) => {
+        return cards.length >= tabletopPlayerCountMin &&
+          cards.length <= tabletopPlayerCountMax;
+      })
+      .map((cards) => ({
+        cards,
+        visibleArea: cards.reduce((area, card) => {
+          const bounds = card.getBoundingClientRect();
+          return area + Math.max(0, bounds.width) * Math.max(0, bounds.height);
+        }, 0),
+      }))
+      .filter((group) => group.visibleArea > 0)
+      .sort((left, right) => right.visibleArea - left.visibleArea)[0]?.cards || [];
+  };
+
+  const groupTabletopRows = (cards) => {
+    const measuredCards = cards
+      .map((card) => ({ card, bounds: card.getBoundingClientRect() }))
+      .filter(({ bounds }) => bounds.width > 0 && bounds.height > 0)
+      .sort((left, right) => {
+        const verticalDelta = left.bounds.top - right.bounds.top;
+        return Math.abs(verticalDelta) > 2
+          ? verticalDelta
+          : left.bounds.left - right.bounds.left;
+      });
+    if (measuredCards.length !== cards.length) {
+      return [];
+    }
+
+    const rowTolerance = Math.max(
+      2,
+      Math.min(...measuredCards.map(({ bounds }) => bounds.height)) * 0.12,
+    );
+    const rows = [];
+    measuredCards.forEach((entry) => {
+      const currentRow = rows[rows.length - 1];
+      if (!currentRow || Math.abs(currentRow.top - entry.bounds.top) > rowTolerance) {
+        rows.push({ top: entry.bounds.top, entries: [entry] });
+        return;
+      }
+      currentRow.entries.push(entry);
+      currentRow.top = currentRow.entries.reduce(
+        (sum, item) => sum + item.bounds.top,
+        0,
+      ) / currentRow.entries.length;
+    });
+    rows.forEach((row) => {
+      row.entries.sort((left, right) => left.bounds.left - right.bounds.left);
+    });
+    return rows;
+  };
+
+  const setTabletopSeat = (entry, facing, rowIndex, positionIndex) => {
+    entry.card.dataset.manaloomSeatFacing = facing;
+    entry.card.dataset.manaloomSeatRow = String(rowIndex + 1);
+    entry.card.dataset.manaloomSeatPosition = String(positionIndex + 1);
+  };
+
+  const syncTabletopSeatLayout = (playerCards = Array.from(
+    document.querySelectorAll(${jsonEncode(LotusDomSelectors.playerCard)}),
+  )) => {
+    const tableCards = findTabletopPlayerCards(playerCards);
+    const tableCardSet = new Set(tableCards);
+    playerCards.forEach((card) => {
+      if (!tableCardSet.has(card)) {
+        clearTabletopSeat(card);
+      }
+    });
+    const rows = groupTabletopRows(tableCards);
+    if (rows.length === 0) {
+      tableCards.forEach(clearTabletopSeat);
+      return [];
+    }
+
+    const tableBounds = tableCards.reduce(
+      (bounds, card) => {
+        const cardBounds = card.getBoundingClientRect();
+        return {
+          left: Math.min(bounds.left, cardBounds.left),
+          right: Math.max(bounds.right, cardBounds.right),
+        };
+      },
+      { left: Number.POSITIVE_INFINITY, right: Number.NEGATIVE_INFINITY },
+    );
+    const tableCenterX = (tableBounds.left + tableBounds.right) / 2;
+
+    rows.forEach((row, rowIndex) => {
+      row.entries.forEach((entry, positionIndex) => {
+        let facing;
+        if (rows.length === 1) {
+          const cardCenterX = entry.bounds.left + entry.bounds.width / 2;
+          facing = cardCenterX <= tableCenterX
+            ? tabletopSeatFacing.left
+            : tabletopSeatFacing.right;
+        } else if (rowIndex === 0) {
+          facing = tabletopSeatFacing.opposite;
+        } else if (rowIndex === rows.length - 1) {
+          facing = tabletopSeatFacing.near;
+        } else {
+          const cardCenterX = entry.bounds.left + entry.bounds.width / 2;
+          facing = cardCenterX <= tableCenterX
+            ? tabletopSeatFacing.left
+            : tabletopSeatFacing.right;
+        }
+        setTabletopSeat(entry, facing, rowIndex, positionIndex);
+      });
+    });
+
+    return tableCards.map((card) => {
+      const panel = card.querySelector('.player-card-inner');
+      const cardBounds = card.getBoundingClientRect();
+      const panelBounds = panel instanceof HTMLElement
+        ? panel.getBoundingClientRect()
+        : null;
+      const panelStyle = panel instanceof HTMLElement
+        ? getComputedStyle(panel)
+        : null;
+      return {
+        facing: card.dataset.manaloomSeatFacing || null,
+        row: Number.parseInt(card.dataset.manaloomSeatRow || '0', 10),
+        position: Number.parseInt(card.dataset.manaloomSeatPosition || '0', 10),
+        rotation: panelStyle?.rotate || null,
+        cardWidth: cardBounds.width,
+        cardHeight: cardBounds.height,
+        panelWidth: panelBounds?.width || 0,
+        panelHeight: panelBounds?.height || 0,
+        panelFits: panelBounds !== null &&
+          panelBounds.left >= cardBounds.left - 2 &&
+          panelBounds.right <= cardBounds.right + 2 &&
+          panelBounds.top >= cardBounds.top - 2 &&
+          panelBounds.bottom <= cardBounds.bottom + 2,
+      };
+    });
+  };
+
   const syncAccessibility = () => {
     syncPtBrCopy();
 
     const playerCards = Array.from(document.querySelectorAll(
       ${jsonEncode(LotusDomSelectors.playerCard)},
     ));
+    syncTabletopSeatLayout(playerCards);
     playerCards.forEach((card, index) => {
       if (!(card instanceof HTMLElement)) {
         return;
@@ -2801,6 +3004,10 @@ textarea:focus-visible {
     observer: accessibilityObserver,
     sync: syncAccessibility,
   };
+  window.__ManaLoomTabletopSeatLayout = Object.freeze({
+    sync: syncTabletopSeatLayout,
+    snapshot: () => syncTabletopSeatLayout(),
+  });
   syncAccessibility();
 })();
 ''';

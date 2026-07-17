@@ -140,7 +140,7 @@ void main() {
       );
     });
 
-    test('keeps life and counters on the horizontal reading axis', () {
+    test('faces every player card toward its physical table seat', () {
       expect(
         lotusInjectedVisualSkinScript,
         contains('.player-card.rotate-left .player-card-inner'),
@@ -156,6 +156,33 @@ void main() {
       expect(
         lotusInjectedVisualSkinScript,
         contains('--sizeHeight: var(--height) !important'),
+      );
+      expect(
+        lotusInjectedVisualSkinScript,
+        contains('data-manaloom-seat-facing=\\"opposite\\"'),
+      );
+      expect(
+        lotusInjectedVisualSkinScript,
+        contains('data-manaloom-seat-facing=\\"near\\"'),
+      );
+      expect(
+        lotusInjectedVisualSkinScript,
+        contains('data-manaloom-seat-facing=\\"left\\"'),
+      );
+      expect(
+        lotusInjectedVisualSkinScript,
+        contains('data-manaloom-seat-facing=\\"right\\"'),
+      );
+      expect(lotusInjectedVisualSkinScript, contains('rotate: 180deg'));
+      expect(lotusInjectedVisualSkinScript, contains('rotate: 90deg'));
+      expect(lotusInjectedVisualSkinScript, contains('rotate: -90deg'));
+      expect(
+        lotusInjectedVisualSkinScript,
+        contains('const syncTabletopSeatLayout ='),
+      );
+      expect(
+        lotusInjectedVisualSkinScript,
+        contains('window.__ManaLoomTabletopSeatLayout'),
       );
       expect(
         lotusInjectedVisualSkinScript,

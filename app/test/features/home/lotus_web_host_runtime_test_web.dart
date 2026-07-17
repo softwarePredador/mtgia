@@ -182,6 +182,94 @@ void main() {
   horizontalPreview.style.aspectRatio = 'var(--aspect-ratio-card)';
   horizontalCard.appendChild(horizontalPreview);
   const horizontalPreviewStyle = getComputedStyle(horizontalPreview);
+  const tabletopLayouts = {
+    2: 'landscape-landscape',
+    3: 'portrait-portrait-landscape',
+    4: 'portrait-portrait-portrait-portrait',
+    5: 'portrait-portrait-portrait-portrait-landscape',
+    6: 'portrait-portrait-portrait-portrait-portrait-portrait',
+  };
+  const tabletopGridTemplates = {
+    2: { columns: '1fr', rows: '1fr 1fr' },
+    3: { columns: '1fr 1fr', rows: '1.7fr 1fr' },
+    4: { columns: '1fr 1fr', rows: '1fr 1fr' },
+    5: { columns: '1fr 1fr', rows: '1fr 1fr .7fr' },
+    6: { columns: '1fr 1fr', rows: '1fr 1fr 1fr' },
+  };
+  const probeTabletopLayout = async (playerCount) => {
+    const tutorial = document.createElement('aside');
+    tutorial.className = 'show-counters-hint-overlay';
+    tutorial.innerHTML = `
+      <article class="player-card"><div class="player-card-inner"></div></article>
+      <article class="player-card"><div class="player-card-inner"></div></article>
+    `;
+    document.body.appendChild(tutorial);
+    const board = document.createElement('section');
+    board.className = tabletopLayouts[playerCount];
+    const gridTemplate = tabletopGridTemplates[playerCount];
+    Object.assign(board.style, {
+      position: 'fixed',
+      left: '-1000px',
+      top: '0',
+      width: '600px',
+      height: '420px',
+      display: 'grid',
+      gridTemplateColumns: gridTemplate.columns,
+      gridTemplateRows: gridTemplate.rows,
+      gap: '4px',
+      opacity: '0',
+      pointerEvents: 'none',
+    });
+    const cards = Array.from({ length: playerCount }, (_, index) => {
+      const card = document.createElement('article');
+      card.className = 'player-card ' + (index % 2 === 0 ? 'rotate-right' : 'rotate-left');
+      card.style.setProperty('--width', '240px');
+      card.style.setProperty('--height', '140px');
+      const inner = document.createElement('div');
+      inner.className = 'player-card-inner';
+      inner.innerHTML = '<div class="player-life-count">40</div>';
+      card.appendChild(inner);
+      board.appendChild(card);
+      return card;
+    });
+    if (playerCount === 3) {
+      cards[2].style.gridColumn = '1 / -1';
+    } else if (playerCount === 5) {
+      cards[4].style.gridColumn = '1 / -1';
+    }
+    document.body.appendChild(board);
+    await new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)));
+    window.__ManaLoomTabletopSeatLayout.sync();
+    await new Promise((resolve) => requestAnimationFrame(resolve));
+
+    const seats = cards.map((card) => {
+      const inner = card.querySelector('.player-card-inner');
+      const style = getComputedStyle(inner);
+      return {
+        facing: card.dataset.manaloomSeatFacing,
+        row: Number(card.dataset.manaloomSeatRow),
+        position: Number(card.dataset.manaloomSeatPosition),
+        rotate: style.rotate,
+        width: style.width,
+        height: style.height,
+      };
+    });
+    const oppositeInner = cards[0].querySelector('.player-card-inner');
+    oppositeInner.style.transform = 'translateY(25px)';
+    const oppositeSwipeStyle = getComputedStyle(oppositeInner);
+    const oppositeSwipe = {
+      transform: oppositeSwipeStyle.transform,
+      rotate: oppositeSwipeStyle.rotate,
+    };
+    board.remove();
+    tutorial.remove();
+    window.__ManaLoomTabletopSeatLayout.sync();
+    return { playerCount, seats, oppositeSwipe };
+  };
+  const tabletopLayoutsProbe = [];
+  for (const playerCount of [2, 3, 4, 5, 6]) {
+    tabletopLayoutsProbe.push(await probeTabletopLayout(playerCount));
+  }
   return JSON.stringify({
     playerCards: document.querySelectorAll('.player-card').length,
     visualSkin: !!document.getElementById('manaloom-lotus-visual-skin'),
@@ -205,6 +293,7 @@ void main() {
     horizontalPreviewAspectRatio: horizontalPreviewStyle.aspectRatio,
     horizontalPreviewWidth: horizontalPreviewStyle.width,
     horizontalPreviewHeight: horizontalPreviewStyle.height,
+    tabletopLayouts: tabletopLayoutsProbe,
   });
 })()
 ''',
@@ -243,11 +332,50 @@ void main() {
       expect(probe['horizontalPreviewAspectRatio'], '2 / 1');
       expect(probe['horizontalPreviewWidth'], '100px');
       expect(probe['horizontalPreviewHeight'], '50px');
+      final tabletopLayouts =
+          (probe['tabletopLayouts'] as List<dynamic>)
+              .cast<Map<String, dynamic>>();
+      final expectedFacingByPlayerCount = <int, List<String>>{
+        2: <String>['opposite', 'near'],
+        3: <String>['opposite', 'opposite', 'near'],
+        4: <String>['opposite', 'opposite', 'near', 'near'],
+        5: <String>['opposite', 'opposite', 'left', 'right', 'near'],
+        6: <String>['opposite', 'opposite', 'left', 'right', 'near', 'near'],
+      };
+      final expectedRotateByFacing = <String, String>{
+        'opposite': '180deg',
+        'near': '0deg',
+        'left': '90deg',
+        'right': '-90deg',
+      };
+      for (final layout in tabletopLayouts) {
+        final playerCount = layout['playerCount'] as int;
+        final seats =
+            (layout['seats'] as List<dynamic>).cast<Map<String, dynamic>>();
+        final facings = seats
+            .map((seat) => seat['facing'] as String)
+            .toList(growable: false);
+        expect(facings, expectedFacingByPlayerCount[playerCount]);
+        for (final seat in seats) {
+          final facing = seat['facing'] as String;
+          expect(seat['rotate'], expectedRotateByFacing[facing]);
+          if (facing == 'left' || facing == 'right') {
+            expect(seat['width'], '140px');
+            expect(seat['height'], '240px');
+          } else {
+            expect(seat['width'], '240px');
+            expect(seat['height'], '140px');
+          }
+        }
+        final oppositeSwipe = layout['oppositeSwipe'] as Map<String, dynamic>;
+        expect(oppositeSwipe['transform'], isNot('none'));
+        expect(oppositeSwipe['rotate'], '180deg');
+      }
       expect(web.window.localStorage.getItem(hostSentinelKey), 'keep');
       expect(persistedValues?['lotusOnly'], 'yes');
       expect(persistedValues, isNot(contains(hostSentinelKey)));
     },
-    timeout: const Timeout(Duration(seconds: 20)),
+    timeout: const Timeout(Duration(seconds: 25)),
   );
 
   test(

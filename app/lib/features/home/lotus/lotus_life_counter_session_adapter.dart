@@ -29,7 +29,7 @@ class LotusLifeCounterSessionAdapter {
       '__manaloom_player_appearances';
   static const String _manaloomTableStateKey = '__manaloom_table_state';
   static const Map<int, String> _layoutTypeByPlayerCount = <int, String>{
-    2: 'portrait-portrait',
+    2: 'landscape-landscape',
     3: 'portrait-portrait-landscape',
     4: 'portrait-portrait-portrait-portrait',
     5: 'portrait-portrait-portrait-portrait-landscape',
@@ -37,6 +37,8 @@ class LotusLifeCounterSessionAdapter {
   };
   static const Map<String, List<int>> _turnTrackerDirectionByLayoutType =
       <String, List<int>>{
+        'landscape-landscape': <int>[1, 0],
+        'landscape-landscape-uni': <int>[1, 0],
         'portrait-portrait': <int>[1, 0],
         'portrait-portrait-landscape': <int>[2, 0, 1],
         'portrait-portrait-portrait-portrait': <int>[3, 2, 0, 1],
