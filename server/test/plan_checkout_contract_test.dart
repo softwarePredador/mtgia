@@ -3,24 +3,37 @@ import 'dart:io';
 import 'package:test/test.dart';
 
 void main() {
-  test('plan checkout route does not activate Pro without explicit config', () {
+  test('free beta checkout is fail-closed with no activation escape hatch', () {
     final route =
         File('routes/users/me/plan/checkout/index.dart').readAsStringSync();
     final provider =
         File('lib/billing/payment_provider.dart').readAsStringSync();
     final webhook =
         File('routes/billing/webhook/index.dart').readAsStringSync();
+    final planRoute =
+        File('routes/users/me/plan/index.dart').readAsStringSync();
+    final planMiddleware = File('lib/plan_middleware.dart').readAsStringSync();
 
-    expect(route, contains('ManaLoomPaymentProvider(pool: pool)'));
+    expect(route, contains('const ManaLoomPaymentProvider()'));
     expect(route, isNot(contains('activatePro(userId)')));
-    expect(provider, contains('MANALOOM_INTERNAL_CHECKOUT_ENABLED'));
-    expect(provider, contains('ALLOW_INTERNAL_PRO_ACTIVATION'));
-    expect(provider, contains('MANALOOM_PRO_CHECKOUT_URL'));
-    expect(provider, contains('payment_provider_not_configured'));
-    expect(provider, contains('_verifyHmacSha256'));
-    expect(provider, contains('provider_adapter_not_implemented'));
+    expect(provider, contains("'checkout_status': 'beta_free_only'"));
+    expect(provider, contains("'billing_enabled': false"));
+    expect(provider, contains("'purchase_available': false"));
+    expect(provider, isNot(contains('MANALOOM_INTERNAL_CHECKOUT_ENABLED')));
+    expect(provider, isNot(contains('ALLOW_INTERNAL_PRO_ACTIVATION')));
+    expect(provider, isNot(contains('MANALOOM_PRO_CHECKOUT_URL')));
+    expect(provider, isNot(contains('activatePro')));
+    expect(provider, isNot(contains('checkout_url')));
     expect(webhook, contains('verifyWebhook'));
-    expect(webhook, contains('context.request.body()'));
+    expect(webhook, isNot(contains('context.request.body()')));
+    expect(provider, contains("'webhook_status': 'beta_free_only'"));
+    expect(planRoute, contains("'is_free': true"));
+    expect(planRoute, contains("'purchase_available': false"));
+    expect(planRoute, isNot(contains("'upgrade_offer'")));
+    expect(planMiddleware, contains("'beta_mode': true"));
+    expect(planMiddleware, contains("'purchase_available': false"));
+    expect(planMiddleware, isNot(contains("'upgrade_hint'")));
+    expect(planMiddleware, isNot(contains('Faça upgrade para continuar')));
   });
 
   test('plan service persists Pro with renewal window', () {
@@ -53,9 +66,6 @@ void main() {
       expect(source, isNot(contains('adaptador do provedor')));
     }
 
-    expect(
-      sources.join('\n'),
-      contains('O ManaLoom Pro ainda não está disponível para contratação.'),
-    );
+    expect(sources.join('\n'), contains('O ManaLoom está em beta gratuita.'));
   });
 }

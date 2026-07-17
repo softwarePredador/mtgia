@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:manaloom/core/api/api_client.dart';
+import 'package:manaloom/core/security/auth_token_store.dart';
 import 'package:manaloom/core/theme/app_theme.dart';
 import 'package:manaloom/features/auth/providers/auth_provider.dart';
 import 'package:manaloom/features/messages/providers/message_provider.dart';
@@ -8,6 +9,19 @@ import 'package:manaloom/features/notifications/providers/notification_provider.
 import 'package:manaloom/features/profile/profile_screen.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
+class _MemorySecureTokenBackend implements SecureTokenBackend {
+  String? value;
+
+  @override
+  Future<void> delete(String key) async => value = null;
+
+  @override
+  Future<String?> read(String key) async => value;
+
+  @override
+  Future<void> write(String key, String value) async => this.value = value;
+}
 
 class _ProfileApiClient extends ApiClient {
   Map<String, dynamic> user = {
@@ -22,11 +36,21 @@ class _ProfileApiClient extends ApiClient {
   };
 
   Map<String, dynamic>? lastPatchBody;
+  Map<String, dynamic>? lastDeleteBody;
 
   @override
   Future<ApiResponse> get(String endpoint) async {
-    expect(endpoint, '/users/me');
-    return ApiResponse(200, {'user': Map<String, dynamic>.from(user)});
+    if (endpoint == '/users/me') {
+      return ApiResponse(200, {'user': Map<String, dynamic>.from(user)});
+    }
+    if (endpoint == '/users/me/export') {
+      return ApiResponse(200, {
+        'schema_version': 1,
+        'account': {'id': 'user-1', 'email': user['email']},
+        'data': {'decks': <Object>[]},
+      });
+    }
+    fail('GET inesperado: $endpoint');
   }
 
   @override
@@ -49,15 +73,35 @@ class _ProfileApiClient extends ApiClient {
     user = {...user, ...body};
     return ApiResponse(200, {'user': Map<String, dynamic>.from(user)});
   }
+
+  @override
+  Future<ApiResponse> delete(
+    String endpoint, {
+    Map<String, dynamic>? body,
+  }) async {
+    expect(endpoint, '/users/me');
+    lastDeleteBody = body;
+    return ApiResponse(401, {'error': 'invalid_password'});
+  }
 }
 
 void main() {
   testWidgets(
     'ProfileScreen edits supported fields and refreshes persisted data',
     (tester) async {
+      tester.view.physicalSize = const Size(390, 844);
+      tester.view.devicePixelRatio = 1;
+      addTearDown(() {
+        tester.view.resetPhysicalSize();
+        tester.view.resetDevicePixelRatio();
+      });
       SharedPreferences.setMockInitialValues({});
       final api = _ProfileApiClient();
-      final auth = AuthProvider(apiClient: api);
+      String? sharedData;
+      final auth = AuthProvider(
+        apiClient: api,
+        tokenStore: AuthTokenStore(secureBackend: _MemorySecureTokenBackend()),
+      );
       final loggedIn = await auth.login(
         'runtime_profile@example.com',
         'TestPassword123!',
@@ -77,13 +121,21 @@ void main() {
           ],
           child: MaterialApp(
             theme: AppTheme.darkTheme,
-            home: const ProfileScreen(),
+            home: ProfileScreen(
+              apiClient: api,
+              shareData: (content) async => sharedData = content,
+            ),
           ),
         ),
       );
       await tester.pumpAndSettle();
 
       expect(find.text('Perfil'), findsOneWidget);
+      expect(
+        tester.getSize(find.byKey(const Key('profile-content'))).width,
+        lessThanOrEqualTo(390),
+      );
+      expect(tester.takeException(), isNull);
       expect(find.text('runtime_profile'), findsOneWidget);
       expect(find.text('Initial notes'), findsOneWidget);
       expect(
@@ -127,6 +179,65 @@ void main() {
       expect(refreshed, isTrue);
       expect(auth.user?.locationCity, 'Campinas');
       expect(auth.user?.tradeNotes, 'Runtime trade notes edited');
+      await tester.pump(const Duration(seconds: 5));
+      await tester.pumpAndSettle();
+
+      final exportButton = find.byKey(const Key('profile-export-data-button'));
+      await tester.scrollUntilVisible(
+        exportButton,
+        250,
+        scrollable: find.byType(Scrollable).first,
+      );
+      await tester.tap(exportButton);
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 300));
+      expect(sharedData, contains('"schema_version": 1'));
+      expect(find.textContaining('Exportação preparada'), findsOneWidget);
+      await tester.pump(const Duration(seconds: 5));
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.byKey(const Key('profile-delete-account-button')));
+      await tester.pumpAndSettle();
+      expect(
+        find.byKey(const Key('profile-delete-account-dialog')),
+        findsOneWidget,
+      );
+      await tester.tap(find.byKey(const Key('profile-delete-confirm-button')));
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 500));
+      expect(
+        find.text('Digite a frase exatamente como exibida.'),
+        findsOneWidget,
+      );
+      expect(find.text('Informe sua senha.'), findsOneWidget);
+
+      await tester.enterText(
+        find.byKey(const Key('profile-delete-confirmation-field')),
+        'EXCLUIR MINHA CONTA',
+      );
+      await tester.enterText(
+        find.byKey(const Key('profile-delete-password-field')),
+        'WrongPassword123!',
+      );
+      await tester.tap(find.byKey(const Key('profile-delete-confirm-button')));
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 500));
+      expect(api.lastDeleteBody, {
+        'confirmation': 'EXCLUIR MINHA CONTA',
+        'password': 'WrongPassword123!',
+      });
+      expect(
+        find.text('Senha incorreta. Sua conta não foi alterada.'),
+        findsOneWidget,
+      );
+
+      tester.view.physicalSize = const Size(1280, 900);
+      await tester.pumpAndSettle();
+      expect(
+        tester.getSize(find.byKey(const Key('profile-content'))).width,
+        lessThanOrEqualTo(840),
+      );
+      expect(tester.takeException(), isNull);
     },
   );
 }

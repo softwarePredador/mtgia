@@ -211,15 +211,15 @@ void main() {
         );
         await tester.pumpAndSettle();
 
-        expect(find.text('Turn Tracker'), findsOneWidget);
+        expect(find.text('Controle de turnos'), findsOneWidget);
 
         await tester.scrollUntilVisible(
-          find.text('Start Game'),
+          find.text('Iniciar partida'),
           250,
           scrollable: find.byType(Scrollable).first,
         );
 
-        await tester.tap(find.text('Start Game'));
+        await tester.tap(find.text('Iniciar partida'));
         await tester.pumpAndSettle();
 
         await tester.tap(
@@ -857,7 +857,7 @@ void main() {
         );
         await tester.pumpAndSettle();
 
-        expect(find.text('Game Timer'), findsOneWidget);
+        expect(find.text('Cronômetro da partida'), findsOneWidget);
 
         await tester.scrollUntilVisible(
           find.byKey(const Key('life-counter-native-game-timer-pause')),
@@ -932,8 +932,8 @@ void main() {
         );
         await tester.pumpAndSettle();
 
-        expect(find.text('Game Timer'), findsOneWidget);
-        expect(find.text('Idle'), findsOneWidget);
+        expect(find.text('Cronômetro da partida'), findsOneWidget);
+        expect(find.text('Inativo'), findsOneWidget);
 
         await tester.scrollUntilVisible(
           find.byKey(const Key('life-counter-native-game-timer-start')),
@@ -1032,7 +1032,7 @@ void main() {
         );
         await tester.pumpAndSettle();
 
-        expect(find.text('Game Timer'), findsOneWidget);
+        expect(find.text('Cronômetro da partida'), findsOneWidget);
 
         await tester.scrollUntilVisible(
           find.byKey(const Key('life-counter-native-game-timer-reset')),
@@ -1121,7 +1121,7 @@ void main() {
         );
         await tester.pumpAndSettle();
 
-        expect(find.text('Game Timer'), findsOneWidget);
+        expect(find.text('Cronômetro da partida'), findsOneWidget);
 
         await tester.scrollUntilVisible(
           find.byKey(const Key('life-counter-native-game-timer-resume')),
@@ -1245,7 +1245,7 @@ void main() {
           );
           await tester.pumpAndSettle();
 
-          expect(find.text('Table State'), findsOneWidget);
+          expect(find.text('Estado da mesa'), findsOneWidget);
 
           await tester.tap(
             find.byKey(
@@ -1395,7 +1395,7 @@ void main() {
         );
         await tester.pumpAndSettle();
 
-        expect(find.text('Table State'), findsOneWidget);
+        expect(find.text('Estado da mesa'), findsOneWidget);
 
         await tester.tap(
           find.byKey(
@@ -1533,7 +1533,7 @@ void main() {
           );
           await tester.pumpAndSettle();
 
-          expect(find.text('Table State'), findsOneWidget);
+          expect(find.text('Estado da mesa'), findsOneWidget);
 
           await tester.scrollUntilVisible(
             find.byKey(const Key('life-counter-native-table-state-storm-plus')),
@@ -1663,7 +1663,7 @@ void main() {
           );
           await tester.pumpAndSettle();
 
-          expect(find.text('Table State'), findsOneWidget);
+          expect(find.text('Estado da mesa'), findsOneWidget);
 
           await tester.tap(
             find.byKey(
@@ -1724,7 +1724,7 @@ void main() {
         );
         await tester.pumpAndSettle();
 
-        expect(find.text('Dice Tools'), findsOneWidget);
+        expect(find.text('Ferramentas de dados'), findsOneWidget);
 
         await tester.tap(
           find.byKey(const Key('life-counter-native-dice-high-roll')),
@@ -1832,7 +1832,7 @@ void main() {
           );
           await tester.pumpAndSettle();
 
-          expect(find.text('Dice Tools'), findsOneWidget);
+          expect(find.text('Ferramentas de dados'), findsOneWidget);
 
           await tester.tap(
             find.byKey(const Key('life-counter-native-dice-d20')),

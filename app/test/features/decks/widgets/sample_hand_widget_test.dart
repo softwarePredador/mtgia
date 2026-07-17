@@ -217,7 +217,15 @@ void main() {
       await tester.tap(find.byKey(const Key('sample-hand-mulligan')));
       await tester.pumpAndSettle();
 
-      expect(find.text('6 cartas'), findsOneWidget);
+      expect(find.text('7 · fundo 1'), findsOneWidget);
+      expect(
+        find.byKey(const Key('sample-hand-bottom-guidance')),
+        findsOneWidget,
+      );
+      expect(
+        find.textContaining('1 carta no fundo do grimório'),
+        findsOneWidget,
+      );
       expectNoLayoutExceptions(tester);
     });
 
@@ -248,11 +256,44 @@ void main() {
 
         await tester.tap(find.byKey(const Key('sample-hand-mulligan')));
         await tester.pumpAndSettle();
+        await tester.ensureVisible(
+          find.byKey(const Key('sample-hand-new-hand')),
+        );
+        await tester.pumpAndSettle();
         await tester.tap(find.byKey(const Key('sample-hand-new-hand')));
         await tester.pumpAndSettle();
 
         expectNoLayoutExceptions(tester);
       },
     );
+
+    testWidgets('wide playtest keeps cards dense and actions content-sized', (
+      tester,
+    ) async {
+      setTestViewport(tester, const Size(1280, 800));
+      await tester.pumpWidget(createSubject(compact: true, width: 900));
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.byKey(const Key('sample-hand-draw')));
+      await tester.pumpAndSettle();
+
+      final firstCenter = tester.getCenter(
+        find.byKey(const Key('sample-hand-card-0')),
+      );
+      final secondCenter = tester.getCenter(
+        find.byKey(const Key('sample-hand-card-1')),
+      );
+      expect((secondCenter.dx - firstCenter.dx).abs(), lessThan(130));
+
+      expect(
+        tester.getSize(find.byKey(const Key('sample-hand-mulligan'))).width,
+        lessThan(240),
+      );
+      expect(
+        tester.getSize(find.byKey(const Key('sample-hand-new-hand'))).width,
+        lessThan(200),
+      );
+      expectNoLayoutExceptions(tester);
+    });
   });
 }

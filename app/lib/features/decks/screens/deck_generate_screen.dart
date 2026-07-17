@@ -565,123 +565,193 @@ class _DeckGenerateScreenState extends State<DeckGenerateScreen> {
           onPressed: () => context.go('/decks'),
         ),
       ),
-      body: SingleChildScrollView(
-        controller: _scrollController,
-        padding: EdgeInsets.fromLTRB(
-          16,
-          16,
-          16,
-          16 + MediaQuery.of(context).padding.bottom + 88,
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
+      body: LayoutBuilder(
+        builder: (context, constraints) {
+          final isDesktop = constraints.maxWidth >= AppTheme.breakpointExpanded;
+          final horizontalPadding =
+              constraints.maxWidth < AppTheme.breakpointCompact ? 16.0 : 24.0;
+
+          return SingleChildScrollView(
+            controller: _scrollController,
+            padding: EdgeInsets.fromLTRB(
+              horizontalPadding,
+              24,
+              horizontalPadding,
+              MediaQuery.paddingOf(context).bottom + (isDesktop ? 40 : 104),
+            ),
+            child: Center(
+              child: ConstrainedBox(
+                key: const Key('deck-generate-content-frame'),
+                constraints: const BoxConstraints(maxWidth: 1120),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    _buildGenerateHeader(theme),
+                    const SizedBox(height: 24),
+                    if (isDesktop)
+                      Row(
+                        key: const Key('deck-generate-desktop-panes'),
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          SizedBox(
+                            key: const Key('deck-generate-form-pane'),
+                            width: 460,
+                            child: _buildGenerationForm(theme, isDesktop: true),
+                          ),
+                          const SizedBox(width: AppTheme.paneGap),
+                          Expanded(
+                            child: Column(
+                              key: const Key('deck-generate-companion-pane'),
+                              crossAxisAlignment: CrossAxisAlignment.stretch,
+                              children: [
+                                _buildAiTrustSection(),
+                                const SizedBox(height: 24),
+                                _buildGenerationOutput(theme, isDesktop: true),
+                              ],
+                            ),
+                          ),
+                        ],
+                      )
+                    else ...[
+                      _buildAiTrustSection(),
+                      const SizedBox(height: 24),
+                      _buildGenerationForm(theme, isDesktop: false),
+                      const SizedBox(height: 20),
+                      _buildGenerationOutput(theme, isDesktop: false),
+                    ],
+                  ],
+                ),
+              ),
+            ),
+          );
+        },
+      ),
+    );
+  }
+
+  Widget _buildGenerateHeader(ThemeData theme) {
+    return Column(
+      key: const Key('deck-generate-header'),
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
           children: [
-            // Header
-            Row(
-              children: [
-                const Icon(
-                  Icons.auto_awesome,
-                  color: AppTheme.brass400,
-                  size: 28,
+            const Icon(Icons.auto_awesome, color: AppTheme.brass400, size: 28),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Text(
+                'Gerar Deck',
+                style: theme.textTheme.headlineSmall?.copyWith(
+                  fontWeight: FontWeight.bold,
                 ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: Text(
-                    'Gerar Deck',
-                    style: theme.textTheme.headlineSmall?.copyWith(
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 8),
-            Text(
-              'Descreva o deck que você quer. A IA monta uma proposta e você revisa antes de salvar.',
-              style: theme.textTheme.bodyMedium?.copyWith(
-                color: AppTheme.textSecondary,
               ),
             ),
-            const SizedBox(height: 16),
-            const _AiTrustPanel(),
-            const SizedBox(height: 12),
-            const AiUsageMeter(compact: true),
-            const SizedBox(height: 24),
+          ],
+        ),
+        const SizedBox(height: 8),
+        Text(
+          'Descreva o deck que você quer. A IA monta uma proposta e você revisa antes de salvar.',
+          style: theme.textTheme.bodyMedium?.copyWith(
+            color: AppTheme.textSecondary,
+          ),
+        ),
+      ],
+    );
+  }
 
-            // Format Selector
-            Text('Formato:', style: theme.textTheme.titleMedium),
-            const SizedBox(height: 8),
-            DropdownButtonFormField<String>(
-              key: const Key('deck-generate-format-field'),
-              initialValue: _selectedFormat,
-              decoration: InputDecoration(
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(AppTheme.radiusMd),
-                ),
-                filled: true,
-                fillColor: theme.colorScheme.surface,
-              ),
-              items:
-                  _formats.map((format) {
-                    return DropdownMenuItem(value: format, child: Text(format));
-                  }).toList(),
-              onChanged: (value) {
-                if (value != null) {
-                  setState(() {
-                    _selectedFormat = value;
-                  });
-                }
-              },
-            ),
-            const SizedBox(height: 24),
-            if (_usesCommanderField) ...[
-              Text(
-                'Comandante (opcional):',
-                style: theme.textTheme.titleMedium,
-              ),
-              const SizedBox(height: 8),
-              TextField(
-                key: const Key('deck-generate-commander-field'),
-                controller: _commanderController,
-                maxLength: maxAiGenerateCommanderNameLength,
-                decoration: InputDecoration(
-                  hintText: 'Ex: Lorehold, the Historian',
-                  helperText:
-                      'Use quando quiser guiar a geração por um comandante específico.',
-                  counterText: '',
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(AppTheme.radiusMd),
-                  ),
-                  filled: true,
-                  fillColor: theme.colorScheme.surface,
-                ),
-              ),
-              const SizedBox(height: 24),
-            ],
+  Widget _buildAiTrustSection() {
+    return const Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        _AiTrustPanel(),
+        SizedBox(height: 12),
+        AiUsageMeter(compact: true),
+      ],
+    );
+  }
 
-            // Prompt Input
-            Text('Descreva seu deck:', style: theme.textTheme.titleMedium),
-            const SizedBox(height: 8),
-            TextField(
-              key: const Key('deck-generate-prompt-field'),
-              controller: _promptController,
-              maxLength: maxAiGeneratePromptLength,
-              maxLines: 4,
-              decoration: InputDecoration(
-                hintText:
-                    'Ex: Deck agressivo de goblins vermelhos com muitas criaturas pequenas...',
-                counterText: '',
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(AppTheme.radiusMd),
-                ),
-                filled: true,
-                fillColor: theme.colorScheme.surface,
-              ),
+  Widget _buildGenerationForm(ThemeData theme, {required bool isDesktop}) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        Text(
+          'Configuração da proposta',
+          style: theme.textTheme.titleMedium?.copyWith(
+            fontWeight: FontWeight.w700,
+          ),
+        ),
+        const SizedBox(height: 12),
+        Text('Formato:', style: theme.textTheme.titleMedium),
+        const SizedBox(height: 8),
+        DropdownButtonFormField<String>(
+          key: const Key('deck-generate-format-field'),
+          initialValue: _selectedFormat,
+          decoration: InputDecoration(
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(AppTheme.radiusMd),
             ),
-            const SizedBox(height: 12),
-
-            // Generate Button (CTA primeiro, para não ficar "abaixo do fold")
-            ElevatedButton.icon(
+            filled: true,
+            fillColor: theme.colorScheme.surface,
+          ),
+          items:
+              _formats.map((format) {
+                return DropdownMenuItem(value: format, child: Text(format));
+              }).toList(),
+          onChanged: (value) {
+            if (value != null) {
+              setState(() {
+                _selectedFormat = value;
+              });
+            }
+          },
+        ),
+        const SizedBox(height: 20),
+        if (_usesCommanderField) ...[
+          Text('Comandante (opcional):', style: theme.textTheme.titleMedium),
+          const SizedBox(height: 8),
+          TextField(
+            key: const Key('deck-generate-commander-field'),
+            controller: _commanderController,
+            maxLength: maxAiGenerateCommanderNameLength,
+            decoration: InputDecoration(
+              hintText: 'Ex: Lorehold, the Historian',
+              helperText:
+                  'Use quando quiser guiar a geração por um comandante específico.',
+              counterText: '',
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(AppTheme.radiusMd),
+              ),
+              filled: true,
+              fillColor: theme.colorScheme.surface,
+            ),
+          ),
+          const SizedBox(height: 20),
+        ],
+        Text('Descreva seu deck:', style: theme.textTheme.titleMedium),
+        const SizedBox(height: 8),
+        TextField(
+          key: const Key('deck-generate-prompt-field'),
+          controller: _promptController,
+          maxLength: maxAiGeneratePromptLength,
+          maxLines: 4,
+          decoration: InputDecoration(
+            hintText:
+                'Ex: Deck agressivo de goblins vermelhos com muitas criaturas pequenas...',
+            counterText: '',
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(AppTheme.radiusMd),
+            ),
+            filled: true,
+            fillColor: theme.colorScheme.surface,
+          ),
+        ),
+        const SizedBox(height: 12),
+        Align(
+          alignment: isDesktop ? Alignment.centerLeft : Alignment.center,
+          child: SizedBox(
+            key: const Key('deck-generate-submit-cta-frame'),
+            width: isDesktop ? 320 : double.infinity,
+            child: ElevatedButton.icon(
               key: const Key('deck-generate-submit-button'),
               onPressed:
                   _isGenerating || _isLoadingLearnedDeck ? null : _generateDeck,
@@ -706,91 +776,94 @@ class _DeckGenerateScreenState extends State<DeckGenerateScreen> {
                 foregroundColor: AppTheme.backgroundAbyss,
               ),
             ),
-            if (_usesCommanderField && _selectedLearnedDeckSummary != null) ...[
-              const SizedBox(height: 12),
-              _LearnedDeckCallout(
-                calloutKey: const Key('deck-generate-learned-deck-button'),
-                onPressed:
-                    _isGenerating || _isLoadingLearnedDeck
-                        ? null
-                        : _loadLearnedCommanderDeck,
-                loading: _isLoadingLearnedDeck,
-                helperText: _learnedDeckButtonHelperText(
-                  _selectedLearnedDeckSummary!,
-                ),
-              ),
-            ],
-            const SizedBox(height: 20),
-            if (_isGenerating || _isLoadingLearnedDeck) ...[
-              _GenerateProgressPanel(
-                currentStep: _generationProgressStep,
-                message: _generationProgressMessage,
-              ),
-              const SizedBox(height: 20),
-            ],
+          ),
+        ),
+        if (_usesCommanderField && _selectedLearnedDeckSummary != null) ...[
+          const SizedBox(height: 12),
+          _LearnedDeckCallout(
+            calloutKey: const Key('deck-generate-learned-deck-button'),
+            onPressed:
+                _isGenerating || _isLoadingLearnedDeck
+                    ? null
+                    : _loadLearnedCommanderDeck,
+            loading: _isLoadingLearnedDeck,
+            helperText: _learnedDeckButtonHelperText(
+              _selectedLearnedDeckSummary!,
+            ),
+          ),
+        ],
+      ],
+    );
+  }
 
-            if (_generatedDeck == null) ...[
-              // Example Prompts
-              _ExamplePromptList(
-                prompts: _examplePrompts,
-                onSelected: (example) {
-                  setState(() {
-                    _promptController.text = example;
-                  });
-                },
-              ),
-              const SizedBox(height: 28),
-            ],
-
-            // Generated Deck Preview
-            if (_generatedDeck != null) ...[
-              const SizedBox(height: 12),
-              Row(
-                key: _previewKey,
-                children: [
-                  const Icon(Icons.preview, color: AppTheme.frost400),
-                  const SizedBox(width: 8),
-                  Text(
-                    'Preview antes de salvar',
-                    style: theme.textTheme.titleLarge?.copyWith(
-                      fontWeight: FontWeight.bold,
-                    ),
+  Widget _buildGenerationOutput(ThemeData theme, {required bool isDesktop}) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        if (_isGenerating || _isLoadingLearnedDeck) ...[
+          _GenerateProgressPanel(
+            currentStep: _generationProgressStep,
+            message: _generationProgressMessage,
+          ),
+          const SizedBox(height: 20),
+        ],
+        if (_generatedDeck == null)
+          _ExamplePromptList(
+            prompts: _examplePrompts,
+            onSelected: (example) {
+              setState(() {
+                _promptController.text = example;
+              });
+            },
+          )
+        else ...[
+          Row(
+            key: _previewKey,
+            children: [
+              const Icon(Icons.preview, color: AppTheme.frost400),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Text(
+                  'Preview antes de salvar',
+                  style: theme.textTheme.titleLarge?.copyWith(
+                    fontWeight: FontWeight.bold,
                   ),
-                ],
-              ),
-              const SizedBox(height: 6),
-              Text(
-                'Confira comandante, quantidade e avisos. Nada entra na sua coleção até você salvar.',
-                style: theme.textTheme.bodySmall?.copyWith(
-                  color: AppTheme.textSecondary,
-                  height: AppTheme.lineHeightCompact,
                 ),
               ),
-              const SizedBox(height: 18),
-
-              // Deck Name Input
-              TextField(
-                key: const Key('deck-generate-name-field'),
-                controller: _deckNameController,
-                decoration: InputDecoration(
-                  labelText: 'Nome do Deck',
-                  hintText: 'Deck Gerado',
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(AppTheme.radiusMd),
-                  ),
-                  filled: true,
-                  fillColor: theme.colorScheme.surface,
-                  prefixIcon: const Icon(Icons.edit),
-                ),
+            ],
+          ),
+          const SizedBox(height: 6),
+          Text(
+            'Confira comandante, quantidade e avisos. Nada entra na sua coleção até você salvar.',
+            style: theme.textTheme.bodySmall?.copyWith(
+              color: AppTheme.textSecondary,
+              height: AppTheme.lineHeightCompact,
+            ),
+          ),
+          const SizedBox(height: 18),
+          TextField(
+            key: const Key('deck-generate-name-field'),
+            controller: _deckNameController,
+            decoration: InputDecoration(
+              labelText: 'Nome do Deck',
+              hintText: 'Deck Gerado',
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(AppTheme.radiusMd),
               ),
-              const SizedBox(height: 16),
-
-              // Card List Preview
-              _buildDeckPreview(),
-              const SizedBox(height: 24),
-
-              // Save Button
-              ElevatedButton.icon(
+              filled: true,
+              fillColor: theme.colorScheme.surface,
+              prefixIcon: const Icon(Icons.edit),
+            ),
+          ),
+          const SizedBox(height: 16),
+          _buildDeckPreview(),
+          const SizedBox(height: 24),
+          Align(
+            alignment: isDesktop ? Alignment.centerRight : Alignment.center,
+            child: SizedBox(
+              key: const Key('deck-generate-save-cta-frame'),
+              width: isDesktop ? 320 : double.infinity,
+              child: ElevatedButton.icon(
                 key: const Key('deck-generate-save-button'),
                 onPressed: _isGeneratedDeckValid() ? _saveDeck : null,
                 icon: const Icon(Icons.save),
@@ -799,7 +872,6 @@ class _DeckGenerateScreenState extends State<DeckGenerateScreen> {
                   style: TextStyle(
                     fontSize: AppTheme.fontLg,
                     fontWeight: FontWeight.bold,
-                    color: AppTheme.backgroundAbyss,
                   ),
                 ),
                 style: ElevatedButton.styleFrom(
@@ -808,10 +880,10 @@ class _DeckGenerateScreenState extends State<DeckGenerateScreen> {
                   foregroundColor: AppTheme.backgroundAbyss,
                 ),
               ),
-            ],
-          ],
-        ),
-      ),
+            ),
+          ),
+        ],
+      ],
     );
   }
 

@@ -52,18 +52,20 @@ class DeckAddCardsMenu extends StatelessWidget {
         elevation: 6,
         shadowColor: AppTheme.backgroundAbyss.withValues(alpha: 0.34),
         borderRadius: BorderRadius.circular(AppTheme.radiusLg),
-        child: const SizedBox(
+        child: SizedBox(
           height: 56,
           child: Padding(
-            padding: EdgeInsets.symmetric(horizontal: 20),
+            padding: const EdgeInsets.symmetric(horizontal: 20),
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Icon(Icons.add),
-                SizedBox(width: 10),
+                const Icon(Icons.add),
+                const SizedBox(width: 10),
                 Text(
                   'Adicionar Cartas',
-                  style: TextStyle(fontWeight: FontWeight.w700),
+                  style: Theme.of(
+                    context,
+                  ).textTheme.labelLarge?.copyWith(fontWeight: FontWeight.w700),
                 ),
               ],
             ),

@@ -1,11 +1,17 @@
 import 'dart:async';
 
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
+import 'package:go_router/go_router.dart';
+import 'package:http/http.dart' as http;
 
 import '../../../core/api/api_client.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/utils/friendly_error_mapper.dart';
+import '../../../core/utils/scryfall_image_helper.dart';
 import '../../../core/widgets/app_state_panel.dart';
+import '../../../core/widgets/responsive_page_frame.dart';
 import '../models/mtg_set.dart';
 import 'set_cards_screen.dart';
 
@@ -168,6 +174,15 @@ class _SetsCatalogScreenState extends State<SetsCatalogScreen> {
   }
 
   void _openSet(MtgSet set) {
+    if (widget.apiClient == null) {
+      context.push(
+        '/collection/sets/${Uri.encodeComponent(set.code.toLowerCase())}',
+      );
+      return;
+    }
+
+    // Injected clients are used by isolated tests/previews where no GoRouter
+    // is mounted. Production navigation remains URL-addressable above.
     Navigator.of(context).push(
       MaterialPageRoute(
         builder:
@@ -180,20 +195,27 @@ class _SetsCatalogScreenState extends State<SetsCatalogScreen> {
   Widget build(BuildContext context) {
     final content = ColoredBox(
       color: AppTheme.backgroundAbyss,
-      child: Column(
-        children: [
-          _CatalogHeader(
-            controller: _searchController,
-            onChanged: _onSearchChanged,
-            statusFilter: _statusFilter,
-            onStatusFilterChanged: (status) {
-              setState(() {
-                _statusFilter = status;
-              });
-            },
+      child: ResponsivePageFrame(
+        maxWidth: AppTheme.contentMaxWidth,
+        child: SizedBox(
+          key: const Key('sets-catalog-responsive-canvas'),
+          width: double.infinity,
+          child: Column(
+            children: [
+              _CatalogHeader(
+                controller: _searchController,
+                onChanged: _onSearchChanged,
+                statusFilter: _statusFilter,
+                onStatusFilterChanged: (status) {
+                  setState(() {
+                    _statusFilter = status;
+                  });
+                },
+              ),
+              Expanded(child: _buildBody()),
+            ],
           ),
-          Expanded(child: _buildBody()),
-        ],
+        ),
       ),
     );
 
@@ -259,23 +281,45 @@ class _SetsCatalogScreenState extends State<SetsCatalogScreen> {
     return RefreshIndicator(
       color: AppTheme.brass400,
       onRefresh: _loadFirstPage,
-      child: ListView.separated(
-        key: const Key('setsCatalogList'),
-        controller: _scrollController,
-        padding: const EdgeInsets.fromLTRB(12, 0, 12, 16),
-        itemCount: visibleSets.length + (_isLoadingMore ? 1 : 0),
-        separatorBuilder: (_, __) => const SizedBox(height: 10),
-        itemBuilder: (context, index) {
-          if (index >= visibleSets.length) {
-            return const Padding(
-              padding: EdgeInsets.all(16),
-              child: Center(
-                child: CircularProgressIndicator(color: AppTheme.brass400),
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          final itemCount = visibleSets.length + (_isLoadingMore ? 1 : 0);
+          Widget itemBuilder(BuildContext context, int index) {
+            if (index >= visibleSets.length) {
+              return const Padding(
+                padding: EdgeInsets.all(16),
+                child: Center(
+                  child: CircularProgressIndicator(color: AppTheme.brass400),
+                ),
+              );
+            }
+            final set = visibleSets[index];
+            return _SetCatalogTile(set: set, onTap: () => _openSet(set));
+          }
+
+          if (constraints.maxWidth >= 960) {
+            return GridView.builder(
+              key: const Key('setsCatalogGrid'),
+              controller: _scrollController,
+              padding: const EdgeInsets.only(bottom: 16),
+              gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
+                maxCrossAxisExtent: 620,
+                crossAxisSpacing: 10,
+                mainAxisSpacing: 10,
+                mainAxisExtent: 104,
               ),
+              itemCount: itemCount,
+              itemBuilder: itemBuilder,
             );
           }
-          final set = visibleSets[index];
-          return _SetCatalogTile(set: set, onTap: () => _openSet(set));
+          return ListView.separated(
+            key: const Key('setsCatalogList'),
+            controller: _scrollController,
+            padding: const EdgeInsets.only(bottom: 16),
+            itemCount: itemCount,
+            separatorBuilder: (_, __) => const SizedBox(height: 10),
+            itemBuilder: itemBuilder,
+          );
         },
       ),
     );
@@ -298,78 +342,97 @@ class _CatalogHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.fromLTRB(12, 12, 12, 10),
+      key: const Key('sets-catalog-header'),
+      padding: const EdgeInsets.fromLTRB(0, 12, 0, 10),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Container(
-            width: double.infinity,
-            padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(
-              gradient: AppTheme.heroGradient,
-              borderRadius: BorderRadius.circular(AppTheme.radiusLg),
-              border: Border.all(color: AppTheme.outlineMuted, width: 0.8),
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const Text(
-                  'Catálogo de Coleções',
-                  style: TextStyle(
-                    color: AppTheme.textPrimary,
-                    fontWeight: FontWeight.w800,
-                    fontSize: AppTheme.fontXxl,
-                  ),
+          Align(
+            alignment: Alignment.centerLeft,
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 960),
+              child: Container(
+                key: const Key('sets-catalog-hero'),
+                width: double.infinity,
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  gradient: AppTheme.heroGradient,
+                  borderRadius: BorderRadius.circular(AppTheme.radiusLg),
+                  border: Border.all(color: AppTheme.outlineMuted, width: 0.8),
                 ),
-                const SizedBox(height: 6),
-                const Text(
-                  'Futuras, novas, atuais e antigas em uma lista local e rápida.',
-                  style: TextStyle(
-                    color: AppTheme.textSecondary,
-                    fontSize: AppTheme.fontSm,
-                  ),
-                ),
-                const SizedBox(height: 14),
-                TextField(
-                  key: const Key('setsSearchField'),
-                  controller: controller,
-                  onChanged: onChanged,
-                  textInputAction: TextInputAction.search,
-                  decoration: InputDecoration(
-                    hintText: 'Buscar por nome ou código da coleção...',
-                    prefixIcon: const Icon(Icons.search),
-                    suffixIcon:
-                        controller.text.isEmpty
-                            ? null
-                            : IconButton(
-                              tooltip: 'Limpar busca',
-                              icon: const Icon(Icons.close),
-                              onPressed: () {
-                                controller.clear();
-                                onChanged('');
-                              },
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text(
+                      'Catálogo de Coleções',
+                      style: TextStyle(
+                        color: AppTheme.textPrimary,
+                        fontWeight: FontWeight.w800,
+                        fontSize: AppTheme.fontXxl,
+                      ),
+                    ),
+                    const SizedBox(height: 6),
+                    const Text(
+                      'Futuras, novas, atuais e antigas em uma lista local e rápida.',
+                      style: TextStyle(
+                        color: AppTheme.textSecondary,
+                        fontSize: AppTheme.fontSm,
+                      ),
+                    ),
+                    const SizedBox(height: 14),
+                    ConstrainedBox(
+                      constraints: const BoxConstraints(maxWidth: 760),
+                      child: TextField(
+                        key: const Key('setsSearchField'),
+                        controller: controller,
+                        onChanged: onChanged,
+                        textInputAction: TextInputAction.search,
+                        decoration: InputDecoration(
+                          hintText: 'Buscar por nome ou código da coleção...',
+                          prefixIcon: const Icon(Icons.search),
+                          suffixIcon:
+                              controller.text.isEmpty
+                                  ? null
+                                  : IconButton(
+                                    tooltip: 'Limpar busca',
+                                    icon: const Icon(Icons.close),
+                                    onPressed: () {
+                                      controller.clear();
+                                      onChanged('');
+                                    },
+                                  ),
+                          filled: true,
+                          fillColor: AppTheme.surfaceSlate,
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(
+                              AppTheme.radiusMd,
                             ),
-                    filled: true,
-                    fillColor: AppTheme.surfaceSlate,
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(AppTheme.radiusMd),
-                      borderSide: const BorderSide(
-                        color: AppTheme.outlineMuted,
+                            borderSide: const BorderSide(
+                              color: AppTheme.outlineMuted,
+                            ),
+                          ),
+                          enabledBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(
+                              AppTheme.radiusMd,
+                            ),
+                            borderSide: const BorderSide(
+                              color: AppTheme.outlineMuted,
+                            ),
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(
+                              AppTheme.radiusMd,
+                            ),
+                            borderSide: const BorderSide(
+                              color: AppTheme.brass400,
+                            ),
+                          ),
+                        ),
                       ),
                     ),
-                    enabledBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(AppTheme.radiusMd),
-                      borderSide: const BorderSide(
-                        color: AppTheme.outlineMuted,
-                      ),
-                    ),
-                    focusedBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(AppTheme.radiusMd),
-                      borderSide: const BorderSide(color: AppTheme.brass400),
-                    ),
-                  ),
+                  ],
                 ),
-              ],
+              ),
             ),
           ),
           const SizedBox(height: 10),
@@ -461,29 +524,12 @@ class _SetCatalogTile extends StatelessWidget {
       child: ListTile(
         key: Key('set-tile-${set.code}'),
         onTap: onTap,
+        isThreeLine: true,
         contentPadding: const EdgeInsets.symmetric(
           horizontal: 14,
           vertical: 10,
         ),
-        leading: Container(
-          width: 52,
-          height: 52,
-          decoration: BoxDecoration(
-            gradient: AppTheme.goldAccentGradient,
-            borderRadius: BorderRadius.circular(AppTheme.radiusMd),
-          ),
-          child: Center(
-            child: Text(
-              set.code,
-              textAlign: TextAlign.center,
-              style: const TextStyle(
-                color: AppTheme.backgroundAbyss,
-                fontWeight: FontWeight.w800,
-                fontSize: AppTheme.fontSm,
-              ),
-            ),
-          ),
-        ),
+        leading: _SetCatalogArtwork(set: set),
         title: Text(
           set.name,
           maxLines: 2,
@@ -517,6 +563,195 @@ class _SetCatalogTile extends StatelessWidget {
           color: AppTheme.textSecondary,
         ),
       ),
+    );
+  }
+}
+
+class _SetCatalogArtwork extends StatelessWidget {
+  static const _imageHeaders = <String, String>{
+    'User-Agent': 'ManaLoom/1.0',
+    'Accept': 'image/*',
+  };
+
+  final MtgSet set;
+
+  const _SetCatalogArtwork({required this.set});
+
+  @override
+  Widget build(BuildContext context) {
+    final persistedArtwork = set.representativeImageUrl?.trim();
+    final artworkUrl =
+        ScryfallImageHelper.withVersion(
+          persistedArtwork,
+          version: 'art_crop',
+        ) ??
+        (persistedArtwork?.isNotEmpty == true ? persistedArtwork : null);
+
+    return Semantics(
+      container: true,
+      image: true,
+      label:
+          artworkUrl == null
+              ? 'Símbolo da coleção ${set.name}'
+              : 'Arte representativa da coleção ${set.name}',
+      child: SizedBox(
+        key: Key('set-artwork-frame-${set.code}'),
+        width: 84,
+        height: 56,
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(AppTheme.radiusMd),
+          child: Stack(
+            fit: StackFit.expand,
+            children: [
+              if (artworkUrl != null)
+                CachedNetworkImage(
+                  key: Key('set-artwork-image-${set.code}'),
+                  imageUrl: artworkUrl,
+                  fit: BoxFit.cover,
+                  httpHeaders: _imageHeaders,
+                  fadeInDuration: const Duration(milliseconds: 180),
+                  placeholder: (_, __) => const _SetArtworkLoading(),
+                  errorWidget: (_, __, ___) => _SetIconArtwork(set: set),
+                )
+              else
+                _SetIconArtwork(set: set),
+              const DecoratedBox(
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
+                    colors: [AppTheme.transparent, AppTheme.overlayBlack65],
+                    stops: [0.48, 1],
+                  ),
+                ),
+              ),
+              Positioned(
+                left: 7,
+                bottom: 6,
+                child: Container(
+                  key: Key('set-code-badge-${set.code}'),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 7,
+                    vertical: 3,
+                  ),
+                  decoration: BoxDecoration(
+                    color: AppTheme.backgroundAbyss.withValues(alpha: 0.86),
+                    borderRadius: BorderRadius.circular(AppTheme.radiusXl),
+                    border: Border.all(
+                      color: AppTheme.brass400.withValues(alpha: 0.64),
+                    ),
+                  ),
+                  child: Text(
+                    set.code,
+                    style: const TextStyle(
+                      color: AppTheme.brass400,
+                      fontSize: AppTheme.fontXs,
+                      height: AppTheme.lineHeightSingle,
+                      fontWeight: FontWeight.w800,
+                      letterSpacing: 0.4,
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _SetIconArtwork extends StatelessWidget {
+  static final Map<String, Future<String?>> _svgCache = {};
+
+  final MtgSet set;
+
+  const _SetIconArtwork({required this.set});
+
+  @override
+  Widget build(BuildContext context) {
+    final iconUrl = set.resolvedIconSvgUri;
+    return DecoratedBox(
+      key: Key('set-icon-fallback-${set.code}'),
+      decoration: const BoxDecoration(gradient: AppTheme.goldAccentGradient),
+      child: Center(
+        child:
+            iconUrl == null
+                ? const _SetIconTerminalFallback()
+                : Padding(
+                  padding: const EdgeInsets.fromLTRB(18, 9, 18, 20),
+                  child: FutureBuilder<String?>(
+                    key: Key('set-icon-request-${set.code}'),
+                    future: _svgCache.putIfAbsent(
+                      iconUrl,
+                      () => _loadSvg(iconUrl),
+                    ),
+                    builder: (context, snapshot) {
+                      final svg = snapshot.data;
+                      if (svg == null) {
+                        return const _SetIconTerminalFallback();
+                      }
+                      return SvgPicture.string(
+                        svg,
+                        key: Key('set-icon-image-${set.code}'),
+                        fit: BoxFit.contain,
+                        colorFilter: const ColorFilter.mode(
+                          AppTheme.backgroundAbyss,
+                          BlendMode.srcIn,
+                        ),
+                      );
+                    },
+                  ),
+                ),
+      ),
+    );
+  }
+
+  static Future<String?> _loadSvg(String url) async {
+    try {
+      final response = await http
+          .get(
+            Uri.parse(url),
+            headers: const {'Accept': 'image/svg+xml,image/*'},
+          )
+          .timeout(const Duration(seconds: 8));
+      if (response.statusCode != 200) return null;
+      final svg = response.body.trim();
+      if (!svg.contains('<svg')) return null;
+      return svg;
+    } catch (_) {
+      return null;
+    }
+  }
+}
+
+class _SetArtworkLoading extends StatelessWidget {
+  const _SetArtworkLoading();
+
+  @override
+  Widget build(BuildContext context) {
+    return const DecoratedBox(
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [AppTheme.surfaceSlate, AppTheme.surfaceElevated],
+        ),
+      ),
+      child: _SetIconTerminalFallback(),
+    );
+  }
+}
+
+class _SetIconTerminalFallback extends StatelessWidget {
+  const _SetIconTerminalFallback();
+
+  @override
+  Widget build(BuildContext context) {
+    return const Icon(
+      Icons.auto_awesome_mosaic_outlined,
+      size: 28,
+      color: AppTheme.backgroundAbyss,
     );
   }
 }

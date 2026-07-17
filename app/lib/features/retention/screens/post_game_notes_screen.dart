@@ -2,20 +2,33 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../core/theme/app_theme.dart';
+import '../../../core/widgets/app_state_panel.dart';
+import '../../../core/widgets/responsive_page_frame.dart';
 import '../models/post_game_note.dart';
 import '../services/post_game_note_store.dart';
 
 class PostGameNotesScreen extends StatefulWidget {
-  const PostGameNotesScreen({super.key, required this.deckId});
+  const PostGameNotesScreen({
+    super.key,
+    required this.deckId,
+    this.store,
+    this.playSessionId,
+    this.sessionStartedAt,
+    this.sessionEndedAt,
+  });
 
   final String deckId;
+  final PostGameNoteStore? store;
+  final String? playSessionId;
+  final DateTime? sessionStartedAt;
+  final DateTime? sessionEndedAt;
 
   @override
   State<PostGameNotesScreen> createState() => _PostGameNotesScreenState();
 }
 
 class _PostGameNotesScreenState extends State<PostGameNotesScreen> {
-  final _store = PostGameNoteStore(remoteClient: ApiPostGameNoteRemoteClient());
+  late final PostGameNoteStore _store;
   final _resultController = TextEditingController();
   final _tableLevelController = TextEditingController(text: 'Casual');
   final _notesController = TextEditingController();
@@ -31,10 +44,19 @@ class _PostGameNotesScreenState extends State<PostGameNotesScreen> {
     suggestions: <String>[],
   );
   bool _isLoading = true;
+  bool _isSaving = false;
+  int _pendingSyncCount = 0;
+  final Set<String> _deletingNoteIds = <String>{};
+  String? _loadError;
+  String? _operationError;
+  Future<void> Function()? _retryOperation;
 
   @override
   void initState() {
     super.initState();
+    _store =
+        widget.store ??
+        PostGameNoteStore(remoteClient: ApiPostGameNoteRemoteClient());
     _load();
   }
 
@@ -48,18 +70,46 @@ class _PostGameNotesScreenState extends State<PostGameNotesScreen> {
     super.dispose();
   }
 
-  Future<void> _load() async {
-    final notes = await _store.loadNotes(widget.deckId);
-    final summary = DeckEvolutionSummary.fromNotes(notes);
-    if (!mounted) return;
-    setState(() {
-      _notes = notes;
-      _summary = summary;
-      _isLoading = false;
-    });
+  Future<void> _load({bool showLoading = true}) async {
+    if (mounted && (showLoading && (!_isLoading || _loadError != null))) {
+      setState(() {
+        _isLoading = true;
+        _loadError = null;
+      });
+    }
+
+    try {
+      final notes = await _store.loadNotes(widget.deckId);
+      final summary = DeckEvolutionSummary.fromNotes(notes);
+      var pendingSyncCount = 0;
+      try {
+        pendingSyncCount = await _store.pendingOperationCount(widget.deckId);
+      } catch (_) {
+        // The notes remain usable even if sync metadata cannot be read.
+      }
+      if (!mounted) return;
+      setState(() {
+        _notes = notes;
+        _summary = summary;
+        _pendingSyncCount = pendingSyncCount;
+        _isLoading = false;
+        _loadError = null;
+        _operationError = null;
+        _retryOperation = null;
+      });
+    } catch (_) {
+      if (!mounted) return;
+      setState(() {
+        _isLoading = false;
+        _loadError =
+            'Não foi possível carregar os registros pós-jogo. '
+            'Tente novamente.';
+      });
+    }
   }
 
   Future<void> _saveNote() async {
+    if (_isSaving) return;
     if (_resultController.text.trim().isEmpty &&
         _notesController.text.trim().isEmpty &&
         _selectedIssues.isEmpty) {
@@ -69,6 +119,11 @@ class _PostGameNotesScreenState extends State<PostGameNotesScreen> {
       return;
     }
 
+    setState(() {
+      _isSaving = true;
+      _operationError = null;
+      _retryOperation = null;
+    });
     final note = PostGameNote.create(
       deckId: widget.deckId,
       result: _resultController.text,
@@ -77,19 +132,77 @@ class _PostGameNotesScreenState extends State<PostGameNotesScreen> {
       performedWell: _splitCards(_goodCardsController.text),
       underperformed: _splitCards(_badCardsController.text),
       issues: _selectedIssues.toList(growable: false),
+      playSessionId: widget.playSessionId,
+      sessionStartedAt: widget.sessionStartedAt,
+      sessionEndedAt: widget.sessionEndedAt,
     );
-    await _store.addNote(note);
-    _resultController.clear();
-    _notesController.clear();
-    _goodCardsController.clear();
-    _badCardsController.clear();
-    _selectedIssues.clear();
-    await _load();
+    try {
+      await _store.addNote(note);
+      if (!mounted) return;
+      setState(() {
+        _resultController.clear();
+        _notesController.clear();
+        _goodCardsController.clear();
+        _badCardsController.clear();
+        _selectedIssues.clear();
+      });
+      await _load(showLoading: false);
+    } catch (_) {
+      if (!mounted) return;
+      _showOperationError(
+        'Não foi possível salvar este pós-jogo. Seus dados continuam no '
+        'formulário; tente novamente.',
+        _saveNote,
+      );
+    } finally {
+      if (mounted) {
+        setState(() => _isSaving = false);
+      }
+    }
   }
 
   Future<void> _deleteNote(PostGameNote note) async {
-    await _store.deleteNote(widget.deckId, note.id);
-    await _load();
+    if (_deletingNoteIds.contains(note.id)) return;
+    setState(() {
+      _deletingNoteIds.add(note.id);
+      _operationError = null;
+      _retryOperation = null;
+    });
+    try {
+      await _store.deleteNote(widget.deckId, note.id);
+      await _load(showLoading: false);
+    } catch (_) {
+      if (!mounted) return;
+      _showOperationError(
+        'Não foi possível remover este registro. Nada foi apagado; tente '
+        'novamente.',
+        () => _deleteNote(note),
+      );
+    } finally {
+      if (mounted) {
+        setState(() => _deletingNoteIds.remove(note.id));
+      }
+    }
+  }
+
+  void _showOperationError(
+    String message,
+    Future<void> Function() retryOperation,
+  ) {
+    setState(() {
+      _operationError = message;
+      _retryOperation = retryOperation;
+    });
+  }
+
+  Future<void> _retryFailedOperation() async {
+    final operation = _retryOperation;
+    if (operation == null) return;
+    setState(() {
+      _operationError = null;
+      _retryOperation = null;
+    });
+    await operation();
   }
 
   List<String> _splitCards(String raw) {
@@ -102,68 +215,254 @@ class _PostGameNotesScreenState extends State<PostGameNotesScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final horizontalGutter =
+        MediaQuery.sizeOf(context).width < AppTheme.breakpointCompact
+            ? 16.0
+            : 24.0;
     return Scaffold(
       appBar: AppBar(title: const Text('Pós-jogo')),
       body:
           _isLoading
               ? const Center(child: CircularProgressIndicator())
-              : ListView(
-                padding: EdgeInsets.fromLTRB(
-                  16,
-                  16,
-                  16,
-                  16 + MediaQuery.of(context).padding.bottom,
+              : _loadError != null
+              ? AppStatePanel(
+                key: const Key('post-game-load-error'),
+                icon: Icons.sync_problem_rounded,
+                title: 'Falha ao carregar o pós-jogo',
+                message: _loadError,
+                accent: AppTheme.error,
+                actionLabel: 'Tentar novamente',
+                onAction: _load,
+              )
+              : SingleChildScrollView(
+                padding: EdgeInsets.only(
+                  top: 16,
+                  bottom: 16 + MediaQuery.of(context).padding.bottom,
                 ),
-                children: [
-                  _EvolutionSummaryPanel(
-                    summary: _summary,
-                    onOptimize:
-                        () => context.go(
-                          '/decks/${widget.deckId}?optimize=post_game',
-                        ),
-                    onRebuild:
-                        () => context.go(
-                          '/decks/${widget.deckId}?optimize=rebuild',
-                        ),
-                  ),
-                  const SizedBox(height: 14),
-                  _PostGameForm(
-                    resultController: _resultController,
-                    tableLevelController: _tableLevelController,
-                    notesController: _notesController,
-                    goodCardsController: _goodCardsController,
-                    badCardsController: _badCardsController,
-                    selectedIssues: _selectedIssues,
-                    onIssueChanged: (issue, selected) {
-                      setState(() {
-                        if (selected) {
-                          _selectedIssues.add(issue);
-                        } else {
-                          _selectedIssues.remove(issue);
-                        }
-                      });
+                child: ResponsivePageFrame(
+                  key: const Key('post-game-responsive-frame'),
+                  maxWidth: AppTheme.contentMaxWidth,
+                  padding: EdgeInsets.symmetric(horizontal: horizontalGutter),
+                  child: LayoutBuilder(
+                    builder: (context, constraints) {
+                      final isDesktop =
+                          constraints.maxWidth >= AppTheme.breakpointExpanded;
+                      final summary = _EvolutionSummaryPanel(
+                        summary: _summary,
+                        contentSizedActions: isDesktop,
+                        onOptimize:
+                            () => context.go(
+                              '/decks/${widget.deckId}?optimize=post_game',
+                            ),
+                        onRebuild:
+                            () => context.go(
+                              '/decks/${widget.deckId}?optimize=rebuild',
+                            ),
+                      );
+                      final formAndHistory = Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          if (widget.playSessionId != null) ...[
+                            _LifeCounterSessionPanel(
+                              startedAt: widget.sessionStartedAt,
+                              endedAt: widget.sessionEndedAt,
+                            ),
+                            const SizedBox(height: 12),
+                          ],
+                          if (_pendingSyncCount > 0) ...[
+                            _PendingSyncPanel(count: _pendingSyncCount),
+                            const SizedBox(height: 12),
+                          ],
+                          _PostGameForm(
+                            resultController: _resultController,
+                            tableLevelController: _tableLevelController,
+                            notesController: _notesController,
+                            goodCardsController: _goodCardsController,
+                            badCardsController: _badCardsController,
+                            selectedIssues: _selectedIssues,
+                            contentSizedAction: isDesktop,
+                            isSaving: _isSaving,
+                            onIssueChanged: (issue, selected) {
+                              setState(() {
+                                if (selected) {
+                                  _selectedIssues.add(issue);
+                                } else {
+                                  _selectedIssues.remove(issue);
+                                }
+                              });
+                            },
+                            onSave: _saveNote,
+                          ),
+                          const SizedBox(height: 18),
+                          _buildHistorySection(),
+                        ],
+                      );
+
+                      if (isDesktop) {
+                        return Row(
+                          key: const Key('post-game-desktop-layout'),
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            SizedBox(
+                              width: AppTheme.inspectorWidth,
+                              child: summary,
+                            ),
+                            const SizedBox(width: AppTheme.paneGap),
+                            Expanded(child: formAndHistory),
+                          ],
+                        );
+                      }
+
+                      return Column(
+                        key: const Key('post-game-mobile-layout'),
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          summary,
+                          const SizedBox(height: 14),
+                          formAndHistory,
+                        ],
+                      );
                     },
-                    onSave: _saveNote,
                   ),
-                  const SizedBox(height: 18),
-                  Text(
-                    'Histórico',
-                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                      fontWeight: FontWeight.w800,
-                    ),
+                ),
+              ),
+      bottomNavigationBar:
+          _operationError == null
+              ? null
+              : SafeArea(
+                top: false,
+                child: Padding(
+                  padding: EdgeInsets.fromLTRB(
+                    horizontalGutter,
+                    8,
+                    horizontalGutter,
+                    8,
                   ),
-                  const SizedBox(height: 8),
-                  if (_notes.isEmpty)
-                    const _EmptyHistoryPanel()
-                  else
-                    ..._notes.map(
-                      (note) => _PostGameNoteTile(
-                        note: note,
-                        onDelete: () => _deleteNote(note),
+                  child: Center(
+                    heightFactor: 1,
+                    child: ConstrainedBox(
+                      constraints: const BoxConstraints(maxWidth: 720),
+                      child: _OperationErrorPanel(
+                        message: _operationError!,
+                        onRetry: _retryFailedOperation,
                       ),
                     ),
-                ],
+                  ),
+                ),
               ),
+    );
+  }
+
+  Widget _buildHistorySection() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        Text(
+          'Histórico',
+          style: Theme.of(
+            context,
+          ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w800),
+        ),
+        const SizedBox(height: 8),
+        if (_notes.isEmpty)
+          const _EmptyHistoryPanel()
+        else
+          ..._notes.map(
+            (note) => _PostGameNoteTile(
+              note: note,
+              isDeleting: _deletingNoteIds.contains(note.id),
+              onDelete: () => _deleteNote(note),
+            ),
+          ),
+      ],
+    );
+  }
+}
+
+class _LifeCounterSessionPanel extends StatelessWidget {
+  const _LifeCounterSessionPanel({this.startedAt, this.endedAt});
+
+  final DateTime? startedAt;
+  final DateTime? endedAt;
+
+  @override
+  Widget build(BuildContext context) {
+    final duration =
+        startedAt != null && endedAt != null && !endedAt!.isBefore(startedAt!)
+            ? endedAt!.difference(startedAt!)
+            : null;
+    final durationLabel =
+        duration == null
+            ? null
+            : duration.inHours > 0
+            ? '${duration.inHours}h ${duration.inMinutes.remainder(60)}min'
+            : '${duration.inMinutes.clamp(1, 9999)} min';
+    return Container(
+      key: const Key('post-game-life-counter-session'),
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: AppTheme.surfaceElevated,
+        borderRadius: BorderRadius.circular(AppTheme.radiusMd),
+        border: Border.all(color: AppTheme.frost400.withValues(alpha: 0.3)),
+      ),
+      child: Row(
+        children: [
+          const Icon(Icons.favorite_outline, color: AppTheme.frost400),
+          const SizedBox(width: 10),
+          Expanded(
+            child: Text(
+              durationLabel == null
+                  ? 'Registro vinculado à sessão do Life Counter.'
+                  : 'Sessão do Life Counter vinculada • $durationLabel',
+              style: const TextStyle(
+                color: AppTheme.textSecondary,
+                height: 1.35,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _PendingSyncPanel extends StatelessWidget {
+  const _PendingSyncPanel({required this.count});
+
+  final int count;
+
+  @override
+  Widget build(BuildContext context) {
+    return Semantics(
+      liveRegion: true,
+      label:
+          '$count ${count == 1 ? 'alteração pendente' : 'alterações pendentes'} de sincronização',
+      child: Container(
+        key: const Key('post-game-pending-sync'),
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+        decoration: BoxDecoration(
+          color: AppTheme.frost400.withValues(alpha: 0.10),
+          borderRadius: BorderRadius.circular(AppTheme.radiusMd),
+          border: Border.all(color: AppTheme.frost400.withValues(alpha: 0.30)),
+        ),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Icon(Icons.sync_rounded, color: AppTheme.frost400, size: 20),
+            const SizedBox(width: 10),
+            Expanded(
+              child: Text(
+                '$count ${count == 1 ? 'alteração está salva' : 'alterações estão salvas'} '
+                'neste dispositivo. A sincronização com sua conta será '
+                'retomada automaticamente quando houver conexão.',
+                style: Theme.of(
+                  context,
+                ).textTheme.bodySmall?.copyWith(color: AppTheme.textPrimary),
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }
@@ -173,11 +472,13 @@ class _EvolutionSummaryPanel extends StatelessWidget {
     required this.summary,
     required this.onOptimize,
     required this.onRebuild,
+    this.contentSizedActions = false,
   });
 
   final DeckEvolutionSummary summary;
   final VoidCallback onOptimize;
   final VoidCallback onRebuild;
+  final bool contentSizedActions;
 
   @override
   Widget build(BuildContext context) {
@@ -267,29 +568,44 @@ class _EvolutionSummaryPanel extends StatelessWidget {
             _CardSignalRows(summary: summary),
           ],
           const SizedBox(height: 14),
-          Row(
-            children: [
-              Expanded(
-                child: ElevatedButton.icon(
-                  key: const Key('post-game-optimize-from-summary-button'),
-                  onPressed: onOptimize,
-                  icon: const Icon(Icons.auto_fix_high),
-                  label: const Text('Otimizar'),
-                ),
-              ),
-              const SizedBox(width: 10),
-              Expanded(
-                child: OutlinedButton.icon(
-                  key: const Key('post-game-rebuild-from-summary-button'),
-                  onPressed: onRebuild,
-                  icon: const Icon(Icons.construction_outlined),
-                  label: const Text('Rebuild'),
-                ),
-              ),
-            ],
-          ),
+          if (contentSizedActions)
+            Wrap(
+              alignment: WrapAlignment.end,
+              spacing: 10,
+              runSpacing: 8,
+              children: [
+                SizedBox(width: 150, child: _buildOptimizeButton()),
+                SizedBox(width: 150, child: _buildRebuildButton()),
+              ],
+            )
+          else
+            Row(
+              children: [
+                Expanded(child: _buildOptimizeButton()),
+                const SizedBox(width: 10),
+                Expanded(child: _buildRebuildButton()),
+              ],
+            ),
         ],
       ),
+    );
+  }
+
+  Widget _buildOptimizeButton() {
+    return ElevatedButton.icon(
+      key: const Key('post-game-optimize-from-summary-button'),
+      onPressed: onOptimize,
+      icon: const Icon(Icons.auto_fix_high),
+      label: const Text('Otimizar'),
+    );
+  }
+
+  Widget _buildRebuildButton() {
+    return OutlinedButton.icon(
+      key: const Key('post-game-rebuild-from-summary-button'),
+      onPressed: onRebuild,
+      icon: const Icon(Icons.construction_outlined),
+      label: const Text('Reconstruir'),
     );
   }
 }
@@ -369,6 +685,8 @@ class _PostGameForm extends StatelessWidget {
     required this.selectedIssues,
     required this.onIssueChanged,
     required this.onSave,
+    required this.isSaving,
+    this.contentSizedAction = false,
   });
 
   final TextEditingController resultController;
@@ -379,6 +697,8 @@ class _PostGameForm extends StatelessWidget {
   final Set<PostGameIssue> selectedIssues;
   final void Function(PostGameIssue issue, bool selected) onIssueChanged;
   final VoidCallback onSave;
+  final bool isSaving;
+  final bool contentSizedAction;
 
   @override
   Widget build(BuildContext context) {
@@ -414,7 +734,7 @@ class _PostGameForm extends StatelessWidget {
             controller: tableLevelController,
             decoration: const InputDecoration(
               labelText: 'Nível da mesa',
-              hintText: 'Casual, upgraded, optimized, cEDH',
+              hintText: 'Casual, melhorada, otimizada ou cEDH',
             ),
           ),
           const SizedBox(height: 10),
@@ -462,13 +782,22 @@ class _PostGameForm extends StatelessWidget {
                 }).toList(),
           ),
           const SizedBox(height: 14),
-          SizedBox(
-            width: double.infinity,
-            child: ElevatedButton.icon(
-              key: const Key('post-game-save-button'),
-              onPressed: onSave,
-              icon: const Icon(Icons.save),
-              label: const Text('Salvar pós-jogo'),
+          Align(
+            alignment: Alignment.centerRight,
+            child: SizedBox(
+              width: contentSizedAction ? 210 : double.infinity,
+              child: ElevatedButton.icon(
+                key: const Key('post-game-save-button'),
+                onPressed: isSaving ? null : onSave,
+                icon:
+                    isSaving
+                        ? const SizedBox.square(
+                          dimension: 18,
+                          child: CircularProgressIndicator(strokeWidth: 2),
+                        )
+                        : const Icon(Icons.save),
+                label: Text(isSaving ? 'Salvando...' : 'Salvar pós-jogo'),
+              ),
             ),
           ),
         ],
@@ -498,10 +827,15 @@ class _EmptyHistoryPanel extends StatelessWidget {
 }
 
 class _PostGameNoteTile extends StatelessWidget {
-  const _PostGameNoteTile({required this.note, required this.onDelete});
+  const _PostGameNoteTile({
+    required this.note,
+    required this.onDelete,
+    required this.isDeleting,
+  });
 
   final PostGameNote note;
   final VoidCallback onDelete;
+  final bool isDeleting;
 
   @override
   Widget build(BuildContext context) {
@@ -528,9 +862,16 @@ class _PostGameNoteTile extends StatelessWidget {
                 ),
               ),
               IconButton(
+                key: Key('post-game-delete-${note.id}'),
                 tooltip: 'Remover nota',
-                onPressed: onDelete,
-                icon: const Icon(Icons.delete_outline),
+                onPressed: isDeleting ? null : onDelete,
+                icon:
+                    isDeleting
+                        ? const SizedBox.square(
+                          dimension: 18,
+                          child: CircularProgressIndicator(strokeWidth: 2),
+                        )
+                        : const Icon(Icons.delete_outline),
               ),
             ],
           ),
@@ -560,6 +901,62 @@ class _PostGameNoteTile extends StatelessWidget {
                       .toList(),
             ),
           ],
+        ],
+      ),
+    );
+  }
+}
+
+class _OperationErrorPanel extends StatelessWidget {
+  const _OperationErrorPanel({required this.message, required this.onRetry});
+
+  final String message;
+  final VoidCallback onRetry;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      key: const Key('post-game-operation-error'),
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: AppTheme.error.withValues(alpha: 0.08),
+        borderRadius: BorderRadius.circular(AppTheme.radiusMd),
+        border: Border.all(color: AppTheme.error.withValues(alpha: 0.36)),
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Icon(Icons.error_outline_rounded, color: AppTheme.error),
+          const SizedBox(width: 10),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Ação não concluída',
+                  style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                    color: AppTheme.textPrimary,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  message,
+                  style: const TextStyle(
+                    color: AppTheme.textSecondary,
+                    height: AppTheme.lineHeightCompact,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                TextButton.icon(
+                  key: const Key('post-game-operation-retry'),
+                  onPressed: onRetry,
+                  icon: const Icon(Icons.refresh_rounded),
+                  label: const Text('Tentar novamente'),
+                ),
+              ],
+            ),
+          ),
         ],
       ),
     );

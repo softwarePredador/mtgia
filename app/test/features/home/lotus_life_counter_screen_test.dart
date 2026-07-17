@@ -6,6 +6,10 @@ import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
 import 'package:manaloom/features/home/life_counter_route.dart';
+import 'package:manaloom/features/home/life_counter/life_counter_history.dart';
+import 'package:manaloom/features/home/life_counter/life_counter_history_store.dart';
+import 'package:manaloom/features/home/life_counter/life_counter_session.dart';
+import 'package:manaloom/features/home/life_counter/life_counter_session_store.dart';
 import 'package:manaloom/features/home/lotus/lotus_host.dart';
 import 'package:manaloom/features/home/lotus/lotus_js_bridges.dart';
 import 'package:manaloom/features/home/lotus_life_counter_screen.dart';
@@ -143,7 +147,7 @@ void main() {
 
       expect(find.byType(LotusLifeCounterScreen), findsOneWidget);
       expect(find.byKey(const Key('fake-lotus-host-view')), findsOneWidget);
-      expect(find.text('Preparing the life counter'), findsOneWidget);
+      expect(find.text('Preparando o contador de vida'), findsOneWidget);
       expect(host.loadBundleCallCount, 1);
     });
 
@@ -177,16 +181,21 @@ void main() {
       await tester.pump();
       await tester.pump();
 
-      expect(find.text('Life counter unavailable'), findsOneWidget);
-      expect(find.text('Test bundle load failure'), findsOneWidget);
+      expect(find.text('Contador de vida indisponível'), findsOneWidget);
+      expect(
+        find.text(
+          'Não foi possível carregar o contador de vida. Tente novamente em instantes.',
+        ),
+        findsOneWidget,
+      );
       expect(host.loadBundleCallCount, 1);
 
-      await tester.tap(find.text('Retry'));
+      await tester.tap(find.text('Tentar novamente'));
       await tester.pump();
       await tester.pump();
 
       expect(host.loadBundleCallCount, 2);
-      expect(find.text('Life counter unavailable'), findsNothing);
+      expect(find.text('Contador de vida indisponível'), findsNothing);
       expect(find.text('Test bundle load failure'), findsNothing);
     });
 
@@ -221,10 +230,115 @@ void main() {
       expect(host.loadBundleCallCount, 1);
     });
 
+    testWidgets('binds deck context before loading the Lotus bundle', (
+      tester,
+    ) async {
+      late _FakeLotusHost host;
+
+      await tester.pumpWidget(
+        MaterialApp(
+          home: LotusLifeCounterScreen(
+            deckId: 'deck-607',
+            deckName: 'Lorehold reconstruído',
+            hostFactory: ({
+              required onAppReviewRequested,
+              required onShellMessageRequested,
+            }) {
+              host = _FakeLotusHost(
+                onShellMessageRequested: onShellMessageRequested,
+                onLoadBundle: (host) async => host.completeSuccessfulLoad(),
+              );
+              return host;
+            },
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      final session = await LifeCounterSessionStore().load();
+      final history = await LifeCounterHistoryStore().load();
+
+      expect(host.loadBundleCallCount, 1);
+      expect(session, isNotNull);
+      expect(session!.deckId, 'deck-607');
+      expect(session.deckName, 'Lorehold reconstruído');
+      expect(session.playSessionId, startsWith('play-'));
+      expect(session.startedAtEpochMs, isNotNull);
+      expect(history?.currentGameMeta?['deckId'], 'deck-607');
+      expect(history?.currentGameMeta?['playSessionId'], session.playSessionId);
+    });
+
+    testWidgets(
+      'switching decks starts a clean board and archives the previous game',
+      (tester) async {
+        final previousSession = LifeCounterSession.initial(
+          playerCount: 4,
+          playSessionId: 'play-deck-a',
+          deckId: 'deck-a',
+          deckName: 'Deck A',
+          startedAtEpochMs: 1000,
+        ).copyWith(
+          lives: const <int>[17, 40, 40, 40],
+          poison: const <int>[4, 0, 0, 0],
+        );
+        await LifeCounterSessionStore().save(previousSession);
+        await LifeCounterHistoryStore().save(
+          const LifeCounterHistoryState(
+            currentGameName: 'Partida do deck A',
+            currentGameMeta: <String, Object?>{
+              'id': 'game-a',
+              'startDate': 1000,
+              'deckId': 'deck-a',
+              'playSessionId': 'play-deck-a',
+            },
+            currentGameEntries: <LifeCounterHistoryEntry>[
+              LifeCounterHistoryEntry(message: 'Jogador 1 perdeu 23 de vida'),
+            ],
+            archiveEntries: <LifeCounterHistoryEntry>[],
+            archivedGameCount: 0,
+          ),
+        );
+
+        await tester.pumpWidget(
+          MaterialApp(
+            home: LotusLifeCounterScreen(
+              deckId: 'deck-b',
+              deckName: 'Deck B',
+              hostFactory: ({
+                required onAppReviewRequested,
+                required onShellMessageRequested,
+              }) {
+                return _FakeLotusHost(
+                  onShellMessageRequested: onShellMessageRequested,
+                  onLoadBundle: (host) async => host.completeSuccessfulLoad(),
+                );
+              },
+            ),
+          ),
+        );
+        await tester.pumpAndSettle();
+
+        final session = await LifeCounterSessionStore().load();
+        final history = await LifeCounterHistoryStore().load();
+        expect(session?.deckId, 'deck-b');
+        expect(session?.lives, everyElement(40));
+        expect(session?.poison, everyElement(0));
+        expect(history?.currentGameEntries, isEmpty);
+        expect(history?.currentGameMeta?['deckId'], 'deck-b');
+        expect(history?.archivedGames, hasLength(1));
+        expect(history?.archivedGames.single.metadata['deckId'], 'deck-a');
+        expect(
+          history?.archivedGames.single.entries.single.message,
+          'Jogador 1 perdeu 23 de vida',
+        );
+      },
+    );
+
     testWidgets(
       'close shell message returns to home when life counter is stacked',
       (tester) async {
         late _FakeLotusHost host;
+        LifeCounterExitResult? routeResult;
         final flushBarrier = Completer<bool>();
         final router = GoRouter(
           initialLocation: '/home',
@@ -234,7 +348,12 @@ void main() {
               builder:
                   (context, state) => Scaffold(
                     body: TextButton(
-                      onPressed: () => openLifeCounterRoute(context),
+                      onPressed: () async {
+                        routeResult =
+                            await openLifeCounterRoute<LifeCounterExitResult>(
+                              context,
+                            );
+                      },
                       child: const Text('open-life-counter'),
                     ),
                   ),
@@ -281,6 +400,89 @@ void main() {
 
         expect(find.text('open-life-counter'), findsOneWidget);
         expect(host.isDisposed, isTrue);
+        expect(routeResult, isNotNull);
+        expect(routeResult!.hadGameActivity, isFalse);
+        expect(routeResult!.storageFlushed, isTrue);
+      },
+    );
+
+    testWidgets(
+      'close reports activity and keeps the play session context after a life change',
+      (tester) async {
+        late _FakeLotusHost host;
+        LifeCounterExitResult? routeResult;
+        final router = GoRouter(
+          initialLocation: '/home',
+          routes: [
+            GoRoute(
+              path: '/home',
+              builder:
+                  (context, state) => Scaffold(
+                    body: TextButton(
+                      onPressed: () async {
+                        routeResult =
+                            await openLifeCounterRoute<LifeCounterExitResult>(
+                              context,
+                              deckId: 'deck-607',
+                              deckName: 'Lorehold',
+                            );
+                      },
+                      child: const Text('open-life-counter'),
+                    ),
+                  ),
+            ),
+            GoRoute(
+              path: lifeCounterRoutePath,
+              builder:
+                  (context, state) => LotusLifeCounterScreen(
+                    deckId: state.uri.queryParameters['deckId'],
+                    deckName: state.uri.queryParameters['deckName'],
+                    hostFactory: ({
+                      required onAppReviewRequested,
+                      required onShellMessageRequested,
+                    }) {
+                      host = _FakeLotusHost(
+                        onShellMessageRequested: onShellMessageRequested,
+                        onFlushStorageSnapshot: () async {
+                          final store = LifeCounterSessionStore();
+                          final session = await store.load();
+                          await store.save(
+                            session!.copyWith(
+                              lives: <int>[
+                                session.lives.first - 1,
+                                ...session.lives.skip(1),
+                              ],
+                            ),
+                          );
+                          return true;
+                        },
+                        onLoadBundle:
+                            (host) async => host.completeSuccessfulLoad(),
+                      );
+                      return host;
+                    },
+                  ),
+            ),
+          ],
+        );
+
+        await tester.pumpWidget(MaterialApp.router(routerConfig: router));
+        await tester.pumpAndSettle();
+        await tester.tap(find.text('open-life-counter'));
+        await tester.pumpAndSettle();
+
+        host.emitShellMessage(
+          '{"type":"close-life-counter","source":"activity_test"}',
+        );
+        await tester.pumpAndSettle();
+
+        expect(find.text('open-life-counter'), findsOneWidget);
+        expect(routeResult, isNotNull);
+        expect(routeResult!.hadGameActivity, isTrue);
+        expect(routeResult!.storageFlushed, isTrue);
+        expect(routeResult!.deckId, 'deck-607');
+        expect(routeResult!.playSessionId, startsWith('play-'));
+        expect(routeResult!.duration, isNotNull);
       },
     );
 

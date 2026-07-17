@@ -63,6 +63,7 @@ class NotificationProvider extends ChangeNotifier {
   int _stateGeneration = 0;
   int _unreadFetchGeneration = 0;
   int _notificationFetchGeneration = 0;
+  Future<bool>? _markAllAsReadOperation;
 
   /// Inicia polling de contagem de não-lidas a cada 30s
   void startPolling() {
@@ -87,6 +88,11 @@ class NotificationProvider extends ChangeNotifier {
 
   /// Busca contagem de não-lidas (badge)
   Future<void> fetchUnreadCount() async {
+    // A resposta de um poll iniciado durante a mutação pode representar o
+    // estado anterior do servidor. O próximo ciclo atualizará o badge depois
+    // que a operação terminar.
+    if (_markAllAsReadOperation != null) return;
+
     final generation = _stateGeneration;
     final requestGeneration = ++_unreadFetchGeneration;
     try {
@@ -227,18 +233,35 @@ class NotificationProvider extends ChangeNotifier {
   }
 
   /// Marca todas como lidas
-  Future<void> markAllAsRead() async {
+  Future<bool> markAllAsRead() {
+    final activeOperation = _markAllAsReadOperation;
+    if (activeOperation != null) return activeOperation;
+
+    late final Future<bool> operation;
+    operation = _performMarkAllAsRead().whenComplete(() {
+      if (identical(_markAllAsReadOperation, operation)) {
+        _markAllAsReadOperation = null;
+      }
+    });
+    _markAllAsReadOperation = operation;
+    return operation;
+  }
+
+  Future<bool> _performMarkAllAsRead() async {
     final generation = _stateGeneration;
     try {
       final hasUnreadLocal = _notifications.any((n) => !n.isRead);
       if (!hasUnreadLocal && _unreadCount == 0) {
-        return;
+        return true;
       }
 
+      // Invalida qualquer contagem solicitada antes da mutação. Sem isso, um
+      // poll lento poderia restaurar o badge antigo depois do sucesso abaixo.
+      _unreadFetchGeneration++;
       final resp = await _api.put('/notifications/read-all', {});
-      if (generation != _stateGeneration) return;
+      if (generation != _stateGeneration) return false;
       if (resp.statusCode < 200 || resp.statusCode >= 300) {
-        return;
+        return false;
       }
       var changed = false;
       for (var i = 0; i < _notifications.length; i++) {
@@ -265,6 +288,7 @@ class NotificationProvider extends ChangeNotifier {
       if (changed) {
         notifyListeners();
       }
+      return true;
     } catch (e, stackTrace) {
       debugPrint('[NotificationProvider] markAllAsRead error: $e');
       _captureProviderException(
@@ -272,6 +296,7 @@ class NotificationProvider extends ChangeNotifier {
         stackTrace: stackTrace,
         operation: 'markAllAsRead',
       );
+      return false;
     }
   }
 
@@ -280,6 +305,7 @@ class NotificationProvider extends ChangeNotifier {
     _stateGeneration++;
     _unreadFetchGeneration++;
     _notificationFetchGeneration++;
+    _markAllAsReadOperation = null;
     if (_notifications.isEmpty &&
         _unreadCount == 0 &&
         !_isLoading &&

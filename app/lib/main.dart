@@ -13,7 +13,6 @@ import 'core/services/realtime_notification_coordinator.dart';
 import 'core/services/performance_service.dart';
 import 'core/theme/app_theme.dart';
 import 'core/widgets/debug_accessibility_tools.dart';
-import 'core/widgets/platform_unavailable_screen.dart';
 import 'features/home/home_screen.dart';
 import 'features/decks/screens/deck_list_screen.dart';
 import 'features/decks/providers/deck_provider.dart';
@@ -21,6 +20,7 @@ import 'features/auth/screens/splash_screen.dart';
 import 'features/auth/screens/login_screen.dart';
 import 'features/auth/screens/register_screen.dart';
 import 'features/auth/providers/auth_provider.dart';
+import 'features/auth/auth_redirect.dart';
 
 import 'core/widgets/main_scaffold.dart';
 
@@ -31,7 +31,6 @@ import 'features/decks/screens/deck_import_screen.dart';
 import 'features/cards/providers/card_provider.dart';
 import 'features/cards/screens/card_search_screen.dart';
 import 'features/market/providers/market_provider.dart';
-import 'features/market/screens/market_screen.dart';
 import 'features/profile/profile_screen.dart';
 import 'features/scanner/screens/card_scanner_screen.dart';
 import 'features/community/providers/community_provider.dart';
@@ -239,7 +238,7 @@ class _ManaLoomAppState extends State<ManaLoomApp> with WidgetsBindingObserver {
         final location = state.matchedLocation;
         final status = _authProvider.status;
 
-        debugPrint('[🧭 Router] redirect: location=$location | status=$status');
+        debugPrint('[🧭 Router] redirect: status=$status');
 
         // Sempre permite a Splash (ela decide para onde ir).
         if (location == '/') return null;
@@ -284,7 +283,8 @@ class _ManaLoomAppState extends State<ManaLoomApp> with WidgetsBindingObserver {
                       isProtectedRoute ? {'redirect': redirectTarget} : null,
                 ).toString();
             debugPrint(
-              '[🧭 Router] → $splashUri (status=$status, aguardando auth)',
+              '[🧭 Router] → splash de autenticação '
+              '(status=$status, aguardando auth)',
             );
             return splashUri;
           }
@@ -294,13 +294,21 @@ class _ManaLoomAppState extends State<ManaLoomApp> with WidgetsBindingObserver {
         }
 
         if (isProtectedRoute && !_authProvider.isAuthenticated) {
-          debugPrint('[🧭 Router] → /login (rota protegida sem auth)');
-          return '/login';
+          final loginLocation = buildAuthLocation(
+            '/login',
+            state.uri.toString(),
+          );
+          debugPrint('[🧭 Router] → login (rota protegida sem auth)');
+          return loginLocation;
         }
 
         if (isAuthRoute && _authProvider.isAuthenticated) {
-          debugPrint('[🧭 Router] → /home (já autenticado)');
-          return '/home';
+          final postAuthRedirect = normalizePostAuthRedirect(
+            state.uri.queryParameters['redirect'],
+          );
+          final target = postAuthRedirect ?? '/home';
+          debugPrint('[🧭 Router] → rota autenticada resolvida');
+          return target;
         }
 
         final uriPath = state.uri.path;
@@ -309,9 +317,7 @@ class _ManaLoomAppState extends State<ManaLoomApp> with WidgetsBindingObserver {
             RegExp(r'/scan$'),
             '/search',
           );
-          debugPrint(
-            '[🧭 Router] → $fallbackPath (scanner deferred neste build)',
-          );
+          debugPrint('[🧭 Router] → busca (scanner deferred neste build)');
           return fallbackPath;
         }
 
@@ -329,29 +335,26 @@ class _ManaLoomAppState extends State<ManaLoomApp> with WidgetsBindingObserver {
 
         GoRoute(
           path: '/login',
-          builder: (context, state) => const LoginScreen(),
+          builder:
+              (context, state) => LoginScreen(
+                redirectPath: state.uri.queryParameters['redirect'],
+              ),
         ),
         GoRoute(
           path: '/register',
-          builder: (context, state) => const RegisterScreen(),
+          builder:
+              (context, state) => RegisterScreen(
+                redirectPath: state.uri.queryParameters['redirect'],
+              ),
         ),
 
         GoRoute(
           path: lifeCounterRoutePath,
           builder:
-              (context, state) =>
-                  kIsWeb
-                      ? const PlatformUnavailableScreen(
-                        title: 'Contador disponivel no app mobile',
-                        message:
-                            'O contador Lotus usa WebView nativo e fica '
-                            'desabilitado no Flutter Web neste corte.',
-                        details:
-                            'No navegador, continue usando deck builder, IA, '
-                            'colecao, planos, comunidade e trade. A rota fica '
-                            'protegida para nao quebrar o app web.',
-                      )
-                      : const LotusLifeCounterScreen(),
+              (context, state) => LotusLifeCounterScreen(
+                deckId: state.uri.queryParameters['deckId'],
+                deckName: state.uri.queryParameters['deckName'],
+              ),
         ),
 
         ShellRoute(
@@ -415,7 +418,29 @@ class _ManaLoomAppState extends State<ManaLoomApp> with WidgetsBindingObserver {
                       path: 'post-game',
                       builder: (context, state) {
                         final id = state.pathParameters['id']!;
-                        return PostGameNotesScreen(deckId: id);
+                        final startedAtMs = int.tryParse(
+                          state.uri.queryParameters['startedAt'] ?? '',
+                        );
+                        final endedAtMs = int.tryParse(
+                          state.uri.queryParameters['endedAt'] ?? '',
+                        );
+                        return PostGameNotesScreen(
+                          deckId: id,
+                          playSessionId:
+                              state.uri.queryParameters['playSessionId'],
+                          sessionStartedAt:
+                              startedAtMs == null
+                                  ? null
+                                  : DateTime.fromMillisecondsSinceEpoch(
+                                    startedAtMs,
+                                  ),
+                          sessionEndedAt:
+                              endedAtMs == null
+                                  ? null
+                                  : DateTime.fromMillisecondsSinceEpoch(
+                                    endedAtMs,
+                                  ),
+                        );
                       },
                     ),
                   ],
@@ -465,11 +490,16 @@ class _ManaLoomAppState extends State<ManaLoomApp> with WidgetsBindingObserver {
             ),
             GoRoute(
               path: '/market',
-              builder: (context, state) => const MarketScreen(),
+              redirect: (context, state) => '/community?tab=3',
             ),
             GoRoute(
               path: '/community',
-              builder: (context, state) => const CommunityScreen(),
+              builder: (context, state) {
+                final tab = int.tryParse(
+                  state.uri.queryParameters['tab'] ?? '',
+                );
+                return CommunityScreen(initialTab: tab ?? 0);
+              },
               routes: [
                 GoRoute(
                   path: 'search-users',
@@ -528,7 +558,18 @@ class _ManaLoomAppState extends State<ManaLoomApp> with WidgetsBindingObserver {
                   path: 'create/:receiverId',
                   builder: (context, state) {
                     final receiverId = state.pathParameters['receiverId']!;
-                    return CreateTradeScreen(receiverId: receiverId);
+                    final args = state.extra;
+                    return CreateTradeScreen(
+                      receiverId: receiverId,
+                      initialType:
+                          args is CreateTradeRouteArgs
+                              ? args.initialType
+                              : 'trade',
+                      preselectedItem:
+                          args is CreateTradeRouteArgs
+                              ? args.preselectedItem
+                              : null,
+                    );
                   },
                 ),
                 GoRoute(

@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-ROOT_DIR="$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)"
+ROOT_DIR="$(CDPATH='' cd -- "$(dirname -- "$0")/.." && pwd)"
 ENV_FILE="${MANALOOM_NEW_SERVER_ENV:-$ROOT_DIR/server/.env}"
 
 if [[ ! -f "$ENV_FILE" ]]; then
@@ -14,12 +14,27 @@ set -a
 . "$ENV_FILE"
 set +a
 
-SOURCE_SHA="${MANALOOM_RELEASE_SOURCE_SHA:-$(git -C "$ROOT_DIR" rev-parse HEAD)}"
-SHORT_SHA="$(git -C "$ROOT_DIR" rev-parse --short=12 "$SOURCE_SHA")"
-VERSION="${MANALOOM_RELEASE_VERSION:-$(git -C "$ROOT_DIR" show "$SOURCE_SHA:app/pubspec.yaml" | awk '/^version:/{print $2; exit}')}"
+IDENTITY_JSON="$(
+  MANALOOM_RELEASE_SOURCE_SHA="${MANALOOM_RELEASE_SOURCE_SHA:-$(git -C "$ROOT_DIR" rev-parse HEAD)}" \
+    "$ROOT_DIR/scripts/manaloom_release_identity.sh"
+)"
+SOURCE_SHA="$(jq -r '.git_sha' <<<"$IDENTITY_JSON")"
+SHORT_SHA="$(jq -r '.short_sha' <<<"$IDENTITY_JSON")"
+IDENTITY_VERSION="$(jq -r '.version' <<<"$IDENTITY_JSON")"
+VERSION="${MANALOOM_RELEASE_VERSION:-$IDENTITY_VERSION}"
+if [[ "$VERSION" != "$IDENTITY_VERSION" ]]; then
+  echo "versao solicitada diverge da identidade do source: requested=$VERSION source=$IDENTITY_VERSION" >&2
+  exit 2
+fi
 RELEASE_DIR="${MANALOOM_RELEASE_DIR:-$HOME/.manaloom/releases/$VERSION/$SHORT_SHA}"
 APK="$RELEASE_DIR/manaloom-$VERSION-$SHORT_SHA.apk"
 AAB="$RELEASE_DIR/manaloom-$VERSION-$SHORT_SHA.aab"
+RELEASE_MANIFEST="$RELEASE_DIR/release-manifest.json"
+RELEASE_IDENTITY="$RELEASE_DIR/release-identity.json"
+SBOM="$RELEASE_DIR/sbom.cdx.json"
+PROVENANCE="$RELEASE_DIR/provenance.intoto.json"
+ANDROID_VERIFICATION="$RELEASE_DIR/android-verification.json"
+OBSERVABILITY_EVIDENCE="${MANALOOM_RELEASE_OBSERVABILITY_EVIDENCE:-}"
 PUBLIC_HOST="${MANALOOM_WEB_PUBLIC_HOST:-evolution-manaloom-web-public.2ta7qx.easypanel.host}"
 PUBLIC_URL="https://$PUBLIC_HOST/downloads/manaloom-android.apk"
 PROJECT="${EASYPANEL_PROJECT_NAME:-evolution}"
@@ -43,12 +58,62 @@ for tool in curl git jq scp shasum ssh tar; do
   require_tool "$tool"
 done
 
-for artifact in "$APK" "$AAB" "$ROOT_DIR/app/release-host/Dockerfile" "$ROOT_DIR/app/release-host/nginx.conf" "$ROOT_DIR/app/release-host/traefik.yaml"; do
+for artifact in "$APK" "$AAB" "$RELEASE_MANIFEST" "$RELEASE_IDENTITY" "$SBOM" "$PROVENANCE" "$ANDROID_VERIFICATION" "$RELEASE_DIR/SHA256SUMS" "$ROOT_DIR/app/release-host/Dockerfile" "$ROOT_DIR/app/release-host/nginx.conf" "$ROOT_DIR/app/release-host/traefik.yaml"; do
   if [[ ! -f "$artifact" ]]; then
     echo "artefato obrigatorio ausente: $artifact" >&2
     exit 2
   fi
 done
+if [[ -z "$OBSERVABILITY_EVIDENCE" || ! -f "$OBSERVABILITY_EVIDENCE" ]]; then
+  echo "publicacao recusada: MANALOOM_RELEASE_OBSERVABILITY_EVIDENCE ausente" >&2
+  exit 2
+fi
+
+(
+  cd "$RELEASE_DIR"
+  shasum -a 256 -c SHA256SUMS >/dev/null
+)
+jq -e --arg sha "$SOURCE_SHA" --arg version "$VERSION" \
+  '.git_sha == $sha and .version == $version and .platform == "android" and .permissions_gate == "passed" and .sentry_configured == true' \
+  "$RELEASE_MANIFEST" >/dev/null
+jq -e --arg sha "$SOURCE_SHA" --arg version "$VERSION" \
+  '.git_sha == $sha and .version == $version' "$RELEASE_IDENTITY" >/dev/null
+jq -e --arg sha "$SOURCE_SHA" \
+  '.predicate.buildDefinition.externalParameters.git_sha == $sha' "$PROVENANCE" >/dev/null
+jq -e --arg sha "$SOURCE_SHA" --arg version "$VERSION" \
+  '.status == "passed" and .git_sha == $sha and .version == $version and
+   .sentry.ingestion == "confirmed" and .fcm.registration == "confirmed" and
+   (.fcm.delivery_required == false or (.fcm.delivery_log_sha256 | type == "string" and length == 64))' \
+  "$OBSERVABILITY_EVIDENCE" >/dev/null || {
+  echo "publicacao recusada: observabilidade Sentry/FCM not_proven para este release" >&2
+  exit 1
+}
+
+APK_HASH="$(shasum -a 256 "$APK" | awk '{print $1}')"
+AAB_HASH="$(shasum -a 256 "$AAB" | awk '{print $1}')"
+SBOM_HASH="$(shasum -a 256 "$SBOM" | awk '{print $1}')"
+PROVENANCE_HASH="$(shasum -a 256 "$PROVENANCE" | awk '{print $1}')"
+OBSERVABILITY_HASH="$(shasum -a 256 "$OBSERVABILITY_EVIDENCE" | awk '{print $1}')"
+CERTIFICATE_SHA256="$(jq -r '.signing.certificate_sha256' "$RELEASE_MANIFEST")"
+jq -e \
+  --arg apk_sha256 "$APK_HASH" \
+  --arg aab_sha256 "$AAB_HASH" \
+  --arg sbom_sha256 "$SBOM_HASH" \
+  --arg certificate_sha256 "$CERTIFICATE_SHA256" \
+  '.artifacts.apk.sha256 == $apk_sha256 and
+   .artifacts.aab.sha256 == $aab_sha256 and
+   .artifacts.sbom.sha256 == $sbom_sha256 and
+   .signing.certificate_sha256 == $certificate_sha256' \
+  "$RELEASE_MANIFEST" >/dev/null
+jq -e \
+  --arg apk "$(basename "$APK")" --arg apk_sha256 "$APK_HASH" \
+  --arg aab "$(basename "$AAB")" --arg aab_sha256 "$AAB_HASH" \
+  'any(.subject[]; .name == $apk and .digest.sha256 == $apk_sha256) and
+   any(.subject[]; .name == $aab and .digest.sha256 == $aab_sha256)' \
+  "$PROVENANCE" >/dev/null
+jq -e --arg version_name "${VERSION%%+*}" --arg version_code "${VERSION##*+}" --arg certificate_sha256 "$CERTIFICATE_SHA256" \
+  '.status == "passed" and .version_name == $version_name and .version_code == $version_code and .certificate_sha256 == $certificate_sha256' \
+  "$ANDROID_VERIFICATION" >/dev/null
 
 trpc_post() {
   local procedure="$1"
@@ -71,14 +136,29 @@ mkdir -p "$BUILD_DIR/public/downloads"
 cp "$ROOT_DIR/app/release-host/Dockerfile" "$BUILD_DIR/Dockerfile"
 cp "$ROOT_DIR/app/release-host/nginx.conf" "$BUILD_DIR/nginx.conf"
 cp "$APK" "$BUILD_DIR/public/downloads/manaloom-android.apk"
-APK_HASH="$(shasum -a 256 "$APK" | awk '{print $1}')"
-AAB_HASH="$(shasum -a 256 "$AAB" | awk '{print $1}')"
 jq -n \
   --arg version "$VERSION" \
   --arg git_sha "$SOURCE_SHA" \
   --arg artifact manaloom-android.apk \
   --arg sha256 "$APK_HASH" \
-  '{version:$version,git_sha:$git_sha,platform:"android",artifact:$artifact,sha256:$sha256}' \
+  --arg aab_sha256 "$AAB_HASH" \
+  --arg sbom_sha256 "$SBOM_HASH" \
+  --arg provenance_sha256 "$PROVENANCE_HASH" \
+  --arg observability_sha256 "$OBSERVABILITY_HASH" \
+  --arg certificate_sha256 "$CERTIFICATE_SHA256" \
+  '{
+    schema_version: 1,
+    version: $version,
+    git_sha: $git_sha,
+    platform: "android",
+    artifact: $artifact,
+    sha256: $sha256,
+    aab_sha256: $aab_sha256,
+    sbom_sha256: $sbom_sha256,
+    provenance_sha256: $provenance_sha256,
+    observability_sha256: $observability_sha256,
+    certificate_sha256: $certificate_sha256
+  }' \
   > "$BUILD_DIR/public/downloads/release.json"
 printf '%s  %s\n' "$APK_HASH" manaloom-android.apk > "$BUILD_DIR/public/downloads/SHA256SUMS"
 chmod 644 "$BUILD_DIR/public/downloads/manaloom-android.apk" \
@@ -92,7 +172,10 @@ ssh -o BatchMode=yes -o StrictHostKeyChecking=accept-new -i "$SSH_KEY" "$SSH_HOS
   "rm -rf '$REMOTE_BUILD' && install -d -m 700 '$REMOTE_BUILD' '$REMOTE_RELEASE'"
 scp -q -i "$SSH_KEY" "$APK" "$SSH_HOST:$REMOTE_RELEASE/$(basename "$APK")"
 scp -q -i "$SSH_KEY" "$AAB" "$SSH_HOST:$REMOTE_RELEASE/$(basename "$AAB")"
-scp -q -i "$SSH_KEY" "$RELEASE_DIR/SHA256SUMS" "$SSH_HOST:$REMOTE_RELEASE/SHA256SUMS"
+for evidence in SHA256SUMS android-verification.json provenance.intoto.json release-identity.json release-manifest.json sbom.cdx.json; do
+  scp -q -i "$SSH_KEY" "$RELEASE_DIR/$evidence" "$SSH_HOST:$REMOTE_RELEASE/$evidence"
+done
+scp -q -i "$SSH_KEY" "$OBSERVABILITY_EVIDENCE" "$SSH_HOST:$REMOTE_RELEASE/observability-result.json"
 ssh -o BatchMode=yes -i "$SSH_KEY" "$SSH_HOST" "chmod 600 '$REMOTE_RELEASE'/*"
 
 COPYFILE_DISABLE=1 tar --no-mac-metadata -C "$BUILD_DIR" -czf - . | \
@@ -117,7 +200,7 @@ scp -q -i "$SSH_KEY" "$ROOT_DIR/app/release-host/traefik.yaml" "$SSH_HOST:/etc/e
 ssh -o BatchMode=yes -i "$SSH_KEY" "$SSH_HOST" \
   "mv /etc/easypanel/traefik/config/evolution-manaloom-releases-path.yaml.tmp /etc/easypanel/traefik/config/evolution-manaloom-releases-path.yaml"
 
-for attempt in $(seq 1 60); do
+for _ in $(seq 1 60); do
   RUNTIME_STATE="$(ssh -o BatchMode=yes -i "$SSH_KEY" "$SSH_HOST" \
     "replicas=\$(docker service ls --filter name='$SWARM_SERVICE' --format '{{.Replicas}}' | head -1); image=\$(docker service inspect '$SWARM_SERVICE' --format '{{.Spec.TaskTemplate.ContainerSpec.Image}}' 2>/dev/null || true); printf '%s|%s' \"\$replicas\" \"\${image%%@*}\"")"
   if [[ "$RUNTIME_STATE" == "1/1|$IMAGE" ]]; then
@@ -130,7 +213,7 @@ if [[ "$RUNTIME_STATE" != "1/1|$IMAGE" ]]; then
   exit 1
 fi
 
-for attempt in $(seq 1 30); do
+for _ in $(seq 1 30); do
   HTTP_CODE="$(curl -sS -o /tmp/manaloom-public-release.apk -w '%{http_code}' "$PUBLIC_URL")"
   if [[ "$HTTP_CODE" == "200" ]]; then
     break
@@ -154,6 +237,17 @@ if [[ "$REMOTE_AAB_HASH" != "$AAB_HASH" ]]; then
   echo "backup privado do AAB diverge do artefato local" >&2
   exit 1
 fi
+REMOTE_MANIFEST_HASH="$(ssh -o BatchMode=yes -i "$SSH_KEY" "$SSH_HOST" "sha256sum '$REMOTE_RELEASE/release-manifest.json' | awk '{print \$1}'")"
+LOCAL_MANIFEST_HASH="$(shasum -a 256 "$RELEASE_MANIFEST" | awk '{print $1}')"
+if [[ "$REMOTE_MANIFEST_HASH" != "$LOCAL_MANIFEST_HASH" ]]; then
+  echo "manifesto privado remoto diverge do artefato local" >&2
+  exit 1
+fi
+REMOTE_OBSERVABILITY_HASH="$(ssh -o BatchMode=yes -i "$SSH_KEY" "$SSH_HOST" "sha256sum '$REMOTE_RELEASE/observability-result.json' | awk '{print \$1}'")"
+if [[ "$REMOTE_OBSERVABILITY_HASH" != "$OBSERVABILITY_HASH" ]]; then
+  echo "evidencia remota de observabilidade diverge do arquivo local" >&2
+  exit 1
+fi
 
-printf '{"status":"published","version":"%s","git_sha":"%s","image":"%s","download_url":"%s","apk_sha256":"%s","private_aab_backup":true}\n' \
-  "$VERSION" "$SOURCE_SHA" "$IMAGE" "$PUBLIC_URL" "$APK_HASH"
+printf '{"status":"published","version":"%s","git_sha":"%s","image":"%s","download_url":"%s","apk_sha256":"%s","aab_sha256":"%s","sbom_sha256":"%s","provenance_sha256":"%s","observability_sha256":"%s","private_aab_backup":true,"private_release_evidence":true}\n' \
+  "$VERSION" "$SOURCE_SHA" "$IMAGE" "$PUBLIC_URL" "$APK_HASH" "$AAB_HASH" "$SBOM_HASH" "$PROVENANCE_HASH" "$OBSERVABILITY_HASH"

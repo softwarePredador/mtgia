@@ -29,20 +29,29 @@ Future<Response> onRequest(RequestContext context, String id) async {
       );
     }
 
-    if (!['shipped', 'delivered', 'completed', 'cancelled', 'disputed']
-        .contains(newStatus)) {
+    if (![
+      'shipped',
+      'delivered',
+      'completed',
+      'cancelled',
+      'disputed',
+    ].contains(newStatus)) {
       _logInvalidPayload(context, id, 'invalid_status');
       return Response.json(
         statusCode: HttpStatus.badRequest,
         body: {
           'error':
-              'Status inválido. Use: shipped, delivered, completed, cancelled, disputed'
+              'Status inválido. Use: shipped, delivered, completed, cancelled, disputed',
         },
       );
     }
     if (deliveryMethod != null &&
-        !['correios', 'motoboy', 'pessoalmente', 'outro']
-            .contains(deliveryMethod)) {
+        ![
+          'correios',
+          'motoboy',
+          'pessoalmente',
+          'outro',
+        ].contains(deliveryMethod)) {
       _logInvalidPayload(context, id, 'invalid_delivery_method');
       return Response.json(
         statusCode: HttpStatus.badRequest,
@@ -61,9 +70,39 @@ Future<Response> onRequest(RequestContext context, String id) async {
       'pending': ['cancelled'],
     };
 
-    // Um único statement faz lock, validação, update e histórico para evitar
-    // round-trips transacionais contra o PostgreSQL remoto.
-    final statusResult = await pool.execute(Sql.named('''
+    // A ordem de lock é users -> trade, igual à exclusão de conta. Assim não
+    // há transição nova depois de um participante ser anonimizado.
+    final statusResult = await pool.runTx((session) async {
+      final participants = await session.execute(
+        Sql.named('''
+          SELECT sender_id, receiver_id
+          FROM trade_offers
+          WHERE id = @id
+        '''),
+        parameters: {'id': id},
+      );
+      if (participants.isNotEmpty) {
+        final participant = participants.first.toColumnMap();
+        final participantIds = <String>[
+          participant['sender_id'] as String,
+          participant['receiver_id'] as String,
+        ]..sort();
+        final activeUsers = await session.execute(
+          Sql.named('''
+            SELECT id
+            FROM users
+            WHERE id = ANY(@participantIds::uuid[])
+              AND deleted_at IS NULL
+            ORDER BY id
+            FOR UPDATE
+          '''),
+          parameters: {'participantIds': participantIds},
+        );
+        if (activeUsers.length != 2) return null;
+      }
+
+      return session.execute(
+        Sql.named('''
       WITH current_trade AS (
         SELECT id, sender_id, receiver_id, status, type
         FROM trade_offers
@@ -135,14 +174,26 @@ Future<Response> onRequest(RequestContext context, String id) async {
         (SELECT receiver_id FROM current_trade) AS receiver_id,
         (SELECT type FROM current_trade) AS type,
         EXISTS(SELECT 1 FROM history) AS history_inserted
-    '''), parameters: {
-      'id': id,
-      'userId': userId,
-      'newStatus': newStatus,
-      'deliveryMethod': deliveryMethod,
-      'trackingCode': trackingCode,
-      'notes': notes ?? 'Status atualizado para $newStatus',
+    '''),
+        parameters: {
+          'id': id,
+          'userId': userId,
+          'newStatus': newStatus,
+          'deliveryMethod': deliveryMethod,
+          'trackingCode': trackingCode,
+          'notes': notes ?? 'Status atualizado para $newStatus',
+        },
+      );
     });
+    if (statusResult == null) {
+      return Response.json(
+        statusCode: HttpStatus.conflict,
+        body: {
+          'error': 'participant_unavailable',
+          'message': 'Um participante não está mais disponível.',
+        },
+      );
+    }
     final statusRow = statusResult.first.toColumnMap();
     final updated = statusRow['result'] as String;
     final currentStatus = statusRow['current_status'] as String?;
@@ -185,7 +236,7 @@ Future<Response> onRequest(RequestContext context, String id) async {
           statusCode: HttpStatus.forbidden,
           body: {
             'error':
-                'Em vendas, apenas o vendedor (quem recebeu a proposta) pode marcar como enviado'
+                'Em vendas, apenas o vendedor (quem recebeu a proposta) pode marcar como enviado',
           },
         );
       case 'only_sender_deliver_sale':
@@ -193,7 +244,7 @@ Future<Response> onRequest(RequestContext context, String id) async {
           statusCode: HttpStatus.forbidden,
           body: {
             'error':
-                'Em vendas, apenas o comprador (quem criou a proposta) pode confirmar recebimento'
+                'Em vendas, apenas o comprador (quem criou a proposta) pode confirmar recebimento',
           },
         );
     }
@@ -204,7 +255,7 @@ Future<Response> onRequest(RequestContext context, String id) async {
     final validNotifTypes = [
       'trade_shipped',
       'trade_delivered',
-      'trade_completed'
+      'trade_completed',
     ];
     if (validNotifTypes.contains(notifyType)) {
       final notifyUserId = isSender ? receiverId : senderId;
@@ -225,8 +276,8 @@ Future<Response> onRequest(RequestContext context, String id) async {
           actorUserId: userId,
           userId: notifyUserId,
           type: notifyType,
-          titleBuilder: (changerName) =>
-              '$changerName ${statusLabels[notifyType]}',
+          titleBuilder:
+              (changerName) => '$changerName ${statusLabels[notifyType]}',
           referenceId: id,
           endpoint: 'PUT /trades/:id/status',
           requestId: _requestId(context),
@@ -235,12 +286,14 @@ Future<Response> onRequest(RequestContext context, String id) async {
       }
     }
 
-    return Response.json(body: {
-      'id': id,
-      'old_status': currentStatus,
-      'status': newStatus,
-      'message': 'Status atualizado para $newStatus',
-    });
+    return Response.json(
+      body: {
+        'id': id,
+        'old_status': currentStatus,
+        'status': newStatus,
+        'message': 'Status atualizado para $newStatus',
+      },
+    );
   } catch (e, st) {
     await captureRouteException(
       context,
@@ -265,11 +318,7 @@ String _requestId(RequestContext context) {
   }
 }
 
-void _logInvalidPayload(
-  RequestContext context,
-  String tradeId,
-  String reason,
-) {
+void _logInvalidPayload(RequestContext context, String tradeId, String reason) {
   String userId;
   try {
     userId = context.read<String>();

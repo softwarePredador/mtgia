@@ -34,7 +34,10 @@ class ShellAppBarActions extends StatelessWidget {
               onPressed: () => context.push('/messages'),
               tooltip: 'Mensagens',
               padding: EdgeInsets.zero,
-              constraints: const BoxConstraints(minWidth: 36, minHeight: 36),
+              constraints: const BoxConstraints(
+                minWidth: AppTheme.touchTargetMin,
+                minHeight: AppTheme.touchTargetMin,
+              ),
             );
           },
         ),
@@ -58,7 +61,10 @@ class ShellAppBarActions extends StatelessWidget {
               onPressed: () => context.push('/notifications'),
               tooltip: 'Notificações',
               padding: EdgeInsets.zero,
-              constraints: const BoxConstraints(minWidth: 36, minHeight: 36),
+              constraints: const BoxConstraints(
+                minWidth: AppTheme.touchTargetMin,
+                minHeight: AppTheme.touchTargetMin,
+              ),
             );
           },
         ),

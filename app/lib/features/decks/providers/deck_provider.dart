@@ -254,6 +254,7 @@ class DeckProvider extends ChangeNotifier {
           _decks,
           deckId,
           state.selectedDeck!.colorIdentity,
+          identityKnown: state.selectedDeck!.colorIdentityKnown,
         );
       }
     } catch (e, stackTrace) {

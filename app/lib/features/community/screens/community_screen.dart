@@ -1,22 +1,24 @@
 import 'dart:async';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:manaloom/core/widgets/shell_app_bar_actions.dart';
 import 'package:provider/provider.dart';
 
 import '../../../core/theme/app_theme.dart';
 import '../../../core/widgets/cached_card_image.dart';
+import '../../../core/widgets/responsive_page_frame.dart';
 import '../providers/community_provider.dart';
 import '../../market/models/card_mover.dart';
 import '../../market/providers/market_provider.dart';
 import '../../social/providers/social_provider.dart';
-import '../../social/screens/user_profile_screen.dart';
 import '../../growth/widgets/community_trade_growth_panel.dart';
 import '../../binder/providers/binder_provider.dart';
-import 'community_deck_detail_screen.dart';
 
 class CommunityScreen extends StatefulWidget {
-  const CommunityScreen({super.key});
+  const CommunityScreen({super.key, this.initialTab = 0});
+
+  final int initialTab;
 
   @override
   State<CommunityScreen> createState() => _CommunityScreenState();
@@ -25,16 +27,43 @@ class CommunityScreen extends StatefulWidget {
 class _CommunityScreenState extends State<CommunityScreen>
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
+  int? _lastActivatedTab;
+  bool _applyingRouteTab = false;
+
+  int get _routeTab => widget.initialTab.clamp(0, 3).toInt();
 
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 4, vsync: this);
+    _tabController = TabController(
+      length: 4,
+      initialIndex: _routeTab,
+      vsync: this,
+    );
     _tabController.addListener(_onTabChanged);
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
       context.read<CommunityProvider>().fetchPublicDecks(reset: true);
       _fetchBinderStatsIfAvailable();
+      _activateTab(_tabController.index);
+      _syncCanonicalLocation(_tabController.index);
+    });
+  }
+
+  @override
+  void didUpdateWidget(covariant CommunityScreen oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    final targetTab = _routeTab;
+    if (_tabController.index != targetTab) {
+      _applyingRouteTab = true;
+      _tabController.index = targetTab;
+      _applyingRouteTab = false;
+    }
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted || _tabController.index != targetTab) return;
+      _activateTab(targetTab);
+      _syncCanonicalLocation(targetTab);
     });
   }
 
@@ -54,14 +83,37 @@ class _CommunityScreenState extends State<CommunityScreen>
   }
 
   void _onTabChanged() {
-    if (_tabController.indexIsChanging) return;
-    if (_tabController.index == 1) {
+    if (_applyingRouteTab || _tabController.indexIsChanging) return;
+    final tab = _tabController.index;
+    _activateTab(tab);
+    _syncCanonicalLocation(tab);
+  }
+
+  void _activateTab(int tab) {
+    if (_lastActivatedTab == tab) return;
+    _lastActivatedTab = tab;
+
+    if (tab == 1) {
       // Aba "Seguindo": carregar feed
       context.read<SocialProvider>().fetchFollowingFeed(reset: true);
-    } else if (_tabController.index == 3) {
+    } else if (tab == 3) {
       // Aba "Cotações": carregar market movers
       context.read<MarketProvider>().fetchMovers();
     }
+  }
+
+  void _syncCanonicalLocation(int tab) {
+    final router = GoRouter.maybeOf(context);
+    if (router == null) return;
+
+    final canonicalUri = Uri(
+      path: '/community',
+      queryParameters: {'tab': '$tab'},
+    );
+    final currentUri = GoRouterState.of(context).uri;
+    if (currentUri == canonicalUri) return;
+
+    router.go(canonicalUri.toString());
   }
 
   @override
@@ -185,82 +237,91 @@ class _ExploreTabState extends State<_ExploreTab>
     super.build(context);
     return Column(
       children: [
-        const CommunityTradeGrowthPanel(),
+        const ResponsivePageFrame(
+          maxWidth: AppTheme.contentMaxWidth,
+          padding: EdgeInsets.zero,
+          child: CommunityTradeGrowthPanel(),
+        ),
         // Search bar + filters
-        Container(
-          padding: const EdgeInsets.fromLTRB(14, 12, 14, 10),
-          color: AppTheme.transparent,
-          child: Column(
-            children: [
-              TextField(
-                key: const Key('community-explore-search-field'),
-                controller: _searchController,
-                style: const TextStyle(color: AppTheme.textPrimary),
-                decoration: InputDecoration(
-                  hintText: 'Pesquisar decks públicos...',
-                  hintStyle: const TextStyle(color: AppTheme.textSecondary),
-                  prefixIcon: const Icon(
-                    Icons.search,
-                    color: AppTheme.brass400,
-                  ),
-                  suffixIcon:
-                      _searchController.text.isEmpty
-                          ? null
-                          : IconButton(
-                            key: const Key(
-                              'community-explore-search-clear-button',
+        ResponsivePageFrame(
+          key: const Key('community-explore-controls-frame'),
+          maxWidth: AppTheme.contentMaxWidth,
+          child: Padding(
+            padding: const EdgeInsets.only(top: 8, bottom: 10),
+            child: Column(
+              children: [
+                TextField(
+                  key: const Key('community-explore-search-field'),
+                  controller: _searchController,
+                  style: const TextStyle(color: AppTheme.textPrimary),
+                  decoration: InputDecoration(
+                    hintText: 'Pesquisar decks públicos...',
+                    hintStyle: const TextStyle(color: AppTheme.textSecondary),
+                    prefixIcon: const Icon(
+                      Icons.search,
+                      color: AppTheme.brass400,
+                    ),
+                    suffixIcon:
+                        _searchController.text.isEmpty
+                            ? null
+                            : IconButton(
+                              key: const Key(
+                                'community-explore-search-clear-button',
+                              ),
+                              tooltip: 'Limpar busca',
+                              icon: const Icon(
+                                Icons.clear,
+                                color: AppTheme.textSecondary,
+                                size: 18,
+                              ),
+                              onPressed: () {
+                                setState(_searchController.clear);
+                                _doSearch();
+                              },
                             ),
-                            tooltip: 'Limpar busca',
-                            icon: const Icon(
-                              Icons.clear,
-                              color: AppTheme.textSecondary,
-                              size: 18,
-                            ),
-                            onPressed: () {
-                              setState(_searchController.clear);
-                              _doSearch();
-                            },
-                          ),
-                  filled: true,
-                  fillColor: AppTheme.surfaceSlate.withValues(alpha: 0.94),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(AppTheme.radiusPill),
-                    borderSide: BorderSide(
-                      color: AppTheme.outlineMuted.withValues(alpha: 0.75),
+                    filled: true,
+                    fillColor: AppTheme.surfaceSlate.withValues(alpha: 0.94),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(AppTheme.radiusPill),
+                      borderSide: BorderSide(
+                        color: AppTheme.outlineMuted.withValues(alpha: 0.75),
+                      ),
+                    ),
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(AppTheme.radiusPill),
+                      borderSide: BorderSide(
+                        color: AppTheme.outlineMuted.withValues(alpha: 0.75),
+                      ),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(AppTheme.radiusPill),
+                      borderSide: BorderSide(
+                        color: AppTheme.brass400.withValues(alpha: 0.8),
+                      ),
+                    ),
+                    contentPadding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 12,
                     ),
                   ),
-                  enabledBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(AppTheme.radiusPill),
-                    borderSide: BorderSide(
-                      color: AppTheme.outlineMuted.withValues(alpha: 0.75),
-                    ),
-                  ),
-                  focusedBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(AppTheme.radiusPill),
-                    borderSide: BorderSide(
-                      color: AppTheme.brass400.withValues(alpha: 0.8),
-                    ),
-                  ),
-                  contentPadding: const EdgeInsets.symmetric(
-                    horizontal: 16,
-                    vertical: 12,
+                  onChanged: (_) => setState(() {}),
+                  onSubmitted: (_) => _doSearch(),
+                ),
+                const SizedBox(height: 8),
+                SizedBox(
+                  height: 36,
+                  child: ListView(
+                    scrollDirection: Axis.horizontal,
+                    children: [
+                      _buildFormatChip(null, 'Todos'),
+                      ..._formats.map(
+                        (f) => _buildFormatChip(f, _capitalize(f)),
+                      ),
+                    ],
                   ),
                 ),
-                onChanged: (_) => setState(() {}),
-                onSubmitted: (_) => _doSearch(),
-              ),
-              const SizedBox(height: 8),
-              SizedBox(
-                height: 36,
-                child: ListView(
-                  scrollDirection: Axis.horizontal,
-                  children: [
-                    _buildFormatChip(null, 'Todos'),
-                    ..._formats.map((f) => _buildFormatChip(f, _capitalize(f))),
-                  ],
-                ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
         // Deck list
@@ -333,15 +394,11 @@ class _ExploreTabState extends State<_ExploreTab>
                 );
               }
 
-              return ListView.builder(
-                key: const Key('community-explore-deck-list'),
+              return _CommunityResponsiveCollection(
+                collectionKey: const Key('community-explore-deck-list'),
                 controller: _scrollController,
-                padding: EdgeInsets.fromLTRB(
-                  12,
-                  12,
-                  12,
-                  12 + MediaQuery.of(context).padding.bottom + 88,
-                ),
+                desktopItemExtent: 144,
+                bottomPadding: MediaQuery.of(context).padding.bottom + 88,
                 itemCount: provider.decks.length + (provider.hasMore ? 1 : 0),
                 itemBuilder: (context, index) {
                   if (index >= provider.decks.length) {
@@ -358,15 +415,7 @@ class _ExploreTabState extends State<_ExploreTab>
                   final deck = provider.decks[index];
                   return _CommunityDeckCard(
                     deck: deck,
-                    onTap:
-                        () => Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder:
-                                (_) =>
-                                    CommunityDeckDetailScreen(deckId: deck.id),
-                          ),
-                        ),
+                    onTap: () => context.push('/community/decks/${deck.id}'),
                   );
                 },
               );
@@ -536,15 +585,11 @@ class _FollowingFeedTabState extends State<_FollowingFeedTab>
         return RefreshIndicator(
           onRefresh: () => provider.fetchFollowingFeed(reset: true),
           color: AppTheme.brass400,
-          child: ListView.builder(
-            key: const Key('community-following-deck-list'),
+          child: _CommunityResponsiveCollection(
+            collectionKey: const Key('community-following-deck-list'),
             controller: _scrollController,
-            padding: EdgeInsets.fromLTRB(
-              12,
-              12,
-              12,
-              12 + MediaQuery.of(context).padding.bottom + 88,
-            ),
+            desktopItemExtent: 112,
+            bottomPadding: MediaQuery.of(context).padding.bottom + 88,
             itemCount:
                 provider.followingFeed.length + (provider.hasMoreFeed ? 1 : 0),
             itemBuilder: (context, index) {
@@ -560,14 +605,7 @@ class _FollowingFeedTabState extends State<_FollowingFeedTab>
               final deck = provider.followingFeed[index];
               return _FollowingDeckCard(
                 deck: deck,
-                onTap:
-                    () => Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder:
-                            (_) => CommunityDeckDetailScreen(deckId: deck.id),
-                      ),
-                    ),
+                onTap: () => context.push('/community/decks/${deck.id}'),
               );
             },
           ),
@@ -616,62 +654,65 @@ class _UserSearchTabState extends State<_UserSearchTab>
     return Column(
       children: [
         // Search bar
-        Container(
-          padding: const EdgeInsets.fromLTRB(14, 12, 14, 10),
-          color: AppTheme.transparent,
-          child: TextField(
-            key: const Key('community-users-search-field'),
-            controller: _searchController,
-            style: const TextStyle(color: AppTheme.textPrimary),
-            decoration: InputDecoration(
-              hintText: 'Buscar por nick ou nome de usuário...',
-              hintStyle: const TextStyle(color: AppTheme.textSecondary),
-              prefixIcon: const Icon(
-                Icons.person_search,
-                color: AppTheme.brass400,
-              ),
-              suffixIcon:
-                  _searchController.text.isEmpty
-                      ? null
-                      : IconButton(
-                        key: const Key('community-users-search-clear-button'),
-                        tooltip: 'Limpar busca',
-                        icon: const Icon(
-                          Icons.clear,
-                          color: AppTheme.textSecondary,
-                          size: 18,
+        ResponsivePageFrame(
+          key: const Key('community-users-controls-frame'),
+          maxWidth: AppTheme.contentMaxWidth,
+          child: Padding(
+            padding: const EdgeInsets.only(top: 12, bottom: 10),
+            child: TextField(
+              key: const Key('community-users-search-field'),
+              controller: _searchController,
+              style: const TextStyle(color: AppTheme.textPrimary),
+              decoration: InputDecoration(
+                hintText: 'Buscar por nick ou nome de usuário...',
+                hintStyle: const TextStyle(color: AppTheme.textSecondary),
+                prefixIcon: const Icon(
+                  Icons.person_search,
+                  color: AppTheme.brass400,
+                ),
+                suffixIcon:
+                    _searchController.text.isEmpty
+                        ? null
+                        : IconButton(
+                          key: const Key('community-users-search-clear-button'),
+                          tooltip: 'Limpar busca',
+                          icon: const Icon(
+                            Icons.clear,
+                            color: AppTheme.textSecondary,
+                            size: 18,
+                          ),
+                          onPressed: () {
+                            setState(_searchController.clear);
+                            context.read<SocialProvider>().clearSearch();
+                          },
                         ),
-                        onPressed: () {
-                          setState(_searchController.clear);
-                          context.read<SocialProvider>().clearSearch();
-                        },
-                      ),
-              filled: true,
-              fillColor: AppTheme.surfaceSlate.withValues(alpha: 0.94),
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(AppTheme.radiusPill),
-                borderSide: BorderSide(
-                  color: AppTheme.outlineMuted.withValues(alpha: 0.75),
+                filled: true,
+                fillColor: AppTheme.surfaceSlate.withValues(alpha: 0.94),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(AppTheme.radiusPill),
+                  borderSide: BorderSide(
+                    color: AppTheme.outlineMuted.withValues(alpha: 0.75),
+                  ),
+                ),
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(AppTheme.radiusPill),
+                  borderSide: BorderSide(
+                    color: AppTheme.outlineMuted.withValues(alpha: 0.75),
+                  ),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(AppTheme.radiusPill),
+                  borderSide: BorderSide(
+                    color: AppTheme.brass400.withValues(alpha: 0.8),
+                  ),
+                ),
+                contentPadding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 12,
                 ),
               ),
-              enabledBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(AppTheme.radiusPill),
-                borderSide: BorderSide(
-                  color: AppTheme.outlineMuted.withValues(alpha: 0.75),
-                ),
-              ),
-              focusedBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(AppTheme.radiusPill),
-                borderSide: BorderSide(
-                  color: AppTheme.brass400.withValues(alpha: 0.8),
-                ),
-              ),
-              contentPadding: const EdgeInsets.symmetric(
-                horizontal: 16,
-                vertical: 12,
-              ),
+              onChanged: _onSearchChanged,
             ),
-            onChanged: _onSearchChanged,
           ),
         ),
         // Results
@@ -758,27 +799,16 @@ class _UserSearchTabState extends State<_UserSearchTab>
                 );
               }
 
-              return ListView.builder(
-                key: const Key('community-users-list'),
-                padding: EdgeInsets.fromLTRB(
-                  12,
-                  12,
-                  12,
-                  12 + MediaQuery.of(context).padding.bottom + 88,
-                ),
+              return _CommunityResponsiveCollection(
+                collectionKey: const Key('community-users-list'),
+                desktopItemExtent: 94,
+                bottomPadding: MediaQuery.of(context).padding.bottom + 88,
                 itemCount: provider.searchResults.length,
                 itemBuilder: (context, index) {
                   final user = provider.searchResults[index];
                   return _UserCard(
                     user: user,
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (_) => UserProfileScreen(userId: user.id),
-                        ),
-                      );
-                    },
+                    onTap: () => context.push('/community/user/${user.id}'),
                   );
                 },
               );
@@ -793,6 +823,78 @@ class _UserSearchTabState extends State<_UserSearchTab>
 // =====================================================================
 // Widgets compartilhados
 // =====================================================================
+
+class _CommunityResponsiveCollection extends StatelessWidget {
+  const _CommunityResponsiveCollection({
+    required this.collectionKey,
+    required this.itemCount,
+    required this.itemBuilder,
+    required this.desktopItemExtent,
+    required this.bottomPadding,
+    this.controller,
+  });
+
+  final Key collectionKey;
+  final int itemCount;
+  final IndexedWidgetBuilder itemBuilder;
+  final double desktopItemExtent;
+  final double bottomPadding;
+  final ScrollController? controller;
+
+  @override
+  Widget build(BuildContext context) {
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final boundedWidth = constraints.constrainWidth(
+          AppTheme.contentMaxWidth,
+        );
+        final isDesktop = boundedWidth >= AppTheme.breakpointMedium;
+        final horizontalGutter =
+            constraints.maxWidth < AppTheme.breakpointCompact
+                ? AppTheme.pageGutterCompact
+                : AppTheme.pageGutter;
+        final padding = EdgeInsets.fromLTRB(
+          horizontalGutter,
+          12,
+          horizontalGutter,
+          12 + bottomPadding,
+        );
+
+        final collection =
+            isDesktop
+                ? GridView.builder(
+                  key: collectionKey,
+                  controller: controller,
+                  padding: padding,
+                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: 2,
+                    crossAxisSpacing: 12,
+                    mainAxisSpacing: 0,
+                    mainAxisExtent: desktopItemExtent,
+                  ),
+                  itemCount: itemCount,
+                  itemBuilder: itemBuilder,
+                )
+                : ListView.builder(
+                  key: collectionKey,
+                  controller: controller,
+                  padding: padding,
+                  itemCount: itemCount,
+                  itemBuilder: itemBuilder,
+                );
+
+        return Align(
+          alignment: Alignment.topCenter,
+          child: SizedBox(
+            width: boundedWidth,
+            height: constraints.maxHeight,
+            child: collection,
+          ),
+        );
+      },
+    );
+  }
+}
 
 class _CommunityDeckCard extends StatelessWidget {
   final CommunityDeck deck;
@@ -882,17 +984,9 @@ class _CommunityDeckCard extends StatelessWidget {
                                       : null,
                               onTap:
                                   deck.ownerId != null
-                                      ? () {
-                                        Navigator.push(
-                                          context,
-                                          MaterialPageRoute(
-                                            builder:
-                                                (_) => UserProfileScreen(
-                                                  userId: deck.ownerId!,
-                                                ),
-                                          ),
-                                        );
-                                      }
+                                      ? () => context.push(
+                                        '/community/user/${deck.ownerId!}',
+                                      )
                                       : null,
                               child: Text(
                                 deck.ownerUsername ?? 'Anônimo',

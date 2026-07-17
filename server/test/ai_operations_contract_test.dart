@@ -41,4 +41,20 @@ void main() {
     expect(source, contains(r'sleep "$((attempt * 2))"'));
     expect(source, contains(r'if [[ -z "$readiness_payload" ]]'));
   });
+
+  test('backend deploy propagates and verifies exact production CORS', () {
+    final source =
+        File('../scripts/manaloom_deploy_backend_image.sh').readAsStringSync();
+
+    expect(source, contains('MANALOOM_ALLOWED_ORIGINS'));
+    expect(
+      source,
+      contains('https://evolution-manaloom-web-public.2ta7qx.easypanel.host'),
+    );
+    expect(source, contains('manaloom_validate_production_origins.py'));
+    expect(source, contains('--env-add MANALOOM_ALLOWED_ORIGINS='));
+    expect(source, contains('spec_allowed_origins_sha256'));
+    expect(source, contains('runtime_allowed_origins_sha256'));
+    expect(source, contains('cors_allowlist":"verified'));
+  });
 }

@@ -37,11 +37,12 @@ Middleware authMiddleware() {
       // Extrair token
       final token = authHeader.substring(7); // Remove "Bearer "
 
-      // Validar token
+      // Validar token e confirmar que a conta ainda existe/está ativa. A
+      // consulta revoga imediatamente JWTs de contas anonimizadas.
       final authService = AuthService();
-      final payload = authService.verifyToken(token);
+      final user = await authService.getUserFromToken(token);
 
-      if (payload == null) {
+      if (user == null) {
         return Response.json(
           statusCode: 401,
           body: {
@@ -52,7 +53,7 @@ Middleware authMiddleware() {
       }
 
       // Injetar userId no contexto para uso nos handlers
-      final userId = payload['userId'] as String;
+      final userId = user['id'] as String;
       try {
         context.read<RequestTrace>().userId = userId;
       } catch (_) {
@@ -79,6 +80,7 @@ String getUserId(RequestContext context) {
     return context.read<String>();
   } catch (e) {
     throw Exception(
-        'UserId não encontrado no contexto. Certifique-se de que authMiddleware() está aplicado.');
+      'UserId não encontrado no contexto. Certifique-se de que authMiddleware() está aplicado.',
+    );
   }
 }

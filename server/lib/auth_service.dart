@@ -143,7 +143,10 @@ class AuthService {
 
     // Verificar se username já existe
     final usernameCheck = await conn.execute(
-      Sql.named('SELECT id FROM users WHERE LOWER(username) = @username'),
+      Sql.named(
+        'SELECT id FROM users WHERE LOWER(username) = @username '
+        'AND deleted_at IS NULL',
+      ),
       parameters: {'username': normalizedUsername},
     );
 
@@ -153,7 +156,10 @@ class AuthService {
 
     // Verificar se email já existe
     final emailCheck = await conn.execute(
-      Sql.named('SELECT id FROM users WHERE LOWER(email) = @email'),
+      Sql.named(
+        'SELECT id FROM users WHERE LOWER(email) = @email '
+        'AND deleted_at IS NULL',
+      ),
       parameters: {'email': normalizedEmail},
     );
 
@@ -217,7 +223,8 @@ class AuthService {
       Sql.named('''
         SELECT id, username, email, password_hash
         FROM users
-        WHERE email = @email OR LOWER(email) = @email
+        WHERE (email = @email OR LOWER(email) = @email)
+          AND deleted_at IS NULL
         ORDER BY CASE WHEN email = @email THEN 0 ELSE 1 END
         LIMIT 1
       '''),
@@ -257,14 +264,17 @@ class AuthService {
     final payload = verifyToken(token);
     if (payload == null) return null;
 
-    final userId = payload['userId'] as String;
+    final rawUserId = payload['userId'];
+    if (rawUserId is! String || rawUserId.trim().isEmpty) return null;
+    final userId = rawUserId.trim();
 
     final db = Database();
     final conn = db.connection;
 
     final result = await conn.execute(
       Sql.named(
-        'SELECT id, username, email, display_name, avatar_url FROM users WHERE id = @userId',
+        'SELECT id, username, email, display_name, avatar_url FROM users '
+        'WHERE id = @userId AND deleted_at IS NULL',
       ),
       parameters: {'userId': userId},
     );

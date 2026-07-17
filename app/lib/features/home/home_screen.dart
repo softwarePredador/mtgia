@@ -1,26 +1,17 @@
 import 'dart:math' as math;
 
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:manaloom/core/widgets/shell_app_bar_actions.dart';
 import 'package:provider/provider.dart';
 
 import '../../core/theme/app_theme.dart';
+import '../../core/utils/scryfall_image_helper.dart';
 import '../../core/widgets/cached_card_image.dart';
+import '../../core/widgets/mana_symbols.dart';
 import 'life_counter_route.dart';
 import '../decks/models/deck.dart';
 import '../decks/providers/deck_provider.dart';
-
-String? _scryfallImageUrl(String? name) {
-  final cardName = name?.trim();
-  if (cardName == null || cardName.isEmpty) return null;
-  return Uri.https('api.scryfall.com', '/cards/named', {
-    'exact': cardName,
-    'format': 'image',
-    'version': 'normal',
-  }).toString();
-}
 
 class HomeScreen extends StatefulWidget {
   final bool? lifeCounterAvailable;
@@ -76,8 +67,11 @@ class _HomeScreenState extends State<HomeScreen>
     final decks = context.select<DeckProvider, List<Deck>>(
       (dp) => dp.decks.toList(),
     );
+    final deckError = context.select<DeckProvider, String?>(
+      (dp) => dp.errorMessage,
+    );
     final recentDecks = decks.take(4).toList();
-    final lifeCounterAvailable = widget.lifeCounterAvailable ?? !kIsWeb;
+    final lifeCounterAvailable = widget.lifeCounterAvailable ?? true;
 
     return Scaffold(
       backgroundColor: AppTheme.transparent,
@@ -122,6 +116,8 @@ class _HomeScreenState extends State<HomeScreen>
                       _RecentDecksRail(decks: recentDecks)
                     else if (isDeckLoading)
                       const _DecksLoadingState()
+                    else if (deckError != null)
+                      _DecksErrorState(message: deckError)
                     else
                       const _EmptyDecksState(),
                   ],
@@ -203,16 +199,19 @@ class _HomeHero extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final actionLabel = lifeCounterAvailable ? 'Jogar agora' : 'Montar deck';
+    final wideArtwork = MediaQuery.sizeOf(context).width >= 840;
+    final artworkSize = wideArtwork ? 680.0 : 430.0;
+    final artworkOverflow = (artworkSize - 190) / 2;
     return RepaintBoundary(
       key: const Key('home-hero-frame'),
       child: Container(
+        key: const Key('home-hero-surface'),
         height: 190,
         width: double.infinity,
         clipBehavior: Clip.antiAlias,
         decoration: BoxDecoration(
           color: AppTheme.backgroundAbyss,
           borderRadius: BorderRadius.circular(AppTheme.radiusXl),
-          border: Border.all(color: AppTheme.brass500.withValues(alpha: 0.42)),
           boxShadow: [
             BoxShadow(
               color: AppTheme.backgroundAbyss.withValues(alpha: 0.28),
@@ -221,14 +220,46 @@ class _HomeHero extends StatelessWidget {
             ),
           ],
         ),
+        // The frame is painted above the artwork. A border in [decoration]
+        // sits behind the child and can disappear at clipped corners.
+        foregroundDecoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(AppTheme.radiusXl),
+          border: Border.all(
+            color: AppTheme.brass500.withValues(alpha: 0.5),
+            width: AppTheme.strokeThin,
+          ),
+        ),
         child: Stack(
           fit: StackFit.expand,
           children: [
-            Positioned.fill(
-              child: Image.asset(
-                'assets/branding/home_hero_banner.png',
-                fit: BoxFit.cover,
-                alignment: Alignment.center,
+            Positioned(
+              right: wideArtwork ? -10 : -34,
+              top: -artworkOverflow,
+              bottom: -artworkOverflow,
+              width: artworkSize,
+              child: Stack(
+                fit: StackFit.expand,
+                children: [
+                  Image.asset(
+                    'assets/branding/home_hero.png',
+                    key: const Key('home-hero-artwork'),
+                    fit: BoxFit.contain,
+                    alignment: Alignment.center,
+                  ),
+                  const DecoratedBox(
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        begin: Alignment.centerLeft,
+                        end: Alignment.centerRight,
+                        colors: [
+                          AppTheme.backgroundAbyss,
+                          AppTheme.transparent,
+                        ],
+                        stops: [0, 0.32],
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ),
             Positioned.fill(
@@ -238,11 +269,12 @@ class _HomeHero extends StatelessWidget {
                     begin: Alignment.centerLeft,
                     end: Alignment.centerRight,
                     colors: [
-                      AppTheme.backgroundAbyss.withValues(alpha: 0.18),
-                      AppTheme.backgroundAbyss.withValues(alpha: 0.02),
+                      AppTheme.backgroundAbyss,
+                      AppTheme.backgroundAbyss.withValues(alpha: 0.98),
+                      AppTheme.backgroundAbyss.withValues(alpha: 0.7),
                       AppTheme.transparent,
                     ],
-                    stops: const [0.0, 0.52, 1],
+                    stops: const [0.0, 0.24, 0.5, 0.78],
                   ),
                 ),
               ),
@@ -281,7 +313,7 @@ class _HomeHero extends StatelessWidget {
                   const Spacer(),
                   SizedBox(
                     width: 122,
-                    height: 36,
+                    height: AppTheme.touchTargetMin,
                     child: FilledButton(
                       style: FilledButton.styleFrom(
                         backgroundColor: AppTheme.brass400,
@@ -405,7 +437,7 @@ class _QuickActions extends StatelessWidget {
         icon: Icons.storefront_rounded,
         title: 'Trocas',
         accent: AppTheme.brass500,
-        onTap: () => context.go('/collection?tab=1'),
+        onTap: () => context.go('/collection?tab=2'),
       ),
     ];
 
@@ -515,12 +547,14 @@ class _RecentDecksRail extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      height: 126,
+      height: 144,
       child: ListView.separated(
+        key: const Key('home-recent-decks-rail'),
+        padding: const EdgeInsets.fromLTRB(2, 4, 2, 12),
         scrollDirection: Axis.horizontal,
         physics: const BouncingScrollPhysics(),
         itemCount: decks.length,
-        separatorBuilder: (_, _) => const SizedBox(width: 10),
+        separatorBuilder: (_, _) => const SizedBox(width: 12),
         itemBuilder: (context, index) => _RecentDeckCard(deck: decks[index]),
       ),
     );
@@ -542,119 +576,129 @@ class _RecentDeckCard extends StatelessWidget {
     final commanderName = deck.commanderName?.trim();
 
     return SizedBox(
+      key: Key('home-recent-deck-${deck.id}'),
       width: 244,
       child: Material(
-        color: AppTheme.transparent,
+        color: AppTheme.surfaceSlate,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(AppTheme.radiusLg),
+          side: BorderSide(
+            color: frameColor.withValues(alpha: 0.74),
+            width: AppTheme.strokeThin,
+          ),
+        ),
+        clipBehavior: Clip.antiAlias,
         child: InkWell(
           onTap: () => context.go('/decks/${deck.id}'),
           borderRadius: BorderRadius.circular(AppTheme.radiusLg),
           splashColor: AppTheme.brass400.withValues(alpha: 0.08),
           highlightColor: AppTheme.brass400.withValues(alpha: 0.04),
-          child: Ink(
-            decoration: BoxDecoration(
-              color: AppTheme.surfaceSlate,
-              borderRadius: BorderRadius.circular(AppTheme.radiusLg),
-              border: Border.all(color: frameColor.withValues(alpha: 0.74)),
-            ),
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(AppTheme.radiusLg),
-              child: Row(
-                children: [
-                  SizedBox(
-                    width: 82,
-                    height: double.infinity,
+          child: Padding(
+            padding: const EdgeInsets.all(8),
+            child: Row(
+              children: [
+                ClipRRect(
+                  key: Key('home-recent-deck-art-${deck.id}'),
+                  borderRadius: BorderRadius.circular(AppTheme.radiusSm),
+                  child: SizedBox(
+                    width: 72,
+                    height: 102,
                     child: _DeckArtwork(deck: deck),
                   ),
-                  Expanded(
-                    child: Padding(
-                      padding: const EdgeInsets.fromLTRB(11, 10, 11, 9),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            deck.name,
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                            style: theme.textTheme.titleSmall?.copyWith(
-                              color: AppTheme.textPrimary,
-                              fontWeight: FontWeight.w900,
-                              fontSize: AppTheme.fontSm,
-                              height: 1.12,
-                            ),
+                ),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: Padding(
+                    padding: const EdgeInsets.fromLTRB(0, 3, 3, 2),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          deck.name,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: theme.textTheme.titleSmall?.copyWith(
+                            color: AppTheme.textPrimary,
+                            fontWeight: FontWeight.w900,
+                            fontSize: AppTheme.fontSm,
+                            height: 1.12,
                           ),
-                          const SizedBox(height: 3),
-                          Text(
-                            commanderName == null || commanderName.isEmpty
-                                ? _formatLabel(deck.format)
-                                : commanderName,
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                            style: theme.textTheme.bodySmall?.copyWith(
-                              color: AppTheme.textSecondary,
-                              fontSize: AppTheme.fontXs,
-                              height: 1.1,
-                            ),
+                        ),
+                        const SizedBox(height: 3),
+                        Text(
+                          commanderName == null || commanderName.isEmpty
+                              ? _formatLabel(deck.format)
+                              : commanderName,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: theme.textTheme.bodySmall?.copyWith(
+                            color: AppTheme.textSecondary,
+                            fontSize: AppTheme.fontXs,
+                            height: 1.1,
                           ),
-                          const Spacer(),
-                          Row(
-                            children: [
-                              Expanded(
-                                child: Text(
-                                  _formatLabel(deck.format),
-                                  maxLines: 1,
-                                  overflow: TextOverflow.ellipsis,
-                                  style: theme.textTheme.labelSmall?.copyWith(
-                                    color: AppTheme.textSecondary,
-                                    fontSize: AppTheme.fontXs,
-                                    fontWeight: FontWeight.w700,
-                                  ),
-                                ),
-                              ),
-                              _ManaPips(identity: deck.colorIdentity),
-                              const SizedBox(width: 6),
-                              Text(
-                                '${deck.cardCount}/$target',
+                        ),
+                        const Spacer(),
+                        Row(
+                          children: [
+                            Expanded(
+                              child: Text(
+                                _formatLabel(deck.format),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
                                 style: theme.textTheme.labelSmall?.copyWith(
-                                  color: AppTheme.textPrimary,
-                                  fontWeight: FontWeight.w800,
+                                  color: AppTheme.textSecondary,
                                   fontSize: AppTheme.fontXs,
+                                  fontWeight: FontWeight.w700,
                                 ),
                               ),
-                            ],
-                          ),
-                          const SizedBox(height: 4),
-                          ClipRRect(
-                            borderRadius: BorderRadius.circular(
-                              AppTheme.radiusPill,
                             ),
-                            child: LinearProgressIndicator(
-                              minHeight: 3,
-                              value: ratio,
-                              backgroundColor: AppTheme.outlineMuted,
-                              valueColor: AlwaysStoppedAnimation<Color>(
-                                ratio >= 1
-                                    ? AppTheme.brass400
-                                    : AppTheme.frost400,
+                            _ManaPips(
+                              identity: deck.colorIdentity,
+                              identityKnown: deck.colorIdentityKnown,
+                            ),
+                            const SizedBox(width: 6),
+                            Text(
+                              '${deck.cardCount}/$target',
+                              style: theme.textTheme.labelSmall?.copyWith(
+                                color: AppTheme.textPrimary,
+                                fontWeight: FontWeight.w800,
+                                fontSize: AppTheme.fontXs,
                               ),
                             ),
+                          ],
+                        ),
+                        const SizedBox(height: 4),
+                        ClipRRect(
+                          borderRadius: BorderRadius.circular(
+                            AppTheme.radiusPill,
                           ),
-                          const SizedBox(height: 5),
-                          Text(
-                            age,
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                            style: theme.textTheme.bodySmall?.copyWith(
-                              color: AppTheme.textHint,
-                              fontSize: AppTheme.fontMicro,
-                              height: 1.05,
+                          child: LinearProgressIndicator(
+                            minHeight: 3,
+                            value: ratio,
+                            backgroundColor: AppTheme.outlineMuted,
+                            valueColor: AlwaysStoppedAnimation<Color>(
+                              ratio >= 1
+                                  ? AppTheme.brass400
+                                  : AppTheme.frost400,
                             ),
                           ),
-                        ],
-                      ),
+                        ),
+                        const SizedBox(height: 5),
+                        Text(
+                          age,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: theme.textTheme.bodySmall?.copyWith(
+                            color: AppTheme.textHint,
+                            fontSize: AppTheme.fontMicro,
+                            height: 1.05,
+                          ),
+                        ),
+                      ],
                     ),
                   ),
-                ],
-              ),
+                ),
+              ],
             ),
           ),
         ),
@@ -674,8 +718,8 @@ class _DeckArtwork extends StatelessWidget {
     if (imageUrl != null && imageUrl.trim().isNotEmpty) {
       return CachedCardImage(
         imageUrl: imageUrl,
-        fallbackImageUrl: _scryfallImageUrl(deck.commanderName),
-        fit: BoxFit.cover,
+        fallbackImageUrl: ScryfallImageHelper.namedImageUrl(deck.commanderName),
+        fit: BoxFit.contain,
       );
     }
     return _DeckFallback(deck: deck);
@@ -689,7 +733,6 @@ class _DeckFallback extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final initial = deck.name.trim().isEmpty ? '?' : deck.name.trim()[0];
     final identity = deck.colorIdentity.toSet();
     final accent = AppTheme.identityColor(identity);
     return Stack(
@@ -708,17 +751,10 @@ class _DeckFallback extends StatelessWidget {
             ),
           ),
         ),
-        Align(
-          alignment: const Alignment(0, -0.12),
-          child: Text(
-            initial.toUpperCase(),
-            style: TextStyle(
-              fontFamily: AppTheme.displayFontFamily,
-              color: AppTheme.textPrimary.withValues(alpha: 0.33),
-              fontSize: AppTheme.fontDisplay * 2.125,
-              fontWeight: FontWeight.w900,
-            ),
-          ),
+        Icon(
+          Icons.style_rounded,
+          color: AppTheme.textPrimary.withValues(alpha: 0.26),
+          size: 34,
         ),
       ],
     );
@@ -727,36 +763,28 @@ class _DeckFallback extends StatelessWidget {
 
 class _ManaPips extends StatelessWidget {
   final List<String> identity;
+  final bool identityKnown;
 
-  const _ManaPips({required this.identity});
+  const _ManaPips({required this.identity, required this.identityKnown});
 
   @override
   Widget build(BuildContext context) {
-    final symbols = identity.isEmpty ? const ['C'] : identity;
-    return Wrap(
+    if (identity.isEmpty && !identityKnown) {
+      return const Tooltip(
+        message: 'Identidade de cor pendente',
+        child: Icon(
+          Icons.help_outline_rounded,
+          size: 13,
+          color: AppTheme.textHint,
+        ),
+      );
+    }
+    return ColorIdentityPips(
+      colors: identity,
+      symbolSize: 12,
       spacing: 2,
-      runSpacing: 2,
-      children:
-          symbols.take(5).map((symbol) {
-            final normalized = symbol.toUpperCase();
-            return Container(
-              width: 10,
-              height: 10,
-              alignment: Alignment.center,
-              decoration: BoxDecoration(
-                color: AppTheme.manaPipBackground(normalized),
-                shape: BoxShape.circle,
-              ),
-              child: Text(
-                normalized,
-                style: TextStyle(
-                  color: AppTheme.manaPipForeground(normalized),
-                  fontSize: AppTheme.fontMicro - 2.5,
-                  fontWeight: FontWeight.w900,
-                ),
-              ),
-            );
-          }).toList(),
+      decorated: false,
+      colorlessWhenEmpty: identityKnown,
     );
   }
 }
@@ -826,6 +854,56 @@ class _EmptyDecksState extends StatelessWidget {
               icon: const Icon(Icons.add_rounded),
               label: const Text('Criar novo deck'),
             ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _DecksErrorState extends StatelessWidget {
+  const _DecksErrorState({required this.message});
+
+  final String message;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return Container(
+      key: const Key('home-decks-error-state'),
+      width: double.infinity,
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: AppTheme.errorContainer.withValues(alpha: 0.54),
+        borderRadius: BorderRadius.circular(AppTheme.radiusLg),
+        border: Border.all(color: AppTheme.error.withValues(alpha: 0.42)),
+      ),
+      child: Column(
+        children: [
+          const Icon(Icons.cloud_off_rounded, color: AppTheme.error, size: 28),
+          const SizedBox(height: 8),
+          Text(
+            'Não foi possível carregar seus decks',
+            textAlign: TextAlign.center,
+            style: theme.textTheme.titleSmall?.copyWith(
+              color: AppTheme.onErrorContainer,
+              fontWeight: FontWeight.w800,
+            ),
+          ),
+          const SizedBox(height: 4),
+          Text(
+            message,
+            textAlign: TextAlign.center,
+            style: theme.textTheme.bodySmall?.copyWith(
+              color: AppTheme.textSecondary,
+            ),
+          ),
+          const SizedBox(height: 12),
+          OutlinedButton.icon(
+            key: const Key('home-decks-retry'),
+            onPressed: () => context.read<DeckProvider>().fetchDecks(),
+            icon: const Icon(Icons.refresh_rounded),
+            label: const Text('Tentar novamente'),
           ),
         ],
       ),

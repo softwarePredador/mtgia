@@ -1,4 +1,7 @@
 import 'dart:io';
+
+import 'package:server/sql_statement_splitter.dart';
+
 import '../lib/database.dart';
 
 Future<void> main() async {
@@ -11,7 +14,9 @@ Future<void> main() async {
 
     // 1. Dropar tabelas que precisam ser recriadas (Decks e DeckCards)
     // Não vamos dropar 'cards' para manter os dados.
-    print('Removendo tabelas antigas (decks, deck_cards, matchups, simulations)...');
+    print(
+      'Removendo tabelas antigas (decks, deck_cards, matchups, simulations)...',
+    );
     await conn.execute('DROP TABLE IF EXISTS battle_simulations');
     await conn.execute('DROP TABLE IF EXISTS deck_matchups');
     await conn.execute('DROP TABLE IF EXISTS deck_cards');
@@ -20,11 +25,12 @@ Future<void> main() async {
     // 2. Ler e executar o script de setup completo
     print('Lendo database_setup.sql...');
     final sqlScript = await File('database_setup.sql').readAsString();
-    
-    // Separa os comandos SQL pelo ponto e vírgula
-    final commands = sqlScript.split(';').where((s) => s.trim().isNotEmpty).toList();
 
-    print('Executando criação das novas tabelas (Users, Rules, Legalities, Decks)...');
+    final commands = splitPostgresStatements(sqlScript);
+
+    print(
+      'Executando criação das novas tabelas (Users, Rules, Legalities, Decks)...',
+    );
 
     for (final command in commands) {
       try {
@@ -36,7 +42,7 @@ Future<void> main() async {
         }
       }
     }
-    
+
     print('Schema atualizado com sucesso!');
   } catch (e) {
     print('Erro fatal na atualização: $e');

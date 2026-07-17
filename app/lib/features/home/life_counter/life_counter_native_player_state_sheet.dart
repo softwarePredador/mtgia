@@ -248,7 +248,7 @@ class _LifeCounterNativePlayerStateSheetState
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              'Player State',
+                              'Estado do jogador',
                               style: TextStyle(
                                 color: AppTheme.textPrimary,
                                 fontSize: AppTheme.fontXxl,
@@ -257,7 +257,7 @@ class _LifeCounterNativePlayerStateSheetState
                             ),
                             SizedBox(height: 6),
                             Text(
-                              'Manage commander setup, tools, and game status for the selected player.',
+                              'Gerencie comandantes, ferramentas e o status do jogador selecionado.',
                               style: TextStyle(
                                 color: AppTheme.textSecondary,
                                 fontSize: AppTheme.fontMd,
@@ -271,7 +271,7 @@ class _LifeCounterNativePlayerStateSheetState
                         onPressed: () => Navigator.of(context).pop(),
                         icon: const Icon(Icons.close_rounded),
                         color: AppTheme.textSecondary,
-                        tooltip: 'Close',
+                        tooltip: 'Fechar',
                       ),
                     ],
                   ),
@@ -282,9 +282,9 @@ class _LifeCounterNativePlayerStateSheetState
                     padding: const EdgeInsets.fromLTRB(20, 18, 20, 12),
                     children: [
                       _SectionCard(
-                        title: 'Target Player',
+                        title: 'Jogador alvo',
                         subtitle:
-                            'Choose which player receives the state changes.',
+                            'Escolha qual jogador receberá as mudanças de estado.',
                         child: Wrap(
                           spacing: 8,
                           runSpacing: 8,
@@ -294,7 +294,7 @@ class _LifeCounterNativePlayerStateSheetState
                               key: Key(
                                 'life-counter-native-player-state-target-$index',
                               ),
-                              label: Text('Player ${index + 1}'),
+                              label: Text('Jogador ${index + 1}'),
                               selected: _targetPlayerIndex == index,
                               onSelected: (_) => _changeTarget(index),
                             ),
@@ -303,9 +303,9 @@ class _LifeCounterNativePlayerStateSheetState
                       ),
                       const SizedBox(height: 18),
                       _SectionCard(
-                        title: 'Current Status',
+                        title: 'Status atual',
                         subtitle:
-                            'See whether this player is active, at risk, or out of the game.',
+                            'Veja se o jogador está ativo, em risco ou fora da partida.',
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
@@ -328,7 +328,7 @@ class _LifeCounterNativePlayerStateSheetState
                               ),
                               style: const TextStyle(
                                 color: AppTheme.textSecondary,
-                                height: 1.4,
+                                height: AppTheme.lineHeightComfortable,
                               ),
                             ),
                           ],
@@ -336,22 +336,23 @@ class _LifeCounterNativePlayerStateSheetState
                       ),
                       const SizedBox(height: 18),
                       _SectionCard(
-                        title: 'Commander Setup',
-                        subtitle: 'Add a partner commander for this player.',
+                        title: 'Configuração de comandante',
+                        subtitle:
+                            'Adicione um comandante parceiro para este jogador.',
                         child: SwitchListTile.adaptive(
                           key: const Key(
                             'life-counter-native-player-state-partner-toggle',
                           ),
                           contentPadding: EdgeInsets.zero,
                           title: const Text(
-                            'Partner commander',
+                            'Comandante parceiro',
                             style: TextStyle(
                               color: AppTheme.textPrimary,
                               fontWeight: FontWeight.w700,
                             ),
                           ),
                           subtitle: const Text(
-                            'Enable split commander tax and split commander damage for this player.',
+                            'Separe a taxa e o dano de cada comandante deste jogador.',
                             style: TextStyle(color: AppTheme.textSecondary),
                           ),
                           value: _partnerCommander,
@@ -362,9 +363,9 @@ class _LifeCounterNativePlayerStateSheetState
                       ),
                       const SizedBox(height: 18),
                       _SectionCard(
-                        title: 'Player Tools',
+                        title: 'Ferramentas do jogador',
                         subtitle:
-                            'Change life, counters, commander damage, appearance, or roll a D20.',
+                            'Altere vida, marcadores, dano de comandante e aparência, ou role um D20.',
                         child: Wrap(
                           spacing: 10,
                           runSpacing: 10,
@@ -375,7 +376,7 @@ class _LifeCounterNativePlayerStateSheetState
                               ),
                               onPressed: _openSetLife,
                               icon: const Icon(Icons.favorite_rounded),
-                              label: const Text('Set Life'),
+                              label: const Text('Definir vida'),
                             ),
                             FilledButton.tonalIcon(
                               key: const Key(
@@ -383,7 +384,7 @@ class _LifeCounterNativePlayerStateSheetState
                               ),
                               onPressed: _openManageCounters,
                               icon: const Icon(Icons.tune_rounded),
-                              label: const Text('Manage Counters'),
+                              label: const Text('Gerenciar marcadores'),
                             ),
                             FilledButton.tonalIcon(
                               key: const Key(
@@ -391,7 +392,7 @@ class _LifeCounterNativePlayerStateSheetState
                               ),
                               onPressed: _openManageCommanderDamage,
                               icon: const Icon(Icons.shield_outlined),
-                              label: const Text('Commander Damage'),
+                              label: const Text('Dano de comandante'),
                             ),
                             FilledButton.tonalIcon(
                               key: const Key(
@@ -399,7 +400,7 @@ class _LifeCounterNativePlayerStateSheetState
                               ),
                               onPressed: _openManageAppearance,
                               icon: const Icon(Icons.palette_outlined),
-                              label: const Text('Player Appearance'),
+                              label: const Text('Aparência do jogador'),
                             ),
                             FilledButton.tonalIcon(
                               key: const Key(
@@ -407,16 +408,16 @@ class _LifeCounterNativePlayerStateSheetState
                               ),
                               onPressed: _rollPlayerD20,
                               icon: const Icon(Icons.casino_rounded),
-                              label: const Text('Roll D20'),
+                              label: const Text('Rolar D20'),
                             ),
                           ],
                         ),
                       ),
                       const SizedBox(height: 18),
                       _SectionCard(
-                        title: 'Special State',
+                        title: 'Estado especial',
                         subtitle:
-                            'Set why this player left the game, or bring them back.',
+                            'Registre por que o jogador saiu ou traga-o de volta.',
                         child: Column(
                           children: [
                             Wrap(
@@ -452,7 +453,7 @@ class _LifeCounterNativePlayerStateSheetState
                               ),
                               style: const TextStyle(
                                 color: AppTheme.textSecondary,
-                                height: 1.4,
+                                height: AppTheme.lineHeightComfortable,
                               ),
                             ),
                             const SizedBox(height: 16),
@@ -466,7 +467,7 @@ class _LifeCounterNativePlayerStateSheetState
                                   ),
                                   onPressed: _markPlayerKnockedOut,
                                   icon: const Icon(Icons.heart_broken_rounded),
-                                  label: const Text('Knock Out'),
+                                  label: const Text('Nocautear'),
                                 ),
                                 FilledButton.tonalIcon(
                                   key: const Key(
@@ -474,7 +475,7 @@ class _LifeCounterNativePlayerStateSheetState
                                   ),
                                   onPressed: _markPlayerDeckedOut,
                                   icon: const Icon(Icons.menu_book_rounded),
-                                  label: const Text('Decked Out'),
+                                  label: const Text('Sem grimório'),
                                 ),
                                 FilledButton.tonalIcon(
                                   key: const Key(
@@ -482,7 +483,7 @@ class _LifeCounterNativePlayerStateSheetState
                                   ),
                                   onPressed: _markPlayerAnswerLeft,
                                   icon: const Icon(Icons.exit_to_app_rounded),
-                                  label: const Text('Left Table'),
+                                  label: const Text('Saiu da mesa'),
                                 ),
                                 FilledButton.tonalIcon(
                                   key: const Key(
@@ -490,7 +491,7 @@ class _LifeCounterNativePlayerStateSheetState
                                   ),
                                   onPressed: _revivePlayer,
                                   icon: const Icon(Icons.restart_alt_rounded),
-                                  label: const Text('Revive'),
+                                  label: const Text('Reativar'),
                                 ),
                               ],
                             ),
@@ -515,7 +516,7 @@ class _LifeCounterNativePlayerStateSheetState
                             ),
                             padding: const EdgeInsets.symmetric(vertical: 14),
                           ),
-                          child: const Text('Cancel'),
+                          child: const Text('Cancelar'),
                         ),
                       ),
                       const SizedBox(width: 12),
@@ -533,7 +534,7 @@ class _LifeCounterNativePlayerStateSheetState
                             foregroundColor: AppTheme.backgroundAbyss,
                             padding: const EdgeInsets.symmetric(vertical: 14),
                           ),
-                          child: const Text('Apply'),
+                          child: const Text('Aplicar'),
                         ),
                       ),
                     ],

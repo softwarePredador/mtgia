@@ -78,6 +78,28 @@ void main() {
     expect(provider.errorMessage, 'Falha ao carregar decks da comunidade');
   });
 
+  test('fetchPublicDecks never exposes raw exception details', () async {
+    final api = _FakeCommunityApiClient(
+      getHandler:
+          (_) async =>
+              throw StateError(
+                'postgres://private-user:secret@internal-host/community',
+              ),
+    );
+    final provider = CommunityProvider(apiClient: api);
+
+    await provider.fetchPublicDecks(reset: true);
+
+    expect(provider.isLoading, isFalse);
+    expect(
+      provider.errorMessage,
+      'Não foi possível carregar a comunidade agora. Verifique sua conexão '
+      'e tente novamente.',
+    );
+    expect(provider.errorMessage, isNot(contains('secret')));
+    expect(provider.errorMessage, isNot(contains('internal-host')));
+  });
+
   test('fetchPublicDeckDetails returns null for 404', () async {
     final api = _FakeCommunityApiClient(
       getHandler:

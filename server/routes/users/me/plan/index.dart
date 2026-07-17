@@ -15,21 +15,22 @@ Future<Response> onRequest(RequestContext context) async {
 
   try {
     final snapshot = await PlanService(pool).getSnapshot(userId);
-    return Response.json(body: {
-      'plan': snapshot.toJson(),
-      'upgrade_offer': {
-        'pro': {
-          'ai_monthly_limit': 2500,
-          'benefits': [
-            'Mais otimizações por mês',
-            'Histórico e uso avançado de IA',
-            'Prioridade em recursos premium'
-          ]
-        }
-      }
-    });
+    return Response.json(
+      body: {
+        'plan': snapshot.toJson(),
+        'beta': {
+          'is_free': true,
+          'billing_enabled': false,
+          'purchase_available': false,
+          'message':
+              'A beta pública atual é gratuita e não oferece compra ou assinatura.',
+        },
+      },
+    );
   } catch (e) {
-    return internalServerError('Falha ao carregar plano do usuário',
-        details: e);
+    return internalServerError(
+      'Falha ao carregar plano do usuário',
+      details: e,
+    );
   }
 }

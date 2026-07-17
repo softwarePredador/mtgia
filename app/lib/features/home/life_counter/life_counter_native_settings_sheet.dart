@@ -93,7 +93,7 @@ class _LifeCounterNativeSettingsSheetState
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              'Life Counter Settings',
+                              'Configurações do contador de vida',
                               style: TextStyle(
                                 color: AppTheme.textPrimary,
                                 fontSize: AppTheme.fontXxl,
@@ -102,7 +102,7 @@ class _LifeCounterNativeSettingsSheetState
                             ),
                             SizedBox(height: 6),
                             Text(
-                              'Customize rules, counters, and table controls.',
+                              'Personalize regras, marcadores e controles da mesa.',
                               style: TextStyle(
                                 color: AppTheme.textSecondary,
                                 fontSize: AppTheme.fontMd,
@@ -116,7 +116,7 @@ class _LifeCounterNativeSettingsSheetState
                         onPressed: () => Navigator.of(context).pop(),
                         icon: const Icon(Icons.close_rounded),
                         color: AppTheme.textSecondary,
-                        tooltip: 'Close',
+                        tooltip: 'Fechar',
                       ),
                     ],
                   ),
@@ -155,7 +155,7 @@ class _LifeCounterNativeSettingsSheetState
                             ),
                             padding: const EdgeInsets.symmetric(vertical: 14),
                           ),
-                          child: const Text('Cancel'),
+                          child: const Text('Cancelar'),
                         ),
                       ),
                       const SizedBox(width: 12),
@@ -168,7 +168,7 @@ class _LifeCounterNativeSettingsSheetState
                             foregroundColor: AppTheme.backgroundAbyss,
                             padding: const EdgeInsets.symmetric(vertical: 14),
                           ),
-                          child: const Text('Apply'),
+                          child: const Text('Aplicar'),
                         ),
                       ),
                     ],
@@ -360,7 +360,7 @@ class _SettingEntryTile extends StatelessWidget {
             style: const TextStyle(
               color: AppTheme.textSecondary,
               fontSize: AppTheme.fontSm,
-              height: 1.3,
+              height: AppTheme.lineHeightDense,
             ),
           ),
           value: entry.toggleValue ?? false,

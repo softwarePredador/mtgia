@@ -45,7 +45,10 @@ Future<Response> _getPublicDeck(RequestContext context, String deckId) async {
           WHERE dcmt.deck_id = d.id
             AND dcmt.status = 'visible'
         ) comment_counts ON TRUE
-        WHERE d.id = @deckId AND d.is_public = true
+        WHERE d.id = @deckId
+          AND d.is_public = true
+          AND d.deleted_at IS NULL
+          AND u.deleted_at IS NULL
       '''),
       parameters: {'deckId': deckId},
     );
@@ -86,11 +89,14 @@ Future<Response> _getPublicDeck(RequestContext context, String deckId) async {
       parameters: {'deckId': deckId},
     );
 
-    final cardsList = cardsResult.map((row) {
-      final m = row.toColumnMap();
-      m['image_url'] = normalizeScryfallImageUrl(m['image_url']?.toString());
-      return m;
-    }).toList();
+    final cardsList =
+        cardsResult.map((row) {
+          final m = row.toColumnMap();
+          m['image_url'] = normalizeScryfallImageUrl(
+            m['image_url']?.toString(),
+          );
+          return m;
+        }).toList();
 
     // Organizar
     final commander = <Map<String, dynamic>>[];
@@ -132,7 +138,7 @@ Future<Response> _getPublicDeck(RequestContext context, String deckId) async {
       'B': 0,
       'R': 0,
       'G': 0,
-      'C': 0
+      'C': 0,
     };
 
     for (final card in cardsList) {
@@ -166,30 +172,32 @@ Future<Response> _getPublicDeck(RequestContext context, String deckId) async {
       }
     }
 
-    return Response.json(body: {
-      ...deckInfo,
-      'stats': {
-        'total_cards': cardsList.fold<int>(
-            0, (sum, item) => sum + (item['quantity'] as int)),
-        'unique_cards': cardsList.length,
-        'mana_curve': manaCurve,
-        'type_distribution': typeDistribution,
-        'color_distribution': colorDistribution,
+    return Response.json(
+      body: {
+        ...deckInfo,
+        'stats': {
+          'total_cards': cardsList.fold<int>(
+            0,
+            (sum, item) => sum + (item['quantity'] as int),
+          ),
+          'unique_cards': cardsList.length,
+          'mana_curve': manaCurve,
+          'type_distribution': typeDistribution,
+          'color_distribution': colorDistribution,
+        },
+        'comments_summary': {'comment_count': deckInfo['comment_count'] ?? 0},
+        'visual_analysis': _buildVisualAnalysis(
+          manaCurve: manaCurve,
+          typeDistribution: typeDistribution,
+          colorDistribution: colorDistribution,
+          commanderName:
+              commander.isNotEmpty ? commander.first['name']?.toString() : null,
+        ),
+        'commander': commander,
+        'main_board': mainBoard,
+        'all_cards_flat': cardsList,
       },
-      'comments_summary': {
-        'comment_count': deckInfo['comment_count'] ?? 0,
-      },
-      'visual_analysis': _buildVisualAnalysis(
-        manaCurve: manaCurve,
-        typeDistribution: typeDistribution,
-        colorDistribution: colorDistribution,
-        commanderName:
-            commander.isNotEmpty ? commander.first['name']?.toString() : null,
-      ),
-      'commander': commander,
-      'main_board': mainBoard,
-      'all_cards_flat': cardsList,
-    });
+    );
   } catch (e, st) {
     await captureRouteException(
       context,
@@ -218,8 +226,9 @@ Map<String, dynamic> _buildVisualAnalysis({
       .where((entry) => entry.value > 0)
       .map((entry) => entry.key)
       .toList(growable: false);
-  final topTypes = typeDistribution.entries.toList()
-    ..sort((a, b) => b.value.compareTo(a.value));
+  final topTypes =
+      typeDistribution.entries.toList()
+        ..sort((a, b) => b.value.compareTo(a.value));
   final lowCurve =
       (manaCurve['0'] ?? 0) + (manaCurve['1'] ?? 0) + (manaCurve['2'] ?? 0);
   final midCurve = (manaCurve['3'] ?? 0) + (manaCurve['4'] ?? 0);
@@ -227,21 +236,21 @@ Map<String, dynamic> _buildVisualAnalysis({
       (manaCurve['5'] ?? 0) + (manaCurve['6'] ?? 0) + (manaCurve['7+'] ?? 0);
 
   return {
-    'headline': commanderName == null || commanderName.isEmpty
-        ? 'Deck publico ManaLoom'
-        : 'Plano publico de $commanderName',
+    'headline':
+        commanderName == null || commanderName.isEmpty
+            ? 'Deck publico ManaLoom'
+            : 'Plano publico de $commanderName',
     'color_identity_hint': nonZeroColors.isEmpty ? ['C'] : nonZeroColors,
     'top_type_buckets': topTypes
         .take(4)
         .map((entry) => {'type': entry.key, 'count': entry.value})
         .toList(growable: false),
-    'curve_shape': {
-      'low': lowCurve,
-      'mid': midCurve,
-      'high': highCurve,
-    },
+    'curve_shape': {'low': lowCurve, 'mid': midCurve, 'high': highCurve},
     'reading': _curveReading(
-        lowCurve: lowCurve, midCurve: midCurve, highCurve: highCurve),
+      lowCurve: lowCurve,
+      midCurve: midCurve,
+      highCurve: highCurve,
+    ),
   };
 }
 
@@ -272,23 +281,30 @@ Future<Response> _copyPublicDeck(RequestContext context, String deckId) async {
 
   final token = authHeader.substring(7);
   final authService = AuthService();
-  final payload = authService.verifyToken(token);
-  if (payload == null) {
+  final user = await authService.getUserFromToken(token);
+  if (user == null) {
     return Response.json(
       statusCode: 401,
       body: {'error': 'Token inválido ou expirado.'},
     );
   }
 
-  final userId = payload['userId'] as String;
+  final userId = user['id'] as String;
   final conn = context.read<Pool>();
 
   try {
     final newDeck = await conn.runTx((session) async {
       // 1. Verificar que o deck original existe e é público
       final original = await session.execute(
-        Sql.named(
-            'SELECT id, name, format, description FROM decks WHERE id = @deckId AND is_public = true'),
+        Sql.named('''
+          SELECT d.id, d.name, d.format, d.description
+          FROM decks d
+          JOIN users u ON u.id = d.user_id
+          WHERE d.id = @deckId
+            AND d.is_public = true
+            AND d.deleted_at IS NULL
+            AND u.deleted_at IS NULL
+        '''),
         parameters: {'deckId': deckId},
       );
 
@@ -329,10 +345,7 @@ Future<Response> _copyPublicDeck(RequestContext context, String deckId) async {
           SELECT @newDeckId, card_id, quantity, is_commander
           FROM deck_cards WHERE deck_id = @deckId
         '''),
-        parameters: {
-          'newDeckId': newDeckId,
-          'deckId': deckId,
-        },
+        parameters: {'newDeckId': newDeckId, 'deckId': deckId},
       );
 
       return newDeckMap;
@@ -383,15 +396,15 @@ Future<Response> getFollowingFeed(RequestContext context) async {
 
   final token = authHeader.substring(7);
   final authService = AuthService();
-  final payload = authService.verifyToken(token);
-  if (payload == null) {
+  final user = await authService.getUserFromToken(token);
+  if (user == null) {
     return Response.json(
       statusCode: HttpStatus.unauthorized,
       body: {'error': 'Invalid or expired token.'},
     );
   }
 
-  final userId = payload['userId'] as String;
+  final userId = user['id'] as String;
 
   try {
     final conn = context.read<Pool>();
@@ -405,9 +418,12 @@ Future<Response> getFollowingFeed(RequestContext context) async {
       Sql.named('''
         SELECT COUNT(*)::int
         FROM decks d
+        JOIN users u ON u.id = d.user_id
         JOIN user_follows uf ON uf.following_id = d.user_id
         WHERE uf.follower_id = @userId
           AND d.is_public = true
+          AND d.deleted_at IS NULL
+          AND u.deleted_at IS NULL
       '''),
       parameters: {'userId': userId},
     );
@@ -454,33 +470,30 @@ Future<Response> getFollowingFeed(RequestContext context) async {
         LEFT JOIN deck_cards dc ON d.id = dc.deck_id
         WHERE uf.follower_id = @userId
           AND d.is_public = true
+          AND d.deleted_at IS NULL
+          AND u.deleted_at IS NULL
         GROUP BY d.id, u.username, u.id, cmd.commander_name, cmd.commander_image_url, first_card.first_image_url
         ORDER BY d.created_at DESC
         LIMIT @lim OFFSET @off
       '''),
-      parameters: {
-        'userId': userId,
-        'lim': limit,
-        'off': offset,
-      },
+      parameters: {'userId': userId, 'lim': limit, 'off': offset},
     );
 
-    final decks = result.map((row) {
-      final m = row.toColumnMap();
-      if (m['created_at'] is DateTime) {
-        m['created_at'] = (m['created_at'] as DateTime).toIso8601String();
-      }
-      m['commander_image_url'] =
-          normalizeScryfallImageUrl(m['commander_image_url']?.toString());
-      return m;
-    }).toList();
+    final decks =
+        result.map((row) {
+          final m = row.toColumnMap();
+          if (m['created_at'] is DateTime) {
+            m['created_at'] = (m['created_at'] as DateTime).toIso8601String();
+          }
+          m['commander_image_url'] = normalizeScryfallImageUrl(
+            m['commander_image_url']?.toString(),
+          );
+          return m;
+        }).toList();
 
-    return Response.json(body: {
-      'data': decks,
-      'page': page,
-      'limit': limit,
-      'total': total,
-    });
+    return Response.json(
+      body: {'data': decks, 'page': page, 'limit': limit, 'total': total},
+    );
   } catch (e, st) {
     await captureRouteException(
       context,

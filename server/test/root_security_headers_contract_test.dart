@@ -7,11 +7,13 @@ void main() {
     final source = File('routes/_middleware.dart').readAsStringSync();
 
     expect(source, contains("'X-Content-Type-Options': 'nosniff'"));
-    expect(source, contains("'X-Frame-Options': 'SAMEORIGIN'"));
+    expect(source, contains("'X-Frame-Options': 'DENY'"));
     expect(source, contains("'Referrer-Policy': 'no-referrer'"));
     expect(source, contains("'Permissions-Policy':"));
     expect(source, contains("'Strict-Transport-Security':"));
-    expect(source, contains('..._corsHeaders'));
+    expect(source, contains("'Content-Security-Policy':"));
+    expect(source, contains('...responseHeaders'));
+    expect(source, isNot(contains("'Access-Control-Allow-Origin': '*'")));
   });
 
   test('production entrypoint suppresses framework disclosure', () {

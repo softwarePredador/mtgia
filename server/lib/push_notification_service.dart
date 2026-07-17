@@ -135,9 +135,9 @@ class PushNotificationService {
 
     // Usar token em cache se ainda válido (com margem de 5 min)
     if (_cachedAccessToken != null && _tokenExpiry != null) {
-      if (DateTime.now()
-          .toUtc()
-          .isBefore(_tokenExpiry!.subtract(const Duration(minutes: 5)))) {
+      if (DateTime.now().toUtc().isBefore(
+        _tokenExpiry!.subtract(const Duration(minutes: 5)),
+      )) {
         return _cachedAccessToken;
       }
     }
@@ -179,6 +179,7 @@ class PushNotificationService {
   static Future<void> sendToUser({
     required Pool pool,
     required String userId,
+    String? actorUserId,
     required String title,
     String? body,
     Map<String, String>? data,
@@ -192,8 +193,23 @@ class PushNotificationService {
     try {
       // Busca FCM token do usuário
       final result = await pool.execute(
-        Sql.named('SELECT fcm_token FROM users WHERE id = @id LIMIT 1'),
-        parameters: {'id': userId},
+        Sql.named('''
+          SELECT recipient.fcm_token
+          FROM users recipient
+          WHERE recipient.id = @id
+            AND recipient.deleted_at IS NULL
+            AND (
+              CAST(@actorUserId AS uuid) IS NULL
+              OR EXISTS (
+                SELECT 1
+                FROM users actor
+                WHERE actor.id = CAST(@actorUserId AS uuid)
+                  AND actor.deleted_at IS NULL
+              )
+            )
+          LIMIT 1
+        '''),
+        parameters: {'id': userId, 'actorUserId': actorUserId},
       );
 
       if (result.isEmpty) return;
@@ -230,10 +246,7 @@ class PushNotificationService {
     final payload = {
       'message': {
         'token': token,
-        'notification': {
-          'title': title,
-          if (body != null) 'body': body,
-        },
+        'notification': {'title': title, if (body != null) 'body': body},
         if (data != null) 'data': data,
         'android': {
           'priority': 'high',
@@ -244,10 +257,7 @@ class PushNotificationService {
         },
         'apns': {
           'payload': {
-            'aps': {
-              'sound': 'default',
-              'badge': 1,
-            },
+            'aps': {'sound': 'default', 'badge': 1},
           },
         },
       },
@@ -307,13 +317,15 @@ class PushNotificationService {
     // mas em paralelo com limite de 10 simultâneos
     final futures = <Future>[];
     for (final token in tokens) {
-      futures.add(_sendFcmMessageV1(
-        projectId: projectId,
-        token: token,
-        title: title,
-        body: body,
-        data: data,
-      ));
+      futures.add(
+        _sendFcmMessageV1(
+          projectId: projectId,
+          token: token,
+          title: title,
+          body: body,
+          data: data,
+        ),
+      );
 
       // Limitar paralelismo
       if (futures.length >= 10) {

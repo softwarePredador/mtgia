@@ -1,9 +1,11 @@
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:manaloom/core/theme/app_theme.dart';
+import 'package:manaloom/core/utils/currency_formatter.dart';
 import 'package:manaloom/core/utils/friendly_error_mapper.dart';
 import 'package:manaloom/core/utils/mana_helper.dart';
 import 'package:manaloom/core/widgets/cached_card_image.dart';
+import 'package:manaloom/core/widgets/mana_symbols.dart';
 import 'package:provider/provider.dart';
 
 import '../../commercial/models/manaloom_plan.dart';
@@ -452,7 +454,6 @@ class _DeckAnalysisTabState extends State<DeckAnalysisTab> {
   List<PieChartSectionData> _buildPieSections(Map<String, int> counts) {
     final total = counts.values.fold(0, (sum, item) => sum + item);
     if (total == 0) return [];
-
     final colorsMap = AppTheme.wubrg;
 
     return counts.entries.where((e) => e.value > 0).map((entry) {
@@ -482,22 +483,13 @@ class _DeckAnalysisTabState extends State<DeckAnalysisTab> {
     };
     final textTheme = Theme.of(context).textTheme;
 
-    final colorsMap = AppTheme.wubrg;
-
     return counts.entries.where((e) => e.value > 0).map((entry) {
       return Padding(
         padding: const EdgeInsets.symmetric(vertical: 3),
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Container(
-              width: 10,
-              height: 10,
-              decoration: BoxDecoration(
-                color: colorsMap[entry.key],
-                shape: BoxShape.circle,
-              ),
-            ),
+            ManaSymbol(symbol: entry.key, size: 16),
             const SizedBox(width: 8),
             Text(
               namesMap[entry.key]!,
@@ -622,29 +614,7 @@ int? _readInt(Object? value) {
 }
 
 String _formatDeckCurrency(double value, String currency) {
-  final normalized = currency.trim().toUpperCase();
-  final fixed = value.toStringAsFixed(2);
-  final parts = fixed.split('.');
-  final whole = parts.first;
-  final cents = parts.length > 1 ? parts[1] : '00';
-  final grouped = whole.replaceAllMapped(
-    RegExp(r'\B(?=(\d{3})+(?!\d))'),
-    (_) => '.',
-  );
-
-  if (normalized == 'USD') {
-    return 'US\$ $grouped,$cents';
-  }
-  if (normalized == 'EUR') {
-    return '€ $grouped,$cents';
-  }
-  if (normalized == 'BRL' || normalized == 'R\$') {
-    return 'R\$ $grouped,$cents';
-  }
-  if (normalized.isEmpty) {
-    return 'R\$ $grouped,$cents';
-  }
-  return '$normalized $grouped,$cents';
+  return CurrencyFormatter.format(value, currencyCode: currency);
 }
 
 class _AnalysisSummaryStrip extends StatelessWidget {
@@ -902,7 +872,12 @@ class _AnalysisStatusPill extends StatelessWidget {
       decoration: BoxDecoration(
         color: accent.withValues(alpha: 0.12),
         borderRadius: BorderRadius.circular(AppTheme.radiusMd),
-        border: Border.all(color: accent.withValues(alpha: 0.26)),
+        border: Border.fromBorderSide(
+          BorderSide(
+            color: accent.withValues(alpha: 0.26),
+            width: AppTheme.strokeDefault,
+          ),
+        ),
       ),
       child: Row(
         children: [
@@ -1555,7 +1530,7 @@ class _FunctionalSampleRow extends StatelessWidget {
       button: true,
       label: 'Ver ${sample.name}',
       child: Material(
-        color: Colors.transparent,
+        color: AppTheme.transparent,
         borderRadius: BorderRadius.circular(AppTheme.radiusSm),
         child: InkWell(
           borderRadius: BorderRadius.circular(AppTheme.radiusSm),

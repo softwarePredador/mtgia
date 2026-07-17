@@ -24,8 +24,13 @@ Future<Response> _getFollowers(RequestContext context, String userId) async {
 
     // Count total followers
     final countResult = await conn.execute(
-      Sql.named(
-          'SELECT COUNT(*)::int FROM user_follows WHERE following_id = @id'),
+      Sql.named('''
+        SELECT COUNT(*)::int
+        FROM user_follows uf
+        JOIN users u ON u.id = uf.follower_id
+        WHERE uf.following_id = @id
+          AND u.deleted_at IS NULL
+      '''),
       parameters: {'id': userId},
     );
     final total = (countResult.first[0] as int?) ?? 0;
@@ -42,30 +47,25 @@ Future<Response> _getFollowers(RequestContext context, String userId) async {
         FROM user_follows uf
         JOIN users u ON u.id = uf.follower_id
         WHERE uf.following_id = @userId
+          AND u.deleted_at IS NULL
         ORDER BY uf.created_at DESC
         LIMIT @lim OFFSET @off
       '''),
-      parameters: {
-        'userId': userId,
-        'lim': limit,
-        'off': offset,
-      },
+      parameters: {'userId': userId, 'lim': limit, 'off': offset},
     );
 
-    final followers = result.map((row) {
-      final m = row.toColumnMap();
-      if (m['followed_at'] is DateTime) {
-        m['followed_at'] = (m['followed_at'] as DateTime).toIso8601String();
-      }
-      return m;
-    }).toList();
+    final followers =
+        result.map((row) {
+          final m = row.toColumnMap();
+          if (m['followed_at'] is DateTime) {
+            m['followed_at'] = (m['followed_at'] as DateTime).toIso8601String();
+          }
+          return m;
+        }).toList();
 
-    return Response.json(body: {
-      'data': followers,
-      'page': page,
-      'limit': limit,
-      'total': total,
-    });
+    return Response.json(
+      body: {'data': followers, 'page': page, 'limit': limit, 'total': total},
+    );
   } catch (e, st) {
     await captureRouteException(
       context,

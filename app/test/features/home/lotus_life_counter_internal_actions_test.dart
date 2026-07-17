@@ -203,9 +203,9 @@ void main() {
         );
         await tester.pumpAndSettle();
 
-        expect(find.text('Day / Night'), findsOneWidget);
+        expect(find.text('Dia / Noite'), findsOneWidget);
 
-        await tester.tap(find.text('Night'));
+        await tester.tap(find.text('Noite'));
         await tester.pumpAndSettle();
 
         await tester.tap(
@@ -348,7 +348,7 @@ void main() {
           );
           await tester.pumpAndSettle();
 
-          await tester.tap(find.text('Night'));
+          await tester.tap(find.text('Noite'));
           await tester.pumpAndSettle();
 
           await tester.tap(
@@ -409,9 +409,9 @@ void main() {
         );
         await tester.pumpAndSettle();
 
-        expect(find.text('Game Modes'), findsOneWidget);
-        expect(find.text('Selected'), findsOneWidget);
-        expect(find.text('Continue With Planechase'), findsOneWidget);
+        expect(find.text('Modos de jogo'), findsOneWidget);
+        expect(find.text('Selecionado'), findsOneWidget);
+        expect(find.text('Continuar com Planechase'), findsOneWidget);
 
         expect(
           logs.any(
@@ -500,9 +500,9 @@ void main() {
         );
         await tester.pumpAndSettle();
 
-        expect(find.text('Game Modes'), findsOneWidget);
-        expect(find.text('Continue With Planechase'), findsOneWidget);
-        expect(find.text('Active Now'), findsOneWidget);
+        expect(find.text('Modos de jogo'), findsOneWidget);
+        expect(find.text('Continuar com Planechase'), findsOneWidget);
+        expect(find.text('Ativo agora'), findsOneWidget);
       },
     );
 
@@ -535,7 +535,7 @@ void main() {
         );
         await tester.pumpAndSettle();
 
-        expect(find.text('Continue To Card Pool'), findsOneWidget);
+        expect(find.text('Continuar para o conjunto'), findsOneWidget);
 
         await tester.ensureVisible(
           find.byKey(
@@ -617,8 +617,8 @@ void main() {
         );
         await tester.pumpAndSettle();
 
-        expect(find.text('Card Pool Open'), findsOneWidget);
-        expect(find.text('Return To Card Pool'), findsOneWidget);
+        expect(find.text('Conjunto de cartas aberto'), findsOneWidget);
+        expect(find.text('Voltar ao conjunto de cartas'), findsOneWidget);
 
         await tester.ensureVisible(
           find.byKey(
@@ -843,7 +843,7 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      expect(find.text('Open Settings'), findsOneWidget);
+      expect(find.text('Abrir configurações'), findsOneWidget);
 
       await tester.ensureVisible(
         find.byKey(
@@ -858,7 +858,7 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      expect(find.text('Life Counter Settings'), findsOneWidget);
+      expect(find.text('Configurações do contador de vida'), findsOneWidget);
     });
 
     testWidgets(
@@ -912,7 +912,7 @@ void main() {
           find.byKey(const Key('life-counter-native-game-modes-limit-warning')),
           findsOneWidget,
         );
-        expect(find.text('Close One Active Mode First'), findsOneWidget);
+        expect(find.text('Encerre um modo ativo primeiro'), findsOneWidget);
 
         await tester.ensureVisible(
           find.byKey(const Key('life-counter-native-game-modes-bounty-open')),

@@ -1,3 +1,5 @@
+import 'scryfall_image_url.dart';
+
 const int setCatalogDefaultLimit = 50;
 const int setCatalogMaxLimit = 200;
 const int setCatalogNewReleaseWindowDays = 30;
@@ -46,8 +48,9 @@ Map<String, dynamic> mapSetCatalogRow(
   DateTime? now,
 }) {
   final releaseDate = row['release_date'] as DateTime?;
+  final code = row['code']?.toString();
   return {
-    'code': row['code'],
+    'code': code,
     'name': row['name'],
     'release_date': releaseDate?.toIso8601String().split('T').first,
     'type': row['type'],
@@ -55,8 +58,20 @@ Map<String, dynamic> mapSetCatalogRow(
     'is_online_only': row['is_online_only'],
     'is_foreign_only': row['is_foreign_only'],
     'card_count': (row['card_count'] as num?)?.toInt() ?? 0,
+    'representative_image_url': normalizeScryfallImageUrl(
+      row['representative_image_url']?.toString(),
+    ),
+    'icon_svg_uri': buildSetIconSvgUri(code),
     'status': resolveSetStatus(releaseDate, now: now),
   };
+}
+
+String? buildSetIconSvgUri(String? code) {
+  final normalized = code?.trim().toLowerCase();
+  if (normalized == null || normalized.isEmpty) return null;
+  return Uri.https('svgs.scryfall.io', '/sets/$normalized.svg', const {
+    'v': '1',
+  }).toString();
 }
 
 Map<String, String> buildSetCatalogTimingHeaders({

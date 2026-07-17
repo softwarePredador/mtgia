@@ -51,7 +51,7 @@ void main() {
     await tester.tap(find.text('Open'));
     await tester.pumpAndSettle();
 
-    expect(find.text('Table State'), findsOneWidget);
+    expect(find.text('Estado da mesa'), findsOneWidget);
 
     await tester.tap(
       find.byKey(const Key('life-counter-native-table-state-monarch-player-0')),
@@ -129,8 +129,8 @@ void main() {
     await tester.tap(find.text('Open'));
     await tester.pumpAndSettle();
 
-    expect(find.text('Player 2 (out)'), findsWidgets);
-    expect(find.text('Player 3 (out)'), findsWidgets);
+    expect(find.text('Jogador 2 (fora)'), findsWidgets);
+    expect(find.text('Jogador 3 (fora)'), findsWidgets);
 
     await tester.tap(
       find.byKey(const Key('life-counter-native-table-state-monarch-player-0')),

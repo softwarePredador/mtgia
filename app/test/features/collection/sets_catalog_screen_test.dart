@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:manaloom/core/api/api_client.dart';
@@ -40,6 +41,9 @@ class _FakeApiClient extends ApiClient {
             'release_date': '2026-06-26',
             'type': 'expansion',
             'card_count': 14,
+            'representative_image_url':
+                'https://cards.scryfall.io/normal/front/a/b/sample.jpg',
+            'icon_svg_uri': 'https://svgs.scryfall.io/sets/msh.svg?v=1',
             'status': 'future',
           },
           {
@@ -48,6 +52,8 @@ class _FakeApiClient extends ApiClient {
             'release_date': '2026-03-06',
             'type': 'expansion',
             'card_count': 195,
+            'representative_image_url': null,
+            'icon_svg_uri': 'https://svgs.scryfall.io/sets/tmt.svg?v=1',
             'status': 'current',
           },
         ],
@@ -104,6 +110,40 @@ class _FailingApiClient extends ApiClient {
 }
 
 void main() {
+  Future<void> setViewport(WidgetTester tester, Size size) async {
+    tester.view.physicalSize = size;
+    tester.view.devicePixelRatio = 1;
+    addTearDown(() {
+      tester.view.resetPhysicalSize();
+      tester.view.resetDevicePixelRatio();
+    });
+  }
+
+  test(
+    'set visual contract parses artwork and derives legacy icon fallback',
+    () {
+      final set = MtgSet.fromJson({
+        'code': 'MSH',
+        'name': 'Marvel Super Heroes',
+        'status': 'future',
+        'representative_image_url': ' https://example.test/art.jpg ',
+        'icon_svg_uri': ' https://example.test/icon.svg ',
+      });
+      final legacy = MtgSet.fromJson({
+        'code': 'HOB',
+        'name': 'The Hobbit',
+        'status': 'future',
+      });
+
+      expect(set.representativeImageUrl, 'https://example.test/art.jpg');
+      expect(set.resolvedIconSvgUri, 'https://example.test/icon.svg');
+      expect(
+        legacy.resolvedIconSvgUri,
+        'https://svgs.scryfall.io/sets/hob.svg?v=1',
+      );
+    },
+  );
+
   testWidgets('sets catalog lists statuses and searches by code/name', (
     tester,
   ) async {
@@ -122,6 +162,17 @@ void main() {
     expect(find.text('MSH'), findsOneWidget);
     expect(find.text('Futura'), findsOneWidget);
     expect(find.text('14 cartas'), findsOneWidget);
+    expect(find.byKey(const Key('set-artwork-frame-MSH')), findsOneWidget);
+    expect(find.byKey(const Key('set-artwork-image-MSH')), findsOneWidget);
+    expect(find.byKey(const Key('set-icon-request-TMT')), findsOneWidget);
+    expect(find.byKey(const Key('set-code-badge-MSH')), findsOneWidget);
+    expect(find.byKey(const Key('set-code-badge-TMT')), findsOneWidget);
+
+    final artwork = tester.widget<CachedNetworkImage>(
+      find.byKey(const Key('set-artwork-image-MSH')),
+    );
+    expect(artwork.imageUrl, contains('/art_crop/'));
+    expect(artwork.fit, BoxFit.cover);
 
     await tester.enterText(find.byKey(const Key('setsSearchField')), 'soc');
     await tester.pump(const Duration(milliseconds: 400));
@@ -160,6 +211,125 @@ void main() {
       apiClient.requests.any((r) => r.startsWith('/cards?set=ECC')),
       isTrue,
     );
+  });
+
+  testWidgets('set artwork keeps a fixed landscape frame on compact catalog', (
+    tester,
+  ) async {
+    await setViewport(tester, const Size(390, 844));
+
+    await tester.pumpWidget(
+      MaterialApp(
+        theme: AppTheme.darkTheme,
+        home: SetsCatalogScreen(apiClient: _FakeApiClient()),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.byKey(const Key('setsCatalogList')), findsOneWidget);
+    expect(find.byKey(const Key('setsCatalogGrid')), findsNothing);
+    expect(
+      tester.getSize(find.byKey(const Key('set-artwork-frame-MSH'))),
+      const Size(84, 56),
+    );
+    expect(find.byKey(const Key('set-code-badge-MSH')), findsOneWidget);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('catalog and set cards use bounded two-column desktop canvases', (
+    tester,
+  ) async {
+    await setViewport(tester, const Size(1280, 900));
+    final apiClient = _FakeApiClient();
+
+    await tester.pumpWidget(
+      MaterialApp(
+        theme: AppTheme.darkTheme,
+        home: SetsCatalogScreen(apiClient: apiClient),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.byKey(const Key('setsCatalogGrid')), findsOneWidget);
+    expect(find.byKey(const Key('setsCatalogList')), findsNothing);
+    expect(
+      tester.getSize(find.byKey(const Key('sets-catalog-hero'))).width,
+      lessThanOrEqualTo(960),
+    );
+    expect(
+      tester
+          .getSize(find.byKey(const Key('sets-catalog-responsive-canvas')))
+          .width,
+      lessThanOrEqualTo(1280),
+    );
+    expect(tester.takeException(), isNull);
+    expect(
+      tester.getSize(find.byKey(const Key('set-artwork-frame-MSH'))),
+      const Size(84, 56),
+    );
+    expect(
+      tester.getSize(find.byKey(const Key('set-tile-MSH'))).height,
+      closeTo(104, 1.1),
+    );
+
+    const set = MtgSet(
+      code: 'ECC',
+      name: 'Lorwyn Eclipsed Commander',
+      releaseDate: '2026-01-23',
+      type: 'commander',
+      cardCount: 1,
+      status: 'current',
+    );
+    await tester.pumpWidget(
+      MaterialApp(
+        theme: AppTheme.darkTheme,
+        home: SetCardsScreen(initialSet: set, apiClient: apiClient),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.byKey(const Key('setCardsGrid')), findsOneWidget);
+    expect(find.byKey(const Key('setCardsList')), findsNothing);
+    final thumbnailSize = tester.getSize(
+      find.byKey(const Key('set-card-thumbnail-card-1')),
+    );
+    expect(
+      thumbnailSize.width / thumbnailSize.height,
+      closeTo(488 / 680, 0.02),
+    );
+    expect(
+      tester
+          .getSize(find.byKey(const Key('set-cards-responsive-canvas')))
+          .width,
+      lessThanOrEqualTo(1280),
+    );
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('set cards preserve the compact mobile list at 390px', (
+    tester,
+  ) async {
+    await setViewport(tester, const Size(390, 844));
+    const set = MtgSet(
+      code: 'ECC',
+      name: 'Lorwyn Eclipsed Commander',
+      releaseDate: '2026-01-23',
+      type: 'commander',
+      cardCount: 1,
+      status: 'current',
+    );
+
+    await tester.pumpWidget(
+      MaterialApp(
+        theme: AppTheme.darkTheme,
+        home: SetCardsScreen(initialSet: set, apiClient: _FakeApiClient()),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.byKey(const Key('setCardsList')), findsOneWidget);
+    expect(find.byKey(const Key('setCardsGrid')), findsNothing);
+    expect(tester.takeException(), isNull);
   });
 
   testWidgets('future set without local cards shows explicit partial state', (

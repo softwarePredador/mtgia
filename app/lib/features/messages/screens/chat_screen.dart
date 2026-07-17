@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/widgets/app_state_panel.dart';
+import '../../../core/widgets/responsive_page_frame.dart';
 import '../../auth/providers/auth_provider.dart';
 import '../providers/message_provider.dart';
 
@@ -151,132 +152,143 @@ class _ChatScreenState extends State<ChatScreen> {
           ],
         ),
       ),
-      body: Column(
-        children: [
-          // ─── Lista de mensagens ────────────────────────
-          Expanded(
-            child: Consumer<MessageProvider>(
-              builder: (context, provider, _) {
-                if (provider.isLoadingMessages && provider.messages.isEmpty) {
-                  return const Center(
-                    child: CircularProgressIndicator(color: AppTheme.brass400),
+      body: ResponsivePageFrame(
+        maxWidth: AppTheme.readingMaxWidth,
+        padding: EdgeInsets.zero,
+        child: Column(
+          key: const Key('chat-reading-column'),
+          children: [
+            // ─── Lista de mensagens ────────────────────────
+            Expanded(
+              child: Consumer<MessageProvider>(
+                builder: (context, provider, _) {
+                  if (provider.isLoadingMessages && provider.messages.isEmpty) {
+                    return const Center(
+                      child: CircularProgressIndicator(
+                        color: AppTheme.brass400,
+                      ),
+                    );
+                  }
+
+                  if (provider.error != null && provider.messages.isEmpty) {
+                    return AppStatePanel(
+                      key: const Key('chat-error-state'),
+                      icon: Icons.cloud_off_outlined,
+                      title: 'Não foi possível carregar a conversa',
+                      message:
+                          'Verifique sua conexão e tente carregar as mensagens novamente.',
+                      accent: AppTheme.error,
+                      actionLabel: 'Tentar novamente',
+                      onAction: _loadMessages,
+                    );
+                  }
+
+                  if (provider.messages.isEmpty) {
+                    return const AppStatePanel(
+                      key: Key('chat-empty-state'),
+                      icon: Icons.forum_outlined,
+                      title: 'Conversa pronta',
+                      message:
+                          'Envie uma mensagem curta para combinar trocas, dúvidas ou disponibilidade.',
+                      accent: AppTheme.brass400,
+                    );
+                  }
+
+                  // Mensagens vêm em DESC (mais recente primeiro)
+                  return ListView.builder(
+                    controller: _scrollController,
+                    reverse: true, // mais recente embaixo
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 12,
+                      vertical: 8,
+                    ),
+                    itemCount: provider.messages.length,
+                    itemBuilder: (context, index) {
+                      final msg = provider.messages[index];
+                      final isMe = msg.senderId == currentUserId;
+                      return _MessageBubble(message: msg, isMe: isMe);
+                    },
                   );
-                }
-
-                if (provider.error != null && provider.messages.isEmpty) {
-                  return AppStatePanel(
-                    key: const Key('chat-error-state'),
-                    icon: Icons.cloud_off_outlined,
-                    title: 'Não foi possível carregar a conversa',
-                    message:
-                        'Verifique sua conexão e tente carregar as mensagens novamente.',
-                    accent: AppTheme.error,
-                    actionLabel: 'Tentar novamente',
-                    onAction: _loadMessages,
-                  );
-                }
-
-                if (provider.messages.isEmpty) {
-                  return const AppStatePanel(
-                    key: Key('chat-empty-state'),
-                    icon: Icons.forum_outlined,
-                    title: 'Conversa pronta',
-                    message:
-                        'Envie uma mensagem curta para combinar trocas, dúvidas ou disponibilidade.',
-                    accent: AppTheme.brass400,
-                  );
-                }
-
-                // Mensagens vêm em DESC (mais recente primeiro)
-                return ListView.builder(
-                  controller: _scrollController,
-                  reverse: true, // mais recente embaixo
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 12,
-                    vertical: 8,
-                  ),
-                  itemCount: provider.messages.length,
-                  itemBuilder: (context, index) {
-                    final msg = provider.messages[index];
-                    final isMe = msg.senderId == currentUserId;
-                    return _MessageBubble(message: msg, isMe: isMe);
-                  },
-                );
-              },
-            ),
-          ),
-
-          // ─── Input de mensagem ────────────────────────
-          Container(
-            padding: EdgeInsets.only(
-              left: 12,
-              right: 8,
-              top: 8,
-              bottom: 8 + MediaQuery.of(context).padding.bottom,
-            ),
-            decoration: const BoxDecoration(
-              color: AppTheme.surfaceSlate,
-              border: Border(
-                top: BorderSide(
-                  color: AppTheme.outlineMuted,
-                  width: AppTheme.strokeHairline,
-                ),
+                },
               ),
             ),
-            child: Row(
-              children: [
-                Expanded(
-                  child: TextField(
-                    key: const Key('chat-message-field'),
-                    controller: _messageController,
-                    style: const TextStyle(color: AppTheme.textPrimary),
-                    maxLines: 4,
-                    minLines: 1,
-                    decoration: InputDecoration(
-                      hintText: 'Mensagem...',
-                      hintStyle: const TextStyle(color: AppTheme.textSecondary),
-                      filled: true,
-                      fillColor: AppTheme.backgroundAbyss,
-                      contentPadding: const EdgeInsets.symmetric(
-                        horizontal: 14,
-                        vertical: 10,
-                      ),
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(AppTheme.radiusXl),
-                        borderSide: BorderSide.none,
-                      ),
-                    ),
-                    onSubmitted: (_) => _sendMessage(),
+
+            // ─── Input de mensagem ────────────────────────
+            Container(
+              padding: EdgeInsets.only(
+                left: 12,
+                right: 8,
+                top: 8,
+                bottom: 8 + MediaQuery.of(context).padding.bottom,
+              ),
+              decoration: const BoxDecoration(
+                color: AppTheme.surfaceSlate,
+                border: Border(
+                  top: BorderSide(
+                    color: AppTheme.outlineMuted,
+                    width: AppTheme.strokeHairline,
                   ),
                 ),
-                const SizedBox(width: 8),
-                Consumer<MessageProvider>(
-                  builder: (context, provider, _) {
-                    return IconButton(
-                      key: const Key('chat-message-send-button'),
-                      tooltip: 'Enviar mensagem',
-                      onPressed: provider.isSending ? null : _sendMessage,
-                      icon:
-                          provider.isSending
-                              ? const SizedBox(
-                                width: AppTheme.iconSpinnerSm,
-                                height: AppTheme.iconSpinnerSm,
-                                child: CircularProgressIndicator(
-                                  strokeWidth: 2,
+              ),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: TextField(
+                      key: const Key('chat-message-field'),
+                      controller: _messageController,
+                      style: const TextStyle(color: AppTheme.textPrimary),
+                      maxLines: 4,
+                      minLines: 1,
+                      decoration: InputDecoration(
+                        hintText: 'Mensagem...',
+                        hintStyle: const TextStyle(
+                          color: AppTheme.textSecondary,
+                        ),
+                        filled: true,
+                        fillColor: AppTheme.backgroundAbyss,
+                        contentPadding: const EdgeInsets.symmetric(
+                          horizontal: 14,
+                          vertical: 10,
+                        ),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(
+                            AppTheme.radiusXl,
+                          ),
+                          borderSide: BorderSide.none,
+                        ),
+                      ),
+                      onSubmitted: (_) => _sendMessage(),
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  Consumer<MessageProvider>(
+                    builder: (context, provider, _) {
+                      return IconButton(
+                        key: const Key('chat-message-send-button'),
+                        tooltip: 'Enviar mensagem',
+                        onPressed: provider.isSending ? null : _sendMessage,
+                        icon:
+                            provider.isSending
+                                ? const SizedBox(
+                                  width: AppTheme.iconSpinnerSm,
+                                  height: AppTheme.iconSpinnerSm,
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 2,
+                                    color: AppTheme.brass400,
+                                  ),
+                                )
+                                : const Icon(
+                                  Icons.send_rounded,
                                   color: AppTheme.brass400,
                                 ),
-                              )
-                              : const Icon(
-                                Icons.send_rounded,
-                                color: AppTheme.brass400,
-                              ),
-                    );
-                  },
-                ),
-              ],
+                      );
+                    },
+                  ),
+                ],
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

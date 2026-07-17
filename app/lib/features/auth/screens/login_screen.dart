@@ -2,11 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import '../../../core/theme/app_theme.dart';
+import '../auth_redirect.dart';
 import '../providers/auth_provider.dart';
 import '../widgets/auth_visual_shell.dart';
 
 class LoginScreen extends StatefulWidget {
-  const LoginScreen({super.key});
+  const LoginScreen({super.key, this.redirectPath});
+
+  final String? redirectPath;
 
   @override
   State<LoginScreen> createState() => _LoginScreenState();
@@ -60,8 +63,9 @@ class _LoginScreenState extends State<LoginScreen> {
     }
 
     if (success) {
-      debugPrint('[📱 LoginScreen] ✅ login OK — navegando para /home');
-      context.go('/home');
+      final target = normalizePostAuthRedirect(widget.redirectPath) ?? '/home';
+      debugPrint('[📱 LoginScreen] ✅ login OK — rota segura resolvida');
+      context.go(target);
       return;
     }
 
@@ -238,7 +242,13 @@ class _LoginScreenState extends State<LoginScreen> {
                       ),
                       TextButton(
                         key: const Key('login-open-register-button'),
-                        onPressed: () => context.push('/register'),
+                        onPressed:
+                            () => context.push(
+                              buildAuthLocation(
+                                '/register',
+                                widget.redirectPath,
+                              ),
+                            ),
                         child: const Text(
                           'Criar conta',
                           style: TextStyle(

@@ -386,7 +386,7 @@ void main() {
             session,
             targetPlayerIndex: 0,
           ),
-          'Player 1 is lethal from Player 2.',
+          'Jogador 1 recebeu dano letal de Jogador 2.',
         );
         expect(
           LifeCounterTabletopEngine.commanderDamageLethalSummary(
@@ -394,7 +394,7 @@ void main() {
             targetPlayerIndex: 0,
             playerLabelBuilder: (playerIndex) => 'Seat ${playerIndex + 1}',
           ),
-          'Seat 1 is lethal from Seat 2.',
+          'Seat 1 recebeu dano letal de Seat 2.',
         );
       },
     );
@@ -416,11 +416,11 @@ void main() {
         playerLabelBuilder: (playerIndex) => 'Seat ${playerIndex + 1}',
       );
 
-      expect(summary.statusSummary.label, 'Active player');
-      expect(summary.criticalCounterLabel('poison'), 'Poison lethal');
+      expect(summary.statusSummary.label, 'Jogador ativo');
+      expect(summary.criticalCounterLabel('poison'), 'Veneno letal');
       expect(
         summary.commanderDamageLethalSummary,
-        'Seat 1 is lethal from Seat 2.',
+        'Seat 1 recebeu dano letal de Seat 2.',
       );
     });
 
@@ -816,7 +816,7 @@ void main() {
           playerIndex: 0,
           counterKey: 'poison',
         ),
-        'Poison lethal',
+        'Veneno letal',
       );
       expect(
         LifeCounterTabletopEngine.counterCriticalLabel(
@@ -824,7 +824,7 @@ void main() {
           playerIndex: 1,
           counterKey: 'tax-1',
         ),
-        'Critical commander tax',
+        'Taxa crítica de comandante',
       );
     });
 
@@ -857,21 +857,21 @@ void main() {
             lethalCommanderSession,
             playerIndex: 0,
           ),
-          'Active player',
+          'Jogador ativo',
         );
         expect(
           LifeCounterTabletopEngine.playerStatusDescription(
             lethalCommanderSession,
             playerIndex: 0,
           ),
-          'Commander damage is lethal, but this player remains active until Auto-KO or a manual knock out records the defeat.',
+          'O dano de comandante é letal, mas o jogador permanece ativo até o nocaute automático ou manual.',
         );
         expect(
           LifeCounterTabletopEngine.playerStatusLabel(
             deckedOutSession,
             playerIndex: 0,
           ),
-          'Decked out',
+          'Sem grimório',
         );
       },
     );
@@ -883,10 +883,10 @@ void main() {
         playerIndex: 0,
       );
       expect(activeSummary.kind, LifeCounterPlayerStatusKind.active);
-      expect(activeSummary.label, 'Active player');
+      expect(activeSummary.label, 'Jogador ativo');
       expect(
         activeSummary.description,
-        'This player is still active in the game.',
+        'Este jogador continua ativo na partida.',
       );
       expect(activeSummary.isLethal, isFalse);
 
@@ -899,7 +899,7 @@ void main() {
       expect(poisonSummary.isLethal, isFalse);
       expect(
         poisonSummary.description,
-        'The poison lethal threshold was reached, but this player remains active until Auto-KO or a manual knock out records the defeat.',
+        'O limite letal de veneno foi atingido, mas o jogador permanece ativo até o nocaute automático ou manual.',
       );
 
       final leftTable = active.copyWith(
@@ -915,7 +915,7 @@ void main() {
         playerIndex: 0,
       );
       expect(leftTableSummary.kind, LifeCounterPlayerStatusKind.leftTable);
-      expect(leftTableSummary.label, 'Left the table');
+      expect(leftTableSummary.label, 'Saiu da mesa');
       expect(leftTableSummary.isLethal, isFalse);
     });
 
@@ -926,19 +926,19 @@ void main() {
           LifeCounterTabletopEngine.playerSpecialStateLabel(
             LifeCounterPlayerSpecialState.none,
           ),
-          'Active player',
+          'Jogador ativo',
         );
         expect(
           LifeCounterTabletopEngine.playerSpecialStateDescription(
             LifeCounterPlayerSpecialState.deckedOut,
           ),
-          'Track that the player lost by drawing from an empty library.',
+          'Registre que o jogador perdeu ao comprar de um grimório vazio.',
         );
         expect(
           LifeCounterTabletopEngine.playerSpecialStateLabel(
             LifeCounterPlayerSpecialState.answerLeft,
           ),
-          'Left the table',
+          'Saiu da mesa',
         );
       },
     );
@@ -986,7 +986,7 @@ void main() {
           session,
           playerIndex: 0,
         ),
-        'Life is zero or less, but this player remains active until Auto-KO or a manual knock out records the defeat.',
+        'A vida chegou a zero ou menos, mas o jogador permanece ativo até o nocaute automático ou manual.',
       );
       expect(
         LifeCounterTabletopEngine.isPlayerActiveOnTable(

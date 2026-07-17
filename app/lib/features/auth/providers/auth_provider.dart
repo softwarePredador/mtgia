@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../../core/api/api_client.dart';
 import '../../../core/observability/app_observability.dart';
+import '../../../core/security/auth_token_store.dart';
 import '../../../core/utils/friendly_error_mapper.dart';
 import '../models/user.dart';
 
@@ -11,6 +12,7 @@ enum AuthStatus { initial, authenticated, unauthenticated, loading }
 
 class AuthProvider extends ChangeNotifier {
   final ApiClient _apiClient;
+  final AuthTokenStore _tokenStore;
 
   User? _user;
   String? _token;
@@ -25,7 +27,9 @@ class AuthProvider extends ChangeNotifier {
   String? get errorMessage => _errorMessage;
   bool get isAuthenticated => _status == AuthStatus.authenticated;
 
-  AuthProvider({ApiClient? apiClient}) : _apiClient = apiClient ?? ApiClient();
+  AuthProvider({ApiClient? apiClient, AuthTokenStore? tokenStore})
+    : _apiClient = apiClient ?? ApiClient(),
+      _tokenStore = tokenStore ?? AuthTokenStore();
 
   /// Inicializa o provider verificando se há token salvo
   Future<void> initialize() async {
@@ -58,7 +62,7 @@ class AuthProvider extends ChangeNotifier {
 
     try {
       final prefs = await SharedPreferences.getInstance();
-      final savedToken = prefs.getString('auth_token');
+      final savedToken = await _tokenStore.read();
       final savedUserJson = prefs.getString('user_data');
       debugPrint(
         '[🔑 Auth] savedToken exists: ${savedToken != null}, savedUser exists: ${savedUserJson != null}',
@@ -75,13 +79,15 @@ class AuthProvider extends ChangeNotifier {
         _status =
             isValid ? AuthStatus.authenticated : AuthStatus.unauthenticated;
         if (!isValid) {
-          await prefs.remove('auth_token');
-          await prefs.remove('user_data');
+          await _clearStoredCredentials(prefs);
           _token = null;
           _user = null;
           ApiClient.setToken(null);
         }
       } else {
+        if (savedToken != null || savedUserJson != null) {
+          await _clearStoredCredentials(prefs);
+        }
         _status = AuthStatus.unauthenticated;
       }
     } catch (e, stackTrace) {
@@ -95,6 +101,11 @@ class AuthProvider extends ChangeNotifier {
           operation: 'initialize',
         ),
       );
+      final prefs = await SharedPreferences.getInstance();
+      await _clearStoredCredentials(prefs);
+      _token = null;
+      _user = null;
+      ApiClient.setToken(null);
       _status = AuthStatus.unauthenticated;
     }
 
@@ -126,7 +137,7 @@ class AuthProvider extends ChangeNotifier {
       if (response.statusCode == 200) {
         if (generation != _authGeneration) return false;
         final data = response.data as Map<String, dynamic>;
-        final nextToken = data['token'] as String?;
+        final nextToken = _readAuthToken(data['token']);
         final nextUser = User.fromJson(data['user'] as Map<String, dynamic>);
         debugPrint(
           '[🔑 Auth] token recebido: ${nextToken != null ? "sim" : "NÃO"}',
@@ -139,6 +150,7 @@ class AuthProvider extends ChangeNotifier {
           token: nextToken,
           user: nextUser,
         )) {
+          _markCredentialContractFailure(generation);
           return false;
         }
         _token = nextToken;
@@ -211,7 +223,7 @@ class AuthProvider extends ChangeNotifier {
       if (response.statusCode == 201) {
         if (generation != _authGeneration) return false;
         final data = response.data as Map<String, dynamic>;
-        final nextToken = data['token'] as String?;
+        final nextToken = _readAuthToken(data['token']);
         final nextUser = User.fromJson(data['user'] as Map<String, dynamic>);
         debugPrint(
           '[🔑 Auth] token recebido: ${nextToken != null ? "sim" : "NÃO"}',
@@ -222,6 +234,7 @@ class AuthProvider extends ChangeNotifier {
           token: nextToken,
           user: nextUser,
         )) {
+          _markCredentialContractFailure(generation);
           return false;
         }
         _token = nextToken;
@@ -270,13 +283,15 @@ class AuthProvider extends ChangeNotifier {
   Future<void> logout() async {
     _authGeneration++;
     final prefs = await SharedPreferences.getInstance();
-    await _clearStoredCredentials(prefs);
-
-    _token = null;
-    _user = null;
-    ApiClient.setToken(null);
-    _status = AuthStatus.unauthenticated;
-    notifyListeners();
+    try {
+      await _clearStoredCredentials(prefs);
+    } finally {
+      _token = null;
+      _user = null;
+      ApiClient.setToken(null);
+      _status = AuthStatus.unauthenticated;
+      notifyListeners();
+    }
   }
 
   /// Salva credenciais localmente
@@ -293,29 +308,42 @@ class AuthProvider extends ChangeNotifier {
       return false;
     }
 
-    final prefs = await SharedPreferences.getInstance();
-    if (generation != _authGeneration) return false;
-
-    await prefs.setString('auth_token', resolvedToken);
+    final userJson = jsonEncode(resolvedUser.toJson());
+    await _tokenStore.write(resolvedToken);
     if (generation != _authGeneration) {
-      if (prefs.getString('auth_token') == resolvedToken) {
-        await prefs.remove('auth_token');
-      }
+      await _tokenStore.deleteIfMatches(resolvedToken);
       return false;
     }
 
-    final userJson = jsonEncode(resolvedUser.toJson());
-    await prefs.setString('user_data', userJson);
-    if (generation != _authGeneration) {
-      await _clearStoredCredentialsIfMatch(prefs, resolvedToken, userJson);
-      return false;
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setString('user_data', userJson);
+      if (generation != _authGeneration) {
+        await _clearStoredCredentialsIfMatch(prefs, resolvedToken, userJson);
+        return false;
+      }
+    } catch (_) {
+      await _tokenStore.deleteIfMatches(resolvedToken);
+      rethrow;
     }
 
     return true;
   }
 
   Future<void> _clearStoredCredentials(SharedPreferences prefs) async {
-    await prefs.remove('auth_token');
+    try {
+      await _tokenStore.delete();
+    } catch (error, stackTrace) {
+      debugPrint('[AuthProvider] falha ao limpar o cofre seguro: $error');
+      unawaited(
+        AppObservability.instance.captureProviderException(
+          error,
+          stackTrace: stackTrace,
+          provider: 'AuthProvider',
+          operation: 'clearSecureCredentials',
+        ),
+      );
+    }
     await prefs.remove('user_data');
   }
 
@@ -324,9 +352,7 @@ class AuthProvider extends ChangeNotifier {
     String token,
     String userJson,
   ) async {
-    if (prefs.getString('auth_token') == token) {
-      await prefs.remove('auth_token');
-    }
+    await _tokenStore.deleteIfMatches(token);
     if (prefs.getString('user_data') == userJson) {
       await prefs.remove('user_data');
     }
@@ -334,6 +360,19 @@ class AuthProvider extends ChangeNotifier {
 
   void clearError() {
     _errorMessage = null;
+    notifyListeners();
+  }
+
+  String? _readAuthToken(dynamic value) {
+    if (value is! String) return null;
+    final normalized = value.trim();
+    return normalized.isEmpty ? null : normalized;
+  }
+
+  void _markCredentialContractFailure(int generation) {
+    if (generation != _authGeneration) return;
+    _errorMessage = 'Resposta inválida do servidor';
+    _status = AuthStatus.unauthenticated;
     notifyListeners();
   }
 

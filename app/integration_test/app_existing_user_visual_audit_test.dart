@@ -104,33 +104,38 @@ void main() {
         tester,
         find.byKey(const Key('profile-open-plans-button')),
       );
-      await pumpUntilFound(tester, find.text('Planos'), attempts: 80);
+      await pumpUntilFound(tester, find.text('Beta gratuita'), attempts: 80);
+      expect(find.byKey(const Key('beta-free-access-panel')), findsOneWidget);
       await tester.pump(const Duration(seconds: 1));
       await _assertClean(tester, 'plans');
       await captureRuntimeCheckpoint(binding, tester, 'auth_audit_07_plans');
 
-      await _tapIfPresent(
-        tester,
-        find.byKey(const Key('plan-pro-upgrade-button')),
-      );
       await _goRoute(tester, '/upgrade');
-      await pumpUntilFound(tester, find.text('Upgrade Pro'), attempts: 80);
+      await pumpUntilFound(
+        tester,
+        find.byKey(const Key('upgrade-beta-notice')),
+        attempts: 80,
+      );
       await tester.pump(const Duration(seconds: 1));
       await _assertClean(tester, 'upgrade');
       await captureRuntimeCheckpoint(binding, tester, 'auth_audit_08_upgrade');
 
-      await _tapIfPresent(
-        tester,
-        find.byKey(const Key('upgrade-start-checkout-button')),
-      );
       await _goRoute(tester, '/checkout');
-      await pumpUntilFound(tester, find.text('Checkout'), attempts: 80);
+      await pumpUntilFound(
+        tester,
+        find.byKey(const Key('checkout-beta-notice')),
+        attempts: 80,
+      );
       await tester.pump(const Duration(seconds: 1));
       await _assertClean(tester, 'checkout');
       await captureRuntimeCheckpoint(binding, tester, 'auth_audit_09_checkout');
 
       await _goRoute(tester, '/upgrade');
-      await pumpUntilFound(tester, find.text('Upgrade Pro'), attempts: 80);
+      await pumpUntilFound(
+        tester,
+        find.byKey(const Key('upgrade-beta-notice')),
+        attempts: 80,
+      );
 
       await _tapIfPresent(
         tester,

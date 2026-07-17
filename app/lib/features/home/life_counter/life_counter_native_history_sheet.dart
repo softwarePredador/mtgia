@@ -13,7 +13,7 @@ Future<void> showLifeCounterNativeHistorySheet(
   return showModalBottomSheet<void>(
     context: context,
     isScrollControlled: true,
-    backgroundColor: Colors.transparent,
+    backgroundColor: AppTheme.transparent,
     builder: (context) {
       return _LifeCounterNativeHistorySheet(
         history: history,
@@ -100,7 +100,7 @@ class _LifeCounterNativeHistorySheetState
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             const Text(
-                              'Life Counter History',
+                              'Histórico do contador de vida',
                               style: TextStyle(
                                 color: AppTheme.textPrimary,
                                 fontSize: AppTheme.fontXxl,
@@ -110,12 +110,12 @@ class _LifeCounterNativeHistorySheetState
                             const SizedBox(height: 6),
                             Text(
                               history.currentGameName == null
-                                  ? 'Review recent events and completed games.'
-                                  : 'Current game: ${history.currentGameName}',
+                                  ? 'Revise eventos recentes e partidas concluídas.'
+                                  : 'Partida atual: ${history.currentGameName}',
                               style: const TextStyle(
                                 color: AppTheme.textSecondary,
                                 fontSize: AppTheme.fontMd,
-                                height: 1.35,
+                                height: AppTheme.lineHeightCompact,
                               ),
                             ),
                           ],
@@ -133,15 +133,13 @@ class _LifeCounterNativeHistorySheetState
                               ?..hideCurrentSnackBar()
                               ..showSnackBar(
                                 const SnackBar(
-                                  content: Text(
-                                    'History copied to the clipboard.',
-                                  ),
+                                  content: Text('Histórico copiado.'),
                                   behavior: SnackBarBehavior.floating,
                                 ),
                               );
                           },
                           icon: const Icon(Icons.ios_share_rounded, size: 18),
-                          label: const Text('Export'),
+                          label: const Text('Exportar'),
                         ),
                       if (onImportSubmitted != null)
                         TextButton.icon(
@@ -168,21 +166,21 @@ class _LifeCounterNativeHistorySheetState
                                 SnackBar(
                                   content: Text(
                                     imported
-                                        ? 'History imported.'
-                                        : 'Could not import that history.',
+                                        ? 'Histórico importado.'
+                                        : 'Não foi possível importar o histórico.',
                                   ),
                                   behavior: SnackBarBehavior.floating,
                                 ),
                               );
                           },
                           icon: const Icon(Icons.download_rounded, size: 18),
-                          label: const Text('Import'),
+                          label: const Text('Importar'),
                         ),
                       IconButton(
                         onPressed: () => Navigator.of(context).pop(),
                         icon: const Icon(Icons.close_rounded),
                         color: AppTheme.textSecondary,
-                        tooltip: 'Close',
+                        tooltip: 'Fechar',
                       ),
                     ],
                   ),
@@ -197,25 +195,25 @@ class _LifeCounterNativeHistorySheetState
                         runSpacing: 10,
                         children: [
                           _SummaryPill(
-                            label: 'Current events',
+                            label: 'Eventos atuais',
                             value: history.currentGameEventCount.toString(),
                           ),
                           _SummaryPill(
-                            label: 'Archived games',
+                            label: 'Partidas arquivadas',
                             value: history.archivedGameCount.toString(),
                           ),
                           _SummaryPill(
-                            label: 'Archived events',
+                            label: 'Eventos arquivados',
                             value: history.archivedEventCount.toString(),
                           ),
                         ],
                       ),
                       const SizedBox(height: 18),
                       _SectionCard(
-                        title: 'Last Table Event',
+                        title: 'Último evento da mesa',
                         child: Text(
                           history.lastTableEvent ??
-                              'No table event captured yet.',
+                              'Nenhum evento da mesa registrado.',
                           key: const Key(
                             'life-counter-native-history-last-event',
                           ),
@@ -225,19 +223,19 @@ class _LifeCounterNativeHistorySheetState
                                     ? AppTheme.textSecondary
                                     : AppTheme.textPrimary,
                             fontSize: AppTheme.fontMd,
-                            height: 1.35,
+                            height: AppTheme.lineHeightCompact,
                             fontWeight: FontWeight.w600,
                           ),
                         ),
                       ),
                       const SizedBox(height: 16),
                       _SectionCard(
-                        title: 'Current Game',
+                        title: 'Partida atual',
                         child:
                             history.currentGameEntries.isEmpty
                                 ? const _EmptyHistoryState(
                                   message:
-                                      'No current-game history was captured yet.',
+                                      'Nenhum evento da partida atual foi registrado.',
                                 )
                                 : Column(
                                   children: [
@@ -249,11 +247,11 @@ class _LifeCounterNativeHistorySheetState
                       ),
                       const SizedBox(height: 16),
                       _SectionCard(
-                        title: 'Archive',
+                        title: 'Arquivo',
                         child:
                             history.archiveEntries.isEmpty
                                 ? const _EmptyHistoryState(
-                                  message: 'No archived games yet.',
+                                  message: 'Nenhuma partida arquivada.',
                                 )
                                 : Column(
                                   children: [
@@ -358,7 +356,7 @@ class _HistoryImportDialogState extends State<_HistoryImportDialog> {
       child: AlertDialog(
         backgroundColor: AppTheme.surfaceElevated,
         title: const Text(
-          'Import History',
+          'Importar histórico',
           style: TextStyle(
             color: AppTheme.textPrimary,
             fontWeight: FontWeight.w700,
@@ -372,13 +370,13 @@ class _HistoryImportDialogState extends State<_HistoryImportDialog> {
           minLines: 6,
           style: const TextStyle(color: AppTheme.textPrimary),
           decoration: const InputDecoration(
-            hintText: 'Paste exported history here',
+            hintText: 'Cole aqui o histórico exportado',
           ),
         ),
         actions: [
           TextButton(
             onPressed: _isSubmitting ? null : () => Navigator.of(context).pop(),
-            child: const Text('Cancel'),
+            child: const Text('Cancelar'),
           ),
           FilledButton(
             key: const Key('life-counter-native-history-import-confirm'),
@@ -390,7 +388,7 @@ class _HistoryImportDialogState extends State<_HistoryImportDialog> {
                       dimension: 18,
                       child: CircularProgressIndicator(strokeWidth: 2),
                     )
-                    : const Text('Import'),
+                    : const Text('Importar'),
           ),
         ],
       ),
@@ -405,26 +403,26 @@ Future<bool?> _confirmHistoryReplacement(BuildContext context) {
       return AlertDialog(
         backgroundColor: AppTheme.surfaceElevated,
         title: const Text(
-          'Replace existing history?',
+          'Substituir o histórico existente?',
           style: TextStyle(
             color: AppTheme.textPrimary,
             fontWeight: FontWeight.w700,
           ),
         ),
         content: const Text(
-          'Importing this history will replace the current game history and every archived game.',
+          'A importação substituirá o histórico da partida atual e todas as partidas arquivadas.',
           style: TextStyle(color: AppTheme.textSecondary),
         ),
         actions: [
           TextButton(
             key: const Key('life-counter-native-history-replace-cancel'),
             onPressed: () => Navigator.of(confirmationContext).pop(false),
-            child: const Text('Keep existing'),
+            child: const Text('Manter histórico atual'),
           ),
           FilledButton(
             key: const Key('life-counter-native-history-replace-confirm'),
             onPressed: () => Navigator.of(confirmationContext).pop(true),
-            child: const Text('Replace history'),
+            child: const Text('Substituir histórico'),
           ),
         ],
       );
@@ -549,7 +547,7 @@ class _HistoryEntryTile extends StatelessWidget {
                     color: AppTheme.textPrimary,
                     fontSize: AppTheme.fontMd,
                     fontWeight: FontWeight.w600,
-                    height: 1.3,
+                    height: AppTheme.lineHeightDense,
                   ),
                 ),
                 if (entry.occurredAt != null) ...[
@@ -594,7 +592,7 @@ class _EmptyHistoryState extends StatelessWidget {
         color: AppTheme.textSecondary,
         fontSize: AppTheme.fontMd,
         fontWeight: FontWeight.w600,
-        height: 1.35,
+        height: AppTheme.lineHeightCompact,
       ),
     );
   }

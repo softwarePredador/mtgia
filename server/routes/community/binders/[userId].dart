@@ -21,9 +21,7 @@ Future<Response> onRequest(RequestContext context, String userId) async {
     final forSale = params['for_sale'];
     final listType = params['list_type']; // 'have', 'want', or null (all)
 
-    final whereClauses = <String>[
-      'bi.user_id = @userId',
-    ];
+    final whereClauses = <String>['bi.user_id = @userId'];
     final sqlParams = <String, dynamic>{'userId': userId};
 
     // Se list_type == 'want', não precisa exigir for_trade/for_sale
@@ -36,7 +34,8 @@ Future<Response> onRequest(RequestContext context, String userId) async {
     } else {
       // Sem filtro de list_type: mostrar disponíveis (have com flag) ou wants
       whereClauses.add(
-          "(bi.list_type = 'want' OR bi.for_trade = TRUE OR bi.for_sale = TRUE)");
+        "(bi.list_type = 'want' OR bi.for_trade = TRUE OR bi.for_sale = TRUE)",
+      );
     }
 
     if (forTrade == 'true') {
@@ -49,9 +48,15 @@ Future<Response> onRequest(RequestContext context, String userId) async {
     final where = whereClauses.join(' AND ');
 
     // Dados do dono
-    final userResult = await pool.execute(Sql.named('''
-      SELECT id, username, display_name, avatar_url, location_state, location_city, trade_notes FROM users WHERE id = @userId
-    '''), parameters: {'userId': userId});
+    final userResult = await pool.execute(
+      Sql.named('''
+      SELECT id, username, display_name, avatar_url, location_state, location_city, trade_notes
+      FROM users
+      WHERE id = @userId
+        AND deleted_at IS NULL
+    '''),
+      parameters: {'userId': userId},
+    );
 
     if (userResult.isEmpty) {
       return Response.json(
@@ -63,15 +68,19 @@ Future<Response> onRequest(RequestContext context, String userId) async {
     final userRow = userResult.first.toColumnMap();
 
     // Count
-    final countResult = await pool.execute(Sql.named('''
+    final countResult = await pool.execute(
+      Sql.named('''
       SELECT COUNT(*) as cnt FROM user_binder_items bi
       JOIN cards c ON c.id = bi.card_id
       WHERE $where
-    '''), parameters: sqlParams);
+    '''),
+      parameters: sqlParams,
+    );
     final total = countResult.first[0] as int? ?? 0;
 
     // Items
-    final result = await pool.execute(Sql.named('''
+    final result = await pool.execute(
+      Sql.named('''
       SELECT bi.id, bi.card_id, bi.quantity, bi.condition, bi.is_foil,
              bi.for_trade, bi.for_sale, bi.price, bi.currency, bi.notes,
              bi.list_type,
@@ -84,50 +93,56 @@ Future<Response> onRequest(RequestContext context, String userId) async {
       WHERE $where
       ORDER BY c.name ASC
       LIMIT @limit OFFSET @offset
-    '''), parameters: {...sqlParams, 'limit': limit, 'offset': offset});
+    '''),
+      parameters: {...sqlParams, 'limit': limit, 'offset': offset},
+    );
 
-    final items = result.map((row) {
-      final cols = row.toColumnMap();
-      return {
-        'id': cols['id'],
-        'card': {
-          'id': cols['card_id'],
-          'name': cols['card_name'],
-          'image_url': cols['card_image_url'],
-          'set_code': cols['card_set_code'],
-          'mana_cost': cols['card_mana_cost'],
-          'rarity': cols['card_rarity'],
-          'is_reserved': cols['card_is_reserved'] == true,
+    final items =
+        result.map((row) {
+          final cols = row.toColumnMap();
+          return {
+            'id': cols['id'],
+            'card': {
+              'id': cols['card_id'],
+              'name': cols['card_name'],
+              'image_url': cols['card_image_url'],
+              'set_code': cols['card_set_code'],
+              'mana_cost': cols['card_mana_cost'],
+              'rarity': cols['card_rarity'],
+              'is_reserved': cols['card_is_reserved'] == true,
+            },
+            'quantity': cols['quantity'],
+            'condition': cols['condition'],
+            'is_foil': cols['is_foil'],
+            'for_trade': cols['for_trade'],
+            'for_sale': cols['for_sale'],
+            'price':
+                cols['price'] != null
+                    ? double.tryParse(cols['price'].toString())
+                    : null,
+            'currency': cols['currency'],
+            'notes': cols['notes'],
+            'list_type': cols['list_type'] ?? 'have',
+          };
+        }).toList();
+
+    return Response.json(
+      body: {
+        'owner': {
+          'id': userRow['id'],
+          'username': userRow['username'],
+          'display_name': userRow['display_name'],
+          'avatar_url': userRow['avatar_url'],
+          'location_state': userRow['location_state'],
+          'location_city': userRow['location_city'],
+          'trade_notes': userRow['trade_notes'],
         },
-        'quantity': cols['quantity'],
-        'condition': cols['condition'],
-        'is_foil': cols['is_foil'],
-        'for_trade': cols['for_trade'],
-        'for_sale': cols['for_sale'],
-        'price': cols['price'] != null
-            ? double.tryParse(cols['price'].toString())
-            : null,
-        'currency': cols['currency'],
-        'notes': cols['notes'],
-        'list_type': cols['list_type'] ?? 'have',
-      };
-    }).toList();
-
-    return Response.json(body: {
-      'owner': {
-        'id': userRow['id'],
-        'username': userRow['username'],
-        'display_name': userRow['display_name'],
-        'avatar_url': userRow['avatar_url'],
-        'location_state': userRow['location_state'],
-        'location_city': userRow['location_city'],
-        'trade_notes': userRow['trade_notes'],
+        'data': items,
+        'page': page,
+        'limit': limit,
+        'total': total,
       },
-      'data': items,
-      'page': page,
-      'limit': limit,
-      'total': total,
-    });
+    );
   } catch (e) {
     print('[ERROR] Erro ao buscar binder público: $e');
     return Response.json(

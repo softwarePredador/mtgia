@@ -143,6 +143,46 @@ void main() {
       settingsStore = LifeCounterSettingsStore();
     });
 
+    test(
+      'keeps deck and play-session context while mirroring Lotus state',
+      () async {
+        final previous = LifeCounterSession.initial(
+          playerCount: 4,
+          playSessionId: 'play-607',
+          deckId: 'deck-607',
+          deckName: 'Lorehold',
+          startedAtEpochMs: 1234,
+        );
+        await sessionStore.save(previous);
+        final incoming = previous.copyWith(
+          lives: const <int>[38, 40, 40, 40],
+          clearPlaySessionId: true,
+          clearDeckId: true,
+          clearDeckName: true,
+          clearStartedAtEpochMs: true,
+        );
+
+        final result = await persistCanonicalMirrorFromLotusSnapshot(
+          dayNightStateStore: dayNightStateStore,
+          gameTimerStateStore: gameTimerStateStore,
+          historyStore: historyStore,
+          sessionStore: sessionStore,
+          settingsStore: settingsStore,
+          snapshot: LotusStorageSnapshot(
+            values: LotusLifeCounterSessionAdapter.buildSnapshotValues(
+              incoming,
+            ),
+          ),
+        );
+
+        expect(result.session?.lives.first, 38);
+        expect(result.session?.playSessionId, 'play-607');
+        expect(result.session?.deckId, 'deck-607');
+        expect(result.session?.deckName, 'Lorehold');
+        expect(result.session?.startedAtEpochMs, 1234);
+      },
+    );
+
     test('mirrors canonical day night state from Lotus snapshot', () async {
       final result = await persistCanonicalMirrorFromLotusSnapshot(
         dayNightStateStore: dayNightStateStore,

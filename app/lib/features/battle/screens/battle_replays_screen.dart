@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/widgets/cached_card_image.dart';
 import '../../../core/widgets/app_state_panel.dart';
+import '../../../core/widgets/mana_symbols.dart';
 import '../models/battle_replay.dart';
 import '../services/battle_replay_service.dart';
 
@@ -199,15 +200,25 @@ class _BattleReplaysScreenState extends State<BattleReplaysScreen> {
           ),
         ],
       ),
-      body: Column(
-        children: [
-          _BattleReplayActions(
-            isRunning: _isRunning,
-            onRunGoldfish: _runGoldfish,
-            onRunBattle: _runBattle,
+      body: Center(
+        child: ConstrainedBox(
+          key: const Key('battle-replays-workspace'),
+          constraints: const BoxConstraints(maxWidth: AppTheme.contentMaxWidth),
+          child: SizedBox(
+            width: double.infinity,
+            height: double.infinity,
+            child: Column(
+              children: [
+                _BattleReplayActions(
+                  isRunning: _isRunning,
+                  onRunGoldfish: _runGoldfish,
+                  onRunBattle: _runBattle,
+                ),
+                Expanded(child: _buildBody()),
+              ],
+            ),
           ),
-          Expanded(child: _buildBody()),
-        ],
+        ),
       ),
     );
   }
@@ -235,39 +246,94 @@ class _BattleReplaysScreenState extends State<BattleReplaysScreen> {
       );
     }
 
-    final selectedReplay = _selectedReplay;
-    if (selectedReplay != null) {
-      return _BattleReplayDetailPane(
-        detail: selectedReplay,
-        view: _detailView,
-        onViewChanged: (view) => setState(() => _detailView = view),
-        onBack: () => setState(() => _selectedReplay = null),
-      );
-    }
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final isDesktop = constraints.maxWidth >= AppTheme.breakpointExpanded;
+        final selectedReplay = _selectedReplay;
 
-    if (_replays.isEmpty) {
-      return AppStatePanel(
-        key: const Key('battle-replays-empty-state'),
-        icon: Icons.history_toggle_off_rounded,
-        title: 'Nenhum replay salvo',
-        message:
-            'Rode uma simulacao para criar historico. Cada replay informa o motor e o contrato de execucao usados.',
-        accent: AppTheme.brass400,
-        actionLabel: 'Rodar goldfish',
-        onAction: _runGoldfish,
-      );
-    }
+        if (isDesktop && (_replays.isNotEmpty || selectedReplay != null)) {
+          return _buildMasterDetail(selectedReplay);
+        }
 
+        if (selectedReplay != null) {
+          return _buildDetailPane(selectedReplay);
+        }
+
+        if (_replays.isEmpty) return _buildEmptyState();
+        return _buildReplayList();
+      },
+    );
+  }
+
+  Widget _buildMasterDetail(BattleReplayDetail? selectedReplay) {
+    return Row(
+      key: const Key('battle-replays-master-detail'),
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        SizedBox(
+          key: const Key('battle-replays-history-pane'),
+          width: 344,
+          child:
+              _replays.isEmpty
+                  ? _buildEmptyState()
+                  : _buildReplayList(
+                    padding: const EdgeInsets.fromLTRB(12, 12, 12, 24),
+                  ),
+        ),
+        VerticalDivider(
+          width: 1,
+          thickness: 1,
+          color: AppTheme.outlineMuted.withValues(alpha: 0.52),
+        ),
+        const SizedBox(width: AppTheme.paneGap),
+        Expanded(
+          child:
+              selectedReplay == null
+                  ? const _ReplaySelectionEmpty()
+                  : _buildDetailPane(selectedReplay, showBack: false),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildDetailPane(BattleReplayDetail detail, {bool showBack = true}) {
+    return _BattleReplayDetailPane(
+      detail: detail,
+      view: _detailView,
+      onViewChanged: (view) => setState(() => _detailView = view),
+      onBack: () => setState(() => _selectedReplay = null),
+      showBack: showBack,
+    );
+  }
+
+  Widget _buildEmptyState() {
+    return AppStatePanel(
+      key: const Key('battle-replays-empty-state'),
+      icon: Icons.history_toggle_off_rounded,
+      title: 'Nenhum replay salvo',
+      message:
+          'Rode uma simulacao para criar historico. Cada replay informa o motor e o contrato de execucao usados.',
+      accent: AppTheme.brass400,
+      actionLabel: 'Rodar goldfish',
+      onAction: _runGoldfish,
+    );
+  }
+
+  Widget _buildReplayList({
+    EdgeInsetsGeometry padding = const EdgeInsets.fromLTRB(16, 12, 16, 24),
+  }) {
     return RefreshIndicator(
       onRefresh: _loadReplays,
       child: ListView.separated(
-        padding: const EdgeInsets.fromLTRB(16, 12, 16, 24),
+        key: const Key('battle-replays-history-list'),
+        padding: padding,
         itemCount: _replays.length,
         separatorBuilder: (_, __) => const SizedBox(height: 10),
         itemBuilder: (context, index) {
           final replay = _replays[index];
           return _BattleReplaySummaryTile(
             replay: replay,
+            selected: replay.id == _selectedReplay?.summary.id,
             onTap: () => _openReplay(replay),
           );
         },
@@ -357,16 +423,24 @@ class _BattleReplayActions extends StatelessWidget {
 }
 
 class _BattleReplaySummaryTile extends StatelessWidget {
-  const _BattleReplaySummaryTile({required this.replay, required this.onTap});
+  const _BattleReplaySummaryTile({
+    required this.replay,
+    required this.onTap,
+    this.selected = false,
+  });
 
   final BattleReplaySummary replay;
   final VoidCallback onTap;
+  final bool selected;
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     return Material(
-      color: AppTheme.surfaceElevated,
+      color:
+          selected
+              ? AppTheme.frost400.withValues(alpha: 0.08)
+              : AppTheme.surfaceElevated,
       borderRadius: BorderRadius.circular(AppTheme.radiusMd),
       child: InkWell(
         key: Key('battle-replay-summary-${replay.id}'),
@@ -377,7 +451,10 @@ class _BattleReplaySummaryTile extends StatelessWidget {
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(AppTheme.radiusMd),
             border: Border.all(
-              color: AppTheme.outlineMuted.withValues(alpha: 0.62),
+              color:
+                  selected
+                      ? AppTheme.frost400.withValues(alpha: 0.48)
+                      : AppTheme.outlineMuted.withValues(alpha: 0.62),
             ),
           ),
           child: Column(
@@ -451,18 +528,66 @@ class _BattleReplaySummaryTile extends StatelessWidget {
   }
 }
 
+class _ReplaySelectionEmpty extends StatelessWidget {
+  const _ReplaySelectionEmpty();
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return Center(
+      key: const Key('battle-replays-selection-empty'),
+      child: ConstrainedBox(
+        constraints: const BoxConstraints(maxWidth: 420),
+        child: Padding(
+          padding: const EdgeInsets.all(32),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Icon(
+                Icons.sports_esports_outlined,
+                size: 36,
+                color: AppTheme.frost400,
+              ),
+              const SizedBox(height: 14),
+              Text(
+                'Selecione um replay',
+                textAlign: TextAlign.center,
+                style: theme.textTheme.titleMedium?.copyWith(
+                  color: AppTheme.textPrimary,
+                  fontWeight: FontWeight.w800,
+                ),
+              ),
+              const SizedBox(height: 6),
+              Text(
+                'O historico permanece visivel enquanto voce percorre a partida.',
+                textAlign: TextAlign.center,
+                style: theme.textTheme.bodySmall?.copyWith(
+                  color: AppTheme.textSecondary,
+                  height: 1.35,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
 class _BattleReplayDetailPane extends StatelessWidget {
   const _BattleReplayDetailPane({
     required this.detail,
     required this.view,
     required this.onViewChanged,
     required this.onBack,
+    this.showBack = true,
   });
 
   final BattleReplayDetail detail;
   final _ReplayDetailView view;
   final ValueChanged<_ReplayDetailView> onViewChanged;
   final VoidCallback onBack;
+  final bool showBack;
 
   @override
   Widget build(BuildContext context) {
@@ -472,14 +597,15 @@ class _BattleReplayDetailPane extends StatelessWidget {
       key: const Key('battle-replay-detail-pane'),
       padding: const EdgeInsets.fromLTRB(16, 12, 16, 24),
       children: [
-        Align(
-          alignment: Alignment.centerLeft,
-          child: TextButton.icon(
-            onPressed: onBack,
-            icon: const Icon(Icons.arrow_back_rounded),
-            label: const Text('Replays'),
+        if (showBack)
+          Align(
+            alignment: Alignment.centerLeft,
+            child: TextButton.icon(
+              onPressed: onBack,
+              icon: const Icon(Icons.arrow_back_rounded),
+              label: const Text('Replays'),
+            ),
           ),
-        ),
         Container(
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
@@ -730,14 +856,64 @@ class _ReplayVisualViewerState extends State<_ReplayVisualViewer> {
                       'Jogada ${value.round() + 1} de ${snapshots.length}',
               onChanged: (value) => setState(() => _index = value.round()),
             ),
-          ...snapshot.players.map(
-            (player) => _VisualPlayerBoard(
-              player: player,
-              isActive: player.name == snapshot.activePlayer,
-            ),
+          _VisualPlayerBoards(
+            players: snapshot.players,
+            activePlayer: snapshot.activePlayer,
           ),
         ],
       ),
+    );
+  }
+}
+
+class _VisualPlayerBoards extends StatelessWidget {
+  const _VisualPlayerBoards({
+    required this.players,
+    required this.activePlayer,
+  });
+
+  final List<BattleReplayPlayerSnapshot> players;
+  final String? activePlayer;
+
+  @override
+  Widget build(BuildContext context) {
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final sideBySide = constraints.maxWidth >= 760 && players.length == 2;
+        if (!sideBySide) {
+          return Column(
+            children: [
+              for (final player in players)
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(10, 0, 10, 10),
+                  child: _VisualPlayerBoard(
+                    player: player,
+                    isActive: player.name == activePlayer,
+                  ),
+                ),
+            ],
+          );
+        }
+
+        return Padding(
+          key: const Key('battle-visual-player-grid'),
+          padding: const EdgeInsets.fromLTRB(10, 0, 10, 10),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              for (var index = 0; index < players.length; index++) ...[
+                if (index > 0) const SizedBox(width: 10),
+                Expanded(
+                  child: _VisualPlayerBoard(
+                    player: players[index],
+                    isActive: players[index].name == activePlayer,
+                  ),
+                ),
+              ],
+            ],
+          ),
+        );
+      },
     );
   }
 }
@@ -752,7 +928,7 @@ class _VisualPlayerBoard extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     return Container(
-      margin: const EdgeInsets.fromLTRB(10, 0, 10, 10),
+      key: Key('battle-visual-player-${player.name}'),
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
         color:
@@ -965,7 +1141,7 @@ class _BattleVisualCardCarouselState extends State<_BattleVisualCardCarousel> {
                 ? constraints.maxWidth
                 : MediaQuery.sizeOf(context).width;
         final viewportFraction =
-            (cardExtent / width).clamp(0.16, 0.44).toDouble();
+            (cardExtent / width).clamp(0.08, 0.44).toDouble();
         final controller = _ensureController(viewportFraction);
 
         return SizedBox(
@@ -1064,6 +1240,7 @@ class _VisualCardTile extends StatelessWidget {
                 Stack(
                   children: [
                     CachedCardImage(
+                      key: Key('battle-visual-card-image-${card.name}'),
                       imageUrl: imageUrl,
                       width: width,
                       height: height,
@@ -1148,7 +1325,7 @@ void _showReplayCardPreview(BuildContext context, BattleReplayVisualCard card) {
     context: context,
     builder: (context) {
       final theme = Theme.of(context);
-      final imageUrl = _battleCardImageUrl(card);
+      final imageUrl = _battleCardImageUrl(card, version: 'normal');
       return Dialog(
         insetPadding: const EdgeInsets.all(20),
         backgroundColor: AppTheme.surfaceElevated,
@@ -1206,7 +1383,22 @@ void _showReplayCardPreview(BuildContext context, BattleReplayVisualCard card) {
                   children: [
                     if (card.manaCost != null &&
                         card.manaCost!.trim().isNotEmpty)
-                      _ReplayMetaChip(label: card.manaCost!),
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 8,
+                          vertical: 5,
+                        ),
+                        decoration: BoxDecoration(
+                          color: AppTheme.surfaceSlate,
+                          borderRadius: BorderRadius.circular(
+                            AppTheme.radiusPill,
+                          ),
+                          border: Border.all(
+                            color: AppTheme.outlineMuted.withValues(alpha: 0.6),
+                          ),
+                        ),
+                        child: ManaCostRow(cost: card.manaCost, symbolSize: 17),
+                      ),
                     if (card.powerToughnessLabel != null)
                       _ReplayMetaChip(label: card.powerToughnessLabel!),
                     if (card.isTapped) const _ReplayMetaChip(label: 'Virada'),
@@ -1417,11 +1609,20 @@ class _ReplayTextBlock extends StatelessWidget {
   }
 }
 
-String _battleCardImageUrl(BattleReplayVisualCard card) {
+String _battleCardImageUrl(
+  BattleReplayVisualCard card, {
+  String version = 'small',
+}) {
   final provided = card.imageUrl?.trim();
-  if (provided != null && provided.isNotEmpty) return provided;
+  if (provided != null && provided.isNotEmpty) {
+    if (version == 'small') return provided.replaceFirst('/normal/', '/small/');
+    if (version == 'normal') {
+      return provided.replaceFirst('/small/', '/normal/');
+    }
+    return provided;
+  }
   final encoded = Uri.encodeComponent(card.name.trim());
-  return 'https://api.scryfall.com/cards/named?exact=$encoded&format=image&version=normal';
+  return 'https://api.scryfall.com/cards/named?exact=$encoded&format=image&version=$version';
 }
 
 String _safeReplayKey(String value) {

@@ -42,6 +42,7 @@ Future<Response> _getUserProfile(RequestContext context, String userId) async {
           FROM decks d
           WHERE d.user_id = @userId
             AND d.is_public = true
+            AND d.deleted_at IS NULL
           GROUP BY d.user_id
         )
         SELECT
@@ -58,6 +59,7 @@ Future<Response> _getUserProfile(RequestContext context, String userId) async {
         LEFT JOIN following_counts flc ON flc.user_id = u.id
         LEFT JOIN public_deck_counts pdc ON pdc.user_id = u.id
         WHERE u.id = @userId
+          AND u.deleted_at IS NULL
       '''),
       parameters: {'userId': userId},
     );
@@ -82,9 +84,9 @@ Future<Response> _getUserProfile(RequestContext context, String userId) async {
     if (authHeader != null && authHeader.startsWith('Bearer ')) {
       final token = authHeader.substring(7);
       final authService = AuthService();
-      final payload = authService.verifyToken(token);
-      if (payload != null) {
-        final viewerId = payload['userId'] as String;
+      final viewer = await authService.getUserFromToken(token);
+      if (viewer != null) {
+        final viewerId = viewer['id'] as String;
         final followResult = await conn.execute(
           Sql.named('''
             SELECT 1 FROM user_follows
@@ -133,7 +135,9 @@ Future<Response> _getUserProfile(RequestContext context, String userId) async {
           LIMIT 1
         ) first_card ON true
         LEFT JOIN deck_cards dc ON d.id = dc.deck_id
-        WHERE d.user_id = @userId AND d.is_public = true
+        WHERE d.user_id = @userId
+          AND d.is_public = true
+          AND d.deleted_at IS NULL
         GROUP BY d.id, cmd.commander_name, cmd.commander_image_url, first_card.first_image_url
         ORDER BY d.created_at DESC
         LIMIT 50
@@ -141,18 +145,16 @@ Future<Response> _getUserProfile(RequestContext context, String userId) async {
       parameters: {'userId': userId},
     );
 
-    final decks = decksResult.map((row) {
-      final m = row.toColumnMap();
-      if (m['created_at'] is DateTime) {
-        m['created_at'] = (m['created_at'] as DateTime).toIso8601String();
-      }
-      return m;
-    }).toList();
+    final decks =
+        decksResult.map((row) {
+          final m = row.toColumnMap();
+          if (m['created_at'] is DateTime) {
+            m['created_at'] = (m['created_at'] as DateTime).toIso8601String();
+          }
+          return m;
+        }).toList();
 
-    return Response.json(body: {
-      'user': user,
-      'public_decks': decks,
-    });
+    return Response.json(body: {'user': user, 'public_decks': decks});
   } catch (e, st) {
     await captureRouteException(
       context,

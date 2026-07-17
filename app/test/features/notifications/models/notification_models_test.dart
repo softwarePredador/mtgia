@@ -71,6 +71,55 @@ class _FailingNotificationApiClient extends ApiClient {
   }
 }
 
+class _FailingReadAllApiClient extends _FakeNotificationApiClient {
+  @override
+  Future<ApiResponse> put(String endpoint, Map<String, dynamic> body) async {
+    if (endpoint == '/notifications/read-all') {
+      return ApiResponse(503, {'error': 'unavailable'});
+    }
+    return super.put(endpoint, body);
+  }
+}
+
+class _ReadAllRaceApiClient extends ApiClient {
+  final staleCountResponse = Completer<ApiResponse>();
+  final readAllResponse = Completer<ApiResponse>();
+  int countRequests = 0;
+  int readAllRequests = 0;
+
+  @override
+  Future<ApiResponse> get(String endpoint) async {
+    if (endpoint == '/notifications/count') {
+      countRequests++;
+      return staleCountResponse.future;
+    }
+    if (endpoint.startsWith('/notifications?')) {
+      return ApiResponse(200, {
+        'data': [
+          {
+            'id': 'notif-race',
+            'type': 'direct_message',
+            'title': 'Mensagem pendente',
+            'read_at': null,
+            'created_at': '2026-07-16T10:00:00Z',
+          },
+        ],
+        'total': 1,
+      });
+    }
+    return ApiResponse(404, {'error': 'unexpected $endpoint'});
+  }
+
+  @override
+  Future<ApiResponse> put(String endpoint, Map<String, dynamic> body) async {
+    if (endpoint == '/notifications/read-all') {
+      readAllRequests++;
+      return readAllResponse.future;
+    }
+    return ApiResponse(404, {'error': 'unexpected $endpoint'});
+  }
+}
+
 void main() {
   group('AppNotification Model', () {
     test('fromJson deve parsear corretamente com todos os campos', () {
@@ -221,10 +270,58 @@ void main() {
       expect(provider.notifications.single.isRead, isTrue);
       expect(provider.unreadCount, 1);
 
-      await provider.markAllAsRead();
+      expect(await provider.markAllAsRead(), isTrue);
       expect(api.readAllCalled, isTrue);
       expect(provider.unreadCount, 0);
     });
+
+    test(
+      'markAllAsRead reports failure without mutating local state',
+      () async {
+        final provider = NotificationProvider(
+          apiClient: _FailingReadAllApiClient(),
+        );
+
+        await provider.fetchNotifications();
+        expect(provider.notifications.single.isRead, isFalse);
+
+        expect(await provider.markAllAsRead(), isFalse);
+        expect(provider.notifications.single.isRead, isFalse);
+      },
+    );
+
+    test(
+      'markAllAsRead invalidates stale poll and coalesces concurrent calls',
+      () async {
+        final api = _ReadAllRaceApiClient();
+        final provider = NotificationProvider(apiClient: api);
+
+        await provider.fetchNotifications();
+        final stalePoll = provider.fetchUnreadCount();
+        await Future<void>.delayed(Duration.zero);
+
+        final firstMark = provider.markAllAsRead();
+        final secondMark = provider.markAllAsRead();
+        await provider.fetchUnreadCount();
+
+        expect(identical(firstMark, secondMark), isTrue);
+        expect(api.countRequests, 1);
+        expect(api.readAllRequests, 1);
+
+        api.readAllResponse.complete(
+          ApiResponse(200, {'marked_read': 1, 'unread': 0}),
+        );
+        expect(await firstMark, isTrue);
+        expect(await secondMark, isTrue);
+        expect(provider.notifications.single.isRead, isTrue);
+        expect(provider.unreadCount, 0);
+
+        api.staleCountResponse.complete(ApiResponse(200, {'unread': 9}));
+        await stalePoll;
+
+        expect(provider.unreadCount, 0);
+      },
+    );
 
     test('fetchNotifications exposes error on backend failure', () async {
       final provider = NotificationProvider(

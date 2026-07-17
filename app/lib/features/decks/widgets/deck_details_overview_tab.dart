@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../core/theme/app_theme.dart';
+import '../../../core/utils/currency_formatter.dart';
+import '../../../core/utils/scryfall_image_helper.dart';
 import '../../../core/widgets/cached_card_image.dart';
 import '../models/deck_card_item.dart';
 import '../models/deck_analysis.dart';
@@ -30,6 +32,7 @@ class DeckDetailsOverviewTab extends StatelessWidget {
   final VoidCallback onForcePricingRefresh;
   final VoidCallback onShowPricingDetails;
   final VoidCallback onTogglePublic;
+  final VoidCallback onPlay;
   final VoidCallback onShowOptimizationOptions;
   final VoidCallback? onOpenBattleReplays;
   final VoidCallback onSelectCommander;
@@ -57,6 +60,7 @@ class DeckDetailsOverviewTab extends StatelessWidget {
     required this.onForcePricingRefresh,
     required this.onShowPricingDetails,
     required this.onTogglePublic,
+    required this.onPlay,
     required this.onShowOptimizationOptions,
     this.onOpenBattleReplays,
     required this.onSelectCommander,
@@ -79,6 +83,14 @@ class DeckDetailsOverviewTab extends StatelessWidget {
       return null;
     }
     return imageUrl;
+  }
+
+  String? get _heroCommanderArtUrl {
+    return ScryfallImageHelper.preferredImageUrl(
+      explicitUrl: _heroCommanderImageUrl,
+      cardName: _heroCommander?.name,
+      version: 'art_crop',
+    );
   }
 
   String get _heroSummary {
@@ -114,260 +126,320 @@ class DeckDetailsOverviewTab extends StatelessWidget {
     }
   }
 
-  @override
-  Widget build(BuildContext context) {
+  Widget _buildHero(BuildContext context, {required Color formatAccent}) {
     final theme = Theme.of(context);
-    final hasHeroArtwork = _heroCommanderImageUrl != null;
-    final formatAccent = _formatAccentColor(deck.format);
+    final artUrl = _heroCommanderArtUrl;
+    final hasArtwork = artUrl != null || _heroCommanderImageUrl != null;
 
-    return SingleChildScrollView(
-      padding: const EdgeInsets.all(16),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Container(
-            width: double.infinity,
-            decoration: BoxDecoration(
-              color: AppTheme.surfaceElevated,
-              borderRadius: BorderRadius.circular(AppTheme.radiusLg),
-              border: Border.all(
-                color:
-                    hasHeroArtwork
-                        ? formatAccent.withValues(alpha: 0.54)
-                        : AppTheme.outlineMuted.withValues(alpha: 0.78),
-                width: AppTheme.strokeRegular,
+    return Container(
+      key: const Key('deck-overview-hero'),
+      width: double.infinity,
+      constraints: const BoxConstraints(minHeight: 176),
+      decoration: BoxDecoration(
+        color: AppTheme.surfaceElevated,
+        borderRadius: BorderRadius.circular(AppTheme.radiusLg),
+        border: Border.all(
+          color:
+              hasArtwork
+                  ? formatAccent.withValues(alpha: 0.46)
+                  : AppTheme.outlineMuted.withValues(alpha: 0.78),
+          width: AppTheme.strokeRegular,
+        ),
+      ),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(AppTheme.radiusLg),
+        child: Stack(
+          children: [
+            if (hasArtwork)
+              Positioned.fill(
+                child: Row(
+                  children: [
+                    const Spacer(flex: 5),
+                    Expanded(
+                      flex: 4,
+                      child: CachedCardImage(
+                        imageUrl: artUrl ?? _heroCommanderImageUrl,
+                        fallbackImageUrl: _heroCommander?.fallbackImageUrl,
+                        fit: BoxFit.cover,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            Positioned.fill(
+              child: DecoratedBox(
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.centerLeft,
+                    end: Alignment.centerRight,
+                    colors: [
+                      AppTheme.backgroundAbyss,
+                      AppTheme.backgroundAbyss.withValues(alpha: 0.96),
+                      AppTheme.surfaceElevated.withValues(
+                        alpha: hasArtwork ? 0.38 : 1,
+                      ),
+                    ],
+                    stops: const [0, 0.48, 1],
+                  ),
+                ),
               ),
             ),
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(AppTheme.radiusLg),
-              child: Stack(
-                children: [
-                  if (_heroCommanderImageUrl != null)
-                    Positioned.fill(
-                      child: IgnorePointer(
-                        child: CachedCardImage(
-                          imageUrl: _heroCommanderImageUrl,
-                          fallbackImageUrl: _heroCommander?.fallbackImageUrl,
-                          fit: BoxFit.cover,
-                        ),
+            Padding(
+              padding: const EdgeInsets.all(22),
+              child: ConstrainedBox(
+                constraints: const BoxConstraints(maxWidth: 720),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      deck.name,
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                      style: theme.textTheme.headlineSmall?.copyWith(
+                        color: AppTheme.textPrimary,
+                        fontWeight: FontWeight.w800,
+                        height: 1.05,
                       ),
                     ),
-                  Positioned.fill(
-                    child: DecoratedBox(
-                      decoration: BoxDecoration(
-                        gradient: LinearGradient(
-                          begin: Alignment.topLeft,
-                          end: Alignment.bottomRight,
-                          colors: [
-                            AppTheme.backgroundAbyss.withValues(
-                              alpha:
-                                  _heroCommanderImageUrl != null ? 0.82 : 0.0,
-                            ),
-                            AppTheme.surfaceElevated.withValues(
-                              alpha: _heroCommanderImageUrl != null ? 0.66 : 1,
-                            ),
-                            AppTheme.backgroundAbyss.withValues(
-                              alpha:
-                                  _heroCommanderImageUrl != null ? 0.88 : 0.0,
-                            ),
-                          ],
+                    if (_heroCommander != null) ...[
+                      const SizedBox(height: 7),
+                      Text(
+                        'Comandante: ${_heroCommander!.name}',
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: theme.textTheme.bodyMedium?.copyWith(
+                          color: AppTheme.textPrimary.withValues(alpha: 0.92),
+                          fontWeight: FontWeight.w700,
                         ),
                       ),
+                    ],
+                    const SizedBox(height: 6),
+                    Text(
+                      _heroSummary,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: theme.textTheme.bodySmall?.copyWith(
+                        color: AppTheme.textSecondary,
+                        fontWeight: FontWeight.w600,
+                      ),
                     ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.all(16),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
+                    const SizedBox(height: 14),
+                    Wrap(
+                      spacing: 8,
+                      runSpacing: 8,
+                      crossAxisAlignment: WrapCrossAlignment.center,
                       children: [
-                        Row(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    deck.name,
-                                    maxLines: 2,
-                                    overflow: TextOverflow.ellipsis,
-                                    style: theme.textTheme.headlineSmall
-                                        ?.copyWith(
-                                          color: AppTheme.textPrimary,
-                                          fontWeight: FontWeight.w800,
-                                          height: 1.05,
-                                        ),
-                                  ),
-                                  if (_heroCommander != null) ...[
-                                    const SizedBox(height: 6),
-                                    Text(
-                                      'Comandante: ${_heroCommander!.name}',
-                                      maxLines: 1,
-                                      overflow: TextOverflow.ellipsis,
-                                      style: theme.textTheme.bodyMedium
-                                          ?.copyWith(
-                                            color: AppTheme.textPrimary
-                                                .withValues(alpha: 0.92),
-                                            fontWeight: FontWeight.w500,
-                                          ),
-                                    ),
-                                  ],
-                                  const SizedBox(height: 6),
-                                  Text(
-                                    _heroSummary,
-                                    maxLines: 1,
-                                    overflow: TextOverflow.ellipsis,
-                                    style: theme.textTheme.bodySmall?.copyWith(
-                                      color: AppTheme.textPrimary.withValues(
-                                        alpha: 0.82,
-                                      ),
-                                      fontWeight: FontWeight.w500,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ],
+                        DeckMetaChip(
+                          label: deck.format.toUpperCase(),
+                          color: formatAccent,
+                          icon: Icons.style_outlined,
+                          prominent: true,
                         ),
-                        const SizedBox(height: 12),
-                        Wrap(
-                          spacing: 8,
-                          runSpacing: 8,
-                          crossAxisAlignment: WrapCrossAlignment.center,
-                          children: [
-                            DeckMetaChip(
-                              label: deck.format.toUpperCase(),
-                              color: formatAccent,
-                              icon: Icons.style_outlined,
-                              prominent: true,
-                            ),
-                            if (deck.colorIdentity.isNotEmpty)
-                              ColorIdentityPips(colors: deck.colorIdentity),
-                            if (isValidating)
-                              const SizedBox(
-                                width: 18,
-                                height: 18,
-                                child: CircularProgressIndicator(
-                                  strokeWidth: 2,
-                                ),
-                              ),
-                            DeckMetaChip(
-                              onTap: onTogglePublic,
-                              label: deck.isPublic ? 'Público' : 'Privado',
-                              color:
-                                  deck.isPublic
-                                      ? AppTheme.frost400
-                                      : AppTheme.textPrimary.withValues(
-                                        alpha: 0.86,
-                                      ),
-                              icon:
-                                  deck.isPublic
-                                      ? Icons.public
-                                      : Icons.lock_outline,
-                              prominent: true,
-                            ),
-                          ],
+                        if (deck.colorIdentityKnown)
+                          ColorIdentityPips(
+                            colors: deck.colorIdentity,
+                            colorlessWhenEmpty: true,
+                          ),
+                        if (isValidating)
+                          const SizedBox.square(
+                            dimension: 18,
+                            child: CircularProgressIndicator(strokeWidth: 2),
+                          ),
+                        DeckMetaChip(
+                          onTap: onTogglePublic,
+                          label: deck.isPublic ? 'Público' : 'Privado',
+                          color:
+                              deck.isPublic
+                                  ? AppTheme.frost400
+                                  : AppTheme.textPrimary.withValues(
+                                    alpha: 0.86,
+                                  ),
+                          icon:
+                              deck.isPublic ? Icons.public : Icons.lock_outline,
+                          prominent: true,
                         ),
                       ],
                     ),
-                  ),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final formatAccent = _formatAccentColor(deck.format);
+
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final useDesktopPanes =
+            constraints.maxWidth >= AppTheme.breakpointExpanded;
+        final gutter =
+            constraints.maxWidth < AppTheme.breakpointCompact
+                ? AppTheme.pageGutterCompact
+                : AppTheme.pageGutter;
+
+        final strategy = _StrategySummaryCard(
+          hasArchetype: _hasArchetype,
+          archetype: deck.archetype,
+          bracket: deck.bracket,
+          bracketLabel: bracketLabel,
+          onTap: onShowOptimizationOptions,
+        );
+        final commander =
+            deck.commander.isEmpty
+                ? null
+                : _CommanderSection(
+                  commander: deck.commander,
+                  isCardInvalid: isCardInvalid,
+                  onShowCardDetails: onShowCardDetails,
+                  onChangeCommander:
+                      () => context.go('/decks/$deckId/search?mode=commander'),
+                );
+        final description = _DescriptionSection(
+          description: deck.description,
+          onEditDescription: onEditDescription,
+        );
+        final diagnostics = DeckDiagnosticPanel(
+          deck: deck,
+          analysis: diagnosticAnalysis,
+          onOpenBattleReplays: onOpenBattleReplays,
+          onShowCardDetails: onShowCardDetails,
+        );
+        final playtest = SampleHandWidget(
+          deck: deck,
+          compact: true,
+          onShowCardDetails: onShowCardDetails,
+        );
+        final pricingPanel = DeckPricingRow(
+          pricing: pricing,
+          isLoading: isPricingLoading,
+          onForceRefresh: onForcePricingRefresh,
+          onShowDetails: onShowPricingDetails,
+        );
+
+        return SingleChildScrollView(
+          padding: EdgeInsets.fromLTRB(gutter, gutter, gutter, 32),
+          child: Center(
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(
+                maxWidth: AppTheme.contentMaxWidth,
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  _buildHero(context, formatAccent: formatAccent),
+                  const SizedBox(height: 14),
+                  if (_isEmptyDeck) ...[
+                    _DeckEmptyState(
+                      isCommanderFormat: isCommanderFormat,
+                      onSelectCommander: onSelectCommander,
+                      onOpenCards: onOpenCards,
+                      onImportList: onImportList,
+                    ),
+                    const SizedBox(height: 16),
+                    Text(
+                      'Depois que o deck ganhar base, os diagnósticos e recomendações aparecem aqui.',
+                      style: theme.textTheme.bodySmall?.copyWith(
+                        color: AppTheme.textPrimary.withValues(alpha: 0.76),
+                      ),
+                    ),
+                  ] else ...[
+                    _OverviewQuickActions(
+                      onPlay: onPlay,
+                      onOptimize: onShowOptimizationOptions,
+                    ),
+                    const SizedBox(height: 14),
+                    _CommanderDeckSummaryGrid(
+                      deck: deck,
+                      totalCards: totalCards,
+                      maxCards: maxCards,
+                      hasCommander: deck.commander.isNotEmpty,
+                      pricing: pricing,
+                    ),
+                    const SizedBox(height: 14),
+                    _LegalityConfidenceCard(
+                      isCommanderFormat: isCommanderFormat,
+                      isValidating: isValidating,
+                      validationResult: validationResult,
+                      totalCards: totalCards,
+                      maxCards: maxCards,
+                      hasCommander: deck.commander.isNotEmpty,
+                      onValidateNow: onValidateNow,
+                      onValidationTap: onValidationTap,
+                      onOpenCards: onOpenCards,
+                      onSelectCommander: onSelectCommander,
+                    ),
+                    if (isCommanderFormat && deck.commander.isEmpty) ...[
+                      const SizedBox(height: 14),
+                      _CommanderPrompt(onSelectCommander: onSelectCommander),
+                    ],
+                    const SizedBox(height: AppTheme.paneGap),
+                    if (useDesktopPanes)
+                      Row(
+                        key: const Key('deck-overview-desktop-panes'),
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Expanded(
+                            child: KeyedSubtree(
+                              key: const Key('deck-overview-primary-pane'),
+                              child: Column(
+                                children: [
+                                  diagnostics,
+                                  const SizedBox(height: AppTheme.paneGap),
+                                  playtest,
+                                ],
+                              ),
+                            ),
+                          ),
+                          const SizedBox(width: AppTheme.paneGap),
+                          SizedBox(
+                            key: const Key('deck-overview-inspector-pane'),
+                            width: AppTheme.inspectorWidth,
+                            child: Column(
+                              children: [
+                                strategy,
+                                if (commander != null) ...[
+                                  const SizedBox(height: 14),
+                                  commander,
+                                ],
+                                const SizedBox(height: 14),
+                                description,
+                                const SizedBox(height: 14),
+                                pricingPanel,
+                              ],
+                            ),
+                          ),
+                        ],
+                      )
+                    else ...[
+                      strategy,
+                      if (commander != null) ...[
+                        const SizedBox(height: 16),
+                        commander,
+                      ],
+                      const SizedBox(height: 16),
+                      description,
+                      const SizedBox(height: 16),
+                      diagnostics,
+                      const SizedBox(height: 16),
+                      playtest,
+                      const SizedBox(height: 24),
+                      pricingPanel,
+                    ],
+                  ],
                 ],
               ),
             ),
           ),
-          const SizedBox(height: 12),
-          if (_isEmptyDeck)
-            _DeckEmptyState(
-              isCommanderFormat: isCommanderFormat,
-              onSelectCommander: onSelectCommander,
-              onOpenCards: onOpenCards,
-              onImportList: onImportList,
-            )
-          else ...[
-            _OverviewQuickActions(onOptimize: onShowOptimizationOptions),
-            const SizedBox(height: 16),
-            _CommanderDeckSummaryGrid(
-              deck: deck,
-              totalCards: totalCards,
-              maxCards: maxCards,
-              hasCommander: deck.commander.isNotEmpty,
-              pricing: pricing,
-            ),
-            const SizedBox(height: 16),
-            _LegalityConfidenceCard(
-              isCommanderFormat: isCommanderFormat,
-              isValidating: isValidating,
-              validationResult: validationResult,
-              totalCards: totalCards,
-              maxCards: maxCards,
-              hasCommander: deck.commander.isNotEmpty,
-              onValidateNow: onValidateNow,
-              onValidationTap: onValidationTap,
-              onOpenCards: onOpenCards,
-              onSelectCommander: onSelectCommander,
-            ),
-            const SizedBox(height: 16),
-            if (isCommanderFormat && deck.commander.isEmpty) ...[
-              _CommanderPrompt(onSelectCommander: onSelectCommander),
-              const SizedBox(height: 16),
-            ],
-            _StrategySummaryCard(
-              hasArchetype: _hasArchetype,
-              archetype: deck.archetype,
-              bracket: deck.bracket,
-              bracketLabel: bracketLabel,
-              onTap: onShowOptimizationOptions,
-            ),
-            const SizedBox(height: 16),
-            if (deck.commander.isNotEmpty) ...[
-              _CommanderSection(
-                commander: deck.commander,
-                isCardInvalid: isCardInvalid,
-                onShowCardDetails: onShowCardDetails,
-                onChangeCommander:
-                    () => context.go('/decks/$deckId/search?mode=commander'),
-              ),
-              const SizedBox(height: 16),
-            ],
-            _DescriptionSection(
-              description: deck.description,
-              onEditDescription: onEditDescription,
-            ),
-            const SizedBox(height: 16),
-            DeckDiagnosticPanel(
-              deck: deck,
-              analysis: diagnosticAnalysis,
-              onOpenBattleReplays: onOpenBattleReplays,
-              onShowCardDetails: onShowCardDetails,
-            ),
-            const SizedBox(height: 16),
-            SampleHandWidget(
-              deck: deck,
-              compact: true,
-              onShowCardDetails: onShowCardDetails,
-            ),
-          ],
-          const SizedBox(height: 16),
-          if (_isEmptyDeck) ...[
-            Text(
-              'Depois que o deck ganhar base, os diagnósticos e recomendações aparecem aqui.',
-              style: theme.textTheme.bodySmall?.copyWith(
-                color: AppTheme.textPrimary.withValues(alpha: 0.76),
-              ),
-            ),
-            const SizedBox(height: 8),
-          ],
-          if (!_isEmptyDeck) ...[
-            const SizedBox(height: 24),
-            DeckPricingRow(
-              pricing: pricing,
-              isLoading: isPricingLoading,
-              onForceRefresh: onForcePricingRefresh,
-              onShowDetails: onShowPricingDetails,
-            ),
-          ],
-        ],
-      ),
+        );
+      },
     );
   }
 }
@@ -498,8 +570,8 @@ class _CommanderDeckSummaryGrid extends StatelessWidget {
   });
 
   String get _identityLabel {
-    if (deck.colorIdentity.isEmpty) return 'Incolor/pendente';
-    return deck.colorIdentity.join('');
+    if (deck.colorIdentity.isNotEmpty) return '';
+    return deck.colorIdentityKnown ? 'Incolor' : 'Pendente';
   }
 
   String get _countLabel =>
@@ -511,13 +583,11 @@ class _CommanderDeckSummaryGrid extends StatelessWidget {
     if (total == null) return 'Pendente';
     final currency =
         pricing?['currency']?.toString() ?? deck.pricingCurrency ?? 'USD';
-    if (total >= 1000000) {
-      return '$currency ${(total / 1000000).toStringAsFixed(1)} mi';
-    }
-    if (total >= 1000) {
-      return '$currency ${(total / 1000).toStringAsFixed(1)} mil';
-    }
-    return '$currency ${total.toStringAsFixed(2)}';
+    return CurrencyFormatter.format(
+      total,
+      currencyCode: currency,
+      compact: true,
+    );
   }
 
   String get _curveLabel {
@@ -536,10 +606,7 @@ class _CommanderDeckSummaryGrid extends StatelessWidget {
     final commanderOk = !isCommanderFormat(deck.format) || hasCommander;
     return LayoutBuilder(
       builder: (context, constraints) {
-        final columns =
-            constraints.maxWidth < 360
-                ? 2
-                : (constraints.maxWidth < 720 ? 4 : 4);
+        final columns = constraints.maxWidth < 680 ? 2 : 4;
         const spacing = 8.0;
         final itemWidth =
             (constraints.maxWidth - ((columns - 1) * spacing)) / columns;
@@ -561,6 +628,16 @@ class _CommanderDeckSummaryGrid extends StatelessWidget {
               child: _SummaryTile(
                 label: 'Identidade',
                 value: _identityLabel,
+                valueWidget:
+                    deck.colorIdentityKnown
+                        ? ColorIdentityPips(
+                          colors: deck.colorIdentity,
+                          symbolSize: 17,
+                          spacing: 3,
+                          decorated: false,
+                          colorlessWhenEmpty: true,
+                        )
+                        : null,
                 icon: Icons.palette_outlined,
                 accent: AppTheme.identityColor(deck.colorIdentity.toSet()),
               ),
@@ -601,12 +678,14 @@ bool isCommanderFormat(String format) {
 class _SummaryTile extends StatelessWidget {
   final String label;
   final String value;
+  final Widget? valueWidget;
   final IconData icon;
   final Color accent;
 
   const _SummaryTile({
     required this.label,
     required this.value,
+    this.valueWidget,
     required this.icon,
     required this.accent,
   });
@@ -634,15 +713,18 @@ class _SummaryTile extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: 1),
-                Text(
-                  value,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: theme.textTheme.bodySmall?.copyWith(
-                    color: AppTheme.textPrimary,
-                    fontWeight: FontWeight.w800,
+                if (valueWidget != null)
+                  valueWidget!
+                else
+                  Text(
+                    value,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: theme.textTheme.bodySmall?.copyWith(
+                      color: AppTheme.textPrimary,
+                      fontWeight: FontWeight.w800,
+                    ),
                   ),
-                ),
               ],
             ),
           ),
@@ -1278,36 +1360,66 @@ class _DescriptionSection extends StatelessWidget {
 }
 
 class _OverviewQuickActions extends StatelessWidget {
+  final VoidCallback onPlay;
   final VoidCallback onOptimize;
 
-  const _OverviewQuickActions({required this.onOptimize});
+  const _OverviewQuickActions({required this.onPlay, required this.onOptimize});
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-
-    return SizedBox(
-      width: double.infinity,
-      child: OutlinedButton.icon(
-        onPressed: onOptimize,
-        style: OutlinedButton.styleFrom(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-          backgroundColor: AppTheme.brass400.withValues(alpha: 0.10),
-          foregroundColor: AppTheme.brass400,
-          side: BorderSide(color: AppTheme.brass400.withValues(alpha: 0.30)),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(AppTheme.radiusLg),
-          ),
-        ),
-        icon: const Icon(Icons.auto_fix_high, color: AppTheme.brass400),
-        label: Text(
-          'Otimizar com IA',
-          style: theme.textTheme.titleSmall?.copyWith(
-            color: AppTheme.brass400,
-            fontWeight: FontWeight.w700,
-          ),
+    final playButton = FilledButton.icon(
+      onPressed: onPlay,
+      style: FilledButton.styleFrom(
+        minimumSize: const Size(0, AppTheme.touchTargetMin),
+        padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 12),
+        backgroundColor: AppTheme.brass400,
+        foregroundColor: AppTheme.backgroundAbyss,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(AppTheme.radiusMd),
         ),
       ),
+      icon: const Icon(Icons.favorite_rounded, size: 19),
+      label: Text(
+        'Jogar agora',
+        style: theme.textTheme.titleSmall?.copyWith(
+          color: AppTheme.backgroundAbyss,
+          fontWeight: FontWeight.w800,
+        ),
+      ),
+    );
+    final optimizeButton = OutlinedButton.icon(
+      onPressed: onOptimize,
+      style: OutlinedButton.styleFrom(
+        minimumSize: const Size(0, AppTheme.touchTargetMin),
+        padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 12),
+        foregroundColor: AppTheme.textPrimary,
+        side: BorderSide(color: AppTheme.frost400.withValues(alpha: 0.55)),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(AppTheme.radiusMd),
+        ),
+      ),
+      icon: const Icon(Icons.auto_fix_high, size: 19),
+      label: const Text('Otimizar'),
+    );
+
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        if (constraints.maxWidth < AppTheme.breakpointCompact) {
+          return Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [playButton, const SizedBox(height: 8), optimizeButton],
+          );
+        }
+        return Align(
+          alignment: Alignment.centerRight,
+          child: Wrap(
+            spacing: 10,
+            runSpacing: 8,
+            children: [optimizeButton, playButton],
+          ),
+        );
+      },
     );
   }
 }

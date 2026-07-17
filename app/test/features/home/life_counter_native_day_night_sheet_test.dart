@@ -48,13 +48,13 @@ void main() {
     await tester.tap(find.text('Open'));
     await tester.pumpAndSettle();
 
-    expect(find.text('Day / Night'), findsOneWidget);
+    expect(find.text('Dia / Noite'), findsOneWidget);
     expect(
       find.byKey(const Key('life-counter-native-day-night-current-label')),
       findsOneWidget,
     );
 
-    await tester.tap(find.text('Night'));
+    await tester.tap(find.text('Noite'));
     await tester.pumpAndSettle();
 
     await tester.tap(

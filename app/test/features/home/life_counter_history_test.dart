@@ -448,5 +448,46 @@ void main() {
       expect(encoded, {'player': 0, 'change': -2, 'life': 38});
       expect(encoded.containsKey('message'), isFalse);
     });
+
+    test('starts a deck session without relabelling prior game events', () {
+      const previous = LifeCounterHistoryState(
+        currentGameName: 'Partida A',
+        currentGameMeta: <String, Object?>{
+          'id': 'game-a',
+          'startDate': 1000,
+          'deckId': 'deck-a',
+          'playSessionId': 'play-a',
+        },
+        currentGameEntries: <LifeCounterHistoryEntry>[
+          LifeCounterHistoryEntry(message: 'Jogador 1 perdeu 5 de vida'),
+        ],
+        archiveEntries: <LifeCounterHistoryEntry>[],
+        archivedGameCount: 0,
+        gameCounter: 1,
+      );
+      final nextSession = LifeCounterSession.initial(
+        playerCount: 4,
+        deckId: 'deck-b',
+        deckName: 'Deck B',
+        playSessionId: 'play-b',
+        startedAtEpochMs: 2000,
+      );
+
+      final next = previous.startNewGameForSession(
+        session: nextSession,
+        startDateEpochMs: 2000,
+      );
+
+      expect(next.currentGameEntries, isEmpty);
+      expect(next.currentGameMeta?['deckId'], 'deck-b');
+      expect(next.currentGameMeta?['playSessionId'], 'play-b');
+      expect(next.gameCounter, 2);
+      expect(next.archivedGameCount, 1);
+      expect(next.archivedGames.single.metadata['deckId'], 'deck-a');
+      expect(
+        next.archivedGames.single.entries.single.source,
+        LifeCounterHistoryEntrySource.archive,
+      );
+    });
   });
 }

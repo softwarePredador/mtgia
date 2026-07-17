@@ -112,7 +112,7 @@ void main() {
         scrollable: scrollable,
       );
 
-      expect(tester.widget<Text>(statusLabel).data, 'Decked out');
+      expect(tester.widget<Text>(statusLabel).data, 'Sem grimório');
     });
 
     testWidgets('preserves each player draft while switching targets', (
@@ -205,7 +205,7 @@ void main() {
       await tester.tap(find.text('Open'));
       await tester.pumpAndSettle();
 
-      expect(find.text('Player State'), findsOneWidget);
+      expect(find.text('Estado do jogador'), findsOneWidget);
 
       await tester.scrollUntilVisible(
         find.byKey(const Key('life-counter-native-player-state-set-life')),
@@ -247,7 +247,7 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      expect(find.text('Player State'), findsOneWidget);
+      expect(find.text('Estado do jogador'), findsOneWidget);
 
       await tester.tap(
         find.byKey(const Key('life-counter-native-player-state-apply')),
@@ -276,7 +276,7 @@ void main() {
       await tester.tap(find.text('Open'));
       await tester.pumpAndSettle();
 
-      expect(find.text('Player State'), findsOneWidget);
+      expect(find.text('Estado do jogador'), findsOneWidget);
 
       await tester.scrollUntilVisible(
         find.byKey(
@@ -298,12 +298,12 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      expect(find.text('Player Counter'), findsOneWidget);
+      expect(find.text('Marcadores do jogador'), findsOneWidget);
 
-      await tester.tap(find.text('Cancel').last);
+      await tester.tap(find.text('Cancelar').last);
       await tester.pumpAndSettle();
 
-      expect(find.text('Player State'), findsOneWidget);
+      expect(find.text('Estado do jogador'), findsOneWidget);
 
       await tester.tap(
         find.byKey(const Key('life-counter-native-player-state-apply')),
@@ -332,7 +332,7 @@ void main() {
       await tester.tap(find.text('Open'));
       await tester.pumpAndSettle();
 
-      expect(find.text('Player State'), findsOneWidget);
+      expect(find.text('Estado do jogador'), findsOneWidget);
 
       await tester.scrollUntilVisible(
         find.byKey(
@@ -359,10 +359,10 @@ void main() {
         findsOneWidget,
       );
 
-      await tester.tap(find.text('Cancel').last);
+      await tester.tap(find.text('Cancelar').last);
       await tester.pumpAndSettle();
 
-      expect(find.text('Player State'), findsOneWidget);
+      expect(find.text('Estado do jogador'), findsOneWidget);
 
       await tester.tap(
         find.byKey(const Key('life-counter-native-player-state-apply')),
@@ -447,7 +447,7 @@ void main() {
           ),
           findsOneWidget,
         );
-        expect(find.text('Active player'), findsOneWidget);
+        expect(find.text('Jogador ativo'), findsOneWidget);
 
         for (var i = 0; i < 21; i += 1) {
           await tester.ensureVisible(
@@ -465,10 +465,10 @@ void main() {
         }
         await tester.pumpAndSettle();
 
-        expect(find.text('Commander damage lethal'), findsOneWidget);
+        expect(find.text('Dano letal de comandante'), findsOneWidget);
         expect(
           find.text(
-            'Commander damage is lethal, but this player remains active until Auto-KO or a manual knock out records the defeat.',
+            'O dano de comandante é letal, mas o jogador permanece ativo até o nocaute automático ou manual.',
           ),
           findsOneWidget,
         );
@@ -498,7 +498,7 @@ void main() {
       await tester.tap(find.text('Open'));
       await tester.pumpAndSettle();
 
-      expect(find.text('Player State'), findsOneWidget);
+      expect(find.text('Estado do jogador'), findsOneWidget);
 
       await tester.scrollUntilVisible(
         find.byKey(
@@ -525,10 +525,10 @@ void main() {
         findsOneWidget,
       );
 
-      await tester.tap(find.text('Cancel').last);
+      await tester.tap(find.text('Cancelar').last);
       await tester.pumpAndSettle();
 
-      expect(find.text('Player State'), findsOneWidget);
+      expect(find.text('Estado do jogador'), findsOneWidget);
 
       await tester.tap(
         find.byKey(const Key('life-counter-native-player-state-apply')),
@@ -551,7 +551,7 @@ void main() {
       await tester.tap(find.text('Open'));
       await tester.pumpAndSettle();
 
-      expect(find.text('Player State'), findsOneWidget);
+      expect(find.text('Estado do jogador'), findsOneWidget);
 
       await tester.scrollUntilVisible(
         find.byKey(const Key('life-counter-native-player-state-roll-d20')),
@@ -578,7 +578,7 @@ void main() {
 
       expect(result, isNotNull);
       expect(result!.lastPlayerRolls[0], isNotNull);
-      expect(result!.lastTableEvent, startsWith('Player 1 rolou D20: '));
+      expect(result!.lastTableEvent, startsWith('Jogador 1 rolou D20: '));
     });
 
     testWidgets('marks and revives a player through canonical state actions', (
@@ -602,7 +602,7 @@ void main() {
         find.byKey(const Key('life-counter-native-player-state-status-label')),
         findsOneWidget,
       );
-      expect(find.text('Active player'), findsOneWidget);
+      expect(find.text('Jogador ativo'), findsOneWidget);
 
       await tester.scrollUntilVisible(
         find.byKey(const Key('life-counter-native-player-state-knockout')),

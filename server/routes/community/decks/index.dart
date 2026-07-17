@@ -27,12 +27,17 @@ Future<Response> _listPublicDecks(RequestContext context) async {
     final offset = (page - 1) * limit;
 
     // Build WHERE clauses
-    final whereParts = <String>['d.is_public = true'];
+    final whereParts = <String>[
+      'd.is_public = true',
+      'd.deleted_at IS NULL',
+      'u.deleted_at IS NULL',
+    ];
     final filterParams = <String, dynamic>{};
 
     if (search != null && search.isNotEmpty) {
       whereParts.add(
-          '(LOWER(d.name) LIKE @search OR LOWER(COALESCE(d.description,\'\')) LIKE @search)');
+        '(LOWER(d.name) LIKE @search OR LOWER(COALESCE(d.description,\'\')) LIKE @search)',
+      );
       filterParams['search'] = '%${search.toLowerCase()}%';
     }
     if (format != null && format.isNotEmpty) {
@@ -44,7 +49,12 @@ Future<Response> _listPublicDecks(RequestContext context) async {
 
     // Count total (only filter params, no lim/off)
     final countResult = await conn.execute(
-      Sql.named('SELECT COUNT(*)::int FROM decks d WHERE $whereClause'),
+      Sql.named('''
+        SELECT COUNT(*)::int
+        FROM decks d
+        JOIN users u ON u.id = d.user_id
+        WHERE $whereClause
+      '''),
       parameters: filterParams,
     );
 
@@ -99,27 +109,24 @@ Future<Response> _listPublicDecks(RequestContext context) async {
       LIMIT @lim OFFSET @off
     ''';
 
-    final result = await conn.execute(
-      Sql.named(sql),
-      parameters: sqlParams,
+    final result = await conn.execute(Sql.named(sql), parameters: sqlParams);
+
+    final decks =
+        result.map((row) {
+          final map = row.toColumnMap();
+          if (map['created_at'] is DateTime) {
+            map['created_at'] =
+                (map['created_at'] as DateTime).toIso8601String();
+          }
+          map['commander_image_url'] = normalizeScryfallImageUrl(
+            map['commander_image_url']?.toString(),
+          );
+          return map;
+        }).toList();
+
+    return Response.json(
+      body: {'data': decks, 'page': page, 'limit': limit, 'total': total},
     );
-
-    final decks = result.map((row) {
-      final map = row.toColumnMap();
-      if (map['created_at'] is DateTime) {
-        map['created_at'] = (map['created_at'] as DateTime).toIso8601String();
-      }
-      map['commander_image_url'] =
-          normalizeScryfallImageUrl(map['commander_image_url']?.toString());
-      return map;
-    }).toList();
-
-    return Response.json(body: {
-      'data': decks,
-      'page': page,
-      'limit': limit,
-      'total': total,
-    });
   } catch (e, st) {
     await captureRouteException(
       context,

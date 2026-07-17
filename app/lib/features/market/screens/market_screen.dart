@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:manaloom/core/widgets/shell_app_bar_actions.dart';
 import '../../../core/theme/app_theme.dart';
+import '../../../core/widgets/responsive_page_frame.dart';
 import '../providers/market_provider.dart';
 import '../models/card_mover.dart';
 
@@ -60,24 +61,47 @@ class _MarketScreenState extends State<MarketScreen>
               ),
               const ShellAppBarActions(),
             ],
-            bottom: TabBar(
-              controller: _tabController,
-              indicatorColor: AppTheme.brass400,
-              labelColor: AppTheme.brass400,
-              unselectedLabelColor: AppTheme.textSecondary,
-              tabs: const [
-                Tab(
-                  icon: Icon(Icons.arrow_upward, size: 18),
-                  text: 'Valorizando',
+            bottom: PreferredSize(
+              preferredSize: const Size.fromHeight(kTextTabBarHeight),
+              child: Center(
+                child: ConstrainedBox(
+                  constraints: const BoxConstraints(maxWidth: 960),
+                  child: TabBar(
+                    key: const Key('market-tab-bar'),
+                    controller: _tabController,
+                    indicatorColor: AppTheme.brass400,
+                    labelColor: AppTheme.brass400,
+                    unselectedLabelColor: AppTheme.textSecondary,
+                    tabs: const [
+                      Tab(
+                        icon: Icon(Icons.arrow_upward, size: 18),
+                        text: 'Valorizando',
+                      ),
+                      Tab(
+                        icon: Icon(Icons.arrow_downward, size: 18),
+                        text: 'Desvalorizando',
+                      ),
+                    ],
+                  ),
                 ),
-                Tab(
-                  icon: Icon(Icons.arrow_downward, size: 18),
-                  text: 'Desvalorizando',
-                ),
-              ],
+              ),
             ),
           ),
-          body: _buildBody(provider),
+          body: ResponsivePageFrame(
+            maxWidth: 960,
+            padding: EdgeInsets.symmetric(
+              horizontal:
+                  MediaQuery.sizeOf(context).width < AppTheme.breakpointCompact
+                      ? 16
+                      : 24,
+            ),
+            child: SizedBox(
+              key: const Key('market-content'),
+              width: double.infinity,
+              height: double.infinity,
+              child: _buildBody(provider),
+            ),
+          ),
         );
       },
     );
@@ -137,38 +161,47 @@ class _MarketScreenState extends State<MarketScreen>
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
       color: AppTheme.backgroundAbyss,
-      child: Row(
+      child: Wrap(
+        alignment: WrapAlignment.spaceBetween,
+        crossAxisAlignment: WrapCrossAlignment.center,
+        spacing: 12,
+        runSpacing: 8,
         children: [
-          const Icon(
-            Icons.calendar_today,
-            size: 14,
-            color: AppTheme.textSecondary,
-          ),
-          const SizedBox(width: 6),
-          Text(
-            data.date != null ? _formatDate(data.date!) : 'Hoje',
-            style: const TextStyle(
-              color: AppTheme.textSecondary,
-              fontSize: AppTheme.fontMd,
-            ),
-          ),
-          if (data.previousDate != null) ...[
-            const Text(
-              '  vs  ',
-              style: TextStyle(
-                color: AppTheme.outlineMuted,
-                fontSize: AppTheme.fontSm,
-              ),
-            ),
-            Text(
-              _formatDate(data.previousDate!),
-              style: const TextStyle(
+          Wrap(
+            spacing: 6,
+            runSpacing: 4,
+            crossAxisAlignment: WrapCrossAlignment.center,
+            children: [
+              const Icon(
+                Icons.calendar_today,
+                size: 14,
                 color: AppTheme.textSecondary,
-                fontSize: AppTheme.fontMd,
               ),
-            ),
-          ],
-          const Spacer(),
+              Text(
+                data.date != null ? _formatDate(data.date!) : 'Hoje',
+                style: const TextStyle(
+                  color: AppTheme.textSecondary,
+                  fontSize: AppTheme.fontMd,
+                ),
+              ),
+              if (data.previousDate != null) ...[
+                const Text(
+                  'vs',
+                  style: TextStyle(
+                    color: AppTheme.outlineMuted,
+                    fontSize: AppTheme.fontSm,
+                  ),
+                ),
+                Text(
+                  _formatDate(data.previousDate!),
+                  style: const TextStyle(
+                    color: AppTheme.textSecondary,
+                    fontSize: AppTheme.fontMd,
+                  ),
+                ),
+              ],
+            ],
+          ),
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
             decoration: BoxDecoration(
@@ -445,7 +478,10 @@ class _MoverCard extends StatelessWidget {
                     overflow: TextOverflow.ellipsis,
                   ),
                   const SizedBox(height: 2),
-                  Row(
+                  Wrap(
+                    spacing: 4,
+                    runSpacing: 2,
+                    crossAxisAlignment: WrapCrossAlignment.center,
                     children: [
                       if (mover.setCode != null)
                         Text(
@@ -457,7 +493,7 @@ class _MoverCard extends StatelessWidget {
                         ),
                       if (mover.rarity != null) ...[
                         const Text(
-                          ' • ',
+                          '•',
                           style: TextStyle(
                             color: AppTheme.outlineMuted,
                             fontSize: AppTheme.fontSm,

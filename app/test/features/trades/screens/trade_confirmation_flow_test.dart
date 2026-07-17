@@ -13,6 +13,10 @@ import 'package:provider/provider.dart';
 class _NoopApiClient extends ApiClient {}
 
 class _FakeBinderProvider extends BinderProvider {
+  _FakeBinderProvider([this.binderItems = const []]);
+
+  final List<BinderItem> binderItems;
+
   @override
   Future<List<BinderItem>?> fetchBinderDirect({
     required String listType,
@@ -29,12 +33,17 @@ class _FakeBinderProvider extends BinderProvider {
     String sortBy = 'name',
     String sortOrder = 'asc',
   }) async {
-    return [];
+    return binderItems;
   }
 }
 
 class _RecordingCreateTradeProvider extends TradeProvider {
   int createCalls = 0;
+  String? lastType;
+  List<Map<String, dynamic>> lastMyItems = const [];
+  List<Map<String, dynamic>> lastRequestedItems = const [];
+  double? lastPaymentAmount;
+  String? lastPaymentMethod;
 
   @override
   Future<bool> createTrade({
@@ -47,6 +56,11 @@ class _RecordingCreateTradeProvider extends TradeProvider {
     String? paymentMethod,
   }) async {
     createCalls++;
+    lastType = type;
+    lastMyItems = myItems;
+    lastRequestedItems = requestedItems;
+    lastPaymentAmount = paymentAmount;
+    lastPaymentMethod = paymentMethod;
     return true;
   }
 }
@@ -113,6 +127,27 @@ class _DetailTradeProvider extends TradeProvider {
     lastStatus = status;
     return true;
   }
+}
+
+class _MissingDetailTradeProvider extends TradeProvider {
+  int fetchCalls = 0;
+
+  @override
+  TradeOffer? get selectedTrade => null;
+
+  @override
+  bool get isLoading => false;
+
+  @override
+  String? get errorMessage => 'Não foi possível carregar este trade agora.';
+
+  @override
+  Future<void> fetchTradeDetail(String tradeId) async {
+    fetchCalls++;
+  }
+
+  @override
+  void clearSelectedTrade() {}
 }
 
 void main() {
@@ -183,6 +218,197 @@ void main() {
     expect(tradeProvider.createCalls, 1);
   });
 
+  testWidgets('switching mixed to trade clears and omits payment', (
+    tester,
+  ) async {
+    final tradeProvider = _RecordingCreateTradeProvider();
+    final requestedItem = _binderItem(
+      id: 'requested-1',
+      cardName: 'Doubling Season',
+      price: 100,
+    );
+    final offeredItem = _binderItem(
+      id: 'offered-1',
+      cardName: 'Sol Ring',
+      price: 20,
+    );
+
+    await tester.pumpWidget(
+      MultiProvider(
+        providers: [
+          ChangeNotifierProvider<BinderProvider>(
+            create: (_) => _FakeBinderProvider([offeredItem]),
+          ),
+          ChangeNotifierProvider<TradeProvider>.value(value: tradeProvider),
+        ],
+        child: MaterialApp(
+          theme: AppTheme.darkTheme,
+          home: CreateTradeScreen(
+            receiverId: 'receiver-1',
+            initialType: 'mixed',
+            preselectedItem: requestedItem,
+          ),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.byKey(const Key('create-trade-add-item-offered')));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Sol Ring'));
+    await tester.pumpAndSettle();
+    await tester.enterText(
+      find.byKey(const Key('create-trade-payment-field')),
+      '25',
+    );
+
+    await tester.tap(find.byKey(const Key('create-trade-type-trade')));
+    await tester.pumpAndSettle();
+    expect(find.byKey(const Key('create-trade-payment-field')), findsNothing);
+    await tester.tap(find.byKey(const Key('create-trade-type-mixed')));
+    await tester.pumpAndSettle();
+    expect(
+      tester
+          .widget<TextField>(
+            find.byKey(const Key('create-trade-payment-field')),
+          )
+          .controller
+          ?.text,
+      isEmpty,
+    );
+    await tester.tap(find.byKey(const Key('create-trade-type-trade')));
+    await tester.pumpAndSettle();
+
+    await tester.ensureVisible(
+      find.byKey(const ValueKey('create-trade-submit-button')),
+    );
+    await tester.tap(find.byKey(const ValueKey('create-trade-submit-button')));
+    await tester.pumpAndSettle();
+    expect(find.textContaining('Pagamento:'), findsNothing);
+    await tester.tap(
+      find.byKey(const ValueKey('create-trade-review-confirm-button')),
+    );
+    await tester.pumpAndSettle();
+
+    expect(tradeProvider.lastType, 'trade');
+    expect(tradeProvider.lastMyItems, hasLength(1));
+    expect(tradeProvider.lastRequestedItems, hasLength(1));
+    expect(tradeProvider.lastPaymentAmount, isNull);
+    expect(tradeProvider.lastPaymentMethod, isNull);
+  });
+
+  testWidgets('switching mixed to sale clears and omits offered items', (
+    tester,
+  ) async {
+    final tradeProvider = _RecordingCreateTradeProvider();
+    final requestedItem = _binderItem(
+      id: 'requested-2',
+      cardName: 'Rhystic Study',
+      price: 150,
+    );
+    final offeredItem = _binderItem(
+      id: 'offered-2',
+      cardName: 'Arcane Signet',
+      price: 8,
+    );
+
+    await tester.pumpWidget(
+      MultiProvider(
+        providers: [
+          ChangeNotifierProvider<BinderProvider>(
+            create: (_) => _FakeBinderProvider([offeredItem]),
+          ),
+          ChangeNotifierProvider<TradeProvider>.value(value: tradeProvider),
+        ],
+        child: MaterialApp(
+          theme: AppTheme.darkTheme,
+          home: CreateTradeScreen(
+            receiverId: 'receiver-1',
+            initialType: 'mixed',
+            preselectedItem: requestedItem,
+          ),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.byKey(const Key('create-trade-add-item-offered')));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Arcane Signet'));
+    await tester.pumpAndSettle();
+    await tester.enterText(
+      find.byKey(const Key('create-trade-payment-field')),
+      '42,50',
+    );
+    await tester.tap(find.byKey(const Key('create-trade-type-sale')));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const Key('create-trade-type-mixed')));
+    await tester.pumpAndSettle();
+    expect(
+      find.byKey(const Key('create-trade-selected-item-offered-0')),
+      findsNothing,
+    );
+    await tester.tap(find.byKey(const Key('create-trade-type-sale')));
+    await tester.pumpAndSettle();
+
+    await tester.ensureVisible(
+      find.byKey(const ValueKey('create-trade-submit-button')),
+    );
+    await tester.tap(find.byKey(const ValueKey('create-trade-submit-button')));
+    await tester.pumpAndSettle();
+    await tester.tap(
+      find.byKey(const ValueKey('create-trade-review-confirm-button')),
+    );
+    await tester.pumpAndSettle();
+
+    expect(tradeProvider.lastType, 'sale');
+    expect(tradeProvider.lastMyItems, isEmpty);
+    expect(tradeProvider.lastRequestedItems, hasLength(1));
+    expect(tradeProvider.lastPaymentAmount, 42.5);
+    expect(tradeProvider.lastPaymentMethod, 'pix');
+  });
+
+  testWidgets('pure trade cannot be submitted with items from one side only', (
+    tester,
+  ) async {
+    final tradeProvider = _RecordingCreateTradeProvider();
+    await tester.pumpWidget(
+      MultiProvider(
+        providers: [
+          ChangeNotifierProvider<BinderProvider>(
+            create: (_) => _FakeBinderProvider(),
+          ),
+          ChangeNotifierProvider<TradeProvider>.value(value: tradeProvider),
+        ],
+        child: MaterialApp(
+          theme: AppTheme.darkTheme,
+          home: CreateTradeScreen(
+            receiverId: 'receiver-1',
+            preselectedItem: _binderItem(
+              id: 'requested-3',
+              cardName: 'Smothering Tithe',
+              price: 120,
+            ),
+          ),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    await tester.ensureVisible(
+      find.byKey(const ValueKey('create-trade-submit-button')),
+    );
+    await tester.tap(find.byKey(const ValueKey('create-trade-submit-button')));
+    await tester.pump();
+
+    expect(
+      find.text('Uma troca precisa de itens dos dois jogadores'),
+      findsOneWidget,
+    );
+    expect(tradeProvider.createCalls, 0);
+    expect(find.byKey(const Key('create-trade-review-dialog')), findsNothing);
+  });
+
   testWidgets('TradeDetailScreen confirms accept before provider action', (
     tester,
   ) async {
@@ -234,11 +460,69 @@ void main() {
     expect(provider.updateCalls, 1);
     expect(provider.lastStatus, 'delivered');
   });
+
+  testWidgets('TradeDetailScreen limita conteudo operacional em 1280px', (
+    tester,
+  ) async {
+    tester.view.physicalSize = const Size(1280, 900);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(() {
+      tester.view.resetPhysicalSize();
+      tester.view.resetDevicePixelRatio();
+    });
+    final provider = _DetailTradeProvider(
+      _trade(status: 'pending', receiverId: 'user-1'),
+    );
+
+    await _pumpTradeDetail(tester, provider, currentUserId: 'user-1');
+
+    expect(
+      tester.getSize(find.byKey(const Key('trade-detail-content'))).width,
+      lessThanOrEqualTo(1120),
+    );
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('TradeDetailScreen vazio oferece retry do detalhe atual', (
+    tester,
+  ) async {
+    final provider = _MissingDetailTradeProvider();
+
+    await _pumpTradeDetail(tester, provider, currentUserId: 'user-1');
+
+    expect(provider.fetchCalls, 1);
+    expect(find.byKey(const Key('trade-detail-error-state')), findsOneWidget);
+    expect(find.text('Não foi possível abrir este trade'), findsOneWidget);
+
+    await tester.tap(find.widgetWithText(ElevatedButton, 'Tentar novamente'));
+    await tester.pump();
+
+    expect(provider.fetchCalls, 2);
+  });
+}
+
+BinderItem _binderItem({
+  required String id,
+  required String cardName,
+  required double price,
+}) {
+  return BinderItem(
+    id: id,
+    cardId: 'card-$id',
+    cardName: cardName,
+    quantity: 1,
+    condition: 'NM',
+    forTrade: true,
+    forSale: true,
+    price: price,
+    currency: 'BRL',
+    language: 'pt',
+  );
 }
 
 Future<void> _pumpTradeDetail(
   WidgetTester tester,
-  _DetailTradeProvider provider, {
+  TradeProvider provider, {
   required String currentUserId,
 }) async {
   await tester.pumpWidget(

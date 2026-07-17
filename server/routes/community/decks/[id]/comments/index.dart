@@ -33,18 +33,16 @@ Future<Response> _list(RequestContext context, String deckId) async {
       limit: limit,
       offset: (page - 1).clamp(0, 999999) * limit.clamp(1, 100),
     );
-    return Response.json(body: {
-      'data': comments,
-      'page': page,
-      'limit': limit.clamp(1, 100),
-    });
+    return Response.json(
+      body: {'data': comments, 'page': page, 'limit': limit.clamp(1, 100)},
+    );
   } catch (error) {
     return internalServerError('Falha ao carregar comentarios', details: error);
   }
 }
 
 Future<Response> _create(RequestContext context, String deckId) async {
-  final userId = readAuthenticatedUserId(context);
+  final userId = await readAuthenticatedUserId(context);
   if (userId == null) return authenticationRequired();
 
   Map<String, dynamic> body;

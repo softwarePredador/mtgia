@@ -406,371 +406,431 @@ class _DeckImportScreenState extends State<DeckImportScreen> {
           onPressed: () => context.go('/decks'),
         ),
       ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            Container(
-              padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                color: AppTheme.surfaceElevated,
-                borderRadius: BorderRadius.circular(AppTheme.radiusMd),
-                border: Border.all(
-                  color: AppTheme.outlineMuted.withValues(alpha: 0.7),
-                ),
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    children: [
-                      Container(
-                        padding: const EdgeInsets.all(10),
-                        decoration: BoxDecoration(
-                          color: AppTheme.primarySoft.withValues(alpha: 0.16),
-                          borderRadius: BorderRadius.circular(
-                            AppTheme.radiusMd,
-                          ),
-                        ),
-                        child: const Icon(
-                          Icons.content_paste_rounded,
-                          color: AppTheme.primarySoft,
-                          size: 20,
-                        ),
-                      ),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              'Importar Lista',
-                              style: theme.textTheme.titleLarge?.copyWith(
-                                fontWeight: FontWeight.w700,
-                                color: AppTheme.textPrimary,
-                              ),
-                            ),
-                            const SizedBox(height: 2),
-                            Text(
-                              'Cole sua lista e transforme isso em um deck editável em poucos passos.',
-                              style: theme.textTheme.bodyMedium?.copyWith(
-                                color: AppTheme.textSecondary,
-                                height: 1.35,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 12),
-                  Wrap(
-                    spacing: 8,
-                    runSpacing: 8,
-                    children: const [
-                      _ImportSourcePill(label: 'Moxfield / Archidekt / EDHRec'),
-                      _ImportSourcePill(label: 'MTGA / MTGO'),
-                      _ImportSourcePill(label: 'Texto simples'),
-                    ],
-                  ),
-                ],
-              ),
+      body: LayoutBuilder(
+        builder: (context, constraints) {
+          final isDesktop = constraints.maxWidth >= AppTheme.breakpointExpanded;
+          final horizontalPadding =
+              constraints.maxWidth < AppTheme.breakpointCompact ? 16.0 : 24.0;
+
+          return SingleChildScrollView(
+            padding: EdgeInsets.fromLTRB(
+              horizontalPadding,
+              24,
+              horizontalPadding,
+              32 + MediaQuery.paddingOf(context).bottom,
             ),
-
-            const SizedBox(height: 20),
-
-            // Nome do Deck
-            TextField(
-              key: const Key('deck-import-screen-name-field'),
-              controller: _nameController,
-              decoration: InputDecoration(
-                labelText: 'Nome do Deck',
-                hintText: 'Ex: Goblins Aggro',
-                border: const OutlineInputBorder(),
-                prefixIcon: const Icon(Icons.edit),
-                filled: true,
-                fillColor: theme.colorScheme.surface,
-              ),
-            ),
-
-            const SizedBox(height: 16),
-
-            // Formato
-            DropdownButtonFormField<String>(
-              key: const Key('deck-import-screen-format-field'),
-              initialValue: _selectedFormat,
-              decoration: const InputDecoration(
-                labelText: 'Formato *',
-                border: OutlineInputBorder(),
-                prefixIcon: Icon(Icons.category),
-              ),
-              items:
-                  _formats
-                      .map(
-                        (f) => DropdownMenuItem(
-                          value: f,
-                          child: Text(f[0].toUpperCase() + f.substring(1)),
-                        ),
-                      )
-                      .toList(),
-              onChanged: (value) {
-                if (value != null) {
-                  setState(() => _selectedFormat = value);
-                }
-              },
-            ),
-
-            const SizedBox(height: 16),
-
-            // Comandante (só para Commander/Brawl)
-            if (_isCommanderFormat) ...[
-              TextField(
-                key: const Key('deck-import-screen-commander-field'),
-                controller: _commanderController,
-                decoration: const InputDecoration(
-                  labelText: 'Comandante (recomendado)',
-                  hintText: 'Ex: Kaalia da Vastidão ou Kaalia of the Vast',
-                  border: OutlineInputBorder(),
-                  prefixIcon: Icon(Icons.star),
-                  helperText:
-                      'Ajuda a validar identidade de cor; também aceita [Commander] na lista.',
-                ),
-              ),
-              const SizedBox(height: 16),
-            ],
-
-            // Descrição
-            TextField(
-              key: const Key('deck-import-screen-description-field'),
-              controller: _descriptionController,
-              decoration: const InputDecoration(
-                labelText: 'Descrição (opcional)',
-                hintText: 'Ex: Deck focado em artefatos...',
-                border: OutlineInputBorder(),
-                prefixIcon: Icon(Icons.description),
-              ),
-              maxLines: 2,
-            ),
-
-            const SizedBox(height: 16),
-
-            // Lista de Cartas
-            Row(
-              children: [
-                Icon(Icons.list_alt, size: 20, color: AppTheme.primarySoft),
-                const SizedBox(width: 8),
-                const Expanded(
-                  child: Text(
-                    'Lista de Cartas',
-                    style: TextStyle(
-                      fontSize: AppTheme.fontLg,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                ),
-                TextButton.icon(
-                  key: const Key('deck-import-screen-example-button'),
-                  onPressed: _pasteExample,
-                  icon: Icon(
-                    Icons.help_outline,
-                    size: 18,
-                    color: AppTheme.primarySoft,
-                  ),
-                  label: Text(
-                    'Exemplo',
-                    style: const TextStyle(color: AppTheme.primarySoft),
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 8),
-            TextField(
-              key: const Key('deck-import-screen-list-field'),
-              controller: _listController,
-              decoration: InputDecoration(
-                hintText:
-                    'Cole aqui sua lista de cartas...\n\nFormato: 1 Sol Ring ou 1x Sol Ring (set)',
-                border: const OutlineInputBorder(),
-                filled: true,
-                fillColor: theme.colorScheme.surface,
-              ),
-              maxLines: 15,
-              style: TextStyle(
-                fontFamily: 'monospace',
-                fontSize: AppTheme.fontMd,
-                color: theme.colorScheme.onSurface,
-              ),
-            ),
-
-            const SizedBox(height: 8),
-
-            // Contador de linhas com feedback inteligente
-            Builder(
-              builder: (context) {
-                final hasCards = _detectedCount > 0;
-                return Container(
-                  key: const Key('deck-import-screen-count-status'),
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 10,
-                    vertical: 8,
-                  ),
-                  decoration: BoxDecoration(
-                    color:
-                        hasCards
-                            ? AppTheme.primarySoft.withValues(alpha: 0.10)
-                            : AppTheme.surfaceElevated,
-                    borderRadius: BorderRadius.circular(AppTheme.radiusMd),
-                    border: Border.all(
-                      color:
-                          hasCards
-                              ? AppTheme.primarySoft.withValues(alpha: 0.28)
-                              : AppTheme.outlineMuted.withValues(alpha: 0.55),
-                    ),
-                  ),
-                  child: Row(
-                    children: [
-                      Icon(
-                        hasCards
-                            ? Icons.check_circle_outline
-                            : Icons.info_outline,
-                        size: 16,
-                        color:
-                            hasCards
-                                ? AppTheme.primarySoft
-                                : AppTheme.textSecondary,
-                      ),
-                      const SizedBox(width: 6),
-                      Expanded(
-                        child: Text(
-                          hasCards
-                              ? '${_detectedCount.toString()} cartas detectadas'
-                              : 'Cole a lista ou use um exemplo para começar',
-                          style: theme.textTheme.bodySmall?.copyWith(
-                            color:
-                                hasCards
-                                    ? AppTheme.textPrimary
-                                    : AppTheme.textSecondary,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                );
-              },
-            ),
-
-            if (_error != null) ...[
-              const SizedBox(height: 16),
-              Container(
-                key: const Key('deck-import-screen-error'),
-                padding: const EdgeInsets.all(14),
-                decoration: BoxDecoration(
-                  color: AppTheme.surfaceElevated,
-                  borderRadius: BorderRadius.circular(AppTheme.radiusMd),
-                  border: Border.all(
-                    color: AppTheme.error.withValues(alpha: 0.35),
-                  ),
-                ),
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+            child: Center(
+              child: ConstrainedBox(
+                key: const Key('deck-import-content-frame'),
+                constraints: const BoxConstraints(maxWidth: 1120),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    Icon(Icons.error_outline_rounded, color: AppTheme.error),
-                    const SizedBox(width: 10),
-                    Expanded(
-                      child: Column(
+                    _buildImportIntro(theme),
+                    const SizedBox(height: 24),
+                    if (isDesktop)
+                      Row(
+                        key: const Key('deck-import-desktop-panes'),
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(
-                            'Não foi possível importar agora',
-                            style: theme.textTheme.titleSmall?.copyWith(
-                              color: AppTheme.textPrimary,
-                              fontWeight: FontWeight.w700,
-                            ),
+                          SizedBox(
+                            key: const Key('deck-import-metadata-pane'),
+                            width: 460,
+                            child: _buildMetadataFields(theme),
                           ),
-                          const SizedBox(height: 4),
-                          Text(
-                            _error!,
-                            style: theme.textTheme.bodyMedium?.copyWith(
-                              color: AppTheme.textSecondary,
-                              height: 1.35,
+                          const SizedBox(width: AppTheme.paneGap),
+                          Expanded(
+                            child: Column(
+                              key: const Key('deck-import-list-pane'),
+                              crossAxisAlignment: CrossAxisAlignment.stretch,
+                              children: [
+                                _buildListEditor(theme),
+                                if (_error != null) ...[
+                                  const SizedBox(height: 16),
+                                  _buildImportError(theme),
+                                ],
+                                const SizedBox(height: 24),
+                                _buildImportFooter(theme, isDesktop: true),
+                              ],
                             ),
                           ),
                         ],
+                      )
+                    else ...[
+                      _buildMetadataFields(theme),
+                      const SizedBox(height: 20),
+                      _buildListEditor(theme),
+                      if (_error != null) ...[
+                        const SizedBox(height: 16),
+                        _buildImportError(theme),
+                      ],
+                      const SizedBox(height: 24),
+                      _buildImportFooter(theme, isDesktop: false),
+                    ],
+                  ],
+                ),
+              ),
+            ),
+          );
+        },
+      ),
+    );
+  }
+
+  Widget _buildImportIntro(ThemeData theme) {
+    return Container(
+      key: const Key('deck-import-intro'),
+      padding: const EdgeInsets.all(18),
+      decoration: BoxDecoration(
+        color: AppTheme.surfaceElevated,
+        borderRadius: BorderRadius.circular(AppTheme.radiusMd),
+        border: Border.all(color: AppTheme.outlineMuted.withValues(alpha: 0.7)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Container(
+                padding: const EdgeInsets.all(10),
+                decoration: BoxDecoration(
+                  color: AppTheme.primarySoft.withValues(alpha: 0.16),
+                  borderRadius: BorderRadius.circular(AppTheme.radiusMd),
+                ),
+                child: const Icon(
+                  Icons.content_paste_rounded,
+                  color: AppTheme.primarySoft,
+                  size: 20,
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Importar Lista',
+                      style: theme.textTheme.titleLarge?.copyWith(
+                        fontWeight: FontWeight.w700,
+                        color: AppTheme.textPrimary,
+                      ),
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      'Cole sua lista e transforme isso em um deck editável em poucos passos.',
+                      style: theme.textTheme.bodyMedium?.copyWith(
+                        color: AppTheme.textSecondary,
+                        height: 1.35,
                       ),
                     ),
                   ],
                 ),
               ),
             ],
+          ),
+          const SizedBox(height: 12),
+          const Wrap(
+            spacing: 8,
+            runSpacing: 8,
+            children: [
+              _ImportSourcePill(label: 'Moxfield / Archidekt / EDHRec'),
+              _ImportSourcePill(label: 'MTGA / MTGO'),
+              _ImportSourcePill(label: 'Texto simples'),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
 
-            const SizedBox(height: 24),
+  Widget _buildMetadataFields(ThemeData theme) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        Text(
+          'Informações do deck',
+          style: theme.textTheme.titleMedium?.copyWith(
+            fontWeight: FontWeight.w700,
+          ),
+        ),
+        const SizedBox(height: 12),
+        TextField(
+          key: const Key('deck-import-screen-name-field'),
+          controller: _nameController,
+          decoration: InputDecoration(
+            labelText: 'Nome do Deck',
+            hintText: 'Ex: Goblins Aggro',
+            border: const OutlineInputBorder(),
+            prefixIcon: const Icon(Icons.edit),
+            filled: true,
+            fillColor: theme.colorScheme.surface,
+          ),
+        ),
+        const SizedBox(height: 16),
+        DropdownButtonFormField<String>(
+          key: const Key('deck-import-screen-format-field'),
+          initialValue: _selectedFormat,
+          decoration: const InputDecoration(
+            labelText: 'Formato *',
+            border: OutlineInputBorder(),
+            prefixIcon: Icon(Icons.category),
+          ),
+          items:
+              _formats
+                  .map(
+                    (f) => DropdownMenuItem(
+                      value: f,
+                      child: Text(f[0].toUpperCase() + f.substring(1)),
+                    ),
+                  )
+                  .toList(),
+          onChanged: (value) {
+            if (value != null) {
+              setState(() => _selectedFormat = value);
+            }
+          },
+        ),
+        const SizedBox(height: 16),
+        if (_isCommanderFormat) ...[
+          TextField(
+            key: const Key('deck-import-screen-commander-field'),
+            controller: _commanderController,
+            decoration: const InputDecoration(
+              labelText: 'Comandante (recomendado)',
+              hintText: 'Ex: Kaalia da Vastidão ou Kaalia of the Vast',
+              border: OutlineInputBorder(),
+              prefixIcon: Icon(Icons.star),
+              helperText:
+                  'Ajuda a validar identidade de cor; também aceita [Commander] na lista.',
+            ),
+          ),
+          const SizedBox(height: 16),
+        ],
+        TextField(
+          key: const Key('deck-import-screen-description-field'),
+          controller: _descriptionController,
+          decoration: const InputDecoration(
+            labelText: 'Descrição (opcional)',
+            hintText: 'Ex: Deck focado em artefatos...',
+            border: OutlineInputBorder(),
+            prefixIcon: Icon(Icons.description),
+          ),
+          maxLines: 2,
+        ),
+      ],
+    );
+  }
 
-            // Botão Importar
-            SizedBox(
-              height: 54,
-              child: ElevatedButton(
-                key: const Key('deck-import-screen-submit-button'),
-                onPressed: _isImporting ? null : _importDeck,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: theme.colorScheme.primary,
-                  foregroundColor: AppTheme.backgroundAbyss,
+  Widget _buildListEditor(ThemeData theme) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        Row(
+          children: [
+            const Icon(Icons.list_alt, size: 20, color: AppTheme.primarySoft),
+            const SizedBox(width: 8),
+            const Expanded(
+              child: Text(
+                'Lista de Cartas',
+                style: TextStyle(
+                  fontSize: AppTheme.fontLg,
+                  fontWeight: FontWeight.w600,
                 ),
-                child:
-                    _isImporting
-                        ? Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            const SizedBox(
-                              width: 20,
-                              height: 20,
-                              child: CircularProgressIndicator(
-                                strokeWidth: 2,
-                                color: AppTheme.backgroundAbyss,
-                              ),
-                            ),
-                            const SizedBox(width: 12),
-                            const Text(
-                              'Importando...',
-                              style: TextStyle(
-                                fontSize: AppTheme.fontLg,
-                                color: AppTheme.textPrimary,
-                              ),
-                            ),
-                          ],
-                        )
-                        : Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            const Icon(Icons.upload),
-                            const SizedBox(width: 8),
-                            const Text(
-                              'Criar Deck',
-                              style: TextStyle(
-                                fontSize: AppTheme.fontLg,
-                                fontWeight: FontWeight.w600,
-                                color: AppTheme.textPrimary,
-                              ),
-                            ),
-                          ],
-                        ),
               ),
             ),
-
-            const SizedBox(height: 12),
-
-            // Texto auxiliar
-            Text(
-              'As cartas reconhecidas entram no deck e o restante volta como revisão.',
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                fontSize: AppTheme.fontSm,
-                color: theme.colorScheme.onSurface.withValues(alpha: 0.5),
+            TextButton.icon(
+              key: const Key('deck-import-screen-example-button'),
+              onPressed: _pasteExample,
+              icon: const Icon(
+                Icons.help_outline,
+                size: 18,
+                color: AppTheme.primarySoft,
+              ),
+              label: const Text(
+                'Exemplo',
+                style: TextStyle(color: AppTheme.primarySoft),
               ),
             ),
           ],
         ),
+        const SizedBox(height: 8),
+        TextField(
+          key: const Key('deck-import-screen-list-field'),
+          controller: _listController,
+          decoration: InputDecoration(
+            hintText:
+                'Cole aqui sua lista de cartas...\n\nFormato: 1 Sol Ring ou 1x Sol Ring (set)',
+            border: const OutlineInputBorder(),
+            filled: true,
+            fillColor: theme.colorScheme.surface,
+          ),
+          maxLines: 15,
+          style: TextStyle(
+            fontFamily: 'monospace',
+            fontSize: AppTheme.fontMd,
+            color: theme.colorScheme.onSurface,
+          ),
+        ),
+        const SizedBox(height: 8),
+        Builder(
+          builder: (context) {
+            final hasCards = _detectedCount > 0;
+            return Container(
+              key: const Key('deck-import-screen-count-status'),
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+              decoration: BoxDecoration(
+                color:
+                    hasCards
+                        ? AppTheme.primarySoft.withValues(alpha: 0.10)
+                        : AppTheme.surfaceElevated,
+                borderRadius: BorderRadius.circular(AppTheme.radiusMd),
+                border: Border.all(
+                  color:
+                      hasCards
+                          ? AppTheme.primarySoft.withValues(alpha: 0.28)
+                          : AppTheme.outlineMuted.withValues(alpha: 0.55),
+                ),
+              ),
+              child: Row(
+                children: [
+                  Icon(
+                    hasCards ? Icons.check_circle_outline : Icons.info_outline,
+                    size: 16,
+                    color:
+                        hasCards
+                            ? AppTheme.primarySoft
+                            : AppTheme.textSecondary,
+                  ),
+                  const SizedBox(width: 6),
+                  Expanded(
+                    child: Text(
+                      hasCards
+                          ? '${_detectedCount.toString()} cartas detectadas'
+                          : 'Cole a lista ou use um exemplo para começar',
+                      style: theme.textTheme.bodySmall?.copyWith(
+                        color:
+                            hasCards
+                                ? AppTheme.textPrimary
+                                : AppTheme.textSecondary,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            );
+          },
+        ),
+      ],
+    );
+  }
+
+  Widget _buildImportError(ThemeData theme) {
+    return Container(
+      key: const Key('deck-import-screen-error'),
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: AppTheme.surfaceElevated,
+        borderRadius: BorderRadius.circular(AppTheme.radiusMd),
+        border: Border.all(color: AppTheme.error.withValues(alpha: 0.35)),
       ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Icon(Icons.error_outline_rounded, color: AppTheme.error),
+          const SizedBox(width: 10),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Não foi possível importar agora',
+                  style: theme.textTheme.titleSmall?.copyWith(
+                    color: AppTheme.textPrimary,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  _error!,
+                  style: theme.textTheme.bodyMedium?.copyWith(
+                    color: AppTheme.textSecondary,
+                    height: 1.35,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildImportFooter(ThemeData theme, {required bool isDesktop}) {
+    return Column(
+      crossAxisAlignment:
+          isDesktop ? CrossAxisAlignment.end : CrossAxisAlignment.stretch,
+      children: [
+        SizedBox(
+          key: const Key('deck-import-cta-frame'),
+          width: isDesktop ? 320 : double.infinity,
+          height: 54,
+          child: ElevatedButton(
+            key: const Key('deck-import-screen-submit-button'),
+            onPressed: _isImporting ? null : _importDeck,
+            style: ElevatedButton.styleFrom(
+              backgroundColor: theme.colorScheme.primary,
+              foregroundColor: AppTheme.backgroundAbyss,
+            ),
+            child:
+                _isImporting
+                    ? const Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        SizedBox(
+                          width: 20,
+                          height: 20,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                            color: AppTheme.backgroundAbyss,
+                          ),
+                        ),
+                        SizedBox(width: 12),
+                        Text(
+                          'Importando...',
+                          style: TextStyle(fontSize: AppTheme.fontLg),
+                        ),
+                      ],
+                    )
+                    : const Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(Icons.upload),
+                        SizedBox(width: 8),
+                        Text(
+                          'Criar Deck',
+                          style: TextStyle(
+                            fontSize: AppTheme.fontLg,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ],
+                    ),
+          ),
+        ),
+        const SizedBox(height: 12),
+        SizedBox(
+          width: isDesktop ? 320 : double.infinity,
+          child: Text(
+            'As cartas reconhecidas entram no deck e o restante volta como revisão.',
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              fontSize: AppTheme.fontSm,
+              color: theme.colorScheme.onSurface.withValues(alpha: 0.5),
+            ),
+          ),
+        ),
+      ],
     );
   }
 }

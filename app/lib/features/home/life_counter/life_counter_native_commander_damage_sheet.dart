@@ -12,7 +12,7 @@ Future<LifeCounterSession?> showLifeCounterNativeCommanderDamageSheet(
   return showModalBottomSheet<LifeCounterSession>(
     context: context,
     isScrollControlled: true,
-    backgroundColor: Colors.transparent,
+    backgroundColor: AppTheme.transparent,
     builder: (context) {
       return _LifeCounterNativeCommanderDamageSheet(
         initialSession: initialSession,
@@ -51,7 +51,7 @@ class _LifeCounterNativeCommanderDamageSheetState
     _draftSession = widget.initialSession;
   }
 
-  String _playerLabel(int index) => 'Player ${index + 1}';
+  String _playerLabel(int index) => 'Jogador ${index + 1}';
 
   void _updateCommanderDamage({
     required int sourceIndex,
@@ -116,7 +116,7 @@ class _LifeCounterNativeCommanderDamageSheetState
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             const Text(
-                              'Commander Damage',
+                              'Dano de comandante',
                               style: TextStyle(
                                 color: AppTheme.textPrimary,
                                 fontSize: AppTheme.fontXxl,
@@ -125,11 +125,11 @@ class _LifeCounterNativeCommanderDamageSheetState
                             ),
                             const SizedBox(height: 6),
                             Text(
-                              'Track commander damage from each opponent.',
+                              'Registre o dano de comandante causado por cada oponente.',
                               style: const TextStyle(
                                 color: AppTheme.textSecondary,
                                 fontSize: AppTheme.fontMd,
-                                height: 1.35,
+                                height: AppTheme.lineHeightCompact,
                               ),
                             ),
                           ],
@@ -139,7 +139,7 @@ class _LifeCounterNativeCommanderDamageSheetState
                         onPressed: () => Navigator.of(context).pop(),
                         icon: const Icon(Icons.close_rounded),
                         color: AppTheme.textSecondary,
-                        tooltip: 'Close',
+                        tooltip: 'Fechar',
                       ),
                     ],
                   ),
@@ -150,9 +150,9 @@ class _LifeCounterNativeCommanderDamageSheetState
                     padding: const EdgeInsets.fromLTRB(20, 18, 20, 12),
                     children: [
                       _SectionCard(
-                        title: 'Target Player',
+                        title: 'Jogador alvo',
                         subtitle:
-                            'Choose which player is receiving commander damage.',
+                            'Escolha qual jogador está recebendo dano de comandante.',
                         child: Wrap(
                           spacing: 8,
                           runSpacing: 8,
@@ -175,16 +175,15 @@ class _LifeCounterNativeCommanderDamageSheetState
                       const SizedBox(height: 18),
                       if (lethalSources.isNotEmpty) ...[
                         _SectionCard(
-                          title: 'Commander damage lethal',
+                          title: 'Dano letal de comandante',
                           subtitle: lethalSummary ?? '',
                           child: const SizedBox.shrink(),
                         ),
                         const SizedBox(height: 18),
                       ],
                       _SectionCard(
-                        title: 'Target Status',
-                        subtitle:
-                            'Review whether the selected damage is lethal.',
+                        title: 'Status do alvo',
+                        subtitle: 'Confira se o dano registrado é letal.',
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
@@ -208,7 +207,7 @@ class _LifeCounterNativeCommanderDamageSheetState
                               style: const TextStyle(
                                 color: AppTheme.textSecondary,
                                 fontSize: AppTheme.fontSm,
-                                height: 1.35,
+                                height: AppTheme.lineHeightCompact,
                               ),
                             ),
                           ],
@@ -216,9 +215,9 @@ class _LifeCounterNativeCommanderDamageSheetState
                       ),
                       const SizedBox(height: 18),
                       _SectionCard(
-                        title: 'Damage By Source',
+                        title: 'Dano por fonte',
                         subtitle:
-                            'Track each commander separately when an opponent has a partner.',
+                            'Registre cada comandante separadamente quando um oponente tiver parceiro.',
                         child: Column(
                           children: [
                             for (
@@ -292,7 +291,7 @@ class _LifeCounterNativeCommanderDamageSheetState
                             ),
                             padding: const EdgeInsets.symmetric(vertical: 14),
                           ),
-                          child: const Text('Cancel'),
+                          child: const Text('Cancelar'),
                         ),
                       ),
                       const SizedBox(width: 12),
@@ -310,7 +309,7 @@ class _LifeCounterNativeCommanderDamageSheetState
                             foregroundColor: AppTheme.backgroundAbyss,
                             padding: const EdgeInsets.symmetric(vertical: 14),
                           ),
-                          child: const Text('Apply'),
+                          child: const Text('Aplicar'),
                         ),
                       ),
                     ],
@@ -382,7 +381,7 @@ class _CommanderDamageSourceCard extends StatelessWidget {
                   ),
                 ),
                 Text(
-                  'Total ${detail.totalDamage}',
+                  'Total: ${detail.totalDamage}',
                   style: TextStyle(
                     color: isLethal ? AppTheme.error : AppTheme.textSecondary,
                     fontWeight: FontWeight.w700,
@@ -472,7 +471,7 @@ class _CommanderDamageStepper extends StatelessWidget {
         ),
         Container(
           key: valueKey,
-          width: 46,
+          width: AppTheme.touchTargetMin,
           alignment: Alignment.center,
           child: Text(
             '$value',
@@ -533,7 +532,7 @@ class _SectionCard extends StatelessWidget {
               style: const TextStyle(
                 color: AppTheme.textSecondary,
                 fontSize: AppTheme.fontSm,
-                height: 1.35,
+                height: AppTheme.lineHeightCompact,
               ),
             ),
             const SizedBox(height: 14),

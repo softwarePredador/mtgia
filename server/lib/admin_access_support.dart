@@ -74,6 +74,7 @@ Future<bool> isConfiguredAdminUser({
         SELECT LOWER(email) AS email
         FROM users
         WHERE id = CAST(@user_id AS uuid)
+          AND deleted_at IS NULL
         LIMIT 1
       '''),
       parameters: {'user_id': userId},

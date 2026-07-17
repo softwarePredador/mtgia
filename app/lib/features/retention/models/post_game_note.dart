@@ -14,7 +14,7 @@ extension PostGameIssueLabel on PostGameIssue {
     PostGameIssue.mana => 'Mana',
     PostGameIssue.draw => 'Compra',
     PostGameIssue.removal => 'Remoção',
-    PostGameIssue.winCondition => 'Win condition',
+    PostGameIssue.winCondition => 'Condição de vitória',
     PostGameIssue.speed => 'Velocidade',
     PostGameIssue.protection => 'Proteção',
   };
@@ -52,6 +52,9 @@ class PostGameNote {
   final List<String> performedWell;
   final List<String> underperformed;
   final List<PostGameIssue> issues;
+  final String? playSessionId;
+  final DateTime? sessionStartedAt;
+  final DateTime? sessionEndedAt;
 
   const PostGameNote({
     required this.id,
@@ -63,6 +66,9 @@ class PostGameNote {
     this.performedWell = const <String>[],
     this.underperformed = const <String>[],
     this.issues = const <PostGameIssue>[],
+    this.playSessionId,
+    this.sessionStartedAt,
+    this.sessionEndedAt,
   });
 
   factory PostGameNote.create({
@@ -73,6 +79,9 @@ class PostGameNote {
     List<String> performedWell = const <String>[],
     List<String> underperformed = const <String>[],
     List<PostGameIssue> issues = const <PostGameIssue>[],
+    String? playSessionId,
+    DateTime? sessionStartedAt,
+    DateTime? sessionEndedAt,
     DateTime? createdAt,
   }) {
     final timestamp = createdAt ?? DateTime.now();
@@ -86,6 +95,9 @@ class PostGameNote {
       performedWell: _cleanList(performedWell),
       underperformed: _cleanList(underperformed),
       issues: List<PostGameIssue>.unmodifiable(issues),
+      playSessionId: _cleanOptional(playSessionId),
+      sessionStartedAt: _validSessionDate(sessionStartedAt),
+      sessionEndedAt: _validSessionDate(sessionEndedAt),
     );
   }
 
@@ -104,6 +116,9 @@ class PostGameNote {
       issues: _readStringList(
         json['issues'],
       ).map(PostGameIssueLabel.fromId).toList(growable: false),
+      playSessionId: _cleanOptional(json['play_session_id']?.toString()),
+      sessionStartedAt: _readSessionDate(json['session_started_at']),
+      sessionEndedAt: _readSessionDate(json['session_ended_at']),
     );
   }
 
@@ -118,7 +133,21 @@ class PostGameNote {
       'performed_well': performedWell,
       'underperformed': underperformed,
       'issues': issues.map((issue) => issue.id).toList(),
+      if (playSessionId != null) 'play_session_id': playSessionId,
+      if (sessionStartedAt != null)
+        'session_started_at': sessionStartedAt!.toIso8601String(),
+      if (sessionEndedAt != null)
+        'session_ended_at': sessionEndedAt!.toIso8601String(),
     };
+  }
+
+  Duration? get sessionDuration {
+    final startedAt = sessionStartedAt;
+    final endedAt = sessionEndedAt;
+    if (startedAt == null || endedAt == null || endedAt.isBefore(startedAt)) {
+      return null;
+    }
+    return endedAt.difference(startedAt);
   }
 
   List<String> get automaticSuggestions {
@@ -138,6 +167,20 @@ class PostGameNote {
         .where((value) => value.isNotEmpty)
         .toSet()
         .toList(growable: false);
+  }
+
+  static String? _cleanOptional(String? value) {
+    final normalized = value?.trim();
+    return normalized == null || normalized.isEmpty ? null : normalized;
+  }
+
+  static DateTime? _validSessionDate(DateTime? value) {
+    if (value == null || value.millisecondsSinceEpoch <= 0) return null;
+    return value;
+  }
+
+  static DateTime? _readSessionDate(Object? value) {
+    return _validSessionDate(DateTime.tryParse(value?.toString() ?? ''));
   }
 
   static List<String> _readStringList(dynamic value) {

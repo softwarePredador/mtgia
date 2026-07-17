@@ -1,9 +1,38 @@
 import 'dart:convert';
 
+import 'package:crypto/crypto.dart';
 import 'package:postgres/postgres.dart';
+
+class PostGameNotePage {
+  const PostGameNotePage({required this.notes, required this.syncCursor});
+
+  final List<Map<String, dynamic>> notes;
+  final DateTime syncCursor;
+}
+
+class PostGameConflictException implements Exception {
+  const PostGameConflictException(this.currentNote);
+
+  final Map<String, dynamic>? currentNote;
+}
+
+class PostGameValidationException implements Exception {
+  const PostGameValidationException(this.message);
+
+  final String message;
+}
+
+class PostGameNoteNotFoundException implements Exception {}
 
 class PostGameNoteService {
   PostGameNoteService(this.pool);
+
+  static const _noteColumns = '''
+    id, deck_id, created_at, result, table_level, notes,
+    performed_well, underperformed, issues, play_session_id,
+    session_started_at, session_ended_at, deck_snapshot_hash,
+    deck_version_at, revision, deleted_at, updated_at
+  ''';
 
   final Pool pool;
 
@@ -24,30 +53,54 @@ class PostGameNoteService {
     return result.isNotEmpty;
   }
 
-  Future<List<Map<String, dynamic>>> listNotes({
+  Future<PostGameNotePage> listNotes({
     required String userId,
     required String deckId,
-  }) async {
-    final result = await pool.execute(
-      Sql.named('''
-        SELECT id, deck_id, created_at, result, table_level, notes,
-               performed_well, underperformed, issues, updated_at
-        FROM post_game_notes
-        WHERE deck_id = CAST(@deckId AS uuid)
-          AND user_id = CAST(@userId AS uuid)
-        ORDER BY created_at DESC, updated_at DESC
-      '''),
-      parameters: {'deckId': deckId, 'userId': userId},
-    );
+    bool includeDeleted = false,
+    DateTime? updatedSince,
+  }) {
+    return pool.runTx((session) async {
+      final syncCursor = await _reserveSyncWatermark(session);
+      final deletedFilter = includeDeleted ? '' : 'AND deleted_at IS NULL';
+      final orderBy =
+          updatedSince == null
+              ? 'created_at DESC, updated_at DESC'
+              : 'updated_at ASC, id ASC';
+      final result = await session.execute(
+        Sql.named('''
+          SELECT $_noteColumns
+          FROM post_game_notes
+          WHERE deck_id = CAST(@deckId AS uuid)
+            AND user_id = CAST(@userId AS uuid)
+            AND updated_at <= @syncCursor
+            AND (
+              CAST(@updatedSince AS timestamptz) IS NULL
+              OR updated_at > CAST(@updatedSince AS timestamptz)
+            )
+            $deletedFilter
+          ORDER BY $orderBy
+        '''),
+        parameters: {
+          'deckId': deckId,
+          'userId': userId,
+          'syncCursor': syncCursor,
+          'updatedSince': updatedSince,
+        },
+      );
 
-    return result.map(_rowToJson).toList(growable: false);
+      return PostGameNotePage(
+        notes: result.map(_rowToJson).toList(growable: false),
+        syncCursor: syncCursor.toUtc(),
+      );
+    });
   }
 
   Future<Map<String, dynamic>> buildTimeline({
     required String userId,
     required String deckId,
   }) async {
-    final notes = await listNotes(userId: userId, deckId: deckId);
+    final page = await listNotes(userId: userId, deckId: deckId);
+    final notes = page.notes;
     final issueCounts = <String, int>{};
     final performerCounts = <String, int>{};
     final reviewCounts = <String, int>{};
@@ -93,101 +146,314 @@ class PostGameNoteService {
     required String deckId,
     required Map<String, dynamic> note,
   }) async {
-    final id = _cleanString(note['id']);
-    final createdAt = _cleanString(note['created_at']);
-    final result = _cleanString(note['result']);
-    final tableLevel = _cleanString(note['table_level']);
-    final notes = _cleanString(note['notes']);
-    final performedWell = _stringList(note['performed_well']);
-    final underperformed = _stringList(note['underperformed']);
-    final issues = _stringList(note['issues']);
-
-    final inserted = await pool.execute(
-      Sql.named('''
-        INSERT INTO post_game_notes (
-          id,
-          user_id,
-          deck_id,
-          created_at,
-          result,
-          table_level,
-          notes,
-          performed_well,
-          underperformed,
-          issues,
-          updated_at
-        )
-        VALUES (
-          @id,
-          CAST(@userId AS uuid),
-          CAST(@deckId AS uuid),
-          COALESCE(CAST(NULLIF(@createdAt, '') AS timestamptz), NOW()),
-          @result,
-          @tableLevel,
-          @notes,
-          @performedWell::jsonb,
-          @underperformed::jsonb,
-          @issues::jsonb,
-          NOW()
-        )
-        ON CONFLICT (id) DO UPDATE SET
-          result = EXCLUDED.result,
-          table_level = EXCLUDED.table_level,
-          notes = EXCLUDED.notes,
-          performed_well = EXCLUDED.performed_well,
-          underperformed = EXCLUDED.underperformed,
-          issues = EXCLUDED.issues,
-          updated_at = NOW()
-        WHERE post_game_notes.user_id = CAST(@userId AS uuid)
-          AND post_game_notes.deck_id = CAST(@deckId AS uuid)
-        RETURNING id, deck_id, created_at, result, table_level, notes,
-                  performed_well, underperformed, issues, updated_at
-      '''),
-      parameters: {
-        'id':
-            id.isEmpty ? DateTime.now().microsecondsSinceEpoch.toString() : id,
-        'userId': userId,
-        'deckId': deckId,
-        'createdAt': createdAt,
-        'result': result,
-        'tableLevel': tableLevel,
-        'notes': notes,
-        'performedWell': jsonEncode(performedWell),
-        'underperformed': jsonEncode(underperformed),
-        'issues': jsonEncode(issues),
-      },
+    final id = _boundedString(note['id'], 'id', 128, allowEmpty: true);
+    final resolvedId =
+        id.isEmpty ? DateTime.now().microsecondsSinceEpoch.toString() : id;
+    final createdAt = _optionalDate(note['created_at'], 'created_at');
+    final result = _boundedString(note['result'], 'result', 80);
+    final tableLevel = _boundedString(note['table_level'], 'table_level', 120);
+    final notes = _boundedString(note['notes'], 'notes', 8000);
+    final performedWell = _boundedList(
+      note['performed_well'],
+      'performed_well',
     );
-
-    if (inserted.isEmpty) {
-      throw StateError('Post-game note not found or permission denied.');
+    final underperformed = _boundedList(
+      note['underperformed'],
+      'underperformed',
+    );
+    final issues = _boundedList(note['issues'], 'issues');
+    final playSessionId = _optionalBoundedString(
+      note['play_session_id'],
+      'play_session_id',
+      160,
+    );
+    final sessionStartedAt = _optionalDate(
+      note['session_started_at'],
+      'session_started_at',
+    );
+    final sessionEndedAt = _optionalDate(
+      note['session_ended_at'],
+      'session_ended_at',
+    );
+    if (sessionStartedAt != null &&
+        sessionEndedAt != null &&
+        sessionEndedAt.isBefore(sessionStartedAt)) {
+      throw const PostGameValidationException(
+        'session_ended_at deve ser posterior a session_started_at.',
+      );
     }
+    final baseRevision = _optionalRevision(note['base_revision']);
 
-    return _rowToJson(inserted.first);
+    try {
+      return await pool.runTx((session) async {
+        final mutationAt = await _reserveSyncWatermark(session);
+        final snapshot = await _captureDeckSnapshot(
+          session,
+          userId: userId,
+          deckId: deckId,
+        );
+        final current = await session.execute(
+          Sql.named('''
+            SELECT user_id, $_noteColumns
+            FROM post_game_notes
+            WHERE id = @id
+            FOR UPDATE
+          '''),
+          parameters: {'id': resolvedId},
+        );
+
+        if (current.isEmpty) {
+          if (baseRevision != null && baseRevision != 0) {
+            throw const PostGameConflictException(null);
+          }
+          final inserted = await session.execute(
+            Sql.named('''
+              INSERT INTO post_game_notes (
+                id, user_id, deck_id, created_at, result, table_level, notes,
+                performed_well, underperformed, issues, play_session_id,
+                session_started_at, session_ended_at, deck_snapshot_hash,
+                deck_version_at, revision, deleted_at, updated_at
+              )
+              VALUES (
+                @id, CAST(@userId AS uuid), CAST(@deckId AS uuid),
+                COALESCE(
+                  CAST(@createdAt AS timestamptz),
+                  CAST(@mutationAt AS timestamptz)
+                ),
+                @result, @tableLevel,
+                @notes, @performedWell::jsonb, @underperformed::jsonb,
+                @issues::jsonb, @playSessionId, @sessionStartedAt,
+                @sessionEndedAt, @deckSnapshotHash, @deckVersionAt, 1, NULL,
+                CAST(@mutationAt AS timestamptz)
+              )
+              RETURNING $_noteColumns
+            '''),
+            parameters: {
+              'id': resolvedId,
+              'userId': userId,
+              'deckId': deckId,
+              'createdAt': createdAt,
+              'mutationAt': mutationAt,
+              'result': result,
+              'tableLevel': tableLevel,
+              'notes': notes,
+              'performedWell': jsonEncode(performedWell),
+              'underperformed': jsonEncode(underperformed),
+              'issues': jsonEncode(issues),
+              'playSessionId': playSessionId,
+              'sessionStartedAt': sessionStartedAt,
+              'sessionEndedAt': sessionEndedAt,
+              'deckSnapshotHash': snapshot.hash,
+              'deckVersionAt': snapshot.capturedAt,
+            },
+          );
+          return _rowToJson(inserted.first);
+        }
+
+        final currentRow = current.first;
+        final currentMap = currentRow.toColumnMap();
+        if (currentMap['user_id']?.toString() != userId ||
+            currentMap['deck_id']?.toString() != deckId) {
+          throw PostGameNoteNotFoundException();
+        }
+        final currentJson = _rowToJson(currentRow);
+        if (currentMap['deleted_at'] != null) {
+          throw PostGameConflictException(currentJson);
+        }
+        final currentRevision = _asInt(currentMap['revision'], fallback: 1);
+        if (baseRevision != null && baseRevision != currentRevision) {
+          throw PostGameConflictException(currentJson);
+        }
+
+        final updated = await session.execute(
+          Sql.named('''
+            UPDATE post_game_notes
+            SET result = @result,
+                table_level = @tableLevel,
+                notes = @notes,
+                performed_well = @performedWell::jsonb,
+                underperformed = @underperformed::jsonb,
+                issues = @issues::jsonb,
+                play_session_id = @playSessionId,
+                session_started_at = @sessionStartedAt,
+                session_ended_at = @sessionEndedAt,
+                deck_snapshot_hash = @deckSnapshotHash,
+                deck_version_at = @deckVersionAt,
+                revision = revision + 1,
+                updated_at = CAST(@mutationAt AS timestamptz)
+            WHERE id = @id
+              AND user_id = CAST(@userId AS uuid)
+              AND deck_id = CAST(@deckId AS uuid)
+              AND deleted_at IS NULL
+            RETURNING $_noteColumns
+          '''),
+          parameters: {
+            'id': resolvedId,
+            'userId': userId,
+            'deckId': deckId,
+            'result': result,
+            'tableLevel': tableLevel,
+            'notes': notes,
+            'performedWell': jsonEncode(performedWell),
+            'underperformed': jsonEncode(underperformed),
+            'issues': jsonEncode(issues),
+            'playSessionId': playSessionId,
+            'sessionStartedAt': sessionStartedAt,
+            'sessionEndedAt': sessionEndedAt,
+            'deckSnapshotHash': snapshot.hash,
+            'deckVersionAt': snapshot.capturedAt,
+            'mutationAt': mutationAt,
+          },
+        );
+        if (updated.isEmpty) throw PostGameConflictException(currentJson);
+        return _rowToJson(updated.first);
+      });
+    } on ServerException catch (error) {
+      if (error.code == '23505') {
+        throw const PostGameConflictException(null);
+      }
+      rethrow;
+    }
   }
 
   Future<bool> deleteNote({
     required String userId,
     required String deckId,
     required String noteId,
-  }) async {
-    final result = await pool.execute(
-      Sql.named('''
-        DELETE FROM post_game_notes
-        WHERE id = @noteId
-          AND deck_id = CAST(@deckId AS uuid)
-          AND user_id = CAST(@userId AS uuid)
-        RETURNING id
-      '''),
-      parameters: {'noteId': noteId, 'deckId': deckId, 'userId': userId},
-    );
-    return result.isNotEmpty;
+    int? baseRevision,
+  }) {
+    return pool.runTx((session) async {
+      final mutationAt = await _reserveSyncWatermark(session);
+      final current = await session.execute(
+        Sql.named('''
+          SELECT $_noteColumns
+          FROM post_game_notes
+          WHERE id = @noteId
+            AND deck_id = CAST(@deckId AS uuid)
+            AND user_id = CAST(@userId AS uuid)
+          FOR UPDATE
+        '''),
+        parameters: {'noteId': noteId, 'deckId': deckId, 'userId': userId},
+      );
+      if (current.isEmpty) return false;
+
+      final currentRow = current.first;
+      final currentMap = currentRow.toColumnMap();
+      if (currentMap['deleted_at'] != null) return true;
+      final revision = _asInt(currentMap['revision'], fallback: 1);
+      if (baseRevision != null && baseRevision != revision) {
+        throw PostGameConflictException(_rowToJson(currentRow));
+      }
+
+      final deleted = await session.execute(
+        Sql.named('''
+          UPDATE post_game_notes
+          SET result = '',
+              table_level = '',
+              notes = '',
+              performed_well = '[]'::jsonb,
+              underperformed = '[]'::jsonb,
+              issues = '[]'::jsonb,
+              play_session_id = NULL,
+              session_started_at = NULL,
+              session_ended_at = NULL,
+              deck_snapshot_hash = NULL,
+              deck_version_at = NULL,
+              revision = revision + 1,
+              deleted_at = CAST(@mutationAt AS timestamptz),
+              updated_at = CAST(@mutationAt AS timestamptz)
+          WHERE id = @noteId
+            AND deck_id = CAST(@deckId AS uuid)
+            AND user_id = CAST(@userId AS uuid)
+            AND deleted_at IS NULL
+          RETURNING id
+        '''),
+        parameters: {
+          'noteId': noteId,
+          'deckId': deckId,
+          'userId': userId,
+          'mutationAt': mutationAt,
+        },
+      );
+      return deleted.isNotEmpty;
+    });
   }
 
-  Map<String, dynamic> _rowToJson(ResultRow row) {
+  /// Reserva um ponto monotono do relogio de sincronizacao. Todas as leituras
+  /// incrementais e mutacoes passam por esta unica linha, de modo que uma
+  /// escrita concorrente fica necessariamente antes do cursor retornado ou
+  /// recebe um timestamp estritamente posterior a ele.
+  Future<DateTime> _reserveSyncWatermark(Session session) async {
+    final result = await session.execute('''
+      UPDATE post_game_sync_state
+      SET watermark = GREATEST(
+        clock_timestamp(),
+        watermark + INTERVAL '1 microsecond'
+      )
+      WHERE id = 1
+      RETURNING watermark
+    ''');
+    if (result.isEmpty || result.first[0] is! DateTime) {
+      throw StateError(
+        'post_game_sync_state ausente; aplique a migration 038.',
+      );
+    }
+    return (result.first[0] as DateTime).toUtc();
+  }
+
+  Future<_DeckSnapshot> _captureDeckSnapshot(
+    Session session, {
+    required String userId,
+    required String deckId,
+  }) async {
+    final rows = await session.execute(
+      Sql.named('''
+        SELECT d.name, d.format, dc.card_id::text AS card_id,
+               COALESCE(dc.quantity, 0)::int AS quantity,
+               COALESCE(dc.is_commander, FALSE) AS is_commander
+        FROM decks d
+        LEFT JOIN deck_cards dc ON dc.deck_id = d.id
+        WHERE d.id = CAST(@deckId AS uuid)
+          AND d.user_id = CAST(@userId AS uuid)
+        ORDER BY dc.card_id::text, dc.is_commander DESC
+      '''),
+      parameters: {'deckId': deckId, 'userId': userId},
+    );
+    if (rows.isEmpty) throw PostGameNoteNotFoundException();
+
+    final canonical = rows
+        .map((row) {
+          final map = row.toColumnMap();
+          return [
+            map['name']?.toString() ?? '',
+            map['format']?.toString() ?? '',
+            map['card_id']?.toString() ?? '',
+            map['quantity']?.toString() ?? '0',
+            map['is_commander'] == true ? '1' : '0',
+          ].join('|');
+        })
+        .join('\n');
+    return _DeckSnapshot(
+      hash: sha256.convert(utf8.encode(canonical)).toString(),
+      capturedAt: DateTime.now().toUtc(),
+    );
+  }
+
+  static Map<String, dynamic> _rowToJson(ResultRow row) {
     final map = row.toColumnMap();
-    return {
+    final deletedAt = _dateString(map['deleted_at']);
+    final common = <String, dynamic>{
       'id': map['id']?.toString() ?? '',
       'deck_id': map['deck_id']?.toString() ?? '',
+      'revision': _asInt(map['revision'], fallback: 1),
+      'updated_at': _dateString(map['updated_at']),
+      'deleted_at': deletedAt,
+      'is_deleted': deletedAt != null,
+    };
+    if (deletedAt != null) return common;
+
+    return {
+      ...common,
       'created_at': _dateString(map['created_at']),
       'result': map['result']?.toString() ?? '',
       'table_level': map['table_level']?.toString() ?? '',
@@ -195,14 +461,80 @@ class PostGameNoteService {
       'performed_well': _stringList(map['performed_well']),
       'underperformed': _stringList(map['underperformed']),
       'issues': _stringList(map['issues']),
-      'updated_at': _dateString(map['updated_at']),
+      'play_session_id': _nullableString(map['play_session_id']),
+      'session_started_at': _dateString(map['session_started_at']),
+      'session_ended_at': _dateString(map['session_ended_at']),
+      'deck_snapshot_hash': _nullableString(map['deck_snapshot_hash']),
+      'deck_version_at': _dateString(map['deck_version_at']),
     };
   }
 
-  static String _cleanString(Object? value) => value?.toString().trim() ?? '';
+  static String _boundedString(
+    Object? value,
+    String field,
+    int maxLength, {
+    bool allowEmpty = true,
+  }) {
+    final normalized = value?.toString().trim() ?? '';
+    if (!allowEmpty && normalized.isEmpty) {
+      throw PostGameValidationException('$field é obrigatório.');
+    }
+    if (normalized.length > maxLength) {
+      throw PostGameValidationException('$field excede $maxLength caracteres.');
+    }
+    return normalized;
+  }
+
+  static String? _optionalBoundedString(
+    Object? value,
+    String field,
+    int maxLength,
+  ) {
+    final normalized = _boundedString(value, field, maxLength);
+    return normalized.isEmpty ? null : normalized;
+  }
+
+  static DateTime? _optionalDate(Object? value, String field) {
+    final raw = value?.toString().trim() ?? '';
+    if (raw.isEmpty) return null;
+    final parsed = DateTime.tryParse(raw);
+    if (parsed == null) {
+      throw PostGameValidationException('$field deve usar ISO-8601.');
+    }
+    return parsed.toUtc();
+  }
+
+  static int? _optionalRevision(Object? value) {
+    if (value == null || value.toString().trim().isEmpty) return null;
+    final revision = int.tryParse(value.toString());
+    if (revision == null || revision < 0) {
+      throw const PostGameValidationException(
+        'base_revision deve ser um inteiro não negativo.',
+      );
+    }
+    return revision;
+  }
+
+  static List<String> _boundedList(Object? value, String field) {
+    final values = _stringList(value);
+    if (values.length > 80 || values.any((entry) => entry.length > 240)) {
+      throw PostGameValidationException('$field excede o limite permitido.');
+    }
+    return values;
+  }
+
+  static int _asInt(Object? value, {required int fallback}) {
+    if (value is int) return value;
+    return int.tryParse(value?.toString() ?? '') ?? fallback;
+  }
+
+  static String? _nullableString(Object? value) {
+    final normalized = value?.toString().trim();
+    return normalized == null || normalized.isEmpty ? null : normalized;
+  }
 
   static String? _dateString(Object? value) {
-    if (value is DateTime) return value.toIso8601String();
+    if (value is DateTime) return value.toUtc().toIso8601String();
     final text = value?.toString();
     return text == null || text.trim().isEmpty ? null : text;
   }
@@ -239,7 +571,7 @@ class PostGameNoteService {
     List<String> dominantIssues,
     List<String> reviewCandidates,
   ) {
-    final diagnostics = <Map<String, dynamic>>[
+    return <Map<String, dynamic>>[
       for (final issue in dominantIssues)
         {
           'issue': issue,
@@ -254,7 +586,6 @@ class PostGameNoteService {
               'As cartas ${reviewCandidates.take(3).join(', ')} apareceram como baixo desempenho. Revise funcao, curva e alternativas antes do proximo upgrade.',
         },
     ];
-    return diagnostics;
   }
 
   static List<String> _nextActions(
@@ -313,4 +644,11 @@ class PostGameNoteService {
     final day = monday.day.toString().padLeft(2, '0');
     return '$year-$month-$day';
   }
+}
+
+class _DeckSnapshot {
+  const _DeckSnapshot({required this.hash, required this.capturedAt});
+
+  final String hash;
+  final DateTime capturedAt;
 }

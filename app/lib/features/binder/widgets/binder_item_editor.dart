@@ -304,8 +304,14 @@ class _BinderItemEditorState extends State<BinderItemEditor> {
     if (ok) {
       Navigator.pop(context);
     } else {
-      if (!mounted) return;
       setState(() => _saving = false);
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text(
+            'Não foi possível remover a carta do fichário. Tente novamente.',
+          ),
+        ),
+      );
     }
   }
 
@@ -466,125 +472,136 @@ class _BinderItemEditorState extends State<BinderItemEditor> {
                               : null;
                       final isSelected = index == _selectedPrintingIndex;
 
-                      return GestureDetector(
-                        onTap:
-                            () =>
-                                setState(() => _selectedPrintingIndex = index),
-                        child: AnimatedContainer(
-                          duration: const Duration(milliseconds: 200),
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 14,
-                            vertical: 8,
-                          ),
-                          decoration: BoxDecoration(
-                            color:
-                                isSelected
-                                    ? AppTheme.manaViolet.withValues(
-                                      alpha: 0.25,
-                                    )
-                                    : AppTheme.surfaceElevated,
-                            borderRadius: BorderRadius.circular(
-                              AppTheme.radiusMd,
+                      return Semantics(
+                        button: true,
+                        selected: isSelected,
+                        label:
+                            'Edição ${cardEditionCodeLabel(setCode: setCode, collectorNumber: collector)}${year.isEmpty ? '' : ', $year'}',
+                        child: GestureDetector(
+                          excludeFromSemantics: true,
+                          onTap:
+                              () => setState(
+                                () => _selectedPrintingIndex = index,
+                              ),
+                          child: AnimatedContainer(
+                            duration: const Duration(milliseconds: 200),
+                            constraints: const BoxConstraints(
+                              minHeight: AppTheme.touchTargetMin,
                             ),
-                            border: Border.all(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 14,
+                              vertical: 8,
+                            ),
+                            decoration: BoxDecoration(
                               color:
                                   isSelected
-                                      ? AppTheme.manaViolet
-                                      : AppTheme.outlineMuted,
-                              width: isSelected ? 2 : 1,
+                                      ? AppTheme.manaViolet.withValues(
+                                        alpha: 0.25,
+                                      )
+                                      : AppTheme.surfaceElevated,
+                              borderRadius: BorderRadius.circular(
+                                AppTheme.radiusMd,
+                              ),
+                              border: Border.all(
+                                color:
+                                    isSelected
+                                        ? AppTheme.manaViolet
+                                        : AppTheme.outlineMuted,
+                                width: isSelected ? 2 : 1,
+                              ),
                             ),
-                          ),
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Row(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  Container(
-                                    padding: const EdgeInsets.symmetric(
-                                      horizontal: 5,
-                                      vertical: 1,
-                                    ),
-                                    decoration: BoxDecoration(
-                                      color:
-                                          isSelected
-                                              ? AppTheme.manaViolet
-                                              : AppTheme.outlineMuted
-                                                  .withValues(alpha: 0.5),
-                                      borderRadius: BorderRadius.circular(
-                                        AppTheme.radiusXs,
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Container(
+                                      padding: const EdgeInsets.symmetric(
+                                        horizontal: 5,
+                                        vertical: 1,
                                       ),
-                                    ),
-                                    child: Text(
-                                      cardEditionCodeLabel(
-                                        setCode: setCode,
-                                        collectorNumber: collector,
-                                      ),
-                                      style: TextStyle(
+                                      decoration: BoxDecoration(
                                         color:
                                             isSelected
-                                                ? AppTheme.backgroundAbyss
-                                                : AppTheme.textPrimary,
-                                        fontWeight: FontWeight.w800,
-                                        fontSize: AppTheme.fontSm - 1,
-                                        letterSpacing: 0.5,
+                                                ? AppTheme.manaViolet
+                                                : AppTheme.outlineMuted
+                                                    .withValues(alpha: 0.5),
+                                        borderRadius: BorderRadius.circular(
+                                          AppTheme.radiusXs,
+                                        ),
+                                      ),
+                                      child: Text(
+                                        cardEditionCodeLabel(
+                                          setCode: setCode,
+                                          collectorNumber: collector,
+                                        ),
+                                        style: TextStyle(
+                                          color:
+                                              isSelected
+                                                  ? AppTheme.backgroundAbyss
+                                                  : AppTheme.textPrimary,
+                                          fontWeight: FontWeight.w800,
+                                          fontSize: AppTheme.fontSm - 1,
+                                          letterSpacing: 0.5,
+                                        ),
                                       ),
                                     ),
+                                    if (year.isNotEmpty) ...[
+                                      const SizedBox(width: 6),
+                                      Text(
+                                        year,
+                                        style: const TextStyle(
+                                          color: AppTheme.textSecondary,
+                                          fontSize: AppTheme.fontSm - 1,
+                                        ),
+                                      ),
+                                    ],
+                                    if (price != null) ...[
+                                      const SizedBox(width: 6),
+                                      Text(
+                                        '\$${price.toStringAsFixed(2)}',
+                                        style: const TextStyle(
+                                          color: AppTheme.mythicGold,
+                                          fontSize: AppTheme.fontSm - 1,
+                                          fontWeight: FontWeight.w600,
+                                        ),
+                                      ),
+                                    ],
+                                  ],
+                                ),
+                                if (rarity.isNotEmpty || foil != null) ...[
+                                  const SizedBox(height: 2),
+                                  Text(
+                                    [
+                                      if (rarity.isNotEmpty) rarity,
+                                      if (cardFoilLabel(foil).isNotEmpty)
+                                        cardFoilLabel(foil),
+                                    ].join(' • '),
+                                    style: const TextStyle(
+                                      color: AppTheme.textSecondary,
+                                      fontSize: AppTheme.fontXs,
+                                    ),
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
                                   ),
-                                  if (year.isNotEmpty) ...[
-                                    const SizedBox(width: 6),
-                                    Text(
-                                      year,
-                                      style: const TextStyle(
-                                        color: AppTheme.textSecondary,
-                                        fontSize: AppTheme.fontSm - 1,
-                                      ),
-                                    ),
-                                  ],
-                                  if (price != null) ...[
-                                    const SizedBox(width: 6),
-                                    Text(
-                                      '\$${price.toStringAsFixed(2)}',
-                                      style: const TextStyle(
-                                        color: AppTheme.mythicGold,
-                                        fontSize: AppTheme.fontSm - 1,
-                                        fontWeight: FontWeight.w600,
-                                      ),
-                                    ),
-                                  ],
                                 ],
-                              ),
-                              if (rarity.isNotEmpty || foil != null) ...[
                                 const SizedBox(height: 2),
                                 Text(
-                                  [
-                                    if (rarity.isNotEmpty) rarity,
-                                    if (cardFoilLabel(foil).isNotEmpty)
-                                      cardFoilLabel(foil),
-                                  ].join(' • '),
-                                  style: const TextStyle(
-                                    color: AppTheme.textSecondary,
+                                  setName,
+                                  style: TextStyle(
+                                    color:
+                                        isSelected
+                                            ? AppTheme.textPrimary
+                                            : AppTheme.textSecondary,
                                     fontSize: AppTheme.fontXs,
                                   ),
                                   maxLines: 1,
                                   overflow: TextOverflow.ellipsis,
                                 ),
                               ],
-                              const SizedBox(height: 2),
-                              Text(
-                                setName,
-                                style: TextStyle(
-                                  color:
-                                      isSelected
-                                          ? AppTheme.textPrimary
-                                          : AppTheme.textSecondary,
-                                  fontSize: AppTheme.fontXs,
-                                ),
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
-                              ),
-                            ],
+                            ),
                           ),
                         ),
                       );
@@ -619,95 +636,113 @@ class _BinderItemEditorState extends State<BinderItemEditor> {
             Row(
               children: [
                 Expanded(
-                  child: GestureDetector(
-                    onTap: () => setState(() => _listType = 'have'),
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(vertical: 10),
-                      decoration: BoxDecoration(
-                        color:
-                            _listType == 'have'
-                                ? AppTheme.primarySoft.withValues(alpha: 0.15)
-                                : AppTheme.surfaceElevated,
-                        borderRadius: const BorderRadius.horizontal(
-                          left: Radius.circular(AppTheme.radiusMd),
+                  child: Semantics(
+                    button: true,
+                    selected: _listType == 'have',
+                    label: 'Lista Tenho',
+                    child: GestureDetector(
+                      key: const Key('binder-editor-list-have'),
+                      excludeFromSemantics: true,
+                      onTap: () => setState(() => _listType = 'have'),
+                      child: Container(
+                        constraints: const BoxConstraints(
+                          minHeight: AppTheme.touchTargetMin,
                         ),
-                        border: Border.all(
+                        decoration: BoxDecoration(
                           color:
                               _listType == 'have'
-                                  ? AppTheme.primarySoft
-                                  : AppTheme.outlineMuted,
-                        ),
-                      ),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Icon(
-                            Icons.inventory_2,
-                            size: 16,
+                                  ? AppTheme.primarySoft.withValues(alpha: 0.15)
+                                  : AppTheme.surfaceElevated,
+                          borderRadius: const BorderRadius.horizontal(
+                            left: Radius.circular(AppTheme.radiusMd),
+                          ),
+                          border: Border.all(
                             color:
                                 _listType == 'have'
                                     ? AppTheme.primarySoft
-                                    : AppTheme.textSecondary,
+                                    : AppTheme.outlineMuted,
                           ),
-                          const SizedBox(width: 6),
-                          Text(
-                            'Tenho',
-                            style: TextStyle(
+                        ),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(
+                              Icons.inventory_2,
+                              size: 16,
                               color:
                                   _listType == 'have'
                                       ? AppTheme.primarySoft
                                       : AppTheme.textSecondary,
-                              fontWeight: FontWeight.w600,
                             ),
-                          ),
-                        ],
+                            const SizedBox(width: 6),
+                            Text(
+                              'Tenho',
+                              style: TextStyle(
+                                color:
+                                    _listType == 'have'
+                                        ? AppTheme.primarySoft
+                                        : AppTheme.textSecondary,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
                     ),
                   ),
                 ),
                 Expanded(
-                  child: GestureDetector(
-                    onTap: () => setState(() => _listType = 'want'),
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(vertical: 10),
-                      decoration: BoxDecoration(
-                        color:
-                            _listType == 'want'
-                                ? AppTheme.mythicGold.withValues(alpha: 0.15)
-                                : AppTheme.surfaceElevated,
-                        borderRadius: const BorderRadius.horizontal(
-                          right: Radius.circular(AppTheme.radiusMd),
+                  child: Semantics(
+                    button: true,
+                    selected: _listType == 'want',
+                    label: 'Lista Quero',
+                    child: GestureDetector(
+                      key: const Key('binder-editor-list-want'),
+                      excludeFromSemantics: true,
+                      onTap: () => setState(() => _listType = 'want'),
+                      child: Container(
+                        constraints: const BoxConstraints(
+                          minHeight: AppTheme.touchTargetMin,
                         ),
-                        border: Border.all(
+                        decoration: BoxDecoration(
                           color:
                               _listType == 'want'
-                                  ? AppTheme.mythicGold
-                                  : AppTheme.outlineMuted,
-                        ),
-                      ),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Icon(
-                            Icons.favorite_border,
-                            size: 16,
+                                  ? AppTheme.mythicGold.withValues(alpha: 0.15)
+                                  : AppTheme.surfaceElevated,
+                          borderRadius: const BorderRadius.horizontal(
+                            right: Radius.circular(AppTheme.radiusMd),
+                          ),
+                          border: Border.all(
                             color:
                                 _listType == 'want'
                                     ? AppTheme.mythicGold
-                                    : AppTheme.textSecondary,
+                                    : AppTheme.outlineMuted,
                           ),
-                          const SizedBox(width: 6),
-                          Text(
-                            'Quero',
-                            style: TextStyle(
+                        ),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(
+                              Icons.favorite_border,
+                              size: 16,
                               color:
                                   _listType == 'want'
                                       ? AppTheme.mythicGold
                                       : AppTheme.textSecondary,
-                              fontWeight: FontWeight.w600,
                             ),
-                          ),
-                        ],
+                            const SizedBox(width: 6),
+                            Text(
+                              'Quero',
+                              style: TextStyle(
+                                color:
+                                    _listType == 'want'
+                                        ? AppTheme.mythicGold
+                                        : AppTheme.textSecondary,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
                     ),
                   ),

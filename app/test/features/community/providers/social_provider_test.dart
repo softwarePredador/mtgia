@@ -33,7 +33,7 @@ class _FakeSocialApiClient extends ApiClient {
   }
 
   @override
-  Future<ApiResponse> delete(String endpoint) {
+  Future<ApiResponse> delete(String endpoint, {Map<String, dynamic>? body}) {
     throw UnimplementedError('No DELETE for $endpoint');
   }
 }

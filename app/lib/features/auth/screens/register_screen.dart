@@ -2,11 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import '../../../core/theme/app_theme.dart';
+import '../auth_redirect.dart';
 import '../providers/auth_provider.dart';
 import '../widgets/auth_visual_shell.dart';
 
 class RegisterScreen extends StatefulWidget {
-  const RegisterScreen({super.key});
+  const RegisterScreen({super.key, this.redirectPath});
+
+  final String? redirectPath;
 
   @override
   State<RegisterScreen> createState() => _RegisterScreenState();
@@ -40,7 +43,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
       context.pop();
       return;
     }
-    context.go('/login');
+    context.go(buildAuthLocation('/login', widget.redirectPath));
   }
 
   @override
@@ -66,7 +69,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
     if (!mounted) return;
 
     if (success) {
-      context.go('/home');
+      context.go(normalizePostAuthRedirect(widget.redirectPath) ?? '/home');
       return;
     }
 

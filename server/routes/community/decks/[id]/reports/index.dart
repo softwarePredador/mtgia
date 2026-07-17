@@ -12,7 +12,7 @@ Future<Response> onRequest(RequestContext context, String id) async {
     return methodNotAllowed();
   }
 
-  final userId = readAuthenticatedUserId(context);
+  final userId = await readAuthenticatedUserId(context);
   if (userId == null) return authenticationRequired();
 
   Map<String, dynamic> body;
@@ -27,12 +27,14 @@ Future<Response> onRequest(RequestContext context, String id) async {
     if (!await service.publicDeckExists(id)) {
       return notFound('Deck publico nao encontrado.');
     }
-    final targetType = body['target_type']?.toString().trim().isNotEmpty == true
-        ? body['target_type'].toString()
-        : 'deck';
-    final targetId = body['target_id']?.toString().trim().isNotEmpty == true
-        ? body['target_id'].toString()
-        : id;
+    final targetType =
+        body['target_type']?.toString().trim().isNotEmpty == true
+            ? body['target_type'].toString()
+            : 'deck';
+    final targetId =
+        body['target_id']?.toString().trim().isNotEmpty == true
+            ? body['target_id'].toString()
+            : id;
     final report = await service.reportContent(
       reporterUserId: userId,
       targetType: targetType,

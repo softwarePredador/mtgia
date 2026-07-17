@@ -1,5 +1,8 @@
 name: ManaLoom Guardrails
 
+permissions:
+  contents: read
+
 on:
   pull_request:
     paths:
@@ -44,6 +47,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - uses: actions/setup-python@v5
         with:
@@ -94,6 +99,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - uses: actions/setup-python@v5
         with:
@@ -118,6 +125,9 @@ jobs:
           dart pub get
           dart run melos bootstrap
 
+      - name: Validate release and disaster-recovery contracts
+        run: scripts/manaloom_release_ops_contract_test.sh
+
       - name: Run ManaLoom product quality gate
         env:
           JWT_SECRET: local_quality_gate_jwt_secret_not_for_production_20260706
@@ -125,6 +135,67 @@ jobs:
           DISABLE_PUSH_INIT: "true"
           DISABLE_FIREBASE_PERFORMANCE_INIT: "true"
         run: dart run melos run quality
+
+      - name: Build CI Android permission probe
+        working-directory: app
+        run: |
+          flutter build apk --release \
+            --dart-define=API_BASE_URL=https://ci.invalid \
+            --dart-define=PUBLIC_API_BASE_URL=https://ci.invalid \
+            --dart-define=DISABLE_FIREBASE_PERFORMANCE_INIT=true \
+            --no-version-check
+
+      - name: Generate release SBOM, permission report and provenance
+        run: |
+          set -euo pipefail
+          evidence_dir="$RUNNER_TEMP/manaloom-release-evidence"
+          mkdir -p "$evidence_dir"
+          source_sha="$(git rev-parse HEAD)"
+          source_committed_at="$(git show -s --format=%cI HEAD)"
+          version="$(awk '/^version:/{print $2; exit}' app/pubspec.yaml)"
+          python3 scripts/manaloom_generate_release_sbom.py \
+            --app-dir app \
+            --git-sha "$source_sha" \
+            --source-committed-at "$source_committed_at" \
+            --output "$evidence_dir/sbom.cdx.json"
+          scripts/manaloom_verify_android_release_artifacts.sh \
+            --apk app/build/app/outputs/flutter-apk/app-release.apk \
+            --expected-package com.mtgia.mtg_app \
+            --expected-version "$version" \
+            --report "$evidence_dir/android-permissions.json" >/dev/null
+          apk_sha256="$(sha256sum app/build/app/outputs/flutter-apk/app-release.apk | awk '{print $1}')"
+          sbom_sha256="$(sha256sum "$evidence_dir/sbom.cdx.json" | awk '{print $1}')"
+          permissions_sha256="$(sha256sum "$evidence_dir/android-permissions.json" | awk '{print $1}')"
+          jq -n \
+            --arg git_sha "$source_sha" \
+            --arg version "$version" \
+            --arg apk_sha256 "$apk_sha256" \
+            --arg sbom_sha256 "$sbom_sha256" \
+            --arg permissions_sha256 "$permissions_sha256" \
+            '{
+              _type: "https://in-toto.io/Statement/v1",
+              subject: [
+                {name: "app-release.apk", digest: {sha256: $apk_sha256}},
+                {name: "sbom.cdx.json", digest: {sha256: $sbom_sha256}},
+                {name: "android-permissions.json", digest: {sha256: $permissions_sha256}}
+              ],
+              predicateType: "https://slsa.dev/provenance/v1",
+              predicate: {
+                buildDefinition: {
+                  buildType: "https://manaloom.local/build/ci-release-probe/v1",
+                  externalParameters: {git_sha: $git_sha, version: $version}
+                },
+                runDetails: {builder: {id: "github-actions/manaloom-guardrails"}}
+              }
+            }' > "$evidence_dir/provenance.intoto.json"
+
+      - name: Upload release evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: manaloom-release-evidence-${{ github.sha }}
+          path: ${{ runner.temp }}/manaloom-release-evidence
+          if-no-files-found: error
+          retention-days: 30
 
       - name: Bootstrap pinned XMage Maven artifacts
         run: services/xmage-sidecar/bin/bootstrap_pinned_xmage_maven.sh

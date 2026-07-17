@@ -12,7 +12,7 @@ Future<LifeCounterSession?> showLifeCounterNativeTurnTrackerSheet(
   return showModalBottomSheet<LifeCounterSession>(
     context: context,
     isScrollControlled: true,
-    backgroundColor: Colors.transparent,
+    backgroundColor: AppTheme.transparent,
     builder: (context) {
       return _LifeCounterNativeTurnTrackerSheet(initialSession: initialSession);
     },
@@ -59,11 +59,11 @@ class _LifeCounterNativeTurnTrackerSheetState
     final currentPlayerLabel =
         _draftSession.currentTurnPlayerIndex != null
             ? _playerLabel(_draftSession.currentTurnPlayerIndex!)
-            : 'No active players';
+            : 'Nenhum jogador ativo';
     final startingPlayerLabel =
         _hasAnyActivePlayers
             ? _playerLabel(_startingPlayerIndex)
-            : 'No active players';
+            : 'Nenhum jogador ativo';
 
     return SafeArea(
       child: Padding(
@@ -95,7 +95,7 @@ class _LifeCounterNativeTurnTrackerSheetState
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              'Turn Tracker',
+                              'Controle de turnos',
                               style: TextStyle(
                                 color: AppTheme.textPrimary,
                                 fontSize: AppTheme.fontXxl,
@@ -104,11 +104,11 @@ class _LifeCounterNativeTurnTrackerSheetState
                             ),
                             SizedBox(height: 6),
                             Text(
-                              'Choose who starts and keep every turn moving.',
+                              'Escolha quem começa e acompanhe a ordem dos turnos.',
                               style: TextStyle(
                                 color: AppTheme.textSecondary,
                                 fontSize: AppTheme.fontMd,
-                                height: 1.35,
+                                height: AppTheme.lineHeightCompact,
                               ),
                             ),
                           ],
@@ -118,7 +118,7 @@ class _LifeCounterNativeTurnTrackerSheetState
                         onPressed: () => Navigator.of(context).pop(),
                         icon: const Icon(Icons.close_rounded),
                         color: AppTheme.textSecondary,
-                        tooltip: 'Close',
+                        tooltip: 'Fechar',
                       ),
                     ],
                   ),
@@ -138,9 +138,9 @@ class _LifeCounterNativeTurnTrackerSheetState
                       ),
                       const SizedBox(height: 18),
                       _SectionCard(
-                        title: 'Starting Player',
+                        title: 'Jogador inicial',
                         subtitle:
-                            'Choose who starts. Dead players stay unavailable.',
+                            'Escolha quem começa. Jogadores eliminados ficam indisponíveis.',
                         child: Wrap(
                           spacing: 8,
                           runSpacing: 8,
@@ -182,9 +182,9 @@ class _LifeCounterNativeTurnTrackerSheetState
                       ),
                       const SizedBox(height: 18),
                       _SectionCard(
-                        title: 'Tracker Options',
+                        title: 'Opções do controle',
                         subtitle:
-                            'Set how turns begin and appear on the table.',
+                            'Defina como os turnos começam e aparecem na mesa.',
                         child: Column(
                           children: [
                             SwitchListTile.adaptive(
@@ -193,14 +193,14 @@ class _LifeCounterNativeTurnTrackerSheetState
                               ),
                               contentPadding: EdgeInsets.zero,
                               title: const Text(
-                                'Auto high roll',
+                                'Maior rolagem automática',
                                 style: TextStyle(
                                   color: AppTheme.textPrimary,
                                   fontWeight: FontWeight.w600,
                                 ),
                               ),
                               subtitle: const Text(
-                                'Automatically roll to choose the starting player.',
+                                'Role automaticamente para escolher quem começa.',
                                 style: TextStyle(color: AppTheme.textSecondary),
                               ),
                               value: _autoHighRoll,
@@ -219,14 +219,14 @@ class _LifeCounterNativeTurnTrackerSheetState
                               ),
                               contentPadding: EdgeInsets.zero,
                               title: const Text(
-                                'Turn timer',
+                                'Cronômetro do turno',
                                 style: TextStyle(
                                   color: AppTheme.textPrimary,
                                   fontWeight: FontWeight.w600,
                                 ),
                               ),
                               subtitle: const Text(
-                                'Show the per-turn timer on the table.',
+                                'Mostre o cronômetro de cada turno na mesa.',
                                 style: TextStyle(color: AppTheme.textSecondary),
                               ),
                               value: _turnTimerActive,
@@ -248,11 +248,11 @@ class _LifeCounterNativeTurnTrackerSheetState
                       ),
                       const SizedBox(height: 18),
                       _SectionCard(
-                        title: 'Actions',
+                        title: 'Ações',
                         subtitle:
                             _isTrackerActive
-                                ? 'Move through turns or stop the tracker.'
-                                : 'Start a tracked game from the selected player.',
+                                ? 'Avance ou volte turnos, ou encerre o controle.'
+                                : 'Inicie o controle a partir do jogador selecionado.',
                         child: Wrap(
                           spacing: 10,
                           runSpacing: 10,
@@ -279,7 +279,7 @@ class _LifeCounterNativeTurnTrackerSheetState
                                         }
                                         : null,
                                 icon: const Icon(Icons.play_arrow_rounded),
-                                label: const Text('Start Game'),
+                                label: const Text('Iniciar partida'),
                               ),
                             if (_isTrackerActive) ...[
                               OutlinedButton.icon(
@@ -298,7 +298,7 @@ class _LifeCounterNativeTurnTrackerSheetState
                                   });
                                 },
                                 icon: const Icon(Icons.undo_rounded),
-                                label: const Text('Back'),
+                                label: const Text('Voltar'),
                               ),
                               FilledButton.icon(
                                 key: const Key(
@@ -313,7 +313,7 @@ class _LifeCounterNativeTurnTrackerSheetState
                                   });
                                 },
                                 icon: const Icon(Icons.redo_rounded),
-                                label: const Text('Next'),
+                                label: const Text('Avançar'),
                               ),
                               OutlinedButton.icon(
                                 key: const Key(
@@ -332,7 +332,7 @@ class _LifeCounterNativeTurnTrackerSheetState
                                   });
                                 },
                                 icon: const Icon(Icons.stop_rounded),
-                                label: const Text('Stop'),
+                                label: const Text('Encerrar'),
                               ),
                             ],
                           ],
@@ -356,7 +356,7 @@ class _LifeCounterNativeTurnTrackerSheetState
                             ),
                             padding: const EdgeInsets.symmetric(vertical: 14),
                           ),
-                          child: const Text('Cancel'),
+                          child: const Text('Cancelar'),
                         ),
                       ),
                       const SizedBox(width: 12),
@@ -378,7 +378,7 @@ class _LifeCounterNativeTurnTrackerSheetState
                             foregroundColor: AppTheme.backgroundAbyss,
                             padding: const EdgeInsets.symmetric(vertical: 14),
                           ),
-                          child: const Text('Apply'),
+                          child: const Text('Aplicar'),
                         ),
                       ),
                     ],
@@ -392,7 +392,7 @@ class _LifeCounterNativeTurnTrackerSheetState
     );
   }
 
-  String _playerLabel(int index) => 'Player ${index + 1}';
+  String _playerLabel(int index) => 'Jogador ${index + 1}';
 }
 
 class _SummaryCard extends StatelessWidget {
@@ -415,25 +415,28 @@ class _SummaryCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return _SectionCard(
-      title: 'Turn Status',
+      title: 'Estado do turno',
       subtitle:
           isTrackerActive
-              ? 'Review the current turn before applying changes.'
-              : 'Tracker is currently stopped.',
+              ? 'Confira o turno atual antes de aplicar as mudanças.'
+              : 'O controle de turnos está parado.',
       child: Wrap(
         spacing: 10,
         runSpacing: 10,
         children: [
           _SummaryChip(
             label: 'Status',
-            value: isTrackerActive ? 'Active' : 'Idle',
+            value: isTrackerActive ? 'Ativo' : 'Inativo',
           ),
-          _SummaryChip(label: 'Turn', value: '$currentTurn'),
-          _SummaryChip(label: 'Current', value: currentPlayerLabel),
-          _SummaryChip(label: 'Starts', value: startingPlayerLabel),
+          _SummaryChip(label: 'Turno', value: '$currentTurn'),
+          _SummaryChip(label: 'Atual', value: currentPlayerLabel),
+          _SummaryChip(label: 'Começa', value: startingPlayerLabel),
           _SummaryChip(
-            label: 'Timer',
-            value: turnTimerActive ? _formatDuration(turnTimerSeconds) : 'Off',
+            label: 'Cronômetro',
+            value:
+                turnTimerActive
+                    ? _formatDuration(turnTimerSeconds)
+                    : 'Desligado',
           ),
         ],
       ),
@@ -530,7 +533,7 @@ class _SectionCard extends StatelessWidget {
               style: const TextStyle(
                 color: AppTheme.textSecondary,
                 fontSize: AppTheme.fontSm,
-                height: 1.35,
+                height: AppTheme.lineHeightCompact,
               ),
             ),
             const SizedBox(height: 14),

@@ -144,9 +144,11 @@ class DeckMetaChip extends StatelessWidget {
       decoration: BoxDecoration(
         color: color.withValues(alpha: backgroundAlpha),
         borderRadius: BorderRadius.circular(AppTheme.radiusXl),
-        border: Border.all(
-          color: color.withValues(alpha: borderAlpha),
-          width: borderWidth,
+        border: Border.fromBorderSide(
+          BorderSide(
+            color: color.withValues(alpha: borderAlpha),
+            width: borderWidth,
+          ),
         ),
       ),
       child: Row(

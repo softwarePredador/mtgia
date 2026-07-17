@@ -4,11 +4,11 @@ import 'dart:math';
 
 import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:firebase_performance/firebase_performance.dart';
 import 'package:sentry_flutter/sentry_flutter.dart';
 
 import '../observability/app_observability.dart';
+import '../security/auth_token_store.dart';
 
 /// Response wrapper para padronizar respostas da API
 class ApiResponse {
@@ -44,7 +44,7 @@ class ApiClient {
       'https://evolution-cartinhas.2ta7qx.easypanel.host';
 
   // ──────────────────────────────────────────
-  // Cache do token em memória (evita SharedPreferences a cada request)
+  // Cache do token em memória (evita acessar o cofre seguro a cada request)
   // ──────────────────────────────────────────
   static String? _cachedToken;
 
@@ -161,8 +161,7 @@ class ApiClient {
 
   /// Carrega token do disco para o cache (chamado 1x no boot).
   static Future<void> loadTokenFromDisk() async {
-    final prefs = await SharedPreferences.getInstance();
-    _cachedToken = prefs.getString('auth_token');
+    _cachedToken = await AuthTokenStore().read();
   }
 
   /// Cria um HttpMetric para rastrear a requisição no Firebase Performance
@@ -480,26 +479,37 @@ class ApiClient {
     }
   }
 
-  Future<ApiResponse> delete(String endpoint) async {
+  Future<ApiResponse> delete(
+    String endpoint, {
+    Map<String, dynamic>? body,
+  }) async {
     _ensureBaseUrlConfigured();
     final url = '$baseUrl$endpoint';
     final requestId = generateRequestId();
     final headers = _getHeaders(requestId: requestId);
     final metric = _createMetric(url, HttpMethod.Delete);
     final stopwatch = Stopwatch()..start();
+    final encodedBody = body == null ? null : jsonEncode(body);
+    final bodyBytes = encodedBody == null ? null : utf8.encode(encodedBody);
 
     debugPrint('[🌐 ApiClient] DELETE $endpoint');
 
     try {
       await metric?.start();
+      if (bodyBytes != null) {
+        metric?.requestPayloadSize = bodyBytes.length;
+      }
 
       final response = await _httpClient
-          .delete(Uri.parse(url), headers: headers)
+          .delete(Uri.parse(url), headers: headers, body: encodedBody)
           .timeout(const Duration(seconds: 15));
 
       stopwatch.stop();
 
+      metric?.responseContentType = response.headers['content-type'];
       metric?.httpResponseCode = response.statusCode;
+      metric?.responsePayloadSize =
+          response.contentLength ?? response.bodyBytes.length;
       await metric?.stop();
 
       final durationMs = stopwatch.elapsedMilliseconds;

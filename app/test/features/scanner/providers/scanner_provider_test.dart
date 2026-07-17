@@ -178,7 +178,8 @@ void main() {
       );
 
       expect(provider.state, ScannerState.notFound);
-      expect(provider.errorMessage, 'Nome nao reconhecido');
+      expect(provider.errorMessage, contains('Melhore a iluminação'));
+      expect(provider.errorMessage, isNot(contains('Nome nao reconhecido')));
       expect(provider.foundCards, isEmpty);
       expect(searchService.exactCalls, isEmpty);
       expect(searchService.resolveCalls, isEmpty);

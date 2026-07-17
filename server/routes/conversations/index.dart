@@ -73,33 +73,36 @@ Future<Response> _listConversations(RequestContext context) async {
     final result = queryResults[1];
     final total = (countResult.first[0] as int?) ?? 0;
 
-    final conversations = result.map((row) {
-      final m = row.toColumnMap();
-      for (final k in ['last_message_at', 'created_at']) {
-        if (m[k] is DateTime) m[k] = (m[k] as DateTime).toIso8601String();
-      }
-      return {
-        'id': m['id'],
-        'other_user': {
-          'id': m['other_user_id'],
-          'username': m['other_username'],
-          'display_name': m['other_display_name'],
-          'avatar_url': m['other_avatar_url'],
-        },
-        'last_message': m['last_message'],
-        'last_message_sender_id': m['last_message_sender_id'],
-        'unread_count': m['unread_count'],
-        'last_message_at': m['last_message_at'],
-        'created_at': m['created_at'],
-      };
-    }).toList();
+    final conversations =
+        result.map((row) {
+          final m = row.toColumnMap();
+          for (final k in ['last_message_at', 'created_at']) {
+            if (m[k] is DateTime) m[k] = (m[k] as DateTime).toIso8601String();
+          }
+          return {
+            'id': m['id'],
+            'other_user': {
+              'id': m['other_user_id'],
+              'username': m['other_username'],
+              'display_name': m['other_display_name'],
+              'avatar_url': m['other_avatar_url'],
+            },
+            'last_message': m['last_message'],
+            'last_message_sender_id': m['last_message_sender_id'],
+            'unread_count': m['unread_count'],
+            'last_message_at': m['last_message_at'],
+            'created_at': m['created_at'],
+          };
+        }).toList();
 
-    return Response.json(body: {
-      'data': conversations,
-      'page': page,
-      'limit': limit,
-      'total': total,
-    });
+    return Response.json(
+      body: {
+        'data': conversations,
+        'page': page,
+        'limit': limit,
+        'total': total,
+      },
+    );
   } catch (e, st) {
     await captureRouteException(
       context,
@@ -139,38 +142,66 @@ Future<Response> _createConversation(RequestContext context) async {
       );
     }
 
-    // Verificar que o outro usuário existe
-    final userCheck = await pool.execute(
-      Sql.named('SELECT id, username, display_name, avatar_url FROM users WHERE id = @id'),
-      parameters: {'id': otherUserId},
-    );
-    if (userCheck.isEmpty) {
+    // Usar LEAST/GREATEST para manter constraint UNIQUE.
+    final userA = userId.compareTo(otherUserId) < 0 ? userId : otherUserId;
+    final userB = userId.compareTo(otherUserId) < 0 ? otherUserId : userId;
+
+    // Trava os dois participantes ativos em ordem estável. Isso serializa a
+    // criação com DELETE /users/me e impede recriar conversa após o cleanup.
+    final creation = await pool.runTx((session) async {
+      final activeUsers = await session.execute(
+        Sql.named('''
+          SELECT id
+          FROM users
+          WHERE id = ANY(@participantIds::uuid[])
+            AND deleted_at IS NULL
+          ORDER BY id
+          FOR UPDATE
+        '''),
+        parameters: {
+          'participantIds': [userA, userB],
+        },
+      );
+      if (activeUsers.length != 2) return null;
+
+      final userCheck = await session.execute(
+        Sql.named('''
+          SELECT id, username, display_name, avatar_url
+          FROM users
+          WHERE id = @id
+            AND deleted_at IS NULL
+        '''),
+        parameters: {'id': otherUserId},
+      );
+      if (userCheck.isEmpty) return null;
+
+      // Tentar inserir; ON CONFLICT retorna a conversa existente.
+      final result = await session.execute(
+        Sql.named('''
+          INSERT INTO conversations (user_a_id, user_b_id)
+          VALUES (@userA, @userB)
+          ON CONFLICT (
+            LEAST(user_a_id, user_b_id),
+            GREATEST(user_a_id, user_b_id)
+          )
+          DO UPDATE SET created_at = conversations.created_at
+          RETURNING id, created_at
+        '''),
+        parameters: {'userA': userA, 'userB': userB},
+      );
+      return {
+        'other_user': userCheck.first.toColumnMap(),
+        'conversation': result.first.toColumnMap(),
+      };
+    });
+    if (creation == null) {
       return Response.json(
         statusCode: HttpStatus.notFound,
         body: {'error': 'Usuário não encontrado'},
       );
     }
-    final otherUser = userCheck.first.toColumnMap();
-
-    // Usar LEAST/GREATEST para manter constraint UNIQUE
-    final userA = userId.compareTo(otherUserId) < 0 ? userId : otherUserId;
-    final userB = userId.compareTo(otherUserId) < 0 ? otherUserId : userId;
-
-    // Tentar inserir, ON CONFLICT retorna existente.
-    // Usa inferência por expressão para compatibilidade com índice funcional
-    // uq_conversation_pair (LEAST/GREATEST), sem depender de constraint nomeada.
-    final result = await pool.execute(
-      Sql.named('''
-        INSERT INTO conversations (user_a_id, user_b_id)
-        VALUES (@userA, @userB)
-        ON CONFLICT (LEAST(user_a_id, user_b_id), GREATEST(user_a_id, user_b_id))
-        DO UPDATE SET created_at = conversations.created_at
-        RETURNING id, created_at
-      '''),
-      parameters: {'userA': userA, 'userB': userB},
-    );
-
-    final conv = result.first.toColumnMap();
+    final otherUser = creation['other_user']!;
+    final conv = creation['conversation']!;
     final createdAt = conv['created_at'];
 
     return Response.json(
@@ -183,7 +214,10 @@ Future<Response> _createConversation(RequestContext context) async {
           'display_name': otherUser['display_name'],
           'avatar_url': otherUser['avatar_url'],
         },
-        'created_at': createdAt is DateTime ? createdAt.toIso8601String() : createdAt?.toString(),
+        'created_at':
+            createdAt is DateTime
+                ? createdAt.toIso8601String()
+                : createdAt?.toString(),
       },
     );
   } catch (e, st) {

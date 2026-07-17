@@ -50,41 +50,41 @@ class LifeCounterTabletopEngine {
   static const LifeCounterPlayerStatusSummary _lifeEliminationSummary =
       LifeCounterPlayerStatusSummary(
         kind: LifeCounterPlayerStatusKind.knockedOut,
-        label: 'Knocked out',
-        description: 'This player is at zero or less life.',
+        label: 'Nocauteado',
+        description: 'Este jogador está com zero de vida ou menos.',
       );
   static const LifeCounterPlayerStatusSummary _poisonEliminationSummary =
       LifeCounterPlayerStatusSummary(
         kind: LifeCounterPlayerStatusKind.poisonLethal,
-        label: 'Poison lethal',
-        description: 'This player reached the poison lethal threshold.',
+        label: 'Veneno letal',
+        description: 'Este jogador atingiu o limite letal de veneno.',
       );
   static const LifeCounterPlayerStatusSummary
   _commanderDamageEliminationSummary = LifeCounterPlayerStatusSummary(
     kind: LifeCounterPlayerStatusKind.commanderDamageLethal,
-    label: 'Commander damage lethal',
-    description: 'One commander source reached lethal damage for this player.',
+    label: 'Dano letal de comandante',
+    description: 'Uma fonte de comandante atingiu dano letal neste jogador.',
   );
   static const LifeCounterPlayerStatusSummary
   _activeLifeWarningSummary = LifeCounterPlayerStatusSummary(
     kind: LifeCounterPlayerStatusKind.active,
-    label: 'Active player',
+    label: 'Jogador ativo',
     description:
-        'Life is zero or less, but this player remains active until Auto-KO or a manual knock out records the defeat.',
+        'A vida chegou a zero ou menos, mas o jogador permanece ativo até o nocaute automático ou manual.',
   );
   static const LifeCounterPlayerStatusSummary
   _activePoisonWarningSummary = LifeCounterPlayerStatusSummary(
     kind: LifeCounterPlayerStatusKind.active,
-    label: 'Active player',
+    label: 'Jogador ativo',
     description:
-        'The poison lethal threshold was reached, but this player remains active until Auto-KO or a manual knock out records the defeat.',
+        'O limite letal de veneno foi atingido, mas o jogador permanece ativo até o nocaute automático ou manual.',
   );
   static const LifeCounterPlayerStatusSummary
   _activeCommanderDamageWarningSummary = LifeCounterPlayerStatusSummary(
     kind: LifeCounterPlayerStatusKind.active,
-    label: 'Active player',
+    label: 'Jogador ativo',
     description:
-        'Commander damage is lethal, but this player remains active until Auto-KO or a manual knock out records the defeat.',
+        'O dano de comandante é letal, mas o jogador permanece ativo até o nocaute automático ou manual.',
   );
 
   static LifeCounterSession setLifeTotal(
@@ -233,15 +233,15 @@ class LifeCounterTabletopEngine {
     }
 
     final labelBuilder =
-        playerLabelBuilder ?? ((playerIndex) => 'Player ${playerIndex + 1}');
+        playerLabelBuilder ?? ((playerIndex) => 'Jogador ${playerIndex + 1}');
     final targetLabel = labelBuilder(targetPlayerIndex);
     final sourceLabels = lethalSources.map(labelBuilder).join(', ');
 
     if (lethalSources.length == 1) {
-      return '$targetLabel is lethal from $sourceLabels.';
+      return '$targetLabel recebeu dano letal de $sourceLabels.';
     }
 
-    return '$targetLabel is lethal from $sourceLabels.';
+    return '$targetLabel recebeu dano letal de $sourceLabels.';
   }
 
   static bool isCounterCritical(
@@ -280,10 +280,10 @@ class LifeCounterTabletopEngine {
 
     switch (counterKey) {
       case 'poison':
-        return 'Poison lethal';
+        return 'Veneno letal';
       case 'tax-1':
       case 'tax-2':
-        return 'Critical commander tax';
+        return 'Taxa crítica de comandante';
       default:
         return null;
     }
@@ -298,14 +298,15 @@ class LifeCounterTabletopEngine {
       case LifeCounterPlayerSpecialState.deckedOut:
         return const LifeCounterPlayerStatusSummary(
           kind: LifeCounterPlayerStatusKind.deckedOut,
-          label: 'Decked out',
-          description: 'This player lost by drawing from an empty library.',
+          label: 'Sem grimório',
+          description:
+              'Este jogador perdeu ao tentar comprar de um grimório vazio.',
         );
       case LifeCounterPlayerSpecialState.answerLeft:
         return const LifeCounterPlayerStatusSummary(
           kind: LifeCounterPlayerStatusKind.leftTable,
-          label: 'Left the table',
-          description: 'This player left or conceded outside of life loss.',
+          label: 'Saiu da mesa',
+          description: 'Este jogador saiu ou concedeu sem perder por vida.',
         );
       case LifeCounterPlayerSpecialState.none:
         break;
@@ -333,8 +334,8 @@ class LifeCounterTabletopEngine {
     }
     return const LifeCounterPlayerStatusSummary(
       kind: LifeCounterPlayerStatusKind.active,
-      label: 'Active player',
-      description: 'This player is still active in the game.',
+      label: 'Jogador ativo',
+      description: 'Este jogador continua ativo na partida.',
     );
   }
 
@@ -412,11 +413,11 @@ class LifeCounterTabletopEngine {
   static String playerSpecialStateLabel(LifeCounterPlayerSpecialState state) {
     switch (state) {
       case LifeCounterPlayerSpecialState.none:
-        return 'Active player';
+        return 'Jogador ativo';
       case LifeCounterPlayerSpecialState.deckedOut:
-        return 'Decked out';
+        return 'Sem grimório';
       case LifeCounterPlayerSpecialState.answerLeft:
-        return 'Left the table';
+        return 'Saiu da mesa';
     }
   }
 
@@ -425,11 +426,11 @@ class LifeCounterTabletopEngine {
   ) {
     switch (state) {
       case LifeCounterPlayerSpecialState.none:
-        return 'This player is still active in the game.';
+        return 'Este jogador continua ativo na partida.';
       case LifeCounterPlayerSpecialState.deckedOut:
-        return 'Track that the player lost by drawing from an empty library.';
+        return 'Registre que o jogador perdeu ao comprar de um grimório vazio.';
       case LifeCounterPlayerSpecialState.answerLeft:
-        return 'Track that the player left or conceded outside of life loss.';
+        return 'Registre que o jogador saiu ou concedeu sem perder por vida.';
     }
   }
 
@@ -806,7 +807,7 @@ class LifeCounterTabletopEngine {
     return session.copyWith(
       playerSpecialStates: specialStates,
       playerEliminationReasons: eliminationReasons,
-      lastTableEvent: 'Jogador ${playerIndex + 1} ficou sem grimorio',
+      lastTableEvent: 'Jogador ${playerIndex + 1} ficou sem grimório',
     );
   }
 

@@ -98,7 +98,7 @@ class _LifeCounterNativeDiceSheetState
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              'Dice Tools',
+                              'Ferramentas de dados',
                               style: TextStyle(
                                 color: AppTheme.textPrimary,
                                 fontSize: AppTheme.fontXxl,
@@ -107,7 +107,7 @@ class _LifeCounterNativeDiceSheetState
                             ),
                             SizedBox(height: 6),
                             Text(
-                              'Roll dice, flip a coin, or choose the starting player.',
+                              'Role dados, jogue uma moeda ou escolha quem começa.',
                               style: TextStyle(
                                 color: AppTheme.textSecondary,
                                 fontSize: AppTheme.fontMd,
@@ -121,7 +121,7 @@ class _LifeCounterNativeDiceSheetState
                         onPressed: () => Navigator.of(context).pop(),
                         icon: const Icon(Icons.close_rounded),
                         color: AppTheme.textSecondary,
-                        tooltip: 'Close',
+                        tooltip: 'Fechar',
                       ),
                     ],
                   ),
@@ -132,13 +132,13 @@ class _LifeCounterNativeDiceSheetState
                     padding: const EdgeInsets.fromLTRB(20, 18, 20, 12),
                     children: [
                       _DiceSectionCard(
-                        title: 'Quick Actions',
+                        title: 'Ações rápidas',
                         subtitle:
                             !_hasAnyActivePlayers
-                                ? 'No active players remain on the table. Dice actions that choose a player stay unavailable.'
+                                ? 'Não há jogadores ativos na mesa. Ações que escolhem um jogador ficam indisponíveis.'
                                 : _hasPendingTieBreak
-                                ? 'The previous high roll ended in a tie. Running high roll again rerolls only tied players.'
-                                : 'Choose a quick action for the table.',
+                                ? 'A maior rolagem terminou empatada. Role novamente apenas para os jogadores empatados.'
+                                : 'Escolha uma ação rápida para a mesa.',
                         child: Wrap(
                           spacing: 10,
                           runSpacing: 10,
@@ -155,7 +155,9 @@ class _LifeCounterNativeDiceSheetState
                                       : null,
                               icon: const Icon(Icons.emoji_events_rounded),
                               label: Text(
-                                _hasPendingTieBreak ? 'Tiebreak' : 'High Roll',
+                                _hasPendingTieBreak
+                                    ? 'Desempatar'
+                                    : 'Maior rolagem',
                               ),
                             ),
                             OutlinedButton.icon(
@@ -174,7 +176,7 @@ class _LifeCounterNativeDiceSheetState
                                     LifeCounterDiceEngine.runCoinFlip,
                                   ),
                               icon: const Icon(Icons.toll_rounded),
-                              label: const Text('Coin'),
+                              label: const Text('Moeda'),
                             ),
                             OutlinedButton.icon(
                               key: const Key(
@@ -188,32 +190,32 @@ class _LifeCounterNativeDiceSheetState
                                       )
                                       : null,
                               icon: const Icon(Icons.flag_rounded),
-                              label: const Text('Roll 1st'),
+                              label: const Text('Sortear 1º'),
                             ),
                           ],
                         ),
                       ),
                       const SizedBox(height: 18),
                       _DiceSectionCard(
-                        title: 'Current State',
+                        title: 'Estado atual',
                         subtitle:
-                            'Review the latest result before applying changes.',
+                            'Confira o resultado mais recente antes de aplicar.',
                         child: Wrap(
                           spacing: 10,
                           runSpacing: 10,
                           children: [
                             _SummaryChip(
-                              label: 'First Player',
+                              label: 'Primeiro jogador',
                               value:
                                   _draftSession.firstPlayerIndex == null
-                                      ? 'Unset'
-                                      : 'Player ${_draftSession.firstPlayerIndex! + 1}',
+                                      ? 'Não definido'
+                                      : 'Jogador ${_draftSession.firstPlayerIndex! + 1}',
                             ),
                             _SummaryChip(
-                              label: 'Last Event',
+                              label: 'Último evento',
                               value:
                                   _draftSession.lastTableEvent == null
-                                      ? 'None'
+                                      ? 'Nenhum'
                                       : _draftSession.lastTableEvent!,
                             ),
                           ],
@@ -224,11 +226,11 @@ class _LifeCounterNativeDiceSheetState
                           .isNotEmpty) ...[
                         const SizedBox(height: 18),
                         _DiceSectionCard(
-                          title: 'High Roll Board',
+                          title: 'Quadro da maior rolagem',
                           subtitle:
                               _highRollWinners.length == 1
-                                  ? 'Winning player is highlighted below.'
-                                  : 'Tie detected. Running high roll again rerolls only tied players.',
+                                  ? 'O jogador vencedor está destacado abaixo.'
+                                  : 'Empate detectado. Role novamente apenas para os jogadores empatados.',
                           child: Wrap(
                             spacing: 8,
                             runSpacing: 8,
@@ -260,7 +262,7 @@ class _LifeCounterNativeDiceSheetState
                     children: [
                       TextButton(
                         onPressed: () => Navigator.of(context).pop(),
-                        child: const Text('Cancel'),
+                        child: const Text('Cancelar'),
                       ),
                       const Spacer(),
                       FilledButton.icon(
@@ -268,7 +270,7 @@ class _LifeCounterNativeDiceSheetState
                         onPressed:
                             () => Navigator.of(context).pop(_draftSession),
                         icon: const Icon(Icons.check_rounded),
-                        label: const Text('Apply'),
+                        label: const Text('Aplicar'),
                       ),
                     ],
                   ),

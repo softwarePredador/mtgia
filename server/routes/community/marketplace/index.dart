@@ -28,6 +28,7 @@ Future<Response> onRequest(RequestContext context) async {
 
     final whereClauses = <String>[
       '(bi.for_trade = TRUE OR bi.for_sale = TRUE)',
+      'u.deleted_at IS NULL',
     ];
     final sqlParams = <String, dynamic>{};
 
@@ -60,7 +61,8 @@ Future<Response> onRequest(RequestContext context) async {
     }
 
     final where = whereClauses.join(' AND ');
-    final needsCardJoinForCount = search != null && search.isNotEmpty ||
+    final needsCardJoinForCount =
+        search != null && search.isNotEmpty ||
         setCode != null && setCode.isNotEmpty ||
         rarity != null && rarity.isNotEmpty;
 
@@ -73,11 +75,13 @@ Future<Response> onRequest(RequestContext context) async {
               SELECT COUNT(*) as cnt
               FROM user_binder_items bi
               JOIN cards c ON c.id = bi.card_id
+              JOIN users u ON u.id = bi.user_id
               WHERE $where
             '''
             : '''
               SELECT COUNT(*) as cnt
               FROM user_binder_items bi
+              JOIN users u ON u.id = bi.user_id
               WHERE $where
             ''',
       ),
@@ -85,7 +89,8 @@ Future<Response> onRequest(RequestContext context) async {
     );
 
     // Items com dados do dono e da carta
-    final itemsFuture = pool.execute(Sql.named('''
+    final itemsFuture = pool.execute(
+      Sql.named('''
       SELECT bi.id, bi.card_id, bi.quantity, bi.condition, bi.is_foil,
              bi.for_trade, bi.for_sale, bi.price, bi.currency, bi.notes,
               bi.user_id, bi.language, bi.list_type,
@@ -169,59 +174,60 @@ Future<Response> onRequest(RequestContext context) async {
       WHERE $where
       ORDER BY bi.created_at DESC
       LIMIT @limit OFFSET @offset
-    '''), parameters: {...sqlParams, 'limit': limit, 'offset': offset});
+    '''),
+      parameters: {...sqlParams, 'limit': limit, 'offset': offset},
+    );
 
     final queryResults = await Future.wait([countFuture, itemsFuture]);
     final countResult = queryResults[0];
     final result = queryResults[1];
     final total = countResult.first[0] as int? ?? 0;
 
-    final items = result.map((row) {
-      final cols = row.toColumnMap();
-      return {
-        'id': cols['id'],
-        'card': {
-          'id': cols['card_id'],
-          'name': cols['card_name'],
-          'image_url': cols['card_image_url'],
-          'set_code': cols['card_set_code'],
-          'mana_cost': cols['card_mana_cost'],
-          'rarity': cols['card_rarity'],
-          'type_line': cols['card_type_line'],
-          'is_reserved': cols['card_is_reserved'] == true,
-        },
-        'quantity': cols['quantity'],
-        'condition': cols['condition'],
-        'is_foil': cols['is_foil'],
-        'for_trade': cols['for_trade'],
-        'for_sale': cols['for_sale'],
-        'price': cols['price'] != null
-            ? double.tryParse(cols['price'].toString())
-            : null,
-        'currency': cols['currency'],
-        'notes': cols['notes'],
-        'language': cols['language'],
-        'list_type': cols['list_type'] ?? 'have',
-        'price_insight': _buildPriceInsight(cols),
-        'owner': {
-          'id': cols['user_id'],
-          'username': cols['owner_username'],
-          'display_name': cols['owner_display_name'],
-          'avatar_url': cols['owner_avatar_url'],
-          'location_state': cols['owner_location_state'],
-          'location_city': cols['owner_location_city'],
-          'trade_notes': cols['owner_trade_notes'],
-          'trust': _buildTrustInsight(cols, 'owner_'),
-        },
-      };
-    }).toList();
+    final items =
+        result.map((row) {
+          final cols = row.toColumnMap();
+          return {
+            'id': cols['id'],
+            'card': {
+              'id': cols['card_id'],
+              'name': cols['card_name'],
+              'image_url': cols['card_image_url'],
+              'set_code': cols['card_set_code'],
+              'mana_cost': cols['card_mana_cost'],
+              'rarity': cols['card_rarity'],
+              'type_line': cols['card_type_line'],
+              'is_reserved': cols['card_is_reserved'] == true,
+            },
+            'quantity': cols['quantity'],
+            'condition': cols['condition'],
+            'is_foil': cols['is_foil'],
+            'for_trade': cols['for_trade'],
+            'for_sale': cols['for_sale'],
+            'price':
+                cols['price'] != null
+                    ? double.tryParse(cols['price'].toString())
+                    : null,
+            'currency': cols['currency'],
+            'notes': cols['notes'],
+            'language': cols['language'],
+            'list_type': cols['list_type'] ?? 'have',
+            'price_insight': _buildPriceInsight(cols),
+            'owner': {
+              'id': cols['user_id'],
+              'username': cols['owner_username'],
+              'display_name': cols['owner_display_name'],
+              'avatar_url': cols['owner_avatar_url'],
+              'location_state': cols['owner_location_state'],
+              'location_city': cols['owner_location_city'],
+              'trade_notes': cols['owner_trade_notes'],
+              'trust': _buildTrustInsight(cols, 'owner_'),
+            },
+          };
+        }).toList();
 
-    return Response.json(body: {
-      'data': items,
-      'page': page,
-      'limit': limit,
-      'total': total,
-    });
+    return Response.json(
+      body: {'data': items, 'page': page, 'limit': limit, 'total': total},
+    );
   } catch (e, st) {
     await captureRouteException(
       context,
@@ -264,9 +270,10 @@ Map<String, dynamic> _buildPriceInsight(Map<String, dynamic> cols) {
     final pct = (change / previous) * 100;
     trend
       ..['status'] = 'available'
-      ..['direction'] = change > 0
-          ? 'up'
-          : change < 0
+      ..['direction'] =
+          change > 0
+              ? 'up'
+              : change < 0
               ? 'down'
               : 'flat'
       ..['change_abs'] = _round2(change)
@@ -290,20 +297,22 @@ Map<String, dynamic> _buildPriceInsight(Map<String, dynamic> cols) {
     final pct = (diff / reference) * 100;
     final isAlert = diff.abs() >= thresholdAbs && pct.abs() >= thresholdPct;
     comparison
-      ..['direction'] = diff > 0
-          ? 'above_reference'
-          : diff < 0
+      ..['direction'] =
+          diff > 0
+              ? 'above_reference'
+              : diff < 0
               ? 'below_reference'
               : 'near_reference'
       ..['difference_abs'] = _round2(diff.abs())
       ..['difference_pct'] = _round2(pct.abs())
       ..['status'] =
           isAlert ? (diff > 0 ? 'alert_high' : 'alert_low') : 'within_range'
-      ..['message'] = isAlert
-          ? (diff > 0
-              ? 'Preço anunciado bem acima da referência interna; confirme condição, idioma e acordo.'
-              : 'Preço anunciado bem abaixo da referência interna; confirme se não há erro no anúncio.')
-          : 'Preço anunciado próximo da referência interna disponível.';
+      ..['message'] =
+          isAlert
+              ? (diff > 0
+                  ? 'Preço anunciado bem acima da referência interna; confirme condição, idioma e acordo.'
+                  : 'Preço anunciado bem abaixo da referência interna; confirme se não há erro no anúncio.')
+              : 'Preço anunciado próximo da referência interna disponível.';
   }
 
   return {
@@ -325,9 +334,11 @@ Map<String, dynamic> _buildTrustInsight(
   final disputed = _toInt(cols['${prefix}disputed_trades']);
   final totalSignals = completed + cancelled + declined + disputed;
   final createdAt = cols['${prefix}created_at'];
-  final isNewAccount = createdAt is DateTime &&
+  final isNewAccount =
+      createdAt is DateTime &&
       DateTime.now().toUtc().difference(createdAt.toUtc()).inDays < 30;
-  final profileIncomplete = (cols['${prefix}display_name'] == null ||
+  final profileIncomplete =
+      (cols['${prefix}display_name'] == null ||
           cols['${prefix}display_name'].toString().trim().isEmpty) ||
       (cols['${prefix}location_state'] == null ||
           cols['${prefix}location_state'].toString().trim().isEmpty) ||

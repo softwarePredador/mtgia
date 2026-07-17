@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 
 import '../../../core/theme/app_theme.dart';
+import '../../../core/utils/currency_formatter.dart';
+export '../../../core/widgets/mana_symbols.dart';
 
 class DeckPricingRow extends StatelessWidget {
   final Map<String, dynamic>? pricing;
@@ -43,7 +44,8 @@ class DeckPricingRow extends StatelessWidget {
     if (isLoading && total == null) {
       subtitle = 'Calculando...';
     } else if (total is num) {
-      subtitle = 'Estimado: \$${total.toStringAsFixed(2)}';
+      subtitle =
+          'Estimado: ${CurrencyFormatter.format(total, currencyCode: pricing?['currency']?.toString() ?? 'USD')}';
       if (missing is num && missing > 0) {
         subtitle += ' • ${missing.toInt()} sem preço';
       }
@@ -97,207 +99,6 @@ class DeckPricingRow extends StatelessWidget {
             icon: const Icon(Icons.refresh),
           ),
         ],
-      ),
-    );
-  }
-}
-
-class ManaCostRow extends StatelessWidget {
-  final String? cost;
-
-  const ManaCostRow({super.key, this.cost});
-
-  @override
-  Widget build(BuildContext context) {
-    if (cost == null || cost!.isEmpty) return const SizedBox.shrink();
-
-    final matches = RegExp(r'\{([^\}]+)\}').allMatches(cost!);
-    return Row(
-      mainAxisSize: MainAxisSize.min,
-      children:
-          matches.map((m) {
-            final symbol = m.group(1)!;
-            return ManaSymbol(symbol: symbol);
-          }).toList(),
-    );
-  }
-}
-
-class ManaSymbol extends StatelessWidget {
-  final String symbol;
-
-  const ManaSymbol({super.key, required this.symbol});
-
-  @override
-  Widget build(BuildContext context) {
-    final filename = symbol.replaceAll('/', '-');
-
-    return Container(
-      margin: const EdgeInsets.only(right: 2),
-      width: 18,
-      height: 18,
-      child: SvgPicture.asset(
-        'assets/symbols/$filename.svg',
-        placeholderBuilder: (context) => FallbackManaSymbol(symbol: symbol),
-      ),
-    );
-  }
-}
-
-class FallbackManaSymbol extends StatelessWidget {
-  final String symbol;
-
-  const FallbackManaSymbol({super.key, required this.symbol});
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      decoration: const BoxDecoration(
-        color: AppTheme.textSecondary,
-        shape: BoxShape.circle,
-      ),
-      alignment: Alignment.center,
-      child: Text(
-        symbol,
-        style: const TextStyle(
-          fontSize: AppTheme.fontMicro,
-          color: AppTheme.backgroundAbyss,
-        ),
-      ),
-    );
-  }
-}
-
-class OracleTextWidget extends StatelessWidget {
-  final String text;
-
-  const OracleTextWidget(this.text, {super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    final spans = <InlineSpan>[];
-    final regex = RegExp(r'\{([^\}]+)\}');
-
-    text.splitMapJoin(
-      regex,
-      onMatch: (Match m) {
-        final symbol = m.group(1)!;
-        spans.add(
-          WidgetSpan(
-            alignment: PlaceholderAlignment.middle,
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 1.0),
-              child: SizedBox(
-                width: 16,
-                height: 16,
-                child: FittedBox(
-                  fit: BoxFit.contain,
-                  child: ManaSymbol(symbol: symbol),
-                ),
-              ),
-            ),
-          ),
-        );
-        return '';
-      },
-      onNonMatch: (String s) {
-        spans.add(TextSpan(text: s));
-        return '';
-      },
-    );
-
-    return Text.rich(
-      TextSpan(
-        style: Theme.of(context).textTheme.bodyMedium?.copyWith(height: 1.5),
-        children: spans,
-      ),
-    );
-  }
-}
-
-class ColorIdentityPips extends StatelessWidget {
-  final List<String> colors;
-
-  const ColorIdentityPips({super.key, required this.colors});
-
-  static const _wubrgOrder = ['W', 'U', 'B', 'R', 'G'];
-
-  @override
-  Widget build(BuildContext context) {
-    final sorted =
-        colors
-            .map((color) => color.trim().toUpperCase())
-            .where(_wubrgOrder.contains)
-            .toSet()
-            .toList()
-          ..sort((a, b) {
-            final ai = _wubrgOrder.indexOf(a);
-            final bi = _wubrgOrder.indexOf(b);
-            return ai.compareTo(bi);
-          });
-
-    if (sorted.isEmpty) {
-      return const SizedBox.shrink();
-    }
-
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 5),
-      decoration: BoxDecoration(
-        color: AppTheme.backgroundAbyss.withValues(alpha: 0.62),
-        borderRadius: BorderRadius.circular(AppTheme.radiusPill),
-        border: Border.all(
-          color: AppTheme.outlineMuted.withValues(alpha: 0.82),
-          width: AppTheme.strokeThin,
-        ),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children:
-            sorted.map((symbol) {
-              return Padding(
-                padding: EdgeInsets.only(right: symbol == sorted.last ? 0 : 4),
-                child: SizedBox(
-                  width: 18,
-                  height: 18,
-                  child: SvgPicture.asset(
-                    'assets/symbols/$symbol.svg',
-                    semanticsLabel: '$symbol mana',
-                    placeholderBuilder: (_) => FallbackColorPip(letter: symbol),
-                  ),
-                ),
-              );
-            }).toList(),
-      ),
-    );
-  }
-}
-
-class FallbackColorPip extends StatelessWidget {
-  final String letter;
-
-  const FallbackColorPip({super.key, required this.letter});
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: 18,
-      height: 18,
-      decoration: BoxDecoration(
-        color: AppTheme.manaPipBackground(letter),
-        shape: BoxShape.circle,
-        border: Border.all(
-          color: AppTheme.outlineMuted,
-          width: AppTheme.strokeHairline,
-        ),
-      ),
-      alignment: Alignment.center,
-      child: Text(
-        letter,
-        style: TextStyle(
-          fontSize: AppTheme.fontXs,
-          fontWeight: FontWeight.bold,
-          color: AppTheme.manaPipForeground(letter),
-        ),
       ),
     );
   }

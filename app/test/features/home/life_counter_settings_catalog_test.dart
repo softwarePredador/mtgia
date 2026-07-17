@@ -20,7 +20,10 @@ void main() {
         updated.showCountersOnPlayerCard,
         LifeCounterSettings.defaults.showCountersOnPlayerCard,
       );
-      expect(updated.whitelabelIcon, LifeCounterSettings.defaults.whitelabelIcon);
+      expect(
+        updated.whitelabelIcon,
+        LifeCounterSettings.defaults.whitelabelIcon,
+      );
     });
 
     test('can explicitly clear the optional whitelabel icon', () {
@@ -60,10 +63,11 @@ void main() {
         LifeCounterSettings.defaults,
       );
 
-      final ids = sections
-          .expand((section) => section.entries)
-          .map((entry) => entry.id)
-          .toList();
+      final ids =
+          sections
+              .expand((section) => section.entries)
+              .map((entry) => entry.id)
+              .toList();
 
       expect(ids.length, LifeCounterSettingFieldId.values.length);
       expect(ids.toSet().length, LifeCounterSettingFieldId.values.length);
@@ -90,7 +94,7 @@ void main() {
         (section) => section.id == LifeCounterSettingsSectionId.advanced,
       );
 
-      expect(timers.title, 'Timers');
+      expect(timers.title, 'Cronômetros');
       expect(
         timers.entries
             .firstWhere(
@@ -110,7 +114,8 @@ void main() {
       expect(
         advanced.entries
             .firstWhere(
-              (entry) => entry.id == LifeCounterSettingFieldId.customLongTapValue,
+              (entry) =>
+                  entry.id == LifeCounterSettingFieldId.customLongTapValue,
             )
             .numberValue,
         30,

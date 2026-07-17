@@ -266,12 +266,20 @@ class LifeCounterSession {
     this.turnTimerActive = false,
     this.turnTimerSeconds = 0,
     required this.lastTableEvent,
+    this.playSessionId,
+    this.deckId,
+    this.deckName,
+    this.startedAtEpochMs,
   });
 
   factory LifeCounterSession.initial({
     int playerCount = lifeCounterMinPlayers,
     int startingLifeTwoPlayer = lifeCounterDefaultTwoPlayerStartingLife,
     int startingLifeMultiPlayer = lifeCounterDefaultMultiPlayerStartingLife,
+    String? playSessionId,
+    String? deckId,
+    String? deckName,
+    int? startedAtEpochMs,
   }) {
     final normalizedPlayerCount = playerCount.clamp(
       lifeCounterMinPlayers,
@@ -334,6 +342,10 @@ class LifeCounterSession {
       turnTimerActive: false,
       turnTimerSeconds: 0,
       lastTableEvent: null,
+      playSessionId: playSessionId,
+      deckId: deckId,
+      deckName: deckName,
+      startedAtEpochMs: startedAtEpochMs,
     );
   }
 
@@ -372,6 +384,10 @@ class LifeCounterSession {
   final bool turnTimerActive;
   final int turnTimerSeconds;
   final String? lastTableEvent;
+  final String? playSessionId;
+  final String? deckId;
+  final String? deckName;
+  final int? startedAtEpochMs;
 
   int get startingLife =>
       playerCount == 2 ? startingLifeTwoPlayer : startingLifeMultiPlayer;
@@ -492,6 +508,14 @@ class LifeCounterSession {
     int? turnTimerSeconds,
     String? lastTableEvent,
     bool clearLastTableEvent = false,
+    String? playSessionId,
+    bool clearPlaySessionId = false,
+    String? deckId,
+    bool clearDeckId = false,
+    String? deckName,
+    bool clearDeckName = false,
+    int? startedAtEpochMs,
+    bool clearStartedAtEpochMs = false,
   }) {
     return LifeCounterSession(
       playerCount: playerCount ?? this.playerCount,
@@ -543,6 +567,14 @@ class LifeCounterSession {
       turnTimerSeconds: turnTimerSeconds ?? this.turnTimerSeconds,
       lastTableEvent:
           clearLastTableEvent ? null : lastTableEvent ?? this.lastTableEvent,
+      playSessionId:
+          clearPlaySessionId ? null : playSessionId ?? this.playSessionId,
+      deckId: clearDeckId ? null : deckId ?? this.deckId,
+      deckName: clearDeckName ? null : deckName ?? this.deckName,
+      startedAtEpochMs:
+          clearStartedAtEpochMs
+              ? null
+              : startedAtEpochMs ?? this.startedAtEpochMs,
     );
   }
 
@@ -589,6 +621,10 @@ class LifeCounterSession {
       'turn_timer_active': turnTimerActive,
       'turn_timer_seconds': turnTimerSeconds,
       'last_table_event': lastTableEvent,
+      if (playSessionId != null) 'play_session_id': playSessionId,
+      if (deckId != null) 'deck_id': deckId,
+      if (deckName != null) 'deck_name': deckName,
+      if (startedAtEpochMs != null) 'started_at_epoch_ms': startedAtEpochMs,
     };
   }
 
@@ -733,6 +769,15 @@ class LifeCounterSession {
     final lastTableEvent = _sanitizeLastTableEvent(
       payload['last_table_event'] as String?,
     );
+    final playSessionId = _readContextString(
+      payload['play_session_id'],
+      maxLength: 160,
+    );
+    final deckId = _readContextString(payload['deck_id'], maxLength: 160);
+    final deckName = _readContextString(payload['deck_name'], maxLength: 240);
+    final rawStartedAt = (payload['started_at_epoch_ms'] as num?)?.toInt();
+    final startedAtEpochMs =
+        rawStartedAt != null && rawStartedAt >= 0 ? rawStartedAt : null;
 
     if (lives == null ||
         poison == null ||
@@ -785,7 +830,20 @@ class LifeCounterSession {
       turnTimerActive: turnTimerActive,
       turnTimerSeconds: turnTimerSeconds,
       lastTableEvent: lastTableEvent,
+      playSessionId: playSessionId,
+      deckId: deckId,
+      deckName: deckName,
+      startedAtEpochMs: startedAtEpochMs,
     );
+  }
+
+  static String? _readContextString(dynamic value, {required int maxLength}) {
+    if (value is! String) return null;
+    final normalized = value.trim();
+    if (normalized.isEmpty) return null;
+    return normalized.length <= maxLength
+        ? normalized
+        : normalized.substring(0, maxLength);
   }
 
   static String _encodePlayerSpecialState(LifeCounterPlayerSpecialState state) {
@@ -1164,4 +1222,50 @@ class LifeCounterSession {
 
     return event;
   }
+}
+
+/// Stable comparison of game play only; route/deck metadata and visual player
+/// customization intentionally do not turn a simple open/close into a match.
+String lifeCounterGameplayFingerprint(LifeCounterSession session) {
+  return jsonEncode(<String, Object?>{
+    'player_count': session.playerCount,
+    'starting_life_two_player': session.startingLifeTwoPlayer,
+    'starting_life_multi_player': session.startingLifeMultiPlayer,
+    'lives': session.lives,
+    'poison': session.poison,
+    'energy': session.energy,
+    'experience': session.experience,
+    'commander_casts': session.commanderCasts,
+    'commander_cast_details': session.resolvedCommanderCastDetails
+        .map((entry) => entry.toJson())
+        .toList(growable: false),
+    'extra_counters': session.resolvedPlayerExtraCounters,
+    'counter_presence': session.resolvedPlayerCounterPresence,
+    'partner_commanders': session.partnerCommanders,
+    'special_states':
+        session.playerSpecialStates.map((entry) => entry.name).toList(),
+    'elimination_reasons':
+        session.resolvedPlayerEliminationReasons
+            .map((entry) => entry.name)
+            .toList(),
+    'last_player_rolls': session.lastPlayerRolls,
+    'last_high_rolls': session.lastHighRolls,
+    'commander_damage': session.commanderDamage,
+    'commander_damage_details': session.resolvedCommanderDamageDetails
+        .map(
+          (row) => row.map((entry) => entry.toJson()).toList(growable: false),
+        )
+        .toList(growable: false),
+    'storm_count': session.stormCount,
+    'monarch_player': session.monarchPlayer,
+    'initiative_player': session.initiativePlayer,
+    'first_player_index': session.firstPlayerIndex,
+    'turn_tracker_active': session.turnTrackerActive,
+    'turn_tracker_ongoing_game': session.turnTrackerOngoingGame,
+    'current_turn_player_index': session.currentTurnPlayerIndex,
+    'current_turn_number': session.currentTurnNumber,
+    'turn_timer_active': session.turnTimerActive,
+    'turn_timer_seconds': session.turnTimerSeconds,
+    'last_table_event': session.lastTableEvent,
+  });
 }

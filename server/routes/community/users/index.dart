@@ -36,8 +36,11 @@ Future<Response> _searchUsers(RequestContext context) async {
       Sql.named('''
         SELECT COUNT(*)::int
         FROM users
-        WHERE LOWER(username) LIKE @search
-           OR LOWER(COALESCE(display_name, '')) LIKE @search
+        WHERE deleted_at IS NULL
+          AND (
+            LOWER(username) LIKE @search
+            OR LOWER(COALESCE(display_name, '')) LIKE @search
+          )
       '''),
       parameters: {'search': '%${query.toLowerCase()}%'},
     );
@@ -54,8 +57,11 @@ Future<Response> _searchUsers(RequestContext context) async {
             u.avatar_url,
             u.created_at
           FROM users u
-          WHERE LOWER(u.username) LIKE @search
-             OR LOWER(COALESCE(u.display_name, '')) LIKE @search
+          WHERE u.deleted_at IS NULL
+            AND (
+              LOWER(u.username) LIKE @search
+              OR LOWER(COALESCE(u.display_name, '')) LIKE @search
+            )
           ORDER BY u.username ASC
           LIMIT @lim OFFSET @off
         ),
@@ -75,6 +81,7 @@ Future<Response> _searchUsers(RequestContext context) async {
           SELECT d.user_id, COUNT(*)::int AS public_deck_count
           FROM decks d
           WHERE d.is_public = true
+            AND d.deleted_at IS NULL
             AND d.user_id IN (SELECT id FROM paged_users)
           GROUP BY d.user_id
         )
@@ -100,23 +107,21 @@ Future<Response> _searchUsers(RequestContext context) async {
       },
     );
 
-    final users = result.map((row) {
-      final m = row.toColumnMap();
-      if (m['created_at'] is DateTime) {
-        m['created_at'] = (m['created_at'] as DateTime).toIso8601String();
-      }
-      // Nunca expor email ou password_hash
-      m.remove('email');
-      m.remove('password_hash');
-      return m;
-    }).toList();
+    final users =
+        result.map((row) {
+          final m = row.toColumnMap();
+          if (m['created_at'] is DateTime) {
+            m['created_at'] = (m['created_at'] as DateTime).toIso8601String();
+          }
+          // Nunca expor email ou password_hash
+          m.remove('email');
+          m.remove('password_hash');
+          return m;
+        }).toList();
 
-    return Response.json(body: {
-      'data': users,
-      'page': page,
-      'limit': limit,
-      'total': total,
-    });
+    return Response.json(
+      body: {'data': users, 'page': page, 'limit': limit, 'total': total},
+    );
   } catch (e, st) {
     await captureRouteException(
       context,
@@ -126,7 +131,8 @@ Future<Response> _searchUsers(RequestContext context) async {
       extras: {'operation': 'search_users'},
     );
     Log.e(
-        '[community_route] server_error endpoint=GET /community/users error=$e');
+      '[community_route] server_error endpoint=GET /community/users error=$e',
+    );
     return Response.json(
       statusCode: HttpStatus.internalServerError,
       body: {'error': 'Internal server error'},

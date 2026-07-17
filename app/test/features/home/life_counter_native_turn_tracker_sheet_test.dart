@@ -42,20 +42,20 @@ void main() {
       await tester.tap(find.text('open'));
       await tester.pumpAndSettle();
 
-      expect(find.text('Turn Tracker'), findsOneWidget);
-      expect(find.text('Tracker is currently stopped.'), findsOneWidget);
+      expect(find.text('Controle de turnos'), findsOneWidget);
+      expect(find.text('O controle de turnos está parado.'), findsOneWidget);
 
       await tester.scrollUntilVisible(
-        find.text('Player 3'),
+        find.text('Jogador 3'),
         200,
         scrollable: find.byType(Scrollable).first,
       );
 
-      await tester.tap(find.text('Player 3'));
+      await tester.tap(find.text('Jogador 3'));
       await tester.pumpAndSettle();
 
       await tester.scrollUntilVisible(
-        find.text('Start Game'),
+        find.text('Iniciar partida'),
         250,
         scrollable: find.byType(Scrollable).first,
       );
@@ -68,11 +68,11 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      expect(find.text('Active'), findsOneWidget);
-      expect(find.text('Player 3'), findsWidgets);
+      expect(find.text('Ativo'), findsOneWidget);
+      expect(find.text('Jogador 3'), findsWidgets);
 
       await tester.scrollUntilVisible(
-        find.text('Next'),
+        find.text('Avançar'),
         250,
         scrollable: find.byType(Scrollable).first,
       );
@@ -143,7 +143,7 @@ void main() {
       await tester.pumpAndSettle();
 
       await tester.scrollUntilVisible(
-        find.text('Stop'),
+        find.text('Encerrar'),
         250,
         scrollable: find.byType(Scrollable).first,
       );
@@ -221,7 +221,7 @@ void main() {
       await tester.tap(find.text('open'));
       await tester.pumpAndSettle();
 
-      expect(find.text('Player 4'), findsWidgets);
+      expect(find.text('Jogador 4'), findsWidgets);
 
       await tester.tap(
         find.byKey(const Key('life-counter-native-turn-tracker-apply')),
@@ -282,7 +282,7 @@ void main() {
         await tester.tap(find.text('open'));
         await tester.pumpAndSettle();
 
-        expect(find.text('No active players'), findsWidgets);
+        expect(find.text('Nenhum jogador ativo'), findsWidgets);
 
         final startButton = tester.widget<FilledButton>(
           find.byKey(const Key('life-counter-native-turn-tracker-start')),

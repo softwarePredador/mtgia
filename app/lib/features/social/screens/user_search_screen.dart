@@ -4,6 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../../core/theme/app_theme.dart';
+import '../../../core/widgets/app_state_panel.dart';
+import '../../../core/widgets/responsive_page_frame.dart';
 import '../providers/social_provider.dart';
 import 'user_profile_screen.dart';
 
@@ -41,140 +43,166 @@ class _UserSearchScreenState extends State<UserSearchScreen> {
         title: const Text('Buscar Usuários'),
         backgroundColor: AppTheme.backgroundAbyss,
       ),
-      body: Column(
-        children: [
-          // Search bar
-          Container(
-            padding: const EdgeInsets.all(12),
-            color: AppTheme.surfaceElevated,
-            child: TextField(
-              key: const Key('user-search-field'),
-              controller: _searchController,
-              autofocus: true,
-              style: const TextStyle(color: AppTheme.textPrimary),
-              decoration: InputDecoration(
-                hintText: 'Buscar por nome de usuário...',
-                hintStyle: const TextStyle(color: AppTheme.textSecondary),
-                prefixIcon: const Icon(Icons.search, color: AppTheme.brass400),
-                suffixIcon:
-                    _searchController.text.isEmpty
-                        ? null
-                        : IconButton(
-                          key: const Key('user-search-clear-button'),
-                          tooltip: 'Limpar busca',
-                          icon: const Icon(
-                            Icons.clear,
-                            color: AppTheme.textSecondary,
-                            size: 18,
+      body: ResponsivePageFrame(
+        maxWidth: 840,
+        padding: EdgeInsets.symmetric(
+          horizontal:
+              MediaQuery.sizeOf(context).width < AppTheme.breakpointCompact
+                  ? 16
+                  : 24,
+        ),
+        child: Column(
+          key: const Key('user-search-content'),
+          children: [
+            // Search bar
+            Container(
+              padding: const EdgeInsets.symmetric(vertical: 12),
+              color: AppTheme.surfaceElevated,
+              child: TextField(
+                key: const Key('user-search-field'),
+                controller: _searchController,
+                autofocus: true,
+                style: const TextStyle(color: AppTheme.textPrimary),
+                decoration: InputDecoration(
+                  hintText: 'Buscar por nome de usuário...',
+                  hintStyle: const TextStyle(color: AppTheme.textSecondary),
+                  prefixIcon: const Icon(
+                    Icons.search,
+                    color: AppTheme.brass400,
+                  ),
+                  suffixIcon:
+                      _searchController.text.isEmpty
+                          ? null
+                          : IconButton(
+                            key: const Key('user-search-clear-button'),
+                            tooltip: 'Limpar busca',
+                            icon: const Icon(
+                              Icons.clear,
+                              color: AppTheme.textSecondary,
+                              size: 18,
+                            ),
+                            onPressed: () {
+                              _debounce?.cancel();
+                              setState(_searchController.clear);
+                              context.read<SocialProvider>().clearSearch();
+                            },
                           ),
-                          onPressed: () {
-                            _debounce?.cancel();
-                            setState(_searchController.clear);
-                            context.read<SocialProvider>().clearSearch();
-                          },
-                        ),
-                filled: true,
-                fillColor: AppTheme.surfaceSlate,
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(AppTheme.radiusMd),
-                  borderSide: BorderSide.none,
+                  filled: true,
+                  fillColor: AppTheme.surfaceSlate,
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(AppTheme.radiusMd),
+                    borderSide: BorderSide.none,
+                  ),
+                  contentPadding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 12,
+                  ),
                 ),
-                contentPadding: const EdgeInsets.symmetric(
-                  horizontal: 16,
-                  vertical: 12,
-                ),
+                onChanged: _onSearchChanged,
               ),
-              onChanged: _onSearchChanged,
             ),
-          ),
-          // Results
-          Expanded(
-            child: Consumer<SocialProvider>(
-              builder: (context, provider, _) {
-                if (provider.isSearching) {
-                  return const Center(
-                    child: CircularProgressIndicator(color: AppTheme.brass500),
-                  );
-                }
-
-                if (provider.searchError != null) {
-                  return Center(
-                    child: Text(
-                      provider.searchError!,
-                      style: const TextStyle(color: AppTheme.textSecondary),
-                    ),
-                  );
-                }
-
-                if (_searchController.text.trim().isEmpty) {
-                  return Center(
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Icon(
-                          Icons.person_search,
-                          size: 64,
-                          color: AppTheme.textSecondary.withValues(alpha: 0.4),
-                        ),
-                        const SizedBox(height: 16),
-                        const Text(
-                          'Digite para buscar usuários',
-                          style: TextStyle(
-                            color: AppTheme.textSecondary,
-                            fontSize: AppTheme.fontLg,
-                          ),
-                        ),
-                      ],
-                    ),
-                  );
-                }
-
-                if (provider.searchResults.isEmpty) {
-                  return Center(
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Icon(
-                          Icons.search_off,
-                          size: 48,
-                          color: AppTheme.textSecondary.withValues(alpha: 0.5),
-                        ),
-                        const SizedBox(height: 12),
-                        const Text(
-                          'Nenhum usuário encontrado',
-                          style: TextStyle(
-                            color: AppTheme.textSecondary,
-                            fontSize: AppTheme.fontLg,
-                          ),
-                        ),
-                      ],
-                    ),
-                  );
-                }
-
-                return ListView.builder(
-                  key: const Key('user-search-list'),
-                  padding: const EdgeInsets.all(12),
-                  itemCount: provider.searchResults.length,
-                  itemBuilder: (context, index) {
-                    final user = provider.searchResults[index];
-                    return _UserSearchCard(
-                      user: user,
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (_) => UserProfileScreen(userId: user.id),
-                          ),
-                        );
-                      },
+            // Results
+            Expanded(
+              child: Consumer<SocialProvider>(
+                builder: (context, provider, _) {
+                  if (provider.isSearching) {
+                    return const Center(
+                      child: CircularProgressIndicator(
+                        color: AppTheme.brass500,
+                      ),
                     );
-                  },
-                );
-              },
+                  }
+
+                  if (provider.searchError != null) {
+                    return AppStatePanel(
+                      key: const Key('user-search-error'),
+                      icon: Icons.person_search_rounded,
+                      title: 'Falha ao buscar jogadores',
+                      message: provider.searchError,
+                      accent: AppTheme.error,
+                      actionLabel: 'Tentar novamente',
+                      onAction:
+                          () => provider.searchUsers(
+                            _searchController.text.trim(),
+                          ),
+                    );
+                  }
+
+                  if (_searchController.text.trim().isEmpty) {
+                    return Center(
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(
+                            Icons.person_search,
+                            size: 64,
+                            color: AppTheme.textSecondary.withValues(
+                              alpha: 0.4,
+                            ),
+                          ),
+                          const SizedBox(height: 16),
+                          const Text(
+                            'Digite para buscar usuários',
+                            style: TextStyle(
+                              color: AppTheme.textSecondary,
+                              fontSize: AppTheme.fontLg,
+                            ),
+                          ),
+                        ],
+                      ),
+                    );
+                  }
+
+                  if (provider.searchResults.isEmpty) {
+                    return Center(
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(
+                            Icons.search_off,
+                            size: 48,
+                            color: AppTheme.textSecondary.withValues(
+                              alpha: 0.5,
+                            ),
+                          ),
+                          const SizedBox(height: 12),
+                          const Text(
+                            'Nenhum usuário encontrado',
+                            style: TextStyle(
+                              color: AppTheme.textSecondary,
+                              fontSize: AppTheme.fontLg,
+                            ),
+                          ),
+                        ],
+                      ),
+                    );
+                  }
+
+                  return ListView.builder(
+                    key: const Key('user-search-list'),
+                    padding: const EdgeInsets.symmetric(vertical: 12),
+                    itemCount: provider.searchResults.length,
+                    itemBuilder: (context, index) {
+                      final user = provider.searchResults[index];
+                      return _UserSearchCard(
+                        user: user,
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder:
+                                  (_) => UserProfileScreen(userId: user.id),
+                            ),
+                          );
+                        },
+                      );
+                    },
+                  );
+                },
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

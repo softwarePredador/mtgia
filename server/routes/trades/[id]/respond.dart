@@ -29,9 +29,39 @@ Future<Response> onRequest(RequestContext context, String id) async {
     final newStatus = action == 'accept' ? 'accepted' : 'declined';
     final notes = action == 'accept' ? 'Proposta aceita' : 'Proposta recusada';
 
-    // Um único statement faz lock, validação, update e histórico para evitar
-    // round-trips transacionais contra o PostgreSQL remoto.
-    final respondResult = await pool.execute(Sql.named('''
+    // A ordem de lock é users -> trade, igual à exclusão de conta. Assim não
+    // há transição nova depois de um participante ser anonimizado.
+    final respondResult = await pool.runTx((session) async {
+      final participants = await session.execute(
+        Sql.named('''
+          SELECT sender_id, receiver_id
+          FROM trade_offers
+          WHERE id = @id
+        '''),
+        parameters: {'id': id},
+      );
+      if (participants.isNotEmpty) {
+        final participant = participants.first.toColumnMap();
+        final participantIds = <String>[
+          participant['sender_id'] as String,
+          participant['receiver_id'] as String,
+        ]..sort();
+        final activeUsers = await session.execute(
+          Sql.named('''
+            SELECT id
+            FROM users
+            WHERE id = ANY(@participantIds::uuid[])
+              AND deleted_at IS NULL
+            ORDER BY id
+            FOR UPDATE
+          '''),
+          parameters: {'participantIds': participantIds},
+        );
+        if (activeUsers.length != 2) return null;
+      }
+
+      return session.execute(
+        Sql.named('''
       WITH current_trade AS (
         SELECT id, sender_id, receiver_id, status
         FROM trade_offers
@@ -76,12 +106,24 @@ Future<Response> onRequest(RequestContext context, String id) async {
         (SELECT status FROM current_trade) AS current_status,
         (SELECT sender_id FROM current_trade) AS sender_id,
         EXISTS(SELECT 1 FROM history) AS history_inserted
-    '''), parameters: {
-      'id': id,
-      'newStatus': newStatus,
-      'userId': userId,
-      'notes': notes,
+    '''),
+        parameters: {
+          'id': id,
+          'newStatus': newStatus,
+          'userId': userId,
+          'notes': notes,
+        },
+      );
     });
+    if (respondResult == null) {
+      return Response.json(
+        statusCode: HttpStatus.conflict,
+        body: {
+          'error': 'participant_unavailable',
+          'message': 'Um participante não está mais disponível.',
+        },
+      );
+    }
     final respondRow = respondResult.first.toColumnMap();
     final result = respondRow['result'] as String;
     final currentStatus = respondRow['current_status'] as String?;
@@ -102,7 +144,7 @@ Future<Response> onRequest(RequestContext context, String id) async {
         return Response.json(
           statusCode: HttpStatus.badRequest,
           body: {
-            'error': 'Trade não está pendente (status atual: $currentStatus)'
+            'error': 'Trade não está pendente (status atual: $currentStatus)',
           },
         );
     }
@@ -120,9 +162,11 @@ Future<Response> onRequest(RequestContext context, String id) async {
         actorUserId: userId,
         userId: senderId,
         type: action == 'accept' ? 'trade_accepted' : 'trade_declined',
-        titleBuilder: (responderName) => action == 'accept'
-            ? '$responderName aceitou sua proposta de trade'
-            : '$responderName recusou sua proposta de trade',
+        titleBuilder:
+            (responderName) =>
+                action == 'accept'
+                    ? '$responderName aceitou sua proposta de trade'
+                    : '$responderName recusou sua proposta de trade',
         referenceId: id,
         endpoint: 'PUT /trades/:id/respond',
         requestId: _requestId(context),
@@ -130,11 +174,13 @@ Future<Response> onRequest(RequestContext context, String id) async {
       );
     }
 
-    return Response.json(body: {
-      'id': id,
-      'status': newStatus,
-      'message': action == 'accept' ? 'Trade aceito!' : 'Trade recusado.',
-    });
+    return Response.json(
+      body: {
+        'id': id,
+        'status': newStatus,
+        'message': action == 'accept' ? 'Trade aceito!' : 'Trade recusado.',
+      },
+    );
   } catch (e, st) {
     await captureRouteException(
       context,
@@ -159,11 +205,7 @@ String _requestId(RequestContext context) {
   }
 }
 
-void _logInvalidPayload(
-  RequestContext context,
-  String tradeId,
-  String reason,
-) {
+void _logInvalidPayload(RequestContext context, String tradeId, String reason) {
   String userId;
   try {
     userId = context.read<String>();

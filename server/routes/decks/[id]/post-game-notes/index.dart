@@ -24,8 +24,28 @@ Future<Response> _list(RequestContext context, String deckId) async {
     if (!await service.ownsDeck(userId: userId, deckId: deckId)) {
       return notFound('Deck nao encontrado.');
     }
-    final notes = await service.listNotes(userId: userId, deckId: deckId);
-    return Response.json(body: {'data': notes});
+    final params = context.request.uri.queryParameters;
+    final includeDeleted = params['include_deleted'] == 'true';
+    final sinceRaw = params['since']?.trim();
+    final since =
+        sinceRaw == null || sinceRaw.isEmpty
+            ? null
+            : DateTime.tryParse(sinceRaw)?.toUtc();
+    if (sinceRaw != null && sinceRaw.isNotEmpty && since == null) {
+      return badRequest('since deve usar ISO-8601.');
+    }
+    final page = await service.listNotes(
+      userId: userId,
+      deckId: deckId,
+      includeDeleted: includeDeleted,
+      updatedSince: since,
+    );
+    return Response.json(
+      body: {
+        'data': page.notes,
+        'sync_cursor': page.syncCursor.toIso8601String(),
+      },
+    );
   } catch (error) {
     return internalServerError(
       'Falha ao carregar historico pos-jogo',
@@ -55,10 +75,25 @@ Future<Response> _upsert(RequestContext context, String deckId) async {
       note: body,
     );
     return Response.json(statusCode: HttpStatus.created, body: {'note': note});
+  } on PostGameValidationException catch (error) {
+    return badRequest(error.message);
+  } on PostGameConflictException catch (error) {
+    return _conflict(error);
+  } on PostGameNoteNotFoundException {
+    return notFound('Nota pos-jogo nao encontrada.');
   } catch (error) {
-    return internalServerError(
-      'Falha ao salvar nota pos-jogo',
-      details: error,
-    );
+    return internalServerError('Falha ao salvar nota pos-jogo', details: error);
   }
+}
+
+Response _conflict(PostGameConflictException error) {
+  return Response.json(
+    statusCode: HttpStatus.conflict,
+    body: {
+      'error': 'post_game_conflict',
+      'message':
+          'A nota mudou em outro dispositivo ou já foi excluída. Atualize antes de tentar novamente.',
+      if (error.currentNote != null) 'current_note': error.currentNote,
+    },
+  );
 }

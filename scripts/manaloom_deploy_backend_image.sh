@@ -29,6 +29,7 @@ EXPECTED_XMAGE_URL="${MANALOOM_EXPECTED_XMAGE_URL:-http://xmage-sidecar:8080}"
 EXPECTED_FORGE_URL="${MANALOOM_EXPECTED_FORGE_URL:-http://forge-sidecar:8080}"
 EXPECTED_NATIVE_URL="${MANALOOM_EXPECTED_NATIVE_URL:-http://${EASYPANEL_PROJECT}_manaloom-ops:8080}"
 API_BASE_URL="${MANALOOM_API_BASE_URL:-https://evolution-cartinhas.2ta7qx.easypanel.host}"
+REQUIRED_WEB_ORIGIN="https://evolution-manaloom-web-public.2ta7qx.easypanel.host"
 
 require_tool() {
   command -v "$1" >/dev/null 2>&1 || {
@@ -40,6 +41,8 @@ require_tool() {
 require_tool git
 require_tool curl
 require_tool jq
+require_tool python3
+require_tool shasum
 require_tool ssh
 require_tool psql
 require_tool pg_isready
@@ -51,12 +54,19 @@ require_clean_worktree() {
   fi
 }
 
-for key in SSH_HOST SSH_KEY EASYPANEL_BASE_URL EASYPANEL_API_TOKEN DB_HOST DB_PORT DB_NAME DB_USER DB_PASS DB_SSL_MODE DATABASE_URL; do
+for key in SSH_HOST SSH_KEY EASYPANEL_BASE_URL EASYPANEL_API_TOKEN DB_HOST DB_PORT DB_NAME DB_USER DB_PASS DB_SSL_MODE DATABASE_URL MANALOOM_ALLOWED_ORIGINS; do
   if [[ -z "${!key:-}" ]]; then
     echo "variavel obrigatoria ausente: $key" >&2
     exit 2
   fi
 done
+
+ALLOWED_ORIGINS_CANONICAL="$(
+  MANALOOM_ALLOWED_ORIGINS="$MANALOOM_ALLOWED_ORIGINS" \
+    python3 "$ROOT_DIR/scripts/manaloom_validate_production_origins.py" \
+      --required-origin "$REQUIRED_WEB_ORIGIN"
+)"
+ALLOWED_ORIGINS_SHA256="$(printf '%s' "$ALLOWED_ORIGINS_CANONICAL" | shasum -a 256 | awk '{print $1}')"
 
 if [[ "$DB_HOST" != "$EXPECTED_DB_HOST" ||
       "$DB_PORT" != "$EXPECTED_DB_PORT" ||
@@ -202,6 +212,7 @@ docker service update \
   --env-add GIT_SHA='$sha' \
   --env-add SENTRY_RELEASE='$sha' \
   --env-add DEPLOY_TIMESTAMP='$deploy_timestamp' \
+  --env-add MANALOOM_ALLOWED_ORIGINS='$ALLOWED_ORIGINS_CANONICAL' \
   '$SERVICE'
 
 for attempt in \$(seq 1 45); do
@@ -231,6 +242,18 @@ docker service ps '$SERVICE' --no-trunc
 exit 1
 REMOTE
 
+spec_allowed_origins_sha256="$(ssh -o BatchMode=yes -o StrictHostKeyChecking=accept-new -i "$SSH_KEY" "$SSH_HOST" "
+docker service inspect '$SERVICE' --format '{{range .Spec.TaskTemplate.ContainerSpec.Env}}{{println .}}{{end}}' |
+  awk -F= '
+    /^MANALOOM_ALLOWED_ORIGINS=/{count++; value=substr(\$0,index(\$0,\"=\")+1)}
+    END{if(count==1) printf \"%s\",value; else printf \"__invalid_count_%d__\",count}' |
+  sha256sum | awk '{print \$1}'
+")"
+if [[ "$spec_allowed_origins_sha256" != "$ALLOWED_ORIGINS_SHA256" ]]; then
+  echo "deploy convergiu sem a allowlist CORS exata na spec do servico" >&2
+  exit 2
+fi
+
 source_payload="$(jq -cn \
   --arg project "$EASYPANEL_PROJECT" \
   --arg service "$EASYPANEL_SERVICE" \
@@ -257,12 +280,21 @@ docker inspect \"\$container\" --format '{{range .Config.Env}}{{println .}}{{end
     END{print sha \"|\" host \"|\" port \"|\" name \"|\" engine \"|\" xmage \"|\" forge \"|\" native \"|\" environment \"|\" profile \"|\" openai \"|\" ops}'
 ")"
 IFS='|' read -r runtime_sha runtime_db_host runtime_db_port runtime_db_name runtime_battle_engine runtime_xmage_url runtime_forge_url runtime_native_url runtime_environment runtime_openai_profile runtime_openai_configured runtime_ops_configured <<<"$runtime_contract"
+runtime_allowed_origins_sha256="$(ssh -o BatchMode=yes -o StrictHostKeyChecking=accept-new -i "$SSH_KEY" "$SSH_HOST" "
+container=\$(docker ps --filter label=com.docker.swarm.service.name='$SERVICE' -q | head -1)
+docker inspect \"\$container\" --format '{{range .Config.Env}}{{println .}}{{end}}' |
+  awk -F= '
+    /^MANALOOM_ALLOWED_ORIGINS=/{count++; value=substr(\$0,index(\$0,\"=\")+1)}
+    END{if(count==1) printf \"%s\",value; else printf \"__invalid_count_%d__\",count}' |
+  sha256sum | awk '{print \$1}'
+")"
 if [[ "$runtime_sha|$runtime_db_host|$runtime_db_port|$runtime_db_name|$runtime_battle_engine|$runtime_xmage_url|$runtime_forge_url|$runtime_native_url" != "$sha|$EXPECTED_DB_HOST|$EXPECTED_DB_PORT|$EXPECTED_DB_NAME|$EXPECTED_BATTLE_ENGINE|$EXPECTED_XMAGE_URL|$EXPECTED_FORGE_URL|$EXPECTED_NATIVE_URL" ||
       "$runtime_environment" != "production" ||
       ( -n "$runtime_openai_profile" && "$runtime_openai_profile" != "prod" ) ||
       "$runtime_openai_configured" != "1" ||
-      "$runtime_ops_configured" != "1" ]]; then
-  echo "deploy convergiu com SHA ou contrato PostgreSQL/battle/IA divergente" >&2
+      "$runtime_ops_configured" != "1" ||
+      "$runtime_allowed_origins_sha256" != "$ALLOWED_ORIGINS_SHA256" ]]; then
+  echo "deploy convergiu com SHA ou contrato PostgreSQL/battle/IA/CORS divergente" >&2
   exit 2
 fi
 
@@ -315,5 +347,5 @@ fi
 ssh -o BatchMode=yes -o StrictHostKeyChecking=accept-new -i "$SSH_KEY" "$SSH_HOST" \
   "rm -rf '$remote_dir'"
 
-printf '{"status":"deployed","service":"%s","image":"%s:%s","git_sha":"%s","remote_dir_removed":"%s"}\n' \
+printf '{"status":"deployed","service":"%s","image":"%s:%s","git_sha":"%s","cors_allowlist":"verified","remote_dir_removed":"%s"}\n' \
   "$SERVICE" "$IMAGE_REPO" "$short_sha" "$sha" "$remote_dir"

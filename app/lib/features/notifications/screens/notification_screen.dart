@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/widgets/app_state_panel.dart';
+import '../../../core/widgets/responsive_page_frame.dart';
 import '../providers/notification_provider.dart';
 
 /// Tela de notificações do app
@@ -17,6 +18,7 @@ class NotificationScreen extends StatefulWidget {
 
 class _NotificationScreenState extends State<NotificationScreen> {
   Timer? _pollTimer;
+  bool _isMarkingAll = false;
 
   @override
   void initState() {
@@ -37,6 +39,24 @@ class _NotificationScreenState extends State<NotificationScreen> {
     super.dispose();
   }
 
+  Future<void> _markAllAsRead(NotificationProvider provider) async {
+    if (_isMarkingAll) return;
+    setState(() => _isMarkingAll = true);
+    final success = await provider.markAllAsRead();
+    if (!mounted) return;
+    setState(() => _isMarkingAll = false);
+    if (success) return;
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text(
+          'Não foi possível marcar as notificações como lidas. Tente novamente.',
+        ),
+        backgroundColor: AppTheme.error,
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -53,10 +73,11 @@ class _NotificationScreenState extends State<NotificationScreen> {
               if (!hasUnread) return const SizedBox.shrink();
               return TextButton(
                 key: const Key('notifications-read-all-button'),
-                onPressed: () => provider.markAllAsRead(),
-                child: const Text(
-                  'Ler todas',
-                  style: TextStyle(
+                onPressed:
+                    _isMarkingAll ? null : () => _markAllAsRead(provider),
+                child: Text(
+                  _isMarkingAll ? 'Atualizando...' : 'Ler todas',
+                  style: const TextStyle(
                     color: AppTheme.brass400,
                     fontSize: AppTheme.fontSm,
                   ),
@@ -66,63 +87,77 @@ class _NotificationScreenState extends State<NotificationScreen> {
           ),
         ],
       ),
-      body: Consumer<NotificationProvider>(
-        builder: (context, provider, _) {
-          if (provider.isLoading && provider.notifications.isEmpty) {
-            return const Center(
-              key: Key('notifications-loading'),
-              child: CircularProgressIndicator(color: AppTheme.brass400),
-            );
-          }
-
-          if (provider.error != null && provider.notifications.isEmpty) {
-            return AppStatePanel(
-              key: const Key('notifications-error'),
-              icon: Icons.error_outline_rounded,
-              title: 'Não foi possível carregar notificações',
-              message:
-                  'Verifique sua conexão e tente novamente. Seus avisos não foram apagados.',
-              accent: AppTheme.error,
-              actionLabel: 'Tentar novamente',
-              onAction: () => provider.fetchNotifications(),
-            );
-          }
-
-          if (provider.notifications.isEmpty) {
-            return const AppStatePanel(
-              key: Key('notifications-empty'),
-              icon: Icons.notifications_none_rounded,
-              title: 'Nenhuma notificação',
-              message:
-                  'Quando algo importante acontecer no app, os avisos aparecem aqui.',
-              accent: AppTheme.brass400,
-            );
-          }
-
-          return RefreshIndicator(
-            color: AppTheme.brass400,
-            onRefresh: () => provider.fetchNotifications(),
-            child: ListView.separated(
-              key: const Key('notifications-list'),
-              padding: const EdgeInsets.all(12),
-              itemCount: provider.notifications.length,
-              separatorBuilder: (_, __) => const SizedBox(height: 8),
-              itemBuilder: (context, index) {
-                final notif = provider.notifications[index];
-                return _NotificationTile(
-                  key: Key('notification-tile-${notif.id}'),
-                  notification: notif,
-                  onTap: () {
-                    if (!notif.isRead) {
-                      provider.markAsRead(notif.id);
-                    }
-                    _navigateToContext(context, notif);
-                  },
+      body: ResponsivePageFrame(
+        maxWidth: 840,
+        padding: EdgeInsets.symmetric(
+          horizontal:
+              MediaQuery.sizeOf(context).width < AppTheme.breakpointCompact
+                  ? 16
+                  : 24,
+        ),
+        child: SizedBox(
+          key: const Key('notifications-content'),
+          width: double.infinity,
+          height: double.infinity,
+          child: Consumer<NotificationProvider>(
+            builder: (context, provider, _) {
+              if (provider.isLoading && provider.notifications.isEmpty) {
+                return const Center(
+                  key: Key('notifications-loading'),
+                  child: CircularProgressIndicator(color: AppTheme.brass400),
                 );
-              },
-            ),
-          );
-        },
+              }
+
+              if (provider.error != null && provider.notifications.isEmpty) {
+                return AppStatePanel(
+                  key: const Key('notifications-error'),
+                  icon: Icons.error_outline_rounded,
+                  title: 'Não foi possível carregar notificações',
+                  message:
+                      'Verifique sua conexão e tente novamente. Seus avisos não foram apagados.',
+                  accent: AppTheme.error,
+                  actionLabel: 'Tentar novamente',
+                  onAction: () => provider.fetchNotifications(),
+                );
+              }
+
+              if (provider.notifications.isEmpty) {
+                return const AppStatePanel(
+                  key: Key('notifications-empty'),
+                  icon: Icons.notifications_none_rounded,
+                  title: 'Nenhuma notificação',
+                  message:
+                      'Quando algo importante acontecer no app, os avisos aparecem aqui.',
+                  accent: AppTheme.brass400,
+                );
+              }
+
+              return RefreshIndicator(
+                color: AppTheme.brass400,
+                onRefresh: () => provider.fetchNotifications(),
+                child: ListView.separated(
+                  key: const Key('notifications-list'),
+                  padding: const EdgeInsets.symmetric(vertical: 12),
+                  itemCount: provider.notifications.length,
+                  separatorBuilder: (_, __) => const SizedBox(height: 8),
+                  itemBuilder: (context, index) {
+                    final notif = provider.notifications[index];
+                    return _NotificationTile(
+                      key: Key('notification-tile-${notif.id}'),
+                      notification: notif,
+                      onTap: () {
+                        if (!notif.isRead) {
+                          provider.markAsRead(notif.id);
+                        }
+                        _navigateToContext(context, notif);
+                      },
+                    );
+                  },
+                ),
+              );
+            },
+          ),
+        ),
       ),
     );
   }

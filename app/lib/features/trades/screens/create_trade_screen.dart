@@ -3,8 +3,20 @@ import 'package:provider/provider.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/utils/friendly_error_mapper.dart';
 import '../../../core/widgets/cached_card_image.dart';
+import '../../../core/widgets/responsive_page_frame.dart';
 import '../../binder/providers/binder_provider.dart';
 import '../providers/trade_provider.dart';
+import '../widgets/trade_safety_notice.dart';
+
+class CreateTradeRouteArgs {
+  const CreateTradeRouteArgs({
+    this.initialType = 'trade',
+    this.preselectedItem,
+  });
+
+  final String initialType;
+  final BinderItem? preselectedItem;
+}
 
 /// Tela para criar uma proposta de troca/compra/venda.
 ///
@@ -27,6 +39,8 @@ class CreateTradeScreen extends StatefulWidget {
 }
 
 class _CreateTradeScreenState extends State<CreateTradeScreen> {
+  static const _supportedTypes = {'trade', 'sale', 'mixed'};
+
   late String _type;
   final _messageCtrl = TextEditingController();
   final _paymentCtrl = TextEditingController();
@@ -41,13 +55,17 @@ class _CreateTradeScreenState extends State<CreateTradeScreen> {
   // Available items from my binder (have list only)
   List<BinderItem> _myBinderItems = [];
   bool _loadingMyBinder = false;
+  String? _myBinderError;
 
   bool _isSubmitting = false;
 
   @override
   void initState() {
     super.initState();
-    _type = widget.initialType;
+    _type =
+        _supportedTypes.contains(widget.initialType)
+            ? widget.initialType
+            : 'trade';
     if (widget.preselectedItem != null) {
       _requestedItems.add(
         _SelectedItem(binderItem: widget.preselectedItem!, quantity: 1),
@@ -64,15 +82,39 @@ class _CreateTradeScreenState extends State<CreateTradeScreen> {
   }
 
   Future<void> _loadMyBinder() async {
-    setState(() => _loadingMyBinder = true);
+    setState(() {
+      _loadingMyBinder = true;
+      _myBinderError = null;
+    });
     try {
       final items = await context.read<BinderProvider>().fetchBinderDirect(
         listType: 'have',
         limit: 200,
         forTrade: true,
       );
-      if (items != null && mounted) {
-        setState(() => _myBinderItems = items);
+      if (!mounted) return;
+      if (items != null) {
+        setState(() {
+          _myBinderItems = items;
+          _myBinderError = null;
+        });
+      } else {
+        setState(() {
+          _myBinderError =
+              _myBinderItems.isEmpty
+                  ? 'Não foi possível carregar seus itens para troca.'
+                  : 'A atualização falhou. Seus itens já carregados foram mantidos.';
+        });
+      }
+    } catch (e) {
+      debugPrint('[CreateTrade] Falha ao carregar fichário: $e');
+      if (mounted) {
+        setState(() {
+          _myBinderError =
+              _myBinderItems.isEmpty
+                  ? 'Não foi possível carregar seus itens para troca.'
+                  : 'A atualização falhou. Seus itens já carregados foram mantidos.';
+        });
       }
     } finally {
       if (mounted) setState(() => _loadingMyBinder = false);
@@ -80,8 +122,24 @@ class _CreateTradeScreenState extends State<CreateTradeScreen> {
   }
 
   Future<void> _submit() async {
-    if (_requestedItems.isEmpty && _myItems.isEmpty) {
-      _showSnack('Selecione pelo menos um item para a proposta');
+    if (_requestedItems.isEmpty) {
+      _showSnack('Selecione pelo menos um item que você quer receber');
+      return;
+    }
+    if (_usesOfferedItems && _myItems.isEmpty) {
+      _showSnack(
+        _type == 'trade'
+            ? 'Uma troca precisa de itens dos dois jogadores'
+            : 'Uma proposta mista precisa incluir ao menos um item seu',
+      );
+      return;
+    }
+    if (_usesPayment && _effectivePaymentAmount <= 0) {
+      _showSnack(
+        _type == 'sale'
+            ? 'Informe um valor de pagamento maior que zero'
+            : 'Uma proposta mista precisa incluir um pagamento maior que zero',
+      );
       return;
     }
 
@@ -92,16 +150,18 @@ class _CreateTradeScreenState extends State<CreateTradeScreen> {
 
     try {
       final myItemsPayload =
-          _myItems
-              .map(
-                (s) => {
-                  'binder_item_id': s.binderItem.id,
-                  'quantity': s.quantity,
-                  if (s.binderItem.price != null)
-                    'agreed_price': s.binderItem.price,
-                },
-              )
-              .toList();
+          _usesOfferedItems
+              ? _myItems
+                  .map(
+                    (s) => {
+                      'binder_item_id': s.binderItem.id,
+                      'quantity': s.quantity,
+                      if (s.binderItem.price != null)
+                        'agreed_price': s.binderItem.price,
+                    },
+                  )
+                  .toList()
+              : <Map<String, dynamic>>[];
 
       final requestedPayload =
           _requestedItems
@@ -115,8 +175,10 @@ class _CreateTradeScreenState extends State<CreateTradeScreen> {
               )
               .toList();
 
-      final parsedPayment = _parsedPaymentAmount();
-      final paymentAmount = parsedPayment > 0 ? parsedPayment : null;
+      final paymentAmount =
+          _usesPayment && _effectivePaymentAmount > 0
+              ? _effectivePaymentAmount
+              : null;
 
       final ok = await context.read<TradeProvider>().createTrade(
         receiverId: widget.receiverId,
@@ -147,19 +209,29 @@ class _CreateTradeScreenState extends State<CreateTradeScreen> {
     }
   }
 
-  void _showSnack(String msg, {bool isError = true}) {
+  void _showSnack(String msg, {bool isError = true, VoidCallback? onRetry}) {
     if (!mounted) return;
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(msg),
         backgroundColor: isError ? AppTheme.error : AppTheme.success,
+        action:
+            onRetry == null
+                ? null
+                : SnackBarAction(
+                  label: 'Tentar novamente',
+                  textColor: AppTheme.textPrimary,
+                  onPressed: onRetry,
+                ),
       ),
     );
   }
 
   Future<bool> _showProposalReviewDialog() async {
     final requestedTotal = _itemsTotal(_requestedItems);
-    final offeredTotal = _itemsTotal(_myItems) + _parsedPaymentAmount();
+    final offeredItems = _usesOfferedItems ? _myItems : const <_SelectedItem>[];
+    final paymentAmount = _effectivePaymentAmount;
+    final offeredTotal = _itemsTotal(offeredItems) + paymentAmount;
     final difference = offeredTotal - requestedTotal;
     final biggest =
         requestedTotal > offeredTotal ? requestedTotal : offeredTotal;
@@ -192,6 +264,8 @@ class _CreateTradeScreenState extends State<CreateTradeScreen> {
                     ),
                   ),
                   const SizedBox(height: 14),
+                  const TradeSafetyNotice(compact: true),
+                  const SizedBox(height: 14),
                   _reviewItemsSection(
                     title: 'Você quer receber',
                     items: _requestedItems,
@@ -200,19 +274,19 @@ class _CreateTradeScreenState extends State<CreateTradeScreen> {
                   const SizedBox(height: 12),
                   _reviewItemsSection(
                     title: 'Você oferece',
-                    items: _myItems,
+                    items: offeredItems,
                     emptyText:
                         _type == 'sale'
                             ? 'Sem cartas oferecidas nesta compra'
                             : 'Nenhum item oferecido',
                   ),
-                  if (_parsedPaymentAmount() > 0) ...[
+                  if (paymentAmount > 0) ...[
                     const SizedBox(height: 12),
                     _reviewLine(
                       icon: Icons.payments_outlined,
                       label: 'Pagamento',
                       value:
-                          'R\$ ${_parsedPaymentAmount().toStringAsFixed(2)} via ${_paymentMethod.toUpperCase()}',
+                          'R\$ ${paymentAmount.toStringAsFixed(2)} via ${_paymentMethod.toUpperCase()}',
                       accent: AppTheme.brass400,
                     ),
                   ],
@@ -377,7 +451,32 @@ class _CreateTradeScreenState extends State<CreateTradeScreen> {
 
   double _parsedPaymentAmount() {
     if (_paymentCtrl.text.trim().isEmpty) return 0;
-    return double.tryParse(_paymentCtrl.text.replaceAll(',', '.')) ?? 0;
+    final amount = double.tryParse(_paymentCtrl.text.replaceAll(',', '.')) ?? 0;
+    return amount.isFinite ? amount : 0;
+  }
+
+  bool get _usesOfferedItems => _type == 'trade' || _type == 'mixed';
+
+  bool get _usesPayment => _type == 'sale' || _type == 'mixed';
+
+  double get _effectivePaymentAmount {
+    if (!_usesPayment) return 0;
+    final amount = _parsedPaymentAmount();
+    return amount > 0 ? amount : 0;
+  }
+
+  void _changeType(String value) {
+    if (value == _type || !_supportedTypes.contains(value)) return;
+    setState(() {
+      if (value == 'trade') {
+        _paymentCtrl.clear();
+        _paymentMethod = 'pix';
+      }
+      if (value == 'sale') {
+        _myItems.clear();
+      }
+      _type = value;
+    });
   }
 
   // ─── Add item from other user's binder ──────────────────────
@@ -387,8 +486,19 @@ class _CreateTradeScreenState extends State<CreateTradeScreen> {
       listType: 'have',
       limit: 100,
     );
-    if (!mounted || items == null || items.isEmpty) {
-      _showSnack('Nenhum item disponível do outro jogador');
+    if (!mounted) return;
+    if (items == null) {
+      _showSnack(
+        'Não foi possível carregar os itens do outro jogador.',
+        onRetry: _pickFromOtherUser,
+      );
+      return;
+    }
+    if (items.isEmpty) {
+      _showSnack(
+        'O outro jogador não tem itens disponíveis para esta proposta.',
+        isError: false,
+      );
       return;
     }
 
@@ -573,140 +683,182 @@ class _CreateTradeScreenState extends State<CreateTradeScreen> {
         backgroundColor: AppTheme.backgroundAbyss,
       ),
       body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // ─── Type selector ──────────────────────────────────
-            _sectionTitle('Tipo de Negociação'),
-            const SizedBox(height: 8),
-            _buildTypeSelector(),
-            const SizedBox(height: 20),
+        padding: const EdgeInsets.symmetric(vertical: 16),
+        child: ResponsivePageFrame(
+          maxWidth: 1120,
+          child: LayoutBuilder(
+            builder: (context, constraints) {
+              final desktop = constraints.maxWidth >= AppTheme.breakpointMedium;
+              final requestPane = Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  _sectionTitle('Tipo de Negociação'),
+                  const SizedBox(height: 8),
+                  _buildTypeSelector(),
+                  const SizedBox(height: 24),
+                  _sectionTitle('Itens que você quer'),
+                  const SizedBox(height: 8),
+                  _buildItemsList(
+                    keyPrefix: 'requested',
+                    items: _requestedItems,
+                    emptyText: 'Nenhum item selecionado',
+                    onAdd: _pickFromOtherUser,
+                    onRemove:
+                        (i) => setState(() => _requestedItems.removeAt(i)),
+                    onQtyChange:
+                        (i, q) =>
+                            setState(() => _requestedItems[i].quantity = q),
+                    accentColor: AppTheme.brass400,
+                  ),
+                ],
+              );
+              final termsPane = _buildTermsPane(desktop: desktop);
 
-            // ─── Requested items (from other user) ──────────────
-            _sectionTitle('Itens que você quer'),
-            const SizedBox(height: 8),
+              return Column(
+                key: const Key('create-trade-content'),
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  if (desktop)
+                    Row(
+                      key: const Key('create-trade-desktop-panes'),
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Expanded(child: requestPane),
+                        const SizedBox(width: AppTheme.paneGap),
+                        Expanded(child: termsPane),
+                      ],
+                    )
+                  else ...[
+                    requestPane,
+                    const SizedBox(height: 20),
+                    termsPane,
+                  ],
+                  const SizedBox(height: 40),
+                ],
+              );
+            },
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildTermsPane({required bool desktop}) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        if (_type == 'trade' || _type == 'mixed') ...[
+          _sectionTitle('Itens que você oferece'),
+          const SizedBox(height: 8),
+          if (_loadingMyBinder && _myBinderItems.isEmpty)
+            const Padding(
+              padding: EdgeInsets.symmetric(vertical: 12),
+              child: Center(
+                child: CircularProgressIndicator(color: AppTheme.brass500),
+              ),
+            )
+          else if (_myBinderError != null && _myBinderItems.isEmpty)
+            _buildMyBinderError()
+          else ...[
+            if (_myBinderError != null) _buildMyBinderError(),
             _buildItemsList(
-              keyPrefix: 'requested',
-              items: _requestedItems,
-              emptyText: 'Nenhum item selecionado',
-              onAdd: _pickFromOtherUser,
-              onRemove: (i) => setState(() => _requestedItems.removeAt(i)),
-              onQtyChange:
-                  (i, q) => setState(() => _requestedItems[i].quantity = q),
-              accentColor: AppTheme.brass400,
+              keyPrefix: 'offered',
+              items: _myItems,
+              emptyText: 'Nenhum item oferecido',
+              onAdd: _pickFromMyBinder,
+              onRemove: (i) => setState(() => _myItems.removeAt(i)),
+              onQtyChange: (i, q) => setState(() => _myItems[i].quantity = q),
+              accentColor: AppTheme.frost400,
             ),
-            const SizedBox(height: 20),
-
-            // ─── My items (trade/sale) ──────────────────────────
-            if (_type == 'trade' || _type == 'mixed') ...[
-              _sectionTitle('Itens que você oferece'),
-              const SizedBox(height: 8),
-              if (_loadingMyBinder)
-                const Padding(
-                  padding: EdgeInsets.symmetric(vertical: 12),
-                  child: Center(
-                    child: CircularProgressIndicator(color: AppTheme.brass500),
-                  ),
-                )
-              else
-                _buildItemsList(
-                  keyPrefix: 'offered',
-                  items: _myItems,
-                  emptyText: 'Nenhum item oferecido',
-                  onAdd: _pickFromMyBinder,
-                  onRemove: (i) => setState(() => _myItems.removeAt(i)),
-                  onQtyChange:
-                      (i, q) => setState(() => _myItems[i].quantity = q),
-                  accentColor: AppTheme.frost400,
-                ),
-              const SizedBox(height: 20),
-            ],
-
-            // ─── Payment (sale/mixed) ───────────────────────────
-            if (_type == 'sale' || _type == 'mixed') ...[
-              _sectionTitle('Pagamento'),
-              const SizedBox(height: 8),
-              _buildPaymentFields(),
-              const SizedBox(height: 20),
-            ],
-
-            // ─── Message ────────────────────────────────────────
-            _sectionTitle('Mensagem (opcional)'),
-            const SizedBox(height: 8),
-            TextField(
-              key: const Key('create-trade-message-field'),
-              controller: _messageCtrl,
-              maxLines: 3,
-              style: const TextStyle(color: AppTheme.textPrimary),
-              decoration: InputDecoration(
-                hintText: 'Diga algo ao outro jogador...',
-                hintStyle: TextStyle(
-                  color: AppTheme.textSecondary.withValues(alpha: 0.6),
-                ),
-                filled: true,
-                fillColor: AppTheme.surfaceSlate,
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(AppTheme.radiusMd),
-                  borderSide: const BorderSide(
-                    color: AppTheme.outlineMuted,
-                    width: AppTheme.strokeHairline,
-                  ),
-                ),
-                enabledBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(AppTheme.radiusMd),
-                  borderSide: const BorderSide(
-                    color: AppTheme.outlineMuted,
-                    width: AppTheme.strokeHairline,
-                  ),
-                ),
-                focusedBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(AppTheme.radiusMd),
-                  borderSide: const BorderSide(
-                    color: AppTheme.brass400,
-                    width: 1,
-                  ),
-                ),
-              ),
-            ),
-            const SizedBox(height: 28),
-
-            // ─── Submit ─────────────────────────────────────────
-            SizedBox(
-              width: double.infinity,
-              height: 50,
-              child: ElevatedButton.icon(
-                key: const ValueKey('create-trade-submit-button'),
-                onPressed: _isSubmitting ? null : _submit,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: AppTheme.brass500,
-                  foregroundColor: AppTheme.backgroundAbyss,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(AppTheme.radiusMd),
-                  ),
-                ),
-                icon:
-                    _isSubmitting
-                        ? const SizedBox(
-                          width: 20,
-                          height: 20,
-                          child: CircularProgressIndicator(
-                            color: AppTheme.backgroundAbyss,
-                            strokeWidth: 2,
-                          ),
-                        )
-                        : const Icon(Icons.send),
-                label: Text(
-                  _isSubmitting ? 'Enviando...' : 'Enviar Proposta',
-                  style: const TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: AppTheme.fontLg,
-                  ),
-                ),
-              ),
-            ),
-            const SizedBox(height: 40),
           ],
+          const SizedBox(height: 20),
+        ],
+        if (_type == 'sale' || _type == 'mixed') ...[
+          _sectionTitle('Pagamento'),
+          const SizedBox(height: 8),
+          _buildPaymentFields(),
+          const SizedBox(height: 20),
+        ],
+        _sectionTitle('Mensagem (opcional)'),
+        const SizedBox(height: 8),
+        _buildMessageField(),
+        const SizedBox(height: 20),
+        const TradeSafetyNotice(),
+        const SizedBox(height: 24),
+        Align(
+          alignment: Alignment.centerRight,
+          child: SizedBox(
+            width: desktop ? 240 : double.infinity,
+            height: 50,
+            child: _buildSubmitButton(),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildMessageField() {
+    return TextField(
+      key: const Key('create-trade-message-field'),
+      controller: _messageCtrl,
+      maxLines: 3,
+      style: const TextStyle(color: AppTheme.textPrimary),
+      decoration: InputDecoration(
+        hintText: 'Diga algo ao outro jogador...',
+        hintStyle: TextStyle(
+          color: AppTheme.textSecondary.withValues(alpha: 0.6),
+        ),
+        filled: true,
+        fillColor: AppTheme.surfaceSlate,
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(AppTheme.radiusMd),
+          borderSide: const BorderSide(
+            color: AppTheme.outlineMuted,
+            width: AppTheme.strokeHairline,
+          ),
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(AppTheme.radiusMd),
+          borderSide: const BorderSide(
+            color: AppTheme.outlineMuted,
+            width: AppTheme.strokeHairline,
+          ),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(AppTheme.radiusMd),
+          borderSide: const BorderSide(color: AppTheme.brass400, width: 1),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildSubmitButton() {
+    return ElevatedButton.icon(
+      key: const ValueKey('create-trade-submit-button'),
+      onPressed: _isSubmitting ? null : _submit,
+      style: ElevatedButton.styleFrom(
+        backgroundColor: AppTheme.brass500,
+        foregroundColor: AppTheme.backgroundAbyss,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(AppTheme.radiusMd),
+        ),
+      ),
+      icon:
+          _isSubmitting
+              ? const SizedBox(
+                width: 20,
+                height: 20,
+                child: CircularProgressIndicator(
+                  color: AppTheme.backgroundAbyss,
+                  strokeWidth: 2,
+                ),
+              )
+              : const Icon(Icons.send),
+      label: Text(
+        _isSubmitting ? 'Enviando...' : 'Enviar Proposta',
+        style: const TextStyle(
+          fontWeight: FontWeight.bold,
+          fontSize: AppTheme.fontLg,
         ),
       ),
     );
@@ -774,44 +926,95 @@ class _CreateTradeScreenState extends State<CreateTradeScreen> {
 
   Widget _typeChip(String label, String value, IconData icon, Color color) {
     final selected = _type == value;
-    return GestureDetector(
-      key: Key('create-trade-type-$value'),
-      onTap: () => setState(() => _type = value),
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 200),
-        constraints: const BoxConstraints(minHeight: 88),
-        padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 10),
-        decoration: BoxDecoration(
-          color:
-              selected ? color.withValues(alpha: 0.15) : AppTheme.surfaceSlate,
-          borderRadius: BorderRadius.circular(AppTheme.radiusMd),
-          border: Border.all(
-            color: selected ? color : AppTheme.outlineMuted,
-            width: selected ? 1.5 : 0.5,
+    return Semantics(
+      button: true,
+      selected: selected,
+      label: 'Tipo de negociação: $label',
+      child: GestureDetector(
+        key: Key('create-trade-type-$value'),
+        excludeFromSemantics: true,
+        onTap: () => _changeType(value),
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 200),
+          constraints: const BoxConstraints(minHeight: 88),
+          padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 10),
+          decoration: BoxDecoration(
+            color:
+                selected
+                    ? color.withValues(alpha: 0.15)
+                    : AppTheme.surfaceSlate,
+            borderRadius: BorderRadius.circular(AppTheme.radiusMd),
+            border: Border.all(
+              color: selected ? color : AppTheme.outlineMuted,
+              width: selected ? 1.5 : 0.5,
+            ),
+          ),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(
+                icon,
+                color: selected ? color : AppTheme.textSecondary,
+                size: 22,
+              ),
+              const SizedBox(height: 4),
+              Text(
+                label,
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  color: selected ? color : AppTheme.textSecondary,
+                  fontWeight: selected ? FontWeight.bold : FontWeight.normal,
+                  fontSize: AppTheme.fontSm,
+                ),
+              ),
+            ],
           ),
         ),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(
-              icon,
-              color: selected ? color : AppTheme.textSecondary,
-              size: 22,
-            ),
-            const SizedBox(height: 4),
-            Text(
-              label,
-              maxLines: 2,
-              overflow: TextOverflow.ellipsis,
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                color: selected ? color : AppTheme.textSecondary,
-                fontWeight: selected ? FontWeight.bold : FontWeight.normal,
-                fontSize: AppTheme.fontSm,
+      ),
+    );
+  }
+
+  Widget _buildMyBinderError() {
+    return Container(
+      key: const Key('create-trade-binder-error'),
+      width: double.infinity,
+      margin: const EdgeInsets.only(bottom: 8),
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: AppTheme.warning.withValues(alpha: 0.10),
+        borderRadius: BorderRadius.circular(AppTheme.radiusMd),
+        border: Border.all(color: AppTheme.warning.withValues(alpha: 0.35)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Icon(Icons.sync_problem_rounded, color: AppTheme.warning),
+              const SizedBox(width: 10),
+              Expanded(
+                child: Text(
+                  _myBinderError!,
+                  style: const TextStyle(
+                    color: AppTheme.textSecondary,
+                    fontSize: AppTheme.fontSm,
+                  ),
+                ),
               ),
+            ],
+          ),
+          Align(
+            alignment: Alignment.centerRight,
+            child: TextButton(
+              key: const Key('create-trade-binder-retry'),
+              onPressed: _loadingMyBinder ? null : _loadMyBinder,
+              child: const Text('Tentar novamente'),
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
@@ -1131,33 +1334,39 @@ class _CreateTradeScreenState extends State<CreateTradeScreen> {
 
   Widget _payChip(String label, String value) {
     final selected = _paymentMethod == value;
-    return GestureDetector(
-      key: Key('create-trade-payment-method-$value'),
-      onTap: () => setState(() => _paymentMethod = value),
-      child: Container(
-        constraints: const BoxConstraints(minHeight: 46),
-        padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 8),
-        decoration: BoxDecoration(
-          color:
-              selected
-                  ? AppTheme.brass400.withValues(alpha: 0.15)
-                  : AppTheme.surfaceSlate,
-          borderRadius: BorderRadius.circular(AppTheme.radiusMd),
-          border: Border.all(
-            color: selected ? AppTheme.brass400 : AppTheme.outlineMuted,
-            width: selected ? 1.5 : 0.5,
+    return Semantics(
+      button: true,
+      selected: selected,
+      label: 'Forma de pagamento: $label',
+      child: GestureDetector(
+        key: Key('create-trade-payment-method-$value'),
+        excludeFromSemantics: true,
+        onTap: () => setState(() => _paymentMethod = value),
+        child: Container(
+          constraints: const BoxConstraints(minHeight: AppTheme.touchTargetMin),
+          padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 8),
+          decoration: BoxDecoration(
+            color:
+                selected
+                    ? AppTheme.brass400.withValues(alpha: 0.15)
+                    : AppTheme.surfaceSlate,
+            borderRadius: BorderRadius.circular(AppTheme.radiusMd),
+            border: Border.all(
+              color: selected ? AppTheme.brass400 : AppTheme.outlineMuted,
+              width: selected ? 1.5 : 0.5,
+            ),
           ),
-        ),
-        alignment: Alignment.center,
-        child: Text(
-          label,
-          maxLines: 2,
-          overflow: TextOverflow.ellipsis,
-          textAlign: TextAlign.center,
-          style: TextStyle(
-            color: selected ? AppTheme.brass400 : AppTheme.textSecondary,
-            fontWeight: selected ? FontWeight.bold : FontWeight.normal,
-            fontSize: AppTheme.fontSm,
+          alignment: Alignment.center,
+          child: Text(
+            label,
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              color: selected ? AppTheme.brass400 : AppTheme.textSecondary,
+              fontWeight: selected ? FontWeight.bold : FontWeight.normal,
+              fontSize: AppTheme.fontSm,
+            ),
           ),
         ),
       ),

@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../../core/api/api_client.dart';
+import '../models/commercial_launch_policy.dart';
 import '../models/manaloom_plan.dart';
 
 typedef SharedPreferencesLoader = Future<SharedPreferences> Function();
@@ -158,6 +159,13 @@ class CommercialProvider extends ChangeNotifier {
 
   Future<CommercialCheckoutResult> startProCheckout() async {
     await load();
+    if (CommercialLaunchPolicy.isFreeBeta) {
+      return const CommercialCheckoutResult(
+        activated: false,
+        requiresExternalPayment: false,
+        message: CommercialLaunchPolicy.betaCheckoutMessage,
+      );
+    }
     try {
       final response = await _apiClient.post('/users/me/plan/checkout', {
         'plan_name': ManaLoomPlanTier.pro.id,

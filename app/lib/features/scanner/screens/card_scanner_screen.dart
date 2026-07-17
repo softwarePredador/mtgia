@@ -8,6 +8,7 @@ import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
 import '../../../core/theme/app_theme.dart';
 import '../providers/scanner_provider.dart';
+import '../utils/scanner_error_mapper.dart';
 import '../widgets/scanner_overlay.dart';
 import '../widgets/scanned_card_preview.dart';
 import '../../decks/providers/deck_provider.dart';
@@ -172,9 +173,13 @@ class _CardScannerScreenState extends State<CardScannerScreen>
       _startLiveStream();
     } catch (e) {
       if (!mounted) return;
+      debugPrint('[ScannerScreen] Falha ao inicializar câmera: $e');
       setState(() {
         _isInitialized = false;
-        _permissionError = 'Erro ao inicializar câmera: $e';
+        _permissionError = ScannerErrorMapper.friendly(
+          e,
+          stage: ScannerErrorStage.camera,
+        );
       });
     } finally {
       _isInitializingCamera = false;
@@ -331,9 +336,14 @@ class _CardScannerScreenState extends State<CardScannerScreen>
       } catch (_) {}
     } catch (e) {
       if (!mounted) return;
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text('Erro ao capturar: $e')));
+      debugPrint('[ScannerScreen] Falha na captura manual: $e');
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            ScannerErrorMapper.friendly(e, stage: ScannerErrorStage.capture),
+          ),
+        ),
+      );
       // Retoma stream se falhou
       _startLiveStream();
     }
@@ -411,6 +421,7 @@ class _CardScannerScreenState extends State<CardScannerScreen>
               elevation: 0,
               leading: IconButton(
                 icon: const Icon(Icons.close),
+                tooltip: 'Fechar scanner',
                 onPressed: () => context.pop(),
               ),
               title: const Text('Escanear Carta'),

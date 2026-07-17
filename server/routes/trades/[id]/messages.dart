@@ -28,9 +28,12 @@ Future<Response> _getMessages(RequestContext context, String id) async {
     final offset = (safePage - 1) * safeLimit;
 
     // Verificar que o usuário participa do trade
-    final tradeResult = await pool.execute(Sql.named('''
+    final tradeResult = await pool.execute(
+      Sql.named('''
       SELECT sender_id, receiver_id FROM trade_offers WHERE id = @id
-    '''), parameters: {'id': id});
+    '''),
+      parameters: {'id': id},
+    );
 
     if (tradeResult.isEmpty) {
       return Response.json(
@@ -40,19 +43,25 @@ Future<Response> _getMessages(RequestContext context, String id) async {
     }
 
     final trade = tradeResult.first.toColumnMap();
-    if (trade['sender_id'] != userId && trade['receiver_id'] != userId) {
+    final senderId = trade['sender_id'] as String;
+    final receiverId = trade['receiver_id'] as String;
+    if (senderId != userId && receiverId != userId) {
       return Response.json(
         statusCode: HttpStatus.forbidden,
         body: {'error': 'Sem permissão para ver mensagens deste trade'},
       );
     }
 
-    final countResult = await pool.execute(Sql.named('''
+    final countResult = await pool.execute(
+      Sql.named('''
       SELECT COUNT(*) as total FROM trade_messages WHERE trade_offer_id = @id
-    '''), parameters: {'id': id});
+    '''),
+      parameters: {'id': id},
+    );
     final total = countResult.first.toColumnMap()['total'] as int;
 
-    final msgResult = await pool.execute(Sql.named('''
+    final msgResult = await pool.execute(
+      Sql.named('''
       SELECT tm.id, tm.sender_id, u.username AS sender_username,
              u.display_name AS sender_display_name, u.avatar_url AS sender_avatar,
              tm.message, tm.attachment_url, tm.attachment_type,
@@ -62,29 +71,34 @@ Future<Response> _getMessages(RequestContext context, String id) async {
       WHERE tm.trade_offer_id = @id
       ORDER BY tm.created_at ASC
       LIMIT @lim OFFSET @off
-    '''), parameters: {'id': id, 'lim': safeLimit, 'off': offset});
+    '''),
+      parameters: {'id': id, 'lim': safeLimit, 'off': offset},
+    );
 
-    final messages = msgResult.map((row) {
-      final m = row.toColumnMap();
-      return {
-        'id': m['id'],
-        'sender_id': m['sender_id'],
-        'sender_username': m['sender_username'],
-        'sender_display_name': m['sender_display_name'],
-        'sender_avatar': m['sender_avatar'],
-        'message': m['message'],
-        'attachment_url': m['attachment_url'],
-        'attachment_type': m['attachment_type'],
-        'created_at': m['created_at']?.toString(),
-      };
-    }).toList();
+    final messages =
+        msgResult.map((row) {
+          final m = row.toColumnMap();
+          return {
+            'id': m['id'],
+            'sender_id': m['sender_id'],
+            'sender_username': m['sender_username'],
+            'sender_display_name': m['sender_display_name'],
+            'sender_avatar': m['sender_avatar'],
+            'message': m['message'],
+            'attachment_url': m['attachment_url'],
+            'attachment_type': m['attachment_type'],
+            'created_at': m['created_at']?.toString(),
+          };
+        }).toList();
 
-    return Response.json(body: {
-      'data': messages,
-      'page': safePage,
-      'limit': safeLimit,
-      'total': total,
-    });
+    return Response.json(
+      body: {
+        'data': messages,
+        'page': safePage,
+        'limit': safeLimit,
+        'total': total,
+      },
+    );
   } catch (e, st) {
     await captureRouteException(
       context,
@@ -134,9 +148,12 @@ Future<Response> _postMessage(RequestContext context, String id) async {
     }
 
     // Verificar trade e participação
-    final tradeResult = await pool.execute(Sql.named('''
+    final tradeResult = await pool.execute(
+      Sql.named('''
       SELECT sender_id, receiver_id, status FROM trade_offers WHERE id = @id
-    '''), parameters: {'id': id});
+    '''),
+      parameters: {'id': id},
+    );
 
     if (tradeResult.isEmpty) {
       return Response.json(
@@ -146,7 +163,9 @@ Future<Response> _postMessage(RequestContext context, String id) async {
     }
 
     final trade = tradeResult.first.toColumnMap();
-    if (trade['sender_id'] != userId && trade['receiver_id'] != userId) {
+    final senderId = trade['sender_id'] as String;
+    final receiverId = trade['receiver_id'] as String;
+    if (senderId != userId && receiverId != userId) {
       return Response.json(
         statusCode: HttpStatus.forbidden,
         body: {'error': 'Sem permissão para enviar mensagens neste trade'},
@@ -159,38 +178,68 @@ Future<Response> _postMessage(RequestContext context, String id) async {
       return Response.json(
         statusCode: HttpStatus.badRequest,
         body: {
-          'error': 'Não é possível enviar mensagens em trade ${trade['status']}'
+          'error':
+              'Não é possível enviar mensagens em trade ${trade['status']}',
         },
       );
     }
 
-    final insertResult = await pool.execute(Sql.named('''
-      INSERT INTO trade_messages (trade_offer_id, sender_id, message, attachment_url, attachment_type)
-      VALUES (@tradeId, @userId, @message, @attachmentUrl, @attachmentType)
-      RETURNING id, created_at
-    '''), parameters: {
-      'tradeId': id,
-      'userId': userId,
-      'message': message?.trim(),
-      'attachmentUrl': attachmentUrl,
-      'attachmentType': attachmentType,
+    final insertResult = await pool.runTx((session) async {
+      final participantIds = <String>[senderId, receiverId]..sort();
+      final activeUsers = await session.execute(
+        Sql.named('''
+          SELECT id
+          FROM users
+          WHERE id = ANY(@participantIds::uuid[])
+            AND deleted_at IS NULL
+          ORDER BY id
+          FOR UPDATE
+        '''),
+        parameters: {'participantIds': participantIds},
+      );
+      if (activeUsers.length != 2) return null;
+
+      return session.execute(
+        Sql.named('''
+        INSERT INTO trade_messages (
+          trade_offer_id, sender_id, message, attachment_url, attachment_type
+        )
+        VALUES (@tradeId, @userId, @message, @attachmentUrl, @attachmentType)
+        RETURNING id, created_at
+      '''),
+        parameters: {
+          'tradeId': id,
+          'userId': userId,
+          'message': message?.trim(),
+          'attachmentUrl': attachmentUrl,
+          'attachmentType': attachmentType,
+        },
+      );
     });
+    if (insertResult == null) {
+      return Response.json(
+        statusCode: HttpStatus.conflict,
+        body: {
+          'error': 'participant_unavailable',
+          'message': 'Um participante não está mais disponível.',
+        },
+      );
+    }
 
     final row = insertResult.first.toColumnMap();
 
     // 🔔 Notificação: mensagem no trade → notificar a outra parte
-    final recipientId = trade['sender_id'] == userId
-        ? trade['receiver_id'] as String
-        : trade['sender_id'] as String;
+    final recipientId = senderId == userId ? receiverId : senderId;
     NotificationService.createFromActorDeferred(
       pool: pool,
       actorUserId: userId,
       userId: recipientId,
       type: 'trade_message',
       titleBuilder: (senderName) => '$senderName enviou mensagem no trade',
-      body: message != null && message.length > 100
-          ? '${message.substring(0, 100)}...'
-          : message,
+      body:
+          message != null && message.length > 100
+              ? '${message.substring(0, 100)}...'
+              : message,
       referenceId: id,
       endpoint: 'POST /trades/:id/messages',
       requestId: _requestId(context),
@@ -233,11 +282,7 @@ String _requestId(RequestContext context) {
   }
 }
 
-void _logInvalidPayload(
-  RequestContext context,
-  String tradeId,
-  String reason,
-) {
+void _logInvalidPayload(RequestContext context, String tradeId, String reason) {
   String userId;
   try {
     userId = context.read<String>();

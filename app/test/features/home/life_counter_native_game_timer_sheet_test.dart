@@ -96,8 +96,8 @@ void main() {
       await tester.tap(find.text('Open'));
       await tester.pumpAndSettle();
 
-      expect(find.text('Game Timer'), findsOneWidget);
-      expect(find.text('Idle'), findsOneWidget);
+      expect(find.text('Cronômetro da partida'), findsOneWidget);
+      expect(find.text('Inativo'), findsOneWidget);
 
       await tester.scrollUntilVisible(
         find.byKey(const Key('life-counter-native-game-timer-start')),
@@ -109,7 +109,7 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      expect(find.text('Running'), findsOneWidget);
+      expect(find.text('Em andamento'), findsOneWidget);
 
       await tester.tap(
         find.byKey(const Key('life-counter-native-game-timer-apply')),
@@ -142,7 +142,7 @@ void main() {
       await tester.tap(find.text('Open'));
       await tester.pumpAndSettle();
 
-      expect(find.text('Running'), findsOneWidget);
+      expect(find.text('Em andamento'), findsOneWidget);
       expect(find.text('0:05'), findsOneWidget);
 
       await tester.scrollUntilVisible(
@@ -155,7 +155,7 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      expect(find.text('Paused'), findsOneWidget);
+      expect(find.text('Pausado'), findsOneWidget);
 
       nowEpochMs = 12_000;
       await tester.tap(
@@ -163,14 +163,14 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      expect(find.text('Running'), findsOneWidget);
+      expect(find.text('Em andamento'), findsOneWidget);
 
       await tester.tap(
         find.byKey(const Key('life-counter-native-game-timer-reset')),
       );
       await tester.pumpAndSettle();
 
-      expect(find.text('Idle'), findsOneWidget);
+      expect(find.text('Inativo'), findsOneWidget);
 
       await tester.tap(
         find.byKey(const Key('life-counter-native-game-timer-apply')),

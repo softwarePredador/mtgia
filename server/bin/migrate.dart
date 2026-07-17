@@ -6,6 +6,7 @@ import 'package:server/ai/candidate_quality_data_support.dart';
 import 'package:server/ai/commander_learning_snapshot_support.dart';
 import 'package:server/import_card_lookup_service.dart';
 import 'package:server/runtime_environment.dart';
+import 'package:server/sql_statement_splitter.dart';
 
 /// Sistema de Migrações Versionado para MTG IA
 ///
@@ -1297,6 +1298,404 @@ final migrations = <Migration>[
       WHERE bracket_scope IN ('bracket_2_plus', 'bracket_3_plus');
     ''',
   ),
+  Migration(
+    version: '038',
+    name: 'add_privacy_and_post_game_sync_contracts',
+    up: '''
+      CREATE EXTENSION IF NOT EXISTS "pgcrypto";
+
+      ALTER TABLE users
+      ADD COLUMN IF NOT EXISTS deleted_at TIMESTAMP WITH TIME ZONE;
+
+      CREATE INDEX IF NOT EXISTS idx_users_active_identity
+      ON users (LOWER(email), LOWER(username))
+      WHERE deleted_at IS NULL;
+
+      CREATE OR REPLACE FUNCTION manaloom_require_active_user()
+      RETURNS trigger
+      LANGUAGE plpgsql
+      AS \$active_user_function\$
+      DECLARE
+        referenced_user_id UUID;
+      BEGIN
+        referenced_user_id := NULLIF(to_jsonb(NEW) ->> TG_ARGV[0], '')::UUID;
+        IF referenced_user_id IS NULL THEN
+          RETURN NEW;
+        END IF;
+
+        PERFORM 1
+        FROM users
+        WHERE id = referenced_user_id
+          AND deleted_at IS NULL
+        FOR UPDATE;
+
+        IF NOT FOUND THEN
+          RAISE EXCEPTION USING
+            ERRCODE = '23503',
+            MESSAGE = 'inactive_user_reference';
+        END IF;
+        RETURN NEW;
+      END;
+      \$active_user_function\$;
+
+      DO \$active_user_triggers\$
+      DECLARE
+        reference RECORD;
+        trigger_name TEXT;
+      BEGIN
+        FOR reference IN
+          SELECT constraint_row.oid AS constraint_oid,
+                 namespace_row.nspname AS schema_name,
+                 relation_row.relname AS table_name,
+                 attribute_row.attname AS column_name
+          FROM pg_constraint constraint_row
+          JOIN pg_class relation_row
+            ON relation_row.oid = constraint_row.conrelid
+          JOIN pg_namespace namespace_row
+            ON namespace_row.oid = relation_row.relnamespace
+          JOIN pg_attribute attribute_row
+            ON attribute_row.attrelid = relation_row.oid
+           AND attribute_row.attnum = constraint_row.conkey[1]
+          WHERE constraint_row.contype = 'f'
+            AND constraint_row.confrelid = 'users'::regclass
+            AND array_length(constraint_row.conkey, 1) = 1
+        LOOP
+          trigger_name := 'manaloom_active_user_' || reference.constraint_oid;
+          EXECUTE format(
+            'DROP TRIGGER IF EXISTS %I ON %I.%I',
+            trigger_name,
+            reference.schema_name,
+            reference.table_name
+          );
+          EXECUTE format(
+            'CREATE TRIGGER %I BEFORE INSERT OR UPDATE OF %I ON %I.%I '
+            'FOR EACH ROW EXECUTE FUNCTION manaloom_require_active_user(%L)',
+            trigger_name,
+            reference.column_name,
+            reference.schema_name,
+            reference.table_name,
+            reference.column_name
+          );
+        END LOOP;
+      END;
+      \$active_user_triggers\$;
+
+      ALTER TABLE post_game_notes
+      ADD COLUMN IF NOT EXISTS play_session_id TEXT;
+      ALTER TABLE post_game_notes
+      ADD COLUMN IF NOT EXISTS session_started_at TIMESTAMP WITH TIME ZONE;
+      ALTER TABLE post_game_notes
+      ADD COLUMN IF NOT EXISTS session_ended_at TIMESTAMP WITH TIME ZONE;
+      ALTER TABLE post_game_notes
+      ADD COLUMN IF NOT EXISTS deck_snapshot_hash TEXT;
+      ALTER TABLE post_game_notes
+      ADD COLUMN IF NOT EXISTS deck_version_at TIMESTAMP WITH TIME ZONE;
+      ALTER TABLE post_game_notes
+      ADD COLUMN IF NOT EXISTS revision BIGINT NOT NULL DEFAULT 1;
+      ALTER TABLE post_game_notes
+      ADD COLUMN IF NOT EXISTS deleted_at TIMESTAMP WITH TIME ZONE;
+
+      ALTER TABLE post_game_notes
+      DROP CONSTRAINT IF EXISTS chk_post_game_notes_revision;
+      ALTER TABLE post_game_notes
+      ADD CONSTRAINT chk_post_game_notes_revision CHECK (revision > 0);
+
+      ALTER TABLE post_game_notes
+      DROP CONSTRAINT IF EXISTS chk_post_game_notes_session_order;
+      ALTER TABLE post_game_notes
+      ADD CONSTRAINT chk_post_game_notes_session_order CHECK (
+        session_started_at IS NULL
+        OR session_ended_at IS NULL
+        OR session_ended_at >= session_started_at
+      );
+
+      CREATE INDEX IF NOT EXISTS idx_post_game_notes_user_sync
+      ON post_game_notes (user_id, updated_at, revision);
+
+      CREATE INDEX IF NOT EXISTS idx_post_game_notes_tombstones
+      ON post_game_notes (user_id, deck_id, updated_at)
+      WHERE deleted_at IS NOT NULL;
+
+      CREATE UNIQUE INDEX IF NOT EXISTS uq_post_game_notes_play_session
+      ON post_game_notes (user_id, deck_id, play_session_id)
+      WHERE play_session_id IS NOT NULL AND deleted_at IS NULL;
+
+      CREATE TABLE IF NOT EXISTS post_game_sync_state (
+        id SMALLINT PRIMARY KEY CHECK (id = 1),
+        watermark TIMESTAMP WITH TIME ZONE NOT NULL
+      );
+
+      INSERT INTO post_game_sync_state (id, watermark)
+      SELECT 1, GREATEST(
+        CURRENT_TIMESTAMP,
+        COALESCE(MAX(updated_at), CURRENT_TIMESTAMP)
+      )
+      FROM post_game_notes
+      ON CONFLICT (id) DO UPDATE
+      SET watermark = GREATEST(
+        post_game_sync_state.watermark,
+        EXCLUDED.watermark
+      );
+
+      CREATE TABLE IF NOT EXISTS account_deletion_receipts (
+        id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+        policy_version TEXT NOT NULL,
+        deletion_mode TEXT NOT NULL,
+        retention_summary JSONB NOT NULL DEFAULT '{}'::jsonb,
+        completed_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        CONSTRAINT chk_account_deletion_mode CHECK (
+          deletion_mode IN ('anonymized')
+        )
+      );
+
+      CREATE INDEX IF NOT EXISTS idx_account_deletion_receipts_completed
+      ON account_deletion_receipts (completed_at DESC);
+
+      CREATE TABLE IF NOT EXISTS privacy_keyring (
+        key_version SMALLINT PRIMARY KEY,
+        hmac_key BYTEA NOT NULL CHECK (octet_length(hmac_key) >= 32),
+        is_active BOOLEAN NOT NULL DEFAULT FALSE,
+        created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP
+      );
+
+      CREATE UNIQUE INDEX IF NOT EXISTS uq_privacy_keyring_active
+      ON privacy_keyring (is_active)
+      WHERE is_active = TRUE;
+
+      INSERT INTO privacy_keyring (key_version, hmac_key, is_active)
+      VALUES (1, gen_random_bytes(32), FALSE)
+      ON CONFLICT (key_version) DO NOTHING;
+
+      UPDATE privacy_keyring
+      SET is_active = TRUE
+      WHERE key_version = (SELECT MIN(key_version) FROM privacy_keyring)
+        AND NOT EXISTS (
+          SELECT 1 FROM privacy_keyring WHERE is_active = TRUE
+        );
+
+      CREATE TABLE IF NOT EXISTS privacy_deleted_deck_tombstones (
+        key_version SMALLINT NOT NULL
+          REFERENCES privacy_keyring(key_version) ON DELETE RESTRICT,
+        deck_token TEXT NOT NULL CHECK (char_length(deck_token) = 64),
+        deleted_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        PRIMARY KEY (key_version, deck_token)
+      );
+
+      CREATE INDEX IF NOT EXISTS idx_privacy_deleted_deck_token
+      ON privacy_deleted_deck_tombstones (deck_token);
+
+      CREATE OR REPLACE FUNCTION manaloom_guard_deck_learning_event()
+      RETURNS trigger
+      LANGUAGE plpgsql
+      AS \$deck_learning_guard\$
+      DECLARE
+        owner_user_id UUID;
+      BEGIN
+        SELECT user_id
+        INTO owner_user_id
+        FROM decks
+        WHERE id = NEW.deck_id;
+
+        IF owner_user_id IS NOT NULL THEN
+          PERFORM 1
+          FROM users
+          WHERE id = owner_user_id
+            AND deleted_at IS NULL
+          FOR UPDATE;
+          IF NOT FOUND THEN
+            RAISE EXCEPTION USING
+              ERRCODE = '23503',
+              MESSAGE = 'inactive_deck_owner_reference';
+          END IF;
+        ELSIF EXISTS (
+          SELECT 1
+          FROM privacy_deleted_deck_tombstones tombstone
+          JOIN privacy_keyring keyring
+            ON keyring.key_version = tombstone.key_version
+          WHERE tombstone.deck_token = encode(
+            hmac(
+              convert_to(NEW.deck_id::text, 'UTF8'),
+              keyring.hmac_key,
+              'sha256'
+            ),
+            'hex'
+          )
+        ) THEN
+          RAISE EXCEPTION USING
+            ERRCODE = '23503',
+            MESSAGE = 'deleted_deck_learning_event_rejected';
+        END IF;
+
+        RETURN NEW;
+      END;
+      \$deck_learning_guard\$;
+
+      CREATE OR REPLACE FUNCTION manaloom_guard_battle_simulation()
+      RETURNS trigger
+      LANGUAGE plpgsql
+      AS \$battle_simulation_guard\$
+      DECLARE
+        referenced_decks UUID[];
+        expected_owner_count INTEGER;
+        active_owner_count INTEGER;
+        active_owner_id UUID;
+      BEGIN
+        referenced_decks := ARRAY[
+          NULLIF(to_jsonb(NEW) ->> 'deck_a_id', '')::UUID,
+          NULLIF(to_jsonb(NEW) ->> 'deck_b_id', '')::UUID,
+          NULLIF(to_jsonb(NEW) ->> 'winner_deck_id', '')::UUID
+        ];
+
+        SELECT COUNT(DISTINCT deck.user_id)::INTEGER
+        INTO expected_owner_count
+        FROM decks deck
+        WHERE deck.id = ANY(referenced_decks);
+
+        active_owner_count := 0;
+        FOR active_owner_id IN
+          SELECT user_row.id
+          FROM users user_row
+          WHERE user_row.id IN (
+            SELECT DISTINCT deck.user_id
+            FROM decks deck
+            WHERE deck.id = ANY(referenced_decks)
+          )
+            AND user_row.deleted_at IS NULL
+          ORDER BY user_row.id
+          FOR UPDATE
+        LOOP
+          active_owner_count := active_owner_count + 1;
+        END LOOP;
+
+        IF active_owner_count <> expected_owner_count THEN
+          RAISE EXCEPTION USING
+            ERRCODE = '23503',
+            MESSAGE = 'inactive_battle_deck_owner_reference';
+        END IF;
+
+        RETURN NEW;
+      END;
+      \$battle_simulation_guard\$;
+
+      DO \$deck_learning_trigger\$
+      BEGIN
+        IF to_regclass('public.deck_learning_events') IS NOT NULL THEN
+          DROP TRIGGER IF EXISTS manaloom_guard_deck_learning_event
+          ON deck_learning_events;
+          CREATE TRIGGER manaloom_guard_deck_learning_event
+          BEFORE INSERT OR UPDATE OF deck_id ON deck_learning_events
+          FOR EACH ROW
+          EXECUTE FUNCTION manaloom_guard_deck_learning_event();
+        END IF;
+      END;
+      \$deck_learning_trigger\$;
+
+      DO \$battle_simulation_trigger\$
+      BEGIN
+        IF to_regclass('public.battle_simulations') IS NOT NULL THEN
+          DROP TRIGGER IF EXISTS manaloom_guard_battle_simulation
+          ON battle_simulations;
+          CREATE TRIGGER manaloom_guard_battle_simulation
+          BEFORE INSERT OR UPDATE OF deck_a_id, deck_b_id, winner_deck_id
+          ON battle_simulations
+          FOR EACH ROW
+          EXECUTE FUNCTION manaloom_guard_battle_simulation();
+        END IF;
+      END;
+      \$battle_simulation_trigger\$;
+
+      ALTER TABLE IF EXISTS trade_items
+      DROP CONSTRAINT IF EXISTS trade_items_binder_item_id_fkey;
+      ALTER TABLE IF EXISTS trade_items
+      ALTER COLUMN binder_item_id DROP NOT NULL;
+      ALTER TABLE IF EXISTS trade_items
+      ADD CONSTRAINT trade_items_binder_item_id_fkey
+      FOREIGN KEY (binder_item_id)
+      REFERENCES user_binder_items(id)
+      ON DELETE SET NULL;
+    ''',
+    down: '''
+      DO \$battle_simulation_trigger\$
+      BEGIN
+        IF to_regclass('public.battle_simulations') IS NOT NULL THEN
+          DROP TRIGGER IF EXISTS manaloom_guard_battle_simulation
+          ON battle_simulations;
+        END IF;
+      END;
+      \$battle_simulation_trigger\$;
+      DROP FUNCTION IF EXISTS manaloom_guard_battle_simulation();
+      DO \$deck_learning_trigger\$
+      BEGIN
+        IF to_regclass('public.deck_learning_events') IS NOT NULL THEN
+          DROP TRIGGER IF EXISTS manaloom_guard_deck_learning_event
+          ON deck_learning_events;
+        END IF;
+      END;
+      \$deck_learning_trigger\$;
+      DROP FUNCTION IF EXISTS manaloom_guard_deck_learning_event();
+      DROP INDEX IF EXISTS idx_privacy_deleted_deck_token;
+      DROP TABLE IF EXISTS privacy_deleted_deck_tombstones;
+      DROP INDEX IF EXISTS uq_privacy_keyring_active;
+      DROP TABLE IF EXISTS privacy_keyring;
+      ALTER TABLE IF EXISTS trade_items
+      DROP CONSTRAINT IF EXISTS trade_items_binder_item_id_fkey;
+      ALTER TABLE IF EXISTS trade_items
+      ALTER COLUMN binder_item_id SET NOT NULL;
+      ALTER TABLE IF EXISTS trade_items
+      ADD CONSTRAINT trade_items_binder_item_id_fkey
+      FOREIGN KEY (binder_item_id)
+      REFERENCES user_binder_items(id)
+      ON DELETE RESTRICT;
+      DROP INDEX IF EXISTS idx_account_deletion_receipts_completed;
+      DROP TABLE IF EXISTS account_deletion_receipts;
+      DROP INDEX IF EXISTS uq_post_game_notes_play_session;
+      DROP INDEX IF EXISTS idx_post_game_notes_tombstones;
+      DROP INDEX IF EXISTS idx_post_game_notes_user_sync;
+      DROP TABLE IF EXISTS post_game_sync_state;
+      ALTER TABLE post_game_notes
+      DROP CONSTRAINT IF EXISTS chk_post_game_notes_session_order;
+      ALTER TABLE post_game_notes
+      DROP CONSTRAINT IF EXISTS chk_post_game_notes_revision;
+      ALTER TABLE post_game_notes DROP COLUMN IF EXISTS deleted_at;
+      ALTER TABLE post_game_notes DROP COLUMN IF EXISTS revision;
+      ALTER TABLE post_game_notes DROP COLUMN IF EXISTS deck_version_at;
+      ALTER TABLE post_game_notes DROP COLUMN IF EXISTS deck_snapshot_hash;
+      ALTER TABLE post_game_notes DROP COLUMN IF EXISTS session_ended_at;
+      ALTER TABLE post_game_notes DROP COLUMN IF EXISTS session_started_at;
+      ALTER TABLE post_game_notes DROP COLUMN IF EXISTS play_session_id;
+      DO \$active_user_triggers\$
+      DECLARE
+        reference RECORD;
+        trigger_name TEXT;
+      BEGIN
+        FOR reference IN
+          SELECT constraint_row.oid AS constraint_oid,
+                 namespace_row.nspname AS schema_name,
+                 relation_row.relname AS table_name
+          FROM pg_constraint constraint_row
+          JOIN pg_class relation_row
+            ON relation_row.oid = constraint_row.conrelid
+          JOIN pg_namespace namespace_row
+            ON namespace_row.oid = relation_row.relnamespace
+          WHERE constraint_row.contype = 'f'
+            AND constraint_row.confrelid = 'users'::regclass
+            AND array_length(constraint_row.conkey, 1) = 1
+        LOOP
+          trigger_name := 'manaloom_active_user_' || reference.constraint_oid;
+          EXECUTE format(
+            'DROP TRIGGER IF EXISTS %I ON %I.%I',
+            trigger_name,
+            reference.schema_name,
+            reference.table_name
+          );
+        END LOOP;
+      END;
+      \$active_user_triggers\$;
+      DROP FUNCTION IF EXISTS manaloom_require_active_user();
+      DROP INDEX IF EXISTS idx_users_active_identity;
+      ALTER TABLE users DROP COLUMN IF EXISTS deleted_at;
+    ''',
+  ),
 ];
 
 class Migration {
@@ -1326,7 +1725,7 @@ MigrationRollbackPolicy migrationRollbackPolicy(String version) =>
       '033' || '035' => MigrationRollbackPolicy.emptyOnly,
       // Estas migrations alteram ou adotam dados preexistentes. O down
       // automático não consegue reconstruir o estado anterior com segurança.
-      '034' || '036' || '037' => MigrationRollbackPolicy.manualOnly,
+      '034' || '036' || '037' || '038' => MigrationRollbackPolicy.manualOnly,
       _ => MigrationRollbackPolicy.standard,
     };
 
@@ -1484,10 +1883,7 @@ void main(List<String> args) async {
         for (final migration in rollbackMigrations) {
           print('◀️  Revertendo ${migration.fullName}...');
           await _assertRollbackSafe(tx, migration);
-          final statements = migration.down!
-              .split(';')
-              .map((statement) => statement.trim())
-              .where((statement) => statement.isNotEmpty);
+          final statements = splitPostgresStatements(migration.down!);
           for (final statement in statements) {
             await tx.execute(statement);
           }
@@ -1533,10 +1929,7 @@ void main(List<String> args) async {
         await connection.runTx((tx) async {
           // Cada migração e seu registro são atômicos: em caso de falha, nenhum
           // statement parcial fica aplicado.
-          final statements = migration.up
-              .split(';')
-              .map((statement) => statement.trim())
-              .where((statement) => statement.isNotEmpty);
+          final statements = splitPostgresStatements(migration.up);
 
           for (final statement in statements) {
             await tx.execute(statement);

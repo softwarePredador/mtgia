@@ -4,10 +4,11 @@ import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
 import '../../../core/theme/app_theme.dart';
+import '../../../core/widgets/app_state_panel.dart';
 import '../../../core/widgets/cached_card_image.dart';
+import '../../../core/widgets/responsive_page_frame.dart';
 import '../../binder/providers/binder_provider.dart';
 import '../../messages/providers/message_provider.dart';
-import '../../messages/screens/chat_screen.dart';
 import '../../trades/screens/create_trade_screen.dart';
 import '../providers/social_provider.dart';
 
@@ -75,16 +76,19 @@ class _UserProfileScreenState extends State<UserProfileScreen>
   Future<void> _openChat(String userId) async {
     final msgProvider = context.read<MessageProvider>();
     final conv = await msgProvider.getOrCreateConversation(userId);
-    if (!mounted || conv == null) return;
+    if (!mounted) return;
+    if (conv == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text(
+            'Não foi possível abrir a conversa agora. Tente novamente.',
+          ),
+        ),
+      );
+      return;
+    }
 
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder:
-            (_) =>
-                ChatScreen(conversationId: conv.id, otherUser: conv.otherUser),
-      ),
-    );
+    context.push('/messages/${conv.id}', extra: conv.otherUser);
   }
 
   void _loadTab(int index) {
@@ -145,225 +149,245 @@ class _UserProfileScreenState extends State<UserProfileScreen>
           final user = provider.visitedUser;
           if (user == null) return const SizedBox.shrink();
 
-          return Column(
-            children: [
-              // === Header do perfil ===
-              Container(
-                padding: const EdgeInsets.all(20),
-                color: AppTheme.surfaceElevated,
-                child: Column(
-                  children: [
-                    // Avatar
-                    CircleAvatar(
-                      radius: 40,
-                      backgroundColor: AppTheme.brass400.withValues(
-                        alpha: 0.16,
+          final compactTabs =
+              MediaQuery.sizeOf(context).width < AppTheme.breakpointCompact;
+          return ResponsivePageFrame(
+            maxWidth: 1120,
+            padding: EdgeInsets.symmetric(horizontal: compactTabs ? 16 : 24),
+            child: Column(
+              key: const Key('user-profile-content'),
+              children: [
+                // === Header do perfil ===
+                Container(
+                  padding: const EdgeInsets.all(20),
+                  color: AppTheme.surfaceElevated,
+                  child: Column(
+                    children: [
+                      // Avatar
+                      CircleAvatar(
+                        radius: 40,
+                        backgroundColor: AppTheme.brass400.withValues(
+                          alpha: 0.16,
+                        ),
+                        backgroundImage:
+                            user.avatarUrl != null
+                                ? CachedNetworkImageProvider(user.avatarUrl!)
+                                : null,
+                        child:
+                            user.avatarUrl == null
+                                ? Text(
+                                  user.username[0].toUpperCase(),
+                                  style: const TextStyle(
+                                    color: AppTheme.brass400,
+                                    fontSize: AppTheme.fontDisplay,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                )
+                                : null,
                       ),
-                      backgroundImage:
-                          user.avatarUrl != null
-                              ? CachedNetworkImageProvider(user.avatarUrl!)
-                              : null,
-                      child:
-                          user.avatarUrl == null
-                              ? Text(
-                                user.username[0].toUpperCase(),
-                                style: const TextStyle(
-                                  color: AppTheme.brass400,
-                                  fontSize: AppTheme.fontDisplay,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              )
-                              : null,
-                    ),
-                    const SizedBox(height: 12),
-                    // Display name
-                    Text(
-                      user.displayName ?? user.username,
-                      style: const TextStyle(
-                        color: AppTheme.textPrimary,
-                        fontSize: AppTheme.fontXxl,
-                        fontWeight: FontWeight.bold,
+                      const SizedBox(height: 12),
+                      // Display name
+                      Text(
+                        user.displayName ?? user.username,
+                        style: const TextStyle(
+                          color: AppTheme.textPrimary,
+                          fontSize: AppTheme.fontXxl,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
-                    ),
-                    if (user.displayName != null)
-                      Padding(
-                        padding: const EdgeInsets.only(top: 4),
-                        child: Text(
-                          '@${user.username}',
-                          style: const TextStyle(
-                            color: AppTheme.textSecondary,
-                            fontSize: AppTheme.fontMd,
+                      if (user.displayName != null)
+                        Padding(
+                          padding: const EdgeInsets.only(top: 4),
+                          child: Text(
+                            '@${user.username}',
+                            style: const TextStyle(
+                              color: AppTheme.textSecondary,
+                              fontSize: AppTheme.fontMd,
+                            ),
                           ),
                         ),
-                      ),
-                    const SizedBox(height: 16),
-                    // Stats row
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        _StatItem(
-                          label: 'Decks',
-                          value: user.publicDeckCount,
-                          icon: Icons.style,
-                        ),
-                        const SizedBox(width: 24),
-                        _StatItem(
-                          label: 'Seguidores',
-                          value: user.followerCount,
-                          icon: Icons.people,
-                          onTap: () {
-                            _tabController.animateTo(1);
-                            _loadTab(1);
-                          },
-                        ),
-                        const SizedBox(width: 24),
-                        _StatItem(
-                          label: 'Seguindo',
-                          value: user.followingCount,
-                          icon: Icons.person_add,
-                          onTap: () {
-                            _tabController.animateTo(2);
-                            _loadTab(2);
-                          },
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 16),
-                    // Follow button (only if not own profile)
-                    if (provider.isOwnProfile != true)
+                      const SizedBox(height: 16),
+                      // Stats row
                       Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          SizedBox(
-                            width: 160,
-                            height: 40,
-                            child: ElevatedButton.icon(
-                              onPressed: _isToggling ? null : _toggleFollow,
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor:
-                                    provider.isFollowingVisited
-                                        ? AppTheme.surfaceSlate
-                                        : AppTheme.brass500,
-                                foregroundColor:
-                                    provider.isFollowingVisited
-                                        ? AppTheme.brass400
-                                        : AppTheme.backgroundAbyss,
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(
-                                    AppTheme.radiusXl,
-                                  ),
-                                  side:
-                                      provider.isFollowingVisited
-                                          ? const BorderSide(
-                                            color: AppTheme.outlineMuted,
-                                          )
-                                          : BorderSide.none,
-                                ),
-                              ),
-                              icon:
-                                  _isToggling
-                                      ? const SizedBox(
-                                        width: 16,
-                                        height: 16,
-                                        child: CircularProgressIndicator(
-                                          strokeWidth: 2,
-                                          color: AppTheme.textPrimary,
-                                        ),
-                                      )
-                                      : Icon(
-                                        provider.isFollowingVisited
-                                            ? Icons.person_remove
-                                            : Icons.person_add,
-                                        size: 18,
-                                      ),
-                              label: Text(
-                                provider.isFollowingVisited
-                                    ? 'Deixar de seguir'
-                                    : 'Seguir',
-                                style: const TextStyle(
-                                  fontSize: AppTheme.fontSm,
-                                ),
-                              ),
+                          Expanded(
+                            child: _StatItem(
+                              label: 'Decks',
+                              value: user.publicDeckCount,
+                              icon: Icons.style,
                             ),
                           ),
-                          const SizedBox(width: 10),
-                          SizedBox(
-                            height: 40,
-                            child: OutlinedButton.icon(
-                              onPressed: () => _openChat(widget.userId),
-                              style: OutlinedButton.styleFrom(
-                                foregroundColor: AppTheme.brass400,
-                                side: const BorderSide(
-                                  color: AppTheme.outlineMuted,
-                                ),
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(
-                                    AppTheme.radiusXl,
-                                  ),
-                                ),
-                              ),
-                              icon: const Icon(
-                                Icons.chat_bubble_outline,
-                                size: 18,
-                              ),
-                              label: const Text(
-                                'Mensagem',
-                                style: TextStyle(fontSize: AppTheme.fontSm),
-                              ),
+                          Expanded(
+                            child: _StatItem(
+                              label: 'Seguidores',
+                              value: user.followerCount,
+                              icon: Icons.people,
+                              onTap: () {
+                                _tabController.animateTo(1);
+                                _loadTab(1);
+                              },
+                            ),
+                          ),
+                          Expanded(
+                            child: _StatItem(
+                              label: 'Seguindo',
+                              value: user.followingCount,
+                              icon: Icons.person_add,
+                              onTap: () {
+                                _tabController.animateTo(2);
+                                _loadTab(2);
+                              },
                             ),
                           ),
                         ],
                       ),
-                  ],
+                      const SizedBox(height: 16),
+                      // Follow button (only if not own profile)
+                      if (provider.isOwnProfile != true)
+                        Wrap(
+                          alignment: WrapAlignment.center,
+                          spacing: 10,
+                          runSpacing: 10,
+                          children: [
+                            SizedBox(
+                              width: 160,
+                              height: AppTheme.touchTargetMin,
+                              child: ElevatedButton.icon(
+                                onPressed: _isToggling ? null : _toggleFollow,
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor:
+                                      provider.isFollowingVisited
+                                          ? AppTheme.surfaceSlate
+                                          : AppTheme.brass500,
+                                  foregroundColor:
+                                      provider.isFollowingVisited
+                                          ? AppTheme.brass400
+                                          : AppTheme.backgroundAbyss,
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(
+                                      AppTheme.radiusXl,
+                                    ),
+                                    side:
+                                        provider.isFollowingVisited
+                                            ? const BorderSide(
+                                              color: AppTheme.outlineMuted,
+                                            )
+                                            : BorderSide.none,
+                                  ),
+                                ),
+                                icon:
+                                    _isToggling
+                                        ? const SizedBox(
+                                          width: 16,
+                                          height: 16,
+                                          child: CircularProgressIndicator(
+                                            strokeWidth: 2,
+                                            color: AppTheme.textPrimary,
+                                          ),
+                                        )
+                                        : Icon(
+                                          provider.isFollowingVisited
+                                              ? Icons.person_remove
+                                              : Icons.person_add,
+                                          size: 18,
+                                        ),
+                                label: Text(
+                                  provider.isFollowingVisited
+                                      ? 'Deixar de seguir'
+                                      : 'Seguir',
+                                  style: const TextStyle(
+                                    fontSize: AppTheme.fontSm,
+                                  ),
+                                ),
+                              ),
+                            ),
+                            SizedBox(
+                              height: AppTheme.touchTargetMin,
+                              child: OutlinedButton.icon(
+                                onPressed: () => _openChat(widget.userId),
+                                style: OutlinedButton.styleFrom(
+                                  foregroundColor: AppTheme.brass400,
+                                  side: const BorderSide(
+                                    color: AppTheme.outlineMuted,
+                                  ),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(
+                                      AppTheme.radiusXl,
+                                    ),
+                                  ),
+                                ),
+                                icon: const Icon(
+                                  Icons.chat_bubble_outline,
+                                  size: 18,
+                                ),
+                                label: const Text(
+                                  'Mensagem',
+                                  style: TextStyle(fontSize: AppTheme.fontSm),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                    ],
+                  ),
                 ),
-              ),
-              // === Tabs ===
-              Container(
-                color: AppTheme.backgroundAbyss,
-                child: TabBar(
-                  controller: _tabController,
-                  indicatorColor: AppTheme.brass400,
-                  labelColor: AppTheme.brass400,
-                  unselectedLabelColor: AppTheme.textSecondary,
-                  tabs: [
-                    Tab(text: 'Decks (${provider.visitedUserDecks.length})'),
-                    const Tab(text: 'Seguidores'),
-                    const Tab(text: 'Seguindo'),
-                    const Tab(text: 'Fichário'),
-                  ],
+                // === Tabs ===
+                Container(
+                  color: AppTheme.backgroundAbyss,
+                  child: TabBar(
+                    key: const Key('user-profile-tabs'),
+                    controller: _tabController,
+                    isScrollable: compactTabs,
+                    tabAlignment:
+                        compactTabs ? TabAlignment.start : TabAlignment.fill,
+                    indicatorColor: AppTheme.brass400,
+                    labelColor: AppTheme.brass400,
+                    unselectedLabelColor: AppTheme.textSecondary,
+                    tabs: [
+                      Tab(text: 'Decks (${provider.visitedUserDecks.length})'),
+                      const Tab(text: 'Seguidores'),
+                      const Tab(text: 'Seguindo'),
+                      const Tab(text: 'Fichário'),
+                    ],
+                  ),
                 ),
-              ),
-              // === Tab content ===
-              Expanded(
-                child: TabBarView(
-                  controller: _tabController,
-                  children: [
-                    _DecksTab(decks: provider.visitedUserDecks),
-                    _UsersListTab(
-                      users: provider.followers,
-                      isLoading: provider.isLoadingFollowers,
-                      errorMessage: provider.followersError,
-                      emptyMessage: 'Nenhum seguidor ainda',
-                      hasMore: provider.hasMoreFollowers,
-                      onLoadMore: () => provider.fetchFollowers(widget.userId),
-                    ),
-                    _UsersListTab(
-                      users: provider.following,
-                      isLoading: provider.isLoadingFollowing,
-                      errorMessage: provider.followingError,
-                      emptyMessage: 'Não segue ninguém ainda',
-                      hasMore: provider.hasMoreFollowing,
-                      onLoadMore: () => provider.fetchFollowing(widget.userId),
-                    ),
-                    Consumer<BinderProvider>(
-                      builder: (context, binder, _) {
-                        return _PublicBinderTabHaveWant(userId: widget.userId);
-                      },
-                    ),
-                  ],
+                // === Tab content ===
+                Expanded(
+                  child: TabBarView(
+                    controller: _tabController,
+                    children: [
+                      _DecksTab(decks: provider.visitedUserDecks),
+                      _UsersListTab(
+                        users: provider.followers,
+                        isLoading: provider.isLoadingFollowers,
+                        errorMessage: provider.followersError,
+                        emptyMessage: 'Nenhum seguidor ainda',
+                        hasMore: provider.hasMoreFollowers,
+                        onLoadMore:
+                            () => provider.fetchFollowers(widget.userId),
+                      ),
+                      _UsersListTab(
+                        users: provider.following,
+                        isLoading: provider.isLoadingFollowing,
+                        errorMessage: provider.followingError,
+                        emptyMessage: 'Não segue ninguém ainda',
+                        hasMore: provider.hasMoreFollowing,
+                        onLoadMore:
+                            () => provider.fetchFollowing(widget.userId),
+                      ),
+                      Consumer<BinderProvider>(
+                        builder: (context, binder, _) {
+                          return _PublicBinderTabHaveWant(
+                            userId: widget.userId,
+                          );
+                        },
+                      ),
+                    ],
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           );
         },
       ),
@@ -742,14 +766,7 @@ class _UsersListTabState extends State<_UsersListTab> {
               Icons.chevron_right,
               color: AppTheme.textSecondary,
             ),
-            onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (_) => UserProfileScreen(userId: user.id),
-                ),
-              );
-            },
+            onTap: () => context.push('/community/user/${user.id}'),
           ),
         );
       },
@@ -853,6 +870,8 @@ class _PublicBinderListViewState extends State<_PublicBinderListView>
   List<BinderItem> _items = [];
   bool _isLoading = false;
   bool _hasMore = true;
+  String? _error;
+  bool _retryShouldReset = false;
   int _page = 1;
 
   @override
@@ -884,10 +903,12 @@ class _PublicBinderListViewState extends State<_PublicBinderListView>
     if (!reset && !_hasMore) return;
     if (reset) {
       _page = 1;
-      _items = [];
-      _hasMore = true;
     }
-    setState(() => _isLoading = true);
+    setState(() {
+      _isLoading = true;
+      _error = null;
+      if (reset) _hasMore = true;
+    });
     try {
       final res = await context.read<BinderProvider>().fetchPublicBinderDirect(
         userId: widget.userId,
@@ -895,13 +916,39 @@ class _PublicBinderListViewState extends State<_PublicBinderListView>
         page: _page,
       );
       if (res != null) {
-        _items.addAll(res);
+        if (reset) {
+          _items = res;
+        } else {
+          _items.addAll(res);
+        }
         _hasMore = res.length >= 20;
         _page++;
+        _error = null;
+        _retryShouldReset = false;
+      } else {
+        _error =
+            _items.isEmpty
+                ? 'Não foi possível carregar esta lista. Verifique sua conexão.'
+                : 'A atualização falhou. Os itens já carregados foram mantidos.';
+        _hasMore = false;
+        _retryShouldReset = reset;
       }
+    } catch (e) {
+      debugPrint('[PublicBinder] Falha ao carregar ${widget.listType}: $e');
+      _error =
+          _items.isEmpty
+              ? 'Não foi possível carregar esta lista. Verifique sua conexão.'
+              : 'A atualização falhou. Os itens já carregados foram mantidos.';
+      _hasMore = false;
+      _retryShouldReset = reset;
     } finally {
       if (mounted) setState(() => _isLoading = false);
     }
+  }
+
+  void _retryFetch() {
+    setState(() => _hasMore = true);
+    _fetch(reset: _retryShouldReset || _items.isEmpty);
   }
 
   void _onInteract(BinderItem item) {
@@ -1097,15 +1144,11 @@ class _PublicBinderListViewState extends State<_PublicBinderListView>
   }
 
   void _openCreateTrade(String type, BinderItem targetItem) {
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder:
-            (_) => CreateTradeScreen(
-              receiverId: widget.userId,
-              initialType: type,
-              preselectedItem: targetItem,
-            ),
+    context.push(
+      '/trades/create/${Uri.encodeComponent(widget.userId)}',
+      extra: CreateTradeRouteArgs(
+        initialType: type,
+        preselectedItem: targetItem,
       ),
     );
   }
@@ -1113,15 +1156,18 @@ class _PublicBinderListViewState extends State<_PublicBinderListView>
   Future<void> _openChat() async {
     final msgProvider = context.read<MessageProvider>();
     final conv = await msgProvider.getOrCreateConversation(widget.userId);
-    if (!mounted || conv == null) return;
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder:
-            (_) =>
-                ChatScreen(conversationId: conv.id, otherUser: conv.otherUser),
-      ),
-    );
+    if (!mounted) return;
+    if (conv == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text(
+            'Não foi possível abrir a conversa agora. Tente novamente.',
+          ),
+        ),
+      );
+      return;
+    }
+    context.push('/messages/${conv.id}', extra: conv.otherUser);
   }
 
   @override
@@ -1130,8 +1176,23 @@ class _PublicBinderListViewState extends State<_PublicBinderListView>
     final isHave = widget.listType == 'have';
 
     if (_isLoading && _items.isEmpty) {
-      return const Center(
-        child: CircularProgressIndicator(color: AppTheme.manaViolet),
+      return AppStatePanel(
+        icon: isHave ? Icons.inventory_2_rounded : Icons.favorite_rounded,
+        title: isHave ? 'Carregando fichário' : 'Carregando wishlist',
+        message: 'Buscando os itens públicos deste jogador.',
+        accent: AppTheme.manaViolet,
+      );
+    }
+
+    if (_error != null && _items.isEmpty) {
+      return AppStatePanel(
+        key: Key('public-binder-error-${widget.listType}'),
+        icon: Icons.error_outline_rounded,
+        title: 'Não foi possível carregar esta lista',
+        message: _error,
+        accent: AppTheme.error,
+        actionLabel: 'Tentar novamente',
+        onAction: _retryFetch,
       );
     }
 
@@ -1167,15 +1228,45 @@ class _PublicBinderListViewState extends State<_PublicBinderListView>
       child: ListView.builder(
         controller: _scrollController,
         padding: const EdgeInsets.all(12),
-        itemCount: _items.length + (_hasMore ? 1 : 0),
+        itemCount: _items.length + ((_hasMore || _error != null) ? 1 : 0),
         itemBuilder: (context, index) {
           if (index >= _items.length) {
-            return const Padding(
-              padding: EdgeInsets.symmetric(vertical: 16),
-              child: Center(
-                child: CircularProgressIndicator(color: AppTheme.manaViolet),
-              ),
-            );
+            if (_error != null) {
+              return Padding(
+                key: Key('public-binder-pagination-error-${widget.listType}'),
+                padding: const EdgeInsets.symmetric(vertical: 12),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      _error!,
+                      textAlign: TextAlign.center,
+                      style: const TextStyle(
+                        color: AppTheme.warning,
+                        fontSize: AppTheme.fontSm,
+                      ),
+                    ),
+                    TextButton.icon(
+                      key: Key(
+                        'public-binder-pagination-retry-${widget.listType}',
+                      ),
+                      onPressed: _retryFetch,
+                      icon: const Icon(Icons.refresh_rounded),
+                      label: const Text('Tentar novamente'),
+                    ),
+                  ],
+                ),
+              );
+            }
+            if (_isLoading) {
+              return const Padding(
+                padding: EdgeInsets.symmetric(vertical: 16),
+                child: Center(
+                  child: CircularProgressIndicator(color: AppTheme.manaViolet),
+                ),
+              );
+            }
+            return const SizedBox(height: 1);
           }
           final item = _items[index];
           return _PublicBinderItemCard(

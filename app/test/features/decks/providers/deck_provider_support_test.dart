@@ -54,7 +54,10 @@ class _FakeApiClient extends ApiClient {
   }
 
   @override
-  Future<ApiResponse> delete(String endpoint) async {
+  Future<ApiResponse> delete(
+    String endpoint, {
+    Map<String, dynamic>? body,
+  }) async {
     final handler = _deleteHandlers[endpoint];
     if (handler == null) {
       throw UnimplementedError('No DELETE handler for $endpoint');
@@ -770,6 +773,60 @@ void main() {
       expect(result.missingColorIdentityDecks, isEmpty);
     },
   );
+
+  test('known colorless deck does not re-enter identity enrichment', () {
+    final colorless = Deck(
+      id: 'deck-colorless',
+      name: 'Karn Colorless',
+      format: 'commander',
+      isPublic: false,
+      createdAt: DateTime.parse('2026-03-24T00:00:00.000Z'),
+      cardCount: 100,
+      colorIdentity: const [],
+      colorIdentityKnown: true,
+    );
+    final pending = Deck(
+      id: 'deck-pending',
+      name: 'Pending',
+      format: 'commander',
+      isPublic: false,
+      createdAt: DateTime.parse('2026-03-24T00:00:00.000Z'),
+      cardCount: 100,
+    );
+
+    expect(decksMissingColorIdentity([colorless, pending]), [pending]);
+  });
+
+  test('cached colorless details mark list identity as known', () {
+    final pending = Deck(
+      id: 'deck-colorless',
+      name: 'Karn Colorless',
+      format: 'commander',
+      isPublic: false,
+      createdAt: DateTime.parse('2026-03-24T00:00:00.000Z'),
+      cardCount: 100,
+    );
+    final details = DeckDetails(
+      id: pending.id,
+      name: pending.name,
+      format: pending.format,
+      isPublic: false,
+      createdAt: pending.createdAt,
+      colorIdentity: const [],
+      colorIdentityKnown: true,
+      stats: const {},
+      commander: const [],
+      mainBoard: const {},
+    );
+
+    final hydrated = applyCachedColorIdentitiesToDeckList(
+      [pending],
+      {pending.id: details},
+    );
+    expect(hydrated.single.colorIdentity, isEmpty);
+    expect(hydrated.single.colorIdentityKnown, isTrue);
+    expect(decksMissingColorIdentity(hydrated), isEmpty);
+  });
 
   test(
     'applyDeckColorIdentityEnrichment returns updated decks and cache details',

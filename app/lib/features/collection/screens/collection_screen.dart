@@ -58,33 +58,65 @@ class _CollectionScreenState extends State<CollectionScreen>
           fontWeight: FontWeight.w700,
         ),
         actions: const [ShellAppBarActions()],
-        bottom: TabBar(
-          key: const Key('collection-hub-tabs'),
-          controller: _tabController,
-          isScrollable: false,
-          labelPadding: EdgeInsets.zero,
-          dividerColor: AppTheme.transparent,
-          indicatorColor: AppTheme.brass400,
-          labelColor: AppTheme.brass400,
-          unselectedLabelColor: AppTheme.textSecondary,
-          labelStyle: const TextStyle(
-            fontSize: AppTheme.fontXs,
-            fontWeight: FontWeight.w700,
+        bottom: PreferredSize(
+          preferredSize: const Size.fromHeight(AppTheme.touchTargetMin),
+          child: LayoutBuilder(
+            builder: (context, constraints) {
+              final gutter = constraints.maxWidth < 600 ? 16.0 : 24.0;
+              return Center(
+                child: ConstrainedBox(
+                  constraints: const BoxConstraints(maxWidth: 1280),
+                  child: Padding(
+                    padding: EdgeInsets.symmetric(horizontal: gutter),
+                    child: SizedBox(
+                      key: const Key('collection-hub-tabs-canvas'),
+                      width: double.infinity,
+                      child: TabBar(
+                        key: const Key('collection-hub-tabs'),
+                        controller: _tabController,
+                        isScrollable: false,
+                        labelPadding: EdgeInsets.zero,
+                        dividerColor: AppTheme.transparent,
+                        indicatorColor: AppTheme.brass400,
+                        labelColor: AppTheme.brass400,
+                        unselectedLabelColor: AppTheme.textSecondary,
+                        labelStyle: const TextStyle(
+                          fontSize: AppTheme.fontXs,
+                          fontWeight: FontWeight.w700,
+                        ),
+                        unselectedLabelStyle: const TextStyle(
+                          fontSize: AppTheme.fontXs,
+                          fontWeight: FontWeight.w700,
+                        ),
+                        tabs: const [
+                          Tab(
+                            key: Key('collection-tab-binder'),
+                            text: 'Fichário',
+                            height: AppTheme.touchTargetMin,
+                          ),
+                          Tab(
+                            key: Key('collection-tab-market'),
+                            text: 'Ofertas',
+                            height: AppTheme.touchTargetMin,
+                          ),
+                          Tab(
+                            key: Key('collection-tab-trades'),
+                            text: 'Trocas',
+                            height: AppTheme.touchTargetMin,
+                          ),
+                          Tab(
+                            key: Key('collection-tab-sets'),
+                            text: 'Edições',
+                            height: AppTheme.touchTargetMin,
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+              );
+            },
           ),
-          unselectedLabelStyle: const TextStyle(
-            fontSize: AppTheme.fontXs,
-            fontWeight: FontWeight.w700,
-          ),
-          tabs: const [
-            Tab(
-              key: Key('collection-tab-binder'),
-              text: 'Fichário',
-              height: 34,
-            ),
-            Tab(key: Key('collection-tab-market'), text: 'Market', height: 34),
-            Tab(key: Key('collection-tab-trades'), text: 'Trades', height: 34),
-            Tab(key: Key('collection-tab-sets'), text: 'Coleções', height: 34),
-          ],
         ),
       ),
       body: TabBarView(

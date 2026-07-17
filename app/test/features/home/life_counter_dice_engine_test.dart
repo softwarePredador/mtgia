@@ -38,7 +38,7 @@ void main() {
       );
 
       expect(updated.lastPlayerRolls[2], isNotNull);
-      expect(updated.lastTableEvent, startsWith('Player 3 rolou D20: '));
+      expect(updated.lastTableEvent, startsWith('Jogador 3 rolou D20: '));
     });
 
     test('runs first player roll and persists the chosen player', () {
@@ -50,7 +50,7 @@ void main() {
       );
 
       expect(updated.firstPlayerIndex, inInclusiveRange(0, 3));
-      expect(updated.lastTableEvent, startsWith('Primeiro jogador: Player '));
+      expect(updated.lastTableEvent, startsWith('Primeiro jogador: Jogador '));
     });
 
     test('runs first player roll only among active players', () {
@@ -93,7 +93,7 @@ void main() {
       expect(updated.firstPlayerIndex, isNull);
       expect(
         updated.lastTableEvent,
-        'Primeiro jogador indisponivel: nenhum jogador ativo',
+        'Primeiro jogador indisponível: nenhum jogador ativo',
       );
     });
 
@@ -106,7 +106,7 @@ void main() {
       );
 
       expect(updated.lastHighRolls.whereType<int>().length, 4);
-      expect(updated.lastTableEvent, startsWith('High Roll'));
+      expect(updated.lastTableEvent, startsWith('Maior rolagem'));
     });
 
     test('runs high roll only for active players', () {
@@ -145,7 +145,7 @@ void main() {
       expect(updated.lastHighRolls[3], isNull);
       expect(updated.lastHighRolls[0], isNotNull);
       expect(updated.lastHighRolls[2], isNotNull);
-      expect(updated.lastTableEvent, contains('Desempate do High Roll'));
+      expect(updated.lastTableEvent, contains('Desempate da maior rolagem'));
     });
 
     test('drops out players from a pending high roll tiebreak', () {
@@ -190,7 +190,7 @@ void main() {
       expect(updated.lastHighRolls.whereType<int>(), isEmpty);
       expect(
         updated.lastTableEvent,
-        'High Roll indisponivel: nenhum jogador ativo',
+        'Maior rolagem indisponível: nenhum jogador ativo',
       );
     });
   });

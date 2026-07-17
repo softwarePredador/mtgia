@@ -410,6 +410,7 @@ class CommercialMetricsService {
         SELECT COUNT(*)::int
         FROM users
         WHERE created_at >= NOW() - (@days * INTERVAL '1 day')
+          AND deleted_at IS NULL
       '''),
       parameters: {'days': days},
     );

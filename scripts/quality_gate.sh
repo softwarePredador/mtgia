@@ -61,7 +61,10 @@ run_flutter_tests_with_proof() {
     rm -f "$output_file"
     return "$status"
   fi
-  if ! grep -Fq "All tests passed!" "$output_file"; then
+  # Flutter prints "All other tests passed!" when the suite succeeds with one
+  # or more declared skips. Keep the process exit status as the primary gate
+  # and accept both official success summaries as the explicit proof.
+  if ! grep -Eq "All (other )?tests passed!" "$output_file"; then
     echo "❌ Flutter tests terminaram sem prova explícita de conclusão."
     rm -f "$output_file"
     return 1

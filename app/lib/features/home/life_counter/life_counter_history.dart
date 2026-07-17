@@ -343,7 +343,7 @@ class LifeCounterHistoryState {
     final resolvedName =
         currentGameName ??
         LifeCounterHistorySnapshot._readString(existingMeta['name']) ??
-        'Game #${gameCounter < 1 ? 1 : gameCounter}';
+        'Partida #${gameCounter < 1 ? 1 : gameCounter}';
     final resolvedId =
         LifeCounterHistorySnapshot._readString(existingMeta['id']) ??
         'canonical-game-${gameCounter < 1 ? 1 : gameCounter}-$resolvedStartDate';
@@ -364,11 +364,76 @@ class LifeCounterHistoryState {
                 ? 'commander'
                 : 'standard',
       );
+      if (session.playSessionId != null) {
+        resolvedMeta['playSessionId'] = session.playSessionId;
+      }
+      if (session.deckId != null) {
+        resolvedMeta['deckId'] = session.deckId;
+      }
+      if (session.deckName != null) {
+        resolvedMeta['deckName'] = session.deckName;
+      }
+      if (session.startedAtEpochMs != null) {
+        resolvedMeta['startedAtEpochMs'] = session.startedAtEpochMs;
+      }
     }
 
     return copyWith(
       currentGameName: resolvedName,
       currentGameMeta: resolvedMeta,
+    );
+  }
+
+  /// Starts a distinct game without relabelling the previous game's events.
+  ///
+  /// When the current game has events, it is moved into the archive with its
+  /// existing metadata. An empty placeholder game is simply replaced so that
+  /// opening one deck and immediately choosing another does not create noise.
+  LifeCounterHistoryState startNewGameForSession({
+    required LifeCounterSession session,
+    required int startDateEpochMs,
+  }) {
+    final hasCurrentEvents = currentGameEntries.isNotEmpty;
+    final archivedCurrentEntries = currentGameEntries
+        .map(
+          (entry) => LifeCounterHistoryEntry(
+            message: entry.message,
+            occurredAt: entry.occurredAt,
+            rawOccurredAt: entry.rawOccurredAt,
+            source: LifeCounterHistoryEntrySource.archive,
+          ),
+        )
+        .toList(growable: false);
+    final nextArchivedGames = <LifeCounterArchivedGame>[
+      ...archivedGames,
+      if (hasCurrentEvents)
+        LifeCounterArchivedGame(
+          name: currentGameName,
+          metadata: Map<String, Object?>.unmodifiable(<String, Object?>{
+            ...?currentGameMeta,
+          }),
+          entries: List<LifeCounterHistoryEntry>.unmodifiable(
+            archivedCurrentEntries,
+          ),
+        ),
+    ];
+    final cleared = copyWith(
+      currentGameName: null,
+      currentGameMeta: null,
+      currentGameEntries: const <LifeCounterHistoryEntry>[],
+      archiveEntries: <LifeCounterHistoryEntry>[
+        ...archiveEntries,
+        ...archivedCurrentEntries,
+      ],
+      archivedGames: nextArchivedGames,
+      archivedGameCount:
+          hasCurrentEvents ? archivedGameCount + 1 : archivedGameCount,
+      gameCounter: hasCurrentEvents ? gameCounter + 1 : gameCounter,
+      lastTableEvent: null,
+    );
+    return cleared.withStableCurrentGameMeta(
+      startDateEpochMs: startDateEpochMs,
+      session: session,
     );
   }
 
@@ -423,7 +488,7 @@ class LifeCounterHistoryState {
 
     final archiveGames = <Map<String, Object?>>[
       <String, Object?>{
-        'name': currentGameName ?? 'Imported History',
+        'name': currentGameName ?? 'Histórico importado',
         'history': archiveEntries
             .map(LifeCounterHistorySnapshot._encodeEntryForLotus)
             .toList(growable: false),
@@ -432,7 +497,7 @@ class LifeCounterHistoryState {
 
     for (var index = 1; index < archivedGameCount; index += 1) {
       archiveGames.add(<String, Object?>{
-        'name': 'Archived Game #${index + 1}',
+        'name': 'Partida arquivada #${index + 1}',
         'history': const <Object?>[],
       });
     }
@@ -718,7 +783,7 @@ class LifeCounterHistorySnapshot {
       ], source: LifeCounterHistoryEntrySource.archive);
       games.add(
         LifeCounterArchivedGame(
-          name: 'Archived Game #${index + 1}',
+          name: 'Partida arquivada #${index + 1}',
           entries: entries,
         ),
       );

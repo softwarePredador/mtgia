@@ -10,7 +10,7 @@ Future<Response> onRequest(RequestContext context) async {
     return methodNotAllowed();
   }
 
-  final userId = readAuthenticatedUserId(context);
+  final userId = await readAuthenticatedUserId(context);
   if (userId == null) return authenticationRequired();
 
   final params = context.request.uri.queryParameters;
@@ -26,7 +26,9 @@ Future<Response> onRequest(RequestContext context) async {
     );
     return Response.json(body: payload);
   } catch (error) {
-    return internalServerError('Falha ao buscar matches de trade',
-        details: error);
+    return internalServerError(
+      'Falha ao buscar matches de trade',
+      details: error,
+    );
   }
 }

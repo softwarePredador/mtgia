@@ -7,6 +7,7 @@ import 'package:sentry_flutter/sentry_flutter.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 
 import '../../../core/observability/app_observability.dart';
+import '../../../core/theme/app_theme.dart';
 import '../life_counter/life_counter_day_night_state.dart';
 import '../life_counter/life_counter_day_night_state_store.dart';
 import '../life_counter/life_counter_game_timer_state.dart';
@@ -360,12 +361,21 @@ Future<LotusCanonicalMirrorResult> persistCanonicalMirrorFromLotusSnapshot({
   final derivedSettings = LotusLifeCounterSettingsAdapter.tryBuildSettings(
     snapshot,
   );
-  final derivedSession =
+  final normalizedSession =
       parsedSession == null || derivedSettings == null
           ? parsedSession
           : LifeCounterTabletopEngine.normalizeOwnedBoardSession(
             parsedSession,
             settings: derivedSettings,
+          );
+  final derivedSession =
+      normalizedSession == null || previousSession == null
+          ? normalizedSession
+          : normalizedSession.copyWith(
+            playSessionId: previousSession.playSessionId,
+            deckId: previousSession.deckId,
+            deckName: previousSession.deckName,
+            startedAtEpochMs: previousSession.startedAtEpochMs,
           );
   final parsedGameTimer = LotusLifeCounterGameTimerAdapter.tryBuildState(
     snapshot,
@@ -627,11 +637,11 @@ class LotusHostController
         LotusLiveStoragePatchCoordinator,
         LotusStorageFlushBarrier {
   static const String _bundleLoadErrorMessage =
-      'ManaLoom could not open the embedded life counter. '
-      'Check the local bundle and try again.';
+      'O ManaLoom não conseguiu abrir o contador de vida. '
+      'Tente carregar novamente.';
   static const String _storageBootstrapErrorMessage =
-      'ManaLoom could not safely restore the life counter state. '
-      'Try loading it again.';
+      'O ManaLoom não conseguiu restaurar o estado do contador de vida. '
+      'Tente carregar novamente.';
 
   LotusHostController({
     required LotusAppReviewCallback onAppReviewRequested,
@@ -911,7 +921,7 @@ class LotusHostController
 
     webViewController
       ..setJavaScriptMode(JavaScriptMode.unrestricted)
-      ..setBackgroundColor(Colors.black)
+      ..setBackgroundColor(AppTheme.lifeCounterBlack)
       ..enableZoom(false)
       ..setOnConsoleMessage(_handleConsoleMessage)
       ..setNavigationDelegate(

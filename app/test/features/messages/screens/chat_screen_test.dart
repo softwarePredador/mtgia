@@ -144,4 +144,30 @@ void main() {
       findsOneWidget,
     );
   });
+
+  testWidgets('chat preserva mobile e limita coluna de leitura no desktop', (
+    tester,
+  ) async {
+    for (final size in const [Size(390, 800), Size(1280, 900)]) {
+      tester.view.physicalSize = size;
+      tester.view.devicePixelRatio = 1;
+      final provider = MessageProvider(
+        apiClient: _ChatApiClient(messagesStatus: 200, sendStatus: 201),
+      );
+
+      await _pumpChat(tester, provider: provider);
+
+      final columnSize = tester.getSize(
+        find.byKey(const Key('chat-reading-column')),
+      );
+      expect(columnSize.width, lessThanOrEqualTo(760));
+      expect(columnSize.width, lessThanOrEqualTo(size.width));
+      expect(tester.takeException(), isNull);
+
+      await tester.pumpWidget(const SizedBox.shrink());
+      await tester.pump();
+    }
+    tester.view.resetPhysicalSize();
+    tester.view.resetDevicePixelRatio();
+  });
 }

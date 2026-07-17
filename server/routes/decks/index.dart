@@ -242,12 +242,14 @@ Future<Response> _listDecks(RequestContext context) async {
         for (final deck in decks) {
           final deckId = deck['id']?.toString() ?? '';
           deck['color_identity'] = colorMap[deckId] ?? <String>[];
+          deck['color_identity_known'] = true;
         }
       } catch (e) {
         Log.e('⚠️ Falha ao buscar color_identity: $e');
         // Non-critical — continue without color identity
         for (final deck in decks) {
           deck['color_identity'] = <String>[];
+          deck['color_identity_known'] = false;
         }
       }
     }

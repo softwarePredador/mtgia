@@ -153,7 +153,7 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      expect(find.text('Player Counter'), findsOneWidget);
+      expect(find.text('Marcadores do jogador'), findsOneWidget);
 
       await tester.enterText(
         find.byKey(const Key('life-counter-native-player-counter-custom-name')),

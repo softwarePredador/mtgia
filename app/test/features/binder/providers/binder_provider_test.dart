@@ -48,7 +48,10 @@ class _FakeBinderApiClient extends ApiClient {
   }
 
   @override
-  Future<ApiResponse> delete(String endpoint) async {
+  Future<ApiResponse> delete(
+    String endpoint, {
+    Map<String, dynamic>? body,
+  }) async {
     deletedItemId = endpoint.split('/').last;
     return ApiResponse(204, null);
   }

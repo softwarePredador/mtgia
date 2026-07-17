@@ -58,7 +58,7 @@ Future<Response> _createTrade(RequestContext context) async {
       return Response.json(
         statusCode: HttpStatus.badRequest,
         body: {
-          'error': 'payment_method inválido. Use: pix, cash, transfer, other'
+          'error': 'payment_method inválido. Use: pix, cash, transfer, other',
         },
       );
     }
@@ -83,8 +83,10 @@ Future<Response> _createTrade(RequestContext context) async {
         body: {'error': parsedMyItems.error},
       );
     }
-    final parsedRequestedItems =
-        _parseTradeItems(requestedItems, 'requested_items');
+    final parsedRequestedItems = _parseTradeItems(
+      requestedItems,
+      'requested_items',
+    );
     if (parsedRequestedItems.error != null) {
       _logInvalidPayload(context, 'POST /trades', parsedRequestedItems.error!);
       return Response.json(
@@ -93,10 +95,16 @@ Future<Response> _createTrade(RequestContext context) async {
       );
     }
 
-    final validationResult = await pool.execute(Sql.named('''
+    final validationResult = await pool.execute(
+      Sql.named('''
       WITH checks AS (
         SELECT
-          EXISTS(SELECT 1 FROM users WHERE id = @receiverId) AS receiver_exists,
+          EXISTS(
+            SELECT 1
+            FROM users
+            WHERE id = @receiverId
+              AND deleted_at IS NULL
+          ) AS receiver_exists,
           (
             SELECT COUNT(*)::int
             FROM user_binder_items
@@ -123,12 +131,14 @@ Future<Response> _createTrade(RequestContext context) async {
           ) AS requested_available
       )
       SELECT * FROM checks
-    '''), parameters: {
-      'receiverId': receiverId,
-      'userId': userId,
-      'myIds': parsedMyItems.uniqueIds,
-      'requestedIds': parsedRequestedItems.uniqueIds,
-    });
+    '''),
+      parameters: {
+        'receiverId': receiverId,
+        'userId': userId,
+        'myIds': parsedMyItems.uniqueIds,
+        'requestedIds': parsedRequestedItems.uniqueIds,
+      },
+    );
     final validation = validationResult.first.toColumnMap();
     if (validation['receiver_exists'] != true) {
       return Response.json(
@@ -154,7 +164,7 @@ Future<Response> _createTrade(RequestContext context) async {
         statusCode: HttpStatus.badRequest,
         body: {
           'error':
-              'Um ou mais itens não pertencem ao destinatário ou não existem'
+              'Um ou mais itens não pertencem ao destinatário ou não existem',
         },
       );
     }
@@ -164,14 +174,29 @@ Future<Response> _createTrade(RequestContext context) async {
         statusCode: HttpStatus.badRequest,
         body: {
           'error':
-              'Um ou mais itens do destinatário não estão disponíveis para troca/venda'
+              'Um ou mais itens do destinatário não estão disponíveis para troca/venda',
         },
       );
     }
 
     // Criar trade, itens e histórico em um único round-trip ao PostgreSQL remoto.
     final tradeResult = await pool.runTx((session) async {
-      final result = await session.execute(Sql.named('''
+      final participantIds = <String>[userId, receiverId]..sort();
+      final activeUsers = await session.execute(
+        Sql.named('''
+          SELECT id
+          FROM users
+          WHERE id = ANY(@participantIds::uuid[])
+            AND deleted_at IS NULL
+          ORDER BY id
+          FOR UPDATE
+        '''),
+        parameters: {'participantIds': participantIds},
+      );
+      if (activeUsers.length != 2) return null;
+
+      final result = await session.execute(
+        Sql.named('''
         WITH offer AS (
           INSERT INTO trade_offers (
             sender_id,
@@ -262,18 +287,21 @@ Future<Response> _createTrade(RequestContext context) async {
           (SELECT COUNT(*)::int FROM offering_items) AS my_items_count,
           (SELECT COUNT(*)::int FROM requesting_items) AS requested_items_count
         FROM offer, history
-      '''), parameters: {
-        'senderId': userId,
-        'receiverId': receiverId,
-        'type': type,
-        'message': message,
-        'paymentAmount': paymentAmount != null
-            ? double.tryParse(paymentAmount.toString())
-            : null,
-        'paymentMethod': paymentMethod,
-        'myItems': jsonEncode(parsedMyItems.rows),
-        'requestedItems': jsonEncode(parsedRequestedItems.rows),
-      });
+      '''),
+        parameters: {
+          'senderId': userId,
+          'receiverId': receiverId,
+          'type': type,
+          'message': message,
+          'paymentAmount':
+              paymentAmount != null
+                  ? double.tryParse(paymentAmount.toString())
+                  : null,
+          'paymentMethod': paymentMethod,
+          'myItems': jsonEncode(parsedMyItems.rows),
+          'requestedItems': jsonEncode(parsedRequestedItems.rows),
+        },
+      );
       final offer = result.first.toColumnMap();
       final tradeId = offer['id'] as String;
 
@@ -287,15 +315,22 @@ Future<Response> _createTrade(RequestContext context) async {
         'status': offer['status'],
         'type': offer['type'],
         'message': offer['message'],
-        'payment_amount': offer['payment_amount'] != null
-            ? double.tryParse(offer['payment_amount'].toString())
-            : null,
+        'payment_amount':
+            offer['payment_amount'] != null
+                ? double.tryParse(offer['payment_amount'].toString())
+                : null,
         'payment_currency': offer['payment_currency'],
         'my_items_count': offer['my_items_count'],
         'requested_items_count': offer['requested_items_count'],
         'created_at': offer['created_at'],
       };
     });
+    if (tradeResult == null) {
+      return Response.json(
+        statusCode: HttpStatus.notFound,
+        body: {'error': 'Usuário destinatário não encontrado'},
+      );
+    }
 
     NotificationService.createFromActorDeferred(
       pool: pool,
@@ -368,9 +403,10 @@ _ParsedTradeItems _parseTradeItems(
     }
 
     final quantityRaw = item['quantity'];
-    final quantity = quantityRaw == null
-        ? 1
-        : quantityRaw is int
+    final quantity =
+        quantityRaw == null
+            ? 1
+            : quantityRaw is int
             ? quantityRaw
             : int.tryParse(quantityRaw.toString());
     if (quantity == null || quantity < 1) {
@@ -451,7 +487,8 @@ Future<Response> _listTrades(RequestContext context) async {
     );
 
     // Fetch
-    final tradesFuture = pool.execute(Sql.named('''
+    final tradesFuture = pool.execute(
+      Sql.named('''
       SELECT
         t.id, t.status, t.type, t.message,
         t.payment_amount, t.payment_currency,
@@ -488,56 +525,58 @@ Future<Response> _listTrades(RequestContext context) async {
       WHERE $where
       ORDER BY t.updated_at DESC
       LIMIT @lim OFFSET @off
-    '''), parameters: {...filterParams, 'lim': limit, 'off': offset});
+    '''),
+      parameters: {...filterParams, 'lim': limit, 'off': offset},
+    );
 
     final queryResults = await Future.wait([countFuture, tradesFuture]);
     final countResult = queryResults[0];
     final result = queryResults[1];
     final total = (countResult.first[0] as int?) ?? 0;
 
-    final trades = result.map((row) {
-      final m = row.toColumnMap();
-      for (final k in ['created_at', 'updated_at']) {
-        if (m[k] is DateTime) m[k] = (m[k] as DateTime).toIso8601String();
-      }
-      if (m['payment_amount'] != null) {
-        m['payment_amount'] = double.tryParse(m['payment_amount'].toString());
-      }
-      return {
-        'id': m['id'],
-        'status': m['status'],
-        'type': m['type'],
-        'message': m['message'],
-        'payment_amount': m['payment_amount'],
-        'payment_currency': m['payment_currency'],
-        'tracking_code': m['tracking_code'],
-        'delivery_method': m['delivery_method'],
-        'sender': {
-          'id': m['sender_id'],
-          'username': m['sender_username'],
-          'display_name': m['sender_display_name'],
-          'trust': _buildTrustInsight(m, 'sender_'),
-        },
-        'receiver': {
-          'id': m['receiver_id'],
-          'username': m['receiver_username'],
-          'display_name': m['receiver_display_name'],
-          'trust': _buildTrustInsight(m, 'receiver_'),
-        },
-        'offering_count': m['offering_count'],
-        'requesting_count': m['requesting_count'],
-        'message_count': m['message_count'],
-        'created_at': m['created_at'],
-        'updated_at': m['updated_at'],
-      };
-    }).toList();
+    final trades =
+        result.map((row) {
+          final m = row.toColumnMap();
+          for (final k in ['created_at', 'updated_at']) {
+            if (m[k] is DateTime) m[k] = (m[k] as DateTime).toIso8601String();
+          }
+          if (m['payment_amount'] != null) {
+            m['payment_amount'] = double.tryParse(
+              m['payment_amount'].toString(),
+            );
+          }
+          return {
+            'id': m['id'],
+            'status': m['status'],
+            'type': m['type'],
+            'message': m['message'],
+            'payment_amount': m['payment_amount'],
+            'payment_currency': m['payment_currency'],
+            'tracking_code': m['tracking_code'],
+            'delivery_method': m['delivery_method'],
+            'sender': {
+              'id': m['sender_id'],
+              'username': m['sender_username'],
+              'display_name': m['sender_display_name'],
+              'trust': _buildTrustInsight(m, 'sender_'),
+            },
+            'receiver': {
+              'id': m['receiver_id'],
+              'username': m['receiver_username'],
+              'display_name': m['receiver_display_name'],
+              'trust': _buildTrustInsight(m, 'receiver_'),
+            },
+            'offering_count': m['offering_count'],
+            'requesting_count': m['requesting_count'],
+            'message_count': m['message_count'],
+            'created_at': m['created_at'],
+            'updated_at': m['updated_at'],
+          };
+        }).toList();
 
-    return Response.json(body: {
-      'data': trades,
-      'page': page,
-      'limit': limit,
-      'total': total,
-    });
+    return Response.json(
+      body: {'data': trades, 'page': page, 'limit': limit, 'total': total},
+    );
   } catch (e, st) {
     await captureRouteException(
       context,
@@ -610,9 +649,11 @@ Map<String, dynamic> _buildTrustInsight(
   final disputed = _toInt(cols['${prefix}disputed_trades']);
   final totalSignals = completed + cancelled + declined + disputed;
   final createdAt = cols['${prefix}created_at'];
-  final isNewAccount = createdAt is DateTime &&
+  final isNewAccount =
+      createdAt is DateTime &&
       DateTime.now().toUtc().difference(createdAt.toUtc()).inDays < 30;
-  final profileIncomplete = (cols['${prefix}display_name'] == null ||
+  final profileIncomplete =
+      (cols['${prefix}display_name'] == null ||
           cols['${prefix}display_name'].toString().trim().isEmpty) ||
       (cols['${prefix}location_state'] == null ||
           cols['${prefix}location_state'].toString().trim().isEmpty) ||

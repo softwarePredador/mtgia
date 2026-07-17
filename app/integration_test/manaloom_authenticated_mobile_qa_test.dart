@@ -113,18 +113,31 @@ void main() {
       await captureRuntimeCheckpoint(binding, tester, 'mobile_qa_07_profile');
 
       await _goRoute(tester, '/plans');
-      await pumpUntilFound(tester, find.text('Planos'), attempts: 80);
+      await pumpUntilFound(tester, find.text('Beta gratuita'), attempts: 80);
+      expect(find.byKey(const Key('beta-free-access-panel')), findsOneWidget);
       await _assertClean(tester, 'plans');
       await captureRuntimeCheckpoint(binding, tester, 'mobile_qa_08_plans');
 
       await _goRoute(tester, '/upgrade');
-      await pumpUntilFound(tester, find.text('Upgrade Pro'), attempts: 80);
+      await pumpUntilFound(
+        tester,
+        find.byKey(const Key('upgrade-beta-notice')),
+        attempts: 80,
+      );
+      expect(
+        find.byKey(const Key('upgrade-start-checkout-button')),
+        findsNothing,
+      );
       await _assertClean(tester, 'upgrade');
       await captureRuntimeCheckpoint(binding, tester, 'mobile_qa_09_upgrade');
 
       await _goRoute(tester, '/checkout');
-      await pumpUntilFound(tester, find.text('Checkout'), attempts: 80);
-      expect(find.byKey(const Key('checkout-confirm-button')), findsOneWidget);
+      await pumpUntilFound(
+        tester,
+        find.byKey(const Key('checkout-beta-notice')),
+        attempts: 80,
+      );
+      expect(find.byKey(const Key('checkout-confirm-button')), findsNothing);
       await _assertClean(tester, 'checkout');
       await captureRuntimeCheckpoint(binding, tester, 'mobile_qa_10_checkout');
 
@@ -154,9 +167,10 @@ void main() {
         find.byKey(const Key('ai-paywall-dialog')),
         attempts: 40,
       );
-      expect(find.textContaining('precisa do Pro'), findsOneWidget);
+      expect(find.textContaining('limite da beta atingido'), findsOneWidget);
+      expect(find.byKey(const Key('ai-paywall-upgrade-button')), findsNothing);
       expect(
-        find.byKey(const Key('ai-paywall-upgrade-button')),
+        find.byKey(const Key('ai-beta-limit-dismiss-button')),
         findsOneWidget,
       );
       await _assertClean(tester, 'ai paywall');

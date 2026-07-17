@@ -123,194 +123,191 @@ List<LifeCounterSettingsSection> buildLifeCounterSettingsCatalog(
   return <LifeCounterSettingsSection>[
     LifeCounterSettingsSection(
       id: LifeCounterSettingsSectionId.gameplay,
-      title: 'Gameplay',
+      title: 'Partida',
       entries: <LifeCounterSettingEntry>[
         LifeCounterSettingEntry.toggle(
           id: LifeCounterSettingFieldId.autoKill,
           sectionId: LifeCounterSettingsSectionId.gameplay,
-          label: 'Auto-kill',
+          label: 'Nocaute automático',
           description:
-              'Eliminate players automatically from life, poison, or commander damage.',
+              'Elimine jogadores automaticamente por vida, veneno ou dano de comandante.',
           value: settings.autoKill,
         ),
         LifeCounterSettingEntry.toggle(
           id: LifeCounterSettingFieldId.lifeLossOnCommanderDamage,
           sectionId: LifeCounterSettingsSectionId.gameplay,
-          label: 'Life loss on commander damage',
+          label: 'Perder vida com dano de comandante',
           description:
-              'Apply commander damage changes to life totals as well as tracked damage.',
+              'Aplique o dano de comandante também ao total de vida do jogador.',
           value: settings.lifeLossOnCommanderDamage,
         ),
         LifeCounterSettingEntry.toggle(
           id: LifeCounterSettingFieldId.setLifeByTappingNumber,
           sectionId: LifeCounterSettingsSectionId.gameplay,
-          label: 'Set life by tapping number',
+          label: 'Definir vida ao tocar no número',
           description:
-              'Allow direct life input by tapping the life total on a player card.',
+              'Permita inserir a vida diretamente ao tocar no total do jogador.',
           value: settings.setLifeByTappingNumber,
         ),
         LifeCounterSettingEntry.toggle(
           id: LifeCounterSettingFieldId.verticalTapAreas,
           sectionId: LifeCounterSettingsSectionId.gameplay,
-          label: 'Vertical tap areas',
+          label: 'Áreas de toque verticais',
           description:
-              'Use vertical tap zones for life adjustments on the player card.',
+              'Use zonas verticais de toque para ajustar a vida no painel do jogador.',
           value: settings.verticalTapAreas,
         ),
         LifeCounterSettingEntry.toggle(
           id: LifeCounterSettingFieldId.criticalDamageWarning,
           sectionId: LifeCounterSettingsSectionId.gameplay,
-          label: 'Critical damage warning',
+          label: 'Aviso de dano crítico',
           description:
-              'Highlight players that are close to elimination from low life.',
+              'Destaque jogadores próximos da eliminação por vida baixa.',
           value: settings.criticalDamageWarning,
         ),
       ],
     ),
     LifeCounterSettingsSection(
       id: LifeCounterSettingsSectionId.counters,
-      title: 'Counters',
+      title: 'Marcadores',
       entries: <LifeCounterSettingEntry>[
         LifeCounterSettingEntry.toggle(
           id: LifeCounterSettingFieldId.showCountersOnPlayerCard,
           sectionId: LifeCounterSettingsSectionId.counters,
-          label: 'Counters on player card',
-          description:
-              'Render counters directly on the player card instead of hiding them.',
+          label: 'Marcadores no painel do jogador',
+          description: 'Exiba os marcadores diretamente no painel do jogador.',
           value: settings.showCountersOnPlayerCard,
         ),
         LifeCounterSettingEntry.toggle(
           id: LifeCounterSettingFieldId.showRegularCounters,
           sectionId: LifeCounterSettingsSectionId.counters,
-          label: 'Regular counters',
+          label: 'Marcadores gerais',
           description:
-              'Show poison, energy, experience and related counters on the card.',
+              'Mostre marcadores de veneno, energia, experiência e semelhantes.',
           value: settings.showRegularCounters,
         ),
         LifeCounterSettingEntry.toggle(
           id: LifeCounterSettingFieldId.showCommanderDamageCounters,
           sectionId: LifeCounterSettingsSectionId.counters,
-          label: 'Commander damage counters',
-          description: 'Render commander damage counters on player cards.',
+          label: 'Marcadores de dano de comandante',
+          description: 'Exiba o dano de comandante nos painéis dos jogadores.',
           value: settings.showCommanderDamageCounters,
         ),
         LifeCounterSettingEntry.toggle(
           id: LifeCounterSettingFieldId.clickableCommanderDamageCounters,
           sectionId: LifeCounterSettingsSectionId.counters,
-          label: 'Clickable commander damage counters',
+          label: 'Dano de comandante interativo',
           description:
-              'Let commander damage counters act as direct interaction targets.',
+              'Permita ajustar o dano de comandante diretamente pelos marcadores.',
           value: settings.clickableCommanderDamageCounters,
         ),
         LifeCounterSettingEntry.toggle(
           id: LifeCounterSettingFieldId.keepZeroCountersOnPlayerCard,
           sectionId: LifeCounterSettingsSectionId.counters,
-          label: 'Keep zero counters visible',
+          label: 'Manter marcadores zerados visíveis',
           description:
-              'Keep counter chips on the player card even when their value is zero.',
+              'Mantenha os marcadores no painel mesmo quando o valor for zero.',
           value: settings.keepZeroCountersOnPlayerCard,
         ),
       ],
     ),
     LifeCounterSettingsSection(
       id: LifeCounterSettingsSectionId.timers,
-      title: 'Timers',
+      title: 'Cronômetros',
       entries: <LifeCounterSettingEntry>[
         LifeCounterSettingEntry.toggle(
           id: LifeCounterSettingFieldId.gameTimer,
           sectionId: LifeCounterSettingsSectionId.timers,
-          label: 'Game timer',
-          description: 'Track the overall match duration.',
+          label: 'Cronômetro da partida',
+          description: 'Acompanhe a duração total da partida.',
           value: settings.gameTimer,
         ),
         LifeCounterSettingEntry.toggle(
           id: LifeCounterSettingFieldId.gameTimerMainScreen,
           sectionId: LifeCounterSettingsSectionId.timers,
-          label: 'Game timer on main screen',
-          description: 'Show the match timer directly on the tabletop.',
+          label: 'Cronômetro na tela principal',
+          description: 'Mostre o cronômetro da partida diretamente na mesa.',
           value: settings.gameTimerMainScreen,
         ),
         LifeCounterSettingEntry.toggle(
           id: LifeCounterSettingFieldId.showClockOnMainScreen,
           sectionId: LifeCounterSettingsSectionId.timers,
-          label: 'Clock on main screen',
-          description: 'Show the current clock time on the tabletop.',
+          label: 'Relógio na tela principal',
+          description: 'Mostre o horário atual diretamente na mesa.',
           value: settings.showClockOnMainScreen,
         ),
       ],
     ),
     LifeCounterSettingsSection(
       id: LifeCounterSettingsSectionId.visuals,
-      title: 'Visuals',
+      title: 'Visual',
       entries: <LifeCounterSettingEntry>[
         LifeCounterSettingEntry.toggle(
           id: LifeCounterSettingFieldId.randomPlayerColors,
           sectionId: LifeCounterSettingsSectionId.visuals,
-          label: 'Random player colors',
-          description:
-              'Shuffle player card colors when the table is regenerated.',
+          label: 'Cores aleatórias dos jogadores',
+          description: 'Alterne as cores dos painéis ao reorganizar a mesa.',
           value: settings.randomPlayerColors,
         ),
         LifeCounterSettingEntry.toggle(
           id: LifeCounterSettingFieldId.preserveBackgroundImagesOnShuffle,
           sectionId: LifeCounterSettingsSectionId.visuals,
-          label: 'Preserve backgrounds on shuffle',
+          label: 'Preservar fundos ao embaralhar',
           description:
-              'Keep custom player background images when colors are reshuffled.',
+              'Mantenha as imagens de fundo ao reorganizar as cores dos jogadores.',
           value: settings.preserveBackgroundImagesOnShuffle,
         ),
         LifeCounterSettingEntry.toggle(
           id: LifeCounterSettingFieldId.cleanLook,
           sectionId: LifeCounterSettingsSectionId.visuals,
-          label: 'Clean look',
-          description:
-              'Reduce UI noise and extra visual treatments on the tabletop.',
+          label: 'Visual limpo',
+          description: 'Reduza elementos e efeitos visuais extras na mesa.',
           value: settings.cleanLook,
         ),
         LifeCounterSettingEntry.text(
           id: LifeCounterSettingFieldId.whitelabelIcon,
           sectionId: LifeCounterSettingsSectionId.visuals,
-          label: 'Whitelabel icon',
+          label: 'Ícone personalizado',
           description:
-              'Optional icon identifier used to customize the menu button shell.',
+              'Identificador opcional para personalizar o ícone do menu.',
           value: settings.whitelabelIcon,
         ),
       ],
     ),
     LifeCounterSettingsSection(
       id: LifeCounterSettingsSectionId.advanced,
-      title: 'Advanced',
+      title: 'Avançado',
       entries: <LifeCounterSettingEntry>[
         LifeCounterSettingEntry.toggle(
           id: LifeCounterSettingFieldId.saltyDefeatMessages,
           sectionId: LifeCounterSettingsSectionId.advanced,
-          label: 'Salty defeat messages',
+          label: 'Mensagens irreverentes de derrota',
           description:
-              'Show the rotating defeat messages from the original tabletop flow.',
+              'Mostre mensagens variadas quando um jogador for derrotado.',
           value: settings.saltyDefeatMessages,
         ),
         LifeCounterSettingEntry.toggle(
           id: LifeCounterSettingFieldId.cycleSaltyDefeatMessages,
           sectionId: LifeCounterSettingsSectionId.advanced,
-          label: 'Cycle defeat messages',
+          label: 'Alternar mensagens de derrota',
           description:
-              'Rotate defeat messages instead of repeating the same message.',
+              'Alterne as mensagens de derrota em vez de repetir sempre a mesma.',
           value: settings.cycleSaltyDefeatMessages,
         ),
         LifeCounterSettingEntry.toggle(
           id: LifeCounterSettingFieldId.customLongTapEnabled,
           sectionId: LifeCounterSettingsSectionId.advanced,
-          label: 'Custom long tap',
+          label: 'Toque longo personalizado',
           description:
-              'Enable a custom increment/decrement value on long press.',
+              'Use um valor personalizado para aumentar ou reduzir ao manter pressionado.',
           value: settings.customLongTapEnabled,
         ),
         LifeCounterSettingEntry.number(
           id: LifeCounterSettingFieldId.customLongTapValue,
           sectionId: LifeCounterSettingsSectionId.advanced,
-          label: 'Custom long tap value',
+          label: 'Valor do toque longo',
           description:
-              'Numeric value used when the custom long tap behavior is enabled.',
+              'Valor usado quando o toque longo personalizado estiver ativo.',
           value: settings.customLongTapValue,
         ),
       ],

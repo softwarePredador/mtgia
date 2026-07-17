@@ -2,8 +2,12 @@ import 'package:accessibility_tools/accessibility_tools.dart';
 import 'package:alchemist/alchemist.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:manaloom/core/theme/app_theme.dart';
 import 'package:manaloom/features/commercial/models/manaloom_plan.dart';
 import 'package:manaloom/features/commercial/providers/commercial_provider.dart';
+import 'package:manaloom/features/commercial/screens/checkout_screen.dart';
+import 'package:manaloom/features/commercial/screens/plan_screen.dart';
+import 'package:manaloom/features/commercial/screens/upgrade_screen.dart';
 import 'package:manaloom/features/commercial/widgets/ai_usage_gate.dart';
 import 'package:manaloom/features/commercial/widgets/ai_usage_meter.dart';
 import 'package:provider/provider.dart';
@@ -35,6 +39,39 @@ void main() {
                   child: _meterScenario(_proActiveProvider()),
                 ),
               ],
+            ),
+      );
+
+      goldenTest(
+        'free beta plans screen keeps the ManaLoom visual contract',
+        fileName: 'manaloom_commercial_beta_plans',
+        constraints: manaloomFullScreenGoldenConstraints,
+        builder:
+            () => _commercialScreenShell(
+              provider: _freeNearLimitProvider(),
+              child: const PlanScreen(),
+            ),
+      );
+
+      goldenTest(
+        'free beta upgrade fallback keeps the ManaLoom visual contract',
+        fileName: 'manaloom_commercial_beta_upgrade',
+        constraints: manaloomFullScreenGoldenConstraints,
+        builder:
+            () => _commercialScreenShell(
+              provider: _freeNearLimitProvider(),
+              child: const UpgradeScreen(),
+            ),
+      );
+
+      goldenTest(
+        'free beta checkout fallback keeps the ManaLoom visual contract',
+        fileName: 'manaloom_commercial_beta_checkout',
+        constraints: manaloomFullScreenGoldenConstraints,
+        builder:
+            () => _commercialScreenShell(
+              provider: _freeNearLimitProvider(),
+              child: const CheckoutScreen(),
             ),
       );
     },
@@ -95,6 +132,20 @@ Widget _commercialShell({
     value: provider,
     child: manaloomDecoratedAuditSurface(
       child: Padding(padding: const EdgeInsets.all(16), child: child),
+    ),
+  );
+}
+
+Widget _commercialScreenShell({
+  required CommercialProvider provider,
+  required Widget child,
+}) {
+  return ChangeNotifierProvider<CommercialProvider>.value(
+    value: provider,
+    child: MaterialApp(
+      debugShowCheckedModeBanner: false,
+      theme: AppTheme.darkTheme,
+      home: child,
     ),
   );
 }

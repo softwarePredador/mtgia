@@ -40,7 +40,10 @@ class MainScaffold extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final location = GoRouterState.of(context).uri.path;
-    int currentIndex = 0;
+    int? currentIndex;
+    if (location == '/home' || location.startsWith('/home/')) {
+      currentIndex = 0;
+    }
     if (location.startsWith('/decks')) {
       currentIndex = 1;
     } else if (location.startsWith('/collection') ||
@@ -57,13 +60,13 @@ class MainScaffold extends StatelessWidget {
       decoration: const BoxDecoration(gradient: AppTheme.scaffoldGradient),
       child: child,
     );
-    final showPrimaryNavigation = _primaryPaths.contains(location);
+    final isPrimaryRoot = _primaryPaths.contains(location);
 
     return LayoutBuilder(
       builder: (context, constraints) {
-        final useRail = showPrimaryNavigation && constraints.maxWidth >= 900;
+        final useRail = constraints.maxWidth >= AppTheme.breakpointMedium;
         if (useRail) {
-          final extended = constraints.maxWidth >= 1180;
+          final extended = constraints.maxWidth >= AppTheme.breakpointExpanded;
           return Scaffold(
             backgroundColor: AppTheme.backgroundAbyss,
             body: Row(
@@ -119,7 +122,7 @@ class MainScaffold extends StatelessWidget {
           backgroundColor: AppTheme.backgroundAbyss,
           body: content,
           bottomNavigationBar:
-              showPrimaryNavigation
+              isPrimaryRoot
                   ? Container(
                     key: const Key('main-bottom-navigation'),
                     decoration: const BoxDecoration(
@@ -131,7 +134,7 @@ class MainScaffold extends StatelessWidget {
                       ),
                     ),
                     child: NavigationBar(
-                      selectedIndex: currentIndex,
+                      selectedIndex: currentIndex ?? 0,
                       onDestinationSelected:
                           (index) => _selectDestination(context, index),
                       destinations: const [

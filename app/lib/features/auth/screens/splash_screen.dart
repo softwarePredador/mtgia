@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import '../../../core/theme/app_theme.dart';
+import '../auth_redirect.dart';
 import '../providers/auth_provider.dart';
 
 class SplashScreen extends StatefulWidget {
@@ -11,29 +12,6 @@ class SplashScreen extends StatefulWidget {
 
   @override
   State<SplashScreen> createState() => _SplashScreenState();
-}
-
-@visibleForTesting
-String? normalizePostSplashRedirect(String? redirectPath) {
-  final trimmed = redirectPath?.trim();
-  if (trimmed == null || trimmed.isEmpty) {
-    return null;
-  }
-
-  final uri = Uri.tryParse(trimmed);
-  if (uri == null || uri.hasScheme || uri.hasAuthority) {
-    return null;
-  }
-
-  final path = uri.path;
-  if (!path.startsWith('/') ||
-      path == '/' ||
-      path == '/login' ||
-      path == '/register') {
-    return null;
-  }
-
-  return uri.toString();
 }
 
 class _SplashScreenState extends State<SplashScreen>
@@ -80,9 +58,11 @@ class _SplashScreenState extends State<SplashScreen>
 
     if (!mounted) return;
 
-    final postAuthRedirect = normalizePostSplashRedirect(widget.redirectPath);
+    final postAuthRedirect = normalizePostAuthRedirect(widget.redirectPath);
     context.go(
-      authProvider.isAuthenticated ? postAuthRedirect ?? '/home' : '/login',
+      authProvider.isAuthenticated
+          ? postAuthRedirect ?? '/home'
+          : buildAuthLocation('/login', postAuthRedirect),
     );
   }
 

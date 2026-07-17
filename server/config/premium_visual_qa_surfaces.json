@@ -43,7 +43,6 @@
       "label": "Meus Decks",
       "files": [
         "app/lib/features/decks/screens/deck_list_screen.dart",
-        "app/lib/features/decks/widgets/deck_card.dart",
         "app/lib/features/decks/widgets/deck_ui_components.dart"
       ],
       "captures": ["04_decks"],

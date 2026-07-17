@@ -9,7 +9,8 @@ import '../models/deck_card_item.dart';
 import '../models/deck_details.dart';
 
 /// Simulador de mão inicial — permite ao jogador "testar" mãos de 7 cartas
-/// aleatórias do deck, com opção de mulligan (nova mão com -1 carta).
+/// aleatórias do deck, com opção de London mulligan. Cada mulligan compra uma
+/// nova mão de sete e informa quantas cartas devem ir para o fundo do grimório.
 ///
 /// Fundamental para qualquer jogador de MTG avaliar a consistência do deck.
 class SampleHandWidget extends StatefulWidget {
@@ -33,7 +34,7 @@ class SampleHandWidget extends StatefulWidget {
 class _SampleHandWidgetState extends State<SampleHandWidget>
     with SingleTickerProviderStateMixin {
   List<DeckCardItem> _hand = [];
-  int _handSize = 7;
+  int _mulligansTaken = 0;
   bool _isDrawn = false;
   late AnimationController _animController;
   late Animation<double> _fadeAnim;
@@ -72,27 +73,28 @@ class _SampleHandWidgetState extends State<SampleHandWidget>
     return pool;
   }
 
-  void _drawHand(int size) {
+  void _drawHand() {
     final pool = _buildPool();
     if (pool.isEmpty) return;
 
     pool.shuffle(_random);
-    final drawSize = min(size, pool.length);
+    final drawSize = min(7, pool.length);
     setState(() {
       _hand = pool.take(drawSize).toList();
-      _handSize = size;
       _isDrawn = true;
     });
     _animController.forward(from: 0);
   }
 
   void _mulligan() {
-    final newSize = max(1, _handSize - 1);
-    _drawHand(newSize);
+    if (_mulligansTaken >= 7) return;
+    _mulligansTaken += 1;
+    _drawHand();
   }
 
   void _newHand() {
-    _drawHand(7);
+    _mulligansTaken = 0;
+    _drawHand();
   }
 
   int get _landCount =>
@@ -179,14 +181,17 @@ class _SampleHandWidgetState extends State<SampleHandWidget>
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final assessment = _assessment;
-    final previewHeight = widget.compact ? 122.0 : 160.0;
+    final previewHeight = widget.compact ? 128.0 : 164.0;
     final imageWidth = widget.compact ? 74.0 : 90.0;
     final imageHeight = widget.compact ? 104.0 : 126.0;
     final horizontalPadding = widget.compact ? 14.0 : 16.0;
     final verticalPadding = widget.compact ? 14.0 : 16.0;
 
     return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      margin:
+          widget.compact
+              ? EdgeInsets.zero
+              : const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       padding: EdgeInsets.symmetric(
         horizontal: horizontalPadding,
         vertical: verticalPadding,
@@ -219,7 +224,11 @@ class _SampleHandWidgetState extends State<SampleHandWidget>
                 Padding(
                   padding: const EdgeInsets.only(left: 8),
                   child: Text(
-                    '$_handSize cartas',
+                    _mulligansTaken == 0
+                        ? '${_hand.length} cartas'
+                        : widget.compact
+                        ? '${_hand.length} · fundo $_mulligansTaken'
+                        : '${_hand.length} cartas · $_mulligansTaken ao fundo',
                     style: theme.textTheme.bodySmall?.copyWith(
                       color: AppTheme.textSecondary,
                     ),
@@ -235,7 +244,7 @@ class _SampleHandWidgetState extends State<SampleHandWidget>
               width: double.infinity,
               child: ElevatedButton.icon(
                 key: const Key('sample-hand-draw'),
-                onPressed: () => _drawHand(7),
+                onPressed: _newHand,
                 icon: const Icon(Icons.casino, size: 20),
                 label: const Text('Comprar 7 cartas'),
                 style: ElevatedButton.styleFrom(
@@ -266,22 +275,27 @@ class _SampleHandWidgetState extends State<SampleHandWidget>
                 borderRadius: BorderRadius.circular(AppTheme.radiusSm),
               ),
               child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
                 children: [
-                  _StatChip(
-                    label: 'Terrenos',
-                    value: '$_landCount',
-                    color: AppTheme.mythicGold,
+                  Expanded(
+                    child: _StatChip(
+                      label: 'Terrenos',
+                      value: '$_landCount',
+                      color: AppTheme.mythicGold,
+                    ),
                   ),
-                  _StatChip(
-                    label: 'Magias',
-                    value: '$_nonLandCount',
-                    color: AppTheme.primarySoft,
+                  Expanded(
+                    child: _StatChip(
+                      label: 'Magias',
+                      value: '$_nonLandCount',
+                      color: AppTheme.primarySoft,
+                    ),
                   ),
-                  _StatChip(
-                    label: 'Total',
-                    value: '${_hand.length}',
-                    color: AppTheme.manaViolet,
+                  Expanded(
+                    child: _StatChip(
+                      label: 'Total',
+                      value: '${_hand.length}',
+                      color: AppTheme.manaViolet,
+                    ),
                   ),
                 ],
               ),
@@ -330,6 +344,32 @@ class _SampleHandWidgetState extends State<SampleHandWidget>
               ),
             ),
             const SizedBox(height: 12),
+            if (_mulligansTaken > 0) ...[
+              Container(
+                key: const Key('sample-hand-bottom-guidance'),
+                width: double.infinity,
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 10,
+                ),
+                decoration: BoxDecoration(
+                  color: AppTheme.frost400.withValues(alpha: 0.10),
+                  borderRadius: BorderRadius.circular(AppTheme.radiusSm),
+                  border: Border.all(
+                    color: AppTheme.frost400.withValues(alpha: 0.28),
+                  ),
+                ),
+                child: Text(
+                  'Mulligan de Londres: escolha e coloque '
+                  '$_mulligansTaken ${_mulligansTaken == 1 ? 'carta' : 'cartas'} '
+                  'no fundo do grimório antes de manter.',
+                  style: theme.textTheme.bodySmall?.copyWith(
+                    color: AppTheme.textPrimary,
+                  ),
+                ),
+              ),
+              const SizedBox(height: 12),
+            ],
 
             // Hand display
             FadeTransition(
@@ -345,43 +385,51 @@ class _SampleHandWidgetState extends State<SampleHandWidget>
             ),
             const SizedBox(height: 12),
 
-            // Action buttons
-            Wrap(
-              spacing: 8,
-              runSpacing: 8,
-              children: [
-                SizedBox(
-                  width: widget.compact ? double.infinity : null,
-                  child: OutlinedButton.icon(
-                    key: const Key('sample-hand-mulligan'),
-                    onPressed: _handSize > 1 ? _mulligan : null,
-                    icon: const Icon(Icons.refresh, size: 18),
-                    label: Text('Mulligan (${max(1, _handSize - 1)})'),
-                    style: OutlinedButton.styleFrom(
-                      foregroundColor: AppTheme.mythicGold,
-                      side: BorderSide(
-                        color:
-                            _handSize > 1
-                                ? AppTheme.mythicGold.withValues(alpha: 0.5)
-                                : AppTheme.outlineMuted,
-                      ),
+            // Action buttons stay compact on desktop and become full-width
+            // only when the available pane is genuinely narrow.
+            LayoutBuilder(
+              builder: (context, constraints) {
+                final stackActions = constraints.maxWidth < 520;
+                final mulligan = OutlinedButton.icon(
+                  key: const Key('sample-hand-mulligan'),
+                  onPressed: _mulligansTaken < 7 ? _mulligan : null,
+                  icon: const Icon(Icons.refresh, size: 18),
+                  label: const Text('Mulligan'),
+                  style: OutlinedButton.styleFrom(
+                    minimumSize: const Size(0, AppTheme.touchTargetMin),
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    foregroundColor: AppTheme.mythicGold,
+                    side: BorderSide(
+                      color:
+                          _mulligansTaken < 7
+                              ? AppTheme.mythicGold.withValues(alpha: 0.5)
+                              : AppTheme.outlineMuted,
                     ),
                   ),
-                ),
-                SizedBox(
-                  width: widget.compact ? double.infinity : null,
-                  child: ElevatedButton.icon(
-                    key: const Key('sample-hand-new-hand'),
-                    onPressed: _newHand,
-                    icon: const Icon(Icons.casino, size: 18),
-                    label: const Text('Nova Mão'),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: AppTheme.brass500,
-                      foregroundColor: AppTheme.backgroundAbyss,
-                    ),
+                );
+                final newHand = ElevatedButton.icon(
+                  key: const Key('sample-hand-new-hand'),
+                  onPressed: _newHand,
+                  icon: const Icon(Icons.casino, size: 18),
+                  label: const Text('Nova Mão'),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppTheme.brass500,
+                    foregroundColor: AppTheme.backgroundAbyss,
                   ),
-                ),
-              ],
+                );
+
+                if (stackActions) {
+                  return Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [mulligan, const SizedBox(height: 8), newHand],
+                  );
+                }
+
+                return Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [mulligan, const SizedBox(width: 8), newHand],
+                );
+              },
             ),
           ],
         ],
@@ -417,7 +465,7 @@ class _SampleHandCarousel extends StatelessWidget {
           final maxFraction = compact ? 0.42 : 0.34;
           final viewportFraction =
               (itemExtent / max(1, constraints.maxWidth))
-                  .clamp(0.18, maxFraction)
+                  .clamp(0.08, maxFraction)
                   .toDouble();
 
           return _SampleHandPageView(

@@ -107,8 +107,25 @@ void main() {
       expect(lotusInjectedVisualSkinScript, contains('box-sizing: border-box'));
       expect(lotusInjectedVisualSkinScript, contains('overflow: hidden'));
       expect(lotusInjectedVisualSkinScript, contains('box-shadow: none'));
-      expect(lotusInjectedVisualSkinScript, contains('Table preferences'));
-      expect(lotusInjectedVisualSkinScript, contains('Card search'));
+      expect(
+        lotusInjectedVisualSkinScript,
+        contains('calc((100% - 12px) / 3)'),
+      );
+      expect(lotusInjectedVisualSkinScript, contains('word-break: normal'));
+      expect(lotusInjectedVisualSkinScript, contains('Preferências da mesa'));
+      expect(lotusInjectedVisualSkinScript, contains('Busca de cartas'));
+      expect(
+        lotusInjectedVisualSkinScript,
+        contains("['Day/Night', 'Dia/Noite']"),
+      );
+      expect(
+        lotusInjectedVisualSkinScript,
+        contains("['Archenemy', 'Arqui-inimigo']"),
+      );
+      expect(
+        lotusInjectedVisualSkinScript,
+        contains("['Bounty', 'Recompensa']"),
+      );
       expect(lotusInjectedVisualSkinScript, contains('label > div'));
       expect(lotusInjectedVisualSkinScript, contains('72px'));
       expect(
@@ -122,6 +139,29 @@ void main() {
         greaterThanOrEqualTo(2),
       );
     });
+
+    test(
+      'keeps history actions clear of the close control on narrow screens',
+      () {
+        expect(
+          lotusInjectedVisualSkinScript,
+          contains('.life-history-overlay .all-games-btn'),
+        );
+        expect(lotusInjectedVisualSkinScript, contains('right: 82px'));
+        expect(
+          lotusInjectedVisualSkinScript,
+          contains('max-width: calc(100% - 100px)'),
+        );
+        expect(
+          lotusInjectedVisualSkinScript,
+          contains('text-overflow: ellipsis'),
+        );
+        expect(
+          lotusInjectedVisualSkinScript,
+          contains('padding-top: calc(env(safe-area-inset-top, 0px) + 78px)'),
+        );
+      },
+    );
 
     test('adds live status, dialog metadata and reduced-motion support', () {
       expect(
@@ -155,6 +195,29 @@ void main() {
       );
     });
 
+    test('localizes the embedded runtime without changing protocol keys', () {
+      expect(lotusInjectedVisualSkinScript, contains('syncPtBrCopy'));
+      expect(
+        lotusInjectedVisualSkinScript,
+        contains("['Settings', 'Configurações']"),
+      );
+      expect(
+        lotusInjectedVisualSkinScript,
+        contains("['Restart Game', 'Reiniciar partida']"),
+      );
+      expect(
+        lotusInjectedVisualSkinScript,
+        contains("['Current Game', 'Partida atual']"),
+      );
+      expect(lotusInjectedVisualSkinScript, contains("['Winner', 'Vencedor']"));
+      expect(lotusInjectedVisualSkinScript, contains("['Save', 'Salvar']"));
+      expect(lotusInjectedVisualSkinScript, contains("['Cancel', 'Cancelar']"));
+      expect(
+        lotusInjectedVisualSkinScript,
+        contains("document.title = 'ManaLoom • Contador de vida'"),
+      );
+    });
+
     test('keeps life controls legible over custom player artwork', () {
       expect(
         lotusInjectedVisualSkinScript,
@@ -175,7 +238,7 @@ void main() {
       );
       expect(
         lotusInjectedVisualSkinScript,
-        contains("['.menu-button-overlay', 'Table controls']"),
+        contains("['.menu-button-overlay', 'Controles da mesa']"),
       );
       expect(
         lotusInjectedVisualSkinScript,
@@ -201,7 +264,10 @@ void main() {
         lotusInjectedVisualSkinScript,
         contains('menuOverlay.appendChild(exitButton)'),
       );
-      expect(lotusInjectedVisualSkinScript, contains('Exit life counter'));
+      expect(
+        lotusInjectedVisualSkinScript,
+        contains('Sair do contador de vida'),
+      );
       expect(
         lotusInjectedVisualSkinScript,
         contains("document.createElement('button')"),

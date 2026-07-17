@@ -3,9 +3,12 @@ import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
 import '../../../core/theme/app_theme.dart';
+import '../../../core/widgets/responsive_page_frame.dart';
+import '../models/commercial_launch_policy.dart';
 import '../models/manaloom_plan.dart';
 import '../providers/commercial_provider.dart';
 import '../widgets/ai_usage_meter.dart';
+import '../widgets/free_beta_notice.dart';
 
 class PlanScreen extends StatelessWidget {
   const PlanScreen({super.key});
@@ -18,36 +21,120 @@ class PlanScreen extends StatelessWidget {
     }
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Planos')),
-      body: ListView(
-        padding: EdgeInsets.fromLTRB(
-          16,
-          16,
-          16,
-          16 + MediaQuery.of(context).padding.bottom,
+      appBar: AppBar(
+        title: Text(
+          CommercialLaunchPolicy.isFreeBeta ? 'Beta gratuita' : 'Planos',
         ),
-        children: [
-          const AiUsageMeter(),
-          const SizedBox(height: 16),
-          _PlanComparisonCard(
-            plan: ManaLoomPlan.free,
-            active: provider.tier == ManaLoomPlanTier.free,
-            onAction: null,
-          ),
-          const SizedBox(height: 12),
-          _PlanComparisonCard(
-            plan: ManaLoomPlan.pro,
-            active: provider.tier == ManaLoomPlanTier.pro,
-            featured: true,
-            onAction: () => context.push('/upgrade'),
-          ),
-          const SizedBox(height: 16),
-          if (provider.isRemoteSynced || provider.lastRemoteError != null) ...[
-            _RemotePlanStatusPanel(provider: provider),
-            const SizedBox(height: 16),
-          ],
-          _LegalShortcutPanel(),
-        ],
+      ),
+      body: LayoutBuilder(
+        builder: (context, viewport) {
+          final isDesktop = viewport.maxWidth >= AppTheme.breakpointMedium;
+          final horizontalGutter =
+              viewport.maxWidth < AppTheme.breakpointCompact ? 16.0 : 24.0;
+          return ListView(
+            padding: EdgeInsets.only(
+              top: 16,
+              bottom: 16 + MediaQuery.of(context).padding.bottom,
+            ),
+            children: [
+              ResponsivePageFrame(
+                key: const Key('plans-responsive-frame'),
+                maxWidth: AppTheme.contentMaxWidth,
+                padding: EdgeInsets.symmetric(horizontal: horizontalGutter),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    Align(
+                      alignment: Alignment.centerLeft,
+                      child: ConstrainedBox(
+                        constraints: const BoxConstraints(
+                          maxWidth: AppTheme.readingMaxWidth,
+                        ),
+                        child: const AiUsageMeter(),
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    if (CommercialLaunchPolicy.isFreeBeta)
+                      Align(
+                        alignment: Alignment.centerLeft,
+                        child: ConstrainedBox(
+                          constraints: const BoxConstraints(
+                            maxWidth: AppTheme.readingMaxWidth,
+                          ),
+                          child: const FreeBetaNotice(
+                            key: Key('beta-free-access-panel'),
+                          ),
+                        ),
+                      )
+                    else if (isDesktop)
+                      Row(
+                        key: const Key('plans-desktop-grid'),
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Expanded(
+                            child: _PlanComparisonCard(
+                              plan: ManaLoomPlan.free,
+                              active: provider.tier == ManaLoomPlanTier.free,
+                              onAction: null,
+                              fullWidthAction: false,
+                            ),
+                          ),
+                          const SizedBox(width: AppTheme.paneGap),
+                          Expanded(
+                            child: _PlanComparisonCard(
+                              plan: ManaLoomPlan.pro,
+                              active: provider.tier == ManaLoomPlanTier.pro,
+                              featured: true,
+                              onAction: () => context.push('/upgrade'),
+                              fullWidthAction: false,
+                            ),
+                          ),
+                        ],
+                      )
+                    else
+                      Column(
+                        key: const Key('plans-mobile-stack'),
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          _PlanComparisonCard(
+                            plan: ManaLoomPlan.free,
+                            active: provider.tier == ManaLoomPlanTier.free,
+                            onAction: null,
+                          ),
+                          const SizedBox(height: 12),
+                          _PlanComparisonCard(
+                            plan: ManaLoomPlan.pro,
+                            active: provider.tier == ManaLoomPlanTier.pro,
+                            featured: true,
+                            onAction: () => context.push('/upgrade'),
+                          ),
+                        ],
+                      ),
+                    const SizedBox(height: 16),
+                    Align(
+                      alignment: Alignment.centerLeft,
+                      child: ConstrainedBox(
+                        constraints: const BoxConstraints(
+                          maxWidth: AppTheme.readingMaxWidth,
+                        ),
+                        child: Column(
+                          children: [
+                            if (provider.isRemoteSynced ||
+                                provider.lastRemoteError != null) ...[
+                              _RemotePlanStatusPanel(provider: provider),
+                              const SizedBox(height: 16),
+                            ],
+                            const _LegalShortcutPanel(),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          );
+        },
       ),
     );
   }
@@ -59,11 +146,13 @@ class _PlanComparisonCard extends StatelessWidget {
     required this.active,
     required this.onAction,
     this.featured = false,
+    this.fullWidthAction = true,
   });
 
   final ManaLoomPlan plan;
   final bool active;
   final bool featured;
+  final bool fullWidthAction;
   final VoidCallback? onAction;
 
   @override
@@ -127,25 +216,28 @@ class _PlanComparisonCard extends StatelessWidget {
                 _PlanLine(icon: Icons.info_outline, text: limit, muted: true),
           ),
           const SizedBox(height: 14),
-          SizedBox(
-            width: double.infinity,
-            child:
-                featured
-                    ? ElevatedButton(
-                      key: const Key('plan-pro-upgrade-button'),
-                      onPressed: active ? null : onAction,
-                      child: Text(active ? 'Pro ativo' : 'Fazer upgrade'),
-                    )
-                    : OutlinedButton(
-                      onPressed: active ? null : onAction,
-                      child: Text(
-                        active
-                            ? 'Free ativo'
-                            : onAction == null
-                            ? 'Incluído no Pro'
-                            : 'Usar Free',
+          Align(
+            alignment: Alignment.centerRight,
+            child: SizedBox(
+              width: fullWidthAction ? double.infinity : 180,
+              child:
+                  featured
+                      ? ElevatedButton(
+                        key: const Key('plan-pro-upgrade-button'),
+                        onPressed: active ? null : onAction,
+                        child: Text(active ? 'Pro ativo' : 'Fazer upgrade'),
+                      )
+                      : OutlinedButton(
+                        onPressed: active ? null : onAction,
+                        child: Text(
+                          active
+                              ? 'Free ativo'
+                              : onAction == null
+                              ? 'Incluído no Pro'
+                              : 'Usar Free',
+                        ),
                       ),
-                    ),
+            ),
           ),
         ],
       ),
@@ -179,7 +271,7 @@ class _RemotePlanStatusPanel extends StatelessWidget {
           Expanded(
             child: Text(
               synced
-                  ? 'Plano sincronizado com o backend. O limite exibido é o que bloqueia os endpoints de IA.'
+                  ? 'Plano sincronizado. Seus limites de uso estão atualizados.'
                   : provider.lastRemoteError ?? 'Plano remoto indisponível.',
               style: theme.textTheme.bodyMedium?.copyWith(
                 color: AppTheme.textSecondary,
@@ -230,6 +322,8 @@ class _PlanLine extends StatelessWidget {
 }
 
 class _LegalShortcutPanel extends StatelessWidget {
+  const _LegalShortcutPanel();
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
@@ -246,7 +340,9 @@ class _LegalShortcutPanel extends StatelessWidget {
           const SizedBox(width: 10),
           Expanded(
             child: Text(
-              'Termos, privacidade, IP e disclaimer ficam disponíveis antes do upgrade.',
+              CommercialLaunchPolicy.isFreeBeta
+                  ? 'Consulte como tratamos privacidade, conteúdo e sugestões de IA durante a beta.'
+                  : 'Termos, privacidade, IP e disclaimer ficam disponíveis antes do upgrade.',
               style: theme.textTheme.bodyMedium?.copyWith(
                 color: AppTheme.textSecondary,
                 height: 1.35,

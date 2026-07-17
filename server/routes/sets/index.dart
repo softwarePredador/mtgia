@@ -34,10 +34,7 @@ Future<Response> onRequest(RequestContext context) async {
   }
 
   final where = <String>[];
-  final sqlParams = <String, dynamic>{
-    'limit': safeLimit,
-    'offset': offset,
-  };
+  final sqlParams = <String, dynamic>{'limit': safeLimit, 'offset': offset};
 
   if (code != null && code.isNotEmpty) {
     where.add('LOWER(code) = LOWER(@code)');
@@ -71,38 +68,86 @@ Future<Response> onRequest(RequestContext context) async {
                 name ASC
             ) AS rn
           FROM filtered_sets
+        ),
+        paged_sets AS (
+          SELECT
+            code,
+            name,
+            release_date,
+            type,
+            block,
+            is_online_only,
+            is_foreign_only
+          FROM canonical_sets
+          WHERE rn = 1
+          ORDER BY release_date DESC NULLS LAST, name ASC
+          LIMIT @limit OFFSET @offset
+        ),
+        card_stats AS (
+          SELECT
+            LOWER(c.set_code) AS set_key,
+            COUNT(c.id)::int AS card_count
+          FROM cards c
+          INNER JOIN paged_sets ps
+            ON LOWER(ps.code) = LOWER(c.set_code)
+          GROUP BY LOWER(c.set_code)
+        ),
+        representative_cards AS (
+          SELECT DISTINCT ON (LOWER(c.set_code))
+            LOWER(c.set_code) AS set_key,
+            c.image_url AS representative_image_url
+          FROM cards c
+          INNER JOIN paged_sets ps
+            ON LOWER(ps.code) = LOWER(c.set_code)
+          WHERE NULLIF(BTRIM(c.image_url), '') IS NOT NULL
+          ORDER BY
+            LOWER(c.set_code),
+            CASE
+              WHEN COALESCE(c.type_line, '') ILIKE '%Token%'
+                OR COALESCE(c.type_line, '') ILIKE '%Emblem%'
+                OR COALESCE(c.type_line, '')
+                  ~* '(^|[^[:alpha:]])basic[[:space:]]+land([^[:alpha:]]|\$)'
+              THEN 1
+              ELSE 0
+            END,
+            CASE
+              WHEN COALESCE(c.type_line, '') ILIKE 'Legendary%' THEN 0
+              ELSE 1
+            END,
+            CASE LOWER(COALESCE(c.rarity, ''))
+              WHEN 'mythic' THEN 0
+              WHEN 'rare' THEN 1
+              WHEN 'uncommon' THEN 2
+              ELSE 3
+            END,
+            LOWER(c.name),
+            c.id
         )
         SELECT
-          cs.code,
-          cs.name,
-          cs.release_date,
-          cs.type,
-          cs.block,
-          cs.is_online_only,
-          cs.is_foreign_only,
-          COUNT(c.id)::int AS card_count
-        FROM canonical_sets cs
-        LEFT JOIN cards c ON LOWER(c.set_code) = LOWER(cs.code)
-        WHERE cs.rn = 1
-        GROUP BY
-          cs.code,
-          cs.name,
-          cs.release_date,
-          cs.type,
-          cs.block,
-          cs.is_online_only,
-          cs.is_foreign_only
-        ORDER BY cs.release_date DESC NULLS LAST, cs.name ASC
-        LIMIT @limit OFFSET @offset
+          ps.code,
+          ps.name,
+          ps.release_date,
+          ps.type,
+          ps.block,
+          ps.is_online_only,
+          ps.is_foreign_only,
+          COALESCE(stats.card_count, 0)::int AS card_count,
+          representative.representative_image_url
+        FROM paged_sets ps
+        LEFT JOIN card_stats stats ON stats.set_key = LOWER(ps.code)
+        LEFT JOIN representative_cards representative
+          ON representative.set_key = LOWER(ps.code)
+        ORDER BY ps.release_date DESC NULLS LAST, ps.name ASC
       '''),
       parameters: sqlParams,
     );
     queryStopwatch.stop();
 
-    final sets = result.map((row) {
-      final map = row.toColumnMap();
-      return mapSetCatalogRow(map);
-    }).toList();
+    final sets =
+        result.map((row) {
+          final map = row.toColumnMap();
+          return mapSetCatalogRow(map);
+        }).toList();
 
     final payload = {
       'data': sets,
@@ -111,8 +156,11 @@ Future<Response> onRequest(RequestContext context) async {
       'total_returned': sets.length,
     };
 
-    EndpointCache.instance
-        .set(cacheKey, payload, ttl: const Duration(seconds: 60));
+    EndpointCache.instance.set(
+      cacheKey,
+      payload,
+      ttl: const Duration(seconds: 60),
+    );
     return Response.json(
       body: payload,
       headers: buildSetCatalogTimingHeaders(

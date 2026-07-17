@@ -45,21 +45,21 @@ void main() {
       await tester.tap(find.text('open'));
       await tester.pumpAndSettle();
 
-      expect(find.text('Dice Tools'), findsOneWidget);
+      expect(find.text('Ferramentas de dados'), findsOneWidget);
 
       await tester.tap(
         find.byKey(const Key('life-counter-native-dice-high-roll')),
       );
       await tester.pumpAndSettle();
 
-      expect(find.text('High Roll Board'), findsOneWidget);
+      expect(find.text('Quadro da maior rolagem'), findsOneWidget);
 
       await tester.tap(find.byKey(const Key('life-counter-native-dice-apply')));
       await tester.pumpAndSettle();
 
       expect(result, isNotNull);
       expect(result!.lastHighRolls.whereType<int>().length, 4);
-      expect(result!.lastTableEvent, startsWith('High Roll'));
+      expect(result!.lastTableEvent, startsWith('Maior rolagem'));
     });
 
     testWidgets(
@@ -109,7 +109,7 @@ void main() {
         await tester.pumpAndSettle();
 
         expect(
-          find.textContaining('No active players remain on the table.'),
+          find.textContaining('Não há jogadores ativos na mesa.'),
           findsOneWidget,
         );
 

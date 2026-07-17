@@ -257,126 +257,112 @@ class _CardSearchScreenState extends State<CardSearchScreen>
       backgroundColor: AppTheme.backgroundAbyss,
       appBar: AppBar(
         toolbarHeight: 54,
-        titleSpacing: 0,
+        titleSpacing: AppTheme.pageGutterCompact,
         backgroundColor: AppTheme.backgroundAbyss,
         surfaceTintColor: AppTheme.transparent,
-        title: Container(
-          height: AppTheme.touchTargetMin,
-          decoration: BoxDecoration(
-            color: AppTheme.surfaceSlate.withValues(alpha: 0.94),
-            borderRadius: BorderRadius.circular(AppTheme.radiusPill),
-            border: Border.all(
-              color: AppTheme.brass400.withValues(alpha: 0.18),
-            ),
-            boxShadow: [
-              BoxShadow(
-                color: AppTheme.backgroundAbyss.withValues(alpha: 0.42),
-                blurRadius: 18,
-                offset: const Offset(0, 10),
+        title: Align(
+          alignment: Alignment.center,
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 720),
+            child: Container(
+              key: const Key('card-search-field-frame'),
+              width: double.infinity,
+              height: AppTheme.touchTargetMin,
+              decoration: BoxDecoration(
+                color: AppTheme.surfaceSlate.withValues(alpha: 0.94),
+                borderRadius: BorderRadius.circular(AppTheme.radiusPill),
+                border: Border.all(
+                  color: AppTheme.brass400.withValues(alpha: 0.18),
+                ),
+                boxShadow: [
+                  BoxShadow(
+                    color: AppTheme.backgroundAbyss.withValues(alpha: 0.42),
+                    blurRadius: 18,
+                    offset: const Offset(0, 10),
+                  ),
+                ],
               ),
-            ],
-          ),
-          child: TextField(
-            key: const Key('card-search-field'),
-            controller: _searchController,
-            onChanged: _onSearchChanged,
-            autofocus: true,
-            textAlignVertical: TextAlignVertical.center,
-            decoration: InputDecoration(
-              hintText:
-                  widget.isBinderMode
-                      ? 'Buscar carta'
-                      : isCommanderMode
-                      ? 'Buscar comandante'
-                      : 'Buscar cartas',
-              border: InputBorder.none,
-              isDense: true,
-              contentPadding: const EdgeInsets.symmetric(
-                horizontal: 14,
-                vertical: 9,
-              ),
-              suffixIcon:
-                  _searchController.text.isEmpty
-                      ? null
-                      : IconButton(
-                        tooltip: 'Limpar busca',
-                        padding: EdgeInsets.zero,
-                        visualDensity: VisualDensity.compact,
-                        icon: const Icon(Icons.close_rounded, size: 16),
-                        color: AppTheme.textSecondary,
-                        onPressed: () {
-                          _searchController.clear();
-                          context.read<CardProvider>().clearSearch();
-                          setState(() {});
-                        },
-                      ),
-              hintStyle: const TextStyle(
-                color: AppTheme.textHint,
-                fontSize: AppTheme.fontSm,
+              child: TextField(
+                key: const Key('card-search-field'),
+                controller: _searchController,
+                onChanged: _onSearchChanged,
+                autofocus: true,
+                textAlignVertical: TextAlignVertical.center,
+                decoration: InputDecoration(
+                  hintText:
+                      widget.isBinderMode
+                          ? 'Buscar carta'
+                          : isCommanderMode
+                          ? 'Buscar comandante'
+                          : 'Buscar cartas',
+                  border: InputBorder.none,
+                  isDense: true,
+                  contentPadding: const EdgeInsets.symmetric(
+                    horizontal: 14,
+                    vertical: 9,
+                  ),
+                  suffixIcon:
+                      _searchController.text.isEmpty
+                          ? null
+                          : IconButton(
+                            tooltip: 'Limpar busca',
+                            padding: EdgeInsets.zero,
+                            visualDensity: VisualDensity.compact,
+                            icon: const Icon(Icons.close_rounded, size: 16),
+                            color: AppTheme.textSecondary,
+                            onPressed: () {
+                              _searchController.clear();
+                              context.read<CardProvider>().clearSearch();
+                              setState(() {});
+                            },
+                          ),
+                  hintStyle: const TextStyle(
+                    color: AppTheme.textHint,
+                    fontSize: AppTheme.fontSm,
+                  ),
+                ),
+                style: const TextStyle(
+                  color: AppTheme.textPrimary,
+                  fontSize: AppTheme.fontSm,
+                ),
+                cursorColor: AppTheme.textPrimary,
               ),
             ),
-            style: const TextStyle(
-              color: AppTheme.textPrimary,
-              fontSize: AppTheme.fontSm,
-            ),
-            cursorColor: AppTheme.textPrimary,
           ),
         ),
-        actions: [
-          Padding(
-            padding: const EdgeInsets.only(left: 8, right: 10),
-            child: InkWell(
-              borderRadius: BorderRadius.circular(AppTheme.radiusPill),
-              onTap: () {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text(
-                      'Filtros rápidos por coleção estão na aba Coleções.',
+        bottom: PreferredSize(
+          preferredSize: const Size.fromHeight(46),
+          child: Center(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(
+                horizontal: AppTheme.pageGutterCompact,
+              ),
+              child: ConstrainedBox(
+                constraints: const BoxConstraints(maxWidth: 720),
+                child: SizedBox(
+                  key: const Key('card-search-tabs-frame'),
+                  width: double.infinity,
+                  child: TabBar(
+                    key: const Key('cardSearchTabs'),
+                    controller: _tabController,
+                    indicatorColor: AppTheme.brass400,
+                    labelColor: AppTheme.brass400,
+                    unselectedLabelColor: AppTheme.textSecondary,
+                    indicatorSize: TabBarIndicatorSize.label,
+                    labelStyle: const TextStyle(
+                      fontSize: AppTheme.fontSm,
+                      fontWeight: FontWeight.w800,
                     ),
-                  ),
-                );
-              },
-              child: Container(
-                width: 34,
-                height: 34,
-                decoration: BoxDecoration(
-                  color: AppTheme.surfaceSlate.withValues(alpha: 0.94),
-                  shape: BoxShape.circle,
-                  border: Border.all(
-                    color: AppTheme.brass400.withValues(alpha: 0.28),
-                  ),
-                  boxShadow: [
-                    BoxShadow(
-                      color: AppTheme.brass400.withValues(alpha: 0.08),
-                      blurRadius: 16,
+                    unselectedLabelStyle: const TextStyle(
+                      fontSize: AppTheme.fontSm,
+                      fontWeight: FontWeight.w600,
                     ),
-                  ],
-                ),
-                child: const Icon(
-                  Icons.tune_rounded,
-                  size: 17,
-                  color: AppTheme.brass400,
+                    tabs: const [Tab(text: 'Cartas'), Tab(text: 'Coleções')],
+                  ),
                 ),
               ),
             ),
           ),
-        ],
-        bottom: TabBar(
-          key: const Key('cardSearchTabs'),
-          controller: _tabController,
-          indicatorColor: AppTheme.brass400,
-          labelColor: AppTheme.brass400,
-          unselectedLabelColor: AppTheme.textSecondary,
-          indicatorSize: TabBarIndicatorSize.label,
-          labelStyle: const TextStyle(
-            fontSize: AppTheme.fontSm,
-            fontWeight: FontWeight.w800,
-          ),
-          unselectedLabelStyle: const TextStyle(
-            fontSize: AppTheme.fontSm,
-            fontWeight: FontWeight.w600,
-          ),
-          tabs: const [Tab(text: 'Cartas'), Tab(text: 'Coleções')],
         ),
       ),
       body: TabBarView(
@@ -425,125 +411,185 @@ class _CardSearchScreenState extends State<CardSearchScreen>
         }
 
         if (provider.errorMessage != null) {
-          return AppStatePanel(
-            key: const Key('card-search-error'),
-            icon: Icons.error_outline_rounded,
-            title: 'Falha ao buscar cartas',
-            message: provider.errorMessage!,
-            accent: AppTheme.error,
-            actionLabel: query.length >= 3 ? 'Tentar novamente' : null,
-            onAction: query.length >= 3 ? () => _onSearchChanged(query) : null,
+          return _SearchStateFrame(
+            child: AppStatePanel(
+              key: const Key('card-search-error'),
+              icon: Icons.error_outline_rounded,
+              title: 'Falha ao buscar cartas',
+              message: provider.errorMessage!,
+              accent: AppTheme.error,
+              actionLabel: query.length >= 3 ? 'Tentar novamente' : null,
+              onAction:
+                  query.length >= 3 ? () => _onSearchChanged(query) : null,
+            ),
           );
         }
 
         if (provider.searchResults.isEmpty) {
-          return AppStatePanel(
-            key: const Key('card-search-empty-state'),
-            icon:
-                query.length >= 3
-                    ? Icons.search_off_rounded
-                    : Icons.search_rounded,
-            title:
-                query.length >= 3
-                    ? 'Nenhuma carta encontrada'
-                    : 'Busque uma carta',
-            message:
-                query.length >= 3
-                    ? 'Tente outro nome, revise a grafia ou procure pela versão em inglês.'
-                    : widget.isBinderMode
-                    ? 'Digite pelo menos 3 letras para encontrar cartas e adicionar ao fichário.'
-                    : 'Digite pelo menos 3 letras para buscar cartas ou abra a aba Coleções.',
-            accent: query.length >= 3 ? AppTheme.warning : AppTheme.brass400,
+          return _SearchStateFrame(
+            child: AppStatePanel(
+              key: const Key('card-search-empty-state'),
+              icon:
+                  query.length >= 3
+                      ? Icons.search_off_rounded
+                      : Icons.search_rounded,
+              title:
+                  query.length >= 3
+                      ? 'Nenhuma carta encontrada'
+                      : 'Busque uma carta',
+              message:
+                  query.length >= 3
+                      ? 'Tente outro nome, revise a grafia ou procure pela versão em inglês.'
+                      : widget.isBinderMode
+                      ? 'Digite pelo menos 3 letras para encontrar cartas e adicionar ao fichário.'
+                      : 'Digite pelo menos 3 letras para buscar cartas ou abra a aba Coleções.',
+              accent: query.length >= 3 ? AppTheme.warning : AppTheme.brass400,
+            ),
           );
         }
 
-        final totalItems =
-            provider.searchResults.length + (provider.hasMore ? 1 : 0) + 1;
-
-        return ListView.builder(
-          key: const Key('card-search-results-list'),
-          controller: _scrollController,
-          itemCount: totalItems,
-          itemBuilder: (context, index) {
-            if (index == 0) {
-              return _SearchResultsHeader(
-                query: query,
-                count: provider.searchResults.length,
-                onFilterTap: () {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text(
-                        'Filtros rápidos por coleção estão na aba Coleções.',
-                      ),
-                    ),
-                  );
-                },
+        Widget buildResultTile(int resultIndex, {required bool inGrid}) {
+          final card = provider.searchResults[resultIndex];
+          final isCommanderEligible = _isCommanderEligible(card);
+          final allowedByIdentity =
+              !isCommanderFormat ||
+              commanderIdentity == null ||
+              _isSubset(card.colorIdentity, commanderIdentity);
+          final canAdd =
+              widget.isBinderMode
+                  ? true
+                  : isCommanderMode
+                  ? isCommanderEligible
+                  : (mustPickCommanderFirst
+                      ? isCommanderEligible
+                      : allowedByIdentity);
+          return _CardSearchResultTile(
+            key: Key('card-search-result-${card.id}'),
+            inGrid: inGrid,
+            card: card,
+            showTypeLine: !widget.isBinderMode,
+            warning:
+                mustPickCommanderFirst && !isCommanderEligible
+                    ? 'Selecione um comandante primeiro'
+                    : !mustPickCommanderFirst &&
+                        isCommanderFormat &&
+                        commanderIdentity != null &&
+                        !allowedByIdentity
+                    ? 'Fora da identidade do comandante'
+                    : null,
+            canAdd: canAdd,
+            onOpen: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => CardDetailScreen(card: card)),
               );
-            }
-            final resultIndex = index - 1;
-            if (resultIndex >= provider.searchResults.length) {
-              return const Padding(
-                padding: EdgeInsets.symmetric(vertical: 16),
-                child: Center(
-                  child: CircularProgressIndicator(color: AppTheme.brass400),
-                ),
-              );
-            }
-            final card = provider.searchResults[resultIndex];
-            final isCommanderEligible = _isCommanderEligible(card);
-            final allowedByIdentity =
-                !isCommanderFormat ||
-                commanderIdentity == null ||
-                _isSubset(card.colorIdentity, commanderIdentity);
-            final canAdd =
-                widget.isBinderMode
-                    ? true
-                    : isCommanderMode
-                    ? isCommanderEligible
-                    : (mustPickCommanderFirst
-                        ? isCommanderEligible
-                        : allowedByIdentity);
-            return _CardSearchResultTile(
-              key: Key('card-search-result-${card.id}'),
-              card: card,
-              showTypeLine: !widget.isBinderMode,
-              warning:
-                  mustPickCommanderFirst && !isCommanderEligible
-                      ? 'Selecione um comandante primeiro'
-                      : !mustPickCommanderFirst &&
-                          isCommanderFormat &&
-                          commanderIdentity != null &&
-                          !allowedByIdentity
-                      ? 'Fora da identidade do comandante'
-                      : null,
-              canAdd: canAdd,
-              onOpen: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (_) => CardDetailScreen(card: card),
-                  ),
-                );
-              },
-              onAdd:
-                  canAdd
-                      ? () {
-                        if (widget.isBinderMode) {
-                          final cardData = {
-                            'id': card.id,
-                            'name': card.name,
-                            'image_url': card.imageUrl,
-                            'set_code': card.setCode,
-                            'mana_cost': card.manaCost,
-                            'rarity': card.rarity,
-                          };
-                          Navigator.pop(context);
-                          widget.onCardSelectedForBinder?.call(cardData);
-                        } else {
-                          _addCardToDeck(card);
-                        }
+            },
+            onAdd:
+                canAdd
+                    ? () {
+                      if (widget.isBinderMode) {
+                        final cardData = {
+                          'id': card.id,
+                          'name': card.name,
+                          'image_url': card.imageUrl,
+                          'set_code': card.setCode,
+                          'mana_cost': card.manaCost,
+                          'rarity': card.rarity,
+                        };
+                        Navigator.pop(context);
+                        widget.onCardSelectedForBinder?.call(cardData);
+                      } else {
+                        _addCardToDeck(card);
                       }
-                      : null,
+                    }
+                    : null,
+          );
+        }
+
+        return LayoutBuilder(
+          builder: (context, constraints) {
+            final useGrid = constraints.maxWidth >= AppTheme.breakpointExpanded;
+            final pageGutter =
+                constraints.maxWidth < AppTheme.breakpointCompact
+                    ? AppTheme.pageGutterCompact
+                    : AppTheme.pageGutter;
+
+            return Center(
+              child: ConstrainedBox(
+                constraints: const BoxConstraints(
+                  maxWidth: AppTheme.contentMaxWidth,
+                ),
+                child: SizedBox(
+                  key: const Key('card-search-results-frame'),
+                  width: double.infinity,
+                  child: CustomScrollView(
+                    key: const Key('card-search-results-scroll'),
+                    controller: _scrollController,
+                    slivers: [
+                      SliverToBoxAdapter(
+                        child: _SearchResultsHeader(
+                          query: query,
+                          count: provider.searchResults.length,
+                          horizontalPadding: pageGutter,
+                        ),
+                      ),
+                      if (useGrid)
+                        SliverPadding(
+                          padding: EdgeInsets.fromLTRB(
+                            pageGutter,
+                            2,
+                            pageGutter,
+                            12,
+                          ),
+                          sliver: SliverGrid(
+                            key: const Key('card-search-results-grid'),
+                            gridDelegate:
+                                const SliverGridDelegateWithMaxCrossAxisExtent(
+                                  maxCrossAxisExtent: 580,
+                                  mainAxisExtent: 104,
+                                  mainAxisSpacing: 12,
+                                  crossAxisSpacing: 12,
+                                ),
+                            delegate: SliverChildBuilderDelegate(
+                              (context, index) =>
+                                  buildResultTile(index, inGrid: true),
+                              childCount: provider.searchResults.length,
+                            ),
+                          ),
+                        )
+                      else
+                        SliverPadding(
+                          padding: EdgeInsets.fromLTRB(
+                            pageGutter,
+                            0,
+                            pageGutter,
+                            12,
+                          ),
+                          sliver: SliverList(
+                            key: const Key('card-search-results-list'),
+                            delegate: SliverChildBuilderDelegate(
+                              (context, index) =>
+                                  buildResultTile(index, inGrid: false),
+                              childCount: provider.searchResults.length,
+                            ),
+                          ),
+                        ),
+                      if (provider.hasMore)
+                        const SliverToBoxAdapter(
+                          child: Padding(
+                            padding: EdgeInsets.symmetric(vertical: 16),
+                            child: Center(
+                              child: CircularProgressIndicator(
+                                color: AppTheme.brass400,
+                              ),
+                            ),
+                          ),
+                        ),
+                      SliverToBoxAdapter(child: SizedBox(height: pageGutter)),
+                    ],
+                  ),
+                ),
+              ),
             );
           },
         );
@@ -552,22 +598,46 @@ class _CardSearchScreenState extends State<CardSearchScreen>
   }
 }
 
+class _SearchStateFrame extends StatelessWidget {
+  const _SearchStateFrame({required this.child});
+
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: ConstrainedBox(
+        constraints: const BoxConstraints(maxWidth: 720),
+        child: Padding(
+          padding: const EdgeInsets.all(AppTheme.pageGutterCompact),
+          child: child,
+        ),
+      ),
+    );
+  }
+}
+
 class _SearchResultsHeader extends StatelessWidget {
   const _SearchResultsHeader({
     required this.query,
     required this.count,
-    required this.onFilterTap,
+    required this.horizontalPadding,
   });
 
   final String query;
   final int count;
-  final VoidCallback onFilterTap;
+  final double horizontalPadding;
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     return Padding(
-      padding: const EdgeInsets.fromLTRB(14, 16, 14, 10),
+      padding: EdgeInsets.fromLTRB(
+        horizontalPadding,
+        16,
+        horizontalPadding,
+        10,
+      ),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
@@ -603,26 +673,6 @@ class _SearchResultsHeader extends StatelessWidget {
               ],
             ),
           ),
-          SizedBox(
-            height: 30,
-            child: FilledButton.tonalIcon(
-              onPressed: onFilterTap,
-              style: FilledButton.styleFrom(
-                padding: const EdgeInsets.symmetric(horizontal: 10),
-                backgroundColor: AppTheme.surfaceSlate.withValues(alpha: 0.9),
-                foregroundColor: AppTheme.brass400,
-                textStyle: const TextStyle(
-                  fontSize: AppTheme.fontSm - 1,
-                  fontWeight: FontWeight.w700,
-                ),
-                side: BorderSide(
-                  color: AppTheme.brass400.withValues(alpha: 0.25),
-                ),
-              ),
-              icon: const Icon(Icons.tune_rounded, size: 13),
-              label: const Text('Filtrar'),
-            ),
-          ),
         ],
       ),
     );
@@ -632,6 +682,7 @@ class _SearchResultsHeader extends StatelessWidget {
 class _CardSearchResultTile extends StatelessWidget {
   const _CardSearchResultTile({
     super.key,
+    required this.inGrid,
     required this.card,
     required this.showTypeLine,
     required this.warning,
@@ -640,6 +691,7 @@ class _CardSearchResultTile extends StatelessWidget {
     required this.onAdd,
   });
 
+  final bool inGrid;
   final DeckCardItem card;
   final bool showTypeLine;
   final String? warning;
@@ -651,7 +703,8 @@ class _CardSearchResultTile extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 5),
+      padding:
+          inGrid ? EdgeInsets.zero : const EdgeInsets.symmetric(vertical: 5),
       child: Material(
         color: AppTheme.transparent,
         borderRadius: BorderRadius.circular(AppTheme.radiusMd),
@@ -797,44 +850,11 @@ class _SearchIdentityPips extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final values =
-        identity
-            .map((symbol) => symbol.trim().toUpperCase())
-            .where((symbol) => symbol.isNotEmpty)
-            .toSet()
-            .toList()
-          ..sort();
-    if (values.isEmpty) return const SizedBox.shrink();
-
-    return Row(
-      mainAxisSize: MainAxisSize.min,
-      children:
-          values
-              .map(
-                (symbol) => Container(
-                  width: 15,
-                  height: 15,
-                  margin: const EdgeInsets.only(right: 3),
-                  alignment: Alignment.center,
-                  decoration: BoxDecoration(
-                    color: AppTheme.manaPipBackground(symbol),
-                    shape: BoxShape.circle,
-                    border: Border.all(
-                      color: AppTheme.backgroundAbyss.withValues(alpha: 0.5),
-                      width: AppTheme.strokeHairline,
-                    ),
-                  ),
-                  child: Text(
-                    symbol,
-                    style: TextStyle(
-                      color: AppTheme.manaPipForeground(symbol),
-                      fontSize: AppTheme.fontMicro,
-                      fontWeight: FontWeight.w900,
-                    ),
-                  ),
-                ),
-              )
-              .toList(),
+    return ColorIdentityPips(
+      colors: identity,
+      symbolSize: 15,
+      spacing: 3,
+      decorated: false,
     );
   }
 }

@@ -2,25 +2,20 @@ import 'dart:math' as math;
 import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
 import 'package:manaloom/core/widgets/shell_app_bar_actions.dart';
 import 'package:provider/provider.dart';
 import '../../../core/theme/app_theme.dart';
+import '../../../core/utils/currency_formatter.dart';
+import '../../../core/utils/scryfall_image_helper.dart';
 import '../../../core/widgets/app_state_panel.dart';
 import '../../../core/widgets/cached_card_image.dart';
+import '../../../core/widgets/mana_symbols.dart';
 import '../models/deck.dart';
 import '../providers/deck_provider.dart';
 
-String? _scryfallDeckImageUrl(String? name) {
-  final cardName = name?.trim();
-  if (cardName == null || cardName.isEmpty) return null;
-  return Uri.https('api.scryfall.com', '/cards/named', {
-    'exact': cardName,
-    'format': 'image',
-    'version': 'normal',
-  }).toString();
-}
+const double _mtgCardAspectRatio = 488 / 680;
+const double _deckGalleryFooterHeight = 124;
 
 class DeckListScreen extends StatefulWidget {
   const DeckListScreen({super.key});
@@ -436,158 +431,177 @@ class _DeckListScreenState extends State<DeckListScreen> {
             key: const Key('deck-list'),
             slivers: [
               SliverToBoxAdapter(
-                child: Padding(
-                  padding: const EdgeInsets.fromLTRB(14, 8, 14, 10),
-                  child: Column(
-                    children: [
-                      Row(
+                child: Center(
+                  child: ConstrainedBox(
+                    constraints: const BoxConstraints(
+                      maxWidth: AppTheme.pageMaxWidth,
+                    ),
+                    child: Padding(
+                      padding: const EdgeInsets.fromLTRB(14, 8, 14, 10),
+                      child: Column(
                         children: [
-                          Expanded(
-                            child: Container(
-                              height: 36,
-                              decoration: BoxDecoration(
-                                color: AppTheme.surfaceSlate,
-                                borderRadius: BorderRadius.circular(
-                                  AppTheme.radiusPill,
+                          Row(
+                            children: [
+                              Flexible(
+                                fit: FlexFit.loose,
+                                child: ConstrainedBox(
+                                  constraints: const BoxConstraints(
+                                    maxWidth: 720,
+                                  ),
+                                  child: Container(
+                                    height: AppTheme.touchTargetMin,
+                                    decoration: BoxDecoration(
+                                      color: AppTheme.surfaceSlate,
+                                      borderRadius: BorderRadius.circular(
+                                        AppTheme.radiusPill,
+                                      ),
+                                      border: Border.all(
+                                        color:
+                                            hasQuery
+                                                ? AppTheme.brass400.withValues(
+                                                  alpha: 0.7,
+                                                )
+                                                : AppTheme.outlineMuted
+                                                    .withValues(alpha: 0.75),
+                                      ),
+                                    ),
+                                    child: TextField(
+                                      key: const Key('deck-list-search-field'),
+                                      controller: _searchController,
+                                      onChanged: (_) => setState(() {}),
+                                      textAlignVertical:
+                                          TextAlignVertical.center,
+                                      decoration: InputDecoration(
+                                        hintText: 'Buscar decks',
+                                        border: InputBorder.none,
+                                        isDense: true,
+                                        prefixIcon: const Icon(
+                                          Icons.search_rounded,
+                                          size: 16,
+                                          color: AppTheme.textHint,
+                                        ),
+                                        prefixIconConstraints:
+                                            const BoxConstraints(
+                                              minWidth: 34,
+                                              minHeight: 34,
+                                            ),
+                                        contentPadding:
+                                            const EdgeInsets.symmetric(
+                                              horizontal: 0,
+                                              vertical: 9,
+                                            ),
+                                        hintStyle: const TextStyle(
+                                          color: AppTheme.textHint,
+                                          fontSize: AppTheme.fontSm,
+                                        ),
+                                      ),
+                                      style: const TextStyle(
+                                        color: AppTheme.textPrimary,
+                                        fontSize: AppTheme.fontSm,
+                                      ),
+                                      cursorColor: AppTheme.textPrimary,
+                                    ),
+                                  ),
                                 ),
-                                border: Border.all(
-                                  color:
-                                      hasQuery
-                                          ? AppTheme.brass400.withValues(
-                                            alpha: 0.7,
-                                          )
-                                          : AppTheme.outlineMuted.withValues(
-                                            alpha: 0.75,
+                              ),
+                              const SizedBox(width: 10),
+                              Semantics(
+                                button: true,
+                                label: 'Alternar filtro de decks',
+                                child: Tooltip(
+                                  message: 'Alternar filtro de decks',
+                                  child: InkWell(
+                                    borderRadius: BorderRadius.circular(
+                                      AppTheme.radiusPill,
+                                    ),
+                                    onTap:
+                                        () => setState(() {
+                                          _deckFilter =
+                                              _deckFilter == 'todos'
+                                                  ? 'commander'
+                                                  : 'todos';
+                                        }),
+                                    child: Container(
+                                      width: 48,
+                                      height: 48,
+                                      decoration: BoxDecoration(
+                                        color: AppTheme.surfaceSlate,
+                                        shape: BoxShape.circle,
+                                        border: Border.all(
+                                          color: AppTheme.brass400.withValues(
+                                            alpha: 0.55,
                                           ),
-                                ),
-                              ),
-                              child: TextField(
-                                key: const Key('deck-list-search-field'),
-                                controller: _searchController,
-                                onChanged: (_) => setState(() {}),
-                                textAlignVertical: TextAlignVertical.center,
-                                decoration: InputDecoration(
-                                  hintText: 'Buscar decks',
-                                  border: InputBorder.none,
-                                  isDense: true,
-                                  prefixIcon: const Icon(
-                                    Icons.search_rounded,
-                                    size: 16,
-                                    color: AppTheme.textHint,
-                                  ),
-                                  prefixIconConstraints: const BoxConstraints(
-                                    minWidth: 34,
-                                    minHeight: 34,
-                                  ),
-                                  contentPadding: const EdgeInsets.symmetric(
-                                    horizontal: 0,
-                                    vertical: 9,
-                                  ),
-                                  hintStyle: const TextStyle(
-                                    color: AppTheme.textHint,
-                                    fontSize: AppTheme.fontSm,
-                                  ),
-                                ),
-                                style: const TextStyle(
-                                  color: AppTheme.textPrimary,
-                                  fontSize: AppTheme.fontSm,
-                                ),
-                                cursorColor: AppTheme.textPrimary,
-                              ),
-                            ),
-                          ),
-                          const SizedBox(width: 10),
-                          Semantics(
-                            button: true,
-                            label: 'Alternar filtro de decks',
-                            child: Tooltip(
-                              message: 'Alternar filtro de decks',
-                              child: InkWell(
-                                borderRadius: BorderRadius.circular(
-                                  AppTheme.radiusPill,
-                                ),
-                                onTap:
-                                    () => setState(() {
-                                      _deckFilter =
-                                          _deckFilter == 'todos'
-                                              ? 'commander'
-                                              : 'todos';
-                                    }),
-                                child: Container(
-                                  width: 48,
-                                  height: 48,
-                                  decoration: BoxDecoration(
-                                    color: AppTheme.surfaceSlate,
-                                    shape: BoxShape.circle,
-                                    border: Border.all(
-                                      color: AppTheme.brass400.withValues(
-                                        alpha: 0.55,
+                                        ),
+                                      ),
+                                      child: const Icon(
+                                        Icons.tune_rounded,
+                                        size: 17,
+                                        color: AppTheme.brass400,
                                       ),
                                     ),
                                   ),
-                                  child: const Icon(
-                                    Icons.tune_rounded,
-                                    size: 17,
-                                    color: AppTheme.brass400,
-                                  ),
                                 ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 13),
+                          SingleChildScrollView(
+                            scrollDirection: Axis.horizontal,
+                            child: Row(
+                              children: [
+                                _DeckFilterChip(
+                                  label: 'Todos',
+                                  count: decks.length,
+                                  selected: _deckFilter == 'todos',
+                                  onTap:
+                                      () =>
+                                          setState(() => _deckFilter = 'todos'),
+                                ),
+                                _DeckFilterChip(
+                                  label: 'Commander',
+                                  count: _countFor(decks, 'commander'),
+                                  selected: _deckFilter == 'commander',
+                                  onTap:
+                                      () => setState(
+                                        () => _deckFilter = 'commander',
+                                      ),
+                                ),
+                                _DeckFilterChip(
+                                  label: 'Padrão',
+                                  count: _countFor(decks, 'standard'),
+                                  selected: _deckFilter == 'standard',
+                                  onTap:
+                                      () => setState(
+                                        () => _deckFilter = 'standard',
+                                      ),
+                                ),
+                                _DeckFilterChip(
+                                  label: 'Outros',
+                                  count: _countFor(decks, 'other'),
+                                  selected: _deckFilter == 'other',
+                                  onTap:
+                                      () =>
+                                          setState(() => _deckFilter = 'other'),
+                                ),
+                              ],
+                            ),
+                          ),
+                          const SizedBox(height: 2),
+                          Align(
+                            alignment: Alignment.centerLeft,
+                            child: Text(
+                              '${decks.length} ${decks.length == 1 ? 'deck criado' : 'decks criados'} · '
+                              '$incompleteCount ${incompleteCount == 1 ? 'incompleto' : 'incompletos'}',
+                              style: theme.textTheme.labelSmall?.copyWith(
+                                color: AppTheme.textHint,
+                                fontSize: AppTheme.fontXs,
+                                fontWeight: FontWeight.w600,
                               ),
                             ),
                           ),
                         ],
                       ),
-                      const SizedBox(height: 13),
-                      SingleChildScrollView(
-                        scrollDirection: Axis.horizontal,
-                        child: Row(
-                          children: [
-                            _DeckFilterChip(
-                              label: 'Todos',
-                              count: decks.length,
-                              selected: _deckFilter == 'todos',
-                              onTap:
-                                  () => setState(() => _deckFilter = 'todos'),
-                            ),
-                            _DeckFilterChip(
-                              label: 'Commander',
-                              count: _countFor(decks, 'commander'),
-                              selected: _deckFilter == 'commander',
-                              onTap:
-                                  () =>
-                                      setState(() => _deckFilter = 'commander'),
-                            ),
-                            _DeckFilterChip(
-                              label: 'Padrão',
-                              count: _countFor(decks, 'standard'),
-                              selected: _deckFilter == 'standard',
-                              onTap:
-                                  () =>
-                                      setState(() => _deckFilter = 'standard'),
-                            ),
-                            _DeckFilterChip(
-                              label: 'Outros',
-                              count: _countFor(decks, 'other'),
-                              selected: _deckFilter == 'other',
-                              onTap:
-                                  () => setState(() => _deckFilter = 'other'),
-                            ),
-                          ],
-                        ),
-                      ),
-                      const SizedBox(height: 2),
-                      Align(
-                        alignment: Alignment.centerLeft,
-                        child: Text(
-                          '${decks.length} ${decks.length == 1 ? 'deck criado' : 'decks criados'} · '
-                          '$incompleteCount ${incompleteCount == 1 ? 'incompleto' : 'incompletos'}',
-                          style: theme.textTheme.labelSmall?.copyWith(
-                            color: AppTheme.textHint,
-                            fontSize: AppTheme.fontXs,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                      ),
-                    ],
+                    ),
                   ),
                 ),
               ),
@@ -606,14 +620,26 @@ class _DeckListScreenState extends State<DeckListScreen> {
                   ),
                 )
               else
-                SliverPadding(
-                  padding: const EdgeInsets.fromLTRB(14, 2, 14, 132),
-                  sliver: SliverLayoutBuilder(
-                    builder: (context, constraints) {
-                      final isWide = constraints.crossAxisExtent >= 640;
-                      if (!isWide) {
-                        final showSparseActions = visibleDecks.length <= 2;
-                        return SliverList.builder(
+                SliverLayoutBuilder(
+                  builder: (context, constraints) {
+                    final isWide =
+                        constraints.crossAxisExtent >=
+                        AppTheme.breakpointMedium;
+                    final horizontalInset = math.max(
+                      14.0,
+                      (constraints.crossAxisExtent - AppTheme.pageMaxWidth) / 2,
+                    );
+                    final padding = EdgeInsets.fromLTRB(
+                      horizontalInset,
+                      2,
+                      horizontalInset,
+                      132,
+                    );
+                    if (!isWide) {
+                      final showSparseActions = visibleDecks.length <= 2;
+                      return SliverPadding(
+                        padding: padding,
+                        sliver: SliverList.builder(
                           itemCount:
                               visibleDecks.length + (showSparseActions ? 1 : 0),
                           itemBuilder: (context, index) {
@@ -635,15 +661,19 @@ class _DeckListScreenState extends State<DeckListScreen> {
                               ),
                             );
                           },
-                        );
-                      }
-                      return SliverGrid.builder(
-                        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                          crossAxisCount: isWide ? 3 : 2,
-                          mainAxisSpacing: 10,
-                          crossAxisSpacing: 10,
-                          childAspectRatio: isWide ? 0.82 : 0.72,
                         ),
+                      );
+                    }
+                    return SliverPadding(
+                      padding: padding,
+                      sliver: SliverGrid.builder(
+                        gridDelegate:
+                            const SliverGridDelegateWithMaxCrossAxisExtent(
+                              maxCrossAxisExtent: 310,
+                              mainAxisSpacing: 12,
+                              crossAxisSpacing: 12,
+                              childAspectRatio: 0.78,
+                            ),
                         itemCount: visibleDecks.length,
                         itemBuilder: (context, index) {
                           final deck = visibleDecks[index];
@@ -654,9 +684,9 @@ class _DeckListScreenState extends State<DeckListScreen> {
                             onDelete: () => _deleteDeck(context, deck),
                           );
                         },
-                      );
-                    },
-                  ),
+                      ),
+                    );
+                  },
                 ),
             ],
           );
@@ -904,12 +934,11 @@ String _timeAgo(DateTime date) {
 }
 
 String _compactDeckPrice(double value, String? currency) {
-  final code = (currency ?? 'USD').trim().toUpperCase();
-  final amount =
-      value >= 1000
-          ? '${(value / 1000).toStringAsFixed(value >= 10000 ? 0 : 1)}k'
-          : value.toStringAsFixed(value >= 100 ? 0 : 2);
-  return '$code $amount';
+  return CurrencyFormatter.format(
+    value,
+    currencyCode: currency ?? 'USD',
+    compact: true,
+  );
 }
 
 class _SparseDeckActions extends StatelessWidget {
@@ -1036,9 +1065,26 @@ class _DeckSpotlightCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final imageUrl = deck.commanderImageUrl?.trim();
-    final hasArt = imageUrl != null && imageUrl.isNotEmpty;
-    final fallbackImageUrl = _scryfallDeckImageUrl(deck.commanderName);
+    final explicitImageUrl = deck.commanderImageUrl?.trim();
+    final thumbnailUrl = ScryfallImageHelper.canonicalCardImageUrl(
+      explicitUrl: explicitImageUrl,
+      cardName: deck.commanderName,
+      version: 'small',
+    );
+    final backgroundUrl = ScryfallImageHelper.canonicalCardImageUrl(
+      explicitUrl: explicitImageUrl,
+      cardName: deck.commanderName,
+      version: 'art_crop',
+    );
+    final fallbackImageUrl = ScryfallImageHelper.namedImageUrl(
+      deck.commanderName,
+      version: 'small',
+    );
+    final fallbackBackgroundUrl = ScryfallImageHelper.namedImageUrl(
+      deck.commanderName,
+      version: 'art_crop',
+    );
+    final hasArt = thumbnailUrl != null;
 
     return Material(
       color: AppTheme.transparent,
@@ -1067,15 +1113,12 @@ class _DeckSpotlightCard extends StatelessWidget {
                             sigmaY: 10,
                           ),
                           child: CachedCardImage(
-                            imageUrl: imageUrl,
-                            fallbackImageUrl: fallbackImageUrl,
+                            imageUrl: backgroundUrl ?? thumbnailUrl,
+                            fallbackImageUrl: fallbackBackgroundUrl,
                             fit: BoxFit.cover,
                           ),
                         )
-                        : _DeckFallbackArt(
-                          accent: AppTheme.brass500,
-                          format: deck.format,
-                        ),
+                        : _DeckFallbackArt(accent: AppTheme.brass500),
               ),
               Positioned.fill(
                 child: DecoratedBox(
@@ -1093,26 +1136,24 @@ class _DeckSpotlightCard extends StatelessWidget {
               ),
               Positioned(
                 left: 12,
-                top: 12,
-                bottom: 12,
+                top: 20,
+                bottom: 20,
                 child: ClipRRect(
                   borderRadius: BorderRadius.circular(AppTheme.radiusSm),
                   child:
                       hasArt
                           ? CachedCardImage(
-                            imageUrl: imageUrl,
+                            key: Key('deck-spotlight-art-${deck.id}'),
+                            imageUrl: thumbnailUrl,
                             fallbackImageUrl: fallbackImageUrl,
-                            width: 82,
-                            height: 144,
-                            fit: BoxFit.cover,
+                            width: 92,
+                            height: 128,
+                            fit: BoxFit.contain,
                           )
                           : SizedBox(
-                            width: 82,
-                            height: 144,
-                            child: _DeckFallbackArt(
-                              accent: AppTheme.brass500,
-                              format: deck.format,
-                            ),
+                            width: 92,
+                            height: 128,
+                            child: _DeckFallbackArt(accent: AppTheme.brass500),
                           ),
                 ),
               ),
@@ -1131,7 +1172,7 @@ class _DeckSpotlightCard extends StatelessWidget {
                 ),
               ),
               Positioned(
-                left: 106,
+                left: 118,
                 right: 14,
                 top: 18,
                 bottom: 14,
@@ -1176,7 +1217,10 @@ class _DeckSpotlightCard extends StatelessWidget {
                       crossAxisAlignment: WrapCrossAlignment.center,
                       children: [
                         _DeckInfoBadge(label: _formatDeckLabel(deck.format)),
-                        _DeckColorPips(colors: deck.colorIdentity),
+                        _DeckColorPips(
+                          colors: deck.colorIdentity,
+                          identityKnown: deck.colorIdentityKnown,
+                        ),
                         _DeckInfoBadge(label: _deckCountLabel(deck)),
                         _DeckInfoBadge(
                           label: _deckStatusLabel(deck),
@@ -1303,19 +1347,33 @@ class _DeckInfoBadge extends StatelessWidget {
 }
 
 class _DeckColorPips extends StatelessWidget {
-  const _DeckColorPips({required this.colors});
+  const _DeckColorPips({required this.colors, required this.identityKnown});
 
   final List<String> colors;
-  static const _order = ['W', 'U', 'B', 'R', 'G'];
+  final bool identityKnown;
 
   @override
   Widget build(BuildContext context) {
-    final sorted =
-        colors.map((e) => e.toUpperCase()).where(_order.contains).toList()
-          ..sort((a, b) => _order.indexOf(a).compareTo(_order.indexOf(b)));
-    if (sorted.isEmpty) {
-      return const _DeckInfoBadge(label: 'C');
+    if (colors.isEmpty && !identityKnown) {
+      return const Tooltip(
+        message: 'Identidade de cor pendente',
+        child: _PendingIdentityBadge(),
+      );
     }
+    return ColorIdentityPips(
+      colors: colors,
+      symbolSize: 13,
+      spacing: 2,
+      colorlessWhenEmpty: identityKnown,
+    );
+  }
+}
+
+class _PendingIdentityBadge extends StatelessWidget {
+  const _PendingIdentityBadge();
+
+  @override
+  Widget build(BuildContext context) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 4),
       decoration: BoxDecoration(
@@ -1323,53 +1381,10 @@ class _DeckColorPips extends StatelessWidget {
         borderRadius: BorderRadius.circular(AppTheme.radiusPill),
         border: Border.all(color: AppTheme.outlineMuted.withValues(alpha: 0.7)),
       ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children:
-            sorted
-                .map(
-                  (color) => Padding(
-                    padding: const EdgeInsets.only(right: 2),
-                    child: SizedBox(
-                      width: 13,
-                      height: 13,
-                      child: SvgPicture.asset(
-                        'assets/symbols/$color.svg',
-                        placeholderBuilder:
-                            (_) => _PipFallback(symbol: color, size: 13),
-                      ),
-                    ),
-                  ),
-                )
-                .toList(),
-      ),
-    );
-  }
-}
-
-class _PipFallback extends StatelessWidget {
-  const _PipFallback({required this.symbol, required this.size});
-
-  final String symbol;
-  final double size;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: size,
-      height: size,
-      decoration: BoxDecoration(
-        color: AppTheme.manaPipBackground(symbol),
-        shape: BoxShape.circle,
-      ),
-      alignment: Alignment.center,
-      child: Text(
-        symbol,
-        style: TextStyle(
-          color: AppTheme.manaPipForeground(symbol),
-          fontSize: size * 0.52,
-          fontWeight: FontWeight.w900,
-        ),
+      child: const Icon(
+        Icons.help_outline_rounded,
+        size: 13,
+        color: AppTheme.textHint,
       ),
     );
   }
@@ -1486,8 +1501,15 @@ class _DeckGalleryCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final commanderImageUrl = deck.commanderImageUrl?.trim();
-    final hasArt = commanderImageUrl != null && commanderImageUrl.isNotEmpty;
-    final fallbackImageUrl = _scryfallDeckImageUrl(deck.commanderName);
+    final cardImageUrl = ScryfallImageHelper.canonicalCardImageUrl(
+      explicitUrl: commanderImageUrl,
+      cardName: deck.commanderName,
+      version: 'normal',
+    );
+    final fallbackImageUrl = ScryfallImageHelper.namedImageUrl(
+      deck.commanderName,
+      version: 'normal',
+    );
     final maxCards = _maxCardsForFormat(deck.format);
     final isComplete = maxCards != null && deck.cardCount >= maxCards;
     final accent = _accentColor(deck.format);
@@ -1513,29 +1535,109 @@ class _DeckGalleryCard extends StatelessWidget {
           child: Stack(
             children: [
               Positioned.fill(
-                child:
-                    hasArt
-                        ? CachedCardImage(
-                          imageUrl: commanderImageUrl,
-                          fallbackImageUrl: fallbackImageUrl,
-                          fit: BoxFit.cover,
-                        )
-                        : _DeckFallbackArt(accent: accent, format: deck.format),
-              ),
-              Positioned.fill(
-                child: DecoratedBox(
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      begin: Alignment.topCenter,
-                      end: Alignment.bottomCenter,
-                      colors: [
-                        AppTheme.backgroundAbyss.withValues(alpha: 0.06),
-                        AppTheme.backgroundAbyss.withValues(alpha: 0.18),
-                        AppTheme.backgroundAbyss.withValues(alpha: 0.84),
-                      ],
-                      stops: const [0, 0.44, 1],
+                child: Column(
+                  children: [
+                    Expanded(
+                      child: DecoratedBox(
+                        decoration: BoxDecoration(
+                          gradient: LinearGradient(
+                            begin: Alignment.topLeft,
+                            end: Alignment.bottomRight,
+                            colors: [
+                              accent.withValues(alpha: 0.16),
+                              AppTheme.surfaceElevated,
+                              AppTheme.backgroundAbyss,
+                            ],
+                          ),
+                        ),
+                        child: Padding(
+                          padding: const EdgeInsets.fromLTRB(14, 12, 14, 10),
+                          child: Center(
+                            child: _DeckCardFrame(
+                              frameKey: Key(
+                                'deck-gallery-art-frame-${deck.id}',
+                              ),
+                              imageKey: Key('deck-gallery-art-${deck.id}'),
+                              imageUrl: cardImageUrl,
+                              fallbackImageUrl: fallbackImageUrl,
+                              accent: accent,
+                            ),
+                          ),
+                        ),
+                      ),
                     ),
-                  ),
+                    SizedBox(
+                      height: _deckGalleryFooterHeight,
+                      child: DecoratedBox(
+                        decoration: BoxDecoration(
+                          color: AppTheme.backgroundAbyss.withValues(
+                            alpha: 0.96,
+                          ),
+                          border: Border(
+                            top: BorderSide(
+                              color: AppTheme.outlineMuted.withValues(
+                                alpha: 0.5,
+                              ),
+                              width: AppTheme.strokeHairline,
+                            ),
+                          ),
+                        ),
+                        child: Padding(
+                          padding: const EdgeInsets.fromLTRB(10, 10, 10, 9),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                deck.name,
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                style: theme.textTheme.titleSmall?.copyWith(
+                                  color: AppTheme.textPrimary,
+                                  fontFamily: AppTheme.displayFontFamily,
+                                  fontSize: AppTheme.fontSm + 1,
+                                  fontWeight: FontWeight.w800,
+                                  height: 1.05,
+                                ),
+                              ),
+                              const SizedBox(height: 3),
+                              Text(
+                                (deck.commanderName ?? '').trim().isEmpty
+                                    ? _formatDeckLabel(deck.format)
+                                    : deck.commanderName!,
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                style: theme.textTheme.labelSmall?.copyWith(
+                                  color: AppTheme.textSecondary,
+                                  fontSize: AppTheme.fontXs,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                              const Spacer(),
+                              Wrap(
+                                spacing: 5,
+                                runSpacing: 5,
+                                crossAxisAlignment: WrapCrossAlignment.center,
+                                children: [
+                                  _DeckInfoBadge(
+                                    label: _formatDeckLabel(deck.format),
+                                  ),
+                                  _DeckColorPips(
+                                    colors: deck.colorIdentity,
+                                    identityKnown: deck.colorIdentityKnown,
+                                  ),
+                                  _DeckInfoBadge(label: _deckCountLabel(deck)),
+                                  _DeckInfoBadge(
+                                    label: _deckStatusLabel(deck),
+                                    color: _deckStatusColor(deck),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
               ),
               Positioned(
@@ -1545,7 +1647,7 @@ class _DeckGalleryCard extends StatelessWidget {
                   width: 18,
                   height: 18,
                   decoration: BoxDecoration(
-                    color: AppTheme.backgroundAbyss.withValues(alpha: 0.46),
+                    color: AppTheme.backgroundAbyss.withValues(alpha: 0.72),
                     shape: BoxShape.circle,
                     border: Border.all(
                       color: AppTheme.brass400.withValues(alpha: 0.42),
@@ -1560,8 +1662,8 @@ class _DeckGalleryCard extends StatelessWidget {
                 ),
               ),
               Positioned(
-                right: 2,
-                top: 86,
+                right: 4,
+                top: 4,
                 child: IconButton(
                   tooltip: 'Opções do deck',
                   visualDensity: VisualDensity.compact,
@@ -1576,57 +1678,6 @@ class _DeckGalleryCard extends StatelessWidget {
                     size: 19,
                   ),
                   onPressed: () => _showDeckMenu(context),
-                ),
-              ),
-              Positioned(
-                left: 10,
-                right: 10,
-                bottom: 10,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Text(
-                      deck.name,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: theme.textTheme.titleSmall?.copyWith(
-                        color: AppTheme.textPrimary,
-                        fontFamily: AppTheme.displayFontFamily,
-                        fontSize: AppTheme.fontSm + 1,
-                        fontWeight: FontWeight.w800,
-                        height: 1.05,
-                      ),
-                    ),
-                    const SizedBox(height: 3),
-                    Text(
-                      (deck.commanderName ?? '').trim().isEmpty
-                          ? _formatDeckLabel(deck.format)
-                          : deck.commanderName!,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: theme.textTheme.labelSmall?.copyWith(
-                        color: AppTheme.textSecondary,
-                        fontSize: AppTheme.fontXs,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    Wrap(
-                      spacing: 5,
-                      runSpacing: 5,
-                      crossAxisAlignment: WrapCrossAlignment.center,
-                      children: [
-                        _DeckInfoBadge(label: _formatDeckLabel(deck.format)),
-                        _DeckColorPips(colors: deck.colorIdentity),
-                        _DeckInfoBadge(label: _deckCountLabel(deck)),
-                        _DeckInfoBadge(
-                          label: _deckStatusLabel(deck),
-                          color: _deckStatusColor(deck),
-                        ),
-                      ],
-                    ),
-                  ],
                 ),
               ),
             ],
@@ -1644,7 +1695,7 @@ class _DeckGalleryCard extends StatelessWidget {
       context: context,
       position: RelativeRect.fromLTRB(
         offset.dx + renderBox.size.width - 48,
-        offset.dy + 86,
+        offset.dy + 12,
         offset.dx + renderBox.size.width,
         offset.dy + renderBox.size.height,
       ),
@@ -1678,11 +1729,62 @@ class _DeckGalleryCard extends StatelessWidget {
   }
 }
 
+class _DeckCardFrame extends StatelessWidget {
+  const _DeckCardFrame({
+    required this.frameKey,
+    required this.imageKey,
+    required this.imageUrl,
+    required this.fallbackImageUrl,
+    required this.accent,
+  });
+
+  final Key frameKey;
+  final Key imageKey;
+  final String? imageUrl;
+  final String? fallbackImageUrl;
+  final Color accent;
+
+  @override
+  Widget build(BuildContext context) {
+    return AspectRatio(
+      key: frameKey,
+      aspectRatio: _mtgCardAspectRatio,
+      child: Container(
+        clipBehavior: Clip.antiAlias,
+        decoration: BoxDecoration(
+          color: AppTheme.surfaceSlate,
+          borderRadius: BorderRadius.circular(AppTheme.radiusSm),
+          border: Border.all(
+            color: AppTheme.outlineMuted.withValues(alpha: 0.72),
+            width: AppTheme.strokeHairline,
+          ),
+          boxShadow: [
+            BoxShadow(
+              color: AppTheme.backgroundAbyss.withValues(alpha: 0.34),
+              blurRadius: 12,
+              offset: const Offset(0, 5),
+            ),
+          ],
+        ),
+        child:
+            imageUrl == null
+                ? _DeckFallbackArt(accent: accent)
+                : CachedCardImage(
+                  key: imageKey,
+                  imageUrl: imageUrl,
+                  fallbackImageUrl:
+                      fallbackImageUrl == imageUrl ? null : fallbackImageUrl,
+                  fit: BoxFit.contain,
+                ),
+      ),
+    );
+  }
+}
+
 class _DeckFallbackArt extends StatelessWidget {
-  const _DeckFallbackArt({required this.accent, required this.format});
+  const _DeckFallbackArt({required this.accent});
 
   final Color accent;
-  final String format;
 
   @override
   Widget build(BuildContext context) {
@@ -1698,16 +1800,10 @@ class _DeckFallbackArt extends StatelessWidget {
           ],
         ),
       ),
-      child: Center(
-        child: Text(
-          format.isEmpty ? 'D' : format[0].toUpperCase(),
-          style: TextStyle(
-            color: AppTheme.textPrimary.withValues(alpha: 0.42),
-            fontFamily: AppTheme.displayFontFamily,
-            fontSize: AppTheme.fontDisplay + AppTheme.fontXxl,
-            fontWeight: FontWeight.w800,
-          ),
-        ),
+      child: Icon(
+        Icons.style_rounded,
+        color: AppTheme.textPrimary.withValues(alpha: 0.16),
+        size: 72,
       ),
     );
   }

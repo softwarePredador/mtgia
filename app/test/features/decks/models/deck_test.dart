@@ -30,6 +30,7 @@ void main() {
       expect(deck.synergyScore, 85);
       expect(deck.isPublic, true);
       expect(deck.cardCount, 100);
+      expect(deck.colorIdentityKnown, isFalse);
     });
 
     test('fromJson deve lidar com campos opcionais nulos', () {
@@ -72,6 +73,32 @@ void main() {
       expect(json['format'], 'modern');
       expect(json['description'], 'Test');
       expect(json['is_public'], true);
+    });
+
+    test('distingue identidade incolor conhecida de metadata pendente', () {
+      final colorless = Deck.fromJson({
+        'id': 'colorless',
+        'name': 'Colorless',
+        'format': 'standard',
+        'is_public': false,
+        'created_at': '2025-01-30T10:00:00Z',
+        'color_identity': <String>[],
+        'color_identity_known': true,
+      });
+      final pending = Deck.fromJson({
+        'id': 'pending',
+        'name': 'Pending',
+        'format': 'commander',
+        'is_public': false,
+        'created_at': '2025-01-30T10:00:00Z',
+        'color_identity': <String>[],
+        'color_identity_known': false,
+      });
+
+      expect(colorless.colorIdentity, isEmpty);
+      expect(colorless.colorIdentityKnown, isTrue);
+      expect(pending.colorIdentity, isEmpty);
+      expect(pending.colorIdentityKnown, isFalse);
     });
   });
 }

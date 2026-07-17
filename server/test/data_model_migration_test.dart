@@ -1,4 +1,5 @@
 import '../bin/migrate.dart' as migrate;
+import 'package:server/sql_statement_splitter.dart';
 import 'package:test/test.dart';
 
 void main() {
@@ -307,6 +308,94 @@ void main() {
       expect(up, contains('battle_rule_matches as'));
       expect(up, contains('br.normalized_name in'));
       expect(down, contains('drop view if exists card_intelligence_snapshot'));
+    });
+
+    test('migration 038 owns privacy and post-game sync schema', () {
+      final migration = migrate.migrations.singleWhere(
+        (migration) => migration.version == '038',
+      );
+      final up = migration.up.toLowerCase();
+
+      expect(
+        migration.name,
+        equals('add_privacy_and_post_game_sync_contracts'),
+      );
+      expect(up, contains('alter table users'));
+      expect(up, contains('create extension if not exists "pgcrypto"'));
+      expect(up, contains('add column if not exists deleted_at'));
+      expect(up, contains('add column if not exists play_session_id'));
+      expect(up, contains('add column if not exists revision bigint'));
+      expect(up, contains('create table if not exists post_game_sync_state'));
+      expect(up, contains('set watermark = greatest'));
+      expect(
+        up,
+        contains('create table if not exists account_deletion_receipts'),
+      );
+      expect(
+        up,
+        contains('create table if not exists privacy_deleted_deck_tombstones'),
+      );
+      expect(up, contains('create table if not exists privacy_keyring'));
+      expect(up, contains('gen_random_bytes(32)'));
+      expect(up, contains('hmac('));
+      expect(up, contains('deck_token text not null'));
+      expect(up, isNot(contains('deck_id uuid primary key')));
+      expect(
+        up,
+        contains('create or replace function manaloom_require_active_user'),
+      );
+      expect(up, contains('for update'));
+      expect(up, contains('create trigger %i before insert or update of %i'));
+      expect(
+        up,
+        contains(
+          'create or replace function manaloom_guard_deck_learning_event',
+        ),
+      );
+      expect(
+        up,
+        contains('create or replace function manaloom_guard_battle_simulation'),
+      );
+      expect(up, contains('on delete set null'));
+      final statements = splitPostgresStatements(migration.up);
+      expect(
+        statements.any(
+          (statement) =>
+              statement.contains('CREATE OR REPLACE FUNCTION') &&
+              statement.contains('manaloom_require_active_user') &&
+              statement.contains('END;'),
+        ),
+        isTrue,
+      );
+      expect(
+        statements.any(
+          (statement) =>
+              statement.contains('DO \$active_user_triggers\$') &&
+              statement.contains('END;'),
+        ),
+        isTrue,
+      );
+      final down = migration.down!.toLowerCase();
+      expect(down, contains('alter column binder_item_id set not null'));
+      expect(down, contains('on delete restrict'));
+      expect(down, contains('drop table if exists post_game_sync_state'));
+      expect(down, contains('drop table if exists privacy_keyring'));
+      expect(
+        down,
+        contains('drop function if exists manaloom_require_active_user'),
+      );
+      expect(
+        down,
+        contains('drop function if exists manaloom_guard_deck_learning_event'),
+      );
+      expect(
+        down,
+        contains('drop function if exists manaloom_guard_battle_simulation'),
+      );
+      expect(
+        migrate.migrationRollbackPolicy('038'),
+        equals(migrate.MigrationRollbackPolicy.manualOnly),
+      );
     });
 
     test('migration 033 persists deck optimization events', () {

@@ -3,7 +3,9 @@ import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:manaloom/core/api/api_client.dart';
 import 'package:manaloom/core/theme/app_theme.dart';
+import 'package:manaloom/core/widgets/cached_card_image.dart';
 import 'package:manaloom/features/auth/providers/auth_provider.dart';
+import 'package:manaloom/features/decks/models/deck.dart';
 import 'package:manaloom/features/decks/providers/deck_provider.dart';
 import 'package:manaloom/features/home/home_screen.dart';
 import 'package:manaloom/features/market/providers/market_provider.dart';
@@ -20,6 +22,27 @@ class _IdleDeckProvider extends DeckProvider {
   Future<void> fetchDecks({bool silent = false}) async {}
 }
 
+class _SeededDeckProvider extends _IdleDeckProvider {
+  _SeededDeckProvider(this.seededDecks);
+
+  final List<Deck> seededDecks;
+
+  @override
+  List<Deck> get decks => List<Deck>.unmodifiable(seededDecks);
+}
+
+class _ErrorDeckProvider extends _IdleDeckProvider {
+  int retryCount = 0;
+
+  @override
+  String? get errorMessage => 'Verifique sua conexão e tente novamente.';
+
+  @override
+  Future<void> fetchDecks({bool silent = false}) async {
+    retryCount += 1;
+  }
+}
+
 class _IdleMarketProvider extends MarketProvider {
   _IdleMarketProvider() : super(apiClient: _NoopApiClient());
 
@@ -31,13 +54,24 @@ class _IdleMarketProvider extends MarketProvider {
   }) async {}
 }
 
-Widget _buildSubject({bool? lifeCounterAvailable}) {
+Widget _buildSubject({
+  bool? lifeCounterAvailable,
+  List<Deck> decks = const [],
+  DeckProvider? deckProvider,
+}) {
   return MultiProvider(
     providers: [
       ChangeNotifierProvider<AuthProvider>(
         create: (_) => AuthProvider(apiClient: _NoopApiClient()),
       ),
-      ChangeNotifierProvider<DeckProvider>(create: (_) => _IdleDeckProvider()),
+      ChangeNotifierProvider<DeckProvider>(
+        create:
+            (_) =>
+                deckProvider ??
+                (decks.isEmpty
+                    ? _IdleDeckProvider()
+                    : _SeededDeckProvider(decks)),
+      ),
       ChangeNotifierProvider<MarketProvider>(
         create: (_) => _IdleMarketProvider(),
       ),
@@ -110,6 +144,25 @@ void main() {
     expect(tester.takeException(), isNull);
   });
 
+  testWidgets('distinguishes deck loading failure from an empty account', (
+    tester,
+  ) async {
+    final provider = _ErrorDeckProvider();
+    await tester.pumpWidget(
+      _buildSubject(lifeCounterAvailable: false, deckProvider: provider),
+    );
+    await tester.pump(const Duration(milliseconds: 900));
+
+    expect(find.byKey(const Key('home-decks-error-state')), findsOneWidget);
+    expect(find.text('Você ainda não tem decks'), findsNothing);
+    expect(find.text('Tentar novamente'), findsOneWidget);
+
+    final callsBeforeTap = provider.retryCount;
+    await tester.tap(find.byKey(const Key('home-decks-retry')));
+    await tester.pump();
+    expect(provider.retryCount, callsBeforeTap + 1);
+  });
+
   testWidgets('keeps home intent cards readable on SM A135M width', (
     tester,
   ) async {
@@ -145,7 +198,7 @@ void main() {
     var imageLoaded = false;
     Object? imageError;
     precacheImage(
-      const AssetImage('assets/branding/home_hero_banner.png'),
+      const AssetImage('assets/branding/home_hero.png'),
       tester.element(find.byType(HomeScreen)),
     ).then<void>(
       (_) => imageLoaded = true,
@@ -169,5 +222,122 @@ void main() {
       find.byKey(const Key('home-hero-frame')),
       matchesGoldenFile('goldens/home_hero_sma135m.png'),
     );
+  });
+
+  testWidgets('hero artwork uses a contained crop and foreground frame', (
+    tester,
+  ) async {
+    tester.view.physicalSize = const Size(1200, 800);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
+    await tester.pumpWidget(_buildSubject(lifeCounterAvailable: false));
+    await tester.pump(const Duration(milliseconds: 900));
+
+    final artwork = tester.widget<Image>(
+      find.byKey(const Key('home-hero-artwork')),
+    );
+    expect(artwork.fit, BoxFit.contain);
+    expect(
+      (artwork.image as AssetImage).assetName,
+      'assets/branding/home_hero.png',
+    );
+
+    final surface = tester.widget<Container>(
+      find.byKey(const Key('home-hero-surface')),
+    );
+    final foreground = surface.foregroundDecoration! as BoxDecoration;
+    expect(foreground.border, isNotNull);
+    expect(foreground.borderRadius, isNotNull);
+  });
+
+  testWidgets('matches the desktop hero visual baseline', (tester) async {
+    tester.view.physicalSize = const Size(1200, 800);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
+    await tester.pumpWidget(_buildSubject(lifeCounterAvailable: false));
+    var imageLoaded = false;
+    Object? imageError;
+    precacheImage(
+      const AssetImage('assets/branding/home_hero.png'),
+      tester.element(find.byType(HomeScreen)),
+    ).then<void>(
+      (_) => imageLoaded = true,
+      onError: (Object error, StackTrace stackTrace) => imageError = error,
+    );
+    for (
+      var attempt = 0;
+      attempt < 50 && !imageLoaded && imageError == null;
+      attempt++
+    ) {
+      await tester.runAsync(
+        () => Future<void>.delayed(const Duration(milliseconds: 20)),
+      );
+      await tester.pump(const Duration(milliseconds: 100));
+    }
+    expect(imageError, isNull);
+    expect(imageLoaded, isTrue, reason: 'home hero asset did not load');
+    await tester.pump(const Duration(milliseconds: 900));
+
+    await expectLater(
+      find.byKey(const Key('home-hero-frame')),
+      matchesGoldenFile('goldens/home_hero_web.png'),
+    );
+  });
+
+  testWidgets('recent deck art is inset on every side and keeps card ratio', (
+    tester,
+  ) async {
+    tester.view.physicalSize = const Size(1200, 800);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
+    final deck = Deck(
+      id: 'deck-padding',
+      name: 'Deck com acabamento',
+      format: 'commander',
+      commanderName: 'Jace, the Mind Sculptor',
+      commanderImageUrl: 'https://cards.scryfall.io/normal/front/test.jpg',
+      isPublic: false,
+      createdAt: DateTime(2026, 7, 15),
+      cardCount: 100,
+      colorIdentity: const ['U'],
+    );
+
+    await tester.pumpWidget(
+      _buildSubject(lifeCounterAvailable: false, decks: [deck]),
+    );
+    await tester.pump(const Duration(milliseconds: 900));
+
+    final railRect = tester.getRect(
+      find.byKey(const Key('home-recent-decks-rail')),
+    );
+    final cardRect = tester.getRect(
+      find.byKey(const Key('home-recent-deck-deck-padding')),
+    );
+    final artRect = tester.getRect(
+      find.byKey(const Key('home-recent-deck-art-deck-padding')),
+    );
+
+    expect(cardRect.top, greaterThan(railRect.top));
+    expect(cardRect.bottom, lessThan(railRect.bottom));
+    expect(artRect.left - cardRect.left, greaterThanOrEqualTo(8));
+    expect(artRect.top - cardRect.top, greaterThanOrEqualTo(8));
+    expect(cardRect.right - artRect.right, greaterThan(8));
+    expect(cardRect.bottom - artRect.bottom, greaterThanOrEqualTo(8));
+    expect(artRect.width / artRect.height, closeTo(72 / 102, 0.01));
+
+    final image = tester.widget<CachedCardImage>(
+      find.descendant(
+        of: find.byKey(const Key('home-recent-deck-art-deck-padding')),
+        matching: find.byType(CachedCardImage),
+      ),
+    );
+    expect(image.fit, BoxFit.contain);
+    expect(tester.takeException(), isNull);
   });
 }

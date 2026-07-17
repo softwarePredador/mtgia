@@ -11,7 +11,7 @@ Future<LifeCounterSession?> showLifeCounterNativeTableStateSheet(
   return showModalBottomSheet<LifeCounterSession>(
     context: context,
     isScrollControlled: true,
-    backgroundColor: Colors.transparent,
+    backgroundColor: AppTheme.transparent,
     builder: (context) {
       return _LifeCounterNativeTableStateSheet(initialSession: initialSession);
     },
@@ -100,7 +100,7 @@ class _LifeCounterNativeTableStateSheetState
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              'Table State',
+                              'Estado da mesa',
                               style: TextStyle(
                                 color: AppTheme.textPrimary,
                                 fontSize: AppTheme.fontXxl,
@@ -109,11 +109,11 @@ class _LifeCounterNativeTableStateSheetState
                             ),
                             SizedBox(height: 6),
                             Text(
-                              'Assign Monarch and Initiative, and track storm.',
+                              'Atribua Monarca e Iniciativa e acompanhe Storm.',
                               style: TextStyle(
                                 color: AppTheme.textSecondary,
                                 fontSize: AppTheme.fontMd,
-                                height: 1.35,
+                                height: AppTheme.lineHeightCompact,
                               ),
                             ),
                           ],
@@ -123,7 +123,7 @@ class _LifeCounterNativeTableStateSheetState
                         onPressed: () => Navigator.of(context).pop(),
                         icon: const Icon(Icons.close_rounded),
                         color: AppTheme.textSecondary,
-                        tooltip: 'Close',
+                        tooltip: 'Fechar',
                       ),
                     ],
                   ),
@@ -134,9 +134,9 @@ class _LifeCounterNativeTableStateSheetState
                     padding: const EdgeInsets.fromLTRB(20, 18, 20, 12),
                     children: [
                       _TableStateCard(
-                        title: 'Monarch',
+                        title: 'Monarca',
                         subtitle:
-                            'Choose who currently holds the monarch token, or clear it.',
+                            'Escolha quem possui o marcador de Monarca ou limpe a seleção.',
                         child: _TokenAssignmentSection(
                           keyPrefix: 'life-counter-native-table-state-monarch',
                           selectedPlayer: _monarchPlayer,
@@ -151,9 +151,9 @@ class _LifeCounterNativeTableStateSheetState
                       ),
                       const SizedBox(height: 18),
                       _TableStateCard(
-                        title: 'Initiative',
+                        title: 'Iniciativa',
                         subtitle:
-                            'Choose who currently holds the initiative, or clear it.',
+                            'Escolha quem possui a Iniciativa ou limpe a seleção.',
                         child: _TokenAssignmentSection(
                           keyPrefix:
                               'life-counter-native-table-state-initiative',
@@ -171,7 +171,7 @@ class _LifeCounterNativeTableStateSheetState
                       const SizedBox(height: 18),
                       _TableStateCard(
                         title: 'Storm',
-                        subtitle: 'Track the current storm count.',
+                        subtitle: 'Acompanhe a contagem atual de Storm.',
                         child: Row(
                           children: [
                             _StormButton(
@@ -186,7 +186,7 @@ class _LifeCounterNativeTableStateSheetState
                                 child: Column(
                                   children: [
                                     const Text(
-                                      'Storm Count',
+                                      'Contagem de Storm',
                                       style: TextStyle(
                                         color: AppTheme.textSecondary,
                                         fontSize: AppTheme.fontSm,
@@ -200,7 +200,8 @@ class _LifeCounterNativeTableStateSheetState
                                       ),
                                       style: const TextStyle(
                                         color: AppTheme.textPrimary,
-                                        fontSize: 42,
+                                        fontSize:
+                                            AppTheme.fontLifeCounterStormValue,
                                         fontWeight: FontWeight.w900,
                                         letterSpacing: -2,
                                       ),
@@ -237,7 +238,7 @@ class _LifeCounterNativeTableStateSheetState
                             ),
                             padding: const EdgeInsets.symmetric(vertical: 14),
                           ),
-                          child: const Text('Cancel'),
+                          child: const Text('Cancelar'),
                         ),
                       ),
                       const SizedBox(width: 12),
@@ -252,7 +253,7 @@ class _LifeCounterNativeTableStateSheetState
                             foregroundColor: AppTheme.backgroundAbyss,
                             padding: const EdgeInsets.symmetric(vertical: 14),
                           ),
-                          child: const Text('Apply'),
+                          child: const Text('Aplicar'),
                         ),
                       ),
                     ],
@@ -305,7 +306,7 @@ class _TableStateCard extends StatelessWidget {
               style: const TextStyle(
                 color: AppTheme.textSecondary,
                 fontSize: AppTheme.fontSm,
-                height: 1.35,
+                height: AppTheme.lineHeightCompact,
               ),
             ),
             const SizedBox(height: 14),
@@ -348,8 +349,8 @@ class _TokenAssignmentSection extends StatelessWidget {
               key: Key('$keyPrefix-player-$index'),
               label: Text(
                 isAvailable
-                    ? 'Player ${index + 1}'
-                    : 'Player ${index + 1} (out)',
+                    ? 'Jogador ${index + 1}'
+                    : 'Jogador ${index + 1} (fora)',
               ),
               selected: selectedPlayer == index,
               onSelected: isAvailable ? (_) => onPlayerSelected(index) : null,
@@ -361,7 +362,7 @@ class _TokenAssignmentSection extends StatelessWidget {
           key: Key('$keyPrefix-clear'),
           onPressed: onCleared,
           icon: const Icon(Icons.remove_circle_outline_rounded),
-          label: const Text('Clear'),
+          label: const Text('Limpar'),
         ),
       ],
     );
@@ -391,7 +392,7 @@ class _StormButton extends StatelessWidget {
           backgroundColor: AppTheme.surfaceElevated,
           foregroundColor: AppTheme.textPrimary,
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(18),
+            borderRadius: BorderRadius.circular(AppTheme.radiusLifeCounterLg),
             side: const BorderSide(color: AppTheme.outlineMuted),
           ),
         ),

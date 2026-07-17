@@ -9,9 +9,12 @@ class CommunityEngagementService {
     final result = await pool.execute(
       Sql.named('''
         SELECT 1
-        FROM decks
-        WHERE id = CAST(@deckId AS uuid)
-          AND is_public = TRUE
+        FROM decks d
+        JOIN users u ON u.id = d.user_id
+        WHERE d.id = CAST(@deckId AS uuid)
+          AND d.is_public = TRUE
+          AND d.deleted_at IS NULL
+          AND u.deleted_at IS NULL
         LIMIT 1
       '''),
       parameters: {'deckId': deckId},
@@ -235,6 +238,7 @@ class CommunityEngagementService {
         JOIN user_binder_items bi ON bi.card_id = w.card_id
         JOIN users u ON u.id = bi.user_id
         WHERE bi.user_id <> CAST(@userId AS uuid)
+          AND u.deleted_at IS NULL
           AND bi.list_type = 'have'
           AND (bi.for_trade = TRUE OR bi.for_sale = TRUE)
         ORDER BY w.card_name ASC, bi.for_trade DESC, bi.price ASC NULLS LAST

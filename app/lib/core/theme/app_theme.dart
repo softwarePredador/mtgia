@@ -17,7 +17,7 @@ import 'package:flutter/material.dart';
 ///   Qualquer cor fora deste arquivo é violação.
 ///
 /// RADIUS SCALE: radiusXxs(2) / radiusXs(4) / radiusSm(8) / radiusMd(12) / radiusLg(16) / radiusXl(20) / radiusPill(999)
-/// FONT SCALE:   fontMicro(8) / fontTiny(9) / fontXs(10) / fontSm(12) / fontMd(14) / fontLg(16) / fontXl(18) / fontXxl(20) / fontDisplay(32)
+/// FONT SCALE:   fontMicro(11) / fontTiny(11) / fontXs(12) / fontSm(12) / fontMd(14) / fontLg(16) / fontXl(18) / fontXxl(20) / fontDisplay(32)
 class AppTheme {
   static const String uiFontFamily = 'Inter';
   static const String displayFontFamily = 'Fraunces';
@@ -145,7 +145,12 @@ class AppTheme {
   // ── Semantic (feedback) ─────────────────────────────────────
   static const Color success = Color(0xFF4FAF7A);
   static const Color warning = Color(0xFFD28B2C);
-  static const Color error = Color(0xFFC65A46);
+  // Light enough to preserve WCAG AA contrast for normal text on every dark
+  // product surface. Containers use the explicit ColorScheme roles below.
+  static const Color error = Color(0xFFFF8A80);
+  static const Color onError = backgroundAbyss;
+  static const Color errorContainer = Color(0xFF5A1F22);
+  static const Color onErrorContainer = Color(0xFFFFDAD6);
   static const Color disabled = textHint;
 
   // ── Gradients ───────────────────────────────────────────────
@@ -197,11 +202,30 @@ class AppTheme {
   static const double strokeThin = 0.7;
   static const double strokeMedium = 0.8;
   static const double strokeRegular = 0.9;
+  static const double strokeDefault = 1;
   static const double strokeStrong = 2;
   static const double strokeAccent = 3;
+  static const double lineHeightSingle = 1;
+  static const double lineHeightTight = 1.25;
+  static const double lineHeightDense = 1.3;
   static const double lineHeightCompact = 1.35;
+  static const double lineHeightComfortable = 1.4;
   static const double touchTargetMin = 48;
   static const double iconSpinnerSm = 20;
+
+  // ── Adaptive layout ───────────────────────────────────────
+  // Breakpoints follow window width, never a guessed device category.
+  static const double breakpointCompact = 600;
+  static const double breakpointMedium = 840;
+  static const double breakpointExpanded = 1200;
+  static const double breakpointWide = 1600;
+  static const double pageMaxWidth = 1600;
+  static const double contentMaxWidth = 1280;
+  static const double readingMaxWidth = 760;
+  static const double inspectorWidth = 360;
+  static const double pageGutterCompact = 12;
+  static const double pageGutter = 20;
+  static const double paneGap = 20;
   static const double radiusLogoOuter = 30;
   static const double radiusLogoInner = 26;
   static const double radiusLifeCounterSm = 10;
@@ -212,9 +236,11 @@ class AppTheme {
   static const double radiusLifeCounterXxl = 24;
 
   // ── Font Size Scale (9 tokens) ────────────────────────────
-  static const double fontMicro = 8; // dense metadata, compact helper text
-  static const double fontTiny = 9; // compact deck/card metadata
-  static const double fontXs = 10; // badges, chips, mini-labels
+  // Operational text never drops below 11 px. Dense surfaces should simplify
+  // their content instead of making essential metadata unreadable.
+  static const double fontMicro = 11; // dense metadata, compact helper text
+  static const double fontTiny = 11; // compact deck/card metadata
+  static const double fontXs = 12; // badges, chips, mini-labels
   static const double fontSm = 12; // captions, labels, metadata
   static const double fontMd = 14; // body text, list items
   static const double fontLg = 16; // section titles, buttons
@@ -222,6 +248,7 @@ class AppTheme {
   static const double fontXxl = 20; // screen titles
   static const double fontDisplay = 32; // hero / avatar placeholder
   static const double fontLifeCounterLabel = 13.4;
+  static const double fontLifeCounterStormValue = 42;
   static const double fontLifeCounterStepLarge = 28;
   static const double fontLifeCounterHub = 22;
   static const double fontLifeCounterAction = 24;
@@ -502,6 +529,10 @@ class AppTheme {
       onSecondary: backgroundAbyss,
       onTertiary: backgroundAbyss,
       onSurface: textPrimary,
+      error: error,
+      onError: onError,
+      errorContainer: errorContainer,
+      onErrorContainer: onErrorContainer,
     ),
     scaffoldBackgroundColor: backgroundAbyss,
     textTheme: _buildTextTheme(),
@@ -516,7 +547,7 @@ class AppTheme {
       actionsIconTheme: IconThemeData(color: textSecondary, size: 22),
       titleTextStyle: TextStyle(
         color: textPrimary,
-        fontFamily: displayFontFamily,
+        fontFamily: uiFontFamily,
         fontSize: fontLg + 1,
         fontWeight: FontWeight.w700,
       ),
@@ -707,6 +738,27 @@ class AppTheme {
         }
         return const IconThemeData(color: textSecondary, size: 21);
       }),
+    ),
+    navigationRailTheme: NavigationRailThemeData(
+      backgroundColor: backgroundAbyss,
+      indicatorColor: brass500.withValues(alpha: 0.10),
+      indicatorShape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(radiusSm),
+      ),
+      selectedIconTheme: const IconThemeData(color: brass500, size: 22),
+      unselectedIconTheme: const IconThemeData(color: textSecondary, size: 22),
+      selectedLabelTextStyle: const TextStyle(
+        color: brass500,
+        fontFamily: uiFontFamily,
+        fontSize: fontXs,
+        fontWeight: FontWeight.w700,
+      ),
+      unselectedLabelTextStyle: const TextStyle(
+        color: textSecondary,
+        fontFamily: uiFontFamily,
+        fontSize: fontXs,
+        fontWeight: FontWeight.w500,
+      ),
     ),
     popupMenuTheme: PopupMenuThemeData(
       color: surfaceElevated,

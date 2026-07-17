@@ -34,6 +34,7 @@ import '../../cards/screens/card_detail_screen.dart';
 import '../../cards/widgets/card_edition_metadata.dart';
 import '../../commercial/models/manaloom_plan.dart';
 import '../../commercial/widgets/ai_usage_gate.dart';
+import '../../home/life_counter_route.dart';
 
 class _GuidedRebuildPaywallBlocked implements Exception {
   const _GuidedRebuildPaywallBlocked();
@@ -122,6 +123,50 @@ class _DeckDetailsScreenState extends State<DeckDetailsScreen>
     );
   }
 
+  Future<void> _openLifeCounterForDeck(DeckDetails deck) async {
+    final result = await openLifeCounterRoute<LifeCounterExitResult>(
+      context,
+      deckId: deck.id,
+      deckName: deck.name,
+    );
+    if (!mounted || result == null) return;
+
+    if (!result.hadGameActivity) {
+      ScaffoldMessenger.of(context)
+        ..hideCurrentSnackBar()
+        ..showSnackBar(
+          const SnackBar(
+            content: Text('Mesa fechada sem registrar uma nova partida.'),
+          ),
+        );
+      return;
+    }
+
+    final postGameLocation =
+        Uri(
+          path: '/decks/${deck.id}/post-game',
+          queryParameters: <String, String>{
+            if (result.playSessionId != null)
+              'playSessionId': result.playSessionId!,
+            if (result.startedAtEpochMs != null)
+              'startedAt': result.startedAtEpochMs!.toString(),
+            'endedAt': result.endedAtEpochMs.toString(),
+          },
+        ).toString();
+
+    ScaffoldMessenger.of(context)
+      ..hideCurrentSnackBar()
+      ..showSnackBar(
+        SnackBar(
+          content: Text('Atividade da partida com ${deck.name} salva.'),
+          action: SnackBarAction(
+            label: 'Registrar pós-jogo',
+            onPressed: () => context.push(postGameLocation),
+          ),
+        ),
+      );
+  }
+
   Map<String, dynamic>? _pricingFromDeck(DeckDetails deck) {
     if (deck.pricingTotal == null) return null;
     return {
@@ -166,12 +211,6 @@ class _DeckDetailsScreenState extends State<DeckDetailsScreen>
       appBar: AppBar(
         title: const Text('Detalhes do Deck'),
         actions: [
-          IconButton(
-            key: const Key('deck-details-optimize-button'),
-            icon: const Icon(Icons.auto_fix_high),
-            tooltip: 'Otimizar deck',
-            onPressed: () => _showOptimizationOptions(context),
-          ),
           PopupMenuButton<String>(
             key: const Key('deck-details-menu'),
             icon: const Icon(Icons.more_vert),
@@ -275,13 +314,23 @@ class _DeckDetailsScreenState extends State<DeckDetailsScreen>
             },
           ),
         ],
-        bottom: TabBar(
-          controller: _tabController,
-          tabs: const [
-            Tab(text: 'Visão Geral'),
-            Tab(text: 'Cartas'),
-            Tab(text: 'Análise'),
-          ],
+        bottom: PreferredSize(
+          preferredSize: const Size.fromHeight(48),
+          child: Center(
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(
+                maxWidth: AppTheme.contentMaxWidth,
+              ),
+              child: TabBar(
+                controller: _tabController,
+                tabs: const [
+                  Tab(text: 'Visão Geral'),
+                  Tab(text: 'Cartas'),
+                  Tab(text: 'Análise'),
+                ],
+              ),
+            ),
+          ),
         ),
       ),
       floatingActionButton:
@@ -437,6 +486,7 @@ class _DeckDetailsScreenState extends State<DeckDetailsScreen>
                 onForcePricingRefresh: () => _loadPricing(force: true),
                 onShowPricingDetails: _showPricingDetails,
                 onTogglePublic: _togglePublic,
+                onPlay: () => _openLifeCounterForDeck(deck),
                 onShowOptimizationOptions:
                     () => _showOptimizationOptions(context),
                 onOpenBattleReplays: _openBattleReplays,
@@ -448,122 +498,138 @@ class _DeckDetailsScreenState extends State<DeckDetailsScreen>
               ),
 
               // Tab 2: Cartas
-              CustomScrollView(
-                cacheExtent: 180,
-                slivers: [
-                  SliverPadding(
-                    padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
-                    sliver: SliverList.list(
-                      children: [
-                        _DeckCardsSearchHeader(
-                          controller: _cardSearchController,
-                          totalCards: totalCards,
-                          onChanged: () => setState(() {}),
-                        ),
-                        const SizedBox(height: 12),
-                        if (maxCards != null)
-                          Padding(
-                            padding: const EdgeInsets.only(bottom: 12),
-                            child: DeckProgressIndicator(
-                              deck: deck,
+              Align(
+                alignment: Alignment.topCenter,
+                child: ConstrainedBox(
+                  constraints: const BoxConstraints(
+                    maxWidth: AppTheme.contentMaxWidth,
+                  ),
+                  child: CustomScrollView(
+                    cacheExtent: 180,
+                    slivers: [
+                      SliverPadding(
+                        padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
+                        sliver: SliverList.list(
+                          children: [
+                            _DeckCardsSearchHeader(
+                              controller: _cardSearchController,
                               totalCards: totalCards,
-                              maxCards: maxCards,
-                              hasCommander: deck.commander.isNotEmpty,
+                              onChanged: () => setState(() {}),
                             ),
-                          ),
-                        if (_invalidCardNames.isNotEmpty)
-                          Padding(
-                            padding: const EdgeInsets.only(bottom: 12),
-                            child: Container(
-                              padding: const EdgeInsets.all(12),
-                              decoration: BoxDecoration(
-                                color: theme.colorScheme.error.withValues(
-                                  alpha: 0.1,
-                                ),
-                                borderRadius: BorderRadius.circular(
-                                  AppTheme.radiusMd,
-                                ),
-                                border: Border.all(
-                                  color: theme.colorScheme.error.withValues(
-                                    alpha: 0.4,
-                                  ),
-                                  width: AppTheme.strokeThin,
+                            const SizedBox(height: 12),
+                            if (maxCards != null)
+                              Padding(
+                                padding: const EdgeInsets.only(bottom: 12),
+                                child: DeckProgressIndicator(
+                                  deck: deck,
+                                  totalCards: totalCards,
+                                  maxCards: maxCards,
+                                  hasCommander: deck.commander.isNotEmpty,
                                 ),
                               ),
-                              child: Row(
-                                children: [
-                                  Icon(
-                                    Icons.warning_amber_rounded,
-                                    color: theme.colorScheme.error,
-                                    size: 20,
-                                  ),
-                                  const SizedBox(width: 8),
-                                  Expanded(
-                                    child: Text(
-                                      '${_invalidCardNames.length} carta(s) com problema: ${_invalidCardNames.join(", ")}',
-                                      style: theme.textTheme.bodySmall
-                                          ?.copyWith(
-                                            color: theme.colorScheme.error,
-                                            fontWeight: FontWeight.w600,
-                                          ),
+                            if (_invalidCardNames.isNotEmpty)
+                              Padding(
+                                padding: const EdgeInsets.only(bottom: 12),
+                                child: Container(
+                                  padding: const EdgeInsets.all(12),
+                                  decoration: BoxDecoration(
+                                    color: theme.colorScheme.error.withValues(
+                                      alpha: 0.1,
+                                    ),
+                                    borderRadius: BorderRadius.circular(
+                                      AppTheme.radiusMd,
+                                    ),
+                                    border: Border.all(
+                                      color: theme.colorScheme.error.withValues(
+                                        alpha: 0.4,
+                                      ),
+                                      width: AppTheme.strokeThin,
                                     ),
                                   ),
-                                ],
+                                  child: Row(
+                                    children: [
+                                      Icon(
+                                        Icons.warning_amber_rounded,
+                                        color: theme.colorScheme.error,
+                                        size: 20,
+                                      ),
+                                      const SizedBox(width: 8),
+                                      Expanded(
+                                        child: Text(
+                                          '${_invalidCardNames.length} carta(s) com problema: ${_invalidCardNames.join(", ")}',
+                                          style: theme.textTheme.bodySmall
+                                              ?.copyWith(
+                                                color: theme.colorScheme.error,
+                                                fontWeight: FontWeight.w600,
+                                              ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
                               ),
-                            ),
-                          ),
-                      ],
-                    ),
-                  ),
-                  if (deck.commander.isNotEmpty)
-                    ..._buildCardSectionSlivers(
-                      context,
-                      title: 'Comandante',
-                      cards: filterCards(deck.commander),
-                      deckFormat: deck.format,
-                    ),
-                  for (final entry in deck.mainBoard.entries)
-                    ..._buildCardSectionSlivers(
-                      context,
-                      title: entry.key,
-                      cards: filterCards(entry.value),
-                      deckFormat: deck.format,
-                    ),
-                  if (cardQuery.isNotEmpty &&
-                      filterCards(deck.commander).isEmpty &&
-                      deck.mainBoard.values
-                          .expand((cards) => filterCards(cards))
-                          .isEmpty)
-                    SliverToBoxAdapter(
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 16,
-                          vertical: 28,
-                        ),
-                        child: Text(
-                          'Nenhuma carta encontrada nesse deck.',
-                          style: theme.textTheme.bodyMedium?.copyWith(
-                            color: AppTheme.textSecondary,
-                          ),
-                          textAlign: TextAlign.center,
+                          ],
                         ),
                       ),
-                    ),
-                  const SliverToBoxAdapter(child: SizedBox(height: 112)),
-                ],
+                      if (deck.commander.isNotEmpty)
+                        ..._buildCardSectionSlivers(
+                          context,
+                          title: 'Comandante',
+                          cards: filterCards(deck.commander),
+                          deckFormat: deck.format,
+                        ),
+                      for (final entry in deck.mainBoard.entries)
+                        ..._buildCardSectionSlivers(
+                          context,
+                          title: entry.key,
+                          cards: filterCards(entry.value),
+                          deckFormat: deck.format,
+                        ),
+                      if (cardQuery.isNotEmpty &&
+                          filterCards(deck.commander).isEmpty &&
+                          deck.mainBoard.values
+                              .expand((cards) => filterCards(cards))
+                              .isEmpty)
+                        SliverToBoxAdapter(
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 16,
+                              vertical: 28,
+                            ),
+                            child: Text(
+                              'Nenhuma carta encontrada nesse deck.',
+                              style: theme.textTheme.bodyMedium?.copyWith(
+                                color: AppTheme.textSecondary,
+                              ),
+                              textAlign: TextAlign.center,
+                            ),
+                          ),
+                        ),
+                      const SliverToBoxAdapter(child: SizedBox(height: 112)),
+                    ],
+                  ),
+                ),
               ),
 
               // Tab 3: Análise
-              SingleChildScrollView(
-                child: Column(
-                  children: [
-                    SampleHandWidget(
-                      deck: deck,
-                      onShowCardDetails:
-                          (card) => _showCardDetails(context, card),
+              Align(
+                alignment: Alignment.topCenter,
+                child: ConstrainedBox(
+                  constraints: const BoxConstraints(
+                    maxWidth: AppTheme.contentMaxWidth,
+                  ),
+                  child: SingleChildScrollView(
+                    child: Column(
+                      children: [
+                        SampleHandWidget(
+                          deck: deck,
+                          onShowCardDetails:
+                              (card) => _showCardDetails(context, card),
+                        ),
+                        DeckAnalysisTab(deck: deck),
+                      ],
                     ),
-                    DeckAnalysisTab(deck: deck),
-                  ],
+                  ),
                 ),
               ),
             ],

@@ -115,7 +115,7 @@ void main() {
 
         await tester.tap(find.text('Open'));
         await tester.pumpAndSettle();
-        expect(find.text('Current game: Existing Game'), findsOneWidget);
+        expect(find.text('Partida atual: Existing Game'), findsOneWidget);
 
         await tester.tap(
           find.byKey(const Key('life-counter-native-history-import')),
@@ -130,7 +130,7 @@ void main() {
         );
         await tester.pumpAndSettle();
 
-        expect(find.text('Replace existing history?'), findsOneWidget);
+        expect(find.text('Substituir o histórico existente?'), findsOneWidget);
         await tester.tap(
           find.byKey(const Key('life-counter-native-history-replace-cancel')),
         );
@@ -151,7 +151,7 @@ void main() {
         await tester.pumpAndSettle();
 
         expect(importCalls, 1);
-        expect(find.text('Current game: Imported Game'), findsOneWidget);
+        expect(find.text('Partida atual: Imported Game'), findsOneWidget);
         expect(find.text('Imported event one'), findsOneWidget);
         expect(find.text('Imported event two'), findsWidgets);
         expect(find.text('Existing event'), findsNothing);
@@ -218,7 +218,7 @@ void main() {
       expect(importCalls, 1);
       expect(navigatorObserver.popCount, 1);
       expect(confirm, findsNothing);
-      expect(find.text('Life Counter History'), findsOneWidget);
+      expect(find.text('Histórico do contador de vida'), findsOneWidget);
     });
   });
 }

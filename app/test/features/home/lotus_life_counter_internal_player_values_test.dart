@@ -179,7 +179,7 @@ void main() {
         );
         await tester.pumpAndSettle();
 
-        expect(find.text('Commander Damage'), findsOneWidget);
+        expect(find.text('Dano de comandante'), findsOneWidget);
 
         await tester.scrollUntilVisible(
           find.byKey(
@@ -744,8 +744,8 @@ void main() {
         );
         await tester.pumpAndSettle();
 
-        expect(find.text('Player Counter'), findsOneWidget);
-        expect(find.text('Player 1 · Poison'), findsOneWidget);
+        expect(find.text('Marcadores do jogador'), findsOneWidget);
+        expect(find.text('Jogador 1 · Veneno'), findsOneWidget);
 
         await tester.scrollUntilVisible(
           find.byKey(const Key('life-counter-native-player-counter-plus')),

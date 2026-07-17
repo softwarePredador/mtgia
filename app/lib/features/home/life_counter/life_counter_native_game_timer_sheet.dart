@@ -14,7 +14,7 @@ Future<LifeCounterGameTimerState?> showLifeCounterNativeGameTimerSheet(
   return showModalBottomSheet<LifeCounterGameTimerState>(
     context: context,
     isScrollControlled: true,
-    backgroundColor: Colors.transparent,
+    backgroundColor: AppTheme.transparent,
     builder: (context) {
       return _LifeCounterNativeGameTimerSheet(
         initialState: initialState,
@@ -93,7 +93,7 @@ class _LifeCounterNativeGameTimerSheetState
       child: Padding(
         padding: const EdgeInsets.fromLTRB(12, 12, 12, 12),
         child: FractionallySizedBox(
-          heightFactor: 0.68,
+          heightFactor: 0.76,
           child: DecoratedBox(
             decoration: BoxDecoration(
               color: AppTheme.backgroundAbyss,
@@ -119,7 +119,7 @@ class _LifeCounterNativeGameTimerSheetState
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              'Game Timer',
+                              'Cronômetro da partida',
                               style: TextStyle(
                                 color: AppTheme.textPrimary,
                                 fontSize: AppTheme.fontXxl,
@@ -128,11 +128,11 @@ class _LifeCounterNativeGameTimerSheetState
                             ),
                             SizedBox(height: 6),
                             Text(
-                              'Track elapsed game time, manage breaks, and keep every match moving at the table.',
+                              'Acompanhe a duração da partida e gerencie as pausas na mesa.',
                               style: TextStyle(
                                 color: AppTheme.textSecondary,
                                 fontSize: AppTheme.fontMd,
-                                height: 1.35,
+                                height: AppTheme.lineHeightCompact,
                               ),
                             ),
                           ],
@@ -142,7 +142,7 @@ class _LifeCounterNativeGameTimerSheetState
                         onPressed: () => Navigator.of(context).pop(),
                         icon: const Icon(Icons.close_rounded),
                         color: AppTheme.textSecondary,
-                        tooltip: 'Close',
+                        tooltip: 'Fechar',
                       ),
                     ],
                   ),
@@ -153,34 +153,11 @@ class _LifeCounterNativeGameTimerSheetState
                     padding: const EdgeInsets.fromLTRB(20, 18, 20, 12),
                     children: [
                       _SectionCard(
-                        title: 'Timer',
-                        subtitle:
-                            'Review elapsed time and timer status before applying your changes.',
-                        child: Wrap(
-                          spacing: 10,
-                          runSpacing: 10,
-                          children: [
-                            _SummaryChip(
-                              label: 'Status',
-                              value:
-                                  !_isActive
-                                      ? 'Idle'
-                                      : (_isPaused ? 'Paused' : 'Running'),
-                            ),
-                            _SummaryChip(
-                              label: 'Elapsed',
-                              value: _formatDuration(elapsedSeconds),
-                            ),
-                          ],
-                        ),
-                      ),
-                      const SizedBox(height: 18),
-                      _SectionCard(
-                        title: 'Actions',
+                        title: 'Ações',
                         subtitle:
                             _isActive
-                                ? 'Pause, resume, or reset the timer whenever the game needs a break.'
-                                : 'Start a new game timer from zero.',
+                                ? 'Pause, retome ou reinicie o cronômetro quando necessário.'
+                                : 'Inicie um novo cronômetro a partir de zero.',
                         child: Wrap(
                           spacing: 10,
                           runSpacing: 10,
@@ -198,7 +175,7 @@ class _LifeCounterNativeGameTimerSheetState
                                   );
                                 },
                                 icon: const Icon(Icons.play_arrow_rounded),
-                                label: const Text('Start'),
+                                label: const Text('Iniciar'),
                               ),
                             if (_isActive && !_isPaused)
                               OutlinedButton.icon(
@@ -214,7 +191,7 @@ class _LifeCounterNativeGameTimerSheetState
                                   );
                                 },
                                 icon: const Icon(Icons.pause_rounded),
-                                label: const Text('Pause'),
+                                label: const Text('Pausar'),
                               ),
                             if (_isActive && _isPaused)
                               FilledButton.icon(
@@ -230,7 +207,7 @@ class _LifeCounterNativeGameTimerSheetState
                                   );
                                 },
                                 icon: const Icon(Icons.play_arrow_rounded),
-                                label: const Text('Resume'),
+                                label: const Text('Retomar'),
                               ),
                             if (_isActive)
                               OutlinedButton.icon(
@@ -243,8 +220,33 @@ class _LifeCounterNativeGameTimerSheetState
                                   );
                                 },
                                 icon: const Icon(Icons.restart_alt_rounded),
-                                label: const Text('Reset'),
+                                label: const Text('Reiniciar'),
                               ),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(height: 18),
+                      _SectionCard(
+                        title: 'Cronômetro',
+                        subtitle:
+                            'Confira o tempo decorrido e o estado do cronômetro.',
+                        child: Wrap(
+                          spacing: 10,
+                          runSpacing: 10,
+                          children: [
+                            _SummaryChip(
+                              label: 'Status',
+                              value:
+                                  !_isActive
+                                      ? 'Inativo'
+                                      : (_isPaused
+                                          ? 'Pausado'
+                                          : 'Em andamento'),
+                            ),
+                            _SummaryChip(
+                              label: 'Tempo decorrido',
+                              value: _formatDuration(elapsedSeconds),
+                            ),
                           ],
                         ),
                       ),
@@ -266,7 +268,7 @@ class _LifeCounterNativeGameTimerSheetState
                             ),
                             padding: const EdgeInsets.symmetric(vertical: 14),
                           ),
-                          child: const Text('Cancel'),
+                          child: const Text('Cancelar'),
                         ),
                       ),
                       const SizedBox(width: 12),
@@ -282,7 +284,7 @@ class _LifeCounterNativeGameTimerSheetState
                             foregroundColor: AppTheme.backgroundAbyss,
                             padding: const EdgeInsets.symmetric(vertical: 14),
                           ),
-                          child: const Text('Apply'),
+                          child: const Text('Aplicar'),
                         ),
                       ),
                     ],
@@ -393,7 +395,7 @@ class _SectionCard extends StatelessWidget {
               style: const TextStyle(
                 color: AppTheme.textSecondary,
                 fontSize: AppTheme.fontSm,
-                height: 1.35,
+                height: AppTheme.lineHeightCompact,
               ),
             ),
             const SizedBox(height: 14),

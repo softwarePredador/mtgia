@@ -4,6 +4,8 @@ import 'package:provider/provider.dart';
 
 import '../../../core/theme/app_theme.dart';
 import '../../../core/widgets/cached_card_image.dart';
+import '../../../core/widgets/mana_symbols.dart';
+import '../../../core/widgets/responsive_page_frame.dart';
 import '../../decks/models/deck_card_item.dart';
 import '../../decks/providers/deck_provider.dart';
 import '../../cards/screens/card_detail_screen.dart';
@@ -80,10 +82,21 @@ class _CommunityDeckDetailScreenState extends State<CommunityDeckDetailScreen> {
     setState(() => _isCopying = false);
 
     if (result['success'] == true) {
+      final copiedDeck = result['deck'];
+      final copiedDeckId =
+          copiedDeck is Map ? copiedDeck['id']?.toString() : null;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: const Text('Deck copiado para sua coleção! 🎉'),
           backgroundColor: AppTheme.success,
+          action:
+              copiedDeckId == null || copiedDeckId.isEmpty
+                  ? null
+                  : SnackBarAction(
+                    label: 'Abrir deck',
+                    textColor: AppTheme.backgroundAbyss,
+                    onPressed: () => context.go('/decks/$copiedDeckId'),
+                  ),
         ),
       );
     } else {
@@ -113,11 +126,17 @@ class _CommunityDeckDetailScreenState extends State<CommunityDeckDetailScreen> {
       body,
     );
     if (!mounted) return;
-    _commentController.clear();
+    if (ok) {
+      _commentController.clear();
+    }
     setState(() => _isSubmittingComment = false);
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text(ok ? 'Comentário publicado.' : 'Falha ao comentar.'),
+        content: Text(
+          ok
+              ? 'Comentário publicado.'
+              : 'Não foi possível publicar. Seu texto foi mantido para tentar novamente.',
+        ),
         backgroundColor: ok ? AppTheme.success : AppTheme.error,
       ),
     );
@@ -211,230 +230,311 @@ class _CommunityDeckDetailScreenState extends State<CommunityDeckDetailScreen> {
         deck['visual_analysis'] as Map<String, dynamic>? ?? const {};
 
     return SingleChildScrollView(
+      child: ResponsivePageFrame(
+        key: const Key('community-deck-detail-frame'),
+        maxWidth: AppTheme.contentMaxWidth,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 16),
+          child: LayoutBuilder(
+            builder: (context, constraints) {
+              final isDesktop =
+                  constraints.maxWidth >= AppTheme.breakpointExpanded;
+              final deckContents = _buildDeckContents(commander, mainBoard);
+              final contextColumn = _buildContextColumn(
+                visualAnalysis,
+                isDesktop: isDesktop,
+              );
+
+              return Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  _buildDeckHeader(deck, stats),
+                  const SizedBox(height: AppTheme.paneGap),
+                  if (isDesktop)
+                    Row(
+                      key: const Key('community-deck-desktop-panes'),
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Expanded(child: deckContents),
+                        const SizedBox(width: AppTheme.paneGap),
+                        SizedBox(
+                          width: AppTheme.inspectorWidth,
+                          child: contextColumn,
+                        ),
+                      ],
+                    )
+                  else
+                    Column(
+                      key: const Key('community-deck-mobile-stack'),
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        contextColumn,
+                        const SizedBox(height: AppTheme.paneGap),
+                        deckContents,
+                      ],
+                    ),
+                ],
+              );
+            },
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildDeckHeader(
+    Map<String, dynamic> deck,
+    Map<String, dynamic> stats,
+  ) {
+    return Container(
+      key: const Key('community-deck-header'),
       padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: AppTheme.surfaceSlate,
+        borderRadius: BorderRadius.circular(AppTheme.radiusMd),
+        border: Border.all(color: AppTheme.outlineMuted),
+      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Header card
-          Container(
-            padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(
-              color: AppTheme.surfaceSlate,
-              borderRadius: BorderRadius.circular(AppTheme.radiusMd),
-              border: Border.all(color: AppTheme.outlineMuted),
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  children: [
-                    Expanded(
-                      child: Text(
-                        deck['name'] ?? '',
-                        style: const TextStyle(
-                          color: AppTheme.textPrimary,
-                          fontSize: AppTheme.fontXxl,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ),
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 8,
-                        vertical: 4,
-                      ),
-                      decoration: BoxDecoration(
-                        color: AppTheme.brass400.withValues(alpha: 0.16),
-                        borderRadius: BorderRadius.circular(AppTheme.radiusSm),
-                      ),
-                      child: Text(
-                        _capitalize(deck['format'] ?? ''),
-                        style: const TextStyle(
-                          color: AppTheme.brass400,
-                          fontWeight: FontWeight.w600,
-                          fontSize: AppTheme.fontSm,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 8),
-                Row(
-                  children: [
-                    const Icon(
-                      Icons.person_outline,
-                      size: 16,
-                      color: AppTheme.textSecondary,
-                    ),
-                    const SizedBox(width: 4),
-                    Expanded(
-                      child: GestureDetector(
-                        onTap:
-                            deck['owner_id'] != null
-                                ? () => context.push(
-                                  '/community/user/${deck['owner_id']}',
-                                )
-                                : null,
-                        child: Text(
-                          deck['owner_username'] ?? 'Anônimo',
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                          style: TextStyle(
-                            color: AppTheme.brass400,
-                            fontSize: AppTheme.fontMd,
-                            decoration:
-                                deck['owner_id'] != null
-                                    ? TextDecoration.underline
-                                    : null,
-                            decorationColor: AppTheme.brass400,
-                          ),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(width: 16),
-                    Text(
-                      '${stats['total_cards'] ?? 0} cartas',
-                      style: const TextStyle(
-                        color: AppTheme.textSecondary,
-                        fontSize: AppTheme.fontMd,
-                      ),
-                    ),
-                  ],
-                ),
-                if (deck['description'] != null &&
-                    (deck['description'] as String).isNotEmpty) ...[
-                  const SizedBox(height: 12),
-                  Text(
-                    deck['description'],
-                    style: const TextStyle(
-                      color: AppTheme.textSecondary,
-                      fontSize: AppTheme.fontMd,
-                    ),
+          Row(
+            children: [
+              Expanded(
+                child: Text(
+                  deck['name'] ?? '',
+                  style: const TextStyle(
+                    color: AppTheme.textPrimary,
+                    fontSize: AppTheme.fontXxl,
+                    fontWeight: FontWeight.bold,
                   ),
-                ],
-                if (deck['synergy_score'] != null) ...[
-                  const SizedBox(height: 12),
-                  Row(
-                    children: [
-                      const Icon(
-                        Icons.auto_awesome,
-                        size: 16,
-                        color: AppTheme.brass400,
-                      ),
-                      const SizedBox(width: 4),
-                      Text(
-                        'Sinergia: ${deck['synergy_score']}%',
-                        style: const TextStyle(
-                          color: AppTheme.brass400,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
-              ],
-            ),
-          ),
-
-          const SizedBox(height: 16),
-
-          // Copy button prominent
-          SizedBox(
-            width: double.infinity,
-            child: ElevatedButton.icon(
-              onPressed: _isCopying ? null : _copyDeck,
-              icon:
-                  _isCopying
-                      ? const SizedBox(
-                        width: 18,
-                        height: 18,
-                        child: CircularProgressIndicator(
-                          strokeWidth: 2,
-                          color: AppTheme.textPrimary,
-                        ),
-                      )
-                      : const Icon(Icons.file_copy_outlined),
-              label: Text(
-                _isCopying ? 'Copiando...' : 'Copiar Deck para minha coleção',
-              ),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: AppTheme.brass500,
-                foregroundColor: AppTheme.backgroundAbyss,
-                padding: const EdgeInsets.symmetric(vertical: 14),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(AppTheme.radiusMd),
                 ),
               ),
-            ),
-          ),
-
-          const SizedBox(height: 20),
-
-          _VisualAnalysisPanel(analysis: visualAnalysis),
-
-          if (_tradeMatches.isNotEmpty) ...[
-            const SizedBox(height: 14),
-            _TradeMatchesPanel(matches: _tradeMatches),
-          ],
-
-          const SizedBox(height: 14),
-          _CommunityFeedbackPanel(
-            comments: _comments,
-            controller: _commentController,
-            isSubmitting: _isSubmittingComment,
-            isReporting: _isReporting,
-            onSubmit: _submitComment,
-            onReport: _reportDeck,
-          ),
-
-          const SizedBox(height: 20),
-
-          // Commander section
-          if (commander.isNotEmpty) ...[
-            const Text(
-              '🏆 Comandante',
-              style: TextStyle(
-                color: AppTheme.brass400,
-                fontWeight: FontWeight.bold,
-                fontSize: AppTheme.fontLg,
-              ),
-            ),
-            const SizedBox(height: 8),
-            ...commander.map(
-              (card) => _buildCardTile(card as Map<String, dynamic>),
-            ),
-            const SizedBox(height: 16),
-          ],
-
-          // Main board sections
-          ...mainBoard.entries.map((entry) {
-            final type = entry.key;
-            final cards = entry.value as List;
-            final totalQty = cards.fold<int>(
-              0,
-              (sum, c) => sum + ((c as Map)['quantity'] as int),
-            );
-            return Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  '$type ($totalQty)',
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                decoration: BoxDecoration(
+                  color: AppTheme.brass400.withValues(alpha: 0.16),
+                  borderRadius: BorderRadius.circular(AppTheme.radiusSm),
+                ),
+                child: Text(
+                  _capitalize(deck['format'] ?? ''),
                   style: const TextStyle(
                     color: AppTheme.brass400,
-                    fontWeight: FontWeight.bold,
-                    fontSize: AppTheme.fontLg,
+                    fontWeight: FontWeight.w600,
+                    fontSize: AppTheme.fontSm,
                   ),
                 ),
-                const SizedBox(height: 6),
-                ...cards.map(
-                  (card) => _buildCardTile(card as Map<String, dynamic>),
+              ),
+            ],
+          ),
+          const SizedBox(height: 8),
+          Row(
+            children: [
+              const Icon(
+                Icons.person_outline,
+                size: 16,
+                color: AppTheme.textSecondary,
+              ),
+              const SizedBox(width: 4),
+              Expanded(
+                child: GestureDetector(
+                  onTap:
+                      deck['owner_id'] != null
+                          ? () => context.push(
+                            '/community/user/${deck['owner_id']}',
+                          )
+                          : null,
+                  child: Text(
+                    deck['owner_username'] ?? 'Anônimo',
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(
+                      color: AppTheme.brass400,
+                      fontSize: AppTheme.fontMd,
+                      decoration:
+                          deck['owner_id'] != null
+                              ? TextDecoration.underline
+                              : null,
+                      decorationColor: AppTheme.brass400,
+                    ),
+                  ),
                 ),
-                const SizedBox(height: 12),
+              ),
+              const SizedBox(width: 16),
+              Text(
+                '${stats['total_cards'] ?? 0} cartas',
+                style: const TextStyle(
+                  color: AppTheme.textSecondary,
+                  fontSize: AppTheme.fontMd,
+                ),
+              ),
+            ],
+          ),
+          if (deck['description'] != null &&
+              (deck['description'] as String).isNotEmpty) ...[
+            const SizedBox(height: 12),
+            Text(
+              deck['description'],
+              style: const TextStyle(
+                color: AppTheme.textSecondary,
+                fontSize: AppTheme.fontMd,
+              ),
+            ),
+          ],
+          if (deck['synergy_score'] != null) ...[
+            const SizedBox(height: 12),
+            Row(
+              children: [
+                const Icon(
+                  Icons.auto_awesome,
+                  size: 16,
+                  color: AppTheme.brass400,
+                ),
+                const SizedBox(width: 4),
+                Text(
+                  'Sinergia: ${deck['synergy_score']}%',
+                  style: const TextStyle(
+                    color: AppTheme.brass400,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
               ],
-            );
-          }),
+            ),
+          ],
         ],
       ),
+    );
+  }
+
+  Widget _buildContextColumn(
+    Map<String, dynamic> visualAnalysis, {
+    required bool isDesktop,
+  }) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        if (isDesktop)
+          Row(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: [SizedBox(width: 240, child: _buildCopyButton())],
+          )
+        else
+          SizedBox(width: double.infinity, child: _buildCopyButton()),
+        const SizedBox(height: 16),
+        _VisualAnalysisPanel(analysis: visualAnalysis),
+        if (_tradeMatches.isNotEmpty) ...[
+          const SizedBox(height: 14),
+          _TradeMatchesPanel(matches: _tradeMatches),
+        ],
+        const SizedBox(height: 14),
+        _CommunityFeedbackPanel(
+          comments: _comments,
+          controller: _commentController,
+          isSubmitting: _isSubmittingComment,
+          isReporting: _isReporting,
+          onSubmit: _submitComment,
+          onReport: _reportDeck,
+        ),
+      ],
+    );
+  }
+
+  Widget _buildCopyButton() {
+    return ElevatedButton.icon(
+      key: const Key('community-deck-copy-button'),
+      onPressed: _isCopying ? null : _copyDeck,
+      icon:
+          _isCopying
+              ? const SizedBox(
+                width: 18,
+                height: 18,
+                child: CircularProgressIndicator(
+                  strokeWidth: 2,
+                  color: AppTheme.textPrimary,
+                ),
+              )
+              : const Icon(Icons.file_copy_outlined),
+      label: Text(_isCopying ? 'Copiando...' : 'Copiar para meus decks'),
+      style: ElevatedButton.styleFrom(
+        backgroundColor: AppTheme.brass500,
+        foregroundColor: AppTheme.backgroundAbyss,
+        padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 14),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(AppTheme.radiusMd),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildDeckContents(List commander, Map<String, dynamic> mainBoard) {
+    if (commander.isEmpty && mainBoard.isEmpty) {
+      return Container(
+        key: const Key('community-deck-empty-list'),
+        padding: const EdgeInsets.all(20),
+        decoration: BoxDecoration(
+          color: AppTheme.surfaceSlate.withValues(alpha: 0.56),
+          borderRadius: BorderRadius.circular(AppTheme.radiusMd),
+          border: Border.all(color: AppTheme.outlineMuted),
+        ),
+        child: const Row(
+          children: [
+            Icon(Icons.style_outlined, color: AppTheme.textSecondary),
+            SizedBox(width: 10),
+            Expanded(
+              child: Text(
+                'A lista de cartas deste deck ainda não está disponível.',
+                style: TextStyle(color: AppTheme.textSecondary),
+              ),
+            ),
+          ],
+        ),
+      );
+    }
+
+    return Column(
+      key: const Key('community-deck-card-list'),
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        if (commander.isNotEmpty) ...[
+          const Text(
+            'Comandante',
+            style: TextStyle(
+              color: AppTheme.brass400,
+              fontWeight: FontWeight.bold,
+              fontSize: AppTheme.fontLg,
+            ),
+          ),
+          const SizedBox(height: 8),
+          ...commander.map(
+            (card) => _buildCardTile(card as Map<String, dynamic>),
+          ),
+          const SizedBox(height: 16),
+        ],
+        ...mainBoard.entries.map((entry) {
+          final cards = entry.value as List;
+          final totalQty = cards.fold<int>(
+            0,
+            (sum, card) => sum + ((card as Map)['quantity'] as int),
+          );
+          return Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                '${entry.key} ($totalQty)',
+                style: const TextStyle(
+                  color: AppTheme.brass400,
+                  fontWeight: FontWeight.bold,
+                  fontSize: AppTheme.fontLg,
+                ),
+              ),
+              const SizedBox(height: 6),
+              ...cards.map(
+                (card) => _buildCardTile(card as Map<String, dynamic>),
+              ),
+              const SizedBox(height: 12),
+            ],
+          );
+        }),
+      ],
     );
   }
 
@@ -483,13 +583,7 @@ class _CommunityDeckDetailScreenState extends State<CommunityDeckDetailScreen> {
         ),
         trailing:
             manaCost.isNotEmpty
-                ? Text(
-                  manaCost,
-                  style: const TextStyle(
-                    color: AppTheme.textSecondary,
-                    fontSize: AppTheme.fontSm,
-                  ),
-                )
+                ? ManaCostRow(cost: manaCost, symbolSize: 16)
                 : null,
       ),
     );
@@ -554,9 +648,49 @@ class _VisualAnalysisPanel extends StatelessWidget {
               _MetricPill(label: 'baixo', value: '${curve['low'] ?? 0}'),
               _MetricPill(label: 'médio', value: '${curve['mid'] ?? 0}'),
               _MetricPill(label: 'alto', value: '${curve['high'] ?? 0}'),
-              if (colors.isNotEmpty)
-                _MetricPill(label: 'cores', value: colors.join('')),
+              if (colors.isNotEmpty) _ColorIdentityMetric(colors: colors),
             ],
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _ColorIdentityMetric extends StatelessWidget {
+  const _ColorIdentityMetric({required this.colors});
+
+  final List<String> colors;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 6),
+      decoration: BoxDecoration(
+        color: AppTheme.backgroundAbyss.withValues(alpha: 0.45),
+        borderRadius: BorderRadius.circular(AppTheme.radiusPill),
+        border: Border.all(
+          color: AppTheme.outlineMuted.withValues(alpha: 0.55),
+          width: AppTheme.strokeHairline,
+        ),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          const Text(
+            'cores',
+            style: TextStyle(
+              color: AppTheme.textSecondary,
+              fontSize: AppTheme.fontXs,
+              fontWeight: FontWeight.w700,
+            ),
+          ),
+          const SizedBox(width: 6),
+          ColorIdentityPips(
+            colors: colors,
+            symbolSize: 14,
+            spacing: 2,
+            decorated: false,
           ),
         ],
       ),

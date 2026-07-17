@@ -40,10 +40,10 @@ import 'life_counter_route.dart';
 import 'lotus/lotus_life_counter_settings_adapter.dart';
 import 'lotus/lotus_life_counter_session_adapter.dart';
 import 'lotus/lotus_host.dart';
-import 'lotus/lotus_host_controller.dart';
 import 'lotus/lotus_host_overlays.dart';
 import 'lotus/lotus_life_counter_game_timer_adapter.dart';
 import 'lotus/lotus_lifecycle_diagnostic_store.dart';
+import 'lotus/lotus_default_host.dart';
 import 'lotus/lotus_presentation_mode.dart';
 import 'lotus/lotus_runtime_flags.dart';
 import 'lotus/lotus_storage_snapshot.dart';
@@ -75,9 +75,16 @@ class _ResolvedNativeFallbackSource {
 }
 
 class LotusLifeCounterScreen extends StatefulWidget {
-  const LotusLifeCounterScreen({super.key, this.hostFactory});
+  const LotusLifeCounterScreen({
+    super.key,
+    this.hostFactory,
+    this.deckId,
+    this.deckName,
+  });
 
   final LotusHostFactory? hostFactory;
+  final String? deckId;
+  final String? deckName;
 
   @override
   State<LotusLifeCounterScreen> createState() => _LotusLifeCounterScreenState();
@@ -239,6 +246,8 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen>
   bool _isNativeTableStateSheetOpen = false;
   bool _isNativeDayNightSheetOpen = false;
   bool _isExitInProgress = false;
+  String? _entryGameplayFingerprint;
+  int _entryCurrentGameEventCount = 0;
 
   @override
   void initState() {
@@ -248,7 +257,7 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen>
       unawaited(LotusPresentationMode.enter());
     }
     _nativeLifecycleChannel.setMethodCallHandler(_handleNativeLifecycleSignal);
-    _hostController = (widget.hostFactory ?? LotusHostController.new)(
+    _hostController = (widget.hostFactory ?? createDefaultLotusHost)(
       onAppReviewRequested: _handleAppReviewRequested,
       onShellMessageRequested: _handleShellMessageRequested,
     );
@@ -271,8 +280,87 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen>
 
       _syncLoadingOverlay();
       _syncErrorOverlay();
-      unawaited(_loadBundleAndSyncOwnedShellState());
+      unawaited(_bindDeckContextAndLoadBundle());
     });
+  }
+
+  Future<void> _bindDeckContextAndLoadBundle() async {
+    await _bindDeckContext();
+    if (!mounted) return;
+    await _captureEntryGameState();
+    if (!mounted) return;
+    await _loadBundleAndSyncOwnedShellState();
+  }
+
+  Future<void> _captureEntryGameState() async {
+    final session = await _sessionStore.load();
+    final history = await _historyStore.load();
+    _entryGameplayFingerprint =
+        session == null ? null : lifeCounterGameplayFingerprint(session);
+    _entryCurrentGameEventCount = history?.currentGameEntries.length ?? 0;
+  }
+
+  Future<void> _bindDeckContext() async {
+    final deckId = widget.deckId?.trim();
+    if (deckId == null || deckId.isEmpty) return;
+
+    final requestedDeckName = widget.deckName?.trim();
+    final deckName =
+        requestedDeckName == null || requestedDeckName.isEmpty
+            ? null
+            : requestedDeckName;
+    final previous =
+        await _sessionStore.load() ??
+        LifeCounterSession.initial(playerCount: 4);
+    final continuesSameDeck = previous.deckId == deckId;
+    final nowEpochMs = DateTime.now().millisecondsSinceEpoch;
+    final session =
+        continuesSameDeck
+            ? previous.copyWith(
+              deckName: deckName,
+              clearDeckName: deckName == null,
+              playSessionId: previous.playSessionId ?? 'play-$nowEpochMs',
+              startedAtEpochMs: previous.startedAtEpochMs ?? nowEpochMs,
+            )
+            : LifeCounterSession.initial(
+              playerCount: previous.playerCount,
+              startingLifeTwoPlayer: previous.startingLifeTwoPlayer,
+              startingLifeMultiPlayer: previous.startingLifeMultiPlayer,
+              playSessionId: 'play-$nowEpochMs',
+              deckId: deckId,
+              deckName: deckName,
+              startedAtEpochMs: nowEpochMs,
+            );
+    await _sessionStore.save(session);
+
+    final history =
+        await _historyStore.load() ?? const LifeCounterHistoryState.empty();
+    if (continuesSameDeck) {
+      await _historyStore.ensureCurrentGameMeta(
+        history: history,
+        session: session,
+      );
+    } else {
+      await _historyStore.save(
+        history.startNewGameForSession(
+          session: session,
+          startDateEpochMs: nowEpochMs,
+        ),
+      );
+    }
+
+    unawaited(
+      AppObservability.instance.recordEvent(
+        'deck_context_bound',
+        category: 'life_counter.session',
+        data: {
+          'deck_id': deckId,
+          'play_session_id': session.playSessionId,
+          'continued_session': continuesSameDeck,
+          'history_started_for_deck': !continuesSameDeck,
+        },
+      ),
+    );
   }
 
   @override
@@ -371,7 +459,24 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen>
         },
       ),
     );
-    closeLifeCounterRoute(context);
+    final session = await _sessionStore.load();
+    final history = await _historyStore.load();
+    if (!mounted) return;
+    final currentFingerprint =
+        session == null ? null : lifeCounterGameplayFingerprint(session);
+    final hadGameActivity =
+        (currentFingerprint != null &&
+            currentFingerprint != _entryGameplayFingerprint) ||
+        (history?.currentGameEntries.length ?? 0) > _entryCurrentGameEventCount;
+    final result = LifeCounterExitResult(
+      hadGameActivity: hadGameActivity,
+      storageFlushed: didFlushStorage,
+      playSessionId: session?.playSessionId,
+      deckId: session?.deckId,
+      startedAtEpochMs: session?.startedAtEpochMs,
+      endedAtEpochMs: DateTime.now().millisecondsSinceEpoch,
+    );
+    closeLifeCounterRoute<LifeCounterExitResult>(context, result: result);
   }
 
   void _handleBackNavigationAttempt(bool didPop) {
@@ -4799,7 +4904,7 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen>
 
   @override
   Widget build(BuildContext context) {
-    return PopScope<void>(
+    return PopScope<LifeCounterExitResult>(
       canPop: false,
       onPopInvokedWithResult: (didPop, _) {
         _handleBackNavigationAttempt(didPop);

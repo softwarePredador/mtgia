@@ -166,6 +166,61 @@ void main() {
     expect(find.text('Commander'), findsNothing);
   });
 
+  testWidgets('DeckGenerateScreen mantém CTA e conteúdo fluidos em 390px', (
+    tester,
+  ) async {
+    tester.view.devicePixelRatio = 1;
+    tester.view.physicalSize = const Size(390, 844);
+    addTearDown(tester.view.resetDevicePixelRatio);
+    addTearDown(tester.view.resetPhysicalSize);
+
+    await tester.pumpWidget(wrapSimple(const DeckGenerateScreen()));
+    await tester.pump();
+
+    expect(find.byKey(const Key('deck-generate-desktop-panes')), findsNothing);
+    expect(tester.takeException(), isNull);
+
+    final frameSize = tester.getSize(
+      find.byKey(const Key('deck-generate-content-frame')),
+    );
+    final ctaSize = tester.getSize(
+      find.byKey(const Key('deck-generate-submit-cta-frame')),
+    );
+    expect(frameSize.width, closeTo(358, 0.1));
+    expect(ctaSize.width, closeTo(frameSize.width, 0.1));
+  });
+
+  testWidgets('DeckGenerateScreen usa dois panes limitados em 1280px', (
+    tester,
+  ) async {
+    tester.view.devicePixelRatio = 1;
+    tester.view.physicalSize = const Size(1280, 900);
+    addTearDown(tester.view.resetDevicePixelRatio);
+    addTearDown(tester.view.resetPhysicalSize);
+
+    await tester.pumpWidget(wrapSimple(const DeckGenerateScreen()));
+    await tester.pump();
+
+    expect(
+      find.byKey(const Key('deck-generate-desktop-panes')),
+      findsOneWidget,
+    );
+    expect(tester.takeException(), isNull);
+
+    final frameSize = tester.getSize(
+      find.byKey(const Key('deck-generate-content-frame')),
+    );
+    final formSize = tester.getSize(
+      find.byKey(const Key('deck-generate-form-pane')),
+    );
+    final ctaSize = tester.getSize(
+      find.byKey(const Key('deck-generate-submit-cta-frame')),
+    );
+    expect(frameSize.width, lessThanOrEqualTo(1120));
+    expect(formSize.width, closeTo(460, 0.1));
+    expect(ctaSize.width, lessThanOrEqualTo(320));
+  });
+
   testWidgets(
     'DeckGenerateScreen mostra atalho de deck aprendido em Commander',
     (tester) async {

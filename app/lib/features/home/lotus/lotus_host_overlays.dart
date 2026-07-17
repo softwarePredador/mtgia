@@ -39,7 +39,7 @@ class LotusLoadingOverlay extends StatelessWidget {
                 ),
                 SizedBox(height: 8),
                 Text(
-                  'Preparing the life counter',
+                  'Preparando o contador de vida',
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     color: AppTheme.textSecondary,
@@ -99,7 +99,7 @@ class LotusErrorOverlay extends StatelessWidget {
                       const _LotusShellBadge(),
                       const SizedBox(height: 18),
                       const Text(
-                        'Life counter unavailable',
+                        'Contador de vida indisponível',
                         style: TextStyle(
                           color: AppTheme.textPrimary,
                           fontSize: AppTheme.fontXxl,
@@ -108,11 +108,11 @@ class LotusErrorOverlay extends StatelessWidget {
                       ),
                       const SizedBox(height: 10),
                       Text(
-                        message,
+                        _localizedHostMessage(message),
                         style: const TextStyle(
                           color: AppTheme.textSecondary,
                           fontSize: AppTheme.fontLg,
-                          height: 1.4,
+                          height: AppTheme.lineHeightComfortable,
                         ),
                       ),
                       const SizedBox(height: 18),
@@ -131,7 +131,7 @@ class LotusErrorOverlay extends StatelessWidget {
                               ),
                             ),
                           ),
-                          child: const Text('Retry'),
+                          child: const Text('Tentar novamente'),
                         ),
                       ),
                     ],
@@ -154,13 +154,13 @@ class _LotusShellBadge extends StatelessWidget {
     return DecoratedBox(
       decoration: BoxDecoration(
         color: AppTheme.surfaceSlate,
-        borderRadius: BorderRadius.circular(999),
+        borderRadius: BorderRadius.circular(AppTheme.radiusPill),
         border: Border.all(color: AppTheme.outlineMuted),
       ),
       child: const Padding(
         padding: EdgeInsets.symmetric(horizontal: 12, vertical: 7),
         child: Text(
-          'ManaLoom shell',
+          'Interface ManaLoom',
           style: TextStyle(
             color: AppTheme.primarySoft,
             fontSize: AppTheme.fontSm,
@@ -171,4 +171,21 @@ class _LotusShellBadge extends StatelessWidget {
       ),
     );
   }
+}
+
+String _localizedHostMessage(String message) {
+  final normalized = message.trim();
+  if (normalized.startsWith('O ManaLoom ')) {
+    return normalized;
+  }
+  return switch (normalized) {
+    'ManaLoom could not open the embedded life counter. Check the local bundle and try again.' =>
+      'O ManaLoom não conseguiu abrir o contador de vida. Tente novamente.',
+    'ManaLoom could not safely restore the life counter state. Try loading it again.' =>
+      'O ManaLoom não conseguiu restaurar o estado da partida com segurança. Tente carregar novamente.',
+    'ManaLoom could not open the Life Counter in this browser. Reload the page and try again.' =>
+      'O ManaLoom não conseguiu abrir o contador de vida neste navegador. Recarregue a página e tente novamente.',
+    _ =>
+      'Não foi possível carregar o contador de vida. Tente novamente em instantes.',
+  };
 }

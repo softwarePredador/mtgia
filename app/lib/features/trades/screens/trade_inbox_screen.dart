@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/widgets/app_state_panel.dart';
+import '../../../core/widgets/responsive_page_frame.dart';
 import '../../auth/providers/auth_provider.dart';
 import '../providers/trade_provider.dart';
 
@@ -66,16 +67,25 @@ class _TradeInboxTabContentState extends State<TradeInboxTabContent>
         // Sub-tabs dentro da tab Trades
         Material(
           color: AppTheme.backgroundAbyss,
-          child: TabBar(
-            controller: _tabController,
-            indicatorColor: AppTheme.brass400,
-            labelColor: AppTheme.brass400,
-            unselectedLabelColor: AppTheme.textSecondary,
-            tabs: const [
-              Tab(text: 'Recebidas', icon: Icon(Icons.inbox, size: 18)),
-              Tab(text: 'Enviadas', icon: Icon(Icons.send, size: 18)),
-              Tab(text: 'Finalizadas', icon: Icon(Icons.done_all, size: 18)),
-            ],
+          child: Center(
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 960),
+              child: TabBar(
+                key: const Key('trade-inbox-tab-bar'),
+                controller: _tabController,
+                indicatorColor: AppTheme.brass400,
+                labelColor: AppTheme.brass400,
+                unselectedLabelColor: AppTheme.textSecondary,
+                tabs: const [
+                  Tab(text: 'Recebidas', icon: Icon(Icons.inbox, size: 18)),
+                  Tab(text: 'Enviadas', icon: Icon(Icons.send, size: 18)),
+                  Tab(
+                    text: 'Finalizadas',
+                    icon: Icon(Icons.done_all, size: 18),
+                  ),
+                ],
+              ),
+            ),
           ),
         ),
         Expanded(
@@ -154,16 +164,28 @@ class _TradeInboxScreenState extends State<TradeInboxScreen>
     return Scaffold(
       appBar: AppBar(
         title: const Text('Trades'),
-        bottom: TabBar(
-          controller: _tabController,
-          indicatorColor: AppTheme.brass400,
-          labelColor: AppTheme.brass400,
-          unselectedLabelColor: AppTheme.textSecondary,
-          tabs: const [
-            Tab(text: 'Recebidas', icon: Icon(Icons.inbox, size: 18)),
-            Tab(text: 'Enviadas', icon: Icon(Icons.send, size: 18)),
-            Tab(text: 'Finalizadas', icon: Icon(Icons.done_all, size: 18)),
-          ],
+        bottom: PreferredSize(
+          preferredSize: const Size.fromHeight(kTextTabBarHeight),
+          child: Center(
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 960),
+              child: TabBar(
+                key: const Key('trade-inbox-tab-bar'),
+                controller: _tabController,
+                indicatorColor: AppTheme.brass400,
+                labelColor: AppTheme.brass400,
+                unselectedLabelColor: AppTheme.textSecondary,
+                tabs: const [
+                  Tab(text: 'Recebidas', icon: Icon(Icons.inbox, size: 18)),
+                  Tab(text: 'Enviadas', icon: Icon(Icons.send, size: 18)),
+                  Tab(
+                    text: 'Finalizadas',
+                    icon: Icon(Icons.done_all, size: 18),
+                  ),
+                ],
+              ),
+            ),
+          ),
         ),
       ),
       body: TabBarView(
@@ -251,16 +273,20 @@ class _TradeListViewState extends State<_TradeListView> {
             accent: AppTheme.brass400,
           );
         }
-        return RefreshIndicator(
-          onRefresh: () async => widget.onRefresh(),
-          child: ListView.builder(
-            controller: _scrollController,
-            padding: const EdgeInsets.all(12),
-            itemCount: provider.trades.length,
-            itemBuilder: (context, index) {
-              final trade = provider.trades[index];
-              return _TradeCard(trade: trade);
-            },
+        return ResponsivePageFrame(
+          maxWidth: 960,
+          child: RefreshIndicator(
+            onRefresh: () async => widget.onRefresh(),
+            child: ListView.builder(
+              key: const Key('trade-inbox-list'),
+              controller: _scrollController,
+              padding: const EdgeInsets.symmetric(vertical: 12),
+              itemCount: provider.trades.length,
+              itemBuilder: (context, index) {
+                final trade = provider.trades[index];
+                return _TradeCard(trade: trade);
+              },
+            ),
           ),
         );
       },

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import '../../../core/theme/app_theme.dart';
+import '../../../core/widgets/mana_symbols.dart';
 import '../../decks/models/deck_card_item.dart';
 import '../models/card_recognition_result.dart';
 
@@ -515,56 +516,7 @@ class _ManaCostIcons extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    if (cost == null || cost!.isEmpty) return const SizedBox.shrink();
-    final symbols = RegExp(r'\{(.+?)\}').allMatches(cost!);
-    if (symbols.isEmpty) return const SizedBox.shrink();
-
-    return Row(
-      mainAxisSize: MainAxisSize.min,
-      children:
-          symbols.map((m) {
-            final s = m.group(1)!;
-            return Container(
-              width: 16,
-              height: 16,
-              margin: const EdgeInsets.only(left: 2),
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: _manaColor(s),
-              ),
-              child: Center(
-                child: Text(
-                  s,
-                  style: TextStyle(
-                    fontSize: AppTheme.fontXs,
-                    fontWeight: FontWeight.w700,
-                    color:
-                        s.toUpperCase() == 'B' ? Colors.white : Colors.black87,
-                  ),
-                ),
-              ),
-            );
-          }).toList(),
-    );
-  }
-
-  Color _manaColor(String s) {
-    switch (s.toUpperCase()) {
-      case 'W':
-        return AppTheme.manaW;
-      case 'U':
-        return AppTheme.manaU;
-      case 'B':
-        return AppTheme.manaB;
-      case 'R':
-        return AppTheme.manaR;
-      case 'G':
-        return AppTheme.manaG;
-      case 'C':
-        return AppTheme.manaC;
-      default:
-        return AppTheme.disabled;
-    }
+    return ManaCostRow(cost: cost, symbolSize: 16, spacing: 2);
   }
 }
 

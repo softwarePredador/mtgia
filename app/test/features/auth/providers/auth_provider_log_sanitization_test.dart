@@ -37,6 +37,23 @@ class _AuthTimeoutApiClient extends ApiClient {
   }
 }
 
+class _MissingTokenApiClient extends ApiClient {
+  @override
+  Future<ApiResponse> post(
+    String endpoint,
+    Map<String, dynamic> body, {
+    Duration? timeout,
+  }) async {
+    return ApiResponse(200, {
+      'user': {
+        'id': 'user-without-token',
+        'username': 'invalid_contract',
+        'email': 'invalid@example.com',
+      },
+    });
+  }
+}
+
 class _RegisterSuccessApiClient extends ApiClient {
   @override
   Future<ApiResponse> post(
@@ -116,6 +133,9 @@ void main() {
       final ok = await provider.login('qa_user@example.com', 'Password123!');
 
       expect(ok, isTrue);
+      final prefs = await SharedPreferences.getInstance();
+      expect(prefs.getString('auth_token'), isNull);
+      expect(prefs.getString('user_data'), isNotNull);
     } finally {
       debugPrint = previousDebugPrint;
     }
@@ -175,6 +195,18 @@ void main() {
     expect(provider.errorMessage, isNot(contains('RequestOptions')));
   });
 
+  test('invalid login contract never leaves auth stuck in loading', () async {
+    SharedPreferences.setMockInitialValues({});
+    final provider = AuthProvider(apiClient: _MissingTokenApiClient());
+
+    final ok = await provider.login('qa_user@example.com', 'Password123!');
+
+    expect(ok, isFalse);
+    expect(provider.status, AuthStatus.unauthenticated);
+    expect(provider.errorMessage, 'Resposta inválida do servidor');
+    expect(provider.token, isNull);
+  });
+
   test('initialize reuses in-flight token validation', () async {
     SharedPreferences.setMockInitialValues({
       'auth_token': 'saved-token',
@@ -195,6 +227,8 @@ void main() {
     expect(api.getCalls, 1);
     expect(provider.status, AuthStatus.authenticated);
     expect(provider.user?.id, 'user-saved');
+    final prefs = await SharedPreferences.getInstance();
+    expect(prefs.getString('auth_token'), isNull);
 
     await provider.initialize();
 

@@ -8,6 +8,56 @@ import 'package:manaloom/features/decks/providers/deck_provider.dart';
 import 'package:provider/provider.dart';
 
 void main() {
+  testWidgets('keeps a padded single-column composition at 390px', (
+    tester,
+  ) async {
+    await _pumpDetail(tester, const Size(390, 844));
+
+    expect(
+      find.byKey(const Key('community-deck-mobile-stack')),
+      findsOneWidget,
+    );
+    expect(find.byKey(const Key('community-deck-desktop-panes')), findsNothing);
+
+    final header = tester.getRect(
+      find.byKey(const Key('community-deck-header')),
+    );
+    final copyButton = tester.getSize(
+      find.byKey(const Key('community-deck-copy-button')),
+    );
+    expect(header.left, greaterThanOrEqualTo(12));
+    expect(header.right, lessThanOrEqualTo(378));
+    expect(copyButton.width, greaterThan(320));
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('uses main content and a 360px inspector at 1280px', (
+    tester,
+  ) async {
+    await _pumpDetail(tester, const Size(1280, 900));
+
+    expect(
+      find.byKey(const Key('community-deck-desktop-panes')),
+      findsOneWidget,
+    );
+    expect(find.byKey(const Key('community-deck-mobile-stack')), findsNothing);
+
+    final panes = tester.getRect(
+      find.byKey(const Key('community-deck-desktop-panes')),
+    );
+    final feedback = tester.getRect(
+      find.byKey(const Key('community-deck-feedback-panel')),
+    );
+    final copyButton = tester.getSize(
+      find.byKey(const Key('community-deck-copy-button')),
+    );
+    expect(panes.left, greaterThanOrEqualTo(20));
+    expect(panes.right, lessThanOrEqualTo(1260));
+    expect(feedback.width, closeTo(AppTheme.inspectorWidth, 0.1));
+    expect(copyButton.width, lessThan(AppTheme.inspectorWidth));
+    expect(tester.takeException(), isNull);
+  });
+
   testWidgets('comment field validates before posting community feedback', (
     tester,
   ) async {
@@ -76,6 +126,32 @@ void main() {
     expect(api.commentPosts, ['Boa sugestão para testar na mesa.']);
     expect(find.text('Comentário publicado.'), findsOneWidget);
   });
+}
+
+Future<void> _pumpDetail(WidgetTester tester, Size size) async {
+  tester.view.devicePixelRatio = 1;
+  tester.view.physicalSize = size;
+  addTearDown(tester.view.resetDevicePixelRatio);
+  addTearDown(tester.view.resetPhysicalSize);
+
+  await tester.pumpWidget(
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider(
+          create:
+              (_) => CommunityProvider(apiClient: _CommunityDetailApiFixture()),
+        ),
+        ChangeNotifierProvider(
+          create: (_) => DeckProvider(apiClient: _DeckApiFixture()),
+        ),
+      ],
+      child: MaterialApp(
+        theme: AppTheme.darkTheme,
+        home: const CommunityDeckDetailScreen(deckId: 'deck-1'),
+      ),
+    ),
+  );
+  await tester.pumpAndSettle();
 }
 
 class _CommunityDetailApiFixture extends ApiClient {

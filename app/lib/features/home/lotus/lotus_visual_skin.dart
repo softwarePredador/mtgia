@@ -694,11 +694,11 @@ ${LotusDomSelectors.optionCard} h3 {
 }
 
 .settings-overlay::before {
-  content: "Settings" !important;
+  content: "Configurações" !important;
 }
 
 .card-search-overlay::before {
-  content: "Card search" !important;
+  content: "Busca de cartas" !important;
   position: absolute !important;
   left: 22px !important;
   top: calc(env(safe-area-inset-top, 0px) + 24px) !important;
@@ -729,7 +729,7 @@ ${LotusDomSelectors.optionCard} h3 {
 }
 
 .settings-overlay .settings-headline::after {
-  content: "Table preferences" !important;
+  content: "Preferências da mesa" !important;
   display: block !important;
   font-family: var(--manaloom-ui-font) !important;
   font-size: 15px !important;
@@ -968,6 +968,22 @@ ${LotusDomSelectors.optionCard} h3 {
 .life-history-overlay {
   overflow: auto !important;
   padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 28px) !important;
+}
+
+.life-history-overlay .all-games-btn {
+  top: calc(env(safe-area-inset-top, 0px) + 18px) !important;
+  right: 82px !important;
+  max-width: calc(100% - 100px) !important;
+  min-width: 0 !important;
+  padding-inline: 14px !important;
+  box-sizing: border-box !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+}
+
+.life-history-overlay .history-meta-header {
+  padding-top: calc(env(safe-area-inset-top, 0px) + 78px) !important;
 }
 
 .life-history-overlay .life-history-header,
@@ -1812,6 +1828,26 @@ ${LotusDomSelectors.playerCard} .player-life-count .font {
   box-shadow: inset 0 0 0 2px rgba(224, 165, 51, 0.32) !important;
 }
 
+@media (max-width: 480px) {
+  .menu-button-overlay .game-states-wrapper {
+    width: min(330px, calc(100vw - 16px)) !important;
+  }
+
+  .life-history-overlay .all-games-btn {
+    font-size: 15px !important;
+  }
+
+  .menu-button-overlay .game-states-wrapper > * {
+    width: calc((100% - 12px) / 3) !important;
+    min-width: 0 !important;
+    flex: 0 0 calc((100% - 12px) / 3) !important;
+    font-size: 10.5px !important;
+    word-break: normal !important;
+    overflow-wrap: normal !important;
+    hyphens: manual !important;
+  }
+}
+
 .settings-overlay,
 .life-history-overlay,
 .card-search-overlay {
@@ -1819,15 +1855,15 @@ ${LotusDomSelectors.playerCard} .player-life-count .font {
 }
 
 .settings-overlay::before {
-  content: "Settings" !important;
+  content: "Configurações" !important;
 }
 
 .settings-overlay .settings-headline::after {
-  content: "Table preferences" !important;
+  content: "Preferências da mesa" !important;
 }
 
 .card-search-overlay::before {
-  content: "Card search" !important;
+  content: "Busca de cartas" !important;
   top: max(
     calc(env(safe-area-inset-top, 0px) + 24px),
     72px
@@ -2002,6 +2038,235 @@ textarea:focus-visible {
     }
     const inputValue = node instanceof HTMLInputElement ? node.value : '';
     return String(inputValue || node.textContent || '').replace(/\\s+/g, ' ').trim();
+  };
+
+  const ptBrText = new Map([
+    ['Settings', 'Configurações'],
+    ['Restart Game', 'Reiniciar partida'],
+    ['Restart', 'Reiniciar'],
+    ['History', 'Histórico'],
+    ['Current Game', 'Partida atual'],
+    ['All Games', 'Todas as partidas'],
+    ['Previous Games', 'Partidas anteriores'],
+    ['Winner', 'Vencedor'],
+    ['No Winner', 'Sem vencedor'],
+    ['Select Winner', 'Selecionar vencedor'],
+    ['Set Winner', 'Definir vencedor'],
+    ['Victory', 'Vitória'],
+    ['Defeated', 'Eliminado'],
+    ['Save', 'Salvar'],
+    ['Saved', 'Salvo'],
+    ['Cancel', 'Cancelar'],
+    ['Confirm', 'Confirmar'],
+    ['Done', 'Concluir'],
+    ['Back', 'Voltar'],
+    ['Return to Game', 'Voltar à partida'],
+    ['Delete', 'Excluir'],
+    ['Delete Game', 'Excluir partida'],
+    ['Delete this game from history?', 'Excluir esta partida do histórico?'],
+    ['Edit', 'Editar'],
+    ['Share', 'Compartilhar'],
+    ['Restore', 'Restaurar'],
+    ['Yes', 'Sim'],
+    ['Players', 'Jogadores'],
+    ['Player', 'Jogador'],
+    ['Player Card', 'Painel do jogador'],
+    ['Player Card Layout', 'Layout dos jogadores'],
+    ['Player Card Direction', 'Orientação dos jogadores'],
+    ['Starting Life', 'Vida inicial'],
+    ['Two-player starting life', 'Vida inicial para dois jogadores'],
+    ['Multi-player starting life', 'Vida inicial para vários jogadores'],
+    ['Set Life', 'Definir vida'],
+    ['Set Life Manually', 'Definir vida manualmente'],
+    ['Set Custom Starting Life', 'Definir vida inicial personalizada'],
+    ['Commander damage', 'Dano de comandante'],
+    ['Partner', 'Parceiro'],
+    ['Partners', 'Parceiros'],
+    ['Background', 'Aparência'],
+    ['Customize', 'Personalizar'],
+    ['Reset Player Background Colors', 'Restaurar cores dos jogadores'],
+    ['Card Search', 'Busca de cartas'],
+    ['Search for a card', 'Buscar uma carta'],
+    ['Search for a gif', 'Buscar um GIF'],
+    ['Cards', 'Cartas'],
+    ['View all prints', 'Ver todas as edições'],
+    ['View card', 'Ver carta'],
+    ['Upload Image', 'Enviar imagem'],
+    ['Change Background Image', 'Alterar imagem de fundo'],
+    ['Set Background Image', 'Definir imagem de fundo'],
+    ['Set Partner Background Image', 'Definir fundo do parceiro'],
+    ['Load Profile', 'Carregar perfil'],
+    ['Save Profile', 'Salvar perfil'],
+    ['Delete Profile', 'Excluir perfil'],
+    ['Share Profile', 'Compartilhar perfil'],
+    ['Profiles', 'Perfis'],
+    ['Edit Profiles', 'Editar perfis'],
+    ['Import', 'Importar'],
+    ['Export All', 'Exportar tudo'],
+    ['Export All Profiles', 'Exportar todos os perfis'],
+    ['Import Profile', 'Importar perfil'],
+    ['Profile code', 'Código do perfil'],
+    ['Paste profile code', 'Cole o código do perfil'],
+    ['How it works', 'Como funciona'],
+    ['Help', 'Ajuda'],
+    ['Game Modes', 'Modos de jogo'],
+    ['Game Duration', 'Duração da partida'],
+    ['Game Timeline', 'Linha do tempo'],
+    ['Turns', 'Turnos'],
+    ['Dice', 'Dados'],
+    ['Roll', 'Rolar'],
+    ['High Roll', 'Maior rolagem'],
+    ['Heads', 'Cara'],
+    ['Tails', 'Coroa'],
+    ['Day/Night', 'Dia/Noite'],
+    ['Monarch', 'Monarca'],
+    ['Initiative', 'Iniciativa'],
+    ['Archenemy', 'Arqui-inimigo'],
+    ['Bounty', 'Recompensa'],
+    ['Claim', 'Reivindicar'],
+    ['Flip', 'Virar'],
+    ['Previous', 'Anterior'],
+    ['Next', 'Próximo'],
+    ['Format', 'Formato'],
+    ['Set Format', 'Definir formato'],
+    ['View all formats', 'Ver todos os formatos'],
+    ['Gameplay', 'Partida'],
+    ['Support', 'Suporte'],
+    ['Review', 'Avaliar'],
+    ['Leave a Review', 'Deixar uma avaliação'],
+    ['Got Feedback?', 'Quer enviar feedback?'],
+    ['Enjoying Lotus?', 'Gostando do contador?'],
+    ['Okay, got it', 'Entendi'],
+    ['Got it!', 'Entendi!'],
+    ['Good to know!', 'Bom saber!'],
+    ['Alright!', 'Certo!'],
+    ['Pinch to zoom • Drag to reposition', 'Aperte para ampliar • arraste para ajustar'],
+    ['Are you sure you want to restart the game?', 'Deseja reiniciar a partida?'],
+    ['Do you want to revive the killed player?', 'Deseja trazer o jogador eliminado de volta?'],
+    ['Revive', 'Trazer de volta'],
+    ['Kill', 'Eliminar'],
+    ['Unkill', 'Restaurar jogador'],
+    ['No life total changes in this game.', 'Nenhuma mudança de vida nesta partida.'],
+    ['No life total changes so far.', 'Nenhuma mudança de vida até agora.'],
+    ['Maximum 2 game modes can be active at once. Please disable one first.', 'No máximo dois modos podem ficar ativos. Desative um antes de continuar.'],
+  ]);
+
+  const settingNamesPtBr = new Map([
+    ['Auto-Kill', 'Nocaute automático'],
+    ['Clean Look', 'Visual limpo'],
+    ['Clickable Commander Damage Counters', 'Dano de comandante interativo'],
+    ['Clock on Main Screen', 'Relógio na mesa'],
+    ['Custom Long Tap', 'Toque longo personalizado'],
+    ['Cycle Salty Defeat Messages', 'Alternar mensagens de eliminação'],
+    ['Game Timer', 'Cronômetro da partida'],
+    ['Game Timer on Main Screen', 'Cronômetro na mesa'],
+    ['Keep Zero Counters on Player Card', 'Manter marcadores zerados'],
+    ['Low Health Warning', 'Aviso de vida baixa'],
+    ['Preserve Background Images On Shuffle', 'Preservar fundos ao embaralhar'],
+    ['Random Player Colors', 'Cores aleatórias dos jogadores'],
+    ['Salty Defeat Messages', 'Mensagens de eliminação'],
+    ['Set Life By Tapping Number', 'Definir vida tocando no número'],
+    ['Show Commander Damage Counters on Player Card', 'Mostrar dano de comandante no painel'],
+    ['Show Counters on Player Card', 'Mostrar marcadores no painel'],
+    ['Show Regular Counters on Player Card', 'Mostrar marcadores comuns no painel'],
+    ['Turn Timer', 'Cronômetro do turno'],
+    ['Turn Tracker', 'Controle de turnos'],
+    ['Vertical Tap Areas', 'Áreas de toque verticais'],
+  ]);
+
+  const translateKnownText = (value) => {
+    const normalized = String(value || '').replace(/\\s+/g, ' ').trim();
+    if (!normalized) {
+      return normalized;
+    }
+    const direct = ptBrText.get(normalized);
+    if (direct) {
+      return direct;
+    }
+    const playerMatch = normalized.match(/^Player\\s+(\\d+)\$/i);
+    if (playerMatch) {
+      return 'Jogador ' + playerMatch[1];
+    }
+    const previousGamesMatch = normalized.match(/^Previous Games\\s*(\\d*)\$/i);
+    if (previousGamesMatch) {
+      return 'Partidas anteriores' + (previousGamesMatch[1] ? ' ' + previousGamesMatch[1] : '');
+    }
+    const toggleMatch = normalized.match(/^(.+):\\s*(Enable|Disable)\$/);
+    if (toggleMatch) {
+      const settingName = settingNamesPtBr.get(toggleMatch[1]) || ptBrText.get(toggleMatch[1]);
+      if (settingName) {
+        return settingName + ': ' + (toggleMatch[2] === 'Enable' ? 'ativar' : 'desativar');
+      }
+    }
+    const startingLifeMatch = normalized.match(/^Set Starting Life:\\s*(.+)\$/);
+    if (startingLifeMatch) {
+      return 'Definir vida inicial: ' + startingLifeMatch[1];
+    }
+    return normalized;
+  };
+
+  const syncPtBrCopy = () => {
+    document.documentElement.lang = 'pt-BR';
+    document.title = 'ManaLoom • Contador de vida';
+    const roots = document.querySelectorAll([
+      '.menu-button-overlay',
+      '.settings-overlay',
+      '.life-history-overlay',
+      '.card-search-overlay',
+      '.commander-damage-overlay',
+      '.first-time-user-overlay',
+      '.custom-life-overlay',
+      '.input-overlay',
+      '.confirm-overlay',
+      '.load-profile-overlay',
+      '.game-modes-overlay',
+      '.dice-overlay',
+      '.winner-overlay',
+      '.killed-overlay',
+    ].join(','));
+    roots.forEach((root) => {
+      const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
+      let textNode = walker.nextNode();
+      while (textNode) {
+        const raw = textNode.nodeValue || '';
+        const trimmed = raw.trim();
+        let translated = translateKnownText(trimmed);
+        const parent = textNode.parentElement;
+        if (
+          translated === trimmed &&
+          parent instanceof HTMLElement &&
+          parent.classList.contains('text') &&
+          parent.closest('.winner-overlay, .killed-overlay')
+        ) {
+          translated = parent.closest('.winner-overlay') ? 'Vitória!' : 'Jogador eliminado';
+        }
+        if (trimmed && translated !== trimmed) {
+          textNode.nodeValue = raw.replace(trimmed, translated);
+        }
+        textNode = walker.nextNode();
+      }
+      root.querySelectorAll('input[placeholder], textarea[placeholder]').forEach((input) => {
+        const translated = translateKnownText(input.getAttribute('placeholder'));
+        if (translated) {
+          input.setAttribute('placeholder', translated);
+        }
+      });
+      root.querySelectorAll('[title]').forEach((node) => {
+        const translated = translateKnownText(node.getAttribute('title'));
+        if (translated) {
+          node.setAttribute('title', translated);
+        }
+      });
+    });
+    document.querySelectorAll('.player-name, .player-name-input').forEach((node) => {
+      if (node instanceof HTMLInputElement) {
+        const translated = translateKnownText(node.value);
+        if (translated !== node.value) node.value = translated;
+      } else {
+        const translated = translateKnownText(node.textContent);
+        if (translated && translated !== node.textContent) node.textContent = translated;
+      }
+    });
   };
 
   const decodeVisualNumber = (node) => {
@@ -2210,7 +2475,7 @@ textarea:focus-visible {
   };
 
   const syncAccessibility = () => {
-    document.documentElement.lang = 'en';
+    syncPtBrCopy();
 
     const playerCards = Array.from(document.querySelectorAll(
       ${jsonEncode(LotusDomSelectors.playerCard)},
@@ -2219,16 +2484,16 @@ textarea:focus-visible {
       if (!(card instanceof HTMLElement)) {
         return;
       }
-      const fallbackName = 'Player ' + String(index + 1);
+      const fallbackName = 'Jogador ' + String(index + 1);
       const nameNode = card.querySelector('.player-name, .player-name-input');
       const playerName = readableText(nameNode) || fallbackName;
       setAttributeIfChanged(card, 'role', 'group');
-      setAttributeIfChanged(card, 'aria-label', playerName + ' controls');
+      setAttributeIfChanged(card, 'aria-label', 'Controles de ' + playerName);
 
       const lifeNode = card.querySelector('.player-life-count');
       if (lifeNode instanceof HTMLElement) {
         const lifeValue =
-          decodeVisualNumber(lifeNode) || readableText(lifeNode) || 'unknown';
+          decodeVisualNumber(lifeNode) || readableText(lifeNode) || 'desconhecida';
         const numericLife = Number.parseInt(lifeValue, 10);
         setAttributeIfChanged(lifeNode, 'role', 'spinbutton');
         setAttributeIfChanged(lifeNode, 'tabindex', '0');
@@ -2242,7 +2507,7 @@ textarea:focus-visible {
         setAttributeIfChanged(
           lifeNode,
           'aria-label',
-          playerName + ' life: ' + lifeValue,
+          playerName + ', vida: ' + lifeValue,
         );
         const increaseButton = card.querySelector('.increase-button.life');
         const decreaseButton = card.querySelector('.decrease-button.life');
@@ -2252,7 +2517,7 @@ textarea:focus-visible {
           setAttributeIfChanged(
             increaseButton,
             'aria-label',
-            'Increase ' + playerName + ' life',
+            'Aumentar a vida de ' + playerName,
           );
           bindKeyboardAction(increaseButton, () => dispatchAccessibleTap(increaseButton));
         }
@@ -2262,7 +2527,7 @@ textarea:focus-visible {
           setAttributeIfChanged(
             decreaseButton,
             'aria-label',
-            'Decrease ' + playerName + ' life',
+            'Diminuir a vida de ' + playerName,
           );
           bindKeyboardAction(decreaseButton, () => dispatchAccessibleTap(decreaseButton));
         }
@@ -2295,7 +2560,7 @@ textarea:focus-visible {
       setAttributeIfChanged(
         menuButton,
         'aria-label',
-        isOpen ? 'Close table controls' : 'Open table controls',
+        isOpen ? 'Fechar controles da mesa' : 'Abrir controles da mesa',
       );
       setAttributeIfChanged(menuButton, 'aria-expanded', String(isOpen));
       bindKeyboardAction(menuButton, () => menuButton.click());
@@ -2324,7 +2589,7 @@ textarea:focus-visible {
       exitButton.type = 'button';
       exitButton.className = 'manaloom-life-counter-exit';
       exitButton.textContent = '←';
-      exitButton.setAttribute('aria-label', 'Exit life counter');
+      exitButton.setAttribute('aria-label', 'Sair do contador de vida');
       document.body.appendChild(exitButton);
     }
     if (exitButton instanceof HTMLElement) {
@@ -2354,15 +2619,15 @@ textarea:focus-visible {
     }
 
     const dialogs = [
-      ['.menu-button-overlay', 'Table controls'],
-      ['.settings-overlay', 'Life counter settings'],
-      ['.life-history-overlay', 'Game history'],
-      ['.card-search-overlay', 'Card search'],
-      ['.commander-damage-overlay', 'Commander damage'],
-      ['.first-time-user-overlay', 'Life counter tutorial'],
-      ['.custom-life-overlay', 'Set life'],
-      ['.input-overlay', 'Enter a value'],
-      ['.confirm-overlay', 'Confirm action'],
+      ['.menu-button-overlay', 'Controles da mesa'],
+      ['.settings-overlay', 'Configurações do contador de vida'],
+      ['.life-history-overlay', 'Histórico da partida'],
+      ['.card-search-overlay', 'Busca de cartas'],
+      ['.commander-damage-overlay', 'Dano de comandante'],
+      ['.first-time-user-overlay', 'Tutorial do contador de vida'],
+      ['.custom-life-overlay', 'Definir vida'],
+      ['.input-overlay', 'Informar um valor'],
+      ['.confirm-overlay', 'Confirmar ação'],
     ];
     const dialogNodes = [];
     dialogs.forEach((entry) => {
@@ -2423,35 +2688,34 @@ String? get lotusInjectedVisualProofScript {
       return _buildSimpleVisualProofScript(
         proofKey: proof,
         overlayClass: 'commander-damage-overlay',
-        title: "COMMANDER DAMAGE YOU'VE RECEIVED",
-        text: 'SWIPE LEFT OR RIGHT TO TRACK COMMANDER DAMAGE',
-        buttons: const ['RETURN TO GAME', 'GOT IT!'],
+        title: 'DANO DE COMANDANTE RECEBIDO',
+        text: 'DESLIZE PARA A ESQUERDA OU DIREITA PARA REGISTRAR O DANO',
+        buttons: const ['VOLTAR À PARTIDA', 'ENTENDI!'],
       );
     case 'turn_tracker_hint':
       return _buildSimpleVisualProofScript(
         proofKey: proof,
         overlayClass: 'manaloom-turn-tracker-proof',
-        title: 'TURN TRACKER',
-        text: 'TAP NEXT OR PREVIOUS TO FOLLOW THE ACTIVE TURN',
-        buttons: const ['GOT IT!'],
+        title: 'CONTROLE DE TURNOS',
+        text: 'TOQUE EM AVANÇAR OU VOLTAR PARA ACOMPANHAR O TURNO ATIVO',
+        buttons: const ['ENTENDI!'],
       );
     case 'turn_tracker_hint_step1':
       return _buildSimpleVisualProofScript(
         proofKey: proof,
         overlayClass: 'manaloom-turn-tracker-proof',
-        title: 'TURN TRACKER',
-        text:
-            'LONG PRESS THE TURN TRACKER TO MOVE IT BACK TO THE PREVIOUS PLAYER IF YOU MISSCLICKED',
-        buttons: const ['NEXT'],
+        title: 'CONTROLE DE TURNOS',
+        text: 'MANTENHA O CONTROLE PRESSIONADO PARA VOLTAR AO JOGADOR ANTERIOR',
+        buttons: const ['PRÓXIMO'],
       );
     case 'turn_tracker_hint_step2':
       return _buildSimpleVisualProofScript(
         proofKey: proof,
         overlayClass: 'manaloom-turn-tracker-proof',
-        title: 'TURN TRACKER',
+        title: 'CONTROLE DE TURNOS',
         text:
-            'WHEN AT TURN 1 ON THE STARTING PLAYER, LONG PRESS TO CHANGE WHO STARTS FIRST',
-        buttons: const ['GOT IT!'],
+            'NO TURNO 1 DO JOGADOR INICIAL, MANTENHA PRESSIONADO PARA TROCAR QUEM COMEÇA',
+        buttons: const ['ENTENDI!'],
       );
     case 'show_counters_hint':
       return _buildShowCountersVisualProofScript(proofKey: proof);
@@ -2460,27 +2724,28 @@ String? get lotusInjectedVisualProofScript {
     case 'first_time_commander_damage':
       return _buildFirstTimeUserVisualProofScript(
         proofKey: proof,
-        headline: 'Commander damage',
-        text: 'Swipe <b>left</b> or <b>right</b> to track Commander damage',
-        buttonLabel: 'Got it!',
+        headline: 'Dano de comandante',
+        text:
+            'Deslize para a <b>esquerda</b> ou <b>direita</b> para registrar o dano',
+        buttonLabel: 'Entendi!',
         coverCardClassName: 'cover-card swipe-left',
         commanderCardClassName: 'commander-card',
       );
     case 'first_time_player_options':
       return _buildFirstTimeUserVisualProofScript(
         proofKey: proof,
-        headline: 'Make it yours',
-        text: 'Swipe <b>up</b> or <b>down</b> to show player options',
-        buttonLabel: 'Alright!',
+        headline: 'Personalize seu jogador',
+        text: 'Deslize para <b>cima</b> ou <b>baixo</b> para ver as opções',
+        buttonLabel: 'Certo!',
         coverCardClassName: 'cover-card swipe-up',
         commanderCardClassName: 'commander-card hide',
       );
     case 'first_time_fullscreen_mode':
       return _buildFirstTimeUserVisualProofScript(
         proofKey: proof,
-        headline: 'Fullscreen mode',
-        text: 'Add website to <b>home screen</b> for fullscreen mode',
-        buttonLabel: 'Good to know!',
+        headline: 'Modo tela cheia',
+        text: 'Adicione o site à <b>tela inicial</b> para usar a tela cheia',
+        buttonLabel: 'Entendi!',
         coverCardClassName: 'cover-card swipe-up',
         commanderCardClassName: 'commander-card hide',
       );
@@ -2488,10 +2753,10 @@ String? get lotusInjectedVisualProofScript {
       return _buildSimpleVisualProofScript(
         proofKey: proof,
         overlayClass: 'own-commander-damage-hint-overlay',
-        title: 'OWN COMMANDER DAMAGE',
+        title: 'DANO DO PRÓPRIO COMANDANTE',
         text:
-            'GOT BETRAYED?<br><span>TAP THE DAGGER TO TRACK DAMAGE TAKEN FROM YOUR OWN COMMANDER.</span>',
-        buttons: const ['GOT IT!'],
+            'FOI TRAÍDO?<br><span>TOQUE NA ADAGA PARA REGISTRAR O DANO DO SEU PRÓPRIO COMANDANTE.</span>',
+        buttons: const ['ENTENDI!'],
       );
     default:
       return null;
@@ -2625,22 +2890,22 @@ String _buildFirstTimeUserVisualProofScript({
       <div class="side plus">+</div>
     </div>
     <div class="$commanderCardClassName">
-      <div class="label"><b>Commander</b>Damage you've received</div>
-      <div class="button">Return to Game</div>
+      <div class="label"><b>Commander</b>Dano recebido</div>
+      <div class="button">Voltar à partida</div>
     </div>
     <div class="options-card">
       <div class="inner">
         <div class="option-entry background">
           <div class="option-entry-icon"></div>
-          <div class="option-entry-text">Background</div>
+          <div class="option-entry-text">Fundo</div>
         </div>
         <div class="option-entry kill">
           <div class="option-entry-icon"></div>
-          <div class="option-entry-text">Kill</div>
+          <div class="option-entry-text">Nocautear</div>
         </div>
         <div class="option-entry partner">
           <div class="option-entry-icon"></div>
-          <div class="option-entry-text">Partner</div>
+          <div class="option-entry-text">Parceiro</div>
         </div>
       </div>
     </div>
@@ -2671,11 +2936,11 @@ $_visualProofChromeCleanupScript
 String _buildMenuOverlayVisualProofScript({required String proofKey}) {
   final overlayHtml = jsonEncode('''
 <div class="game-states-wrapper">
-  <div class="dice-btn">Dice</div>
-  <div class="life-history-btn">History</div>
-  <div class="initiative-btn">Initiative</div>
-  <div class="monarch-btn">Monarch</div>
-  <div class="card-search-btn">Card Search</div>
+  <div class="dice-btn">Dados</div>
+  <div class="life-history-btn">Histórico</div>
+  <div class="initiative-btn">Iniciativa</div>
+  <div class="monarch-btn">Monarca</div>
+  <div class="card-search-btn">Busca de cartas</div>
 </div>
 ''');
   final proofJson = jsonEncode(proofKey);
@@ -2707,10 +2972,10 @@ String _buildShowCountersVisualProofScript({required String proofKey}) {
     </div>
   </div>
 </div>
-<div class="manaloom-proof-title">DISPLAY COUNTERS ON PLAYER CARDS? <br><span>(YOU CAN TOGGLE THIS IN THE SETTINGS)</span></div>
+<div class="manaloom-proof-title">EXIBIR MARCADORES NOS PAINÉIS? <br><span>(VOCÊ PODE ALTERAR ISSO NAS CONFIGURAÇÕES)</span></div>
 <div class="manaloom-proof-actions">
-  <div class="btn disable">NO</div>
-  <div class="btn confirm">YES</div>
+  <div class="btn disable">NÃO</div>
+  <div class="btn confirm">SIM</div>
 </div>
 ''');
   final proofJson = jsonEncode(proofKey);

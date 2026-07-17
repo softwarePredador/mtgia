@@ -64,30 +64,22 @@ void main() {
       await tester.tap(find.text('Open'));
       await tester.pumpAndSettle();
 
-      expect(find.text('Player Counter'), findsOneWidget);
+      expect(find.text('Marcadores do jogador'), findsOneWidget);
 
       await tester.ensureVisible(
-        find.byKey(
-          const Key('life-counter-native-player-counter-custom-name'),
-        ),
+        find.byKey(const Key('life-counter-native-player-counter-custom-name')),
       );
       await tester.pumpAndSettle();
       await tester.enterText(
-        find.byKey(
-          const Key('life-counter-native-player-counter-custom-name'),
-        ),
+        find.byKey(const Key('life-counter-native-player-counter-custom-name')),
         'Quest Counter',
       );
       await tester.ensureVisible(
-        find.byKey(
-          const Key('life-counter-native-player-counter-custom-add'),
-        ),
+        find.byKey(const Key('life-counter-native-player-counter-custom-add')),
       );
       await tester.pumpAndSettle();
       await tester.tap(
-        find.byKey(
-          const Key('life-counter-native-player-counter-custom-add'),
-        ),
+        find.byKey(const Key('life-counter-native-player-counter-custom-add')),
       );
       await tester.pumpAndSettle();
 
@@ -118,9 +110,7 @@ void main() {
 
       await tester.pumpWidget(
         _Host(
-          initialSession: LifeCounterSession.initial(
-            playerCount: 4,
-          ).copyWith(
+          initialSession: LifeCounterSession.initial(playerCount: 4).copyWith(
             playerExtraCounters: const [
               {'rad': 3},
               {},
@@ -138,21 +128,15 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(
-        find.byKey(
-          const Key('life-counter-native-player-counter-chip-rad'),
-        ),
+        find.byKey(const Key('life-counter-native-player-counter-chip-rad')),
         findsOneWidget,
       );
       await tester.ensureVisible(
-        find.byKey(
-          const Key('life-counter-native-player-counter-chip-rad'),
-        ),
+        find.byKey(const Key('life-counter-native-player-counter-chip-rad')),
       );
       await tester.pumpAndSettle();
       await tester.tap(
-        find.byKey(
-          const Key('life-counter-native-player-counter-chip-rad'),
-        ),
+        find.byKey(const Key('life-counter-native-player-counter-chip-rad')),
       );
       await tester.pumpAndSettle();
       await tester.scrollUntilVisible(
@@ -184,7 +168,10 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(result, isNotNull);
-      expect(result!.resolvedPlayerExtraCounters[0].containsKey('rad'), isFalse);
+      expect(
+        result!.resolvedPlayerExtraCounters[0].containsKey('rad'),
+        isFalse,
+      );
     });
 
     testWidgets('surfaces canonical player status and critical poison state', (
@@ -212,7 +199,7 @@ void main() {
         ),
         findsOneWidget,
       );
-      expect(find.text('Active player'), findsOneWidget);
+      expect(find.text('Jogador ativo'), findsOneWidget);
 
       await tester.ensureVisible(
         find.byKey(const Key('life-counter-native-player-counter-plus')),
@@ -231,7 +218,7 @@ void main() {
         ),
         findsOneWidget,
       );
-      expect(find.text('Poison lethal'), findsWidgets);
+      expect(find.text('Veneno letal'), findsWidgets);
 
       await tester.tap(
         find.byKey(const Key('life-counter-native-player-counter-apply')),

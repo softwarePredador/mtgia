@@ -496,7 +496,8 @@ void main() {
 
       expect(find.text('Smoke Deck'), findsOneWidget);
 
-      await tester.tap(find.byTooltip('Otimizar deck'));
+      await tester.ensureVisible(find.text('Otimizar'));
+      await tester.tap(find.text('Otimizar'));
       await tester.pumpAndSettle();
 
       expect(find.text('Otimizar Deck'), findsOneWidget);
@@ -620,7 +621,8 @@ void main() {
       await _pumpScreen(tester, apiClient: apiClient, provider: provider);
       await tester.pumpAndSettle();
 
-      await tester.tap(find.byTooltip('Otimizar deck'));
+      await tester.ensureVisible(find.text('Otimizar'));
+      await tester.tap(find.text('Otimizar'));
       await tester.pumpAndSettle();
       final rebuildScrollable = find.byType(Scrollable).last;
       await tester.scrollUntilVisible(

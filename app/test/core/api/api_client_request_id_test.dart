@@ -1,4 +1,5 @@
 import 'dart:math';
+import 'dart:convert';
 
 import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
@@ -197,6 +198,55 @@ void main() {
       expect(response.responseRequestId, 'backend-request-503');
       expect(response.data, containsPair('error', 'maintenance'));
       expect(attempts, 2);
+    });
+
+    test(
+      'DELETE accepts an optional JSON body without breaking headers',
+      () async {
+        ApiClient.resetForTesting(
+          performanceUnavailable: true,
+          token: 'test-token',
+          httpClient: MockClient((request) async {
+            expect(request.method, 'DELETE');
+            expect(request.url.path, '/users/me');
+            expect(request.headers['authorization'], 'Bearer test-token');
+            expect(request.headers['content-type'], 'application/json');
+            expect(request.headers['x-request-id'], startsWith('mob-'));
+            expect(jsonDecode(request.body), {
+              'confirmation': 'DELETE',
+              'reason': 'user_request',
+            });
+            return http.Response(
+              '{"deleted":true}',
+              200,
+              headers: const {'content-type': 'application/json'},
+            );
+          }),
+        );
+
+        final response = await ApiClient().delete(
+          '/users/me',
+          body: const {'confirmation': 'DELETE', 'reason': 'user_request'},
+        );
+
+        expect(response.statusCode, 200);
+        expect(response.data, containsPair('deleted', true));
+      },
+    );
+
+    test('DELETE without a body preserves existing callers', () async {
+      ApiClient.resetForTesting(
+        performanceUnavailable: true,
+        httpClient: MockClient((request) async {
+          expect(request.method, 'DELETE');
+          expect(request.body, isEmpty);
+          return http.Response('', 204);
+        }),
+      );
+
+      final response = await ApiClient().delete('/notifications/1');
+
+      expect(response.statusCode, 204);
     });
 
     test('recovers when a transient GET succeeds on retry', () async {

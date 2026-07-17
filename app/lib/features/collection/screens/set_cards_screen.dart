@@ -5,6 +5,7 @@ import '../../../core/theme/app_theme.dart';
 import '../../../core/utils/friendly_error_mapper.dart';
 import '../../../core/widgets/app_state_panel.dart';
 import '../../../core/widgets/cached_card_image.dart';
+import '../../../core/widgets/responsive_page_frame.dart';
 import '../../cards/screens/card_detail_screen.dart';
 import '../../decks/models/deck_card_item.dart';
 import '../models/mtg_set.dart';
@@ -108,7 +109,7 @@ class _SetCardsScreenState extends State<SetCardsScreen> {
             .toList() ??
         const <MtgSet>[];
     if (sets.isEmpty) {
-      throw Exception('Coleção não encontrada no banco local');
+      throw Exception('Coleção não encontrada');
     }
     return sets.first;
   }
@@ -233,7 +234,17 @@ class _SetCardsScreenState extends State<SetCardsScreen> {
           ),
         ],
       ),
-      body: _buildBody(),
+      body: ColoredBox(
+        color: AppTheme.backgroundAbyss,
+        child: ResponsivePageFrame(
+          maxWidth: AppTheme.contentMaxWidth,
+          child: SizedBox(
+            key: const Key('set-cards-responsive-canvas'),
+            width: double.infinity,
+            child: _buildBody(),
+          ),
+        ),
+      ),
     );
   }
 
@@ -260,7 +271,7 @@ class _SetCardsScreenState extends State<SetCardsScreen> {
       return AppStatePanel(
         icon: Icons.inventory_2_outlined,
         title: 'Coleção indisponível',
-        message: 'Não foi possível identificar a coleção no banco local.',
+        message: 'Não foi possível identificar esta coleção.',
         accent: AppTheme.warning,
       );
     }
@@ -275,24 +286,49 @@ class _SetCardsScreenState extends State<SetCardsScreen> {
                   : RefreshIndicator(
                     color: AppTheme.brass500,
                     onRefresh: _loadSetAndCards,
-                    child: ListView.separated(
-                      key: const Key('setCardsList'),
-                      controller: _scrollController,
-                      padding: const EdgeInsets.fromLTRB(12, 0, 12, 16),
-                      itemCount: _cards.length + (_isLoadingMore ? 1 : 0),
-                      separatorBuilder: (_, __) => const SizedBox(height: 8),
-                      itemBuilder: (context, index) {
-                        if (index >= _cards.length) {
-                          return const Padding(
-                            padding: EdgeInsets.all(16),
-                            child: Center(
-                              child: CircularProgressIndicator(
-                                color: AppTheme.brass500,
+                    child: LayoutBuilder(
+                      builder: (context, constraints) {
+                        final itemCount =
+                            _cards.length + (_isLoadingMore ? 1 : 0);
+                        Widget itemBuilder(BuildContext context, int index) {
+                          if (index >= _cards.length) {
+                            return const Padding(
+                              padding: EdgeInsets.all(16),
+                              child: Center(
+                                child: CircularProgressIndicator(
+                                  color: AppTheme.brass500,
+                                ),
                               ),
-                            ),
+                            );
+                          }
+                          return _SetCardTile(card: _cards[index]);
+                        }
+
+                        if (constraints.maxWidth >= 960) {
+                          return GridView.builder(
+                            key: const Key('setCardsGrid'),
+                            controller: _scrollController,
+                            padding: const EdgeInsets.only(bottom: 16),
+                            gridDelegate:
+                                const SliverGridDelegateWithMaxCrossAxisExtent(
+                                  maxCrossAxisExtent: 620,
+                                  crossAxisSpacing: 10,
+                                  mainAxisSpacing: 10,
+                                  mainAxisExtent: 92,
+                                ),
+                            itemCount: itemCount,
+                            itemBuilder: itemBuilder,
                           );
                         }
-                        return _SetCardTile(card: _cards[index]);
+                        return ListView.separated(
+                          key: const Key('setCardsList'),
+                          controller: _scrollController,
+                          padding: const EdgeInsets.only(bottom: 16),
+                          itemCount: itemCount,
+                          separatorBuilder:
+                              (_, __) => const SizedBox(height: 8),
+                          itemBuilder: itemBuilder,
+                        );
                       },
                     ),
                   ),
@@ -311,14 +347,17 @@ class _SetHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.fromLTRB(12, 12, 12, 8),
+      padding: const EdgeInsets.fromLTRB(0, 12, 0, 8),
       child: Container(
         width: double.infinity,
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
           gradient: AppTheme.cardGradient,
           borderRadius: BorderRadius.circular(AppTheme.radiusLg),
-          border: Border.all(color: AppTheme.outlineMuted, width: AppTheme.strokeMedium),
+          border: Border.all(
+            color: AppTheme.outlineMuted,
+            width: AppTheme.strokeMedium,
+          ),
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -358,7 +397,7 @@ class _SetHeader extends StatelessWidget {
             ),
             const SizedBox(height: 4),
             Text(
-              '${set.type ?? 'tipo indisponível'} • dados servidos pelo banco local',
+              '${set.type ?? 'tipo indisponível'} • catálogo de cartas da edição',
               style: const TextStyle(
                 color: AppTheme.textSecondary,
                 fontSize: AppTheme.fontSm,
@@ -382,30 +421,36 @@ class _SetCardTile extends StatelessWidget {
       decoration: BoxDecoration(
         color: AppTheme.surfaceSlate,
         borderRadius: BorderRadius.circular(AppTheme.radiusMd),
-        border: Border.all(color: AppTheme.outlineMuted, width: AppTheme.strokeHairline),
+        border: Border.all(
+          color: AppTheme.outlineMuted,
+          width: AppTheme.strokeHairline,
+        ),
       ),
       child: ListTile(
         key: Key('set-card-${card.name}'),
         contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-        leading: ClipRRect(
-          borderRadius: BorderRadius.circular(AppTheme.radiusSm),
-          child: SizedBox(
-            width: AppTheme.touchTargetMin,
-            height: 60,
-            child:
-                card.imageUrl == null || card.imageUrl!.isEmpty
-                    ? Container(
-                      color: AppTheme.surfaceElevated,
-                      child: const Icon(
-                        Icons.image_not_supported,
-                        color: AppTheme.textSecondary,
-                        size: 18,
+        leading: SizedBox(
+          key: Key('set-card-thumbnail-${card.id}'),
+          height: 64,
+          child: AspectRatio(
+            aspectRatio: 488 / 680,
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(AppTheme.radiusSm),
+              child:
+                  card.imageUrl == null || card.imageUrl!.isEmpty
+                      ? Container(
+                        color: AppTheme.surfaceElevated,
+                        child: const Icon(
+                          Icons.image_not_supported,
+                          color: AppTheme.textSecondary,
+                          size: 18,
+                        ),
+                      )
+                      : CachedCardImage(
+                        imageUrl: card.imageUrl,
+                        fit: BoxFit.contain,
                       ),
-                    )
-                    : CachedCardImage(
-                      imageUrl: card.imageUrl,
-                      fit: BoxFit.cover,
-                    ),
+            ),
           ),
         ),
         title: Text(
@@ -482,7 +527,10 @@ class _InfoChip extends StatelessWidget {
       decoration: BoxDecoration(
         color: AppTheme.surfaceElevated,
         borderRadius: BorderRadius.circular(AppTheme.radiusXl),
-        border: Border.all(color: AppTheme.outlineMuted, width: AppTheme.strokeHairline),
+        border: Border.all(
+          color: AppTheme.outlineMuted,
+          width: AppTheme.strokeHairline,
+        ),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,

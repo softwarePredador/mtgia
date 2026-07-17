@@ -20,48 +20,62 @@ void main() {
   tearDown(ApiClient.resetForTesting);
 
   for (final kind in AiUsageKind.values) {
-    testWidgets('shows paywall when ${kind.name} quota is exhausted', (
-      tester,
-    ) async {
-      SharedPreferences.setMockInitialValues({});
-      final provider = CommercialProvider(now: () => DateTime(2026, 7, 1));
-      await provider.load();
-      for (var i = 0; i < ManaLoomPlan.free.monthlyAiLimit; i += 1) {
-        expect(
-          await provider.consumeAiAction(AiUsageKind.deckGeneration),
-          true,
-        );
-      }
+    testWidgets(
+      'shows a non-commercial limit notice when ${kind.name} is exhausted',
+      (tester) async {
+        SharedPreferences.setMockInitialValues({});
+        final provider = CommercialProvider(now: () => DateTime(2026, 7, 1));
+        await provider.load();
+        for (var i = 0; i < ManaLoomPlan.free.monthlyAiLimit; i += 1) {
+          expect(
+            await provider.consumeAiAction(AiUsageKind.deckGeneration),
+            true,
+          );
+        }
 
-      await tester.pumpWidget(
-        ChangeNotifierProvider<CommercialProvider>.value(
-          value: provider,
-          child: MaterialApp(
-            home: Builder(
-              builder:
-                  (context) => Scaffold(
-                    body: TextButton(
-                      onPressed:
-                          () =>
-                              reserveAiActionOrShowPaywall(context, kind: kind),
-                      child: const Text('run'),
+        await tester.pumpWidget(
+          ChangeNotifierProvider<CommercialProvider>.value(
+            value: provider,
+            child: MaterialApp(
+              home: Builder(
+                builder:
+                    (context) => Scaffold(
+                      body: TextButton(
+                        onPressed:
+                            () => reserveAiActionOrShowPaywall(
+                              context,
+                              kind: kind,
+                            ),
+                        child: const Text('run'),
+                      ),
                     ),
-                  ),
+              ),
             ),
           ),
-        ),
-      );
+        );
 
-      await tester.tap(find.text('run'));
-      await tester.pumpAndSettle();
+        await tester.tap(find.text('run'));
+        await tester.pumpAndSettle();
 
-      expect(find.byKey(const Key('ai-paywall-dialog')), findsOneWidget);
-      expect(find.text('${kind.label} precisa do Pro'), findsOneWidget);
-      expect(
-        find.byKey(const Key('ai-paywall-upgrade-button')),
-        findsOneWidget,
-      );
-    });
+        expect(find.byKey(const Key('ai-paywall-dialog')), findsOneWidget);
+        expect(
+          find.text('${kind.label}: limite da beta atingido'),
+          findsOneWidget,
+        );
+        expect(
+          find.byKey(const Key('ai-paywall-upgrade-button')),
+          findsNothing,
+        );
+        expect(
+          find.byKey(const Key('ai-beta-limit-dismiss-button')),
+          findsOneWidget,
+        );
+        expect(
+          find.textContaining('Compras e upgrades não estão'),
+          findsOneWidget,
+        );
+      },
+    );
   }
 
   testWidgets(

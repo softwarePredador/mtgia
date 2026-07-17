@@ -114,6 +114,7 @@ void main() {
       expect(details.cardCount, 0);
       expect(details.commanderName, isNull);
       expect(details.commanderImageUrl, isNull);
+      expect(details.colorIdentityKnown, isFalse);
     });
 
     test('fromJson deve usar commander_name explícito sobre inferido', () {
@@ -166,52 +167,55 @@ void main() {
       expect(details.pricingUpdatedAt, isNotNull);
     });
 
-    test('fromJson deve usar card.colors como fallback quando color_identity por carta está vazio', () {
-      // Simula resposta do servidor de produção que não retorna color_identity
-      // por carta, mas retorna colors
-      final json = {
-        'id': 'deck-fallback',
-        'name': 'Colors Fallback Deck',
-        'format': 'commander',
-        'is_public': false,
-        'created_at': '2025-01-30T10:00:00Z',
-        // Sem color_identity no nível do deck
-        'commander': [
-          {
-            'id': 'card-c1',
-            'name': 'Atraxa, Praetors Voice',
-            'type_line': 'Legendary Creature',
-            'colors': ['W', 'U', 'B', 'G'],
-            // color_identity ausente (servidor antigo)
-            'set_code': 'cm2',
-            'rarity': 'mythic',
-            'quantity': 1,
-            'is_commander': true,
-          },
-        ],
-        'main_board': {
-          'Creature': [
+    test(
+      'fromJson deve usar card.colors como fallback quando color_identity por carta está vazio',
+      () {
+        // Simula resposta do servidor de produção que não retorna color_identity
+        // por carta, mas retorna colors
+        final json = {
+          'id': 'deck-fallback',
+          'name': 'Colors Fallback Deck',
+          'format': 'commander',
+          'is_public': false,
+          'created_at': '2025-01-30T10:00:00Z',
+          // Sem color_identity no nível do deck
+          'commander': [
             {
-              'id': 'card-c2',
-              'name': 'Birds of Paradise',
-              'type_line': 'Creature — Bird',
-              'colors': ['G'],
-              // color_identity ausente
-              'set_code': 'rav',
-              'rarity': 'rare',
+              'id': 'card-c1',
+              'name': 'Atraxa, Praetors Voice',
+              'type_line': 'Legendary Creature',
+              'colors': ['W', 'U', 'B', 'G'],
+              // color_identity ausente (servidor antigo)
+              'set_code': 'cm2',
+              'rarity': 'mythic',
               'quantity': 1,
-              'is_commander': false,
+              'is_commander': true,
             },
           ],
-        },
-      };
+          'main_board': {
+            'Creature': [
+              {
+                'id': 'card-c2',
+                'name': 'Birds of Paradise',
+                'type_line': 'Creature — Bird',
+                'colors': ['G'],
+                // color_identity ausente
+                'set_code': 'rav',
+                'rarity': 'rare',
+                'quantity': 1,
+                'is_commander': false,
+              },
+            ],
+          },
+        };
 
-      final details = DeckDetails.fromJson(json);
+        final details = DeckDetails.fromJson(json);
 
-      // Deve ter usado card.colors como fallback
-      expect(details.colorIdentity, isNotEmpty);
-      expect(details.colorIdentity, containsAll(['W', 'U', 'B', 'G']));
-    });
+        // Deve ter usado card.colors como fallback
+        expect(details.colorIdentity, isNotEmpty);
+        expect(details.colorIdentity, containsAll(['W', 'U', 'B', 'G']));
+      },
+    );
 
     test('copyWith deve substituir campos específicos', () {
       final original = DeckDetails(
@@ -236,6 +240,24 @@ void main() {
       expect(updated.format, 'commander');
       expect(updated.isPublic, true);
       expect(updated.synergyScore, 90);
+    });
+
+    test('preserva identidade incolor conhecida no detalhe', () {
+      final details = DeckDetails.fromJson({
+        'id': 'deck-colorless',
+        'name': 'Karn',
+        'format': 'commander',
+        'is_public': false,
+        'created_at': '2025-01-30T10:00:00Z',
+        'color_identity': <String>[],
+        'color_identity_known': true,
+        'commander': const <dynamic>[],
+        'main_board': const <String, dynamic>{},
+        'stats': const <String, dynamic>{},
+      });
+
+      expect(details.colorIdentity, isEmpty);
+      expect(details.colorIdentityKnown, isTrue);
     });
   });
 }

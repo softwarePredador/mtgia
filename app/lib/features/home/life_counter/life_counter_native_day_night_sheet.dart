@@ -10,7 +10,7 @@ Future<LifeCounterDayNightState?> showLifeCounterNativeDayNightSheet(
   return showModalBottomSheet<LifeCounterDayNightState>(
     context: context,
     isScrollControlled: true,
-    backgroundColor: Colors.transparent,
+    backgroundColor: AppTheme.transparent,
     builder: (context) {
       return _LifeCounterNativeDayNightSheet(initialState: initialState);
     },
@@ -68,7 +68,7 @@ class _LifeCounterNativeDayNightSheetState
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            'Day / Night',
+                            'Dia / Noite',
                             style: TextStyle(
                               color: AppTheme.textPrimary,
                               fontSize: AppTheme.fontXxl,
@@ -77,11 +77,11 @@ class _LifeCounterNativeDayNightSheetState
                           ),
                           SizedBox(height: 6),
                           Text(
-                            'Set the current day or night state.',
+                            'Defina o estado atual de dia ou noite.',
                             style: TextStyle(
                               color: AppTheme.textSecondary,
                               fontSize: AppTheme.fontMd,
-                              height: 1.35,
+                              height: AppTheme.lineHeightCompact,
                             ),
                           ),
                         ],
@@ -91,7 +91,7 @@ class _LifeCounterNativeDayNightSheetState
                       onPressed: () => Navigator.of(context).pop(),
                       icon: const Icon(Icons.close_rounded),
                       color: AppTheme.textSecondary,
-                      tooltip: 'Close',
+                      tooltip: 'Fechar',
                     ),
                   ],
                 ),
@@ -106,12 +106,12 @@ class _LifeCounterNativeDayNightSheetState
                       segments: const [
                         ButtonSegment<bool>(
                           value: false,
-                          label: Text('Day'),
+                          label: Text('Dia'),
                           icon: Icon(Icons.wb_sunny_outlined),
                         ),
                         ButtonSegment<bool>(
                           value: true,
-                          label: Text('Night'),
+                          label: Text('Noite'),
                           icon: Icon(Icons.nightlight_round),
                         ),
                       ],
@@ -125,8 +125,8 @@ class _LifeCounterNativeDayNightSheetState
                     const SizedBox(height: 16),
                     Text(
                       _isNight
-                          ? 'Night is active on the tabletop.'
-                          : 'Day is active on the tabletop.',
+                          ? 'Noite está ativa na mesa.'
+                          : 'Dia está ativo na mesa.',
                       key: const Key(
                         'life-counter-native-day-night-current-label',
                       ),
@@ -151,7 +151,7 @@ class _LifeCounterNativeDayNightSheetState
                           side: const BorderSide(color: AppTheme.outlineMuted),
                           padding: const EdgeInsets.symmetric(vertical: 14),
                         ),
-                        child: const Text('Cancel'),
+                        child: const Text('Cancelar'),
                       ),
                     ),
                     const SizedBox(width: 12),
@@ -167,7 +167,7 @@ class _LifeCounterNativeDayNightSheetState
                           foregroundColor: AppTheme.backgroundAbyss,
                           padding: const EdgeInsets.symmetric(vertical: 14),
                         ),
-                        child: const Text('Apply'),
+                        child: const Text('Aplicar'),
                       ),
                     ),
                   ],

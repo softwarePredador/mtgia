@@ -44,7 +44,7 @@ class LifeCounterDiceEngine {
     if (activePlayers.isEmpty) {
       return session.copyWith(
         clearFirstPlayerIndex: true,
-        lastTableEvent: 'Primeiro jogador indisponivel: nenhum jogador ativo',
+        lastTableEvent: 'Primeiro jogador indisponível: nenhum jogador ativo',
       );
     }
 
@@ -64,7 +64,7 @@ class LifeCounterDiceEngine {
     if (participants.isEmpty) {
       return session.copyWith(
         lastHighRolls: List<int?>.filled(session.playerCount, null),
-        lastTableEvent: 'High Roll indisponivel: nenhum jogador ativo',
+        lastTableEvent: 'Maior rolagem indisponível: nenhum jogador ativo',
       );
     }
 
@@ -85,7 +85,7 @@ class LifeCounterDiceEngine {
         lastHighRolls: nextHighRolls,
         firstPlayerIndex: winner,
         lastTableEvent:
-            '${isTieBreaker ? 'Desempate do High Roll' : 'High Roll'}: ${_playerLabel(winner)} venceu com $value',
+            '${isTieBreaker ? 'Desempate da maior rolagem' : 'Maior rolagem'}: ${_playerLabel(winner)} venceu com $value',
       );
     }
 
@@ -96,7 +96,7 @@ class LifeCounterDiceEngine {
     return session.copyWith(
       lastHighRolls: nextHighRolls,
       lastTableEvent:
-          '${isTieBreaker ? 'Desempate do High Roll' : 'High Roll'} empatado em $highest entre $tiedPlayers',
+          '${isTieBreaker ? 'Desempate da maior rolagem' : 'Maior rolagem'} empatou em $highest entre $tiedPlayers',
     );
   }
 
@@ -125,7 +125,7 @@ class LifeCounterDiceEngine {
     return activePlayers;
   }
 
-  static String _playerLabel(int playerIndex) => 'Player ${playerIndex + 1}';
+  static String _playerLabel(int playerIndex) => 'Jogador ${playerIndex + 1}';
 
   static List<int> _activePlayerIndexes(LifeCounterSession session) {
     return <int>[

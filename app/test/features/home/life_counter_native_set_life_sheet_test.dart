@@ -126,7 +126,7 @@ void main() {
       find.byKey(const Key('life-counter-native-set-life-status-label')),
       findsOneWidget,
     );
-    expect(find.text('Active player'), findsOneWidget);
+    expect(find.text('Jogador ativo'), findsOneWidget);
 
     await tester.tap(
       find.byKey(const Key('life-counter-native-set-life-adjust-minus-10')),
@@ -145,10 +145,10 @@ void main() {
     );
     await tester.pumpAndSettle();
 
-    expect(find.text('Active player'), findsOneWidget);
+    expect(find.text('Jogador ativo'), findsOneWidget);
     expect(
       find.text(
-        'Life is zero or less, but this player remains active until Auto-KO or a manual knock out records the defeat.',
+        'A vida chegou a zero ou menos, mas o jogador permanece ativo até o nocaute automático ou manual.',
       ),
       findsOneWidget,
     );

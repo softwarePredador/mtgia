@@ -5,6 +5,7 @@ import '../../../core/config/launch_features.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/widgets/app_state_panel.dart';
 import '../../../core/widgets/cached_card_image.dart';
+import '../../../core/widgets/responsive_page_frame.dart';
 import '../providers/binder_provider.dart';
 import '../widgets/binder_item_editor.dart';
 import '../../cards/widgets/card_edition_metadata.dart';
@@ -49,43 +50,53 @@ class _BinderTabContentState extends State<BinderTabContent>
   Widget build(BuildContext context) {
     super.build(context);
 
-    return Column(
-      children: [
-        // Sub-tabs: Tenho / Quero
-        Container(
-          color: AppTheme.backgroundAbyss,
-          child: TabBar(
-            controller: _subTabController,
-            dividerColor: AppTheme.transparent,
-            indicatorColor: AppTheme.brass400,
-            labelColor: AppTheme.brass400,
-            unselectedLabelColor: AppTheme.textSecondary,
-            labelStyle: const TextStyle(
-              fontWeight: FontWeight.w700,
-              fontSize: AppTheme.fontSm,
-            ),
-            unselectedLabelStyle: const TextStyle(
-              fontWeight: FontWeight.w700,
-              fontSize: AppTheme.fontSm,
-            ),
-            tabs: const [
-              Tab(text: 'Tenho', height: 34),
-              Tab(text: 'Quero', height: 34),
-            ],
-          ),
-        ),
+    return ColoredBox(
+      color: AppTheme.backgroundAbyss,
+      child: ResponsivePageFrame(
+        maxWidth: AppTheme.contentMaxWidth,
+        child: SizedBox(
+          key: const Key('binder-responsive-canvas'),
+          width: double.infinity,
+          child: Column(
+            children: [
+              // Sub-tabs: Tenho / Quero
+              Container(
+                color: AppTheme.backgroundAbyss,
+                child: TabBar(
+                  controller: _subTabController,
+                  dividerColor: AppTheme.transparent,
+                  indicatorColor: AppTheme.brass400,
+                  labelColor: AppTheme.brass400,
+                  unselectedLabelColor: AppTheme.textSecondary,
+                  labelStyle: const TextStyle(
+                    fontWeight: FontWeight.w700,
+                    fontSize: AppTheme.fontSm,
+                  ),
+                  unselectedLabelStyle: const TextStyle(
+                    fontWeight: FontWeight.w700,
+                    fontSize: AppTheme.fontSm,
+                  ),
+                  tabs: const [
+                    Tab(text: 'Tenho', height: AppTheme.touchTargetMin),
+                    Tab(text: 'Quero', height: AppTheme.touchTargetMin),
+                  ],
+                ),
+              ),
 
-        // Content area
-        Expanded(
-          child: TabBarView(
-            controller: _subTabController,
-            children: const [
-              _BinderListView(listType: 'have'),
-              _BinderListView(listType: 'want'),
+              // Content area
+              Expanded(
+                child: TabBarView(
+                  controller: _subTabController,
+                  children: const [
+                    _BinderListView(listType: 'have'),
+                    _BinderListView(listType: 'want'),
+                  ],
+                ),
+              ),
             ],
           ),
         ),
-      ],
+      ),
     );
   }
 }
@@ -121,7 +132,9 @@ class _BinderListViewState extends State<_BinderListView>
   bool _isLoading = false;
   bool _hasMore = true;
   String? _error;
+  bool _retryShouldReset = false;
   int _page = 1;
+  int _fetchGeneration = 0;
 
   @override
   bool get wantKeepAlive => true;
@@ -156,52 +169,89 @@ class _BinderListViewState extends State<_BinderListView>
   }
 
   Future<void> _fetchItems({bool reset = false}) async {
-    if (_isLoading) return;
+    // A reset represents a new query and must supersede an in-flight request.
+    // Pagination remains single-flight inside the current query generation.
+    if (_isLoading && !reset) return;
     if (!reset && !_hasMore) return;
 
     if (reset) {
       _page = 1;
-      _items = [];
-      _hasMore = true;
+      _fetchGeneration++;
     }
+
+    final generation = _fetchGeneration;
+    final requestPage = _page;
+    final requestCondition = _conditionFilter;
+    final requestSearch = _searchController.text.trim();
+    final requestForTrade = _tradeFilter;
+    final requestForSale = _saleFilter;
+    final requestSetCode = _setController.text.trim();
+    final requestRarity = _rarityFilter;
+    final requestLanguage = _languageFilter;
+    final requestFoil = _foilFilter;
+    final requestSortBy = _sortBy;
+    final requestSortOrder = _sortOrder;
 
     setState(() {
       _isLoading = true;
       _error = null;
+      if (reset) _hasMore = true;
     });
 
     try {
       final provider = context.read<BinderProvider>();
       final res = await provider.fetchBinderDirect(
         listType: widget.listType,
-        page: _page,
-        condition: _conditionFilter,
-        search: _searchController.text.trim(),
-        forTrade: _tradeFilter,
-        forSale: _saleFilter,
-        setCode: _setController.text.trim(),
-        rarity: _rarityFilter,
-        language: _languageFilter,
-        foil: _foilFilter,
-        sortBy: _sortBy,
-        sortOrder: _sortOrder,
+        page: requestPage,
+        condition: requestCondition,
+        search: requestSearch,
+        forTrade: requestForTrade,
+        forSale: requestForSale,
+        setCode: requestSetCode,
+        rarity: requestRarity,
+        language: requestLanguage,
+        foil: requestFoil,
+        sortBy: requestSortBy,
+        sortOrder: requestSortOrder,
       );
+      if (!mounted || generation != _fetchGeneration) return;
       if (res != null) {
-        _items.addAll(res);
+        if (reset) {
+          _items = res;
+        } else {
+          _items.addAll(res);
+        }
         _hasMore = res.length >= 20;
-        _page++;
+        _page = requestPage + 1;
         _error = null;
+        _retryShouldReset = false;
       } else {
-        _error = 'Não conseguimos carregar seu fichário agora.';
+        _error =
+            _items.isEmpty
+                ? 'Verifique sua conexão e tente novamente.'
+                : 'A atualização falhou. As cartas já carregadas foram mantidas.';
+        _hasMore = false;
+        _retryShouldReset = reset;
       }
     } catch (e) {
+      if (!mounted || generation != _fetchGeneration) return;
       debugPrint('[❌ BinderList] fetchItems (${widget.listType}): $e');
-      _error = 'Não foi possível conectar ao servidor';
+      _error =
+          _items.isEmpty
+              ? 'Verifique sua conexão e tente novamente.'
+              : 'A atualização falhou. As cartas já carregadas foram mantidas.';
+      _hasMore = false;
+      _retryShouldReset = reset;
     } finally {
-      if (mounted) {
+      if (mounted && generation == _fetchGeneration) {
         setState(() => _isLoading = false);
       }
     }
+  }
+
+  void _retryFetch() {
+    setState(() => _hasMore = true);
+    _fetchItems(reset: _retryShouldReset || _items.isEmpty);
   }
 
   void _applyFilters() {
@@ -429,7 +479,7 @@ class _BinderListViewState extends State<_BinderListView>
         message: _error!,
         accent: AppTheme.error,
         actionLabel: 'Tentar novamente',
-        onAction: () => _fetchItems(reset: true),
+        onAction: _retryFetch,
       );
     }
 
@@ -536,28 +586,83 @@ class _BinderListViewState extends State<_BinderListView>
         await binderProvider.fetchStats();
       },
       color: AppTheme.frost400,
-      child: ListView.builder(
-        key: Key('binder-list-${widget.listType}'),
-        controller: _scrollController,
-        padding: EdgeInsets.fromLTRB(
-          12,
-          12,
-          12,
-          12 + MediaQuery.of(context).padding.bottom + 88,
-        ),
-        itemCount: _items.length + (_hasMore ? 1 : 0),
-        itemBuilder: (context, index) {
-          if (index >= _items.length) {
-            return const Padding(
-              padding: EdgeInsets.symmetric(vertical: 16),
-              child: Center(
-                child: CircularProgressIndicator(color: AppTheme.frost400),
-              ),
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          final useGrid = constraints.maxWidth >= 960;
+          final hasFooter = _hasMore || _error != null;
+          final itemCount = _items.length + (hasFooter ? 1 : 0);
+          Widget itemBuilder(BuildContext context, int index) {
+            if (index >= _items.length) {
+              if (_error != null) {
+                return Padding(
+                  key: Key('binder-pagination-error-${widget.listType}'),
+                  padding: const EdgeInsets.symmetric(vertical: 12),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        _error!,
+                        textAlign: TextAlign.center,
+                        style: const TextStyle(
+                          color: AppTheme.warning,
+                          fontSize: AppTheme.fontSm,
+                        ),
+                      ),
+                      TextButton.icon(
+                        key: Key('binder-pagination-retry-${widget.listType}'),
+                        onPressed: _retryFetch,
+                        icon: const Icon(Icons.refresh_rounded),
+                        label: const Text('Tentar novamente'),
+                      ),
+                    ],
+                  ),
+                );
+              }
+              if (_isLoading) {
+                return const Padding(
+                  padding: EdgeInsets.symmetric(vertical: 16),
+                  child: Center(
+                    child: CircularProgressIndicator(color: AppTheme.frost400),
+                  ),
+                );
+              }
+              return const SizedBox(height: 1);
+            }
+            return _BinderItemCard(
+              item: _items[index],
+              margin:
+                  useGrid ? EdgeInsets.zero : const EdgeInsets.only(bottom: 8),
+              onTap: () => _editItem(_items[index]),
             );
           }
-          return _BinderItemCard(
-            item: _items[index],
-            onTap: () => _editItem(_items[index]),
+
+          final padding = EdgeInsets.fromLTRB(
+            0,
+            12,
+            0,
+            12 + MediaQuery.of(context).padding.bottom + 88,
+          );
+          if (useGrid) {
+            return GridView.builder(
+              key: Key('binder-grid-${widget.listType}'),
+              controller: _scrollController,
+              padding: padding,
+              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 2,
+                crossAxisSpacing: 12,
+                mainAxisSpacing: 12,
+                mainAxisExtent: 108,
+              ),
+              itemCount: itemCount,
+              itemBuilder: itemBuilder,
+            );
+          }
+          return ListView.builder(
+            key: Key('binder-list-${widget.listType}'),
+            controller: _scrollController,
+            padding: padding,
+            itemCount: itemCount,
+            itemBuilder: itemBuilder,
           );
         },
       ),
@@ -1165,53 +1270,59 @@ class _SearchFilterBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+      padding: const EdgeInsets.symmetric(vertical: 8),
       color: AppTheme.backgroundAbyss,
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          ValueListenableBuilder<TextEditingValue>(
-            valueListenable: searchController,
-            builder: (context, searchValue, _) {
-              return TextField(
-                key: const Key('binder-search-field'),
-                controller: searchController,
-                onSubmitted: (_) => onSearch(),
-                style: const TextStyle(
-                  color: AppTheme.textPrimary,
-                  fontSize: AppTheme.fontMd,
-                ),
-                decoration: InputDecoration(
-                  hintText: 'Buscar carta...',
-                  hintStyle: const TextStyle(color: AppTheme.textSecondary),
-                  prefixIcon: const Icon(
-                    Icons.search,
-                    color: AppTheme.textSecondary,
-                  ),
-                  suffixIcon:
-                      searchValue.text.isEmpty
-                          ? null
-                          : IconButton(
-                            tooltip: 'Limpar busca',
-                            icon: const Icon(
-                              Icons.clear,
-                              color: AppTheme.textSecondary,
-                            ),
-                            onPressed: () {
-                              searchController.clear();
-                              onSearch();
-                            },
-                          ),
-                  filled: true,
-                  fillColor: AppTheme.surfaceSlate,
-                  contentPadding: const EdgeInsets.symmetric(vertical: 0),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(AppTheme.radiusMd),
-                    borderSide: BorderSide.none,
-                  ),
-                ),
-              );
-            },
+          Align(
+            alignment: Alignment.centerLeft,
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 760),
+              child: ValueListenableBuilder<TextEditingValue>(
+                valueListenable: searchController,
+                builder: (context, searchValue, _) {
+                  return TextField(
+                    key: const Key('binder-search-field'),
+                    controller: searchController,
+                    onSubmitted: (_) => onSearch(),
+                    style: const TextStyle(
+                      color: AppTheme.textPrimary,
+                      fontSize: AppTheme.fontMd,
+                    ),
+                    decoration: InputDecoration(
+                      hintText: 'Buscar carta...',
+                      hintStyle: const TextStyle(color: AppTheme.textSecondary),
+                      prefixIcon: const Icon(
+                        Icons.search,
+                        color: AppTheme.textSecondary,
+                      ),
+                      suffixIcon:
+                          searchValue.text.isEmpty
+                              ? null
+                              : IconButton(
+                                tooltip: 'Limpar busca',
+                                icon: const Icon(
+                                  Icons.clear,
+                                  color: AppTheme.textSecondary,
+                                ),
+                                onPressed: () {
+                                  searchController.clear();
+                                  onSearch();
+                                },
+                              ),
+                      filled: true,
+                      fillColor: AppTheme.surfaceSlate,
+                      contentPadding: const EdgeInsets.symmetric(vertical: 0),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(AppTheme.radiusMd),
+                        borderSide: BorderSide.none,
+                      ),
+                    ),
+                  );
+                },
+              ),
+            ),
           ),
           const SizedBox(height: 8),
           SingleChildScrollView(
@@ -1529,14 +1640,19 @@ class _FilterDropdown extends StatelessWidget {
 class _BinderItemCard extends StatelessWidget {
   final BinderItem item;
   final VoidCallback onTap;
+  final EdgeInsetsGeometry margin;
 
-  const _BinderItemCard({required this.item, required this.onTap});
+  const _BinderItemCard({
+    required this.item,
+    required this.onTap,
+    this.margin = EdgeInsets.zero,
+  });
 
   @override
   Widget build(BuildContext context) {
     return Card(
       key: Key('binder-item-card-${item.id}'),
-      margin: const EdgeInsets.only(bottom: 8),
+      margin: margin,
       color: AppTheme.surfaceSlate,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(AppTheme.radiusMd),

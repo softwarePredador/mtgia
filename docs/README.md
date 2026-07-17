@@ -6,15 +6,28 @@ as fontes canônicas abaixo.
 
 ## Entrada canônica atual
 
-1. `docs/MANALOOM_E2E_RELEASE_CONTRACT.md`
+1. `docs/qa/MANALOOM_FREE_BETA_RELEASE_CANDIDATE_2026-07-16.md`
+   - decisão go/no-go da beta gratuita Web + Android: escopo, segurança,
+     identidade de mesma SHA, evidências confirmadas, bloqueios, ordem de
+     promoção, rollback e checklist final. E2E, resolution, Patrol, builds,
+     runtime local, restore isolado e `full` já têm prova; gates externos
+     e demais P0 permanecem abertos, portanto o estado continua NO-GO.
+2. `docs/qa/MANALOOM_PRODUCT_EXPERIENCE_AUDIT_2026-07-16.md`
+   - auditoria canônica de produto e experiência do app: inventário de rotas e
+     telas, necessidades dos jogadores, sistema visual, fluxos interligados,
+     correções, riscos P0-P2 e estado verificável dos gates.
+3. `docs/qa/MANALOOM_FREE_BETA_RELEASE_OPS_GATE_2026-07-16.md`
+   - contratos fail-closed de build/publicação, CORS, observabilidade,
+     backup off-site, restore isolado, SBOM/provenance e provas externas.
+4. `docs/MANALOOM_E2E_RELEASE_CONTRACT.md`
    - perfis de execução, autorização de mutações, matriz de gates e critérios
      separados de conclusão local e de release.
-2. `docs/CONTEXTO_PRODUTO_ATUAL.md`
+5. `docs/CONTEXTO_PRODUTO_ATUAL.md`
    - prioridade operacional vigente e ponte para a evidência mais recente.
-3. `docs/qa/MANALOOM_E2E_PROJECT_CLOSURE_2026-07-15.md`
+6. `docs/qa/MANALOOM_E2E_PROJECT_CLOSURE_2026-07-15.md`
    - evidência fechada, remoções, resultados, resíduos e bloqueadores de release
-     da rodada corrente.
-4. `docs/qa/MANALOOM_BATTLE_DECKBUILDER_DEFINITIVE_2026-07-15.md`
+     da rodada anterior; não substitui os gates do candidato de 2026-07-16.
+7. `docs/qa/MANALOOM_BATTLE_DECKBUILDER_DEFINITIVE_2026-07-15.md`
    - auditoria final de battle, deckbuilder, famílias, cargas PostgreSQL,
      cobertura externa e pendências de produto.
 

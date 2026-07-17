@@ -1,5 +1,4 @@
 import 'package:dart_frog/dart_frog.dart';
-import 'package:postgres/postgres.dart';
 
 import '../../../../../lib/auth_middleware.dart';
 import '../../../../../lib/http_responses.dart';
@@ -10,8 +9,7 @@ Future<Response> onRequest(RequestContext context) async {
     return methodNotAllowed();
   }
 
-  final userId = getUserId(context);
-  final pool = context.read<Pool>();
+  getUserId(context);
 
   Map<String, dynamic> body;
   try {
@@ -22,17 +20,17 @@ Future<Response> onRequest(RequestContext context) async {
 
   final planName = body['plan_name']?.toString().trim().toLowerCase() ?? 'pro';
   if (planName != 'pro') {
-    return badRequest('Somente upgrade para Pro esta disponivel neste fluxo.');
+    return badRequest('Nenhum plano pago está disponível durante a beta.');
   }
 
   try {
-    final result = await ManaLoomPaymentProvider(pool: pool).createCheckout(
-      BillingCheckoutRequest(userId: userId, planName: planName),
+    final result = await const ManaLoomPaymentProvider().createCheckout(
+      BillingCheckoutRequest(planName: planName),
     );
     return Response.json(statusCode: result.statusCode, body: result.body);
   } catch (error) {
     return internalServerError(
-      'Falha ao iniciar checkout do plano Pro',
+      'Falha ao processar solicitação de plano durante a beta',
       details: error,
     );
   }

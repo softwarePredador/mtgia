@@ -53,6 +53,7 @@ Future<Response> _putToken(RequestContext context) async {
       Sql.named('''
         UPDATE users SET fcm_token = @token, updated_at = CURRENT_TIMESTAMP
         WHERE id = @id
+          AND deleted_at IS NULL
       '''),
       parameters: {'id': userId, 'token': token},
     );
@@ -76,6 +77,7 @@ Future<Response> _deleteToken(RequestContext context) async {
       Sql.named('''
         UPDATE users SET fcm_token = NULL, updated_at = CURRENT_TIMESTAMP
         WHERE id = @id
+          AND deleted_at IS NULL
       '''),
       parameters: {'id': userId},
     );

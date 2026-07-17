@@ -24,6 +24,10 @@ GoRouter _routerFor(String initialLocation) {
             builder:
                 (context, state) => Text('deck ${state.pathParameters['id']}'),
           ),
+          GoRoute(
+            path: '/messages',
+            builder: (context, state) => const Text('messages'),
+          ),
         ],
       ),
     ],
@@ -74,6 +78,31 @@ void main() {
     );
 
     expect(find.byKey(const Key('main-navigation-rail')), findsNothing);
+    expect(find.byKey(const Key('main-bottom-navigation')), findsNothing);
+  });
+
+  testWidgets('keeps the deck section rail on wide nested screens', (
+    tester,
+  ) async {
+    await _pumpAt(
+      tester,
+      size: const Size(1280, 900),
+      location: '/decks/deck-1',
+    );
+
+    expect(find.byKey(const Key('main-navigation-rail')), findsOneWidget);
+    expect(find.byKey(const Key('main-bottom-navigation')), findsNothing);
+  });
+
+  testWidgets('keeps an unselected rail on wide auxiliary screens', (
+    tester,
+  ) async {
+    await _pumpAt(tester, size: const Size(1280, 900), location: '/messages');
+
+    final rail = tester.widget<NavigationRail>(
+      find.byKey(const Key('main-navigation-rail')),
+    );
+    expect(rail.selectedIndex, isNull);
     expect(find.byKey(const Key('main-bottom-navigation')), findsNothing);
   });
 }

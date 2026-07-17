@@ -76,7 +76,7 @@ Future<LifeCounterGameModesAction?> showLifeCounterNativeGameModesSheet(
   return showModalBottomSheet<LifeCounterGameModesAction>(
     context: context,
     isScrollControlled: true,
-    backgroundColor: Colors.transparent,
+    backgroundColor: AppTheme.transparent,
     builder:
         (context) => _LifeCounterNativeGameModesSheet(
           availability: availability,
@@ -130,7 +130,7 @@ class _LifeCounterNativeGameModesSheet extends StatelessWidget {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              'Game Modes',
+                              'Modos de jogo',
                               style: TextStyle(
                                 color: AppTheme.textPrimary,
                                 fontSize: AppTheme.fontXxl,
@@ -139,11 +139,11 @@ class _LifeCounterNativeGameModesSheet extends StatelessWidget {
                             ),
                             SizedBox(height: 6),
                             Text(
-                              'Choose a variant or manage an active mode.',
+                              'Escolha uma variante ou gerencie um modo ativo.',
                               style: TextStyle(
                                 color: AppTheme.textSecondary,
                                 fontSize: AppTheme.fontMd,
-                                height: 1.35,
+                                height: AppTheme.lineHeightCompact,
                               ),
                             ),
                           ],
@@ -154,7 +154,7 @@ class _LifeCounterNativeGameModesSheet extends StatelessWidget {
                         onPressed: () => Navigator.of(context).pop(),
                         icon: const Icon(Icons.close_rounded),
                         color: AppTheme.textSecondary,
-                        tooltip: 'Close',
+                        tooltip: 'Fechar',
                       ),
                     ],
                   ),
@@ -178,8 +178,8 @@ class _LifeCounterNativeGameModesSheet extends StatelessWidget {
                           ),
                           child: Text(
                             activeModeLabels.isEmpty
-                                ? 'Two game modes are already active. Close one before starting another mode or opening another card pool editor.'
-                                : '${activeModeLabels.join(' and ')} ${activeModeLabels.length == 1 ? 'is' : 'are'} already active. Close one before starting another mode or opening another card pool editor.',
+                                ? 'Dois modos de jogo já estão ativos. Encerre um antes de iniciar outro ou abrir outro conjunto de cartas.'
+                                : '${activeModeLabels.join(' e ')} já ${activeModeLabels.length == 1 ? 'está ativo' : 'estão ativos'}. Encerre um antes de iniciar outro ou abrir outro conjunto de cartas.',
                             key: const Key(
                               'life-counter-native-game-modes-limit-warning',
                             ),
@@ -187,7 +187,7 @@ class _LifeCounterNativeGameModesSheet extends StatelessWidget {
                               color: AppTheme.textPrimary,
                               fontSize: AppTheme.fontMd,
                               fontWeight: FontWeight.w600,
-                              height: 1.35,
+                              height: AppTheme.lineHeightCompact,
                             ),
                           ),
                         ),
@@ -198,7 +198,7 @@ class _LifeCounterNativeGameModesSheet extends StatelessWidget {
                         title: 'Planechase',
                         icon: Icons.public_rounded,
                         summary:
-                            'Play with a shared planar deck and planar die.',
+                            'Jogue com um deck planar e um dado planar compartilhados.',
                         available: availability.planechaseAvailable,
                         active: availability.planechaseActive,
                         preferred:
@@ -231,7 +231,7 @@ class _LifeCounterNativeGameModesSheet extends StatelessWidget {
                         title: 'Archenemy',
                         icon: Icons.shield_moon_outlined,
                         summary:
-                            'Face one empowered player and their scheme deck.',
+                            'Enfrente um jogador fortalecido e seu deck de esquemas.',
                         available: availability.archenemyAvailable,
                         active: availability.archenemyActive,
                         preferred:
@@ -263,7 +263,7 @@ class _LifeCounterNativeGameModesSheet extends StatelessWidget {
                         title: 'Bounty',
                         icon: Icons.workspace_premium_outlined,
                         summary:
-                            'Complete rotating objectives to earn escalating rewards.',
+                            'Cumpra objetivos rotativos para receber recompensas crescentes.',
                         available: availability.bountyAvailable,
                         active: availability.bountyActive,
                         preferred:
@@ -378,22 +378,24 @@ class _GameModeStatusCard extends StatelessWidget {
               spacing: 8,
               runSpacing: 8,
               children: [
-                _GameModeBadge(label: available ? 'Available' : 'Unavailable'),
+                _GameModeBadge(
+                  label: available ? 'Disponível' : 'Indisponível',
+                ),
                 if (active)
                   const _GameModeBadge(
-                    label: 'Active Now',
+                    label: 'Ativo agora',
                     foregroundColor: AppTheme.backgroundAbyss,
                     backgroundColor: AppTheme.success,
                   ),
                 if (cardPoolActive)
                   const _GameModeBadge(
-                    label: 'Card Pool Open',
+                    label: 'Conjunto de cartas aberto',
                     foregroundColor: AppTheme.backgroundAbyss,
                     backgroundColor: AppTheme.warning,
                   ),
                 if (preferred)
                   const _GameModeBadge(
-                    label: 'Selected',
+                    label: 'Selecionado',
                     foregroundColor: AppTheme.backgroundAbyss,
                     backgroundColor: AppTheme.primarySoft,
                   ),
@@ -405,30 +407,30 @@ class _GameModeStatusCard extends StatelessWidget {
               style: const TextStyle(
                 color: AppTheme.textSecondary,
                 fontSize: AppTheme.fontMd,
-                height: 1.35,
+                height: AppTheme.lineHeightCompact,
               ),
             ),
             if (active) ...[
               const SizedBox(height: 10),
               const Text(
-                'This mode is already open in the current game.',
+                'Este modo já está aberto na partida atual.',
                 style: TextStyle(
                   color: AppTheme.textPrimary,
                   fontSize: AppTheme.fontSm,
                   fontWeight: FontWeight.w600,
-                  height: 1.35,
+                  height: AppTheme.lineHeightCompact,
                 ),
               ),
             ],
             if (cardPoolActive) ...[
               const SizedBox(height: 10),
               const Text(
-                'The card pool editor is already open for this mode.',
+                'O conjunto de cartas já está aberto para este modo.',
                 style: TextStyle(
                   color: AppTheme.textPrimary,
                   fontSize: AppTheme.fontSm,
                   fontWeight: FontWeight.w600,
-                  height: 1.35,
+                  height: AppTheme.lineHeightCompact,
                 ),
               ),
             ],
@@ -436,13 +438,13 @@ class _GameModeStatusCard extends StatelessWidget {
               const SizedBox(height: 10),
               Text(
                 activeModeLabels.isEmpty
-                    ? 'Only $maxActiveModes game modes can be active at once. Close one before starting $title or opening its card pool editor.'
-                    : 'Only $maxActiveModes game modes can be active at once. ${activeModeLabels.join(' and ')} ${activeModeLabels.length == 1 ? 'is' : 'are'} already active, so close one before starting $title or opening its card pool editor.',
+                    ? 'Apenas $maxActiveModes modos de jogo podem ficar ativos ao mesmo tempo. Encerre um antes de iniciar $title ou abrir seu conjunto de cartas.'
+                    : 'Apenas $maxActiveModes modos de jogo podem ficar ativos ao mesmo tempo. ${activeModeLabels.join(' e ')} já ${activeModeLabels.length == 1 ? 'está ativo' : 'estão ativos'}; encerre um antes de iniciar $title ou abrir seu conjunto de cartas.',
                 style: const TextStyle(
                   color: AppTheme.textPrimary,
                   fontSize: AppTheme.fontSm,
                   fontWeight: FontWeight.w600,
-                  height: 1.35,
+                  height: AppTheme.lineHeightCompact,
                 ),
               ),
             ],
@@ -451,12 +453,12 @@ class _GameModeStatusCard extends StatelessWidget {
                     LifeCounterGameModesEntryIntent.editCards) ...[
               const SizedBox(height: 10),
               Text(
-                'Continue to the $title card pool editor.',
+                'Continue para o conjunto de cartas de $title.',
                 style: const TextStyle(
                   color: AppTheme.textPrimary,
                   fontSize: AppTheme.fontSm,
                   fontWeight: FontWeight.w600,
-                  height: 1.35,
+                  height: AppTheme.lineHeightCompact,
                 ),
               ),
             ],
@@ -475,19 +477,19 @@ class _GameModeStatusCard extends StatelessWidget {
               icon: const Icon(Icons.launch_rounded),
               label: Text(
                 !available
-                    ? 'Not Available Right Now'
+                    ? 'Indisponível no momento'
                     : blockedByActiveModeLimit
-                    ? 'Close One Active Mode First'
+                    ? 'Encerre um modo ativo primeiro'
                     : cardPoolActive
-                    ? 'Return To Card Pool'
+                    ? 'Voltar ao conjunto de cartas'
                     : preferred
                     ? preferredIntent ==
                             LifeCounterGameModesEntryIntent.editCards
-                        ? 'Continue To Card Pool'
-                        : 'Continue With $title'
+                        ? 'Continuar para o conjunto'
+                        : 'Continuar com $title'
                     : active
-                    ? 'Return To $title'
-                    : 'Open $title',
+                    ? 'Voltar para $title'
+                    : 'Abrir $title',
               ),
             ),
             if (available &&
@@ -503,7 +505,7 @@ class _GameModeStatusCard extends StatelessWidget {
                   ),
                   onPressed: () => Navigator.of(context).pop(editAction),
                   icon: const Icon(Icons.style_outlined),
-                  label: const Text('Edit Card Pool'),
+                  label: const Text('Editar conjunto de cartas'),
                 ),
               ),
             ],
@@ -518,7 +520,7 @@ class _GameModeStatusCard extends StatelessWidget {
                   onPressed:
                       () => Navigator.of(context).pop(closeCardPoolAction),
                   icon: const Icon(Icons.close_fullscreen_rounded),
-                  label: const Text('Close Card Pool'),
+                  label: const Text('Fechar conjunto de cartas'),
                 ),
               ),
             ],
@@ -532,7 +534,7 @@ class _GameModeStatusCard extends StatelessWidget {
                   ),
                   onPressed: () => Navigator.of(context).pop(closeAction),
                   icon: const Icon(Icons.close_fullscreen_rounded),
-                  label: const Text('Close Mode'),
+                  label: const Text('Encerrar modo'),
                 ),
               ),
             ],
@@ -547,7 +549,7 @@ class _GameModeStatusCard extends StatelessWidget {
                         context,
                       ).pop(LifeCounterGameModesAction.openSettings),
                   icon: const Icon(Icons.settings_outlined),
-                  label: const Text('Open Settings'),
+                  label: const Text('Abrir configurações'),
                 ),
               ),
             ],
@@ -558,7 +560,7 @@ class _GameModeStatusCard extends StatelessWidget {
                 key: Key('life-counter-native-game-modes-$keyName-info'),
                 onPressed: () => _showGameModeInfoSheet(context, modeKind),
                 icon: const Icon(Icons.info_outline_rounded),
-                label: const Text('How It Works'),
+                label: const Text('Como funciona'),
               ),
             ),
           ],
@@ -585,7 +587,7 @@ class _GameModeBadge extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
       decoration: BoxDecoration(
         color: backgroundColor,
-        borderRadius: BorderRadius.circular(999),
+        borderRadius: BorderRadius.circular(AppTheme.radiusPill),
         border: Border.all(color: AppTheme.outlineMuted),
       ),
       child: Text(
@@ -608,7 +610,7 @@ Future<void> _showGameModeInfoSheet(
   return showModalBottomSheet<void>(
     context: context,
     isScrollControlled: true,
-    backgroundColor: Colors.transparent,
+    backgroundColor: AppTheme.transparent,
     builder:
         (context) => SafeArea(
           child: Padding(
@@ -642,7 +644,7 @@ Future<void> _showGameModeInfoSheet(
                             key: Key(
                               'life-counter-native-game-modes-${info.keyName}-info-close',
                             ),
-                            tooltip: 'Close details',
+                            tooltip: 'Fechar detalhes',
                             onPressed: () => Navigator.of(context).pop(),
                             icon: const Icon(Icons.close_rounded),
                             color: AppTheme.textSecondary,
@@ -655,12 +657,12 @@ Future<void> _showGameModeInfoSheet(
                         style: const TextStyle(
                           color: AppTheme.textSecondary,
                           fontSize: AppTheme.fontMd,
-                          height: 1.4,
+                          height: AppTheme.lineHeightComfortable,
                         ),
                       ),
                       const SizedBox(height: 14),
                       const Text(
-                        'Quick Rules',
+                        'Regras rápidas',
                         style: TextStyle(
                           color: AppTheme.textPrimary,
                           fontSize: AppTheme.fontLg,
@@ -687,7 +689,7 @@ Future<void> _showGameModeInfoSheet(
                                 style: const TextStyle(
                                   color: AppTheme.textSecondary,
                                   fontSize: AppTheme.fontMd,
-                                  height: 1.4,
+                                  height: AppTheme.lineHeightComfortable,
                                 ),
                               ),
                             ),
@@ -702,7 +704,7 @@ Future<void> _showGameModeInfoSheet(
                           color: AppTheme.textPrimary,
                           fontSize: AppTheme.fontSm,
                           fontWeight: FontWeight.w600,
-                          height: 1.4,
+                          height: AppTheme.lineHeightComfortable,
                         ),
                       ),
                     ],
@@ -722,41 +724,42 @@ _gameModeInfo(LifeCounterGameModeKind modeKind) {
       return (
         keyName: 'planechase',
         title: 'Planechase',
-        summary: 'A shared planar deck changes the battlefield for everyone.',
+        summary:
+            'Um deck planar compartilhado muda o campo de batalha para todos.',
         rules: <String>[
-          'During your turn, you may roll the planar die whenever you could cast a sorcery.',
-          'Your first roll each turn is free. Every extra roll costs one mana more than the previous roll.',
-          'Planeswalk on the planeswalker symbol, trigger chaos on the chaos symbol, and blank faces do nothing.',
+          'Durante seu turno, você pode rolar o dado planar sempre que puder conjurar um feitiço.',
+          'A primeira rolagem de cada turno é gratuita. Cada rolagem extra custa um mana a mais que a anterior.',
+          'Atravesse planos com o símbolo de planeswalker, ative caos com o símbolo de caos; faces vazias não fazem nada.',
         ],
         tip:
-            'Tip: long-press the Planechase button to roll the planar die instantly.',
+            'Dica: mantenha Planechase pressionado para rolar o dado planar imediatamente.',
       );
     case LifeCounterGameModeKind.archenemy:
       return (
         keyName: 'archenemy',
         title: 'Archenemy',
-        summary: 'The scheme deck powers up one player against the table.',
+        summary: 'O deck de esquemas fortalece um jogador contra toda a mesa.',
         rules: <String>[
-          'At the start of the archenemy turn, set a scheme in motion.',
-          'Ongoing schemes stay in play until abandoned or completed.',
-          'When a scheme is finished, the next one comes from the shared scheme deck.',
+          'No início do turno do Archenemy, coloque um esquema em andamento.',
+          'Esquemas contínuos permanecem em jogo até serem abandonados ou concluídos.',
+          'Quando um esquema termina, revele o próximo do deck compartilhado.',
         ],
         tip:
-            'Tip: keep an eye on ongoing schemes because they stack pressure across turns.',
+            'Dica: acompanhe os esquemas contínuos, pois a pressão aumenta a cada turno.',
       );
     case LifeCounterGameModeKind.bounty:
       return (
         keyName: 'bounty',
         title: 'Bounty',
         summary:
-            'A shared bounty deck gives the table rotating objectives and rewards.',
+            'Um deck de Bounty compartilhado oferece objetivos e recompensas rotativos.',
         rules: <String>[
-          'Starting on turn 3, reveal a bounty card with a condition to complete.',
-          'If a player completes the bounty, they claim the reward and a new one appears on the next turn.',
-          'If no one claims it, the reward level escalates up to level 4.',
+          'A partir do turno 3, revele uma carta de Bounty com uma condição a cumprir.',
+          'Se um jogador cumprir a Bounty, ele recebe a recompensa e uma nova aparece no próximo turno.',
+          'Se ninguém a cumprir, o nível da recompensa aumenta até o nível 4.',
         ],
         tip:
-            'Tip: Bounty rewards snowball quickly, so unanswered objectives become table-wide pressure.',
+            'Dica: recompensas de Bounty crescem rápido; objetivos ignorados pressionam toda a mesa.',
       );
   }
 }

@@ -4,9 +4,12 @@ import 'package:provider/provider.dart';
 import '../../../core/models/user_trust_insight.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/utils/friendly_error_mapper.dart';
+import '../../../core/widgets/app_state_panel.dart';
 import '../../../core/widgets/cached_card_image.dart';
+import '../../../core/widgets/responsive_page_frame.dart';
 import '../../auth/providers/auth_provider.dart';
 import '../providers/trade_provider.dart';
+import '../widgets/trade_safety_notice.dart';
 
 /// Tela de detalhe de um trade — Timeline + Items + Chat + Ações
 class TradeDetailScreen extends StatefulWidget {
@@ -78,11 +81,20 @@ class _TradeDetailScreenState extends State<TradeDetailScreen> {
             return const Center(child: CircularProgressIndicator());
           }
           if (tradeData.trade == null) {
-            return Center(
-              child: Text(
-                tradeData.error ?? 'Trade não encontrado',
-                style: const TextStyle(color: AppTheme.textSecondary),
-              ),
+            return AppStatePanel(
+              key: const Key('trade-detail-error-state'),
+              icon: Icons.sync_problem_rounded,
+              title: 'Não foi possível abrir este trade',
+              message:
+                  tradeData.error ??
+                  'A troca pode ter mudado ou estar temporariamente '
+                      'indisponível.',
+              accent: AppTheme.error,
+              actionLabel: 'Tentar novamente',
+              onAction:
+                  () => context.read<TradeProvider>().fetchTradeDetail(
+                    widget.tradeId,
+                  ),
             );
           }
 
@@ -92,54 +104,61 @@ class _TradeDetailScreenState extends State<TradeDetailScreen> {
           final isReceiver = trade.receiver.id == currentUserId;
           final provider = context.read<TradeProvider>();
 
-          return Column(
-            children: [
-              Expanded(
-                child: ListView(
-                  controller: _scrollController,
-                  padding: const EdgeInsets.all(16),
-                  children: [
-                    _buildStatusHeader(trade),
-                    const SizedBox(height: 16),
-                    _buildParticipants(trade, isSender),
-                    if (trade.valueSummary?.hasValues == true) ...[
+          return ResponsivePageFrame(
+            maxWidth: 1120,
+            padding: EdgeInsets.zero,
+            child: Column(
+              key: const Key('trade-detail-content'),
+              children: [
+                Expanded(
+                  child: ListView(
+                    controller: _scrollController,
+                    padding: const EdgeInsets.all(16),
+                    children: [
+                      _buildStatusHeader(trade),
                       const SizedBox(height: 12),
-                      _buildValueSummary(trade.valueSummary!),
-                    ],
-                    const SizedBox(height: 16),
-                    _buildActions(trade, isSender, isReceiver, provider),
-                    const SizedBox(height: 16),
-                    _buildItems(
-                      'Itens oferecidos',
-                      trade.myItems,
-                      Icons.upload,
-                    ),
-                    const SizedBox(height: 12),
-                    _buildItems(
-                      'Itens pedidos',
-                      trade.theirItems,
-                      Icons.download,
-                    ),
-                    if (trade.paymentAmount != null) ...[
+                      const TradeSafetyNotice(compact: true),
+                      const SizedBox(height: 16),
+                      _buildParticipants(trade, isSender),
+                      if (trade.valueSummary?.hasValues == true) ...[
+                        const SizedBox(height: 12),
+                        _buildValueSummary(trade.valueSummary!),
+                      ],
+                      const SizedBox(height: 16),
+                      _buildActions(trade, isSender, isReceiver, provider),
+                      const SizedBox(height: 16),
+                      _buildItems(
+                        'Itens oferecidos',
+                        trade.myItems,
+                        Icons.upload,
+                      ),
                       const SizedBox(height: 12),
-                      _buildPayment(trade),
+                      _buildItems(
+                        'Itens pedidos',
+                        trade.theirItems,
+                        Icons.download,
+                      ),
+                      if (trade.paymentAmount != null) ...[
+                        const SizedBox(height: 12),
+                        _buildPayment(trade),
+                      ],
+                      if (trade.trackingCode != null) ...[
+                        const SizedBox(height: 12),
+                        _buildTracking(trade),
+                      ],
+                      const SizedBox(height: 16),
+                      _buildTimeline(trade),
+                      const SizedBox(height: 16),
+                      // Chat section — isolated rebuild via its own Selector
+                      _TradeChat(tradeId: widget.tradeId),
                     ],
-                    if (trade.trackingCode != null) ...[
-                      const SizedBox(height: 12),
-                      _buildTracking(trade),
-                    ],
-                    const SizedBox(height: 16),
-                    _buildTimeline(trade),
-                    const SizedBox(height: 16),
-                    // Chat section — isolated rebuild via its own Selector
-                    _TradeChat(tradeId: widget.tradeId),
-                  ],
+                  ),
                 ),
-              ),
-              // Input de mensagem — isolated rebuild
-              if (!['declined', 'cancelled'].contains(trade.status))
-                _buildMessageInput(provider),
-            ],
+                // Input de mensagem — isolated rebuild
+                if (!['declined', 'cancelled'].contains(trade.status))
+                  _buildMessageInput(provider),
+              ],
+            ),
           );
         },
       ),

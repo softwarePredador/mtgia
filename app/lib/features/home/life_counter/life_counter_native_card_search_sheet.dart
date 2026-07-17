@@ -97,7 +97,7 @@ class _LifeCounterNativeCardSearchSheetState
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Text(
-                                    'Card Search',
+                                    'Busca de cartas',
                                     style: TextStyle(
                                       color: AppTheme.textPrimary,
                                       fontSize: AppTheme.fontXxl,
@@ -106,7 +106,7 @@ class _LifeCounterNativeCardSearchSheetState
                                   ),
                                   SizedBox(height: 6),
                                   Text(
-                                    'Find card details without leaving the game.',
+                                    'Consulte detalhes das cartas sem sair da partida.',
                                     style: TextStyle(
                                       color: AppTheme.textSecondary,
                                       fontSize: AppTheme.fontMd,
@@ -120,7 +120,7 @@ class _LifeCounterNativeCardSearchSheetState
                               onPressed: () => Navigator.of(context).pop(),
                               icon: const Icon(Icons.close_rounded),
                               color: AppTheme.textSecondary,
-                              tooltip: 'Close',
+                              tooltip: 'Fechar',
                             ),
                           ],
                         ),
@@ -160,7 +160,7 @@ class _LifeCounterNativeCardSearchSheetState
                                     fontWeight: FontWeight.w700,
                                   ),
                                   decoration: InputDecoration(
-                                    hintText: 'Search cards',
+                                    hintText: 'Buscar cartas',
                                     prefixIcon: const Icon(
                                       Icons.search_rounded,
                                       color: AppTheme.textSecondary,
@@ -172,7 +172,7 @@ class _LifeCounterNativeCardSearchSheetState
                                               key: const Key(
                                                 'life-counter-native-card-search-clear',
                                               ),
-                                              tooltip: 'Clear search',
+                                              tooltip: 'Limpar busca',
                                               onPressed: () {
                                                 _controller.clear();
                                                 provider.clearSearch();
@@ -207,7 +207,7 @@ class _LifeCounterNativeCardSearchSheetState
                                 const SizedBox(height: 18),
                                 if (!hasQuery)
                                   const Text(
-                                    'Type at least 3 letters or use a quick suggestion.',
+                                    'Digite pelo menos 3 letras ou use uma sugestão rápida.',
                                     style: TextStyle(
                                       color: AppTheme.textSecondary,
                                       fontSize: AppTheme.fontMd,
@@ -236,7 +236,7 @@ class _LifeCounterNativeCardSearchSheetState
                                   )
                                 else if (provider.searchResults.isEmpty)
                                   Text(
-                                    'No card found for "${_controller.text.trim().toUpperCase()}".',
+                                    'Nenhuma carta encontrada para "${_controller.text.trim().toUpperCase()}".',
                                     style: const TextStyle(
                                       color: AppTheme.textSecondary,
                                       fontSize: AppTheme.fontMd,
@@ -410,7 +410,7 @@ class _CardSearchResultTile extends StatelessWidget {
                             color: AppTheme.textSecondary,
                             fontSize: AppTheme.fontSm,
                             fontWeight: FontWeight.w600,
-                            height: 1.25,
+                            height: AppTheme.lineHeightTight,
                           ),
                         ),
                       ],

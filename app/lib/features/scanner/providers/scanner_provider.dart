@@ -8,6 +8,7 @@ import '../services/image_preprocessor.dart';
 import '../services/fuzzy_card_matcher.dart';
 import '../services/scanner_card_search_service.dart';
 import '../services/scanner_ocr_parser.dart';
+import '../utils/scanner_error_mapper.dart';
 import '../../decks/models/deck_card_item.dart';
 
 enum ScannerState {
@@ -153,7 +154,11 @@ class ScannerProvider extends ChangeNotifier {
 
       await processRecognitionResult(result);
     } catch (e) {
-      _errorMessage = 'Erro ao processar: $e';
+      debugPrint('[ScannerProvider] Falha ao processar imagem: $e');
+      _errorMessage = ScannerErrorMapper.friendly(
+        e,
+        stage: ScannerErrorStage.processing,
+      );
       _setState(ScannerState.error);
     }
   }
@@ -166,7 +171,10 @@ class ScannerProvider extends ChangeNotifier {
     _autoSelectedCard = null;
 
     if (!result.success || result.primaryName == null) {
-      _errorMessage = result.error ?? 'Nome não reconhecido';
+      _errorMessage = ScannerErrorMapper.friendly(
+        result.error,
+        stage: ScannerErrorStage.processing,
+      );
       _setState(ScannerState.notFound);
       return;
     }
@@ -193,10 +201,15 @@ class ScannerProvider extends ChangeNotifier {
         return;
       }
 
-      _errorMessage = 'Carta "${result.primaryName}" não encontrada no banco';
+      _errorMessage =
+          'Não encontramos "${result.primaryName}". Confira o nome ou busque manualmente.';
       _setState(ScannerState.notFound);
     } catch (e) {
-      _errorMessage = 'Erro ao buscar: $e';
+      debugPrint('[ScannerProvider] Falha ao buscar carta: $e');
+      _errorMessage = ScannerErrorMapper.friendly(
+        e,
+        stage: ScannerErrorStage.search,
+      );
       _setState(ScannerState.error);
     }
   }
@@ -450,7 +463,11 @@ class ScannerProvider extends ChangeNotifier {
         _setState(ScannerState.notFound);
       }
     } catch (e) {
-      _errorMessage = 'Erro na busca: $e';
+      debugPrint('[ScannerProvider] Falha na busca manual: $e');
+      _errorMessage = ScannerErrorMapper.friendly(
+        e,
+        stage: ScannerErrorStage.search,
+      );
       _setState(ScannerState.error);
     }
   }

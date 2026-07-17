@@ -32,27 +32,40 @@ Future<Response> _followUser(RequestContext context, String targetId) async {
       );
     }
 
-    // Verificar se o alvo existe
-    final userExists = await conn.execute(
-      Sql.named('SELECT 1 FROM users WHERE id = @id'),
-      parameters: {'id': targetId},
-    );
-    if (userExists.isEmpty) {
+    // Trava o alvo ativo até o follow ser criado. Se uma exclusão de conta
+    // estiver em andamento, uma das operações vence e a outra observa o estado
+    // final, sem recriar relação após o cleanup.
+    final targetActive = await conn.runTx((session) async {
+      final participantIds = <String>[userId, targetId]..sort();
+      final activeUsers = await session.execute(
+        Sql.named('''
+          SELECT id
+          FROM users
+          WHERE id = ANY(@participantIds::uuid[])
+            AND deleted_at IS NULL
+          ORDER BY id
+          FOR UPDATE
+        '''),
+        parameters: {'participantIds': participantIds},
+      );
+      if (activeUsers.length != 2) return false;
+
+      await session.execute(
+        Sql.named('''
+          INSERT INTO user_follows (follower_id, following_id)
+          VALUES (@follower, @following)
+          ON CONFLICT (follower_id, following_id) DO NOTHING
+        '''),
+        parameters: {'follower': userId, 'following': targetId},
+      );
+      return true;
+    });
+    if (!targetActive) {
       return Response.json(
         statusCode: HttpStatus.notFound,
         body: {'error': 'User not found.'},
       );
     }
-
-    // Inserir follow (ON CONFLICT ignora duplicatas)
-    await conn.execute(
-      Sql.named('''
-        INSERT INTO user_follows (follower_id, following_id)
-        VALUES (@follower, @following)
-        ON CONFLICT (follower_id, following_id) DO NOTHING
-      '''),
-      parameters: {'follower': userId, 'following': targetId},
-    );
 
     // Retornar contadores atualizados
     final counts = await _getFollowCounts(conn, targetId);
@@ -71,11 +84,7 @@ Future<Response> _followUser(RequestContext context, String targetId) async {
 
     return Response.json(
       statusCode: HttpStatus.ok,
-      body: {
-        'message': 'Now following user.',
-        'is_following': true,
-        ...counts,
-      },
+      body: {'message': 'Now following user.', 'is_following': true, ...counts},
     );
   } catch (e, st) {
     await captureRouteException(
@@ -86,7 +95,8 @@ Future<Response> _followUser(RequestContext context, String targetId) async {
       extras: {'operation': 'follow_user'},
     );
     Log.e(
-        '[social_route] server_error endpoint=POST /users/:id/follow error=$e');
+      '[social_route] server_error endpoint=POST /users/:id/follow error=$e',
+    );
     return Response.json(
       statusCode: HttpStatus.internalServerError,
       body: {'error': 'Internal server error'},
@@ -118,11 +128,9 @@ Future<Response> _unfollowUser(RequestContext context, String targetId) async {
 
     final counts = await _getFollowCounts(conn, targetId);
 
-    return Response.json(body: {
-      'message': 'Unfollowed user.',
-      'is_following': false,
-      ...counts,
-    });
+    return Response.json(
+      body: {'message': 'Unfollowed user.', 'is_following': false, ...counts},
+    );
   } catch (e, st) {
     await captureRouteException(
       context,
@@ -143,7 +151,9 @@ Future<Response> _unfollowUser(RequestContext context, String targetId) async {
 
 /// GET /users/:id/follow — checar se o autenticado segue o alvo
 Future<Response> _checkFollowing(
-    RequestContext context, String targetId) async {
+  RequestContext context,
+  String targetId,
+) async {
   try {
     final conn = context.read<Pool>();
     final userId = context.read<String>();
@@ -158,10 +168,7 @@ Future<Response> _checkFollowing(
 
     final counts = await _getFollowCounts(conn, targetId);
 
-    return Response.json(body: {
-      'is_following': result.isNotEmpty,
-      ...counts,
-    });
+    return Response.json(body: {'is_following': result.isNotEmpty, ...counts});
   } catch (e, st) {
     await captureRouteException(
       context,
@@ -171,7 +178,8 @@ Future<Response> _checkFollowing(
       extras: {'operation': 'check_following'},
     );
     Log.e(
-        '[social_route] server_error endpoint=GET /users/:id/follow error=$e');
+      '[social_route] server_error endpoint=GET /users/:id/follow error=$e',
+    );
     return Response.json(
       statusCode: HttpStatus.internalServerError,
       body: {'error': 'Internal server error'},
@@ -183,8 +191,18 @@ Future<Map<String, dynamic>> _getFollowCounts(Pool conn, String userId) async {
   final result = await conn.execute(
     Sql.named('''
       SELECT
-        (SELECT COUNT(*)::int FROM user_follows WHERE following_id = @id) as follower_count,
-        (SELECT COUNT(*)::int FROM user_follows WHERE follower_id = @id) as following_count
+        (
+          SELECT COUNT(*)::int
+          FROM user_follows uf
+          JOIN users u ON u.id = uf.follower_id
+          WHERE uf.following_id = @id AND u.deleted_at IS NULL
+        ) as follower_count,
+        (
+          SELECT COUNT(*)::int
+          FROM user_follows uf
+          JOIN users u ON u.id = uf.following_id
+          WHERE uf.follower_id = @id AND u.deleted_at IS NULL
+        ) as following_count
     '''),
     parameters: {'id': userId},
   );

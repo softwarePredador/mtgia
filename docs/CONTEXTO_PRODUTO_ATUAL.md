@@ -3,46 +3,63 @@
 > Fonte de verdade de prioridade do `mtgia`. O método de validação e conclusão
 > fica em `docs/MANALOOM_E2E_RELEASE_CONTRACT.md`.
 
-## Estado operacional vigente — 2026-07-16
+## Estado operacional vigente — candidato de beta gratuita, 2026-07-16
 
-- produto ativo: app Flutter em `app/`, API Dart Frog em `server/` e serviços
-  de battle em `services/`;
-- foco dominante: jornada Commander
-  `generate/import -> analyze -> optimize/rebuild -> apply -> validate`, com
-  battle e aprendizado como evidência tipada, não como atalho de promoção;
-- PostgreSQL é a verdade de produto; Hermes/SQLite é cache operacional;
-- o gate `full` é determinístico e exclui tags live;
-- o gate integrado é `./scripts/quality_gate.sh e2e`, com resumo Markdown e
-  JSON por etapa;
-- live, device e corpus mutante são perfis separados e exigem pré-requisitos e
-  confirmação textual; não entram automaticamente em um `PASS` local;
-- a base técnica local e de dados está verde: no perfil mutável isolado, 12
-  etapas E2E passaram, 3 perfis live foram pulados e não houve
-  falha/bloqueio; qualidade de produto continua aberta nos decks abaixo;
-- as migrations 033 a 037, rulings, Spellbook, famílias funcionais,
-  cleanup de fixtures e reparo legal do Goblins foram aplicados com backup,
-  rollback e postcheck; o status é 37/37 migrations;
-- PG869, PG870, PG871 e PG872 foram revalidados no PostgreSQL novo; PG873 está
-  apenas preparado e não deve ser tratado como aplicado;
-- battle tem 0 residual convencional acionável no snapshot final; produto tem
-  7/16 decks estruturalmente prontos e 9 skeletons aguardando intenção do dono;
-- a API e o app web autenticado em `/app` estão publicados no servidor novo;
-  o APK Android assinado está publicado com checksum validado e foi executado
-  em aparelho físico;
-- a distribuição iOS nativa continua bloqueada exclusivamente pela ausência de
-  uma equipe Apple Developer/App Store Connect da ManaLoom para
-  `com.mtgia.mtgApp`;
-- o fechamento e a evidência ficam em
-  `docs/qa/MANALOOM_E2E_PROJECT_CLOSURE_2026-07-15.md` e
-  `docs/qa/MANALOOM_BATTLE_DECKBUILDER_DEFINITIVE_2026-07-15.md`.
+- alvo da rodada final: beta gratuita para Web + Android; checkout pago fica
+  desabilitado/não anunciado e billing falha fechado;
+- decisão atual: **NO-GO para publicação** até fechar os P0 do documento de
+  candidato; implementação no checkout não equivale a produção;
+- versão selecionada: `1.0.0+2`; a SHA final ainda precisa ser congelada em
+  checkout limpo com `HEAD == origin/master`;
+- o gate `full` integrado final passou com exit 0: backend 1494/1494, Flutter
+  analyze com 0 issues, Flutter 909 testes + 1 skip web-only, Web
+  ESLint/build de 12 páginas/smoke aprovados e npm com 0 vulnerabilidades;
+- a prova do smoke público fica em
+  `/tmp/manaloom_public_web_smoke/20260717T005350Z_97473_2517619098`;
+- o E2E passou com 14 etapas executadas e 5 perfis opt-in em SKIP; resolution
+  preflight passou 19/19 sem writes e o Patrol smoke passou 9/9;
+- builds locais Web, Android e iOS passaram para `1.0.0+2`; APK/AAB Android
+  tiveram package, versão, assinatura e permissões validados, e o APK instalou
+  e abriu no emulador Android 36 sem fatal/`MissingPlugin`;
+- o Life Counter web passou em desktop e 390 × 844, com vida 40→41 persistida
+  após reload, menu/histórico/rota direta e console sem erros ou warnings;
+- no Android 36 debug host, o Life Counter nativo passou com quatro jogadores,
+  vida 40→41, menu e histórico/evento persistido; o overlap de “Todas as
+  partidas” com fechar/header foi corrigido e revalidado visualmente + teste
+  estático;
+- restore PostgreSQL local isolado passou em `postgres:17` sem rede, com 83
+  tabelas, 63 FKs, constraints válidas e zero writes remotos. `age 1.3.1` e
+  Docker 28.1.1 estão prontos, mas a cadeia off-site criptografada continua
+  pendente por falta de destino/recipient;
+- exportação/exclusão de conta e sync pós-jogo com revisão/cursor/tombstones
+  estão implementados no cliente/servidor; dependem da migration 038 e de prova
+  autenticada/multi-device;
+- a migration 038 está preparada e não deve ser tratada como aplicada. O fluxo
+  live continua exigindo precheck, backup, autorização literal, apply,
+  postcheck e rollback;
+- trocas são coordenação P2P: ManaLoom não processa, protege nem garante
+  pagamento ou entrega; o aviso de segurança foi incorporado à interface;
+- scanner permanece desabilitado por padrão até prova física fresca;
+- build iOS sem codesign passou como probe, mas publicação iOS segue fora do
+  alvo e bloqueada pela cadeia Apple;
+- a API/Web/APK já existentes em produção pertencem à versão anterior. Nenhum
+  artefato deste candidato deve ser descrito como publicado;
+- PostgreSQL continua como verdade de produto; Hermes/SQLite é cache
+  operacional;
+- os documentos canônicos desta decisão são:
+  `docs/qa/MANALOOM_FREE_BETA_RELEASE_CANDIDATE_2026-07-16.md`,
+  `docs/qa/MANALOOM_PRODUCT_EXPERIENCE_AUDIT_2026-07-16.md` e
+  `docs/qa/MANALOOM_FREE_BETA_RELEASE_OPS_GATE_2026-07-16.md`.
 
 ## Próxima ação oficial
 
-1. decidir excluir ou reconstruir os 9 skeletons de produto;
-2. obter replay de exposição natural para os 4 pacotes candidatos bloqueados;
-3. revisar os 37 deltas upstream de XMage/Forge antes de mover pins;
-4. repetir os gates live sobre cada novo SHA candidato antes de promovê-lo;
-5. configurar a equipe Apple da ManaLoom e assinar/publicar o build iOS.
+1. revisar, commitar e publicar a SHA candidata sem misturar artefatos; o
+   `full`, E2E, resolution preflight e Patrol já têm evidência verde;
+2. executar o precheck read-only da migration 038 e preparar backup/rollback;
+3. obter autorização literal antes de migration ou deploy live;
+4. provar Web autenticada, APK assinado exato em Android físico, Sentry/FCM e
+   backup off-site criptografado; o restore local isolado já passou;
+5. somente então decidir **GO Web + Android** e promover de forma controlada.
 
 ## Histórico acumulado anterior
 

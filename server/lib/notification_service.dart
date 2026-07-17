@@ -23,10 +23,15 @@ class NotificationService {
     bool rethrowOnError = false,
   }) async {
     try {
-      await pool.execute(
+      final inserted = await pool.execute(
         Sql.named('''
           INSERT INTO notifications (user_id, type, reference_id, title, body)
-          VALUES (@userId, @type, @referenceId, @title, @body)
+          SELECT id, @type, @referenceId, @title, @body
+          FROM users
+          WHERE id = CAST(@userId AS uuid)
+            AND deleted_at IS NULL
+          FOR UPDATE
+          RETURNING id
         '''),
         parameters: {
           'userId': userId,
@@ -36,6 +41,7 @@ class NotificationService {
           'body': body,
         },
       );
+      if (inserted.isEmpty) return;
 
       // Envia push notification em background; a gravação no banco é a fonte
       // de verdade e não deve depender da disponibilidade do FCM.
@@ -53,7 +59,8 @@ class NotificationService {
       );
     } catch (e, st) {
       Log.e(
-          '[notification_service] create_failed type=$type user_id=$userId reference_id=${referenceId ?? 'n/a'} error=$e');
+        '[notification_service] create_failed type=$type user_id=$userId reference_id=${referenceId ?? 'n/a'} error=$e',
+      );
       if (rethrowOnError) {
         Error.throwWithStackTrace(e, st);
       }
@@ -77,63 +84,125 @@ class NotificationService {
     final startedAt = DateTime.now();
     unawaited(
       Future<void>(() async {
-        final actorName = await _resolveActorName(pool, actorUserId);
-        await create(
-          pool: pool,
-          userId: userId,
-          type: type,
-          title: titleBuilder(actorName),
-          body: body,
-          referenceId: referenceId,
-          rethrowOnError: true,
-        );
-      }).timeout(const Duration(seconds: 10)).then((_) {
-        final durationMs = DateTime.now().difference(startedAt).inMilliseconds;
-        if (durationMs >= 1000) {
-          Log.w(
-            '[social_notification] slow_deferred '
-            'endpoint=$endpoint duration_ms=$durationMs request_id=$requestId '
-            'actor_user_id=$actorUserId recipient_user_id=$userId '
-            'reference_id=${referenceId ?? 'n/a'} trade_id=${tradeId ?? 'n/a'} '
-            'conversation_id=${conversationId ?? 'n/a'} type=$type',
-          );
-        }
-      }).catchError((Object error, StackTrace stackTrace) async {
-        final durationMs = DateTime.now().difference(startedAt).inMilliseconds;
-        Log.e(
-          '[social_notification] deferred_failed '
-          'endpoint=$endpoint duration_ms=$durationMs request_id=$requestId '
-          'actor_user_id=$actorUserId recipient_user_id=$userId '
-          'reference_id=${referenceId ?? 'n/a'} trade_id=${tradeId ?? 'n/a'} '
-          'conversation_id=${conversationId ?? 'n/a'} type=$type error=$error',
-        );
-        await captureObservedException(
-          error,
-          stackTrace: stackTrace,
-          userId: actorUserId,
-          tags: {'source': source, 'endpoint': endpoint, 'type': type},
-          extras: {
-            'request_id': requestId,
-            'recipient_user_id': userId,
-            if (referenceId != null) 'reference_id': referenceId,
-            if (tradeId != null) 'trade_id': tradeId,
-            if (conversationId != null) 'conversation_id': conversationId,
-            'duration_ms': durationMs,
-          },
-        );
-      }),
+            final title = await _createFromActiveActor(
+              pool: pool,
+              actorUserId: actorUserId,
+              userId: userId,
+              type: type,
+              titleBuilder: titleBuilder,
+              body: body,
+              referenceId: referenceId,
+            );
+            if (title == null) return;
+            unawaited(
+              PushNotificationService.sendToUser(
+                pool: pool,
+                userId: userId,
+                actorUserId: actorUserId,
+                title: title,
+                body: body,
+                data: {
+                  'type': type,
+                  if (referenceId != null) 'reference_id': referenceId,
+                },
+              ),
+            );
+          })
+          .timeout(const Duration(seconds: 10))
+          .then((_) {
+            final durationMs =
+                DateTime.now().difference(startedAt).inMilliseconds;
+            if (durationMs >= 1000) {
+              Log.w(
+                '[social_notification] slow_deferred '
+                'endpoint=$endpoint duration_ms=$durationMs request_id=$requestId '
+                'actor_user_id=$actorUserId recipient_user_id=$userId '
+                'reference_id=${referenceId ?? 'n/a'} trade_id=${tradeId ?? 'n/a'} '
+                'conversation_id=${conversationId ?? 'n/a'} type=$type',
+              );
+            }
+          })
+          .catchError((Object error, StackTrace stackTrace) async {
+            final durationMs =
+                DateTime.now().difference(startedAt).inMilliseconds;
+            Log.e(
+              '[social_notification] deferred_failed '
+              'endpoint=$endpoint duration_ms=$durationMs request_id=$requestId '
+              'actor_user_id=$actorUserId recipient_user_id=$userId '
+              'reference_id=${referenceId ?? 'n/a'} trade_id=${tradeId ?? 'n/a'} '
+              'conversation_id=${conversationId ?? 'n/a'} type=$type error=$error',
+            );
+            await captureObservedException(
+              error,
+              stackTrace: stackTrace,
+              userId: actorUserId,
+              tags: {'source': source, 'endpoint': endpoint, 'type': type},
+              extras: {
+                'request_id': requestId,
+                'recipient_user_id': userId,
+                if (referenceId != null) 'reference_id': referenceId,
+                if (tradeId != null) 'trade_id': tradeId,
+                if (conversationId != null) 'conversation_id': conversationId,
+                'duration_ms': durationMs,
+              },
+            );
+          }),
     );
   }
 
-  static Future<String> _resolveActorName(Pool pool, String actorUserId) async {
-    final result = await pool.execute(
-      Sql.named('SELECT username, display_name FROM users WHERE id = @id'),
-      parameters: {'id': actorUserId},
-    );
-    if (result.isEmpty) {
-      return 'Alguém';
-    }
-    final row = result.first.toColumnMap();
-    return (row['display_name'] ?? row['username']) as String? ?? 'Alguém';
+  static Future<String?> _createFromActiveActor({
+    required Pool pool,
+    required String actorUserId,
+    required String userId,
+    required String type,
+    required String Function(String actorName) titleBuilder,
+    String? body,
+    String? referenceId,
+  }) {
+    return pool.runTx((session) async {
+      final participantIds = {actorUserId, userId}.toList()..sort();
+      final activeUsers = await session.execute(
+        Sql.named('''
+          SELECT id
+          FROM users
+          WHERE id = ANY(@participantIds::uuid[])
+            AND deleted_at IS NULL
+          ORDER BY id
+          FOR UPDATE
+        '''),
+        parameters: {'participantIds': participantIds},
+      );
+      if (activeUsers.length != participantIds.length) return null;
+
+      final actor = await session.execute(
+        Sql.named('''
+          SELECT username, display_name
+          FROM users
+          WHERE id = @actorUserId
+            AND deleted_at IS NULL
+        '''),
+        parameters: {'actorUserId': actorUserId},
+      );
+      if (actor.isEmpty) return null;
+      final row = actor.first.toColumnMap();
+      final actorName =
+          (row['display_name'] ?? row['username']) as String? ?? 'Alguém';
+      final title = titleBuilder(actorName);
+
+      await session.execute(
+        Sql.named('''
+          INSERT INTO notifications (user_id, type, reference_id, title, body)
+          VALUES (@userId, @type, @referenceId, @title, @body)
+        '''),
+        parameters: {
+          'userId': userId,
+          'type': type,
+          'referenceId': referenceId,
+          'title': title,
+          'body': body,
+        },
+      );
+      return title;
+    });
   }
 }

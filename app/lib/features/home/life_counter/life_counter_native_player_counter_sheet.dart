@@ -13,7 +13,7 @@ Future<LifeCounterSession?> showLifeCounterNativePlayerCounterSheet(
   return showModalBottomSheet<LifeCounterSession>(
     context: context,
     isScrollControlled: true,
-    backgroundColor: Colors.transparent,
+    backgroundColor: AppTheme.transparent,
     builder: (context) {
       return _LifeCounterNativePlayerCounterSheet(
         initialSession: initialSession,
@@ -109,7 +109,7 @@ class _LifeCounterNativePlayerCounterSheetState
     );
     if (normalizedKey == null) {
       setState(() {
-        _customCounterError = 'Enter a custom counter name to continue.';
+        _customCounterError = 'Informe um nome para o marcador personalizado.';
       });
       return;
     }
@@ -147,7 +147,7 @@ class _LifeCounterNativePlayerCounterSheetState
   @override
   Widget build(BuildContext context) {
     final counterLabel = _counterLabel(_selectedCounterKey);
-    final playerLabel = 'Player ${_targetPlayerIndex + 1}';
+    final playerLabel = 'Jogador ${_targetPlayerIndex + 1}';
     final isCustomCounter =
         !LifeCounterTabletopEngine.isKnownCounterKey(_selectedCounterKey);
     final playerBoardSummary = LifeCounterTabletopEngine.playerBoardSummary(
@@ -189,7 +189,7 @@ class _LifeCounterNativePlayerCounterSheetState
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             const Text(
-                              'Player Counter',
+                              'Marcadores do jogador',
                               style: TextStyle(
                                 color: AppTheme.textPrimary,
                                 fontSize: AppTheme.fontXxl,
@@ -202,7 +202,7 @@ class _LifeCounterNativePlayerCounterSheetState
                               style: const TextStyle(
                                 color: AppTheme.textSecondary,
                                 fontSize: AppTheme.fontMd,
-                                height: 1.35,
+                                height: AppTheme.lineHeightCompact,
                               ),
                             ),
                           ],
@@ -212,7 +212,7 @@ class _LifeCounterNativePlayerCounterSheetState
                         onPressed: () => Navigator.of(context).pop(),
                         icon: const Icon(Icons.close_rounded),
                         color: AppTheme.textSecondary,
-                        tooltip: 'Close',
+                        tooltip: 'Fechar',
                       ),
                     ],
                   ),
@@ -228,7 +228,7 @@ class _LifeCounterNativePlayerCounterSheetState
                           style: const TextStyle(
                             color: AppTheme.textSecondary,
                             fontSize: AppTheme.fontMd,
-                            height: 1.4,
+                            height: AppTheme.lineHeightComfortable,
                           ),
                         ),
                         const SizedBox(height: 18),
@@ -246,7 +246,7 @@ class _LifeCounterNativePlayerCounterSheetState
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 const Text(
-                                  'Current player status',
+                                  'Status atual do jogador',
                                   style: TextStyle(
                                     color: AppTheme.textPrimary,
                                     fontSize: AppTheme.fontLg,
@@ -274,7 +274,7 @@ class _LifeCounterNativePlayerCounterSheetState
                                   style: const TextStyle(
                                     color: AppTheme.textSecondary,
                                     fontSize: AppTheme.fontSm,
-                                    height: 1.35,
+                                    height: AppTheme.lineHeightCompact,
                                   ),
                                 ),
                               ],
@@ -283,7 +283,7 @@ class _LifeCounterNativePlayerCounterSheetState
                         ),
                         const SizedBox(height: 20),
                         const Text(
-                          'Available counters',
+                          'Marcadores disponíveis',
                           style: TextStyle(
                             color: AppTheme.textPrimary,
                             fontSize: AppTheme.fontLg,
@@ -322,7 +322,7 @@ class _LifeCounterNativePlayerCounterSheetState
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 const Text(
-                                  'Add custom counter',
+                                  'Adicionar marcador personalizado',
                                   style: TextStyle(
                                     color: AppTheme.textPrimary,
                                     fontSize: AppTheme.fontLg,
@@ -331,11 +331,11 @@ class _LifeCounterNativePlayerCounterSheetState
                                 ),
                                 const SizedBox(height: 6),
                                 const Text(
-                                  'Add counters for game-specific effects.',
+                                  'Adicione marcadores para efeitos específicos da partida.',
                                   style: TextStyle(
                                     color: AppTheme.textSecondary,
                                     fontSize: AppTheme.fontSm,
-                                    height: 1.35,
+                                    height: AppTheme.lineHeightCompact,
                                   ),
                                 ),
                                 const SizedBox(height: 14),
@@ -352,7 +352,7 @@ class _LifeCounterNativePlayerCounterSheetState
                                         textInputAction: TextInputAction.done,
                                         onSubmitted: (_) => _addCustomCounter(),
                                         decoration: InputDecoration(
-                                          labelText: 'Custom counter name',
+                                          labelText: 'Nome do marcador',
                                           errorText: _customCounterError,
                                         ),
                                       ),
@@ -369,7 +369,7 @@ class _LifeCounterNativePlayerCounterSheetState
                                           vertical: 18,
                                         ),
                                       ),
-                                      child: const Text('Add'),
+                                      child: const Text('Adicionar'),
                                     ),
                                   ],
                                 ),
@@ -413,7 +413,9 @@ class _LifeCounterNativePlayerCounterSheetState
                                       color: AppTheme.error.withValues(
                                         alpha: 0.12,
                                       ),
-                                      borderRadius: BorderRadius.circular(999),
+                                      borderRadius: BorderRadius.circular(
+                                        AppTheme.radiusPill,
+                                      ),
                                       border: Border.all(
                                         color: AppTheme.error.withValues(
                                           alpha: 0.35,
@@ -473,11 +475,11 @@ class _LifeCounterNativePlayerCounterSheetState
                         if (_isTaxCounter(_selectedCounterKey)) ...[
                           const SizedBox(height: 14),
                           const Text(
-                            'Commander tax moves in steps of 2 to match the tabletop mana tax.',
+                            'A taxa de comandante aumenta de 2 em 2, como o custo adicional na mesa.',
                             style: TextStyle(
                               color: AppTheme.textSecondary,
                               fontSize: AppTheme.fontSm,
-                              height: 1.35,
+                              height: AppTheme.lineHeightCompact,
                             ),
                           ),
                         ],
@@ -491,7 +493,9 @@ class _LifeCounterNativePlayerCounterSheetState
                               ),
                               onPressed: _removeSelectedCustomCounter,
                               icon: const Icon(Icons.delete_outline_rounded),
-                              label: const Text('Remove custom counter'),
+                              label: const Text(
+                                'Remover marcador personalizado',
+                              ),
                               style: TextButton.styleFrom(
                                 foregroundColor: AppTheme.textSecondary,
                               ),
@@ -517,7 +521,7 @@ class _LifeCounterNativePlayerCounterSheetState
                             ),
                             padding: const EdgeInsets.symmetric(vertical: 14),
                           ),
-                          child: const Text('Cancel'),
+                          child: const Text('Cancelar'),
                         ),
                       ),
                       const SizedBox(width: 12),
@@ -533,7 +537,7 @@ class _LifeCounterNativePlayerCounterSheetState
                             foregroundColor: AppTheme.backgroundAbyss,
                             padding: const EdgeInsets.symmetric(vertical: 14),
                           ),
-                          child: const Text('Apply'),
+                          child: const Text('Aplicar'),
                         ),
                       ),
                     ],
@@ -614,15 +618,15 @@ bool _isTaxCounter(String counterKey) =>
 String _counterLabel(String counterKey) {
   switch (counterKey) {
     case 'poison':
-      return 'Poison';
+      return 'Veneno';
     case 'energy':
-      return 'Energy';
+      return 'Energia';
     case 'xp':
-      return 'Experience';
+      return 'Experiência';
     case 'tax-1':
-      return 'Commander Tax 1';
+      return 'Taxa de comandante 1';
     case 'tax-2':
-      return 'Commander Tax 2';
+      return 'Taxa de comandante 2';
     case 'rad':
       return 'Rad';
     default:
@@ -638,15 +642,15 @@ String _counterLabel(String counterKey) {
 String _counterDescription(String counterKey) {
   switch (counterKey) {
     case 'poison':
-      return 'Track poison counters for this player.';
+      return 'Acompanhe os marcadores de veneno deste jogador.';
     case 'energy':
-      return 'Track energy counters for this player.';
+      return 'Acompanhe os marcadores de energia deste jogador.';
     case 'xp':
-      return 'Track experience counters for this player.';
+      return 'Acompanhe os marcadores de experiência deste jogador.';
     case 'tax-1':
     case 'tax-2':
-      return 'Commander tax increases by 2 after each cast from the command zone.';
+      return 'A taxa de comandante aumenta em 2 após cada conjuração da zona de comando.';
     default:
-      return 'Adjust or remove this custom counter.';
+      return 'Ajuste ou remova este marcador personalizado.';
   }
 }

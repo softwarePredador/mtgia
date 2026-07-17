@@ -191,9 +191,9 @@ void main() {
         );
         await tester.pumpAndSettle();
 
-        expect(find.text('Player State'), findsOneWidget);
+        expect(find.text('Estado do jogador'), findsOneWidget);
 
-        await tester.tap(find.text('Partner commander'));
+        await tester.tap(find.text('Comandante parceiro'));
         await tester.pumpAndSettle();
 
         await tester.scrollUntilVisible(
@@ -337,7 +337,7 @@ void main() {
           );
           await tester.pumpAndSettle();
 
-          await tester.tap(find.text('Partner commander'));
+          await tester.tap(find.text('Comandante parceiro'));
           await tester.pumpAndSettle();
 
           await tester.tap(
@@ -445,7 +445,7 @@ void main() {
           );
           await tester.pumpAndSettle();
 
-          await tester.tap(find.text('Partner commander'));
+          await tester.tap(find.text('Comandante parceiro'));
           await tester.pumpAndSettle();
 
           await tester.tap(
@@ -524,7 +524,7 @@ void main() {
           );
           await tester.pumpAndSettle();
 
-          await tester.tap(find.text('Partner commander'));
+          await tester.tap(find.text('Comandante parceiro'));
           await tester.pumpAndSettle();
 
           await tester.tap(
@@ -593,7 +593,7 @@ void main() {
           );
           await tester.pumpAndSettle();
 
-          await tester.tap(find.text('Partner commander'));
+          await tester.tap(find.text('Comandante parceiro'));
           await tester.pumpAndSettle();
 
           await tester.tap(
@@ -689,7 +689,7 @@ void main() {
         final session = await LifeCounterSessionStore().load();
         expect(session, isNotNull);
         expect(session!.lastPlayerRolls[0], isNotNull);
-        expect(session.lastTableEvent, startsWith('Player 1 rolou D20: '));
+        expect(session.lastTableEvent, startsWith('Jogador 1 rolou D20: '));
         expect(host.loadBundleCallCount, 1);
         expect(
           logs.any(
@@ -1176,7 +1176,7 @@ void main() {
         );
         await tester.pumpAndSettle();
 
-        expect(find.text('Player State'), findsOneWidget);
+        expect(find.text('Estado do jogador'), findsOneWidget);
 
         await tester.tap(
           find.byKey(const Key('life-counter-native-player-state-apply')),
@@ -1324,7 +1324,7 @@ void main() {
           );
           await tester.pumpAndSettle();
 
-          expect(find.text('Player State'), findsOneWidget);
+          expect(find.text('Estado do jogador'), findsOneWidget);
 
           await tester.tap(
             find.byKey(const Key('life-counter-native-player-state-apply')),
@@ -1466,7 +1466,7 @@ void main() {
           );
           await tester.pumpAndSettle();
 
-          expect(find.text('Player State'), findsOneWidget);
+          expect(find.text('Estado do jogador'), findsOneWidget);
 
           await tester.tap(
             find.byKey(const Key('life-counter-native-player-state-apply')),
@@ -1620,7 +1620,7 @@ void main() {
           );
           await tester.pumpAndSettle();
 
-          expect(find.text('Player State'), findsOneWidget);
+          expect(find.text('Estado do jogador'), findsOneWidget);
 
           await tester.tap(
             find.byKey(const Key('life-counter-native-player-state-apply')),
@@ -1776,7 +1776,7 @@ void main() {
           );
           await tester.pumpAndSettle();
 
-          expect(find.text('Player State'), findsOneWidget);
+          expect(find.text('Estado do jogador'), findsOneWidget);
 
           await tester.tap(
             find.byKey(const Key('life-counter-native-player-state-apply')),
@@ -1937,7 +1937,7 @@ void main() {
           );
           await tester.pumpAndSettle();
 
-          expect(find.text('Player State'), findsOneWidget);
+          expect(find.text('Estado do jogador'), findsOneWidget);
 
           await tester.tap(
             find.byKey(const Key('life-counter-native-player-state-apply')),
@@ -2087,7 +2087,7 @@ void main() {
           );
           await tester.pumpAndSettle();
 
-          expect(find.text('Player State'), findsOneWidget);
+          expect(find.text('Estado do jogador'), findsOneWidget);
 
           await tester.tap(
             find.byKey(const Key('life-counter-native-player-state-apply')),
@@ -2145,12 +2145,12 @@ void main() {
           );
           await tester.pumpAndSettle();
 
-          expect(find.text('Player State'), findsOneWidget);
+          expect(find.text('Estado do jogador'), findsOneWidget);
 
-          await tester.tap(find.text('Cancel'));
+          await tester.tap(find.text('Cancelar'));
           await tester.pumpAndSettle();
 
-          expect(find.text('Player State'), findsNothing);
+          expect(find.text('Estado do jogador'), findsNothing);
           expect(host.loadBundleCallCount, 1);
           expect(
             host.executedScripts.any(

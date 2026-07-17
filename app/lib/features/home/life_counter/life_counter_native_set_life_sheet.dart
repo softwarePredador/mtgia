@@ -144,7 +144,7 @@ class _LifeCounterNativeSetLifeSheetState
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             const Text(
-                              'Set Life',
+                              'Definir vida',
                               style: TextStyle(
                                 color: AppTheme.textPrimary,
                                 fontSize: AppTheme.fontXxl,
@@ -153,7 +153,7 @@ class _LifeCounterNativeSetLifeSheetState
                             ),
                             const SizedBox(height: 6),
                             Text(
-                              'Enter a new life total for Player ${_targetPlayerIndex + 1}.',
+                              'Informe o novo total de vida do Jogador ${_targetPlayerIndex + 1}.',
                               style: const TextStyle(
                                 color: AppTheme.textSecondary,
                                 fontSize: AppTheme.fontMd,
@@ -167,7 +167,7 @@ class _LifeCounterNativeSetLifeSheetState
                         onPressed: () => Navigator.of(context).pop(),
                         icon: const Icon(Icons.close_rounded),
                         color: AppTheme.textSecondary,
-                        tooltip: 'Close',
+                        tooltip: 'Fechar',
                       ),
                     ],
                   ),
@@ -179,7 +179,7 @@ class _LifeCounterNativeSetLifeSheetState
                     children: [
                       Center(
                         child: Text(
-                          'PLAYER ${_targetPlayerIndex + 1}',
+                          'JOGADOR ${_targetPlayerIndex + 1}',
                           style: TextStyle(
                             color: AppTheme.textSecondary.withValues(
                               alpha: 0.76,
@@ -232,7 +232,8 @@ class _LifeCounterNativeSetLifeSheetState
                                   textAlign: TextAlign.center,
                                   style: const TextStyle(
                                     color: AppTheme.textPrimary,
-                                    fontSize: AppTheme.fontLifeCounterInputValue,
+                                    fontSize:
+                                        AppTheme.fontLifeCounterInputValue,
                                     fontWeight: FontWeight.w900,
                                     letterSpacing: -2,
                                     height: 1,
@@ -300,7 +301,7 @@ class _LifeCounterNativeSetLifeSheetState
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               const Text(
-                                'Preview Status',
+                                'Prévia do status',
                                 style: TextStyle(
                                   color: AppTheme.textPrimary,
                                   fontSize: AppTheme.fontLg,
@@ -396,14 +397,14 @@ class _LifeCounterNativeSetLifeSheetState
                     children: [
                       TextButton(
                         onPressed: () => Navigator.of(context).pop(),
-                        child: const Text('Cancel'),
+                        child: const Text('Cancelar'),
                       ),
                       const Spacer(),
                       FilledButton.icon(
                         key: const Key('life-counter-native-set-life-apply'),
                         onPressed: _apply,
                         icon: const Icon(Icons.favorite_rounded),
-                        label: const Text('Set Life'),
+                        label: const Text('Definir vida'),
                       ),
                     ],
                   ),
@@ -469,8 +470,8 @@ class _SetLifeKeypadButton extends StatelessWidget {
         destructive
             ? 'Limpar valor'
             : label == 'DEL'
-            ? 'Apagar ultimo digito'
-            : 'Adicionar digito $label';
+            ? 'Apagar último dígito'
+            : 'Adicionar dígito $label';
     return Semantics(
       button: true,
       label: semanticLabel,

@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/widgets/app_state_panel.dart';
+import '../../../core/widgets/responsive_page_frame.dart';
 import '../providers/message_provider.dart';
 
 /// Tela Inbox de mensagens diretas — lista de conversas
@@ -78,24 +79,30 @@ class _MessageInboxScreenState extends State<MessageInboxScreen> {
             );
           }
 
-          return RefreshIndicator(
-            color: AppTheme.brass400,
-            onRefresh: () => provider.fetchConversations(),
-            child: ListView.separated(
-              key: const Key('messages-inbox-list'),
-              padding: const EdgeInsets.all(12),
-              itemCount: provider.conversations.length,
-              separatorBuilder: (_, __) => const SizedBox(height: 8),
-              itemBuilder: (context, index) {
-                final conv = provider.conversations[index];
-                return _ConversationTile(
-                  key: Key('message-conversation-tile-${conv.id}'),
-                  conversation: conv,
-                  onTap: () {
-                    context.push('/messages/${conv.id}', extra: conv.otherUser);
-                  },
-                );
-              },
+          return ResponsivePageFrame(
+            maxWidth: 840,
+            child: RefreshIndicator(
+              color: AppTheme.brass400,
+              onRefresh: () => provider.fetchConversations(),
+              child: ListView.separated(
+                key: const Key('messages-inbox-list'),
+                padding: const EdgeInsets.symmetric(vertical: 12),
+                itemCount: provider.conversations.length,
+                separatorBuilder: (_, __) => const SizedBox(height: 8),
+                itemBuilder: (context, index) {
+                  final conv = provider.conversations[index];
+                  return _ConversationTile(
+                    key: Key('message-conversation-tile-${conv.id}'),
+                    conversation: conv,
+                    onTap: () {
+                      context.push(
+                        '/messages/${conv.id}',
+                        extra: conv.otherUser,
+                      );
+                    },
+                  );
+                },
+              ),
             ),
           );
         },
@@ -221,7 +228,9 @@ class _ConversationTile extends StatelessWidget {
                           ),
                           decoration: BoxDecoration(
                             color: AppTheme.brass400,
-                            borderRadius: BorderRadius.circular(AppTheme.radiusLifeCounterSm),
+                            borderRadius: BorderRadius.circular(
+                              AppTheme.radiusLifeCounterSm,
+                            ),
                           ),
                           child: Text(
                             '${conversation.unreadCount}',

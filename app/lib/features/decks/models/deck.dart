@@ -20,6 +20,7 @@ class Deck {
   final DateTime createdAt;
   final int cardCount;
   final List<String> colorIdentity;
+  final bool colorIdentityKnown;
 
   Deck({
     required this.id,
@@ -41,7 +42,8 @@ class Deck {
     required this.createdAt,
     this.cardCount = 0,
     this.colorIdentity = const [],
-  });
+    bool? colorIdentityKnown,
+  }) : colorIdentityKnown = colorIdentityKnown ?? colorIdentity.isNotEmpty;
 
   /// Factory para criar Deck a partir de JSON (API response)
   factory Deck.fromJson(Map<String, dynamic> json) {
@@ -72,6 +74,9 @@ class Deck {
               ?.map((e) => e.toString())
               .toList() ??
           const [],
+      colorIdentityKnown:
+          json['color_identity_known'] as bool? ??
+          json['color_identity'] is List,
     );
   }
 
@@ -121,6 +126,7 @@ class Deck {
     DateTime? createdAt,
     int? cardCount,
     List<String>? colorIdentity,
+    bool? colorIdentityKnown,
   }) {
     return Deck(
       id: id ?? this.id,
@@ -142,6 +148,7 @@ class Deck {
       createdAt: createdAt ?? this.createdAt,
       cardCount: cardCount ?? this.cardCount,
       colorIdentity: colorIdentity ?? this.colorIdentity,
+      colorIdentityKnown: colorIdentityKnown ?? this.colorIdentityKnown,
     );
   }
 }

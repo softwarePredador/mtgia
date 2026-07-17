@@ -120,7 +120,7 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      expect(find.text('Table State'), findsOneWidget);
+      expect(find.text('Estado da mesa'), findsOneWidget);
 
       await tester.tap(
         find.byKey(

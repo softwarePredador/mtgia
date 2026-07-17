@@ -66,6 +66,54 @@ Widget _buildSubject({DeckProvider? provider}) {
 }
 
 void main() {
+  testWidgets('uses a padded single-column layout at 390px', (tester) async {
+    tester.view.devicePixelRatio = 1;
+    tester.view.physicalSize = const Size(390, 844);
+    addTearDown(tester.view.resetDevicePixelRatio);
+    addTearDown(tester.view.resetPhysicalSize);
+
+    await tester.pumpWidget(_buildSubject());
+    await tester.pumpAndSettle();
+
+    expect(find.byKey(const Key('deck-import-desktop-panes')), findsNothing);
+    expect(tester.takeException(), isNull);
+
+    final frameSize = tester.getSize(
+      find.byKey(const Key('deck-import-content-frame')),
+    );
+    final ctaSize = tester.getSize(
+      find.byKey(const Key('deck-import-cta-frame')),
+    );
+    expect(frameSize.width, closeTo(358, 0.1));
+    expect(ctaSize.width, closeTo(frameSize.width, 0.1));
+  });
+
+  testWidgets('uses bounded metadata and list panes at 1280px', (tester) async {
+    tester.view.devicePixelRatio = 1;
+    tester.view.physicalSize = const Size(1280, 900);
+    addTearDown(tester.view.resetDevicePixelRatio);
+    addTearDown(tester.view.resetPhysicalSize);
+
+    await tester.pumpWidget(_buildSubject());
+    await tester.pumpAndSettle();
+
+    expect(find.byKey(const Key('deck-import-desktop-panes')), findsOneWidget);
+    expect(tester.takeException(), isNull);
+
+    final frameSize = tester.getSize(
+      find.byKey(const Key('deck-import-content-frame')),
+    );
+    final metadataSize = tester.getSize(
+      find.byKey(const Key('deck-import-metadata-pane')),
+    );
+    final ctaSize = tester.getSize(
+      find.byKey(const Key('deck-import-cta-frame')),
+    );
+    expect(frameSize.width, lessThanOrEqualTo(1120));
+    expect(metadataSize.width, closeTo(460, 0.1));
+    expect(ctaSize.width, lessThanOrEqualTo(320));
+  });
+
   testWidgets('shows calmer initial import state and example updates count', (
     tester,
   ) async {

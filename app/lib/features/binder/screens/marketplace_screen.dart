@@ -7,6 +7,7 @@ import '../../../core/models/user_trust_insight.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/widgets/app_state_panel.dart';
 import '../../../core/widgets/cached_card_image.dart';
+import '../../../core/widgets/responsive_page_frame.dart';
 import '../../cards/screens/card_detail_screen.dart';
 import '../../decks/models/deck_card_item.dart';
 import '../../trades/screens/create_trade_screen.dart';
@@ -77,115 +78,149 @@ class _MarketplaceTabContentState extends State<MarketplaceTabContent>
   @override
   Widget build(BuildContext context) {
     super.build(context);
-    return Column(
-      children: [
-        // Search bar (local state only — no provider rebuild needed)
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-          child: TextField(
-            key: const Key('marketplace-search-field'),
-            controller: _searchController,
-            onChanged: (_) => setState(() {}),
-            onSubmitted: (_) => _doSearch(),
-            style: const TextStyle(
-              color: AppTheme.textPrimary,
-              fontSize: AppTheme.fontMd,
-            ),
-            decoration: InputDecoration(
-              hintText: 'Buscar carta no marketplace...',
-              hintStyle: const TextStyle(color: AppTheme.textSecondary),
-              prefixIcon: const Icon(
-                Icons.search,
-                color: AppTheme.textSecondary,
-              ),
-              suffixIcon:
-                  _searchController.text.isEmpty
-                      ? null
-                      : IconButton(
-                        tooltip: 'Limpar busca',
-                        icon: const Icon(
-                          Icons.clear,
+    return ColoredBox(
+      color: AppTheme.backgroundAbyss,
+      child: ResponsivePageFrame(
+        maxWidth: AppTheme.contentMaxWidth,
+        child: SizedBox(
+          key: const Key('marketplace-responsive-canvas'),
+          width: double.infinity,
+          child: Column(
+            children: [
+              // Search bar (local state only — no provider rebuild needed)
+              Padding(
+                padding: const EdgeInsets.symmetric(vertical: 8),
+                child: Align(
+                  alignment: Alignment.centerLeft,
+                  child: ConstrainedBox(
+                    constraints: const BoxConstraints(maxWidth: 760),
+                    child: TextField(
+                      key: const Key('marketplace-search-field'),
+                      controller: _searchController,
+                      onChanged: (_) => setState(() {}),
+                      onSubmitted: (_) => _doSearch(),
+                      style: const TextStyle(
+                        color: AppTheme.textPrimary,
+                        fontSize: AppTheme.fontMd,
+                      ),
+                      decoration: InputDecoration(
+                        hintText: 'Buscar carta no marketplace...',
+                        hintStyle: const TextStyle(
                           color: AppTheme.textSecondary,
                         ),
-                        onPressed: () {
-                          setState(_searchController.clear);
+                        prefixIcon: const Icon(
+                          Icons.search,
+                          color: AppTheme.textSecondary,
+                        ),
+                        suffixIcon:
+                            _searchController.text.isEmpty
+                                ? null
+                                : IconButton(
+                                  tooltip: 'Limpar busca',
+                                  icon: const Icon(
+                                    Icons.clear,
+                                    color: AppTheme.textSecondary,
+                                  ),
+                                  onPressed: () {
+                                    setState(_searchController.clear);
+                                    _doSearch();
+                                  },
+                                ),
+                        filled: true,
+                        fillColor: AppTheme.surfaceSlate,
+                        contentPadding: const EdgeInsets.symmetric(vertical: 0),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(
+                            AppTheme.radiusMd,
+                          ),
+                          borderSide: BorderSide.none,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+
+              // Filter chips (local state only)
+              Padding(
+                padding: EdgeInsets.zero,
+                child: SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  child: Row(
+                    children: [
+                      _ConditionDropdown(
+                        value: _conditionFilter,
+                        onChanged: (v) {
+                          setState(() => _conditionFilter = v);
                           _doSearch();
                         },
                       ),
-              filled: true,
-              fillColor: AppTheme.surfaceSlate,
-              contentPadding: const EdgeInsets.symmetric(vertical: 0),
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(AppTheme.radiusMd),
-                borderSide: BorderSide.none,
+                      const SizedBox(width: 8),
+                      FilterChip(
+                        label: const Text('Troca'),
+                        selected: _onlyTrade,
+                        onSelected: (v) {
+                          setState(() => _onlyTrade = v);
+                          _doSearch();
+                        },
+                        selectedColor: AppTheme.brass400.withValues(
+                          alpha: 0.18,
+                        ),
+                        backgroundColor: AppTheme.surfaceSlate,
+                        labelStyle: TextStyle(
+                          color:
+                              _onlyTrade
+                                  ? AppTheme.brass400
+                                  : AppTheme.textSecondary,
+                          fontSize: AppTheme.fontSm,
+                        ),
+                        side: BorderSide(
+                          color:
+                              _onlyTrade
+                                  ? AppTheme.brass400
+                                  : AppTheme.outlineMuted,
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      FilterChip(
+                        label: const Text('Venda'),
+                        selected: _onlySale,
+                        onSelected: (v) {
+                          setState(() => _onlySale = v);
+                          _doSearch();
+                        },
+                        selectedColor: AppTheme.brass400.withValues(
+                          alpha: 0.22,
+                        ),
+                        backgroundColor: AppTheme.surfaceSlate,
+                        labelStyle: TextStyle(
+                          color:
+                              _onlySale
+                                  ? AppTheme.brass400
+                                  : AppTheme.textSecondary,
+                          fontSize: AppTheme.fontSm,
+                        ),
+                        side: BorderSide(
+                          color:
+                              _onlySale
+                                  ? AppTheme.brass400
+                                  : AppTheme.outlineMuted,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
               ),
-            ),
+              const SizedBox(height: 4),
+
+              // List — only this part needs provider data
+              Expanded(
+                child: _buildMarketList(context.watch<BinderProvider>()),
+              ),
+            ],
           ),
         ),
-
-        // Filter chips (local state only)
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 12),
-          child: SingleChildScrollView(
-            scrollDirection: Axis.horizontal,
-            child: Row(
-              children: [
-                _ConditionDropdown(
-                  value: _conditionFilter,
-                  onChanged: (v) {
-                    setState(() => _conditionFilter = v);
-                    _doSearch();
-                  },
-                ),
-                const SizedBox(width: 8),
-                FilterChip(
-                  label: const Text('Troca'),
-                  selected: _onlyTrade,
-                  onSelected: (v) {
-                    setState(() => _onlyTrade = v);
-                    _doSearch();
-                  },
-                  selectedColor: AppTheme.brass400.withValues(alpha: 0.18),
-                  backgroundColor: AppTheme.surfaceSlate,
-                  labelStyle: TextStyle(
-                    color:
-                        _onlyTrade ? AppTheme.brass400 : AppTheme.textSecondary,
-                    fontSize: AppTheme.fontSm,
-                  ),
-                  side: BorderSide(
-                    color:
-                        _onlyTrade ? AppTheme.brass400 : AppTheme.outlineMuted,
-                  ),
-                ),
-                const SizedBox(width: 8),
-                FilterChip(
-                  label: const Text('Venda'),
-                  selected: _onlySale,
-                  onSelected: (v) {
-                    setState(() => _onlySale = v);
-                    _doSearch();
-                  },
-                  selectedColor: AppTheme.brass400.withValues(alpha: 0.22),
-                  backgroundColor: AppTheme.surfaceSlate,
-                  labelStyle: TextStyle(
-                    color:
-                        _onlySale ? AppTheme.brass400 : AppTheme.textSecondary,
-                    fontSize: AppTheme.fontSm,
-                  ),
-                  side: BorderSide(
-                    color:
-                        _onlySale ? AppTheme.brass400 : AppTheme.outlineMuted,
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
-        const SizedBox(height: 4),
-
-        // List — only this part needs provider data
-        Expanded(child: _buildMarketList(context.watch<BinderProvider>())),
-      ],
+      ),
     );
   }
 
@@ -223,72 +258,75 @@ class _MarketplaceTabContentState extends State<MarketplaceTabContent>
       );
     }
 
-    return ListView.builder(
-      key: const Key('marketplace-list'),
-      controller: _scrollController,
-      padding: const EdgeInsets.all(12),
-      itemCount: provider.marketItems.length + (provider.hasMoreMarket ? 1 : 0),
-      itemBuilder: (context, index) {
-        if (index >= provider.marketItems.length) {
-          return const Padding(
-            padding: EdgeInsets.symmetric(vertical: 16),
-            child: Center(
-              child: CircularProgressIndicator(color: AppTheme.frost400),
-            ),
-          );
-        }
-        return _MarketplaceCard(
-          item: provider.marketItems[index],
-          onCardTap: () {
-            final mktItem = provider.marketItems[index];
-            Navigator.of(context).push(
-              MaterialPageRoute(
-                builder:
-                    (_) => CardDetailScreen(card: _cardFromMarket(mktItem)),
-              ),
+    return Align(
+      alignment: Alignment.topLeft,
+      child: ConstrainedBox(
+        constraints: const BoxConstraints(maxWidth: 900),
+        child: ListView.builder(
+          key: const Key('marketplace-list'),
+          controller: _scrollController,
+          padding: const EdgeInsets.only(top: 8, bottom: 16),
+          itemCount:
+              provider.marketItems.length + (provider.hasMoreMarket ? 1 : 0),
+          itemBuilder: (context, index) {
+            if (index >= provider.marketItems.length) {
+              return const Padding(
+                padding: EdgeInsets.symmetric(vertical: 16),
+                child: Center(
+                  child: CircularProgressIndicator(color: AppTheme.frost400),
+                ),
+              );
+            }
+            return _MarketplaceCard(
+              item: provider.marketItems[index],
+              onCardTap: () {
+                final mktItem = provider.marketItems[index];
+                Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder:
+                        (_) => CardDetailScreen(card: _cardFromMarket(mktItem)),
+                  ),
+                );
+              },
+              onOwnerTap: () {
+                final ownerId = provider.marketItems[index].ownerId;
+                context.push('/community/user/$ownerId');
+              },
+              onTradeTap: () {
+                final mktItem = provider.marketItems[index];
+                // Convert to BinderItem for CreateTradeScreen
+                final binderItem = BinderItem(
+                  id: mktItem.id,
+                  cardId: mktItem.cardId,
+                  cardName: mktItem.cardName,
+                  cardImageUrl: mktItem.cardImageUrl,
+                  cardSetCode: mktItem.cardSetCode,
+                  quantity: mktItem.quantity,
+                  condition: mktItem.condition,
+                  isFoil: mktItem.isFoil,
+                  forTrade: mktItem.forTrade,
+                  forSale: mktItem.forSale,
+                  price: mktItem.price,
+                  listType: 'have',
+                );
+                final type =
+                    mktItem.forSale && !mktItem.forTrade
+                        ? 'sale'
+                        : mktItem.forTrade && !mktItem.forSale
+                        ? 'trade'
+                        : 'mixed';
+                context.push(
+                  '/trades/create/${Uri.encodeComponent(mktItem.ownerId)}',
+                  extra: CreateTradeRouteArgs(
+                    initialType: type,
+                    preselectedItem: binderItem,
+                  ),
+                );
+              },
             );
           },
-          onOwnerTap: () {
-            final ownerId = provider.marketItems[index].ownerId;
-            context.push('/community/user/$ownerId');
-          },
-          onTradeTap: () {
-            final mktItem = provider.marketItems[index];
-            // Convert to BinderItem for CreateTradeScreen
-            final binderItem = BinderItem(
-              id: mktItem.id,
-              cardId: mktItem.cardId,
-              cardName: mktItem.cardName,
-              cardImageUrl: mktItem.cardImageUrl,
-              cardSetCode: mktItem.cardSetCode,
-              quantity: mktItem.quantity,
-              condition: mktItem.condition,
-              isFoil: mktItem.isFoil,
-              forTrade: mktItem.forTrade,
-              forSale: mktItem.forSale,
-              price: mktItem.price,
-              listType: 'have',
-            );
-            final type =
-                mktItem.forSale && !mktItem.forTrade
-                    ? 'sale'
-                    : mktItem.forTrade && !mktItem.forSale
-                    ? 'trade'
-                    : 'mixed';
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder:
-                    (_) => CreateTradeScreen(
-                      receiverId: mktItem.ownerId,
-                      initialType: type,
-                      preselectedItem: binderItem,
-                    ),
-              ),
-            );
-          },
-        );
-      },
+        ),
+      ),
     );
   }
 
@@ -605,7 +643,7 @@ class _MarketplaceCard extends StatelessWidget {
                         const SizedBox(height: 8),
                         SizedBox(
                           width: double.infinity,
-                          height: 32,
+                          height: AppTheme.touchTargetMin,
                           child: OutlinedButton.icon(
                             key: Key('marketplace-propose-trade-${item.id}'),
                             onPressed: onTradeTap,

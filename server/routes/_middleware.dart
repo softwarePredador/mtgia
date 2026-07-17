@@ -6,27 +6,38 @@ import 'package:postgres/postgres.dart';
 import 'package:sentry/sentry.dart';
 
 import '../lib/auth_service.dart';
+import '../lib/cors_policy.dart';
 import '../lib/database.dart';
 import '../lib/logger.dart';
 import '../lib/observability.dart';
 import '../lib/request_metrics_service.dart';
 import '../lib/request_trace.dart';
+import '../lib/runtime_environment.dart';
 
 final _db = Database();
 var _connected = false;
 const _socialSlowRequestThresholdMs = 1000;
+final _runtimeEnvironment = loadRuntimeEnvironment();
+final _corsPolicy = CorsPolicy.fromEnvironment({
+  'ENVIRONMENT': _runtimeEnvironment['ENVIRONMENT'] ?? 'development',
+  'MANALOOM_ALLOWED_ORIGINS':
+      _runtimeEnvironment['MANALOOM_ALLOWED_ORIGINS'] ?? '',
+  'MANALOOM_ALLOW_DEV_ORIGINS':
+      _runtimeEnvironment['MANALOOM_ALLOW_DEV_ORIGINS'] ?? 'false',
+});
 
-const _corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
+const _securityHeaders = {
   'Access-Control-Allow-Methods': 'GET, POST, PUT, PATCH, DELETE, OPTIONS',
   'Access-Control-Allow-Headers':
       'Content-Type, Authorization, X-Request-Id, X-ManaLoom-Ops-Key',
   'Access-Control-Max-Age': '86400',
   'X-Content-Type-Options': 'nosniff',
-  'X-Frame-Options': 'SAMEORIGIN',
+  'X-Frame-Options': 'DENY',
   'Referrer-Policy': 'no-referrer',
   'Permissions-Policy': 'camera=(), microphone=(), geolocation=()',
   'Strict-Transport-Security': 'max-age=31536000',
+  'Content-Security-Policy':
+      "default-src 'none'; frame-ancestors 'none'; base-uri 'none'",
 };
 
 Handler middleware(Handler handler) {
@@ -36,11 +47,43 @@ Handler middleware(Handler handler) {
     final trace = RequestTrace(requestId: requestId);
     final endpoint =
         '${context.request.method.name.toUpperCase()} ${context.request.uri.path}';
+    final origin = _header(context.request.headers, 'origin');
+    final responseHeaders = <String, Object>{
+      ..._securityHeaders,
+      ..._corsPolicy.headersFor(origin),
+    };
+
+    if (!_corsPolicy.isAllowed(origin)) {
+      return Response.json(
+        statusCode: HttpStatus.forbidden,
+        body: {'error': 'cors_origin_denied'},
+        headers: {...responseHeaders, 'x-request-id': requestId},
+      );
+    }
 
     if (context.request.method == HttpMethod.options) {
+      final validPreflight =
+          origin == null ||
+          _corsPolicy.isValidPreflight(
+            requestedMethod: _header(
+              context.request.headers,
+              'access-control-request-method',
+            ),
+            requestedHeaders: _header(
+              context.request.headers,
+              'access-control-request-headers',
+            ),
+          );
+      if (!validPreflight) {
+        return Response.json(
+          statusCode: HttpStatus.forbidden,
+          body: {'error': 'cors_preflight_rejected'},
+          headers: {...responseHeaders, 'x-request-id': requestId},
+        );
+      }
       return Response(
         statusCode: HttpStatus.noContent,
-        headers: {..._corsHeaders, 'x-request-id': requestId},
+        headers: {...responseHeaders, 'x-request-id': requestId},
       );
     }
 
@@ -53,7 +96,7 @@ Handler middleware(Handler handler) {
           return Response.json(
             statusCode: HttpStatus.serviceUnavailable,
             body: {'error': 'Serviço temporariamente indisponível (DB)'},
-            headers: {..._corsHeaders, 'x-request-id': requestId},
+            headers: {...responseHeaders, 'x-request-id': requestId},
           );
         }
         _connected = true;
@@ -77,7 +120,7 @@ Handler middleware(Handler handler) {
 
       final mergedHeaders = <String, Object>{
         ...response.headers,
-        ..._corsHeaders,
+        ...responseHeaders,
         'x-request-id': requestId,
       };
       final finalResponse = response.copyWith(headers: mergedHeaders);
@@ -122,10 +165,18 @@ Handler middleware(Handler handler) {
       return Response.json(
         statusCode: HttpStatus.internalServerError,
         body: {'error': 'Erro interno do servidor'},
-        headers: {..._corsHeaders, 'x-request-id': requestId},
+        headers: {...responseHeaders, 'x-request-id': requestId},
       );
     }
   };
+}
+
+String? _header(Map<String, String> headers, String name) {
+  final normalized = name.toLowerCase();
+  for (final entry in headers.entries) {
+    if (entry.key.toLowerCase() == normalized) return entry.value;
+  }
+  return null;
 }
 
 void _recordHttpObservability({

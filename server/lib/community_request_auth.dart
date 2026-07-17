@@ -4,21 +4,20 @@ import 'package:dart_frog/dart_frog.dart';
 
 import 'auth_service.dart';
 
-String? readAuthenticatedUserId(RequestContext context) {
+Future<String?> readAuthenticatedUserId(RequestContext context) async {
   final authHeader = context.request.headers['Authorization'];
   if (authHeader == null || !authHeader.startsWith('Bearer ')) {
     return null;
   }
 
   final token = authHeader.substring(7);
-  final payload = AuthService().verifyToken(token);
-  return payload?['userId'] as String?;
+  final user = await AuthService().getUserFromToken(token);
+  return user?['id'] as String?;
 }
 
 Response authenticationRequired([
   String message = 'Autenticacao necessaria.',
-]) =>
-    Response.json(
-      statusCode: HttpStatus.unauthorized,
-      body: {'error': message},
-    );
+]) => Response.json(
+  statusCode: HttpStatus.unauthorized,
+  body: {'error': message},
+);

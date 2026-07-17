@@ -194,7 +194,7 @@ class _LifeCounterNativePlayerAppearanceSheetState
     final normalized = _normalizeHexColor(_customBackgroundController.text);
     if (normalized == null) {
       setState(() {
-        _backgroundError = 'Use a hex color like #FFB51E.';
+        _backgroundError = 'Use uma cor hexadecimal, como #FFB51E.';
       });
       return false;
     }
@@ -222,7 +222,7 @@ class _LifeCounterNativePlayerAppearanceSheetState
       ?..hideCurrentSnackBar()
       ..showSnackBar(
         const SnackBar(
-          content: Text('Player appearance copied to the clipboard.'),
+          content: Text('A aparência do jogador foi copiada.'),
           behavior: SnackBarBehavior.floating,
         ),
       );
@@ -257,7 +257,7 @@ class _LifeCounterNativePlayerAppearanceSheetState
       ?..hideCurrentSnackBar()
       ..showSnackBar(
         const SnackBar(
-          content: Text('Player appearance imported.'),
+          content: Text('A aparência do jogador foi importada.'),
           behavior: SnackBarBehavior.floating,
         ),
       );
@@ -272,7 +272,7 @@ class _LifeCounterNativePlayerAppearanceSheetState
     final profileName = _profileNameController.text.trim();
     if (profileName.isEmpty) {
       setState(() {
-        _profileError = 'Choose a profile name before saving.';
+        _profileError = 'Informe um nome para o perfil antes de salvar.';
       });
       return;
     }
@@ -291,7 +291,7 @@ class _LifeCounterNativePlayerAppearanceSheetState
       ?..hideCurrentSnackBar()
       ..showSnackBar(
         SnackBar(
-          content: Text('Saved "$profileName" for player appearance.'),
+          content: Text('Perfil de aparência "$profileName" salvo.'),
           behavior: SnackBarBehavior.floating,
         ),
       );
@@ -344,14 +344,14 @@ class _LifeCounterNativePlayerAppearanceSheetState
             key: const Key('life-counter-native-player-appearance-export'),
             onPressed: _handleExportPressed,
             icon: const Icon(Icons.ios_share_rounded, size: 18),
-            label: const Text('Export'),
+            label: const Text('Exportar'),
           ),
         if (widget.onImportSubmitted != null)
           TextButton.icon(
             key: const Key('life-counter-native-player-appearance-import'),
             onPressed: _handleImportPressed,
             icon: const Icon(Icons.download_rounded, size: 18),
-            label: const Text('Import'),
+            label: const Text('Importar'),
           ),
       ],
     );
@@ -359,8 +359,8 @@ class _LifeCounterNativePlayerAppearanceSheetState
 
   Widget _buildProfilesSection() {
     return _SectionCard(
-      title: 'Profiles',
-      subtitle: 'Save this appearance to reuse in future games.',
+      title: 'Perfis',
+      subtitle: 'Salve esta aparência para reutilizá-la em outras partidas.',
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -374,8 +374,8 @@ class _LifeCounterNativePlayerAppearanceSheetState
                   ),
                   controller: _profileNameController,
                   decoration: InputDecoration(
-                    labelText: 'Profile name',
-                    hintText: 'Commander pod / player profile',
+                    labelText: 'Nome do perfil',
+                    hintText: 'Grupo de Commander / perfil do jogador',
                     errorText: _profileError,
                   ),
                 ),
@@ -392,14 +392,14 @@ class _LifeCounterNativePlayerAppearanceSheetState
                     vertical: 18,
                   ),
                 ),
-                child: const Text('Save'),
+                child: const Text('Salvar'),
               ),
             ],
           ),
           const SizedBox(height: 16),
           if (_profiles.isEmpty)
             const Text(
-              'No saved appearance profiles yet.',
+              'Nenhum perfil de aparência salvo.',
               style: TextStyle(
                 color: AppTheme.textSecondary,
                 fontSize: AppTheme.fontSm,
@@ -428,7 +428,7 @@ class _LifeCounterNativePlayerAppearanceSheetState
 
   @override
   Widget build(BuildContext context) {
-    final playerLabel = 'Player ${_targetPlayerIndex + 1}';
+    final playerLabel = 'Jogador ${_targetPlayerIndex + 1}';
 
     return SafeArea(
       child: Padding(
@@ -465,7 +465,7 @@ class _LifeCounterNativePlayerAppearanceSheetState
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: const [
                             Text(
-                              'Player Appearance',
+                              'Aparência do jogador',
                               style: TextStyle(
                                 color: AppTheme.textPrimary,
                                 fontSize: AppTheme.fontXxl,
@@ -474,7 +474,7 @@ class _LifeCounterNativePlayerAppearanceSheetState
                             ),
                             SizedBox(height: 6),
                             Text(
-                              'Customize names and backgrounds for each player.',
+                              'Personalize nomes e fundos de cada jogador.',
                               style: TextStyle(
                                 color: AppTheme.textSecondary,
                                 fontSize: AppTheme.fontMd,
@@ -488,7 +488,7 @@ class _LifeCounterNativePlayerAppearanceSheetState
                         onPressed: () => Navigator.of(context).pop(),
                         icon: const Icon(Icons.close_rounded),
                         color: AppTheme.textSecondary,
-                        tooltip: 'Close',
+                        tooltip: 'Fechar',
                       ),
                     ],
                   ),
@@ -504,9 +504,9 @@ class _LifeCounterNativePlayerAppearanceSheetState
                     padding: const EdgeInsets.fromLTRB(20, 18, 20, 12),
                     children: [
                       _SectionCard(
-                        title: 'Target Player',
+                        title: 'Jogador alvo',
                         subtitle:
-                            'Choose which player appearance you want to edit.',
+                            'Escolha qual aparência de jogador deseja editar.',
                         child: Wrap(
                           spacing: 8,
                           runSpacing: 8,
@@ -516,7 +516,7 @@ class _LifeCounterNativePlayerAppearanceSheetState
                               key: Key(
                                 'life-counter-native-player-appearance-target-$index',
                               ),
-                              label: Text('Player ${index + 1}'),
+                              label: Text('Jogador ${index + 1}'),
                               selected: _targetPlayerIndex == index,
                               onSelected: (_) => _changeTarget(index),
                             ),
@@ -525,8 +525,8 @@ class _LifeCounterNativePlayerAppearanceSheetState
                       ),
                       const SizedBox(height: 18),
                       _SectionCard(
-                        title: 'Nickname',
-                        subtitle: 'Set an optional name for this player.',
+                        title: 'Apelido',
+                        subtitle: 'Defina um nome opcional para este jogador.',
                         child: TextField(
                           key: const Key(
                             'life-counter-native-player-appearance-nickname',
@@ -534,8 +534,8 @@ class _LifeCounterNativePlayerAppearanceSheetState
                           controller: _nicknameController,
                           onChanged: (_) => setState(() {}),
                           decoration: const InputDecoration(
-                            labelText: 'Nickname',
-                            hintText: 'Optional player label',
+                            labelText: 'Apelido',
+                            hintText: 'Nome opcional do jogador',
                           ),
                         ),
                       ),
@@ -545,9 +545,9 @@ class _LifeCounterNativePlayerAppearanceSheetState
                       ],
                       const SizedBox(height: 18),
                       _SectionCard(
-                        title: 'Background',
+                        title: 'Fundo',
                         subtitle:
-                            '$playerLabel: choose a preset or enter a custom color.',
+                            '$playerLabel: escolha uma cor pronta ou personalizada.',
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
@@ -592,7 +592,8 @@ class _LifeCounterNativePlayerAppearanceSheetState
                                     textCapitalization:
                                         TextCapitalization.characters,
                                     decoration: InputDecoration(
-                                      labelText: 'Custom hex color',
+                                      labelText:
+                                          'Cor hexadecimal personalizada',
                                       hintText: '#FFB51E',
                                       errorText: _backgroundError,
                                     ),
@@ -610,7 +611,7 @@ class _LifeCounterNativePlayerAppearanceSheetState
                                       vertical: 18,
                                     ),
                                   ),
-                                  child: const Text('Use'),
+                                  child: const Text('Usar'),
                                 ),
                               ],
                             ),
@@ -619,14 +620,14 @@ class _LifeCounterNativePlayerAppearanceSheetState
                       ),
                       const SizedBox(height: 18),
                       _SectionCard(
-                        title: 'Background Images',
+                        title: 'Imagens de fundo',
                         subtitle:
-                            'Review or clear the images already set for this player.',
+                            'Confira ou remova as imagens definidas para este jogador.',
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             _ImageStatusRow(
-                              title: 'Main background image',
+                              title: 'Imagem de fundo principal',
                               hasValue: _appearance.backgroundImage != null,
                               onClear:
                                   _appearance.backgroundImage == null
@@ -638,7 +639,7 @@ class _LifeCounterNativePlayerAppearanceSheetState
                             ),
                             const SizedBox(height: 12),
                             _ImageStatusRow(
-                              title: 'Partner background image',
+                              title: 'Imagem de fundo do parceiro',
                               hasValue: _hasPartnerImage,
                               onClear:
                                   _hasPartnerImage ? _clearPartnerImage : null,
@@ -667,7 +668,7 @@ class _LifeCounterNativePlayerAppearanceSheetState
                             ),
                             padding: const EdgeInsets.symmetric(vertical: 14),
                           ),
-                          child: const Text('Cancel'),
+                          child: const Text('Cancelar'),
                         ),
                       ),
                       const SizedBox(width: 12),
@@ -687,7 +688,7 @@ class _LifeCounterNativePlayerAppearanceSheetState
                             foregroundColor: AppTheme.backgroundAbyss,
                             padding: const EdgeInsets.symmetric(vertical: 14),
                           ),
-                          child: const Text('Apply'),
+                          child: const Text('Aplicar'),
                         ),
                       ),
                     ],
@@ -713,7 +714,7 @@ Future<LifeCounterSession?> _showPlayerAppearanceImportDialog(
       return AlertDialog(
         backgroundColor: AppTheme.surfaceElevated,
         title: const Text(
-          'Import Player Appearance',
+          'Importar aparência do jogador',
           style: TextStyle(
             color: AppTheme.textPrimary,
             fontWeight: FontWeight.w700,
@@ -726,13 +727,13 @@ Future<LifeCounterSession?> _showPlayerAppearanceImportDialog(
           minLines: 6,
           style: const TextStyle(color: AppTheme.textPrimary),
           decoration: const InputDecoration(
-            hintText: 'Paste a player appearance export',
+            hintText: 'Cole aqui uma aparência de jogador exportada',
           ),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(dialogContext).pop(),
-            child: const Text('Cancel'),
+            child: const Text('Cancelar'),
           ),
           FilledButton(
             key: const Key(
@@ -745,7 +746,7 @@ Future<LifeCounterSession?> _showPlayerAppearanceImportDialog(
               }
               Navigator.of(dialogContext).pop(importedSession);
             },
-            child: const Text('Import'),
+            child: const Text('Importar'),
           ),
         ],
       );
@@ -791,7 +792,7 @@ class _SectionCard extends StatelessWidget {
               style: const TextStyle(
                 color: AppTheme.textSecondary,
                 fontSize: AppTheme.fontSm,
-                height: 1.4,
+                height: AppTheme.lineHeightComfortable,
               ),
             ),
             const SizedBox(height: 16),
@@ -835,7 +836,7 @@ class _BackgroundPreview extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            nickname.isEmpty ? 'Preview' : nickname,
+            nickname.isEmpty ? 'Prévia' : nickname,
             key: const Key(
               'life-counter-native-player-appearance-preview-nickname',
             ),
@@ -855,10 +856,13 @@ class _BackgroundPreview extends StatelessWidget {
                 foreground: foreground,
               ),
               if (hasMainImage)
-                _PreviewBadge(label: 'Main image kept', foreground: foreground),
+                _PreviewBadge(
+                  label: 'Imagem principal mantida',
+                  foreground: foreground,
+                ),
               if (hasPartnerImage)
                 _PreviewBadge(
-                  label: 'Partner image kept',
+                  label: 'Imagem do parceiro mantida',
                   foreground: foreground,
                 ),
             ],
@@ -1019,7 +1023,7 @@ class _AppearanceProfileTile extends StatelessWidget {
                   'life-counter-native-player-appearance-apply-profile-${profile.id}',
                 ),
                 onPressed: onApply,
-                child: const Text('Use'),
+                child: const Text('Usar'),
               ),
               if (onDelete != null)
                 IconButton(
@@ -1029,7 +1033,7 @@ class _AppearanceProfileTile extends StatelessWidget {
                   onPressed: onDelete,
                   icon: const Icon(Icons.delete_outline_rounded),
                   color: AppTheme.textSecondary,
-                  tooltip: 'Delete profile',
+                  tooltip: 'Excluir perfil',
                 ),
             ],
           ),
@@ -1069,7 +1073,7 @@ class _ImageStatusRow extends StatelessWidget {
               ),
               const SizedBox(height: 4),
               Text(
-                hasValue ? 'Image kept' : 'No image saved',
+                hasValue ? 'Imagem mantida' : 'Nenhuma imagem salva',
                 style: const TextStyle(
                   color: AppTheme.textSecondary,
                   fontSize: AppTheme.fontSm,
@@ -1082,7 +1086,7 @@ class _ImageStatusRow extends StatelessWidget {
         OutlinedButton(
           key: clearKey,
           onPressed: onClear,
-          child: const Text('Clear'),
+          child: const Text('Limpar'),
         ),
       ],
     );

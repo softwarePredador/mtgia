@@ -39,6 +39,15 @@ class _FakeBinderProvider extends BinderProvider {
 }
 
 void main() {
+  Future<void> setViewport(WidgetTester tester, Size size) async {
+    tester.view.physicalSize = size;
+    tester.view.devicePixelRatio = 1;
+    addTearDown(() {
+      tester.view.resetPhysicalSize();
+      tester.view.resetDevicePixelRatio();
+    });
+  }
+
   Widget buildTestWidget(double width, BinderProvider provider) {
     return MultiProvider(
       providers: [
@@ -93,6 +102,43 @@ void main() {
       expect(tester.takeException(), isNull);
     },
   );
+
+  testWidgets('Marketplace bounds desktop canvas and search width', (
+    tester,
+  ) async {
+    await setViewport(tester, const Size(1280, 900));
+    final provider = _FakeBinderProvider([
+      MarketplaceItem(
+        id: 'desktop-market',
+        cardId: 'desktop-card',
+        cardName: 'Command Tower',
+        quantity: 1,
+        condition: 'NM',
+        forTrade: true,
+        ownerId: 'desktop-owner',
+        ownerUsername: 'desktop_user',
+      ),
+    ]);
+
+    await tester.pumpWidget(buildTestWidget(1280, provider));
+    await tester.pumpAndSettle();
+
+    expect(
+      tester
+          .getSize(find.byKey(const Key('marketplace-responsive-canvas')))
+          .width,
+      lessThanOrEqualTo(1280),
+    );
+    expect(
+      tester.getSize(find.byKey(const Key('marketplace-search-field'))).width,
+      lessThanOrEqualTo(760),
+    );
+    expect(
+      tester.getSize(find.byKey(const Key('marketplace-list'))).width,
+      lessThanOrEqualTo(900),
+    );
+    expect(tester.takeException(), isNull);
+  });
 
   testWidgets('Marketplace item abre detalhe da carta', (tester) async {
     final provider = _FakeBinderProvider([

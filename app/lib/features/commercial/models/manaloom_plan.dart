@@ -15,7 +15,7 @@ extension ManaLoomPlanTierLabel on ManaLoomPlanTier {
   };
 
   String get label => switch (this) {
-    ManaLoomPlanTier.free => 'Free',
+    ManaLoomPlanTier.free => 'Beta gratuita',
     ManaLoomPlanTier.pro => 'Pro',
   };
 
@@ -40,7 +40,7 @@ extension AiUsageKindLabel on AiUsageKind {
 class ManaLoomPlan {
   final ManaLoomPlanTier tier;
   final int monthlyAiLimit;
-  final String priceLabel;
+  final ManaLoomBillingTerms billingTerms;
   final String description;
   final List<String> features;
   final List<String> limits;
@@ -48,49 +48,48 @@ class ManaLoomPlan {
   const ManaLoomPlan({
     required this.tier,
     required this.monthlyAiLimit,
-    required this.priceLabel,
+    required this.billingTerms,
     required this.description,
     required this.features,
     required this.limits,
   });
 
   bool get isPro => tier == ManaLoomPlanTier.pro;
+  String get priceLabel => billingTerms.priceLabel;
 
   static const free = ManaLoomPlan(
     tier: ManaLoomPlanTier.free,
     monthlyAiLimit: 120,
-    priceLabel: 'R\$ 0',
+    billingTerms: ManaLoomBillingTerms.free,
     description:
-        'Para testar ManaLoom, criar listas iniciais e validar se o fluxo serve para sua mesa.',
+        'Acesso aos recursos disponíveis no ManaLoom durante a beta pública.',
     features: [
       '120 ações de IA por mês',
-      'Gerador de decks revisável',
-      'Otimização com preview antes de aplicar',
-      'Coleção, fichário e trocas básicos',
+      'Geração, análise e otimização com revisão antes de aplicar',
+      'Coleção, fichário, trocas e comunidade',
+      'Life Counter e acompanhamento pós-jogo',
     ],
     limits: [
-      'Sem excedente de IA depois do limite mensal',
-      'Relatórios e recomendações avançadas limitados',
-      'Checkout Pro necessário para uso contínuo',
+      'Ações de IA param ao atingir o limite mensal',
+      'O saldo de IA não é acumulado para o mês seguinte',
     ],
   );
 
   static const pro = ManaLoomPlan(
     tier: ManaLoomPlanTier.pro,
     monthlyAiLimit: 2500,
-    priceLabel: 'R\$ 19,90/mês',
+    billingTerms: ManaLoomBillingTerms.pro,
     description:
-        'Para acompanhar decks vivos, otimizar por coleção/orçamento e voltar depois de cada partida.',
+        'Para quem usa IA com frequência e precisa de um limite mensal maior.',
     features: [
       '2.500 ações de IA por mês',
-      'Otimização por coleção e orçamento',
-      'Relatório antes/depois compartilhável',
-      'Histórico pós-jogo e alertas de evolução',
-      'Camada social, fichário público e trade matching',
+      'Geração, análise e otimização com a mesma revisão segura',
+      'Limite sincronizado com o plano da sua conta',
     ],
     limits: [
-      'Uso sujeito a política de fair use',
-      'Pagamento real depende do provedor configurado no backend',
+      'Social, trocas e pós-jogo continuam disponíveis no Free',
+      'Ativação depende da confirmação do provedor de pagamento',
+      'O saldo de IA não é acumulado para o mês seguinte',
     ],
   );
 
@@ -100,6 +99,50 @@ class ManaLoomPlan {
       ManaLoomPlanTier.pro => pro,
     };
   }
+}
+
+/// Fonte única para preço, recorrência e condições mostradas antes do checkout.
+///
+/// O provedor externo continua sendo a fonte final do total e da data de
+/// cobrança. Se houver divergência, a compra não deve ser concluída.
+class ManaLoomBillingTerms {
+  final String priceLabel;
+  final String recurrenceLabel;
+  final String renewalDisclosure;
+  final String cancellationDisclosure;
+  final String refundDisclosure;
+  final String checkoutGuardrail;
+
+  const ManaLoomBillingTerms({
+    required this.priceLabel,
+    required this.recurrenceLabel,
+    required this.renewalDisclosure,
+    required this.cancellationDisclosure,
+    required this.refundDisclosure,
+    required this.checkoutGuardrail,
+  });
+
+  static const free = ManaLoomBillingTerms(
+    priceLabel: 'Sem custo',
+    recurrenceLabel: 'Sem cobrança',
+    renewalDisclosure: 'A beta gratuita não tem renovação paga.',
+    cancellationDisclosure: 'Não há assinatura para cancelar durante a beta.',
+    refundDisclosure: 'Não há cobrança da beta para reembolsar.',
+    checkoutGuardrail: 'A beta gratuita não exige checkout.',
+  );
+
+  static const pro = ManaLoomBillingTerms(
+    priceLabel: 'R\$ 19,90/mês',
+    recurrenceLabel: 'Assinatura mensal recorrente',
+    renewalDisclosure:
+        'Renovação automática a cada mês até o cancelamento. O checkout confirma a próxima cobrança antes do pagamento.',
+    cancellationDisclosure:
+        'Cancelamento: esta versão ainda não oferece gestão dentro do app. Solicite pelo canal indicado pelo provedor antes da próxima cobrança.',
+    refundDisclosure:
+        'Reembolso: não é automático; solicitações seguem a legislação aplicável e as regras informadas pelo provedor no checkout.',
+    checkoutGuardrail:
+        'Confira preço, periodicidade e total no checkout externo. Se houver divergência, não conclua a compra.',
+  );
 }
 
 class AiUsageSnapshot {

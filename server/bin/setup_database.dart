@@ -1,5 +1,7 @@
 import 'dart:io';
 
+import 'package:server/sql_statement_splitter.dart';
+
 import '../lib/database.dart';
 
 Future<void> main() async {
@@ -10,9 +12,8 @@ Future<void> main() async {
   try {
     print('Lendo o script SQL...');
     final sqlScript = await File('database_setup.sql').readAsString();
-    
-    // Separa os comandos SQL pelo ponto e vírgula
-    final commands = sqlScript.split(';').where((s) => s.trim().isNotEmpty).toList();
+
+    final commands = splitPostgresStatements(sqlScript);
 
     print('Executando ${commands.length} comandos SQL...');
 
@@ -20,7 +21,7 @@ Future<void> main() async {
     for (final command in commands) {
       await conn.execute(command);
     }
-    
+
     print('Tabelas criadas com sucesso!');
   } catch (e) {
     print('Ocorreu um erro ao executar o script SQL: $e');

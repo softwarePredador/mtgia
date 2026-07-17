@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/utils/mana_helper.dart';
 import '../../../core/widgets/cached_card_image.dart';
+import '../../../core/widgets/mana_symbols.dart';
 import '../../decks/models/deck_card_item.dart';
 import '../widgets/card_edition_metadata.dart';
 
@@ -11,8 +12,11 @@ class CardDetailScreen extends StatelessWidget {
 
   /// Standard MTG card proportion: 63mm wide × 88mm tall → width/height.
   static const double _mtgCardAspectRatio = 63 / 88;
-  static final RegExp _manaSymbolRegex = RegExp(r'\{([^\}]+)\}');
-
+  static const double _desktopBreakpoint = 900;
+  static const double _tabletBreakpoint = 560;
+  static const double _desktopCardMaxWidth = 400;
+  static const double _stackedCardMaxWidth = 420;
+  static const double _contentMaxWidth = 1120;
   const CardDetailScreen({super.key, required this.card});
 
   @override
@@ -40,31 +44,97 @@ class CardDetailScreen extends StatelessWidget {
               onPressed: () => Navigator.of(context).pop(),
             ),
           ),
-          SliverToBoxAdapter(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                _buildCardImage(context),
-                Padding(
-                  padding: const EdgeInsets.fromLTRB(20, 20, 20, 32),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      _buildHeader(theme),
-                      const SizedBox(height: 20),
-                      _buildDivider(),
-                      const SizedBox(height: 16),
-                      _buildOracleText(theme),
-                      const SizedBox(height: 16),
-                      _buildDivider(),
-                      const SizedBox(height: 16),
-                      _buildDetailsGrid(theme),
-                    ],
-                  ),
+          SliverToBoxAdapter(child: _buildResponsiveContent(context, theme)),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildResponsiveContent(BuildContext context, ThemeData theme) {
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        if (constraints.maxWidth >= _desktopBreakpoint) {
+          final imageWidth = (constraints.maxWidth * 0.34).clamp(
+            320.0,
+            _desktopCardMaxWidth,
+          );
+
+          return Padding(
+            padding: const EdgeInsets.fromLTRB(32, 28, 32, 48),
+            child: Center(
+              child: ConstrainedBox(
+                constraints: const BoxConstraints(maxWidth: _contentMaxWidth),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    SizedBox(
+                      width: imageWidth,
+                      child: _buildCardImage(context, roundedAllCorners: true),
+                    ),
+                    const SizedBox(width: 36),
+                    Expanded(
+                      child: _buildCardInformation(
+                        theme,
+                        padding: const EdgeInsets.only(top: 4),
+                      ),
+                    ),
+                  ],
                 ),
-              ],
+              ),
             ),
-          ),
+          );
+        }
+
+        final centerCard = constraints.maxWidth >= _tabletBreakpoint;
+        final image =
+            centerCard
+                ? Padding(
+                  padding: const EdgeInsets.fromLTRB(24, 24, 24, 0),
+                  child: Center(
+                    child: ConstrainedBox(
+                      constraints: const BoxConstraints(
+                        maxWidth: _stackedCardMaxWidth,
+                      ),
+                      child: _buildCardImage(context, roundedAllCorners: true),
+                    ),
+                  ),
+                )
+                : _buildCardImage(context);
+
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            image,
+            Center(
+              child: ConstrainedBox(
+                constraints: const BoxConstraints(maxWidth: 760),
+                child: _buildCardInformation(theme),
+              ),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Widget _buildCardInformation(
+    ThemeData theme, {
+    EdgeInsetsGeometry padding = const EdgeInsets.fromLTRB(20, 20, 20, 32),
+  }) {
+    return Padding(
+      padding: padding,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _buildHeader(theme),
+          const SizedBox(height: 20),
+          _buildDivider(),
+          const SizedBox(height: 16),
+          _buildOracleText(theme),
+          const SizedBox(height: 16),
+          _buildDivider(),
+          const SizedBox(height: 16),
+          _buildDetailsGrid(theme),
         ],
       ),
     );
@@ -73,58 +143,76 @@ class CardDetailScreen extends StatelessWidget {
   // ---------------------------------------------------------------------------
   // Card image (tappable for fullscreen)
   // ---------------------------------------------------------------------------
-  Widget _buildCardImage(BuildContext context) {
+  Widget _buildCardImage(
+    BuildContext context, {
+    bool roundedAllCorners = false,
+  }) {
     final imageUrl = card.effectiveImageUrl;
-    return GestureDetector(
-      onTap: () => _showFullscreenImage(context),
-      child: AspectRatio(
-        aspectRatio: _mtgCardAspectRatio,
-        child:
-            imageUrl != null && imageUrl.isNotEmpty
-                ? ClipRRect(
-                  borderRadius: const BorderRadius.only(
-                    bottomLeft: Radius.circular(AppTheme.radiusLg),
-                    bottomRight: Radius.circular(AppTheme.radiusLg),
-                  ),
-                  child: CachedCardImage(
-                    imageUrl: imageUrl,
-                    width: double.infinity,
-                    fit: BoxFit.contain,
-                  ),
-                )
-                : Container(
-                  decoration: BoxDecoration(
-                    color: AppTheme.surfaceSlate,
-                    borderRadius: const BorderRadius.only(
-                      bottomLeft: Radius.circular(AppTheme.radiusLg),
-                      bottomRight: Radius.circular(AppTheme.radiusLg),
+    final borderRadius =
+        roundedAllCorners
+            ? BorderRadius.circular(AppTheme.radiusLg)
+            : const BorderRadius.only(
+              bottomLeft: Radius.circular(AppTheme.radiusLg),
+              bottomRight: Radius.circular(AppTheme.radiusLg),
+            );
+
+    final hasImage = imageUrl != null && imageUrl.isNotEmpty;
+    final imageFrame = Material(
+      color: AppTheme.transparent,
+      child: InkWell(
+        key: const Key('card-detail-image-frame'),
+        onTap: hasImage ? () => _showFullscreenImage(context) : null,
+        borderRadius: borderRadius,
+        child: AspectRatio(
+          aspectRatio: _mtgCardAspectRatio,
+          child:
+              hasImage
+                  ? ClipRRect(
+                    borderRadius: borderRadius,
+                    child: CachedCardImage(
+                      imageUrl: imageUrl,
+                      width: double.infinity,
+                      fit: BoxFit.contain,
                     ),
-                    border: Border.all(
-                      color: AppTheme.outlineMuted.withValues(alpha: 0.5),
+                  )
+                  : Container(
+                    decoration: BoxDecoration(
+                      color: AppTheme.surfaceSlate,
+                      borderRadius: borderRadius,
+                      border: Border.all(
+                        color: AppTheme.outlineMuted.withValues(alpha: 0.5),
+                      ),
                     ),
-                  ),
-                  child: const Center(
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Icon(
-                          Icons.style,
-                          size: 48,
-                          color: AppTheme.textSecondary,
-                        ),
-                        SizedBox(height: 8),
-                        Text(
-                          'Sem imagem',
-                          style: TextStyle(
+                    child: const Center(
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(
+                            Icons.style,
+                            size: 48,
                             color: AppTheme.textSecondary,
-                            fontSize: AppTheme.fontMd,
                           ),
-                        ),
-                      ],
+                          SizedBox(height: 8),
+                          Text(
+                            'Sem imagem',
+                            style: TextStyle(
+                              color: AppTheme.textSecondary,
+                              fontSize: AppTheme.fontMd,
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
                   ),
-                ),
+        ),
       ),
+    );
+
+    if (!hasImage) return imageFrame;
+    return Semantics(
+      button: true,
+      label: 'Ampliar imagem de ${card.name}',
+      child: Tooltip(message: 'Ampliar imagem', child: imageFrame),
     );
   }
 
@@ -198,97 +286,7 @@ class CardDetailScreen extends StatelessWidget {
   // Mana cost symbols
   // ---------------------------------------------------------------------------
   Widget _buildManaCostWidget(String manaCost) {
-    final matches = _manaSymbolRegex.allMatches(manaCost);
-    if (matches.isEmpty) return const SizedBox.shrink();
-
-    return Wrap(
-      spacing: 3,
-      runSpacing: 3,
-      children:
-          matches.map((m) {
-            final symbol = m.group(1)!.toUpperCase();
-            final config = _manaSymbolConfig(symbol);
-            return Container(
-              width: 22,
-              height: 22,
-              decoration: BoxDecoration(
-                color: config.background,
-                shape: BoxShape.circle,
-                boxShadow: [
-                  BoxShadow(
-                    color: config.background.withValues(alpha: 0.4),
-                    blurRadius: 4,
-                    offset: const Offset(0, 1),
-                  ),
-                ],
-              ),
-              alignment: Alignment.center,
-              child: Text(
-                config.label,
-                style: TextStyle(
-                  color: config.foreground,
-                  fontSize: AppTheme.fontSm - 1,
-                  fontWeight: FontWeight.w800,
-                  height: 1,
-                ),
-              ),
-            );
-          }).toList(),
-    );
-  }
-
-  _ManaSymbolStyle _manaSymbolConfig(String symbol) {
-    switch (symbol) {
-      case 'W':
-        return _ManaSymbolStyle(
-          AppTheme.manaPipBackground('W'),
-          AppTheme.manaPipForeground('W'),
-          'W',
-        );
-      case 'U':
-        return _ManaSymbolStyle(
-          AppTheme.manaPipBackground('U'),
-          AppTheme.manaPipForeground('U'),
-          'U',
-        );
-      case 'B':
-        return _ManaSymbolStyle(
-          AppTheme.manaPipBackground('B'),
-          AppTheme.manaPipForeground('B'),
-          'B',
-        );
-      case 'R':
-        return _ManaSymbolStyle(
-          AppTheme.manaPipBackground('R'),
-          AppTheme.manaPipForeground('R'),
-          'R',
-        );
-      case 'G':
-        return _ManaSymbolStyle(
-          AppTheme.manaPipBackground('G'),
-          AppTheme.manaPipForeground('G'),
-          'G',
-        );
-      case 'C':
-        return _ManaSymbolStyle(
-          AppTheme.manaPipBackground('C'),
-          AppTheme.manaPipForeground('C'),
-          'C',
-        );
-      case 'X':
-        return _ManaSymbolStyle(
-          AppTheme.textSecondary,
-          AppTheme.textPrimary,
-          'X',
-        );
-      default:
-        // Numeric or other generic symbols
-        return _ManaSymbolStyle(
-          AppTheme.textSecondary,
-          AppTheme.textPrimary,
-          symbol,
-        );
-    }
+    return ManaCostRow(cost: manaCost, symbolSize: 22, spacing: 3);
   }
 
   // ---------------------------------------------------------------------------
@@ -320,13 +318,7 @@ class CardDetailScreen extends StatelessWidget {
           ),
           child:
               hasText
-                  ? Text(
-                    card.oracleText!,
-                    style: theme.textTheme.bodyMedium?.copyWith(
-                      color: AppTheme.textPrimary,
-                      height: 1.5,
-                    ),
-                  )
+                  ? OracleTextWidget(card.oracleText!)
                   : Text(
                     'Sem texto de regras',
                     style: theme.textTheme.bodyMedium?.copyWith(
@@ -526,46 +518,12 @@ class CardDetailScreen extends StatelessWidget {
     final identityColors =
         card.colorIdentity.isNotEmpty ? card.colorIdentity : card.colors;
 
-    if (identityColors.isEmpty) {
-      return _colorCircle(
-        'C',
-        AppTheme.manaPipBackground('C'),
-        AppTheme.manaPipForeground('C'),
-      );
-    }
-
-    return Wrap(
+    return ColorIdentityPips(
+      colors: identityColors,
+      symbolSize: 24,
       spacing: 4,
-      children:
-          identityColors.map((c) {
-            final upper = c.toUpperCase();
-            final config = _manaSymbolConfig(upper);
-            return _colorCircle(upper, config.background, config.foreground);
-          }).toList(),
-    );
-  }
-
-  Widget _colorCircle(String label, Color bg, Color fg) {
-    return Container(
-      width: 24,
-      height: 24,
-      decoration: BoxDecoration(
-        color: bg,
-        shape: BoxShape.circle,
-        border: Border.all(
-          color: AppTheme.outlineMuted.withValues(alpha: 0.45),
-          width: 0.5,
-        ),
-      ),
-      alignment: Alignment.center,
-      child: Text(
-        label,
-        style: TextStyle(
-          color: fg,
-          fontSize: AppTheme.fontSm - 1,
-          fontWeight: FontWeight.w800,
-        ),
-      ),
+      decorated: false,
+      colorlessWhenEmpty: true,
     );
   }
 
@@ -590,15 +548,4 @@ class CardDetailScreen extends StatelessWidget {
     if (rarity.isEmpty) return rarity;
     return rarity[0].toUpperCase() + rarity.substring(1);
   }
-}
-
-// ---------------------------------------------------------------------------
-// Internal helper class for mana symbol styling
-// ---------------------------------------------------------------------------
-class _ManaSymbolStyle {
-  final Color background;
-  final Color foreground;
-  final String label;
-
-  const _ManaSymbolStyle(this.background, this.foreground, this.label);
 }

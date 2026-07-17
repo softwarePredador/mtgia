@@ -67,6 +67,7 @@ void main() {
     required VoidCallback onForcePricingRefresh,
     required VoidCallback onShowPricingDetails,
     required VoidCallback onTogglePublic,
+    VoidCallback? onPlay,
     required VoidCallback onShowOptimizationOptions,
     required VoidCallback onSelectCommander,
     required VoidCallback onImportList,
@@ -76,12 +77,13 @@ void main() {
       'ok': false,
       'error': 'Commander ausente',
     },
+    double width = 320,
   }) {
     return MaterialApp(
       theme: AppTheme.darkTheme,
       home: Scaffold(
         body: SizedBox(
-          width: 320,
+          width: width,
           child: DeckDetailsOverviewTab(
             deckId: deck.id,
             deck: deck,
@@ -100,6 +102,7 @@ void main() {
             onForcePricingRefresh: onForcePricingRefresh,
             onShowPricingDetails: onShowPricingDetails,
             onTogglePublic: onTogglePublic,
+            onPlay: onPlay ?? () {},
             onShowOptimizationOptions: onShowOptimizationOptions,
             onSelectCommander: onSelectCommander,
             onImportList: onImportList,
@@ -116,6 +119,7 @@ void main() {
   ) async {
     var validationTapped = 0;
     var optimizationTapped = 0;
+    var playTapped = 0;
     var commanderTapped = 0;
     var importTapped = 0;
     var cardsOpened = 0;
@@ -129,6 +133,7 @@ void main() {
         onForcePricingRefresh: () {},
         onShowPricingDetails: () {},
         onTogglePublic: () {},
+        onPlay: () => playTapped++,
         onShowOptimizationOptions: () => optimizationTapped++,
         onSelectCommander: () => commanderTapped++,
         onImportList: () => importTapped++,
@@ -141,13 +146,18 @@ void main() {
     expect(find.text('99 cartas'), findsOneWidget);
     expect(find.text('Abrir cartas'), findsOneWidget);
     expect(find.text('Abrir análise'), findsNothing);
-    expect(find.text('Otimizar com IA'), findsOneWidget);
+    expect(find.text('Jogar agora'), findsOneWidget);
+    expect(find.text('Otimizar'), findsOneWidget);
     expect(find.text('Atenção na legalidade'), findsOneWidget);
     expect(find.text('Comandante ausente'), findsOneWidget);
     expect(find.text('Deck abaixo de 100 cartas'), findsOneWidget);
     expect(find.text('Descrição'), findsOneWidget);
     expect(find.text('Estratégia'), findsOneWidget);
     expect(find.text('Selecionar'), findsOneWidget);
+
+    await tester.tap(find.text('Jogar agora'));
+    await tester.pump();
+    expect(playTapped, 1);
 
     final commanderPromptTop = tester.getTopLeft(
       find.text(
@@ -175,8 +185,8 @@ void main() {
     await tester.pumpAndSettle();
     expect(commanderTapped, 1);
 
-    await tester.ensureVisible(find.text('Otimizar com IA'));
-    await tester.tap(find.text('Otimizar com IA'));
+    await tester.ensureVisible(find.text('Otimizar'));
+    await tester.tap(find.text('Otimizar'));
     await tester.pumpAndSettle();
     expect(optimizationTapped, 1);
 
@@ -322,5 +332,91 @@ void main() {
     expect(find.text('r'), findsNothing);
     expect(find.text('R'), findsNothing);
     expect(find.text('W'), findsNothing);
+  });
+
+  testWidgets('wide overview uses bounded primary and inspector panes', (
+    tester,
+  ) async {
+    tester.view.physicalSize = const Size(1440, 1000);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
+    await tester.pumpWidget(
+      createSubject(
+        deck: makeCommanderDeck(),
+        totalCards: 100,
+        validationResult: const {'ok': true},
+        onValidationTap: () {},
+        onOpenCards: () {},
+        onForcePricingRefresh: () {},
+        onShowPricingDetails: () {},
+        onTogglePublic: () {},
+        onShowOptimizationOptions: () {},
+        onSelectCommander: () {},
+        onImportList: () {},
+        onEditDescription: (_) {},
+        width: 1280,
+      ),
+    );
+    await tester.pump();
+
+    expect(
+      find.byKey(const Key('deck-overview-desktop-panes')),
+      findsOneWidget,
+    );
+    expect(
+      tester
+          .getSize(find.byKey(const Key('deck-overview-inspector-pane')))
+          .width,
+      AppTheme.inspectorWidth,
+    );
+    expect(
+      tester.getSize(find.byKey(const Key('deck-overview-hero'))).width,
+      lessThanOrEqualTo(AppTheme.contentMaxWidth),
+    );
+
+    final primaryLeft =
+        tester
+            .getTopLeft(find.byKey(const Key('deck-overview-primary-pane')))
+            .dx;
+    final inspectorLeft =
+        tester
+            .getTopLeft(find.byKey(const Key('deck-overview-inspector-pane')))
+            .dx;
+    expect(primaryLeft, lessThan(inspectorLeft));
+  });
+
+  testWidgets('mobile summary keeps mana identity inside readable tiles', (
+    tester,
+  ) async {
+    tester.view.physicalSize = const Size(390, 844);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
+    await tester.pumpWidget(
+      createSubject(
+        deck: makeCommanderDeck().copyWith(
+          colorIdentity: const ['W', 'U', 'B', 'R', 'G'],
+        ),
+        totalCards: 100,
+        validationResult: const {'ok': true},
+        onValidationTap: () {},
+        onOpenCards: () {},
+        onForcePricingRefresh: () {},
+        onShowPricingDetails: () {},
+        onTogglePublic: () {},
+        onShowOptimizationOptions: () {},
+        onSelectCommander: () {},
+        onImportList: () {},
+        onEditDescription: (_) {},
+        width: 390,
+      ),
+    );
+    await tester.pump();
+
+    expect(find.byType(SvgPicture), findsWidgets);
+    expect(tester.takeException(), isNull);
   });
 }

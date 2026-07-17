@@ -76,27 +76,27 @@ void main() {
     await tester.tap(find.text('Open'));
     await tester.pumpAndSettle();
 
-    expect(find.text('Game Modes'), findsOneWidget);
+    expect(find.text('Modos de jogo'), findsOneWidget);
     expect(find.text('Planechase'), findsOneWidget);
     expect(find.text('Archenemy'), findsOneWidget);
     expect(find.text('Bounty'), findsOneWidget);
-    expect(find.text('Available'), findsNWidgets(2));
-    expect(find.text('Unavailable'), findsOneWidget);
-    expect(find.text('Active Now'), findsOneWidget);
-    expect(find.text('Card Pool Open'), findsOneWidget);
-    expect(find.text('Selected'), findsOneWidget);
+    expect(find.text('Disponível'), findsNWidgets(2));
+    expect(find.text('Indisponível'), findsOneWidget);
+    expect(find.text('Ativo agora'), findsOneWidget);
+    expect(find.text('Conjunto de cartas aberto'), findsOneWidget);
+    expect(find.text('Selecionado'), findsOneWidget);
     expect(
-      find.text('This mode is already open in the current game.'),
+      find.text('Este modo já está aberto na partida atual.'),
       findsOneWidget,
     );
     expect(
-      find.text('The card pool editor is already open for this mode.'),
+      find.text('O conjunto de cartas já está aberto para este modo.'),
       findsOneWidget,
     );
-    expect(find.text('Return To Card Pool'), findsOneWidget);
-    expect(find.text('Edit Card Pool'), findsNWidgets(2));
-    expect(find.text('Close Mode'), findsOneWidget);
-    expect(find.text('Close Card Pool'), findsOneWidget);
+    expect(find.text('Voltar ao conjunto de cartas'), findsOneWidget);
+    expect(find.text('Editar conjunto de cartas'), findsNWidgets(2));
+    expect(find.text('Encerrar modo'), findsOneWidget);
+    expect(find.text('Fechar conjunto de cartas'), findsOneWidget);
 
     await tester.ensureVisible(
       find.byKey(const Key('life-counter-native-game-modes-planechase-info')),
@@ -107,10 +107,10 @@ void main() {
     );
     await tester.pumpAndSettle();
 
-    expect(find.text('Quick Rules'), findsOneWidget);
+    expect(find.text('Regras rápidas'), findsOneWidget);
     expect(
       find.text(
-        'Tip: long-press the Planechase button to roll the planar die instantly.',
+        'Dica: mantenha Planechase pressionado para rolar o dado planar imediatamente.',
       ),
       findsOneWidget,
     );
@@ -150,9 +150,9 @@ void main() {
     await tester.tap(find.text('Open'));
     await tester.pumpAndSettle();
 
-    expect(find.text('Continue To Card Pool'), findsOneWidget);
+    expect(find.text('Continuar para o conjunto'), findsOneWidget);
     expect(
-      find.textContaining('Continue to the Planechase card pool editor.'),
+      find.textContaining('Continue para o conjunto de cartas de Planechase.'),
       findsOneWidget,
     );
 
@@ -288,9 +288,9 @@ void main() {
     await tester.tap(find.text('Open'));
     await tester.pumpAndSettle();
 
-    expect(find.text('Selected'), findsOneWidget);
-    expect(find.text('Not Available Right Now'), findsOneWidget);
-    expect(find.text('Open Settings'), findsOneWidget);
+    expect(find.text('Selecionado'), findsOneWidget);
+    expect(find.text('Indisponível no momento'), findsOneWidget);
+    expect(find.text('Abrir configurações'), findsOneWidget);
 
     await tester.ensureVisible(
       find.byKey(
@@ -335,13 +335,15 @@ void main() {
       find.byKey(const Key('life-counter-native-game-modes-limit-warning')),
       findsOneWidget,
     );
-    expect(find.text('Close One Active Mode First'), findsOneWidget);
+    expect(find.text('Encerre um modo ativo primeiro'), findsOneWidget);
     expect(
       find.byKey(const Key('life-counter-native-game-modes-bounty-edit-cards')),
       findsNothing,
     );
     expect(
-      find.textContaining('Only 2 game modes can be active at once'),
+      find.textContaining(
+        'Apenas 2 modos de jogo podem ficar ativos ao mesmo tempo',
+      ),
       findsOneWidget,
     );
 

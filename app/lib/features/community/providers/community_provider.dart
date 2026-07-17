@@ -241,7 +241,9 @@ class CommunityProvider extends ChangeNotifier {
           extras: {'endpoint': '/community/decks'},
         ),
       );
-      _errorMessage = 'Erro de conexão: $e';
+      _errorMessage =
+          'Não foi possível carregar a comunidade agora. Verifique sua '
+          'conexão e tente novamente.';
     }
 
     if (generation == _fetchGeneration) {

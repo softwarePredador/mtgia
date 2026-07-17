@@ -584,7 +584,8 @@ void main() {
       expect(find.text('Detalhes do Deck'), findsOneWidget);
       expect(find.text('Runtime Talrand'), findsOneWidget);
 
-      await tester.tap(find.byTooltip('Otimizar deck'));
+      await tester.ensureVisible(find.text('Otimizar'));
+      await tester.tap(find.text('Otimizar'));
       await tester.pumpAndSettle();
 
       expect(find.text('Otimizar Deck'), findsOneWidget);

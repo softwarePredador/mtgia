@@ -110,6 +110,10 @@ void main() {
         turnTimerActive: true,
         turnTimerSeconds: 125,
         lastTableEvent: 'Primeiro jogador: Jogador 2',
+        playSessionId: 'play-20260716',
+        deckId: 'deck-607',
+        deckName: 'Lorehold reconstruído',
+        startedAtEpochMs: 1784224800000,
       );
 
       await store.save(session);
@@ -117,6 +121,10 @@ void main() {
 
       expect(restored, isNotNull);
       expect(restored!.toJson(), session.toJson());
+      expect(restored.playSessionId, 'play-20260716');
+      expect(restored.deckId, 'deck-607');
+      expect(restored.deckName, 'Lorehold reconstruído');
+      expect(restored.startedAtEpochMs, 1784224800000);
     });
 
     test(

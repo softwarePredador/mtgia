@@ -158,9 +158,9 @@ void main() {
         );
         await tester.pumpAndSettle();
 
-        expect(find.text('Life Counter Settings'), findsOneWidget);
+        expect(find.text('Configurações do contador de vida'), findsOneWidget);
 
-        await tester.tap(find.text('Auto-kill'));
+        await tester.tap(find.text('Nocaute automático'));
         await tester.pumpAndSettle();
 
         await tester.tap(
@@ -244,7 +244,7 @@ void main() {
         );
         await tester.pumpAndSettle();
 
-        expect(find.text('Life Counter History'), findsOneWidget);
+        expect(find.text('Histórico do contador de vida'), findsOneWidget);
         expect(
           find.byKey(const Key('life-counter-native-history-last-event')),
           findsOneWidget,
@@ -806,7 +806,7 @@ void main() {
         );
         await tester.pumpAndSettle();
 
-        expect(find.text('Card Search'), findsOneWidget);
+        expect(find.text('Busca de cartas'), findsOneWidget);
         expect(
           find.byKey(const Key('life-counter-native-card-search-input')),
           findsOneWidget,

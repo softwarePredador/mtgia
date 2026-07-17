@@ -14,67 +14,32 @@ void main() {
     expect(secureExternalCheckoutUri('not a URL'), isNull);
   });
 
-  testWidgets('external checkout exposes and opens the payment action', (
+  testWidgets('free beta never starts or exposes a payment action', (
     tester,
   ) async {
-    Uri? openedUri;
+    var checkoutStarts = 0;
     await tester.pumpWidget(
       MaterialApp(
         home: CheckoutScreen(
-          startCheckout:
-              () async => const CommercialCheckoutResult(
-                activated: false,
-                requiresExternalPayment: true,
-                message: 'Finalize o pagamento para ativar o Pro.',
-                checkoutUrl: 'https://pay.example.com/session/123',
-              ),
-          externalCheckoutLauncher: (uri) async {
-            openedUri = uri;
-            return true;
+          startCheckout: () async {
+            checkoutStarts += 1;
+            return const CommercialCheckoutResult(
+              activated: true,
+              requiresExternalPayment: false,
+              message: 'should not run',
+            );
           },
         ),
       ),
     );
-
-    await tester.tap(find.byKey(const Key('checkout-confirm-button')));
     await tester.pumpAndSettle();
 
-    expect(
-      find.byKey(const Key('checkout-open-payment-button')),
-      findsOneWidget,
-    );
-    expect(find.text('Continuar para pagamento'), findsOneWidget);
-
-    await tester.tap(find.byKey(const Key('checkout-open-payment-button')));
-    await tester.pumpAndSettle();
-
-    expect(openedUri, Uri.parse('https://pay.example.com/session/123'));
-  });
-
-  testWidgets('invalid payment URL is not exposed as an action', (
-    tester,
-  ) async {
-    await tester.pumpWidget(
-      MaterialApp(
-        home: CheckoutScreen(
-          startCheckout:
-              () async => const CommercialCheckoutResult(
-                activated: false,
-                requiresExternalPayment: true,
-                message: 'Finalize o pagamento para ativar o Pro.',
-                checkoutUrl: 'javascript:alert(1)',
-              ),
-        ),
-      ),
-    );
-
-    await tester.tap(find.byKey(const Key('checkout-confirm-button')));
-    await tester.pumpAndSettle();
-
-    expect(
-      find.text('O link de pagamento recebido não é seguro. Tente novamente.'),
-      findsWidgets,
-    );
+    expect(find.byKey(const Key('checkout-beta-notice')), findsOneWidget);
+    expect(find.text('Checkout não é necessário'), findsOneWidget);
+    expect(find.textContaining('Não há assinatura'), findsOneWidget);
+    expect(find.byKey(const Key('checkout-confirm-button')), findsNothing);
     expect(find.byKey(const Key('checkout-open-payment-button')), findsNothing);
+    expect(find.textContaining('R\$'), findsNothing);
+    expect(checkoutStarts, 0);
   });
 }

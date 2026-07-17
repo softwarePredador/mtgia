@@ -145,6 +145,18 @@ DeckCardItem _sampleCard() {
   );
 }
 
+List<DeckCardItem> _sampleCards(int count) {
+  final card = _sampleCard();
+  return List.generate(
+    count,
+    (index) => card.copyWith(
+      id: 'card-${index + 1}',
+      name: 'Carta de teste ${index + 1}',
+      collectorNumber: '${28 + index}',
+    ),
+  );
+}
+
 Map<String, dynamic> _deckDetailsJson() {
   return {
     'id': 'deck-1',
@@ -247,6 +259,87 @@ void main() {
       apiClient.requests.any((r) => r.startsWith('/cards?set=SOC')),
       isTrue,
     );
+  });
+
+  testWidgets('wide search constrains chrome and arranges results in a grid', (
+    tester,
+  ) async {
+    tester.view.devicePixelRatio = 1;
+    tester.view.physicalSize = const Size(1280, 900);
+    addTearDown(tester.view.resetDevicePixelRatio);
+    addTearDown(tester.view.resetPhysicalSize);
+
+    await tester.pumpWidget(
+      ChangeNotifierProvider<CardProvider>(
+        create: (_) => _FixedCardProvider(_sampleCards(4)),
+        child: MaterialApp(
+          theme: AppTheme.darkTheme,
+          home: const CardSearchScreen(deckId: 'binder-1', mode: 'binder'),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(
+      tester.getSize(find.byKey(const Key('card-search-field-frame'))).width,
+      lessThanOrEqualTo(720.1),
+    );
+    expect(
+      tester.getSize(find.byKey(const Key('card-search-tabs-frame'))).width,
+      lessThanOrEqualTo(720.1),
+    );
+    expect(
+      tester.getSize(find.byKey(const Key('card-search-results-frame'))).width,
+      lessThanOrEqualTo(1280.1),
+    );
+    expect(find.byKey(const Key('card-search-results-grid')), findsOneWidget);
+    expect(find.byKey(const Key('card-search-results-list')), findsNothing);
+
+    final first = tester.getRect(
+      find.byKey(const Key('card-search-result-card-1')),
+    );
+    final second = tester.getRect(
+      find.byKey(const Key('card-search-result-card-2')),
+    );
+    expect(first.width, lessThanOrEqualTo(580.1));
+    expect((first.top - second.top).abs(), lessThan(0.1));
+    expect(second.left, greaterThan(first.left));
+    expect(first.left, greaterThanOrEqualTo(AppTheme.pageGutter - 0.1));
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('compact search keeps list results inside twelve pixel gutters', (
+    tester,
+  ) async {
+    tester.view.devicePixelRatio = 1;
+    tester.view.physicalSize = const Size(390, 844);
+    addTearDown(tester.view.resetDevicePixelRatio);
+    addTearDown(tester.view.resetPhysicalSize);
+
+    await tester.pumpWidget(
+      ChangeNotifierProvider<CardProvider>(
+        create: (_) => _FixedCardProvider(_sampleCards(2)),
+        child: MaterialApp(
+          theme: AppTheme.darkTheme,
+          home: const CardSearchScreen(deckId: 'binder-1', mode: 'binder'),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.byKey(const Key('card-search-results-list')), findsOneWidget);
+    expect(find.byKey(const Key('card-search-results-grid')), findsNothing);
+
+    final tile = tester.getRect(
+      find.byKey(const Key('card-search-result-card-1')),
+    );
+    expect(tile.left, greaterThanOrEqualTo(11.9));
+    expect(tile.right, lessThanOrEqualTo(378.1));
+    expect(
+      tester.getSize(find.byKey(const Key('card-search-field-frame'))).width,
+      lessThan(390),
+    );
+    expect(tester.takeException(), isNull);
   });
 
   testWidgets('card search exposes keyed empty and error states', (

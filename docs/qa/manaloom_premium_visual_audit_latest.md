@@ -8,11 +8,14 @@ Este relatorio valida sinais objetivos de drift visual, mas nao substitui prova 
 
 ## Metadata
 
-- Gerado em UTC: `2026-07-07T09:39:15.604808+00:00`
+- Gerado em UTC: `2026-07-16T20:29:14.405119+00:00`
 - Branch: `master`
-- SHA: `f642915b1`
+- SHA: `54541c013`
 - Config: `server/config/premium_visual_qa_surfaces.json`
-- Arquivos auditados: `47`
+- Arquivos inventariados: `65`
+- Arquivos textuais auditados: `63`
+- Caminhos configurados invalidos: `0`
+- Erros bloqueantes de inventario: `0`
 - Life Counter incluido: `True`
 
 ## Fontes de verdade
@@ -51,7 +54,7 @@ Este relatorio valida sinais objetivos de drift visual, mas nao substitui prova 
 | Colecao/Fichario/Marketplace | `08_collection`, `collection_01_binder`, `collection_02_marketplace`, `collection_04_sets_catalog`, `sets_search_04_set_detail` | 0 | menus nao deslocados; tabs e filtros alinhados; cards/empty states; editor modal; marketplace sem default colors |
 | Trades/Mensagens/Notificacoes | `market_trade_05_trade_list`, `market_trade_08_trade_chat`, `messages_01_inbox`, `messages_02_conversation`, `market_trade_11_notifications` | 0 | status chips; linhas de conversa; unread badges; CTA/context menus; empty/loading/error states |
 | Comunidade/Perfil | `07_community`, `09_profile`, `profile_community_02_user_profile`, `profile_community_05_community_deck_detail` | 0 | feed/cards; perfil proprio e publico; badges sociais; botoes seguir/editar; hierarquia de texto |
-| Life Counter/Lotus | `commander_damage_overlay`, `turn_tracker_hint_overlay`, `life_counter_card_search_sheet`, `life_counter_set_life_sheet_35`, `life_counter_player_appearance_presets` | 0 | linguagem tabletop propria; contadores legiveis por jogador; overlays/settings; cores separaveis; touch targets em mesa |
+| Life Counter/Lotus | `life_counter_main_2_players`, `life_counter_main_3_players`, `life_counter_main_4_players`, `life_counter_main_5_players`, `life_counter_main_6_players`, `life_counter_main_4_players_landscape`, `life_counter_menu_open_active_state`, `life_counter_settings`, `life_counter_history`, `commander_damage_overlay`, `turn_tracker_hint_overlay`, `life_counter_card_search_sheet`, `life_counter_set_life_sheet_35`, `life_counter_player_appearance_presets`, `life_counter_player_appearance_custom_image`, `life_counter_exit_flow` | 0 | linguagem tabletop propria; contadores legiveis por jogador; densidade de 2 a 6 jogadores e landscape; overlays/settings e safe areas; cores separaveis e estados ativos; imagem personalizada preservada; touch targets em mesa |
 
 ## Comandos de prova viva obrigatoria
 
@@ -89,4 +92,6 @@ cd app && flutter test integration_test/commander_learned_deck_runtime_test.dart
 ## Sinais detalhados
 
 Nenhum sinal objetivo encontrado.
+VISUAL_PREMIUM_QA_CONFIG_RESULT: issues=0 blocking=0 valid=true
+
 VISUAL_PREMIUM_QA_RESULT: signals=0 P1=0 P2=0 visual_pass=false

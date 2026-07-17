@@ -31,7 +31,8 @@ Future<Response> _getMessages(RequestContext context, String id) async {
     // Verificar participação
     final convResult = await pool.execute(
       Sql.named(
-          'SELECT user_a_id, user_b_id FROM conversations WHERE id = @id'),
+        'SELECT user_a_id, user_b_id FROM conversations WHERE id = @id',
+      ),
       parameters: {'id': id},
     );
     if (convResult.isEmpty) {
@@ -74,7 +75,8 @@ Future<Response> _getMessages(RequestContext context, String id) async {
       // Count completo para paginação tradicional.
       final countFuture = pool.execute(
         Sql.named(
-            'SELECT COUNT(*)::int FROM direct_messages WHERE conversation_id = @id'),
+          'SELECT COUNT(*)::int FROM direct_messages WHERE conversation_id = @id',
+        ),
         parameters: {'id': id},
       );
 
@@ -97,29 +99,27 @@ Future<Response> _getMessages(RequestContext context, String id) async {
       msgResult = queryResults[1];
     }
 
-    final messages = msgResult.map((row) {
-      final m = row.toColumnMap();
-      for (final k in ['read_at', 'created_at']) {
-        if (m[k] is DateTime) m[k] = (m[k] as DateTime).toIso8601String();
-      }
-      return {
-        'id': m['id'],
-        'sender_id': m['sender_id'],
-        'sender_username': m['sender_username'],
-        'sender_display_name': m['sender_display_name'],
-        'sender_avatar_url': m['sender_avatar_url'],
-        'message': m['message'],
-        'read_at': m['read_at'],
-        'created_at': m['created_at'],
-      };
-    }).toList();
+    final messages =
+        msgResult.map((row) {
+          final m = row.toColumnMap();
+          for (final k in ['read_at', 'created_at']) {
+            if (m[k] is DateTime) m[k] = (m[k] as DateTime).toIso8601String();
+          }
+          return {
+            'id': m['id'],
+            'sender_id': m['sender_id'],
+            'sender_username': m['sender_username'],
+            'sender_display_name': m['sender_display_name'],
+            'sender_avatar_url': m['sender_avatar_url'],
+            'message': m['message'],
+            'read_at': m['read_at'],
+            'created_at': m['created_at'],
+          };
+        }).toList();
 
-    return Response.json(body: {
-      'data': messages,
-      'page': page,
-      'limit': limit,
-      'total': total,
-    });
+    return Response.json(
+      body: {'data': messages, 'page': page, 'limit': limit, 'total': total},
+    );
   } catch (e, st) {
     await captureRouteException(
       context,
@@ -128,7 +128,7 @@ Future<Response> _getMessages(RequestContext context, String id) async {
       source: 'conversation_messages_route',
       extras: {
         'operation': 'list_conversation_messages',
-        'conversation_id': id
+        'conversation_id': id,
       },
     );
     Log.e('[ERROR] list conversation messages failed: $e');
@@ -158,7 +158,8 @@ Future<Response> _postMessage(RequestContext context, String id) async {
     // Verificar participação
     final convResult = await pool.execute(
       Sql.named(
-          'SELECT user_a_id, user_b_id FROM conversations WHERE id = @id'),
+        'SELECT user_a_id, user_b_id FROM conversations WHERE id = @id',
+      ),
       parameters: {'id': id},
     );
     if (convResult.isEmpty) {
@@ -176,29 +177,56 @@ Future<Response> _postMessage(RequestContext context, String id) async {
     }
 
     // Determinar o destinatário
-    final receiverId = conv['user_a_id'] == userId
-        ? conv['user_b_id'] as String
-        : conv['user_a_id'] as String;
+    final receiverId =
+        conv['user_a_id'] == userId
+            ? conv['user_b_id'] as String
+            : conv['user_a_id'] as String;
 
-    // Inserir mensagem + atualizar last_message_at em um round-trip.
-    final insertResult = await pool.execute(
-      Sql.named('''
-        WITH inserted AS (
-          INSERT INTO direct_messages (conversation_id, sender_id, message)
-          VALUES (@convId, @senderId, @message)
-          RETURNING id, created_at
-        ),
-        updated AS (
-          UPDATE conversations
-          SET last_message_at = (SELECT created_at FROM inserted)
-          WHERE id = @convId
-          RETURNING id
-        )
-        SELECT inserted.id, inserted.created_at
-        FROM inserted, updated
-      '''),
-      parameters: {'convId': id, 'senderId': userId, 'message': message},
-    );
+    // Trava os participantes ativos antes do insert. Se a exclusão de uma das
+    // contas vencer a corrida, nenhuma mensagem nova é persistida.
+    final insertResult = await pool.runTx((session) async {
+      final participants = <String>[userId, receiverId]..sort();
+      final activeUsers = await session.execute(
+        Sql.named('''
+          SELECT id
+          FROM users
+          WHERE id = ANY(@participantIds::uuid[])
+            AND deleted_at IS NULL
+          ORDER BY id
+          FOR UPDATE
+        '''),
+        parameters: {'participantIds': participants},
+      );
+      if (activeUsers.length != 2) return null;
+
+      return session.execute(
+        Sql.named('''
+          WITH inserted AS (
+            INSERT INTO direct_messages (conversation_id, sender_id, message)
+            VALUES (@convId, @senderId, @message)
+            RETURNING id, created_at
+          ),
+          updated AS (
+            UPDATE conversations
+            SET last_message_at = (SELECT created_at FROM inserted)
+            WHERE id = @convId
+            RETURNING id
+          )
+          SELECT inserted.id, inserted.created_at
+          FROM inserted, updated
+        '''),
+        parameters: {'convId': id, 'senderId': userId, 'message': message},
+      );
+    });
+    if (insertResult == null) {
+      return Response.json(
+        statusCode: HttpStatus.conflict,
+        body: {
+          'error': 'recipient_unavailable',
+          'message': 'O destinatário não está mais disponível.',
+        },
+      );
+    }
 
     final msg = insertResult.first.toColumnMap();
     final createdAt = msg['created_at'];
@@ -223,9 +251,10 @@ Future<Response> _postMessage(RequestContext context, String id) async {
         'conversation_id': id,
         'sender_id': userId,
         'message': message,
-        'created_at': createdAt is DateTime
-            ? createdAt.toIso8601String()
-            : createdAt?.toString(),
+        'created_at':
+            createdAt is DateTime
+                ? createdAt.toIso8601String()
+                : createdAt?.toString(),
       },
     );
   } catch (e, st) {

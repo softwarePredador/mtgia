@@ -61,7 +61,10 @@ class _FakeApiClient extends ApiClient {
   }
 
   @override
-  Future<ApiResponse> delete(String endpoint) async {
+  Future<ApiResponse> delete(
+    String endpoint, {
+    Map<String, dynamic>? body,
+  }) async {
     final handler = _deleteHandlers[endpoint];
     if (handler == null) {
       throw UnimplementedError('No DELETE handler for $endpoint');
@@ -654,9 +657,7 @@ void main() {
                 'status': 'completed',
                 'result_status_code': 200,
                 'result': {
-                  'generated_deck': {
-                    'cards': const <Map<String, dynamic>>[],
-                  },
+                  'generated_deck': {'cards': const <Map<String, dynamic>>[]},
                   'validation': const {'is_valid': true},
                 },
               }),

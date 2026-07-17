@@ -4,6 +4,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:go_router/go_router.dart';
 import 'package:manaloom/core/api/api_client.dart';
 import 'package:manaloom/core/theme/app_theme.dart';
@@ -38,7 +39,11 @@ Directory? _pathProviderTestTempDir;
 var _sqfliteFfiInitialized = false;
 
 void main() {
-  setUp(_installPathProviderMock);
+  setUp(() {
+    _installPathProviderMock();
+    // ignore: invalid_use_of_visible_for_testing_member
+    FlutterSecureStorage.setMockInitialValues(<String, String>{});
+  });
   tearDownAll(() {
     TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
         .setMockMethodCallHandler(
@@ -69,8 +74,8 @@ void main() {
     ).enterText('Password123!');
     await $(find.byKey(const Key('login-submit-button'))).tap();
 
-    await _expectTextEventually($, 'Planos');
-    expect($('Uso de IA Free'), findsOneWidget);
+    await _expectTextEventually($, 'Beta gratuita');
+    expect($(find.byKey(const Key('ai-usage-meter'))), findsOneWidget);
   });
 
   patrolTest('auth register validates mismatch and accepts corrected form', (
@@ -112,13 +117,13 @@ void main() {
 
     await _expectTextEventually(
       $,
-      'Planos',
+      'Beta gratuita',
       timeout: const Duration(seconds: 10),
     );
   });
 
   patrolTest(
-    'commercial paywall opens upgrade when Free AI limit is exhausted',
+    'commercial beta reports the AI limit without exposing a purchase route',
     ($) async {
       await _pumpProductApp(
         $,
@@ -133,46 +138,42 @@ void main() {
       await $(find.byKey(const Key('patrol-open-ai-paywall-button'))).tap();
 
       expect($(find.byKey(const Key('ai-paywall-dialog'))), findsOneWidget);
-      expect($('Otimizar deck precisa do Pro'), findsOneWidget);
+      expect($('Otimizar deck: limite da beta atingido'), findsOneWidget);
+      expect(
+        $(find.byKey(const Key('ai-paywall-upgrade-button'))),
+        findsNothing,
+      );
 
-      await $(find.byKey(const Key('ai-paywall-upgrade-button'))).tap();
+      await $(find.byKey(const Key('ai-beta-limit-dismiss-button'))).tap();
 
-      expect($('Upgrade Pro'), findsOneWidget);
-      expect($('ManaLoom Pro'), findsOneWidget);
+      expect($(find.byKey(const Key('ai-paywall-dialog'))), findsNothing);
     },
   );
 
-  patrolTest('commercial plans navigate through upgrade, checkout and legal', (
+  patrolTest('commercial beta keeps plan, upgrade and checkout routes honest', (
     $,
   ) async {
     await _pumpProductApp($, initialLocation: '/plans');
 
-    expect($('Planos'), findsWidgets);
-    expect($(find.byKey(const Key('plan-card-free'))), findsOneWidget);
-
-    await _scrollUntilVisible($, const Key('plan-card-pro'));
-    expect($(find.byKey(const Key('plan-card-pro'))), findsOneWidget);
+    expect($('Beta gratuita'), findsWidgets);
+    expect($(find.byKey(const Key('beta-free-access-panel'))), findsOneWidget);
+    expect($(find.byKey(const Key('plan-card-pro'))), findsNothing);
 
     await _scrollUntilVisibleAndTap($, const Key('plans-open-legal-button'));
     expect($('Termos de uso'), findsOneWidget);
     expect($('Disclaimer de IA'), findsOneWidget);
+    expect($('Trocas entre usuários'), findsOneWidget);
 
-    await _goTo($, '/plans');
-    await _scrollUntilVisibleAndTap($, const Key('plan-pro-upgrade-button'));
-    expect($('Upgrade Pro'), findsOneWidget);
+    await _goTo($, '/upgrade');
+    expect($(find.byKey(const Key('upgrade-beta-notice'))), findsOneWidget);
+    expect(
+      $(find.byKey(const Key('upgrade-start-checkout-button'))),
+      findsNothing,
+    );
 
-    await $(find.byKey(const Key('upgrade-start-checkout-button'))).tap();
-    expect($('Checkout'), findsOneWidget);
-    expect($('Resumo do pedido'), findsOneWidget);
-
-    await $(find.byKey(const Key('checkout-confirm-button'))).tap();
-    await $.pumpAndSettle();
-
-    await _expectTextEventually($, 'Planos');
-    await _scrollToTop($);
-    expect($('Uso de IA Pro'), findsOneWidget);
-    await _scrollUntilVisible($, const Key('plan-card-pro'));
-    expect($('Pro ativo'), findsOneWidget);
+    await _goTo($, '/checkout');
+    expect($(find.byKey(const Key('checkout-beta-notice'))), findsOneWidget);
+    expect($(find.byKey(const Key('checkout-confirm-button'))), findsNothing);
   });
 
   patrolTest('deckbuilder async generation previews and saves generated deck', (
@@ -333,7 +334,7 @@ void main() {
     expect(authProvider.user?.tradeNotes, 'Trocas em loja local.');
 
     await _scrollUntilVisibleAndTap($, const Key('profile-open-plans-button'));
-    await _expectTextEventually($, 'Planos');
+    await _expectTextEventually($, 'Beta gratuita');
   });
 
   patrolTest('life counter native player counter applies poison changes', (
@@ -407,7 +408,7 @@ void main() {
     );
 
     await $(find.byKey(const Key('patrol-open-player-counter-button'))).tap();
-    await _expectTextEventually($, 'Player Counter');
+    await _expectTextEventually($, 'Marcadores do jogador');
     await _scrollUntilVisible(
       $,
       const Key('life-counter-native-player-counter-value'),
@@ -750,14 +751,6 @@ Future<void> _scrollUntilVisible(PatrolIntegrationTester $, Key key) async {
   await $.pumpAndSettle();
 }
 
-Future<void> _scrollToTop(PatrolIntegrationTester $) async {
-  final scrollable = find.byType(Scrollable).first;
-  for (var i = 0; i < 4; i++) {
-    await $.tester.drag(scrollable, const Offset(0, 500));
-    await $.pumpAndSettle();
-  }
-}
-
 Future<void> _scrollUntilVisibleAndTap(
   PatrolIntegrationTester $,
   Key key,
@@ -1012,13 +1005,12 @@ class _PatrolProductApiClient extends ApiClient {
         'token': 'patrol-login-token',
         'user': _profileUser,
       }),
-      '/users/me/plan/checkout' => ApiResponse(201, {
-        'message': 'Plano Pro ativado.',
-        'plan': {
-          'plan_name': 'pro',
-          'ai_requests_used': 0,
-          'ai_monthly_limit': 2500,
-        },
+      '/users/me/plan/checkout' => ApiResponse(403, {
+        'checkout_status': 'beta_free_only',
+        'beta_mode': true,
+        'billing_enabled': false,
+        'purchase_available': false,
+        'message': 'A beta gratuita não aceita pagamentos.',
       }),
       '/cards/resolve/batch' => ApiResponse(200, {
         'data':

@@ -530,6 +530,7 @@ Future<Response> _getDeckById(RequestContext context, String deckId) async {
     final responseBody = {
       ...deckInfo,
       'color_identity': deckColorIdentity.toList(),
+      'color_identity_known': true,
       'stats': {
         'total_cards': cardsList.fold<int>(
           0,

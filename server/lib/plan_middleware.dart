@@ -56,7 +56,9 @@ Middleware aiPlanLimitMiddleware() {
           body: {
             'error': 'Plano inativo',
             'message':
-                'Seu plano está inativo. Reative para continuar usando IA.',
+                'Seu acesso de IA está inativo. Entre em contato com o suporte para revisão.',
+            'beta_mode': true,
+            'billing_enabled': false,
             'plan_name': snapshot.planName,
             'status': snapshot.status,
           },
@@ -69,12 +71,14 @@ Middleware aiPlanLimitMiddleware() {
           body: {
             'error': 'Limite do plano atingido',
             'message':
-                'Você atingiu o limite de requisições de IA do seu plano atual. Faça upgrade para continuar.',
+                'Você atingiu o limite de IA da beta gratuita. O acesso volta no próximo período de uso.',
+            'beta_mode': true,
+            'billing_enabled': false,
+            'purchase_available': false,
             'plan_name': snapshot.planName,
             'ai_monthly_limit': snapshot.aiMonthlyLimit,
             'ai_requests_used': snapshot.aiRequestsUsed,
             'ai_requests_remaining': snapshot.aiRequestsRemaining,
-            'upgrade_hint': 'Plano Pro libera mais capacidade de otimização.',
           },
           headers: {
             'X-Plan-Name': snapshot.planName,

@@ -31,14 +31,17 @@ void storeDeckDetailsInCache({
 List<Deck> syncDeckColorIdentityToList(
   List<Deck> decks,
   String deckId,
-  List<String> colorIdentity,
-) {
-  if (colorIdentity.isEmpty) return decks;
+  List<String> colorIdentity, {
+  bool identityKnown = true,
+}) {
   return decks
       .map(
         (deck) =>
-            deck.id == deckId && deck.colorIdentity.isEmpty
-                ? deck.copyWith(colorIdentity: colorIdentity)
+            deck.id == deckId && !deck.colorIdentityKnown
+                ? deck.copyWith(
+                  colorIdentity: colorIdentity,
+                  colorIdentityKnown: identityKnown,
+                )
                 : deck,
       )
       .toList();
@@ -49,10 +52,13 @@ List<Deck> applyCachedColorIdentitiesToDeckList(
   Map<String, DeckDetails> cache,
 ) {
   return decks.map((deck) {
-    if (deck.colorIdentity.isNotEmpty) return deck;
+    if (deck.colorIdentityKnown) return deck;
     final cached = cache[deck.id];
-    if (cached == null || cached.colorIdentity.isEmpty) return deck;
-    return deck.copyWith(colorIdentity: cached.colorIdentity);
+    if (cached == null || !cached.colorIdentityKnown) return deck;
+    return deck.copyWith(
+      colorIdentity: cached.colorIdentity,
+      colorIdentityKnown: true,
+    );
   }).toList();
 }
 
@@ -72,7 +78,7 @@ DeckListHydrationResult buildDeckListHydrationResult(
 
 List<Deck> decksMissingColorIdentity(List<Deck> decks) {
   return decks
-      .where((deck) => deck.colorIdentity.isEmpty && deck.cardCount > 0)
+      .where((deck) => !deck.colorIdentityKnown && deck.cardCount > 0)
       .toList();
 }
 
@@ -184,7 +190,7 @@ Future<DeckColorIdentityEnrichmentResult> fetchMissingDeckColorIdentities(
     try {
       final state = await fetchDeckDetailsRequest(apiClient, deck.id);
       final details = state.selectedDeck;
-      if (details != null && details.colorIdentity.isNotEmpty) {
+      if (details != null && details.colorIdentityKnown) {
         detailsByDeckId[deck.id] = details;
       } else if (state.statusCode != 200) {
         failedDeckIds.add(deck.id);
@@ -213,6 +219,7 @@ DeckColorIdentityApplyResult applyDeckColorIdentityEnrichment(
       nextDecks,
       details.id,
       details.colorIdentity,
+      identityKnown: details.colorIdentityKnown,
     );
   }
 
