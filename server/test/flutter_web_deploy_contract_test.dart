@@ -30,6 +30,16 @@ void main() {
     expect(nginx, contains('add_header Referrer-Policy'));
     expect(nginx, contains('add_header Permissions-Policy'));
     expect(nginx, contains('add_header Strict-Transport-Security'));
+    expect(
+      nginx,
+      contains(
+        "script-src 'self' 'unsafe-inline' 'unsafe-eval' blob: "
+        'https://browser.sentry-cdn.com;',
+      ),
+      reason:
+          'The production Sentry browser SDK must be permitted without '
+          'widening script-src to arbitrary HTTPS origins',
+    );
     expect(deploy, contains('--base-href /app/'));
     expect(
       deploy,
