@@ -236,6 +236,14 @@ ${LotusDomSelectors.playerCard} .commander-damage-counters .counter.commander-da
     0 10px 18px rgba(0, 0, 0, 0.26);
 }
 
+.switch-to-own-damage {
+  background-color: rgba(5, 10, 23, 0.94) !important;
+  border: 1px solid rgba(224, 165, 51, 0.82) !important;
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 255, 255, 0.08),
+    0 10px 24px rgba(0, 0, 0, 0.34) !important;
+}
+
 ${LotusDomSelectors.menuButton},
 .day-night-switcher,
 .planechase-btn,

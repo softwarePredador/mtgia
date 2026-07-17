@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter_test/flutter_test.dart';
 import 'package:manaloom/features/home/lotus/lotus_visual_skin.dart';
 import 'package:manaloom/features/home/lotus/lotus_webview_contract.dart';
@@ -97,6 +99,17 @@ void main() {
       expect(lotusInjectedVisualSkinScript, contains('clamp(13px, 4vw, 19px)'));
       expect(lotusInjectedVisualSkinScript, contains('white-space: normal'));
       expect(lotusInjectedVisualSkinScript, contains('word-break: break-word'));
+    });
+
+    test('replaces the Lotus dagger with the ManaLoom commander mark', () {
+      final commanderMark =
+          File('assets/lotus/images/dagger.svg').readAsStringSync();
+
+      expect(commanderMark, contains('Dano de comandante ManaLoom'));
+      expect(commanderMark, contains('M14.5 17.5 3 6V3h3'));
+      expect(commanderMark, isNot(contains('M22.5 27.18')));
+      expect(lotusInjectedVisualSkinScript, contains('.switch-to-own-damage'));
+      expect(lotusInjectedVisualSkinScript, contains('rgba(224, 165, 51'));
     });
 
     test('keeps the tabletop restrained and touch targets readable', () {
