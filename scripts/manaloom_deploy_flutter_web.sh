@@ -291,6 +291,7 @@ build_args=(
   web
   --release
   --base-href /app/
+  --no-web-resources-cdn
   --dart-define="API_BASE_URL=$API_BASE_URL"
   --dart-define="PUBLIC_API_BASE_URL=$API_BASE_URL"
   --dart-define="SENTRY_ENVIRONMENT=production"

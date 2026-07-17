@@ -169,6 +169,7 @@ for invalid_origins in "${INVALID_ORIGIN_LISTS[@]}"; do
 done
 
 NGINX="$ROOT_DIR/app/web/nginx.conf"
+FLUTTER_WEB_DEPLOY="$ROOT_DIR/scripts/manaloom_deploy_flutter_web.sh"
 grep -Fq '"/app/release.json" "no-cache, no-store, must-revalidate"' "$NGINX"
 grep -Fq '"/app/flutter_bootstrap.js" "no-cache, must-revalidate"' "$NGINX"
 grep -Fq '"/app/main.dart.js" "no-cache, must-revalidate"' "$NGINX"
@@ -176,6 +177,7 @@ grep -Fq '~*^/app/assets/assets/lotus/ "no-cache, must-revalidate"' "$NGINX"
 grep -Fq 'Content-Security-Policy' "$NGINX"
 grep -Fq "object-src 'none'" "$NGINX"
 grep -Fq 'Permissions-Policy "camera=(self), microphone=(), geolocation=()"' "$NGINX"
+grep -Fq -- '--no-web-resources-cdn' "$FLUTTER_WEB_DEPLOY"
 if [[ "$(grep -c 'add_header Cache-Control' "$NGINX")" != "1" ]]; then
   echo "nginx deve declarar Cache-Control uma unica vez no server" >&2
   exit 1

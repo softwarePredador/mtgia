@@ -31,6 +31,13 @@ void main() {
     expect(nginx, contains('add_header Permissions-Policy'));
     expect(nginx, contains('add_header Strict-Transport-Security'));
     expect(deploy, contains('--base-href /app/'));
+    expect(
+      deploy,
+      contains('--no-web-resources-cdn'),
+      reason:
+          'Flutter runtime assets must remain same-origin so the production '
+          'CSP cannot block CanvasKit during bootstrap',
+    );
     expect(deploy, contains('MANALOOM_FLUTTER_WEB_SERVICE:-manaloom-app'));
     expect(deploy, contains('PathPrefix(\\`/app/\\`)'));
     expect(deploy, contains('worktree add --detach'));
