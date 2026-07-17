@@ -37,6 +37,10 @@ for web_deploy in \
     exit 1
   fi
 done
+grep -Fq 'flutter_web_release_marker()' \
+  "$ROOT_DIR/scripts/manaloom_deploy_flutter_web.sh"
+grep -Fq 'printf '\''flutter_bootstrap.js:%s'\''' \
+  "$ROOT_DIR/scripts/manaloom_deploy_flutter_web.sh"
 
 MOTD_DIGEST="$TMP_DIR/repo-digest-output"
 printf '%s\n' \

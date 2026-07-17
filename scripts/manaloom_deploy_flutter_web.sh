@@ -125,6 +125,27 @@ trpc_post() {
     "$EASYPANEL_BASE_URL/api/trpc/$procedure"
 }
 
+flutter_web_release_marker() {
+  local marker_hash
+  if marker_hash="$(
+    curl -fsS "$PUBLIC_BASE_URL/app/release.json" 2>/dev/null |
+      shasum -a 256 | awk '{print $1}'
+  )"; then
+    printf 'release.json:%s' "$marker_hash"
+    return 0
+  fi
+  # The pre-release legacy image did not expose release.json. Its immutable
+  # service digest is still the primary rollback identity; hashing the
+  # bootstrap provides an independent external proof that the same legacy
+  # payload was restored. Every newly published release still requires
+  # release.json in the success gate below.
+  marker_hash="$(
+    curl -fsS "$PUBLIC_BASE_URL/app/flutter_bootstrap.js" 2>/dev/null |
+      shasum -a 256 | awk '{print $1}'
+  )"
+  printf 'flutter_bootstrap.js:%s' "$marker_hash"
+}
+
 DEPLOY_MUTATION_STARTED=0
 DEPLOY_COMMITTED=0
 SOURCE_MUTATED=0
@@ -133,11 +154,11 @@ ROLLBACK_SOURCE_IMAGE=""
 PREVIOUS_SPEC_IMAGE=""
 PREVIOUS_RUNNING_IMAGE=""
 PREVIOUS_UPDATE_STATE=""
-PREVIOUS_RELEASE_HASH=""
+PREVIOUS_RELEASE_MARKER=""
 
 rollback_flutter_web() {
   local runtime_status=1 configured_status=1 health_status=1
-  local services_json configured_image rollback_state release_hash
+  local services_json configured_image rollback_state release_marker
 
   echo "deploy Flutter Web falhou; restaurando origem e digest anteriores" >&2
   if [[ "$SOURCE_MUTATED" == "1" && -n "$ROLLBACK_SOURCE_IMAGE" ]]; then
@@ -209,9 +230,8 @@ exit 1
   fi
 
   for _ in $(seq 1 30); do
-    if release_hash="$(curl -fsS "$PUBLIC_BASE_URL/app/release.json" 2>/dev/null | \
-         shasum -a 256 | awk '{print $1}')" &&
-       [[ "$release_hash" == "$PREVIOUS_RELEASE_HASH" ]]; then
+    if release_marker="$(flutter_web_release_marker)" &&
+       [[ "$release_marker" == "$PREVIOUS_RELEASE_MARKER" ]]; then
       health_status=0
       break
     fi
@@ -220,7 +240,7 @@ exit 1
 
   if [[ "$runtime_status" == "0" && "$configured_status" == "0" &&
         "$health_status" == "0" ]]; then
-    echo "rollback Flutter Web comprovado: origem, digest e release.json restaurados" >&2
+    echo "rollback Flutter Web comprovado: origem, digest e marcador externo restaurados" >&2
     return 0
   fi
   echo "CRITICAL: rollback Flutter Web nao foi comprovado (runtime=$runtime_status configured=$configured_status health=$health_status)" >&2
@@ -478,8 +498,7 @@ ROLLBACK_SOURCE_IMAGE="$PREVIOUS_SPEC_IMAGE"
 if [[ "$PREVIOUS_SOURCE_IMAGE" != "$ROLLBACK_SOURCE_IMAGE" ]]; then
   echo "origem EasyPanel anterior sera normalizada para o digest imutavel da spec durante eventual rollback" >&2
 fi
-PREVIOUS_RELEASE_HASH="$(curl -fsS "$PUBLIC_BASE_URL/app/release.json" | \
-  shasum -a 256 | awk '{print $1}')"
+PREVIOUS_RELEASE_MARKER="$(flutter_web_release_marker)"
 
 DEPLOY_MUTATION_STARTED=1
 ssh -o BatchMode=yes -i "$SSH_KEY" "$SSH_HOST" "
