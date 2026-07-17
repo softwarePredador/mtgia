@@ -165,7 +165,7 @@ class TrustedProxyPolicy {
     String? remoteAddress,
   }) {
     if (!isEnabled) {
-      final directPeer = InternetAddress.tryParse(remoteAddress ?? '');
+      final directPeer = _parseCanonicalInternetAddress(remoteAddress);
       if (directPeer != null) {
         return ClientIdentityResolution.success(
           directPeer.address,
@@ -178,7 +178,7 @@ class TrustedProxyPolicy {
       );
     }
 
-    final peer = InternetAddress.tryParse(remoteAddress ?? '');
+    final peer = _parseCanonicalInternetAddress(remoteAddress);
     if (peer == null) {
       return const ClientIdentityResolution.failure('missing_remote_peer');
     }
@@ -204,16 +204,19 @@ class TrustedProxyPolicy {
     // cannot move the trusted client hop when the edge proxy appends/overwrites
     // the actual peer address as required by the deployment contract.
     final clientIndex = chain.length - trustedHops;
+    InternetAddress? clientAddress;
     for (var index = clientIndex; index < chain.length; index++) {
-      if (InternetAddress.tryParse(chain[index]) == null) {
+      final address = _parseCanonicalInternetAddress(chain[index]);
+      if (address == null) {
         return const ClientIdentityResolution.failure(
           'invalid_forwarded_for_address',
         );
       }
+      if (index == clientIndex) clientAddress = address;
     }
 
     return ClientIdentityResolution.success(
-      chain[clientIndex],
+      clientAddress!.address,
       source: ClientIdentitySource.trustedForwardedFor,
     );
   }
@@ -271,7 +274,7 @@ class _IpNetwork {
   static _IpNetwork? tryParse(String value) {
     final separator = value.indexOf('/');
     final addressText = separator == -1 ? value : value.substring(0, separator);
-    final address = InternetAddress.tryParse(addressText);
+    final address = _parseCanonicalInternetAddress(addressText);
     if (address == null) return null;
 
     final bitLength = address.rawAddress.length * 8;
@@ -314,6 +317,23 @@ class _IpNetwork {
     final mask = (0xff << (8 - remainingBits)) & 0xff;
     return (candidate[fullBytes] & mask) == (networkBytes[fullBytes] & mask);
   }
+}
+
+/// Dart Frog's production server binds to [InternetAddress.anyIPv6]. IPv4
+/// connections can therefore surface as IPv4-mapped IPv6 peers
+/// (`::ffff:a.b.c.d`). Canonicalizing that transport representation before
+/// CIDR comparison keeps the allowlist exact without broadening trusted peers.
+InternetAddress? _parseCanonicalInternetAddress(String? value) {
+  final parsed = InternetAddress.tryParse(value?.trim() ?? '');
+  if (parsed == null) return null;
+  final bytes = parsed.rawAddress;
+  final isIpv4MappedIpv6 =
+      bytes.length == 16 &&
+      bytes.take(10).every((byte) => byte == 0) &&
+      bytes[10] == 0xff &&
+      bytes[11] == 0xff;
+  if (!isIpv4MappedIpv6) return parsed;
+  return InternetAddress.tryParse(bytes.sublist(12).join('.'));
 }
 
 String _buildNonProxyFingerprint(Map<String, String> headers) {

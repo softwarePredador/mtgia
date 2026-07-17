@@ -119,6 +119,37 @@ void main() {
       expect(identity.source, ClientIdentitySource.trustedForwardedFor);
     });
 
+    test('canonicalizes IPv4-mapped IPv6 peers without widening trust', () {
+      final identity = resolveRateLimitClientIdentity(
+        headers: const {'X-Forwarded-For': '::ffff:203.0.113.10'},
+        environment: const {
+          'ENVIRONMENT': 'production',
+          'MANALOOM_TRUSTED_PROXY_HOPS': '1',
+          'MANALOOM_TRUSTED_PROXY_PEERS': '10.0.0.42/32',
+        },
+        remoteAddress: '::ffff:10.0.0.42',
+      );
+
+      expect(identity.isValid, isTrue);
+      expect(identity.identifier, '203.0.113.10');
+      expect(identity.source, ClientIdentitySource.trustedForwardedFor);
+    });
+
+    test('still rejects a mapped peer outside the exact IPv4 allowlist', () {
+      final identity = resolveRateLimitClientIdentity(
+        headers: const {'X-Forwarded-For': '203.0.113.10'},
+        environment: const {
+          'ENVIRONMENT': 'production',
+          'MANALOOM_TRUSTED_PROXY_HOPS': '1',
+          'MANALOOM_TRUSTED_PROXY_PEERS': '10.0.0.42/32',
+        },
+        remoteAddress: '::ffff:10.0.0.43',
+      );
+
+      expect(identity.isValid, isFalse);
+      expect(identity.failureCode, 'untrusted_proxy_peer');
+    });
+
     test('rejects missing, short or malformed trusted proxy chains', () {
       const environment = {
         'ENVIRONMENT': 'production',
