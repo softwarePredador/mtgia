@@ -414,9 +414,8 @@ COPYFILE_DISABLE=1 tar --no-mac-metadata -C "$WORKTREE_DIR/app" -czf - Dockerfil
 # Capture the final remote registry RepoDigest after both tag pushes. All
 # deployment/configuration calls below use only this immutable reference.
 # shellcheck disable=SC2087
-IMAGE_DIGEST_REF="$(
-  ssh -o BatchMode=yes -i "$SSH_KEY" "$SSH_HOST" <<REMOTE |
-    extract_manaloom_repo_digest_ref "$IMAGE_REPO"
+IMAGE_DIGEST_OUTPUT="$(
+  ssh -o BatchMode=yes -i "$SSH_KEY" "$SSH_HOST" <<REMOTE
 set -euo pipefail
 cd '$REMOTE_DIR'
 docker build -f Dockerfile.web -t '$IMAGE' -t '$IMAGE_REPO:latest' . >&2
@@ -437,6 +436,10 @@ fi
 printf '%s\n' "\$image_digest_ref"
 REMOTE
 )"
+IMAGE_DIGEST_REF="$(
+  extract_manaloom_repo_digest_ref "$IMAGE_REPO" <<<"$IMAGE_DIGEST_OUTPUT"
+)"
+unset IMAGE_DIGEST_OUTPUT
 image_digest="${IMAGE_DIGEST_REF#"$IMAGE_REPO@sha256:"}"
 if [[ "$IMAGE_DIGEST_REF" != "$IMAGE_REPO@sha256:$image_digest" ||
       ! "$image_digest" =~ ^[0-9a-f]{64}$ ]]; then
