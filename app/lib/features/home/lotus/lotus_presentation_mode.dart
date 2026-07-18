@@ -4,6 +4,9 @@ import 'package:flutter/services.dart';
 class LotusPresentationMode {
   LotusPresentationMode._();
 
+  static int _activeClients = 0;
+  static Future<void> _operationQueue = Future<void>.value();
+
   static const SystemUiOverlayStyle _overlayStyle = SystemUiOverlayStyle(
     statusBarColor: Colors.transparent,
     systemNavigationBarColor: Colors.black,
@@ -12,7 +15,32 @@ class LotusPresentationMode {
     statusBarBrightness: Brightness.dark,
   );
 
-  static Future<void> enter() async {
+  static Future<void> enter() {
+    _activeClients += 1;
+    return _enqueueDesiredState();
+  }
+
+  static Future<void> exit() {
+    if (_activeClients > 0) {
+      _activeClients -= 1;
+    }
+    return _enqueueDesiredState();
+  }
+
+  static Future<void> _enqueueDesiredState() {
+    _operationQueue = _operationQueue.then<void>(
+      (_) => _applyDesiredState(),
+      onError: (Object _, StackTrace _) => _applyDesiredState(),
+    );
+    return _operationQueue;
+  }
+
+  static Future<void> _applyDesiredState() async {
+    if (_activeClients == 0) {
+      await _applyExit();
+      return;
+    }
+
     await SystemChrome.setPreferredOrientations([
       DeviceOrientation.landscapeLeft,
       DeviceOrientation.landscapeRight,
@@ -24,9 +52,9 @@ class LotusPresentationMode {
     SystemChrome.setSystemUIOverlayStyle(_overlayStyle);
   }
 
-  static Future<void> exit() async {
-    SystemChrome.setPreferredOrientations(DeviceOrientation.values);
-    SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
+  static Future<void> _applyExit() async {
+    await SystemChrome.setPreferredOrientations(DeviceOrientation.values);
+    await SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
     SystemChrome.setSystemUIOverlayStyle(_overlayStyle);
   }
 }

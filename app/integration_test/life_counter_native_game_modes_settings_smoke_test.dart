@@ -68,10 +68,10 @@ void main() {
       await state.debugHandleShellMessage(
         '{"type":"open-native-game-modes","source":"archenemy_mode_pressed","preferredMode":"archenemy"}',
       );
-      await _pumpUntilVisible(tester, find.text('Game Modes'));
+      await _pumpUntilVisible(tester, find.text('Modos de jogo'));
       await tester.pumpAndSettle();
 
-      expect(find.text('Game Modes'), findsOneWidget);
+      expect(find.text('Modos de jogo'), findsOneWidget);
       expect(
         find.byKey(
           const Key('life-counter-native-game-modes-archenemy-settings'),
@@ -79,21 +79,24 @@ void main() {
         findsOneWidget,
       );
 
-      await tester.ensureVisible(
-        find.byKey(
-          const Key('life-counter-native-game-modes-archenemy-settings'),
-        ),
+      final settingsButton = find.byKey(
+        const Key('life-counter-native-game-modes-archenemy-settings'),
       );
-      await tester.tap(
-        find.byKey(
-          const Key('life-counter-native-game-modes-archenemy-settings'),
-        ),
-        warnIfMissed: false,
+      await tester.scrollUntilVisible(
+        settingsButton,
+        250,
+        scrollable: find.byType(Scrollable).first,
       );
-      await _pumpUntilVisible(tester, find.text('Life Counter Settings'));
+      await tester.ensureVisible(settingsButton);
+      await tester.pumpAndSettle();
+      await tester.tap(settingsButton);
+      await _pumpUntilVisible(
+        tester,
+        find.text('Configurações do contador de vida'),
+      );
       await tester.pumpAndSettle();
 
-      expect(find.text('Life Counter Settings'), findsOneWidget);
+      expect(find.text('Configurações do contador de vida'), findsOneWidget);
     },
   );
 }

@@ -133,7 +133,7 @@ void main() {
       await tester.pump();
       await tester.pump(const Duration(milliseconds: 600));
 
-      expect(find.text('Player State'), findsOneWidget);
+      expect(find.text('Estado do jogador'), findsOneWidget);
 
       await tester.scrollUntilVisible(
         find.byKey(const Key('life-counter-native-player-state-set-life')),
@@ -176,7 +176,7 @@ void main() {
       await tester.pump();
       await tester.pump(const Duration(milliseconds: 600));
 
-      expect(find.text('Player State'), findsOneWidget);
+      expect(find.text('Estado do jogador'), findsOneWidget);
 
       await tester.tap(
         find.byKey(const Key('life-counter-native-player-state-apply')),

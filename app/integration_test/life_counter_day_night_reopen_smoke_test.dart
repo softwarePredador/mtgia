@@ -98,10 +98,10 @@ void main() {
       await screenState.debugHandleShellMessage(
         '{"type":"open-native-day-night","source":"day_night_surface_pressed"}',
       );
-      await _pumpUntilVisible(tester, find.text('Day / Night'));
+      await _pumpUntilVisible(tester, find.text('Dia / Noite'));
       await tester.pumpAndSettle();
 
-      await tester.tap(find.text('Night'));
+      await tester.tap(find.text('Noite'));
       await tester.pumpAndSettle();
       await tester.tap(
         find.byKey(const Key('life-counter-native-day-night-apply')),

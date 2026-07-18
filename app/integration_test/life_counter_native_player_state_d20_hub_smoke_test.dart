@@ -57,7 +57,7 @@ Future<LifeCounterSession?> _pumpUntilPlayerD20Applied(
     attempt < 20 &&
         (session == null ||
             session.lastPlayerRolls[1] == null ||
-            !(session.lastTableEvent?.startsWith('Player 2 rolou D20: ') ??
+            !(session.lastTableEvent?.startsWith('Jogador 2 rolou D20: ') ??
                 false));
     attempt += 1
   ) {
@@ -133,7 +133,7 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      expect(find.text('Player State'), findsOneWidget);
+      expect(find.text('Estado do jogador'), findsOneWidget);
 
       await tester.scrollUntilVisible(
         find.byKey(const Key('life-counter-native-player-state-roll-d20')),
@@ -164,7 +164,7 @@ void main() {
       );
       expect(session, isNotNull);
       expect(session!.lastPlayerRolls[1], isNotNull);
-      expect(session.lastTableEvent, startsWith('Player 2 rolou D20: '));
+      expect(session.lastTableEvent, startsWith('Jogador 2 rolou D20: '));
 
       final hubState = await _readPlayerStateD20HubState(
         tester,

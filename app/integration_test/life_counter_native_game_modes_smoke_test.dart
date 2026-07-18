@@ -64,14 +64,14 @@ void main() {
       await state.debugHandleShellMessage(
         '{"type":"open-native-game-modes","source":"quick_actions_game_modes"}',
       );
-      await _pumpUntilVisible(tester, find.text('Game Modes'));
+      await _pumpUntilVisible(tester, find.text('Modos de jogo'));
       await tester.pumpAndSettle();
 
-      expect(find.text('Game Modes'), findsOneWidget);
+      expect(find.text('Modos de jogo'), findsOneWidget);
       expect(find.text('Planechase'), findsOneWidget);
       expect(find.text('Archenemy'), findsOneWidget);
       expect(find.text('Bounty'), findsOneWidget);
-      expect(find.text('Available'), findsNWidgets(3));
+      expect(find.text('Disponível'), findsNWidgets(3));
     },
   );
 }

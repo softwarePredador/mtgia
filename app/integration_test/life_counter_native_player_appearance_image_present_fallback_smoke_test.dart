@@ -143,7 +143,7 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      expect(find.text('Player Appearance'), findsOneWidget);
+      expect(find.text('Aparência do jogador'), findsOneWidget);
 
       await tester.scrollUntilVisible(
         find.byKey(const Key('life-counter-native-player-appearance-preset-2')),

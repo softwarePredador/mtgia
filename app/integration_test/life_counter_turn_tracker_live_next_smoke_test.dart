@@ -145,7 +145,7 @@ void main() {
     );
     await tester.pumpAndSettle();
 
-    expect(find.text('Turn Tracker'), findsOneWidget);
+    expect(find.text('Controle de turnos'), findsOneWidget);
 
     await tester.scrollUntilVisible(
       find.byKey(const Key('life-counter-native-turn-tracker-next')),

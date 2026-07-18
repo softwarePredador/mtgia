@@ -140,7 +140,7 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      expect(find.text('Commander Damage'), findsOneWidget);
+      expect(find.text('Dano de comandante'), findsOneWidget);
 
       await tester.scrollUntilVisible(
         find.byKey(const Key('life-counter-native-commander-damage-plus-1-c1')),

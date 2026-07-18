@@ -59,13 +59,6 @@ Future<void> captureVisualProof(
     print('CAPTURE_ERROR $name $error');
     // ignore: avoid_print
     print(stackTrace);
-    _surfaceConverted = false;
-    await _ensureSurfaceConverted(binding, '${name}_retry');
-    final screenshot = await binding
-        .takeScreenshot(name)
-        .timeout(const Duration(seconds: 90));
-    // ignore: avoid_print
-    print('CAPTURE_TAKEN $name bytes=${screenshot.length}');
-    _emitScreenshot(name, screenshot);
+    throw TestFailure('Visual proof "$name" could not be captured: $error');
   }
 }

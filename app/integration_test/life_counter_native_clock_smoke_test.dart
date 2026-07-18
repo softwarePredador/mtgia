@@ -80,7 +80,7 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      expect(find.text('Game Timer'), findsOneWidget);
+      expect(find.text('Cronômetro da partida'), findsOneWidget);
     },
   );
 }

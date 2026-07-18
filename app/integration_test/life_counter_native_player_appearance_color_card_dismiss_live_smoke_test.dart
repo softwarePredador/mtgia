@@ -172,9 +172,9 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      expect(find.text('Player Appearance'), findsOneWidget);
+      expect(find.text('Aparência do jogador'), findsOneWidget);
 
-      await tester.tap(find.text('Cancel'));
+      await tester.tap(find.text('Cancelar'));
       await tester.pumpAndSettle();
 
       final session = await sessionStore.load();

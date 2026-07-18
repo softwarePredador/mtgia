@@ -137,7 +137,7 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      expect(find.text('Player State'), findsOneWidget);
+      expect(find.text('Estado do jogador'), findsOneWidget);
 
       await tester.scrollUntilVisible(
         find.byKey(
@@ -175,7 +175,7 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      expect(find.text('Player State'), findsOneWidget);
+      expect(find.text('Estado do jogador'), findsOneWidget);
 
       await tester.tap(
         find.byKey(const Key('life-counter-native-player-state-apply')),

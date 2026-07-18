@@ -89,7 +89,7 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      expect(find.text('Player State'), findsOneWidget);
+      expect(find.text('Estado do jogador'), findsOneWidget);
       await captureVisualProof(binding, tester, 'life_counter_02_player_state');
 
       await tester.scrollUntilVisible(
@@ -109,7 +109,6 @@ void main() {
         find.byKey(
           const Key('life-counter-native-player-state-partner-toggle'),
         ),
-        warnIfMissed: false,
       );
       await tester.pumpAndSettle();
 
@@ -207,7 +206,7 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      expect(find.text('Player State'), findsOneWidget);
+      expect(find.text('Estado do jogador'), findsOneWidget);
       await captureVisualProof(
         binding,
         tester,

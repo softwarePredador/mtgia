@@ -59,9 +59,9 @@ Future<LifeCounterSession?> _pumpUntilHighRollApplied(
         (session == null ||
             session.lastHighRolls.whereType<int>().length !=
                 session.playerCount ||
-            !(session.lastTableEvent?.startsWith('High Roll') ?? false) &&
+            !(session.lastTableEvent?.startsWith('Maior rolagem') ?? false) &&
                 !(session.lastTableEvent?.startsWith(
-                      'Desempate do High Roll',
+                      'Desempate da maior rolagem',
                     ) ??
                     false));
     attempt += 1
@@ -81,9 +81,9 @@ Future<LifeCounterHistoryState?> _pumpUntilHistoryMirrorsLastEvent(
     var attempt = 0;
     attempt < 20 &&
         (history == null ||
-            !(history.lastTableEvent?.startsWith('High Roll') ?? false) &&
+            !(history.lastTableEvent?.startsWith('Maior rolagem') ?? false) &&
                 !(history.lastTableEvent?.startsWith(
-                      'Desempate do High Roll',
+                      'Desempate da maior rolagem',
                     ) ??
                     false));
     attempt += 1
@@ -130,11 +130,19 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      expect(find.text('Dice Tools'), findsOneWidget);
+      expect(find.text('Ferramentas de dados'), findsOneWidget);
 
-      await tester.tap(
-        find.byKey(const Key('life-counter-native-dice-high-roll')),
+      final highRollButton = find.byKey(
+        const Key('life-counter-native-dice-high-roll'),
       );
+      await tester.scrollUntilVisible(
+        highRollButton,
+        250,
+        scrollable: find.byType(Scrollable).first,
+      );
+      await tester.ensureVisible(highRollButton);
+      await tester.pumpAndSettle();
+      await tester.tap(highRollButton);
       await tester.pumpAndSettle();
 
       await tester.tap(find.byKey(const Key('life-counter-native-dice-apply')));
@@ -152,8 +160,8 @@ void main() {
         session.playerCount,
       );
       expect(
-        session.lastTableEvent?.startsWith('High Roll') == true ||
-            session.lastTableEvent?.startsWith('Desempate do High Roll') ==
+        session.lastTableEvent?.startsWith('Maior rolagem') == true ||
+            session.lastTableEvent?.startsWith('Desempate da maior rolagem') ==
                 true,
         isTrue,
       );

@@ -188,15 +188,15 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      expect(find.text('Player State'), findsOneWidget);
+      expect(find.text('Estado do jogador'), findsOneWidget);
       await tester.scrollUntilVisible(
-        find.text('Partner commander'),
+        find.text('Comandante parceiro'),
         250,
         scrollable: find.byType(Scrollable).first,
       );
-      await tester.ensureVisible(find.text('Partner commander'));
+      await tester.ensureVisible(find.text('Comandante parceiro'));
       await tester.pumpAndSettle();
-      await tester.tap(find.text('Partner commander'));
+      await tester.tap(find.text('Comandante parceiro'));
       await tester.pumpAndSettle();
 
       await tester.tap(

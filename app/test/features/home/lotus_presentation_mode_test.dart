@@ -31,9 +31,13 @@ void main() {
       'DeviceOrientation.landscapeLeft',
       'DeviceOrientation.landscapeRight',
     ]);
+
+    await LotusPresentationMode.exit();
   });
 
   test('restores every orientation when leaving the life counter', () async {
+    await LotusPresentationMode.enter();
+    platformCalls.clear();
     await LotusPresentationMode.exit();
 
     final orientationCall = platformCalls.firstWhere(
@@ -45,5 +49,24 @@ void main() {
       'DeviceOrientation.portraitDown',
       'DeviceOrientation.landscapeRight',
     ]);
+  });
+
+  test('keeps landscape when one counter exits while another enters', () async {
+    final firstEnter = LotusPresentationMode.enter();
+    final firstExit = LotusPresentationMode.exit();
+    final secondEnter = LotusPresentationMode.enter();
+
+    await Future.wait([firstEnter, firstExit, secondEnter]);
+
+    final orientationCalls = platformCalls
+        .where((call) => call.method == 'SystemChrome.setPreferredOrientations')
+        .toList(growable: false);
+    expect(orientationCalls, isNotEmpty);
+    expect(orientationCalls.last.arguments, <String>[
+      'DeviceOrientation.landscapeLeft',
+      'DeviceOrientation.landscapeRight',
+    ]);
+
+    await LotusPresentationMode.exit();
   });
 }

@@ -33,42 +33,6 @@ Future<void> _seedFourPlayerSession() async {
   );
 }
 
-void _emitScreenshot(String name, List<int> pngBytes) {
-  final encoded = base64Encode(pngBytes);
-  const chunkSize = 12000;
-  // ignore: avoid_print
-  print('SCREENSHOT_BEGIN $name');
-  for (var offset = 0; offset < encoded.length; offset += chunkSize) {
-    final end =
-        (offset + chunkSize < encoded.length)
-            ? offset + chunkSize
-            : encoded.length;
-    // ignore: avoid_print
-    print('SCREENSHOT_CHUNK $name ${encoded.substring(offset, end)}');
-  }
-  // ignore: avoid_print
-  print('SCREENSHOT_END $name');
-}
-
-Future<void> _tryCaptureScreenshot(
-  IntegrationTestWidgetsFlutterBinding binding,
-  String name,
-) async {
-  try {
-    await binding.convertFlutterSurfaceToImage().timeout(
-      const Duration(seconds: 20),
-    );
-    final screenshot = await binding
-        .takeScreenshot(name)
-        .timeout(const Duration(seconds: 30));
-    _emitScreenshot(name, screenshot);
-  } catch (error) {
-    // Screenshot capture is evidence-only; DOM probes below still validate runtime.
-    // ignore: avoid_print
-    print('LOTUS_SCREENSHOT_NOT_PROVEN $name ${error.runtimeType}');
-  }
-}
-
 Future<Map<String, dynamic>?> _probeViaShellBridge(
   WidgetTester tester,
   dynamic screenState, {
@@ -307,6 +271,153 @@ return {
   );
 }
 
+Future<Map<String, dynamic>> _measureLifeInteractionPerformance(
+  WidgetTester tester,
+  dynamic screenState,
+) async {
+  final requestId = DateTime.now().microsecondsSinceEpoch;
+  const probeType = 'debug_life_counter_interaction_performance_probe';
+  screenState.debugClearLastShellMessage();
+  await screenState.debugRunJavaScript('''
+(async () => {
+  try {
+    const readFirstLife = () => {
+      const players = JSON.parse(localStorage.getItem('players') ?? '[]');
+      return players[0]?.life ?? null;
+    };
+    const nextFrame = () => new Promise((resolve, reject) => {
+      const timeout = setTimeout(
+        () => reject(new Error('animation_frame_timeout')),
+        1000,
+      );
+      requestAnimationFrame((timestamp) => {
+        clearTimeout(timeout);
+        resolve(timestamp);
+      });
+    });
+    const waitForLife = async (expectedLife) => {
+      for (let attempt = 0; attempt < 40; attempt += 1) {
+        if (readFirstLife() === expectedLife) {
+          return performance.now();
+        }
+        await new Promise((resolve) => setTimeout(resolve, 1));
+      }
+      throw new Error('life_state_timeout_' + expectedLife);
+    };
+    const samples = [];
+    const runInteraction = async (selector, kind, expectedLife) => {
+      const target = document.querySelector(selector);
+      if (!target) {
+        throw new Error('missing_' + kind + '_control');
+      }
+      const rect = target.getBoundingClientRect();
+      const options = {
+        bubbles: true,
+        cancelable: true,
+        view: window,
+        clientX: rect.left + rect.width / 2,
+        clientY: rect.top + rect.height / 2,
+      };
+      const startedAt = performance.now();
+      for (const type of [
+        'pointerdown',
+        'mousedown',
+        'pointerup',
+        'mouseup',
+        'click',
+      ]) {
+        const event = type.startsWith('pointer') &&
+                typeof PointerEvent === 'function'
+            ? new PointerEvent(type, options)
+            : new MouseEvent(type, options);
+        target.dispatchEvent(event);
+      }
+      const stateUpdatedAt = await waitForLife(expectedLife);
+      const firstFrameAt = await nextFrame();
+      const secondFrameAt = await nextFrame();
+      samples.push({
+        kind,
+        inputToStateMs: stateUpdatedAt - startedAt,
+        inputToFirstFrameMs: firstFrameAt - startedAt,
+        inputToSecondFrameMs: secondFrameAt - startedAt,
+      });
+    };
+    const percentile = (values, fraction) => {
+      const ordered = [...values].sort((left, right) => left - right);
+      const index = Math.min(
+        ordered.length - 1,
+        Math.ceil((ordered.length - 1) * fraction),
+      );
+      return ordered[index];
+    };
+    const summarize = (key) => {
+      const values = samples.map((sample) => sample[key]);
+      return {
+        p50: percentile(values, 0.50),
+        p95: percentile(values, 0.95),
+        max: Math.max(...values),
+      };
+    };
+
+    const initialLife = readFirstLife();
+    for (let iteration = 0; iteration < 15; iteration += 1) {
+      await runInteraction(
+        '.player-card:first-of-type .increase-button.life',
+        'plus',
+        initialLife + 1,
+      );
+      await runInteraction(
+        '.player-card:first-of-type .decrease-button.life',
+        'minus',
+        initialLife,
+      );
+    }
+    FlutterManaLoomShellBridge.postMessage(JSON.stringify({
+      type: '$probeType',
+      request_id: $requestId,
+      payload: {
+        visibilityState: document.visibilityState,
+        sampleCount: samples.length,
+        initialLife,
+        finalLife: readFirstLife(),
+        inputToStateMs: summarize('inputToStateMs'),
+        inputToFirstFrameMs: summarize('inputToFirstFrameMs'),
+        inputToSecondFrameMs: summarize('inputToSecondFrameMs'),
+      },
+    }));
+  } catch (error) {
+    FlutterManaLoomShellBridge.postMessage(JSON.stringify({
+      type: '$probeType',
+      request_id: $requestId,
+      error: true,
+      message: String(error),
+    }));
+  }
+})()
+''');
+
+  for (var attempt = 0; attempt < 100; attempt += 1) {
+    await tester.pump(const Duration(milliseconds: 100));
+    final raw = screenState.debugGetLastShellMessage();
+    if (raw == null) {
+      continue;
+    }
+    final decoded = jsonDecode(raw);
+    if (decoded is Map &&
+        decoded['type'] == probeType &&
+        decoded['request_id'] == requestId) {
+      expect(
+        decoded['error'],
+        isNot(true),
+        reason: decoded['message'] as String?,
+      );
+      return Map<String, dynamic>.from(decoded['payload'] as Map);
+    }
+  }
+
+  fail('Life-counter interaction performance probe timed out.');
+}
+
 Future<Map<String, dynamic>> _probePersistedSession(
   WidgetTester tester,
   dynamic screenState,
@@ -353,10 +464,10 @@ return {
 }
 
 void main() {
-  final binding = IntegrationTestWidgetsFlutterBinding.ensureInitialized();
+  IntegrationTestWidgetsFlutterBinding.ensureInitialized();
 
   testWidgets(
-    'proves Lotus life counter visual runtime, controls, and persistence',
+    'validates Lotus runtime geometry, controls, and persistence',
     (tester) async {
       await _resetHarness();
       await _seedFourPlayerSession();
@@ -404,11 +515,6 @@ void main() {
         findsNothing,
       );
 
-      await _tryCaptureScreenshot(
-        binding,
-        'life_counter_lotus_runtime_initial',
-      );
-
       final afterPlus = await _clickLifeButtonAndProbe(
         tester,
         screenState,
@@ -433,6 +539,29 @@ void main() {
       // ignore: avoid_print
       print('LOTUS_RUNTIME_AFTER_MINUS ${jsonEncode(afterMinus)}');
 
+      final performance = await _measureLifeInteractionPerformance(
+        tester,
+        screenState,
+      );
+      // ignore: avoid_print
+      print('LOTUS_RUNTIME_PERFORMANCE ${jsonEncode(performance)}');
+      expect(performance['visibilityState'], 'visible');
+      expect(performance['sampleCount'], 30);
+      expect(performance['finalLife'], performance['initialLife']);
+      final stateTiming = Map<String, dynamic>.from(
+        performance['inputToStateMs'] as Map,
+      );
+      final firstFrameTiming = Map<String, dynamic>.from(
+        performance['inputToFirstFrameMs'] as Map,
+      );
+      final secondFrameTiming = Map<String, dynamic>.from(
+        performance['inputToSecondFrameMs'] as Map,
+      );
+      expect((stateTiming['p95'] as num).toDouble(), lessThan(80));
+      expect((firstFrameTiming['p95'] as num).toDouble(), lessThan(100));
+      expect((secondFrameTiming['p95'] as num).toDouble(), lessThan(150));
+      expect((secondFrameTiming['max'] as num).toDouble(), lessThan(250));
+
       await _clickLifeButtonAndProbe(
         tester,
         screenState,
@@ -443,11 +572,6 @@ void main() {
       final persistedSession = await LifeCounterSessionStore().load();
       expect(persistedSession, isNotNull);
       expect(persistedSession!.lives.first, 41);
-
-      await _tryCaptureScreenshot(
-        binding,
-        'life_counter_lotus_runtime_after_plus',
-      );
 
       await tester.pumpWidget(const SizedBox.shrink());
       await tester.pump(const Duration(seconds: 2));

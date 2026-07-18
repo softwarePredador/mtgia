@@ -80,11 +80,13 @@ class LotusLifeCounterScreen extends StatefulWidget {
     this.hostFactory,
     this.deckId,
     this.deckName,
+    this.managePresentationMode,
   });
 
   final LotusHostFactory? hostFactory;
   final String? deckId;
   final String? deckName;
+  final bool? managePresentationMode;
 
   @override
   State<LotusLifeCounterScreen> createState() => _LotusLifeCounterScreenState();
@@ -248,14 +250,20 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen>
   bool _isExitInProgress = false;
   String? _entryGameplayFingerprint;
   int _entryCurrentGameEventCount = 0;
+  late final bool _ownsPresentationMode;
+  late final Future<void> _presentationModeReady;
 
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
-    if (!kIsWeb) {
-      unawaited(LotusPresentationMode.enter());
-    }
+    _ownsPresentationMode =
+        !kIsWeb &&
+        (widget.managePresentationMode ?? widget.hostFactory == null);
+    _presentationModeReady =
+        _ownsPresentationMode
+            ? LotusPresentationMode.enter()
+            : Future<void>.value();
     _nativeLifecycleChannel.setMethodCallHandler(_handleNativeLifecycleSignal);
     _hostController = (widget.hostFactory ?? createDefaultLotusHost)(
       onAppReviewRequested: _handleAppReviewRequested,
@@ -285,11 +293,38 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen>
   }
 
   Future<void> _bindDeckContextAndLoadBundle() async {
+    await _presentationModeReady;
+    if (!mounted) return;
+    await _waitForLandscapeViewport();
+    if (!mounted) return;
     await _bindDeckContext();
     if (!mounted) return;
     await _captureEntryGameState();
     if (!mounted) return;
     await _loadBundleAndSyncOwnedShellState();
+  }
+
+  Future<void> _waitForLandscapeViewport() async {
+    if (!_ownsPresentationMode) return;
+
+    for (var attempt = 0; attempt < 30; attempt += 1) {
+      if (!mounted) return;
+      final size = View.of(context).physicalSize;
+      if (size.width >= size.height) return;
+      await Future<void>.delayed(const Duration(milliseconds: 50));
+      await WidgetsBinding.instance.endOfFrame;
+    }
+
+    unawaited(
+      AppObservability.instance.recordEvent(
+        'landscape_wait_timed_out',
+        category: 'life_counter.presentation',
+        data: {
+          'route': lifeCounterRoutePath,
+          'implementation': 'embedded_lotus',
+        },
+      ),
+    );
   }
 
   Future<void> _captureEntryGameState() async {
@@ -382,7 +417,7 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen>
       ),
     );
     _hostController.dispose();
-    if (!kIsWeb) {
+    if (_ownsPresentationMode) {
       unawaited(LotusPresentationMode.exit());
     }
     super.dispose();

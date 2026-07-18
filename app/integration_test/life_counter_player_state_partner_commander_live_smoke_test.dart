@@ -141,8 +141,8 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      expect(find.text('Player State'), findsOneWidget);
-      await tester.tap(find.text('Partner commander'));
+      expect(find.text('Estado do jogador'), findsOneWidget);
+      await tester.tap(find.text('Comandante parceiro'));
       await tester.pumpAndSettle();
 
       await tester.tap(

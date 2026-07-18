@@ -128,7 +128,7 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      expect(find.text('Dice Tools'), findsOneWidget);
+      expect(find.text('Ferramentas de dados'), findsOneWidget);
 
       await tester.tap(find.byKey(const Key('life-counter-native-dice-coin')));
       await tester.pumpAndSettle();

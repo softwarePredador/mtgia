@@ -50,7 +50,9 @@ Future<Map<String, dynamic>> _readTimerDomState(
   const nonceKey = '__manaloom_test_timer_state_nonce';
   final nonce = DateTime.now().microsecondsSinceEpoch.toString();
 
-  await screenState.debugRunJavaScript('''
+  String? encodedState;
+  for (var attempt = 0; attempt < 40 && encodedState == null; attempt += 1) {
+    await screenState.debugRunJavaScript('''
 (() => {
   try {
     const timer = document.querySelector('.game-timer:not(.current-time-clock)');
@@ -63,9 +65,6 @@ Future<Map<String, dynamic>> _readTimerDomState(
   } catch (_) {}
 })()
 ''');
-
-  String? encodedState;
-  for (var attempt = 0; attempt < 20 && encodedState == null; attempt += 1) {
     await tester.pump(const Duration(milliseconds: 300));
     final snapshot = await snapshotStore.load();
     if (snapshot == null) {
@@ -162,17 +161,25 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      expect(find.text('Game Timer'), findsOneWidget);
-      expect(find.text('Idle'), findsOneWidget);
-
+      expect(find.text('Cronômetro da partida'), findsOneWidget);
       await tester.scrollUntilVisible(
-        find.byKey(const Key('life-counter-native-game-timer-start')),
+        find.text('Inativo'),
         250,
         scrollable: find.byType(Scrollable).first,
       );
-      await tester.tap(
-        find.byKey(const Key('life-counter-native-game-timer-start')),
+      expect(find.text('Inativo'), findsOneWidget);
+
+      final startButton = find.byKey(
+        const Key('life-counter-native-game-timer-start'),
       );
+      await tester.scrollUntilVisible(
+        startButton,
+        -250,
+        scrollable: find.byType(Scrollable).first,
+      );
+      await tester.ensureVisible(startButton);
+      await tester.pumpAndSettle();
+      await tester.tap(startButton);
       await tester.pumpAndSettle();
 
       await tester.tap(

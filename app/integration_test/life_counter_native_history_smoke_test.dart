@@ -49,10 +49,16 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      expect(find.text('Life Counter History'), findsOneWidget);
+      expect(find.text('Histórico do contador de vida'), findsOneWidget);
       expect(find.text('Player 1 lost 3 life'), findsOneWidget);
       expect(find.text('Player 2 gained 2 life'), findsOneWidget);
-      expect(find.text('Player 3 was eliminated'), findsOneWidget);
+      final archivedEvent = find.text('Player 3 was eliminated');
+      await tester.scrollUntilVisible(
+        archivedEvent,
+        250,
+        scrollable: find.byType(Scrollable).first,
+      );
+      expect(archivedEvent, findsOneWidget);
     },
   );
 }

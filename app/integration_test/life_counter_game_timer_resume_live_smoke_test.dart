@@ -177,7 +177,7 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      expect(find.text('Game Timer'), findsOneWidget);
+      expect(find.text('Cronômetro da partida'), findsOneWidget);
 
       await tester.scrollUntilVisible(
         find.byKey(const Key('life-counter-native-game-timer-resume')),

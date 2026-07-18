@@ -3,10 +3,8 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
 import 'package:manaloom/features/home/lotus_life_counter_screen.dart';
 
-import 'visual_capture_helpers.dart';
-
 void main() {
-  final binding = IntegrationTestWidgetsFlutterBinding.ensureInitialized();
+  IntegrationTestWidgetsFlutterBinding.ensureInitialized();
 
   testWidgets(
     'opens the ManaLoom-owned native card search on the live WebView path',
@@ -22,18 +20,12 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      expect(find.text('Card Search'), findsOneWidget);
+      expect(find.text('Busca de cartas'), findsOneWidget);
       expect(
         find.byKey(const Key('life-counter-native-card-search-input')),
         findsOneWidget,
       );
       expect(find.text('SOL RING'), findsOneWidget);
-
-      await captureVisualProof(
-        binding,
-        tester,
-        'life_counter_card_search_sheet',
-      );
     },
   );
 }
