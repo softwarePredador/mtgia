@@ -32,7 +32,6 @@ class _LifeCounterNativeSettingsSheetState
     extends State<_LifeCounterNativeSettingsSheet> {
   late LifeCounterSettings _settings;
   late final TextEditingController _customLongTapController;
-  late final TextEditingController _whitelabelIconController;
 
   @override
   void initState() {
@@ -41,15 +40,11 @@ class _LifeCounterNativeSettingsSheetState
     _customLongTapController = TextEditingController(
       text: _settings.customLongTapValue.toString(),
     );
-    _whitelabelIconController = TextEditingController(
-      text: _settings.whitelabelIcon ?? '',
-    );
   }
 
   @override
   void dispose() {
     _customLongTapController.dispose();
-    _whitelabelIconController.dispose();
     super.dispose();
   }
 
@@ -132,10 +127,8 @@ class _LifeCounterNativeSettingsSheetState
                       return _SettingsSection(
                         section: section,
                         customLongTapController: _customLongTapController,
-                        whitelabelIconController: _whitelabelIconController,
                         onToggleChanged: _handleToggleChanged,
                         onNumberChanged: _handleNumberChanged,
-                        onTextChanged: _handleTextChanged,
                       );
                     },
                   ),
@@ -228,7 +221,6 @@ class _LifeCounterNativeSettingsSheetState
         case LifeCounterSettingFieldId.customLongTapEnabled:
           _settings = _settings.copyWith(customLongTapEnabled: value);
         case LifeCounterSettingFieldId.customLongTapValue:
-        case LifeCounterSettingFieldId.whitelabelIcon:
           break;
       }
     });
@@ -251,38 +243,21 @@ class _LifeCounterNativeSettingsSheetState
       }
     });
   }
-
-  void _handleTextChanged(LifeCounterSettingFieldId id, String value) {
-    setState(() {
-      switch (id) {
-        case LifeCounterSettingFieldId.whitelabelIcon:
-          _settings = _settings.copyWith(
-            whitelabelIcon: value.trim().isEmpty ? null : value.trim(),
-          );
-        default:
-          break;
-      }
-    });
-  }
 }
 
 class _SettingsSection extends StatelessWidget {
   const _SettingsSection({
     required this.section,
     required this.customLongTapController,
-    required this.whitelabelIconController,
     required this.onToggleChanged,
     required this.onNumberChanged,
-    required this.onTextChanged,
   });
 
   final LifeCounterSettingsSection section;
   final TextEditingController customLongTapController;
-  final TextEditingController whitelabelIconController;
   final void Function(LifeCounterSettingFieldId id, bool value) onToggleChanged;
   final void Function(LifeCounterSettingFieldId id, String value)
   onNumberChanged;
-  final void Function(LifeCounterSettingFieldId id, String value) onTextChanged;
 
   @override
   Widget build(BuildContext context) {
@@ -311,10 +286,8 @@ class _SettingsSection extends StatelessWidget {
               _SettingEntryTile(
                 entry: entry,
                 customLongTapController: customLongTapController,
-                whitelabelIconController: whitelabelIconController,
                 onToggleChanged: onToggleChanged,
                 onNumberChanged: onNumberChanged,
-                onTextChanged: onTextChanged,
               ),
           ],
         ),
@@ -327,19 +300,15 @@ class _SettingEntryTile extends StatelessWidget {
   const _SettingEntryTile({
     required this.entry,
     required this.customLongTapController,
-    required this.whitelabelIconController,
     required this.onToggleChanged,
     required this.onNumberChanged,
-    required this.onTextChanged,
   });
 
   final LifeCounterSettingEntry entry;
   final TextEditingController customLongTapController;
-  final TextEditingController whitelabelIconController;
   final void Function(LifeCounterSettingFieldId id, bool value) onToggleChanged;
   final void Function(LifeCounterSettingFieldId id, String value)
   onNumberChanged;
-  final void Function(LifeCounterSettingFieldId id, String value) onTextChanged;
 
   @override
   Widget build(BuildContext context) {
@@ -350,22 +319,25 @@ class _SettingEntryTile extends StatelessWidget {
           contentPadding: EdgeInsets.zero,
           title: Text(
             entry.label,
-            style: const TextStyle(
-              color: AppTheme.textPrimary,
+            style: TextStyle(
+              color: entry.enabled ? AppTheme.textPrimary : AppTheme.textHint,
               fontSize: AppTheme.fontMd,
               fontWeight: FontWeight.w600,
             ),
           ),
           subtitle: Text(
             entry.description,
-            style: const TextStyle(
-              color: AppTheme.textSecondary,
+            style: TextStyle(
+              color: entry.enabled ? AppTheme.textSecondary : AppTheme.textHint,
               fontSize: AppTheme.fontSm,
               height: AppTheme.lineHeightDense,
             ),
           ),
           value: entry.toggleValue ?? false,
-          onChanged: (value) => onToggleChanged(entry.id, value),
+          onChanged:
+              entry.enabled
+                  ? (value) => onToggleChanged(entry.id, value)
+                  : null,
         );
       case LifeCounterSettingValueKind.number:
         return Padding(
@@ -373,6 +345,7 @@ class _SettingEntryTile extends StatelessWidget {
           child: TextField(
             key: Key('life-counter-setting-${entry.id.name}'),
             controller: customLongTapController,
+            enabled: entry.enabled,
             keyboardType: TextInputType.number,
             style: const TextStyle(color: AppTheme.textPrimary),
             decoration: InputDecoration(
@@ -380,20 +353,6 @@ class _SettingEntryTile extends StatelessWidget {
               helperText: entry.description,
             ),
             onChanged: (value) => onNumberChanged(entry.id, value),
-          ),
-        );
-      case LifeCounterSettingValueKind.text:
-        return Padding(
-          padding: const EdgeInsets.only(bottom: 12),
-          child: TextField(
-            key: Key('life-counter-setting-${entry.id.name}'),
-            controller: whitelabelIconController,
-            style: const TextStyle(color: AppTheme.textPrimary),
-            decoration: InputDecoration(
-              labelText: entry.label,
-              helperText: entry.description,
-            ),
-            onChanged: (value) => onTextChanged(entry.id, value),
           ),
         );
     }

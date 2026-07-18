@@ -323,7 +323,7 @@ class _CardSearchSuggestionChip extends StatelessWidget {
                   color: AppTheme.textPrimary,
                   fontSize: AppTheme.fontXs,
                   fontWeight: FontWeight.w800,
-                  letterSpacing: 0.8,
+                  letterSpacing: 0,
                 ),
               ),
             ),

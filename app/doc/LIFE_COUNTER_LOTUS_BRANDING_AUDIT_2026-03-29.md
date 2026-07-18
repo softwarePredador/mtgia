@@ -1,5 +1,10 @@
 # Life Counter Lotus Branding Audit - 2026-03-29
 
+> Runtime update (2026-07-17): the static shell findings involving
+> `index.html`, `js/platform.js`, Cordova source files, and the Insomnia plugin
+> have been resolved. `js/platform.js` and the dead Cordova assets are no longer
+> packaged; this document remains the historical discovery record.
+
 ## Objective
 
 Identify everything in the embedded Lotus counter that still belongs to Lotus as a product, brand, promo surface, or external ecosystem.

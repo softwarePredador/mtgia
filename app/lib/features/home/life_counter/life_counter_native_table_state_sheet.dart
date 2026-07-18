@@ -203,7 +203,7 @@ class _LifeCounterNativeTableStateSheetState
                                         fontSize:
                                             AppTheme.fontLifeCounterStormValue,
                                         fontWeight: FontWeight.w900,
-                                        letterSpacing: -2,
+                                        letterSpacing: 0,
                                       ),
                                     ),
                                   ],

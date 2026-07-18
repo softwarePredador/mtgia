@@ -27,13 +27,16 @@ This plan assumes:
 
 ### Validated state
 
-- `143/144` files from the original Lotus `base.apk` match byte-for-byte
-- the only intentional delta is `index.html`, where `cordova.js` is replaced by `flutter_bootstrap.js`
+- the gameplay runtime remains the preserved `js/app.min.js` bundle
+- `index.html` boots it exclusively through `flutter_bootstrap.js`
+- dead Cordova source, plugin-list, platform helper, and Insomnia files were
+  removed from the packaged assets on `2026-07-17`
 - bridges validated in runtime:
   - `cordova`
   - `AppReview`
   - `clipboard`
-  - `insomnia`
+- presentation mode, orientation, system UI, and the screen wake lock are owned
+  by Flutter in `LotusPresentationMode`
 - stable board screenshots are effectively equivalent to the original Lotus render
 
 ## Architecture target

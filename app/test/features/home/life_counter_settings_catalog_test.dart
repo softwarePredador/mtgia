@@ -121,5 +121,60 @@ void main() {
         30,
       );
     });
+
+    test('disables child controls while their parent feature is off', () {
+      final settings = LifeCounterSettings.defaults.copyWith(
+        showCountersOnPlayerCard: false,
+        showCommanderDamageCounters: true,
+        gameTimer: false,
+        saltyDefeatMessages: false,
+        customLongTapEnabled: false,
+      );
+
+      final entries = buildLifeCounterSettingsCatalog(
+        settings,
+      ).expand((section) => section.entries);
+      LifeCounterSettingEntry entry(LifeCounterSettingFieldId id) =>
+          entries.firstWhere((candidate) => candidate.id == id);
+
+      expect(
+        entry(LifeCounterSettingFieldId.showRegularCounters).enabled,
+        false,
+      );
+      expect(
+        entry(LifeCounterSettingFieldId.showCommanderDamageCounters).enabled,
+        false,
+      );
+      expect(
+        entry(
+          LifeCounterSettingFieldId.clickableCommanderDamageCounters,
+        ).enabled,
+        false,
+      );
+      expect(
+        entry(LifeCounterSettingFieldId.keepZeroCountersOnPlayerCard).enabled,
+        false,
+      );
+      expect(
+        entry(LifeCounterSettingFieldId.gameTimerMainScreen).enabled,
+        false,
+      );
+      expect(
+        entry(LifeCounterSettingFieldId.cycleSaltyDefeatMessages).enabled,
+        false,
+      );
+      expect(
+        entry(LifeCounterSettingFieldId.customLongTapValue).enabled,
+        false,
+      );
+    });
+
+    test('does not expose the legacy white-label icon setting', () {
+      final labels = buildLifeCounterSettingsCatalog(
+        LifeCounterSettings.defaults.copyWith(whitelabelIcon: 'legacy-icon'),
+      ).expand((section) => section.entries).map((entry) => entry.label);
+
+      expect(labels, isNot(contains('Ícone personalizado')));
+    });
   });
 }

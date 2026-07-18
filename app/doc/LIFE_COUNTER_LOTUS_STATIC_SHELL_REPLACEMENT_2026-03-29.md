@@ -1,5 +1,10 @@
 # Life Counter Lotus Static Shell Replacement - 2026-03-29
 
+> Runtime update (2026-07-17): `platform.js`, `cordova.js`, the Cordova
+> source bundle, and the no-op Insomnia bridge were removed after browser and
+> Android validation proved they were not loaded by the ManaLoom shell. Screen
+> wake behavior is now owned by Flutter through `LotusPresentationMode`.
+
 ## Objective
 
 Replace the last remaining static Lotus-owned landing shell with a ManaLoom-owned fallback shell, without altering the embedded gameplay runtime.
@@ -7,7 +12,7 @@ Replace the last remaining static Lotus-owned landing shell with a ManaLoom-owne
 This targets only:
 
 - `index.html`
-- `platform.js`
+- `flutter_bootstrap.js`
 - document title ownership
 
 It does not touch:
@@ -31,16 +36,16 @@ Behavior:
 - Lotus product name, store links, promo sections, Patreon, feedback, screenshots, and web-install copy were removed
 - the page still loads the same CSS and gameplay runtime scripts
 
-### 2. `platform.js` no longer rewrites to the Lotus Play Store listing
+### 2. The obsolete platform helper is no longer packaged
 
-Files:
+Removed file:
 
 - `app/assets/lotus/js/platform.js`
 
 Behavior:
 
-- the old forced redirect target is gone
-- if a legacy `app-store-link` node exists, it is neutralized rather than rewritten
+- the old forced redirect target cannot be loaded
+- the ManaLoom shell does not expose a legacy `app-store-link` node
 
 ### 3. document title ownership
 

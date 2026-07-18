@@ -6,8 +6,9 @@ void main() {
   late String bootstrapSource;
 
   setUpAll(() {
-    bootstrapSource =
-        File('assets/lotus/flutter_bootstrap.js').readAsStringSync();
+    bootstrapSource = File(
+      'assets/lotus/flutter_bootstrap.js',
+    ).readAsStringSync();
   });
 
   test('does not release app boot from the 500ms retry timer', () {
@@ -94,6 +95,30 @@ void main() {
     expect(
       deviceReadyFunction,
       contains('setTimeout(removeInactiveGameTimerState, 0)'),
+    );
+  });
+
+  test('does not package the obsolete Cordova wake-lock runtime', () {
+    for (final path in const [
+      'assets/lotus/cordova.js',
+      'assets/lotus/cordova_plugins.js',
+      'assets/lotus/cordova-js-src',
+      'assets/lotus/plugins/cordova-plugin-insomnia',
+      'assets/lotus/js/platform.js',
+      'assets/lotus/css/platform.css',
+    ]) {
+      expect(
+        FileSystemEntity.typeSync(path),
+        FileSystemEntityType.notFound,
+        reason: '$path must not return to the packaged Life Counter runtime',
+      );
+    }
+
+    expect(bootstrapSource, isNot(contains('window.plugins')));
+    expect(bootstrapSource, isNot(contains('plugins.insomnia')));
+    expect(
+      File('pubspec.yaml').readAsStringSync(),
+      isNot(contains('cordova-js-src')),
     );
   });
 

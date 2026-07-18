@@ -262,7 +262,7 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen>
         (widget.managePresentationMode ?? widget.hostFactory == null);
     _presentationModeReady =
         _ownsPresentationMode
-            ? LotusPresentationMode.enter()
+            ? LotusPresentationMode.instance.enter()
             : Future<void>.value();
     _nativeLifecycleChannel.setMethodCallHandler(_handleNativeLifecycleSignal);
     _hostController = (widget.hostFactory ?? createDefaultLotusHost)(
@@ -418,7 +418,7 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen>
     );
     _hostController.dispose();
     if (_ownsPresentationMode) {
-      unawaited(LotusPresentationMode.exit());
+      unawaited(LotusPresentationMode.instance.exit());
     }
     super.dispose();
   }
@@ -440,6 +440,9 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen>
     );
 
     if (state == AppLifecycleState.resumed) {
+      if (_ownsPresentationMode) {
+        unawaited(LotusPresentationMode.instance.refresh());
+      }
       unawaited(_dumpRecentLifecycleDiagnostics());
     }
   }

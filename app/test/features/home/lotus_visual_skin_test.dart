@@ -363,6 +363,18 @@ void main() {
       );
     });
 
+    test('uses neutral letter spacing throughout the injected skin', () {
+      final declarations = RegExp(
+        r'letter-spacing:\s*([^;]+);',
+      ).allMatches(lotusInjectedVisualSkinScript);
+
+      expect(declarations, isNotEmpty);
+      expect(
+        declarations.map((match) => match.group(1)!.trim()).toSet(),
+        everyElement(matches(RegExp(r'^0(?:\s+!important)?$'))),
+      );
+    });
+
     test('exposes an accessible exit only with the table menu', () {
       expect(
         lotusInjectedVisualSkinScript,

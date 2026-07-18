@@ -186,7 +186,7 @@ class _LifeCounterNativeSetLifeSheetState
                             ),
                             fontSize: AppTheme.fontSm,
                             fontWeight: FontWeight.w900,
-                            letterSpacing: 1.6,
+                            letterSpacing: 0,
                           ),
                         ),
                       ),
@@ -235,7 +235,7 @@ class _LifeCounterNativeSetLifeSheetState
                                     fontSize:
                                         AppTheme.fontLifeCounterInputValue,
                                     fontWeight: FontWeight.w900,
-                                    letterSpacing: -2,
+                                    letterSpacing: 0,
                                     height: 1,
                                   ),
                                 ),
@@ -512,7 +512,7 @@ class _SetLifeKeypadButton extends StatelessWidget {
                 style: TextStyle(
                   fontSize: label == 'DEL' ? AppTheme.fontXs : AppTheme.fontXxl,
                   fontWeight: FontWeight.w900,
-                  letterSpacing: label == 'DEL' ? 0.2 : 0,
+                  letterSpacing: 0,
                 ),
               ),
             ),

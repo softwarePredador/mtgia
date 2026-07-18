@@ -59,7 +59,7 @@ body {
   background:
     radial-gradient(circle at top, rgba(92, 124, 189, 0.08), transparent 38%),
     linear-gradient(180deg, rgba(7, 12, 23, 0.95), rgba(2, 6, 16, 0.99));
-  letter-spacing: 0.01em;
+  letter-spacing: 0;
 }
 
 ${LotusDomSelectors.playerCard} {
@@ -199,7 +199,7 @@ ${LotusDomSelectors.playerCard} .player-name,
 ${LotusDomSelectors.playerCard} .player-name-input {
   font-family: var(--manaloom-display-font) !important;
   font-weight: 650;
-  letter-spacing: 0.015em;
+  letter-spacing: 0;
   text-shadow: 0 2px 18px rgba(3, 8, 21, 0.35);
 }
 
@@ -497,7 +497,7 @@ ${LotusDomSelectors.menuButton} .menu-button-stroke:before {
   font-size: 23px !important;
   line-height: 1 !important;
   font-weight: 800 !important;
-  letter-spacing: -0.02em !important;
+  letter-spacing: 0 !important;
   color: rgba(255, 255, 255, 0.96) !important;
   opacity: 1 !important;
   transform: translateY(-1px) !important;
@@ -572,7 +572,7 @@ ${LotusDomSelectors.optionCard} h1,
 ${LotusDomSelectors.optionCard} h2,
 ${LotusDomSelectors.optionCard} h3 {
   font-family: var(--manaloom-display-font) !important;
-  letter-spacing: 0.01em;
+  letter-spacing: 0;
 }
 
 .menu-button-overlay .game-states-wrapper {
@@ -608,7 +608,7 @@ ${LotusDomSelectors.optionCard} h3 {
   font-size: 10.5px !important;
   line-height: 1.12 !important;
   font-weight: 700 !important;
-  letter-spacing: 0.02em !important;
+  letter-spacing: 0 !important;
   text-transform: uppercase !important;
   text-align: center !important;
   white-space: normal !important;
@@ -696,7 +696,7 @@ ${LotusDomSelectors.optionCard} h3 {
   font-size: 30px !important;
   line-height: 1 !important;
   font-weight: 700 !important;
-  letter-spacing: -0.02em !important;
+  letter-spacing: 0 !important;
   color: rgb(247, 241, 226) !important;
   text-align: left !important;
 }
@@ -723,7 +723,7 @@ ${LotusDomSelectors.optionCard} h3 {
 .card-search-overlay .results-wrapper .card-name {
   font-family: var(--manaloom-display-font) !important;
   color: rgb(247, 241, 226) !important;
-  letter-spacing: -0.01em !important;
+  letter-spacing: 0 !important;
 }
 
 .settings-overlay .settings-headline {
@@ -799,7 +799,7 @@ ${LotusDomSelectors.optionCard} h3 {
   font-size: 20px !important;
   line-height: 1.05 !important;
   font-weight: 700 !important;
-  letter-spacing: -0.01em !important;
+  letter-spacing: 0 !important;
   text-align: left !important;
   color: rgb(247, 241, 226) !important;
 }
@@ -1242,7 +1242,7 @@ ${LotusDomSelectors.optionCard} h3 {
   font-size: clamp(14px, 4.8vw, 21px) !important;
   font-weight: 700 !important;
   line-height: 0.98 !important;
-  letter-spacing: -0.01em !important;
+  letter-spacing: 0 !important;
   text-align: center !important;
   text-wrap: balance !important;
 }
@@ -1265,7 +1265,7 @@ ${LotusDomSelectors.optionCard} h3 {
   font-family: var(--manaloom-ui-font) !important;
   font-size: 16px !important;
   font-weight: 800 !important;
-  letter-spacing: 0.01em !important;
+  letter-spacing: 0 !important;
   color: #170f04 !important;
   box-shadow:
     0 14px 24px rgba(216, 154, 47, 0.22),
@@ -1336,7 +1336,7 @@ ${LotusDomSelectors.optionCard} h3 {
   white-space: normal !important;
   font-size: clamp(13px, 4vw, 19px) !important;
   line-height: 1.08;
-  letter-spacing: -0.01em;
+  letter-spacing: 0;
   text-wrap: balance;
   overflow-wrap: anywhere;
   word-break: break-word;
@@ -1368,7 +1368,7 @@ ${LotusDomSelectors.optionCard} h3 {
   font-family: var(--manaloom-ui-font) !important;
   font-size: clamp(14px, 4vw, 18px) !important;
   font-weight: 800;
-  letter-spacing: 0.01em;
+  letter-spacing: 0;
   white-space: normal;
 }
 
@@ -1410,7 +1410,7 @@ ${LotusDomSelectors.optionCard} h3 {
   font-size: 12px !important;
   font-weight: 900 !important;
   line-height: 1 !important;
-  letter-spacing: 0.08em !important;
+  letter-spacing: 0 !important;
   text-transform: uppercase !important;
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08) !important;
 }
@@ -1423,7 +1423,7 @@ ${LotusDomSelectors.optionCard} h3 {
   font-size: clamp(13px, 4vw, 18px) !important;
   font-weight: 700 !important;
   line-height: 1.08 !important;
-  letter-spacing: -0.01em !important;
+  letter-spacing: 0 !important;
   text-align: center !important;
   color: var(--manaloom-shell-text) !important;
   text-wrap: balance !important;
@@ -1625,7 +1625,7 @@ ${LotusDomSelectors.turnTracker} {
   backdrop-filter: var(--manaloom-shell-backdrop);
   color: var(--manaloom-shell-text);
   font-weight: 700;
-  letter-spacing: 0.02em;
+  letter-spacing: 0;
 }
 
 ${LotusDomSelectors.mainGameTimer}:after,
@@ -1644,7 +1644,7 @@ ${LotusDomSelectors.turnTracker} .minutes-seconds:before {
   border-radius: 18px 18px 0 0;
   border: 1px solid rgba(255, 255, 255, 0.12);
   box-shadow: var(--manaloom-shell-shadow);
-  letter-spacing: 0.015em;
+  letter-spacing: 0;
 }
 
 .toast.error {

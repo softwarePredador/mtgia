@@ -23,7 +23,6 @@
     platformId: platformId,
     plugins: {},
   };
-  window.plugins = window.plugins || {};
   window.cordova.plugins = window.cordova.plugins || {};
   window.cordova.plugins.AppReview =
     window.cordova.plugins.AppReview || {
@@ -36,10 +35,6 @@
         }
       },
     };
-  window.plugins.insomnia = window.plugins.insomnia || {
-    keepAwake: function () {},
-    allowSleepAgain: function () {},
-  };
   window.device = window.device || {
     platform: isAndroid ? 'Android' : 'iOS',
   };

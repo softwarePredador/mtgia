@@ -49,6 +49,10 @@ Estado vivo do contador hoje:
 - decisao arquitetural fechada: o `WebView` nao sera removido como meta ativa enquanto a prioridade for manter ou superar a qualidade visual do Lotus
 - customizacao futura deve priorizar edicao do proprio Lotus no `WebView` (`css`, `js`, assets e injecao controlada pelo host), nao reimplementacao do board em Flutter puro
 - runtime source-of-truth: `app/assets/lotus/`
+- o shell empacota apenas o bootstrap Flutter e os assets usados pelo runtime;
+  fontes Cordova antigas, `platform.js` e o bridge Insomnia no-op foram removidos
+- orientacao, system UI e tela sempre ativa pertencem a
+  `app/lib/features/home/lotus/lotus_presentation_mode.dart`
 - implementacao oficial: `app/lib/features/home/lotus_life_counter_screen.dart`
 - rota viva: `app/lib/features/home/life_counter_route.dart`
 - contrato proprio de sessao/persistencia: `app/lib/features/home/life_counter/`

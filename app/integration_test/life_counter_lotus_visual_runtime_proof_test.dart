@@ -14,6 +14,7 @@ import 'package:manaloom/features/home/life_counter/life_counter_settings_store.
 import 'package:manaloom/features/home/lotus/lotus_storage_snapshot_store.dart';
 import 'package:manaloom/features/home/lotus/lotus_ui_snapshot_store.dart';
 import 'package:manaloom/features/home/lotus_life_counter_screen.dart';
+import 'package:wakelock_plus/wakelock_plus.dart';
 
 Future<void> _resetHarness() async {
   await LotusStorageSnapshotStore().clear();
@@ -139,6 +140,11 @@ const firstLifeNode = playerCards[0]?.querySelector('.player-life-count');
 const firstLifeFont = firstLifeNode?.querySelector('.font') ?? firstLifeNode;
 const lifeStyle = firstLifeFont ? window.getComputedStyle(firstLifeFont) : null;
 const lifeRect = firstLifeFont ? firstLifeFont.getBoundingClientRect() : null;
+const lifeNodes = Array.from(document.querySelectorAll('.player-life-count'));
+const primaryControls = Array.from(document.querySelectorAll(
+  '.increase-button.life, .decrease-button.life, .menu-button'
+));
+const controlRects = primaryControls.map((node) => node.getBoundingClientRect());
 return {
   readyState: document.readyState,
   title: document.title,
@@ -160,6 +166,29 @@ return {
   lifeContentFits: lifeDigitsFit(firstLifeNode),
   horizontalOverflow:
     document.documentElement.scrollWidth > document.documentElement.clientWidth + 2,
+  documentLanguage: document.documentElement.lang,
+  playerGroupsAccessible: playerCards.every((card) =>
+    card.getAttribute('role') === 'group' &&
+    (card.getAttribute('aria-label') ?? '').startsWith('Controles de ')
+  ),
+  lifeTotalsAccessible: lifeNodes.every((node) =>
+    node.getAttribute('role') === 'spinbutton' &&
+    node.getAttribute('tabindex') === '0' &&
+    node.hasAttribute('aria-valuenow') &&
+    (node.getAttribute('aria-label') ?? '').includes('vida:')
+  ),
+  primaryControlsAccessible: primaryControls.every((node) =>
+    node.getAttribute('role') === 'button' &&
+    node.getAttribute('tabindex') === '0' &&
+    (node.getAttribute('aria-label') ?? '').trim().length > 0
+  ),
+  primaryControlsMeetTouchTarget: controlRects.every((rect) =>
+    rect.width >= 44 && rect.height >= 44
+  ),
+  smallestPrimaryControlWidth:
+    controlRects.length === 0 ? 0 : Math.min(...controlRects.map((rect) => rect.width)),
+  smallestPrimaryControlHeight:
+    controlRects.length === 0 ? 0 : Math.min(...controlRects.map((rect) => rect.height)),
   webViewErrorText: document.body.innerText.includes('Life counter unavailable'),
 };
 ''',
@@ -508,6 +537,19 @@ void main() {
       expect(readyPayload['lifeTextShadow'], isNot('none'));
       expect(readyPayload['lifeContentFits'], isTrue);
       expect(readyPayload['horizontalOverflow'], isFalse);
+      expect(readyPayload['documentLanguage'], 'pt-BR');
+      expect(readyPayload['playerGroupsAccessible'], isTrue);
+      expect(readyPayload['lifeTotalsAccessible'], isTrue);
+      expect(readyPayload['primaryControlsAccessible'], isTrue);
+      expect(
+        readyPayload['primaryControlsMeetTouchTarget'],
+        isTrue,
+        reason:
+            'smallest control: '
+            '${readyPayload['smallestPrimaryControlWidth']} x '
+            '${readyPayload['smallestPrimaryControlHeight']}',
+      );
+      expect(await WakelockPlus.enabled, isTrue);
       expect(
         find.text(
           'External shortcut disabled while ManaLoom owns the life counter shell.',
@@ -603,6 +645,11 @@ void main() {
       expect(reopenedPayload['playerCardCount'], 4);
       expect(reopenedPayload['firstStoredLife'], 41);
       expect(reopenedPayload['visibleLifeText'], '41');
+      expect(await WakelockPlus.enabled, isTrue);
+
+      await tester.pumpWidget(const SizedBox.shrink());
+      await tester.pump(const Duration(seconds: 2));
+      expect(await WakelockPlus.enabled, isFalse);
     },
     timeout: const Timeout(Duration(minutes: 5)),
   );

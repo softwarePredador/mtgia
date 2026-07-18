@@ -31,10 +31,9 @@ enum LifeCounterSettingFieldId {
   criticalDamageWarning,
   customLongTapEnabled,
   customLongTapValue,
-  whitelabelIcon,
 }
 
-enum LifeCounterSettingValueKind { toggle, number, text }
+enum LifeCounterSettingValueKind { toggle, number }
 
 @immutable
 class LifeCounterSettingEntry {
@@ -44,9 +43,9 @@ class LifeCounterSettingEntry {
     required this.label,
     required this.description,
     required this.kind,
+    this.enabled = true,
     this.toggleValue,
     this.numberValue,
-    this.textValue,
   });
 
   const LifeCounterSettingEntry.toggle({
@@ -55,12 +54,14 @@ class LifeCounterSettingEntry {
     required String label,
     required String description,
     required bool value,
+    bool enabled = true,
   }) : this._(
          id: id,
          sectionId: sectionId,
          label: label,
          description: description,
          kind: LifeCounterSettingValueKind.toggle,
+         enabled: enabled,
          toggleValue: value,
        );
 
@@ -70,28 +71,15 @@ class LifeCounterSettingEntry {
     required String label,
     required String description,
     required int value,
+    bool enabled = true,
   }) : this._(
          id: id,
          sectionId: sectionId,
          label: label,
          description: description,
          kind: LifeCounterSettingValueKind.number,
+         enabled: enabled,
          numberValue: value,
-       );
-
-  const LifeCounterSettingEntry.text({
-    required LifeCounterSettingFieldId id,
-    required LifeCounterSettingsSectionId sectionId,
-    required String label,
-    required String description,
-    required String? value,
-  }) : this._(
-         id: id,
-         sectionId: sectionId,
-         label: label,
-         description: description,
-         kind: LifeCounterSettingValueKind.text,
-         textValue: value,
        );
 
   final LifeCounterSettingFieldId id;
@@ -99,9 +87,9 @@ class LifeCounterSettingEntry {
   final String label;
   final String description;
   final LifeCounterSettingValueKind kind;
+  final bool enabled;
   final bool? toggleValue;
   final int? numberValue;
-  final String? textValue;
 }
 
 @immutable
@@ -185,6 +173,7 @@ List<LifeCounterSettingsSection> buildLifeCounterSettingsCatalog(
           description:
               'Mostre marcadores de veneno, energia, experiência e semelhantes.',
           value: settings.showRegularCounters,
+          enabled: settings.showCountersOnPlayerCard,
         ),
         LifeCounterSettingEntry.toggle(
           id: LifeCounterSettingFieldId.showCommanderDamageCounters,
@@ -192,6 +181,7 @@ List<LifeCounterSettingsSection> buildLifeCounterSettingsCatalog(
           label: 'Marcadores de dano de comandante',
           description: 'Exiba o dano de comandante nos painéis dos jogadores.',
           value: settings.showCommanderDamageCounters,
+          enabled: settings.showCountersOnPlayerCard,
         ),
         LifeCounterSettingEntry.toggle(
           id: LifeCounterSettingFieldId.clickableCommanderDamageCounters,
@@ -200,6 +190,9 @@ List<LifeCounterSettingsSection> buildLifeCounterSettingsCatalog(
           description:
               'Permita ajustar o dano de comandante diretamente pelos marcadores.',
           value: settings.clickableCommanderDamageCounters,
+          enabled:
+              settings.showCountersOnPlayerCard &&
+              settings.showCommanderDamageCounters,
         ),
         LifeCounterSettingEntry.toggle(
           id: LifeCounterSettingFieldId.keepZeroCountersOnPlayerCard,
@@ -208,6 +201,8 @@ List<LifeCounterSettingsSection> buildLifeCounterSettingsCatalog(
           description:
               'Mantenha os marcadores no painel mesmo quando o valor for zero.',
           value: settings.keepZeroCountersOnPlayerCard,
+          enabled:
+              settings.showCountersOnPlayerCard && settings.showRegularCounters,
         ),
       ],
     ),
@@ -228,6 +223,7 @@ List<LifeCounterSettingsSection> buildLifeCounterSettingsCatalog(
           label: 'Cronômetro na tela principal',
           description: 'Mostre o cronômetro da partida diretamente na mesa.',
           value: settings.gameTimerMainScreen,
+          enabled: settings.gameTimer,
         ),
         LifeCounterSettingEntry.toggle(
           id: LifeCounterSettingFieldId.showClockOnMainScreen,
@@ -264,14 +260,6 @@ List<LifeCounterSettingsSection> buildLifeCounterSettingsCatalog(
           description: 'Reduza elementos e efeitos visuais extras na mesa.',
           value: settings.cleanLook,
         ),
-        LifeCounterSettingEntry.text(
-          id: LifeCounterSettingFieldId.whitelabelIcon,
-          sectionId: LifeCounterSettingsSectionId.visuals,
-          label: 'Ícone personalizado',
-          description:
-              'Identificador opcional para personalizar o ícone do menu.',
-          value: settings.whitelabelIcon,
-        ),
       ],
     ),
     LifeCounterSettingsSection(
@@ -293,6 +281,7 @@ List<LifeCounterSettingsSection> buildLifeCounterSettingsCatalog(
           description:
               'Alterne as mensagens de derrota em vez de repetir sempre a mesma.',
           value: settings.cycleSaltyDefeatMessages,
+          enabled: settings.saltyDefeatMessages,
         ),
         LifeCounterSettingEntry.toggle(
           id: LifeCounterSettingFieldId.customLongTapEnabled,
@@ -309,6 +298,7 @@ List<LifeCounterSettingsSection> buildLifeCounterSettingsCatalog(
           description:
               'Valor usado quando o toque longo personalizado estiver ativo.',
           value: settings.customLongTapValue,
+          enabled: settings.customLongTapEnabled,
         ),
       ],
     ),

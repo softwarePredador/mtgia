@@ -1489,11 +1489,6 @@ class LotusHostController
             window.cordova.plugins.AppReview &&
             window.cordova.plugins.AppReview.requestReview
           ),
-          insomnia: !!(
-            window.plugins &&
-            window.plugins.insomnia &&
-            window.plugins.insomnia.keepAwake
-          ),
           clipboard: !!(
             navigator.clipboard &&
             navigator.clipboard.writeText
